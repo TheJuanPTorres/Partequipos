@@ -7,3 +7,7 @@ next-env.d.ts
 package-lock.json
 public
 *.min.js
+
+# Archivos generados por Payload (se reescriben con `generate:types`/`generate:importmap`)
+src/payload-types.ts
+src/app/(payload)/

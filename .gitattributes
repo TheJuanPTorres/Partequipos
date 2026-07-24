@@ -1,0 +1,12 @@
+# Normaliza saltos de línea a LF en el repo (coincide con Prettier endOfLine: "lf").
+* text=auto eol=lf
+
+# Binarios: sin conversión.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+*.woff binary
+*.woff2 binary

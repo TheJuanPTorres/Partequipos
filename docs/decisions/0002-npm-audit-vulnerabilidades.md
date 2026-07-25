@@ -10,11 +10,11 @@
 Tras integrar Payload 3.86 y su cadena de dependencias (Drizzle, monaco-editor,
 sharp, etc.), `npm audit` reporta **19 advisories**:
 
-| Ámbito | Totales |
-| ------------------------------- | ---------------------------------------- |
-| Todo el árbol | 19 (12 high · 6 moderate · 1 low · 0 critical) |
-| Solo producción (`--omit=dev`) | 10 (3 high · 6 moderate · 1 low) |
-| Solo desarrollo | 9 |
+| Ámbito                         | Totales                                        |
+| ------------------------------ | ---------------------------------------------- |
+| Todo el árbol                  | 19 (12 high · 6 moderate · 1 low · 0 critical) |
+| Solo producción (`--omit=dev`) | 10 (3 high · 6 moderate · 1 low)               |
+| Solo desarrollo                | 9                                              |
 
 Antes de Payload (fin de la tarea 0.1) eran solo 3, todas heredadas de Next
 (`postcss`×2 + `sharp`). El aumento proviene del árbol de Payload, no de código

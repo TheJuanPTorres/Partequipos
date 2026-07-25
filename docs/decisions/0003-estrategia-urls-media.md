@@ -60,9 +60,50 @@ Acciones para la 0.3:
    Core Web Vitals.
 3. Documentar la resolución como un ADR de seguimiento si cambia el enfoque.
 
+## Hallazgo de la tarea 0.3 (2026-07-25) — cómo se entrega hoy la imagen
+
+Renderizada la ruta de prueba `/probe/marcas` con `next/image src={doc.url}`
+(donde `doc.url = /api/media/file/<filename>`), se observó en el HTML de origen:
+
+```
+src="/_next/image?url=%2Fapi%2Fmedia%2Ffile%2F_tmp-cat.png&w=640&q=75"
+```
+
+Cadena de entrega real al visitante (medida con curl, sin seguir redirects):
+
+1. El navegador pide **`/_next/image?url=/api/media/file/...`** → optimizador de
+   Next (serverless) → `HTTP 200 image/png`.
+2. Ese optimizador busca internamente **`/api/media/file/<filename>`** (ruta de
+   Payload, serverless) → `HTTP 200 image/png`, **sin `3xx`** (`redirect_url`
+   vacío): hace **proxy/streaming desde Blob**, no redirect al CDN.
+
+**Conclusión:** la imagen **NO** llega desde el dominio del Blob
+(`*.public.blob.vercel-storage.com`). Pasa por la serverless **dos veces**
+(optimizador de `next/image` + ruta `/api/media/file`), y el parámetro `url`
+interno de `next/image` apunta a la ruta de Payload, no al CDN.
+
+`remotePatterns` para `**.public.blob.vercel-storage.com` ya quedó configurado en
+`next.config.ts`, de modo que `next/image` **aceptaría** una URL del dominio del
+Blob el día que decidamos servir desde el CDN.
+
+### Recomendación (a decidir al construir la página real de marcas)
+
+El doble salto por serverless es aceptable para una ruta de prueba, pero **no**
+para el catálogo público con prioridad SEO. Opciones para servir desde el CDN
+manteniendo `doc.url` interno en la BD:
+
+- Que `/api/media/file/<filename>` responda **redirect 3xx** al CDN del Blob, o
+- Resolver la URL del Blob **solo en la capa de presentación** (construir la URL
+  del CDN a partir del `filename` al renderizar), o
+- Activar `disablePayloadAccessControl` **solo** para `Media` (es de lectura
+  pública) para que `next/image` consuma directamente el CDN.
+
+Cualquiera de las tres se evaluará midiendo Core Web Vitals. Queda como
+**pendiente para la página definitiva** (no para este esqueleto).
+
 ## Consecuencia
 
 `doc.url` interno queda aceptado por diseño. La **forma de entrega al visitante**
-queda explícitamente **abierta y marcada como riesgo de rendimiento/SEO** a
-resolver en la tarea 0.3, antes de construir páginas públicas de catálogo con
-imágenes.
+queda **medida y documentada** (hoy pasa dos veces por serverless) y su
+optimización hacia el CDN del Blob queda como **pendiente explícito** para la
+página pública de marcas, antes de construir catálogo con imágenes.

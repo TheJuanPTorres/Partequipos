@@ -70,6 +70,9 @@ export interface Config {
     users: User;
     media: Media;
     marcas: Marca;
+    'tipos-equipo': TiposEquipo;
+    'modelos-repuesto': ModelosRepuesto;
+    'categorias-tecnicas': CategoriasTecnica;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +83,9 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     marcas: MarcasSelect<false> | MarcasSelect<true>;
+    'tipos-equipo': TiposEquipoSelect<false> | TiposEquipoSelect<true>;
+    'modelos-repuesto': ModelosRepuestoSelect<false> | ModelosRepuestoSelect<true>;
+    'categorias-tecnicas': CategoriasTecnicasSelect<false> | CategoriasTecnicasSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -184,6 +190,80 @@ export interface Marca {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tipos-equipo".
+ */
+export interface TiposEquipo {
+  id: number;
+  nombre: string;
+  /**
+   * Se genera automáticamente desde el nombre (minúsculas, sin tildes, con guiones). Editable manualmente.
+   */
+  slug: string;
+  marca: number | Marca;
+  descripcion?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modelos-repuesto".
+ */
+export interface ModelosRepuesto {
+  id: number;
+  nombre: string;
+  /**
+   * Se genera automáticamente desde el nombre (minúsculas, sin tildes, con guiones). Editable manualmente.
+   */
+  slug: string;
+  /**
+   * Desnormalizada para consultas y breadcrumbs. Debe coincidir con la marca del tipo elegido.
+   */
+  marca: number | Marca;
+  /**
+   * Se filtra por la marca seleccionada arriba.
+   */
+  tipo: number | TiposEquipo;
+  /**
+   * Código del modelo, ej. 320D.
+   */
+  codigo?: string | null;
+  descripcion?: string | null;
+  imagenes?: (number | Media)[] | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-tecnicas".
+ */
+export interface CategoriasTecnica {
+  id: number;
+  nombre: string;
+  /**
+   * Se genera automáticamente desde el nombre (minúsculas, sin tildes, con guiones). Editable manualmente.
+   */
+  slug: string;
+  descripcion?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -217,6 +297,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'marcas';
         value: number | Marca;
+      } | null)
+    | ({
+        relationTo: 'tipos-equipo';
+        value: number | TiposEquipo;
+      } | null)
+    | ({
+        relationTo: 'modelos-repuesto';
+        value: number | ModelosRepuesto;
+      } | null)
+    | ({
+        relationTo: 'categorias-tecnicas';
+        value: number | CategoriasTecnica;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -309,6 +401,65 @@ export interface MarcasSelect<T extends boolean = true> {
   slug?: T;
   descripcion?: T;
   logo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tipos-equipo_select".
+ */
+export interface TiposEquipoSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  marca?: T;
+  descripcion?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modelos-repuesto_select".
+ */
+export interface ModelosRepuestoSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  marca?: T;
+  tipo?: T;
+  codigo?: T;
+  descripcion?: T;
+  imagenes?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-tecnicas_select".
+ */
+export interface CategoriasTecnicasSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  descripcion?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

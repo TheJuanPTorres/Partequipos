@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { formatSlugHook } from "../lib/utils/formatSlug";
+import { slugField } from "../lib/fields/slugField";
 
 /**
  * Marcas de maquinaria y repuestos (Caterpillar, CASE, etc.).
@@ -25,22 +25,8 @@ export const Marca: CollectionConfig = {
       required: true,
       label: "Nombre",
     },
-    {
-      name: "slug",
-      type: "text",
-      required: true,
-      unique: true,
-      index: true,
-      label: "Slug",
-      admin: {
-        position: "sidebar",
-        description:
-          "Se genera automáticamente desde el nombre (minúsculas, sin tildes, con guiones). Editable manualmente.",
-      },
-      hooks: {
-        beforeValidate: [formatSlugHook("nombre")],
-      },
-    },
+    // Marca es de nivel superior: unicidad global del slug.
+    slugField({ unique: true }),
     {
       name: "descripcion",
       type: "textarea",

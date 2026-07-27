@@ -14,6 +14,14 @@ const eslintConfig = defineConfig([
       "no-console": ["error", { allow: ["warn", "error"] }],
     },
   },
+  {
+    // Los scripts de línea de comandos (importación, semillas) sí imprimen su
+    // reporte por consola; ahí no aplica la prohibición de console.
+    files: ["scripts/**/*.ts", "scripts/**/*.mts"],
+    rules: {
+      "no-console": "off",
+    },
+  },
   // Debe ir al final: desactiva reglas de ESLint que chocan con Prettier.
   eslintConfigPrettier,
   // Override default ignores of eslint-config-next.

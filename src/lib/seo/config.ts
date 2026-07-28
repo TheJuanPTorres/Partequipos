@@ -4,23 +4,53 @@
  * Open Graph y JSON-LD de todo el sitio.
  */
 export const seoConfig = {
-  /** Nombre comercial de la organización. */
+  /** Nombre comercial de la organización. Fuente: sitio actual (marca y footer). */
   siteName: "Partequipos",
-  /** Razón social / nombre legal para JSON-LD Organization. */
-  legalName: "Partequipos S.A.S.",
+  /**
+   * Razón social para JSON-LD `Organization`.
+   *
+   * PENDIENTE DE CONFIRMAR CON EL CLIENTE. El sitio actual declara **dos**
+   * entidades legales en /tratamiento-de-datos/ y no hay forma de deducir cuál
+   * corresponde a este dominio:
+   *   - "PARTEQUIPOS S.A.S"           · NIT 830.080.641-4 · Carrera 68D # 17 A – 84
+   *   - "PARTEQUIPOS MAQUINARIA S.A.S" · NIT 830.116.807-7 · Diagonal 16 # 96 G-85
+   * Se deja vacío a propósito: `buildOrganizationJsonLd` omite el campo si no hay
+   * valor, y es preferible omitirlo a publicar una razón social equivocada.
+   */
+  legalName: "",
+  /**
+   * NIT / identificación tributaria. PENDIENTE: depende de cuál razón social
+   * se confirme arriba (830.080.641-4 o 830.116.807-7).
+   */
+  taxId: "",
   /** Descripción por defecto cuando la entidad no trae una propia. */
   defaultDescription:
     "Repuestos para maquinaria pesada en Colombia: excavadoras, bulldozers, retrocargadoras y más, con respaldo técnico.",
-  /** Ruta del logo, relativa al sitio (se absolutiza al construir el JSON-LD). */
-  logoPath: "/next.svg",
+  /** Logo institucional (Media id 5, servido desde el CDN del Blob). */
+  logoPath: "https://sr2s4ngkjzfzpxhi.public.blob.vercel-storage.com/logo-partequipos.png",
   /** Imagen social por defecto cuando la entidad no tiene `ogImage`. */
-  defaultOgImagePath: "/next.svg",
+  defaultOgImagePath:
+    "https://sr2s4ngkjzfzpxhi.public.blob.vercel-storage.com/logo-partequipos.png",
   /** Idioma/mercado objetivo. */
   locale: "es_CO",
   /** País de operación (ISO 3166-1 alfa-2), para JSON-LD Organization. */
   country: "CO",
-  /** Perfiles oficiales; alimentan `sameAs` de Organization. */
-  sameAs: [] as string[],
+  /** Datos de contacto públicos. Fuente: footer y /contactanos/ del sitio actual. */
+  contact: {
+    email: "info@partequipos.com",
+    /** Teléfono principal publicado en el encabezado y el footer. */
+    phone: "+57 317 670 7071",
+    streetAddress: "Carrera 68D # 17A-84",
+    addressLocality: "Bogotá D.C.",
+    /** Horario tal como lo publica el sitio. */
+    openingHours: "Lunes a viernes de 8:00 a. m. a 5:30 p. m. y sábados de 9:00 a. m. a 12:00 m.",
+  },
+  /** Perfiles oficiales; alimentan `sameAs` de Organization. Fuente: footer. */
+  sameAs: [
+    "https://www.facebook.com/partequip0s",
+    "https://www.instagram.com/partequipos_sas/",
+    "https://www.youtube.com/channel/UCiUU1dE8QvchvTKv47KuDVw",
+  ] as string[],
   /** Plantilla de títulos: `%s` se sustituye por el título de la página. */
   titleTemplate: "%s | Partequipos",
 } as const;

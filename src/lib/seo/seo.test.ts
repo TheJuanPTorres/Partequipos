@@ -191,17 +191,43 @@ describe("buildOrganizationJsonLd", () => {
 
     assert.equal(jsonLd["@type"], "Organization");
     assert.equal(jsonLd.name, seoConfig.siteName);
-    assert.equal(jsonLd.legalName, seoConfig.legalName);
     assert.equal(jsonLd.url, "https://partequipos.com");
     assert.match(String(jsonLd.logo), /^https?:\/\//);
-    assert.deepEqual(jsonLd.address, {
-      "@type": "PostalAddress",
-      addressCountry: seoConfig.country,
-    });
   });
 
-  it("omite sameAs cuando no hay perfiles configurados", () => {
+  it("incluye la dirección real con país, calle y ciudad", () => {
+    const address = buildOrganizationJsonLd().address as Record<string, unknown>;
+
+    assert.equal(address["@type"], "PostalAddress");
+    assert.equal(address.addressCountry, seoConfig.country);
+    assert.equal(address.streetAddress, seoConfig.contact.streetAddress);
+    assert.equal(address.addressLocality, seoConfig.contact.addressLocality);
+  });
+
+  it("incluye los datos de contacto públicos", () => {
     const jsonLd = buildOrganizationJsonLd();
+
+    assert.equal(jsonLd.email, seoConfig.contact.email);
+    assert.equal(jsonLd.telephone, seoConfig.contact.phone);
+  });
+
+  it("emite sameAs con los perfiles sociales configurados", () => {
+    const jsonLd = buildOrganizationJsonLd();
+
     assert.equal("sameAs" in jsonLd, seoConfig.sameAs.length > 0);
+    if (seoConfig.sameAs.length > 0) {
+      assert.deepEqual(jsonLd.sameAs, [...seoConfig.sameAs]);
+    }
+  });
+
+  it("omite legalName y taxID mientras estén pendientes de confirmar", () => {
+    const jsonLd = buildOrganizationJsonLd();
+
+    // Nunca deben publicarse vacíos ni con un valor inventado: o hay dato real,
+    // o el campo no se emite.
+    assert.equal("legalName" in jsonLd, Boolean(seoConfig.legalName));
+    assert.equal("taxID" in jsonLd, Boolean(seoConfig.taxId));
+    if ("legalName" in jsonLd) assert.notEqual(jsonLd.legalName, "");
+    if ("taxID" in jsonLd) assert.notEqual(jsonLd.taxID, "");
   });
 });

@@ -76,20 +76,32 @@ export function buildBreadcrumbJsonLd(items: BreadcrumbItem[]): JsonLdObject {
  * no hay valores quemados aquí.
  */
 export function buildOrganizationJsonLd(): JsonLdObject {
+  const { contact } = seoConfig;
+
+  const address: JsonLdObject = {
+    "@type": "PostalAddress",
+    addressCountry: seoConfig.country,
+  };
+  if (contact.streetAddress) address.streetAddress = contact.streetAddress;
+  if (contact.addressLocality) address.addressLocality = contact.addressLocality;
+
   const jsonLd: JsonLdObject = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: seoConfig.siteName,
-    legalName: seoConfig.legalName,
     url: getSiteUrl(),
     logo: absoluteUrl(seoConfig.logoPath),
     description: seoConfig.defaultDescription,
-    address: {
-      "@type": "PostalAddress",
-      addressCountry: seoConfig.country,
-    },
+    address,
   };
 
+  // Campos pendientes de confirmar con el cliente: se omiten si están vacíos.
+  // Mejor omitir que publicar una razón social o un NIT equivocados.
+  if (seoConfig.legalName) jsonLd.legalName = seoConfig.legalName;
+  if (seoConfig.taxId) jsonLd.taxID = seoConfig.taxId;
+
+  if (contact.email) jsonLd.email = contact.email;
+  if (contact.phone) jsonLd.telephone = contact.phone;
   if (seoConfig.sameAs.length > 0) jsonLd.sameAs = [...seoConfig.sameAs];
 
   return jsonLd;

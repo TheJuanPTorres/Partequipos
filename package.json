@@ -15,7 +15,8 @@
     "payload": "payload",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",
-    "import": "payload run scripts/import/import.ts"
+    "import": "payload run scripts/import/import.ts",
+    "crawl": "tsx scripts/crawl/crawl.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.86.0",
@@ -38,6 +39,7 @@
     "eslint-config-prettier": "10.1.8",
     "prettier": "3.9.6",
     "tailwindcss": "^4",
+    "tsx": "4.22.4",
     "typescript": "^5"
   }
 }

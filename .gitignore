@@ -41,3 +41,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# crawl: progreso incremental (regenerable, no se versiona)
+scripts/crawl/progress.jsonl

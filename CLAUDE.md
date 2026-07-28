@@ -164,5 +164,30 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   Tailwind v4, ESLint + Prettier). Ver ADR `docs/decisions/0001-version-nextjs.md`.
 - **Decisión pendiente y bloqueante:** hosting definitivo (Vercel vs. infraestructura
   del cliente). Ver `docs/decisions/`.
-- **Riesgo abierto:** inconsistencia en el inventario de modelos
-  (Caterpillar 140 vs 130 · CASE 38 vs 34). Debe resolverse antes de la carga masiva.
+
+### 10.1 Inventario real (fuente de verdad)
+
+> Medido por rastreo propio del sitio en producción (`npm run crawl`, 2026-07-27).
+> **Estos datos reemplazan a los documentos del cliente**, que subcontaban.
+> Salidas: `docs/url-map.csv`, `docs/inventario-repuestos.csv`, `docs/crawl-reporte.md`.
+
+- **351 modelos de repuestos** (no ~332). Caterpillar **141** (documentos: 140 vs 130),
+  Case Construction **39** (documentos: 38 vs 34). Resto: Hitachi 46, Komatsu 32,
+  Hyundai 26, Liugong 15, Doosan 12, Link Belt 11, Kobelco 9, Bobcat 6, Yanmar 6,
+  Okada 5, Volvo 3.
+- **648 URLs vivas**: repuestos 435 · maquinaria 122 · blog 51 · corporativo 34 · otro 6.
+  Todas responden 2xx; 0 errores y 0 redirecciones preexistentes.
+
+### 10.2 Riesgos y hallazgos
+
+- **RIESGO CERRADO** — la inconsistencia del inventario de modelos ya no bloquea:
+  se resolvió por medición directa sobre el sitio en producción.
+- **Hallazgo de alcance:** el **blog NO está vacío** — tiene **51 URLs vivas**.
+  Requiere migración de contenido y sus redirects, no solo plantillas.
+- **Hallazgo de alcance:** **lubricantes** tiene **índice + 4 subsecciones**
+  (`/lubricantes/lubricantes-eni/` y 4 hijas), no 1 página como indicaba el
+  documento de alcance.
+- **Limpieza sugerida al cliente:** 2 duplicados con sufijo `-copy` son borradores
+  publicados por error (`...case-construction-650l-copy`,
+  `...komatsu-gd555-5-copy`). **No se migran**; quedan documentados.
+- Decisiones sobre estos hallazgos: ADR `docs/decisions/0004-hallazgos-crawl.md`.

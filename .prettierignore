@@ -11,6 +11,8 @@ public
 # Archivos generados por Payload (se reescriben con `generate:types`/`generate:importmap`)
 src/payload-types.ts
 src/app/(payload)/
+# Migraciones generadas por `payload migrate:create`
+src/migrations/
 
 # Artefactos generados por `npm run crawl` (se reescriben en cada rastreo)
 docs/crawl-reporte.md

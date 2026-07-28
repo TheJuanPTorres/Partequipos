@@ -191,6 +191,12 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   publicados por error (`...case-construction-650l-copy`,
   `...komatsu-gd555-5-copy`). **No se migran**; quedan documentados.
 - Decisiones sobre estos hallazgos: ADR `docs/decisions/0004-hallazgos-crawl.md`.
+- **RIESGO ABIERTO — migraciones:** el esquema no se sincroniza solo en
+  producción. Se requieren migraciones versionadas de Payload
+  (`payload migrate`); el push automático es solo para desarrollo local.
+  Detectado al probar `npm start` tras añadir el campo `puedeEditarSlugs` y la
+  colección `Redirects`: la consulta falló con
+  `column users.puede_editar_slugs does not exist`.
 
 ### 10.3 Pendientes de confirmar con el cliente
 

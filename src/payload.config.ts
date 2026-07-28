@@ -38,6 +38,16 @@ export default buildConfig({
       // la cadena directa satura los límites de conexión. Ver .env.example.
       connectionString: process.env.DATABASE_URI || "",
     },
+    /*
+     * El push automático de esquema SOLO en desarrollo local.
+     *
+     * En producción el esquema se aplica con migraciones versionadas
+     * (`npm run migrate`), no con push: el push compara y altera el esquema en
+     * caliente, sin control de versiones ni posibilidad de revertir. Ver README
+     * y el riesgo registrado en CLAUDE.md §10.2.
+     */
+    push: process.env.NODE_ENV !== "production",
+    migrationDir: path.resolve(dirname, "migrations"),
   }),
   sharp,
   plugins: [

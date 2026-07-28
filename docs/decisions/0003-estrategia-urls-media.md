@@ -1,7 +1,9 @@
 # ADR 0003 — Estrategia de URLs de Media (Payload + Vercel Blob)
 
-- **Estado:** Aceptada (con un punto PENDIENTE de verificar en la tarea 0.3)
-- **Fecha:** 2026-07-25
+- **Estado:** **Sustituida por la decisión final de la sección "Resolución"**
+  (Sprint 2, tarea 2.1). Decidido e **implementado**: las imágenes se sirven
+  desde el CDN del Blob.
+- **Fecha:** 2026-07-25 · **Resuelta:** 2026-07-27
 - **Decisión tomada por:** Dirección técnica
 - **Relacionado:** [[0001-version-nextjs]], colección `Media` y `payload.config.ts`
 
@@ -24,7 +26,7 @@ Esto se debe a que `@payloadcms/plugin-cloud-storage` mantiene
 `disablePayloadAccessControl = false` por defecto: Payload sirve el archivo a
 través de su propia ruta en lugar de exponer la URL directa del CDN.
 
-## Decisión
+## Decisión inicial (2026-07-25) — REVERTIDA, ver "Resolución"
 
 **Mantener `doc.url` como ruta interna de Payload.** Es una capa de indirección
 intencional: permite cambiar de proveedor de almacenamiento (Blob → R2 u otro) o
@@ -33,7 +35,16 @@ quedan acopladas al hostname de un proveedor concreto.
 
 No se activa `disablePayloadAccessControl`.
 
-## PENDIENTE — verificar en la tarea 0.3 (afecta rendimiento y SEO)
+> Esta decisión quedó **revertida** en la tarea 2.1 al medirse el coste real de
+> entrega. El argumento de indirección resultó menos relevante de lo previsto:
+> la URL **no** está congelada en la base de datos, el plugin la recalcula en
+> lectura (ver "Resolución"), así que cambiar de proveedor tampoco exigiría
+> reescribir registros.
+
+## ~~PENDIENTE~~ — RESUELTO en la tarea 2.1 (histórico del análisis)
+
+> Este bloque se conserva como registro del análisis que llevó a la decisión
+> final. Ya no hay nada pendiente: ver "Resolución" al final del documento.
 
 La decisión anterior es sobre **qué se guarda** (`doc.url`), no sobre **cómo llega
 la imagen al visitante**. Falta confirmar el comportamiento de entrega de la ruta
@@ -101,9 +112,55 @@ manteniendo `doc.url` interno en la BD:
 Cualquiera de las tres se evaluará midiendo Core Web Vitals. Queda como
 **pendiente para la página definitiva** (no para este esqueleto).
 
+## Resolución (2026-07-27, tarea 2.1) — decidido e implementado
+
+**Decisión final: las imágenes se sirven directo desde el CDN del Blob.** Son
+imágenes públicas de catálogo (`Media` ya tiene `read: () => true`), la velocidad
+pesa en el SEO —prioridad del negocio (CLAUDE.md §1)— y en un sitio con cientos de
+fichas no tiene sentido pagar dos saltos de serverless por foto.
+
+### Implementación
+
+Una línea en `src/payload.config.ts`, en el plugin `vercelBlobStorage`:
+
+```ts
+collections: {
+  [Media.slug]: { disablePayloadAccessControl: true },
+},
+```
+
+Opción verificada contra la documentación oficial vigente del adaptador y contra
+los tipos instalados (`collections` acepta `Omit<CollectionOptions, 'adapter'>`).
+No hizo falta `generateFileURL` personalizado: el plugin ya genera la URL del CDN.
+
+### Medición ANTES / DESPUÉS
+
+|                                        | **ANTES**                                                                                                    | **DESPUÉS**                                                                                |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `doc.url`                              | `/api/media/file/_tmp-cat.png`                                                                               | `https://sr2s4ngkjzfzpxhi.public.blob.vercel-storage.com/_tmp-cat.png`                     |
+| `<img>` en `/probe/marcas`             | `/_next/image?url=%2Fapi%2Fmedia%2Ffile%2F_tmp-cat.png&w=640&q=75`                                           | `/_next/image?url=https%3A%2F%2F…public.blob.vercel-storage.com%2F_tmp-cat.png&w=640&q=75` |
+| Saltos por serverless                  | **2** (optimizador → ruta `/api/media/file`, que hacía proxy/streaming desde Blob con `HTTP 200`, sin `3xx`) | **1** (solo el optimizador de `next/image`)                                                |
+| Referencias a `/api/media/` en el HTML | 2                                                                                                            | **0**                                                                                      |
+| Origen real de los bytes               | función serverless                                                                                           | **CDN de Vercel** (`X-Vercel-Cache: HIT`, `Cache-Control: public, max-age=31536000`)       |
+
+`next/image` sigue optimizando correctamente: `remotePatterns` para
+`**.public.blob.vercel-storage.com` ya estaba configurado desde la tarea 0.3
+(`HTTP 200 image/png`, `X-Nextjs-Cache: HIT`).
+
+### Sobre las imágenes ya existentes
+
+Los logos de Caterpillar y Komatsu **siguen funcionando sin ninguna migración**.
+La URL **no** estaba persistida de forma rígida: el plugin la recalcula al leer el
+documento, por lo que el cambio aplicó de inmediato a los archivos ya subidos. **No
+hace falta regenerar ni volver a subir nada.**
+
 ## Consecuencia
 
-`doc.url` interno queda aceptado por diseño. La **forma de entrega al visitante**
-queda **medida y documentada** (hoy pasa dos veces por serverless) y su
-optimización hacia el CDN del Blob queda como **pendiente explícito** para la
-página pública de marcas, antes de construir catálogo con imágenes.
+- Las imágenes de catálogo llegan al visitante **desde el CDN**, con caché de 1 año,
+  eliminando un salto de serverless por imagen. Mejor Core Web Vitals y menos
+  invocaciones.
+- Se **bypassa el control de acceso de Payload para `Media`**, lo cual es correcto
+  aquí porque la colección es de lectura pública. Si en el futuro se necesitara
+  media privada, deberá ir en **otra colección** que conserve el control de acceso.
+- Las plantillas del Sprint 2 se construyen asumiendo que `doc.url` es una URL
+  absoluta del CDN.

@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { revalidarModelo, revalidarModeloBorrado } from "./hooks/revalidateHooks";
 
 /**
  * Modelo concreto dentro de un tipo de equipo (ej. "CAT 320D" en Excavadora).
@@ -22,6 +23,11 @@ export const ModeloRepuesto: CollectionConfig = {
   },
   // Unicidad del slug POR TIPO (el tipo ya implica una marca). Ver reporte.
   indexes: [{ fields: ["tipo", "slug"], unique: true }],
+  // ISR: revalida la ficha y la página del tipo donde el modelo se lista.
+  hooks: {
+    afterChange: [revalidarModelo],
+    afterDelete: [revalidarModeloBorrado],
+  },
   fields: [
     {
       name: "nombre",

@@ -14,9 +14,23 @@ export async function getMarcas(): Promise<Marca[]> {
   const { docs } = await payload.find({
     collection: "marcas",
     depth: 1,
-    limit: 100,
+    limit: 0, // sin límite: el catálogo completo
     sort: "nombre",
   });
 
   return docs;
+}
+
+/** Una marca por su slug (único a nivel global). */
+export async function getMarcaPorSlug(slug: string): Promise<Marca | null> {
+  const payload = await getPayload({ config });
+
+  const { docs } = await payload.find({
+    collection: "marcas",
+    where: { slug: { equals: slug } },
+    depth: 1,
+    limit: 1,
+  });
+
+  return docs[0] ?? null;
 }

@@ -191,3 +191,28 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   publicados por error (`...case-construction-650l-copy`,
   `...komatsu-gd555-5-copy`). **No se migran**; quedan documentados.
 - Decisiones sobre estos hallazgos: ADR `docs/decisions/0004-hallazgos-crawl.md`.
+
+### 10.3 Pendientes de confirmar con el cliente
+
+> Lista para la reunión de firma. Son datos que **no se pueden deducir del sitio
+> actual sin riesgo de publicar información equivocada**; mientras tanto los
+> campos afectados se **omiten** en vez de rellenarse con suposiciones
+> (ver `src/lib/seo/config.ts`).
+
+1. **Razón social y NIT** (bloquea `legalName` / `taxID` del JSON-LD
+   `Organization`). `/tratamiento-de-datos/` declara **dos** entidades legales:
+   - `PARTEQUIPOS S.A.S` · NIT 830.080.641-4 · Carrera 68D # 17 A – 84
+   - `PARTEQUIPOS MAQUINARIA S.A.S` · NIT 830.116.807-7 · Diagonal 16 # 96 G-85
+
+   ¿Cuál corresponde a este dominio? (La dirección de contacto pública coincide
+   con la primera, pero es una inferencia, no un dato afirmado por el sitio.)
+
+2. **URL canónica de LinkedIn.** La única del footer es un enlace de _challenge_
+   de sesión (`/organization-guest/company/...?challengeId=...`), no estable.
+   Falta la URL limpia del perfil.
+3. **Página oficial de Facebook.** El sitio enlaza **dos**:
+   `facebook.com/partequip0s` y `facebook.com/Partequipos-384833565199317`.
+   Se usa la primera (enlace principal del footer) hasta confirmar.
+4. **Teléfono de contacto.** Se publica el móvil `+57 317 670 7071`; el aviso
+   legal menciona además un fijo `492-62-60` sin indicativo. Confirmar cuál(es)
+   deben figurar y con qué formato.

@@ -198,6 +198,32 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   colección `Redirects`: la consulta falló con
   `column users.puede_editar_slugs does not exist`.
 
+### 10.4 Despliegue (medido en producción el 2026-07-28)
+
+- **RIESGO CERRADO — fricción de Payload sobre Vercel serverless: NO se
+  materializó.** Medido en `https://partequipos.vercel.app`:
+  `/admin` **2.89 s en frío** (tras 16 min sin uso) y **0.44 s en caliente**;
+  subida a **Vercel Blob operativa desde serverless** (201 en 0.65 s); crear
+  registros y renderizar catálogo por debajo del segundo. Ningún timeout ni
+  error de pool. Los 28–48 s que veíamos en local eran compilación bajo demanda
+  de `next dev`, no un problema de serverless.
+- **Entornos separados (verificado):** rama Neon **`production`** (la usa
+  Vercel) y **`development`** (local). Comprobado creando un registro en local
+  y confirmando que **no** aparece en producción.
+- **PENDIENTE — limpieza de producción:** producción conserva los datos de demo;
+  hay que limpiarlos antes de cargar contenido real. Además **el store de Vercel
+  Blob sigue compartido** entre entornos (mismo `BLOB_READ_WRITE_TOKEN`).
+- **BLOQUEANTE de despliegue — `payload migrate` es interactivo:** si
+  `payload_migrations` contiene el marcador `dev` (`batch -1`, que deja el push
+  de desarrollo), el comando abre un prompt —
+  _"It looks like you've run Payload in dev mode… data loss will occur. Would you
+  like to proceed?"_ — y **se queda esperando**. En un build de Vercel (sin
+  stdin) eso cuelga o falla el despliegue. Reproducido en local: `npm run migrate`
+  colgado 5 min sin aplicar nada. Existe la opción `forceAcceptWarning` para
+  ejecución no interactiva. **Ojo:** el propio aviso advierte de pérdida de datos,
+  y la migración inicial hace `CREATE TABLE` sin `IF NOT EXISTS`, así que solo es
+  segura contra una base **vacía**.
+
 ### 10.3 Pendientes de confirmar con el cliente
 
 > Lista para la reunión de firma. Son datos que **no se pueden deducir del sitio

@@ -73,6 +73,7 @@ export interface Config {
     'tipos-equipo': TiposEquipo;
     'modelos-repuesto': ModelosRepuesto;
     'categorias-tecnicas': CategoriasTecnica;
+    redirects: Redirect;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +87,7 @@ export interface Config {
     'tipos-equipo': TiposEquipoSelect<false> | TiposEquipoSelect<true>;
     'modelos-repuesto': ModelosRepuestoSelect<false> | ModelosRepuestoSelect<true>;
     'categorias-tecnicas': CategoriasTecnicasSelect<false> | CategoriasTecnicasSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -131,6 +133,10 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  /**
+   * Los slugs son de solo lectura tras crear el registro porque forman la URL indexada. Marca esta casilla solo para corregir erratas reales; el cambio generará un redirect 301 automático. Ver ADR 0005.
+   */
+  puedeEditarSlugs?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -180,7 +186,7 @@ export interface Marca {
   id: number;
   nombre: string;
   /**
-   * Se genera automáticamente desde el nombre (minúsculas, sin tildes, con guiones). Editable manualmente.
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
    */
   slug: string;
   descripcion?: string | null;
@@ -196,7 +202,7 @@ export interface TiposEquipo {
   id: number;
   nombre: string;
   /**
-   * Se genera automáticamente desde el nombre (minúsculas, sin tildes, con guiones). Editable manualmente.
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
    */
   slug: string;
   marca: number | Marca;
@@ -217,7 +223,7 @@ export interface ModelosRepuesto {
   id: number;
   nombre: string;
   /**
-   * Se genera automáticamente desde el nombre (minúsculas, sin tildes, con guiones). Editable manualmente.
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
    */
   slug: string;
   /**
@@ -250,7 +256,7 @@ export interface CategoriasTecnica {
   id: number;
   nombre: string;
   /**
-   * Se genera automáticamente desde el nombre (minúsculas, sin tildes, con guiones). Editable manualmente.
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
    */
   slug: string;
   descripcion?: string | null;
@@ -259,6 +265,34 @@ export interface CategoriasTecnica {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Redirecciones de URLs antiguas hacia las vigentes. Evita perder posicionamiento cuando una URL cambia.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * Ruta antigua, empezando por «/». Ej: /repuestos-viejo/modelo-x
+   */
+  desde: string;
+  /**
+   * Ruta vigente o URL absoluta a la que se redirige.
+   */
+  hacia: string;
+  /**
+   * 301 salvo que la redirección sea realmente temporal.
+   */
+  tipo: '301' | '302';
+  /**
+   * Cómo se creó esta redirección. Las automáticas no deben editarse a la ligera.
+   */
+  origen: 'manual' | 'cambio-de-slug' | 'migracion';
+  notas?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -309,6 +343,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categorias-tecnicas';
         value: number | CategoriasTecnica;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -357,6 +395,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  puedeEditarSlugs?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -460,6 +499,19 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  desde?: T;
+  hacia?: T;
+  tipo?: T;
+  origen?: T;
+  notas?: T;
   updatedAt?: T;
   createdAt?: T;
 }

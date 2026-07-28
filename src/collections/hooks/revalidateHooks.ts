@@ -1,8 +1,11 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadRequest } from "payload";
 
 import { revalidarRutas, rutasDeMarca, rutasDeModelo, rutasDeTipo } from "@/lib/revalidation";
+import { rutas } from "@/lib/routes";
 import { poblado } from "@/lib/utils/relations";
 import type { Marca, TiposEquipo } from "@/payload-types";
+
+import { crearRedirectPorCambioDeSlug } from "./autoRedirect";
 
 /**
  * Hooks de revalidación (ISR). Ver el grafo de dependencias y la justificación
@@ -71,6 +74,23 @@ export const revalidarMarca: CollectionAfterChangeHook = async ({ doc, previousD
     // Si el slug cambió, la ruta anterior y todo su subárbol quedan obsoletos.
     if (previousDoc?.slug && previousDoc.slug !== doc.slug) {
       paths.push(...rutasDeMarca(previousDoc.slug, hijos));
+
+      // ADR 0005: salvar las URLs indexadas con un 301 (la marca y su subárbol).
+      await crearRedirectPorCambioDeSlug(req, rutas.marca(previousDoc.slug), rutas.marca(doc.slug));
+      for (const { tipoSlug, modeloSlugs } of hijos) {
+        await crearRedirectPorCambioDeSlug(
+          req,
+          rutas.tipo(previousDoc.slug, tipoSlug),
+          rutas.tipo(doc.slug, tipoSlug),
+        );
+        for (const modeloSlug of modeloSlugs) {
+          await crearRedirectPorCambioDeSlug(
+            req,
+            rutas.modelo(previousDoc.slug, tipoSlug, modeloSlug),
+            rutas.modelo(doc.slug, tipoSlug, modeloSlug),
+          );
+        }
+      }
     }
 
     revalidarRutas(paths, `marca ${doc.slug}`);
@@ -104,6 +124,20 @@ export const revalidarTipo: CollectionAfterChangeHook = async ({ doc, previousDo
 
     if (previousDoc?.slug && previousDoc.slug !== doc.slug) {
       paths.push(...rutasDeTipo(marcaSlug, previousDoc.slug, modeloSlugs));
+
+      // ADR 0005: 301 del tipo y de las fichas que colgaban de él.
+      await crearRedirectPorCambioDeSlug(
+        req,
+        rutas.tipo(marcaSlug, previousDoc.slug),
+        rutas.tipo(marcaSlug, doc.slug),
+      );
+      for (const modeloSlug of modeloSlugs) {
+        await crearRedirectPorCambioDeSlug(
+          req,
+          rutas.modelo(marcaSlug, previousDoc.slug, modeloSlug),
+          rutas.modelo(marcaSlug, doc.slug, modeloSlug),
+        );
+      }
     }
 
     // Si el tipo se movió de marca, la marca anterior también cambia su listado.
@@ -166,8 +200,14 @@ export const revalidarModelo: CollectionAfterChangeHook = async ({ doc, previous
     if (previousDoc) {
       const anterior = await contextoDeModelo(req, previousDoc);
       if (anterior) {
-        paths.push(
-          ...rutasDeModelo(anterior.marcaSlug, anterior.tipoSlug, previousDoc.slug ?? doc.slug),
+        const slugAnterior = previousDoc.slug ?? doc.slug;
+        paths.push(...rutasDeModelo(anterior.marcaSlug, anterior.tipoSlug, slugAnterior));
+
+        // ADR 0005: si la URL de la ficha cambió, salvarla con un 301.
+        await crearRedirectPorCambioDeSlug(
+          req,
+          rutas.modelo(anterior.marcaSlug, anterior.tipoSlug, slugAnterior),
+          rutas.modelo(actual.marcaSlug, actual.tipoSlug, doc.slug),
         );
       }
     }

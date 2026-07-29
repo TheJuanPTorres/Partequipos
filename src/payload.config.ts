@@ -11,6 +11,7 @@ import { CategoriaTecnica } from "./collections/CategoriaTecnica";
 import { Marca } from "./collections/Marca";
 import { Media } from "./collections/Media";
 import { ModeloRepuesto } from "./collections/ModeloRepuesto";
+import { PaginaInstitucional } from "./collections/PaginaInstitucional";
 import { Redirects } from "./collections/Redirects";
 import { TipoEquipo } from "./collections/TipoEquipo";
 import { Users } from "./collections/Users";
@@ -25,7 +26,16 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Marca, TipoEquipo, ModeloRepuesto, CategoriaTecnica, Redirects],
+  collections: [
+    Users,
+    Media,
+    Marca,
+    TipoEquipo,
+    ModeloRepuesto,
+    CategoriaTecnica,
+    Redirects,
+    PaginaInstitucional,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

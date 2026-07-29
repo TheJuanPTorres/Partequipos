@@ -1,65 +1,115 @@
-import Image from "next/image";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
-export default function Home() {
+import { RichText } from "@/components/layout/RichText";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { enlaceWhatsApp, navegacionPrincipal } from "@/lib/navegacion";
+import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
+import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { seoConfig } from "@/lib/seo/config";
+import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
+import { imagenDeMedia } from "@/lib/utils/relations";
+
+/**
+ * Portada. El contenido es editable desde Payload (documento con slug
+ * `inicio`); aquí no hay texto de negocio quemado.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const pagina = await getPaginaPorSlug(SLUG_PORTADA);
+  if (!pagina) return {};
+
+  return buildMetadata({
+    nombre: pagina.titulo,
+    path: "/",
+    descripcion: pagina.entradilla,
+    seo: pagina.seo,
+    imageUrl: imagenDeMedia(pagina.seo?.ogImage, pagina.titulo)?.url,
+  });
+}
+
+export default async function HomePage() {
+  const pagina = await getPaginaPorSlug(SLUG_PORTADA);
+  if (!pagina) notFound();
+
+  const { contact } = seoConfig;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
+    <main className="mx-auto max-w-5xl px-4 py-12">
+      <JsonLd data={buildOrganizationJsonLd()} />
+
+      <h1 className="text-4xl font-semibold text-gray-900">{pagina.titulo}</h1>
+      {pagina.entradilla ? (
+        <p className="mt-4 max-w-2xl text-lg text-gray-600">{pagina.entradilla}</p>
+      ) : null}
+
+      {/* Acceso a las secciones principales del sitio. */}
+      <nav className="mt-10" aria-labelledby="secciones-heading">
+        <h2 id="secciones-heading" className="text-xl font-medium text-gray-900">
+          Qué encontrarás aquí
+        </h2>
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+          {navegacionPrincipal.map((item) => (
+            <li key={item.href} className="rounded-lg border border-gray-200">
+              <Link href={item.href} className="block p-4 hover:bg-gray-50">
+                <span className="font-medium text-gray-900">{item.etiqueta}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {pagina.contenido ? (
+        <section className="mt-12" aria-labelledby="propuesta-heading">
+          <h2 id="propuesta-heading" className="text-xl font-medium text-gray-900">
+            Sobre Partequipos
+          </h2>
+          <div className="mt-4">
+            <RichText data={pagina.contenido} />
+          </div>
+        </section>
+      ) : null}
+
+      {/* Secciones con ancla, si el editor las define para la portada. */}
+      {(pagina.secciones ?? []).map((seccion) => (
+        <section key={seccion.ancla} id={seccion.ancla} className="mt-12 scroll-mt-8">
+          <h2 className="text-xl font-medium text-gray-900">{seccion.titulo}</h2>
+          <div className="mt-4">
+            <RichText data={seccion.contenido} />
+          </div>
+        </section>
+      ))}
+
+      <section className="mt-12 border-t border-gray-200 pt-8" aria-labelledby="contacto-heading">
+        <h2 id="contacto-heading" className="text-xl font-medium text-gray-900">
+          Contacto
+        </h2>
+        <address className="mt-3 space-y-1 not-italic text-gray-700">
+          <p>
+            <a href={`tel:${contact.phone.replace(/\s/g, "")}`} className="underline">
+              {contact.phone}
             </a>{" "}
-            or the{" "}
+            ·{" "}
             <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              href={enlaceWhatsApp(contact.phone)}
+              className="underline"
+              rel="noopener noreferrer"
+              target="_blank"
             >
-              Learning
-            </a>{" "}
-            center.
+              WhatsApp
+            </a>
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+          <p>
+            <a href={`mailto:${contact.email}`} className="underline">
+              {contact.email}
+            </a>
+          </p>
+          <p>
+            {contact.streetAddress}, {contact.addressLocality}
+          </p>
+        </address>
+        <p className="mt-2 text-sm text-gray-600">{contact.openingHours}</p>
+      </section>
+    </main>
   );
 }

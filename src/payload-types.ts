@@ -74,6 +74,7 @@ export interface Config {
     'modelos-repuesto': ModelosRepuesto;
     'categorias-tecnicas': CategoriasTecnica;
     redirects: Redirect;
+    paginas: Pagina;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +89,7 @@ export interface Config {
     'modelos-repuesto': ModelosRepuestoSelect<false> | ModelosRepuestoSelect<true>;
     'categorias-tecnicas': CategoriasTecnicasSelect<false> | CategoriasTecnicasSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    paginas: PaginasSelect<false> | PaginasSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -297,6 +299,78 @@ export interface Redirect {
   createdAt: string;
 }
 /**
+ * Páginas fijas del sitio. El slug es la ruta completa y no debe cambiarse: son URLs indexadas.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "paginas".
+ */
+export interface Pagina {
+  id: number;
+  titulo: string;
+  /**
+   * Ruta completa sin barras al inicio ni al final. Ej: 'nosotros' o 'nosotros/trabaja-con-nosotros'. Para la portada, usar 'inicio'.
+   */
+  slug: string;
+  /**
+   * Las legales no deberían despublicarse: son de cumplimiento.
+   */
+  tipoPagina?: ('institucional' | 'legal' | 'portada') | null;
+  /**
+   * Párrafo introductorio bajo el título.
+   */
+  entradilla?: string | null;
+  contenido?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Bloques enlazables dentro de la página, p. ej. /servicio-tecnico/#taller. No generan URLs nuevas.
+   */
+  secciones?:
+    | {
+        titulo: string;
+        /**
+         * Identificador del enlace, sin '#'. Debe copiarse EXACTO del sitio actual (distingue mayúsculas): 'taller', 'GARANTIA', 'Devoluciones'.
+         */
+        ancla: string;
+        contenido?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -347,6 +421,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'paginas';
+        value: number | Pagina;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -512,6 +590,34 @@ export interface RedirectsSelect<T extends boolean = true> {
   tipo?: T;
   origen?: T;
   notas?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "paginas_select".
+ */
+export interface PaginasSelect<T extends boolean = true> {
+  titulo?: T;
+  slug?: T;
+  tipoPagina?: T;
+  entradilla?: T;
+  contenido?: T;
+  secciones?:
+    | T
+    | {
+        titulo?: T;
+        ancla?: T;
+        contenido?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

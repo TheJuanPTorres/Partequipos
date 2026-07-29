@@ -1,9 +1,15 @@
 import * as migration_20260728_072955_inicial from './20260728_072955_inicial';
+import * as migration_20260729_042128_paginas_institucionales from './20260729_042128_paginas_institucionales';
 
 export const migrations = [
   {
     up: migration_20260728_072955_inicial.up,
     down: migration_20260728_072955_inicial.down,
-    name: '20260728_072955_inicial'
+    name: '20260728_072955_inicial',
+  },
+  {
+    up: migration_20260729_042128_paginas_institucionales.up,
+    down: migration_20260729_042128_paginas_institucionales.down,
+    name: '20260729_042128_paginas_institucionales'
   },
 ];

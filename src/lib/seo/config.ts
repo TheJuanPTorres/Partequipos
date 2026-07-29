@@ -45,6 +45,24 @@ export const seoConfig = {
     /** Horario tal como lo publica el sitio. */
     openingHours: "Lunes a viernes de 8:00 a. m. a 5:30 p. m. y sábados de 9:00 a. m. a 12:00 m.",
   },
+  /**
+   * Portales externos enlazados desde el pie del sitio actual (zona de clientes
+   * y proveedores, tienda, empleo).
+   *
+   * PENDIENTE: las URLs reales no están confirmadas. Se dejan vacías a
+   * propósito — el pie omite el enlace si falta el valor, en vez de apuntar a
+   * un destino inventado. Ver CLAUDE.md §10.3.
+   */
+  portales: {
+    /** Zona de clientes/proveedores de repuestos (SAP). */
+    sapRepuestos: "",
+    /** Zona de clientes/proveedores de maquinaria (SAP). */
+    sapMaquinaria: "",
+    /** Portal de empleo (Buk). */
+    empleo: "",
+    /** Tienda en línea (PE PartsShop / STAL). */
+    tienda: "",
+  },
   /** Perfiles oficiales; alimentan `sameAs` de Organization. Fuente: footer. */
   sameAs: [
     "https://www.facebook.com/partequip0s",

@@ -233,3 +233,39 @@ export const revalidarModeloBorrado: CollectionAfterDeleteHook = async ({ doc, r
   }
   return doc;
 };
+
+// ---------------------------------------------------------------------------
+// PÁGINAS INSTITUCIONALES
+// ---------------------------------------------------------------------------
+/** Ruta pública de una página institucional; "inicio" es la portada. */
+function rutaDePagina(slug: string): string {
+  const limpio = (slug ?? "").replace(/^\/+|\/+$/g, "");
+  return limpio === "inicio" || limpio === "" ? "/" : `/${limpio}`;
+}
+
+export const revalidarPagina: CollectionAfterChangeHook = async ({ doc, previousDoc, req }) => {
+  try {
+    const paths = [rutaDePagina(doc.slug)];
+
+    if (previousDoc?.slug && previousDoc.slug !== doc.slug) {
+      const anterior = rutaDePagina(previousDoc.slug);
+      paths.push(anterior);
+      // ADR 0005: salvar la URL anterior con un 301.
+      await crearRedirectPorCambioDeSlug(req, anterior, rutaDePagina(doc.slug));
+    }
+
+    revalidarRutas(paths, `página ${doc.slug}`);
+  } catch (error) {
+    console.error("[revalidación] hook de PaginaInstitucional falló:", error);
+  }
+  return doc;
+};
+
+export const revalidarPaginaBorrada: CollectionAfterDeleteHook = ({ doc }) => {
+  try {
+    revalidarRutas([rutaDePagina(doc.slug)], `página borrada ${doc.slug}`);
+  } catch (error) {
+    console.error("[revalidación] hook de borrado de PaginaInstitucional falló:", error);
+  }
+  return doc;
+};

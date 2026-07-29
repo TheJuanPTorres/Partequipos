@@ -210,6 +210,11 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 - **Entornos separados (verificado):** rama Neon **`production`** (la usa
   Vercel) y **`development`** (local). Comprobado creando un registro en local
   y confirmando que **no** aparece en producción.
+- **RIESGO CERRADO — flujo de migraciones verificado y operativo en producción.**
+  Confirmado en la rama `production`: `payload_migrations` contiene
+  `20260728_072955_inicial` con **`batch 1`** (ya no el marcador `dev`). El
+  esquema de producción proviene de una migración versionada, no de push, así que
+  los próximos cambios de colección se aplicarán y quedarán registrados.
 - **RESUELTO — producción limpia y esquema aplicado por migración.** Se ejecutó
   `DROP SCHEMA` en la rama `production` y se redesplegó sin caché (2026-07-28).
   Verificado en producción: las **6 colecciones responden `totalDocs: 0`** con

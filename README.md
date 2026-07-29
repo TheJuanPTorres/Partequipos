@@ -38,8 +38,8 @@ administrador.
 | `npm run migrate*`       | Migraciones de base de datos (ver §3)                    |
 
 > **Importante:** `npm run build` **no** ejecuta el linter (cambió en Next 16).
-> El control de calidad son cuatro comandos separados: `lint`, `typecheck`,
-> `test` y `build`. El CI debe correr los cuatro.
+> El control de calidad son comandos separados: `lint`, `typecheck`, `format:check`
+> y `test`. Los corre el CI en cada push y PR (§5).
 
 ---
 
@@ -132,7 +132,51 @@ npm run migrate && npm run build
 
 ---
 
-## 5. Estructura
+## 5. Integración continua
+
+`.github/workflows/ci.yml` se ejecuta en **cada push a `main` y en cada PR**.
+Existe porque en Next 16 `next build` ya no ejecuta el linter (ADR 0001): sin
+esto, un error de lint o de tipos llegaría a `main` sin que nadie lo note.
+
+Valida cuatro cosas, en este orden:
+
+| Paso    | Comando                | Qué falla si se rompe                         |
+| ------- | ---------------------- | --------------------------------------------- |
+| Tipos   | `npm run typecheck`    | `any` implícito, tipo incorrecto, import roto |
+| Lint    | `npm run lint`         | reglas de ESLint (incluye `any` y `console`)  |
+| Formato | `npm run format:check` | archivo sin pasar por Prettier                |
+| Tests   | `npm test`             | tests unitarios de `src/**/*.test.ts`         |
+
+**No necesita secretos ni base de datos**: los cuatro pasos corren sin conexión
+(verificado ejecutándolos sin `.env.local`). Si algún día un paso necesitara
+credenciales, hay que discutirlo antes de añadir secretos al repositorio.
+
+**El build no corre en CI a propósito.** Vercel lo ejecuta en cada despliegue —
+duplicarlo sumaría ~2 minutos por ejecución para detectar lo mismo un rato antes.
+Lo que el build detectaría y el CI no (un fallo de compilación) aparecería igual
+en el preview del PR, antes de fusionar. Si en el futuro se despliega fuera de
+Vercel, habría que añadirlo.
+
+**La versión de Node se fija una sola vez**, en `.nvmrc` (+ `engines.node` en
+`package.json`). Vercel y el CI leen de ahí, así que no pueden divergir.
+
+### Si el CI falla
+
+Reproduce el mismo paso en local; son los mismos comandos:
+
+```bash
+npm run typecheck     # errores de tipos
+npm run lint          # o `npm run lint:fix` para lo autocorregible
+npm run format:check  # o `npm run format` para arreglarlo
+npm test
+```
+
+Casi siempre es formato: `npm run format` y volver a commitear. No fusiones un PR
+con el CI en rojo — la rama `main` debe estar siempre desplegable (CLAUDE.md §6).
+
+---
+
+## 6. Estructura
 
 ```
 src/

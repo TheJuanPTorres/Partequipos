@@ -1,0 +1,53 @@
+name: CI
+
+# En Next 16 `next build` ya NO ejecuta el linter (ver ADR 0001), así que un
+# error de lint o de tipos podría llegar a main sin que nadie lo note.
+# Este workflow es el que lo impide.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Si se empuja dos veces seguidas a la misma rama, cancela la ejecución anterior:
+# solo interesa el resultado del último commit.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    name: Tipos, lint, formato y tests
+    runs-on: ubuntu-latest
+    # Nada aquí necesita base de datos ni secretos: los cuatro pasos corren
+    # sin conexión (verificado). Por eso el workflow no declara ningún `secrets`.
+    permissions:
+      contents: read
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          # La versión sale de .nvmrc, el MISMO archivo que respeta Vercel junto
+          # con `engines.node` en package.json. Así CI y despliegue no divergen.
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependencias
+        # `npm ci` instala exactamente lo del package-lock y falla si está
+        # desincronizado con package.json, que es lo que se quiere en CI.
+        run: npm ci
+
+      - name: Chequeo de tipos
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Formato
+        run: npm run format:check
+
+      - name: Tests
+        run: npm test

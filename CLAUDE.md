@@ -225,6 +225,17 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   `canonical`, `og:url` y JSON-LD usan el **dominio real**.
 - **`development` intacta** tras la limpieza de producción: 5 marcas · 10 tipos ·
   81 modelos · 10 categorías · 3 media, y su usuario admin sigue operativo.
+- **PENDIENTE / RIESGO ABIERTO — el despliegue automático NO funciona.** Los
+  push a `main` **no disparan despliegue en Vercel**: todos los deployments son
+  «Redeploy of…», es decir, manuales. Verificado el 2026-07-28 con marcadores de
+  ruta: el commit `0c66a0f` (19:41) introdujo `/sitemap.xml` y `/robots.txt`, y
+  casi dos horas después producción seguía devolviendo **404** en ambas mientras
+  servía con normalidad `/api/redirects-map` (del commit anterior `d9329d4`). El
+  último build desplegado es, por tanto, **anterior a `0c66a0f`**.
+  **Consecuencia:** cada cambio exige intervención manual, y el repositorio puede
+  quedar por delante de producción sin que nadie lo note. A revisar en Vercel →
+  Settings → Git (repo conectado, rama de producción = `main`, «Ignored Build
+  Step» vacío, y permisos de la GitHub App tras pasar el repo a privado).
 - **PENDIENTE — separar los stores de Vercel Blob.** Ambos entornos comparten el
   mismo `BLOB_READ_WRITE_TOKEN`. El `DROP SCHEMA` borró los registros de los 3
   media de producción, pero **los archivos siguen en el Blob y `development` los

@@ -255,6 +255,16 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   **vacía**. Al haber partido de un esquema limpio, este escenario ya no aplica
   en producción, pero volvería a darse si alguien hace push contra ella.
 
+### 10.5 Nota operativa — regeneración de `package-lock.json`
+
+> El `package-lock.json` se regenera **SIEMPRE** con instalación limpia
+> (`rm -rf node_modules && npm install`), **nunca** con `--package-lock-only`.
+>
+> Regenerarlo en Windows descarta entradas transitivas que la resolución de Linux
+> necesita (`@emnapi/*`, dependencias de `sharp` y `@tailwindcss/oxide`), y **CI y
+> Vercel construyen sobre Linux**. Si `npm ci` falla en CI con
+> `Missing: X from lock file`, **esta es la causa**.
+
 ### 10.3 Pendientes de confirmar con el cliente
 
 > Lista para la reunión de firma. Son datos que **no se pueden deducir del sitio

@@ -40,7 +40,19 @@ jobs:
       - name: Instalar dependencias
         # `npm ci` instala exactamente lo del package-lock y falla si está
         # desincronizado con package.json, que es lo que se quiere en CI.
-        run: npm ci
+        #
+        # DIAGNÓSTICO TEMPORAL: si falla, publica el error como anotación de
+        # GitHub. El log crudo del job solo es accesible con permisos de admin,
+        # así que sin esto el fallo se ve únicamente como "exit code 1".
+        # Retirar cuando el CI esté estable.
+        run: |
+          set +e
+          salida=$(npm ci 2>&1); codigo=$?
+          echo "$salida"
+          if [ $codigo -ne 0 ]; then
+            echo "::error::npm ci falló (código $codigo): $(echo "$salida" | grep -iE 'npm (error|ERR)' | head -12 | tr '\n' ' ¶ ')"
+          fi
+          exit $codigo
 
       - name: Chequeo de tipos
         run: npm run typecheck

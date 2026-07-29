@@ -210,19 +210,33 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 - **Entornos separados (verificado):** rama Neon **`production`** (la usa
   Vercel) y **`development`** (local). Comprobado creando un registro en local
   y confirmando que **no** aparece en producción.
-- **PENDIENTE — limpieza de producción:** producción conserva los datos de demo;
-  hay que limpiarlos antes de cargar contenido real. Además **el store de Vercel
-  Blob sigue compartido** entre entornos (mismo `BLOB_READ_WRITE_TOKEN`).
-- **BLOQUEANTE de despliegue — `payload migrate` es interactivo:** si
+- **RESUELTO — producción limpia y esquema aplicado por migración.** Se ejecutó
+  `DROP SCHEMA` en la rama `production` y se redesplegó sin caché (2026-07-28).
+  Verificado en producción: las **6 colecciones responden `totalDocs: 0`** con
+  JSON válido (si faltaran tablas, Postgres daría `relation does not exist`, así
+  que el esquema **existe**); `/admin` sirve el flujo de **primer usuario** y las
+  credenciales anteriores dan `401`; las páginas manejan el vacío sin errores
+  ("0 marcas disponibles", un solo `<h1>`, `404` en rutas ya inexistentes);
+  `canonical`, `og:url` y JSON-LD usan el **dominio real**.
+- **`development` intacta** tras la limpieza de producción: 5 marcas · 10 tipos ·
+  81 modelos · 10 categorías · 3 media, y su usuario admin sigue operativo.
+- **PENDIENTE — separar los stores de Vercel Blob.** Ambos entornos comparten el
+  mismo `BLOB_READ_WRITE_TOKEN`. El `DROP SCHEMA` borró los registros de los 3
+  media de producción, pero **los archivos siguen en el Blob y `development` los
+  referencia**: no se deben borrar hasta separar los stores. Aislamiento a medias
+  mientras esto siga así.
+- **CUIDADO al desplegar — `payload migrate` es interactivo:** si
   `payload_migrations` contiene el marcador `dev` (`batch -1`, que deja el push
   de desarrollo), el comando abre un prompt —
   _"It looks like you've run Payload in dev mode… data loss will occur. Would you
-  like to proceed?"_ — y **se queda esperando**. En un build de Vercel (sin
-  stdin) eso cuelga o falla el despliegue. Reproducido en local: `npm run migrate`
-  colgado 5 min sin aplicar nada. Existe la opción `forceAcceptWarning` para
-  ejecución no interactiva. **Ojo:** el propio aviso advierte de pérdida de datos,
-  y la migración inicial hace `CREATE TABLE` sin `IF NOT EXISTS`, así que solo es
-  segura contra una base **vacía**.
+  like to proceed?"_ — con `initial: false` y `onCancel: process.exit(0)`. Sin
+  stdin (build de Vercel) **sale con código 0 sin aplicar nada**, y el `&&` deja
+  continuar el build: el despliegue queda "Ready" pero sin migrar. Reproducido en
+  local: `npm run migrate` colgado 5 min sin aplicar nada. Existe
+  `forceAcceptWarning` para ejecución no interactiva. La migración inicial hace
+  `CREATE TABLE` sin `IF NOT EXISTS`, así que solo es segura contra una base
+  **vacía**. Al haber partido de un esquema limpio, este escenario ya no aplica
+  en producción, pero volvería a darse si alguien hace push contra ella.
 
 ### 10.3 Pendientes de confirmar con el cliente
 

@@ -160,6 +160,16 @@ Vercel, habría que añadirlo.
 **La versión de Node se fija una sola vez**, en `.nvmrc` (+ `engines.node` en
 `package.json`). Vercel y el CI leen de ahí, así que no pueden divergir.
 
+**El repositorio es privado.** Dos consecuencias prácticas:
+
+- Las ejecuciones del CI **consumen los minutos de Actions del plan de GitHub**
+  (en repos públicos serían gratis). De ahí que el workflow no ejecute el build
+  —lo hace Vercel— y que use `concurrency` con `cancel-in-progress`, para no
+  gastar minutos en ejecuciones que ya quedaron obsoletas.
+- El estado del CI **no se puede consultar sin credenciales**: ni por la API
+  pública ni por enlace anónimo. Se revisa desde la pestaña **Actions** del repo
+  o con `gh run list` autenticado.
+
 ### Si el CI falla
 
 Reproduce el mismo paso en local; son los mismos comandos:

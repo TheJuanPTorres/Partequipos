@@ -41,18 +41,13 @@ jobs:
         # `npm ci` instala exactamente lo del package-lock y falla si está
         # desincronizado con package.json, que es lo que se quiere en CI.
         #
-        # DIAGNÓSTICO TEMPORAL: si falla, publica el error como anotación de
-        # GitHub. El log crudo del job solo es accesible con permisos de admin,
-        # así que sin esto el fallo se ve únicamente como "exit code 1".
-        # Retirar cuando el CI esté estable.
-        run: |
-          set +e
-          salida=$(npm ci 2>&1); codigo=$?
-          echo "$salida"
-          if [ $codigo -ne 0 ]; then
-            echo "::error::npm ci falló (código $codigo): $(echo "$salida" | grep -iE 'npm (error|ERR)' | head -12 | tr '\n' ' ¶ ')"
-          fi
-          exit $codigo
+        # OJO al regenerar el lock: hay que hacerlo con una instalación limpia
+        # (`rm package-lock.json && rm -rf node_modules && npm install`).
+        # Actualizarlo con `npm install --package-lock-only` desde Windows
+        # re-resuelve el árbol para esa plataforma y descarta entradas que la
+        # resolución de Linux necesita (p. ej. `@emnapi/runtime`, `@emnapi/core`),
+        # lo que rompe este paso con `EUSAGE` aunque en local funcione.
+        run: npm ci
 
       - name: Chequeo de tipos
         run: npm run typecheck

@@ -170,6 +170,17 @@ Vercel, habría que añadirlo.
   pública ni por enlace anónimo. Se revisa desde la pestaña **Actions** del repo
   o con `gh run list` autenticado.
 
+> **Cuidado al regenerar `package-lock.json` desde Windows.** El CI corre en
+> Linux, y `npm install --package-lock-only` re-resuelve el árbol para la
+> plataforma actual: descarta entradas que la resolución de Linux necesita
+> (`@emnapi/runtime`, `@emnapi/core`, dependencias wasm de `sharp` y
+> `@tailwindcss/oxide`) y el paso de instalación falla con `EUSAGE — Missing:
+… from lock file`, **aunque en local funcione**. Si hay que rehacer el lock:
+>
+> ```bash
+> rm package-lock.json && rm -rf node_modules && npm install
+> ```
+
 ### Si el CI falla
 
 Reproduce el mismo paso en local; son los mismos comandos:

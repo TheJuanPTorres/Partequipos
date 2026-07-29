@@ -24,7 +24,8 @@
     "migrate:status": "payload migrate:status",
     "migrate:down": "payload migrate:down",
     "import": "payload run scripts/import/import.ts",
-    "crawl": "tsx scripts/crawl/crawl.ts"
+    "crawl": "tsx scripts/crawl/crawl.ts",
+    "redirects:map": "tsx scripts/redirects/build-map.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.86.0",

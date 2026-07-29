@@ -18,3 +18,7 @@ src/migrations/
 docs/crawl-reporte.md
 docs/url-map.csv
 docs/inventario-repuestos.csv
+
+# Artefactos generados por `npm run redirects:map`
+docs/redirects-cobertura.md
+docs/redirects-map.csv

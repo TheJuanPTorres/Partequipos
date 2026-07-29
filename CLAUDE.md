@@ -225,17 +225,18 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   `canonical`, `og:url` y JSON-LD usan el **dominio real**.
 - **`development` intacta** tras la limpieza de producción: 5 marcas · 10 tipos ·
   81 modelos · 10 categorías · 3 media, y su usuario admin sigue operativo.
-- **PENDIENTE / RIESGO ABIERTO — el despliegue automático NO funciona.** Los
-  push a `main` **no disparan despliegue en Vercel**: todos los deployments son
-  «Redeploy of…», es decir, manuales. Verificado el 2026-07-28 con marcadores de
-  ruta: el commit `0c66a0f` (19:41) introdujo `/sitemap.xml` y `/robots.txt`, y
-  casi dos horas después producción seguía devolviendo **404** en ambas mientras
-  servía con normalidad `/api/redirects-map` (del commit anterior `d9329d4`). El
-  último build desplegado es, por tanto, **anterior a `0c66a0f`**.
-  **Consecuencia:** cada cambio exige intervención manual, y el repositorio puede
-  quedar por delante de producción sin que nadie lo note. A revisar en Vercel →
-  Settings → Git (repo conectado, rama de producción = `main`, «Ignored Build
-  Step» vacío, y permisos de la GitHub App tras pasar el repo a privado).
+- **RESUELTO — el despliegue automático SÍ funciona.** Los últimos deployments
+  provienen de **push a `main`** con su commit asociado (`ff54dda`, `0c66a0f`),
+  no de un «Redeploy» manual. El diagnóstico anterior —que los push no
+  disparaban despliegue— quedó explicado por el punto siguiente: el bloqueo era
+  de plan, no de configuración de Git.
+- **HALLAZGO — el plan Hobby de Vercel no admite colaboración en repositorios
+  privados.** Al pasar el repositorio a privado, los despliegues quedaron en
+  estado **«Blocked»**, lo que se manifestó como «los push no despliegan».
+  **Solución temporal:** repositorio público, con autorización del cliente.
+  **Decisión pendiente:** pasar a **Vercel Pro** (ya presupuestado en la
+  cotización) **antes** de que el repositorio vuelva a ser privado; de lo
+  contrario los despliegues se bloquearán de nuevo.
 - **PENDIENTE — separar los stores de Vercel Blob.** Ambos entornos comparten el
   mismo `BLOB_READ_WRITE_TOKEN`. El `DROP SCHEMA` borró los registros de los 3
   media de producción, pero **los archivos siguen en el Blob y `development` los

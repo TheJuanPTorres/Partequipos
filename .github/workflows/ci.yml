@@ -25,10 +25,12 @@ jobs:
 
     steps:
       - name: Descargar el repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurar Node
-        uses: actions/setup-node@v4
+        # v7 es la major vigente. Las v4 apuntan al runtime de Node 20, ya
+        # deprecado en los runners, que las fuerza a ejecutarse sobre Node 24.
+        uses: actions/setup-node@v7
         with:
           # La versión sale de .nvmrc, el MISMO archivo que respeta Vercel junto
           # con `engines.node` en package.json. Así CI y despliegue no divergen.

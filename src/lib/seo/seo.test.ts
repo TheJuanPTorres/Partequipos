@@ -10,11 +10,11 @@ process.env.NEXT_PUBLIC_SERVER_URL = "https://partequipos.com";
 
 describe("absoluteUrl", () => {
   it("absolutiza una ruta relativa", () => {
-    assert.equal(absoluteUrl("/repuestos/cat"), "https://partequipos.com/repuestos/cat");
+    assert.equal(absoluteUrl("/repuestos/cat"), "https://partequipos.com/repuestos/cat/");
   });
 
   it("añade la barra faltante", () => {
-    assert.equal(absoluteUrl("repuestos/cat"), "https://partequipos.com/repuestos/cat");
+    assert.equal(absoluteUrl("repuestos/cat"), "https://partequipos.com/repuestos/cat/");
   });
 
   it("deja intacta una URL ya absoluta (imagen del CDN)", () => {
@@ -72,7 +72,7 @@ describe("buildMetadata", () => {
 
   it("emite canonical absoluto", () => {
     const meta = buildMetadata({ nombre: "X", path: "/a/b" });
-    assert.equal(meta.alternates?.canonical, "https://partequipos.com/a/b");
+    assert.equal(meta.alternates?.canonical, "https://partequipos.com/a/b/");
   });
 
   it("emite Open Graph completo con locale es_CO", () => {
@@ -82,7 +82,7 @@ describe("buildMetadata", () => {
     assert.ok(og);
     assert.equal(og.locale, seoConfig.locale);
     assert.equal(og.siteName, seoConfig.siteName);
-    assert.equal("url" in og ? og.url : undefined, "https://partequipos.com/a");
+    assert.equal("url" in og ? og.url : undefined, "https://partequipos.com/a/");
     assert.equal("type" in og ? og.type : undefined, "website");
     assert.ok(Array.isArray(og.images) && og.images.length > 0);
   });
@@ -139,7 +139,7 @@ describe("buildProductJsonLd", () => {
     assert.equal(jsonLd["@context"], "https://schema.org");
     assert.equal(jsonLd["@type"], "Product");
     assert.equal(jsonLd.name, "Caterpillar 320D");
-    assert.equal(jsonLd.url, "https://partequipos.com/repuestos/cat/excavadora/320d");
+    assert.equal(jsonLd.url, "https://partequipos.com/repuestos/cat/excavadora/320d/");
     assert.equal(jsonLd.sku, "320D");
     assert.deepEqual(jsonLd.brand, { "@type": "Brand", name: "Caterpillar" });
     assert.deepEqual(jsonLd.image, ["https://abc.public.blob.vercel-storage.com/320d.png"]);
@@ -175,7 +175,7 @@ describe("buildBreadcrumbJsonLd", () => {
     assert.equal(items[0]?.position, 1);
     assert.equal(items[2]?.position, 3);
     assert.equal(items[1]?.name, "Caterpillar");
-    assert.equal(items[1]?.item, "https://partequipos.com/cat");
+    assert.equal(items[1]?.item, "https://partequipos.com/cat/");
     assert.equal(items[0]?.["@type"], "ListItem");
   });
 

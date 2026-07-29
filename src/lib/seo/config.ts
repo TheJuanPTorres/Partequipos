@@ -70,10 +70,26 @@ export function getSiteUrl(): string {
  * Convierte una ruta o URL en absoluta. Las URLs que ya son absolutas
  * (p. ej. las imágenes servidas desde el CDN del Blob, ver ADR 0003) se
  * devuelven intactas.
+ *
+ * Emite **con barra final**, para que coincida con lo que sirve el sitio
+ * (`trailingSlash: true`, ADR 0006). Sin esto, el `canonical` y el JSON-LD
+ * apuntarían a una URL que responde 308 hacia la versión con barra: una
+ * autorreferencia que no es canónica.
+ *
+ * Excepción: las rutas que terminan en un archivo con extensión (`/sitemap.xml`,
+ * `/robots.txt`, imágenes) no llevan barra — no son directorios.
  */
 export function absoluteUrl(pathOrUrl: string): string {
   const value = (pathOrUrl ?? "").trim();
-  if (value.length === 0) return getSiteUrl();
+  if (value.length === 0) return `${getSiteUrl()}/`;
   if (/^https?:\/\//i.test(value)) return value;
-  return `${getSiteUrl()}/${value.replace(/^\/+/, "")}`;
+
+  const ruta = value.replace(/^\/+/, "").replace(/\/+$/, "");
+  if (ruta.length === 0) return `${getSiteUrl()}/`;
+
+  // Un último segmento con extensión es un archivo, no un directorio.
+  const ultimo = ruta.split("/").pop() ?? "";
+  const esArchivo = /\.[a-z0-9]{2,5}$/i.test(ultimo);
+
+  return `${getSiteUrl()}/${ruta}${esArchivo ? "" : "/"}`;
 }

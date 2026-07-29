@@ -1,7 +1,32 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { cadenasAAplanar, creaBucle, normalizarRuta } from "./normalizar";
+import { aRutaCanonica, cadenasAAplanar, creaBucle, normalizarRuta } from "./normalizar";
+
+describe("aRutaCanonica", () => {
+  it("emite con barra final, que es la forma que sirve el sitio", () => {
+    assert.equal(aRutaCanonica("/a/b"), "/a/b/");
+    assert.equal(aRutaCanonica("/a/b/"), "/a/b/");
+    assert.equal(aRutaCanonica("a/b"), "/a/b/");
+  });
+
+  it("no añade barra a la raíz duplicándola", () => {
+    assert.equal(aRutaCanonica("/"), "/");
+    assert.equal(aRutaCanonica(""), "/");
+  });
+
+  it("no añade barra a archivos con extensión", () => {
+    assert.equal(aRutaCanonica("/sitemap.xml"), "/sitemap.xml");
+    assert.equal(aRutaCanonica("/robots.txt"), "/robots.txt");
+  });
+
+  it("coincide con normalizarRuta al comparar, pero difiere al emitir", () => {
+    // Misma clave de emparejamiento, distinta forma de emisión: es el punto
+    // exacto donde antes se colaba un 308 detrás del 301.
+    assert.equal(normalizarRuta("/a/b/"), normalizarRuta("/a/b"));
+    assert.notEqual(aRutaCanonica("/a/b"), normalizarRuta("/a/b"));
+  });
+});
 
 describe("normalizarRuta", () => {
   it("añade la barra inicial", () => {

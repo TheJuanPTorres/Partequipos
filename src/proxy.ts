@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { normalizarRuta } from "@/lib/redirects/normalizar";
+import { aRutaCanonica, normalizarRuta } from "@/lib/redirects/normalizar";
 
 /**
  * Redirecciones 301/302 en el borde de la aplicación (ADR 0005).
@@ -70,9 +70,12 @@ export async function proxy(request: NextRequest) {
     const entrada = mapa.get(ruta);
     if (!entrada) return NextResponse.next();
 
+    // El destino se emite en su forma CANÓNICA (con barra final, ADR 0006).
+    // Guardado va normalizado sin barra para que el emparejamiento sea estable;
+    // si se emitiera así, Next encadenaría un 308 detrás del 301.
     const destino = /^https?:\/\//i.test(entrada.hacia)
       ? new URL(entrada.hacia)
-      : new URL(entrada.hacia, request.nextUrl.origin);
+      : new URL(aRutaCanonica(entrada.hacia), request.nextUrl.origin);
 
     // Conserva la query original: no debe perderse al redirigir.
     destino.search = request.nextUrl.search;

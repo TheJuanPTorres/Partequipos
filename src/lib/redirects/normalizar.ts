@@ -18,6 +18,27 @@ export function normalizarRuta(ruta: string): string {
   return valor;
 }
 
+/**
+ * Convierte una ruta interna a su forma CANÓNICA servida por el sitio, que
+ * lleva barra final (`trailingSlash: true`, ADR 0006).
+ *
+ * `normalizarRuta` quita la barra para **comparar** (así `/a/b` y `/a/b/` son la
+ * misma clave, se escriba como se escriba en el panel). Pero al **emitir** un
+ * redirect hay que devolver la forma canónica: si no, el 301 apunta a la versión
+ * sin barra y Next encadena un 308 detrás — dos saltos donde debería haber uno.
+ *
+ * Las rutas que terminan en archivo con extensión no llevan barra.
+ */
+export function aRutaCanonica(ruta: string): string {
+  const base = normalizarRuta(ruta);
+  if (base === "/" || base === "") return "/";
+
+  const ultimo = base.split("/").pop() ?? "";
+  if (/\.[a-z0-9]{2,5}$/i.test(ultimo)) return base;
+
+  return `${base}/`;
+}
+
 export type RedirectSimple = { desde: string; hacia: string };
 
 /**

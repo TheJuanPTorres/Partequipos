@@ -94,6 +94,23 @@ evolución natural es consultar por clave en vez de traer el mapa entero.
 - **Bucle A→B con B→A → se rechaza.**
 - `desde` es único: no puede haber dos destinos para la misma URL.
 
+### Normalización de rutas — actualizado por el ADR 0006
+
+`desde` y `hacia` se **almacenan normalizados sin barra final** (`normalizarRuta`).
+Eso es deliberado y sigue siendo correcto: hace que el emparejamiento sea estable
+se escriba `/a/b` o `/a/b/` en el panel.
+
+Lo que cambió al activar `trailingSlash: true` ([[0006-trailing-slash]]) es la
+**emisión**: el destino debe devolverse en su forma canónica **con** barra. Si se
+emitía normalizado, el `301` del proxy encadenaba un `308` de Next detrás —dos
+saltos donde debe haber uno—, que es justo el coste que el ADR 0006 elimina.
+
+De ahí la separación:
+
+- `normalizarRuta()` → **comparar** (clave estable, sin barra).
+- `aRutaCanonica()` → **emitir** (forma servida, con barra; salvo archivos con
+  extensión, que no la llevan).
+
 ## Consecuencias
 
 - El editor no puede romper una URL indexada por accidente; si lo hace a

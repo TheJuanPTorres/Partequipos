@@ -395,14 +395,14 @@ function escribirInforme(
     }
   }
 
-  l.push("## 4. Nota sobre la barra final");
+  l.push("## 4. Barra final — RESUELTO");
   l.push("");
   l.push(
-    "Las **648** URLs del sitio actual terminan en `/`. El sitio nuevo sirve las rutas **sin** barra final y Next emite un **308** de `/ruta/` a `/ruta`.",
+    "Las **648** URLs del sitio actual terminan en `/`. Se activó **`trailingSlash: true`** (ADR 0006), así que el sitio nuevo sirve esas mismas rutas **con barra**: son **byte a byte idénticas** a las indexadas y ya no hay ningún 308 intermedio.",
   );
   l.push("");
   l.push(
-    "El 308 conserva el posicionamiento, así que no hay pérdida — pero **cada URL indexada paga un salto extra**. Alternativa: activar `trailingSlash: true` en `next.config.ts`, con lo que las rutas del catálogo quedarían **byte a byte idénticas** a las actuales y ese salto desaparecería. Es una decisión de dirección: afecta a todas las URLs del sitio y conviene tomarla antes del lanzamiento.",
+    "Esto no cambia la clasificación de este informe —el mapeo siempre comparó rutas normalizadas—, pero sí su significado: las URLs marcadas como *ruta conservada* ahora se sirven **directamente con 200**, sin el salto extra que se pagaba antes en cada visita.",
   );
   l.push("");
 

@@ -34,19 +34,19 @@ describe("buildSitemapEntries", () => {
 
   it("construye la jerarquía completa en la URL del modelo", () => {
     const e = buildSitemapEntries(datos, AHORA);
-    const modelo = e.find((x) => x.url.endsWith("/modelo-a"));
+    const modelo = e.find((x) => x.url.endsWith("/modelo-a/"));
 
     assert.ok(modelo);
-    assert.ok(modelo.url.includes("/marca-a/tipo-a/modelo-a"));
+    assert.ok(modelo.url.includes("/marca-a/tipo-a/modelo-a/"));
   });
 
   it("toma lastModified del updatedAt real de cada entidad", () => {
     const e = buildSitemapEntries(datos, AHORA);
 
-    const marca = e.find((x) => x.url.endsWith("/marca-a"));
+    const marca = e.find((x) => x.url.endsWith("/marca-a/"));
     assert.equal(marca?.lastModified.toISOString(), "2026-07-20T10:00:00.000Z");
 
-    const modelo = e.find((x) => x.url.endsWith("/modelo-a"));
+    const modelo = e.find((x) => x.url.endsWith("/modelo-a/"));
     assert.equal(modelo?.lastModified.toISOString(), "2026-07-25T10:00:00.000Z");
   });
 
@@ -70,7 +70,7 @@ describe("buildSitemapEntries", () => {
       { marcas: [{ slug: "m", updatedAt: null }], tipos: [], modelos: [] },
       AHORA,
     );
-    const marca = e.find((x) => x.url.endsWith("/m"));
+    const marca = e.find((x) => x.url.endsWith("/m/"));
     assert.equal(marca?.lastModified.getTime(), AHORA.getTime());
 
     const invalida = buildSitemapEntries(
@@ -78,7 +78,7 @@ describe("buildSitemapEntries", () => {
       AHORA,
     );
     assert.equal(
-      invalida.find((x) => x.url.endsWith("/m"))?.lastModified.getTime(),
+      invalida.find((x) => x.url.endsWith("/m/"))?.lastModified.getTime(),
       AHORA.getTime(),
     );
   });
@@ -99,7 +99,7 @@ describe("buildSitemapEntries", () => {
   it("da más prioridad a los índices que a las fichas", () => {
     const e = buildSitemapEntries(datos, AHORA);
     const indice = e[0];
-    const modelo = e.find((x) => x.url.endsWith("/modelo-a"));
+    const modelo = e.find((x) => x.url.endsWith("/modelo-a/"));
 
     assert.ok(indice && modelo);
     assert.ok(indice.priority > modelo.priority);

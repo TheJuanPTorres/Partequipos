@@ -22,6 +22,27 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  /*
+   * Bloqueo de indexación por cabecera HTTP.
+   *
+   * Es la tercera vía, junto a la metadata y robots.txt. Cubre lo que las otras
+   * dos no alcanzan: respuestas que no son HTML (el XML del sitemap, imágenes,
+   * ficheros) y cualquier rastreador que ignore la etiqueta del documento.
+   *
+   * Se lee la variable en tiempo de build, igual que las otras dos vías: las
+   * tres se activan y desactivan juntas con el mismo valor.
+   */
+  async headers() {
+    if (process.env.NEXT_PUBLIC_PERMITIR_INDEXACION?.trim().toLowerCase() === "true") {
+      return [];
+    }
+    return [
+      {
+        source: "/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+      },
+    ];
+  },
 };
 
 export default withPayload(nextConfig);

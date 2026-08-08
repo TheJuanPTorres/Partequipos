@@ -74,6 +74,25 @@ export const seoConfig = {
 } as const;
 
 /**
+ * ¿Se permite que los buscadores indexen este despliegue?
+ *
+ * Mientras el sitio real siga en WordPress, este entorno es una DEMOSTRACIÓN.
+ * Si se indexa: compite como contenido duplicado con el sitio vivo del cliente
+ * y expone textos legales que hoy son marcadores sin validez jurídica.
+ *
+ * Controlado por `NEXT_PUBLIC_PERMITIR_INDEXACION`. **Por defecto bloqueado**:
+ * si la variable falta o está mal escrita, el resultado seguro es no indexar.
+ * Para abrir el sitio el día del lanzamiento basta ponerla en "true" y
+ * redesplegar — no hay que tocar código.
+ *
+ * Es `NEXT_PUBLIC_*` porque se incrusta en build: la decisión se congela con el
+ * artefacto desplegado, no cambia sola en caliente.
+ */
+export function indexacionPermitida(): boolean {
+  return process.env.NEXT_PUBLIC_PERMITIR_INDEXACION?.trim().toLowerCase() === "true";
+}
+
+/**
  * Base absoluta del sitio, sin barra final.
  * Sale de NEXT_PUBLIC_SERVER_URL (CLAUDE.md §8: configuración por entorno).
  */

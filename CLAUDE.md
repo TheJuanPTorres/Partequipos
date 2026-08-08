@@ -255,6 +255,25 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   **vacía**. Al haber partido de un esquema limpio, este escenario ya no aplica
   en producción, pero volvería a darse si alguien hace push contra ella.
 
+### 10.6 Los datos de producción son de DEMOSTRACIÓN
+
+> **Producción NO contiene contenido real del cliente.** Lo que hay son datos de
+> demo sembrados con `npm run import` y `npm run seed:paginas`: 5 marcas, 10
+> tipos, 81 modelos, 10 categorías técnicas y 9 páginas institucionales con
+> **textos de relleno redactados por nosotros**.
+>
+> Los textos legales (garantías, tratamiento de datos, código de ética, términos)
+> son **marcadores de posición sin validez jurídica** y lo dicen explícitamente en
+> su propio contenido.
+>
+> **Antes de cargar contenido real del cliente hay que VACIAR producción**, igual
+> que se hizo el 2026-07-28: los datos de demo no deben mezclarse con los reales,
+> porque después no hay forma fiable de distinguirlos.
+>
+> Mientras tanto el entorno está **cerrado a buscadores**
+> (`NEXT_PUBLIC_PERMITIR_INDEXACION`, ver README §7): es una demostración, no el
+> sitio del cliente, y no debe competir con el WordPress vivo.
+
 ### 10.5 Nota operativa — regeneración de `package-lock.json`
 
 > El `package-lock.json` se regenera **SIEMPRE** con instalación limpia

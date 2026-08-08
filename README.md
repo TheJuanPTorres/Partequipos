@@ -197,6 +197,57 @@ con el CI en rojo — la rama `main` debe estar siempre desplegable (CLAUDE.md �
 
 ---
 
+## 7. Indexación por buscadores
+
+Mientras el sitio real siga en WordPress, este despliegue es una **demostración
+accesible públicamente**. Si Google lo indexa compite como contenido duplicado
+con el sitio vivo del cliente y expone textos legales que hoy son marcadores sin
+validez jurídica. Por eso el bloqueo está activo.
+
+Lo controla una sola variable: **`NEXT_PUBLIC_PERMITIR_INDEXACION`**.
+
+| Valor                                              | Efecto                      |
+| -------------------------------------------------- | --------------------------- |
+| vacío, ausente o cualquier cosa distinta de `true` | **Bloqueado** (por defecto) |
+| `true`                                             | Sitio abierto a buscadores  |
+
+El valor por defecto es el seguro: si alguien se equivoca al escribirlo, el
+resultado es _no indexar_, no lo contrario.
+
+### Las tres vías del bloqueo
+
+| Vía           | Dónde                          | Qué emite                                          |
+| ------------- | ------------------------------ | -------------------------------------------------- |
+| Metadata      | `src/app/(site)/layout.tsx`    | `<meta name="robots" content="noindex, nofollow">` |
+| Cabecera HTTP | `next.config.ts` → `headers()` | `X-Robots-Tag: noindex, nofollow, noarchive`       |
+| robots.txt    | `src/app/robots.ts`            | `Disallow: /` total, **sin** anunciar el sitemap   |
+
+Se usan las tres porque cada una cubre un hueco: la metadata no llega a las
+respuestas que no son HTML (el XML del sitemap, imágenes), robots.txt es una
+petición que algunos rastreadores ignoran, y la cabecera alcanza todo lo que se
+sirve. Con una sola vía basta un despiste para quedar indexado.
+
+**El sitemap se sigue generando y sirviendo** aunque el bloqueo esté activo: hace
+falta para QA. Lo que no se hace es anunciarlo en `robots.txt` — sería entregar
+al rastreador la lista completa de URLs que se intenta ocultar.
+
+### Levantar el bloqueo el día del lanzamiento
+
+1. En Vercel → Settings → Environment Variables, poner
+   `NEXT_PUBLIC_PERMITIR_INDEXACION=true` en **Production**.
+2. Redesplegar. La variable es `NEXT_PUBLIC_*`, o sea que se incrusta en el
+   build: sin redespliegue no cambia nada.
+3. Comprobar las tres vías:
+   ```bash
+   curl -sI https://<dominio>/ | grep -i x-robots-tag     # no debe aparecer
+   curl -s  https://<dominio>/robots.txt                  # debe permitir y anunciar el sitemap
+   curl -s  https://<dominio>/ | grep -i 'name="robots"'  # no debe haber noindex
+   ```
+
+No hay que tocar código en ningún paso.
+
+---
+
 ## 6. Estructura
 
 ```

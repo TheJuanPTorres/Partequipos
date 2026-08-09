@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { getMarcas } from "@/lib/queries/getMarcas";
 import { getModelos } from "@/lib/queries/getModelos";
+import { getPaginas } from "@/lib/queries/getPaginas";
 import { getTipos } from "@/lib/queries/getTipos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
 import { poblado } from "@/lib/utils/relations";
@@ -30,9 +31,16 @@ import type { Marca, TiposEquipo } from "@/payload-types";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [marcas, tipos, modelos] = await Promise.all([getMarcas(), getTipos(), getModelos()]);
+  const [marcas, tipos, modelos, paginas] = await Promise.all([
+    getMarcas(),
+    getTipos(),
+    getModelos(),
+    getPaginas(),
+  ]);
 
   return buildSitemapEntries({
+    paginas: paginas.map((pagina) => ({ slug: pagina.slug, updatedAt: pagina.updatedAt })),
+
     marcas: marcas.map((marca) => ({ slug: marca.slug, updatedAt: marca.updatedAt })),
 
     tipos: tipos.flatMap((tipo) => {

@@ -1,13 +1,47 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
 import { describe, it } from "node:test";
+import { fileURLToPath } from "node:url";
 
-import { buildSitemapEntries } from "./sitemap";
+import { PATRONES_SITEMAP, buildSitemapEntries } from "./sitemap";
 
 process.env.NEXT_PUBLIC_SERVER_URL = "https://partequipos.com";
 
 const AHORA = new Date("2026-07-28T00:00:00.000Z");
 
+/**
+ * Recorre `src/app/(site)` y devuelve la ruta pública de cada `page.tsx`.
+ *
+ * Los grupos de rutas —carpetas entre paréntesis— no aparecen en la URL, así que
+ * se descartan. Los segmentos dinámicos (`[marca]`, `[...slug]`) se conservan
+ * tal cual para comparar patrones, no URLs concretas.
+ */
+function rutasConstruidas(): string[] {
+  const raizApp = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../app/(site)");
+
+  const encontradas: string[] = [];
+
+  const recorrer = (dir: string, segmentos: string[]) => {
+    for (const entrada of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entrada.isDirectory()) {
+        const esGrupo = entrada.name.startsWith("(") && entrada.name.endsWith(")");
+        recorrer(path.join(dir, entrada.name), esGrupo ? segmentos : [...segmentos, entrada.name]);
+      } else if (entrada.name === "page.tsx") {
+        encontradas.push(segmentos.length === 0 ? "/" : `/${segmentos.join("/")}`);
+      }
+    }
+  };
+
+  recorrer(raizApp, []);
+  return encontradas.sort();
+}
+
 const datos = {
+  paginas: [
+    { slug: "inicio", updatedAt: "2026-07-28T10:00:00.000Z" },
+    { slug: "nosotros", updatedAt: "2026-07-27T10:00:00.000Z" },
+  ],
   marcas: [{ slug: "marca-a", updatedAt: "2026-07-20T10:00:00.000Z" }],
   tipos: [{ slug: "tipo-a", updatedAt: "2026-07-22T10:00:00.000Z", marcaSlug: "marca-a" }],
   modelos: [
@@ -21,9 +55,10 @@ const datos = {
 };
 
 describe("buildSitemapEntries", () => {
-  it("incluye los dos índices más una entrada por entidad", () => {
+  it("incluye portada, índices y una entrada por entidad", () => {
     const e = buildSitemapEntries(datos, AHORA);
-    assert.equal(e.length, 5); // 2 índices + 1 marca + 1 tipo + 1 modelo
+    // 1 portada + 2 índices + 1 institucional + 1 marca + 1 tipo + 1 modelo
+    assert.equal(e.length, 7);
   });
 
   it("emite solo URLs absolutas", () => {
@@ -62,19 +97,21 @@ describe("buildSitemapEntries", () => {
       AHORA,
     );
 
-    assert.equal(e[0]?.lastModified.toISOString(), "2026-07-26T00:00:00.000Z");
+    // e[0] es la portada; los índices de catálogo van detrás.
+    const indice = e.find((x) => x.url.endsWith("/repuestos-maquinaria-pesada-colombia/"));
+    assert.equal(indice?.lastModified.toISOString(), "2026-07-26T00:00:00.000Z");
   });
 
   it("cae a la fecha actual si updatedAt falta o es inválido", () => {
     const e = buildSitemapEntries(
-      { marcas: [{ slug: "m", updatedAt: null }], tipos: [], modelos: [] },
+      { marcas: [{ slug: "m", updatedAt: null }], tipos: [], modelos: [], paginas: [] },
       AHORA,
     );
     const marca = e.find((x) => x.url.endsWith("/m/"));
     assert.equal(marca?.lastModified.getTime(), AHORA.getTime());
 
     const invalida = buildSitemapEntries(
-      { marcas: [{ slug: "m", updatedAt: "no-es-fecha" }], tipos: [], modelos: [] },
+      { marcas: [{ slug: "m", updatedAt: "no-es-fecha" }], tipos: [], modelos: [], paginas: [] },
       AHORA,
     );
     assert.equal(
@@ -83,9 +120,10 @@ describe("buildSitemapEntries", () => {
     );
   });
 
-  it("con catálogo vacío devuelve solo los índices, sin romperse", () => {
-    const e = buildSitemapEntries({ marcas: [], tipos: [], modelos: [] }, AHORA);
+  it("con base vacía devuelve solo los índices, sin romperse", () => {
+    const e = buildSitemapEntries({ marcas: [], tipos: [], modelos: [], paginas: [] }, AHORA);
 
+    // Sin documento de portada no se lista `/`: solo quedan los 2 índices.
     assert.equal(e.length, 2);
     assert.equal(e[0]?.lastModified.getTime(), AHORA.getTime());
     for (const entrada of e) assert.match(entrada.url, /^https:\/\//);
@@ -98,10 +136,83 @@ describe("buildSitemapEntries", () => {
 
   it("da más prioridad a los índices que a las fichas", () => {
     const e = buildSitemapEntries(datos, AHORA);
-    const indice = e[0];
+    const indice = e.find((x) => x.url.endsWith("/repuestos-maquinaria-pesada-colombia/"));
     const modelo = e.find((x) => x.url.endsWith("/modelo-a/"));
 
     assert.ok(indice && modelo);
     assert.ok(indice.priority > modelo.priority);
+  });
+});
+
+describe("cobertura del sitemap frente a las rutas construidas", () => {
+  it("no hay ninguna ruta pública fuera de PATRONES_SITEMAP", () => {
+    const construidas = rutasConstruidas();
+    const cubiertas = new Set<string>(PATRONES_SITEMAP);
+    const sinCubrir = construidas.filter((r) => !cubiertas.has(r));
+
+    assert.deepEqual(
+      sinCubrir,
+      [],
+      `Rutas construidas que NO están en el sitemap:\n  ${sinCubrir.join("\n  ")}\n\n` +
+        "Añádelas a PATRONES_SITEMAP y emite sus URLs en buildSitemapEntries " +
+        "(src/lib/seo/sitemap.ts).",
+    );
+  });
+
+  it("no se declaran patrones que ya no existen en la aplicación", () => {
+    const construidas = new Set(rutasConstruidas());
+    const sobrantes = PATRONES_SITEMAP.filter((p) => !construidas.has(p));
+
+    assert.deepEqual(
+      sobrantes,
+      [],
+      `Patrones declarados sin ruta que los respalde:\n  ${sobrantes.join("\n  ")}`,
+    );
+  });
+
+  it("detecta una ruta nueva sin declarar (comprobación del propio guardián)", () => {
+    const construidas = [...rutasConstruidas(), "/maquinaria-pesada"];
+    const cubiertas = new Set<string>(PATRONES_SITEMAP);
+
+    assert.deepEqual(
+      construidas.filter((r) => !cubiertas.has(r)),
+      ["/maquinaria-pesada"],
+    );
+  });
+});
+
+describe("páginas institucionales en el sitemap", () => {
+  it("incluye la portada en / y las institucionales por su slug", () => {
+    const e = buildSitemapEntries(datos, AHORA);
+    const urls = e.map((x) => x.url);
+
+    assert.ok(urls.includes("https://partequipos.com/"), "falta la portada");
+    assert.ok(urls.includes("https://partequipos.com/nosotros/"), "falta /nosotros/");
+    assert.equal(
+      urls.some((u) => u.includes("/inicio")),
+      false,
+      "el slug 'inicio' no debe aparecer como URL propia",
+    );
+  });
+
+  it("toma lastModified del updatedAt real de cada página", () => {
+    const e = buildSitemapEntries(datos, AHORA);
+
+    assert.equal(
+      e.find((x) => x.url === "https://partequipos.com/")?.lastModified.toISOString(),
+      "2026-07-28T10:00:00.000Z",
+    );
+    assert.equal(
+      e.find((x) => x.url === "https://partequipos.com/nosotros/")?.lastModified.toISOString(),
+      "2026-07-27T10:00:00.000Z",
+    );
+  });
+
+  it("omite la portada si no existe su documento (la ruta daría 404)", () => {
+    const e = buildSitemapEntries({ ...datos, paginas: [] }, AHORA);
+    assert.equal(
+      e.some((x) => x.url === "https://partequipos.com/"),
+      false,
+    );
   });
 });

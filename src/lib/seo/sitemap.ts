@@ -18,7 +18,34 @@ export type SitemapInput = {
   marcas: ConSlug[];
   tipos: TipoLike[];
   modelos: ModeloLike[];
+  /** Páginas institucionales. El slug `inicio` corresponde a la portada `/`. */
+  paginas: ConSlug[];
 };
+
+/**
+ * Patrones de ruta que este sitemap cubre.
+ *
+ * Es una declaración explícita, no decorativa: `sitemap.test.ts` recorre
+ * `src/app/(site)` buscando `page.tsx` y **falla si encuentra una ruta que no
+ * esté aquí**. Así, añadir una sección nueva (maquinaria, blog, lubricantes…)
+ * rompe la prueba con el nombre de la ruta en vez de quedar fuera del sitemap
+ * en silencio, que es como se detectó el hueco de las páginas institucionales.
+ *
+ * Al añadir un patrón hay que añadir también sus URLs en `buildSitemapEntries`;
+ * declararlo aquí sin emitirlas dejaría la prueba en verde mintiendo.
+ */
+export const PATRONES_SITEMAP = [
+  "/",
+  "/[...slug]",
+  "/repuestos-maquinaria-pesada-colombia",
+  "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas",
+  "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]",
+  "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]",
+  "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]/[modelo]",
+] as const;
+
+/** Slug reservado de la portada dentro de la colección de páginas. */
+export const SLUG_PORTADA_SITEMAP = "inicio";
 
 /** Convierte `updatedAt` en Date; si falta o es inválido, usa `porDefecto`. */
 function fecha(updatedAt: string | null | undefined, porDefecto: Date): Date {
@@ -49,16 +76,32 @@ function masReciente(items: ConSlug[], porDefecto: Date): Date {
  *   cambia cualquiera de sus hijos.
  */
 export function buildSitemapEntries(
-  { marcas, tipos, modelos }: SitemapInput,
+  { marcas, tipos, modelos, paginas }: SitemapInput,
   ahora: Date = new Date(),
 ): SitemapEntry[] {
-  const entradas: SitemapEntry[] = [
-    // Índices: prioridad alta, cambian cuando cambia cualquier hijo.
+  const portada = paginas.find((p) => p.slug === SLUG_PORTADA_SITEMAP);
+  const institucionales = paginas.filter((p) => p.slug !== SLUG_PORTADA_SITEMAP);
+
+  const entradas: SitemapEntry[] = [];
+
+  // Portada. Solo se lista si existe el documento que la alimenta: sin él la
+  // ruta responde 404 y anunciarla sería mandar al rastreador a un error.
+  if (portada) {
+    entradas.push({
+      url: absoluteUrl("/"),
+      lastModified: fecha(portada.updatedAt, ahora),
+      changeFrequency: "weekly",
+      priority: 1,
+    });
+  }
+
+  entradas.push(
+    // Índices de catálogo: cambian cuando cambia cualquier hijo.
     {
       url: absoluteUrl(rutas.repuestos()),
       lastModified: masReciente(marcas, ahora),
       changeFrequency: "weekly",
-      priority: 1,
+      priority: 0.9,
     },
     {
       url: absoluteUrl(rutas.marcas()),
@@ -66,7 +109,17 @@ export function buildSitemapEntries(
       changeFrequency: "weekly",
       priority: 0.9,
     },
-  ];
+  );
+
+  // Páginas institucionales y legales. Cambian poco, de ahí `monthly`.
+  for (const pagina of institucionales) {
+    entradas.push({
+      url: absoluteUrl(`/${pagina.slug}`),
+      lastModified: fecha(pagina.updatedAt, ahora),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    });
+  }
 
   for (const marca of marcas) {
     entradas.push({

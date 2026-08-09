@@ -291,21 +291,51 @@ región son de orden 1–5 ms, de ahí que Vercel tarde 2 min y local 230 s.
 
 #### Consultas por página: NO hay agrupación
 
-Cada página resuelve por su cuenta, y además **por duplicado**: `generateMetadata`
-y el componente de página llaman a la misma cadena de resolución sin compartir
-resultado, porque ninguna función de `src/lib/queries/` está envuelta en `cache()`
-de React. Medido por lectura del código, no estimado:
+Cada página resuelve por su cuenta, y además resolvía **por duplicado**:
+`generateMetadata` y el componente llaman a la misma cadena sin compartir
+resultado por sí solos.
 
-| Ruta                     | Consultas por página |
-| ------------------------ | -------------------: |
-| ficha de equipo / modelo |            6 (3 × 2) |
-| tipo                     |                    5 |
-| marca                    |                    5 |
-| categoría                |                    3 |
-| índices                  |                  1–2 |
+| Ruta                     | Consultas por página (antes) |
+| ------------------------ | ---------------------------: |
+| ficha de equipo / modelo |                    6 (3 × 2) |
+| tipo                     |                            5 |
+| marca                    |                            5 |
+| categoría                |                            3 |
+| índices                  |                          1–2 |
 
 `generateStaticParams` sí hace **una sola consulta masiva por ruta** — ahí no hay
 problema. El coste está en el renderizado de cada página.
+
+#### Mitigación 1 aplicada: `cache()` de React (2026-08-09)
+
+Las 24 funciones de `src/lib/queries/` se envolvieron en `cache()`. Ninguna
+llamada cambió: las firmas son las mismas.
+
+**Medido, no estimado.** Se contaron las consultas reales parcheando
+`pg.Client.prototype.query` mediante `NODE_OPTIONS=--require`, sin tocar el
+código de la aplicación, y se cronometró la fase de generación con `.next`
+borrado antes de cada corrida:
+
+| Métrica                        | Antes | Después | Cambio    |
+| ------------------------------ | ----: | ------: | --------- |
+| Consultas SQL en todo el build | 2.912 |   1.519 | **−48 %** |
+| Generación estática (media)    | 9,9 s |   6,8 s | **−31 %** |
+
+El conteo es **exactamente reproducible**: 2.912 en las dos corridas sin
+`cache()` y 1.519 en las dos con él. Los tiempos son media de 3 y 4 corridas
+limpias (sin `cache()`: 9,7 · 10,7 · 9,3 s — con: 7,0 · 7,6 · 5,9 · 6,7 s).
+
+**Sin cambio de contenido.** Se compararon las 185 páginas prerenderizadas de
+ambos builds por hash: **idénticas**. Hay que normalizar antes de comparar,
+porque Next inyecta un `buildId` distinto en cada build y en crudo salen
+diferentes el 100 % de las páginas aunque el contenido sea el mismo.
+
+`cache()` memoiza **por petición**, así que no filtra datos entre páginas: eso es
+justo lo que confirma la comparación de hashes.
+
+Limitación conocida: no memoiza cuando el argumento es un array
+(`getEquiposDeTipos`), porque la identidad cambia en cada llamada. No empeora
+nada respecto de antes; simplemente ahí no ayuda.
 
 #### Proyección a ~650 páginas
 
@@ -321,23 +351,25 @@ consultas × latencia, que reproduce los 22,8 s observados):
 
 Ni en el peor caso se acerca al límite de 45 min de Vercel. **El riesgo de
 tiempo no es grave; el de concurrencia sí:** el build lanza 11 workers en
-paralelo, así que con ~3.600 consultas se le exige al servidor del cliente un
-pico de conexiones simultáneas. Esto refuerza el requisito de _pooler_ de §10.7.
+paralelo, así que se le exige al servidor un pico de conexiones simultáneas.
+Con las 2.912 consultas medidas hoy a 189 páginas, el volumen real (~650) da
+**~3.600 consultas** aun después de aplicar `cache()`. Esto convierte el
+_pooler_ de §10.7 en requisito duro.
 
-#### Mitigaciones posibles (NO implementadas — decisión pendiente)
+#### Mitigaciones restantes (NO implementadas — decisión pendiente)
 
-1. **Envolver las consultas en `cache()` de React.** Elimina la duplicación entre
-   `generateMetadata` y la página: ~40 % menos consultas. Unas 10 líneas, sin
-   cambiar ninguna llamada.
+La 1 (`cache()`) ya está aplicada; ver arriba. Las demás quedan documentadas
+para decidir cuando exista la infraestructura del cliente:
+
 2. **Resolver desde un mapa en memoria**: una consulta masiva por colección al
-   arrancar el build y resolución local. Reduce de ~3.600 consultas a ~10, pero
+   arrancar el build y resolución local. Bajaría de ~3.600 consultas a ~10, pero
    reestructura la capa de datos.
 3. **Bajar `depth`** y pedir solo los campos usados (la ficha con `depth: 2`
    cuesta 2,6× una consulta normal).
 4. **Limitar los workers** si el pool del cliente resulta estrecho.
 
-La 1 es barata y sin riesgo. La 2 solo se justifica si la latencia real de la
-infraestructura del cliente lo pide; medir primero, optimizar después.
+La 2 solo se justifica si la latencia real de la infraestructura del cliente lo
+pide; medir primero, optimizar después.
 
 ### 10.9 INCIDENTE 2026-08-09 — build colgado por el marcador `dev`
 
@@ -427,10 +459,19 @@ base poblada fallaría igual.
 >    saliente variable, así que la base debe aceptar conexiones desde fuera de su
 >    red. Una base solo accesible por VPN o en red privada **no funciona** con
 >    este hosting: obligaría a cambiar de estrategia de despliegue.
-> 2. **Agrupador de conexiones (pooler).** Cada invocación serverless abre su
->    propia conexión; sin un pooler delante (PgBouncer o equivalente) se agotan
->    los límites del servidor bajo carga. Es lo que hoy resuelve la cadena
->    _pooled_ de Neon.
+> 2. **Agrupador de conexiones (pooler). REQUISITO DURO, no recomendación.**
+>    Cada invocación serverless abre su propia conexión; sin un pooler delante
+>    (PgBouncer o equivalente) se agotan los límites del servidor bajo carga. Es
+>    lo que hoy resuelve la cadena _pooled_ de Neon.
+>
+>    **El dato para llevar a la conversación (medido, no estimado — §10.10):** el
+>    build de producción emite **~3.600 consultas** con el volumen real (~650
+>    páginas), y las emite **en paralelo desde 11 procesos worker**. Esa cifra ya
+>    incluye la optimización de `cache()` ya aplicada, que quitó el 48 % de las
+>    consultas: sin pooler, el pico de conexiones simultáneas de un solo
+>    despliegue basta para agotar los límites de un Postgres configurado por
+>    defecto. No es una carga de tráfico, es una carga de **build**, y ocurre en
+>    cada publicación.
 >
 > Si alguno no se cumple, hay que replantear el hosting antes de migrar los datos.
 

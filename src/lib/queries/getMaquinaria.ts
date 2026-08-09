@@ -1,5 +1,19 @@
+import { cache } from "react";
 import config from "@payload-config";
 import { getPayload } from "payload";
+
+/*
+ * Las consultas de este módulo van envueltas en `cache()` de React.
+ *
+ * Sin ello cada página resolvía DOS VECES la misma cadena: una en
+ * `generateMetadata` y otra en el componente, que no comparten resultado por
+ * sí solos. `cache()` memoiza por petición y elimina esa duplicación. El coste
+ * medido está en CLAUDE.md §10.10.
+ *
+ * Transparente para quien llama: las firmas no cambian. No memoiza cuando el
+ * argumento es un array (identidad distinta en cada llamada); no empeora nada
+ * respecto de antes, simplemente no ayuda ahí.
+ */
 
 import type {
   CategoriasMaquinaria,
@@ -17,7 +31,7 @@ import type {
  */
 
 // --- Marcas -----------------------------------------------------------------
-export async function getMarcasMaquinaria(): Promise<MarcasMaquinaria[]> {
+export const getMarcasMaquinaria = cache(async (): Promise<MarcasMaquinaria[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "marcas-maquinaria",
@@ -26,21 +40,23 @@ export async function getMarcasMaquinaria(): Promise<MarcasMaquinaria[]> {
     sort: "nombre",
   });
   return docs;
-}
+});
 
-export async function getMarcaMaquinariaPorSlug(slug: string): Promise<MarcasMaquinaria | null> {
-  const payload = await getPayload({ config });
-  const { docs } = await payload.find({
-    collection: "marcas-maquinaria",
-    where: { slug: { equals: slug } },
-    depth: 1,
-    limit: 1,
-  });
-  return docs[0] ?? null;
-}
+export const getMarcaMaquinariaPorSlug = cache(
+  async (slug: string): Promise<MarcasMaquinaria | null> => {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "marcas-maquinaria",
+      where: { slug: { equals: slug } },
+      depth: 1,
+      limit: 1,
+    });
+    return docs[0] ?? null;
+  },
+);
 
 // --- Tipos ------------------------------------------------------------------
-export async function getTiposMaquinaria(): Promise<TiposMaquinaria[]> {
+export const getTiposMaquinaria = cache(async (): Promise<TiposMaquinaria[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "tipos-maquinaria",
@@ -49,40 +65,41 @@ export async function getTiposMaquinaria(): Promise<TiposMaquinaria[]> {
     sort: "nombre",
   });
   return docs;
-}
+});
 
-export async function getTiposDeMarcaMaquinaria(marcaId: number): Promise<TiposMaquinaria[]> {
-  const payload = await getPayload({ config });
-  const { docs } = await payload.find({
-    collection: "tipos-maquinaria",
-    where: { marca: { equals: marcaId } },
-    depth: 0,
-    limit: 0,
-    sort: "nombre",
-  });
-  return docs;
-}
+export const getTiposDeMarcaMaquinaria = cache(
+  async (marcaId: number): Promise<TiposMaquinaria[]> => {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "tipos-maquinaria",
+      where: { marca: { equals: marcaId } },
+      depth: 0,
+      limit: 0,
+      sort: "nombre",
+    });
+    return docs;
+  },
+);
 
 /**
  * Un tipo por slug DENTRO de una marca. La unicidad es compuesta (marca+slug),
  * así que buscar solo por slug devolvería el tipo de otra marca.
  */
-export async function getTipoMaquinariaPorSlug(
-  marcaId: number,
-  slug: string,
-): Promise<TiposMaquinaria | null> {
-  const payload = await getPayload({ config });
-  const { docs } = await payload.find({
-    collection: "tipos-maquinaria",
-    where: { and: [{ marca: { equals: marcaId } }, { slug: { equals: slug } }] },
-    depth: 1,
-    limit: 1,
-  });
-  return docs[0] ?? null;
-}
+export const getTipoMaquinariaPorSlug = cache(
+  async (marcaId: number, slug: string): Promise<TiposMaquinaria | null> => {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "tipos-maquinaria",
+      where: { and: [{ marca: { equals: marcaId } }, { slug: { equals: slug } }] },
+      depth: 1,
+      limit: 1,
+    });
+    return docs[0] ?? null;
+  },
+);
 
 // --- Equipos nuevos ---------------------------------------------------------
-export async function getEquiposNuevos(): Promise<EquiposNuevo[]> {
+export const getEquiposNuevos = cache(async (): Promise<EquiposNuevo[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "equipos-nuevos",
@@ -91,9 +108,9 @@ export async function getEquiposNuevos(): Promise<EquiposNuevo[]> {
     sort: "nombre",
   });
   return docs;
-}
+});
 
-export async function getEquiposDeTipo(tipoId: number): Promise<EquiposNuevo[]> {
+export const getEquiposDeTipo = cache(async (tipoId: number): Promise<EquiposNuevo[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "equipos-nuevos",
@@ -103,25 +120,24 @@ export async function getEquiposDeTipo(tipoId: number): Promise<EquiposNuevo[]> 
     sort: "nombre",
   });
   return docs;
-}
+});
 
 /** Un equipo por slug DENTRO de un tipo. `depth: 2` puebla galería y marca. */
-export async function getEquipoNuevoPorSlug(
-  tipoId: number,
-  slug: string,
-): Promise<EquiposNuevo | null> {
-  const payload = await getPayload({ config });
-  const { docs } = await payload.find({
-    collection: "equipos-nuevos",
-    where: { and: [{ tipo: { equals: tipoId } }, { slug: { equals: slug } }] },
-    depth: 2,
-    limit: 1,
-  });
-  return docs[0] ?? null;
-}
+export const getEquipoNuevoPorSlug = cache(
+  async (tipoId: number, slug: string): Promise<EquiposNuevo | null> => {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "equipos-nuevos",
+      where: { and: [{ tipo: { equals: tipoId } }, { slug: { equals: slug } }] },
+      depth: 2,
+      limit: 1,
+    });
+    return docs[0] ?? null;
+  },
+);
 
 /** Equipos de varios tipos a la vez: alimenta las categorías transversales. */
-export async function getEquiposDeTipos(tipoIds: number[]): Promise<EquiposNuevo[]> {
+export const getEquiposDeTipos = cache(async (tipoIds: number[]): Promise<EquiposNuevo[]> => {
   if (tipoIds.length === 0) return [];
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
@@ -132,10 +148,10 @@ export async function getEquiposDeTipos(tipoIds: number[]): Promise<EquiposNuevo
     sort: "nombre",
   });
   return docs;
-}
+});
 
 // --- Categorías de la línea nueva -------------------------------------------
-export async function getCategoriasMaquinaria(): Promise<CategoriasMaquinaria[]> {
+export const getCategoriasMaquinaria = cache(async (): Promise<CategoriasMaquinaria[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "categorias-maquinaria",
@@ -144,23 +160,23 @@ export async function getCategoriasMaquinaria(): Promise<CategoriasMaquinaria[]>
     sort: "nombre",
   });
   return docs;
-}
+});
 
-export async function getCategoriaMaquinariaPorSlug(
-  slug: string,
-): Promise<CategoriasMaquinaria | null> {
-  const payload = await getPayload({ config });
-  const { docs } = await payload.find({
-    collection: "categorias-maquinaria",
-    where: { slug: { equals: slug } },
-    depth: 1,
-    limit: 1,
-  });
-  return docs[0] ?? null;
-}
+export const getCategoriaMaquinariaPorSlug = cache(
+  async (slug: string): Promise<CategoriasMaquinaria | null> => {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "categorias-maquinaria",
+      where: { slug: { equals: slug } },
+      depth: 1,
+      limit: 1,
+    });
+    return docs[0] ?? null;
+  },
+);
 
 // --- Línea usada ------------------------------------------------------------
-export async function getCategoriasUsada(): Promise<CategoriasUsada[]> {
+export const getCategoriasUsada = cache(async (): Promise<CategoriasUsada[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "categorias-usada",
@@ -169,30 +185,34 @@ export async function getCategoriasUsada(): Promise<CategoriasUsada[]> {
     sort: "nombre",
   });
   return docs;
-}
+});
 
-export async function getCategoriaUsadaPorSlug(slug: string): Promise<CategoriasUsada | null> {
-  const payload = await getPayload({ config });
-  const { docs } = await payload.find({
-    collection: "categorias-usada",
-    where: { slug: { equals: slug } },
-    depth: 0,
-    limit: 1,
-  });
-  return docs[0] ?? null;
-}
+export const getCategoriaUsadaPorSlug = cache(
+  async (slug: string): Promise<CategoriasUsada | null> => {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "categorias-usada",
+      where: { slug: { equals: slug } },
+      depth: 0,
+      limit: 1,
+    });
+    return docs[0] ?? null;
+  },
+);
 
 /** Unidades DISPONIBLES de una categoría. Las vendidas no se listan. */
-export async function getEquiposUsadosDeCategoria(categoriaId: number): Promise<EquiposUsado[]> {
-  const payload = await getPayload({ config });
-  const { docs } = await payload.find({
-    collection: "equipos-usados",
-    where: {
-      and: [{ categoria: { equals: categoriaId } }, { disponible: { equals: true } }],
-    },
-    depth: 1,
-    limit: 0,
-    sort: "-anio",
-  });
-  return docs;
-}
+export const getEquiposUsadosDeCategoria = cache(
+  async (categoriaId: number): Promise<EquiposUsado[]> => {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "equipos-usados",
+      where: {
+        and: [{ categoria: { equals: categoriaId } }, { disponible: { equals: true } }],
+      },
+      depth: 1,
+      limit: 0,
+      sort: "-anio",
+    });
+    return docs;
+  },
+);

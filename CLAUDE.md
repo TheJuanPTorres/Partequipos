@@ -255,6 +255,90 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   **vacía**. Al haber partido de un esquema limpio, este escenario ya no aplica
   en producción, pero volvería a darse si alguien hace push contra ella.
 
+### 10.10 Línea base de tiempo de build (medida el 2026-08-09)
+
+> Primera medición formal. **No hay registro de builds anteriores**: las cifras
+> de Vercel de días pasados existen, pero no sabemos con cuántas páginas se
+> hicieron, así que no son comparables. Esta es la línea base a partir de la cual
+> se compara de aquí en adelante.
+
+**Medición local (Windows, `development` en Neon, 189 páginas):**
+
+| Fase                | En frío (`.next` borrado) | En caliente |
+| ------------------- | ------------------------: | ----------: |
+| Compilación         |                     132 s |        24 s |
+| Generación estática |                    22,8 s |       9,6 s |
+| **Total**           |                 **230 s** |    **58 s** |
+
+**Vercel, 117 páginas** (commit `d00aaf0`, sin datos de maquinaria): **2 min**.
+
+**El build lo domina la compilación, no la base de datos.** La compilación
+depende del número de _componentes de ruta_ (~22), no del de páginas, así que es
+prácticamente constante: crecer de 189 a 650 páginas no la mueve.
+
+#### Latencia por consulta (local → Neon)
+
+| Operación                   |  ms |
+| --------------------------- | --: |
+| `count` (ida y vuelta pura) | 113 |
+| `find` por slug, `depth: 1` | 226 |
+| `find` de ficha, `depth: 2` | 597 |
+| `find` masivo, `limit: 0`   | 528 |
+
+Un `find` cuesta ~2 idas y vueltas. **Esos 113 ms son de una máquina de
+desarrollo por internet**; desde el build de Vercel contra Neon en la misma
+región son de orden 1–5 ms, de ahí que Vercel tarde 2 min y local 230 s.
+
+#### Consultas por página: NO hay agrupación
+
+Cada página resuelve por su cuenta, y además **por duplicado**: `generateMetadata`
+y el componente de página llaman a la misma cadena de resolución sin compartir
+resultado, porque ninguna función de `src/lib/queries/` está envuelta en `cache()`
+de React. Medido por lectura del código, no estimado:
+
+| Ruta                     | Consultas por página |
+| ------------------------ | -------------------: |
+| ficha de equipo / modelo |            6 (3 × 2) |
+| tipo                     |                    5 |
+| marca                    |                    5 |
+| categoría                |                    3 |
+| índices                  |                  1–2 |
+
+`generateStaticParams` sí hace **una sola consulta masiva por ruta** — ahí no hay
+problema. El coste está en el renderizado de cada página.
+
+#### Proyección a ~650 páginas
+
+Extrapolación lineal desde la medida (verificada contra el modelo
+consultas × latencia, que reproduce los 22,8 s observados):
+
+| Escenario                          | Latencia | Generación estática |
+| ---------------------------------- | -------: | ------------------: |
+| Vercel + Neon (hoy)                |   1–5 ms |            ~10–20 s |
+| Local por internet (hoy)           |   113 ms |               ~80 s |
+| Infraestructura del cliente, media |   300 ms |            ~3,5 min |
+| Infraestructura del cliente, mala  |   500 ms |            ~5,5 min |
+
+Ni en el peor caso se acerca al límite de 45 min de Vercel. **El riesgo de
+tiempo no es grave; el de concurrencia sí:** el build lanza 11 workers en
+paralelo, así que con ~3.600 consultas se le exige al servidor del cliente un
+pico de conexiones simultáneas. Esto refuerza el requisito de _pooler_ de §10.7.
+
+#### Mitigaciones posibles (NO implementadas — decisión pendiente)
+
+1. **Envolver las consultas en `cache()` de React.** Elimina la duplicación entre
+   `generateMetadata` y la página: ~40 % menos consultas. Unas 10 líneas, sin
+   cambiar ninguna llamada.
+2. **Resolver desde un mapa en memoria**: una consulta masiva por colección al
+   arrancar el build y resolución local. Reduce de ~3.600 consultas a ~10, pero
+   reestructura la capa de datos.
+3. **Bajar `depth`** y pedir solo los campos usados (la ficha con `depth: 2`
+   cuesta 2,6× una consulta normal).
+4. **Limitar los workers** si el pool del cliente resulta estrecho.
+
+La 1 es barata y sin riesgo. La 2 solo se justifica si la latencia real de la
+infraestructura del cliente lo pide; medir primero, optimizar después.
+
 ### 10.9 INCIDENTE 2026-08-09 — build colgado por el marcador `dev`
 
 **Qué pasó.** Un build de Vercel se quedó **20 minutos colgado** en el prompt

@@ -411,3 +411,10 @@ base poblada fallaría igual.
 4. **Teléfono de contacto.** Se publica el móvil `+57 317 670 7071`; el aviso
    legal menciona además un fijo `492-62-60` sin indicativo. Confirmar cuál(es)
    deben figurar y con qué formato.
+5. **Anomalía de jerarquía en Case Construction (maquinaria nueva).** La URL
+   `/…/nueva/marcas/case-construction/vibrocompactador-case-sv208/` cuelga al
+   **nivel de tipo**, junto a `bulldozer` o `excavadoras`, cuando su contenido es
+   un **modelo concreto** (el vibrocompactador SV208). Debería ser una ficha
+   dentro de un tipo, no un tipo. **Se replicó tal cual** —igual que se hizo con
+   las anomalías de Bobcat en repuestos— para no romper una URL indexada.
+   Preguntar si se corrige (implicaría un 301) o se deja como está.

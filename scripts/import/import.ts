@@ -9,8 +9,9 @@
  *   exceden los timeouts de Vercel y presionan el pool de conexiones.
  * - IDEMPOTENTE: busca por slug (dentro de su contexto) y actualiza si existe,
  *   crea si no. Correrlo dos veces no duplica nada.
- * - Respeta el orden de dependencias: Marcas -> Tipos -> Modelos (+ Categorías).
- *   Las relaciones se resuelven por SLUG, no por id.
+ * - Respeta el orden de dependencias: Marcas -> Tipos -> Modelos (+ Categorías),
+ *   y después la sección de maquinaria, que tiene su propia jerarquía paralela
+ *   (ADR 0007). Las relaciones se resuelven por SLUG, no por id.
  * - Valida antes de escribir: si un tipo/modelo referencia algo inexistente,
  *   lo reporta como error y NO escribe ese registro.
  * - Reporte final con creados/actualizados/omitidos/errores y sale con código
@@ -295,6 +296,315 @@ async function main(): Promise<number> {
         report.actualizados.push(label);
       } else {
         await payload.create({ collection: "categorias-tecnicas", data });
+        report.creados.push(label);
+      }
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
+  // ==========================================================================
+  // MAQUINARIA (ADR 0007)
+  //
+  // Jerarquía propia y separada de repuestos: marcas -> tipos -> equipos, más
+  // las categorías transversales de la línea nueva y las de la línea usada con
+  // su inventario. Mismos slugs que el sitio actual, tomados del crawl.
+  // ==========================================================================
+  const marcaMaqIdBySlug = new Map<string, number>();
+  const tipoMaqIdByKey = new Map<string, number>(); // key = `${marcaId}::${tipoSlug}`
+
+  // --- MARCAS DE MAQUINARIA -------------------------------------------------
+  for (const row of readCSV("maquinaria-marcas.csv")) {
+    const label = `Marca de maquinaria "${row.slug}"`;
+    try {
+      const nombre = opt(row.nombre);
+      const slug = opt(row.slug);
+      if (!nombre || !slug) {
+        report.omitidos.push(`${label}: falta nombre o slug`);
+        continue;
+      }
+      const data = { nombre, slug, descripcion: opt(row.descripcion) };
+      const existing = await findOne("marcas-maquinaria", { slug: { equals: slug } });
+      if (existing) {
+        const doc = await payload.update({
+          collection: "marcas-maquinaria",
+          id: existing.id,
+          data,
+        });
+        marcaMaqIdBySlug.set(slug, doc.id);
+        report.actualizados.push(label);
+      } else {
+        const doc = await payload.create({ collection: "marcas-maquinaria", data });
+        marcaMaqIdBySlug.set(slug, doc.id);
+        report.creados.push(label);
+      }
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
+  async function resolveMarcaMaqId(slug: string): Promise<number | null> {
+    if (marcaMaqIdBySlug.has(slug)) return marcaMaqIdBySlug.get(slug) ?? null;
+    const doc = await findOne("marcas-maquinaria", { slug: { equals: slug } });
+    if (doc) marcaMaqIdBySlug.set(slug, doc.id);
+    return doc?.id ?? null;
+  }
+
+  // --- TIPOS DE MAQUINARIA --------------------------------------------------
+  for (const row of readCSV("maquinaria-tipos.csv")) {
+    const label = `Tipo de maquinaria "${row.slug}"`;
+    try {
+      const nombre = opt(row.nombre);
+      const slug = opt(row.slug);
+      const marcaSlug = opt(row.marca_slug);
+      if (!nombre || !slug || !marcaSlug) {
+        report.omitidos.push(`${label}: falta nombre, slug o marca_slug`);
+        continue;
+      }
+      const marcaId = await resolveMarcaMaqId(marcaSlug);
+      if (marcaId === null) {
+        report.errores.push(`${label}: la marca "${marcaSlug}" no existe`);
+        continue;
+      }
+      const data = {
+        nombre,
+        slug,
+        marca: marcaId,
+        descripcion: opt(row.descripcion),
+        seo: { metaTitle: opt(row.metaTitle), metaDescription: opt(row.metaDescription) },
+      };
+      const existing = await findOne("tipos-maquinaria", {
+        and: [{ marca: { equals: marcaId } }, { slug: { equals: slug } }],
+      });
+      let id: number;
+      if (existing) {
+        const doc = await payload.update({ collection: "tipos-maquinaria", id: existing.id, data });
+        id = doc.id;
+        report.actualizados.push(label);
+      } else {
+        const doc = await payload.create({ collection: "tipos-maquinaria", data });
+        id = doc.id;
+        report.creados.push(label);
+      }
+      tipoMaqIdByKey.set(`${marcaId}::${slug}`, id);
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
+  async function resolveTipoMaqId(marcaId: number, slug: string): Promise<number | null> {
+    const key = `${marcaId}::${slug}`;
+    if (tipoMaqIdByKey.has(key)) return tipoMaqIdByKey.get(key) ?? null;
+    const doc = await findOne("tipos-maquinaria", {
+      and: [{ marca: { equals: marcaId } }, { slug: { equals: slug } }],
+    });
+    if (doc) tipoMaqIdByKey.set(key, doc.id);
+    return doc?.id ?? null;
+  }
+
+  /*
+   * Ficha técnica de DEMOSTRACIÓN.
+   *
+   * Las etiquetas son plausibles para una excavadora, pero los valores dicen
+   * explícitamente que no hay dato. Es deliberado: publicar specs inventadas de
+   * una máquina real sería peor que no publicar ninguna. Solo la lleva la ficha
+   * marcada con `ficha_tecnica_demo` en el CSV, para comprobar que la tabla
+   * renderiza. El resto van con el array vacío.
+   */
+  const PENDIENTE = "— dato pendiente del fabricante —";
+  const FICHA_TECNICA_DEMO = [
+    { etiqueta: "Peso operativo", valor: PENDIENTE },
+    { etiqueta: "Potencia neta", valor: PENDIENTE },
+    { etiqueta: "Capacidad del cucharón", valor: PENDIENTE },
+    { etiqueta: "Profundidad máxima de excavación", valor: PENDIENTE },
+    { etiqueta: "Alcance máximo", valor: PENDIENTE },
+  ];
+
+  // --- EQUIPOS NUEVOS -------------------------------------------------------
+  for (const row of readCSV("maquinaria-equipos.csv")) {
+    const label = `Equipo nuevo "${row.slug}"`;
+    try {
+      const nombre = opt(row.nombre);
+      const slug = opt(row.slug);
+      const marcaSlug = opt(row.marca_slug);
+      const tipoSlug = opt(row.tipo_slug);
+      if (!nombre || !slug || !marcaSlug || !tipoSlug) {
+        report.omitidos.push(`${label}: falta nombre, slug, marca_slug o tipo_slug`);
+        continue;
+      }
+      const marcaId = await resolveMarcaMaqId(marcaSlug);
+      if (marcaId === null) {
+        report.errores.push(`${label}: la marca "${marcaSlug}" no existe`);
+        continue;
+      }
+      const tipoId = await resolveTipoMaqId(marcaId, tipoSlug);
+      if (tipoId === null) {
+        report.errores.push(`${label}: el tipo "${tipoSlug}" no existe en la marca "${marcaSlug}"`);
+        continue;
+      }
+
+      // Los destacados vienen en una sola celda separados por "|".
+      const destacados = (opt(row.destacados) ?? "")
+        .split("|")
+        .map((t) => t.trim())
+        .filter(Boolean)
+        .map((texto) => ({ texto }));
+
+      const data = {
+        nombre,
+        slug,
+        marca: marcaId,
+        tipo: tipoId,
+        codigo: opt(row.codigo),
+        entradilla: opt(row.entradilla),
+        destacados,
+        fichaTecnica: opt(row.ficha_tecnica_demo) ? FICHA_TECNICA_DEMO : [],
+        seo: { metaTitle: opt(row.metaTitle), metaDescription: opt(row.metaDescription) },
+      };
+      const existing = await findOne("equipos-nuevos", {
+        and: [{ tipo: { equals: tipoId } }, { slug: { equals: slug } }],
+      });
+      if (existing) {
+        await payload.update({ collection: "equipos-nuevos", id: existing.id, data });
+        report.actualizados.push(label);
+      } else {
+        await payload.create({ collection: "equipos-nuevos", data });
+        report.creados.push(label);
+      }
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
+  // --- CATEGORÍAS TRANSVERSALES DE LA LÍNEA NUEVA ---------------------------
+  for (const row of readCSV("maquinaria-categorias.csv")) {
+    const label = `Categoría de maquinaria nueva "${row.slug}"`;
+    try {
+      const nombre = opt(row.nombre);
+      const slug = opt(row.slug);
+      if (!nombre || !slug) {
+        report.omitidos.push(`${label}: falta nombre o slug`);
+        continue;
+      }
+
+      // `tipos` viene como "marca_slug:tipo_slug|marca_slug:tipo_slug".
+      const tiposIncluidos: number[] = [];
+      for (const par of (opt(row.tipos) ?? "").split("|").filter(Boolean)) {
+        const [marcaSlug, tipoSlug] = par.split(":").map((s) => s.trim());
+        if (!marcaSlug || !tipoSlug) continue;
+        const marcaId = await resolveMarcaMaqId(marcaSlug);
+        const tipoId = marcaId === null ? null : await resolveTipoMaqId(marcaId, tipoSlug);
+        if (tipoId === null) {
+          report.errores.push(`${label}: el tipo "${par}" no existe`);
+          continue;
+        }
+        tiposIncluidos.push(tipoId);
+      }
+
+      const data = {
+        nombre,
+        slug,
+        descripcion: opt(row.descripcion),
+        tiposIncluidos,
+        seo: { metaTitle: opt(row.metaTitle), metaDescription: opt(row.metaDescription) },
+      };
+      const existing = await findOne("categorias-maquinaria", { slug: { equals: slug } });
+      if (existing) {
+        await payload.update({ collection: "categorias-maquinaria", id: existing.id, data });
+        report.actualizados.push(label);
+      } else {
+        await payload.create({ collection: "categorias-maquinaria", data });
+        report.creados.push(label);
+      }
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
+  // --- CATEGORÍAS DE LA LÍNEA USADA -----------------------------------------
+  const categoriaUsadaIdBySlug = new Map<string, number>();
+
+  for (const row of readCSV("maquinaria-usada-categorias.csv")) {
+    const label = `Categoría de usada "${row.slug}"`;
+    try {
+      const nombre = opt(row.nombre);
+      const slug = opt(row.slug);
+      if (!nombre || !slug) {
+        report.omitidos.push(`${label}: falta nombre o slug`);
+        continue;
+      }
+      const data = {
+        nombre,
+        slug,
+        descripcion: opt(row.descripcion),
+        seo: { metaTitle: opt(row.metaTitle), metaDescription: opt(row.metaDescription) },
+      };
+      const existing = await findOne("categorias-usada", { slug: { equals: slug } });
+      if (existing) {
+        const doc = await payload.update({ collection: "categorias-usada", id: existing.id, data });
+        categoriaUsadaIdBySlug.set(slug, doc.id);
+        report.actualizados.push(label);
+      } else {
+        const doc = await payload.create({ collection: "categorias-usada", data });
+        categoriaUsadaIdBySlug.set(slug, doc.id);
+        report.creados.push(label);
+      }
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
+  /*
+   * --- INVENTARIO DE USADA -------------------------------------------------
+   *
+   * `EquipoUsado` no tiene slug (no es una página), así que la identidad para la
+   * idempotencia es el par (categoría, nombre). No es tan sólida como un slug
+   * único, pero es lo que hay: dos unidades distintas con el mismo nombre en la
+   * misma categoría se pisarían. Para datos de demostración es suficiente; con
+   * inventario real conviene un campo de referencia interna.
+   */
+  for (const row of readCSV("maquinaria-usada-equipos.csv")) {
+    const label = `Equipo usado "${row.nombre}"`;
+    try {
+      const nombre = opt(row.nombre);
+      const categoriaSlug = opt(row.categoria_slug);
+      if (!nombre || !categoriaSlug) {
+        report.omitidos.push(`${label}: falta nombre o categoria_slug`);
+        continue;
+      }
+      const categoriaId =
+        categoriaUsadaIdBySlug.get(categoriaSlug) ??
+        (await findOne("categorias-usada", { slug: { equals: categoriaSlug } }))?.id ??
+        null;
+      if (categoriaId === null) {
+        report.errores.push(`${label}: la categoría "${categoriaSlug}" no existe`);
+        continue;
+      }
+
+      const numero = (v: string | undefined) => {
+        const n = Number(opt(v));
+        return Number.isFinite(n) ? n : undefined;
+      };
+
+      const data = {
+        nombre,
+        categoria: categoriaId,
+        marca: opt(row.marca),
+        modelo: opt(row.modelo),
+        anio: numero(row.anio),
+        horometro: numero(row.horometro),
+        ubicacion: opt(row.ubicacion),
+        descripcion: opt(row.descripcion),
+        disponible: opt(row.disponible) === "si",
+      };
+      const existing = await findOne("equipos-usados", {
+        and: [{ categoria: { equals: categoriaId } }, { nombre: { equals: nombre } }],
+      });
+      if (existing) {
+        await payload.update({ collection: "equipos-usados", id: existing.id, data });
+        report.actualizados.push(label);
+      } else {
+        await payload.create({ collection: "equipos-usados", data });
         report.creados.push(label);
       }
     } catch (err) {

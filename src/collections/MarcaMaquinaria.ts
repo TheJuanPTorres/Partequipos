@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { revalidarMarcaMaquinaria, revalidarMarcaMaquinariaBorrada } from "./hooks/maquinariaHooks";
 
 /**
  * Marcas de la línea de maquinaria NUEVA (Case Construction, Dynapac, Hitachi,
@@ -23,6 +24,10 @@ export const MarcaMaquinaria: CollectionConfig = {
     group: "Maquinaria",
   },
   access: { read: () => true },
+  hooks: {
+    afterChange: [revalidarMarcaMaquinaria],
+    afterDelete: [revalidarMarcaMaquinariaBorrada],
+  },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
     // Nivel superior de su rama: unicidad global del slug.

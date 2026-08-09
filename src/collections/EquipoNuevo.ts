@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { revalidarEquipoNuevo, revalidarEquipoNuevoBorrado } from "./hooks/maquinariaHooks";
 
 /**
  * Ficha de un equipo de la línea NUEVA. Es una página de **venta**, no una
@@ -19,6 +20,7 @@ export const EquipoNuevo: CollectionConfig = {
     group: "Maquinaria",
   },
   access: { read: () => true },
+  hooks: { afterChange: [revalidarEquipoNuevo], afterDelete: [revalidarEquipoNuevoBorrado] },
   // Unicidad por tipo; el tipo ya implica una marca. Igual que en repuestos.
   indexes: [{ fields: ["tipo", "slug"], unique: true }],
   fields: [

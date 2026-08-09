@@ -1,12 +1,19 @@
 import type { MetadataRoute } from "next";
 
+import {
+  getCategoriasMaquinaria,
+  getCategoriasUsada,
+  getEquiposNuevos,
+  getMarcasMaquinaria,
+  getTiposMaquinaria,
+} from "@/lib/queries/getMaquinaria";
 import { getMarcas } from "@/lib/queries/getMarcas";
 import { getModelos } from "@/lib/queries/getModelos";
 import { getPaginas } from "@/lib/queries/getPaginas";
 import { getTipos } from "@/lib/queries/getTipos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
 import { poblado } from "@/lib/utils/relations";
-import type { Marca, TiposEquipo } from "@/payload-types";
+import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/payload-types";
 
 /**
  * Sitemap dinámico generado desde Payload (nunca escrito a mano).
@@ -31,11 +38,26 @@ import type { Marca, TiposEquipo } from "@/payload-types";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [marcas, tipos, modelos, paginas] = await Promise.all([
+  const [
+    marcas,
+    tipos,
+    modelos,
+    paginas,
+    marcasMaquinaria,
+    tiposMaquinaria,
+    equiposNuevos,
+    categoriasNueva,
+    categoriasUsada,
+  ] = await Promise.all([
     getMarcas(),
     getTipos(),
     getModelos(),
     getPaginas(),
+    getMarcasMaquinaria(),
+    getTiposMaquinaria(),
+    getEquiposNuevos(),
+    getCategoriasMaquinaria(),
+    getCategoriasUsada(),
   ]);
 
   return buildSitemapEntries({
@@ -62,5 +84,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
       ];
     }),
+
+    // --- Maquinaria ---------------------------------------------------------
+    marcasMaquinaria: marcasMaquinaria.map((marca) => ({
+      slug: marca.slug,
+      updatedAt: marca.updatedAt,
+    })),
+
+    tiposMaquinaria: tiposMaquinaria.flatMap((tipo) => {
+      const marca = poblado<MarcasMaquinaria>(tipo.marca);
+      return marca ? [{ slug: tipo.slug, updatedAt: tipo.updatedAt, marcaSlug: marca.slug }] : [];
+    }),
+
+    equiposNuevos: equiposNuevos.flatMap((equipo) => {
+      const marca = poblado<MarcasMaquinaria>(equipo.marca);
+      const tipo = poblado<TiposMaquinaria>(equipo.tipo);
+      if (!marca || !tipo) return [];
+      return [
+        {
+          slug: equipo.slug,
+          updatedAt: equipo.updatedAt,
+          marcaSlug: marca.slug,
+          tipoSlug: tipo.slug,
+        },
+      ];
+    }),
+
+    categoriasNueva: categoriasNueva.map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
+
+    categoriasUsada: categoriasUsada.map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
   });
 }

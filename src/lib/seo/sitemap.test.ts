@@ -37,6 +37,15 @@ function rutasConstruidas(): string[] {
   return encontradas.sort();
 }
 
+/** Maquinaria sin datos: se reutiliza en los casos que solo miran repuestos. */
+const SIN_MAQUINARIA = {
+  marcasMaquinaria: [],
+  tiposMaquinaria: [],
+  equiposNuevos: [],
+  categoriasNueva: [],
+  categoriasUsada: [],
+};
+
 const datos = {
   paginas: [
     { slug: "inicio", updatedAt: "2026-07-28T10:00:00.000Z" },
@@ -52,13 +61,33 @@ const datos = {
       tipoSlug: "tipo-a",
     },
   ],
+  ...SIN_MAQUINARIA,
+};
+
+const datosConMaquinaria = {
+  ...datos,
+  marcasMaquinaria: [{ slug: "marca-m", updatedAt: "2026-07-21T10:00:00.000Z" }],
+  tiposMaquinaria: [
+    { slug: "tipo-m", updatedAt: "2026-07-23T10:00:00.000Z", marcaSlug: "marca-m" },
+  ],
+  equiposNuevos: [
+    {
+      slug: "equipo-m",
+      updatedAt: "2026-07-24T10:00:00.000Z",
+      marcaSlug: "marca-m",
+      tipoSlug: "tipo-m",
+    },
+  ],
+  categoriasNueva: [{ slug: "categoria-n", updatedAt: "2026-07-19T10:00:00.000Z" }],
+  categoriasUsada: [{ slug: "categoria-u", updatedAt: "2026-07-18T10:00:00.000Z" }],
 };
 
 describe("buildSitemapEntries", () => {
   it("incluye portada, índices y una entrada por entidad", () => {
     const e = buildSitemapEntries(datos, AHORA);
-    // 1 portada + 2 índices + 1 institucional + 1 marca + 1 tipo + 1 modelo
-    assert.equal(e.length, 7);
+    // 1 portada + 2 índices de repuestos + 4 índices de maquinaria
+    // + 1 institucional + 1 marca + 1 tipo + 1 modelo
+    assert.equal(e.length, 11);
   });
 
   it("emite solo URLs absolutas", () => {
@@ -104,14 +133,26 @@ describe("buildSitemapEntries", () => {
 
   it("cae a la fecha actual si updatedAt falta o es inválido", () => {
     const e = buildSitemapEntries(
-      { marcas: [{ slug: "m", updatedAt: null }], tipos: [], modelos: [], paginas: [] },
+      {
+        marcas: [{ slug: "m", updatedAt: null }],
+        tipos: [],
+        modelos: [],
+        paginas: [],
+        ...SIN_MAQUINARIA,
+      },
       AHORA,
     );
     const marca = e.find((x) => x.url.endsWith("/m/"));
     assert.equal(marca?.lastModified.getTime(), AHORA.getTime());
 
     const invalida = buildSitemapEntries(
-      { marcas: [{ slug: "m", updatedAt: "no-es-fecha" }], tipos: [], modelos: [], paginas: [] },
+      {
+        marcas: [{ slug: "m", updatedAt: "no-es-fecha" }],
+        tipos: [],
+        modelos: [],
+        paginas: [],
+        ...SIN_MAQUINARIA,
+      },
       AHORA,
     );
     assert.equal(
@@ -121,10 +162,14 @@ describe("buildSitemapEntries", () => {
   });
 
   it("con base vacía devuelve solo los índices, sin romperse", () => {
-    const e = buildSitemapEntries({ marcas: [], tipos: [], modelos: [], paginas: [] }, AHORA);
+    const e = buildSitemapEntries(
+      { marcas: [], tipos: [], modelos: [], paginas: [], ...SIN_MAQUINARIA },
+      AHORA,
+    );
 
-    // Sin documento de portada no se lista `/`: solo quedan los 2 índices.
-    assert.equal(e.length, 2);
+    // Sin documento de portada no se lista `/`: quedan los 2 índices de
+    // repuestos y los 4 de maquinaria, que son rutas estáticas y existen igual.
+    assert.equal(e.length, 6);
     assert.equal(e[0]?.lastModified.getTime(), AHORA.getTime());
     for (const entrada of e) assert.match(entrada.url, /^https:\/\//);
   });
@@ -171,13 +216,47 @@ describe("cobertura del sitemap frente a las rutas construidas", () => {
   });
 
   it("detecta una ruta nueva sin declarar (comprobación del propio guardián)", () => {
-    const construidas = [...rutasConstruidas(), "/maquinaria-pesada"];
+    // Sección inventada a propósito: si algún día existe, hay que cambiarla aquí.
+    const inventada = "/seccion-que-no-existe";
+    const construidas = [...rutasConstruidas(), inventada];
     const cubiertas = new Set<string>(PATRONES_SITEMAP);
 
     assert.deepEqual(
       construidas.filter((r) => !cubiertas.has(r)),
-      ["/maquinaria-pesada"],
+      [inventada],
     );
+  });
+});
+
+describe("maquinaria en el sitemap", () => {
+  it("emite los cuatro índices más una URL por entidad", () => {
+    const urls = buildSitemapEntries(datosConMaquinaria, AHORA).map((x) => x.url);
+    const base = "https://partequipos.com/maquinaria-pesada";
+
+    for (const esperada of [
+      `${base}/`,
+      `${base}/maquinaria-pesada-nueva/`,
+      `${base}/maquinaria-pesada-nueva/marcas/`,
+      `${base}/maquinaria-pesada-nueva/categoria-n/`,
+      `${base}/maquinaria-pesada-nueva/marcas/marca-m/`,
+      `${base}/maquinaria-pesada-nueva/marcas/marca-m/tipo-m/`,
+      `${base}/maquinaria-pesada-nueva/marcas/marca-m/tipo-m/equipo-m/`,
+      `${base}/maquinaria-pesada-usada/`,
+      `${base}/maquinaria-pesada-usada/categoria-u/`,
+    ]) {
+      assert.ok(urls.includes(esperada), `falta ${esperada}`);
+    }
+  });
+
+  it("no colisiona con las URLs de repuestos ni duplica", () => {
+    const e = buildSitemapEntries(datosConMaquinaria, AHORA);
+    assert.equal(new Set(e.map((x) => x.url)).size, e.length);
+  });
+
+  it("toma lastModified del updatedAt real del equipo", () => {
+    const e = buildSitemapEntries(datosConMaquinaria, AHORA);
+    const equipo = e.find((x) => x.url.endsWith("/equipo-m/"));
+    assert.equal(equipo?.lastModified.toISOString(), "2026-07-24T10:00:00.000Z");
   });
 });
 

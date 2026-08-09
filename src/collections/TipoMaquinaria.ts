@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { revalidarTipoMaquinaria, revalidarTipoMaquinariaBorrado } from "./hooks/maquinariaHooks";
 
 /**
  * Tipo de equipo dentro de una marca de maquinaria nueva
@@ -16,6 +17,7 @@ export const TipoMaquinaria: CollectionConfig = {
     group: "Maquinaria",
   },
   access: { read: () => true },
+  hooks: { afterChange: [revalidarTipoMaquinaria], afterDelete: [revalidarTipoMaquinariaBorrado] },
   /*
    * Unicidad del slug POR MARCA, igual que en repuestos: `excavadoras` existe
    * bajo Case y bajo Hitachi, y la URL las distingue. Con unicidad global la

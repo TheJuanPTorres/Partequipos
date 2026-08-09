@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { revalidarCategoriaNueva, revalidarCategoriaNuevaBorrada } from "./hooks/maquinariaHooks";
 
 /**
  * Categorías transversales de la línea NUEVA
@@ -24,6 +25,7 @@ export const CategoriaMaquinaria: CollectionConfig = {
     group: "Maquinaria",
   },
   access: { read: () => true },
+  hooks: { afterChange: [revalidarCategoriaNueva], afterDelete: [revalidarCategoriaNuevaBorrada] },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
     slugField({ unique: true }),

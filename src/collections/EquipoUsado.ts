@@ -1,5 +1,7 @@
 import type { CollectionConfig } from "payload";
 
+import { revalidarEquipoUsado, revalidarEquipoUsadoBorrado } from "./hooks/maquinariaHooks";
+
 /**
  * Unidad del inventario de maquinaria USADA (el «marketplace»).
  *
@@ -25,6 +27,7 @@ export const EquipoUsado: CollectionConfig = {
       "Inventario de maquinaria usada. Se muestra dentro de la página de su categoría; no genera URLs propias.",
   },
   access: { read: () => true },
+  hooks: { afterChange: [revalidarEquipoUsado], afterDelete: [revalidarEquipoUsadoBorrado] },
   fields: [
     {
       name: "nombre",

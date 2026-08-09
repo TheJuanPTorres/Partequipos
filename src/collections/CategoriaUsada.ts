@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { revalidarCategoriaUsada, revalidarCategoriaUsadaBorrada } from "./hooks/maquinariaHooks";
 
 /**
  * Categorías de la línea USADA: las 9 rutas indexadas bajo
@@ -21,6 +22,7 @@ export const CategoriaUsada: CollectionConfig = {
     group: "Maquinaria",
   },
   access: { read: () => true },
+  hooks: { afterChange: [revalidarCategoriaUsada], afterDelete: [revalidarCategoriaUsadaBorrada] },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
     slugField({ unique: true }),

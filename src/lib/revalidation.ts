@@ -106,3 +106,76 @@ export function rutasDeModelo(marcaSlug: string, tipoSlug: string, modeloSlug: s
     rutas.modelo(marcaSlug, tipoSlug, modeloSlug),
   ];
 }
+
+/* ---------------------------------------------------------------------------
+ * MAQUINARIA
+ *
+ * Mismo grafo que en repuestos:
+ *   cambia MARCA   -> su página + índice de marcas + índice de línea + subárbol
+ *   cambia TIPO    -> su página + la de su marca + fichas de sus equipos
+ *   cambia EQUIPO  -> su ficha + la página de su tipo
+ *
+ * Añadido propio de esta sección: las categorías transversales listan equipos de
+ * varias marcas, así que un cambio en un equipo también las afecta. Como la
+ * relación va en sentido contrario (la categoría declara los tipos), se
+ * revalidan todas: son 4, no compensa resolver cuáles.
+ * ------------------------------------------------------------------------ */
+
+/** Rutas afectadas por un cambio en una MARCA de maquinaria. */
+export function rutasDeMarcaMaquinaria(
+  marcaSlug: string,
+  hijos: { tipoSlug: string; equipoSlugs: string[] }[],
+): string[] {
+  const paths = [
+    rutas.maquinaria(),
+    rutas.nueva(),
+    rutas.marcasMaquinaria(),
+    rutas.marcaMaquinaria(marcaSlug),
+  ];
+
+  for (const { tipoSlug, equipoSlugs } of hijos) {
+    paths.push(rutas.tipoMaquinaria(marcaSlug, tipoSlug));
+    for (const equipoSlug of equipoSlugs) {
+      paths.push(rutas.equipoNuevo(marcaSlug, tipoSlug, equipoSlug));
+    }
+  }
+
+  return paths;
+}
+
+/** Rutas afectadas por un cambio en un TIPO de maquinaria. */
+export function rutasDeTipoMaquinaria(
+  marcaSlug: string,
+  tipoSlug: string,
+  equipoSlugs: string[],
+): string[] {
+  const paths = [rutas.marcaMaquinaria(marcaSlug), rutas.tipoMaquinaria(marcaSlug, tipoSlug)];
+  for (const equipoSlug of equipoSlugs) {
+    paths.push(rutas.equipoNuevo(marcaSlug, tipoSlug, equipoSlug));
+  }
+  return paths;
+}
+
+/** Rutas afectadas por un cambio en un EQUIPO nuevo. */
+export function rutasDeEquipoNuevo(
+  marcaSlug: string,
+  tipoSlug: string,
+  equipoSlug: string,
+  categoriaSlugs: string[],
+): string[] {
+  return [
+    rutas.tipoMaquinaria(marcaSlug, tipoSlug),
+    rutas.equipoNuevo(marcaSlug, tipoSlug, equipoSlug),
+    ...categoriaSlugs.map((slug) => rutas.categoriaNueva(slug)),
+  ];
+}
+
+/** Rutas afectadas por un cambio en una categoría de la línea nueva. */
+export function rutasDeCategoriaNueva(slug: string): string[] {
+  return [rutas.nueva(), rutas.categoriaNueva(slug)];
+}
+
+/** Rutas afectadas por un cambio en una categoría de usada. */
+export function rutasDeCategoriaUsada(slug: string): string[] {
+  return [rutas.maquinaria(), rutas.usada(), rutas.categoriaUsada(slug)];
+}

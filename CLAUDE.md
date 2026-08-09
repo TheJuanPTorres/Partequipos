@@ -255,6 +255,28 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   **vacía**. Al haber partido de un esquema limpio, este escenario ya no aplica
   en producción, pero volvería a darse si alguien hace push contra ella.
 
+### 10.8 Deuda técnica — el logo institucional no está en `Media`
+
+> `logo-partequipos.png` se referencia por **URL absoluta cableada** en
+> `src/lib/seo/config.ts` (`logoPath` y `defaultOgImagePath`), en vez de tener un
+> registro en la colección `Media` y referenciarse por relación.
+>
+> **Por qué es frágil:** el archivo vive en el Blob sin ningún registro en base
+> que lo respalde, así que cualquier inventario de media lo da por huérfano. Si
+> alguien lo borra del store —o cambiamos de almacenamiento— se rompen a la vez
+> la **cabecera de todas las páginas** (`Header.tsx`), el **logo del JSON-LD
+> `Organization`** (`jsonLd.ts`) y la **imagen social por defecto**
+> (`buildMetadata.ts`), **sin que nada avise**: no hay error de compilación ni de
+> tipos, solo una imagen rota en producción.
+>
+> Ya estuvo a punto de pasar: en la limpieza del Blob del 2026-08-09 figuraba
+> como uno de los "3 media huérfanos" a borrar. Se salvó por revisar las
+> referencias en código antes de ejecutar el borrado.
+>
+> **Arreglo pendiente:** subirlo a `Media` y que `seoConfig` lo resuelva por
+> relación en vez de por URL fija. No se hizo en su momento para no mezclarlo con
+> otra tarea; queda registrado aquí.
+
 ### 10.7 PENDIENTE bloqueante — infraestructura de base de datos
 
 > El cliente confirmó que la base de datos irá en **su propia infraestructura**.

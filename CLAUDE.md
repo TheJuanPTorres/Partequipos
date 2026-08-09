@@ -255,12 +255,39 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   **vacía**. Al haber partido de un esquema limpio, este escenario ya no aplica
   en producción, pero volvería a darse si alguien hace push contra ella.
 
+### 10.7 PENDIENTE bloqueante — infraestructura de base de datos
+
+> El cliente confirmó que la base de datos irá en **su propia infraestructura**.
+> **Neon es transitorio**: sirve para la demo, no es la solución final.
+>
+> Dos requisitos son **bloqueantes** y hay que confirmarlos con su equipo antes
+> de comprometer fechas:
+>
+> 1. **Accesible desde internet.** Vercel ejecuta funciones serverless con IP
+>    saliente variable, así que la base debe aceptar conexiones desde fuera de su
+>    red. Una base solo accesible por VPN o en red privada **no funciona** con
+>    este hosting: obligaría a cambiar de estrategia de despliegue.
+> 2. **Agrupador de conexiones (pooler).** Cada invocación serverless abre su
+>    propia conexión; sin un pooler delante (PgBouncer o equivalente) se agotan
+>    los límites del servidor bajo carga. Es lo que hoy resuelve la cadena
+>    _pooled_ de Neon.
+>
+> Si alguno no se cumple, hay que replantear el hosting antes de migrar los datos.
+
 ### 10.6 Los datos de producción son de DEMOSTRACIÓN
 
-> **Producción NO contiene contenido real del cliente.** Lo que hay son datos de
-> demo sembrados con `npm run import` y `npm run seed:paginas`: 5 marcas, 10
-> tipos, 81 modelos, 10 categorías técnicas y 9 páginas institucionales con
-> **textos de relleno redactados por nosotros**.
+> **Producción NO contiene contenido real del cliente.** Está **sembrada**
+> (2026-08-09) con datos de demo mediante `npm run import` (106 registros: 5
+> marcas, 10 tipos, 81 modelos, 10 categorías) y `npm run seed:paginas` (9
+> páginas institucionales), todos con **textos de relleno redactados por
+> nosotros**.
+>
+> **Sembrar desde un script NO refresca el sitio desplegado.** Los scripts corren
+> en un proceso aparte, así que el `revalidatePath` de los hooks no alcanza la
+> instancia de Vercel: las rutas ya visitadas siguen sirviendo su versión en
+> caché (se vio con `/` y `/nosotros/`, que quedaron en 404 con `Age` de ~10 h
+> mientras los datos ya estaban en la base). **Tras una siembra masiva hay que
+> redesplegar.**
 >
 > Los textos legales (garantías, tratamiento de datos, código de ética, términos)
 > son **marcadores de posición sin validez jurídica** y lo dicen explícitamente en

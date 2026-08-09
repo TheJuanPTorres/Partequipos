@@ -16,7 +16,14 @@
  */
 import { getPayload } from "payload";
 
-import config from "../../src/payload.config";
+/*
+ * SEGURIDAD DE ESQUEMA: este script mueve DATOS, nunca estructura.
+ * Import dinámico de la config para que la variable llegue antes de cargarla.
+ * Ver la explicación en `scripts/import/import.ts` y CLAUDE.md §10.9.
+ */
+process.env.PAYLOAD_DISABLE_PUSH = "true";
+
+const { default: config } = await import("../../src/payload.config");
 
 /** Construye un richText de Lexical a partir de párrafos y subtítulos. */
 function contenido(bloques: { tipo: "p" | "h2"; texto: string }[]) {

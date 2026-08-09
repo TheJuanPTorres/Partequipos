@@ -255,6 +255,60 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   **vacía**. Al haber partido de un esquema limpio, este escenario ya no aplica
   en producción, pero volvería a darse si alguien hace push contra ella.
 
+### 10.9 INCIDENTE 2026-08-09 — build colgado por el marcador `dev`
+
+**Qué pasó.** Un build de Vercel se quedó **20 minutos colgado** en el prompt
+interactivo de `payload migrate` (_"It looks like you've run Payload in dev
+mode…"_) y hubo que cancelarlo a mano.
+
+**Por qué.** Los scripts de datos (`npm run import`, `npm run seed:paginas`) se
+ejecutaron desde una máquina de desarrollo apuntando `DATABASE_URI` a otra base.
+El push de esquema estaba condicionado solo a `NODE_ENV !== "production"`, y
+**`payload run` no fija `NODE_ENV`**, así que el push quedó activo: alteró el
+esquema y `pushDevSchema` insertó el marcador `dev` (batch −1) en
+`payload_migrations`. Ese marcador es justo lo que hace que `payload migrate`
+pida confirmación — y en un build no hay stdin.
+
+Confirmado en el código (`@payloadcms/drizzle/dist/utilities/pushDevSchema.js`:
+inserta `name: 'dev', batch: -1`) y **reproducido en la rama `development`**: el
+marcador aparece con fecha `2026-08-09T06:48`, la hora exacta de esa ejecución.
+
+**Arreglo de la causa raíz.** Un script de datos no debe poder tocar el esquema,
+corra donde corra:
+
+- `payload.config.ts` desactiva el push también con `PAYLOAD_DISABLE_PUSH=true`.
+- `import.ts` y `seed-paginas.ts` **se ponen esa variable ellos mismos** antes de
+  cargar la config (import dinámico, porque los `import` estáticos se evalúan
+  antes que cualquier sentencia). Ya no depende de que nadie la recuerde.
+
+Se descartó `NODE_ENV=production`: cambia mucho más que el push, sigue siendo
+ambiental —o sea, olvidable— y en Windows no funciona en los scripts de npm.
+
+**Arreglo del síntoma (que el build falle ruidoso).** `npm run db:check`
+(`scripts/db/check-migrations.ts`) lee `payload_migrations` y corta con código 1
+y mensaje accionable si encuentra el marcador. Va **antes** de migrar:
+
+```
+Build Command:  npm run deploy:migrate && npm run build
+```
+
+Se descartó `forceAcceptWarning`: convertiría la parada en un avance silencioso
+(lo contrario de lo que se quiere), el aviso de pérdida de datos es real, y la
+migración inicial hace `CREATE TABLE` sin `IF NOT EXISTS`, así que contra una
+base poblada fallaría igual.
+
+**Procedimiento correcto para sembrar producción**
+
+1. Comprobar antes y después: `DATABASE_URI="<pooled prod>" npm run db:check`.
+2. Sembrar: `DATABASE_URI="<pooled prod>" npm run import` y luego
+   `… npm run seed:paginas`. Ambos son idempotentes y ya no activan el push.
+3. **Redesplegar**: sembrar desde un script no refresca el sitio desplegado
+   (ver §10.6).
+4. Si `db:check` encuentra el marcador `dev`, resolverlo **antes** de desplegar:
+   si el esquema ya coincide con las migraciones del repo, basta
+   `DELETE FROM payload_migrations WHERE batch = -1;`; si divergió, reconciliarlo
+   primero.
+
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 
 > `logo-partequipos.png` se referencia por **URL absoluta cableada** en

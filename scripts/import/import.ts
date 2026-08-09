@@ -27,9 +27,23 @@ import { fileURLToPath } from "node:url";
 import { getPayload } from "payload";
 import type { CollectionSlug, Where } from "payload";
 
+/*
+ * SEGURIDAD DE ESQUEMA: este script mueve DATOS, nunca estructura.
+ *
+ * Se marca antes de cargar la config para que el adaptador arranque con el push
+ * desactivado. Sin esto, lanzarlo desde una máquina de desarrollo contra la base
+ * de producción activa el push (porque `payload run` no fija `NODE_ENV`), altera
+ * el esquema y deja el marcador `dev` que cuelga el build. Ver CLAUDE.md §10.9.
+ *
+ * El import de la config es DINÁMICO a propósito: los `import` estáticos se
+ * evalúan antes que cualquier sentencia del módulo, así que la variable llegaría
+ * tarde.
+ */
+process.env.PAYLOAD_DISABLE_PUSH = "true";
+
 // Import RELATIVO del config (evita depender de la resolución del alias
 // @payload-config fuera del runtime de Next).
-import config from "../../src/payload.config";
+const { default: config } = await import("../../src/payload.config");
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(dirname, "data");

@@ -103,9 +103,8 @@ npm run migrate:down     # revierte el último lote
 En el despliegue se aplican **antes** de que arranque la nueva versión. En Vercel
 se configura como _Build Command_:
 
-```
-npm run migrate && npm run build
-```
+````
+undefined```
 
 > **Ojo con la migración inicial:** genera `CREATE TABLE` sin `IF NOT EXISTS`, así
 > que está pensada para una base **vacía** (la rama de producción recién creada).
@@ -118,8 +117,10 @@ npm run migrate && npm run build
 
 - **Hosting:** Vercel. `main` despliega a producción; cada rama genera un preview.
 - **Variables:** se cargan en el panel de Vercel por entorno (§2). Nunca en el repo.
-- **Build Command:** `npm run migrate && npm run build` (aplica migraciones antes
-  de compilar).
+- **Build Command:** `npm run deploy:migrate && npm run build`. Aplica migraciones
+  antes de compilar, pasando primero por `npm run db:check`, que aborta con un
+  mensaje claro si la base tiene el marcador `dev` — sin ese guardián el build se
+  cuelga en un prompt interactivo (ver CLAUDE.md §10.9).
 - **Base de datos:** una rama de Neon por entorno.
 
 ### Antes de dar un despliegue por bueno
@@ -190,7 +191,7 @@ npm run typecheck     # errores de tipos
 npm run lint          # o `npm run lint:fix` para lo autocorregible
 npm run format:check  # o `npm run format` para arreglarlo
 npm test
-```
+````
 
 Casi siempre es formato: `npm run format` y volver a commitear. No fusiones un PR
 con el CI en rojo — la rama `main` debe estar siempre desplegable (CLAUDE.md §6).

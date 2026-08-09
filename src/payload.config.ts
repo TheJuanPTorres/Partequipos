@@ -56,7 +56,21 @@ export default buildConfig({
      * caliente, sin control de versiones ni posibilidad de revertir. Ver README
      * y el riesgo registrado en CLAUDE.md §10.2.
      */
-    push: process.env.NODE_ENV !== "production",
+    /*
+     * Se desactiva de dos formas, y basta con una:
+     *
+     * 1. `NODE_ENV === "production"` — el caso del servidor desplegado.
+     * 2. `PAYLOAD_DISABLE_PUSH === "true"` — lo ponen los scripts de datos
+     *    (`import`, `seed:paginas`) antes de cargar esta config.
+     *
+     * El punto 2 existe porque el punto 1 no basta: `payload run` NO fija
+     * `NODE_ENV`, así que un script lanzado desde una máquina de desarrollo
+     * contra la base de PRODUCCIÓN activaba el push, alteraba el esquema y
+     * dejaba el marcador `dev` (batch -1) en `payload_migrations` — lo que
+     * después cuelga el build en el prompt de `payload migrate`.
+     * Un script de datos nunca debe tocar el esquema. Ver CLAUDE.md §10.9.
+     */
+    push: process.env.NODE_ENV !== "production" && process.env.PAYLOAD_DISABLE_PUSH !== "true",
     migrationDir: path.resolve(dirname, "migrations"),
   }),
   sharp,

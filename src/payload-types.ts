@@ -75,6 +75,12 @@ export interface Config {
     'categorias-tecnicas': CategoriasTecnica;
     redirects: Redirect;
     paginas: Pagina;
+    'marcas-maquinaria': MarcasMaquinaria;
+    'tipos-maquinaria': TiposMaquinaria;
+    'equipos-nuevos': EquiposNuevo;
+    'categorias-maquinaria': CategoriasMaquinaria;
+    'categorias-usada': CategoriasUsada;
+    'equipos-usados': EquiposUsado;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +96,12 @@ export interface Config {
     'categorias-tecnicas': CategoriasTecnicasSelect<false> | CategoriasTecnicasSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     paginas: PaginasSelect<false> | PaginasSelect<true>;
+    'marcas-maquinaria': MarcasMaquinariaSelect<false> | MarcasMaquinariaSelect<true>;
+    'tipos-maquinaria': TiposMaquinariaSelect<false> | TiposMaquinariaSelect<true>;
+    'equipos-nuevos': EquiposNuevosSelect<false> | EquiposNuevosSelect<true>;
+    'categorias-maquinaria': CategoriasMaquinariaSelect<false> | CategoriasMaquinariaSelect<true>;
+    'categorias-usada': CategoriasUsadaSelect<false> | CategoriasUsadaSelect<true>;
+    'equipos-usados': EquiposUsadosSelect<false> | EquiposUsadosSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -372,6 +384,214 @@ export interface Pagina {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcas-maquinaria".
+ */
+export interface MarcasMaquinaria {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  descripcion?: string | null;
+  logo?: (number | null) | Media;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tipos-maquinaria".
+ */
+export interface TiposMaquinaria {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  marca: number | MarcasMaquinaria;
+  descripcion?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "equipos-nuevos".
+ */
+export interface EquiposNuevo {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  /**
+   * Desnormalizada para consultas y migas. Debe coincidir con la marca del tipo elegido.
+   */
+  marca: number | MarcasMaquinaria;
+  /**
+   * Se filtra por la marca seleccionada arriba.
+   */
+  tipo: number | TiposMaquinaria;
+  /**
+   * Referencia del fabricante, ej. 1150M o ZX350LC-6.
+   */
+  codigo?: string | null;
+  /**
+   * Resumen de una o dos líneas, bajo el título.
+   */
+  entradilla?: string | null;
+  descripcion?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Ventajas o argumentos de venta, uno por línea.
+   */
+  destacados?:
+    | {
+        texto: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * La primera imagen se usa como portada y como imagen social.
+   */
+  imagenes?: (number | Media)[] | null;
+  /**
+   * Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera.
+   */
+  fichaTecnica?:
+    | {
+        /**
+         * Ej. «Peso operativo», «Potencia neta».
+         */
+        etiqueta: string;
+        /**
+         * Incluir la unidad: «20.500 kg», «122 kW».
+         */
+        valor: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Fichas técnicas o folletos del fabricante en PDF.
+   */
+  documentos?: (number | Media)[] | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-maquinaria".
+ */
+export interface CategoriasMaquinaria {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  descripcion?: string | null;
+  /**
+   * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
+   */
+  tiposIncluidos?: (number | TiposMaquinaria)[] | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-usada".
+ */
+export interface CategoriasUsada {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  descripcion?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Inventario de maquinaria usada. Se muestra dentro de la página de su categoría; no genera URLs propias.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "equipos-usados".
+ */
+export interface EquiposUsado {
+  id: number;
+  /**
+   * Ej. «Excavadora Hitachi ZX200-3».
+   */
+  nombre: string;
+  /**
+   * Determina en qué página aparece la unidad.
+   */
+  categoria: number | CategoriasUsada;
+  marca?: string | null;
+  modelo?: string | null;
+  /**
+   * Año del equipo, no de la publicación.
+   */
+  anio?: number | null;
+  /**
+   * Horas de trabajo acumuladas. Es el dato que más comparan los compradores.
+   */
+  horometro?: number | null;
+  /**
+   * Ciudad donde está el equipo; condiciona el costo de traslado.
+   */
+  ubicacion?: string | null;
+  descripcion?: string | null;
+  imagenes?: (number | Media)[] | null;
+  /**
+   * Al venderse, desmarcar en vez de borrar: conserva el historial y permite deshacer.
+   */
+  disponible?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -425,6 +645,30 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'paginas';
         value: number | Pagina;
+      } | null)
+    | ({
+        relationTo: 'marcas-maquinaria';
+        value: number | MarcasMaquinaria;
+      } | null)
+    | ({
+        relationTo: 'tipos-maquinaria';
+        value: number | TiposMaquinaria;
+      } | null)
+    | ({
+        relationTo: 'equipos-nuevos';
+        value: number | EquiposNuevo;
+      } | null)
+    | ({
+        relationTo: 'categorias-maquinaria';
+        value: number | CategoriasMaquinaria;
+      } | null)
+    | ({
+        relationTo: 'categorias-usada';
+        value: number | CategoriasUsada;
+      } | null)
+    | ({
+        relationTo: 'equipos-usados';
+        value: number | EquiposUsado;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -618,6 +862,136 @@ export interface PaginasSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcas-maquinaria_select".
+ */
+export interface MarcasMaquinariaSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  descripcion?: T;
+  logo?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tipos-maquinaria_select".
+ */
+export interface TiposMaquinariaSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  marca?: T;
+  descripcion?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "equipos-nuevos_select".
+ */
+export interface EquiposNuevosSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  marca?: T;
+  tipo?: T;
+  codigo?: T;
+  entradilla?: T;
+  descripcion?: T;
+  destacados?:
+    | T
+    | {
+        texto?: T;
+        id?: T;
+      };
+  imagenes?: T;
+  fichaTecnica?:
+    | T
+    | {
+        etiqueta?: T;
+        valor?: T;
+        id?: T;
+      };
+  documentos?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-maquinaria_select".
+ */
+export interface CategoriasMaquinariaSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  descripcion?: T;
+  tiposIncluidos?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-usada_select".
+ */
+export interface CategoriasUsadaSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  descripcion?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "equipos-usados_select".
+ */
+export interface EquiposUsadosSelect<T extends boolean = true> {
+  nombre?: T;
+  categoria?: T;
+  marca?: T;
+  modelo?: T;
+  anio?: T;
+  horometro?: T;
+  ubicacion?: T;
+  descripcion?: T;
+  imagenes?: T;
+  disponible?: T;
   updatedAt?: T;
   createdAt?: T;
 }

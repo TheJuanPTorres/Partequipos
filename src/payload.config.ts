@@ -7,13 +7,19 @@ import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
+import { CategoriaMaquinaria } from "./collections/CategoriaMaquinaria";
 import { CategoriaTecnica } from "./collections/CategoriaTecnica";
+import { CategoriaUsada } from "./collections/CategoriaUsada";
+import { EquipoNuevo } from "./collections/EquipoNuevo";
+import { EquipoUsado } from "./collections/EquipoUsado";
 import { Marca } from "./collections/Marca";
+import { MarcaMaquinaria } from "./collections/MarcaMaquinaria";
 import { Media } from "./collections/Media";
 import { ModeloRepuesto } from "./collections/ModeloRepuesto";
 import { PaginaInstitucional } from "./collections/PaginaInstitucional";
 import { Redirects } from "./collections/Redirects";
 import { TipoEquipo } from "./collections/TipoEquipo";
+import { TipoMaquinaria } from "./collections/TipoMaquinaria";
 import { Users } from "./collections/Users";
 
 const filename = fileURLToPath(import.meta.url);
@@ -35,6 +41,13 @@ export default buildConfig({
     CategoriaTecnica,
     Redirects,
     PaginaInstitucional,
+    // Maquinaria (ADR 0007): colecciones propias, separadas de las de repuestos.
+    MarcaMaquinaria,
+    TipoMaquinaria,
+    EquipoNuevo,
+    CategoriaMaquinaria,
+    CategoriaUsada,
+    EquipoUsado,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",

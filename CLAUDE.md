@@ -504,8 +504,29 @@ base poblada fallaría igual.
 
 ### 10.5 Nota operativa — regeneración de `package-lock.json`
 
-> El `package-lock.json` se regenera **SIEMPRE** con instalación limpia
-> (`rm -rf node_modules && npm install`), **nunca** con `--package-lock-only`.
+> El `package-lock.json` se regenera **SIEMPRE** borrando **el lock Y
+> `node_modules`**:
+>
+> ```bash
+> rm -f package-lock.json && rm -rf node_modules && npm install
+> ```
+>
+> **Nunca** con `--package-lock-only`, y **no basta con borrar solo
+> `node_modules`**: el lock existente ancla las resoluciones y npm se limita a
+> podar lo que esa máquina no usa.
+>
+> **Corregido el 2026-08-12.** La versión anterior de esta nota decía
+> `rm -rf node_modules && npm install`, y **eso no arregla el problema**: al
+> instalar `@payloadcms/email-resend` en Windows desaparecieron del lock
+> `@emnapi/core` y el `@emnapi/runtime` anidado bajo
+> `@unrs/resolver-binding-wasm32-wasi`, y la instalación limpia **no los
+> devolvió**. `npm ci` seguía pasando en Windows y **fallando en CI**
+> (run `31647508405`, commit `bbc66e3`). Borrando también el lock, la resolución
+> arranca de cero y vuelven: 693 paquetes en vez de 690.
+>
+> Detalle que despista: los paquetes perdidos figuran como
+> `optional + peer + dev`, lo que invita a darlos por inocuos. No lo son —
+> Linux los necesita.
 >
 > Regenerarlo en Windows descarta entradas transitivas que la resolución de Linux
 > necesita (`@emnapi/*`, dependencias de `sharp` y `@tailwindcss/oxide`), y **CI y

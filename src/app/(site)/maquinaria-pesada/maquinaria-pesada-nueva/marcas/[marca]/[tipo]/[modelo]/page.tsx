@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
@@ -15,7 +16,9 @@ import {
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
+import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
+import { enlaceWhatsApp } from "@/lib/whatsapp";
 import type { MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
 
 type Params = { marca: string; tipo: string; modelo: string };
@@ -200,6 +203,21 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
           </div>
         </section>
       ) : null}
+
+      {/*
+       * Cotización con el equipo ya preseleccionado: quien llega hasta aquí ya
+       * sabe qué quiere, y volver a escribirlo es fricción que cuesta leads.
+       */}
+      <FormularioSolicitud
+        tipo="cotizacion"
+        origen={rutas.equipoNuevo(marca.slug, tipo.slug, equipo.slug)}
+        siteKey={turnstileSiteKey()}
+        whatsapp={enlaceWhatsApp(`Hola, quiero cotizar la ${equipo.nombre}.`)}
+        referencia={{ tipo: "equipos-nuevos", id: equipo.id, texto: equipo.nombre }}
+        titulo="Solicitar cotización"
+        descripcion="Te enviamos precio, disponibilidad y condiciones de entrega."
+        textoBoton="Pedir cotización"
+      />
 
       <nav
         className="mt-10 border-t border-gray-200 pt-6 text-sm"

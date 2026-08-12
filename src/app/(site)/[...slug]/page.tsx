@@ -2,12 +2,20 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { SLUG_PORTADA, getPaginaPorSlug, getPaginas } from "@/lib/queries/getPaginas";
+import {
+  SLUG_CONTACTO,
+  SLUG_PORTADA,
+  getPaginaPorSlug,
+  getPaginas,
+} from "@/lib/queries/getPaginas";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
+import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia } from "@/lib/utils/relations";
+import { enlaceWhatsApp } from "@/lib/whatsapp";
 
 /**
  * Páginas institucionales y legales.
@@ -113,6 +121,23 @@ export default async function PaginaInstitucionalPage({ params }: { params: Prom
           </div>
         </section>
       ))}
+
+      {/*
+       * Formulario de contacto. Solo en /contactanos/: es la página que el
+       * usuario busca cuando quiere escribirnos, y meterlo en todas las
+       * institucionales (garantías, ética…) sería ruido.
+       */}
+      {clave === SLUG_CONTACTO ? (
+        <FormularioSolicitud
+          tipo="contacto"
+          origen={`/${pagina.slug}`}
+          siteKey={turnstileSiteKey()}
+          whatsapp={enlaceWhatsApp()}
+          titulo="Escríbenos"
+          descripcion="Cuéntanos qué necesitas y te respondemos en horario de oficina."
+          textoBoton="Enviar solicitud"
+        />
+      ) : null}
     </main>
   );
 }

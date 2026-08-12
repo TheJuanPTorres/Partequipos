@@ -20,6 +20,13 @@ import type { Pagina } from "@/payload-types";
 /** Slug reservado para la portada: no cuelga de una ruta propia. */
 export const SLUG_PORTADA = "inicio";
 
+/**
+ * Slug de la página de contacto. Se declara aquí porque la ruta comodín
+ * `[...slug]` necesita reconocerla para insertar el formulario: es la única
+ * página institucional con comportamiento propio.
+ */
+export const SLUG_CONTACTO = "contactanos";
+
 /** Todas las páginas institucionales. Para generateStaticParams. */
 export const getPaginas = cache(async (): Promise<Pagina[]> => {
   const payload = await getPayload({ config });

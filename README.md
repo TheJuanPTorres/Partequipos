@@ -58,6 +58,9 @@ panel del proyecto.
 | `NEXT_PUBLIC_SENTRY_DSN`                                  | opcional                | sí               | sí                        |
 | `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT`     | opcional                | sí               | sí                        |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | opcional                | sí               | sí                        |
+| `RESEND_API_KEY`                                          | opcional                | sí               | sí                        |
+| `RESEND_FROM_EMAIL` / `RESEND_FROM_NAME`                  | opcional                | sí               | sí                        |
+| `SOLICITUDES_EMAIL_TO`                                    | opcional                | sí               | sí                        |
 
 Reglas:
 
@@ -103,8 +106,9 @@ npm run migrate:down     # revierte el último lote
 En el despliegue se aplican **antes** de que arranque la nueva versión. En Vercel
 se configura como _Build Command_:
 
-````
-undefined```
+```
+npm run deploy:migrate && npm run build
+```
 
 > **Ojo con la migración inicial:** genera `CREATE TABLE` sin `IF NOT EXISTS`, así
 > que está pensada para una base **vacía** (la rama de producción recién creada).
@@ -191,7 +195,7 @@ npm run typecheck     # errores de tipos
 npm run lint          # o `npm run lint:fix` para lo autocorregible
 npm run format:check  # o `npm run format` para arreglarlo
 npm test
-````
+```
 
 Casi siempre es formato: `npm run format` y volver a commitear. No fusiones un PR
 con el CI en rojo — la rama `main` debe estar siempre desplegable (CLAUDE.md §6).
@@ -271,3 +275,44 @@ docs/
   url-map.csv        mapa de URLs del sitio actual
   decisions/         ADR
 ```
+
+---
+
+## 8. Formularios y aviso por correo
+
+Los tres formularios públicos (contacto en `/contactanos/`, cotización en la
+ficha de equipo nuevo y solicitud en la ficha de repuesto) escriben en la
+colección **`solicitudes`**, visible solo desde `/admin`.
+
+### Protección: Cloudflare Turnstile
+
+El token se verifica **en el servidor** antes de guardar nada. Si
+`NEXT_PUBLIC_TURNSTILE_SITE_KEY` está vacía se usan las **claves de prueba
+públicas de Cloudflare**, que aceptan cualquier token: los formularios
+funcionan pero **no están protegidos**. Al recibir las claves reales basta
+rellenar las dos variables; no hay que tocar código.
+
+### Aviso por correo: Resend
+
+Al entrar una solicitud se envía un aviso a `SOLICITUDES_EMAIL_TO` (o, si está
+vacía, a la dirección de contacto de `seoConfig`).
+
+**Sin `RESEND_API_KEY` el sitio sigue funcionando.** No se configura adaptador y
+el hook lo detecta: la solicitud **se guarda igual** y se registra una
+advertencia indicando que ese lead quedó sin aviso. Lo mismo si Resend falla o
+agota la cuota: el error se registra y no se propaga.
+
+Es una decisión deliberada, no un descuido: perder el aviso es molesto; perder
+el lead es perder el objetivo comercial del sitio.
+
+```
+WARN: Solicitud guardada SIN aviso por correo: falta RESEND_API_KEY.
+      El lead está en /admin y no se ha perdido.
+```
+
+Para activarlo hacen falta tres cosas:
+
+1. Una cuenta de Resend y su clave de API.
+2. El **dominio verificado** en esa cuenta — Resend rechaza remitentes de
+   dominios sin verificar.
+3. `RESEND_FROM_EMAIL` con una dirección de ese dominio.

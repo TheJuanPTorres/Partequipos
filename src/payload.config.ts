@@ -2,6 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { resendAdapter } from "@payloadcms/email-resend";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { buildConfig } from "payload";
@@ -18,12 +19,34 @@ import { Media } from "./collections/Media";
 import { ModeloRepuesto } from "./collections/ModeloRepuesto";
 import { PaginaInstitucional } from "./collections/PaginaInstitucional";
 import { Redirects } from "./collections/Redirects";
+import { Solicitud } from "./collections/Solicitud";
 import { TipoEquipo } from "./collections/TipoEquipo";
 import { TipoMaquinaria } from "./collections/TipoMaquinaria";
 import { Users } from "./collections/Users";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+
+/*
+ * Adaptador de correo (Resend), OPCIONAL a propósito.
+ *
+ * Sin `RESEND_API_KEY` no se configura ningún adaptador: Payload deja entonces
+ * `sendEmail` como una operación que solo registra el intento. El aviso de una
+ * solicitud nueva se pierde, pero **la solicitud se guarda igual** — el hook que
+ * notifica captura su propio error y nunca lo relanza.
+ *
+ * Es deliberado y es lo que hay que preservar al tocar esto: una caída del
+ * correo, una clave caducada o una cuota agotada no pueden costar un lead, que
+ * es el objetivo comercial del proyecto. Ver `notificarSolicitud.ts`.
+ */
+const email = process.env.RESEND_API_KEY
+  ? resendAdapter({
+      apiKey: process.env.RESEND_API_KEY,
+      // Resend exige que el remitente sea de un dominio verificado en la cuenta.
+      defaultFromAddress: process.env.RESEND_FROM_EMAIL || "",
+      defaultFromName: process.env.RESEND_FROM_NAME || "Partequipos",
+    })
+  : undefined;
 
 export default buildConfig({
   admin: {
@@ -48,8 +71,12 @@ export default buildConfig({
     CategoriaMaquinaria,
     CategoriaUsada,
     EquipoUsado,
+    // Leads de los formularios publicos. Unica coleccion con datos personales:
+    // su control de acceso de lectura es privado, no publico como el catalogo.
+    Solicitud,
   ],
   editor: lexicalEditor(),
+  email,
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getMarcaPorSlug } from "@/lib/queries/getMarcas";
 import { getModeloPorSlug, getModelos } from "@/lib/queries/getModelos";
@@ -11,7 +12,9 @@ import { getTipoPorSlug } from "@/lib/queries/getTipos";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
+import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
+import { enlaceWhatsApp } from "@/lib/whatsapp";
 import type { Marca, TiposEquipo } from "@/payload-types";
 
 type Params = { marca: string; tipo: string; modelo: string };
@@ -150,6 +153,22 @@ export default async function ModeloPage({ params }: { params: Promise<Params> }
           </ul>
         </section>
       ) : null}
+
+      {/*
+       * Solicitud del repuesto, con el modelo ya preseleccionado. La ficha de
+       * repuestos no publica precio ni existencias: el objetivo de la página es
+       * exactamente esta solicitud.
+       */}
+      <FormularioSolicitud
+        tipo="repuesto"
+        origen={rutas.modelo(marca.slug, tipo.slug, modelo.slug)}
+        siteKey={turnstileSiteKey()}
+        whatsapp={enlaceWhatsApp(`Hola, busco repuestos para ${modelo.nombre}.`)}
+        referencia={{ tipo: "modelos-repuesto", id: modelo.id, texto: modelo.nombre }}
+        titulo="Solicitar este repuesto"
+        descripcion="Dinos qué pieza necesitas y te confirmamos disponibilidad y precio."
+        textoBoton="Solicitar repuesto"
+      />
 
       <nav
         className="mt-10 border-t border-gray-200 pt-6 text-sm"

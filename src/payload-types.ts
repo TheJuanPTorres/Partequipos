@@ -81,6 +81,7 @@ export interface Config {
     'categorias-maquinaria': CategoriasMaquinaria;
     'categorias-usada': CategoriasUsada;
     'equipos-usados': EquiposUsado;
+    solicitudes: Solicitude;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -102,6 +103,7 @@ export interface Config {
     'categorias-maquinaria': CategoriasMaquinariaSelect<false> | CategoriasMaquinariaSelect<true>;
     'categorias-usada': CategoriasUsadaSelect<false> | CategoriasUsadaSelect<true>;
     'equipos-usados': EquiposUsadosSelect<false> | EquiposUsadosSelect<true>;
+    solicitudes: SolicitudesSelect<false> | SolicitudesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -591,6 +593,44 @@ export interface EquiposUsado {
   createdAt: string;
 }
 /**
+ * Formularios enviados desde el sitio. Contienen datos personales: no se publican y solo son visibles aquí.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "solicitudes".
+ */
+export interface Solicitude {
+  id: number;
+  tipo: 'contacto' | 'cotizacion' | 'repuesto';
+  /**
+   * Marcar como atendida en vez de borrar: conserva el historial.
+   */
+  estado: 'nueva' | 'atendida';
+  nombre: string;
+  correo: string;
+  telefono?: string | null;
+  empresa?: string | null;
+  mensaje: string;
+  /**
+   * Se rellena solo cuando la solicitud sale de una ficha.
+   */
+  referencia?:
+    | ({
+        relationTo: 'equipos-nuevos';
+        value: number | EquiposNuevo;
+      } | null)
+    | ({
+        relationTo: 'modelos-repuesto';
+        value: number | ModelosRepuesto;
+      } | null);
+  referenciaTexto?: string | null;
+  /**
+   * Página desde la que se envió el formulario.
+   */
+  origen?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -669,6 +709,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'equipos-usados';
         value: number | EquiposUsado;
+      } | null)
+    | ({
+        relationTo: 'solicitudes';
+        value: number | Solicitude;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -992,6 +1036,24 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
   descripcion?: T;
   imagenes?: T;
   disponible?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "solicitudes_select".
+ */
+export interface SolicitudesSelect<T extends boolean = true> {
+  tipo?: T;
+  estado?: T;
+  nombre?: T;
+  correo?: T;
+  telefono?: T;
+  empresa?: T;
+  mensaje?: T;
+  referencia?: T;
+  referenciaTexto?: T;
+  origen?: T;
   updatedAt?: T;
   createdAt?: T;
 }

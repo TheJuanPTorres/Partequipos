@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.86.0",
+    "@payloadcms/email-resend": "^3.86.0",
     "@payloadcms/next": "^3.86.0",
     "@payloadcms/richtext-lexical": "^3.86.0",
     "@payloadcms/storage-vercel-blob": "^3.86.0",
@@ -39,7 +40,8 @@
     "payload": "^3.86.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

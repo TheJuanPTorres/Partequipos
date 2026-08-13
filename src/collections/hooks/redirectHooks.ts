@@ -80,3 +80,21 @@ export const aplanarCadenas: CollectionAfterChangeHook = async ({ doc, req }) =>
 // Nota: no hay invalidación push de la caché del proxy. El proxy puede correr en
 // otro proceso (o en el CDN), así que no se puede alcanzar su memoria desde aquí.
 // El mecanismo de frescura es el TTL de 60 s documentado en el ADR 0005.
+
+/**
+ * Invalida el veredicto del destino cuando `hacia` cambia.
+ *
+ * Sin esto, un redirect verificado hace un mes seguiría luciendo «✓ Resuelve»
+ * después de que alguien le cambiara el destino en el panel — una seguridad
+ * falsa, que es peor que no tener el campo. Se vuelve a poner en verde solo
+ * cuando `npm run redirects:check` lo comprueba de nuevo.
+ */
+export const marcarDestinoSinVerificar: CollectionBeforeValidateHook = ({ data, originalDoc }) => {
+  if (!data) return data;
+
+  const cambio = !originalDoc || data.hacia !== originalDoc.hacia;
+  if (cambio && data.estadoDestino !== "sin-verificar") {
+    return { ...data, estadoDestino: "sin-verificar", destinoVerificadoEn: null };
+  }
+  return data;
+};

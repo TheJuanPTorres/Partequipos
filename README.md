@@ -23,19 +23,20 @@ administrador.
 
 ### Comandos
 
-| Comando                  | Qué hace                                                 |
-| ------------------------ | -------------------------------------------------------- |
-| `npm run dev`            | Servidor de desarrollo                                   |
-| `npm run build`          | Compilación de producción                                |
-| `npm start`              | Sirve la compilación de producción                       |
-| `npm run lint`           | ESLint                                                   |
-| `npm run typecheck`      | `tsc --noEmit`                                           |
-| `npm test`               | Tests unitarios (`node:test`)                            |
-| `npm run format`         | Prettier                                                 |
-| `npm run generate:types` | Regenera `src/payload-types.ts` tras tocar una colección |
-| `npm run import`         | Importa los CSV de `scripts/import/data` (idempotente)   |
-| `npm run crawl`          | Rastrea el sitio actual y actualiza `docs/url-map.csv`   |
-| `npm run migrate*`       | Migraciones de base de datos (ver §3)                    |
+| Comando                   | Qué hace                                                 |
+| ------------------------- | -------------------------------------------------------- |
+| `npm run dev`             | Servidor de desarrollo                                   |
+| `npm run build`           | Compilación de producción                                |
+| `npm start`               | Sirve la compilación de producción                       |
+| `npm run lint`            | ESLint                                                   |
+| `npm run typecheck`       | `tsc --noEmit`                                           |
+| `npm test`                | Tests unitarios (`node:test`)                            |
+| `npm run format`          | Prettier                                                 |
+| `npm run generate:types`  | Regenera `src/payload-types.ts` tras tocar una colección |
+| `npm run import`          | Importa los CSV de `scripts/import/data` (idempotente)   |
+| `npm run crawl`           | Rastrea el sitio actual y actualiza `docs/url-map.csv`   |
+| `npm run migrate*`        | Migraciones de base de datos (ver §3)                    |
+| `npm run redirects:check` | Verifica que el destino de cada redirect resuelva        |
 
 > **Importante:** `npm run build` **no** ejecuta el linter (cambió en Next 16).
 > El control de calidad son comandos separados: `lint`, `typecheck`, `format:check`

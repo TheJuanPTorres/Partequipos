@@ -28,7 +28,9 @@
     "redirects:map": "tsx scripts/redirects/build-map.ts",
     "seed:paginas": "payload run scripts/import/seed-paginas.ts",
     "db:check": "tsx scripts/db/check-migrations.ts",
-    "deploy:migrate": "npm run db:check && payload migrate"
+    "deploy:migrate": "npm run db:check && payload migrate",
+    "redirects:check": "payload run scripts/redirects/verificar-destinos.ts",
+    "redirects:check:estricto": "REDIRECTS_ESTRICTO=true payload run scripts/redirects/verificar-destinos.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.86.0",

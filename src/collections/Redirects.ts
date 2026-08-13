@@ -1,7 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { normalizarRuta } from "../lib/redirects/normalizar";
-import { aplanarCadenas, validarRedirect } from "./hooks/redirectHooks";
+import { aplanarCadenas, marcarDestinoSinVerificar, validarRedirect } from "./hooks/redirectHooks";
 
 /**
  * Redirecciones 301/302 (ADR 0005).
@@ -19,7 +19,7 @@ export const Redirects: CollectionConfig = {
   },
   admin: {
     useAsTitle: "desde",
-    defaultColumns: ["desde", "hacia", "tipo", "origen"],
+    defaultColumns: ["desde", "hacia", "estadoDestino", "tipo", "origen"],
     description:
       "Redirecciones de URLs antiguas hacia las vigentes. Evita perder posicionamiento cuando una URL cambia.",
   },
@@ -28,7 +28,7 @@ export const Redirects: CollectionConfig = {
     read: () => true,
   },
   hooks: {
-    beforeValidate: [validarRedirect],
+    beforeValidate: [validarRedirect, marcarDestinoSinVerificar],
     afterChange: [aplanarCadenas],
   },
   fields: [
@@ -99,6 +99,49 @@ export const Redirects: CollectionConfig = {
       name: "notas",
       type: "textarea",
       label: "Notas",
+    },
+    /*
+     * ESTADO DEL DESTINO — advertencia visible, nunca bloqueo.
+     *
+     * Un 301 hacia un 404 es PEOR que el 404 original: el rastreador gasta
+     * presupuesto siguiéndolo y no se transfiere ninguna autoridad. Nada lo
+     * comprobaba hasta ahora.
+     *
+     * No se valida al guardar, y es deliberado: durante la migración es
+     * legítimo apuntar a contenido que todavía no se ha cargado. Bloquear ahí
+     * impediría preparar los redirects por adelantado, que es justo lo que hay
+     * que hacer. Lo verifica `npm run redirects:check` y este campo enseña el
+     * veredicto en el listado del panel.
+     *
+     * Se pone en `sin-verificar` cada vez que cambia `hacia` (ver
+     * `marcarDestinoSinVerificar`), para que un veredicto viejo no dé una
+     * seguridad que ya no corresponde.
+     */
+    {
+      name: "estadoDestino",
+      type: "select",
+      defaultValue: "sin-verificar",
+      label: "Estado del destino",
+      options: [
+        { label: "Sin verificar", value: "sin-verificar" },
+        { label: "✓ Resuelve", value: "resuelve" },
+        { label: "⚠ Ruta correcta, sin contenido todavía", value: "sin-contenido" },
+        { label: "✗ No corresponde a ninguna ruta", value: "sin-ruta" },
+        { label: "Externa (no se comprueba)", value: "externa" },
+      ],
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        description:
+          "Lo actualiza `npm run redirects:check`. «Sin contenido» es normal mientras se migra; " +
+          "«No corresponde a ninguna ruta» hay que corregirlo antes de publicar.",
+      },
+    },
+    {
+      name: "destinoVerificadoEn",
+      type: "date",
+      label: "Destino verificado el",
+      admin: { position: "sidebar", readOnly: true },
     },
   ],
 };

@@ -4,6 +4,7 @@ import * as migration_20260809_075627_maquinaria from './20260809_075627_maquina
 import * as migration_20260809_225008_solicitudes from './20260809_225008_solicitudes';
 import * as migration_20260812_225927_lubricantes from './20260812_225927_lubricantes';
 import * as migration_20260813_030629_blog from './20260813_030629_blog';
+import * as migration_20260813_205131_estado_destino_redirects from './20260813_205131_estado_destino_redirects';
 
 export const migrations = [
   {
@@ -34,6 +35,11 @@ export const migrations = [
   {
     up: migration_20260813_030629_blog.up,
     down: migration_20260813_030629_blog.down,
-    name: '20260813_030629_blog'
+    name: '20260813_030629_blog',
+  },
+  {
+    up: migration_20260813_205131_estado_destino_redirects.up,
+    down: migration_20260813_205131_estado_destino_redirects.down,
+    name: '20260813_205131_estado_destino_redirects'
   },
 ];

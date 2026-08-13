@@ -317,6 +317,11 @@ export interface Redirect {
    */
   origen: 'manual' | 'cambio-de-slug' | 'migracion';
   notas?: string | null;
+  /**
+   * Lo actualiza `npm run redirects:check`. «Sin contenido» es normal mientras se migra; «No corresponde a ninguna ruta» hay que corregirlo antes de publicar.
+   */
+  estadoDestino?: ('sin-verificar' | 'resuelve' | 'sin-contenido' | 'sin-ruta' | 'externa') | null;
+  destinoVerificadoEn?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1070,6 +1075,8 @@ export interface RedirectsSelect<T extends boolean = true> {
   tipo?: T;
   origen?: T;
   notas?: T;
+  estadoDestino?: T;
+  destinoVerificadoEn?: T;
   updatedAt?: T;
   createdAt?: T;
 }

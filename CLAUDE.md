@@ -676,3 +676,20 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
    dentro de un tipo, no un tipo. **Se replicó tal cual** —igual que se hizo con
    las anomalías de Bobcat en repuestos— para no romper una URL indexada.
    Preguntar si se corrige (implicaría un 301) o se deja como está.
+
+8. **Cuatro URLs de maquinaria clasificadas como basura que HOY ESTÁN VIVAS.**
+   El ADR 0007 §5 las marcó como no migrables, y así se hizo. Pero **las cuatro
+   responden 200 y están indexadas**: si se lanza sin decidir nada, pasan a
+   **404** el día del cambio.
+
+   | URL                                                 | Recomendación                                                  |
+   | --------------------------------------------------- | -------------------------------------------------------------- |
+   | `/…/nueva/excavadoras-propuesta2025/`               | **301 → `/…/nueva/excavadoras/`** — mismo `<title>`, duplicado |
+   | `/…/usada/excavadoras4/`                            | **301 → `/…/usada/excavadoras/`** — duplicado                  |
+   | `/maquinaria-pesada/test/`                          | 404 aceptable: es una página de prueba                         |
+   | `/maquinaria-pesada/maquinaria-pesada-usada-otros/` | Decidir: sin hijos y con título duplicado, pero viva           |
+
+   Para las dos primeras **el 301 es trivial y el destino está demostrado en el
+   rastreo**: son dos filas en la colección `Redirects`, sin tocar código. **No
+   se han cargado** porque la dirección las clasificó como basura; se pide
+   confirmación explícita antes de dejarlas caer en 404.

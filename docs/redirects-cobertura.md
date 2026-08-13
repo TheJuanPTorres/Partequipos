@@ -144,11 +144,43 @@ El 301 es correcto. El destino da 404 porque `development` solo tiene **81 de lo
 Comprobado: los dos existen en el rastreo (1 aparición cada uno) y **no** en
 `modelos.csv`.
 
-> **PENDIENTE ANTES DE PRODUCCIÓN — validar que cada destino resuelve.**
-> Un redirect hacia un 404 es peor que el 404 original: consume presupuesto de
-> rastreo y no transfiere nada. Hoy **nada comprueba** que el destino exista.
-> Con los datos reales cargados hay que verificar los 10 destinos, o añadir esa
-> comprobación al guardián de despliegue.
+### Validación de destino — RESUELTO (2026-08-13)
+
+Ya existe la comprobación que faltaba: **`npm run redirects:check`**.
+
+Para cada redirect cargado resuelve su destino contra la base y escribe el
+veredicto en el campo `estadoDestino`, visible como columna en el listado del
+panel. Tres veredictos, y **solo uno es un error**:
+
+| Veredicto           | Significado                                            | Gravedad |
+| ------------------- | ------------------------------------------------------ | -------- |
+| `resuelve`          | La ruta existe y su documento también                   | —        |
+| `sin-contenido`     | La ruta es válida; el documento no está cargado todavía | AVISO    |
+| `sin-ruta`          | No corresponde a **ninguna** ruta del sitio             | **ERROR** |
+| `externa`           | URL a otro dominio: fuera de nuestro control            | —        |
+
+Estado actual en `development`: **8 resuelven · 2 avisos · 0 errores**. Los dos
+avisos son los `-copy`, cuyo canónico no está entre los 81 modelos de demo.
+
+**Por qué es un script y no una validación al guardar.** Durante la migración es
+legítimo crear un redirect hacia contenido aún no cargado —preparar el mapa por
+adelantado es justo lo que hay que hacer—, así que bloquear ahí empujaría a
+saltarse la comprobación. Además resolver un destino anidado exige hasta tres
+consultas, y cargar eso en cada guardado penaliza una operación hoy instantánea.
+
+Complementos que sí actúan en el panel:
+
+- El veredicto se **invalida solo** cuando alguien cambia `hacia`: vuelve a
+  «sin verificar» y se borra la fecha. Un veredicto viejo daría una seguridad
+  que ya no corresponde.
+- `npm run redirects:check:estricto` sale con **código 1** si hay algún
+  `sin-ruta`, para encadenarlo antes de publicar. **Nunca** falla por avisos.
+
+**Limitación conocida:** un destino de un solo nivel (`/lo-que-sea/`) nunca puede
+dar `sin-ruta`. En la raíz conviven páginas institucionales y artículos con slugs
+arbitrarios, así que es indistinguible de una página aún sin cargar; sale como
+aviso. En las secciones con estructura conocida sí se detecta la ruta imposible
+— verificado creando un redirect a `/maquinaria-pesada/rama-inventada/x`.
 
 ---
 
@@ -156,7 +188,8 @@ Comprobado: los dos existen en el rastreo (1 aparición cada uno) y **no** en
 
 1. Resolver los **14 pendientes** con el cliente (§3).
 2. Decidir las **4 de maquinaria** clasificadas como basura pero vivas (§4).
-3. **Validar que los 10 destinos resuelven** con los datos reales (§5).
+3. Ejecutar `npm run redirects:check` **con los datos reales cargados** y dejar
+   los avisos en cero: hasta entonces los `-copy` seguirán marcados (§5).
 4. Cargar en producción: `DATABASE_URI="<pooled prod>" npm run import` y
    **redesplegar** (§10.6 de `CLAUDE.md`: sembrar por script no refresca las
    rutas ya cacheadas).

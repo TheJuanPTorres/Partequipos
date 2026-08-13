@@ -26,6 +26,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { getPayload } from "payload";
+
+import { normalizarRuta } from "../../src/lib/redirects/normalizar";
 import type { CollectionSlug, Where } from "payload";
 
 /*
@@ -778,6 +780,62 @@ async function main(): Promise<number> {
         report.actualizados.push(label);
       } else {
         await payload.create({ collection: "articulos", data });
+        report.creados.push(label);
+      }
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
+  // ==========================================================================
+  // REDIRECTS 301
+  //
+  // Solo se cargan las URLs que CAMBIAN de destino. Las 618 rutas conservadas
+  // idénticas no necesitan redirect: emitir uno de `/x/` a `/x/` sería un bucle.
+  //
+  // Las que dependen de una decisión del cliente (landings de campaña,
+  // /blog-partequipos/, /lubricantes-eni/, /pe-partsshop/) y la basura NO se
+  // cargan: quedan listadas en docs/redirects-cobertura.md.
+  //
+  // La colección normaliza `desde` y `hacia` en sus propios hooks, y valida
+  // cadenas y bucles (ADR 0005), así que aquí no se replica esa lógica.
+  // ==========================================================================
+  for (const row of readCSV("redirects.csv")) {
+    const label = `Redirect "${row.desde}"`;
+    try {
+      const desde = opt(row.desde);
+      const hacia = opt(row.hacia);
+      if (!desde || !hacia) {
+        report.omitidos.push(`${label}: falta desde o hacia`);
+        continue;
+      }
+      if (desde === hacia) {
+        report.omitidos.push(`${label}: desde y hacia son iguales (sería un bucle)`);
+        continue;
+      }
+
+      const data = {
+        desde,
+        hacia,
+        tipo: (opt(row.tipo) ?? "301") as "301" | "302",
+        origen: "migracion" as const,
+        notas: opt(row.motivo),
+      };
+
+      /*
+       * La búsqueda es por `desde` NORMALIZADO, no por el valor del CSV: la
+       * colección le quita la barra final al guardar, así que buscar el valor
+       * crudo no encontraría el registro existente y el script crearía un
+       * duplicado en cada corrida — rompiendo la idempotencia.
+       */
+      const existing = await findOne("redirects", {
+        desde: { equals: normalizarRuta(desde) },
+      });
+      if (existing) {
+        await payload.update({ collection: "redirects", id: existing.id, data });
+        report.actualizados.push(label);
+      } else {
+        await payload.create({ collection: "redirects", data });
         report.creados.push(label);
       }
     } catch (err) {

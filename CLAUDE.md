@@ -433,6 +433,36 @@ base poblada fallaría igual.
    `DELETE FROM payload_migrations WHERE batch = -1;`; si divergió, reconciliarlo
    primero.
 
+### 10.12 Nota — `media` y `users` se perdieron en `development` (2026-08-13)
+
+> El inventario de cierre encontró `users` y `media` en **0** en `development`,
+> pese a que §10.4 registraba 3 media y un usuario admin operativo. Las tablas
+> existían; estaban vacías. Causa probable: la recreación de la rama de Neon.
+> **No se investigó más** — decisión de dirección, no aportaba nada.
+>
+> **Recuperado el 2026-08-13:** usuario admin de desarrollo
+> `admin@partequipos.local` y 4 imágenes generadas con `sharp` (rotuladas
+> «imagen de demostración»), asignadas al logo de la marca Hitachi, a la galería
+> del equipo ZX350LC-5B (2 imágenes) y al modelo Bobcat E32.
+>
+> **Consecuencia mientras estuvieron vacías:** todas las plantillas se
+> verificaron por su camino «sin imagen». El camino **con** imágenes se ejerció
+> por primera vez en esa fecha.
+
+### 10.13 No midas la optimización de imágenes en local
+
+> `next start` en esta máquina **no optimiza**: `/_next/image` devuelve el
+> original byte a byte (40.127 → 40.127) en todos los anchos y aunque el cliente
+> mande `Accept: image/webp`. `sharp` está instalado y funciona.
+>
+> **En Vercel sí optimiza**, y bien: el mismo logo de 42.474 bytes sale en
+> **946 bytes WebP** a `w=128` y 4.928 a `w=640`. La optimización la hace la
+> infraestructura de Vercel, no nuestro proceso.
+>
+> Conclusión operativa: **un pase sin optimizar en local no es un defecto** y no
+> hay que perseguirlo. Si alguna vez hay que auditar peso de imágenes, se mide
+> contra el despliegue, nunca contra `npm start`.
+
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 
 > `logo-partequipos.png` se referencia por **URL absoluta cableada** en

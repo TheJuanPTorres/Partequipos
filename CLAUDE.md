@@ -447,6 +447,43 @@ base poblada fallaría igual.
 > relación en vez de por URL fija. No se hizo en su momento para no mezclarlo con
 > otra tarea; queda registrado aquí.
 
+### 10.11 PENDIENTE PRE-LANZAMIENTO · PRIORIDAD ALTA — claves de producción
+
+> **Los formularios públicos están hoy SIN PROTECCIÓN ANTI-SPAM en producción, y
+> las solicitudes NO se notifican.** Nada de esto puede seguir así el día que el
+> sitio se abra a buscadores.
+>
+> Comprobado el 2026-08-12 con `vercel env ls production`: el proyecto solo tiene
+> `DATABASE_URI`, `PAYLOAD_SECRET`, `BLOB_READ_WRITE_TOKEN` y
+> `NEXT_PUBLIC_SERVER_URL`. Faltan las tres de abajo.
+
+**1. Turnstile — `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`.**
+
+Sin ellas, `src/lib/turnstile.ts` recurre a las **claves de prueba públicas de
+Cloudflare**, que por diseño **aceptan cualquier token**. El captcha se dibuja y
+la verificación del servidor responde `success: true` siempre: en la práctica es
+un formulario abierto. Un bot que envíe un POST con cualquier cadena en
+`cf-turnstile-response` escribe en `solicitudes`.
+
+Ese comportamiento es correcto para desarrollar —permite probar sin cuenta de
+Cloudflare— y **peligroso en producción**. Hacen falta las claves reales del
+cliente; al ponerlas no hay que tocar código.
+
+**2. Resend — `RESEND_API_KEY` (más `RESEND_FROM_EMAIL`).**
+
+Sin ella no se configura adaptador de correo: la solicitud **se guarda igual**
+—eso está probado y es deliberado, un fallo del correo no puede costar un lead—
+pero **nadie se entera de que entró**. El registro lo deja escrito:
+
+```
+WARN: Solicitud guardada SIN aviso por correo: falta RESEND_API_KEY.
+      El lead está en /admin y no se ha perdido.
+```
+
+Mientras esto siga así, la única forma de ver los leads es entrar a `/admin`. Un
+lead comercial que nadie mira durante tres días es un lead perdido, así que esto
+es tan urgente como el captcha. Requiere además **dominio verificado** en Resend.
+
 ### 10.7 PENDIENTE bloqueante — infraestructura de base de datos
 
 > El cliente confirmó que la base de datos irá en **su propia infraestructura**.
@@ -557,7 +594,25 @@ base poblada fallaría igual.
 4. **Teléfono de contacto.** Se publica el móvil `+57 317 670 7071`; el aviso
    legal menciona además un fijo `492-62-60` sin indicativo. Confirmar cuál(es)
    deben figurar y con qué formato.
-5. **Anomalía de jerarquía en Case Construction (maquinaria nueva).** La URL
+5. **Dos URLs vivas de lubricantes con contenido similar.** Conviven:
+   - `/lubricantes-eni/` (nivel 1) — título _«Lubricantes - Partequipos»_,
+     describe _«Lubricantes Eni y Dispel»_. El rastreo la clasifica como
+     **corporativo/institucional**.
+   - `/lubricantes/lubricantes-eni/` (nivel 2) — título _«Lubricantes Eni»_, es
+     la raíz de la sección construida, con sus 4 categorías.
+
+   Parece la misma página en dos direcciones, probablemente heredado de una
+   reestructuración del sitio. **Las dos responden 200 y están indexadas**, así
+   que ninguna puede acabar en 404. Dos salidas posibles:
+   **(a)** migrar la de nivel 1 como página institucional, o
+   **(b)** redirigirla con **301** a la de nivel 2, concentrando la autoridad.
+
+   La (b) es mejor para SEO si el contenido es realmente el mismo, pero eso
+   **cambia lo que ve Google** y depende de si el cliente quiere una página
+   separada que hable también de Dispel. **Es decisión de negocio, no técnica**;
+   mientras tanto la de nivel 1 no se ha construido ni redirigido.
+
+6. **Anomalía de jerarquía en Case Construction (maquinaria nueva).** La URL
    `/…/nueva/marcas/case-construction/vibrocompactador-case-sv208/` cuelga al
    **nivel de tipo**, junto a `bulldozer` o `excavadoras`, cuando su contenido es
    un **modelo concreto** (el vibrocompactador SV208). Debería ser una ficha

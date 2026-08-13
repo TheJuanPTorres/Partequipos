@@ -356,6 +356,14 @@ Con las 2.912 consultas medidas hoy a 189 páginas, el volumen real (~650) da
 **~3.600 consultas** aun después de aplicar `cache()`. Esto convierte el
 _pooler_ de §10.7 en requisito duro.
 
+#### Aviso observado el 2026-08-13: el pico de conexiones ya se manifiesta
+
+Con 204 páginas, un build local **falló** con `ETIMEDOUT` contra Neon en plena
+generación estática; el reintento inmediato pasó sin tocar nada. Fue transitorio,
+pero es la primera vez que se ve el síntoma, y confirma que el problema del pico
+de conexiones **no es teórico**. Contra una base con menos capacidad que Neon
+—o con más latencia— dejaría de ser transitorio.
+
 #### Mitigaciones restantes (NO implementadas — decisión pendiente)
 
 La 1 (`cache()`) ya está aplicada; ver arriba. Las demás quedan documentadas
@@ -612,7 +620,26 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
    separada que hable también de Dispel. **Es decisión de negocio, no técnica**;
    mientras tanto la de nivel 1 no se ha construido ni redirigido.
 
-6. **Anomalía de jerarquía en Case Construction (maquinaria nueva).** La URL
+6. **Tres puertas de entrada al blog — canibalización.** Tres URLs vivas llevan
+   al mismo contenido:
+   - `/noticias/` — índice real, **con meta description propia y redactada**.
+   - `/category/noticias/` — archivo automático de WordPress, **sin meta
+     description** (título «Noticias archivos»).
+   - `/blog-partequipos/` — su meta es **el texto genérico de la empresa**, el
+     mismo de otras páginas: señal de que nadie le dio contenido propio.
+
+   Las tres compiten por la misma intención de búsqueda y se reparten la
+   autoridad. Y **ninguna declara canónica hacia otra**: las 648 URLs del
+   rastreo se apuntan a sí mismas, así que Google las ve como tres páginas
+   distintas.
+
+   **Recomendación técnica:** 301 de `/category/noticias/` y `/blog-partequipos/`
+   hacia `/noticias/`, la única con metadatos propios. **No se ha aplicado**: un
+   301 sobre URLs indexadas es difícil de revertir una vez procesado y es
+   decisión del cliente. **Si la aprueban son dos filas en la colección
+   `Redirects` que ya existe**, sin tocar código. Ver ADR 0008.
+
+7. **Anomalía de jerarquía en Case Construction (maquinaria nueva).** La URL
    `/…/nueva/marcas/case-construction/vibrocompactador-case-sv208/` cuelga al
    **nivel de tipo**, junto a `bulldozer` o `excavadoras`, cuando su contenido es
    un **modelo concreto** (el vibrocompactador SV208). Debería ser una ficha

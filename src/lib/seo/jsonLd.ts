@@ -106,3 +106,50 @@ export function buildOrganizationJsonLd(): JsonLdObject {
 
   return jsonLd;
 }
+
+export type ArticleJsonLdInput = {
+  titulo: string;
+  path: string;
+  descripcion?: string | null;
+  /** ISO. Obligatoria: `datePublished` es lo que distingue un Article. */
+  fechaPublicacion: string;
+  fechaModificacion?: string | null;
+  autor?: string | null;
+  imagenUrl?: string | null;
+};
+
+/**
+ * JSON-LD `Article` para las fichas del blog.
+ *
+ * Los campos ausentes se **omiten** en vez de emitirse vacíos, igual que en el
+ * resto de constructores: un `author` con cadena vacía es peor que no declarar
+ * autor, porque afirma algo falso.
+ *
+ * El `publisher` sale de `Organization`, que ya construye este módulo desde
+ * `seoConfig`: no se repiten aquí los datos de la empresa.
+ */
+export function buildArticleJsonLd(input: ArticleJsonLdInput): JsonLdObject {
+  const { titulo, path, descripcion, fechaPublicacion, fechaModificacion, autor, imagenUrl } =
+    input;
+
+  const jsonLd: JsonLdObject = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: titulo,
+    url: absoluteUrl(path),
+    mainEntityOfPage: absoluteUrl(path),
+    datePublished: fechaPublicacion,
+    publisher: {
+      "@type": "Organization",
+      name: seoConfig.siteName,
+      logo: { "@type": "ImageObject", url: absoluteUrl(seoConfig.logoPath) },
+    },
+  };
+
+  if (descripcion?.trim()) jsonLd.description = descripcion.trim();
+  if (fechaModificacion?.trim()) jsonLd.dateModified = fechaModificacion.trim();
+  if (autor?.trim()) jsonLd.author = { "@type": "Person", name: autor.trim() };
+  if (imagenUrl?.trim()) jsonLd.image = [absoluteUrl(imagenUrl.trim())];
+
+  return jsonLd;
+}

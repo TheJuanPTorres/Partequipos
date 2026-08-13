@@ -8,6 +8,8 @@ import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
+import { Articulo } from "./collections/Articulo";
+import { CategoriaBlog } from "./collections/CategoriaBlog";
 import { CategoriaLubricante } from "./collections/CategoriaLubricante";
 import { CategoriaMaquinaria } from "./collections/CategoriaMaquinaria";
 import { CategoriaTecnica } from "./collections/CategoriaTecnica";
@@ -76,6 +78,10 @@ export default buildConfig({
     // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.
     MarcaLubricante,
     CategoriaLubricante,
+    // Blog. Los articulos se sirven en la raiz /{slug}/, igual que las paginas
+    // institucionales: de ahi el guardarrail de unicidad entre ambas.
+    CategoriaBlog,
+    Articulo,
     // Leads de los formularios publicos. Unica coleccion con datos personales:
     // su control de acceso de lectura es privado, no publico como el catalogo.
     Solicitud,

@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { ArticuloCuerpo } from "@/components/blog/ArticuloCuerpo";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getArticuloPorSlug, getArticulos } from "@/lib/queries/getBlog";
 import {
   SLUG_CONTACTO,
   SLUG_PORTADA,
   getPaginaPorSlug,
   getPaginas,
 } from "@/lib/queries/getPaginas";
+import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
@@ -18,24 +21,62 @@ import { imagenDeMedia } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 
 /**
- * Páginas institucionales y legales.
+ * Ruta raíz comodín: sirve DOS cosas distintas.
  *
- * Es una ruta comodín porque sus slugs no siguen ningún patrón (`nosotros`,
- * `politica-de-garantia-de-repuestos`, `nosotros/trabaja-con-nosotros`…) y hay
- * que reproducirlos EXACTAMENTE como están indexados (CLAUDE.md §3.3).
+ *   1. Páginas institucionales y legales (`nosotros`, `contactanos`,
+ *      `politica-de-garantia-de-repuestos`, `nosotros/trabaja-con-nosotros`…).
+ *   2. Artículos del blog.
+ *
+ * Ambas viven en `/{slug}/`, en la raíz: el rastreo mide los 51 artículos en
+ * profundidad 1, sin prefijo `/blog/`, sin fecha y sin categoría en la ruta
+ * (permalink «nombre de la entrada» de WordPress). No es una elección de
+ * diseño, es la jerarquía existente, que es intocable (CLAUDE.md §3.3).
+ *
+ * ═══ ORDEN DE PRECEDENCIA: PÁGINA INSTITUCIONAL PRIMERO, LUEGO ARTÍCULO ═══
+ *
+ * El orden importa y es deliberado. Las páginas institucionales son estructura
+ * del sitio (contacto, legales, quiénes somos) y una colisión que las tapara
+ * rompería navegación y enlaces del pie; un artículo tapado «solo» deja de ser
+ * accesible. Ante la duda, gana lo más estructural.
+ *
+ * Dicho eso, **esa colisión no debería poder existir**: el hook
+ * `slugUnicoFrenteA` la impide al guardar, en las dos direcciones, tanto desde
+ * el panel como desde los scripts de importación. Este orden es la segunda
+ * línea de defensa, no la primera.
  *
  * No canibaliza el catálogo: las rutas estáticas y dinámicas declaradas tienen
- * prioridad sobre un comodín, así que `/repuestos-…` y `/admin` siguen resueltas
- * por sus propios segmentos.
+ * prioridad sobre un comodín, así que `/repuestos-…`, `/noticias/`, `/category/…`
+ * y `/admin` siguen resueltas por sus propios segmentos.
  */
 type Params = { slug: string[] };
 
 export async function generateStaticParams(): Promise<Params[]> {
-  const paginas = await getPaginas();
+  const [paginas, articulos] = await Promise.all([getPaginas(), getArticulos()]);
 
-  return paginas
-    .filter((p) => p.slug !== SLUG_PORTADA) // la portada la sirve `/`
-    .map((p) => ({ slug: p.slug.split("/").filter(Boolean) }));
+  return [
+    ...paginas
+      .filter((p) => p.slug !== SLUG_PORTADA) // la portada la sirve `/`
+      .map((p) => ({ slug: p.slug.split("/").filter(Boolean) })),
+    // Los artículos son siempre de un solo segmento.
+    ...articulos.map((a) => ({ slug: [a.slug] })),
+  ];
+}
+
+/**
+ * Resuelve qué documento sirve esta URL, respetando la precedencia explicada
+ * arriba. Devuelve `null` si no hay ninguno, y la ruta responde 404.
+ */
+async function resolver(clave: string) {
+  const pagina = await getPaginaPorSlug(clave);
+  if (pagina) return { tipo: "pagina" as const, pagina };
+
+  // Los artículos son de un solo segmento: `a/b` nunca puede serlo.
+  if (clave.includes("/")) return null;
+
+  const articulo = await getArticuloPorSlug(clave);
+  if (articulo) return { tipo: "articulo" as const, articulo };
+
+  return null;
 }
 
 /** Une los segmentos en el slug tal como se guarda en Payload. */
@@ -43,9 +84,24 @@ const aSlug = (segs: string[]) => segs.filter(Boolean).join("/");
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
-  const pagina = await getPaginaPorSlug(aSlug(slug));
-  if (!pagina) return {};
+  const resuelto = await resolver(aSlug(slug));
+  if (!resuelto) return {};
 
+  if (resuelto.tipo === "articulo") {
+    const { articulo } = resuelto;
+    return buildMetadata({
+      nombre: articulo.titulo,
+      path: rutas.articulo(articulo.slug),
+      descripcion: articulo.entradilla,
+      seo: articulo.seo,
+      imageUrl: imagenDeMedia(articulo.imagenDestacada, articulo.titulo)?.url,
+      // `article`, no `website`: es lo que distingue una entrada de blog para
+      // los agregadores y las tarjetas sociales.
+      ogType: "article",
+    });
+  }
+
+  const { pagina } = resuelto;
   return buildMetadata({
     nombre: pagina.titulo,
     path: `/${pagina.slug}`,
@@ -55,16 +111,19 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
-export default async function PaginaInstitucionalPage({ params }: { params: Promise<Params> }) {
+export default async function PaginaRaizPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   const clave = aSlug(slug);
 
   // La portada vive en `/`; servirla también aquí duplicaría contenido.
   if (clave === SLUG_PORTADA) notFound();
 
-  const pagina = await getPaginaPorSlug(clave);
-  if (!pagina) notFound();
+  const resuelto = await resolver(clave);
+  if (!resuelto) notFound();
 
+  if (resuelto.tipo === "articulo") return <ArticuloCuerpo articulo={resuelto.articulo} />;
+
+  const { pagina } = resuelto;
   const secciones = pagina.secciones ?? [];
 
   const breadcrumbs = [

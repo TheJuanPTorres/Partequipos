@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
+import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
 
 /**
  * Páginas institucionales y legales (nosotros, contacto, servicio técnico,
@@ -28,6 +29,9 @@ export const PaginaInstitucional: CollectionConfig = {
     read: () => true,
   },
   hooks: {
+    // Lado inverso del guardarraiz: una pagina no puede tapar un articulo del
+    // blog, que vive en el mismo espacio de nombres raiz.
+    beforeValidate: [slugUnicoFrenteA("articulos", "un artículo del blog")],
     afterChange: [revalidarPagina],
     afterDelete: [revalidarPaginaBorrada],
   },

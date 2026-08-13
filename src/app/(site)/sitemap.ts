@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { getArticulos, getCategoriasBlog } from "@/lib/queries/getBlog";
 import { getCategoriasLubricante, getMarcasLubricante } from "@/lib/queries/getLubricantes";
 import {
   getCategoriasMaquinaria,
@@ -57,6 +58,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     categoriasUsada,
     marcasLubricante,
     categoriasLubricante,
+    articulos,
+    categoriasBlog,
   ] = await Promise.all([
     getMarcas(),
     getTipos(),
@@ -69,6 +72,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getCategoriasUsada(),
     getMarcasLubricante(),
     getCategoriasLubricante(),
+    getArticulos(),
+    getCategoriasBlog(),
   ]);
 
   return buildSitemapEntries({
@@ -134,5 +139,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ? [{ slug: categoria.slug, updatedAt: categoria.updatedAt, marcaSlug: marca.slug }]
         : [];
     }),
+
+    // --- Blog ---------------------------------------------------------------
+    articulos: articulos.map((a) => ({ slug: a.slug, updatedAt: a.updatedAt })),
+
+    categoriasBlog: categoriasBlog.map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
   });
 }

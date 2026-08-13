@@ -83,6 +83,8 @@ export interface Config {
     'equipos-usados': EquiposUsado;
     'marcas-lubricante': MarcasLubricante;
     'categorias-lubricante': CategoriasLubricante;
+    'categorias-blog': CategoriasBlog;
+    articulos: Articulo;
     solicitudes: Solicitude;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -107,6 +109,8 @@ export interface Config {
     'equipos-usados': EquiposUsadosSelect<false> | EquiposUsadosSelect<true>;
     'marcas-lubricante': MarcasLubricanteSelect<false> | MarcasLubricanteSelect<true>;
     'categorias-lubricante': CategoriasLubricanteSelect<false> | CategoriasLubricanteSelect<true>;
+    'categorias-blog': CategoriasBlogSelect<false> | CategoriasBlogSelect<true>;
+    articulos: ArticulosSelect<false> | ArticulosSelect<true>;
     solicitudes: SolicitudesSelect<false> | SolicitudesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -689,6 +693,82 @@ export interface CategoriasLubricante {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-blog".
+ */
+export interface CategoriasBlog {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  descripcion?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Se publican en la raíz del sitio: /{slug}/, sin prefijo.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articulos".
+ */
+export interface Articulo {
+  id: number;
+  titulo: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  /**
+   * Determina en qué archivo aparece el artículo.
+   */
+  categoria?: (number | null) | CategoriasBlog;
+  /**
+   * Alimenta el orden del índice y el JSON-LD del artículo.
+   */
+  fechaPublicacion: string;
+  /**
+   * Firma que aparece en el artículo.
+   */
+  autor?: string | null;
+  /**
+   * Resumen para el índice y para la descripción social.
+   */
+  entradilla?: string | null;
+  /**
+   * Se usa en el índice y como imagen social.
+   */
+  imagenDestacada?: (number | null) | Media;
+  contenido?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Formularios enviados desde el sitio. Contienen datos personales: no se publican y solo son visibles aquí.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -813,6 +893,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categorias-lubricante';
         value: number | CategoriasLubricante;
+      } | null)
+    | ({
+        relationTo: 'categorias-blog';
+        value: number | CategoriasBlog;
+      } | null)
+    | ({
+        relationTo: 'articulos';
+        value: number | Articulo;
       } | null)
     | ({
         relationTo: 'solicitudes';
@@ -1181,6 +1269,47 @@ export interface CategoriasLubricanteSelect<T extends boolean = true> {
         descripcion?: T;
         id?: T;
       };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-blog_select".
+ */
+export interface CategoriasBlogSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  descripcion?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articulos_select".
+ */
+export interface ArticulosSelect<T extends boolean = true> {
+  titulo?: T;
+  slug?: T;
+  categoria?: T;
+  fechaPublicacion?: T;
+  autor?: T;
+  entradilla?: T;
+  imagenDestacada?: T;
+  contenido?: T;
   seo?:
     | T
     | {

@@ -43,6 +43,19 @@ export const SEGMENTO_MARCAS_MAQUINARIA = "marcas";
  */
 export const SEGMENTO_LUBRICANTES = "lubricantes";
 
+/**
+ * Blog.
+ *
+ * Los ARTICULOS no tienen segmento propio: viven en `/{slug}/`, en la raiz,
+ * como los mide el rastreo (profundidad 1, sin prefijo ni fecha). Por eso aqui
+ * solo hay constantes para el indice y para el archivo de categoria.
+ *
+ * `category` es el segmento que genera WordPress y se conserva porque
+ * /category/noticias/ esta indexada.
+ */
+export const SEGMENTO_BLOG_INDICE = "noticias";
+export const SEGMENTO_BLOG_CATEGORIA = "category";
+
 export const rutas = {
   repuestos: () => `/${SEGMENTO_REPUESTOS}`,
   marcas: () => `/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}`,
@@ -70,4 +83,10 @@ export const rutas = {
   marcaLubricante: (marcaSlug: string) => `/${SEGMENTO_LUBRICANTES}/${marcaSlug}`,
   categoriaLubricante: (marcaSlug: string, categoriaSlug: string) =>
     `/${SEGMENTO_LUBRICANTES}/${marcaSlug}/${categoriaSlug}`,
+
+  // --- Blog ---------------------------------------------------------------
+  blog: () => `/${SEGMENTO_BLOG_INDICE}`,
+  categoriaBlog: (slug: string) => `/${SEGMENTO_BLOG_CATEGORIA}/${slug}`,
+  /** Los articulos van en la raiz, sin prefijo. */
+  articulo: (slug: string) => `/${slug}`,
 } as const;

@@ -700,6 +700,91 @@ async function main(): Promise<number> {
     }
   }
 
+  // ==========================================================================
+  // BLOG
+  //
+  // Los artículos se publican en la RAÍZ (`/{slug}/`), el mismo espacio de
+  // nombres que las páginas institucionales. El hook `slugUnicoFrenteA` corre
+  // también aquí —es un hook de colección, no del panel—, así que una colisión
+  // introducida desde este script se rechaza igual y sale como error en el
+  // reporte, en vez de dejar un artículo inalcanzable en silencio.
+  // ==========================================================================
+  const categoriaBlogIdBySlug = new Map<string, number>();
+
+  for (const row of readCSV("blog-categorias.csv")) {
+    const label = `Categoría de blog "${row.slug}"`;
+    try {
+      const nombre = opt(row.nombre);
+      const slug = opt(row.slug);
+      if (!nombre || !slug) {
+        report.omitidos.push(`${label}: falta nombre o slug`);
+        continue;
+      }
+      const data = {
+        nombre,
+        slug,
+        descripcion: opt(row.descripcion),
+        seo: { metaTitle: opt(row.metaTitle), metaDescription: opt(row.metaDescription) },
+      };
+      const existing = await findOne("categorias-blog", { slug: { equals: slug } });
+      if (existing) {
+        const doc = await payload.update({ collection: "categorias-blog", id: existing.id, data });
+        categoriaBlogIdBySlug.set(slug, doc.id);
+        report.actualizados.push(label);
+      } else {
+        const doc = await payload.create({ collection: "categorias-blog", data });
+        categoriaBlogIdBySlug.set(slug, doc.id);
+        report.creados.push(label);
+      }
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
+  for (const row of readCSV("blog-articulos.csv")) {
+    const label = `Artículo "${row.slug}"`;
+    try {
+      const titulo = opt(row.titulo);
+      const slug = opt(row.slug);
+      const fechaPublicacion = opt(row.fechaPublicacion);
+      if (!titulo || !slug || !fechaPublicacion) {
+        report.omitidos.push(`${label}: falta titulo, slug o fechaPublicacion`);
+        continue;
+      }
+
+      const categoriaSlug = opt(row.categoria_slug);
+      const categoriaId = categoriaSlug
+        ? (categoriaBlogIdBySlug.get(categoriaSlug) ??
+          (await findOne("categorias-blog", { slug: { equals: categoriaSlug } }))?.id ??
+          null)
+        : null;
+      if (categoriaSlug && categoriaId === null) {
+        report.errores.push(`${label}: la categoría "${categoriaSlug}" no existe`);
+        continue;
+      }
+
+      const data = {
+        titulo,
+        slug,
+        fechaPublicacion: new Date(`${fechaPublicacion}T12:00:00.000Z`).toISOString(),
+        autor: opt(row.autor),
+        entradilla: opt(row.entradilla),
+        ...(categoriaId !== null ? { categoria: categoriaId } : {}),
+        seo: { metaTitle: opt(row.metaTitle), metaDescription: opt(row.metaDescription) },
+      };
+      const existing = await findOne("articulos", { slug: { equals: slug } });
+      if (existing) {
+        await payload.update({ collection: "articulos", id: existing.id, data });
+        report.actualizados.push(label);
+      } else {
+        await payload.create({ collection: "articulos", data });
+        report.creados.push(label);
+      }
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
   // --- REPORTE --------------------------------------------------------------
   console.log("\n=========== IMPORTACIÓN — REPORTE ===========");
   console.log(`Creados:      ${report.creados.length}`);

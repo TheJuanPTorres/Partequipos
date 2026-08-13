@@ -200,3 +200,25 @@ export function rutasDeMarcaLubricante(marcaSlug: string, categoriaSlugs: string
 export function rutasDeCategoriaLubricante(marcaSlug: string, categoriaSlug: string): string[] {
   return [rutas.categoriaLubricante(marcaSlug, categoriaSlug), rutas.marcaLubricante(marcaSlug)];
 }
+
+// --- Blog -------------------------------------------------------------------
+
+/**
+ * Rutas que caduca un cambio de ARTÍCULO: la suya, el índice y el archivo de su
+ * categoría. Los dos últimos lo listan, así que su contenido cambia con él.
+ */
+export function rutasDeArticulo(slug: string, categoriaSlug: string | null): string[] {
+  return [
+    rutas.articulo(slug),
+    rutas.blog(),
+    ...(categoriaSlug ? [rutas.categoriaBlog(categoriaSlug)] : []),
+  ];
+}
+
+/**
+ * Rutas que caduca un cambio de CATEGORÍA: su archivo, el índice y la página de
+ * cada artículo suyo, que muestra el nombre de la categoría en las migas.
+ */
+export function rutasDeCategoriaBlog(slug: string, articuloSlugs: string[]): string[] {
+  return [rutas.categoriaBlog(slug), rutas.blog(), ...articuloSlugs.map((s) => rutas.articulo(s))];
+}

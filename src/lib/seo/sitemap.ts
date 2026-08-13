@@ -29,6 +29,9 @@ export type SitemapInput = {
   /** Lubricantes: marca → categoría de aplicación. Sin índice de sección. */
   marcasLubricante: ConSlug[];
   categoriasLubricante: TipoLike[];
+  /** Blog. Los artículos van en la raíz, sin prefijo. */
+  articulos: ConSlug[];
+  categoriasBlog: ConSlug[];
 };
 
 /**
@@ -66,6 +69,13 @@ export const PATRONES_SITEMAP = [
    */
   "/lubricantes/[marca]",
   "/lubricantes/[marca]/[categoria]",
+  /*
+   * Blog. Los ARTÍCULOS no aparecen aquí: se sirven desde `[...slug]`, que ya
+   * está declarado arriba, porque viven en la raíz igual que las páginas
+   * institucionales. Sus URLs sí se emiten en `buildSitemapEntries`.
+   */
+  "/noticias",
+  "/category/[categoria]",
 ] as const;
 
 /** Slug reservado de la portada dentro de la colección de páginas. */
@@ -112,6 +122,8 @@ export function buildSitemapEntries(
     categoriasUsada,
     marcasLubricante,
     categoriasLubricante,
+    articulos,
+    categoriasBlog,
   }: SitemapInput,
   ahora: Date = new Date(),
 ): SitemapEntry[] {
@@ -294,6 +306,41 @@ export function buildSitemapEntries(
       lastModified: fecha(categoria.updatedAt, ahora),
       changeFrequency: "monthly",
       priority: 0.7,
+    });
+  }
+
+  /*
+   * BLOG.
+   *
+   * El índice se lista siempre (es una ruta estática y una URL viva). Los
+   * artículos van en la RAÍZ, sin prefijo: es la estructura del sitio actual.
+   *
+   * No se emite `/blog-partequipos/`: es una de las tres puertas de entrada del
+   * sitio actual y su destino está pendiente de decisión del cliente (ADR 0008).
+   * Anunciar en el sitemap una URL que quizá acabe en 301 sería contraproducente.
+   */
+  entradas.push({
+    url: absoluteUrl(rutas.blog()),
+    lastModified: masReciente(articulos, ahora),
+    changeFrequency: "weekly",
+    priority: 0.8,
+  });
+
+  for (const categoria of categoriasBlog) {
+    entradas.push({
+      url: absoluteUrl(rutas.categoriaBlog(categoria.slug)),
+      lastModified: fecha(categoria.updatedAt, ahora),
+      changeFrequency: "weekly",
+      priority: 0.6,
+    });
+  }
+
+  for (const articulo of articulos) {
+    entradas.push({
+      url: absoluteUrl(rutas.articulo(articulo.slug)),
+      lastModified: fecha(articulo.updatedAt, ahora),
+      changeFrequency: "yearly",
+      priority: 0.6,
     });
   }
 

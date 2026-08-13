@@ -49,6 +49,8 @@ const SIN_MAQUINARIA = {
   categoriasUsada: [],
   marcasLubricante: [],
   categoriasLubricante: [],
+  articulos: [],
+  categoriasBlog: [],
 };
 
 const datos = {
@@ -91,8 +93,8 @@ describe("buildSitemapEntries", () => {
   it("incluye portada, índices y una entrada por entidad", () => {
     const e = buildSitemapEntries(datos, AHORA);
     // 1 portada + 2 índices de repuestos + 4 índices de maquinaria
-    // + 1 institucional + 1 marca + 1 tipo + 1 modelo
-    assert.equal(e.length, 11);
+    // + 1 índice de blog + 1 institucional + 1 marca + 1 tipo + 1 modelo
+    assert.equal(e.length, 12);
   });
 
   it("emite solo URLs absolutas", () => {
@@ -173,8 +175,9 @@ describe("buildSitemapEntries", () => {
     );
 
     // Sin documento de portada no se lista `/`: quedan los 2 índices de
-    // repuestos y los 4 de maquinaria, que son rutas estáticas y existen igual.
-    assert.equal(e.length, 6);
+    // repuestos, los 4 de maquinaria y el del blog, que son rutas estáticas y
+    // existen aunque no haya contenido.
+    assert.equal(e.length, 7);
     assert.equal(e[0]?.lastModified.getTime(), AHORA.getTime());
     for (const entrada of e) assert.match(entrada.url, /^https:\/\//);
   });
@@ -313,6 +316,68 @@ describe("lubricantes en el sitemap", () => {
       e.find((x) => x.url.endsWith("/lubricantes-eni/"))?.lastModified.toISOString(),
       "2026-07-17T10:00:00.000Z",
     );
+  });
+});
+
+describe("blog en el sitemap", () => {
+  const datosConBlog = {
+    ...datos,
+    articulos: [
+      { slug: "usas-la-grasa-correcta", updatedAt: "2026-07-15T10:00:00.000Z" },
+      {
+        // Slug largo heredado: se respeta tal cual, no se acorta.
+        slug: "variables-que-afectan-la-vida-util-del-tren-de-rodaje-en-excavadoras-y-bulldozer-en-la-maquinaria-pesada-en-colombia",
+        updatedAt: "2026-07-14T10:00:00.000Z",
+      },
+    ],
+    categoriasBlog: [{ slug: "noticias", updatedAt: "2026-07-13T10:00:00.000Z" }],
+  };
+
+  it("emite los artículos en la RAÍZ, sin prefijo de sección", () => {
+    const urls = buildSitemapEntries(datosConBlog, AHORA).map((x) => x.url);
+
+    assert.ok(urls.includes("https://partequipos.com/usas-la-grasa-correcta/"));
+    // Ni /blog/ ni /noticias/ delante: los artículos cuelgan de la raíz.
+    assert.equal(
+      urls.some((u) => u.includes("/noticias/usas-la-grasa-correcta")),
+      false,
+    );
+  });
+
+  it("respeta los slugs largos heredados", () => {
+    const urls = buildSitemapEntries(datosConBlog, AHORA).map((x) => x.url);
+    assert.ok(
+      urls.includes(
+        "https://partequipos.com/variables-que-afectan-la-vida-util-del-tren-de-rodaje-en-excavadoras-y-bulldozer-en-la-maquinaria-pesada-en-colombia/",
+      ),
+    );
+  });
+
+  it("emite el índice y el archivo de categoría", () => {
+    const urls = buildSitemapEntries(datosConBlog, AHORA).map((x) => x.url);
+    assert.ok(urls.includes("https://partequipos.com/noticias/"));
+    assert.ok(urls.includes("https://partequipos.com/category/noticias/"));
+  });
+
+  it("NO emite /blog-partequipos/: su destino está pendiente de decisión", () => {
+    const urls = buildSitemapEntries(datosConBlog, AHORA).map((x) => x.url);
+    assert.equal(
+      urls.some((u) => u.includes("blog-partequipos")),
+      false,
+    );
+  });
+
+  it("el índice toma la fecha del artículo más reciente", () => {
+    const e = buildSitemapEntries(datosConBlog, AHORA);
+    assert.equal(
+      e.find((x) => x.url === "https://partequipos.com/noticias/")?.lastModified.toISOString(),
+      "2026-07-15T10:00:00.000Z",
+    );
+  });
+
+  it("no colisiona con las páginas institucionales ni duplica", () => {
+    const e = buildSitemapEntries(datosConBlog, AHORA);
+    assert.equal(new Set(e.map((x) => x.url)).size, e.length);
   });
 });
 

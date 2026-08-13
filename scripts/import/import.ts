@@ -612,6 +612,94 @@ async function main(): Promise<number> {
     }
   }
 
+  // ==========================================================================
+  // LUBRICANTES
+  //
+  // Dos niveles: marca -> categoría de aplicación. No hay fichas de producto
+  // porque el sitio actual no publica ninguna.
+  // ==========================================================================
+  const marcaLubIdBySlug = new Map<string, number>();
+
+  for (const row of readCSV("lubricantes-marcas.csv")) {
+    const label = `Marca de lubricante "${row.slug}"`;
+    try {
+      const nombre = opt(row.nombre);
+      const slug = opt(row.slug);
+      if (!nombre || !slug) {
+        report.omitidos.push(`${label}: falta nombre o slug`);
+        continue;
+      }
+      const data = {
+        nombre,
+        slug,
+        entradilla: opt(row.entradilla),
+        seo: { metaTitle: opt(row.metaTitle), metaDescription: opt(row.metaDescription) },
+      };
+      const existing = await findOne("marcas-lubricante", { slug: { equals: slug } });
+      if (existing) {
+        const doc = await payload.update({
+          collection: "marcas-lubricante",
+          id: existing.id,
+          data,
+        });
+        marcaLubIdBySlug.set(slug, doc.id);
+        report.actualizados.push(label);
+      } else {
+        const doc = await payload.create({ collection: "marcas-lubricante", data });
+        marcaLubIdBySlug.set(slug, doc.id);
+        report.creados.push(label);
+      }
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
+  for (const row of readCSV("lubricantes-categorias.csv")) {
+    const label = `Categoría de lubricante "${row.slug}"`;
+    try {
+      const nombre = opt(row.nombre);
+      const slug = opt(row.slug);
+      const marcaSlug = opt(row.marca_slug);
+      if (!nombre || !slug || !marcaSlug) {
+        report.omitidos.push(`${label}: falta nombre, slug o marca_slug`);
+        continue;
+      }
+      const marcaId =
+        marcaLubIdBySlug.get(marcaSlug) ??
+        (await findOne("marcas-lubricante", { slug: { equals: marcaSlug } }))?.id ??
+        null;
+      if (marcaId === null) {
+        report.errores.push(`${label}: la marca "${marcaSlug}" no existe`);
+        continue;
+      }
+
+      /*
+       * `productos` se deja SIN tocar a propósito: no tenemos el catálogo real
+       * de la marca y publicar viscosidades o especificaciones inventadas de un
+       * lubricante que existe sería peor que no publicar nada.
+       */
+      const data = {
+        nombre,
+        slug,
+        marca: marcaId,
+        entradilla: opt(row.entradilla),
+        seo: { metaTitle: opt(row.metaTitle), metaDescription: opt(row.metaDescription) },
+      };
+      const existing = await findOne("categorias-lubricante", {
+        and: [{ marca: { equals: marcaId } }, { slug: { equals: slug } }],
+      });
+      if (existing) {
+        await payload.update({ collection: "categorias-lubricante", id: existing.id, data });
+        report.actualizados.push(label);
+      } else {
+        await payload.create({ collection: "categorias-lubricante", data });
+        report.creados.push(label);
+      }
+    } catch (err) {
+      report.errores.push(`${label}: ${(err as Error).message}`);
+    }
+  }
+
   // --- REPORTE --------------------------------------------------------------
   console.log("\n=========== IMPORTACIÓN — REPORTE ===========");
   console.log(`Creados:      ${report.creados.length}`);

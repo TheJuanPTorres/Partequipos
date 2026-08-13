@@ -179,3 +179,24 @@ export function rutasDeCategoriaNueva(slug: string): string[] {
 export function rutasDeCategoriaUsada(slug: string): string[] {
   return [rutas.maquinaria(), rutas.usada(), rutas.categoriaUsada(slug)];
 }
+
+// --- Lubricantes ------------------------------------------------------------
+
+/**
+ * Rutas que caduca un cambio de MARCA de lubricantes: su propia página y la de
+ * cada categoría, porque todas muestran el nombre de la marca en las migas.
+ */
+export function rutasDeMarcaLubricante(marcaSlug: string, categoriaSlugs: string[]): string[] {
+  return [
+    rutas.marcaLubricante(marcaSlug),
+    ...categoriaSlugs.map((slug) => rutas.categoriaLubricante(marcaSlug, slug)),
+  ];
+}
+
+/**
+ * Rutas que caduca un cambio de CATEGORÍA: la suya y la de su marca, que la
+ * lista.
+ */
+export function rutasDeCategoriaLubricante(marcaSlug: string, categoriaSlug: string): string[] {
+  return [rutas.categoriaLubricante(marcaSlug, categoriaSlug), rutas.marcaLubricante(marcaSlug)];
+}

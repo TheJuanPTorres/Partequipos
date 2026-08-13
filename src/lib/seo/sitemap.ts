@@ -26,6 +26,9 @@ export type SitemapInput = {
   equiposNuevos: ModeloLike[];
   categoriasNueva: ConSlug[];
   categoriasUsada: ConSlug[];
+  /** Lubricantes: marca → categoría de aplicación. Sin índice de sección. */
+  marcasLubricante: ConSlug[];
+  categoriasLubricante: TipoLike[];
 };
 
 /**
@@ -57,6 +60,12 @@ export const PATRONES_SITEMAP = [
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
   "/maquinaria-pesada/maquinaria-pesada-usada",
   "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]",
+  /*
+   * Lubricantes. No hay patrón "/lubricantes" a secas: esa página NO existe en
+   * el sitio actual, así que tampoco aquí. Ver SEGMENTO_LUBRICANTES.
+   */
+  "/lubricantes/[marca]",
+  "/lubricantes/[marca]/[categoria]",
 ] as const;
 
 /** Slug reservado de la portada dentro de la colección de páginas. */
@@ -101,6 +110,8 @@ export function buildSitemapEntries(
     equiposNuevos,
     categoriasNueva,
     categoriasUsada,
+    marcasLubricante,
+    categoriasLubricante,
   }: SitemapInput,
   ahora: Date = new Date(),
 ): SitemapEntry[] {
@@ -257,6 +268,31 @@ export function buildSitemapEntries(
       url: absoluteUrl(rutas.categoriaUsada(categoria.slug)),
       lastModified: fecha(categoria.updatedAt, ahora),
       changeFrequency: "daily",
+      priority: 0.7,
+    });
+  }
+
+  /*
+   * LUBRICANTES.
+   *
+   * Sin entrada de índice: `/lubricantes/` no es una página en el sitio actual
+   * y no se inventa. La raíz de la sección es cada marca. Cambian poco, de ahí
+   * `monthly`.
+   */
+  for (const marca of marcasLubricante) {
+    entradas.push({
+      url: absoluteUrl(rutas.marcaLubricante(marca.slug)),
+      lastModified: fecha(marca.updatedAt, ahora),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    });
+  }
+
+  for (const categoria of categoriasLubricante) {
+    entradas.push({
+      url: absoluteUrl(rutas.categoriaLubricante(categoria.marcaSlug, categoria.slug)),
+      lastModified: fecha(categoria.updatedAt, ahora),
+      changeFrequency: "monthly",
       priority: 0.7,
     });
   }

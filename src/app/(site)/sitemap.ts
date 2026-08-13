@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { getCategoriasLubricante, getMarcasLubricante } from "@/lib/queries/getLubricantes";
 import {
   getCategoriasMaquinaria,
   getCategoriasUsada,
@@ -13,7 +14,13 @@ import { getPaginas } from "@/lib/queries/getPaginas";
 import { getTipos } from "@/lib/queries/getTipos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
 import { poblado } from "@/lib/utils/relations";
-import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/payload-types";
+import type {
+  Marca,
+  MarcasLubricante,
+  MarcasMaquinaria,
+  TiposEquipo,
+  TiposMaquinaria,
+} from "@/payload-types";
 
 /**
  * Sitemap dinámico generado desde Payload (nunca escrito a mano).
@@ -48,6 +55,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     equiposNuevos,
     categoriasNueva,
     categoriasUsada,
+    marcasLubricante,
+    categoriasLubricante,
   ] = await Promise.all([
     getMarcas(),
     getTipos(),
@@ -58,6 +67,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getEquiposNuevos(),
     getCategoriasMaquinaria(),
     getCategoriasUsada(),
+    getMarcasLubricante(),
+    getCategoriasLubricante(),
   ]);
 
   return buildSitemapEntries({
@@ -113,5 +124,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     categoriasNueva: categoriasNueva.map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
 
     categoriasUsada: categoriasUsada.map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
+
+    // --- Lubricantes --------------------------------------------------------
+    marcasLubricante: marcasLubricante.map((m) => ({ slug: m.slug, updatedAt: m.updatedAt })),
+
+    categoriasLubricante: categoriasLubricante.flatMap((categoria) => {
+      const marca = poblado<MarcasLubricante>(categoria.marca);
+      return marca
+        ? [{ slug: categoria.slug, updatedAt: categoria.updatedAt, marcaSlug: marca.slug }]
+        : [];
+    }),
   });
 }

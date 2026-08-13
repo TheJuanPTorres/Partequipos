@@ -81,6 +81,8 @@ export interface Config {
     'categorias-maquinaria': CategoriasMaquinaria;
     'categorias-usada': CategoriasUsada;
     'equipos-usados': EquiposUsado;
+    'marcas-lubricante': MarcasLubricante;
+    'categorias-lubricante': CategoriasLubricante;
     solicitudes: Solicitude;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -103,6 +105,8 @@ export interface Config {
     'categorias-maquinaria': CategoriasMaquinariaSelect<false> | CategoriasMaquinariaSelect<true>;
     'categorias-usada': CategoriasUsadaSelect<false> | CategoriasUsadaSelect<true>;
     'equipos-usados': EquiposUsadosSelect<false> | EquiposUsadosSelect<true>;
+    'marcas-lubricante': MarcasLubricanteSelect<false> | MarcasLubricanteSelect<true>;
+    'categorias-lubricante': CategoriasLubricanteSelect<false> | CategoriasLubricanteSelect<true>;
     solicitudes: SolicitudesSelect<false> | SolicitudesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -593,6 +597,98 @@ export interface EquiposUsado {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcas-lubricante".
+ */
+export interface MarcasLubricante {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  /**
+   * Resumen de una o dos líneas, bajo el título.
+   */
+  entradilla?: string | null;
+  descripcion?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  logo?: (number | null) | Media;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-lubricante".
+ */
+export interface CategoriasLubricante {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  marca: number | MarcasLubricante;
+  /**
+   * Resumen de una o dos líneas, bajo el título.
+   */
+  entradilla?: string | null;
+  descripcion?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Se usa también como imagen social.
+   */
+  imagen?: (number | null) | Media;
+  /**
+   * Nombre comercial y descripción tal como los publica el fabricante. No inventar especificaciones.
+   */
+  productos?:
+    | {
+        nombre: string;
+        descripcion?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Formularios enviados desde el sitio. Contienen datos personales: no se publican y solo son visibles aquí.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -709,6 +805,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'equipos-usados';
         value: number | EquiposUsado;
+      } | null)
+    | ({
+        relationTo: 'marcas-lubricante';
+        value: number | MarcasLubricante;
+      } | null)
+    | ({
+        relationTo: 'categorias-lubricante';
+        value: number | CategoriasLubricante;
       } | null)
     | ({
         relationTo: 'solicitudes';
@@ -1036,6 +1140,54 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
   descripcion?: T;
   imagenes?: T;
   disponible?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcas-lubricante_select".
+ */
+export interface MarcasLubricanteSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  entradilla?: T;
+  descripcion?: T;
+  logo?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-lubricante_select".
+ */
+export interface CategoriasLubricanteSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  marca?: T;
+  entradilla?: T;
+  descripcion?: T;
+  imagen?: T;
+  productos?:
+    | T
+    | {
+        nombre?: T;
+        descripcion?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

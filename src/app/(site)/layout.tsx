@@ -38,8 +38,27 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
+        {/*
+         * Enlace de salto al contenido (WCAG 2.4.1, nivel A).
+         *
+         * Sin él, quien navega con teclado o lector de pantalla tiene que
+         * recorrer la cabecera entera —logo, seis enlaces y el teléfono— ANTES
+         * de llegar al contenido, y en CADA página del sitio.
+         *
+         * Está oculto hasta que recibe el foco: es la única forma de que sirva
+         * sin ocupar espacio visual. `id="contenido"` lo pone la envoltura de
+         * abajo, no cada plantilla, para que ninguna se olvide.
+         */}
+        <a
+          href="#contenido"
+          className="sr-only rounded bg-gray-900 px-4 py-2 text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50"
+        >
+          Saltar al contenido
+        </a>
         <Header />
-        <div className="flex-1">{children}</div>
+        <div id="contenido" className="flex-1">
+          {children}
+        </div>
         <Footer />
       </body>
     </html>

@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+/*
+ * Paleta base.
+ *
+ * NO hay bloque de `prefers-color-scheme: dark`, y es deliberado.
+ *
+ * El que traía la plantilla de create-next-app ponía el fondo en #0a0a0a
+ * mientras TODAS las plantillas usan clases de color fijas (`text-gray-900`,
+ * `bg-gray-50`, `border-gray-200`). Resultado medido: los títulos quedaban en
+ * **1,12:1** de contraste sobre ese fondo — WCAG AA exige 4,5:1. Es decir,
+ * cualquiera con el modo oscuro activado en su sistema veía páginas
+ * prácticamente en blanco. Ver auditoría del Bloque F.
+ *
+ * Soportar modo oscuro de verdad es una decisión de DISEÑO y exige revisar cada
+ * color del sitio, no una variable. Cuando llegue el diseño se decide; mientras
+ * tanto es preferible un solo tema legible que dos, uno de ellos roto.
+ */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,15 +28,40 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/*
+ * Foco visible y consistente en todo lo que se puede enfocar.
+ *
+ * El navegador ya dibuja un anillo por defecto, pero cambia entre navegadores y
+ * se pierde sobre fondos claros. Declararlo aquí garantiza que quien navega con
+ * teclado siempre sepa dónde está — WCAG 2.4.7.
+ *
+ * Se usa `:focus-visible` y no `:focus` para no dibujarlo al hacer clic con el
+ * ratón, que es ruido visual sin ninguna utilidad.
+ */
+:focus-visible {
+  outline: 3px solid #111827;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/*
+ * Respeta a quien pide menos movimiento en su sistema (WCAG 2.3.3). Hoy no hay
+ * animaciones propias, pero esto cubre las que traiga el diseño y las del
+ * desplazamiento suave del navegador.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

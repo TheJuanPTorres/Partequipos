@@ -693,3 +693,48 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
    rastreo**: son dos filas en la colección `Redirects`, sin tocar código. **No
    se han cargado** porque la dirección las clasificó como basura; se pide
    confirmación explícita antes de dejarlas caer en 404.
+
+9. **Destino de los respaldos.** El mecanismo está construido y probado
+   (README §9), pero **no hay dónde guardarlos**. Tres opciones evaluadas:
+
+   | Opción                                 | A favor                                                                                | En contra                                                                     |
+   | -------------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+   | Vercel Blob (ya contratado)            | Cero servicios nuevos; el token ya existe                                              | **Misma cuenta que el sitio**: un incidente de cuenta se lleva las dos cosas  |
+   | **S3 / Cloudflare R2** _(recomendado)_ | Reglas de ciclo de vida del proveedor aplican la retención; cifrado en reposo de serie | Servicio nuevo que contratar                                                  |
+   | Servidor del cliente                   | El dato no sale de su infraestructura                                                  | **Misma máquina que la base**: un fallo del servidor se lleva base y respaldo |
+
+   **El principio que decide:** un respaldo no debe vivir en la misma cuenta ni
+   en la misma máquina que aquello que respalda. **Vercel Blob y el servidor del
+   cliente incumplen ese principio**; por eso la recomendación es almacenamiento
+   externo (R2 o equivalente).
+
+10. **Cifrado en reposo de los respaldos.** Los volcados contienen **datos
+    personales de terceros**: correos de usuarios, y nombre, correo y teléfono de
+    cada lead de `solicitudes`. Hoy el fichero va **comprimido pero NO cifrado**,
+    y comprimir no es proteger.
+
+    Es tema para tratar **junto con las políticas de seguridad que el cliente ya
+    planteó** (MFA, WAF), no por separado: son la misma conversación sobre
+    protección de datos, y la Ley 1581 de 2012 obliga igual en los dos frentes.
+
+    Mitigación provisional en uso: `respaldos/` está en `.gitignore` y existe
+    `BACKUP_SIN_DATOS_PERSONALES=true` para generar copias compartibles sin esas
+    filas.
+
+11. **Programación periódica de los respaldos.** Se define **cuando exista la
+    infraestructura definitiva** — depende de dónde viva la base y de dónde se
+    guarden los volcados (punto 9). Los scripts ya son automatizables tal cual:
+    un cron que encadene `backup` → subida → `backup:prune`.
+
+    Hasta entonces el respaldo es **manual**, y conviene decirlo así al cliente:
+    el mecanismo existe y está probado, la periodicidad comprometida en el SLA
+    todavía no.
+
+12. **Sincronización de los binarios del Blob.** Hoy solo hay **inventario** —
+    qué archivos existían, con nombre, tamaño y a qué registro pertenecían—, no
+    copia de los bytes. Copiar los archivos exige decidir antes el destino, que
+    es el punto 9.
+
+    Consecuencia práctica si hoy hubiera un incidente: el catálogo se
+    reconstruye entero desde el volcado y el inventario, pero **las imágenes
+    habría que reponerlas a mano**.

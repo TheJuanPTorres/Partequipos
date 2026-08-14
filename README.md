@@ -317,3 +317,127 @@ Para activarlo hacen falta tres cosas:
 2. El **dominio verificado** en esa cuenta — Resend rechaza remitentes de
    dominios sin verificar.
 3. `RESEND_FROM_EMAIL` con una dirección de ese dominio.
+
+---
+
+## 9. Respaldos y restauración
+
+Lo compromete el documento de Gestión de Incidencias entregado al cliente
+(RPO/RTO y prueba de restauración trimestral).
+
+### 9.1 Por qué no usa `pg_dump`
+
+`pg_dump` exige un binario cliente de versión **igual o superior** a la del
+servidor. El servidor corre **PostgreSQL 18.4**, esta máquina no tiene ningún
+cliente instalado, y la base va a mudarse a la infraestructura del cliente, cuya
+versión no controlamos. Depender de que cada máquina y cada runner tenga el
+binario correcto es una fragilidad que se paga el día peor: el día que hay que
+restaurar.
+
+El mecanismo usa el cliente `pg` que el proyecto ya trae, así que **funciona
+contra cualquier PostgreSQL** sin instalar nada.
+
+**Qué implica:** es un volcado de **datos**, no de esquema. Y puede serlo porque
+el esquema ya está versionado en `src/migrations/`. El manifiesto del volcado
+guarda qué migraciones estaban aplicadas, para reconstruir el esquema exacto de
+ese momento.
+
+Si el equipo de sistemas del cliente prefiere además un volcado físico con
+`pg_dump`, los dos mecanismos conviven sin estorbarse.
+
+### 9.2 Respaldar
+
+```bash
+npm run backup                                   # a ./respaldos
+BACKUP_DIR=D:/respaldos npm run backup           # a otra carpeta
+BACKUP_SIN_DATOS_PERSONALES=true npm run backup  # sin users ni solicitudes
+npm run backup:blob                              # inventario de archivos
+```
+
+Sale un `.ndjson.gz` con marca temporal UTC:
+`partequipos-<entorno>-YYYYMMDD-HHMMSS.ndjson.gz`. El nombre ordena
+alfabéticamente igual que cronológicamente.
+
+El script **falla si el volcado sale vacío**, en vez de dejar un fichero inútil
+que parezca correcto.
+
+### 9.3 Restaurar
+
+**El orden importa.** El volcado no trae esquema:
+
+```bash
+# 1. Base vacía + esquema desde las migraciones versionadas
+DATABASE_URI="<destino>" npm run migrate
+
+# 2. Cargar los datos
+RESTORE_FILE=respaldos/<fichero>.ndjson.gz \
+DATABASE_URI="<destino>" \
+RESTORE_CONFIRMAR=true \
+npm run restore
+
+# 3. Comprobar que coincide con el origen
+ORIGEN_URI="<origen>" DESTINO_URI="<destino>" npm run backup:verify
+```
+
+Tres protecciones, todas explícitas y ninguna evitable por accidente:
+
+| Situación                                          | Qué exige                 |
+| -------------------------------------------------- | ------------------------- |
+| El destino ya tiene datos                          | `RESTORE_CONFIRMAR=true`  |
+| El destino parece producción                       | `RESTORE_PRODUCCION=true` |
+| El entorno del respaldo no coincide con el destino | avisa en pantalla         |
+
+La restauración va **en una transacción**: si algo falla, no queda una base a
+medias. Reajusta además las **secuencias** — sin eso el primer registro nuevo
+chocaría con un id existente, que es el fallo clásico de una restauración «que
+funcionó».
+
+### 9.4 Retención
+
+Política del SLA, implementada en `src/lib/backup/retencion.ts` (función pura,
+con pruebas):
+
+| Ventana          | Se conserva    |
+| ---------------- | -------------- |
+| Últimos 30 días  | uno por día    |
+| Últimos 3 meses  | uno por semana |
+| Últimos 12 meses | uno por mes    |
+
+```bash
+npm run backup:prune                      # enseña qué borraría; NO borra
+BACKUP_PODAR=true npm run backup:prune    # borra
+```
+
+**Borra en seco por defecto**, y **el más reciente nunca se borra** aunque la
+política diga lo contrario.
+
+### 9.5 Qué verificar (prueba trimestral)
+
+1. `npm run backup` termina y el fichero pesa lo esperado.
+2. Restaurar sobre una base **limpia** siguiendo §9.3.
+3. `npm run backup:verify` dice **✓ LOS DATOS COINCIDEN** y las dos huellas MD5
+   son iguales.
+4. Crear un registro en la base restaurada: debe asignar un id nuevo, sin
+   colisión (comprueba las secuencias).
+5. `npm run backup:blob` con `BLOB_COMPROBAR=true`: todos los archivos responden 200.
+
+Anotar fecha, duración y resultado. Sin el paso 3 el respaldo no está probado.
+
+### 9.6 Datos personales
+
+**El volcado contiene datos personales**: `users` (correos y hashes) y
+`solicitudes` (nombre, teléfono, correo y mensaje de cada lead). Es el único
+punto del proyecto con datos de terceros, y la Ley 1581 de 2012 obliga a
+protegerlos.
+
+Reglas mínimas mientras no haya una decisión de almacenamiento:
+
+- **No se versionan.** `respaldos/` está en `.gitignore`.
+- **No se comparten sin filtrar.** Para pasarle una copia a alguien:
+  `BACKUP_SIN_DATOS_PERSONALES=true npm run backup`, que vuelca la estructura sin
+  esas filas.
+- **Cifrado en reposo** allí donde se guarden. El fichero va comprimido pero
+  **no cifrado**: comprimir no es proteger.
+- **Acceso restringido** a quien administre la infraestructura.
+- **Caducidad real:** la poda no es solo higiene de disco, es una obligación —
+  conservar datos personales más de lo necesario es incumplir.

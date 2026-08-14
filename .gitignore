@@ -47,3 +47,4 @@ scripts/crawl/progress.jsonl
 
 # credenciales locales de desarrollo (nunca se versionan)
 *.local.md
+respaldos/

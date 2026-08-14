@@ -30,7 +30,12 @@
     "db:check": "tsx scripts/db/check-migrations.ts",
     "deploy:migrate": "npm run db:check && payload migrate",
     "redirects:check": "payload run scripts/redirects/verificar-destinos.ts",
-    "redirects:check:estricto": "REDIRECTS_ESTRICTO=true payload run scripts/redirects/verificar-destinos.ts"
+    "redirects:check:estricto": "REDIRECTS_ESTRICTO=true payload run scripts/redirects/verificar-destinos.ts",
+    "backup": "tsx scripts/backup/respaldar.ts",
+    "restore": "tsx scripts/backup/restaurar.ts",
+    "backup:verify": "tsx scripts/backup/verificar-restauracion.ts",
+    "backup:prune": "tsx scripts/backup/podar.ts",
+    "backup:blob": "payload run scripts/backup/inventario-blob.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.86.0",

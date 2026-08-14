@@ -2,132 +2,129 @@
 
 **Contexto:** el proyecto está bloqueado en dos frentes ajenos a nosotros — el
 acceso al WordPress actual (migración de contenido) y la entrega del diseño.
-Este documento ordena todo lo que sí se puede ejecutar mientras tanto.
+Este documento ordenó todo lo que sí se podía ejecutar mientras tanto.
 
-**Estado al inicio de esta ruta:** infraestructura completa y desplegada,
-repuestos y maquinaria construidos y poblados con datos de demostración,
-corporativo construido, SEO íntegro, CI en verde.
-
----
-
-## Bloque A — Formularios y captación de leads
-
-**Por qué primero:** es el único rubro cotizado que es funcionalidad nueva, y
-hoy el sitio no tiene forma de captar un lead — que es el objetivo comercial
-del proyecto. No depende de diseño ni de contenido.
-
-**Cotizado:** 15 h (Formularios + Cloudflare Turnstile)
-
-- Formulario de contacto general
-- Solicitud de cotización desde ficha de equipo y de modelo
-- Protección con Cloudflare Turnstile
-- Validación en servidor con Zod
-- Estados post-envío en la propia página (sustituyen las 8 URLs de "gracias")
-- Persistencia de solicitudes en Payload, consultables por el cliente
-- Notificación por correo al recibir una solicitud
-
-**Cierra además:** el grupo D de URLs huérfanas del mapa de redirects.
+**CIERRE DE FASE (2026-08-14): los seis bloques de código están COMPLETOS.**
+Lo único que queda de esta ruta es el bloque G, que no es código.
 
 ---
 
-## Bloque B — Lubricantes
+## Estado
 
-**Por qué:** corto, estructura ya conocida por el crawl, cierra una sección
-completa del sitio.
-
-- Índice de lubricantes + 4 subsecciones (auto liviano, auto pesado,
-  engranajes, motos/scooter)
-- Modelo de datos, plantillas, SEO y entrada en el sitemap
-- Datos de demostración
-
-**Nota de alcance:** el documento del cliente indicaba 1 página; el crawl
-encontró 5. Es la cuarta discrepancia medida.
-
----
-
-## Bloque C — Redirects 301 en producción
-
-**Por qué:** es el mayor riesgo del lanzamiento y no depende de nadie. El
-mecanismo y el mapa ya existen; falta poblarlo y verificarlo.
-
-- Cargar el mapa de redirects generado en la colección Redirects
-- Verificar que las URLs antiguas responden 301 hacia su destino
-- Resolver las URLs huérfanas que ya tengan destino claro
-- Dejar documentada la lista de decisiones pendientes del cliente
+| Bloque                                 | Estado       | Cotizado | Cierra                               |
+| -------------------------------------- | ------------ | -------- | ------------------------------------ |
+| **A** — Formularios y captación        | ✅ completo  | 15 h     | Grupo D de URLs huérfanas            |
+| **B** — Lubricantes                    | ✅ completo  | —        | Sección completa (5 URLs)            |
+| **C** — Redirects 301                  | ✅ completo  | —        | El mayor riesgo del lanzamiento      |
+| **D** — Plantillas de blog             | ✅ completo  | 45 h     | Molde; falta el contenido real       |
+| **E** — Respaldos automatizados        | ✅ completo  | —        | Compromiso de Gestión de Incidencias |
+| **F** — QA, accesibilidad, rendimiento | ✅ completo  | 45 h     | Línea base para los umbrales         |
+| **G** — Acuerdo de diseño              | ⬜ pendiente | —        | No es código: es una conversación    |
 
 ---
 
-## Bloque D — Plantillas de blog (sin contenido)
+## Bloque A — Formularios y captación de leads ✅
 
-**Por qué:** el molde se puede construir ahora; solo la migración de los 51
-artículos depende del acceso a WordPress.
+Tres formularios (contacto, cotización de equipo, solicitud de repuesto) con
+Server Actions, validación con Zod en el servidor, Turnstile verificado en el
+servidor y confirmación **en la misma página**, que sustituye a las 8 URLs de
+«gracias».
 
-**Cotizado:** 45 h (blog completo, incluido dentro de las 480)
+Colección `Solicitud`, la única con datos personales: control de acceso privado
+verificado (`GET` y `POST` a `/api/solicitudes/` devuelven 403).
 
-- Colección de artículos con categorías y campos SEO
-- Plantilla de listado con paginación
-- Plantilla de artículo individual
-- JSON-LD tipo Article
-- Entrada en el sitemap
-- Datos de demostración
+Adaptador de correo Resend, con **degradación controlada**: sin clave la
+solicitud se guarda igual y solo se registra que no se pudo avisar.
 
-**Queda pendiente del acceso:** la migración real de los 51 artículos.
+**Pendiente:** claves reales de Turnstile y Resend en producción → §10.11 de
+`CLAUDE.md`. Hoy los formularios corren con las claves de prueba de Cloudflare,
+que aceptan cualquier token.
 
----
+## Bloque B — Lubricantes ✅
 
-## Bloque E — Respaldos automatizados
+Modelo de **dos niveles** (marca → categoría de aplicación), no los tres de
+repuestos. `/lubricantes/` no existe como página y se replica así.
 
-**Por qué:** está comprometido en el documento de Gestión de Incidencias
-entregado al cliente. No depende de nadie.
+El documento del cliente indicaba 1 página; el rastreo encontró 5. Cuarta
+discrepancia medida.
 
-- Volcado automatizado de base de datos con retención definida
-- Sincronización de archivos del Blob
-- Prueba de restauración documentada
-- Bitácora de respaldos
+## Bloque C — Redirects 301 ✅
 
----
+El mapa de julio quedó obsoleto y **sobreestimaba el trabajo**: 618 URLs
+conservan ruta idéntica, no 398. Cargados **10** redirects (8 de «gracias» y 2
+duplicados `-copy`), verificados en el proxy: 301 en un salto, sin cadenas ni
+bucles.
 
-## Bloque F — QA, accesibilidad y rendimiento
+Se añadió la validación que faltaba: `npm run redirects:check` comprueba que el
+destino de cada redirect **resuelva**, con advertencia visible en el panel.
 
-**Por qué:** se puede ejecutar sobre lo ya construido. Parte habrá que repetir
-cuando llegue el diseño, pero los problemas estructurales se detectan ahora.
+**Pendiente:** 14 decisiones del cliente + 4 URLs de maquinaria vivas
+clasificadas como basura.
 
-**Cotizado:** 45 h
+## Bloque D — Plantillas de blog ✅
 
-- Auditoría de accesibilidad: contraste, navegación por teclado, orden de
-  encabezados, etiquetas y roles
-- Medición de Core Web Vitals sobre las plantillas existentes
-- Verificación automatizada de las URLs construidas (estado, H1 único,
-  canonical, datos estructurados, enlaces internos)
-- Revisión de estados de error y vacíos
+Los 51 artículos viven en la **raíz** (`/{slug}/`), el mismo espacio de nombres
+que las páginas institucionales. La ruta `[...slug]` resuelve ambas con
+precedencia documentada, y un **guardarraíl bidireccional** impide que una tape
+a la otra — verificado contra la base en las dos direcciones.
 
----
+**Pendiente:** migración de los 51 artículos → acceso a WordPress.
 
-## Bloque G — Acuerdo de diseño (no es código)
+## Bloque E — Respaldos automatizados ✅
 
-**Por qué:** es lo que más tiempo ahorra cuando llegue la entrega del tercero.
+No usa `pg_dump` (exige binario de versión ≥ servidor; hay PostgreSQL 18.4 y
+ningún cliente instalado). Usa el cliente `pg` del proyecto: funciona contra
+cualquier PostgreSQL.
 
-- Acordar con el diseñador: paleta, escala tipográfica, escala de espaciado
-- Catálogo de componentes que entregará: tarjeta de producto, listado,
-  migas de pan, cabecera de categoría, formulario, cabecera y pie
-- Confirmar que entregará archivos exportables y editables
-- Acordar restricciones de peso y dimensiones de imagen (necesario para
-  sostener los umbrales de rendimiento discutidos con el cliente)
+**Prueba de restauración real:** base limpia → 7 migraciones → restauración →
+verificación. 35 de 35 tablas idénticas, misma huella MD5, secuencias correctas.
+
+**Pendiente:** destino de los volcados, cifrado en reposo, programación
+periódica y sincronización de binarios → §10.3 puntos 9–12 de `CLAUDE.md`.
+
+## Bloque F — QA, accesibilidad y rendimiento ✅
+
+`npm run qa` recorre todas las URLs del sitemap: **0 errores** en local (198) y
+en producción (112).
+
+Corregido lo estructural en accesibilidad, incluido un **fallo crítico de modo
+oscuro** heredado del andamiaje inicial (§10.14).
+
+Línea base de Core Web Vitals medida en navegador real sobre producción:
+LCP 384–800 ms, **CLS 0**, cero tareas largas.
+
+**Pendiente:** clave de PageSpeed Insights para cifras contractuales, y repetir
+la medición cuando llegue el diseño.
+
+## Bloque G — Acuerdo de diseño ⬜ (no es código)
+
+Lo único de esta ruta que sigue abierto. Es lo que más tiempo ahorra cuando
+llegue la entrega del tercero.
+
+- Acordar paleta, escala tipográfica y escala de espaciado.
+- Catálogo de componentes: tarjeta de producto, listado, migas, cabecera de
+  categoría, formulario, cabecera y pie.
+- Confirmar entrega de archivos exportables y editables.
+- **Acordar restricciones de peso y dimensiones de imagen.** Es lo que
+  sostendrá los umbrales de rendimiento: hoy el LCP es texto y con el diseño
+  pasará a ser una imagen destacada.
 
 ---
 
 ## Fuera de esta ruta — bloqueado por terceros
 
-| Pendiente                                | Depende de                 |
-| ---------------------------------------- | -------------------------- |
-| Migración de las ~55 páginas editoriales | Acceso a WordPress         |
-| Migración de los 51 artículos de blog    | Acceso a WordPress         |
-| Carga de 351 modelos de repuestos reales | CSV del cliente            |
-| Carga de 80 fichas de maquinaria reales  | CSV e imágenes del cliente |
-| Aplicación del diseño definitivo         | Entrega del diseñador      |
-| Textos legales definitivos               | Área jurídica del cliente  |
-| Razón social, NIT y URLs de portales     | Definición del cliente     |
-| Base de datos en infraestructura propia  | Provisión del cliente      |
+| Pendiente                                | Depende de                  |
+| ---------------------------------------- | --------------------------- |
+| Migración de las ~55 páginas editoriales | Acceso a WordPress          |
+| Migración de los 51 artículos de blog    | Acceso a WordPress          |
+| Carga de 351 modelos de repuestos reales | CSV del cliente             |
+| Carga de 80 fichas de maquinaria reales  | CSV e imágenes del cliente  |
+| Aplicación del diseño definitivo         | Entrega del diseñador       |
+| Textos legales definitivos               | Área jurídica del cliente   |
+| Razón social, NIT y URLs de portales     | Definición del cliente      |
+| Base de datos en infraestructura propia  | Provisión del cliente       |
+| Claves de Turnstile y Resend             | Cuentas del cliente         |
+| Destino y cifrado de los respaldos       | Infraestructura del cliente |
 
 ---
 
@@ -141,3 +138,5 @@ cuando llegue el diseño, pero los problemas estructurales se detectan ahora.
   cliente. Al volver a privado hará falta Vercel Pro.
 - **El pooler de conexiones es requisito duro** para la infraestructura del
   cliente: el build emite ~3.600 consultas en paralelo por publicación.
+- **Los formularios no tienen protección anti-spam real en producción** hasta
+  que lleguen las claves de Turnstile.

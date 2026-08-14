@@ -158,12 +158,78 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 
 ## 10. Estado actual
 
-- **Fase:** MVP · Sprint 0
-- **Plan vigente:** `docs/PLAN-MVP.md`
-- **Base del repo:** inicializada con Next.js 16.2.11 (App Router, TS strict,
-  Tailwind v4, ESLint + Prettier). Ver ADR `docs/decisions/0001-version-nextjs.md`.
-- **Decisión pendiente y bloqueante:** hosting definitivo (Vercel vs. infraestructura
-  del cliente). Ver `docs/decisions/`.
+> **CIERRE DE FASE — 2026-08-14.** Está construido **todo lo que no depende de
+> terceros**. Los seis bloques de código de `docs/RUTA-DESARROLLO.md` (A–F)
+> quedaron completos; el único abierto de esa ruta es el G, que es una
+> conversación con el diseñador, no código.
+
+- **Base del repo:** Next.js 16.2.11 (App Router, TS strict, Tailwind v4,
+  ESLint + Prettier). Ver ADR `docs/decisions/0001-version-nextjs.md`.
+- **Plan de referencia:** `docs/PLAN-MVP.md` y `docs/RUTA-DESARROLLO.md`.
+
+### 10.0 Qué está construido y qué falta
+
+**Construido y verificado en producción:**
+
+| Área            | Estado                                                              |
+| --------------- | ------------------------------------------------------------------- |
+| Infraestructura | Payload 3 + Neon + Vercel Blob, desplegado, migraciones versionadas |
+| Repuestos       | 3 niveles · 433 URLs cubiertas                                      |
+| Maquinaria      | Nueva y usada · 118 URLs (ADR 0007)                                 |
+| Lubricantes     | 2 niveles · 5 URLs                                                  |
+| Corporativo     | Ruta comodín · 9 páginas sembradas                                  |
+| Blog            | Plantillas + guardarraíl de slug entre colecciones (ADR 0008)       |
+| Formularios     | 3 formularios · Turnstile · Zod · Resend con degradación controlada |
+| SEO             | Metadata, JSON-LD, sitemap con guardián, robots, canonical          |
+| Redirects       | 10 cargados + validación de destino                                 |
+| Respaldos       | Volcado, restauración **probada** y política de retención           |
+| QA              | `npm run qa`: 0 errores en local (198 URLs) y producción (112)      |
+| CI              | typecheck · lint · formato · 184 pruebas, verde en cada push        |
+
+**Cobertura del sitio actual:** de las 648 URLs del rastreo, **565 tienen ruta
+propia**; las 83 restantes también tienen ruta (`[...slug]`) pero les falta el
+**contenido**: 51 artículos de blog y 24 páginas corporativas. Ver §10.0.1.
+
+**Lo que falta, en una línea:** contenido real (bloqueado por WordPress y por
+los CSV del cliente), diseño (bloqueado por el diseñador) e infraestructura
+definitiva de base de datos (bloqueado por el cliente).
+
+### 10.0.1 Pendientes agrupados por responsable
+
+**DEL CLIENTE** — nada de esto lo podemos resolver nosotros:
+
+| #   | Pendiente                                                            | Bloquea                                                         |
+| --- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
+| 1   | Claves de Turnstile y Resend (§10.11)                                | **Lanzamiento.** Formularios abiertos a bots y leads sin avisar |
+| 2   | Infraestructura de base de datos, con pooler (§10.7)                 | **Migración.** Requisito duro                                   |
+| 3   | Acceso a WordPress                                                   | 51 artículos + ~55 páginas editoriales                          |
+| 4   | CSV e imágenes reales                                                | 351 modelos + 80 fichas de maquinaria                           |
+| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)          | JSON-LD `Organization` completo                                 |
+| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8) | Redirects y 404 del día del cambio                              |
+| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)            | Cumplir el SLA de Gestión de Incidencias                        |
+| 8   | Clave de PageSpeed Insights (§10.3 13)                               | Umbrales de rendimiento contractuales                           |
+| 9   | Vercel Pro antes de volver el repositorio a privado                  | Despliegue automático                                           |
+| 10  | Textos legales definitivos                                           | Sustituir los marcadores de posición                            |
+
+**DEL DISEÑADOR:**
+
+| Pendiente                                     | Nota                                                      |
+| --------------------------------------------- | --------------------------------------------------------- |
+| Paleta, tipografía y escala de espaciado      | La actual pasa AA pero cambiará entera                    |
+| Catálogo de componentes                       | Ver bloque G de `RUTA-DESARROLLO.md`                      |
+| Restricciones de peso y dimensiones de imagen | Sostiene los umbrales de rendimiento                      |
+| Decisión sobre modo oscuro                    | Hoy NO se soporta, a propósito (§10.14)                   |
+| Menú plegable en móvil                        | Hoy no hay; si lo mete, revisar teclado y `aria-expanded` |
+
+**NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
+
+| Pendiente                                          | Referencia |
+| -------------------------------------------------- | ---------- |
+| Logo institucional fuera de `Media` (URL cableada) | §10.8      |
+| Separar los stores de Vercel Blob por entorno      | §10.4      |
+| Mitigaciones 2–4 de consultas en el build          | §10.10     |
+| Repetir la auditoría de rendimiento con el diseño  | §10.3 p.14 |
+| Revisar el modo oscuro con el diseño puesto        | §10.14     |
 
 ### 10.1 Inventario real (fuente de verdad)
 
@@ -463,6 +529,35 @@ base poblada fallaría igual.
 > hay que perseguirlo. Si alguna vez hay que auditar peso de imágenes, se mide
 > contra el despliegue, nunca contra `npm start`.
 
+### 10.14 LECCIÓN — el modo oscuro roto que sobrevivió todo el proyecto
+
+> **Qué pasó.** `globals.css` traía desde el andamiaje de `create-next-app` un
+> bloque `@media (prefers-color-scheme: dark)` que ponía el fondo en `#0a0a0a`.
+> Nadie lo quitó, y todas las plantillas se construyeron con colores fijos
+> (`text-gray-900`, `bg-gray-50`, `border-gray-200`).
+>
+> Resultado medido: con el modo oscuro activado en el sistema, los títulos
+> quedaban en **1,12:1** de contraste — WCAG AA exige 4,5:1. Es decir,
+> **cualquiera con modo oscuro veía las páginas prácticamente en blanco**.
+> Sobrevivió desde el Sprint 0 hasta la auditoría del Bloque F.
+>
+> **Por qué no lo detectó nada.** Todas las verificaciones de este proyecto
+> —QA automatizado, comparaciones de HTML, revisión de marcado— miran el
+> **HTML de origen**. El fallo no estaba en el HTML: estaba en cómo lo pinta el
+> navegador **según una preferencia del sistema operativo**. Ningún `curl` lo
+> puede ver, y el navegador de quien desarrolla suele ir en modo claro.
+>
+> **La lección, generalizable:** verificar el HTML de origen no es verificar la
+> página. Todo lo que dependa del entorno del visitante —preferencia de color,
+> `prefers-reduced-motion`, tamaño de fuente del sistema, zoom, alto contraste—
+> es invisible para nuestras comprobaciones actuales.
+>
+> **Qué hacer cuando llegue el diseño:** revisar explícitamente cada plantilla
+> con el modo oscuro del sistema activado, y decidir de forma consciente si se
+> soporta. Hoy **no se soporta**, y es deliberado: es preferible un solo tema
+> legible que dos, uno de ellos roto. Soportarlo de verdad exige revisar cada
+> color del sitio, no una variable.
+
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 
 > `logo-partequipos.png` se referencia por **URL absoluta cableada** en
@@ -738,3 +833,32 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
     Consecuencia práctica si hoy hubiera un incidente: el catálogo se
     reconstruye entero desde el volcado y el inventario, pero **las imágenes
     habría que reponerlas a mano**.
+
+13. **Clave de PageSpeed Insights (o Lighthouse CI).** El cliente pidió
+    **umbrales de rendimiento verificados automáticamente que bloqueen el
+    despliegue** — está clasificado como alcance adicional y no se ha
+    implementado, pero **sin esto no se puede ni acordar la cifra**.
+
+    La API pública de PSI devuelve **HTTP 429 sin clave**, comprobado también
+    tras esperar. La línea base del Bloque F se midió con un navegador real,
+    que es dato válido pero **no comparable** con la cifra de Lighthouse que el
+    cliente reconocerá — Lighthouse simula móvil con red lenta y da números
+    bastante peores.
+
+    Hacen falta dos cosas: la **clave de API** y **sembrar producción**, porque
+    hoy no se pueden medir la ficha de equipo ni el artículo (esas secciones no
+    están cargadas allí).
+
+14. **La línea base de rendimiento cambiará con el diseño. No es un umbral.**
+
+    Lo medido hoy sobre producción: LCP 384–800 ms, **CLS 0**, cero tareas
+    largas. Son cifras buenas, y hay que decir por qué lo son: **el elemento
+    LCP es TEXTO** —un `<h1>` o un párrafo— en las tres plantillas medidas.
+
+    En cuanto el diseño introduzca una **imagen destacada** arriba, el LCP
+    pasará a depender de ella y las cifras empeorarán. Es esperable, no un
+    fallo. Lo que se mantendrá es lo estructural: CLS 0 (las imágenes declaran
+    dimensiones), TTFB del edge (~190 ms) y la ausencia de tareas largas.
+
+    **Comprometer hoy un umbral basado en estas cifras sería un error**: se
+    acordaría contra una página sin diseño.

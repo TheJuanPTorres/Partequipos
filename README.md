@@ -441,3 +441,99 @@ Reglas mínimas mientras no haya una decisión de almacenamiento:
 - **Acceso restringido** a quien administre la infraestructura.
 - **Caducidad real:** la poda no es solo higiene de disco, es una obligación —
   conservar datos personales más de lo necesario es incumplir.
+
+---
+
+## 10. Usuarios, roles y seguridad del panel
+
+### 10.1 Los dos roles
+
+| Puede…                                            | Administrador | Editor |
+| ------------------------------------------------- | :-----------: | :----: |
+| Entrar al panel                                   |      ✅       |   ✅   |
+| Ver y editar el catálogo, páginas y blog          |      ✅       |   ✅   |
+| Crear contenido nuevo                             |      ✅       |   ✅   |
+| Ver las solicitudes (leads) y marcarlas atendidas |      ✅       |   ✅   |
+| Subir archivos a Media                            |      ✅       |   ✅   |
+| **Borrar** cualquier registro                     |      ✅       |   ❌   |
+| Crear, editar o borrar **usuarios**               |      ✅       |   ❌   |
+| Cambiar **roles** o el permiso de editar slugs    |      ✅       |   ❌   |
+| Gestionar **redirecciones**                       |      ✅       |   ❌   |
+| Ver el correo de otros usuarios                   |      ✅       |   ❌   |
+| Editar **su propio** perfil y contraseña          |      ✅       |   ✅   |
+
+**Por qué el editor no borra.** Borrar es irreversible y no hay papelera: un
+modelo borrado se lleva por delante una URL indexada. Crear y editar cubre el
+trabajo diario; borrar es excepcional y puede pedirse.
+
+Para retirar contenido sin borrarlo: en `solicitudes` está el estado
+«atendida», y en el inventario de usada, la casilla «disponible».
+
+### 10.2 Cómo se asigna un rol
+
+1. Entra un **administrador** a `/admin`.
+2. **Usuarios** (grupo _Configuración_) → **Crear**.
+3. Correo, contraseña y **Rol**. Por defecto es **Editor**.
+
+El campo **Rol** solo lo ve editable un administrador. Un editor que abra su
+propio perfil no puede cambiárselo: el intento se descarta en silencio y el rol
+se queda como estaba.
+
+> **El primer usuario** se crea desde `/admin` la primera vez que se levanta una
+> base vacía, sin estar autenticado. A partir de ahí, solo un administrador crea
+> cuentas. Asegúrate de que ese primero sea **administrador**.
+
+### 10.3 Contraseñas
+
+- **Mínimo 12 caracteres.**
+- **No** se exige mezclar mayúsculas, dígitos y símbolos, siguiendo el criterio
+  del NIST SP 800-63B: esas reglas empujan hacia contraseñas predecibles del
+  tipo `Partequipos2026!`. Una frase larga es mejor y más fácil de recordar.
+- Se rechazan las obvias (`password…`, `partequipos…`) y las que contienen tu
+  propia dirección de correo.
+
+Se valida **en el servidor**, así que la regla se aplica también desde la API y
+desde los scripts, no solo en el formulario del panel.
+
+### 10.4 Sesión y bloqueo por intentos fallidos
+
+| Parámetro                 | Por defecto en Payload | **Configurado** |
+| ------------------------- | ---------------------: | --------------: |
+| Duración de la sesión     |                    2 h |         **8 h** |
+| Intentos antes de bloqueo |                      5 |           **5** |
+| Duración del bloqueo      |                 10 min |      **30 min** |
+
+8 h cubre una jornada y caduca al terminarla. 30 minutos de bloqueo triplica el
+coste de un ataque automatizado sin castigar de más a quien olvidó su clave.
+
+### 10.5 Qué es público y qué no
+
+| Colección                      | Lectura pública | Motivo                                     |
+| ------------------------------ | :-------------: | ------------------------------------------ |
+| Catálogo, páginas, blog, media |       Sí        | Es el contenido del sitio                  |
+| `solicitudes`                  |     **No**      | Datos personales de terceros               |
+| `users`                        |     **No**      | Correos y credenciales                     |
+| `redirects`                    |     **No**      | Estructura interna; no aporta al visitante |
+
+La escritura está cerrada al público en **todas** las colecciones. Los
+formularios no son una excepción: escriben por la API local desde una Server
+Action, no por la API pública.
+
+### 10.6 Cabeceras de seguridad
+
+Activas en todas las respuestas: `X-Content-Type-Options`, `Referrer-Policy`,
+`Permissions-Policy`, `X-Frame-Options` y `Strict-Transport-Security`.
+
+La **política de contenido (CSP)** está en **fase 1: `Report-Only`**. Observa y
+avisa por consola, **no bloquea**. Antes de pasar a fase 2, revisar unos días
+que no aparezcan violaciones nuevas y entonces renombrar la cabecera.
+
+> **No da la protección que aparenta.** Incluye `'unsafe-inline'` en
+> `script-src` porque Next y Payload inyectan scripts en línea. Ver CLAUDE.md
+> §10.16.
+
+### 10.7 Fuera de alcance
+
+**MFA y WAF no están implementados** y no se han presupuestado. Son la
+conversación pendiente con el cliente sobre políticas de seguridad, junto con el
+cifrado en reposo de los respaldos (§9.6).

@@ -75,6 +75,46 @@ const nextConfig: NextConfig = {
        * la protección; ampliarlo es una decisión posterior e informada.
        */
       { key: "Strict-Transport-Security", value: "max-age=31536000" },
+      /*
+       * POLÍTICA DE CONTENIDO — FASE 1: SOLO OBSERVA, NO BLOQUEA.
+       *
+       * `Report-Only` significa exactamente eso: el navegador avisa por consola
+       * de lo que la política prohibiría, pero **no impide nada**. En esta fase
+       * la CSP no protege: sirve para descubrir qué se rompería antes de
+       * activarla de verdad, que es la parte que puede tumbar el panel o dejar
+       * los formularios sin enviar sin que nadie se entere.
+       *
+       * Para pasar a fase 2 basta renombrar la cabecera a
+       * `Content-Security-Policy`, tras unos días sin violaciones nuevas.
+       *
+       * TRES AVISOS, registrados también en CLAUDE.md §10.15:
+       *
+       * 1. `'unsafe-inline'` en `script-src` es HOY inevitable — Next inyecta
+       *    scripts en línea para la hidratación y Payload también. Con él, la
+       *    CSP protege bastante menos de lo que aparenta. Es deuda técnica
+       *    consciente, no un descuido.
+       * 2. Turnstile necesita TRES directivas (`script-src`, `frame-src` y
+       *    `connect-src`). Es el punto donde más fácil se rompe el formulario
+       *    sin que nadie lo note hasta que un cliente no pueda enviarlo.
+       * 3. `blob:` y `data:` en `img-src` los necesitan el panel (vistas previas
+       *    de subida) y el optimizador de imágenes.
+       */
+      {
+        key: "Content-Security-Policy-Report-Only",
+        value: [
+          "default-src 'self'",
+          "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+          "style-src 'self' 'unsafe-inline'",
+          "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
+          "font-src 'self' data:",
+          "frame-src https://challenges.cloudflare.com",
+          "connect-src 'self' https://challenges.cloudflare.com",
+          "object-src 'none'",
+          "base-uri 'self'",
+          "form-action 'self'",
+          "frame-ancestors 'self'",
+        ].join("; "),
+      },
     ];
 
     const indexable = process.env.NEXT_PUBLIC_PERMITIR_INDEXACION?.trim().toLowerCase() === "true";

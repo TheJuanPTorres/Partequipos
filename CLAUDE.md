@@ -198,18 +198,19 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **DEL CLIENTE** — nada de esto lo podemos resolver nosotros:
 
-| #   | Pendiente                                                            | Bloquea                                                         |
-| --- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
-| 1   | Claves de Turnstile y Resend (§10.11)                                | **Lanzamiento.** Formularios abiertos a bots y leads sin avisar |
-| 2   | Infraestructura de base de datos, con pooler (§10.7)                 | **Migración.** Requisito duro                                   |
-| 3   | Acceso a WordPress                                                   | 51 artículos + ~55 páginas editoriales                          |
-| 4   | CSV e imágenes reales                                                | 351 modelos + 80 fichas de maquinaria                           |
-| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)          | JSON-LD `Organization` completo                                 |
-| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8) | Redirects y 404 del día del cambio                              |
-| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)            | Cumplir el SLA de Gestión de Incidencias                        |
-| 8   | Clave de PageSpeed Insights (§10.3 13)                               | Umbrales de rendimiento contractuales                           |
-| 9   | Vercel Pro antes de volver el repositorio a privado                  | Despliegue automático                                           |
-| 10  | Textos legales definitivos                                           | Sustituir los marcadores de posición                            |
+| #   | Pendiente                                                            | Bloquea                                                            |
+| --- | -------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| 1   | Claves de Turnstile y Resend (§10.11)                                | **Lanzamiento.** Formularios abiertos a bots y leads sin avisar    |
+| 2   | Infraestructura de base de datos, con pooler (§10.7)                 | **Migración.** Requisito duro                                      |
+| 3   | Acceso a WordPress                                                   | 51 artículos + ~55 páginas editoriales                             |
+| 4   | CSV e imágenes reales                                                | 351 modelos + 80 fichas de maquinaria                              |
+| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)          | JSON-LD `Organization` completo                                    |
+| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8) | Redirects y 404 del día del cambio                                 |
+| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)            | Cumplir el SLA de Gestión de Incidencias                           |
+| 8   | Clave de PageSpeed Insights (§10.3 13)                               | Umbrales de rendimiento contractuales                              |
+| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                   | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña |
+| 10  | Vercel Pro antes de volver el repositorio a privado                  | Despliegue automático                                              |
+| 11  | Textos legales definitivos                                           | Sustituir los marcadores de posición                               |
 
 **DEL DISEÑADOR:**
 
@@ -219,6 +220,7 @@ definitiva de base de datos (bloqueado por el cliente).
 | Catálogo de componentes                       | Ver bloque G de `RUTA-DESARROLLO.md`                      |
 | Restricciones de peso y dimensiones de imagen | Sostiene los umbrales de rendimiento                      |
 | Decisión sobre modo oscuro                    | Hoy NO se soporta, a propósito (§10.14)                   |
+| Icono cuadrado para el favicon                | Alternativa al cliente si él no lo tiene (§10.3 15)       |
 | Menú plegable en móvil                        | Hoy no hay; si lo mete, revisar teclado y `aria-expanded` |
 
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
@@ -230,6 +232,7 @@ definitiva de base de datos (bloqueado por el cliente).
 | Mitigaciones 2–4 de consultas en el build          | §10.10     |
 | Repetir la auditoría de rendimiento con el diseño  | §10.3 p.14 |
 | Revisar el modo oscuro con el diseño puesto        | §10.14     |
+| Pasar la CSP a fase 2 y evaluar los nonces         | §10.16     |
 
 ### 10.1 Inventario real (fuente de verdad)
 
@@ -558,6 +561,66 @@ base poblada fallaría igual.
 > legible que dos, uno de ellos roto. Soportarlo de verdad exige revisar cada
 > color del sitio, no una variable.
 
+### 10.15 LECCIÓN — en Payload, un HTTP 200 NO significa que algo funcionara
+
+> **Qué pasó.** Al verificar los roles, la primera versión de la prueba dio tres
+> «fallos» que no lo eran, porque comprobaba el **código de respuesta**:
+>
+> | Intento del editor            | HTTP | Qué pasó de verdad                |
+> | ----------------------------- | ---- | --------------------------------- |
+> | Ascenderse a administrador    | 200  | El rol **no cambió**              |
+> | Darse permiso de editar slugs | 200  | El permiso **no se concedió**     |
+> | Listar usuarios               | 200  | Devolvió **solo su propia ficha** |
+>
+> **Por qué.** Payload solo responde 403 cuando la denegación es de
+> **colección**. Cuando es de **campo** (`field.access`), acepta la petición y
+> **descarta en silencio** el campo que no puedes tocar. Y cuando la lectura se
+> restringe devolviendo una **consulta** en vez de `false` —que es lo que
+> permite que un editor use `/admin/account`—, la respuesta es 200 con menos
+> filas, no un rechazo.
+>
+> **El riesgo, en las dos direcciones:**
+>
+> - Verificar por código **reporta agujeros inexistentes** (lo que me pasó), y
+>   eso quema credibilidad y tiempo.
+> - Peor: puede **dar por cerrado uno abierto**. Si un día el acceso de campo se
+>   quita por error, la petición seguirá devolviendo 200 — exactamente igual que
+>   cuando estaba bien protegido. Una prueba basada en el código HTTP seguiría
+>   en verde mientras el editor se asciende a administrador.
+>
+> **La regla:** el control de acceso se verifica comprobando **el estado real de
+> la base** después de la operación, no la respuesta HTTP. Está aplicado así en
+> la verificación de roles; cualquier prueba futura de permisos debe hacer lo
+> mismo.
+>
+> Es la misma familia de error que §10.14: **medir la señal fácil en vez de la
+> que importa**. Allí era el HTML de origen en lugar de la página pintada; aquí,
+> el código de respuesta en lugar del efecto.
+
+### 10.16 Deuda técnica — la CSP protege menos de lo que aparenta
+
+> La política de contenido está en **fase 1 (`Report-Only`)**: observa y avisa,
+> **no bloquea nada**. Ver `next.config.ts`.
+>
+> **`script-src` incluye `'unsafe-inline'`, y eso desactiva buena parte de su
+> valor.** Con `'unsafe-inline'`, una inyección de script en línea —el caso que
+> la CSP existe para frenar— pasaría igual.
+>
+> **Por qué está ahí:** Next inyecta scripts en línea para la hidratación y
+> Payload también en el panel. Quitarlo exige _nonces_ por petición, lo que con
+> Turbopack y con el panel de Payload es **trabajo real**, no una línea de
+> configuración: hay que generar el nonce en el middleware, propagarlo a la
+> respuesta y lograr que ambas partes lo usen.
+>
+> **Que quede dicho para no engañarnos:** tener CSP en la lista de cabeceras
+> **no** equivale a estar protegido contra XSS. Es una capa parcial. La defensa
+> real hoy son la validación en servidor con Zod, el escapado de React y el
+> control de acceso — no esta cabecera.
+>
+> **Pendiente:** pasar a fase 2 (quitar `-Report-Only`) tras unos días sin
+> violaciones nuevas, y evaluar los nonces como trabajo aparte si el cliente
+> quiere endurecerlo de verdad.
+
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 
 > `logo-partequipos.png` se referencia por **URL absoluta cableada** en
@@ -862,3 +925,15 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
 
     **Comprometer hoy un umbral basado en estas cifras sería un error**: se
     acordaría contra una página sin diseño.
+
+15. **Icono cuadrado de la marca (favicon).** El único recurso gráfico que
+    tenemos es el logotipo, de **1614 × 317** — una tira horizontal. Sirve para
+    la cabecera y para el panel, pero **no para un favicon**: recortarlo daría
+    un fragmento de letra sin sentido.
+
+    Hoy el panel emite el logo como icono y el navegador acaba usando el
+    `favicon.ico` que trae el andamiaje. No es un fallo, pero es lo primero que
+    ve el cliente en la pestaña.
+
+    Hace falta un **icono cuadrado** (ideal: SVG, o PNG de 512 × 512 con
+    márgenes) del cliente o del diseñador. No se fabrica recortando el logo.

@@ -4,6 +4,7 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarArticulo, revalidarArticuloBorrado } from "./hooks/blogHooks";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Artículo del blog. Se sirve en `/{slug}/`, **en la raíz**.
@@ -28,7 +29,12 @@ export const Articulo: CollectionConfig = {
     group: "Blog",
     description: "Se publican en la raíz del sitio: /{slug}/, sin prefijo.",
   },
-  access: { read: () => true },
+  access: {
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
+  },
   // Lo más reciente primero: es un blog.
   defaultSort: "-fechaPublicacion",
   hooks: {

@@ -152,11 +152,17 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Cuentas con acceso al panel. Solo un administrador puede crear usuarios o cambiar roles.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: number;
+  /**
+   * El editor no puede crear usuarios, cambiar roles ni borrar registros. Solo un administrador cambia este campo.
+   */
+  rol: 'administrador' | 'editor';
   /**
    * Los slugs son de solo lectura tras crear el registro porque forman la URL indexada. Marca esta casilla solo para corregir erratas reales; el cambio generará un redirect 301 automático. Ver ADR 0005.
    */
@@ -958,6 +964,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  rol?: T;
   puedeEditarSlugs?: T;
   updatedAt?: T;
   createdAt?: T;

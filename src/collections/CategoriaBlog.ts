@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarCategoriaBlog, revalidarCategoriaBlogBorrada } from "./hooks/blogHooks";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Categoría del blog: `/category/{slug}/`.
@@ -22,7 +23,12 @@ export const CategoriaBlog: CollectionConfig = {
     defaultColumns: ["nombre", "slug"],
     group: "Blog",
   },
-  access: { read: () => true },
+  access: {
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
+  },
   hooks: {
     afterChange: [revalidarCategoriaBlog],
     afterDelete: [revalidarCategoriaBlogBorrada],

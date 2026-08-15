@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { slugField } from "../lib/fields/slugField";
 import { revalidarMarca, revalidarMarcaBorrada } from "./hooks/revalidateHooks";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Marcas de maquinaria y repuestos (Caterpillar, CASE, etc.).
@@ -17,7 +18,10 @@ export const Marca: CollectionConfig = {
     defaultColumns: ["nombre", "slug"],
   },
   access: {
-    read: () => true,
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
   },
   // ISR: revalida la marca, los índices y su subárbol. Ver lib/revalidation.ts.
   hooks: {

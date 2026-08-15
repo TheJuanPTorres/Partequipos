@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Categorías técnicas transversales del proyecto (Tren de Rodaje, Filtración,
@@ -20,7 +21,10 @@ export const CategoriaTecnica: CollectionConfig = {
     defaultColumns: ["nombre", "slug"],
   },
   access: {
-    read: () => true,
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
   },
   fields: [
     {

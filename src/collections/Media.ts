@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Archivos subidos (imágenes, logos, etc.).
@@ -8,7 +9,10 @@ import type { CollectionConfig } from "payload";
 export const Media: CollectionConfig = {
   slug: "media",
   access: {
-    read: () => true,
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
   },
   upload: true,
   fields: [

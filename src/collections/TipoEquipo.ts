@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarTipo, revalidarTipoBorrado } from "./hooks/revalidateHooks";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Tipo de equipo dentro de una marca (ej. "Excavadora" de CAT).
@@ -19,7 +20,10 @@ export const TipoEquipo: CollectionConfig = {
     defaultColumns: ["nombre", "marca", "slug"],
   },
   access: {
-    read: () => true,
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
   },
   // Unicidad del slug POR MARCA (no global): "excavadora" puede existir bajo
   // CAT y bajo Komatsu sin chocar. Ver justificación en el reporte del sprint.

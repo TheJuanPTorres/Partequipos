@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import {
   revalidarCategoriaLubricante,
   revalidarCategoriaLubricanteBorrada,
@@ -23,7 +24,12 @@ export const CategoriaLubricante: CollectionConfig = {
     defaultColumns: ["nombre", "marca", "slug"],
     group: "Lubricantes",
   },
-  access: { read: () => true },
+  access: {
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
+  },
   hooks: {
     afterChange: [revalidarCategoriaLubricante],
     afterDelete: [revalidarCategoriaLubricanteBorrada],

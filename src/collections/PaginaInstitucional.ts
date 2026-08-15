@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Páginas institucionales y legales (nosotros, contacto, servicio técnico,
@@ -26,7 +27,10 @@ export const PaginaInstitucional: CollectionConfig = {
       "Páginas fijas del sitio. El slug es la ruta completa y no debe cambiarse: son URLs indexadas.",
   },
   access: {
-    read: () => true,
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
   },
   hooks: {
     // Lado inverso del guardarraiz: una pagina no puede tapar un articulo del

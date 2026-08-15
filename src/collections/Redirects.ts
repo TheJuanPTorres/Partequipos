@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { normalizarRuta } from "../lib/redirects/normalizar";
+import { soloAdmin, soloPersonal } from "../lib/seguridad/acceso";
 import { aplanarCadenas, marcarDestinoSinVerificar, validarRedirect } from "./hooks/redirectHooks";
 
 /**
@@ -23,9 +24,25 @@ export const Redirects: CollectionConfig = {
     description:
       "Redirecciones de URLs antiguas hacia las vigentes. Evita perder posicionamiento cuando una URL cambia.",
   },
+  /*
+   * NO son públicas.
+   *
+   * Antes eran `read: () => true`, lo que exponía el mapa completo de
+   * redirecciones —incluidas las notas internas— en `GET /api/redirects`. No es
+   * un dato personal, pero sí información de estructura que no aporta nada al
+   * visitante.
+   *
+   * El proxy NO se ve afectado: consulta el mapa por `/api/redirects-map`, que
+   * usa la API local con `overrideAccess: true`.
+   *
+   * Escritura solo de administrador: un redirect mal puesto es peor que un 404
+   * y afecta al posicionamiento de todo el sitio.
+   */
   access: {
-    // El proxy las consulta a través de una ruta interna; no se exponen a escritura pública.
-    read: () => true,
+    read: soloPersonal,
+    create: soloAdmin,
+    update: soloAdmin,
+    delete: soloAdmin,
   },
   hooks: {
     beforeValidate: [validarRedirect, marcarDestinoSinVerificar],

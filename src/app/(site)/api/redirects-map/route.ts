@@ -14,7 +14,24 @@ import { getPayload } from "payload";
  */
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(peticion: Request) {
+  /*
+   * HIGIENE, NO AUTENTICACIÓN. Que quede claro: esta cabecera la puede poner
+   * cualquiera, así que no protege de nadie que se lo proponga.
+   *
+   * Lo que sí hace es que el mapa de redirects deje de ser recogido por
+   * rastreadores y escáneres que piden rutas de API a ciegas. El contenido
+   * tampoco es secreto —cualquiera puede descubrir un redirect pidiendo la URL
+   * antigua—, pero enumerarlo entero de una vez no aporta nada a un visitante.
+   *
+   * Protegerlo de verdad exigiría un secreto compartido con el proxy, y eso es
+   * una variable de entorno más y un modo de fallo más para una ruta que se
+   * llama una vez por minuto. No compensa.
+   */
+  if (peticion.headers.get("x-proxy-internal") !== "1") {
+    return NextResponse.json({ redirects: [] }, { status: 403 });
+  }
+
   try {
     const payload = await getPayload({ config });
     const { docs } = await payload.find({

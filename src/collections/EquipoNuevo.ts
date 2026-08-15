@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarEquipoNuevo, revalidarEquipoNuevoBorrado } from "./hooks/maquinariaHooks";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Ficha de un equipo de la línea NUEVA. Es una página de **venta**, no una
@@ -19,7 +20,12 @@ export const EquipoNuevo: CollectionConfig = {
     defaultColumns: ["nombre", "marca", "tipo", "slug"],
     group: "Maquinaria",
   },
-  access: { read: () => true },
+  access: {
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
+  },
   hooks: { afterChange: [revalidarEquipoNuevo], afterDelete: [revalidarEquipoNuevoBorrado] },
   // Unicidad por tipo; el tipo ya implica una marca. Igual que en repuestos.
   indexes: [{ fields: ["tipo", "slug"], unique: true }],

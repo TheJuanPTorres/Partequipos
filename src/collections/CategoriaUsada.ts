@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarCategoriaUsada, revalidarCategoriaUsadaBorrada } from "./hooks/maquinariaHooks";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Categorías de la línea USADA: las 9 rutas indexadas bajo
@@ -21,7 +22,12 @@ export const CategoriaUsada: CollectionConfig = {
     defaultColumns: ["nombre", "slug"],
     group: "Maquinaria",
   },
-  access: { read: () => true },
+  access: {
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
+  },
   hooks: { afterChange: [revalidarCategoriaUsada], afterDelete: [revalidarCategoriaUsadaBorrada] },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },

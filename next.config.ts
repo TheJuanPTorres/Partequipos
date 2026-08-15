@@ -33,13 +33,58 @@ const nextConfig: NextConfig = {
    * tres se activan y desactivan juntas con el mismo valor.
    */
   async headers() {
-    if (process.env.NEXT_PUBLIC_PERMITIR_INDEXACION?.trim().toLowerCase() === "true") {
-      return [];
-    }
+    /*
+     * CABECERAS DE SEGURIDAD.
+     *
+     * Se aplican las que no pueden romper nada. La política de contenido (CSP)
+     * NO está aquí a propósito: ver la nota al final.
+     */
+    const seguridad = [
+      /*
+       * Impide que el navegador «adivine» el tipo de un fichero. Sin esto, un
+       * fichero subido a Media que el navegador interprete como HTML podría
+       * ejecutarse en nuestro dominio.
+       */
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      /*
+       * Al salir del sitio se envía solo el origen, no la URL completa. Importa
+       * porque hay URLs internas del panel y rutas de fichas que no tienen por
+       * qué llegar a terceros.
+       */
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      /*
+       * El sitio no usa cámara, micrófono ni geolocalización. Declararlo cierra
+       * la puerta a que lo haga un script de terceros que entre más adelante.
+       */
+      {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+      },
+      /*
+       * Sustituye a X-Frame-Options, que está obsoleto. `SAMEORIGIN` en vez de
+       * `DENY` porque el panel usa iframes para la vista previa de documentos.
+       */
+      { key: "X-Frame-Options", value: "SAMEORIGIN" },
+      /*
+       * HSTS. Solo tiene efecto sobre HTTPS, así que en local es inocuo.
+       *
+       * SIN `preload` y SIN `includeSubDomains` deliberadamente: los dos son
+       * difíciles de revertir —el preload exige darse de baja en una lista de
+       * navegadores y esperar meses— y el cliente todavía puede tener
+       * subdominios sirviendo por HTTP que desconocemos. Un año de max-age da
+       * la protección; ampliarlo es una decisión posterior e informada.
+       */
+      { key: "Strict-Transport-Security", value: "max-age=31536000" },
+    ];
+
+    const indexable = process.env.NEXT_PUBLIC_PERMITIR_INDEXACION?.trim().toLowerCase() === "true";
+
     return [
       {
         source: "/:path*",
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+        headers: indexable
+          ? seguridad
+          : [...seguridad, { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
       },
     ];
   },

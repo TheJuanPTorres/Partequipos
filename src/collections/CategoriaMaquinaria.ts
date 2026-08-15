@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarCategoriaNueva, revalidarCategoriaNuevaBorrada } from "./hooks/maquinariaHooks";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Categorías transversales de la línea NUEVA
@@ -24,7 +25,12 @@ export const CategoriaMaquinaria: CollectionConfig = {
     defaultColumns: ["nombre", "slug"],
     group: "Maquinaria",
   },
-  access: { read: () => true },
+  access: {
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
+  },
   hooks: { afterChange: [revalidarCategoriaNueva], afterDelete: [revalidarCategoriaNuevaBorrada] },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },

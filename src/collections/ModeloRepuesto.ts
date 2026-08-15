@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarModelo, revalidarModeloBorrado } from "./hooks/revalidateHooks";
+import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
 /**
  * Modelo concreto dentro de un tipo de equipo (ej. "CAT 320D" en Excavadora).
@@ -19,7 +20,10 @@ export const ModeloRepuesto: CollectionConfig = {
     defaultColumns: ["nombre", "marca", "tipo", "slug"],
   },
   access: {
-    read: () => true,
+    read: publico,
+    create: escrituraContenido,
+    update: escrituraContenido,
+    delete: borradoAdmin,
   },
   // Unicidad del slug POR TIPO (el tipo ya implica una marca). Ver reporte.
   indexes: [{ fields: ["tipo", "slug"], unique: true }],

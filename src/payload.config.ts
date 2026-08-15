@@ -27,6 +27,7 @@ import { Solicitud } from "./collections/Solicitud";
 import { TipoEquipo } from "./collections/TipoEquipo";
 import { TipoMaquinaria } from "./collections/TipoMaquinaria";
 import { Users } from "./collections/Users";
+import { seoConfig } from "./lib/seo/config";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -57,6 +58,27 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    /*
+     * Identidad del cliente en el panel. Verificado contra la documentación
+     * vigente de Payload 3 (`admin/metadata` y `custom-components/root-components`):
+     * `meta` acepta title, description, titleSuffix, icons y openGraph, y las
+     * gráficas se sustituyen por RUTA DE FICHERO, no por import — el panel las
+     * resuelve por su cuenta a través del import map.
+     */
+    meta: {
+      title: "Panel",
+      titleSuffix: "· Partequipos",
+      description: "Gestión de contenido de partequipos.com",
+      icons: [{ rel: "icon", type: "image/png", url: seoConfig.logoPath }],
+      // El panel nunca debe indexarse, esté abierto el sitio o no.
+      robots: "noindex, nofollow",
+    },
+    components: {
+      graphics: {
+        Logo: "/components/admin/Logo",
+        Icon: "/components/admin/Icon",
+      },
     },
   },
   collections: [

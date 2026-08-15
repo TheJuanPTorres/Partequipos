@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { notificarSolicitud } from "./hooks/notificarSolicitud";
+import { escrituraContenido, soloAdmin, soloPersonal } from "../lib/seguridad/acceso";
 
 /**
  * Solicitudes enviadas desde los formularios públicos: el lead comercial, que es
@@ -27,11 +28,11 @@ export const Solicitud: CollectionConfig = {
   /*
    * CONTROL DE ACCESO — el punto delicado de esta colección.
    *
-   * `read: false` cierra la API REST y GraphQL a cualquiera que no esté
+   * `read: soloPersonal` cierra la API REST y GraphQL a cualquiera que no esté
    * autenticado. Sin esto, `GET /api/solicitudes` devolvería el listado de leads
    * con nombres, correos y teléfonos a quien lo pidiera: el resto de colecciones
-   * son `read: () => true` precisamente porque son catálogo público, y copiar
-   * ese patrón aquí sería una fuga de datos personales.
+   * son de lectura pública precisamente porque son catálogo, y copiar ese patrón
+   * aquí sería una fuga de datos personales.
    *
    * `create: false` cierra la creación por API pública. Los formularios NO pasan
    * por ahí: usan la API local de Payload desde una Server Action, y la API
@@ -42,10 +43,12 @@ export const Solicitud: CollectionConfig = {
    * marca una solicitud como atendida desde /admin.
    */
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: soloPersonal,
     create: () => false,
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
+    update: escrituraContenido,
+    // Borrar un lead es irreversible: solo administrador. Para el trabajo
+    // diario basta con marcarlo "atendida".
+    delete: soloAdmin,
   },
 
   fields: [

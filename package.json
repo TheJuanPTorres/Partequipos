@@ -36,7 +36,9 @@
     "backup:verify": "tsx scripts/backup/verificar-restauracion.ts",
     "backup:prune": "tsx scripts/backup/podar.ts",
     "backup:blob": "payload run scripts/backup/inventario-blob.ts",
-    "qa": "tsx scripts/qa/verificar.ts"
+    "qa": "tsx scripts/qa/verificar.ts",
+    "rol": "payload run scripts/usuarios/asignar-rol.ts",
+    "rol:admin": "payload run scripts/usuarios/asignar-rol.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.86.0",

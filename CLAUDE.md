@@ -14,7 +14,12 @@ repuestos y servicios para el mercado colombiano.
 **El objetivo del negocio es el tráfico orgánico.** Todo lo demás es secundario.
 Cualquier decisión técnica que comprometa el SEO es una decisión incorrecta.
 
-Volumen: ~470 URLs públicas, generadas desde ~22 componentes de ruta.
+Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
+
+> Las 648 son **medidas** por rastreo propio del sitio en producción, no
+> estimadas (ver §10.1). Este número decía «~470» hasta el 2026-09-13: era la
+> cifra de los documentos de alcance del cliente, que subcontaban. Donde un
+> documento del cliente y una medición discrepen, **manda la medición**.
 
 ---
 
@@ -620,6 +625,44 @@ base poblada fallaría igual.
 > **Pendiente:** pasar a fase 2 (quitar `-Report-Only`) tras unos días sin
 > violaciones nuevas, y evaluar los nonces como trabajo aparte si el cliente
 > quiere endurecerlo de verdad.
+
+### 10.17 INCIDENTE 2026-09-13 — la migración de roles dejó las bases SIN ADMINISTRADOR
+
+> **Qué pasó.** La migración `20260815_043632_roles_usuarios` añadió el campo con
+> `ALTER TABLE "users" ADD COLUMN "rol" ... DEFAULT 'editor' NOT NULL`. Las
+> cuentas que **ya existían** —la de producción y la de desarrollo— quedaron por
+> tanto como **editor**.
+>
+> Consecuencia, medida con `npm run rol`: **0 administradores**. Nadie podía
+> crear usuarios, borrar nada ni gestionar redirects. Y tampoco ascenderse,
+> porque `rol` solo lo escribe un administrador (acceso de campo). Es decir, la
+> interfaz quedó **sin salida**.
+>
+> **Por qué no lo vi al implementarlo.** La verificación de roles creó sus dos
+> usuarios de prueba **desde un script**, asignándoles el rol explícitamente. Esa
+> prueba no pasaba nunca por el camino real: «una cuenta que ya existía antes de
+> la migración». Probé los permisos, no la migración de datos.
+>
+> **Arreglo estructural — hook `primerUsuarioEsAdministrador`.** El primer
+> usuario de una base vacía se crea como administrador. Va en `beforeChange` y no
+> ampliando el acceso del campo: así el valor lo pone el servidor y no depende de
+> lo que mande el cliente. Verificado por el camino real
+> (`POST /api/users/first-register` contra una base recién migrada): primer
+> usuario → **administrador**; segundo → **editor**.
+>
+> **Vía de rescate — `npm run rol`.** Lista los usuarios y sus roles, avisa en
+> grande si no hay ningún administrador y da el comando exacto para arreglarlo.
+> Usa la API local, que ignora el control de acceso: es la única forma de salir
+> cuando el panel ya no puede.
+>
+> **La lección, que es de familia conocida:** al añadir un campo obligatorio con
+> valor por defecto hay que preguntarse **qué les pasa a las filas que ya
+> existen**. El `DEFAULT` de una migración no es una decisión de esquema, es una
+> decisión de datos — y aquí decidió dejar el sistema sin administradores.
+>
+> Encaja con §10.14 y §10.15: se probó lo nuevo y no la transición. Allí se
+> midió el HTML en vez de la página, y el código HTTP en vez del efecto; aquí, el
+> permiso en vez de la migración que lo reparte.
 
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 

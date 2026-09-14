@@ -8,6 +8,7 @@ import {
   soloAdmin,
 } from "../lib/seguridad/acceso";
 import { validarPassword } from "../lib/seguridad/password";
+import { primerUsuarioEsAdministrador } from "./hooks/primerUsuario";
 
 /**
  * Colección de autenticación que protege el panel `/admin` (CLAUDE.md §8).
@@ -57,6 +58,9 @@ export const Users: CollectionConfig = {
   },
 
   hooks: {
+    // Una base vacía debe acabar con un administrador, no con un editor
+    // incapaz de administrar nada. Ver el hook.
+    beforeChange: [primerUsuarioEsAdministrador],
     /*
      * Política de contraseñas. Payload no trae longitud mínima configurable
      * (revisado `IncomingAuthType` en la versión instalada), así que se valida

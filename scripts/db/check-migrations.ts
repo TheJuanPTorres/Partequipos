@@ -70,6 +70,18 @@ async function main(): Promise<number> {
       return 0;
     }
 
+    /*
+     * Se imprime SIEMPRE contra qué base se está comprobando.
+     *
+     * Este guardián se ejecuta justo antes de migrar y de sembrar, y la
+     * confusión de entorno es el error que más caro sale en este proyecto
+     * (ver CLAUDE.md §10.9). Saber el host de un vistazo lo previene.
+     */
+    const u = new URL(connectionString);
+    console.log(`BASE DE DATOS: ${u.hostname}`);
+    console.log(`Nombre       : ${u.pathname.slice(1)}
+`);
+
     const { rows } = await pool.query<{ name: string; batch: number }>(
       "select name, batch from payload_migrations order by id",
     );

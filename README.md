@@ -23,20 +23,22 @@ administrador.
 
 ### Comandos
 
-| Comando                   | Qué hace                                                 |
-| ------------------------- | -------------------------------------------------------- |
-| `npm run dev`             | Servidor de desarrollo                                   |
-| `npm run build`           | Compilación de producción                                |
-| `npm start`               | Sirve la compilación de producción                       |
-| `npm run lint`            | ESLint                                                   |
-| `npm run typecheck`       | `tsc --noEmit`                                           |
-| `npm test`                | Tests unitarios (`node:test`)                            |
-| `npm run format`          | Prettier                                                 |
-| `npm run generate:types`  | Regenera `src/payload-types.ts` tras tocar una colección |
-| `npm run import`          | Importa los CSV de `scripts/import/data` (idempotente)   |
-| `npm run crawl`           | Rastrea el sitio actual y actualiza `docs/url-map.csv`   |
-| `npm run migrate*`        | Migraciones de base de datos (ver §3)                    |
-| `npm run redirects:check` | Verifica que el destino de cada redirect resuelva        |
+| Comando                   | Qué hace                                                   |
+| ------------------------- | ---------------------------------------------------------- |
+| `npm run dev`             | Servidor de desarrollo                                     |
+| `npm run build`           | Compilación de producción                                  |
+| `npm start`               | Sirve la compilación de producción                         |
+| `npm run lint`            | ESLint                                                     |
+| `npm run typecheck`       | `tsc --noEmit`                                             |
+| `npm test`                | Tests unitarios (`node:test`)                              |
+| `npm run format`          | Prettier                                                   |
+| `npm run generate:types`  | Regenera `src/payload-types.ts` tras tocar una colección   |
+| `npm run import`          | Importa los CSV de `scripts/import/data` (idempotente)     |
+| `npm run crawl`           | Rastrea el sitio actual y actualiza `docs/url-map.csv`     |
+| `npm run migrate*`        | Migraciones de base de datos (ver §3)                      |
+| `npm run redirects:check` | Verifica que el destino de cada redirect resuelva          |
+| `npm run rol`             | Lista usuarios y roles; avisa si no hay administrador      |
+| `npm run qa`              | Verifica todas las URLs del sitemap (estado, SEO, enlaces) |
 
 > **Importante:** `npm run build` **no** ejecuta el linter (cambió en Next 16).
 > El control de calidad son comandos separados: `lint`, `typecheck`, `format:check`
@@ -480,8 +482,28 @@ propio perfil no puede cambiárselo: el intento se descarta en silencio y el rol
 se queda como estaba.
 
 > **El primer usuario** se crea desde `/admin` la primera vez que se levanta una
-> base vacía, sin estar autenticado. A partir de ahí, solo un administrador crea
-> cuentas. Asegúrate de que ese primero sea **administrador**.
+> base vacía, sin estar autenticado. **Se crea como administrador
+> automáticamente**; a partir de ahí, solo un administrador crea cuentas.
+
+#### Si te quedas sin administrador
+
+El campo **Rol** solo lo escribe un administrador, así que una base sin ninguno
+**no se puede arreglar desde el panel**. Para eso está el script de rescate, que
+usa la API local y no pasa por el control de acceso:
+
+```powershell
+npm run rol                                   # lista usuarios y roles
+$env:ROL_EMAIL = "persona@empresa.com"
+npm run rol:admin                             # la pone administrador
+```
+
+`npm run rol` avisa en grande cuando no hay ningún administrador y ya imprime el
+comando exacto para arreglarlo. Enseña **siempre** contra qué base actúa:
+compruébalo antes de confiar en el resultado.
+
+Pasó de verdad el 2026-09-13: la migración que añadió `rol` lo hizo con
+`DEFAULT 'editor'`, así que las cuentas que ya existían quedaron como editores y
+las dos bases se quedaron sin administrador. Ver CLAUDE.md §10.17.
 
 ### 10.3 Contraseñas
 

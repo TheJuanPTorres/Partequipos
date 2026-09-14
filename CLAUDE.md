@@ -239,6 +239,8 @@ definitiva de base de datos (bloqueado por el cliente).
 | Revisar el modo oscuro con el diseño puesto        | §10.14     |
 | Pasar la CSP a fase 2 y evaluar los nonces         | §10.16     |
 | Desacoplar `sharp` del arranque de Payload         | §10.19     |
+| Prueba de humo automática post-despliegue          | §10.20     |
+| Separar variables de entorno Production/Preview    | §10.21     |
 
 ### 10.1 Inventario real (fuente de verdad)
 
@@ -777,6 +779,108 @@ condiciones que el roto** (mismo CLI, sin caché) antes de tocar el alias. Así 
 > primero levantar producción. **Queda pendiente de decidir**, y el argumento a
 > favor es más fuerte ahora que antes, porque ya sabemos que el modo de fallo no
 > es hipotético: ocurrió, y sin que cambiara nada en el repositorio.
+
+### 10.20 LECCIÓN — ninguna de nuestras verificaciones toca la aplicación desplegada
+
+> **El hecho desnudo del incidente §10.18:** el despliegue roto pasó **todas**
+> nuestras puertas de calidad. `typecheck`, `lint`, `format` y las **198
+> pruebas** en verde; el propio `next build` **compiló, tipó y prerenderizó 118
+> páginas sin un error**. Y `/admin`, la API REST, el sitemap y el mapa de
+> redirects devolvían 500 en cuanto llegaba una petición.
+>
+> No fue mala suerte: **es lo que nuestras comprobaciones pueden ver.**
+
+| Comprobación                | Qué mira                    | Corre                |
+| --------------------------- | --------------------------- | -------------------- |
+| `typecheck`, `lint`, `test` | el **código fuente**        | automático, en CI    |
+| `next build`                | que el código **compile**   | automático, en build |
+| `npm run qa`                | el **HTML servido**         | **a mano**           |
+| _(nada)_                    | el **lambda ya desplegado** | —                    |
+
+Las tres primeras se ejecutan **antes** de que exista el paquete serverless, así
+que por construcción no pueden ver un fallo que solo existe dentro de él. La
+cuarta sí mira el sitio desplegado, y es la única que habría detectado esto —
+pero **solo se corre cuando alguien se acuerda**, y en el despliegue roto nadie
+la corrió. El hueco no es que falte una herramienta: es que **la única que mira
+el sitio real no está enganchada a nada**.
+
+Y hay un agravante descubierto al separar las variables de entorno: `qa` lee el
+sitemap, y el sitemap sale de `NEXT_PUBLIC_SERVER_URL`, que hoy es la misma en
+Production y Preview. **`npm run qa` contra un preview mide producción sin
+avisar.** El preview del arreglo se verificó ruta a ruta, no con `qa`; de haberlo
+usado, habría dado verde midiendo otra cosa.
+
+**Familia conocida.** §10.14 midió el HTML de origen en vez de la página
+pintada. §10.15 midió el código HTTP en vez del efecto en la base. §10.17 probó
+el permiso nuevo en vez de la migración que lo reparte. Aquí se mide **el código
+en vez del despliegue**. Cuatro veces el mismo patrón: **la señal fácil está un
+paso antes de donde ocurre el fallo.**
+
+#### Comprobación mínima que cerraría el hueco (PROPUESTA — no implementada)
+
+Una prueba de humo **contra la URL desplegada**, disparada **automáticamente**
+al terminar cada despliegue —preview incluido—, que pida las rutas que solo
+fallan en tiempo de petición y exija 200:
+
+| Ruta                  | Por qué está en la lista                          |
+| --------------------- | ------------------------------------------------- |
+| `/admin/`             | carga la config de Payload; es lo que cayó        |
+| `/api/marcas/`        | API REST contra la base                           |
+| `/sitemap.xml`        | ruta dinámica con consulta                        |
+| `/api/redirects-map/` | con `x-proxy-internal: 1`; sostiene los redirects |
+| `/`                   | control: si esto cae, es otra cosa                |
+
+Cuatro propiedades que la hacen valer, y que son el motivo de la propuesta:
+
+1. **Ejercita el lambda**, no el código. Es el único nivel donde este fallo
+   existe.
+2. **Lista de rutas fija, escrita a mano. NO lee el sitemap** — leerlo es
+   justamente el agravante de arriba.
+3. **Corre también en preview**, así el fallo aparece antes de tocar el alias de
+   producción. Requiere atravesar la protección de despliegue
+   (`vercel curl`, o un token de derivación).
+4. **Falla ruidosa.** Nada de avisos en un registro que nadie lee.
+
+**Dónde engancharla.** Un workflow de GitHub Actions con el evento
+`deployment_status` que Vercel ya publica: no necesita plan Pro, vive fuera de
+Vercel —así que un fallo del propio Vercel no lo silencia— y reutiliza el
+`scripts/qa/` existente añadiéndole un modo de rutas fijas.
+
+**Lo que NO resuelve, para no venderla de más:** solo cubre las rutas de la
+lista, y solo el camino «responde 200». Un 200 con contenido equivocado seguiría
+pasando — que es §10.15 otra vez. Es una red para el fallo catastrófico, no una
+verificación funcional.
+
+**No implementada**: queda como propuesta pendiente de aprobación.
+
+### 10.21 PENDIENTE — variables de entorno compartidas entre Production y Preview
+
+> Descubierto el 2026-09-13 al arreglar §10.18. **Las cuatro variables del
+> proyecto están en `Production, Preview`**, y el procedimiento que salió de ese
+> incidente es «validar en preview antes de tocar producción» — así que esto pasó
+> de detalle a camino crítico: **un preview con una migración nueva aplicaría el
+> esquema a la base de PRODUCCIÓN**, porque el build corre `payload migrate`.
+
+| Variable                          | Acción                                | Por qué                                                                                                                        |
+| --------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_URI`                    | **Separar** · Preview = rama dedicada | Un preview migra la base a la que apunte                                                                                       |
+| `PAYLOAD_SECRET`                  | **Separar** · valor nuevo en Preview  | Firma las sesiones: compartido, un token de preview valida en producción                                                       |
+| `BLOB_READ_WRITE_TOKEN`           | **Separar** · segundo store           | Una subida desde preview escribe en el store de producción (§10.4)                                                             |
+| `NEXT_PUBLIC_SERVER_URL`          | **Compartida a propósito**            | Que el preview emita `canonical` de producción evita que un preview indexado duplique el sitio. Ver la trampa de abajo         |
+| Turnstile (2)                     | **Crear solo en Production**          | Sin clave se cae a las de prueba de Cloudflare, que aceptan cualquier token: es lo deseable en preview (§10.11)                |
+| Resend (3)                        | **Crear solo en Production**          | `SOLICITUDES_EMAIL_TO` cae al **correo público real del cliente**: con Resend en preview, cada prueba de formulario le escribe |
+| `NEXT_PUBLIC_PERMITIR_INDEXACION` | **Crear solo en Production**          | El día que se active para lanzar, en Preview haría **indexable cada preview** y duplicaría el sitio entero                     |
+
+**La rama de Preview debe partir de `production`, NO de `development`.**
+`development` usa push de esquema, así que lleva el marcador `dev` (batch −1) en
+`payload_migrations`, y contra ese marcador `payload migrate` abre el prompt
+interactivo de §10.9: sin stdin **sale con código 0 sin migrar**. El preview
+quedaría «Ready» con esquema viejo.
+
+**Trampa de `NEXT_PUBLIC_SERVER_URL`, que se acepta a cambio de la protección
+SEO:** el sitemap de un preview lista URLs de **producción**, y `npm run qa` lee
+el sitemap. **`npm run qa` contra un preview mide producción sin avisar.** Para
+verificar un preview hay que ir ruta a ruta. Ver §10.20.
 
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 

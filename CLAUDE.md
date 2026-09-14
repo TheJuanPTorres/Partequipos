@@ -238,6 +238,7 @@ definitiva de base de datos (bloqueado por el cliente).
 | Repetir la auditoría de rendimiento con el diseño  | §10.3 p.14 |
 | Revisar el modo oscuro con el diseño puesto        | §10.14     |
 | Pasar la CSP a fase 2 y evaluar los nonces         | §10.16     |
+| Desacoplar `sharp` del arranque de Payload         | §10.19     |
 
 ### 10.1 Inventario real (fuente de verdad)
 
@@ -663,6 +664,119 @@ base poblada fallaría igual.
 > Encaja con §10.14 y §10.15: se probó lo nuevo y no la transición. Allí se
 > midió el HTML en vez de la página, y el código HTTP en vez del efecto; aquí, el
 > permiso en vez de la migración que lo reparte.
+
+### 10.18 INCIDENTE 2026-09-13 — el suelo se movió sin que cambiara una línea
+
+> **Qué pasó.** `/admin`, la API REST, el sitemap y el mapa de redirects
+> devolvieron **500** en producción. El sitio público seguía en 200 porque sus
+> páginas están prerenderizadas: cayó todo lo que carga la config de Payload en
+> tiempo de petición.
+>
+> El error real, de los registros de runtime de Vercel:
+>
+> ```
+> Could not load the "sharp" module using the linux-x64 runtime
+> ERR_DLOPEN_FAILED: libvips-cpp.so.8.18.3: cannot open shared object file
+> ```
+>
+> `payload.config.ts` importa `sharp` y lo pasa a `buildConfig`, así que cargar
+> la config **es** cargar sharp.
+
+**La causa raíz: una biblioteca nativa invisible para el trazador.**
+
+Next decide qué ficheros entran en el paquete serverless con
+[`@vercel/nft`](https://github.com/vercel/nft), que —en palabras de la propia
+documentación— _analiza de forma estática `import`, `require` y `fs`_.
+
+El binario `@img/sharp-linux-x64/lib/sharp-linux-x64.node` **no requiere su
+libvips desde JavaScript**: lo enlaza el **enlazador dinámico del sistema
+operativo** por rpath. Ninguno de los tres mecanismos que nft inspecciona puede
+verlo. Resultado: el binario entra en el lambda y su biblioteca se queda fuera.
+De ahí la firma exacta del error — el `.node` **sí** cargó, y falló el `dlopen`
+de su dependencia.
+
+**Y el repositorio no cambió.** Mismo commit, mismo `package-lock.json`, misma
+versión de sharp (`0.35.3`, desde el 2026-07-28). Lo que cambió fue el **entorno
+de construcción**: Vercel pasó de **CLI 58.1.0** a **59.11.7**. El despliegue del
+2026-08-15 seguía sirviendo `/api/marcas/` en **200** mientras los nuevos daban
+500, con el mismo código.
+
+**El arreglo** (`next.config.ts`): `outputFileTracingIncludes` mete los ficheros
+a mano. Verificado contra Next 16.2.11 —no de memoria— en los tipos instalados y
+en `collect-build-traces.js`: es opción de **primer nivel** (no va bajo
+`experimental`), la clave se empareja con `picomatch` en modo **`contains`** (así
+que `"/*"` cubre todas las rutas con trazado) y los globs de valor se resuelven
+desde la raíz del proyecto.
+
+#### La primera hipótesis era plausible y era falsa
+
+Vale la pena dejarla escrita, porque la trampa era buena:
+
+El registro del build roto decía **`removed 6 packages in 1s`** tras
+`Restored build cache from previous deployment`, y **todo** el árbol de sharp
+está marcado `optional: true` en el lock —`@img/sharp-libvips-linux-x64` cuelga
+solo por vía opcional, dos veces—. Encajaba además con la nota §10.5, que ya nos
+había mordido con paquetes opcionales perdidos. Conclusión tentadora: el npm
+nuevo podó los binarios de Linux.
+
+**Qué la refutó, en dos medidas:**
+
+1. **Redespliegue sin caché de build.** Instalación fresca,
+   `added 697 packages`, mismo commit. **Error idéntico.** Si el podado fuera la
+   causa, una instalación desde cero lo habría arreglado.
+2. **Reproducción local de la instalación de Linux.** Con
+   `npm ci --os=linux --cpu=x64` aparece
+   `node_modules/@img/sharp-libvips-linux-x64/lib/libvips-cpp.so.8.18.3` — el
+   fichero exacto que el error dice que falta. **npm lo instala bien.**
+
+Las dos juntas mueven la culpa de npm al empaquetado: el `.so` **está** en la
+máquina de build y **no llega** al lambda.
+
+**La lección, generalizable:** una dependencia nativa que el **sistema
+operativo** enlaza es invisible para un trazador que lee `require`, y por tanto
+puede desaparecer del despliegue **sin que cambie una línea del repositorio**,
+porque el entorno de construcción se actualiza por debajo. El proyecto no se
+rompió; se rompió el suelo.
+
+Dos corolarios operativos:
+
+- **Nada en nuestras puertas de calidad lo detecta.** `typecheck`, `lint`,
+  `format`, las 198 pruebas y el propio `next build` pasaron en verde en el
+  despliegue roto. El build **compiló y prerenderizó 118 páginas sin un error**;
+  el fallo solo existe en tiempo de petición, dentro del lambda. Es la misma
+  familia que §10.14 y §10.15: medir la señal fácil en vez de la que importa.
+- **La sonda barata primero.** El redespliegue sin caché costó dos minutos y
+  refutó la hipótesis antes de escribir código. El arreglo que se iba a aplicar
+  sobre esa hipótesis —anclar los binarios como dependencias explícitas— habría
+  sido un **no-op con aspecto de arreglo**, que es peor que no tocar nada.
+
+**Procedimiento que funcionó, para repetirlo:** revertir el alias al último
+despliegue bueno (`vercel promote <url>`) para levantar producción **primero**,
+arreglar con calma después, y validar en un **preview construido en las mismas
+condiciones que el roto** (mismo CLI, sin caché) antes de tocar el alias. Así la
+única variable que cambia es el arreglo.
+
+### 10.19 Deuda técnica — sharp tumba medio sitio, y es un componente accesorio
+
+> `payload.config.ts` importa `sharp` en el nivel superior del módulo y lo pasa a
+> `buildConfig`. Consecuencia medida en el incidente §10.18: **un fallo de la
+> biblioteca de imágenes deja en 500 `/admin`, la API REST, el sitemap y el mapa
+> de redirects.**
+>
+> Eso es demasiado acoplamiento para lo que sharp hace aquí: redimensionar
+> imágenes al subirlas. Que no se pueda **leer** el catálogo porque no se puede
+> **redimensionar** una foto es una dependencia mal colocada.
+>
+> **Arreglo posible:** cargar sharp de forma tolerante y degradar a «sin
+> redimensionado» en vez de caer. Es **trabajo real**, no una línea: hay que ver
+> qué hace Payload cuando `sharp` falta —los tamaños derivados de `Media`
+> dependen de él— y decidir si una subida sin miniaturas es aceptable o debe
+> rechazarse con un mensaje claro.
+>
+> **No se implementó** en el arreglo del incidente, por decisión de dirección:
+> primero levantar producción. **Queda pendiente de decidir**, y el argumento a
+> favor es más fuerte ahora que antes, porque ya sabemos que el modo de fallo no
+> es hipotético: ocurrió, y sin que cambiara nada en el repositorio.
 
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 

@@ -23,6 +23,42 @@ const nextConfig: NextConfig = {
     ],
   },
   /*
+   * TRAZADO DE FICHEROS — mete la biblioteca nativa de sharp en el lambda.
+   *
+   * INCIDENTE 2026-09-13 (CLAUDE.md §10.18). Sin esto, /admin, la API REST, el
+   * sitemap y el mapa de redirects devuelven 500 en producción con:
+   *
+   *   ERR_DLOPEN_FAILED: libvips-cpp.so.8.18.3: cannot open shared object file
+   *
+   * POR QUÉ EL TRAZADO NO LO VE SOLO. Next traza con `@vercel/nft`, que analiza
+   * de forma estática `import`, `require` y `fs`. El binario
+   * `@img/sharp-linux-x64/lib/sharp-linux-x64.node` NO requiere su libvips desde
+   * JavaScript: lo enlaza el enlazador dinámico del sistema operativo por rpath.
+   * Ninguno de los tres mecanismos que nft inspecciona puede verlo, así que el
+   * binario entra en el paquete y su biblioteca se queda fuera.
+   *
+   * Verificado contra Next 16.2.11: `outputFileTracingIncludes` es de PRIMER
+   * NIVEL (no va bajo `experimental`); la clave se empareja con picomatch en
+   * modo `contains`, así que "/*" cubre todas las rutas con trazado; y los globs
+   * de valor se resuelven desde la raíz del proyecto.
+   *
+   * SOLO glibc-x64 a propósito: los lambda de Vercel son Amazon Linux x64, y
+   * añadir musl (18 MB) y wasm32 (9 MB) engordaría el paquete sin usarse. Los
+   * docs piden globs estrechos. CONTRAPARTIDA: si algún día el runtime pasa a
+   * arm64 o a musl, ESTO VUELVE A FALLAR IGUAL, con el mismo error. No es
+   * silencioso —tumba /admin— pero que quede escrito dónde mirar.
+   *
+   * En Windows el glob no encuentra nada y no pasa nada: el build local no usa
+   * estos paquetes.
+   */
+  outputFileTracingIncludes: {
+    "/*": [
+      "node_modules/sharp/**/*",
+      "node_modules/@img/sharp-linux-x64/**/*",
+      "node_modules/@img/sharp-libvips-linux-x64/**/*",
+    ],
+  },
+  /*
    * Bloqueo de indexación por cabecera HTTP.
    *
    * Es la tercera vía, junto a la metadata y robots.txt. Cubre lo que las otras

@@ -230,17 +230,18 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
 
-| Pendiente                                          | Referencia |
-| -------------------------------------------------- | ---------- |
-| Logo institucional fuera de `Media` (URL cableada) | §10.8      |
-| Separar los stores de Vercel Blob por entorno      | §10.4      |
-| Mitigaciones 2–4 de consultas en el build          | §10.10     |
-| Repetir la auditoría de rendimiento con el diseño  | §10.3 p.14 |
-| Revisar el modo oscuro con el diseño puesto        | §10.14     |
-| Pasar la CSP a fase 2 y evaluar los nonces         | §10.16     |
-| Desacoplar `sharp` del arranque de Payload         | §10.19     |
-| Prueba de humo automática post-despliegue          | §10.20     |
-| Separar variables de entorno Production/Preview    | §10.21     |
+| Pendiente                                            | Referencia |
+| ---------------------------------------------------- | ---------- |
+| Logo institucional fuera de `Media` (URL cableada)   | §10.8      |
+| Separar los stores de Vercel Blob por entorno        | §10.4      |
+| Mitigaciones 2–4 de consultas en el build            | §10.10     |
+| Repetir la auditoría de rendimiento con el diseño    | §10.3 p.14 |
+| Revisar el modo oscuro con el diseño puesto          | §10.14     |
+| Pasar la CSP a fase 2 y evaluar los nonces           | §10.16     |
+| Desacoplar `sharp` del arranque de Payload           | §10.19     |
+| Prueba de humo automática post-despliegue            | §10.20     |
+| Verificar el store de Blob de preview con una subida | §10.21     |
+| Redirects no validables en preview (proteccion)      | §10.22     |
 
 ### 10.1 Inventario real (fuente de verdad)
 
@@ -853,9 +854,44 @@ verificación funcional.
 
 **No implementada**: queda como propuesta pendiente de aprobación.
 
-### 10.21 PENDIENTE — variables de entorno compartidas entre Production y Preview
+### 10.21 RESUELTO — variables de entorno separadas por entorno
 
-> Descubierto el 2026-09-13 al arreglar §10.18. **Las cuatro variables del
+> **SEPARADO Y VERIFICADO el 2026-09-16.** `DATABASE_URI`, `PAYLOAD_SECRET` y
+> `BLOB_READ_WRITE_TOKEN` tienen ya valor distinto en Production y Preview, con
+> una rama de Neon `preview` clonada de `production` y un store de Blob nuevo.
+>
+> **Cómo se probó, sin exponer credenciales** (importa, porque las lecturas NO
+> sirven: la rama es un clon, así que los datos son idénticos y ninguna consulta
+> distingue una base de la otra — hace falta una **escritura**):
+>
+> 1. Se creó una `Marca` `prueba-aislamiento-borrar` desde el `/admin` del
+>    **preview**. Resultado: preview `/api/marcas/` **6 docs** y su página en
+>    **200**; producción **5 docs** y esa página en **404**.
+> 2. Con el Build Command corregido (ver abajo), `db:check` imprime el host en
+>    cada build — **solo el hostname, sin usuario ni contraseña**:
+>
+> | Entorno    | Host de Neon                                                    |
+> | ---------- | --------------------------------------------------------------- |
+> | Production | `ep-tiny-fog-awnwc8ie-pooler.c-12.us-east-1.aws.neon.tech`      |
+> | Preview    | `ep-withered-cell-awv8x9ki-pooler.c-12.us-east-1.aws.neon.tech` |
+>
+> Endpoints distintos, los dos **pooled** (§10.7), los dos con 8 migraciones y
+> sin marcador `dev`.
+>
+> **CORREGIDO TAMBIÉN — el Build Command de Vercel no era el documentado.** Era
+> `npm run migrate && npm run build`, así que **`db:check` no corría en ningún
+> build** y el guardián del marcador `dev` de §10.9 no estaba conectado, pese a
+> estar documentado como si lo estuviera. Ya es
+> `npm run deploy:migrate && npm run build`, verificado primero en preview.
+>
+> **Lo que sigue SIN verificar: el store de Blob.** Los registros de `media` del
+> preview vienen clonados y apuntan al store de **producción**, así que leer no
+> prueba nada: solo una **subida nueva** en el `/admin` del preview lo
+> demostraría, comprobando que la URL del fichero lleva otro subdominio de
+> `*.public.blob.vercel-storage.com`. Un **editor** puede subir (`create` es
+> `escrituraContenido`), no hace falta administrador.
+>
+> Contexto original del hallazgo, que conviene conservar: **Las cuatro variables del
 > proyecto están en `Production, Preview`**, y el procedimiento que salió de ese
 > incidente es «validar en preview antes de tocar producción» — así que esto pasó
 > de detalle a camino crítico: **un preview con una migración nueva aplicaría el
@@ -881,6 +917,68 @@ quedaría «Ready» con esquema viejo.
 SEO:** el sitemap de un preview lista URLs de **producción**, y `npm run qa` lee
 el sitemap. **`npm run qa` contra un preview mide producción sin avisar.** Para
 verificar un preview hay que ir ruta a ruta. Ver §10.20.
+
+### 10.22 Los redirects NO funcionan en ningún preview, y por qué costó verlo
+
+> Descubierto el 2026-09-16 al verificar la separación de entornos de §10.21.
+> **En cualquier despliegue con la protección de Vercel activada —es decir,
+> todos los preview— el mapa de redirects no se puede cargar.** Las páginas
+> siguen sirviendo 200 porque la degradación del proxy funciona, pero **ningún
+> redirect se aplica**.
+
+**Por qué.** `proxy.ts` pide el mapa con `fetch` a su propio despliegue
+(`${origin}/api/redirects-map/`, ADR 0005). Esa petición atraviesa la protección
+de despliegue igual que cualquier visitante: responde **302 hacia
+`vercel.com/sso-api`**. Comprobado:
+
+```
+HTTP 302 -> https://vercel.com/sso-api?url=...%2Fapi%2Fredirects-map%2F&nonce=...
+```
+
+**Dos fallos se tapaban entre sí.** `fetch` seguía la redirección hasta la página
+de login, que responde **200 con HTML**. Así que `respuesta.ok` salía `true` y el
+fallo aparecía mucho después, en el parseo:
+
+```
+[proxy] redirects no disponibles: SyntaxError: Unexpected token '<', "<!DOCTYPE "...
+```
+
+Un `SyntaxError` de JSON que no menciona la protección de despliegue ni el 302.
+**Arreglado** (`src/proxy.ts`): `redirect: "manual"`, más una comprobación de
+`content-type`. El mensaje ahora es `mapa de redirects: HTTP 302`.
+
+#### El casi-accidente: el arreglo obvio habría roto producción en silencio
+
+Poner `redirect: "manual"` **a secas** rompe los redirects en **producción**. El
+proxy pedía `/api/redirects-map` **sin barra final**, y con `trailingSlash: true`
+eso responde **308**:
+
+```
+GET /api/redirects-map   -> 308 -> /api/redirects-map/
+GET /api/redirects-map/  -> 200 application/json
+```
+
+Funcionaba solo porque `fetch` seguía ese 308 — una ida y vuelta de más en cada
+refresco del mapa. Al dejar de seguir redirecciones, el 308 se habría convertido
+en error y **los redirects habrían muerto en producción sin que nada avisara**,
+porque la degradación del proxy los oculta tras un 200.
+
+Por eso el arreglo son **dos** cambios: la barra final **y** `redirect: "manual"`.
+Se detectó midiendo la ruta sin barra antes de escribir el código, no después.
+
+#### Corrección a la prueba de humo propuesta en §10.20
+
+La propuesta incluía `/api/redirects-map/` entre las rutas a verificar. Al
+probarla en un preview con `vercel curl` **dio 200** — porque `vercel curl`
+**inyecta el token de derivación de la protección**, que el proxy real no tiene.
+Es decir: la prueba habría dado **verde midiendo un camino privilegiado que el
+llamante real no puede usar**. Es §10.15 otra vez, dentro de la propia
+herramienta de verificación.
+
+**Consecuencia para el procedimiento de §10.18** («validar en preview antes de
+tocar producción»): **la ruta de redirects no se puede validar en un preview.**
+Hay que verificarla en producción tras promocionar, o resolver antes la
+derivación de la protección para las peticiones internas.
 
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 

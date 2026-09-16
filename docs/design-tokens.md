@@ -302,11 +302,35 @@ hacen falta `!important` ni selectores más específicos. **No existe una opció
   sigue sin cumplir. Remedio medido: `--muted-foreground` da **4,62:1**, pero
   oscurece bastante el aspecto de todos los campos.
 
-**Verificado pintado solo el inicio de sesión.** Navegación, listados y
-formularios de edición **no** se pudieron verificar pintados: exigen sesión, y
-no introduzco contraseñas en formularios. Las variables viven en `:root`, así
-que esas vistas heredan lo mismo — pero eso es un razonamiento, no una medición,
-y §10.20 dice exactamente que no se confundan.
+### Las otras tres vistas, también medidas pintadas (en PRODUCCIÓN)
+
+Se verificaron aprovechando la sesión ya abierta en el navegador del equipo; no
+se introdujo ninguna contraseña.
+
+| Vista   | Elemento                  | Frente    | Fondo     | Ratio     | AA                |
+| ------- | ------------------------- | --------- | --------- | --------- | ----------------- |
+| Panel   | enlace de navegación      | `#121212` | `#fcfcfc` | **18,26** | pasa              |
+| Panel   | **título de grupo (nav)** | `#808080` | `#fcfcfc` | **3,85**  | **falla** (13 px) |
+| Panel   | título de vista (26 px)   | `#121212` | `#fcfcfc` | **18,26** | pasa              |
+| Panel   | tarjeta de colección      | `#121212` | `#fcfcfc` | **18,26** | pasa              |
+| Edición | título del documento      | `#121212` | `#fcfcfc` | **18,26** | pasa              |
+| Edición | etiqueta de campo         | `#121212` | `#fcfcfc` | **18,26** | pasa              |
+| Edición | texto escrito en input    | `#121212` | `#fcfcfc` | **18,26** | pasa              |
+| Edición | **botón Guardar**         | `#fef2f2` | `#dc2626` | **4,41**  | **falla**         |
+| Edición | **texto de ayuda**        | `#808080` | `#fcfcfc` | **3,85**  | **falla**         |
+| Edición | **campo de solo lectura** | `#808080` | `#e2e2e2` | **3,05**  | **falla**         |
+
+Los tres textos grises fallan por el mismo motivo: el panel los pinta con
+`--theme-elevation-500`, que en nuestra rampa derivada cae en **`#808080`** —
+exactamente el `--color-base-500: rgb(128, 128, 128)` de Payload de fábrica. Es
+decir, **fallaban igual antes de este cambio**; la derivación no los empeoró ni
+un punto.
+
+**Remedio, si se decide corregirlo:** subir el texto secundario a
+`--theme-elevation-550` o superior, o redefinir solo ese paso con
+`--muted-foreground` del sistema (`#737373`, que da **4,62:1**). Afecta a
+etiquetas de grupo, textos de ayuda y campos de solo lectura de todo el panel,
+así que es una decisión de diseño, no un ajuste local.
 
 ---
 

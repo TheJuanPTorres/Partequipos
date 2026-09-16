@@ -1,0 +1,217 @@
+/* =========================================================================
+ * SISTEMA DE DISEÑO DE PARTEQUIPOS APLICADO AL PANEL
+ *
+ * Fuente de los valores: docs/design-tokens.md. Se extrajeron del CSS
+ * compilado de https://ui.partequipos.com (no del HTML renderizado) y se
+ * verificaron leyendo getComputedStyle sobre esa misma página.
+ *
+ * MECANISMO. Payload declara todo su tema dentro de @layer payload-default.
+ * Este fichero se importa DESPUÉS de @payloadcms/next/css en
+ * (payload)/layout.tsx y va SIN capa, y el CSS sin capa gana a cualquier capa
+ * con independencia de la especificidad. Por eso basta redeclarar las
+ * variables: no hacen falta !important ni selectores más específicos.
+ *
+ * ALCANCE: solo el panel. El sitio público no se toca (lo entrega un tercero).
+ * ========================================================================= */
+
+/* -------------------------------------------------------------------------
+ * 0. FUENTES, ALOJADAS EN NUESTRO PROPIO ORIGEN
+ *
+ * Los ficheros son los subconjuntos LATINOS que sirve el propio sistema de
+ * diseño, copiados a public/fonts/. Se alojan aquí, y no se enlazan a
+ * ui.partequipos.com, por dos motivos: la CSP declara `font-src 'self' data:`
+ * (enlazar fuera exigiría abrirla, que es una decisión de seguridad aparte), y
+ * una fuente de terceros añade un dominio del que depende el panel.
+ *
+ * `next/font` habría sido la vía idiomática, pero exige tocar
+ * (payload)/layout.tsx, que Payload marca como generado automáticamente y
+ * advierte que puede reescribir. Ver docs/design-tokens.md.
+ *
+ * Ambas son variables (un solo fichero cubre todos los pesos) y van con
+ * `font-display: swap`, igual que en el sistema original.
+ * ----------------------------------------------------------------------- */
+@font-face {
+  font-family: "Rubik";
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url("/fonts/rubik-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/geist-mono-latin.woff2") format("woff2");
+}
+
+/* -------------------------------------------------------------------------
+ * 1. TOKENS DEL SISTEMA, COPIADOS TAL CUAL
+ *
+ * En OKLCH, que es el espacio en el que están autorizados. Los valores son los
+ * que calcula el motor de color del navegador a partir del lab() que sirve el
+ * bundle del sistema; el hex del comentario es su renderizado en sRGB, medido.
+ * Ver docs/design-tokens.md para la advertencia sobre esa conversión.
+ * ----------------------------------------------------------------------- */
+:root {
+  --pq-background: oklch(0.9911 0 112.86); /* #fcfcfc */
+  --pq-foreground: oklch(0 0 0); /* #000000 */
+  --pq-primary: oklch(0.577 0.215 27.33); /* #dc2626 */
+  --pq-primary-foreground: oklch(0.971 0.013 17.49); /* #fef2f2 */
+  --pq-secondary: oklch(0.96 0 112.93); /* #f2f2f2 */
+  --pq-muted: oklch(0.9461 0 113.26); /* #ededed */
+  --pq-muted-foreground: oklch(0.556 0 112.25); /* #737373 */
+  --pq-border: oklch(0.9037 0 112.55); /* #dfdfdf */
+  --pq-input: oklch(0.922 0 112.84); /* #e5e5e5 */
+  --pq-destructive: oklch(0.577 0.245 27.33); /* #e7000b */
+  --pq-success: oklch(0.696 0.17 162.48); /* #00bc7d */
+  --pq-warning: oklch(0.769 0.188 70.08); /* #fe9a00 */
+  --pq-radius: 0.45rem; /* --radius del sistema */
+
+  /* Familias tal como las expone el sistema en --font-sans / --font-mono. */
+  --pq-font-sans: "Rubik";
+  --pq-font-mono: "Geist Mono";
+}
+
+/* -------------------------------------------------------------------------
+ * 2. RAMPA NEUTRA
+ *
+ * El panel deriva casi todas sus superficies de --theme-elevation-0..1000.
+ * El sistema de diseño NO publica una rampa de 21 pasos, así que inventarla
+ * sería inventar colores. En su lugar se conservan las POSICIONES de la rampa
+ * propia de Payload y se sustituyen sus EXTREMOS por los del sistema:
+ *
+ *   posicion(N)  = (255 - grisPayload(N)) / 255
+ *   elevation(N) = mezcla(foreground * posicion, background)
+ *
+ * Los grises de Payload (255, 245, 235, 221 ... 7, 0) están en
+ * @payloadcms/ui/dist/scss/colors.scss. Así cada paso es derivable de dos
+ * tokens extraídos mediante una fórmula escrita, no una elección estética.
+ * ----------------------------------------------------------------------- */
+$posiciones: (
+  0: 0,
+  50: 3.9,
+  100: 7.8,
+  150: 13.3,
+  200: 18.4,
+  250: 23.5,
+  300: 29,
+  350: 34.1,
+  400: 39.6,
+  450: 44.7,
+  500: 49.8,
+  550: 55.3,
+  600: 60.4,
+  650: 65.9,
+  700: 71,
+  750: 76.5,
+  800: 81.6,
+  850: 86.7,
+  900: 92.2,
+  950: 97.3,
+  1000: 100,
+);
+
+:root {
+  @each $paso, $pct in $posiciones {
+    --theme-elevation-#{$paso}: color-mix(
+      in oklab,
+      var(--pq-foreground) #{$pct}#{"%"},
+      var(--pq-background)
+    );
+  }
+
+  /* El borde del sistema es un token propio, no un paso de la rampa. */
+  --theme-border-color: var(--pq-border);
+  --theme-input-bg: var(--pq-background);
+
+  /* ---------------------------------------------------------------------
+   * FOCO. Payload usa por defecto 2px solid var(--theme-text).
+   *
+   * Se cambia a --pq-primary y NO a --pq-ring, que es lo que pediría la
+   * convención, por una razón medida: --pq-ring (#a1a1a1) da 2,52:1 contra el
+   * fondo y WCAG 1.4.11 exige 3:1 para indicadores no textuales.
+   * --pq-primary da 4,71:1. Desviación deliberada, documentada en
+   * docs/design-tokens.md.
+   * ------------------------------------------------------------------- */
+  --accessibility-outline: 2px solid var(--pq-primary);
+  --accessibility-outline-offset: 2px;
+
+  /* ---------------------------------------------------------------------
+   * TIPOGRAFÍA. Las familias las carga next/font en (payload)/layout.tsx, que
+   * expone --pq-font-sans y --pq-font-mono. Autoalojadas: no hay peticiones a
+   * terceros, así que la CSP (font-src 'self' data:) no se toca. El sistema no
+   * personaliza la escala tipográfica ni el espaciado —usa los de Tailwind v4—
+   * así que aquí tampoco se altera la del panel.
+   * ------------------------------------------------------------------- */
+  --font-body: var(--pq-font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--pq-font-mono), ui-monospace, monospace;
+
+  /* ---------------------------------------------------------------------
+   * RADIO. El sistema publica UN solo --radius: .45rem (7,2 px). Payload usa
+   * tres (3 / 4 / 8 px por defecto). Se derivan del token único con la misma
+   * progresión que usa shadcn, para no inventar valores:
+   *   s = radius - 4px  ·  m = radius - 2px  ·  l = radius
+   * ------------------------------------------------------------------- */
+  --style-radius-s: calc(var(--pq-radius) - 4px);
+  --style-radius-m: calc(var(--pq-radius) - 2px);
+  --style-radius-l: var(--pq-radius);
+}
+
+/* -------------------------------------------------------------------------
+ * 3. RAMPAS DE ESTADO
+ *
+ * Mismo criterio que la rampa neutra: el sistema publica UN valor por estado y
+ * el panel usa hasta 14 pasos. Se ancla el paso 500 al token exacto y el resto
+ * se deriva mezclando hacia el fondo (pasos claros) o hacia el texto (oscuros):
+ *
+ *   N <= 500 : mezcla(token * N/5 %, background)
+ *   N >  500 : mezcla(token * (100 - (N-500)/5) %, foreground)
+ *
+ * El success propio de Payload es AZUL; el del sistema es verde. Sustituirlo es
+ * justamente el objetivo.
+ * ----------------------------------------------------------------------- */
+$pasos-estado: 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850,
+  900, 950;
+
+:root {
+  @each $nombre, $token in (error: --pq-destructive, success: --pq-success, warning: --pq-warning) {
+    @each $paso in $pasos-estado {
+      @if $paso <= 500 {
+        --theme-#{$nombre}-#{$paso}: color-mix(
+          in oklab,
+          var(#{$token}) #{$paso * 0.2}#{"%"},
+          var(--pq-background)
+        );
+      } @else {
+        --theme-#{$nombre}-#{$paso}: color-mix(
+          in oklab,
+          var(#{$token}) #{100 - ($paso - 500) * 0.2}#{"%"},
+          var(--pq-foreground)
+        );
+      }
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------
+ * 4. ACCIÓN PRINCIPAL
+ *
+ * El botón primario de Payload se pinta con --theme-elevation-800, que es
+ * también el color del TEXTO del panel: redefinirlo pondría todo el texto en
+ * rojo. Así que la marca se aplica acotada a la clase del botón, que expone sus
+ * propias variables (@payloadcms/ui/dist/elements/Button/index.scss).
+ *
+ * AVISO DE CONTRASTE, medido: --pq-primary sobre --pq-primary-foreground da
+ * 4,41:1, por debajo del 4,5:1 que AA exige para texto normal. Es un valor del
+ * sistema del cliente, no nuestro, y corregirlo es decisión suya: con blanco
+ * puro sería 4,83:1. Registrado en docs/design-tokens.md.
+ * ----------------------------------------------------------------------- */
+.btn--style-primary {
+  --bg-color: var(--pq-primary);
+  --color: var(--pq-primary-foreground);
+  /* Hover derivado del propio token, no elegido a ojo. */
+  --hover-bg: color-mix(in oklab, var(--pq-primary) 85%, var(--pq-foreground));
+  --hover-color: var(--pq-primary-foreground);
+}

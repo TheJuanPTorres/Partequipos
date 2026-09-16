@@ -219,14 +219,15 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **DEL DISEÑADOR:**
 
-| Pendiente                                     | Nota                                                      |
-| --------------------------------------------- | --------------------------------------------------------- |
-| Paleta, tipografía y escala de espaciado      | La actual pasa AA pero cambiará entera                    |
-| Catálogo de componentes                       | Ver bloque G de `RUTA-DESARROLLO.md`                      |
-| Restricciones de peso y dimensiones de imagen | Sostiene los umbrales de rendimiento                      |
-| Decisión sobre modo oscuro                    | Hoy NO se soporta, a propósito (§10.14)                   |
-| Icono cuadrado para el favicon                | Alternativa al cliente si él no lo tiene (§10.3 15)       |
-| Menú plegable en móvil                        | Hoy no hay; si lo mete, revisar teclado y `aria-expanded` |
+| Pendiente                                     | Nota                                                                          |
+| --------------------------------------------- | ----------------------------------------------------------------------------- |
+| Color, tipografía y radio: **YA EXISTEN**     | Extraídos y medidos: `docs/design-tokens.md`                                  |
+| Escala tipográfica y espaciado                | **No los define el sistema**: usa los de Tailwind v4                          |
+| Catálogo de componentes                       | Ver bloque G de `RUTA-DESARROLLO.md`                                          |
+| Restricciones de peso y dimensiones de imagen | Sostiene los umbrales de rendimiento                                          |
+| Decisión sobre modo oscuro                    | El sitio NO lo soporta (§10.14). El sistema del cliente SÍ lo define completo |
+| Icono cuadrado para el favicon                | Alternativa al cliente si él no lo tiene (§10.3 15)                           |
+| Menú plegable en móvil                        | Hoy no hay; si lo mete, revisar teclado y `aria-expanded`                     |
 
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
 
@@ -242,6 +243,18 @@ definitiva de base de datos (bloqueado por el cliente).
 | Prueba de humo automática post-despliegue            | §10.20     |
 | Verificar el store de Blob de preview con una subida | §10.21     |
 | Redirects no validables en preview (proteccion)      | §10.22     |
+
+> **SISTEMA DE DISEÑO DEL CLIENTE (2026-09-16).** Existe en
+> `https://ui.partequipos.com` y sus tokens están extraídos, medidos y
+> documentados en **`docs/design-tokens.md`**, que es su fuente única. Aplicado
+> **solo al panel** (`src/app/(payload)/custom.scss`); el sitio público no se
+> tocó. Tres datos que cambian la conversación con el diseñador: el sistema
+> cubre **color, tipografía y radio** pero **no** escala ni espaciado (usa los de
+> Tailwind v4); el sitio público usa la misma arquitectura, así que pegar los
+> tokens es trivial, **pero las plantillas llevan 182 colores fijos de Tailwind
+> en 31 ficheros** y hasta sustituirlos no cambiaría casi nada; y **queda una
+> decisión pendiente de una línea** sobre el modo oscuro del panel
+> (docs/design-tokens.md §9).
 
 ### 10.1 Inventario real (fuente de verdad)
 

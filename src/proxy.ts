@@ -31,11 +31,42 @@ let cache: { mapa: Map<string, RedirectEntry>; expiraEn: number } | null = null;
 let cargaEnCurso: Promise<Map<string, RedirectEntry>> | null = null;
 
 async function cargarMapa(origin: string): Promise<Map<string, RedirectEntry>> {
-  const respuesta = await fetch(`${origin}/api/redirects-map`, {
+  /*
+   * DOS DETALLES QUE PARECEN COSMÉTICOS Y NO LO SON. Ver CLAUDE.md §10.22.
+   *
+   * 1. La barra final es OBLIGATORIA. El proyecto usa `trailingSlash: true`,
+   *    así que `/api/redirects-map` responde 308 hacia `/api/redirects-map/`.
+   *    Pedirla sin barra funcionaba solo porque `fetch` seguía la redirección:
+   *    era una ida y vuelta de más en cada refresco del mapa, y volvía
+   *    incompatible con el punto 2.
+   *
+   * 2. `redirect: "manual"` para NO seguir redirecciones. En un despliegue con
+   *    la protección de Vercel activada (todos los preview), esta petición
+   *    recibe un 302 hacia `vercel.com/sso-api`; siguiéndolo se llega a la
+   *    página de login, que responde **200 con HTML**. Es decir: `respuesta.ok`
+   *    salía `true` y el fallo se manifestaba mucho después como
+   *    `SyntaxError: Unexpected token '<'` de `JSON.parse`, que no dice nada de
+   *    la causa. Sin seguir la redirección, el 302 se ve tal cual.
+   */
+  const respuesta = await fetch(`${origin}/api/redirects-map/`, {
     headers: { "x-proxy-internal": "1" },
     cache: "no-store",
+    redirect: "manual",
   });
   if (!respuesta.ok) throw new Error(`mapa de redirects: HTTP ${respuesta.status}`);
+
+  /*
+   * Cinturón además del tirante: si algún día la protección responde 200 con
+   * HTML en vez de redirigir, esto lo dice con su nombre en vez de estallar en
+   * el parseo.
+   */
+  const tipo = respuesta.headers.get("content-type") ?? "";
+  if (!tipo.includes("application/json")) {
+    throw new Error(
+      `mapa de redirects: respuesta no-JSON (${tipo || "sin content-type"}); ` +
+        "probablemente la proteccion de despliegue de Vercel",
+    );
+  }
 
   const datos = (await respuesta.json()) as { redirects?: RedirectEntry[] };
   const mapa = new Map<string, RedirectEntry>();

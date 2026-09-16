@@ -69,6 +69,20 @@
   --pq-warning: oklch(0.769 0.188 70.08); /* #fe9a00 */
   --pq-radius: 0.45rem; /* --radius del sistema */
 
+  /*
+   * Escala de radios del sistema, copiada literalmente de la capa de tema de su
+   * bundle (@layer theme). Multiplicativa sobre --radius.
+   */
+  --pq-radius-md: calc(var(--pq-radius) * 0.8); /* 5,8 px */
+  --pq-radius-lg: var(--pq-radius); /* 7,2 px */
+  --pq-radius-xl: calc(var(--pq-radius) * 1.4); /* 10,1 px — ítems de menú */
+  --pq-radius-2xl: calc(var(--pq-radius) * 1.8); /* 13 px — campos, filas */
+  --pq-radius-4xl: calc(var(--pq-radius) * 2.6); /* 18,7 px — tarjetas */
+
+  /* Superficie de tarjeta y reflejo (specular-edge / --glass-specular). */
+  --pq-card: oklch(0.9911 0 112.86); /* #fcfcfc — igual que el fondo */
+  --pq-glass-specular: 62%;
+
   /* Familias tal como las expone el sistema en --font-sans / --font-mono. */
   --pq-font-sans: "Rubik";
   --pq-font-mono: "Geist Mono";
@@ -110,6 +124,8 @@ html[data-theme="dark"] {
   --pq-border: oklch(1 0 112.71 / 0.1); /* blanco al 10 % */
   --pq-input: oklch(1 0 112.71 / 0.15); /* blanco al 15 % */
   --pq-destructive: oklch(0.704 0.191 22.22); /* #ff6467 */
+  --pq-card: oklch(0.2046 0 112.89); /* #171717 */
+  --pq-glass-specular: 22%;
 }
 
 /* -------------------------------------------------------------------------
@@ -212,14 +228,22 @@ $posiciones: (
   --font-mono: var(--pq-font-mono), ui-monospace, monospace;
 
   /* ---------------------------------------------------------------------
-   * RADIO. El sistema publica UN solo --radius: .45rem (7,2 px). Payload usa
-   * tres (3 / 4 / 8 px por defecto). Se derivan del token único con la misma
-   * progresión que usa shadcn, para no inventar valores:
-   *   s = radius - 4px  ·  m = radius - 2px  ·  l = radius
+   * RADIO — CORREGIDO el 2026-09-16 (fase 1).
+   *
+   * La versión anterior decía que el sistema publica «un solo --radius» y
+   * derivaba los tres radios de Payload con la progresión genérica de shadcn
+   * (radius - 4px / - 2px / radius). ERA FALSO: el sistema tiene su propia
+   * escala, MULTIPLICATIVA sobre --radius, en la capa de tema de su bundle.
+   * Ver docs/design-tokens.md §5 para el porqué de la omisión.
+   *
+   * Los tres radios genéricos de Payload se asignan por PAPEL, conservando su
+   * orden s < m < l, a los pasos del sistema que cumplen ese papel. Las piezas
+   * con radio propio del sistema (tarjetas, filas) se sobrescriben por clase en
+   * el apartado 5.
    * ------------------------------------------------------------------- */
-  --style-radius-s: calc(var(--pq-radius) - 4px);
-  --style-radius-m: calc(var(--pq-radius) - 2px);
-  --style-radius-l: var(--pq-radius);
+  --style-radius-s: var(--pq-radius-md); /* 5,8 px  (Payload: 3 px) */
+  --style-radius-m: var(--pq-radius-lg); /* 7,2 px  (Payload: 4 px) */
+  --style-radius-l: var(--pq-radius-xl); /* 10,1 px (Payload: 8 px) */
 }
 
 /* -------------------------------------------------------------------------
@@ -278,4 +302,153 @@ $pasos-estado: 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 7
   --color: var(--pq-on-primary);
   --hover-bg: color-mix(in oklab, var(--pq-primary) 85%, oklch(0 0 0));
   --hover-color: var(--pq-on-primary);
+}
+
+/* =========================================================================
+ * 5. APARIENCIA DEL SISTEMA — FASE 1: SUPERFICIES Y DENSIDAD
+ *
+ * Patrones extraídos de https://ui.partequipos.com/components leyendo las
+ * clases de cada pieza por su data-slot, no la apariencia. La fuente exacta de
+ * cada valor va junto a su regla.
+ *
+ * Solo superficies y espaciado. Campos y botones son la fase 2; navegación y
+ * tablas, la 3.
+ * ========================================================================= */
+
+/* -------------------------------------------------------------------------
+ * 5.1 TARJETAS — .card del panel de inicio.
+ *
+ * Sistema (data-slot="card"):
+ *   rounded-[min(var(--radius-4xl),24px)]  bg-card  py-(--card-spacing)
+ *   shadow-sm  ring-1 ring-foreground/5  dark:ring-foreground/10
+ *   [--card-spacing:--spacing(5)]  specular-edge
+ *
+ * Sin borde: el contorno lo hacen la sombra y un anillo de 1 px al 5 % del
+ * texto. Los px son los que el sistema obtiene con su raíz de 16 px; se ponen
+ * en px y no en rem porque la raíz del panel de Payload NO es de 16 px, y en rem
+ * saldrían más pequeños que en el sistema.
+ * ----------------------------------------------------------------------- */
+.card {
+  /* shadow-sm de Tailwind v4, literal del bundle del sistema. */
+  --pq-card-sombra: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+  --pq-card-anillo: 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 5%, transparent);
+
+  background: var(--pq-card);
+  border-color: transparent;
+  border-radius: min(var(--pq-radius-4xl), 24px);
+  padding: 20px; /* --spacing(5) */
+  gap: 20px;
+  box-shadow: var(--pq-card-anillo), var(--pq-card-sombra);
+}
+
+html[data-theme="dark"] .card {
+  --pq-card-anillo: 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 10%, transparent);
+}
+
+/*
+ * specular-edge del sistema, literal:
+ *   .specular-edge:after { content:""; border-radius:inherit;
+ *     pointer-events:none; position:absolute; inset:0;
+ *     box-shadow: inset 0 1px 0 0 color-mix(in oklch, white
+ *                 var(--glass-specular), transparent) }
+ * .card ya es position:relative en Payload, así que el ::after se ancla bien, y
+ * pointer-events:none deja pasar el clic al enlace de la tarjeta (.card__click).
+ */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 0 color-mix(in oklch, white var(--pq-glass-specular), transparent);
+}
+
+/*
+ * HOVER. El sistema no define hover en la tarjeta: la acción está en botones
+ * internos. En Payload la tarjeta ENTERA es un enlace, y quitarle la respuesta
+ * al paso del ratón empeoraría el uso (regla 10). Se conserva, subiendo al
+ * siguiente escalón de la escala de sombras de Tailwind que usa el sistema
+ * (shadow-md) y al anillo del 10 %. No se inventa ningún valor.
+ */
+.card--has-onclick:hover {
+  background: var(--pq-card);
+  border-color: transparent;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--pq-foreground) 10%, transparent),
+    0 4px 6px -1px #0000001a,
+    0 2px 4px -2px #0000001a;
+}
+
+/* card-title del sistema: font-heading text-base font-medium (16 px, 500). */
+.card__title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* -------------------------------------------------------------------------
+ * 5.2 FILAS DE ARRAY Y BLOQUES PLEGABLES — .collapsible
+ *
+ * Equivalente en el sistema: data-slot="item" variant="muted":
+ *   rounded-2xl  border-transparent  bg-muted/50  px-4 py-3.5
+ *
+ * Payload compila aquí su radio como LITERAL SCSS ($style-radius-m = 4 px), así
+ * que no sigue --style-radius-*: hay que sobrescribir cada esquina a mano.
+ *
+ * DESVIACIÓN: el sistema no pone borde en «item». Aquí se conserva un contorno,
+ * con el mismo anillo del 5 % / 10 % de las tarjetas, porque una fila de array
+ * contiene CAMPOS y sin contorno el contenido de filas contiguas se funde
+ * (regla 10). No se usa overflow:hidden para redondear: recortaría los menús
+ * desplegables de los selectores que viven dentro de la fila.
+ * ----------------------------------------------------------------------- */
+.collapsible {
+  border-radius: var(--pq-radius-2xl);
+}
+
+.collapsible--style-default {
+  border-color: transparent;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 10%, transparent);
+}
+
+html[data-theme="dark"] .collapsible--style-default {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 15%, transparent);
+}
+
+.collapsible__toggle-wrap,
+.collapsible__toggle {
+  border-top-left-radius: var(--pq-radius-2xl);
+  border-top-right-radius: var(--pq-radius-2xl);
+}
+
+.collapsible__toggle-wrap {
+  /* bg-muted/50 del sistema. */
+  background: color-mix(in oklab, var(--pq-muted) 50%, transparent);
+}
+
+.collapsible--collapsed .collapsible__toggle-wrap,
+.collapsible--collapsed .collapsible__toggle,
+.collapsible__content {
+  border-bottom-left-radius: var(--pq-radius-2xl);
+  border-bottom-right-radius: var(--pq-radius-2xl);
+}
+
+/* -------------------------------------------------------------------------
+ * 5.3 DENSIDAD DE FORMULARIO
+ *
+ * Sistema:
+ *   field-group  flex-col gap-6   -> 24 px entre campos
+ *   field        flex-col gap-3   -> 12 px entre etiqueta y control
+ *
+ * Payload separa campos con --spacing-field (= var(--base)) y la etiqueta con
+ * padding-bottom: base(0.25). Se redefinen esas dos cosas y NADA MÁS: tocar
+ * --base reescalaría todo el panel, márgenes y alturas incluidos.
+ *
+ * Se respetan las variantes que Payload ya reduce a propósito
+ * (--margins-none), que existen para campos en fila o anidados.
+ * ----------------------------------------------------------------------- */
+.render-fields:not(.render-fields--margins-none) {
+  --spacing-field: 24px;
+}
+
+label.field-label:not(.unstyled) {
+  padding-bottom: 12px;
 }

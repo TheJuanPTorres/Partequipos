@@ -854,6 +854,43 @@ verificación funcional.
 
 **No implementada**: queda como propuesta pendiente de aprobación.
 
+#### Addendum 2026-09-16 — no se pueden medir Core Web Vitals en una pestaña de fondo
+
+Al intentar completar la línea base con la ficha de maquinaria y el artículo de
+blog, la automatización del navegador devolvió **cero entradas** de `paint` y de
+`largest-contentful-paint`, pese a que Chrome las soporta. Causa, medida:
+
+```
+document.visibilityState === "hidden"
+```
+
+**Chrome no emite temporizaciones de pintado en una pestaña que nunca se pinta.**
+Y al forzar el pintado con una captura de pantalla, las entradas aparecen
+**ancladas al instante de la captura**:
+
+```
+first-paint = first-contentful-paint = LCP = 38.080 ms
+```
+
+38 segundos. No es el rendimiento de la página: es cuándo se la obligó a pintar.
+
+**Dos conclusiones operativas:**
+
+1. **LCP, FCP y CLS no son medibles así.** Y ojo con el CLS: un `cls: 0` en una
+   pestaña oculta **no es evidencia de nada** — sin maquetación no hay
+   desplazamientos que contar. Reportarlo como 0 sería inventar un dato.
+2. **TTFB y peso transferido sí valen**, porque son de red y no dependen del
+   pintado.
+
+Para medir de verdad hacen falta: una **ventana en primer plano**, o Lighthouse
+en local, o la **clave de PageSpeed Insights** (§10.3 p.13, sigue pendiente del
+cliente). La línea base del Bloque F se midió con la ventana visible; de ahí que
+entonces sí diera cifras.
+
+Es la cuarta vez que aparece el patrón de §10.14, §10.15 y §10.17: **la señal
+fácil está un paso antes de donde ocurre lo que importa.** Aquí el
+instrumento devolvía números con aspecto de medición.
+
 ### 10.21 RESUELTO — variables de entorno separadas por entorno
 
 > **SEPARADO Y VERIFICADO el 2026-09-16.** `DATABASE_URI`, `PAYLOAD_SECRET` y

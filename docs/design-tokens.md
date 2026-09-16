@@ -21,9 +21,13 @@ de **Tailwind v4**: `--text-xs: .75rem`, `--text-sm: .875rem`,
 
 **2. No hay espaciado propio.** `--spacing: .25rem`, el de Tailwind v4.
 
-**3. No hay tokens de sombra.** `--shadow` aparece **cero veces** en el bundle.
-Lo único parecido es un efecto de vidrio compuesto (`--glass-*`, §5), que no es
-una rampa de elevación.
+**3. No hay tokens de sombra propios.** Las sombras son las utilidades por
+defecto de Tailwind v4 (`shadow-sm`…). Lo único propio es un efecto de vidrio
+(`--glass-*`, §5). _Esta línea decía antes que `--shadow` aparece cero veces:
+era falso, aparece como `--tw-shadow`._
+
+**Y una corrección en sentido contrario: el sistema SÍ define escala de
+radios propia** (§5). Estaba en esta lista por error.
 
 **4. Las plantillas públicas usan colores fijos, no tokens.** Medido en
 `src/app/(site)` y `src/components`, sin el panel: **188 ocurrencias en 31
@@ -226,10 +230,43 @@ existente.
 
 ## 5. Radio y elevación
 
-- **`--radius: .45rem`** (7,2 px). **Un solo valor**, como es convención en
-  shadcn. No hay `--radius-sm/md/lg` publicados.
-- **No hay tokens de sombra.** `--shadow*` no aparece ni una vez en el bundle.
-  Lo que sí existe es un tratamiento propio de «vidrio»:
+### Escala de radios — CORREGIDA el 2026-09-16
+
+**El sistema SÍ tiene escala de radios, y es propia:** multiplicativa sobre
+`--radius: .45rem` (7,2 px). Literal de la capa de tema del bundle:
+
+| Token          | Fórmula                     | Valor       | Dónde la usa el sistema           |
+| -------------- | --------------------------- | ----------- | --------------------------------- |
+| `--radius-xs`  | `.125rem`                   | 2 px        | —                                 |
+| `--radius-md`  | `calc(var(--radius) * .8)`  | 5,8 px      | —                                 |
+| `--radius-lg`  | `var(--radius)`             | 7,2 px      | —                                 |
+| `--radius-xl`  | `calc(var(--radius) * 1.4)` | 10,1 px     | ítems de menú, botón icono `xs`   |
+| `--radius-2xl` | `calc(var(--radius) * 1.8)` | **13 px**   | campos, botones, insignias, ítems |
+| `--radius-4xl` | `calc(var(--radius) * 2.6)` | **18,7 px** | tarjetas, con tope de 24 px       |
+
+No es la escala por defecto de Tailwind v4 (`md` .375rem, `2xl` 1rem…): está
+redefinida en función del `--radius` del cliente.
+
+> **Por qué la primera extracción la perdió — para la próxima.** Esta sección
+> decía «un solo valor, no hay `--radius-sm/md/lg` publicados», y el panel
+> derivaba sus radios con una progresión inventada (`radius − 4px` / `− 2px`).
+> El script buscaba el **primer** bloque `:root,:host{` del bundle y leía solo
+> ese. Pero Tailwind v4 emite **varios**: el primero que aparece contenía una
+> sola variable (`--shimmer-angle`), y la escala de radios, la escala de texto y
+> el resto de tokens de tema estaban en **otro** bloque `:root,:host{` dentro de
+> `@layer theme`. La regla para la próxima extracción: **recorrer TODOS los
+> bloques de cada selector**, no quedarse con el primero; y desconfiar de un
+> resultado que dice «el sistema no define X» sin haber buscado `--X-` por todo
+> el fichero.
+
+### Sombras
+
+- **No hay tokens `--shadow-*` propios.** Las sombras son las **utilidades por
+  defecto de Tailwind v4** con valores literales (`shadow-xs`, `shadow-sm`…),
+  y `--drop-shadow-md` / `--drop-shadow-lg` también son los de Tailwind.
+  _Corrección: una versión anterior decía que `--shadow` «no aparece ni una
+  vez»; sí aparece, como `--tw-shadow` dentro de esas utilidades._
+- Lo que sí es propio es un tratamiento de «vidrio»:
 
   | Token               | Claro   | Oscuro  |
   | ------------------- | ------- | ------- |
@@ -239,9 +276,10 @@ existente.
   | `--glass-specular`  | `62%`   | `22%`   |
   | `--glass-shadow`    | `.14`   | `.12`   |
 
-  Es la única «elevación» del sistema, y es un efecto compuesto, no una rampa de
-  sombras. **No se aplicó al panel**: Payload no tiene un punto de extensión
-  donde encaje sin reescribir componentes.
+  Es un efecto compuesto, no una rampa de sombras. **Al panel solo se lleva el
+  reflejo** (`specular-edge`: línea interior blanca de 1 px arriba, con
+  `--glass-specular`) en las tarjetas, desde la fase 1. El resto —tinte con
+  desenfoque en ventanas y cajones— no: cuesta rendimiento y no aporta al uso.
 
 ---
 
@@ -345,7 +383,7 @@ hacen falta `!important` ni selectores más específicos. **No existe una opció
 | Rampas de estado | `--theme-{error,success,warning}-*` ancladas al token en el paso 500 y derivadas hacia fondo/texto                                              |
 | Borde            | `--theme-border-color: var(--pq-border)`                                                                                                        |
 | Tipografía       | `--font-body` / `--font-mono`, con `@font-face` autoalojado                                                                                     |
-| Radio            | `--style-radius-s/m/l` derivados del único `--radius`                                                                                           |
+| Radio            | `--style-radius-s/m/l` asignados por papel a la escala real (md / lg / xl)                                                                      |
 | Acción principal | `.btn--style-primary`, acotado, con texto `--pq-on-primary` (blanco)                                                                            |
 | Foco             | `--accessibility-outline` con `--pq-primary`                                                                                                    |
 | Modo oscuro      | `html[data-theme="dark"]` redefine los `--pq-*` que cambian; las rampas se invierten solas                                                      |

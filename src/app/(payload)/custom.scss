@@ -72,6 +72,44 @@
   /* Familias tal como las expone el sistema en --font-sans / --font-mono. */
   --pq-font-sans: "Rubik";
   --pq-font-mono: "Geist Mono";
+
+  /*
+   * Texto sobre --pq-primary. DESVIACIÓN APROBADA del sistema: su
+   * --primary-foreground (#fef2f2) da 4,41:1 sobre #dc2626, por debajo del
+   * 4,5:1 de AA para texto normal. Blanco puro da 4,83:1. Se declara como token
+   * propio y NO se sobrescribe --pq-primary-foreground, para que el valor del
+   * cliente siga siendo trazable. Ver docs/design-tokens.md §8.
+   */
+  --pq-on-primary: oklch(1 0 0); /* #ffffff */
+}
+
+/* -------------------------------------------------------------------------
+ * 1b. TOKENS DEL MODO OSCURO
+ *
+ * Los del bloque .dark del sistema (43 tokens). Payload marca el tema con
+ * html[data-theme="dark"], así que es ese selector y no .dark.
+ *
+ * Solo se redefinen los --pq-* que CAMBIAN entre modos: --pq-primary, success
+ * y warning son idénticos en el sistema. Las rampas de los apartados 2 y 3 se
+ * escriben en función de --pq-background y --pq-foreground, así que al
+ * cambiar estos dos se invierten solas —fondo oscuro, texto claro— sin
+ * duplicar las fórmulas.
+ *
+ * PRECEDENCIA. html[data-theme="dark"] tiene más especificidad que :root, y
+ * los dos van sin capa: gana este bloque, que es lo que se busca. El bloque
+ * oscuro PROPIO de Payload va dentro de @layer payload-default y pierde contra
+ * ambos. Ese es justamente el estado mixto que había antes de este bloque: el
+ * panel anunciaba data-theme="dark" y pintaba en claro.
+ * ----------------------------------------------------------------------- */
+html[data-theme="dark"] {
+  --pq-background: oklch(0.1822 0 113.1); /* #121212 */
+  --pq-foreground: oklch(0.9288 0.0126 255.44); /* #e2e8f0 */
+  --pq-secondary: oklch(0.29 0 113.31); /* #2b2b2b */
+  --pq-muted: oklch(0.2393 0 113.1); /* #1f1f1f */
+  --pq-muted-foreground: oklch(0.798 0.0028 158.7); /* #bcbebc */
+  --pq-border: oklch(1 0 112.71 / 0.1); /* blanco al 10 % */
+  --pq-input: oklch(1 0 112.71 / 0.15); /* blanco al 15 % */
+  --pq-destructive: oklch(0.704 0.191 22.22); /* #ff6467 */
 }
 
 /* -------------------------------------------------------------------------
@@ -121,6 +159,31 @@ $posiciones: (
       var(--pq-background)
     );
   }
+
+  /* ---------------------------------------------------------------------
+   * TEXTO SECUNDARIO. Remedio de contraste aprobado, medido sobre el panel
+   * pintado.
+   *
+   * Los títulos de grupo del menú, los textos de ayuda de los campos y el
+   * texto de los campos de solo lectura se pintan con --theme-elevation-400
+   * (comprobado resolviendo la rampa en el navegador, no supuesto). Por la
+   * fórmula de arriba ese paso da:
+   *
+   *   claro  #808080 sobre #fcfcfc -> 3,85:1   FALLA AA
+   *   oscuro #5b5d60 sobre #121212 -> 2,84:1   FALLA AA
+   *
+   * Se sustituye ese único paso por --pq-muted-foreground, que es el token que
+   * el propio sistema reserva para texto atenuado:
+   *
+   *   claro  #737373 -> 4,62:1   ·   oscuro #bcbebc -> 10,0:1
+   *
+   * CONTRAPARTIDA, a sabiendas: en oscuro la rampa deja de ser monótona en este
+   * paso (el 400 queda más claro que el 500). Todo lo demás que usa el 400
+   * —algún borde, algún icono— se ve algo más claro en oscuro. Se prioriza la
+   * legibilidad del texto sobre la pureza de la rampa. En claro sigue siendo
+   * monótona (#909090 > #737373 > #717171).
+   * ------------------------------------------------------------------- */
+  --theme-elevation-400: var(--pq-muted-foreground);
 
   /* El borde del sistema es un token propio, no un paso de la rampa. */
   --theme-border-color: var(--pq-border);
@@ -203,15 +266,16 @@ $pasos-estado: 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 7
  * rojo. Así que la marca se aplica acotada a la clase del botón, que expone sus
  * propias variables (@payloadcms/ui/dist/elements/Button/index.scss).
  *
- * AVISO DE CONTRASTE, medido: --pq-primary sobre --pq-primary-foreground da
- * 4,41:1, por debajo del 4,5:1 que AA exige para texto normal. Es un valor del
- * sistema del cliente, no nuestro, y corregirlo es decisión suya: con blanco
- * puro sería 4,83:1. Registrado en docs/design-tokens.md.
+ * CONTRASTE: el texto usa --pq-on-primary (blanco, 4,83:1) y no el
+ * --primary-foreground del sistema (4,41:1). Ver el apartado 1.
+ *
+ * El hover se oscurece mezclando con NEGRO y no con --pq-foreground: en modo
+ * oscuro --pq-foreground es casi blanco, y mezclar con él ACLARARÍA el rojo
+ * y bajaría el contraste con el texto blanco justo al pasar el ratón.
  * ----------------------------------------------------------------------- */
 .btn--style-primary {
   --bg-color: var(--pq-primary);
-  --color: var(--pq-primary-foreground);
-  /* Hover derivado del propio token, no elegido a ojo. */
-  --hover-bg: color-mix(in oklab, var(--pq-primary) 85%, var(--pq-foreground));
-  --hover-color: var(--pq-primary-foreground);
+  --color: var(--pq-on-primary);
+  --hover-bg: color-mix(in oklab, var(--pq-primary) 85%, oklch(0 0 0));
+  --hover-color: var(--pq-on-primary);
 }

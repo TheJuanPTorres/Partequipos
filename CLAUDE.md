@@ -217,17 +217,23 @@ definitiva de base de datos (bloqueado por el cliente).
 | 10  | Vercel Pro antes de volver el repositorio a privado                  | Despliegue automático                                              |
 | 11  | Textos legales definitivos                                           | Sustituir los marcadores de posición                               |
 
+**DE LA DIRECCIÓN TÉCNICA** — asumido por la dirección, no depende del cliente:
+
+| Pendiente                                                   | Motivo                                                                                      |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Rotar la contraseña del rol `neondb_owner` de `development` | Se pegó en claro en una conversación el 2026-09-16. Rotar en Neon y actualizar `.env.local` |
+
 **DEL DISEÑADOR:**
 
-| Pendiente                                     | Nota                                                                          |
-| --------------------------------------------- | ----------------------------------------------------------------------------- |
-| Color, tipografía y radio: **YA EXISTEN**     | Extraídos y medidos: `docs/design-tokens.md`                                  |
-| Escala tipográfica y espaciado                | **No los define el sistema**: usa los de Tailwind v4                          |
-| Catálogo de componentes                       | Ver bloque G de `RUTA-DESARROLLO.md`                                          |
-| Restricciones de peso y dimensiones de imagen | Sostiene los umbrales de rendimiento                                          |
-| Decisión sobre modo oscuro                    | El sitio NO lo soporta (§10.14). El sistema del cliente SÍ lo define completo |
-| Icono cuadrado para el favicon                | Alternativa al cliente si él no lo tiene (§10.3 15)                           |
-| Menú plegable en móvil                        | Hoy no hay; si lo mete, revisar teclado y `aria-expanded`                     |
+| Pendiente                                     | Nota                                                                                      |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Color, tipografía y radio: **YA EXISTEN**     | Extraídos y medidos: `docs/design-tokens.md`                                              |
+| Escala tipográfica y espaciado                | **No los define el sistema**: usa los de Tailwind v4                                      |
+| Catálogo de componentes                       | Ver bloque G de `RUTA-DESARROLLO.md`                                                      |
+| Restricciones de peso y dimensiones de imagen | Sostiene los umbrales de rendimiento                                                      |
+| Decisión sobre modo oscuro del SITIO          | El panel ya lo soporta con los tokens del sistema; el sitio público sigue sin él (§10.14) |
+| Icono cuadrado para el favicon                | Alternativa al cliente si él no lo tiene (§10.3 15)                                       |
+| Menú plegable en móvil                        | Hoy no hay; si lo mete, revisar teclado y `aria-expanded`                                 |
 
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
 
@@ -246,15 +252,23 @@ definitiva de base de datos (bloqueado por el cliente).
 
 > **SISTEMA DE DISEÑO DEL CLIENTE (2026-09-16).** Existe en
 > `https://ui.partequipos.com` y sus tokens están extraídos, medidos y
-> documentados en **`docs/design-tokens.md`**, que es su fuente única. Aplicado
-> **solo al panel** (`src/app/(payload)/custom.scss`); el sitio público no se
-> tocó. Tres datos que cambian la conversación con el diseñador: el sistema
-> cubre **color, tipografía y radio** pero **no** escala ni espaciado (usa los de
-> Tailwind v4); el sitio público usa la misma arquitectura, así que pegar los
-> tokens es trivial, **pero las plantillas llevan 182 colores fijos de Tailwind
-> en 31 ficheros** y hasta sustituirlos no cambiaría casi nada; y **queda una
-> decisión pendiente de una línea** sobre el modo oscuro del panel
-> (docs/design-tokens.md §9).
+> documentados en **`docs/design-tokens.md`**, que es su fuente única.
+>
+> **Aplicado SOLO al panel** (`src/app/(payload)/custom.scss`), con **modo claro
+> y oscuro** e **interfaz en español**. El sitio público no se tocó.
+>
+> Lo que va al brief del diseñador, recuadro inicial de ese documento: el
+> sistema cubre **color, tipografía y radio**, pero **no** define escala
+> tipográfica ni espaciado (son los de Tailwind v4) **ni tokens de sombra**; y las
+> plantillas públicas llevan **188 colores fijos de Tailwind en 31 ficheros**
+> (175 grises), así que pegar los tokens en `globals.css` es trivial pero no
+> cambiaría casi nada hasta sustituirlos.
+>
+> **Contraste del panel, medido pintado:** pasan cuerpo, etiquetas, inputs,
+> enlaces, botón principal (4,83) y texto secundario (4,62 claro · 10,0 oscuro).
+> **Siguen fallando dos, documentados y sin corregir** por no tener salida
+> limpia: el campo de solo lectura en claro (3,66) y el borde de los inputs
+> (1,49 claro · 1,29 oscuro), que ya fallaba de fábrica.
 
 ### 10.1 Inventario real (fuente de verdad)
 

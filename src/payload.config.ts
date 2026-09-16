@@ -5,6 +5,13 @@ import { postgresAdapter } from "@payloadcms/db-postgres";
 import { resendAdapter } from "@payloadcms/email-resend";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
+/*
+ * @payloadcms/translations NO está en package.json a propósito. Payload 3.88.0
+ * la declara como dependencia exacta en su misma versión, así que su presencia
+ * está garantizada. Añadirla a mano obligaría a tocar el lock desde Windows, que
+ * es exactamente el riesgo de CLAUDE.md §10.5.
+ */
+import { es } from "@payloadcms/translations/languages/es";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
@@ -109,6 +116,20 @@ export default buildConfig({
     Solicitud,
   ],
   editor: lexicalEditor(),
+  /*
+   * Panel en español (CLAUDE.md §5: textos de interfaz en español).
+   *
+   * Solo se declara `es` en `supportedLanguages`, así que el inglés deja de
+   * existir como opción: nadie puede cambiar el idioma desde su cuenta ni
+   * recibirlo por la cabecera Accept-Language del navegador. Es deliberado — el
+   * panel lo usa un equipo hispanohablante y dos idiomas duplicarían la
+   * superficie a revisar. Opción verificada en los tipos instalados
+   * (`I18nOptions` de @payloadcms/translations), no de memoria.
+   */
+  i18n: {
+    fallbackLanguage: "es",
+    supportedLanguages: { es },
+  },
   email,
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

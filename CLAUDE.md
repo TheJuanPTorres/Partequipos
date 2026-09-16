@@ -1044,6 +1044,58 @@ tocar producción»): **la ruta de redirects no se puede validar en un preview.*
 Hay que verificarla en producción tras promocionar, o resolver antes la
 derivación de la protección para las peticiones internas.
 
+### 10.23 LECCIÓN — cambiar el tema a mano no es cambiar el tema
+
+> **Qué pasó (2026-09-16).** Para medir el contraste del panel en claro y en
+> oscuro sin recargar, se alternó el atributo `data-theme` del elemento `<html>`
+> desde la consola y se midió cada vez. Los números salían limpios, con aspecto de
+> medición, y **una parte era falsa**.
+>
+> La pista fue un dato que no cuadraba: el borde de los campos salía **`#29292a`
+> en los dos modos**. Ese valor es exactamente el paso 150 de la rampa **oscura**,
+> y aparecía también estando en «claro». Repitiendo por el mecanismo real —la
+> cookie `payload-theme` y recargar la página— el borde en claro dio **`#d1d1d1`**,
+> que es el valor correcto.
+
+**Lo observado, sin adornarlo:**
+
+| Qué se medía                               | Al alternar `data-theme` a mano | Con cookie + recarga |
+| ------------------------------------------ | ------------------------------- | -------------------- |
+| Variables resueltas en una sonda **nueva** | cambiaban bien                  | igual                |
+| Elementos **que ya estaban** en la página  | conservaban el valor anterior   | valor correcto       |
+| Borde del input en «claro»                 | `#29292a` (oscuro) — **falso**  | `#d1d1d1`            |
+
+**No se aisló el mecanismo exacto**, y es mejor decirlo que inventarlo: puede
+ser invalidación de estilos, puede ser que Payload aplique el tema por algo más
+que el atributo. Lo que sí está probado es el **efecto**: el atajo no reproduce
+el cambio real, y los elementos ya pintados son justo los que mienten.
+
+**Por qué es peligroso:** la mitad de las cifras de esa tanda eran correctas
+—las que salían de sondas creadas en el momento—, así que el conjunto parecía
+coherente. Un error que afecta a todo se detecta; uno que afecta a la mitad se
+publica.
+
+**La regla:** para medir un tema, **entrar en ese tema como entra el usuario**.
+En el panel de Payload eso es la cookie `payload-theme` (o la preferencia del
+sistema operativo) y **recargar**. Nunca alternar el atributo en caliente.
+
+**Quinta vez que el instrumento devuelve algo con aspecto de dato:**
+
+| Sección | Se midió…                                       | …en lugar de…                        |
+| ------- | ----------------------------------------------- | ------------------------------------ |
+| §10.14  | el HTML de origen                               | la página pintada                    |
+| §10.15  | el código HTTP                                  | el efecto en la base                 |
+| §10.17  | el permiso nuevo                                | la migración que lo reparte          |
+| §10.20  | el código, y el pintado de una pestaña de fondo | el despliegue, y una pestaña visible |
+| §10.23  | el tema forzado desde la consola                | el tema al que entra un usuario      |
+
+**Y en la misma tanda, un primo cercano:** `docs/design-tokens.md` afirmó que los
+grises que fallaban eran el paso 500 e «iguales a los de fábrica». Era una
+**coincidencia de valor tomada por identidad**: el paso real era el 400, y el de
+fábrica era peor, no igual. Se detectó al ir a aplicar el remedio, resolviendo la
+rampa en vez de suponerla. Es el mismo defecto de fondo: **un número plausible
+que nadie contrastó con la fuente**.
+
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 
 > `logo-partequipos.png` se referencia por **URL absoluta cableada** en

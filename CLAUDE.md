@@ -1158,6 +1158,47 @@ que nadie contrastó con la fuente**.
 | §10.23  | el tema forzado desde la consola                | el tema al que entra un usuario      |
 | §10.24  | un instante de la transición del borde          | el estado asentado                   |
 
+### 10.26 HALLAZGO — dos filas de preferencia para la misma clave, y tres formas de leerlas
+
+> Descubierto el 2026-09-17 al reagrupar el menú del panel. En **producción**,
+> `payload-preferences` tenía **dos filas** con la clave `nav` para el **mismo
+> usuario** (ids 12 y 13). Una con `Configuración=cerrado`, la otra vacía.
+>
+> Solo se vio porque el script de lectura imprimía «usuarios: 1 · filas: 2». La
+> primera versión de ese script **agrupaba por usuario y se quedaba con la
+> primera coincidencia**, así que enseñaba una salida limpia que escondía la
+> segunda fila. Corregido: `npm run prefs:menu` lista **filas**, no usuarios, y
+> marca las huérfanas.
+
+**Lo que SÍ está verificado**, leyendo Payload 3.88 instalado: con duplicados, el
+estado deja de ser determinista, porque cada camino elige fila con un criterio
+distinto.
+
+| Quién                                         | Cómo ordena                                 | Qué fila coge         |
+| --------------------------------------------- | ------------------------------------------- | --------------------- |
+| El servidor al pintar el menú (`getNavPrefs`) | sin `sort`: cae al `-createdAt` por defecto | la creada más tarde   |
+| El cliente (`preferences.findOne`, vía REST)  | `sort: '-updatedAt'`                        | la actualizada última |
+| La escritura (`db.upsert` → `updateOne`)      | `select … limit 1` **sin `ORDER BY`**       | la que dé Postgres    |
+| El borrado de Payload (`DELETE …/:key`)       | `deleteOne` con `where`, sin orden          | la que dé Postgres    |
+
+**Efecto medido en producción:** el menú pintaba los 6 grupos desplegados, o sea
+leyendo la fila vacía (la más nueva), y el `Configuración=cerrado` de la otra no
+se aplicaba. Coherente con la tabla.
+
+**Origen: NO confirmado.** Lo más probable es una **carrera entre dos peticiones**
+cuando todavía no existía ninguna fila: la escritura es un _upsert_ por clave y
+usuario, y dos POST simultáneos sin fila previa crean dos. **No se intentó
+reproducir** — decisión de dirección: no cambiaba el plan. Queda el rastro por si
+reaparece.
+
+**Resuelto en producción** borrando la fila duplicada con `npm run prefs:borrar`,
+que exige el **id** exacto justamente porque el borrado por clave no garantiza
+cuál cae.
+
+**La lección, que es la de §10.24 en otra forma:** un resumen que agrupa puede
+esconder el dato que importa. Cuando el recuento de la cabecera no cuadre con las
+líneas de detalle —1 usuario, 2 filas—, **el resumen está mal, no el recuento**.
+
 ### 10.25 GUARDARRAÍLES — convertir un olvido silencioso en un fallo ruidoso
 
 > El patrón que comparten las lecciones §10.14 a §10.24 es que **el fallo no

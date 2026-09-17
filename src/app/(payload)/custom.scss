@@ -67,7 +67,17 @@
   --pq-destructive: oklch(0.577 0.245 27.33); /* #e7000b */
   --pq-success: oklch(0.696 0.17 162.48); /* #00bc7d */
   --pq-warning: oklch(0.769 0.188 70.08); /* #fe9a00 */
-  --pq-radius: 0.45rem; /* --radius del sistema */
+  /*
+   * --radius del sistema: .45rem. Se escribe en PX (7,2 px) y NO en rem.
+   *
+   * CORREGIDO el 2026-09-16, medido: el panel de Payload tiene la raíz a 13 px
+   * (getComputedStyle(html).fontSize), no a 16 px como el sistema. Con .45rem
+   * el radio resolvía a 5,85 px en el panel frente a 7,2 px en el sistema, y
+   * como toda la escala multiplica sobre este valor, TODOS los radios salían un
+   * 19 % más pequeños. Mismo motivo por el que el resto de medidas del apartado
+   * 5 van en px.
+   */
+  --pq-radius: 7.2px;
 
   /*
    * Escala de radios del sistema, copiada literalmente de la capa de tema de su

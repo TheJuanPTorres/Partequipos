@@ -615,7 +615,16 @@ html[data-theme="dark"] {
  * recibe el mismo relleno y borde que el campo para que sigan leyéndose como
  * una pieza.
  */
-.relationship--allow-create .react-select .rs__control {
+/*
+ * Especificidad: la regla común de 6.1 tiene 4 clases
+ * (.react-select:not(.react-select--error) .rs__control:not(...)) y va sin capa
+ * igual que esta, así que con 3 clases esta perdía y el control salía redondeado
+ * por los cuatro lados: la muesca con el «+» quedó visible en el preview. Se
+ * iguala la cadena y se añade el tipo de campo para ganar.
+ */
+.field-type.relationship.relationship--allow-create
+  .react-select:not(.react-select--error)
+  .rs__control:not(.rs__control--is-disabled) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }

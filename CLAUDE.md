@@ -1158,6 +1158,34 @@ que nadie contrastó con la fuente**.
 | §10.23  | el tema forzado desde la consola                | el tema al que entra un usuario      |
 | §10.24  | un instante de la transición del borde          | el estado asentado                   |
 
+### 10.25 GUARDARRAÍLES — convertir un olvido silencioso en un fallo ruidoso
+
+> El patrón que comparten las lecciones §10.14 a §10.24 es que **el fallo no
+> avisa**: el sitio sigue respondiendo 200, el panel sigue pintando, el build
+> sigue en verde. Contra eso solo sirve una comprobación que **rompa** cuando
+> alguien olvida algo, y que corra sin que nadie se acuerde de ella.
+>
+> Esta es la lista de los que existen. **Al añadir una pieza que se pueda
+> olvidar, el sitio correcto para el guardarraíl es esta tabla**, no un párrafo
+> de documentación que nadie relee.
+
+| Guardarraíl                            | Qué olvido atrapa                                                                                       | Dónde                                                      | Cuándo corre     |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------- |
+| Cobertura del sitemap                  | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe            | `src/lib/seo/sitemap.test.ts`                              | CI, en cada push |
+| Grupos del menú del panel              | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada | `src/collections/grupos.test.ts`                           | CI, en cada push |
+| Unicidad de slug entre colecciones     | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)         | hook `slugUnicoEntreColecciones` + su prueba               | CI y escritura   |
+| Destino de un redirect                 | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                  | `src/lib/redirects/destino.ts` + `npm run redirects:check` | CI y a mano      |
+| Marcador `dev` en `payload_migrations` | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                        | `npm run db:check`, antes de `payload migrate`             | En cada build    |
+
+**Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
+lista real, y una prueba que exige que coincidan. La del sitemap incluye además
+una tercera prueba que **verifica el propio guardián** con una ruta inventada —
+un guardarraíl que no falla nunca puede estar roto y parecer sano.
+
+**Lo que NINGUNO cubre:** todos corren antes de que exista el despliegue, así que
+no ven lo que solo falla en tiempo de petición. Ese hueco sigue abierto y su
+propuesta está en §10.20.
+
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 
 > `logo-partequipos.png` se referencia por **URL absoluta cableada** en

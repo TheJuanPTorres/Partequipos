@@ -92,6 +92,11 @@
 
   /* Superficie de tarjeta y reflejo (specular-edge / --glass-specular). */
   --pq-card: oklch(0.9911 0 112.86); /* #fcfcfc — igual que el fondo */
+
+  /* Barra lateral del sistema (--sidebar-*). */
+  --pq-sidebar-accent: oklch(0.9461 0 113.26); /* #ededed */
+  --pq-sidebar-accent-foreground: oklch(0.2435 0 112.79); /* #202020 */
+  --pq-sidebar-border: oklch(0.9037 0 112.55); /* #dfdfdf */
   --pq-glass-specular: 62%;
 
   /* Familias tal como las expone el sistema en --font-sans / --font-mono. */
@@ -137,6 +142,9 @@ html[data-theme="dark"] {
   --pq-input: oklch(1 0 112.71 / 0.15); /* blanco al 15 % */
   --pq-destructive: oklch(0.704 0.191 22.22); /* #ff6467 */
   --pq-card: oklch(0.2046 0 112.89); /* #171717 */
+  --pq-sidebar-accent: oklch(0.3132 0 113.02); /* #313131 */
+  --pq-sidebar-accent-foreground: oklch(0.9851 0 112.78); /* #fafafa */
+  --pq-sidebar-border: oklch(0.2809 0 113.2); /* #292929 */
   --pq-glass-specular: 22%;
 }
 
@@ -561,14 +569,34 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  *   rounded-2xl  border  bg-input/50  px-2.5
  *   focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30
  * ----------------------------------------------------------------------- */
-.field-type.text:not(.error):not(.read-only) input:not(:disabled):not([readonly]),
-.field-type.email:not(.error):not(.read-only) input:not(:disabled):not([readonly]),
-.field-type.number:not(.error):not(.read-only) input:not(:disabled):not([readonly]),
-.field-type.password:not(.error) input:not(:disabled):not([readonly]),
-.field-type.confirm-password:not(.error) input:not(:disabled):not([readonly]),
-.date-time-picker:not(.date-time-picker--has-error) .react-datepicker__input-container input:not(:disabled),
-.field-type.textarea:not(.error):not(.read-only) textarea:not(:disabled):not([readonly]),
-.react-select:not(.react-select--error) .rs__control:not(.rs__control--is-disabled) {
+/*
+ * ESPECIFICIDAD — regla sostenible (fase 3).
+ *
+ * Las exclusiones de estado (error, solo lectura, deshabilitado) van SIEMPRE
+ * dentro de :where(), que tiene especificidad CERO. Así:
+ *   - la regla de reposo pesa lo mismo que sin exclusiones (2 clases + 1
+ *     elemento), y
+ *   - cualquier regla de estado gana por sí sola al añadir UNA pseudoclase
+ *     (:focus) o UNA clase (--allow-create), sin repetir la cadena y sin
+ *     !important.
+ *
+ * Antes las exclusiones iban con :not() fuera de :where(), que SÍ suma
+ * especificidad: la regla de reposo llegaba a 6 y tapaba el foco (4) y la
+ * partición de la relación (3). Dos defectos medidos en la fase 2.
+ *
+ * Para cualquier regla nueva de este fichero: exclusiones dentro de :where(),
+ * estados fuera.
+ */
+.field-type.text:where(:not(.error, .read-only)) input:where(:not(:disabled, [readonly])),
+.field-type.email:where(:not(.error, .read-only)) input:where(:not(:disabled, [readonly])),
+.field-type.number:where(:not(.error, .read-only)) input:where(:not(:disabled, [readonly])),
+.field-type.password:where(:not(.error)) input:where(:not(:disabled, [readonly])),
+.field-type.confirm-password:where(:not(.error)) input:where(:not(:disabled, [readonly])),
+.date-time-picker:where(:not(.date-time-picker--has-error))
+  .react-datepicker__input-container
+  input:where(:not(:disabled)),
+.field-type.textarea:where(:not(.error, .read-only)) textarea:where(:not(:disabled, [readonly])),
+.react-select:where(:not(.react-select--error)) .rs__control:where(:not(.rs__control--is-disabled)) {
   background: var(--pq-campo-fondo);
   border-color: var(--pq-campo-borde);
   border-radius: var(--pq-radius-2xl);
@@ -581,20 +609,17 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  * cumple es el BORDE primario (4,71:1 claro · 3,88:1 oscuro); el halo es solo
  * refuerzo visual.
  */
-/*
- * Especificidad: cada selector de foco repite ENTERA la cadena de su regla de
- * reposo y añade :focus. Con una cadena más corta el reposo (6 clases y
- * pseudoclases) ganaba al foco (4) y el campo no mostraba ningún indicador de
- * foco: detectado midiendo el preview.
- */
-.field-type.text:not(.error):not(.read-only) input:not(:disabled):not([readonly]):focus,
-.field-type.email:not(.error):not(.read-only) input:not(:disabled):not([readonly]):focus,
-.field-type.number:not(.error):not(.read-only) input:not(:disabled):not([readonly]):focus,
-.field-type.password:not(.error) input:not(:disabled):not([readonly]):focus,
-.field-type.confirm-password:not(.error) input:not(:disabled):not([readonly]):focus,
-.date-time-picker:not(.date-time-picker--has-error) .react-datepicker__input-container input:focus,
-.field-type.textarea:not(.error):not(.read-only) textarea:not(:disabled):not([readonly]):focus,
-.react-select:not(.react-select--error) .rs__control.rs__control--is-focused {
+/* Una pseudoclase o clase de estado más que el reposo: gana sin repetir nada. */
+.field-type.text:where(:not(.error, .read-only)) input:where(:not(:disabled, [readonly])):focus,
+.field-type.email:where(:not(.error, .read-only)) input:where(:not(:disabled, [readonly])):focus,
+.field-type.number:where(:not(.error, .read-only)) input:where(:not(:disabled, [readonly])):focus,
+.field-type.password:where(:not(.error)) input:where(:not(:disabled, [readonly])):focus,
+.field-type.confirm-password:where(:not(.error)) input:where(:not(:disabled, [readonly])):focus,
+.date-time-picker:where(:not(.date-time-picker--has-error))
+  .react-datepicker__input-container
+  input:where(:not(:disabled)):focus,
+.field-type.textarea:where(:not(.error, .read-only)) textarea:where(:not(:disabled, [readonly])):focus,
+.react-select:where(:not(.react-select--error)) .rs__control.rs__control--is-focused {
   border-color: var(--pq-primary);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--pq-primary) 30%, transparent);
   outline: 0;
@@ -612,14 +637,14 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  * El estado marcado de Payload no cambia el fondo, solo muestra el icono, así
  * que no hace falta excluirlo.
  */
-.checkbox-input:not(.checkbox-input--read-only) .checkbox-input__input {
+.checkbox-input:where(:not(.checkbox-input--read-only)) .checkbox-input__input {
   background: var(--pq-campo-fondo);
   border-color: var(--pq-campo-borde);
   border-radius: 5px;
   box-shadow: none;
 }
 
-.checkbox-input:not(.checkbox-input--read-only):focus-within .checkbox-input__input {
+.checkbox-input:where(:not(.checkbox-input--read-only)):focus-within .checkbox-input__input {
   border-color: var(--pq-primary);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--pq-primary) 30%, transparent);
 }
@@ -673,16 +698,8 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  * recibe el mismo relleno y borde que el campo para que sigan leyéndose como
  * una pieza.
  */
-/*
- * Especificidad: la regla común de 6.1 tiene 4 clases
- * (.react-select:not(.react-select--error) .rs__control:not(...)) y va sin capa
- * igual que esta, así que con 3 clases esta perdía y el control salía redondeado
- * por los cuatro lados: la muesca con el «+» quedó visible en el preview. Se
- * iguala la cadena y se añade el tipo de campo para ganar.
- */
-.field-type.relationship.relationship--allow-create
-  .react-select:not(.react-select--error)
-  .rs__control:not(.rs__control--is-disabled) {
+/* Una clase más que la regla común (que pesa 2 gracias a :where): gana sola. */
+.relationship--allow-create .react-select .rs__control {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -815,4 +832,167 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 .search-bar .btn--style-pill:not(:disabled) {
   --bg-color: var(--theme-elevation-150);
   background: var(--theme-elevation-150);
+}
+
+/* =========================================================================
+ * 7. APARIENCIA DEL SISTEMA — FASE 3: NAVEGACIÓN Y TABLAS
+ *
+ * Misma regla de especificidad que el apartado 6: exclusiones dentro de
+ * :where(), estados fuera.
+ * ========================================================================= */
+
+/* -------------------------------------------------------------------------
+ * 7.1 BARRA LATERAL
+ *
+ * Sistema (data-slot="sidebar-menu-button"):
+ *   flex w-full items-center gap-2 rounded-xl px-3 py-2 text-start
+ *   hover:bg-sidebar-accent hover:text-sidebar-accent-foreground
+ *   data-active:bg-sidebar-accent data-active:font-medium
+ *   data-active:text-sidebar-accent-foreground   focus-visible:ring-3
+ *
+ * En el sistema hover y activo COMPARTEN fondo; el activo solo añade peso 500.
+ *
+ * SIN ICONOS. El ítem del sistema no depende del icono: su forma (radio, relleno,
+ * fondo) es la misma, y la clase solo ajusta el relleno SI hay icono
+ * (has-[>svg:first-child]:ps-2.5). Los iconos exigirían un componente Nav a
+ * medida y quedaron fuera de alcance.
+ * ----------------------------------------------------------------------- */
+.nav {
+  border-right-color: var(--pq-sidebar-border);
+}
+
+.nav__link {
+  border-radius: var(--pq-radius-xl);
+  padding-block: 8px; /* py-2 */
+  padding-inline: 12px; /* px-3 */
+  text-decoration: none;
+  width: 100%;
+}
+
+/*
+ * Payload marca el activo con una barra de 2 px a la izquierda. El sistema lo
+ * marca con fondo: la barra sobra y además se saldría del ítem redondeado.
+ */
+.nav__link-indicator {
+  display: none;
+}
+
+.nav a.nav__link:hover,
+.nav__link.active,
+.nav__link:has(.nav__link-indicator) {
+  background: var(--pq-sidebar-accent);
+  color: var(--pq-sidebar-accent-foreground);
+  text-decoration: none;
+}
+
+/* Peso: Payload usa 600 en el activo; el sistema, font-medium. */
+.nav__link.active,
+.nav__link:has(.nav__link-indicator) {
+  font-weight: 500;
+}
+
+/*
+ * FOCO. Payload solo subraya. Decisión ya tomada: forma del sistema en color
+ * accesible, así que contorno primario (4,71:1 claro · 3,88:1 oscuro) en vez
+ * del anillo del sistema.
+ */
+.nav a.nav__link:focus-visible {
+  outline: var(--accessibility-outline);
+  outline-offset: -2px;
+  text-decoration: none;
+}
+
+/*
+ * ETIQUETA DE GRUPO. Sistema (data-slot="sidebar-group-label"):
+ *   h-8 px-3 text-xs font-medium text-sidebar-foreground/70
+ *
+ * El color NO es el del sistema: sidebar-foreground al 70 % da ~2,74:1.
+ * Decisión ya tomada: --muted-foreground (el paso 400 de la rampa), 4,62:1 en
+ * claro y 10,0:1 en oscuro. Tamaño, peso y relleno sí son los del sistema, para
+ * que la etiqueta quede alineada con los ítems.
+ */
+.nav-group__toggle {
+  font-size: 12px; /* text-xs */
+  font-weight: 500;
+  padding-inline: 12px;
+}
+
+/* -------------------------------------------------------------------------
+ * 7.2 TABLAS DE LISTADO
+ *
+ * Sistema:
+ *   table-head  h-10 px-2 font-medium text-foreground
+ *   table-row   border-b hover:bg-muted/50
+ *   table-cell  p-2
+ *   table-header [&_tr]:border-b
+ *
+ * Payload separa filas con FRANJAS (impares en el paso 50, con esquinas
+ * redondeadas) y pinta la cabecera en gris con peso normal. El sistema usa una
+ * línea bajo cada fila y la cabecera en color de texto.
+ *
+ * La línea va en las CELDAS y no en la fila: la tabla de Payload no colapsa
+ * bordes, y en ese modo el borde de un <tr> no se pinta.
+ *
+ * La línea usa --border (1,30:1 en claro): es un SEPARADOR decorativo, no el
+ * límite de un control, así que WCAG 1.4.11 no le pide 3:1.
+ * ----------------------------------------------------------------------- */
+.table tbody tr:nth-child(odd) {
+  background: transparent;
+}
+
+.table thead th,
+.table tbody td {
+  border-bottom: 1px solid var(--pq-border);
+  padding-block: 8px; /* p-2 */
+  padding-inline: 8px;
+}
+
+/*
+ * Se conservan los 16 px laterales que Payload da a la primera y la última
+ * columna: alinean la tabla con la cabecera y la barra de búsqueda del listado.
+ * Bajarlos a 8 px desalinearía la primera columna respecto al resto de la vista.
+ */
+.table thead th:first-child,
+.table tbody td:first-child {
+  padding-inline-start: 16px;
+}
+
+.table thead th:last-child,
+.table tbody td:last-child {
+  padding-inline-end: 16px;
+}
+
+.table thead th {
+  height: 40px; /* h-10 */
+  color: var(--pq-foreground);
+  font-weight: 500;
+}
+
+.table tbody tr:hover {
+  background: color-mix(in oklab, var(--pq-muted) 50%, transparent);
+}
+
+/* -------------------------------------------------------------------------
+ * 7.3 MIGAS DE PAN — .step-nav
+ *
+ * Sistema:
+ *   breadcrumb-list  text-sm text-muted-foreground
+ *   breadcrumb-link  hover:text-foreground
+ *   breadcrumb-page  font-normal text-foreground
+ *
+ * Payload pone TODOS los enlaces en negrita (600). El sistema los atenúa y deja
+ * en color pleno solo la página actual, que es el último elemento.
+ * ----------------------------------------------------------------------- */
+.step-nav a {
+  color: var(--pq-muted-foreground);
+  font-weight: 400;
+}
+
+.step-nav a:hover {
+  color: var(--pq-foreground);
+}
+
+.step-nav > :last-child {
+  color: var(--pq-foreground);
+  font-weight: 400;
 }

@@ -26,7 +26,7 @@ export const Articulo: CollectionConfig = {
   admin: {
     useAsTitle: "titulo",
     defaultColumns: ["titulo", "categoria", "fechaPublicacion", "slug"],
-    group: "Blog",
+    group: "Contenido",
     description: "Se publican en la raíz del sitio: /{slug}/, sin prefijo.",
   },
   access: {

@@ -23,6 +23,7 @@ export const PaginaInstitucional: CollectionConfig = {
   admin: {
     useAsTitle: "titulo",
     defaultColumns: ["titulo", "slug", "tipoPagina"],
+    group: "Contenido",
     description:
       "Páginas fijas del sitio. El slug es la ruta completa y no debe cambiarse: son URLs indexadas.",
   },

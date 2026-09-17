@@ -19,6 +19,7 @@ export const CategoriaTecnica: CollectionConfig = {
   admin: {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "slug"],
+    group: "Repuestos",
   },
   access: {
     read: publico,

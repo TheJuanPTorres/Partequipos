@@ -974,6 +974,31 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   padding-inline: 12px;
 }
 
+/*
+ * PIE FIJO — decisión de dirección (2026-09-17). Payload mete los controles
+ * (cerrar sesión) al final de la lista, dentro del mismo contenedor con scroll:
+ * con una ventana baja, cerrar sesión queda fuera de la vista. Con sticky se
+ * queda pegado abajo mientras la lista se desplaza, sin reemplazar el componente.
+ *
+ * bottom negativo: el contenedor con scroll (.nav__scroll) tiene relleno
+ * inferior, y sticky se ancla al borde interior del relleno; sin compensarlo, el
+ * pie flotaría 40 px por encima del borde. Fondo opaco para que la lista pase
+ * por debajo sin transparentarse, y separador decorativo arriba.
+ */
+.nav__controls {
+  position: sticky;
+  bottom: calc(-1 * var(--nav-padding-block-end));
+  z-index: 1;
+  background: var(--theme-bg);
+  border-top: 1px solid var(--pq-sidebar-border);
+  padding-block: 12px;
+}
+
+/* Payload separa los controles con 20 px de margen; ahora lo da el relleno. */
+.nav__controls > :first-child {
+  margin-top: 0;
+}
+
 /* -------------------------------------------------------------------------
  * 7.2 TABLAS DE LISTADO
  *

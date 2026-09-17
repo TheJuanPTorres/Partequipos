@@ -88,15 +88,27 @@ export default buildConfig({
       },
     },
   },
+  /*
+   * EL ORDEN DE ESTE ARRAY ES EL ORDEN DEL MENÚ DEL PANEL. Payload
+   * (groupNavItems, 3.88) crea cada grupo de `admin.group` en el orden en que
+   * aparece por primera vez, y ordena las entradas dentro del grupo igual. No
+   * afecta al esquema: las tablas se generan por slug.
+   *
+   * Grupos aprobados por dirección (2026-09-17): Comercial · Repuestos ·
+   * Maquinaria · Lubricantes · Contenido · Configuración. Ninguna colección debe
+   * quedar sin `admin.group`: caería en «Colecciones», el grupo por defecto, que
+   * es el cajón de sastre que esta agrupación eliminó.
+   */
   collections: [
-    Users,
-    Media,
+    // Leads de los formularios publicos. Unica coleccion con datos personales:
+    // su control de acceso de lectura es privado, no publico como el catalogo.
+    // Primero en el menu: es lo mas urgente de revisar (CLAUDE.md §10.11).
+    Solicitud,
+    // Repuestos.
     Marca,
     TipoEquipo,
     ModeloRepuesto,
     CategoriaTecnica,
-    Redirects,
-    PaginaInstitucional,
     // Maquinaria (ADR 0007): colecciones propias, separadas de las de repuestos.
     MarcaMaquinaria,
     TipoMaquinaria,
@@ -107,13 +119,15 @@ export default buildConfig({
     // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.
     MarcaLubricante,
     CategoriaLubricante,
-    // Blog. Los articulos se sirven en la raiz /{slug}/, igual que las paginas
-    // institucionales: de ahi el guardarrail de unicidad entre ambas.
-    CategoriaBlog,
+    // Contenido. Los articulos se sirven en la raiz /{slug}/, igual que las
+    // paginas institucionales: de ahi el guardarrail de unicidad entre ambas.
+    PaginaInstitucional,
     Articulo,
-    // Leads de los formularios publicos. Unica coleccion con datos personales:
-    // su control de acceso de lectura es privado, no publico como el catalogo.
-    Solicitud,
+    CategoriaBlog,
+    Media,
+    // Configuracion.
+    Users,
+    Redirects,
   ],
   editor: lexicalEditor(),
   /*

@@ -18,6 +18,7 @@ export const ModeloRepuesto: CollectionConfig = {
   admin: {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "marca", "tipo", "slug"],
+    group: "Repuestos",
   },
   access: {
     read: publico,

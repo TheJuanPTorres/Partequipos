@@ -38,7 +38,8 @@
     "backup:blob": "payload run scripts/backup/inventario-blob.ts",
     "qa": "tsx scripts/qa/verificar.ts",
     "rol": "payload run scripts/usuarios/asignar-rol.ts",
-    "rol:admin": "payload run scripts/usuarios/asignar-rol.ts"
+    "rol:admin": "payload run scripts/usuarios/asignar-rol.ts",
+    "prefs:menu": "payload run scripts/usuarios/preferencias-menu.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.86.0",

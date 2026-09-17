@@ -21,7 +21,7 @@ export const CategoriaBlog: CollectionConfig = {
   admin: {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "slug"],
-    group: "Blog",
+    group: "Contenido",
   },
   access: {
     read: publico,

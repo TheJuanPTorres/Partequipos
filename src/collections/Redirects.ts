@@ -20,6 +20,7 @@ export const Redirects: CollectionConfig = {
   },
   admin: {
     useAsTitle: "desde",
+    group: "Configuración",
     defaultColumns: ["desde", "hacia", "estadoDestino", "tipo", "origen"],
     description:
       "Redirecciones de URLs antiguas hacia las vigentes. Evita perder posicionamiento cuando una URL cambia.",

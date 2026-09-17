@@ -8,6 +8,9 @@ import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acce
  */
 export const Media: CollectionConfig = {
   slug: "media",
+  admin: {
+    group: "Contenido",
+  },
   access: {
     read: publico,
     create: escrituraContenido,

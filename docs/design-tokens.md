@@ -479,6 +479,61 @@ campos, que es una decisión estética del sistema, no un ajuste de contraste.
   `#29292a`, el paso 150 **oscuro**, estando en «claro»). La medición válida
   exige el mecanismo real: la cookie `payload-theme` y recargar.
 
+### Fase 1 — superficies y densidad (rama `feat/panel-fase1-superficies`)
+
+Patrones tomados de `ui.partequipos.com/components` leyendo las clases de cada
+pieza por su `data-slot`. Medido sobre la página pintada, en claro y oscuro, con
+cookie `payload-theme` y recarga (§10.23), en producción («antes») y en el
+preview («después»).
+
+| Medida                    | Antes (producción) | Después (preview)                 | Fuente del sistema                        |
+| ------------------------- | ------------------ | --------------------------------- | ----------------------------------------- |
+| Radio de tarjeta          | 3,85 px            | **18,72 px**                      | `rounded-[min(var(--radius-4xl),24px)]`   |
+| Borde de tarjeta          | 1 px               | **ninguno**                       | `ring-1 ring-foreground/5` + `shadow-sm`  |
+| Sombra de tarjeta         | ninguna            | **anillo 5 % / 10 % + shadow-sm** | ídem                                      |
+| Relleno de tarjeta        | 16 px              | **20 px**                         | `--card-spacing: --spacing(5)`            |
+| Título de tarjeta         | 13 px · 600        | **16 px · 500**                   | `text-base font-medium`                   |
+| Fondo de tarjeta (oscuro) | `#181919`          | **`#171717`**                     | `--card` oscuro                           |
+| Radio de fila de array    | 4 px               | **12,96 px**                      | `item`: `rounded-2xl`                     |
+| Cabecera de fila (claro)  | `#efefef`          | **`#f4f4f4`**                     | `item muted`: `bg-muted/50`               |
+| Radio del botón primario  | 1,65 px            | 5,76 px                           | escala corregida (`md`); la forma, fase 2 |
+| Entre campos              | 20 px              | **24 px**                         | `field-group gap-6`                       |
+| Bajo la etiqueta          | 5 px               | **12 px**                         | `field gap-3`                             |
+| Etiqueta de casilla       | 0 px · desfase 0   | **0 px · desfase 0**              | (se conserva; ver defectos)               |
+
+**Contraste: ningún valor empeoró.** Los textos tocados mejoran: título de
+tarjeta de 16,29 a **18,26** en claro (ahora sobre `#fcfcfc`) y 14,29 a
+**14,54** en oscuro; cabecera de fila 17,03 claro y 14,26 oscuro. Siguen sin
+cambios —y sin arreglar, como estaba decidido— el borde de los campos (1,49 /
+1,29) y el campo de solo lectura en claro (3,66).
+
+**Tres defectos encontrados al medir, corregidos antes de enseñar el resultado:**
+
+1. **El radio base iba en `rem` y la raíz del panel es de 13 px.** Con
+   `.45rem`, `--pq-radius` resolvía a **5,85 px** en vez de 7,2 px, y toda la
+   escala multiplicativa quedaba un 19 % más pequeña. **Este defecto también
+   está en producción** desde que se aplicaron los tokens; lo corrige esta fase.
+   Ahora `--pq-radius: 7.2px`.
+2. **La etiqueta de las casillas quedaba 6 px por debajo del control**, porque
+   la regla general de 12 px (sin capa) pisaba la anulación que Payload ya tenía
+   para etiquetas en línea.
+3. **El primer arreglo de lo anterior también era falso**: restauraba
+   `base(0.25)` suponiendo que era el valor original. Medido en producción era
+   **0**. Se detectó midiendo producción antes de dar el arreglo por bueno.
+
+**No verificado:** las esquinas inferiores de una fila de array **plegada**.
+Plegarla escribe en las preferencias del usuario (una escritura en la base), y la
+verificación se limitó a navegar y leer. El CSS cubre ese estado
+(`.collapsible--collapsed`), pero no está medido pintado.
+
+**Dejado fuera a propósito en esta fase:**
+
+- **Grupos** (`.group-field`): son secciones a ancho completo con márgenes
+  negativos; convertirlos en tarjeta estrecharía el formulario (regla 10).
+- **Listados**: sin cambios. Franjas, cabecera y filas de tabla son la fase 3.
+- **Campos y botones**: solo heredan la escala de radios corregida; su forma del
+  sistema es la fase 2.
+
 ---
 
 ## 9. Modo oscuro del panel — IMPLEMENTADO

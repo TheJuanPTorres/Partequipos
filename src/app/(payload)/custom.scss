@@ -975,6 +975,40 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 }
 
 /*
+ * ICONO DEL GRUPO. Sistema: `size-4` (16 px) y `gap-2` entre icono y texto, con
+ * el icono al color del texto. La etiqueta pasa a fila para alinearlos por su
+ * centro; el icono no se encoge si el nombre del grupo es largo.
+ */
+.nav-group__label {
+  align-items: center;
+  display: flex;
+  gap: 8px; /* gap-2 */
+}
+
+.nav-group__label svg {
+  color: currentColor;
+  flex-shrink: 0;
+}
+
+/*
+ * CHEVRON. Uno solo, de Tabler, que gira: Payload usaba su propio icono y lo
+ * cambiaba de dirección por prop. Con `prefers-reduced-motion` no gira, salta.
+ */
+.nav-group__chevron {
+  transition: transform 200ms ease;
+}
+
+.nav-group__chevron--abierto {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-group__chevron {
+    transition: none;
+  }
+}
+
+/*
  * PIE FIJO — decisión de dirección (2026-09-17). Payload mete los controles
  * (cerrar sesión) al final de la lista, dentro del mismo contenedor con scroll:
  * con una ventana baja, cerrar sesión queda fuera de la vista. Con sticky se

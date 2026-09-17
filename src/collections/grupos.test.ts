@@ -6,6 +6,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import type { CollectionConfig } from "payload";
 
+import { ICONOS_DE_GRUPO } from "../components/admin/Nav/iconos";
+
 /**
  * Una colección sin `admin.group` no da error: Payload la mete en silencio en
  * «Colecciones», el grupo por defecto, que es justo el cajón de sastre que la
@@ -57,5 +59,55 @@ describe("grupos del menú del panel", () => {
         `«${coleccion.slug}» tiene grupo ${JSON.stringify(grupo)}: caería en «Colecciones»`,
       );
     }
+  });
+
+  it("detecta una colección sin grupo (comprobación del propio guardián)", () => {
+    const sinGrupo = { slug: "inventada", admin: {} } as CollectionConfig;
+    const grupo = sinGrupo.admin?.group;
+    assert.equal(typeof grupo === "string" && GRUPOS_APROBADOS.includes(grupo), false);
+  });
+
+  /*
+   * El menú propio (src/components/admin/Nav) pone un icono por grupo. Si
+   * alguien renombra un grupo y olvida el icono, el grupo se queda sin él y no
+   * avisa nada: el panel sigue funcionando.
+   */
+  it("todo grupo aprobado tiene icono en el menú", () => {
+    for (const grupo of GRUPOS_APROBADOS) {
+      assert.ok(ICONOS_DE_GRUPO[grupo], `el grupo «${grupo}» no tiene icono asignado`);
+    }
+  });
+
+  it("no hay iconos de grupos que ya no existen", () => {
+    for (const nombre of Object.keys(ICONOS_DE_GRUPO)) {
+      assert.ok(GRUPOS_APROBADOS.includes(nombre), `«${nombre}» ya no es un grupo del menú`);
+    }
+  });
+});
+
+/*
+ * Dos cosas que el menú propio NO pinta, porque sus componentes no se exportan o
+ * no se usan. Si algún día se configuran, desaparecerían en silencio del panel:
+ * estas pruebas lo convierten en un fallo de CI que apunta al fichero correcto.
+ */
+describe("lo que el menú propio no puede pintar", () => {
+  it("settingsMenu y las carpetas siguen sin configurarse", async () => {
+    const { default: config } = (await import("../payload.config")) as {
+      default: Promise<{
+        admin?: { components?: { settingsMenu?: unknown } };
+        folders?: unknown;
+      }>;
+    };
+    const resuelto = await config;
+
+    assert.equal(
+      resuelto.admin?.components?.settingsMenu,
+      undefined,
+      "settingsMenu está configurado y el menú propio no lo pinta: ver src/components/admin/Nav",
+    );
+    assert.ok(
+      !resuelto.folders,
+      "las carpetas están activas y el menú propio no pinta su botón: ver src/components/admin/Nav",
+    );
   });
 });

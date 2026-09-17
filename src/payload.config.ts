@@ -86,6 +86,18 @@ export default buildConfig({
         Logo: "/components/admin/Logo",
         Icon: "/components/admin/Icon",
       },
+      /*
+       * Menú lateral propio: los iconos del sistema del cliente van en los
+       * grupos, y `NavGroup` de Payload no tiene sitio para un icono ni emite
+       * `aria-expanded`. Payload solo permite reemplazar el menú COMPLETO, así
+       * que el componente replica lo que se perdería (permisos por rol, estado
+       * del menú, página activa, `inert` con el menú cerrado) y lo documenta,
+       * incluidas las piezas que Payload marca `@internal`.
+       *
+       * NO configurar `settingsMenu` sin leer antes ese fichero: su componente
+       * no se exporta y este menú no lo pinta. Hay una prueba que lo vigila.
+       */
+      Nav: "/components/admin/Nav",
     },
   },
   /*

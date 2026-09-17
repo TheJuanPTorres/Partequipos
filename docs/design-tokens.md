@@ -778,6 +778,67 @@ problema de contraste sino de que el estado no comunicaba. Payload la dibuja a
 margen baja a 10 px, recortada. Se movió **dentro del ítem** (4 px desde el
 borde, 5 px hasta el texto). Verificado que hover y activo ya se distinguen.
 
+#### Iconos del menú y menú propio — fase B (2026-09-17)
+
+El sistema del cliente usa **`@tabler/icons-react`** (`size-4`, trazo regular) y
+prohíbe **mezclar familias de iconos**
+(`ui.partequipos.com/foundations/icons`). Dependencia **aprobada por dirección**
+(CLAUDE.md §2) frente a la alternativa de máscaras CSS, que dependían del nombre
+del grupo y habrían dejado el icono en blanco sin avisar al renombrarlo.
+
+**Los iconos van solo en los grupos** (primer nivel). Las entradas no llevan: son
+19, y distinguir «Categorías de usada» de «Categorías de maquinaria nueva» con
+iconos obligaría a inventar metáforas.
+
+| Grupo         | Icono       |
+| ------------- | ----------- |
+| Comercial     | `inbox`     |
+| Repuestos     | `tool`      |
+| Maquinaria    | `bulldozer` |
+| Lubricantes   | `droplet`   |
+| Contenido     | `article`   |
+| Configuración | `settings`  |
+
+El **chevron** de los grupos y el **botón de cerrar sesión** pasan también a
+Tabler (`chevron-down` girando 180°, que no gira con
+`prefers-reduced-motion`, y `logout`): eran los dos únicos iconos de la familia
+de Payload que quedaban en el menú.
+
+**Esto obliga a reemplazar el menú completo** (`admin.components.Nav`): Payload
+no permite sustituir solo el grupo, y su `NavGroup` no tiene sitio para un icono.
+El detalle de qué se replica, qué piezas `@internal` se usan y qué no se puede
+replicar está en `src/components/admin/Nav/index.tsx`.
+
+**Medido en el preview, en claro y oscuro:**
+
+| Medida (claro · oscuro)           | Resultado                                                                           |
+| --------------------------------- | ----------------------------------------------------------------------------------- |
+| Icono de grupo                    | 16 px, al color de la etiqueta (4,62 · 10,0)                                        |
+| Etiqueta de grupo                 | 4,62 · 10,0                                                                         |
+| `aria-expanded` / `aria-controls` | presentes y correctos en los 6 grupos; el `id` que referencian existe               |
+| Grupo plegado                     | `display: none` en su contenido                                                     |
+| Teclado con un grupo plegado      | el tabulador **salta** sus enlaces y va al grupo siguiente                          |
+| Foco del botón de grupo           | contorno 1,6 px, **4,71 · 3,88**                                                    |
+| Cerrar sesión                     | icono 16 px, 18,26 · 15,2, `aria-label` «Cerrar sesión» de la traducción de Payload |
+| Página activa                     | barra indicadora presente, texto 13,92 · 12,46                                      |
+| Pie                               | sigue `sticky` y a la vista                                                         |
+| Entradas                          | 19, en los 6 grupos                                                                 |
+
+**Un defecto de accesibilidad de Payload, corregido aquí:** su
+`.nav-group__toggle:focus-visible` lleva `outline: none` y solo aclara el color
+del texto. Medido con el teclado en el preview: el botón enfocado no tenía
+contorno mientras los enlaces sí. Ahora usa el mismo indicador que los enlaces
+(WCAG 2.4.7).
+
+**Lo que NO cambia respecto a Payload, a propósito:** con `trailingSlash: true`,
+la entrada de la página actual sigue siendo un enlace y no un `div`, porque la
+ruta lleva barra final y el `href` no. Es el comportamiento de Payload, no una
+regresión de este menú.
+
+**Colapsar por defecto sigue descartado** (el problema que lo motivaba lo resolvió
+la fase A), pero la puerta queda abierta: `ABIERTO_POR_DEFECTO` en
+`src/components/admin/Nav/index.tsx` es el único sitio donde se decide.
+
 #### Agrupación del menú y pie fijo — fase A (2026-09-17)
 
 Aprobado por dirección tras el estudio del menú. **El problema de fondo no era el

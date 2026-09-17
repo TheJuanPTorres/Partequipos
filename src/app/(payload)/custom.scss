@@ -794,8 +794,13 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   background: var(--pq-secondary);
   color: var(--pq-secondary-foreground);
   font-weight: 500;
-  /* Mismo contorno que la píldora-botón: también es un control. */
-  border: 1px solid var(--pq-campo-borde);
+  /*
+   * Mismo contorno que la píldora-botón: también es un control. Va como sombra
+   * INTERIOR y no como borde: Payload no reserva borde en .pill y un borde de
+   * 1 px la hacía crecer de 24 a 26 px (medido en el preview), descuadrando la
+   * barra de controles. La sombra interior se pinta igual y no ocupa espacio.
+   */
+  box-shadow: inset 0 0 0 1px var(--pq-campo-borde);
 }
 
 /*

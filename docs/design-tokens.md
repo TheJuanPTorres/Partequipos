@@ -361,6 +361,28 @@ Dato relevante para la decisión sobre modo oscuro en el panel (§9).
 
 Ver `src/app/(payload)/custom.scss`, que lleva el porqué de cada decisión.
 
+### Defectos de Payload 3.88 corregidos por el camino
+
+Ninguno lo detectó una herramienta: todos salieron al medir la página pintada o
+al recorrer el panel con el teclado. Se listan juntos porque **al actualizar
+Payload hay que comprobar si siguen ahí**: si los arreglan arriba, nuestra
+corrección pasa a ser código muerto; si cambian el marcado, deja de aplicar.
+
+| Defecto de Payload                                                        | Qué se veía                                                    | Corrección nuestra                                  |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------- |
+| Borde de los campos a **1,49 · 1,29** de fábrica (1.4.11 pide 3:1)        | El contorno del control casi no se distinguía del fondo        | Borde derivado, primer paso de la rampa con ≥ 3:1   |
+| Texto secundario (paso 400) a **2,81** de fábrica                         | Etiquetas y textos de apoyo por debajo de AA                   | `--muted-foreground`: 4,62 · 10,0                   |
+| Botón principal a **4,41**                                                | Texto sobre rojo por debajo de AA                              | Texto blanco: 4,83                                  |
+| `.nav-group__toggle:focus-visible` con **`outline: none`**                | Con el teclado, el botón de grupo enfocado no tenía contorno   | Mismo indicador que los enlaces: 4,71 · 3,88        |
+| El botón de grupo **no emite `aria-expanded`**                            | Un lector de pantalla no anuncia si el grupo está abierto      | `aria-expanded` y `aria-controls` en el menú propio |
+| La barra del activo del menú se dibuja a **−20 px**, en el margen         | Recortada cuando el margen baja a 10 px (≤ 1024 px)            | Dentro del ítem, a 4 px del borde                   |
+| `date-time-field--has-error` no coincidía con el selector que documentaba | Nuestra regla tapaba el borde rojo del campo de fecha inválido | Exclusión por el contenedor real                    |
+| Objetivo táctil del menú en **25 px** (AA pide 24)                        | Cumplía por 1 px, pero con el dedo es poco                     | 36 px con puntero grueso                            |
+
+Dos más, de Payload también, que **no** se corrigen y están documentados: el
+campo de solo lectura en claro (3,66) y que el borde de fila de tabla use
+`--border` (1,30), que es decorativo y no le aplica 1.4.11.
+
 ### Estado final — cierre del trabajo de diseño del panel (2026-09-17)
 
 > Este apartado **manda** sobre los de abajo, que se conservan como registro de

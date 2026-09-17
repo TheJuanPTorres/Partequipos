@@ -1185,6 +1185,12 @@ distinto.
 leyendo la fila vacía (la más nueva), y el `Configuración=cerrado` de la otra no
 se aplicaba. Coherente con la tabla.
 
+**Apareció también en la base de PREVIEW** (clonada de producción) con los seis
+grupos del menú en cerrado y fecha del 2026-09-17. La dirección apunta a que
+**probablemente los plegó ella** al revisar el menú, pero **no está confirmado**:
+si vuelve a pasar sin que nadie toque los grupos, hay que investigarlo, porque
+entonces habría algo más escribiendo esa preferencia.
+
 **Origen: NO confirmado.** Lo más probable es una **carrera entre dos peticiones**
 cuando todavía no existía ninguna fila: la escritura es un _upsert_ por clave y
 usuario, y dos POST simultáneos sin fila previa crean dos. **No se intentó

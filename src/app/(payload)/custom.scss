@@ -538,7 +538,7 @@ html[data-theme="dark"] {
 .field-type.number:not(.error):not(.read-only) input:not(:disabled):not([readonly]),
 .field-type.password:not(.error) input:not(:disabled):not([readonly]),
 .field-type.confirm-password:not(.error) input:not(:disabled):not([readonly]),
-.field-type.date:not(.error) .react-datepicker__input-container input:not(:disabled),
+.date-time-picker:not(.date-time-picker--has-error) .react-datepicker__input-container input:not(:disabled),
 .field-type.textarea:not(.error):not(.read-only) textarea:not(:disabled):not([readonly]),
 .react-select:not(.react-select--error) .rs__control:not(.rs__control--is-disabled) {
   background: var(--pq-campo-fondo);
@@ -558,7 +558,7 @@ html[data-theme="dark"] {
 .field-type.number:not(.error) input:focus,
 .field-type.password:not(.error) input:focus,
 .field-type.confirm-password:not(.error) input:focus,
-.field-type.date:not(.error) .react-datepicker__input-container input:focus,
+.date-time-picker:not(.date-time-picker--has-error) .react-datepicker__input-container input:focus,
 .field-type.textarea:not(.error) textarea:focus,
 .react-select:not(.react-select--error) .rs__control.rs__control--is-focused {
   border-color: var(--pq-primary);
@@ -585,12 +585,46 @@ html[data-theme="dark"] {
 .field-type.email input,
 .field-type.number:not(.has-many) input,
 .field-type.password input,
-.field-type.confirm-password input,
-.field-type.date .react-datepicker__input-container input {
+.field-type.confirm-password input {
   height: 32px;
   line-height: 20px;
   padding-block: 5px;
   padding-inline: 10px;
+}
+
+/*
+ * FECHA: mismo alto, pero SOLO el relleno izquierdo. Payload reserva el derecho
+ * para el icono del calendario (base(0.75) + ancho del icono); pisarlo metería
+ * el texto debajo del icono.
+ */
+.date-time-picker .react-datepicker__input-container input {
+  height: 32px;
+  line-height: 20px;
+  padding-block: 5px;
+  padding-left: 10px;
+}
+
+/*
+ * RELACIÓN CON BOTÓN «+» (relationship--allow-create).
+ *
+ * Payload une el selector y el botón de crear como una sola pieza: el control
+ * lleva las esquinas derechas a 0 y el botón las izquierdas. La regla común de
+ * 6.1 redondea las cuatro esquinas del control, lo que abriría una muesca en la
+ * unión. Medido en producción: control «5.76px 0 0 5.76px», botón «0 5.76px
+ * 5.76px 0». Se conserva esa partición con el radio del sistema, y el botón
+ * recibe el mismo relleno y borde que el campo para que sigan leyéndose como
+ * una pieza.
+ */
+.relationship--allow-create .react-select .rs__control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.relationship--allow-create .relationship-add-new__add-button {
+  background: var(--pq-campo-fondo);
+  border-color: var(--pq-campo-borde);
+  border-radius: 0 var(--pq-radius-2xl) var(--pq-radius-2xl) 0;
+  box-shadow: none;
 }
 
 /* textarea del sistema: px-2.5 py-2. Sin altura fija: crece con las filas. */

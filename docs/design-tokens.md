@@ -534,6 +534,108 @@ verificación se limitó a navegar y leer. El CSS cubre ese estado
 - **Campos y botones**: solo heredan la escala de radios corregida; su forma del
   sistema es la fase 2.
 
+### Fase 2 — campos, botones y variantes (rama `feat/panel-fase2-campos`)
+
+Mismo método que la fase 1: «antes» en producción, «después» en el preview, en
+claro y oscuro, con cookie `payload-theme` y recarga (§10.23). El foco se midió
+con un **clic real**, no con `focus()` desde script, que en una pestaña de fondo
+no activa `:focus` de forma fiable.
+
+**Decisiones de dirección aplicadas:** relleno y radio del sistema **más** un
+borde derivado (no el campo sin borde); 32 px solo donde no recorta; hover, foco
+y etiquetas de grupo, lo accesible.
+
+#### Campos
+
+| Medida (claro · oscuro)           | Antes (producción)            | Después (preview)                                 |
+| --------------------------------- | ----------------------------- | ------------------------------------------------- |
+| Radio                             | 5,76 px                       | **12,96 px** (`2xl`)                              |
+| Borde contra el fondo             | 1,49 · 1,29                   | **3,11 · 3,35**                                   |
+| Borde en la caja de acceso        | 1,33 · 1,21                   | **4,12 · 3,15**                                   |
+| Relleno                           | `#fcfcfc` · `#1f1f20`         | **`#f0f0f0` · `#272727`** (`bg-input/50` · `/60`) |
+| Texto sobre el relleno            | 18,26 · 8,55                  | **16,44 · 7,75**                                  |
+| Foco                              | borde gris, sin halo          | **borde primario 4,71 · 3,88 + halo 3 px**        |
+| Alto texto, correo, número, fecha | 40 px                         | **32 px**, sin desbordar                          |
+| Casilla                           | radio 5,76, borde 1,49 · 1,29 | **radio 5 px, borde 3,11 · 3,35**                 |
+
+#### Botones y píldoras
+
+| Medida (claro · oscuro)       | Antes                  | Después                       |
+| ----------------------------- | ---------------------- | ----------------------------- |
+| Radio de todos los botones    | 5,76 px                | **12,96 px**                  |
+| Peso de texto                 | 400                    | **500** (`font-medium`)       |
+| Primario (texto blanco)       | 4,83                   | **4,83**, alto 32 px (ya era) |
+| Secundario → `outline`: borde | 16,29 (casi negro)     | **4,12 · 3,15** (derivado)    |
+| Píldora «Crear» → `secondary` | 12,27 · **4,20 FALLA** | **16,01 · 13,57**             |
+| Píldora en barra de búsqueda  | `#d1d1d1`, radio 3 px  | `#d1d1d1`, **radio 12,96 px** |
+
+**Un fallo que ya estaba en producción queda resuelto:** el botón «Crear» del
+campo de subida daba **4,20:1 en oscuro**; con la variante `secondary` del
+sistema da **13,57:1**.
+
+#### Qué se queda en 40 px (o más), y por qué
+
+| Campo               | Alto          | Motivo                                                                                                                                               |
+| ------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Selector (`select`) | 40 px o más   | `react-select` con altura automática: un valor largo **parte en dos líneas** (el rol mide 60 px en producción) y lleva iconos de limpiar y desplegar |
+| Relación            | 40 px o más   | Mismo componente; con varios valores apila píldoras. Y su botón «+» tiene que igualar la altura del control                                          |
+| Área de texto       | según filas   | Multilínea por naturaleza: crece con el contenido                                                                                                    |
+| Subida              | ~61 px        | No es un campo: es una zona con botones («Crear», «Elegir de los existentes») y texto de arrastre                                                    |
+| Texto enriquecido   | variable      | Superficie de edición de Lexical, no un campo de una línea                                                                                           |
+| Casilla             | 20 px (no 16) | El sistema la dibuja a 16 px; bajarla reduciría el área pulsable                                                                                     |
+| Píldoras            | 24 px (no 20) | A menudo son interactivas (filtros, columnas); 24 px es el mínimo táctil de WCAG 2.5.8                                                               |
+
+Los campos a 32 px cumplen ese mínimo táctil con margen.
+
+#### Defectos encontrados al medir, corregidos antes de enseñar el resultado
+
+1. **La fecha no se estilaba**: su selector real es `.date-time-picker`, no
+   `.field-type.date`.
+2. **El icono del calendario habría quedado bajo el texto**: Payload reserva
+   relleno derecho para él. Solo se toca el izquierdo.
+3. **La relación y su botón «+» se separaban**: la regla de partición de esquinas
+   perdía por especificidad (3 clases contra 4, ambas sin capa). Visible en la
+   captura del preview.
+4. **El foco no se veía**: la regla de reposo (6 clases y pseudoclases) ganaba a
+   la de foco (4). Al enfocar un campo el borde seguía gris y sin halo. Un campo
+   sin indicador de foco visible es un fallo de accesibilidad, no estético.
+5. **La casilla no estaba estilada**: estaba en el plan y no se había escrito.
+6. **El borde derivado no llegaba a 3:1 sobre la caja gris de acceso** (2,78:1):
+   esa superficie usa el paso 50. Ahí el borde pasa al primer paso que cumple.
+7. **Las píldoras de la barra de búsqueda dejaban de parecer botones**: con el
+   `secondary` del sistema, 1,03:1 contra la barra. Recuperan el fondo que tenían.
+
+Los defectos 3 y 4 son la misma trampa: **las reglas sin capa ganan a Payload,
+pero entre ellas manda la especificidad**, y excluir estados (`:not(.error)`,
+`:not([readonly])`) la dispara. Cualquier regla de estado nueva tiene que repetir
+la cadena completa de su regla de reposo.
+
+#### Una decisión pendiente de dirección
+
+**La píldora «Crear» sobre el fondo blanco es muy tenue.** Es el aspecto exacto
+del `secondary` del sistema (`#f2f2f2` sobre `#fcfcfc`, ~1,07:1 de separación),
+y el texto contrasta de sobra (16,01:1). Pero la forma de botón apenas se ve. No
+se ha tocado porque no hay un fallo WCAG claro —el texto identifica la acción—, y
+porque es justo el aspecto del sistema del cliente.
+
+#### Verificado también
+
+- **Esquinas de una fila de array PLEGADA** (pendiente de la fase 1): contenedor,
+  cabecera y botón con las cuatro esquinas a 12,96 px. Medido en el preview
+  plegando con «Contraer todo», que escribe en las preferencias del usuario; se
+  restauró con «Mostrar todo».
+
+#### No verificado
+
+- **Campos de contraseña**: la regla está aplicada, pero no se abrieron (en la
+  cuenta aparecen al pulsar «Cambiar contraseña», que cambia el estado del
+  formulario).
+- **Estado de error**: provocarlo exige intentar guardar un formulario inválido.
+  Las reglas lo excluyen para no taparlo, pero no se midió pintado.
+- **Selector y redirects con permisos de administrador**: en la base de preview
+  la cuenta de pruebas es **editor**, así que la vista de crear redirect sale
+  vacía. El selector se midió en «Tipo» de páginas institucionales.
+
 ---
 
 ## 9. Modo oscuro del panel — IMPLEMENTADO

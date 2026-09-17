@@ -526,6 +526,33 @@ html[data-theme="dark"] {
   --pq-campo-fondo: color-mix(in oklab, var(--pq-input) 60%, transparent);
 }
 
+/*
+ * BORDE SOBRE SUPERFICIES ELEVADAS.
+ *
+ * Algunos contenedores de Payload con campos dentro usan de fondo el paso 50
+ * (#efefef en claro), no el fondo general. Medido en el preview sobre la caja de
+ * acceso de la cuenta: el paso 350 da 2,78:1 contra ese gris, por debajo de 3:1,
+ * y lo mismo el borde de los botones secundarios de la caja.
+ *
+ * Se redefine la variable en esos contenedores, así campos y botones heredan el
+ * paso correcto sin tocar sus reglas. Mismo criterio que arriba —el primer paso
+ * de la rampa que llega a 3:1 sobre SU fondo—:
+ *   claro:  paso 400 sobre #efefef (el 350 no llega).
+ *   oscuro: el 450 sigue cumpliendo sobre el paso 50 oscuro; se reafirma
+ *           explícitamente porque, si no, heredaría el 400 claro, que en oscuro
+ *           es #bbbebc.
+ */
+.auth-fields,
+.where-builder,
+.group-by-builder,
+.upload {
+  --pq-campo-borde: var(--theme-elevation-400);
+}
+
+html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .upload) {
+  --pq-campo-borde: var(--theme-elevation-450);
+}
+
 /* -------------------------------------------------------------------------
  * 6.1 CAMPOS — aspecto común
  *

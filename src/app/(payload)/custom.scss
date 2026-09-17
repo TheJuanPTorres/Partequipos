@@ -462,3 +462,17 @@ html[data-theme="dark"] .collapsible--style-default {
 label.field-label:not(.unstyled) {
   padding-bottom: 12px;
 }
+
+/*
+ * EXCEPCIÓN — etiquetas EN LÍNEA con su control (casilla, radio).
+ *
+ * Ahí la etiqueta no va encima del control sino a su lado, y el relleno
+ * inferior la desplaza hacia abajo. Medido en el preview sobre la casilla
+ * «Puede editar slugs ya publicados»: con 12 px el centro de la etiqueta
+ * quedaba 6 px por debajo del centro de la casilla. Se les devuelve el valor
+ * original de Payload (base(0.25)).
+ */
+.checkbox-input label.field-label:not(.unstyled),
+.radio-input label.field-label:not(.unstyled) {
+  padding-bottom: calc(var(--base) * 0.25);
+}

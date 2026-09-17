@@ -580,13 +580,19 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  * cumple es el BORDE primario (4,71:1 claro · 3,88:1 oscuro); el halo es solo
  * refuerzo visual.
  */
-.field-type.text:not(.error) input:focus,
-.field-type.email:not(.error) input:focus,
-.field-type.number:not(.error) input:focus,
-.field-type.password:not(.error) input:focus,
-.field-type.confirm-password:not(.error) input:focus,
+/*
+ * Especificidad: cada selector de foco repite ENTERA la cadena de su regla de
+ * reposo y añade :focus. Con una cadena más corta el reposo (6 clases y
+ * pseudoclases) ganaba al foco (4) y el campo no mostraba ningún indicador de
+ * foco: detectado midiendo el preview.
+ */
+.field-type.text:not(.error):not(.read-only) input:not(:disabled):not([readonly]):focus,
+.field-type.email:not(.error):not(.read-only) input:not(:disabled):not([readonly]):focus,
+.field-type.number:not(.error):not(.read-only) input:not(:disabled):not([readonly]):focus,
+.field-type.password:not(.error) input:not(:disabled):not([readonly]):focus,
+.field-type.confirm-password:not(.error) input:not(:disabled):not([readonly]):focus,
 .date-time-picker:not(.date-time-picker--has-error) .react-datepicker__input-container input:focus,
-.field-type.textarea:not(.error) textarea:focus,
+.field-type.textarea:not(.error):not(.read-only) textarea:not(:disabled):not([readonly]):focus,
 .react-select:not(.react-select--error) .rs__control.rs__control--is-focused {
   border-color: var(--pq-primary);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--pq-primary) 30%, transparent);

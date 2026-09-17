@@ -980,14 +980,19 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  * con una ventana baja, cerrar sesión queda fuera de la vista. Con sticky se
  * queda pegado abajo mientras la lista se desplaza, sin reemplazar el componente.
  *
- * bottom negativo: el contenedor con scroll (.nav__scroll) tiene relleno
- * inferior, y sticky se ancla al borde interior del relleno; sin compensarlo, el
- * pie flotaría 40 px por encima del borde. Fondo opaco para que la lista pase
- * por debajo sin transparentarse, y separador decorativo arriba.
+ * El relleno inferior del contenedor con scroll pasa a 0 y lo sustituye el del
+ * propio pie: sticky se ancla al borde interior del relleno, así que con los
+ * 40 px de Payload el pie se despegaba 40 px justo al final del scroll. Medido
+ * en el preview antes de escribir esto. Fondo opaco para que la lista pase por
+ * debajo sin transparentarse, y separador decorativo arriba.
  */
+.nav__scroll {
+  --nav-padding-block-end: 0px;
+}
+
 .nav__controls {
   position: sticky;
-  bottom: calc(-1 * var(--nav-padding-block-end));
+  bottom: 0;
   z-index: 1;
   background: var(--theme-bg);
   border-top: 1px solid var(--pq-sidebar-border);

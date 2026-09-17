@@ -361,6 +361,75 @@ Dato relevante para la decisión sobre modo oscuro en el panel (§9).
 
 Ver `src/app/(payload)/custom.scss`, que lleva el porqué de cada decisión.
 
+### Estado final — cierre del trabajo de diseño del panel (2026-09-17)
+
+> Este apartado **manda** sobre los de abajo, que se conservan como registro de
+> cada tanda. Donde un apartado antiguo diga que algo falla o no se verificó,
+> comprobar aquí si se resolvió después.
+
+**Método en las tres fases:** rama → preview → «antes» en producción y «después»
+en el preview, **en claro y oscuro**, con cookie `payload-theme` y recarga
+(§10.23 de CLAUDE.md) y **varias lecturas tras asentar** (§10.24). Producción no
+se tocó hasta la aprobación de dirección; cada paso a producción, con contraste en
+los dos modos, `qa` sin errores, español y logo.
+
+#### Qué se aplicó (todo en producción)
+
+| Tanda    | Qué                                                                                                                                                                                                      |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Base     | Rampa neutra derivada, rampas de estado, fuentes autoalojadas, escala de radios, botón principal, foco, modo oscuro, interfaz en español                                                                 |
+| 1        | Tarjetas (radio, anillo, sombra, 20 px), filas de array (`2xl`, cabecera `muted/50`), 24 px entre campos, 12 px bajo la etiqueta; radio base corregido a px (defecto en producción)                      |
+| 2        | Campos: relleno `input/50`, radio `2xl`, borde derivado ≥ 3:1, foco primario + halo 3 px, 32 px en una línea; casilla; botones `2xl` y peso 500; `outline`, `secondary`, `subtle`; píldoras con contorno |
+| 3        | Menú: esquinas `xl`, fondo del activo, barra del activo dentro del ítem, 25 px (36 px con puntero grueso); tablas sin franjas, línea por fila, cabecera 40 px · 500; migas atenuadas                     |
+| Arreglos | Exclusiones de estado dentro de `:where()` (sin `!important`); fecha en error con su borde rojo; radio uniforme en todos los estados del campo                                                           |
+
+#### Desviaciones deliberadas del sistema
+
+Todas por accesibilidad o usabilidad, medidas y aprobadas por dirección:
+
+| Sistema                                           | Panel                                            | Motivo                                      |
+| ------------------------------------------------- | ------------------------------------------------ | ------------------------------------------- |
+| Foco con `--ring` al 30 % (2,52:1)                | Borde primario + halo (4,71 · 3,88)              | WCAG 1.4.11                                 |
+| Campo sin borde visible (1,49 · 1,29)             | Primer paso de la rampa con ≥ 3:1 sobre su fondo | El campo se identifica por su contorno      |
+| Píldora `secondary` sin contorno                  | Contorno con el borde derivado                   | 1.4.11 aplica al límite del control         |
+| Texto del primario `#fef2f2`                      | Blanco (4,83)                                    | AA en texto normal                          |
+| Etiqueta de grupo `sidebar-foreground/70` (2,74)  | `muted-foreground` (4,62 · 10,0)                 | AA en texto                                 |
+| Ítem de menú 32 px                                | 25 px; 36 px con puntero grueso                  | 19 colecciones: con 32 px desbordaba 127 px |
+| Activo solo con fondo (1,14:1, igual al hover)    | Fondo + barra                                    | El estado no comunicaba                     |
+| Casilla 16 px · píldora 20 px                     | 20 px · 24 px                                    | Objetivo táctil (2.5.8)                     |
+| Selector, relación, área de texto, subida a 32 px | Alto de Payload                                  | Recortaban contenido o apilan valores       |
+
+#### Qué quedó fuera, y por qué
+
+| Fuera                                | Por qué                                                                            |
+| ------------------------------------ | ---------------------------------------------------------------------------------- |
+| Iconos del menú                      | Exigen un componente `Nav` a medida; el ítem del sistema funciona sin ellos        |
+| Grupos (`.group-field`) como tarjeta | Son secciones a ancho completo con márgenes negativos: estrecharían el formulario  |
+| Escala tipográfica y espaciado       | El sistema no los define (Tailwind v4 por defecto)                                 |
+| Logo en oscuro                       | Falta el recurso del cliente: SVG o PNG transparente ≥ 520 × 102 con letras claras |
+| Favicon                              | Falta un icono cuadrado; no se fabrica recortando el logo                          |
+| Sitio público                        | Fuera del alcance de este trabajo (§10)                                            |
+
+#### Qué sigue fallando
+
+- **Campo de solo lectura en claro: 3,66:1.** Sin salida limpia (ver abajo). Es
+  el `slug`, un dato que el editor necesita leer: no se ampara en la exención de
+  componentes inactivos.
+
+#### Qué NO quedó verificado en producción, y por qué
+
+| Sin verificar en producción                     | Por qué                                                                                                                                                                                          | Dónde sí                                                          |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| Fecha con error (borde rojo) y error en general | Provocarlo exige pulsar Guardar: en producción solo se navega y se leen estilos. Se comprobó que el CSS servido lleva la regla nueva                                                             | Preview, claro y oscuro, pintado                                  |
+| Campos de contraseña                            | Abrirlos cambia el estado del formulario de la cuenta                                                                                                                                            | Preview, claro y oscuro                                           |
+| Fila de array plegada                           | Plegar escribe en las preferencias del usuario                                                                                                                                                   | Preview                                                           |
+| Hover de fila de tabla y de enlace del menú     | No se repitió; mismo CSS                                                                                                                                                                         | Preview                                                           |
+| Capturas de la fase 3                           | Fallaron las de producción: la pestaña no respondió a tiempo (`Page.captureScreenshot` y la inyección de script agotaron el tiempo). Las mediciones sí se tomaron, con dos lecturas coincidentes | Capturas de preview en la conversación, no guardadas como fichero |
+| Menú a 36 px con puntero grueso                 | La extensión del navegador no emula `pointer: coarse`. Se verificó que la regla existe y no se activa con ratón, y su efecto aplicándola sin la media query                                      | Preview, simulado; **ningún dispositivo táctil real**             |
+| Anchos estrechos (1000, 1024, 768, 390 px)      | La ventana estaba maximizada y no se pudo redimensionar: se midió en un `iframe` del mismo origen, donde las media queries se evalúan igual                                                      | Preview, `iframe`                                                 |
+| Selector y vista de redirects con administrador | En producción no se abrió; en preview la cuenta pasó a administrador tarde y la vista no se midió                                                                                                | Solo el selector de «Tipo» de páginas                             |
+| Logo en oscuro                                  | Se comprobó que carga (22 px); su aspecto sobre fondo oscuro depende del recurso pendiente del cliente                                                                                           | —                                                                 |
+
 **Mecanismo, verificado en la API instalada (Payload 3.88.0) y no de memoria:**
 Payload declara su tema dentro de `@layer payload-default`
 (`@payloadcms/ui/dist/scss/colors.scss` y `app.scss`). `custom.scss` se importa
@@ -457,13 +526,18 @@ llega. Dos matices:
 - No hay salida limpia sin tocar su fondo o elegir un gris que el sistema no
   publica. Queda documentado, **no corregido**.
 
-**Borde del input — 1,49:1 en claro, 1,29:1 en oscuro.** Sin salida limpia: el
+**Borde del input — 1,49:1 en claro, 1,29:1 en oscuro.** _Resuelto después, en
+la fase 2 (3,11 · 3,35), con el borde derivado aprobado por dirección._ Lo que
+sigue es el razonamiento de entonces. Sin salida limpia: el
 `--border` del sistema es un gris muy suave en claro y **blanco al 10 %** en
 oscuro. Llevarlo a 3:1 exigiría un borde bastante más marcado en todos los
 campos, que es una decisión estética del sistema, no un ajuste de contraste.
 **De fábrica ya fallaba** (1,36:1).
 
 ### Qué NO quedó verificado pintado, dicho claro
+
+_Superado: las fases 1–3 midieron navegación, listados y edición en los dos
+modos. Ver «Estado final»._
 
 - **En modo oscuro, solo el inicio de sesión.** Navegación, listados y edición
   no se midieron en oscuro: no hay sesión en el entorno local y la de producción
@@ -731,7 +805,28 @@ navegador estaba maximizada y no se pudo redimensionar.
 × 35 (etiqueta 20 + 5 + margen 10) = 210 · 19 enlaces × 25 = 475 · controles 41
 (con 20 de margen) · relleno inferior 40.
 
-**Propuesta, no aplicada:** subir el alto solo con puntero grueso,
+**APLICADA (decisión de dirección, 2026-09-17):** `@media (pointer: coarse)`
+con `min-height: 36px` en el enlace. `min-height` y no relleno: en móvil el
+interlineado de Payload ya da 35 px y el relleno lo inflaría.
+
+| Ventana (px) | Ratón (sin cambio) | Puntero grueso (simulado) | Exceso del menú |
+| ------------ | -----------------: | ------------------------: | --------------: |
+| 1528 × 828   |              25 px |                     36 px |         0 → 203 |
+| 1000 × 780   |              25 px |                     36 px |        26 → 235 |
+| 1024 × 768   |              25 px |                     36 px |        38 → 247 |
+| 768 × 1024   |              35 px |                     36 px |           0 → 0 |
+| 390 × 844    |              35 px |                     36 px |       152 → 171 |
+
+Texto y barra del activo siguen centrados en todos los anchos. **Cómo se midió,
+dicho claro:** la extensión del navegador no emula `pointer: coarse`, así que el
+efecto se midió **inyectando la regla sin la media query**, en la ventana y en
+`iframe` del mismo origen; y por separado se comprobó que el despliegue **sirve**
+`@media (pointer:coarse){.nav__link{min-height:36px}}` y que con ratón el enlace
+sigue en 25 px. **No se probó en un dispositivo táctil real.** La simulación se
+hizo sobre producción (solo estilos, sin escribir nada) porque la sesión del
+preview había caducado; el HTML del menú es el mismo.
+
+**Propuesta original:** subir el alto solo con puntero grueso,
 `@media (pointer: coarse)`, a 32–36 px. En ratón no cambia nada; en táctil el
 menú haría scroll, que en una tableta es el gesto normal. Recortar márgenes
 (relleno inferior 40 → 16, margen de grupo 10 → 4, margen de controles 20 → 8)

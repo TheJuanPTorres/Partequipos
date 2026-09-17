@@ -203,19 +203,20 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **DEL CLIENTE** — nada de esto lo podemos resolver nosotros:
 
-| #   | Pendiente                                                            | Bloquea                                                            |
-| --- | -------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| 1   | Claves de Turnstile y Resend (§10.11)                                | **Lanzamiento.** Formularios abiertos a bots y leads sin avisar    |
-| 2   | Infraestructura de base de datos, con pooler (§10.7)                 | **Migración.** Requisito duro                                      |
-| 3   | Acceso a WordPress                                                   | 51 artículos + ~55 páginas editoriales                             |
-| 4   | CSV e imágenes reales                                                | 351 modelos + 80 fichas de maquinaria                              |
-| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)          | JSON-LD `Organization` completo                                    |
-| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8) | Redirects y 404 del día del cambio                                 |
-| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)            | Cumplir el SLA de Gestión de Incidencias                           |
-| 8   | Clave de PageSpeed Insights (§10.3 13)                               | Umbrales de rendimiento contractuales                              |
-| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                   | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña |
-| 10  | Vercel Pro antes de volver el repositorio a privado                  | Despliegue automático                                              |
-| 11  | Textos legales definitivos                                           | Sustituir los marcadores de posición                               |
+| #   | Pendiente                                                                       | Bloquea                                                                                |
+| --- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1   | Claves de Turnstile y Resend (§10.11)                                           | **Lanzamiento.** Formularios abiertos a bots y leads sin avisar                        |
+| 2   | Infraestructura de base de datos, con pooler (§10.7)                            | **Migración.** Requisito duro                                                          |
+| 3   | Acceso a WordPress                                                              | 51 artículos + ~55 páginas editoriales                                                 |
+| 4   | CSV e imágenes reales                                                           | 351 modelos + 80 fichas de maquinaria                                                  |
+| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                     | JSON-LD `Organization` completo                                                        |
+| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)            | Redirects y 404 del día del cambio                                                     |
+| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                       | Cumplir el SLA de Gestión de Incidencias                                               |
+| 8   | Clave de PageSpeed Insights (§10.3 13)                                          | Umbrales de rendimiento contractuales                                                  |
+| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                              | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                     |
+| 10  | Vercel Pro antes de volver el repositorio a privado                             | Despliegue automático                                                                  |
+| 11  | Textos legales definitivos                                                      | Sustituir los marcadores de posición                                                   |
+| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras | El logo actual lleva fondo blanco: en el panel en oscuro se ve como una tarjeta blanca |
 
 **DE LA DIRECCIÓN TÉCNICA** — asumido por la dirección, no depende del cliente:
 
@@ -233,6 +234,7 @@ definitiva de base de datos (bloqueado por el cliente).
 | Restricciones de peso y dimensiones de imagen | Sostiene los umbrales de rendimiento                                                      |
 | Decisión sobre modo oscuro del SITIO          | El panel ya lo soporta con los tokens del sistema; el sitio público sigue sin él (§10.14) |
 | Icono cuadrado para el favicon                | Alternativa al cliente si él no lo tiene (§10.3 15)                                       |
+| Logo para fondos oscuros                      | Alternativa al cliente (#12) si él no lo tiene; no se fabrica invirtiendo el PNG          |
 | Menú plegable en móvil                        | Hoy no hay; si lo mete, revisar teclado y `aria-expanded`                                 |
 
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
@@ -264,11 +266,30 @@ definitiva de base de datos (bloqueado por el cliente).
 > (175 grises), así que pegar los tokens en `globals.css` es trivial pero no
 > cambiaría casi nada hasta sustituirlos.
 >
-> **Contraste del panel, medido pintado:** pasan cuerpo, etiquetas, inputs,
-> enlaces, botón principal (4,83) y texto secundario (4,62 claro · 10,0 oscuro).
-> **Siguen fallando dos, documentados y sin corregir** por no tener salida
-> limpia: el campo de solo lectura en claro (3,66) y el borde de los inputs
-> (1,49 claro · 1,29 oscuro), que ya fallaba de fábrica.
+> **PANEL — TRABAJO DE DISEÑO CERRADO (2026-09-17).** Tres fases, cada una por
+> rama + preview, medidas pintadas en claro y oscuro (§10.23, §10.24) y llevadas
+> a producción con `qa` sin errores. Detalle y cifras: `docs/design-tokens.md` §8,
+> «Estado final».
+>
+> | Fase | Qué cambió                                                                                           |
+> | ---- | ---------------------------------------------------------------------------------------------------- |
+> | Base | Tokens de color, tipografía y radio; modo oscuro; interfaz en español                                |
+> | 1    | Superficies: tarjetas, filas de array, espaciado entre campos y bajo etiquetas                       |
+> | 2    | Campos (radio, relleno, borde ≥ 3:1, foco primario, 32 px), casilla, botones y píldoras con contorno |
+> | 3    | Menú (esquinas, fondo y barra del activo, 25 px; 36 px táctil), tablas sin franjas, migas atenuadas  |
+>
+> **Criterio que manda en todas las fases:** accesibilidad y usabilidad por
+> encima de la fidelidad al sistema. Donde el sistema bajaba de AA o no
+> comunicaba un estado, se desvió y está anotado (foco, borde derivado, contorno
+> de píldoras, barra del activo, densidad del menú).
+>
+> **Sigue fallando uno, documentado y sin corregir:** el campo de solo lectura en
+> claro (3,66:1), sin salida limpia. El borde de los inputs, que fallaba de
+> fábrica (1,49 · 1,29), **quedó resuelto en la fase 2** (3,11 · 3,35).
+>
+> **Fuera de alcance:** iconos del menú (exigen un `Nav` a medida), grupos como
+> tarjeta (estrechaban el formulario) y el sitio público. **Pendiente de
+> terceros:** logo para fondos oscuros (#12) y favicon (#9).
 
 ### 10.1 Inventario real (fuente de verdad)
 
@@ -1095,6 +1116,47 @@ grises que fallaban eran el paso 500 e «iguales a los de fábrica». Era una
 fábrica era peor, no igual. Se detectó al ir a aplicar el remedio, resolviendo la
 rampa en vez de suponerla. Es el mismo defecto de fondo: **un número plausible
 que nadie contrastó con la fuente**.
+
+### 10.24 LECCIÓN — el borde autorrellenado leído a mitad de su transición
+
+> **Qué pasó (2026-09-17).** Al verificar la fase 2 del panel en producción, el
+> borde del campo del inicio de sesión dio **1,49:1**: justo el valor que tenía
+> **antes** de la fase 2, como si el arreglo no se hubiera desplegado. Tres
+> lecturas seguidas, tras dejar asentar la página, dieron **3,11:1**, el valor
+> correcto.
+>
+> **Por qué.** Chrome había **autorrellenado** el campo, y el borde estaba a
+> mitad de su transición. `formInput` de Payload 3.88 declara
+> `transition-property: border, box-shadow, background-color` con
+> **`transition-duration: 100ms`** para el borde (verificado en
+> `@payloadcms/ui/dist/scss/vars.scss`). `getComputedStyle` devuelve el valor
+> **interpolado en ese instante**, no el final: la lectura capturó un estado
+> transitorio que ningún usuario llega a ver.
+>
+> **Se repitió el mismo día sin autorrelleno**, en la vista de crear artículo:
+> primera lectura del borde del título 1,49 y del botón «Crear» 20,47; tres
+> lecturas a los 8 s dieron los valores correctos (`#909090`, 3,11). Ahí **no se
+> aisló el mecanismo** —puede ser la misma transición al hidratar o el montaje
+> de Payload—; lo probado es el efecto.
+>
+> **Por qué es peligroso:** el número era **plausible**. No era basura; era un
+> valor real de la página, el de antes del cambio. Una sola lectura habría
+> reportado «el arreglo no llegó a producción» con evidencia de aspecto sólido.
+>
+> **La regla:** en la página pintada, **varias lecturas separadas tras dejar
+> asentar**, y solo vale si coinciden. Una lectura única cerca de una carga, un
+> autorrelleno o una interacción no es una medición.
+
+**Sexta vez que el instrumento devuelve algo con aspecto de dato:**
+
+| Sección | Se midió…                                       | …en lugar de…                        |
+| ------- | ----------------------------------------------- | ------------------------------------ |
+| §10.14  | el HTML de origen                               | la página pintada                    |
+| §10.15  | el código HTTP                                  | el efecto en la base                 |
+| §10.17  | el permiso nuevo                                | la migración que lo reparte          |
+| §10.20  | el código, y el pintado de una pestaña de fondo | el despliegue, y una pestaña visible |
+| §10.23  | el tema forzado desde la consola                | el tema al que entra un usuario      |
+| §10.24  | un instante de la transición del borde          | el estado asentado                   |
 
 ### 10.8 Deuda técnica — el logo institucional no está en `Media`
 

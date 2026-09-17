@@ -916,6 +916,24 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   border-radius: 2px;
 }
 
+/*
+ * OBJETIVO TÁCTIL — decisión de dirección (2026-09-17). Los 25 px cumplen el
+ * mínimo AA (24 px) por 1 px, y con el dedo es poco. El hueco real son las
+ * tabletas de 769–1024 px: en móvil (≤768 px) Payload ya da 35 px. Solo con
+ * puntero grueso, así que el escritorio con ratón no cambia; en tableta el menú
+ * hace scroll, que ahí es el gesto normal.
+ *
+ * min-height y no relleno: en móvil el interlineado de Payload (30 px) ya da
+ * 35 px y el relleno lo inflaría; con min-height todos los anchos quedan en
+ * 36 px. El enlace es flex con align-items: center, así que texto y barra
+ * siguen centrados.
+ */
+@media (pointer: coarse) {
+  .nav__link {
+    min-height: 36px;
+  }
+}
+
 .nav a.nav__link:hover,
 .nav__link.active,
 .nav__link:has(.nav__link-indicator) {

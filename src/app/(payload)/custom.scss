@@ -469,10 +469,14 @@ label.field-label:not(.unstyled) {
  * Ahí la etiqueta no va encima del control sino a su lado, y el relleno
  * inferior la desplaza hacia abajo. Medido en el preview sobre la casilla
  * «Puede editar slugs ya publicados»: con 12 px el centro de la etiqueta
- * quedaba 6 px por debajo del centro de la casilla. Se les devuelve el valor
- * original de Payload (base(0.25)).
+ * quedaba 6 px por debajo del centro de la casilla.
+ *
+ * Se les devuelve 0, que es lo que tienen en producción MEDIDO (desfase 0 px):
+ * Payload ya anulaba ese relleno para las casillas con una regla propia, que
+ * la regla general de arriba —sin capa— pisaba. Un primer intento restauraba
+ * base(0.25) suponiendo que ese era el valor original; no lo era.
  */
 .checkbox-input label.field-label:not(.unstyled),
 .radio-input label.field-label:not(.unstyled) {
-  padding-bottom: calc(var(--base) * 0.25);
+  padding-bottom: 0;
 }

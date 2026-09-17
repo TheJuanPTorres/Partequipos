@@ -60,6 +60,7 @@
   --pq-primary: oklch(0.577 0.215 27.33); /* #dc2626 */
   --pq-primary-foreground: oklch(0.971 0.013 17.49); /* #fef2f2 */
   --pq-secondary: oklch(0.96 0 112.93); /* #f2f2f2 */
+  --pq-secondary-foreground: oklch(0.2046 0 112.89); /* #171717 */
   --pq-muted: oklch(0.9461 0 113.26); /* #ededed */
   --pq-muted-foreground: oklch(0.556 0 112.25); /* #737373 */
   --pq-border: oklch(0.9037 0 112.55); /* #dfdfdf */
@@ -129,6 +130,7 @@ html[data-theme="dark"] {
   --pq-background: oklch(0.1822 0 113.1); /* #121212 */
   --pq-foreground: oklch(0.9288 0.0126 255.44); /* #e2e8f0 */
   --pq-secondary: oklch(0.29 0 113.31); /* #2b2b2b */
+  --pq-secondary-foreground: oklch(0.9851 0 112.78); /* #fafafa */
   --pq-muted: oklch(0.2393 0 113.1); /* #1f1f1f */
   --pq-muted-foreground: oklch(0.798 0.0028 158.7); /* #bcbebc */
   --pq-border: oklch(1 0 112.71 / 0.1); /* blanco al 10 % */
@@ -479,4 +481,205 @@ label.field-label:not(.unstyled) {
 .checkbox-input label.field-label:not(.unstyled),
 .radio-input label.field-label:not(.unstyled) {
   padding-bottom: 0;
+}
+
+/* =========================================================================
+ * 6. APARIENCIA DEL SISTEMA — FASE 2: CAMPOS, BOTONES Y VARIANTES
+ *
+ * Decisiones de dirección ya tomadas (2026-09-16), aplicadas aquí:
+ *   - Campos: relleno y radio del sistema MÁS un borde derivado de la rampa.
+ *     NO el campo sin borde del sistema (límite a ~1,10:1).
+ *   - 32 px de alto solo donde no recorte el contenido.
+ *   - Hover primario, foco y etiquetas de grupo: se mantiene lo accesible.
+ *
+ * PRECEDENCIA. Estas reglas van sin capa y ganan a TODO lo de Payload, incluidos
+ * sus estados :hover, :focus, error y solo lectura. Por eso cada selector
+ * excluye error y solo lectura explícitamente, y el foco se redefine aquí: si no,
+ * el borde de reposo taparía el rojo de error y el realce del foco.
+ * ========================================================================= */
+
+:root {
+  /*
+   * BORDE DE CAMPO — derivado, no inventado.
+   *
+   * Claro: paso 350 de la rampa (#909090), 3,11:1 sobre el fondo. Es el primer
+   * paso que cumple el 3:1 de WCAG 1.4.11.
+   */
+  --pq-campo-borde: var(--theme-elevation-350);
+
+  /* Relleno del sistema: input: bg-input/50. */
+  --pq-campo-fondo: color-mix(in oklab, var(--pq-input) 50%, transparent);
+}
+
+html[data-theme="dark"] {
+  /*
+   * En OSCURO el paso 350 NO cumple: #505254 sobre #121212 da 2,39:1. Se usa el
+   * primer paso que sí cumple, el 450 (#66686b, 3,36:1). Mismo criterio que en
+   * claro —el primer paso de la rampa que llega a 3:1—, distinto número. La
+   * decisión aprobada decía «paso 350» calculándolo en claro; en oscuro literal
+   * habría dejado el borde por debajo de 3:1, que es justo lo que se quería
+   * evitar.
+   */
+  --pq-campo-borde: var(--theme-elevation-450);
+
+  /* Relleno del sistema en oscuro: dark:bg-input/60. */
+  --pq-campo-fondo: color-mix(in oklab, var(--pq-input) 60%, transparent);
+}
+
+/* -------------------------------------------------------------------------
+ * 6.1 CAMPOS — aspecto común
+ *
+ * Sistema (data-slot="input" / "textarea" / "select-trigger"):
+ *   rounded-2xl  border  bg-input/50  px-2.5
+ *   focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30
+ * ----------------------------------------------------------------------- */
+.field-type.text:not(.error):not(.read-only) input:not(:disabled):not([readonly]),
+.field-type.email:not(.error):not(.read-only) input:not(:disabled):not([readonly]),
+.field-type.number:not(.error):not(.read-only) input:not(:disabled):not([readonly]),
+.field-type.password:not(.error) input:not(:disabled):not([readonly]),
+.field-type.confirm-password:not(.error) input:not(:disabled):not([readonly]),
+.field-type.date:not(.error) .react-datepicker__input-container input:not(:disabled),
+.field-type.textarea:not(.error):not(.read-only) textarea:not(:disabled):not([readonly]),
+.react-select:not(.react-select--error) .rs__control:not(.rs__control--is-disabled) {
+  background: var(--pq-campo-fondo);
+  border-color: var(--pq-campo-borde);
+  border-radius: var(--pq-radius-2xl);
+  box-shadow: none; /* Payload añade inputShadow; el sistema no lleva sombra. */
+}
+
+/*
+ * FOCO. Forma del sistema (halo de 3 px) en el color PRIMARIO, no en --ring:
+ * --ring da 2,52:1 y al 30 % queda muy por debajo del 3:1. El indicador que
+ * cumple es el BORDE primario (4,71:1 claro · 3,88:1 oscuro); el halo es solo
+ * refuerzo visual.
+ */
+.field-type.text:not(.error) input:focus,
+.field-type.email:not(.error) input:focus,
+.field-type.number:not(.error) input:focus,
+.field-type.password:not(.error) input:focus,
+.field-type.confirm-password:not(.error) input:focus,
+.field-type.date:not(.error) .react-datepicker__input-container input:focus,
+.field-type.textarea:not(.error) textarea:focus,
+.react-select:not(.react-select--error) .rs__control.rs__control--is-focused {
+  border-color: var(--pq-primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--pq-primary) 30%, transparent);
+  outline: 0;
+}
+
+/* -------------------------------------------------------------------------
+ * 6.2 CAMPOS — altura
+ *
+ * Sistema: input h-8 (32 px) · px-2.5 (10 px) · py-1.
+ * Payload: base(2) = 40 px · base(0.4) base(0.75).
+ *
+ * 32 px SOLO en los campos de una línea donde se ha comprobado que no recorta
+ * (texto, correo, número, contraseña, fecha). Interlineado 20 px + 5 px arriba y
+ * abajo + 1 px de borde = 32 px. El objetivo táctil mínimo de WCAG 2.5.8 es de
+ * 24 px, así que 32 px lo cumple con margen.
+ *
+ * Se QUEDAN como están, con su motivo, en docs/design-tokens.md §8 (fase 2):
+ * selector/relación (react-select), área de texto, casilla, subida y texto
+ * enriquecido.
+ * ----------------------------------------------------------------------- */
+.field-type.text:not(.has-many) input,
+.field-type.email input,
+.field-type.number:not(.has-many) input,
+.field-type.password input,
+.field-type.confirm-password input,
+.field-type.date .react-datepicker__input-container input {
+  height: 32px;
+  line-height: 20px;
+  padding-block: 5px;
+  padding-inline: 10px;
+}
+
+/* textarea del sistema: px-2.5 py-2. Sin altura fija: crece con las filas. */
+.field-type.textarea textarea {
+  padding-block: 8px;
+  padding-inline: 10px;
+}
+
+/* -------------------------------------------------------------------------
+ * 6.3 BOTONES
+ *
+ * Sistema (data-slot="button"):
+ *   rounded-2xl  font-medium  h-8 px-3 (default)  h-7 (sm)
+ *   active:not-aria-[haspopup]:translate-y-px
+ *
+ * El botón mediano de Payload YA mide 32 px (interlineado 22 px + 4 px + 4 px +
+ * borde), igual que h-8: la altura no se toca.
+ *
+ * El radio del botón sale de var(--style-radius-s). Se redefine ESA variable
+ * dentro de .btn —y no el radio— para no alterar nada más que la use fuera.
+ * ----------------------------------------------------------------------- */
+.btn {
+  --style-radius-s: var(--pq-radius-2xl);
+}
+
+.btn:not(.btn--style-tab) {
+  --btn-font-weight: 500;
+}
+
+.btn:active:not(:disabled):not([aria-haspopup]) {
+  transform: translateY(1px);
+}
+
+/*
+ * SECUNDARIO de Payload -> variante OUTLINE del sistema.
+ *   Sistema: border-border bg-background hover:bg-muted
+ * Payload lo pinta con borde casi negro (paso 800). Se lleva al aspecto del
+ * sistema, pero con el borde DERIVADO de los campos (3:1) en vez de --border
+ * (1,30:1), por la misma decisión del conflicto 1.
+ */
+.btn--style-secondary:not(:disabled) {
+  --bg-color: var(--pq-background);
+  --color: var(--pq-foreground);
+  --btn-border: 1px solid var(--pq-campo-borde);
+  --hover-bg: var(--pq-muted);
+  --hover-color: var(--pq-foreground);
+  --hover-btn-border: 1px solid var(--pq-campo-borde);
+}
+
+/*
+ * PÍLDORA de Payload -> variante SECONDARY del sistema.
+ *   Sistema: bg-secondary text-secondary-foreground
+ *            hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]
+ */
+.btn--style-pill:not(:disabled) {
+  --bg-color: var(--pq-secondary);
+  --color: var(--pq-secondary-foreground);
+  --hover-bg: color-mix(in oklch, var(--pq-secondary), var(--pq-foreground) 5%);
+  --hover-color: var(--pq-secondary-foreground);
+}
+
+/*
+ * SUTIL de Payload. No tiene equivalente exacto: en Payload es un botón con
+ * fondo y borde suaves. Se lleva al fondo atenuado del sistema (bg-muted, el de
+ * las pestañas y los ítems) y se le quita el borde, que el sistema no pone en
+ * superficies rellenas. Conserva el fondo: quitárselo lo convertiría en «ghost»
+ * y le haría perder la forma de botón (regla 10).
+ */
+.btn--style-subtle:not(:disabled) {
+  --bg-color: var(--pq-muted);
+  --color: var(--pq-foreground);
+  --btn-border: 1px solid transparent;
+  --hover-bg: color-mix(in oklch, var(--pq-muted), var(--pq-foreground) 5%);
+  --hover-btn-border: 1px solid transparent;
+}
+
+/* -------------------------------------------------------------------------
+ * 6.4 INSIGNIAS — .pill (elemento, no botón)
+ *
+ * Sistema (data-slot="badge" variant="secondary"):
+ *   rounded-2xl bg-secondary text-secondary-foreground text-xs font-medium h-5
+ *
+ * La ALTURA NO se baja a 20 px: en Payload las píldoras son muchas veces
+ * interactivas (quitar un valor, abrir un filtro) y 24 px es el mínimo táctil
+ * de WCAG 2.5.8. Radio compilado como literal en Payload: se sobrescribe.
+ * ----------------------------------------------------------------------- */
+.pill {
+  border-radius: var(--pq-radius-2xl);
+  background: var(--pq-secondary);
+  color: var(--pq-secondary-foreground);
+  font-weight: 500;
 }

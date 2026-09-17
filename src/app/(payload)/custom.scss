@@ -777,3 +777,17 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   color: var(--pq-secondary-foreground);
   font-weight: 500;
 }
+
+/*
+ * EXCEPCIÓN — píldoras sobre la barra de búsqueda del listado.
+ *
+ * La barra (.search-bar) tiene fondo #efefef y --secondary es #f2f2f2: medido en
+ * el preview, 1,03:1 entre píldora y barra. «Columnas» y «Filtros» dejaban de
+ * parecer botones y se leían como texto en negrita (regla 10). Ahí se conserva el
+ * fondo que ya tenían, el paso 150 de la rampa.
+ */
+.search-bar .pill,
+.search-bar .btn--style-pill:not(:disabled) {
+  --bg-color: var(--theme-elevation-150);
+  background: var(--theme-elevation-150);
+}

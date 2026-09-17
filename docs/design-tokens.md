@@ -647,16 +647,100 @@ con el mismo borde derivado de los campos.
   plegando con «Contraer todo», que escribe en las preferencias del usuario; se
   restauró con «Mostrar todo».
 
-#### No verificado
+#### No verificado en la fase 2 — cerrado en la fase 3
 
-- **Campos de contraseña**: la regla está aplicada, pero no se abrieron (en la
-  cuenta aparecen al pulsar «Cambiar contraseña», que cambia el estado del
-  formulario).
-- **Estado de error**: provocarlo exige intentar guardar un formulario inválido.
-  Las reglas lo excluyen para no taparlo, pero no se midió pintado.
+- **Campos de contraseña** y **estado de error**: medidos en el preview de la
+  fase 3 (ver abajo). El error de la **fecha** estaba roto: se corrigió allí.
 - **Selector y redirects con permisos de administrador**: en la base de preview
-  la cuenta de pruebas es **editor**, así que la vista de crear redirect sale
-  vacía. El selector se midió en «Tipo» de páginas institucionales.
+  la cuenta de pruebas era **editor**; ya es administrador en esa base.
+
+### Fase 3 — navegación, tablas y migas (rama `feat/panel-fase3-navegacion-tablas`)
+
+Mismo método: «antes» en producción, «después» en el preview, claro y oscuro con
+cookie y recarga (§10.23), varias lecturas tras asentar. Ventana de 1528 × 828 px
+CSS (DPR 1,25), salvo donde se indica.
+
+#### Menú lateral
+
+| Medida (claro · oscuro)      | Antes (producción)           | Después (preview)                     |
+| ---------------------------- | ---------------------------- | ------------------------------------- |
+| Alto de enlace               | 25 px                        | **36 px**                             |
+| Relleno                      | 2,5 px 0                     | **8 px 12 px**                        |
+| Radio                        | 0                            | **10,08 px** (`xl`)                   |
+| Texto de enlace              | 18,26 · 15,2                 | 18,26 · 15,2                          |
+| Activo: marca                | barra indicadora + peso 600  | **fondo `sidebar-accent`** + peso 500 |
+| Activo: fondo contra el menú | —                            | **1,14 · 1,44**                       |
+| Etiqueta de grupo            | 13 px · 400 · 4,62 · 10,0    | **12 px · 500** · 4,62 · 10,0         |
+| Contenido / visible          | 828 / 828 (≈6 px de holgura) | **1031 / 828: 203 px de scroll**      |
+
+**Con las 19 colecciones, el menú del sistema NO cabe.** Exceso medido según el
+relleno vertical del enlace (ventana de 828 px):
+
+| Relleno | Alto de enlace | Exceso |
+| ------- | -------------: | -----: |
+| 8 px    |          36 px | 203 px |
+| 6 px    |          32 px | 127 px |
+| 5 px    |          30 px |  89 px |
+| 4 px    |          28 px |  51 px |
+| 3 px    |          26 px |  13 px |
+| 2,5 px  |          25 px |   0 px |
+
+32 px es el alto real del sistema (`h-8`). Con una ventana de 780 px el exceso
+del preview sube a 251 px; producción, con ~822 px de contenido, también
+desbordaría ahí. **Pendiente de decisión de dirección** (densidad frente a
+fidelidad).
+
+**Pendiente también: el activo solo se distingue por un fondo de 1,14:1 en
+claro**, idéntico al del hover, más un peso 500 frente a 400. La barra
+indicadora que Payload mostraba se ocultó. No es un límite de control, pero es un
+estado: se plantea a dirección antes de tocarlo.
+
+#### Tabla de listado
+
+| Medida (claro · oscuro) | Antes (producción)            | Después (preview)                      |
+| ----------------------- | ----------------------------- | -------------------------------------- |
+| Franjas                 | impares `#efefef` · `#181919` | **ninguna**                            |
+| Línea bajo fila         | ninguna                       | **1 px `--border`** (1,30 · 1,30)      |
+| Cabecera: alto          | 54 px                         | **40 px** (`h-10`)                     |
+| Cabecera: peso · texto  | 400 · 4,62 · 10,0             | **500 · 20,47 · 15,2**                 |
+| Celda: relleno · fila   | 12 px · 44 px                 | **8 px · 37 px** (16 px en los bordes) |
+| Hover de fila           | —                             | `muted/50`                             |
+
+La línea de fila es separador decorativo: 1.4.11 no le pide 3:1.
+
+#### Migas de pan
+
+| Medida (claro · oscuro) | Antes              | Después                          |
+| ----------------------- | ------------------ | -------------------------------- |
+| Enlace                  | 600 · 18,26 · 15,2 | **400 · 4,62 · 10,0** (atenuado) |
+| Página actual           | 400 · 18,26 · 15,2 | 400 · **20,47** · 15,2           |
+
+#### Estados pendientes de la fase 2, medidos
+
+| Estado (claro · oscuro)        | Resultado                                                               |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| Contraseña y confirmación      | 32 px · 12,96 px · borde 4,12 · 3,15 (superficie elevada, paso 400/450) |
+| Texto en error, reposo         | borde rojo de Payload 4,65 · 4,41 · aviso 8,64 · 4,90                   |
+| Texto en error, con foco       | borde 6,49 (oscuro); Payload conserva su estilo, no el halo primario    |
+| Foco normal (regresión fase 2) | borde primario 3,88 + halo 3 px (oscuro), igual que en la fase 2        |
+| Partición relación / «+»       | `12.96px 0 0 12.96px` / `0 12.96px 12.96px 0`, igual que en la fase 2   |
+
+#### Defectos encontrados al medir, corregidos antes de enseñar el resultado
+
+1. **La fecha en error perdía el borde rojo.** La exclusión apuntaba a
+   `.date-time-picker--has-error`, clase que **no existe** en Payload 3.88: el
+   error se marca en el contenedor (`.date-time-field--has-error`). El borde gris
+   del campo tapaba el rojo; solo quedaba el aviso de texto. Tras el arreglo:
+   `#e7000b` 4,65 en claro, 4,94 en oscuro.
+2. **Un campo en error quedaba a 5,76 px** junto a campos a 12,96 px, porque el
+   radio iba en la regla de reposo, que excluye el error. El radio va ahora en
+   regla aparte para todos los estados; los colores de estado siguen siendo los
+   de Payload.
+3. **La cabecera de tabla medía 46,8 px, no 40.** El botón de ordenar (30 px) más
+   el `p-2` común. El sistema no da relleno vertical al `th`.
+
+El defecto 1 es de la familia de §10.15: la regla «excluía el error» en el
+código, y el error seguía tapado en la página pintada.
 
 ---
 

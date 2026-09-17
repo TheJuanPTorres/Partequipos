@@ -662,16 +662,20 @@ CSS (DPR 1,25), salvo donde se indica.
 
 #### Menú lateral
 
-| Medida (claro · oscuro)      | Antes (producción)           | Después (preview)                     |
-| ---------------------------- | ---------------------------- | ------------------------------------- |
-| Alto de enlace               | 25 px                        | **36 px**                             |
-| Relleno                      | 2,5 px 0                     | **8 px 12 px**                        |
-| Radio                        | 0                            | **10,08 px** (`xl`)                   |
-| Texto de enlace              | 18,26 · 15,2                 | 18,26 · 15,2                          |
-| Activo: marca                | barra indicadora + peso 600  | **fondo `sidebar-accent`** + peso 500 |
-| Activo: fondo contra el menú | —                            | **1,14 · 1,44**                       |
-| Etiqueta de grupo            | 13 px · 400 · 4,62 · 10,0    | **12 px · 500** · 4,62 · 10,0         |
-| Contenido / visible          | 828 / 828 (≈6 px de holgura) | **1031 / 828: 203 px de scroll**      |
+Primera versión con el `py-2` del sistema; versión final tras las dos decisiones
+de dirección de abajo.
+
+| Medida (claro · oscuro)      | Antes (producción)        | Primera versión       | **Final**                                    |
+| ---------------------------- | ------------------------- | --------------------- | -------------------------------------------- |
+| Alto de enlace               | 25 px                     | 36 px                 | **25 px**                                    |
+| Relleno                      | 2,5 px 0                  | 8 px 12 px            | **2,5 px 12 px**                             |
+| Radio                        | 0                         | 10,08 px              | **10,08 px** (`xl`)                          |
+| Texto de enlace              | 18,26 · 15,2              | 18,26 · 15,2          | 18,26 · 15,2                                 |
+| Activo: marca                | barra + peso 600          | solo fondo + peso 500 | **barra + fondo + peso 500**                 |
+| Activo: fondo contra el menú | —                         | 1,14 · 1,44           | 1,14 · 1,44                                  |
+| Barra del activo             | a −20 px, fuera del ítem  | oculta                | **3 × 16 px dentro del ítem · 16,0 · 10,55** |
+| Etiqueta de grupo            | 13 px · 400 · 4,62 · 10,0 | 12 px · 500           | 12 px · 500 · 4,62 · 10,0                    |
+| Contenido del menú           | 822 px                    | 1031 px               | **822 px**                                   |
 
 **Con las 19 colecciones, el menú del sistema NO cabe.** Exceso medido según el
 relleno vertical del enlace (ventana de 828 px):
@@ -685,15 +689,54 @@ relleno vertical del enlace (ventana de 828 px):
 | 3 px    |          26 px |  13 px |
 | 2,5 px  |          25 px |   0 px |
 
-32 px es el alto real del sistema (`h-8`). Con una ventana de 780 px el exceso
-del preview sube a 251 px; producción, con ~822 px de contenido, también
-desbordaría ahí. **Pendiente de decisión de dirección** (densidad frente a
-fidelidad).
+32 px es el alto real del sistema (`h-8`).
 
-**Pendiente también: el activo solo se distingue por un fondo de 1,14:1 en
-claro**, idéntico al del hover, más un peso 500 frente a 400. La barra
-indicadora que Payload mostraba se ocultó. No es un límite de control, pero es un
-estado: se plantea a dirección antes de tocarlo.
+**Decisión de dirección 1 (2026-09-17) — relleno a 2,5 px.** Usabilidad sobre
+fidelidad: un menú con scroll en un panel de uso diario es peor que uno menos
+vistoso. Se conservan esquinas, fondo del activo y peso 500. El contenido vuelve
+a los **822 px de producción**: el menú cabe sin scroll en ventanas de 822 px o
+más; por debajo desborda **lo mismo que producción** (42 px a 780 px), no más.
+
+**Decisión de dirección 2 — la barra del activo vuelve.** Con fondo de 1,14:1
+idéntico al del hover, la página actual no se distinguía de la señalada. No es un
+problema de contraste sino de que el estado no comunicaba. Payload la dibuja a
+−20 px, en el margen del menú: fuera del ítem redondeado y, a ≤1024 px, donde el
+margen baja a 10 px, recortada. Se movió **dentro del ítem** (4 px desde el
+borde, 5 px hasta el texto). Verificado que hover y activo ya se distinguen.
+
+#### Objetivo táctil del menú
+
+| Ventana (px) | Menú                            | Enlace       | Exceso del menú |
+| ------------ | ------------------------------- | ------------ | --------------: |
+| 1528 × 828   | lateral fijo                    | 25 × 234     |               0 |
+| 1528 × 780   | lateral fijo                    | 25 × 234     |              42 |
+| 1000 × 780   | desplegable (cerrado de inicio) | 25 × 256     |              26 |
+| 1024 × 600   | desplegable                     | 25 × 256     |             206 |
+| 768 × 1024   | pantalla completa               | **35** × 735 |               0 |
+| 390 × 844    | pantalla completa               | **35** × 358 |             152 |
+
+Anchos por debajo de 1528 medidos en un `iframe` del mismo origen: la ventana del
+navegador estaba maximizada y no se pudo redimensionar.
+
+- **WCAG 2.5.8 (AA, 24 × 24 px): cumple en todos los anchos**, por 1 px en
+  escritorio. Los enlaces son contiguos (0 px entre ellos), así que no aplica la
+  excepción por espaciado: cumple por tamaño.
+- **WCAG 2.5.5 (AAA, 44 px): no cumple en ningún ancho**, tampoco en producción.
+- **En móvil (≤768 px) Payload ya sube el enlace a 35 px** (17,5 px / 30 px de
+  interlineado), y el menú a pantalla completa hace scroll con naturalidad.
+- **El hueco es la franja 769–1024 px con pantalla táctil** (tabletas en
+  horizontal): 25 px con el dedo.
+
+**Reparto vertical del menú (822 px):** relleno superior 56 (cabecera) · 6 grupos
+× 35 (etiqueta 20 + 5 + margen 10) = 210 · 19 enlaces × 25 = 475 · controles 41
+(con 20 de margen) · relleno inferior 40.
+
+**Propuesta, no aplicada:** subir el alto solo con puntero grueso,
+`@media (pointer: coarse)`, a 32–36 px. En ratón no cambia nada; en táctil el
+menú haría scroll, que en una tableta es el gesto normal. Recortar márgenes
+(relleno inferior 40 → 16, margen de grupo 10 → 4, margen de controles 20 → 8)
+libera 72 px, que dan 29 px por enlace a 828 px de ventana, pero **reintroduce
+el scroll en cualquier ventana menor** y comprime la separación entre grupos.
 
 #### Tabla de listado
 

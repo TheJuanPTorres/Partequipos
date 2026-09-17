@@ -975,6 +975,17 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 }
 
 /*
+ * FOCO DEL BOTÓN DE GRUPO. Payload pone `outline: none` en su `:focus-visible`
+ * y solo aclara el color del texto: medido con el teclado en el preview, el
+ * botón enfocado no tenía contorno mientras los enlaces sí. Se le da el mismo
+ * indicador que a los enlaces (WCAG 2.4.7).
+ */
+.nav .nav-group__toggle:focus-visible {
+  outline: var(--accessibility-outline);
+  outline-offset: -2px;
+}
+
+/*
  * ICONO DEL GRUPO. Sistema: `size-4` (16 px) y `gap-2` entre icono y texto, con
  * el icono al color del texto. La etiqueta pasa a fila para alinearlos por su
  * centro; el icono no se encoge si el nombre del grupo es largo.

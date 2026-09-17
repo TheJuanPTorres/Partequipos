@@ -2,7 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, soloAdmin } from "../lib/seguridad/acceso";
 
 /**
  * Categorías técnicas transversales del proyecto (Tren de Rodaje, Filtración,
@@ -22,7 +22,9 @@ export const CategoriaTecnica: CollectionConfig = {
     group: "Repuestos",
   },
   access: {
-    read: publico,
+    // PRUEBA TEMPORAL (2026-09-17): restringido a administradores para verificar
+    // que el menu propio OCULTA lo que el rol no puede leer. SE REVIERTE.
+    read: soloAdmin,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

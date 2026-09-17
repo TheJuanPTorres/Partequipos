@@ -592,15 +592,38 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 .field-type.number:where(:not(.error, .read-only)) input:where(:not(:disabled, [readonly])),
 .field-type.password:where(:not(.error)) input:where(:not(:disabled, [readonly])),
 .field-type.confirm-password:where(:not(.error)) input:where(:not(:disabled, [readonly])),
-.date-time-picker:where(:not(.date-time-picker--has-error))
+.date-time-picker:where(:not(.date-time-field--has-error .date-time-picker))
   .react-datepicker__input-container
   input:where(:not(:disabled)),
 .field-type.textarea:where(:not(.error, .read-only)) textarea:where(:not(:disabled, [readonly])),
 .react-select:where(:not(.react-select--error)) .rs__control:where(:not(.rs__control--is-disabled)) {
   background: var(--pq-campo-fondo);
   border-color: var(--pq-campo-borde);
-  border-radius: var(--pq-radius-2xl);
   box-shadow: none; /* Payload añade inputShadow; el sistema no lleva sombra. */
+}
+
+/*
+ * RADIO en TODOS los estados. Va aparte de la regla de reposo porque la forma no
+ * compite con los colores de estado: el error, el solo lectura y el deshabilitado
+ * conservan sus colores de Payload, pero con la misma silueta que el resto.
+ * Medido en el preview de la fase 3: un campo en error quedaba a 5,76 px junto a
+ * campos a 12,96 px.
+ *
+ * El error de la fecha lo pone Payload en el CONTENEDOR del campo
+ * (.date-time-field--has-error), no en .date-time-picker: la exclusión anterior
+ * (.date-time-picker--has-error) apuntaba a una clase que no existe en 3.88 y el
+ * borde gris tapaba el rojo. Se excluye con :not() de selector complejo para no
+ * atar la regla al contenedor: el mismo selector de fecha se usa en los filtros.
+ */
+.field-type.text input,
+.field-type.email input,
+.field-type.number input,
+.field-type.password input,
+.field-type.confirm-password input,
+.date-time-picker .react-datepicker__input-container input,
+.field-type.textarea textarea,
+.react-select .rs__control {
+  border-radius: var(--pq-radius-2xl);
 }
 
 /*
@@ -615,7 +638,7 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 .field-type.number:where(:not(.error, .read-only)) input:where(:not(:disabled, [readonly])):focus,
 .field-type.password:where(:not(.error)) input:where(:not(:disabled, [readonly])):focus,
 .field-type.confirm-password:where(:not(.error)) input:where(:not(:disabled, [readonly])):focus,
-.date-time-picker:where(:not(.date-time-picker--has-error))
+.date-time-picker:where(:not(.date-time-field--has-error .date-time-picker))
   .react-datepicker__input-container
   input:where(:not(:disabled)):focus,
 .field-type.textarea:where(:not(.error, .read-only)) textarea:where(:not(:disabled, [readonly])):focus,
@@ -962,7 +985,13 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   padding-inline-end: 16px;
 }
 
+/*
+ * Sin relleno vertical en la cabecera: el sistema da h-10 y NO p-2 al th. Con el
+ * p-2 común, el botón de ordenar de Payload (30 px) + 16 px empujaba la cabecera
+ * a 46,8 px (medido en el preview). Con relleno 0 queda en 40 px y el botón cabe.
+ */
 .table thead th {
+  padding-block: 0;
   height: 40px; /* h-10 */
   color: var(--pq-foreground);
   font-weight: 500;

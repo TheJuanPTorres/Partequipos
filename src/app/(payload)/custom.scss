@@ -874,6 +874,7 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  *   data-active:text-sidebar-accent-foreground   focus-visible:ring-3
  *
  * En el sistema hover y activo COMPARTEN fondo; el activo solo añade peso 500.
+ * Aquí el activo lleva además la barra de Payload (ver abajo).
  *
  * SIN ICONOS. El ítem del sistema no depende del icono: su forma (radio, relleno,
  * fondo) es la misma, y la clase solo ajusta el relleno SI hay icono
@@ -884,20 +885,35 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   border-right-color: var(--pq-sidebar-border);
 }
 
+/*
+ * DENSIDAD — decisión de dirección (2026-09-17): usabilidad sobre fidelidad.
+ * Con el py-2 del sistema (36 px por enlace) las 19 colecciones desbordaban el
+ * menú 203 px en una ventana de 828 px. Se conserva el relleno vertical de
+ * Payload (2,5 px, enlace de 25 px), que cabe sin scroll, y se mantiene lo que
+ * sí se percibe del sistema: esquinas, fondo del activo y peso 500.
+ * 25 px cumple el objetivo mínimo de WCAG 2.5.8 (24 px). Medición completa en
+ * docs/design-tokens.md §8, fase 3.
+ */
 .nav__link {
   border-radius: var(--pq-radius-xl);
-  padding-block: 8px; /* py-2 */
+  padding-block: 2.5px;
   padding-inline: 12px; /* px-3 */
   text-decoration: none;
   width: 100%;
 }
 
 /*
- * Payload marca el activo con una barra de 2 px a la izquierda. El sistema lo
- * marca con fondo: la barra sobra y además se saldría del ítem redondeado.
+ * BARRA DEL ACTIVO — decisión de dirección: se recupera. En el sistema hover y
+ * activo comparten fondo (1,14:1 en claro), así que la página actual no se
+ * distinguía de la que se señala con el ratón. Payload la dibuja a -20 px, en el
+ * margen del menú: fuera del ítem redondeado y recortada por el overflow del
+ * menú cuando ese margen baja a 10 px (≤1024 px). Se mete DENTRO del ítem, en el
+ * hueco del relleno izquierdo.
  */
 .nav__link-indicator {
-  display: none;
+  inset-inline-start: 4px;
+  width: 3px;
+  border-radius: 2px;
 }
 
 .nav a.nav__link:hover,

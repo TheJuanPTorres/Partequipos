@@ -566,6 +566,30 @@ html[data-theme="dark"] {
   outline: 0;
 }
 
+/*
+ * CASILLA. Sistema (data-slot="checkbox"):
+ *   size-4 rounded-[5px] border bg-input/90
+ *   focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30
+ *
+ * Se aplican el radio de 5 px, el relleno y el borde DERIVADO (mismo conflicto
+ * 1: su borde de fábrica da 1,49:1 y la casilla se identifica justamente por su
+ * contorno). El TAMAÑO NO se baja a 16 px: Payload la dibuja a $baseline y
+ * amplía el área pulsable del input real; bajarla reduciría el objetivo táctil.
+ * El estado marcado de Payload no cambia el fondo, solo muestra el icono, así
+ * que no hace falta excluirlo.
+ */
+.checkbox-input:not(.checkbox-input--read-only) .checkbox-input__input {
+  background: var(--pq-campo-fondo);
+  border-color: var(--pq-campo-borde);
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.checkbox-input:not(.checkbox-input--read-only):focus-within .checkbox-input__input {
+  border-color: var(--pq-primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--pq-primary) 30%, transparent);
+}
+
 /* -------------------------------------------------------------------------
  * 6.2 CAMPOS — altura
  *

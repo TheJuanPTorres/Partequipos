@@ -778,6 +778,54 @@ problema de contraste sino de que el estado no comunicaba. Payload la dibuja a
 margen baja a 10 px, recortada. Se movió **dentro del ítem** (4 px desde el
 borde, 5 px hasta el texto). Verificado que hover y activo ya se distinguen.
 
+#### Agrupación del menú y pie fijo — fase A (2026-09-17)
+
+Aprobado por dirección tras el estudio del menú. **El problema de fondo no era el
+scroll, era la agrupación:** «Colecciones» es el grupo por defecto de Payload y
+recogía 7 colecciones de naturaleza distinta (catálogo de repuestos, Media,
+páginas, redirecciones), y los nombres no decían de qué sección eran («Marcas»
+junto a «Marcas de maquinaria»).
+
+| Antes                            | Después                                        |
+| -------------------------------- | ---------------------------------------------- |
+| Colecciones (7, cajón de sastre) | **Comercial** (1): Solicitudes, primero        |
+| Configuración (1)                | **Repuestos** (4)                              |
+| Maquinaria (6)                   | **Maquinaria** (6)                             |
+| Lubricantes (2)                  | **Lubricantes** (2)                            |
+| Blog (2)                         | **Contenido** (4): páginas, blog y Media       |
+| Comercial (1), último            | **Configuración** (2): Usuarios, Redirecciones |
+
+Solicitudes va primera porque son los leads y hoy solo se ven entrando al panel
+(CLAUDE.md §10.11). **El orden del menú es el orden del array `collections` de
+`payload.config.ts`**: `groupNavItems` crea cada grupo cuando aparece por primera
+vez. No toca el esquema —las tablas se generan por slug— ni los slugs del panel.
+
+`src/collections/grupos.test.ts` falla si una colección se queda sin grupo
+aprobado: sin `admin.group` Payload la mete en «Colecciones» sin avisar.
+
+**Preferencias guardadas.** Payload guarda el estado de cada grupo en
+`payload-preferences` (clave `nav`) **por nombre de grupo**. Maquinaria,
+Lubricantes, Comercial y Configuración conservan nombre y estado; Repuestos y
+Contenido son nuevos y salen abiertos (el valor por defecto); «Colecciones» y
+«Blog» quedan como entradas huérfanas que Payload no lee. Las preferencias de
+listado (columnas, orden, paginación) van por slug y no se tocan.
+`npm run prefs:menu` lista el estado por usuario e imprime el host de la base.
+
+**Pie fijo del menú, medido en el preview:**
+
+| Medida (claro · oscuro)             | Antes                        | Después                        |
+| ----------------------------------- | ---------------------------- | ------------------------------ |
+| Cerrar sesión con ventana de 600 px | fuera de la vista (a 782 px) | **pegado abajo**               |
+| Posición                            | al final de la lista         | `sticky`                       |
+| Fondo                               | transparente                 | opaco (`#fcfcfc` · `#121212`)  |
+| Separador superior                  | ninguno                      | 1 px (1,30 · 1,29, decorativo) |
+| Icono de cerrar sesión              | 18,26 · 15,2                 | 18,26 · 15,2                   |
+| Alto del contenido del menú         | 822 px                       | 828 px                         |
+
+El relleno inferior del contenedor con scroll pasa al propio pie: `sticky` se
+ancla al borde **interior** del relleno, así que con los 40 px de Payload el pie
+se despegaba justo al terminar el scroll. Medido antes de escribir la regla.
+
 #### Objetivo táctil del menú
 
 | Ventana (px) | Menú                            | Enlace       | Exceso del menú |

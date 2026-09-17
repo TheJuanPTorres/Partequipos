@@ -545,11 +545,12 @@ html[data-theme="dark"] {
 .auth-fields,
 .where-builder,
 .group-by-builder,
-.upload {
+.upload,
+.search-bar {
   --pq-campo-borde: var(--theme-elevation-400);
 }
 
-html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .upload) {
+html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .upload, .search-bar) {
   --pq-campo-borde: var(--theme-elevation-450);
 }
 
@@ -750,6 +751,17 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   --color: var(--pq-secondary-foreground);
   --hover-bg: color-mix(in oklch, var(--pq-secondary), var(--pq-foreground) 5%);
   --hover-color: var(--pq-secondary-foreground);
+  /*
+   * CONTORNO — decisión de dirección (2026-09-17). El secondary del sistema
+   * (#f2f2f2 sobre #fcfcfc) deja la forma del botón casi invisible, ~1,07:1.
+   * WCAG 1.4.11 aplica al LÍMITE del control, no solo a su texto: si la forma
+   * no se distingue, no se sabe que se puede pulsar. Se le da el mismo borde
+   * derivado que a los campos (el primer paso de la rampa que cumple 3:1 sobre
+   * su fondo). Payload ya reserva 1 px de borde transparente en .btn, así que
+   * el tamaño no cambia.
+   */
+  --btn-border: 1px solid var(--pq-campo-borde);
+  --hover-btn-border: 1px solid var(--pq-campo-borde);
 }
 
 /*
@@ -782,6 +794,8 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   background: var(--pq-secondary);
   color: var(--pq-secondary-foreground);
   font-weight: 500;
+  /* Mismo contorno que la píldora-botón: también es un control. */
+  border: 1px solid var(--pq-campo-borde);
 }
 
 /*

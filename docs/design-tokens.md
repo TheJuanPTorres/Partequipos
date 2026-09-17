@@ -558,6 +558,24 @@ y etiquetas de grupo, lo accesible.
 | Alto texto, correo, número, fecha | 40 px                         | **32 px**, sin desbordar                          |
 | Casilla                           | radio 5,76, borde 1,49 · 1,29 | **radio 5 px, borde 3,11 · 3,35**                 |
 
+#### Criterio del borde derivado — aprobado por dirección
+
+> **El criterio aprobado NO es «el paso 350». Es: el borde de un control usa
+> el PRIMER paso de la rampa que cumple 3:1 (WCAG 1.4.11) sobre el fondo en el
+> que está.** El número del paso sale de aplicar ese criterio, y cambia con el
+> fondo. Cuando en el código aparecen pasos distintos según el contexto, **es el
+> criterio funcionando, no un incumplimiento**.
+
+| Fondo sobre el que va el control                                                 | Claro                 | Oscuro                |
+| -------------------------------------------------------------------------------- | --------------------- | --------------------- |
+| Fondo general (`--background`)                                                   | paso **350** · 3,11:1 | paso **450** · 3,35:1 |
+| Superficie elevada (paso 50): caja de acceso, barra de búsqueda, filtros, subida | paso **400** · 4,12:1 | paso **450** · 3,15:1 |
+
+Por qué salen números distintos: en oscuro el paso 350 da **2,39:1** sobre el
+fondo general, y en claro da **2,78:1** sobre la superficie elevada. En los dos
+casos el siguiente paso que llega a 3:1 es el que se usa. Implementado como una
+sola variable, `--pq-campo-borde`, redefinida por contexto en `custom.scss`.
+
 #### Botones y píldoras
 
 | Medida (claro · oscuro)       | Antes                  | Después                       |
@@ -610,13 +628,17 @@ pero entre ellas manda la especificidad**, y excluir estados (`:not(.error)`,
 `:not([readonly])`) la dispara. Cualquier regla de estado nueva tiene que repetir
 la cadena completa de su regla de reposo.
 
-#### Una decisión pendiente de dirección
+#### Píldoras con contorno — decisión de dirección (2026-09-17)
 
-**La píldora «Crear» sobre el fondo blanco es muy tenue.** Es el aspecto exacto
-del `secondary` del sistema (`#f2f2f2` sobre `#fcfcfc`, ~1,07:1 de separación),
-y el texto contrasta de sobra (16,01:1). Pero la forma de botón apenas se ve. No
-se ha tocado porque no hay un fallo WCAG claro —el texto identifica la acción—, y
-porque es justo el aspecto del sistema del cliente.
+La píldora «Crear» junto al título del listado se veía muy tenue: es el
+`secondary` exacto del sistema, `#f2f2f2` sobre `#fcfcfc`, ~1,07:1 de
+separación, aunque su texto contrasta 16,01:1. **Decisión: darle contorno.** Un
+control tiene que parecer un control, y WCAG 1.4.11 aplica al **límite** del
+control, no solo a su texto. La fidelidad al sistema no compensa perder claridad
+de uso en una herramienta de trabajo interna.
+
+Aplicado a todas las píldoras que son controles (`.btn--style-pill` y `.pill`),
+con el mismo borde derivado de los campos.
 
 #### Verificado también
 

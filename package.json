@@ -39,7 +39,8 @@
     "qa": "tsx scripts/qa/verificar.ts",
     "rol": "payload run scripts/usuarios/asignar-rol.ts",
     "rol:admin": "payload run scripts/usuarios/asignar-rol.ts",
-    "prefs:menu": "payload run scripts/usuarios/preferencias-menu.ts"
+    "prefs:menu": "payload run scripts/usuarios/preferencias-menu.ts",
+    "prefs:borrar": "payload run scripts/usuarios/borrar-preferencia.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.86.0",

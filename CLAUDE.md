@@ -1226,6 +1226,77 @@ cuál cae.
 esconder el dato que importa. Cuando el recuento de la cabecera no cuadre con las
 líneas de detalle —1 usuario, 2 filas—, **el resumen está mal, no el recuento**.
 
+### 10.28 DOS CVE CRÍTICOS DE NEXT — nos afectan por versión, y solo uno por camino real
+
+> `npm audit` (2026-09-17) marca **next** como **crítico** en el rango
+> `>=16.0.0 <16.3.3`. Estamos en **16.2.11**, así que por versión entramos en los
+> dos. **No se ha actualizado nada**: decisión de dirección.
+
+| Aviso                                                                                                | CVSS | Condición que exige                                                                              | ¿Nos aplica?                                                               |
+| ---------------------------------------------------------------------------------------------------- | ---: | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| [GHSA-p293-qw3h-jr36](https://github.com/advisories/GHSA-p293-qw3h-jr36) · RCE por _path traversal_  |  9,0 | Servidor alojado **en sistema de ficheros Windows**, con Pages o App Router sin Cache Components | **Producción NO**: Vercel es Linux. **El desarrollo local SÍ**: es Windows |
+| [GHSA-2xp9-vwfh-vxw4](https://github.com/advisories/GHSA-2xp9-vwfh-vxw4) · RCE al optimizar **AVIF** |  9,5 | Que se optimice un fichero **AVIF** (fallo de `libheif` dentro de `sharp`)                       | **Sí, por un camino autenticado** (ver abajo)                              |
+
+**Parcheado en 16.3.3**; la última estable es **16.3.5**. Ojo: **16.2.12 existe y
+NO basta** — sigue por debajo de 16.3.3.
+
+#### El camino real del AVIF, medido en nuestra configuración
+
+- `next.config.ts` no declara `formats`, así que Next **emite solo WebP** (el
+  valor por defecto verificado en `image-config.js`). El problema no es la
+  salida: es **decodificar un AVIF de entrada**.
+- `remotePatterns` solo admite `**.public.blob.vercel-storage.com`, así que un
+  extraño **no puede** pasarle una URL arbitraria a `/_next/image`.
+- Pero `Media` es `upload: true` **sin `mimeTypes`**, y `payload.config.ts` pasa
+  `sharp` a `buildConfig`. Es decir: **un editor autenticado puede subir un
+  `.avif` manipulado y nuestro propio lambda lo decodifica con `sharp` 0.35.4**.
+  No es «sin autenticar» como dice el aviso, pero es un camino que existe.
+
+**Mitigación barata, sin actualizar Next** (no implementada, pendiente de
+decisión): restringir `mimeTypes` en `Media` a JPEG, PNG y WebP. Cierra el
+camino de subida y además evita que entren formatos que el sitio no sirve.
+
+**Para el desarrollo local en Windows:** `npm run dev` es `next dev` a secas. Si
+el servidor de desarrollo escucha más allá de `localhost`, cualquiera en la
+misma red entra en el escenario del primer aviso. Mitigación inmediata:
+`next dev -H 127.0.0.1`.
+
+#### Qué implicaría subir de 16.2.11, con la compatibilidad de Payload verificada
+
+**Payload lo soporta.** Documentación vigente (`getting-started/installation`):
+los rangos válidos son `15.2.9–15.2.x`, `15.3.9–15.3.x`, `15.4.11–15.4.x` y
+**`16.2.6+`**. Y el `peerDependencies` del paquete instalado dice exactamente
+`>=15.2.9 <15.3.0 || >=15.3.9 <15.4.0 || >=15.4.11 <15.5.0 || >=16.2.6 <17.0.0`.
+**16.3.5 cae dentro**, así que subir no rompe el ADR 0001; el rango es estrecho
+pero no nos bloquea (recordatorio: 15.5 nunca estuvo soportado).
+
+Lo que exige el cambio, y por qué no es un `npm i next@latest` y a correr:
+
+1. **Regenerar el lock borrando lock y `node_modules`** (§10.5): instalar en
+   Windows sin eso ya nos tiró las entradas `@emnapi/*` que Linux necesita.
+2. **Revalidar el trazado de `sharp`** (§10.18): `outputFileTracingIncludes` se
+   verificó contra el `collect-build-traces` de **16.2.11**. Un salto de minor
+   puede mover ese código, y el modo de fallo es un 500 en `/admin`, la API, el
+   sitemap y el mapa de redirects.
+3. **Revalidar el proxy** (`src/proxy.ts`, §10.22) y las cabeceras/CSP.
+4. **Preview primero**, ruta a ruta: `/admin/`, `/api/marcas/`, `/sitemap.xml`,
+   `/` y una ficha. `npm run qa` contra un preview mide producción (§10.21).
+5. **Tener a mano el revert de alias** de §10.18 antes de tocar producción.
+
+**Esfuerzo: 2–4 h** con verificación completa. **Riesgo: medio** — el salto es
+de minor, pero toca justo las piezas que ya nos rompieron producción una vez.
+
+#### Nota de versión: el panel ya corre Payload 3.89.0, no 3.88.0
+
+Al regenerar el lock para instalar los iconos, el rango `^3.86.0` resolvió a
+**3.89.0** en los ocho paquetes de Payload, y así se construyó el despliegue de
+la fase B. Todo lo que este repositorio documenta como «verificado contra 3.88»
+—los componentes `@internal` del menú, el selector de error de la fecha, la
+transición de 100 ms del borde— se leyó del código de 3.88. **La fase B se
+verificó pintada ya sobre 3.89.0 y el menú propio funciona**, pero cualquier
+afirmación futura sobre el código de Payload hay que releerla en la versión
+instalada, no en estas notas.
+
 ### 10.27 CLI del sistema de diseño del cliente — cómo usarlo sin regalar el repo
 
 > Partequipos publica su sistema como CLI al estilo de shadcn: copia los

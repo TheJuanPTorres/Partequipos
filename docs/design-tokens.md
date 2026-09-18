@@ -361,7 +361,12 @@ Dato relevante para la decisión sobre modo oscuro en el panel (§9).
 
 Ver `src/app/(payload)/custom.scss`, que lleva el porqué de cada decisión.
 
-### Defectos de Payload 3.88 corregidos por el camino
+### Defectos de Payload corregidos por el camino
+
+> **Versión: leídos y medidos en 3.88.0; hoy corremos 3.89.0** (el lock se
+> regeneró el 2026-09-17 y `^3.86.0` resolvió a 3.89.0). Las correcciones se
+> verificaron pintadas ya sobre 3.89, pero **las causas de la tabla no se han
+> releído en 3.89**: al actualizar Payload hay que comprobar si siguen ahí.
 
 Ninguno lo detectó una herramienta: todos salieron al medir la página pintada o
 al recorrer el panel con el teclado. Se listan juntos porque **al actualizar
@@ -452,7 +457,8 @@ Todas por accesibilidad o usabilidad, medidas y aprobadas por dirección:
 | Selector y vista de redirects con administrador | En producción no se abrió; en preview la cuenta pasó a administrador tarde y la vista no se midió                                                                                                | Solo el selector de «Tipo» de páginas                                                                             |
 | Logo en oscuro                                  | Se comprobó que carga (22 px); su aspecto sobre fondo oscuro depende del recurso pendiente del cliente                                                                                           | —                                                                                                                 |
 
-**Mecanismo, verificado en la API instalada (Payload 3.88.0) y no de memoria:**
+**Mecanismo, verificado en la API instalada y no de memoria** (se leyó en
+**3.88.0**; la instalada hoy es **3.89.0**, ver la nota de versión de abajo)**:**
 Payload declara su tema dentro de `@layer payload-default`
 (`@payloadcms/ui/dist/scss/colors.scss` y `app.scss`). `custom.scss` se importa
 después de `@payloadcms/next/css` en `(payload)/layout.tsx` y **va sin capa**, y
@@ -460,12 +466,20 @@ el CSS sin capa gana a cualquier capa con independencia de la especificidad. No
 hacen falta `!important` ni selectores más específicos. **No existe una opción
 `admin.css` en la configuración**; esta es la vía.
 
-> **Corrección.** Una versión anterior de este documento decía «Payload 3.86».
-> `package.json` declara `^3.86.0`, pero **lo instalado —y lo que corre en
-> producción— es 3.88.0** en todo el ecosistema (`payload`, `@payloadcms/next`,
-> `ui`, `db-postgres`, `email-resend`, `storage-vercel-blob`,
-> `richtext-lexical`, `translations`). Coherente entre sí; solo estaba mal
-> anotado.
+> **Versión de Payload — corregido dos veces, y por eso conviene la regla.**
+> `package.json` declara `^3.86.0`, un rango, así que la versión real **la fija
+> el lock, no este documento**:
+>
+> | Cuándo     | Instalado  | Cómo se supo                                                                                                               |
+> | ---------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
+> | 2026-09-16 | **3.88.0** | Este documento decía «3.86»: era el rango, no lo instalado                                                                 |
+> | 2026-09-17 | **3.89.0** | Al regenerar el lock (§10.5) para instalar los iconos, `^3.86.0` resolvió a 3.89.0 en los **ocho** paquetes del ecosistema |
+>
+> **La regla:** antes de afirmar algo sobre el código de Payload, leer la versión
+> instalada (`node -p "require('payload/package.json').version"`), no estas notas.
+> Todo lo que aquí diga «3.88» se leyó de 3.88 y **no se ha reverificado en
+> 3.89**; lo que sí está verificado sobre 3.89 es el **resultado pintado** de las
+> tres fases y del menú propio, medido en producción.
 
 | Qué              | Cómo                                                                                                                                            |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -997,7 +1011,8 @@ La línea de fila es separador decorativo: 1.4.11 no le pide 3:1.
 #### Defectos encontrados al medir, corregidos antes de enseñar el resultado
 
 1. **La fecha en error perdía el borde rojo.** La exclusión apuntaba a
-   `.date-time-picker--has-error`, clase que **no existe** en Payload 3.88: el
+   `.date-time-picker--has-error`, clase que **no existe** en Payload 3.88 (leído
+   de 3.88, sin reverificar en 3.89): el
    error se marca en el contenedor (`.date-time-field--has-error`). El borde gris
    del campo tapaba el rojo; solo quedaba el aviso de texto. Tras el arreglo:
    `#e7000b` 4,65 en claro, 4,94 en oscuro.

@@ -19,7 +19,10 @@ import { Salir } from "./Salir";
  * Payload los exporta pero los marca `@internal`: pueden cambiar en una
  * actualización SIN aparecer en las notas de versión. Queda escrito aquí para
  * que, si un `npm update` rompe el menú, se sepa dónde mirar. Verificado contra
- * **Payload 3.88.0**.
+ * **Payload 3.88.0**. ATENCIÓN: la versión instalada hoy es **3.89.0** (el lock
+ * se regeneró el 2026-09-17 y `^3.86.0` resolvió a 3.89.0). Este menú se verificó
+ * pintado ya sobre 3.89 y funciona, pero las firmas de la tabla **no se han
+ * releído** en esa versión.
  *
  * | Pieza                                | De dónde                        | Qué aporta que no se replica a mano            |
  * | ------------------------------------ | ------------------------------- | ---------------------------------------------- |

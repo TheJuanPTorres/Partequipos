@@ -1147,7 +1147,8 @@ que nadie contrastó con la fuente**.
 > correcto.
 >
 > **Por qué.** Chrome había **autorrellenado** el campo, y el borde estaba a
-> mitad de su transición. `formInput` de Payload 3.88 declara
+> mitad de su transición. `formInput` de Payload **3.88** declara
+> —leído de 3.88, **sin reverificar** en la 3.89 que corremos hoy—
 > `transition-property: border, box-shadow, background-color` con
 > **`transition-duration: 100ms`** para el borde (verificado en
 > `@payloadcms/ui/dist/scss/vars.scss`). `getComputedStyle` devuelve el valor
@@ -1191,7 +1192,8 @@ que nadie contrastó con la fuente**.
 > segunda fila. Corregido: `npm run prefs:menu` lista **filas**, no usuarios, y
 > marca las huérfanas.
 
-**Lo que SÍ está verificado**, leyendo Payload 3.88 instalado: con duplicados, el
+**Lo que SÍ está verificado**, leyendo Payload 3.88 (**leído de 3.88, sin
+reverificar** en 3.89): con duplicados, el
 estado deja de ser determinista, porque cada camino elige fila con un criterio
 distinto.
 

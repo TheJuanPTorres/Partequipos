@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { formatoDeImagenPermitido } from "./hooks/formatoDeImagenPermitido";
 
 /**
  * Archivos subidos (imágenes, logos, etc.).
@@ -34,6 +35,13 @@ export const Media: CollectionConfig = {
    */
   upload: {
     mimeTypes: ["image/jpeg", "image/png", "image/webp"],
+  },
+  /*
+   * El mensaje de rechazo de Payload está cableado en inglés; este hook se
+   * adelanta para decirlo en español. Ver el fichero del hook.
+   */
+  hooks: {
+    beforeOperation: [formatoDeImagenPermitido],
   },
   fields: [
     {

@@ -31,10 +31,31 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 | Lenguaje      | TypeScript (modo estricto)                                          |
 | CMS           | Payload 3 (integrado en el mismo proyecto, no como servicio aparte) |
 | Base de datos | PostgreSQL (Neon)                                                   |
-| Estilos       | Tailwind CSS + shadcn/ui                                            |
+| Estilos       | Tailwind CSS v4 (ver la corrección de abajo)                        |
 | Hosting       | Vercel                                                              |
 | Archivos      | Vercel Blob (o Cloudflare R2)                                       |
 | Errores       | Sentry                                                              |
+
+> **CORREGIDO 2026-09-17 — NO usamos shadcn/ui ni Radix.** Esta tabla decía
+> «Tailwind CSS + shadcn/ui» desde el Sprint 0. Era **intención, nunca
+> materializada**, y es el tipo de dato que lleva a decisiones equivocadas: al
+> evaluar el CLI del sistema de diseño del cliente, la primera pregunta fue si su
+> primitivo chocaría con Radix… que no existe aquí.
+>
+> **Lo que hay de verdad, medido en el repo:**
+>
+> | Afirmación                      | Realidad                                                               |
+> | ------------------------------- | ---------------------------------------------------------------------- |
+> | `shadcn/ui`                     | **No instalado.** `src/components/ui/` contiene solo un `.gitkeep`     |
+> | Radix (`@radix-ui/*`)           | **Ninguna dependencia**                                                |
+> | `cva`, `clsx`, `tailwind-merge` | **Ninguna**                                                            |
+> | Tailwind                        | **v4.3.3**, con `@tailwindcss/postcss`; sin fichero de configuración   |
+> | Estilos del sitio público       | Utilidades de Tailwind **con colores fijos** (188 en 31 ficheros)      |
+> | Estilos del panel               | SCSS propio sin capa: `src/app/(payload)/custom.scss`                  |
+> | Iconos                          | `@tabler/icons-react` (aprobado 2026-09-17), solo en el menú del panel |
+>
+> **Consecuencia práctica:** adoptar componentes del sistema del cliente **no**
+> duplicaría un primitivo, porque no hay ninguno. Ver `docs/design-tokens.md`.
 
 **Prohibido sin aprobación previa:** agregar dependencias pesadas, cambiar de ORM,
 introducir otro gestor de estado, o mover contenido fuera de Payload.
@@ -203,20 +224,20 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **DEL CLIENTE** — nada de esto lo podemos resolver nosotros:
 
-| #   | Pendiente                                                                       | Bloquea                                                                                |
-| --- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| 1   | Claves de Turnstile y Resend (§10.11)                                           | **Lanzamiento.** Formularios abiertos a bots y leads sin avisar                        |
-| 2   | Infraestructura de base de datos, con pooler (§10.7)                            | **Migración.** Requisito duro                                                          |
-| 3   | Acceso a WordPress                                                              | 51 artículos + ~55 páginas editoriales                                                 |
-| 4   | CSV e imágenes reales                                                           | 351 modelos + 80 fichas de maquinaria                                                  |
-| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                     | JSON-LD `Organization` completo                                                        |
-| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)            | Redirects y 404 del día del cambio                                                     |
-| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                       | Cumplir el SLA de Gestión de Incidencias                                               |
-| 8   | Clave de PageSpeed Insights (§10.3 13)                                          | Umbrales de rendimiento contractuales                                                  |
-| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                              | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                     |
-| 10  | Vercel Pro antes de volver el repositorio a privado                             | Despliegue automático                                                                  |
-| 11  | Textos legales definitivos                                                      | Sustituir los marcadores de posición                                                   |
-| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras | El logo actual lleva fondo blanco: en el panel en oscuro se ve como una tarjeta blanca |
+| #   | Pendiente                                                                       | Bloquea                                                                                                                                                                                     |
+| --- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Claves de Turnstile y Resend (§10.11)                                           | **Lanzamiento.** Formularios abiertos a bots y leads sin avisar                                                                                                                             |
+| 2   | Infraestructura de base de datos, con pooler (§10.7)                            | **Migración.** Requisito duro                                                                                                                                                               |
+| 3   | Acceso a WordPress                                                              | 51 artículos + ~55 páginas editoriales                                                                                                                                                      |
+| 4   | CSV e imágenes reales                                                           | 351 modelos + 80 fichas de maquinaria                                                                                                                                                       |
+| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                     | JSON-LD `Organization` completo                                                                                                                                                             |
+| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)            | Redirects y 404 del día del cambio                                                                                                                                                          |
+| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                       | Cumplir el SLA de Gestión de Incidencias                                                                                                                                                    |
+| 8   | Clave de PageSpeed Insights (§10.3 13)                                          | Umbrales de rendimiento contractuales                                                                                                                                                       |
+| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                              | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                                                                                                                          |
+| 10  | Vercel Pro antes de volver el repositorio a privado                             | Despliegue automático                                                                                                                                                                       |
+| 11  | Textos legales definitivos                                                      | Sustituir los marcadores de posición                                                                                                                                                        |
+| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras | El logo actual lleva fondo blanco: en el panel en oscuro se ve como una tarjeta blanca. **Puede que ya no haga falta**: su CLI publica `partequipos-logo` y `partequipos-wordmark` (§10.27) |
 
 **DE LA DIRECCIÓN TÉCNICA** — asumido por la dirección, no depende del cliente:
 
@@ -234,7 +255,7 @@ definitiva de base de datos (bloqueado por el cliente).
 | Restricciones de peso y dimensiones de imagen | Sostiene los umbrales de rendimiento                                                      |
 | Decisión sobre modo oscuro del SITIO          | El panel ya lo soporta con los tokens del sistema; el sitio público sigue sin él (§10.14) |
 | Icono cuadrado para el favicon                | Alternativa al cliente si él no lo tiene (§10.3 15)                                       |
-| Logo para fondos oscuros                      | Alternativa al cliente (#12) si él no lo tiene; no se fabrica invirtiendo el PNG          |
+| Logo para fondos oscuros                      | Alternativa al cliente (#12); mirar antes `partequipos-wordmark` del CLI (§10.27)         |
 | Menú plegable en móvil                        | Hoy no hay; si lo mete, revisar teclado y `aria-expanded`                                 |
 
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
@@ -1204,6 +1225,52 @@ cuál cae.
 **La lección, que es la de §10.24 en otra forma:** un resumen que agrupa puede
 esconder el dato que importa. Cuando el recuento de la cabecera no cuadre con las
 líneas de detalle —1 usuario, 2 filas—, **el resumen está mal, no el recuento**.
+
+### 10.27 CLI del sistema de diseño del cliente — cómo usarlo sin regalar el repo
+
+> Partequipos publica su sistema como CLI al estilo de shadcn: copia los
+> componentes al repositorio y quedan editables.
+> `npm view partequipos` → **0.3.5**, MIT, 18,5 kB, una dependencia
+> (`@clack/prompts`), publicado por **GitHub Actions con OIDC** desde
+> `github.com/Partequipos/design-system`. Su registro vive en
+> `https://ui.partequipos.com/r/*.json` (89 entradas, **77 componentes**).
+>
+> **Leído el código del paquete antes de ejecutarlo** (510 líneas, sin
+> telemetría y sin scripts de instalación):
+
+| Comando | Qué hace de verdad                                                                                             |
+| ------- | -------------------------------------------------------------------------------------------------------------- |
+| `list`  | **Solo lee**: descarga `registry.json` e imprime. No escribe ni instala                                        |
+| `add`   | Escribe en `src/components/ui/…` **y ejecuta el gestor de paquetes** con las dependencias que diga el registro |
+| `init`  | Inyecta el bloque de tokens en el CSS global, entre marcadores, de forma idempotente                           |
+
+**RIESGO DE CADENA DE SUMINISTRO, que es el que importa.** `add` hace
+`spawnSync(pm, ['add', ...deps], { shell: true })` con `deps` leídas del **JSON
+del registro**, no del paquete npm firmado. Es decir: **quien controle
+`ui.partequipos.com` puede hacernos instalar cualquier paquete de npm**, y ese
+dominio no está bajo nuestro control ni bajo la protección de npm.
+
+**LA REGLA, no negociable:**
+
+1. **Componentes de uno en uno.** `add <componente>`, nunca varios a ciegas.
+2. **Revisar `https://ui.partequipos.com/r/<componente>.json` antes**: mirar
+   `dependencies` y `registryDependencies` y aceptarlas explícitamente.
+3. **NUNCA `add --all`.** Además del riesgo, mete 77 ficheros que CI tiene que
+   tipar y lintar, la mayoría sin usar.
+4. **Revisar el diff** de cada fichero copiado antes de confirmarlo, como
+   cualquier código de terceros que entra al repositorio.
+5. **Los tokens se pegan a mano**, no con `init`: para Next el CLI apunta a
+   `app/globals.css` **relativo a la raíz** y el nuestro está en
+   `src/app/(site)/globals.css`; `init` crearía un fichero huérfano que Next
+   ignora. El bloque conserva los marcadores del CLI para poder regenerarlo.
+
+**Dos hallazgos del registro, anotados para pendientes abiertos:**
+
+- **`partequipos-logo` y `partequipos-wordmark`** podrían resolver el logo para
+  fondos oscuros (§10.0.1, pendiente del cliente #12) sin esperar a nadie, **si**
+  el wordmark usa `currentColor`. **Sin verificar y sin instalar.**
+- **`empty`** cubre los estados vacíos del panel, si algún día se retoma esa
+  parte (hoy cerrada por decisión de dirección: fidelidad estética sin retorno).
 
 ### 10.25 GUARDARRAÍLES — convertir un olvido silencioso en un fallo ruidoso
 

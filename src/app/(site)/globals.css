@@ -65,3 +65,204 @@ body {
     scroll-behavior: auto !important;
   }
 }
+/*
+ * TOKENS DEL SISTEMA DE DISENO DEL CLIENTE — fase 0 (2026-09-17).
+ *
+ * Pegados A MANO, no con `partequipos init`: para Next el CLI escribe en
+ * `app/globals.css` RELATIVO A LA RAIZ, y nuestro CSS real vive en
+ * `src/app/(site)/globals.css`. Ejecutarlo crearia un fichero huerfano que Next
+ * ignora. Se conservan sus marcadores para poder regenerar el bloque.
+ *
+ * Fuente: https://ui.partequipos.com/r/theme.json (registro del CLI).
+ *
+ * MODO OSCURO: el sistema lo define POR CLASE
+ * (`@custom-variant dark (&:is(.dark *))` mas un bloque `.dark`), NO por
+ * `prefers-color-scheme`. Sin una clase `.dark` en un ancestro no se activa
+ * nada, asi que esto NO rearma el fallo de CLAUDE.md §10.14. Verificado en el
+ * preview con el sistema operativo en oscuro: la pagina sigue clara.
+ */
+/* partequipos:tokens:start — no edites a mano, se regenera con `partequipos init` */
+/* Tokens del design system de Partequipos — generado desde globals.css.
+   Importa este archivo en tu CSS global (requiere Tailwind v4). */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+  --font-weight-normal: 450;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --card: oklch(0.9911 0 0);
+  --card-foreground: oklch(0 0 0);
+  --popover: oklch(0.9911 0 0);
+  --popover-foreground: oklch(0 0 0);
+  --primary: oklch(0.577 0.215 27.325);
+  --primary-foreground: oklch(0.971 0.013 17.38);
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.2046 0 0);
+  --muted: oklch(0.9461 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.9461 0 0);
+  --accent-foreground: oklch(0.2435 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: var(--color-red-400);
+  --info: var(--color-blue-500);
+  --info-foreground: var(--color-blue-700);
+  --success: var(--color-emerald-500);
+  --success-foreground: var(--color-emerald-700);
+  --warning: var(--color-amber-500);
+  --warning-foreground: var(--color-amber-700);
+  --border: oklch(0.9037 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.879 0.169 91.605);
+  --chart-2: oklch(0.769 0.188 70.08);
+  --chart-3: oklch(0.666 0.179 58.318);
+  --chart-4: oklch(0.555 0.163 48.998);
+  --chart-5: oklch(0.473 0.137 46.201);
+  --radius: 0.45rem;
+  --sidebar: oklch(0.9911 0 0);
+  --sidebar-foreground: oklch(0.5452 0 0);
+  --sidebar-primary: rgb(220, 38, 38);
+  --sidebar-primary-foreground: oklch(0.971 0.013 17.38);
+  --sidebar-accent: oklch(0.9461 0 0);
+  --sidebar-accent-foreground: oklch(0.2435 0 0);
+  --sidebar-border: oklch(0.9037 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+  --background: oklch(0.9911 0 0);
+  --foreground: oklch(0 0 0);
+  /* Cuánto tiñe la superficie glass sobre lo que hay detrás (ver
+       `@utility glass-surface`). Más bajo = más transparente. */
+  /* En light el cristal va MUCHO más denso que en dark (como el Spotlight de
+       macOS): sobre fondo claro, una superficie muy transparente se lee lavada y
+       "flotando", y el texto pierde contraste. Es esmerilado, no traslúcido. */
+  --glass-tint: 82%;
+  /* El aro es OSCURO en light y blanco en dark. Un canto blanco sobre una
+       superficie casi blanca no existe: sin filo, el panel no se asienta contra
+       la página. Sobre fondo claro el borde se lee por sombra, no por luz. */
+  --glass-rim-color: black;
+  --glass-rim: 12%;
+  /* Reflejo especular del canto superior: blanco, marcado (Liquid Glass). El
+       canto es lo único que lee como LUZ en light —el aro va oscuro—, así que
+       aquí es donde vive el brillo del material. */
+  --glass-specular: 62%;
+  /* La sombra es la que ancla el panel; con 0.04 parecía despegado. */
+  --glass-shadow: 0.14;
+}
+
+.dark {
+  --background: oklch(0.1822 0 0);
+  --foreground: oklch(0.9288 0.0126 255.5078);
+  --card: oklch(0.2046 0 0);
+  --card-foreground: oklch(0.9288 0.0126 255.5078);
+  --popover: oklch(0.2603 0 0);
+  --popover-foreground: oklch(0.9288 0.0126 255.5078);
+  --primary: oklch(0.577 0.215 27.325);
+  --primary-foreground: oklch(0.971 0.013 17.38);
+  --secondary: oklch(0.29 0 0);
+  --secondary-foreground: oklch(0.9851 0 0);
+  --muted: oklch(0.2393 0 0);
+  --muted-foreground: oklch(0.798 0.00275 159);
+  --accent: oklch(0.3132 0 0);
+  --accent-foreground: oklch(0.9851 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: var(--color-red-400);
+  --info: var(--color-blue-500);
+  --info-foreground: var(--color-blue-400);
+  --success: var(--color-emerald-500);
+  --success-foreground: var(--color-emerald-400);
+  --warning: var(--color-amber-500);
+  --warning-foreground: var(--color-amber-400);
+  /* Blanco translúcido, no un gris opaco: los componentes los consumen como
+       `bg-input/50`, `bg-input/30`, `dark:bg-input/32`. Con alpha, esa fracción
+       aclara SIEMPRE la superficie de debajo (background, card o popover). Un
+       gris opaco, en cambio, se mezcla con el fondo y se anula sobre el popover. */
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.879 0.169 91.605);
+  --chart-2: oklch(0.769 0.188 70.08);
+  --chart-3: oklch(0.666 0.179 58.318);
+  --chart-4: oklch(0.555 0.163 48.998);
+  --chart-5: oklch(0.473 0.137 46.201);
+  --sidebar: oklch(0.1822 0 0);
+  --sidebar-foreground: oklch(0.6301 0 0);
+  --sidebar-primary: oklch(0.577 0.215 27.325);
+  --sidebar-primary-foreground: oklch(0.971 0.013 17.38);
+  --sidebar-accent: oklch(0.3132 0 0);
+  --sidebar-accent-foreground: oklch(0.9851 0 0);
+  --sidebar-border: oklch(0.2809 0 0);
+  --sidebar-ring: oklch(0.556 0 0);
+  /* Más denso que en light: sobre fondo oscuro el texto tiene menos contraste,
+       y con el valor de light perdería legibilidad cuando pasa algo claro detrás. */
+  --glass-tint: 58%;
+  /* Sobre superficie oscura basta muy poco blanco para que el canto brille, y
+       la sombra puede ir más marcada sin llamar la atención (el ojo acusa menos
+       el contraste sobre fondo oscuro). Aquí el aro SÍ es blanco: sobre fondo
+       oscuro el filo se lee por luz, al revés que en light. */
+  --glass-rim-color: white;
+  /* Muy por debajo de light (62%): sobre superficie oscura el blanco tiene
+       todo el contraste a su favor y pasado de aquí el canto deja de ser un
+       filo de luz y se lee como una línea pintada. */
+  --glass-specular: 22%;
+  --glass-rim: 3%;
+  --glass-shadow: 0.12;
+}
+/* partequipos:tokens:end */
+
+/*
+ * Nuestra fuente, DESPUES del bloque: el `@theme inline` del sistema declara
+ * `--font-sans: var(--font-sans)`, que es circular y dejaria la utilidad
+ * `font-sans` sin valor. Hoy no se usa en ninguna plantilla, pero se repone
+ * para que no sea una trampa cuando alguien la use.
+ */
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}

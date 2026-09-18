@@ -17,7 +17,24 @@ export const Media: CollectionConfig = {
     update: escrituraContenido,
     delete: borradoAdmin,
   },
-  upload: true,
+  /*
+   * FORMATOS PERMITIDOS — mitigación del CVE GHSA-2xp9-vwfh-vxw4 (CLAUDE.md
+   * §10.28). El fallo está en `libheif`, dentro de `sharp`, al DECODIFICAR
+   * ficheros AVIF, y `payload.config.ts` pasa `sharp` a `buildConfig`: sin esta
+   * lista, un editor autenticado podía subir un `.avif` manipulado y nuestro
+   * propio lambda lo decodificaba.
+   *
+   * La lista es también la de formatos que el sitio sirve de verdad. Payload la
+   * usa en las dos direcciones: filtra el selector de ficheros del panel y
+   * valida en el servidor, así que no depende del navegador.
+   *
+   * SVG queda fuera a propósito: es ejecutable (puede llevar script) y
+   * `next.config.ts` no lo permite en el optimizador (`dangerouslyAllowSVG`
+   * sigue en false).
+   */
+  upload: {
+    mimeTypes: ["image/jpeg", "image/png", "image/webp"],
+  },
   fields: [
     {
       name: "alt",

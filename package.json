@@ -49,7 +49,7 @@
     "@payloadcms/richtext-lexical": "^3.86.0",
     "@payloadcms/storage-vercel-blob": "^3.86.0",
     "@tabler/icons-react": "^3.46.0",
-    "next": "16.2.11",
+    "next": "16.3.5",
     "payload": "^3.86.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",

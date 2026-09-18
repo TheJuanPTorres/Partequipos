@@ -1037,6 +1037,56 @@ texto blanco justo al pasar el ratón.
 
 ---
 
+## 9.b Sitio público — fase 0: los tokens, medidos (2026-09-17)
+
+El cliente entregó su sistema como **CLI** (`partequipos@0.3.5`, 77 componentes;
+riesgos y reglas de uso en CLAUDE.md §10.27). La fase 0 es solo el bloque de
+tokens en `src/app/(site)/globals.css`, **pegado a mano**: para Next el CLI
+escribe en `app/globals.css` relativo a la raíz y crearía un fichero huérfano.
+
+**Antes y después, medido ruta a ruta** (producción contra el preview de la
+rama; `npm run qa` contra un preview mide producción, §10.21, así que aquí no
+sirve):
+
+| Medida                        | Antes                              | Después          |
+| ----------------------------- | ---------------------------------- | ---------------- |
+| Fondo del cuerpo              | `#ffffff`                          | **`#fcfcfc`**    |
+| Color del cuerpo              | `#171717`                          | **`#000000`**    |
+| `--radius`                    | sin definir                        | **0,45 rem**     |
+| `--primary`                   | sin definir                        | rojo del sistema |
+| H1 de la portada (36 px)      | 17,75                              | 17,30            |
+| Párrafo de la portada (18 px) | 7,56                               | 7,37             |
+| H1 de ficha de modelo (30 px) | 17,75                              | 17,30            |
+| Párrafo de ficha (16 px)      | 10,30                              | 10,04            |
+| Campo del formulario          | borde `#d1d5dc`, radio 4 px, 42 px | **sin cambio**   |
+| Botón de enviar               | fondo `#101828`, radio 4 px        | **sin cambio**   |
+
+**Por qué cambia tan poco, y por qué es lo esperado:** el sitio no usa **ninguna**
+clase basada en tokens (`bg-background`, `text-foreground`, `text-muted-foreground`:
+cero ocurrencias) ni `font-sans`/`font-mono`. Lo único que los consume es la regla
+`body` de nuestro CSS. Los 188 colores fijos son utilidades de paleta y no
+dependen de estas variables: por eso el formulario sale idéntico.
+
+Los contrastes bajan unas centésimas porque el fondo es un punto más oscuro.
+Todos siguen muy por encima de AA.
+
+**MODO OSCURO: no se reactiva, verificado.** El sistema lo declara **por clase**
+(`@custom-variant dark (&:is(.dark *))` más un bloque `.dark`), no por
+`prefers-color-scheme`. La comprobación salió redonda porque el sistema operativo
+de la máquina de pruebas **estaba en oscuro**: las tres rutas siguieron claras y
+sin clase `.dark`, antes y después. El fallo de CLAUDE.md §10.14 no puede
+repetirse por esta vía.
+
+**Un defecto del bloque, corregido al pegarlo:** su `@theme inline` declara
+`--font-sans: var(--font-sans)`, que es circular, y su `:root` no define
+`--font-sans`. Eso dejaría la utilidad `font-sans` sin valor. Hoy no se usa en
+ninguna plantilla, así que no rompía nada, pero se repone nuestra fuente después
+del bloque para que no sea una trampa futura.
+
+**Fases 1 y 2 (formularios y catálogo con componentes reales): EN ESPERA** del
+diseño, por decisión de dirección — reconstruir los formularios dos veces no
+tiene sentido.
+
 ## 10. ¿Y el sitio público? — sí, sería trivial
 
 **Fuera de alcance, pero el dato cambia la conversación con el diseñador.** Ver

@@ -224,20 +224,20 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **DEL CLIENTE** — nada de esto lo podemos resolver nosotros:
 
-| #   | Pendiente                                                                       | Bloquea                                                                                                                                                                                     |
-| --- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Claves de Turnstile y Resend (§10.11)                                           | **Lanzamiento.** Formularios abiertos a bots y leads sin avisar                                                                                                                             |
-| 2   | Infraestructura de base de datos, con pooler (§10.7)                            | **Migración.** Requisito duro                                                                                                                                                               |
-| 3   | Acceso a WordPress                                                              | 51 artículos + ~55 páginas editoriales                                                                                                                                                      |
-| 4   | CSV e imágenes reales                                                           | 351 modelos + 80 fichas de maquinaria                                                                                                                                                       |
-| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                     | JSON-LD `Organization` completo                                                                                                                                                             |
-| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)            | Redirects y 404 del día del cambio                                                                                                                                                          |
-| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                       | Cumplir el SLA de Gestión de Incidencias                                                                                                                                                    |
-| 8   | Clave de PageSpeed Insights (§10.3 13)                                          | Umbrales de rendimiento contractuales                                                                                                                                                       |
-| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                              | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                                                                                                                          |
-| 10  | Vercel Pro antes de volver el repositorio a privado                             | Despliegue automático                                                                                                                                                                       |
-| 11  | Textos legales definitivos                                                      | Sustituir los marcadores de posición                                                                                                                                                        |
-| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras | El logo actual lleva fondo blanco: en el panel en oscuro se ve como una tarjeta blanca. **Puede que ya no haga falta**: su CLI publica `partequipos-logo` y `partequipos-wordmark` (§10.27) |
+| #   | Pendiente                                                                       | Bloquea                                                                                                                                                                                                                                                   |
+| --- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Claves de Turnstile y Resend (§10.11)                                           | **Lanzamiento.** VERIFICADO EN EL DOM (2026-09-17): `/contactanos/` **no pinta ningún widget de Turnstile** en producción. Es el único punto del sitio por donde entran datos de terceros y hoy no tiene barrera anti-bot; los leads tampoco se notifican |
+| 2   | Infraestructura de base de datos, con pooler (§10.7)                            | **Migración.** Requisito duro                                                                                                                                                                                                                             |
+| 3   | Acceso a WordPress                                                              | 51 artículos + ~55 páginas editoriales                                                                                                                                                                                                                    |
+| 4   | CSV e imágenes reales                                                           | 351 modelos + 80 fichas de maquinaria                                                                                                                                                                                                                     |
+| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                     | JSON-LD `Organization` completo                                                                                                                                                                                                                           |
+| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)            | Redirects y 404 del día del cambio                                                                                                                                                                                                                        |
+| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                       | Cumplir el SLA de Gestión de Incidencias                                                                                                                                                                                                                  |
+| 8   | Clave de PageSpeed Insights (§10.3 13)                                          | Umbrales de rendimiento contractuales                                                                                                                                                                                                                     |
+| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                              | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                                                                                                                                                                                        |
+| 10  | Vercel Pro antes de volver el repositorio a privado                             | Despliegue automático                                                                                                                                                                                                                                     |
+| 11  | Textos legales definitivos                                                      | Sustituir los marcadores de posición                                                                                                                                                                                                                      |
+| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras | El logo actual lleva fondo blanco: en el panel en oscuro se ve como una tarjeta blanca. **Puede que ya no haga falta**: su CLI publica `partequipos-logo` y `partequipos-wordmark` (§10.27)                                                               |
 
 **DE LA DIRECCIÓN TÉCNICA** — asumido por la dirección, no depende del cliente:
 
@@ -1404,6 +1404,19 @@ propuesta está en §10.20.
 > `NEXT_PUBLIC_SERVER_URL`. Faltan las tres de abajo.
 
 **1. Turnstile — `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`.**
+
+> **MEDIDO EN PRODUCCIÓN, no inferido (2026-09-17).** Se inspeccionó el DOM de
+> `https://partequipos.vercel.app/contactanos/`: **no existe ningún nodo del
+> widget de Turnstile**, ni contenedor propio ni `iframe` de
+> `challenges.cloudflare.com`. Antes esto se deducía de que faltaban las
+> variables de entorno; ahora está comprobado sobre la página pintada, que es el
+> nivel que exige §10.14.
+>
+> Consecuencia exacta: **el formulario de contacto —el único punto del sitio por
+> donde entran datos de terceros— acepta envíos sin ninguna barrera anti-bot**, y
+> cada envío escribe en `solicitudes`, la única colección con datos personales
+> (nombre, correo y teléfono). Sumado a la falta de `RESEND_API_KEY`, un envío
+> entra sin verificar y sin que nadie reciba aviso.
 
 Sin ellas, `src/lib/turnstile.ts` recurre a las **claves de prueba públicas de
 Cloudflare**, que por diseño **aceptan cualquier token**. El captcha se dibuja y

@@ -1228,11 +1228,16 @@ cuál cae.
 esconder el dato que importa. Cuando el recuento de la cabecera no cuadre con las
 líneas de detalle —1 usuario, 2 filas—, **el resumen está mal, no el recuento**.
 
-### 10.28 DOS CVE CRÍTICOS DE NEXT — nos afectan por versión, y solo uno por camino real
+### 10.28 RESUELTO — dos CVE críticos de Next, cerrados con 16.3.5
 
-> `npm audit` (2026-09-17) marca **next** como **crítico** en el rango
-> `>=16.0.0 <16.3.3`. Estamos en **16.2.11**, así que por versión entramos en los
-> dos. **No se ha actualizado nada**: decisión de dirección.
+> **Estado: cerrado el 2026-09-18.** Producción corre **Next 16.3.5** y
+> **`next` ya no aparece en `npm audit`** (quedan 7 avisos ajenos: 1 bajo, 6
+> moderados). Lo que sigue conserva el análisis, porque explica por qué se hizo
+> en dos pasos —mitigar primero, actualizar después— y qué hay que revalidar la
+> próxima vez.
+>
+> El punto de partida: `npm audit` (2026-09-17) marcaba **next** como crítico en
+> el rango `>=16.0.0 <16.3.3`, y corríamos **16.2.11**.
 
 | Aviso                                                                                                | CVSS | Condición que exige                                                                              | ¿Nos aplica?                                                               |
 | ---------------------------------------------------------------------------------------------------- | ---: | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
@@ -1287,6 +1292,79 @@ Lo que exige el cambio, y por qué no es un `npm i next@latest` y a correr:
 
 **Esfuerzo: 2–4 h** con verificación completa. **Riesgo: medio** — el salto es
 de minor, pero toca justo las piezas que ya nos rompieron producción una vez.
+
+#### Lo que se hizo de verdad, y contra qué versión se revalidó (2026-09-18)
+
+**Paso 1 — mitigar sin tocar Next** (commits `3743615`, `a06e8f3`):
+
+- `Media.upload.mimeTypes` a JPEG, PNG y WebP. Payload lo usa en las dos
+  direcciones: `accept` del selector y validación en servidor.
+- Hook propio `formatoDeImagenPermitido`, porque el mensaje de rechazo de Payload
+  está **cableado en inglés** (`checkFileRestrictions.js`) y el panel está en
+  español (§5). Mira **firmas de contenido**, no la extensión.
+- `npm run dev` pasa a `next dev -H 127.0.0.1`: el primer aviso solo afecta a
+  hosts Windows, o sea a la máquina de desarrollo.
+
+Verificado en el preview: GIF rechazado; **GIF renombrado a `.png` rechazado
+igual** (Payload también detecta por contenido); PNG válido aceptado. Y de paso
+quedó cerrado el pendiente del **store de Blob de preview** (§10.21): la subida
+fue a `lsndnc29nh4ws7eh…`, producción usa `sr2s4ngkjzfzpxhi…`, y al borrar el
+registro el binario también desapareció (404).
+
+**Paso 2 — subir a 16.3.5** (commit `d1d8314`), con la lista de arriba cumplida:
+
+| Qué se revalidó                     | Contra qué                       | Resultado                                                               |
+| ----------------------------------- | -------------------------------- | ----------------------------------------------------------------------- |
+| `outputFileTracingIncludes`         | código de **16.3.5**             | Sigue de primer nivel, y en modo `contains`                             |
+| Trazado real de `libvips`           | **`/admin/` en el preview: 200** | No se puede probar en Windows: el paquete de Linux no existe en local   |
+| Proxy y CSP                         | preview, cabeceras               | CSP intacta en 4 rutas, sigue `Report-Only`                             |
+| Redirects (§10.22, solo producción) | `/gracias/`                      | **301** hacia `/contactanos/`                                           |
+| Panel pintado                       | preview y producción             | 6 grupos con icono, 19 entradas, cabecera 40 px, sin errores de consola |
+| `qa` completo                       | producción                       | **0 errores**                                                           |
+| Puertas locales                     | 16.3.5                           | typecheck, lint, formato y **210 pruebas**                              |
+
+**El revert de alias quedó preparado antes de promocionar** (§10.18) y no hizo
+falta usarlo.
+
+#### Decisión: NO se probó una subida en producción
+
+El camino de rechazo y aceptación de formatos se verificó **en preview, con el
+mismo código**. En producción se comprobó lo que importaba sin escribir nada: las
+**5 PNG existentes se listan con su miniatura**, se abren, y el selector filtra
+(`accept="image/jpeg, image/png, image/webp"`).
+
+**Por qué no se reconfirmó ahí:** una subida de prueba escribe en el **Blob de
+producción** —la cuenta que sirve el sitio real— para volver a demostrar algo ya
+demostrado. Decisión de dirección: no compensa. Si algún día hace falta, el
+procedimiento es el del preview: subir, comprobar y borrar registro y binario.
+
+#### LECCIÓN — la versión se fija, no se deja flotar
+
+`npm install next@16.3.5` escribió **`^16.3.5`** en `package.json`. Se cambió a
+**`16.3.5` exacto** antes de commitear, y el lock se regeneró con ese valor.
+
+**Por qué importa aquí más que en otros proyectos:** la ventana de Payload es
+estrecha (`>=16.2.6 <17.0.0`, y 15.5 nunca estuvo soportado), así que un caret
+permite saltar a una versión de Next **que nadie ha verificado con este panel**,
+y el salto ocurriría en el próximo `npm install` de cualquiera.
+
+**Ya nos pasó, en la misma sesión y sin avisar:** `^3.86.0` resolvió a **3.89.0**
+en los ocho paquetes de Payload al regenerar el lock, y el repositorio siguió
+documentando «3.88» un rato más. Esa deriva no dio ningún error; simplemente dejó
+la documentación hablando de otra versión.
+
+**La regla, en la línea de §10.25:** para las dependencias que sostienen el
+arranque —Next y Payload— **versión exacta**, y el salto como tarea con su
+verificación. Un rango convierte una decisión en una deriva silenciosa.
+
+**Convertido en guardarraíl** (`src/lib/deps/versiones-fijas.test.ts`, §10.25):
+CI falla si `next`, `payload` o cualquier `@payloadcms/*` declara un rango. La
+lista no está escrita a mano —se deduce de `package.json`—, así que un paquete
+nuevo de Payload queda cubierto sin tocar la prueba, y lleva su propia
+comprobación del guardián. Al escribirlo **encontró el caso vivo**: `payload` y
+sus cinco paquetes seguían en `^3.86.0`. Se fijaron a **3.89.0**, que es lo que
+ya estaba instalado y desplegado: no cambia nada en ejecución, solo cierra la
+deriva.
 
 #### Nota de versión: el panel ya corre Payload 3.89.0, no 3.88.0
 
@@ -1363,6 +1441,7 @@ dominio no está bajo nuestro control ni bajo la protección de npm.
 | Unicidad de slug entre colecciones     | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)         | hook `slugUnicoEntreColecciones` + su prueba               | CI y escritura   |
 | Destino de un redirect                 | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                  | `src/lib/redirects/destino.ts` + `npm run redirects:check` | CI y a mano      |
 | Marcador `dev` en `payload_migrations` | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                        | `npm run db:check`, antes de `payload migrate`             | En cada build    |
+| Versión exacta de Next y Payload       | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel             | `src/lib/deps/versiones-fijas.test.ts`                     | CI, en cada push |
 
 **Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
 lista real, y una prueba que exige que coincidan. La del sitemap incluye además

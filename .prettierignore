@@ -22,3 +22,10 @@ docs/inventario-repuestos.csv
 # Artefactos generados por `npm run redirects:map`
 docs/redirects-cobertura.md
 docs/redirects-map.csv
+
+# Componentes COPIADOS del sistema de diseño del cliente con su CLI (§10.27).
+# No se formatean a propósito: así el fichero del repositorio sigue comparable
+# BYTE A BYTE con `https://ui.partequipos.com/r/<componente>.json`, que es la
+# comprobación de cadena de suministro cuando se añade o se actualiza uno.
+# Si algún día se edita uno de verdad, se saca de esta lista y se formatea.
+src/components/ui/partequipos-wordmark.tsx

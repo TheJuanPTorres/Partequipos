@@ -1,24 +1,22 @@
-import { seoConfig } from "@/lib/seo/config";
+import { PartequiposWordmark } from "@/components/ui/partequipos-wordmark";
 
 /**
- * Icono del panel: aparece en la barra lateral y en espacios reducidos, donde
- * el logotipo completo no cabe.
+ * Icono del panel: aparece en las migas de pan y en espacios reducidos.
+ *
+ * Mismo cambio y mismo motivo que `Logo.tsx` (pendiente #12): el PNG llevaba
+ * fondo blanco y en oscuro se veía como una pastilla blanca. Aquí el tamaño lo
+ * fija la altura —22 px, la que ya tenía el PNG— y el ancho sale del `viewBox`
+ * (718 × 173), así que la proporción se conserva sin declarar dimensiones.
+ *
+ * Los ojales de las letras usan `--theme-bg` igual que en el acceso: en las
+ * migas el logotipo se apoya sobre el fondo de la vista, no sobre una tarjeta.
  */
 export default function Icon() {
   return (
-    /*
-     * eslint-disable-next-line @next/next/no-img-element --
-     * El panel de Payload se sirve fuera del grupo de rutas del sitio y no pasa
-     * por el optimizador de next/image. Aquí <img> es lo correcto; el aviso de
-     * LCP no aplica a una pantalla interna que se ve una vez al día.
-     */
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={seoConfig.logoPath}
-      alt={seoConfig.siteName}
-      width={1614}
-      height={317}
-      style={{ width: "auto", height: 22 }}
+    <PartequiposWordmark
+      className="pq-logo-migas"
+      holeColor="var(--theme-bg)"
+      textColor="var(--theme-elevation-1000)"
     />
   );
 }

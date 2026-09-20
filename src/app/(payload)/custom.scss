@@ -1111,6 +1111,29 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 }
 
 /* -------------------------------------------------------------------------
+ * 7.4 LOGOTIPO DEL PANEL
+ *
+ * El wordmark del sistema es un SVG de 718 × 173 sin dimensiones propias: el
+ * tamaño lo fija esta hoja, y el ancho sale de la proporción del viewBox.
+ *
+ * Sustituye al PNG institucional, que llevaba fondo blanco y en modo oscuro se
+ * veía como una tarjeta blanca (pendiente #12 del cliente). Los colores se le
+ * pasan por props desde los componentes: la rampa del panel, no los tokens del
+ * sistema, que aquí no existen.
+ * ----------------------------------------------------------------------- */
+.pq-logo-acceso {
+  width: auto;
+  height: 46px; /* El PNG ocupaba 260 px de ancho: a esta altura es equivalente. */
+  max-width: 100%;
+}
+
+/* Migas de pan: misma altura que tenía el PNG, para no mover la línea. */
+.pq-logo-migas {
+  width: auto;
+  height: 22px;
+}
+
+/* -------------------------------------------------------------------------
  * 7.3 MIGAS DE PAN — .step-nav
  *
  * Sistema:

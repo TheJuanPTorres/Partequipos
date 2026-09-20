@@ -224,20 +224,21 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **DEL CLIENTE** — nada de esto lo podemos resolver nosotros:
 
-| #   | Pendiente                                                                       | Bloquea                                                                                                                                                                                                                                                   |
-| --- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Claves de Turnstile y Resend (§10.11)                                           | **Lanzamiento.** VERIFICADO EN EL DOM (2026-09-17): `/contactanos/` **no pinta ningún widget de Turnstile** en producción. Es el único punto del sitio por donde entran datos de terceros y hoy no tiene barrera anti-bot; los leads tampoco se notifican |
-| 2   | Infraestructura de base de datos, con pooler (§10.7)                            | **Migración.** Requisito duro                                                                                                                                                                                                                             |
-| 3   | Acceso a WordPress                                                              | 51 artículos + ~55 páginas editoriales                                                                                                                                                                                                                    |
-| 4   | CSV e imágenes reales                                                           | 351 modelos + 80 fichas de maquinaria                                                                                                                                                                                                                     |
-| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                     | JSON-LD `Organization` completo                                                                                                                                                                                                                           |
-| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)            | Redirects y 404 del día del cambio                                                                                                                                                                                                                        |
-| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                       | Cumplir el SLA de Gestión de Incidencias                                                                                                                                                                                                                  |
-| 8   | Clave de PageSpeed Insights (§10.3 13)                                          | Umbrales de rendimiento contractuales                                                                                                                                                                                                                     |
-| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                              | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                                                                                                                                                                                        |
-| 10  | Vercel Pro antes de volver el repositorio a privado                             | Despliegue automático                                                                                                                                                                                                                                     |
-| 11  | Textos legales definitivos                                                      | Sustituir los marcadores de posición                                                                                                                                                                                                                      |
-| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras | El logo actual lleva fondo blanco: en el panel en oscuro se ve como una tarjeta blanca. **Puede que ya no haga falta**: su CLI publica `partequipos-logo` y `partequipos-wordmark` (§10.27)                                                               |
+| #   | Pendiente                                                                                       | Bloquea                                                                                                                                                                                                                                                   |
+| --- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Claves de Turnstile y Resend (§10.11)                                                           | **Lanzamiento.** VERIFICADO EN EL DOM (2026-09-17): `/contactanos/` **no pinta ningún widget de Turnstile** en producción. Es el único punto del sitio por donde entran datos de terceros y hoy no tiene barrera anti-bot; los leads tampoco se notifican |
+| 2   | Infraestructura de base de datos, con pooler (§10.7)                                            | **Migración.** Requisito duro                                                                                                                                                                                                                             |
+| 3   | Acceso a WordPress                                                                              | 51 artículos + ~55 páginas editoriales                                                                                                                                                                                                                    |
+| 4   | CSV e imágenes reales                                                                           | 351 modelos + 80 fichas de maquinaria                                                                                                                                                                                                                     |
+| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                                     | JSON-LD `Organization` completo                                                                                                                                                                                                                           |
+| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)                            | Redirects y 404 del día del cambio                                                                                                                                                                                                                        |
+| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                                       | Cumplir el SLA de Gestión de Incidencias                                                                                                                                                                                                                  |
+| 8   | Clave de PageSpeed Insights (§10.3 13)                                                          | Umbrales de rendimiento contractuales                                                                                                                                                                                                                     |
+| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                                              | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                                                                                                                                                                                        |
+| 10  | Vercel Pro antes de volver el repositorio a privado                                             | Despliegue automático                                                                                                                                                                                                                                     |
+| 11  | Textos legales definitivos                                                                      | Sustituir los marcadores de posición                                                                                                                                                                                                                      |
+| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras                 | El logo actual lleva fondo blanco: en el panel en oscuro se ve como una tarjeta blanca. **Puede que ya no haga falta**: su CLI publica `partequipos-logo` y `partequipos-wordmark` (§10.27)                                                               |
+| 13  | **Qué claims trae el `access_token` de Auth Central** y cuál es el flujo real de OAuth (§10.29) | **Cotización del SSO en firme.** Sin los claims no se puede diseñar el mapeo a nuestro campo `rol`; y la contradicción del flujo decide si el trabajo son ~30 h o ~46 h                                                                                   |
 
 **DE LA DIRECCIÓN TÉCNICA** — asumido por la dirección, no depende del cliente:
 
@@ -1377,6 +1378,77 @@ verificó pintada ya sobre 3.89.0 y el menú propio funciona**, pero cualquier
 afirmación futura sobre el código de Payload hay que releerla en la versión
 instalada, no en estas notas.
 
+### 10.29 PREGUNTA BLOQUEANTE AL CLIENTE — su PDF y su propio código se contradicen sobre el flujo de OAuth
+
+> Descubierto el 2026-09-20 al estudiar el componente `login-screen` de su CLI
+> (§10.27). **Esto se aclara ANTES de cotizar el SSO en firme**: las dos
+> versiones exigen trabajo distinto y tienen riesgos distintos.
+
+**Versión A — el PDF de integración que entregó el cliente.** Según lo que
+transmitió la dirección técnica de ese documento: **el canje del código exige
+`client_secret`, así que va en servidor**; **no emiten `id_token` ni tienen
+`/userinfo`**; y el **refresh token rota en cada uso**, así que hay que
+serializar renovaciones concurrentes. _(Reportado por dirección; el PDF no se ha
+leído en esta sesión, así que estas tres líneas son cita indirecta.)_
+
+**Versión B — el código que publica su propio CLI**, textual de
+`hooks/use-auth.ts` (registro `https://ui.partequipos.com/r/use-auth.json`):
+
+> «Auth Central no entrega un `code` para canjear: manda el `access_token` y el
+> `refresh_token` directo en el query del redirect.»
+
+Y el formato del callback, también textual:
+
+> `?status=success&token=…&refresh_token=…&state=…`
+
+**Las dos no pueden ser ciertas a la vez.** Consecuencias:
+
+| Si manda…                       | Qué implica                                                                                                                                                                               |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A: código + `client_secret`** | El canje va en un endpoint nuestro. Flujo estándar, tokens nunca en la URL. El componente del CLI **no ayuda** en esa parte                                                               |
+| **B: tokens en el query**       | Los tokens **viajan en la URL**: quedan en el historial, pueden filtrarse por `Referer` y **NUNCA se puede registrar la URL del callback** (ni en logs, ni en Sentry, ni en un `console`) |
+
+**Lo que las dos versiones comparten**, y por eso no hay atajo: el hook dice
+—textual— que el `refresh_token` «se renueva desde TU BACKEND —nunca desde el
+navegador— porque el `grant_type=refresh_token` de `/oauth2/token` exige el
+client secret». O sea, **la rotación del refresh es trabajo nuestro en las dos
+versiones**, y el componente no implementa nada de eso.
+
+**Segunda pregunta, igual de bloqueante: qué claims trae el `access_token`.** El
+hook dice que es un JWT RS256 de 15 minutos validable **offline** contra
+`{authUrl}/.well-known/jwks.json` (issuer = `authUrl`, audience = nuestro
+`clientId`), lo que **matiza** la trampa del `id_token` ausente: la identidad
+saldría de sus claims. Pero **el registro no dice qué claims son**, y de eso
+depende el mapeo al campo `rol` de `Users`. Pendiente #13 del cliente.
+
+**Estimación revisada del SSO con lo que se sabe hoy: 30–46 h** (antes 30–50 h
+suponiendo construirlo desde cero). El componente abarata **la pantalla, no el
+protocolo**: de las tres trampas del PDF **no cubre ninguna**.
+
+**Recomendación para cuando llegue el momento —anotada ahora para no repetir el
+estudio:** copiar **solo `use-auth`**, que declara **cero dependencias**, y
+construir la pantalla con nuestro propio marcado. `login-screen` arrastra
+`button`, `input` y `spinner`, y con ellos **cuatro paquetes nuevos**
+—`@base-ui/react` (9,6 MB), `class-variance-authority`, `clsx` y
+`tailwind-merge`— para lo que en modo `oidc` acaba siendo **un botón**: el
+formulario de correo no aplica a una app satélite, porque ese POST deja cookie
+en el dominio de Auth Central, no un token para nosotros.
+
+**Y lo que el componente NO resuelve del lado de Payload:** no autentica contra
+Payload. Payload necesita **su propia sesión** —es la que sostiene los roles y
+todo el control de acceso—, así que la integración exige un endpoint que valide
+el JWT, resuelva el usuario y emita la cookie de Payload
+(`getFieldsToSign`, `jwtSign`, `generatePayloadCookie`; API pública, verificada
+en 3.89.0), o una `auth.strategies` en `Users`. La pantalla de login **sí** se
+puede sustituir (`admin.components.views.login` gana sobre la vista interna,
+verificado en `getRouteData`), pero eso es lo de menos. **No poner
+`disableLocalStrategy`:** conviene conservar correo y contraseña como vía de
+rescate (§10.17).
+
+**La integración sigue planificada AL FINAL**, y no por el coste: cada
+`redirect_uri` se registra por dominio y los de staging y producción todavía no
+existen.
+
 ### 10.27 CLI del sistema de diseño del cliente — cómo usarlo sin regalar el repo
 
 > Partequipos publica su sistema como CLI al estilo de shadcn: copia los
@@ -1417,9 +1489,26 @@ dominio no está bajo nuestro control ni bajo la protección de npm.
 
 **Dos hallazgos del registro, anotados para pendientes abiertos:**
 
-- **`partequipos-logo` y `partequipos-wordmark`** podrían resolver el logo para
-  fondos oscuros (§10.0.1, pendiente del cliente #12) sin esperar a nadie, **si**
-  el wordmark usa `currentColor`. **Sin verificar y sin instalar.**
+- **`partequipos-wordmark` — EVALUADO el 2026-09-20, y sirve para el pendiente
+  #12** (logo sobre fondo oscuro). **Sigue sin instalar.** Lo que trae, leído del
+  registro:
+  - **Un solo fichero**, `components/ui/partequipos-wordmark.tsx`, 16,7 kB y 97
+    líneas: un `<svg viewBox="0 0 718 173" aria-hidden>` con 18 `path`.
+  - **`dependencies: []` y `registryDependencies: []`.** Cero paquetes nuevos,
+    **cero imports** —ni siquiera de React— y nada de `fetch`, `eval` ni scripts.
+  - **No usa `currentColor`**; usa **tres props con variables CSS por defecto**:
+    `textColor = var(--foreground)` en 10 paths, `holeColor = var(--sidebar)` en
+    los 7 ojales de las letras, y `pColor = "#D92035"` —el rojo de marca— en 1.
+    Así que **se adapta al tema**, y en el panel se le pasarían nuestras
+    variables (`--theme-elevation-1000` y el fondo real de la superficie) en vez
+    de las del sistema.
+  - **Cumple la regla de §10.27 sin fricción:** es un componente suelto, se
+    añadiría de uno en uno, no declara dependencias que revisar y el diff es un
+    único fichero de marcado.
+  - **Lo que hay que decidir antes:** el favicon (#9) **sigue pendiente** —esto
+    no lo resuelve—, y el logo institucional del SITIO seguiría siendo el PNG
+    cableado de §10.8. Esto solo arregla el panel en oscuro.
+- **`partequipos-logo`**: no evaluado todavía.
 - **`empty`** cubre los estados vacíos del panel, si algún día se retoma esa
   parte (hoy cerrada por decisión de dirección: fidelidad estética sin retorno).
 

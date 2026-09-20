@@ -28,10 +28,18 @@ import { PartequiposWordmark } from "@/components/ui/partequipos-wordmark";
  */
 export default function Logo() {
   return (
-    <PartequiposWordmark
-      className="pq-logo-acceso"
-      holeColor="var(--theme-bg)"
-      textColor="var(--theme-elevation-1000)"
-    />
+    /*
+     * NOMBRE ACCESIBLE. El componente del sistema trae `aria-hidden` en su
+     * `<svg>`, así que por sí solo no dice nada a un lector de pantalla — y el
+     * PNG que había antes sí llevaba `alt`. Se envuelve en un `role="img"` con
+     * `aria-label` para no perder esa información al cambiar de pieza.
+     */
+    <span aria-label="Partequipos" role="img">
+      <PartequiposWordmark
+        className="pq-logo-acceso"
+        holeColor="var(--theme-bg)"
+        textColor="var(--theme-elevation-1000)"
+      />
+    </span>
   );
 }

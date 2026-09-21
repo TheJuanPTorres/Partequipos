@@ -814,6 +814,65 @@ problema de contraste sino de que el estado no comunicaba. Payload la dibuja a
 margen baja a 10 px, recortada. Se movió **dentro del ítem** (4 px desde el
 borde, 5 px hasta el texto). Verificado que hover y activo ya se distinguen.
 
+#### Logotipo del panel con el wordmark del sistema (2026-09-20)
+
+Rama `feat/panel-wordmark`, **sin fusionar** mientras falte la verificación
+pintada de abajo.
+
+El PNG institucional (`seoConfig.logoPath`) **lleva fondo blanco**: en el panel
+en modo oscuro se veía como una tarjeta blanca pegada al fondo — el pendiente
+#12 del cliente. Lo sustituye `partequipos-wordmark`, copiado con el CLI del
+cliente (§10.27 de CLAUDE.md): **un fichero, cero dependencias, cero imports,
+solo un `<svg viewBox="0 0 718 173">` con 18 `path`**.
+
+**Colores: los del panel, no los del sistema.** El componente trae por defecto
+`var(--foreground)` y `var(--sidebar)`, que no existen en el panel de Payload. Se
+le pasan `textColor="var(--theme-elevation-1000)"` y `holeColor="var(--theme-bg)"`;
+la «P» se queda en el rojo de marca (`#d92035`), idéntico en los dos modos.
+
+**Medido sobre la pantalla de acceso pintada, en el preview:**
+
+| Medida (claro · oscuro)            | Antes (PNG)                        | Después (wordmark)                         |
+| ---------------------------------- | ---------------------------------- | ------------------------------------------ |
+| Texto del logotipo contra su fondo | —, era una imagen con fondo propio | **20,47 · 15,2**                           |
+| Ojales de las letras               | —                                  | `#fcfcfc` · `#121212`: **el fondo exacto** |
+| «P» de marca                       | —                                  | 4,86 · 3,75 (mismo rojo)                   |
+| Tamaño                             | 260 px de ancho                    | 46 × 191 px (proporción 4,15)              |
+| Elementos `<img>` en la pantalla   | 1, con fondo blanco                | **0**                                      |
+
+Dos lecturas coincidentes por modo. **El contraste de un logotipo no es un
+requisito WCAG** —1.4.11 exime los logotipos—, pero se mide igual porque lo que
+falla en oscuro no es el contraste: es el recuadro blanco, y eso sí se ve.
+
+**Un defecto que introdujo el cambio, corregido:** el `<svg>` del sistema trae
+`aria-hidden="true"`, así que al cambiar de pieza **se perdió el `alt`** que el
+PNG sí tenía. Va envuelto en `role="img"` con `aria-label="Partequipos"`.
+
+**El fichero copiado se excluye de Prettier** a propósito
+(`.prettierignore`): así sigue comparable **byte a byte** con
+`https://ui.partequipos.com/r/partequipos-wordmark.json`, que es la comprobación
+de cadena de suministro al añadir o actualizar un componente del cliente. Al
+copiarlo coincidía exacto: 16.708 bytes.
+
+**QUÉ CIERRA Y QUÉ NO:**
+
+| Pendiente                                                                    | Estado                                                            |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| #12 · logo en oscuro **del panel**                                           | **CERRADO** (acceso y migas), a falta de la verificación de abajo |
+| #9 · **favicon**                                                             | **SIGUE ABIERTO.** Hace falta un icono cuadrado; esto no lo da    |
+| Logo del **sitio público** (cabecera, JSON-LD `Organization`, imagen social) | **SIN TOCAR**: sigue el PNG cableado de §10.8                     |
+
+**PENDIENTE DE VERIFICACIÓN PINTADA (§10.14), y por eso la rama no se fusiona:**
+
+1. **El nombre accesible** (`role="img"` + `aria-label`): el commit está en el
+   remoto, pero **Vercel no desplegó** —22 min después el alias seguía sirviendo
+   el despliegue anterior—, así que no se ha visto en la página.
+2. **El logotipo en las migas de pan**: esa vista exige sesión, y en el host del
+   preview no había ninguna.
+
+El criterio que manda aquí es el de §10.18: aquel despliegue pasó CI, compiló y
+prerenderizó 118 páginas, y dejó `/admin`, la API, el sitemap y los redirects en 500. **Verde en CI no es verde en el lambda.**
+
 #### Iconos del menú y menú propio — fase B (2026-09-17)
 
 El sistema del cliente usa **`@tabler/icons-react`** (`size-4`, trazo regular) y

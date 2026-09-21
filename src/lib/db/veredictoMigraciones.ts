@@ -26,10 +26,7 @@ export type VeredictoMigraciones = {
   codigo: 0 | 1;
   /** Marcadores `dev` encontrados. Si hay alguno, se aborta. */
   marcadores: FilaMigracion[];
-  motivo:
-    | "base-nueva-sin-tabla"
-    | "hay-marcador-dev"
-    | "sin-marcador-dev";
+  motivo: "base-nueva-sin-tabla" | "hay-marcador-dev" | "sin-marcador-dev";
 };
 
 /**

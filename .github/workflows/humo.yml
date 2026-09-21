@@ -1,0 +1,60 @@
+name: Prueba de humo
+
+# POR QUÉ EXISTE. Ninguna de nuestras puertas de calidad mira el lambda ya
+# desplegado (CLAUDE.md §10.20). El despliegue del incidente §10.18 pasó
+# typecheck, lint, formato, 198 pruebas y un `next build` completo, y dejó
+# /admin, la API, el sitemap y el mapa de redirects en 500. Esta prueba pide esas
+# rutas al despliegue real y exige 200.
+#
+# SE DISPARA CON `deployment_status`, el evento que Vercel ya publica: no
+# necesita plan Pro y vive FUERA de Vercel, así que un fallo de Vercel no lo
+# silencia.
+#
+# SEGURIDAD DEL SECRETO, que es lo que decide que este workflow sea seguro con
+# el repositorio público:
+#
+#   1. `deployment_status` solo dispara el workflow SI EL FICHERO EXISTE EN LA
+#      RAMA POR DEFECTO, y se ejecuta con ESA definición (documentación de
+#      GitHub Actions). Un PR —de un fork o no— no puede modificar lo que corre
+#      aquí ni, por tanto, hacerse con el secreto.
+#   2. El repositorio NO define workflows con `pull_request_target`, que es el
+#      otro camino por el que el código de un fork alcanzaría secretos.
+#   3. El token viaja como variable de entorno hacia una cabecera HTTP. NUNCA se
+#      imprime: el script solo dice si está presente.
+on:
+  deployment_status:
+
+# Dos despliegues seguidos de la misma rama: solo interesa el último.
+concurrency:
+  group: humo-${{ github.event.deployment.environment }}-${{ github.event.deployment_status.target_url }}
+  cancel-in-progress: true
+
+jobs:
+  humo:
+    name: Rutas que solo fallan en tiempo de petición
+    # Solo cuando el despliegue terminó bien: un `error` o un `pending` no tienen
+    # URL que comprobar, y Vercel ya lo reporta por su cuenta.
+    if: github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version: 22
+
+      - run: npm ci
+
+      - name: Comprobar el despliegue
+        env:
+          HUMO_URL: ${{ github.event.deployment_status.environment_url }}
+          # `production` o `preview`, tal como lo nombra Vercel. Cualquier otro
+          # valor se trata como preview, que es el caso conservador: exige token.
+          HUMO_ENTORNO: ${{ github.event.deployment.environment == 'Production' && 'production' || 'preview' }}
+          # Vacío en producción a propósito: allí no hay protección que derivar,
+          # y así el token no viaja a donde no hace falta.
+          HUMO_BYPASS: ${{ github.event.deployment.environment == 'Production' && '' || secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: npm run humo

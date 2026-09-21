@@ -40,7 +40,8 @@
     "rol": "payload run scripts/usuarios/asignar-rol.ts",
     "rol:admin": "payload run scripts/usuarios/asignar-rol.ts",
     "prefs:menu": "payload run scripts/usuarios/preferencias-menu.ts",
-    "prefs:borrar": "payload run scripts/usuarios/borrar-preferencia.ts"
+    "prefs:borrar": "payload run scripts/usuarios/borrar-preferencia.ts",
+    "humo": "tsx scripts/qa/humo.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.89.0",

@@ -922,7 +922,52 @@ lista, y solo el camino «responde 200». Un 200 con contenido equivocado seguir
 pasando — que es §10.15 otra vez. Es una red para el fallo catastrófico, no una
 verificación funcional.
 
-**No implementada**: queda como propuesta pendiente de aprobación.
+#### IMPLEMENTADA el 2026-09-21
+
+`.github/workflows/humo.yml` + `npm run humo`, con la decisión en
+`src/lib/qa/humo.ts` y sus pruebas en `humo.test.ts`.
+
+| Qué        | Cómo quedó                                                                                                                                               |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rutas      | **Lista fija escrita a mano.** `/admin/`, `/api/marcas/`, `/sitemap.xml`, `/`, y `/api/redirects-map/` **solo en producción**                            |
+| Exigencia  | **200 exacto.** Un 3xx también falla: en `/admin/` significaría que la protección no se derivó                                                           |
+| Reintentos | Solo con 5xx o red caída, **máximo 4 intentos** y esperas de 1 s, 2 s y 4 s: **7 s por ruta como techo**. Un 4xx NO se reintenta: no es arranque en frío |
+| Fallo      | Ruidoso: imprime ruta, código, intentos, **por qué esa ruta está en la lista** y el comando de revert de §10.18                                          |
+| Disparo    | `deployment_status`, el evento que Vercel ya publica. Corre en **preview y producción**                                                                  |
+
+**El token de derivación y por qué este workflow es seguro con el repositorio
+público:** `deployment_status` **solo dispara el workflow si el fichero existe en
+la rama por defecto, y ejecuta ESA definición** (documentación de GitHub
+Actions), así que un PR —de un fork o no— no puede alterar lo que corre ni
+alcanzar el secreto. El repositorio no usa `pull_request_target`, que es el otro
+camino. El token viaja en la cabecera `x-vercel-protection-bypass`, **nunca en la
+URL** —acabaría en los registros— y el script solo dice si está presente.
+En producción se pasa **vacío a propósito**: allí no hay protección que derivar.
+
+**La excepción de §10.22, escrita en el código:** `/api/redirects-map/` se mide
+**solo en producción**. En un preview el token la haría responder 200 midiendo
+**un camino privilegiado que el proxy real no tiene**, que es §10.15 dentro de la
+propia herramienta.
+
+**VERIFICADO QUE FALLA CUANDO DEBE**, con los dos niveles:
+
+- **Pruebas unitarias:** falla con 500, con 302, con la red caída; no reintenta
+  un 4xx; y para en el límite de intentos.
+- **De punta a punta, contra despliegues reales:** contra **producción**, las 5
+  rutas en 200. Contra un **preview con un token inválido**, las 4 rutas en
+  **302 y salida 1**. Sin token, corta antes con el motivo.
+
+**NO se ha hecho check requerido para fusionar, y el motivo importa:** con
+`deployment_status`, si Vercel **no despliega** el check nunca aparece y el PR
+queda bloqueado sin salida — y eso ya nos pasó (§10.30). Además el flujo actual
+fusiona por avance rápido desde local, sin PR, así que exigirlo cambiaría la
+forma de trabajar. Y cuando el repositorio vuelva a privado, las reglas de
+protección de rama **exigen plan de pago** en una cuenta personal. Si algún día
+se quiere bloqueante, la versión robusta no es esta: es un job disparado por
+`pull_request` que **espera** el preview vía API de Vercel.
+
+**Regla operativa mientras no sea bloqueante:** si la prueba de humo falla en un
+preview, **ese despliegue no se promociona**.
 
 #### Addendum 2026-09-16 — no se pueden medir Core Web Vitals en una pestaña de fondo
 

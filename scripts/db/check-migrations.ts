@@ -26,7 +26,14 @@ import { fileURLToPath } from "node:url";
 
 import { Pool } from "pg";
 
-const MARCADOR_DEV = -1;
+import { veredictoMigraciones } from "../../src/lib/db/veredictoMigraciones";
+
+/*
+ * La DECISIÓN vive en `src/lib/db/veredictoMigraciones.ts`, no aquí, y tiene
+ * pruebas que comprueban que **corta** cuando aparece el marcador: hacerlo
+ * contra una base real exigiría plantar el marcador en un entorno, que es
+ * justo lo que este guardián evita. Aquí queda el acceso a datos y el mensaje.
+ */
 
 /**
  * Lee `DATABASE_URI` del entorno y, si no está, de los ficheros `.env` locales.
@@ -65,10 +72,7 @@ async function main(): Promise<number> {
     const existe = await pool.query(
       "select to_regclass('public.payload_migrations') is not null as existe",
     );
-    if (!existe.rows[0]?.existe) {
-      console.log("✓ Base sin tabla payload_migrations: es una base nueva, se puede migrar.");
-      return 0;
-    }
+    const hayTabla = Boolean(existe.rows[0]?.existe);
 
     /*
      * Se imprime SIEMPRE contra qué base se está comprobando.
@@ -82,19 +86,27 @@ async function main(): Promise<number> {
     console.log(`Nombre       : ${u.pathname.slice(1)}
 `);
 
-    const { rows } = await pool.query<{ name: string; batch: number }>(
-      "select name, batch from payload_migrations order by id",
-    );
+    const filas = hayTabla
+      ? (
+          await pool.query<{ name: string; batch: number }>(
+            "select name, batch from payload_migrations order by id",
+          )
+        ).rows
+      : null;
 
-    const dev = rows.filter((r) => Number(r.batch) === MARCADOR_DEV);
-    const aplicadas = rows.filter((r) => Number(r.batch) > 0);
+    const veredicto = veredictoMigraciones(filas);
 
-    console.log(`Migraciones registradas: ${aplicadas.length}`);
-    aplicadas.forEach((r) => console.log(`  · ${r.name} (batch ${r.batch})`));
+    if (veredicto.motivo === "base-nueva-sin-tabla") {
+      console.log("✓ Base sin tabla payload_migrations: es una base nueva, se puede migrar.");
+      return veredicto.codigo;
+    }
 
-    if (dev.length === 0) {
+    console.log(`Migraciones registradas: ${veredicto.aplicadas.length}`);
+    veredicto.aplicadas.forEach((r) => console.log(`  · ${r.name} (batch ${r.batch})`));
+
+    if (veredicto.motivo === "sin-marcador-dev") {
       console.log("✓ Sin marcador 'dev'. `payload migrate` puede ejecutarse sin bloquearse.");
-      return 0;
+      return veredicto.codigo;
     }
 
     console.error("");
@@ -114,7 +126,7 @@ async function main(): Promise<number> {
     console.error("     cambió el push y generar la migración correspondiente.");
     console.error("");
     console.error("  Ver CLAUDE.md §10.9 (incidente del 2026-08-09).");
-    return 1;
+    return veredicto.codigo;
   } catch (error) {
     console.error("✗ No se pudo comprobar el estado de migraciones:");
     console.error(`  ${(error as Error).message}`);

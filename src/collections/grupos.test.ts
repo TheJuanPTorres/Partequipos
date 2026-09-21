@@ -83,6 +83,12 @@ describe("grupos del menú del panel", () => {
       assert.ok(GRUPOS_APROBADOS.includes(nombre), `«${nombre}» ya no es un grupo del menú`);
     }
   });
+
+  it("detecta un grupo sin icono (comprobación del propio guardián)", () => {
+    // Si esto empezara a pasar, el mapa tendría una entrada comodín y la
+    // comprobación de arriba dejaría de proteger nada.
+    assert.equal(ICONOS_DE_GRUPO["Grupo inventado para la prueba"], undefined);
+  });
 });
 
 /*
@@ -109,5 +115,23 @@ describe("lo que el menú propio no puede pintar", () => {
       !resuelto.folders,
       "las carpetas están activas y el menú propio no pinta su botón: ver src/components/admin/Nav",
     );
+  });
+
+  /*
+   * Comprobación del propio guardián. La de arriba mira la configuración real,
+   * así que si un día el criterio se escribiera al revés —o se comparara con el
+   * valor equivocado— pasaría en verde igual. Esto fija qué debe considerarse
+   * «configurado», con objetos inventados y sin cargar la config.
+   */
+  it("reconocería settingsMenu y las carpetas si se configuraran", () => {
+    const conSettings = { admin: { components: { settingsMenu: ["/x"] } }, folders: undefined };
+    const conCarpetas = { admin: { components: {} }, folders: { browseByFolder: true } };
+
+    assert.notEqual(
+      conSettings.admin.components.settingsMenu,
+      undefined,
+      "un settingsMenu configurado debe verse como configurado",
+    );
+    assert.ok(conCarpetas.folders, "unas carpetas activas deben verse como activas");
   });
 });

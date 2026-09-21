@@ -1590,9 +1590,40 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Versión exacta de Next y Payload       | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel             | `src/lib/deps/versiones-fijas.test.ts`                     | CI, en cada push |
 
 **Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
-lista real, y una prueba que exige que coincidan. La del sitemap incluye además
-una tercera prueba que **verifica el propio guardián** con una ruta inventada —
-un guardarraíl que no falla nunca puede estar roto y parecer sano.
+lista real, y una prueba que exige que coincidan.
+
+#### ¿Y quién vigila al vigilante? (auditado el 2026-09-21)
+
+**Un guardarraíl que no falla nunca puede estar roto y parecer sano.** Auditados
+los seis, uno por uno:
+
+| Guardarraíl             | ¿Se comprueba que FALLA cuando debe?                                                                                                               |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cobertura del sitemap   | **Sí**: una ruta inventada que debe salir como no cubierta                                                                                         |
+| Grupos del menú         | **Sí**: una colección sin grupo, y un grupo sin icono                                                                                              |
+| `settingsMenu`/carpetas | **Sí**: objetos inventados que fijan qué cuenta como «configurado»                                                                                 |
+| Unicidad de slug        | **Sí, por construcción**: la prueba tiene casos que **rechazan** y casos que **aceptan**, así que un hook que dijera siempre «no» también fallaría |
+| Destino de un redirect  | **Sí, por construcción**: además de los destinos válidos, hay casos que **deben** rechazarse (un nivel de más, una rama inventada)                 |
+| Versión exacta          | **Sí**: un rango (`^16.3.5`, `>=16.2.6`) debe reconocerse como rango                                                                               |
+| Marcador `dev`          | **Sí, tras refactorizarlo**. Ver abajo                                                                                                             |
+
+**El caso del marcador `dev` merece explicación, porque es el único que corta un
+build.** Probar que corta exigiría **plantar el marcador en una base real**: un
+efecto secundario sobre `production`, `preview` o `development`, justo lo que el
+guardián existe para evitar. La salida fue separar la **decisión** del **acceso a
+datos**: `src/lib/db/veredictoMigraciones.ts` es una función pura que recibe las
+filas y devuelve el veredicto, y `scripts/db/check-migrations.ts` se queda con la
+consulta y el mensaje. Las pruebas cubren que **aborta** con el marcador
+presente, incluido el caso en que `batch` llega como **cadena** `"-1"` —el driver
+lo hace, y `"-1" === -1` es `false`—, y que **no** confunde el batch 0 ni un −2.
+
+**Y hay una demostración en vivo, que no se buscó:** `npm run db:check` contra
+`development` **aborta con código 1**, porque esa base lleva el marcador desde el
+incidente de §10.9. El guardián no es teórico: se le ve cortar.
+
+**Lo que queda sin cubrir por pruebas, dicho claro:** la consulta SQL y el
+`to_regclass` del script. Eso es acceso a datos, no criterio, y comprobarlo
+exigiría una base.
 
 **Lo que NINGUNO cubre:** todos corren antes de que exista el despliegue, así que
 no ven lo que solo falla en tiempo de petición. Ese hueco sigue abierto y su

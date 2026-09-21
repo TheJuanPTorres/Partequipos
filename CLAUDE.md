@@ -1619,6 +1619,26 @@ propuesta está en §10.20.
 > **Arreglo pendiente:** subirlo a `Media` y que `seoConfig` lo resuelva por
 > relación en vez de por URL fija. No se hizo en su momento para no mezclarlo con
 > otra tarea; queda registrado aquí.
+>
+> **Y cuando llegue el diseño del sitio, este arreglo tiene un candidato mejor
+> (anotado el 2026-09-21).** El CLI del cliente publica `partequipos-logo` y
+> `partequipos-wordmark` (§10.27): SVG, **un fichero y cero dependencias cada
+> uno**, con los colores por props, ya en uso en el panel y **verificados
+> pintados en los dos modos**. Sustituirlos aquí quitaría de un golpe **tres
+> dependencias del PNG del Blob**: la cabecera de todas las páginas, el logo del
+> JSON-LD `Organization` y la imagen social por defecto.
+>
+> **NO se hace ahora, por decisión de dirección:** el diseño del sitio público es
+> trabajo del diseñador y rehacer la cabecera dos veces no tiene sentido. Las dos
+> cosas se resuelven en la misma tanda, porque son la misma: el día que se toque
+> la cabecera se decide si el logo va por `Media` o por componente.
+>
+> **Un matiz que hay que tener presente ese día:** un SVG en línea **no sirve
+> para el JSON-LD ni para la imagen social**. `Organization.logo` y el
+> `og:image` exigen una **URL de imagen** que un rastreador pueda descargar, así
+> que esos dos seguirían necesitando un fichero —PNG o SVG servido— aunque la
+> cabecera pase a componente. El componente solo resuelve lo que se pinta en el
+> navegador.
 
 ### 10.11 PENDIENTE PRE-LANZAMIENTO · PRIORIDAD ALTA — claves de producción
 

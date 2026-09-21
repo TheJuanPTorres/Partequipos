@@ -1,30 +1,26 @@
-import { PartequiposWordmark } from "@/components/ui/partequipos-wordmark";
+import { PartequiposLogo } from "@/components/ui/partequipos-logo";
 
 /**
- * Icono del panel: aparece en las migas de pan y en espacios reducidos.
+ * Icono del panel: aparece en las migas de pan y en cualquier hueco reducido.
  *
- * Mismo cambio y mismo motivo que `Logo.tsx` (pendiente #12): el PNG llevaba
- * fondo blanco y en oscuro se veía como una pastilla blanca. Aquí el tamaño lo
- * fija la altura —22 px, la que ya tenía el PNG— y el ancho sale del `viewBox`
- * (718 × 173), así que la proporción se conserva sin declarar dimensiones.
+ * AQUÍ VA EL ISOTIPO, NO EL LOGOTIPO, y eso se descubrió midiendo la página
+ * pintada (§10.14): el hueco que Payload reserva mide **18 × 22 px con
+ * `overflow: hidden`**, y el wordmark, que a 22 px de alto ocupa 91 px, salía
+ * recortado en «PA». El isotipo tiene el `viewBox` más alto que ancho
+ * (188 × 272), así que a esa altura ocupa ~15 px y cabe.
  *
- * Los ojales de las letras usan `--theme-bg` igual que en el acceso: en las
- * migas el logotipo se apoya sobre el fondo de la vista, no sobre una tarjeta.
+ * `holeColor` es el ojal interior de la P y debe igualar la superficie: en las
+ * migas es el fondo de la vista, `--theme-bg`. Su valor por defecto
+ * (`var(--sidebar)`) no existe en el panel. El rojo de marca se conserva: es
+ * legible en los dos modos y es la marca.
+ *
+ * Nombre accesible: el `<svg>` del sistema va con `aria-hidden`, así que se
+ * envuelve en `role="img"`, igual que en `Logo.tsx`.
  */
 export default function Icon() {
   return (
-    /*
-     * NOMBRE ACCESIBLE. El componente del sistema trae `aria-hidden` en su
-     * `<svg>`, así que por sí solo no dice nada a un lector de pantalla — y el
-     * PNG que había antes sí llevaba `alt`. Se envuelve en un `role="img"` con
-     * `aria-label` para no perder esa información al cambiar de pieza.
-     */
     <span aria-label="Partequipos" role="img">
-      <PartequiposWordmark
-        className="pq-logo-migas"
-        holeColor="var(--theme-bg)"
-        textColor="var(--theme-elevation-1000)"
-      />
+      <PartequiposLogo className="pq-isotipo-migas" holeColor="var(--theme-bg)" />
     </span>
   );
 }

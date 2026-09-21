@@ -29,3 +29,4 @@ docs/redirects-map.csv
 # comprobación de cadena de suministro cuando se añade o se actualiza uno.
 # Si algún día se edita uno de verdad, se saca de esta lista y se formatea.
 src/components/ui/partequipos-wordmark.tsx
+src/components/ui/partequipos-logo.tsx

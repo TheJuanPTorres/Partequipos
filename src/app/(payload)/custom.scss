@@ -1127,10 +1127,14 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   max-width: 100%;
 }
 
-/* Migas de pan: misma altura que tenía el PNG, para no mover la línea. */
-.pq-logo-migas {
+/*
+ * Migas de pan: el ISOTIPO, no el logotipo. El hueco que Payload reserva mide
+ * 18 × 22 px con `overflow: hidden` (medido), y el wordmark a esa altura ocupa
+ * 91 px: salía recortado. El isotipo es más alto que ancho, así que cabe.
+ */
+.pq-isotipo-migas {
   width: auto;
-  height: 22px;
+  height: 20px;
 }
 
 /* -------------------------------------------------------------------------

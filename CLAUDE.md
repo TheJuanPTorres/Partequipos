@@ -1378,6 +1378,39 @@ verificó pintada ya sobre 3.89.0 y el menú propio funciona**, pero cualquier
 afirmación futura sobre el código de Payload hay que releerla en la versión
 instalada, no en estas notas.
 
+### 10.30 SIN DIAGNOSTICAR — un commit que nunca disparó despliegue (2026-09-20)
+
+> `3e286fe` («el logotipo recupera su nombre accesible»), en la rama
+> `feat/panel-wordmark`, **nunca generó despliegue en Vercel**. Verificado por
+> dirección en la lista de deployments: no aparece **ni en cola, ni cancelado, ni
+> bloqueado, ni con error**. Simplemente no existe.
+>
+> **Qué descarta el caso:**
+>
+> - El commit **sí está en el remoto**: `git ls-remote` devolvió el mismo sha que
+>   local, y `origin/feat/panel-wordmark` lo tiene.
+> - **La integración de Git funcionaba minutos antes**: los dos commits
+>   anteriores de esa misma rama (`0721e20`, `de78c99`) sí desplegaron.
+> - **No es el plan ni el repositorio privado** (§10.4): otras ramas siguieron
+>   desplegando el mismo día.
+>
+> **Cómo se salió adelante sin diagnosticarlo:** la rama `docs/wordmark-registro`
+> se creó **encima** de ese commit, y su push **sí** desplegó. Comprobado con
+> `git merge-base --is-ancestor 3e286fe 3701202` —no por suposición— y mirando el
+> árbol del commit desplegado, que contiene el arreglo. Así que **el preview de
+> otra rama sirvió para verificar el commit que no se desplegó**.
+>
+> **Si vuelve a pasar:** mirar las entregas del webhook en GitHub (Settings →
+> Webhooks → el de `vercel.com` → Recent Deliveries). Si el evento `push` no
+> aparece, el corte es de GitHub hacia Vercel; si aparece con error, es de Vercel.
+> Y como desbloqueo inmediato, un «Redeploy» manual de ese commit, o un commit
+> nuevo encima, que es lo que resolvió este caso.
+>
+> **Decisión de dirección: no se persigue ahora.** Queda el rastro, porque es el
+> segundo aviso que tenemos sobre el disparo de despliegues —el primero fue el
+> bloqueo por plan de §10.4— y lo que no se anota se vuelve a diagnosticar desde
+> cero.
+
 ### 10.29 PREGUNTA BLOQUEANTE AL CLIENTE — su PDF y su propio código se contradicen sobre el flujo de OAuth
 
 > Descubierto el 2026-09-20 al estudiar el componente `login-screen` de su CLI

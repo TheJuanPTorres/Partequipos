@@ -856,22 +856,44 @@ copiarlo coincidía exacto: 16.708 bytes.
 
 **QUÉ CIERRA Y QUÉ NO:**
 
-| Pendiente                                                                    | Estado                                                            |
-| ---------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| #12 · logo en oscuro **del panel**                                           | **CERRADO** (acceso y migas), a falta de la verificación de abajo |
-| #9 · **favicon**                                                             | **SIGUE ABIERTO.** Hace falta un icono cuadrado; esto no lo da    |
-| Logo del **sitio público** (cabecera, JSON-LD `Organization`, imagen social) | **SIN TOCAR**: sigue el PNG cableado de §10.8                     |
+| Pendiente                                                                    | Estado                                                              |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| #12 · logo en oscuro **del panel**                                           | **CERRADO Y VERIFICADO** pintado (acceso y migas), en los dos modos |
+| #9 · **favicon**                                                             | **SIGUE ABIERTO.** Hace falta un icono cuadrado; esto no lo da      |
+| Logo del **sitio público** (cabecera, JSON-LD `Organization`, imagen social) | **SIN TOCAR**: sigue el PNG cableado de §10.8                       |
 
-**PENDIENTE DE VERIFICACIÓN PINTADA (§10.14), y por eso la rama no se fusiona:**
+#### Verificación pintada: completada, y encontró un defecto
 
-1. **El nombre accesible** (`role="img"` + `aria-label`): el commit está en el
-   remoto, pero **Vercel no desplegó** —22 min después el alias seguía sirviendo
-   el despliegue anterior—, así que no se ha visto en la página.
-2. **El logotipo en las migas de pan**: esa vista exige sesión, y en el host del
-   preview no había ninguna.
+El **nombre accesible** se comprobó en el **árbol de accesibilidad**, no en el
+marcado: sale `img "Partequipos"`. Lo raro fue cómo: el commit del arreglo
+**nunca disparó despliegue** (CLAUDE.md §10.30), y se verificó desde el preview
+de otra rama que lo lleva dentro, tras confirmar la ascendencia con
+`git merge-base --is-ancestor` y no por suposición.
 
-El criterio que manda aquí es el de §10.18: aquel despliegue pasó CI, compiló y
-prerenderizó 118 páginas, y dejó `/admin`, la API, el sitemap y los redirects en 500. **Verde en CI no es verde en el lambda.**
+**EL DEFECTO: en las migas de pan iba el logotipo, y no cabe.** El hueco que
+Payload reserva para el icono mide **18 × 22 px con `overflow: hidden`**, y el
+wordmark a 22 px de alto ocupa **91 px**: se veía «PA» recortado. El componente
+compilaba, tipaba y renderizaba sin una queja; el recorte **solo existía en la
+página pintada**.
+
+**Arreglo: ahí va el ISOTIPO**, `partequipos-logo`, cuyo `viewBox` es más alto
+que ancho (188 × 272). Copiado con el CLI de uno en uno, cero dependencias,
+verificado byte a byte (5.668 bytes) y también excluido de Prettier.
+
+| Migas de pan (claro · oscuro) | Antes (wordmark) | Después (isotipo)                      |
+| ----------------------------- | ---------------- | -------------------------------------- |
+| Tamaño                        | 91 × 22 px       | **14 × 20 px**                         |
+| ¿Cabe en el hueco de 18 px?   | **No: «PA»**     | **Sí**                                 |
+| Rojo de marca contra el fondo | —                | 4,28 · 4,27                            |
+| Ojal de la P                  | —                | `#fcfcfc` · `#121212`: el fondo exacto |
+| Nombre accesible              | —                | `Partequipos`                          |
+
+El único `<img>` que queda en el panel es el **gravatar de la cuenta**, de
+Payload: ningún logotipo nuestro es ya una imagen con fondo propio.
+
+**La lección es la de §10.18 en pequeño:** aquel despliegue pasó CI, compiló y
+prerenderizó 118 páginas, y dejó `/admin`, la API, el sitemap y los redirects en 500. Aquí el componente pasó todas las puertas y salía recortado. **Verde en CI
+no es verde en pantalla.**
 
 #### Iconos del menú y menú propio — fase B (2026-09-17)
 

@@ -1558,11 +1558,14 @@ fichero, cero dependencias, cero imports, solo marcado.
 - **Un defecto que introdujo el cambio, y se corrigió:** su `<svg>` trae
   `aria-hidden="true"`, así que al sustituir el PNG **se perdió el `alt`**. Va
   envuelto en `role="img"` con `aria-label="Partequipos"`.
-- **PENDIENTE DE VERIFICACIÓN PINTADA** (§10.14): el **nombre accesible** y el
-  logotipo en las **migas de pan**. El primero, porque Vercel **no ha desplegado**
-  el commit del arreglo; el segundo, porque esa vista exige sesión. **La rama no
-  se fusiona hasta verificarlo**: el precedente de §10.18 es que CI en verde y un
-  build completo no garantizan el lambda.
+- **VERIFICADO PINTADO en los dos modos, y encontró un defecto:** en las **migas
+  de pan** el hueco del icono mide **18 × 22 px con `overflow: hidden`**, y el
+  wordmark a esa altura ocupa 91 px — se veía «PA» recortado, aunque el
+  componente compilaba y renderizaba sin queja. Ahí va ahora el **isotipo**
+  (`partequipos-logo`: un fichero, cero dependencias, verificado byte a byte),
+  que a 20 px de alto ocupa 14 y cabe. El nombre accesible sale como
+  `img "Partequipos"` en el árbol de accesibilidad. Cifras en
+  `docs/design-tokens.md`.
 - **`empty`** cubre los estados vacíos del panel, si algún día se retoma esa
   parte (hoy cerrada por decisión de dirección: fidelidad estética sin retorno).
 

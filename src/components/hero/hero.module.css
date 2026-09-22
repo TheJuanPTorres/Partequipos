@@ -1,0 +1,350 @@
+/*
+ * HERO «POTENCIA HITACHI» — PROTOTIPO.
+ *
+ * ================== LOS VALORES DE ANDRÉS VIVEN AQUÍ ==================
+ * Todo lo que viene de https://partequipos.uxdesign.website/ux-9/ está en el
+ * bloque `.hero` de abajo, como variables. Cambiar al sistema de diseño del
+ * cliente es cambiar ESE bloque, no las reglas: ninguna otra regla de este
+ * fichero lleva un valor de Andrés cableado.
+ *
+ * Al lado de cada variable va su equivalente del sistema (docs/design-tokens.md)
+ * cuando existe. NO se resuelven las diferencias aquí: es decisión de dirección.
+ * ======================================================================
+ *
+ * La geometría no se copió de la captura: se midió elemento a elemento contra
+ * la tarjeta en su página, y el modelo reproduce su altura exacta (745 px en
+ * escritorio, 628 px a 1018 px de ancho). La pieza que no se ve a simple vista
+ * es el margen inferior NEGATIVO del título: es lo que hace que la máquina se
+ * le monte encima.
+ */
+
+.hero {
+  /* --- Tipografía. Sistema: Rubik. Nuestro sitio hoy: Geist. --- */
+  --hero-fuente: var(--fuente-hero, ui-sans-serif), system-ui, sans-serif;
+
+  /* --- Rojo de las flechas. Sistema: --primary #dc2626. Wordmark del CLI: #D92035. --- */
+  --hero-rojo: #e5242d;
+
+  /* --- Radio. Sistema: --radius-4xl = 18,7 px (tope 24 px en tarjetas). --- */
+  --hero-radio: 30px;
+
+  /* --- Tarjeta. El relleno 50/30/30 es SOLO ≤1024 px; en escritorio son 10 px. --- */
+  --hero-alto-min: 86vh;
+  --hero-relleno: 10px;
+  --hero-gap: 20px;
+
+  /* --- Título. Interlineado 1,4em: 120 → 168 px, 70 → 98 px. --- */
+  --hero-titulo-tam: 120px;
+  --hero-titulo-peso: 600;
+  --hero-titulo-interlineado: 1.4em;
+  /* El solape con la máquina. Medido en su página, no estimado. */
+  --hero-titulo-margen-abajo: -250px;
+
+  /* --- Imagen frontal: ancho pintado; la altura la da la proporción 1476×1057. --- */
+  --hero-imagen-ancho: 809px;
+  --hero-imagen-margen-arriba: 100px;
+
+  /* --- Flechas --- */
+  --hero-flecha-tam: 42px;
+  --hero-flecha-icono: 21px;
+  --hero-flecha-fondo: rgb(255 255 255 / 58%);
+  --hero-flechas-margen-abajo: 20px;
+
+  /* --- Vidrio. NO coincide con los --glass-* del sistema: ver docs. --- */
+  --hero-vidrio-ancho: 400px;
+  --hero-vidrio-fondo: rgb(255 255 255 / 12%);
+  --hero-vidrio-borde: 1px solid rgb(255 255 255 / 25%);
+  --hero-vidrio-desenfoque: blur(18px);
+  --hero-vidrio-sombra: 0 8px 32px rgb(0 0 0 / 8%);
+  --hero-vidrio-relleno: 30px;
+  --hero-vidrio-derecha: 21px;
+  --hero-vidrio-abajo: -113px;
+
+  /* --- Párrafo del vidrio --- */
+  --hero-parrafo-tam: 16px;
+  --hero-parrafo-peso: 300;
+
+  /* --- Animación. GSAP: stagger 0,3 · duración 2 · distancia 50 · power3.out. --- */
+  --hero-revelado-duracion: 900ms;
+  --hero-revelado-escalon: 90ms;
+  --hero-revelado-distancia: 50px;
+  --hero-revelado-curva: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --hero-parallax-titulo: -60px;
+  --hero-parallax-vidrio: -30px;
+
+  font-family: var(--hero-fuente);
+  /* En su página la tarjeta no pega a los bordes de la ventana. */
+  padding: 8px;
+}
+
+/* ---------------------------------------------------------------- tarjeta */
+
+.tarjeta {
+  position: relative;
+  display: flex;
+  min-height: var(--hero-alto-min);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hero-gap);
+  padding: var(--hero-relleno);
+  /*
+   * SIN recorte: el vidrio sobresale por abajo a propósito (`bottom: -113px`),
+   * igual que en el diseño, donde la tarjeta tiene `overflow: visible`. El
+   * redondeo del fondo lo hace `.marco`, no esta caja.
+   */
+  isolation: isolate;
+}
+
+/*
+ * FONDO CON next/image, no con background-image (§6 del encargo): así lo
+ * optimiza Vercel a WebP y admite `priority`. El marco existe para recortar la
+ * imagen con el radio sin recortar el vidrio que sobresale.
+ */
+.marco {
+  position: absolute;
+  z-index: 0;
+  border-radius: var(--hero-radio);
+  inset: 0;
+  overflow: clip;
+}
+
+.fondo {
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* ----------------------------------------------------------------- título */
+
+.filaTitulo {
+  z-index: 0;
+  width: 100%;
+  /* Aquí está el solape: el título cede 250 px al elemento siguiente. */
+  margin-bottom: var(--hero-titulo-margen-abajo);
+}
+
+.titulo {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  color: #fff;
+  font-size: var(--hero-titulo-tam);
+  font-weight: var(--hero-titulo-peso);
+  line-height: var(--hero-titulo-interlineado);
+  /* MAYÚSCULAS SOLO POR CSS: en el HTML el texto va en caso normal. */
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* -------------------------------------------------------- imagen frontal */
+
+.imagen {
+  z-index: 1;
+  width: min(var(--hero-imagen-ancho), 100%);
+  height: auto;
+  margin-top: var(--hero-imagen-margen-arriba);
+}
+
+/* --------------------------------------------------------- fila inferior */
+
+.fila {
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--hero-gap);
+  padding: 10px;
+}
+
+.flechas {
+  display: flex;
+  gap: 4px;
+  margin-bottom: var(--hero-flechas-margen-abajo);
+}
+
+/*
+ * FLECHAS: <button> de verdad. En el diseño son `div` decorativos sin nombre
+ * accesible y sin comportamiento (verificado: 0 enlaces, 0 botones y ningún
+ * slider en la tarjeta). Aquí mueven el carrusel del prototipo.
+ */
+.flecha {
+  display: grid;
+  width: var(--hero-flecha-tam);
+  height: var(--hero-flecha-tam);
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--hero-flecha-fondo);
+  color: var(--hero-rojo);
+  cursor: pointer;
+}
+
+.flecha svg {
+  width: var(--hero-flecha-icono);
+  height: var(--hero-flecha-icono);
+}
+
+/* Foco visible propio: el anillo del navegador se pierde sobre la foto. */
+.flecha:focus-visible,
+.mas:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ----------------------------------------------------------------- vidrio */
+
+/* Columna derecha de la fila: es el bloque respecto al que se posiciona. */
+.ancla {
+  position: relative;
+  flex: 1;
+  align-self: stretch;
+}
+
+.vidrio {
+  position: absolute;
+  right: calc(var(--hero-vidrio-derecha) * -1);
+  bottom: var(--hero-vidrio-abajo);
+  display: flex;
+  width: var(--hero-vidrio-ancho);
+  max-width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: var(--hero-vidrio-relleno);
+  border: var(--hero-vidrio-borde);
+  border-radius: var(--hero-radio);
+  background: var(--hero-vidrio-fondo);
+  box-shadow: var(--hero-vidrio-sombra);
+  backdrop-filter: var(--hero-vidrio-desenfoque);
+}
+
+.parrafo {
+  margin: 0;
+  color: #fff;
+  font-size: var(--hero-parrafo-tam);
+  font-weight: var(--hero-parrafo-peso);
+  line-height: 1.4;
+}
+
+.mas {
+  display: grid;
+  flex: none;
+  place-items: center;
+  color: #fff;
+}
+
+.mas svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* ------------------------------------------------- revelado por palabras */
+
+.mascara {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* Sin esto el recorte se comería las colas de las letras. */
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+
+.palabra {
+  display: inline-block;
+}
+
+/*
+ * SIN JAVASCRIPT EL TEXTO SE VE. El estado inicial oculto solo se aplica
+ * cuando el cliente ha marcado `data-revelar`, y eso únicamente ocurre si el JS
+ * corrió. Si no llega, no hay nada que revelar.
+ */
+.hero[data-revelar="preparado"] .palabra {
+  opacity: 0;
+  transform: translateY(var(--hero-revelado-distancia));
+}
+
+.hero[data-revelar="visible"] .palabra {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--hero-revelado-duracion) var(--hero-revelado-curva),
+    transform var(--hero-revelado-duracion) var(--hero-revelado-curva);
+  transition-delay: calc(var(--indice, 0) * var(--hero-revelado-escalon));
+}
+
+/*
+ * PARALLAX. El cliente escribe SOLO el avance (0 a 1) en
+ * `--hero-parallax-base`; la distancia de cada capa se decide aquí, con el
+ * resto de los valores de diseño. Título a velocidad 1 y vidrio a 0,5, los dos
+ * hacia arriba, igual que los efectos de movimiento del diseño.
+ */
+.capaParallax {
+  transform: translate3d(0, var(--hero-parallax, 0px), 0);
+  will-change: transform;
+}
+
+.filaTitulo.capaParallax {
+  --hero-parallax: calc(var(--hero-parallax-base, 0) * var(--hero-parallax-titulo));
+}
+
+.vidrio.capaParallax {
+  --hero-parallax: calc(var(--hero-parallax-base, 0) * var(--hero-parallax-vidrio));
+}
+
+/* ------------------------------------------------------------- reducción */
+
+/*
+ * prefers-reduced-motion: ni revelado ni parallax. Se anula el estado inicial
+ * oculto —no solo la transición—, porque si el JS lo pusiera y la transición no
+ * corriera, el texto se quedaría invisible para siempre.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .hero[data-revelar] .palabra {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .capaParallax {
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------- adaptaciones */
+
+/* ≤1024 px: los valores que la dirección midió a 1010 px. */
+@media (max-width: 1024px) {
+  .hero {
+    --hero-titulo-tam: 70px;
+    --hero-imagen-ancho: 631px;
+    --hero-relleno: 50px 30px 30px;
+    --hero-vidrio-derecha: 20px;
+  }
+}
+
+/* ≤767 px: el vidrio desaparece y el título pasa a proporcional. */
+@media (max-width: 767px) {
+  .hero {
+    --hero-titulo-tam: 12vw;
+    --hero-alto-min: 85vh;
+    --hero-imagen-margen-arriba: 200px;
+    --hero-parrafo-tam: 13px;
+    --hero-flecha-icono: 15px;
+    /* Con el título a 12vw, el solape de 250 px se comería la máquina. */
+    --hero-titulo-margen-abajo: -120px;
+  }
+
+  .tarjeta {
+    justify-content: space-between;
+  }
+
+  .fila {
+    padding: 0;
+  }
+
+  /* Igual que en el diseño: `elementor-hidden-mobile` sobre el vidrio. */
+  .vidrio {
+    display: none;
+  }
+}

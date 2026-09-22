@@ -67,14 +67,11 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
-    media: Media;
+    solicitudes: Solicitude;
     marcas: Marca;
     'tipos-equipo': TiposEquipo;
     'modelos-repuesto': ModelosRepuesto;
     'categorias-tecnicas': CategoriasTecnica;
-    redirects: Redirect;
-    paginas: Pagina;
     'marcas-maquinaria': MarcasMaquinaria;
     'tipos-maquinaria': TiposMaquinaria;
     'equipos-nuevos': EquiposNuevo;
@@ -83,9 +80,12 @@ export interface Config {
     'equipos-usados': EquiposUsado;
     'marcas-lubricante': MarcasLubricante;
     'categorias-lubricante': CategoriasLubricante;
-    'categorias-blog': CategoriasBlog;
+    paginas: Pagina;
     articulos: Articulo;
-    solicitudes: Solicitude;
+    'categorias-blog': CategoriasBlog;
+    media: Media;
+    users: User;
+    redirects: Redirect;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -93,14 +93,11 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
+    solicitudes: SolicitudesSelect<false> | SolicitudesSelect<true>;
     marcas: MarcasSelect<false> | MarcasSelect<true>;
     'tipos-equipo': TiposEquipoSelect<false> | TiposEquipoSelect<true>;
     'modelos-repuesto': ModelosRepuestoSelect<false> | ModelosRepuestoSelect<true>;
     'categorias-tecnicas': CategoriasTecnicasSelect<false> | CategoriasTecnicasSelect<true>;
-    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
-    paginas: PaginasSelect<false> | PaginasSelect<true>;
     'marcas-maquinaria': MarcasMaquinariaSelect<false> | MarcasMaquinariaSelect<true>;
     'tipos-maquinaria': TiposMaquinariaSelect<false> | TiposMaquinariaSelect<true>;
     'equipos-nuevos': EquiposNuevosSelect<false> | EquiposNuevosSelect<true>;
@@ -109,9 +106,12 @@ export interface Config {
     'equipos-usados': EquiposUsadosSelect<false> | EquiposUsadosSelect<true>;
     'marcas-lubricante': MarcasLubricanteSelect<false> | MarcasLubricanteSelect<true>;
     'categorias-lubricante': CategoriasLubricanteSelect<false> | CategoriasLubricanteSelect<true>;
-    'categorias-blog': CategoriasBlogSelect<false> | CategoriasBlogSelect<true>;
+    paginas: PaginasSelect<false> | PaginasSelect<true>;
     articulos: ArticulosSelect<false> | ArticulosSelect<true>;
-    solicitudes: SolicitudesSelect<false> | SolicitudesSelect<true>;
+    'categorias-blog': CategoriasBlogSelect<false> | CategoriasBlogSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -152,296 +152,40 @@ export interface UserAuthOperations {
   };
 }
 /**
- * Cuentas con acceso al panel. Solo un administrador puede crear usuarios o cambiar roles.
+ * Formularios enviados desde el sitio. Contienen datos personales: no se publican y solo son visibles aquí.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "solicitudes".
  */
-export interface User {
+export interface Solicitude {
   id: number;
+  tipo: 'contacto' | 'cotizacion' | 'repuesto';
   /**
-   * El editor no puede crear usuarios, cambiar roles ni borrar registros. Solo un administrador cambia este campo.
+   * Marcar como atendida en vez de borrar: conserva el historial.
    */
-  rol: 'administrador' | 'editor';
-  /**
-   * Los slugs son de solo lectura tras crear el registro porque forman la URL indexada. Marca esta casilla solo para corregir erratas reales; el cambio generará un redirect 301 automático. Ver ADR 0005.
-   */
-  puedeEditarSlugs?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  /**
-   * Descripción de la imagen para accesibilidad y SEO.
-   */
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "marcas".
- */
-export interface Marca {
-  id: number;
+  estado: 'nueva' | 'atendida';
   nombre: string;
+  correo: string;
+  telefono?: string | null;
+  empresa?: string | null;
+  mensaje: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Se rellena solo cuando la solicitud sale de una ficha.
    */
-  slug: string;
-  descripcion?: string | null;
-  logo?: (number | null) | Media;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tipos-equipo".
- */
-export interface TiposEquipo {
-  id: number;
-  nombre: string;
+  referencia?:
+    | ({
+        relationTo: 'equipos-nuevos';
+        value: number | EquiposNuevo;
+      } | null)
+    | ({
+        relationTo: 'modelos-repuesto';
+        value: number | ModelosRepuesto;
+      } | null);
+  referenciaTexto?: string | null;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Página desde la que se envió el formulario.
    */
-  slug: string;
-  marca: number | Marca;
-  descripcion?: string | null;
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "modelos-repuesto".
- */
-export interface ModelosRepuesto {
-  id: number;
-  nombre: string;
-  /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
-   */
-  slug: string;
-  /**
-   * Desnormalizada para consultas y breadcrumbs. Debe coincidir con la marca del tipo elegido.
-   */
-  marca: number | Marca;
-  /**
-   * Se filtra por la marca seleccionada arriba.
-   */
-  tipo: number | TiposEquipo;
-  /**
-   * Código del modelo, ej. 320D.
-   */
-  codigo?: string | null;
-  descripcion?: string | null;
-  imagenes?: (number | Media)[] | null;
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categorias-tecnicas".
- */
-export interface CategoriasTecnica {
-  id: number;
-  nombre: string;
-  /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
-   */
-  slug: string;
-  descripcion?: string | null;
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Redirecciones de URLs antiguas hacia las vigentes. Evita perder posicionamiento cuando una URL cambia.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects".
- */
-export interface Redirect {
-  id: number;
-  /**
-   * Ruta antigua, empezando por «/». Ej: /repuestos-viejo/modelo-x
-   */
-  desde: string;
-  /**
-   * Ruta vigente o URL absoluta a la que se redirige.
-   */
-  hacia: string;
-  /**
-   * 301 salvo que la redirección sea realmente temporal.
-   */
-  tipo: '301' | '302';
-  /**
-   * Cómo se creó esta redirección. Las automáticas no deben editarse a la ligera.
-   */
-  origen: 'manual' | 'cambio-de-slug' | 'migracion';
-  notas?: string | null;
-  /**
-   * Lo actualiza `npm run redirects:check`. «Sin contenido» es normal mientras se migra; «No corresponde a ninguna ruta» hay que corregirlo antes de publicar.
-   */
-  estadoDestino?: ('sin-verificar' | 'resuelve' | 'sin-contenido' | 'sin-ruta' | 'externa') | null;
-  destinoVerificadoEn?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Páginas fijas del sitio. El slug es la ruta completa y no debe cambiarse: son URLs indexadas.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "paginas".
- */
-export interface Pagina {
-  id: number;
-  titulo: string;
-  /**
-   * Ruta completa sin barras al inicio ni al final. Ej: 'nosotros' o 'nosotros/trabaja-con-nosotros'. Para la portada, usar 'inicio'.
-   */
-  slug: string;
-  /**
-   * Las legales no deberían despublicarse: son de cumplimiento.
-   */
-  tipoPagina?: ('institucional' | 'legal' | 'portada') | null;
-  /**
-   * Párrafo introductorio bajo el título.
-   */
-  entradilla?: string | null;
-  contenido?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Bloques enlazables dentro de la página, p. ej. /servicio-tecnico/#taller. No generan URLs nuevas.
-   */
-  secciones?:
-    | {
-        titulo: string;
-        /**
-         * Identificador del enlace, sin '#'. Debe copiarse EXACTO del sitio actual (distingue mayúsculas): 'taller', 'GARANTIA', 'Devoluciones'.
-         */
-        ancla: string;
-        contenido?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        id?: string | null;
-      }[]
-    | null;
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "marcas-maquinaria".
- */
-export interface MarcasMaquinaria {
-  id: number;
-  nombre: string;
-  /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
-   */
-  slug: string;
-  descripcion?: string | null;
-  logo?: (number | null) | Media;
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tipos-maquinaria".
- */
-export interface TiposMaquinaria {
-  id: number;
-  nombre: string;
-  /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
-   */
-  slug: string;
-  marca: number | MarcasMaquinaria;
-  descripcion?: string | null;
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
+  origen?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -520,6 +264,160 @@ export interface EquiposNuevo {
    * Fichas técnicas o folletos del fabricante en PDF.
    */
   documentos?: (number | Media)[] | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcas-maquinaria".
+ */
+export interface MarcasMaquinaria {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  descripcion?: string | null;
+  logo?: (number | null) | Media;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  /**
+   * Descripción de la imagen para accesibilidad y SEO.
+   */
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tipos-maquinaria".
+ */
+export interface TiposMaquinaria {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  marca: number | MarcasMaquinaria;
+  descripcion?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modelos-repuesto".
+ */
+export interface ModelosRepuesto {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  /**
+   * Desnormalizada para consultas y breadcrumbs. Debe coincidir con la marca del tipo elegido.
+   */
+  marca: number | Marca;
+  /**
+   * Se filtra por la marca seleccionada arriba.
+   */
+  tipo: number | TiposEquipo;
+  /**
+   * Código del modelo, ej. 320D.
+   */
+  codigo?: string | null;
+  descripcion?: string | null;
+  imagenes?: (number | Media)[] | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcas".
+ */
+export interface Marca {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  descripcion?: string | null;
+  logo?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tipos-equipo".
+ */
+export interface TiposEquipo {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  marca: number | Marca;
+  descripcion?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-tecnicas".
+ */
+export interface CategoriasTecnica {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  descripcion?: string | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -704,17 +602,69 @@ export interface CategoriasLubricante {
   createdAt: string;
 }
 /**
+ * Páginas fijas del sitio. El slug es la ruta completa y no debe cambiarse: son URLs indexadas.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categorias-blog".
+ * via the `definition` "paginas".
  */
-export interface CategoriasBlog {
+export interface Pagina {
   id: number;
-  nombre: string;
+  titulo: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Ruta completa sin barras al inicio ni al final. Ej: 'nosotros' o 'nosotros/trabaja-con-nosotros'. Para la portada, usar 'inicio'.
    */
   slug: string;
-  descripcion?: string | null;
+  /**
+   * Las legales no deberían despublicarse: son de cumplimiento.
+   */
+  tipoPagina?: ('institucional' | 'legal' | 'portada') | null;
+  /**
+   * Párrafo introductorio bajo el título.
+   */
+  entradilla?: string | null;
+  contenido?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Bloques enlazables dentro de la página, p. ej. /servicio-tecnico/#taller. No generan URLs nuevas.
+   */
+  secciones?:
+    | {
+        titulo: string;
+        /**
+         * Identificador del enlace, sin '#'. Debe copiarse EXACTO del sitio actual (distingue mayúsculas): 'taller', 'GARANTIA', 'Devoluciones'.
+         */
+        ancla: string;
+        contenido?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -780,40 +730,90 @@ export interface Articulo {
   createdAt: string;
 }
 /**
- * Formularios enviados desde el sitio. Contienen datos personales: no se publican y solo son visibles aquí.
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-blog".
+ */
+export interface CategoriasBlog {
+  id: number;
+  nombre: string;
+  /**
+   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   */
+  slug: string;
+  descripcion?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cuentas con acceso al panel. Solo un administrador puede crear usuarios o cambiar roles.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "solicitudes".
+ * via the `definition` "users".
  */
-export interface Solicitude {
+export interface User {
   id: number;
-  tipo: 'contacto' | 'cotizacion' | 'repuesto';
   /**
-   * Marcar como atendida en vez de borrar: conserva el historial.
+   * El editor no puede crear usuarios, cambiar roles ni borrar registros. Solo un administrador cambia este campo.
    */
-  estado: 'nueva' | 'atendida';
-  nombre: string;
-  correo: string;
-  telefono?: string | null;
-  empresa?: string | null;
-  mensaje: string;
+  rol: 'administrador' | 'editor';
   /**
-   * Se rellena solo cuando la solicitud sale de una ficha.
+   * Los slugs son de solo lectura tras crear el registro porque forman la URL indexada. Marca esta casilla solo para corregir erratas reales; el cambio generará un redirect 301 automático. Ver ADR 0005.
    */
-  referencia?:
-    | ({
-        relationTo: 'equipos-nuevos';
-        value: number | EquiposNuevo;
-      } | null)
-    | ({
-        relationTo: 'modelos-repuesto';
-        value: number | ModelosRepuesto;
-      } | null);
-  referenciaTexto?: string | null;
+  puedeEditarSlugs?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * Redirecciones de URLs antiguas hacia las vigentes. Evita perder posicionamiento cuando una URL cambia.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
   /**
-   * Página desde la que se envió el formulario.
+   * Ruta antigua, empezando por «/». Ej: /repuestos-viejo/modelo-x
    */
-  origen?: string | null;
+  desde: string;
+  /**
+   * Ruta vigente o URL absoluta a la que se redirige.
+   */
+  hacia: string;
+  /**
+   * 301 salvo que la redirección sea realmente temporal.
+   */
+  tipo: '301' | '302';
+  /**
+   * Cómo se creó esta redirección. Las automáticas no deben editarse a la ligera.
+   */
+  origen: 'manual' | 'cambio-de-slug' | 'migracion';
+  notas?: string | null;
+  /**
+   * Lo actualiza `npm run redirects:check`. «Sin contenido» es normal mientras se migra; «No corresponde a ninguna ruta» hay que corregirlo antes de publicar.
+   */
+  estadoDestino?: ('sin-verificar' | 'resuelve' | 'sin-contenido' | 'sin-ruta' | 'externa') | null;
+  destinoVerificadoEn?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -842,12 +842,8 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
-      } | null)
-    | ({
-        relationTo: 'media';
-        value: number | Media;
+        relationTo: 'solicitudes';
+        value: number | Solicitude;
       } | null)
     | ({
         relationTo: 'marcas';
@@ -864,14 +860,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categorias-tecnicas';
         value: number | CategoriasTecnica;
-      } | null)
-    | ({
-        relationTo: 'redirects';
-        value: number | Redirect;
-      } | null)
-    | ({
-        relationTo: 'paginas';
-        value: number | Pagina;
       } | null)
     | ({
         relationTo: 'marcas-maquinaria';
@@ -906,16 +894,28 @@ export interface PayloadLockedDocument {
         value: number | CategoriasLubricante;
       } | null)
     | ({
-        relationTo: 'categorias-blog';
-        value: number | CategoriasBlog;
+        relationTo: 'paginas';
+        value: number | Pagina;
       } | null)
     | ({
         relationTo: 'articulos';
         value: number | Articulo;
       } | null)
     | ({
-        relationTo: 'solicitudes';
-        value: number | Solicitude;
+        relationTo: 'categorias-blog';
+        value: number | CategoriasBlog;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -961,45 +961,21 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "solicitudes_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  rol?: T;
-  puedeEditarSlugs?: T;
+export interface SolicitudesSelect<T extends boolean = true> {
+  tipo?: T;
+  estado?: T;
+  nombre?: T;
+  correo?: T;
+  telefono?: T;
+  empresa?: T;
+  mensaje?: T;
+  referencia?: T;
+  referenciaTexto?: T;
+  origen?: T;
   updatedAt?: T;
   createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1062,49 +1038,6 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   nombre?: T;
   slug?: T;
   descripcion?: T;
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects_select".
- */
-export interface RedirectsSelect<T extends boolean = true> {
-  desde?: T;
-  hacia?: T;
-  tipo?: T;
-  origen?: T;
-  notas?: T;
-  estadoDestino?: T;
-  destinoVerificadoEn?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "paginas_select".
- */
-export interface PaginasSelect<T extends boolean = true> {
-  titulo?: T;
-  slug?: T;
-  tipoPagina?: T;
-  entradilla?: T;
-  contenido?: T;
-  secciones?:
-    | T
-    | {
-        titulo?: T;
-        ancla?: T;
-        contenido?: T;
-        id?: T;
-      };
   seo?:
     | T
     | {
@@ -1295,12 +1228,22 @@ export interface CategoriasLubricanteSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categorias-blog_select".
+ * via the `definition` "paginas_select".
  */
-export interface CategoriasBlogSelect<T extends boolean = true> {
-  nombre?: T;
+export interface PaginasSelect<T extends boolean = true> {
+  titulo?: T;
   slug?: T;
-  descripcion?: T;
+  tipoPagina?: T;
+  entradilla?: T;
+  contenido?: T;
+  secciones?:
+    | T
+    | {
+        titulo?: T;
+        ancla?: T;
+        contenido?: T;
+        id?: T;
+      };
   seo?:
     | T
     | {
@@ -1336,19 +1279,76 @@ export interface ArticulosSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "solicitudes_select".
+ * via the `definition` "categorias-blog_select".
  */
-export interface SolicitudesSelect<T extends boolean = true> {
-  tipo?: T;
-  estado?: T;
+export interface CategoriasBlogSelect<T extends boolean = true> {
   nombre?: T;
-  correo?: T;
-  telefono?: T;
-  empresa?: T;
-  mensaje?: T;
-  referencia?: T;
-  referenciaTexto?: T;
+  slug?: T;
+  descripcion?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  rol?: T;
+  puedeEditarSlugs?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  desde?: T;
+  hacia?: T;
+  tipo?: T;
   origen?: T;
+  notas?: T;
+  estadoDestino?: T;
+  destinoVerificadoEn?: T;
   updatedAt?: T;
   createdAt?: T;
 }

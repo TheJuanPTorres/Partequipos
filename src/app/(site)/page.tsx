@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { SLIDES_PROTOTIPO } from "@/components/hero/datosPrototipo";
+import { HeroPotencia } from "@/components/hero/HeroPotencia";
+import { IMAGENES_HERO_PROTOTIPO } from "@/components/hero/imagenesPrototipo";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp, navegacionPrincipal } from "@/lib/navegacion";
@@ -10,6 +14,20 @@ import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { seoConfig } from "@/lib/seo/config";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
+
+/*
+ * PROTOTIPO — fuente del hero de Andrés. El sistema de diseño del cliente usa
+ * Rubik y el sitio usa Geist (docs/design-tokens.md): Inter entra SOLO aquí, con
+ * los dos pesos que el diseño usa, para no cargar una tercera familia en todo
+ * el sitio. `variable` la expone como `--fuente-hero`, que es lo que lee
+ * `hero.module.css`.
+ */
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "600"],
+  display: "swap",
+  variable: "--fuente-hero",
+});
 
 /**
  * Portada. El contenido es editable desde Payload (documento con slug
@@ -35,81 +53,99 @@ export default async function HomePage() {
   const { contact } = seoConfig;
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-12">
+    <main>
       <JsonLd data={buildOrganizationJsonLd()} />
 
-      <h1 className="text-4xl font-semibold text-gray-900">{pagina.titulo}</h1>
-      {pagina.entradilla ? (
-        <p className="mt-4 max-w-2xl text-lg text-gray-600">{pagina.entradilla}</p>
-      ) : null}
+      {/*
+       * PROTOTIPO DEL HERO DE ANDRÉS — rama `proto/hero-andres`, no se fusiona.
+       * Datos e imágenes de prueba; el modelo real está por decidir.
+       */}
+      <HeroPotencia
+        slides={SLIDES_PROTOTIPO}
+        fondo={IMAGENES_HERO_PROTOTIPO.fondo}
+        frontal={IMAGENES_HERO_PROTOTIPO.frontal}
+        claseFuente={inter.variable}
+      />
 
-      {/* Acceso a las secciones principales del sitio. */}
-      <nav className="mt-10" aria-labelledby="secciones-heading">
-        <h2 id="secciones-heading" className="text-xl font-medium text-gray-900">
-          Qué encontrarás aquí
-        </h2>
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-          {navegacionPrincipal.map((item) => (
-            <li key={item.href} className="rounded-lg border border-gray-200">
-              <Link href={item.href} className="block p-4 hover:bg-gray-50">
-                <span className="font-medium text-gray-900">{item.etiqueta}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <div className="mx-auto max-w-5xl px-4 py-12">
+        {/*
+         * EL TÍTULO DEL CMS BAJA A <h2> porque el hero se queda el único <h1>
+         * (§3.4: un solo h1 por página). Es un cambio de SEO, no de maquetación:
+         * ver la advertencia del informe.
+         */}
+        <h2 className="text-4xl font-semibold text-gray-900">{pagina.titulo}</h2>
+        {pagina.entradilla ? (
+          <p className="mt-4 max-w-2xl text-lg text-gray-600">{pagina.entradilla}</p>
+        ) : null}
 
-      {pagina.contenido ? (
-        <section className="mt-12" aria-labelledby="propuesta-heading">
-          <h2 id="propuesta-heading" className="text-xl font-medium text-gray-900">
-            Sobre Partequipos
+        {/* Acceso a las secciones principales del sitio. */}
+        <nav className="mt-10" aria-labelledby="secciones-heading">
+          <h2 id="secciones-heading" className="text-xl font-medium text-gray-900">
+            Qué encontrarás aquí
           </h2>
-          <div className="mt-4">
-            <RichText data={pagina.contenido} />
-          </div>
-        </section>
-      ) : null}
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            {navegacionPrincipal.map((item) => (
+              <li key={item.href} className="rounded-lg border border-gray-200">
+                <Link href={item.href} className="block p-4 hover:bg-gray-50">
+                  <span className="font-medium text-gray-900">{item.etiqueta}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-      {/* Secciones con ancla, si el editor las define para la portada. */}
-      {(pagina.secciones ?? []).map((seccion) => (
-        <section key={seccion.ancla} id={seccion.ancla} className="mt-12 scroll-mt-8">
-          <h2 className="text-xl font-medium text-gray-900">{seccion.titulo}</h2>
-          <div className="mt-4">
-            <RichText data={seccion.contenido} />
-          </div>
-        </section>
-      ))}
+        {pagina.contenido ? (
+          <section className="mt-12" aria-labelledby="propuesta-heading">
+            <h2 id="propuesta-heading" className="text-xl font-medium text-gray-900">
+              Sobre Partequipos
+            </h2>
+            <div className="mt-4">
+              <RichText data={pagina.contenido} />
+            </div>
+          </section>
+        ) : null}
 
-      <section className="mt-12 border-t border-gray-200 pt-8" aria-labelledby="contacto-heading">
-        <h2 id="contacto-heading" className="text-xl font-medium text-gray-900">
-          Contacto
-        </h2>
-        <address className="mt-3 space-y-1 not-italic text-gray-700">
-          <p>
-            <a href={`tel:${contact.phone.replace(/\s/g, "")}`} className="underline">
-              {contact.phone}
-            </a>{" "}
-            ·{" "}
-            <a
-              href={enlaceWhatsApp(contact.phone)}
-              className="underline"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              WhatsApp
-            </a>
-          </p>
-          <p>
-            <a href={`mailto:${contact.email}`} className="underline">
-              {contact.email}
-            </a>
-          </p>
-          <p>
-            {contact.streetAddress}, {contact.addressLocality}
-          </p>
-        </address>
-        <p className="mt-2 text-sm text-gray-600">{contact.openingHours}</p>
-      </section>
+        {/* Secciones con ancla, si el editor las define para la portada. */}
+        {(pagina.secciones ?? []).map((seccion) => (
+          <section key={seccion.ancla} id={seccion.ancla} className="mt-12 scroll-mt-8">
+            <h2 className="text-xl font-medium text-gray-900">{seccion.titulo}</h2>
+            <div className="mt-4">
+              <RichText data={seccion.contenido} />
+            </div>
+          </section>
+        ))}
+
+        <section className="mt-12 border-t border-gray-200 pt-8" aria-labelledby="contacto-heading">
+          <h2 id="contacto-heading" className="text-xl font-medium text-gray-900">
+            Contacto
+          </h2>
+          <address className="mt-3 space-y-1 not-italic text-gray-700">
+            <p>
+              <a href={`tel:${contact.phone.replace(/\s/g, "")}`} className="underline">
+                {contact.phone}
+              </a>{" "}
+              ·{" "}
+              <a
+                href={enlaceWhatsApp(contact.phone)}
+                className="underline"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                WhatsApp
+              </a>
+            </p>
+            <p>
+              <a href={`mailto:${contact.email}`} className="underline">
+                {contact.email}
+              </a>
+            </p>
+            <p>
+              {contact.streetAddress}, {contact.addressLocality}
+            </p>
+          </address>
+          <p className="mt-2 text-sm text-gray-600">{contact.openingHours}</p>
+        </section>
+      </div>
     </main>
   );
 }

@@ -159,6 +159,20 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 5. Sin datos quemados: todo viene de Payload.
 6. Accesible: navegable por teclado, contraste suficiente, imágenes con `alt`.
 7. Desplegada en preview y verificada.
+8. **La prueba de humo pasa en ese preview** (§10.20). Corre sola con cada
+   despliegue, en la pestaña Actions.
+
+> **ANTES DE PROMOCIONAR A PRODUCCIÓN — regla operativa, no sugerencia:**
+> **si la prueba de humo falla en un preview, ese despliegue NO se promociona.**
+>
+> No es un check bloqueante a propósito (el motivo está en §10.20: con
+> `deployment_status`, un despliegue que no ocurre dejaría el PR sin salida, y ya
+> pasó — §10.30). Así que la disciplina es de quien promociona.
+>
+> Y recuerda por qué existe: el despliegue del incidente §10.18 pasó typecheck,
+> lint, formato, 198 pruebas y un `next build` completo, y dejó `/admin`, la API,
+> el sitemap y el mapa de redirects en **500**. **Verde en CI no es verde en el
+> lambda.**
 
 ---
 
@@ -822,6 +836,10 @@ Dos corolarios operativos:
   refutó la hipótesis antes de escribir código. El arreglo que se iba a aplicar
   sobre esa hipótesis —anclar los binarios como dependencias explícitas— habría
   sido un **no-op con aspecto de arreglo**, que es peor que no tocar nada.
+
+**Antes de tocar el alias, la prueba de humo del preview tiene que estar en
+verde (§10.20 y §7).** Si falla, el despliegue no se promociona: es exactamente
+este incidente el que la puso ahí.
 
 **Procedimiento que funcionó, para repetirlo:** revertir el alias al último
 despliegue bueno (`vercel promote <url>`) para levantar producción **primero**,

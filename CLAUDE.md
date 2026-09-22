@@ -868,6 +868,22 @@ condiciones que el roto** (mismo CLI, sin caché) antes de tocar el alias. Así 
 > primero levantar producción. **Queda pendiente de decidir**, y el argumento a
 > favor es más fuerte ahora que antes, porque ya sabemos que el modo de fallo no
 > es hipotético: ocurrió, y sin que cambiara nada en el repositorio.
+>
+> **MENOS URGENTE desde el 2026-09-21, y conviene decir por qué exactamente.**
+> La prueba de humo de §10.20 pide `/admin/` en **cada despliegue, preview
+> incluido**, y exige 200. Este modo de fallo —sharp que no carga y tumba la
+> config de Payload— es justo el que ahí sale en rojo. Con la regla de §7, un
+> preview en rojo **no se promociona**, así que el fallo ya no llega a producción
+> sin que nadie lo vea: es lo que cambió.
+>
+> **Lo que NO cambió, para no confundir detección con arreglo:** el
+> acoplamiento sigue igual de mal puesto, y un fallo de sharp sigue tumbando
+> `/admin`, la API, el sitemap y el mapa de redirects. La red solo cubre lo que
+> pasa por un despliegue nuevo; si el suelo se mueve **bajo un despliegue ya
+> promocionado** —que es literalmente lo que pasó en §10.18, con el mismo commit
+> sirviendo 200 antes y 500 después— nada lo detecta hasta el siguiente
+> despliegue. Detectarlo antes de promocionar baja la urgencia; no baja el
+> riesgo.
 
 ### 10.20 LECCIÓN — ninguna de nuestras verificaciones toca la aplicación desplegada
 
@@ -953,14 +969,47 @@ verificación funcional.
 | Fallo      | Ruidoso: imprime ruta, código, intentos, **por qué esa ruta está en la lista** y el comando de revert de §10.18                                          |
 | Disparo    | `deployment_status`, el evento que Vercel ya publica. Corre en **preview y producción**                                                                  |
 
-**El token de derivación y por qué este workflow es seguro con el repositorio
-público:** `deployment_status` **solo dispara el workflow si el fichero existe en
-la rama por defecto, y ejecuta ESA definición** (documentación de GitHub
-Actions), así que un PR —de un fork o no— no puede alterar lo que corre ni
-alcanzar el secreto. El repositorio no usa `pull_request_target`, que es el otro
-camino. El token viaja en la cabecera `x-vercel-protection-bypass`, **nunca en la
-URL** —acabaría en los registros— y el script solo dice si está presente.
+**El token de derivación, y una corrección a lo que este documento afirmó
+primero (2026-09-22).** La versión inicial de este párrafo decía que
+`deployment_status` **solo dispara el workflow si el fichero existe en la rama
+por defecto, y ejecuta ESA definición**, y de ahí concluía que ningún PR podía
+alterar lo que corre. La documentación de GitHub Actions dice exactamente eso
+—textual: _«will only trigger a workflow run if the workflow file exists on the
+default branch»_— pero **lo observado en este repositorio la contradice**:
+
+| Hora (UTC) | Commit    | ¿Estaba `humo.yml` en `main`?               | ¿Disparó? |
+| ---------- | --------- | ------------------------------------------- | --------- |
+| 22:44      | `eaff6e2` | **No** — solo en `test/guardianes`          | **Sí**    |
+| 00:29      | `eaff6e2` | Sí (avance rápido a `main` un minuto antes) | Sí        |
+| 00:30      | `1e5b8c8` | Sí                                          | Sí        |
+
+La primera se disparó **un minuto después de subir el fichero a una rama**, con
+`main` todavía sin él. Así que la regla documentada **no describe lo que hace
+Vercel + GitHub aquí**, y el mecanismo exacto —de qué sha toma la definición—
+**no se ha aislado**.
+
+**Qué sigue siendo cierto de la protección del secreto, y qué queda abierto:**
+
+- **Cierto:** escribir en este repositorio exige acceso de colaborador, así que
+  quien puede alterar el workflow ya podía leer el secreto por otras vías. El
+  repositorio **no usa `pull_request_target`**, que es el camino conocido para
+  filtrar secretos a código de un PR.
+- **ABIERTO, y no se da por resuelto:** si un PR **de un fork** genera un
+  despliegue de Vercel, y GitHub toma la definición del sha de ese despliegue,
+  ese código correría con el secreto. **No se ha comprobado** —no ha habido
+  ningún PR de fork— y el sha de un fork no es alcanzable desde este
+  repositorio, lo que hace el escenario dudoso, pero **dudoso no es descartado**.
+  Si alguna vez llega un PR externo, **rotar el token de Vercel** es más barato
+  que investigarlo.
+
+El token viaja en la cabecera `x-vercel-protection-bypass`, **nunca en la URL**
+—acabaría en los registros— y el script solo dice si está presente.
 En producción se pasa **vacío a propósito**: allí no hay protección que derivar.
+
+**Y hay una demostración en vivo de que falla cuando debe, que no se buscó:** la
+ejecución de las 22:44 **falló en rojo** porque el secreto todavía no estaba
+cargado en GitHub. El camino «sin token» se había probado a mano; ahí se le vio
+cortar solo, en CI.
 
 **La excepción de §10.22, escrita en el código:** `/api/redirects-map/` se mide
 **solo en producción**. En un preview el token la haría responder 200 midiendo

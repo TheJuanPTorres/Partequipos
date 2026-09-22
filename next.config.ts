@@ -121,9 +121,15 @@ const nextConfig: NextConfig = {
        * los formularios sin enviar sin que nadie se entere.
        *
        * Para pasar a fase 2 basta renombrar la cabecera a
-       * `Content-Security-Policy`, tras unos días sin violaciones nuevas.
+       * `Content-Security-Policy`… pero NO con el criterio de «unos días sin
+       * violaciones nuevas», porque ESTA POLÍTICA NO REPORTA A NINGÚN SITIO: no
+       * declara `report-uri` ni `report-to`, y el proyecto no emite `Report-To`
+       * ni `Reporting-Endpoints`. Sin endpoint, el navegador no envía nada a
+       * ningún servidor: el aviso sale solo en la consola de devtools DEL
+       * VISITANTE. Así que el silencio no es evidencia de nada. Ver CLAUDE.md
+       * §10.16 y §10.31 (el destino natural era Sentry, que tampoco está).
        *
-       * TRES AVISOS, registrados también en CLAUDE.md §10.15:
+       * TRES AVISOS, registrados también en CLAUDE.md §10.16:
        *
        * 1. `'unsafe-inline'` en `script-src` es HOY inevitable — Next inyecta
        *    scripts en línea para la hidratación y Payload también. Con él, la

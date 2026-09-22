@@ -25,16 +25,16 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 
 ## 2. Stack (no cambiar sin aprobación)
 
-| Capa          | Tecnología                                                          |
-| ------------- | ------------------------------------------------------------------- |
-| Framework     | Next.js 16 · App Router · React 19                                  |
-| Lenguaje      | TypeScript (modo estricto)                                          |
-| CMS           | Payload 3 (integrado en el mismo proyecto, no como servicio aparte) |
-| Base de datos | PostgreSQL (Neon)                                                   |
-| Estilos       | Tailwind CSS v4 (ver la corrección de abajo)                        |
-| Hosting       | Vercel                                                              |
-| Archivos      | Vercel Blob (o Cloudflare R2)                                       |
-| Errores       | Sentry                                                              |
+| Capa          | Tecnología                                                              |
+| ------------- | ----------------------------------------------------------------------- |
+| Framework     | Next.js 16 · App Router · React 19                                      |
+| Lenguaje      | TypeScript (modo estricto)                                              |
+| CMS           | Payload 3 (integrado en el mismo proyecto, no como servicio aparte)     |
+| Base de datos | PostgreSQL (Neon)                                                       |
+| Estilos       | Tailwind CSS v4 (ver la corrección de abajo)                            |
+| Hosting       | Vercel                                                                  |
+| Archivos      | Vercel Blob (o Cloudflare R2)                                           |
+| Errores       | **`console.error` a los registros de Vercel** — Sentry NO está (§10.31) |
 
 > **CORREGIDO 2026-09-17 — NO usamos shadcn/ui ni Radix.** Esta tabla decía
 > «Tailwind CSS + shadcn/ui» desde el Sprint 0. Era **intención, nunca
@@ -56,6 +56,16 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 >
 > **Consecuencia práctica:** adoptar componentes del sistema del cliente **no**
 > duplicaría un primitivo, porque no hay ninguno. Ver `docs/design-tokens.md`.
+
+> **CORREGIDO 2026-09-22 — SENTRY NO ESTÁ INSTALADO.** Esta tabla decía «Errores:
+> Sentry» desde el Sprint 0, y es el mismo tipo de dato que shadcn/ui: **quedó
+> aplazado en la tarea 0.4 y nunca se retomó**. Medido: **ningún `@sentry/*`** en
+> `dependencies` ni en `devDependencies`, ningún `sentry.*.config.*`, ninguna
+> `instrumentation.ts`. La única mención en el código es un **comentario**
+> (`src/lib/revalidation.ts:56`).
+>
+> **Lo grave no es la tabla, es que el compromiso con el cliente sí existe** —
+> cotización y Gestión de Incidencias— **y hoy no se cumple. Ver §10.31.**
 
 **Prohibido sin aprobación previa:** agregar dependencias pesadas, cambiar de ORM,
 introducir otro gestor de estado, o mover contenido fuera de Payload.
@@ -135,7 +145,13 @@ docs/
 - Formularios: Server Actions + validación con Zod en el servidor.
   Validar en cliente es cortesía, no seguridad.
 - Imágenes siempre con `next/image` y dimensiones explícitas.
-- Sin `console.log` en el código entregado. Errores a Sentry.
+- Sin `console.log` en el código entregado. Los errores van a `console.error`
+  con prefijo de área (`[revalidación]`, `[redirects]`, `[proxy]`), y de ahí a
+  los **registros de Vercel**. **NO hay Sentry** (§10.31), así que nadie recibe
+  aviso y el registro se retiene solo lo que el plan permita: escribe el mensaje
+  pensando en quien lo lea **dentro de la ventana de registros**, no meses
+  después. Cuando Sentry entre, esta regla cambia y hay que revisar los 101
+  puntos que hoy escriben a consola.
 
 ---
 
@@ -256,9 +272,10 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **DE LA DIRECCIÓN TÉCNICA** — asumido por la dirección, no depende del cliente:
 
-| Pendiente                                                   | Motivo                                                                                      |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Rotar la contraseña del rol `neondb_owner` de `development` | Se pegó en claro en una conversación el 2026-09-16. Rotar en Neon y actualizar `.env.local` |
+| Pendiente                                                        | Motivo                                                                                                                                                                                                                     |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rotar la contraseña del rol `neondb_owner` de `development`      | Se pegó en claro en una conversación el 2026-09-16. Rotar en Neon y actualizar `.env.local`                                                                                                                                |
+| **Sentry: aprobar la dependencia, la cuenta y el plan** (§10.31) | **Compromiso contractual sin cumplir**: está en la cotización y en la revisión semanal de errores de Gestión de Incidencias. Añade dependencia, así que §2 exige aprobación. Cierra también el endpoint de la CSP (§10.16) |
 
 **DEL DISEÑADOR:**
 
@@ -275,18 +292,18 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
 
-| Pendiente                                            | Referencia |
-| ---------------------------------------------------- | ---------- |
-| Logo institucional fuera de `Media` (URL cableada)   | §10.8      |
-| Separar los stores de Vercel Blob por entorno        | §10.4      |
-| Mitigaciones 2–4 de consultas en el build            | §10.10     |
-| Repetir la auditoría de rendimiento con el diseño    | §10.3 p.14 |
-| Revisar el modo oscuro con el diseño puesto          | §10.14     |
-| Pasar la CSP a fase 2 y evaluar los nonces           | §10.16     |
-| Desacoplar `sharp` del arranque de Payload           | §10.19     |
-| Prueba de humo automática post-despliegue            | §10.20     |
-| Verificar el store de Blob de preview con una subida | §10.21     |
-| Redirects no validables en preview (proteccion)      | §10.22     |
+| Pendiente                                             | Referencia      |
+| ----------------------------------------------------- | --------------- |
+| Logo institucional fuera de `Media` (URL cableada)    | §10.8           |
+| Separar los stores de Vercel Blob por entorno         | §10.4           |
+| Mitigaciones 2–4 de consultas en el build             | §10.10          |
+| Repetir la auditoría de rendimiento con el diseño     | §10.3 p.14      |
+| Revisar el modo oscuro con el diseño puesto           | §10.14          |
+| Pasar la CSP a fase 2 — **depende de tener endpoint** | §10.16 · §10.31 |
+| Desacoplar `sharp` del arranque de Payload            | §10.19          |
+| Prueba de humo automática post-despliegue             | §10.20          |
+| Verificar el store de Blob de preview con una subida  | §10.21          |
+| Redirects no validables en preview (proteccion)       | §10.22          |
 
 > **SISTEMA DE DISEÑO DEL CLIENTE (2026-09-16).** Existe en
 > `https://ui.partequipos.com` y sus tokens están extraídos, medidos y
@@ -713,6 +730,33 @@ base poblada fallaría igual.
 > **Pendiente:** pasar a fase 2 (quitar `-Report-Only`) tras unos días sin
 > violaciones nuevas, y evaluar los nonces como trabajo aparte si el cliente
 > quiere endurecerlo de verdad.
+>
+> #### CORREGIDO 2026-09-22 — la CSP no reporta a ningún sitio
+>
+> Esa condición de arriba —«tras unos días sin violaciones nuevas»— **este
+> montaje no la puede evaluar**.
+>
+> **La cabecera no declara `report-uri` ni `report-to`**, y no existe ninguna
+> cabecera `Report-To` ni `Reporting-Endpoints` en el proyecto. Comprobado:
+> `next.config.ts` es la **única** fuente de CSP (no hay `vercel.json`), y son
+> 12 directivas —`default-src`, `script-src`, `style-src`, `img-src`,
+> `font-src`, `frame-src`, `connect-src`, `object-src`, `base-uri`,
+> `form-action`, `frame-ancestors`— ninguna de reporte.
+>
+> **Consecuencia exacta:** sin endpoint, el navegador **no envía el informe a
+> ningún servidor**. La violación sale solo en la consola de devtools **del
+> visitante**. Así que **nadie ha observado nada**, y no por descuido: no hay
+> nada que observar. Quitar el `-Report-Only` hoy sería **decidir a ciegas**, y
+> el modo de fallo es silencioso en la dirección peor — un script bloqueado en
+> el panel, o Turnstile sin cargar en `/contactanos/`, que es el único punto de
+> entrada de datos de terceros.
+>
+> **El destino natural del informe era Sentry, y Sentry tampoco está** (§10.31).
+> Las dos cosas se deciden juntas.
+>
+> **Séptima vez del patrón de §10.14 a §10.24, con un giro:** allí el
+> instrumento devolvía un dato falso; aquí **el instrumento no existía** y el
+> plan lo daba por hecho. El silencio se leyó como «no hay violaciones».
 
 ### 10.17 INCIDENTE 2026-09-13 — la migración de roles dejó las bases SIN ADMINISTRADOR
 
@@ -1522,6 +1566,78 @@ instalada, no en estas notas.
 > segundo aviso que tenemos sobre el disparo de despliegues —el primero fue el
 > bloqueo por plan de §10.4— y lo que no se anota se vuelve a diagnosticar desde
 > cero.
+
+### 10.31 COMPROMISO INCUMPLIDO — Sentry está en la cotización y no está en el repo
+
+> Descubierto el 2026-09-22 buscando un destino para los informes de la CSP
+> (§10.16). No es deuda técnica nuestra y ya está: **es algo que el cliente pagó
+> y hoy no tiene.**
+
+**Medido en el repositorio, no inferido:**
+
+| Qué se buscó                                    | Resultado                                                 |
+| ----------------------------------------------- | --------------------------------------------------------- |
+| `@sentry/*` en `dependencies`/`devDependencies` | **Ninguno** (12 de producción, 10 de desarrollo)          |
+| `sentry.client.config.*` / `sentry.server.*`    | **No existen**                                            |
+| `instrumentation.ts`                            | **No existe**                                             |
+| `error.tsx` / `global-error.tsx` en `(site)`    | **No existen**; el único `not-found.tsx` es del panel     |
+| Menciones en el código                          | **Una, y es un comentario**: `src/lib/revalidation.ts:56` |
+
+**Dónde se aplazó, y que nunca se retomó:** `docs/sprint-0.md`, **tarea 0.4
+(«Despliegue y observabilidad»)**, con el criterio **sin marcar**: `[ ] Sentry
+capturando errores de servidor y de cliente`. La verificación de cierre de ese
+sprint incluye «4. Un error provocado a propósito llega a Sentry», y
+`docs/PLAN-MVP.md` lista «Sentry conectado». Se avanzó igual.
+
+**Y el `README.md` lo da por hecho**, que es lo que hace que nadie lo note: la
+tabla de variables pide `NEXT_PUBLIC_SENTRY_DSN` y
+`SENTRY_AUTH_TOKEN`/`ORG`/`PROJECT` con un **«sí»** en Preview y Producción
+—ninguna de las cuatro está cargada en Vercel (§10.11)— y la lista «Antes de dar
+un despliegue por bueno» incluye «5. Sentry recibe errores de servidor y de
+cliente», **un paso que nadie ha podido pasar nunca**. Es el mismo defecto del
+Build Command de §10.21: documentación que describe un guardián no conectado.
+
+#### El compromiso con el cliente, que es lo que convierte esto en prioridad
+
+Transmitido por la dirección técnica: Sentry aparece en **dos** documentos
+contractuales.
+
+| Documento                  | Qué compromete                                                |
+| -------------------------- | ------------------------------------------------------------- |
+| **Cotización**             | En el **stack** y en los **costos operativos**                |
+| **Gestión de Incidencias** | **Revisión semanal de errores** como mantenimiento preventivo |
+
+_(Los dos documentos **no están en el repositorio** y no se han leído en esta
+sesión: estas dos líneas son cita indirecta de la dirección.)_
+
+**La revisión semanal hoy es imposible, y conviene decir por qué y no solo
+que falta la herramienta.** Lo que hay son **101 llamadas a `console.error` /
+`console.warn`** en `src` y `scripts`, con prefijo de área, que van a los
+**registros de runtime de Vercel**. Eso implica tres cosas:
+
+1. **Nadie recibe aviso.** Hay que entrar al panel de Vercel y mirar.
+2. **No se retienen para una revisión semanal.** La retención de los registros
+   de runtime **depende del plan y de Observability Plus** (documentación de
+   Vercel, que remite a sus límites; en Hobby es corta, y la vía para conservar
+   más es un **Log Drain**). Una revisión de los errores de la semana pasada no
+   tiene contra qué hacerse.
+3. **No hay agrupación, ni frecuencia, ni versión, ni traza con fuentes.** Un
+   error que ocurre 400 veces son 400 líneas sueltas.
+
+**Y hay un agujero aparte del registro:** el sitio público **no tiene
+`error.tsx` ni `global-error.tsx`**, así que un fallo de render en un Server
+Component sirve la página de error por defecto de Next. No se pierde el dato
+—va al registro— pero el visitante ve una pantalla genérica sin salida.
+
+**Segundo compromiso que esto desbloquearía:** Sentry es el destino natural de
+los informes de la **CSP** (§10.16), que hoy no se recogen en ninguna parte.
+**Un solo trabajo cierra los dos**, y por eso se plantean juntos.
+
+**NO se ha instalado nada.** Añadir `@sentry/nextjs` es una dependencia nueva y
+**§2 exige aprobación previa**; además hay que decidir cuenta, plan y —lo que
+más importa— **qué datos salen del sitio**: `solicitudes` guarda nombre, correo
+y teléfono de terceros, y la Ley 1581 de 2012 aplica igual aquí que en los
+respaldos (§10.3 p.10).
 
 ### 10.29 PREGUNTA BLOQUEANTE AL CLIENTE — su PDF y su propio código se contradicen sobre el flujo de OAuth
 

@@ -57,8 +57,14 @@
   --hero-vidrio-desenfoque: blur(18px);
   --hero-vidrio-sombra: 0 8px 32px rgb(0 0 0 / 8%);
   --hero-vidrio-relleno: 30px;
+  /*
+   * MEDIDO, y no es lo que parece: en escritorio el vidrio va DENTRO de la
+   * tarjeta (`right: 21px`, sin `bottom`, o sea en su posición de flujo), y solo
+   * a partir de ≤1024 px se sale (`right: -20px; bottom: -113px`, que deja 73 px
+   * por debajo del borde). Por eso son dos variables y no una negación.
+   */
   --hero-vidrio-derecha: 21px;
-  --hero-vidrio-abajo: -113px;
+  --hero-vidrio-abajo: auto;
 
   /* --- Párrafo del vidrio --- */
   --hero-parrafo-tam: 16px;
@@ -203,7 +209,7 @@
 
 .vidrio {
   position: absolute;
-  right: calc(var(--hero-vidrio-derecha) * -1);
+  right: var(--hero-vidrio-derecha);
   bottom: var(--hero-vidrio-abajo);
   display: flex;
   width: var(--hero-vidrio-ancho);
@@ -319,7 +325,8 @@
     --hero-titulo-tam: 70px;
     --hero-imagen-ancho: 631px;
     --hero-relleno: 50px 30px 30px;
-    --hero-vidrio-derecha: 20px;
+    --hero-vidrio-derecha: -20px;
+    --hero-vidrio-abajo: -113px;
   }
 }
 

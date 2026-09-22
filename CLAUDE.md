@@ -1695,18 +1695,55 @@ respaldos (§10.3 p.10).
 de CSP · 1–2 h la fase 2. **Riesgo:** medio en el paso 2 (toca lo que ya rompió
 producción) y medio en el 3 (la configuración de PII es lo delicado).
 
-**Y un aviso de §10.5 que aplica de lleno:** `@sentry/cli` trae **8 paquetes
-opcionales por plataforma** (`@sentry/cli-linux-x64`, `-win32-x64`, …). Es la
-misma familia que `sharp` y `@emnapi`: regenerar el lock en Windows puede dejar
-fuera el de Linux, y **CI y Vercel construyen sobre Linux**. Al instalar, lock y
-`node_modules` se borran (§10.5) y **se comprueba que `@sentry/cli-linux-x64`
-está en el lock** antes de commitear.
+#### TRES COMPROBACIONES OBLIGATORIAS EL DÍA QUE SE INSTALE
+
+> Salen de la auditoría del árbol (abajo) y **no son recomendaciones**: sin las
+> tres, la instalación no se da por hecha. Cada una cubre un riesgo concreto que
+> ya se midió, no una preocupación general.
+
+**1. `@sentry/cli-linux-x64` tiene que estar en el lock antes de commitear.**
+`@sentry/cli` trae **8 paquetes opcionales por plataforma**
+(`@sentry/cli-linux-x64`, `-win32-x64`, `-darwin`, …). Al instalar se borran lock
+y `node_modules` (§10.5) y **se comprueba el del Linux**, porque aquí se instala
+en Windows y **CI y Vercel construyen sobre Linux**.
+
+**Es la tercera aparición del mismo patrón, y por eso ya no se trata como mala
+suerte:**
+
+| Cuándo | Qué faltó                                          | Cómo se vio                                 |
+| ------ | -------------------------------------------------- | ------------------------------------------- |
+| §10.5  | `@emnapi/core` y su `runtime` anidado              | `npm ci` verde en Windows, **rojo en CI**   |
+| §10.18 | `libvips-cpp.so` de `@img/sharp-libvips-linux-x64` | **500 en producción** sin cambiar una línea |
+| Sentry | `@sentry/cli-linux-x64` _(riesgo, no ocurrido)_    | Fallaría el build al subir _source maps_    |
+
+**2. Revalidar en preview que `import-in-the-middle` no choca con Payload ni con
+Turbopack.** Ese paquete —y `require-in-the-middle`— **parchean la carga de
+módulos** para instrumentar, así que se meten justo por debajo de las dos piezas
+más sensibles que tenemos. Se comprueba **en el despliegue**, no en local, y con
+las rutas que cargan la config de Payload en tiempo de petición: `/admin/`,
+`/api/marcas/`, `/sitemap.xml` y una ficha. La prueba de humo (§10.20) cubre las
+tres primeras **automáticamente**, así que el trabajo extra es mirar la consola
+del panel y los registros de runtime buscando avisos de parcheo.
+
+**3. Medir el peso de una página de catálogo antes y después.** `@sentry/browser`,
+`@sentry/react`, `@sentry/replay`, `@sentry/replay-canvas` y `@sentry/feedback`
+**se instalan aunque no se usen**: son dependencias de `@sentry/nextjs`. «Solo
+servidor» significa **no cargarlos**, no que no se descarguen, y el modo de fallo
+es silencioso —el sitio funciona, solo pesa más— en el único sitio donde no
+podemos permitirlo (§1: el objetivo es tráfico orgánico). La cifra se toma de la
+**misma ruta** antes y después, contra el **despliegue** y no contra `npm start`
+(§10.13).
 
 #### El árbol transitivo, leído del registro SIN instalar (2026-09-22)
 
 Mismo criterio que con el CLI del cliente (§10.27): se lee antes de ejecutar.
 Recorrido de `dependencies` desde `@sentry/nextjs@10.75.2` contra
 `registry.npmjs.org`.
+
+> **ALCANCE DE ESTA AUDITORÍA, para quien la relea y no le atribuya más de lo
+> que hizo:** se auditó **qué entra, de quién es y qué corre al instalar**.
+> **NO se auditó el código** de los 55 paquetes nuevos. Nadie debe leer esta
+> sección como «el árbol de Sentry está revisado»: está **inventariado**.
 
 | Dato                                      | Cifra                                                            |
 | ----------------------------------------- | ---------------------------------------------------------------- |
@@ -1746,12 +1783,15 @@ Recorrido de `dependencies` desde `@sentry/nextjs@10.75.2` contra
   de **sindresorhus**, `flru` y `empathic` de **lukeed**. Todos con repositorio
   público y descripción coherente. **Sin hallazgos.**
 
-**Lo que este recorrido NO cubre, dicho claro:** solo siguió
-`dependencies` —los 8 opcionales de `@sentry/cli` se listaron aparte, a mano— y
-resolvió cada rango a la última estable cuando no era exacto, así que las
-versiones definitivas las fija el lock el día de la instalación. Y **no se ha
-auditado el código** de los 55 paquetes nuevos: se ha auditado **qué entra, de
-quién es y qué corre al instalar**.
+**Los límites del método, además del alcance de arriba:** el recorrido siguió
+solo `dependencies` —los 8 opcionales de `@sentry/cli` se listaron **aparte, a
+mano**, y ese descuido es justo el riesgo de la comprobación 1— y resolvió cada
+rango a la última estable cuando no era exacto, así que **las versiones
+definitivas las fija el lock el día de la instalación**, no esta tabla.
+
+**Los tres riesgos que salieron de aquí están arriba como comprobaciones
+obligatorias**, no como advertencias: es la diferencia entre anotar un riesgo y
+atraparlo (§10.25).
 
 ### 10.29 PREGUNTA BLOQUEANTE AL CLIENTE — su PDF y su propio código se contradicen sobre el flujo de OAuth
 

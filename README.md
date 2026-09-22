@@ -58,8 +58,8 @@ panel del proyecto.
 | `PAYLOAD_SECRET`                                          | cualquiera, largo       | propio           | **propio y distinto**     |
 | `NEXT_PUBLIC_SERVER_URL`                                  | `http://localhost:3000` | URL del preview  | `https://partequipos.com` |
 | `BLOB_READ_WRITE_TOKEN`                                   | store de pruebas        | store de pruebas | store de producción       |
-| `NEXT_PUBLIC_SENTRY_DSN`                                  | opcional                | sí               | sí                        |
-| `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT`     | opcional                | sí               | sí                        |
+| `SENTRY_DSN`                                              | **no existe todavía**   | **no existe**    | **no existe**             |
+| `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT`     | **no existe todavía**   | **no existe**    | **no existe**             |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | opcional                | sí               | sí                        |
 | `RESEND_API_KEY`                                          | opcional                | sí               | sí                        |
 | `RESEND_FROM_EMAIL` / `RESEND_FROM_NAME`                  | opcional                | sí               | sí                        |
@@ -73,6 +73,12 @@ Reglas:
   semilla de desarrollo, no contenido real: producción arranca vacía.
 - `PAYLOAD_SECRET` distinto por entorno: filtrar el de producción invalidaría
   todas las sesiones del panel.
+- **Las cuatro variables de Sentry no existen en ningún entorno, y Sentry no
+  está instalado** (CLAUDE.md §10.31). Esta tabla las daba por cargadas con un
+  «sí» en Preview y Producción; era falso. Quedaron aplazadas en la tarea 0.4 de
+  `docs/sprint-0.md` y no se retomaron. **Cuando entren será `SENTRY_DSN`, no
+  `NEXT_PUBLIC_SENTRY_DSN`**: el plan aprobado es SDK **solo de servidor**, así
+  que el DSN no se expone al navegador.
 
 ---
 
@@ -136,7 +142,14 @@ npm run deploy:migrate && npm run build
 2. Subir una imagen a `Media` funciona (va a Vercel Blob, no a disco).
 3. Las páginas de catálogo renderizan.
 4. El proxy de redirects responde `301` en una URL con redirect.
-5. Sentry recibe errores de servidor y de cliente.
+5. **La prueba de humo pasa** — corre sola con cada despliegue en la pestaña
+   Actions (`npm run humo`, CLAUDE.md §10.20). **Si falla en un preview, ese
+   despliegue no se promociona.**
+
+> El punto 5 decía «Sentry recibe errores de servidor y de cliente», y era un
+> paso **que nadie podía pasar**: Sentry no está instalado (CLAUDE.md §10.31).
+> Se sustituye por la comprobación que sí existe y sí corre. Cuando Sentry entre,
+> vuelve como punto 6 con su propia verificación.
 
 ---
 

@@ -254,21 +254,22 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **DEL CLIENTE** — nada de esto lo podemos resolver nosotros:
 
-| #   | Pendiente                                                                                       | Bloquea                                                                                                                                                                                                                                                                                                                |
-| --- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Claves de Turnstile y Resend (§10.11)                                                           | **Lanzamiento.** VERIFICADO EN EL DOM (2026-09-17): `/contactanos/` **no pinta ningún widget de Turnstile** en producción. Es el único punto del sitio por donde entran datos de terceros y hoy no tiene barrera anti-bot; los leads tampoco se notifican                                                              |
-| 2   | Infraestructura de base de datos, con pooler (§10.7)                                            | **Migración.** Requisito duro                                                                                                                                                                                                                                                                                          |
-| 3   | Acceso a WordPress                                                                              | 51 artículos + ~55 páginas editoriales                                                                                                                                                                                                                                                                                 |
-| 4   | CSV e imágenes reales                                                                           | 351 modelos + 80 fichas de maquinaria                                                                                                                                                                                                                                                                                  |
-| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                                     | JSON-LD `Organization` completo                                                                                                                                                                                                                                                                                        |
-| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)                            | Redirects y 404 del día del cambio                                                                                                                                                                                                                                                                                     |
-| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                                       | Cumplir el SLA de Gestión de Incidencias                                                                                                                                                                                                                                                                               |
-| 8   | Clave de PageSpeed Insights (§10.3 13)                                                          | Umbrales de rendimiento contractuales                                                                                                                                                                                                                                                                                  |
-| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                                              | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                                                                                                                                                                                                                                                     |
-| 10  | Vercel Pro antes de volver el repositorio a privado                                             | Despliegue automático                                                                                                                                                                                                                                                                                                  |
-| 11  | Textos legales definitivos                                                                      | Sustituir los marcadores de posición                                                                                                                                                                                                                                                                                   |
-| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras                 | **RESUELTO PARA EL PANEL el 2026-09-20** con `partequipos-wordmark` de su CLI (§10.27), sin esperar al cliente: medido 20,47 en claro y 15,2 en oscuro, con los ojales igualando el fondo exacto. **Sigue abierto para el SITIO PÚBLICO**, cuya cabecera, JSON-LD e imagen social usan el PNG con fondo blanco (§10.8) |
-| 13  | **Qué claims trae el `access_token` de Auth Central** y cuál es el flujo real de OAuth (§10.29) | **Cotización del SSO en firme.** Sin los claims no se puede diseñar el mapeo a nuestro campo `rol`; y la contradicción del flujo decide si el trabajo son ~30 h o ~46 h                                                                                                                                                |
+| #   | Pendiente                                                                                                                                                                                                                                                                                                                                                                                                                 | Bloquea                                                                                                                                                                                                                                                                                                                                                               |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Claves de Turnstile y Resend (§10.11)                                                                                                                                                                                                                                                                                                                                                                                     | **Lanzamiento.** VERIFICADO EN EL DOM (2026-09-17): `/contactanos/` **no pinta ningún widget de Turnstile** en producción. Es el único punto del sitio por donde entran datos de terceros y hoy no tiene barrera anti-bot; los leads tampoco se notifican                                                                                                             |
+| 2   | Infraestructura de base de datos, con pooler (§10.7)                                                                                                                                                                                                                                                                                                                                                                      | **Migración.** Requisito duro                                                                                                                                                                                                                                                                                                                                         |
+| 3   | Acceso a WordPress                                                                                                                                                                                                                                                                                                                                                                                                        | 51 artículos + ~55 páginas editoriales                                                                                                                                                                                                                                                                                                                                |
+| 4   | CSV e imágenes reales                                                                                                                                                                                                                                                                                                                                                                                                     | 351 modelos + 80 fichas de maquinaria                                                                                                                                                                                                                                                                                                                                 |
+| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                                                                                                                                                                                                                                                                                                                                                               | JSON-LD `Organization` completo                                                                                                                                                                                                                                                                                                                                       |
+| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)                                                                                                                                                                                                                                                                                                                                                      | Redirects y 404 del día del cambio                                                                                                                                                                                                                                                                                                                                    |
+| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                                                                                                                                                                                                                                                                                                                                                                 | Cumplir el SLA de Gestión de Incidencias                                                                                                                                                                                                                                                                                                                              |
+| 8   | Clave de PageSpeed Insights (§10.3 13)                                                                                                                                                                                                                                                                                                                                                                                    | Umbrales de rendimiento contractuales                                                                                                                                                                                                                                                                                                                                 |
+| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                                                                                                                                                                                                                                                                                                                                                                        | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                                                                                                                                                                                                                                                                                                    |
+| 10  | Vercel Pro antes de volver el repositorio a privado                                                                                                                                                                                                                                                                                                                                                                       | Despliegue automático                                                                                                                                                                                                                                                                                                                                                 |
+| 11  | Textos legales definitivos                                                                                                                                                                                                                                                                                                                                                                                                | Sustituir los marcadores de posición                                                                                                                                                                                                                                                                                                                                  |
+| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras                                                                                                                                                                                                                                                                                                                                           | **RESUELTO PARA EL PANEL el 2026-09-20** con `partequipos-wordmark` de su CLI (§10.27), sin esperar al cliente: medido 20,47 en claro y 15,2 en oscuro, con los ojales igualando el fondo exacto. **Sigue abierto para el SITIO PÚBLICO**, cuya cabecera, JSON-LD e imagen social usan el PNG con fondo blanco (§10.8)                                                |
+| 13  | **Qué claims trae el `access_token` de Auth Central** y cuál es el flujo real de OAuth (§10.29)                                                                                                                                                                                                                                                                                                                           | **Cotización del SSO en firme.** Sin los claims no se puede diseñar el mapeo a nuestro campo `rol`; y la contradicción del flujo decide si el trabajo son ~30 h o ~46 h                                                                                                                                                                                               |
+| 14  | **Crear la organización de Sentry a su nombre** (§10.31): plan **Team** ($26/mes, usuarios ilimitados —el gratuito admite **uno**, y la revisión semanal la tiene que poder hacer más de una persona—), **decidir la región del centro de datos con su área jurídica** (US o UE: es transferencia internacional de datos personales, Ley 1581 de 2012, y se fija al crear la organización) e **invitarnos como miembros** | **Compromiso contractual que hoy no se cumple**: Sentry está en la cotización (stack y costos operativos) y la Gestión de Incidencias promete **revisión semanal de errores**. Hasta que exista la cuenta **no se instala nada**, porque la verificación del blindaje de datos necesita el destino real. Desbloquea además el endpoint de informes de la CSP (§10.16) |
 
 **DE LA DIRECCIÓN TÉCNICA** — asumido por la dirección, no depende del cliente:
 
@@ -1638,6 +1639,119 @@ los informes de la **CSP** (§10.16), que hoy no se recogen en ninguna parte.
 más importa— **qué datos salen del sitio**: `solicitudes` guarda nombre, correo
 y teléfono de terceros, y la Ley 1581 de 2012 aplica igual aquí que en los
 respaldos (§10.3 p.10).
+
+#### PLAN APROBADO (2026-09-22) — en espera de que el cliente cree la cuenta
+
+> **NO se instala nada hasta que exista la organización de Sentry** (pendiente
+> #14 del cliente). Decisión de dirección, y el motivo es bueno: **una
+> dependencia inerte no aporta nada**, y la verificación que de verdad importa
+> —la del blindaje de datos— **necesita el destino real** para comprobarse.
+> Instalar antes sería tener el riesgo sin la prestación.
+
+**Opción C, en este orden:**
+
+1. **SDK solo de servidor. NADA de SDK de cliente en `(site)`.** El objetivo del
+   negocio es tráfico orgánico (§1) y la línea base de rendimiento ya depende
+   del diseño que falta (§10.3 p.14): el SDK de navegador añadiría JavaScript a
+   cada página de catálogo para cubrir un fallo que ocurre en el **lambda**
+   (§10.18). La CSP reporta por cabecera desde el navegador, así que **no
+   necesita SDK de cliente** para nada de esto.
+2. **Revalidar `outputFileTracingIncludes` al anidar con `withPayload`.**
+   `next.config.ts` ya va envuelto, y `withSentryConfig` envuelve también. Es
+   exactamente la pieza que rompió producción en §10.18, y el modo de fallo es
+   un 500 en `/admin`, la API, el sitemap y el mapa de redirects. Se revalida
+   **contra la versión instalada**, no contra estas notas.
+3. **Blindaje de datos, que no es un extra: es parte del trabajo.** Los valores
+   por defecto de `dataCollection` del SDK **mandarían los datos personales**:
+   `httpBodies` recoge el cuerpo de la petición entrante —el POST del
+   formulario con nombre, correo y teléfono— y `stackFrameVariables: true`
+   captura las **variables locales** de cada marco, o sea el objeto ya validado
+   por Zod. Configuración exigida: `httpBodies: []`,
+   `stackFrameVariables: false`, `userInfo: false` (sin IP), `cookies: false`
+   (la sesión del panel no tiene por qué viajar), `httpHeaders` con lista de
+   permitidos, un `beforeSend` propio como última barrera, y el **Data
+   Scrubbing** del servidor de Sentry activado además, para que el filtro no
+   dependa solo de nuestro código.
+   **Quedarse en `sendDefaultPii: false` NO protege**: su propia documentación
+   lo marca obsoleto en favor de `dataCollection`, y los cuerpos y las variables
+   locales salen igual.
+4. **La prueba con datos reconocibles. Sin ella no se da por terminado.** Se
+   provoca un error **dentro del camino del formulario** en preview, con un
+   nombre, un correo y un teléfono inventados y buscables, y **se busca esa
+   cadena en el evento que llegó a Sentry**. Si aparece, la configuración no
+   sirve —diga lo que diga el código—. Es §10.15 aplicado aquí: se verifica el
+   **efecto**, no la configuración.
+5. **`/api/csp-report/` con filtrado, y fase 2 de la CSP tras una semana de
+   datos reales.** La ruta recibe el `report-uri`, **filtra el ruido de
+   extensiones de navegador** —que inyectan scripts en la página del visitante y
+   disparan violaciones que no son nuestras—, deduplica y reenvía a Sentry. Se
+   hace con ruta propia y no apuntando la cabecera directamente a Sentry por dos
+   razones: el filtrado, y que su endpoint nativo de informes de cabeceras
+   **hoy no aparece en el índice de su documentación** y no se da por vivo sin
+   comprobarlo. Solo **después de una semana con datos** se quita el
+   `-Report-Only` (§10.16).
+
+**Esfuerzo estimado:** 4–6 h el SDK con blindaje y verificación · 2–3 h la ruta
+de CSP · 1–2 h la fase 2. **Riesgo:** medio en el paso 2 (toca lo que ya rompió
+producción) y medio en el 3 (la configuración de PII es lo delicado).
+
+**Y un aviso de §10.5 que aplica de lleno:** `@sentry/cli` trae **8 paquetes
+opcionales por plataforma** (`@sentry/cli-linux-x64`, `-win32-x64`, …). Es la
+misma familia que `sharp` y `@emnapi`: regenerar el lock en Windows puede dejar
+fuera el de Linux, y **CI y Vercel construyen sobre Linux**. Al instalar, lock y
+`node_modules` se borran (§10.5) y **se comprueba que `@sentry/cli-linux-x64`
+está en el lock** antes de commitear.
+
+#### El árbol transitivo, leído del registro SIN instalar (2026-09-22)
+
+Mismo criterio que con el CLI del cliente (§10.27): se lee antes de ejecutar.
+Recorrido de `dependencies` desde `@sentry/nextjs@10.75.2` contra
+`registry.npmjs.org`.
+
+| Dato                                      | Cifra                                                            |
+| ----------------------------------------- | ---------------------------------------------------------------- |
+| Paquetes en el árbol                      | **104**, más **8 opcionales** de `@sentry/cli` por plataforma    |
+| **Ya presentes en nuestro lock**          | **49** (los `@babel/*`, `browserslist`, `picomatch`, `debug`, …) |
+| **NUEVOS**                                | **55** — 19 `@sentry/*`, 8 `@opentelemetry/*`, 28 ajenos         |
+| Dependencias directas de `@sentry/nextjs` | 14, incluidas `rollup` y `@rollup/plugin-commonjs`               |
+
+**Lo que hay que mirar, y por qué:**
+
+- **`@sentry/cli@3.8.0` tiene `postinstall`**, y es el único del árbol que
+  **descarga de la red al instalar**. Leído su `scripts/install.js`: el binario
+  normalmente llega por el **paquete opcional de la plataforma**, y el
+  `postinstall` solo hace de **respaldo** descargando de
+  `downloads.sentry-cdn.com` con validación de checksum contra el
+  `checksums.txt` del paquete. Tiene escape: `SENTRYCLI_SKIP_DOWNLOAD=1`.
+  **Para qué sirve:** subir _source maps_ en el build. Nada en tiempo de
+  petición.
+- **Los otros 11 scripts del árbol son `prepare`** (`rollup`, `glob`,
+  `minimatch`, `lru-cache`, `undici`, …), y **`prepare` no corre al instalar
+  desde el tarball publicado**: solo al instalar desde git o desde fuente. No
+  son un camino de ejecución en un `npm ci`.
+- **`import-in-the-middle` y `require-in-the-middle`** vienen con
+  `@sentry/node`: **parchean la carga de módulos** para instrumentar. Es como
+  funciona la instrumentación automática, y es el punto donde una
+  incompatibilidad con Payload o con Turbopack se notaría. A revalidar en el
+  preview, no a suponer.
+- **Se instala el SDK de navegador aunque no se use**: `@sentry/browser`,
+  `@sentry/react`, `@sentry/replay`, `@sentry/replay-canvas`, `@sentry/feedback`
+  son dependencias **directas o transitivas** de `@sentry/nextjs`. «Solo
+  servidor» significa **no cargarlo** —sin config de cliente, sin DSN público—,
+  no que no se descargue. Lo que importa es que **no entre en el bundle de
+  `(site)`**, y eso se comprueba midiendo el peso de una página de catálogo
+  antes y después.
+- **Cinco nombres raros, comprobados uno por uno** porque en un árbol nuevo es
+  donde se esconde un typosquat: `obug` y `verkit` son de **sxzz**, `tagged-tag`
+  de **sindresorhus**, `flru` y `empathic` de **lukeed**. Todos con repositorio
+  público y descripción coherente. **Sin hallazgos.**
+
+**Lo que este recorrido NO cubre, dicho claro:** solo siguió
+`dependencies` —los 8 opcionales de `@sentry/cli` se listaron aparte, a mano— y
+resolvió cada rango a la última estable cuando no era exacto, así que las
+versiones definitivas las fija el lock el día de la instalación. Y **no se ha
+auditado el código** de los 55 paquetes nuevos: se ha auditado **qué entra, de
+quién es y qué corre al instalar**.
 
 ### 10.29 PREGUNTA BLOQUEANTE AL CLIENTE — su PDF y su propio código se contradicen sobre el flujo de OAuth
 

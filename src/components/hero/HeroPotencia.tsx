@@ -188,7 +188,12 @@ export function HeroPotencia({ slides, fondo, frontal, claseFuente = "" }: Props
           alt={frontal.alt}
           width={frontal.width}
           height={frontal.height}
-          sizes="(max-width: 1024px) 100vw, 809px"
+          /*
+           * `sizes` ajustado al ancho REAL pintado en cada corte, no a 100vw:
+           * Lighthouse marcaba 23 kB de sobrecoste por pedir una imagen mayor
+           * que la caja. Los tres valores salen de las variables del CSS.
+           */
+          sizes="(max-width: 767px) 100vw, (max-width: 1024px) 631px, 809px"
           className={estilos.imagen}
         />
 

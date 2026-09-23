@@ -1,34 +1,75 @@
 /**
- * IMÁGENES DEL PROTOTIPO — el único sitio con URLs, para poder cambiarlas de
- * una línea cuando vivan en Payload.
+ * IMÁGENES DEL PROTOTIPO — el único sitio con URLs y con su procedencia.
  *
- * ORIGEN: descargadas del diseño de Andrés
- * (`.../wp-content/uploads/2026/09/`), tal cual, sin recomprimir:
+ * ⚠ SOLO PARA EL PROTOTIPO. Se sustituyen por imágenes del cliente, subidas a
+ * `Media`, antes de producción (ADR 0009). Ninguna de estas es contenido real.
  *
- * | Fichero      | Dimensiones | Peso original |
- * | ------------ | ----------- | ------------- |
- * | Fondo.jpg    | 2048 × 1360 | 593,4 kB JPEG |
- * | Hero-1.png   | 1476 × 1057 | 908,2 kB PNG  |
+ * Cada imagen lleva su FUENTE y su LICENCIA al lado, porque la condición para
+ * usar imágenes de ejemplo era que la licencia admitiera uso comercial y que
+ * quedara anotada. Las de Wikimedia son CC0: dominio público, sin obligación de
+ * atribución; se anota igual para poder comprobarlo.
  *
- * El PNG pesa 908 kB porque lleva transparencia (RGBA). Vercel lo reoptimiza a
- * WebP al servirlo por `next/image` (§10.13: eso NO pasa en local), así que el
- * peso que paga el visitante es otro — y está medido en el informe.
- *
- * POR QUÉ ESTÁN EN `public/` Y NO EN `Media`: es el paso intermedio para que el
- * preview se pueda ver antes de tener sesión en su `/admin`. Al subirlas a
- * `Media` en preview, aquí solo cambian las dos `url` por las del Blob; el
- * componente no se toca porque recibe las imágenes por props.
+ * El efecto del hero pide DOS imágenes por diapositiva —fondo y máquina
+ * recortada en PNG transparente—. Recortadas con licencia comercial NO se
+ * encontraron: las candidatas de Wikimedia con licencia libre eran fotos
+ * completas, sin canal alfa (comprobado con `sharp`: 0 % de píxeles
+ * transparentes). Por eso Caterpillar y Komatsu van SOLO CON FONDO, que es
+ * justo el caso que el componente tiene que aguantar sin romperse.
  */
 
+export type ImagenHero = {
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
+  /** Procedencia y licencia. Obligatorio: sin esto una imagen no entra. */
+  fuente: string;
+};
+
 export const IMAGENES_HERO_PROTOTIPO = {
-  fondo: {
-    url: "/prototipo/hero-fondo.jpg",
-    alt: "Excavadora Hitachi trabajando en un frente de roca",
+  hitachi: {
+    /*
+     * Del diseño de Andrés (`.../wp-content/uploads/2026/09/`), sin recomprimir.
+     * Son material del proyecto, no de un banco de imágenes.
+     */
+    fondo: {
+      url: "/prototipo/hero-fondo.jpg",
+      /*
+       * Decorativo: cielo y roca, sin máquina. Lo que informa es la imagen
+       * frontal, que sí lleva `alt`. Un `alt` aquí solo haría ruido al lector.
+       * En Caterpillar y Komatsu es al revés: la máquina ESTÁ en el fondo.
+       */
+      alt: "",
+      width: 2048,
+      height: 1360,
+      fuente: "Diseño de Andrés — Fondo.jpg (593 kB JPEG)",
+    },
+    frontal: {
+      url: "/prototipo/hero-frontal.png",
+      alt: "Excavadora Hitachi vista de tres cuartos",
+      width: 1476,
+      height: 1057,
+      fuente: "Diseño de Andrés — Hero-1.png (908 kB PNG con transparencia)",
+    },
   },
-  frontal: {
-    url: "/prototipo/hero-frontal.png",
-    alt: "Excavadora Hitachi vista de tres cuartos",
-    width: 1476,
-    height: 1057,
+  caterpillar: {
+    fondo: {
+      url: "/prototipo/hero-caterpillar-fondo.jpg",
+      alt: "Excavadora hidráulica Caterpillar 318CL en una obra",
+      width: 2048,
+      height: 1366,
+      fuente:
+        "Wikimedia Commons, «Caterpillar 318CL hydraulic excavator +Spielvogel1.jpg», autor Spielvogel, CC0 — https://commons.wikimedia.org/wiki/File:Caterpillar_318CL_hydraulic_excavator_%2BSpielvogel1.jpg (reducida a 2048 px y recomprimida, 466 kB)",
+    },
   },
-} as const;
+  komatsu: {
+    fondo: {
+      url: "/prototipo/hero-komatsu-fondo.jpg",
+      alt: "Excavadora Komatsu trabajando junto a una casa",
+      width: 2048,
+      height: 1361,
+      fuente:
+        "Wikimedia Commons, «Komatsu excavator - Arlington, MA.jpg», autor Daderot, CC0 — https://commons.wikimedia.org/wiki/File:Komatsu_excavator_-_Arlington,_MA.jpg (reducida a 2048 px y recomprimida, 617 kB)",
+    },
+  },
+} as const satisfies Record<string, { fondo: ImagenHero; frontal?: ImagenHero }>;

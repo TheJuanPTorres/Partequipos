@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 
 import { SLIDES_PROTOTIPO } from "@/components/hero/datosPrototipo";
 import { HeroPotencia } from "@/components/hero/HeroPotencia";
-import { IMAGENES_HERO_PROTOTIPO } from "@/components/hero/imagenesPrototipo";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp, navegacionPrincipal } from "@/lib/navegacion";
@@ -21,10 +20,13 @@ import { imagenDeMedia } from "@/lib/utils/relations";
  * los dos pesos que el diseño usa, para no cargar una tercera familia en todo
  * el sitio. `variable` la expone como `--fuente-hero`, que es lo que lee
  * `hero.module.css`.
+ *
+ * 700 y 800 entran para PROBAR más presencia en el título. Inter es variable,
+ * así que Google sirve UN fichero para todos los pesos: medido, no suma bytes.
  */
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "600"],
+  weight: ["300", "600", "700", "800"],
   display: "swap",
   variable: "--fuente-hero",
 });
@@ -60,12 +62,7 @@ export default async function HomePage() {
        * PROTOTIPO DEL HERO DE ANDRÉS — rama `proto/hero-andres`, no se fusiona.
        * Datos e imágenes de prueba; el modelo real está por decidir.
        */}
-      <HeroPotencia
-        slides={SLIDES_PROTOTIPO}
-        fondo={IMAGENES_HERO_PROTOTIPO.fondo}
-        frontal={IMAGENES_HERO_PROTOTIPO.frontal}
-        claseFuente={inter.variable}
-      />
+      <HeroPotencia slides={SLIDES_PROTOTIPO} claseFuente={inter.variable} />
 
       <div className="mx-auto max-w-5xl px-4 py-12">
         {/*

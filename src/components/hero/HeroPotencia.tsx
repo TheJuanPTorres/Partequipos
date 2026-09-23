@@ -2,7 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment, useCallback, useEffect, useId, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
 
 import type { SlideHero } from "./datosPrototipo";
 import estilos from "./hero.module.css";
@@ -13,16 +21,19 @@ import estilos from "./hero.module.css";
  * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1 pide justificarlo): las
  * flechas son botones con estado y el revelado necesita un observador. El
  * MARCADO SE SIGUE RENDERIZANDO EN EL SERVIDOR —un componente de cliente
- * también se prerenderiza—, así que **los textos de los tres slides están en el
- * HTML inicial** y se ven sin JavaScript. Comprobable con `curl`.
+ * también se prerenderiza—, así que **los textos de todas las diapositivas
+ * están en el HTML inicial** y se ven sin JavaScript. Comprobable con `curl`.
  *
  * NO HAY VALORES DE DISEÑO EN ESTE FICHERO: todos viven en `hero.module.css`.
+ *
+ * CARGA DE IMÁGENES. Solo la primera diapositiva se precarga. Las demás
+ * van dentro de contenedores con `hidden` —o sea `display: none`— y con carga
+ * diferida, así que el navegador **no las pide hasta que se muestran**: el
+ * carrusel no compite con el LCP de la primera.
  */
 
 type Props = {
   slides: SlideHero[];
-  fondo: { url: string; alt: string };
-  frontal: { url: string; alt: string; width: number; height: number };
   /** Clase de la fuente (next/font) que define `--fuente-hero`. */
   claseFuente?: string;
 };
@@ -78,28 +89,49 @@ function IconoMas() {
   );
 }
 
-export function HeroPotencia({ slides, fondo, frontal, claseFuente = "" }: Props) {
+export function HeroPotencia({ slides, claseFuente = "" }: Props) {
   const [activo, setActivo] = useState(0);
+  /*
+   * El anuncio solo se escribe DESPUÉS de una acción del usuario. Si la región
+   * viva tuviera texto desde el principio, el lector lo leería al cargar la
+   * página, que es ruido: el título ya está en el <h1>.
+   */
+  const [anuncio, setAnuncio] = useState("");
   const raiz = useRef<HTMLElement>(null);
-  const idSlides = useId();
+  const idTitulo = useId();
+  const total = slides.length;
   const slide = slides[activo]!;
 
   const mover = useCallback(
-    (paso: number) => setActivo((i) => (i + paso + slides.length) % slides.length),
-    [slides.length],
+    (paso: number) => {
+      const siguiente = (activo + paso + total) % total;
+      setActivo(siguiente);
+      setAnuncio(`Diapositiva ${siguiente + 1} de ${total}: ${slides[siguiente]!.titulo}`);
+    },
+    [activo, slides, total],
   );
+
+  /* Flechas del teclado con el foco en cualquier control del carrusel. */
+  const alPulsar = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      mover(-1);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      mover(1);
+    }
+  };
 
   /*
    * REVELADO. El estado inicial oculto se pone AQUÍ y no en el CSS, para que sin
-   * JavaScript el texto quede visible (§7 del encargo). Si el usuario pide menos
-   * movimiento, no se prepara nada: se marca visible directamente.
+   * JavaScript el texto quede visible. Si el usuario pide menos movimiento, no
+   * se prepara nada: se marca visible directamente.
    */
   useEffect(() => {
     const el = raiz.current;
     if (!el) return;
 
-    const menosMovimiento = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (menosMovimiento) {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
       el.dataset.revelar = "visible";
       return;
     }
@@ -122,9 +154,8 @@ export function HeroPotencia({ slides, fondo, frontal, claseFuente = "" }: Props
   }, []);
 
   /*
-   * PARALLAX. Un listener pasivo con rAF que escribe una variable CSS; el
-   * navegador solo compone. En el diseño el título va a velocidad 1 y el vidrio
-   * a 0,5, los dos hacia arriba.
+   * PARALLAX. Un listener pasivo con rAF que escribe el avance en una variable
+   * CSS; la distancia de cada capa la decide el CSS.
    */
   useEffect(() => {
     const el = raiz.current;
@@ -137,7 +168,6 @@ export function HeroPotencia({ slides, fondo, frontal, claseFuente = "" }: Props
       requestAnimationFrame(() => {
         pendiente = false;
         const caja = el.getBoundingClientRect();
-        // Avance de 0 a 1 mientras la tarjeta cruza la ventana.
         const avance = Math.min(Math.max(-caja.top / Math.max(caja.height, 1), 0), 1);
         el.style.setProperty("--hero-parallax-base", String(avance));
       });
@@ -154,27 +184,47 @@ export function HeroPotencia({ slides, fondo, frontal, claseFuente = "" }: Props
       className={`${estilos.hero} ${claseFuente}`}
       aria-roledescription="carrusel"
       aria-label="Marcas de maquinaria"
+      onKeyDown={alPulsar}
     >
       <div className={estilos.tarjeta}>
-        {/* El marco recorta el fondo con el radio; el vidrio queda fuera de él. */}
+        {/* El marco recorta los fondos con el radio; el vidrio queda fuera. */}
         <div className={estilos.marco}>
-          <Image
-            src={fondo.url}
-            alt={fondo.alt}
-            fill
-            sizes="100vw"
-            priority
-            className={estilos.fondo}
-          />
+          {slides.map((s, i) => (
+            <div key={s.fondo.url} className={estilos.capaFondo} hidden={i !== activo}>
+              <Image
+                src={s.fondo.url}
+                alt={s.fondo.alt}
+                fill
+                sizes="100vw"
+                /*
+                 * SOLO la primera: es el LCP. Las demás, diferidas. `preload` y
+                 * no `priority`, que Next 16 marca obsoleto (get-img-props.d.ts
+                 * de 16.3.5); `fetchPriority` además, para que el navegador la
+                 * ponga por delante del resto aunque la precarga llegue tarde.
+                 */
+                preload={i === 0}
+                fetchPriority={i === 0 ? "high" : undefined}
+                loading={i === 0 ? "eager" : "lazy"}
+                className={estilos.fondo}
+              />
+            </div>
+          ))}
+          {/* Velo: añadido nuestro, NO está en el diseño. Ver el CSS. */}
+          <div className={estilos.velo} aria-hidden="true" />
         </div>
 
         {/*
-         * TÍTULO COMO <h1> (§4). Se renderizan los tres títulos para que estén
-         * en el HTML inicial; los inactivos van ocultos a la accesibilidad y no
-         * se pintan, así que no hay dos h1 visibles ni texto duplicado leído.
+         * TÍTULO COMO <h1>. Se renderizan todos los títulos para que estén en el
+         * HTML inicial; los inactivos van con `hidden`, así que no se pintan ni
+         * se leen: nunca hay dos títulos visibles.
          */}
         <div className={`${estilos.filaTitulo} ${estilos.capaParallax}`}>
-          <h1 className={estilos.titulo} id={idSlides}>
+          <h1
+            className={estilos.titulo}
+            id={idTitulo}
+            // Letras del título activo: el CSS encoge solo el que no cabe.
+            style={{ ["--hero-titulo-letras" as string]: String(slide.titulo.length) }}
+          >
             {slides.map((s, i) => (
               <span key={s.titulo} hidden={i !== activo}>
                 <Palabras texto={s.titulo} />
@@ -183,19 +233,26 @@ export function HeroPotencia({ slides, fondo, frontal, claseFuente = "" }: Props
           </h1>
         </div>
 
-        <Image
-          src={frontal.url}
-          alt={frontal.alt}
-          width={frontal.width}
-          height={frontal.height}
-          /*
-           * `sizes` ajustado al ancho REAL pintado en cada corte, no a 100vw:
-           * Lighthouse marcaba 23 kB de sobrecoste por pedir una imagen mayor
-           * que la caja. Los tres valores salen de las variables del CSS.
-           */
-          sizes="(max-width: 767px) 100vw, (max-width: 1024px) 631px, 809px"
-          className={estilos.imagen}
-        />
+        {/*
+         * HUECO DE LA MÁQUINA. Mide siempre lo mismo —ancho del diseño y la
+         * proporción 1476×1057—, tenga o no la diapositiva una imagen recortada.
+         * Así el título y las flechas no saltan al cambiar de diapositiva.
+         */}
+        <div className={estilos.hueco}>
+          {slides.map((s, i) =>
+            s.frontal ? (
+              <div key={s.frontal.url} className={estilos.capaFrontal} hidden={i !== activo}>
+                <Image
+                  src={s.frontal.url}
+                  alt={s.frontal.alt}
+                  fill
+                  sizes="(max-width: 767px) 100vw, (max-width: 1024px) 631px, 809px"
+                  className={estilos.frontal}
+                />
+              </div>
+            ) : null,
+          )}
+        </div>
 
         <div className={estilos.fila}>
           <div className={estilos.flechas}>
@@ -203,8 +260,8 @@ export function HeroPotencia({ slides, fondo, frontal, claseFuente = "" }: Props
               type="button"
               className={estilos.flecha}
               onClick={() => mover(-1)}
-              aria-label="Marca anterior"
-              aria-controls={idSlides}
+              aria-label="Diapositiva anterior"
+              aria-controls={idTitulo}
             >
               <IconoFlecha hacia="anterior" />
             </button>
@@ -212,38 +269,44 @@ export function HeroPotencia({ slides, fondo, frontal, claseFuente = "" }: Props
               type="button"
               className={estilos.flecha}
               onClick={() => mover(1)}
-              aria-label="Marca siguiente"
-              aria-controls={idSlides}
+              aria-label="Diapositiva siguiente"
+              aria-controls={idTitulo}
             >
               <IconoFlecha hacia="siguiente" />
             </button>
           </div>
-
-          {/*
-           * VIDRIO. Cuelga por debajo de la tarjeta, así que su bloque de
-           * posición es esta columna. `aria-live` anuncia el cambio de marca sin
-           * mover el foco. Oculto en móvil por CSS, igual que en el diseño.
-           */}
-          <div className={estilos.ancla}>
-            <aside className={`${estilos.vidrio} ${estilos.capaParallax}`} aria-live="polite">
-              <p className={estilos.parrafo}>
-                {slides.map((s, i) => (
-                  <span key={s.parrafo} hidden={i !== activo}>
-                    <Palabras texto={s.parrafo} desde={4} />
-                  </span>
-                ))}
-              </p>
-              <Link
-                href={slide.enlace.href}
-                className={estilos.mas}
-                aria-label={slide.enlace.nombreAccesible}
-              >
-                <IconoMas />
-              </Link>
-            </aside>
-          </div>
         </div>
+
+        {/*
+         * VIDRIO, posicionado respecto a la TARJETA con los valores medidos en
+         * su página al mismo ancho de ventana. Oculto en móvil por CSS.
+         */}
+        <aside className={`${estilos.vidrio} ${estilos.capaParallax}`}>
+          <p className={estilos.parrafo}>
+            {slides.map((s, i) => (
+              <span key={s.parrafo} hidden={i !== activo}>
+                <Palabras texto={s.parrafo} desde={4} />
+              </span>
+            ))}
+          </p>
+          <Link
+            href={slide.enlace.href}
+            className={estilos.mas}
+            aria-label={slide.enlace.nombreAccesible}
+          >
+            <IconoMas />
+          </Link>
+        </aside>
       </div>
+
+      {/*
+       * ANUNCIO DISCRETO del cambio de diapositiva. Va FUERA del vidrio a
+       * propósito: el vidrio está en `display: none` en móvil, y una región viva
+       * oculta no anuncia nada. Visualmente oculta, pero legible.
+       */}
+      <p className={estilos.soloLector} aria-live="polite" aria-atomic="true">
+        {anuncio}
+      </p>
     </section>
   );
 }

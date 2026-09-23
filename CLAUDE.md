@@ -629,19 +629,33 @@ base poblada fallaría igual.
 > verificaron por su camino «sin imagen». El camino **con** imágenes se ejerció
 > por primera vez en esa fecha.
 
-### 10.13 No midas la optimización de imágenes en local
+### 10.13 La optimización de imágenes en local — CAMBIÓ CON LA VERSIÓN
 
-> `next start` en esta máquina **no optimiza**: `/_next/image` devuelve el
-> original byte a byte (40.127 → 40.127) en todos los anchos y aunque el cliente
-> mande `Accept: image/webp`. `sharp` está instalado y funciona.
+> **ACTUALIZADO 2026-09-22: `next start` SÍ optimiza.** Medido con **Next
+> 16.3.5** al montar el prototipo del hero: `/_next/image/?url=/prototipo/
+hero-fondo.jpg&w=750&q=75` devolvió **`image/webp` de 37 kB** desde un JPEG de
+> **593 kB**, y la imagen frontal salió en 62 kB WebP desde un PNG de 908 kB. Lo
+> hace el proceso local con `sharp`.
 >
-> **En Vercel sí optimiza**, y bien: el mismo logo de 42.474 bytes sale en
-> **946 bytes WebP** a `w=128` y 4.928 a `w=640`. La optimización la hace la
-> infraestructura de Vercel, no nuestro proceso.
+> **Lo que decía esta nota, y por qué era cierto cuando se escribió:** con
+> **16.2.x** se midió que `/_next/image` devolvía el original **byte a byte**
+> (40.127 → 40.127) en todos los anchos y aun mandando `Accept: image/webp`. No
+> era un error de medición: era el comportamiento de esa versión.
 >
-> Conclusión operativa: **un pase sin optimizar en local no es un defecto** y no
-> hay que perseguirlo. Si alguna vez hay que auditar peso de imágenes, se mide
-> contra el despliegue, nunca contra `npm start`.
+> **La lección, que es la que hay que conservar:** una nota operativa sobre el
+> comportamiento de una herramienta **caduca con su versión**, y esta caducó sin
+> que nadie lo notara porque nadie volvió a medir. Si una nota dice «X no
+> funciona en local», hay que volver a comprobarlo tras cada salto de Next o de
+> `sharp` —igual que se revalida el trazado de §10.18—, y no darla por buena
+> porque esté escrita aquí.
+>
+> **En Vercel también optimiza**, como siempre: el logo de 42.474 bytes sale en
+> **946 bytes WebP** a `w=128` y 4.928 a `w=640`.
+>
+> Conclusión operativa **nueva**: ya se puede comparar peso de imágenes entre dos
+> builds locales, y esa comparación es válida porque las dos pasan por el mismo
+> optimizador. Lo que sigue **sin** ser comparable es una cifra local contra una
+> de producción: cambian la red, la caché del borde y el hardware.
 
 ### 10.14 LECCIÓN — el modo oscuro roto que sobrevivió todo el proyecto
 
@@ -2348,6 +2362,30 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
 
     **Comprometer hoy un umbral basado en estas cifras sería un error**: se
     acordaría contra una página sin diseño.
+
+    **CORRECCIÓN 2026-09-22 — el «99» NO es una cifra de Lighthouse, y se
+    estaba citando como si lo fuera.** Iba camino de una reunión con el cliente,
+    así que conviene que quede escrito con los números al lado.
+
+    | Cómo se mide                                      | Puntuación         | LCP               |
+    | ------------------------------------------------- | ------------------ | ----------------- |
+    | Navegador real, ventana visible (esta línea base) | «99» (de ahí sale) | 384–800 ms        |
+    | **Lighthouse móvil sobre producción**, 3 corridas | **73 · 90 · 83**   | 4,2 · 3,3 · 4,0 s |
+
+    Las dos son válidas y **miden cosas distintas**: Lighthouse emula un móvil
+    con red lenta y CPU frenada; el navegador real mide esta máquina con fibra.
+    La cifra que el cliente va a reconocer —y la que usaría cualquier auditoría
+    suya— es la de Lighthouse.
+
+    **Y una advertencia de método que vale para las dos:** entre corridas del
+    **mismo** código la puntuación se movió **17 puntos** (73 a 90) y el LCP casi
+    un segundo. Una sola corrida no es una medición (§10.24): hay que dar
+    mediana y rango, y comparar siempre en la misma máquina y condiciones.
+
+    Con el hero del diseño puesto, la comparación controlada —misma máquina,
+    build local, 3 corridas por lado, única variable el hero— dio **96 → 87** de
+    mediana y el LCP pasando de texto (2,2 s) a la **imagen de fondo** (3,75 s).
+    Detalle en `docs/design-tokens.md` §11.
 
 15. **Icono cuadrado de la marca (favicon).** El único recurso gráfico que
     tenemos es el logotipo, de **1614 × 317** — una tira horizontal. Sirve para

@@ -1202,3 +1202,151 @@ desajuste: el sitio declara hoy `--font-sans: var(--font-geist-sans)` —
 **En una frase para el diseñador:** el color, la tipografía y el radio **ya
 existen y están medidos**; lo que falta es decidir la retícula, la escala y los
 componentes, y sustituir los colores fijos de las plantillas por tokens.
+
+---
+
+## 11. Hero «Potencia Hitachi» de Andrés — prototipo medido (2026-09-22)
+
+> Construido en la rama **`proto/hero-andres`**, con preview y **sin fusionar a
+> `main`**. Es un prototipo para validar el diseño, no una entrega.
+>
+> Fuente del diseño: `https://partequipos.uxdesign.website/ux-9/` — **no** está
+> en la home de ese sitio.
+
+### 11.1 Lo extraído, y una corrección de alcance
+
+Todo medido con `getComputedStyle` y recorriendo las reglas de Elementor, no
+copiado de una captura.
+
+| Recurso      | Dimensiones     | Peso original                      |
+| ------------ | --------------- | ---------------------------------- |
+| `Fondo.jpg`  | **2048 × 1360** | **593,4 kB** JPEG                  |
+| `Hero-1.png` | **1476 × 1057** | **908,2 kB** PNG con transparencia |
+
+**Su diseño tiene TRES cortes, y los valores que circulaban como «escritorio»
+son los del corte de en medio:**
+
+| Valor              | ≥1025 px                   | ≤1024 px                               | ≤767 px            |
+| ------------------ | -------------------------- | -------------------------------------- | ------------------ |
+| Título             | **120 px** / 168           | **70 px** / 98                         | **12vw**           |
+| Imagen frontal     | **809 px**                 | **631 px**                             | 631 px, tope 100 % |
+| Relleno de tarjeta | **10 px**                  | **50/30/30**                           | 50/30/30           |
+| Alto mínimo        | 86vh                       | 86vh                                   | **85vh**           |
+| Margen sup. imagen | 100 px                     | 100 px                                 | **200 px**         |
+| Icono de flecha    | 21 px                      | 21 px                                  | **15 px**          |
+| Vidrio             | **dentro** (`right: 21px`) | **sobresale** 73 px (`bottom: -113px`) | **oculto**         |
+
+**Tres piezas que no se ven a simple vista:**
+
+1. **El solape es un margen inferior de `-250px`** en la fila del título: es lo
+   que hace que la máquina se le monte encima. Con él, el modelo reproduce la
+   altura exacta de su tarjeta (745 px en escritorio, 628 px a 1018 px).
+2. **El vidrio declara el borde en `1px`**, no en 0,8: los 0,8 que salen al
+   medir son el redondeo de Chrome a DPR 1,25.
+3. **`backdrop-filter: blur(18px)`**, que no estaba en la lista de valores.
+
+**No hay carrusel.** En la tarjeta: 0 enlaces, 0 botones y ningún slider. Las
+flechas y el «+» son `div` decorativos, sin nombre accesible y sin
+comportamiento. Y **la página no tiene ningún `<h1>`**: el título es un `<h2>`.
+
+### 11.2 Diferencias con el sistema del cliente — SIN resolver
+
+Es decisión de Andrés y del cliente; el prototipo mantiene los valores de él,
+aislados en variables (`src/components/hero/hero.module.css`).
+
+|                 | Andrés             | Sistema del cliente                    | Sitio hoy |
+| --------------- | ------------------ | -------------------------------------- | --------- |
+| Fuente          | **Inter** 300/600  | **Rubik**                              | **Geist** |
+| Rojo            | **#E5242D**        | `--primary` **#dc2626**                | —         |
+| Radio           | **30 px**          | tope `--radius-4xl` **18,7 px**        | —         |
+| Escala de texto | 120/70/12vw, 1,4em | **no define escala** (usa Tailwind v4) | Tailwind  |
+
+Y sumando el CLI, el rojo tiene **tres** versiones vivas: `partequipos-wordmark`
+usa **#D92035**.
+
+**El vidrio NO es el `--glass-*` del sistema**, y el 12 % es una trampa de las
+de §10.23 de CLAUDE.md —mismo número, papel distinto—:
+
+| Capa       | Andrés          | Sistema                                          |
+| ---------- | --------------- | ------------------------------------------------ |
+| Fondo      | blanco **12 %** | `--glass-tint` **82 % / 58 %**                   |
+| Borde      | blanco **25 %** | `--glass-rim` **12 % / 3 %**, **negro** en claro |
+| Sombra     | negro **8 %**   | `--glass-shadow` **,14 / ,12**                   |
+| Desenfoque | **18 px**       | sin token publicado                              |
+
+### 11.3 Contraste medido — TRES FALLOS, sin corregir
+
+**El método, que es lo que permite decidir con datos.** El texto va sobre una
+foto, así que no hay «un color de fondo»: se muestrean los **píxeles reales** de
+`Fondo.jpg` en la zona que ocupa cada elemento —reproduciendo el recorte
+`object-fit: cover`—, y encima se componen las capas translúcidas: el vidrio
+(blanco al 12 %) y la píldora de la flecha (blanco al 58 %). De ahí sale la
+luminancia, y con ella el contraste.
+
+| Elemento                      | Medido                               | Exige WCAG                    | Resultado               |
+| ----------------------------- | ------------------------------------ | ----------------------------- | ----------------------- |
+| Título blanco sobre el cielo  | **2,40** media · **1,16** peor píxel | **3:1** (texto grande, 1.4.3) | **FALLA**               |
+| Rojo #E5242D sobre su píldora | **2,17** media · 2,98 mejor caso     | **3:1** (no textual, 1.4.11)  | **FALLA**               |
+| Blanco sobre el vidrio        | **7,59** donde cae hoy               | 4,5:1                         | pasa, pero condicionado |
+
+El vidrio pasa **por dónde está**: sobre las rocas oscuras. Con el desenfoque de
+18 px lo que manda es la media local, y el parche más claro de esa zona daba
+**1,81** — si la foto cambia o el recorte se estira y le toca cielo, se cae.
+
+> **Y el aviso que importa para no fiarse de lo automático:** Lighthouse da
+> **accesibilidad 100** y su auditoría `color-contrast` **en verde** en esta
+> misma página. axe **no evalúa texto sobre imágenes**: no puede resolver el
+> fondo, así que lo omite. Es el patrón de §10.14 de CLAUDE.md — la herramienta
+> fácil mira un paso antes de donde está el problema.
+
+### 11.4 Rendimiento — comparación controlada
+
+Lighthouse móvil, **misma máquina, build de producción local, incógnito, 3
+corridas por lado, única variable el hero**. Se descartó medir el preview: está
+detrás de la protección de despliegue y el token de derivación no sale de GitHub
+Secrets (decisión de dirección).
+
+|              | Sin hero       | Con hero            |
+| ------------ | -------------- | ------------------- |
+| Puntuación   | **96** (91–99) | **87** (84–94)      |
+| LCP          | **2,2 s**      | **3,75 s**          |
+| Elemento LCP | `<h1>` (texto) | **imagen de fondo** |
+| CLS          | 0              | 0                   |
+| Peso total   | 283 kB         | **446 kB**          |
+
+**−9 puntos y +1,5 s de LCP.** Qué lo determina, del desglose del LCP: TTFB
+112 ms · descubrimiento 27 ms · **descarga de la imagen 1112 ms** · render
+121 ms. Es la descarga del fondo bajo la red simulada, no el JavaScript.
+
+**Peso añadido: +163 kB.**
+
+| Concepto         | Añade                                                  |
+| ---------------- | ------------------------------------------------------ |
+| Fuente **Inter** | **+49 kB** (un woff2; el sitio pasa de 2 familias a 3) |
+| Imágenes         | **+98 kB** — fondo 37 kB y frontal 62 kB, **en WebP**  |
+| JavaScript       | **+3 kB** (154 → 157): React ya estaba en el paquete   |
+| CSS              | +4 kB                                                  |
+
+### 11.5 Decisiones pendientes — NO son nuestras
+
+1. **Los tres fallos de contraste** (§11.3). Salidas posibles: velo sobre la
+   foto, una foto más oscura, u oscurecer el rojo. **No se tocó ninguno**:
+   cambiar sus valores sin decirlo falsearía la validación.
+2. **El `<h1>`.** Su diseño no tiene ninguno. En el prototipo el título del hero
+   es el único `<h1>` de la portada, y eso **sustituye** al actual —«Partequipos
+   — Repuestos y maquinaria pesada en Colombia»—, que cubre las palabras clave
+   del negocio. Con el tráfico orgánico como objetivo (CLAUDE.md §1) es decisión
+   de negocio, no de maquetación. **Queda como está en el prototipo.**
+3. **Las cuatro diferencias con el sistema** (§11.2): fuente, rojo, radio y
+   vidrio.
+
+### 11.6 Modelo de datos aprobado (2026-09-22)
+
+**Grupo `hero` en la colección `Paginas`, condicionado al slug `inicio`.** No se
+crea una colección de slides: el diseño **no tiene carrusel**, y modelar uno
+sería inventar una estructura que nadie pidió. Ver ADR 0009.
+
+En el prototipo el contenido son **datos de prueba** en
+`src/components/hero/datosPrototipo.ts`, y las imágenes están en `public/` con
+sus URL aisladas en `imagenesPrototipo.ts`: el componente las recibe por props,
+así que pasar a Payload no le cambia una línea.

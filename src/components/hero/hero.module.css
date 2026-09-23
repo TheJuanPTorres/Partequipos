@@ -64,7 +64,8 @@
   /*
    * POSICIÓN RESPECTO A LA TARJETA, medida en su página al MISMO ancho de
    * ventana (2026-09-23). En escritorio va DENTRO: 41 px del borde derecho y
-   * 91 px por encima del inferior. Por debajo de 1024 px se sale (ver abajo).
+   * 91 px por encima del inferior. Por debajo de 1024 px su diseño lo saca de
+   * la tarjeta; aquí NO (desviación nuestra, ver el bloque de ≤1024 px).
    */
   --hero-vidrio-derecha: 41px;
   --hero-vidrio-abajo: 91px;
@@ -82,9 +83,13 @@
   --hero-parallax-vidrio: -30px;
 
   /* ============ AÑADIDO NUESTRO — NO ESTÁ EN EL DISEÑO DE ANDRÉS ============
+   * ⚠ PENDIENTE DE APROBACIÓN DE ANDRÉS. Cambia la foto de forma visible —el
+   * borde superior se oscurece—, así que no lo decidimos nosotros: está puesto
+   * para que se vea y se juzgue, no aprobado. Rechazarlo = opacidad 0.
+   *
    * VELO del título: degradado oscuro en la franja superior de la foto, para
    * darle presencia y subir el contraste del blanco (2,4 a 1 sin él).
-   * Opacidad 0 = su diseño tal cual. Ver docs/design-tokens.md §11.
+   * Opacidad 0 = su diseño tal cual. Ver docs/design-tokens.md §11.7.
    * ======================================================================== */
   --hero-velo-color: 0 0 0;
   --hero-velo-opacidad: 0.5;
@@ -114,15 +119,15 @@
   gap: var(--hero-gap);
   padding: var(--hero-relleno);
   /*
-   * SIN recorte: por debajo de 1024 px el vidrio sobresale a propósito, igual
-   * que en el diseño. El redondeo del fondo lo hace `.marco`, no esta caja.
+   * Sin recorte en esta caja: el redondeo del fondo lo hace `.marco`. Así el
+   * foco y la sombra del vidrio no se cortan contra el borde.
    */
   isolation: isolate;
 }
 
 /*
  * FONDOS CON next/image, no con background-image: así los optimiza el
- * servidor a WebP y la primera admite `priority`. El marco recorta con el radio
+ * servidor a WebP y la primera admite `preload`. El marco recorta con el radio
  * sin recortar el vidrio.
  *
  * OJO con `[hidden]`: las capas NO declaran `display`, porque cualquier
@@ -409,13 +414,20 @@
     --hero-imagen-ancho: 631px;
     --hero-relleno: 50px 30px 30px;
     /*
-     * AQUÍ EL DISEÑO SACA EL VIDRIO DE LA TARJETA: 73 px por debajo del borde,
-     * sobre el fondo blanco de la página. Medido igual en su página y en la
-     * nuestra a 1018 px. Es DECISIÓN PENDIENTE (docs/design-tokens.md §11):
-     * se deja fiel hasta que se decida.
+     * DESVIACIÓN NUESTRA, DECIDIDA (2026-09-23) — el vidrio va DENTRO.
+     *
+     * Su diseño lo saca de la tarjeta por debajo de 1024 px: entre 12 y 73 px
+     * según el alto de ventana, porque su parallax lo recoloca. La parte de
+     * fuera cae sobre el blanco de la página y midió 1,05 a 1 —texto blanco
+     * sobre blanco—, en su página y en la nuestra.
+     *
+     * Criterio de dirección, el mismo del panel: LEGIBILIDAD ANTES QUE
+     * FIDELIDAD. Su valor era `right: -20px; bottom: -113px` respecto a su
+     * columna (−73 px medidos respecto a la tarjeta). Ver docs/design-tokens.md
+     * §11.8.
      */
     --hero-vidrio-derecha: 20px;
-    --hero-vidrio-abajo: -73px;
+    --hero-vidrio-abajo: 30px;
   }
 }
 

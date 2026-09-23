@@ -30,3 +30,8 @@ docs/redirects-map.csv
 # Si algún día se edita uno de verdad, se saca de esta lista y se formatea.
 src/components/ui/partequipos-wordmark.tsx
 src/components/ui/partequipos-logo.tsx
+
+# Exportación de Elementor de la home de Andrés (ux-9). Sin formatear a
+# propósito: así se puede comparar con su exportación original, cambiando solo
+# el marcador del token de Mapbox (docs/diseno/elementor/LEEME.md).
+docs/diseno/elementor/*.json

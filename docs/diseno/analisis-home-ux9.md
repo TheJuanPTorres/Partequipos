@@ -6,6 +6,11 @@
 > del sitio público y se replican con precisión, sin cambios estéticos. Lo único
 > que se aparta son las correcciones de accesibilidad acordadas, y cada una se
 > documenta como desviación con su motivo.
+>
+> **Aprobado por dirección el 2026-09-23.** Las preguntas abiertas de §5.5, §7 y
+> §8 (imágenes, flechas, encabezados) están respondidas en
+> **`decisiones-home-ux9.md`**, junto con el plan por fases. Este documento se
+> conserva como el análisis que las motivó. Los JSON están en `elementor/`.
 
 ## 0. Fuente y cómo se verificó
 

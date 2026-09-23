@@ -72,7 +72,7 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
             width={logo.width}
             height={logo.height}
             className="h-14 w-auto object-contain"
-            priority
+            preload
           />
         ) : null}
         <h1 className="text-3xl font-semibold text-gray-900">Maquinaria pesada {marca.nombre}</h1>

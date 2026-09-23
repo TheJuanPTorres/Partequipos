@@ -23,7 +23,7 @@ export function Header() {
             width={1614}
             height={317}
             className="h-9 w-auto object-contain"
-            priority
+            preload
           />
         </Link>
 

@@ -67,7 +67,7 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
             width={logo.width}
             height={logo.height}
             className="h-14 w-auto object-contain"
-            priority
+            preload
           />
         ) : null}
         <h1 className="text-3xl font-semibold text-gray-900">

@@ -1995,6 +1995,47 @@ definitivas las fija el lock el día de la instalación**, no esta tabla.
 obligatorias**, no como advertencias: es la diferencia entre anotar un riesgo y
 atraparlo (§10.25).
 
+### 10.32 SUBIR UN ARCHIVO DESDE UNA URL — dos vías, las dos cerradas (2026-09-23)
+
+> Investigado antes de la fase C a raíz del botón «Pegar URL» del panel, que
+> estaba en `Media` y por tanto en producción. Leído en el código de Payload
+> **3.89.0** y comprobado por efecto en el preview. **Riesgo real antes de
+> cerrarlo: bajo** —las dos vías exigen sesión del panel y hoy hay una sola
+> cuenta—, pero una de ellas saltaba nuestros controles de tamaño.
+
+| Vía                                                                    | Quién descarga                                                                                                                                                                                                                                                                                                              | Estado                                                                                                                                                      |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. «Pegar URL»** (`upload.pasteURL`)                                 | El **navegador** del editor; el fichero se sube después como cualquier otro y pasa por todos los controles. El endpoint del servidor (`/api/<col>/paste-url`) solo se activa con una `allowList`: **ya estaba desactivado** (comprobado: 400 «Pasting from URL is not enabled» en las dos)                                  | **Cerrada a propósito**: `pasteURL: false` en `media` y `videos`. Quita el botón. Nadie lo usa: se sube desde el equipo                                     |
+| **2. Descarga para recortar** (`generateFileData` → `getExternalFile`) | El **servidor**. Si la operación llega **sin fichero** con `filename` y `url`, y Payload decide «volver a subir» —recorte, punto focal, o un `create`, donde el punto focal por defecto 50/50 ya basta—, el lambda descarga esa url. Es lo que usa el panel para recortar una imagen subida, pero la url la pone el cliente | **Cerrada por nuestro gancho** `sinDescargaRemota`: solo se admite el host del Blob propio. **No depende de `pasteURL`**: desactivar el botón no la cerraba |
+
+**Qué bloquea el filtro anti-SSRF de Payload (`safeFetch`) en la vía 2, y qué no:**
+
+| Bloquea                                                                                                                      | NO bloquea                                                                                                                                                                                                                              |
+| ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cualquier IP que no sea unicast pública: loopback, redes privadas, enlace local (incluida la de metadatos `169.254.169.254`) | **Cualquier host público**: el lambda descarga lo que se le diga                                                                                                                                                                        |
+| Hosts cuyo DNS resuelve a una IP de esas (se comprueba la IP resuelta, no el nombre)                                         | **El tamaño**: carga la respuesta entera en memoria. Sin nuestro gancho, un vídeo traído así **se saltaba el tope de 4 MB**                                                                                                             |
+| Redirecciones hacia esas IP (máximo 3, comprobando cada salto)                                                               | **Nuestros ganchos** de formato y tamaño, que miran `req.file` y en esta vía no existe. La validación de contenido de Payload **sí** corre (detecta el tipo por los bytes antes de `sharp`), así que un AVIF sigue rechazado en `Media` |
+|                                                                                                                              | Una url que empieza por **`/`**: se completa con la cabecera `Origin` de la petición y **se reenvían las cookies**. Desde un navegador no se falsifica; con la API, el propio editor mandaría sus cookies a su host                     |
+
+**El cierre** (`src/collections/hooks/sinDescargaRemota.ts`, con pruebas que
+incluyen su comprobación de fallo): en `beforeOperation`, sin fichero, la url
+tiene que ser `https` y **exactamente** el host del almacén propio (deducido
+del token, como el plugin). Otro dominio, `http`, rutas relativas, un host que
+solo contenga el nuestro o la ausencia de token: rechazado. Así recortar,
+cambiar el punto focal y duplicar —que reutilizan la url del propio fichero—
+siguen funcionando.
+
+**DEPENDE DE PAYLOAD 3.89 Y SE REVISA EN CADA ACTUALIZACIÓN:** que
+`beforeOperation` corra **antes** que `generateFileData` en `create`, `update`
+y `updateByID`, y que la url se lea de `data.url`. Si cambia cualquiera de las
+dos, el gancho **deja de cerrar la vía sin dar ningún error**. Anotado en la
+tabla de defectos de Payload de `docs/design-tokens.md`.
+
+**Efecto secundario en el preview, esperado:** los registros de `media` del
+preview vienen clonados de producción y apuntan al almacén de **producción**;
+recortarlos allí se rechaza, porque su host no es el del preview. En
+producción los registros y el almacén coinciden.
+
 ### 10.29 PREGUNTA BLOQUEANTE AL CLIENTE — su PDF y su propio código se contradicen sobre el flujo de OAuth
 
 > Descubierto el 2026-09-20 al estudiar el componente `login-screen` de su CLI
@@ -2175,6 +2216,7 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Vaciado de `solicitudes` solo en preview | Ejecutar el vaciado con la variable apuntando a producción y borrar leads reales                        | `src/lib/db/vaciadoSolicitudes.ts` + su prueba             | Al vaciar (§10.21)             |
 | Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                 | `npm run qa:acceso-portada`                                | **A mano**, contra development |
 | Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB              | `formatoDeVideoPermitido` + su prueba                      | CI y subida                    |
+| Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)  | `sinDescargaRemota` + su prueba                            | CI y subida                    |
 
 **Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
 lista real, y una prueba que exige que coincidan.

@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { formatoDeVideoPermitido } from "./hooks/formatoDeVideoPermitido";
+import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("videos");
@@ -44,9 +45,12 @@ export const Video: CollectionConfig = {
   },
   upload: {
     mimeTypes: ["video/mp4", "video/webm"],
+    // «Pegar URL» cerrado a propósito, como en Media (CLAUDE.md §10.32).
+    pasteURL: false,
   },
   hooks: {
-    beforeOperation: [formatoDeVideoPermitido],
+    // Sin el cierre, un vídeo traído por url se saltaría el tope de 4 MB (§10.32).
+    beforeOperation: [sinDescargaRemota, formatoDeVideoPermitido],
     afterChange: [portada.afterChange],
     afterDelete: [portada.afterDelete],
   },

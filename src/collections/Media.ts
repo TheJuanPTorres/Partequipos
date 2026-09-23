@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { formatoDeImagenPermitido } from "./hooks/formatoDeImagenPermitido";
+import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
 
 /**
  * Archivos subidos (imágenes, logos, etc.).
@@ -35,13 +36,22 @@ export const Media: CollectionConfig = {
    */
   upload: {
     mimeTypes: ["image/jpeg", "image/png", "image/webp"],
+    /*
+     * «Pegar URL» CERRADO A PROPÓSITO (CLAUDE.md §10.32). Con el valor por
+     * defecto el panel descarga la url desde el navegador y el endpoint del
+     * servidor ya estaba desactivado; `false` quita además el botón. Nadie lo
+     * usa: se sube desde el equipo.
+     */
+    pasteURL: false,
   },
   /*
    * El mensaje de rechazo de Payload está cableado en inglés; este hook se
    * adelanta para decirlo en español. Ver el fichero del hook.
    */
   hooks: {
-    beforeOperation: [formatoDeImagenPermitido],
+    // Primero el cierre de la descarga remota: esa vía no trae `req.file`, así
+    // que el gancho de formato no la vería (§10.32).
+    beforeOperation: [sinDescargaRemota, formatoDeImagenPermitido],
   },
   fields: [
     {

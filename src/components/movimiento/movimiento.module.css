@@ -1,0 +1,99 @@
+/*
+ * MOVIMIENTO — revelado por palabras y botón de pausa.
+ *
+ * Ningún valor de diseño vive en las reglas del revelado: escalón, duración,
+ * distancia y curva llegan por variables desde cada instancia (ritmos.ts).
+ */
+
+/* ------------------------------------------------------------- revelado */
+
+/*
+ * MÁSCARA: copiada del CSS del widget de Andrés. El relleno inferior de 0,1em
+ * con margen negativo igual evita que el recorte se coma las colas de las
+ * letras (g, p, q, j) sin mover la línea.
+ */
+.mascara {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+
+.palabra {
+  display: inline-block;
+}
+
+/*
+ * El estado oculto SOLO existe cuando el componente lo ha pedido
+ * (`data-revelado="preparado"`), y eso solo pasa si el JS corrió y hay
+ * movimiento permitido. Sin JS, el texto se ve.
+ */
+.revelado[data-revelado="preparado"] .palabra {
+  opacity: 0;
+  /* % del alto de la PALABRA: el `yPercent` de GSAP. */
+  transform: translateY(var(--revelado-distancia));
+}
+
+.revelado[data-revelado="visible"] .palabra {
+  opacity: 1;
+  transform: none;
+  transition-property: opacity, transform;
+  transition-duration: var(--revelado-duracion);
+  transition-delay: calc(var(--indice, 0) * var(--revelado-escalon));
+  /* Navegadores sin `linear()` (Safari < 17.2): aproximación en cubic-bezier. */
+  transition-timing-function: var(--revelado-curva-aprox);
+}
+
+/*
+ * La curva exacta de GSAP, muestreada. Va tras `@supports` y NO como segunda
+ * declaración: con `var()`, un valor no soportado no cae a la declaración
+ * anterior, cae al valor inicial (`ease`).
+ */
+@supports (transition-timing-function: linear(0, 1)) {
+  .revelado[data-revelado="visible"] .palabra {
+    transition-timing-function: var(--revelado-curva);
+  }
+}
+
+/*
+ * MOVIMIENTO REDUCIDO: texto entero y quieto, pase lo que pase. El componente
+ * ya no prepara nada, pero si la preferencia se activa A MITAD de una
+ * animación, esto la corta en su estado final.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .revelado[data-revelado] .palabra {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------- pausa */
+
+/*
+ * BOTÓN DE PAUSA (desviación D2). ux-9 no lo tiene, así que no hay valores de
+ * Andrés que copiar: se dibuja con los tokens del kit y con el tamaño mínimo
+ * cómodo para el dedo (44 px). Cada sección lo coloca donde toque.
+ */
+.pausa {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: var(--boton-borde) solid var(--color-texto-suave);
+  border-radius: var(--boton-radio);
+  background: rgb(255 255 255 / 90%);
+  color: var(--color-texto);
+  cursor: pointer;
+}
+
+.pausa:hover {
+  background: var(--color-fondo);
+  border-color: var(--color-texto);
+}
+
+.pausa svg {
+  width: 18px;
+  height: 18px;
+}

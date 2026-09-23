@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -7,13 +7,16 @@ import { indexacionPermitida } from "@/lib/seo/config";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+/*
+ * Inter, la fuente del diseño aprobado (ux-9). SIN `weight`: así next/font sirve
+ * la versión VARIABLE, un solo fichero para todos los pesos que usa el kit
+ * (300, 400, 500, 600 y 700). Declarar pesos sueltos serían cinco ficheros.
+ *
+ * Sustituye a Geist y Geist Mono, que se precargaban en cada página y no se
+ * pintaban en ninguna: `globals.css` los pisaba con Arial.
+ */
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -36,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="es" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         {/*
          * Enlace de salto al contenido (WCAG 2.4.1, nivel A).

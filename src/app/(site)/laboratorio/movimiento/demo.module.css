@@ -1,0 +1,19 @@
+.franja {
+  animation: franja 3s linear infinite alternate;
+}
+
+.franja[data-pausado="true"] {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .franja {
+    animation: none;
+  }
+}
+
+@keyframes franja {
+  to {
+    left: calc(100% - 4rem);
+  }
+}

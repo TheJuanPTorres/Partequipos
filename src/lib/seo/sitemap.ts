@@ -78,6 +78,19 @@ export const PATRONES_SITEMAP = [
   "/category/[categoria]",
 ] as const;
 
+/**
+ * Rutas construidas que NO van al sitemap, cada una con su motivo. Existen para
+ * que el guardián de `sitemap.test.ts` no las confunda con un olvido: quitar
+ * una ruta del sitemap tiene que ser una decisión escrita, no un silencio.
+ */
+export const RUTAS_FUERA_DEL_SITEMAP = {
+  /*
+   * Banco de pruebas del movimiento (fase A de la home). Devuelve 404 en
+   * PRODUCCIÓN (`VERCEL_ENV`): solo existe en local y en los preview.
+   */
+  "/laboratorio/movimiento": "banco de pruebas, 404 en producción",
+} as const;
+
 /** Slug reservado de la portada dentro de la colección de páginas. */
 export const SLUG_PORTADA_SITEMAP = "inicio";
 

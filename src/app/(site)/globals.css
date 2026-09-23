@@ -24,14 +24,19 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
 }
 
+/*
+ * FUENTE DEL SITIO: Inter, la del diseño aprobado (ux-9, las 8 tipografías del
+ * kit). Hasta la fase A (2026-09-23) aquí decía `font-family: Arial`, que
+ * PISABA a Geist: el sitio entero se pintaba en Arial mientras cada página
+ * precargaba 52 kB de Geist que nunca se usaban. Medido en la página pintada.
+ */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 /*
@@ -259,10 +264,135 @@ body {
 /*
  * Nuestra fuente, DESPUES del bloque: el `@theme inline` del sistema declara
  * `--font-sans: var(--font-sans)`, que es circular y dejaria la utilidad
- * `font-sans` sin valor. Hoy no se usa en ninguna plantilla, pero se repone
- * para que no sea una trampa cuando alguien la use.
+ * `font-sans` sin valor. Se repone aquí, y es la que usa `body`.
  */
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+}
+
+/* ==========================================================================
+ * BASE DEL DISEÑO APROBADO (ux-9) — fase A, 2026-09-23.
+ *
+ * Fuente: docs/diseno/elementor/site-settings.json (kit de Andrés). Nombres por
+ * PAPEL, no por el identificador de Elementor ni por el nombre del kit
+ * (docs/diseno/decisiones-home-ux9.md §5). El origen va en cada comentario.
+ *
+ * Esto es la BASE: no reestiliza ninguna plantilla existente. Las plantillas
+ * siguen con sus clases de Tailwind; las secciones de la home usan esto.
+ * ========================================================================== */
+
+/*
+ * COLORES. En `@theme` para que Tailwind genere las utilidades con el mismo
+ * nombre (`bg-marca`, `text-texto-suave`, `bg-fondo-seccion`…).
+ *
+ * OJO con la trampa de nombres del sistema del cliente: allí `secondary` y
+ * `accent` son SUPERFICIES; en el kit son colores de TEXTO. Por eso aquí no
+ * se usan esas palabras.
+ */
+@theme {
+  --color-marca: #e5242d; /* kit: primary «Principal» */
+  --color-marca-tenue: #e5242d17; /* kit: 123d64f — el rojo al 9 % */
+  --color-texto: #100f0f; /* kit: text «Texto» */
+  --color-texto-suave: #56545a; /* kit: secondary «Secundario» */
+  --color-texto-fuerte: #2e2e2e; /* kit: accent «Énfasis» */
+  --color-fondo: #ffffff; /* kit: 099f28a */
+  --color-fondo-seccion: #f0f0f0; /* kit: a372504 */
+}
+
+/*
+ * ESCALA TIPOGRÁFICA. Tres cortes, los de Elementor en ux-9 (viewport_md 768,
+ * viewport_lg 1025): escritorio ≥ 1025, tablet 768–1024, móvil ≤ 767. NO son
+ * los de Tailwind (`lg` empieza en 1024): se usan los del diseño para
+ * replicarlo exacto, también a 1024 px.
+ *
+ * En móvil los títulos van en `vw`, como en el kit.
+ */
+:root {
+  --texto-titulo-seccion: 55px; /* kit: primary */
+  --texto-titulo-bloque: 45px; /* kit: secondary */
+  --texto-titulo-3: 35px; /* kit: aa37d38 «H3» */
+  --texto-titulo-4: 30px; /* kit: 43da5c7 «H4» */
+  --texto-destacado: 20px; /* kit: cd1706f «M» y 2e6cf84 «M BOLD» */
+  --texto-cuerpo: 16px; /* kit: text */
+  --texto-etiqueta: 16px; /* kit: accent */
+
+  /* Botón global del kit: radio 50 px, relleno 12 · 25 · 10 · 25, borde 1 px. */
+  --boton-radio: 50px;
+  --boton-relleno: 12px 25px 10px 25px;
+  --boton-borde: 1px;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --texto-titulo-seccion: 40px;
+    --texto-titulo-bloque: 35px;
+    --texto-titulo-3: 30px;
+    --texto-titulo-4: 25px;
+    --texto-cuerpo: 14px;
+    --texto-etiqueta: 13px;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --texto-titulo-seccion: 10vw;
+    --texto-titulo-bloque: 9vw;
+    --texto-titulo-3: 7.5vw;
+    --texto-titulo-4: 6.5vw;
+    --texto-destacado: 18px;
+    --texto-cuerpo: 13px;
+  }
+}
+
+/*
+ * Una utilidad por estilo: tamaño, peso e interlineado juntos, como en el kit.
+ * El interlineado del kit va en `em` (1,2em); aquí sin unidad, que es lo mismo
+ * y además lo heredan bien los hijos.
+ */
+@utility texto-titulo-seccion {
+  font-size: var(--texto-titulo-seccion);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@utility texto-titulo-bloque {
+  font-size: var(--texto-titulo-bloque);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@utility texto-titulo-3 {
+  font-size: var(--texto-titulo-3);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@utility texto-titulo-4 {
+  font-size: var(--texto-titulo-4);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@utility texto-destacado {
+  font-size: var(--texto-destacado);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+@utility texto-destacado-negrita {
+  font-size: var(--texto-destacado);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@utility texto-cuerpo {
+  font-size: var(--texto-cuerpo);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+@utility texto-etiqueta {
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  line-height: 1;
 }

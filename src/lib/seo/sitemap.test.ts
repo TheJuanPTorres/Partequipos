@@ -4,7 +4,7 @@ import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { PATRONES_SITEMAP, buildSitemapEntries } from "./sitemap";
+import { PATRONES_SITEMAP, RUTAS_FUERA_DEL_SITEMAP, buildSitemapEntries } from "./sitemap";
 
 process.env.NEXT_PUBLIC_SERVER_URL = "https://partequipos.com";
 
@@ -35,6 +35,14 @@ function rutasConstruidas(): string[] {
 
   recorrer(raizApp, []);
   return encontradas.sort();
+}
+
+/**
+ * Lo que el código declara: las rutas del sitemap y las que quedan fuera por
+ * decisión escrita. Una ruta construida tiene que estar en uno de los dos.
+ */
+function rutasDeclaradas(): Set<string> {
+  return new Set<string>([...PATRONES_SITEMAP, ...Object.keys(RUTAS_FUERA_DEL_SITEMAP)]);
 }
 
 /**
@@ -200,7 +208,7 @@ describe("buildSitemapEntries", () => {
 describe("cobertura del sitemap frente a las rutas construidas", () => {
   it("no hay ninguna ruta pública fuera de PATRONES_SITEMAP", () => {
     const construidas = rutasConstruidas();
-    const cubiertas = new Set<string>(PATRONES_SITEMAP);
+    const cubiertas = rutasDeclaradas();
     const sinCubrir = construidas.filter((r) => !cubiertas.has(r));
 
     assert.deepEqual(
@@ -214,7 +222,7 @@ describe("cobertura del sitemap frente a las rutas construidas", () => {
 
   it("no se declaran patrones que ya no existen en la aplicación", () => {
     const construidas = new Set(rutasConstruidas());
-    const sobrantes = PATRONES_SITEMAP.filter((p) => !construidas.has(p));
+    const sobrantes = [...rutasDeclaradas()].filter((p) => !construidas.has(p));
 
     assert.deepEqual(
       sobrantes,
@@ -227,7 +235,7 @@ describe("cobertura del sitemap frente a las rutas construidas", () => {
     // Sección inventada a propósito: si algún día existe, hay que cambiarla aquí.
     const inventada = "/seccion-inventada-para-la-prueba";
     const construidas = [...rutasConstruidas(), inventada];
-    const cubiertas = new Set<string>(PATRONES_SITEMAP);
+    const cubiertas = rutasDeclaradas();
 
     assert.deepEqual(
       construidas.filter((r) => !cubiertas.has(r)),

@@ -544,6 +544,18 @@ pero es la primera vez que se ve el síntoma, y confirma que el problema del pic
 de conexiones **no es teórico**. Contra una base con menos capacidad que Neon
 —o con más latencia— dejaría de ser transitorio.
 
+**Actualización 2026-09-23 — ya no es transitorio en local, y hay una causa
+probable.** Tres builds seguidos fallaron con `ETIMEDOUT` en rutas distintas
+(`development`, 204 páginas). El error es un `AggregateError` con **seis**
+`ETIMEDOUT` dentro: la firma de la **selección automática de familia de red**
+de Node (`autoSelectFamily`), que prueba cada IP del host con **250 ms** por
+intento y se rinde si ninguna contesta a tiempo. Con 11 workers cargando la
+CPU, 250 ms se quedan cortos. Con
+`NODE_OPTIONS="--network-family-autoselection-attempt-timeout=2000"` el build
+siguiente pasó, y el de después también: **dos de dos**, no más, así que es
+causa probable, no demostrada. Solo afecta a builds locales (Node 24.12); en
+Vercel no se ha visto. No se cambió ningún fichero del proyecto.
+
 #### Mitigaciones restantes (NO implementadas — decisión pendiente)
 
 La 1 (`cache()`) ya está aplicada; ver arriba. Las demás quedan documentadas

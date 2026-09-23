@@ -286,3 +286,89 @@ contra ux-9 al mismo ancho, con Chrome sin interfaz, como el hero.
 **Lo que no depende de nadie y puede empezar ya:** A y B. De la C en adelante,
 el contenido real sigue bloqueado por el cliente (CSV, WordPress), así que las
 secciones se construyen con los textos de ux-9 sembrados en `development`.
+
+### Pendientes anotados antes de sus fases
+
+| Pendiente                                                                                                                                                                                          | Antes de   |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **Reexportar el MP4 de la sección 7 a H.264 de 8 bits.** Hoy es High 10 (10 bits): puede que Safari de iPhone no lo reproduzca y el visitante vea solo el póster (§4)                              | **Fase F** |
+| **Versión más ligera del recorte de 1.570 kB de la sección 3** (`excavadora-amarilla-aislada-…-e1788914890653.png`), que pesa entre 2,4 y 4 veces lo que sus vecinos de pestaña (§1)               | **Fase D** |
+| **El revelado del prototipo del hero usa `translateY` en px (50 px)**; el widget de Andrés usa `yPercent` (50 % del alto de la palabra). Se corrige al pasarlo a `Revelado` con el ritmo `portada` | **Fase C** |
+
+---
+
+## 8. Fase A — hecha, en revisión (2026-09-23)
+
+Rama `feat/base-ux9`, **sin fusionar**.
+
+| Pieza                       | Dónde                                                                                                                        |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Colores por papel           | `@theme` de `src/app/(site)/globals.css` → `bg-marca`, `text-texto-suave`…                                                   |
+| Escala tipográfica          | Mismo fichero: variables `--texto-*` con los cortes de ux-9 (767 / 1024) y una utilidad por estilo (`texto-titulo-seccion`…) |
+| Inter                       | `layout.tsx`, variable: **un** fichero para los cinco pesos                                                                  |
+| Revelado sin GSAP           | `src/components/movimiento/Revelado.tsx` + `ritmos.ts` (puro, probado)                                                       |
+| Pausa y movimiento reducido | `usePausa`, `useMovimientoReducido`, `BotonPausa`                                                                            |
+| Banco de pruebas            | `/laboratorio/movimiento/`: **404 en producción**, fuera del sitemap por decisión escrita                                    |
+
+**Lo que NO toca:** ninguna plantilla existente cambia de clases. Lo único que
+les llega es la fuente.
+
+### Hallazgo: el sitio NO usaba Geist — se pintaba en Arial
+
+`globals.css` traía `body { font-family: Arial, Helvetica, sans-serif }` del
+andamiaje, y eso pisaba la variable de Geist. Medido en la página pintada: las
+21 plantillas en **Arial**. Y aun así cada página **precargaba 52 kB** de Geist
+(23 + 29 kB) que no se usaban en ninguna parte. El cambio real de la fase A para
+las páginas existentes es **Arial → Inter**, no Geist → Inter.
+
+### Impacto medido sobre las páginas que ya existen
+
+Una ruta por plantilla (21: portada, institucional, contacto, los 5 niveles de
+repuestos, los 6 de maquinaria nueva, usada, lubricantes, blog y su categoría,
+artículo), pintadas con Chrome sin interfaz a 390, 1010 y 1440 px, antes y
+después, sobre builds locales contra `development`:
+
+| Comprobación            | Antes              | Después                                                                               |
+| ----------------------- | ------------------ | ------------------------------------------------------------------------------------- |
+| Desborde horizontal     | 0 de 63            | **0 de 63**                                                                           |
+| Errores de consola      | 0                  | **0**                                                                                 |
+| Un solo `<h1>`          | 63 de 63           | **63 de 63**                                                                          |
+| Fuente pintada          | Arial              | **Inter**                                                                             |
+| Altura de página        | —                  | igual o **+0,6 a +3,8 %**: Inter es más ancha que Arial y algunas líneas parten antes |
+| `npm run qa` (198 URLs) | 0 errores, 1 aviso | **0 errores, el mismo aviso**                                                         |
+
+Revisado a ojo en las dos que más crecen (blog a 390 px, maquinaria nueva a
+1440 px): mismas cajas, solo cambia dónde parten las líneas. A 390 px, en el
+menú de la cabecera, «Contacto» pasa a la segunda línea, que ya existía.
+
+### Lighthouse móvil, local, mediana de 3
+
+| Plantilla               | Antes: puntuación · LCP  | Después: puntuación · LCP |
+| ----------------------- | ------------------------ | ------------------------- |
+| Portada                 | 88 · 2,96 s              | 96 · 2,72 s               |
+| Contacto                | 90 · 3,07 s              | 93 · 3,05 s               |
+| Artículo                | 93 · 3,05 s              | 97 · 2,65 s               |
+| Ficha de maquinaria     | 87 · 3,30 s              | 92 · 3,14 s               |
+| Modelo de repuestos     | 89 · 3,34 s              | 92 · 3,07 s               |
+| **Fuentes descargadas** | **2 ficheros · 53,4 kB** | **1 fichero · 48,4 kB**   |
+
+**CLS 0 en todas, antes y después.** Lo que sí es atribuible al cambio: **un
+fichero de fuente menos y 5 kB menos**, porque Inter variable sustituye a los
+dos de Geist. La subida de puntuación **no se atribuye**: entre corridas del
+mismo código la puntuación ya se movía hasta 19 puntos (74 a 93 en la portada),
+y la mejora de TBT apunta más al estado de la máquina que a 5 kB de fuente.
+Conclusión prudente: **Inter no empeora nada medible**.
+
+### El revelado, probado pintado (`/laboratorio/movimiento/`)
+
+| Caso                                        | Resultado                                                                                                                |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Con movimiento                              | Oculto antes del disparo; a 250 ms, a medio camino; al final, opacidad 1 y quieto. Los tres ritmos y la curva con rebote |
+| **`prefers-reduced-motion`**                | **Las cinco instancias visibles y quietas SIN hacer scroll**; la franja de prueba, parada y con «Reproducir»             |
+| Sin JavaScript                              | Todo visible                                                                                                             |
+| Entrando por un ancla al final de la página | Los bloques que quedaron por encima, visibles (un IntersectionObserver a secas los dejaba ocultos)                       |
+| Lector de pantalla                          | Encabezados con `aria-label` del texto entero y palabras fuera del árbol; el párrafo, legible sin `aria-label`           |
+| Pausa                                       | Para la franja y cambia su nombre a «Reproducir la franja»                                                               |
+
+**Limitación conocida:** un bloque ya visible al cargar se pinta, se oculta al
+hidratar y se revela. Solo afecta al hero; se decide en la fase C.

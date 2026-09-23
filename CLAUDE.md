@@ -25,17 +25,23 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 
 ## 2. Stack (no cambiar sin aprobación)
 
-| Capa          | Tecnología                                                                         |
-| ------------- | ---------------------------------------------------------------------------------- |
-| Framework     | Next.js **16.3.5** · App Router · React **19.2.4**                                 |
-| Lenguaje      | TypeScript 5.9 (modo estricto)                                                     |
-| CMS           | Payload **3.89.0** (integrado en el mismo proyecto, no como servicio aparte)       |
-| Base de datos | PostgreSQL (Neon), por el host _pooled_                                            |
-| Estilos       | Tailwind CSS **v4.3.3** (ver la corrección de abajo)                               |
-| Fuente        | **Inter** variable con `next/font` (desde 2026-09-23; **antes Arial**, ver abajo)  |
-| Hosting       | Vercel                                                                             |
-| Archivos      | **Vercel Blob**. Cloudflare R2 **no se usa**: era alternativa, no está configurado |
-| Errores       | **`console.error` a los registros de Vercel** — Sentry NO está (§10.31)            |
+| Capa          | Tecnología                                                                          |
+| ------------- | ----------------------------------------------------------------------------------- |
+| Framework     | Next.js **16.3.5** · App Router · React **19.2.4**                                  |
+| Lenguaje      | TypeScript 5.9 (modo estricto)                                                      |
+| CMS           | Payload **3.89.0** (integrado en el mismo proyecto, no como servicio aparte)        |
+| Base de datos | PostgreSQL (Neon), por el host _pooled_                                             |
+| Estilos       | Tailwind CSS **v4.3.3** (ver la corrección de abajo)                                |
+| Fuente        | **Inter** variable con `next/font` (desde 2026-09-23; **antes Arial**, ver abajo)   |
+| Hosting       | Vercel                                                                              |
+| Archivos      | **Vercel Blob**. Cloudflare R2 **no se usa**: era alternativa, no está configurado  |
+| Errores       | **`console.error` a los registros de Vercel** — Sentry NO está (§10.31)             |
+| Validación    | **Zod** 4, en el servidor, en los formularios públicos (§5)                         |
+| Imágenes      | **sharp** 0.35, lo usa Payload al subir; su carga tumba medio sitio (§10.18/§10.19) |
+| Editor        | **Lexical** (`@payloadcms/richtext-lexical` 3.89.0), el texto enriquecido del panel |
+| Correo        | **Resend** (`@payloadcms/email-resend`). **Sin clave en producción** (§10.11)       |
+| Anti-bot      | **Cloudflare Turnstile**, por script, sin dependencia. **Sin claves en producción** |
+| Panel         | SCSS propio compilado con **sass 1.77.4**, declarado exacto desde 2026-09-23        |
 
 > **REVISIÓN COMPLETA DE ESTA TABLA — 2026-09-23.** Tercera afirmación falsa
 > sobre el stack en dos semanas (shadcn/ui, Sentry y la fuente), así que se
@@ -105,21 +111,65 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 
 **Lo que NO cuadra y sigue abierto (no se ha tocado):**
 
-- **`sass` no está declarado y el panel lo necesita.** `custom.scss` (46 kB)
-  compila porque `sass` 1.77.4 llega **de rebote** con `@payloadcms/next`. Si
-  Payload deja de depender de él, el panel se rompe sin que cambie nada nuestro.
-  Declararlo es añadir una dependencia: **§2 exige aprobación**.
-- **Scripts de instalación que npm no cubre en Vercel.** El registro de build
-  del 2026-09-23 dice: _«4 packages have install scripts not yet covered by
-  allowScripts»_ (`esbuild` en tres versiones y `unrs-resolver`). El build pasó
-  y producción responde, pero es un cambio del **entorno de build** —la familia
-  de §10.18— y **no se ha diagnosticado** si esos scripts se ejecutan o no.
-- **Stack que se usa y la tabla no nombra:** `zod` (validación de formularios,
-  §5), `sharp` (imágenes de Payload, §10.19), `@payloadcms/richtext-lexical`
-  (editor), `@payloadcms/email-resend` (correo, **sin clave en producción**,
-  §10.11) y Cloudflare **Turnstile** (script, sin dependencia; **sin claves en
-  producción**, §10.11). No son capas nuevas, pero una tabla de stack que no
-  los nombra no sirve para saber qué se puede romper.
+- **RESUELTO 2026-09-23 — `sass` declarado**, exacto a 1.77.4 (la versión que
+  ya resolvía el lock). Antes llegaba **de rebote** con `@payloadcms/next`.
+  La instalación mínima en Windows **volvió a tirar `@emnapi/core` y
+  `@emnapi/runtime`** del lock —exactamente §10.5—, así que se regeneró
+  borrando lock y `node_modules`: 839 entradas antes y después, **ninguna de
+  Linux perdida**, y 20 subidas de versión menor por los rangos `^` (la única
+  de código propio, `@tabler/icons-react` 3.46 → 3.48).
+- **RESUELTO 2026-09-23 — tabla completada** con Zod, sharp, Lexical, Resend y
+  Turnstile.
+- **DIAGNOSTICADO 2026-09-23 — scripts de instalación y `allowScripts`.** Ver
+  el apartado siguiente.
+
+#### `allowScripts` de npm: qué pasa con esbuild y unrs-resolver (2026-09-23)
+
+El registro de build de Vercel dice: _«4 packages have install scripts not yet
+covered by allowScripts»_ (`esbuild` 0.18.20, 0.25.12 y 0.28.2, y
+`unrs-resolver` 1.12.2).
+
+**¿Se ejecutan hoy? Sí, o no hace falta.** Dos hechos:
+
+1. En **npm 11** el ajuste es **solo un aviso**. La documentación de
+   [`npm approve-scripts` (v11)](https://docs.npmjs.com/cli/v11/commands/npm-approve-scripts/):
+   _«this field is advisory: install scripts still run by default»_.
+2. En nuestros builds, además, **no se instala nada**: Vercel restaura la caché
+   y npm responde _«up to date in 2s»_. Los scripts corrieron en la instalación
+   que creó esa caché; el aviso lista paquetes del árbol, no scripts bloqueados.
+
+**¿Qué pasaría si se bloquearan?** Es lo que hará **npm 12**: _«Install
+commands silently skip lifecycle scripts for any dependency that does not have
+a matching entry in `allowScripts`»_
+([`npm install-scripts`, v12](https://docs.npmjs.com/cli/v12/commands/npm-install-scripts/)).
+Leído el código de los cuatro scripts:
+
+| Script                               | Qué hace en Linux                                                                                                                                                                                                               | Si no corre                                                            |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `esbuild` (`install.js`)             | Si el binario de la plataforma (`@esbuild/linux-x64`, dependencia opcional) está, sustituye el lanzador JS por el binario nativo, para arrancar más rápido, y comprueba la versión. **Solo si falta**, lo instala o lo descarga | La API de esbuild sigue encontrando el binario por el paquete opcional |
+| `unrs-resolver` (`napi-postinstall`) | Igual con su binario nativo: comprueba que está y, si falta, lo descarga                                                                                                                                                        | Igual: funciona si el binario opcional está                            |
+
+**Los cuatro binarios de Linux están en el lock** (`@esbuild/linux-x64` en las
+tres versiones y `@unrs/resolver-binding-linux-x64-gnu`).
+
+**Prueba empírica:** el lock instalado en una carpeta aparte con
+`npm ci --ignore-scripts` —lo mismo que hará npm 12—: las **tres** versiones de
+esbuild transforman TypeScript, `tsx` ejecuta un `.ts` y `unrs-resolver`
+resuelve un módulo. **Límite de la prueba: se hizo en Windows**, donde el paso
+de «optimizar» no existe; en Linux se omitiría ese paso, que solo es velocidad.
+
+**Dónde importa:** `tsx` (esbuild 0.28) ejecuta **`db:check` y
+`payload migrate` en cada build de Vercel**; las otras dos versiones las trae
+`drizzle-kit` con Payload; `unrs-resolver` solo lo usa ESLint, que corre en CI
+y no en el build.
+
+**Conclusión:** bloquearlos **no rompe nada mientras los binarios opcionales
+estén en el lock**. El riesgo real es el de siempre, §10.5: si una regeneración
+en Windows pierde un binario de Linux, **hoy** el script lo descargaría y el
+build seguiría; **con npm 12**, no, y el build fallaría. Por eso la
+comprobación de binarios de Linux de §10.5 pasa de recomendable a obligatoria
+el día que Vercel use npm 12. **Sin cambios**: no se ha tocado `allowScripts`.
+
 - **Menor, fuera de §2:** el logo de la cabecera se pinta a unos 183 px y
   descarga la versión de **1920 px** (11,7 kB en vez de 2,9 kB), porque
   `width={1614}` genera el `srcset` desde el tamaño original. Se resuelve con
@@ -1284,12 +1334,25 @@ En verde, y verificando la mitad.
    verificar: si no coinciden, la verificación mide otra cosa.
 4. **Una ruta que da 404 en el preview y 200 en producción** se contrasta con el
    preview ANTERIOR, sin el cambio. Si también daba 404, es la base, no el código.
+5. **Vaciar `solicitudes` en la rama `preview`**, tras CADA refresco:
+
+   ```
+   DATABASE_URI="<cadena pooled de la rama preview>" npm run db:vaciar-solicitudes-preview
+   ```
+
+   Es la única colección con datos personales de terceros (nombre, correo,
+   teléfono). Hoy tiene 0 filas, pero el día que tenga leads reales, clonarlos
+   es **copiar datos personales a otro entorno sin necesidad** (Ley 1581 de
+   2012). El script **solo acepta el host de la rama `preview`** —lista de
+   permitidos de un elemento, `src/lib/db/vaciadoSolicitudes.ts`, con pruebas—
+   y se niega **antes de conectar** con cualquier otro, producción incluida:
+   el modo de fallo que evita es borrar leads reales. Comprueba el efecto
+   contando después (§10.15).
 
 **Cuidado:** refrescar desde `production` **borra** lo que se hubiera creado a
 mano en el preview (p. ej. la marca `prueba-aislamiento-borrar` de arriba). Y
-arrastra los datos de producción, que hoy son de demostración (§10.6); el día
-que haya leads reales en `solicitudes`, clonarlos al preview es copiar datos
-personales a otro entorno, y habrá que decidirlo antes.
+arrastra los datos de producción, que hoy son de demostración (§10.6). Los de
+`solicitudes` se quitan con el paso 5.
 
 **La rama de Preview debe partir de `production`, NO de `development`.**
 `development` usa push de esquema, así que lleva el marcador `dev` (batch −1) en

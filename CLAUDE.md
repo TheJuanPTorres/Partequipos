@@ -1197,6 +1197,42 @@ instrumento devolvía números con aspecto de medición.
 | Resend (3)                        | **Crear solo en Production**          | `SOLICITUDES_EMAIL_TO` cae al **correo público real del cliente**: con Resend en preview, cada prueba de formulario le escribe |
 | `NEXT_PUBLIC_PERMITIR_INDEXACION` | **Crear solo en Production**          | El día que se active para lanzar, en Preview haría **indexable cada preview** y duplicaría el sitio entero                     |
 
+#### PROCEDIMIENTO — refrescar la rama `preview` antes de verificar plantillas (2026-09-23)
+
+**Antes de cada fase que verifique plantillas en un preview, se refresca la
+rama `preview` de Neon desde `production`.** No es higiene: sin esto la
+verificación cubre menos de lo que parece.
+
+**Qué pasó.** En la fase A de la home se verificaron 21 plantillas ruta a ruta
+en el preview: **8 dieron 404**. No era el cambio —el preview anterior, sin él,
+daba los mismos 404—: la rama `preview` se había clonado el 2026-09-16 y tenía
+**0** artículos, **0** marcas de lubricante y **0** categorías de usada, que en
+producción se sembraron después. Refrescada la rama, las 8 pasaron a 200.
+
+**Por qué nada lo avisaba.** La prueba de humo (§10.20) pide **cinco rutas
+fijas** —`/admin/`, la API, el sitemap, la portada y el mapa de redirects—, y
+todas existen con cualquier base. Una base desfasada no rompe ninguna: solo
+deja **sin datos** las plantillas que dependen de colecciones sembradas después.
+En verde, y verificando la mitad.
+
+**Pasos:**
+
+1. En Neon, restablecer la rama `preview` desde `production` («Reset from
+   parent» o equivalente). Lo hace dirección: es una operación sobre la base.
+2. **Redesplegar el preview** si las rutas a verificar están **prerenderizadas**:
+   el HTML se genera en el build, así que refrescar la base no cambia lo ya
+   construido. Las que se renderizan bajo demanda sí toman la base nueva.
+3. Comprobar los recuentos de la API en preview **y** producción antes de
+   verificar: si no coinciden, la verificación mide otra cosa.
+4. **Una ruta que da 404 en el preview y 200 en producción** se contrasta con el
+   preview ANTERIOR, sin el cambio. Si también daba 404, es la base, no el código.
+
+**Cuidado:** refrescar desde `production` **borra** lo que se hubiera creado a
+mano en el preview (p. ej. la marca `prueba-aislamiento-borrar` de arriba). Y
+arrastra los datos de producción, que hoy son de demostración (§10.6); el día
+que haya leads reales en `solicitudes`, clonarlos al preview es copiar datos
+personales a otro entorno, y habrá que decidirlo antes.
+
 **La rama de Preview debe partir de `production`, NO de `development`.**
 `development` usa push de esquema, así que lleva el marcador `dev` (batch −1) en
 `payload_migrations`, y contra ese marcador `payload migrate` abre el prompt

@@ -297,9 +297,9 @@ secciones se construyen con los textos de ux-9 sembrados en `development`.
 
 ---
 
-## 8. Fase A — hecha, en revisión (2026-09-23)
+## 8. Fase A — hecha y fusionada (2026-09-23)
 
-Rama `feat/base-ux9`, **sin fusionar**.
+Rama `feat/base-ux9`, fusionada a `main` tras verificarla en el preview.
 
 | Pieza                       | Dónde                                                                                                                        |
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -373,21 +373,21 @@ Conclusión prudente: **Inter no empeora nada medible**.
 **Limitación conocida:** un bloque ya visible al cargar se pinta, se oculta al
 hidratar y se revela. Solo afecta al hero; se decide en la fase C.
 
-### En el preview (`partequipos-o5a0txlxl`, commit `ebe018c`)
+### En el preview — las 21 plantillas
 
-- **Prueba de humo: verde.**
+- **Prueba de humo: verde** en los tres despliegues de la rama.
 - **Ruta a ruta** con `vercel curl`, no con `qa` (contra un preview mide
-  producción, §10.21): **12 de las 21 plantillas en 200**, con un `<h1>`, **un**
-  fichero de fuente precargado, ningún rastro de Geist, `canonical` y
-  `noindex`. `/laboratorio/movimiento/` en 200.
-- **Las otras 9 dan 404, y no es por la fase A.** Son blog, lubricantes,
-  usada por categoría y parte de maquinaria nueva. **El preview anterior, sin
-  este cambio (`bcb4890`), da los mismos 404**, y la base del preview tiene
-  **0** artículos, **0** marcas de lubricante y **0** categorías de usada,
-  frente a 8, 1 y 8 en producción. Esa rama de Neon se clonó de producción el
-  2026-09-16, **antes** de que esas secciones se sembraran allí. Esas 9
-  plantillas quedan verificadas **solo en local**.
-- **Pendiente de decisión (no lo he tocado):** refrescar la rama `preview` de
-  Neon desde `production`. Es una operación sobre la base, así que la decide
-  dirección. Mientras no se haga, cualquier preview verifica menos plantillas
-  de las que parece.
+  producción, §10.21). Criterio: 200, un `<h1>`, **un** fichero de fuente
+  precargado, ningún rastro de Geist, `canonical` y `noindex`.
+- **Primera pasada (`partequipos-o5a0txlxl`): 13 de 21.** Las otras **8** —blog
+  por categoría y artículo, lubricantes, usada por categoría y tres de
+  maquinaria nueva— dieron 404, y **no por la fase A**: el preview anterior sin
+  este cambio (`bcb4890`) daba los mismos 404, y la base del preview tenía **0**
+  artículos, **0** marcas de lubricante y **0** categorías de usada, frente a 8,
+  1 y 8 en producción. La rama de Neon se clonó el 2026-09-16, antes de sembrar
+  esas secciones en producción. _(Este documento dijo primero «12 de 21» y «las
+  otras 9»: estaba mal contado. Eran 13 y 8.)_
+- **Dirección refrescó la rama `preview` desde `production`** (2026-09-23).
+  Segunda pasada sobre `partequipos-hemmu9t58`: **las 8 en 200** con el mismo
+  criterio. **Las 21 plantillas quedan verificadas en el preview**, no solo en
+  local. Procedimiento para las próximas fases: CLAUDE.md §10.21.

@@ -372,3 +372,22 @@ Conclusión prudente: **Inter no empeora nada medible**.
 
 **Limitación conocida:** un bloque ya visible al cargar se pinta, se oculta al
 hidratar y se revela. Solo afecta al hero; se decide en la fase C.
+
+### En el preview (`partequipos-o5a0txlxl`, commit `ebe018c`)
+
+- **Prueba de humo: verde.**
+- **Ruta a ruta** con `vercel curl`, no con `qa` (contra un preview mide
+  producción, §10.21): **12 de las 21 plantillas en 200**, con un `<h1>`, **un**
+  fichero de fuente precargado, ningún rastro de Geist, `canonical` y
+  `noindex`. `/laboratorio/movimiento/` en 200.
+- **Las otras 9 dan 404, y no es por la fase A.** Son blog, lubricantes,
+  usada por categoría y parte de maquinaria nueva. **El preview anterior, sin
+  este cambio (`bcb4890`), da los mismos 404**, y la base del preview tiene
+  **0** artículos, **0** marcas de lubricante y **0** categorías de usada,
+  frente a 8, 1 y 8 en producción. Esa rama de Neon se clonó de producción el
+  2026-09-16, **antes** de que esas secciones se sembraran allí. Esas 9
+  plantillas quedan verificadas **solo en local**.
+- **Pendiente de decisión (no lo he tocado):** refrescar la rama `preview` de
+  Neon desde `production`. Es una operación sobre la base, así que la decide
+  dirección. Mientras no se haga, cualquier preview verifica menos plantillas
+  de las que parece.

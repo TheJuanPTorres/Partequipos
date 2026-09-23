@@ -1339,6 +1339,11 @@ Secrets (decisión de dirección).
    de negocio, no de maquetación. **Queda como está en el prototipo.**
 3. **Las cuatro diferencias con el sistema** (§11.2): fuente, rojo, radio y
    vidrio.
+4. **Añadidas en la segunda ronda (§11.7):** si se acepta el **velo** sobre la
+   foto —cambia la imagen de forma notoria—; qué hacer con el **vidrio que se sale
+   de la tarjeta** por debajo de 1024 px, que en su diseño también ocurre; y que
+   el vidrio **solo es legible sobre una zona oscura** de la foto, cosa que las
+   fotos reales del catálogo no garantizan.
 
 ### 11.6 Modelo de datos aprobado (2026-09-22)
 
@@ -1350,3 +1355,131 @@ En el prototipo el contenido son **datos de prueba** en
 `src/components/hero/datosPrototipo.ts`, y las imágenes están en `public/` con
 sus URL aisladas en `imagenesPrototipo.ts`: el componente las recibe por props,
 así que pasar a Payload no le cambia una línea.
+
+### 11.7 Segunda ronda (2026-09-23) — vidrio, presencia del título y carrusel
+
+Rama `proto/hero-andres`, commit `e09da93`. Sin fusionar.
+
+**Método nuevo, y por qué.** La ventana del navegador de trabajo no obedecía los
+cambios de tamaño (se quedaba en 1018 px con zoom), así que todo lo de esta
+ronda se midió con **Chrome sin interfaz a anchos exactos** —1440, 1010 y
+390 px—, con las dos páginas en las mismas condiciones: sin barra de
+administración, sin scroll y tras dejar asentar el revelado.
+
+Y el contraste se mide **solo donde la letra se pinta y se ve**: se captura la
+zona con el texto y sin él, y cuentan los píxeles que cambian. La primera
+versión del método tomaba toda la caja del título, incluida la parte que la
+máquina tapa —ahí no hay texto que leer—, y daba un «peor píxel» que ningún
+velo movía. Estaba midiendo la máquina.
+
+#### El vidrio
+
+| Ancho   | Sitio de Andrés                                           | Nuestro antes | Nuestro ahora        |
+| ------- | --------------------------------------------------------- | ------------- | -------------------- |
+| 1440 px | **dentro**: 41 px del borde derecho, 110 del inferior     | se salía      | **dentro** (41 · 91) |
+| 1010 px | **se sale**: 12 px con ventana de 900 de alto, 73 con 552 | 73 px         | 73 px (fiel)         |
+
+En escritorio era un defecto nuestro y está corregido. **Por debajo de 1024 px
+su diseño también lo saca de la tarjeta**, y la cantidad depende del alto de
+ventana porque su parallax lo recoloca. La parte que queda fuera, sobre el
+fondo blanco de la página, mide **1,05 a 1**: blanco sobre blanco. En su
+página, con ventanas altas, solo sale el relleno y el texto queda sobre la
+foto; con ventanas bajas, la última línea cae en el blanco. **Decisión
+pendiente**; se deja fiel hasta entonces.
+
+#### La presencia del título — con el velo, que NO es de Andrés
+
+| Opción (1440 px, diapositiva 1)              | Contraste medio | 10 % peor | Letra que pasa 3:1 |
+| -------------------------------------------- | --------------- | --------- | ------------------ |
+| Diseño de Andrés                             | 2,40            | 1,55      | 37 %               |
+| Peso 800 y −0,02em, sin velo                 | 2,40            | 1,56      | 37 %               |
+| Velo 0,25 en el 60 % superior                | 3,58            | 2,41      | 69 %               |
+| Velo 0,40 en el 60 % superior                | 4,64            | 3,27      | 96 %               |
+| **Velo 0,50 en el 40 % superior + peso 700** | **4,91**        | **3,50**  | **97 %**           |
+
+El peso da presencia pero **no toca el contraste**. El velo sí. La combinación
+de la última fila es la que queda por defecto en el prototipo, en variables
+**propias y marcadas** (`--hero-velo-*`, `--hero-nuestro-titulo-*`): quitarla
+es borrar líneas, y las reglas vuelven solas a los valores de Andrés.
+
+**El velo cambia la foto de forma notoria**, y Andrés tiene que saberlo: al
+40 % superior el borde de arriba se oscurece; al 60 %, el cielo soleado pasa a
+verse nublado. Es una decisión de diseño, no un ajuste técnico.
+
+Resultado en las tres diapositivas y tres anchos, **letra que pasa 3:1**:
+
+| Diapositiva | 1440 px   | 1010 px       | 390 px     |
+| ----------- | --------- | ------------- | ---------- |
+| Hitachi     | 37 → 97 % | 23 → 96 %     | 15 → 100 % |
+| Caterpillar | 20 → 96 % | 25 → **39 %** | 2 → 76 %   |
+| Komatsu     | 69 → 89 % | 66 → 77 %     | 97 → 100 % |
+
+El velo **no resuelve todas las fotos**: depende de qué haya detrás del título
+en cada una. Caterpillar a 1010 px se queda en 39 %.
+
+#### Un supuesto del diseño que se rompe con más marcas
+
+«POTENCIA HITACHI» tiene 16 letras. **«POTENCIA CATERPILLAR» tiene 20 y no cabe
+a 120 px**: parte en dos líneas, la tarjeta crece y todo salta al cambiar de
+diapositiva. Solución del prototipo: el tamaño es el menor entre el del diseño
+y el que cabe en la tarjeta; un título que cabe conserva sus 120 px exactos, y
+la fila del título tiene alto fijo. Medido: la tarjeta mide lo mismo en las
+tres diapositivas (774 px en escritorio, 717 en móvil). **Es añadido nuestro.**
+
+#### El vidrio y las fotos claras
+
+Con las fotos nuevas aparece un fallo que con la de Andrés no se veía: el texto
+blanco del vidrio **solo se lee si debajo hay algo oscuro**.
+
+| Diapositiva | 1440 px — contraste medio del vidrio | Letra que pasa 4,5:1 |
+| ----------- | ------------------------------------ | -------------------- |
+| Hitachi     | 6,36 (rocas oscuras)                 | 92 %                 |
+| Caterpillar | **2,41** (grava clara)               | **0 %**              |
+| Komatsu     | 5,08                                 | 68 %                 |
+
+El diseño **presupone una foto oscura en la esquina inferior derecha**. Con
+fotos reales del catálogo eso no está garantizado.
+
+#### El carrusel
+
+- Una máquina por diapositiva, cada título con la suya. Hitachi con las
+  imágenes de Andrés; **Caterpillar y Komatsu con fotos de Wikimedia Commons en
+  CC0**, con la fuente anotada en `imagenesPrototipo.ts`. Se sustituyen antes de
+  producción.
+- **Máquinas recortadas en PNG transparente con licencia comercial: no se
+  encontraron.** Las candidatas libres eran fotos completas sin canal alfa
+  (comprobado: 0 % de píxeles transparentes). Esas dos diapositivas van solo con
+  fondo, y el hueco de la máquina conserva su tamaño para que nada salte.
+- **Carga**: solo la primera se precarga. Al cargar la página se piden dos
+  imágenes —las de Hitachi—; las de Caterpillar y Komatsu se piden al mostrarse.
+  Comprobado en la red, no leído en el código.
+- **Accesibilidad, comprobada con teclado real**: foco visible de 3 px blanco;
+  Enter y flechas izquierda/derecha cambian de diapositiva; un anuncio discreto
+  («Diapositiva 2 de 3: Potencia Caterpillar») solo tras una acción, **fuera del
+  vidrio** —en móvil el vidrio está oculto y una región viva oculta no anuncia—;
+  un solo `<h1>` visible; **sin rotación automática** (12 s quieto sin cambio).
+  Sin JavaScript se ve el título y el párrafo; con menos movimiento no hay
+  revelado.
+
+**Rendimiento**, Lighthouse móvil, build local, 3 corridas:
+
+|            | Hero de una diapositiva | Carrusel de tres |
+| ---------- | ----------------------- | ---------------- |
+| Puntuación | 87 (84–94)              | **86** (83–90)   |
+| LCP        | 3,75 s                  | **3,9 s**        |
+| Peso total | 446 kB                  | **439–447 kB**   |
+
+Dentro del ruido entre corridas, y el dato robusto es el peso: **idéntico**. Las
+diapositivas 2 y 3 no se descargan, y los pesos 700/800 de Inter **no suman
+bytes**: es una fuente variable, el mismo woff2 de 48 kB.
+
+#### Dos hallazgos laterales
+
+- **`priority` de `next/image` está obsoleto en Next 16.3.5**, sustituido por
+  `preload` (`get-img-props.d.ts`). Sigue funcionando. El prototipo ya usa
+  `preload` + `fetchPriority`; **hay 4 usos más en el sitio** (cabecera, fichas de
+  marca de maquinaria y repuestos, artículo de blog) que no se tocaron.
+- El optimizador local de imágenes se quedó **colgado** en una petición a
+  640 px tras cortar varias ejecuciones de Chrome por tiempo: todas las
+  peticiones iguales esperaban a la atascada. Reiniciar el servidor lo resolvió
+  y no se reprodujo. Anotado por si reaparece al medir.

@@ -47,8 +47,10 @@ async function cargarColecciones(): Promise<CollectionConfig[]> {
 }
 
 describe("grupos del menú del panel", () => {
-  it("encuentra las 19 colecciones", async () => {
-    assert.equal((await cargarColecciones()).length, 19);
+  // 23 desde la fase B de la home (2026-09-23): videos, sedes, testimonios y
+  // preguntas-frecuentes. Si este número cambia, revisa que la nueva tenga grupo.
+  it("encuentra las 23 colecciones", async () => {
+    assert.equal((await cargarColecciones()).length, 23);
   });
 
   it("toda colección tiene un grupo aprobado", async () => {

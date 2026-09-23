@@ -2,6 +2,9 @@ import type { CollectionConfig } from "payload";
 
 import { revalidarEquipoUsado, revalidarEquipoUsadoBorrado } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { revalidarPortada } from "./hooks/portadaHooks";
+
+const portada = revalidarPortada("equipos-usados");
 
 /**
  * Unidad del inventario de maquinaria USADA (el «marketplace»).
@@ -33,7 +36,10 @@ export const EquipoUsado: CollectionConfig = {
     update: escrituraContenido,
     delete: borradoAdmin,
   },
-  hooks: { afterChange: [revalidarEquipoUsado], afterDelete: [revalidarEquipoUsadoBorrado] },
+  hooks: {
+    afterChange: [revalidarEquipoUsado, portada.afterChange],
+    afterDelete: [revalidarEquipoUsadoBorrado, portada.afterDelete],
+  },
   fields: [
     {
       name: "nombre",
@@ -77,6 +83,36 @@ export const EquipoUsado: CollectionConfig = {
       type: "text",
       label: "Ubicación",
       admin: { description: "Ciudad donde está el equipo; condiciona el costo de traslado." },
+    },
+    /*
+     * FICHA TÉCNICA de la tarjeta de la portada (sección 3 de ux-9: «Peso
+     * operativo: 8.4 t · Potencia: 64 hp · Motor: YANMAR 4TNV98CT»). Opcional:
+     * las unidades ya cargadas no la tienen, y la tarjeta omite lo que falte.
+     */
+    {
+      type: "row",
+      fields: [
+        {
+          name: "pesoOperativo",
+          type: "number",
+          label: "Peso operativo (t)",
+          min: 0,
+          admin: { step: 0.1, width: "33%" },
+        },
+        {
+          name: "potencia",
+          type: "number",
+          label: "Potencia (hp)",
+          min: 0,
+          admin: { width: "33%" },
+        },
+        {
+          name: "motor",
+          type: "text",
+          label: "Motor",
+          admin: { width: "34%", description: "Ej. YANMAR 4TNV98CT" },
+        },
+      ],
     },
     {
       name: "descripcion",

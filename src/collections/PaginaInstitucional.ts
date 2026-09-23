@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { validarEnlace } from "../lib/fields/reglasPortada";
 import { seoField } from "../lib/fields/seoField";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
@@ -121,6 +122,86 @@ export const PaginaInstitucional: CollectionConfig = {
           name: "contenido",
           type: "richText",
           label: "Contenido de la sección",
+        },
+      ],
+    },
+    /*
+     * HERO DE LA PORTADA (ADR 0009, revisado el 2026-09-23): N diapositivas.
+     * Solo aparece en la página con slug `inicio`; en las institucionales sería
+     * un campo huérfano invitando a rellenarse.
+     *
+     * SIN `minRows`. El ADR proponía 1, pero la portada YA EXISTE sin hero: con
+     * mínimo 1, el próximo guardado de `inicio` fallaría hasta que alguien
+     * añadiera una diapositiva. Con 0 el hero simplemente no se pinta.
+     */
+    {
+      name: "hero",
+      type: "group",
+      label: "Hero de la portada",
+      admin: {
+        condition: (data) => data?.slug === "inicio",
+        description: "Carrusel del inicio. Con una sola diapositiva no se muestran las flechas.",
+      },
+      fields: [
+        {
+          name: "diapositivas",
+          type: "array",
+          label: "Diapositivas",
+          labels: { singular: "Diapositiva", plural: "Diapositivas" },
+          fields: [
+            {
+              name: "titulo",
+              type: "text",
+              required: true,
+              label: "Título",
+              admin: { description: "Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño." },
+            },
+            {
+              name: "parrafo",
+              type: "textarea",
+              label: "Párrafo",
+              admin: { description: "El texto del recuadro de vidrio. No se muestra en móvil." },
+            },
+            {
+              name: "imagenFondo",
+              type: "upload",
+              relationTo: "media",
+              required: true,
+              label: "Imagen de fondo",
+            },
+            {
+              name: "imagenFrontal",
+              type: "upload",
+              relationTo: "media",
+              label: "Máquina recortada (PNG transparente)",
+              admin: { description: "Opcional: va delante del título." },
+            },
+            {
+              type: "row",
+              fields: [
+                {
+                  name: "enlace",
+                  type: "text",
+                  label: "Enlace del «+»",
+                  validate: validarEnlace,
+                  admin: { width: "50%", description: "Ruta del sitio (/…) o https://" },
+                },
+                {
+                  name: "enlaceNombre",
+                  type: "text",
+                  label: "Nombre accesible del enlace",
+                  validate: (
+                    valor: unknown,
+                    { siblingData }: { siblingData: { enlace?: string } },
+                  ) =>
+                    siblingData?.enlace && !valor
+                      ? "El «+» no tiene texto visible: di adónde lleva (p. ej. «Ver maquinaria Hitachi»)."
+                      : true,
+                  admin: { width: "50%" },
+                },
+              ],
+            },
+          ],
         },
       ],
     },

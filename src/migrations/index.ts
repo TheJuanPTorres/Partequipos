@@ -6,6 +6,7 @@ import * as migration_20260812_225927_lubricantes from './20260812_225927_lubric
 import * as migration_20260813_030629_blog from './20260813_030629_blog';
 import * as migration_20260813_205131_estado_destino_redirects from './20260813_205131_estado_destino_redirects';
 import * as migration_20260815_043632_roles_usuarios from './20260815_043632_roles_usuarios';
+import * as migration_20260923_210806_fase_b_portada from './20260923_210806_fase_b_portada';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20260815_043632_roles_usuarios.up,
     down: migration_20260815_043632_roles_usuarios.down,
-    name: '20260815_043632_roles_usuarios'
+    name: '20260815_043632_roles_usuarios',
+  },
+  {
+    up: migration_20260923_210806_fase_b_portada.up,
+    down: migration_20260923_210806_fase_b_portada.down,
+    name: '20260923_210806_fase_b_portada'
   },
 ];

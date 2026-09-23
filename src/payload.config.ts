@@ -29,11 +29,15 @@ import { MarcaMaquinaria } from "./collections/MarcaMaquinaria";
 import { Media } from "./collections/Media";
 import { ModeloRepuesto } from "./collections/ModeloRepuesto";
 import { PaginaInstitucional } from "./collections/PaginaInstitucional";
+import { PreguntaFrecuente } from "./collections/PreguntaFrecuente";
 import { Redirects } from "./collections/Redirects";
+import { Sede } from "./collections/Sede";
 import { Solicitud } from "./collections/Solicitud";
+import { Testimonio } from "./collections/Testimonio";
 import { TipoEquipo } from "./collections/TipoEquipo";
 import { TipoMaquinaria } from "./collections/TipoMaquinaria";
 import { Users } from "./collections/Users";
+import { Video } from "./collections/Video";
 import { seoConfig } from "./lib/seo/config";
 
 const filename = fileURLToPath(import.meta.url);
@@ -137,6 +141,11 @@ export default buildConfig({
     Articulo,
     CategoriaBlog,
     Media,
+    // Portada (home de ux-9, fase B). Sin URL propia: se muestran en el inicio.
+    Video,
+    Sede,
+    Testimonio,
+    PreguntaFrecuente,
     // Configuracion.
     Users,
     Redirects,
@@ -206,6 +215,10 @@ export default buildConfig({
         // y servirlas desde el CDN evita dos saltos de serverless por foto,
         // lo que pesa en Core Web Vitals y por tanto en SEO. Ver ADR 0003.
         [Media.slug]: { disablePayloadAccessControl: true },
+        // Igual para los vídeos, y aquí es OBLIGATORIO: servidos por
+        // /api/videos/file/… pasarían por una función, que corta la RESPUESTA en
+        // 4,5 MB igual que la petición (docs de Vercel, «Request body size»).
+        [Video.slug]: { disablePayloadAccessControl: true },
       },
       token: process.env.BLOB_READ_WRITE_TOKEN || "",
     }),

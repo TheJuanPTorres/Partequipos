@@ -4,6 +4,9 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarMarcaMaquinaria, revalidarMarcaMaquinariaBorrada } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { revalidarPortada } from "./hooks/portadaHooks";
+
+const portada = revalidarPortada("marcas-maquinaria");
 
 /**
  * Marcas de la línea de maquinaria NUEVA (Case Construction, Dynapac, Hitachi,
@@ -31,8 +34,8 @@ export const MarcaMaquinaria: CollectionConfig = {
     delete: borradoAdmin,
   },
   hooks: {
-    afterChange: [revalidarMarcaMaquinaria],
-    afterDelete: [revalidarMarcaMaquinariaBorrada],
+    afterChange: [revalidarMarcaMaquinaria, portada.afterChange],
+    afterDelete: [revalidarMarcaMaquinariaBorrada, portada.afterDelete],
   },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
@@ -40,6 +43,14 @@ export const MarcaMaquinaria: CollectionConfig = {
     slugField({ unique: true }),
     { name: "descripcion", type: "textarea", label: "Descripción" },
     { name: "logo", type: "upload", relationTo: "media", label: "Logo" },
+    // Fase B de la home: fondo de la tarjeta de marca (sección 2). Opcional.
+    {
+      name: "imagenTarjeta",
+      type: "upload",
+      relationTo: "media",
+      label: "Foto de la tarjeta en la portada",
+      admin: { description: "Fondo de la tarjeta de esta marca en el inicio." },
+    },
     seoField(),
   ],
 };

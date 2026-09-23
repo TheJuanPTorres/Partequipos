@@ -2031,6 +2031,50 @@ y `updateByID`, y que la url se lea de `data.url`. Si cambia cualquiera de las
 dos, el gancho **deja de cerrar la vía sin dar ningún error**. Anotado en la
 tabla de defectos de Payload de `docs/design-tokens.md`.
 
+**VERIFICADO POR EFECTO en el preview (2026-09-23):**
+
+| Prueba                                                         | Sin el cierre (preview anterior)                                                                      | Con el cierre                                            |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `POST /api/media` sin fichero, `url` externa                   | El servidor **descargó** `example.com` (error «File type text/plain… is not allowed»): la vía existía | **400** con nuestro mensaje, 235 ms, sin descargar       |
+| `POST /api/videos`, igual                                      | —                                                                                                     | **400**, sin registro                                    |
+| `PATCH` de una imagen existente con `url` externa              | —                                                                                                     | **400**; el registro no cambia (url, punto focal, fecha) |
+| Recortar desde el panel una imagen propia                      | Registro 600×400                                                                                      | **Igual**: el cierre no lo impide                        |
+| Cambiar el punto focal (API; el panel no lo ofrece en `media`) | —                                                                                                     | 50/50 → 30/70, 200, misma url                            |
+
+**¿El servidor se quedaba esperando la descarga? NO.** La hipótesis del
+cuelgue de la pestaña era falsa: sin el cierre, la descarga de `example.com`
+respondió en **421 ms**. El cuelgue fue del navegador, no del lambda.
+
+**¿Qué acota esa vía, el tiempo o la memoria? La memoria es el problema
+real.** `getExternalFile` usa `safeFetch` **sin límite de tiempo propio**; lo
+acota la duración máxima de la función de Vercel, **300 s** en Hobby (por
+defecto y máximo, según su documentación), así que una respuesta lenta como
+mucho retiene una instancia cinco minutos. En cambio el cuerpo se lee **entero
+en memoria** (`arrayBuffer()`), con el techo de memoria de la función (**2 GB**
+en Hobby): un fichero grande tumba la instancia. Es lo que ahora cierra el
+gancho, y la razón para no reabrir la vía con una `allowList` sin tope.
+
+#### DEFECTO PREVIO DE PAYLOAD, encontrado al verificar: el recorte no llega al Blob
+
+> **El recorte del panel actualiza el REGISTRO pero no el FICHERO.** Recortada
+> una imagen de 1200×800 a 600×400: el registro dice 600×400 y 6.960 bytes; el
+> fichero en Vercel Blob **se sobrescribe en ese momento** (`Last-Modified`
+> coincide) **con el original**, 1200×800 y 29.193 bytes. Comprobado con y sin
+> nuestro gancho, en dos imágenes: **idéntico**, así que no es el cierre —el
+> gancho solo deja pasar o rechaza—, es Payload 3.89 o su plugin de
+> almacenamiento en la nube.
+>
+> **Por qué importa más que «el recorte no funciona»:** el registro queda
+> **mintiendo** sobre el fichero. `next/image` usa el ancho y el alto del
+> registro, así que una imagen recortada se pintaría con la **proporción
+> equivocada** —deformada o con el CLS que ahora es 0—. Y el editor ve la
+> miniatura recortada en el panel, así que cree que funcionó.
+>
+> **No está corregido.** Mientras tanto, **no recortar en el panel**: recortar
+> antes de subir. Hoy en producción no hay ningún registro afectado que
+> sepamos, pero no se ha auditado. Anotado en la tabla de defectos de Payload
+> de `docs/design-tokens.md`.
+
 **Efecto secundario en el preview, esperado:** los registros de `media` del
 preview vienen clonados de producción y apuntan al almacén de **producción**;
 recortarlos allí se rechaza, porque su host no es el del preview. En

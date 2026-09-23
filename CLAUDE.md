@@ -838,6 +838,25 @@ hero-fondo.jpg&w=750&q=75` devolvió **`image/webp` de 37 kB** desde un JPEG de
 > la verificación de roles; cualquier prueba futura de permisos debe hacer lo
 > mismo.
 >
+> **Aplicada en la fase B de la home (2026-09-23)** — `npm run qa:acceso-portada`,
+> 15 comprobaciones contra `development`, y **encontró dos fallos que el código
+> no enseñaba**, los dos por el ORDEN de los ganchos de Payload 3:
+>
+> 1. Un gancho `beforeChange` de colección corre **antes** de validar los
+>    campos. El que forzaba «testimonio sin autorización → no publicado» dejaba
+>    a la validación sin nada que rechazar: el editor «publicaba», no veía
+>    error, y el testimonio quedaba sin publicar **sin que lo supiera**. El
+>    rechazo tiene que ir en `beforeValidate`.
+> 2. En una actualización, `beforeValidate` recibe `data` **ya mezclado con lo
+>    guardado**: retirar la autorización de uno publicado llegaba con
+>    `publicado: true` y se rechazaba en vez de despublicar. Se rechaza solo el
+>    **paso** a publicado.
+>
+> **La regla que sale de aquí:** en Payload, la lógica de un gancho se prueba
+> **ejecutando la operación** y leyendo la base, no leyendo el gancho. Ninguno
+> de los dos fallos se veía en el código, y los dos pasaban las pruebas
+> unitarias de la función pura que el gancho usa.
+>
 > Es la misma familia de error que §10.14: **medir la señal fácil en vez de la
 > que importa**. Allí era el HTML de origen en lugar de la página pintada; aquí,
 > el código de respuesta en lugar del efecto.
@@ -2145,14 +2164,17 @@ fichero, cero dependencias, cero imports, solo marcado.
 > olvidar, el sitio correcto para el guardarraíl es esta tabla**, no un párrafo
 > de documentación que nadie relee.
 
-| Guardarraíl                            | Qué olvido atrapa                                                                                       | Dónde                                                      | Cuándo corre     |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------- |
-| Cobertura del sitemap                  | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe            | `src/lib/seo/sitemap.test.ts`                              | CI, en cada push |
-| Grupos del menú del panel              | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada | `src/collections/grupos.test.ts`                           | CI, en cada push |
-| Unicidad de slug entre colecciones     | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)         | hook `slugUnicoEntreColecciones` + su prueba               | CI y escritura   |
-| Destino de un redirect                 | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                  | `src/lib/redirects/destino.ts` + `npm run redirects:check` | CI y a mano      |
-| Marcador `dev` en `payload_migrations` | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                        | `npm run db:check`, antes de `payload migrate`             | En cada build    |
-| Versión exacta de Next y Payload       | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel             | `src/lib/deps/versiones-fijas.test.ts`                     | CI, en cada push |
+| Guardarraíl                              | Qué olvido atrapa                                                                                       | Dónde                                                      | Cuándo corre                   |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------ |
+| Cobertura del sitemap                    | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe            | `src/lib/seo/sitemap.test.ts`                              | CI, en cada push               |
+| Grupos del menú del panel                | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada | `src/collections/grupos.test.ts`                           | CI, en cada push               |
+| Unicidad de slug entre colecciones       | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)         | hook `slugUnicoEntreColecciones` + su prueba               | CI y escritura                 |
+| Destino de un redirect                   | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                  | `src/lib/redirects/destino.ts` + `npm run redirects:check` | CI y a mano                    |
+| Marcador `dev` en `payload_migrations`   | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                        | `npm run db:check`, antes de `payload migrate`             | En cada build                  |
+| Versión exacta de Next y Payload         | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel             | `src/lib/deps/versiones-fijas.test.ts`                     | CI, en cada push               |
+| Vaciado de `solicitudes` solo en preview | Ejecutar el vaciado con la variable apuntando a producción y borrar leads reales                        | `src/lib/db/vaciadoSolicitudes.ts` + su prueba             | Al vaciar (§10.21)             |
+| Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                 | `npm run qa:acceso-portada`                                | **A mano**, contra development |
+| Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB              | `formatoDeVideoPermitido` + su prueba                      | CI y subida                    |
 
 **Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
 lista real, y una prueba que exige que coincidan.
@@ -2567,3 +2589,13 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
 
     Hace falta un **icono cuadrado** (ideal: SVG, o PNG de 512 × 512 con
     márgenes) del cliente o del diseñador. No se fabrica recortando el logo.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

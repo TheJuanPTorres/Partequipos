@@ -392,3 +392,48 @@ hidratar y se revela. Solo afecta al hero; se decide en la fase C.
   Segunda pasada sobre `partequipos-hemmu9t58`: **las 8 en 200** con el mismo
   criterio. **Las 21 plantillas quedan verificadas en el preview**, no solo en
   local. Procedimiento para las próximas fases: CLAUDE.md §10.21.
+
+---
+
+## 9. Vídeo: cómo se sube (fase B, 2026-09-23)
+
+**El límite:** las funciones de Vercel cortan el **cuerpo de la petición en
+4,5 MB** y devuelven 413 `FUNCTION_PAYLOAD_TOO_LARGE`, en todos los planes
+([documentación de Vercel](https://vercel.com/docs/functions/limitations),
+«Request body size»). **Y la respuesta, igual**: un vídeo servido por
+`/api/videos/file/…` pasaría por una función. El MP4 de ux-9 pesa 6,5 MB, así
+que por la subida normal **no entra**.
+
+**La subida directa del navegador a Blob existe** (`clientUploads` de
+`@payloadcms/storage-vercel-blob` 3.89.0) y **no se ha activado**, por tres
+cosas leídas en su código:
+
+1. **Es de todo el plugin, no de una colección**: activarla la aplicaría
+   también a `Media`, la colección restringida por el CVE (§10.28).
+2. **El token de subida no limita nada**: la ruta que lo emite devuelve
+   `addRandomSuffix`, `allowOverwrite: true` y la caché, **sin tipos de
+   contenido ni tamaño máximo**. Cualquier usuario del panel podría subir
+   cualquier fichero, de cualquier tamaño, y **sobrescribir** uno existente
+   —incluido el logo, que no está en `Media` (§10.8)—.
+3. **El fichero se publica ANTES de validarse**: Payload lo descarga de Blob
+   para comprobar el tipo, pero para entonces ya tiene URL pública.
+
+**Lo que se hizo:** colección `videos` con subida NORMAL y **tope de 4 MB**,
+por debajo del límite. Encaja con el pendiente que ya existía —el MP4 hay que
+reexportarlo a H.264 de 8 bits antes de la fase F— y con el rendimiento: 19 s
+de fondo en bucle no necesitan 6,5 MB. Servido directo desde Blob
+(`disablePayloadAccessControl`), así la respuesta no pasa por una función.
+
+**Si el vídeo reexportado no cabe en 4 MB**, la salida no es `clientUploads`
+tal cual: sería una ruta propia con `handleUpload` de `@vercel/blob/client`
+que fije `allowedContentTypes`, `maximumSizeInBytes` y un prefijo de ruta, y
+`allowOverwrite: false`. Es trabajo aparte y se decide entonces.
+
+**Formato por contenido**, como en `Media`: `formatoDeVideoPermitido` acepta MP4
+por **lista de marcas** de la caja `ftyp` —AVIF y HEIC empiezan igual, y un
+AVIF es el formato del CVE— y WebM por su cabecera EBML.
+
+**No probado de punta a punta:** la subida real de un vídeo. En local no se
+puede: el Blob de `development` **es el de producción** (almacén
+`sr2s4ngkjzfzpxhi`, §10.4), y una subida de prueba escribiría en el real. Se
+prueba en el preview, que tiene almacén propio.

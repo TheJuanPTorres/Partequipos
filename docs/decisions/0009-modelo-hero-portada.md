@@ -39,9 +39,19 @@ array `diapositivas`.**
 | `imagenFrontal`           | relación a `Media`, **opcional** | La máquina recortada. El hueco mide lo mismo con o sin ella |
 | `enlace`                  | destino y nombre accesible       | El «+» del vidrio                                           |
 
-**`minRows: 1`.** Sin `maxRows` fijado en el esquema; si el rendimiento lo pide
-(cada diapositiva añade su foto al HTML inicial, aunque solo la primera se
-precarga), se fija entonces con la medida delante.
+**Sin `minRows`** (esta ADR proponía 1; cambiado al implementarlo, fase B,
+2026-09-23). La portada **ya existe sin hero**: con mínimo 1, el siguiente
+guardado de `inicio` fallaría hasta que alguien añadiera una diapositiva. Con 0
+el hero no se pinta. Verificado: `inicio` y `nosotros` se guardan igual que
+antes y el hero queda como lista vacía.
+
+Los campos del enlace quedaron como `enlace` (ruta del sitio o `https://`,
+validado: rechaza `//otro.com` y `javascript:`) y `enlaceNombre`, obligatorio
+si hay enlace, porque el «+» no tiene texto visible.
+
+Sin `maxRows` fijado en el esquema; si el rendimiento lo pide (cada diapositiva
+añade su foto al HTML inicial, aunque solo la primera se precarga), se fija
+entonces con la medida delante.
 
 La condición por slug es necesaria porque `Paginas` sirve además a las **9
 páginas institucionales** (ruta comodín): sin condición, el grupo aparecería en

@@ -1340,10 +1340,10 @@ Secrets (decisión de dirección).
 3. **Las cuatro diferencias con el sistema** (§11.2): fuente, rojo, radio y
    vidrio.
 4. **Añadidas en la segunda ronda (§11.7):** si se acepta el **velo** sobre la
-   foto —cambia la imagen de forma notoria—; qué hacer con el **vidrio que se sale
-   de la tarjeta** por debajo de 1024 px, que en su diseño también ocurre; y que
-   el vidrio **solo es legible sobre una zona oscura** de la foto, cosa que las
-   fotos reales del catálogo no garantizan.
+   foto —cambia la imagen de forma notoria—, y que el vidrio **solo es legible
+   sobre una zona oscura** de la foto, cosa que las fotos reales del catálogo no
+   garantizan (opción documentada en §11.8). El **vidrio que se salía** de la
+   tarjeta en tablet **ya NO está pendiente**: lo decidió dirección (§11.8).
 
 ### 11.6 Modelo de datos aprobado (2026-09-22)
 
@@ -1483,3 +1483,66 @@ bytes**: es una fuente variable, el mismo woff2 de 48 kB.
   640 px tras cortar varias ejecuciones de Chrome por tiempo: todas las
   peticiones iguales esperaban a la atascada. Reiniciar el servidor lo resolvió
   y no se reprodujo. Anotado por si reaparece al medir.
+
+### 11.8 Decisiones de la segunda ronda (2026-09-23)
+
+Rama `proto/hero-andres`, commit `d52a545`.
+
+#### El vidrio va dentro de la tarjeta también en tablet — DESVIACIÓN NUESTRA
+
+**Decidido por dirección**, con el mismo criterio que en el panel:
+**legibilidad antes que fidelidad**. Por debajo de 1024 px su diseño saca el
+vidrio de la tarjeta, entre 12 y 73 px según el alto de ventana, y la parte de
+fuera cae sobre el blanco de la página: **1,05 a 1**, texto blanco sobre blanco.
+Que esté en el diseño original no lo convierte en opción.
+
+Su valor era `right: -20px; bottom: -113px` respecto a su columna (−73 px medidos
+respecto a la tarjeta). El nuestro: **20 px del borde derecho y 30 del
+inferior**, dentro. Medido a 1010 px con ventanas de 900 y de 552 de alto, sin
+pisar la máquina ni las flechas:
+
+| Diapositiva | Contraste medio del texto del vidrio | Letra que pasa 4,5:1 |
+| ----------- | ------------------------------------ | -------------------- |
+| Hitachi     | **7,71** (antes, parte fuera: 1,05)  | **100 %**            |
+| Komatsu     | 7,05 – 8,27                          | 100 %                |
+| Caterpillar | 2,63 – 3,20                          | 0 – 11 %             |
+
+Caterpillar sigue fallando **dentro**: ya no es la posición, es la foto clara
+(abajo).
+
+#### El velo: puesto, pero PENDIENTE DE APROBACIÓN DE ANDRÉS
+
+Se queda en el prototipo como se propuso (0,5 en el 40 % superior), marcado en
+el CSS como pendiente. **Cambia la foto de forma visible y no lo decidimos
+nosotros.** Rechazarlo es poner la opacidad a 0.
+
+#### El vidrio sobre fotos claras — va a Andrés, con una opción documentada
+
+**NO se aplica.** Queda como dato para que decida.
+
+El vidrio del sistema del cliente **no depende de la foto**, y la razón está en
+su CSS publicado (`ui.partequipos.com`, regla `.glass-surface`, leída el
+2026-09-23):
+
+|              | Vidrio de Andrés   | Vidrio del sistema (`.glass-surface`)                                                                                              |
+| ------------ | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Fondo        | blanco al **12 %** | `color-mix(in oklch, var(--popover) var(--glass-tint), transparent)` → `#fcfcfc` al **82 %** en claro, `#242424` al 58 % en oscuro |
+| Desenfoque   | 18 px              | **28 px y saturación al 200 %**                                                                                                    |
+| Texto encima | **blanco**         | **negro** (`--popover-foreground: #000`) en claro                                                                                  |
+
+**El matiz que decide:** adoptarlo no es subir la opacidad y ya. Es una
+superficie **clara con texto oscuro**. Con texto blanco encima fallaría siempre.
+
+Cota **calculada** —mezcla en sRGB como aproximación de la mezcla en oklch; no
+medida en página pintada—, del peor al mejor fondo posible:
+
+| Lo que hay detrás         | Superficie resultante | Texto negro | Texto blanco |
+| ------------------------- | --------------------- | ----------- | ------------ |
+| Foto blanca               | `#fdfdfd`             | 20,6        | 1,02         |
+| Grava clara (Caterpillar) | `#f1f0ee`             | 18,4        | 1,14         |
+| Roca oscura               | `#d6d5d5`             | 14,3        | 1,46         |
+| Negro puro                | `#cfcfcf`             | **13,5**    | 1,56         |
+
+Con texto negro pasa de **13,5 a 20,6 : 1 sea cual sea la foto**. Es la opción
+robusta; el coste es que el vidrio deja de ser «transparente» y pasa a ser una
+tarjeta clara.

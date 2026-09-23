@@ -289,11 +289,12 @@ secciones se construyen con los textos de ux-9 sembrados en `development`.
 
 ### Pendientes anotados antes de sus fases
 
-| Pendiente                                                                                                                                                                                          | Antes de   |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| **Reexportar el MP4 de la sección 7 a H.264 de 8 bits.** Hoy es High 10 (10 bits): puede que Safari de iPhone no lo reproduzca y el visitante vea solo el póster (§4)                              | **Fase F** |
-| **Versión más ligera del recorte de 1.570 kB de la sección 3** (`excavadora-amarilla-aislada-…-e1788914890653.png`), que pesa entre 2,4 y 4 veces lo que sus vecinos de pestaña (§1)               | **Fase D** |
-| **El revelado del prototipo del hero usa `translateY` en px (50 px)**; el widget de Andrés usa `yPercent` (50 % del alto de la palabra). Se corrige al pasarlo a `Revelado` con el ritmo `portada` | **Fase C** |
+| Pendiente                                                                                                                                                                                                                                                                                                            | Antes de   |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **Reexportar el MP4 de la sección 7 a H.264 de 8 bits.** Hoy es High 10 (10 bits): puede que Safari de iPhone no lo reproduzca y el visitante vea solo el póster (§4)                                                                                                                                                | **Fase F** |
+| **Versión más ligera del recorte de 1.570 kB de la sección 3** (`excavadora-amarilla-aislada-…-e1788914890653.png`), que pesa entre 2,4 y 4 veces lo que sus vecinos de pestaña (§1)                                                                                                                                 | **Fase D** |
+| **El revelado del prototipo del hero usa `translateY` en px (50 px)**; el widget de Andrés usa `yPercent` (50 % del alto de la palabra). Se corrige al pasarlo a `Revelado` con el ritmo `portada`                                                                                                                   | **Fase C** |
+| **El parpadeo del hero:** un bloque ya visible al cargar se pinta, se oculta al hidratar y se revela (limitación de `Revelado`, §8). Resolverlo **sin retrasar el LCP**, que en la home es el título o la foto del hero, y **medir antes y después** (Lighthouse local, mediana de 3, y el LCP en la página pintada) | **Fase C** |
 
 ---
 

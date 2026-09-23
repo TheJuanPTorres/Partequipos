@@ -25,16 +25,23 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 
 ## 2. Stack (no cambiar sin aprobación)
 
-| Capa          | Tecnología                                                              |
-| ------------- | ----------------------------------------------------------------------- |
-| Framework     | Next.js 16 · App Router · React 19                                      |
-| Lenguaje      | TypeScript (modo estricto)                                              |
-| CMS           | Payload 3 (integrado en el mismo proyecto, no como servicio aparte)     |
-| Base de datos | PostgreSQL (Neon)                                                       |
-| Estilos       | Tailwind CSS v4 (ver la corrección de abajo)                            |
-| Hosting       | Vercel                                                                  |
-| Archivos      | Vercel Blob (o Cloudflare R2)                                           |
-| Errores       | **`console.error` a los registros de Vercel** — Sentry NO está (§10.31) |
+| Capa          | Tecnología                                                                         |
+| ------------- | ---------------------------------------------------------------------------------- |
+| Framework     | Next.js **16.3.5** · App Router · React **19.2.4**                                 |
+| Lenguaje      | TypeScript 5.9 (modo estricto)                                                     |
+| CMS           | Payload **3.89.0** (integrado en el mismo proyecto, no como servicio aparte)       |
+| Base de datos | PostgreSQL (Neon), por el host _pooled_                                            |
+| Estilos       | Tailwind CSS **v4.3.3** (ver la corrección de abajo)                               |
+| Fuente        | **Inter** variable con `next/font` (desde 2026-09-23; **antes Arial**, ver abajo)  |
+| Hosting       | Vercel                                                                             |
+| Archivos      | **Vercel Blob**. Cloudflare R2 **no se usa**: era alternativa, no está configurado |
+| Errores       | **`console.error` a los registros de Vercel** — Sentry NO está (§10.31)            |
+
+> **REVISIÓN COMPLETA DE ESTA TABLA — 2026-09-23.** Tercera afirmación falsa
+> sobre el stack en dos semanas (shadcn/ui, Sentry y la fuente), así que se
+> revisó **cada fila** en tres niveles: **instalada** (`package.json` y
+> `node_modules`), **usada** (el código) y **vista en producción** (la página
+> o el registro de build). Detalle en «Revisión fila a fila», abajo.
 
 > **CORREGIDO 2026-09-17 — NO usamos shadcn/ui ni Radix.** Esta tabla decía
 > «Tailwind CSS + shadcn/ui» desde el Sprint 0. Era **intención, nunca
@@ -44,15 +51,15 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 >
 > **Lo que hay de verdad, medido en el repo:**
 >
-> | Afirmación                      | Realidad                                                               |
-> | ------------------------------- | ---------------------------------------------------------------------- |
-> | `shadcn/ui`                     | **No instalado.** `src/components/ui/` contiene solo un `.gitkeep`     |
-> | Radix (`@radix-ui/*`)           | **Ninguna dependencia**                                                |
-> | `cva`, `clsx`, `tailwind-merge` | **Ninguna**                                                            |
-> | Tailwind                        | **v4.3.3**, con `@tailwindcss/postcss`; sin fichero de configuración   |
-> | Estilos del sitio público       | Utilidades de Tailwind **con colores fijos** (188 en 31 ficheros)      |
-> | Estilos del panel               | SCSS propio sin capa: `src/app/(payload)/custom.scss`                  |
-> | Iconos                          | `@tabler/icons-react` (aprobado 2026-09-17), solo en el menú del panel |
+> | Afirmación                      | Realidad                                                                                                                       |
+> | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+> | `shadcn/ui`                     | **No instalado.** `src/components/ui/` tiene los 2 componentes copiados del CLI del cliente (§10.27), no shadcn                |
+> | Radix (`@radix-ui/*`)           | **Ninguna dependencia**                                                                                                        |
+> | `cva`, `clsx`, `tailwind-merge` | **Ninguna**                                                                                                                    |
+> | Tailwind                        | **v4.3.3**, con `@tailwindcss/postcss`; sin fichero de configuración                                                           |
+> | Estilos del sitio público       | Utilidades de Tailwind **con colores fijos** (186 en 31 ficheros, recontado 2026-09-23) y, desde la fase A, los tokens de ux-9 |
+> | Estilos del panel               | SCSS propio sin capa: `src/app/(payload)/custom.scss`                                                                          |
+> | Iconos                          | `@tabler/icons-react` (aprobado 2026-09-17), solo en el menú del panel                                                         |
 >
 > **Consecuencia práctica:** adoptar componentes del sistema del cliente **no**
 > duplicaría un primitivo, porque no hay ninguno. Ver `docs/design-tokens.md`.
@@ -66,6 +73,57 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 >
 > **Lo grave no es la tabla, es que el compromiso con el cliente sí existe** —
 > cotización y Gestión de Incidencias— **y hoy no se cumple. Ver §10.31.**
+
+#### Revisión fila a fila (2026-09-23)
+
+| Fila         | Instalada                                | Usada                                                   | Vista en producción                                              |
+| ------------ | ---------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------- |
+| Next · React | 16.3.5 · 19.2.4, **exactas**             | App Router en `src/app`                                 | 198 URLs servidas, `qa` sin errores                              |
+| TypeScript   | 5.9.3 (`^5`)                             | `strict: true` en `tsconfig.json`                       | —                                                                |
+| Payload      | 3.89.0 en los 6 paquetes, **exactas**    | `src/app/(payload)`, API local en `src/lib/queries`     | `/admin/` y `/api/marcas/` en 200 (prueba de humo)               |
+| Neon         | `@payloadcms/db-postgres` 3.89.0         | `DATABASE_URI`                                          | Registro de build: `ep-tiny-fog-awnwc8ie-**pooler**…neon.tech`   |
+| Tailwind v4  | 4.3.3 + `@tailwindcss/postcss`           | Sin fichero de configuración; `@theme` en `globals.css` | Utilidades aplicadas en las 21 plantillas pintadas               |
+| Fuente       | Inter vía `next/font/google`             | `layout.tsx` y `body` en `globals.css`                  | **Inter** en 63 de 63 medidas (21 plantillas × 3 anchos)         |
+| Vercel Blob  | `@payloadcms/storage-vercel-blob` 3.89.0 | Adaptador de `Media`                                    | Imágenes desde `sr2s4ngkjzfzpxhi.public.blob.vercel-storage.com` |
+| Errores      | Ningún `@sentry/*`                       | 101 `console.error`/`warn`; 0 `console.log`             | —                                                                |
+
+**Lo que NO cuadraba, y se corrigió aquí:**
+
+1. **La fuente.** El sitio **nunca se pintó en Geist**: `globals.css` fijaba
+   `body { font-family: Arial }` desde el andamiaje, que pisaba la variable de
+   Geist. Medido: 21 plantillas en **Arial**, y cada página precargando **52 kB
+   de Geist** sin usarlo. **Esta tabla no lo afirmaba** —no tenía fila de
+   fuente—; lo afirmaba `docs/design-tokens.md` (§10 y §11.2), ya corregido.
+   Desde la fase A de la home (2026-09-23), **Inter**.
+2. **`src/components/ui/`** ya no tenía «solo un `.gitkeep`»: tiene
+   `partequipos-logo` y `partequipos-wordmark` del CLI del cliente (§10.27).
+3. **Cloudflare R2** figuraba como opción de archivos. **No hay nada de R2**:
+   ni dependencia ni configuración. Sigue siendo la recomendación para
+   **respaldos** (§10.3 p.9), que es otra cosa.
+4. **Faltaban versiones.** Una fila sin versión permite que la tabla siga
+   «verdadera» mientras la versión real deriva (§10.28).
+
+**Lo que NO cuadra y sigue abierto (no se ha tocado):**
+
+- **`sass` no está declarado y el panel lo necesita.** `custom.scss` (46 kB)
+  compila porque `sass` 1.77.4 llega **de rebote** con `@payloadcms/next`. Si
+  Payload deja de depender de él, el panel se rompe sin que cambie nada nuestro.
+  Declararlo es añadir una dependencia: **§2 exige aprobación**.
+- **Scripts de instalación que npm no cubre en Vercel.** El registro de build
+  del 2026-09-23 dice: _«4 packages have install scripts not yet covered by
+  allowScripts»_ (`esbuild` en tres versiones y `unrs-resolver`). El build pasó
+  y producción responde, pero es un cambio del **entorno de build** —la familia
+  de §10.18— y **no se ha diagnosticado** si esos scripts se ejecutan o no.
+- **Stack que se usa y la tabla no nombra:** `zod` (validación de formularios,
+  §5), `sharp` (imágenes de Payload, §10.19), `@payloadcms/richtext-lexical`
+  (editor), `@payloadcms/email-resend` (correo, **sin clave en producción**,
+  §10.11) y Cloudflare **Turnstile** (script, sin dependencia; **sin claves en
+  producción**, §10.11). No son capas nuevas, pero una tabla de stack que no
+  los nombra no sirve para saber qué se puede romper.
+- **Menor, fuera de §2:** el logo de la cabecera se pinta a unos 183 px y
+  descarga la versión de **1920 px** (11,7 kB en vez de 2,9 kB), porque
+  `width={1614}` genera el `srcset` desde el tamaño original. Se resuelve con
+  la cabecera (fase C de la home, §10.8).
 
 **Prohibido sin aprobación previa:** agregar dependencias pesadas, cambiar de ORM,
 introducir otro gestor de estado, o mover contenido fuera de Payload.
@@ -120,7 +178,7 @@ src/
     api/
   collections/         # colecciones de Payload
   components/
-    ui/                # shadcn
+    ui/                # componentes copiados del CLI del cliente (§10.27)
     layout/
     catalog/
   lib/

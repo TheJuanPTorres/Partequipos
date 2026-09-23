@@ -1196,8 +1196,19 @@ bloque de tokens de §2 y §3 en ese fichero**, sin tocar un solo componente.
 
 **Pero no cambiaría casi nada**, porque las plantillas llevan colores fijos de
 Tailwind (desglose en el recuadro inicial). Y la tipografía tiene el mismo
-desajuste: el sitio declara hoy `--font-sans: var(--font-geist-sans)` —
-**Geist, no Rubik**.
+desajuste: el sitio declaraba `--font-sans: var(--font-geist-sans)` —Geist,
+no Rubik—.
+
+> **CORREGIDO 2026-09-23 — el sitio NO se pintaba en Geist, sino en Arial.**
+> Este párrafo leyó la **declaración** (`--font-sans`) y la dio por la fuente
+> pintada. Pero `globals.css` fijaba además `body { font-family: Arial,
+Helvetica, sans-serif }`, que pisa a `--font-sans` porque ninguna plantilla
+> usa la utilidad `font-sans`. Medido en la página pintada (fase A de la home,
+> `docs/diseno/decisiones-home-ux9.md` §8): **las 21 plantillas en Arial**, y a
+> la vez **52 kB de Geist precargados** en cada página sin usarse. Desde la
+> fase A el sitio se pinta en **Inter**, la del diseño aprobado.
+>
+> Es el patrón de CLAUDE.md §10.14: se leyó el código en vez de la página.
 
 **En una frase para el diseñador:** el color, la tipografía y el radio **ya
 existen y están medidos**; lo que falta es decidir la retícula, la escala y los
@@ -1254,12 +1265,12 @@ comportamiento. Y **la página no tiene ningún `<h1>`**: el título es un `<h2>
 Es decisión de Andrés y del cliente; el prototipo mantiene los valores de él,
 aislados en variables (`src/components/hero/hero.module.css`).
 
-|                 | Andrés             | Sistema del cliente                    | Sitio hoy |
-| --------------- | ------------------ | -------------------------------------- | --------- |
-| Fuente          | **Inter** 300/600  | **Rubik**                              | **Geist** |
-| Rojo            | **#E5242D**        | `--primary` **#dc2626**                | —         |
-| Radio           | **30 px**          | tope `--radius-4xl` **18,7 px**        | —         |
-| Escala de texto | 120/70/12vw, 1,4em | **no define escala** (usa Tailwind v4) | Tailwind  |
+|                 | Andrés             | Sistema del cliente                    | Sitio hoy                                                          |
+| --------------- | ------------------ | -------------------------------------- | ------------------------------------------------------------------ |
+| Fuente          | **Inter** 300/600  | **Rubik**                              | **Arial** (no Geist: ver §10 corregido); **Inter** desde la fase A |
+| Rojo            | **#E5242D**        | `--primary` **#dc2626**                | —                                                                  |
+| Radio           | **30 px**          | tope `--radius-4xl` **18,7 px**        | —                                                                  |
+| Escala de texto | 120/70/12vw, 1,4em | **no define escala** (usa Tailwind v4) | Tailwind                                                           |
 
 Y sumando el CLI, el rojo tiene **tres** versiones vivas: `partequipos-wordmark`
 usa **#D92035**.

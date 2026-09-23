@@ -10,9 +10,9 @@
  * Al lado de cada variable va su equivalente del sistema (docs/design-tokens.md)
  * cuando existe. NO se resuelven las diferencias aquí: es decisión de dirección.
  *
- * Y un segundo bloque, separado y marcado, con lo que AÑADIMOS nosotros y no
- * está en su diseño (el velo del título). Andrés tiene que poder ver de un
- * vistazo qué es suyo y qué no.
+ * Lo que se aparta de su diseño son SOLO correcciones de accesibilidad
+ * acordadas, cada una marcada «DESVIACIÓN» en su regla y documentada en
+ * docs/diseno/decisiones-home-ux9.md. Nada estético añadido.
  * ======================================================================
  *
  * La geometría no se copió de la captura: se midió elemento a elemento contra
@@ -82,29 +82,13 @@
   --hero-parallax-titulo: -60px;
   --hero-parallax-vidrio: -30px;
 
-  /* ============ AÑADIDO NUESTRO — NO ESTÁ EN EL DISEÑO DE ANDRÉS ============
-   * ⚠ PENDIENTE DE APROBACIÓN DE ANDRÉS. Cambia la foto de forma visible —el
-   * borde superior se oscurece—, así que no lo decidimos nosotros: está puesto
-   * para que se vea y se juzgue, no aprobado. Rechazarlo = opacidad 0.
-   *
-   * VELO del título: degradado oscuro en la franja superior de la foto, para
-   * darle presencia y subir el contraste del blanco (2,4 a 1 sin él).
-   * Opacidad 0 = su diseño tal cual. Ver docs/design-tokens.md §11.7.
-   * ======================================================================== */
-  --hero-velo-color: 0 0 0;
-  --hero-velo-opacidad: 0.5;
-  --hero-velo-alto: 40%;
-  /*
-   * PRESENCIA del título: más peso y un espaciado algo más ajustado. Se
-   * declaran APARTE de los de Andrés (600, normal) para que quitarlos sea
-   * borrar estas dos líneas: las reglas caen solas a sus valores.
-   */
-  --hero-nuestro-titulo-peso: 700;
-  --hero-nuestro-titulo-espaciado: -0.01em;
+  /* --- Contenedor exterior (1717.json, raíz de la sección 1; sin cambios por corte). --- */
+  --hero-exterior-alto-min: 88vh;
+  --hero-exterior-relleno: 0 1.5% 1.5%;
 
   font-family: var(--hero-fuente);
-  /* En su página la tarjeta no pega a los bordes de la ventana. */
-  padding: 8px;
+  min-height: var(--hero-exterior-alto-min);
+  padding: var(--hero-exterior-relleno);
 }
 
 /* ---------------------------------------------------------------- tarjeta */
@@ -152,18 +136,6 @@
   object-position: center center;
 }
 
-.velo {
-  position: absolute;
-  inset: 0 0 auto;
-  height: var(--hero-velo-alto);
-  background: linear-gradient(
-    to bottom,
-    rgb(var(--hero-velo-color) / var(--hero-velo-opacidad)) 0%,
-    rgb(var(--hero-velo-color) / 0) 100%
-  );
-  pointer-events: none;
-}
-
 /* ----------------------------------------------------------------- título */
 
 .filaTitulo {
@@ -203,9 +175,9 @@
     var(--hero-titulo-tam),
     calc((100cqi - 40px) / (var(--hero-titulo-letras, 16) * 0.62))
   );
-  font-weight: var(--hero-nuestro-titulo-peso, var(--hero-titulo-peso));
+  font-weight: var(--hero-titulo-peso);
   line-height: var(--hero-titulo-interlineado);
-  letter-spacing: var(--hero-nuestro-titulo-espaciado, var(--hero-titulo-espaciado));
+  letter-spacing: var(--hero-titulo-espaciado);
   /* MAYÚSCULAS SOLO POR CSS: en el HTML el texto va en caso normal. */
   text-transform: uppercase;
   text-align: center;
@@ -237,12 +209,18 @@
 /* --------------------------------------------------------- fila inferior */
 
 .fila {
+  --hero-fila-relleno: 10px;
+
   z-index: 1;
   display: flex;
   width: 100%;
+  /* Mismo alto con y sin flechas: con una diapositiva no se pintan. */
+  min-height: calc(
+    var(--hero-flecha-tam) + var(--hero-flechas-margen-abajo) + 2 * var(--hero-fila-relleno)
+  );
   align-items: flex-end;
   justify-content: space-between;
-  padding: 10px;
+  padding: var(--hero-fila-relleno);
 }
 
 .flechas {
@@ -461,7 +439,7 @@
   }
 
   .fila {
-    padding: 0;
+    --hero-fila-relleno: 0px;
   }
 
   /* Igual que en el diseño: `elementor-hidden-mobile` sobre el vidrio. */

@@ -66,9 +66,9 @@ export default async function HomePage() {
 
       <div className="mx-auto max-w-5xl px-4 py-12">
         {/*
-         * EL TÍTULO DEL CMS BAJA A <h2> porque el hero se queda el único <h1>
-         * (§3.4: un solo h1 por página). Es un cambio de SEO, no de maquetación:
-         * ver la advertencia del informe.
+         * EL TÍTULO DEL CMS VA EN <h2>. El <h1> de la portada será el logo de la
+         * cabecera (desviación D1, docs/diseno/decisiones-home-ux9.md), que se
+         * construye con la cabecera: hasta entonces este prototipo NO tiene <h1>.
          */}
         <h2 className="text-4xl font-semibold text-gray-900">{pagina.titulo}</h2>
         {pagina.entradilla ? (

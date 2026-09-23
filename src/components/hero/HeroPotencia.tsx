@@ -94,12 +94,13 @@ export function HeroPotencia({ slides, claseFuente = "" }: Props) {
   /*
    * El anuncio solo se escribe DESPUÉS de una acción del usuario. Si la región
    * viva tuviera texto desde el principio, el lector lo leería al cargar la
-   * página, que es ruido: el título ya está en el <h1>.
+   * página, que es ruido: el título ya está en el encabezado.
    */
   const [anuncio, setAnuncio] = useState("");
   const raiz = useRef<HTMLElement>(null);
   const idTitulo = useId();
   const total = slides.length;
+  const hayVarias = total > 1;
   const slide = slides[activo]!;
 
   const mover = useCallback(
@@ -113,6 +114,7 @@ export function HeroPotencia({ slides, claseFuente = "" }: Props) {
 
   /* Flechas del teclado con el foco en cualquier control del carrusel. */
   const alPulsar = (e: KeyboardEvent<HTMLElement>) => {
+    if (!hayVarias) return;
     if (e.key === "ArrowLeft") {
       e.preventDefault();
       mover(-1);
@@ -209,17 +211,16 @@ export function HeroPotencia({ slides, claseFuente = "" }: Props) {
               />
             </div>
           ))}
-          {/* Velo: añadido nuestro, NO está en el diseño. Ver el CSS. */}
-          <div className={estilos.velo} aria-hidden="true" />
         </div>
 
         {/*
-         * TÍTULO COMO <h1>. Se renderizan todos los títulos para que estén en el
+         * TÍTULO COMO <h2>: el <h1> de la portada es el logo de la cabecera
+         * (desviación D1, docs/diseno/decisiones-home-ux9.md). Se renderizan todos los títulos para que estén en el
          * HTML inicial; los inactivos van con `hidden`, así que no se pintan ni
          * se leen: nunca hay dos títulos visibles.
          */}
         <div className={`${estilos.filaTitulo} ${estilos.capaParallax}`}>
-          <h1
+          <h2
             className={estilos.titulo}
             id={idTitulo}
             // Letras del título activo: el CSS encoge solo el que no cabe.
@@ -230,7 +231,7 @@ export function HeroPotencia({ slides, claseFuente = "" }: Props) {
                 <Palabras texto={s.titulo} />
               </span>
             ))}
-          </h1>
+          </h2>
         </div>
 
         {/*
@@ -254,27 +255,33 @@ export function HeroPotencia({ slides, claseFuente = "" }: Props) {
           )}
         </div>
 
+        {/*
+         * Con una sola diapositiva no hay flechas: un botón que no mueve nada es
+         * un control inerte. La fila se queda, así la tarjeta no cambia de alto.
+         */}
         <div className={estilos.fila}>
-          <div className={estilos.flechas}>
-            <button
-              type="button"
-              className={estilos.flecha}
-              onClick={() => mover(-1)}
-              aria-label="Diapositiva anterior"
-              aria-controls={idTitulo}
-            >
-              <IconoFlecha hacia="anterior" />
-            </button>
-            <button
-              type="button"
-              className={estilos.flecha}
-              onClick={() => mover(1)}
-              aria-label="Diapositiva siguiente"
-              aria-controls={idTitulo}
-            >
-              <IconoFlecha hacia="siguiente" />
-            </button>
-          </div>
+          {hayVarias ? (
+            <div className={estilos.flechas}>
+              <button
+                type="button"
+                className={estilos.flecha}
+                onClick={() => mover(-1)}
+                aria-label="Diapositiva anterior"
+                aria-controls={idTitulo}
+              >
+                <IconoFlecha hacia="anterior" />
+              </button>
+              <button
+                type="button"
+                className={estilos.flecha}
+                onClick={() => mover(1)}
+                aria-label="Diapositiva siguiente"
+                aria-controls={idTitulo}
+              >
+                <IconoFlecha hacia="siguiente" />
+              </button>
+            </div>
+          ) : null}
         </div>
 
         {/*

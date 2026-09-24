@@ -57,6 +57,33 @@
 }
 
 /*
+ * AL CARGAR (el hero): la misma animación, pero por @keyframes desde el primer
+ * pintado. `both` mantiene el estado inicial durante el escalón y el final al
+ * acabar. El estado oculto NO depende de JavaScript: si el JS no llega, la
+ * animación corre igual y el texto acaba visible.
+ */
+.revelado[data-revelado="al-cargar"] .palabra {
+  animation-name: revelar;
+  animation-duration: var(--revelado-duracion);
+  animation-delay: calc(var(--indice, 0) * var(--revelado-escalon));
+  animation-fill-mode: both;
+  animation-timing-function: var(--revelado-curva-aprox);
+}
+
+@supports (animation-timing-function: linear(0, 1)) {
+  .revelado[data-revelado="al-cargar"] .palabra {
+    animation-timing-function: var(--revelado-curva);
+  }
+}
+
+@keyframes revelar {
+  from {
+    opacity: 0;
+    transform: translateY(var(--revelado-distancia));
+  }
+}
+
+/*
  * MOVIMIENTO REDUCIDO: texto entero y quieto, pase lo que pase. El componente
  * ya no prepara nada, pero si la preferencia se activa A MITAD de una
  * animación, esto la corta en su estado final.
@@ -66,6 +93,7 @@
     opacity: 1;
     transform: none;
     transition: none;
+    animation: none;
   }
 }
 

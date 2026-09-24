@@ -27,6 +27,13 @@ type Props = Partial<Ritmo> & {
   ritmo?: NombreRitmo;
   className?: string;
   id?: string;
+  /**
+   * Para lo que YA está a la vista al cargar (el hero). La animación la lleva
+   * un `@keyframes` de CSS desde el PRIMER PINTADO, sin observador ni
+   * hidratación: así no hay parpadeo (texto visible → oculto al hidratar →
+   * revelado). Ver «LIMITACIÓN» abajo, que es lo que esto resuelve.
+   */
+  alCargar?: boolean;
 };
 
 const ES_ENCABEZADO = new Set<Etiqueta>(["h1", "h2", "h3", "h4"]);
@@ -53,9 +60,11 @@ const ES_ENCABEZADO = new Set<Etiqueta>(["h1", "h2", "h3", "h4"]);
  *    se ocultan al árbol de accesibilidad. En un párrafo `aria-label` no está
  *    permitido, así que ahí se dejan las palabras legibles.
  *
- * LIMITACIÓN CONOCIDA: un bloque que ya está a la vista AL CARGAR se pinta
- * visible, se oculta al hidratar y se revela. Es el precio de la garantía 1; en
- * la home solo afecta al hero, y se decide con él (fase C).
+ * LIMITACIÓN del modo por defecto: un bloque que ya está a la vista AL CARGAR se
+ * pinta visible, se oculta al hidratar y se revela (parpadeo). Para esos
+ * bloques, `alCargar`: la animación es CSS pura desde el primer pintado. Sin
+ * JavaScript también se anima, y acaba visible (`animation-fill-mode: both`);
+ * con movimiento reducido no hay animación.
  */
 export function Revelado({
   texto,
@@ -63,6 +72,7 @@ export function Revelado({
   ritmo = "titulo",
   className,
   id,
+  alCargar = false,
   ...ajustes
 }: Props) {
   const ref = useRef<HTMLElement>(null);
@@ -73,7 +83,7 @@ export function Revelado({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || alCargar) return;
     if (reducido) {
       el.dataset.revelado = "visible";
       return;
@@ -95,7 +105,7 @@ export function Revelado({
     );
     observador.observe(el);
     return () => observador.disconnect();
-  }, [reducido, r.disparo, r.unaVez]);
+  }, [reducido, r.disparo, r.unaVez, alCargar]);
 
   const variables = {
     "--revelado-escalon": `${r.escalon}s`,
@@ -113,6 +123,7 @@ export function Revelado({
       id={id}
       className={`${estilos.revelado} ${className ?? ""}`}
       style={variables}
+      data-revelado={alCargar ? "al-cargar" : undefined}
       aria-label={encabezado ? textoPlano(texto) : undefined}
     >
       {lineas.map((palabras, l) => (

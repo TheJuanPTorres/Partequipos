@@ -181,7 +181,16 @@ export function analizarPagina(pagina: Pagina, ctx: Contexto): Hallazgo[] {
     if (alt === null) err("alt", `la imagen ${i + 1} no tiene atributo alt`);
     const w = extraerAtributo(img, "width");
     const hh = extraerAtributo(img, "height");
-    if (!w || !hh) avi("dimensiones", `la imagen ${i + 1} no declara width/height (provoca CLS)`);
+    /*
+     * Una imagen `fill` de next/image (`data-nimg="fill"`) no lleva width/height
+     * a propósito: va en posición absoluta dentro de una caja que ya tiene su
+     * tamaño, así que no puede desplazar nada. Avisar de ella es un falso
+     * positivo (fondos del hero, fase C: CLS medido 0).
+     */
+    const esFill = extraerAtributo(img, "data-nimg") === "fill";
+    if ((!w || !hh) && !esFill) {
+      avi("dimensiones", `la imagen ${i + 1} no declara width/height (provoca CLS)`);
+    }
   });
 
   // --- accesibilidad estructural ---------------------------------------------

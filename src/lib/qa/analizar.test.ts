@@ -131,6 +131,12 @@ describe("analizarPagina — imágenes y accesibilidad", () => {
 
   it("avisa si falta width/height", () => {
     assert.ok(criterios(paginaValida('<img src="/x.png" alt="x">')).includes("dimensiones"));
+    // Una imagen `fill` de next/image no lleva dimensiones a propósito: no avisa.
+    assert.ok(
+      !criterios(paginaValida('<img src="/x.png" alt="" data-nimg="fill">')).includes(
+        "dimensiones",
+      ),
+    );
   });
 
   it("exige lang en el html", () => {

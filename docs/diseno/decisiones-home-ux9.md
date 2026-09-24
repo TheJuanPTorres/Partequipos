@@ -489,3 +489,88 @@ título) no cambia con una foto más pesada; la cifra absoluta sí.
 - **El hero con las fotos reales de ux-9** en el preview: la portada de
   producción no tiene diapositivas, así que hoy el hero no se pinta en
   producción hasta que un editor las cree.
+
+### Lighthouse móvil con la foto real (2026-09-24)
+
+Corrido por dirección desde las DevTools, en incógnito, **Lighthouse 13.4.1**,
+móvil, _simulated throttling_, solo Performance. «Antes» = portada de
+producción (sin hero); «después» = alias del preview de la fase C, con la
+diapositiva «Potencia Hitachi» y las fotos de ux-9 (\`Fondo.jpg\` 593 kB,
+\`Hero-1.png\` 908 kB).
+
+**Validación:**
+
+- Las seis corridas, misma versión (13.4.1) y URL final correcta; ninguna en la
+  pantalla de acceso de Vercel.
+- **\`despues-1\` descartada:** \`runtimeError: NO_FCP` —la página no llegó a
+  pintarse (pestaña sin primer plano, §10.20)—. El «después» queda con **2**
+  corridas: su mediana es la media de las dos.
+- **\`antes-1\` atípica** (arranque en frío): TTFB 931 ms, _render delay_ 9 s,
+  Speed Index 14,5 s frente a 1,05–1,32 de sus compañeras. La mediana la
+  absorbe.
+
+| Métrica      | Antes (mediana de 3)         | Después (mediana de 2)        |
+| ------------ | ---------------------------- | ----------------------------- |
+| Performance  | 99 (84 · 99 · 100)           | 99 (99 · 99)                  |
+| **LCP**      | 1,82 s                       | **1,56 s**                    |
+| FCP          | 1,06 s                       | 1,04 s                        |
+| TBT          | 85 ms                        | 98 ms                         |
+| CLS          | 0                            | 0                             |
+| Speed Index  | 1,32 s                       | 1,19 s                        |
+| Elemento LCP | el \`<h1>\` de texto del CMS | **la foto de fondo del hero** |
+
+**Lectura:** el hero **no empeora** el LCP; lo baja 0,26 s. El elemento LCP
+pasa de un texto grande, que esperaba a la fuente y al pintado, a una imagen
+de **36 kB precargada con prioridad alta** (fases: TTFB 150 · retraso de carga
+30–67 · descarga 175–185 · pintado 82 ms). **1,56 s, por debajo de 2,5.**
+
+**Por qué tan distinto del 2,99 s local:** aquello era Lighthouse 12 por línea
+de comandos contra \`next start\` en local, sin CDN, con las imágenes de
+demostración. Métodos distintos: no se comparan entre sí.
+
+**Frente a la línea base 73 / 90 / 83 (2026-09-22):** solo como referencia. Hoy
+la misma portada de producción da 84 / 99 / 100 con la otra herramienta
+(DevTools, Lighthouse 13.4.1, otra máquina): el cambio de método mueve la
+puntuación más que el hero. Al cliente, las cifras de antes y después **de esta
+tanda**, que sí son comparables entre sí.
+
+### La foto se sirve AMPLIADA en móvil (confirmado)
+
+Lighthouse móvil emula 412 × 823 px a densidad 1,75. La tarjeta mide unos
+400 × 708 px y la foto (3:2, proporción 1,506) la cubre con \`object-cover\`:
+para cubrir 708 px de alto se pinta a **~1.066 px de ancho CSS**, o sea
+**~1.866 px físicos**. Con \`sizes="100vw"\` el navegador calcula 412 × 1,75 =
+721 y pide **w=750**: la foto se amplía **~2,5 veces**. Borrosa en cualquier
+móvil en vertical (en un iPhone de 390 px a densidad 3 pide w=1200 para
+~2.600 px necesarios: ~2,2 veces).
+
+### Recomendación (NO aplicada; decisión pendiente)
+
+1. **\`sizes\` por la proporción de cada imagen.** La altura manda cuando la
+   ventana es más estrecha que la proporción de la foto por la altura de la
+   tarjeta. Con la tarjeta a ~86vh y una foto de proporción \`p\`:
+   \`sizes="(max-aspect-ratio: {86·p}/100) {86·p}vh, 100vw"\`. Para \`Fondo.jpg\`
+   (\`p\` = 1,506): \`(max-aspect-ratio: 129/100) 129vh, 100vw\`. Se calcula en el
+   componente con el ancho y el alto de cada foto, así sirve para cualquier
+   diapositiva. En escritorio apaisado no cambia nada (sigue 100vw).
+2. **Calidad 60 solo para los fondos del hero.** Medido con \`sharp\` sobre
+   \`Fondo.jpg\` (mismo codificador que \`next/image\`; a 1920/75 da los 156 kB
+   que sirve el preview):
+
+   | Ancho | q75    | q65    | q60        | q55    |
+   | ----- | ------ | ------ | ---------- | ------ |
+   | 1080  | 67 kB  | 58 kB  | 55 kB      | 52 kB  |
+   | 1920  | 156 kB | 136 kB | **127 kB** | 119 kB |
+
+   Exige declarar \`images.qualities: [60, 75]\` en \`next.config.ts\`: Next 16
+   solo admite por defecto la 75. A validar a ojo por Andrés: es una foto de
+   fondo con texto encima.
+
+3. **LCP estimado** con \`sizes\` ajustado + q60: Lighthouse móvil pediría w=1920
+   (1.866 px necesarios) → **127 kB** en vez de 36 (+91 kB). Al ancho de banda
+   simulado (~1,6 Mbit/s ≈ 200 kB/s) son ~0,45 s más: **LCP ≈ 2,0 s**. Con q75,
+   156 kB → **≈ 2,2 s**. Las dos por debajo de 2,5. **Es una estimación**: se
+   mide de nuevo con el cambio aplicado, con este mismo método.
+
+Pendiente de medir con la foto real, lo que queda de la fase C: nada más. El
+punto focal y la regeneración, verificados (arriba).

@@ -4,7 +4,10 @@ import { describe, it } from "node:test";
 import { HOST_PREVIEW } from "../db/vaciadoSolicitudes";
 import {
   ALMACEN_PREVIEW,
+  EQUIPOS_PRUEBA,
+  IMAGENES_SECCIONES,
   almacenDeToken,
+  esEquipoDePrueba,
   esDiapositivaDePrueba,
   puedeTocarHeroDePrueba,
   sinDiapositivasDePrueba,
@@ -55,5 +58,21 @@ describe("reconocer y quitar la diapositiva de prueba", () => {
 
   it("quita solo la de prueba y conserva el orden del resto", () => {
     assert.deepEqual(sinDiapositivasDePrueba([real, prueba, otra], [8, 9]), [real, otra]);
+  });
+});
+
+describe("secciones 2 y 3 de prueba", () => {
+  it("cada equipo de prueba usa una imagen que se siembra, y todo lleva la marca", () => {
+    const ficheros = IMAGENES_SECCIONES.map((i) => i.fichero as string);
+    for (const e of EQUIPOS_PRUEBA) {
+      assert.ok(ficheros.includes(e.imagen), e.imagen);
+      assert.equal(esEquipoDePrueba(e), true);
+    }
+    for (const i of IMAGENES_SECCIONES) assert.match(i.alt, /^PRUEBA HERO — /);
+  });
+
+  it("un equipo real no se toma por uno de prueba", () => {
+    assert.equal(esEquipoDePrueba({ descripcion: "Excavadora en buen estado" }), false);
+    assert.equal(esEquipoDePrueba({ descripcion: null }), false);
   });
 });

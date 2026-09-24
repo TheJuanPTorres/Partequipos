@@ -37,6 +37,8 @@ export function ListaArticulos({ articulos, vacio }: { articulos: Articulo[]; va
                 width={imagen.width}
                 height={imagen.height}
                 className="mb-3 h-40 w-full rounded object-cover"
+                // Punto focal del panel: qué parte se ve en el recorte de 160 px.
+                style={{ objectPosition: imagen.posicion }}
               />
             ) : null}
 

@@ -105,6 +105,7 @@ export function ArticuloCuerpo({ articulo }: { articulo: Articulo }) {
             width={imagen.width}
             height={imagen.height}
             className="mt-6 h-auto w-full rounded-lg object-cover"
+            style={{ objectPosition: imagen.posicion }}
             preload
           />
         ) : null}

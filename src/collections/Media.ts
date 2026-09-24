@@ -51,6 +51,13 @@ export const Media: CollectionConfig = {
      * lo cierra en el servidor, que no mira esta opción.
      */
     crop: false,
+    /*
+     * PUNTO FOCAL ACTIVADO EXPLÍCITAMENTE (fase C). Sin `true` el panel no
+     * muestra el selector, porque `Media` no tiene tamaños derivados. Se aplica
+     * como `object-position` en las imágenes con `object-cover` (hero, blog):
+     * decide qué parte de la foto se ve cuando la caja la recorta.
+     */
+    focalPoint: true,
   },
   /*
    * El mensaje de rechazo de Payload está cableado en inglés; este hook se

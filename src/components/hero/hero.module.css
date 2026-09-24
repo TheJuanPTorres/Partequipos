@@ -1,0 +1,408 @@
+/*
+ * HERO DE LA PORTADA — ux-9, sección 1. Diapositivas desde Payload (ADR 0009).
+ *
+ * ================== LOS VALORES DE ANDRÉS VIVEN AQUÍ ==================
+ * Todo lo que viene de https://partequipos.uxdesign.website/ux-9/ está en el
+ * bloque `.hero` de abajo, como variables. Cambiar al sistema de diseño del
+ * cliente es cambiar ESE bloque, no las reglas: ninguna otra regla de este
+ * fichero lleva un valor de Andrés cableado.
+ *
+ * Al lado de cada variable va su equivalente del sistema (docs/design-tokens.md)
+ * cuando existe. NO se resuelven las diferencias aquí: es decisión de dirección.
+ *
+ * Lo que se aparta de su diseño son SOLO correcciones de accesibilidad
+ * acordadas, cada una marcada «DESVIACIÓN» en su regla y documentada en
+ * docs/diseno/decisiones-home-ux9.md. Nada estético añadido.
+ * ======================================================================
+ *
+ * La geometría no se copió de la captura: se midió elemento a elemento contra
+ * la tarjeta en su página. La pieza que no se ve a simple vista es el margen
+ * inferior NEGATIVO del título: es lo que hace que la máquina se le monte
+ * encima.
+ */
+
+.hero {
+  /* --- Tipografía: Inter, la del sitio desde la fase A. Sistema del cliente: Rubik. --- */
+  --hero-fuente: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* --- Rojo de las flechas. Sistema: --primary #dc2626. Wordmark del CLI: #D92035. --- */
+  --hero-rojo: #e5242d;
+
+  /* --- Radio. Sistema: --radius-4xl = 18,7 px (tope 24 px en tarjetas). --- */
+  --hero-radio: 30px;
+
+  /* --- Tarjeta. El relleno 50/30/30 es SOLO ≤1024 px; en escritorio son 10 px. --- */
+  --hero-alto-min: 86vh;
+  --hero-relleno: 10px;
+  --hero-gap: 20px;
+
+  /* --- Título. Interlineado 1,4em: 120 → 168 px, 70 → 98 px. --- */
+  --hero-titulo-tam: 120px;
+  --hero-titulo-peso: 600;
+  --hero-titulo-interlineado: 1.4;
+  --hero-titulo-espaciado: normal;
+  /* El solape con la máquina. Medido en su página, no estimado. */
+  --hero-titulo-margen-abajo: -250px;
+
+  /* --- Hueco de la máquina: ancho pintado; la altura, la proporción 1476×1057. --- */
+  --hero-imagen-ancho: 809px;
+  --hero-imagen-margen-arriba: 100px;
+
+  /* --- Flechas --- */
+  --hero-flecha-tam: 42px;
+  --hero-flecha-icono: 21px;
+  --hero-flecha-fondo: rgb(255 255 255 / 58%);
+  --hero-flechas-margen-abajo: 20px;
+
+  /* --- Vidrio. NO coincide con los --glass-* del sistema: ver docs. --- */
+  --hero-vidrio-ancho: 400px;
+  --hero-vidrio-fondo: rgb(255 255 255 / 12%);
+  --hero-vidrio-borde: 1px solid rgb(255 255 255 / 25%);
+  --hero-vidrio-desenfoque: blur(18px);
+  --hero-vidrio-sombra: 0 8px 32px rgb(0 0 0 / 8%);
+  --hero-vidrio-relleno: 30px;
+  /*
+   * POSICIÓN RESPECTO A LA TARJETA, medida en su página al MISMO ancho de
+   * ventana (2026-09-23). En escritorio va DENTRO: 41 px del borde derecho y
+   * 91 px por encima del inferior. Por debajo de 1024 px su diseño lo saca de
+   * la tarjeta; aquí NO (desviación nuestra, ver el bloque de ≤1024 px).
+   */
+  --hero-vidrio-derecha: 41px;
+  --hero-vidrio-abajo: 91px;
+
+  /* --- Párrafo del vidrio --- */
+  --hero-parrafo-tam: 16px;
+  --hero-parrafo-peso: 300;
+
+  /*
+   * --- Animación. El revelado del título y del párrafo lo hace `Revelado` con
+   * los valores de 1717.json (ritmo «portada»: escalón 0,3 · 2 s · 50 % del alto
+   * de la palabra · power3.out; párrafo con el ritmo «titulo»). Aquí solo el
+   * parallax.
+   */
+  --hero-parallax-titulo: -60px;
+  --hero-parallax-vidrio: -30px;
+
+  /* --- Contenedor exterior (1717.json, raíz de la sección 1; sin cambios por corte). --- */
+  --hero-exterior-alto-min: 88vh;
+  --hero-exterior-relleno: 0 1.5% 1.5%;
+
+  font-family: var(--hero-fuente);
+  min-height: var(--hero-exterior-alto-min);
+  padding: var(--hero-exterior-relleno);
+}
+
+/* ---------------------------------------------------------------- tarjeta */
+
+.tarjeta {
+  position: relative;
+  display: flex;
+  min-height: var(--hero-alto-min);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hero-gap);
+  padding: var(--hero-relleno);
+  /*
+   * Sin recorte en esta caja: el redondeo del fondo lo hace `.marco`. Así el
+   * foco y la sombra del vidrio no se cortan contra el borde.
+   */
+  isolation: isolate;
+}
+
+/*
+ * FONDOS CON next/image, no con background-image: así los optimiza el
+ * servidor a WebP y la primera admite `preload`. El marco recorta con el radio
+ * sin recortar el vidrio.
+ *
+ * OJO con `[hidden]`: las capas NO declaran `display`, porque cualquier
+ * `display` de autor ganaría al `display: none` del atributo y se verían todas
+ * las diapositivas a la vez.
+ */
+.marco {
+  position: absolute;
+  z-index: 0;
+  border-radius: var(--hero-radio);
+  inset: 0;
+  overflow: clip;
+}
+
+.capaFondo {
+  position: absolute;
+  inset: 0;
+}
+
+.fondo {
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* ----------------------------------------------------------------- título */
+
+.filaTitulo {
+  z-index: 0;
+  width: 100%;
+  /*
+   * Alto FIJO de una línea al tamaño del diseño, aunque el título encoja para
+   * caber: si no, cada diapositiva tendría una tarjeta de altura distinta y
+   * todo saltaría al cambiar.
+   */
+  min-height: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado));
+  /* Aquí está el solape: el título cede 250 px al elemento siguiente. */
+  margin-bottom: var(--hero-titulo-margen-abajo);
+}
+
+/*
+ * AJUSTE AL ANCHO — añadido nuestro. El diseño asume un título corto
+ * («POTENCIA HITACHI», 16 letras). «POTENCIA CATERPILLAR» (20) no cabe a
+ * 120 px, parte en dos líneas y la tarjeta crece: todo salta al cambiar de
+ * diapositiva. Se vio pintado.
+ *
+ * El tamaño es el MENOR entre el del diseño y el que cabe en la tarjeta,
+ * calculado con el número de letras (lo pone el componente) y el ancho medio
+ * de una mayúscula de Inter seminegrita: medido 0,59 em, se usa 0,62 de margen.
+ * Un título que cabe conserva sus 120 px exactos; solo encoge el que no.
+ */
+.tarjeta {
+  container-type: inline-size;
+}
+
+.titulo {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  color: #fff;
+  font-size: min(
+    var(--hero-titulo-tam),
+    calc((100cqi - 40px) / (var(--hero-titulo-letras, 16) * 0.62))
+  );
+  font-weight: var(--hero-titulo-peso);
+  line-height: var(--hero-titulo-interlineado);
+  letter-spacing: var(--hero-titulo-espaciado);
+  /* MAYÚSCULAS SOLO POR CSS: en el HTML el texto va en caso normal. */
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* -------------------------------------------------------- hueco de la máquina */
+
+/*
+ * Mide lo mismo con o sin imagen recortada: por eso existe como caja propia y
+ * no se deja que la imagen le dé el tamaño.
+ */
+.hueco {
+  position: relative;
+  z-index: 1;
+  width: min(var(--hero-imagen-ancho), 100%);
+  margin-top: var(--hero-imagen-margen-arriba);
+  aspect-ratio: 1476 / 1057;
+}
+
+.capaFrontal {
+  position: absolute;
+  inset: 0;
+}
+
+.frontal {
+  object-fit: contain;
+}
+
+/* --------------------------------------------------------- fila inferior */
+
+.fila {
+  --hero-fila-relleno: 10px;
+
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  /* Mismo alto con y sin flechas: con una diapositiva no se pintan. */
+  min-height: calc(
+    var(--hero-flecha-tam) + var(--hero-flechas-margen-abajo) + 2 * var(--hero-fila-relleno)
+  );
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: var(--hero-fila-relleno);
+}
+
+.flechas {
+  display: flex;
+  gap: 4px;
+  margin-bottom: var(--hero-flechas-margen-abajo);
+}
+
+/*
+ * FLECHAS: <button> de verdad. En el diseño son `div` decorativos sin nombre
+ * accesible y sin comportamiento (verificado: 0 enlaces, 0 botones y ningún
+ * slider en la tarjeta).
+ */
+.flecha {
+  display: grid;
+  width: var(--hero-flecha-tam);
+  height: var(--hero-flecha-tam);
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--hero-flecha-fondo);
+  color: var(--hero-rojo);
+  cursor: pointer;
+}
+
+.flecha svg {
+  width: var(--hero-flecha-icono);
+  height: var(--hero-flecha-icono);
+}
+
+/* Foco visible propio: el anillo del navegador se pierde sobre la foto. */
+.flecha:focus-visible,
+.mas:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ----------------------------------------------------------------- vidrio */
+
+.vidrio {
+  position: absolute;
+  z-index: 2;
+  right: var(--hero-vidrio-derecha);
+  bottom: var(--hero-vidrio-abajo);
+  display: flex;
+  width: var(--hero-vidrio-ancho);
+  max-width: calc(100% - 2 * var(--hero-vidrio-derecha));
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: var(--hero-vidrio-relleno);
+  border: var(--hero-vidrio-borde);
+  border-radius: var(--hero-radio);
+  background: var(--hero-vidrio-fondo);
+  box-shadow: var(--hero-vidrio-sombra);
+  backdrop-filter: var(--hero-vidrio-desenfoque);
+}
+
+.parrafo {
+  margin: 0;
+  color: #fff;
+  font-size: var(--hero-parrafo-tam);
+  font-weight: var(--hero-parrafo-peso);
+  line-height: 1.4;
+}
+
+.mas {
+  display: grid;
+  flex: none;
+  place-items: center;
+  color: #fff;
+}
+
+.mas svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* --------------------------------------------------- anuncio para lectores */
+
+.soloLector {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/*
+ * PARALLAX. El cliente escribe SOLO el avance (0 a 1) en
+ * `--hero-parallax-base`; la distancia de cada capa se decide aquí.
+ */
+.capaParallax {
+  transform: translate3d(0, var(--hero-parallax, 0px), 0);
+  will-change: transform;
+}
+
+.filaTitulo.capaParallax {
+  --hero-parallax: calc(var(--hero-parallax-base, 0) * var(--hero-parallax-titulo));
+}
+
+.vidrio.capaParallax {
+  --hero-parallax: calc(var(--hero-parallax-base, 0) * var(--hero-parallax-vidrio));
+}
+
+/* ------------------------------------------------------------- reducción */
+
+/*
+ * prefers-reduced-motion: sin parallax. El revelado lo anula `Revelado`.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .capaParallax {
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------- adaptaciones */
+
+/* ≤1024 px: los valores que la dirección midió a 1010 px. */
+@media (max-width: 1024px) {
+  .hero {
+    --hero-titulo-tam: 70px;
+    --hero-imagen-ancho: 631px;
+    --hero-relleno: 50px 30px 30px;
+    /*
+     * DESVIACIÓN NUESTRA, DECIDIDA (2026-09-23) — el vidrio va DENTRO.
+     *
+     * Su diseño lo saca de la tarjeta por debajo de 1024 px: entre 12 y 73 px
+     * según el alto de ventana, porque su parallax lo recoloca. La parte de
+     * fuera cae sobre el blanco de la página y midió 1,05 a 1 —texto blanco
+     * sobre blanco—, en su página y en la nuestra.
+     *
+     * Criterio de dirección, el mismo del panel: LEGIBILIDAD ANTES QUE
+     * FIDELIDAD. Su valor era `right: -20px; bottom: -113px` respecto a su
+     * columna (−73 px medidos respecto a la tarjeta). Ver docs/design-tokens.md
+     * §11.8.
+     */
+    --hero-vidrio-derecha: 20px;
+    --hero-vidrio-abajo: 30px;
+  }
+}
+
+/* ≤767 px: el vidrio desaparece y el título pasa a proporcional. */
+@media (max-width: 767px) {
+  .hero {
+    --hero-titulo-tam: 12vw;
+    --hero-alto-min: 85vh;
+    --hero-imagen-margen-arriba: 200px;
+    --hero-parrafo-tam: 13px;
+    --hero-flecha-icono: 15px;
+    /*
+     * El solape de −250 px se MANTIENE en móvil, como en su diseño. Aquí hubo
+     * un −120 puesto por suposición («se comería la máquina»); medido contra su
+     * página a 390 px, con −250 las dos tarjetas miden 717 px y la máquina cae
+     * en el mismo sitio. La suposición era falsa.
+     */
+  }
+
+  .tarjeta {
+    justify-content: space-between;
+  }
+
+  /*
+   * En móvil el diseño SÍ parte el título en dos líneas («POTENCIA» / marca),
+   * así que el ajuste al ancho no aplica: encogería el título a una línea de
+   * 34 px. Cada palabra cabe sola a 12vw, incluida «CATERPILLAR».
+   */
+  .titulo {
+    font-size: var(--hero-titulo-tam);
+  }
+
+  .fila {
+    --hero-fila-relleno: 0px;
+  }
+
+  /* Igual que en el diseño: `elementor-hidden-mobile` sobre el vidrio. */
+  .vidrio {
+    display: none;
+  }
+}

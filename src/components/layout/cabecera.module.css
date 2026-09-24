@@ -31,7 +31,6 @@
   --cab-enlace-relleno: 8px;
   --cab-icono: 30px;
   --cab-velo: rgb(255 255 255 / 27%); /* #FFFFFF45 */
-  --cab-desenfoque: blur(10px);
   --cab-col-relleno: 10px; /* relleno de cada contenedor de Elementor */
   --cab-transicion: transform 0.3s ease;
 
@@ -58,12 +57,24 @@
   box-shadow: none;
 }
 
-/* Portada al bajar: el velo #FFFFFF45 con desenfoque de Andrés. */
+/*
+ * Portada al bajar: el velo #FFFFFF45 con el desenfoque de Andrés, MEDIDO en
+ * ux-9 pintado: `blur(20px) saturate(1.8)`. VALORES LITERALES a propósito: con
+ * `var()`, el compilador de CSS eliminaba las dos propiedades del resultado
+ * (comprobado en producción el 2026-09-24: el velo sin desenfoque).
+ */
 .cabecera[data-modo="velo"] {
   background: var(--cab-velo);
   box-shadow: none;
-  backdrop-filter: var(--cab-desenfoque);
-  -webkit-backdrop-filter: var(--cab-desenfoque);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  backdrop-filter: blur(20px) saturate(1.8);
+}
+
+/* Sin soporte de desenfoque: fondo casi opaco, para que el menú se lea. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cabecera[data-modo="velo"] {
+    background: rgb(255 255 255 / 92%);
+  }
 }
 
 /*

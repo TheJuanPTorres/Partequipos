@@ -574,3 +574,28 @@ móvil en vertical (en un iPhone de 390 px a densidad 3 pide w=1200 para
 
 Pendiente de medir con la foto real, lo que queda de la fase C: nada más. El
 punto focal y la regeneración, verificados (arriba).
+
+### Medición con el `sizes` por proporción (2026-09-24)
+
+Mismo método (Lighthouse 13.4.1, DevTools, incógnito, móvil, _simulated
+throttling_), **tres corridas válidas** del «después». Las tres piden el fondo
+a **w=1920, 157 kB**, y su elemento LCP es la foto.
+
+| Métrica     | `sizes="100vw"` (mediana de 2) | `sizes` por proporción (mediana de 3) |
+| ----------- | ------------------------------ | ------------------------------------- |
+| Performance | 99                             | **98** (98 · 95 · 98)                 |
+| **LCP**     | 1,56 s                         | **2,24 s** (2,24 · 2,30 · 2,24)       |
+| FCP         | 1,04 s                         | 1,09 s                                |
+| TBT         | 98 ms                          | 122 ms                                |
+| CLS         | 0                              | 0                                     |
+| Speed Index | 1,19 s                         | 1,33 s                                |
+
+**+0,68 s de LCP por +121 kB de foto**: el precio de dejar de servirla ampliada
+2,5 veces. Coincide con la estimación previa (≈ 2,2 s). **2,24 s: por debajo de
+2,5, con 0,26 s de margen**, y con poca dispersión entre corridas (2,24–2,30).
+La corrida 2 descargó la foto más despacio (658 ms frente a ~245) y es la de
+menor puntuación; la mediana no la recoge.
+
+**Calidad 60, si algún día hiciera falta** (no aplicada: cambio visual que
+decide Andrés): a 1920 px pasa de 156 a 127 kB (−29 kB). Al ancho de banda
+simulado (~200 kB/s) son **~0,15 s menos: LCP ≈ 2,1 s**. Margen de 0,26 → ~0,4 s.

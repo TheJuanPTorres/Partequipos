@@ -717,6 +717,12 @@ export interface Pagina {
         }[]
       | null;
   };
+  seccionUsada?: {
+    /**
+     * Decorativa: asoma sobre la sección anterior. Opcional.
+     */
+    imagen?: (number | null) | Media;
+  };
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -830,8 +836,6 @@ export interface Video {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * Sedes del mapa de la portada. No generan URLs propias.
@@ -1458,6 +1462,11 @@ export interface PaginasSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  seccionUsada?:
+    | T
+    | {
+        imagen?: T;
+      };
   seo?:
     | T
     | {
@@ -1544,8 +1553,6 @@ export interface VideosSelect<T extends boolean = true> {
   filesize?: T;
   width?: T;
   height?: T;
-  focalX?: T;
-  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

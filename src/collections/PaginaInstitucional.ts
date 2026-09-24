@@ -205,6 +205,29 @@ export const PaginaInstitucional: CollectionConfig = {
         },
       ],
     },
+    /*
+     * SECCIÓN 3 DE LA PORTADA (fase D): la máquina recortada que asoma sobre la
+     * sección 2. Es decorativa (`alt` vacío al pintarla) y OPCIONAL: sin ella la
+     * columna se pinta igual, solo sin imagen. En Payload y no en el repositorio
+     * porque la foto de ux-9 es de banco y su licencia está pendiente (L3).
+     */
+    {
+      name: "seccionUsada",
+      type: "group",
+      label: "Sección «Maquinaria pesada usada» de la portada",
+      admin: { condition: (data) => data?.slug === "inicio" },
+      fields: [
+        {
+          name: "imagen",
+          type: "upload",
+          relationTo: "media",
+          label: "Máquina recortada (PNG transparente)",
+          admin: {
+            description: "Decorativa: asoma sobre la sección anterior. Opcional.",
+          },
+        },
+      ],
+    },
     seoField(),
   ],
 };

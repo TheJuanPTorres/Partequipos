@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useSelectedLayoutSegment } from "next/navigation";
 
 type Props = {
   src: string;
@@ -17,15 +17,23 @@ type Props = {
  * título de cada una y el logo es un enlace sin encabezado.
  *
  * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): la cabecera vive en el
- * layout, que no sabe en qué ruta está; `usePathname` sí. Se prerenderiza en el
- * servidor igualmente: el `<h1>` está en el HTML inicial.
+ * layout, que no sabe en qué ruta está; `useSelectedLayoutSegment` sí. Se
+ * prerenderiza en el servidor igualmente: el `<h1>` está en el HTML inicial.
+ *
+ * NO `usePathname`: medido en el preview, cuando Vercel REGENERA la portada
+ * tras un `revalidatePath("/")` (al guardarla en el panel), la renderiza como
+ * `/index` (`"c":["","index"]` en el árbol de rutas), `usePathname` devuelve
+ * `/index` y el logo dejaba de ser el `<h1>` en el HTML servido —y el cliente,
+ * que sí ve `/`, pintaba otro: desajuste de hidratación—. El segmento del
+ * árbol no depende de la URL: en la portada es la propia página (`null`).
  *
  * TAMAÑO: se declara el PINTADO (36 px de alto → 184 de ancho, proporción del
  * PNG 1614×317), no el del fichero. Con 1614×317 `next/image` generaba el
  * `srcset` a 1920 y 3840 px para pintar 184: 11,7 kB en vez de 2,9 (§2).
  */
 export function LogoCabecera({ src, nombreSitio, tituloPortada }: Props) {
-  const esPortada = usePathname() === "/";
+  // En la portada, el hijo seleccionado del layout (site) es la página: null.
+  const esPortada = useSelectedLayoutSegment() === null;
   const imagen = (
     <Image
       src={src}

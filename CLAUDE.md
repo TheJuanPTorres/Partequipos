@@ -2107,6 +2107,23 @@ Resultado de hoy: **400 en las dos, registros 5 → 5 y 0 → 0.**
 > sepamos, pero no se ha auditado. Anotado en la tabla de defectos de Payload
 > de `docs/design-tokens.md`.
 
+#### DOS MEDICIONES DE LA FASE C que corrigen lo de arriba (2026-09-24)
+
+1. **`Last-Modified` del Blob NO es la fecha de escritura.** Pedido `Fondo.jpg`
+   sin caché (MISS), `Last-Modified` dio **la hora de esa misma petición**
+   (02:04:39), no la de la subida (01:59:32). Lo que se dedujo en el caso del
+   recorte —«se sobrescribió en ese momento, `Last-Modified` coincide»— **no se
+   sostiene**. Para saber si un fichero cambió: `ETag` y hash del contenido,
+   leídos **pasados los 60 s** de propagación.
+2. **El panel manda un «recorte» al guardar SOLO el punto focal:**
+   `crop = {x:0, y:0, width:100, height:100, unit:"%"}` más las medidas
+   completas. La primera versión de `sinRecorte` lo rechazaba: **400 al
+   guardar el punto focal** en el preview. Y dejarlo pasar tampoco: Payload
+   recortaría la imagen entera con `sharp` —la **recodificaría**, otros bytes y
+   pérdida de calidad— y la sobrescribiría con el mismo nombre en cada ajuste.
+   **Corregido:** el recorte de la imagen entera se QUITA de la petición y queda
+   solo el punto focal; un recorte real se sigue rechazando. Con pruebas.
+
 #### RECORTE DESACTIVADO (2026-09-23) — y el riesgo de fondo: sobrescribir con el mismo nombre
 
 **Decisión de dirección:** sin esperar a discriminar si era caché o fichero,

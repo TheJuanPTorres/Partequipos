@@ -2054,6 +2054,18 @@ en memoria** (`arrayBuffer()`), con el techo de memoria de la función (**2 GB**
 en Hobby): un fichero grande tumba la instancia. Es lo que ahora cierra el
 gancho, y la razón para no reabrir la vía con una `allowList` sin tope.
 
+**CONFIRMADO EN PRODUCCIÓN (2026-09-23), sin crear nada — y así se repite tras
+cada actualización de Payload:** un `POST` **anónimo** a `/api/media/` y a
+`/api/videos/` (con la barra final: sin ella da 308) con `{"filename":"x.png","url":"https://example.com/"}`.
+En 3.89 `beforeOperation` corre **antes** que el control de acceso, así que:
+
+- **400 con nuestro mensaje** → el gancho está activo.
+- **403** → el gancho **ya no corre antes**: el cierre puede haber quedado sin
+  efecto. Revisar el orden de las operaciones.
+
+Anónimo, no puede crear nada en ningún caso: sin gancho, lo rechaza el acceso.
+Resultado de hoy: **400 en las dos, registros 5 → 5 y 0 → 0.**
+
 #### DEFECTO PREVIO DE PAYLOAD, encontrado al verificar: el recorte no llega al Blob
 
 > **El recorte del panel actualiza el REGISTRO pero no el FICHERO.** Recortada

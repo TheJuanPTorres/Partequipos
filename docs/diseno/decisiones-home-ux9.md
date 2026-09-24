@@ -802,16 +802,16 @@ Sin desbordes ni errores de consola.
 
 ### Desviaciones
 
-| #   | En ux-9                                                                                                      | Aquí                                                                                           | Por qué                                                                                                 |
-| --- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| P1  | «Trabaja con nosotros», «Zona de clientes», «Financiación»                                                   | **No se pintan**                                                                               | No tienen destino. **Pendiente del cliente:** sus URL                                                   |
-| P2  | Redes con etiquetas cruzadas («Google Plus» con icono de LinkedIn, «Tiktok» con el de YouTube), Font Awesome | Solo las de `seoConfig` (Facebook, Instagram, YouTube), con su nombre real. Iconos de Tabler   | Un nombre accesible equivocado es un enlace que miente; Font Awesome no está en el proyecto             |
-| P3  | Sin franja legal                                                                                             | Franja inferior: tratamiento de datos primero, las demás páginas legales, dirección y teléfono | **No es estética:** la Ley 1581 obliga a enlazar la política de datos                                   |
-| P4  | Texto de la empresa en HelveticaNeue, sin global                                                             | Inter                                                                                          | Licencia web pendiente (**L1**)                                                                         |
-| P5  | «Ayudamos sectores…»                                                                                         | «Ayudamos **a** sectores…»                                                                     | Corrección de redacción. **Para Andrés**                                                                |
-| P6  | «Somos una empresa…» en `<h3>`                                                                               | Párrafo en negrita. Títulos de columna en `<h2>`                                               | No es un encabezado; con `<h3>` saltaba un nivel en páginas sin `<h2>`                                  |
-| P7  | Buscador                                                                                                     | **No se pinta**                                                                                | Funcionalidad no cotizada; un cuadro que no busca es un defecto. Esfuerzo, abajo                        |
-| P8  | Máquina decorativa `Partequipos3553.png`, girada 90°, solo escritorio                                        | **No se pinta**                                                                                | Foto de banco con licencia pendiente (**L3**), y el repositorio es **público**: no puede ir a `public/` |
+| #   | En ux-9                                                                                                      | Aquí                                                                                                 | Por qué                                                                                                                                                     |
+| --- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1  | «Trabaja con nosotros», «Zona de clientes», «Financiación»                                                   | **No se pintan**                                                                                     | No tienen destino. **Pendiente del cliente:** sus URL                                                                                                       |
+| P2  | Redes con etiquetas cruzadas («Google Plus» con icono de LinkedIn, «Tiktok» con el de YouTube), Font Awesome | Solo las de `seoConfig` (Facebook, Instagram, YouTube), con su nombre real. Iconos de Tabler         | Un nombre accesible equivocado es un enlace que miente; Font Awesome no está en el proyecto                                                                 |
+| P3  | Sin franja legal                                                                                             | Franja inferior: tratamiento de datos primero, las demás páginas legales, dirección y teléfono       | **No es estética:** la Ley 1581 obliga a enlazar la política de datos                                                                                       |
+| P4  | Texto de la empresa en HelveticaNeue, sin global                                                             | Inter                                                                                                | Licencia web pendiente (**L1**)                                                                                                                             |
+| P5  | «Ayudamos sectores…»                                                                                         | «Ayudamos **a** sectores…»                                                                           | Corrección de redacción. **Para Andrés**                                                                                                                    |
+| P6  | «Somos una empresa…» en `<h3>`                                                                               | Párrafo en negrita. Títulos de columna en `<h2>`                                                     | No es un encabezado; con `<h3>` saltaba un nivel en páginas sin `<h2>`                                                                                      |
+| P7  | Buscador                                                                                                     | **No se pinta**                                                                                      | Funcionalidad no cotizada; un cuadro que no busca es un defecto. Esfuerzo, abajo                                                                            |
+| P8  | Máquina decorativa `Partequipos3553.png`, girada 90°, solo escritorio                                        | **Campo opcional «Imagen decorativa» del global `pie`**, en `Media`. Vacío: la tarjeta va sin imagen | Foto de banco con licencia pendiente (**L3**), y el repositorio es **público**: no puede ir a `public/`. En producción solo para la demo (CLAUDE.md §10.33) |
 
 El isotipo de la marca de agua (`Icon.png`) sí va, en `public/`: es el isotipo
 del cliente.
@@ -851,3 +851,21 @@ nuevos y usados, y artículos:
   pooler de §10.7 es asumible; sin él, no.
 - `like` no ordena por relevancia. Si hace falta, el paso siguiente es la
   búsqueda de texto completo de Postgres (`tsvector`), con migración: +4–6 h.
+
+### Imagen decorativa del pie: geometría medida (2026-09-24)
+
+Medido en ux-9 pintado, desde su HTML guardado, a 1440, 1280 y 1025:
+
+- **Tamaño y giro:** 536 px de ancho sin girar, constante; girada 90° a la
+  derecha, con `brightness(0.94) saturate(1.32)`.
+- **Posición, ya girada:** su borde inferior queda 1 px por debajo de la
+  tarjeta, y sobresale por la derecha el 11 % del ancho de la tarjeta menos
+  66 px (80, 64 y 39 px). Oculta por debajo de 1025.
+- **CSS:** se replica con la caja sin girar en `right: calc(133px - 11%)`,
+  `bottom: -68px`. Esos valores se deducen de la medida para una imagen de
+  proporción 4:5 como la de ux-9. Con otra proporción, la posición cambia.
+- **Fallo de ux-9 que NO se replica:** a 1440 la imagen creaba **23 px de
+  scroll horizontal**. Aquí el pie corta en horizontal con `overflow-x: clip`,
+  que no crea contenedor de scroll y deja que sobresalga hacia arriba.
+- **Accesibilidad y carga:** decorativa (`alt` vacío y `aria-hidden`), con
+  carga diferida (bajo el pliegue, no toca el LCP), `sizes="536px"`.

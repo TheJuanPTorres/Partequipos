@@ -9,6 +9,7 @@ import * as migration_20260815_043632_roles_usuarios from './20260815_043632_rol
 import * as migration_20260923_210806_fase_b_portada from './20260923_210806_fase_b_portada';
 import * as migration_20260924_143657_fase_d_portada from './20260924_143657_fase_d_portada';
 import * as migration_20260924_194316_pie_global from './20260924_194316_pie_global';
+import * as migration_20260924_200150_pie_imagen_decorativa from './20260924_200150_pie_imagen_decorativa';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20260924_194316_pie_global.up,
     down: migration_20260924_194316_pie_global.down,
-    name: '20260924_194316_pie_global'
+    name: '20260924_194316_pie_global',
+  },
+  {
+    up: migration_20260924_200150_pie_imagen_decorativa.up,
+    down: migration_20260924_200150_pie_imagen_decorativa.down,
+    name: '20260924_200150_pie_imagen_decorativa'
   },
 ];

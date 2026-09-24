@@ -11,6 +11,7 @@ import { Revelado } from "@/components/movimiento/Revelado";
 import { enlaceWhatsApp, navegacionLegal } from "@/lib/navegacion";
 import { columnasDelPie, hrefTelefono, type ColumnaPie } from "@/lib/pie";
 import { getPie } from "@/lib/queries/getPie";
+import { imagenDeMedia } from "@/lib/utils/relations";
 import { seoConfig } from "@/lib/seo/config";
 
 import estilos from "./pie.module.css";
@@ -82,6 +83,8 @@ export async function Footer() {
   const { contact } = seoConfig;
   const telefono = hrefTelefono(contact.phone);
   const columnas = columnasDelPie(pie.columnas, contact.phone);
+  // Decorativa: sin nombre accesible (`alt` vacío y `aria-hidden`).
+  const decorativa = imagenDeMedia(pie.imagenDecorativa, "");
   // Primero la política de tratamiento de datos (Ley 1581 de 2012).
   const legalesEnOrden = [
     ...navegacionLegal.filter((l) => l.href.includes("tratamiento-de-datos")),
@@ -97,6 +100,18 @@ export async function Footer() {
       {/* Sin lema o sin texto del botón (global aún vacío), la tarjeta no se pinta. */}
       {pie.lema && pie.textoBoton ? (
         <div className={estilos.tarjeta}>
+          {decorativa ? (
+            <Image
+              src={decorativa.url}
+              alt=""
+              aria-hidden="true"
+              width={decorativa.width}
+              height={decorativa.height}
+              sizes="536px"
+              loading="lazy"
+              className={estilos.decorativa}
+            />
+          ) : null}
           <Revelado
             como="p"
             texto={pie.lema}

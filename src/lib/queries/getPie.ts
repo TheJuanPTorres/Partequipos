@@ -4,8 +4,11 @@ import { getPayload } from "payload";
 
 import type { Pie } from "@/payload-types";
 
-/** El global `pie`, con la API local (CLAUDE.md §3.2). Memoizado por petición. */
+/**
+ * El global `pie`, con la API local (CLAUDE.md §3.2). Memoizado por petición.
+ * `depth: 1` puebla la imagen decorativa.
+ */
 export const getPie = cache(async (): Promise<Pie> => {
   const payload = await getPayload({ config });
-  return payload.findGlobal({ slug: "pie", depth: 0 });
+  return payload.findGlobal({ slug: "pie", depth: 1 });
 });

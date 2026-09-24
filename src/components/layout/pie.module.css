@@ -14,6 +14,12 @@
   margin-top: var(--pie-margen);
   padding: var(--pie-relleno);
   color: var(--color-texto);
+  /*
+   * La imagen decorativa sobresale por la derecha. `clip` y no `hidden`: corta
+   * en horizontal sin crear contenedor de scroll, y deja que sobresalga hacia
+   * arriba. En ux-9 esto daba 23 px de scroll horizontal a 1440.
+   */
+  overflow-x: clip;
 }
 
 /* --- Tarjeta roja --------------------------------------------------------- */
@@ -26,7 +32,6 @@
   align-items: center;
   gap: 20px;
   padding: 7% 5% 6%;
-  overflow: hidden;
   border-radius: var(--pie-radio);
   background: var(--color-marca); /* global `primary` */
   color: var(--color-fondo); /* global `099f28a` */
@@ -39,8 +44,35 @@
   position: absolute;
   inset: 0;
   z-index: -1;
+  border-radius: inherit;
   background: url("/isotipo-partequipos.png") left bottom / contain no-repeat;
   opacity: 0.11;
+}
+
+/*
+ * IMAGEN DECORATIVA — medida en ux-9 pintado (2026-09-24). 536 px de ancho sin
+ * girar, girada 90° a la derecha, `brightness(0.94) saturate(1.32)`. Ya girada,
+ * su borde inferior queda 1 px por debajo de la tarjeta y sobresale por la
+ * derecha el 11 % del ancho de la tarjeta menos 66 px (80 px a 1440). Las
+ * posiciones de abajo son las de la caja SIN girar que dan ese resultado al
+ * girar sobre su centro (536 × 670). Solo en escritorio, como en el export.
+ */
+.decorativa {
+  position: absolute;
+  right: calc(133px - 11%);
+  bottom: -68px;
+  z-index: 1;
+  width: 536px;
+  height: auto;
+  transform: rotate(90deg);
+  filter: brightness(0.94) saturate(1.32);
+  pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+  .decorativa {
+    display: none;
+  }
 }
 
 .lema {

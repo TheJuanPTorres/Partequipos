@@ -402,14 +402,14 @@ definitiva de base de datos (bloqueado por el cliente).
 **PIE DE UX-9 — DE ANDRÉS Y DEL CLIENTE, en un solo sitio** (2026-09-24;
 detalle en `docs/diseno/decisiones-home-ux9.md` §13):
 
-| Pendiente                                                                                     | De quién                      | Mientras tanto                     |
-| --------------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------- |
-| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | No se pinta                        |
-| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | No se pinta                        |
-| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | No se pinta                        |
-| **Imagen decorativa** `Partequipos3553.png` (brazo de excavadora): licencia de banco (**L3**) | Andrés (procedencia), cliente | Omitida: el repositorio es público |
-| **HelveticaNeue** del texto de la empresa: licencia web (**L1**)                              | Cliente, vía Andrés           | Inter                              |
-| Redacción: «Ayudamos sectores…» → «Ayudamos **a** sectores…»                                  | Andrés (para su maqueta)      | Corregido en el sitio              |
+| Pendiente                                                                                     | De quién                      | Mientras tanto                                                             |
+| --------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------- |
+| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | No se pinta                                                                |
+| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | No se pinta                                                                |
+| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | No se pinta                                                                |
+| **Imagen decorativa** `Partequipos3553.png` (brazo de excavadora): licencia de banco (**L3**) | Andrés (procedencia), cliente | En `Media` de producción para la demo (§10.33 punto 2); nunca en `public/` |
+| **HelveticaNeue** del texto de la empresa: licencia web (**L1**)                              | Cliente, vía Andrés           | Inter                                                                      |
+| Redacción: «Ayudamos sectores…» → «Ayudamos **a** sectores…»                                  | Andrés (para su maqueta)      | Corregido en el sitio                                                      |
 
 Cuando lleguen las URL, se añaden en el panel (global **Pie de página**), sin
 tocar código.
@@ -518,6 +518,13 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 2. **LICENCIA L3:** las fotos de Andrés están en producción para la demo.
    **Antes del lanzamiento real se reemplazan o se licencian.** El paso 1 las
    quita; si la demo se alarga, este pendiente sigue abierto mientras estén.
+   **Ampliado el 2026-09-24:** la excepción cubre también la **imagen
+   decorativa del pie** (`Partequipos3553.png`). La sube dirección desde el
+   panel de producción al campo «Imagen decorativa» del global `pie`: está en
+   `Media`, no en `public/`, porque el repositorio es público. **Se licencia o
+   se reemplaza antes del lanzamiento real.** El paso 1 (`retirar produccion`)
+   **no la quita**, porque no la siembra el script: hay que vaciar el campo y
+   borrarla de `Media` a mano.
 3. **Lighthouse de la fase D:** 3 corridas válidas con el método de §10.3
    p.14. Aplicar la regla: más de 2,4 s, calidad 60 con Andrés; más de 2,5 s,
    parar.

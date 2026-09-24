@@ -40,6 +40,16 @@ export const Pie: GlobalConfig = {
       label: "Texto del botón de WhatsApp",
       admin: { description: "El número sale de la configuración de la empresa." },
     },
+    {
+      name: "imagenDecorativa",
+      type: "upload",
+      relationTo: "media",
+      label: "Imagen decorativa",
+      admin: {
+        description:
+          "Opcional. Máquina recortada (PNG transparente) que asoma girada sobre la tarjeta roja, solo en escritorio. Vacío: la tarjeta sin imagen.",
+      },
+    },
     { name: "empresaTitulo", type: "text", label: "Frase destacada de la empresa" },
     { name: "empresaTexto", type: "textarea", label: "Texto de la empresa" },
     {

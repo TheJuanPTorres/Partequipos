@@ -1708,6 +1708,10 @@ export interface Pie {
    * El número sale de la configuración de la empresa.
    */
   textoBoton: string;
+  /**
+   * Opcional. Máquina recortada (PNG transparente) que asoma girada sobre la tarjeta roja, solo en escritorio. Vacío: la tarjeta sin imagen.
+   */
+  imagenDecorativa?: (number | null) | Media;
   empresaTitulo?: string | null;
   empresaTexto?: string | null;
   columnas?:
@@ -1737,6 +1741,7 @@ export interface Pie {
 export interface PieSelect<T extends boolean = true> {
   lema?: T;
   textoBoton?: T;
+  imagenDecorativa?: T;
   empresaTitulo?: T;
   empresaTexto?: T;
   columnas?:

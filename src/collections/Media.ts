@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { formatoDeImagenPermitido } from "./hooks/formatoDeImagenPermitido";
 import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
+import { sinRecorte } from "./hooks/sinRecorte";
 
 /**
  * Archivos subidos (imágenes, logos, etc.).
@@ -43,6 +44,13 @@ export const Media: CollectionConfig = {
      * usa: se sube desde el equipo.
      */
     pasteURL: false,
+    /*
+     * RECORTE DESACTIVADO (CLAUDE.md §10.32): sobrescribía el fichero con el
+     * mismo nombre y la caché de un año seguía sirviendo el original con las
+     * medidas del recorte. `crop: false` quita el botón; el gancho `sinRecorte`
+     * lo cierra en el servidor, que no mira esta opción.
+     */
+    crop: false,
   },
   /*
    * El mensaje de rechazo de Payload está cableado en inglés; este hook se
@@ -51,7 +59,7 @@ export const Media: CollectionConfig = {
   hooks: {
     // Primero el cierre de la descarga remota: esa vía no trae `req.file`, así
     // que el gancho de formato no la vería (§10.32).
-    beforeOperation: [sinDescargaRemota, formatoDeImagenPermitido],
+    beforeOperation: [sinDescargaRemota, sinRecorte, formatoDeImagenPermitido],
   },
   fields: [
     {

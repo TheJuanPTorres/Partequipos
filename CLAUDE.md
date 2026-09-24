@@ -1531,14 +1531,15 @@ que nadie contrastó con la fuente**.
 
 **Sexta vez que el instrumento devuelve algo con aspecto de dato:**
 
-| Sección | Se midió…                                       | …en lugar de…                        |
-| ------- | ----------------------------------------------- | ------------------------------------ |
-| §10.14  | el HTML de origen                               | la página pintada                    |
-| §10.15  | el código HTTP                                  | el efecto en la base                 |
-| §10.17  | el permiso nuevo                                | la migración que lo reparte          |
-| §10.20  | el código, y el pintado de una pestaña de fondo | el despliegue, y una pestaña visible |
-| §10.23  | el tema forzado desde la consola                | el tema al que entra un usuario      |
-| §10.24  | un instante de la transición del borde          | el estado asentado                   |
+| Sección | Se midió…                                                                                     | …en lugar de…                                                    |
+| ------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| §10.14  | el HTML de origen                                                                             | la página pintada                                                |
+| §10.15  | el código HTTP                                                                                | el efecto en la base                                             |
+| §10.17  | el permiso nuevo                                                                              | la migración que lo reparte                                      |
+| §10.20  | el código, y el pintado de una pestaña de fondo                                               | el despliegue, y una pestaña visible                             |
+| §10.23  | el tema forzado desde la consola                                                              | el tema al que entra un usuario                                  |
+| §10.24  | un instante de la transición del borde                                                        | el estado asentado                                               |
+| §10.32  | el Blob **dentro de su ventana de propagación** (≤ 60 s), con un anti-caché que el CDN ignora | el fichero ya propagado — y se publicó como «defecto de Payload» |
 
 ### 10.26 HALLAZGO — dos filas de preferencia para la misma clave, y tres formas de leerlas
 
@@ -2106,6 +2107,39 @@ Resultado de hoy: **400 en las dos, registros 5 → 5 y 0 → 0.**
 > sepamos, pero no se ha auditado. Anotado en la tabla de defectos de Payload
 > de `docs/design-tokens.md`.
 
+#### RECORTE DESACTIVADO (2026-09-23) — y el riesgo de fondo: sobrescribir con el mismo nombre
+
+**Decisión de dirección:** sin esperar a discriminar si era caché o fichero,
+porque el resultado no cambia la decisión: sobrescribir con el mismo nombre
+hace que se pinte el original con la proporción del recortado.
+
+| Qué             | Cómo                                                                                                                                                                                                           |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Botón del panel | `upload.crop: false` en `media` y `videos` (en `videos` también `focalPoint: false`)                                                                                                                           |
+| **Servidor**    | Gancho `sinRecorte`. **`crop: false` solo quita el botón**: Payload 3.89 recorta si la query trae `uploadEdits[crop]`, `heightInPixels` o `widthInPixels`, sin mirar esa opción. Por la API se seguía pudiendo |
+| Punto focal     | **No** se bloquea: no cambia los bytes, y se conecta a `object-position` en la fase C (aprobado)                                                                                                               |
+
+**Para reabrir el recorte algún día: `addRandomSuffix: true`** en
+`vercelBlobStorage`. Cada subida —y cada recorte— tendría un nombre nuevo, que es
+lo que recomienda Vercel («treat blobs as immutable») y lo que evita la caché
+rancia. **Condiciones:** cambia el nombre de **todas** las subidas nuevas (las
+URL dejan de ser el nombre original), y **hay que probarlo antes** —que el
+recorte suba el fichero nuevo, que el viejo se borre y que no queden
+huérfanos— midiendo el Blob **pasados los 60 s** de propagación.
+
+**EL PROBLEMA DE FONDO NO ES EL RECORTE: es cualquier sobrescritura con el
+mismo nombre.** El plugin sube con `allowOverwrite: true` y caché de un año:
+todo lo que reescriba un fichero existente tiene el mismo riesgo de caché
+rancia. Revisado en Payload 3.89 qué vías del panel reescriben el fichero de un
+registro existente conservando el nombre:
+
+| Vía                                                                           | ¿Reutiliza el nombre?                                                                                                                                                                                                      |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Reemplazar el fichero** de un registro (quitar y subir otro)                | **No.** `getSafeFileName` busca CUALQUIER documento con ese nombre —incluido el propio— y añade `-1`, `-2`…: es un fichero nuevo                                                                                           |
+| Subida en lotes, duplicar                                                     | **No**: registro nuevo, nombre seguro                                                                                                                                                                                      |
+| **«Volver a subir»** (`generateFileData` con `overwriteExistingFiles = true`) | **Sí.** Lo disparan recorte, tamaño y **punto focal**. Recorte y tamaño, cerrados; el punto focal reescribe **los mismos bytes**, así que no debería cambiar lo que se ve — **a verificar en la fase C**, pasados los 60 s |
+| Por REST, pedir `overwriteExistingFiles`                                      | **No**: ningún endpoint lo expone                                                                                                                                                                                          |
+
 **Efecto secundario en el preview, esperado:** los registros de `media` del
 preview vienen clonados de producción y apuntan al almacén de **producción**;
 recortarlos allí se rechaza, porque su host no es el del preview. En
@@ -2271,6 +2305,11 @@ fichero, cero dependencias, cero imports, solo marcado.
 
 ### 10.25 GUARDARRAÍLES — convertir un olvido silencioso en un fallo ruidoso
 
+> Mismo patrón en §10.32: una lectura del Blob hecha **dentro de la ventana de
+> propagación de su caché** devolvió el fichero anterior con aspecto de dato, y
+> se documentó como defecto demostrado. La tabla de estas lecciones está al
+> final de §10.24.
+>
 > El patrón que comparten las lecciones §10.14 a §10.24 es que **el fallo no
 > avisa**: el sitio sigue respondiendo 200, el panel sigue pintando, el build
 > sigue en verde. Contra eso solo sirve una comprobación que **rompa** cuando
@@ -2292,6 +2331,7 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                 | `npm run qa:acceso-portada`                                | **A mano**, contra development |
 | Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB              | `formatoDeVideoPermitido` + su prueba                      | CI y subida                    |
 | Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)  | `sinDescargaRemota` + su prueba                            | CI y subida                    |
+| Recorte cerrado en el servidor           | Un recorte pedido por la API (`uploadEdits[crop]`), que Payload aplica aunque `crop: false` (§10.32)    | `sinRecorte` + su prueba                                   | CI y subida                    |
 
 **Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
 lista real, y una prueba que exige que coincidan.

@@ -503,7 +503,20 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
    sin migrar en la fase C (`0d2dbd3`) y los recogió por sorpresa la migración
    de la fase D. Idea a evaluar: `payload migrate:create` en seco comparando
    contra el último snapshot.
-6. **Restablecer las tres reglas de arriba.** Este apartado deja de aplicarse.
+6. **Devolver `disponible = true` a los equipos usados 4 a 8 de producción.**
+   Para la demo se ocultó la pestaña «Otros» de la home: esos 5 equipos de
+   demo no tenían foto ni ficha y se veían vacíos. Mientras sigan así, las
+   páginas de minicargadores, motoniveladoras y retrocargadoras dicen «No hay
+   unidades disponibles». En la misma limpieza (`.tmp-hero/limpieza-demo.sql`)
+   se quitó «(demo)» de los 8 nombres de equipo y se pusieron los textos de
+   ux-9 en las marcas Hitachi, CASE y Yanmar; eso no hace falta revertirlo.
+   Después, **redeploy**: un `UPDATE` directo no revalida nada.
+
+   ```sql
+   UPDATE equipos_usados SET disponible = true WHERE id BETWEEN 4 AND 8 RETURNING id, nombre, disponible;
+   ```
+
+7. **Restablecer las tres reglas de arriba.** Este apartado deja de aplicarse.
 
 ### 10.34 INCIDENTE 2026-09-24 — marcador `dev` en PRODUCCIÓN por un import estático
 

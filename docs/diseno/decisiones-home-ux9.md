@@ -292,7 +292,7 @@ secciones se construyen con los textos de ux-9 sembrados en `development`.
 | Pendiente                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Antes de   |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
 | **Reexportar el MP4 de la sección 7: a H.264 de 8 bits Y por debajo de 4 MB.** Hoy es High 10 (10 bits), y puede que Safari de iPhone no lo reproduzca y el visitante vea solo el póster (§4). Y pesa 6,5 MB: la colección `videos` admite **4 MB como máximo**, porque la subida pasa por una función de Vercel que corta a 4,5 MB (§9). Las dos condiciones a la vez; si no cabe en 4 MB con calidad aceptable, se decide la subida directa con ruta propia (§9) | **Fase F** |
-| **Versión más ligera del recorte de 1.570 kB de la sección 3** (`excavadora-amarilla-aislada-…-e1788914890653.png`), que pesa entre 2,4 y 4 veces lo que sus vecinos de pestaña (§1)                                                                                                                                                                                                                                                                               | **Fase D** |
+| **RESUELTO (§11)** — versión más ligera del recorte de 1.570 kB de la sección 3: PNG con paleta, **558 kB**, exacta en todo píxel visible                                                                                                                                                                                                                                                                                                                          | **Fase D** |
 | **El revelado del prototipo del hero usa `translateY` en px (50 px)**; el widget de Andrés usa `yPercent` (50 % del alto de la palabra). Se corrige al pasarlo a `Revelado` con el ritmo `portada`                                                                                                                                                                                                                                                                 | **Fase C** |
 | **El parpadeo del hero:** un bloque ya visible al cargar se pinta, se oculta al hidratar y se revela (limitación de `Revelado`, §8). Resolverlo **sin retrasar el LCP**, que en la home es el título o la foto del hero, y **medir antes y después** (Lighthouse local, mediana de 3, y el LCP en la página pintada)                                                                                                                                               | **Fase C** |
 
@@ -442,13 +442,13 @@ prueba en el preview, que tiene almacén propio.
 
 ## 10. Fase C — cabecera y hero (2026-09-23)
 
-| Pieza                                    | Dónde                                                                                                                                     |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Hero desde Payload                       | `HeroPortada.tsx` + `src/lib/portada/hero.ts` (descarta diapositivas sin fondo; enlace solo con nombre accesible). Sustituye al prototipo |
-| Logo como `<h1>` solo en la portada (D1) | `LogoCabecera.tsx`: `usePathname`, prerenderizado en el servidor. Nombre: el título de la página `inicio`                                 |
-| Logo al tamaño pintado                   | 184×36 en vez de 1614×317: se pide a **256 px** en vez de 1920                                                                            |
-| Revelado sin parpadeo                    | `Revelado` con `alCargar`: animación por `@keyframes` desde el primer pintado                                                             |
-| Punto focal                              | `focalPoint: true` en `Media`; `object-position` en el fondo del hero y en las imágenes del blog con `object-cover`                       |
+| Pieza                                    | Dónde                                                                                                                                                                                |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Hero desde Payload                       | `HeroPortada.tsx` + `src/lib/portada/hero.ts` (descarta diapositivas sin fondo; enlace solo con nombre accesible). Sustituye al prototipo                                            |
+| Logo como `<h1>` solo en la portada (D1) | `LogoCabecera.tsx`: `useSelectedLayoutSegment` (no `usePathname`, que en una regeneración devuelve `/index`), prerenderizado en el servidor. Nombre: el título de la página `inicio` |
+| Logo al tamaño pintado                   | 184×36 en vez de 1614×317: se pide a **256 px** en vez de 1920                                                                                                                       |
+| Revelado sin parpadeo                    | `Revelado` con `alCargar`: animación por `@keyframes` desde el primer pintado                                                                                                        |
+| Punto focal                              | `focalPoint: true` en `Media`; `object-position` en el fondo del hero y en las imágenes del blog con `object-cover`                                                                  |
 
 ### El parpadeo, medido antes y después
 
@@ -605,3 +605,110 @@ p.14): esta medición —**LCP 2,24 s**— es la referencia de la home. Tras cad
 fase que añada algo a la portada se repite con el mismo método. **> 2,4 s** →
 calidad 60 en los fondos del hero, con validación visual de Andrés. **> 2,5 s
 aun así** → se para y se analiza.
+
+---
+
+## 11. Fase D — secciones 2 y 3 (2026-09-24)
+
+Rama `feat/fase-d-secciones-2-3`.
+
+| Pieza                                   | Dónde                                                                                                                                   |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Lógica pura (tarjetas, pestañas, ficha) | `src/lib/portada/secciones.ts` + `secciones.test.ts`                                                                                    |
+| Consultas                               | `getMarcasDePortada` y `getEquiposUsadosDePortada` en `src/lib/queries/getMaquinaria.ts` (dos consultas con tope, una por pestaña)      |
+| Sección 2                               | `SeccionMaquinariaNueva.tsx` (servidor) + `CarruselMarcas.tsx` (cliente, `scroll-snap`, sin Swiper) + `maquinariaNueva.module.css`      |
+| Sección 3                               | `SeccionMaquinariaUsada.tsx` (servidor, pinta las tarjetas) + `PestanasUsada.tsx` (cliente, patrón ARIA) + `maquinariaUsada.module.css` |
+| Máquina decorativa de la sección 3      | Campo nuevo **opcional** `paginas.seccionUsada.imagen` (solo en `inicio`). Migración `20260924_143657_fase_d_portada`                   |
+| Portada de prueba del preview           | `npm run preview:hero-prueba` siembra y retira también las secciones 2 y 3                                                              |
+
+**Sin GSAP.** Los títulos usan `Revelado` (disparo al 95 %, ritmo `titulo`) y
+la frase de marcas el ritmo `pausado`. El panel de pestañas aparece con el
+`fadeIn` de Elementor (0,75 s) y la foto de la tarjeta crece al pasar el ratón
+(×1,1 en 0,3 s), como en ux-9. **Con movimiento reducido**: títulos visibles y
+quietos (medido: 24 palabras, 0 ocultas o desplazadas), sin aparición del panel,
+sin crecimiento y con desplazamiento instantáneo del carrusel.
+
+### Medido contra ux-9 pintado, en los tres cortes
+
+Los valores **no salen de la captura**: se midió cada elemento de su página
+pintada (Chrome sin interfaz) y se cotejó con la nuestra, en coordenadas
+relativas a la sección. Lo que no depende de las imágenes coincide al píxel:
+
+| Elemento (1440)              | ux-9                      | Nuestro                   |
+| ---------------------------- | ------------------------- | ------------------------- |
+| Sección 2                    | 1440 × 691                | 1440 × 691                |
+| Tarjetas de marca            | x 63 · 511 · 959, 418×270 | x 63 · 511 · 959, 418×270 |
+| Texto de la tarjeta          | 217, 357                  | 217, 357                  |
+| «Ver todo»                   | 648, 569 · 145×40         | 648, 569 · 145×40         |
+| Título «usada»               | 955, 121 · 418×132        | 955, 121 · 418×132        |
+| Pestañas                     | y 293, alto 46            | y 293, alto 46            |
+| Tarjeta de equipo            | 684, 379 · 679 de ancho   | 684, 379 · 679 de ancho   |
+| Nombre · primer dato · botón | x 998 · y 399 / 499 / 684 | x 998 · y 399 / 499 / 684 |
+
+A 1010 y 390 igual (tarjetas de marca de 440 y 327, flechas en x 40 y 22, logo
+de 100 y 120 px, pestañas de 43 de alto, tarjetas de equipo de 465 en tablet).
+Lo que cambia de alto se debe a las **imágenes de demostración** de
+`development` (la máquina de ux-9 es 4:5; la de demo, 4:3): la distancia de la
+máquina al titular de marcas es la misma (179 px a 1440, 41 a 1010).
+
+**Un ajuste que salió de medir:** el hueco entre tarjetas de marca es **30 px**,
+no 20: Swiper suma su `spaceBetween` de 10 a los 10 px de relleno de cada
+diapositiva. La primera versión daba 20.
+
+### Desviaciones de esta fase
+
+| #   | En ux-9                                                                                                     | Aquí                                                                                     | Por qué                                                                                                                                                                                                                                                 |
+| --- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Títulos en `<div>`, frase en `<h2>`, nombres de tarjeta en `<h2>`                                           | `<h2>`, `<p>` y `<h3>`                                                                   | Ya decidida (§2)                                                                                                                                                                                                                                        |
+| D5  | En **móvil** la tarjeta de equipo sigue en fila y la columna de texto empieza en **x = 382 de 390**         | La tarjeta se **apila**: imagen arriba, texto debajo, con los mismos valores             | Medido: nombre, ficha y «Ver producto» quedan **fuera de la pantalla**. Es un fallo del diseño, no una decisión                                                                                                                                         |
+| D6  | Iconos de Flaticon (`debt`, `meter-bolt`, `engine`, `settings`, `blog-text`)                                | Iconos de **Tabler** equivalentes, mismo tamaño y color                                  | **L2**: la licencia gratuita de Flaticon exige atribución visible. Tabler (MIT) ya es dependencia aprobada; va en componentes de servidor, así que no añade JavaScript. **Primer uso fuera del panel.** Si Andrés resuelve L2, se cambian por los suyos |
+| D7  | Swiper en **bucle**: flechas y puntos aunque las tres tarjetas quepan                                       | Sin bucle. Si todo cabe, **no hay flechas** y la fila de puntos queda vacía, con su alto | Unas flechas que no llevan a ninguna parte son un control falso. Con 4 o más marcas con foto aparecen también en escritorio                                                                                                                             |
+| D8  | Puntos pulsables de 6 px, 18 px entre centros                                                               | Los puntos **indican**; no se pulsan (`aria-hidden`)                                     | WCAG 2.5.8 pide 24 px de objetivo, y no cabe sin cambiar su aspecto. Las flechas y el gesto ya navegan                                                                                                                                                  |
+| D9  | Las tarjetas de marca **no enlazan**                                                                        | Cada tarjeta enlaza a **su marca**                                                       | Sin cambio visual. Enlaces internos a las páginas de marca (SEO) y un destino evidente para quien pulsa la tarjeta                                                                                                                                      |
+| D10 | En **móvil** las pestañas pasan a acordeón: «Otros» y «Aditamentos» quedan **debajo** del contenido abierto | Siguen siendo pestañas: todas arriba, a todo el ancho, mismo aspecto                     | El patrón ARIA exige la lista junta; partirla lo rompe                                                                                                                                                                                                  |
+| D11 | Pestaña **«Aditamentos»**                                                                                   | **No se pinta**                                                                          | Sin fuente en la línea usada: «Aditamentos» es una «marca» de la línea **nueva** (ADR 0007). **Decisión pendiente de dirección.** «Excavadoras» es la categoría `excavadoras`; «Otros», el resto                                                        |
+| D12 | La máquina de la sección 3 sube 140 px **encima** del botón «Ver todo»                                      | El botón queda **por encima**                                                            | En ux-9 el recorte es transparente y el botón se ve, pero el `<img>` se queda el clic en la zona que solapa (a 390 px, el botón entero)                                                                                                                 |
+
+**Y dos que no son desviación, anotadas para no confundirlas:**
+
+- **«Ver producto» lleva a la categoría**, no a la máquina: el equipo usado no
+  tiene URL propia (ADR 0007). El nombre accesible es el texto visible, y el
+  enlace se describe con el `<h3>` de su tarjeta (`aria-describedby`).
+- **El decimal va con coma** («8,4 t»), no con el punto de ux-9: es la
+  convención de Colombia (`es-CO`), la misma del resto del sitio.
+
+### Textos de la sección: interfaz, no contenido
+
+«Venta de maquinaria», «Maquinaria pesada nueva/usada», «Marcas que respaldan
+nuestro trabajo», su frase y los botones están **en el código**, como los
+títulos de la navegación y los de la portada anterior («Qué encontrarás aquí»).
+Las tarjetas, sus textos, fotos y fichas **salen de Payload**. Si el cliente
+quiere editar esos títulos, es un grupo más en `inicio`, con migración: no se
+hizo sin que nadie lo pidiera.
+
+### El recorte de 1.570 kB: resuelto sin pérdida visible
+
+El pendiente de §7. Medido con `sharp`:
+
+| Versión                          | Tamaño     | Píxeles visibles distintos |
+| -------------------------------- | ---------- | -------------------------- |
+| Original (RGBA)                  | 1.570 kB   | —                          |
+| RGBA recomprimida, sin paleta    | 1.560 kB   | 0 (bytes idénticos)        |
+| **PNG con paleta, mismo tamaño** | **558 kB** | **0**                      |
+| 1200 px, WebP q90                | 240 kB     | con pérdida                |
+
+**Por qué la paleta sale exacta:** el original solo tiene **255 colores
+visibles** —ya estaba cuantizado— guardados como RGBA de 32 bits. Una paleta de
+256 entradas los representa todos. Las únicas diferencias están en el color de
+píxeles **totalmente transparentes**, que no se ven. **−64 % sin tocar un píxel
+visible.** El script de prueba sube esta versión.
+
+### Una deriva de esquema que salió al generar la migración
+
+`payload migrate:create` añadió, además de la columna nueva, **`DROP COLUMN`
+de `videos.focal_x` y `videos.focal_y`**: el commit `0d2dbd3` (fase C) puso
+`focalPoint: false` en `Video` **sin migración**, y las columnas seguían en las
+bases. Se queda en esta migración, anotado en ella: un punto focal de un vídeo
+no se usó nunca (el póster tiene el suyo en `Media`). **Lección:** un cambio en
+una colección, aunque sea «quitar una opción», puede cambiar el esquema; hay que
+generar la migración en el mismo commit, o la recoge por sorpresa la siguiente.

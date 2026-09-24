@@ -65,7 +65,7 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 > | Tailwind                        | **v4.3.3**, con `@tailwindcss/postcss`; sin fichero de configuración                                                           |
 > | Estilos del sitio público       | Utilidades de Tailwind **con colores fijos** (186 en 31 ficheros, recontado 2026-09-23) y, desde la fase A, los tokens de ux-9 |
 > | Estilos del panel               | SCSS propio sin capa: `src/app/(payload)/custom.scss`                                                                          |
-> | Iconos                          | `@tabler/icons-react` (aprobado 2026-09-17), solo en el menú del panel                                                         |
+> | Iconos                          | `@tabler/icons-react` (aprobado 2026-09-17), menú del panel y portada (D6)                                                     |
 >
 > **Consecuencia práctica:** adoptar componentes del sistema del cliente **no**
 > duplicaría un primitivo, porque no hay ninguno. Ver `docs/design-tokens.md`.

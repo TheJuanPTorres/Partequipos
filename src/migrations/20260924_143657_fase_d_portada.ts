@@ -12,7 +12,8 @@
  *    generador las recoge aquí. Se pierde su contenido: un punto focal de un
  *    VÍDEO nunca se usó en ninguna plantilla (el póster es una imagen de
  *    `Media`, con su propio punto focal), así que no hay dato que conservar.
- *    Contado antes de aplicarla en cada base: ver docs/diseno/decisiones-home-ux9.md §11.
+ *    Vídeos al aplicarla (2026-09-24): preview 0 (contado DESPUÉS de migrar,
+ *    por la API) y producción 0 (contado ANTES de fusionar). Nada que perder.
  */
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 

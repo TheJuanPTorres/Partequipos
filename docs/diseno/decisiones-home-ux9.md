@@ -709,6 +709,6 @@ visible.** El script de prueba sube esta versión.
 de `videos.focal_x` y `videos.focal_y`**: el commit `0d2dbd3` (fase C) puso
 `focalPoint: false` en `Video` **sin migración**, y las columnas seguían en las
 bases. Se queda en esta migración, anotado en ella: un punto focal de un vídeo
-no se usó nunca (el póster tiene el suyo en `Media`). **Lección:** un cambio en
+no se usó nunca (el póster tiene el suyo en `Media`), y **no había ningún vídeo**: 0 en el preview (contado tras migrar) y 0 en producción (contado antes de fusionar). **Lección:** un cambio en
 una colección, aunque sea «quitar una opción», puede cambiar el esquema; hay que
 generar la migración en el mismo commit, o la recoge por sorpresa la siguiente.

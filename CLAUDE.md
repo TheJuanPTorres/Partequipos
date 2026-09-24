@@ -453,6 +453,58 @@ definitiva de base de datos (bloqueado por el cliente).
 > tarjeta (estrechaban el formulario) y el sitio público. **Pendiente de
 > terceros:** logo para fondos oscuros (#12) y favicon (#9).
 
+### 10.33 SUSPENSIÓN TEMPORAL — demo de la home al cliente (2026-09-24)
+
+> **Tres reglas se SUSPENDEN para esta demo, NO se derogan.** Vuelven a
+> aplicarse en cuanto termine. Decisión de dirección del 2026-09-24, por la
+> **reunión con el cliente de las 16:00**, en la que se le enseña la home en
+> producción. **Quien lea esto después: no es un cambio de criterio.**
+
+| Regla suspendida                                                                          | Qué se hizo en su lugar                                                                                                                                          |
+| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Las fotos de Andrés (licencia pendiente, **L3**) solo van al preview, nunca a producción  | Se suben al Blob de producción con `npm run preview:hero-prueba -- sembrar produccion`                                                                           |
+| Una prueba que crearía registros en producción no se hace                                 | La siembra crea en producción imágenes, 2 equipos usados y relaciones en marcas y portada                                                                        |
+| La fase D no se fusiona sin la medición del LCP de §10.3 p.14 ni la verificación completa | Se fusionó con CI, prueba de humo y la migración confirmada en el registro del build (`db:check` sin marcador `dev`, `Migrated: 20260924_143657_fase_d_portada`) |
+
+**Por qué el riesgo es bajo y aceptable (dirección):**
+`partequipos.vercel.app` **no es el sitio real**. El sitio real sigue siendo el
+WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
+(§10.6) y solo llega quien tiene el enlace.
+
+**Cómo está acotado el modo de producción del script:**
+
+- Por defecto el script se sigue negando: solo acepta el preview.
+- Con el argumento posicional `produccion` exige base **y** Blob de producción.
+  Con development, que comparte el Blob de producción, se niega.
+- Es un argumento y no una bandera `--produccion` porque `payload run` descarta
+  las banderas con guiones: se midió que no llegaban al script.
+- `retirar produccion` limpia lo sembrado.
+- Los equipos de prueba llevan **nombres y fichas verosímiles** (Hitachi
+  ZX75US-7 y Yanmar ViO55-6), porque los ve el cliente. Se reconocen por sus
+  imágenes, cuyo texto alternativo sí lleva la marca «PRUEBA HERO —».
+
+#### PENDIENTES DESPUÉS DE LA REUNIÓN — en este orden
+
+1. **Retirar la siembra de producción:**
+   `npm run preview:hero-prueba -- retirar produccion`, con base y Blob de
+   producción. Comprueba que los ficheros dan 404 en el Blob.
+2. **LICENCIA L3:** las fotos de Andrés están en producción para la demo.
+   **Antes del lanzamiento real se reemplazan o se licencian.** El paso 1 las
+   quita; si la demo se alarga, este pendiente sigue abierto mientras estén.
+3. **Lighthouse de la fase D:** 3 corridas válidas con el método de §10.3
+   p.14. Aplicar la regla: más de 2,4 s, calidad 60 con Andrés; más de 2,5 s,
+   parar.
+4. **Verificación completa de las secciones 2 y 3,** pintadas y con las fotos
+   reales, en los tres cortes. Hoy solo hay la pasada visual rápida de la demo
+   y la verificación local contra `development` de
+   `docs/diseno/decisiones-home-ux9.md` §11.
+5. **Guardarraíl de deriva de esquema:** que CI falle si una colección cambia
+   el esquema sin su migración. Motivo: `videos.focal_x` y `focal_y` quedaron
+   sin migrar en la fase C (`0d2dbd3`) y los recogió por sorpresa la migración
+   de la fase D. Idea a evaluar: `payload migrate:create` en seco comparando
+   contra el último snapshot.
+6. **Restablecer las tres reglas de arriba.** Este apartado deja de aplicarse.
+
 ### 10.1 Inventario real (fuente de verdad)
 
 > Medido por rastreo propio del sitio en producción (`npm run crawl`, 2026-07-27).

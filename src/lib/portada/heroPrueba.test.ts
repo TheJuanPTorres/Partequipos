@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import { HOST_PREVIEW } from "../db/vaciadoSolicitudes";
 import {
   ALMACEN_PREVIEW,
+  ALMACEN_PRODUCCION,
   EQUIPOS_PRUEBA,
   IMAGENES_SECCIONES,
   almacenDeToken,
@@ -61,18 +62,46 @@ describe("reconocer y quitar la diapositiva de prueba", () => {
   });
 });
 
+describe("modo producción (demo al cliente)", () => {
+  it("con la bandera, solo base Y Blob de producción", () => {
+    assert.deepEqual(puedeTocarHeroDePrueba(uri(PROD_HOST), token(ALMACEN_PRODUCCION), true), {
+      permitido: true,
+    });
+  });
+
+  it("sin la bandera, producción se sigue rechazando", () => {
+    assert.equal(
+      puedeTocarHeroDePrueba(uri(PROD_HOST), token(ALMACEN_PRODUCCION)).permitido,
+      false,
+    );
+  });
+
+  it("con la bandera, rechaza el preview y la base de development con el Blob de producción", () => {
+    assert.equal(
+      puedeTocarHeroDePrueba(uri(HOST_PREVIEW), token(ALMACEN_PREVIEW), true).permitido,
+      false,
+    );
+    const dev = "ep-aged-forest-aw4bua7l-pooler.c-12.us-east-1.aws.neon.tech";
+    assert.equal(
+      puedeTocarHeroDePrueba(uri(dev), token(ALMACEN_PRODUCCION), true).permitido,
+      false,
+    );
+  });
+});
+
 describe("secciones 2 y 3 de prueba", () => {
-  it("cada equipo de prueba usa una imagen que se siembra, y todo lleva la marca", () => {
+  it("cada equipo de prueba usa una imagen que se siembra, sin marca visible", () => {
     const ficheros = IMAGENES_SECCIONES.map((i) => i.fichero as string);
     for (const e of EQUIPOS_PRUEBA) {
       assert.ok(ficheros.includes(e.imagen), e.imagen);
-      assert.equal(esEquipoDePrueba(e), true);
+      assert.doesNotMatch(`${e.nombre} ${e.descripcion}`, /PRUEBA/);
     }
     for (const i of IMAGENES_SECCIONES) assert.match(i.alt, /^PRUEBA HERO — /);
   });
 
-  it("un equipo real no se toma por uno de prueba", () => {
-    assert.equal(esEquipoDePrueba({ descripcion: "Excavadora en buen estado" }), false);
-    assert.equal(esEquipoDePrueba({ descripcion: null }), false);
+  it("un equipo es de prueba solo si usa una imagen de prueba", () => {
+    assert.equal(esEquipoDePrueba({ imagenes: [3, { id: 8 }] }, [8, 9]), true);
+    assert.equal(esEquipoDePrueba({ imagenes: [3] }, [8, 9]), false);
+    assert.equal(esEquipoDePrueba({ imagenes: null }, [8, 9]), false);
   });
 });

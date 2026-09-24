@@ -92,23 +92,50 @@ export const IMAGENES_SECCIONES = [
 ] as const;
 
 /** Los dos equipos usados de las tarjetas de ux-9 (sección 3, «Excavadoras»). */
+/*
+ * Dos equipos usados de las tarjetas de ux-9 (sección 3, «Excavadoras»).
+ * Nombres, fichas y textos VEROSÍMILES: desde el 2026-09-24 también se siembran
+ * en producción para la demo al cliente, y la página de la categoría muestra
+ * nombre, año, horómetro, ubicación y descripción. Por eso NO llevan marca de
+ * prueba visible: se reconocen por sus IMÁGENES (texto alternativo marcado).
+ */
 export const EQUIPOS_PRUEBA = [
-  { imagen: "excavadora-amarilla-aislada-archivo-png-fondo-transparente-e1788914890653.png" },
-  { imagen: "014_Cut01_2560x1710v0-2.png" },
-].map((e) => ({
-  ...e,
-  nombre: "Excavadora Hitachi ZX75US-7",
-  marca: "Hitachi",
-  modelo: "ZX75US-7",
-  pesoOperativo: 8.4,
-  potencia: 64,
-  motor: "YANMAR 4TNV98CT",
-  /** Marca de registro de prueba: así los encuentra `retirar`. */
-  descripcion: `${MARCA_PRUEBA}equipo de demostración de la portada (fase D).`,
-}));
+  {
+    imagen: "excavadora-amarilla-aislada-archivo-png-fondo-transparente-e1788914890653.png",
+    nombre: "Excavadora Hitachi ZX75US-7",
+    marca: "Hitachi",
+    modelo: "ZX75US-7",
+    anio: 2019,
+    horometro: 4200,
+    ubicacion: "Bogotá",
+    pesoOperativo: 8.4,
+    potencia: 64,
+    motor: "YANMAR 4TNV98CT",
+    descripcion:
+      "Excavadora compacta de radio de giro corto, ideal para obra urbana. Mantenimientos al día.",
+  },
+  {
+    imagen: "014_Cut01_2560x1710v0-2.png",
+    nombre: "Miniexcavadora Yanmar ViO55-6",
+    marca: "Yanmar",
+    modelo: "ViO55-6",
+    anio: 2020,
+    horometro: 3100,
+    ubicacion: "Medellín",
+    pesoOperativo: 5.5,
+    potencia: 47,
+    motor: "YANMAR 4TNV88C",
+    descripcion:
+      "Miniexcavadora de voladizo cero con hoja niveladora. Cabina cerrada y aire acondicionado.",
+  },
+];
 
-export function esEquipoDePrueba(e: { descripcion?: string | null }): boolean {
-  return Boolean(e.descripcion?.startsWith(MARCA_PRUEBA));
+/** Un equipo es de prueba si alguna de sus imágenes es de prueba. */
+export function esEquipoDePrueba(
+  e: { imagenes?: (number | { id: number })[] | null },
+  idsPrueba: number[],
+): boolean {
+  return (e.imagenes ?? []).some((i) => idsPrueba.includes(typeof i === "object" ? i.id : i));
 }
 
 /** Punto focal en el centro, como en el diseño de Andrés. */
@@ -121,27 +148,39 @@ export function almacenDeToken(token: string | undefined): string | null {
   return token?.match(/^vercel_blob_rw_([a-z\d]+)_[a-z\d]+$/i)?.[1]?.toLowerCase() ?? null;
 }
 
+/** Base y almacén de PRODUCCIÓN (§10.21, §10.4). Identificadores, no secretos. */
+export const HOST_PRODUCCION = "ep-tiny-fog-awnwc8ie-pooler.c-12.us-east-1.aws.neon.tech";
+export const ALMACEN_PRODUCCION = "sr2s4ngkjzfzpxhi";
+
 /**
- * Solo si la base es la del preview Y el Blob es el del preview. Lista de
- * permitidos de un elemento en cada caso: producción, development o cualquier
- * desconocido se rechazan, también si falta la variable.
+ * Por defecto, SOLO preview: base Y Blob del preview. Con `produccion: true`
+ * (argumento `produccion` del script), SOLO producción: base Y Blob de
+ * producción. Nunca otra combinación: development comparte el Blob de
+ * producción, así que la base se exige siempre además del Blob.
+ *
+ * El modo producción existe para la DEMO AL CLIENTE del 2026-09-24 (CLAUDE.md
+ * §10.33). Las fotos siguen con la licencia pendiente (L3).
  */
 export function puedeTocarHeroDePrueba(
   databaseUri: string | undefined,
   blobToken: string | undefined,
+  produccion = false,
 ): Veredicto {
+  const [hostEsperado, almacenEsperado, entorno] = produccion
+    ? [HOST_PRODUCCION, ALMACEN_PRODUCCION, "producción"]
+    : [HOST_PREVIEW, ALMACEN_PREVIEW, "preview"];
   const host = databaseUri?.trim() ? hostDeConexion(databaseUri.trim()) : null;
-  if (host !== HOST_PREVIEW) {
+  if (host !== hostEsperado) {
     return {
       permitido: false,
-      motivo: `la base «${host ?? "sin DATABASE_URI"}» no es la del preview (${HOST_PREVIEW})`,
+      motivo: `la base «${host ?? "sin DATABASE_URI"}» no es la de ${entorno} (${hostEsperado})`,
     };
   }
   const almacen = almacenDeToken(blobToken);
-  if (almacen !== ALMACEN_PREVIEW) {
+  if (almacen !== almacenEsperado) {
     return {
       permitido: false,
-      motivo: `el Blob «${almacen ?? "sin BLOB_READ_WRITE_TOKEN"}» no es el del preview (${ALMACEN_PREVIEW}); con .env.local sería el de PRODUCCIÓN`,
+      motivo: `el Blob «${almacen ?? "sin BLOB_READ_WRITE_TOKEN"}» no es el de ${entorno} (${almacenEsperado})${produccion ? "" : "; con .env.local sería el de PRODUCCIÓN"}`,
     };
   }
   return { permitido: true };

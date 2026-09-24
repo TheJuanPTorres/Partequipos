@@ -1,5 +1,6 @@
 /**
- * Siembra o retira la PORTADA DE PRUEBA en el PREVIEW, con las fotos de Andrés
+ * Siembra o retira la PORTADA DE PRUEBA en el PREVIEW (y, con el argumento `produccion`,
+ * en PRODUCCIÓN para la demo al cliente del 2026-09-24, CLAUDE.md §10.33), con las fotos de Andrés
  * (ux-9): la diapositiva del hero y, desde la fase D, las secciones 2 y 3.
  * Sirve para medir el LCP tras cada fase (CLAUDE.md §10.3 p.14) y para
  * enseñarle la portada. Lógica y guardián: `src/lib/portada/heroPrueba.ts`.
@@ -10,13 +11,16 @@
  *     npm run preview:hero-prueba -- sembrar
  *   … npm run preview:hero-prueba -- retirar
  *
+ *   Demo en producción (§10.33): base Y Blob de PRODUCCIÓN, más la bandera:
+ *   … npm run preview:hero-prueba -- sembrar produccion
+ *
  * - SOLO preview: se niega ANTES de conectar si la base o el Blob no son los del
  *   preview. `payload run` carga `.env.local`, cuyo Blob es el de PRODUCCIÓN.
  * - Idempotente: lo que ya existe no se duplica.
  * - Punto focal en el centro (50/50), como en el diseño.
  * - NO PISA DATOS: a una marca solo se le pone foto o logo de prueba si no
  *   tenía; la máquina de la sección 3, igual. Los equipos de prueba son
- *   registros NUEVOS, marcados en su descripción.
+ *   registros NUEVOS, con nombres verosímiles; se reconocen por sus imágenes.
  * - `retirar`: quita PRIMERO lo que apunta a las imágenes (diapositiva, equipos,
  *   relaciones de marcas y portada) y DESPUÉS las imágenes, y comprueba que los
  *   ficheros desaparecen del Blob.
@@ -48,8 +52,12 @@ import {
 import { SLUG_EXCAVADORAS } from "../../src/lib/portada/secciones";
 import { SLUG_PORTADA } from "../../src/lib/queries/getPaginas";
 
-const modo = process.argv[process.argv.length - 1];
-if (modo !== "sembrar" && modo !== "retirar") {
+const args = process.argv.slice(2);
+const modo = args.find((a) => a === "sembrar" || a === "retirar");
+/** DEMO AL CLIENTE (CLAUDE.md §10.33): solo con la bandera Y base y Blob de producción. */
+// Argumento POSICIONAL: `payload run` descarta las banderas con guiones (medido).
+const produccion = args.includes("produccion");
+if (!modo) {
   console.error("[hero-prueba] indica el modo: «sembrar» o «retirar».");
   process.exit(1);
 }
@@ -57,6 +65,7 @@ if (modo !== "sembrar" && modo !== "retirar") {
 const veredicto = puedeTocarHeroDePrueba(
   process.env.DATABASE_URI,
   process.env.BLOB_READ_WRITE_TOKEN,
+  produccion,
 );
 if (!veredicto.permitido) {
   console.error(`[hero-prueba] NO se hace nada: ${veredicto.motivo}`);
@@ -70,6 +79,7 @@ const payload = await getPayload({ config });
 
 const log = (m: string) => process.stdout.write(`[hero-prueba] ${m}\n`);
 const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
+log(`entorno: ${produccion ? "PRODUCCIÓN (demo al cliente)" : "preview"}`);
 
 type Imagen = { fichero: string; alt: string; paleta?: boolean };
 const TODAS: Imagen[] = [...IMAGENES_PRUEBA, ...IMAGENES_SECCIONES];
@@ -116,19 +126,21 @@ async function portada() {
     overrideAccess: true,
   });
   const doc = r.docs[0];
-  if (!doc) throw new Error("no existe la portada (slug «inicio») en el preview");
+  if (!doc) throw new Error("no existe la portada (slug «inicio»)");
   return doc;
 }
 
-async function equiposDePrueba() {
+/** Equipos que usan una imagen de prueba (sin marca visible: los ve el cliente). */
+async function equiposDePrueba(idsPrueba: number[]) {
+  if (idsPrueba.length === 0) return [];
   const r = await payload.find({
     collection: "equipos-usados",
-    where: { descripcion: { like: MARCA_PRUEBA } },
+    where: { imagenes: { in: idsPrueba } },
     depth: 0,
     limit: 20,
     overrideAccess: true,
   });
-  return r.docs.filter(esEquipoDePrueba);
+  return r.docs.filter((e) => esEquipoDePrueba(e, idsPrueba));
 }
 
 /** Espera a que la URL pública responda lo esperado; la caché tarda hasta 60 s. */
@@ -278,7 +290,7 @@ if (modo === "sembrar") {
   if (!categoria) {
     log(`categoría «${SLUG_EXCAVADORAS}»: no existe en el preview; sin equipos de prueba`);
   } else {
-    const ya = await equiposDePrueba();
+    const ya = await equiposDePrueba(idsPrueba);
     for (const e of EQUIPOS_PRUEBA) {
       const idImagen = idPorFichero[e.imagen]!;
       const existe = ya.some((x) =>
@@ -294,6 +306,9 @@ if (modo === "sembrar") {
           nombre: e.nombre,
           marca: e.marca,
           modelo: e.modelo,
+          anio: e.anio,
+          horometro: e.horometro,
+          ubicacion: e.ubicacion,
           pesoOperativo: e.pesoOperativo,
           potencia: e.potencia,
           motor: e.motor,
@@ -342,7 +357,7 @@ if (modo === "sembrar") {
     log("portada: nada de prueba");
   }
 
-  for (const e of await equiposDePrueba()) {
+  for (const e of await equiposDePrueba(idsPrueba)) {
     await payload.delete({ collection: "equipos-usados", id: e.id, overrideAccess: true });
     log(`equipo de prueba ${e.id} borrado`);
   }

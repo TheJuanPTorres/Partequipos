@@ -3,10 +3,23 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { HeroPortada } from "@/components/hero/HeroPortada";
+import { SeccionMaquinariaNueva } from "@/components/portada/SeccionMaquinariaNueva";
+import { SeccionMaquinariaUsada } from "@/components/portada/SeccionMaquinariaUsada";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp, navegacionPrincipal } from "@/lib/navegacion";
 import { diapositivasDeHero } from "@/lib/portada/hero";
+import {
+  SLUG_EXCAVADORAS,
+  hrefDeCategoriaUsada,
+  pestanasDeUsada,
+  tarjetasDeMarcas,
+} from "@/lib/portada/secciones";
+import {
+  getCategoriaUsadaPorSlug,
+  getEquiposUsadosDePortada,
+  getMarcasDePortada,
+} from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { seoConfig } from "@/lib/seo/config";
@@ -36,11 +49,25 @@ export default async function HomePage() {
 
   const { contact } = seoConfig;
   const diapositivas = diapositivasDeHero(pagina.hero);
+  const [marcas, usados, excavadoras] = await Promise.all([
+    getMarcasDePortada(),
+    getEquiposUsadosDePortada(),
+    getCategoriaUsadaPorSlug(SLUG_EXCAVADORAS),
+  ]);
+  const maquinaUsada = imagenDeMedia(pagina.seccionUsada?.imagen, "");
 
   return (
     <>
       {/* Sección 1 de ux-9. Sin diapositivas en Payload, no se pinta. */}
       {diapositivas.length > 0 ? <HeroPortada diapositivas={diapositivas} /> : null}
+
+      {/* Secciones 2 y 3 de ux-9 (fase D). Sin datos, no se pintan. */}
+      <SeccionMaquinariaNueva tarjetas={tarjetasDeMarcas(marcas)} />
+      <SeccionMaquinariaUsada
+        pestanas={pestanasDeUsada(usados)}
+        maquina={maquinaUsada ? { ...maquinaUsada, alt: "" } : null}
+        hrefExcavadoras={excavadoras ? hrefDeCategoriaUsada(excavadoras.slug) : null}
+      />
 
       <main className="mx-auto max-w-5xl px-4 py-12">
         <JsonLd data={buildOrganizationJsonLd()} />

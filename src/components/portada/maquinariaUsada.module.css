@@ -1,0 +1,433 @@
+/*
+ * SECCIÓN 3 DE LA PORTADA — «Maquinaria pesada usada» + «Marcas que respaldan
+ * nuestro trabajo» (ux-9, 1717.json [3]).
+ *
+ * ================== LOS VALORES DE ANDRÉS VIVEN AQUÍ ==================
+ * Medidos en su página pintada a 390 · 1010 · 1440 (2026-09-24). Todo va en
+ * variables en `.seccion`. Lo que se aparta está marcado «DESVIACIÓN» y
+ * documentado en docs/diseno/decisiones-home-ux9.md §11.
+ * ======================================================================
+ */
+
+.seccion {
+  /* Contenedor: fila, relleno derecho 3 %, radio 30, fondo gris de sección. */
+  --s3-relleno: 0 3% 0 0;
+  --s3-radio: 30px;
+  --s3-gap: 20px;
+
+  /* Columna izquierda 45 %. Máquina que SUBE 140 px sobre la sección 2. */
+  --s3-izq: 45%;
+  --s3-maquina-ancho: 100%;
+  --s3-maquina-solape: -140px;
+  --s3-espacio-maquina: 139px;
+  --s3-espacio-final: 93px;
+  /* Titular de marcas: 536 px de caja con el texto a 9 % de ella. */
+  --s3-marcas-ancho: 536px;
+  --s3-marcas-sangria: 0.09;
+  /* Frase: 510 px de caja; relleno 0 · 4 % · 4 % · 11 % de esa caja. */
+  --s3-frase-ancho: 510px;
+  --s3-boton-sangria: 8%;
+
+  /* Columna derecha 54 %, relleno 10. */
+  --s3-der: 54%;
+  --s3-der-relleno: 10px;
+  --s3-espacio-der: 55px;
+  --s3-titulo-ancho: 418px;
+
+  /* Pestañas: relleno 15 · 35, radio 6, hueco 10. */
+  --s3-pestana-relleno: 15px 35px;
+  --s3-pestana-radio: 6px;
+  --s3-pestana-hueco: 10px;
+  --s3-pestana-interlineado: 16px;
+
+  /* Tarjeta de equipo: 95 % del panel, a la derecha; 30 px sobre cada una. */
+  --s3-tarjeta-ancho: 95%;
+  --s3-tarjeta-arriba: 30px;
+  --s3-tarjeta-hueco: 24px;
+  --s3-img-col: 38%;
+  --s3-img-relleno: 15px;
+  --s3-img-ancho: 96%;
+  --s3-texto-col: 58%;
+  --s3-texto-relleno: 20px 29px 29px;
+  --s3-texto-hueco: 10px;
+  --s3-nombre: 18px;
+  /* Icono de la ficha: 20 px en un círculo rojo al 9 %. */
+  --s3-icono: 20px;
+  --s3-icono-caja: 44px;
+  --s3-boton-icono: 16px;
+  --s3-boton-hueco: 16px;
+
+  display: flex;
+  padding: var(--s3-relleno);
+  border-radius: var(--s3-radio);
+  background: var(--color-fondo-seccion);
+  color: var(--color-texto);
+}
+
+@media (max-width: 1024px) {
+  .seccion {
+    --s3-maquina-ancho: 46%;
+    --s3-espacio-maquina: 1px;
+    --s3-pestana-interlineado: 13px;
+    --s3-boton-icono: 13px;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    --s3-maquina-ancho: 72%;
+    --s3-der: 100%;
+  }
+}
+
+/* --- Columna izquierda ------------------------------------------------------ */
+
+.izq {
+  display: flex;
+  flex: 0 0 var(--s3-izq);
+  flex-direction: column;
+  gap: var(--s3-gap);
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .izq {
+    flex-basis: auto;
+  }
+}
+
+.maquina {
+  display: block;
+  width: var(--s3-maquina-ancho);
+  height: auto;
+  margin-top: var(--s3-maquina-solape);
+}
+
+.espacioMaquina {
+  height: var(--s3-espacio-maquina);
+}
+
+.espacioFinal {
+  height: var(--s3-espacio-final);
+}
+
+.tituloMarcas {
+  width: min(var(--s3-marcas-ancho), 100%);
+  margin: 0;
+  padding-left: calc(min(var(--s3-marcas-ancho), 100%) * var(--s3-marcas-sangria));
+  color: var(--color-texto-fuerte);
+}
+
+.frase {
+  width: min(var(--s3-frase-ancho), 100%);
+  margin: 0;
+  padding: 0 calc(min(var(--s3-frase-ancho), 100%) * 0.04)
+    calc(min(var(--s3-frase-ancho), 100%) * 0.04) calc(min(var(--s3-frase-ancho), 100%) * 0.11);
+  color: var(--color-texto-suave);
+}
+
+.botonIzq {
+  padding-left: var(--s3-boton-sangria);
+}
+
+/* --- Columna derecha -------------------------------------------------------- */
+
+.der {
+  display: flex;
+  flex: 0 0 var(--s3-der);
+  flex-direction: column;
+  gap: var(--s3-gap);
+  min-width: 0;
+  padding: var(--s3-der-relleno);
+}
+
+@media (max-width: 1024px) {
+  .der {
+    flex-basis: auto;
+    width: var(--s3-der);
+  }
+}
+
+.espacioDer {
+  height: var(--s3-espacio-der);
+}
+
+.antetitulo {
+  margin: 0;
+  color: var(--color-marca);
+  text-align: right;
+}
+
+.tituloUsada {
+  align-self: flex-end;
+  max-width: var(--s3-titulo-ancho);
+  margin: 0;
+  color: var(--color-texto);
+  text-align: right;
+}
+
+@media (max-width: 767px) {
+  .antetitulo {
+    text-align: center;
+  }
+}
+
+/* --- Pestañas --------------------------------------------------------------- */
+
+.pestanas {
+  margin-top: var(--s3-gap);
+}
+
+.lista {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s3-pestana-hueco);
+}
+
+.pestana {
+  padding: var(--s3-pestana-relleno);
+  border: 0;
+  border-radius: var(--s3-pestana-radio);
+  background: var(--color-marca-tenue);
+  color: var(--color-texto-suave);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: var(--s3-pestana-interlineado);
+  cursor: pointer;
+}
+
+.pestana[aria-selected="true"] {
+  background: var(--color-texto-fuerte);
+  color: var(--color-fondo);
+}
+
+.pestana:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 2px;
+}
+
+/*
+ * DESVIACIÓN (D10): en móvil ux-9 convierte las pestañas en acordeón y deja
+ * «Otros» y «Aditamentos» DEBAJO del contenido abierto. Aquí siguen siendo
+ * pestañas: las tres arriba, a todo el ancho y con el mismo aspecto. El patrón
+ * ARIA de pestañas exige que la lista vaya junta; partirla lo rompe.
+ */
+@media (max-width: 767px) {
+  .lista {
+    flex-direction: column;
+  }
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3-gap);
+  padding: var(--s3-der-relleno);
+}
+
+/* `display: flex` taparía el `hidden` de los paneles inactivos. */
+.panel[hidden] {
+  display: none;
+}
+
+.panel:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 2px;
+  border-radius: var(--s3-radio);
+}
+
+.panelEntrando {
+  animation: aparecer 0.75s both;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+}
+
+/* --- Tarjeta de equipo ------------------------------------------------------- */
+
+.tarjeta {
+  display: flex;
+  align-self: flex-end;
+  justify-content: space-between;
+  gap: var(--s3-tarjeta-hueco);
+  width: var(--s3-tarjeta-ancho);
+  margin-top: var(--s3-tarjeta-arriba);
+  border-radius: var(--s3-radio);
+  background: var(--color-fondo);
+}
+
+.imgCol {
+  display: flex;
+  flex: 0 0 var(--s3-img-col);
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--s3-img-relleno);
+  border-radius: var(--s3-radio);
+}
+
+.img {
+  display: block;
+  width: var(--s3-img-ancho);
+  height: auto;
+  transition: transform 0.3s;
+}
+
+.img:hover {
+  transform: scale(1.1);
+}
+
+.textoCol {
+  display: flex;
+  flex: 0 0 var(--s3-texto-col);
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--s3-texto-hueco);
+  min-width: 0;
+  padding: var(--s3-texto-relleno);
+}
+
+/*
+ * DESVIACIÓN (D5): en móvil ux-9 deja la tarjeta en fila, y la columna de
+ * texto se sale por la derecha de la pantalla (medido: empieza en x = 382 de
+ * 390). Nombre, ficha y botón quedan INVISIBLES. Aquí la tarjeta se apila:
+ * la imagen arriba y el texto debajo, con los mismos valores.
+ */
+@media (max-width: 767px) {
+  .tarjeta {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .imgCol,
+  .textoCol {
+    flex-basis: auto;
+  }
+}
+
+.nombre {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+}
+
+.principal {
+  margin-bottom: 10px;
+  font-size: var(--s3-nombre);
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.modelo {
+  color: var(--color-texto-suave);
+}
+
+.filete {
+  padding: 15px 0;
+}
+
+.filete::before {
+  content: "";
+  display: block;
+  border-top: 1px solid var(--color-texto-suave);
+}
+
+.ficha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3-texto-hueco);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dato {
+  display: flex;
+  align-items: center;
+  gap: var(--s3-texto-hueco);
+  color: var(--color-texto-suave);
+}
+
+.icono {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: var(--s3-icono-caja);
+  height: calc(var(--s3-icono-caja) + 1px);
+  border-radius: 80px;
+  background: var(--color-marca-tenue);
+  color: var(--color-marca);
+}
+
+.icono svg {
+  width: var(--s3-icono);
+  height: var(--s3-icono);
+}
+
+/* En ux-9 es un <strong> a peso 400: más que el 300 del valor, no negrita. */
+.etiquetaDato {
+  font-weight: 400;
+}
+
+/* --- Botones --------------------------------------------------------------- */
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3-boton-hueco);
+  padding: var(--boton-relleno);
+  border: var(--boton-borde) solid var(--color-marca);
+  border-radius: var(--s3-radio);
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.boton svg {
+  width: var(--s3-boton-icono);
+  height: var(--s3-boton-icono);
+}
+
+.boton:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.botonIzq .boton {
+  gap: 12px;
+}
+
+.botonTarjeta {
+  align-self: flex-start;
+  margin-top: 20px;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panelEntrando {
+    animation: none;
+  }
+
+  .img,
+  .boton {
+    transition: none;
+  }
+
+  .img:hover {
+    transform: none;
+  }
+}

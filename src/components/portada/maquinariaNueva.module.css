@@ -1,0 +1,332 @@
+/*
+ * SECCIÓN 2 DE LA PORTADA — «Maquinaria pesada nueva» (ux-9, 1717.json [2]).
+ *
+ * ================== LOS VALORES DE ANDRÉS VIVEN AQUÍ ==================
+ * Medidos en su página pintada a 390 · 1010 · 1440 (2026-09-24), no copiados
+ * de la captura. Todo va en variables en `.seccion`; ninguna regla de abajo
+ * lleva un valor suyo cableado. Lo que se aparta está marcado «DESVIACIÓN» y
+ * documentado en docs/diseno/decisiones-home-ux9.md §11.
+ * ======================================================================
+ */
+
+.seccion {
+  /* Contenedor: relleno 5 % · 3 % (del ancho), radio 30, fondo blanco. */
+  --s2-relleno: 5% 3%;
+  --s2-radio: 30px;
+  --s2-gap: 20px;
+  /* Cabecera: filete superior de 1 px en el gris de sección y 18 px bajo él. */
+  --s2-filete: 1px solid var(--color-fondo-seccion);
+  --s2-filete-relleno: 18px;
+  --s2-titulo-ancho: 737px;
+
+  /*
+   * Carrusel: 10 px alrededor; cada diapositiva 10 px por lado y 10 px entre
+   * diapositivas (el `spaceBetween` de Swiper): 30 px entre tarjetas.
+   */
+  --s2-carrusel-relleno: 10px;
+  --s2-diapositiva-relleno: 10px;
+  --s2-entre-diapositivas: 10px;
+  --s2-por-vista: 3;
+
+  /* Tarjeta: alto mínimo 30vh, radio 30, relleno 10; contenido abajo. */
+  --s2-tarjeta-alto: 30vh;
+  --s2-tarjeta-relleno: 10px;
+  /* Velo: degradado blanco → #535353 al 81 % en MULTIPLICAR. */
+  --s2-velo: linear-gradient(#fff 0%, #535353 100%);
+  --s2-velo-opacidad: 0.81;
+  /* Fila logo 30 % / texto 70 %, hueco 20, 10 px de relleno en cada columna. */
+  --s2-logo-col: 30%;
+  --s2-logo-max: 120px;
+  --s2-logo-radio: 10px;
+  --s2-col-relleno: 10px;
+
+  /* Flechas: chevron de 25 px en gris claro al 90 %. Puntos de 6 px. */
+  --s2-flecha: 25px;
+  --s2-flecha-color: rgb(238 238 238 / 90%);
+  /* Su centro queda 7 px por ENCIMA del de la tarjeta (medido a 1440). */
+  --s2-flecha-desfase: -7px;
+  --s2-punto: 6px;
+  --s2-punto-margen: 6px;
+  --s2-puntos-arriba: 10px;
+
+  /* Botón «Ver todo»: radio 30, borde 1 px rojo; icono y hueco de 12. */
+  --s2-boton-radio: 30px;
+  --s2-boton-icono: 16px;
+  --s2-boton-hueco: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2-gap);
+  padding: var(--s2-relleno);
+  border-radius: var(--s2-radio);
+  background: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+@media (max-width: 1024px) {
+  .seccion {
+    --s2-por-vista: 2;
+    --s2-boton-icono: 13px;
+  }
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    --s2-por-vista: 1;
+  }
+}
+
+.cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2-gap);
+  padding-top: var(--s2-filete-relleno);
+  border-top: var(--s2-filete);
+}
+
+.antetitulo {
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+.titulo {
+  margin: 0;
+  max-width: var(--s2-titulo-ancho);
+  color: var(--color-texto);
+}
+
+/* --- Carrusel ----------------------------------------------------------- */
+
+.carrusel {
+  position: relative;
+  padding: var(--s2-carrusel-relleno);
+}
+
+.marco {
+  position: relative;
+}
+
+.pista {
+  display: flex;
+  gap: var(--s2-entre-diapositivas);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  /* La barra de desplazamiento no está en ux-9; el gesto y las flechas, sí. */
+  scrollbar-width: none;
+}
+
+.pista::-webkit-scrollbar {
+  display: none;
+}
+
+.diapositiva {
+  flex: 0 0
+    calc((100% - (var(--s2-por-vista) - 1) * var(--s2-entre-diapositivas)) / var(--s2-por-vista));
+  padding: var(--s2-diapositiva-relleno);
+  scroll-snap-align: start;
+}
+
+.tarjeta {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  min-height: var(--s2-tarjeta-alto);
+  padding: var(--s2-tarjeta-relleno);
+  overflow: hidden;
+  border-radius: var(--s2-radio);
+  color: var(--color-fondo);
+  text-decoration: none;
+}
+
+.fondo {
+  z-index: -2;
+  object-fit: cover;
+}
+
+.tarjeta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--s2-velo);
+  opacity: var(--s2-velo-opacidad);
+  mix-blend-mode: multiply;
+}
+
+.tarjeta:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 3px;
+}
+
+.fila {
+  display: flex;
+  gap: var(--s2-gap);
+}
+
+.logoCol {
+  flex: 0 0 calc((100% - var(--s2-gap)) * 0.3);
+  padding: var(--s2-col-relleno);
+}
+
+.logo {
+  display: block;
+  width: 100%;
+  max-width: var(--s2-logo-max);
+  height: auto;
+  border-radius: var(--s2-logo-radio);
+}
+
+.textoCol {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: var(--s2-col-relleno);
+}
+
+.texto {
+  margin: 0 0 0.9em;
+}
+
+/* Móvil: el logo encima, centrado a 120 px; el texto debajo a todo el ancho. */
+@media (max-width: 767px) {
+  .fila {
+    flex-direction: column;
+  }
+
+  .logoCol {
+    flex-basis: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .logo {
+    width: var(--s2-logo-max);
+  }
+}
+
+.flecha {
+  position: absolute;
+  top: calc(50% + var(--s2-flecha-desfase));
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--s2-flecha);
+  height: var(--s2-flecha);
+  margin-top: calc(var(--s2-flecha) / -2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--s2-flecha-color);
+  cursor: pointer;
+}
+
+.flecha svg {
+  width: 100%;
+  height: 100%;
+}
+
+.flecha:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.flecha:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.anterior {
+  left: 0;
+}
+
+.siguiente {
+  right: 0;
+}
+
+/*
+ * DESVIACIÓN (D8): los puntos son INDICADOR, no botones. En ux-9 se pueden
+ * pulsar, pero miden 6 px con 18 px entre centros: por debajo del mínimo de
+ * 24 px de WCAG 2.5.8 sin forma de cumplirlo sin cambiar su aspecto. Las
+ * flechas y el gesto ya navegan.
+ */
+.puntos {
+  display: flex;
+  justify-content: center;
+  min-height: var(--s2-punto);
+  margin-top: var(--s2-puntos-arriba);
+}
+
+.punto {
+  width: var(--s2-punto);
+  height: var(--s2-punto);
+  margin: 0 var(--s2-punto-margen);
+  border-radius: 50%;
+  background: #000;
+  opacity: 0.2;
+}
+
+.puntoActivo {
+  opacity: 1;
+}
+
+/* --- Botón ---------------------------------------------------------------- */
+
+/*
+ * DESVIACIÓN (D12): el botón queda POR ENCIMA de la máquina de la sección 3,
+ * que sube 140 px sobre esta. En ux-9 el recorte es transparente y el botón se
+ * ve, pero el <img> sigue encima y se queda el clic en la zona que solapa.
+ */
+.pie {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding: var(--s2-carrusel-relleno);
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2-boton-hueco);
+  padding: var(--boton-relleno);
+  border: var(--boton-borde) solid var(--color-marca);
+  border-radius: var(--s2-boton-radio);
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.boton svg {
+  width: var(--s2-boton-icono);
+  height: var(--s2-boton-icono);
+}
+
+.boton:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pista {
+    scroll-behavior: auto;
+  }
+
+  .boton {
+    transition: none;
+  }
+}

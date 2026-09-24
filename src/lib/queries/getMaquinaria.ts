@@ -1,6 +1,6 @@
 import { cache } from "react";
 import config from "@payload-config";
-import { getPayload } from "payload";
+import { getPayload, type Where } from "payload";
 
 /*
  * Las consultas de este módulo van envueltas en `cache()` de React.
@@ -23,6 +23,8 @@ import type {
   MarcasMaquinaria,
   TiposMaquinaria,
 } from "@/payload-types";
+
+import { SLUG_EXCAVADORAS, TARJETAS_POR_PESTANA } from "../portada/secciones";
 
 /**
  * Acceso a datos de la sección maquinaria (API local de Payload, CLAUDE.md §3.2).
@@ -216,3 +218,40 @@ export const getEquiposUsadosDeCategoria = cache(
     return docs;
   },
 );
+
+// --- Portada (fase D: secciones 2 y 3 de ux-9) --------------------------------
+/** Marcas con foto de tarjeta, para el carrusel de la sección 2. */
+export const getMarcasDePortada = cache(async (): Promise<MarcasMaquinaria[]> => {
+  const payload = await getPayload({ config });
+  const { docs } = await payload.find({
+    collection: "marcas-maquinaria",
+    where: { imagenTarjeta: { exists: true } },
+    depth: 1,
+    limit: 0,
+    sort: "nombre",
+  });
+  return docs;
+});
+
+/**
+ * Equipos usados DISPONIBLES para las pestañas de la sección 3: los de
+ * excavadoras y los del resto, por separado y con su tope, para que un
+ * inventario con muchas unidades de una categoría no deje vacía la otra
+ * pestaña. `depth: 1` puebla la categoría (para enlazarla) y las imágenes.
+ */
+export const getEquiposUsadosDePortada = cache(async (): Promise<EquiposUsado[]> => {
+  const payload = await getPayload({ config });
+  const consulta = (categoria: Where) =>
+    payload.find({
+      collection: "equipos-usados",
+      where: { and: [{ disponible: { equals: true } }, categoria] },
+      depth: 1,
+      limit: TARJETAS_POR_PESTANA,
+      sort: "-updatedAt",
+    });
+  const [excavadoras, otros] = await Promise.all([
+    consulta({ "categoria.slug": { equals: SLUG_EXCAVADORAS } }),
+    consulta({ "categoria.slug": { not_equals: SLUG_EXCAVADORAS } }),
+  ]);
+  return [...excavadoras.docs, ...otros.docs];
+});

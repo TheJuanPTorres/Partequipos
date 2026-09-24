@@ -50,7 +50,6 @@ import {
   sinDiapositivasDePrueba,
 } from "../../src/lib/portada/heroPrueba";
 import { SLUG_EXCAVADORAS } from "../../src/lib/portada/secciones";
-import { SLUG_PORTADA } from "../../src/lib/queries/getPaginas";
 
 const args = process.argv.slice(2);
 const modo = args.find((a) => a === "sembrar" || a === "retirar");
@@ -75,6 +74,10 @@ if (!veredicto.permitido) {
 // Un script de datos no toca el esquema (CLAUDE.md §10.9).
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 const { default: config } = await import("../../src/payload.config");
+// DINÁMICO a propósito: `getPaginas` importa la config, y un import estático se
+// evalúa ANTES de la línea de arriba, con el push activo. Así entró el marcador
+// `dev` en PRODUCCIÓN el 2026-09-24 (§10.34). Lo vigila `scriptsSinPush.test.ts`.
+const { SLUG_PORTADA } = await import("../../src/lib/queries/getPaginas");
 const payload = await getPayload({ config });
 
 const log = (m: string) => process.stdout.write(`[hero-prueba] ${m}\n`);

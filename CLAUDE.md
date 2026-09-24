@@ -534,7 +534,13 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
    oscuras); el encogido al bajar, que interpreta el «85 px» del export como
    logo al 85 %; y el menú móvil provisional, no diseñado.
 
-8. **Restablecer las reglas de arriba.** Este apartado deja de aplicarse.
+8. **Hero: el título queda unos 45 px más abajo que en ux-9**, desde la
+   fase C (`docs/diseno/decisiones-home-ux9.md` §12). **Movimiento de la
+   cabecera:** medir en ux-9 la duración y la curva al esconder y mostrar, y
+   replicarlas respetando el movimiento reducido. ux-9 está en mantenimiento;
+   su HTML guardado se puede pintar con su CSS y JS reales.
+
+9. **Restablecer las reglas de arriba.** Este apartado deja de aplicarse.
 
 ### 10.34 INCIDENTE 2026-09-24 — marcador `dev` en PRODUCCIÓN por un import estático
 

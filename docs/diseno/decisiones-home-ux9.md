@@ -712,3 +712,61 @@ bases. Se queda en esta migración, anotado en ella: un punto focal de un vídeo
 no se usó nunca (el póster tiene el suyo en `Media`), y **no había ningún vídeo**: 0 en el preview (contado tras migrar) y 0 en producción (contado antes de fusionar). **Lección:** un cambio en
 una colección, aunque sea «quitar una opción», puede cambiar el esquema; hay que
 generar la migración en el mismo commit, o la recoge por sorpresa la siguiente.
+
+---
+
+## 12. Cabecera (2026-09-24, directa a producción por la reunión)
+
+Fuente: `elementor-2629-2026-09-24.json`, idéntico valor a valor a la
+plantilla 2162 del kit. Geometría medida en ux-9 **pintado desde su HTML
+guardado**, porque la página estaba en modo mantenimiento. Los estáticos del
+servidor sí respondían.
+
+| Qué                      | ux-9                              | Nuestro                                   |
+| ------------------------ | --------------------------------- | ----------------------------------------- |
+| Alto 1440 · 1010 · 390   | 100 · 71 · 67 px                  | 100 · 71 · 66 px                          |
+| Tarjeta del hero empieza | justo debajo de la cabecera       | igual; la foto no pasa por debajo         |
+| Espacio entre enlaces    | 170 · 106 · 115 px                | idéntico (el bloque, 8 px a la izquierda) |
+| Enlaces · activo         | global `text` #100F0F · `primary` | igual                                     |
+| Iconos móviles           | global `secondary` #56545A        | igual                                     |
+
+### LECCIÓN — un color fijo no vale si tiene referencia global
+
+En el export, un ajuste puede llevar **a la vez** un valor fijo (`title_color:
+"#F0F0F0"`) y una referencia en `__globals__` (`title_color` → `text`). **En
+Elementor manda la global**; el fijo es un resto sin uso. La primera versión
+de la cabecera tomó el fijo y pintó el menú en `#F0F0F0` sobre el cielo claro
+del hero: ilegible. Corregido en el mismo día.
+
+**Regla:** al leer un export de Elementor, **resolver primero `__globals__`**
+contra `site-settings.json`, y usar el fijo solo si no hay referencia.
+
+**Revisión hecha (script sobre 1717.json, secciones 1–3, y la cabecera):**
+
+- **Sección 1 (fase C) y sección 2:** ningún fijo contradice a su global.
+- **Sección 3 (fase D):** hay fijos que contradicen a su global, pero **en todos
+  ya se había usado la global**: fondo de la tarjeta, nombre e iconos de la
+  ficha. El borde de «Ver producto» es `none`, así que no se pinta.
+- **Una excepción consciente:** el texto de «Ver producto» en **4 de las 6
+  tarjetas**, las de las pestañas «Otros» y «Aditamentos». Su global es
+  `secondary`, gris `#56545A` sobre el rojo (≈ 2,3:1), mientras que las 2 de
+  «Excavadoras» usan blanco. Aquí va **blanco en todas**: es lo que se ve
+  pintado en ux-9, es consistente y es legible. Anotado para Andrés.
+
+### Decisiones tomadas deprisa, a revisar
+
+- `Logo-1.png` de Andrés en `public/` (transparente, letras oscuras). Es el
+  logo del cliente, sin la licencia pendiente de las fotos.
+- **Encogido al bajar:** el «85 px» del export se interpreta como logo al
+  85 %, con `transform` para no desplazar la página (CLS 0).
+- **Menú móvil provisional:** no está diseñado.
+- **Botón «Contáctanos»:** en ux-9 queda 15 px más a la izquierda. Sin
+  investigar.
+
+### PENDIENTE — el título del hero, desde la fase C
+
+Comparando pintados, en ux-9 el título queda unos **15 px** bajo el borde de la
+tarjeta; en el nuestro, unos **60 px**. **No lo introdujo la cabecera**: se ve
+igual en las capturas de la fase C. La medida numérica en ux-9 da cajas
+contradictorias (el texto sale por encima de su caja), probablemente por el
+`transform` de su animación. Hay que medirlo con la animación terminada.

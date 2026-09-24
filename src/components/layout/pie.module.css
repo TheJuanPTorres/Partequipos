@@ -207,6 +207,11 @@
     padding: 3%;
   }
 
+  .logo {
+    width: 75%;
+    max-width: 280px;
+  }
+
   .columna {
     flex-basis: 100%;
     padding: 30px;

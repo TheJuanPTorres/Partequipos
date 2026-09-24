@@ -540,7 +540,15 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
    replicarlas respetando el movimiento reducido. ux-9 está en mantenimiento;
    su HTML guardado se puede pintar con su CSS y JS reales.
 
-9. **Restablecer las reglas de arriba.** Este apartado deja de aplicarse.
+9. **Pie de ux-9** (`docs/diseno/decisiones-home-ux9.md` §13):
+   - Pendiente del cliente: las URL de «Trabaja con nosotros», «Zona de
+     clientes» y «Financiación».
+   - Decidir el buscador (7–11 h, no cotizado) y el global de Payload del pie
+     (3–4 h).
+   - La foto decorativa del pie espera la licencia (L3).
+   - Punto de retorno previo al pie: `dpl_4gcAnPLNaeB9xsBNdzqqxC88eUpw`.
+
+10. **Restablecer las reglas de arriba.** Este apartado deja de aplicarse.
 
 ### 10.34 INCIDENTE 2026-09-24 — marcador `dev` en PRODUCCIÓN por un import estático
 

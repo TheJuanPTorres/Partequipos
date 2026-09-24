@@ -770,3 +770,84 @@ tarjeta; en el nuestro, unos **60 px**. **No lo introdujo la cabecera**: se ve
 igual en las capturas de la fase C. La medida numérica en ux-9 da cajas
 contradictorias (el texto sale por encima de su caja), probablemente por el
 `transform` de su animación. Hay que medirlo con la animación terminada.
+
+---
+
+## 13. Pie (2026-09-24, directo a producción por la reunión)
+
+Fuente: `elementor-2696-2026-09-24 (1).json`. Colores de las **referencias
+globales** (§12):
+
+- Fondo de la tarjeta: `primary`.
+- Texto y borde del botón: `099f28a`.
+- Columnas: `a372504`.
+- Títulos de columna: tipografía `2e6cf84` (M BOLD).
+- Lema: tipografía `secondary`.
+- Redes: `icon_background 099f28a`, `icon_color text` y hover `primary`.
+
+Punto de retorno antes de empezar: `dpl_4gcAnPLNaeB9xsBNdzqqxC88eUpw`.
+
+**Contraste medido en la página pintada** (390, 1010 y 1440; portada y
+«Servicio técnico»):
+
+| Elemento                                     | Contraste                                 |
+| -------------------------------------------- | ----------------------------------------- |
+| Lema y botón de WhatsApp (blanco sobre rojo) | **4,54:1**, AA por poco, ya anotado en §2 |
+| Títulos y enlaces de columna                 | 16,79:1                                   |
+| Texto de la empresa                          | 19,14:1                                   |
+| Franja legal                                 | 7,47:1                                    |
+| Iconos de redes                              | 19,14:1                                   |
+
+Sin desbordes ni errores de consola.
+
+### Desviaciones
+
+| #   | En ux-9                                                                                                      | Aquí                                                                                           | Por qué                                                                                                 |
+| --- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| P1  | «Trabaja con nosotros», «Zona de clientes», «Financiación»                                                   | **No se pintan**                                                                               | No tienen destino. **Pendiente del cliente:** sus URL                                                   |
+| P2  | Redes con etiquetas cruzadas («Google Plus» con icono de LinkedIn, «Tiktok» con el de YouTube), Font Awesome | Solo las de `seoConfig` (Facebook, Instagram, YouTube), con su nombre real. Iconos de Tabler   | Un nombre accesible equivocado es un enlace que miente; Font Awesome no está en el proyecto             |
+| P3  | Sin franja legal                                                                                             | Franja inferior: tratamiento de datos primero, las demás páginas legales, dirección y teléfono | **No es estética:** la Ley 1581 obliga a enlazar la política de datos                                   |
+| P4  | Texto de la empresa en HelveticaNeue, sin global                                                             | Inter                                                                                          | Licencia web pendiente (**L1**)                                                                         |
+| P5  | «Ayudamos sectores…»                                                                                         | «Ayudamos **a** sectores…»                                                                     | Corrección de redacción. **Para Andrés**                                                                |
+| P6  | «Somos una empresa…» en `<h3>`                                                                               | Párrafo en negrita. Títulos de columna en `<h2>`                                               | No es un encabezado; con `<h3>` saltaba un nivel en páginas sin `<h2>`                                  |
+| P7  | Buscador                                                                                                     | **No se pinta**                                                                                | Funcionalidad no cotizada; un cuadro que no busca es un defecto. Esfuerzo, abajo                        |
+| P8  | Máquina decorativa `Partequipos3553.png`, girada 90°, solo escritorio                                        | **No se pinta**                                                                                | Foto de banco con licencia pendiente (**L3**), y el repositorio es **público**: no puede ir a `public/` |
+
+El isotipo de la marca de agua (`Icon.png`) sí va, en `public/`: es el isotipo
+del cliente.
+
+### Propuesta: el pie en un global de Payload
+
+**Qué iría en el global `pie`:** el lema, el texto de la empresa, las tres
+columnas y el texto del botón. Las columnas, como un array de título más
+enlaces con etiqueta y destino, validados con `validarEnlace`, como el hero.
+
+**Qué no:** las redes y los datos de contacto. Ya están en `seoConfig` y
+alimentan el JSON-LD `Organization`; duplicarlos permitiría que el pie y el
+JSON-LD dijeran cosas distintas. Si el cliente los quiere editar, se mueven
+los dos juntos a un global `empresa`.
+
+**Esfuerzo: 3–4 h.** Incluye la migración (un grupo nuevo, sin datos
+existentes sobre los que decidir), la revalidación de todo el sitio al
+guardar (`revalidatePath("/", "layout")`) y su prueba.
+
+### Buscador: esfuerzo, NO construido
+
+`/buscar?q=` sobre modelos de repuestos, marcas (las dos líneas), equipos
+nuevos y usados, y artículos:
+
+| Parte                                                                                                             | Horas      |
+| ----------------------------------------------------------------------------------------------------------------- | ---------- |
+| Consulta en `src/lib/queries/` con la API local: `like` por nombre en 5–6 colecciones, con tope por tipo          | 2–3        |
+| Página `/buscar` dinámica, resultados agrupados, estado vacío, `noindex` y fuera del sitemap (con su guardarraíl) | 2–3        |
+| Formulario accesible (GET, sin JS obligatorio) en el pie y, si se quiere, en la cabecera                          | 1          |
+| Normalizar tildes y mayúsculas («camión» = «camion»)                                                              | 1–2        |
+| Verificación y prueba                                                                                             | 1–2        |
+| **Total**                                                                                                         | **7–11 h** |
+
+**Riesgos:**
+
+- Cada búsqueda son 5–6 consultas a la base en tiempo de petición. Con el
+  pooler de §10.7 es asumible; sin él, no.
+- `like` no ordena por relevancia. Si hace falta, el paso siguiente es la
+  búsqueda de texto completo de Postgres (`tsvector`), con migración: +4–6 h.

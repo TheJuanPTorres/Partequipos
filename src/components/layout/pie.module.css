@@ -1,0 +1,259 @@
+/*
+ * PIE DEL SITIO — ux-9, export `elementor-2696-2026-09-24 (1).json` de Andrés.
+ * Colores de las REFERENCIAS GLOBALES (`__globals__`), resueltas contra
+ * site-settings.json; el valor fijo solo donde no hay global (CLAUDE.md §10.33,
+ * decisiones-home-ux9.md §12). Lo que se aparta, marcado DESVIACIÓN y en §13.
+ */
+
+.pie {
+  /* Contenedor exterior: relleno 4 % · 4 % · 0; 70 px sobre él. */
+  --pie-relleno: 4% 4% 0;
+  --pie-margen: 70px;
+  --pie-radio: 30px;
+
+  margin-top: var(--pie-margen);
+  padding: var(--pie-relleno);
+  color: var(--color-texto);
+}
+
+/* --- Tarjeta roja --------------------------------------------------------- */
+
+.tarjeta {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 7% 5% 6%;
+  overflow: hidden;
+  border-radius: var(--pie-radio);
+  background: var(--color-marca); /* global `primary` */
+  color: var(--color-fondo); /* global `099f28a` */
+  text-align: center;
+}
+
+/* Marca de agua: el isotipo, abajo a la izquierda, contenido, al 11 %. */
+.tarjeta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url("/isotipo-partequipos.png") left bottom / contain no-repeat;
+  opacity: 0.11;
+}
+
+.lema {
+  max-width: 610px;
+  margin: 0;
+}
+
+.whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--boton-relleno);
+  border: 1px solid var(--color-fondo); /* global `099f28a` */
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-fondo);
+  text-decoration: none;
+}
+
+.whatsapp svg {
+  width: 18px;
+  height: 18px;
+}
+
+.whatsapp:hover {
+  border-color: var(--color-texto); /* global `text` */
+  background: var(--color-texto);
+}
+
+.whatsapp:focus-visible {
+  outline: 3px solid var(--color-fondo);
+  outline-offset: 3px;
+}
+
+/* --- Panel blanco --------------------------------------------------------- */
+
+.panel {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 4%;
+  padding: 5% 5% 2%;
+  border-radius: var(--pie-radio) var(--pie-radio) 0 0;
+  background: var(--color-fondo);
+}
+
+.empresa {
+  display: flex;
+  flex: 0 0 39%;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.logo {
+  display: block;
+  width: 39%;
+  min-width: 140px;
+  height: auto;
+}
+
+.textoEmpresa {
+  max-width: 418px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.textoEmpresa + .textoEmpresa {
+  margin-top: 0.6em;
+}
+
+.lemaEmpresa {
+  font-weight: 600;
+}
+
+/* Columnas: 32 % con el gris de sección (global `a372504`), radio 30, 30 px. */
+.columnas {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.columna {
+  flex: 0 0 calc((100% - 40px) / 3);
+  padding: 30px;
+  border-radius: var(--pie-radio);
+  background: var(--color-fondo-seccion);
+}
+
+.tituloColumna {
+  margin: 0 0 16px;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.enlace {
+  color: var(--color-texto);
+  text-decoration: none;
+}
+
+.enlace:hover {
+  color: var(--color-marca); /* global `primary` en el hover */
+}
+
+.enlace:focus-visible,
+.red:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Redes: círculo de 35 px blanco, icono de 23 en `text`; al pasar, rojo. */
+.redes {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.red {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.red svg {
+  width: 23px;
+  height: 23px;
+}
+
+.red:hover {
+  background: var(--color-marca);
+  color: var(--color-fondo);
+}
+
+@media (max-width: 1024px) {
+  .empresa {
+    flex-basis: 100%;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .panel {
+    padding: 3%;
+  }
+
+  .columna {
+    flex-basis: 100%;
+    padding: 30px;
+  }
+}
+
+/*
+ * DESVIACIÓN (decisión 3, no estética): franja legal. ux-9 no la trae, pero el
+ * sitio tiene que enlazar la política de tratamiento de datos (Ley 1581 de
+ * 2012) y las demás páginas legales, y conservar la dirección y el teléfono.
+ */
+.legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 20px 5%;
+  border-top: 1px solid var(--color-fondo-seccion);
+  background: var(--color-fondo);
+  color: var(--color-texto-suave);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.legal ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legal a {
+  color: var(--color-texto-suave);
+}
+
+.legal a:hover {
+  color: var(--color-marca);
+}
+
+.legal address {
+  font-style: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .red {
+    transition: none;
+  }
+}

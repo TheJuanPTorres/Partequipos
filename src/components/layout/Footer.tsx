@@ -1,140 +1,196 @@
+import {
+  IconBrandFacebook,
+  IconBrandInstagram,
+  IconBrandWhatsapp,
+  IconBrandYoutube,
+} from "@tabler/icons-react";
+import Image from "next/image";
 import Link from "next/link";
 
-import { enlaceWhatsApp, navegacionLegal, navegacionPrincipal } from "@/lib/navegacion";
+import { Revelado } from "@/components/movimiento/Revelado";
+import { enlaceWhatsApp, navegacionLegal } from "@/lib/navegacion";
+import { rutas } from "@/lib/routes";
 import { seoConfig } from "@/lib/seo/config";
 
-/** Etiqueta legible para cada perfil social, deducida del dominio. */
-function nombreDeRed(url: string): string {
-  if (/facebook\./i.test(url)) return "Facebook";
-  if (/instagram\./i.test(url)) return "Instagram";
-  if (/youtube\./i.test(url)) return "YouTube";
-  if (/linkedin\./i.test(url)) return "LinkedIn";
-  return "Perfil";
-}
+import estilos from "./pie.module.css";
 
 /**
- * Pie del sitio. Todos los datos salen de `seoConfig` (CLAUDE.md §5: nada
- * quemado). Los portales externos cuyo URL aún no está confirmado **no se
- * renderizan**: mejor omitir el enlace que apuntar a un destino inventado.
+ * PIE DEL SITIO — ux-9 (export 2696 de Andrés). Server Component: solo el lema
+ * que se revela es de cliente. Valores en `pie.module.css`.
+ *
+ * Lo que se aparta de ux-9 (docs/diseno/decisiones-home-ux9.md §13):
+ * - Enlaces SIN destino no se pintan: «Trabaja con nosotros», «Zona de
+ *   clientes» y «Financiación» esperan su URL (pendiente del cliente).
+ * - Redes: solo las de `seoConfig`, con su nombre real; el export trae
+ *   etiquetas cruzadas. Iconos de Tabler.
+ * - Franja legal inferior (Ley 1581), con dirección y teléfono.
+ * - «Somos una empresa…» es párrafo, no `<h3>`: los títulos de columna son
+ *   `<h2>`, el nivel siguiente al `<h1>` de cualquier página.
+ * - Sin buscador hasta aprobar su construcción: un cuadro que no busca es un
+ *   defecto.
+ * - Sin la máquina decorativa `Partequipos3553.png`: foto con la licencia
+ *   pendiente (L3), y el repositorio es público.
  */
-export function Footer() {
-  const { contact, portales } = seoConfig;
 
-  const portalesDisponibles = [
-    { etiqueta: "Zona clientes — Repuestos", href: portales.sapRepuestos },
-    { etiqueta: "Zona clientes — Maquinaria", href: portales.sapMaquinaria },
-    { etiqueta: "Tienda en línea", href: portales.tienda },
-    { etiqueta: "Trabaja con nosotros (portal)", href: portales.empleo },
-  ].filter((p) => p.href.length > 0);
+const REDES = [
+  { patron: /facebook\./i, nombre: "Facebook", Icono: IconBrandFacebook },
+  { patron: /instagram\./i, nombre: "Instagram", Icono: IconBrandInstagram },
+  { patron: /youtube\./i, nombre: "YouTube", Icono: IconBrandYoutube },
+] as const;
+
+type Enlace = { etiqueta: string; href: string; externo?: boolean };
+
+function Columna({ titulo, enlaces, id }: { titulo: string; enlaces: Enlace[]; id: string }) {
+  return (
+    <section className={estilos.columna} aria-labelledby={id}>
+      <h2 id={id} className={`${estilos.tituloColumna} texto-destacado-negrita`}>
+        {titulo}
+      </h2>
+      <ul className={`${estilos.lista} texto-cuerpo`}>
+        {enlaces.map((e) => (
+          <li key={e.etiqueta}>
+            {e.externo ? (
+              <a href={e.href} className={estilos.enlace}>
+                {e.etiqueta}
+              </a>
+            ) : (
+              <Link href={e.href} className={estilos.enlace}>
+                {e.etiqueta}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export function Footer() {
+  const { contact } = seoConfig;
+  const telefono = `tel:${contact.phone.replace(/\s/g, "")}`;
+  // Primero la política de tratamiento de datos (Ley 1581 de 2012).
+  const legalesEnOrden = [
+    ...navegacionLegal.filter((l) => l.href.includes("tratamiento-de-datos")),
+    ...navegacionLegal.filter((l) => !l.href.includes("tratamiento-de-datos")),
+  ];
+  const redes = seoConfig.sameAs.flatMap((url) => {
+    const red = REDES.find((r) => r.patron.test(url));
+    return red ? [{ ...red, url }] : [];
+  });
 
   return (
-    <footer className="mt-16 border-t border-gray-200 bg-gray-50">
-      <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
-        <section aria-labelledby="pie-contacto">
-          <h2 id="pie-contacto" className="text-sm font-semibold text-gray-900">
-            Contacto
-          </h2>
-          <address className="mt-3 space-y-1 text-sm not-italic text-gray-600">
-            <p>
-              <a href={`mailto:${contact.email}`} className="hover:underline">
-                {contact.email}
-              </a>
-            </p>
-            <p>
-              <a href={`tel:${contact.phone.replace(/\s/g, "")}`} className="hover:underline">
-                {contact.phone}
-              </a>
-            </p>
-            <p>{contact.streetAddress}</p>
-            <p>{contact.addressLocality}</p>
-          </address>
-          <p className="mt-3 text-sm text-gray-600">{contact.openingHours}</p>
-          <p className="mt-3 text-sm">
-            <a
-              href={enlaceWhatsApp(contact.phone)}
-              className="text-gray-900 underline"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Escríbenos por WhatsApp
-            </a>
-          </p>
-        </section>
-
-        <section aria-labelledby="pie-secciones">
-          <h2 id="pie-secciones" className="text-sm font-semibold text-gray-900">
-            Secciones
-          </h2>
-          <ul className="mt-3 space-y-1 text-sm text-gray-600">
-            {navegacionPrincipal.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className="hover:underline">
-                  {item.etiqueta}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section aria-labelledby="pie-legal">
-          <h2 id="pie-legal" className="text-sm font-semibold text-gray-900">
-            Legal
-          </h2>
-          <ul className="mt-3 space-y-1 text-sm text-gray-600">
-            {navegacionLegal.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className="hover:underline">
-                  {item.etiqueta}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section aria-labelledby="pie-enlaces">
-          <h2 id="pie-enlaces" className="text-sm font-semibold text-gray-900">
-            Enlaces
-          </h2>
-          {portalesDisponibles.length > 0 ? (
-            <ul className="mt-3 space-y-1 text-sm text-gray-600">
-              {portalesDisponibles.map((p) => (
-                <li key={p.etiqueta}>
-                  <a
-                    href={p.href}
-                    className="hover:underline"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    {p.etiqueta}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-
-          {seoConfig.sameAs.length > 0 ? (
-            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
-              {seoConfig.sameAs.map((url) => (
-                <li key={url}>
-                  <a
-                    href={url}
-                    className="hover:underline"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    {nombreDeRed(url)}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </section>
+    <footer className={estilos.pie}>
+      <div className={estilos.tarjeta}>
+        <Revelado
+          como="p"
+          texto="Ofrecemos Soluciones para tus Proyectos"
+          ritmo="titulo"
+          escalon={0.08}
+          duracion={0.75}
+          className={`${estilos.lema} texto-titulo-bloque`}
+        />
+        <a
+          href={enlaceWhatsApp(contact.phone)}
+          className={`${estilos.whatsapp} texto-etiqueta`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={1.75} />
+          WhatsApp
+        </a>
       </div>
 
-      <div className="border-t border-gray-200">
-        <p className="mx-auto max-w-5xl px-4 py-4 text-xs text-gray-500">
-          © {new Date().getFullYear()} {seoConfig.siteName}
-        </p>
+      <div className={estilos.panel}>
+        <div className={estilos.empresa}>
+          <Image
+            src="/logo-partequipos.png"
+            alt={seoConfig.siteName}
+            width={187}
+            height={51}
+            className={estilos.logo}
+          />
+          <div>
+            <p className={`${estilos.textoEmpresa} ${estilos.lemaEmpresa}`}>
+              Somos una empresa que brinda soluciones integrales
+            </p>
+            <p className={estilos.textoEmpresa}>
+              Ayudamos a sectores de la construcción, infraestructura, agroindustria y agregados;
+              especializándonos en la venta de maquinaria pesada, repuestos, servicio técnico y
+              lubricantes
+            </p>
+          </div>
+        </div>
+
+        <div className={estilos.columnas}>
+          <Columna
+            id="pie-maquinaria"
+            titulo="Maquinaria pesada"
+            enlaces={[
+              { etiqueta: "Nueva", href: `${rutas.nueva()}/` },
+              { etiqueta: "Usada", href: `${rutas.usada()}/` },
+              { etiqueta: "Repuestos", href: `${rutas.repuestos()}/` },
+              { etiqueta: "Servicio técnico", href: "/servicio-tecnico/" },
+            ]}
+          />
+          <Columna
+            id="pie-navegacion"
+            titulo="Navegación"
+            enlaces={[
+              { etiqueta: "Inicio", href: "/" },
+              { etiqueta: "Nosotros", href: "/nosotros/" },
+            ]}
+          />
+          <section className={estilos.columna} aria-labelledby="pie-contacto">
+            <h2 id="pie-contacto" className={`${estilos.tituloColumna} texto-destacado-negrita`}>
+              Contacto
+            </h2>
+            <ul className={`${estilos.lista} texto-cuerpo`}>
+              <li>
+                <a href={telefono} className={estilos.enlace}>
+                  Call center
+                </a>
+              </li>
+              <li>
+                <Link href="/contactanos/" className={estilos.enlace}>
+                  Solicita una cotización
+                </Link>
+              </li>
+            </ul>
+            {redes.length > 0 ? (
+              <ul className={estilos.redes}>
+                {redes.map(({ url, nombre, Icono }) => (
+                  <li key={url}>
+                    <a
+                      href={url}
+                      className={estilos.red}
+                      aria-label={`${nombre} de Partequipos`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Icono aria-hidden="true" focusable="false" stroke={1.5} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+        </div>
+      </div>
+
+      <div className={estilos.legal}>
+        <nav aria-label="Legal">
+          <ul>
+            {legalesEnOrden.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href}>{item.etiqueta}</Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <address>
+          {contact.streetAddress}, {contact.addressLocality} ·{" "}
+          <a href={telefono}>{contact.phone}</a> · © {new Date().getFullYear()} {seoConfig.siteName}
+        </address>
       </div>
     </footer>
   );

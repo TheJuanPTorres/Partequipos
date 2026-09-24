@@ -466,6 +466,18 @@ definitiva de base de datos (bloqueado por el cliente).
 | Una prueba que crearía registros en producción no se hace                                 | La siembra crea en producción imágenes, 2 equipos usados y relaciones en marcas y portada                                                                        |
 | La fase D no se fusiona sin la medición del LCP de §10.3 p.14 ni la verificación completa | Se fusionó con CI, prueba de humo y la migración confirmada en el registro del build (`db:check` sin marcador `dev`, `Migrated: 20260924_143657_fase_d_portada`) |
 
+**Cuarta excepción, el mismo día: la CABECERA de ux-9 se construyó
+directamente sobre `main` y producción**, sin rama ni preview, con
+autorización expresa de dirección para la reunión.
+
+- **Punto de retorno:** `dpl_8ujvAXeB1ATNexDXKZNsdHrm98B8`
+  (`partequipos-lm4jtczzh-thejuanptorres-projects.vercel.app`, commit
+  `4713e4e`). Se devuelve con `vercel promote <url>` (§10.18).
+- **Fuente:** el export `elementor-2629-2026-09-24.json` de Andrés, idéntico
+  valor a valor a la plantilla 2162 del kit.
+- **Verificación mínima:** CI, prueba de humo y una pasada visual. La
+  verificación completa y el Lighthouse quedan pendientes.
+
 **Por qué el riesgo es bajo y aceptable (dirección):**
 `partequipos.vercel.app` **no es el sitio real**. El sitio real sigue siendo el
 WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
@@ -516,7 +528,13 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
    UPDATE equipos_usados SET disponible = true WHERE id BETWEEN 4 AND 8 RETURNING id, nombre, disponible;
    ```
 
-7. **Restablecer las tres reglas de arriba.** Este apartado deja de aplicarse.
+7. **Cabecera de ux-9: verificación completa y Lighthouse de la home.** Se
+   subió con verificación mínima. Revisar además tres decisiones tomadas
+   deprisa: el `Logo-1.png` de Andrés en `public/` (transparente, letras
+   oscuras); el encogido al bajar, que interpreta el «85 px» del export como
+   logo al 85 %; y el menú móvil provisional, no diseñado.
+
+8. **Restablecer las reglas de arriba.** Este apartado deja de aplicarse.
 
 ### 10.34 INCIDENTE 2026-09-24 — marcador `dev` en PRODUCCIÓN por un import estático
 

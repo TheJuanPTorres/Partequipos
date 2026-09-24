@@ -15,6 +15,17 @@ export const navegacionPrincipal = [
   { etiqueta: "Contacto", href: "/contactanos/" },
 ] as const;
 
+/**
+ * Menú de la CABECERA de ux-9 (plantilla 2162): los cuatro de Andrés, con
+ * nuestras rutas. «Contáctanos» va aparte, como botón.
+ */
+export const navegacionCabecera = [
+  { etiqueta: "Maquinaria Pesada", href: `${rutas.maquinaria()}/` },
+  { etiqueta: "Repuestos", href: `${rutas.repuestos()}/` },
+  { etiqueta: "Lubricantes", href: "/lubricantes/lubricantes-eni/" },
+  { etiqueta: "Servicio Técnico", href: "/servicio-tecnico/" },
+] as const;
+
 /** Enlaces legales del pie. Slugs copiados literalmente del rastreo. */
 export const navegacionLegal = [
   { etiqueta: "Política de garantías", href: "/politica-de-garantia-de-repuestos/" },

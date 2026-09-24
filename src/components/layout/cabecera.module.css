@@ -1,0 +1,274 @@
+/*
+ * CABECERA DEL SITIO — ux-9, export `elementor-2629-2026-09-24.json` de Andrés
+ * (idéntico, valor a valor, a la plantilla 2162 de home-page.zip). Valores
+ * leídos del export, no medidos pintados: el 2026-09-24 ux-9 estaba en modo
+ * mantenimiento (CLAUDE.md §10.33).
+ *
+ * Decisiones de dirección (2026-09-24):
+ * 1. Transparente y con texto claro SOLO en la portada y mientras está arriba,
+ *    sobre el hero. En el resto de páginas —y en la portada al desplazarse—,
+ *    fondo y colores legibles.
+ * 2. Menú móvil provisional y accesible.
+ * 3. Iconos de Tabler en vez de Flaticon (L2).
+ * 5. Se esconde al bajar y reaparece al subir o con el foco; con movimiento
+ *    reducido no se esconde. Sin CLS: solo `transform`.
+ */
+
+.cabecera {
+  /* --- Plantilla 2162 --- */
+  --cab-relleno: 1% 2%;
+  --cab-logo: 187px;
+  --cab-logo-movil: 170px;
+  --cab-enlace-tam: 16px;
+  --cab-enlace-relleno: 8px;
+  --cab-icono: 30px;
+  --cab-velo: rgb(255 255 255 / 27%); /* #FFFFFF45 */
+  --cab-desenfoque: blur(10px);
+  --cab-texto-claro: #f0f0f0;
+  --cab-transicion: transform 0.3s ease;
+
+  --cab-texto: var(--color-texto);
+  --cab-fondo: var(--color-fondo);
+
+  z-index: 50;
+  top: 0;
+  width: 100%;
+  background: var(--cab-fondo);
+  border-bottom: 1px solid var(--color-fondo-seccion);
+  color: var(--cab-texto);
+  transition:
+    var(--cab-transicion),
+    background-color 0.3s ease;
+}
+
+/* Fuera de la portada: en el flujo y pegada arriba. */
+.cabecera[data-portada="no"] {
+  position: sticky;
+}
+
+/* Portada: flota sobre el hero, como en ux-9. */
+.cabecera[data-portada="si"] {
+  position: fixed;
+  left: 0;
+}
+
+/* Transparente con texto claro: solo en la portada y arriba del todo. */
+.cabecera[data-modo="transparente"] {
+  --cab-texto: var(--cab-texto-claro);
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+/*
+ * Portada al bajar: el velo #FFFFFF45 con desenfoque de Andrés. DESVIACIÓN
+ * (decisión 1): texto OSCURO, no #F0F0F0, que sobre blanco al 27 % no se lee.
+ */
+.cabecera[data-modo="velo"] {
+  background: var(--cab-velo);
+  border-bottom-color: transparent;
+  backdrop-filter: var(--cab-desenfoque);
+  -webkit-backdrop-filter: var(--cab-desenfoque);
+}
+
+/*
+ * Al bajar se encoge (`shrink_header` del export). Su «85 px» no puede ser la
+ * altura del logo (mide 51): se interpreta como logo al 85 % y medio relleno.
+ */
+.cabecera[data-encogida="si"] {
+  --cab-relleno: 0.5% 2%;
+  --cab-logo: calc(187px * 0.85);
+  --cab-logo-movil: calc(170px * 0.85);
+}
+
+.cabecera[data-oculta="si"] {
+  transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cabecera {
+    transition: none;
+  }
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  padding: var(--cab-relleno);
+}
+
+.logoCol {
+  flex: 0 0 25%;
+}
+
+.logo {
+  display: block;
+  width: var(--cab-logo);
+  height: auto;
+  transition: width 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo {
+    transition: none;
+  }
+}
+
+.nav {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.lista {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.enlace {
+  display: block;
+  padding: var(--cab-enlace-relleno);
+  font-size: var(--cab-enlace-tam);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--cab-texto);
+  text-decoration: none;
+}
+
+.enlace:hover,
+.enlace[aria-current="page"] {
+  color: var(--color-marca);
+}
+
+.enlace:focus-visible,
+.icono:focus-visible,
+.hamburguesa:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.accionCol {
+  flex: 0 0 25%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--boton-relleno);
+  border: var(--boton-borde) solid var(--color-marca);
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.boton:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.boton svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* --- Tablet y móvil: atención al cliente · logo · menú --- */
+
+.icono,
+.hamburguesa {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cab-texto);
+  cursor: pointer;
+}
+
+.icono svg,
+.hamburguesa svg {
+  width: var(--cab-icono);
+  height: var(--cab-icono);
+}
+
+.soloMovil {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .fila {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    padding: 6px 2%;
+  }
+
+  .soloMovil {
+    display: grid;
+  }
+
+  .nav,
+  .accionCol {
+    display: none;
+  }
+
+  .logoCol {
+    flex: none;
+  }
+
+  .hamburguesa {
+    justify-self: end;
+  }
+}
+
+@media (max-width: 767px) {
+  .logo {
+    width: var(--cab-logo-movil);
+  }
+}
+
+/* Panel del menú: debajo de la cabecera, siempre legible. */
+.panel {
+  border-top: 1px solid var(--color-fondo-seccion);
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  padding: 8px 4% 20px;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .panel {
+    display: none;
+  }
+}
+
+.panel .lista {
+  flex-direction: column;
+  gap: 0;
+}
+
+.panel .enlace {
+  --cab-texto: var(--color-texto);
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--color-fondo-seccion);
+}
+
+.panel .boton {
+  margin-top: 16px;
+}

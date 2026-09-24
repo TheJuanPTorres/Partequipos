@@ -2770,6 +2770,24 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
     se cuenta), ventana en primer plano, y qué hacer con las atípicas (p. ej. un
     arranque en frío). «LCP < 2,5 s» sin esto es una frase, no un umbral.
 
+    **REFERENCIA DE LA HOME Y REGLA PARA LAS FASES SIGUIENTES (decisión de
+    dirección, 2026-09-24).**
+
+    - **Referencia: LCP 2,24 s**, mediana de 3 corridas válidas, fase C con la
+      foto real de ux-9 y el `sizes` por proporción. Método: Lighthouse
+      **13.4.1** desde las DevTools, incógnito con sesión de Vercel, móvil,
+      _simulated throttling_, solo Performance, contra el alias del preview de
+      la rama, ventana en primer plano, corridas con `runtimeError` repetidas.
+      Detalle: `docs/diseno/decisiones-home-ux9.md` §10.
+    - **Después de CADA fase que añada algo a la portada** se repite la medición
+      con ese mismo método.
+    - **Si la mediana del LCP supera 2,4 s:** se activa la **calidad 60 para los
+      fondos del hero** (`images.qualities: [60, 75]` y `quality={60}` solo en
+      esa imagen), **previa validación visual de Andrés**. Estimado: ~0,15 s
+      menos con la foto de ux-9.
+    - **Si aun así supera 2,5 s: se para y se analiza** antes de seguir con la
+      fase siguiente.
+
 15. **Icono cuadrado de la marca (favicon).** El único recurso gráfico que
     tenemos es el logotipo, de **1614 × 317** — una tira horizontal. Sirve para
     la cabecera y para el panel, pero **no para un favicon**: recortarlo daría

@@ -599,3 +599,9 @@ menor puntuación; la mediana no la recoge.
 **Calidad 60, si algún día hiciera falta** (no aplicada: cambio visual que
 decide Andrés): a 1920 px pasa de 156 a 127 kB (−29 kB). Al ancho de banda
 simulado (~200 kB/s) son **~0,15 s menos: LCP ≈ 2,1 s**. Margen de 0,26 → ~0,4 s.
+
+**Regla desde aquí** (dirección, 2026-09-24; completa en CLAUDE.md §10.3
+p.14): esta medición —**LCP 2,24 s**— es la referencia de la home. Tras cada
+fase que añada algo a la portada se repite con el mismo método. **> 2,4 s** →
+calidad 60 en los fondos del hero, con validación visual de Andrés. **> 2,5 s
+aun así** → se para y se analiza.

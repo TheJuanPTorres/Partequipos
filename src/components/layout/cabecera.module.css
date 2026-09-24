@@ -43,7 +43,9 @@
   top: 0;
   width: 100%;
   background: var(--cab-fondo);
-  border-bottom: 1px solid var(--color-fondo-seccion);
+  /* Filete con sombra, no con borde: un borde, aunque sea transparente, suma
+     1 px de alto y la tarjeta del hero dejaría de empezar donde en ux-9. */
+  box-shadow: 0 1px 0 var(--color-fondo-seccion);
   color: var(--cab-texto);
   transition:
     var(--cab-transicion),
@@ -53,13 +55,13 @@
 /* Sin fondo: solo en la portada y arriba, sobre el fondo claro de la página. */
 .cabecera[data-modo="transparente"] {
   background: transparent;
-  border-bottom-color: transparent;
+  box-shadow: none;
 }
 
 /* Portada al bajar: el velo #FFFFFF45 con desenfoque de Andrés. */
 .cabecera[data-modo="velo"] {
   background: var(--cab-velo);
-  border-bottom-color: transparent;
+  box-shadow: none;
   backdrop-filter: var(--cab-desenfoque);
   -webkit-backdrop-filter: var(--cab-desenfoque);
 }
@@ -122,7 +124,7 @@
 
 .lista {
   display: flex;
-  gap: 4px;
+  gap: 10px; /* 26 px entre enlaces con sus 8 de relleno, medido en ux-9 */
   margin: 0;
   padding: 0;
   list-style: none;

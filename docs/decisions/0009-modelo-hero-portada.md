@@ -1,8 +1,9 @@
 # ADR 0009 — El hero de la portada: diapositivas dentro de la página, no colección aparte
 
 - **Fecha:** 2026-09-22 · **revisada el 2026-09-23**
-- **Estado:** aprobada por dirección técnica. **Sin implementar**: hoy existe
-  solo como prototipo en la rama `proto/hero-andres`, con datos de prueba.
+- **Estado:** aprobada e **implementada en la fase C** (2026-09-23):
+  `src/components/hero/HeroPortada.tsx`, datos desde el grupo `hero` de la
+  portada (`src/lib/portada/hero.ts`). Sin diapositivas, el hero no se pinta.
 
 ## Revisión del 2026-09-23 — N diapositivas
 

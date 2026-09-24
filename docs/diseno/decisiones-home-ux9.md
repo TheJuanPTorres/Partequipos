@@ -437,3 +437,55 @@ AVIF es el formato del CVE— y WebM por su cabecera EBML.
 puede: el Blob de `development` **es el de producción** (almacén
 `sr2s4ngkjzfzpxhi`, §10.4), y una subida de prueba escribiría en el real. Se
 prueba en el preview, que tiene almacén propio.
+
+---
+
+## 10. Fase C — cabecera y hero (2026-09-23)
+
+| Pieza                                    | Dónde                                                                                                                                     |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Hero desde Payload                       | `HeroPortada.tsx` + `src/lib/portada/hero.ts` (descarta diapositivas sin fondo; enlace solo con nombre accesible). Sustituye al prototipo |
+| Logo como `<h1>` solo en la portada (D1) | `LogoCabecera.tsx`: `usePathname`, prerenderizado en el servidor. Nombre: el título de la página `inicio`                                 |
+| Logo al tamaño pintado                   | 184×36 en vez de 1614×317: se pide a **256 px** en vez de 1920                                                                            |
+| Revelado sin parpadeo                    | `Revelado` con `alCargar`: animación por `@keyframes` desde el primer pintado                                                             |
+| Punto focal                              | `focalPoint: true` en `Media`; `object-position` en el fondo del hero y en las imágenes del blog con `object-cover`                       |
+
+### El parpadeo, medido antes y después
+
+Traza fotograma a fotograma de la opacidad de la primera palabra del título,
+inyectada antes de cargar la página (6 cargas: 1440 y 390 px × 3), y
+Lighthouse móvil local, mediana de 3:
+
+|                         | Parpadeo                                                                    | LCP mediana | Elemento LCP             |
+| ----------------------- | --------------------------------------------------------------------------- | ----------- | ------------------------ |
+| Antes (observador)      | **6 de 6**: opacidad 1 a ~140 ms, 0 a ~240 ms al hidratar, y vuelve a subir | 3,05 s      | imagen de fondo del hero |
+| Después (CSS al cargar) | **0 de 6**: arranca en 0 y sube hasta 1                                     | 2,99 s      | imagen de fondo del hero |
+
+**No retrasa el LCP:** el LCP es la imagen de fondo en las dos, así que ocultar
+el título al primer pintado no lo toca; la diferencia está dentro del ruido.
+Con movimiento reducido el texto está visible y quieto a los 50 ms; sin
+JavaScript la animación CSS corre igual y acaba visible.
+
+**Límite de la medición:** con las imágenes de demostración de `development`
+(40 kB), no con la foto de ux-9 (593 kB). El orden de LCP (imagen antes que
+título) no cambia con una foto más pesada; la cifra absoluta sí.
+
+### Verificado en la página pintada (local, contra `development`)
+
+- `<h1>` único en la portada (el logo, «Partequipos — Repuestos y maquinaria
+  pesada en Colombia», `aria-current`); en `/nosotros/` el `<h1>` es su título
+  y el logo un enlace «Partequipos — Inicio».
+- Carrusel: flecha derecha por teclado cambia de diapositiva y lo anuncia.
+- Geometría a 390 · 1010 · 1440: tarjeta 717 · 774 · 774 px, **idéntica al
+  prototipo** medido contra ux-9 en sus rondas; vidrio dentro de la tarjeta;
+  sin desborde.
+- `qa` completo: 0 errores. Enseñado a no avisar de imágenes `fill`
+  (`data-nimg="fill"`): van en una caja con tamaño y no causan CLS.
+
+### Pendiente dentro de la fase C
+
+- **Punto focal no sobrescribe el fichero:** a verificar en el preview con una
+  imagen subida allí, midiendo el Blob **pasados los 60 s** de propagación.
+- **El hero con las fotos reales de ux-9** en el preview: la portada de
+  producción no tiene diapositivas, así que hoy el hero no se pinta en
+  producción hasta que un editor las cree.

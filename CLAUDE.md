@@ -2752,6 +2752,24 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
     mediana y el LCP pasando de texto (2,2 s) a la **imagen de fondo** (3,75 s).
     Detalle en `docs/design-tokens.md` §11.
 
+    **CORRECCIÓN 2026-09-24 — el 73 / 90 / 83 NO es comparable con el método
+    actual.** Se midió con Lighthouse **12 por línea de comandos**, desde esta
+    máquina. La fase C se midió con Lighthouse **13.4.1 desde las DevTools**, en
+    incógnito, otra máquina: con ese método **la misma portada de producción da
+    84 / 99 / 100**. El cambio de herramienta mueve la puntuación más que
+    cualquier cambio del sitio medido hasta ahora, así que **una cifra de un
+    método no se compara con la de otro**. Detalle en
+    `docs/diseno/decisiones-home-ux9.md` §10.
+
+    **REGLA para cualquier umbral que se acuerde con el cliente: tiene que fijar
+    el MÉTODO COMPLETO, o no significa nada.** Como mínimo: herramienta y
+    versión exacta (p. ej. Lighthouse 13.4.1), cómo se lanza (CLI o DevTools),
+    perfil (móvil), limitación (_simulated throttling_), categorías, URL y
+    entorno (producción, preview…), número de corridas y estadístico (mediana de
+    3 **válidas**; una corrida con `NO_FCP` u otro `runtimeError` se repite, no
+    se cuenta), ventana en primer plano, y qué hacer con las atípicas (p. ej. un
+    arranque en frío). «LCP < 2,5 s» sin esto es una frase, no un umbral.
+
 15. **Icono cuadrado de la marca (favicon).** El único recurso gráfico que
     tenemos es el logotipo, de **1614 × 317** — una tira horizontal. Sirve para
     la cabecera y para el panel, pero **no para un favicon**: recortarlo daría

@@ -39,3 +39,23 @@ export function diapositivasDeHero(hero: Pagina["hero"]): DiapositivaHero[] {
     ];
   });
 }
+
+/**
+ * `sizes` DEL FONDO DEL HERO, por la proporción de cada foto (fase C).
+ *
+ * La tarjeta mide ~86vh de alto y la foto la cubre con `object-cover`. Cuando la
+ * ventana es más ESTRECHA que (proporción de la foto × 86vh) —cualquier móvil en
+ * vertical—, lo que manda es el alto: la foto se pinta a `86·p` vh de ancho, no
+ * a 100vw. Con `sizes="100vw"` el navegador pedía la versión del ancho de la
+ * ventana y la foto se ampliaba ~2,5 veces en Lighthouse móvil (medido,
+ * docs/diseno/decisiones-home-ux9.md §10). En ventanas más anchas, 100vw.
+ *
+ * Sin dimensiones utilizables, 100vw: lo de antes.
+ */
+export const ALTO_TARJETA_VH = 86;
+
+export function sizesFondoHero(ancho: number, alto: number): string {
+  if (!(ancho > 0 && alto > 0)) return "100vw";
+  const vh = Math.ceil((ALTO_TARJETA_VH * ancho) / alto);
+  return `(max-aspect-ratio: ${vh}/100) ${vh}vh, 100vw`;
+}

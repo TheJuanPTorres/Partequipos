@@ -6,7 +6,7 @@ import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } f
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { useMovimientoReducido } from "@/components/movimiento/useMovimiento";
-import type { DiapositivaHero } from "@/lib/portada/hero";
+import { sizesFondoHero, type DiapositivaHero } from "@/lib/portada/hero";
 
 import estilos from "./hero.module.css";
 
@@ -141,7 +141,8 @@ export function HeroPortada({ diapositivas }: Props) {
                 src={s.fondo.url}
                 alt=""
                 fill
-                sizes="100vw"
+                // Por la proporción de la foto: en vertical manda el alto (ver la función).
+                sizes={sizesFondoHero(s.fondo.width, s.fondo.height)}
                 /*
                  * SOLO la primera: es el LCP. `preload` y no `priority` (obsoleto
                  * en Next 16.3.5); `fetchPriority` para que vaya por delante.

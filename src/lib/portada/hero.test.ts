@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { diapositivasDeHero } from "./hero";
+import { diapositivasDeHero, sizesFondoHero } from "./hero";
 
 const media = (id: number, extra: object = {}) =>
   ({
@@ -54,5 +54,20 @@ describe("diapositivas del hero", () => {
   it("sin hero, ninguna diapositiva", () => {
     assert.deepEqual(diapositivasDeHero(undefined), []);
     assert.deepEqual(diapositivasDeHero({ diapositivas: null }), []);
+  });
+});
+
+describe("sizes del fondo del hero", () => {
+  it("Fondo.jpg (2048×1360): el alto manda por debajo de 1,30:1", () => {
+    assert.equal(sizesFondoHero(2048, 1360), "(max-aspect-ratio: 130/100) 130vh, 100vw");
+  });
+
+  it("una foto más panorámica necesita más ancho en vertical", () => {
+    assert.equal(sizesFondoHero(1920, 800), "(max-aspect-ratio: 207/100) 207vh, 100vw");
+  });
+
+  it("sin dimensiones, 100vw como antes", () => {
+    assert.equal(sizesFondoHero(0, 800), "100vw");
+    assert.equal(sizesFondoHero(Number.NaN, 800), "100vw");
   });
 });

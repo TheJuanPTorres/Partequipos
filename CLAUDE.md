@@ -1368,6 +1368,23 @@ En verde, y verificando la mitad.
    el modo de fallo que evita es borrar leads reales. Comprueba el efecto
    contando después (§10.15).
 
+6. **Volver a sembrar la diapositiva de prueba del hero**, si se va a medir el
+   LCP o a enseñar el hero: el refresco la borra, porque producción no la
+   tiene.
+
+   ```
+   DATABASE_URI="<pooled del preview>" BLOB_READ_WRITE_TOKEN="<token del Blob del preview>" npm run preview:hero-prueba -- sembrar
+   ```
+
+   Sube las fotos de ux-9 desde `Desktop/partequipos-diseno/assets/`, con el
+   punto focal en el centro, y pone la diapositiva «Potencia Hitachi» la
+   PRIMERA de la portada. Idempotente. `-- retirar` la quita (primero la
+   diapositiva, después las imágenes) y comprueba que los ficheros dan 404 en
+   el Blob. **Se niega si la base O el Blob no son los del preview**: `payload
+run` carga `.env.local`, cuyo Blob es el de producción, y las fotos tienen
+   la licencia pendiente (L3). No refresca la portada: al acabar, guardarla en
+   el panel del preview o redesplegar.
+
 **Cuidado:** refrescar desde `production` **borra** lo que se hubiera creado a
 mano en el preview (p. ej. la marca `prueba-aislamiento-borrar` de arriba). Y
 arrastra los datos de producción, que hoy son de demostración (§10.6). Los de
@@ -2336,19 +2353,20 @@ fichero, cero dependencias, cero imports, solo marcado.
 > olvidar, el sitio correcto para el guardarraíl es esta tabla**, no un párrafo
 > de documentación que nadie relee.
 
-| Guardarraíl                              | Qué olvido atrapa                                                                                       | Dónde                                                      | Cuándo corre                   |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------ |
-| Cobertura del sitemap                    | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe            | `src/lib/seo/sitemap.test.ts`                              | CI, en cada push               |
-| Grupos del menú del panel                | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada | `src/collections/grupos.test.ts`                           | CI, en cada push               |
-| Unicidad de slug entre colecciones       | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)         | hook `slugUnicoEntreColecciones` + su prueba               | CI y escritura                 |
-| Destino de un redirect                   | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                  | `src/lib/redirects/destino.ts` + `npm run redirects:check` | CI y a mano                    |
-| Marcador `dev` en `payload_migrations`   | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                        | `npm run db:check`, antes de `payload migrate`             | En cada build                  |
-| Versión exacta de Next y Payload         | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel             | `src/lib/deps/versiones-fijas.test.ts`                     | CI, en cada push               |
-| Vaciado de `solicitudes` solo en preview | Ejecutar el vaciado con la variable apuntando a producción y borrar leads reales                        | `src/lib/db/vaciadoSolicitudes.ts` + su prueba             | Al vaciar (§10.21)             |
-| Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                 | `npm run qa:acceso-portada`                                | **A mano**, contra development |
-| Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB              | `formatoDeVideoPermitido` + su prueba                      | CI y subida                    |
-| Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)  | `sinDescargaRemota` + su prueba                            | CI y subida                    |
-| Recorte cerrado en el servidor           | Un recorte pedido por la API (`uploadEdits[crop]`), que Payload aplica aunque `crop: false` (§10.32)    | `sinRecorte` + su prueba                                   | CI y subida                    |
+| Guardarraíl                              | Qué olvido atrapa                                                                                                            | Dónde                                                      | Cuándo corre                   |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------ |
+| Cobertura del sitemap                    | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe                                 | `src/lib/seo/sitemap.test.ts`                              | CI, en cada push               |
+| Grupos del menú del panel                | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada                      | `src/collections/grupos.test.ts`                           | CI, en cada push               |
+| Unicidad de slug entre colecciones       | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)                              | hook `slugUnicoEntreColecciones` + su prueba               | CI y escritura                 |
+| Destino de un redirect                   | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                                       | `src/lib/redirects/destino.ts` + `npm run redirects:check` | CI y a mano                    |
+| Marcador `dev` en `payload_migrations`   | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                                             | `npm run db:check`, antes de `payload migrate`             | En cada build                  |
+| Versión exacta de Next y Payload         | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel                                  | `src/lib/deps/versiones-fijas.test.ts`                     | CI, en cada push               |
+| Vaciado de `solicitudes` solo en preview | Ejecutar el vaciado con la variable apuntando a producción y borrar leads reales                                             | `src/lib/db/vaciadoSolicitudes.ts` + su prueba             | Al vaciar (§10.21)             |
+| Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                                      | `npm run qa:acceso-portada`                                | **A mano**, contra development |
+| Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB                                   | `formatoDeVideoPermitido` + su prueba                      | CI y subida                    |
+| Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)                       | `sinDescargaRemota` + su prueba                            | CI y subida                    |
+| Recorte cerrado en el servidor           | Un recorte pedido por la API (`uploadEdits[crop]`), que Payload aplica aunque `crop: false` (§10.32)                         | `sinRecorte` + su prueba                                   | CI y subida                    |
+| Hero de prueba solo en el preview        | Subir las fotos de ux-9 (licencia pendiente) a la base o al Blob de producción — el Blob de `.env.local` es el de producción | `puedeTocarHeroDePrueba` + su prueba                       | Al sembrar o retirar           |
 
 **Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
 lista real, y una prueba que exige que coincidan.

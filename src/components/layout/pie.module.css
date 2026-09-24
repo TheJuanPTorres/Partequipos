@@ -75,6 +75,20 @@
   }
 }
 
+/*
+ * RESERVA DEL VUELO de la imagen, SOLO entre 1025 y 1279 px (decisión de
+ * dirección, 2026-09-24). Medido con los píxeles opacos del recorte: a 1025 el
+ * cucharón tapaba el final de 9 de 21 plantillas, porque el contenido llega al
+ * borde derecho; a 1280 y 1440, ninguna, y ahí se conserva la separación de
+ * ux-9 (70 px). Una plantilla nueva con contenido a todo el ancho obliga a
+ * repetir `scripts/qa/vuelo-pie.mjs` en escritorio (CLAUDE.md §10.25).
+ */
+@media (min-width: 1025px) and (max-width: 1279px) {
+  .pie[data-con-imagen] {
+    margin-top: calc(var(--pie-margen) + 100px);
+  }
+}
+
 .lema {
   max-width: 610px;
   margin: 0;

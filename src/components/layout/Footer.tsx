@@ -96,7 +96,7 @@ export async function Footer() {
   });
 
   return (
-    <footer className={estilos.pie}>
+    <footer className={estilos.pie} data-con-imagen={decorativa ? "" : undefined}>
       {/* Sin lema o sin texto del botón (global aún vacío), la tarjeta no se pinta. */}
       {pie.lema && pie.textoBoton ? (
         <div className={estilos.tarjeta}>

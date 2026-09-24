@@ -591,11 +591,17 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     | Botón «Contáctanos» de la cabecera **15 px más a la derecha**            | A 1440                                                        | `cabecera.module.css`   |
     | Menú de la cabecera **8 px más a la izquierda**                          | Mismo espaciado interno que ux-9; el bloque entero desplazado | `cabecera.module.css`   |
 
-11. **Imagen decorativa del pie: tapa contenido a 1025 px** en 9 de 21
-    plantillas; a 1280 y 1440, en ninguna. Medido con los píxeles opacos del
-    recorte, no con su caja. **Solución propuesta, pendiente de aprobar:**
-    reservar su vuelo encima del pie. Detalle en
-    `docs/diseno/decisiones-home-ux9.md` §13.
+11. **Imagen decorativa del pie. RESUELTO el 2026-09-24.** Tapaba contenido
+    a 1025 px en 9 de 21 plantillas; a 1280 y 1440, en ninguna. Se reserva su
+    vuelo encima del pie (margen 170 px en lugar de 70) **solo entre 1025 y
+    1279 px**: por encima se conserva la separación de ux-9.
+
+    **REGLA:** al crear una plantilla nueva con contenido **a todo el
+    ancho**, hay que repetir `npm run qa:vuelo-pie` en escritorio (1025, 1280
+    y 1440), añadiendo su ruta a la lista del script o en un fichero de rutas.
+    **La reserva solo cubre 1025–1279**: a 1280 y más, una plantilla así
+    quedaría tapada sin que nada avisara. `qa` no lo ve, porque lee el HTML y
+    no la página pintada.
 
 12. **Restablecer las reglas de arriba.** Este apartado deja de aplicarse.
 
@@ -2532,21 +2538,22 @@ fichero, cero dependencias, cero imports, solo marcado.
 > olvidar, el sitio correcto para el guardarraíl es esta tabla**, no un párrafo
 > de documentación que nadie relee.
 
-| Guardarraíl                              | Qué olvido atrapa                                                                                                                | Dónde                                                      | Cuándo corre                   |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------ |
-| Cobertura del sitemap                    | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe                                     | `src/lib/seo/sitemap.test.ts`                              | CI, en cada push               |
-| Grupos del menú del panel                | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada                          | `src/collections/grupos.test.ts`                           | CI, en cada push               |
-| Unicidad de slug entre colecciones       | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)                                  | hook `slugUnicoEntreColecciones` + su prueba               | CI y escritura                 |
-| Destino de un redirect                   | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                                           | `src/lib/redirects/destino.ts` + `npm run redirects:check` | CI y a mano                    |
-| Marcador `dev` en `payload_migrations`   | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                                                 | `npm run db:check`, antes de `payload migrate`             | En cada build                  |
-| Versión exacta de Next y Payload         | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel                                      | `src/lib/deps/versiones-fijas.test.ts`                     | CI, en cada push               |
-| Vaciado de `solicitudes` solo en preview | Ejecutar el vaciado con la variable apuntando a producción y borrar leads reales                                                 | `src/lib/db/vaciadoSolicitudes.ts` + su prueba             | Al vaciar (§10.21)             |
-| Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                                          | `npm run qa:acceso-portada`                                | **A mano**, contra development |
-| Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB                                       | `formatoDeVideoPermitido` + su prueba                      | CI y subida                    |
-| Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)                           | `sinDescargaRemota` + su prueba                            | CI y subida                    |
-| Recorte cerrado en el servidor           | Un recorte pedido por la API (`uploadEdits[crop]`), que Payload aplica aunque `crop: false` (§10.32)                             | `sinRecorte` + su prueba                                   | CI y subida                    |
-| Hero de prueba solo en el preview        | Subir las fotos de ux-9 (licencia pendiente) a la base o al Blob de producción — el Blob de `.env.local` es el de producción     | `puedeTocarHeroDePrueba` + su prueba                       | Al sembrar o retirar           |
-| Scripts sin push de esquema              | Un script que alcanza la config por un import estático antes de fijar `PAYLOAD_DISABLE_PUSH`: marcador `dev` en la base (§10.34) | `src/lib/db/scriptsSinPush.test.ts`                        | CI, en cada push               |
+| Guardarraíl                              | Qué olvido atrapa                                                                                                                                         | Dónde                                                                              | Cuándo corre                   |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------ |
+| Cobertura del sitemap                    | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe                                                              | `src/lib/seo/sitemap.test.ts`                                                      | CI, en cada push               |
+| Grupos del menú del panel                | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada                                                   | `src/collections/grupos.test.ts`                                                   | CI, en cada push               |
+| Unicidad de slug entre colecciones       | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)                                                           | hook `slugUnicoEntreColecciones` + su prueba                                       | CI y escritura                 |
+| Destino de un redirect                   | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                                                                    | `src/lib/redirects/destino.ts` + `npm run redirects:check`                         | CI y a mano                    |
+| Marcador `dev` en `payload_migrations`   | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                                                                          | `npm run db:check`, antes de `payload migrate`                                     | En cada build                  |
+| Versión exacta de Next y Payload         | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel                                                               | `src/lib/deps/versiones-fijas.test.ts`                                             | CI, en cada push               |
+| Vaciado de `solicitudes` solo en preview | Ejecutar el vaciado con la variable apuntando a producción y borrar leads reales                                                                          | `src/lib/db/vaciadoSolicitudes.ts` + su prueba                                     | Al vaciar (§10.21)             |
+| Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                                                                   | `npm run qa:acceso-portada`                                                        | **A mano**, contra development |
+| Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB                                                                | `formatoDeVideoPermitido` + su prueba                                              | CI y subida                    |
+| Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)                                                    | `sinDescargaRemota` + su prueba                                                    | CI y subida                    |
+| Recorte cerrado en el servidor           | Un recorte pedido por la API (`uploadEdits[crop]`), que Payload aplica aunque `crop: false` (§10.32)                                                      | `sinRecorte` + su prueba                                                           | CI y subida                    |
+| Hero de prueba solo en el preview        | Subir las fotos de ux-9 (licencia pendiente) a la base o al Blob de producción — el Blob de `.env.local` es el de producción                              | `puedeTocarHeroDePrueba` + su prueba                                               | Al sembrar o retirar           |
+| Scripts sin push de esquema              | Un script que alcanza la config por un import estático antes de fijar `PAYLOAD_DISABLE_PUSH`: marcador `dev` en la base (§10.34)                          | `src/lib/db/scriptsSinPush.test.ts`                                                | CI, en cada push               |
+| Imagen del pie sin tapar contenido       | La imagen decorativa del pie (sobresale por encima) tapando texto de una plantilla. Mide con los píxeles opacos del recorte, no con su caja (§10.33 p.11) | `npm run qa:vuelo-pie` (`scripts/qa/vuelo-pie.mjs`, con `npx`: necesita navegador) | **A mano**, contra producción  |
 
 **Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
 lista real, y una prueba que exige que coincidan.

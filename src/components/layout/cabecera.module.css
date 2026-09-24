@@ -4,10 +4,18 @@
  * leídos del export, no medidos pintados: el 2026-09-24 ux-9 estaba en modo
  * mantenimiento (CLAUDE.md §10.33).
  *
+ * COLORES: los de las REFERENCIAS GLOBALES del export (`__globals__`), no los
+ * valores fijos. En Elementor manda la global; el `#F0F0F0` fijo del menú era
+ * un resto sin uso. Enlaces `text` #100F0F · activo `primary` · texto del botón
+ * `099f28a` #FFFFFF · iconos móviles `secondary` #56545A (site-settings.json).
+ *
+ * POSICIÓN, medida en ux-9 pintado (desde su HTML guardado, 2026-09-24): la
+ * cabecera va EN EL FLUJO, encima de la tarjeta del hero, que empieza justo
+ * debajo: 100 px a 1440, 71 a 1010, 67 a 390. La foto no pasa por debajo.
+ *
  * Decisiones de dirección (2026-09-24):
- * 1. Transparente y con texto claro SOLO en la portada y mientras está arriba,
- *    sobre el hero. En el resto de páginas —y en la portada al desplazarse—,
- *    fondo y colores legibles.
+ * 1. Sin fondo SOLO en la portada y arriba del todo (sobre el fondo claro de la
+ *    página). En el resto, fondo blanco desde el inicio.
  * 2. Menú móvil provisional y accesible.
  * 3. Iconos de Tabler en vez de Flaticon (L2).
  * 5. Se esconde al bajar y reaparece al subir o con el foco; con movimiento
@@ -24,12 +32,13 @@
   --cab-icono: 30px;
   --cab-velo: rgb(255 255 255 / 27%); /* #FFFFFF45 */
   --cab-desenfoque: blur(10px);
-  --cab-texto-claro: #f0f0f0;
+  --cab-col-relleno: 10px; /* relleno de cada contenedor de Elementor */
   --cab-transicion: transform 0.3s ease;
 
   --cab-texto: var(--color-texto);
   --cab-fondo: var(--color-fondo);
 
+  position: sticky;
   z-index: 50;
   top: 0;
   width: 100%;
@@ -41,28 +50,13 @@
     background-color 0.3s ease;
 }
 
-/* Fuera de la portada: en el flujo y pegada arriba. */
-.cabecera[data-portada="no"] {
-  position: sticky;
-}
-
-/* Portada: flota sobre el hero, como en ux-9. */
-.cabecera[data-portada="si"] {
-  position: fixed;
-  left: 0;
-}
-
-/* Transparente con texto claro: solo en la portada y arriba del todo. */
+/* Sin fondo: solo en la portada y arriba, sobre el fondo claro de la página. */
 .cabecera[data-modo="transparente"] {
-  --cab-texto: var(--cab-texto-claro);
   background: transparent;
   border-bottom-color: transparent;
 }
 
-/*
- * Portada al bajar: el velo #FFFFFF45 con desenfoque de Andrés. DESVIACIÓN
- * (decisión 1): texto OSCURO, no #F0F0F0, que sobre blanco al 27 % no se lee.
- */
+/* Portada al bajar: el velo #FFFFFF45 con desenfoque de Andrés. */
 .cabecera[data-modo="velo"] {
   background: var(--cab-velo);
   border-bottom-color: transparent;
@@ -72,12 +66,12 @@
 
 /*
  * Al bajar se encoge (`shrink_header` del export). Su «85 px» no puede ser la
- * altura del logo (mide 51): se interpreta como logo al 85 % y medio relleno.
+ * altura del logo (mide 51): se interpreta como logo al 85 %. Con `transform`
+ * y no con el ancho: la cabecera está en el flujo, y cambiar su alto al
+ * desplazar movería la página (CLS).
  */
-.cabecera[data-encogida="si"] {
-  --cab-relleno: 0.5% 2%;
-  --cab-logo: calc(187px * 0.85);
-  --cab-logo-movil: calc(170px * 0.85);
+.cabecera[data-encogida="si"] .logo {
+  transform: scale(0.85);
 }
 
 .cabecera[data-oculta="si"] {
@@ -96,6 +90,12 @@
   padding: var(--cab-relleno);
 }
 
+.logoCol,
+.nav,
+.accionCol {
+  padding: var(--cab-col-relleno);
+}
+
 .logoCol {
   flex: 0 0 25%;
 }
@@ -104,7 +104,8 @@
   display: block;
   width: var(--cab-logo);
   height: auto;
-  transition: width 0.3s ease;
+  transform-origin: left center;
+  transition: transform 0.3s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -195,7 +196,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--cab-texto);
+  color: var(--color-texto-suave); /* global `secondary` */
   cursor: pointer;
 }
 
@@ -213,7 +214,7 @@
   .fila {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    padding: 6px 2%;
+    padding: 0 2%;
   }
 
   .soloMovil {
@@ -227,6 +228,10 @@
 
   .logoCol {
     flex: none;
+  }
+
+  .logoCol .logo {
+    transform-origin: center;
   }
 
   .hamburguesa {

@@ -20,8 +20,8 @@ import estilos from "./cabecera.module.css";
  * - El logo es el `<h1>` SOLO en la portada (D1), con el criterio que tenía
  *   `LogoCabecera`: `useSelectedLayoutSegment`, no `usePathname`, porque al
  *   regenerarse la portada `usePathname` devuelve `/index`.
- * - Portada: transparente con texto claro arriba; al bajar, el velo de Andrés
- *   con texto oscuro. Resto de páginas: fondo blanco y texto oscuro siempre.
+ * - En el flujo (`sticky`), encima del hero, como en ux-9. Portada: sin fondo
+ *   arriba; al bajar, el velo de Andrés. Resto de páginas: fondo blanco.
  * - Se esconde al bajar y reaparece al subir o al recibir el foco; con
  *   movimiento reducido no se esconde.
  * - Menú móvil: Escape lo cierra y devuelve el foco al botón; al abrir, el foco

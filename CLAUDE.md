@@ -2066,7 +2066,26 @@ En 3.89 `beforeOperation` corre **antes** que el control de acceso, así que:
 Anónimo, no puede crear nada en ningún caso: sin gancho, lo rechaza el acceso.
 Resultado de hoy: **400 en las dos, registros 5 → 5 y 0 → 0.**
 
-#### DEFECTO PREVIO DE PAYLOAD, encontrado al verificar: el recorte no llega al Blob
+#### SIN DEMOSTRAR — el recorte «no llega al Blob» (corregido el 2026-09-23)
+
+> **CORRECCIÓN, léase antes que el recuadro de abajo.** Lo que sigue se
+> escribió como defecto demostrado y **no lo está**. Todas las lecturas del
+> fichero recortado se hicieron **dentro de los 60 s** siguientes al guardado,
+> y la documentación de Vercel Blob dice que al sobrescribir un blob _«the
+> changes may take up to 60 seconds to propagate through our cache»_. Además
+> el CDN **ignora la query**: la cabecera `Age` salió idéntica con y sin
+> parámetro anti-caché, así que la lectura «sin caché» también era de caché.
+> Lo observado es compatible con las dos explicaciones —fichero mal escrito, o
+> caché sin propagar— y **no se ha discriminado**. Lo que sí vale: ocurre
+> igual con y sin nuestro gancho.
+>
+> **Y aun si fuese solo caché, el recorte en el sitio sigue roto:** el plugin
+> sube con `max-age` de un año y sobrescribe en el MISMO nombre, así que los
+> navegadores y el optimizador de `/_next/image` pueden seguir sirviendo el
+> original mucho después de esos 60 s, mientras el registro ya dice 600×400.
+> Vercel recomienda justo lo contrario: tratar los blobs como inmutables.
+
+##### Lo que se escribió primero (conservado como registro)
 
 > **El recorte del panel actualiza el REGISTRO pero no el FICHERO.** Recortada
 > una imagen de 1200×800 a 600×400: el registro dice 600×400 y 6.960 bytes; el

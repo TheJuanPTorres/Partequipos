@@ -129,8 +129,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    pie: Pie;
+  };
+  globalsSelect: {
+    pie: PieSelect<false> | PieSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -1690,6 +1694,68 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Texto y enlaces del pie de todas las páginas. Las redes y el contacto se editan en la configuración de la empresa, no aquí.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pie".
+ */
+export interface Pie {
+  id: number;
+  lema: string;
+  /**
+   * El número sale de la configuración de la empresa.
+   */
+  textoBoton: string;
+  empresaTitulo?: string | null;
+  empresaTexto?: string | null;
+  columnas?:
+    | {
+        titulo: string;
+        enlaces?:
+          | {
+              etiqueta: string;
+              tipo: 'pagina' | 'telefono';
+              /**
+               * Ruta del sitio (/…) o https://
+               */
+              destino?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pie_select".
+ */
+export interface PieSelect<T extends boolean = true> {
+  lema?: T;
+  textoBoton?: T;
+  empresaTitulo?: T;
+  empresaTexto?: T;
+  columnas?:
+    | T
+    | {
+        titulo?: T;
+        enlaces?:
+          | T
+          | {
+              etiqueta?: T;
+              tipo?: T;
+              destino?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

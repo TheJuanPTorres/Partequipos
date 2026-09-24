@@ -8,6 +8,7 @@ import * as migration_20260813_205131_estado_destino_redirects from './20260813_
 import * as migration_20260815_043632_roles_usuarios from './20260815_043632_roles_usuarios';
 import * as migration_20260923_210806_fase_b_portada from './20260923_210806_fase_b_portada';
 import * as migration_20260924_143657_fase_d_portada from './20260924_143657_fase_d_portada';
+import * as migration_20260924_194316_pie_global from './20260924_194316_pie_global';
 
 export const migrations = [
   {
@@ -58,6 +59,11 @@ export const migrations = [
   {
     up: migration_20260924_143657_fase_d_portada.up,
     down: migration_20260924_143657_fase_d_portada.down,
-    name: '20260924_143657_fase_d_portada'
+    name: '20260924_143657_fase_d_portada',
+  },
+  {
+    up: migration_20260924_194316_pie_global.up,
+    down: migration_20260924_194316_pie_global.down,
+    name: '20260924_194316_pie_global'
   },
 ];

@@ -222,3 +222,15 @@ export function rutasDeArticulo(slug: string, categoriaSlug: string | null): str
 export function rutasDeCategoriaBlog(slug: string, articuloSlugs: string[]): string[] {
   return [rutas.categoriaBlog(slug), rutas.blog(), ...articuloSlugs.map((s) => rutas.articulo(s))];
 }
+
+/**
+ * Revalida TODO el sitio: cada página lleva el pie (y la cabecera) en el layout.
+ * Para cambios en globales como `pie`. Nunca relanza.
+ */
+export function revalidarTodoElSitio(motivo: string): void {
+  try {
+    revalidatePath("/", "layout");
+  } catch (error) {
+    console.error(`[revalidación] falló el sitio entero (${motivo}):`, error);
+  }
+}

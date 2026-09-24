@@ -399,6 +399,21 @@ definitiva de base de datos (bloqueado por el cliente).
 | Logo para fondos oscuros                      | Alternativa al cliente (#12); mirar antes `partequipos-wordmark` del CLI (§10.27)         |
 | Menú plegable en móvil                        | Hoy no hay; si lo mete, revisar teclado y `aria-expanded`                                 |
 
+**PIE DE UX-9 — DE ANDRÉS Y DEL CLIENTE, en un solo sitio** (2026-09-24;
+detalle en `docs/diseno/decisiones-home-ux9.md` §13):
+
+| Pendiente                                                                                     | De quién                      | Mientras tanto                     |
+| --------------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------- |
+| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | No se pinta                        |
+| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | No se pinta                        |
+| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | No se pinta                        |
+| **Imagen decorativa** `Partequipos3553.png` (brazo de excavadora): licencia de banco (**L3**) | Andrés (procedencia), cliente | Omitida: el repositorio es público |
+| **HelveticaNeue** del texto de la empresa: licencia web (**L1**)                              | Cliente, vía Andrés           | Inter                              |
+| Redacción: «Ayudamos sectores…» → «Ayudamos **a** sectores…»                                  | Andrés (para su maqueta)      | Corregido en el sitio              |
+
+Cuando lleguen las URL, se añaden en el panel (global **Pie de página**), sin
+tocar código.
+
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
 
 | Pendiente                                             | Referencia      |
@@ -547,6 +562,17 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
      (3–4 h).
    - La foto decorativa del pie espera la licencia (L3).
    - Punto de retorno previo al pie: `dpl_4gcAnPLNaeB9xsBNdzqqxC88eUpw`.
+   - **Global `pie` en Payload** (2026-09-24, directo a producción). Su
+     migración **siembra** el contenido que el pie tenía en el código, porque
+     si no el pie de todo el sitio quedaría vacío. Punto de retorno previo:
+     `dpl_FNZWR7RaZoaaFNWE8f9dSeHXjWyz`. **Ojo al revertir:** devolver el alias
+     no deshace la migración. Las tablas `pie*` se quedan y el código anterior
+     no las usa, así que no rompe nada.
+   - **Buscador: en espera de decisión** (la respuesta llegó sin marcar
+     «aprobado / en espera»). Si se aprueba: coincidencia por nombre y código
+     con los exactos primero, longitud mínima y máxima, tope de resultados,
+     caché, `noindex`, fuera del sitemap y formulario GET. Se registra como
+     **alcance adicional** sobre la cotización.
 
 10. **Restablecer las reglas de arriba.** Este apartado deja de aplicarse.
 

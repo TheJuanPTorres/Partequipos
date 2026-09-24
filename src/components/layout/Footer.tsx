@@ -9,7 +9,8 @@ import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { enlaceWhatsApp, navegacionLegal } from "@/lib/navegacion";
-import { rutas } from "@/lib/routes";
+import { columnasDelPie, hrefTelefono, type ColumnaPie } from "@/lib/pie";
+import { getPie } from "@/lib/queries/getPie";
 import { seoConfig } from "@/lib/seo/config";
 
 import estilos from "./pie.module.css";
@@ -17,6 +18,10 @@ import estilos from "./pie.module.css";
 /**
  * PIE DEL SITIO — ux-9 (export 2696 de Andrés). Server Component: solo el lema
  * que se revela es de cliente. Valores en `pie.module.css`.
+ *
+ * CONTENIDO: el global `pie` de Payload (lema, texto de la empresa, columnas y
+ * texto del botón). Redes y contacto salen de `seoConfig`, fuente única del
+ * JSON-LD `Organization`.
  *
  * Lo que se aparta de ux-9 (docs/diseno/decisiones-home-ux9.md §13):
  * - Enlaces SIN destino no se pintan: «Trabaja con nosotros», «Zona de
@@ -38,36 +43,45 @@ const REDES = [
   { patron: /youtube\./i, nombre: "YouTube", Icono: IconBrandYoutube },
 ] as const;
 
-type Enlace = { etiqueta: string; href: string; externo?: boolean };
-
-function Columna({ titulo, enlaces, id }: { titulo: string; enlaces: Enlace[]; id: string }) {
+function Columna({
+  columna,
+  id,
+  children,
+}: {
+  columna: ColumnaPie;
+  id: string;
+  children?: React.ReactNode;
+}) {
   return (
     <section className={estilos.columna} aria-labelledby={id}>
       <h2 id={id} className={`${estilos.tituloColumna} texto-destacado-negrita`}>
-        {titulo}
+        {columna.titulo}
       </h2>
       <ul className={`${estilos.lista} texto-cuerpo`}>
-        {enlaces.map((e) => (
-          <li key={e.etiqueta}>
-            {e.externo ? (
-              <a href={e.href} className={estilos.enlace}>
-                {e.etiqueta}
-              </a>
-            ) : (
+        {columna.enlaces.map((e) => (
+          <li key={`${e.etiqueta}-${e.href}`}>
+            {e.interno ? (
               <Link href={e.href} className={estilos.enlace}>
                 {e.etiqueta}
               </Link>
+            ) : (
+              <a href={e.href} className={estilos.enlace}>
+                {e.etiqueta}
+              </a>
             )}
           </li>
         ))}
       </ul>
+      {children}
     </section>
   );
 }
 
-export function Footer() {
+export async function Footer() {
+  const pie = await getPie();
   const { contact } = seoConfig;
-  const telefono = `tel:${contact.phone.replace(/\s/g, "")}`;
+  const telefono = hrefTelefono(contact.phone);
+  const columnas = columnasDelPie(pie.columnas, contact.phone);
   // Primero la política de tratamiento de datos (Ley 1581 de 2012).
   const legalesEnOrden = [
     ...navegacionLegal.filter((l) => l.href.includes("tratamiento-de-datos")),
@@ -80,25 +94,28 @@ export function Footer() {
 
   return (
     <footer className={estilos.pie}>
-      <div className={estilos.tarjeta}>
-        <Revelado
-          como="p"
-          texto="Ofrecemos Soluciones para tus Proyectos"
-          ritmo="titulo"
-          escalon={0.08}
-          duracion={0.75}
-          className={`${estilos.lema} texto-titulo-bloque`}
-        />
-        <a
-          href={enlaceWhatsApp(contact.phone)}
-          className={`${estilos.whatsapp} texto-etiqueta`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={1.75} />
-          WhatsApp
-        </a>
-      </div>
+      {/* Sin lema o sin texto del botón (global aún vacío), la tarjeta no se pinta. */}
+      {pie.lema && pie.textoBoton ? (
+        <div className={estilos.tarjeta}>
+          <Revelado
+            como="p"
+            texto={pie.lema}
+            ritmo="titulo"
+            escalon={0.08}
+            duracion={0.75}
+            className={`${estilos.lema} texto-titulo-bloque`}
+          />
+          <a
+            href={enlaceWhatsApp(contact.phone)}
+            className={`${estilos.whatsapp} texto-etiqueta`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={1.75} />
+            {pie.textoBoton}
+          </a>
+        </div>
+      ) : null}
 
       <div className={estilos.panel}>
         <div className={estilos.empresa}>
@@ -110,70 +127,38 @@ export function Footer() {
             className={estilos.logo}
           />
           <div>
-            <p className={`${estilos.textoEmpresa} ${estilos.lemaEmpresa}`}>
-              Somos una empresa que brinda soluciones integrales
-            </p>
-            <p className={estilos.textoEmpresa}>
-              Ayudamos a sectores de la construcción, infraestructura, agroindustria y agregados;
-              especializándonos en la venta de maquinaria pesada, repuestos, servicio técnico y
-              lubricantes
-            </p>
+            {pie.empresaTitulo ? (
+              <p className={`${estilos.textoEmpresa} ${estilos.lemaEmpresa}`}>
+                {pie.empresaTitulo}
+              </p>
+            ) : null}
+            {pie.empresaTexto ? <p className={estilos.textoEmpresa}>{pie.empresaTexto}</p> : null}
           </div>
         </div>
 
         <div className={estilos.columnas}>
-          <Columna
-            id="pie-maquinaria"
-            titulo="Maquinaria pesada"
-            enlaces={[
-              { etiqueta: "Nueva", href: `${rutas.nueva()}/` },
-              { etiqueta: "Usada", href: `${rutas.usada()}/` },
-              { etiqueta: "Repuestos", href: `${rutas.repuestos()}/` },
-              { etiqueta: "Servicio técnico", href: "/servicio-tecnico/" },
-            ]}
-          />
-          <Columna
-            id="pie-navegacion"
-            titulo="Navegación"
-            enlaces={[
-              { etiqueta: "Inicio", href: "/" },
-              { etiqueta: "Nosotros", href: "/nosotros/" },
-            ]}
-          />
-          <section className={estilos.columna} aria-labelledby="pie-contacto">
-            <h2 id="pie-contacto" className={`${estilos.tituloColumna} texto-destacado-negrita`}>
-              Contacto
-            </h2>
-            <ul className={`${estilos.lista} texto-cuerpo`}>
-              <li>
-                <a href={telefono} className={estilos.enlace}>
-                  Call center
-                </a>
-              </li>
-              <li>
-                <Link href="/contactanos/" className={estilos.enlace}>
-                  Solicita una cotización
-                </Link>
-              </li>
-            </ul>
-            {redes.length > 0 ? (
-              <ul className={estilos.redes}>
-                {redes.map(({ url, nombre, Icono }) => (
-                  <li key={url}>
-                    <a
-                      href={url}
-                      className={estilos.red}
-                      aria-label={`${nombre} de Partequipos`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Icono aria-hidden="true" focusable="false" stroke={1.5} />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </section>
+          {columnas.map((c, i) => (
+            <Columna key={c.titulo} columna={c} id={`pie-columna-${i + 1}`}>
+              {/* Las redes van bajo la ÚLTIMA columna, como en ux-9 («Contacto»). */}
+              {i === columnas.length - 1 && redes.length > 0 ? (
+                <ul className={estilos.redes}>
+                  {redes.map(({ url, nombre, Icono }) => (
+                    <li key={url}>
+                      <a
+                        href={url}
+                        className={estilos.red}
+                        aria-label={`${nombre} de Partequipos`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Icono aria-hidden="true" focusable="false" stroke={1.5} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </Columna>
+          ))}
         </div>
       </div>
 

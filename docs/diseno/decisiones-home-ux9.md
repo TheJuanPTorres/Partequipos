@@ -869,3 +869,39 @@ Medido en ux-9 pintado, desde su HTML guardado, a 1440, 1280 y 1025:
   que no crea contenedor de scroll y deja que sobresalga hacia arriba.
 - **Accesibilidad y carga:** decorativa (`alt` vacío y `aria-hidden`), con
   carga diferida (bajo el pliegue, no toca el LCP), `sizes="536px"`.
+
+### La imagen decorativa sobre el final de la página (2026-09-24)
+
+**Método:** 21 plantillas, a 1025, 1280 y 1440 (los anchos donde se muestra).
+Se cruzan las cajas de cada línea de texto y de cada elemento visible anterior
+al pie con los **píxeles opacos reales** del recorte. Se leen del canal alfa,
+deshaciendo el giro. No basta con la caja: el PNG es transparente en su
+mayor parte.
+
+**Resultado:**
+
+- **1280 y 1440: no tapa nada en ninguna.** El contenido mide como máximo
+  1024 px y va centrado; el cucharón cae en el margen derecho.
+- **1025: tapa en 9 de 21.** Portada, contacto, lubricantes Eni, aditamentos,
+  ficha de bulldozer, vibrocompactadores, nosotros, marca Bobcat (1 punto,
+  marginal) y ficha Bobcat E32. Aquí el contenido llega al borde derecho.
+
+**Propuesta, NO aplicada:** con imagen y a partir de 1025, el margen superior
+del pie pasa de 70 a **170 px**. Es general, no página a página.
+
+| Ancho | Vuelo de la imagen | Hueco libre hoy, mín.–máx. | Hueco con la propuesta |
+| ----- | ------------------ | -------------------------- | ---------------------- |
+| 1025  | 242 px             | 153–178 px                 | 253–278 px             |
+| 1280  | 212 px             | 163–188 px                 | 263–288 px             |
+| 1440  | 193 px             | 170–195 px                 | 270–295 px             |
+
+**Garantía:** el hueco mínimo con la propuesta supera el vuelo en todos los
+anchos.
+
+**Qué no cambia:** tablet, móvil y el pie sin imagen.
+
+**Por qué 100 px fijos y no la cifra exacta de cada ancho:** el vuelo depende
+del alto de la tarjeta, que CSS no conoce. Una cifra fija que cubre el peor
+caso (1025) es robusta.
+
+**El coste:** a 1280 y 1440 añade 100 px de blanco donde hoy no hace falta.

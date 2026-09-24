@@ -581,7 +581,23 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
      caché, `noindex`, fuera del sitemap y formulario GET. Se registra como
      **alcance adicional** sobre la cotización.
 
-10. **Restablecer las reglas de arriba.** Este apartado deja de aplicarse.
+10. **AJUSTE FINO CON UX-9 — se resuelve junto, en una sola pasada, más
+    adelante.** Diferencias pequeñas ya medidas, ninguna rompe nada:
+
+    | Diferencia                                                               | Medida                                                        | Dónde                   |
+    | ------------------------------------------------------------------------ | ------------------------------------------------------------- | ----------------------- |
+    | Tarjeta roja del pie **18 px más baja**                                  | 342 frente a 360 px a 1440 (la imagen asoma 193 y no 175)     | `pie.module.css`        |
+    | Título del hero **unos 45 px más abajo** respecto al borde de la tarjeta | Desde la fase C; ux-9, unos 15 px; el nuestro, unos 60        | `hero.module.css` (§12) |
+    | Botón «Contáctanos» de la cabecera **15 px más a la derecha**            | A 1440                                                        | `cabecera.module.css`   |
+    | Menú de la cabecera **8 px más a la izquierda**                          | Mismo espaciado interno que ux-9; el bloque entero desplazado | `cabecera.module.css`   |
+
+11. **Imagen decorativa del pie: tapa contenido a 1025 px** en 9 de 21
+    plantillas; a 1280 y 1440, en ninguna. Medido con los píxeles opacos del
+    recorte, no con su caja. **Solución propuesta, pendiente de aprobar:**
+    reservar su vuelo encima del pie. Detalle en
+    `docs/diseno/decisiones-home-ux9.md` §13.
+
+12. **Restablecer las reglas de arriba.** Este apartado deja de aplicarse.
 
 ### 10.34 INCIDENTE 2026-09-24 — marcador `dev` en PRODUCCIÓN por un import estático
 

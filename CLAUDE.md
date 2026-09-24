@@ -505,6 +505,39 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
    contra el último snapshot.
 6. **Restablecer las tres reglas de arriba.** Este apartado deja de aplicarse.
 
+### 10.34 INCIDENTE 2026-09-24 — marcador `dev` en PRODUCCIÓN por un import estático
+
+> **Qué pasó.** El redeploy de producción tras sembrar la demo (§10.33) abortó
+> en `db:check`: había marcador `dev` (batch −1) en `payload_migrations`.
+> Producción siguió sirviendo el despliegue anterior. **El guardián de §10.9
+> hizo su trabajo.**
+>
+> **Causa, leída en el código.** El script sí fijaba `PAYLOAD_DISABLE_PUSH`
+> antes del import dinámico de la config, pero **demasiado tarde**: un import
+> ESTÁTICO de `SLUG_PORTADA` desde `src/lib/queries/getPaginas.ts`, que a su vez
+> importa `@payload-config`, evaluaba la config antes que cualquier sentencia
+> del script. `push` se decide al evaluar la config, así que quedó activo.
+> `payload run` no carga la config por su cuenta (leído en `payload/dist/bin`).
+> Segunda vez que un script deja el marcador; la primera fue §10.9.
+>
+> **Qué hace el push de Payload 3.89** (`pushDevSchema`): aplica los cambios
+> sin pérdida de datos **sin preguntar**, y **siempre** inserta el marcador. El
+> marcador no dice si la estructura cambió. Eso se comprueba aparte, abajo.
+>
+> **Comprobación de la estructura, solo lectura.** Hay una consulta que
+> compara la base con el snapshot de la última migración: columnas (tipo y
+> NOT NULL), índices, claves foráneas y enums, y **cero filas** significa
+> estructura idéntica. Se validó en las dos direcciones contra `development`:
+> 0 filas con el snapshot actual, y exactamente las 3 diferencias conocidas con
+> el anterior. **No cubre los valores por defecto.**
+>
+> **Arreglo:** el import pasa a dinámico, después de fijar la variable. Nuevo
+> guardarraíl `src/lib/db/scriptsSinPush.test.ts`: falla si algún script de
+> `scripts/` **alcanza la config por un import estático**, directo o
+> transitivo, o si la importa sin fijar antes la variable. Detectó el script
+> culpable y ningún otro, y lleva su propia comprobación de que falla cuando
+> debe.
+
 ### 10.1 Inventario real (fuente de verdad)
 
 > Medido por rastreo propio del sitio en producción (`npm run crawl`, 2026-07-27).
@@ -2405,20 +2438,21 @@ fichero, cero dependencias, cero imports, solo marcado.
 > olvidar, el sitio correcto para el guardarraíl es esta tabla**, no un párrafo
 > de documentación que nadie relee.
 
-| Guardarraíl                              | Qué olvido atrapa                                                                                                            | Dónde                                                      | Cuándo corre                   |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------ |
-| Cobertura del sitemap                    | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe                                 | `src/lib/seo/sitemap.test.ts`                              | CI, en cada push               |
-| Grupos del menú del panel                | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada                      | `src/collections/grupos.test.ts`                           | CI, en cada push               |
-| Unicidad de slug entre colecciones       | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)                              | hook `slugUnicoEntreColecciones` + su prueba               | CI y escritura                 |
-| Destino de un redirect                   | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                                       | `src/lib/redirects/destino.ts` + `npm run redirects:check` | CI y a mano                    |
-| Marcador `dev` en `payload_migrations`   | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                                             | `npm run db:check`, antes de `payload migrate`             | En cada build                  |
-| Versión exacta de Next y Payload         | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel                                  | `src/lib/deps/versiones-fijas.test.ts`                     | CI, en cada push               |
-| Vaciado de `solicitudes` solo en preview | Ejecutar el vaciado con la variable apuntando a producción y borrar leads reales                                             | `src/lib/db/vaciadoSolicitudes.ts` + su prueba             | Al vaciar (§10.21)             |
-| Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                                      | `npm run qa:acceso-portada`                                | **A mano**, contra development |
-| Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB                                   | `formatoDeVideoPermitido` + su prueba                      | CI y subida                    |
-| Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)                       | `sinDescargaRemota` + su prueba                            | CI y subida                    |
-| Recorte cerrado en el servidor           | Un recorte pedido por la API (`uploadEdits[crop]`), que Payload aplica aunque `crop: false` (§10.32)                         | `sinRecorte` + su prueba                                   | CI y subida                    |
-| Hero de prueba solo en el preview        | Subir las fotos de ux-9 (licencia pendiente) a la base o al Blob de producción — el Blob de `.env.local` es el de producción | `puedeTocarHeroDePrueba` + su prueba                       | Al sembrar o retirar           |
+| Guardarraíl                              | Qué olvido atrapa                                                                                                                | Dónde                                                      | Cuándo corre                   |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------ |
+| Cobertura del sitemap                    | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe                                     | `src/lib/seo/sitemap.test.ts`                              | CI, en cada push               |
+| Grupos del menú del panel                | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada                          | `src/collections/grupos.test.ts`                           | CI, en cada push               |
+| Unicidad de slug entre colecciones       | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)                                  | hook `slugUnicoEntreColecciones` + su prueba               | CI y escritura                 |
+| Destino de un redirect                   | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                                           | `src/lib/redirects/destino.ts` + `npm run redirects:check` | CI y a mano                    |
+| Marcador `dev` en `payload_migrations`   | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                                                 | `npm run db:check`, antes de `payload migrate`             | En cada build                  |
+| Versión exacta de Next y Payload         | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel                                      | `src/lib/deps/versiones-fijas.test.ts`                     | CI, en cada push               |
+| Vaciado de `solicitudes` solo en preview | Ejecutar el vaciado con la variable apuntando a producción y borrar leads reales                                                 | `src/lib/db/vaciadoSolicitudes.ts` + su prueba             | Al vaciar (§10.21)             |
+| Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                                          | `npm run qa:acceso-portada`                                | **A mano**, contra development |
+| Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB                                       | `formatoDeVideoPermitido` + su prueba                      | CI y subida                    |
+| Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)                           | `sinDescargaRemota` + su prueba                            | CI y subida                    |
+| Recorte cerrado en el servidor           | Un recorte pedido por la API (`uploadEdits[crop]`), que Payload aplica aunque `crop: false` (§10.32)                             | `sinRecorte` + su prueba                                   | CI y subida                    |
+| Hero de prueba solo en el preview        | Subir las fotos de ux-9 (licencia pendiente) a la base o al Blob de producción — el Blob de `.env.local` es el de producción     | `puedeTocarHeroDePrueba` + su prueba                       | Al sembrar o retirar           |
+| Scripts sin push de esquema              | Un script que alcanza la config por un import estático antes de fijar `PAYLOAD_DISABLE_PUSH`: marcador `dev` en la base (§10.34) | `src/lib/db/scriptsSinPush.test.ts`                        | CI, en cada push               |
 
 **Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
 lista real, y una prueba que exige que coincidan.

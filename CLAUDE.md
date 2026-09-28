@@ -324,22 +324,28 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 
 ## 10. Estado actual
 
-> **ESTADO ACTUAL — 2026-09-28, excepción de la demo CERRADA.**
-> **En producción:** home de ux-9, secciones 1–3 (fases A–D), cabecera y pie de
-> ux-9 (pie editable en el global `pie`); datos de demo, cerrado a buscadores.
-> Next 16.3.5 · Payload 3.89.0 · 377 pruebas.
-> **Sin excepciones activas desde el 2026-09-28** (§10.33): todo cambio va por
-> rama, preview y prueba de humo. **La retirada de lo sembrado para la demo está
-> PENDIENTE DE EJECUCIÓN (fase 1b)**: hasta entonces producción sigue sirviendo
-> las fotos L3, la del pie y los equipos 4–8 ocultos.
+> **ESTADO ACTUAL — 2026-09-28, excepción de la demo CERRADA Y EJECUTADA.**
+> **En producción:** home de ux-9 **sin hero ni sección 2** (se quedaron sin
+> imágenes al retirar la demo), sección 3, cabecera y pie de ux-9 (pie
+> editable en el global `pie`, sin imagen decorativa); datos de demo, cerrado a
+> buscadores. `Media` de producción, vacía. Next 16.3.5 · Payload 3.89.0 · 377
+> pruebas.
+> **Sin excepciones activas** (§10.33): todo cambio va por rama, preview y
+> prueba de humo.
 > **Próximos pasos, por prioridad:**
 >
-> 1. Fase 1b: retirada en producción según el runbook de dirección (§10.33).
-> 2. Fase 2: icono «+» del hero (L2), comentario de `cabecera.module.css`
->    (§10.35) y movimiento de la cabecera (§10.33 p.8).
-> 3. Guardarraíl de deriva de esquema, en PR propio (§10.33 p.5, aprobado).
-> 4. Lighthouse de la home y verificación completa de secciones 2–3 y cabecera.
-> 5. Fase E de la home: secciones 4 y 5 (`decisiones-home-ux9.md` §7).
+> 1. **Desbloquear los preview:** la migración `20260924_194316_pie_global`
+>    falla contra cualquier base que no la tenga aplicada (§10.33 p.13). Hasta
+>    corregirla, o refrescar la rama `preview` desde `production`, ningún
+>    preview se construye.
+> 2. **Fase 2, en rama, con las fotos sembradas SOLO en el preview:**
+>    verificación completa de las secciones 2–3 y la cabecera; Lighthouse;
+>    ajuste fino; movimiento y contraste de la cabecera; icono «+» por Tabler
+>    (L2); comentario de `cabecera.module.css` (§10.35); ajuste sin imagen de la
+>    sección 3 y sus tarjetas (§10.33 p.14).
+> 3. En paralelo, el guardarraíl de deriva de esquema, en PR propio (§10.33
+>    p.5, aprobado).
+> 4. Fase E de la home: secciones 4 y 5 (`decisiones-home-ux9.md` §7).
 
 > **CIERRE DE FASE — 2026-08-14.** Está construido **todo lo que no depende de
 > terceros**. Los seis bloques de código de `docs/RUTA-DESARROLLO.md` (A–F)
@@ -490,18 +496,40 @@ tocar código.
 > tarjeta (estrechaban el formulario) y el sitio público. **Pendiente de
 > terceros:** logo para fondos oscuros (#12) y favicon (#9).
 
-### 10.33 SUSPENSIÓN TEMPORAL — demo de la home al cliente (2026-09-24) · CERRADA el 2026-09-28
+### 10.33 SUSPENSIÓN TEMPORAL — demo de la home al cliente (2026-09-24) · CERRADA Y EJECUTADA el 2026-09-28
 
-> **EXCEPCIÓN CERRADA el 2026-09-28 (decisión de dirección).** Se cierran las
-> **cuatro**: las tres reglas suspendidas y el trabajo directo sobre `main`.
-> Desde ese día todo cambio va por **rama, preview y prueba de humo**.
+> **EXCEPCIÓN CERRADA Y EJECUTADA el 2026-09-28 (decisión de dirección).** Se
+> cierran las **cuatro**: las tres reglas suspendidas y el trabajo directo
+> sobre `main`. **Las reglas vuelven a aplicarse sin excepciones**: todo cambio
+> va por **rama, preview y prueba de humo**.
 >
-> **Se retira lo que se puso en producción para la demo:** la siembra del
-> script, la foto decorativa del pie (id 17) y las imágenes `Media` 1, 2 y 5,
-> de origen desconocido, que se tratan como **sin licencia** y se borran si
-> nada las referencia. Los equipos usados 4–8 vuelven a `disponible = true`.
-> **Estado: PENDIENTE DE EJECUCIÓN, fase 1b.** La ejecuta dirección con su
-> runbook; los resultados se anotan aquí al terminar.
+> **Retirada ejecutada por dirección el 2026-09-28 (fase 1b):**
+>
+> | Paso                                                     | Resultado                                                                   |
+> | -------------------------------------------------------- | --------------------------------------------------------------------------- |
+> | `db:check` antes y después                               | 12 migraciones, sin marcador `dev`                                          |
+> | `hero-prueba-preview.ts retirar produccion`              | Código 0: 11 registros borrados (ids 6–16) y 11 ficheros con 404 en el Blob |
+> | Panel: global `pie`                                      | «Imagen decorativa» vaciada                                                 |
+> | Panel: `Media`                                           | Borrados los ids 17, 1, 2 y 5. **`Media` de producción queda vacía**        |
+> | `UPDATE equipos_usados` ids 4–8                          | `disponible = true`, 5 filas                                                |
+> | Redeploy de producción **sin caché de build**            | Ready; prueba de humo #68 en verde                                          |
+> | `verificar-cierre.cjs` (≥ 150 s después de los borrados) | Todo en verde: 15 URLs del Blob en 404, API, categorías y home en 3 cortes  |
+> | `npm run qa` contra producción                           | 198 URLs, **0 errores**, 1 aviso (un `title` de 80 caracteres)              |
+>
+> **Evidencias**, fuera del repositorio, en
+> `C:\Users\Juan Torres\Desktop\partequipos-cierre\`: `verificacion.txt`,
+> `qa-cierre.txt`, las capturas `cierre-*.png`, el SQL de solo lectura
+> (`cierre-select.sql`), el runbook (`runbook-cierre.md`) y `media-antes.json`
+> (las URLs del Blob antes de la retirada).
+>
+> **Efectos conocidos de la retirada, esperados:**
+>
+> - Las marcas de maquinaria **Hitachi, CASE y Yanmar** se quedan sin logo ni
+>   imagen de tarjeta (apuntaban a imágenes de prueba).
+> - La home se queda **sin hero** (sin diapositivas con fondo) y **sin
+>   sección 2** (ninguna marca tiene imagen de tarjeta).
+> - Queda anotado sin tocar: el equipo usado **3 (Komatsu PC200-8)** sigue con
+>   `disponible = false`. No formaba parte del punto 6.
 >
 > **Resultado de la reunión del 2026-09-24**, tal como lo comunicó dirección:
 >
@@ -515,12 +543,15 @@ tocar código.
 > **REGLA DEL BUSCADOR:** fuera de la cola de trabajo **hasta que el cliente
 > apruebe por escrito una cotización de alcance adicional**.
 >
-> **Hallazgo del reconocimiento (fase 0, 2026-09-28):** la rama remota
-> `proto/hero-andres` contiene dos fotos L3 del kit (`Fondo.jpg` y `Hero-1.png`,
-> como `public/prototipo/hero-fondo.jpg` y `hero-frontal.png`, desde `ea23f0e`)
-> en el **repositorio público**. No se borró: el objeto `site-settings.json`
-> del kit también está en las demás ramas, y la condición de dirección para
-> borrarla era que el kit apareciera solo en ella. Pendiente de decisión.
+> **Hallazgo del reconocimiento (fase 0, 2026-09-28), RESUELTO el mismo
+> día:** la rama remota `proto/hero-andres` contenía dos fotos L3 del kit
+> (`Fondo.jpg` y `Hero-1.png`, como `public/prototipo/hero-fondo.jpg` y
+> `hero-frontal.png`, desde `ea23f0e`) en el **repositorio público**. Se
+> archivó en `Desktop\partequipos-diseno\archivo\proto-hero-andres.bundle`
+> (`git bundle verify` correcto), se borró la rama remota y la local, y los
+> dos blobs ya no aparecen en ninguna referencia remota (ramas, tags ni
+> `refs/pull`). **GitHub seguía sirviéndolos por SHA** (commit y fichero raw en
+> 200), así que dirección envió la solicitud de purga a GitHub Support.
 
 > **Tres reglas se SUSPENDIERON para esta demo, NO se derogaron.** Vuelven a
 > aplicarse desde el 2026-09-28. Decisión de dirección del 2026-09-24, por la
@@ -562,26 +593,31 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
   ZX75US-7 y Yanmar ViO55-6), porque los ve el cliente. Se reconocen por sus
   imágenes, cuyo texto alternativo sí lleva la marca «PRUEBA HERO —».
 
-#### PENDIENTES DE LA DEMO — en este orden (revisados el 2026-09-28)
+#### PENDIENTES DE LA DEMO — en este orden (revisados tras la fase 1b, 2026-09-28)
 
-1. **[Dirección, fase 1b — PENDIENTE DE EJECUCIÓN] Retirar la siembra de producción:**
-   `npx.cmd payload run scripts/portada/hero-prueba-preview.ts retirar produccion`,
-   con base y Blob de producción fijados a mano en la sesión (en PowerShell,
-   `npm run … --` puede perder el `--`). Comprueba que los ficheros dan 404 en
-   el Blob. **No revalida: después, redeploy.** Antes, las consultas de solo
-   lectura del reconocimiento: qué borra, que nada más apunte a esas imágenes
-   (31 columnas con clave foránea a `media` y texto enriquecido) y que no toca
-   los equipos 4–8 ni la imagen del pie.
-2. **[Cliente y Andrés] LICENCIA L3:** las fotos de Andrés están en producción para la demo.
-   **Antes del lanzamiento real se reemplazan o se licencian.** El paso 1 las
-   quita; si la demo se alarga, este pendiente sigue abierto mientras estén.
+1. **[Dirección, fase 1b] Retirar la siembra de producción. HECHO el
+   2026-09-28** (resultados arriba). Procedimiento, por si hay que repetirlo
+   en otro entorno: `npx.cmd payload run scripts/portada/hero-prueba-preview.ts retirar produccion`,
+   con base y Blob fijados a mano en la sesión (en PowerShell, `npm run … --`
+   puede perder el `--`). Comprueba que los ficheros dan 404 en el Blob. **No
+   revalida: después, redeploy sin caché de build.** Antes, las consultas de
+   solo lectura: qué borra, que nada más apunte a esas imágenes (31 columnas
+   con clave foránea a `media` y texto enriquecido) y que no toca otros
+   equipos ni la imagen del pie.
+   **Al copiar la cadena de conexión de Neon, activar «Show password»:**
+   copiada enmascarada, lleva asteriscos en lugar de la contraseña y la
+   conexión da `password authentication failed`.
+2. **[Cliente y Andrés] LICENCIA L3:** las fotos de Andrés **se retiraron de
+   producción el 2026-09-28** (paso 1). Mientras no se licencien, solo pueden
+   usarse en el preview. **Antes del lanzamiento real se reemplazan o se
+   licencian.**
    **Ampliado el 2026-09-24:** la excepción cubre también la **imagen
    decorativa del pie** (`Partequipos3553.png`). La sube dirección desde el
    panel de producción al campo «Imagen decorativa» del global `pie`: está en
    `Media`, no en `public/`, porque el repositorio es público. **Se licencia o
    se reemplaza antes del lanzamiento real.** El paso 1 (`retirar produccion`)
-   **no la quita**, porque no la siembra el script: hay que vaciar el campo y
-   borrarla de `Media` a mano.
+   no la quitaba, porque no la siembra el script: **se vació el campo y se
+   borró de `Media` a mano el 2026-09-28.**
 3. **[Dirección corre Lighthouse; nosotros, el análisis] Lighthouse de la fase D:** 3 corridas válidas con el método de §10.3
    p.14. Aplicar la regla: más de 2,4 s, calidad 60 con Andrés; más de 2,5 s,
    parar.
@@ -603,7 +639,7 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
    interactiva de drizzle-kit ante un posible renombrado (sin TTY se
    colgaría: `timeout`), y falsos positivos por el formato de los valores por
    defecto tras actualizar Payload o drizzle-kit.
-6. **[Dirección ejecuta el SQL] Devolver `disponible = true` a los equipos usados 4 a 8 de producción.**
+6. **[Dirección ejecuta el SQL] Devolver `disponible = true` a los equipos usados 4 a 8 de producción. HECHO el 2026-09-28** (5 filas; las tres categorías ya tienen unidades).
    Para la demo se ocultó la pestaña «Otros» de la home: esos 5 equipos de
    demo no tenían foto ni ficha y se veían vacíos. Mientras sigan así, las
    páginas de minicargadores, motoniveladoras y retrocargadoras dicen «No hay
@@ -675,7 +711,38 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     no la página pintada.
 
 12. **[Dirección] Restablecer las reglas de arriba. HECHO el 2026-09-28**:
-    excepción cerrada. Queda ejecutar la retirada (puntos 1 y 6, fase 1b).
+    excepción cerrada y retirada ejecutada (puntos 1 y 6).
+
+13. **[Nosotros] HALLAZGO 2026-09-28 — la migración del pie no se aplica en
+    una base nueva, y bloquea todos los preview.** El preview del PR #1 falló
+    en `payload migrate` (despliegue `dpl_DMcyw4DxanSLekHzxAYvKXN1PGDZ`):
+
+    ```
+    Error running migration 20260924_194316_pie_global
+    column pie.imagen_decorativa_id does not exist
+    ```
+
+    **Causa, leída en el código:** la migración siembra con
+    `payload.updateGlobal` (`src/migrations/20260924_194316_pie_global.ts:49`).
+    Esa llamada usa el esquema del código **actual**, que ya incluye la
+    columna `imagen_decorativa_id` de la migración SIGUIENTE
+    (`20260924_200150`). En producción funcionó porque se aplicó con el código
+    de su propio commit; contra la rama `preview`, que no la tenía, falla. La
+    migración va en transacción, así que la base se queda **intacta, sin
+    migrar**. **Afecta a cualquier base que se migre desde cero, incluida la
+    infraestructura definitiva del cliente (§10.7).** Salidas: sembrar con SQL
+    en la propia migración (sin API local ni `PIE_INICIAL` importado del
+    código), o, solo para desbloquear el preview, refrescar la rama `preview`
+    desde `production` (§10.21). **Guardarraíl a considerar:** aplicar todas
+    las migraciones contra un Postgres vacío en CI; el de deriva de esquema
+    (p.5) no lo detectaría.
+
+14. **[Nosotros, fase 2] La sección 3 y sus tarjetas sin imagen dejan el
+    hueco reservado.** Medido en las capturas de la fase 1b: a 390, espacio
+    vacío entre «Ver todas las excavadoras» y «Venta de maquinaria»; a 1010, la
+    mitad derecha de la sección vacía; y las tarjetas de equipos sin foto
+    dejan vacía su zona de imagen. **Criterio:** sección y tarjetas se ajustan
+    sin hueco cuando falta la imagen.
 
 ### 10.35 CORREGIDO 2026-09-28 — el desenfoque de la cabecera no lo quitaba `var()`: lo quitaba el ORDEN
 

@@ -135,10 +135,9 @@ plantillas que aún no tienen diseño.
 
 ## Recordatorios de dirección
 
-- **Producción contiene datos de demostración**, y desde el 2026-09-24 las
-  fotos de Andrés para la demo al cliente (CLAUDE.md §10.33). La excepción de
-  la demo se cerró el 2026-09-28 y **su retirada está pendiente de ejecución
-  (fase 1b)**. Producción debe vaciarse antes de cargar contenido real.
+- **Producción contiene datos de demostración.** Las fotos de Andrés que se
+  subieron para la demo al cliente se retiraron el 2026-09-28 (CLAUDE.md
+  §10.33). Producción debe vaciarse antes de cargar contenido real.
 - **El bloqueo de indexación está activo.** Se levanta cambiando una
   variable de entorno el día del lanzamiento.
 - **El repositorio está público de forma temporal**, autorizado por el

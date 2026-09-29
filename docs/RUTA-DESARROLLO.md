@@ -11,15 +11,15 @@ Lo único que queda de esta ruta es el bloque G, que no es código.
 
 ## Estado
 
-| Bloque                                 | Estado       | Cotizado | Cierra                               |
-| -------------------------------------- | ------------ | -------- | ------------------------------------ |
-| **A** — Formularios y captación        | ✅ completo  | 15 h     | Grupo D de URLs huérfanas            |
-| **B** — Lubricantes                    | ✅ completo  | —        | Sección completa (5 URLs)            |
-| **C** — Redirects 301                  | ✅ completo  | —        | El mayor riesgo del lanzamiento      |
-| **D** — Plantillas de blog             | ✅ completo  | 45 h     | Molde; falta el contenido real       |
-| **E** — Respaldos automatizados        | ✅ completo  | —        | Compromiso de Gestión de Incidencias |
-| **F** — QA, accesibilidad, rendimiento | ✅ completo  | 45 h     | Línea base para los umbrales         |
-| **G** — Acuerdo de diseño              | ⬜ pendiente | —        | No es código: es una conversación    |
+| Bloque                                 | Estado      | Cotizado | Cierra                                |
+| -------------------------------------- | ----------- | -------- | ------------------------------------- |
+| **A** — Formularios y captación        | ✅ completo | 15 h     | Grupo D de URLs huérfanas             |
+| **B** — Lubricantes                    | ✅ completo | —        | Sección completa (5 URLs)             |
+| **C** — Redirects 301                  | ✅ completo | —        | El mayor riesgo del lanzamiento       |
+| **D** — Plantillas de blog             | ✅ completo | 45 h     | Molde; falta el contenido real        |
+| **E** — Respaldos automatizados        | ✅ completo | —        | Compromiso de Gestión de Incidencias  |
+| **F** — QA, accesibilidad, rendimiento | ✅ completo | 45 h     | Línea base para los umbrales          |
+| **G** — Acuerdo de diseño              | 🟨 en curso | —        | Diseño de ux-9 recibido y aplicándose |
 
 ---
 
@@ -96,10 +96,15 @@ LCP 384–800 ms, **CLS 0**, cero tareas largas.
 **Pendiente:** clave de PageSpeed Insights para cifras contractuales, y repetir
 la medición cuando llegue el diseño.
 
-## Bloque G — Acuerdo de diseño ⬜ (no es código)
+## Bloque G — Acuerdo de diseño 🟨 (en curso desde el 2026-09-23)
 
-Lo único de esta ruta que sigue abierto. Es lo que más tiempo ahorra cuando
-llegue la entrega del tercero.
+**Actualizado el 2026-09-24.** El diseño llegó: la home **ux-9** de Andrés,
+con su kit (colores, tipografías) y los exports de la cabecera y el pie.
+**Aplicado y en producción:** fases A–D de la home (secciones 1–3), la
+cabecera y el pie. **Pendiente:** fases E–I de la home y el resto de
+plantillas. Plan, decisiones y desviaciones en
+`docs/diseno/decisiones-home-ux9.md`. Lo de abajo sigue valiendo para las
+plantillas que aún no tienen diseño.
 
 - Acordar paleta, escala tipográfica y escala de espaciado.
 - Catálogo de componentes: tarjeta de producto, listado, migas, cabecera de
@@ -119,7 +124,7 @@ llegue la entrega del tercero.
 | Migración de los 51 artículos de blog    | Acceso a WordPress          |
 | Carga de 351 modelos de repuestos reales | CSV del cliente             |
 | Carga de 80 fichas de maquinaria reales  | CSV e imágenes del cliente  |
-| Aplicación del diseño definitivo         | Entrega del diseñador       |
+| Resto del diseño (home E–I y plantillas) | Andrés; licencias L1–L3     |
 | Textos legales definitivos               | Área jurídica del cliente   |
 | Razón social, NIT y URLs de portales     | Definición del cliente      |
 | Base de datos en infraestructura propia  | Provisión del cliente       |
@@ -130,8 +135,9 @@ llegue la entrega del tercero.
 
 ## Recordatorios de dirección
 
-- **Producción contiene datos de demostración.** Debe vaciarse antes de
-  cargar contenido real.
+- **Producción contiene datos de demostración.** Las fotos de Andrés que se
+  subieron para la demo al cliente se retiraron el 2026-09-28 (CLAUDE.md
+  §10.33). Producción debe vaciarse antes de cargar contenido real.
 - **El bloqueo de indexación está activo.** Se levanta cambiando una
   variable de entorno el día del lanzamiento.
 - **El repositorio está público de forma temporal**, autorizado por el

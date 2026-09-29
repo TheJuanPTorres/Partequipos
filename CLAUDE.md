@@ -65,7 +65,7 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 > | Tailwind                        | **v4.3.3**, con `@tailwindcss/postcss`; sin fichero de configuración                                                           |
 > | Estilos del sitio público       | Utilidades de Tailwind **con colores fijos** (186 en 31 ficheros, recontado 2026-09-23) y, desde la fase A, los tokens de ux-9 |
 > | Estilos del panel               | SCSS propio sin capa: `src/app/(payload)/custom.scss`                                                                          |
-> | Iconos                          | `@tabler/icons-react` (aprobado 2026-09-17), menú del panel y portada (D6)                                                     |
+> | Iconos                          | `@tabler/icons-react` (aprobado 2026-09-17), menú del panel, portada, cabecera y pie                                           |
 >
 > **Consecuencia práctica:** adoptar componentes del sistema del cliente **no**
 > duplicaría un primitivo, porque no hay ninguno. Ver `docs/design-tokens.md`.
@@ -198,6 +198,7 @@ introducir otro gestor de estado, o mover contenido fuera de Payload.
 - Toda consulta va en `src/lib/queries/` — no consultas sueltas dentro de componentes.
 - Tipos generados por Payload (`payload-types.ts`). No escribir tipos a mano
   para entidades del CMS.
+- **Excepción: las migraciones NO usan la API local.** Ver §3.5.
 
 ### 3.3 URLs
 
@@ -216,6 +217,24 @@ Ninguna ruta se considera terminada sin:
 - Entrada en el sitemap dinámico.
 - Un solo `<h1>` por página.
 
+### 3.5 Migraciones (leer ANTES de escribir una)
+
+- **Una migración nunca usa la API local de Payload** (`payload.create`,
+  `update`, `updateGlobal`, `find`…) **ni nada que dependa del esquema actual
+  del código**: ni importar constantes o tipos de `src/`, ni consultas
+  generadas desde la config. La API local consulta con el esquema de HOY; la
+  migración corre en SU punto del historial. En cuanto el código gana una
+  columna, la migración deja de aplicarse en cualquier base nueva (§10.33
+  p.13).
+- **Los datos se siembran con SQL explícito** (`INSERT`/`UPDATE` con valores
+  escritos en la propia migración), tocando solo tablas y columnas que existen
+  en ese punto del historial.
+- **Una migración ya aplicada en producción no se vuelve a ejecutar allí**:
+  corregirla solo afecta a las bases que aún no la tienen.
+- Antes de cualquier cambio de esquema (a partir de la fase E), tienen que
+  estar en CI los dos guardarraíles de §10.33 p.5: deriva de esquema y
+  migrar desde cero.
+
 ---
 
 ## 4. Estructura de carpetas
@@ -229,6 +248,8 @@ src/
   collections/         # colecciones de Payload
   components/
     ui/                # componentes copiados del CLI del cliente (§10.27)
+    portada/           # secciones de la home de ux-9
+  globals/             # globales de Payload (el pie, §10.33)
     layout/
     catalog/
   lib/
@@ -322,13 +343,33 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 
 ## 10. Estado actual
 
+> **ESTADO ACTUAL — 2026-09-28, excepción de la demo CERRADA Y EJECUTADA.**
+> **En producción:** home de ux-9 **sin hero ni sección 2** (se quedaron sin
+> imágenes al retirar la demo), sección 3, cabecera y pie de ux-9 (pie
+> editable en el global `pie`, sin imagen decorativa); datos de demo, cerrado a
+> buscadores. `Media` de producción, vacía. Next 16.3.5 · Payload 3.89.0 · 377
+> pruebas.
+> **Sin excepciones activas** (§10.33): todo cambio va por rama, preview y
+> prueba de humo.
+> **Próximos pasos, por prioridad:**
+>
+> 1. **Fase 2, en rama, con las fotos sembradas SOLO en el preview:**
+>    verificación completa de las secciones 2–3 y la cabecera; Lighthouse;
+>    ajuste fino; movimiento y contraste de la cabecera; icono «+» por Tabler
+>    (L2); comentario de `cabecera.module.css` (§10.35); ajuste sin imagen de la
+>    sección 3 y sus tarjetas (§10.33 p.14).
+> 2. **Los dos guardarraíles de migraciones, ANTES de la fase E**, cada uno en
+>    su PR (§10.33 p.5, aprobados): deriva de esquema y migrar desde cero.
+> 3. Fase E de la home: secciones 4 y 5 (`decisiones-home-ux9.md` §7).
+
 > **CIERRE DE FASE — 2026-08-14.** Está construido **todo lo que no depende de
 > terceros**. Los seis bloques de código de `docs/RUTA-DESARROLLO.md` (A–F)
 > quedaron completos; el único abierto de esa ruta es el G, que es una
 > conversación con el diseñador, no código.
 
-- **Base del repo:** Next.js 16.2.11 (App Router, TS strict, Tailwind v4,
-  ESLint + Prettier). Ver ADR `docs/decisions/0001-version-nextjs.md`.
+- **Base del repo:** Next.js **16.3.5** y Payload **3.89.0**, versiones
+  exactas (App Router, TS strict, Tailwind v4, ESLint + Prettier). Arrancó en
+  16.2.11 (ADR `docs/decisions/0001-version-nextjs.md`); el salto, en §10.28.
 - **Plan de referencia:** `docs/PLAN-MVP.md` y `docs/RUTA-DESARROLLO.md`.
 
 ### 10.0 Qué está construido y qué falta
@@ -347,37 +388,39 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 | SEO             | Metadata, JSON-LD, sitemap con guardián, robots, canonical          |
 | Redirects       | 10 cargados + validación de destino                                 |
 | Respaldos       | Volcado, restauración **probada** y política de retención           |
-| QA              | `npm run qa`: 0 errores en local (198 URLs) y producción (112)      |
-| CI              | typecheck · lint · formato · 184 pruebas, verde en cada push        |
+| QA              | `npm run qa`: 0 errores en local (198 URLs, 2026-09-24)             |
+| CI              | typecheck · lint · formato · 377 pruebas (2026-09-24), en cada push |
 
 **Cobertura del sitio actual:** de las 648 URLs del rastreo, **565 tienen ruta
 propia**; las 83 restantes también tienen ruta (`[...slug]`) pero les falta el
 **contenido**: 51 artículos de blog y 24 páginas corporativas. Ver §10.0.1.
 
 **Lo que falta, en una línea:** contenido real (bloqueado por WordPress y por
-los CSV del cliente), diseño (bloqueado por el diseñador) e infraestructura
-definitiva de base de datos (bloqueado por el cliente).
+los CSV del cliente), el resto del diseño y la infraestructura definitiva de
+base de datos (bloqueada por el cliente). Del diseño, la home de ux-9 lleva
+hechas las fases A–D, la cabecera y el pie; faltan las fases E–I
+(`docs/diseno/decisiones-home-ux9.md` §7) y el resto de plantillas.
 
 ### 10.0.1 Pendientes agrupados por responsable
 
 **DEL CLIENTE** — nada de esto lo podemos resolver nosotros:
 
-| #   | Pendiente                                                                                                                                                                                                                                                                                                                                                                                                                 | Bloquea                                                                                                                                                                                                                                                                                                                                                               |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Claves de Turnstile y Resend (§10.11)                                                                                                                                                                                                                                                                                                                                                                                     | **Lanzamiento.** VERIFICADO EN EL DOM (2026-09-17): `/contactanos/` **no pinta ningún widget de Turnstile** en producción. Es el único punto del sitio por donde entran datos de terceros y hoy no tiene barrera anti-bot; los leads tampoco se notifican                                                                                                             |
-| 2   | Infraestructura de base de datos, con pooler (§10.7)                                                                                                                                                                                                                                                                                                                                                                      | **Migración.** Requisito duro                                                                                                                                                                                                                                                                                                                                         |
-| 3   | Acceso a WordPress                                                                                                                                                                                                                                                                                                                                                                                                        | 51 artículos + ~55 páginas editoriales                                                                                                                                                                                                                                                                                                                                |
-| 4   | CSV e imágenes reales                                                                                                                                                                                                                                                                                                                                                                                                     | 351 modelos + 80 fichas de maquinaria                                                                                                                                                                                                                                                                                                                                 |
-| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                                                                                                                                                                                                                                                                                                                                                               | JSON-LD `Organization` completo                                                                                                                                                                                                                                                                                                                                       |
-| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)                                                                                                                                                                                                                                                                                                                                                      | Redirects y 404 del día del cambio                                                                                                                                                                                                                                                                                                                                    |
-| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                                                                                                                                                                                                                                                                                                                                                                 | Cumplir el SLA de Gestión de Incidencias                                                                                                                                                                                                                                                                                                                              |
-| 8   | Clave de PageSpeed Insights (§10.3 13)                                                                                                                                                                                                                                                                                                                                                                                    | Umbrales de rendimiento contractuales                                                                                                                                                                                                                                                                                                                                 |
-| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                                                                                                                                                                                                                                                                                                                                                                        | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                                                                                                                                                                                                                                                                                                    |
-| 10  | Vercel Pro antes de volver el repositorio a privado                                                                                                                                                                                                                                                                                                                                                                       | Despliegue automático                                                                                                                                                                                                                                                                                                                                                 |
-| 11  | Textos legales definitivos                                                                                                                                                                                                                                                                                                                                                                                                | Sustituir los marcadores de posición                                                                                                                                                                                                                                                                                                                                  |
-| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras                                                                                                                                                                                                                                                                                                                                           | **RESUELTO PARA EL PANEL el 2026-09-20** con `partequipos-wordmark` de su CLI (§10.27), sin esperar al cliente: medido 20,47 en claro y 15,2 en oscuro, con los ojales igualando el fondo exacto. **Sigue abierto para el SITIO PÚBLICO**, cuya cabecera, JSON-LD e imagen social usan el PNG con fondo blanco (§10.8)                                                |
-| 13  | **Qué claims trae el `access_token` de Auth Central** y cuál es el flujo real de OAuth (§10.29)                                                                                                                                                                                                                                                                                                                           | **Cotización del SSO en firme.** Sin los claims no se puede diseñar el mapeo a nuestro campo `rol`; y la contradicción del flujo decide si el trabajo son ~30 h o ~46 h                                                                                                                                                                                               |
-| 14  | **Crear la organización de Sentry a su nombre** (§10.31): plan **Team** ($26/mes, usuarios ilimitados —el gratuito admite **uno**, y la revisión semanal la tiene que poder hacer más de una persona—), **decidir la región del centro de datos con su área jurídica** (US o UE: es transferencia internacional de datos personales, Ley 1581 de 2012, y se fija al crear la organización) e **invitarnos como miembros** | **Compromiso contractual que hoy no se cumple**: Sentry está en la cotización (stack y costos operativos) y la Gestión de Incidencias promete **revisión semanal de errores**. Hasta que exista la cuenta **no se instala nada**, porque la verificación del blindaje de datos necesita el destino real. Desbloquea además el endpoint de informes de la CSP (§10.16) |
+| #   | Pendiente                                                                                                                                                                                                                                                                                                                                                                                                                 | Bloquea                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Claves de Turnstile y Resend (§10.11)                                                                                                                                                                                                                                                                                                                                                                                     | **Lanzamiento.** VERIFICADO EN EL DOM (2026-09-17): `/contactanos/` **no pinta ningún widget de Turnstile** en producción. Es el único punto del sitio por donde entran datos de terceros y hoy no tiene barrera anti-bot; los leads tampoco se notifican                                                                                                                                                                                                |
+| 2   | Infraestructura de base de datos, con pooler (§10.7)                                                                                                                                                                                                                                                                                                                                                                      | **Migración.** Requisito duro                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 3   | Acceso a WordPress                                                                                                                                                                                                                                                                                                                                                                                                        | 51 artículos + ~55 páginas editoriales                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 4   | CSV e imágenes reales                                                                                                                                                                                                                                                                                                                                                                                                     | 351 modelos + 80 fichas de maquinaria                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 5   | Razón social, NIT, LinkedIn, Facebook, teléfono (§10.3 1–4)                                                                                                                                                                                                                                                                                                                                                               | JSON-LD `Organization` completo                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 6   | Decisiones de URLs: lubricantes, blog, Case, basura viva (§10.3 5–8)                                                                                                                                                                                                                                                                                                                                                      | Redirects y 404 del día del cambio                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                                                                                                                                                                                                                                                                                                                                                                 | Cumplir el SLA de Gestión de Incidencias                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 8   | Clave de PageSpeed Insights (§10.3 13)                                                                                                                                                                                                                                                                                                                                                                                    | Umbrales de rendimiento contractuales                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 9   | Icono cuadrado de marca para el favicon (§10.3 15)                                                                                                                                                                                                                                                                                                                                                                        | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                                                                                                                                                                                                                                                                                                                                                                                       |
+| 10  | Vercel Pro antes de volver el repositorio a privado. **PRIORIDAD ALTA desde el 2026-09-28** (§10.33)                                                                                                                                                                                                                                                                                                                      | Despliegue automático                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 11  | Textos legales definitivos                                                                                                                                                                                                                                                                                                                                                                                                | Sustituir los marcadores de posición                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras                                                                                                                                                                                                                                                                                                                                           | **RESUELTO PARA EL PANEL el 2026-09-20** con `partequipos-wordmark` de su CLI (§10.27), sin esperar al cliente: medido 20,47 en claro y 15,2 en oscuro, con los ojales igualando el fondo exacto. **Para el SITIO PÚBLICO, en parte:** desde el 2026-09-24 la cabecera y el pie usan `Logo-1.png` de Andrés, transparente y con letras oscuras (`public/logo-partequipos.png`). El JSON-LD y la imagen social siguen con el PNG con fondo blanco (§10.8) |
+| 13  | **Qué claims trae el `access_token` de Auth Central** y cuál es el flujo real de OAuth (§10.29)                                                                                                                                                                                                                                                                                                                           | **Cotización del SSO en firme.** Sin los claims no se puede diseñar el mapeo a nuestro campo `rol`; y la contradicción del flujo decide si el trabajo son ~30 h o ~46 h                                                                                                                                                                                                                                                                                  |
+| 14  | **Crear la organización de Sentry a su nombre** (§10.31): plan **Team** ($26/mes, usuarios ilimitados —el gratuito admite **uno**, y la revisión semanal la tiene que poder hacer más de una persona—), **decidir la región del centro de datos con su área jurídica** (US o UE: es transferencia internacional de datos personales, Ley 1581 de 2012, y se fija al crear la organización) e **invitarnos como miembros** | **Compromiso contractual que hoy no se cumple**: Sentry está en la cotización (stack y costos operativos) y la Gestión de Incidencias promete **revisión semanal de errores**. Hasta que exista la cuenta **no se instala nada**, porque la verificación del blindaje de datos necesita el destino real. Desbloquea además el endpoint de informes de la CSP (§10.16)                                                                                    |
 
 **DE LA DIRECCIÓN TÉCNICA** — asumido por la dirección, no depende del cliente:
 
@@ -388,28 +431,28 @@ definitiva de base de datos (bloqueado por el cliente).
 
 **DEL DISEÑADOR:**
 
-| Pendiente                                     | Nota                                                                                      |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Color, tipografía y radio: **YA EXISTEN**     | Extraídos y medidos: `docs/design-tokens.md`                                              |
-| Escala tipográfica y espaciado                | **No los define el sistema**: usa los de Tailwind v4                                      |
-| Catálogo de componentes                       | Ver bloque G de `RUTA-DESARROLLO.md`                                                      |
-| Restricciones de peso y dimensiones de imagen | Sostiene los umbrales de rendimiento                                                      |
-| Decisión sobre modo oscuro del SITIO          | El panel ya lo soporta con los tokens del sistema; el sitio público sigue sin él (§10.14) |
-| Icono cuadrado para el favicon                | Alternativa al cliente si él no lo tiene (§10.3 15)                                       |
-| Logo para fondos oscuros                      | Alternativa al cliente (#12); mirar antes `partequipos-wordmark` del CLI (§10.27)         |
-| Menú plegable en móvil                        | Hoy no hay; si lo mete, revisar teclado y `aria-expanded`                                 |
+| Pendiente                                     | Nota                                                                                          |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Color, tipografía y radio: **YA EXISTEN**     | Extraídos y medidos: `docs/design-tokens.md`                                                  |
+| Escala tipográfica y espaciado                | **No los define el sistema**: usa los de Tailwind v4                                          |
+| Catálogo de componentes                       | Ver bloque G de `RUTA-DESARROLLO.md`                                                          |
+| Restricciones de peso y dimensiones de imagen | Sostiene los umbrales de rendimiento                                                          |
+| Decisión sobre modo oscuro del SITIO          | El panel ya lo soporta con los tokens del sistema; el sitio público sigue sin él (§10.14)     |
+| Icono cuadrado para el favicon                | Alternativa al cliente si él no lo tiene (§10.3 15)                                           |
+| Logo para fondos oscuros                      | Alternativa al cliente (#12); mirar antes `partequipos-wordmark` del CLI (§10.27)             |
+| Menú plegable en móvil                        | **Hay uno PROVISIONAL** desde el 2026-09-24 (Escape, foco y `aria-expanded`); falta su diseño |
 
 **PIE DE UX-9 — DE ANDRÉS Y DEL CLIENTE, en un solo sitio** (2026-09-24;
 detalle en `docs/diseno/decisiones-home-ux9.md` §13):
 
-| Pendiente                                                                                     | De quién                      | Mientras tanto                                                             |
-| --------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------- |
-| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | No se pinta                                                                |
-| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | No se pinta                                                                |
-| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | No se pinta                                                                |
-| **Imagen decorativa** `Partequipos3553.png` (brazo de excavadora): licencia de banco (**L3**) | Andrés (procedencia), cliente | En `Media` de producción para la demo (§10.33 punto 2); nunca en `public/` |
-| **HelveticaNeue** del texto de la empresa: licencia web (**L1**)                              | Cliente, vía Andrés           | Inter                                                                      |
-| Redacción: «Ayudamos sectores…» → «Ayudamos **a** sectores…»                                  | Andrés (para su maqueta)      | Corregido en el sitio                                                      |
+| Pendiente                                                                                     | De quién                      | Mientras tanto                                                                                                     |
+| --------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | No se pinta                                                                                                        |
+| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | No se pinta                                                                                                        |
+| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | No se pinta                                                                                                        |
+| **Imagen decorativa** `Partequipos3553.png` (brazo de excavadora): licencia de banco (**L3**) | Andrés (procedencia), cliente | Retirada de producción el 2026-09-28 (§10.33); sin imagen hasta que se licencie o se reemplace; nunca en `public/` |
+| **HelveticaNeue** del texto de la empresa: licencia web (**L1**)                              | Cliente, vía Andrés           | Inter                                                                                                              |
+| Redacción: «Ayudamos sectores…» → «Ayudamos **a** sectores…»                                  | Andrés (para su maqueta)      | Corregido en el sitio                                                                                              |
 
 Cuando lleguen las URL, se añaden en el panel (global **Pie de página**), sin
 tocar código.
@@ -425,8 +468,8 @@ tocar código.
 | Revisar el modo oscuro con el diseño puesto           | §10.14          |
 | Pasar la CSP a fase 2 — **depende de tener endpoint** | §10.16 · §10.31 |
 | Desacoplar `sharp` del arranque de Payload            | §10.19          |
-| Prueba de humo automática post-despliegue             | §10.20          |
-| Verificar el store de Blob de preview con una subida  | §10.21          |
+| ~~Prueba de humo automática post-despliegue~~ HECHA   | §10.20          |
+| ~~Verificar el store de Blob de preview~~ HECHO       | §10.28          |
 | Redirects no validables en preview (proteccion)       | §10.22          |
 
 > **SISTEMA DE DISEÑO DEL CLIENTE (2026-09-16).** Existe en
@@ -468,10 +511,71 @@ tocar código.
 > tarjeta (estrechaban el formulario) y el sitio público. **Pendiente de
 > terceros:** logo para fondos oscuros (#12) y favicon (#9).
 
-### 10.33 SUSPENSIÓN TEMPORAL — demo de la home al cliente (2026-09-24)
+### 10.33 SUSPENSIÓN TEMPORAL — demo de la home al cliente (2026-09-24) · CERRADA Y EJECUTADA el 2026-09-28
 
-> **Tres reglas se SUSPENDEN para esta demo, NO se derogan.** Vuelven a
-> aplicarse en cuanto termine. Decisión de dirección del 2026-09-24, por la
+> **EXCEPCIÓN CERRADA Y EJECUTADA el 2026-09-28 (decisión de dirección).** Se
+> cierran las **cuatro**: las tres reglas suspendidas y el trabajo directo
+> sobre `main`. **Las reglas vuelven a aplicarse sin excepciones**: todo cambio
+> va por **rama, preview y prueba de humo**.
+>
+> **Retirada ejecutada por dirección el 2026-09-28 (fase 1b):**
+>
+> | Paso                                                     | Resultado                                                                   |
+> | -------------------------------------------------------- | --------------------------------------------------------------------------- |
+> | `db:check` antes y después                               | 12 migraciones, sin marcador `dev`                                          |
+> | `hero-prueba-preview.ts retirar produccion`              | Código 0: 11 registros borrados (ids 6–16) y 11 ficheros con 404 en el Blob |
+> | Panel: global `pie`                                      | «Imagen decorativa» vaciada                                                 |
+> | Panel: `Media`                                           | Borrados los ids 17, 1, 2 y 5. **`Media` de producción queda vacía**        |
+> | `UPDATE equipos_usados` ids 4–8                          | `disponible = true`, 5 filas                                                |
+> | Redeploy de producción **sin caché de build**            | Ready; prueba de humo #68 en verde                                          |
+> | `verificar-cierre.cjs` (≥ 150 s después de los borrados) | Todo en verde: 15 URLs del Blob en 404, API, categorías y home en 3 cortes  |
+> | `npm run qa` contra producción                           | 198 URLs, **0 errores**, 1 aviso (un `title` de 80 caracteres)              |
+>
+> **Evidencias**, fuera del repositorio, en
+> `C:\Users\Juan Torres\Desktop\partequipos-cierre\`: `verificacion.txt`,
+> `qa-cierre.txt`, las capturas `cierre-*.png`, el SQL de solo lectura
+> (`cierre-select.sql`), el runbook (`runbook-cierre.md`) y `media-antes.json`
+> (las URLs del Blob antes de la retirada).
+>
+> **Efectos conocidos de la retirada, esperados:**
+>
+> - Las marcas de maquinaria **Hitachi, CASE y Yanmar** se quedan sin logo ni
+>   imagen de tarjeta (apuntaban a imágenes de prueba).
+> - La home se queda **sin hero** (sin diapositivas con fondo) y **sin
+>   sección 2** (ninguna marca tiene imagen de tarjeta).
+> - Queda anotado sin tocar: el equipo usado **3 (Komatsu PC200-8)** sigue con
+>   `disponible = false`. No formaba parte del punto 6.
+>
+> **Resultado de la reunión del 2026-09-24**, tal como lo comunicó dirección:
+>
+> | Tema                                                          | Resultado                           |
+> | ------------------------------------------------------------- | ----------------------------------- |
+> | Licencias de las fotos (L3), HelveticaNeue (L1) e iconos (L2) | **No se trataron**                  |
+> | Buscador (7–11 h, alcance adicional)                          | **No se trató**                     |
+> | Excepción de la demo                                          | Cerrada por dirección el 2026-09-28 |
+> | Otros acuerdos o pedidos del cliente                          | **Ninguno comunicado**              |
+>
+> **REGLA DEL BUSCADOR:** fuera de la cola de trabajo **hasta que el cliente
+> apruebe por escrito una cotización de alcance adicional**.
+>
+> **Hallazgo del reconocimiento (fase 0, 2026-09-28), RESUELTO el mismo
+> día:** la rama remota `proto/hero-andres` contenía dos fotos L3 del kit
+> (`Fondo.jpg` y `Hero-1.png`, como `public/prototipo/hero-fondo.jpg` y
+> `hero-frontal.png`, desde `ea23f0e`) en el **repositorio público**. Se
+> archivó en `Desktop\partequipos-diseno\archivo\proto-hero-andres.bundle`
+> (`git bundle verify` correcto), se borró la rama remota y la local, y los
+> dos blobs ya no aparecen en ninguna referencia remota (ramas, tags ni
+> `refs/pull`). **GitHub seguía sirviéndolos por SHA** (commit y fichero raw en
+> 200), así que dirección envió la solicitud de purga a GitHub Support:
+> **caso 4803315, enviada el 2026-09-28.** Puede responder que no: su política
+> de purga excluye los datos que no son sensibles, y unas fotos sin licencia
+> pueden no contar como tales. **La mitigación definitiva es volver el
+> repositorio a privado**, que depende de pasar a Vercel Pro (pendiente del
+> cliente #10, §10.0.1; en Hobby los despliegues de un repo privado se
+> bloquean, §10.4). **Ese pendiente pasa a PRIORIDAD ALTA.**
+
+> **Tres reglas se SUSPENDIERON para esta demo, NO se derogaron.** Vuelven a
+> aplicarse desde el 2026-09-28. Decisión de dirección del 2026-09-24, por la
 > **reunión con el cliente de las 16:00**, en la que se le enseña la home en
 > producción. **Quien lea esto después: no es un cambio de criterio.**
 
@@ -510,38 +614,65 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
   ZX75US-7 y Yanmar ViO55-6), porque los ve el cliente. Se reconocen por sus
   imágenes, cuyo texto alternativo sí lleva la marca «PRUEBA HERO —».
 
-#### PENDIENTES DESPUÉS DE LA REUNIÓN — en este orden
+#### PENDIENTES DE LA DEMO — en este orden (revisados tras la fase 1b, 2026-09-28)
 
-1. **Retirar la siembra de producción:**
-   `npm run preview:hero-prueba -- retirar produccion`, con base y Blob de
-   producción. Comprueba que los ficheros dan 404 en el Blob.
-2. **LICENCIA L3:** las fotos de Andrés están en producción para la demo.
-   **Antes del lanzamiento real se reemplazan o se licencian.** El paso 1 las
-   quita; si la demo se alarga, este pendiente sigue abierto mientras estén.
-   **Ampliado el 2026-09-24:** la excepción cubre también la **imagen
-   decorativa del pie** (`Partequipos3553.png`). La sube dirección desde el
-   panel de producción al campo «Imagen decorativa» del global `pie`: está en
-   `Media`, no en `public/`, porque el repositorio es público. **Se licencia o
+1. **[Dirección, fase 1b] Retirar la siembra de producción. HECHO el
+   2026-09-28** (resultados arriba). Procedimiento, por si hay que repetirlo
+   en otro entorno: `npx.cmd payload run scripts/portada/hero-prueba-preview.ts retirar produccion`,
+   con base y Blob fijados a mano en la sesión (en PowerShell, `npm run … --`
+   puede perder el `--`). Comprueba que los ficheros dan 404 en el Blob. **No
+   revalida: después, redeploy sin caché de build.** Antes, las consultas de
+   solo lectura: qué borra, que nada más apunte a esas imágenes (31 columnas
+   con clave foránea a `media` y texto enriquecido) y que no toca otros
+   equipos ni la imagen del pie.
+   **Al copiar la cadena de conexión de Neon, activar «Show password»:**
+   copiada enmascarada, lleva asteriscos en lugar de la contraseña y la
+   conexión da `password authentication failed`.
+2. **[Cliente y Andrés] LICENCIA L3:** las fotos de Andrés **se retiraron de
+   producción el 2026-09-28** (paso 1). Mientras no se licencien, solo pueden
+   usarse en el preview. **Antes del lanzamiento real se reemplazan o se
+   licencian.**
+   **Ampliado el 2026-09-24:** la excepción cubrió también la **imagen
+   decorativa del pie** (`Partequipos3553.png`). La subió dirección desde el
+   panel de producción al campo «Imagen decorativa» del global `pie`: estaba
+   en `Media`, no en `public/`, porque el repositorio es público. **Se licencia o
    se reemplaza antes del lanzamiento real.** El paso 1 (`retirar produccion`)
-   **no la quita**, porque no la siembra el script: hay que vaciar el campo y
-   borrarla de `Media` a mano.
-3. **Lighthouse de la fase D:** 3 corridas válidas con el método de §10.3
+   no la quitaba, porque no la siembra el script: **se vació el campo y se
+   borró de `Media` a mano el 2026-09-28.**
+3. **[Dirección corre Lighthouse; nosotros, el análisis] Lighthouse de la fase D:** 3 corridas válidas con el método de §10.3
    p.14. Aplicar la regla: más de 2,4 s, calidad 60 con Andrés; más de 2,5 s,
    parar.
-4. **Verificación completa de las secciones 2 y 3,** pintadas y con las fotos
+4. **[Nosotros] Verificación completa de las secciones 2 y 3,** pintadas y con las fotos
    reales, en los tres cortes. Hoy solo hay la pasada visual rápida de la demo
    y la verificación local contra `development` de
    `docs/diseno/decisiones-home-ux9.md` §11.
-5. **Guardarraíl de deriva de esquema:** que CI falle si una colección cambia
-   el esquema sin su migración. Motivo: `videos.focal_x` y `focal_y` quedaron
-   sin migrar en la fase C (`0d2dbd3`) y los recogió por sorpresa la migración
-   de la fase D. Idea a evaluar: `payload migrate:create` en seco comparando
-   contra el último snapshot.
-6. **Devolver `disponible = true` a los equipos usados 4 a 8 de producción.**
+5. **[Nosotros] Guardarraíles de migraciones — LOS DOS APROBADOS el
+   2026-09-28, cada uno en su PR. CONDICIÓN OBLIGATORIA antes de cualquier
+   cambio de esquema (fase E).**
+   - **Migrar desde cero:** un job de CI con un Postgres de servicio aplica
+     todas las migraciones con el `payload migrate` real y exige 0 filas en
+     la consulta de estructura de §10.34, generada desde el último snapshot.
+     Atrapa migraciones que no se aplican en una base nueva (p.13). No cubre
+     bases con datos, valores por defecto, `down` ni lo específico de Neon.
+     Estimado 3–4 h; +30–45 s de CI como paso, ~0 como job paralelo.
+   - **Deriva de esquema:** que CI falle si una colección cambia el esquema
+     sin su migración. Motivo: `videos.focal_x` y `focal_y` quedaron sin migrar
+     en la fase C (`0d2dbd3`) y los recogió por sorpresa la migración de la
+     fase D. **Demostrado sin base de datos** en el reconocimiento: `getPayload`
+     con `disableDBConnect` construye el esquema Drizzle (`db.init()` no
+     conecta), y `generateMigration` de `drizzle-kit/api` contra el último
+     snapshot de `src/migrations` —lo mismo que hace `migrate:create`, leído en
+     `@payloadcms/drizzle/dist/utilities/buildCreateMigration.js`— da en
+     `0d2dbd3` exactamente los dos `DROP COLUMN` y en `main` cero sentencias.
+     Unos 2 min por corrida. Estimado 3–5 h. Riesgos a cubrir: la pregunta
+     interactiva de drizzle-kit ante un posible renombrado (sin TTY se
+     colgaría: `timeout`), y falsos positivos por el formato de los valores por
+     defecto tras actualizar Payload o drizzle-kit.
+6. **[Dirección ejecuta el SQL] Devolver `disponible = true` a los equipos usados 4 a 8 de producción. HECHO el 2026-09-28** (5 filas; las tres categorías ya tienen unidades).
    Para la demo se ocultó la pestaña «Otros» de la home: esos 5 equipos de
-   demo no tenían foto ni ficha y se veían vacíos. Mientras sigan así, las
-   páginas de minicargadores, motoniveladoras y retrocargadoras dicen «No hay
-   unidades disponibles». En la misma limpieza (`.tmp-hero/limpieza-demo.sql`)
+   demo no tenían foto ni ficha y se veían vacíos. Así estuvieron hasta el
+   2026-09-28: mientras tanto, las páginas de minicargadores, motoniveladoras
+   y retrocargadoras decían «No hay unidades disponibles». En la misma limpieza (`.tmp-hero/limpieza-demo.sql`)
    se quitó «(demo)» de los 8 nombres de equipo y se pusieron los textos de
    ux-9 en las marcas Hitachi, CASE y Yanmar; eso no hace falta revertirlo.
    Después, **redeploy**: un `UPDATE` directo no revalida nada.
@@ -550,23 +681,27 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
    UPDATE equipos_usados SET disponible = true WHERE id BETWEEN 4 AND 8 RETURNING id, nombre, disponible;
    ```
 
-7. **Cabecera de ux-9: verificación completa y Lighthouse de la home.** Se
+7. **[Nosotros] Cabecera de ux-9: verificación completa y Lighthouse de la home.** Se
    subió con verificación mínima. Revisar además tres decisiones tomadas
    deprisa: el `Logo-1.png` de Andrés en `public/` (transparente, letras
    oscuras); el encogido al bajar, que interpreta el «85 px» del export como
    logo al 85 %; y el menú móvil provisional, no diseñado.
 
-8. **Hero: el título queda unos 45 px más abajo que en ux-9**, desde la
+8. **[Nosotros] Hero: el título queda unos 45 px más abajo que en ux-9**, desde la
    fase C (`docs/diseno/decisiones-home-ux9.md` §12). **Movimiento de la
-   cabecera:** medir en ux-9 la duración y la curva al esconder y mostrar, y
-   replicarlas respetando el movimiento reducido. ux-9 está en mantenimiento;
-   su HTML guardado se puede pintar con su CSS y JS reales.
+   cabecera (fase 2):** LEÍDO en el plugin de ux-9, «Sticky Header Effects
+   for Elementor» 2.2.3 (`she-header.js` y `she-header-style.css`): esconder
+   y mostrar con `transform 0.4s ease-in-out` (`.headerup` con
+   `translateY(-110vh)`), se esconde a partir de **500 px** de scroll, y el
+   velo y el encogido entran a los **60 px**. El nuestro: `0.3s ease`, 120 px
+   y 10 px. ux-9 **no** respeta el movimiento reducido en la cabecera; el
+   nuestro sí, y se conserva. Leído en código, no medido pintado.
 
-9. **Pie de ux-9** (`docs/diseno/decisiones-home-ux9.md` §13):
+9. **[Cliente: URL y licencias · Andrés: redacción · Dirección: buscador y global] Pie de ux-9** (`docs/diseno/decisiones-home-ux9.md` §13):
    - Pendiente del cliente: las URL de «Trabaja con nosotros», «Zona de
      clientes» y «Financiación».
-   - Decidir el buscador (7–11 h, no cotizado) y el global de Payload del pie
-     (3–4 h).
+   - El global de Payload del pie ya está hecho (abajo). El buscador, fuera
+     de la cola (último punto de esta lista).
    - La foto decorativa del pie espera la licencia (L3).
    - Punto de retorno previo al pie: `dpl_4gcAnPLNaeB9xsBNdzqqxC88eUpw`.
    - **Global `pie` en Payload** (2026-09-24, directo a producción). Su
@@ -575,13 +710,14 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
      `dpl_FNZWR7RaZoaaFNWE8f9dSeHXjWyz`. **Ojo al revertir:** devolver el alias
      no deshace la migración. Las tablas `pie*` se quedan y el código anterior
      no las usa, así que no rompe nada.
-   - **Buscador: en espera de decisión** (la respuesta llegó sin marcar
-     «aprobado / en espera»). Si se aprueba: coincidencia por nombre y código
-     con los exactos primero, longitud mínima y máxima, tope de resultados,
-     caché, `noindex`, fuera del sitemap y formulario GET. Se registra como
-     **alcance adicional** sobre la cotización.
+   - **Buscador: FUERA DE LA COLA** (dirección, 2026-09-28) hasta que el
+     cliente apruebe por escrito una cotización de alcance adicional. En la
+     reunión no se trató. Si llega a aprobarse, el diseño técnico ya está
+     escrito: coincidencia por nombre y código con los exactos primero,
+     longitud mínima y máxima, tope de resultados, caché, `noindex`, fuera
+     del sitemap y formulario GET.
 
-10. **AJUSTE FINO CON UX-9 — se resuelve junto, en una sola pasada, más
+10. **[Nosotros] AJUSTE FINO CON UX-9 — se resuelve junto, en una sola pasada, más
     adelante.** Diferencias pequeñas ya medidas, ninguna rompe nada:
 
     | Diferencia                                                               | Medida                                                        | Dónde                   |
@@ -603,7 +739,86 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     quedaría tapada sin que nada avisara. `qa` no lo ve, porque lee el HTML y
     no la página pintada.
 
-12. **Restablecer las reglas de arriba.** Este apartado deja de aplicarse.
+12. **[Dirección] Restablecer las reglas de arriba. HECHO el 2026-09-28**:
+    excepción cerrada y retirada ejecutada (puntos 1 y 6).
+
+13. **[Nosotros] Migración del pie que no se aplicaba en una base nueva —
+    RESUELTO el 2026-09-28 en el PR #2 (`172cea4`).**
+    - **Síntoma:** los preview dejaron de construirse
+      (`dpl_DMcyw4DxanSLekHzxAYvKXN1PGDZ`):
+
+      ```
+      Error running migration 20260924_194316_pie_global
+      column pie.imagen_decorativa_id does not exist
+      ```
+
+    - **Causa:** la migración sembraba con `payload.updateGlobal`, y la API
+      local consulta con el esquema del código **actual**, que ya incluía
+      `imagen_decorativa_id`, de la migración SIGUIENTE (`20260924_200150`).
+      En producción funcionó porque se aplicó con el código de su propio
+      commit; contra cualquier base sin esa migración —la rama `preview`, o
+      la infraestructura definitiva del cliente (§10.7)— fallaba. Va en
+      transacción, así que la base quedaba intacta.
+    - **Arreglo:** la siembra pasa a `INSERT` explícitos con los valores de
+      `PIE_INICIAL` en `ad37601` y los mismos ids que producción. Mismo nombre
+      de fichero y de migración; el esquema que crea y el snapshot, sin
+      cambios. En producción ya estaba aplicada y no se vuelve a ejecutar: el
+      despliegue de producción del PR #2 registró las 12 y no aplicó ninguna.
+    - **Prueba:** el preview del PR #2 migró la rama `preview` de Neon, que no
+      tenía la migración (aplicó `pie_global` y `pie_imagen_decorativa`); la
+      consulta de estructura de §10.34 contra esa rama dio **0 filas**; el pie
+      del preview, igual al de producción en la API, en el HTML y pintado en
+      escritorio y móvil. Antes, las 12 migraciones aplicadas a un Postgres
+      vacío (PGlite) pasaron, y la versión original fallaba en el mismo arnés.
+    - **Regla que deja** (también en §3.5): una migración nunca usa la API
+      local de Payload ni nada que dependa del esquema actual; los datos se
+      siembran con SQL explícito.
+    - **Guardarraíl:** «migrar desde cero», en p.5.
+
+14. **[Nosotros, fase 2] La sección 3 y sus tarjetas sin imagen dejan el
+    hueco reservado.** Medido en las capturas de la fase 1b: a 390, espacio
+    vacío entre «Ver todas las excavadoras» y «Venta de maquinaria»; a 1010, la
+    mitad derecha de la sección vacía; y las tarjetas de equipos sin foto
+    dejan vacía su zona de imagen. **Criterio:** sección y tarjetas se ajustan
+    sin hueco cuando falta la imagen.
+    Comprobar también el pie entre 1025 y 1279 px SIN imagen decorativa: la
+    reserva de 170 px de §10.33 p.11 no debe dejar hueco.
+
+### 10.35 CORREGIDO 2026-09-28 — el desenfoque de la cabecera no lo quitaba `var()`: lo quitaba el ORDEN
+
+> **Lo que se creyó y quedó escrito** (comentario de
+> `src/components/layout/cabecera.module.css`, commit `8eb1a86`): «con
+> `var()`, el compilador de CSS eliminaba las dos propiedades». El arreglo
+> pasó a valores literales **y a la vez** invirtió el orden, así que funcionó
+> por la razón equivocada.
+>
+> **La causa real, reproducida con el `lightningcss` 1.32.0 del proyecto:**
+> cuando una regla declara `backdrop-filter` **antes** que
+> `-webkit-backdrop-filter`, el compilador las fusiona y **se queda con la
+> última**, la prefijada. **Pasa igual con valores literales**:
+>
+> ```
+> a{backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}  ->  a{-webkit-backdrop-filter:blur(2px)}
+> a{-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}  ->  a{backdrop-filter:blur(2px)}
+> ```
+>
+> El commit `691d793` tenía el primer orden, y Chrome solo aplica la
+> propiedad sin prefijo: velo sin desenfoque. **Regla: la variante
+> `-webkit-` va SIEMPRE antes que la estándar.** `var()` no tenía nada que
+> ver. Límite: Turbopack usa su propio lightningcss embebido y la reproducción
+> es con el paquete de npm; el CSS servido entonces no se pudo leer (el
+> despliegue antiguo responde 302 por la protección de Vercel).
+>
+> **Auditoría de todo el CSS de los módulos contra producción (2026-09-28):**
+> las **682 declaraciones** de los 7 `*.module.css` (**236 con `var()`**),
+> comparadas regla a regla con el CSS servido en `/` y `/nosotros/`: **no
+> falta ninguna**; las que no coinciden letra a letra son equivalentes
+> minificados (`transparent` → `0 0`, `::before` → `:before`, fotogramas
+> renombrados). En la página pintada, a 390 y 1440, **cero variables sin
+> definir**, y el vidrio del hero, el velo de la cabecera, el velo de la
+> sección 2 y la marca de agua del pie con sus valores. **El pendiente de
+> revisar «propiedades con `var()` eliminadas» queda CERRADO.** El comentario
+> de `cabecera.module.css` se corrige en la fase 2.
 
 ### 10.34 INCIDENTE 2026-09-24 — marcador `dev` en PRODUCCIÓN por un import estático
 
@@ -2604,7 +2819,8 @@ propuesta está en §10.20.
 > **Por qué es frágil:** el archivo vive en el Blob sin ningún registro en base
 > que lo respalde, así que cualquier inventario de media lo da por huérfano. Si
 > alguien lo borra del store —o cambiamos de almacenamiento— se rompen a la vez
-> la **cabecera de todas las páginas** (`Header.tsx`), el **logo del JSON-LD
+> la ~~cabecera de todas las páginas~~ (desde el 2026-09-24 la cabecera usa
+> `public/logo-partequipos.png`), el **logo del JSON-LD
 > `Organization`** (`jsonLd.ts`) y la **imagen social por defecto**
 > (`buildMetadata.ts`), **sin que nada avise**: no hay error de compilación ni de
 > tipos, solo una imagen rota en producción.

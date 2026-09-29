@@ -198,6 +198,7 @@ introducir otro gestor de estado, o mover contenido fuera de Payload.
 - Toda consulta va en `src/lib/queries/` — no consultas sueltas dentro de componentes.
 - Tipos generados por Payload (`payload-types.ts`). No escribir tipos a mano
   para entidades del CMS.
+- **Excepción: las migraciones NO usan la API local.** Ver §3.5.
 
 ### 3.3 URLs
 
@@ -215,6 +216,24 @@ Ninguna ruta se considera terminada sin:
 - JSON-LD correspondiente (`Product`, `BreadcrumbList`, `Organization`, `Article`).
 - Entrada en el sitemap dinámico.
 - Un solo `<h1>` por página.
+
+### 3.5 Migraciones (leer ANTES de escribir una)
+
+- **Una migración nunca usa la API local de Payload** (`payload.create`,
+  `update`, `updateGlobal`, `find`…) **ni nada que dependa del esquema actual
+  del código**: ni importar constantes o tipos de `src/`, ni consultas
+  generadas desde la config. La API local consulta con el esquema de HOY; la
+  migración corre en SU punto del historial. En cuanto el código gana una
+  columna, la migración deja de aplicarse en cualquier base nueva (§10.33
+  p.13).
+- **Los datos se siembran con SQL explícito** (`INSERT`/`UPDATE` con valores
+  escritos en la propia migración), tocando solo tablas y columnas que existen
+  en ese punto del historial.
+- **Una migración ya aplicada en producción no se vuelve a ejecutar allí**:
+  corregirla solo afecta a las bases que aún no la tienen.
+- Antes de cualquier cambio de esquema (a partir de la fase E), tienen que
+  estar en CI los dos guardarraíles de §10.33 p.5: deriva de esquema y
+  migrar desde cero.
 
 ---
 
@@ -334,18 +353,14 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 > prueba de humo.
 > **Próximos pasos, por prioridad:**
 >
-> 1. **Desbloquear los preview:** la migración `20260924_194316_pie_global`
->    falla contra cualquier base que no la tenga aplicada (§10.33 p.13). Hasta
->    corregirla, o refrescar la rama `preview` desde `production`, ningún
->    preview se construye.
-> 2. **Fase 2, en rama, con las fotos sembradas SOLO en el preview:**
+> 1. **Fase 2, en rama, con las fotos sembradas SOLO en el preview:**
 >    verificación completa de las secciones 2–3 y la cabecera; Lighthouse;
 >    ajuste fino; movimiento y contraste de la cabecera; icono «+» por Tabler
 >    (L2); comentario de `cabecera.module.css` (§10.35); ajuste sin imagen de la
 >    sección 3 y sus tarjetas (§10.33 p.14).
-> 3. En paralelo, el guardarraíl de deriva de esquema, en PR propio (§10.33
->    p.5, aprobado).
-> 4. Fase E de la home: secciones 4 y 5 (`decisiones-home-ux9.md` §7).
+> 2. **Los dos guardarraíles de migraciones, ANTES de la fase E**, cada uno en
+>    su PR (§10.33 p.5, aprobados): deriva de esquema y migrar desde cero.
+> 3. Fase E de la home: secciones 4 y 5 (`decisiones-home-ux9.md` §7).
 
 > **CIERRE DE FASE — 2026-08-14.** Está construido **todo lo que no depende de
 > terceros**. Los seis bloques de código de `docs/RUTA-DESARROLLO.md` (A–F)
@@ -401,7 +416,7 @@ hechas las fases A–D, la cabecera y el pie; faltan las fases E–I
 | 7   | Destino, cifrado y periodicidad de respaldos (§10.3 9–12)                                                                                                                                                                                                                                                                                                                                                                 | Cumplir el SLA de Gestión de Incidencias                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 8   | Clave de PageSpeed Insights (§10.3 13)                                                                                                                                                                                                                                                                                                                                                                                    | Umbrales de rendimiento contractuales                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 9   | Icono cuadrado de marca para el favicon (§10.3 15)                                                                                                                                                                                                                                                                                                                                                                        | El logo es 1614×317 y no sirve; lo primero que se ve en la pestaña                                                                                                                                                                                                                                                                                                                                                                                       |
-| 10  | Vercel Pro antes de volver el repositorio a privado                                                                                                                                                                                                                                                                                                                                                                       | Despliegue automático                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 10  | Vercel Pro antes de volver el repositorio a privado. **PRIORIDAD ALTA desde el 2026-09-28** (§10.33)                                                                                                                                                                                                                                                                                                                      | Despliegue automático                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 11  | Textos legales definitivos                                                                                                                                                                                                                                                                                                                                                                                                | Sustituir los marcadores de posición                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 12  | Logo para fondos oscuros: SVG, o PNG transparente ≥ 520 × 102 con letras claras                                                                                                                                                                                                                                                                                                                                           | **RESUELTO PARA EL PANEL el 2026-09-20** con `partequipos-wordmark` de su CLI (§10.27), sin esperar al cliente: medido 20,47 en claro y 15,2 en oscuro, con los ojales igualando el fondo exacto. **Para el SITIO PÚBLICO, en parte:** desde el 2026-09-24 la cabecera y el pie usan `Logo-1.png` de Andrés, transparente y con letras oscuras (`public/logo-partequipos.png`). El JSON-LD y la imagen social siguen con el PNG con fondo blanco (§10.8) |
 | 13  | **Qué claims trae el `access_token` de Auth Central** y cuál es el flujo real de OAuth (§10.29)                                                                                                                                                                                                                                                                                                                           | **Cotización del SSO en firme.** Sin los claims no se puede diseñar el mapeo a nuestro campo `rol`; y la contradicción del flujo decide si el trabajo son ~30 h o ~46 h                                                                                                                                                                                                                                                                                  |
@@ -551,7 +566,13 @@ tocar código.
 > (`git bundle verify` correcto), se borró la rama remota y la local, y los
 > dos blobs ya no aparecen en ninguna referencia remota (ramas, tags ni
 > `refs/pull`). **GitHub seguía sirviéndolos por SHA** (commit y fichero raw en
-> 200), así que dirección envió la solicitud de purga a GitHub Support.
+> 200), así que dirección envió la solicitud de purga a GitHub Support:
+> **caso 4803315, enviada el 2026-09-28.** Puede responder que no: su política
+> de purga excluye los datos que no son sensibles, y unas fotos sin licencia
+> pueden no contar como tales. **La mitigación definitiva es volver el
+> repositorio a privado**, que depende de pasar a Vercel Pro (pendiente del
+> cliente #10, §10.0.1; en Hobby los despliegues de un repo privado se
+> bloquean, §10.4). **Ese pendiente pasa a PRIORIDAD ALTA.**
 
 > **Tres reglas se SUSPENDIERON para esta demo, NO se derogaron.** Vuelven a
 > aplicarse desde el 2026-09-28. Decisión de dirección del 2026-09-24, por la
@@ -625,20 +646,28 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
    reales, en los tres cortes. Hoy solo hay la pasada visual rápida de la demo
    y la verificación local contra `development` de
    `docs/diseno/decisiones-home-ux9.md` §11.
-5. **[Nosotros] Guardarraíl de deriva de esquema — APROBADO el 2026-09-28,
-   pendiente, en PR propio.** Que CI falle si una colección cambia el esquema
-   sin su migración. Motivo: `videos.focal_x` y `focal_y` quedaron sin migrar
-   en la fase C (`0d2dbd3`) y los recogió por sorpresa la migración de la
-   fase D. **Demostrado sin base de datos** en el reconocimiento: `getPayload`
-   con `disableDBConnect` construye el esquema Drizzle (`db.init()` no
-   conecta), y `generateMigration` de `drizzle-kit/api` contra el último
-   snapshot de `src/migrations` —lo mismo que hace `migrate:create`, leído en
-   `@payloadcms/drizzle/dist/utilities/buildCreateMigration.js`— da en
-   `0d2dbd3` exactamente los dos `DROP COLUMN` y en `main` cero sentencias.
-   Unos 2 min por corrida. Estimado 3–5 h. Riesgos a cubrir: la pregunta
-   interactiva de drizzle-kit ante un posible renombrado (sin TTY se
-   colgaría: `timeout`), y falsos positivos por el formato de los valores por
-   defecto tras actualizar Payload o drizzle-kit.
+5. **[Nosotros] Guardarraíles de migraciones — LOS DOS APROBADOS el
+   2026-09-28, cada uno en su PR. CONDICIÓN OBLIGATORIA antes de cualquier
+   cambio de esquema (fase E).**
+   - **Migrar desde cero:** un job de CI con un Postgres de servicio aplica
+     todas las migraciones con el `payload migrate` real y exige 0 filas en
+     la consulta de estructura de §10.34, generada desde el último snapshot.
+     Atrapa migraciones que no se aplican en una base nueva (p.13). No cubre
+     bases con datos, valores por defecto, `down` ni lo específico de Neon.
+     Estimado 3–4 h; +30–45 s de CI como paso, ~0 como job paralelo.
+   - **Deriva de esquema:** que CI falle si una colección cambia el esquema
+     sin su migración. Motivo: `videos.focal_x` y `focal_y` quedaron sin migrar
+     en la fase C (`0d2dbd3`) y los recogió por sorpresa la migración de la
+     fase D. **Demostrado sin base de datos** en el reconocimiento: `getPayload`
+     con `disableDBConnect` construye el esquema Drizzle (`db.init()` no
+     conecta), y `generateMigration` de `drizzle-kit/api` contra el último
+     snapshot de `src/migrations` —lo mismo que hace `migrate:create`, leído en
+     `@payloadcms/drizzle/dist/utilities/buildCreateMigration.js`— da en
+     `0d2dbd3` exactamente los dos `DROP COLUMN` y en `main` cero sentencias.
+     Unos 2 min por corrida. Estimado 3–5 h. Riesgos a cubrir: la pregunta
+     interactiva de drizzle-kit ante un posible renombrado (sin TTY se
+     colgaría: `timeout`), y falsos positivos por el formato de los valores por
+     defecto tras actualizar Payload o drizzle-kit.
 6. **[Dirección ejecuta el SQL] Devolver `disponible = true` a los equipos usados 4 a 8 de producción. HECHO el 2026-09-28** (5 filas; las tres categorías ya tienen unidades).
    Para la demo se ocultó la pestaña «Otros» de la home: esos 5 equipos de
    demo no tenían foto ni ficha y se veían vacíos. Mientras sigan así, las
@@ -713,29 +742,33 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 12. **[Dirección] Restablecer las reglas de arriba. HECHO el 2026-09-28**:
     excepción cerrada y retirada ejecutada (puntos 1 y 6).
 
-13. **[Nosotros] HALLAZGO 2026-09-28 — la migración del pie no se aplica en
-    una base nueva, y bloquea todos los preview.** El preview del PR #1 falló
-    en `payload migrate` (despliegue `dpl_DMcyw4DxanSLekHzxAYvKXN1PGDZ`):
-
-    ```
-    Error running migration 20260924_194316_pie_global
-    column pie.imagen_decorativa_id does not exist
-    ```
-
-    **Causa, leída en el código:** la migración siembra con
-    `payload.updateGlobal` (`src/migrations/20260924_194316_pie_global.ts:49`).
-    Esa llamada usa el esquema del código **actual**, que ya incluye la
-    columna `imagen_decorativa_id` de la migración SIGUIENTE
-    (`20260924_200150`). En producción funcionó porque se aplicó con el código
-    de su propio commit; contra la rama `preview`, que no la tenía, falla. La
-    migración va en transacción, así que la base se queda **intacta, sin
-    migrar**. **Afecta a cualquier base que se migre desde cero, incluida la
-    infraestructura definitiva del cliente (§10.7).** Salidas: sembrar con SQL
-    en la propia migración (sin API local ni `PIE_INICIAL` importado del
-    código), o, solo para desbloquear el preview, refrescar la rama `preview`
-    desde `production` (§10.21). **Guardarraíl a considerar:** aplicar todas
-    las migraciones contra un Postgres vacío en CI; el de deriva de esquema
-    (p.5) no lo detectaría.
+13. **[Nosotros] Migración del pie que no se aplicaba en una base nueva —
+    RESUELTO el 2026-09-28 en el PR #2 (`172cea4`).**
+    - **Síntoma:** los preview dejaron de construirse (`dpl_DMcyw4DxanSLekHzxAYvKXN1PGDZ`):
+      `Error running migration 20260924_194316_pie_global` · `column
+pie.imagen_decorativa_id does not exist`.
+    - **Causa:** la migración sembraba con `payload.updateGlobal`, y la API
+      local consulta con el esquema del código **actual**, que ya incluía
+      `imagen_decorativa_id`, de la migración SIGUIENTE (`20260924_200150`).
+      En producción funcionó porque se aplicó con el código de su propio
+      commit; contra cualquier base sin esa migración —la rama `preview`, o
+      la infraestructura definitiva del cliente (§10.7)— fallaba. Va en
+      transacción, así que la base quedaba intacta.
+    - **Arreglo:** la siembra pasa a `INSERT` explícitos con los valores de
+      `PIE_INICIAL` en `ad37601` y los mismos ids que producción. Mismo nombre
+      de fichero y de migración; el esquema que crea y el snapshot, sin
+      cambios. En producción ya estaba aplicada y no se vuelve a ejecutar: el
+      despliegue de producción del PR #2 registró las 12 y no aplicó ninguna.
+    - **Prueba:** el preview del PR #2 migró la rama `preview` de Neon, que no
+      tenía la migración (aplicó `pie_global` y `pie_imagen_decorativa`); la
+      consulta de estructura de §10.34 contra esa rama dio **0 filas**; el pie
+      del preview, igual al de producción en la API, en el HTML y pintado en
+      escritorio y móvil. Antes, las 12 migraciones aplicadas a un Postgres
+      vacío (PGlite) pasaron, y la versión original fallaba en el mismo arnés.
+    - **Regla que deja** (también en §3.5): una migración nunca usa la API
+      local de Payload ni nada que dependa del esquema actual; los datos se
+      siembran con SQL explícito.
+    - **Guardarraíl:** «migrar desde cero», en p.5.
 
 14. **[Nosotros, fase 2] La sección 3 y sus tarjetas sin imagen dejan el
     hueco reservado.** Medido en las capturas de la fase 1b: a 390, espacio

@@ -5,10 +5,18 @@
  * tablas, SIEMBRA el contenido que el pie tenía en el código (`PIE_INICIAL`).
  * Sin esto, el pie de TODAS las páginas quedaría vacío al desplegar, hasta que
  * alguien lo rellenara en el panel. No pisa nada: la tabla es nueva.
+ *
+ * LA SIEMBRA ES SQL, NO LA API LOCAL (corregido el 2026-09-28, CLAUDE.md
+ * §10.33 p.13). La primera versión usaba `payload.updateGlobal` con
+ * `PIE_INICIAL`, y la API local consulta con el esquema del código ACTUAL: en
+ * cuanto el global ganó `imagen_decorativa_id` (migración siguiente), esta
+ * migración dejó de aplicarse en cualquier base nueva (`column
+ * pie.imagen_decorativa_id does not exist`). Una migración solo puede tocar
+ * las tablas y columnas que existen en SU punto del historial: por eso los
+ * valores van escritos aquí y no importados del código, que seguirá cambiando.
+ * Son los de `PIE_INICIAL` en `ad37601`, con los mismos ids que producción.
  */
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
-
-import { PIE_INICIAL } from '../lib/pie'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
@@ -46,7 +54,33 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "pie_columnas_order_idx" ON "pie_columnas" USING btree ("_order");
   CREATE INDEX "pie_columnas_parent_id_idx" ON "pie_columnas" USING btree ("_parent_id");`)
 
-  await payload.updateGlobal({ slug: 'pie', data: PIE_INICIAL, req })
+  await db.execute(sql`
+  INSERT INTO "pie" ("id", "lema", "texto_boton", "empresa_titulo", "empresa_texto", "updated_at", "created_at")
+  VALUES (
+    1,
+    'Ofrecemos Soluciones para tus Proyectos',
+    'WhatsApp',
+    'Somos una empresa que brinda soluciones integrales',
+    'Ayudamos a sectores de la construcción, infraestructura, agroindustria y agregados; especializándonos en la venta de maquinaria pesada, repuestos, servicio técnico y lubricantes',
+    now(),
+    now()
+  );
+  SELECT setval(pg_get_serial_sequence('"pie"', 'id'), 1);
+
+  INSERT INTO "pie_columnas" ("_order", "_parent_id", "id", "titulo") VALUES
+    (1, 1, '6ab57ed8a5ec44005ea52b64', 'Maquinaria pesada'),
+    (2, 1, '6ab57ed8a5ec44005ea52b67', 'Navegación'),
+    (3, 1, '6ab57ed8a5ec44005ea52b6a', 'Contacto');
+
+  INSERT INTO "pie_columnas_enlaces" ("_order", "_parent_id", "id", "etiqueta", "tipo", "destino") VALUES
+    (1, '6ab57ed8a5ec44005ea52b64', '6ab57ed8a5ec44005ea52b60', 'Nueva', 'pagina', '/maquinaria-pesada/maquinaria-pesada-nueva/'),
+    (2, '6ab57ed8a5ec44005ea52b64', '6ab57ed8a5ec44005ea52b61', 'Usada', 'pagina', '/maquinaria-pesada/maquinaria-pesada-usada/'),
+    (3, '6ab57ed8a5ec44005ea52b64', '6ab57ed8a5ec44005ea52b62', 'Repuestos', 'pagina', '/repuestos-maquinaria-pesada-colombia/'),
+    (4, '6ab57ed8a5ec44005ea52b64', '6ab57ed8a5ec44005ea52b63', 'Servicio técnico', 'pagina', '/servicio-tecnico/'),
+    (1, '6ab57ed8a5ec44005ea52b67', '6ab57ed8a5ec44005ea52b65', 'Inicio', 'pagina', '/'),
+    (2, '6ab57ed8a5ec44005ea52b67', '6ab57ed8a5ec44005ea52b66', 'Nosotros', 'pagina', '/nosotros/'),
+    (1, '6ab57ed8a5ec44005ea52b6a', '6ab57ed8a5ec44005ea52b68', 'Call center', 'telefono', NULL),
+    (2, '6ab57ed8a5ec44005ea52b6a', '6ab57ed8a5ec44005ea52b69', 'Solicita una cotización', 'pagina', '/contactanos/');`)
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {

@@ -445,14 +445,14 @@ hechas las fases A–D, la cabecera y el pie; faltan las fases E–I
 **PIE DE UX-9 — DE ANDRÉS Y DEL CLIENTE, en un solo sitio** (2026-09-24;
 detalle en `docs/diseno/decisiones-home-ux9.md` §13):
 
-| Pendiente                                                                                     | De quién                      | Mientras tanto                                                             |
-| --------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------- |
-| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | No se pinta                                                                |
-| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | No se pinta                                                                |
-| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | No se pinta                                                                |
-| **Imagen decorativa** `Partequipos3553.png` (brazo de excavadora): licencia de banco (**L3**) | Andrés (procedencia), cliente | En `Media` de producción para la demo (§10.33 punto 2); nunca en `public/` |
-| **HelveticaNeue** del texto de la empresa: licencia web (**L1**)                              | Cliente, vía Andrés           | Inter                                                                      |
-| Redacción: «Ayudamos sectores…» → «Ayudamos **a** sectores…»                                  | Andrés (para su maqueta)      | Corregido en el sitio                                                      |
+| Pendiente                                                                                     | De quién                      | Mientras tanto                                                                                                     |
+| --------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | No se pinta                                                                                                        |
+| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | No se pinta                                                                                                        |
+| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | No se pinta                                                                                                        |
+| **Imagen decorativa** `Partequipos3553.png` (brazo de excavadora): licencia de banco (**L3**) | Andrés (procedencia), cliente | Retirada de producción el 2026-09-28 (§10.33); sin imagen hasta que se licencie o se reemplace; nunca en `public/` |
+| **HelveticaNeue** del texto de la empresa: licencia web (**L1**)                              | Cliente, vía Andrés           | Inter                                                                                                              |
+| Redacción: «Ayudamos sectores…» → «Ayudamos **a** sectores…»                                  | Andrés (para su maqueta)      | Corregido en el sitio                                                                                              |
 
 Cuando lleguen las URL, se añaden en el panel (global **Pie de página**), sin
 tocar código.
@@ -632,10 +632,10 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
    producción el 2026-09-28** (paso 1). Mientras no se licencien, solo pueden
    usarse en el preview. **Antes del lanzamiento real se reemplazan o se
    licencian.**
-   **Ampliado el 2026-09-24:** la excepción cubre también la **imagen
-   decorativa del pie** (`Partequipos3553.png`). La sube dirección desde el
-   panel de producción al campo «Imagen decorativa» del global `pie`: está en
-   `Media`, no en `public/`, porque el repositorio es público. **Se licencia o
+   **Ampliado el 2026-09-24:** la excepción cubrió también la **imagen
+   decorativa del pie** (`Partequipos3553.png`). La subió dirección desde el
+   panel de producción al campo «Imagen decorativa» del global `pie`: estaba
+   en `Media`, no en `public/`, porque el repositorio es público. **Se licencia o
    se reemplaza antes del lanzamiento real.** El paso 1 (`retirar produccion`)
    no la quitaba, porque no la siembra el script: **se vació el campo y se
    borró de `Media` a mano el 2026-09-28.**
@@ -670,9 +670,9 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
      defecto tras actualizar Payload o drizzle-kit.
 6. **[Dirección ejecuta el SQL] Devolver `disponible = true` a los equipos usados 4 a 8 de producción. HECHO el 2026-09-28** (5 filas; las tres categorías ya tienen unidades).
    Para la demo se ocultó la pestaña «Otros» de la home: esos 5 equipos de
-   demo no tenían foto ni ficha y se veían vacíos. Mientras sigan así, las
-   páginas de minicargadores, motoniveladoras y retrocargadoras dicen «No hay
-   unidades disponibles». En la misma limpieza (`.tmp-hero/limpieza-demo.sql`)
+   demo no tenían foto ni ficha y se veían vacíos. Así estuvieron hasta el
+   2026-09-28: mientras tanto, las páginas de minicargadores, motoniveladoras
+   y retrocargadoras decían «No hay unidades disponibles». En la misma limpieza (`.tmp-hero/limpieza-demo.sql`)
    se quitó «(demo)» de los 8 nombres de equipo y se pusieron los textos de
    ux-9 en las marcas Hitachi, CASE y Yanmar; eso no hace falta revertirlo.
    Después, **redeploy**: un `UPDATE` directo no revalida nada.
@@ -781,6 +781,8 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     mitad derecha de la sección vacía; y las tarjetas de equipos sin foto
     dejan vacía su zona de imagen. **Criterio:** sección y tarjetas se ajustan
     sin hueco cuando falta la imagen.
+    Comprobar también el pie entre 1025 y 1279 px SIN imagen decorativa: la
+    reserva de 170 px de §10.33 p.11 no debe dejar hueco.
 
 ### 10.35 CORREGIDO 2026-09-28 — el desenfoque de la cabecera no lo quitaba `var()`: lo quitaba el ORDEN
 

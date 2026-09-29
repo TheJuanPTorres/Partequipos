@@ -920,14 +920,114 @@ Decisiones de dirección para esta fase:
 - **Paso 7:** si el contraste de los iconos móviles sobre el hero falla, se
   para con la propuesta antes de tocar nada.
 
-### 14.1 Siembra del preview
+### 14.1 Siembra del preview (2026-09-29)
 
-_Pendiente de rellenar._
+`npm run preview:sembrar`, con `preview:db:check` antes y después (12
+migraciones, sin marcador `dev`). Comprobado en la rama `preview` de Neon, en
+solo lectura:
 
-### 14.2 Línea base contra ux-9
+- **11 imágenes de prueba, las 11 en el almacén del preview** y ninguna en el
+  de producción. `Fondo.jpg` y `Hero-1.png` ya estaban de la fase C: el script
+  no las duplicó.
+- Diapositiva «Potencia Hitachi» la primera, con fondo y frontal de prueba;
+  máquina de la sección 3; Hitachi, CASE y Yanmar con logo y tarjeta; equipos
+  de prueba 9 y 10, disponibles.
+- **Aparte, anotado sin tocar:** la rama `preview` conserva 5 registros de
+  `media` (ids 1–5) clonados de producción que apuntan al almacén de
+  producción, del que se borraron el 2026-09-28 los ids 1, 2 y 5
+  (CLAUDE.md §10.33). En el preview son imágenes rotas si algo las enlaza.
 
-_Pendiente de rellenar: secciones 2 y 3, cabecera, las 4 diferencias del
-ajuste fino (§10.33 p.10) y las tres decisiones del p.7._
+### 14.2 Línea base contra ux-9 (2026-09-29)
+
+**Método.** ux-9 desde su HTML guardado (`<base>` al servidor de ux-9, que
+sigue sirviendo su CSS y su JS); el nuestro, el preview de la rama con las
+fotos sembradas, por el bypass de automatización. Chrome sin interfaz, a 390,
+1010 y 1440, tras recorrer la página y dejar terminar las animaciones.
+Coordenadas **relativas a la sección** (la cabecera, a sí misma). Dos lecturas
+separadas 2 s, iguales en los dos sitios (§10.24).
+
+**Una trampa del instrumento, anotada:** la primera pasada comparó cajas no
+equivalentes —el `span` del texto en ux-9 contra el botón entero en el
+nuestro, y diapositivas clonadas del carrusel de ux-9 fuera de la ventana—.
+La segunda compara botón con botón, pestaña con pestaña y diapositivas
+visibles. Y el **título del hero** no se puede comparar por su caja: en ux-9
+las letras se pintan por encima de la caja (la contradicción de §12); se midió
+por los **píxeles blancos de las letras** en la captura.
+
+#### Cabecera
+
+| Qué (MEDIDO)                   | 1440 ux-9 · nuestro                                                                              | 1010 ux-9 · nuestro                 | 390 ux-9 · nuestro                                                                                             |
+| ------------------------------ | ------------------------------------------------------------------------------------------------ | ----------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Alto                           | 100 · 100                                                                                        | 71 · 71                             | **67 · 66**                                                                                                    |
+| Logo (x, y, ancho × alto)      | 39,24 187×51 · igual                                                                             | 412,10 187×51 · igual               | 110,10 170×**47** · 170×**46**                                                                                 |
+| Enlaces del menú (x)           | 454 · 624 · 730 · 845, **idénticos**                                                             | —                                   | —                                                                                                              |
+| Botón «Contáctanos» (x)        | **1209 · 1224** (+15)                                                                            | —                                   | —                                                                                                              |
+| Iconos móviles (x izq. · der.) | —                                                                                                | 30 · 950, y 18 → **27 · 953, y 21** | 18 · 342, y 15 → **15 · 345, y 18**                                                                            |
+| **Al bajar**                   | ux-9: **alto 100 → 70** y logo al 85 % (159×43, y 13). Nuestro: alto **100**, logo 159×43 (y 28) | —                                   | ux-9: **no es fija**: se va con la página, sin velo ni encogido. Nuestro: fija, velo, logo 145×40 y se esconde |
+| Se esconde a los 300 px        | ux-9 **no** (umbral 500). Nuestro **sí** (120)                                                   | —                                   | ux-9 no aplica (no es fija)                                                                                    |
+
+#### Hero
+
+| Qué (MEDIDO)                          | 1440          | 1010          | 390            |
+| ------------------------------------- | ------------- | ------------- | -------------- |
+| Tarjeta                               | idéntica      | idéntica      | idéntica       |
+| Letras del título bajo el borde, ux-9 | 14 px         | 96 px         | 90 px          |
+| Ídem, nuestro                         | 66 px         | 159 px        | 64 px          |
+| **Diferencia**                        | **+52 abajo** | **+63 abajo** | **−26 arriba** |
+
+Mismo alto de letra en los tres anchos (86 · 50 · 32 px): mismo tamaño.
+
+#### Sección 2
+
+**Idéntica** en los tres anchos: alto de la sección (691 · 624 · 625/622, −3 px
+a 390), «Venta de maquinaria», título, tarjetas de marca (418×270 a 1440; la
+diapositiva de ux-9 mide 20 px más porque incluye su relleno de 10) y «Ver
+todo» (648,569 145×40 a 1440; 2 px más arriba a 390).
+
+#### Sección 3
+
+| Qué (MEDIDO)       | 1440                                                                                  | 1010                                | 390                            |
+| ------------------ | ------------------------------------------------------------------------------------- | ----------------------------------- | ------------------------------ |
+| Alto de la sección | 1278 · 1279                                                                           | **1867 · 1994** (+127)              | 1881 · 2474 (D5 y D10)         |
+| Máquina            | 629×786, idéntica                                                                     | **368×460 · 451×563**               | 272×340, idéntica              |
+| Título, botones    | idénticos                                                                             | desplazados **+104** por la máquina | título y «Ver todas» idénticos |
+| Pestañas           | alto igual; ux-9 tiene 3 (D11), así que las nuestras empiezan 177 px más a la derecha | ídem                                | ux-9 acordeón (D10)            |
+
+**Diferencia nueva:** a **1010 la máquina es 83 px más ancha** que en ux-9, y
+empuja la sección 127 px. A 1440 y 390 coincide.
+
+#### Pie
+
+| Qué (MEDIDO)      | 1440          | 1010          | 390           |
+| ----------------- | ------------- | ------------- | ------------- |
+| Alto tarjeta roja | 360 · **342** | 282 · **267** | 250 · **235** |
+| Lema              | idéntico      | idéntico      | idéntico      |
+
+**Desbordes:** ux-9 tiene scroll horizontal (23 px a 1440, **331 px a 390**); el
+nuestro, 0.
+
+#### Las 4 diferencias del ajuste fino (§10.33 p.10), medidas
+
+| Diferencia anotada                   | Hoy (MEDIDO)                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------- |
+| Tarjeta roja del pie 18 px más baja  | **Confirmada**: −18 a 1440, y también −15 a 1010 y a 390                        |
+| Título del hero ~45 px más abajo     | **Confirmada y precisada**: +52 a 1440, +63 a 1010; a **390, 26 px más ARRIBA** |
+| «Contáctanos» 15 px más a la derecha | **Confirmada**: 1209 frente a 1224                                              |
+| Menú 8 px más a la izquierda         | **NO se reproduce**: los 4 enlaces están en la misma x que en ux-9 a 1440       |
+
+#### Las tres decisiones del p.7 frente a ux-9
+
+| Decisión                  | ¿Choca con ux-9?                                                                                                                                                                                                                                     |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Logo-1.png` en `public/` | **No.** Mismo fichero, mismo tamaño y posición (1 px de alto menos en móvil). MEDIDO                                                                                                                                                                 |
+| Encogido: logo al 85 %    | **En parte.** El logo al 85 % coincide exacto (159×43). Pero ux-9 **además baja el alto de la cabecera de 100 a 70 px** (`custom_height_header: 70` del export), y el nuestro no. En móvil ux-9 no encoge nada porque su cabecera no es fija. MEDIDO |
+| Menú móvil provisional    | **Sin referencia.** En el HTML guardado de ux-9 el icono de hamburguesa no tiene enlace ni acción: pulsarlo no abre nada. MEDIDO. INFERIDO: el menú de ux-9 dependía de algo que la copia guardada no conserva, o no estaba hecho                    |
+
+**Para el paso 5 (movimiento), con la decisión de dirección:** a 390 ux-9 **no
+esconde** la cabecera porque **no es fija**: se va con el contenido. «Replicar
+eso» significa una cabecera **no fija en móvil**. A 1010 no se ha medido (la
+misma plantilla lleva `elementor-hidden-tablet`, así que se espera lo mismo:
+INFERIDO); se mide en el paso 5.
 
 ### 14.3 Lighthouse
 

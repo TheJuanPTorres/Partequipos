@@ -744,9 +744,14 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 
 13. **[Nosotros] Migración del pie que no se aplicaba en una base nueva —
     RESUELTO el 2026-09-28 en el PR #2 (`172cea4`).**
-    - **Síntoma:** los preview dejaron de construirse (`dpl_DMcyw4DxanSLekHzxAYvKXN1PGDZ`):
-      `Error running migration 20260924_194316_pie_global` · `column
-pie.imagen_decorativa_id does not exist`.
+    - **Síntoma:** los preview dejaron de construirse
+      (`dpl_DMcyw4DxanSLekHzxAYvKXN1PGDZ`):
+
+      ```
+      Error running migration 20260924_194316_pie_global
+      column pie.imagen_decorativa_id does not exist
+      ```
+
     - **Causa:** la migración sembraba con `payload.updateGlobal`, y la API
       local consulta con el esquema del código **actual**, que ya incluía
       `imagen_decorativa_id`, de la migración SIGUIENTE (`20260924_200150`).

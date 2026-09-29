@@ -35,6 +35,9 @@ yarn-error.log*
 # ...pero la plantilla sin secretos sí se versiona:
 !.env.example
 
+# Claude Code: barreras, hooks y agentes LOCALES de esta máquina (CLAUDE.md §9)
+/.claude/
+
 # vercel
 .vercel
 

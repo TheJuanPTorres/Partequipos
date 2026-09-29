@@ -339,6 +339,57 @@ Una tarea no está terminada hasta que cumple **todo** esto:
   **detenerse y preguntar**, no improvisar.
 - Toda decisión relevante se documenta como ADR en `docs/decisions/`.
 
+### Modo de trabajo (2026-09-28)
+
+**Reparto:**
+
+| Quién          | Qué                                                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Claude, solo   | `development` y **preview**: sembrar y retirar en el preview, `db:check`, verificación pintada, CI y PR                                                                               |
+| Dirección      | **Cualquier escritura en producción**, siempre con un runbook que prepara Claude. Las fusiones a `main`, solo con aprobación explícita en el prompt                                   |
+| Nadie (Claude) | Los **secretos** nunca entran en el contexto de Claude: viven en `.env.preview.local` (ignorado por git), lo rellena dirección y lo cargan los scripts. Claude no lo lee ni lo nombra |
+
+**Entorno del preview:** `.env.preview.local` (`DATABASE_URI`,
+`BLOB_READ_WRITE_TOKEN`, `VERCEL_AUTOMATION_BYPASS_SECRET`). Lo cargan
+`scripts/preview/con-entorno.ts` —por encima de `.env.local`, que tiene el Blob
+de producción— y los comandos `npm run preview:comprobar`, `preview:db:check`,
+`preview:sembrar`, `preview:retirar` y `preview:ejecutar -- <comando>`.
+`preview:comprobar` imprime solo el host de la base, el almacén del Blob y
+«bypass: presente/VACIO», y **falla** si el fichero apunta a producción o no es
+el preview. La decisión está en `src/lib/preview/entornoPreview.ts`, con
+pruebas; los guardas de cada script (`puedeTocarHeroDePrueba`) siguen mandando.
+
+**Barreras locales** (`.claude/`, ignorado por git, solo en esta máquina):
+
+- Lectura, edición y escritura de `.env*` denegadas en los permisos; un hook
+  `PreToolUse` bloquea además cualquier comando que nombre un `.env*`.
+- El mismo hook bloquea todo comando con «produccion», `vercel promote`,
+  `rollback` o `redeploy`, `--prod`, `--target production`, el host de
+  producción de Neon o el almacén de producción del Blob, con el mensaje
+  «Producción: solo dirección, con runbook». Y también los push forzados a
+  `main` y `git reset --hard`.
+- Lo rutinario va sin preguntar: git, `npm run test/lint/typecheck/format/qa/db:check/preview:*`,
+  las herramientas de verificación por `npx`, `vercel curl/inspect/ls` y
+  `gh pr view/checks/list/create`.
+- Cada bloqueo se demostró con comandos inofensivos (`echo` con el patrón),
+  nunca con el comando real.
+
+**Neon en solo lectura:** MCP de Neon en ámbito local (fuera del repo) con
+`?readonly=true&projectId=solitary-cake-17810450`, y denegadas además las
+herramientas que devuelven cadenas de conexión o escriben
+(`get_connection_string`, crear y borrar proyectos y ramas,
+`reset_from_parent`, migraciones y _tuning_). El skill `neon-postgres` está
+instalado a nivel de usuario.
+
+**Informes:** al final de cada parte, además de mostrarse, se guardan en
+`Desktop\partequipos-cierre\informes\AAAA-MM-DD-<tema>.md`.
+
+**Verificador:** subagente `.claude/agents/verificador.md` que, con el
+contexto limpio y en solo lectura, comprueba **por su efecto** lo que el
+agente principal afirma. **Regla de hitos:** ningún informe de hito (CI,
+preview, prueba de humo, despliegue, lo pintado, la base) se da sin su
+veredicto, que va en el informe.
+
 ---
 
 ## 10. Estado actual

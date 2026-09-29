@@ -905,3 +905,35 @@ del alto de la tarjeta, que CSS no conoce. Una cifra fija que cubre el peor
 caso (1025) es robusta.
 
 **El coste:** a 1280 y 1440 añade 100 px de blanco donde hoy no hace falta.
+
+---
+
+## 14. Fase 2 — verificación, ajuste fino y cabecera (2026-09-29)
+
+Rama `feat/home-fase-2`, un PR en borrador para toda la fase, un commit por
+paso (plan de 10 pasos de la fase 2a). Fotos de ux-9 (licencia L3 pendiente)
+sembradas **solo en el preview** (CLAUDE.md §10.33 p.2).
+
+Decisiones de dirección para esta fase:
+
+- **Paso 5:** si ux-9 no esconde la cabecera en móvil, se replica eso.
+- **Paso 7:** si el contraste de los iconos móviles sobre el hero falla, se
+  para con la propuesta antes de tocar nada.
+
+### 14.1 Siembra del preview
+
+_Pendiente de rellenar._
+
+### 14.2 Línea base contra ux-9
+
+_Pendiente de rellenar: secciones 2 y 3, cabecera, las 4 diferencias del
+ajuste fino (§10.33 p.10) y las tres decisiones del p.7._
+
+### 14.3 Lighthouse
+
+_Pendiente de rellenar: calibración por línea de comandos y corridas de
+dirección con el método de §10.3 p.14._
+
+### 14.4 Cambios de la fase
+
+_Pendiente: pasos 2 a 9._

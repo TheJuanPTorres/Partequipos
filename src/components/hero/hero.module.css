@@ -81,6 +81,8 @@
    * es mayor que el de arriba. Arriba, al menos 64 px (40 en móvil).
    */
   --hero-texto-arriba: 64px;
+  /* Máquina recortada bajada para no tocar el título (ver `.capaFrontal`). */
+  --hero-frontal-bajada: 16px;
   --hero-texto-abajo: 22%;
 
   /* --- Velo sobre la foto (D14, ver `.marco::after`). --- */
@@ -346,6 +348,12 @@
 .capaFrontal {
   position: absolute;
   inset: 0;
+  /*
+   * Baja la máquina lo justo para que no toque las letras del título, que ya
+   * está en su posición de ux-9 (a 1440 el brazo las pisaba 3 px y a 1010,
+   * 18: MEDIDO con máscaras). Solo `transform`: la tarjeta no cambia de alto.
+   */
+  transform: translateY(var(--hero-frontal-bajada));
 }
 
 .frontal {
@@ -610,6 +618,7 @@
   .hero {
     --hero-titulo-tam: 70px;
     --hero-titulo-ajuste: -63px;
+    --hero-frontal-bajada: 30px;
     --hero-imagen-ancho: 631px;
     --hero-relleno: 50px 30px 30px;
     /*
@@ -636,6 +645,8 @@
     --hero-titulo-tam: 12vw;
     --hero-titulo-ajuste: 25px;
     --hero-texto-arriba: 40px;
+    /* A 390 ya hay 89 px de aire (MEDIDO). */
+    --hero-frontal-bajada: 0px;
     --hero-alto-min: 85vh;
     --hero-imagen-margen-arriba: 200px;
     --hero-parrafo-tam: 13px;

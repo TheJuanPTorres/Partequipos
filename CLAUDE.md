@@ -872,10 +872,14 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
   Andrés):** va centrado en la tarjeta, algo por encima del centro, en vez de
   pegado arriba; con eso la tilde de «PRECISIÓN» queda dentro de la tarjeta
   en todos los cortes. Detalle en `decisiones-home-ux9.md` §16.
-- **Con máquina recortada, la composición de ux-9 (2026-09-30, PR #8):** si la
-  diapositiva tiene imagen frontal, el título vuelve a su posición medida de
-  ux-9 (arriba) y la máquina baja 16 px (escritorio) o 30 px (tablet) para no
-  tocar las letras. Sin imagen frontal, el título sigue centrado (D15).
+- **TÍTULO SIEMPRE EN EL MISMO SITIO (2026-09-30, PR #9) — DESVIACIÓN DE ux-9
+  POR DECISIÓN DE DIRECCIÓN, PENDIENTE DE ANDRÉS.** Sustituye a la regla del
+  PR #8 («con máquina, composición de ux-9»): en un carrusel el texto no
+  puede saltar de sitio. El título va siempre centrado y en la misma y en
+  todas las diapositivas; **la máquina recortada se adapta al texto**, en su
+  propia caja: bajo el bloque del título, a la izquierda del vidrio y por
+  encima de los controles, con 16 px de aire medidos en los 8 anchos. Detalle
+  en `decisiones-home-ux9.md` §16.2.
 - **PRUEBA INTENCIONADA DE DIRECCIÓN, TEMPORAL (2026-09-30):** `Fondo.jpg` y
   `Hero-1.png` del kit de ux-9 (L3) están en `Media` de producción y forman
   la diapositiva «Fuerza Hitachi». Es decisión de dirección y **se retiran al

@@ -38,9 +38,10 @@ import estilos from "./hero.module.css";
  * - D13 (carrusel, versión «premium» pedida por dirección): fundido cruzado,
  *   Ken Burns, 7 s por diapositiva, texto que entra con fundido y línea de
  *   progreso en el punto activo. ux-9 no tiene carrusel en el hero.
- * - D15: en las diapositivas SIN máquina recortada, el título va centrado en la
- *   tarjeta (en ux-9, pegado arriba). CON máquina, la composición de ux-9: el
- *   título arriba, en su posición medida, y la máquina debajo.
+ * - D15 (dirección, pendiente de Andrés): el título va SIEMPRE centrado y en el
+ *   mismo sitio, haya o no máquina recortada: en un carrusel el texto no salta.
+ *   La máquina se adapta al texto: su caja empieza bajo el título y queda a la
+ *   izquierda del vidrio (en ux-9, el título arriba y la máquina debajo).
  *
  * EL TIEMPO LO MARCA LA LÍNEA DE PROGRESO: cuando su animación CSS termina,
  * pasa la diapositiva. Así la pausa (botón, ratón o foco dentro) detiene a la
@@ -268,33 +269,26 @@ export function HeroPortada({ diapositivas }: Props) {
           )}
         </div>
 
-        {/*
-         * TÍTULO EN <h2> (D1). CON máquina recortada va en el flujo, en la
-         * posición de ux-9 (esta fila conserva además el alto de la tarjeta);
-         * SIN ella, en su capa, centrado (D15).
-         */}
+        {/* Fila y hueco en el flujo: conservan el alto de la tarjeta de ux-9. */}
+        <div className={estilos.filaTitulo} aria-hidden="true" />
+
+        {/* TÍTULO EN <h2> (D1): siempre centrado y en el mismo sitio (D15). */}
         <div
-          className={`${estilos.filaTitulo} ${estilos.capaParallax}`}
+          className={`${estilos.capaTexto} ${estilos.capaParallax}`}
+          // Letras del título activo: el CSS encoge solo el que no cabe.
           style={{ ["--hero-titulo-letras" as string]: String(d.titulo.length) }}
         >
-          {d.frontal ? titulo : null}
+          {titulo}
         </div>
 
-        {d.frontal ? null : (
-          <div
-            className={`${estilos.capaTexto} ${estilos.capaParallax}`}
-            // Letras del título activo: el CSS encoge solo el que no cabe.
-            style={{ ["--hero-titulo-letras" as string]: String(d.titulo.length) }}
-          >
-            {titulo}
-          </div>
-        )}
+        <div className={estilos.hueco} aria-hidden="true" />
 
         {/*
-         * HUECO DE LA MÁQUINA. Mide siempre lo mismo, tenga o no la diapositiva
-         * una imagen recortada: el título y las flechas no saltan al cambiar.
+         * MÁQUINA RECORTADA: en su propia caja, que se adapta al texto (D15):
+         * empieza bajo el bloque del título, a la izquierda del vidrio y por
+         * encima de los controles. Nunca se solapa con el texto.
          */}
-        <div className={estilos.hueco}>
+        <div className={estilos.capaMaquina}>
           {diapositivas.map((s, i) =>
             s.frontal && cargadas.has(i) ? (
               <div
@@ -306,7 +300,7 @@ export function HeroPortada({ diapositivas }: Props) {
                   src={s.frontal.url}
                   alt={s.frontal.alt}
                   fill
-                  sizes="(max-width: 767px) 100vw, (max-width: 1024px) 631px, 809px"
+                  sizes="(max-width: 767px) 100vw, (max-width: 1024px) 60vw, 940px"
                   className={estilos.frontal}
                 />
               </div>

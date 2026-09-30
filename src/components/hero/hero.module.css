@@ -81,9 +81,22 @@
    * es mayor que el de arriba. Arriba, al menos 64 px (40 en móvil).
    */
   --hero-texto-arriba: 64px;
-  /* Máquina recortada bajada para no tocar el título (ver `.capaFrontal`). */
-  --hero-frontal-bajada: 16px;
-  --hero-texto-abajo: 22%;
+  /* En `cqi` (ancho de la tarjeta) para que la caja de la máquina use el mismo número. */
+  --hero-texto-abajo: 22cqi;
+  /* Media altura del bloque del título: una línea de `--hero-titulo-tam` × 1,4. */
+  --hero-titulo-medio: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado) / 2);
+  /* Caja de la máquina (ver `.capaMaquina`). */
+  --hero-maquina-aire: 16px;
+  --hero-maquina-izquierda: var(--hero-relleno);
+  --hero-maquina-derecha: calc(var(--hero-vidrio-derecha) + var(--hero-vidrio-ancho) + 16px);
+  /*
+   * Abajo: por encima de flechas y puntos más el aire. La fila NO va pegada al
+   * borde: el contenido se centra en la tarjeta, así que su sitio depende del
+   * alto. Controles desde abajo = relleno + (alto − contenido) / 2 + 72 px;
+   * con el contenido de escritorio (719 px + 20 de relleno) sale 50 % − 287,5,
+   * y con 16 de aire, 50 % − 271,5. MEDIDO: coincide a 1025–1920.
+   */
+  --hero-maquina-abajo: calc(50% - 271.5px);
 
   /* --- Velo sobre la foto (D14, ver `.marco::after`). --- */
   /* Sobre el global `text` (#100F0F): el kit no tiene negro. */
@@ -312,6 +325,15 @@
 
 .capaTexto .titulo {
   top: 0;
+  /*
+   * ALTO FIJO: el del bloque a tamaño completo. Un título que encoge para caber
+   * se centra dentro, así que la caja (y la máquina, que se mide con ella)
+   * queda en la misma y en todas las diapositivas.
+   */
+  display: flex;
+  min-height: calc(var(--hero-titulo-medio) * 2);
+  align-items: center;
+  justify-content: center;
 }
 
 /* ENTRADA DEL TEXTO: al cambiar de diapositiva (la primera se pinta quieta). */
@@ -345,19 +367,36 @@
   aspect-ratio: 1476 / 1057;
 }
 
+/*
+ * CAJA DE LA MÁQUINA (D15): se adapta al texto, que no se mueve.
+ * - Arriba: el borde inferior del bloque del título (mismo cálculo que el
+ *   centrado de `.capaTexto`) más `--hero-maquina-aire`.
+ * - Derecha: deja libre el vidrio (en móvil no hay vidrio).
+ * - Abajo: por encima de flechas y puntos.
+ * Absoluta: no ocupa sitio, así que la tarjeta no cambia de alto (CLS 0).
+ */
+.capaMaquina {
+  position: absolute;
+  z-index: 1;
+  top: calc(
+    (var(--hero-texto-arriba) + 100% - var(--hero-texto-abajo)) / 2 + var(--hero-titulo-medio) +
+      var(--hero-maquina-aire)
+  );
+  right: var(--hero-maquina-derecha);
+  bottom: var(--hero-maquina-abajo);
+  left: var(--hero-maquina-izquierda);
+  pointer-events: none;
+}
+
 .capaFrontal {
   position: absolute;
   inset: 0;
-  /*
-   * Baja la máquina lo justo para que no toque las letras del título, que ya
-   * está en su posición de ux-9 (a 1440 el brazo las pisaba 3 px y a 1010,
-   * 18: MEDIDO con máscaras). Solo `transform`: la tarjeta no cambia de alto.
-   */
-  transform: translateY(var(--hero-frontal-bajada));
 }
 
+/* Contenida en su caja y apoyada abajo: la máquina «pisa el suelo». */
 .frontal {
   object-fit: contain;
+  object-position: center bottom;
 }
 
 /* --------------------------------------------------------- fila inferior */
@@ -636,9 +675,11 @@
   .hero {
     --hero-titulo-tam: 70px;
     --hero-titulo-ajuste: -63px;
-    --hero-frontal-bajada: 30px;
     --hero-imagen-ancho: 631px;
     --hero-relleno: 50px 30px 30px;
+    --hero-maquina-izquierda: 30px;
+    /* Tablet: contenido 522 px + 80 de relleno → 50 % − 199 + 16 de aire. */
+    --hero-maquina-abajo: calc(50% - 183px);
     /*
      * DESVIACIÓN NUESTRA, DECIDIDA (2026-09-23) — el vidrio va DENTRO.
      *
@@ -663,8 +704,12 @@
     --hero-titulo-tam: 12vw;
     --hero-titulo-ajuste: 25px;
     --hero-texto-arriba: 40px;
-    /* A 390 ya hay 89 px de aire (MEDIDO). */
-    --hero-frontal-bajada: 0px;
+    /* En móvil el título va en DOS líneas (una palabra por línea). */
+    --hero-titulo-medio: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado));
+    /* Sin vidrio en móvil: la máquina usa todo el ancho. */
+    --hero-maquina-derecha: var(--hero-maquina-izquierda);
+    /* Móvil: la fila va abajo (space-between): 30 + 62 + 16 de aire. */
+    --hero-maquina-abajo: 108px;
     --hero-alto-min: 85vh;
     --hero-imagen-margen-arriba: 200px;
     --hero-parrafo-tam: 13px;

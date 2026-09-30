@@ -1452,3 +1452,64 @@ fijo):
 **No falta ninguno** de la home, el hero, la cabecera o el pie. El hero no
 tiene export propio: es la primera sección de la home. Los globales solo están
 en `site-settings.json`.
+
+### 16.2 Título siempre en el mismo sitio (2026-09-30, PR #9)
+
+**DESVIACIÓN DE ux-9 POR DECISIÓN DE DIRECCIÓN, PENDIENTE DE ANDRÉS.**
+Sustituye a la regla de §16.1 («con máquina recortada, composición de ux-9»).
+Motivo: en un carrusel el texto no puede saltar de sitio entre diapositivas.
+
+- **Título:** siempre centrado en la tarjeta, en la misma posición haya o no
+  máquina. Su caja tiene el alto fijo de una línea a tamaño completo (dos en
+  móvil). Un título que encoge para caber se centra dentro, así que la caja no
+  se mueve.
+- **Párrafo:** en el vidrio, que tampoco se mueve entre diapositivas (alto
+  fijo, §16.1).
+- **Máquina recortada, en su propia caja** (`.capaMaquina`, absoluta; la
+  tarjeta no cambia de alto):
+  - **Arriba:** el borde inferior del bloque del título más 16 px, con el
+    mismo cálculo que el centrado. Por eso el relleno inferior del texto pasa
+    a `22cqi`: el mismo número sirve a los dos.
+  - **Derecha:** deja libre el vidrio más 16 px. En móvil no hay vidrio.
+  - **Abajo:** por encima de flechas y puntos más 16 px. En tablet y
+    escritorio la fila no va pegada al borde, porque el contenido se centra;
+    su sitio se calcula desde el alto de la tarjeta.
+  - La imagen va contenida y apoyada abajo.
+
+**Medido pintado** en el preview, con la diapositiva de prueba «Potencia
+Hitachi» (sembrada para esto y retirada al acabar):
+
+| Ancho | Título (y de la caja) igual en las 5 | Aire máquina–título | Máquina–vidrio | Máquina–controles |
+| ----- | ------------------------------------ | ------------------- | -------------- | ----------------- |
+| 390   | Sí (278)                             | 16 px               | Sin vidrio     | 16 px             |
+| 768   | Sí (271)                             | 16 px               | 16 px          | 16 px             |
+| 1010  | Sí (269)                             | 16 px               | 16 px          | 16 px             |
+| 1025  | Sí (228)                             | 16 px               | 16 px          | 16 px             |
+| 1280  | Sí (201)                             | 16 px               | 16 px          | 16 px             |
+| 1366  | Sí (191)                             | 16 px               | 16 px          | 16 px             |
+| 1440  | Sí (184)                             | 16 px               | 16 px          | 16 px             |
+| 1920  | Sí (132)                             | 16 px               | 16 px          | 16 px             |
+
+- **Primera versión, corregida:** en la primera pasada el título cambiaba hasta
+  13 px de y a 768, 1025 y 1280, porque los títulos que encogen tenían una caja
+  más baja. Se corrigió con el alto fijo.
+- **CLS:**
+  - 0 en el pase automático y con clics, con las fuentes registradas.
+  - Dos pasadas completas dieron 0,003–0,004 una vez, y no se reprodujo al
+    buscar la fuente.
+- **Contraste**, con el título centrado sobre las 5 diapositivas: título
+  ≥ 3,63:1 (p10) y párrafo ≥ 4,81:1.
+
+**La lectura inestable de ~52 px de §16.1 era un fallo de la medición, no un
+estado real:**
+
+- En producción, sin estilos inyectados, se registró la posición de la máquina
+  en cada fotograma durante 25 s de pase automático y un clic: unos 1.900
+  fotogramas por ancho.
+- **Nunca cambió** (81 px a 1440 y 134 a 1010, respecto a la tarjeta). Lo
+  único que variaba era el título en su entrada de 12 px.
+- En la lectura anómala, la silueta de 1440 tenía los mismos píxeles que la de
+  1010: la captura se tomó en otro estado de la página, no la vio un
+  visitante.
+- Con la máquina en su propia caja absoluta, además, su posición ya no depende
+  del flujo de la tarjeta.

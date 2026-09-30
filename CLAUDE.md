@@ -508,6 +508,13 @@ detalle en `docs/diseno/decisiones-home-ux9.md` §13):
 Cuando lleguen las URL, se añaden en el panel (global **Pie de página**), sin
 tocar código.
 
+**FOTOS DEL HERO ENVIADAS POR EL CLIENTE (2026-09-30):** **derecho de uso
+confirmado por el cliente**; dirección conserva la confirmación. Son otras que
+las fotos de ux-9 de Andrés (L3), que siguen sin licencia. Mientras tanto
+**solo en el preview**: pasan a producción cuando lo haga dirección, con un
+runbook. Originales en `Desktop\partequipos-diseno\cliente-hero\`, **nunca en
+`public/` ni en el repositorio** (el repositorio es público, §10.33).
+
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
 
 | Pendiente                                             | Referencia      |
@@ -2238,6 +2245,13 @@ instalada, no en estas notas.
 > segundo aviso que tenemos sobre el disparo de despliegues —el primero fue el
 > bloqueo por plan de §10.4— y lo que no se anota se vuelve a diagnosticar desde
 > cero.
+>
+> **SEGUNDO CASO, 2026-09-30 — PENDIENTE DE INVESTIGAR.** `70573ef` («máquina
+> de la sección 3 al tamaño de ux-9 en tablet», rama `feat/home-fase-2`):
+> CI en verde, **ningún despliegue de Vercel ni prueba de humo**. Lo desplegó el
+> commit siguiente, `3bf7acf`, que lo contiene. Con dos casos ya no es una
+> rareza: **se investiga más adelante** (decisión de dirección), empezando por
+> las entregas del webhook de ese push.
 
 ### 10.31 COMPROMISO INCUMPLIDO — Sentry está en la cotización y no está en el repo
 
@@ -3292,6 +3306,21 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
     ≥ 2,6 s → es el CÓDIGO: no se propone fusionar y se localiza la causa
     midiendo. Cualquier otro resultado → 9 corridas más de cada una; si sigue
     sin concluir, se informa.
+
+    **REFERENCIA VIGENTE desde el 2026-09-30 (decisión de dirección, cierre
+    de la fase 2). Sustituye a los 2,24 s de arriba:**
+
+    - **LCP de referencia: 2,28 s**, la mediana de la fase 2 en la tanda que
+      decidió (tanda 2: fase C 2,80 s, criterio «entorno»), según la regla
+      fijada de antemano. Detalle: `docs/diseno/decisiones-home-ux9.md` §14.5.
+    - **Umbrales: 2,44 s** (calidad 60 para los fondos del hero, con Andrés) y
+      **2,54 s** (parar y analizar).
+    - **Método:** Lighthouse 13.4.1 por línea de comandos, **9 o más**
+      corridas alternadas con calentamiento, contra URL fijas.
+    - **La distribución es BIMODAL** (~2,1–2,3 s o ~2,8–3,0 s en las dos
+      variantes, y la proporción cambia entre tandas): una mediana de pocas
+      corridas puede saltar ~0,6 s sin cambiar el código. Por eso nunca
+      menos de 9 alternadas.
 
 15. **Icono cuadrado de la marca (favicon).** El único recurso gráfico que
     tenemos es el logotipo, de **1614 × 317** — una tira horizontal. Sirve para

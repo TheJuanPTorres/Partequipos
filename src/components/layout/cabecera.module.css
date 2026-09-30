@@ -103,6 +103,13 @@
 .fila {
   display: flex;
   align-items: center;
+  /*
+   * Modelo de Elementor, MEDIDO en ux-9 pintado (2026-09-30): columnas de 25 %,
+   * 100 % y 25 % que ENCOGEN en proporción, con 20 px entre ellas. Las
+   * laterales quedan en ~16,4 % del ancho útil (227 px a 1440) y el logo
+   * encoge con la suya por debajo de ~1335 px.
+   */
+  gap: 20px;
   padding: var(--cab-relleno);
 }
 
@@ -113,12 +120,13 @@
 }
 
 .logoCol {
-  flex: 0 0 25%;
+  flex: 0 1 25%;
 }
 
 .logo {
   display: block;
   width: var(--cab-logo);
+  max-width: 100%;
   height: auto;
   transform-origin: left center;
   transition: transform 0.3s ease;
@@ -131,7 +139,7 @@
 }
 
 .nav {
-  flex: 1 1 auto;
+  flex: 0 1 100%;
   display: flex;
   justify-content: center;
 }
@@ -168,9 +176,14 @@
 }
 
 .accionCol {
-  flex: 0 0 25%;
+  flex: 0 1 25%;
   display: flex;
-  justify-content: flex-end;
+  /*
+   * Centrado en su columna, como en ux-9 (no pegado a la derecha). DESVIACIÓN:
+   * la columna no encoge por debajo del botón (`min-width: auto` de flex). En
+   * ux-9 sí, y entre 1025 y ~1250 px el botón se sale de ella.
+   */
+  justify-content: center;
 }
 
 .boton {
@@ -229,6 +242,7 @@
 @media (max-width: 1024px) {
   .fila {
     display: grid;
+    gap: 0;
     grid-template-columns: 1fr auto 1fr;
     padding: 0 2%;
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import { IconCirclePlus } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
@@ -44,17 +45,6 @@ function IconoFlecha({ hacia }: { hacia: "anterior" | "siguiente" }) {
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function IconoMas() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path
-        fill="currentColor"
-        d="m12 0a12 12 0 1 0 12 12 12.013 12.013 0 0 0 -12-12zm0 22a10 10 0 1 1 10-10 10.011 10.011 0 0 1 -10 10zm5-10a1 1 0 0 1 -1 1h-3v3a1 1 0 0 1 -2 0v-3h-3a1 1 0 0 1 0-2h3v-3a1 1 0 0 1 2 0v3h3a1 1 0 0 1 1 1z"
       />
     </svg>
   );
@@ -243,7 +233,7 @@ export function HeroPortada({ diapositivas }: Props) {
             ) : null}
             {d.enlace ? (
               <Link href={d.enlace.href} className={estilos.mas} aria-label={d.enlace.nombre}>
-                <IconoMas />
+                <IconCirclePlus aria-hidden="true" focusable="false" stroke={1.5} />
               </Link>
             ) : null}
           </aside>

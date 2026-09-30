@@ -97,7 +97,14 @@
 .whatsapp {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  /*
+   * MEDIDO en ux-9 pintado (2026-09-30): el botón va dentro de un contenedor
+   * de Elementor con 10 px de relleno (de ahí el margen), su icono mide 1 em y
+   * el hueco es de 5 px. Con 18 px y 10 de hueco, la tarjeta salía 18 px más
+   * baja a 1440 y 15 a 1010 y 390.
+   */
+  margin-block: 10px;
+  gap: 5px;
   padding: var(--boton-relleno);
   border: 1px solid var(--color-fondo); /* global `099f28a` */
   border-radius: 7px;
@@ -107,8 +114,8 @@
 }
 
 .whatsapp svg {
-  width: 18px;
-  height: 18px;
+  width: 1em;
+  height: 1em;
 }
 
 .whatsapp:hover {

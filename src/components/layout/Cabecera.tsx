@@ -38,7 +38,13 @@ type Props = {
   tituloPortada: string;
 };
 
-const UMBRAL_ESCONDER = 120;
+/*
+ * Umbrales de ux-9, MEDIDOS en su plugin («Sticky Header Effects» 2.2.3): el
+ * velo y el encogido entran con el scroll ≥ 60 px, y se esconde al bajar
+ * cuando la posición anterior pasa de 500 px (y reaparece al subir).
+ */
+const UMBRAL_VELO = 60;
+const UMBRAL_ESCONDER = 500;
 
 function Logo({
   esPortada,
@@ -92,9 +98,11 @@ export function Cabecera({ enlaces, contacto, whatsapp, nombreSitio, tituloPorta
     let ultimo = window.scrollY;
     const alDesplazar = () => {
       const y = window.scrollY;
-      setArriba(y < 10);
-      if (y > ultimo && y > UMBRAL_ESCONDER) setOculta(true);
-      else if (y < ultimo) setOculta(false);
+      setArriba(y < UMBRAL_VELO);
+      if (ultimo > UMBRAL_ESCONDER) {
+        if (y > ultimo) setOculta(true);
+        else if (y < ultimo) setOculta(false);
+      } else if (y < ultimo) setOculta(false);
       ultimo = y;
     };
     alDesplazar();

@@ -508,6 +508,13 @@ detalle en `docs/diseno/decisiones-home-ux9.md` §13):
 Cuando lleguen las URL, se añaden en el panel (global **Pie de página**), sin
 tocar código.
 
+**FOTOS DEL HERO ENVIADAS POR EL CLIENTE (2026-09-30):** **derecho de uso
+confirmado por el cliente**; dirección conserva la confirmación. Son otras que
+las fotos de ux-9 de Andrés (L3), que siguen sin licencia. Mientras tanto
+**solo en el preview**: pasan a producción cuando lo haga dirección, con un
+runbook. Originales en `Desktop\partequipos-diseno\cliente-hero\`, **nunca en
+`public/` ni en el repositorio** (el repositorio es público, §10.33).
+
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
 
 | Pendiente                                             | Referencia      |
@@ -2238,6 +2245,13 @@ instalada, no en estas notas.
 > segundo aviso que tenemos sobre el disparo de despliegues —el primero fue el
 > bloqueo por plan de §10.4— y lo que no se anota se vuelve a diagnosticar desde
 > cero.
+>
+> **SEGUNDO CASO, 2026-09-30 — PENDIENTE DE INVESTIGAR.** `70573ef` («máquina
+> de la sección 3 al tamaño de ux-9 en tablet», rama `feat/home-fase-2`):
+> CI en verde, **ningún despliegue de Vercel ni prueba de humo**. Lo desplegó el
+> commit siguiente, `3bf7acf`, que lo contiene. Con dos casos ya no es una
+> rareza: **se investiga más adelante** (decisión de dirección), empezando por
+> las entregas del webhook de ese push.
 
 ### 10.31 COMPROMISO INCUMPLIDO — Sentry está en la cotización y no está en el repo
 
@@ -3259,6 +3273,54 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
       menos con la foto de ux-9.
     - **Si aun así supera 2,5 s: se para y se analiza** antes de seguir con la
       fase siguiente.
+
+    **MÉTODO VIGENTE desde el 2026-09-30 (decisión de dirección, fase 2c).**
+    Sustituye al de las DevTools para toda medición nueva:
+
+    - **Lighthouse 13.4.1 por línea de comandos** (su API de Node), móvil,
+      _simulated throttling_, solo Performance. Las corridas las hace Claude;
+      dirección ya no corre Lighthouse.
+    - **9 corridas válidas por variante, ALTERNADAS** (A, B, A, B…), en la
+      misma máquina y la misma sesión, contra las **URL fijas** de cada
+      despliegue (no el alias de la rama, que cambia con cada push).
+    - **Una carga de calentamiento** de cada variante antes de empezar, que
+      no cuenta.
+    - En un preview, el bypass va **solo** en la cabecera y como cookie; el
+      secreto no puede aparecer en ningún JSON guardado (se comprueba).
+    - **La parada por LCP se aplica a la FUSIÓN, no al desarrollo:** se
+      desarrolla la fase entera y se mide una vez al final. Nada se fusiona
+      sin esa medición.
+
+    **Por qué:** en la fase 2c las 3 corridas de las DevTools dieron 2,81 s
+    de mediana, y la sonda alternada mostró que el código de la referencia
+    (fase C) daba **más** que el de la fase 2 en la misma sesión (3,40 frente
+    a 2,83). Con 3 corridas sueltas, un cambio del entorno entre sesiones se
+    lee como un cambio del código. Medir **las dos variantes alternadas** en
+    la misma sesión cancela la deriva, y 9 corridas dan una mediana estable.
+    Por eso cada medición final compara **siempre** contra la fase C medida
+    en la misma sesión, no contra los 2,24 s escritos.
+
+    **Criterio de la medición final:** fase C ≥ 2,6 s → es el ENTORNO; la
+    nueva referencia es la mediana de la fase 2, con umbrales de referencia
+    +0,16 s (calidad 60 con Andrés) y +0,26 s (parar). Fase C ≤ 2,4 s y fase 2
+    ≥ 2,6 s → es el CÓDIGO: no se propone fusionar y se localiza la causa
+    midiendo. Cualquier otro resultado → 9 corridas más de cada una; si sigue
+    sin concluir, se informa.
+
+    **REFERENCIA VIGENTE desde el 2026-09-30 (decisión de dirección, cierre
+    de la fase 2). Sustituye a los 2,24 s de arriba:**
+
+    - **LCP de referencia: 2,28 s**, la mediana de la fase 2 en la tanda que
+      decidió (tanda 2: fase C 2,80 s, criterio «entorno»), según la regla
+      fijada de antemano. Detalle: `docs/diseno/decisiones-home-ux9.md` §14.5.
+    - **Umbrales: 2,44 s** (calidad 60 para los fondos del hero, con Andrés) y
+      **2,54 s** (parar y analizar).
+    - **Método:** Lighthouse 13.4.1 por línea de comandos, **9 o más**
+      corridas alternadas con calentamiento, contra URL fijas.
+    - **La distribución es BIMODAL** (~2,1–2,3 s o ~2,8–3,0 s en las dos
+      variantes, y la proporción cambia entre tandas): una mediana de pocas
+      corridas puede saltar ~0,6 s sin cambiar el código. Por eso nunca
+      menos de 9 alternadas.
 
 15. **Icono cuadrado de la marca (favicon).** El único recurso gráfico que
     tenemos es el logotipo, de **1614 × 317** — una tira horizontal. Sirve para

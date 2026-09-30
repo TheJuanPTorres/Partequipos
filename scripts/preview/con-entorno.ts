@@ -18,6 +18,7 @@ import {
   leerFicheroEntorno,
   veredictoEntornoPreview,
 } from "../../src/lib/preview/entornoPreview";
+import { lineaDeComando } from "../../src/lib/preview/lineaDeComando";
 
 const fichero = path.resolve(FICHERO_ENTORNO_PREVIEW);
 if (!fs.existsSync(fichero)) {
@@ -40,5 +41,12 @@ const env: NodeJS.ProcessEnv = { ...process.env, ENTORNO_PREVIEW: "1" };
 for (const [clave, valor] of Object.entries(entorno)) if (valor) env[clave] = valor;
 
 console.error(`entorno del preview: ${v.host} · ${v.almacen} · bypass ${v.bypass}`);
-const r = spawnSync(comando, argumentos, { env, shell: true, stdio: "inherit" });
+// Con `shell: true`, Node junta comando y argumentos SIN comillas: se
+// entrecomilla aquí (src/lib/preview/lineaDeComando.ts) para que una ruta con
+// espacios llegue entera.
+const r = spawnSync(lineaDeComando([comando, ...argumentos], process.platform), {
+  env,
+  shell: true,
+  stdio: "inherit",
+});
 process.exit(r.status ?? 1);

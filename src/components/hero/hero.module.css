@@ -43,6 +43,14 @@
   --hero-titulo-espaciado: normal;
   /* El solape con la máquina. Medido en su página, no estimado. */
   --hero-titulo-margen-abajo: -250px;
+  /*
+   * Ajuste de la posición de las letras, MEDIDO en ux-9 pintado (carga limpia,
+   * scroll 0, letras pintadas en magenta; 2026-09-30): allí quedan 13 px bajo
+   * el borde de la tarjeta a 1440, 96 a 1010 y 90 a 390. Sin ajuste, aquí 66,
+   * 159 y 65. Se corrige solo lo que se ve (`top` relativo): la maquetación, la
+   * máquina y el vidrio no se mueven.
+   */
+  --hero-titulo-ajuste: -53px;
 
   /* --- Hueco de la máquina: ancho pintado; la altura, la proporción 1476×1057. --- */
   --hero-imagen-ancho: 809px;
@@ -168,6 +176,8 @@
 }
 
 .titulo {
+  position: relative;
+  top: var(--hero-titulo-ajuste);
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
@@ -354,6 +364,7 @@
 @media (max-width: 1024px) {
   .hero {
     --hero-titulo-tam: 70px;
+    --hero-titulo-ajuste: -63px;
     --hero-imagen-ancho: 631px;
     --hero-relleno: 50px 30px 30px;
     /*
@@ -378,6 +389,7 @@
 @media (max-width: 767px) {
   .hero {
     --hero-titulo-tam: 12vw;
+    --hero-titulo-ajuste: 25px;
     --hero-alto-min: 85vh;
     --hero-imagen-margen-arriba: 200px;
     --hero-parrafo-tam: 13px;

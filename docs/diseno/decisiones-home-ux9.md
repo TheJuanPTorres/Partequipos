@@ -1031,9 +1031,98 @@ INFERIDO); se mide en el paso 5.
 
 ### 14.3 Lighthouse
 
-_Pendiente de rellenar: calibración por línea de comandos y corridas de
-dirección con el método de §10.3 p.14._
+**Parada del paso 0 de la fase 2c (2026-09-30).** Tres corridas de dirección
+desde las DevTools, contra el alias de la rama: LCP **2,99 · 2,81 · 2,51 s**
+(mediana **2,81**, por encima del tope de 2,5 de §10.3 p.14), rendimiento
+93 · 94 · 97. Frente a la referencia de la fase C (2,24 s): mismo JavaScript
+(165 kB) y 13 imágenes en vez de 3, porque ahora están sembradas las de las
+secciones 2 y 3.
+
+Dos sondas por línea de comandos, **alternando** las dos variantes en la misma
+máquina y minuto a minuto:
+
+- Bloqueando las imágenes de las secciones 2 y 3: 2,70 frente a 2,59 s. La
+  hipótesis «las imágenes nuevas retrasan el LCP» **no se sostiene**.
+- Fase C frente a fase 2, sin tocar nada: **3,40 s (2,80–4,59) frente a
+  2,83**. La fase C, con el código de la referencia de 2,24, da hoy **más**
+  que la fase 2: todo apunta al entorno de medida, no al código.
+
+**Decisión de dirección (fase 2c):** la parada por LCP se aplica a la
+**fusión**, no al desarrollo; se mide **una vez al final**, con el método nuevo
+(CLI, 9 corridas válidas alternadas y una carga de calentamiento). El
+resultado va en §14.5.
 
 ### 14.4 Cambios de la fase
 
-_Pendiente: pasos 2 a 9._
+Cada cambio, verificado **pintado** en el preview a 390, 1010 y 1440 (y entre
+1025 y 1279 donde aplica), contra ux-9 desde su HTML guardado.
+
+| Commit    | Cambio                                                   | Antes (MEDIDO)                                                                           | Después (MEDIDO)                                                                                                                    |
+| --------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `877aceb` | El cargador del preview entrecomilla los argumentos      | Un argumento con espacios llegaba partido                                                | Llega entero; prueba con un proceso real y un control que reproduce el corte                                                        |
+| `91b5848` | Comentario de `cabecera.module.css` (§10.35)             | Culpaba a `var()`                                                                        | Culpa al orden. CSS servido **idéntico byte a byte** (62.067 bytes)                                                                 |
+| `bdb72e8` | Icono «+» del hero con Tabler (L2)                       | Trazado del kit; aro 30, cruz 12. **47 SVG / 165 trazados** del kit en `src/`            | `IconCirclePlus`: aro 30, cruz 10, misma caja de 30×30. **0** trazados del kit en `src/`                                            |
+| `99838cd` | «Contáctanos» en su columna (tres commits)               | x = 1224 a 1440 (ux-9, 1209)                                                             | Columnas, logo, menú y botón **idénticos** a ux-9 a 1280, 1440 y 1920                                                               |
+| `ba09d0a` | Título del hero a la altura de ux-9                      | Letras bajo el borde de la tarjeta: 66 · 159 · 65 (1440 · 1010 · 390; ux-9 13 · 96 · 90) | **13 · 96 · 90**                                                                                                                    |
+| `a117d78` | Tarjeta roja del pie                                     | 342 · 267 · 235 (ux-9 360 · 282 · 250)                                                   | **360 · 282 · 250**; botón de WhatsApp igual (153×40 · 135×37, icono 16 · 13, hueco 5)                                              |
+| `70573ef` | Máquina de la sección 3 a 1010                           | 451×563 (ux-9 368×460); título de la sección +104                                        | **368×460**; título de la sección de vuelta a 851                                                                                   |
+| `3bf7acf` | Movimiento de la cabecera en escritorio; no fija ≤1024   | Fija en todos los anchos; se escondía a 120 px, velo a 10, 0,3 s ease                    | Ver abajo                                                                                                                           |
+| —         | Contraste de los iconos móviles a scroll 0               | **7,28:1** en el peor píxel (390, 768, 1010): los iconos van sobre el fondo de la página | **Sin cambio**: pasa de largo el 3:1. Nada pendiente de Andrés                                                                      |
+| `29a6f61` | Sección 3 sin hueco cuando falta la imagen               | Ver abajo                                                                                | Ver abajo                                                                                                                           |
+| —         | 5 registros huérfanos de `media` en el preview (ids 1–5) | Clonados de producción, apuntando a su almacén                                           | Borrados con la API local tras comprobar **0 referencias** en las 31 columnas con FK a `media` y en Lexical. `media` del preview: 0 |
+
+**Movimiento de la cabecera (`3bf7acf`)**, medido fotograma a fotograma con
+scroll progresivo de 25 px, ux-9 contra el nuestro:
+
+| Qué                 | ux-9                                  | Nuestro                                                                            |
+| ------------------- | ------------------------------------- | ---------------------------------------------------------------------------------- |
+| Esconder y mostrar  | 411 ms, 58 fotogramas, 0 ↔ −990       | 412 ms, 58 fotogramas, 0 ↔ −990                                                    |
+| Curva               | —                                     | Diferencia máxima 4–8 px; cruza el borde a 75/76 ms (esconder) y 325/326 (mostrar) |
+| Velo y encogido     | Desde 60 px; alto 100 → 70; logo 85 % | Igual                                                                              |
+| Se esconde          | Si la posición anterior pasa de 500   | Igual                                                                              |
+| CLS de la secuencia | **0,07** (sale del flujo al encoger)  | **0** (recorte con `clip-path`)                                                    |
+| ≤ 1024 px           | No es fija (1024, 1010, 800 y 390)    | No es fija                                                                         |
+| Movimiento reducido | No lo respeta                         | No se esconde; sin transiciones                                                    |
+
+**Sección 3 sin imagen (`29a6f61`).** «Antes» es el despliegue de `main`, que
+no tiene imágenes; «después», el preview tras retirar la siembra (§14.5).
+
+| Qué (MEDIDO)                         | Antes                                                                             | Después                                                    |
+| ------------------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Tarjeta sin foto                     | Columna de foto **vacía**: 177–258 px de ancho en escritorio, 30 px de alto a 390 | §14.5                                                      |
+| Reserva de la máquina, en escritorio | **139 px** vacíos sobre «Marcas que respaldan…»                                   | §14.5                                                      |
+| Con imágenes                         | —                                                                                 | **Idéntico** a antes en 390, 1010, 1025, 1100, 1279 y 1440 |
+
+**Lo que se midió y NO era hueco por falta de imagen** (anotado en la fase 1b,
+CLAUDE.md §10.33 p.14):
+
+- A 390, el espacio entre «Ver todas las excavadoras» y «Venta de
+  maquinaria»: son el espacio final (93) y el superior de la columna derecha
+  (55) de ux-9. Con imágenes, «Venta de maquinaria» queda a la misma altura
+  que en ux-9 (728).
+- A 1010, la mitad derecha vacía: en ux-9 la columna derecha también mide el
+  54 % en columna (título de 101 a 519).
+- El pie entre 1025 y 1279 **sin imagen decorativa**: margen de 70 px en
+  1025, 1100 y 1279. La reserva de 170 px solo entra con imagen
+  (`data-con-imagen`).
+
+**Desviaciones que quedan, a propósito:**
+
+- **«Contáctanos» entre 1025 y ~1250 px:** en ux-9 se sale de su columna, y a
+  1025 hasta 5 px fuera de la página. Aquí se queda dentro, pegado a la
+  derecha de la columna (x = 817 · 891 a 1025 · 1100; ux-9 853 · 915).
+- **CLS del encogido**, no replicado (arriba).
+- **Cruz del «+» de 10 px** en vez de 12: es la proporción de Tabler.
+- **Residuo a 1010:** «Ver producto» +18 px y la sección 3 +23 px de alto.
+  INFERIDO: el contenido de la tarjeta; no estaba en la lista del ajuste fino.
+- **Cabecera a 390:** 66 px frente a 67 (1 px), fuera de la lista.
+- **«Menú 8 px más a la izquierda»** no se reproduce: los 4 enlaces están en
+  la misma x que en ux-9. Se da por cerrado.
+
+**Incidencia de Vercel:** `70573ef` **no generó despliegue**, como en §10.30
+(CI verde, sin despliegue ni prueba de humo). Lo desplegó el commit siguiente,
+`3bf7acf`, que lo contiene.
+
+### 14.5 Medición final
+
+_Pendiente: sección 3 sin imagen, pintada, y Lighthouse final._

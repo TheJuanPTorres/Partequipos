@@ -181,12 +181,17 @@
   /*
    * La columna encoge como en ux-9 (`min-width: 0`), y el botón va CENTRADO en
    * ella. DESVIACIÓN: cuando no cabe (entre 1025 y ~1250 px), en ux-9 se sale
-   * por la derecha —hasta 5 px fuera de la página a 1025—; aquí `row-reverse`
-   * con `safe center` lo deja dentro, pegado a la derecha de la columna.
+   * por la derecha —hasta 5 px fuera de la página a 1025—; aquí se queda
+   * dentro, pegado a la derecha de la columna: en `row-reverse` el inicio es la
+   * derecha, y los márgenes automáticos centran cuando sobra sitio y valen 0
+   * cuando falta.
    */
   flex-direction: row-reverse;
-  justify-content: safe center;
   min-width: 0;
+}
+
+.accionCol > * {
+  margin-inline: auto;
 }
 
 .boton {

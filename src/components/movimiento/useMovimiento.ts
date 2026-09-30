@@ -37,5 +37,7 @@ export function usePausa() {
   const [eleccion, setEleccion] = useState<boolean | null>(null);
   const pausado = estaPausado(eleccion, reducido);
   const alternar = useCallback(() => setEleccion(!pausado), [pausado]);
-  return { pausado, alternar };
+  /** Detiene sin alternar: lo usa quien se para al interactuar (el hero). */
+  const pausar = useCallback(() => setEleccion(true), []);
+  return { pausado, alternar, pausar };
 }

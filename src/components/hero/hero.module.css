@@ -116,6 +116,8 @@
    * foco y la sombra del vidrio no se cortan contra el borde.
    */
   isolation: isolate;
+  /* El gesto horizontal lo lleva el carrusel; el vertical sigue siendo scroll. */
+  touch-action: pan-y;
 }
 
 /*
@@ -236,6 +238,7 @@
 
 .flechas {
   display: flex;
+  align-items: center;
   gap: 4px;
   margin-bottom: var(--hero-flechas-margen-abajo);
 }
@@ -262,7 +265,72 @@
   height: var(--hero-flecha-icono);
 }
 
+/*
+ * PAUSA DEL PASE (WCAG 2.2.2): con el aspecto de las flechas. Tamaño y
+ * posición los manda esta regla, más específica que la del botón compartido.
+ */
+.flechas .pausa {
+  width: var(--hero-flecha-tam);
+  height: var(--hero-flecha-tam);
+  margin-left: 8px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--hero-flecha-fondo);
+  color: var(--hero-rojo);
+}
+
+.flechas .pausa svg {
+  width: var(--hero-flecha-icono);
+  height: var(--hero-flecha-icono);
+}
+
+/*
+ * PUNTOS: como los de ux-9 (6 px), pero pulsables, con un objetivo de 24 px
+ * (WCAG 2.5.8) que no cambia su aspecto. El activo, lleno y más largo.
+ */
+.puntos {
+  display: flex;
+  align-items: center;
+  margin: 0 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.punto {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.punto::before {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 60%);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 25%);
+  content: "";
+  transition: width 0.3s ease;
+}
+
+.punto[aria-current="true"]::before {
+  width: 20px;
+  background: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .punto::before {
+    transition: none;
+  }
+}
+
 /* Foco visible propio: el anillo del navegador se pierde sobre la foto. */
+.punto:focus-visible,
+.flechas .pausa:focus-visible,
 .flecha:focus-visible,
 .mas:focus-visible {
   outline: 3px solid #fff;

@@ -62,9 +62,23 @@
   --hero-flecha-fondo: rgb(255 255 255 / 58%);
   --hero-flechas-margen-abajo: 20px;
 
+  /* --- Velo sobre la foto (D14, ver `.marco::after`). --- */
+  --hero-velo: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 55%) 0%,
+    rgb(0 0 0 / 40%) 38%,
+    rgb(0 0 0 / 15%) 62%,
+    rgb(0 0 0 / 40%) 100%
+  );
+
   /* --- Vidrio. NO coincide con los --glass-* del sistema: ver docs. --- */
   --hero-vidrio-ancho: 400px;
-  --hero-vidrio-fondo: rgb(255 255 255 / 12%);
+  /*
+   * DESVIACIÓN D14 (2026-09-30), PENDIENTE DE APROBACIÓN DE ANDRÉS: en ux-9,
+   * blanco al 12 %. Con las fotos del cliente (cielos claros) el párrafo daba
+   * 1,6–2,7:1; oscurecido, ≥ 5,9:1 en las cuatro (MEDIDO).
+   */
+  --hero-vidrio-fondo: rgb(0 0 0 / 28%);
   --hero-vidrio-borde: 1px solid rgb(255 255 255 / 25%);
   --hero-vidrio-desenfoque: blur(18px);
   --hero-vidrio-sombra: 0 8px 32px rgb(0 0 0 / 8%);
@@ -145,6 +159,22 @@
 .fondo {
   object-fit: cover;
   object-position: center center;
+}
+
+/*
+ * VELO SOBRE LA FOTO — DESVIACIÓN D14 (2026-09-30), PENDIENTE DE APROBACIÓN
+ * DE ANDRÉS. ux-9 no lo tiene: su foto es oscura. Las del cliente tienen
+ * cielos claros detrás del título blanco, y sin velo daban 1,0–1,4:1 (MEDIDO
+ * bajo los píxeles de las letras). Con este degradado, ≥ 4:1 (p10) en las
+ * cuatro a 1010 y 390; más oscuro arriba (título) y abajo (vidrio y
+ * controles). Por encima de las capas: el marco lo pinta después de ellas.
+ */
+.marco::after {
+  position: absolute;
+  inset: 0;
+  background: var(--hero-velo);
+  content: "";
+  pointer-events: none;
 }
 
 /* ----------------------------------------------------------------- título */

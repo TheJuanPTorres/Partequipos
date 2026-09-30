@@ -34,7 +34,7 @@ import estilos from "./hero.module.css";
  * - D1: el título va en `<h2>`; el `<h1>` de la portada es el logo.
  * - D3: el vidrio no sale de la tarjeta por debajo de 1024 px.
  * - D4: las flechas son botones que funcionan; con una diapositiva no se pintan.
- * - D12 (carrusel): ux-9 no tiene carrusel en el hero; se copia el de su
+ * - D13 (carrusel): ux-9 no tiene carrusel en el hero; se copia el de su
  *   sección 2 (Swiper, MEDIDO): pase cada 5 s, deslizamiento de 500 ms, bucle,
  *   flechas, puntos y gesto, y se detiene al interactuar. Además: botón de
  *   pausa (WCAG 2.2.2), espera mientras el foco está dentro, y sin pase

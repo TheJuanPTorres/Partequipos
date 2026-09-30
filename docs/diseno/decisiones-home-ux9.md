@@ -1177,3 +1177,120 @@ la referencia. Ningún JSON contiene el secreto ni nombra la cabecera de bypass
   ha tocado** en la referencia: sigue en 2,24 s hasta esa decisión.
 
 JSON en `Desktop\partequipos-cierre\lighthouse\lh-final-*` y `lh-final2-*`.
+
+**Actualización (2026-09-30, cierre de la fase 2):** dirección adoptó **2,28 s**
+como referencia, con umbrales 2,44 y 2,54 s. Ya está en CLAUDE.md §10.3 p.14.
+
+## 15. Carrusel del hero para la demo al cliente (2026-09-30)
+
+Rama `feat/hero-slider`, PR en borrador. **Solo preview:** el contenido de la
+demo (fotos del cliente, derecho de uso confirmado, CLAUDE.md §10.0.1) está
+sembrado en la rama `preview` de Neon y en su Blob. Nada en producción.
+
+### 15.1 Qué hacía el hero antes
+
+- Admitía **N diapositivas** desde Payload (ADR 0009), con flechas y teclado.
+- El cambio era **seco**: sin pase automático, sin puntos y sin gesto.
+- Campos de cada diapositiva: título (obligatorio), párrafo, imagen de fondo
+  (obligatoria), imagen frontal recortada (**opcional**), enlace del «+» y su
+  nombre. Las diapositivas de la demo van **sin imagen frontal**, porque no hay
+  recortes: solo fondo.
+
+### 15.2 ux-9, medido pintado
+
+- **El hero de ux-9 NO es un carrusel:** 0 sliders en la tarjeta y el título
+  no cambia en 12 s. Las flechas son dibujo (ADR 0009).
+- **El único carrusel de ux-9 es el de la sección 2** (Swiper), y es el que se
+  copia:
+
+| Qué             | ux-9 (MEDIDO)                                                                    |
+| --------------- | -------------------------------------------------------------------------------- |
+| Pase automático | Cada **5 s** (`autoplay.delay` 5000; cambios medidos a ~5,5 s con la transición) |
+| Transición      | **Deslizamiento** horizontal (`effect: slide`), **500 ms**                       |
+| Bucle           | Sí                                                                               |
+| Controles       | 2 flechas y puntos (uno por diapositiva)                                         |
+| Gesto           | Sí (`allowTouchMove`)                                                            |
+| Al interactuar  | **Se detiene** el pase (`disableOnInteraction`)                                  |
+| Ratón encima    | El export dice «pausa», pero **pintado NO pausa** (sigue cambiando en 11 s)      |
+
+### 15.3 Lo implementado
+
+| Qué                     | Nuestro                                                                                                                             |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Pase, transición, bucle | Igual: 5 s, deslizamiento de 500 ms con `ease` (API de animaciones web), bucle                                                      |
+| Flechas, puntos, gesto  | Igual. Puntos **pulsables**, con objetivo de 24 px (WCAG 2.5.8) y nombre «Diapositiva N de 4: título»                               |
+| Al interactuar          | Igual: se detiene; el botón pasa a «Reproducir»                                                                                     |
+| **Botón de pausa**      | **Nuevo** (WCAG 2.2.2), el de D2, con el aspecto de las flechas                                                                     |
+| Foco dentro             | El pase **espera** mientras el foco está en el hero                                                                                 |
+| Ratón encima            | No pausa, como ux-9 pintado: el hero ocupa casi toda la pantalla                                                                    |
+| Movimiento reducido     | **Sin pase automático** (empieza en pausa, D2) y cambio seco, sin deslizamiento                                                     |
+| Teclado                 | Flechas izquierda y derecha dentro del hero                                                                                         |
+| Lector de pantalla      | Anuncia la diapositiva solo tras una acción del usuario; con el pase automático, nada                                               |
+| Carga                   | Solo el primer fondo con prioridad. **Los demás no existen en el HTML**: se añaden tras el `load`, y siempre el siguiente al activo |
+
+**Desviaciones nuevas:**
+
+- **D13 — carrusel en el hero.** ux-9 no tiene carrusel en el hero; se copia
+  el de su sección 2, más la pausa y lo de accesibilidad de arriba.
+- **D14 — velo sobre la foto y vidrio oscurecido. PENDIENTE DE APROBACIÓN DE
+  ANDRÉS.**
+  - Las fotos del cliente tienen cielos claros detrás del título blanco.
+  - **Sin velo, medido bajo los píxeles de las letras:** título 1,0–1,4:1
+    (p10) en tres de las cuatro, y párrafo 1,6–2,7:1 en dos.
+  - **Con el velo** (degradado negro del 55 % arriba al 15 % a media altura y
+    40 % abajo) y el vidrio en negro al 28 % (en ux-9, blanco al 12 %):
+    - título ≥ 4,0:1 (p10) a 1010 y 390;
+    - párrafo ≥ 5,9:1 en las cuatro.
+  - A 1440 la máscara de letras no fue fiable; la comprobación ahí es visual,
+    con las capturas.
+- **Defecto anotado, sin tocar:** a ≥ 1025 px las letras van a 13 px del borde
+  de la tarjeta, como en ux-9, y la **tilde de «PRECISIÓN»** sale por encima,
+  blanca sobre el fondo claro de la página. Ocurre con todo título con tilde
+  en mayúscula. Para Andrés: ¿se baja el título o se acepta?
+
+### 15.4 Contenido de la demo (solo preview)
+
+`npm run preview:demo:sembrar` sube las fotos **ya reducidas** y deja en el
+hero solo las diapositivas de la demo. Quita del hero la de prueba «Potencia
+Hitachi», pero sus fotos se quedan en Media.
+
+| Diapositiva       | Foto                                      | JPG (2560 px, calidad 80, sin metadatos) | Punto focal |
+| ----------------- | ----------------------------------------- | ---------------------------------------- | ----------- |
+| Fuerza Hitachi    | ZX245USLC-6 (original 8192×5464, 33,6 MB) | 2560×1708, **818 kB**                    | 48 / 45     |
+| Potencia LiuGong  | 856H (5472×3648, 8,5 MB)                  | 2560×1707, **810 kB**                    | 60 / 60     |
+| Precisión Dynapac | Dynapac.png (3520×4704, 21,7 MB)          | 1916×2560, **537 kB**                    | 62 / 55     |
+| Precisión Yanmar  | Yanmar.png (2560×1708, 5,7 MB)            | 2560×1708, **670 kB**                    | 45 / 50     |
+
+- **CASE no tiene diapositiva:** en `cliente-hero` no llegó ni la 580SV ni la
+  SR240B. Tampoco llegó ningún TIF.
+- El JPG no es lo que descarga el visitante: `/_next/image` sirve WebP al ancho
+  pedido.
+- Los originales no se suben: quedan en `Desktop\partequipos-diseno\cliente-hero\`
+  y los reducidos en su subcarpeta `web\`.
+
+**Textos, primera lista (sembrada):**
+
+- Yanmar: Precisión. Tecnología. Confianza.
+- CASE: Versatilidad. Fuerza. Experiencia.
+- Dynapac: Precisión. Compactación. Desempeño.
+- Hitachi LANDCROS: Fuerza. Tradición. Respaldo.
+- LiuGong: Potencia. Productividad. Capacidad.
+
+**Segunda lista, alternativa para que elija el cliente:**
+
+- Yanmar: Precisión. Ingeniería. Detalle.
+- CASE: Fuerza. Versatilidad. Trayectoria.
+- Dynapac: Control. Precisión. Compactación.
+- Hitachi LANDCROS: Fuerza. Tradición. Respaldo.
+- LiuGong: Capacidad. Productividad. Evolución.
+
+Los títulos siguen el patrón de ux-9, «<primera palabra> <marca>». Con la
+segunda lista cambiarían a «Precisión Yanmar», «Control Dynapac» y «Capacidad
+LiuGong». Todo se edita en el panel.
+
+**Restaurar la diapositiva de prueba después de la demo:**
+
+1. `npm run preview:demo:retirar`: quita las diapositivas de la demo y sus
+   imágenes, y comprueba que el Blob responde 404.
+2. `npm run preview:sembrar`: vuelve a poner «Potencia Hitachi» la primera.
+3. Redesplegar el preview.

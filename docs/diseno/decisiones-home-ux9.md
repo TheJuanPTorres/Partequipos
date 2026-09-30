@@ -1132,4 +1132,48 @@ sección no cambia (lo marca la columna derecha) y el pie queda con su margen de
 70 px en todos los anchos. Después se volvió a sembrar el preview para la
 medición final.
 
-_Pendiente: Lighthouse final con el método de CLAUDE.md §10.3 p.14._
+**Lighthouse final (2026-09-30)**, con el método vigente de CLAUDE.md §10.3
+p.14: Lighthouse 13.4.1 por línea de comandos, móvil, _simulated throttling_,
+solo Performance, variantes alternadas, una carga de calentamiento de cada una
+que no cuenta, contra las **URL fijas**:
+
+- **Fase C:** `partequipos-pcjcvm425` (commit `5dc579f`, que solo añade
+  documentación a `e65b75e`, el código de la referencia de 2,24 s).
+- **Fase 2:** `partequipos-oue9ctnyh` (commit `b448c59`), con las fotos
+  sembradas en el preview.
+
+| Tanda             | Fase C: LCP mediana (mín.–máx.) | Fase 2: LCP mediana (mín.–máx.) | benchmarkIndex (medianas) |
+| ----------------- | ------------------------------- | ------------------------------- | ------------------------- |
+| 1 (9 + 9)         | **2,15 s** (2,07–3,02)          | **2,23 s** (2,20–3,03)          | 2339 · 2142               |
+| 2 (9 + 9)         | **2,80 s** (2,06–2,98)          | **2,28 s** (2,20–2,96)          | 2276 · 2340               |
+| Las 18, juntas    | 2,31 s                          | 2,23 s                          | 2317 · 2202               |
+| Referencia fase C | 2,24 s (3 corridas, DevTools)   | —                               | 1864 (1863–2021)          |
+
+En todas las corridas el elemento LCP es la **foto de fondo del hero**, como en
+la referencia. Ningún JSON contiene el secreto ni nombra la cabecera de bypass
+(comprobado en los 36).
+
+**Criterio aplicado:**
+
+1. **Tanda 1:** fase C 2,15 (≤ 2,4) y fase 2 2,23 (< 2,6): ni «entorno» ni
+   «código». Según la regla, 9 corridas más de cada una.
+2. **Tanda 2:** fase C **2,80 ≥ 2,6: ENTORNO.** La regla da como nueva
+   referencia la mediana de la fase 2, **2,28 s**, con umbrales **2,44 s**
+   (calidad 60 con Andrés) y **2,54 s** (parar).
+
+**Lo que hay que leer junto al criterio, sin adornarlo:**
+
+- La distribución es **bimodal en las dos variantes**: casi todas las corridas
+  caen en ~2,1–2,3 s o en ~2,8–3,0 s (solo dos quedan entre medias: 2,50 y 2,52), y la proporción de corridas lentas cambia de una
+  tanda a otra (fase C: 2 de 9 por encima de 2,6 s en la primera y 5 de 9 en la segunda). Eso
+  mueve la mediana de la fase C de 2,15 a 2,80 **sin cambiar una línea**.
+- El benchmarkIndex **no** lo explica: las corridas lentas salen con índices
+  de 2117 a 2545, igual que las rápidas. Y hoy la máquina puntúa ~20 % **más**
+  que el día de la referencia (2317 frente a 1864).
+- **En ninguna de las dos tandas la fase 2 queda peor que la fase C**; con las
+  18 juntas, 2,23 frente a 2,31. El código de la fase 2 no empeora el LCP.
+- Tomar 2,28 s como referencia nueva sale de la regla; es de dirección
+  decidir si se adopta ese valor o las 18 juntas. **CLAUDE.md §10.3 p.14 no se
+  ha tocado** en la referencia: sigue en 2,24 s hasta esa decisión.
+
+JSON en `Desktop\partequipos-cierre\lighthouse\lh-final-*` y `lh-final2-*`.

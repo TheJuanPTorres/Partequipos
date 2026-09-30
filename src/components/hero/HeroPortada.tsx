@@ -233,7 +233,7 @@ export function HeroPortada({ diapositivas }: Props) {
             ) : null}
             {d.enlace ? (
               <Link href={d.enlace.href} className={estilos.mas} aria-label={d.enlace.nombre}>
-                <IconCirclePlus aria-hidden="true" focusable="false" stroke={1.389} />
+                <IconCirclePlus aria-hidden="true" focusable="false" stroke={1.5} />
               </Link>
             ) : null}
           </aside>

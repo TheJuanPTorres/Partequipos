@@ -297,13 +297,13 @@
 
 /*
  * Icono de Tabler (L2: el «add» del kit de Andrés es de Flaticon). Su aro mide
- * 18 de 24 unidades; con la escala 1,2 y el trazo 1,389 se pinta como el de
+ * 18 de 24 unidades; con la escala 1,28 y el trazo 1,5 se pinta como el de
  * ux-9: aro de ~30 px y trazo de 2 px, sin cambiar la caja de 30 px del enlace.
  */
 .mas svg {
   width: 30px;
   height: 30px;
-  transform: scale(1.2);
+  transform: scale(1.28);
 }
 
 /* --------------------------------------------------- anuncio para lectores */

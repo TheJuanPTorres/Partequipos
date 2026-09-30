@@ -38,7 +38,9 @@ import estilos from "./hero.module.css";
  * - D13 (carrusel, versión «premium» pedida por dirección): fundido cruzado,
  *   Ken Burns, 7 s por diapositiva, texto que entra con fundido y línea de
  *   progreso en el punto activo. ux-9 no tiene carrusel en el hero.
- * - D15: el título, centrado en la tarjeta (en ux-9, pegado arriba).
+ * - D15: en las diapositivas SIN máquina recortada, el título va centrado en la
+ *   tarjeta (en ux-9, pegado arriba). CON máquina, la composición de ux-9: el
+ *   título arriba, en su posición medida, y la máquina debajo.
  *
  * EL TIEMPO LO MARCA LA LÍNEA DE PROGRESO: cuando su animación CSS termina,
  * pasa la diapositiva. Así la pausa (botón, ratón o foco dentro) detiene a la
@@ -203,6 +205,11 @@ export function HeroPortada({ diapositivas }: Props) {
   const estadoDe = (i: number) =>
     i === activo ? "activa" : i === saliente ? "saliente" : "oculta";
   const entra = cambiado ? ` ${estilos.entra}` : "";
+  const titulo = (
+    <h2 key={`titulo-${activo}`} id={idTitulo} className={`${estilos.titulo}${entra}`}>
+      {d.titulo}
+    </h2>
+  );
 
   return (
     <section
@@ -261,21 +268,26 @@ export function HeroPortada({ diapositivas }: Props) {
         </div>
 
         {/*
-         * HUECO DEL TÍTULO en el flujo: conserva el alto de la tarjeta de ux-9.
-         * El título se pinta en su capa, centrado (D15).
+         * TÍTULO EN <h2> (D1). CON máquina recortada va en el flujo, en la
+         * posición de ux-9 (esta fila conserva además el alto de la tarjeta);
+         * SIN ella, en su capa, centrado (D15).
          */}
-        <div className={estilos.filaTitulo} aria-hidden="true" />
-
-        {/* TÍTULO EN <h2> (D1), centrado en la tarjeta (D15). */}
         <div
-          className={`${estilos.capaTexto} ${estilos.capaParallax}`}
-          // Letras del título activo: el CSS encoge solo el que no cabe.
+          className={`${estilos.filaTitulo} ${estilos.capaParallax}`}
           style={{ ["--hero-titulo-letras" as string]: String(d.titulo.length) }}
         >
-          <h2 key={`titulo-${activo}`} id={idTitulo} className={`${estilos.titulo}${entra}`}>
-            {d.titulo}
-          </h2>
+          {d.frontal ? titulo : null}
         </div>
+
+        {d.frontal ? null : (
+          <div
+            className={`${estilos.capaTexto} ${estilos.capaParallax}`}
+            // Letras del título activo: el CSS encoge solo el que no cabe.
+            style={{ ["--hero-titulo-letras" as string]: String(d.titulo.length) }}
+          >
+            {titulo}
+          </div>
+        )}
 
         {/*
          * HUECO DE LA MÁQUINA. Mide siempre lo mismo, tenga o no la diapositiva

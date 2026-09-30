@@ -26,7 +26,7 @@
   --hero-fuente: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 
   /* --- Rojo de las flechas. Sistema: --primary #dc2626. Wordmark del CLI: #D92035. --- */
-  --hero-rojo: #e5242d;
+  --hero-rojo: var(--color-marca); /* kit: global `primary` (__globals__ de las flechas) */
 
   /* --- Radio. Sistema: --radius-4xl = 18,7 px (tope 24 px en tarjetas). --- */
   --hero-radio: 30px;
@@ -84,13 +84,14 @@
   --hero-texto-abajo: 22%;
 
   /* --- Velo sobre la foto (D14, ver `.marco::after`). --- */
+  /* Sobre el global `text` (#100F0F): el kit no tiene negro. */
   --hero-velo: linear-gradient(
     to bottom,
-    rgb(0 0 0 / 45%) 0%,
-    rgb(0 0 0 / 52%) 35%,
-    rgb(0 0 0 / 48%) 55%,
-    rgb(0 0 0 / 22%) 75%,
-    rgb(0 0 0 / 40%) 100%
+    color-mix(in srgb, var(--color-texto) 45%, transparent) 0%,
+    color-mix(in srgb, var(--color-texto) 52%, transparent) 35%,
+    color-mix(in srgb, var(--color-texto) 48%, transparent) 55%,
+    color-mix(in srgb, var(--color-texto) 22%, transparent) 75%,
+    color-mix(in srgb, var(--color-texto) 40%, transparent) 100%
   );
 
   /* --- Vidrio. NO coincide con los --glass-* del sistema: ver docs. --- */
@@ -100,7 +101,7 @@
    * blanco al 12 %. Con las fotos del cliente (cielos claros) el párrafo daba
    * 1,6–2,7:1; oscurecido, ≥ 5,9:1 en las cuatro (MEDIDO).
    */
-  --hero-vidrio-fondo: rgb(0 0 0 / 28%);
+  --hero-vidrio-fondo: color-mix(in srgb, var(--color-texto) 28%, transparent);
   --hero-vidrio-borde: 1px solid rgb(255 255 255 / 25%);
   --hero-vidrio-desenfoque: blur(18px);
   --hero-vidrio-sombra: 0 8px 32px rgb(0 0 0 / 8%);
@@ -445,15 +446,16 @@
   width: 8px;
   height: 8px;
   border-radius: 4px;
-  background: rgb(255 255 255 / 60%);
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 25%);
+  /* Globales del kit: blanco `099f28a` y `text`, con transparencia. */
+  background: color-mix(in srgb, var(--color-fondo) 60%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-texto) 25%, transparent);
   content: "";
   transition: width 0.3s ease;
 }
 
 .punto[aria-current="true"]::before {
   width: 28px;
-  background: rgb(255 255 255 / 35%);
+  background: color-mix(in srgb, var(--color-fondo) 35%, transparent);
 }
 
 /*
@@ -467,7 +469,7 @@
   width: 28px;
   height: 8px;
   border-radius: 4px;
-  background: #fff;
+  background: var(--color-fondo); /* kit: global `099f28a` */
   content: "";
   transform: scaleX(0);
   transform-origin: left center;
@@ -495,7 +497,7 @@
 .flechas .pausa:focus-visible,
 .flecha:focus-visible,
 .mas:focus-visible {
-  outline: 3px solid #fff;
+  outline: 3px solid var(--color-fondo);
   outline-offset: 3px;
 }
 
@@ -522,7 +524,7 @@
 
 .parrafo {
   margin: 0;
-  color: #fff;
+  color: var(--color-fondo); /* kit: `text_color` → global `099f28a` */
   font-size: var(--hero-parrafo-tam);
   font-weight: var(--hero-parrafo-peso);
   line-height: 1.4;
@@ -569,6 +571,7 @@
   will-change: transform;
 }
 
+.filaTitulo.capaParallax,
 .capaTexto.capaParallax {
   --hero-parallax: calc(var(--hero-parallax-base, 0) * var(--hero-parallax-titulo));
 }

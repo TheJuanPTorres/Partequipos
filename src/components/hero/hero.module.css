@@ -318,6 +318,15 @@
 
 .capaTexto .titulo {
   top: 0;
+  /*
+   * ALTO FIJO: el del bloque a tamaño completo. Un título que encoge para caber
+   * se centra dentro, así que la caja (y la máquina, que se mide con ella)
+   * queda en la misma y en todas las diapositivas.
+   */
+  display: flex;
+  min-height: calc(var(--hero-titulo-medio) * 2);
+  align-items: center;
+  justify-content: center;
 }
 
 /* ENTRADA DEL TEXTO: al cambiar de diapositiva (la primera se pinta quieta). */

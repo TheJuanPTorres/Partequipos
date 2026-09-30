@@ -364,11 +364,24 @@ export function HeroPortada({ diapositivas }: Props) {
         {/* VIDRIO: oculto en móvil por CSS, como en el diseño. */}
         {d.parrafo || d.enlace ? (
           <aside className={`${estilos.vidrio} ${estilos.capaParallax}`}>
-            {d.parrafo ? (
-              <p key={`parrafo-${activo}`} className={`${estilos.parrafo}${entra}`}>
-                {d.parrafo}
-              </p>
-            ) : null}
+            {/*
+             * TODOS los párrafos en la misma celda y solo el activo visible: el
+             * vidrio mide siempre lo del más largo y no cambia de alto al pasar
+             * (medido: un párrafo más largo movía el vidrio, CLS 0,009–0,018).
+             */}
+            <div className={estilos.textosVidrio}>
+              {diapositivas.map((s, i) =>
+                s.parrafo ? (
+                  <p
+                    key={i === activo ? `parrafo-${activo}` : `parrafo-quieto-${i}`}
+                    className={`${estilos.parrafo}${i === activo ? entra : ""}`}
+                    aria-hidden={i !== activo}
+                  >
+                    {s.parrafo}
+                  </p>
+                ) : null,
+              )}
+            </div>
             {d.enlace ? (
               <Link href={d.enlace.href} className={estilos.mas} aria-label={d.enlace.nombre}>
                 <IconCirclePlus aria-hidden="true" focusable="false" stroke={1.5} />

@@ -530,6 +530,20 @@
   backdrop-filter: var(--hero-vidrio-desenfoque);
 }
 
+/* Párrafos apilados en una celda: el vidrio mide lo del más largo. */
+.textosVidrio {
+  display: grid;
+  flex: 1;
+}
+
+.textosVidrio > .parrafo {
+  grid-area: 1 / 1;
+}
+
+.textosVidrio > .parrafo[aria-hidden="true"] {
+  visibility: hidden;
+}
+
 .parrafo {
   margin: 0;
   color: var(--color-fondo); /* kit: `text_color` → global `099f28a` */

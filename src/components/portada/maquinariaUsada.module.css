@@ -114,6 +114,21 @@
   height: var(--s3-espacio-maquina);
 }
 
+/*
+ * Sin máquina (sin imagen en la portada): ni solape ni reserva de 139 px. En
+ * escritorio el título arranca a la altura del antetítulo de la derecha (su
+ * relleno más su espacio); en columna, como con máquina.
+ */
+.espacioSinMaquina {
+  height: calc(var(--s3-espacio-der) + var(--s3-der-relleno));
+}
+
+@media (max-width: 1024px) {
+  .espacioSinMaquina {
+    height: var(--s3-espacio-maquina);
+  }
+}
+
 .espacioFinal {
   height: var(--s3-espacio-final);
 }
@@ -295,6 +310,11 @@
   gap: var(--s3-texto-hueco);
   min-width: 0;
   padding: var(--s3-texto-relleno);
+}
+
+/* Tarjeta sin foto: el texto ocupa todo su ancho, sin columna vacía. */
+.textoCol:only-child {
+  flex: 1 1 auto;
 }
 
 /*

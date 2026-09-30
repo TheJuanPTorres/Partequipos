@@ -38,8 +38,9 @@ const SIZES_TARJETA = "(max-width: 767px) 90vw, (max-width: 1024px) 150px, 230px
 function Tarjeta({ equipo, idNombre }: { equipo: TarjetaEquipo; idNombre: string }) {
   return (
     <article className={estilos.tarjeta} aria-labelledby={idNombre}>
-      <div className={estilos.imgCol}>
-        {equipo.imagen ? (
+      {/* Sin foto no se reserva su columna: el texto ocupa la tarjeta. */}
+      {equipo.imagen ? (
+        <div className={estilos.imgCol}>
           <Image
             src={equipo.imagen.url}
             alt={equipo.imagen.alt}
@@ -48,8 +49,8 @@ function Tarjeta({ equipo, idNombre }: { equipo: TarjetaEquipo; idNombre: string
             sizes={SIZES_TARJETA}
             className={estilos.img}
           />
-        ) : null}
-      </div>
+        </div>
+      ) : null}
       <div className={estilos.textoCol}>
         <h3 id={idNombre} className={estilos.nombre}>
           <span className={estilos.principal}>{equipo.principal}</span>
@@ -99,17 +100,22 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras }: P
   return (
     <section className={estilos.seccion} aria-labelledby="portada-usada-titulo">
       <div className={estilos.izq}>
+        {/* Sin máquina no se reserva su sitio: la columna arranca a la altura de la derecha. */}
         {maquina ? (
-          <Image
-            src={maquina.url}
-            alt=""
-            width={maquina.width}
-            height={maquina.height}
-            sizes="(max-width: 767px) 72vw, (max-width: 1024px) min(46vw, 368px), 45vw"
-            className={estilos.maquina}
-          />
-        ) : null}
-        <div className={estilos.espacioMaquina} />
+          <>
+            <Image
+              src={maquina.url}
+              alt=""
+              width={maquina.width}
+              height={maquina.height}
+              sizes="(max-width: 767px) 72vw, (max-width: 1024px) min(46vw, 368px), 45vw"
+              className={estilos.maquina}
+            />
+            <div className={estilos.espacioMaquina} />
+          </>
+        ) : (
+          <div className={estilos.espacioSinMaquina} />
+        )}
         <Revelado
           como="h2"
           texto="Marcas que Respaldan Nuestro Trabajo"

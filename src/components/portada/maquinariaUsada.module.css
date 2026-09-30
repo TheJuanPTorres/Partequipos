@@ -17,7 +17,13 @@
 
   /* Columna izquierda 45 %. Máquina que SUBE 140 px sobre la sección 2. */
   --s3-izq: 45%;
-  --s3-maquina-ancho: 100%;
+  /*
+   * Proporción de la máquina sobre su contenedor, que en ux-9 no pasa de
+   * 800 px (MEDIDO 2026-09-30: a 1010 el contenedor mide 800 de 980 y la
+   * imagen, el 46 % de 800 = 368 px). Por eso el factor multiplica
+   * `min(100%, 800px)` y no la columna.
+   */
+  --s3-maquina-factor: 1;
   --s3-maquina-solape: -140px;
   --s3-espacio-maquina: 139px;
   --s3-espacio-final: 93px;
@@ -66,7 +72,7 @@
 
 @media (max-width: 1024px) {
   .seccion {
-    --s3-maquina-ancho: 46%;
+    --s3-maquina-factor: 0.46;
     --s3-espacio-maquina: 1px;
     --s3-pestana-interlineado: 13px;
     --s3-boton-icono: 13px;
@@ -76,7 +82,7 @@
 
 @media (max-width: 767px) {
   .seccion {
-    --s3-maquina-ancho: 72%;
+    --s3-maquina-factor: 0.72;
     --s3-der: 100%;
   }
 }
@@ -99,7 +105,7 @@
 
 .maquina {
   display: block;
-  width: var(--s3-maquina-ancho);
+  width: calc(min(100%, 800px) * var(--s3-maquina-factor));
   height: auto;
   margin-top: var(--s3-maquina-solape);
 }

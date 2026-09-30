@@ -105,7 +105,7 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras }: P
             alt=""
             width={maquina.width}
             height={maquina.height}
-            sizes="(max-width: 767px) 72vw, (max-width: 1024px) 46vw, 45vw"
+            sizes="(max-width: 767px) 72vw, (max-width: 1024px) min(46vw, 368px), 45vw"
             className={estilos.maquina}
           />
         ) : null}

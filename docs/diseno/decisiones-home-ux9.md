@@ -1294,3 +1294,53 @@ LiuGong». Todo se edita en el panel.
    imágenes, y comprueba que el Blob responde 404.
 2. `npm run preview:sembrar`: vuelve a poner «Potencia Hitachi» la primera.
 3. Redesplegar el preview.
+
+### 15.5 Verificación y LCP (2026-09-30)
+
+**Pintado**, en el despliegue de la demo `partequipos-20jdd8edg` (commit
+`f9c461f`), a 1440, 1010 y 390:
+
+- Las 4 diapositivas se ven y el pase cambia cada ~5 s.
+- El deslizamiento, las flechas, los puntos y el teclado funcionan, y a 390
+  también el gesto.
+- La pausa deja el carrusel quieto 7 s. Con movimiento reducido no hay pase y
+  el botón ofrece «Reproducir».
+- Un solo `h1` y sin scroll horizontal.
+- **CLS:** 0 a 1010 y 390; 0,0034 a 1440.
+- **Cascada:** solo se pide el primer fondo antes del LCP. El segundo, después
+  (1904 ms frente a 1592 a 1440; 397 frente a 360 a 1010; 417 frente a 352 a
+  390).
+- Capturas en `Desktop\partequipos-cierre\capturas-hero-demo\`.
+
+**Un falso negativo del instrumento, anotado:** en Chrome sin interfaz el
+párrafo del vidrio sale **vacío** en las capturas. La animación de las
+palabras dentro de un elemento con `backdrop-filter` no se repinta, aunque el
+estilo calculado diga que terminó. En Chrome con interfaz **se ve**, también
+al cambiar de diapositiva (comprobado a mano).
+
+**LCP: 9 + 9 corridas alternadas**, con el método de CLAUDE.md §10.3 p.14,
+contra el código de `main` (preview `partequipos-7jdioum0m`, commit `9c9018a`,
+mismo árbol que `main`):
+
+| Variante                    | LCP mediana (mín.–máx.) | Imagen del LCP (móvil, `w=1920`, WebP q75) |
+| --------------------------- | ----------------------- | ------------------------------------------ |
+| `main` («Potencia Hitachi») | 2,58 s (2,23–4,01)      | `Fondo.jpg` de ux-9: **157 kB**            |
+| Demo («Fuerza Hitachi»)     | **4,00 s** (3,63–4,32)  | ZX245USLC-6 del cliente: **419 kB**        |
+
+**Supera los 2,44 s** y también el umbral de parada de 2,54 s. **No afecta a
+la demo**, que es en el preview, pero **esta rama no se puede fusionar así.**
+
+**Causa, medida:** el peso de la foto. En móvil el fondo se pide a 1920 px,
+porque la tarjeta la recorta por la altura (`sizesFondoHero`). Las fotos del
+cliente, con mucho detalle, pesan 346–424 kB a ese ancho, frente a los 157 kB
+de la de ux-9. Con la red simulada (~1,6 Mb/s), los 262 kB de más son ~1,3 s:
+casi toda la diferencia.
+
+**Opciones, para dirección:**
+
+1. **Calidad 60: no basta.** Quita ~57 kB por foto, unos 0,3 s.
+2. **Recorte propio para móvil** (`<picture>` con una versión vertical de cada
+   foto): el móvil pediría ~720 px en vez de 1920. Es la palanca grande, pero
+   exige un campo nuevo en Payload (con su migración, así que primero los
+   guardarraíles de §10.33 p.5) o recortar a mano.
+3. **Primera diapositiva con una foto más ligera**, o preparada a propósito.

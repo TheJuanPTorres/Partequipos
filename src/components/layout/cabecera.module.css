@@ -59,9 +59,12 @@
 
 /*
  * Portada al bajar: el velo #FFFFFF45 con el desenfoque de Andrés, MEDIDO en
- * ux-9 pintado: `blur(20px) saturate(1.8)`. VALORES LITERALES a propósito: con
- * `var()`, el compilador de CSS eliminaba las dos propiedades del resultado
- * (comprobado en producción el 2026-09-24: el velo sin desenfoque).
+ * ux-9 pintado: `blur(20px) saturate(1.8)`.
+ *
+ * EL ORDEN IMPORTA, no `var()` (CLAUDE.md §10.35): si `backdrop-filter` va
+ * ANTES que `-webkit-backdrop-filter`, lightningcss las fusiona y se queda con
+ * la última, la prefijada, que Chrome no aplica (así se perdió el velo el
+ * 2026-09-24). La variante `-webkit-` va SIEMPRE primero.
  */
 .cabecera[data-modo="velo"] {
   background: var(--cab-velo);

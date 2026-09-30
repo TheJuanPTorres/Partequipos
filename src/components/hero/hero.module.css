@@ -89,7 +89,14 @@
   --hero-maquina-aire: 16px;
   --hero-maquina-izquierda: var(--hero-relleno);
   --hero-maquina-derecha: calc(var(--hero-vidrio-derecha) + var(--hero-vidrio-ancho) + 16px);
-  --hero-maquina-abajo: 96px;
+  /*
+   * Abajo: por encima de flechas y puntos más el aire. La fila NO va pegada al
+   * borde: el contenido se centra en la tarjeta, así que su sitio depende del
+   * alto. Controles desde abajo = relleno + (alto − contenido) / 2 + 72 px;
+   * con el contenido de escritorio (719 px + 20 de relleno) sale 50 % − 287,5,
+   * y con 16 de aire, 50 % − 271,5. MEDIDO: coincide a 1025–1920.
+   */
+  --hero-maquina-abajo: calc(50% - 271.5px);
 
   /* --- Velo sobre la foto (D14, ver `.marco::after`). --- */
   /* Sobre el global `text` (#100F0F): el kit no tiene negro. */
@@ -671,7 +678,8 @@
     --hero-imagen-ancho: 631px;
     --hero-relleno: 50px 30px 30px;
     --hero-maquina-izquierda: 30px;
-    --hero-maquina-abajo: 116px;
+    /* Tablet: contenido 522 px + 80 de relleno → 50 % − 199 + 16 de aire. */
+    --hero-maquina-abajo: calc(50% - 183px);
     /*
      * DESVIACIÓN NUESTRA, DECIDIDA (2026-09-23) — el vidrio va DENTRO.
      *
@@ -700,7 +708,8 @@
     --hero-titulo-medio: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado));
     /* Sin vidrio en móvil: la máquina usa todo el ancho. */
     --hero-maquina-derecha: var(--hero-maquina-izquierda);
-    --hero-maquina-abajo: 80px;
+    /* Móvil: la fila va abajo (space-between): 30 + 62 + 16 de aire. */
+    --hero-maquina-abajo: 108px;
     --hero-alto-min: 85vh;
     --hero-imagen-margen-arriba: 200px;
     --hero-parrafo-tam: 13px;

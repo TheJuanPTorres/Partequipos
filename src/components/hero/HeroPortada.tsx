@@ -9,12 +9,12 @@ import {
   useId,
   useRef,
   useState,
+  type AnimationEvent,
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
 
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
-import { Revelado } from "@/components/movimiento/Revelado";
 import { useMovimientoReducido, usePausa } from "@/components/movimiento/useMovimiento";
 import { sizesFondoHero, type DiapositivaHero } from "@/lib/portada/hero";
 
@@ -28,35 +28,33 @@ import estilos from "./hero.module.css";
  * prerenderiza igual: el título y el párrafo de la primera diapositiva están
  * en el HTML inicial.
  *
- * NO HAY VALORES DE DISEÑO EN ESTE FICHERO: viven en `hero.module.css`.
+ * NO HAY VALORES DE DISEÑO EN ESTE FICHERO: tiempos y curvas viven en
+ * `hero.module.css`.
  *
  * Lo que se aparta de ux-9, todo documentado en docs/diseno/decisiones-home-ux9.md:
  * - D1: el título va en `<h2>`; el `<h1>` de la portada es el logo.
  * - D3: el vidrio no sale de la tarjeta por debajo de 1024 px.
  * - D4: las flechas son botones que funcionan; con una diapositiva no se pintan.
- * - D13 (carrusel): ux-9 no tiene carrusel en el hero; se copia el de su
- *   sección 2 (Swiper, MEDIDO): pase cada 5 s, deslizamiento de 500 ms, bucle,
- *   flechas, puntos y gesto, y se detiene al interactuar. Además: botón de
- *   pausa (WCAG 2.2.2), espera mientras el foco está dentro, y sin pase
- *   automático con movimiento reducido (empieza en pausa, D2). Como en ux-9
- *   pintado, el ratón encima NO lo pausa: el hero ocupa casi toda la pantalla.
+ * - D13 (carrusel, versión «premium» pedida por dirección): fundido cruzado,
+ *   Ken Burns, 7 s por diapositiva, texto que entra con fundido y línea de
+ *   progreso en el punto activo. ux-9 no tiene carrusel en el hero.
+ * - D15: el título, centrado en la tarjeta (en ux-9, pegado arriba).
  *
- * REVELADO SIN PARPADEO: título y párrafo usan `Revelado` con `alCargar`, que
- * anima por CSS desde el primer pintado.
+ * EL TIEMPO LO MARCA LA LÍNEA DE PROGRESO: cuando su animación CSS termina,
+ * pasa la diapositiva. Así la pausa (botón, ratón o foco dentro) detiene a la
+ * vez la línea, el Ken Burns y el pase, sin dos relojes que se desincronicen.
  *
- * CARGA DE IMÁGENES: el fondo de la primera diapositiva es el LCP y es la única
- * que se precarga. Las demás NO se pintan en el HTML: se añaden después del
- * evento `load` de la página, cuando el navegador está libre, y siempre la
- * siguiente a la activa, para que el deslizamiento no enseñe un hueco.
+ * CARGA DE IMÁGENES: el fondo de la primera diapositiva es el LCP y es el único
+ * que se precarga. Los demás NO están en el HTML: se añaden desde código cuando
+ * la primera foto ha terminado de cargar, y siempre la siguiente a la activa.
  */
 
 type Props = { diapositivas: DiapositivaHero[] };
 
-/** Ritmo MEDIDO en el carrusel de ux-9 (Swiper: `autoplay.delay`, `speed`). */
-const PASE_MS = 5000;
-const DESLIZAMIENTO_MS = 500;
 /** Desplazamiento mínimo del dedo para contar como gesto, en px. */
 const GESTO_PX = 50;
+/** Lo que dura el fundido (`--hero-fundido` en el CSS), para soltar la saliente. */
+const FUNDIDO_MS = 1200;
 
 function IconoFlecha({ hacia }: { hacia: "anterior" | "siguiente" }) {
   return (
@@ -74,20 +72,21 @@ function IconoFlecha({ hacia }: { hacia: "anterior" | "siguiente" }) {
 
 export function HeroPortada({ diapositivas }: Props) {
   const [activo, setActivo] = useState(0);
-  /** Diapositiva que sale y sentido del paso, mientras dura el deslizamiento. */
-  const [saliente, setSaliente] = useState<{ indice: number; sentido: 1 | -1 } | null>(null);
+  /** La que se va: sigue opaca DEBAJO mientras la nueva aparece encima. */
+  const [saliente, setSaliente] = useState<number | null>(null);
+  /** Hubo ya un cambio: el texto de la primera se pinta sin animación. */
+  const [cambiado, setCambiado] = useState(false);
   /** Fondos que ya pueden pintarse. Al cargar, solo el primero (el LCP). */
   const [cargadas, setCargadas] = useState<ReadonlySet<number>>(() => new Set([0]));
-  /** Foco dentro: el pase espera (no cuenta como pausa del usuario). */
+  /** Ratón o foco dentro: el pase espera (no cuenta como pausa del usuario). */
   const [dentro, setDentro] = useState(false);
   /*
    * El anuncio solo se escribe DESPUÉS de una acción del usuario: con texto
    * desde el principio, el lector lo leería al cargar, y el título ya está.
-   * Con el pase automático no se anuncia nada: sería un anuncio cada 5 s.
+   * Con el pase automático no se anuncia nada: sería un anuncio cada 7 s.
    */
   const [anuncio, setAnuncio] = useState("");
   const raiz = useRef<HTMLElement>(null);
-  const capas = useRef<(HTMLDivElement | null)[]>([]);
   const gesto = useRef<{ x: number; y: number } | null>(null);
   const idTitulo = useId();
   const reducido = useMovimientoReducido();
@@ -106,14 +105,15 @@ export function HeroPortada({ diapositivas }: Props) {
   }, []);
 
   const ir = useCallback(
-    (destino: number, sentido: 1 | -1, porUsuario: boolean) => {
+    (destino: number, porUsuario: boolean) => {
       const siguiente = (destino + total) % total;
       if (siguiente === activo) return;
       cargar(siguiente, (siguiente + 1) % total);
-      setSaliente({ indice: activo, sentido });
+      setSaliente(activo);
       setActivo(siguiente);
+      setCambiado(true);
       if (porUsuario) {
-        // Como Swiper con `disableOnInteraction`: quien toca, toma el control.
+        // Quien toca, toma el control: el pase se detiene (como Swiper en ux-9).
         pausar();
         setAnuncio(`Diapositiva ${siguiente + 1} de ${total}: ${diapositivas[siguiente]!.titulo}`);
       }
@@ -121,7 +121,7 @@ export function HeroPortada({ diapositivas }: Props) {
     [activo, cargar, diapositivas, pausar, total],
   );
 
-  const mover = (paso: 1 | -1) => ir(activo + paso, paso, true);
+  const mover = (paso: 1 | -1) => ir(activo + paso, true);
 
   const alPulsar = (e: KeyboardEvent<HTMLElement>) => {
     if (!hayVarias) return;
@@ -134,66 +134,27 @@ export function HeroPortada({ diapositivas }: Props) {
     }
   };
 
-  /*
-   * PRECARGA DIFERIDA: la siguiente diapositiva, solo cuando la página ya ha
-   * cargado (el LCP ya se pintó) y el navegador está libre.
-   */
+  /* La saliente se suelta cuando el fundido ha terminado. */
   useEffect(() => {
+    if (saliente === null) return;
+    const t = window.setTimeout(() => setSaliente(null), reducido ? 0 : FUNDIDO_MS);
+    return () => window.clearTimeout(t);
+  }, [reducido, saliente]);
+
+  /*
+   * PRECARGA DIFERIDA: la segunda foto, solo cuando la primera ha terminado de
+   * cargar (el LCP ya se pintó) y el navegador está libre.
+   */
+  const alCargarPrimera = useCallback(() => {
     if (!hayVarias) return;
-    let idle = 0;
-    const tras = () => {
-      const ric = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 200));
-      idle = ric(() => cargar(1 % total));
-    };
-    if (document.readyState === "complete") tras();
-    else addEventListener("load", tras, { once: true });
-    return () => {
-      removeEventListener("load", tras);
-      (window.cancelIdleCallback ?? clearTimeout)(idle);
-    };
+    const ric = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 200));
+    ric(() => cargar(1 % total));
   }, [cargar, hayVarias, total]);
 
-  /* PASE AUTOMÁTICO: 5 s por diapositiva; se reinicia en cada cambio. */
-  useEffect(() => {
-    if (!hayVarias || pausado || dentro) return;
-    const t = window.setTimeout(() => ir(activo + 1, 1, false), PASE_MS);
-    return () => window.clearTimeout(t);
-  }, [activo, dentro, hayVarias, ir, pausado]);
-
-  /*
-   * DESLIZAMIENTO: la que entra viene del lado del paso y la que sale se va
-   * por el contrario, a la vez. Con movimiento reducido, el cambio es seco.
-   */
-  useEffect(() => {
-    if (!saliente) return;
-    const entra = capas.current[activo];
-    const sale = capas.current[saliente.indice];
-    if (reducido || !entra || !sale || typeof entra.animate !== "function") {
-      setSaliente(null);
-      return;
-    }
-    const opciones: KeyframeAnimationOptions = { duration: DESLIZAMIENTO_MS, easing: "ease" };
-    const desde = `${saliente.sentido * 100}%`;
-    const hasta = `${saliente.sentido * -100}%`;
-    const a = entra.animate(
-      [{ transform: `translateX(${desde})` }, { transform: "translateX(0)" }],
-      opciones,
-    );
-    const b = sale.animate(
-      [{ transform: "translateX(0)" }, { transform: `translateX(${hasta})` }],
-      opciones,
-    );
-    let vivo = true;
-    b.finished.then(
-      () => vivo && setSaliente(null),
-      () => undefined,
-    );
-    return () => {
-      vivo = false;
-      a.cancel();
-      b.cancel();
-    };
-  }, [activo, reducido, saliente]);
+  /* Fin de la línea de progreso del punto activo: pasa a la siguiente. */
+  const alTerminarProgreso = (e: AnimationEvent<HTMLElement>) => {
+    if (e.animationName.includes("progreso")) ir(activo + 1, false);
+  };
 
   /*
    * PARALLAX. Un listener pasivo con rAF que escribe el avance en una variable
@@ -239,13 +200,21 @@ export function HeroPortada({ diapositivas }: Props) {
 
   if (!d) return null;
 
+  const estadoDe = (i: number) =>
+    i === activo ? "activa" : i === saliente ? "saliente" : "oculta";
+  const entra = cambiado ? ` ${estilos.entra}` : "";
+
   return (
     <section
       ref={raiz}
       className={estilos.hero}
       aria-roledescription={hayVarias ? "carrusel" : undefined}
       aria-labelledby={idTitulo}
+      // Todo lo que se mueve solo se detiene aquí: línea, Ken Burns y pase.
+      data-pausado={pausado || dentro ? "" : undefined}
       onKeyDown={alPulsar}
+      onMouseEnter={() => setDentro(true)}
+      onMouseLeave={() => setDentro(false)}
       onFocus={() => setDentro(true)}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDentro(false);
@@ -259,18 +228,14 @@ export function HeroPortada({ diapositivas }: Props) {
       >
         {/* El marco recorta los fondos con el radio; el vidrio queda fuera. */}
         <div className={estilos.marco}>
-          {diapositivas.map((s, i) => (
-            <div
-              key={`${s.fondo.url}-${i}`}
-              ref={(el) => {
-                capas.current[i] = el;
-              }}
-              className={estilos.capaFondo}
-              // La que sale sigue visible mientras se desliza, por debajo.
-              hidden={i !== activo && i !== saliente?.indice}
-              data-saliente={i === saliente?.indice ? "" : undefined}
-            >
-              {cargadas.has(i) ? (
+          {diapositivas.map((s, i) =>
+            cargadas.has(i) ? (
+              <div
+                key={`${s.fondo.url}-${i}`}
+                className={estilos.capaFondo}
+                data-estado={estadoDe(i)}
+                aria-hidden={i !== activo}
+              >
                 <Image
                   src={s.fondo.url}
                   alt=""
@@ -280,38 +245,36 @@ export function HeroPortada({ diapositivas }: Props) {
                   /*
                    * SOLO la primera: es el LCP. `preload` y no `priority` (obsoleto
                    * en Next 16.3.5); `fetchPriority` para que vaya por delante.
-                   * Las demás no existen en el HTML hasta después del `load`.
+                   * Las demás no existen en el HTML hasta que carga la primera.
                    */
                   preload={i === 0}
                   fetchPriority={i === 0 ? "high" : "low"}
                   loading="eager"
+                  onLoad={i === 0 ? alCargarPrimera : undefined}
                   className={estilos.fondo}
-                  // Punto focal del panel: qué parte de la foto se ve.
-                  style={{ objectPosition: s.fondo.posicion }}
+                  // Punto focal del panel: qué parte se ve, y desde dónde crece el Ken Burns.
+                  style={{ objectPosition: s.fondo.posicion, transformOrigin: s.fondo.posicion }}
                 />
-              ) : null}
-            </div>
-          ))}
+              </div>
+            ) : null,
+          )}
         </div>
 
         {/*
-         * TÍTULO EN <h2> (D1). Solo el de la diapositiva activa: al cambiar, el
-         * `key` monta uno nuevo y la animación vuelve a correr.
+         * HUECO DEL TÍTULO en el flujo: conserva el alto de la tarjeta de ux-9.
+         * El título se pinta en su capa, centrado (D15).
          */}
+        <div className={estilos.filaTitulo} aria-hidden="true" />
+
+        {/* TÍTULO EN <h2> (D1), centrado en la tarjeta (D15). */}
         <div
-          className={`${estilos.filaTitulo} ${estilos.capaParallax}`}
+          className={`${estilos.capaTexto} ${estilos.capaParallax}`}
           // Letras del título activo: el CSS encoge solo el que no cabe.
           style={{ ["--hero-titulo-letras" as string]: String(d.titulo.length) }}
         >
-          <Revelado
-            key={`titulo-${activo}`}
-            id={idTitulo}
-            como="h2"
-            ritmo="portada"
-            alCargar
-            texto={d.titulo}
-            className={estilos.titulo}
-          />
+          <h2 key={`titulo-${activo}`} id={idTitulo} className={`${estilos.titulo}${entra}`}>
+            {d.titulo}
+          </h2>
         </div>
 
         {/*
@@ -373,7 +336,8 @@ export function HeroPortada({ diapositivas }: Props) {
                     <button
                       type="button"
                       className={estilos.punto}
-                      onClick={() => ir(i, i > activo ? 1 : -1, true)}
+                      onClick={() => ir(i, true)}
+                      onAnimationEnd={i === activo ? alTerminarProgreso : undefined}
                       aria-label={`Diapositiva ${i + 1} de ${total}: ${s.titulo}`}
                       aria-current={i === activo ? "true" : undefined}
                       aria-controls={idTitulo}
@@ -389,14 +353,9 @@ export function HeroPortada({ diapositivas }: Props) {
         {d.parrafo || d.enlace ? (
           <aside className={`${estilos.vidrio} ${estilos.capaParallax}`}>
             {d.parrafo ? (
-              <Revelado
-                key={`parrafo-${activo}`}
-                como="p"
-                ritmo="titulo"
-                alCargar
-                texto={d.parrafo}
-                className={estilos.parrafo}
-              />
+              <p key={`parrafo-${activo}`} className={`${estilos.parrafo}${entra}`}>
+                {d.parrafo}
+              </p>
             ) : null}
             {d.enlace ? (
               <Link href={d.enlace.href} className={estilos.mas} aria-label={d.enlace.nombre}>

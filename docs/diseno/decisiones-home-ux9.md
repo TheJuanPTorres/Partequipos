@@ -1344,3 +1344,44 @@ casi toda la diferencia.
    exige un campo nuevo en Payload (con su migración, así que primero los
    guardarraíles de §10.33 p.5) o recortar a mano.
 3. **Primera diapositiva con una foto más ligera**, o preparada a propósito.
+
+## 16. Carrusel «premium» (2026-09-30, a petición de dirección)
+
+Rama `feat/hero-premium`, PR #7. Sustituye el deslizamiento de §15 por:
+
+| Qué                 | Cómo                                                                                                                                     |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Transición          | **Fundido cruzado** de 1,2 s, `cubic-bezier(0.4, 0, 0.2, 1)`. La que entra aparece encima y la que sale sigue opaca debajo: sin parpadeo |
+| Ken Burns           | La foto activa pasa de escala 1,00 a 1,06 durante su permanencia (7 s + 1,2 s del fundido), solo `transform`, desde el punto focal       |
+| Intervalo           | **7 s**, marcados por la **línea de progreso** del punto activo: cuando su animación termina, pasa la diapositiva                        |
+| Texto               | Título y párrafo entran con un fundido de 600 ms y suben 12 px, 300 ms después del cambio (la primera, quieta)                           |
+| Pausa               | Botón, ratón encima o foco dentro detienen a la vez la línea, el Ken Burns y el pase                                                     |
+| Movimiento reducido | Sin Ken Burns, sin fundido, texto quieto y sin pase automático                                                                           |
+| Carga               | Las fotos 2 y siguientes se añaden desde código **cuando la primera ha terminado de cargar**                                             |
+
+**D15 — posición del título, PENDIENTE DE ANDRÉS.** A petición de dirección,
+el título va centrado en la tarjeta, algo por encima del centro. Mínimo arriba:
+64 px en escritorio y 40 en móvil. En ux-9 va pegado arriba. La tarjeta
+conserva su alto: el hueco del título sigue en el flujo.
+
+**El velo (D14) se oscurece en la franja central**, porque ahí va ahora el
+título. Con el degradado anterior el título quedaba en 2,2–2,7:1 en cuatro
+casos. Con el nuevo, **≥ 4,0:1 (p10) en las cuatro diapositivas** a 1440, 1010
+y 390, y el párrafo ≥ 5,8:1.
+
+**Verificado pintado en el preview** (`partequipos-rfgpq54mi`), a 1440, 1010 y
+390:
+
+| Qué                  | Resultado                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| Fundido              | La entrante llega a 1 en ~1,17 s; la saliente, opaca debajo en todos los fotogramas |
+| Texto                | Empieza a ~370 ms y está completo a ~840 ms                                         |
+| Intervalos           | 7,00–7,04 s                                                                         |
+| Ken Burns            | 1,000 → 1,037 en 5 s; nunca por debajo de 1                                         |
+| Tilde de «PRECISIÓN» | Dentro de la tarjeta: letras a 194 (1440), 269 (1010) y 276 px (390) del borde      |
+| Pausa                | Con el botón y con el ratón: quieto 9 s, línea detenida                             |
+| Gesto y reducido     | Gesto en móvil correcto; con movimiento reducido, sin pase ni Ken Burns             |
+| Estabilidad y página | CLS 0, sin scroll horizontal, un solo `h1`                                          |
+| Cascada              | La 2.ª foto se pide después del LCP y de acabar la 1.ª                              |
+
+Fotogramas de una transición: `Desktop\partequipos-cierre\capturas-premium\transicion-*.png`.

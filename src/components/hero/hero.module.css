@@ -62,12 +62,34 @@
   --hero-flecha-fondo: rgb(255 255 255 / 58%);
   --hero-flechas-margen-abajo: 20px;
 
+  /*
+   * --- Carrusel «premium» (D13, pedido por dirección el 2026-09-30) ---
+   * 7 s por diapositiva; fundido cruzado de 1,2 s; Ken Burns de 1,00 a 1,06
+   * durante toda la permanencia; el texto entra 300 ms después con un fundido
+   * de 600 ms que sube 12 px.
+   */
+  --hero-pase: 7s;
+  --hero-fundido: 1.2s;
+  --hero-curva: cubic-bezier(0.4, 0, 0.2, 1);
+  --hero-ken-burns: 1.06;
+  --hero-texto-entrada: 600ms;
+  --hero-texto-retraso: 300ms;
+  --hero-texto-subida: 12px;
+  /*
+   * --- Posición del título (D15, dirección; PENDIENTE DE ANDRÉS) ---
+   * Centrado en la tarjeta, un poco por encima del centro: el hueco de abajo
+   * es mayor que el de arriba. Arriba, al menos 64 px (40 en móvil).
+   */
+  --hero-texto-arriba: 64px;
+  --hero-texto-abajo: 22%;
+
   /* --- Velo sobre la foto (D14, ver `.marco::after`). --- */
   --hero-velo: linear-gradient(
     to bottom,
-    rgb(0 0 0 / 55%) 0%,
-    rgb(0 0 0 / 40%) 38%,
-    rgb(0 0 0 / 15%) 62%,
+    rgb(0 0 0 / 45%) 0%,
+    rgb(0 0 0 / 52%) 35%,
+    rgb(0 0 0 / 48%) 55%,
+    rgb(0 0 0 / 22%) 75%,
     rgb(0 0 0 / 40%) 100%
   );
 
@@ -153,7 +175,26 @@
 
 .capaFondo {
   position: absolute;
+  z-index: 0;
   inset: 0;
+  opacity: 0;
+  transition: opacity var(--hero-fundido) var(--hero-curva);
+}
+
+/*
+ * FUNDIDO SIN PARPADEO: la que entra aparece ENCIMA, y la que sale sigue opaca
+ * DEBAJO hasta el final. Si las dos se fundieran a la vez, a mitad se vería el
+ * fondo de la página a través de ambas.
+ */
+.capaFondo[data-estado="activa"] {
+  z-index: 2;
+  opacity: 1;
+}
+
+.capaFondo[data-estado="saliente"] {
+  z-index: 1;
+  opacity: 1;
+  transition: none;
 }
 
 .fondo {
@@ -162,15 +203,40 @@
 }
 
 /*
+ * KEN BURNS: solo `transform`, desde el punto focal (lo pone el componente).
+ * Dura la permanencia más el fundido de salida, así no se detiene mientras se
+ * va. Solo crece desde 1, así que nunca asoma un borde vacío.
+ */
+.capaFondo[data-estado="activa"] .fondo,
+.capaFondo[data-estado="saliente"] .fondo {
+  animation: kenBurns calc(var(--hero-pase) + var(--hero-fundido)) linear forwards;
+}
+
+.hero[data-pausado] .fondo {
+  animation-play-state: paused;
+}
+
+@keyframes kenBurns {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(var(--hero-ken-burns));
+  }
+}
+
+/*
  * VELO SOBRE LA FOTO — DESVIACIÓN D14 (2026-09-30), PENDIENTE DE APROBACIÓN
  * DE ANDRÉS. ux-9 no lo tiene: su foto es oscura. Las del cliente tienen
  * cielos claros detrás del título blanco, y sin velo daban 1,0–1,4:1 (MEDIDO
- * bajo los píxeles de las letras). Con este degradado, ≥ 4:1 (p10) en las
- * cuatro a 1010 y 390; más oscuro arriba (título) y abajo (vidrio y
- * controles). Por encima de las capas: el marco lo pinta después de ellas.
+ * bajo los píxeles de las letras). Desde que el título va centrado (D15), el
+ * degradado es más oscuro en la franja central: ≥ 4:1 (p10) en las cuatro a
+ * 1440, 1010 y 390, y abajo sigue oscuro para el vidrio y los controles. Por encima de las capas: el marco lo pinta después de ellas.
  */
 .marco::after {
   position: absolute;
+  z-index: 3;
   inset: 0;
   background: var(--hero-velo);
   content: "";
@@ -224,6 +290,42 @@
   /* MAYÚSCULAS SOLO POR CSS: en el HTML el texto va en caso normal. */
   text-transform: uppercase;
   text-align: center;
+}
+
+/*
+ * CAPA DEL TEXTO (D15): el título, centrado en la tarjeta con un sesgo hacia
+ * arriba. No recibe clics: los controles quedan por encima de todos modos.
+ */
+.capaTexto {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  inset: 0;
+  padding: var(--hero-texto-arriba) 20px var(--hero-texto-abajo);
+  pointer-events: none;
+}
+
+.capaTexto .titulo {
+  top: 0;
+}
+
+/* ENTRADA DEL TEXTO: al cambiar de diapositiva (la primera se pinta quieta). */
+.entra {
+  animation: textoEntra var(--hero-texto-entrada) var(--hero-curva) var(--hero-texto-retraso) both;
+}
+
+@keyframes textoEntra {
+  from {
+    opacity: 0;
+    transform: translateY(var(--hero-texto-subida));
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* -------------------------------------------------------- hueco de la máquina */
@@ -327,8 +429,10 @@
 }
 
 .punto {
+  position: relative;
   display: grid;
-  width: 24px;
+  /* 32 px para todos: el activo es más largo y nada se mueve al cambiar. */
+  width: 32px;
   height: 24px;
   place-items: center;
   padding: 0;
@@ -348,8 +452,36 @@
 }
 
 .punto[aria-current="true"]::before {
-  width: 20px;
+  width: 28px;
+  background: rgb(255 255 255 / 35%);
+}
+
+/*
+ * LÍNEA DE PROGRESO del activo: se llena en `--hero-pase`. Su final es lo que
+ * pasa la diapositiva (lo escucha el componente), así que se para con la pausa.
+ */
+.punto[aria-current="true"]::after {
+  position: absolute;
+  top: calc(50% - 4px);
+  left: calc(50% - 14px);
+  width: 28px;
+  height: 8px;
+  border-radius: 4px;
   background: #fff;
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: progreso var(--hero-pase) linear forwards;
+}
+
+.hero[data-pausado] .punto::after {
+  animation-play-state: paused;
+}
+
+@keyframes progreso {
+  to {
+    transform: scaleX(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -437,7 +569,7 @@
   will-change: transform;
 }
 
-.filaTitulo.capaParallax {
+.capaTexto.capaParallax {
   --hero-parallax: calc(var(--hero-parallax-base, 0) * var(--hero-parallax-titulo));
 }
 
@@ -453,6 +585,18 @@
 @media (prefers-reduced-motion: reduce) {
   .capaParallax {
     transform: none;
+  }
+
+  /* Sin Ken Burns, cambio seco y texto quieto. La línea sigue: solo marca el
+     tiempo, y sin pase automático (empieza en pausa) está quieta. */
+  .fondo,
+  .capaFondo[data-estado] .fondo,
+  .entra {
+    animation: none;
+  }
+
+  .capaFondo {
+    transition: none;
   }
 }
 
@@ -488,6 +632,7 @@
   .hero {
     --hero-titulo-tam: 12vw;
     --hero-titulo-ajuste: 25px;
+    --hero-texto-arriba: 40px;
     --hero-alto-min: 85vh;
     --hero-imagen-margen-arriba: 200px;
     --hero-parrafo-tam: 13px;

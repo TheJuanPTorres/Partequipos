@@ -866,6 +866,12 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
   cambio, con Andrés.
 - **Pendiente de Andrés:** el velo sobre la foto y el vidrio oscurecido (D14),
   y la tilde de «PRECISIÓN», que a ≥ 1025 px sale por encima de la tarjeta.
+- **Carrusel «premium» (2026-09-30, PR #7, a petición de dirección):** fundido
+  cruzado, Ken Burns, 7 s por diapositiva y línea de progreso. **La posición
+  del título se aparta de ux-9 a petición de dirección (D15, pendiente de
+  Andrés):** va centrado en la tarjeta, algo por encima del centro, en vez de
+  pegado arriba; con eso la tilde de «PRECISIÓN» queda dentro de la tarjeta
+  en todos los cortes. Detalle en `decisiones-home-ux9.md` §16.
 - **CASE sin diapositiva:** no se descargaron sus fotos (580SV, SR240B).
 - **Fotos del cliente:** derecho de uso confirmado (§10.0.1); en producción,
   cargadas por dirección desde el panel.

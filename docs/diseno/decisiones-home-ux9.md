@@ -1385,3 +1385,70 @@ y 390, y el párrafo ≥ 5,8:1.
 | Cascada              | La 2.ª foto se pide después del LCP y de acabar la 1.ª                              |
 
 Fotogramas de una transición: `Desktop\partequipos-cierre\capturas-premium\transicion-*.png`.
+
+### 16.1 Ajustes (2026-09-30, PR #8)
+
+**Título frente a la máquina recortada.**
+
+- **Con imagen frontal:** composición de ux-9. El título va en el flujo, en su
+  posición medida (letras a 13 px del borde a 1440), y la máquina, debajo.
+- **Sin imagen frontal:** el título centrado de §16 (D15).
+- **Solape medido con máscaras** (letras en magenta, máquina como silueta),
+  con la diapositiva de prueba «Potencia Hitachi», sembrada en el preview solo
+  para esto y retirada después:
+
+  | Ancho | ux-9 tal cual                 | Con la máquina bajada             |
+  | ----- | ----------------------------- | --------------------------------- |
+  | 1440  | El brazo pisa las letras 3 px | Bajada 16 px: 0 px, 13 px de aire |
+  | 1010  | 18 px                         | Bajada 30 px: 0 px, 12 px de aire |
+  | 390   | 0 px, 89 px de aire           | Sin bajada                        |
+
+  La bajada es solo `transform`, así que la tarjeta no cambia de alto.
+
+- **Límite del instrumento:**
+  - De las lecturas alineadas a la tarjeta, 2 de cada 3 dan 0 px. La tercera
+    sale con la silueta desplazada unos 52 px, sin que la página cambie.
+  - Las capturas normales confirman el aire (`solape-*.png`).
+
+**CLS que apareció con la diapositiva de prueba, corregido.** El vidrio
+cambiaba de alto entre diapositivas por dos causas: un párrafo más largo y un
+«+» que solo tenía una de ellas. CLS 0,009 a 1440 y 0,0175 a 1010. Arreglo:
+
+- todos los párrafos apilados en una celda de rejilla, con solo el activo
+  visible;
+- el hueco del «+» reservado si alguna diapositiva lo tiene.
+
+Resultado: **CLS 0** en los tres anchos.
+
+**Colores desde los globales del kit** (`__globals__` manda sobre el valor
+fijo):
+
+| Pieza                         | Antes                   | Ahora                                                                             |
+| ----------------------------- | ----------------------- | --------------------------------------------------------------------------------- |
+| Rojo de las flechas           | `#e5242d` fijo          | `var(--color-marca)`, global `primary` (el `__globals__` del icono)               |
+| Párrafo del vidrio            | `#fff`                  | `var(--color-fondo)`, global `099f28a` (su `text_color`)                          |
+| Línea de progreso             | `#fff`                  | `var(--color-fondo)`, global `099f28a`                                            |
+| Puntos, pista y foco          | blanco/negro inventados | `color-mix` sobre `--color-fondo` y `--color-texto`                               |
+| Velo y fondo del vidrio (D14) | negro `rgb(0 0 0 / x)`  | `color-mix` sobre `--color-texto`, global `text` (#100F0F): el kit no tiene negro |
+
+- **Se quedan como están**, porque el export los trae fijos y sin global:
+  - el título (#FFFFFF);
+  - el fondo de las flechas (#FFFFFF94, el nuestro al 58 %).
+- **Contraste después del cambio:**
+  - preview: título ≥ 3,63:1 (p10) y párrafo ≥ 4,81:1 (p10);
+  - producción, antes de fusionar: título ≥ 4,29:1 y párrafo ≥ 6,47:1.
+
+**Exports de Elementor disponibles:**
+
+| Fichero                                    | Qué es                               | Dónde                         |
+| ------------------------------------------ | ------------------------------------ | ----------------------------- |
+| `docs/diseno/elementor/1717.json`          | Secciones de la home (hero incluido) | Repositorio                   |
+| `docs/diseno/elementor/site-settings.json` | Globales (colores y tipografías)     | Repositorio                   |
+| `elementor-2516-2026-09-23.json`           | «home-page» (página)                 | `Desktop\partequipos-diseno\` |
+| `elementor-2629-2026-09-24.json`           | «header»                             | `Desktop\partequipos-diseno\` |
+| `elementor-2696-2026-09-24 (1).json`       | «footer»                             | `Desktop\partequipos-diseno\` |
+| `home-page.zip`                            | Kit completo                         | `Desktop\partequipos-diseno\` |
+
+**No falta ninguno** de la home, el hero, la cabecera o el pie. El hero no
+tiene export propio: es la primera sección de la home. Los globales solo están
+en `site-settings.json`.

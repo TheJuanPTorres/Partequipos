@@ -86,9 +86,10 @@
   /* --- Velo sobre la foto (D14, ver `.marco::after`). --- */
   --hero-velo: linear-gradient(
     to bottom,
-    rgb(0 0 0 / 55%) 0%,
-    rgb(0 0 0 / 40%) 38%,
-    rgb(0 0 0 / 15%) 62%,
+    rgb(0 0 0 / 45%) 0%,
+    rgb(0 0 0 / 52%) 35%,
+    rgb(0 0 0 / 48%) 55%,
+    rgb(0 0 0 / 22%) 75%,
     rgb(0 0 0 / 40%) 100%
   );
 
@@ -229,9 +230,9 @@
  * VELO SOBRE LA FOTO — DESVIACIÓN D14 (2026-09-30), PENDIENTE DE APROBACIÓN
  * DE ANDRÉS. ux-9 no lo tiene: su foto es oscura. Las del cliente tienen
  * cielos claros detrás del título blanco, y sin velo daban 1,0–1,4:1 (MEDIDO
- * bajo los píxeles de las letras). Con este degradado, ≥ 4:1 (p10) en las
- * cuatro a 1010 y 390; más oscuro arriba (título) y abajo (vidrio y
- * controles). Por encima de las capas: el marco lo pinta después de ellas.
+ * bajo los píxeles de las letras). Desde que el título va centrado (D15), el
+ * degradado es más oscuro en la franja central: ≥ 4:1 (p10) en las cuatro a
+ * 1440, 1010 y 390, y abajo sigue oscuro para el vidrio y los controles. Por encima de las capas: el marco lo pinta después de ellas.
  */
 .marco::after {
   position: absolute;

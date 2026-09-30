@@ -179,11 +179,14 @@
   flex: 0 1 25%;
   display: flex;
   /*
-   * Centrado en su columna, como en ux-9 (no pegado a la derecha). DESVIACIÓN:
-   * la columna no encoge por debajo del botón (`min-width: auto` de flex). En
-   * ux-9 sí, y entre 1025 y ~1250 px el botón se sale de ella.
+   * La columna encoge como en ux-9 (`min-width: 0`), y el botón va CENTRADO en
+   * ella. DESVIACIÓN: cuando no cabe (entre 1025 y ~1250 px), en ux-9 se sale
+   * por la derecha —hasta 5 px fuera de la página a 1025—; aquí `row-reverse`
+   * con `safe center` lo deja dentro, pegado a la derecha de la columna.
    */
-  justify-content: center;
+  flex-direction: row-reverse;
+  justify-content: safe center;
+  min-width: 0;
 }
 
 .boton {

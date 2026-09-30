@@ -26,7 +26,7 @@
   --hero-fuente: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 
   /* --- Rojo de las flechas. Sistema: --primary #dc2626. Wordmark del CLI: #D92035. --- */
-  --hero-rojo: #e5242d;
+  --hero-rojo: var(--color-marca); /* kit: global `primary` (__globals__ de las flechas) */
 
   /* --- Radio. Sistema: --radius-4xl = 18,7 px (tope 24 px en tarjetas). --- */
   --hero-radio: 30px;
@@ -81,16 +81,19 @@
    * es mayor que el de arriba. Arriba, al menos 64 px (40 en móvil).
    */
   --hero-texto-arriba: 64px;
+  /* Máquina recortada bajada para no tocar el título (ver `.capaFrontal`). */
+  --hero-frontal-bajada: 16px;
   --hero-texto-abajo: 22%;
 
   /* --- Velo sobre la foto (D14, ver `.marco::after`). --- */
+  /* Sobre el global `text` (#100F0F): el kit no tiene negro. */
   --hero-velo: linear-gradient(
     to bottom,
-    rgb(0 0 0 / 45%) 0%,
-    rgb(0 0 0 / 52%) 35%,
-    rgb(0 0 0 / 48%) 55%,
-    rgb(0 0 0 / 22%) 75%,
-    rgb(0 0 0 / 40%) 100%
+    color-mix(in srgb, var(--color-texto) 45%, transparent) 0%,
+    color-mix(in srgb, var(--color-texto) 52%, transparent) 35%,
+    color-mix(in srgb, var(--color-texto) 48%, transparent) 55%,
+    color-mix(in srgb, var(--color-texto) 22%, transparent) 75%,
+    color-mix(in srgb, var(--color-texto) 40%, transparent) 100%
   );
 
   /* --- Vidrio. NO coincide con los --glass-* del sistema: ver docs. --- */
@@ -100,7 +103,7 @@
    * blanco al 12 %. Con las fotos del cliente (cielos claros) el párrafo daba
    * 1,6–2,7:1; oscurecido, ≥ 5,9:1 en las cuatro (MEDIDO).
    */
-  --hero-vidrio-fondo: rgb(0 0 0 / 28%);
+  --hero-vidrio-fondo: color-mix(in srgb, var(--color-texto) 28%, transparent);
   --hero-vidrio-borde: 1px solid rgb(255 255 255 / 25%);
   --hero-vidrio-desenfoque: blur(18px);
   --hero-vidrio-sombra: 0 8px 32px rgb(0 0 0 / 8%);
@@ -345,6 +348,12 @@
 .capaFrontal {
   position: absolute;
   inset: 0;
+  /*
+   * Baja la máquina lo justo para que no toque las letras del título, que ya
+   * está en su posición de ux-9 (a 1440 el brazo las pisaba 3 px y a 1010,
+   * 18: MEDIDO con máscaras). Solo `transform`: la tarjeta no cambia de alto.
+   */
+  transform: translateY(var(--hero-frontal-bajada));
 }
 
 .frontal {
@@ -445,15 +454,16 @@
   width: 8px;
   height: 8px;
   border-radius: 4px;
-  background: rgb(255 255 255 / 60%);
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 25%);
+  /* Globales del kit: blanco `099f28a` y `text`, con transparencia. */
+  background: color-mix(in srgb, var(--color-fondo) 60%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-texto) 25%, transparent);
   content: "";
   transition: width 0.3s ease;
 }
 
 .punto[aria-current="true"]::before {
   width: 28px;
-  background: rgb(255 255 255 / 35%);
+  background: color-mix(in srgb, var(--color-fondo) 35%, transparent);
 }
 
 /*
@@ -467,7 +477,7 @@
   width: 28px;
   height: 8px;
   border-radius: 4px;
-  background: #fff;
+  background: var(--color-fondo); /* kit: global `099f28a` */
   content: "";
   transform: scaleX(0);
   transform-origin: left center;
@@ -495,7 +505,7 @@
 .flechas .pausa:focus-visible,
 .flecha:focus-visible,
 .mas:focus-visible {
-  outline: 3px solid #fff;
+  outline: 3px solid var(--color-fondo);
   outline-offset: 3px;
 }
 
@@ -520,12 +530,30 @@
   backdrop-filter: var(--hero-vidrio-desenfoque);
 }
 
+/* Párrafos apilados en una celda: el vidrio mide lo del más largo. */
+.textosVidrio {
+  display: grid;
+  flex: 1;
+}
+
+.textosVidrio > .parrafo {
+  grid-area: 1 / 1;
+}
+
+.textosVidrio > .parrafo[aria-hidden="true"] {
+  visibility: hidden;
+}
+
 .parrafo {
   margin: 0;
-  color: #fff;
+  color: var(--color-fondo); /* kit: `text_color` → global `099f28a` */
   font-size: var(--hero-parrafo-tam);
   font-weight: var(--hero-parrafo-peso);
   line-height: 1.4;
+}
+
+.masVacio {
+  visibility: hidden;
 }
 
 .mas {
@@ -569,6 +597,7 @@
   will-change: transform;
 }
 
+.filaTitulo.capaParallax,
 .capaTexto.capaParallax {
   --hero-parallax: calc(var(--hero-parallax-base, 0) * var(--hero-parallax-titulo));
 }
@@ -607,6 +636,7 @@
   .hero {
     --hero-titulo-tam: 70px;
     --hero-titulo-ajuste: -63px;
+    --hero-frontal-bajada: 30px;
     --hero-imagen-ancho: 631px;
     --hero-relleno: 50px 30px 30px;
     /*
@@ -633,6 +663,8 @@
     --hero-titulo-tam: 12vw;
     --hero-titulo-ajuste: 25px;
     --hero-texto-arriba: 40px;
+    /* A 390 ya hay 89 px de aire (MEDIDO). */
+    --hero-frontal-bajada: 0px;
     --hero-alto-min: 85vh;
     --hero-imagen-margen-arriba: 200px;
     --hero-parrafo-tam: 13px;

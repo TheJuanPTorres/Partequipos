@@ -872,6 +872,15 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
   Andrés):** va centrado en la tarjeta, algo por encima del centro, en vez de
   pegado arriba; con eso la tilde de «PRECISIÓN» queda dentro de la tarjeta
   en todos los cortes. Detalle en `decisiones-home-ux9.md` §16.
+- **Con máquina recortada, la composición de ux-9 (2026-09-30, PR #8):** si la
+  diapositiva tiene imagen frontal, el título vuelve a su posición medida de
+  ux-9 (arriba) y la máquina baja 16 px (escritorio) o 30 px (tablet) para no
+  tocar las letras. Sin imagen frontal, el título sigue centrado (D15).
+- **PRUEBA INTENCIONADA DE DIRECCIÓN, TEMPORAL (2026-09-30):** `Fondo.jpg` y
+  `Hero-1.png` del kit de ux-9 (L3) están en `Media` de producción y forman
+  la diapositiva «Fuerza Hitachi». Es decisión de dirección y **se retiran al
+  terminar la prueba**. No contradice §10.33: es una excepción acotada de
+  dirección.
 - **CASE sin diapositiva:** no se descargaron sus fotos (580SV, SR240B).
 - **Fotos del cliente:** derecho de uso confirmado (§10.0.1); en producción,
   cargadas por dirección desde el panel.

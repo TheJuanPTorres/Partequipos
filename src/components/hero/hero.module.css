@@ -552,6 +552,10 @@
   line-height: 1.4;
 }
 
+.masVacio {
+  visibility: hidden;
+}
+
 .mas {
   display: grid;
   flex: none;

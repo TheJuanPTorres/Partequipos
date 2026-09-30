@@ -95,6 +95,7 @@ export function HeroPortada({ diapositivas }: Props) {
   const { pausado, alternar, pausar } = usePausa();
   const total = diapositivas.length;
   const hayVarias = total > 1;
+  const hayEnlaces = diapositivas.some((s) => s.enlace);
   const d = diapositivas[activo];
 
   const cargar = useCallback((...indices: number[]) => {
@@ -386,6 +387,11 @@ export function HeroPortada({ diapositivas }: Props) {
               <Link href={d.enlace.href} className={estilos.mas} aria-label={d.enlace.nombre}>
                 <IconCirclePlus aria-hidden="true" focusable="false" stroke={1.5} />
               </Link>
+            ) : hayEnlaces ? (
+              // Hueco del «+» si otra diapositiva lo tiene: el párrafo no cambia de ancho.
+              <span className={`${estilos.mas} ${estilos.masVacio}`} aria-hidden="true">
+                <IconCirclePlus focusable="false" stroke={1.5} />
+              </span>
             ) : null}
           </aside>
         ) : null}

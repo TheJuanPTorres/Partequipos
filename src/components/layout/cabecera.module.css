@@ -32,7 +32,12 @@
   --cab-icono: 30px;
   --cab-velo: rgb(255 255 255 / 27%); /* #FFFFFF45 */
   --cab-col-relleno: 10px; /* relleno de cada contenedor de Elementor */
-  --cab-transicion: transform 0.3s ease;
+  /*
+   * Movimiento MEDIDO en ux-9 pintado (plugin «Sticky Header Effects» 2.2.3,
+   * 2026-09-30): esconder y mostrar con `transform` 0,4 s ease-in-out hasta
+   * −110vh; el velo, el logo y el alto, también 0,4 s ease-in-out.
+   */
+  --cab-transicion: transform 0.4s ease-in-out;
 
   --cab-texto: var(--color-texto);
   --cab-fondo: var(--color-fondo);
@@ -48,7 +53,8 @@
   color: var(--cab-texto);
   transition:
     var(--cab-transicion),
-    background-color 0.3s ease;
+    background-color 0.4s ease-in-out,
+    clip-path 0.4s ease-in-out;
 }
 
 /* Sin fondo: solo en la portada y arriba, sobre el fondo claro de la página. */
@@ -81,21 +87,49 @@
 }
 
 /*
- * Al bajar se encoge (`shrink_header` del export). Su «85 px» no puede ser la
- * altura del logo (mide 51): se interpreta como logo al 85 %. Con `transform`
- * y no con el ancho: la cabecera está en el flujo, y cambiar su alto al
- * desplazar movería la página (CLS).
+ * Al bajar se encoge, como en ux-9 MEDIDO: logo al 85 % y barra de 70 px de
+ * alto. En ux-9 la cabecera sale del flujo al encoger y el contenido SALTA
+ * (CLS 0,07); aquí no se replica: la caja conserva su alto y la barra se
+ * RECORTA a 70 px con `clip-path` (recorta lo pintado y lo pulsable), con el
+ * contenido recentrado en ella. Solo en escritorio: por debajo de 1025 px
+ * ux-9 no fija la cabecera (medido a 1024, 1010, 800 y 390).
  */
 .cabecera[data-encogida="si"] .logo {
   transform: scale(0.85);
 }
 
+@media (min-width: 1025px) {
+  /* Recorte del encogido, solo aquí. `-1px` deja ver el filete de 1 px. */
+  .cabecera {
+    clip-path: inset(0 0 -1px 0);
+  }
+
+  .cabecera[data-encogida="si"] {
+    clip-path: inset(0 0 calc(100% - 70px) 0);
+  }
+
+  .cabecera[data-encogida="si"] .fila {
+    transform: translateY(calc(35px - 50%));
+  }
+
+  /* El filete de las páginas con fondo, dentro de los 70 px recortados. */
+  .cabecera[data-encogida="si"][data-modo="solido"] {
+    background: linear-gradient(
+      var(--cab-fondo) 69px,
+      var(--color-fondo-seccion) 69px 70px,
+      var(--cab-fondo) 70px
+    );
+  }
+}
+
+/* Esconder: −110vh, como en ux-9 (con 0,4 s sale de la vista en ~75 ms). */
 .cabecera[data-oculta="si"] {
-  transform: translateY(-100%);
+  transform: translateY(-110vh);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cabecera {
+  .cabecera,
+  .fila {
     transition: none;
   }
 }
@@ -111,6 +145,7 @@
    */
   gap: 20px;
   padding: var(--cab-relleno);
+  transition: transform 0.4s ease-in-out;
 }
 
 .logoCol,
@@ -129,7 +164,7 @@
   max-width: 100%;
   height: auto;
   transform-origin: left center;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease-in-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -248,6 +283,30 @@
 }
 
 @media (max-width: 1024px) {
+  /*
+   * NO fija por debajo de 1025 px, como ux-9 (MEDIDO a 1024, 1010, 800 y 390;
+   * confirmado por Andrés como intencional): se va con la página, sin velo,
+   * sin encogido y sin esconderse.
+   */
+  .cabecera,
+  .cabecera[data-modo="velo"],
+  .cabecera[data-oculta="si"] {
+    position: relative;
+    transform: none;
+    background: var(--cab-fondo);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .cabecera[data-modo="transparente"],
+  .cabecera[data-modo="velo"] {
+    background: transparent;
+  }
+
+  .cabecera[data-encogida="si"] .logo {
+    transform: none;
+  }
+
   .fila {
     display: grid;
     gap: 0;

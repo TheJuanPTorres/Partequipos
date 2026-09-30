@@ -394,23 +394,20 @@ veredicto, que va en el informe.
 
 ## 10. Estado actual
 
-> **ESTADO ACTUAL — 2026-09-28, excepción de la demo CERRADA Y EJECUTADA.**
-> **En producción:** home de ux-9 **sin hero ni sección 2** (se quedaron sin
-> imágenes al retirar la demo), sección 3, cabecera y pie de ux-9 (pie
-> editable en el global `pie`, sin imagen decorativa); datos de demo, cerrado a
-> buscadores. `Media` de producción, vacía. Next 16.3.5 · Payload 3.89.0 · 377
-> pruebas.
-> **Sin excepciones activas** (§10.33): todo cambio va por rama, preview y
-> prueba de humo.
+> **ESTADO ACTUAL — 2026-09-30, EXCEPCIÓN DE DEMO ACTIVA (§10.36).**
+> **En producción:** home de ux-9 con el **carrusel del hero** (fase 2 y PR #5)
+> y las 4 diapositivas del cliente cargadas por dirección desde el panel;
+> sección 3, cabecera y pie de ux-9; datos de demo, cerrado a buscadores.
+> Next 16.3.5 · Payload 3.89.0 · 399 pruebas.
+> **Excepción activa:** LCP de la home **4,00 s**, por encima de la regla
+> (§10.3 p.14), aprobada por dirección para la demo. El resto de reglas, sin
+> excepciones: todo cambio va por rama, preview y prueba de humo.
 > **Próximos pasos, por prioridad:**
 >
-> 1. **Fase 2, en rama, con las fotos sembradas SOLO en el preview:**
->    verificación completa de las secciones 2–3 y la cabecera; Lighthouse;
->    ajuste fino; movimiento y contraste de la cabecera; icono «+» por Tabler
->    (L2); comentario de `cabecera.module.css` (§10.35); ajuste sin imagen de la
->    sección 3 y sus tarjetas (§10.33 p.14).
-> 2. **Los dos guardarraíles de migraciones, ANTES de la fase E**, cada uno en
->    su PR (§10.33 p.5, aprobados): deriva de esquema y migrar desde cero.
+> 1. **PRIORIDAD 1 tras la demo — recorte vertical del hero para móvil**
+>    (§10.36). Es cambio de esquema, así que ANTES:
+> 2. **Los dos guardarraíles de migraciones**, cada uno en su PR (§10.33 p.5,
+>    aprobados): deriva de esquema y migrar desde cero.
 > 3. Fase E de la home: secciones 4 y 5 (`decisiones-home-ux9.md` §7).
 
 > **CIERRE DE FASE — 2026-08-14.** Está construido **todo lo que no depende de
@@ -512,7 +509,9 @@ tocar código.
 confirmado por el cliente**; dirección conserva la confirmación. Son otras que
 las fotos de ux-9 de Andrés (L3), que siguen sin licencia. Mientras tanto
 **solo en el preview**: pasan a producción cuando lo haga dirección, con un
-runbook. Originales en `Desktop\partequipos-diseno\cliente-hero\`, **nunca en
+runbook. **ACTUALIZADO 2026-09-30: ya en producción**, cargadas por dirección
+desde el panel (las 4 reducidas de `cliente-hero
+educidas\`). Originales en `Desktop\partequipos-diseno\cliente-hero\`, **nunca en
 `public/` ni en el repositorio** (el repositorio es público, §10.33).
 
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
@@ -841,6 +840,35 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     sin hueco cuando falta la imagen.
     Comprobar también el pie entre 1025 y 1279 px SIN imagen decorativa: la
     reserva de 170 px de §10.33 p.11 no debe dejar hueco.
+
+### 10.36 EXCEPCIÓN DE DEMO — el carrusel del hero en producción con LCP 4,00 s (2026-09-30)
+
+> **Decisión de dirección:** el PR #5 (carrusel del hero) se fusionó **aunque
+> el LCP pasa de la regla**. Motivo: demo al cliente; producción no está
+> indexada (§10.6) y hoy es el sitio de demo. **No es un cambio de criterio.**
+
+| Qué                      | Medido (9 + 9 alternadas, método de §10.3 p.14)                                   |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| Demo («Fuerza Hitachi»)  | LCP **4,00 s** (3,63–4,32), umbral de parada **2,54 s**                           |
+| `main` en la misma tanda | **2,58 s** (2,23–4,01): también por encima de 2,54. Se revisa al medir el arreglo |
+
+- **Causa, medida:** en móvil el fondo se pide a **1920 px** porque ocupa todo
+  el alto del hero (`sizesFondoHero`). La foto de Hitachi del cliente pesa
+  **419 kB** en WebP a ese ancho, frente a los **157 kB** de la de ux-9. Con
+  la red simulada, ~1,3 s. Calidad 60 solo quitaría ~0,3 s.
+- **Arreglo comprometido — PRIORIDAD 1 tras la demo:** **recorte vertical para
+  móvil** (una versión vertical de cada fondo; el móvil pediría ~720 px). Es
+  **cambio de esquema**, así que primero van los **dos guardarraíles de
+  migraciones** (§10.33 p.5).
+- **Sección 3:** los espacios a 390 (~190 px entre «Ver todas las excavadoras» y
+  «Venta de maquinaria») y a 1010 (mitad derecha vacía) **son la maqueta de
+  ux-9 y se quedan** (medido en `decisiones-home-ux9.md` §14.4). Cualquier
+  cambio, con Andrés.
+- **Pendiente de Andrés:** el velo sobre la foto y el vidrio oscurecido (D14),
+  y la tilde de «PRECISIÓN», que a ≥ 1025 px sale por encima de la tarjeta.
+- **CASE sin diapositiva:** no se descargaron sus fotos (580SV, SR240B).
+- **Fotos del cliente:** derecho de uso confirmado (§10.0.1); en producción,
+  cargadas por dirección desde el panel.
 
 ### 10.35 CORREGIDO 2026-09-28 — el desenfoque de la cabecera no lo quitaba `var()`: lo quitaba el ORDEN
 

@@ -3260,6 +3260,39 @@ es tan urgente como el captcha. Requiere además **dominio verificado** en Resen
     - **Si aun así supera 2,5 s: se para y se analiza** antes de seguir con la
       fase siguiente.
 
+    **MÉTODO VIGENTE desde el 2026-09-30 (decisión de dirección, fase 2c).**
+    Sustituye al de las DevTools para toda medición nueva:
+
+    - **Lighthouse 13.4.1 por línea de comandos** (su API de Node), móvil,
+      _simulated throttling_, solo Performance. Las corridas las hace Claude;
+      dirección ya no corre Lighthouse.
+    - **9 corridas válidas por variante, ALTERNADAS** (A, B, A, B…), en la
+      misma máquina y la misma sesión, contra las **URL fijas** de cada
+      despliegue (no el alias de la rama, que cambia con cada push).
+    - **Una carga de calentamiento** de cada variante antes de empezar, que
+      no cuenta.
+    - En un preview, el bypass va **solo** en la cabecera y como cookie; el
+      secreto no puede aparecer en ningún JSON guardado (se comprueba).
+    - **La parada por LCP se aplica a la FUSIÓN, no al desarrollo:** se
+      desarrolla la fase entera y se mide una vez al final. Nada se fusiona
+      sin esa medición.
+
+    **Por qué:** en la fase 2c las 3 corridas de las DevTools dieron 2,81 s
+    de mediana, y la sonda alternada mostró que el código de la referencia
+    (fase C) daba **más** que el de la fase 2 en la misma sesión (3,40 frente
+    a 2,83). Con 3 corridas sueltas, un cambio del entorno entre sesiones se
+    lee como un cambio del código. Medir **las dos variantes alternadas** en
+    la misma sesión cancela la deriva, y 9 corridas dan una mediana estable.
+    Por eso cada medición final compara **siempre** contra la fase C medida
+    en la misma sesión, no contra los 2,24 s escritos.
+
+    **Criterio de la medición final:** fase C ≥ 2,6 s → es el ENTORNO; la
+    nueva referencia es la mediana de la fase 2, con umbrales de referencia
+    +0,16 s (calidad 60 con Andrés) y +0,26 s (parar). Fase C ≤ 2,4 s y fase 2
+    ≥ 2,6 s → es el CÓDIGO: no se propone fusionar y se localiza la causa
+    midiendo. Cualquier otro resultado → 9 corridas más de cada una; si sigue
+    sin concluir, se informa.
+
 15. **Icono cuadrado de la marca (favicon).** El único recurso gráfico que
     tenemos es el logotipo, de **1614 × 317** — una tira horizontal. Sirve para
     la cabecera y para el panel, pero **no para un favicon**: recortarlo daría

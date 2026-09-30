@@ -1087,11 +1087,12 @@ scroll progresivo de 25 px, ux-9 contra el nuestro:
 **Sección 3 sin imagen (`29a6f61`).** «Antes» es el despliegue de `main`, que
 no tiene imágenes; «después», el preview tras retirar la siembra (§14.5).
 
-| Qué (MEDIDO)                         | Antes                                                                             | Después                                                    |
-| ------------------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| Tarjeta sin foto                     | Columna de foto **vacía**: 177–258 px de ancho en escritorio, 30 px de alto a 390 | §14.5                                                      |
-| Reserva de la máquina, en escritorio | **139 px** vacíos sobre «Marcas que respaldan…»                                   | §14.5                                                      |
-| Con imágenes                         | —                                                                                 | **Idéntico** a antes en 390, 1010, 1025, 1100, 1279 y 1440 |
+| Qué (MEDIDO)                         | Antes                                                                             | Después                                                                                             |
+| ------------------------------------ | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Tarjeta sin foto                     | Columna de foto **vacía**: 177–258 px de ancho en escritorio, 30 px de alto a 390 | Sin columna: el texto ocupa la tarjeta (679 px a 1440, 321 a 390); a 390 la tarjeta, 12 px más baja |
+| Reserva de la máquina, en escritorio | **139 px** vacíos: el título de marcas a 159 px del borde de la sección           | Título a **85 px**, a la altura de «Venta de maquinaria» de la derecha (1025, 1100, 1279 y 1440)    |
+| Reserva de la máquina, en columna    | 1 px (≤ 1024)                                                                     | Igual                                                                                               |
+| Con imágenes                         | —                                                                                 | **Idéntico** a antes en 390, 1010, 1025, 1100, 1279 y 1440                                          |
 
 **Lo que se midió y NO era hueco por falta de imagen** (anotado en la fase 1b,
 CLAUDE.md §10.33 p.14):
@@ -1125,4 +1126,10 @@ CLAUDE.md §10.33 p.14):
 
 ### 14.5 Medición final
 
-_Pendiente: sección 3 sin imagen, pintada, y Lighthouse final._
+**Sección 3 sin imagen, pintada** en el preview `09f2ac2`, desplegado tras
+retirar la siembra: resultados en la tabla de `29a6f61` (§14.4). El alto de la
+sección no cambia (lo marca la columna derecha) y el pie queda con su margen de
+70 px en todos los anchos. Después se volvió a sembrar el preview para la
+medición final.
+
+_Pendiente: Lighthouse final con el método de CLAUDE.md §10.3 p.14._

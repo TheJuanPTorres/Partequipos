@@ -1772,3 +1772,85 @@ Se siembran con `npm run preview:fase-f:sembrar` y se quitan con `retirar`. El s
 - La tarjeta se ve en oscuro (`text`, #100F0F) con el velo y el texto blanco.
 - Por encima de 768 px, el fijado, el encogido y el texto en movimiento funcionan igual.
 - Sin YouTube, no hay botón de reproducir.
+
+---
+
+## 20. Fase H — secciones 10 y 11 (2026-10-01)
+
+**Fuentes:**
+
+- **El export:** `306ba9d3`, `7150fed1` y `4d701aa3` (sección 10); `1945efcb`, `73c4efc3`, `709b7472`, `69024d18`, `68ccfda2` y `5a2d8e5d` (sección 11).
+- **El código del widget de Andrés** del acordeón de testimonios (`bangluxor_acordeon_video_popup`, su `css.tpl` y `html.tpl`). Se aplican sus valores por defecto, porque el export solo cambia el texto del botón.
+- **El acordeón de la FAQ**, de Unlimited Elements: no trae CSS en el JSON, así que se **midió pintado**.
+
+### Sección 10 — testimonios
+
+| Qué (ux-9)       | Valor                                                                                                                         |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Contenedor       | Relleno 3 %                                                                                                                   |
+| Título           | 815 px, `primary`, 60 px debajo; ritmo `titulo`, disparo al 95 %                                                              |
+| Pista            | 560 px de alto, 12 de hueco; tarjetas con radio 14                                                                            |
+| Abierta          | La **segunda** al cargar; crece ×3 en 700 ms `cubic-bezier(.65,0,.35,1)`                                                      |
+| Cerradas         | Foto con desenfoque de 14 px y escala 1,15                                                                                    |
+| Abierta, detalle | Degradado inferior negro al 70 %; «Ver Video» en píldora arriba a la izquierda (14 px, borde blanco al 55 %, vidrio de 10 px) |
+| Textos           | Nombre `clamp(24px, 2.4vw, 34px)`; lugar `clamp(16px, 1.5vw, 21px)`; texto 13 px, peso 300, blanco al 85 %                    |
+| Con ratón        | Se abre al pasar por encima y vuelve a la inicial al salir                                                                    |
+| Con dedo         | Se abre al pulsar                                                                                                             |
+| < 768 px         | Apiladas: 96 px cerradas, 460 la abierta                                                                                      |
+
+**Medido en ux-9 a 1440** (pista de 1354 px): tarjetas de 253 · 659 · 253 · 253 px, con las cerradas en 253 × 644. **A 390:** 110 · 460 · 110 · 110 px.
+
+**Datos:** `testimonios`.
+
+- **Contenido de la tarjeta:**
+  - en grande, la **empresa** («EMT SAS»), que es lo que pinta ux-9;
+  - en pequeño, la **ciudad**;
+  - el texto, la cita;
+  - la foto lleva como `alt` el **nombre de la persona**.
+- **Campo nuevo `youtube`**, con la misma validación que la sección 7. Los cuatro de ux-9 tienen vídeo, al contrario de lo que decía la nota de la fase B.
+- **Solo los publicados:** la API local salta el control de acceso, así que el filtro va en la consulta **y** en la lógica, con prueba. Un testimonio no se publica sin la autorización (L4, gancho de la fase B).
+
+### Sección 11 — preguntas frecuentes
+
+| Qué (ux-9)                   | Valor                                                                                                                                               |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sección                      | Relleno 16 % · 0 · 11 % · 0, fondo #F0F0F0                                                                                                          |
+| Columnas                     | 40 % y 60 %, relleno 5 %. En móvil, apiladas: la izquierda con alto mínimo de 60vh, la derecha con relleno 10 % · 5 %                               |
+| Izquierda                    | Título de 412 px con curva de rebote (`back.out(1.4)`), disparo al 85 %; texto `text` en #56545A; «Solicita asesoría» con radio 8                   |
+| Acordeón, cabecera (MEDIDA)  | Blanca, relleno 10, radio 10, 10 px entre preguntas                                                                                                 |
+| Acordeón, icono (MEDIDO)     | Caja roja de 40 con radio 8, icono blanco de 18                                                                                                     |
+| Acordeón, pregunta (MEDIDA)  | `cd1706f` en #000; + / − de 11 px en #56545A                                                                                                        |
+| Acordeón, respuesta (MEDIDA) | Relleno 20, peso 300, #616161                                                                                                                       |
+| Estado inicial               | Todas cerradas; al abrir una se cierra la anterior                                                                                                  |
+| Máquina                      | 64 % de ancho, `top: −29 %` y `left: −22,777 %` (en móvil −4 % y −15 %), volteada y girada −13°; brillo 70, contraste 94, saturación 115; z-index 1 |
+
+**Implementación:**
+
+- `<details>` nativo con `name` compartido: al abrir una se cierra la otra, sin JavaScript, como el widget.
+- JSON-LD `FAQPage` con las mismas preguntas. Sin preguntas no se emite.
+
+**Datos:** `preguntas-frecuentes` publicadas, por orden; la máquina, en el campo nuevo `paginas.seccionFaq.imagen`.
+
+### Desviaciones de esta fase
+
+| #   | ux-9                                                                   | Nuestro                                                                                                                    | Por qué                                                |
+| --- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| D1  | Títulos en `<div>`; nombres de la tarjeta en `<div>`                   | `<h2>` y `<h3>`; la pregunta en `<summary>`                                                                                | Jerarquía                                              |
+| D2  | Las tarjetas animan siempre                                            | Con movimiento reducido, sin transiciones                                                                                  | Aprobado                                               |
+| D6  | Iconos del kit y de Font Awesome                                       | Tabler (`message-question`, `player-play`); + / − en CSS                                                                   | Licencia L2                                            |
+| D20 | Ventana de YouTube propia del widget                                   | El `<dialog>` común de la sección 7                                                                                        | Foco                                                   |
+| D23 | Las tarjetas son `div` con `tabindex`; «Ver Video» igual en las cuatro | Cada tarjeta lleva un botón con `aria-expanded`; el texto de las cerradas está oculto al lector; «Ver el vídeo de EMT SAS» | Teclado y lector de pantalla. Con el ratón se ve igual |
+
+### Assets — solo en el preview
+
+Se siembran con `npm run preview:fase-h:sembrar` y se quitan con `retirar`. El script se niega si la base o el Blob no son los del preview.
+
+- **4 testimonios** con los textos de ux-9; tres de ellos son el mismo relleno.
+  - Su «autorización» es **de prueba** y lo dice en la referencia.
+  - Están en **L4**: hace falta autorización real de cada persona y empresa.
+- **4 fotos:** `Video-Testimonio.jpg`, `Testimono-24.jpg`, `345345.jpg` y `Case.jpg`. Son de personas reales (L4) y de procedencia por confirmar (L3).
+- **YouTube** `hBeMsx5WEko` y `hV33sXph6sU`: titularidad por confirmar con el cliente.
+- **Máquina** `P1415_6500-2_red_211111.png`: L3.
+- **5 preguntas de ux-9:** son contenido redactado, no un asset con licencia. En producción las carga dirección o el cliente desde el panel.
+
+**En producción, sin ellos:** las dos secciones no se pintan hasta que haya testimonios publicados o preguntas publicadas. Si hay preguntas pero no máquina, la sección 11 sale sin la imagen y sin hueco.

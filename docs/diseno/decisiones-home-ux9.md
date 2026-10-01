@@ -1810,6 +1810,28 @@ Se siembran con `npm run preview:fase-f:sembrar` y se quitan con `retirar`. El s
 - **Campo nuevo `youtube`**, con la misma validación que la sección 7. Los cuatro de ux-9 tienen vídeo, al contrario de lo que decía la nota de la fase B.
 - **Solo los publicados:** la API local salta el control de acceso, así que el filtro va en la consulta **y** en la lógica, con prueba. Un testimonio no se publica sin la autorización (L4, gancho de la fase B).
 
+**Sin desplazamiento de layout al pasar el ratón.** El widget de ux-9 cambia
+el `flex-grow` de las tarjetas, y eso es layout: al pasar el ratón por una
+tarjeta y salir, **medido, 0,19 de CLS**. El navegador no excluye el
+movimiento del ratón como «entrada», así que lo sumarían los usuarios reales.
+
+Aquí, a 768 px o más:
+
+- todas las tarjetas miden lo que mide la abierta (3u);
+- se colocan con `transform`;
+- la parte visible de las cerradas la recorta `clip-path`.
+
+Ni `transform` ni `clip-path` mueven el layout. Con `cover`, el recorte
+centrado enseña lo mismo que la caja estrecha de ux-9. Medido después:
+
+| Ancho | Tarjetas visibles (1.ª a 4.ª, la 2.ª abierta) | CLS al pasar el ratón |
+| ----- | --------------------------------------------- | --------------------- |
+| 1440  | 220 · 659 · 220 · 220                         | **0**                 |
+| 1010  | 152 · 457 · 152 · 152                         | **0**                 |
+
+Sin scroll horizontal: la pista recorta (`overflow-x: clip`) las cajas que
+sobresalen.
+
 ### Sección 11 — preguntas frecuentes
 
 | Qué (ux-9)                   | Valor                                                                                                                                               |
@@ -1833,13 +1855,14 @@ Se siembran con `npm run preview:fase-f:sembrar` y se quitan con `retirar`. El s
 
 ### Desviaciones de esta fase
 
-| #   | ux-9                                                                   | Nuestro                                                                                                                    | Por qué                                                |
-| --- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| D1  | Títulos en `<div>`; nombres de la tarjeta en `<div>`                   | `<h2>` y `<h3>`; la pregunta en `<summary>`                                                                                | Jerarquía                                              |
-| D2  | Las tarjetas animan siempre                                            | Con movimiento reducido, sin transiciones                                                                                  | Aprobado                                               |
-| D6  | Iconos del kit y de Font Awesome                                       | Tabler (`message-question`, `player-play`); + / − en CSS                                                                   | Licencia L2                                            |
-| D20 | Ventana de YouTube propia del widget                                   | El `<dialog>` común de la sección 7                                                                                        | Foco                                                   |
-| D23 | Las tarjetas son `div` con `tabindex`; «Ver Video» igual en las cuatro | Cada tarjeta lleva un botón con `aria-expanded`; el texto de las cerradas está oculto al lector; «Ver el vídeo de EMT SAS» | Teclado y lector de pantalla. Con el ratón se ve igual |
+| #   | ux-9                                                                   | Nuestro                                                                                                                    | Por qué                                                                                                                           |
+| --- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Títulos en `<div>`; nombres de la tarjeta en `<div>`                   | `<h2>` y `<h3>`; la pregunta en `<summary>`                                                                                | Jerarquía                                                                                                                         |
+| D2  | Las tarjetas animan siempre                                            | Con movimiento reducido, sin transiciones                                                                                  | Aprobado                                                                                                                          |
+| D6  | Iconos del kit y de Font Awesome                                       | Tabler (`message-question`, `player-play`); + / − en CSS                                                                   | Licencia L2                                                                                                                       |
+| D20 | Ventana de YouTube propia del widget                                   | El `<dialog>` común de la sección 7                                                                                        | Foco                                                                                                                              |
+| D24 | En móvil, la tarjeta cambia de alto en 700 ms                          | 450 ms                                                                                                                     | El cambio de alto es layout, y el navegador solo lo excluye del CLS durante 500 ms tras el toque. Con 700 ms, 0,009 de CLS medido |
+| D23 | Las tarjetas son `div` con `tabindex`; «Ver Video» igual en las cuatro | Cada tarjeta lleva un botón con `aria-expanded`; el texto de las cerradas está oculto al lector; «Ver el vídeo de EMT SAS» | Teclado y lector de pantalla. Con el ratón se ve igual                                                                            |
 
 ### Assets — solo en el preview
 

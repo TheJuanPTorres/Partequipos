@@ -400,7 +400,7 @@ veredicto, que va en el informe.
 > Lo que depende de assets con licencia pendiente (L2–L4: logos, fotos,
 > vídeo, testimonios) **solo está en el preview**; en producción esas
 > secciones salen sin ellos o no se pintan. Datos de demo, cerrado a
-> buscadores. Next 16.3.5 · Payload 3.89.0 · 437 pruebas · 17 migraciones.
+> buscadores. Next 16.3.5 · Payload 3.89.0 · 437 pruebas · 16 migraciones.
 > **Excepción activa:** LCP móvil de la home **2,94 s** con el recorte cargado
 > (9 + 9 alternadas), por encima de la regla (§10.3 p.14). Palancas pendientes
 > de dirección en `decisiones-home-ux9.md` §17.

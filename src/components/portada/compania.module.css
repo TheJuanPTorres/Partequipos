@@ -1,0 +1,243 @@
+/*
+ * SECCIONES 6 Y 7 — «Nuestra Compañía». Valores de ux-9:
+ * - Contenedor `19fb55e9`: relleno 0 · 1,5 % · 1,5 % · 1,5 %.
+ * - Tarjeta `74556815`: alto 100vh, radio 30, relleno 10, contenido centrado,
+ *   velo del color `text` (#100F0F) al 21 %.
+ * - Efecto (widget `6b438010`, leído en su código): fijado 350 px, escala 0,4,
+ *   radio 32; texto en movimiento detrás, Inter 600 en mayúsculas,
+ *   `clamp(36px, 6vw, 110px)`, #0A0A0A, rojo al pasar el ratón.
+ * Detalle en docs/diseno/decisiones-home-ux9.md §19.
+ */
+.seccion {
+  position: relative;
+}
+
+/* La capa blanca de ux-9 (`.lmn-hero-bg`): fija, detrás del vídeo. */
+.fondoBlanco {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: var(--color-fondo);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* El recorrido del fijado: el alto de la pantalla más los 350 px del efecto. */
+.recorrido {
+  height: calc(100vh + 350px);
+}
+
+.fijado {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: 100vh;
+}
+
+.encoge {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0 1.5% 1.5%;
+  overflow: hidden;
+  border-radius: var(--compania-radio, 0);
+  transform: scale(var(--compania-escala, 1));
+  transform-origin: center center;
+}
+
+.tarjeta {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 10px;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  border-radius: 30px;
+  /* Sin vídeo (o hasta que cargue): oscuro, para que el texto blanco se lea. */
+  background: var(--color-texto);
+}
+
+/* Velo: `background_overlay` del color `text` al 21 %. */
+.tarjeta::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgb(16 15 15 / 0.21);
+  content: "";
+  pointer-events: none;
+}
+
+.medio {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contenido {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  color: var(--color-fondo);
+  text-align: center;
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-fondo);
+}
+
+/* `3f91730a`: 490 px, tipografía `cd1706f` (el global gana a los 55 px fijos). */
+.texto {
+  max-width: 490px;
+  margin: 0;
+  color: var(--color-fondo);
+}
+
+/* `1a1256e3`: círculo de 80 px, fondo `primary`, icono blanco. */
+.reproducir {
+  display: grid;
+  width: 80px;
+  height: 80px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.reproducir svg {
+  width: 22px;
+  height: 22px;
+}
+
+.reproducir:hover {
+  background: var(--color-texto);
+}
+
+.reproducir:focus-visible {
+  outline: 3px solid var(--color-fondo);
+  outline-offset: 4px;
+}
+
+/* Pausa (D2): abajo a la derecha de la tarjeta, sobre el vídeo. */
+.pausa {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  z-index: 3;
+  border-color: var(--color-fondo);
+  background: var(--color-fondo);
+}
+
+/* ------------------------------------------------- texto en movimiento */
+
+.marquee {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  pointer-events: none;
+}
+
+.pista {
+  display: flex;
+  width: max-content;
+  animation: desplazar var(--marquee-duracion, 30s) linear infinite;
+}
+
+.grupo {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  color: #0a0a0a;
+  font-size: clamp(36px, 6vw, 110px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: auto;
+  transition: color 0.3s ease;
+}
+
+.item:hover {
+  color: var(--color-marca);
+}
+
+.separador {
+  display: inline-block;
+  margin: 0 0.35em;
+}
+
+.marquee:hover .pista,
+.marquee[data-pausado] .pista {
+  animation-play-state: paused;
+}
+
+@keyframes desplazar {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pista {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------- 768 px o menos */
+
+/* Como ux-9: sin fijado, sin encogido y sin texto en movimiento. */
+@media (max-width: 768px) {
+  .recorrido {
+    height: auto;
+  }
+
+  .fijado {
+    position: static;
+    height: auto;
+  }
+
+  /* Sin capas: la sección 8 sube encima del final del vídeo, como en ux-9. */
+  .encoge {
+    z-index: auto;
+    height: auto;
+    transform: none;
+  }
+
+  .marquee,
+  .fondoBlanco {
+    display: none;
+  }
+
+  /* Arriba: abajo lo tapa el título de la sección 8, que sube sobre el vídeo. */
+  .pausa {
+    top: 24px;
+    bottom: auto;
+  }
+
+  /* Sin vídeo no se mueve nada: no hay qué pausar. */
+  .seccion:not([data-con-video]) .pausa {
+    display: none;
+  }
+}

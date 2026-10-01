@@ -1,0 +1,56 @@
+/*
+ * Ventana del vídeo de YouTube. ux-9 (widget de Andrés de la sección 10): hasta
+ * 1100 px de ancho, 16:9, fondo oscuro. Mismo patrón aquí para las secciones 7
+ * y 10.
+ */
+.dialogo {
+  width: min(1100px, calc(100vw - 32px));
+  max-width: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.dialogo::backdrop {
+  background: rgb(16 15 15 / 0.85);
+}
+
+.marco {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  background: var(--color-texto);
+}
+
+.iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 14px;
+}
+
+.cerrar {
+  position: absolute;
+  top: -52px;
+  right: 0;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  cursor: pointer;
+}
+
+.cerrar svg {
+  width: 22px;
+  height: 22px;
+}
+
+.cerrar:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 3px;
+}

@@ -750,6 +750,16 @@ export interface Pagina {
         }[]
       | null;
   };
+  seccionCompania?: {
+    /**
+     * En bucle y sin sonido. MP4 H.264 de 8 bits, máximo 4 MB.
+     */
+    video?: (number | null) | Video;
+    /**
+     * Opcional. Se abre en una ventana, desde youtube-nocookie.com, solo al pulsar.
+     */
+    youtube?: string | null;
+  };
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -757,6 +767,36 @@ export interface Pagina {
   };
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Vídeos del sitio: MP4 o WebM, máximo 4 MB, con imagen de póster obligatoria.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  /**
+   * Para quien no lo ve. Aunque sea decorativo, dilo aquí: es lo que queda en el panel.
+   */
+  descripcion: string;
+  /**
+   * Lo que se ve antes de cargar, con «reducir movimiento» activado, al pausar y si el vídeo no se puede reproducir.
+   */
+  poster: number | Media;
+  /**
+   * Un vídeo de fondo sin información se oculta a los lectores de pantalla.
+   */
+  decorativo?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
 }
 /**
  * Se publican en la raíz del sitio: /{slug}/, sin prefijo.
@@ -833,36 +873,6 @@ export interface CategoriasBlog {
   };
   updatedAt: string;
   createdAt: string;
-}
-/**
- * Vídeos del sitio: MP4 o WebM, máximo 4 MB, con imagen de póster obligatoria.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "videos".
- */
-export interface Video {
-  id: number;
-  /**
-   * Para quien no lo ve. Aunque sea decorativo, dilo aquí: es lo que queda en el panel.
-   */
-  descripcion: string;
-  /**
-   * Lo que se ve antes de cargar, con «reducir movimiento» activado, al pausar y si el vídeo no se puede reproducir.
-   */
-  poster: number | Media;
-  /**
-   * Un vídeo de fondo sin información se oculta a los lectores de pantalla.
-   */
-  decorativo?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
 }
 /**
  * Sedes del mapa de la portada. No generan URLs propias.
@@ -1506,6 +1516,12 @@ export interface PaginasSelect<T extends boolean = true> {
               nombre?: T;
               id?: T;
             };
+      };
+  seccionCompania?:
+    | T
+    | {
+        video?: T;
+        youtube?: T;
       };
   seo?:
     | T

@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { seoField } from "../lib/fields/seoField";
+import { validarYouTube } from "../lib/fields/youtube";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
@@ -281,6 +282,36 @@ export const PaginaInstitucional: CollectionConfig = {
               admin: { description: "Es el texto alternativo del logo." },
             },
           ],
+        },
+      ],
+    },
+    /*
+     * SECCIÓN 7 DE LA PORTADA (fase F): «Nuestra Compañía». El vídeo de fondo
+     * y el de YouTube del botón de reproducir. Los dos opcionales: sin vídeo,
+     * la tarjeta se pinta en oscuro con su texto; sin YouTube, sin botón.
+     */
+    {
+      name: "seccionCompania",
+      type: "group",
+      label: "Sección «Nuestra Compañía» de la portada",
+      admin: { condition: (data) => data?.slug === "inicio" },
+      fields: [
+        {
+          name: "video",
+          type: "upload",
+          relationTo: "videos",
+          label: "Vídeo de fondo",
+          admin: { description: "En bucle y sin sonido. MP4 H.264 de 8 bits, máximo 4 MB." },
+        },
+        {
+          name: "youtube",
+          type: "text",
+          label: "Vídeo de YouTube del botón «reproducir»",
+          validate: validarYouTube,
+          admin: {
+            description:
+              "Opcional. Se abre en una ventana, desde youtube-nocookie.com, solo al pulsar.",
+          },
         },
       ],
     },

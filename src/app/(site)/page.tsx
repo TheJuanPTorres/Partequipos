@@ -7,6 +7,8 @@ import { SeccionMaquinariaNueva } from "@/components/portada/SeccionMaquinariaNu
 import { SeccionMaquinariaUsada } from "@/components/portada/SeccionMaquinariaUsada";
 import { CarruselLogos } from "@/components/portada/CarruselLogos";
 import { SeccionRepuestos } from "@/components/portada/SeccionRepuestos";
+import { SeccionCatalogo } from "@/components/portada/SeccionCatalogo";
+import { SeccionCompania } from "@/components/portada/SeccionCompania";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp, navegacionPrincipal } from "@/lib/navegacion";
@@ -18,7 +20,9 @@ import {
   tarjetasDeMarcas,
 } from "@/lib/portada/secciones";
 import { logosDeMarcas, tarjetasDeRepuestos } from "@/lib/portada/seccionesE";
+import { videoDeCompania, videoDeYouTube } from "@/lib/portada/seccionesF";
 import { getCategoriasTecnicasDePortada } from "@/lib/queries/getCategoriasTecnicas";
+import { getVideoPorId } from "@/lib/queries/getVideos";
 import {
   getCategoriaUsadaPorSlug,
   getEquiposUsadosDePortada,
@@ -60,6 +64,11 @@ export default async function HomePage() {
     getCategoriasTecnicasDePortada(),
   ]);
   const maquinaUsada = imagenDeMedia(pagina.seccionUsada?.imagen, "");
+  const relVideo = pagina.seccionCompania?.video;
+  const idVideo = typeof relVideo === "object" && relVideo ? relVideo.id : relVideo;
+  const videoCompania = videoDeCompania({
+    video: idVideo ? await getVideoPorId(idVideo) : null,
+  });
 
   return (
     <>
@@ -77,6 +86,16 @@ export default async function HomePage() {
       {/* Secciones 4 y 5 de ux-9 (fase E). Sin datos, no se pintan. */}
       <CarruselLogos logos={logosDeMarcas(pagina.seccionLogos)} />
       <SeccionRepuestos tarjetas={tarjetasDeRepuestos(categoriasTecnicas)} />
+
+      {/* Secciones 6, 7 y 8 de ux-9 (fase F). Sin vídeo, la tarjeta va en oscuro. */}
+      <SeccionCompania
+        video={videoCompania}
+        youtube={videoDeYouTube(pagina.seccionCompania?.youtube)}
+      />
+      <SeccionCatalogo
+        whatsapp={enlaceWhatsApp(contact.phone)}
+        sobreVideo={videoCompania !== null}
+      />
 
       <main className="mx-auto max-w-5xl px-4 py-12">
         <JsonLd data={buildOrganizationJsonLd()} />

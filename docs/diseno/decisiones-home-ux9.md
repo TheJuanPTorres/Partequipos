@@ -1670,3 +1670,105 @@ script se niega si la base o el Blob no son los del preview.
 - La sección 4 no se pinta, porque no hay logos.
 - La sección 5 sale con tarjetas de solo texto en cuanto dirección asigne
   `ordenPortada`, icono y enlace a las categorías desde el panel.
+
+---
+
+## 19. Fase F — secciones 6, 7 y 8 (2026-10-01)
+
+**Fuentes:**
+
+- El export: `19fb55e9`, `74556815`, `26964688`, `3f91730a` y `1a1256e3` (sección 7); `1e1e3861`, `37ba086b`, `7977e122` y `4f9102b5` (sección 8).
+- El **código del efecto**, que vive en el widget HTML `6b438010` de la sección 6. La sección 6 no pinta nada: es ese script.
+- Lo pintado, medido en el HTML guardado de ux-9 a 1440, 1010 y 390.
+
+### Sección 7 — «Nuestra Compañía»
+
+| Qué (ux-9)              | Valor                                                                                                                                                                                    |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Contenedor              | Relleno 0 · 1,5 % · 1,5 % · 1,5 %                                                                                                                                                        |
+| Tarjeta                 | Alto 100vh, radio 30, relleno 10, contenido centrado                                                                                                                                     |
+| Fondo                   | Vídeo `hf_20260903_212148` en bucle y sin sonido; respaldo `2151307778.jpg`                                                                                                              |
+| Velo                    | `text` (#100F0F) al 21 %                                                                                                                                                                 |
+| Título                  | «Nuestra Compañía», `primary`, blanco; ritmo `pausado` (0,01 · 2 s), disparo al 85 %                                                                                                     |
+| Texto                   | 490 px, `cd1706f` (20 / 20 / 18), blanco, mismo ritmo                                                                                                                                    |
+| Botón de reproducir     | Círculo de 80 px, `primary`, icono blanco; abre YouTube `lcIx96OBAWU`                                                                                                                    |
+| **Fijado** (> 768 px)   | 350 px de scroll, `scrub` 0,6                                                                                                                                                            |
+| **Encogido**            | Escala 1 → 0,4 y radio 0 → 32, lineal                                                                                                                                                    |
+| **Capa blanca fija**    | Opacidad 0 → 1 en el primer 8 %, 1 hasta el 75 %, 0 al 100 %                                                                                                                             |
+| **Texto en movimiento** | «MAQUINARIA PESADA EN COLOMBIA •» × 3 × 2 grupos, Inter 600 en mayúsculas, `clamp(36px, 6vw, 110px)`, #0A0A0A (rojo al pasar el ratón), 90 px/s, detrás del vídeo; enlaza a `/nosotros/` |
+| ≤ 768 px                | Sin fijado, sin encogido y sin texto en movimiento                                                                                                                                       |
+
+**Medido en ux-9 a 1440**, tarjeta según el desplazamiento dentro del fijado:
+
+| Desplazamiento | Tarjeta    | Escala | Radio | Capa blanca |
+| -------------- | ---------- | ------ | ----- | ----------- |
+| 0              | 1397 × 900 | 1      | 0     | 0           |
+| 175            | 978 × 630  | 0,7    | 16    | 1           |
+| 350            | 559 × 360  | 0,4    | 32    | 0           |
+
+**Replicado sin GSAP:**
+
+- El fijado es CSS (`sticky` dentro de un recorrido de 100vh + 350 px).
+- La escala, el radio y la capa los calcula `requestAnimationFrame` a partir del scroll, con alcance de ~0,6 s como el `scrub`.
+- La duración del texto en movimiento sale del ancho real del grupo: 90 px/s.
+
+**Vídeo:**
+
+- `preload="none"`: solo se reproduce mientras la tarjeta está a la vista.
+- El póster va debajo con `next/image`; es lo que se ve antes de cargar, al pausar y con movimiento reducido.
+- `aria-hidden` si el vídeo está marcado como decorativo.
+
+**Datos** (`paginas.seccionCompania`):
+
+- `video`: relación con `videos`.
+- `youtube`: URL validada (`src/lib/fields/youtube.ts`, con pruebas). Solo `youtube.com`, `youtu.be` y `youtube-nocookie.com` por https, con id de 11 caracteres.
+
+**YouTube** (`DialogoYouTube`, reutilizable en la fase H):
+
+- El iframe no existe hasta pulsar, y siempre desde `youtube-nocookie.com`.
+- `<dialog>` nativo con `showModal()`: el foco queda dentro, se cierra con Escape o pulsando el fondo, y el foco vuelve siempre al botón.
+- Al cerrar, el iframe se destruye.
+
+### Sección 8 — «Encuentra la maquinaria que tu operación necesita»
+
+| Qué (ux-9) | Valor                                                                                                 |
+| ---------- | ----------------------------------------------------------------------------------------------------- |
+| Contenedor | Relleno 10 · 10 · 50 · 10, **margen superior −180 px**                                                |
+| Título     | 735 px, `primary`, #100F0F, 30 px debajo; ritmo `titulo`, disparo al 95 %                             |
+| Botones    | «Catálogo» y «WhatsApp»: radio 7, borde 1 px, `primary`; al pasar el ratón, `text`; 20 px entre ellos |
+
+**Dónde cae el −180** (medido en ux-9):
+
+- **Por encima de 768 px**, el recorrido del fijado deja libre ese hueco: el título queda 100 px por debajo de la tarjeta ya encogida.
+- **A 768 px o menos** no hay fijado, y el título se pinta **sobre** el final del vídeo, en oscuro sobre la imagen. Se replica, y su contraste queda **pendiente de Andrés**, como los demás contrastes de ux-9 que fallan.
+
+### Desviaciones de esta fase
+
+| #   | ux-9                                                                                 | Nuestro                                                                                             | Por qué                                   |
+| --- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| D1  | Título de la 8 en `<div>`; texto de la 7 en `<h3>`                                   | `<h2>` y `<p>`                                                                                      | Jerarquía                                 |
+| D2  | Vídeo y texto en movimiento sin pausa; el encogido no respeta el movimiento reducido | Botón de pausa en la tarjeta; con movimiento reducido, póster sin vídeo ni encogido, y texto quieto | WCAG 2.2.2, aprobado                      |
+| D6  | Iconos de Font Awesome                                                               | Tabler (`truck`, `brand-whatsapp`, `player-play`)                                                   | Sin la fuente de iconos                   |
+| D16 | «Catálgo»                                                                            | «Catálogo»                                                                                          | Errata                                    |
+| D20 | Ventana de YouTube del widget de Andrés: foco devuelto solo si se abrió con teclado  | `<dialog>` nativo: foco dentro y devuelto siempre                                                   | Teclado                                   |
+| D21 | El primer enlace del texto en movimiento recibe foco, invisible tras el vídeo        | Ningún enlace del texto en movimiento recibe foco; sigue siendo enlace con el ratón                 | Foco visible                              |
+| D22 | —                                                                                    | **Sin vídeo** (producción), a ≤ 768 px la sección 8 no sube                                         | Título oscuro sobre tarjeta oscura: 1,0:1 |
+
+### Assets — solo en el preview
+
+Se siembran con `npm run preview:fase-f:sembrar` y se quitan con `retirar`. El script se niega si la base o el Blob no son los del preview.
+
+- **Vídeo** `hf_20260903_212148`, **reexportado** en local a H.264 High de 8 bits:
+  - 1920 × 1080 a 1,5 Mbit/s, dos pasadas, sin audio, `+faststart`;
+  - **3.679.952 bytes**, por debajo del tope de 4 MiB;
+  - VMAF 91,3 frente al original.
+  - Está en `Desktop/partequipos-diseno/web/`, nunca en el repositorio.
+  - Generado por IA: L3.
+- **Póster** `2151307778.jpg`: banco, L3.
+- **YouTube** `lcIx96OBAWU`: titularidad por confirmar con el cliente.
+
+**En producción, sin ellos:**
+
+- La tarjeta se ve en oscuro (`text`, #100F0F) con el velo y el texto blanco.
+- Por encima de 768 px, el fijado, el encogido y el texto en movimiento funcionan igual.
+- Sin YouTube, no hay botón de reproducir.

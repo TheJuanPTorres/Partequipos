@@ -33,6 +33,8 @@
   position: relative;
   width: 100%;
   height: 560px;
+  /* Las cajas de 3u de las cerradas sobresalen por los lados: sin scroll. */
+  overflow-x: clip;
   container-type: inline-size;
 }
 
@@ -252,7 +254,11 @@
     border-radius: 14px;
     transform: none;
     clip-path: none;
-    transition: height 700ms var(--curva);
+    /*
+     * 450 ms y no los 700 de ux-9: el cambio de alto es layout, y el navegador
+     * solo lo excluye del CLS durante 500 ms tras el toque (§20, D24).
+     */
+    transition: height 450ms var(--curva);
   }
 
   .tarjeta:has(.abrir:focus-visible)::after {

@@ -421,12 +421,25 @@ veredicto, que va en el informe.
 > **Pendientes, por prioridad:**
 >
 > 1. **Dirección:**
->    - el encuadre del hero (propuesta en el informe del paso 3 de la fase 5: Dynapac y Yanmar);
->    - si se quiere la sección 5 en producción, `ordenPortada`, icono y enlace en las categorías técnicas;
 >    - decidir qué se hace con el bloque anterior al diseño de la home («Qué encontrarás aquí», «Sobre Partequipos» y contacto), que ux-9 no tiene.
 > 2. **Fase G (sedes):** espera a la cuenta de Mapbox del cliente (L5).
 > 3. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview.
 > 4. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
+>
+> **Decisiones de dirección (2026-10-01, fase 6):**
+>
+> - **Encuadre del hero:** los puntos focales **no se tocan** hasta que llegue el material definitivo (fondo + imagen frontal). La propuesta de la fase 5 (Dynapac 50/45, Yanmar 45/35) queda solo como referencia.
+> - **Sección 5 en producción:** se activa cuando haya contenido real (`ordenPortada`, icono y enlace en las categorías técnicas). Hasta entonces no se pinta.
+>
+> **Hero listo para el material futuro (verificado 2026-10-01, fase 6):** en el preview, una diapositiva con fondo de escritorio, recorte móvil e imagen frontal a la vez, a 390, 1010 y 1440:
+>
+> - texto y máquina no se solapan: 16 px de aire sobre y bajo la máquina en los tres anchos;
+> - el título queda en el mismo sitio que en una diapositiva sin frontal (0 px de diferencia);
+> - CLS 0 (a 1440, solo el 0,0000057 conocido del menú);
+> - en móvil se descarga **una** foto de fondo, el recorte;
+> - en móvil la frontal **se muestra**, ajustada a su caja (`decisiones-home-ux9.md` §16.2).
+>
+> Diapositiva retirada al terminar.
 
 > **CIERRE DE FASE — 2026-08-14.** Está construido **todo lo que no depende de
 > terceros**. Los seis bloques de código de `docs/RUTA-DESARROLLO.md` (A–F)
@@ -537,7 +550,7 @@ educidas\`). Originales en `Desktop\partequipos-diseno\cliente-hero\`, **nunca e
 | Pendiente                                             | Referencia      |
 | ----------------------------------------------------- | --------------- |
 | Logo institucional fuera de `Media` (URL cableada)    | §10.8           |
-| Separar los stores de Vercel Blob por entorno         | §10.4           |
+| Separar el Blob de `development` del de producción    | §10.4           |
 | Mitigaciones 2–4 de consultas en el build             | §10.10          |
 | Repetir la auditoría de rendimiento con el diseño     | §10.3 p.14      |
 | Revisar el modo oscuro con el diseño puesto           | §10.14          |
@@ -1082,11 +1095,21 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
   **Decisión pendiente:** pasar a **Vercel Pro** (ya presupuestado en la
   cotización) **antes** de que el repositorio vuelva a ser privado; de lo
   contrario los despliegues se bloquearán de nuevo.
-- **PENDIENTE — separar los stores de Vercel Blob.** Ambos entornos comparten el
+- **A MEDIAS — separar los stores de Vercel Blob.** Ambos entornos comparten el
   mismo `BLOB_READ_WRITE_TOKEN`. El `DROP SCHEMA` borró los registros de los 3
   media de producción, pero **los archivos siguen en el Blob y `development` los
   referencia**: no se deben borrar hasta separar los stores. Aislamiento a medias
   mientras esto siga así.
+  - **Preview y producción: CERRADO.** Se separaron el 2026-09-16 (§10.21) y se
+    verificó con una subida el 2026-09-18 (§10.28). Comprobado otra vez el
+    2026-10-01: los 38 registros de `media` del preview apuntan a su almacén
+    (`lsndnc29…`), y los 8 de producción y todas las URL de imagen del HTML de su
+    portada, al de producción.
+  - **`development` y producción: SIGUE ABIERTO.** `.env.local` lleva el Blob de
+    producción (§9, «Entorno del preview»), así que una subida desde
+    `development` escribe en el almacén que sirve el sitio. La mitigación de hoy
+    son los guardas de los scripts (`puedeTocarHeroDePrueba`); el arreglo es un
+    tercer almacén para `development`.
 - **CUIDADO al desplegar — `payload migrate` es interactivo:** si
   `payload_migrations` contiene el marcador `dev` (`batch -1`, que deja el push
   de desarrollo), el comando abre un prompt —
@@ -2351,6 +2374,36 @@ instalada, no en estas notas.
 > commit siguiente, `3bf7acf`, que lo contiene. Con dos casos ya no es una
 > rareza: **se investiga más adelante** (decisión de dirección), empezando por
 > las entregas del webhook de ese push.
+>
+> **INVESTIGADO EL 2026-10-01 (fase 6, solo lectura). Causa NO determinada; el
+> corte está entre GitHub y Vercel, del lado de Vercel.**
+>
+> | Comprobación                               | Resultado                                                                                                                                        |
+> | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+> | ¿GitHub recibió el push?                   | **Sí.** `PushEvent` propio a las 05:42:35 UTC (de `a117d78` a `70573ef`, un solo commit), y CI arrancó 5 s después por `pull_request`            |
+> | ¿Vercel dejó rastro en GitHub?             | **Ninguno**: ni estado «Vercel» (ni siquiera `pending`), ni despliegue, ni check «Vercel Preview Comments». El anterior y el siguiente, los tres |
+> | ¿Lo pidió el commit?                       | **No**: sin `[skip ci]` ni similar; no hay `vercel.json` ni orden de «Ignored Build Step» en el proyecto                                         |
+> | ¿Despliegue cancelado u omitido en Vercel? | **No verificable**: los previews de esa rama ya no existen en Vercel (`vercel ls` e `inspect` no encuentran ni los que sí desplegaron)           |
+> | Las entregas del webhook                   | **No accesibles**: Vercel entra como GitHub App, y sus entregas solo las ve el dueño de la app                                                   |
+> | El primer caso (`3e286fe`, 2026-09-20)     | **Misma firma**: push propio, ningún estado de Vercel                                                                                            |
+>
+> **Frecuencia medida:** la API de eventos del repositorio conserva los últimos
+> 300 eventos; el 2026-10-01 eran unos 165 pushes (2026-09-17 a 2026-10-01) con
+> **149 commits distintos**. De ellos, **2** no tuvieron ningún estado de Vercel:
+> exactamente estos dos. La ventana se desplaza, así que el recuento cambia con
+> el tiempo.
+> Los dos en ramas de trabajo, de un solo commit pequeño, unos 5 min después del
+> push anterior de la misma rama, que sí desplegó.
+>
+> **Hipótesis con evidencia:** el evento de la GitHub App de Vercel no llegó a
+> crear despliegue (entrega perdida o descartada en Vercel). Nada de nuestro
+> repositorio ni de la configuración del proyecto lo explica.
+>
+> **¿Puede repetirse? Sí**, a ~1 de cada 75 commits empujados, y **sin aviso**: el PR se
+> queda sin preview ni prueba de humo y nada falla. **Cómo detectarlo:** antes
+> de dar por verificado un commit, comprobar que tiene estado «Vercel». **Cómo
+> salir:** un commit nuevo encima, como en los dos casos. Si un día molesta,
+> se puede preguntar a soporte de Vercel con los dos sha y las horas de arriba.
 
 ### 10.31 COMPROMISO INCUMPLIDO — Sentry está en la cotización y no está en el repo
 

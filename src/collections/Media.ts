@@ -69,6 +69,8 @@ export const Media: CollectionConfig = {
     beforeOperation: [sinDescargaRemota, sinRecorte, formatoDeImagenPermitido],
   },
   fields: [
+    // PRUEBA A PROPÓSITO: campo sin migración. Esta rama NO se fusiona.
+    { name: "derivaDePrueba", type: "text" },
     {
       name: "alt",
       type: "text",

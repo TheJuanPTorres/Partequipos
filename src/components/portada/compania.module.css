@@ -230,6 +230,12 @@
     display: none;
   }
 
+  /* Arriba: abajo lo tapa el título de la sección 8, que sube sobre el vídeo. */
+  .pausa {
+    top: 24px;
+    bottom: auto;
+  }
+
   /* Sin vídeo no se mueve nada: no hay qué pausar. */
   .seccion:not([data-con-video]) .pausa {
     display: none;

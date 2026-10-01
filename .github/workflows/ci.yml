@@ -72,3 +72,54 @@ jobs:
           PAYLOAD_SECRET: ci-sin-secreto
           DATABASE_URI: postgres://ci:ci@127.0.0.1:5432/ci-sin-base
         run: npm run db:deriva < /dev/null
+
+  migrar-desde-cero:
+    # Aplica TODAS las migraciones a un Postgres vacío con el mismo comando que
+    # el build de Vercel (`deploy:migrate`) y exige que la estructura resultante
+    # coincida con el snapshot de la última (CLAUDE.md §10.33 p.5). Atrapa una
+    # migración que solo funciona sobre la base donde se escribió (§10.33 p.13).
+    # No cubre: bases con datos, valores por defecto, `down` ni lo propio de Neon.
+    name: Migrar desde cero
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    services:
+      postgres:
+        # Supuesto: Neon usa Postgres 17 en proyectos nuevos (no se pudo leer
+        # la versión del proyecto al escribir esto).
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Base efímera del job y secreto de relleno: nada real.
+      DATABASE_URI: postgres://ci:ci@127.0.0.1:5432/ci
+      PAYLOAD_SECRET: ci-sin-secreto
+      PAYLOAD_DISABLE_PUSH: "true"
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v7
+
+      - name: Configurar Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Migrar con el comando del build
+        run: npm run deploy:migrate < /dev/null
+
+      - name: Comparar la estructura con el snapshot
+        run: npx tsx scripts/db/estructura-ci.ts

@@ -8,6 +8,11 @@ export type DiapositivaHero = {
   parrafo: string | null;
   /** Decorativa: `alt` vacío, el título ya dice qué es (ADR 0009). */
   fondo: ImagenLista;
+  /**
+   * Recorte vertical para móvil (< 768 px). Decorativo, como el fondo. Si
+   * falta, el móvil usa `fondo` con su punto focal (CLAUDE.md §10.36).
+   */
+  fondoMovil: ImagenLista | null;
   frontal: ImagenLista | null;
   enlace: { href: string; nombre: string } | null;
 };
@@ -24,6 +29,7 @@ export type DiapositivaHero = {
 export function diapositivasDeHero(hero: Pagina["hero"]): DiapositivaHero[] {
   return (hero?.diapositivas ?? []).flatMap((d) => {
     const fondo = imagenDeMedia(d.imagenFondo, "");
+    const movil = imagenDeMedia(d.imagenFondoMovil, "");
     const titulo = d.titulo?.trim();
     if (!fondo || !titulo) return [];
     const href = d.enlace?.trim();
@@ -33,6 +39,7 @@ export function diapositivasDeHero(hero: Pagina["hero"]): DiapositivaHero[] {
         titulo,
         parrafo: d.parrafo?.trim() || null,
         fondo: { ...fondo, alt: "" },
+        fondoMovil: movil ? { ...movil, alt: "" } : null,
         frontal: imagenDeMedia(d.imagenFrontal, titulo),
         enlace: href && nombre && validarEnlace(href) === true ? { href, nombre } : null,
       },

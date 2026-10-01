@@ -34,6 +34,27 @@ describe("diapositivas del hero", () => {
     assert.deepEqual(d?.enlace, { href: "/maquinaria-pesada/", nombre: "Ver maquinaria Hitachi" });
   });
 
+  it("el recorte para móvil es opcional y decorativo", () => {
+    const [sin] = diapositivasDeHero({ diapositivas: [{ titulo: "X", imagenFondo: media(1) }] });
+    assert.equal(sin?.fondoMovil, null, "sin recorte: el móvil usa el fondo de escritorio");
+    const [con] = diapositivasDeHero({
+      diapositivas: [
+        {
+          titulo: "X",
+          imagenFondo: media(1),
+          imagenFondoMovil: media(3, { focalX: 60, focalY: 40 }),
+        },
+      ],
+    });
+    assert.equal(con?.fondoMovil?.url, "https://x/3.jpg");
+    assert.equal(con?.fondoMovil?.alt, "", "decorativo, como el fondo");
+    assert.equal(con?.fondoMovil?.posicion, "60% 40%");
+    const [roto] = diapositivasDeHero({
+      diapositivas: [{ titulo: "X", imagenFondo: media(1), imagenFondoMovil: 9 }],
+    });
+    assert.equal(roto?.fondoMovil, null, "imagen borrada (llega el id): como si no hubiera");
+  });
+
   it("descarta la diapositiva sin fondo utilizable (p. ej. imagen borrada: llega el id)", () => {
     assert.deepEqual(diapositivasDeHero({ diapositivas: [{ titulo: "X", imagenFondo: 7 }] }), []);
   });

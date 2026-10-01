@@ -16,6 +16,13 @@ export const MARCA_DEMO = "HERO CLIENTE —";
 
 export type DiapositivaDemo = {
   fichero: string;
+  /**
+   * Recorte vertical 9:16 (1080 × 1920) para móvil (CLAUDE.md §10.36), generado desde la foto
+   * reducida centrado en su punto focal; por eso su propio foco es el centro.
+   * Está en `cliente-hero/movil/`.
+   */
+  ficheroMovil: string;
+  altMovil: string;
   alt: string;
   titulo: string;
   parrafo: string;
@@ -38,7 +45,9 @@ const d = (
   focalY: number,
 ): DiapositivaDemo => ({
   fichero,
+  ficheroMovil: fichero.replace(/\.jpg$/, "-movil.jpg"),
   alt: `${MARCA_DEMO} ${descripcion}`,
+  altMovil: `${MARCA_DEMO} ${descripcion} (recorte para móvil)`,
   titulo: titulo(palabras, marca),
   parrafo: palabras,
   focalX,

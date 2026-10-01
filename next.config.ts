@@ -150,6 +150,9 @@ const nextConfig: NextConfig = {
        *    sin que nadie lo note hasta que un cliente no pueda enviarlo.
        * 3. `blob:` y `data:` en `img-src` los necesitan el panel (vistas previas
        *    de subida) y el optimizador de imágenes.
+       * 4. Portada (fases F y H): `media-src` para los vídeos, que se sirven
+       *    directos desde el Blob, y `frame-src` para YouTube, SOLO el dominio
+       *    sin cookies y solo cuando el visitante pulsa «reproducir».
        */
       {
         key: "Content-Security-Policy-Report-Only",
@@ -159,7 +162,8 @@ const nextConfig: NextConfig = {
           "style-src 'self' 'unsafe-inline'",
           "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
           "font-src 'self' data:",
-          "frame-src https://challenges.cloudflare.com",
+          "media-src 'self' https://*.public.blob.vercel-storage.com",
+          "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com",
           "connect-src 'self' https://challenges.cloudflare.com",
           "object-src 'none'",
           "base-uri 'self'",

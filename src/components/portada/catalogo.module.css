@@ -1,0 +1,69 @@
+/*
+ * SECCIÓN 8 — contenedor `1e1e3861`: relleno 10 · 10 · 50 · 10, margen
+ * superior −180 px. Título `37ba086b`: 735 px, centrado, `primary`, #100F0F,
+ * 30 px debajo. Botones `7977e122` y `4f9102b5`: radio 7, borde 1 px, fondo
+ * `primary`, al pasar `text`; relleno del botón global. 20 px entre los dos.
+ */
+.seccion {
+  position: relative;
+  display: flex;
+  margin-top: -180px;
+  padding: 10px 10px 50px;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.titulo {
+  width: 100%;
+  max-width: 735px;
+  margin: 0 0 30px;
+  color: var(--color-texto);
+  text-align: center;
+}
+
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.boton {
+  display: inline-flex;
+  padding: var(--boton-relleno);
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--color-marca);
+  border-radius: 7px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.boton svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.boton:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/* D22: sin vídeo, a 768 px o menos no sube sobre la tarjeta oscura. */
+@media (max-width: 768px) {
+  .seccion[data-sin-video] {
+    margin-top: 0;
+    padding-top: 40px;
+  }
+}

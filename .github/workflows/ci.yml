@@ -60,3 +60,15 @@ jobs:
 
       - name: Tests
         run: npm test
+
+      - name: Deriva de esquema
+        # Falla si una colección cambia el esquema sin su migración (CLAUDE.md
+        # §10.33 p.5). NO conecta a ninguna base (`disableDBConnect`): las dos
+        # variables son de relleno para que la config arranque. Tope de tiempo
+        # porque drizzle-kit PREGUNTA ante un posible renombrado de columna, y sin
+        # TTY se quedaría esperando; la entrada estándar va cerrada.
+        timeout-minutes: 5
+        env:
+          PAYLOAD_SECRET: ci-sin-secreto
+          DATABASE_URI: postgres://ci:ci@127.0.0.1:5432/ci-sin-base
+        run: npm run db:deriva < /dev/null

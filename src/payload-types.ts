@@ -709,6 +709,10 @@ export interface Pagina {
           parrafo?: string | null;
           imagenFondo: number | Media;
           /**
+           * Opcional. Recorte vertical (p. ej. 1080 × 1620) que se usa por debajo de 768 px. Si se deja vacío, se usa la de escritorio con su punto focal.
+           */
+          imagenFondoMovil?: (number | null) | Media;
+          /**
            * Opcional: va delante del título.
            */
           imagenFrontal?: (number | null) | Media;
@@ -1460,6 +1464,7 @@ export interface PaginasSelect<T extends boolean = true> {
               titulo?: T;
               parrafo?: T;
               imagenFondo?: T;
+              imagenFondoMovil?: T;
               imagenFrontal?: T;
               enlace?: T;
               enlaceNombre?: T;

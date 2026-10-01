@@ -215,7 +215,17 @@
 
 .fondo {
   object-fit: cover;
-  object-position: center center;
+  /* Punto focal del panel (variables que pone el componente): qué parte se ve
+     y desde dónde crece el Ken Burns. En móvil, el del recorte vertical. */
+  object-position: var(--hero-foco, center);
+  transform-origin: var(--hero-foco, center);
+}
+
+@media (max-width: 767px) {
+  .fondo {
+    object-position: var(--hero-foco-movil, var(--hero-foco, center));
+    transform-origin: var(--hero-foco-movil, var(--hero-foco, center));
+  }
 }
 
 /*

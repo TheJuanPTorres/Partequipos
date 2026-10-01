@@ -170,6 +170,22 @@ export const PaginaInstitucional: CollectionConfig = {
               label: "Imagen de fondo",
             },
             {
+              /*
+               * RECORTE VERTICAL PARA MÓVIL (CLAUDE.md §10.36): por debajo de
+               * 768 px el fondo ocupa todo el alto del hero y el navegador pedía
+               * la foto de escritorio a 1920 px. Con un recorte vertical pide
+               * ~750 px. Opcional: sin él se usa la de escritorio, como antes.
+               */
+              name: "imagenFondoMovil",
+              type: "upload",
+              relationTo: "media",
+              label: "Imagen de fondo para móvil (vertical)",
+              admin: {
+                description:
+                  "Opcional. Recorte vertical (p. ej. 1080 × 1620) que se usa por debajo de 768 px. Si se deja vacío, se usa la de escritorio con su punto focal.",
+              },
+            },
+            {
               name: "imagenFrontal",
               type: "upload",
               relationTo: "media",

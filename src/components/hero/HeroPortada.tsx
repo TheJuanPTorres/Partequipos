@@ -1,7 +1,7 @@
 "use client";
 
 import { IconCirclePlus } from "@tabler/icons-react";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import {
   useCallback,
@@ -70,6 +70,84 @@ function IconoFlecha({ hacia }: { hacia: "anterior" | "siguiente" }) {
         strokeLinejoin="round"
       />
     </svg>
+  );
+}
+
+/** Por debajo de este ancho se usa el recorte vertical, si lo hay (CLAUDE.md §10.36). */
+const MEDIA_MOVIL = "(max-width: 767px)";
+
+/**
+ * FONDO DE UNA DIAPOSITIVA. Sin recorte para móvil, un `<Image>` como siempre.
+ * Con recorte, `<picture>`: el navegador elige UNA de las dos fotos por la
+ * media query y solo descarga esa. Por eso ahí NO hay `preload` (precargaría
+ * la de escritorio también en el móvil, lo advierte la documentación de
+ * `getImageProps`): la primera va con `fetchPriority="high"`.
+ *
+ * El punto focal de cada foto llega por variables CSS: `.fondo` lo aplica a
+ * `object-position` y al origen del Ken Burns, y el móvil usa el suyo.
+ */
+function FondoHero({
+  diapositiva: s,
+  primera,
+  alCargar,
+}: {
+  diapositiva: DiapositivaHero;
+  primera: boolean;
+  alCargar?: () => void;
+}) {
+  const focos = {
+    ["--hero-foco" as string]: s.fondo.posicion,
+    ["--hero-foco-movil" as string]: (s.fondoMovil ?? s.fondo).posicion,
+  };
+  const prioridad = primera ? ("high" as const) : ("low" as const);
+
+  if (!s.fondoMovil) {
+    return (
+      <Image
+        src={s.fondo.url}
+        alt=""
+        fill
+        // Por la proporción de la foto: en vertical manda el alto (ver la función).
+        sizes={sizesFondoHero(s.fondo.width, s.fondo.height)}
+        // SOLO la primera: es el LCP. `preload` y no `priority` (obsoleto en 16.3.5).
+        preload={primera}
+        fetchPriority={prioridad}
+        loading="eager"
+        onLoad={alCargar}
+        className={estilos.fondo}
+        style={focos}
+      />
+    );
+  }
+
+  const {
+    props: { srcSet: srcSetMovil, sizes: sizesMovil },
+  } = getImageProps({
+    src: s.fondoMovil.url,
+    alt: "",
+    fill: true,
+    sizes: sizesFondoHero(s.fondoMovil.width, s.fondoMovil.height),
+  });
+  const { props: escritorio } = getImageProps({
+    src: s.fondo.url,
+    alt: "",
+    fill: true,
+    sizes: sizesFondoHero(s.fondo.width, s.fondo.height),
+    fetchPriority: prioridad,
+    loading: "eager",
+  });
+
+  return (
+    <picture>
+      <source media={MEDIA_MOVIL} srcSet={srcSetMovil} sizes={sizesMovil} />
+      <img
+        {...escritorio}
+        alt=""
+        onLoad={alCargar}
+        className={estilos.fondo}
+        style={{ ...escritorio.style, ...focos }}
+      />
+    </picture>
   );
 }
 
@@ -245,24 +323,10 @@ export function HeroPortada({ diapositivas }: Props) {
                 data-estado={estadoDe(i)}
                 aria-hidden={i !== activo}
               >
-                <Image
-                  src={s.fondo.url}
-                  alt=""
-                  fill
-                  // Por la proporción de la foto: en vertical manda el alto (ver la función).
-                  sizes={sizesFondoHero(s.fondo.width, s.fondo.height)}
-                  /*
-                   * SOLO la primera: es el LCP. `preload` y no `priority` (obsoleto
-                   * en Next 16.3.5); `fetchPriority` para que vaya por delante.
-                   * Las demás no existen en el HTML hasta que carga la primera.
-                   */
-                  preload={i === 0}
-                  fetchPriority={i === 0 ? "high" : "low"}
-                  loading="eager"
-                  onLoad={i === 0 ? alCargarPrimera : undefined}
-                  className={estilos.fondo}
-                  // Punto focal del panel: qué parte se ve, y desde dónde crece el Ken Burns.
-                  style={{ objectPosition: s.fondo.posicion, transformOrigin: s.fondo.posicion }}
+                <FondoHero
+                  diapositiva={s}
+                  primera={i === 0}
+                  alCargar={i === 0 ? alCargarPrimera : undefined}
                 />
               </div>
             ) : null,

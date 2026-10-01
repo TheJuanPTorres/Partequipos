@@ -10,6 +10,7 @@ import * as migration_20260923_210806_fase_b_portada from './20260923_210806_fas
 import * as migration_20260924_143657_fase_d_portada from './20260924_143657_fase_d_portada';
 import * as migration_20260924_194316_pie_global from './20260924_194316_pie_global';
 import * as migration_20260924_200150_pie_imagen_decorativa from './20260924_200150_pie_imagen_decorativa';
+import * as migration_20261001_002948_hero_fondo_movil from './20261001_002948_hero_fondo_movil';
 
 export const migrations = [
   {
@@ -70,6 +71,11 @@ export const migrations = [
   {
     up: migration_20260924_200150_pie_imagen_decorativa.up,
     down: migration_20260924_200150_pie_imagen_decorativa.down,
-    name: '20260924_200150_pie_imagen_decorativa'
+    name: '20260924_200150_pie_imagen_decorativa',
+  },
+  {
+    up: migration_20261001_002948_hero_fondo_movil.up,
+    down: migration_20261001_002948_hero_fondo_movil.down,
+    name: '20261001_002948_hero_fondo_movil'
   },
 ];

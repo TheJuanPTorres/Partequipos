@@ -17,7 +17,7 @@ export const MARCA_DEMO = "HERO CLIENTE —";
 export type DiapositivaDemo = {
   fichero: string;
   /**
-   * Recorte vertical 2:3 para móvil (CLAUDE.md §10.36), generado desde la foto
+   * Recorte vertical 9:16 (1080 × 1920) para móvil (CLAUDE.md §10.36), generado desde la foto
    * reducida centrado en su punto focal; por eso su propio foco es el centro.
    * Está en `cliente-hero/movil/`.
    */

@@ -71,11 +71,24 @@ jobs:
         # variables son de relleno para que la config arranque. Tope de tiempo
         # porque drizzle-kit PREGUNTA ante un posible renombrado de columna, y sin
         # TTY se quedaría esperando; la entrada estándar va cerrada.
+        #
+        # La salida va a un FICHERO y se muestra después: así el paso espera a
+        # que termine npm, no a que se cierre la tubería del runner (un proceso
+        # hijo que la heredara la mantendría abierta). `timeout` convierte un
+        # cuelgue en un fallo explícito a los 2 min (CLAUDE.md §10.25).
         timeout-minutes: 5
         env:
           PAYLOAD_SECRET: ci-sin-secreto
           DATABASE_URI: postgres://ci:ci@127.0.0.1:5432/ci-sin-base
-        run: npm run db:deriva < /dev/null
+        run: |
+          set +e
+          timeout -k 10 120 npm run db:deriva < /dev/null > deriva.log 2>&1
+          codigo=$?
+          cat deriva.log
+          if [ $codigo -eq 124 ] || [ $codigo -eq 137 ]; then
+            echo "::error::La deriva no terminó en 2 min (cuelgue): ver CLAUDE.md §10.25"
+          fi
+          exit $codigo
 
   migrar-desde-cero:
     # Aplica TODAS las migraciones a un Postgres vacío con el mismo comando que

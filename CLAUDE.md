@@ -2892,27 +2892,27 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Scripts sin push de esquema              | Un script que alcanza la config por un import estático antes de fijar `PAYLOAD_DISABLE_PUSH`: marcador `dev` en la base (§10.34)                               | `src/lib/db/scriptsSinPush.test.ts`                                                | CI, en cada push               |
 | Imagen del pie sin tapar contenido       | La imagen decorativa del pie (sobresale por encima) tapando texto de una plantilla. Mide con los píxeles opacos del recorte, no con su caja (§10.33 p.11)      | `npm run qa:vuelo-pie` (`scripts/qa/vuelo-pie.mjs`, con `npx`: necesita navegador) | **A mano**, contra producción  |
 
-**«Deriva de esquema» se colgó una vez (run 36806029786) y está blindada (fase 5).**
-Imprimió el veredicto y no terminó hasta el tope del paso. No se reprodujo en
-40 ejecuciones seguidas en CI ni en 20 en local, así que la causa no está
-observada; la explicación que encaja con el código:
+**«Deriva de esquema» se colgó dos veces; está blindada (fase 5).**
 
-- `payload run` carga el script con `tsImport` de tsx. En Node 24 eso usa el
-  hilo de ganchos de carga, porque `payload/bin.js` desactiva
-  `module.registerHooks`.
-- El script llamaba a `process.exit()` **mientras ese `import` aún se
-  evaluaba**.
+**Qué pasó:** imprimió el veredicto y no terminó hasta el tope del paso, en los runs 36806029786 y 36815507606 (intento 3).
 
-La conexión a la base queda **descartada**: con `disableDBConnect` no se abre
-ninguna, y sin `process.exit` el script termina solo en ~6 s, sin handles
-pendientes.
+**La causa NO se ha observado:**
 
-**Lo que se descubrió por el camino, y vale para cualquier script de
-`payload run`:** al acabar el `import`, Payload 3.89 llama **siempre** a
-`process.exit(0)`. Un `process.exitCode = 1` del script queda pisado y el
-fallo saldría en verde. Para que falle, el script tiene que **lanzar** un
-error: Payload lo captura y sale con 1. El guardarraíl ya no llama a
-`process.exit`; el job de CI lleva además `timeout-minutes: 15` como red.
+- 0 cuelgues en 70 ejecuciones de diagnóstico en CI (aisladas, con el job completo y con la salida por tubería) y en 20 locales.
+- Primera hipótesis: `process.exit()` durante la evaluación del `import` de `payload run`. **La refutó el segundo cuelgue.**
+- La conexión a la base queda **descartada**: con `disableDBConnect` no se abre ninguna.
+
+**Dos cosas sí demostradas, y valen para cualquier script de `payload run`:**
+
+1. **Payload lanza un proceso hijo huérfano.** Salvo con `NODE_ENV` de despliegue, cada `getPayload` lanza `payload generate:types` y no lo espera (Payload 3.89, `dist/index.js`). Ese hijo se queda reescribiendo `payload-types.ts` mientras el script sale. Los scripts lo apagan con `PAYLOAD_SIN_GENERAR_TIPOS=true`, que controla `typescript.autoGenerate` en la config.
+2. **El código de salida que fija el script no cuenta.** Al acabar el `import`, `payload run` llama **siempre** a `process.exit(0)`, así que un `process.exitCode = 1` queda pisado y el fallo saldría en verde. Para fallar, el script tiene que **lanzar** un error: Payload lo captura y sale con 1.
+
+**Blindaje:**
+
+- El script no llama a `process.exit` y termina solo, sin el hijo de tipos.
+- El paso de CI espera a `npm` y no a la tubería: la salida va a un fichero y luego se muestra.
+- `timeout` de 2 min sobre el proceso, con un mensaje claro si salta.
+- `timeout-minutes: 15` en el job.
 
 **Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
 lista real, y una prueba que exige que coincidan.

@@ -26,6 +26,8 @@ import { veredictoDeriva } from "../../src/lib/db/derivaEsquema";
 // Un script de datos no toca el esquema (CLAUDE.md §10.9, §10.34). Aquí,
 // además, no hay conexión: el push no podría correr de todos modos.
 process.env.PAYLOAD_DISABLE_PUSH = "true";
+// Y no lanza el proceso hijo que regenera los tipos (ver `payload.config.ts`).
+process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 const { default: config } = await import("../../src/payload.config");
 const payload = await getPayload({ config, disableDBConnect: true });
 

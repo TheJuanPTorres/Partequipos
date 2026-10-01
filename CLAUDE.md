@@ -1104,7 +1104,7 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     verificó con una subida el 2026-09-18 (§10.28). Comprobado otra vez el
     2026-10-01: los 38 registros de `media` del preview apuntan a su almacén
     (`lsndnc29…`), y los 8 de producción y todas las URL de imagen del HTML de su
-    portada (33), al de producción.
+    portada, al de producción.
   - **`development` y producción: SIGUE ABIERTO.** `.env.local` lleva el Blob de
     producción (§9, «Entorno del preview»), así que una subida desde
     `development` escribe en el almacén que sirve el sitio. La mitigación de hoy
@@ -2387,8 +2387,11 @@ instalada, no en estas notas.
 > | Las entregas del webhook                   | **No accesibles**: Vercel entra como GitHub App, y sus entregas solo las ve el dueño de la app                                                   |
 > | El primer caso (`3e286fe`, 2026-09-20)     | **Misma firma**: push propio, ningún estado de Vercel                                                                                            |
 >
-> **Frecuencia medida:** de los **168 pushes** que GitHub conserva (2026-09-17 a
-> 2026-10-01), **2** no tuvieron ningún estado de Vercel: exactamente estos dos.
+> **Frecuencia medida:** la API de eventos del repositorio conserva los últimos
+> 300 eventos; el 2026-10-01 eran unos 165 pushes (2026-09-17 a 2026-10-01) con
+> **149 commits distintos**. De ellos, **2** no tuvieron ningún estado de Vercel:
+> exactamente estos dos. La ventana se desplaza, así que el recuento cambia con
+> el tiempo.
 > Los dos en ramas de trabajo, de un solo commit pequeño, unos 5 min después del
 > push anterior de la misma rama, que sí desplegó.
 >
@@ -2396,7 +2399,7 @@ instalada, no en estas notas.
 > crear despliegue (entrega perdida o descartada en Vercel). Nada de nuestro
 > repositorio ni de la configuración del proyecto lo explica.
 >
-> **¿Puede repetirse? Sí**, a ~1 de cada 85 pushes, y **sin aviso**: el PR se
+> **¿Puede repetirse? Sí**, a ~1 de cada 75 commits empujados, y **sin aviso**: el PR se
 > queda sin preview ni prueba de humo y nada falla. **Cómo detectarlo:** antes
 > de dar por verificado un commit, comprobar que tiene estado «Vercel». **Cómo
 > salir:** un commit nuevo encima, como en los dos casos. Si un día molesta,

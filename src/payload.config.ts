@@ -173,6 +173,15 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
+    /*
+     * Fuera de producción, cada `getPayload` LANZA un proceso hijo
+     * `payload generate:types` y no lo espera (leído en Payload 3.89,
+     * `dist/index.js`). En un script eso deja un huérfano reescribiendo
+     * `payload-types.ts` mientras el script sale; en CI, además, durante el
+     * guardarraíl de deriva (CLAUDE.md §10.25, cuelgue del run 36806029786).
+     * Los scripts lo apagan con esta variable; `next dev` y el panel, no.
+     */
+    autoGenerate: process.env.PAYLOAD_SIN_GENERAR_TIPOS !== "true",
   },
   db: postgresAdapter({
     pool: {

@@ -7,7 +7,7 @@ import type { DatoFicha, Pestana, TarjetaEquipo } from "@/lib/portada/secciones"
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import estilos from "./maquinariaUsada.module.css";
-import { PestanasUsada } from "./PestanasUsada";
+import { PestanasUsada } from "./diferidos";
 
 /**
  * SECCIÓN 3 DE LA PORTADA — «Maquinaria pesada usada» (ux-9).

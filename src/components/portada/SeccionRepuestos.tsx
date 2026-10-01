@@ -17,7 +17,7 @@ import {
 } from "@/lib/portada/seccionesE";
 
 import estilos from "./repuestos.module.css";
-import { TarjetasApiladas } from "./TarjetasApiladas";
+import { TarjetasApiladas } from "./diferidos";
 
 /**
  * SECCIÓN 5 DE LA PORTADA — «Venta de repuestos» con tarjetas apiladas (ux-9).

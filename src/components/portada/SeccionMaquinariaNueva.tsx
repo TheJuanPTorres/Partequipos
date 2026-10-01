@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { RUTA_MARCAS_NUEVA, type TarjetaMarca } from "@/lib/portada/secciones";
 
-import { CarruselMarcas } from "./CarruselMarcas";
+import { CarruselMarcas } from "./diferidos";
 import estilos from "./maquinariaNueva.module.css";
 
 /**

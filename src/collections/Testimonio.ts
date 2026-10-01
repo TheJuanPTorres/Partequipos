@@ -12,6 +12,7 @@ import {
   validarPublicacionTestimonio,
 } from "../lib/fields/reglasPortada";
 import { borradoAdmin, esPersonal, escrituraContenido } from "../lib/seguridad/acceso";
+import { validarYouTube } from "../lib/fields/youtube";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("testimonios");
@@ -113,7 +114,21 @@ export const Testimonio: CollectionConfig = {
       relationTo: "videos",
       label: "Vídeo del testimonio",
       admin: {
-        description: "Opcional. En ux-9 ninguno lo tiene, aunque el botón dice «Ver Video».",
+        description: "Opcional. Un MP4 propio; para YouTube, el campo de abajo.",
+      },
+    },
+    /*
+     * Fase H: en ux-9 los cuatro testimonios abren un vídeo de YouTube con su
+     * segundo de inicio (la nota de la fase B decía que ninguno tenía vídeo:
+     * era falsa). Se abre desde youtube-nocookie.com y solo al pulsar.
+     */
+    {
+      name: "youtube",
+      type: "text",
+      label: "Vídeo de YouTube del testimonio",
+      validate: validarYouTube,
+      admin: {
+        description: "Opcional. Enlace de YouTube; si lleva «&t=21s», empieza en ese segundo.",
       },
     },
     {

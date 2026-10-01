@@ -1,0 +1,246 @@
+/*
+ * SECCIÓN 10 — testimonios. Contenedor `306ba9d3`: relleno 3 %. Título
+ * `7150fed1`: 815 px, 60 px debajo. Acordeón `4d701aa3`: valores por defecto
+ * del widget de Andrés (`css.tpl`, leído), con el texto del botón «Ver Video».
+ */
+.seccion {
+  display: flex;
+  padding: 3%;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.titulo {
+  width: 100%;
+  max-width: 815px;
+  margin: 0 0 60px;
+  color: var(--color-texto);
+  text-align: center;
+}
+
+.pista {
+  display: flex;
+  width: 100%;
+  height: 560px;
+  gap: 12px;
+}
+
+.tarjeta {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 14px;
+  transition:
+    flex-grow 700ms cubic-bezier(0.65, 0, 0.35, 1),
+    height 700ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.tarjeta[data-activa] {
+  flex-grow: 3;
+}
+
+.medio {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: #111;
+}
+
+/* Cerradas: desenfocadas 14 px y algo ampliadas; abierta, nítida. */
+.img {
+  object-fit: cover;
+  transform: scale(1.15);
+  filter: blur(14px);
+  transition:
+    filter 700ms ease,
+    transform 700ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.tarjeta[data-activa] .img {
+  transform: scale(1);
+  filter: blur(0);
+}
+
+/* Degradado inferior, solo en la abierta. */
+.sombra {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.7) 0%, rgb(0 0 0 / 0) 65%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.tarjeta[data-activa] .sombra {
+  opacity: 1;
+  transition: opacity 0.6s ease 280ms;
+}
+
+/* El botón que abre la tarjeta la cubre entera; transparente. */
+.abrir {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tarjeta[data-activa] .abrir {
+  cursor: default;
+}
+
+.abrir:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: -3px;
+}
+
+/* «Ver Video»: píldora arriba a la izquierda, solo en la abierta. */
+.ver {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border: 1px solid rgb(255 255 255 / 0.55);
+  border-radius: 999px;
+  background-color: rgb(255 255 255 / 0.12);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    visibility 0s linear 0.25s,
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.ver svg {
+  width: 12px;
+  height: 12px;
+}
+
+.ver:hover,
+.ver:focus-visible {
+  border-color: rgb(255 255 255 / 0.9);
+  background-color: rgb(255 255 255 / 0.24);
+  outline: none;
+}
+
+.ver:focus-visible {
+  box-shadow: 0 0 0 3px var(--color-marca);
+}
+
+.tarjeta[data-activa] .ver {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.45s ease 350ms,
+    transform 0.45s ease 350ms,
+    visibility 0s linear 0s,
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.contenido {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  max-width: 640px;
+  padding: 24px 28px;
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.tarjeta[data-activa] .contenido {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.5s ease 420ms,
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 420ms;
+}
+
+.nombre {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(24px, 2.4vw, 34px);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.lugar {
+  margin: 2px 0 0;
+  color: #fff;
+  font-size: clamp(16px, 1.5vw, 21px);
+  line-height: 1.2;
+}
+
+.texto {
+  margin: 16px 0 0;
+  color: rgb(255 255 255 / 0.85);
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* Apiladas, como el widget por debajo de 768 px. */
+@media (max-width: 767px) {
+  .pista {
+    height: auto;
+    flex-direction: column;
+  }
+
+  .tarjeta,
+  .tarjeta[data-activa] {
+    flex: 0 0 auto;
+  }
+
+  .tarjeta {
+    height: 96px;
+  }
+
+  .tarjeta[data-activa] {
+    height: 460px;
+  }
+
+  .contenido {
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta,
+  .img,
+  .sombra,
+  .ver,
+  .contenido {
+    transition: none !important;
+  }
+}

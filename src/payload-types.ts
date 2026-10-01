@@ -760,6 +760,12 @@ export interface Pagina {
      */
     youtube?: string | null;
   };
+  seccionFaq?: {
+    /**
+     * Decorativa: asoma arriba a la izquierda. Opcional.
+     */
+    imagen?: (number | null) | Media;
+  };
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -936,9 +942,13 @@ export interface Testimonio {
   cita: string;
   foto?: (number | null) | Media;
   /**
-   * Opcional. En ux-9 ninguno lo tiene, aunque el botón dice «Ver Video».
+   * Opcional. Un MP4 propio; para YouTube, el campo de abajo.
    */
   video?: (number | null) | Video;
+  /**
+   * Opcional. Enlace de YouTube; si lleva «&t=21s», empieza en ese segundo.
+   */
+  youtube?: string | null;
   autorizacionUso?: boolean | null;
   fechaAutorizacion?: string | null;
   /**
@@ -1523,6 +1533,11 @@ export interface PaginasSelect<T extends boolean = true> {
         video?: T;
         youtube?: T;
       };
+  seccionFaq?:
+    | T
+    | {
+        imagen?: T;
+      };
   seo?:
     | T
     | {
@@ -1648,6 +1663,7 @@ export interface TestimoniosSelect<T extends boolean = true> {
   cita?: T;
   foto?: T;
   video?: T;
+  youtube?: T;
   autorizacionUso?: T;
   fechaAutorizacion?: T;
   referenciaAutorizacion?: T;

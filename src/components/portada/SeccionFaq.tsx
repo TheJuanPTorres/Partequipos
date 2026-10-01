@@ -1,0 +1,82 @@
+import { IconMessageQuestion } from "@tabler/icons-react";
+import Image from "next/image";
+import Link from "next/link";
+
+import { Revelado } from "@/components/movimiento/Revelado";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { RUTA_ASESORIA, type Pregunta } from "@/lib/portada/seccionesH";
+import { buildFaqJsonLd } from "@/lib/seo/jsonLd";
+import type { ImagenLista } from "@/lib/utils/relations";
+
+import estilos from "./faq.module.css";
+
+/**
+ * SECCIÓN 11 DE LA PORTADA — preguntas frecuentes (ux-9).
+ *
+ * Componente de SERVIDOR: el acordeón es `<details>` nativo con `name`
+ * compartido, así que al abrir una se cierra la anterior sin JavaScript, como
+ * el widget de ux-9. Todas empiezan cerradas, como en ux-9.
+ *
+ * Lo que se aparta (docs/diseno/decisiones-home-ux9.md §20):
+ * - D1: el título de cada pregunta va en el `<summary>`, no en un `<div>`.
+ * - D6: icono de Tabler (en ux-9, un SVG del kit) y +/− dibujados con CSS (en
+ *   ux-9, Font Awesome).
+ * - JSON-LD `FAQPage` con las mismas preguntas.
+ */
+type Props = { preguntas: Pregunta[]; imagen: ImagenLista | null };
+
+export function SeccionFaq({ preguntas, imagen }: Props) {
+  if (preguntas.length === 0) return null;
+  const jsonLd = buildFaqJsonLd(preguntas);
+  return (
+    <section className={estilos.seccion} aria-labelledby="portada-faq-titulo">
+      {jsonLd ? <JsonLd data={jsonLd} /> : null}
+      {imagen ? (
+        <Image
+          src={imagen.url}
+          alt=""
+          width={imagen.width}
+          height={imagen.height}
+          sizes="64vw"
+          className={estilos.maquina}
+        />
+      ) : null}
+      <div className={estilos.fila}>
+        <div className={estilos.izq}>
+          <Revelado
+            como="h2"
+            id="portada-faq-titulo"
+            texto="Preguntas frecuentes"
+            ritmo="titulo"
+            curva="back.out"
+            disparo={0.85}
+            className={`${estilos.titulo} texto-titulo-seccion`}
+          />
+          <p className={`${estilos.intro} texto-cuerpo`}>
+            Resuelve tus dudas sobre nuestros equipos, repuestos y servicios. En Partequipos estamos
+            para ayudarte a encontrar las mejores soluciones para mantener tu maquinaria trabajando.
+          </p>
+          <div>
+            <Link href={RUTA_ASESORIA} className={`${estilos.boton} texto-etiqueta`}>
+              Solicita asesoría
+            </Link>
+          </div>
+        </div>
+        <div className={estilos.der}>
+          {preguntas.map((p) => (
+            <details key={p.id} name="portada-faq" className={estilos.item}>
+              <summary className={estilos.cabecera}>
+                <span className={estilos.icono} aria-hidden="true">
+                  <IconMessageQuestion focusable="false" stroke={1.75} />
+                </span>
+                <span className={`${estilos.pregunta} texto-destacado`}>{p.pregunta}</span>
+                <span className={estilos.indicador} aria-hidden="true" />
+              </summary>
+              <div className={`${estilos.respuesta} texto-cuerpo`}>{p.respuesta}</div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

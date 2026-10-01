@@ -1,0 +1,203 @@
+/*
+ * SECCIÓN 11 — preguntas frecuentes. Export: contenedor `1945efcb` (relleno
+ * 16 % · 0 · 11 % · 0, fondo #F0F0F0), columnas `709b7472` (40 %, relleno 5 %,
+ * alto mínimo 60vh en móvil) y `69024d18` (60 %, relleno 5 %; en móvil
+ * 10 % · 5 %), imagen `68ccfda2` (64 %, −22,777 % · −29 %, volteada, −13°,
+ * brillo 70, contraste 94, saturación 115, z-index 1). El acordeón
+ * `5a2d8e5d` se MIDIÓ pintado (no trae su CSS en el JSON).
+ */
+.seccion {
+  position: relative;
+  padding: 16% 0 11%;
+  background: var(--color-fondo-seccion);
+}
+
+.maquina {
+  position: absolute;
+  top: -29%;
+  left: -22.777%;
+  z-index: 1;
+  width: 64%;
+  height: auto;
+  transform: rotate(-13deg) scaleX(-1);
+  filter: brightness(0.7) contrast(0.94) saturate(1.15);
+  pointer-events: none;
+}
+
+.fila {
+  display: flex;
+}
+
+.izq {
+  display: flex;
+  box-sizing: border-box;
+  width: 40%;
+  padding: 5%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.der {
+  display: flex;
+  box-sizing: border-box;
+  width: 60%;
+  padding: 5%;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.titulo {
+  width: 100%;
+  max-width: 412px;
+  margin: 0;
+  color: var(--color-texto);
+}
+
+/* Tipografía `text` (el global gana a HelveticaNeue 400), color #56545A. */
+.intro {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+/* `79788c69`: radio 8, borde 1 px, `primary`; al pasar, `text`. */
+.boton {
+  display: inline-flex;
+  padding: var(--boton-relleno);
+  border: 1px solid var(--color-marca);
+  border-radius: 8px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.boton:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------ acordeón */
+
+.item {
+  margin: 0 0 10px;
+}
+
+.item:last-child {
+  margin-bottom: 0;
+}
+
+/* Cabecera: relleno 10, radio 10, blanca; 60 px con la pregunta en una línea. */
+.cabecera {
+  display: flex;
+  padding: 10px;
+  align-items: center;
+  gap: 15px;
+  border-radius: 10px;
+  background: var(--color-fondo);
+  cursor: pointer;
+  list-style: none;
+}
+
+.cabecera::-webkit-details-marker {
+  display: none;
+}
+
+.cabecera:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 2px;
+}
+
+.icono {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+}
+
+.icono svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Tipografía `cd1706f` (20 / 20 / 18), en negro como el widget. */
+.pregunta {
+  flex: 1 1 auto;
+  color: #000;
+}
+
+/* + y − de 11 px en #56545A, dibujados con dos líneas. */
+.indicador {
+  position: relative;
+  width: 11px;
+  height: 11px;
+  flex: none;
+  margin-right: 6px;
+  color: var(--color-texto-suave);
+}
+
+.indicador::before,
+.indicador::after {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  content: "";
+  transform: translateY(-50%);
+}
+
+.indicador::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.item[open] .indicador::after {
+  display: none;
+}
+
+/* Respuesta: relleno 20, peso 300, #616161. */
+.respuesta {
+  padding: 20px;
+  color: #616161;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+/* ---------------------------------------------------------------- móvil */
+
+@media (max-width: 767px) {
+  .maquina {
+    top: -4%;
+    left: -15%;
+  }
+
+  .fila {
+    flex-direction: column;
+  }
+
+  .izq {
+    width: 100%;
+    min-height: 60vh;
+  }
+
+  .der {
+    width: 100%;
+    padding: 10% 5%;
+    gap: 40px;
+  }
+}

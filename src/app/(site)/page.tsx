@@ -9,6 +9,8 @@ import { CarruselLogos } from "@/components/portada/CarruselLogos";
 import { SeccionRepuestos } from "@/components/portada/SeccionRepuestos";
 import { SeccionCatalogo } from "@/components/portada/SeccionCatalogo";
 import { SeccionCompania } from "@/components/portada/SeccionCompania";
+import { SeccionFaq } from "@/components/portada/SeccionFaq";
+import { SeccionTestimonios } from "@/components/portada/SeccionTestimonios";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp, navegacionPrincipal } from "@/lib/navegacion";
@@ -21,7 +23,9 @@ import {
 } from "@/lib/portada/secciones";
 import { logosDeMarcas, tarjetasDeRepuestos } from "@/lib/portada/seccionesE";
 import { videoDeCompania, videoDeYouTube } from "@/lib/portada/seccionesF";
+import { preguntasDeFaq, tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getCategoriasTecnicasDePortada } from "@/lib/queries/getCategoriasTecnicas";
+import { getPreguntasDePortada, getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getVideoPorId } from "@/lib/queries/getVideos";
 import {
   getCategoriaUsadaPorSlug,
@@ -57,12 +61,16 @@ export default async function HomePage() {
 
   const { contact } = seoConfig;
   const diapositivas = diapositivasDeHero(pagina.hero);
-  const [marcas, usados, excavadoras, categoriasTecnicas] = await Promise.all([
-    getMarcasDePortada(),
-    getEquiposUsadosDePortada(),
-    getCategoriaUsadaPorSlug(SLUG_EXCAVADORAS),
-    getCategoriasTecnicasDePortada(),
-  ]);
+  const [marcas, usados, excavadoras, categoriasTecnicas, testimonios, preguntas] =
+    await Promise.all([
+      getMarcasDePortada(),
+      getEquiposUsadosDePortada(),
+      getCategoriaUsadaPorSlug(SLUG_EXCAVADORAS),
+      getCategoriasTecnicasDePortada(),
+      getTestimoniosDePortada(),
+      getPreguntasDePortada(),
+    ]);
+  const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
   const maquinaUsada = imagenDeMedia(pagina.seccionUsada?.imagen, "");
   const relVideo = pagina.seccionCompania?.video;
   const idVideo = typeof relVideo === "object" && relVideo ? relVideo.id : relVideo;
@@ -95,6 +103,13 @@ export default async function HomePage() {
       <SeccionCatalogo
         whatsapp={enlaceWhatsApp(contact.phone)}
         sobreVideo={videoCompania !== null}
+      />
+
+      {/* Secciones 10 y 11 de ux-9 (fase H). Sin datos publicados, no se pintan. */}
+      <SeccionTestimonios tarjetas={tarjetasDeTestimonios(testimonios)} />
+      <SeccionFaq
+        preguntas={preguntasDeFaq(preguntas)}
+        imagen={maquinaFaq ? { ...maquinaFaq, alt: "" } : null}
       />
 
       <main className="mx-auto max-w-5xl px-4 py-12">

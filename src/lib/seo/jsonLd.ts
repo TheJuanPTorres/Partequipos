@@ -153,3 +153,28 @@ export function buildArticleJsonLd(input: ArticleJsonLdInput): JsonLdObject {
 
   return jsonLd;
 }
+
+// ---------------------------------------------------------------------------
+// FAQPage — preguntas frecuentes de la portada (fase H)
+// ---------------------------------------------------------------------------
+export type PreguntaJsonLd = { pregunta: string; respuesta: string };
+
+/**
+ * JSON-LD `FAQPage`. Google dejó de mostrar el resultado enriquecido de FAQ
+ * para la mayoría de sitios: se emite por corrección estructural, sin esperar
+ * un resultado visible (docs/diseno/decisiones-home-ux9.md §7). Sin preguntas,
+ * no se emite: un `FAQPage` vacío afirma algo falso.
+ */
+export function buildFaqJsonLd(preguntas: PreguntaJsonLd[]): JsonLdObject | null {
+  const validas = preguntas.filter((p) => p.pregunta.trim() && p.respuesta.trim());
+  if (validas.length === 0) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: validas.map((p) => ({
+      "@type": "Question",
+      name: p.pregunta.trim(),
+      acceptedAnswer: { "@type": "Answer", text: p.respuesta.trim() },
+    })),
+  };
+}

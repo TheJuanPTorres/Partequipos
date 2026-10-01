@@ -2892,6 +2892,28 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Scripts sin push de esquema              | Un script que alcanza la config por un import estático antes de fijar `PAYLOAD_DISABLE_PUSH`: marcador `dev` en la base (§10.34)                               | `src/lib/db/scriptsSinPush.test.ts`                                                | CI, en cada push               |
 | Imagen del pie sin tapar contenido       | La imagen decorativa del pie (sobresale por encima) tapando texto de una plantilla. Mide con los píxeles opacos del recorte, no con su caja (§10.33 p.11)      | `npm run qa:vuelo-pie` (`scripts/qa/vuelo-pie.mjs`, con `npx`: necesita navegador) | **A mano**, contra producción  |
 
+**«Deriva de esquema» se colgó una vez (run 36806029786) y está blindada (fase 5).**
+Imprimió el veredicto y no terminó hasta el tope del paso. No se reprodujo en
+40 ejecuciones seguidas en CI ni en 20 en local, así que la causa no está
+observada; la explicación que encaja con el código:
+
+- `payload run` carga el script con `tsImport` de tsx. En Node 24 eso usa el
+  hilo de ganchos de carga, porque `payload/bin.js` desactiva
+  `module.registerHooks`.
+- El script llamaba a `process.exit()` **mientras ese `import` aún se
+  evaluaba**.
+
+La conexión a la base queda **descartada**: con `disableDBConnect` no se abre
+ninguna, y sin `process.exit` el script termina solo en ~6 s, sin handles
+pendientes.
+
+**Lo que se descubrió por el camino, y vale para cualquier script de
+`payload run`:** al acabar el `import`, Payload 3.89 llama **siempre** a
+`process.exit(0)`. Un `process.exitCode = 1` del script queda pisado y el
+fallo saldría en verde. Para que falle, el script tiene que **lanzar** un
+error: Payload lo captura y sale con 1. El guardarraíl ya no llama a
+`process.exit`; el job de CI lleva además `timeout-minutes: 15` como red.
+
 **Los dos primeros son literalmente el mismo patrón:** una lista declarada y una
 lista real, y una prueba que exige que coincidan.
 

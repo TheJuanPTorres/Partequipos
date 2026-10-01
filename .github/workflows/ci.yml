@@ -18,6 +18,10 @@ jobs:
   verificar:
     name: Tipos, lint, formato y tests
     runs-on: ubuntu-latest
+    # Red de todo el job (fase 5): un paso colgado no puede retener el runner
+    # más de esto. Hoy el job tarda ~4 min; el paso de deriva tiene además el
+    # suyo propio.
+    timeout-minutes: 15
     # Nada aquí necesita base de datos ni secretos: los cuatro pasos corren
     # sin conexión (verificado). Por eso el workflow no declara ningún `secrets`.
     permissions:

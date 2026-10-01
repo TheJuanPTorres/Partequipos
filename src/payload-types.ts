@@ -440,6 +440,10 @@ export interface CategoriasTecnica {
    * Ruta del sitio (/…) o https://
    */
   enlace?: string | null;
+  /**
+   * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».
+   */
+  ordenPortada?: number | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -730,6 +734,21 @@ export interface Pagina {
      * Decorativa: asoma sobre la sección anterior. Opcional.
      */
     imagen?: (number | null) | Media;
+  };
+  seccionLogos?: {
+    /**
+     * En este orden en el carrusel. PNG transparente, con el logo centrado en su lienzo.
+     */
+    logos?:
+      | {
+          logo: number | Media;
+          /**
+           * Es el texto alternativo del logo.
+           */
+          nombre: string;
+          id?: string | null;
+        }[]
+      | null;
   };
   seo?: {
     metaTitle?: string | null;
@@ -1245,6 +1264,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   imagen?: T;
   icono?: T;
   enlace?: T;
+  ordenPortada?: T;
   seo?:
     | T
     | {
@@ -1475,6 +1495,17 @@ export interface PaginasSelect<T extends boolean = true> {
     | T
     | {
         imagen?: T;
+      };
+  seccionLogos?:
+    | T
+    | {
+        logos?:
+          | T
+          | {
+              logo?: T;
+              nombre?: T;
+              id?: T;
+            };
       };
   seo?:
     | T

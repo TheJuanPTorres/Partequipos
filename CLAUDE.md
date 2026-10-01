@@ -394,21 +394,27 @@ veredicto, que va en el informe.
 
 ## 10. Estado actual
 
-> **ESTADO ACTUAL — 2026-09-30, EXCEPCIÓN DE DEMO ACTIVA (§10.36).**
-> **En producción:** home de ux-9 con el **carrusel del hero** (fase 2 y PR #5)
-> y las 4 diapositivas del cliente cargadas por dirección desde el panel;
-> sección 3, cabecera y pie de ux-9; datos de demo, cerrado a buscadores.
-> Next 16.3.5 · Payload 3.89.0 · 399 pruebas.
-> **Excepción activa:** LCP de la home **4,00 s**, por encima de la regla
-> (§10.3 p.14), aprobada por dirección para la demo. El resto de reglas, sin
-> excepciones: todo cambio va por rama, preview y prueba de humo.
-> **Próximos pasos, por prioridad:**
+> **ESTADO ACTUAL — 2026-10-01, EXCEPCIÓN DE DEMO ACTIVA (§10.36).**
+> **En producción:** home de ux-9 con hero (carrusel, recorte vertical para
+> móvil, precarga con `media` y AVIF), secciones 2–8, 10 y 11, cabecera y pie.
+> Lo que depende de assets con licencia pendiente (L2–L4: logos, fotos,
+> vídeo, testimonios) **solo está en el preview**; en producción esas
+> secciones salen sin ellos o no se pintan. Datos de demo, cerrado a
+> buscadores. Next 16.3.5 · Payload 3.89.0 · 437 pruebas · 17 migraciones.
+> **Excepción activa:** LCP móvil de la home **2,94 s** con el recorte cargado
+> (9 + 9 alternadas), por encima de la regla (§10.3 p.14). Palancas pendientes
+> de dirección en `decisiones-home-ux9.md` §17.
+> **Pendientes, por prioridad:**
 >
-> 1. **PRIORIDAD 1 tras la demo — recorte vertical del hero para móvil**
->    (§10.36). Es cambio de esquema, así que ANTES:
-> 2. **Los dos guardarraíles de migraciones**, cada uno en su PR (§10.33 p.5,
->    aprobados): deriva de esquema y migrar desde cero.
-> 3. Fase E de la home: secciones 4 y 5 (`decisiones-home-ux9.md` §7).
+> 1. **Dirección:** subir los 4 recortes verticales al panel (§10.36) y, si
+>    se quiere la sección 5 en producción, dar `ordenPortada`, icono y enlace
+>    a las categorías técnicas (informe de la fase 4, paso 1).
+> 2. **LCP ≤ 2,44 s:** decidir entre no precargar Inter, calidad 60 del fondo
+>    (con Andrés), orden de las diapositivas o revisar el JS (§17).
+> 3. **Guardarraíl «Deriva de esquema»:** se colgó una vez tras dar el
+>    veredicto (run 36806029786, intento 1). Investigar y blindar.
+> 4. **Fase G (sedes):** espera a la cuenta de Mapbox del cliente (L5).
+> 5. **Fase I (cierre)** y la prueba del vídeo en Safari de iPhone real.
 
 > **CIERRE DE FASE — 2026-08-14.** Está construido **todo lo que no depende de
 > terceros**. Los seis bloques de código de `docs/RUTA-DESARROLLO.md` (A–F)

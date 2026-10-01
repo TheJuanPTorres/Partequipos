@@ -2,7 +2,7 @@
 
 import { IconPlayerPlayFilled } from "@tabler/icons-react";
 import Image from "next/image";
-import { useState, type PointerEvent } from "react";
+import { useState, type CSSProperties, type PointerEvent } from "react";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { tarjetaInicial, type TarjetaTestimonio } from "@/lib/portada/seccionesH";
@@ -21,6 +21,14 @@ import estilos from "./testimonios.module.css";
  * cargar) crece ×3; las demás, desenfocadas 14 px. Con ratón se abre al pasar
  * por encima y al salir vuelve a la inicial; con dedo o teclado, al pulsar.
  * Por debajo de 768 px se apilan: 96 px cerradas, 460 la abierta.
+ *
+ * SIN DESPLAZAMIENTO DE LAYOUT (CLS) AL PASAR EL RATÓN. El widget de ux-9
+ * cambia el `flex-grow`: cada pasada movía las tarjetas y sumaba ~0,19 de CLS
+ * medido (mover el ratón no es una «entrada» que lo excluya). Aquí, a 768 px o
+ * más, todas miden lo que la abierta y se colocan con `transform`; la parte
+ * visible la recorta `clip-path`. Ninguna de las dos mueve el layout. Con
+ * `cover`, el recorte centrado de la caja ancha enseña lo mismo que la caja
+ * estrecha de ux-9 (§20).
  *
  * Lo que se aparta (docs/diseno/decisiones-home-ux9.md §20):
  * - D1: el título en `<h2>` y cada testimonio en `<h3>`.
@@ -53,6 +61,7 @@ export function SeccionTestimonios({ tarjetas }: Props) {
       />
       <div
         className={estilos.pista}
+        style={{ "--testimonios-n": tarjetas.length } as CSSProperties}
         onPointerLeave={(e) => {
           if (conRaton(e)) setActiva(inicial);
         }}
@@ -67,6 +76,13 @@ export function SeccionTestimonios({ tarjetas }: Props) {
               className={estilos.tarjeta}
               data-activa={abierta ? "" : undefined}
               aria-labelledby={idTitulo}
+              style={
+                {
+                  "--i": i,
+                  "--abierta": abierta ? 1 : 0,
+                  "--tras-abierta": i > activa ? 1 : 0,
+                } as CSSProperties
+              }
               onPointerEnter={(e) => {
                 if (conRaton(e)) setActiva(i);
               }}

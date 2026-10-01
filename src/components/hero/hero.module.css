@@ -336,6 +336,14 @@
 .capaTexto .titulo {
   top: 0;
   /*
+   * ANCHO FIJO (fase 5): con `fit-content` la caja se encogía de 1047 a 991 px
+   * al llegar Inter tras el primer pintado (fuente de respaldo más ancha) y,
+   * al estar centrada, se desplazaba 28 px: 0,0027 de CLS en la mitad de las
+   * cargas sin caché. A todo el ancho, la caja no cambia; el texto sigue
+   * centrado (`justify-content` y `text-align`).
+   */
+  width: 100%;
+  /*
    * ALTO FIJO: el del bloque a tamaño completo. Un título que encoge para caber
    * se centra dentro, así que la caja (y la máquina, que se mide con ella)
    * queda en la misma y en todas las diapositivas.

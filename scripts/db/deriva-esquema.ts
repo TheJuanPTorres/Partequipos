@@ -13,7 +13,8 @@
  *
  * Riesgo cubierto: ante un posible renombrado de columna, drizzle-kit
  * PREGUNTA, y sin TTY se quedaría esperando. El paso de CI lleva un tope de
- * tiempo, y aquí se cierra la entrada estándar.
+ * tiempo y la entrada estándar cerrada (`< /dev/null`); este script no la
+ * cierra por sí mismo, así que a mano conviene lanzarlo igual.
  */
 import fs from "node:fs";
 import path from "node:path";

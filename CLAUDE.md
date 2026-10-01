@@ -851,6 +851,38 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 
 ### 10.36 EXCEPCIÓN DE DEMO — el carrusel del hero en producción con LCP 4,00 s (2026-09-30)
 
+> **CERRADO EL 2026-10-01 (fase 5).** Resumen:
+>
+> - **Recortes:** dirección cargó en producción las 4 diapositivas con sus recortes móviles.
+> - **Prueba de dirección:** se borraron `Fondo.jpg` y `Hero-1.png` (media 21 y 22), así que **la prueba intencionada de dirección queda cerrada**.
+> - **LCP móvil:** la regla de ≤ 2,44 s **no se alcanza**. Se cierra el tema con el resultado y las causas.
+>
+> **Medido** con el método vigente (9 + 9 alternadas contra `main` en la misma tanda):
+>
+> | Variante                                      | Mediana | `main` en la tanda | Diferencia |
+> | --------------------------------------------- | ------- | ------------------ | ---------- |
+> | Recorte + precarga + AVIF (fase 4)            | 2,94 s  | 3,38 s             | −0,44 s    |
+> | (a) JS de las secciones bajo el hero diferido | 2,49 s  | 2,72 s             | −0,23 s    |
+> | (b) Inter sin precarga, con el título fijo    | 2,57 s  | 2,91 s             | −0,34 s    |
+> | (a) + (b)                                     | 2,81 s  | 2,96 s             | −0,15 s    |
+> | Producción (los recortes, código de `main`)   | 2,83 s  | 2,87 s             | ≈ 0        |
+>
+> CLS 0 en todas las corridas.
+>
+> **Por qué no baja más:**
+>
+> - **La foto ya no es el problema:** el recorte de Hitachi pesa 92 kB en AVIF.
+> - **Pesa el marco:** de los ~230 kB de JS comprimido de la portada, 212 son de Next y React (React DOM 63, router ~45) y solo ~15 son del sitio. Con la red simulada de Lighthouse, ese JS, Inter y el CSS comparten ancho de banda con la foto.
+> - **El ruido de medida es del mismo orden que la mejora.** Entre tandas, el `main` del preview varió de 2,72 a 2,96 s sin cambiar el código, y las dos palancas juntas midieron menos que cada una por separado.
+>
+> **Lo que queda aplicado:**
+>
+> - (a) el JS diferido;
+> - (b) Inter sin precarga;
+> - el arreglo del CLS del título del hero: con `fit-content` cambiaba de caja al llegar Inter (0,0027 en la mitad de las cargas sin caché).
+>
+> **Bajar más exigiría** quitar JavaScript del marco, por ejemplo que el hero deje de ser componente de cliente, o rebajar la calidad de la foto con Andrés. Detalle en `docs/diseno/decisiones-home-ux9.md` §21.
+
 > **Decisión de dirección:** el PR #5 (carrusel del hero) se fusionó **aunque
 > el LCP pasa de la regla**. Motivo: demo al cliente; producción no está
 > indexada (§10.6) y hoy es el sitio de demo. **No es un cambio de criterio.**

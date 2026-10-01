@@ -18,6 +18,14 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  /*
+   * SIN PRECARGA (fase 5, paso 2b): la fuente no compite con la foto del hero,
+   * que es el LCP. Medido: −0,34 s de LCP móvil en la misma tanda, CLS 0. Es
+   * posible porque el título del hero ya no cambia de caja al llegar Inter
+   * (`hero.module.css`); el único resto es un desplazamiento de 3 px de un
+   * elemento del menú de la cabecera, 0,0000057, que ya ocurría con precarga.
+   */
+  preload: false,
 });
 
 export const metadata: Metadata = {

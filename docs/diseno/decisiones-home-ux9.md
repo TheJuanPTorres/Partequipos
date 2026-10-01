@@ -1877,3 +1877,44 @@ Se siembran con `npm run preview:fase-h:sembrar` y se quitan con `retirar`. El s
 - **5 preguntas de ux-9:** son contenido redactado, no un asset con licencia. En producción las carga dirección o el cliente desde el panel.
 
 **En producción, sin ellos:** las dos secciones no se pintan hasta que haya testimonios publicados o preguntas publicadas. Si hay preguntas pero no máquina, la sección 11 sale sin la imagen y sin hueco.
+
+---
+
+## 21. LCP móvil, cierre (fase 5, 2026-10-01)
+
+**Método:** Lighthouse 13.4.1 por línea de comandos, móvil; 9 + 9 corridas alternadas con calentamiento, contra URL fijas. Cada variante se mide contra el código de `main` en el mismo preview (`demgsmou4`) y **en la misma tanda**.
+
+### (a) JS de la portada
+
+**Desglose** con el analizador de Turbopack (`next experimental-analyze --output`, ruta `/`):
+
+- JS de cliente comprimido: ~232 kB.
+  - **212 kB son de Next y React:** React DOM 63, router ~45 y el resto del marco.
+  - **~15 kB son del sitio:** portada 7,4, hero 2,7, movimiento 1,8, cabecera 1,4 e iconos 1,3.
+- `polyfill-nomodule` (38,5 kB) va con `nomodule`: los navegadores modernos no lo descargan, y en los JSON de Lighthouse no aparece.
+
+**Cambio:** los componentes de cliente bajo el hero salen del chunk inicial con `next/dynamic`, desde un fichero de cliente (`portada/diferidos.tsx`), con SSR. Son las secciones 2, 3, 4, 5, 7 y 10. Desde un componente de servidor, `next/dynamic` no parte el JS: lo dice la guía de Next 16.
+
+**Resultado:** el chunk de la página se queda con el hero (2,4 kB) y cada sección va en el suyo. Medido: **2,49 s** frente a 2,72 s; CLS 0.
+
+### (b) Inter sin precarga
+
+**Antes, el origen del 0,0027 de CLS del título del hero:**
+
+- Cuando Inter llega después del primer pintado (~550–720 ms, 4 de cada 8 cargas sin caché a 1440), el título pasa de 1047 a 991 px de ancho.
+- Su caja era `fit-content` y está centrada, así que se desplazaba de x = 197 a x = 225.
+- **Arreglo:** el título va a todo el ancho de su capa (`width: 100%`), con el texto centrado igual. Resultado: 0 desplazamientos del título en 16 cargas sin caché (10 a 1440 y 6 a 390).
+- **Resto:** un elemento del menú de la cabecera se desplaza 3 px, con un valor de **0,0000057**. Ocurre con y sin precarga.
+
+**Sin precarga** de Inter (`preload: false`), con el título fijo: **2,57 s** frente a 2,91 s. CLS 0 en Lighthouse, y en las cargas sin caché solo queda el 0,0000057 del menú.
+
+### Juntas, y producción
+
+| Variante                  | Mediana | `main` en la tanda |
+| ------------------------- | ------- | ------------------ |
+| (a) + (b)                 | 2,81 s  | 2,96 s             |
+| Producción (los recortes) | 2,83 s  | 2,87 s             |
+
+**No se llega a 2,44 s.** El ruido entre tandas (el mismo `main`, de 2,72 a 2,96 s) es del orden de la mejora, y el resto del LCP lo ocupa el JS del marco.
+
+Se aplican (a), (b) y el arreglo del título, y **se cierra el tema** (CLAUDE.md §10.36).

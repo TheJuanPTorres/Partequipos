@@ -21,6 +21,7 @@
  * NO REFRESCA EL PREVIEW: el HTML se genera en el build. Sembrar ANTES del
  * último push (o redesplegar después).
  */
+import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -60,6 +61,14 @@ const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const CARPETA =
   process.env.HERO_DEMO_FOTOS ??
   path.join(os.homedir(), "Desktop", "partequipos-diseno", "cliente-hero", "web");
+/** Recortes verticales para móvil (§10.36). Si falta el fichero, la diapositiva va sin él. */
+const CARPETA_MOVIL = path.join(
+  os.homedir(),
+  "Desktop",
+  "partequipos-diseno",
+  "cliente-hero",
+  "movil",
+);
 
 async function mediaDeDemo() {
   const r = await payload.find({
@@ -125,12 +134,38 @@ if (modo === "sembrar") {
     ids.push(creado.id);
   }
 
+  // Recortes para móvil: subidos una vez, foco en el centro (el recorte ya va centrado).
+  const idsMovil: (number | null)[] = [];
+  for (const s of DIAPOSITIVAS_DEMO) {
+    const ya = existentes.find((m) => m.alt === s.altMovil);
+    if (ya) {
+      idsMovil.push(ya.id);
+      log(`${s.ficheroMovil}: ya existía (id ${ya.id})`);
+      continue;
+    }
+    const ruta = path.join(CARPETA_MOVIL, s.ficheroMovil);
+    if (!fs.existsSync(ruta)) {
+      idsMovil.push(null);
+      log(`${s.ficheroMovil}: no está en ${CARPETA_MOVIL}; la diapositiva va sin recorte`);
+      continue;
+    }
+    const creado = await payload.create({
+      collection: "media",
+      data: { alt: s.altMovil, focalX: 50, focalY: 50 },
+      filePath: ruta,
+      overrideAccess: true,
+    });
+    log(`${s.ficheroMovil}: subida (id ${creado.id}), ${creado.width}×${creado.height}`);
+    idsMovil.push(creado.id);
+  }
+
   const pag = await portada();
   const antes = pag.hero?.diapositivas ?? [];
   const nuevas = DIAPOSITIVAS_DEMO.map((s, i) => ({
     titulo: s.titulo,
     parrafo: s.parrafo,
     imagenFondo: ids[i]!,
+    imagenFondoMovil: idsMovil[i] ?? null,
   }));
   await payload.update({
     collection: "paginas",

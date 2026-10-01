@@ -218,7 +218,9 @@
     height: auto;
   }
 
+  /* Sin capas: la sección 8 sube encima del final del vídeo, como en ux-9. */
   .encoge {
+    z-index: auto;
     height: auto;
     transform: none;
   }

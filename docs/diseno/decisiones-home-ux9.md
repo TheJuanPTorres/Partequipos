@@ -1513,3 +1513,160 @@ estado real:**
   visitante.
 - Con la máquina en su propia caja absoluta, además, su posición ya no depende
   del flujo de la tarjeta.
+
+---
+
+## 17. LCP móvil: precarga del recorte y AVIF (fase 4, paso 0, 2026-10-01)
+
+**Precarga.** Con el recorte vertical (CLAUDE.md §10.36), el `<picture>` del
+hero no tenía precarga: el `preload` de `next/image` solo conoce la foto de
+escritorio. La primera diapositiva emite ahora **dos** `preload()` de React 19
+con `media` complementarios, `(max-width: 767px)` y `(min-width: 768px)`, cada
+uno con el mismo `srcset` y `sizes` que su `<source>` o `<img>`.
+
+El navegador solo atiende la que encaja con su ancho. Demostrado en la red:
+una sola foto por ancho, pedida por la precarga (`initiatorType: link`).
+
+**AVIF.** `images.formats: ["image/avif", "image/webp"]`. Afecta solo a la
+salida: `Media` sigue sin admitir AVIF de entrada (el CVE de CLAUDE.md
+§10.28). El recorte a 390 px pasa de 209 kB en WebP a 105 kB en AVIF.
+
+**Límite de Vercel Hobby** (documentación de agosto de 2026):
+
+- **Cuota:** 5.000 transformaciones al mes.
+- **Qué cuenta:** cada MISS o STALE. La clave de caché incluye `Accept`, así
+  que AVIF y WebP son dos transformaciones.
+- **Al pasarse:** las imágenes **nuevas** dan 402 y se ve su `alt`.
+- **Caché:** las del Blob se cachean un año (`max-age` del Blob).
+
+| Escenario                         | Transformaciones                                                                   |
+| --------------------------------- | ---------------------------------------------------------------------------------- |
+| Hoy (~19 imágenes)                | Menos de 200                                                                       |
+| Catálogo real (~930 imágenes)     | ~2.800 por formato                                                                 |
+| Peor caso, el mes del lanzamiento | ~5.600, por encima de Hobby: **el lanzamiento necesita Pro**, que ya era requisito |
+
+**Medido** (Lighthouse 13.4.1, 9 + 9 corridas alternadas): **2,94 s**, frente
+a 3,38 s del código anterior. No llega a 2,44 s: antes de que termine la foto
+(94 kB) se descargan ~314 kB entre documento, Inter (48 kB), CSS y JS.
+
+Palancas que quedan, a decisión de dirección:
+
+- no precargar Inter;
+- calidad 60 en el fondo del hero (con Andrés);
+- el orden de las diapositivas;
+- el JS de la portada.
+
+Detalle en el informe `2026-10-01-fase4-paso0-lcp-movil.md`.
+
+---
+
+## 18. Fase E — secciones 4 y 5 (2026-10-01)
+
+**Fuentes:**
+
+- El export: `c57ff81` y `351c67f0` (sección 4); `1f904ecd`, `5929bf8c`,
+  `2b1c018b`, `5b81de61` y `1c74077d` (sección 5). `__globals__` manda sobre el
+  valor fijo.
+- **Medido pintado** lo que los widgets no traen en el JSON: Logo Marquee y
+  Stacking Cards, de Unlimited Elements, no tienen zip ni CSS en el export.
+
+### Sección 4 — carrusel de logos
+
+| Qué (MEDIDO en ux-9) | 1440         | 1010      | 390       |
+| -------------------- | ------------ | --------- | --------- |
+| Logos por vista      | 5            | 3         | 2         |
+| Caja (relleno 20)    | 258 × 180    | 307 × 180 | 165 × 180 |
+| Logo (`contain`)     | 218 × 140    | 267 × 140 | 125 × 140 |
+| Hueco a la derecha   | 30           | 30        | 30        |
+| Vuelta               | 81 s, lineal | 81 s      | 81 s      |
+
+- **Movimiento:** la pista de ux-9 lleva **cuatro copias** de los 9 logos y se
+  desplaza la mitad en 81 s (`transition_speed` 9000 × 9), es decir, **4,5 s
+  por logo**. Se replica igual, con la duración calculada por número de logos.
+- **Pausa al pasar el ratón**, como ux-9.
+- **Sección:** blanca, radio 30 y 20 px arriba y abajo: 220 px en total.
+
+**Datos:** lista propia en la portada (`paginas.seccionLogos.logos`: logo y
+nombre). No sale de `marcas` ni de `marcas-maquinaria`, porque ux-9 mezcla las
+dos líneas y además incluye a Donaldson, que no está en ninguna. Sin logos, la
+sección no se pinta.
+
+### Sección 5 — tarjetas apiladas
+
+| Qué (MEDIDO en ux-9)   | 1440                | 1010 | 390                    |
+| ---------------------- | ------------------- | ---- | ---------------------- |
+| Caja                   | 1140 centrada       | 990  | 370                    |
+| Tarjeta                | 600 alto, radio 20  | ídem | ídem; foto debajo, 180 |
+| Foto                   | 40 % a la derecha   | 40 % | todo el ancho          |
+| Fijada (`sticky`)      | 150 px              | 60   | 40                     |
+| Escalón entre apiladas | 20 px               | 20   | 20                     |
+| Hueco entre tarjetas   | 100 px              | 100  | 100                    |
+| Título de tarjeta      | 45 px (`secondary`) | 35   | 9vw                    |
+| Texto                  | 16 / 300, #333      | 14   | 13                     |
+
+**Escala ligada al scroll, medida en ux-9 cada 150 px:**
+
+- Cada tarjeta encoge desde que llega arriba hasta ~150 px después de que se
+  apile la última.
+- Llega a `1 − 0,03 × (tarjetas encima)`, es decir 0,91 · 0,94 · 0,97 · 1, con
+  freno al final.
+
+Replicada sin GSAP (`TarjetasApiladas`): `requestAnimationFrame` solo mientras
+la lista está a la vista, con curva cuadrática de salida.
+
+| Desplazamiento | ux-9 (tarjetas 1 · 2 · 3) | Nuestro               |
+| -------------- | ------------------------- | --------------------- |
+| 300            | 0,978 · 1 · 1             | 0,978 · 1 · 1         |
+| 750            | 0,951 · 0,996 · 1         | 0,950 · 0,996 · 1     |
+| 1200           | 0,931 · 0,969 · 1         | 0,930 · 0,968 · 1     |
+| 1800           | 0,915 · 0,946 · 0,980     | 0,914 · 0,945 · 0,978 |
+
+**Posiciones** a 1440, 1010 y 390 (separador, antetítulo, título, tarjetas y
+botón): iguales a ux-9 al píxel. CLS 0 y sin scroll horizontal en los tres
+anchos.
+
+**Datos:** `categorias-tecnicas`, con el campo nuevo **`ordenPortada`**:
+
+- vacío, la categoría no sale;
+- 1, 2, 3…: el orden de las tarjetas.
+
+Un solo campo elige y ordena; así el orden de ux-9 no depende del nombre. El
+título y el texto son los de la categoría.
+
+**Sin foto** (producción, mientras las de ux-9 sigan en L3): la tarjeta se
+pinta solo con el texto, medido quitando la foto en la página pintada.
+
+- **A ≥ 768 px**, el texto ocupa la tarjeta entera.
+- **En móvil**, la tarjeta mide lo que su texto (326–368 px), sin la franja de
+  180 px de la foto.
+
+### Desviaciones de esta fase
+
+| #   | ux-9                                         | Nuestro                                                            | Por qué                                       |
+| --- | -------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------- |
+| D1  | Título y tarjetas en `<div>`                 | `<h2>` y `<h3>`                                                    | Jerarquía de encabezados                      |
+| D2  | Carrusel sin pausa (solo al pasar el ratón)  | Botón de pausa abajo a la derecha; quieto con movimiento reducido  | WCAG 2.2.2, aprobado                          |
+| D6  | Iconos SVG del kit (Flaticon, L2)            | Tabler: `settings`, `wheel`, `bucket-droplet`, `filter` y `engine` | Licencia L2                                   |
+| D16 | «Ver todas los repuestos»                    | «Ver todos los repuestos»                                          | Errata                                        |
+| D17 | «Ver más» en todas, enlazando a `#`          | Solo si la categoría tiene enlace                                  | Un botón que no lleva a ningún sitio          |
+| D18 | Las copias del carrusel se leen cuatro veces | Solo la primera es accesible                                       | Lector de pantalla                            |
+| D19 | Escala con GSAP                              | `requestAnimationFrame`; sin escala con movimiento reducido        | Sin dependencia; las tarjetas se apilan igual |
+
+### Assets — solo en el preview
+
+Se siembran con `npm run preview:fase-e:sembrar` y se quitan con `retirar`. El
+script se niega si la base o el Blob no son los del preview.
+
+- **9 logos de fabricantes** (`assets/08/Mesa-de-trabajo-*`): Hitachi, CASE,
+  Yanmar, Dynapac, Donaldson, Volvo, Caterpillar, Hyundai y Komatsu.
+  - El uso como distribuidor está **por confirmar** (§6).
+  - A la lista de §6 le faltaban Caterpillar, Komatsu, Volvo, Hyundai y
+    Donaldson.
+- **4 fotos de tarjeta:** `235553.jpg` (banco) y tres `hf_20260914_*` (IA),
+  las cuatro L3.
+
+**En producción, sin esos assets:**
+
+- La sección 4 no se pinta, porque no hay logos.
+- La sección 5 sale con tarjetas de solo texto en cuanto dirección asigne
+  `ordenPortada`, icono y enlace a las categorías desde el panel.

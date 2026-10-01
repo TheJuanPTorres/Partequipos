@@ -34,6 +34,7 @@
     "preview:db:check": "tsx scripts/preview/con-entorno.ts tsx scripts/db/check-migrations.ts",
     "preview:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/hero-prueba-preview.ts sembrar",
     "preview:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/hero-prueba-preview.ts retirar",
+    "db:deriva": "payload run scripts/db/deriva-esquema.ts",
     "preview:ejecutar": "tsx scripts/preview/con-entorno.ts",
     "preview:demo:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/hero-demo-cliente.ts sembrar",
     "preview:demo:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/hero-demo-cliente.ts retirar",

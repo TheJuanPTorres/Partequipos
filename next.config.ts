@@ -21,6 +21,16 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
+    /*
+     * AVIF primero, WebP para quien no lo acepte (decisión de dirección,
+     * fase 4, por el LCP del hero en móvil: ~40 % menos que WebP). Es solo la
+     * SALIDA: `Media` sigue sin admitir AVIF de entrada, que es lo que tocaba el
+     * CVE (CLAUDE.md §10.28). El formato entra en la clave de caché del
+     * optimizador (cabecera `Accept`), así que cada imagen se transforma una
+     * vez más; las del Blob se cachean un año (`max-age` del Blob). Coste en
+     * el límite de Hobby, en docs/diseno/decisiones-home-ux9.md §17.
+     */
+    formats: ["image/avif", "image/webp"],
   },
   /*
    * TRAZADO DE FICHEROS — mete la biblioteca nativa de sharp en el lambda.

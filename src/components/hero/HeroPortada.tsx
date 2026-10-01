@@ -13,6 +13,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
+import { preload } from "react-dom";
 
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { useMovimientoReducido, usePausa } from "@/components/movimiento/useMovimiento";
@@ -75,13 +76,18 @@ function IconoFlecha({ hacia }: { hacia: "anterior" | "siguiente" }) {
 
 /** Por debajo de este ancho se usa el recorte vertical, si lo hay (CLAUDE.md §10.36). */
 const MEDIA_MOVIL = "(max-width: 767px)";
+/** El complementario exacto de `MEDIA_MOVIL`: así solo se precarga UNA de las dos. */
+const MEDIA_ESCRITORIO = "(min-width: 768px)";
 
 /**
  * FONDO DE UNA DIAPOSITIVA. Sin recorte para móvil, un `<Image>` como siempre.
  * Con recorte, `<picture>`: el navegador elige UNA de las dos fotos por la
- * media query y solo descarga esa. Por eso ahí NO hay `preload` (precargaría
- * la de escritorio también en el móvil, lo advierte la documentación de
- * `getImageProps`): la primera va con `fetchPriority="high"`.
+ * media query y solo descarga esa. El `preload` de `next/image` no sirve ahí
+ * (solo conoce la foto de escritorio y la precargaría también en el móvil, lo
+ * advierte la documentación de `getImageProps`), así que la primera emite DOS
+ * precargas propias con `media` complementarios: el navegador solo hace caso
+ * a la que encaja con su ancho. Mismo `srcset` y `sizes` que el `<picture>`,
+ * para que elija el mismo candidato y la descarga se reutilice.
  *
  * El punto focal de cada foto llega por variables CSS: `.fondo` lo aplica a
  * `object-position` y al origen del Ken Burns, y el móvil usa el suyo.
@@ -136,6 +142,24 @@ function FondoHero({
     fetchPriority: prioridad,
     loading: "eager",
   });
+
+  if (primera) {
+    // En el render, no en un efecto: así salen en el <head> del HTML del servidor.
+    preload(s.fondoMovil.url, {
+      as: "image",
+      imageSrcSet: srcSetMovil,
+      imageSizes: sizesMovil,
+      fetchPriority: "high",
+      media: MEDIA_MOVIL,
+    });
+    preload(s.fondo.url, {
+      as: "image",
+      imageSrcSet: escritorio.srcSet,
+      imageSizes: escritorio.sizes,
+      fetchPriority: "high",
+      media: MEDIA_ESCRITORIO,
+    });
+  }
 
   return (
     <picture>

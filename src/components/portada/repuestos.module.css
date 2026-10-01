@@ -1,0 +1,234 @@
+/*
+ * SECCIÓN 5 — «Venta de repuestos» con tarjetas apiladas. Valores de ux-9:
+ * el export para lo que trae (contenedor `1f904ecd`, widgets `5929bf8c`,
+ * `2b1c018b`, `5b81de61` y `1c74077d`, con `__globals__` por encima del valor
+ * fijo) y MEDIDOS pintados para lo que el widget no trae en el JSON
+ * (docs/diseno/decisiones-home-ux9.md §18).
+ */
+.seccion {
+  /* Tarjetas: alto 600, 100 de hueco, fijadas a 150 / 60 / 40 px del borde. */
+  --s5-alto: 600px;
+  --s5-hueco: 100px;
+  --s5-fijada: 150px;
+  /* Cada tarjeta se fija 20 px más abajo que la anterior. */
+  --s5-escalon: 20px;
+  --s5-foto: 40%;
+  --s5-relleno-tarjeta: 40px;
+
+  padding: 70px 10px 30px;
+  background: var(--color-fondo-seccion);
+  color: var(--color-texto);
+}
+
+@media (max-width: 1024px) {
+  .seccion {
+    --s5-fijada: 60px;
+  }
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    --s5-fijada: 40px;
+  }
+}
+
+/* Contenedor «boxed» de Elementor: 1140 px. Huecos de 20 entre widgets. */
+.caja {
+  display: flex;
+  max-width: 1140px;
+  margin: 0 auto;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Divisor `43d29a48`: línea de 1 px en blanco (`099f28a`) con 15 px arriba y abajo. */
+.separador {
+  height: 1px;
+  margin: 15px 0;
+  background: var(--color-fondo);
+}
+
+/* Antetítulo: color `primary`, tipografía `accent` (el global gana a HelveticaNeue). */
+.antetitulo {
+  margin: 0;
+  color: var(--color-marca);
+  line-height: 1;
+  text-align: center;
+}
+
+/* Título: 737 px centrado, color `text`, tipografía `primary`. */
+.titulo {
+  width: 100%;
+  max-width: 737px;
+  margin: 0 auto;
+  color: var(--color-texto);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- tarjetas */
+
+/* Rejilla con 100 de hueco, 80 de relleno inferior y 100 de margen: como ux-9. */
+.lista {
+  display: grid;
+  margin: 0 0 100px;
+  padding: 0 0 80px;
+  gap: var(--s5-hueco);
+  list-style: none;
+}
+
+/*
+ * Cada <li> mide lo que la tarjeta y se fija arriba; el relleno superior crece
+ * 20 px por tarjeta, así que las apiladas asoman escalonadas (en ux-9 la
+ * tarjeta desborda su <li> por abajo, igual que aquí).
+ */
+.item {
+  position: sticky;
+  top: var(--s5-fijada);
+  box-sizing: border-box;
+  height: var(--s5-alto);
+  padding-top: calc(var(--s5-escalon) * (var(--apilada-i) + 1));
+  transform: scale(var(--apilada-escala, 1));
+  transform-origin: top center;
+}
+
+.tarjeta {
+  display: flex;
+  height: var(--s5-alto);
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--color-fondo);
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.3);
+}
+
+/* Columna de texto: 60 % con foto; reparte icono, título, texto y botón. */
+.contenido {
+  display: flex;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  padding: var(--s5-relleno-tarjeta);
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.tarjeta[data-con-foto] .contenido {
+  flex: 0 0 calc(100% - var(--s5-foto));
+}
+
+.icono {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  flex: none;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+}
+
+.icono svg {
+  width: 26px;
+  height: 26px;
+}
+
+.tituloTarjeta {
+  margin: 0;
+  color: var(--color-texto);
+}
+
+/* El texto del widget va en #333 (no es un global del kit), peso 300. */
+.texto {
+  margin: 0;
+  color: #333;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.verMas {
+  display: inline-flex;
+  padding: 14px 35px 12px;
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  line-height: 1;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.verMas:hover {
+  background: var(--color-texto);
+}
+
+.verMas:focus-visible,
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.foto {
+  position: relative;
+  flex: 0 0 var(--s5-foto);
+}
+
+.img {
+  object-fit: cover;
+}
+
+/* Móvil: la foto va DEBAJO, 180 px; el texto, en columna con 20 px de hueco. */
+@media (max-width: 767px) {
+  .tarjeta {
+    flex-direction: column;
+  }
+
+  .tarjeta[data-con-foto] .contenido {
+    flex: 1 1 auto;
+  }
+
+  .foto {
+    flex: 0 0 180px;
+  }
+
+  /* Sin foto, la tarjeta mide lo que su texto: no queda hueco abajo. */
+  .tarjeta:not([data-con-foto]),
+  .item:has(.tarjeta:not([data-con-foto])) {
+    height: auto;
+  }
+
+  .tarjeta:not([data-con-foto]) .contenido {
+    gap: 20px;
+  }
+}
+
+/* ------------------------------------------------------------------- botón */
+
+.pie {
+  display: flex;
+  justify-content: center;
+}
+
+/* `1c74077d`: fondo `primary`, borde 1 px, radio 30, relleno del botón global; al pasar, `text`. */
+.boton {
+  display: inline-flex;
+  padding: var(--boton-relleno);
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--color-marca);
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.boton svg {
+  width: 1em;
+  height: 1em;
+}
+
+.boton:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}

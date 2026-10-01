@@ -80,6 +80,22 @@ export const CategoriaTecnica: CollectionConfig = {
       validate: validarEnlace,
       admin: { description: "Ruta del sitio (/…) o https://" },
     },
+    /*
+     * Fase E: QUÉ categorías salen en la sección 5 de la portada y en qué
+     * orden. Un solo campo para las dos cosas: vacío, no sale. Así el orden
+     * de ux-9 (Blades, Llantas, Lubricantes, Filtración) no depende del nombre.
+     */
+    {
+      name: "ordenPortada",
+      type: "number",
+      min: 1,
+      label: "Posición en la portada",
+      admin: {
+        position: "sidebar",
+        description:
+          "Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».",
+      },
+    },
     seoField(),
   ],
 };

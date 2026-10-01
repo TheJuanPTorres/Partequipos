@@ -244,6 +244,46 @@ export const PaginaInstitucional: CollectionConfig = {
         },
       ],
     },
+    /*
+     * SECCIÓN 4 DE LA PORTADA (fase E): carrusel de logos. Lista PROPIA y no
+     * `marcas` ni `marcas-maquinaria`: ux-9 mezcla fabricantes de las dos y
+     * uno que no está en ninguna (Donaldson), y meterlos en `marcas` crearía
+     * URLs de repuestos. Sin logos, la sección no se pinta.
+     */
+    {
+      name: "seccionLogos",
+      type: "group",
+      label: "Sección «Logos de marcas» de la portada",
+      admin: { condition: (data) => data?.slug === "inicio" },
+      fields: [
+        {
+          name: "logos",
+          type: "array",
+          label: "Logos",
+          labels: { singular: "Logo", plural: "Logos" },
+          admin: {
+            description:
+              "En este orden en el carrusel. PNG transparente, con el logo centrado en su lienzo.",
+          },
+          fields: [
+            {
+              name: "logo",
+              type: "upload",
+              relationTo: "media",
+              required: true,
+              label: "Logo",
+            },
+            {
+              name: "nombre",
+              type: "text",
+              required: true,
+              label: "Nombre de la marca",
+              admin: { description: "Es el texto alternativo del logo." },
+            },
+          ],
+        },
+      ],
+    },
     seoField(),
   ],
 };

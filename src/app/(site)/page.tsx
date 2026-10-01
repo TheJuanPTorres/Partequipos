@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import { HeroPortada } from "@/components/hero/HeroPortada";
 import { SeccionMaquinariaNueva } from "@/components/portada/SeccionMaquinariaNueva";
 import { SeccionMaquinariaUsada } from "@/components/portada/SeccionMaquinariaUsada";
+import { CarruselLogos } from "@/components/portada/CarruselLogos";
+import { SeccionRepuestos } from "@/components/portada/SeccionRepuestos";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp, navegacionPrincipal } from "@/lib/navegacion";
@@ -15,6 +17,8 @@ import {
   pestanasDeUsada,
   tarjetasDeMarcas,
 } from "@/lib/portada/secciones";
+import { logosDeMarcas, tarjetasDeRepuestos } from "@/lib/portada/seccionesE";
+import { getCategoriasTecnicasDePortada } from "@/lib/queries/getCategoriasTecnicas";
 import {
   getCategoriaUsadaPorSlug,
   getEquiposUsadosDePortada,
@@ -49,10 +53,11 @@ export default async function HomePage() {
 
   const { contact } = seoConfig;
   const diapositivas = diapositivasDeHero(pagina.hero);
-  const [marcas, usados, excavadoras] = await Promise.all([
+  const [marcas, usados, excavadoras, categoriasTecnicas] = await Promise.all([
     getMarcasDePortada(),
     getEquiposUsadosDePortada(),
     getCategoriaUsadaPorSlug(SLUG_EXCAVADORAS),
+    getCategoriasTecnicasDePortada(),
   ]);
   const maquinaUsada = imagenDeMedia(pagina.seccionUsada?.imagen, "");
 
@@ -68,6 +73,10 @@ export default async function HomePage() {
         maquina={maquinaUsada ? { ...maquinaUsada, alt: "" } : null}
         hrefExcavadoras={excavadoras ? hrefDeCategoriaUsada(excavadoras.slug) : null}
       />
+
+      {/* Secciones 4 y 5 de ux-9 (fase E). Sin datos, no se pintan. */}
+      <CarruselLogos logos={logosDeMarcas(pagina.seccionLogos)} />
+      <SeccionRepuestos tarjetas={tarjetasDeRepuestos(categoriasTecnicas)} />
 
       <main className="mx-auto max-w-5xl px-4 py-12">
         <JsonLd data={buildOrganizationJsonLd()} />

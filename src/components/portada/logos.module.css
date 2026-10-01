@@ -1,0 +1,100 @@
+/*
+ * SECCIÓN 4 — carrusel de logos. Valores de ux-9 MEDIDOS pintados
+ * (docs/diseno/decisiones-home-ux9.md §18), no leídos del export: el widget no
+ * trae su CSS en el JSON.
+ *
+ * Contenedor `c57ff81`: ancho completo, radio 30, fondo blanco (`099f28a`).
+ * Widget `351c67f0`: margen 20 · 0, caja de 180 px con relleno 20, 30 px a la
+ * derecha de cada caja, logo `contain`.
+ */
+.seccion {
+  --logos-por-vista: 5;
+  --logos-caja: 180px;
+  --logos-relleno: 20px;
+  --logos-hueco: 30px;
+
+  position: relative;
+  /* El ancho de cada caja sale del de la sección, no del de la pista. */
+  container-type: inline-size;
+  padding: 20px 0;
+  overflow: hidden;
+  border-radius: 30px;
+  background: var(--color-fondo);
+}
+
+@media (max-width: 1024px) {
+  .seccion {
+    --logos-por-vista: 3;
+  }
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    --logos-por-vista: 2;
+  }
+}
+
+.ventana {
+  overflow: hidden;
+}
+
+.pista {
+  display: flex;
+  width: max-content;
+  animation: desplazar var(--logos-duracion) linear infinite;
+}
+
+.lista {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 1440 / 5 = 288 = 258 de caja + 30 de hueco, como en ux-9. */
+.caja {
+  display: flex;
+  box-sizing: border-box;
+  width: calc(100cqw / var(--logos-por-vista) - var(--logos-hueco));
+  height: var(--logos-caja);
+  margin-right: var(--logos-hueco);
+  padding: var(--logos-relleno);
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ux-9: `autoplay_hover_pause`. Aquí también con el botón (D2). */
+.ventana:hover .pista,
+.ventana[data-pausado] .pista {
+  animation-play-state: paused;
+}
+
+@keyframes desplazar {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Sin movimiento: ni siquiera arranca, aunque el botón diga otra cosa. */
+@media (prefers-reduced-motion: reduce) {
+  .pista {
+    animation: none;
+  }
+}
+
+/*
+ * Botón de pausa (D2): ux-9 no lo tiene. Abajo a la derecha, sobre el margen
+ * inferior de la sección, con fondo propio para que se lea sobre un logo.
+ */
+.pausa {
+  position: absolute;
+  right: 16px;
+  bottom: 8px;
+  background: var(--color-fondo);
+}

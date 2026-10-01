@@ -38,6 +38,8 @@
     "preview:ejecutar": "tsx scripts/preview/con-entorno.ts",
     "preview:demo:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/hero-demo-cliente.ts sembrar",
     "preview:demo:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/hero-demo-cliente.ts retirar",
+    "preview:fase-e:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-e-preview.ts sembrar",
+    "preview:fase-e:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-e-preview.ts retirar",
     "deploy:migrate": "npm run db:check && payload migrate",
     "redirects:check": "payload run scripts/redirects/verificar-destinos.ts",
     "redirects:check:estricto": "REDIRECTS_ESTRICTO=true payload run scripts/redirects/verificar-destinos.ts",

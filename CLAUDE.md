@@ -394,27 +394,39 @@ veredicto, que va en el informe.
 
 ## 10. Estado actual
 
-> **ESTADO ACTUAL — 2026-10-01, EXCEPCIÓN DE DEMO ACTIVA (§10.36).**
-> **En producción:** home de ux-9 con hero (carrusel, recorte vertical para
-> móvil, precarga con `media` y AVIF), secciones 2–8, 10 y 11, cabecera y pie.
-> Lo que depende de assets con licencia pendiente (L2–L4: logos, fotos,
-> vídeo, testimonios) **solo está en el preview**; en producción esas
-> secciones salen sin ellos o no se pintan. Datos de demo, cerrado a
-> buscadores. Next 16.3.5 · Payload 3.89.0 · 437 pruebas · 16 migraciones.
-> **Excepción activa:** LCP móvil de la home **2,94 s** con el recorte cargado
-> (9 + 9 alternadas), por encima de la regla (§10.3 p.14). Palancas pendientes
-> de dirección en `decisiones-home-ux9.md` §17.
+> **ESTADO ACTUAL — 2026-10-01, HOME DE UX-9 CERRADA (salvo la sección 9).**
+>
+> **En producción:** la home de ux-9 con todas sus secciones salvo la 9:
+>
+> - **Hero:** las 4 diapositivas del cliente con sus recortes móviles, precarga con `media`, AVIF e Inter sin precarga.
+> - **Secciones:** 2–8, 10 y 11, más cabecera y pie.
+> - **Assets pendientes de licencia** (L2–L4: logos, fotos, vídeo, testimonios): **solo en el preview**. En producción esas secciones salen sin ellos o no se pintan, sin huecos.
+> - **Datos de demo**, sitio cerrado a buscadores.
+> - **Versiones:** Next 16.3.5 · Payload 3.89.0 · 437 pruebas · 16 migraciones.
+>
+> **LCP móvil: tema cerrado sin alcanzar ≤ 2,44 s.** Producción da 2,83 s y la última variante medida, 2,81 s; resultado y causas en §10.36.
+>
+> **Lighthouse de cierre** (mediana de 5 en producción, móvil · escritorio):
+>
+> | Categoría        | Móvil | Escritorio |
+> | ---------------- | ----- | ---------- |
+> | Rendimiento      | 85    | 99         |
+> | Accesibilidad    | 97    | 97         |
+> | Buenas prácticas | 100   | 100        |
+> | SEO              | 69    | 69         |
+>
+> - **SEO** solo falla por el `noindex` puesto a propósito (§10.6).
+> - **Accesibilidad** solo falla por el contraste del antetítulo rojo sobre gris (3,98:1), un fallo de ux-9 pendiente de Andrés.
+>
 > **Pendientes, por prioridad:**
 >
-> 1. **Dirección:** subir los 4 recortes verticales al panel (§10.36) y, si
->    se quiere la sección 5 en producción, dar `ordenPortada`, icono y enlace
->    a las categorías técnicas (informe de la fase 4, paso 1).
-> 2. **LCP ≤ 2,44 s:** decidir entre no precargar Inter, calidad 60 del fondo
->    (con Andrés), orden de las diapositivas o revisar el JS (§17).
-> 3. **Guardarraíl «Deriva de esquema»:** se colgó una vez tras dar el
->    veredicto (run 36806029786, intento 1). Investigar y blindar.
-> 4. **Fase G (sedes):** espera a la cuenta de Mapbox del cliente (L5).
-> 5. **Fase I (cierre)** y la prueba del vídeo en Safari de iPhone real.
+> 1. **Dirección:**
+>    - el encuadre del hero (propuesta en el informe del paso 3 de la fase 5: Dynapac y Yanmar);
+>    - si se quiere la sección 5 en producción, `ordenPortada`, icono y enlace en las categorías técnicas;
+>    - decidir qué se hace con el bloque anterior al diseño de la home («Qué encontrarás aquí», «Sobre Partequipos» y contacto), que ux-9 no tiene.
+> 2. **Fase G (sedes):** espera a la cuenta de Mapbox del cliente (L5).
+> 3. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview.
+> 4. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
 
 > **CIERRE DE FASE — 2026-08-14.** Está construido **todo lo que no depende de
 > terceros**. Los seis bloques de código de `docs/RUTA-DESARROLLO.md` (A–F)

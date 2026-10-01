@@ -315,6 +315,27 @@ export const PaginaInstitucional: CollectionConfig = {
         },
       ],
     },
+    /*
+     * SECCIÓN 11 DE LA PORTADA (fase H): la máquina decorativa junto a las
+     * preguntas frecuentes. Opcional y decorativa (`alt` vacío); sin ella la
+     * sección se pinta igual. En Payload y no en el repositorio porque la foto
+     * de ux-9 tiene la licencia pendiente (L3).
+     */
+    {
+      name: "seccionFaq",
+      type: "group",
+      label: "Sección «Preguntas frecuentes» de la portada",
+      admin: { condition: (data) => data?.slug === "inicio" },
+      fields: [
+        {
+          name: "imagen",
+          type: "upload",
+          relationTo: "media",
+          label: "Máquina recortada (PNG transparente)",
+          admin: { description: "Decorativa: asoma arriba a la izquierda. Opcional." },
+        },
+      ],
+    },
     seoField(),
   ],
 };

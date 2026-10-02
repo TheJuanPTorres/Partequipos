@@ -51,6 +51,17 @@ export const MarcaMaquinaria: CollectionConfig = {
       label: "Foto de la tarjeta en la portada",
       admin: { description: "Fondo de la tarjeta de esta marca en el inicio." },
     },
+    {
+      name: "ordenPortada",
+      type: "number",
+      min: 1,
+      label: "Posición en la portada",
+      admin: {
+        position: "sidebar",
+        description:
+          "Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» (en ux-9: Hitachi, CASE y Yanmar). Necesita la foto de la tarjeta.",
+      },
+    },
     seoField(),
   ],
 };

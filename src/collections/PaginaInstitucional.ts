@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { seoField } from "../lib/fields/seoField";
 import { validarYouTube } from "../lib/fields/youtube";
+import { enlace, parrafo, texto } from "../lib/fields/textosPortada";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
@@ -223,6 +224,26 @@ export const PaginaInstitucional: CollectionConfig = {
       ],
     },
     /*
+     * SECCIÓN 2 DE LA PORTADA: textos. Las tarjetas salen de
+     * `marcas-maquinaria` (las que tienen posición en la portada y foto).
+     */
+    {
+      name: "seccionNueva",
+      type: "group",
+      label: "Sección «Maquinaria pesada nueva» de la portada",
+      admin: { condition: (data) => data?.slug === "inicio" },
+      fields: [
+        texto("antetitulo", "Antetítulo", "Venta de maquinaria"),
+        texto("titulo", "Título", "Maquinaria pesada nueva"),
+        texto("botonTexto", "Texto del botón", "Ver todo"),
+        enlace(
+          "botonEnlace",
+          "Enlace del botón",
+          "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/",
+        ),
+      ],
+    },
+    /*
      * SECCIÓN 3 DE LA PORTADA (fase D): la máquina recortada que asoma sobre la
      * sección 2. Es decorativa (`alt` vacío al pintarla) y OPCIONAL: sin ella la
      * columna se pinta igual, solo sin imagen. En Payload y no en el repositorio
@@ -243,6 +264,33 @@ export const PaginaInstitucional: CollectionConfig = {
             description: "Decorativa: asoma sobre la sección anterior. Opcional.",
           },
         },
+        texto("antetitulo", "Antetítulo", "Venta de maquinaria"),
+        texto("titulo", "Título", "Maquinaria pesada usada"),
+        texto(
+          "pestanaExcavadoras",
+          "Pestaña de excavadoras",
+          "Excavadoras",
+          "Vacío: el nombre de la categoría «excavadoras».",
+        ),
+        texto("pestanaOtros", "Pestaña del resto de categorías", "Otros"),
+        texto("pestanaAditamentos", "Pestaña de aditamentos", "Aditamentos"),
+        texto("verProductoTexto", "Texto del enlace de cada equipo", "Ver producto"),
+        texto(
+          "marcasTitulo",
+          "Título de la columna izquierda",
+          "Marcas que Respaldan Nuestro Trabajo",
+        ),
+        parrafo(
+          "marcasTexto",
+          "Frase de la columna izquierda",
+          "Trabajamos con fabricantes líderes a nivel internacional para ofrecerle calidad, rendimiento y respaldo",
+        ),
+        texto(
+          "botonTexto",
+          "Texto del botón de excavadoras",
+          "Ver todas las excavadoras",
+          "El botón lleva a la categoría «excavadoras» de usados.",
+        ),
       ],
     },
     /*
@@ -286,6 +334,23 @@ export const PaginaInstitucional: CollectionConfig = {
       ],
     },
     /*
+     * SECCIÓN 5 DE LA PORTADA: textos. Las tarjetas salen de
+     * `categorias-tecnicas` (las que tienen posición en la portada).
+     */
+    {
+      name: "seccionRepuestos",
+      type: "group",
+      label: "Sección «Venta de repuestos» de la portada",
+      admin: { condition: (data) => data?.slug === "inicio" },
+      fields: [
+        texto("antetitulo", "Antetítulo", "Venta de repuestos"),
+        texto("titulo", "Título", "Encuentra Maquinaria y Repuestos Rápido y Fácil"),
+        texto("verMasTexto", "Texto del enlace de cada tarjeta", "Ver más"),
+        texto("botonTexto", "Texto del botón", "Ver todos los repuestos"),
+        enlace("botonEnlace", "Enlace del botón", "/repuestos-maquinaria-pesada-colombia/"),
+      ],
+    },
+    /*
      * SECCIÓN 7 DE LA PORTADA (fase F): «Nuestra Compañía». El vídeo de fondo
      * y el de YouTube del botón de reproducir. Los dos opcionales: sin vídeo,
      * la tarjeta se pinta en oscuro con su texto; sin YouTube, sin botón.
@@ -313,6 +378,58 @@ export const PaginaInstitucional: CollectionConfig = {
               "Opcional. Se abre en una ventana, desde youtube-nocookie.com, solo al pulsar.",
           },
         },
+        texto("titulo", "Título", "Nuestra Compañía"),
+        parrafo(
+          "texto",
+          "Texto",
+          "En Partequipos somos expertos en repuestos y maquinaria pesada, con asesores en todo el país que marcan la diferencia en Colombia",
+        ),
+        texto("marquesina", "Texto en movimiento", "MAQUINARIA PESADA EN COLOMBIA"),
+        enlace("marquesinaEnlace", "Enlace del texto en movimiento", "/nosotros/"),
+      ],
+    },
+    /* SECCIÓN 8 DE LA PORTADA: la llamada a la acción sobre la tarjeta de la 7. */
+    {
+      name: "seccionCatalogo",
+      type: "group",
+      label: "Sección «Catálogo» de la portada",
+      admin: { condition: (data) => data?.slug === "inicio" },
+      fields: [
+        texto("titulo", "Título", "Encuentra la maquinaria que tu operación necesita"),
+        texto("catalogoTexto", "Texto del botón de catálogo", "Catálogo"),
+        enlace("catalogoEnlace", "Enlace del botón de catálogo", "/maquinaria-pesada/"),
+        texto(
+          "whatsappTexto",
+          "Texto del botón de WhatsApp",
+          "WhatsApp",
+          "El número sale de la configuración de la empresa.",
+        ),
+      ],
+    },
+    /* SECCIÓN 9 DE LA PORTADA: las sedes salen de la colección `sedes`. */
+    {
+      name: "seccionSedes",
+      type: "group",
+      label: "Sección «Sedes» de la portada",
+      admin: { condition: (data) => data?.slug === "inicio" },
+      fields: [
+        texto(
+          "titulo",
+          "Título (solo para lectores de pantalla)",
+          "Nuestras sedes",
+          "ux-9 no pinta título en esta sección; este lo leen los lectores de pantalla.",
+        ),
+      ],
+    },
+    /* SECCIÓN 10 DE LA PORTADA: los testimonios salen de la colección `testimonios`. */
+    {
+      name: "seccionTestimonios",
+      type: "group",
+      label: "Sección «Testimonios» de la portada",
+      admin: { condition: (data) => data?.slug === "inicio" },
+      fields: [
+        texto("titulo", "Título", "La confianza de nuestros clientes habla por nosotros"),
+        texto("verVideoTexto", "Texto del botón de vídeo", "Ver Video"),
       ],
     },
     /*
@@ -334,6 +451,14 @@ export const PaginaInstitucional: CollectionConfig = {
           label: "Máquina recortada (PNG transparente)",
           admin: { description: "Decorativa: asoma arriba a la izquierda. Opcional." },
         },
+        texto("titulo", "Título", "Preguntas frecuentes"),
+        parrafo(
+          "intro",
+          "Introducción",
+          "Resuelve tus dudas sobre nuestros equipos, repuestos y servicios. En Partequipos estamos para ayudarte a encontrar las mejores soluciones para mantener tu maquinaria trabajando.",
+        ),
+        texto("botonTexto", "Texto del botón", "Solicita asesoría"),
+        enlace("botonEnlace", "Enlace del botón", "/contactanos/"),
       ],
     },
     seoField(),

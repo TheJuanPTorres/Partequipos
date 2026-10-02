@@ -1,6 +1,7 @@
 import type { GlobalConfig } from "payload";
 
 import { escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { validarEnlace } from "../lib/fields/reglasPortada";
 import { validarDestinoPie } from "../lib/pie";
 import { revalidarTodoElSitio } from "../lib/revalidation";
 
@@ -100,6 +101,39 @@ export const Pie: GlobalConfig = {
                   },
                 },
               ],
+            },
+          ],
+        },
+      ],
+    },
+    /*
+     * Enlaces de la franja legal (Ley 1581 de 2012). Antes, `navegacionLegal`
+     * en el código; la migración `20261002_*_home_panel` los siembra. El de
+     * tratamiento de datos va el primero.
+     */
+    {
+      name: "legales",
+      type: "array",
+      label: "Enlaces legales",
+      labels: { singular: "Enlace", plural: "Enlaces" },
+      fields: [
+        {
+          type: "row",
+          fields: [
+            {
+              name: "etiqueta",
+              type: "text",
+              required: true,
+              label: "Texto",
+              admin: { width: "40%" },
+            },
+            {
+              name: "enlace",
+              type: "text",
+              required: true,
+              label: "Enlace",
+              validate: validarEnlace,
+              admin: { width: "60%" },
             },
           ],
         },

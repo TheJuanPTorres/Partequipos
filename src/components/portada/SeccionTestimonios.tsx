@@ -37,12 +37,14 @@ import estilos from "./testimonios.module.css";
  *   cerradas, oculto también al lector. «Ver Video» dice de quién es.
  * - D2: con movimiento reducido, sin la transición ni el desenfoque animado.
  */
-type Props = { tarjetas: TarjetaTestimonio[] };
+export type TextosTestimonios = { titulo: string; verVideoTexto: string };
+
+type Props = { tarjetas: TarjetaTestimonio[]; textos: TextosTestimonios };
 
 /** Ancho pintado de la foto: la abierta, ~660 px a 1440; en móvil, toda. */
 const SIZES_FOTO = "(max-width: 767px) 100vw, 50vw";
 
-export function SeccionTestimonios({ tarjetas }: Props) {
+export function SeccionTestimonios({ tarjetas, textos }: Props) {
   const inicial = tarjetaInicial(tarjetas.length);
   const [activa, setActiva] = useState(inicial);
   if (tarjetas.length === 0) return null;
@@ -51,14 +53,16 @@ export function SeccionTestimonios({ tarjetas }: Props) {
 
   return (
     <section className={estilos.seccion} aria-labelledby="portada-testimonios-titulo">
-      <Revelado
-        como="h2"
-        id="portada-testimonios-titulo"
-        texto="La confianza de nuestros clientes habla por nosotros"
-        ritmo="titulo"
-        disparo={0.95}
-        className={`${estilos.titulo} texto-titulo-seccion`}
-      />
+      {textos.titulo ? (
+        <Revelado
+          como="h2"
+          id="portada-testimonios-titulo"
+          texto={textos.titulo}
+          ritmo="titulo"
+          disparo={0.95}
+          className={`${estilos.titulo} texto-titulo-seccion`}
+        />
+      ) : null}
       <div
         className={estilos.pista}
         style={{ "--testimonios-n": tarjetas.length } as CSSProperties}
@@ -117,7 +121,7 @@ export function SeccionTestimonios({ tarjetas }: Props) {
                   className={estilos.ver}
                 >
                   <IconPlayerPlayFilled aria-hidden="true" focusable="false" />
-                  <span aria-hidden="true">Ver Video</span>
+                  <span aria-hidden="true">{textos.verVideoTexto}</span>
                 </DialogoYouTube>
               ) : null}
               <div id={idContenido} className={estilos.contenido} aria-hidden={!abierta}>

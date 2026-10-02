@@ -130,10 +130,12 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
+    cabecera: Cabecera;
     pie: Pie;
     seo: Seo;
   };
   globalsSelect: {
+    cabecera: CabeceraSelect<false> | CabeceraSelect<true>;
     pie: PieSelect<false> | PieSelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
   };
@@ -303,6 +305,10 @@ export interface MarcasMaquinaria {
    * Fondo de la tarjeta de esta marca en el inicio.
    */
   imagenTarjeta?: (number | null) | Media;
+  /**
+   * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» (en ux-9: Hitachi, CASE y Yanmar). Necesita la foto de la tarjeta.
+   */
+  ordenPortada?: number | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -540,6 +546,7 @@ export interface EquiposUsado {
    * Al venderse, desmarcar en vez de borrar: conserva el historial y permite deshacer.
    */
   disponible?: boolean | null;
+  pestanaPortada?: ('categoria' | 'aditamentos') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -731,11 +738,35 @@ export interface Pagina {
         }[]
       | null;
   };
+  seccionNueva?: {
+    antetitulo?: string | null;
+    titulo?: string | null;
+    botonTexto?: string | null;
+    /**
+     * Una ruta del sitio (/…/) o una dirección https://.
+     */
+    botonEnlace?: string | null;
+  };
   seccionUsada?: {
     /**
      * Decorativa: asoma sobre la sección anterior. Opcional.
      */
     imagen?: (number | null) | Media;
+    antetitulo?: string | null;
+    titulo?: string | null;
+    /**
+     * Vacío: el nombre de la categoría «excavadoras».
+     */
+    pestanaExcavadoras?: string | null;
+    pestanaOtros?: string | null;
+    pestanaAditamentos?: string | null;
+    verProductoTexto?: string | null;
+    marcasTitulo?: string | null;
+    marcasTexto?: string | null;
+    /**
+     * El botón lleva a la categoría «excavadoras» de usados.
+     */
+    botonTexto?: string | null;
   };
   seccionLogos?: {
     /**
@@ -752,6 +783,16 @@ export interface Pagina {
         }[]
       | null;
   };
+  seccionRepuestos?: {
+    antetitulo?: string | null;
+    titulo?: string | null;
+    verMasTexto?: string | null;
+    botonTexto?: string | null;
+    /**
+     * Una ruta del sitio (/…/) o una dirección https://.
+     */
+    botonEnlace?: string | null;
+  };
   seccionCompania?: {
     /**
      * En bucle y sin sonido. MP4 H.264 de 8 bits, máximo 4 MB.
@@ -761,12 +802,48 @@ export interface Pagina {
      * Opcional. Se abre en una ventana, desde youtube-nocookie.com, solo al pulsar.
      */
     youtube?: string | null;
+    titulo?: string | null;
+    texto?: string | null;
+    marquesina?: string | null;
+    /**
+     * Una ruta del sitio (/…/) o una dirección https://.
+     */
+    marquesinaEnlace?: string | null;
+  };
+  seccionCatalogo?: {
+    titulo?: string | null;
+    catalogoTexto?: string | null;
+    /**
+     * Una ruta del sitio (/…/) o una dirección https://.
+     */
+    catalogoEnlace?: string | null;
+    /**
+     * El número sale de la configuración de la empresa.
+     */
+    whatsappTexto?: string | null;
+  };
+  seccionSedes?: {
+    /**
+     * ux-9 no pinta título en esta sección; este lo leen los lectores de pantalla.
+     */
+    titulo?: string | null;
+  };
+  seccionTestimonios?: {
+    titulo?: string | null;
+    verVideoTexto?: string | null;
   };
   seccionFaq?: {
     /**
      * Decorativa: asoma arriba a la izquierda. Opcional.
      */
     imagen?: (number | null) | Media;
+    titulo?: string | null;
+    intro?: string | null;
+    botonTexto?: string | null;
+    /**
+     * Una ruta del sitio (/…/) o una dirección https://.
+     */
+    botonEnlace?: string | null;
   };
   seo?: {
     metaTitle?: string | null;
@@ -1307,6 +1384,7 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
   descripcion?: T;
   logo?: T;
   imagenTarjeta?: T;
+  ordenPortada?: T;
   seo?:
     | T
     | {
@@ -1428,6 +1506,7 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
   descripcion?: T;
   imagenes?: T;
   disponible?: T;
+  pestanaPortada?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1513,10 +1592,27 @@ export interface PaginasSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  seccionNueva?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        botonTexto?: T;
+        botonEnlace?: T;
+      };
   seccionUsada?:
     | T
     | {
         imagen?: T;
+        antetitulo?: T;
+        titulo?: T;
+        pestanaExcavadoras?: T;
+        pestanaOtros?: T;
+        pestanaAditamentos?: T;
+        verProductoTexto?: T;
+        marcasTitulo?: T;
+        marcasTexto?: T;
+        botonTexto?: T;
       };
   seccionLogos?:
     | T
@@ -1529,16 +1625,52 @@ export interface PaginasSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  seccionRepuestos?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        verMasTexto?: T;
+        botonTexto?: T;
+        botonEnlace?: T;
+      };
   seccionCompania?:
     | T
     | {
         video?: T;
         youtube?: T;
+        titulo?: T;
+        texto?: T;
+        marquesina?: T;
+        marquesinaEnlace?: T;
+      };
+  seccionCatalogo?:
+    | T
+    | {
+        titulo?: T;
+        catalogoTexto?: T;
+        catalogoEnlace?: T;
+        whatsappTexto?: T;
+      };
+  seccionSedes?:
+    | T
+    | {
+        titulo?: T;
+      };
+  seccionTestimonios?:
+    | T
+    | {
+        titulo?: T;
+        verVideoTexto?: T;
       };
   seccionFaq?:
     | T
     | {
         imagen?: T;
+        titulo?: T;
+        intro?: T;
+        botonTexto?: T;
+        botonEnlace?: T;
       };
   seo?:
     | T
@@ -1763,6 +1895,29 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Menú y botón de la cabecera de todas las páginas.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cabecera".
+ */
+export interface Cabecera {
+  id: number;
+  enlaces?:
+    | {
+        etiqueta: string;
+        /**
+         * Una ruta del sitio (/…/) o https://.
+         */
+        enlace: string;
+        id?: string | null;
+      }[]
+    | null;
+  botonTexto?: string | null;
+  botonEnlace?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Texto y enlaces del pie de todas las páginas. Las redes y el contacto se editan en la configuración de la empresa, no aquí.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1798,6 +1953,13 @@ export interface Pie {
         id?: string | null;
       }[]
     | null;
+  legales?:
+    | {
+        etiqueta: string;
+        enlace: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1825,6 +1987,24 @@ export interface Seo {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cabecera_select".
+ */
+export interface CabeceraSelect<T extends boolean = true> {
+  enlaces?:
+    | T
+    | {
+        etiqueta?: T;
+        enlace?: T;
+        id?: T;
+      };
+  botonTexto?: T;
+  botonEnlace?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pie_select".
  */
 export interface PieSelect<T extends boolean = true> {
@@ -1845,6 +2025,13 @@ export interface PieSelect<T extends boolean = true> {
               destino?: T;
               id?: T;
             };
+        id?: T;
+      };
+  legales?:
+    | T
+    | {
+        etiqueta?: T;
+        enlace?: T;
         id?: T;
       };
   updatedAt?: T;

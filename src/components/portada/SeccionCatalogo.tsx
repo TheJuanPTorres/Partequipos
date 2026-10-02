@@ -2,7 +2,6 @@ import { IconBrandWhatsapp, IconTruck } from "@tabler/icons-react";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
-import { RUTA_CATALOGO } from "@/lib/portada/seccionesF";
 
 import estilos from "./catalogo.module.css";
 
@@ -21,38 +20,51 @@ import estilos from "./catalogo.module.css";
  * - D22: SIN vídeo (producción), a 768 px o menos no sube: el título oscuro
  *   quedaría sobre la tarjeta oscura, ilegible.
  */
-type Props = { whatsapp: string; sobreVideo: boolean };
+export type TextosCatalogo = {
+  titulo: string;
+  catalogoTexto: string;
+  catalogoEnlace: string;
+  whatsappTexto: string;
+};
 
-export function SeccionCatalogo({ whatsapp, sobreVideo }: Props) {
+type Props = { whatsapp: string; sobreVideo: boolean; textos: TextosCatalogo };
+
+export function SeccionCatalogo({ whatsapp, sobreVideo, textos }: Props) {
   return (
     <section
       className={estilos.seccion}
       aria-labelledby="portada-catalogo-titulo"
       data-sin-video={sobreVideo ? undefined : ""}
     >
-      <Revelado
-        como="h2"
-        id="portada-catalogo-titulo"
-        texto="Encuentra la maquinaria que tu operación necesita"
-        ritmo="titulo"
-        disparo={0.95}
-        className={`${estilos.titulo} texto-titulo-seccion`}
-      />
+      {textos.titulo ? (
+        <Revelado
+          como="h2"
+          id="portada-catalogo-titulo"
+          texto={textos.titulo}
+          ritmo="titulo"
+          disparo={0.95}
+          className={`${estilos.titulo} texto-titulo-seccion`}
+        />
+      ) : null}
       <div className={estilos.botones}>
-        <Link href={RUTA_CATALOGO} className={`${estilos.boton} texto-etiqueta`}>
-          <IconTruck aria-hidden="true" focusable="false" stroke={1.75} />
-          Catálogo
-        </Link>
-        <a
-          href={whatsapp}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`${estilos.boton} texto-etiqueta`}
-        >
-          <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={1.75} />
-          WhatsApp
-          <span className="sr-only"> (se abre en otra pestaña)</span>
-        </a>
+        {textos.catalogoTexto && textos.catalogoEnlace ? (
+          <Link href={textos.catalogoEnlace} className={`${estilos.boton} texto-etiqueta`}>
+            <IconTruck aria-hidden="true" focusable="false" stroke={1.75} />
+            {textos.catalogoTexto}
+          </Link>
+        ) : null}
+        {textos.whatsappTexto ? (
+          <a
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${estilos.boton} texto-etiqueta`}
+          >
+            <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={1.75} />
+            {textos.whatsappTexto}
+            <span className="sr-only"> (se abre en otra pestaña)</span>
+          </a>
+        ) : null}
       </div>
     </section>
   );

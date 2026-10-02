@@ -8,7 +8,7 @@ import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { useMovimientoReducido, usePausa } from "@/components/movimiento/useMovimiento";
 import type { VideoYouTube } from "@/lib/fields/youtube";
-import { RUTA_NOSOTROS, type VideoCompania } from "@/lib/portada/seccionesF";
+import type { VideoCompania } from "@/lib/portada/seccionesF";
 
 import estilos from "./compania.module.css";
 import { DialogoYouTube } from "./DialogoYouTube";
@@ -45,10 +45,16 @@ const RADIO_FINAL_PX = 32;
 const ALCANCE_S = 0.6;
 /** ux-9: `MQ_SPEED`. */
 const MARQUEE_PX_S = 90;
-const MARQUEE_TEXTO = "MAQUINARIA PESADA EN COLOMBIA";
 const MARQUEE_REPETICIONES = 3;
 
-type Props = { video: VideoCompania | null; youtube: VideoYouTube | null };
+export type TextosCompania = {
+  titulo: string;
+  texto: string;
+  marquesina: string;
+  marquesinaEnlace: string;
+};
+
+type Props = { video: VideoCompania | null; youtube: VideoYouTube | null; textos: TextosCompania };
 
 /** La capa blanca de ux-9: entra en el primer 8 %, se apaga del 75 % al 100 %. */
 function opacidadFondo(p: number): number {
@@ -58,7 +64,7 @@ function opacidadFondo(p: number): number {
   return 1 - (p - 0.75) / 0.25;
 }
 
-export function SeccionCompania({ video, youtube }: Props) {
+export function SeccionCompania({ video, youtube, textos }: Props) {
   const recorrido = useRef<HTMLDivElement>(null);
   const encoge = useRef<HTMLDivElement>(null);
   const fondo = useRef<HTMLDivElement>(null);
@@ -164,8 +170,13 @@ export function SeccionCompania({ video, youtube }: Props) {
   const grupoMarquee = (oculto: boolean) => (
     <div ref={oculto ? undefined : grupo} className={estilos.grupo}>
       {Array.from({ length: MARQUEE_REPETICIONES }, (_, i) => (
-        <a key={i} href={RUTA_NOSOTROS} className={estilos.item} tabIndex={-1}>
-          {MARQUEE_TEXTO}
+        <a
+          key={i}
+          href={textos.marquesinaEnlace || undefined}
+          className={estilos.item}
+          tabIndex={-1}
+        >
+          {textos.marquesina}
           <span className={estilos.separador}>•</span>
         </a>
       ))}
@@ -221,14 +232,14 @@ export function SeccionCompania({ video, youtube }: Props) {
                 <Revelado
                   como="h2"
                   id="portada-compania-titulo"
-                  texto="Nuestra Compañía"
+                  texto={textos.titulo}
                   ritmo="pausado"
                   disparo={0.85}
                   className={`${estilos.titulo} texto-titulo-seccion`}
                 />
                 <Revelado
                   como="p"
-                  texto="En Partequipos somos expertos en repuestos y maquinaria pesada, con asesores en todo el país que marcan la diferencia en Colombia"
+                  texto={textos.texto}
                   ritmo="pausado"
                   disparo={0.85}
                   className={`${estilos.texto} texto-destacado`}

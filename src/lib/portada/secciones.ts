@@ -31,12 +31,15 @@ export type TarjetaMarca = {
 };
 
 /**
- * Solo las marcas con FOTO DE TARJETA: sin ella el texto blanco caería sobre la
- * página. Así «Aditamentos», que figura como marca (ADR 0007), no sale hasta
- * que alguien le ponga foto a propósito.
+ * Solo las marcas con POSICIÓN EN LA PORTADA y FOTO DE TARJETA (sin foto, el
+ * texto blanco caería sobre la página), en el orden de esa posición. En ux-9:
+ * Hitachi, CASE y Yanmar.
  */
 export function tarjetasDeMarcas(marcas: MarcasMaquinaria[]): TarjetaMarca[] {
-  return marcas.flatMap((m) => {
+  const conPosicion = marcas
+    .filter((m) => typeof m.ordenPortada === "number")
+    .sort((a, b) => (a.ordenPortada ?? 0) - (b.ordenPortada ?? 0));
+  return conPosicion.flatMap((m) => {
     const fondo = imagenDeMedia(m.imagenTarjeta, "");
     const nombre = m.nombre?.trim();
     if (!fondo || !nombre || !m.slug) return [];
@@ -122,23 +125,31 @@ export function hrefDeCategoriaUsada(slug: string): string {
   return `${RUTA_USADA}${slug}/`;
 }
 
+/** Etiquetas de las pestañas, desde el panel (página «inicio»). */
+export type EtiquetasPestanas = {
+  excavadoras?: string | null;
+  otros?: string | null;
+  aditamentos?: string | null;
+};
+
 /**
- * PESTAÑAS de la sección 3. ux-9 tiene tres: «Excavadoras», «Otros» y
- * «Aditamentos». Las dos primeras salen del inventario: la categoría
- * `excavadoras` y todas las demás. «Aditamentos» NO tiene fuente en la línea
- * usada —es una «marca» de la línea nueva (ADR 0007)—, así que no se pinta
- * hasta que se decida de dónde sale (desviación documentada).
+ * PESTAÑAS de la sección 3, las tres de ux-9: «Excavadoras» (la categoría
+ * `excavadoras`), «Otros» (el resto de categorías) y «Aditamentos» (los
+ * equipos marcados con «Pestaña en la portada: Aditamentos», porque en la
+ * línea usada no hay categoría de aditamentos). Las etiquetas salen del panel.
  *
  * Solo equipos DISPONIBLES y con categoría poblada (sin ella no hay adónde
  * enlazar). Una pestaña sin equipos no se pinta.
  */
 export function pestanasDeUsada(
   equipos: EquiposUsado[],
+  etiquetas: EtiquetasPestanas = {},
   por: number = TARJETAS_POR_PESTANA,
 ): Pestana[] {
   const excavadoras: TarjetaEquipo[] = [];
   const otros: TarjetaEquipo[] = [];
-  let etiquetaExcavadoras = "Excavadoras";
+  const aditamentos: TarjetaEquipo[] = [];
+  let etiquetaExcavadoras = etiquetas.excavadoras?.trim() || "";
 
   for (const e of equipos) {
     if (!e.disponible) continue;
@@ -154,8 +165,10 @@ export function pestanasDeUsada(
       ficha: fichaDeEquipo(e),
       href: hrefDeCategoriaUsada(categoria.slug),
     };
-    if (categoria.slug === SLUG_EXCAVADORAS) {
-      etiquetaExcavadoras = categoria.nombre?.trim() || etiquetaExcavadoras;
+    if (e.pestanaPortada === "aditamentos") {
+      aditamentos.push(tarjeta);
+    } else if (categoria.slug === SLUG_EXCAVADORAS) {
+      etiquetaExcavadoras ||= categoria.nombre?.trim() || "Excavadoras";
       excavadoras.push(tarjeta);
     } else {
       otros.push(tarjeta);
@@ -163,8 +176,17 @@ export function pestanasDeUsada(
   }
 
   const pestanas: Pestana[] = [
-    { clave: SLUG_EXCAVADORAS, etiqueta: etiquetaExcavadoras, equipos: excavadoras.slice(0, por) },
-    { clave: "otros", etiqueta: "Otros", equipos: otros.slice(0, por) },
+    {
+      clave: SLUG_EXCAVADORAS,
+      etiqueta: etiquetaExcavadoras || "Excavadoras",
+      equipos: excavadoras.slice(0, por),
+    },
+    { clave: "otros", etiqueta: etiquetas.otros?.trim() || "Otros", equipos: otros.slice(0, por) },
+    {
+      clave: "aditamentos",
+      etiqueta: etiquetas.aditamentos?.trim() || "Aditamentos",
+      equipos: aditamentos.slice(0, por),
+    },
   ];
   return pestanas.filter((p) => p.equipos.length > 0);
 }

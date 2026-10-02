@@ -76,9 +76,19 @@ página tiene bloques. Configuración en `src/collections/bloques/bloquesPagina.
 traducción desde Payload en `src/lib/bloques/desdePayload.ts`; aviso del panel
 en `src/components/admin/AvisoBloques.tsx`.
 
-**Migración `20261002_202057_paginas_bloques`:** solo esquema. Siete tablas
+**Migración `20261002_204606_paginas_bloques`:** solo esquema. Siete tablas
 nuevas (`paginas_blocks_*`) con sus índices y claves foráneas; ninguna tabla
 existente cambia; el `down` solo borra esas siete.
+
+**Corrección en la ventana:** la primera versión (`20261002_202057`) tenía una
+clave foránea de 66 caracteres (`paginas_blocks_tarjetas_expandibles_tarjetas_imagen_id_media_id_fk`);
+Postgres la corta a 63, la base no cuadraba con el snapshot y «Migrar desde
+cero» falló en tres commits seguidos sin que lo viera hasta el tercero. Se
+deshizo en el preview con su propio `down` (lote 19), el bloque
+`tarjetasExpandibles` pasó a `dbName: paginas_blocks_tarjetas_exp` (58
+caracteres; el `blockType` no cambia) y la migración se regeneró. **Nunca
+llegó a producción.** Lección: comprobar «Migrar desde cero» en el MISMO
+commit que trae la migración, no dar el CI por verde por el último check.
 
 ## 4. Lo que se aparta de ux-9
 

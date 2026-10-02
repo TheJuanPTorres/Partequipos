@@ -84,11 +84,17 @@ Reglas:
 
 ## 3. Migraciones de base de datos
 
-**Por qué existen:** el esquema **no** se sincroniza solo en producción. En
-desarrollo Payload hace _push_ (compara y altera el esquema en caliente), pero
-eso no tiene control de versiones ni marcha atrás, así que está **desactivado en
-producción** (`push: process.env.NODE_ENV !== "production"` en
-`src/payload.config.ts`).
+**Por qué existen:** el esquema se cambia **solo con migraciones, en todos los
+entornos**. El _push_ de Payload (comparar y alterar el esquema en caliente) no
+tiene control de versiones ni marcha atrás, deja el marcador `dev` que cuelga
+`payload migrate` y puede abrir una pregunta interactiva de drizzle-kit.
+
+**Desde el 2026-10-02 el push está APAGADO por defecto, también en
+`npm run dev`.** Solo se enciende con `PAYLOAD_PERMITIR_PUSH=true` y nunca con
+`NODE_ENV=production` ni con `PAYLOAD_DISABLE_PUSH=true`
+(`src/lib/db/pushEsquema.ts`, con pruebas). Si el servidor local falla por una
+columna que no existe, la base local va atrasada: `npm run db:check` y después
+`npm run migrate`, **nunca push**.
 
 Las migraciones viven en **`src/migrations/`** y **se versionan en el repo**.
 
@@ -121,8 +127,8 @@ npm run deploy:migrate && npm run build
 
 > **Ojo con la migración inicial:** genera `CREATE TABLE` sin `IF NOT EXISTS`, así
 > que está pensada para una base **vacía** (la rama de producción recién creada).
-> La base de desarrollo ya tiene el esquema aplicado por _push_, por lo que ahí no
-> debe ejecutarse.
+> La base de desarrollo tuvo el esquema aplicado por _push_ hasta el
+> 2026-10-02 y lleva el marcador `dev`: antes de migrarla, `db:check`.
 
 ---
 

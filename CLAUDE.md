@@ -1424,6 +1424,16 @@ corra donde corra:
 Se descartó `NODE_ENV=production`: cambia mucho más que el push, sigue siendo
 ambiental —o sea, olvidable— y en Windows no funciona en los scripts de npm.
 
+> **ACTUALIZADO 2026-10-02 — el push es OPT-IN en todas partes, `npm run dev`
+> incluido.** El agente B estuvo a punto de recibir una pregunta interactiva de
+> push de drizzle-kit al levantar `npm run dev` contra `development`. Ahora
+> `push` solo se activa con `PAYLOAD_PERMITIR_PUSH=true` (y nunca con
+> `NODE_ENV=production` ni `PAYLOAD_DISABLE_PUSH=true`): decisión en
+> `src/lib/db/pushEsquema.ts`, con pruebas. Comprobado levantando
+> `npm run dev` contra `development`: `/admin/` y la API en 200, sin push ni
+> pregunta. **`development` también se pone al día con `payload migrate`,
+> nunca con push**, con `db:check` antes y después.
+
 **Arreglo del síntoma (que el build falle ruidoso).** `npm run db:check`
 (`scripts/db/check-migrations.ts`) lee `payload_migrations` y corta con código 1
 y mensaje accionable si encuentra el marcador. Va **antes** de migrar:
@@ -3151,6 +3161,7 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Deriva de esquema                        | Una colección que cambia el esquema sin su migración (lo de `videos.focal_x` en la fase C, §10.33 p.5). Reproduce `migrate:create` sin conectar a ninguna base            | `npm run db:deriva` (`scripts/db/deriva-esquema.ts`) + `derivaEsquema.test.ts`                  | CI, en cada push y PR                 |
 | Migrar desde cero                        | Una migración que solo funciona sobre la base donde se escribió (§10.33 p.13): aplica todas a un Postgres 17 vacío y compara la estructura con el snapshot                | Job «Migrar desde cero» de `ci.yml` + `scripts/db/estructura-ci.ts`                             | CI, en cada push y PR                 |
 | Scripts sin push de esquema              | Un script que alcanza la config por un import estático antes de fijar `PAYLOAD_DISABLE_PUSH`: marcador `dev` en la base (§10.34)                                          | `src/lib/db/scriptsSinPush.test.ts`                                                             | CI, en cada push                      |
+| Push de esquema solo si se pide          | `npm run dev` u otro proceso que altere el esquema en caliente, deje el marcador `dev` o abra la pregunta interactiva de drizzle-kit                                      | `pushPermitido` (`src/lib/db/pushEsquema.ts`) + su prueba                                       | CI, y al cargar la config             |
 | Almacén de Blob del entorno              | Escribir, sobrescribir o borrar ficheros en el almacén de otro entorno: development o un script contra el Blob de producción, o producción contra el del preview (§10.37) | `almacenEsperado` (media y videos) + `exigirAlmacen` (scripts) + `src/lib/blob/almacen.test.ts` | Cada escritura y cada script que sube |
 | Imagen del pie sin tapar contenido       | La imagen decorativa del pie (sobresale por encima) tapando texto de una plantilla. Mide con los píxeles opacos del recorte, no con su caja (§10.33 p.11)                 | `npm run qa:vuelo-pie` (`scripts/qa/vuelo-pie.mjs`, con `npx`: necesita navegador)              | **A mano**, contra producción         |
 

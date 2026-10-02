@@ -8,9 +8,6 @@ import { imagenDeMedia, type ImagenLista } from "../utils/relations";
  * a datos está en `src/lib/queries/getCategoriasTecnicas.ts` y en la portada.
  */
 
-/** Adónde lleva «Ver todos los repuestos». La raíz del catálogo de repuestos. */
-export const RUTA_REPUESTOS = "/repuestos-maquinaria-pesada-colombia/";
-
 // --- Sección 4: logos -----------------------------------------------------------
 
 export type LogoMarca = { id: string; nombre: string; logo: ImagenLista };

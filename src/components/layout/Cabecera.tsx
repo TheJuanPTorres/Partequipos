@@ -32,7 +32,8 @@ type Enlace = { etiqueta: string; href: string };
 
 type Props = {
   enlaces: readonly Enlace[];
-  contacto: Enlace;
+  /** Botón de la cabecera (global `cabecera`). Sin él, no se pinta. */
+  contacto: Enlace | null;
   whatsapp: string;
   nombreSitio: string;
   tituloPortada: string;
@@ -141,12 +142,12 @@ export function Cabecera({ enlaces, contacto, whatsapp, nombreSitio, tituloPorta
     </ul>
   );
 
-  const botonContacto = (
+  const botonContacto = contacto ? (
     <Link href={contacto.href} className={`${estilos.boton} texto-etiqueta`}>
       <IconMail aria-hidden="true" focusable="false" stroke={1.75} />
       {contacto.etiqueta}
     </Link>
-  );
+  ) : null;
 
   return (
     <header

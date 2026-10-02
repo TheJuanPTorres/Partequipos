@@ -8,9 +8,6 @@ import { imagenDeMedia, type ImagenLista } from "../utils/relations";
  * Lógica pura: lo que se pinta a partir de Payload.
  */
 
-/** Adónde lleva «Solicita asesoría». */
-export const RUTA_ASESORIA = "/contactanos/";
-
 // --- Sección 10: testimonios ------------------------------------------------------------
 
 export type TarjetaTestimonio = {

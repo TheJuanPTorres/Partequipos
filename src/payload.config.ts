@@ -16,6 +16,7 @@ import { buildConfig } from "payload";
 import sharp from "sharp";
 
 import { Articulo } from "./collections/Articulo";
+import { Cabecera } from "./globals/Cabecera";
 import { Pie } from "./globals/Pie";
 import { Seo } from "./globals/Seo";
 import { CategoriaBlog } from "./collections/CategoriaBlog";
@@ -154,7 +155,7 @@ export default buildConfig({
   ],
   // Globales: contenido único, no listas. El pie de todas las páginas (§13 de
   // docs/diseno/decisiones-home-ux9.md).
-  globals: [Pie, Seo],
+  globals: [Cabecera, Pie, Seo],
   editor: lexicalEditor(),
   /*
    * Panel en español (CLAUDE.md §5: textos de interfaz en español).

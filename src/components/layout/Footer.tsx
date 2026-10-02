@@ -8,7 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
-import { enlaceWhatsApp, navegacionLegal } from "@/lib/navegacion";
+import { enlaceWhatsApp } from "@/lib/navegacion";
 import { columnasDelPie, hrefTelefono, type ColumnaPie } from "@/lib/pie";
 import { getPie } from "@/lib/queries/getPie";
 import { imagenDeMedia } from "@/lib/utils/relations";
@@ -86,11 +86,13 @@ export async function Footer() {
   const columnas = columnasDelPie(pie.columnas, contact.phone);
   // Decorativa: sin nombre accesible (`alt` vacío y `aria-hidden`).
   const decorativa = imagenDeMedia(pie.imagenDecorativa, "");
-  // Primero la política de tratamiento de datos (Ley 1581 de 2012).
-  const legalesEnOrden = [
-    ...navegacionLegal.filter((l) => l.href.includes("tratamiento-de-datos")),
-    ...navegacionLegal.filter((l) => !l.href.includes("tratamiento-de-datos")),
-  ];
+  // Enlaces legales del global, en su orden (la migración pone primero el de
+  // tratamiento de datos, Ley 1581 de 2012). Sin texto o sin enlace, no salen.
+  const legalesEnOrden = (pie.legales ?? []).flatMap((l) =>
+    l.etiqueta?.trim() && l.enlace?.trim()
+      ? [{ etiqueta: l.etiqueta.trim(), href: l.enlace.trim() }]
+      : [],
+  );
   const redes = seoConfig.sameAs.flatMap((url) => {
     const red = REDES.find((r) => r.patron.test(url));
     return red ? [{ ...red, url }] : [];

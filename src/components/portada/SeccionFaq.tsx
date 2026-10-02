@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { RUTA_ASESORIA, type Pregunta } from "@/lib/portada/seccionesH";
+import type { Pregunta } from "@/lib/portada/seccionesH";
 import { buildFaqJsonLd } from "@/lib/seo/jsonLd";
 import type { ImagenLista } from "@/lib/utils/relations";
 
@@ -23,9 +23,11 @@ import estilos from "./faq.module.css";
  *   ux-9, Font Awesome).
  * - JSON-LD `FAQPage` con las mismas preguntas.
  */
-type Props = { preguntas: Pregunta[]; imagen: ImagenLista | null };
+export type TextosFaq = { titulo: string; intro: string; botonTexto: string; botonEnlace: string };
 
-export function SeccionFaq({ preguntas, imagen }: Props) {
+type Props = { preguntas: Pregunta[]; imagen: ImagenLista | null; textos: TextosFaq };
+
+export function SeccionFaq({ preguntas, imagen, textos }: Props) {
   if (preguntas.length === 0) return null;
   const jsonLd = buildFaqJsonLd(preguntas);
   return (
@@ -43,24 +45,25 @@ export function SeccionFaq({ preguntas, imagen }: Props) {
       ) : null}
       <div className={estilos.fila}>
         <div className={estilos.izq}>
-          <Revelado
-            como="h2"
-            id="portada-faq-titulo"
-            texto="Preguntas frecuentes"
-            ritmo="titulo"
-            curva="back.out"
-            disparo={0.85}
-            className={`${estilos.titulo} texto-titulo-seccion`}
-          />
-          <p className={`${estilos.intro} texto-cuerpo`}>
-            Resuelve tus dudas sobre nuestros equipos, repuestos y servicios. En Partequipos estamos
-            para ayudarte a encontrar las mejores soluciones para mantener tu maquinaria trabajando.
-          </p>
-          <div>
-            <Link href={RUTA_ASESORIA} className={`${estilos.boton} texto-etiqueta`}>
-              Solicita asesoría
-            </Link>
-          </div>
+          {textos.titulo ? (
+            <Revelado
+              como="h2"
+              id="portada-faq-titulo"
+              texto={textos.titulo}
+              ritmo="titulo"
+              curva="back.out"
+              disparo={0.85}
+              className={`${estilos.titulo} texto-titulo-seccion`}
+            />
+          ) : null}
+          {textos.intro ? <p className={`${estilos.intro} texto-cuerpo`}>{textos.intro}</p> : null}
+          {textos.botonTexto && textos.botonEnlace ? (
+            <div>
+              <Link href={textos.botonEnlace} className={`${estilos.boton} texto-etiqueta`}>
+                {textos.botonTexto}
+              </Link>
+            </div>
+          ) : null}
         </div>
         <div className={estilos.der}>
           {preguntas.map((p) => (

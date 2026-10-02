@@ -225,10 +225,10 @@ export const getMarcasDePortada = cache(async (): Promise<MarcasMaquinaria[]> =>
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "marcas-maquinaria",
-    where: { imagenTarjeta: { exists: true } },
+    where: { and: [{ imagenTarjeta: { exists: true } }, { ordenPortada: { exists: true } }] },
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    sort: "ordenPortada",
   });
   return docs;
 });
@@ -249,9 +249,11 @@ export const getEquiposUsadosDePortada = cache(async (): Promise<EquiposUsado[]>
       limit: TARJETAS_POR_PESTANA,
       sort: "-updatedAt",
     });
-  const [excavadoras, otros] = await Promise.all([
-    consulta({ "categoria.slug": { equals: SLUG_EXCAVADORAS } }),
-    consulta({ "categoria.slug": { not_equals: SLUG_EXCAVADORAS } }),
+  const noAditamento: Where = { pestanaPortada: { not_equals: "aditamentos" } };
+  const [excavadoras, otros, aditamentos] = await Promise.all([
+    consulta({ and: [{ "categoria.slug": { equals: SLUG_EXCAVADORAS } }, noAditamento] }),
+    consulta({ and: [{ "categoria.slug": { not_equals: SLUG_EXCAVADORAS } }, noAditamento] }),
+    consulta({ pestanaPortada: { equals: "aditamentos" } }),
   ]);
-  return [...excavadoras.docs, ...otros.docs];
+  return [...excavadoras.docs, ...otros.docs, ...aditamentos.docs];
 });

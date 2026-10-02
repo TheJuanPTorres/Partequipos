@@ -9,11 +9,6 @@ export { urlInsercion, validarYouTube, videoDeYouTube, type VideoYouTube } from 
  * y el YouTube de la H. Lógica pura: lo que se pinta a partir de Payload.
  */
 
-/** Adónde lleva «Catálogo» en la sección 8: la raíz de maquinaria. */
-export const RUTA_CATALOGO = "/maquinaria-pesada/";
-/** Adónde lleva el texto en movimiento de la sección 7 (ux-9: `MQ_URL`). */
-export const RUTA_NOSOTROS = "/nosotros/";
-
 // --- Sección 7: vídeo de la compañía ------------------------------------------------
 
 export type VideoCompania = {

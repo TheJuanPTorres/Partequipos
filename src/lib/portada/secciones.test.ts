@@ -9,7 +9,7 @@ const media = (id: number, alt = ""): Media =>
   ({ id, url: `/m/${id}.jpg`, alt, width: 800, height: 600 }) as Media;
 
 const marca = (over: Partial<MarcasMaquinaria>): MarcasMaquinaria =>
-  ({ id: 1, nombre: "Hitachi", slug: "hitachi", ...over }) as MarcasMaquinaria;
+  ({ id: 1, nombre: "Hitachi", slug: "hitachi", ordenPortada: 1, ...over }) as MarcasMaquinaria;
 
 const cat = (slug: string, nombre: string): CategoriasUsada =>
   ({ id: slug.length, slug, nombre }) as CategoriasUsada;
@@ -21,6 +21,31 @@ const equipo = (
 ) => ({ id, nombre: `Equipo ${id}`, categoria, disponible: true, ...over }) as EquiposUsado;
 
 describe("sección 2: tarjetas de marca", () => {
+  it("en el orden de su posición en la portada; sin posición no salen (Dynapac, LiuGong)", () => {
+    const r = tarjetasDeMarcas([
+      marca({ id: 3, nombre: "Yanmar", slug: "yanmar", ordenPortada: 3, imagenTarjeta: media(12) }),
+      marca({ id: 1, imagenTarjeta: media(10) }),
+      marca({
+        id: 2,
+        nombre: "CASE",
+        slug: "case-construction",
+        ordenPortada: 2,
+        imagenTarjeta: media(11),
+      }),
+      marca({
+        id: 4,
+        nombre: "Dynapac",
+        slug: "dynapac",
+        ordenPortada: null,
+        imagenTarjeta: media(13),
+      }),
+    ]);
+    assert.deepEqual(
+      r.map((t) => t.nombre),
+      ["Hitachi", "CASE", "Yanmar"],
+    );
+  });
+
   it("solo las marcas con foto de tarjeta; el resto no sale", () => {
     const r = tarjetasDeMarcas([
       marca({ id: 1, imagenTarjeta: media(10) }),
@@ -113,6 +138,26 @@ describe("sección 3: pestañas", () => {
     assert.deepEqual(
       r.map((p) => p.clave),
       ["otros"],
+    );
+  });
+
+  it("tercera pestaña: los marcados como aditamentos; etiquetas desde el panel", () => {
+    const r = pestanasDeUsada(
+      [
+        equipo(1, exc),
+        equipo(2, mini),
+        equipo(3, exc, { pestanaPortada: "aditamentos" }),
+        equipo(4, mini, { pestanaPortada: "aditamentos" }),
+      ],
+      { excavadoras: "Excavadoras", otros: "Otros equipos", aditamentos: "Aditamentos" },
+    );
+    assert.deepEqual(
+      r.map((p) => [p.clave, p.etiqueta, p.equipos.map((e) => e.id)]),
+      [
+        ["excavadoras", "Excavadoras", [1]],
+        ["otros", "Otros equipos", [2]],
+        ["aditamentos", "Aditamentos", [3, 4]],
+      ],
     );
   });
 

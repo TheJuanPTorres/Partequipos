@@ -60,6 +60,15 @@ export default async function HomePage() {
   if (!pagina) notFound();
 
   const { contact } = seoConfig;
+  // Textos de las secciones, desde el panel (página «inicio»). Vacío: no se pinta.
+  const tx = (v: string | null | undefined) => v?.trim() ?? "";
+  const nueva = pagina.seccionNueva;
+  const usada = pagina.seccionUsada;
+  const repuestos = pagina.seccionRepuestos;
+  const compania = pagina.seccionCompania;
+  const catalogo = pagina.seccionCatalogo;
+  const testimoniosT = pagina.seccionTestimonios;
+  const faq = pagina.seccionFaq;
   const diapositivas = diapositivasDeHero(pagina.hero);
   const [marcas, usados, excavadoras, categoriasTecnicas, testimonios, preguntas, horario, sedes] =
     await Promise.all([
@@ -94,38 +103,92 @@ export default async function HomePage() {
       {diapositivas.length > 0 ? <HeroPortada diapositivas={diapositivas} /> : null}
 
       {/* Secciones 2 y 3 de ux-9 (fase D). Sin datos, no se pintan. */}
-      <SeccionMaquinariaNueva tarjetas={tarjetasDeMarcas(marcas)} />
+      <SeccionMaquinariaNueva
+        tarjetas={tarjetasDeMarcas(marcas)}
+        textos={{
+          antetitulo: tx(nueva?.antetitulo),
+          titulo: tx(nueva?.titulo),
+          botonTexto: tx(nueva?.botonTexto),
+          botonEnlace: tx(nueva?.botonEnlace),
+        }}
+      />
       <SeccionMaquinariaUsada
-        pestanas={pestanasDeUsada(usados)}
+        pestanas={pestanasDeUsada(usados, {
+          excavadoras: usada?.pestanaExcavadoras,
+          otros: usada?.pestanaOtros,
+          aditamentos: usada?.pestanaAditamentos,
+        })}
         maquina={maquinaUsada ? { ...maquinaUsada, alt: "" } : null}
         hrefExcavadoras={excavadoras ? hrefDeCategoriaUsada(excavadoras.slug) : null}
+        textos={{
+          antetitulo: tx(usada?.antetitulo),
+          titulo: tx(usada?.titulo),
+          marcasTitulo: tx(usada?.marcasTitulo),
+          marcasTexto: tx(usada?.marcasTexto),
+          botonTexto: tx(usada?.botonTexto),
+          verProductoTexto: tx(usada?.verProductoTexto),
+        }}
       />
 
       {/* Secciones 4 y 5 de ux-9 (fase E). Sin datos, no se pintan. */}
       <CarruselLogos logos={logosDeMarcas(pagina.seccionLogos)} />
-      <SeccionRepuestos tarjetas={tarjetasDeRepuestos(categoriasTecnicas)} />
+      <SeccionRepuestos
+        tarjetas={tarjetasDeRepuestos(categoriasTecnicas)}
+        textos={{
+          antetitulo: tx(repuestos?.antetitulo),
+          titulo: tx(repuestos?.titulo),
+          verMasTexto: tx(repuestos?.verMasTexto),
+          botonTexto: tx(repuestos?.botonTexto),
+          botonEnlace: tx(repuestos?.botonEnlace),
+        }}
+      />
 
       {/* Secciones 6, 7 y 8 de ux-9 (fase F). Sin vídeo, la tarjeta va en oscuro. */}
       <SeccionCompania
         video={videoCompania}
-        youtube={videoDeYouTube(pagina.seccionCompania?.youtube)}
+        youtube={videoDeYouTube(compania?.youtube)}
+        textos={{
+          titulo: tx(compania?.titulo),
+          texto: tx(compania?.texto),
+          marquesina: tx(compania?.marquesina),
+          marquesinaEnlace: tx(compania?.marquesinaEnlace),
+        }}
       />
       <SeccionCatalogo
         whatsapp={enlaceWhatsApp(contact.phone)}
         sobreVideo={videoCompania !== null}
+        textos={{
+          titulo: tx(catalogo?.titulo),
+          catalogoTexto: tx(catalogo?.catalogoTexto),
+          catalogoEnlace: tx(catalogo?.catalogoEnlace),
+          whatsappTexto: tx(catalogo?.whatsappTexto),
+        }}
       />
 
       {/* Sección 9 de ux-9 (fase G). Globo solo con token de Mapbox; sin él, la lista. */}
       <SeccionSedes
         sedes={sedesDePortada(sedes)}
         token={tokenMapbox(process.env.NEXT_PUBLIC_MAPBOX_TOKEN)}
+        titulo={tx(pagina.seccionSedes?.titulo)}
       />
 
       {/* Secciones 10 y 11 de ux-9 (fase H). Sin datos publicados, no se pintan. */}
-      <SeccionTestimonios tarjetas={tarjetasDeTestimonios(testimonios)} />
+      <SeccionTestimonios
+        tarjetas={tarjetasDeTestimonios(testimonios)}
+        textos={{
+          titulo: tx(testimoniosT?.titulo),
+          verVideoTexto: tx(testimoniosT?.verVideoTexto),
+        }}
+      />
       <SeccionFaq
         preguntas={preguntasDeFaq(preguntas)}
         imagen={maquinaFaq ? { ...maquinaFaq, alt: "" } : null}
+        textos={{
+          titulo: tx(faq?.titulo),
+          intro: tx(faq?.intro),
+          botonTexto: tx(faq?.botonTexto),
+          botonEnlace: tx(faq?.botonEnlace),
+        }}
       />
     </main>
   );

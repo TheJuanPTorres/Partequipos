@@ -10,11 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
-import {
-  RUTA_REPUESTOS,
-  type IconoCategoria,
-  type TarjetaRepuesto,
-} from "@/lib/portada/seccionesE";
+import type { IconoCategoria, TarjetaRepuesto } from "@/lib/portada/seccionesE";
 
 import estilos from "./repuestos.module.css";
 import { TarjetasApiladas } from "./diferidos";
@@ -45,7 +41,15 @@ const ICONOS: Record<IconoCategoria, typeof IconSettings> = {
 /** Ancho pintado de la foto: 40 % de la tarjeta (456 px a 1440); en móvil, toda. */
 const SIZES_FOTO = "(max-width: 767px) calc(100vw - 20px), (max-width: 1024px) 40vw, 456px";
 
-function Tarjeta({ t, idTitulo }: { t: TarjetaRepuesto; idTitulo: string }) {
+function Tarjeta({
+  t,
+  idTitulo,
+  verMas,
+}: {
+  t: TarjetaRepuesto;
+  idTitulo: string;
+  verMas: string;
+}) {
   const Icono = t.icono ? ICONOS[t.icono] : null;
   return (
     <article
@@ -63,13 +67,13 @@ function Tarjeta({ t, idTitulo }: { t: TarjetaRepuesto; idTitulo: string }) {
           {t.titulo}
         </h3>
         {t.texto ? <p className={`${estilos.texto} texto-cuerpo`}>{t.texto}</p> : null}
-        {t.href ? (
+        {t.href && verMas ? (
           <Link
             href={t.href}
             aria-describedby={idTitulo}
             className={`${estilos.verMas} texto-etiqueta`}
           >
-            Ver más
+            {verMas}
           </Link>
         ) : null}
       </div>
@@ -90,33 +94,58 @@ function Tarjeta({ t, idTitulo }: { t: TarjetaRepuesto; idTitulo: string }) {
   );
 }
 
-export function SeccionRepuestos({ tarjetas }: { tarjetas: TarjetaRepuesto[] }) {
+export type TextosRepuestos = {
+  antetitulo: string;
+  titulo: string;
+  verMasTexto: string;
+  botonTexto: string;
+  botonEnlace: string;
+};
+
+export function SeccionRepuestos({
+  tarjetas,
+  textos,
+}: {
+  tarjetas: TarjetaRepuesto[];
+  textos: TextosRepuestos;
+}) {
   if (tarjetas.length === 0) return null;
   return (
     <section className={estilos.seccion} aria-labelledby="portada-repuestos-titulo">
       <div className={estilos.caja}>
         <div className={estilos.separador} aria-hidden="true" />
-        <p className={`${estilos.antetitulo} texto-etiqueta`}>Venta de repuestos</p>
-        <Revelado
-          como="h2"
-          id="portada-repuestos-titulo"
-          texto="Encuentra Maquinaria y Repuestos Rápido y Fácil"
-          ritmo="titulo"
-          disparo={0.95}
-          className={`${estilos.titulo} texto-titulo-seccion`}
-        />
+        {textos.antetitulo ? (
+          <p className={`${estilos.antetitulo} texto-etiqueta`}>{textos.antetitulo}</p>
+        ) : null}
+        {textos.titulo ? (
+          <Revelado
+            como="h2"
+            id="portada-repuestos-titulo"
+            texto={textos.titulo}
+            ritmo="titulo"
+            disparo={0.95}
+            className={`${estilos.titulo} texto-titulo-seccion`}
+          />
+        ) : null}
         <TarjetasApiladas className={estilos.lista} claseItem={estilos.item}>
           {tarjetas.map((t, i) => (
             // El id sale de la posición, no de la base: no se exponen ids (CLAUDE.md §8).
-            <Tarjeta key={t.id} t={t} idTitulo={`portada-repuesto-${i + 1}`} />
+            <Tarjeta
+              key={t.id}
+              t={t}
+              idTitulo={`portada-repuesto-${i + 1}`}
+              verMas={textos.verMasTexto}
+            />
           ))}
         </TarjetasApiladas>
-        <div className={estilos.pie}>
-          <Link href={RUTA_REPUESTOS} className={`${estilos.boton} texto-etiqueta`}>
-            <IconEngine aria-hidden="true" focusable="false" stroke={1.75} />
-            Ver todos los repuestos
-          </Link>
-        </div>
+        {textos.botonTexto && textos.botonEnlace ? (
+          <div className={estilos.pie}>
+            <Link href={textos.botonEnlace} className={`${estilos.boton} texto-etiqueta`}>
+              <IconEngine aria-hidden="true" focusable="false" stroke={1.75} />
+              {textos.botonTexto}
+            </Link>
+          </div>
+        ) : null}
       </div>
     </section>
   );

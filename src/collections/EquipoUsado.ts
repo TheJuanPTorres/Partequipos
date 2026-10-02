@@ -142,5 +142,23 @@ export const EquipoUsado: CollectionConfig = {
           "Al venderse, desmarcar en vez de borrar: conserva el historial y permite deshacer.",
       },
     },
+    /*
+     * PESTAÑA DE LA PORTADA (sección 3 de ux-9: «Excavadoras», «Otros» y
+     * «Aditamentos»). En la línea usada no hay categoría de aditamentos —solo
+     * existen en la nueva y en repuestos—, y crearla añadiría una URL que el
+     * sitio actual no tiene (§3.3). Así que el equipo se marca aquí: por
+     * defecto, la pestaña sale de su categoría (excavadoras u «Otros»).
+     */
+    {
+      name: "pestanaPortada",
+      type: "select",
+      defaultValue: "categoria",
+      label: "Pestaña en la portada",
+      options: [
+        { label: "Según su categoría (Excavadoras u Otros)", value: "categoria" },
+        { label: "Aditamentos", value: "aditamentos" },
+      ],
+      admin: { position: "sidebar" },
+    },
   ],
 };

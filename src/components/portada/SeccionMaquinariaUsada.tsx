@@ -35,7 +35,15 @@ const ICONOS: Record<DatoFicha["clave"], typeof IconWeight> = {
 const SIZES_TARJETA = "(max-width: 767px) 90vw, (max-width: 1024px) 150px, 230px";
 
 /** `idNombre` sale de la posición, no del id de la base: no se exponen ids (CLAUDE.md §8). */
-function Tarjeta({ equipo, idNombre }: { equipo: TarjetaEquipo; idNombre: string }) {
+function Tarjeta({
+  equipo,
+  idNombre,
+  verTexto,
+}: {
+  equipo: TarjetaEquipo;
+  idNombre: string;
+  verTexto: string;
+}) {
   return (
     <article className={estilos.tarjeta} aria-labelledby={idNombre}>
       {/* Sin foto no se reserva su columna: el texto ocupa la tarjeta. */}
@@ -82,20 +90,30 @@ function Tarjeta({ equipo, idNombre }: { equipo: TarjetaEquipo; idNombre: string
           className={`${estilos.boton} ${estilos.botonTarjeta} texto-etiqueta`}
         >
           <IconFileText aria-hidden="true" focusable="false" stroke={1.75} />
-          Ver producto
+          {verTexto}
         </Link>
       </div>
     </article>
   );
 }
 
+export type TextosUsada = {
+  antetitulo: string;
+  titulo: string;
+  marcasTitulo: string;
+  marcasTexto: string;
+  botonTexto: string;
+  verProductoTexto: string;
+};
+
 type Props = {
   pestanas: Pestana[];
   maquina: ImagenLista | null;
   hrefExcavadoras: string | null;
+  textos: TextosUsada;
 };
 
-export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras }: Props) {
+export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras, textos }: Props) {
   if (pestanas.length === 0) return null;
   return (
     <section className={estilos.seccion} aria-labelledby="portada-usada-titulo">
@@ -116,24 +134,28 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras }: P
         ) : (
           <div className={estilos.espacioSinMaquina} />
         )}
-        <Revelado
-          como="h2"
-          texto="Marcas que Respaldan Nuestro Trabajo"
-          ritmo="titulo"
-          disparo={0.95}
-          className={`${estilos.tituloMarcas} texto-titulo-bloque`}
-        />
-        <Revelado
-          como="p"
-          texto="Trabajamos con fabricantes líderes a nivel internacional para ofrecerle calidad, rendimiento y respaldo"
-          ritmo="pausado"
-          className={`${estilos.frase} texto-destacado`}
-        />
-        {hrefExcavadoras ? (
+        {textos.marcasTitulo ? (
+          <Revelado
+            como="h2"
+            texto={textos.marcasTitulo}
+            ritmo="titulo"
+            disparo={0.95}
+            className={`${estilos.tituloMarcas} texto-titulo-bloque`}
+          />
+        ) : null}
+        {textos.marcasTexto ? (
+          <Revelado
+            como="p"
+            texto={textos.marcasTexto}
+            ritmo="pausado"
+            className={`${estilos.frase} texto-destacado`}
+          />
+        ) : null}
+        {hrefExcavadoras && textos.botonTexto ? (
           <div className={estilos.botonIzq}>
             <Link href={hrefExcavadoras} className={`${estilos.boton} texto-etiqueta`}>
               <IconSettings aria-hidden="true" focusable="false" stroke={1.75} />
-              Ver todas las excavadoras
+              {textos.botonTexto}
             </Link>
           </div>
         ) : null}
@@ -142,21 +164,30 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras }: P
 
       <div className={estilos.der}>
         <div className={estilos.espacioDer} />
-        <p className={`${estilos.antetitulo} texto-etiqueta`}>Venta de maquinaria</p>
-        <Revelado
-          como="h2"
-          id="portada-usada-titulo"
-          texto="Maquinaria pesada usada"
-          ritmo="titulo"
-          disparo={0.95}
-          className={`${estilos.tituloUsada} texto-titulo-seccion`}
-        />
+        {textos.antetitulo ? (
+          <p className={`${estilos.antetitulo} texto-etiqueta`}>{textos.antetitulo}</p>
+        ) : null}
+        {textos.titulo ? (
+          <Revelado
+            como="h2"
+            id="portada-usada-titulo"
+            texto={textos.titulo}
+            ritmo="titulo"
+            disparo={0.95}
+            className={`${estilos.tituloUsada} texto-titulo-seccion`}
+          />
+        ) : null}
         <PestanasUsada
           etiquetadoPor="portada-usada-titulo"
           pestanas={pestanas.map(({ clave, etiqueta }) => ({ clave, etiqueta }))}
           paneles={pestanas.map((p) =>
             p.equipos.map((e, i) => (
-              <Tarjeta key={e.id} equipo={e} idNombre={`portada-usada-${p.clave}-${i + 1}`} />
+              <Tarjeta
+                key={e.id}
+                equipo={e}
+                idNombre={`portada-usada-${p.clave}-${i + 1}`}
+                verTexto={textos.verProductoTexto}
+              />
             )),
           )}
         />

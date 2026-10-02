@@ -2,8 +2,14 @@
  * COPIA DE DEMOSTRACIÓN DEL PREVIEW A PRODUCCIÓN (CLAUDE.md §10.38).
  *
  * Copia del PREVIEW al DESTINO el contenido de las secciones 2 a 8, 10 y 11 de
- * la portada, las sedes (sección 9, SIN sus fotos: §10.38 no las cubre) y la
- * imagen decorativa del pie, si el preview la tiene. NO toca el hero.
+ * la portada, las sedes de la sección 9 CON sus fotos (§10.38 cubre todos los
+ * assets de ux-9 desde el 2026-10-02) y la imagen decorativa del pie, si el
+ * preview la tiene. De los equipos usados, SOLO las fichas de ejemplo de ux-9
+ * (las de `preview:ejemplo:sembrar`, marcadas «EJEMPLO UX-9 —»), con su
+ * pestaña de la portada. NO toca el hero.
+ *
+ * Todo lo que CREA es contenido de EJEMPLO de ux-9: el manifiesto lo apunta en
+ * `ejemplo`, y `retirar` lo quita de una vez.
  *
  *   npx payload run scripts/demo/copia-demo.ts <modo> <destino> origen=<url del preview> [manifiesto=<ruta>]
  *
@@ -40,6 +46,7 @@ import { exigirAlmacen } from "../blob/exigirAlmacen";
 import {
   REFERENCIA_AUTORIZACION,
   clave,
+  esDeEjemplo,
   origenValido,
   veredictoDestino,
 } from "../../src/lib/demo/copiaDemo";
@@ -111,8 +118,21 @@ type Manifiesto = {
   videos: Record<string, Id>;
   urlsCreadas: string[];
   creados: Record<"equipos-usados" | "testimonios" | "preguntas-frecuentes" | "sedes", Id[]>;
+  /**
+   * CONTENIDO DE EJEMPLO de ux-9 (§10.38): todo lo creado, por colección, más
+   * las imágenes y los vídeos. Es lo que `retirar` borra de una vez.
+   */
+  ejemplo?: Record<string, Id[]>;
   antes: {
-    marcas: Record<string, { logo: Id | null; imagenTarjeta: Id | null }>;
+    marcas: Record<
+      string,
+      {
+        logo: Id | null;
+        imagenTarjeta: Id | null;
+        ordenPortada?: number | null;
+        descripcion?: string | null;
+      }
+    >;
     categorias: Record<
       string,
       {
@@ -271,7 +291,13 @@ if (modo === "simular" || modo === "copiar") {
   const pO =
     (await get<Lista<PaginaO>>("/api/paginas/?where[slug][equals]=inicio&depth=2&limit=1"))
       .docs[0] ?? fallar("el origen no tiene portada");
-  type MarcaO = { slug: string; logo?: MediaOrigen | null; imagenTarjeta?: MediaOrigen | null };
+  type MarcaO = {
+    slug: string;
+    logo?: MediaOrigen | null;
+    imagenTarjeta?: MediaOrigen | null;
+    ordenPortada?: number | null;
+    descripcion?: string | null;
+  };
   const marcasO = (
     await get<Lista<MarcaO>>("/api/marcas-maquinaria/?depth=1&limit=100")
   ).docs.filter((x) => x.logo || x.imagenTarjeta);
@@ -299,11 +325,12 @@ if (modo === "simular" || modo === "copiar") {
     descripcion?: string | null;
     imagenes?: MediaOrigen[] | null;
     disponible?: boolean | null;
+    pestanaPortada?: "categoria" | "aditamentos" | null;
   };
-  // Solo los equipos CON imagen: los de la portada de ux-9. Los demás ya están en el destino.
+  // Solo las fichas de EJEMPLO de ux-9 (marca al principio de la descripción).
   const equiposO = (
     await get<Lista<EquipoO>>("/api/equipos-usados/?depth=1&limit=200")
-  ).docs.filter((x) => (x.imagenes ?? []).length > 0);
+  ).docs.filter((x) => esDeEjemplo(x.descripcion));
   type TestO = {
     nombre: string;
     empresa?: string | null;
@@ -336,8 +363,9 @@ if (modo === "simular" || modo === "copiar") {
       | { linea: string; localidad?: string | null; direccion: string; telefono?: string | null }[]
       | null;
     orden?: number | null;
+    foto?: MediaOrigen | null;
   };
-  const sedesO = (await get<Lista<SedeO>>("/api/sedes/?depth=0&limit=100")).docs;
+  const sedesO = (await get<Lista<SedeO>>("/api/sedes/?depth=1&limit=100")).docs;
   const pieO = await get<{ imagenDecorativa?: MediaOrigen | null }>("/api/globals/pie?depth=1");
 
   // ---------------------------------------------------------------- plan
@@ -354,6 +382,7 @@ if (modo === "simular" || modo === "copiar") {
   catsO.forEach((x) => anotar(x.imagen));
   equiposO.forEach((x) => (x.imagenes ?? []).forEach(anotar));
   testO.forEach((x) => anotar(x.foto));
+  sedesO.forEach((x) => anotar(x.foto));
   anotar(pieO.imagenDecorativa);
   const video = pO.seccionCompania?.video ?? null;
   const ajenos = [...ficheros.values()].filter((f) => almacenDeUrl(f.url) === null);
@@ -425,6 +454,7 @@ if (modo === "simular" || modo === "copiar") {
           videos: {},
           urlsCreadas: [],
           creados: { "equipos-usados": [], testimonios: [], "preguntas-frecuentes": [], sedes: [] },
+          ejemplo: {},
           antes: { marcas: {}, categorias: {} },
         };
   if (m.estado === "completa")
@@ -460,11 +490,11 @@ if (modo === "simular" || modo === "copiar") {
     return nuevos;
   };
   const equiposNuevos = crear(
-    "EQUIPOS USADOS",
+    "EQUIPOS USADOS (fichas de ejemplo)",
     equiposO,
     clave.equipo,
     existentes.equipos.map(clave.equipo),
-    (x) => x.nombre,
+    (x) => `${x.nombre} · ${(x.descripcion ?? "").slice(0, 60)}`,
   );
   const testNuevos = crear(
     "TESTIMONIOS",
@@ -481,7 +511,7 @@ if (modo === "simular" || modo === "copiar") {
     (x) => x.pregunta,
   );
   const sedesNuevas = crear(
-    "SEDES (sin foto)",
+    "SEDES (con foto)",
     sedesO,
     clave.sede,
     existentes.sedes.map(clave.sede),
@@ -495,7 +525,7 @@ if (modo === "simular" || modo === "copiar") {
       : (plan.push(`  ! marca «${x.slug}» no existe en el destino: se omite`), []);
   });
   plan.push(
-    `MARCAS DE MAQUINARIA a modificar (logo e imagen de tarjeta): ${marcasMod.map((x) => x.o.slug).join(", ") || "ninguna"}`,
+    `MARCAS DE MAQUINARIA a modificar (logo, imagen de tarjeta, posición y texto): ${marcasMod.map((x) => x.o.slug).join(", ") || "ninguna"}`,
   );
   const catsMod = catsO.flatMap((x) => {
     const d = existentes.categorias.find((y) => y.slug === x.slug);
@@ -607,6 +637,8 @@ if (modo === "simular" || modo === "copiar") {
       m.antes.marcas[String(d.id)] ??= {
         logo: idDe(d.logo as Rel),
         imagenTarjeta: idDe(d.imagenTarjeta as Rel),
+        ordenPortada: d.ordenPortada ?? null,
+        descripcion: d.descripcion ?? null,
       };
       guardar(m);
       await payload.update({
@@ -615,6 +647,8 @@ if (modo === "simular" || modo === "copiar") {
         data: {
           logo: await copiarMedia(o.logo),
           imagenTarjeta: await copiarMedia(o.imagenTarjeta),
+          ordenPortada: o.ordenPortada ?? null,
+          ...(o.descripcion ? { descripcion: o.descripcion } : {}),
         },
         overrideAccess: true,
       });
@@ -672,6 +706,7 @@ if (modo === "simular" || modo === "copiar") {
           descripcion: e.descripcion ?? null,
           imagenes,
           disponible: e.disponible ?? true,
+          pestanaPortada: e.pestanaPortada ?? "categoria",
         },
         overrideAccess: true,
       });
@@ -735,6 +770,7 @@ if (modo === "simular" || modo === "copiar") {
             telefono: telefono ?? null,
           })),
           orden: s.orden ?? null,
+          foto: await copiarMedia(s.foto),
         },
         overrideAccess: true,
       });
@@ -757,6 +793,12 @@ if (modo === "simular" || modo === "copiar") {
 
     if ((await huellaHero()) !== m.hero) fallar("el HERO cambió durante la copia: revisar a mano");
     log("hero: sin cambios ✓");
+    // Todo lo creado es contenido de EJEMPLO de ux-9 (§10.38).
+    m.ejemplo = {
+      ...m.creados,
+      media: Object.values(m.media),
+      videos: Object.values(m.videos),
+    };
     m.estado = "completa";
     guardar(m);
     log(`✓ COPIA COMPLETA. Manifiesto: ${MANIFIESTO}`);

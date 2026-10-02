@@ -67,9 +67,24 @@ export function origenValido(url: string | undefined): string | null {
   }
 }
 
+/**
+ * Marca del contenido de ejemplo de ux-9 que siembra `preview:ejemplo:sembrar`
+ * (en el `alt` de sus imágenes y al principio de la descripción de las fichas).
+ */
+export const MARCA_EJEMPLO = "EJEMPLO UX-9 —";
+
+/** ¿Es contenido de ejemplo de ux-9? (por su marca, al principio del texto). */
+export const esDeEjemplo = (texto: string | null | undefined) =>
+  texto?.trimStart().startsWith(MARCA_EJEMPLO) ?? false;
+
 /** Claves naturales con las que la copia reconoce lo que ya existe en el destino. */
 export const clave = {
-  equipo: (e: { nombre?: string | null }) => e.nombre?.trim().toLowerCase() ?? "",
+  /*
+   * Nombre Y descripción: las 6 fichas de ejemplo de ux-9 se llaman igual
+   * («Excavadora Hitachi ZX75US-7») y solo las distingue la descripción.
+   */
+  equipo: (e: { nombre?: string | null; descripcion?: string | null }) =>
+    [e.nombre, e.descripcion].map((x) => x?.trim().toLowerCase() ?? "").join("|"),
   testimonio: (t: { empresa?: string | null; nombre?: string | null; cita?: string | null }) =>
     [t.empresa, t.nombre, t.cita].map((x) => x?.trim().toLowerCase() ?? "").join("|"),
   pregunta: (p: { pregunta?: string | null }) => p.pregunta?.trim().toLowerCase() ?? "",

@@ -5,7 +5,14 @@ import { ALMACEN_PREVIEW, ALMACEN_PRODUCCION } from "../blob/almacen";
 import { HOST_PREVIEW } from "../db/vaciadoSolicitudes";
 import { HOST_PRODUCCION } from "../portada/heroPrueba";
 
-import { HOST_DEVELOPMENT, clave, origenValido, veredictoDestino } from "./copiaDemo";
+import {
+  HOST_DEVELOPMENT,
+  MARCA_EJEMPLO,
+  clave,
+  esDeEjemplo,
+  origenValido,
+  veredictoDestino,
+} from "./copiaDemo";
 
 const uri = (host: string) => `postgres://u:p@${host}/neondb?sslmode=require`;
 const token = (a: string) => `vercel_blob_rw_${a}_Secreto123`;
@@ -90,5 +97,22 @@ describe("copia de demostración: claves naturales", () => {
   it("no distinguen mayúsculas ni espacios", () => {
     assert.equal(clave.pregunta({ pregunta: " ¿Qué? " }), clave.pregunta({ pregunta: "¿qué?" }));
     assert.equal(clave.sede({ nombre: "Bogotá" }), "bogotá");
+  });
+
+  it("distinguen fichas con el mismo nombre por su descripción", () => {
+    const a = { nombre: "Excavadora Hitachi ZX75US-7", descripcion: `${MARCA_EJEMPLO} ficha 1.` };
+    const b = { nombre: "Excavadora Hitachi ZX75US-7", descripcion: `${MARCA_EJEMPLO} ficha 2.` };
+    assert.notEqual(clave.equipo(a), clave.equipo(b));
+    assert.equal(clave.equipo(a), clave.equipo({ ...a, nombre: " excavadora hitachi zx75us-7 " }));
+  });
+});
+
+describe("copia de demostración: contenido de ejemplo", () => {
+  it("reconoce la marca solo al principio", () => {
+    assert.equal(esDeEjemplo(`${MARCA_EJEMPLO} ficha 1`), true);
+    assert.equal(esDeEjemplo(`  ${MARCA_EJEMPLO} x`), true);
+    assert.equal(esDeEjemplo(`Equipo real. ${MARCA_EJEMPLO}`), false);
+    assert.equal(esDeEjemplo(null), false);
+    assert.equal(esDeEjemplo(""), false);
   });
 });

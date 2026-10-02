@@ -1,5 +1,6 @@
 /*
- * PIE DEL SITIO — ux-9, export `elementor-2696-2026-09-24 (1).json` de Andrés.
+ * PIE DEL SITIO — ux-9, export `elementor-2178-2026-10-02.json` de Andrés (sustituye
+ * al 2696; solo cambia la imagen decorativa).
  * Colores de las REFERENCIAS GLOBALES (`__globals__`), resueltas contra
  * site-settings.json; el valor fijo solo donde no hay global (CLAUDE.md §10.33,
  * decisiones-home-ux9.md §12). Lo que se aparta, marcado DESVIACIÓN y en §13.
@@ -50,21 +51,20 @@
 }
 
 /*
- * IMAGEN DECORATIVA — medida en ux-9 pintado (2026-09-24). 536 px de ancho sin
- * girar, girada 90° a la derecha, `brightness(0.94) saturate(1.32)`. Ya girada,
- * su borde inferior queda 1 px por debajo de la tarjeta y sobresale por la
- * derecha el 11 % del ancho de la tarjeta menos 66 px (80 px a 1440). Las
- * posiciones de abajo son las de la caja SIN girar que dan ese resultado al
- * girar sobre su centro (536 × 670). Solo en escritorio, como en el export.
+ * IMAGEN DECORATIVA — export 2178 de Andrés (2026-10-02), que sustituye al
+ * 2696: una cargadora SIN girar (el 2696 giraba 90° el brazo de excavadora).
+ * Medido en ux-9 pintado a 1025, 1280 y 1440: 518 px de ancho, sobresale por
+ * la derecha el 5 % del ancho de la tarjeta, su borde inferior queda 210 px
+ * por ENCIMA del de la tarjeta y lleva `brightness(0.94) saturate(1.32)`.
+ * Solo en escritorio, como en el export.
  */
 .decorativa {
   position: absolute;
-  right: calc(133px - 11%);
-  bottom: -68px;
+  right: -5%;
+  bottom: 210px;
   z-index: 1;
-  width: 536px;
+  width: 518px;
   height: auto;
-  transform: rotate(90deg);
   filter: brightness(0.94) saturate(1.32);
   pointer-events: none;
 }

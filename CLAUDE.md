@@ -390,6 +390,19 @@ agente principal afirma. **Regla de hitos:** ningún informe de hito (CI,
 preview, prueba de humo, despliegue, lo pintado, la base) se da sin su
 veredicto, que va en el informe.
 
+**Rutina de fusión (desde la fase 6, 2026-10-01):**
+
+1. Antes de fusionar: CI, prueba de humo del preview y verificador en verde.
+   **El preview tiene que ser del último commit del PR**: si ese commit no
+   tiene estado «Vercel», no hay preview ni humo de él (§10.30).
+2. Fusionar (squash) y sincronizar `main`.
+3. **Comprobar que el commit de `main` tiene estado «Vercel»**
+   (`gh api repos/<repo>/commits/<sha>/statuses`, contexto `Vercel`).
+4. **Si a los 5 minutos no lo tiene:** un commit vacío encima
+   (`git commit --allow-empty`) y push. Volver al punto 3 con el nuevo sha.
+   Anotarlo en el informe: es el fallo silencioso de §10.30.
+5. Con el estado en verde, la prueba de humo de ese despliegue también.
+
 ---
 
 ## 10. Estado actual
@@ -2404,6 +2417,11 @@ instalada, no en estas notas.
 > de dar por verificado un commit, comprobar que tiene estado «Vercel». **Cómo
 > salir:** un commit nuevo encima, como en los dos casos. Si un día molesta,
 > se puede preguntar a soporte de Vercel con los dos sha y las horas de arriba.
+>
+> **PROCEDIMIENTO (decisión de dirección, fase 6):** después de **cada
+> fusión**, comprobar que el commit tiene estado «Vercel»; si a los 5 minutos
+> no lo tiene, un commit vacío encima. Es la rutina de fusión de §9, y se
+> aplica desde las fusiones de la fase 6.
 
 ### 10.31 COMPROMISO INCUMPLIDO — Sentry está en la cotización y no está en el repo
 

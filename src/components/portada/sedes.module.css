@@ -144,7 +144,7 @@
 
 .lista > li {
   display: flex;
-  flex: 0 1 20rem;
+  flex: 0 1 18rem;
   border: 1px solid var(--sedes-linea);
   border-radius: 1em;
   background: var(--sedes-panel);

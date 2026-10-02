@@ -89,6 +89,11 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
    * PRODUCCIÓN (`VERCEL_ENV`): solo existe en local y en los preview.
    */
   "/laboratorio/movimiento": "banco de pruebas, 404 en producción",
+  /*
+   * Banco de pruebas de los bloques de página (Nosotros de ux-9). TEMPORAL:
+   * se borra, con su ruta, antes de fusionar feat/pagina-nosotros.
+   */
+  "/laboratorio/nosotros": "banco de pruebas temporal, 404 en producción",
 } as const;
 
 /** Slug reservado de la portada dentro de la colección de páginas. */

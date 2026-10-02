@@ -1,0 +1,43 @@
+/*
+ * Botón rojo de los bloques — «Conoce más» y «Ver todo» de Nosotros en ux-9.
+ * MEDIDO pintado: relleno del kit (12 · 25 · 10 · 25), borde 1 px, icono de
+ * 1em. El radio y el hueco del icono cambian entre los dos botones de ux-9
+ * (10 y 5 px en «Conoce más», 30 y 12 px en «Ver todo»): cada bloque los fija
+ * con `--boton-bloque-radio` y `--boton-bloque-hueco`.
+ */
+.boton {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: var(--boton-bloque-hueco, 5px);
+  padding: var(--boton-relleno);
+  border: var(--boton-borde) solid var(--color-marca);
+  border-radius: var(--boton-bloque-radio, 10px);
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.boton svg {
+  width: 1em;
+  height: 1em;
+}
+
+.boton:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton {
+    transition: none;
+  }
+}

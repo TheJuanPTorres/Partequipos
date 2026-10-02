@@ -1,0 +1,80 @@
+/*
+ * BLOQUE «PRESENTACIÓN CON IMAGEN» — Nosotros de ux-9, contenedores `acca276`,
+ * `f06d229` y `5dcd37f0`. Valores MEDIDOS pintados a 1440, 1010 y 390
+ * (docs/diseno/decisiones-nosotros.md §5).
+ *
+ * Dos mitades con 20 px de hueco y 3vw a los lados, centradas en vertical; la
+ * imagen a 455 px de ancho centrada en su mitad (la caja del Lottie de ux-9
+ * mide 657 px de alto). En móvil, una debajo de la otra, la imagen primero.
+ */
+.seccion {
+  display: flex;
+  padding: 0 3vw;
+  align-items: center;
+  gap: 20px;
+}
+
+.columnaImagen,
+.columnaTexto {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 10px;
+  flex-direction: column;
+}
+
+.columnaImagen {
+  min-height: 677px;
+  align-items: center;
+  justify-content: center;
+}
+
+.imagen {
+  width: 455px;
+  max-width: 100%;
+  height: auto;
+}
+
+.columnaTexto {
+  gap: 20px;
+}
+
+.antetitulo {
+  margin: 0;
+  color: var(--color-marca);
+}
+
+.titulo {
+  max-width: 610px;
+  margin: 0;
+  color: var(--color-texto);
+}
+
+/* El texto del editor: párrafos con el margen de Elementor (0,9rem). */
+.texto {
+  color: var(--color-texto-suave);
+}
+
+.texto p {
+  margin: 0 0 0.9rem;
+}
+
+.texto a {
+  color: var(--color-marca);
+  text-decoration: underline;
+}
+
+.texto strong {
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    flex-direction: column;
+  }
+
+  .columnaImagen,
+  .columnaTexto {
+    width: 100%;
+  }
+}

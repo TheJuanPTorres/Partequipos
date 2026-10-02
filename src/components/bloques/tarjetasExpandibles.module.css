@@ -1,0 +1,266 @@
+/*
+ * BLOQUE «TARJETAS EXPANDIBLES» — Nosotros de ux-9, contenedores `5aaee2d5`,
+ * `22cef2c0` y `12d5461a`, widget «Expanding Content Cards» `5872e232`.
+ * Valores LEÍDOS del widget exportado y MEDIDOS pintados a 1440, 1010 y 390
+ * (docs/diseno/decisiones-nosotros.md §5).
+ */
+.seccion {
+  --tarjetas-alto: 538px;
+  --tarjetas-hueco: 26px;
+  --tarjetas-plegada: 60px;
+  --tarjetas-curva: cubic-bezier(0.05, 0.61, 0.41, 0.95);
+  --tarjetas-transicion: 0.8s;
+
+  padding: 5vw 3vw;
+  border-radius: 30px;
+  background: var(--color-fondo);
+}
+
+.interior {
+  display: flex;
+  padding-top: 18px;
+  flex-direction: column;
+  gap: 20px;
+  border-top: 1px solid var(--color-fondo-seccion);
+}
+
+.antetitulo {
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto);
+}
+
+.caja {
+  position: relative;
+  padding: 10px;
+}
+
+.tarjetas {
+  display: flex;
+  height: var(--tarjetas-alto);
+  margin: 0;
+  padding: 0;
+  gap: var(--tarjetas-hueco);
+  list-style: none;
+}
+
+/* ------------------------------------------------------------ tarjeta */
+
+.tarjeta {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  padding: 10px;
+  flex: 0 0 var(--tarjetas-plegada);
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 30px;
+  background: var(--color-marca);
+  cursor: pointer;
+  transition: all var(--tarjetas-transicion) var(--tarjetas-curva);
+}
+
+.tarjeta[data-abierta] {
+  padding: 20px 20px 40px;
+  flex-grow: 10000;
+  cursor: auto;
+}
+
+.foto {
+  object-fit: cover;
+}
+
+/* Degradado de ux-9; las plegadas, además, tintadas de gris al 35 %. */
+.sombra {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background-color: var(--color-texto-suave);
+  background-image: linear-gradient(rgb(255 255 255 / 0%) 43%, rgb(16 15 15 / 88%) 82%);
+  opacity: 0.35;
+  transition: var(--tarjetas-transicion);
+}
+
+.tarjeta:hover .sombra,
+.tarjeta[data-abierta] .sombra {
+  background-color: transparent;
+  opacity: 1;
+}
+
+.tarjeta:not([data-abierta]):hover .sombra {
+  background-color: var(--color-texto-suave);
+}
+
+.progreso {
+  position: absolute;
+  z-index: 3;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  overflow: hidden;
+  background: rgb(255 255 255 / 25%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tarjeta[data-abierta] .progreso {
+  opacity: 1;
+}
+
+.progreso span {
+  display: block;
+  height: 100%;
+  background: var(--color-fondo);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* ----------------------------------------------------------- etiqueta */
+
+.etiqueta {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 4px;
+  text-align: left;
+}
+
+.tarjeta[data-abierta] .etiqueta {
+  width: min(934px, 100%);
+  flex-direction: column;
+  align-items: stretch;
+  /* El texto aparece cuando la tarjeta ya se abrió (ux-9: `sub-content-fade`). */
+  animation: aparecer var(--tarjetas-transicion) both;
+}
+
+@keyframes aparecer {
+  0%,
+  80% {
+    opacity: 0;
+  }
+}
+
+.nombre {
+  margin: 0;
+  color: var(--color-fondo);
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1.4;
+  writing-mode: vertical-rl;
+}
+
+.tarjeta[data-abierta] .nombre {
+  font-size: 30px;
+  writing-mode: horizontal-tb;
+}
+
+/* Botón o enlace con la letra del título; toda la tarjeta plegada abre (el `<li>`). */
+.disparador {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.disparador:focus-visible {
+  outline: none;
+}
+
+.tarjeta:has(.disparador:focus-visible) {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.texto {
+  margin: 0;
+  color: var(--color-fondo);
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+/* -------------------------------------------------------------- resto */
+
+/* Botón de pausa (D2): ux-9 no lo tiene. A la derecha de la fila de «Ver todo», fuera de las tarjetas. */
+.pausa {
+  position: absolute;
+  /* Centrado con el botón: la fila lleva 30 px arriba y 10 abajo. */
+  top: calc(50% + 10px);
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+.pie {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 30px 10px 10px;
+  justify-content: center;
+  --boton-bloque-radio: 30px;
+  --boton-bloque-hueco: 12px;
+}
+
+/* ux-9, medido: a 1024 px o menos, 12 px entre el título y el texto (4 por encima). */
+@media (max-width: 1024px) {
+  .etiqueta {
+    gap: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta,
+  .sombra {
+    transition: none;
+  }
+
+  .tarjeta[data-abierta] .etiqueta {
+    animation: none;
+  }
+}
+
+/* ux-9: a 500 px o menos, una columna, todas abiertas en alto y sin rotación. */
+@media (max-width: 500px) {
+  .tarjetas {
+    display: grid;
+    height: auto;
+    grid-template-columns: 1fr;
+    gap: 37px;
+  }
+
+  .tarjeta,
+  .tarjeta[data-abierta] {
+    height: 460px;
+    padding: 20px;
+  }
+
+  .tarjeta:not([data-abierta]) {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .etiqueta {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nombre {
+    writing-mode: horizontal-tb;
+  }
+
+  .pausa {
+    display: none;
+  }
+}

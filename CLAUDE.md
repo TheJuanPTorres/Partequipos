@@ -2284,6 +2284,28 @@ registro el binario también desapareció (404).
 **El revert de alias quedó preparado antes de promocionar** (§10.18) y no hizo
 falta usarlo.
 
+#### DECISIÓN 2026-10-01 (fase 6): los PDF NO entran en `Media`
+
+**El inventario de la fase 6** repasó todo lo que relaciona con `Media`: 22
+relaciones en 15 colecciones y el global del pie. Todas son imágenes salvo
+`EquipoNuevo.documentos`, que se describía como «fichas técnicas en PDF». Con
+la restricción de formatos, ese campo **no podía recibir ningún PDF**, y el
+sitio tampoco lo pinta. Registros fuera de JPEG/PNG/WebP: **0** (preview y
+producción).
+
+**Por qué no se añade `application/pdf` a `Media`:** un PDF se podría elegir
+en cualquiera de los campos de imagen —hero, marcas, equipos…— y `next/image`
+fallaría al pintarlo. Habría que filtrar el tipo en cada campo.
+
+**Decisión de dirección:**
+
+- **Hoy:** la descripción de `documentos` ya no promete PDF (imágenes JPEG,
+  PNG o WebP, y no se muestran en el sitio).
+- **Cuando las fichas se muestren en el sitio:** colección aparte para
+  documentos, solo PDF, con su migración. Es cambio de esquema, así que va en
+  su fase autorizada y con los dos guardarraíles de §10.33 p.5.
+- **`Media` sigue sin PDF ni SVG.**
+
 #### Decisión: NO se probó una subida en producción
 
 El camino de rechazo y aceptación de formatos se verificó **en preview, con el

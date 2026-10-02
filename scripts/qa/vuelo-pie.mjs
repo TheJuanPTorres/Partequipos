@@ -4,7 +4,8 @@
  *
  * La imagen sobresale por encima del pie. Esta comprobación cruza cada línea
  * de texto y cada elemento visible ANTERIOR al pie con los PÍXELES OPACOS del
- * recorte, leídos del canal alfa y deshaciendo el giro de 90°. Hacerlo con la
+ * recorte, leídos del canal alfa y deshaciendo el giro si lo hay (el 2696
+ * giraba 90°; el 2178, de 2026-10-02, no gira). Hacerlo con la
  * caja no sirve: el PNG es transparente en su mayor parte y daría falsos
  * positivos.
  *
@@ -15,8 +16,9 @@
  *
  *   npx -y -p puppeteer-core@24.43.1 node scripts/qa/vuelo-pie.mjs [base] [fichero-de-rutas]
  *
- * - `base`: por defecto https://partequipos.vercel.app. Contra un preview, la
- *   protección de Vercel lo impide sin sesión (CLAUDE.md §10.20).
+ * - `base`: por defecto https://partequipos.vercel.app. Contra un preview,
+ *   lanzar con `npm run preview:ejecutar -- npx …`: la cabecera de derivación
+ *   (VERCEL_AUTOMATION_BYPASS_SECRET) va SOLO a ese origen, nunca a producción.
  * - `fichero-de-rutas`: una ruta por línea. Por defecto, las 21 plantillas.
  * - Navegador: Chrome instalado. Otra ruta, con `CHROME_PATH`.
  *
@@ -92,14 +94,26 @@ function medir(umbral) {
   const ctx = lienzo.getContext("2d");
   ctx.drawImage(img, 0, 0);
   const alfa = ctx.getImageData(0, 0, lienzo.width, lienzo.height).data;
-  const caja = img.getBoundingClientRect(); // ya girada
+  const caja = img.getBoundingClientRect(); // ya girada, si gira
   const W = img.naturalWidth;
   const H = img.naturalHeight;
   const escala = img.offsetWidth / W;
+  // ¿Gira 90°? Se lee de la matriz pintada, no se supone.
+  const t = getComputedStyle(img).transform;
+  const m =
+    t && t !== "none"
+      ? t
+          .match(/matrix\(([^)]+)\)/)?.[1]
+          .split(",")
+          .map(Number)
+      : null;
+  const gira90 = !!m && Math.abs(m[0]) < 0.01 && m[1] > 0.99;
   // Punto de pantalla → píxel del original. Giro de 90° horario: x' = H − oy, y' = ox.
   const opaco = (x, y) => {
-    const ox = Math.floor((y - caja.top) / escala);
-    const oy = Math.floor(H - (x - caja.left) / escala);
+    const ox = gira90 ? Math.floor((y - caja.top) / escala) : Math.floor((x - caja.left) / escala);
+    const oy = gira90
+      ? Math.floor(H - (x - caja.left) / escala)
+      : Math.floor((y - caja.top) / escala);
     if (ox < 0 || oy < 0 || ox >= W || oy >= H) return false;
     return alfa[(oy * W + ox) * 4 + 3] > umbral;
   };
@@ -152,10 +166,23 @@ const navegador = await puppeteer.launch({
 });
 let fallos = 0;
 let sinImagen = false;
+const origen = new URL(base).origin;
+const bypass =
+  origen === "https://partequipos.vercel.app"
+    ? ""
+    : (process.env.VERCEL_AUTOMATION_BYPASS_SECRET ?? "");
 for (const ruta of rutas) {
   for (const ancho of ANCHOS) {
     const pagina = await navegador.newPage();
     await pagina.setViewport({ width: ancho, height: 900 });
+    if (bypass) {
+      await pagina.setRequestInterception(true);
+      pagina.on("request", (q) =>
+        new URL(q.url()).origin === origen
+          ? q.continue({ headers: { ...q.headers(), "x-vercel-protection-bypass": bypass } })
+          : q.continue(),
+      );
+    }
     await pagina.goto(base + ruta, { waitUntil: "networkidle2", timeout: 90000 });
     // La imagen va con carga diferida: hay que llegar al pie para que se pida.
     await pagina.evaluate(async () => {

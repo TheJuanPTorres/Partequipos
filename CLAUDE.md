@@ -481,6 +481,8 @@ veredicto, que va en el informe.
   16.2.11 (ADR `docs/decisions/0001-version-nextjs.md`); el salto, en §10.28.
 - **Plan de referencia:** `docs/PLAN-MVP.md` y `docs/RUTA-DESARROLLO.md`.
 
+- **Página Nosotros de ux-9 (2026-10-02):** `paginas.bloques` con cinco bloques reutilizables (migración `20261002_202057_paginas_bloques`, solo esquema); detalle, desviaciones y CLS aceptado en `docs/diseno/decisiones-nosotros.md`.
+
 ### 10.0 Qué está construido y qué falta
 
 **Construido y verificado en producción:**

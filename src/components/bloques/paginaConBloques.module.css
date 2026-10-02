@@ -6,6 +6,12 @@
   background: var(--color-fondo-seccion);
 }
 
+/* Migas: solo se ven con el foco dentro (el resto del tiempo, `sr-only`). */
+.migas:focus-within {
+  display: block;
+  padding: 8px 3vw 0;
+}
+
 /* Sin bloque de cabecera, el título de la página es el `<h1>`. */
 .titulo {
   margin: 0;

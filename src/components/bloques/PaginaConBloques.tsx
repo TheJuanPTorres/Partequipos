@@ -29,8 +29,12 @@ export function PaginaConBloques({ titulo, migas, bloques }: Props) {
   return (
     <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(migas)} />
-      {/* Migas solo para lectores de pantalla: ux-9 no las pinta (decisión de dirección). */}
-      <div className="sr-only">
+      {/*
+       * Migas solo para lectores de pantalla: ux-9 no las pinta (decisión de
+       * dirección). Su enlace sí recibe el foco, así que se muestran mientras
+       * lo tiene, como el enlace de salto (WCAG 2.4.7).
+       */}
+      <div className={`sr-only focus-within:not-sr-only ${estilos.migas}`}>
         <Breadcrumbs items={migas} />
       </div>
       {tieneCabecera(bloques) ? null : <h1 className={estilos.titulo}>{titulo}</h1>}

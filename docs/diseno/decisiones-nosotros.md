@@ -48,6 +48,15 @@ es un widget nativo de Elementor.
 4. **Erratas corregidas** (para Andrés, §7).
 5. Contenido de ejemplo permitido; aplica la excepción §10.38.
 
+**Ventana (2026-10-02), decisiones añadidas:**
+
+6. **CLS:** caja fija como el título del hero (§10.36); si no llega a 0, se
+   acepta y se documenta junto al del menú. **No se precarga Inter.**
+7. **Migas solo para lectores de pantalla**, con el JSON-LD `BreadcrumbList`.
+   Los botones de pausa, visibles.
+8. `/nosotros/`: el texto de relleno puede dejar de verse; la entradilla
+   sigue como meta descripción.
+
 ## 3. Bloques (forma de datos)
 
 Tipos en `src/lib/bloques/vista.ts`. Los componentes reciben las relaciones ya
@@ -62,22 +71,29 @@ resueltas (URL, medidas, `alt`), así no dependen del esquema.
 | `tarjetasExpandibles` | antetítulo, título, tarjetas (título, texto, imagen, enlace), botón              |
 
 Componentes en `src/components/bloques/`; `PaginaConBloques` compone la página
-(migas, JSON-LD, `<h1>` de reserva y bloques) y es lo que usará `[...slug]`.
+(migas, JSON-LD, `<h1>` de reserva y bloques) y la usa `[...slug]` cuando la
+página tiene bloques. Configuración en `src/collections/bloques/bloquesPagina.ts`;
+traducción desde Payload en `src/lib/bloques/desdePayload.ts`; aviso del panel
+en `src/components/admin/AvisoBloques.tsx`.
+
+**Migración `20261002_202057_paginas_bloques`:** solo esquema. Siete tablas
+nuevas (`paginas_blocks_*`) con sus índices y claves foráneas; ninguna tabla
+existente cambia; el `down` solo borra esas siete.
 
 ## 4. Lo que se aparta de ux-9
 
-| Id  | Qué                                                                                                                    | Por qué                                               |
-| --- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| D1  | Antetítulos y etiquetas en `<p>`; en ux-9 todos los revelados son `<h2>`/`div`                                         | Jerarquía de encabezados real                         |
-| D2  | Botón de pausa en el vídeo, el marquee y la rotación de tarjetas; con movimiento reducido, parado y sin vídeo          | WCAG 2.2.2                                            |
-| N1  | Mapa como imagen fija (último fotograma)                                                                               | Decisión 3                                            |
-| N2  | El mapa no desborda a 390 (en ux-9 el SVG mide 455 px y la página tiene scroll horizontal: 477 px)                     | Sin scroll horizontal                                 |
-| N3  | Migas visibles encima de la cabecera (ux-9 no las tiene)                                                               | Decisión 2; desplaza la página unos 30 px hacia abajo |
-| N4  | Copias del marquee como texto con `aria-hidden` y el texto una vez para el lector; en ux-9, ocho enlaces a «#»         | No hay destino; el lector no repite ocho veces        |
-| N5  | Tarjetas: la plegada es un `<button aria-expanded>`, la abierta su enlace; al abrir con teclado el foco pasa al enlace | Teclado                                               |
-| N6  | Texto de las tarjetas en Inter 300; en ux-9, Roboto (no cargada en el sitio)                                           | Una sola fuente                                       |
-| N7  | Sin la entrada con desenfoque de las tarjetas                                                                          | Movimiento de una vez, sin valor                      |
-| N8  | Botón de pausa de las tarjetas a la derecha de «Ver todo», no encima de las tarjetas                                   | Sobre la tarjeta plegada tapaba su zona de clic       |
+| Id  | Qué                                                                                                                    | Por qué                                         |
+| --- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| D1  | Antetítulos y etiquetas en `<p>`; en ux-9 todos los revelados son `<h2>`/`div`                                         | Jerarquía de encabezados real                   |
+| D2  | Botón de pausa en el vídeo, el marquee y la rotación de tarjetas; con movimiento reducido, parado y sin vídeo          | WCAG 2.2.2                                      |
+| N1  | Mapa como imagen fija (último fotograma)                                                                               | Decisión 3                                      |
+| N2  | El mapa no desborda a 390 (en ux-9 el SVG mide 455 px y la página tiene scroll horizontal: 477 px)                     | Sin scroll horizontal                           |
+| N3  | Migas solo para lectores; aparecen mientras su enlace tiene el foco (como el enlace de salto)                          | Decisión 7; WCAG 2.4.7                          |
+| N4  | Copias del marquee como texto con `aria-hidden` y el texto una vez para el lector; en ux-9, ocho enlaces a «#»         | No hay destino; el lector no repite ocho veces  |
+| N5  | Tarjetas: la plegada es un `<button aria-expanded>`, la abierta su enlace; al abrir con teclado el foco pasa al enlace | Teclado                                         |
+| N6  | Texto de las tarjetas en Inter 300; en ux-9, Roboto (no cargada en el sitio)                                           | Una sola fuente                                 |
+| N7  | Sin la entrada con desenfoque de las tarjetas                                                                          | Movimiento de una vez, sin valor                |
+| N8  | Botón de pausa de las tarjetas a la derecha de «Ver todo», no encima de las tarjetas                                   | Sobre la tarjeta plegada tapaba su zona de clic |
 
 ## 5. Medidas (ux-9 pintado, 2026-10-02)
 
@@ -115,12 +131,38 @@ toda la página. Lo esencial, todo en el CSS de cada bloque:
 | Movimiento reducido              | Sin vídeo, marquee quieto, rotación parada, revelados y cifras visibles                                   |
 | CLS                              | 0,000024–0,000066, igual en `next dev` y en el preview: la llegada de Inter mueve «somos» del `<h1>` (§8) |
 
+### Verificación de `/nosotros/` con bloques (preview `7ab7f1c`, 2026-10-02)
+
+| Comprobación                     | Resultado                                                                         |
+| -------------------------------- | --------------------------------------------------------------------------------- |
+| Cajas y tipografía frente a ux-9 | 0–2 px en 1440, 1010 y 390 (salvo N2, y anchos de caja que no cambian lo pintado) |
+| Hero bajo la cabecera            | 100 / 71 / 66 px (ux-9: 100 / 71 / 67; el píxel es de la cabecera)                |
+| `<h1>` / `<main>` / JSON-LD      | 1 / 1 / `BreadcrumbList`; migas ocultas a la vista                                |
+| Teclado                          | Orden lógico; Intro abre la tarjeta y el foco pasa a su enlace                    |
+| Movimiento reducido              | Sin vídeo, marquee y rotación parados                                             |
+| CLS                              | 0,000024 (1010), 0,000066 (390), 0,00012 (1440), en todas las cargas (abajo)      |
+
+**CLS ACEPTADO (decisión 6).** La caja del texto de la cabecera ya es fija
+(680 px), que es la técnica del título del hero (§10.36), y no basta: lo que
+se mueve no es la caja, sino la segunda palabra DENTRO de la línea. Al llegar
+Inter (sin precarga), «Quiénes» cambia de ancho y «somos» se corre 3–5 px; a
+1440 entra también un nodo de texto del título de la presentación, sin cambio
+de caja. Misma causa que el desplazamiento del menú de la cabecera que ya
+acepta §10.36 (0,0000057), mayor. Lighthouse lo redondea a 0.
+
 ## 6. Rutas de control (decisión 2)
 
 `/garantias/` **no existe** (404, no está en `url-map.csv`). Se usa
 `/politica-de-garantia-de-repuestos/`, que es la página de garantías con
 anclas (`#GARANTIA`, `#Devoluciones`), junto a `/servicio-tecnico/`
 (`#taller`, `#posventa`).
+
+**Resultado:** sin cambios. Se capturó el `<main>` en el preview anterior a
+los bloques (`f651203`) y en el de la ventana (`7ab7f1c`), a 390 y 1440,
+forzando el mismo fondo en las dos (el `body` pasó de #FCFCFC a #FFFFFF en
+`main` por un cambio del agente A en `globals.css`, ajeno a esta rama):
+**0 bytes distintos** en las cuatro capturas; `<h1>`, anclas, índice, texto
+y caja del `<main>` idénticos, y cada ancla lleva a su sección.
 
 ## 7. Para Andrés
 
@@ -139,23 +181,14 @@ anclas (`#GARANTIA`, `#Devoluciones`), junto a `/servicio-tecnico/`
 
 ## 8. Pendientes
 
-- **CLS de la fuente en el `<h1>` — PENDIENTE DE DIRECCIÓN.** Medido en el
-  preview de `f651203`, 5 cargas sin caché por ancho: **0,000066** a 1440 y
-  390 y **0,000024** a 1010, en las 15. Siempre lo mismo: al llegar Inter
-  (sin precarga, §10.36), «Quiénes» cambia de ancho y «somos» se mueve 3–5 px
-  en horizontal. Es la familia del desplazamiento del menú que ya acepta §10.36
-  (0,0000057), mayor. Opciones:
-  1. Aceptarlo y anotarlo (Lighthouse lo redondea a 0).
-  2. Precargar Inter: es global (`layout.tsx`) y §10.36 midió que la precarga
-     empeora el LCP móvil en 0,34 s.
-  3. Que la cabecera espere a la fuente para mostrar el texto
-     (`document.fonts.ready`): local, pero retrasa el texto del hero.
-- **Lo que dejaría de verse en `/nosotros/` de producción** al activar sus
-  bloques (leído pintado el 2026-10-02): la entradilla («Más de dos décadas
-  suministrando repuestos y servicio para maquinaria pesada.») y dos párrafos
-  de contenido. Todo es texto de relleno nuestro (§10.6); no tiene secciones
-  con ancla. La entradilla se sigue usando como meta descripción.
-- Ventana de migración (decisión 1).
-- Animación del mapa (Lottie), PR aparte.
-- Borrar `/laboratorio/nosotros/` y su entrada en `RUTAS_FUERA_DEL_SITEMAP`
-  antes de fusionar.
+- **Producción:** la página Nosotros con bloques **no está** en producción.
+  La migración se aplicará con el despliegue de la fusión (solo esquema: la
+  página queda sin bloques y se pinta como hoy). Llevar los bloques y sus
+  medios es la ampliación del runbook de copia (§10.38), que ejecuta dirección.
+- **Lo que dejará de verse en `/nosotros/` de producción** cuando tenga
+  bloques: la entradilla («Más de dos décadas suministrando repuestos y
+  servicio para maquinaria pesada.») y dos párrafos. Todo es texto de relleno
+  nuestro (§10.6), sin secciones con ancla; la entradilla sigue como meta
+  descripción (decisión 8).
+- Animación del mapa (Lottie), PR aparte con aprobación propia.
+- Para Andrés, §7.

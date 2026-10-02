@@ -28,3 +28,4 @@ export const SeccionCompania = dynamic(() =>
 export const SeccionTestimonios = dynamic(() =>
   import("./SeccionTestimonios").then((m) => m.SeccionTestimonios),
 );
+export const GloboSedes = dynamic(() => import("./GloboSedes").then((m) => m.GloboSedes));

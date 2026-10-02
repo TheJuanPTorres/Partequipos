@@ -8,6 +8,7 @@ import { SeccionRepuestos } from "@/components/portada/SeccionRepuestos";
 import { SeccionCatalogo } from "@/components/portada/SeccionCatalogo";
 import { CarruselLogos, SeccionCompania, SeccionTestimonios } from "@/components/portada/diferidos";
 import { SeccionFaq } from "@/components/portada/SeccionFaq";
+import { SeccionSedes } from "@/components/portada/SeccionSedes";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { diapositivasDeHero } from "@/lib/portada/hero";
@@ -20,6 +21,7 @@ import {
 import { logosDeMarcas, tarjetasDeRepuestos } from "@/lib/portada/seccionesE";
 import { videoDeCompania, videoDeYouTube } from "@/lib/portada/seccionesF";
 import { preguntasDeFaq, tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
+import { sedesDePortada, tokenMapbox } from "@/lib/portada/sedes";
 import { getCategoriasTecnicasDePortada } from "@/lib/queries/getCategoriasTecnicas";
 import { getPreguntasDePortada, getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getVideoPorId } from "@/lib/queries/getVideos";
@@ -30,6 +32,7 @@ import {
 } from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { getHorario } from "@/lib/queries/getSeo";
+import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { seoConfig } from "@/lib/seo/config";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
@@ -58,7 +61,7 @@ export default async function HomePage() {
 
   const { contact } = seoConfig;
   const diapositivas = diapositivasDeHero(pagina.hero);
-  const [marcas, usados, excavadoras, categoriasTecnicas, testimonios, preguntas, horario] =
+  const [marcas, usados, excavadoras, categoriasTecnicas, testimonios, preguntas, horario, sedes] =
     await Promise.all([
       getMarcasDePortada(),
       getEquiposUsadosDePortada(),
@@ -67,6 +70,7 @@ export default async function HomePage() {
       getTestimoniosDePortada(),
       getPreguntasDePortada(),
       getHorario(),
+      getSedesDePortada(),
     ]);
   const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
   const maquinaUsada = imagenDeMedia(pagina.seccionUsada?.imagen, "");
@@ -109,6 +113,12 @@ export default async function HomePage() {
       <SeccionCatalogo
         whatsapp={enlaceWhatsApp(contact.phone)}
         sobreVideo={videoCompania !== null}
+      />
+
+      {/* Sección 9 de ux-9 (fase G). Globo solo con token de Mapbox; sin él, la lista. */}
+      <SeccionSedes
+        sedes={sedesDePortada(sedes)}
+        token={tokenMapbox(process.env.NEXT_PUBLIC_MAPBOX_TOKEN)}
       />
 
       {/* Secciones 10 y 11 de ux-9 (fase H). Sin datos publicados, no se pintan. */}

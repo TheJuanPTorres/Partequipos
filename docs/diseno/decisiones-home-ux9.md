@@ -1951,3 +1951,48 @@ sigue siendo el logo de la cabecera (D1).
 legal del pie muestra dirección, teléfono **y correo** (`mailto:` de
 `seoConfig`). ux-9 no pone el correo en el pie. Sale de `seoConfig`, como el
 teléfono, así que no puede contradecir al JSON-LD; sin cambio de esquema.
+
+## 23. Fase G — sección 9, sedes (2026-10-02)
+
+**Fuente:** el widget HTML `b9b46e6` del contenedor `79b3d7aa` de `1717.json`.
+Es un globo de Mapbox a todo el ancho, con un panel a la derecha (gris
+`#EBEBEB`, 26rem) y una ficha por sede. El widget lleva el token de Mapbox de
+Andrés: no se usa ni entra al repositorio.
+
+**Datos:** colección `sedes`. Lo que añade la fase G (migración
+`20261002_154950_fase_g_sedes`):
+
+- `ciudad` y `departamento`, para la etiqueta «Ciudad, Departamento» de la
+  ficha;
+- el **teléfono por línea**, como en ux-9, donde cada línea de Antioquia tiene
+  el suyo. Se quitó el array de teléfonos de la sede, que estaba vacío en todas
+  las bases.
+
+**Cómo se pinta:**
+
+- **Sin token** (`NEXT_PUBLIC_MAPBOX_TOKEN` vacío, hoy en todos los entornos):
+  la **lista de sedes** en rejilla, con las fichas de ux-9 y sin hueco para el
+  mapa.
+- **Con token:** el globo de ux-9. Mapbox GL 3.20 se carga **desde su CDN**,
+  como en ux-9 y sin dependencia nueva, y **solo al acercarse la sección a la
+  pantalla**, así que no pesa en el LCP. Lleva un pin por sede, vuelo al
+  cambiar de sede, el panel plegable y la navegación anterior/siguiente.
+- **La lista va siempre en el HTML**, para buscadores y lectores de pantalla.
+  El globo la envuelve.
+
+**Lo que se aparta de ux-9:**
+
+| #   | ux-9                                    | Aquí                                                               | Motivo                            |
+| --- | --------------------------------------- | ------------------------------------------------------------------ | --------------------------------- |
+| G1  | Sin título                              | `<h2>` «Nuestras sedes» solo para lectores de pantalla             | Estructura de encabezados (D1)    |
+| G2  | Logo y atribución de Mapbox **ocultos** | **Visibles** (compactos)                                           | Los exigen los términos de Mapbox |
+| G3  | Sin token, la sección no funciona       | Lista en rejilla                                                   | Decisión de dirección             |
+| G4  | Fichas en `<div>`, líneas en `<div>`    | `<article>` con `<h3>`; líneas en `<ul>`, dirección en `<address>` | Semántica                         |
+| G5  | Vuelos de 2,2 s siempre                 | Instantáneos con movimiento reducido                               | Accesibilidad                     |
+| G6  | Pines como `<div>`                      | Pines como `<button>` con nombre accesible                         | Teclado y lector de pantalla      |
+| G7  | Fotos de ciudad                         | Solo en el preview; producción sin foto, sin hueco                 | §10.38 no las cubre               |
+
+**Pendiente:** el modo globo **no se ha probado**, porque no hay token de la
+cuenta del cliente (L5). Con él: verificar pintado contra ux-9 a 390, 1010 y
+1440, y la CSP (ya incluye `api.mapbox.com`, `events.mapbox.com` y los
+workers `blob:`).

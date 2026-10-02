@@ -23,6 +23,11 @@ const portada = revalidarPortada("sedes");
  * Los datos de ux-9 son de una maqueta: las direcciones y teléfonos se
  * confirman con el cliente antes de publicarse o de ir al JSON-LD
  * (docs/diseno/analisis-home-ux9.md §1).
+ *
+ * Fase G (2026-10-02): como en ux-9, la ficha lleva la etiqueta «Ciudad,
+ * Departamento» (`ciudad` y `departamento`) y el teléfono va POR LÍNEA, no por
+ * sede: en Antioquia cada línea tiene el suyo. El array `telefonos` de la sede
+ * se quitó (estaba vacío en todas las bases).
  */
 export const Sede: CollectionConfig = {
   slug: "sedes",
@@ -47,7 +52,31 @@ export const Sede: CollectionConfig = {
       type: "text",
       required: true,
       label: "Nombre",
-      admin: { description: "Como se muestra en el mapa. Ej. «Bogotá», «Antioquia»." },
+      admin: {
+        description: "Nombre de la sede. La ficha dice «Sede <nombre>». Ej. «Bogotá», «Antioquia».",
+      },
+    },
+    {
+      type: "row",
+      fields: [
+        {
+          name: "ciudad",
+          type: "text",
+          required: true,
+          label: "Ciudad",
+          admin: { width: "50%", description: "Ej. «Medellín» en la sede Antioquia." },
+        },
+        {
+          name: "departamento",
+          type: "text",
+          required: true,
+          label: "Departamento",
+          admin: {
+            width: "50%",
+            description: "Ej. «Antioquia». Etiqueta: «Ciudad, Departamento».",
+          },
+        },
+      ],
     },
     {
       type: "row",
@@ -88,21 +117,14 @@ export const Sede: CollectionConfig = {
           admin: { description: "Solo si no es el de la sede. Ej. «Guarne» en Antioquia." },
         },
         { name: "direccion", type: "text", required: true, label: "Dirección" },
-      ],
-    },
-    {
-      name: "telefonos",
-      type: "array",
-      label: "Teléfonos",
-      labels: { singular: "Teléfono", plural: "Teléfonos" },
-      admin: { description: "Opcional: en ux-9, tres sedes no tienen teléfono." },
-      fields: [
         {
-          name: "numero",
+          name: "telefono",
           type: "text",
-          required: true,
-          label: "Número",
-          admin: { description: "Con indicativo. Ej. (601) 492 62 60." },
+          label: "Teléfono",
+          admin: {
+            description:
+              "Opcional: en ux-9, tres sedes no tienen teléfono. Con indicativo. Ej. (601) 492 62 60.",
+          },
         },
       ],
     },

@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { formatoDeImagenPermitido } from "./hooks/formatoDeImagenPermitido";
+import { almacenEsperado } from "./hooks/almacenEsperado";
 import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
 import { sinRecorte } from "./hooks/sinRecorte";
 
@@ -66,7 +67,7 @@ export const Media: CollectionConfig = {
   hooks: {
     // Primero el cierre de la descarga remota: esa vía no trae `req.file`, así
     // que el gancho de formato no la vería (§10.32).
-    beforeOperation: [sinDescargaRemota, sinRecorte, formatoDeImagenPermitido],
+    beforeOperation: [almacenEsperado, sinDescargaRemota, sinRecorte, formatoDeImagenPermitido],
   },
   fields: [
     {

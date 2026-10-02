@@ -11,8 +11,9 @@
  * `overrideAccess: true`.
  *
  * Crea sus propios registros, marcados con un prefijo, y los borra al final
- * pase lo que pase. NO sube ficheros: en development el token de Blob es el de
- * producción (§10.4), y una subida de prueba escribiría en el Blob real.
+ * pase lo que pase. NO sube ficheros: no le hacen falta. (Hasta el 2026-10-01
+ * el token de Blob de development era el de producción, §10.4; si alguna vez
+ * sube, la guarda del almacén de §10.37 lo vigila.)
  *
  * Se niega a correr contra el host de producción.
  */

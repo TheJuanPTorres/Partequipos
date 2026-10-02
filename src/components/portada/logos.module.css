@@ -31,6 +31,8 @@
 @media (max-width: 767px) {
   .seccion {
     --logos-por-vista: 2;
+    /* Medido en ux-9 a 390: caja de 110 px (logo de 125 × 70 con relleno 20). */
+    --logos-caja: 110px;
   }
 }
 

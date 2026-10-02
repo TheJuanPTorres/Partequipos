@@ -1,6 +1,6 @@
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { tieneCabecera, type BloquePagina } from "@/lib/bloques/vista";
+import { tieneCabecera, type VistaBloque } from "@/lib/bloques/vista";
 import { buildBreadcrumbJsonLd, type BreadcrumbItem } from "@/lib/seo/jsonLd";
 
 import { BloqueCabeceraVideo } from "./BloqueCabeceraVideo";
@@ -14,7 +14,7 @@ type Props = {
   /** El título de la página: es el `<h1>` si ningún bloque de cabecera lo pone. */
   titulo: string;
   migas: BreadcrumbItem[];
-  bloques: BloquePagina[];
+  bloques: VistaBloque[];
 };
 
 /**
@@ -29,7 +29,8 @@ export function PaginaConBloques({ titulo, migas, bloques }: Props) {
   return (
     <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(migas)} />
-      <div className={estilos.migas}>
+      {/* Migas solo para lectores de pantalla: ux-9 no las pinta (decisión de dirección). */}
+      <div className="sr-only">
         <Breadcrumbs items={migas} />
       </div>
       {tieneCabecera(bloques) ? null : <h1 className={estilos.titulo}>{titulo}</h1>}

@@ -1,6 +1,6 @@
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 
-import type { BloquePagina, ImagenBloque } from "@/lib/bloques/vista";
+import type { VistaBloque, ImagenBloque } from "@/lib/bloques/vista";
 
 /*
  * DATOS FIJOS de la ruta de pruebas: el contenido de ejemplo de Nosotros de
@@ -44,7 +44,7 @@ const parrafos = (...textos: string[]): SerializedEditorState =>
 const DYNAPAC =
   "Equipos DYNAPAC para compactación y pavimentación, desarrollados para lograr precisión y uniformidad en obras de infraestructura y construcción.";
 
-export const BLOQUES_NOSOTROS: BloquePagina[] = [
+export const BLOQUES_NOSOTROS: VistaBloque[] = [
   {
     blockType: "cabeceraVideo",
     antetitulo: "Partequipos",

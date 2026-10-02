@@ -32,7 +32,7 @@ export type VideoBloque = {
 
 export type EnlaceBloque = { texto: string; href: string };
 
-export type BloqueCabeceraVideo = {
+export type VistaCabeceraVideo = {
   blockType: "cabeceraVideo";
   id?: string | null;
   antetitulo?: string | null;
@@ -43,7 +43,7 @@ export type BloqueCabeceraVideo = {
   imagen: ImagenBloque | null;
 };
 
-export type BloquePresentacionImagen = {
+export type VistaPresentacionImagen = {
   blockType: "presentacionImagen";
   id?: string | null;
   imagen: ImagenBloque | null;
@@ -61,13 +61,13 @@ export type Cifra = {
   etiqueta: string;
 };
 
-export type BloqueCifras = {
+export type VistaCifras = {
   blockType: "cifras";
   id?: string | null;
   cifras: Cifra[];
 };
 
-export type BloqueFranjaMarquee = {
+export type VistaFranjaMarquee = {
   blockType: "franjaMarquee";
   id?: string | null;
   /** El texto que se repite en movimiento, p. ej. «Marcas aliadas». */
@@ -85,7 +85,7 @@ export type TarjetaExpandible = {
   href?: string | null;
 };
 
-export type BloqueTarjetasExpandibles = {
+export type VistaTarjetasExpandibles = {
   blockType: "tarjetasExpandibles";
   id?: string | null;
   antetitulo?: string | null;
@@ -94,12 +94,12 @@ export type BloqueTarjetasExpandibles = {
   boton: EnlaceBloque | null;
 };
 
-export type BloquePagina =
-  | BloqueCabeceraVideo
-  | BloquePresentacionImagen
-  | BloqueCifras
-  | BloqueFranjaMarquee
-  | BloqueTarjetasExpandibles;
+export type VistaBloque =
+  | VistaCabeceraVideo
+  | VistaPresentacionImagen
+  | VistaCifras
+  | VistaFranjaMarquee
+  | VistaTarjetasExpandibles;
 
 /**
  * Formato de las cifras como en ux-9: separador de miles «,» (el que pone el
@@ -121,6 +121,6 @@ export function valorContador(final: number, t: number): number {
 }
 
 /** ¿Hay un `<h1>` en los bloques? Solo lo pone la cabecera. */
-export function tieneCabecera(bloques: readonly BloquePagina[]): boolean {
+export function tieneCabecera(bloques: readonly VistaBloque[]): boolean {
   return bloques.some((b) => b.blockType === "cabeceraVideo");
 }

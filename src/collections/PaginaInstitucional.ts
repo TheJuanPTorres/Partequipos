@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { seoField } from "../lib/fields/seoField";
+import { BLOQUES_PAGINA } from "./bloques/bloquesPagina";
 import { validarYouTube } from "../lib/fields/youtube";
 import { enlace, parrafo, texto } from "../lib/fields/textosPortada";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
@@ -17,6 +18,12 @@ import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acce
  * (`nosotros/trabaja-con-nosotros`). Se copia literal del rastreo: la jerarquía
  * de URLs es intocable (CLAUDE.md §3.3).
  */
+/** Descripción con aviso si la página tiene bloques (`src/components/admin/AvisoBloques`). */
+const AVISO_BLOQUES = (texto?: string) => ({
+  path: "/components/admin/AvisoBloques",
+  clientProps: texto ? { texto } : {},
+});
+
 export const PaginaInstitucional: CollectionConfig = {
   slug: "paginas",
   labels: {
@@ -88,6 +95,7 @@ export const PaginaInstitucional: CollectionConfig = {
       name: "contenido",
       type: "richText",
       label: "Contenido",
+      admin: { components: { Description: AVISO_BLOQUES() } },
     },
     /*
      * Secciones con ancla. Las anclas (#taller, #GARANTIA…) NO son páginas:
@@ -100,8 +108,11 @@ export const PaginaInstitucional: CollectionConfig = {
       label: "Secciones con ancla",
       labels: { singular: "Sección", plural: "Secciones" },
       admin: {
-        description:
-          "Bloques enlazables dentro de la página, p. ej. /servicio-tecnico/#taller. No generan URLs nuevas.",
+        components: {
+          Description: AVISO_BLOQUES(
+            "Bloques enlazables dentro de la página, p. ej. /servicio-tecnico/#taller. No generan URLs nuevas.",
+          ),
+        },
       },
       fields: [
         {
@@ -126,6 +137,25 @@ export const PaginaInstitucional: CollectionConfig = {
           label: "Contenido de la sección",
         },
       ],
+    },
+    /*
+     * BLOQUES DE PÁGINA (decisión de dirección, 2026-10-02): si una página los
+     * tiene, se compone SOLO con ellos (más migas y JSON-LD); su «Contenido» y
+     * sus «Secciones con ancla» no se pintan, y el panel lo avisa en esos dos
+     * campos. Sin bloques, la página se pinta como siempre. No en la portada,
+     * que tiene sus propias secciones. Ver docs/diseno/decisiones-nosotros.md.
+     */
+    {
+      name: "bloques",
+      type: "blocks",
+      label: "Bloques de la página",
+      labels: { singular: "Bloque", plural: "Bloques" },
+      blocks: BLOQUES_PAGINA,
+      admin: {
+        condition: (data) => data?.slug !== "inicio",
+        description:
+          "Opcional. Si añades bloques, la página se compone con ellos y dejan de mostrarse «Contenido» y «Secciones con ancla».",
+      },
     },
     /*
      * HERO DE LA PORTADA (ADR 0009, revisado el 2026-09-23): N diapositivas.

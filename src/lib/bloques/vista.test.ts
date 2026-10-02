@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { formatearCifra, tieneCabecera, valorContador, type BloquePagina } from "./vista";
+import { formatearCifra, tieneCabecera, valorContador, type VistaBloque } from "./vista";
 
 describe("formatearCifra (como el contador de ux-9)", () => {
   it("separa los miles con coma", () => {
@@ -43,8 +43,8 @@ describe("valorContador (curva «swing», medida en ux-9)", () => {
 });
 
 describe("tieneCabecera (quién pone el único <h1>)", () => {
-  const cifras: BloquePagina = { blockType: "cifras", cifras: [] };
-  const cabecera: BloquePagina = {
+  const cifras: VistaBloque = { blockType: "cifras", cifras: [] };
+  const cabecera: VistaBloque = {
     blockType: "cabeceraVideo",
     titulo: "Quiénes somos",
     video: null,

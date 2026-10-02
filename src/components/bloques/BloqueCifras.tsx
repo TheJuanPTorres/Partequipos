@@ -1,4 +1,4 @@
-import type { BloqueCifras as Datos } from "@/lib/bloques/vista";
+import type { VistaCifras as Datos } from "@/lib/bloques/vista";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 

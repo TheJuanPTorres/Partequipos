@@ -2,7 +2,7 @@ import { RichText as LexicalRichText } from "@payloadcms/richtext-lexical/react"
 import Image from "next/image";
 
 import { Revelado } from "@/components/movimiento/Revelado";
-import type { BloquePresentacionImagen as Datos } from "@/lib/bloques/vista";
+import type { VistaPresentacionImagen as Datos } from "@/lib/bloques/vista";
 
 import { BotonBloque } from "./BotonBloque";
 import estilos from "./presentacionImagen.module.css";

@@ -6,7 +6,7 @@ import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { usePausa } from "@/components/movimiento/useMovimiento";
-import type { BloqueTarjetasExpandibles as Datos } from "@/lib/bloques/vista";
+import type { VistaTarjetasExpandibles as Datos } from "@/lib/bloques/vista";
 
 import { BotonBloque } from "./BotonBloque";
 import estilos from "./tarjetasExpandibles.module.css";

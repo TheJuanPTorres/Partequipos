@@ -6,7 +6,7 @@ import { useEffect, useId, useRef } from "react";
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { useMovimientoReducido, usePausa } from "@/components/movimiento/useMovimiento";
-import type { BloqueCabeceraVideo as Datos } from "@/lib/bloques/vista";
+import type { VistaCabeceraVideo as Datos } from "@/lib/bloques/vista";
 
 import estilos from "./cabeceraVideo.module.css";
 

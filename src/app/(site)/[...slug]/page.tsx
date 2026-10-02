@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 import { Fragment } from "react";
 
 import { ArticuloCuerpo } from "@/components/blog/ArticuloCuerpo";
+import { PaginaConBloques } from "@/components/bloques/PaginaConBloques";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { idsDeVideos, vistaDeBloques } from "@/lib/bloques/desdePayload";
 import { getArticuloPorSlug, getArticulos } from "@/lib/queries/getBlog";
 import {
   SLUG_CONTACTO,
@@ -15,6 +17,7 @@ import {
   getPaginas,
 } from "@/lib/queries/getPaginas";
 import { getHorario } from "@/lib/queries/getSeo";
+import { getVideoPorId } from "@/lib/queries/getVideos";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { textoDias, textoHora } from "@/lib/seo/horario";
@@ -134,6 +137,23 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
     { nombre: "Inicio", path: "/" },
     { nombre: pagina.titulo, path: `/${pagina.slug}` },
   ];
+
+  /*
+   * PÁGINA CON BLOQUES (docs/diseno/decisiones-nosotros.md): migas, bloques y
+   * JSON-LD; su «Contenido» y sus «Secciones con ancla» no se pintan. Sin
+   * bloques, la plantilla de siempre, sin ningún cambio.
+   */
+  if (pagina.bloques?.length) {
+    const videos = await Promise.all(idsDeVideos(pagina.bloques).map((id) => getVideoPorId(id)));
+    const porId = new Map(videos.flatMap((v) => (v ? [[v.id, v] as const] : [])));
+    return (
+      <PaginaConBloques
+        titulo={pagina.titulo}
+        migas={breadcrumbs}
+        bloques={vistaDeBloques(pagina.bloques, porId)}
+      />
+    );
+  }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">

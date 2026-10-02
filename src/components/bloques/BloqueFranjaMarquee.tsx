@@ -5,7 +5,7 @@ import { useId } from "react";
 
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { usePausa } from "@/components/movimiento/useMovimiento";
-import type { BloqueFranjaMarquee as Datos } from "@/lib/bloques/vista";
+import type { VistaFranjaMarquee as Datos } from "@/lib/bloques/vista";
 
 import estilos from "./franjaMarquee.module.css";
 

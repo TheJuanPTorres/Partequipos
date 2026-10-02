@@ -6,18 +6,6 @@
   background: var(--color-fondo-seccion);
 }
 
-/*
- * Migas: ux-9 no las pinta en Nosotros; aquí sí, por decisión de dirección.
- * Fila discreta alineada con el contenido (docs/diseno/decisiones-nosotros.md §4).
- */
-.migas {
-  padding: 8px 3vw 0;
-}
-
-.migas nav {
-  margin-bottom: 8px;
-}
-
 /* Sin bloque de cabecera, el título de la página es el `<h1>`. */
 .titulo {
   margin: 0;

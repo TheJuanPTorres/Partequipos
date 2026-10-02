@@ -351,8 +351,9 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 
 **Entorno del preview:** `.env.preview.local` (`DATABASE_URI`,
 `BLOB_READ_WRITE_TOKEN`, `VERCEL_AUTOMATION_BYPASS_SECRET`). Lo cargan
-`scripts/preview/con-entorno.ts` —por encima de `.env.local`, que tiene el Blob
-de producción— y los comandos `npm run preview:comprobar`, `preview:db:check`,
+`scripts/preview/con-entorno.ts` —por encima de `.env.local`, que es
+`development` y desde el 2026-10-01 lleva el Blob del **preview** (§10.4)— y
+los comandos `npm run preview:comprobar`, `preview:db:check`,
 `preview:sembrar`, `preview:retirar` y `preview:ejecutar -- <comando>`.
 `preview:comprobar` imprime solo el host de la base, el almacén del Blob y
 «bypass: presente/VACIO», y **falla** si el fichero apunta a producción o no es
@@ -373,6 +374,12 @@ pruebas; los guardas de cada script (`puedeTocarHeroDePrueba`) siguen mandando.
   `gh pr view/checks/list/create`.
 - Cada bloqueo se demostró con comandos inofensivos (`echo` con el patrón),
   nunca con el comando real.
+- **Lo que este hook NO ve:** un script que escribe en el Blob con el token
+  que tenga el entorno, sin nombrar el almacén en el comando. Así fue la subida
+  a producción del 2026-10-01 (§10.37). Eso lo para la **guarda del almacén**,
+  que está en el repositorio y corre en cada escritura: `almacenEsperado` en
+  `media` y `videos`, `exigirAlmacen` en los scripts y `npm run blob:almacen`
+  para comprobarlo sin escribir.
 
 **Neon en solo lectura:** MCP de Neon en ámbito local (fuera del repo) con
 `?readonly=true&projectId=solitary-cake-17810450`, y denegadas además las
@@ -560,18 +567,18 @@ educidas\`). Originales en `Desktop\partequipos-diseno\cliente-hero\`, **nunca e
 
 **NUESTRO** — se puede hacer sin esperar a nadie, pero no es urgente:
 
-| Pendiente                                             | Referencia      |
-| ----------------------------------------------------- | --------------- |
-| Logo institucional fuera de `Media` (URL cableada)    | §10.8           |
-| Separar el Blob de `development` del de producción    | §10.4           |
-| Mitigaciones 2–4 de consultas en el build             | §10.10          |
-| Repetir la auditoría de rendimiento con el diseño     | §10.3 p.14      |
-| Revisar el modo oscuro con el diseño puesto           | §10.14          |
-| Pasar la CSP a fase 2 — **depende de tener endpoint** | §10.16 · §10.31 |
-| Desacoplar `sharp` del arranque de Payload            | §10.19          |
-| ~~Prueba de humo automática post-despliegue~~ HECHA   | §10.20          |
-| ~~Verificar el store de Blob de preview~~ HECHO       | §10.28          |
-| Redirects no validables en preview (proteccion)       | §10.22          |
+| Pendiente                                                    | Referencia      |
+| ------------------------------------------------------------ | --------------- |
+| Logo institucional fuera de `Media` (URL cableada)           | §10.8           |
+| ~~Separar el Blob de `development` del de producción~~ HECHO | §10.4           |
+| Mitigaciones 2–4 de consultas en el build                    | §10.10          |
+| Repetir la auditoría de rendimiento con el diseño            | §10.3 p.14      |
+| Revisar el modo oscuro con el diseño puesto                  | §10.14          |
+| Pasar la CSP a fase 2 — **depende de tener endpoint**        | §10.16 · §10.31 |
+| Desacoplar `sharp` del arranque de Payload                   | §10.19          |
+| ~~Prueba de humo automática post-despliegue~~ HECHA          | §10.20          |
+| ~~Verificar el store de Blob de preview~~ HECHO              | §10.28          |
+| Redirects no validables en preview (proteccion)              | §10.22          |
 
 > **SISTEMA DE DISEÑO DEL CLIENTE (2026-09-16).** Existe en
 > `https://ui.partequipos.com` y sus tokens están extraídos, medidos y
@@ -707,7 +714,8 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 
 - Por defecto el script se sigue negando: solo acepta el preview.
 - Con el argumento posicional `produccion` exige base **y** Blob de producción.
-  Con development, que comparte el Blob de producción, se niega.
+  Con cualquier otra combinación se niega. Además, desde §10.37, declara el
+  almacén de producción para la guarda (`ALMACEN_BLOB_ESPERADO`).
 - Es un argumento y no una bandera `--produccion` porque `payload run` descarta
   las banderas con guiones: se midió que no llegaban al script.
 - `retirar produccion` limpia lo sembrado.
@@ -1146,7 +1154,7 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
   **Decisión pendiente:** pasar a **Vercel Pro** (ya presupuestado en la
   cotización) **antes** de que el repositorio vuelva a ser privado; de lo
   contrario los despliegues se bloquearán de nuevo.
-- **A MEDIAS — separar los stores de Vercel Blob.** Ambos entornos comparten el
+- **CERRADO EL 2026-10-01 — separar los stores de Vercel Blob.** Ambos entornos comparten el
   mismo `BLOB_READ_WRITE_TOKEN`. El `DROP SCHEMA` borró los registros de los 3
   media de producción, pero **los archivos siguen en el Blob y `development` los
   referencia**: no se deben borrar hasta separar los stores. Aislamiento a medias
@@ -1156,11 +1164,21 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     2026-10-01: los 38 registros de `media` del preview apuntan a su almacén
     (`lsndnc29…`), y los 8 de producción y todas las URL de imagen del HTML de su
     portada, al de producción.
-  - **`development` y producción: SIGUE ABIERTO.** `.env.local` lleva el Blob de
-    producción (§9, «Entorno del preview»), así que una subida desde
-    `development` escribe en el almacén que sirve el sitio. La mitigación de hoy
-    son los guardas de los scripts (`puedeTocarHeroDePrueba`); el arreglo es un
-    tercer almacén para `development`.
+  - **`development` y producción: CERRADO (2026-10-01).** Dirección cambió el
+    token de `.env.local` al almacén del preview, comprobado sin escribir con
+    `npm run blob:almacen` (`lsndnc29nh4ws7eh`, también con `payload run`).
+    - **Imágenes de demo:** sus 4 registros de `media` (las de §10.12, usadas en
+      12 relaciones) se volvieron a subir a ese almacén. Mismo contenido, con
+      hash idéntico; mismos ids; ahora `demo-*-1.png`.
+    - **Ficheros viejos:** los `demo-*.png` del almacén de producción quedaron
+      sueltos. Los borra dirección con
+      `Desktop\partequipos-cierre\runbook-borrar-demo-blob.md`.
+    - **Guarda:** desde §10.37, la guarda del almacén impide que `development`
+      o un script vuelvan a escribir en el almacén de producción.
+    - **Respaldos:** `backup:blob` lee la URL **guardada** (no la recalculada
+      con el token) y falla si no es del almacén esperado. Contra producción
+      desde una máquina local hay que declarar `ALMACEN_BLOB_ESPERADO`
+      (README §9.2).
 - **CUIDADO al desplegar — `payload migrate` es interactivo:** si
   `payload_migrations` contiene el marcador `dev` (`batch -1`, que deja el push
   de desarrollo), el comando abre un prompt —
@@ -2011,9 +2029,10 @@ En verde, y verificando la mitad.
    punto focal en el centro, y pone la diapositiva «Potencia Hitachi» la
    PRIMERA de la portada. Idempotente. `-- retirar` la quita (primero la
    diapositiva, después las imágenes) y comprueba que los ficheros dan 404 en
-   el Blob. **Se niega si la base O el Blob no son los del preview**: `payload
-run` carga `.env.local`, cuyo Blob es el de producción, y las fotos tienen
-   la licencia pendiente (L3). No refresca la portada: al acabar, guardarla en
+   el Blob. **Se niega si la base O el Blob no son los del preview**: las
+   fotos tienen la licencia pendiente (L3). Hasta el 2026-10-01 `.env.local`
+   llevaba el Blob de producción; hoy lleva el del preview, y la guarda de
+   §10.37 lo comprueba además. No refresca la portada: al acabar, guardarla en
    el panel del preview o redesplegar.
 
 **Cuidado:** refrescar desde `production` **borra** lo que se hubiera creado a
@@ -3061,7 +3080,7 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB                                                                                | `formatoDeVideoPermitido` + su prueba                                                           | CI y subida                           |
 | Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)                                                                    | `sinDescargaRemota` + su prueba                                                                 | CI y subida                           |
 | Recorte cerrado en el servidor           | Un recorte pedido por la API (`uploadEdits[crop]`), que Payload aplica aunque `crop: false` (§10.32)                                                                      | `sinRecorte` + su prueba                                                                        | CI y subida                           |
-| Hero de prueba solo en el preview        | Subir las fotos de ux-9 (licencia pendiente) a la base o al Blob de producción — el Blob de `.env.local` es el de producción                                              | `puedeTocarHeroDePrueba` + su prueba                                                            | Al sembrar o retirar                  |
+| Hero de prueba solo en el preview        | Subir las fotos de ux-9 (licencia pendiente) a la base o al Blob de producción — también con una base de preview y un token de otro almacén                               | `puedeTocarHeroDePrueba` + su prueba                                                            | Al sembrar o retirar                  |
 | Deriva de esquema                        | Una colección que cambia el esquema sin su migración (lo de `videos.focal_x` en la fase C, §10.33 p.5). Reproduce `migrate:create` sin conectar a ninguna base            | `npm run db:deriva` (`scripts/db/deriva-esquema.ts`) + `derivaEsquema.test.ts`                  | CI, en cada push y PR                 |
 | Migrar desde cero                        | Una migración que solo funciona sobre la base donde se escribió (§10.33 p.13): aplica todas a un Postgres 17 vacío y compara la estructura con el snapshot                | Job «Migrar desde cero» de `ci.yml` + `scripts/db/estructura-ci.ts`                             | CI, en cada push y PR                 |
 | Scripts sin push de esquema              | Un script que alcanza la config por un import estático antes de fijar `PAYLOAD_DISABLE_PUSH`: marcador `dev` en la base (§10.34)                                          | `src/lib/db/scriptsSinPush.test.ts`                                                             | CI, en cada push                      |

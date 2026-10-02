@@ -242,35 +242,62 @@
   border-radius: 4px;
 }
 
-/* Redes: círculo de 35 px blanco, icono de 23 en `text`; al pasar, rojo. */
+/*
+ * Redes — widget «Social Icons Glare Effect» de Andrés (css.tpl, leído):
+ * caja de 35 px blanca (`099f28a`) con radio 10 y sombra suave, icono de 23 px
+ * al 80 % en `text`. Al pasar, un relleno `primary` sube desde abajo en
+ * 0,35 s y el icono pasa a blanco con la curva del widget. Hueco MEDIDO en
+ * ux-9 pintado: paso de 49,5 px entre cajas a 1440.
+ */
 .redes {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 14.5px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .red {
+  position: relative;
   display: grid;
   place-items: center;
   width: 35px;
   height: 35px;
-  border-radius: 50%;
+  overflow: hidden;
+  border-radius: 10px;
   background: var(--color-fondo);
+  box-shadow: 0 0 30px 0 rgb(0 0 0 / 0.05);
   color: var(--color-texto);
-  transition:
-    background-color 0.3s,
-    color 0.3s;
+  transition: all 0.35s cubic-bezier(0.31, -0.105, 0.43, 1.59);
+}
+
+.red::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-marca);
+  transition: all 0.35s;
+}
+
+.red:hover::before,
+.red:focus-visible::before {
+  top: 0;
 }
 
 .red svg {
+  position: relative;
   width: 23px;
   height: 23px;
+  transform: scale(0.8);
+  transition: all 0.35s cubic-bezier(0.31, -0.105, 0.43, 1.59);
 }
 
-.red:hover {
-  background: var(--color-marca);
+.red:hover,
+.red:focus-visible {
   color: var(--color-fondo);
 }
 
@@ -347,7 +374,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .red {
+  .red,
+  .red::before,
+  .red svg {
     transition: none;
   }
 }

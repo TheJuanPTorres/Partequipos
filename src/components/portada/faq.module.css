@@ -95,6 +95,25 @@
 
 .item {
   margin: 0 0 10px;
+  /* Para animar la altura hasta `auto` (abajo). */
+  interpolate-size: allow-keywords;
+}
+
+/*
+ * Abrir y cerrar como el widget (`icon_accordion.js`, leído): `slideDown` y
+ * `slideUp` de jQuery, 400 ms con su curva `swing` (= 0,5 − cos(πt)/2). Donde
+ * el navegador no anima `::details-content`, abre de golpe, sin más.
+ */
+.item::details-content {
+  height: 0;
+  overflow: clip;
+  transition:
+    height 400ms cubic-bezier(0.37, 0, 0.63, 1),
+    content-visibility 400ms allow-discrete;
+}
+
+.item[open]::details-content {
+  height: auto;
 }
 
 .item:last-child {
@@ -180,6 +199,12 @@
   color: #616161;
   font-weight: 300;
   line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item::details-content {
+    transition: none;
+  }
 }
 
 /* ---------------------------------------------------------------- móvil */

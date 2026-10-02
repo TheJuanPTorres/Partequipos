@@ -34,7 +34,7 @@ import estilos from "./pie.module.css";
  * - «Somos una empresa…» es párrafo, no `<h3>`: los títulos de columna son
  *   `<h2>`, el nivel siguiente al `<h1>` de cualquier página.
  * - Sin buscador hasta aprobar su construcción: un cuadro que no busca es un
- *   defecto.
+ *   defecto. Su hueco se conserva vacío para que las filas caigan como en ux-9.
  * - La máquina decorativa NO está en el repositorio (es público): se sube a
  *   `Media` y se elige en el global `pie`. Con §10.38 activa, la de ux-9.
  */
@@ -102,36 +102,38 @@ export async function Footer() {
     <footer className={estilos.pie} data-con-imagen={decorativa ? "" : undefined}>
       {/* Sin lema o sin texto del botón (global aún vacío), la tarjeta no se pinta. */}
       {pie.lema && pie.textoBoton ? (
-        <div className={estilos.tarjeta}>
-          {decorativa ? (
-            <Image
-              src={decorativa.url}
-              alt=""
-              aria-hidden="true"
-              width={decorativa.width}
-              height={decorativa.height}
-              sizes="518px"
-              loading="lazy"
-              className={estilos.decorativa}
+        <div className={estilos.marco}>
+          <div className={estilos.tarjeta}>
+            {decorativa ? (
+              <Image
+                src={decorativa.url}
+                alt=""
+                aria-hidden="true"
+                width={decorativa.width}
+                height={decorativa.height}
+                sizes="518px"
+                loading="lazy"
+                className={estilos.decorativa}
+              />
+            ) : null}
+            <Revelado
+              como="p"
+              texto={pie.lema}
+              ritmo="titulo"
+              escalon={0.08}
+              duracion={0.75}
+              className={`${estilos.lema} texto-titulo-bloque`}
             />
-          ) : null}
-          <Revelado
-            como="p"
-            texto={pie.lema}
-            ritmo="titulo"
-            escalon={0.08}
-            duracion={0.75}
-            className={`${estilos.lema} texto-titulo-bloque`}
-          />
-          <a
-            href={enlaceWhatsApp(contact.phone)}
-            className={`${estilos.whatsapp} texto-etiqueta`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={1.75} />
-            {pie.textoBoton}
-          </a>
+            <a
+              href={enlaceWhatsApp(contact.phone)}
+              className={`${estilos.whatsapp} texto-etiqueta`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={1.75} />
+              {pie.textoBoton}
+            </a>
+          </div>
         </div>
       ) : null}
 
@@ -145,14 +147,11 @@ export async function Footer() {
             className={estilos.logo}
           />
           <div>
-            {pie.empresaTitulo ? (
-              <p className={`${estilos.textoEmpresa} ${estilos.lemaEmpresa}`}>
-                {pie.empresaTitulo}
-              </p>
-            ) : null}
+            {pie.empresaTitulo ? <p className={estilos.lemaEmpresa}>{pie.empresaTitulo}</p> : null}
             {pie.empresaTexto ? <p className={estilos.textoEmpresa}>{pie.empresaTexto}</p> : null}
           </div>
         </div>
+        <div className={estilos.hueco} />
 
         <div className={estilos.columnas}>
           {columnas.map((c, i) => (

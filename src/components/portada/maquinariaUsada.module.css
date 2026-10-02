@@ -192,6 +192,12 @@
   .antetitulo {
     text-align: center;
   }
+
+  /* Export 3e5a53cb: `text_align_mobile` «Centro»; medido centrado a 390. */
+  .tituloUsada {
+    align-self: center;
+    text-align: center;
+  }
 }
 
 /* --- Pestañas --------------------------------------------------------------- */
@@ -213,7 +219,8 @@
   background: var(--color-marca-tenue);
   color: var(--color-texto-suave);
   font: inherit;
-  font-size: 16px;
+  /* Medido en ux-9: 16 px en escritorio y 13 en tablet y móvil. */
+  font-size: var(--texto-etiqueta);
   font-weight: 500;
   line-height: var(--s3-pestana-interlineado);
   cursor: pointer;

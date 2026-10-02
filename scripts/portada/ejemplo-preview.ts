@@ -16,6 +16,8 @@
  * fichas de usados de la sección 3 (export 2516: dos por pestaña, todas la
  * «Excavadora Hitachi ZX75US-7» de ux-9). Las fichas llevan la marca al
  * principio de su `descripcion`.
+ * Además pone en las 3 marcas de la sección 2 el texto de ux-9 (el mismo que
+ * producción; no es contenido de ejemplo y `retirar` no lo toca).
  *
  * NO REFRESCA EL PREVIEW: sembrar ANTES del último push (o redesplegar).
  */
@@ -120,7 +122,35 @@ const IMAGENES_FICHA = [
   "014_Cut01_2560x1710v0-2-946x1024.png",
 ] as const;
 
+/** Texto de la tarjeta de cada marca en ux-9 (export 2516, sección 2). */
+const TEXTOS_MARCAS: Record<string, string> = {
+  hitachi:
+    "Maquinaria nueva Hitachi para construcción, minería e infraestructura, con tecnología, potencia y rendimiento adaptados a las exigencias de cada proyecto.",
+  "case-construction":
+    "Equipos nuevos CASE Construction, desarrollados para ofrecer potencia, eficiencia y versatilidad en proyectos de construcción y trabajo pesado.",
+  yanmar:
+    "Equipos nuevos YANMAR, reconocidos por su eficiencia, maniobrabilidad y confiabilidad para aplicaciones de construcción, agricultura e industria.",
+};
+
 if (modo === "sembrar") {
+  for (const [slug, descripcion] of Object.entries(TEXTOS_MARCAS)) {
+    const r = await payload.find({
+      collection: "marcas-maquinaria",
+      where: { slug: { equals: slug } },
+      depth: 0,
+      limit: 1,
+      overrideAccess: true,
+    });
+    const marca = r.docs[0];
+    if (!marca || marca.descripcion === descripcion) continue;
+    await payload.update({
+      collection: "marcas-maquinaria",
+      id: marca.id,
+      data: { descripcion },
+      overrideAccess: true,
+    });
+    log(`marca ${slug}: texto de ux-9 puesto`);
+  }
   const imagenes = [
     await subir(IMAGENES_FICHA[0], "excavadora de las fichas de usados (1)"),
     await subir(IMAGENES_FICHA[1], "excavadora de las fichas de usados (2)"),

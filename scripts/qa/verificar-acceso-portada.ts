@@ -286,6 +286,8 @@ try {
       collection: "sedes",
       data: {
         nombre: `${MARCA}fuera`,
+        ciudad: "Bogotá",
+        departamento: "Cundinamarca",
         latitud: 95,
         longitud: -74,
         lineas: [{ linea: "X", direccion: "Y" }],
@@ -302,6 +304,8 @@ try {
       collection: "sedes",
       data: {
         nombre: `${MARCA}anonima`,
+        ciudad: "Bogotá",
+        departamento: "Cundinamarca",
         latitud: 4.6,
         longitud: -74,
         lineas: [{ linea: "X", direccion: "Y" }],
@@ -316,6 +320,8 @@ try {
     collection: "sedes",
     data: {
       nombre: `${MARCA}bogota`,
+      ciudad: "Bogotá",
+      departamento: "Cundinamarca",
       latitud: 4.65,
       longitud: -74.1,
       lineas: [{ linea: "Maquinaria", direccion: "Diagonal 16" }],

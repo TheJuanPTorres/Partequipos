@@ -891,9 +891,17 @@ export interface CategoriasBlog {
 export interface Sede {
   id: number;
   /**
-   * Como se muestra en el mapa. Ej. «Bogotá», «Antioquia».
+   * Nombre de la sede. La ficha dice «Sede <nombre>». Ej. «Bogotá», «Antioquia».
    */
   nombre: string;
+  /**
+   * Ej. «Medellín» en la sede Antioquia.
+   */
+  ciudad: string;
+  /**
+   * Ej. «Antioquia». Etiqueta: «Ciudad, Departamento».
+   */
+  departamento: string;
   latitud: number;
   longitud: number;
   /**
@@ -907,18 +915,10 @@ export interface Sede {
          */
         localidad?: string | null;
         direccion: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Opcional: en ux-9, tres sedes no tienen teléfono.
-   */
-  telefonos?:
-    | {
         /**
-         * Con indicativo. Ej. (601) 492 62 60.
+         * Opcional: en ux-9, tres sedes no tienen teléfono. Con indicativo. Ej. (601) 492 62 60.
          */
-        numero: string;
+        telefono?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -1633,6 +1633,8 @@ export interface VideosSelect<T extends boolean = true> {
  */
 export interface SedesSelect<T extends boolean = true> {
   nombre?: T;
+  ciudad?: T;
+  departamento?: T;
   latitud?: T;
   longitud?: T;
   lineas?:
@@ -1641,12 +1643,7 @@ export interface SedesSelect<T extends boolean = true> {
         linea?: T;
         localidad?: T;
         direccion?: T;
-        id?: T;
-      };
-  telefonos?:
-    | T
-    | {
-        numero?: T;
+        telefono?: T;
         id?: T;
       };
   foto?: T;

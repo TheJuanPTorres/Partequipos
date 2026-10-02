@@ -254,6 +254,10 @@ al rastreador la lista completa de URLs que se intenta ocultar.
 
 ### Levantar el bloqueo el día del lanzamiento
 
+0. **BLOQUEO — excepción de demostración (CLAUDE.md §10.38).** Mientras esté
+   activa, **no se abre a buscadores**. Antes del paso 1: **retirar §10.38**
+   (runbook de retirada) **o confirmar por escrito las licencias** de los
+   assets que cubre. Si no, no se sigue.
 1. En Vercel → Settings → Environment Variables, poner
    `NEXT_PUBLIC_PERMITIR_INDEXACION=true` en **Production**.
 2. Redesplegar. La variable es `NEXT_PUBLIC_*`, o sea que se incrusta en el

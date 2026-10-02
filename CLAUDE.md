@@ -450,9 +450,9 @@ veredicto, que va en el informe.
 >
 > **Pendientes, por prioridad:**
 >
-> 1. **Fase G (sedes):** espera a la cuenta de Mapbox del cliente (L5).
-> 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview.
-> 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
+> 1. **Fase G (sedes):** construida (2026-10-02). Sin token de Mapbox se ve la lista de sedes; el globo se activa con `NEXT_PUBLIC_MAPBOX_TOKEN` de la cuenta del cliente (L5). **El globo no se ha podido probar sin ese token.**
+>
+> **§10.38 ACTIVA:** excepción temporal de demostración con la home completa en producción. Bloquea el lanzamiento: retirarla o confirmar las licencias. 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview. 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
 >
 > **Bloque anterior al diseño: QUITADO (fase 6).** La home tiene un solo `<main>` con las secciones de ux-9; el correo pasa al pie (desviación menor, pendiente de Andrés). El horario pasa al global `seo` de Payload (editable, con su migración): va en el JSON-LD `Organization` (`contactPoint.hoursAvailable`) y en `/contactanos/`. Detalle en `decisiones-home-ux9.md` §22.
 >
@@ -904,6 +904,36 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     sin hueco cuando falta la imagen.
     Comprobar también el pie entre 1025 y 1279 px SIN imagen decorativa: la
     reserva de 170 px de §10.33 p.11 no debe dejar hueco.
+
+### 10.38 EXCEPCIÓN TEMPORAL DE DEMOSTRACIÓN — la home completa en producción (2026-10-02) · ACTIVA
+
+> **Decisión de dirección del 2026-10-02.** Para enseñar el avance, la home de
+> producción puede llevar los assets que hasta ahora solo iban al preview:
+>
+> | Assets                                                                                         | Base del permiso                                                             |
+> | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+> | Imágenes, vídeo y póster de ux-9 (secciones 2, 3 y 5; vídeo de 6–8; imagen decorativa del pie) | **Permiso temporal** comunicado a dirección                                  |
+> | Logos de fabricantes (sección 4)                                                               | **Permiso del cliente**, temporal                                            |
+> | Testimonios (sección 10)                                                                       | Son del cliente; la autorización de las personas es **responsabilidad suya** |
+>
+> **Reglas mientras esté activa:**
+>
+> - **Es TEMPORAL y para demostrar avance.** No es un cambio de criterio.
+> - **La web NO se abre a buscadores** mientras esté activa. Es un **bloqueo
+>   del lanzamiento**: «retirar §10.38 o confirmar las licencias», el paso 0
+>   de «Levantar el bloqueo el día del lanzamiento» (README §7).
+> - **Ningún asset entra en el repositorio ni en `public/`**: van a `Media`
+>   (Blob), copiados por dirección con un runbook.
+> - Mientras esté activa, estos assets **no se vuelven a señalar como L2–L4**
+>   en producción.
+> - **Lo que NO cubre:** las **fotos de ciudad de la sección 9** (sedes). No
+>   figuran en la decisión, así que siguen solo en el preview; la copia a
+>   producción lleva las sedes sin foto. Los datos de las sedes son de la
+>   maqueta de ux-9 y se confirman con el cliente (§10.0.1, análisis §1).
+>
+> **Runbooks** (en `Desktop\partequipos-cierre\`, los ejecuta dirección):
+> `runbook-copia-demo-produccion.md` (copia del preview) y
+> `runbook-retirada-demo-produccion.md` (deshace exactamente la copia).
 
 ### 10.37 INCIDENTE 2026-10-01 — una subida de prueba fue al Blob de PRODUCCIÓN
 

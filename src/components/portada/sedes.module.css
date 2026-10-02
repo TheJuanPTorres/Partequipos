@@ -1,0 +1,495 @@
+/*
+ * SECCIÓN 9 — SEDES (ux-9, widget HTML `b9b46e6` del contenedor `79b3d7aa`).
+ * Valores copiados del widget; nombres en español. Lo que se aparta, en
+ * docs/diseno/decisiones-home-ux9.md §23.
+ */
+.seccion {
+  --sedes-panel: #ebebeb;
+  --sedes-panel-hover: #dcdcdc;
+  --sedes-tinta: #000;
+  --sedes-cta: var(--color-marca);
+  --sedes-cta-hover: #c82027;
+  --sedes-linea: rgb(0 0 0 / 14%);
+  --sedes-linea-2: rgb(0 0 0 / 22%);
+  --sedes-hueco: rgb(0 0 0 / 6%);
+  --sedes-panel-ancho: 26rem;
+  --sedes-curva: cubic-bezier(0.625, 0.05, 0, 1);
+
+  width: 100%;
+  background: #fff;
+  color: var(--sedes-tinta);
+}
+
+/* ------------------------------------------------------------- ficha */
+
+.ficha {
+  display: flex;
+  flex-flow: column;
+  gap: 2em;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 2em;
+}
+
+.visual {
+  aspect-ratio: 3 / 2;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.75em;
+  background-color: var(--sedes-hueco);
+}
+
+.foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cabecera {
+  display: flex;
+  flex-flow: column;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+
+.etiqueta {
+  margin: 0;
+  opacity: 0.6;
+  font-size: 0.8125em;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.nombre {
+  margin: 0;
+  font-size: 2.375em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.detalles {
+  display: flex;
+  flex-flow: column;
+  gap: 1em;
+  width: 100%;
+  margin: 0.25em 0 0;
+  padding: 1.25em 0 0;
+  border-top: 1px solid var(--sedes-linea-2);
+  list-style: none;
+}
+
+.detalle {
+  display: flex;
+  flex-flow: column;
+  gap: 0.1875em;
+}
+
+.detalleEtiqueta {
+  opacity: 0.6;
+  font-size: 0.8125em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.direccion {
+  margin: 0;
+  font-size: 0.9375em;
+  font-style: normal;
+  line-height: 1.5;
+}
+
+/* Teléfonos: CTA rojo, como en ux-9. */
+.telefono {
+  width: fit-content;
+  color: var(--sedes-cta);
+  font-size: 0.9375em;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: color 0.25s ease;
+}
+
+.telefono:hover,
+.telefono:focus-visible {
+  color: var(--sedes-cta-hover);
+}
+
+.telefono:focus-visible {
+  outline: 2px solid var(--sedes-tinta);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------- sin globo: la lista */
+
+.lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: 1em;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2em 1em;
+  list-style: none;
+}
+
+.lista > li {
+  display: flex;
+  border: 1px solid var(--sedes-linea);
+  border-radius: 1em;
+  background: var(--sedes-panel);
+}
+
+/* ------------------------------------------------------- con globo */
+
+.globo {
+  position: relative;
+  width: 100%;
+  height: min(100vh, 100rem);
+  overflow: clip;
+}
+
+.mapa {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.panel {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  bottom: 1em;
+  z-index: 10;
+  width: var(--sedes-panel-ancho);
+  border: 1px solid var(--sedes-linea);
+  border-radius: 1em;
+  background-color: var(--sedes-panel);
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, 0);
+  transition: all 0.65s var(--sedes-curva);
+}
+
+.globo[data-plegado] .panel {
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(4em, 0);
+}
+
+.carril {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden auto;
+  list-style: none;
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
+.carril > li {
+  display: flex;
+  min-height: 100%;
+  scroll-snap-align: start;
+}
+
+.carril:focus-visible {
+  outline: 2px solid var(--sedes-cta);
+  outline-offset: -2px;
+}
+
+.cerrar {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5em;
+  height: 2.5em;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sedes-cta);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.cerrar svg {
+  width: 0.625em;
+}
+
+.cerrar:hover,
+.cerrar:focus-visible,
+.reabrir:hover,
+.reabrir:focus-visible {
+  background: var(--sedes-cta-hover);
+}
+
+.cerrar:focus-visible,
+.reabrir:focus-visible {
+  outline: 2px solid var(--sedes-tinta);
+  outline-offset: 2px;
+}
+
+.nav {
+  position: absolute;
+  right: calc(var(--sedes-panel-ancho) + 2em);
+  bottom: 1em;
+  z-index: 10;
+  display: flex;
+  gap: 1em;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25em;
+  color: var(--sedes-tinta);
+  transition: all 0.65s var(--sedes-curva);
+}
+
+.globo[data-plegado] .nav {
+  right: 1em;
+}
+
+.navBoton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2em;
+  height: 2em;
+  padding: 0;
+  border: 0;
+  border-radius: 100em;
+  background: transparent;
+  color: var(--sedes-cta);
+  cursor: pointer;
+}
+
+.navBoton:hover {
+  color: var(--sedes-cta-hover);
+}
+
+.navBoton:focus-visible {
+  outline: 2px solid var(--sedes-cta);
+}
+
+.navBoton svg {
+  width: 0.75em;
+}
+
+.contador {
+  margin: 0;
+  font-size: 0.9375em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.reabrir {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3em;
+  padding: 0 0.5em;
+  border: 0;
+  border-radius: 0.5em 0 0 0.5em;
+  background: var(--sedes-cta);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(2em, -50%);
+  transition: all 0.4s var(--sedes-curva);
+}
+
+.reabrir svg {
+  width: 1em;
+}
+
+.globo[data-plegado] .reabrir {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, -50%);
+}
+
+/* Pines (los crea el globo; `:global` porque los monta Mapbox). */
+.globo :global(.sedes-pin) {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.globo :global(.sedes-pin__punto) {
+  display: block;
+  width: 0.75em;
+  height: 0.75em;
+  border-radius: 100em;
+  background-color: var(--sedes-cta);
+  transition: all 0.35s var(--sedes-curva);
+}
+
+.globo :global(.sedes-pin:hover .sedes-pin__punto) {
+  transform: scale(1.35);
+}
+
+.globo :global(.sedes-pin[data-activo] .sedes-pin__punto) {
+  outline: 1px solid var(--sedes-cta);
+  outline-offset: 0.375em;
+}
+
+.globo :global(.sedes-pin:focus-visible) {
+  outline: 2px solid var(--sedes-tinta);
+  outline-offset: 4px;
+}
+
+.globo :global(.sedes-pin__etiqueta) {
+  margin-top: 0.875em;
+  color: var(--sedes-tinta);
+  font-size: 0.75em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 3px #fff,
+    0 0 3px #fff;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-0.25em);
+  transition: all 0.35s var(--sedes-curva);
+}
+
+.globo :global(.sedes-pin:hover .sedes-pin__etiqueta),
+.globo :global(.sedes-pin[data-activo] .sedes-pin__etiqueta),
+.globo :global(.sedes-pin:focus-visible .sedes-pin__etiqueta) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Controles de Mapbox con la paleta del panel. La atribución y el logo de
+ * Mapbox SE VEN (en ux-9 se ocultaban; sus términos exigen mostrarlos). */
+.globo :global(.mapboxgl-ctrl-group) {
+  border: 1px solid var(--sedes-linea-2);
+  background: var(--sedes-panel);
+  box-shadow: 0 2px 12px rgb(0 0 0 / 8%);
+}
+
+@media (width <= 991px) {
+  .globo {
+    display: flex;
+    flex-flow: column;
+    height: auto;
+  }
+
+  .mapa {
+    position: relative;
+    inset: auto;
+    flex: none;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .panel {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    width: 100%;
+    border-style: solid none none;
+    border-radius: 0;
+  }
+
+  .carril {
+    position: relative;
+    inset: auto;
+    display: flex;
+    overflow: auto hidden;
+    scroll-snap-type: x mandatory;
+  }
+
+  .carril > li {
+    flex: 0 0 80%;
+    min-width: 80%;
+    min-height: 0;
+    border-right: 1px solid var(--sedes-linea);
+    scroll-snap-align: center;
+  }
+
+  .carril .ficha {
+    padding: 1.5em 1.5em 2em;
+  }
+
+  .carril .cabecera {
+    margin-bottom: 0;
+  }
+
+  .carril .nombre {
+    font-size: 1.5em;
+  }
+
+  .cerrar,
+  .reabrir {
+    display: none;
+  }
+
+  .nav {
+    position: relative;
+    inset: auto;
+    justify-content: space-between;
+    padding: 1em 1.5em;
+  }
+
+  .lista .nombre {
+    font-size: 1.5em;
+  }
+
+  .lista .ficha {
+    padding: 1.5em 1.5em 2em;
+  }
+}
+
+@media (width <= 479px) {
+  .ficha {
+    gap: 1em;
+  }
+
+  .carril .ficha,
+  .lista .ficha {
+    padding: 1em 1em 2em;
+  }
+
+  .visual {
+    border-radius: 0.5em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .nav,
+  .reabrir,
+  .telefono,
+  .cerrar,
+  .globo :global(.sedes-pin__punto),
+  .globo :global(.sedes-pin__etiqueta) {
+    transition: none;
+  }
+
+  .carril {
+    scroll-behavior: auto;
+  }
+}

@@ -153,18 +153,24 @@ const nextConfig: NextConfig = {
        * 4. Portada (fases F y H): `media-src` para los vídeos, que se sirven
        *    directos desde el Blob, y `frame-src` para YouTube, SOLO el dominio
        *    sin cookies y solo cuando el visitante pulsa «reproducir».
+       * 5. Portada (fase G): el globo de sedes carga Mapbox GL desde su CDN
+       *    (`api.mapbox.com`: script y hoja de estilos), pide teselas y
+       *    estilos a `api.mapbox.com` y envía telemetría a `events.mapbox.com`,
+       *    y crea sus workers desde `blob:`. Solo si hay token de Mapbox.
        */
       {
         key: "Content-Security-Policy-Report-Only",
         value: [
           "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
-          "style-src 'self' 'unsafe-inline'",
+          "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://api.mapbox.com",
+          "style-src 'self' 'unsafe-inline' https://api.mapbox.com",
           "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
           "font-src 'self' data:",
           "media-src 'self' https://*.public.blob.vercel-storage.com",
           "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com",
-          "connect-src 'self' https://challenges.cloudflare.com",
+          "connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com",
+          "worker-src 'self' blob:",
+          "child-src blob:",
           "object-src 'none'",
           "base-uri 'self'",
           "form-action 'self'",

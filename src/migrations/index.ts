@@ -15,6 +15,7 @@ import * as migration_20261001_021417_fase_e_portada from './20261001_021417_fas
 import * as migration_20261001_024835_fase_f_portada from './20261001_024835_fase_f_portada';
 import * as migration_20261001_031754_fase_h_portada from './20261001_031754_fase_h_portada';
 import * as migration_20261002_010203_seo_horario from './20261002_010203_seo_horario';
+import * as migration_20261002_154950_fase_g_sedes from './20261002_154950_fase_g_sedes';
 
 export const migrations = [
   {
@@ -100,6 +101,11 @@ export const migrations = [
   {
     up: migration_20261002_010203_seo_horario.up,
     down: migration_20261002_010203_seo_horario.down,
-    name: '20261002_010203_seo_horario'
+    name: '20261002_010203_seo_horario',
+  },
+  {
+    up: migration_20261002_154950_fase_g_sedes.up,
+    down: migration_20261002_154950_fase_g_sedes.down,
+    name: '20261002_154950_fase_g_sedes'
   },
 ];

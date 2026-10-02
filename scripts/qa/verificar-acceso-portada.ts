@@ -19,9 +19,12 @@
  */
 import { getPayload, type Payload } from "payload";
 
+import { HOST_PRODUCCION } from "../../src/lib/portada/heroPrueba";
+
 process.env.PAYLOAD_DISABLE_PUSH = "true";
-const HOST_PRODUCCION = "ep-tiny-fog-awnwc8ie";
-if ((process.env.DATABASE_URI ?? "").includes(HOST_PRODUCCION)) {
+// El endpoint sin «-pooler»: vale para la cadena directa y para la pooled.
+const ENDPOINT_PRODUCCION = HOST_PRODUCCION.split(".")[0]!.replace(/-pooler$/, "");
+if ((process.env.DATABASE_URI ?? "").includes(ENDPOINT_PRODUCCION)) {
   console.error("[acceso] NO se ejecuta contra producción.");
   process.exit(1);
 }

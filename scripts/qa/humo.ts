@@ -110,6 +110,6 @@ for (const fallo of v.fallos) {
 }
 console.error("\n  Un 500 aquí es el modo de fallo de CLAUDE.md §10.18: el build pasa en");
 console.error("  verde y el lambda cae en tiempo de petición. NO promocionar este");
-console.error("  despliegue; si ya está en producción, revertir el alias primero:");
-console.error("    vercel promote <url del último despliegue bueno>");
+console.error("  despliegue; si ya está en producción, dirección revierte el alias al");
+console.error("  último despliegue bueno (procedimiento de CLAUDE.md §10.18).");
 process.exit(1);

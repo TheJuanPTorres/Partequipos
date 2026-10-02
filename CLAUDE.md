@@ -374,6 +374,31 @@ pruebas; los guardas de cada script (`puedeTocarHeroDePrueba`) siguen mandando.
   `gh pr view/checks/list/create`.
 - Cada bloqueo se demostró con comandos inofensivos (`echo` con el patrón),
   nunca con el comando real.
+- **Desde el 2026-10-02 la barrera mira también DENTRO de los scripts**
+  (aprobado por dirección). Antes solo leía el texto del comando, y un script
+  guardado en un fichero pasaba sin que lo viera. Con los **patrones fuertes**
+  (host de producción de Neon, almacén de producción del Blob, `vercel
+promote`/`rollback`/`redeploy`, `--prod`, `--target production`; **no** la
+  palabra «produccion» a secas):
+  - **(a)** bloquea un comando que **ejecuta** un fichero que los contiene:
+    `python`, `node`, `tsx`, `bash`, `sh`, `payload run`, `powershell -File`
+    y los scripts de `npm run`. Expande las variables del comando (también
+    `$env:` de PowerShell y las de un bucle `for`). Una ruta que no sabe
+    resolver, la bloquea.
+  - **(b)** no deja **guardar** un script (`.py`, `.js`, `.cjs`, `.mjs`, `.ts`,
+    `.sh`, `.ps1`…) que los contenga. Los textos (`.md`, `.txt`) sí se
+    guardan.
+  - **Demostrado con scripts inofensivos** (solo imprimen el patrón):
+    bloqueados con `python`, `node` (también con la ruta en una variable y
+    desde PowerShell), `tsx`, `payload run` y `npm run`; bloqueado guardar un
+    `.ps1`; guardado un `.md`; y los de control, sin el patrón, se ejecutan.
+  - Dos scripts del repositorio llevaban un patrón por motivos legítimos y
+    se reformularon: `humo.ts` describe la reversión con palabras y
+    `verificar-acceso-portada.ts` importa la constante del host.
+- **REGLA: si la barrera bloquea, no se busca otra vía.** Se reformula el
+  comando sin lo que la activó, o se informa a dirección. Solo los **textos**
+  —mensaje de commit, cuerpo de un PR y documentación— pueden ir por un
+  fichero `.md` o `.txt`, y se menciona en el informe.
 - **Lo que este hook NO ve:** un script que escribe en el Blob con el token
   que tenga el entorno, sin nombrar el almacén en el comando. Así fue la subida
   a producción del 2026-10-01 (§10.37). Eso lo para la **guarda del almacén**,

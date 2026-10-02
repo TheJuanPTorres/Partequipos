@@ -2026,8 +2026,9 @@ Decisión de dirección: **lo pintado manda**. Se midió ux-9 con el navegador a
 - **Logos:** la caja mide **110 px** en móvil (en ux-9, el logo ocupa
   125 × 70 con relleno 20), y la sección 150. Antes eran 180 y 220.
 - **FAQ a 390:** la columna izquierda va sin relleno lateral, del alto de su
-  contenido y con todo centrado (título, entradilla y botón). El `60vh` del
-  export no se aplica en lo publicado.
+  contenido, con 120 px encima y 30 debajo, y todo centrado (título,
+  entradilla y botón). El `60vh` del export no se aplica en lo publicado. La
+  sección mide 994 px, como en ux-9.
 - **Sección 2 a 390:** antetítulo y título centrados, con la caja de ux-9.
 
 ### 24.3 Buscador del pie — PENDIENTE

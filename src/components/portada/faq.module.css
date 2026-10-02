@@ -221,11 +221,12 @@
 
   /*
    * Como se PINTA en ux-9 a 390 (2026-10-02): sin relleno lateral, del alto
-   * de su contenido (el `60vh` del export no se aplica en lo publicado) y
-   * todo centrado: título, entradilla y botón.
+   * de su contenido (el `60vh` del export no se aplica en lo publicado), con
+   * 120 px encima y 30 debajo, y todo centrado: título, entradilla y botón.
    */
   .izq {
     width: 100%;
+    margin: 120px 0 30px;
     padding: 0;
     align-items: center;
     text-align: center;

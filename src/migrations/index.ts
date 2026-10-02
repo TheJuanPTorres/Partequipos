@@ -14,6 +14,7 @@ import * as migration_20261001_002948_hero_fondo_movil from './20261001_002948_h
 import * as migration_20261001_021417_fase_e_portada from './20261001_021417_fase_e_portada';
 import * as migration_20261001_024835_fase_f_portada from './20261001_024835_fase_f_portada';
 import * as migration_20261001_031754_fase_h_portada from './20261001_031754_fase_h_portada';
+import * as migration_20261002_010203_seo_horario from './20261002_010203_seo_horario';
 
 export const migrations = [
   {
@@ -94,6 +95,11 @@ export const migrations = [
   {
     up: migration_20261001_031754_fase_h_portada.up,
     down: migration_20261001_031754_fase_h_portada.down,
-    name: '20261001_031754_fase_h_portada'
+    name: '20261001_031754_fase_h_portada',
+  },
+  {
+    up: migration_20261002_010203_seo_horario.up,
+    down: migration_20261002_010203_seo_horario.down,
+    name: '20261002_010203_seo_horario'
   },
 ];

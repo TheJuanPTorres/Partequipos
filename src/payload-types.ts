@@ -131,9 +131,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     pie: Pie;
+    seo: Seo;
   };
   globalsSelect: {
     pie: PieSelect<false> | PieSelect<true>;
+    seo: SeoSelect<false> | SeoSelect<true>;
   };
   locale: null;
   widgets: {
@@ -273,7 +275,7 @@ export interface EquiposNuevo {
       }[]
     | null;
   /**
-   * Fichas técnicas o folletos del fabricante en PDF.
+   * Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). Los PDF no se admiten todavía. Hoy no se muestran en el sitio.
    */
   documentos?: (number | Media)[] | null;
   seo?: {
@@ -1803,6 +1805,28 @@ export interface Pie {
   createdAt?: string | null;
 }
 /**
+ * Datos de la empresa que usan los buscadores y el sitio. Hoy: el horario de atención.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seo".
+ */
+export interface Seo {
+  id: number;
+  /**
+   * Un tramo por grupo de días con el mismo horario. Ejemplo: lunes a viernes de 08:00 a 17:30.
+   */
+  horario?:
+    | {
+        dias: ('Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday')[];
+        abre: string;
+        cierra: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pie_select".
  */
@@ -1824,6 +1848,23 @@ export interface PieSelect<T extends boolean = true> {
               destino?: T;
               id?: T;
             };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seo_select".
+ */
+export interface SeoSelect<T extends boolean = true> {
+  horario?:
+    | T
+    | {
+        dias?: T;
+        abre?: T;
+        cierra?: T;
         id?: T;
       };
   updatedAt?: T;

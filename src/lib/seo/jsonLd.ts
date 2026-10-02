@@ -1,3 +1,4 @@
+import { horarioJsonLd, type Tramo } from "./horario";
 import { absoluteUrl, getSiteUrl, seoConfig } from "./config";
 
 /** Objeto JSON-LD serializable. */
@@ -75,7 +76,7 @@ export function buildBreadcrumbJsonLd(items: BreadcrumbItem[]): JsonLdObject {
  * JSON-LD `Organization`. Todos los datos de negocio salen de `seoConfig`,
  * no hay valores quemados aquí.
  */
-export function buildOrganizationJsonLd(): JsonLdObject {
+export function buildOrganizationJsonLd(horario: Tramo[] = []): JsonLdObject {
   const { contact } = seoConfig;
 
   const address: JsonLdObject = {
@@ -102,6 +103,25 @@ export function buildOrganizationJsonLd(): JsonLdObject {
 
   if (contact.email) jsonLd.email = contact.email;
   if (contact.phone) jsonLd.telephone = contact.phone;
+
+  /*
+   * Horario de atención (global `seo`). `Organization` no admite
+   * `openingHoursSpecification` en schema.org (es propiedad de `Place` y
+   * `LocalBusiness`): va en un `ContactPoint`, cuyo `hoursAvailable` sí espera
+   * `OpeningHoursSpecification`. Sin tramos válidos, no se emite.
+   */
+  if (horario.length > 0) {
+    const punto: JsonLdObject = {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      hoursAvailable: horarioJsonLd(horario),
+      areaServed: seoConfig.country,
+      availableLanguage: "es",
+    };
+    if (contact.phone) punto.telephone = contact.phone;
+    if (contact.email) punto.email = contact.email;
+    jsonLd.contactPoint = punto;
+  }
   if (seoConfig.sameAs.length > 0) jsonLd.sameAs = [...seoConfig.sameAs];
 
   return jsonLd;

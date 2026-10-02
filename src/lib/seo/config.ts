@@ -42,8 +42,7 @@ export const seoConfig = {
     phone: "+57 317 670 7071",
     streetAddress: "Carrera 68D # 17A-84",
     addressLocality: "Bogotá D.C.",
-    /** Horario tal como lo publica el sitio. */
-    openingHours: "Lunes a viernes de 8:00 a. m. a 5:30 p. m. y sábados de 9:00 a. m. a 12:00 m.",
+    // El HORARIO ya no está aquí: es editable en el global `seo` (fase 6).
   },
   /**
    * Portales externos enlazados desde el pie del sitio actual (zona de clientes

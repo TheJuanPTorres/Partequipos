@@ -1918,3 +1918,36 @@ Se siembran con `npm run preview:fase-h:sembrar` y se quitan con `retirar`. El s
 **No se llega a 2,44 s.** El ruido entre tandas (el mismo `main`, de 2,72 a 2,96 s) es del orden de la mejora, y el resto del LCP lo ocupa el JS del marco.
 
 Se aplican (a), (b) y el arreglo del título, y **se cierra el tema** (CLAUDE.md §10.36).
+
+## 22. Fin del bloque previo al diseño y correo en el pie (fase 6, 2026-10-01)
+
+**Qué se quitó:** el bloque de la home anterior a ux-9, antes del pie: el
+`<h2>` con el título de la portada y su entradilla, «Qué encontrarás aquí»,
+«Sobre Partequipos» (el campo `contenido`), las secciones con ancla y
+«Contacto». ux-9 no lo tiene.
+
+**Enlaces:** de sus 7 enlaces, 6 ya estaban en la cabecera, las secciones o
+el pie (`/repuestos-…/`, `/servicio-tecnico/`, `/nosotros/`, `/contactanos/`,
+teléfono y WhatsApp). El séptimo, el correo, pasa al pie.
+
+**Horario: RESUELTO (decisión de dirección, fase 6).** Se creía que quedaba
+en el JSON-LD `Organization` y no estaba: `seoConfig.contact.openingHours` era
+texto libre en el código y solo lo pintaba el bloque previo. Ahora:
+
+- vive en el **global `seo`** de Payload («SEO y datos de la empresa»),
+  editable desde el panel, por tramos (días, abre, cierra en HH:MM). Su
+  migración (`20261002_010203_seo_horario`) siembra el valor de antes: lunes a
+  viernes de 08:00 a 17:30 y sábado de 09:00 a 12:00;
+- va en el JSON-LD `Organization` como `contactPoint.hoursAvailable`, una
+  `OpeningHoursSpecification` por tramo. `Organization` no admite
+  `openingHoursSpecification` directamente (es de `Place`/`LocalBusiness`);
+- se pinta en `/contactanos/`, sobre el formulario.
+
+**Estructura:** ese bloque era el único `<main>` de la home. Ahora las
+secciones de ux-9 van dentro de **un** `<main>`, con el JSON-LD; el `<h1>`
+sigue siendo el logo de la cabecera (D1).
+
+**DESVIACIÓN MENOR, PENDIENTE DE ANDRÉS: el correo en el pie.** La franja
+legal del pie muestra dirección, teléfono **y correo** (`mailto:` de
+`seoConfig`). ux-9 no pone el correo en el pie. Sale de `seoConfig`, como el
+teléfono, así que no puede contradecir al JSON-LD; sin cambio de esquema.

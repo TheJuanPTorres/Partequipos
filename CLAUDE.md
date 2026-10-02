@@ -440,11 +440,11 @@ veredicto, que va en el informe.
 >
 > **Pendientes, por prioridad:**
 >
-> 1. **Dirección:**
->    - decidir qué se hace con el bloque anterior al diseño de la home («Qué encontrarás aquí», «Sobre Partequipos» y contacto), que ux-9 no tiene.
-> 2. **Fase G (sedes):** espera a la cuenta de Mapbox del cliente (L5).
-> 3. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview.
-> 4. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
+> 1. **Fase G (sedes):** espera a la cuenta de Mapbox del cliente (L5).
+> 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview.
+> 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
+>
+> **Bloque anterior al diseño: QUITADO (fase 6).** La home tiene un solo `<main>` con las secciones de ux-9; el correo pasa al pie (desviación menor, pendiente de Andrés). El horario pasa al global `seo` de Payload (editable, con su migración): va en el JSON-LD `Organization` (`contactPoint.hoursAvailable`) y en `/contactanos/`. Detalle en `decisiones-home-ux9.md` §22.
 >
 > **Decisiones de dirección (2026-10-01, fase 6):**
 >

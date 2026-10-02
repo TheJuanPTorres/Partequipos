@@ -1,21 +1,6 @@
 import { rutas } from "./routes";
 
 /**
- * Navegación principal del sitio.
- *
- * Las rutas salen de `lib/routes` (catálogo) o son slugs de páginas
- * institucionales copiados del rastreo — nunca escritas a mano dos veces.
- * Solo se enlaza lo que existe: maquinaria y blog no están construidos y por
- * eso no aparecen todavía.
- */
-export const navegacionPrincipal = [
-  { etiqueta: "Repuestos", href: `${rutas.repuestos()}/` },
-  { etiqueta: "Servicio técnico", href: "/servicio-tecnico/" },
-  { etiqueta: "Nosotros", href: "/nosotros/" },
-  { etiqueta: "Contacto", href: "/contactanos/" },
-] as const;
-
-/**
  * Menú de la CABECERA de ux-9 (plantilla 2162): los cuatro de Andrés, con
  * nuestras rutas. «Contáctanos» va aparte, como botón.
  */

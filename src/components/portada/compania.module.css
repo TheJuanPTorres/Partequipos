@@ -103,7 +103,12 @@
   color: var(--color-fondo);
 }
 
-/* `1a1256e3`: círculo de 80 px, fondo `primary`, icono blanco. */
+/*
+ * `1a1256e3`, widget «Blox Play Button» (css.tpl, leído): círculo de 80 px,
+ * fondo `primary` e icono blanco de 20 px (el export solo cambia esos dos
+ * colores). Al pasar, lo que el export deja por defecto: crece a 1,1 en
+ * 0,5 s y el fondo pasa a #ededed con el icono negro en 0,3 s.
+ */
 .reproducir {
   display: grid;
   width: 80px;
@@ -114,16 +119,21 @@
   background: var(--color-marca);
   color: var(--color-fondo);
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition:
+    transform 0.5s,
+    background-color 0.3s,
+    color 0.3s;
 }
 
 .reproducir svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 .reproducir:hover {
-  background: var(--color-texto);
+  background: #ededed;
+  color: #000;
+  transform: scale(1.1);
 }
 
 .reproducir:focus-visible {
@@ -202,6 +212,14 @@
 @media (prefers-reduced-motion: reduce) {
   .pista {
     animation: none;
+  }
+
+  .reproducir {
+    transition: none;
+  }
+
+  .reproducir:hover {
+    transform: none;
   }
 }
 

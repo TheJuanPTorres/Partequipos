@@ -89,6 +89,8 @@
   padding-top: calc(var(--s5-escalon) * (var(--apilada-i) + 1));
   transform: scale(var(--apilada-escala, 1));
   transform-origin: top center;
+  /* El widget añade `grayscale` por defecto (`greyscale_end` 30 %). */
+  filter: grayscale(var(--apilada-gris, 0%));
 }
 
 .tarjeta {

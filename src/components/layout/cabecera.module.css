@@ -195,6 +195,10 @@
   line-height: 1;
   color: var(--cab-texto);
   text-decoration: none;
+  /* Widget «Mega Menu» (css.tpl, leído): color y fondo en 0,3 s `ease`. */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 .enlace:hover,

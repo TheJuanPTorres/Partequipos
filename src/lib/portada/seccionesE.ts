@@ -42,7 +42,18 @@ export type TarjetaRepuesto = {
  * texto, sin hueco, que es como se ve en producción mientras las fotos de ux-9
  * (L3) sigan sin licencia.
  */
-export function tarjetasDeRepuestos(categorias: CategoriasTecnica[]): TarjetaRepuesto[] {
+/*
+ * TÍTULO EN PORTADA (2026-10-02): la tarjeta usa el título propio de la
+ * portada si la categoría lo tiene y, si no, el nombre real. Así ux-9 puede
+ * decir «Blades y corte» sin renombrar la categoría del catálogo.
+ *
+ * PROVISIONAL hasta la migración del campo `tituloPortada` (espera a que se
+ * libere la ventana de migraciones): el tipo se amplía aquí a mano. Con el
+ * campo en Payload, `payload-types.ts` ya lo trae y esta ampliación se quita.
+ */
+type CategoriaConTitulo = CategoriasTecnica & { tituloPortada?: string | null };
+
+export function tarjetasDeRepuestos(categorias: CategoriaConTitulo[]): TarjetaRepuesto[] {
   return categorias
     .filter((c) => typeof c.ordenPortada === "number" && c.nombre?.trim())
     .sort(
@@ -53,7 +64,7 @@ export function tarjetasDeRepuestos(categorias: CategoriasTecnica[]): TarjetaRep
       const imagen = imagenDeMedia(c.imagen, "");
       return {
         id: c.id,
-        titulo: c.nombre.trim(),
+        titulo: c.tituloPortada?.trim() || c.nombre.trim(),
         texto: c.descripcion?.trim() || null,
         imagen: imagen ? { ...imagen, alt: "" } : null,
         icono: c.icono ?? null,

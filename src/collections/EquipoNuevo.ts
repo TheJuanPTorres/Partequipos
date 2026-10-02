@@ -132,8 +132,10 @@ export const EquipoNuevo: CollectionConfig = {
       ],
     },
     /*
-     * Documentación descargable (fichas del fabricante en PDF). Es material que
-     * el comercial suele enviar y que aquí puede estar desde el primer clic.
+     * Documentación descargable. `Media` solo admite JPEG, PNG y WebP
+     * (CLAUDE.md §10.28), así que hoy aquí van IMÁGENES, no PDF, y el sitio no
+     * las pinta. Decisión de dirección (fase 6): cuando las fichas se muestren,
+     * colección aparte para documentos; los PDF no entran en `Media`.
      */
     {
       name: "documentos",
@@ -141,7 +143,10 @@ export const EquipoNuevo: CollectionConfig = {
       relationTo: "media",
       hasMany: true,
       label: "Documentos",
-      admin: { description: "Fichas técnicas o folletos del fabricante en PDF." },
+      admin: {
+        description:
+          "Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). Los PDF no se admiten todavía. Hoy no se muestran en el sitio.",
+      },
     },
     seoField(),
   ],

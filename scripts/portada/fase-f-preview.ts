@@ -23,6 +23,8 @@ import path from "node:path";
 
 import { getPayload } from "payload";
 
+import { exigirAlmacen } from "../blob/exigirAlmacen";
+
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 
 const modo = process.argv.slice(2).find((a) => a === "sembrar" || a === "retirar");
@@ -39,6 +41,7 @@ if (!veredicto.permitido) {
   console.error(`[fase-f] NO se hace nada: ${veredicto.motivo}`);
   process.exit(1);
 }
+exigirAlmacen("[fase-f]");
 
 // Un script de datos no toca el esquema (CLAUDE.md §10.9, §10.34).
 process.env.PAYLOAD_DISABLE_PUSH = "true";

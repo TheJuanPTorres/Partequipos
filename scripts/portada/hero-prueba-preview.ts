@@ -15,7 +15,8 @@
  *   … npm run preview:hero-prueba -- sembrar produccion
  *
  * - SOLO preview: se niega ANTES de conectar si la base o el Blob no son los del
- *   preview. `payload run` carga `.env.local`, cuyo Blob es el de PRODUCCIÓN.
+ *   preview. Además, la guarda del almacén (§10.37) imprime su id y aborta si
+ *   no es el esperado; el modo de producción lo declara explícitamente.
  * - Idempotente: lo que ya existe no se duplica.
  * - Punto focal en el centro (50/50), como en el diseño.
  * - NO PISA DATOS: a una marca solo se le pone foto o logo de prueba si no
@@ -36,6 +37,9 @@ import os from "node:os";
 import path from "node:path";
 
 import { getPayload } from "payload";
+
+import { ALMACEN_PRODUCCION } from "../../src/lib/blob/almacen";
+import { exigirAlmacen } from "../blob/exigirAlmacen";
 
 import {
   DIAPOSITIVA_PRUEBA,
@@ -70,6 +74,10 @@ if (!veredicto.permitido) {
   console.error(`[hero-prueba] NO se hace nada: ${veredicto.motivo}`);
   process.exit(1);
 }
+// El almacén esperado fuera de Vercel es el del preview; el modo de producción
+// lo DECLARA, ya validado arriba con base y almacén (§10.37).
+if (produccion) process.env.ALMACEN_BLOB_ESPERADO = ALMACEN_PRODUCCION;
+exigirAlmacen("[hero-prueba]");
 
 // Un script de datos no toca el esquema (CLAUDE.md §10.9).
 process.env.PAYLOAD_DISABLE_PUSH = "true";

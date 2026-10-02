@@ -390,6 +390,19 @@ agente principal afirma. **Regla de hitos:** ningún informe de hito (CI,
 preview, prueba de humo, despliegue, lo pintado, la base) se da sin su
 veredicto, que va en el informe.
 
+**Rutina de fusión (desde la fase 6, 2026-10-01):**
+
+1. Antes de fusionar: CI, prueba de humo del preview y verificador en verde.
+   **El preview tiene que ser del último commit del PR**: si ese commit no
+   tiene estado «Vercel», no hay preview ni humo de él (§10.30).
+2. Fusionar (squash) y sincronizar `main`.
+3. **Comprobar que el commit de `main` tiene estado «Vercel»**
+   (`gh api repos/<repo>/commits/<sha>/statuses`, contexto `Vercel`).
+4. **Si a los 5 minutos no lo tiene:** un commit vacío encima
+   (`git commit --allow-empty`) y push. Volver al punto 3 con el nuevo sha.
+   Anotarlo en el informe: es el fallo silencioso de §10.30.
+5. Con el estado en verde, la prueba de humo de ese despliegue también.
+
 ---
 
 ## 10. Estado actual
@@ -873,6 +886,44 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     sin hueco cuando falta la imagen.
     Comprobar también el pie entre 1025 y 1279 px SIN imagen decorativa: la
     reserva de 170 px de §10.33 p.11 no debe dejar hueco.
+
+### 10.37 INCIDENTE 2026-10-01 — una subida de prueba fue al Blob de PRODUCCIÓN
+
+> **Qué pasó.** En la fase 6, para comprobar que `development` ya escribía en
+> el almacén del preview, se subió un PNG de prueba (8 × 8 px) a `Media`
+> desde `development` y se miró **después** a qué almacén había ido. Fue al de
+> **producción**: el token nuevo no había llegado a `.env.local` (se había
+> guardado por error en el fichero de ejemplo, que está versionado; no llegó
+> a commitearse). Se borró en el acto: 404 a los 70 s y ningún registro. La
+> base de producción no se tocó.
+>
+> **Causa:** **se comprobó el almacén ESCRIBIENDO.** El script de prueba no
+> pasaba por ningún guarda (`puedeTocarHeroDePrueba` solo protege los scripts
+> de siembra), y la colección `Media` no tenía ninguno.
+>
+> **Corrección — la guarda del almacén** (`src/lib/blob/almacen.ts`):
+>
+> - Identifica el almacén **sin escribir**, por el id que lleva el propio token
+>   (`vercel_blob_rw_<id>_…`). Imprime solo ese id, nunca el token:
+>   `npm run blob:almacen`, que carga las variables como `payload run`.
+> - **Almacén esperado:** en Vercel `production`, el de producción; en
+>   cualquier otro sitio (previews, `development`, scripts), el del preview.
+>   Una operación de producción fuera de Vercel lo **declara** con
+>   `ALMACEN_BLOB_ESPERADO`; nunca se deduce.
+> - **Gancho `almacenEsperado`**, el primero de `beforeOperation` en `media` y
+>   `videos`: aborta crear, actualizar y borrar si el almacén no es el
+>   esperado. Cubre el panel, la API y la API local de cualquier script.
+> - **Los scripts que suben** (`scripts/portada/*`) llaman además a
+>   `exigirAlmacen` antes de cargar Payload: imprimen el id y salen con 1 si
+>   no coincide. El modo `produccion` de `hero-prueba` declara el almacén de
+>   producción tras su propio guardián de base y almacén.
+>
+> **LA REGLA: el almacén se comprueba SIEMPRE antes y SIN ESCRIBIR**
+> (`npm run blob:almacen`). Nunca subiendo algo y mirando adónde fue.
+>
+> **Comprobado el 2026-10-01** con la guarda, tras el cambio de dirección:
+> `development` (`.env.local`, con `tsx` y con `payload run`) →
+> `lsndnc29nh4ws7eh`, el del preview.
 
 ### 10.36 EXCEPCIÓN DE DEMO — el carrusel del hero en producción con LCP 4,00 s (2026-09-30)
 
@@ -2284,6 +2335,28 @@ registro el binario también desapareció (404).
 **El revert de alias quedó preparado antes de promocionar** (§10.18) y no hizo
 falta usarlo.
 
+#### DECISIÓN 2026-10-01 (fase 6): los PDF NO entran en `Media`
+
+**El inventario de la fase 6** repasó todo lo que relaciona con `Media`: 22
+relaciones en 15 colecciones y el global del pie. Todas son imágenes salvo
+`EquipoNuevo.documentos`, que se describía como «fichas técnicas en PDF». Con
+la restricción de formatos, ese campo **no podía recibir ningún PDF**, y el
+sitio tampoco lo pinta. Registros fuera de JPEG/PNG/WebP: **0** (preview y
+producción).
+
+**Por qué no se añade `application/pdf` a `Media`:** un PDF se podría elegir
+en cualquiera de los campos de imagen —hero, marcas, equipos…— y `next/image`
+fallaría al pintarlo. Habría que filtrar el tipo en cada campo.
+
+**Decisión de dirección:**
+
+- **Hoy:** la descripción de `documentos` ya no promete PDF (imágenes JPEG,
+  PNG o WebP, y no se muestran en el sitio).
+- **Cuando las fichas se muestren en el sitio:** colección aparte para
+  documentos, solo PDF, con su migración. Es cambio de esquema, así que va en
+  su fase autorizada y con los dos guardarraíles de §10.33 p.5.
+- **`Media` sigue sin PDF ni SVG.**
+
 #### Decisión: NO se probó una subida en producción
 
 El camino de rechazo y aceptación de formatos se verificó **en preview, con el
@@ -2404,6 +2477,11 @@ instalada, no en estas notas.
 > de dar por verificado un commit, comprobar que tiene estado «Vercel». **Cómo
 > salir:** un commit nuevo encima, como en los dos casos. Si un día molesta,
 > se puede preguntar a soporte de Vercel con los dos sha y las horas de arriba.
+>
+> **PROCEDIMIENTO (decisión de dirección, fase 6):** después de **cada
+> fusión**, comprobar que el commit tiene estado «Vercel»; si a los 5 minutos
+> no lo tiene, un commit vacío encima. Es la rutina de fusión de §9, y se
+> aplica desde las fusiones de la fase 6.
 
 ### 10.31 COMPROMISO INCUMPLIDO — Sentry está en la cotización y no está en el repo
 
@@ -2970,24 +3048,25 @@ fichero, cero dependencias, cero imports, solo marcado.
 > olvidar, el sitio correcto para el guardarraíl es esta tabla**, no un párrafo
 > de documentación que nadie relee.
 
-| Guardarraíl                              | Qué olvido atrapa                                                                                                                                              | Dónde                                                                              | Cuándo corre                   |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------ |
-| Cobertura del sitemap                    | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe                                                                   | `src/lib/seo/sitemap.test.ts`                                                      | CI, en cada push               |
-| Grupos del menú del panel                | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada                                                        | `src/collections/grupos.test.ts`                                                   | CI, en cada push               |
-| Unicidad de slug entre colecciones       | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)                                                                | hook `slugUnicoEntreColecciones` + su prueba                                       | CI y escritura                 |
-| Destino de un redirect                   | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                                                                         | `src/lib/redirects/destino.ts` + `npm run redirects:check`                         | CI y a mano                    |
-| Marcador `dev` en `payload_migrations`   | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                                                                               | `npm run db:check`, antes de `payload migrate`                                     | En cada build                  |
-| Versión exacta de Next y Payload         | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel                                                                    | `src/lib/deps/versiones-fijas.test.ts`                                             | CI, en cada push               |
-| Vaciado de `solicitudes` solo en preview | Ejecutar el vaciado con la variable apuntando a producción y borrar leads reales                                                                               | `src/lib/db/vaciadoSolicitudes.ts` + su prueba                                     | Al vaciar (§10.21)             |
-| Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                                                                        | `npm run qa:acceso-portada`                                                        | **A mano**, contra development |
-| Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB                                                                     | `formatoDeVideoPermitido` + su prueba                                              | CI y subida                    |
-| Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)                                                         | `sinDescargaRemota` + su prueba                                                    | CI y subida                    |
-| Recorte cerrado en el servidor           | Un recorte pedido por la API (`uploadEdits[crop]`), que Payload aplica aunque `crop: false` (§10.32)                                                           | `sinRecorte` + su prueba                                                           | CI y subida                    |
-| Hero de prueba solo en el preview        | Subir las fotos de ux-9 (licencia pendiente) a la base o al Blob de producción — el Blob de `.env.local` es el de producción                                   | `puedeTocarHeroDePrueba` + su prueba                                               | Al sembrar o retirar           |
-| Deriva de esquema                        | Una colección que cambia el esquema sin su migración (lo de `videos.focal_x` en la fase C, §10.33 p.5). Reproduce `migrate:create` sin conectar a ninguna base | `npm run db:deriva` (`scripts/db/deriva-esquema.ts`) + `derivaEsquema.test.ts`     | CI, en cada push y PR          |
-| Migrar desde cero                        | Una migración que solo funciona sobre la base donde se escribió (§10.33 p.13): aplica todas a un Postgres 17 vacío y compara la estructura con el snapshot     | Job «Migrar desde cero» de `ci.yml` + `scripts/db/estructura-ci.ts`                | CI, en cada push y PR          |
-| Scripts sin push de esquema              | Un script que alcanza la config por un import estático antes de fijar `PAYLOAD_DISABLE_PUSH`: marcador `dev` en la base (§10.34)                               | `src/lib/db/scriptsSinPush.test.ts`                                                | CI, en cada push               |
-| Imagen del pie sin tapar contenido       | La imagen decorativa del pie (sobresale por encima) tapando texto de una plantilla. Mide con los píxeles opacos del recorte, no con su caja (§10.33 p.11)      | `npm run qa:vuelo-pie` (`scripts/qa/vuelo-pie.mjs`, con `npx`: necesita navegador) | **A mano**, contra producción  |
+| Guardarraíl                              | Qué olvido atrapa                                                                                                                                                         | Dónde                                                                                           | Cuándo corre                          |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------- |
+| Cobertura del sitemap                    | Una ruta pública nueva que no se emite en el sitemap, y un patrón declarado que ya no existe                                                                              | `src/lib/seo/sitemap.test.ts`                                                                   | CI, en cada push                      |
+| Grupos del menú del panel                | Una colección sin `admin.group`: Payload la mete en «Colecciones», el grupo por defecto, sin decir nada                                                                   | `src/collections/grupos.test.ts`                                                                | CI, en cada push                      |
+| Unicidad de slug entre colecciones       | Un artículo y una página institucional con el mismo slug, que se taparían en la raíz (ADR 0008)                                                                           | hook `slugUnicoEntreColecciones` + su prueba                                                    | CI y escritura                        |
+| Destino de un redirect                   | Un 301 hacia una URL que no corresponde a ninguna ruta construida: un 301 hacia un 404                                                                                    | `src/lib/redirects/destino.ts` + `npm run redirects:check`                                      | CI y a mano                           |
+| Marcador `dev` en `payload_migrations`   | Un push de esquema de desarrollo que dejaría el build «Ready» sin migrar (§10.9)                                                                                          | `npm run db:check`, antes de `payload migrate`                                                  | En cada build                         |
+| Versión exacta de Next y Payload         | Un rango (`^3.86.0`) que deriva en silencio a una versión que nadie verificó con este panel                                                                               | `src/lib/deps/versiones-fijas.test.ts`                                                          | CI, en cada push                      |
+| Vaciado de `solicitudes` solo en preview | Ejecutar el vaciado con la variable apuntando a producción y borrar leads reales                                                                                          | `src/lib/db/vaciadoSolicitudes.ts` + su prueba                                                  | Al vaciar (§10.21)                    |
+| Acceso de la portada, por efecto         | Un testimonio publicado sin autorización, o visible para el público sin estar publicado                                                                                   | `npm run qa:acceso-portada`                                                                     | **A mano**, contra development        |
+| Vídeo por contenido y tamaño             | Un AVIF disfrazado de MP4 (mismo arranque `ftyp`), o un vídeo que Vercel cortaría a 4,5 MB                                                                                | `formatoDeVideoPermitido` + su prueba                                                           | CI y subida                           |
+| Descarga remota desde el servidor        | Un `create`/`update` sin fichero y con `data.url` externa, que el lambda descargaría sin tope (§10.32)                                                                    | `sinDescargaRemota` + su prueba                                                                 | CI y subida                           |
+| Recorte cerrado en el servidor           | Un recorte pedido por la API (`uploadEdits[crop]`), que Payload aplica aunque `crop: false` (§10.32)                                                                      | `sinRecorte` + su prueba                                                                        | CI y subida                           |
+| Hero de prueba solo en el preview        | Subir las fotos de ux-9 (licencia pendiente) a la base o al Blob de producción — el Blob de `.env.local` es el de producción                                              | `puedeTocarHeroDePrueba` + su prueba                                                            | Al sembrar o retirar                  |
+| Deriva de esquema                        | Una colección que cambia el esquema sin su migración (lo de `videos.focal_x` en la fase C, §10.33 p.5). Reproduce `migrate:create` sin conectar a ninguna base            | `npm run db:deriva` (`scripts/db/deriva-esquema.ts`) + `derivaEsquema.test.ts`                  | CI, en cada push y PR                 |
+| Migrar desde cero                        | Una migración que solo funciona sobre la base donde se escribió (§10.33 p.13): aplica todas a un Postgres 17 vacío y compara la estructura con el snapshot                | Job «Migrar desde cero» de `ci.yml` + `scripts/db/estructura-ci.ts`                             | CI, en cada push y PR                 |
+| Scripts sin push de esquema              | Un script que alcanza la config por un import estático antes de fijar `PAYLOAD_DISABLE_PUSH`: marcador `dev` en la base (§10.34)                                          | `src/lib/db/scriptsSinPush.test.ts`                                                             | CI, en cada push                      |
+| Almacén de Blob del entorno              | Escribir, sobrescribir o borrar ficheros en el almacén de otro entorno: development o un script contra el Blob de producción, o producción contra el del preview (§10.37) | `almacenEsperado` (media y videos) + `exigirAlmacen` (scripts) + `src/lib/blob/almacen.test.ts` | Cada escritura y cada script que sube |
+| Imagen del pie sin tapar contenido       | La imagen decorativa del pie (sobresale por encima) tapando texto de una plantilla. Mide con los píxeles opacos del recorte, no con su caja (§10.33 p.11)                 | `npm run qa:vuelo-pie` (`scripts/qa/vuelo-pie.mjs`, con `npx`: necesita navegador)              | **A mano**, contra producción         |
 
 **«Deriva de esquema» se colgó dos veces; está blindada (fase 5).**
 

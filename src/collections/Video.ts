@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { formatoDeVideoPermitido } from "./hooks/formatoDeVideoPermitido";
+import { almacenEsperado } from "./hooks/almacenEsperado";
 import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
 import { sinRecorte } from "./hooks/sinRecorte";
 import { revalidarPortada } from "./hooks/portadaHooks";
@@ -54,7 +55,7 @@ export const Video: CollectionConfig = {
   },
   hooks: {
     // Sin el cierre, un vídeo traído por url se saltaría el tope de 4 MB (§10.32).
-    beforeOperation: [sinDescargaRemota, sinRecorte, formatoDeVideoPermitido],
+    beforeOperation: [almacenEsperado, sinDescargaRemota, sinRecorte, formatoDeVideoPermitido],
     afterChange: [portada.afterChange],
     afterDelete: [portada.afterDelete],
   },

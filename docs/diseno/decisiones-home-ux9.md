@@ -1926,10 +1926,14 @@ Se aplican (a), (b) y el arreglo del título, y **se cierra el tema** (CLAUDE.md
 «Sobre Partequipos» (el campo `contenido`), las secciones con ancla y
 «Contacto». ux-9 no lo tiene.
 
-**Por qué no se pierde nada:** de sus 7 enlaces, 6 ya estaban en la cabecera,
-las secciones o el pie (`/repuestos-…/`, `/servicio-tecnico/`, `/nosotros/`,
-`/contactanos/`, teléfono y WhatsApp). El séptimo, el correo, pasa al pie. El
-horario se queda solo en el JSON-LD `Organization`, que no cambia.
+**Enlaces:** de sus 7 enlaces, 6 ya estaban en la cabecera, las secciones o
+el pie (`/repuestos-…/`, `/servicio-tecnico/`, `/nosotros/`, `/contactanos/`,
+teléfono y WhatsApp). El séptimo, el correo, pasa al pie.
+
+**Horario: PENDIENTE DE DECISIÓN.** Se creía que quedaba en el JSON-LD
+`Organization`, y **no está**: `buildOrganizationJsonLd` no emite
+`seoConfig.contact.openingHours`, y el bloque previo era el único sitio que lo
+pintaba. Sin decisión, el horario sale del sitio.
 
 **Estructura:** ese bloque era el único `<main>` de la home. Ahora las
 secciones de ux-9 van dentro de **un** `<main>`, con el JSON-LD; el `<h1>`

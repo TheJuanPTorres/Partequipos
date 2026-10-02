@@ -310,6 +310,11 @@
   font-style: normal;
 }
 
+/* Teléfono y correo no se parten: a 390 el teléfono se cortaba en dos líneas. */
+.legal address a {
+  white-space: nowrap;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .red {
     transition: none;

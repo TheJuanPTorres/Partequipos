@@ -78,8 +78,8 @@ export default async function HomePage() {
     /*
      * Un solo <main> con las secciones de ux-9 (fase 6). El bloque previo al
      * diseño («Qué encontrarás aquí», «Sobre Partequipos» y contacto) se quitó:
-     * sus enlaces están en la cabecera, las secciones y el pie, y el horario
-     * queda en el JSON-LD `Organization`.
+     * sus enlaces están en la cabecera, las secciones y el pie
+     * (docs/diseno/decisiones-home-ux9.md §22).
      */
     <main>
       <JsonLd data={buildOrganizationJsonLd()} />

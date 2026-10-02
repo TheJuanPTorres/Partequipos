@@ -424,7 +424,7 @@ veredicto, que va en el informe.
 > 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview.
 > 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
 >
-> **Bloque anterior al diseño: QUITADO (fase 6).** La home tiene un solo `<main>` con las secciones de ux-9; el correo pasa al pie (desviación menor, pendiente de Andrés) y el horario queda en el JSON-LD. Detalle en `decisiones-home-ux9.md` §22.
+> **Bloque anterior al diseño: QUITADO (fase 6).** La home tiene un solo `<main>` con las secciones de ux-9; el correo pasa al pie (desviación menor, pendiente de Andrés). **El horario no está en el JSON-LD**: queda pendiente de decisión. Detalle en `decisiones-home-ux9.md` §22.
 >
 > **Decisiones de dirección (2026-10-01, fase 6):**
 >

@@ -15,6 +15,8 @@ import { es } from "@payloadcms/translations/languages/es";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
+import { pushPermitido } from "./lib/db/pushEsquema";
+
 import { Articulo } from "./collections/Articulo";
 import { Cabecera } from "./globals/Cabecera";
 import { Pie } from "./globals/Pie";
@@ -193,28 +195,12 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URI || "",
     },
     /*
-     * El push automático de esquema SOLO en desarrollo local.
-     *
-     * En producción el esquema se aplica con migraciones versionadas
-     * (`npm run migrate`), no con push: el push compara y altera el esquema en
-     * caliente, sin control de versiones ni posibilidad de revertir. Ver README
-     * y el riesgo registrado en CLAUDE.md §10.2.
+     * PUSH DE ESQUEMA: APAGADO salvo que se pida con `PAYLOAD_PERMITIR_PUSH=true`
+     * (desde el 2026-10-02). `npm run dev` va SIEMPRE sin push: el esquema se
+     * cambia con migraciones en todos los entornos. La decisión y su historia
+     * (§10.9, §10.34), en `src/lib/db/pushEsquema.ts`, con pruebas.
      */
-    /*
-     * Se desactiva de dos formas, y basta con una:
-     *
-     * 1. `NODE_ENV === "production"` — el caso del servidor desplegado.
-     * 2. `PAYLOAD_DISABLE_PUSH === "true"` — lo ponen los scripts de datos
-     *    (`import`, `seed:paginas`) antes de cargar esta config.
-     *
-     * El punto 2 existe porque el punto 1 no basta: `payload run` NO fija
-     * `NODE_ENV`, así que un script lanzado desde una máquina de desarrollo
-     * contra la base de PRODUCCIÓN activaba el push, alteraba el esquema y
-     * dejaba el marcador `dev` (batch -1) en `payload_migrations` — lo que
-     * después cuelga el build en el prompt de `payload migrate`.
-     * Un script de datos nunca debe tocar el esquema. Ver CLAUDE.md §10.9.
-     */
-    push: process.env.NODE_ENV !== "production" && process.env.PAYLOAD_DISABLE_PUSH !== "true",
+    push: pushPermitido(process.env),
     migrationDir: path.resolve(dirname, "migrations"),
   }),
   sharp,

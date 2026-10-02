@@ -1424,6 +1424,16 @@ corra donde corra:
 Se descartó `NODE_ENV=production`: cambia mucho más que el push, sigue siendo
 ambiental —o sea, olvidable— y en Windows no funciona en los scripts de npm.
 
+> **ACTUALIZADO 2026-10-02 — el push es OPT-IN en todas partes, `npm run dev`
+> incluido.** El agente B estuvo a punto de recibir una pregunta interactiva de
+> push de drizzle-kit al levantar `npm run dev` contra `development`. Ahora
+> `push` solo se activa con `PAYLOAD_PERMITIR_PUSH=true` (y nunca con
+> `NODE_ENV=production` ni `PAYLOAD_DISABLE_PUSH=true`): decisión en
+> `src/lib/db/pushEsquema.ts`, con pruebas. Comprobado levantando
+> `npm run dev` contra `development`: `/admin/` y la API en 200, sin push ni
+> pregunta. **`development` también se pone al día con `payload migrate`,
+> nunca con push**, con `db:check` antes y después.
+
 **Arreglo del síntoma (que el build falle ruidoso).** `npm run db:check`
 (`scripts/db/check-migrations.ts`) lee `payload_migrations` y corta con código 1
 y mensaje accionable si encuentra el marcador. Va **antes** de migrar:

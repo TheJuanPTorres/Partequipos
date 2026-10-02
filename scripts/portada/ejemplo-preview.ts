@@ -27,6 +27,7 @@ import path from "node:path";
 import { getPayload } from "payload";
 
 import { exigirAlmacen } from "../blob/exigirAlmacen";
+import { MARCA_EJEMPLO } from "../../src/lib/demo/copiaDemo";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 
 const modo = process.argv.slice(2).find((a) => a === "sembrar" || a === "retirar");
@@ -52,8 +53,8 @@ const payload = await getPayload({ config });
 const log = (m: string) => process.stdout.write(`[ejemplo] ${m}\n`);
 const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const ASSETS = path.join(os.homedir(), "Desktop", "partequipos-diseno", "assets", "09");
-/** Marca en el `alt` de todo lo que siembra este script. */
-const MARCA = "EJEMPLO UX-9 —";
+/** Marca en el `alt` de todo lo que siembra este script (la que reconoce la copia). */
+const MARCA = MARCA_EJEMPLO;
 
 const marcadas = async () =>
   (

@@ -6,14 +6,17 @@
  *
  * LAS FOTOS SON DE ANDRÉS Y SU LICENCIA ESTÁ PENDIENTE (L3): solo van al
  * preview. El guardián de abajo exige a la vez la base Y el almacén de Blob del
- * preview, porque `payload run` carga `.env.local`, cuyo token de Blob es el de
- * PRODUCCIÓN (§10.4): con solo la base comprobada, las fotos acabarían en el
- * almacén público de producción.
+ * preview: con solo la base comprobada, un token de otro almacén las mandaría
+ * allí. Hasta el 2026-10-01 `.env.local` llevaba el Blob de PRODUCCIÓN (§10.4);
+ * desde entonces lleva el del preview, y el almacén lo vigila además la guarda
+ * de §10.37 (`src/lib/blob/almacen.ts`).
  */
+import { ALMACEN_PREVIEW, ALMACEN_PRODUCCION, almacenDeToken } from "../blob/almacen";
 import { HOST_PREVIEW, hostDeConexion } from "../db/vaciadoSolicitudes";
 
-/** Almacén de Blob del preview (§10.21). Es un identificador, no un secreto. */
-export const ALMACEN_PREVIEW = "lsndnc29nh4ws7eh";
+// Fuente única de los almacenes: `src/lib/blob/almacen.ts`. Se reexportan para
+// quien ya los importaba de aquí.
+export { ALMACEN_PREVIEW, ALMACEN_PRODUCCION, almacenDeToken };
 
 /** Marca de los registros de prueba: el texto alternativo empieza así. */
 export const MARCA_PRUEBA = "PRUEBA HERO — ";
@@ -143,20 +146,14 @@ export const FOCAL_PRUEBA = { focalX: 50, focalY: 50 } as const;
 
 export type Veredicto = { permitido: true } | { permitido: false; motivo: string };
 
-/** Id del almacén de un token de Blob (`vercel_blob_rw_<id>_<secreto>`), sin el secreto. */
-export function almacenDeToken(token: string | undefined): string | null {
-  return token?.match(/^vercel_blob_rw_([a-z\d]+)_[a-z\d]+$/i)?.[1]?.toLowerCase() ?? null;
-}
-
 /** Base y almacén de PRODUCCIÓN (§10.21, §10.4). Identificadores, no secretos. */
 export const HOST_PRODUCCION = "ep-tiny-fog-awnwc8ie-pooler.c-12.us-east-1.aws.neon.tech";
-export const ALMACEN_PRODUCCION = "sr2s4ngkjzfzpxhi";
 
 /**
  * Por defecto, SOLO preview: base Y Blob del preview. Con `produccion: true`
  * (argumento `produccion` del script), SOLO producción: base Y Blob de
- * producción. Nunca otra combinación: development comparte el Blob de
- * producción, así que la base se exige siempre además del Blob.
+ * producción. Nunca otra combinación: la base se exige siempre además del
+ * Blob, y el Blob además de la base.
  *
  * El modo producción existe para la DEMO AL CLIENTE del 2026-09-24 (CLAUDE.md
  * §10.33). Las fotos siguen con la licencia pendiente (L3).
@@ -180,7 +177,7 @@ export function puedeTocarHeroDePrueba(
   if (almacen !== almacenEsperado) {
     return {
       permitido: false,
-      motivo: `el Blob «${almacen ?? "sin BLOB_READ_WRITE_TOKEN"}» no es el de ${entorno} (${almacenEsperado})${produccion ? "" : "; con .env.local sería el de PRODUCCIÓN"}`,
+      motivo: `el Blob «${almacen ?? "sin BLOB_READ_WRITE_TOKEN"}» no es el de ${entorno} (${almacenEsperado})${almacen === ALMACEN_PRODUCCION && !produccion ? " (es el de PRODUCCIÓN)" : ""}`,
     };
   }
   return { permitido: true };

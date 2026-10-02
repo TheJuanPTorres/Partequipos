@@ -27,6 +27,8 @@ import path from "node:path";
 
 import { getPayload } from "payload";
 
+import { exigirAlmacen } from "../blob/exigirAlmacen";
+
 import {
   DIAPOSITIVAS_DEMO,
   MARCA_DEMO,
@@ -49,6 +51,7 @@ if (!veredicto.permitido) {
   console.error(`[hero-demo] NO se hace nada: ${veredicto.motivo}`);
   process.exit(1);
 }
+exigirAlmacen("[hero-demo]");
 
 // Un script de datos no toca el esquema (CLAUDE.md §10.9, §10.34).
 process.env.PAYLOAD_DISABLE_PUSH = "true";

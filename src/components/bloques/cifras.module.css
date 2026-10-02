@@ -1,0 +1,92 @@
+/*
+ * BLOQUE «CIFRAS» — Nosotros de ux-9, contenedores `24d1a631` y `286803db`.
+ * Valores MEDIDOS pintados a 1440, 1010 y 390 (docs/diseno/decisiones-nosotros.md §5).
+ *
+ * Fila de tres columnas en una caja de 1140 px, con un filete rojo de 1 px a
+ * la derecha de cada una salvo la última; en móvil, en columna y alineadas a
+ * la izquierda, conservando el filete a la derecha.
+ */
+.seccion {
+  /* El hueco inferior del contenedor de ux-9: 41 / 28 / 11 px. */
+  padding: 0 3vw 41px;
+}
+
+.lista {
+  display: flex;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0;
+  gap: 20px;
+  list-style: none;
+}
+
+.cifra {
+  display: flex;
+  flex: 1 1 0;
+  padding: 10px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--color-marca);
+}
+
+.cifra:last-child {
+  border-right: 0;
+}
+
+.numero {
+  color: var(--color-marca);
+  font-size: var(--texto-titulo-seccion);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* La cifra final y la que cuenta, en la misma celda: la caja no cambia. */
+.celda {
+  display: inline-grid;
+}
+
+.reserva,
+.cuenta {
+  grid-area: 1 / 1;
+  text-align: center;
+}
+
+.celda[data-contando] .reserva {
+  visibility: hidden;
+}
+
+/* ux-9: caja de 237 px, centrada en la columna, con el texto a la izquierda. */
+.etiqueta {
+  width: 237px;
+  max-width: 100%;
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+@media (max-width: 1024px) {
+  .seccion {
+    padding-bottom: 28px;
+  }
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    padding-bottom: 11px;
+  }
+
+  .lista {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .cifra {
+    padding: 0;
+    gap: 7px;
+    align-items: flex-start;
+  }
+
+  .cifra:last-child {
+    border-right: 0;
+  }
+}

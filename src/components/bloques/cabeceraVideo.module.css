@@ -1,0 +1,70 @@
+/*
+ * BLOQUE «CABECERA CON VÍDEO» — Nosotros de ux-9, contenedores `22d172e1` y
+ * `36e8a780`. Valores MEDIDOS pintados a 1440, 1010 y 390
+ * (docs/diseno/decisiones-nosotros.md §5).
+ *
+ * Tarjeta de radio 30 con 1,5vw de margen a los lados y abajo; alto mínimo
+ * 540 px (450 en móvil); relleno 2,9vw (0 en móvil); el texto en una caja de
+ * 680 px centrada. Velo negro al 45 % en `multiply`, como el de Elementor.
+ */
+.seccion {
+  padding: 0 1.5vw 1.5vw;
+}
+
+.tarjeta {
+  position: relative;
+  display: flex;
+  min-height: 540px;
+  padding: 2.9vw;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 30px;
+  /* Mientras llega la imagen, el tono oscuro del velo: el texto blanco se lee. */
+  background: #1f1d1b;
+}
+
+.medio {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.velo {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0.45;
+  mix-blend-mode: multiply;
+}
+
+.contenido {
+  position: relative;
+  display: flex;
+  width: 680px;
+  max-width: 100%;
+  margin: 0 auto;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.texto {
+  margin: 0;
+  color: var(--color-fondo);
+}
+
+/* Botón de pausa (D2): ux-9 no lo tiene. Abajo a la derecha, dentro de la tarjeta. */
+.pausa {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+}
+
+@media (max-width: 767px) {
+  .tarjeta {
+    min-height: 450px;
+    padding: 0;
+  }
+}

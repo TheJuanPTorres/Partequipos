@@ -678,9 +678,6 @@ export interface Pagina {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Bloques enlazables dentro de la página, p. ej. /servicio-tecnico/#taller. No generan URLs nuevas.
-   */
   secciones?:
     | {
         titulo: string;
@@ -705,6 +702,14 @@ export interface Pagina {
         } | null;
         id?: string | null;
       }[]
+    | null;
+  /**
+   * Opcional. Si añades bloques, la página se compone con ellos y dejan de mostrarse «Contenido» y «Secciones con ancla».
+   */
+  bloques?:
+    | (
+        BloqueCabeceraVideo | BloquePresentacionImagen | BloqueCifras | BloqueFranjaMarquee | BloqueTarjetasExpandibles
+      )[]
     | null;
   /**
    * Carrusel del inicio. Con una sola diapositiva no se muestran las flechas.
@@ -854,6 +859,31 @@ export interface Pagina {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueCabeceraVideo".
+ */
+export interface BloqueCabeceraVideo {
+  /**
+   * Texto corto encima del título. Opcional.
+   */
+  antetitulo?: string | null;
+  /**
+   * Es el título principal de la página (su <h1>). Úsalo una sola vez por página.
+   */
+  titulo: string;
+  /**
+   * En bucle y sin sonido; su póster se ve mientras carga y con «reducir movimiento». Opcional.
+   */
+  video?: (number | null) | Video;
+  /**
+   * Se usa si no hay vídeo. Con vídeo, manda el póster del vídeo.
+   */
+  imagen?: (number | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cabeceraVideo';
+}
+/**
  * Vídeos del sitio: MP4 o WebM, máximo 4 MB, con imagen de póster obligatoria.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -882,6 +912,132 @@ export interface Video {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloquePresentacionImagen".
+ */
+export interface BloquePresentacionImagen {
+  /**
+   * A un lado del texto (debajo en móvil). Si transmite información, como un mapa, cuida su texto alternativo.
+   */
+  imagen?: (number | null) | Media;
+  /**
+   * Texto corto encima del título. Opcional.
+   */
+  antetitulo?: string | null;
+  titulo: string;
+  texto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  botonTexto?: string | null;
+  /**
+   * Una ruta del sitio (/…/) o una dirección https://. Vacío: sin botón.
+   */
+  botonEnlace?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'presentacionImagen';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueCifras".
+ */
+export interface BloqueCifras {
+  /**
+   * El número cuenta desde cero al llegar con el scroll.
+   */
+  cifras?:
+    | {
+        /**
+         * Ej. «+».
+         */
+        prefijo?: string | null;
+        /**
+         * Sin separadores: 10000.
+         */
+        numero: number;
+        /**
+         * Ej. «%» o «+».
+         */
+        sufijo?: string | null;
+        etiqueta: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cifras';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueFranjaMarquee".
+ */
+export interface BloqueFranjaMarquee {
+  /**
+   * Se repite de lado a lado, en mayúsculas. Ej. «Marcas aliadas».
+   */
+  texto: string;
+  /**
+   * Decorativa.
+   */
+  imagenFondo?: (number | null) | Media;
+  /**
+   * Va delante del texto. Decorativa. Opcional.
+   */
+  imagenFrontal?: (number | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'franjaMarquee';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueTarjetasExpandibles".
+ */
+export interface BloqueTarjetasExpandibles {
+  /**
+   * Texto corto encima del título. Opcional.
+   */
+  antetitulo?: string | null;
+  titulo: string;
+  /**
+   * Una abierta y las demás plegadas; rotan cada 4 s. Con más de 4 las plegadas quedan muy estrechas.
+   */
+  tarjetas?:
+    | {
+        titulo: string;
+        /**
+         * Se ve con la tarjeta abierta.
+         */
+        texto?: string | null;
+        imagen?: (number | null) | Media;
+        /**
+         * Una ruta del sitio (/…/) o una dirección https://. Opcional.
+         */
+        enlace?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  botonTexto?: string | null;
+  /**
+   * Una ruta del sitio (/…/) o una dirección https://. Vacío: sin botón.
+   */
+  botonEnlace?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'tarjetasExpandibles';
 }
 /**
  * Se publican en la raíz del sitio: /{slug}/, sin prefijo.
@@ -1576,6 +1732,15 @@ export interface PaginasSelect<T extends boolean = true> {
         contenido?: T;
         id?: T;
       };
+  bloques?:
+    | T
+    | {
+        cabeceraVideo?: T | BloqueCabeceraVideoSelect<T>;
+        presentacionImagen?: T | BloquePresentacionImagenSelect<T>;
+        cifras?: T | BloqueCifrasSelect<T>;
+        franjaMarquee?: T | BloqueFranjaMarqueeSelect<T>;
+        tarjetasExpandibles?: T | BloqueTarjetasExpandiblesSelect<T>;
+      };
   hero?:
     | T
     | {
@@ -1681,6 +1846,81 @@ export interface PaginasSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueCabeceraVideo_select".
+ */
+export interface BloqueCabeceraVideoSelect<T extends boolean = true> {
+  antetitulo?: T;
+  titulo?: T;
+  video?: T;
+  imagen?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloquePresentacionImagen_select".
+ */
+export interface BloquePresentacionImagenSelect<T extends boolean = true> {
+  imagen?: T;
+  antetitulo?: T;
+  titulo?: T;
+  texto?: T;
+  botonTexto?: T;
+  botonEnlace?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueCifras_select".
+ */
+export interface BloqueCifrasSelect<T extends boolean = true> {
+  cifras?:
+    | T
+    | {
+        prefijo?: T;
+        numero?: T;
+        sufijo?: T;
+        etiqueta?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueFranjaMarquee_select".
+ */
+export interface BloqueFranjaMarqueeSelect<T extends boolean = true> {
+  texto?: T;
+  imagenFondo?: T;
+  imagenFrontal?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueTarjetasExpandibles_select".
+ */
+export interface BloqueTarjetasExpandiblesSelect<T extends boolean = true> {
+  antetitulo?: T;
+  titulo?: T;
+  tarjetas?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+        imagen?: T;
+        enlace?: T;
+        id?: T;
+      };
+  botonTexto?: T;
+  botonEnlace?: T;
+  id?: T;
+  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

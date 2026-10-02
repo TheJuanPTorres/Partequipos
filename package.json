@@ -50,6 +50,8 @@
     "preview:fase-g:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-g-preview.ts retirar",
     "preview:fase-h:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-h-preview.ts sembrar",
     "preview:fase-h:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-h-preview.ts retirar",
+    "preview:nosotros:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/nosotros/nosotros-preview.ts sembrar",
+    "preview:nosotros:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/nosotros/nosotros-preview.ts retirar",
     "deploy:migrate": "npm run db:check && payload migrate",
     "redirects:check": "payload run scripts/redirects/verificar-destinos.ts",
     "redirects:check:estricto": "REDIRECTS_ESTRICTO=true payload run scripts/redirects/verificar-destinos.ts",

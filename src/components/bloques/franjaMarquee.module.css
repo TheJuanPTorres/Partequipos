@@ -1,0 +1,138 @@
+/*
+ * BLOQUE «FRANJA CON MARQUEE» — Nosotros de ux-9, contenedores `71d4927` y
+ * `67ccc064`, widget «List Marquee» `2aa6a439` e imagen `3ce5ff58`. Valores
+ * MEDIDOS pintados a 1440, 1010 y 390 (docs/diseno/decisiones-nosotros.md §5).
+ */
+.seccion {
+  /* Posición del texto en movimiento: borde superior de su caja, medido. */
+  --franja-marquee-arriba: 375px;
+  --franja-texto: 110px;
+
+  /* El contenedor de ux-9 mide al menos 792 px: en móvil deja 27 px bajo la tarjeta. */
+  box-sizing: border-box;
+  min-height: 792px;
+  padding: 0 1.5vw 1.5vw;
+}
+
+.tarjeta {
+  position: relative;
+  min-height: 774px;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #8a7d70;
+}
+
+.fondo {
+  object-fit: cover;
+}
+
+/* El velo de ux-9: #CACACA al 74 % en `multiply`, que apaga y calienta la foto. */
+.velo {
+  position: absolute;
+  inset: 0;
+  background: #cacaca;
+  opacity: 0.74;
+  mix-blend-mode: multiply;
+}
+
+.marquee {
+  position: absolute;
+  top: var(--franja-marquee-arriba);
+  right: 0;
+  left: 0;
+  padding: 10px;
+  overflow: hidden;
+}
+
+/* Ocho copias; la pista recorre la mitad en 80 s, tras 250 ms, como ux-9. */
+.pista {
+  display: flex;
+  width: max-content;
+  animation: desplazar 80s linear 0.25s infinite;
+}
+
+.marquee[data-pausado] .pista {
+  animation-play-state: paused;
+}
+
+.item {
+  display: flex;
+  padding: 10px;
+  align-items: center;
+  gap: 34px;
+  white-space: nowrap;
+}
+
+/* El `fa-circle` de 20 px de ux-9, dibujado sin la fuente de iconos. */
+.punto {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-fondo);
+}
+
+.texto {
+  color: var(--color-fondo);
+  font-size: var(--franja-texto);
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@keyframes desplazar {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pista {
+    animation: none;
+  }
+}
+
+/* La máquina, delante del texto y apoyada a 3vh del borde inferior. */
+.maquina {
+  position: absolute;
+  right: calc(17vw + 48px);
+  bottom: 3vh;
+  width: 704px;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Botón de pausa (D2): ux-9 no lo tiene. */
+.pausa {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+}
+
+@media (max-width: 1024px) {
+  .seccion {
+    --franja-marquee-arriba: 443px;
+    --franja-texto: var(--texto-titulo-seccion);
+  }
+
+  .maquina {
+    right: 17vw;
+    width: 631px;
+  }
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    --franja-marquee-arriba: 60px;
+  }
+
+  .tarjeta {
+    min-height: 765px;
+  }
+
+  .maquina {
+    right: auto;
+    left: 0;
+    width: 80vw;
+  }
+}

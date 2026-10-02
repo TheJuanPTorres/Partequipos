@@ -1,0 +1,23 @@
+/*
+ * PÁGINA CON BLOQUES. El fondo gris claro de ux-9 (#F0F0F0, el `body` de su
+ * kit) va en el `<main>`: no se toca el fondo global del sitio.
+ */
+.pagina {
+  background: var(--color-fondo-seccion);
+}
+
+/* Migas: solo se ven con el foco dentro (el resto del tiempo, `sr-only`). */
+.migas:focus-within {
+  display: block;
+  padding: 8px 3vw 0;
+}
+
+/* Sin bloque de cabecera, el título de la página es el `<h1>`. */
+.titulo {
+  margin: 0;
+  padding: 0 3vw 20px;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-seccion);
+  font-weight: 500;
+  line-height: 1.2;
+}

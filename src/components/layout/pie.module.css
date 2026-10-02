@@ -7,13 +7,10 @@
  */
 
 .pie {
-  /* Contenedor exterior: relleno 4 % · 4 % · 0; 70 px sobre él. */
-  --pie-relleno: 4% 4% 0;
   --pie-margen: 70px;
   --pie-radio: 30px;
 
   margin-top: var(--pie-margen);
-  padding: var(--pie-relleno);
   color: var(--color-texto);
   /*
    * La imagen decorativa sobresale por la derecha. `clip` y no `hidden`: corta
@@ -24,6 +21,15 @@
 }
 
 /* --- Tarjeta roja --------------------------------------------------------- */
+
+/*
+ * Contenedor de la tarjeta (export: relleno 4 % · 4 % · 0). El panel de abajo
+ * es OTRO contenedor de primer nivel, a todo el ancho: no va dentro de este
+ * relleno (medido: sus tarjetas empiezan a 72 px a 1440, el 5 % del ancho).
+ */
+.marco {
+  padding: 4% 4% 0;
+}
 
 .tarjeta {
   position: relative;
@@ -130,6 +136,13 @@
 
 /* --- Panel blanco --------------------------------------------------------- */
 
+/*
+ * Export 2178, contenedor 1: fila con `wrap`, hueco 20, margen 4 % arriba,
+ * relleno 5 % · 5 % · 2 % (3 % en móvil), radio 30 · 30 · 0 · 0, blanco.
+ * Hijos: empresa 39 %, buscador 59 % y las tres columnas al 32 %. Las filas
+ * caen solas con esa aritmética, como en ux-9: a 1440 empresa y buscador
+ * comparten fila; a 1010 no caben (el 2 % no llega a los 20 px de hueco).
+ */
 .panel {
   position: relative;
   z-index: 5;
@@ -156,6 +169,25 @@
   height: auto;
 }
 
+/*
+ * DESVIACIÓN (buscador fuera de la cola): el hueco del buscador se conserva
+ * vacío, con su ancho y el alto de su botón, para que las filas caigan igual
+ * que en ux-9. Cuando se apruebe el buscador, va aquí.
+ */
+.hueco {
+  flex: 0 0 59%;
+  min-height: 56px;
+}
+
+/* El `<h3>` del texto de la empresa: estilo H3 del tema, medido 28 · 1,2 · 500. */
+.lemaEmpresa {
+  max-width: 418px;
+  margin: 0 0 19px;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
 .textoEmpresa {
   max-width: 418px;
   margin: 0;
@@ -163,44 +195,39 @@
   line-height: 1.4;
 }
 
-.textoEmpresa + .textoEmpresa {
-  margin-top: 0.6em;
-}
-
-.lemaEmpresa {
-  font-weight: 600;
+/* Las columnas son hijas directas del panel en el export. */
+.columnas {
+  display: contents;
 }
 
 /* Columnas: 32 % con el gris de sección (global `a372504`), radio 30, 30 px. */
-.columnas {
-  display: flex;
-  flex: 1 1 100%;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
 .columna {
-  flex: 0 0 calc((100% - 40px) / 3);
+  display: flex;
+  flex: 0 0 32%;
+  flex-direction: column;
+  gap: 20px;
   padding: 30px;
   border-radius: var(--pie-radio);
   background: var(--color-fondo-seccion);
 }
 
+/* Título: M BOLD en el rojo `primary`, como pinta ux-9 (el color del tema). */
 .tituloColumna {
-  margin: 0 0 16px;
+  margin: 0;
+  color: var(--color-marca);
 }
 
+/* Enlaces: el gris `secondary` del tema, sin hueco (interlineado 1,4). */
 .lista {
   display: flex;
   flex-direction: column;
-  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .enlace {
-  color: var(--color-texto);
+  color: var(--color-texto-suave);
   text-decoration: none;
 }
 
@@ -219,7 +246,7 @@
 .redes {
   display: flex;
   gap: 10px;
-  margin: 20px 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -247,17 +274,22 @@
   color: var(--color-fondo);
 }
 
+/* Tablet: logo y texto de la empresa centrados (`align_tablet` center). */
 @media (max-width: 1024px) {
   .empresa {
-    flex-basis: 100%;
     align-items: center;
     text-align: center;
   }
 }
 
+/* Móvil: empresa a todo el ancho; columnas de dos en dos, como ux-9 a 390. */
 @media (max-width: 767px) {
   .panel {
     padding: 3%;
+  }
+
+  .empresa {
+    flex-basis: 100%;
   }
 
   .logo {
@@ -266,8 +298,7 @@
   }
 
   .columna {
-    flex-basis: 100%;
-    padding: 30px;
+    flex-basis: calc((100% - 20px) / 2);
   }
 }
 

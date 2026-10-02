@@ -34,7 +34,12 @@
  * precargaba 52 kB de Geist que nunca se usaban. Medido en la página pintada.
  */
 body {
-  background: var(--background);
+  /*
+   * Blanco del kit (`099f28a`), como ux-9 pintado. El `--background` del
+   * sistema del cliente es oklch(0.9911 0 0), casi blanco: sobre él se veía el
+   * borde del panel blanco del pie, que en ux-9 no se distingue.
+   */
+  background: var(--color-fondo);
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }

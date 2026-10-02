@@ -27,6 +27,9 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
+  /* Contenedor anidado `5734201e`: el relleno por defecto de Elementor, 10 px
+     (medido: la sección de ux-9 mide 20 px más en los tres anchos). */
+  padding: 10px;
 }
 
 .boton {

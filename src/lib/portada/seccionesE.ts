@@ -45,15 +45,10 @@ export type TarjetaRepuesto = {
 /*
  * TÍTULO EN PORTADA (2026-10-02): la tarjeta usa el título propio de la
  * portada si la categoría lo tiene y, si no, el nombre real. Así ux-9 puede
- * decir «Blades y corte» sin renombrar la categoría del catálogo.
- *
- * PROVISIONAL hasta la migración del campo `tituloPortada` (espera a que se
- * libere la ventana de migraciones): el tipo se amplía aquí a mano. Con el
- * campo en Payload, `payload-types.ts` ya lo trae y esta ampliación se quita.
+ * decir «Blades y corte» sin renombrar la categoría del catálogo (campo
+ * `tituloPortada`, migración 20261002_214044_titulo_portada_repuestos).
  */
-type CategoriaConTitulo = CategoriasTecnica & { tituloPortada?: string | null };
-
-export function tarjetasDeRepuestos(categorias: CategoriaConTitulo[]): TarjetaRepuesto[] {
+export function tarjetasDeRepuestos(categorias: CategoriasTecnica[]): TarjetaRepuesto[] {
   return categorias
     .filter((c) => typeof c.ordenPortada === "number" && c.nombre?.trim())
     .sort(

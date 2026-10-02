@@ -105,15 +105,15 @@ toda la página. Lo esencial, todo en el CSS de cada bloque:
 
 ### Verificación de la ruta de pruebas (local, contra la base del preview)
 
-| Comprobación                     | Resultado                                                                             |
-| -------------------------------- | ------------------------------------------------------------------------------------- |
-| Cajas y tipografía frente a ux-9 | 0–3 px en 1440, 1010 y 390 (salvo N2 y N3)                                            |
-| Geometría de las tarjetas        | Idéntica en los tres cortes                                                           |
-| `<h1>` / `<main>`                | 1 / 1                                                                                 |
-| Scroll horizontal                | No, en los tres                                                                       |
-| Teclado                          | Orden lógico, anillo visible, Intro abre la tarjeta y el foco pasa a su enlace        |
-| Movimiento reducido              | Sin vídeo, marquee quieto, rotación parada, revelados y cifras visibles               |
-| CLS                              | 0,00002–0,00007 en `next dev`: la llegada de Inter mueve 5 px «somos» del `<h1>` (§8) |
+| Comprobación                     | Resultado                                                                                                 |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Cajas y tipografía frente a ux-9 | 0–3 px en 1440, 1010 y 390 (salvo N2 y N3)                                                                |
+| Geometría de las tarjetas        | Idéntica en los tres cortes                                                                               |
+| `<h1>` / `<main>`                | 1 / 1                                                                                                     |
+| Scroll horizontal                | No, en los tres                                                                                           |
+| Teclado                          | Orden lógico, anillo visible, Intro abre la tarjeta y el foco pasa a su enlace                            |
+| Movimiento reducido              | Sin vídeo, marquee quieto, rotación parada, revelados y cifras visibles                                   |
+| CLS                              | 0,000024–0,000066, igual en `next dev` y en el preview: la llegada de Inter mueve «somos» del `<h1>` (§8) |
 
 ## 6. Rutas de control (decisión 2)
 
@@ -139,9 +139,22 @@ anclas (`#GARANTIA`, `#Devoluciones`), junto a `/servicio-tecnico/`
 
 ## 8. Pendientes
 
-- **CLS de la fuente en el `<h1>`:** medir en el build del preview. Si
-  persiste, la palanca es la carga de Inter (`layout.tsx`, §10.36), que es
-  global: se decide con dirección.
+- **CLS de la fuente en el `<h1>` — PENDIENTE DE DIRECCIÓN.** Medido en el
+  preview de `f651203`, 5 cargas sin caché por ancho: **0,000066** a 1440 y
+  390 y **0,000024** a 1010, en las 15. Siempre lo mismo: al llegar Inter
+  (sin precarga, §10.36), «Quiénes» cambia de ancho y «somos» se mueve 3–5 px
+  en horizontal. Es la familia del desplazamiento del menú que ya acepta §10.36
+  (0,0000057), mayor. Opciones:
+  1. Aceptarlo y anotarlo (Lighthouse lo redondea a 0).
+  2. Precargar Inter: es global (`layout.tsx`) y §10.36 midió que la precarga
+     empeora el LCP móvil en 0,34 s.
+  3. Que la cabecera espere a la fuente para mostrar el texto
+     (`document.fonts.ready`): local, pero retrasa el texto del hero.
+- **Lo que dejaría de verse en `/nosotros/` de producción** al activar sus
+  bloques (leído pintado el 2026-10-02): la entradilla («Más de dos décadas
+  suministrando repuestos y servicio para maquinaria pesada.») y dos párrafos
+  de contenido. Todo es texto de relleno nuestro (§10.6); no tiene secciones
+  con ancla. La entradilla se sigue usando como meta descripción.
 - Ventana de migración (decisión 1).
 - Animación del mapa (Lottie), PR aparte.
 - Borrar `/laboratorio/nosotros/` y su entrada en `RUTAS_FUERA_DEL_SITEMAP`

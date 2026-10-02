@@ -70,3 +70,21 @@
     padding-top: 40px;
   }
 }
+
+/*
+ * TÍTULOS ANIMADOS COMO SE PINTAN EN UX-9 (decisión de dirección, 2026-10-02;
+ * decisiones-home-ux9.md §24, pendiente de Andrés): a la izquierda dentro de su
+ * caja a partir de 768 px; en móvil, centrados en la caja medida a 390.
+ */
+@media (min-width: 768px) {
+  .titulo {
+    text-align: left;
+  }
+}
+
+@media (max-width: 767px) {
+  .titulo {
+    box-sizing: border-box;
+    padding-inline: 20px;
+  }
+}

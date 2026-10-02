@@ -1996,3 +1996,43 @@ Andrés: no se usa ni entra al repositorio.
 cuenta del cliente (L5). Con él: verificar pintado contra ux-9 a 390, 1010 y
 1440, y la CSP (ya incluye `api.mapbox.com`, `events.mapbox.com` y los
 workers `blob:`).
+
+## 24. La home medida contra ux-9 publicado (2026-10-02)
+
+Decisión de dirección: **lo pintado manda**. Se midió ux-9 con el navegador a
+1440, 1010 y 390, y se compararon las mismas cajas en nuestro preview.
+
+### 24.1 Títulos animados — PENDIENTE DE CONFIRMAR CON ANDRÉS
+
+| Ancho    | ux-9 publicado                                                                                                                                  | Antes                                                                                       | Ahora                      |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | -------------------------- |
+| ≥ 768 px | **A la izquierda** dentro de su caja, en los 13 títulos                                                                                         | Centrados (repuestos, compañía, catálogo, testimonios, lema del pie) o a la derecha (usada) | A la izquierda, misma caja |
+| ≤ 767 px | **Centrados**, salvo «Marcas que Respaldan…» y «Trabajamos…», que siguen a la izquierda. Cajas 20 px más estrechas por lado (30 en testimonios) | Varios a la izquierda y con cajas más anchas                                                | Centrados, cajas de ux-9   |
+
+- **Por qué difiere del export:** el export pone «Centro» y «Derecha» en
+  `text_align`. Pero el widget publicado **no imprime `data-text-align`** en
+  su contenedor, y su JavaScript cae entonces al valor por defecto, «left».
+  El zip del widget sí lo traduce bien (`resolveOption`).
+- **Pregunta para Andrés:** ¿la intención era centrar (export) o lo publicado
+  es lo que quiere? Si es el export, se vuelve atrás quitando las reglas
+  marcadas «TÍTULOS ANIMADOS COMO SE PINTAN EN UX-9» de cada `*.module.css`.
+- **No afecta al hero:** su título sigue centrado por decisión de dirección
+  (D15).
+
+### 24.2 Otras medidas de móvil, aplicadas
+
+- **Catálogo a 390:** con la caja de ux-9 el título corta en 4 líneas, como en
+  ux-9 (antes 3).
+- **Logos:** la caja mide **110 px** en móvil (en ux-9, el logo ocupa
+  125 × 70 con relleno 20), y la sección 150. Antes eran 180 y 220.
+- **FAQ a 390:** la columna izquierda va sin relleno lateral, del alto de su
+  contenido y con todo centrado (título, entradilla y botón). El `60vh` del
+  export no se aplica en lo publicado.
+- **Sección 2 a 390:** antetítulo y título centrados, con la caja de ux-9.
+
+### 24.3 Buscador del pie — PENDIENTE
+
+El hueco del buscador se conserva **vacío**, con su ancho (59 %) y el alto de
+su botón (56 px), para que las filas del pie caigan como en ux-9
+(`pie.module.css`, `.hueco`). Cuando el cliente apruebe el buscador (fuera de
+la cola, CLAUDE.md §10.33 p.9), va en ese hueco.

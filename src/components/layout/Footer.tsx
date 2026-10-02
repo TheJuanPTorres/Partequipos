@@ -29,7 +29,8 @@ import estilos from "./pie.module.css";
  *   clientes» y «Financiación» esperan su URL (pendiente del cliente).
  * - Redes: solo las de `seoConfig`, con su nombre real; el export trae
  *   etiquetas cruzadas. Iconos de Tabler.
- * - Franja legal inferior (Ley 1581), con dirección y teléfono.
+ * - Franja legal inferior (Ley 1581), con dirección, teléfono y correo (el
+ *   correo, desde la fase 6: antes solo estaba en el bloque previo de la home).
  * - «Somos una empresa…» es párrafo, no `<h3>`: los títulos de columna son
  *   `<h2>`, el nivel siguiente al `<h1>` de cualquier página.
  * - Sin buscador hasta aprobar su construcción: un cuadro que no busca es un
@@ -189,7 +190,9 @@ export async function Footer() {
         </nav>
         <address>
           {contact.streetAddress}, {contact.addressLocality} ·{" "}
-          <a href={telefono}>{contact.phone}</a> · © {new Date().getFullYear()} {seoConfig.siteName}
+          <a href={telefono}>{contact.phone}</a> ·{" "}
+          <a href={`mailto:${contact.email}`}>{contact.email}</a> · © {new Date().getFullYear()}{" "}
+          {seoConfig.siteName}
         </address>
       </div>
     </footer>

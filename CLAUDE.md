@@ -388,6 +388,16 @@ herramientas que devuelven cadenas de conexión o escriben
 `reset_from_parent`, migraciones y _tuning_). El skill `neon-postgres` está
 instalado a nivel de usuario.
 
+**Runbooks para dirección (desde el 2026-10-01):**
+
+- **Comandos en PowerShell**: dirección trabaja en Windows. Usar `curl.exe`
+  (no el alias `curl`) y la sintaxis de PowerShell en bucles y variables.
+- **Borrados en producción por el panel** (Vercel, Payload o Neon), **salvo
+  que el panel no pueda**. Así ningún token de producción entra en la sesión.
+  Si hace falta otra vía, el runbook lo justifica.
+- Cada runbook lleva una comprobación previa de solo lectura y una
+  comprobación final, como el del Blob de §10.4.
+
 **Informes:** al final de cada parte, además de mostrarse, se guardan en
 `Desktop\partequipos-cierre\informes\AAAA-MM-DD-<tema>.md`.
 
@@ -932,6 +942,16 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > **Comprobado el 2026-10-01** con la guarda, tras el cambio de dirección:
 > `development` (`.env.local`, con `tsx` y con `payload run`) →
 > `lsndnc29nh4ws7eh`, el del preview.
+>
+> **Cierre, el mismo día:**
+>
+> - Las 4 imágenes de demo de `development` se resubieron al almacén del
+>   preview.
+> - Dirección **borró desde el panel de Vercel** las 4 copias sueltas del
+>   almacén de producción, con su runbook. Resultado y comprobaciones en
+>   §10.4. Ya no queda nada de `development` en ese almacén.
+> - Dos reglas para los runbooks, en §9: **comandos en PowerShell**, y
+>   **borrados en producción por el panel**, salvo que el panel no pueda.
 
 ### 10.36 EXCEPCIÓN DE DEMO — el carrusel del hero en producción con LCP 4,00 s (2026-09-30)
 
@@ -1170,9 +1190,17 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     - **Imágenes de demo:** sus 4 registros de `media` (las de §10.12, usadas en
       12 relaciones) se volvieron a subir a ese almacén. Mismo contenido, con
       hash idéntico; mismos ids; ahora `demo-*-1.png`.
-    - **Ficheros viejos:** los `demo-*.png` del almacén de producción quedaron
-      sueltos. Los borra dirección con
-      `Desktop\partequipos-cierre\runbook-borrar-demo-blob.md`.
+    - **Ficheros viejos: BORRADOS por dirección el 2026-10-01** con
+      `Desktop\partequipos-cierre\runbook-borrar-demo-blob.md`, desde el
+      **panel de Vercel**. Se descartó la vía por CLI para no tener el token de
+      producción en la sesión.
+      - **Antes:** los 4 `demo-*.png` en 200. La consulta de solo lectura dio
+        0 filas en `production`, `development` y `preview`; en las dos
+        últimas, con el patrón terminado en `\.png`, para no contar los
+        `demo-*-1.png` nuevos. La `Media` de producción solo tenía las 8
+        `hero-*`.
+      - **Después:** los 4 en **404**; el logo de §10.8 y las 8 `hero-*` en
+        200; la home pinta.
     - **Guarda:** desde §10.37, la guarda del almacén impide que `development`
       o un script vuelvan a escribir en el almacén de producción.
     - **Respaldos:** `backup:blob` lee la URL **guardada** (no la recalculada

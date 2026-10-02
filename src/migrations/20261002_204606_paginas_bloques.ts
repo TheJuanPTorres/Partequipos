@@ -57,7 +57,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"block_name" varchar
   );
   
-  CREATE TABLE "paginas_blocks_tarjetas_expandibles_tarjetas" (
+  CREATE TABLE "paginas_blocks_tarjetas_exp_tarjetas" (
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
@@ -67,7 +67,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"enlace" varchar
   );
   
-  CREATE TABLE "paginas_blocks_tarjetas_expandibles" (
+  CREATE TABLE "paginas_blocks_tarjetas_exp" (
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"_path" text NOT NULL,
@@ -89,9 +89,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "paginas_blocks_franja_marquee" ADD CONSTRAINT "paginas_blocks_franja_marquee_imagen_fondo_id_media_id_fk" FOREIGN KEY ("imagen_fondo_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "paginas_blocks_franja_marquee" ADD CONSTRAINT "paginas_blocks_franja_marquee_imagen_frontal_id_media_id_fk" FOREIGN KEY ("imagen_frontal_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "paginas_blocks_franja_marquee" ADD CONSTRAINT "paginas_blocks_franja_marquee_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."paginas"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "paginas_blocks_tarjetas_expandibles_tarjetas" ADD CONSTRAINT "paginas_blocks_tarjetas_expandibles_tarjetas_imagen_id_media_id_fk" FOREIGN KEY ("imagen_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
-  ALTER TABLE "paginas_blocks_tarjetas_expandibles_tarjetas" ADD CONSTRAINT "paginas_blocks_tarjetas_expandibles_tarjetas_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."paginas_blocks_tarjetas_expandibles"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "paginas_blocks_tarjetas_expandibles" ADD CONSTRAINT "paginas_blocks_tarjetas_expandibles_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."paginas"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "paginas_blocks_tarjetas_exp_tarjetas" ADD CONSTRAINT "paginas_blocks_tarjetas_exp_tarjetas_imagen_id_media_id_fk" FOREIGN KEY ("imagen_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "paginas_blocks_tarjetas_exp_tarjetas" ADD CONSTRAINT "paginas_blocks_tarjetas_exp_tarjetas_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."paginas_blocks_tarjetas_exp"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "paginas_blocks_tarjetas_exp" ADD CONSTRAINT "paginas_blocks_tarjetas_exp_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."paginas"("id") ON DELETE cascade ON UPDATE no action;
   CREATE INDEX "paginas_blocks_cabecera_video_order_idx" ON "paginas_blocks_cabecera_video" USING btree ("_order");
   CREATE INDEX "paginas_blocks_cabecera_video_parent_id_idx" ON "paginas_blocks_cabecera_video" USING btree ("_parent_id");
   CREATE INDEX "paginas_blocks_cabecera_video_path_idx" ON "paginas_blocks_cabecera_video" USING btree ("_path");
@@ -111,12 +111,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "paginas_blocks_franja_marquee_path_idx" ON "paginas_blocks_franja_marquee" USING btree ("_path");
   CREATE INDEX "paginas_blocks_franja_marquee_imagen_fondo_idx" ON "paginas_blocks_franja_marquee" USING btree ("imagen_fondo_id");
   CREATE INDEX "paginas_blocks_franja_marquee_imagen_frontal_idx" ON "paginas_blocks_franja_marquee" USING btree ("imagen_frontal_id");
-  CREATE INDEX "paginas_blocks_tarjetas_expandibles_tarjetas_order_idx" ON "paginas_blocks_tarjetas_expandibles_tarjetas" USING btree ("_order");
-  CREATE INDEX "paginas_blocks_tarjetas_expandibles_tarjetas_parent_id_idx" ON "paginas_blocks_tarjetas_expandibles_tarjetas" USING btree ("_parent_id");
-  CREATE INDEX "paginas_blocks_tarjetas_expandibles_tarjetas_imagen_idx" ON "paginas_blocks_tarjetas_expandibles_tarjetas" USING btree ("imagen_id");
-  CREATE INDEX "paginas_blocks_tarjetas_expandibles_order_idx" ON "paginas_blocks_tarjetas_expandibles" USING btree ("_order");
-  CREATE INDEX "paginas_blocks_tarjetas_expandibles_parent_id_idx" ON "paginas_blocks_tarjetas_expandibles" USING btree ("_parent_id");
-  CREATE INDEX "paginas_blocks_tarjetas_expandibles_path_idx" ON "paginas_blocks_tarjetas_expandibles" USING btree ("_path");`)
+  CREATE INDEX "paginas_blocks_tarjetas_exp_tarjetas_order_idx" ON "paginas_blocks_tarjetas_exp_tarjetas" USING btree ("_order");
+  CREATE INDEX "paginas_blocks_tarjetas_exp_tarjetas_parent_id_idx" ON "paginas_blocks_tarjetas_exp_tarjetas" USING btree ("_parent_id");
+  CREATE INDEX "paginas_blocks_tarjetas_exp_tarjetas_imagen_idx" ON "paginas_blocks_tarjetas_exp_tarjetas" USING btree ("imagen_id");
+  CREATE INDEX "paginas_blocks_tarjetas_exp_order_idx" ON "paginas_blocks_tarjetas_exp" USING btree ("_order");
+  CREATE INDEX "paginas_blocks_tarjetas_exp_parent_id_idx" ON "paginas_blocks_tarjetas_exp" USING btree ("_parent_id");
+  CREATE INDEX "paginas_blocks_tarjetas_exp_path_idx" ON "paginas_blocks_tarjetas_exp" USING btree ("_path");`)
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
@@ -126,6 +126,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "paginas_blocks_cifras_cifras" CASCADE;
   DROP TABLE "paginas_blocks_cifras" CASCADE;
   DROP TABLE "paginas_blocks_franja_marquee" CASCADE;
-  DROP TABLE "paginas_blocks_tarjetas_expandibles_tarjetas" CASCADE;
-  DROP TABLE "paginas_blocks_tarjetas_expandibles" CASCADE;`)
+  DROP TABLE "paginas_blocks_tarjetas_exp_tarjetas" CASCADE;
+  DROP TABLE "paginas_blocks_tarjetas_exp" CASCADE;`)
 }

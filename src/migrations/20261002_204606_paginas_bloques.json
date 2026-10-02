@@ -4209,8 +4209,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.paginas_blocks_tarjetas_expandibles_tarjetas": {
-      "name": "paginas_blocks_tarjetas_expandibles_tarjetas",
+    "public.paginas_blocks_tarjetas_exp_tarjetas": {
+      "name": "paginas_blocks_tarjetas_exp_tarjetas",
       "schema": "",
       "columns": {
         "_order": {
@@ -4257,8 +4257,8 @@
         }
       },
       "indexes": {
-        "paginas_blocks_tarjetas_expandibles_tarjetas_order_idx": {
-          "name": "paginas_blocks_tarjetas_expandibles_tarjetas_order_idx",
+        "paginas_blocks_tarjetas_exp_tarjetas_order_idx": {
+          "name": "paginas_blocks_tarjetas_exp_tarjetas_order_idx",
           "columns": [
             {
               "expression": "_order",
@@ -4272,8 +4272,8 @@
           "method": "btree",
           "with": {}
         },
-        "paginas_blocks_tarjetas_expandibles_tarjetas_parent_id_idx": {
-          "name": "paginas_blocks_tarjetas_expandibles_tarjetas_parent_id_idx",
+        "paginas_blocks_tarjetas_exp_tarjetas_parent_id_idx": {
+          "name": "paginas_blocks_tarjetas_exp_tarjetas_parent_id_idx",
           "columns": [
             {
               "expression": "_parent_id",
@@ -4287,8 +4287,8 @@
           "method": "btree",
           "with": {}
         },
-        "paginas_blocks_tarjetas_expandibles_tarjetas_imagen_idx": {
-          "name": "paginas_blocks_tarjetas_expandibles_tarjetas_imagen_idx",
+        "paginas_blocks_tarjetas_exp_tarjetas_imagen_idx": {
+          "name": "paginas_blocks_tarjetas_exp_tarjetas_imagen_idx",
           "columns": [
             {
               "expression": "imagen_id",
@@ -4304,9 +4304,9 @@
         }
       },
       "foreignKeys": {
-        "paginas_blocks_tarjetas_expandibles_tarjetas_imagen_id_media_id_fk": {
-          "name": "paginas_blocks_tarjetas_expandibles_tarjetas_imagen_id_media_id_fk",
-          "tableFrom": "paginas_blocks_tarjetas_expandibles_tarjetas",
+        "paginas_blocks_tarjetas_exp_tarjetas_imagen_id_media_id_fk": {
+          "name": "paginas_blocks_tarjetas_exp_tarjetas_imagen_id_media_id_fk",
+          "tableFrom": "paginas_blocks_tarjetas_exp_tarjetas",
           "tableTo": "media",
           "columnsFrom": [
             "imagen_id"
@@ -4317,10 +4317,10 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "paginas_blocks_tarjetas_expandibles_tarjetas_parent_id_fk": {
-          "name": "paginas_blocks_tarjetas_expandibles_tarjetas_parent_id_fk",
-          "tableFrom": "paginas_blocks_tarjetas_expandibles_tarjetas",
-          "tableTo": "paginas_blocks_tarjetas_expandibles",
+        "paginas_blocks_tarjetas_exp_tarjetas_parent_id_fk": {
+          "name": "paginas_blocks_tarjetas_exp_tarjetas_parent_id_fk",
+          "tableFrom": "paginas_blocks_tarjetas_exp_tarjetas",
+          "tableTo": "paginas_blocks_tarjetas_exp",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -4337,8 +4337,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.paginas_blocks_tarjetas_expandibles": {
-      "name": "paginas_blocks_tarjetas_expandibles",
+    "public.paginas_blocks_tarjetas_exp": {
+      "name": "paginas_blocks_tarjetas_exp",
       "schema": "",
       "columns": {
         "_order": {
@@ -4397,8 +4397,8 @@
         }
       },
       "indexes": {
-        "paginas_blocks_tarjetas_expandibles_order_idx": {
-          "name": "paginas_blocks_tarjetas_expandibles_order_idx",
+        "paginas_blocks_tarjetas_exp_order_idx": {
+          "name": "paginas_blocks_tarjetas_exp_order_idx",
           "columns": [
             {
               "expression": "_order",
@@ -4412,8 +4412,8 @@
           "method": "btree",
           "with": {}
         },
-        "paginas_blocks_tarjetas_expandibles_parent_id_idx": {
-          "name": "paginas_blocks_tarjetas_expandibles_parent_id_idx",
+        "paginas_blocks_tarjetas_exp_parent_id_idx": {
+          "name": "paginas_blocks_tarjetas_exp_parent_id_idx",
           "columns": [
             {
               "expression": "_parent_id",
@@ -4427,8 +4427,8 @@
           "method": "btree",
           "with": {}
         },
-        "paginas_blocks_tarjetas_expandibles_path_idx": {
-          "name": "paginas_blocks_tarjetas_expandibles_path_idx",
+        "paginas_blocks_tarjetas_exp_path_idx": {
+          "name": "paginas_blocks_tarjetas_exp_path_idx",
           "columns": [
             {
               "expression": "_path",
@@ -4444,9 +4444,9 @@
         }
       },
       "foreignKeys": {
-        "paginas_blocks_tarjetas_expandibles_parent_id_fk": {
-          "name": "paginas_blocks_tarjetas_expandibles_parent_id_fk",
-          "tableFrom": "paginas_blocks_tarjetas_expandibles",
+        "paginas_blocks_tarjetas_exp_parent_id_fk": {
+          "name": "paginas_blocks_tarjetas_exp_parent_id_fk",
+          "tableFrom": "paginas_blocks_tarjetas_exp",
           "tableTo": "paginas",
           "columnsFrom": [
             "_parent_id"
@@ -8949,6 +8949,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "1740cd19-1e9b-45d8-9cc8-3192a9a880d1",
+  "id": "8bfcf4e6-d235-447c-991d-068867af1332",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

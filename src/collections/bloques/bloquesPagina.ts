@@ -176,6 +176,12 @@ export const BloqueFranjaMarquee: Block = {
 
 export const BloqueTarjetasExpandibles: Block = {
   slug: "tarjetasExpandibles",
+  /*
+   * Nombre de tabla corto: con el del slug, la clave foránea de la imagen de
+   * cada tarjeta mide 66 caracteres y Postgres la corta a 63, así que la base
+   * no cuadra con el snapshot (falló «Migrar desde cero»). Así mide 58.
+   */
+  dbName: "paginas_blocks_tarjetas_exp",
   interfaceName: "BloqueTarjetasExpandibles",
   labels: { singular: "Tarjetas expandibles", plural: "Tarjetas expandibles" },
   fields: [

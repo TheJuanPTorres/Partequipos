@@ -926,10 +926,19 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 >   (Blob), copiados por dirección con un runbook.
 > - Mientras esté activa, estos assets **no se vuelven a señalar como L2–L4**
 >   en producción.
-> - **Lo que NO cubre:** las **fotos de ciudad de la sección 9** (sedes). No
->   figuran en la decisión, así que siguen solo en el preview; la copia a
->   producción lleva las sedes sin foto. Los datos de las sedes son de la
+> - **AMPLIADA el 2026-10-02 (dirección): cubre TODOS los assets de ux-9**,
+>   también las **fotos de ciudad de la sección 9** y la imagen decorativa del
+>   pie. La copia lleva las sedes con su foto. Los datos de las sedes son de la
 >   maqueta de ux-9 y se confirman con el cliente (§10.0.1, análisis §1).
+> - **Contenido de EJEMPLO:** las 6 fichas de usados de la sección 3
+>   (`npm run preview:ejemplo:sembrar`, marca «EJEMPLO UX-9 —» en la
+>   descripción y en el `alt`), los testimonios, las sedes y las preguntas.
+>   Todo lo que crea la copia queda en `ejemplo` de su manifiesto y la
+>   retirada lo quita de una vez.
+> - **Copia y retirada PROBADAS de punta a punta el 2026-10-02** contra la rama
+>   temporal `copia-demo-prueba` de Neon: segunda copia sin duplicados,
+>   37 ficheros en 404 tras retirar y huella de 41 tablas idéntica antes y
+>   después (PR #31).
 >
 > **Runbooks** (en `Desktop\partequipos-cierre\`, los ejecuta dirección):
 > `runbook-copia-demo-produccion.md` (copia del preview) y

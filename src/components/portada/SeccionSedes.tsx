@@ -85,7 +85,10 @@ export function SeccionSedes({ sedes, token }: { sedes: SedeLista[]; token: stri
           {fichas}
         </GloboSedes>
       ) : (
-        <ul className={estilos.lista}>{fichas}</ul>
+        // En móvil es un carril que se desplaza: enfocable para el teclado.
+        <ul className={estilos.lista} tabIndex={0} aria-label="Sedes">
+          {fichas}
+        </ul>
       )}
     </section>
   );

@@ -102,14 +102,15 @@
   line-height: 1.5;
 }
 
-/* Teléfonos: CTA rojo, como en ux-9. */
+/* Teléfonos: CTA rojo en negrita, sin subrayado, como se pinta en ux-9 (su
+ * CSS pide subrayado, pero Elementor lo quita). Subrayado al pasar y con foco. */
 .telefono {
   width: fit-content;
   color: var(--sedes-cta);
   font-size: 0.9375em;
   font-weight: 600;
   line-height: 1.5;
-  text-decoration: underline;
+  text-decoration: none;
   text-underline-offset: 0.2em;
   transition: color 0.25s ease;
 }
@@ -117,6 +118,7 @@
 .telefono:hover,
 .telefono:focus-visible {
   color: var(--sedes-cta-hover);
+  text-decoration: underline;
 }
 
 .telefono:focus-visible {
@@ -124,12 +126,16 @@
   outline-offset: 2px;
 }
 
-/* ---------------------------------------------- sin globo: la lista */
+/* ---------------------------------------------- sin globo: la lista
+ * Escritorio: filas centradas (con 7 sedes, 4 + 3 sin celda vacía).
+ * Móvil y tablet: carril horizontal con fichas al 80 %, como el panel de
+ * ux-9 en móvil, solo con CSS. */
 
 .lista {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1em;
+  justify-content: center;
   max-width: 1400px;
   margin: 0 auto;
   padding: 2em 1em;
@@ -138,9 +144,15 @@
 
 .lista > li {
   display: flex;
+  flex: 0 1 20rem;
   border: 1px solid var(--sedes-linea);
   border-radius: 1em;
   background: var(--sedes-panel);
+}
+
+.lista:focus-visible {
+  outline: 2px solid var(--sedes-cta);
+  outline-offset: -2px;
 }
 
 /* ------------------------------------------------------- con globo */
@@ -452,6 +464,20 @@
     inset: auto;
     justify-content: space-between;
     padding: 1em 1.5em;
+  }
+
+  .lista {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow: auto hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1em;
+  }
+
+  .lista > li {
+    flex: 0 0 80%;
+    min-width: 80%;
+    scroll-snap-align: center;
   }
 
   .lista .nombre {

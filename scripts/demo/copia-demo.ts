@@ -140,6 +140,7 @@ type Manifiesto = {
         icono: CategoriasTecnica["icono"];
         imagen: Id | null;
         enlace: string | null;
+        tituloPortada?: string | null;
       }
     >;
     portada?: {
@@ -307,6 +308,7 @@ if (modo === "simular" || modo === "copiar") {
     icono?: string | null;
     imagen?: MediaOrigen | null;
     enlace?: string | null;
+    tituloPortada?: string | null;
   };
   const catsO = (await get<Lista<CatO>>("/api/categorias-tecnicas/?depth=1&limit=100")).docs.filter(
     (x) => typeof x.ordenPortada === "number",
@@ -534,7 +536,7 @@ if (modo === "simular" || modo === "copiar") {
       : (plan.push(`  ! categoría «${x.slug}» no existe en el destino: se omite`), []);
   });
   plan.push(
-    `CATEGORÍAS TÉCNICAS a modificar (posición, icono, imagen, enlace): ${catsMod.map((x) => x.o.slug).join(", ") || "ninguna"}`,
+    `CATEGORÍAS TÉCNICAS a modificar (posición, icono, imagen, enlace y título en portada): ${catsMod.map((x) => x.o.slug).join(", ") || "ninguna"}`,
   );
   plan.push(
     `PORTADA a modificar: sección 3 (imagen), sección 4 (${(pO.seccionLogos?.logos ?? []).length} logos), sección 6–8 (vídeo y YouTube), sección 11 (imagen). EL HERO NO SE TOCA.`,
@@ -661,6 +663,7 @@ if (modo === "simular" || modo === "copiar") {
         icono: d.icono ?? null,
         imagen: idDe(d.imagen as Rel),
         enlace: d.enlace ?? null,
+        tituloPortada: d.tituloPortada ?? null,
       };
       guardar(m);
       await payload.update({
@@ -671,6 +674,7 @@ if (modo === "simular" || modo === "copiar") {
           icono: (o.icono ?? null) as CategoriasTecnica["icono"],
           imagen: await copiarMedia(o.imagen),
           enlace: o.enlace ?? null,
+          tituloPortada: o.tituloPortada ?? null,
         },
         overrideAccess: true,
       });

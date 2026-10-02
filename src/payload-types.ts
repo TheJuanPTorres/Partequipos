@@ -445,6 +445,10 @@ export interface CategoriasTecnica {
   imagen?: (number | null) | Media;
   icono?: ('corte' | 'llanta' | 'lubricante' | 'filtro' | 'motor' | 'rodaje') | null;
   /**
+   * Opcional. Vacío: la tarjeta de la portada usa el nombre de la categoría.
+   */
+  tituloPortada?: string | null;
+  /**
    * Ruta del sitio (/…) o https://
    */
   enlace?: string | null;
@@ -1518,6 +1522,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   descripcion?: T;
   imagen?: T;
   icono?: T;
+  tituloPortada?: T;
   enlace?: T;
   ordenPortada?: T;
   seo?:

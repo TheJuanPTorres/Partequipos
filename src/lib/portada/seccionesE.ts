@@ -42,6 +42,12 @@ export type TarjetaRepuesto = {
  * texto, sin hueco, que es como se ve en producción mientras las fotos de ux-9
  * (L3) sigan sin licencia.
  */
+/*
+ * TÍTULO EN PORTADA (2026-10-02): la tarjeta usa el título propio de la
+ * portada si la categoría lo tiene y, si no, el nombre real. Así ux-9 puede
+ * decir «Blades y corte» sin renombrar la categoría del catálogo (campo
+ * `tituloPortada`, migración 20261002_214044_titulo_portada_repuestos).
+ */
 export function tarjetasDeRepuestos(categorias: CategoriasTecnica[]): TarjetaRepuesto[] {
   return categorias
     .filter((c) => typeof c.ordenPortada === "number" && c.nombre?.trim())
@@ -53,7 +59,7 @@ export function tarjetasDeRepuestos(categorias: CategoriasTecnica[]): TarjetaRep
       const imagen = imagenDeMedia(c.imagen, "");
       return {
         id: c.id,
-        titulo: c.nombre.trim(),
+        titulo: c.tituloPortada?.trim() || c.nombre.trim(),
         texto: c.descripcion?.trim() || null,
         imagen: imagen ? { ...imagen, alt: "" } : null,
         icono: c.icono ?? null,

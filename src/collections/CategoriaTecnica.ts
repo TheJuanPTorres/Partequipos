@@ -73,6 +73,19 @@ export const CategoriaTecnica: CollectionConfig = {
         { label: "Tren de rodaje", value: "rodaje" },
       ],
     },
+    /*
+     * Título de la tarjeta de la portada (2026-10-02): ux-9 dice «Blades y
+     * corte» donde el catálogo dice «Herramienta de Corte (GETS)». Vacío, la
+     * tarjeta usa el nombre real; así no hay que renombrar la categoría.
+     */
+    {
+      name: "tituloPortada",
+      type: "text",
+      label: "Título en portada",
+      admin: {
+        description: "Opcional. Vacío: la tarjeta de la portada usa el nombre de la categoría.",
+      },
+    },
     {
       name: "enlace",
       type: "text",

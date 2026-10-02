@@ -17,7 +17,9 @@
  * «Excavadora Hitachi ZX75US-7» de ux-9). Las fichas llevan la marca al
  * principio de su `descripcion`.
  * Además pone en las 3 marcas de la sección 2 el texto de ux-9 (el mismo que
- * producción; no es contenido de ejemplo y `retirar` no lo toca).
+ * producción; no es contenido de ejemplo y `retirar` no lo toca), y el
+ * «Título en portada» de ux-9 en las 4 categorías de repuestos (ejemplo:
+ * `retirar` lo vacía si sigue siendo el de ux-9).
  *
  * NO REFRESCA EL PREVIEW: sembrar ANTES del último push (o redesplegar).
  */
@@ -133,7 +135,37 @@ const TEXTOS_MARCAS: Record<string, string> = {
     "Equipos nuevos YANMAR, reconocidos por su eficiencia, maniobrabilidad y confiabilidad para aplicaciones de construcción, agricultura e industria.",
 };
 
+/** «Título en portada» de las 4 tarjetas de repuestos de ux-9 (export 2516, sección 5). */
+const TITULOS_REPUESTOS: Record<string, string> = {
+  "herramienta-de-corte-gets": "Blades y corte",
+  "llantas-y-rines": "Llantas y rines",
+  lubricantes: "Lubricantes",
+  filtracion: "Filtración",
+};
+
+async function categoriaTecnica(slug: string) {
+  const r = await payload.find({
+    collection: "categorias-tecnicas",
+    where: { slug: { equals: slug } },
+    depth: 0,
+    limit: 1,
+    overrideAccess: true,
+  });
+  return r.docs[0] ?? null;
+}
+
 if (modo === "sembrar") {
+  for (const [slug, tituloPortada] of Object.entries(TITULOS_REPUESTOS)) {
+    const c = await categoriaTecnica(slug);
+    if (!c || c.tituloPortada === tituloPortada) continue;
+    await payload.update({
+      collection: "categorias-tecnicas",
+      id: c.id,
+      data: { tituloPortada },
+      overrideAccess: true,
+    });
+    log(`categoría ${slug}: título en portada «${tituloPortada}»`);
+  }
   for (const [slug, descripcion] of Object.entries(TEXTOS_MARCAS)) {
     const r = await payload.find({
       collection: "marcas-maquinaria",
@@ -195,6 +227,17 @@ if (modo === "sembrar") {
   });
   log("pie: imagen decorativa puesta");
 } else {
+  for (const [slug, tituloPortada] of Object.entries(TITULOS_REPUESTOS)) {
+    const c = await categoriaTecnica(slug);
+    if (!c || c.tituloPortada !== tituloPortada) continue;
+    await payload.update({
+      collection: "categorias-tecnicas",
+      id: c.id,
+      data: { tituloPortada: null },
+      overrideAccess: true,
+    });
+  }
+  log("títulos en portada de ejemplo: vaciados");
   for (const e of await fichasDeEjemplo()) {
     await payload.delete({ collection: "equipos-usados", id: e.id, overrideAccess: true });
   }

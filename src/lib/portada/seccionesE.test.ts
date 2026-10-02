@@ -68,6 +68,26 @@ describe("sección 5: tarjetas de repuestos", () => {
     assert.equal(sin!.imagen, null);
   });
 
+  it("usa el título en portada si existe; si no (o está en blanco), el nombre real", () => {
+    // Los cuatro de ux-9: tres con título propio y Filtración sin él.
+    const r = tarjetasDeRepuestos([
+      {
+        ...cat({ id: 1, nombre: "Herramienta de Corte (GETS)", ordenPortada: 1 }),
+        tituloPortada: "Blades y corte",
+      },
+      {
+        ...cat({ id: 2, nombre: "Llantas y Rines", ordenPortada: 2 }),
+        tituloPortada: " Llantas y rines ",
+      },
+      { ...cat({ id: 3, nombre: "Lubricantes", ordenPortada: 3 }), tituloPortada: "   " },
+      { ...cat({ id: 4, nombre: "Filtración", ordenPortada: 4 }), tituloPortada: null },
+    ]);
+    assert.deepEqual(
+      r.map((t) => t.titulo),
+      ["Blades y corte", "Llantas y rines", "Lubricantes", "Filtración"],
+    );
+  });
+
   it("texto, icono y enlace vacíos pasan a null", () => {
     const [t] = tarjetasDeRepuestos([cat({ ordenPortada: 1, descripcion: " ", enlace: "" })]);
     assert.equal(t!.texto, null);

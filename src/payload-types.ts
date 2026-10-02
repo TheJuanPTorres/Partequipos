@@ -1776,7 +1776,7 @@ export interface Pie {
    */
   textoBoton: string;
   /**
-   * Opcional. Máquina recortada (PNG transparente) que asoma girada sobre la tarjeta roja, solo en escritorio. Vacío: la tarjeta sin imagen.
+   * Opcional. Máquina recortada (PNG transparente) que asoma sobre la esquina derecha de la tarjeta roja, solo en escritorio. Vacío: la tarjeta sin imagen.
    */
   imagenDecorativa?: (number | null) | Media;
   empresaTitulo?: string | null;

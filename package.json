@@ -43,6 +43,8 @@
     "preview:fase-e:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-e-preview.ts retirar",
     "preview:fase-f:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-f-preview.ts sembrar",
     "preview:fase-f:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-f-preview.ts retirar",
+    "preview:ejemplo:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/ejemplo-preview.ts sembrar",
+    "preview:ejemplo:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/ejemplo-preview.ts retirar",
     "preview:fase-g:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-g-preview.ts sembrar",
     "preview:fase-g:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-g-preview.ts retirar",
     "preview:fase-h:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-h-preview.ts sembrar",

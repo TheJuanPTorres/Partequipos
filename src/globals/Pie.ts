@@ -47,7 +47,7 @@ export const Pie: GlobalConfig = {
       label: "Imagen decorativa",
       admin: {
         description:
-          "Opcional. Máquina recortada (PNG transparente) que asoma girada sobre la tarjeta roja, solo en escritorio. Vacío: la tarjeta sin imagen.",
+          "Opcional. Máquina recortada (PNG transparente) que asoma sobre la esquina derecha de la tarjeta roja, solo en escritorio. Vacío: la tarjeta sin imagen.",
       },
     },
     { name: "empresaTitulo", type: "text", label: "Frase destacada de la empresa" },

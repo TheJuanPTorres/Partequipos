@@ -17,7 +17,7 @@ import { seoConfig } from "@/lib/seo/config";
 import estilos from "./pie.module.css";
 
 /**
- * PIE DEL SITIO — ux-9 (export 2696 de Andrés). Server Component: solo el lema
+ * PIE DEL SITIO — ux-9 (export 2178 de Andrés, que sustituye al 2696). Server Component: solo el lema
  * que se revela es de cliente. Valores en `pie.module.css`.
  *
  * CONTENIDO: el global `pie` de Payload (lema, texto de la empresa, columnas y
@@ -35,8 +35,8 @@ import estilos from "./pie.module.css";
  *   `<h2>`, el nivel siguiente al `<h1>` de cualquier página.
  * - Sin buscador hasta aprobar su construcción: un cuadro que no busca es un
  *   defecto.
- * - Sin la máquina decorativa `Partequipos3553.png`: foto con la licencia
- *   pendiente (L3), y el repositorio es público.
+ * - La máquina decorativa NO está en el repositorio (es público): se sube a
+ *   `Media` y se elige en el global `pie`. Con §10.38 activa, la de ux-9.
  */
 
 const REDES = [
@@ -108,7 +108,7 @@ export async function Footer() {
               aria-hidden="true"
               width={decorativa.width}
               height={decorativa.height}
-              sizes="536px"
+              sizes="518px"
               loading="lazy"
               className={estilos.decorativa}
             />

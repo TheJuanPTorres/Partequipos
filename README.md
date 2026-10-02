@@ -366,7 +366,8 @@ Si el equipo de sistemas del cliente prefiere además un volcado físico con
 npm run backup                                   # a ./respaldos
 BACKUP_DIR=D:/respaldos npm run backup           # a otra carpeta
 BACKUP_SIN_DATOS_PERSONALES=true npm run backup  # sin users ni solicitudes
-npm run backup:blob                              # inventario de archivos
+npm run backup:blob                              # inventario de archivos (del almacén de este entorno)
+ALMACEN_BLOB_ESPERADO=<id> npm run backup:blob   # el de otro entorno, p. ej. producción desde local
 ```
 
 Sale un `.ndjson.gz` con marca temporal UTC:
@@ -435,6 +436,9 @@ política diga lo contrario.
 4. Crear un registro en la base restaurada: debe asignar un id nuevo, sin
    colisión (comprueba las secuencias).
 5. `npm run backup:blob` con `BLOB_COMPROBAR=true`: todos los archivos responden 200.
+   El inventario usa la URL **guardada** de cada registro y **falla** si alguna
+   no es del almacén esperado. Fuera de Vercel se espera el del preview: contra
+   producción, declara el suyo con `ALMACEN_BLOB_ESPERADO` (CLAUDE.md §10.37).
 
 Anotar fecha, duración y resultado. Sin el paso 3 el respaldo no está probado.
 

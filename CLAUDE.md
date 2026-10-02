@@ -1154,11 +1154,11 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
   **Decisión pendiente:** pasar a **Vercel Pro** (ya presupuestado en la
   cotización) **antes** de que el repositorio vuelva a ser privado; de lo
   contrario los despliegues se bloquearán de nuevo.
-- **CERRADO EL 2026-10-01 — separar los stores de Vercel Blob.** Ambos entornos comparten el
-  mismo `BLOB_READ_WRITE_TOKEN`. El `DROP SCHEMA` borró los registros de los 3
-  media de producción, pero **los archivos siguen en el Blob y `development` los
-  referencia**: no se deben borrar hasta separar los stores. Aislamiento a medias
-  mientras esto siga así.
+- **CERRADO EL 2026-10-01 — separar los stores de Vercel Blob.** Lo que se
+  anotó el 2026-07-28: producción y `development` **compartían** el mismo
+  `BLOB_READ_WRITE_TOKEN`; el `DROP SCHEMA` borró los registros de los 3 media
+  de producción, pero los archivos seguían en el Blob y `development` los
+  referenciaba. Hoy cada entorno escribe en su almacén:
   - **Preview y producción: CERRADO.** Se separaron el 2026-09-16 (§10.21) y se
     verificó con una subida el 2026-09-18 (§10.28). Comprobado otra vez el
     2026-10-01: los 38 registros de `media` del preview apuntan a su almacén

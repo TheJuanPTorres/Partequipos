@@ -220,6 +220,24 @@ describe("buildOrganizationJsonLd", () => {
     }
   });
 
+  it("horario: ContactPoint con hoursAvailable (OpeningHoursSpecification); sin tramos, nada", () => {
+    assert.equal("contactPoint" in buildOrganizationJsonLd(), false);
+    const punto = buildOrganizationJsonLd([
+      {
+        dias: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        abre: "08:00",
+        cierra: "17:30",
+      },
+      { dias: ["Saturday"], abre: "09:00", cierra: "12:00" },
+    ]).contactPoint as Record<string, unknown>;
+    assert.equal(punto["@type"], "ContactPoint");
+    assert.equal(punto.telephone, seoConfig.contact.phone);
+    const horas = punto.hoursAvailable as Record<string, unknown>[];
+    assert.equal(horas.length, 2);
+    assert.equal(horas[0]?.["@type"], "OpeningHoursSpecification");
+    assert.deepEqual([horas[1]?.opens, horas[1]?.closes], ["09:00", "12:00"]);
+  });
+
   it("omite legalName y taxID mientras estén pendientes de confirmar", () => {
     const jsonLd = buildOrganizationJsonLd();
 

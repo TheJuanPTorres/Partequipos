@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Fragment } from "react";
 
 import { ArticuloCuerpo } from "@/components/blog/ArticuloCuerpo";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
@@ -13,8 +14,10 @@ import {
   getPaginaPorSlug,
   getPaginas,
 } from "@/lib/queries/getPaginas";
+import { getHorario } from "@/lib/queries/getSeo";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { textoDias, textoHora } from "@/lib/seo/horario";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia } from "@/lib/utils/relations";
@@ -125,6 +128,7 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
 
   const { pagina } = resuelto;
   const secciones = pagina.secciones ?? [];
+  const horario = clave === SLUG_CONTACTO ? await getHorario() : [];
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -180,6 +184,26 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
           </div>
         </section>
       ))}
+
+      {/* Horario de atención (global `seo`), solo en /contactanos/. Sin tramos, no se pinta. */}
+      {clave === SLUG_CONTACTO && horario.length > 0 ? (
+        <section className="mt-10" aria-labelledby="horario-heading">
+          <h2 id="horario-heading" className="text-xl font-medium text-gray-900">
+            Horario de atención
+          </h2>
+          <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-gray-700">
+            {horario.map((t) => (
+              <Fragment key={`${t.dias.join("-")}-${t.abre}`}>
+                <dt className="first-letter:uppercase">{textoDias(t.dias)}</dt>
+                <dd>
+                  <time dateTime={t.abre}>{textoHora(t.abre)}</time> a{" "}
+                  <time dateTime={t.cierra}>{textoHora(t.cierra)}</time>
+                </dd>
+              </Fragment>
+            ))}
+          </dl>
+        </section>
+      ) : null}
 
       {/*
        * Formulario de contacto. Solo en /contactanos/: es la página que el

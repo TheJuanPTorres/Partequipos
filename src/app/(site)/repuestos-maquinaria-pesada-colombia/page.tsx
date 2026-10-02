@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getMarcas } from "@/lib/queries/getMarcas";
+import { getHorario } from "@/lib/queries/getSeo";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { buildBreadcrumbJsonLd, buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
@@ -17,7 +18,7 @@ export function generateMetadata(): Metadata {
 }
 
 export default async function RepuestosIndexPage() {
-  const marcas = await getMarcas();
+  const [marcas, horario] = await Promise.all([getMarcas(), getHorario()]);
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -26,7 +27,7 @@ export default async function RepuestosIndexPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <JsonLd data={[buildOrganizationJsonLd(), buildBreadcrumbJsonLd(breadcrumbs)]} />
+      <JsonLd data={[buildOrganizationJsonLd(horario), buildBreadcrumbJsonLd(breadcrumbs)]} />
       <Breadcrumbs items={breadcrumbs} />
 
       <h1 className="text-3xl font-semibold text-gray-900">{TITULO}</h1>

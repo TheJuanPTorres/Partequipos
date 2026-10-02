@@ -29,6 +29,7 @@ import {
   getMarcasDePortada,
 } from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
+import { getHorario } from "@/lib/queries/getSeo";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { seoConfig } from "@/lib/seo/config";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
@@ -57,7 +58,7 @@ export default async function HomePage() {
 
   const { contact } = seoConfig;
   const diapositivas = diapositivasDeHero(pagina.hero);
-  const [marcas, usados, excavadoras, categoriasTecnicas, testimonios, preguntas] =
+  const [marcas, usados, excavadoras, categoriasTecnicas, testimonios, preguntas, horario] =
     await Promise.all([
       getMarcasDePortada(),
       getEquiposUsadosDePortada(),
@@ -65,6 +66,7 @@ export default async function HomePage() {
       getCategoriasTecnicasDePortada(),
       getTestimoniosDePortada(),
       getPreguntasDePortada(),
+      getHorario(),
     ]);
   const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
   const maquinaUsada = imagenDeMedia(pagina.seccionUsada?.imagen, "");
@@ -82,7 +84,7 @@ export default async function HomePage() {
      * (docs/diseno/decisiones-home-ux9.md §22).
      */
     <main>
-      <JsonLd data={buildOrganizationJsonLd()} />
+      <JsonLd data={buildOrganizationJsonLd(horario)} />
 
       {/* Sección 1 de ux-9. Sin diapositivas en Payload, no se pinta. */}
       {diapositivas.length > 0 ? <HeroPortada diapositivas={diapositivas} /> : null}

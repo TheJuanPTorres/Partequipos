@@ -1930,10 +1930,18 @@ Se aplican (a), (b) y el arreglo del título, y **se cierra el tema** (CLAUDE.md
 el pie (`/repuestos-…/`, `/servicio-tecnico/`, `/nosotros/`, `/contactanos/`,
 teléfono y WhatsApp). El séptimo, el correo, pasa al pie.
 
-**Horario: PENDIENTE DE DECISIÓN.** Se creía que quedaba en el JSON-LD
-`Organization`, y **no está**: `buildOrganizationJsonLd` no emite
-`seoConfig.contact.openingHours`, y el bloque previo era el único sitio que lo
-pintaba. Sin decisión, el horario sale del sitio.
+**Horario: RESUELTO (decisión de dirección, fase 6).** Se creía que quedaba
+en el JSON-LD `Organization` y no estaba: `seoConfig.contact.openingHours` era
+texto libre en el código y solo lo pintaba el bloque previo. Ahora:
+
+- vive en el **global `seo`** de Payload («SEO y datos de la empresa»),
+  editable desde el panel, por tramos (días, abre, cierra en HH:MM). Su
+  migración (`20261002_010203_seo_horario`) siembra el valor de antes: lunes a
+  viernes de 08:00 a 17:30 y sábado de 09:00 a 12:00;
+- va en el JSON-LD `Organization` como `contactPoint.hoursAvailable`, una
+  `OpeningHoursSpecification` por tramo. `Organization` no admite
+  `openingHoursSpecification` directamente (es de `Place`/`LocalBusiness`);
+- se pinta en `/contactanos/`, sobre el formulario.
 
 **Estructura:** ese bloque era el único `<main>` de la home. Ahora las
 secciones de ux-9 van dentro de **un** `<main>`, con el JSON-LD; el `<h1>`

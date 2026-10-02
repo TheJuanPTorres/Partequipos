@@ -360,8 +360,22 @@ los comandos `npm run preview:comprobar`, `preview:db:check`,
 el preview. La decisión está en `src/lib/preview/entornoPreview.ts`, con
 pruebas; los guardas de cada script (`puedeTocarHeroDePrueba`) siguen mandando.
 
-**Barreras locales** (`.claude/`, ignorado por git, solo en esta máquina):
+**Barreras locales** (fuera del repositorio, solo en esta máquina):
 
+- **DÓNDE VIVEN (desde el 2026-10-02): `Desktop\partequipos-claude\`**,
+  compartida por todas las copias de trabajo (`Devs\Partequipos`,
+  `Devs\Partequipos-nosotros`, `Devs\Partequipos-panel`). Ahí están
+  `hooks\barrera.mjs` y `agents\verificador.md`. El `.claude\settings.local.json`
+  de cada copia apunta al hook con **ruta absoluta**, y su `.claude\agents` es
+  un enlace (junction) a la carpeta compartida. Así un cambio de la barrera
+  llega a todas las copias a la vez.
+- **LA BARRERA NO LA EDITA EL AGENTE.** Los permisos de cada copia deniegan
+  `Edit` y `Write` sobre `.claude\` y sobre `partequipos-claude\`, y la propia
+  barrera bloquea además cualquier comando que nombre esas carpetas. Para
+  cambiarla, el agente deja la propuesta (el diff y la demostración que hará
+  falta) en `Desktop\partequipos-cierre\propuestas\`, y la aplica dirección.
+  Demostrado el 2026-10-02: un `Edit` sobre `barrera.mjs` y un `Write` en
+  `.claude\` se deniegan, y `ls .claude` lo bloquea la barrera.
 - Lectura, edición y escritura de `.env*` denegadas en los permisos; un hook
   `PreToolUse` bloquea además cualquier comando que nombre un `.env*`.
 - El mismo hook bloquea todo comando con «produccion», `vercel promote`,
@@ -426,7 +440,52 @@ instalado a nivel de usuario.
 **Informes:** al final de cada parte, además de mostrarse, se guardan en
 `Desktop\partequipos-cierre\informes\AAAA-MM-DD-<tema>.md`.
 
-**Verificador:** subagente `.claude/agents/verificador.md` que, con el
+**Formato del informe (desde el 2026-10-02), en este orden:**
+
+1. **Fusionado** — PR, qué trae, verificador y estado de `main`.
+2. **En curso** — lo empezado y sin fusionar, con su rama.
+3. **Paradas** — lo que se detuvo y por qué (ver «Paradas», abajo).
+4. **Necesito de dirección** — **siempre al final y breve**: solo lo que
+   dirección tiene que hacer o decidir.
+
+**Coordinación entre agentes (desde el 2026-10-02): la ventana de
+migraciones se pide en `Desktop\partequipos-coordinacion\`, sin pasar por
+dirección.**
+
+- **`VENTANA.md`**: «libre» u «ocupada por <agente> desde <hora>, motivo».
+  1. Leerlo. Si está ocupada, no se crean migraciones: se espera.
+  2. Si está libre, escribir el nombre propio, la hora y el motivo.
+  3. **Releerlo** para confirmar que es el nombre propio (otro agente pudo
+     escribir a la vez). Si no, no se ha cogido.
+  4. **Liberarla al fusionar** la migración (o al abandonarla).
+  - Una ventana ocupada **más de 4 h** sin cambios: se avisa a dirección.
+  - **Nunca se libera la ventana de otro agente.**
+- **`ESTADO.md`**: una línea por agente (copia, rama, en qué está y qué
+  espera). Cada uno actualiza **solo la suya**, al empezar y al terminar cada
+  tarea.
+
+**Decisiones estándar de réplica (desde el 2026-10-02): se aplican sin
+preguntar.** Al replicar un diseño (ux-9 y lo que venga):
+
+| Decisión                                                           | Detalle                                                                                       |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| **Lo pintado manda sobre el export**                               | Se mide la página publicada; si difiere del export, se replica lo pintado y se anota          |
+| **Lo oculto en los tres tamaños no existe**                        | Elemento o contenedor con `hide_desktop`, `hide_tablet` y `hide_mobile` a la vez: no se hace  |
+| **`__globals__` manda sobre el valor fijo**                        | La referencia global del kit gana al valor escrito en el elemento                             |
+| **Las erratas se corrigen y se anotan para Andrés**                | En `docs/diseno/decisiones-home-ux9.md` (o el documento de decisiones de esa plantilla)       |
+| **Migas solo para lectores de pantalla si el diseño no las tiene** | Si el diseño no las pinta, van visualmente ocultas (solo lectores); el `BreadcrumbList` sigue |
+| **Botón de pausa visible en lo que se mueve solo** (WCAG 2.2.2)    | Carruseles, marquesinas, vídeos en bucle                                                      |
+| **Contenido de ejemplo permitido, marcado para limpiar** (§10.38)  | Marca «EJEMPLO UX-9 —» y en el manifiesto de la copia                                         |
+| **Assets nunca al repositorio**                                    | Ni a `public/`: van a `Media` (Blob) por script o panel                                       |
+| **Nada de dependencias nuevas sin aprobación**                     | §2                                                                                            |
+
+**Paradas:** el agente se detiene y pregunta **solo** ante lo que no esté en
+esa lista o en las PARADAS del prompt en curso (escrituras en producción, lo
+que no se puede igualar sin apartarse del diseño o de las reglas, un widget
+que no se puede replicar…).
+
+**Verificador:** subagente `verificador.md` (en `Desktop\partequipos-claude\agents\`,
+enlazado desde `.claude\agents` de cada copia) que, con el
 contexto limpio y en solo lectura, comprueba **por su efecto** lo que el
 agente principal afirma. **Regla de hitos:** ningún informe de hito (CI,
 preview, prueba de humo, despliegue, lo pintado, la base) se da sin su

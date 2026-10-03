@@ -52,18 +52,18 @@ Nunca se versionan valores reales. La plantilla es [`.env.example`](./.env.examp
 en local se copia a `.env.local` (ignorado por git) y en Vercel se cargan en el
 panel del proyecto.
 
-| Variable                                                  | Local (`.env.local`)    | Preview (Vercel) | Producción (Vercel)       |
-| --------------------------------------------------------- | ----------------------- | ---------------- | ------------------------- |
-| `DATABASE_URI`                                            | rama **dev** de Neon    | rama **preview** | rama **producción**       |
-| `PAYLOAD_SECRET`                                          | cualquiera, largo       | propio           | **propio y distinto**     |
-| `NEXT_PUBLIC_SERVER_URL`                                  | `http://localhost:3000` | URL del preview  | `https://partequipos.com` |
-| `BLOB_READ_WRITE_TOKEN`                                   | store de pruebas        | store de pruebas | store de producción       |
-| `SENTRY_DSN`                                              | **no existe todavía**   | **no existe**    | **no existe**             |
-| `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT`     | **no existe todavía**   | **no existe**    | **no existe**             |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | opcional                | sí               | sí                        |
-| `RESEND_API_KEY`                                          | opcional                | sí               | sí                        |
-| `RESEND_FROM_EMAIL` / `RESEND_FROM_NAME`                  | opcional                | sí               | sí                        |
-| `SOLICITUDES_EMAIL_TO`                                    | opcional                | sí               | sí                        |
+| Variable                                                  | Local (`.env.local`)    | Preview (Vercel)          | Producción (Vercel)                                                                                       |
+| --------------------------------------------------------- | ----------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URI`                                            | rama **dev** de Neon    | rama **preview**          | rama **producción**                                                                                       |
+| `PAYLOAD_SECRET`                                          | cualquiera, largo       | propio                    | **propio y distinto**                                                                                     |
+| `NEXT_PUBLIC_SERVER_URL`                                  | `http://localhost:3000` | la de Producción (§10.21) | hoy `https://partequipos.vercel.app`; `https://partequipos.com` al lanzar (`docs/runbook-lanzamiento.md`) |
+| `BLOB_READ_WRITE_TOKEN`                                   | store de pruebas        | store de pruebas          | store de producción                                                                                       |
+| `SENTRY_DSN`                                              | **no existe todavía**   | **no existe**             | **no existe**                                                                                             |
+| `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT`     | **no existe todavía**   | **no existe**             | **no existe**                                                                                             |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | opcional                | sí                        | sí                                                                                                        |
+| `RESEND_API_KEY`                                          | opcional                | sí                        | sí                                                                                                        |
+| `RESEND_FROM_EMAIL` / `RESEND_FROM_NAME`                  | opcional                | sí                        | sí                                                                                                        |
+| `SOLICITUDES_EMAIL_TO`                                    | opcional                | sí                        | sí                                                                                                        |
 
 Reglas:
 

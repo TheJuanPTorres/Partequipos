@@ -68,6 +68,7 @@
     "prefs:menu": "payload run scripts/usuarios/preferencias-menu.ts",
     "prefs:borrar": "payload run scripts/usuarios/borrar-preferencia.ts",
     "humo": "tsx scripts/qa/humo.ts",
+    "lanzamiento:urls": "tsx scripts/lanzamiento/comprobar-urls.ts",
     "qa:vuelo-pie": "npx -y -p puppeteer-core@24.43.1 node scripts/qa/vuelo-pie.mjs"
   },
   "dependencies": {

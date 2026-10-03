@@ -3395,6 +3395,35 @@ Ese comportamiento es correcto para desarrollar —permite probar sin cuenta de
 Cloudflare— y **peligroso en producción**. Hacen falta las claves reales del
 cliente; al ponerlas no hay que tocar código.
 
+> **PROBADO DE PUNTA A PUNTA el 2026-10-03, con las claves de prueba de
+> Cloudflare** ([documentación](https://developers.cloudflare.com/turnstile/troubleshooting/testing/)).
+> Las claves se pasaron en línea al comando, sin escribirlas en ningún `.env`.
+> Se usó `npm run dev` contra `development`, el formulario de `/contactanos/` y
+> datos evidentemente falsos:
+>
+> | Caso                                    | Claves                         | Resultado                                                                                                 |
+> | --------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------- |
+> | 1. Siempre aprueba                      | sitio `1x…AA`, secreto `1x…AA` | «Solicitud enviada» y **1 fila** en `solicitudes`                                                         |
+> | 2. Siempre rechaza                      | sitio `1x…AA`, secreto `2x…AA` | «No pudimos comprobar que eres una persona. Recarga la página e inténtalo de nuevo.» y **0 filas nuevas** |
+> | 3. Sin claves (lo de hoy en producción) | ninguna (vacías)               | Cae a las de prueba: el HTML sirve la clave `1x…AA`, el envío se guarda (**1 fila**)                      |
+>
+> - **Limpieza:** las 2 filas de prueba se borraron por su correo falso, con un script que se niega fuera de `development`. Quedan 0.
+> - **Registro:** en los casos 1 y 3 aparece «Solicitud guardada SIN aviso por correo», como se espera sin Resend.
+> - **Prueba automática:** `src/lib/turnstile.test.ts` cubre los tres casos y además que se niega sin token, con la red caída y con un 5xx. Comprueba qué secreto viaja con un `fetch` simulado, sin red en CI. **Demostrado que falla:** si el código ignora `TURNSTILE_SECRET_KEY`, el caso 2 sale en rojo.
+>
+> **PARA ACTIVARLO SOLO FALTA pegar las claves reales en Vercel**:
+>
+> - `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`, **solo en Production**;
+> - redesplegar, porque la clave del sitio es `NEXT_PUBLIC_*` y se incrusta en el build;
+> - comprobar que el HTML de `/contactanos/` sirve la clave real y no `1x00000000000000000000AA`.
+>
+> No hay que tocar código. El widget del cliente tiene que tener `partequipos.com` entre sus dominios en Cloudflare (`docs/runbook-lanzamiento.md`, paso a).
+>
+> **Observado de paso, sin investigar:**
+>
+> - Tras el rechazo del caso 2, el formulario **se vacía**: React restablece el formulario al terminar la acción. Quien escribe un mensaje largo y falla el reto lo pierde. Mejora de UX pendiente de decidir.
+> - En `next dev`, los primeros clics en «Enviar» no hicieron nada (0 peticiones) hasta pasados unos segundos. Lo más probable es la hidratación en desarrollo. **No se ha comprobado en producción.**
+
 **2. Resend — `RESEND_API_KEY` (más `RESEND_FROM_EMAIL`).**
 
 Sin ella no se configura adaptador de correo: la solicitud **se guarda igual**

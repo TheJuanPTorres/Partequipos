@@ -45,9 +45,8 @@ lo que lee el editor:
 Solo cambian etiquetas y descripciones: ni columnas ni migración (comprobado
 con `npm run db:deriva`).
 
-**No se tocó** `PaginaInstitucional.ts` (terreno del agente B), donde quedan dos
-textos de la auditoría: «El slug es la ruta completa… URLs indexadas» y «Las
-legales no deberían despublicarse», que habla de una acción que no existe.
+`PaginaInstitucional.ts` (terreno del agente B) quedó fuera; sus textos van
+en §3.
 
 ### 1.3 Imágenes (`media`)
 
@@ -69,3 +68,20 @@ Escrita contra el panel después del orden 1 (etiquetas nuevas) y con los
 mensajes de error copiados del código. Dice claro lo que hoy no hay:
 borradores, historial, recuperación de contraseña por correo y edición del
 teléfono y las redes desde el panel.
+
+## 3. Textos de Páginas (2026-10-03, rama `feat/panel-textos-paginas`)
+
+Aprobado por dirección como ayuda del panel. Antes se comprobó que ninguna
+rama abierta del agente B toca `PaginaInstitucional.ts` (la única que lo
+tocaba, `feat/pagina-nosotros`, ya está fusionada y es idéntica a `main`).
+
+| Dónde          | Antes                                                          | Ahora                                                         |
+| -------------- | -------------------------------------------------------------- | ------------------------------------------------------------- |
+| Colección      | «El slug es la ruta completa… son URLs indexadas»              | Qué páginas hay y por qué no cambiar la ruta de una publicada |
+| Campo de ruta  | «Ruta (slug)», «Ej: 'nosotros'…»                               | «Ruta (dirección web)», con los ejemplos entre comillas «»    |
+| Tipo de página | «Las legales no deberían despublicarse» (no existe esa acción) | Para qué es «Legal / cumplimiento» y que no se borran         |
+
+**Hallazgo anotado, sin tocar:** a diferencia del resto de colecciones, la
+ruta de las páginas **no se bloquea** tras crearlas (es un campo de texto
+propio, no `slugField`), así que hoy un editor sí puede cambiarla y nada crea
+el 301. Se propone a dirección; no entra en este PR.

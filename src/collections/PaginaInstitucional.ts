@@ -35,7 +35,7 @@ export const PaginaInstitucional: CollectionConfig = {
     defaultColumns: ["titulo", "slug", "tipoPagina"],
     group: "Contenido",
     description:
-      "Páginas fijas del sitio. El slug es la ruta completa y no debe cambiarse: son URLs indexadas.",
+      "Páginas fijas del sitio (Nosotros, Contacto, textos legales…) y la portada. No cambies la ruta de una página publicada: Google ya conoce esa dirección.",
   },
   access: {
     read: publico,
@@ -63,11 +63,11 @@ export const PaginaInstitucional: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
-      label: "Ruta (slug)",
+      label: "Ruta (dirección web)",
       admin: {
         position: "sidebar",
         description:
-          "Ruta completa sin barras al inicio ni al final. Ej: 'nosotros' o 'nosotros/trabaja-con-nosotros'. Para la portada, usar 'inicio'.",
+          "La dirección de la página, sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio».",
       },
     },
     {
@@ -82,7 +82,8 @@ export const PaginaInstitucional: CollectionConfig = {
       ],
       admin: {
         position: "sidebar",
-        description: "Las legales no deberían despublicarse: son de cumplimiento.",
+        description:
+          "«Legal / cumplimiento» para tratamiento de datos, términos y similares: tienen que estar siempre en el sitio, así que no se borran.",
       },
     },
     {

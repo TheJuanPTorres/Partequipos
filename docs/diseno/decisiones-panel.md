@@ -61,3 +61,11 @@ legales no deberían despublicarse», que habla de una acción que no existe.
 
 `listSearchableFields`: modelos por nombre y código («320D»), equipos nuevos
 por nombre y código, equipos usados por nombre, marca y modelo.
+
+## 2. Guía breve del editor (2026-10-02, rama `feat/panel-guia-editor`)
+
+Entregable cotizado del Sprint 4 (`docs/PLAN-MVP.md`): `docs/guia-editor.md`.
+Escrita contra el panel después del orden 1 (etiquetas nuevas) y con los
+mensajes de error copiados del código. Dice claro lo que hoy no hay:
+borradores, historial, recuperación de contraseña por correo y edición del
+teléfono y las redes desde el panel.

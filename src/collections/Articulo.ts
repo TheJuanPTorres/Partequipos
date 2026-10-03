@@ -27,7 +27,8 @@ export const Articulo: CollectionConfig = {
     useAsTitle: "titulo",
     defaultColumns: ["titulo", "categoria", "fechaPublicacion", "slug"],
     group: "Contenido",
-    description: "Se publican en la raíz del sitio: /{slug}/, sin prefijo.",
+    description:
+      "Cada artículo vive en partequipos.com/<slug>/. Su slug no puede repetir el de una página.",
   },
   access: {
     read: publico,
@@ -50,7 +51,7 @@ export const Articulo: CollectionConfig = {
       type: "relationship",
       relationTo: "categorias-blog",
       label: "Categoría",
-      admin: { description: "Determina en qué archivo aparece el artículo." },
+      admin: { description: "En qué listado del blog aparece el artículo." },
     },
     {
       name: "fechaPublicacion",
@@ -59,7 +60,8 @@ export const Articulo: CollectionConfig = {
       label: "Fecha de publicación",
       admin: {
         position: "sidebar",
-        description: "Alimenta el orden del índice y el JSON-LD del artículo.",
+        description:
+          "Ordena el blog (lo más reciente primero) y es la fecha que ven los buscadores.",
         date: { pickerAppearance: "dayOnly", displayFormat: "d MMM yyyy" },
       },
     },

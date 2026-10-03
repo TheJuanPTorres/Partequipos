@@ -47,8 +47,8 @@ export async function comprobarSlugLibre(
   if (await existeEnLaOtra(limpio)) {
     return (
       `El slug "${limpio}" ya lo usa ${etiquetaOtraColeccion}. ` +
-      "Las dos comparten el espacio de URLs raíz, así que una de las dos quedaría " +
-      "inalcanzable. Elige otro slug."
+      "Artículos y páginas comparten las direcciones del tipo partequipos.com/<slug>/, " +
+      "así que uno taparía al otro. Elige otro slug."
     );
   }
   return null;

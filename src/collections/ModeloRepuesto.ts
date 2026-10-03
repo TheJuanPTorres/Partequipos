@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
 import { revalidarModelo, revalidarModeloBorrado } from "./hooks/revalidateHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
@@ -19,6 +20,8 @@ export const ModeloRepuesto: CollectionConfig = {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "marca", "tipo", "slug"],
     group: "Repuestos",
+    // El código («320D») es como busca un comercial; el nombre solo no basta.
+    listSearchableFields: ["nombre", "codigo"],
   },
   access: {
     read: publico,
@@ -30,6 +33,8 @@ export const ModeloRepuesto: CollectionConfig = {
   indexes: [{ fields: ["tipo", "slug"], unique: true }],
   // ISR: revalida la ficha y la página del tipo donde el modelo se lista.
   hooks: {
+    // La marca desnormalizada tiene que ser la del tipo (ver el hook).
+    beforeValidate: [marcaDelTipoCoincide("tipos-equipo")],
     afterChange: [revalidarModelo],
     afterDelete: [revalidarModeloBorrado],
   },
@@ -51,7 +56,7 @@ export const ModeloRepuesto: CollectionConfig = {
       label: "Marca",
       admin: {
         description:
-          "Desnormalizada para consultas y breadcrumbs. Debe coincidir con la marca del tipo elegido.",
+          "Tiene que ser la marca del tipo de equipo de abajo. Si la cambias, vuelve a elegir el tipo.",
       },
     },
     {
@@ -61,7 +66,7 @@ export const ModeloRepuesto: CollectionConfig = {
       required: true,
       label: "Tipo de equipo",
       admin: {
-        description: "Se filtra por la marca seleccionada arriba.",
+        description: "Solo aparecen los tipos de la marca elegida arriba.",
       },
       // Filtra el desplegable de tipos por la marca ya seleccionada.
       filterOptions: ({ siblingData }) => {

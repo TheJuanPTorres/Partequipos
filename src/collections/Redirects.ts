@@ -151,8 +151,8 @@ export const Redirects: CollectionConfig = {
         position: "sidebar",
         readOnly: true,
         description:
-          "Lo actualiza `npm run redirects:check`. «Sin contenido» es normal mientras se migra; " +
-          "«No corresponde a ninguna ruta» hay que corregirlo antes de publicar.",
+          "Lo actualiza el equipo técnico al revisar las redirecciones. «Sin contenido» es normal " +
+          "mientras se migra; «No corresponde a ninguna ruta» hay que corregirlo antes de publicar.",
       },
     },
     {

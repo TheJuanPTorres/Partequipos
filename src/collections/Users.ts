@@ -111,7 +111,7 @@ export const Users: CollectionConfig = {
       admin: {
         position: "sidebar",
         description:
-          "Los slugs son de solo lectura tras crear el registro porque forman la URL indexada. Marca esta casilla solo para corregir erratas reales; el cambio generará un redirect 301 automático. Ver ADR 0005.",
+          "Permite cambiar el slug de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.",
       },
       // Mismo motivo que `rol`: es un permiso, no una preferencia.
       access: { create: campoSoloAdmin, update: campoSoloAdmin },

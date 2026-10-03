@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
 import { revalidarEquipoNuevo, revalidarEquipoNuevoBorrado } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
@@ -19,6 +20,7 @@ export const EquipoNuevo: CollectionConfig = {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "marca", "tipo", "slug"],
     group: "Maquinaria",
+    listSearchableFields: ["nombre", "codigo"],
   },
   access: {
     read: publico,
@@ -26,7 +28,12 @@ export const EquipoNuevo: CollectionConfig = {
     update: escrituraContenido,
     delete: borradoAdmin,
   },
-  hooks: { afterChange: [revalidarEquipoNuevo], afterDelete: [revalidarEquipoNuevoBorrado] },
+  hooks: {
+    // La marca desnormalizada tiene que ser la del tipo (ver el hook).
+    beforeValidate: [marcaDelTipoCoincide("tipos-maquinaria")],
+    afterChange: [revalidarEquipoNuevo],
+    afterDelete: [revalidarEquipoNuevoBorrado],
+  },
   // Unicidad por tipo; el tipo ya implica una marca. Igual que en repuestos.
   indexes: [{ fields: ["tipo", "slug"], unique: true }],
   fields: [
@@ -40,7 +47,7 @@ export const EquipoNuevo: CollectionConfig = {
       label: "Marca",
       admin: {
         description:
-          "Desnormalizada para consultas y migas. Debe coincidir con la marca del tipo elegido.",
+          "Tiene que ser la marca del tipo de equipo de abajo. Si la cambias, vuelve a elegir el tipo.",
       },
     },
     {
@@ -49,7 +56,7 @@ export const EquipoNuevo: CollectionConfig = {
       relationTo: "tipos-maquinaria",
       required: true,
       label: "Tipo de equipo",
-      admin: { description: "Se filtra por la marca seleccionada arriba." },
+      admin: { description: "Solo aparecen los tipos de la marca elegida arriba." },
       filterOptions: ({ siblingData }) => {
         const marca = (siblingData as { marca?: number | string | null }).marca;
         return marca ? { marca: { equals: marca } } : true;

@@ -10,23 +10,23 @@ export function seoField(): Field {
   return {
     name: "seo",
     type: "group",
-    label: "SEO",
+    label: "Buscadores y redes sociales",
     fields: [
       {
         name: "metaTitle",
         type: "text",
-        label: "Meta título",
+        label: "Título para buscadores",
       },
       {
         name: "metaDescription",
         type: "textarea",
-        label: "Meta descripción",
+        label: "Descripción para buscadores",
       },
       {
         name: "ogImage",
         type: "upload",
         relationTo: "media",
-        label: "Imagen social (OG)",
+        label: "Imagen al compartir en redes",
       },
     ],
   };

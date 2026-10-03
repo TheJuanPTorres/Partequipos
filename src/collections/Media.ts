@@ -12,8 +12,15 @@ import { sinRecorte } from "./hooks/sinRecorte";
  */
 export const Media: CollectionConfig = {
   slug: "media",
+  // Solo admite imágenes (ver `mimeTypes`): «Media» a secas no le dice nada al editor.
+  labels: { singular: "Imagen", plural: "Imágenes" },
   admin: {
     group: "Contenido",
+    description:
+      "Fotos y logos del sitio, en JPEG, PNG o WebP. El texto alternativo describe la imagen a quien no la ve.",
+    // El texto alternativo en la lista, para ver de un vistazo cuáles están flojos.
+    defaultColumns: ["filename", "alt", "updatedAt"],
+    listSearchableFields: ["filename", "alt"],
   },
   access: {
     read: publico,

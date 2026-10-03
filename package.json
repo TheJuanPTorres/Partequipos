@@ -62,6 +62,7 @@
     "backup:blob": "payload run scripts/backup/inventario-blob.ts",
     "qa": "tsx scripts/qa/verificar.ts",
     "qa:acceso-portada": "payload run scripts/qa/verificar-acceso-portada.ts",
+    "qa:marca-tipo": "payload run scripts/qa/verificar-marca-tipo.ts",
     "rol": "payload run scripts/usuarios/asignar-rol.ts",
     "rol:admin": "payload run scripts/usuarios/asignar-rol.ts",
     "prefs:menu": "payload run scripts/usuarios/preferencias-menu.ts",

@@ -25,14 +25,14 @@ export function slugField({ from = "nombre", unique = false }: SlugFieldOptions 
     required: true,
     unique,
     index: true,
-    label: "Slug",
+    label: "Slug (dirección web)",
     admin: {
       position: "sidebar",
       description:
-        "Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. " +
-        "Después queda de solo lectura: cambiarlo rompe la URL posicionada. " +
-        "Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; " +
-        "el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).",
+        "Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. " +
+        "Después ya no se puede cambiar, porque Google ya conoce esa dirección. " +
+        "Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: " +
+        "la dirección antigua seguirá llevando a la nueva.",
     },
     access: {
       /**

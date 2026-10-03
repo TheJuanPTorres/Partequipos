@@ -75,6 +75,6 @@ describe("comprobarSlugLibre — casos límite", () => {
 
   it("explica por qué importa, no solo que falla", async () => {
     const error = await comprobarSlugLibre("ocupado", "un artículo", cualquiera);
-    assert.match(error ?? "", /inalcanzable/);
+    assert.match(error ?? "", /uno taparía al otro/);
   });
 });

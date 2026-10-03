@@ -27,6 +27,7 @@ export const EquipoUsado: CollectionConfig = {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "categoria", "anio", "disponible"],
     group: "Maquinaria",
+    listSearchableFields: ["nombre", "marca", "modelo"],
     description:
       "Inventario de maquinaria usada. Se muestra dentro de la página de su categoría; no genera URLs propias.",
   },

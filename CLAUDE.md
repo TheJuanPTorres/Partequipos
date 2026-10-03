@@ -567,6 +567,7 @@ veredicto, que va en el informe.
 
 - **Página Nosotros de ux-9 (2026-10-02):** `paginas.bloques` con cinco bloques reutilizables (migración `20261002_204606_paginas_bloques`, solo esquema); detalle, desviaciones y CLS aceptado en `docs/diseno/decisiones-nosotros.md`.
 - **Panel, orden 1 (2026-10-02, PR #46):** marca = marca del tipo en modelos y equipos nuevos (`marcaDelTipoCoincide`, por efecto con `npm run qa:marca-tipo`), ayudas sin jerga, «Imágenes» con columnas y búsqueda por código; sin esquema. Detalle en `docs/diseno/decisiones-panel.md`.
+- **Guía del editor (2026-10-03, PR #47):** `docs/guia-editor.md`, entregable del Sprint 4 para quien carga contenido en el panel.
 
 ### 10.0 Qué está construido y qué falta
 

@@ -566,6 +566,7 @@ veredicto, que va en el informe.
 - **Plan de referencia:** `docs/PLAN-MVP.md` y `docs/RUTA-DESARROLLO.md`.
 
 - **Página Nosotros de ux-9 (2026-10-02):** `paginas.bloques` con cinco bloques reutilizables (migración `20261002_204606_paginas_bloques`, solo esquema); detalle, desviaciones y CLS aceptado en `docs/diseno/decisiones-nosotros.md`.
+- **Panel, orden 1 (2026-10-02, PR #46):** marca = marca del tipo en modelos y equipos nuevos (`marcaDelTipoCoincide`, por efecto con `npm run qa:marca-tipo`), ayudas sin jerga, «Imágenes» con columnas y búsqueda por código; sin esquema. Detalle en `docs/diseno/decisiones-panel.md`.
 
 ### 10.0 Qué está construido y qué falta
 

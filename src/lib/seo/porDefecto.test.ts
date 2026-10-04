@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { recortarDescripcion, tituloPorDefecto } from "./porDefecto";
+import { concuerda, recortarDescripcion, tituloPorDefecto } from "./porDefecto";
 import { SEO_POR_COLECCION, estadoLongitud } from "./seoPanel";
 
 describe("tituloPorDefecto", () => {
@@ -62,5 +62,32 @@ describe("estadoLongitud", () => {
     assert.equal(estadoLongitud(61, { max: 60 }), "largo");
     assert.equal(estadoLongitud(50, { min: 120, max: 160 }), "corto");
     assert.equal(estadoLongitud(140, { min: 120, max: 160 }), "bien");
+  });
+});
+
+describe("concordancia de nuevas/usadas", () => {
+  it("las 11 categorías que hay hoy (8 de usada y 3 de nueva)", () => {
+    const usada = {
+      Vibrocompactadores: "Vibrocompactadores usados",
+      Retrocargadoras: "Retrocargadoras usadas",
+      Motoniveladoras: "Motoniveladoras usadas",
+      Minicargadores: "Minicargadores usados",
+      Excavadoras: "Excavadoras usadas",
+      Compactadores: "Compactadores usados",
+      Cargadores: "Cargadores usados",
+      Bulldozers: "Bulldozers usados",
+    };
+    for (const [nombre, titulo] of Object.entries(usada)) {
+      assert.equal(tituloPorDefecto.categoriaUsada(nombre), titulo);
+    }
+    assert.equal(tituloPorDefecto.categoriaNueva("Excavadoras"), "Excavadoras nuevas");
+    assert.equal(tituloPorDefecto.categoriaNueva("Compactadores"), "Compactadores nuevos");
+    assert.equal(tituloPorDefecto.categoriaNueva("Cargadores"), "Cargadores nuevos");
+  });
+
+  it("mira la última palabra, sin importar mayúsculas", () => {
+    assert.equal(concuerda("Grúas TELESCÓPICAS", "f", "m"), "f");
+    assert.equal(concuerda("Equipos de compactación", "f", "m"), "m");
+    assert.equal(concuerda("bulldozer", "f", "m"), "m");
   });
 });

@@ -7,14 +7,25 @@
  * Solo funciones puras: lo importa también un componente de cliente.
  */
 
+/**
+ * «nuevas» o «nuevos», «usadas» o «usados», según el nombre de la categoría.
+ * Las categorías son plurales («Excavadoras», «Cargadores», «Bulldozers»): el
+ * femenino plural acaba en «-as», y todo lo demás va en masculino. Antes el
+ * sitio decía «Vibrocompactadores usadas» y «Cargadores nuevas».
+ */
+export function concuerda(nombre: string, femenino: string, masculino: string): string {
+  const ultima = nombre.trim().split(/\s+/).pop()?.toLowerCase() ?? "";
+  return ultima.endsWith("as") ? femenino : masculino;
+}
+
 /** Título por defecto de cada página del catálogo, a partir de sus nombres. */
 export const tituloPorDefecto = {
   tipoRepuesto: (tipo: string, marca: string) => `Repuestos para ${tipo.toLowerCase()} ${marca}`,
   modeloRepuesto: (modelo: string) => `Repuestos ${modelo}`,
   marcaMaquinaria: (marca: string) => `Maquinaria pesada ${marca}`,
   tipoMaquinaria: (tipo: string, marca: string) => `${tipo} ${marca}`,
-  categoriaNueva: (categoria: string) => `${categoria} nuevas`,
-  categoriaUsada: (categoria: string) => `${categoria} usadas`,
+  categoriaNueva: (categoria: string) => `${categoria} ${concuerda(categoria, "nuevas", "nuevos")}`,
+  categoriaUsada: (categoria: string) => `${categoria} ${concuerda(categoria, "usadas", "usados")}`,
   marcaLubricante: (marca: string) => `Lubricantes ${marca}`,
   categoriaLubricante: (categoria: string, marca: string) => `${categoria} | Lubricantes ${marca}`,
 } as const;

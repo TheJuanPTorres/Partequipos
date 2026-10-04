@@ -61,7 +61,9 @@ export default async function CategoriaUsadaPage({ params }: { params: Promise<P
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <Breadcrumbs items={breadcrumbs} />
 
-      <h1 className="text-3xl font-semibold text-gray-900">{categoria.nombre} usadas</h1>
+      <h1 className="text-3xl font-semibold text-gray-900">
+        {tituloPorDefecto.categoriaUsada(categoria.nombre)}
+      </h1>
 
       {categoria.descripcion ? (
         <p className="mt-3 max-w-2xl text-gray-600">{categoria.descripcion}</p>

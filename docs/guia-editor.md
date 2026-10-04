@@ -30,7 +30,7 @@ equipo técnico: la guía se corrige, no tú.
 | ------------------------------------------------- | :------: | :-----------: |
 | Crear y editar catálogo, páginas, blog e imágenes |    ✅    |      ✅       |
 | Ver las solicitudes y marcarlas atendidas         |    ✅    |      ✅       |
-| Cambiar el menú, el pie y el horario              |    ✅    |      ✅       |
+| Cambiar el menú, el pie y los datos de la empresa |    ✅    |      ✅       |
 | **Borrar** cualquier cosa                         |    ❌    |      ✅       |
 | Redirecciones                                     | solo ver |      ✅       |
 | Crear usuarios y cambiar roles                    |    ❌    |      ✅       |
@@ -50,7 +50,8 @@ Consecuencias prácticas:
 - **Un artículo a medio escribir se publica al guardar.** Redáctalo fuera
   (Word, Google Docs) y pégalo en el panel cuando esté terminado.
 - **Revisa antes de guardar**, sobre todo títulos y precios o datos técnicos.
-- **El menú, el pie y el horario afectan a todas las páginas a la vez.**
+- **El menú, el pie y los datos de la empresa (horario, contacto, logo)
+  afectan a todas las páginas a la vez.**
 - No hay historial de versiones: si cambias un texto, el anterior no se
   guarda. Si es largo o delicado, copia el original antes.
 
@@ -65,11 +66,19 @@ A la izquierda, en grupos:
 | Maquinaria    | Marcas, tipos y equipos nuevos; categorías y equipos usados                                  |
 | Lubricantes   | Marcas y categorías de lubricante                                                            |
 | Contenido     | Páginas, artículos del blog, imágenes, vídeos, sedes, testimonios, preguntas, cabecera y pie |
-| Configuración | Usuarios, redirecciones y «SEO y datos de la empresa» (el horario)                           |
+| Configuración | Usuarios, redirecciones y «SEO y datos de la empresa» (horario, imágenes y contacto)         |
 
 En cada listado puedes **buscar** (en modelos y equipos nuevos, también por
 código, p. ej. «320D»), **ordenar** pulsando en una columna y **filtrar** con
 el botón «Filtros».
+
+**Ver en el sitio:** en las fichas con página pública (marcas, tipos y
+modelos de repuesto; marcas, tipos y equipos nuevos de maquinaria; categorías
+de maquinaria nueva y usada; lubricantes; páginas, artículos y categorías del
+blog), arriba del formulario hay un botón **«Ver en el sitio»** que abre esa
+página en otra pestaña. Sale cuando la ficha ya está guardada; en móvil es solo
+el icono. Lo que no tiene página propia (equipos usados, categorías técnicas,
+sedes, testimonios, solicitudes…) no lo lleva.
 
 ## 5. Tareas frecuentes
 
@@ -164,17 +173,34 @@ oficial, no lo pongas.
 - Cada sección de la portada tiene su bloque en esa página. Lo que dejes vacío
   no se pinta.
 
-### 5.9 Menú, pie y horario
+### 5.9 Menú, pie y datos de la empresa
 
 - **Cabecera:** enlaces del menú y botón.
 - **Pie de página:** columnas de enlaces, lema y textos.
-- **SEO y datos de la empresa:** el **horario de atención**, que sale en la
-  página de contacto y en la información que leen los buscadores.
 - Los enlaces son rutas del sitio que empiezan por «/» (p. ej.
   `/contactanos/`) o direcciones completas `https://…`.
 
-El teléfono, el WhatsApp y las redes sociales **todavía no se cambian desde el
-panel**: pídeselo al equipo técnico.
+**Configuración → SEO y datos de la empresa** tiene tres partes. **Lo que dejes
+vacío no rompe nada: el sitio usa el dato de siempre.**
+
+- **Horario de atención:** un tramo por grupo de días con el mismo horario.
+  Sale en la página de contacto y en la información que leen los buscadores.
+- **Imágenes:**
+  - **Logo:** el de la cabecera, el pie y el que leen los buscadores. PNG con
+    fondo transparente y letras oscuras, de al menos 520 px de ancho.
+  - **Imagen al compartir por defecto:** la que sale al pegar en WhatsApp,
+    LinkedIn o Facebook el enlace de una página que no tiene imagen propia.
+    Imagen **opaca** (sin transparencia), de **1200 × 630 px**. Si la dejas
+    vacía, se usa el logo; pero algunas redes pintan la transparencia del logo
+    en negro, así que conviene subirla.
+- **Contacto de la empresa:** teléfono, WhatsApp, correo, dirección, ciudad y
+  redes sociales. Salen en el pie, la cabecera, el botón de WhatsApp, la página
+  de contacto y la información que leen los buscadores.
+  - **Teléfono y WhatsApp:** completos, con indicativo: `+57 317 670 7071`. Si
+    dejas el WhatsApp vacío, se usa el teléfono.
+  - **Redes:** la dirección completa del perfil, copiada del navegador, con
+    `https://`. En el pie salen Facebook, Instagram y YouTube; las demás (por
+    ejemplo, LinkedIn) solo las leen los buscadores.
 
 ## 6. Retirar algo sin borrarlo
 
@@ -213,7 +239,8 @@ vacío**.
 - **Imagen al compartir en redes:** la que sale al pegar el enlace en
   WhatsApp, LinkedIn o Facebook. En algunas fichas gana su propia imagen (la
   primera de la galería, el logo o la imagen destacada); el bloque te dice
-  cuál.
+  cuál. Si la ficha no tiene ninguna, se usa la **imagen al compartir por
+  defecto** de «SEO y datos de la empresa» (§5.9).
 
 Si dejas un campo vacío, el sitio usa el nombre o la descripción de la ficha;
 el bloque te enseña exactamente qué texto.
@@ -229,6 +256,9 @@ el bloque te enseña exactamente qué texto.
 | «El recorte está desactivado»                             | Recorta la imagen en tu equipo antes de subirla                    |
 | «No se puede publicar sin la autorización de uso marcada» | Marca la autorización (si la tienes firmada) o déjalo sin publicar |
 | «Usa una ruta del sitio que empiece por «/»…»             | Escribe el enlace como `/contactanos/` o `https://…`               |
+| «Escribe el número completo, con indicativo…»             | Escribe el teléfono entero: `+57 317 670 7071`                     |
+| «Tiene que empezar por https://…»                         | Copia la dirección del perfil desde el navegador, con `https://`   |
+| «No es una dirección válida…»                             | Pega la dirección completa del perfil, no solo el nombre           |
 | El slug aparece gris y no se puede escribir               | Es normal tras crear la ficha: ver §7                              |
 
 Si ves un error que no está aquí, haz una captura con la hora y envíasela al

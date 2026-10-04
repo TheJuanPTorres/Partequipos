@@ -304,3 +304,21 @@ Aprobado por dirección. **Cambio de esquema**, con la ventana tomada por C.
   después: solo la imagen social (redes con ella, JSON-LD con el logo de
   siempre) y las dos a la vez (redes con la imagen social; cabecera, pie y
   JSON-LD con el logo).
+
+## 13. Guía del editor al día (2026-10-04, rama `feat/panel-guia-editor`)
+
+Mejora 1 de las tres aprobadas. Solo documentación, en `docs/guia-editor.md`:
+
+- «Ver en el sitio» (§4): qué fichas lo tienen y cuáles no.
+- «SEO y datos de la empresa» (§5.9): horario, imágenes (logo e imagen al
+  compartir por defecto, con formato y medidas) y contacto; se quita «todavía
+  no se cambian desde el panel».
+- La imagen al compartir de las fichas sin imagen propia (§8) y tres mensajes
+  de error nuevos (teléfono y redes, §9).
+- **Corregido de paso (lo encontró el verificador):** la ayuda de «Redes
+  sociales» (del #61) y la guía decían que el pie pinta LinkedIn; el pie solo
+  pinta Facebook, Instagram y YouTube, y el resto va solo al JSON-LD. Sin
+  esquema (solo la descripción del campo y `payload-types.ts`).
+- **Sin capturas en la guía:** el repositorio es público y una captura del
+  panel enseña datos y cuentas. Las capturas de las pantallas nuevas salen de
+  `panel:revision` en la mejora 3 y se guardan fuera del repositorio.

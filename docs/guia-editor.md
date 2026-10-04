@@ -139,7 +139,10 @@ oficial, no lo pongas.
 - **Texto alternativo, obligatorio:** describe lo que se ve, como se lo
   contarías a alguien por teléfono. «Excavadora Hitachi ZX200 trabajando en una
   obra», no «foto1» ni «imagen». Lo leen los lectores de pantalla y los
-  buscadores.
+  buscadores. **El panel no deja guardar** uno vacío, de menos de 5 letras,
+  genérico («imagen», «IMG_1234») o igual al nombre del fichero.
+- **Encima de la lista de Imágenes** sale un aviso si alguna ya guardada tiene
+  el texto flojo, con el motivo y el enlace para arreglarla.
 - **Recorta antes de subir.** El recorte del panel está desactivado a
   propósito.
 - **Punto focal:** al abrir una imagen puedes marcar qué parte es la
@@ -247,19 +250,20 @@ el bloque te enseña exactamente qué texto.
 
 ## 9. Mensajes de error frecuentes
 
-| Mensaje (resumido)                                        | Qué hacer                                                          |
-| --------------------------------------------------------- | ------------------------------------------------------------------ |
-| «El tipo … es de otra marca»                              | Elige un tipo de la marca seleccionada, o cambia la marca          |
-| «El slug … ya lo usa una página / un artículo»            | Cambia el slug antes de guardar                                    |
-| «… no es una imagen JPEG, PNG ni WebP»                    | Convierte la imagen y vuelve a subirla                             |
-| «… pesa … MB y el máximo es 4 MB»                         | Exporta el vídeo con más compresión                                |
-| «El recorte está desactivado»                             | Recorta la imagen en tu equipo antes de subirla                    |
-| «No se puede publicar sin la autorización de uso marcada» | Marca la autorización (si la tienes firmada) o déjalo sin publicar |
-| «Usa una ruta del sitio que empiece por «/»…»             | Escribe el enlace como `/contactanos/` o `https://…`               |
-| «Escribe el número completo, con indicativo…»             | Escribe el teléfono entero: `+57 317 670 7071`                     |
-| «Tiene que empezar por https://…»                         | Copia la dirección del perfil desde el navegador, con `https://`   |
-| «No es una dirección válida…»                             | Pega la dirección completa del perfil, no solo el nombre           |
-| El slug aparece gris y no se puede escribir               | Es normal tras crear la ficha: ver §7                              |
+| Mensaje (resumido)                                                            | Qué hacer                                                          |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| «El tipo … es de otra marca»                                                  | Elige un tipo de la marca seleccionada, o cambia la marca          |
+| «El slug … ya lo usa una página / un artículo»                                | Cambia el slug antes de guardar                                    |
+| «… no es una imagen JPEG, PNG ni WebP»                                        | Convierte la imagen y vuelve a subirla                             |
+| «… pesa … MB y el máximo es 4 MB»                                             | Exporta el vídeo con más compresión                                |
+| «Es demasiado corto…», «Es una palabra genérica…», «Es el nombre del fichero» | Describe lo que se ve en la imagen (§5.5)                          |
+| «El recorte está desactivado»                                                 | Recorta la imagen en tu equipo antes de subirla                    |
+| «No se puede publicar sin la autorización de uso marcada»                     | Marca la autorización (si la tienes firmada) o déjalo sin publicar |
+| «Usa una ruta del sitio que empiece por «/»…»                                 | Escribe el enlace como `/contactanos/` o `https://…`               |
+| «Escribe el número completo, con indicativo…»                                 | Escribe el teléfono entero: `+57 317 670 7071`                     |
+| «Tiene que empezar por https://…»                                             | Copia la dirección del perfil desde el navegador, con `https://`   |
+| «No es una dirección válida…»                                                 | Pega la dirección completa del perfil, no solo el nombre           |
+| El slug aparece gris y no se puede escribir                                   | Es normal tras crear la ficha: ver §7                              |
 
 Si ves un error que no está aquí, haz una captura con la hora y envíasela al
 equipo técnico.

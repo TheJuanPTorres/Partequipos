@@ -1311,3 +1311,36 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 .pq-seo__nota {
   color: var(--pq-muted-foreground);
 }
+
+/*
+ * Aviso de textos alternativos flojos, encima de la lista de «Imágenes»
+ * (`src/components/admin/AltFlojos.tsx`). Borde de aviso de Payload y el fondo y
+ * el texto de las superficies, que tienen contraste medido en claro y oscuro.
+ */
+.pq-alt-flojos {
+  margin: 0 0 calc(var(--base) * 1);
+  padding: calc(var(--base) * 0.75) calc(var(--base) * 1);
+  border: 1px solid var(--theme-warning-500);
+  border-radius: var(--style-radius-m);
+  border-left-width: 4px;
+  background: var(--theme-elevation-50);
+  color: var(--theme-elevation-1000);
+
+  p {
+    margin: 0;
+  }
+
+  &__lista {
+    margin: calc(var(--base) * 0.5) 0 0;
+    padding-left: calc(var(--base) * 1.25);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  &__resto {
+    margin-top: calc(var(--base) * 0.25);
+  }
+}

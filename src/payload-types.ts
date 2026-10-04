@@ -334,7 +334,7 @@ export interface MarcasMaquinaria {
 export interface Media {
   id: number;
   /**
-   * Descripción de la imagen para accesibilidad y SEO.
+   * Describe lo que se ve, como se lo contarías a alguien por teléfono: «Excavadora Hitachi ZX200 trabajando en una obra». Ni «foto1», ni «imagen», ni el nombre del fichero.
    */
   alt: string;
   updatedAt: string;

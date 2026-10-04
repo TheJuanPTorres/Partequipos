@@ -1,6 +1,6 @@
 import type { CollectionAfterChangeHook } from "payload";
 
-import { seoConfig } from "@/lib/seo/config";
+import { datosEmpresa } from "@/lib/seo/empresa";
 
 /**
  * Avisa por correo cuando entra una solicitud nueva (Resend).
@@ -17,7 +17,10 @@ import { seoConfig } from "@/lib/seo/config";
 export const notificarSolicitud: CollectionAfterChangeHook = async ({ doc, operation, req }) => {
   if (operation !== "create") return doc;
 
-  const destino = process.env.SOLICITUDES_EMAIL_TO?.trim() || seoConfig.contact.email;
+  // Sin destino propio, el correo de contacto de la empresa (global `seo`,
+  // con respaldo en `seoConfig`).
+  const seo = await req.payload.findGlobal({ slug: "seo", depth: 0, req });
+  const destino = process.env.SOLICITUDES_EMAIL_TO?.trim() || datosEmpresa(seo.empresa).correo;
 
   /*
    * Sin clave no hay adaptador (ver payload.config.ts). Se comprueba de forma

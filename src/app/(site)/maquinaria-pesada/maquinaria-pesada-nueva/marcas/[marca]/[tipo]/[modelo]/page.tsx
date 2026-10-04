@@ -19,6 +19,7 @@ import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
+import { getEmpresa } from "@/lib/queries/getSeo";
 import type { MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
 
 type Params = { marca: string; tipo: string; modelo: string };
@@ -70,6 +71,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 export default async function EquipoNuevoPage({ params }: { params: Promise<Params> }) {
   const data = await resolver(await params);
   if (!data) notFound();
+  const empresa = await getEmpresa();
 
   const { marca, tipo, equipo } = data;
 
@@ -212,7 +214,7 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
         tipo="cotizacion"
         origen={rutas.equipoNuevo(marca.slug, tipo.slug, equipo.slug)}
         siteKey={turnstileSiteKey()}
-        whatsapp={enlaceWhatsApp(`Hola, quiero cotizar la ${equipo.nombre}.`)}
+        whatsapp={enlaceWhatsApp(empresa.whatsapp, `Hola, quiero cotizar la ${equipo.nombre}.`)}
         referencia={{ tipo: "equipos-nuevos", id: equipo.id, texto: equipo.nombre }}
         titulo="Solicitar cotización"
         descripcion="Te enviamos precio, disponibilidad y condiciones de entrega."

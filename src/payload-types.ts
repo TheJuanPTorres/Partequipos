@@ -2324,6 +2324,28 @@ export interface Seo {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Sale en el pie, la cabecera, el botón de WhatsApp y la información que leen los buscadores. Si dejas un campo vacío, se usa el dato de siempre.
+   */
+  empresa?: {
+    telefono?: string | null;
+    /**
+     * Si lo dejas vacío, se usa el teléfono.
+     */
+    whatsapp?: string | null;
+    correo?: string | null;
+    direccion?: string | null;
+    ciudad?: string | null;
+    /**
+     * La dirección completa de cada perfil oficial. En el pie salen Facebook, Instagram, LinkedIn y YouTube.
+     */
+    redes?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2392,6 +2414,21 @@ export interface SeoSelect<T extends boolean = true> {
         abre?: T;
         cierra?: T;
         id?: T;
+      };
+  empresa?:
+    | T
+    | {
+        telefono?: T;
+        whatsapp?: T;
+        correo?: T;
+        direccion?: T;
+        ciudad?: T;
+        redes?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
       };
   updatedAt?: T;
   createdAt?: T;

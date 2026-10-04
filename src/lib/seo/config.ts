@@ -35,7 +35,14 @@ export const seoConfig = {
   locale: "es_CO",
   /** País de operación (ISO 3166-1 alfa-2), para JSON-LD Organization. */
   country: "CO",
-  /** Datos de contacto públicos. Fuente: footer y /contactanos/ del sitio actual. */
+  /**
+   * Datos de contacto públicos. Fuente: footer y /contactanos/ del sitio actual.
+   *
+   * RESPALDO desde el 2026-10-04: el sitio los lee del global `seo` («Contacto
+   * de la empresa», editable en el panel) con `getEmpresa()`, y solo usa estos
+   * si el campo del panel está vacío (`src/lib/seo/empresa.ts`). Las redes, igual
+   * con `sameAs`.
+   */
   contact: {
     email: "info@partequipos.com",
     /** Teléfono principal publicado en el encabezado y el footer. */

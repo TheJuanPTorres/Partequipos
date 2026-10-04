@@ -16,7 +16,7 @@ import {
   getPaginaPorSlug,
   getPaginas,
 } from "@/lib/queries/getPaginas";
-import { getHorario } from "@/lib/queries/getSeo";
+import { getEmpresa, getHorario } from "@/lib/queries/getSeo";
 import { getVideoPorId } from "@/lib/queries/getVideos";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
@@ -132,6 +132,7 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
   const { pagina } = resuelto;
   const secciones = pagina.secciones ?? [];
   const horario = clave === SLUG_CONTACTO ? await getHorario() : [];
+  const empresa = clave === SLUG_CONTACTO ? await getEmpresa() : null;
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -235,7 +236,7 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
           tipo="contacto"
           origen={`/${pagina.slug}`}
           siteKey={turnstileSiteKey()}
-          whatsapp={enlaceWhatsApp()}
+          whatsapp={empresa ? enlaceWhatsApp(empresa.whatsapp) : undefined}
           titulo="Escríbenos"
           descripcion="Cuéntanos qué necesitas y te respondemos en horario de oficina."
           textoBoton="Enviar solicitud"

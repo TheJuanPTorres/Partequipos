@@ -11,6 +11,7 @@ import { Revelado } from "@/components/movimiento/Revelado";
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { columnasDelPie, hrefTelefono, type ColumnaPie } from "@/lib/pie";
 import { getPie } from "@/lib/queries/getPie";
+import { getEmpresa } from "@/lib/queries/getSeo";
 import { imagenDeMedia } from "@/lib/utils/relations";
 import { seoConfig } from "@/lib/seo/config";
 
@@ -21,7 +22,8 @@ import estilos from "./pie.module.css";
  * que se revela es de cliente. Valores en `pie.module.css`.
  *
  * CONTENIDO: el global `pie` de Payload (lema, texto de la empresa, columnas y
- * texto del botón). Redes y contacto salen de `seoConfig`, fuente única del
+ * texto del botón). Redes y contacto salen del global `seo` (`getEmpresa`, con
+ * respaldo en `seoConfig`), fuente única del
  * JSON-LD `Organization`.
  *
  * Lo que se aparta de ux-9 (docs/diseno/decisiones-home-ux9.md §13):
@@ -80,10 +82,9 @@ function Columna({
 }
 
 export async function Footer() {
-  const pie = await getPie();
-  const { contact } = seoConfig;
-  const telefono = hrefTelefono(contact.phone);
-  const columnas = columnasDelPie(pie.columnas, contact.phone);
+  const [pie, empresa] = await Promise.all([getPie(), getEmpresa()]);
+  const telefono = hrefTelefono(empresa.telefono);
+  const columnas = columnasDelPie(pie.columnas, empresa.telefono);
   // Decorativa: sin nombre accesible (`alt` vacío y `aria-hidden`).
   const decorativa = imagenDeMedia(pie.imagenDecorativa, "");
   // Enlaces legales del global, en su orden (la migración pone primero el de
@@ -93,7 +94,7 @@ export async function Footer() {
       ? [{ etiqueta: l.etiqueta.trim(), href: l.enlace.trim() }]
       : [],
   );
-  const redes = seoConfig.sameAs.flatMap((url) => {
+  const redes = empresa.redes.flatMap((url) => {
     const red = REDES.find((r) => r.patron.test(url));
     return red ? [{ ...red, url }] : [];
   });
@@ -125,7 +126,7 @@ export async function Footer() {
               className={`${estilos.lema} texto-titulo-bloque`}
             />
             <a
-              href={enlaceWhatsApp(contact.phone)}
+              href={enlaceWhatsApp(empresa.whatsapp)}
               className={`${estilos.whatsapp} texto-etiqueta`}
               target="_blank"
               rel="noopener noreferrer"
@@ -190,9 +191,8 @@ export async function Footer() {
           </ul>
         </nav>
         <address>
-          {contact.streetAddress}, {contact.addressLocality} ·{" "}
-          <a href={telefono}>{contact.phone}</a> ·{" "}
-          <a href={`mailto:${contact.email}`}>{contact.email}</a> · © {new Date().getFullYear()}{" "}
+          {empresa.direccion}, {empresa.ciudad} · <a href={telefono}>{empresa.telefono}</a> ·{" "}
+          <a href={`mailto:${empresa.correo}`}>{empresa.correo}</a> · © {new Date().getFullYear()}{" "}
           {seoConfig.siteName}
         </address>
       </div>

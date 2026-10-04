@@ -263,3 +263,21 @@ porque con este la clave foránea pasaría de 63 bytes (65). Migración
 regeneración completa traía 62 subidas de versión ajenas, entre ellas `sharp`
 (§10.18). Se añadió **solo** la entrada de `lottie-web` al lock anterior
 (7 líneas) y `npm ci` lo validó.
+
+**LCP de `/nosotros/`, antes y después** (método vigente de §10.3 p.14:
+Lighthouse 13.4.1 por línea de comandos, móvil, _simulated throttling_, solo
+Performance; 9 corridas alternadas con calentamiento, contra las URL fijas de
+los previews de `1d29fa1` —sin animación— y `4e2757f`, con la misma base):
+
+| Variante | LCP (mediana)          | TBT (mediana) | Rendimiento | CLS máx |
+| -------- | ---------------------- | ------------- | ----------- | ------- |
+| Sin mapa | **3,96 s** (3,13–4,45) | 132 ms        | 85          | 0,0001  |
+| Con mapa | **3,88 s** (3,63–5,13) | 254 ms        | 80          | 0,0001  |
+
+- **El LCP no cambia:** la diferencia está dentro del ruido, y el elemento LCP
+  no es el mapa.
+- **El TBT sube unos 120 ms.** En el móvil simulado de Lighthouse (CPU frenada
+  cuatro veces) el mapa está a la vista al cargar, así que lottie-web se carga,
+  analiza el JSON y anima durante la medición. Es el coste real de la
+  animación; ux-9 lo paga igual, y además en todas las cargas.
+- El CLS de 0,0001 es el desplazamiento de Inter de §5, igual en las dos.

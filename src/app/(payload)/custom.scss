@@ -1161,3 +1161,41 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   color: var(--pq-foreground);
   font-weight: 400;
 }
+
+/* =========================================================================
+ * ARREGLOS DE LA REVISIÓN EN PANTALLA (2026-10-04, docs/diseno/decisiones-panel.md §6)
+ * ========================================================================= */
+
+/* -------------------------------------------------------------------------
+ * «o» en minúscula en el buscador («Buscar por Nombre o Código») viene de la
+ * traducción (`i18n.translations` en payload.config.ts). La misma palabra es
+ * el separador y el botón de añadir del constructor de filtros, que empiezan
+ * línea: ahí vuelve la mayúscula, como «Y».
+ * ----------------------------------------------------------------------- */
+.where-builder__label,
+.where-builder__add-or .btn__label {
+  text-transform: capitalize;
+}
+
+/* -------------------------------------------------------------------------
+ * Barra de selección de las listas. Payload la fija abajo (`position: fixed`)
+ * con fondo opaco aunque no haya nada seleccionado, y en móvil tapaba los
+ * números de página cuando la lista acababa justo al final de la pantalla
+ * (medido a 390 px en Modelos). Vacía no aporta nada: se oculta. Con filas
+ * marcadas, Payload la rellena y vuelve a verse.
+ * ----------------------------------------------------------------------- */
+.collection-list__list-selection:has(> .collection-list__list-selection-actions:empty:only-child) {
+  display: none;
+}
+
+/* -------------------------------------------------------------------------
+ * Línea de fechas del formulario en móvil. La barra tiene altura fija y
+ * `overflow: hidden`, así que no puede bajar a otra línea: «Creado» se cortaba
+ * por la derecha a 390 px. En pantallas estrechas queda solo «Última
+ * modificación», que es la que importa al editar.
+ * ----------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .doc-controls__meta > .doc-controls__list-item:nth-child(n + 2) {
+    display: none;
+  }
+}

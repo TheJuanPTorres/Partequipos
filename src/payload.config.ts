@@ -12,7 +12,7 @@ import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
  * es exactamente el riesgo de CLAUDE.md §10.5.
  */
 import { es } from "@payloadcms/translations/languages/es";
-import { buildConfig } from "payload";
+import { buildConfig, type CollectionConfig, type GlobalConfig } from "payload";
 import sharp from "sharp";
 
 import { pushPermitido } from "./lib/db/pushEsquema";
@@ -69,9 +69,24 @@ const email = process.env.RESEND_API_KEY
     })
   : undefined;
 
+/*
+ * Sin la pestaña «API» en los formularios del panel: enseñaba al editor el
+ * JSON en bruto del documento, sin nada que hacer con él. La API REST sigue
+ * igual; solo se quita la pestaña (`admin.hideAPIURL` de Payload).
+ */
+function sinPestanaApi<T extends CollectionConfig | GlobalConfig>(configs: T[]): T[] {
+  return configs.map((c) => ({ ...c, admin: { ...c.admin, hideAPIURL: true } }));
+}
+
 export default buildConfig({
   admin: {
     user: Users.slug,
+    /*
+     * Fechas del panel como «15 sep 2026, 23:56». El formato por defecto de
+     * Payload («MMMM do yyyy, h:mm a») salía «septiembre 15° 2026, 11:56 PM»
+     * con la traducción al español: ordinal raro y reloj de 12 horas.
+     */
+    dateFormat: "d MMM yyyy, HH:mm",
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -120,7 +135,7 @@ export default buildConfig({
    * quedar sin `admin.group`: caería en «Colecciones», el grupo por defecto, que
    * es el cajón de sastre que esta agrupación eliminó.
    */
-  collections: [
+  collections: sinPestanaApi([
     // Leads de los formularios publicos. Unica coleccion con datos personales:
     // su control de acceso de lectura es privado, no publico como el catalogo.
     // Primero en el menu: es lo mas urgente de revisar (CLAUDE.md §10.11).
@@ -154,10 +169,10 @@ export default buildConfig({
     // Configuracion.
     Users,
     Redirects,
-  ],
+  ]),
   // Globales: contenido único, no listas. El pie de todas las páginas (§13 de
   // docs/diseno/decisiones-home-ux9.md).
-  globals: [Cabecera, Pie, Seo],
+  globals: sinPestanaApi([Cabecera, Pie, Seo]),
   editor: lexicalEditor(),
   /*
    * Panel en español (CLAUDE.md §5: textos de interfaz en español).
@@ -172,6 +187,12 @@ export default buildConfig({
   i18n: {
     fallbackLanguage: "es",
     supportedLanguages: { es },
+    /*
+     * «o» en minúscula: la traducción de Payload dice «O», y el buscador de
+     * las listas la usa en mitad de frase («Buscar por Nombre O Código»).
+     * Donde empieza línea (filtros) la mayúscula vuelve por CSS: custom.scss.
+     */
+    translations: { es: { general: { or: "o" } } },
   },
   email,
   secret: process.env.PAYLOAD_SECRET || "",

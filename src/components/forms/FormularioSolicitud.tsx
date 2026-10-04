@@ -105,6 +105,9 @@ export function FormularioSolicitud({
   }
 
   const err = estado.errores ?? {};
+  // Tras un error, lo que escribió el usuario vuelve como valor por defecto:
+  // React restablece el formulario al terminar la acción y, sin esto, lo vaciaría.
+  const previo = estado.estado === "error" ? (estado.valores ?? {}) : {};
 
   return (
     <section aria-labelledby={idTitulo} className="mt-10 rounded-lg border border-gray-200 p-6">
@@ -152,6 +155,7 @@ export function FormularioSolicitud({
               <input
                 {...p}
                 name="nombre"
+                defaultValue={previo.nombre}
                 type="text"
                 autoComplete="name"
                 className={claseControl}
@@ -164,6 +168,7 @@ export function FormularioSolicitud({
               <input
                 {...p}
                 name="correo"
+                defaultValue={previo.correo}
                 type="email"
                 autoComplete="email"
                 className={claseControl}
@@ -181,6 +186,7 @@ export function FormularioSolicitud({
               <input
                 {...p}
                 name="telefono"
+                defaultValue={previo.telefono}
                 type="tel"
                 autoComplete="tel"
                 className={claseControl}
@@ -193,6 +199,7 @@ export function FormularioSolicitud({
               <input
                 {...p}
                 name="empresa"
+                defaultValue={previo.empresa}
                 type="text"
                 autoComplete="organization"
                 className={claseControl}
@@ -202,10 +209,19 @@ export function FormularioSolicitud({
         </div>
 
         <Campo id={campo("mensaje")} etiqueta="Mensaje" obligatorio error={err.mensaje}>
-          {(p) => <textarea {...p} name="mensaje" rows={5} className={claseControl} />}
+          {(p) => (
+            <textarea
+              {...p}
+              name="mensaje"
+              rows={5}
+              defaultValue={previo.mensaje}
+              className={claseControl}
+            />
+          )}
         </Campo>
 
-        <Turnstile siteKey={siteKey} />
+        {/* Cada respuesta del servidor reinicia el reto: el token es de un solo uso. */}
+        <Turnstile siteKey={siteKey} reinicio={estado} />
 
         <div className="flex flex-wrap items-center gap-4 pt-2">
           {/*

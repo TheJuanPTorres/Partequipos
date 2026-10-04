@@ -3422,7 +3422,11 @@ cliente; al ponerlas no hay que tocar código.
 >
 > **Observado de paso, sin investigar:**
 >
-> - Tras el rechazo del caso 2, el formulario **se vacía**: React restablece el formulario al terminar la acción. Quien escribe un mensaje largo y falla el reto lo pierde. Mejora de UX pendiente de decidir.
+> - ~~Tras el rechazo del caso 2, el formulario **se vacía**~~ **RESUELTO el 2026-10-03.** React restablece el formulario al terminar la acción.
+>   - **Datos:** ante cualquier error (Turnstile, validación o base), la acción devuelve lo escrito en `valores`, cortado a la longitud máxima de cada campo, y el formulario lo repone como `defaultValue`.
+>   - **Reto:** además se **reinicia el widget** de Turnstile tras cada respuesta. El token es de un solo uso y el reinicio vacía también su campo oculto: sin esto, el reenvío llegaría sin token.
+>   - **Dónde vive:** la decisión está en `src/lib/actions/procesarSolicitud.ts`, con 8 pruebas. Se demostró que fallan si el caso de Turnstile no devuelve los valores.
+>   - **Comprobado de punta a punta** en local, con el secreto que siempre rechaza y Playwright sobre un Chrome de perfil temporal: dos envíos seguidos, los 5 campos conservados, token nuevo tras cada rechazo y 0 filas guardadas.
 > - En `next dev`, los primeros clics en «Enviar» no hicieron nada (0 peticiones) hasta pasados unos segundos. Lo más probable es la hidratación en desarrollo. **No se ha comprobado en producción.**
 
 **2. Resend — `RESEND_API_KEY` (más `RESEND_FROM_EMAIL`).**

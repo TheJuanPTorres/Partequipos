@@ -322,3 +322,30 @@ Mejora 1 de las tres aprobadas. Solo documentación, en `docs/guia-editor.md`:
 - **Sin capturas en la guía:** el repositorio es público y una captura del
   panel enseña datos y cuentas. Las capturas de las pantallas nuevas salen de
   `panel:revision` en la mejora 3 y se guardan fuera del repositorio.
+
+## 14. Texto alternativo de las imágenes (2026-10-04, rama `feat/panel-alt-imagenes`)
+
+Mejora 2 de las tres aprobadas (accesibilidad, CLAUDE.md §7.6). Sin esquema.
+
+- **La regla, una sola** (`src/lib/media/altFlojo.ts`, con pruebas): un texto
+  alternativo es flojo si está vacío, tiene menos de 5 letras (los números no
+  cuentan), es el nombre del fichero (sin extensión, con o sin el `-1` que
+  añade Payload) o solo son palabras genéricas («imagen», «foto», «IMG_1234»,
+  «captura 2026»…). Devuelve el motivo en español.
+- **Al guardar:** `validate` del campo «Texto alternativo» de `Media`, con el
+  motivo y un ejemplo. Corre en el panel, la API y la API local de los
+  scripts; los textos que crean los scripts de siembra pasan (prueba).
+- **Lo que ya está guardado:** aviso encima de la lista de «Imágenes»
+  (`src/components/admin/AltFlojos.tsx`, `beforeListTable`, componente de servidor
+  que solo lee `id`, `alt` y `filename`): cuántas, las 12 más recientes con
+  enlace y motivo, y «Y N más». Sin flojas no pinta nada. Probado renderizado
+  con una lista falsa (`AltFlojos.test.ts`).
+- **Recuento:** `npm run media:alt-flojos`, solo lectura. Hoy: `development`
+  0 de 4 y preview 0 de 55; producción no se ha contado (no se lee desde
+  aquí).
+- **Por efecto** (§10.15): `npm run qa:alt` contra `development` intenta
+  guardar cuatro textos flojos en una imagen real; se rechazan con su motivo y
+  la base no cambia. No sube ficheros ni crea registros.
+- **Efecto a conocer:** una imagen ya guardada con el texto flojo no se puede
+  volver a guardar (p. ej. al mover el punto focal) sin arreglar el texto. Es
+  a propósito: el aviso de la lista la señala antes.

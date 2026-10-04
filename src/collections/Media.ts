@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { validarAlt } from "../lib/media/altFlojo";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { formatoDeImagenPermitido } from "./hooks/formatoDeImagenPermitido";
 import { almacenEsperado } from "./hooks/almacenEsperado";
@@ -21,6 +22,9 @@ export const Media: CollectionConfig = {
     // El texto alternativo en la lista, para ver de un vistazo cuáles están flojos.
     defaultColumns: ["filename", "alt", "updatedAt"],
     listSearchableFields: ["filename", "alt"],
+    // Aviso con las imágenes de texto alternativo flojo (`src/lib/media/altFlojo.ts`).
+    // Entre el buscador y la tabla: `beforeList` lo pintaba fuera del margen.
+    components: { beforeListTable: ["/components/admin/AltFlojos"] },
   },
   access: {
     read: publico,
@@ -82,8 +86,13 @@ export const Media: CollectionConfig = {
       type: "text",
       required: true,
       label: "Texto alternativo",
+      // Rechaza los flojos («foto1», el nombre del fichero, menos de 5 letras).
+      // Solo al guardar: las imágenes que ya lo tienen flojo salen en el aviso
+      // de la lista y se arreglan al abrirlas.
+      validate: validarAlt,
       admin: {
-        description: "Descripción de la imagen para accesibilidad y SEO.",
+        description:
+          "Describe lo que se ve, como se lo contarías a alguien por teléfono: «Excavadora Hitachi ZX200 trabajando en una obra». Ni «foto1», ni «imagen», ni el nombre del fichero.",
       },
     },
   ],

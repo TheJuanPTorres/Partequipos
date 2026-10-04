@@ -596,6 +596,7 @@ veredicto, que va en el informe.
 - **Logo institucional en el panel (2026-10-04):** campo «Logo» en «Imágenes» del global `seo`; lo usan cabecera, pie, JSON-LD y la imagen social por defecto, cada uno con su respaldo de siempre si está vacío (`getLogo`); migración `20261004_191621_logo_institucional`, solo esquema. Detalle en `docs/diseno/decisiones-panel.md` §11.
 - **Imagen al compartir por defecto (2026-10-04):** campo opcional en «Imágenes» del global `seo` (opaca, 1200 × 630) para `og:image` y `twitter:image` de las páginas sin imagen propia; vacía, el logo, y si no, `config.ts`; el JSON-LD sigue con el logo; migración `20261004_205655_imagen_social`, solo esquema. Detalle en `docs/diseno/decisiones-panel.md` §12.
 - **Guía del editor al día (2026-10-04):** «Ver en el sitio», datos de la empresa (horario, logo, imagen al compartir y contacto) y mensajes de error nuevos en `docs/guia-editor.md`. Detalle en `docs/diseno/decisiones-panel.md` §13.
+- **Texto alternativo de las imágenes (2026-10-04):** `Media` rechaza al guardar los textos flojos (vacíos, de menos de 5 letras, genéricos o el nombre del fichero; `src/lib/media/altFlojo.ts`), la lista de «Imágenes» avisa de las ya guardadas y `npm run media:alt-flojos` las cuenta; por efecto con `npm run qa:alt`; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §14.
 
 ### 10.0 Qué está construido y qué falta
 

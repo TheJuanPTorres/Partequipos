@@ -49,11 +49,17 @@ import type { CategoriasTecnica, Pagina } from "@/payload-types";
 
 import { exigirAlmacen } from "../blob/exigirAlmacen";
 import {
+  PREFIJO_COPIA,
   REFERENCIA_AUTORIZACION,
   clave,
   esDeEjemplo,
+  nombreDeCopia,
   origenValido,
+  puedeRetirar,
+  urlEnAlmacen,
+  veredictoCreado,
   veredictoDestino,
+  veredictoSubida,
 } from "../../src/lib/demo/copiaDemo";
 import { almacenDeUrl } from "../../src/lib/blob/almacen";
 import { FICHERO_ENTORNO_PREVIEW, leerFicheroEntorno } from "../../src/lib/preview/entornoPreview";
@@ -274,32 +280,53 @@ if (modo === "retirar") {
       }
       log(`${col}: ${m.creados[col].length} borrados`);
     }
-    for (const id of Object.values(m.videos)) {
-      await payload
-        .delete({ collection: "videos", id, overrideAccess: true })
-        .catch(() => undefined);
-    }
-    for (const id of Object.values(m.media)) {
-      await payload
-        .delete({ collection: "media", id, overrideAccess: true })
-        .catch(() => undefined);
-    }
-    log(
-      `ficheros borrados: ${Object.keys(m.videos).length} vídeos y ${Object.keys(m.media).length} imágenes`,
-    );
+    /*
+     * Ficheros: SOLO los que están en el manifiesto Y llevan el prefijo
+     * `demo-copia-` (decisión del 2026-10-03). Un fichero que no cumpla las
+     * dos cosas NO se borra: se lista y la retirada termina en error para que
+     * alguien lo mire.
+     */
+    const noBorrados: string[] = [];
+    const borrarFicheros = async (coleccion: "videos" | "media", ids: Id[]) => {
+      let borrados = 0;
+      for (const id of ids) {
+        const doc = await payload
+          .findByID({ collection: coleccion, id, depth: 0, overrideAccess: true })
+          .catch(() => null);
+        if (!doc) {
+          log(`  ${coleccion} ${id}: no estaba`);
+          continue;
+        }
+        if (!puedeRetirar(doc.url, m.urlsCreadas)) {
+          noBorrados.push(`${coleccion} ${id} ${doc.url ?? "(sin URL)"}`);
+          continue;
+        }
+        await payload.delete({ collection: coleccion, id, overrideAccess: true });
+        borrados++;
+      }
+      return borrados;
+    };
+    const videosBorrados = await borrarFicheros("videos", Object.values(m.videos));
+    const mediaBorrados = await borrarFicheros("media", Object.values(m.media));
+    log(`ficheros borrados: ${videosBorrados} vídeos y ${mediaBorrados} imágenes`);
 
     // 3. Comprobaciones.
     const hero = await huellaHero();
     if (hero !== m.hero)
       fallar("el HERO del destino ya no es el de antes de la copia: revisar a mano");
     log("hero: idéntico al de antes de la copia ✓");
+    if (noBorrados.length)
+      fallar(
+        `NO se borran ${noBorrados.length} ficheros (fuera del manifiesto o sin el prefijo ${PREFIJO_COPIA}); revisar a mano: ${noBorrados.join(" · ")}`,
+      );
+    const aComprobar = m.urlsCreadas.filter((u) => puedeRetirar(u, m.urlsCreadas));
     log("espero 70 s (propagación del Blob) y compruebo que los ficheros dan 404");
     await esperar(70_000);
     const vivos: string[] = [];
-    for (const u of m.urlsCreadas)
+    for (const u of aComprobar)
       if ((await fetch(u, { method: "HEAD" })).status !== 404) vivos.push(u);
     if (vivos.length) fallar(`${vivos.length} ficheros siguen en el Blob: ${vivos.join(" ")}`);
-    log(`✓ los ${m.urlsCreadas.length} ficheros creados dan 404`);
+    log(`✓ los ${aComprobar.length} ficheros creados dan 404`);
     m.estado = "retirada";
     guardar(m);
     log(`✓ RETIRADA COMPLETA. Manifiesto: ${MANIFIESTO}`);
@@ -545,7 +572,9 @@ if (modo === "simular" || modo === "copiar") {
     `IMÁGENES a crear en Media: ${nuevosFicheros.length} (${kb(nuevosFicheros.reduce((s, f) => s + f.filesize, 0))})`,
   );
   nuevosFicheros.forEach((f) =>
-    plan.push(`  + ${f.filename} · ${kb(f.filesize)} · alt «${(f.alt ?? "").slice(0, 50)}»`),
+    plan.push(
+      `  + ${f.filename} → ${nombreDeCopia(f.filename)} · ${kb(f.filesize)} · alt «${(f.alt ?? "").slice(0, 50)}»`,
+    ),
   );
   if (video && m.videos[String(video.id)] === undefined)
     plan.push(
@@ -644,24 +673,51 @@ if (modo === "simular" || modo === "copiar") {
     guardar(m);
     log(`manifiesto: ${MANIFIESTO}`);
 
+    /*
+     * NOMBRE PROPIO (decisión del 2026-10-03): todo fichero se sube como
+     * `demo-copia-<nombre original>`, nunca con su nombre. Antes de subir se
+     * comprueba que esa URL no existe en el almacén de destino ni es la del
+     * origen; después, que lo que creó Payload cumple lo mismo. Así la copia
+     * no puede pisar —ni la retirada borrar— un fichero que no sea suyo.
+     */
+    const almacenDestino = v.almacen;
+    const leerParaSubir = async (f: MediaOrigen) => {
+      const nombre = nombreDeCopia(f.filename);
+      const prevista = urlEnAlmacen(almacenDestino, nombre);
+      const estado = (await fetch(prevista, { method: "HEAD" }).catch(() => null))?.status ?? 0;
+      const antes = veredictoSubida({
+        urlOrigen: f.url,
+        urlPrevista: prevista,
+        existeEnDestino: estado !== 404,
+      });
+      if (!antes.valido)
+        fallar(`${f.filename}: ${antes.motivo} (${prevista}, HTTP ${estado || "sin respuesta"})`);
+      const r = await fetch(f.url);
+      if (!r.ok) fallar(`no se pudo leer ${f.url}: HTTP ${r.status}`);
+      return { nombre, data: Buffer.from(await r.arrayBuffer()) };
+    };
+    const comprobarCreado = (f: MediaOrigen, urlCreada: string | null | undefined) => {
+      const despues = veredictoCreado({ urlOrigen: f.url, urlCreada });
+      if (!despues.valido) fallar(`${f.filename}: ${despues.motivo} (${urlCreada ?? "sin URL"})`);
+    };
+
     /** Sube al destino una copia del fichero del origen (o reutiliza la ya copiada). */
     const copiarMedia = async (f: MediaOrigen | null | undefined): Promise<Id | null> => {
       if (!f) return null;
       const ya = m.media[String(f.id)];
       if (ya !== undefined) return ya;
-      const r = await fetch(f.url);
-      if (!r.ok) fallar(`no se pudo leer ${f.url}: HTTP ${r.status}`);
-      const data = Buffer.from(await r.arrayBuffer());
+      const { nombre, data } = await leerParaSubir(f);
       const doc = await payload.create({
         collection: "media",
         data: { alt: f.alt ?? "", focalX: f.focalX ?? 50, focalY: f.focalY ?? 50 },
-        file: { data, mimetype: f.mimeType, name: f.filename, size: data.length },
+        file: { data, mimetype: f.mimeType, name: nombre, size: data.length },
         overrideAccess: true,
       });
       m.media[String(f.id)] = doc.id;
       if (doc.url) m.urlsCreadas.push(doc.url);
       guardar(m);
-      log(`  media ${f.filename} → id ${doc.id}`);
+      comprobarCreado(f, doc.url);
+      log(`  media ${f.filename} → ${doc.filename} (id ${doc.id})`);
       return doc.id;
     };
 
@@ -689,9 +745,7 @@ if (modo === "simular" || modo === "copiar") {
       const ya = m.videos[String(v.id)];
       if (ya !== undefined) return ya;
       const poster = await copiarMedia(v.poster);
-      const r = await fetch(v.url);
-      if (!r.ok) fallar(`no se pudo leer el vídeo: HTTP ${r.status}`);
-      const data = Buffer.from(await r.arrayBuffer());
+      const { nombre, data } = await leerParaSubir(v);
       const doc = await payload.create({
         collection: "videos",
         data: {
@@ -699,13 +753,14 @@ if (modo === "simular" || modo === "copiar") {
           decorativo: v.decorativo ?? true,
           poster: poster ?? 0,
         },
-        file: { data, mimetype: v.mimeType, name: v.filename, size: data.length },
+        file: { data, mimetype: v.mimeType, name: nombre, size: data.length },
         overrideAccess: true,
       });
       m.videos[String(v.id)] = doc.id;
       if (doc.url) m.urlsCreadas.push(doc.url);
       guardar(m);
-      log(`  vídeo ${v.filename} → id ${doc.id}`);
+      comprobarCreado(v, doc.url);
+      log(`  vídeo ${v.filename} → ${doc.filename} (id ${doc.id})`);
       return doc.id;
     };
 

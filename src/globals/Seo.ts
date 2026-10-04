@@ -1,5 +1,6 @@
 import type { GlobalConfig } from "payload";
 
+import { validarTelefono, validarUrlRed } from "../lib/seo/empresa";
 import { DIAS, NOMBRE_DIA, validarHora } from "../lib/seo/horario";
 import { revalidarTodoElSitio } from "../lib/revalidation";
 import { escrituraContenido, publico } from "../lib/seguridad/acceso";
@@ -12,8 +13,11 @@ import { escrituraContenido, publico } from "../lib/seguridad/acceso";
  * ux-9. Va en el JSON-LD `Organization` (`contactPoint.hoursAvailable`, como
  * `OpeningHoursSpecification`) y en /contactanos/.
  *
- * El resto de los datos de la empresa (razón social, contacto, redes) sigue en
- * `src/lib/seo/config.ts` hasta que se decida moverlos aquí.
+ * CONTACTO DE LA EMPRESA (2026-10-04): teléfono, WhatsApp, correo, dirección y
+ * redes, que antes solo estaban en `src/lib/seo/config.ts`. Ese fichero queda
+ * como RESPALDO campo a campo (`src/lib/seo/empresa.ts`); la migración siembra
+ * aquí sus mismos valores. La razón social y el NIT siguen en `config.ts`,
+ * pendientes del cliente (CLAUDE.md §10.3).
  *
  * Al guardar se revalida todo el sitio: el JSON-LD va en varias páginas.
  */
@@ -74,6 +78,77 @@ export const Seo: GlobalConfig = {
               label: "Cierra",
               validate: validarHora,
               admin: { width: "50%", placeholder: "17:30" },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "empresa",
+      type: "group",
+      label: "Contacto de la empresa",
+      admin: {
+        description:
+          "Sale en el pie, la cabecera, el botón de WhatsApp y la información que leen los buscadores. Si dejas un campo vacío, se usa el dato de siempre.",
+      },
+      fields: [
+        {
+          type: "row",
+          fields: [
+            {
+              name: "telefono",
+              type: "text",
+              label: "Teléfono",
+              validate: validarTelefono,
+              admin: { width: "50%", placeholder: "+57 317 670 7071" },
+            },
+            {
+              name: "whatsapp",
+              type: "text",
+              label: "WhatsApp",
+              validate: validarTelefono,
+              admin: {
+                width: "50%",
+                placeholder: "+57 317 670 7071",
+                description: "Si lo dejas vacío, se usa el teléfono.",
+              },
+            },
+          ],
+        },
+        { name: "correo", type: "email", label: "Correo de contacto" },
+        {
+          type: "row",
+          fields: [
+            {
+              name: "direccion",
+              type: "text",
+              label: "Dirección",
+              admin: { width: "60%", placeholder: "Carrera 68D # 17A-84" },
+            },
+            {
+              name: "ciudad",
+              type: "text",
+              label: "Ciudad",
+              admin: { width: "40%", placeholder: "Bogotá D.C." },
+            },
+          ],
+        },
+        {
+          name: "redes",
+          type: "array",
+          label: "Redes sociales",
+          labels: { singular: "Red", plural: "Redes" },
+          admin: {
+            description:
+              "La dirección completa de cada perfil oficial. En el pie salen Facebook, Instagram, LinkedIn y YouTube.",
+          },
+          fields: [
+            {
+              name: "url",
+              type: "text",
+              required: true,
+              label: "Dirección",
+              validate: validarUrlRed,
             },
           ],
         },

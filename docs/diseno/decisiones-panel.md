@@ -215,3 +215,35 @@ acaba en «-as», femenino; si no, masculino. Cubre las 11 de hoy, que están
 en las pruebas. Una categoría nueva que no siga la regla se ve en el SEO
 guiado del panel antes de publicarla. Lo usan el `generateMetadata`, el
 `<h1>` de las dos páginas de categoría y el panel. Sin esquema.
+
+## 10. Datos de la empresa en el panel (2026-10-04, rama `feat/panel-datos-empresa`)
+
+Aprobado por dirección. **Cambio de esquema**, con la ventana de migraciones
+tomada por C.
+
+- **Panel:** en el global «SEO y datos de la empresa», un grupo nuevo,
+  «Contacto de la empresa»:
+  - campos: teléfono, WhatsApp (vacío = el teléfono), correo, dirección,
+    ciudad y redes;
+  - validaciones en español: número con indicativo y redes con `https://`.
+- **Lectura:** `getEmpresa()` (`src/lib/queries/getSeo.ts`) devuelve los datos
+  del global, con respaldo **campo a campo** en `src/lib/seo/config.ts`
+  (función pura en `src/lib/seo/empresa.ts`, con pruebas). Si un campo queda
+  vacío, o la base aún no tiene la migración, el sitio pinta lo de siempre.
+- **Consumidores:**
+  - el pie (teléfono, WhatsApp, correo, dirección y redes) y la cabecera
+    (WhatsApp);
+  - la home (WhatsApp y JSON-LD) y el índice de repuestos (JSON-LD);
+  - `/contactanos/` (WhatsApp) y las dos fichas (WhatsApp con mensaje);
+  - el JSON-LD `Organization` y el destino del aviso de solicitudes, si no hay
+    `SOLICITUDES_EMAIL_TO`.
+  - `lib/whatsapp.ts` ahora recibe el número.
+- **Migración `20261004_175926_empresa_contacto`** (va después de la de B,
+  `animaciones`): columnas `seo.empresa_*` y la tabla `seo_empresa_redes`.
+  Siembra con SQL explícito (§3.5) los mismos valores de `config.ts`, sobre
+  la fila 1 del global, la que creó la migración del horario.
+- **`config.ts`:** queda como respaldo y solo cambia su comentario. Lo editó la
+  herramienta de edición sobre un fragmento sin el patrón del almacén
+  (permitido por dirección).
+- La razón social y el NIT siguen en `config.ts`, pendientes del cliente
+  (CLAUDE.md §10.3).

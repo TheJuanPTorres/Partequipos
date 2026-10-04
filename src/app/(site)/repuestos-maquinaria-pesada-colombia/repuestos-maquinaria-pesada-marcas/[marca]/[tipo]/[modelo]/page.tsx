@@ -16,6 +16,7 @@ import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
+import { getEmpresa } from "@/lib/queries/getSeo";
 import type { Marca, TiposEquipo } from "@/payload-types";
 
 type Params = { marca: string; tipo: string; modelo: string };
@@ -69,6 +70,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 export default async function ModeloPage({ params }: { params: Promise<Params> }) {
   const data = await resolver(await params);
   if (!data) notFound();
+  const empresa = await getEmpresa();
 
   const { marca, tipo, modelo } = data;
 
@@ -164,7 +166,7 @@ export default async function ModeloPage({ params }: { params: Promise<Params> }
         tipo="repuesto"
         origen={rutas.modelo(marca.slug, tipo.slug, modelo.slug)}
         siteKey={turnstileSiteKey()}
-        whatsapp={enlaceWhatsApp(`Hola, busco repuestos para ${modelo.nombre}.`)}
+        whatsapp={enlaceWhatsApp(empresa.whatsapp, `Hola, busco repuestos para ${modelo.nombre}.`)}
         referencia={{ tipo: "modelos-repuesto", id: modelo.id, texto: modelo.nombre }}
         titulo="Solicitar este repuesto"
         descripcion="Dinos qué pieza necesitas y te confirmamos disponibilidad y precio."

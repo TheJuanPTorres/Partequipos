@@ -31,10 +31,9 @@ import {
   getMarcasDePortada,
 } from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
-import { getHorario } from "@/lib/queries/getSeo";
+import { getEmpresa, getHorario } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
-import { seoConfig } from "@/lib/seo/config";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
@@ -59,7 +58,6 @@ export default async function HomePage() {
   const pagina = await getPaginaPorSlug(SLUG_PORTADA);
   if (!pagina) notFound();
 
-  const { contact } = seoConfig;
   // Textos de las secciones, desde el panel (página «inicio»). Vacío: no se pinta.
   const tx = (v: string | null | undefined) => v?.trim() ?? "";
   const nueva = pagina.seccionNueva;
@@ -70,17 +68,27 @@ export default async function HomePage() {
   const testimoniosT = pagina.seccionTestimonios;
   const faq = pagina.seccionFaq;
   const diapositivas = diapositivasDeHero(pagina.hero);
-  const [marcas, usados, excavadoras, categoriasTecnicas, testimonios, preguntas, horario, sedes] =
-    await Promise.all([
-      getMarcasDePortada(),
-      getEquiposUsadosDePortada(),
-      getCategoriaUsadaPorSlug(SLUG_EXCAVADORAS),
-      getCategoriasTecnicasDePortada(),
-      getTestimoniosDePortada(),
-      getPreguntasDePortada(),
-      getHorario(),
-      getSedesDePortada(),
-    ]);
+  const [
+    marcas,
+    usados,
+    excavadoras,
+    categoriasTecnicas,
+    testimonios,
+    preguntas,
+    horario,
+    sedes,
+    empresa,
+  ] = await Promise.all([
+    getMarcasDePortada(),
+    getEquiposUsadosDePortada(),
+    getCategoriaUsadaPorSlug(SLUG_EXCAVADORAS),
+    getCategoriasTecnicasDePortada(),
+    getTestimoniosDePortada(),
+    getPreguntasDePortada(),
+    getHorario(),
+    getSedesDePortada(),
+    getEmpresa(),
+  ]);
   const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
   const maquinaUsada = imagenDeMedia(pagina.seccionUsada?.imagen, "");
   const relVideo = pagina.seccionCompania?.video;
@@ -97,7 +105,7 @@ export default async function HomePage() {
      * (docs/diseno/decisiones-home-ux9.md §22).
      */
     <main>
-      <JsonLd data={buildOrganizationJsonLd(horario)} />
+      <JsonLd data={buildOrganizationJsonLd(horario, empresa)} />
 
       {/* Sección 1 de ux-9. Sin diapositivas en Payload, no se pinta. */}
       {diapositivas.length > 0 ? <HeroPortada diapositivas={diapositivas} /> : null}
@@ -155,7 +163,7 @@ export default async function HomePage() {
         }}
       />
       <SeccionCatalogo
-        whatsapp={enlaceWhatsApp(contact.phone)}
+        whatsapp={enlaceWhatsApp(empresa.whatsapp)}
         sobreVideo={videoCompania !== null}
         textos={{
           titulo: tx(catalogo?.titulo),

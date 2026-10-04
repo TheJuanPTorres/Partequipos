@@ -1,5 +1,6 @@
 import { horarioJsonLd, type Tramo } from "./horario";
 import { absoluteUrl, getSiteUrl, seoConfig } from "./config";
+import { datosEmpresa, type Empresa } from "./empresa";
 
 /** Objeto JSON-LD serializable. */
 export type JsonLdObject = Record<string, unknown>;
@@ -73,18 +74,19 @@ export function buildBreadcrumbJsonLd(items: BreadcrumbItem[]): JsonLdObject {
 // Organization — identidad del sitio
 // ---------------------------------------------------------------------------
 /**
- * JSON-LD `Organization`. Todos los datos de negocio salen de `seoConfig`,
- * no hay valores quemados aquí.
+ * JSON-LD `Organization`. El contacto sale del global `seo` (`empresa`, con
+ * respaldo en `seoConfig`); el resto de datos de negocio, de `seoConfig`.
  */
-export function buildOrganizationJsonLd(horario: Tramo[] = []): JsonLdObject {
-  const { contact } = seoConfig;
-
+export function buildOrganizationJsonLd(
+  horario: Tramo[] = [],
+  empresa: Empresa = datosEmpresa(undefined),
+): JsonLdObject {
   const address: JsonLdObject = {
     "@type": "PostalAddress",
     addressCountry: seoConfig.country,
   };
-  if (contact.streetAddress) address.streetAddress = contact.streetAddress;
-  if (contact.addressLocality) address.addressLocality = contact.addressLocality;
+  if (empresa.direccion) address.streetAddress = empresa.direccion;
+  if (empresa.ciudad) address.addressLocality = empresa.ciudad;
 
   const jsonLd: JsonLdObject = {
     "@context": "https://schema.org",
@@ -101,8 +103,8 @@ export function buildOrganizationJsonLd(horario: Tramo[] = []): JsonLdObject {
   if (seoConfig.legalName) jsonLd.legalName = seoConfig.legalName;
   if (seoConfig.taxId) jsonLd.taxID = seoConfig.taxId;
 
-  if (contact.email) jsonLd.email = contact.email;
-  if (contact.phone) jsonLd.telephone = contact.phone;
+  if (empresa.correo) jsonLd.email = empresa.correo;
+  if (empresa.telefono) jsonLd.telephone = empresa.telefono;
 
   /*
    * Horario de atención (global `seo`). `Organization` no admite
@@ -118,11 +120,11 @@ export function buildOrganizationJsonLd(horario: Tramo[] = []): JsonLdObject {
       areaServed: seoConfig.country,
       availableLanguage: "es",
     };
-    if (contact.phone) punto.telephone = contact.phone;
-    if (contact.email) punto.email = contact.email;
+    if (empresa.telefono) punto.telephone = empresa.telefono;
+    if (empresa.correo) punto.email = empresa.correo;
     jsonLd.contactPoint = punto;
   }
-  if (seoConfig.sameAs.length > 0) jsonLd.sameAs = [...seoConfig.sameAs];
+  if (empresa.redes.length > 0) jsonLd.sameAs = [...empresa.redes];
 
   return jsonLd;
 }

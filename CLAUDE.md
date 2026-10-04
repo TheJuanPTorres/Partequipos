@@ -581,6 +581,7 @@ veredicto, que va en el informe.
 - **Panel, «Ver en el sitio» (2026-10-04):** enlace a la página pública en el formulario de las 13 colecciones con URL (`admin.preview`, ruta relativa, `src/lib/panel/verEnElSitio.ts`); sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §7.
 - **Panel, SEO guiado (2026-10-04):** vista de Google, contadores y valores por defecto en «Buscadores y redes sociales» (campo `ui`, sin esquema); los títulos por defecto del catálogo salen de `src/lib/seo/porDefecto.ts`, compartido con el sitio. `seoConfig.titleTemplate` no se usa. Detalle en `docs/diseno/decisiones-panel.md` §8.
 - **Concordancia de «nuevas/usadas» (2026-10-04):** «Vibrocompactadores usados», «Cargadores nuevos»… en el título y el `<h1>` de las categorías (`concuerda` en `porDefecto.ts`); 7 de 11 salían mal.
+- **Datos de la empresa en el panel (2026-10-04):** teléfono, WhatsApp, correo, dirección y redes en el global `seo` («Contacto de la empresa»), con `src/lib/seo/config.ts` como respaldo campo a campo (`getEmpresa`); migración `20261004_175926_empresa_contacto` con la siembra de los valores de siempre. Detalle en `docs/diseno/decisiones-panel.md` §10.
 
 ### 10.0 Qué está construido y qué falta
 

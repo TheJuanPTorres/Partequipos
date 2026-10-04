@@ -570,6 +570,7 @@ veredicto, que va en el informe.
 - **Guía del editor (2026-10-03, PR #47):** `docs/guia-editor.md`, entregable del Sprint 4 para quien carga contenido en el panel.
 - **Panel, textos de Páginas (2026-10-03):** ayudas de la colección, la ruta y el tipo en lenguaje llano; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §3.
 - **Panel, ruta de las páginas bloqueada (2026-10-03):** como el resto de slugs, solo al crear o con el permiso (`slugEditable`, por efecto con `npm run qa:slug-paginas`); `payload-types.ts` regenerado; sin esquema.
+- **Panel, revisión en pantalla (2026-10-03):** `npm run panel:revision -- <preview>` inicia sesión como editor con la cuenta que lee el propio script (nunca la imprime) y captura a 1440 y 390; Playwright por `npx`, sin MCP. Detalle en `docs/diseno/decisiones-panel.md` §5.
 
 ### 10.0 Qué está construido y qué falta
 

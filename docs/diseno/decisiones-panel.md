@@ -108,3 +108,24 @@ Aprobado por dirección. Sin esquema.
   - Quitando el bloqueo, la comprobación sale en rojo.
 - `src/payload-types.ts` regenerado: solo cambian comentarios, que recogen
   las descripciones de los PR #46, #48 y de este.
+
+## 5. Revisión del panel en pantalla (2026-10-03, rama `feat/panel-revision-pantalla`)
+
+`npm run panel:revision -- <url del preview>` (`scripts/qa/revision-panel.mjs`).
+
+- **Cuenta:** la lee el propio script de `.env.editor-preview.local`
+  (rol Editor; la rellena dirección). Solo imprime los **nombres** de las
+  claves, nunca los valores. El agente no abre ese fichero: los permisos se
+  lo deniegan.
+- **Destino:** solo un preview del proyecto (`partequipos-*.vercel.app`).
+  Rechaza producción y cualquier otro host antes de leer la cuenta
+  (comprobado). El token de la protección va solo a ese origen.
+- **Herramienta:** `playwright-core` 1.63.0 por `npx`, como `puppeteer-core`
+  en `vuelo-pie`. No añade dependencias. Usa el Chrome instalado y ningún MCP.
+- **Qué hace:** a 1440 y a 390 captura la portada del panel, Imágenes,
+  Páginas, Modelos y el formulario del primer modelo. Busca además textos en
+  inglés y errores de consola. Las capturas van fuera del repositorio, en
+  `Desktop\partequipos-cierre\capturas\panel-<fecha>\`. No escribe nada.
+- **Primera corrida:** el «formulario» salió igual que la lista, porque el
+  primer enlace de la página era el de «Crear». Se corrigió para coger un
+  enlace de fila.

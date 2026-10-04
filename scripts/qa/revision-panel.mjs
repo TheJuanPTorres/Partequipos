@@ -160,10 +160,11 @@ try {
 
     // Formulario de edición: el primer modelo de la lista.
     await pagina.goto(`${base}/admin/collections/modelos-repuesto`, { waitUntil: "networkidle" });
-    const enlace = await pagina
-      .locator('a[href*="/admin/collections/modelos-repuesto/"]')
-      .first()
-      .getAttribute("href");
+    // Un enlace de FILA de la tabla: el primero de la página es el de «Crear».
+    const enlaces = await pagina
+      .locator('table a[href*="/admin/collections/modelos-repuesto/"]')
+      .evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+    const enlace = enlaces.find((h) => h && !/\/create\/?$/.test(h));
     if (enlace) await visitar("formulario-modelo", new URL(enlace, base).pathname);
     else decir(`· sin modelos: no hay formulario que capturar (${ancho.nombre})`);
 

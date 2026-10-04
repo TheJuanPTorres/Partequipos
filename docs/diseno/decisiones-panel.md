@@ -371,11 +371,12 @@ Mejora 3 de las tres aprobadas. Sin esquema.
     host y ruta;
   - intercepta solo el origen del preview, para que el token no pueda viajar
     a terceros.
-- **Observado y sin aislar:** en el Chrome automatizado, las miniaturas de la
-  lista de «Imágenes» salen a veces como icono de fichero. Es
-  `ERR_BLOCKED_BY_ORB` sobre las imágenes del Blob, que responden **200 con
-  `image/png` o `image/jpeg`**. En la primera pasada del día sí cargaron. No se
-  sabe si un editor lo ve en un navegador normal: está en «Necesito de
-  dirección» del informe.
+- **Miniaturas como icono — CERRADO (2026-10-04).** En el Chrome
+  automatizado de `panel:revision`, las miniaturas de la lista de «Imágenes»
+  salían a veces como icono de fichero: `ERR_BLOCKED_BY_ORB` sobre las
+  imágenes del Blob, que responden **200 con `image/png` o `image/jpeg`**.
+  **Dirección las revisó en un navegador normal y se ven todas bien:** es solo
+  del Chrome automatizado, no algo que vea un editor. Si `panel:revision`
+  registra esas peticiones fallidas, no son un defecto del panel.
 - La guía (§8 y §9) lo recoge; «IMG_1234» se cambia por «foto 3» como ejemplo
   de genérico (el primero se rechaza por corto).

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getLogo } from "@/lib/queries/getSeo";
 import { rutas } from "@/lib/routes";
 import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
@@ -27,7 +28,8 @@ function fechaLegible(iso: string): string {
   });
 }
 
-export function ArticuloCuerpo({ articulo }: { articulo: Articulo }) {
+export async function ArticuloCuerpo({ articulo }: { articulo: Articulo }) {
+  const logo = await getLogo();
   const categoria = poblado<CategoriasBlog>(articulo.categoria);
   const imagen = imagenDeMedia(articulo.imagenDestacada, articulo.titulo);
 
@@ -62,6 +64,7 @@ export function ArticuloCuerpo({ articulo }: { articulo: Articulo }) {
             fechaModificacion: articulo.updatedAt,
             autor: articulo.autor,
             imagenUrl: imagen?.url,
+            logoUrl: logo.buscadores,
           }),
           buildBreadcrumbJsonLd(breadcrumbs),
         ]}

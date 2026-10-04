@@ -10,7 +10,7 @@ import { getMarcaPorSlug } from "@/lib/queries/getMarcas";
 import { getModeloPorSlug, getModelos } from "@/lib/queries/getModelos";
 import { getTipoPorSlug } from "@/lib/queries/getTipos";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const imagenes = Array.isArray(modelo.imagenes) ? modelo.imagenes : [];
   const portada = imagenDeMedia(imagenes[0], modelo.nombre);
 
-  return buildMetadata({
+  return metadataDe({
     nombre: tituloPorDefecto.modeloRepuesto(modelo.nombre),
     path: rutas.modelo(marca.slug, tipo.slug, modelo.slug),
     descripcion: modelo.descripcion,

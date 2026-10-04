@@ -5,15 +5,15 @@ import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
 const TITULO = "Marcas de maquinaria pesada nueva";
 const DESCRIPCION = "Marcas que distribuimos, con sus tipos de equipo y modelos disponibles.";
 
-export function generateMetadata(): Metadata {
-  return buildMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return metadataDe({
     nombre: TITULO,
     path: rutas.marcasMaquinaria(),
     descripcion: DESCRIPCION,

@@ -24,6 +24,8 @@ export type BuildMetadataInput = {
   seo?: SeoGroup;
   /** Imagen social explícita ya resuelta (URL absoluta del CDN). */
   imageUrl?: string | null;
+  /** Imagen social por defecto: el logo del panel (`getLogo().social`). */
+  imagenPorDefecto?: string | null;
   /** Tipo de Open Graph. Las fichas usan "website" salvo artículos de blog. */
   ogType?: "website" | "article";
 };
@@ -43,10 +45,10 @@ function ogImageUrl(ogImage: SeoGroup extends null ? never : NonNullable<SeoGrou
  * Prioridad de datos:
  *   title       -> seo.metaTitle        | nombre
  *   description -> seo.metaDescription  | descripcion | descripción por defecto
- *   imagen      -> imageUrl             | seo.ogImage | imagen social por defecto
+ *   imagen      -> imageUrl | seo.ogImage | imagenPorDefecto (logo) | config.ts
  */
 export function buildMetadata(input: BuildMetadataInput): Metadata {
-  const { nombre, path, descripcion, seo, imageUrl, ogType = "website" } = input;
+  const { nombre, path, descripcion, seo, imageUrl, imagenPorDefecto, ogType = "website" } = input;
 
   const title = seo?.metaTitle?.trim() || nombre.trim();
   const description = recortarDescripcion(
@@ -55,7 +57,10 @@ export function buildMetadata(input: BuildMetadataInput): Metadata {
 
   const canonical = absoluteUrl(path);
   const image = absoluteUrl(
-    imageUrl?.trim() || ogImageUrl(seo?.ogImage) || seoConfig.defaultOgImagePath,
+    imageUrl?.trim() ||
+      ogImageUrl(seo?.ogImage) ||
+      imagenPorDefecto?.trim() ||
+      seoConfig.defaultOgImagePath,
   );
 
   return {

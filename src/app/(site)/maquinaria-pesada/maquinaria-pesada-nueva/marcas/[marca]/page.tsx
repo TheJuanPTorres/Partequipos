@@ -11,7 +11,7 @@ import {
   getTiposDeMarcaMaquinaria,
 } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const marca = await getMarcaMaquinariaPorSlug(slug);
   if (!marca) return {};
 
-  return buildMetadata({
+  return metadataDe({
     nombre: tituloPorDefecto.marcaMaquinaria(marca.nombre),
     path: rutas.marcaMaquinaria(marca.slug),
     descripcion: marca.descripcion,

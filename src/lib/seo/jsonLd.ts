@@ -80,6 +80,8 @@ export function buildBreadcrumbJsonLd(items: BreadcrumbItem[]): JsonLdObject {
 export function buildOrganizationJsonLd(
   horario: Tramo[] = [],
   empresa: Empresa = datosEmpresa(undefined),
+  /** Logo del panel o el de siempre (`getLogo().buscadores`). */
+  logoUrl: string = seoConfig.logoPath,
 ): JsonLdObject {
   const address: JsonLdObject = {
     "@type": "PostalAddress",
@@ -93,7 +95,7 @@ export function buildOrganizationJsonLd(
     "@type": "Organization",
     name: seoConfig.siteName,
     url: getSiteUrl(),
-    logo: absoluteUrl(seoConfig.logoPath),
+    logo: absoluteUrl(logoUrl),
     description: seoConfig.defaultDescription,
     address,
   };
@@ -138,6 +140,8 @@ export type ArticleJsonLdInput = {
   fechaModificacion?: string | null;
   autor?: string | null;
   imagenUrl?: string | null;
+  /** Logo del editor: el del panel o el de siempre (`getLogo().buscadores`). */
+  logoUrl?: string | null;
 };
 
 /**
@@ -164,7 +168,7 @@ export function buildArticleJsonLd(input: ArticleJsonLdInput): JsonLdObject {
     publisher: {
       "@type": "Organization",
       name: seoConfig.siteName,
-      logo: { "@type": "ImageObject", url: absoluteUrl(seoConfig.logoPath) },
+      logo: { "@type": "ImageObject", url: absoluteUrl(input.logoUrl ?? seoConfig.logoPath) },
     },
   };
 

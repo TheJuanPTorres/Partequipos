@@ -5,15 +5,15 @@ import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getCategoriasMaquinaria, getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 
 const TITULO = "Maquinaria pesada nueva";
 const DESCRIPCION =
   "Equipos nuevos organizados por marca y tipo, con ficha técnica y solicitud de cotización.";
 
-export function generateMetadata(): Metadata {
-  return buildMetadata({ nombre: TITULO, path: rutas.nueva(), descripcion: DESCRIPCION });
+export async function generateMetadata(): Promise<Metadata> {
+  return metadataDe({ nombre: TITULO, path: rutas.nueva(), descripcion: DESCRIPCION });
 }
 
 export default async function NuevaIndexPage() {

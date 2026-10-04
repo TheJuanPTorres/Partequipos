@@ -11,7 +11,7 @@ import {
   getCategoriasBlog,
 } from "@/lib/queries/getBlog";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 
 /**
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const categoria = await getCategoriaBlogPorSlug(slug);
   if (!categoria) return {};
 
-  return buildMetadata({
+  return metadataDe({
     nombre: categoria.nombre,
     path: rutas.categoriaBlog(categoria.slug),
     descripcion: categoria.descripcion,

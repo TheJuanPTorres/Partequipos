@@ -4,21 +4,26 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getMarcas } from "@/lib/queries/getMarcas";
-import { getEmpresa, getHorario } from "@/lib/queries/getSeo";
+import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
 
 const TITULO = "Repuestos para maquinaria pesada en Colombia";
 const DESCRIPCION =
   "Catálogo de repuestos para maquinaria pesada: excavadoras, bulldozers, retrocargadoras, motoniveladoras y más, organizados por marca y tipo de equipo.";
 
-export function generateMetadata(): Metadata {
-  return buildMetadata({ nombre: TITULO, path: rutas.repuestos(), descripcion: DESCRIPCION });
+export async function generateMetadata(): Promise<Metadata> {
+  return metadataDe({ nombre: TITULO, path: rutas.repuestos(), descripcion: DESCRIPCION });
 }
 
 export default async function RepuestosIndexPage() {
-  const [marcas, horario, empresa] = await Promise.all([getMarcas(), getHorario(), getEmpresa()]);
+  const [marcas, horario, empresa, logo] = await Promise.all([
+    getMarcas(),
+    getHorario(),
+    getEmpresa(),
+    getLogo(),
+  ]);
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -28,7 +33,10 @@ export default async function RepuestosIndexPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <JsonLd
-        data={[buildOrganizationJsonLd(horario, empresa), buildBreadcrumbJsonLd(breadcrumbs)]}
+        data={[
+          buildOrganizationJsonLd(horario, empresa, logo.buscadores),
+          buildBreadcrumbJsonLd(breadcrumbs),
+        ]}
       />
       <Breadcrumbs items={breadcrumbs} />
 

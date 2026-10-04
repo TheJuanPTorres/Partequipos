@@ -5,7 +5,7 @@ import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getArticulos } from "@/lib/queries/getBlog";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 
 /**
@@ -21,12 +21,14 @@ import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
  *
  * Ruta estática: gana sobre el comodín `[...slug]` por precedencia de Next.
  */
-export const metadata: Metadata = buildMetadata({
-  nombre: "Noticias",
-  path: rutas.blog(),
-  descripcion:
-    "Novedades, guías técnicas y tendencias de maquinaria pesada, repuestos y mantenimiento.",
-});
+export function generateMetadata(): Promise<Metadata> {
+  return metadataDe({
+    nombre: "Noticias",
+    path: rutas.blog(),
+    descripcion:
+      "Novedades, guías técnicas y tendencias de maquinaria pesada, repuestos y mantenimiento.",
+  });
+}
 
 export default async function BlogIndicePage() {
   const articulos = await getArticulos();

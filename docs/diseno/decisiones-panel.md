@@ -247,3 +247,39 @@ tomada por C.
   (permitido por dirección).
 - La razón social y el NIT siguen en `config.ts`, pendientes del cliente
   (CLAUDE.md §10.3).
+
+## 11. Logo institucional en el panel (2026-10-04, rama `feat/panel-logo`)
+
+Aprobado por dirección (CLAUDE.md §10.8). **Cambio de esquema**, con la
+ventana de migraciones tomada por C.
+
+- **Panel:** en el global «SEO y datos de la empresa», sección «Imágenes»,
+  campo de subida «Logo» (colección `media`, que ya solo admite JPEG, PNG y
+  WebP).
+- **Respaldo, distinto por sitio, para que con el campo vacío NADA cambie**
+  (`src/lib/seo/logo.ts`, con pruebas):
+  - cabecera y pie: `public/logo-partequipos.png` (el de Andrés,
+    transparente), 187 × 51;
+  - JSON-LD `Organization` (home e índice de repuestos) y `Article.publisher`:
+    `seoConfig.logoPath`;
+  - imagen social de las páginas sin imagen propia: `seoConfig.defaultOgImagePath`.
+- **Con el logo subido**, los cuatro usan el de `Media`. En la cabecera y el
+  pie las medidas se escalan a 187 px de ancho con su proporción, para que
+  `next/image` no genere el `srcset` del original.
+- **Lectura:** el global `seo` se pide UNA vez por petición (`getSeoGlobal`,
+  `depth: 1`) y de ahí salen `getHorario`, `getEmpresa` y `getLogo`.
+- **Metadata:** las 20 páginas pasan de `buildMetadata` (puro, sigue con sus
+  pruebas) a `metadataDe` (`src/lib/seo/metadata.ts`), que añade la imagen
+  social por defecto. Las `generateMetadata` síncronas pasan a `async`, y
+  `/noticias/` cambia su `metadata` constante por `generateMetadata`.
+- **Migración `20261004_191621_logo_institucional`:** solo esquema (columna
+  `seo.logo_id`, su clave foránea a `media` con `ON DELETE set null` y su
+  índice). Borrar el logo en `Media` deja el campo vacío y el sitio vuelve al
+  de siempre.
+- **No cambia:** el favicon del panel (`payload.config.ts`, sigue con
+  `seoConfig.logoPath`; el favicon espera el icono cuadrado, §10.3 p.15) y el
+  logo del propio panel (`partequipos-wordmark`).
+- **Ojo al subirlo (para dirección):** el mismo fichero sirve para la cabecera
+  (fondo claro) y como imagen social. Un PNG transparente con letras oscuras
+  se ve bien en la cabecera, pero algunas redes pintan la transparencia en
+  negro. Si molesta, cada página puede llevar su propia imagen social.

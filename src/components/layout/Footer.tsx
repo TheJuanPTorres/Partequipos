@@ -11,7 +11,7 @@ import { Revelado } from "@/components/movimiento/Revelado";
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { columnasDelPie, hrefTelefono, type ColumnaPie } from "@/lib/pie";
 import { getPie } from "@/lib/queries/getPie";
-import { getEmpresa } from "@/lib/queries/getSeo";
+import { getEmpresa, getLogo } from "@/lib/queries/getSeo";
 import { imagenDeMedia } from "@/lib/utils/relations";
 import { seoConfig } from "@/lib/seo/config";
 
@@ -82,7 +82,7 @@ function Columna({
 }
 
 export async function Footer() {
-  const [pie, empresa] = await Promise.all([getPie(), getEmpresa()]);
+  const [pie, empresa, logo] = await Promise.all([getPie(), getEmpresa(), getLogo()]);
   const telefono = hrefTelefono(empresa.telefono);
   const columnas = columnasDelPie(pie.columnas, empresa.telefono);
   // Decorativa: sin nombre accesible (`alt` vacío y `aria-hidden`).
@@ -141,10 +141,10 @@ export async function Footer() {
       <div className={estilos.panel}>
         <div className={estilos.empresa}>
           <Image
-            src="/logo-partequipos.png"
+            src={logo.sitio.src}
             alt={seoConfig.siteName}
-            width={187}
-            height={51}
+            width={logo.sitio.width}
+            height={logo.sitio.height}
             className={estilos.logo}
           />
           <div>

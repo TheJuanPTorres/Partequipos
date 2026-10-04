@@ -4,15 +4,15 @@ import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 
 const TITULO = "Maquinaria pesada";
 const DESCRIPCION =
   "Maquinaria pesada nueva y usada para construcción, infraestructura y agroindustria, con respaldo técnico y repuestos.";
 
-export function generateMetadata(): Metadata {
-  return buildMetadata({ nombre: TITULO, path: rutas.maquinaria(), descripcion: DESCRIPCION });
+export async function generateMetadata(): Promise<Metadata> {
+  return metadataDe({ nombre: TITULO, path: rutas.maquinaria(), descripcion: DESCRIPCION });
 }
 
 export default function MaquinariaIndexPage() {

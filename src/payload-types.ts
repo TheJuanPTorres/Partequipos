@@ -2306,7 +2306,7 @@ export interface Pie {
   createdAt?: string | null;
 }
 /**
- * Datos de la empresa que usan los buscadores y el sitio. Hoy: el horario de atención.
+ * Datos de la empresa que usan los buscadores y el sitio: el horario de atención, el logo y el contacto.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "seo".
@@ -2324,6 +2324,10 @@ export interface Seo {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Sale en la cabecera, el pie, la información que leen los buscadores y al compartir en redes las páginas sin imagen propia. Usa un PNG con fondo transparente y letras oscuras, de al menos 520 px de ancho. Si lo dejas vacío, se usa el logo de siempre.
+   */
+  logo?: (number | null) | Media;
   /**
    * Sale en el pie, la cabecera, el botón de WhatsApp y la información que leen los buscadores. Si dejas un campo vacío, se usa el dato de siempre.
    */
@@ -2415,6 +2419,7 @@ export interface SeoSelect<T extends boolean = true> {
         cierra?: T;
         id?: T;
       };
+  logo?: T;
   empresa?:
     | T
     | {

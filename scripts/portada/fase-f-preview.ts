@@ -26,6 +26,7 @@ import { getPayload } from "payload";
 import { exigirAlmacen } from "../blob/exigirAlmacen";
 
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
+import { buscarPorMarca } from "../../src/lib/portada/porMarca";
 
 const modo = process.argv.slice(2).find((a) => a === "sembrar" || a === "retirar");
 if (!modo) {
@@ -71,27 +72,9 @@ async function portada() {
   return doc;
 }
 
-const videos = async () =>
-  (
-    await payload.find({
-      collection: "videos",
-      where: { descripcion: { like: MARCA } },
-      depth: 0,
-      limit: 10,
-      overrideAccess: true,
-    })
-  ).docs.filter((v) => v.descripcion.startsWith(MARCA));
+const videos = () => buscarPorMarca(payload, "videos", "descripcion", MARCA);
 
-const posters = async () =>
-  (
-    await payload.find({
-      collection: "media",
-      where: { alt: { like: MARCA } },
-      depth: 0,
-      limit: 10,
-      overrideAccess: true,
-    })
-  ).docs.filter((m) => m.alt?.startsWith(MARCA));
+const posters = () => buscarPorMarca(payload, "media", "alt", MARCA);
 
 if (modo === "sembrar") {
   let video = (await videos())[0];

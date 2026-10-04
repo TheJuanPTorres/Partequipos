@@ -36,6 +36,7 @@ import {
   esImagenDeDemo,
 } from "../../src/lib/portada/heroDemoCliente";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
+import { buscarPorMarca } from "../../src/lib/portada/porMarca";
 
 const modo = process.argv.slice(2).find((a) => a === "sembrar" || a === "retirar");
 if (!modo) {
@@ -74,14 +75,8 @@ const CARPETA_MOVIL = path.join(
 );
 
 async function mediaDeDemo() {
-  const r = await payload.find({
-    collection: "media",
-    where: { alt: { like: MARCA_DEMO } },
-    depth: 0,
-    limit: 50,
-    overrideAccess: true,
-  });
-  return r.docs.filter((m) => esImagenDeDemo(m.alt));
+  const docs = await buscarPorMarca(payload, "media", "alt", MARCA_DEMO);
+  return docs.filter((m) => esImagenDeDemo(m.alt));
 }
 
 async function portada() {

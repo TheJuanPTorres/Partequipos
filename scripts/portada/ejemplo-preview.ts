@@ -31,6 +31,7 @@ import { getPayload } from "payload";
 import { exigirAlmacen } from "../blob/exigirAlmacen";
 import { MARCA_EJEMPLO } from "../../src/lib/demo/copiaDemo";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
+import { buscarPorMarca } from "../../src/lib/portada/porMarca";
 
 const modo = process.argv.slice(2).find((a) => a === "sembrar" || a === "retirar");
 if (!modo) {
@@ -58,16 +59,7 @@ const ASSETS = path.join(os.homedir(), "Desktop", "partequipos-diseno", "assets"
 /** Marca en el `alt` de todo lo que siembra este script (la que reconoce la copia). */
 const MARCA = MARCA_EJEMPLO;
 
-const marcadas = async () =>
-  (
-    await payload.find({
-      collection: "media",
-      where: { alt: { like: MARCA } },
-      depth: 0,
-      limit: 200,
-      overrideAccess: true,
-    })
-  ).docs.filter((m) => m.alt?.startsWith(MARCA));
+const marcadas = () => buscarPorMarca(payload, "media", "alt", MARCA);
 
 /** Sube un fichero del kit (o reutiliza el ya subido con el mismo `alt`). */
 async function subir(fichero: string, alt: string) {
@@ -85,16 +77,7 @@ async function subir(fichero: string, alt: string) {
 }
 
 /** Fichas de usados de ejemplo (descripción marcada). */
-const fichasDeEjemplo = async () =>
-  (
-    await payload.find({
-      collection: "equipos-usados",
-      where: { descripcion: { like: MARCA } },
-      depth: 0,
-      limit: 50,
-      overrideAccess: true,
-    })
-  ).docs.filter((e) => e.descripcion?.startsWith(MARCA));
+const fichasDeEjemplo = () => buscarPorMarca(payload, "equipos-usados", "descripcion", MARCA);
 
 async function categoriaUsada(slug: string) {
   const r = await payload.find({

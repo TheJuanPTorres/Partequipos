@@ -283,3 +283,24 @@ ventana de migraciones tomada por C.
   (fondo claro) y como imagen social. Un PNG transparente con letras oscuras
   se ve bien en la cabecera, pero algunas redes pintan la transparencia en
   negro. Si molesta, cada página puede llevar su propia imagen social.
+
+## 12. Imagen al compartir por defecto (2026-10-04, rama `feat/panel-imagen-social`)
+
+Aprobado por dirección. **Cambio de esquema**, con la ventana tomada por C.
+
+- **Por qué:** el logo es un PNG transparente con letras oscuras, bueno para
+  la cabecera pero no para las redes: algunas pintan la transparencia en negro
+  (§11).
+- **Panel:** en «Imágenes», junto al logo, campo opcional «Imagen al compartir
+  por defecto» (opaca, 1200 × 630).
+- **Respaldo en cadena** (`urlImagenSocialPorDefecto`, con pruebas): la imagen
+  social del panel → el logo del panel → `seoConfig.defaultOgImagePath`. Solo
+  para `og:image` y `twitter:image` de las páginas sin imagen propia.
+- **El JSON-LD `Organization` y `Article.publisher` siguen con el logo.**
+- **Migración `20261004_205655_imagen_social`:** solo esquema (columna
+  `seo.imagen_social_id`, clave foránea a `media` con `ON DELETE set null` e
+  índice).
+- **Probado en `development`** con imágenes de demostración, y retiradas
+  después: solo la imagen social (redes con ella, JSON-LD con el logo de
+  siempre) y las dos a la vez (redes con la imagen social; cabecera, pie y
+  JSON-LD con el logo).

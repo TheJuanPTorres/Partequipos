@@ -2325,9 +2325,13 @@ export interface Seo {
       }[]
     | null;
   /**
-   * Sale en la cabecera, el pie, la información que leen los buscadores y al compartir en redes las páginas sin imagen propia. Usa un PNG con fondo transparente y letras oscuras, de al menos 520 px de ancho. Si lo dejas vacío, se usa el logo de siempre.
+   * Sale en la cabecera, el pie y la información que leen los buscadores (y al compartir en redes, si no hay imagen al compartir por defecto). Usa un PNG con fondo transparente y letras oscuras, de al menos 520 px de ancho. Si lo dejas vacío, se usa el logo de siempre.
    */
   logo?: (number | null) | Media;
+  /**
+   * La que sale al compartir en redes (WhatsApp, Facebook, LinkedIn…) las páginas que no tienen imagen propia. Usa una imagen opaca, sin transparencia, de 1200 × 630 px. Si la dejas vacía, se usa el logo.
+   */
+  imagenSocial?: (number | null) | Media;
   /**
    * Sale en el pie, la cabecera, el botón de WhatsApp y la información que leen los buscadores. Si dejas un campo vacío, se usa el dato de siempre.
    */
@@ -2420,6 +2424,7 @@ export interface SeoSelect<T extends boolean = true> {
         id?: T;
       };
   logo?: T;
+  imagenSocial?: T;
   empresa?:
     | T
     | {

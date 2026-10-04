@@ -2,7 +2,7 @@ import { APIError, type CollectionBeforeOperationHook } from "payload";
 
 /**
  * CIERRA LA DESCARGA REMOTA DESDE EL SERVIDOR en las colecciones de subida
- * (`media`, `videos`). CLAUDE.md §10.32.
+ * (`media`, `videos`, `animaciones`). CLAUDE.md §10.32.
  *
  * EL MECANISMO, leído en Payload 3.89 (`uploads/generateFileData.js`): si una
  * operación de subida llega SIN fichero pero con `filename` y `url` en los

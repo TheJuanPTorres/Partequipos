@@ -93,6 +93,18 @@ export const BloquePresentacionImagen: Block = {
           "A un lado del texto (debajo en móvil). Si transmite información, como un mapa, cuida su texto alternativo.",
       },
     },
+    {
+      // «lottie» y no «animacion»: con este, la clave foránea pasaría de 63 bytes
+      // (paginas_blocks_presentacion_imagen_animacion_id_animaciones_id_fk, 65).
+      name: "lottie",
+      type: "upload",
+      relationTo: "animaciones",
+      label: "Animación (opcional)",
+      admin: {
+        description:
+          "Se reproduce una vez, en el sitio de la imagen, al llegar con el scroll. La imagen sigue haciendo falta: es lo que se ve con «reducir movimiento», si la animación no carga y lo que lee un lector de pantalla. Usa como imagen el último fotograma.",
+      },
+    },
     antetitulo,
     { name: "titulo", type: "text", required: true, label: "Título" },
     { name: "texto", type: "richText", label: "Texto" },

@@ -566,6 +566,7 @@ veredicto, que va en el informe.
 - **Plan de referencia:** `docs/PLAN-MVP.md` y `docs/RUTA-DESARROLLO.md`.
 
 - **Página Nosotros de ux-9 (2026-10-02):** `paginas.bloques` con cinco bloques reutilizables (migración `20261002_204606_paginas_bloques`, solo esquema); detalle, desviaciones y CLS aceptado en `docs/diseno/decisiones-nosotros.md`.
+- **Mapa animado de Nosotros (2026-10-04):** `lottie-web` 5.13.0 ligera por import dinámico solo al acercarse el bloque, con la imagen fija de respaldo (movimiento reducido o fallo) y botón de pausa; colección `animaciones` (solo Lottie, comprobado por contenido) y campo `lottie` en «Presentación con imagen» (migración `20261004_052512_animaciones`, solo esquema); la copia de demostración la lleva. Detalle, medidas y LCP en `docs/diseno/decisiones-nosotros.md` §9.
 - **Panel, orden 1 (2026-10-02, PR #46):** marca = marca del tipo en modelos y equipos nuevos (`marcaDelTipoCoincide`, por efecto con `npm run qa:marca-tipo`), ayudas sin jerga, «Imágenes» con columnas y búsqueda por código; sin esquema. Detalle en `docs/diseno/decisiones-panel.md`.
 - **Guía del editor (2026-10-03, PR #47):** `docs/guia-editor.md`, entregable del Sprint 4 para quien carga contenido en el panel.
 - **Panel, textos de Páginas (2026-10-03):** ayudas de la colección, la ruta y el tipo en lenguaje llano; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §3.

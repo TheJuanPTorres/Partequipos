@@ -81,6 +81,32 @@ describe("vistaDeBloques", () => {
     assert.equal(v?.blockType === "presentacionImagen" && v.imagen?.alt, "alt 77");
   });
 
+  it("presentación: la animación solo con URL y medidas; sin ella, null", () => {
+    const anim = (extra: object) =>
+      ({
+        id: 5,
+        descripcion: "Mapa",
+        url: "https://x.public.blob.vercel-storage.com/mapa.json",
+        ancho: 1073,
+        alto: 1536,
+        updatedAt: "",
+        createdAt: "",
+        ...extra,
+      }) as const;
+    const [a, b, c] = vistaDeBloques([
+      { blockType: "presentacionImagen", titulo: "T", lottie: anim({}) },
+      { blockType: "presentacionImagen", titulo: "T", lottie: anim({ ancho: null }) },
+      { blockType: "presentacionImagen", titulo: "T", lottie: 5 },
+    ]);
+    assert.deepEqual(a?.blockType === "presentacionImagen" && a.animacion, {
+      url: "https://x.public.blob.vercel-storage.com/mapa.json",
+      ancho: 1073,
+      alto: 1536,
+    });
+    assert.equal(b?.blockType === "presentacionImagen" && b.animacion, null);
+    assert.equal(c?.blockType === "presentacionImagen" && c.animacion, null);
+  });
+
   it("cifras: descarta las incompletas y el bloque vacío", () => {
     const vistas = vistaDeBloques([
       {

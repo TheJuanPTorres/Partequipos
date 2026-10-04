@@ -84,6 +84,7 @@ export interface Config {
     articulos: Articulo;
     'categorias-blog': CategoriasBlog;
     media: Media;
+    animaciones: Animacion;
     videos: Video;
     sedes: Sede;
     testimonios: Testimonio;
@@ -114,6 +115,7 @@ export interface Config {
     articulos: ArticulosSelect<false> | ArticulosSelect<true>;
     'categorias-blog': CategoriasBlogSelect<false> | CategoriasBlogSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    animaciones: AnimacionesSelect<false> | AnimacionesSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     sedes: SedesSelect<false> | SedesSelect<true>;
     testimonios: TestimoniosSelect<false> | TestimoniosSelect<true>;
@@ -280,6 +282,9 @@ export interface EquiposNuevo {
    * Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). Los PDF no se admiten todavía. Hoy no se muestran en el sitio.
    */
   documentos?: (number | Media)[] | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -309,6 +314,9 @@ export interface MarcasMaquinaria {
    * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» (en ux-9: Hitachi, CASE y Yanmar). Necesita la foto de la tarjeta.
    */
   ordenPortada?: number | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -354,6 +362,9 @@ export interface TiposMaquinaria {
   slug: string;
   marca: number | MarcasMaquinaria;
   descripcion?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -387,6 +398,9 @@ export interface ModelosRepuesto {
   codigo?: string | null;
   descripcion?: string | null;
   imagenes?: (number | Media)[] | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -424,6 +438,9 @@ export interface TiposEquipo {
   slug: string;
   marca: number | Marca;
   descripcion?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -458,6 +475,9 @@ export interface CategoriasTecnica {
    * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».
    */
   ordenPortada?: number | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -482,6 +502,9 @@ export interface CategoriasMaquinaria {
    * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
    */
   tiposIncluidos?: (number | TiposMaquinaria)[] | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -502,6 +525,9 @@ export interface CategoriasUsada {
    */
   slug: string;
   descripcion?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -587,6 +613,9 @@ export interface MarcasLubricante {
     [k: string]: unknown;
   } | null;
   logo?: (number | null) | Media;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -640,6 +669,9 @@ export interface CategoriasLubricante {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -856,6 +888,9 @@ export interface Pagina {
      */
     botonEnlace?: string | null;
   };
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -929,6 +964,10 @@ export interface BloquePresentacionImagen {
    */
   imagen?: (number | null) | Media;
   /**
+   * Se reproduce una vez, en el sitio de la imagen, al llegar con el scroll. La imagen sigue haciendo falta: es lo que se ve con «reducir movimiento», si la animación no carga y lo que lee un lector de pantalla. Usa como imagen el último fotograma.
+   */
+  lottie?: (number | null) | Animacion;
+  /**
    * Texto corto encima del título. Opcional.
    */
   antetitulo?: string | null;
@@ -956,6 +995,33 @@ export interface BloquePresentacionImagen {
   id?: string | null;
   blockName?: string | null;
   blockType: 'presentacionImagen';
+}
+/**
+ * Animaciones Lottie (.json exportado con Bodymovin, sin expresiones), máximo 4 MB. Se reproducen una vez al llegar con el scroll.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "animaciones".
+ */
+export interface Animacion {
+  id: number;
+  /**
+   * Para el panel. Lo que lee un lector de pantalla es el texto alternativo de la imagen fija del bloque.
+   */
+  descripcion: string;
+  /**
+   * Lo lee del fichero al subirlo.
+   */
+  ancho?: number | null;
+  alto?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1093,6 +1159,9 @@ export interface Articulo {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -1113,6 +1182,9 @@ export interface CategoriasBlog {
    */
   slug: string;
   descripcion?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -1376,6 +1448,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'animaciones';
+        value: number | Animacion;
       } | null)
     | ({
         relationTo: 'videos';
@@ -1872,6 +1948,7 @@ export interface BloqueCabeceraVideoSelect<T extends boolean = true> {
  */
 export interface BloquePresentacionImagenSelect<T extends boolean = true> {
   imagen?: T;
+  lottie?: T;
   antetitulo?: T;
   titulo?: T;
   texto?: T;
@@ -1987,6 +2064,24 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "animaciones_select".
+ */
+export interface AnimacionesSelect<T extends boolean = true> {
+  descripcion?: T;
+  ancho?: T;
+  alto?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

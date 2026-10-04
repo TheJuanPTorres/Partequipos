@@ -45,6 +45,8 @@ es un widget nativo de Elementor.
    pintada, en la Media del preview y con texto alternativo. La animación, en
    un PR posterior con aprobación propia (exige dependencia nueva, §2 de
    CLAUDE.md). El JSON queda en `wordpress\nosotros\`.
+   **Superada el 2026-10-04:** animación aprobada con `lottie-web` ligera (§9).
+   La imagen fija sigue: es el respaldo.
 4. **Erratas corregidas** (para Andrés, §7).
 5. Contenido de ejemplo permitido; aplica la excepción §10.38.
 
@@ -92,18 +94,20 @@ commit que trae la migración, no dar el CI por verde por el último check.
 
 ## 4. Lo que se aparta de ux-9
 
-| Id  | Qué                                                                                                                    | Por qué                                         |
-| --- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| D1  | Antetítulos y etiquetas en `<p>`; en ux-9 todos los revelados son `<h2>`/`div`                                         | Jerarquía de encabezados real                   |
-| D2  | Botón de pausa en el vídeo, el marquee y la rotación de tarjetas; con movimiento reducido, parado y sin vídeo          | WCAG 2.2.2                                      |
-| N1  | Mapa como imagen fija (último fotograma)                                                                               | Decisión 3                                      |
-| N2  | El mapa no desborda a 390 (en ux-9 el SVG mide 455 px y la página tiene scroll horizontal: 477 px)                     | Sin scroll horizontal                           |
-| N3  | Migas solo para lectores; aparecen mientras su enlace tiene el foco (como el enlace de salto)                          | Decisión 7; WCAG 2.4.7                          |
-| N4  | Copias del marquee como texto con `aria-hidden` y el texto una vez para el lector; en ux-9, ocho enlaces a «#»         | No hay destino; el lector no repite ocho veces  |
-| N5  | Tarjetas: la plegada es un `<button aria-expanded>`, la abierta su enlace; al abrir con teclado el foco pasa al enlace | Teclado                                         |
-| N6  | Texto de las tarjetas en Inter 300; en ux-9, Roboto (no cargada en el sitio)                                           | Una sola fuente                                 |
-| N7  | Sin la entrada con desenfoque de las tarjetas                                                                          | Movimiento de una vez, sin valor                |
-| N8  | Botón de pausa de las tarjetas a la derecha de «Ver todo», no encima de las tarjetas                                   | Sobre la tarjeta plegada tapaba su zona de clic |
+| Id  | Qué                                                                                                                     | Por qué                                         |
+| --- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| D1  | Antetítulos y etiquetas en `<p>`; en ux-9 todos los revelados son `<h2>`/`div`                                          | Jerarquía de encabezados real                   |
+| D2  | Botón de pausa en el vídeo, el marquee y la rotación de tarjetas; con movimiento reducido, parado y sin vídeo           | WCAG 2.2.2                                      |
+| N1  | Mapa animado encima de la imagen fija; con movimiento reducido o si falla la carga, la imagen fija (ux-9 anima siempre) | WCAG 2.3.3 y degradación (§9)                   |
+| N2  | El mapa no desborda a 390 (en ux-9 el SVG mide 455 px y la página tiene scroll horizontal: 477 px)                      | Sin scroll horizontal                           |
+| N3  | Migas solo para lectores; aparecen mientras su enlace tiene el foco (como el enlace de salto)                           | Decisión 7; WCAG 2.4.7                          |
+| N4  | Copias del marquee como texto con `aria-hidden` y el texto una vez para el lector; en ux-9, ocho enlaces a «#»          | No hay destino; el lector no repite ocho veces  |
+| N5  | Tarjetas: la plegada es un `<button aria-expanded>`, la abierta su enlace; al abrir con teclado el foco pasa al enlace  | Teclado                                         |
+| N6  | Texto de las tarjetas en Inter 300; en ux-9, Roboto (no cargada en el sitio)                                            | Una sola fuente                                 |
+| N7  | Sin la entrada con desenfoque de las tarjetas                                                                           | Movimiento de una vez, sin valor                |
+| N8  | Botón de pausa de las tarjetas a la derecha de «Ver todo», no encima de las tarjetas                                    | Sobre la tarjeta plegada tapaba su zona de clic |
+| N9  | Botón de pausa del mapa, abajo a la derecha de su caja, solo mientras se mueve                                          | WCAG 2.2.2: dura 6 s, más de 5                  |
+| N10 | El mapa se carga al acercarse (una pantalla antes); ux-9 lo carga con la página                                         | Fuera de las demás páginas y del arranque (§9)  |
 
 ## 5. Medidas (ux-9 pintado, 2026-10-02)
 
@@ -200,5 +204,80 @@ y caja del `<main>` idénticos, y cada ancla lleva a su sección.
   servicio para maquinaria pesada.») y dos párrafos. Todo es texto de relleno
   nuestro (§10.6), sin secciones con ancla; la entradilla sigue como meta
   descripción (decisión 8).
-- Animación del mapa (Lottie), PR aparte con aprobación propia.
+- ~~Animación del mapa (Lottie), PR aparte con aprobación propia.~~ Hecha (§9).
 - Para Andrés, §7.
+
+## 9. Mapa animado (2026-10-04)
+
+**Aprobado por dirección:** `lottie-web` **5.13.0** exacta, solo la versión
+ligera (`lottie_light`, sin expresiones ni `eval`). Componente
+`AnimacionLottie` (de cliente) dentro del bloque «Presentación con imagen»,
+que sigue siendo de servidor.
+
+**Cómo se comporta en ux-9** (medido pintado a 1440, 1010 y 390, ventana de
+900 px y de 250 px de alto):
+
+- Espera en el **fotograma 0** hasta que la caja asoma a la pantalla.
+- Entonces se reproduce **una vez**: 180 fotogramas a 30 fps, **6,0 s**.
+- Se queda en el último fotograma. **No se repite** al salir y volver.
+- Ignora el movimiento reducido.
+
+**El nuestro:**
+
+| Qué                 | Cómo                                                                                                                                   |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Carga               | Import dinámico de `lottie_light` y `fetch` del JSON, **solo** cuando la caja está a menos de una pantalla (`rootMargin: 100%`)        |
+| Arranque            | Al asomar un píxel (como ux-9). Si asoma antes de cargar, arranca en cuanto carga                                                      |
+| Duración            | **5,97 s** (ux-9: 6,0 s), medida por las mutaciones del SVG                                                                            |
+| Último fotograma    | Igual al de ux-9 a 1440: **0,14 %** de píxeles distintos (antialiasado). A 1010 y 390, escalado a la columna (N2)                      |
+| Movimiento reducido | No descarga nada; se ve la imagen fija                                                                                                 |
+| Fallo de carga      | Queda la imagen fija; `console.error` con prefijo `[animacion]`                                                                        |
+| Caja                | `aspect-ratio` de la imagen fija; la animación va en una capa absoluta encima. Igual animada, reducida y con fallo                     |
+| Accesibilidad       | La imagen nunca sale del árbol de accesibilidad (solo `opacity: 0`): su `alt` nombra lo que se ve. La capa del SVG lleva `aria-hidden` |
+| Pausa (N9)          | «Pausar la animación del mapa» mientras se mueve; desaparece al terminar (salvo que tenga el foco: entonces «Reproducir» la repite)    |
+
+**La imagen fija y el JSON tienen la misma proporción** (910 × 1302 y
+1073 × 1536: 0,2 px de diferencia de alto a 455 px), así que la caja no
+cambia al pasar de una a otra.
+
+**Peso:** `lottie_light` es un chunk aparte de 168 kB sin comprimir; el JSON,
+415 kB servidos con brotli desde el Blob.
+
+**Probado en la red, en el preview, bajando cada página entera:** `/`,
+`/contactanos/`, `/servicio-tecnico/` y `/maquinaria-pesada/` **no descargan**
+ni el chunk ni el JSON; `/nosotros/` sí, al acercarse el mapa.
+
+**N10 (carga perezosa) tiene un coste en el peor caso:** si se salta de golpe
+al mapa desde lejos (ventana de 250 px), arranca a los 0,54 s de asomar
+(ux-9, 0,11 s, porque lo cargó con la página). Bajando con el scroll normal,
+la pantalla de margen da tiempo de sobra.
+
+**Datos:** colección `animaciones` (solo `application/json`, comprobado por
+contenido en `formatoDeAnimacionPermitido`: forma de Lottie, sin expresiones
+ni imágenes externas, máximo 4 MB; deja el ancho y el alto en el registro) y
+campo opcional `lottie` en el bloque. Se llama `lottie` y no `animacion`
+porque con este la clave foránea pasaría de 63 bytes (65). Migración
+`20261004_052512_animaciones`, solo esquema.
+
+**Lock:** `npm install` en Windows volvió a tirar `@emnapi/*` (§10.5), y la
+regeneración completa traía 62 subidas de versión ajenas, entre ellas `sharp`
+(§10.18). Se añadió **solo** la entrada de `lottie-web` al lock anterior
+(7 líneas) y `npm ci` lo validó.
+
+**LCP de `/nosotros/`, antes y después** (método vigente de §10.3 p.14:
+Lighthouse 13.4.1 por línea de comandos, móvil, _simulated throttling_, solo
+Performance; 9 corridas alternadas con calentamiento, contra las URL fijas de
+los previews de `1d29fa1` —sin animación— y `4e2757f`, con la misma base):
+
+| Variante | LCP (mediana)          | TBT (mediana) | Rendimiento | CLS máx |
+| -------- | ---------------------- | ------------- | ----------- | ------- |
+| Sin mapa | **3,96 s** (3,13–4,45) | 132 ms        | 85          | 0,0001  |
+| Con mapa | **3,88 s** (3,63–5,13) | 254 ms        | 80          | 0,0001  |
+
+- **El LCP no cambia:** la diferencia está dentro del ruido, y el elemento LCP
+  no es el mapa.
+- **El TBT sube unos 120 ms.** En el móvil simulado de Lighthouse (CPU frenada
+  cuatro veces) el mapa está a la vista al cargar, así que lottie-web se carga,
+  analiza el JSON y anima durante la medición. Es el coste real de la
+  animación; ux-9 lo paga igual, y además en todas las cargas.
+- El CLS de 0,0001 es el desplazamiento de Inter de §5, igual en las dos.

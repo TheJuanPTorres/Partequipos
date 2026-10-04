@@ -7,7 +7,7 @@ const ESCRIBEN = new Set(["create", "update", "updateByID", "delete", "deleteByI
 
 /**
  * GUARDA DEL ALMACÉN (CLAUDE.md §10.37): antes de cualquier operación que
- * pueda subir, sobrescribir o borrar un fichero de `media` o `videos`, comprueba
+ * pueda subir, sobrescribir o borrar un fichero de `media`, `videos` o `animaciones`, comprueba
  * SIN ESCRIBIR que el token activo es del almacén que toca a este entorno
  * (`src/lib/blob/almacen.ts`). Si no, aborta antes de tocar nada.
  *

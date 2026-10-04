@@ -157,6 +157,8 @@ const nextConfig: NextConfig = {
        *    (`api.mapbox.com`: script y hoja de estilos), pide teselas y
        *    estilos a `api.mapbox.com` y envía telemetría a `events.mapbox.com`,
        *    y crea sus workers desde `blob:`. Solo si hay token de Mapbox.
+       * 6. Nosotros: las animaciones Lottie se piden con `fetch` al Blob
+       *    (`connect-src`), solo cuando el bloque se acerca a la pantalla.
        */
       {
         key: "Content-Security-Policy-Report-Only",
@@ -168,7 +170,7 @@ const nextConfig: NextConfig = {
           "font-src 'self' data:",
           "media-src 'self' https://*.public.blob.vercel-storage.com",
           "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com",
-          "connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com",
+          "connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com https://*.public.blob.vercel-storage.com",
           "worker-src 'self' blob:",
           "child-src blob:",
           "object-src 'none'",

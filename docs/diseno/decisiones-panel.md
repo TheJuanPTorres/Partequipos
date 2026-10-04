@@ -315,6 +315,10 @@ Mejora 1 de las tres aprobadas. Solo documentación, en `docs/guia-editor.md`:
   no se cambian desde el panel».
 - La imagen al compartir de las fichas sin imagen propia (§8) y tres mensajes
   de error nuevos (teléfono y redes, §9).
+- **Corregido de paso (lo encontró el verificador):** la ayuda de «Redes
+  sociales» (del #61) y la guía decían que el pie pinta LinkedIn; el pie solo
+  pinta Facebook, Instagram y YouTube, y el resto va solo al JSON-LD. Sin
+  esquema (solo la descripción del campo y `payload-types.ts`).
 - **Sin capturas en la guía:** el repositorio es público y una captura del
   panel enseña datos y cuentas. Las capturas de las pantallas nuevas salen de
   `panel:revision` en la mejora 3 y se guardan fuera del repositorio.

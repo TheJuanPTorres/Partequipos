@@ -199,7 +199,8 @@ vacío no rompe nada: el sitio usa el dato de siempre.**
   - **Teléfono y WhatsApp:** completos, con indicativo: `+57 317 670 7071`. Si
     dejas el WhatsApp vacío, se usa el teléfono.
   - **Redes:** la dirección completa del perfil, copiada del navegador, con
-    `https://`. En el pie salen Facebook, Instagram, LinkedIn y YouTube.
+    `https://`. En el pie salen Facebook, Instagram y YouTube; las demás (por
+    ejemplo, LinkedIn) solo las leen los buscadores.
 
 ## 6. Retirar algo sin borrarlo
 

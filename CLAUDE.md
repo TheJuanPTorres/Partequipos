@@ -460,6 +460,11 @@ dirección.**
   4. **Liberarla al fusionar** la migración (o al abandonarla).
   - Una ventana ocupada **más de 4 h** sin cambios: se avisa a dirección.
   - **Nunca se libera la ventana de otro agente.**
+  - **Sin esperas dentro de la ventana (desde el 2026-10-04).** Antes de
+    tomarla, el agente pide y espera **todo lo que dependa de dirección**
+    (por ejemplo, la rama de prueba de Neon). La ventana se toma solo cuando
+    se puede trabajar en ella sin esperas. Motivo: una ventana estuvo 11 h
+    ocupada esperando una rama, con otro agente bloqueado detrás.
 - **`ESTADO.md`**: una línea por agente (copia, rama, en qué está y qué
   espera). Cada uno actualiza **solo la suya**, al empezar y al terminar cada
   tarea.

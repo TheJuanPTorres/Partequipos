@@ -200,15 +200,23 @@ panel**: pídeselo al equipo técnico.
 
 ## 8. Buscadores y redes sociales
 
-Cada ficha tiene un bloque **«Buscadores y redes sociales»**. Es opcional: si
-lo dejas vacío, el sitio usa el nombre y la descripción de la ficha.
+Cada ficha con página propia tiene un bloque **«Buscadores y redes
+sociales»**. Es opcional. Debajo de los campos verás **cómo saldrá en Google**
+mientras escribes, un **contador de caracteres** y **qué se usa si lo dejas
+vacío**.
 
-- **Título para buscadores:** lo que sale en azul en Google. Corto y claro,
-  unos 50–60 caracteres. No hace falta poner «Partequipos»: se añade solo.
-- **Descripción para buscadores:** el texto bajo el título en Google. Unos
-  140–160 caracteres que expliquen qué hay en la página.
-- **Imagen al compartir en redes:** la que sale al pegar el enlace en WhatsApp,
-  LinkedIn o Facebook.
+- **Título para buscadores:** lo que sale en azul en Google. Hasta unos 60
+  caracteres; Google corta lo que pase. **No se le añade nada**: si quieres
+  que diga «Partequipos», escríbelo tú.
+- **Descripción para buscadores:** el texto bajo el título en Google. Entre
+  120 y 160 caracteres; a partir de 160 se corta con «…».
+- **Imagen al compartir en redes:** la que sale al pegar el enlace en
+  WhatsApp, LinkedIn o Facebook. En algunas fichas gana su propia imagen (la
+  primera de la galería, el logo o la imagen destacada); el bloque te dice
+  cuál.
+
+Si dejas un campo vacío, el sitio usa el nombre o la descripción de la ficha;
+el bloque te enseña exactamente qué texto.
 
 ## 9. Mensajes de error frecuentes
 

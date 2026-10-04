@@ -13,6 +13,7 @@ import {
 } from "@/lib/queries/getLubricantes";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!marca) return {};
 
   return buildMetadata({
-    nombre: `Lubricantes ${marca.nombre}`,
+    nombre: tituloPorDefecto.marcaLubricante(marca.nombre),
     path: rutas.marcaLubricante(marca.slug),
     descripcion: marca.entradilla,
     seo: marca.seo,

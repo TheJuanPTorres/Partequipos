@@ -9,6 +9,7 @@ import { getModelosDeTipo } from "@/lib/queries/getModelos";
 import { getTipoPorSlug, getTipos } from "@/lib/queries/getTipos";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import type { Marca } from "@/payload-types";
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const { marca, tipo } = data;
   return buildMetadata({
-    nombre: `Repuestos para ${tipo.nombre.toLowerCase()} ${marca.nombre}`,
+    nombre: tituloPorDefecto.tipoRepuesto(tipo.nombre, marca.nombre),
     path: rutas.tipo(marca.slug, tipo.slug),
     descripcion: tipo.descripcion,
     seo: tipo.seo,

@@ -138,8 +138,14 @@ try {
     pagina.on("console", (m) => m.type() === "error" && errores.push(m.text().slice(0, 200)));
 
     await pagina.goto(`${base}/admin/login`, { waitUntil: "networkidle" });
-    await pagina.locator('input[name="email"]').fill(cuenta[claveCorreo]);
-    await pagina.locator('input[name="password"]').fill(cuenta[claveClave]);
+    // Con mensaje fijo: la traza de un error de Playwright podría llevar lo
+    // tecleado, y la contraseña no puede salir de este proceso.
+    try {
+      await pagina.locator('input[name="email"]').fill(cuenta[claveCorreo]);
+      await pagina.locator('input[name="password"]').fill(cuenta[claveClave]);
+    } catch {
+      fallar(`No se pudo rellenar el formulario de acceso (${ancho.nombre}).`);
+    }
     await Promise.all([
       pagina.waitForURL((u) => !u.pathname.includes("/login"), { timeout: 30_000 }),
       pagina.locator('button[type="submit"]').click(),

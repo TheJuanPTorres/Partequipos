@@ -91,7 +91,8 @@ export default function SeoGuiado() {
   if (!regla) {
     return (
       <p className="pq-seo__nota">
-        Esta colección no tiene página propia en el sitio: estos campos no se usan.
+        Hoy esta colección no tiene página propia en el sitio: estos campos se guardan, pero no
+        salen en Google.
       </p>
     );
   }

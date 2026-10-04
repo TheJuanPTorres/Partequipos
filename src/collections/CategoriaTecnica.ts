@@ -109,6 +109,8 @@ export const CategoriaTecnica: CollectionConfig = {
           "Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».",
       },
     },
-    seoField(),
+    // Sin página propia hoy: las 32 URL de categoría del sitio actual están
+    // pendientes de decisión (docs/redirects-map.csv, «HUÉRFANA»).
+    seoField({ sinPagina: true }),
   ],
 };

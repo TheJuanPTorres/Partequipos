@@ -8,14 +8,21 @@ import type { Field } from "payload";
  *
  * `vistaBuscadores` es un campo `ui`: no guarda nada ni tiene columna. Pinta
  * el SEO guiado (vista de Google, contadores y valores por defecto).
+ *
+ * `sinPagina`: para colecciones que HOY no tienen página propia (categorías
+ * técnicas). El bloque se conserva —los datos se guardan para cuando la
+ * tengan— y la descripción lo dice ANTES de los campos. Solo cambia el texto:
+ * mismo esquema.
  */
-export function seoField(): Field {
+export function seoField({ sinPagina = false }: { sinPagina?: boolean } = {}): Field {
   return {
     name: "seo",
     type: "group",
     label: "Buscadores y redes sociales",
     admin: {
-      description: "Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.",
+      description: sinPagina
+        ? "Hoy estas fichas no tienen página propia en el sitio, así que esto no sale en Google. Se guarda para cuando la tengan."
+        : "Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.",
     },
     fields: [
       {

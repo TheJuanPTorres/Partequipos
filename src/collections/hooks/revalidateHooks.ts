@@ -5,6 +5,7 @@ import { rutas } from "@/lib/routes";
 import { poblado } from "@/lib/utils/relations";
 import type { Marca, TiposEquipo } from "@/payload-types";
 
+import { rutaDePagina } from "../../lib/panel/verEnElSitio";
 import { crearRedirectPorCambioDeSlug } from "./autoRedirect";
 
 /**
@@ -238,10 +239,6 @@ export const revalidarModeloBorrado: CollectionAfterDeleteHook = async ({ doc, r
 // PÁGINAS INSTITUCIONALES
 // ---------------------------------------------------------------------------
 /** Ruta pública de una página institucional; "inicio" es la portada. */
-function rutaDePagina(slug: string): string {
-  const limpio = (slug ?? "").replace(/^\/+|\/+$/g, "");
-  return limpio === "inicio" || limpio === "" ? "/" : `/${limpio}`;
-}
 
 export const revalidarPagina: CollectionAfterChangeHook = async ({ doc, previousDoc, req }) => {
   try {

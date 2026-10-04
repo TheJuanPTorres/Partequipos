@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { pasoElDisparo } from "@/components/movimiento/ritmos";
+import { margenDeDisparo, pasoElDisparo } from "@/components/movimiento/ritmos";
 import { useMovimientoReducido } from "@/components/movimiento/useMovimiento";
 import { formatearCifra, valorContador } from "@/lib/bloques/vista";
 
@@ -65,12 +65,24 @@ export function Contador({ numero, prefijo, sufijo }: Props) {
       };
       frame = requestAnimationFrame(paso);
     };
-    const observador = new IntersectionObserver(() => {
-      if (pasoElDisparo(el.getBoundingClientRect().top, innerHeight, DISPARO)) {
-        observador.disconnect();
-        arrancar();
-      }
-    });
+    /*
+     * El `rootMargin` recorta la ventana por abajo hasta la línea del 90 %:
+     * así el aviso llega JUSTO al cruzarla. Sin él, el observador solo avisa al
+     * entrar en pantalla; si el bloque entraba por abajo sin haber cruzado aún
+     * el 90 % (bajando con el scroll normal), la comprobación decía «todavía
+     * no» y no volvía a avisar: las cifras se quedaban en 0 para siempre
+     * (medido el 2026-10-04, en producción y en el preview). Es lo mismo que
+     * hace `Revelado`.
+     */
+    const observador = new IntersectionObserver(
+      () => {
+        if (pasoElDisparo(el.getBoundingClientRect().top, innerHeight, DISPARO)) {
+          observador.disconnect();
+          arrancar();
+        }
+      },
+      { rootMargin: margenDeDisparo(DISPARO) },
+    );
     observador.observe(el);
     return () => {
       observador.disconnect();

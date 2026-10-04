@@ -29,10 +29,20 @@ declare global {
   }
 }
 
-export function Turnstile({ siteKey }: { siteKey: string }) {
+export function Turnstile({ siteKey, reinicio }: { siteKey: string; reinicio?: unknown }) {
   const contenedor = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
   const idEtiqueta = useId();
+
+  /*
+   * REINICIO TRAS CADA RESPUESTA. El token es de un solo uso, y React vacía
+   * el formulario (también el campo oculto del token) al terminar la acción:
+   * sin pedir un token nuevo, el reenvío llegaría sin él y se rechazaría.
+   * `reinicio` cambia con cada respuesta del servidor.
+   */
+  useEffect(() => {
+    if (widgetId.current && window.turnstile) window.turnstile.reset(widgetId.current);
+  }, [reinicio]);
 
   useEffect(() => {
     const montar = () => {

@@ -14,7 +14,7 @@ export const TIPOS_SOLICITUD = ["contacto", "cotizacion", "repuesto"] as const;
 export type TipoSolicitud = (typeof TIPOS_SOLICITUD)[number];
 
 /** Longitudes máximas. Cortan el abuso antes de llegar a la base. */
-const MAX = { nombre: 120, correo: 200, telefono: 40, empresa: 160, mensaje: 4000 } as const;
+export const MAX = { nombre: 120, correo: 200, telefono: 40, empresa: 160, mensaje: 4000 } as const;
 
 /*
  * Teléfono: se acepta cualquier combinación de dígitos, espacios, guiones,

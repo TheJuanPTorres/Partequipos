@@ -14,11 +14,13 @@
  * - El token de la protección de Vercel (`VERCEL_AUTOMATION_BYPASS_SECRET`,
  *   cargado por `scripts/preview/con-entorno.ts`) va en una cabecera y solo a
  *   ese origen.
- * - Capturas a 1440 y a 390 de: portada del panel, Imágenes, Páginas, Modelos
- *   y el formulario de edición del primer modelo. Se guardan FUERA del
+ * - Capturas a 1440 y a 390 de: portada del panel, Imágenes, Páginas, Modelos,
+ *   el global «SEO y datos de la empresa» y el formulario de edición del primer
+ *   modelo y de la primera categoría técnica. Se guardan FUERA del
  *   repositorio, en `Desktop/partequipos-cierre/capturas/panel-<fecha>/`.
  * - Además lista los textos visibles que parecen inglés (palabras de una lista
- *   corta) y los errores de consola, para no depender solo de mirar.
+ *   corta), los errores de consola y las peticiones que fallan (solo host y
+ *   ruta), para no depender solo de mirar.
  * - Navegador: Chrome instalado (otra ruta con `CHROME_PATH`).
  * - No escribe nada en el panel: solo navega y lee.
  */
@@ -105,6 +107,14 @@ const PANTALLAS = [
   { nombre: "imagenes", ruta: "/admin/collections/media" },
   { nombre: "paginas", ruta: "/admin/collections/paginas" },
   { nombre: "modelos", ruta: "/admin/collections/modelos-repuesto" },
+  // El global con el horario, las imágenes (logo e imagen al compartir) y el contacto.
+  { nombre: "seo-empresa", ruta: "/admin/globals/seo" },
+];
+// Formularios de edición: el primer registro de cada lista.
+const FORMULARIOS = [
+  { nombre: "formulario-modelo", coleccion: "modelos-repuesto" },
+  // Sin página propia: el SEO guiado tiene que decirlo.
+  { nombre: "formulario-categoria-tecnica", coleccion: "categorias-tecnicas" },
 ];
 // Palabras inglesas que no deberían verse en un panel en español.
 const INGLES =
@@ -125,17 +135,31 @@ try {
       hasTouch: ancho.movil,
       locale: "es-CO",
     });
-    // El token solo a ese origen, nunca a terceros.
-    await contexto.route("**/*", (r) =>
-      new URL(r.request().url()).origin === origin
-        ? r.continue({
-            headers: { ...r.request().headers(), "x-vercel-protection-bypass": bypass },
-          })
-        : r.continue(),
+    // El token solo a ese origen, nunca a terceros. Se intercepta SOLO ese
+    // origen: interceptar también las imágenes del Blob (otro dominio) las
+    // hacía fallar con ERR_BLOCKED_BY_ORB y las miniaturas salían como icono.
+    await contexto.route(`${origin}/**`, (r) =>
+      r.continue({
+        headers: { ...r.request().headers(), "x-vercel-protection-bypass": bypass },
+      }),
     );
     const pagina = await contexto.newPage();
     const errores = [];
     pagina.on("console", (m) => m.type() === "error" && errores.push(m.text().slice(0, 200)));
+    // Peticiones que fallan (p. ej. una miniatura que no carga y sale como icono).
+    // Solo host y ruta: sin query, que podría llevar algo que no debe salir.
+    const fallidas = [];
+    const sinQuery = (u) => {
+      const x = new URL(u);
+      return `${x.host}${x.pathname}`;
+    };
+    pagina.on("requestfailed", (r) =>
+      fallidas.push(`${sinQuery(r.url())} — ${r.failure()?.errorText ?? "fallo"}`),
+    );
+    pagina.on(
+      "response",
+      (r) => r.status() >= 400 && fallidas.push(`${sinQuery(r.url())} — HTTP ${r.status()}`),
+    );
 
     await pagina.goto(`${base}/admin/login`, { waitUntil: "networkidle" });
     // Con mensaje fijo: la traza de un error de Playwright podría llevar lo
@@ -164,17 +188,19 @@ try {
 
     for (const p of PANTALLAS) await visitar(p.nombre, p.ruta);
 
-    // Formulario de edición: el primer modelo de la lista.
-    await pagina.goto(`${base}/admin/collections/modelos-repuesto`, { waitUntil: "networkidle" });
-    // Un enlace de FILA de la tabla: el primero de la página es el de «Crear».
-    const enlaces = await pagina
-      .locator('table a[href*="/admin/collections/modelos-repuesto/"]')
-      .evaluateAll((as) => as.map((a) => a.getAttribute("href")));
-    const enlace = enlaces.find((h) => h && !/\/create\/?$/.test(h));
-    if (enlace) await visitar("formulario-modelo", new URL(enlace, base).pathname);
-    else decir(`· sin modelos: no hay formulario que capturar (${ancho.nombre})`);
+    for (const f of FORMULARIOS) {
+      await pagina.goto(`${base}/admin/collections/${f.coleccion}`, { waitUntil: "networkidle" });
+      // Un enlace de FILA de la tabla: el primero de la página es el de «Crear».
+      const enlaces = await pagina
+        .locator(`table a[href*="/admin/collections/${f.coleccion}/"]`)
+        .evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+      const enlace = enlaces.find((h) => h && !/\/create\/?$/.test(h));
+      if (enlace) await visitar(f.nombre, new URL(enlace, base).pathname);
+      else decir(`· sin registros en ${f.coleccion}: no hay formulario (${ancho.nombre})`);
+    }
 
     hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+    hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
     await contexto.close();
   }
 } finally {
@@ -187,4 +213,5 @@ for (const h of hallazgos) {
   if (h.ingles?.length)
     decir(`· posible inglés en ${h.pantalla} (${h.ancho}): ${h.ingles.join(" | ")}`);
   if (h.errores?.length) decir(`· errores de consola (${h.ancho}): ${h.errores.length}`);
+  if (h.fallidas?.length) decir(`· peticiones fallidas (${h.ancho}): ${h.fallidas.length}`);
 }

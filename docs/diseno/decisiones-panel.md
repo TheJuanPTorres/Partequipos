@@ -349,3 +349,33 @@ Mejora 2 de las tres aprobadas (accesibilidad, CLAUDE.md §7.6). Sin esquema.
 - **Efecto a conocer:** una imagen ya guardada con el texto flojo no se puede
   volver a guardar (p. ej. al mover el punto focal) sin arreglar el texto. Es
   a propósito: el aviso de la lista la señala antes.
+
+## 15. SEO de las categorías técnicas y revisión de las pantallas nuevas (2026-10-04, rama `feat/panel-categorias-tecnicas`)
+
+Mejora 3 de las tres aprobadas. Sin esquema.
+
+- **Hallazgo que cambia el plan:** el sitio actual tiene **32 URL de categoría
+  técnica** (`/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/…`),
+  vivas en el rastreo. Hoy dan **404** en nuestro sitio, y
+  `docs/redirects-map.csv` las marca «HUÉRFANA… Requiere decisión humana».
+  Las 10 categorías técnicas tienen datos en su bloque SEO (en `development` y
+  en el preview).
+- **Por eso NO se quita el bloque** (sería una migración que borra esos datos,
+  y harán falta si se construyen esas páginas). **Se explica:**
+  `seoField({ sinPagina: true })` pone el aviso en la descripción del bloque,
+  antes de los campos; el SEO guiado lo repite abajo. Mismo esquema.
+- **`panel:revision`** (`scripts/qa/revision-panel.mjs`):
+  - pantallas nuevas: el global «SEO y datos de la empresa» y el formulario de
+    la primera categoría técnica;
+  - registra las peticiones que fallan (`requestfailed` y HTTP ≥ 400), solo
+    host y ruta;
+  - intercepta solo el origen del preview, para que el token no pueda viajar
+    a terceros.
+- **Observado y sin aislar:** en el Chrome automatizado, las miniaturas de la
+  lista de «Imágenes» salen a veces como icono de fichero. Es
+  `ERR_BLOCKED_BY_ORB` sobre las imágenes del Blob, que responden **200 con
+  `image/png` o `image/jpeg`**. En la primera pasada del día sí cargaron. No se
+  sabe si un editor lo ve en un navegador normal: está en «Necesito de
+  dirección» del informe.
+- La guía (§8 y §9) lo recoge; «IMG_1234» se cambia por «foto 3» como ejemplo
+  de genérico (el primero se rechaza por corto).

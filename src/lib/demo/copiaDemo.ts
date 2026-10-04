@@ -94,3 +94,91 @@ export const clave = {
 /** Referencia de autorización con la que entran los testimonios (§10.38). */
 export const REFERENCIA_AUTORIZACION =
   "§10.38 — excepción temporal de demostración (2026-10-02). La autorización de las personas es responsabilidad del cliente.";
+
+/*
+ * NOMBRES DE LOS FICHEROS COPIADOS (decisión de dirección, 2026-10-03).
+ *
+ * La copia subía cada fichero con su nombre ORIGINAL. En modo «prueba» el
+ * destino comparte almacén con el origen (el del preview), así que la copia
+ * sobrescribía el fichero del origen y la retirada lo BORRABA: el preview
+ * perdió así 36 imágenes y un vídeo (docs/diseno/decisiones-nosotros.md).
+ *
+ * Desde ahora, en TODOS los modos:
+ * 1. Todo fichero copiado lleva nombre propio, con el prefijo `demo-copia-`.
+ * 2. La copia se niega si la URL de destino ya existe o coincide con la de
+ *    origen (antes de subir y, otra vez, con la URL que devuelve Payload).
+ * 3. La retirada solo borra URLs que estén en su manifiesto Y lleven el
+ *    prefijo.
+ */
+export const PREFIJO_COPIA = "demo-copia-";
+
+/** Nombre del fichero en una URL, sin decodificar fallos. */
+function nombreDeUrl(url: string): string {
+  try {
+    return decodeURIComponent(new URL(url).pathname.split("/").pop() ?? "");
+  } catch {
+    return "";
+  }
+}
+
+/** Mismo fichero: mismo host y mismo nombre, sin distinguir la codificación. */
+function mismaUrl(a: string, b: string): boolean {
+  try {
+    const x = new URL(a);
+    const y = new URL(b);
+    return x.host.toLowerCase() === y.host.toLowerCase() && nombreDeUrl(a) === nombreDeUrl(b);
+  } catch {
+    return a === b;
+  }
+}
+
+/** Nombre con el que se sube la copia de un fichero. Idempotente. */
+export function nombreDeCopia(original: string): string {
+  const base = original.trim();
+  return base.startsWith(PREFIJO_COPIA) ? base : `${PREFIJO_COPIA}${base}`;
+}
+
+/** URL pública que tendrá un fichero en un almacén de Vercel Blob. */
+export function urlEnAlmacen(almacen: string, nombre: string): string {
+  return `https://${almacen}.public.blob.vercel-storage.com/${encodeURIComponent(nombre)}`;
+}
+
+export type VeredictoFichero = { valido: true } | { valido: false; motivo: string };
+
+/**
+ * ANTES de subir: la URL prevista lleva el prefijo, no es la del origen y no
+ * existe ya en el destino. `existeEnDestino` lo decide quien llama (un HEAD
+ * que no dé 404 cuenta como «existe»: ante la duda, no se sube).
+ */
+export function veredictoSubida(p: {
+  urlOrigen: string;
+  urlPrevista: string;
+  existeEnDestino: boolean;
+}): VeredictoFichero {
+  if (!nombreDeUrl(p.urlPrevista).startsWith(PREFIJO_COPIA))
+    return { valido: false, motivo: `la URL de destino no lleva el prefijo ${PREFIJO_COPIA}` };
+  if (mismaUrl(p.urlOrigen, p.urlPrevista))
+    return { valido: false, motivo: "la URL de destino coincide con la de origen" };
+  if (p.existeEnDestino) return { valido: false, motivo: "la URL de destino ya existe" };
+  return { valido: true };
+}
+
+/** DESPUÉS de subir: lo que creó Payload lleva el prefijo y no es el origen. */
+export function veredictoCreado(p: {
+  urlOrigen: string;
+  urlCreada: string | null | undefined;
+}): VeredictoFichero {
+  if (!p.urlCreada) return { valido: false, motivo: "Payload no devolvió la URL creada" };
+  if (!nombreDeUrl(p.urlCreada).startsWith(PREFIJO_COPIA))
+    return { valido: false, motivo: `el fichero creado no lleva el prefijo ${PREFIJO_COPIA}` };
+  if (mismaUrl(p.urlOrigen, p.urlCreada))
+    return { valido: false, motivo: "el fichero creado es el mismo que el de origen" };
+  return { valido: true };
+}
+
+/** La retirada solo borra lo que está en su manifiesto Y lleva el prefijo. */
+export function puedeRetirar(url: string | null | undefined, urlsDelManifiesto: string[]): boolean {
+  if (!url) return false;
+  if (!nombreDeUrl(url).startsWith(PREFIJO_COPIA)) return false;
+  return urlsDelManifiesto.some((u) => mismaUrl(u, url));
+}

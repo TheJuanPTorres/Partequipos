@@ -282,6 +282,9 @@ export interface EquiposNuevo {
    * Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). Los PDF no se admiten todavía. Hoy no se muestran en el sitio.
    */
   documentos?: (number | Media)[] | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -311,6 +314,9 @@ export interface MarcasMaquinaria {
    * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» (en ux-9: Hitachi, CASE y Yanmar). Necesita la foto de la tarjeta.
    */
   ordenPortada?: number | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -356,6 +362,9 @@ export interface TiposMaquinaria {
   slug: string;
   marca: number | MarcasMaquinaria;
   descripcion?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -389,6 +398,9 @@ export interface ModelosRepuesto {
   codigo?: string | null;
   descripcion?: string | null;
   imagenes?: (number | Media)[] | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -426,6 +438,9 @@ export interface TiposEquipo {
   slug: string;
   marca: number | Marca;
   descripcion?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -460,6 +475,9 @@ export interface CategoriasTecnica {
    * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».
    */
   ordenPortada?: number | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -484,6 +502,9 @@ export interface CategoriasMaquinaria {
    * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
    */
   tiposIncluidos?: (number | TiposMaquinaria)[] | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -504,6 +525,9 @@ export interface CategoriasUsada {
    */
   slug: string;
   descripcion?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -589,6 +613,9 @@ export interface MarcasLubricante {
     [k: string]: unknown;
   } | null;
   logo?: (number | null) | Media;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -642,6 +669,9 @@ export interface CategoriasLubricante {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -858,6 +888,9 @@ export interface Pagina {
      */
     botonEnlace?: string | null;
   };
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -1126,6 +1159,9 @@ export interface Articulo {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -1146,6 +1182,9 @@ export interface CategoriasBlog {
    */
   slug: string;
   descripcion?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;

@@ -200,3 +200,18 @@ del grupo SEO, y los campos `ui` no guardan nada ni tienen columna.
 - **Colores:** la vista de Google va siempre en blanco, con los colores de su
   resultado (≥ 7:1). El estado del contador lo dice el texto; el punto de
   color es solo un apoyo.
+
+## 9. Concordancia de «nuevas/usadas» (2026-10-04, rama `feat/panel-concordancia-titulos`)
+
+Aprobado por dirección. El título por defecto y el `<h1>` de las categorías
+decían «nuevas» y «usadas» para todas, y salían mal en 7 de las 11:
+
+- **Nuevas:** «Compactadores nuevas» y «Cargadores nuevas».
+- **Usadas:** «Bulldozers», «Minicargadores», «Compactadores», «Cargadores» y
+  «Vibrocompactadores usadas».
+
+`concuerda` (`src/lib/seo/porDefecto.ts`): si la última palabra del nombre
+acaba en «-as», femenino; si no, masculino. Cubre las 11 de hoy, que están
+en las pruebas. Una categoría nueva que no siga la regla se ve en el SEO
+guiado del panel antes de publicarla. Lo usan el `generateMetadata`, el
+`<h1>` de las dos páginas de categoría y el panel. Sin esquema.

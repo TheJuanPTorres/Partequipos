@@ -83,7 +83,9 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <Breadcrumbs items={breadcrumbs} />
 
-      <h1 className="text-3xl font-semibold text-gray-900">{categoria.nombre} nuevas</h1>
+      <h1 className="text-3xl font-semibold text-gray-900">
+        {tituloPorDefecto.categoriaNueva(categoria.nombre)}
+      </h1>
 
       {categoria.descripcion ? (
         <p className="mt-3 max-w-2xl text-gray-600">{categoria.descripcion}</p>

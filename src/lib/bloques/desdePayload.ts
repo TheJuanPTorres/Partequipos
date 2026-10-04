@@ -1,9 +1,9 @@
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 
-import type { Media, Pagina, Video } from "@/payload-types";
+import type { Animacion, Media, Pagina, Video } from "@/payload-types";
 
 import { imagenDeMedia, poblado } from "../utils/relations";
-import type { EnlaceBloque, VideoBloque, VistaBloque } from "./vista";
+import type { AnimacionBloque, EnlaceBloque, VideoBloque, VistaBloque } from "./vista";
 
 /**
  * DE PAYLOAD A LA VISTA — traduce el campo `bloques` de una página (leída con
@@ -51,6 +51,12 @@ function video(
   };
 }
 
+function animacion(rel: number | Animacion | null | undefined): AnimacionBloque | null {
+  const doc = poblado<Animacion>(rel);
+  if (!doc?.url || !doc.ancho || !doc.alto) return null;
+  return { url: doc.url, ancho: doc.ancho, alto: doc.alto };
+}
+
 export function vistaDeBloque(
   b: BloqueDoc,
   videos: ReadonlyMap<number, Video> = new Map(),
@@ -70,6 +76,7 @@ export function vistaDeBloque(
         blockType: b.blockType,
         id: b.id,
         imagen: imagenDeMedia(b.imagen, ""),
+        animacion: animacion(b.lottie),
         antetitulo: b.antetitulo,
         titulo: b.titulo,
         texto: b.texto ? (b.texto as unknown as SerializedEditorState) : null,

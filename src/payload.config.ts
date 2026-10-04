@@ -49,6 +49,7 @@ import { TipoEquipo } from "./collections/TipoEquipo";
 import { TipoMaquinaria } from "./collections/TipoMaquinaria";
 import { Users } from "./collections/Users";
 import { Video } from "./collections/Video";
+import { Animacion } from "./collections/Animacion";
 import { seoConfig } from "./lib/seo/config";
 
 const filename = fileURLToPath(import.meta.url);
@@ -194,6 +195,7 @@ export default buildConfig({
       Articulo,
       CategoriaBlog,
       Media,
+      Animacion,
       // Portada (home de ux-9, fase B). Sin URL propia: se muestran en el inicio.
       Video,
       Sede,
@@ -281,6 +283,9 @@ export default buildConfig({
         // /api/videos/file/… pasarían por una función, que corta la RESPUESTA en
         // 4,5 MB igual que la petición (docs de Vercel, «Request body size»).
         [Video.slug]: { disablePayloadAccessControl: true },
+        // Las animaciones Lottie las pide el navegador con `fetch` desde el CDN
+        // (el Blob responde con `Access-Control-Allow-Origin: *`).
+        [Animacion.slug]: { disablePayloadAccessControl: true },
       },
       token: process.env.BLOB_READ_WRITE_TOKEN || "",
     }),

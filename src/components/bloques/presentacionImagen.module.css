@@ -35,6 +35,45 @@
   height: auto;
 }
 
+/*
+ * Con animación: la caja mide lo mismo que la imagen sola (455 px, sin pasar
+ * del ancho disponible, y la proporción de la imagen por `aspect-ratio`), así
+ * que cargar, animar o fallar no mueve nada (CLS 0). La animación se pinta en
+ * una capa encima; mientras se anima, la imagen se vuelve transparente pero
+ * sigue en el árbol de accesibilidad.
+ */
+.caja {
+  position: relative;
+  width: 455px;
+  max-width: 100%;
+}
+
+.imagenEnCaja {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.caja[data-animada] .imagenEnCaja {
+  opacity: 0;
+}
+
+.capaAnimacion {
+  position: absolute;
+  inset: 0;
+}
+
+.capaAnimacion svg {
+  display: block;
+}
+
+/* Botón de pausa (N4): ux-9 no lo tiene. Abajo a la derecha, dentro de la caja. */
+.pausa {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
 .columnaTexto {
   gap: 20px;
 }

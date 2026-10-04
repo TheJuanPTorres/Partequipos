@@ -32,6 +32,9 @@ export type VideoBloque = {
 
 export type EnlaceBloque = { texto: string; href: string };
 
+/** Animación Lottie: el JSON se pide en el navegador, al acercarse a la pantalla. */
+export type AnimacionBloque = { url: string; ancho: number; alto: number };
+
 export type VistaCabeceraVideo = {
   blockType: "cabeceraVideo";
   id?: string | null;
@@ -47,6 +50,8 @@ export type VistaPresentacionImagen = {
   blockType: "presentacionImagen";
   id?: string | null;
   imagen: ImagenBloque | null;
+  /** Sustituye a la imagen mientras se reproduce; la imagen queda para movimiento reducido y fallos. */
+  animacion: AnimacionBloque | null;
   antetitulo?: string | null;
   titulo: string;
   texto: SerializedEditorState | null;

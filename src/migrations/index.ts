@@ -19,6 +19,7 @@ import * as migration_20261002_154950_fase_g_sedes from './20261002_154950_fase_
 import * as migration_20261002_175645_home_panel from './20261002_175645_home_panel';
 import * as migration_20261002_204606_paginas_bloques from './20261002_204606_paginas_bloques';
 import * as migration_20261002_214044_titulo_portada_repuestos from './20261002_214044_titulo_portada_repuestos';
+import * as migration_20261004_052512_animaciones from './20261004_052512_animaciones';
 
 export const migrations = [
   {
@@ -124,6 +125,11 @@ export const migrations = [
   {
     up: migration_20261002_214044_titulo_portada_repuestos.up,
     down: migration_20261002_214044_titulo_portada_repuestos.down,
-    name: '20261002_214044_titulo_portada_repuestos'
+    name: '20261002_214044_titulo_portada_repuestos',
+  },
+  {
+    up: migration_20261004_052512_animaciones.up,
+    down: migration_20261004_052512_animaciones.down,
+    name: '20261004_052512_animaciones'
   },
 ];

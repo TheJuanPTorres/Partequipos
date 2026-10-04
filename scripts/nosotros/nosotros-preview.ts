@@ -12,19 +12,23 @@
  *   ux-9 (licencia pendiente, L3; excepción de demostración §10.38) y el vídeo
  *   de la cabecera reexportado a H.264 de 8 bits (3,6 MB, bajo el tope de 4 MB
  *   de `videos`). El mapa es el ÚLTIMO FOTOGRAMA del Lottie de ux-9, capturado
- *   de la página pintada (docs/diseno/decisiones-nosotros.md).
+ *   de la página pintada (docs/diseno/decisiones-nosotros.md), y el Lottie
+ *   mismo va a `animaciones` (desde `wordpress/nosotros/`) como
+ *   `nosotros-mapa-sedes.json`.
  * - Los medios se reconocen por el NOMBRE DE FICHERO (`nosotros-*`), no por
  *   una marca en el texto alternativo: el `alt` es el definitivo.
  * - Pone los cinco bloques en la página «nosotros»; su «Contenido» y sus
  *   «Secciones» no se tocan (dejan de pintarse, no se borran).
  * - Idempotente: los medios que ya están no se vuelven a subir y los bloques
  *   se sustituyen enteros.
- * - `retirar` deja la página sin bloques, borra los medios y comprueba que
+ * - `retirar` deja la página sin bloques, borra los medios (también la
+ *   animación) y comprueba que
  *   desaparecen del Blob.
  *
  * NO REFRESCA EL PREVIEW: las páginas institucionales están prerenderizadas.
  * Sembrar ANTES del último push, o redesplegar.
  */
+import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -84,6 +88,19 @@ const IMAGENES = {
 } as const;
 type ClaveImagen = keyof typeof IMAGENES;
 const VIDEO = "nosotros-cabecera.mp4";
+const ANIMACION = {
+  origen: path.join(
+    os.homedir(),
+    "Desktop",
+    "partequipos-diseno",
+    "wordpress",
+    "nosotros",
+    "mapa-sedes-2025-negro-rojo.json",
+  ),
+  fichero: "nosotros-mapa-sedes.json",
+  descripcion:
+    "Mapa de Colombia en el que aparecen, una a una, las sedes de Partequipos y sus filiales (Lottie de ux-9).",
+};
 
 const media = async () =>
   (
@@ -106,6 +123,17 @@ const videos = async () =>
       overrideAccess: true,
     })
   ).docs.filter((v) => v.filename?.startsWith(PREFIJO));
+
+const animaciones = async () =>
+  (
+    await payload.find({
+      collection: "animaciones",
+      where: { filename: { like: PREFIJO } },
+      depth: 0,
+      limit: 10,
+      overrideAccess: true,
+    })
+  ).docs.filter((a) => a.filename?.startsWith(PREFIJO));
 
 async function paginaNosotros() {
   const r = await payload.find({
@@ -152,7 +180,7 @@ const DYNAPAC =
   "Equipos DYNAPAC para compactación y pavimentación, desarrollados para lograr precisión y uniformidad en obras de infraestructura y construcción.";
 
 /** Los cinco bloques de ejemplo de Nosotros, con las erratas de ux-9 corregidas. */
-function bloques(ids: Record<ClaveImagen, number>, video: number) {
+function bloques(ids: Record<ClaveImagen, number>, video: number, animacion: number) {
   return [
     {
       blockType: "cabeceraVideo" as const,
@@ -164,6 +192,7 @@ function bloques(ids: Record<ClaveImagen, number>, video: number) {
     {
       blockType: "presentacionImagen" as const,
       imagen: ids.mapa,
+      lottie: animacion,
       antetitulo: "PARTEQUIPOS",
       titulo: "Ofrecemos Soluciones para tus Proyectos",
       texto: parrafos(
@@ -252,11 +281,23 @@ if (modo === "sembrar") {
     log(`vídeo: subido (id ${video.id}), ${video.filesize} bytes`);
   } else log(`vídeo: ya existía (id ${video.id})`);
 
+  let animacion = (await animaciones())[0];
+  if (!animacion) {
+    const data = fs.readFileSync(ANIMACION.origen);
+    animacion = await payload.create({
+      collection: "animaciones",
+      data: { descripcion: ANIMACION.descripcion },
+      file: { data, name: ANIMACION.fichero, mimetype: "application/json", size: data.length },
+      overrideAccess: true,
+    });
+    log(`animación: subida (id ${animacion.id}), ${animacion.ancho}×${animacion.alto}`);
+  } else log(`animación: ya existía (id ${animacion.id})`);
+
   const pagina = await paginaNosotros();
   await payload.update({
     collection: "paginas",
     id: pagina.id,
-    data: { bloques: bloques(ids, video.id) },
+    data: { bloques: bloques(ids, video.id, animacion.id) },
     overrideAccess: true,
   });
   log(`página «${SLUG}» (id ${pagina.id}): 5 bloques puestos`);
@@ -277,6 +318,10 @@ const ficheros: string[] = [];
 for (const v of await videos()) {
   if (v.url) ficheros.push(v.url);
   await payload.delete({ collection: "videos", id: v.id, overrideAccess: true });
+}
+for (const a of await animaciones()) {
+  if (a.url) ficheros.push(a.url);
+  await payload.delete({ collection: "animaciones", id: a.id, overrideAccess: true });
 }
 for (const m of await media()) {
   if (m.url) ficheros.push(m.url);

@@ -2306,7 +2306,7 @@ export interface Pie {
   createdAt?: string | null;
 }
 /**
- * Datos de la empresa que usan los buscadores y el sitio. Hoy: el horario de atención.
+ * Datos de la empresa que usan los buscadores y el sitio: el horario de atención, el logo y el contacto.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "seo".

@@ -573,6 +573,7 @@ veredicto, que va en el informe.
 - **Panel, revisión en pantalla (2026-10-03):** `npm run panel:revision -- <preview>` inicia sesión como editor con la cuenta que lee el propio script (nunca la imprime) y captura a 1440 y 390; Playwright por `npx`, sin MCP. Detalle en `docs/diseno/decisiones-panel.md` §5.
 - **Panel, arreglos de la revisión (2026-10-04):** fechas «15 sep 2026, 23:56», sin pestaña «API», «o» minúscula en el buscador y paginación y fechas visibles en móvil; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §6.
 - **Panel, «Ver en el sitio» (2026-10-04):** enlace a la página pública en el formulario de las 13 colecciones con URL (`admin.preview`, ruta relativa, `src/lib/panel/verEnElSitio.ts`); sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §7.
+- **Panel, SEO guiado (2026-10-04):** vista de Google, contadores y valores por defecto en «Buscadores y redes sociales» (campo `ui`, sin esquema); los títulos por defecto del catálogo salen de `src/lib/seo/porDefecto.ts`, compartido con el sitio. `seoConfig.titleTemplate` no se usa. Detalle en `docs/diseno/decisiones-panel.md` §8.
 
 ### 10.0 Qué está construido y qué falta
 

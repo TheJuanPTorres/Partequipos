@@ -168,3 +168,35 @@ Aprobado por dirección. Sin esquema.
 - `rutaDePagina` (la portada `inicio` es `/`) se movió aquí desde
   `revalidateHooks.ts`, que ahora la importa: la ruta de una página la decide
   un solo sitio.
+
+## 8. SEO guiado (2026-10-04, rama `feat/panel-seo-guiado`)
+
+Aprobado por dirección. **Sin esquema:** `vistaBuscadores` es un campo `ui`
+del grupo SEO, y los campos `ui` no guardan nada ni tienen columna.
+
+- **Qué enseña:** debajo de «Buscadores y redes sociales», mientras se
+  escribe (`src/components/admin/SeoGuiado.tsx`):
+  - cómo saldrá en Google;
+  - un contador de caracteres para el título (hasta 60) y la descripción
+    (120–160; a partir de 160 el sitio la corta con «…»);
+  - qué se usa si cada campo queda vacío;
+  - qué imagen gana a la social.
+- **Una sola fuente para panel y sitio:** las plantillas del título por
+  defecto (`Repuestos ${modelo}`, `${categoría} nuevas`…) estaban escritas
+  en cada página. Pasan a `src/lib/seo/porDefecto.ts` y las 8 páginas del
+  catálogo las importan: el panel no puede enseñar un título distinto del que
+  pone el sitio. `buildMetadata` usa también de ahí el recorte a 160.
+  `src/lib/seo/seoPanel.ts` dice, por colección, de qué campo sale el nombre
+  y la descripción y qué imagen gana. Las rutas `[...slug]` (páginas y
+  artículos) y la home no se tocaron: usan el título tal cual.
+- **Hallazgos, sin cambiar el sitio:**
+  - `seoConfig.titleTemplate` («%s | Partequipos») **no se usa** en ninguna
+    parte: el título sale tal cual se escribe. La guía del editor decía que
+    «Partequipos» se añadía solo; se corrigió.
+  - Cuando la ficha tiene imagen propia (primera de la galería, logo o imagen
+    destacada), esa imagen gana a «Imagen al compartir en redes».
+  - `CategoriaTecnica` tiene el grupo SEO, pero ninguna página propia: sus
+    campos no se usan, y el bloque lo dice.
+- **Colores:** la vista de Google va siempre en blanco, con los colores de su
+  resultado (≥ 7:1). El estado del contador lo dice el texto; el punto de
+  color es solo un apoyo.

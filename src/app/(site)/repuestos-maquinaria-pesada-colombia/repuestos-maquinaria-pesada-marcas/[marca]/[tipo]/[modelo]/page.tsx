@@ -11,6 +11,7 @@ import { getModeloPorSlug, getModelos } from "@/lib/queries/getModelos";
 import { getTipoPorSlug } from "@/lib/queries/getTipos";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
@@ -57,7 +58,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const portada = imagenDeMedia(imagenes[0], modelo.nombre);
 
   return buildMetadata({
-    nombre: `Repuestos ${modelo.nombre}`,
+    nombre: tituloPorDefecto.modeloRepuesto(modelo.nombre),
     path: rutas.modelo(marca.slug, tipo.slug, modelo.slug),
     descripcion: modelo.descripcion,
     seo: modelo.seo,

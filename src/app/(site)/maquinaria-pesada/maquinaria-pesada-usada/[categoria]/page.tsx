@@ -11,6 +11,7 @@ import {
 } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!categoria) return {};
 
   return buildMetadata({
-    nombre: `${categoria.nombre} usadas`,
+    nombre: tituloPorDefecto.categoriaUsada(categoria.nombre),
     path: rutas.categoriaUsada(categoria.slug),
     descripcion: categoria.descripcion,
     seo: categoria.seo,

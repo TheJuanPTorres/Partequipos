@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { absoluteUrl, seoConfig } from "./config";
+import { recortarDescripcion } from "./porDefecto";
 
 /**
  * Grupo `seo` tal como lo define `seoField()` en las colecciones de Payload.
@@ -27,13 +28,6 @@ export type BuildMetadataInput = {
   ogType?: "website" | "article";
 };
 
-/** Recorta una descripción a una longitud sensata para un meta tag. */
-function truncate(text: string, max = 160): string {
-  const clean = text.replace(/\s+/g, " ").trim();
-  if (clean.length <= max) return clean;
-  return `${clean.slice(0, max - 1).trimEnd()}…`;
-}
-
 /** Extrae la URL de un `ogImage` que puede venir poblado o como id. */
 function ogImageUrl(ogImage: SeoGroup extends null ? never : NonNullable<SeoGroup>["ogImage"]) {
   if (ogImage && typeof ogImage === "object" && typeof ogImage.url === "string") {
@@ -55,7 +49,7 @@ export function buildMetadata(input: BuildMetadataInput): Metadata {
   const { nombre, path, descripcion, seo, imageUrl, ogType = "website" } = input;
 
   const title = seo?.metaTitle?.trim() || nombre.trim();
-  const description = truncate(
+  const description = recortarDescripcion(
     seo?.metaDescription?.trim() || descripcion?.trim() || seoConfig.defaultDescription,
   );
 

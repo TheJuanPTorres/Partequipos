@@ -11,6 +11,7 @@ import {
 } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import type { MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!categoria) return {};
 
   return buildMetadata({
-    nombre: `${categoria.nombre} nuevas`,
+    nombre: tituloPorDefecto.categoriaNueva(categoria.nombre),
     path: rutas.categoriaNueva(categoria.slug),
     descripcion: categoria.descripcion,
     seo: categoria.seo,

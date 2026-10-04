@@ -12,6 +12,7 @@ import {
 } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!marca) return {};
 
   return buildMetadata({
-    nombre: `Maquinaria pesada ${marca.nombre}`,
+    nombre: tituloPorDefecto.marcaMaquinaria(marca.nombre),
     path: rutas.marcaMaquinaria(marca.slug),
     descripcion: marca.descripcion,
     seo: marca.seo,

@@ -195,6 +195,8 @@ panel**: pídeselo al equipo técnico.
   dirección. Si tiene una errata, un administrador puede darte el permiso
   «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a
   la nueva.
+- En las **páginas** (Contenido → Páginas) se llama «Ruta (dirección web)» y
+  funciona igual.
 
 ## 8. Buscadores y redes sociales
 

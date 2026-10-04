@@ -6,6 +6,7 @@ import { BLOQUES_PAGINA } from "./bloques/bloquesPagina";
 import { validarYouTube } from "../lib/fields/youtube";
 import { enlace, parrafo, texto } from "../lib/fields/textosPortada";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
+import { slugEditable } from "../lib/fields/slugField";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 
@@ -67,8 +68,12 @@ export const PaginaInstitucional: CollectionConfig = {
       admin: {
         position: "sidebar",
         description:
-          "La dirección de la página, sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio».",
+          "La dirección de la página, sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio». " +
+          "Después de crearla ya no se puede cambiar; si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.",
       },
+      // Igual que el resto de slugs (ADR 0005, parte B): solo al crear, o con el
+      // permiso. El 301 desde la ruta anterior ya lo crea `revalidarPagina`.
+      access: { update: slugEditable },
     },
     {
       name: "tipoPagina",

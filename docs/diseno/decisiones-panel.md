@@ -83,5 +83,28 @@ tocaba, `feat/pagina-nosotros`, ya está fusionada y es idéntica a `main`).
 
 **Hallazgo anotado, sin tocar:** a diferencia del resto de colecciones, la
 ruta de las páginas **no se bloquea** tras crearlas (es un campo de texto
-propio, no `slugField`), así que hoy un editor sí puede cambiarla y nada crea
-el 301. Se propone a dirección; no entra en este PR.
+propio, no `slugField`). **Corregido el 2026-10-03:** este párrafo decía
+además que nada creaba el 301; era falso: `revalidarPagina` ya lo crea al
+cambiar la ruta. El bloqueo se hizo en §4.
+
+## 4. Ruta de las páginas bloqueada tras crearlas (2026-10-03, rama `feat/panel-slug-paginas`)
+
+Aprobado por dirección. Sin esquema.
+
+- El acceso del slug sale de `slugField` a `slugEditable`
+  (`src/lib/fields/slugField.ts`) y se aplica también a la ruta de
+  `PaginaInstitucional`: se escribe al crear y, después, solo con el permiso
+  «Puede editar slugs ya publicados». El 301 desde la ruta anterior lo crea
+  `revalidarPagina`, como antes.
+- **Pruebas:** `slugField.test.ts` cubre la regla y que el bloqueo esté
+  puesto en `slugField` y en la ruta de las páginas. Quitando el bloqueo, la
+  prueba falla.
+- **Por efecto** (§10.15), con `npm run qa:slug-paginas` contra
+  `development`:
+  - Un editor sin el permiso no cambia la ruta: Payload lo descarta en
+    silencio y la base no cambia.
+  - Con el permiso, sí la cambia, y se crea la redirección.
+  - No quedan restos.
+  - Quitando el bloqueo, la comprobación sale en rojo.
+- `src/payload-types.ts` regenerado: solo cambian comentarios, que recogen
+  las descripciones de los PR #46, #48 y de este.

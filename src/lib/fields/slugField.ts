@@ -1,4 +1,4 @@
-import type { Field } from "payload";
+import type { Field, FieldAccess } from "payload";
 
 import { formatSlugHook } from "../utils/formatSlug";
 
@@ -11,6 +11,28 @@ type SlugFieldOptions = {
    * se define como índice compuesto en la colección (ej. marca+slug), no aquí.
    */
   unique?: boolean;
+};
+
+/**
+ * Guardarraíl (ADR 0005, parte B): el slug solo se puede escribir al crear el
+ * documento. Para modificarlo después hace falta el permiso explícito
+ * `puedeEditarSlugs`.
+ *
+ * Al ser control de acceso de CAMPO (y no `admin.readOnly`), Payload
+ * deshabilita el input en el panel automáticamente y además protege la API
+ * REST, no solo la interfaz.
+ *
+ * La importación por script NO se ve afectada: la API local se ejecuta con
+ * `overrideAccess: true` por defecto, así que `scripts/import` sigue pudiendo
+ * actualizar slugs (es su trabajo).
+ *
+ * Exportado para los slugs que no usan este campo, como la ruta de las páginas
+ * institucionales.
+ */
+export const slugEditable: FieldAccess = ({ req, doc }) => {
+  // Sin `doc` es una creación: el slug se puede establecer libremente.
+  if (!doc) return true;
+  return Boolean(req.user && "puedeEditarSlugs" in req.user && req.user.puedeEditarSlugs);
 };
 
 /**
@@ -34,26 +56,7 @@ export function slugField({ from = "nombre", unique = false }: SlugFieldOptions 
         "Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: " +
         "la dirección antigua seguirá llevando a la nueva.",
     },
-    access: {
-      /**
-       * Guardarraíl (ADR 0005, parte B): el slug solo se puede escribir al crear
-       * el documento. Para modificarlo después hace falta el permiso explícito
-       * `puedeEditarSlugs`.
-       *
-       * Al ser control de acceso de CAMPO (y no `admin.readOnly`), Payload
-       * deshabilita el input en el panel automáticamente y además protege la API
-       * REST, no solo la interfaz.
-       *
-       * La importación por script NO se ve afectada: la API local se ejecuta con
-       * `overrideAccess: true` por defecto, así que `scripts/import` sigue
-       * pudiendo actualizar slugs (es su trabajo).
-       */
-      update: ({ req, doc }) => {
-        // Sin `doc` es una creación: el slug se puede establecer libremente.
-        if (!doc) return true;
-        return Boolean(req.user && "puedeEditarSlugs" in req.user && req.user.puedeEditarSlugs);
-      },
-    },
+    access: { update: slugEditable },
     hooks: {
       beforeValidate: [formatSlugHook(from)],
     },

@@ -9,7 +9,8 @@ const MAX_LISTADAS = 12;
  * Aviso encima de la lista de «Imágenes»: cuántas tienen el texto alternativo
  * flojo, cuáles y por qué (mejora 2 de la auditoría, `src/lib/media/altFlojo.ts`).
  *
- * Componente de servidor (`beforeList`): Payload le pasa su instancia y la
+ * Componente de servidor (`beforeListTable`, entre el buscador y la tabla):
+ * Payload le pasa su instancia y la
  * consulta solo LEE `id`, `alt` y `filename`. Sin imágenes flojas no pinta nada.
  */
 export default async function AltFlojos({ payload }: { payload: Payload }) {

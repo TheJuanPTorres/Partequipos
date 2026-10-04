@@ -336,7 +336,7 @@ Mejora 2 de las tres aprobadas (accesibilidad, CLAUDE.md §7.6). Sin esquema.
   motivo y un ejemplo. Corre en el panel, la API y la API local de los
   scripts; los textos que crean los scripts de siembra pasan (prueba).
 - **Lo que ya está guardado:** aviso encima de la lista de «Imágenes»
-  (`src/components/admin/AltFlojos.tsx`, `beforeList`, componente de servidor
+  (`src/components/admin/AltFlojos.tsx`, `beforeListTable`, componente de servidor
   que solo lee `id`, `alt` y `filename`): cuántas, las 12 más recientes con
   enlace y motivo, y «Y N más». Sin flojas no pinta nada. Probado renderizado
   con una lista falsa (`AltFlojos.test.ts`).

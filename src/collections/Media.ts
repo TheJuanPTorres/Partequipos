@@ -23,7 +23,8 @@ export const Media: CollectionConfig = {
     defaultColumns: ["filename", "alt", "updatedAt"],
     listSearchableFields: ["filename", "alt"],
     // Aviso con las imágenes de texto alternativo flojo (`src/lib/media/altFlojo.ts`).
-    components: { beforeList: ["/components/admin/AltFlojos"] },
+    // Entre el buscador y la tabla: `beforeList` lo pintaba fuera del margen.
+    components: { beforeListTable: ["/components/admin/AltFlojos"] },
   },
   access: {
     read: publico,

@@ -129,3 +129,16 @@ Aprobado por dirección. Sin esquema.
 - **Primera corrida:** el «formulario» salió igual que la lista, porque el
   primer enlace de la página era el de «Crear». Se corrigió para coger un
   enlace de fila.
+
+## 6. Arreglos de la revisión en pantalla (2026-10-04, rama `feat/panel-arreglos-revision`)
+
+Aprobados por dirección. Sin esquema. Cada uno se vio en las capturas de
+`npm run panel:revision`; las de antes y después van en el informe del día.
+
+| #   | Qué se veía                                            | Causa                                                                                                                                                 | Arreglo                                                                                                                      |
+| --- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Fechas «septiembre 15° 2026, 11:56 PM»                 | El formato por defecto de Payload (`MMMM do yyyy, h:mm a`) con la traducción al español                                                               | `admin.dateFormat: "d MMM yyyy, HH:mm"`                                                                                      |
+| 2   | Pestaña «API» en cada formulario, con el JSON en bruto | Opción por defecto de Payload                                                                                                                         | `admin.hideAPIURL: true` en todas las colecciones y globales (`sinPestanaApi` en `payload.config.ts`). La API REST no cambia |
+| 3   | «Buscar por Nombre **O** Código»                       | La traducción `general.or` de Payload es «O»                                                                                                          | `i18n.translations.es.general.or = "o"`; en el constructor de filtros, donde empieza línea, vuelve la mayúscula por CSS      |
+| 4   | Móvil: en Modelos no se veían los números de página    | La barra de selección de Payload va fija abajo con fondo opaco aunque esté vacía, y tapaba la paginación (comprobado con `elementFromPoint` a 390 px) | Se oculta cuando no hay nada seleccionado (`:has(... :empty:only-child)`)                                                    |
+| 5   | Móvil: «Creado:» cortado por la derecha                | La barra de fechas tiene altura fija y `overflow: hidden`; no puede bajar de línea                                                                    | ≤ 768 px: solo «Última modificación»                                                                                         |

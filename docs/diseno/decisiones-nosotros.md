@@ -186,7 +186,13 @@ y caja del `<main>` idénticos, y cada ancla lleva a su sección.
   valor por defecto de Elementor y la página pintada dice **100 %**. Se usa
   100 %. ¿Es el dato real? ¿Y a qué remite su asterisco?
 - Separador de miles «,» (10,000), el de Elementor. En Colombia es habitual
-  «.»: ¿se cambia?
+  «.»: ¿se cambia? **Vuelto a medir el 2026-10-04**: la página publicada
+  pinta «10,000+» (el contador lleva `data-delimiter=","` y a mitad de cuenta
+  se lee «9,794»), así que se respeta, porque manda lo pintado. Si Andrés lo
+  cambia a «.», es una línea en `formatearCifra` (`src/lib/bloques/vista.ts`).
+- **Corregido el 2026-10-04 (PR #65):** las cifras se quedaban en «+0», «0%»
+  y «0+» si se llegaba bajando con el scroll normal (fallo nuestro, del
+  contador, no del diseño).
 - A 390 px el texto de la cabecera queda pegado al borde izquierdo de la
   tarjeta (relleno 0 en móvil): se replica tal cual.
 - Las tres tarjetas llevan el mismo texto, de Dynapac: contenido de ejemplo.

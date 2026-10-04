@@ -213,15 +213,15 @@ export interface EquiposNuevo {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   /**
-   * Desnormalizada para consultas y migas. Debe coincidir con la marca del tipo elegido.
+   * Tiene que ser la marca del tipo de equipo de abajo. Si la cambias, vuelve a elegir el tipo.
    */
   marca: number | MarcasMaquinaria;
   /**
-   * Se filtra por la marca seleccionada arriba.
+   * Solo aparecen los tipos de la marca elegida arriba.
    */
   tipo: number | TiposMaquinaria;
   /**
@@ -296,7 +296,7 @@ export interface MarcasMaquinaria {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -318,6 +318,8 @@ export interface MarcasMaquinaria {
   createdAt: string;
 }
 /**
+ * Fotos y logos del sitio, en JPEG, PNG o WebP. El texto alternativo describe la imagen a quien no la ve.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -347,7 +349,7 @@ export interface TiposMaquinaria {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   marca: number | MarcasMaquinaria;
@@ -368,15 +370,15 @@ export interface ModelosRepuesto {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   /**
-   * Desnormalizada para consultas y breadcrumbs. Debe coincidir con la marca del tipo elegido.
+   * Tiene que ser la marca del tipo de equipo de abajo. Si la cambias, vuelve a elegir el tipo.
    */
   marca: number | Marca;
   /**
-   * Se filtra por la marca seleccionada arriba.
+   * Solo aparecen los tipos de la marca elegida arriba.
    */
   tipo: number | TiposEquipo;
   /**
@@ -401,7 +403,7 @@ export interface Marca {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -417,7 +419,7 @@ export interface TiposEquipo {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   marca: number | Marca;
@@ -438,7 +440,7 @@ export interface CategoriasTecnica {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -472,7 +474,7 @@ export interface CategoriasMaquinaria {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -496,7 +498,7 @@ export interface CategoriasUsada {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -562,7 +564,7 @@ export interface MarcasLubricante {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   /**
@@ -601,7 +603,7 @@ export interface CategoriasLubricante {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   marca: number | MarcasLubricante;
@@ -647,7 +649,7 @@ export interface CategoriasLubricante {
   createdAt: string;
 }
 /**
- * Páginas fijas del sitio. El slug es la ruta completa y no debe cambiarse: son URLs indexadas.
+ * Páginas fijas del sitio (Nosotros, Contacto, textos legales…) y la portada. No cambies la ruta de una página publicada: Google ya conoce esa dirección.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "paginas".
@@ -656,11 +658,11 @@ export interface Pagina {
   id: number;
   titulo: string;
   /**
-   * Ruta completa sin barras al inicio ni al final. Ej: 'nosotros' o 'nosotros/trabaja-con-nosotros'. Para la portada, usar 'inicio'.
+   * La dirección de la página, sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio». Después de crearla ya no se puede cambiar; si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   /**
-   * Las legales no deberían despublicarse: son de cumplimiento.
+   * «Legal / cumplimiento» para tratamiento de datos, términos y similares: tienen que estar siempre en el sitio, así que no se borran.
    */
   tipoPagina?: ('institucional' | 'legal' | 'portada') | null;
   /**
@@ -1044,7 +1046,7 @@ export interface BloqueTarjetasExpandibles {
   blockType: 'tarjetasExpandibles';
 }
 /**
- * Se publican en la raíz del sitio: /{slug}/, sin prefijo.
+ * Cada artículo vive en partequipos.com/<slug>/. Su slug no puede repetir el de una página.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articulos".
@@ -1053,15 +1055,15 @@ export interface Articulo {
   id: number;
   titulo: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   /**
-   * Determina en qué archivo aparece el artículo.
+   * En qué listado del blog aparece el artículo.
    */
   categoria?: (number | null) | CategoriasBlog;
   /**
-   * Alimenta el orden del índice y el JSON-LD del artículo.
+   * Ordena el blog (lo más reciente primero) y es la fecha que ven los buscadores.
    */
   fechaPublicacion: string;
   /**
@@ -1107,7 +1109,7 @@ export interface CategoriasBlog {
   id: number;
   nombre: string;
   /**
-   * Forma la URL indexada. Se genera automáticamente desde el nombre al crear el registro. Después queda de solo lectura: cambiarlo rompe la URL posicionada. Si necesitas corregir una errata, pide el permiso «Puede editar slugs ya publicados»; el sistema creará un redirect 301 automático desde la URL anterior (ADR 0005).
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -1228,7 +1230,7 @@ export interface User {
    */
   rol: 'administrador' | 'editor';
   /**
-   * Los slugs son de solo lectura tras crear el registro porque forman la URL indexada. Marca esta casilla solo para corregir erratas reales; el cambio generará un redirect 301 automático. Ver ADR 0005.
+   * Permite cambiar el slug de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.
    */
   puedeEditarSlugs?: boolean | null;
   updatedAt: string;
@@ -1276,7 +1278,7 @@ export interface Redirect {
   origen: 'manual' | 'cambio-de-slug' | 'migracion';
   notas?: string | null;
   /**
-   * Lo actualiza `npm run redirects:check`. «Sin contenido» es normal mientras se migra; «No corresponde a ninguna ruta» hay que corregirlo antes de publicar.
+   * Lo actualiza el equipo técnico al revisar las redirecciones. «Sin contenido» es normal mientras se migra; «No corresponde a ninguna ruta» hay que corregirlo antes de publicar.
    */
   estadoDestino?: ('sin-verificar' | 'resuelve' | 'sin-contenido' | 'sin-ruta' | 'externa') | null;
   destinoVerificadoEn?: string | null;

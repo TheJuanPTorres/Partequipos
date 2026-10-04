@@ -569,6 +569,7 @@ veredicto, que va en el informe.
 - **Panel, orden 1 (2026-10-02, PR #46):** marca = marca del tipo en modelos y equipos nuevos (`marcaDelTipoCoincide`, por efecto con `npm run qa:marca-tipo`), ayudas sin jerga, «Imágenes» con columnas y búsqueda por código; sin esquema. Detalle en `docs/diseno/decisiones-panel.md`.
 - **Guía del editor (2026-10-03, PR #47):** `docs/guia-editor.md`, entregable del Sprint 4 para quien carga contenido en el panel.
 - **Panel, textos de Páginas (2026-10-03):** ayudas de la colección, la ruta y el tipo en lenguaje llano; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §3.
+- **Panel, ruta de las páginas bloqueada (2026-10-03):** como el resto de slugs, solo al crear o con el permiso (`slugEditable`, por efecto con `npm run qa:slug-paginas`); `payload-types.ts` regenerado; sin esquema.
 
 ### 10.0 Qué está construido y qué falta
 

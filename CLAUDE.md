@@ -419,6 +419,17 @@ promote`/`rollback`/`redeploy`, `--prod`, `--target production`; **no** la
   que está en el repositorio y corre en cada escritura: `almacenEsperado` en
   `media` y `videos`, `exigirAlmacen` en los scripts y `npm run blob:almacen`
   para comprobarlo sin escribir.
+- **RTK reescribe los comandos de `Bash` después de que la barrera los
+  apruebe (2026-10-04).** Es un hook `PreToolUse` de los ajustes de
+  **usuario** (`rtk hook claude`). Los hooks corren en paralelo sobre la
+  entrada original, así que **la barrera evalúa el comando original y se
+  ejecuta el reescrito**. Hoy es seguro, porque la reescritura solo antepone
+  `rtk` o cambia `cat`/`head` por `rtk read` sin quitar ningún token; un
+  bloqueo de la barrera gana a su `allow`. Versión fijada: **RTK 0.44.1**.
+  **REGLA: RTK no se actualiza sin que un agente revise antes, en solo
+  lectura, cómo cambia la reescritura de comandos** (`rtk rewrite <cmd>`
+  sobre los comandos habituales). Análisis completo en
+  `Desktop\partequipos-cierre\propuestas\2026-10-04-barrera-rtk.md`.
 
 **Neon en solo lectura:** MCP de Neon en ámbito local (fuera del repo) con
 `?readonly=true&projectId=solitary-cake-17810450`, y denegadas además las

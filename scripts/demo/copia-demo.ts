@@ -10,7 +10,8 @@
  *
  * Y la página NOSOTROS (docs/diseno/decisiones-nosotros.md): sus bloques
  * (`paginas.bloques` de la página «nosotros») y los medios que usan, imágenes y
- * vídeo con su póster. El valor anterior de los bloques del destino va al
+ * vídeo con su póster, y la animación Lottie del mapa (`animaciones`). El
+ * valor anterior de los bloques del destino va al
  * manifiesto y `retirar` lo devuelve.
  *
  * Todo lo que CREA es contenido de EJEMPLO de ux-9: el manifiesto lo apunta en
@@ -112,6 +113,7 @@ type MediaOrigen = {
   focalX?: number | null;
   focalY?: number | null;
 };
+type AnimacionOrigen = MediaOrigen & { descripcion?: string | null };
 type VideoOrigen = MediaOrigen & {
   descripcion?: string | null;
   decorativo?: boolean | null;
@@ -127,6 +129,8 @@ type Manifiesto = {
   hero: string;
   media: Record<string, Id>;
   videos: Record<string, Id>;
+  /** Animaciones Lottie copiadas (id del origen → id del destino). Opcional: los manifiestos anteriores no lo tienen. */
+  animaciones?: Record<string, Id>;
   urlsCreadas: string[];
   creados: Record<"equipos-usados" | "testimonios" | "preguntas-frecuentes" | "sedes", Id[]>;
   /**
@@ -287,7 +291,7 @@ if (modo === "retirar") {
      * alguien lo mire.
      */
     const noBorrados: string[] = [];
-    const borrarFicheros = async (coleccion: "videos" | "media", ids: Id[]) => {
+    const borrarFicheros = async (coleccion: "videos" | "media" | "animaciones", ids: Id[]) => {
       let borrados = 0;
       for (const id of ids) {
         const doc = await payload
@@ -307,8 +311,14 @@ if (modo === "retirar") {
       return borrados;
     };
     const videosBorrados = await borrarFicheros("videos", Object.values(m.videos));
+    const animacionesBorradas = await borrarFicheros(
+      "animaciones",
+      Object.values(m.animaciones ?? {}),
+    );
     const mediaBorrados = await borrarFicheros("media", Object.values(m.media));
-    log(`ficheros borrados: ${videosBorrados} vídeos y ${mediaBorrados} imágenes`);
+    log(
+      `ficheros borrados: ${videosBorrados} vídeos, ${animacionesBorradas} animaciones y ${mediaBorrados} imágenes`,
+    );
 
     // 3. Comprobaciones.
     const hero = await huellaHero();
@@ -451,6 +461,7 @@ if (modo === "simular" || modo === "copiar") {
     imagenFondo?: ImgO;
     imagenFrontal?: ImgO;
     video?: VideoOrigen | null;
+    lottie?: AnimacionOrigen | null;
     cifras?:
       | { prefijo?: string | null; numero: number; sufijo?: string | null; etiqueta: string }[]
       | null;
@@ -489,7 +500,10 @@ if (modo === "simular" || modo === "copiar") {
   }
   const video = pO.seccionCompania?.video ?? null;
   const videosNosotros = bloquesO.flatMap((b) => (b.video ? [b.video] : []));
-  const ajenos = [...ficheros.values(), ...videosNosotros].filter(
+  const animacionesNosotros = bloquesO.flatMap((b) =>
+    b.lottie && typeof b.lottie === "object" ? [b.lottie] : [],
+  );
+  const ajenos = [...ficheros.values(), ...videosNosotros, ...animacionesNosotros].filter(
     (f) => almacenDeUrl(f.url) === null,
   );
   if (ajenos.length)
@@ -558,11 +572,14 @@ if (modo === "simular" || modo === "copiar") {
           hero: await huellaHero(),
           media: {},
           videos: {},
+          animaciones: {},
           urlsCreadas: [],
           creados: { "equipos-usados": [], testimonios: [], "preguntas-frecuentes": [], sedes: [] },
           ejemplo: {},
           antes: { marcas: {}, categorias: {} },
         };
+  m.animaciones ??= {};
+  const animacionesCopiadas = m.animaciones;
   if (m.estado === "completa")
     log("el manifiesto dice que la copia ya está COMPLETA: se comprueba y no se duplica nada");
 
@@ -656,6 +673,11 @@ if (modo === "simular" || modo === "copiar") {
     if (m.videos[String(v.id)] === undefined)
       plan.push(
         `VÍDEO a crear (Nosotros): ${v.filename} · ${kb(v.filesize)} (póster ${v.poster?.filename ?? "-"})`,
+      );
+  for (const a of animacionesNosotros)
+    if (animacionesCopiadas[String(a.id)] === undefined)
+      plan.push(
+        `ANIMACIÓN a crear (Nosotros): ${a.filename} → ${nombreDeCopia(a.filename)} · ${kb(a.filesize)}`,
       );
   if (!nosotrosO) plan.push("PÁGINA NOSOTROS: el origen no la tiene; no se toca");
   else if (!bloquesO.length) plan.push("PÁGINA NOSOTROS: el origen no tiene bloques; no se toca");
@@ -761,6 +783,26 @@ if (modo === "simular" || modo === "copiar") {
       guardar(m);
       comprobarCreado(v, doc.url);
       log(`  vídeo ${v.filename} → ${doc.filename} (id ${doc.id})`);
+      return doc.id;
+    };
+
+    /** Igual que `copiarMedia`, para una animación Lottie (o reutiliza la ya copiada). */
+    const copiarAnimacion = async (a: AnimacionOrigen | null | undefined): Promise<Id | null> => {
+      if (!a || typeof a !== "object") return null;
+      const ya = animacionesCopiadas[String(a.id)];
+      if (ya !== undefined) return ya;
+      const { nombre, data } = await leerParaSubir(a);
+      const doc = await payload.create({
+        collection: "animaciones",
+        data: { descripcion: a.descripcion ?? "" },
+        file: { data, mimetype: a.mimeType, name: nombre, size: data.length },
+        overrideAccess: true,
+      });
+      animacionesCopiadas[String(a.id)] = doc.id;
+      if (doc.url) m.urlsCreadas.push(doc.url);
+      guardar(m);
+      comprobarCreado(a, doc.url);
+      log(`  animación ${a.filename} → ${doc.filename} (id ${doc.id})`);
       return doc.id;
     };
 
@@ -967,6 +1009,7 @@ if (modo === "simular" || modo === "copiar") {
             bloques.push({
               blockType: "presentacionImagen",
               imagen: await copiarMedia(b.imagen),
+              lottie: await copiarAnimacion(b.lottie),
               antetitulo: b.antetitulo ?? null,
               titulo: b.titulo ?? "",
               texto: (b.texto ?? null) as Extract<
@@ -1038,6 +1081,7 @@ if (modo === "simular" || modo === "copiar") {
       ...m.creados,
       media: Object.values(m.media),
       videos: Object.values(m.videos),
+      animaciones: Object.values(animacionesCopiadas),
     };
     m.estado = "completa";
     guardar(m);

@@ -82,7 +82,7 @@ export default buildConfig({
   admin: {
     user: Users.slug,
     /*
-     * Fechas del panel como «15 sept 2026, 23:56». El formato por defecto de
+     * Fechas del panel como «15 sep 2026, 23:56». El formato por defecto de
      * Payload («MMMM do yyyy, h:mm a») salía «septiembre 15° 2026, 11:56 PM»
      * con la traducción al español: ordinal raro y reloj de 12 horas.
      */

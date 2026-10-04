@@ -594,6 +594,7 @@ veredicto, que va en el informe.
 - **Concordancia de «nuevas/usadas» (2026-10-04):** «Vibrocompactadores usados», «Cargadores nuevos»… en el título y el `<h1>` de las categorías (`concuerda` en `porDefecto.ts`); 7 de 11 salían mal.
 - **Datos de la empresa en el panel (2026-10-04):** teléfono, WhatsApp, correo, dirección y redes en el global `seo` («Contacto de la empresa»), con `src/lib/seo/config.ts` como respaldo campo a campo (`getEmpresa`); migración `20261004_175926_empresa_contacto` con la siembra de los valores de siempre. Detalle en `docs/diseno/decisiones-panel.md` §10.
 - **Logo institucional en el panel (2026-10-04):** campo «Logo» en «Imágenes» del global `seo`; lo usan cabecera, pie, JSON-LD y la imagen social por defecto, cada uno con su respaldo de siempre si está vacío (`getLogo`); migración `20261004_191621_logo_institucional`, solo esquema. Detalle en `docs/diseno/decisiones-panel.md` §11.
+- **Imagen al compartir por defecto (2026-10-04):** campo opcional en «Imágenes» del global `seo` (opaca, 1200 × 630) para `og:image` y `twitter:image` de las páginas sin imagen propia; vacía, el logo, y si no, `config.ts`; el JSON-LD sigue con el logo; migración `20261004_205655_imagen_social`, solo esquema. Detalle en `docs/diseno/decisiones-panel.md` §12.
 
 ### 10.0 Qué está construido y qué falta
 

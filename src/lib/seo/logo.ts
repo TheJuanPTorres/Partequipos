@@ -8,7 +8,8 @@ import { seoConfig } from "./config";
  *  - Cabecera y pie: `public/logo-partequipos.png` (el de Andrés, transparente).
  *  - JSON-LD `Organization`/`Article` e imagen social por defecto: la URL del
  *    Blob de `seoConfig.logoPath` / `seoConfig.defaultOgImagePath`.
- * Con el logo subido, los cuatro usan el de `Media`.
+ * Con el logo subido, los cuatro usan el de `Media`. La imagen social tiene
+ * además su propio campo, «Imagen al compartir por defecto», que gana al logo.
  *
  * Funciones puras: el acceso a la base está en `src/lib/queries/getSeo.ts`.
  */
@@ -66,7 +67,11 @@ export function urlLogoBuscadores(logo: LogoGlobal): string {
   return subido(logo)?.url ?? seoConfig.logoPath;
 }
 
-/** Imagen social de las páginas que no tienen una propia. */
-export function urlImagenSocialPorDefecto(logo: LogoGlobal): string {
-  return subido(logo)?.url ?? seoConfig.defaultOgImagePath;
+/**
+ * Imagen social de las páginas que no tienen una propia: la «Imagen al
+ * compartir por defecto» del panel; si está vacía, el logo; y si también, la
+ * de `config.ts`.
+ */
+export function urlImagenSocialPorDefecto(logo: LogoGlobal, imagenSocial?: LogoGlobal): string {
+  return subido(imagenSocial)?.url ?? subido(logo)?.url ?? seoConfig.defaultOgImagePath;
 }

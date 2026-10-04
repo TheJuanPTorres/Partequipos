@@ -45,11 +45,11 @@ export const getEmpresa = cache(async (): Promise<Empresa> => {
  */
 export const getLogo = cache(
   async (): Promise<{ sitio: ImagenLogo; buscadores: string; social: string }> => {
-    const { logo } = await getSeoGlobal();
+    const { logo, imagenSocial } = await getSeoGlobal();
     return {
       sitio: logoDelSitio(logo),
       buscadores: urlLogoBuscadores(logo),
-      social: urlImagenSocialPorDefecto(logo),
+      social: urlImagenSocialPorDefecto(logo, imagenSocial),
     };
   },
 );

@@ -38,6 +38,15 @@ describe("logo institucional", () => {
     assert.equal(logoDelSitio(subido).src, subido.url);
   });
 
+  it("imagen social: la propia, si no el logo, si no config.ts; el JSON-LD sigue con el logo", () => {
+    const social = { url: "https://ejemplo.blob/social.jpg", width: 1200, height: 630 };
+    assert.equal(urlImagenSocialPorDefecto(subido, social), social.url);
+    assert.equal(urlImagenSocialPorDefecto(undefined, social), social.url);
+    assert.equal(urlImagenSocialPorDefecto(subido, null), subido.url);
+    assert.equal(urlImagenSocialPorDefecto(null, { url: " " }), seoConfig.defaultOgImagePath);
+    assert.equal(urlLogoBuscadores(subido), subido.url);
+  });
+
   it("subido: medidas escaladas a 187 px de ancho, con su proporción", () => {
     assert.deepEqual(logoDelSitio(subido), { src: subido.url, width: 187, height: 37 });
   });

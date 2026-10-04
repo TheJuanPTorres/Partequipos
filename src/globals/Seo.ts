@@ -19,6 +19,10 @@ import { escrituraContenido, publico } from "../lib/seguridad/acceso";
  * aquí sus mismos valores. La razón social y el NIT siguen en `config.ts`,
  * pendientes del cliente (CLAUDE.md §10.3).
  *
+ * IMAGEN AL COMPARTIR POR DEFECTO (2026-10-04): opaca, 1200 × 630, en
+ * «Imágenes». Vacía, la imagen social es el logo; y si este también está
+ * vacío, la de `config.ts`. El JSON-LD sigue con el logo.
+ *
  * LOGO (2026-10-04, §10.8): campo «Logo» en «Imágenes». Vacío, cada sitio usa
  * el de siempre (`src/lib/seo/logo.ts`); la migración solo crea la columna.
  *
@@ -98,7 +102,17 @@ export const Seo: GlobalConfig = {
           label: "Logo",
           admin: {
             description:
-              "Sale en la cabecera, el pie, la información que leen los buscadores y al compartir en redes las páginas sin imagen propia. Usa un PNG con fondo transparente y letras oscuras, de al menos 520 px de ancho. Si lo dejas vacío, se usa el logo de siempre.",
+              "Sale en la cabecera, el pie y la información que leen los buscadores (y al compartir en redes, si no hay imagen al compartir por defecto). Usa un PNG con fondo transparente y letras oscuras, de al menos 520 px de ancho. Si lo dejas vacío, se usa el logo de siempre.",
+          },
+        },
+        {
+          name: "imagenSocial",
+          type: "upload",
+          relationTo: "media",
+          label: "Imagen al compartir por defecto",
+          admin: {
+            description:
+              "La que sale al compartir en redes (WhatsApp, Facebook, LinkedIn…) las páginas que no tienen imagen propia. Usa una imagen opaca, sin transparencia, de 1200 × 630 px. Si la dejas vacía, se usa el logo.",
           },
         },
       ],

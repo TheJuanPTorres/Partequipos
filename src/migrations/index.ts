@@ -22,6 +22,7 @@ import * as migration_20261002_214044_titulo_portada_repuestos from './20261002_
 import * as migration_20261004_052512_animaciones from './20261004_052512_animaciones';
 import * as migration_20261004_175926_empresa_contacto from './20261004_175926_empresa_contacto';
 import * as migration_20261004_191621_logo_institucional from './20261004_191621_logo_institucional';
+import * as migration_20261004_205655_imagen_social from './20261004_205655_imagen_social';
 
 export const migrations = [
   {
@@ -142,6 +143,11 @@ export const migrations = [
   {
     up: migration_20261004_191621_logo_institucional.up,
     down: migration_20261004_191621_logo_institucional.down,
-    name: '20261004_191621_logo_institucional'
+    name: '20261004_191621_logo_institucional',
+  },
+  {
+    up: migration_20261004_205655_imagen_social.up,
+    down: migration_20261004_205655_imagen_social.down,
+    name: '20261004_205655_imagen_social'
   },
 ];

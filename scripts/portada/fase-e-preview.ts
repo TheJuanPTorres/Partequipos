@@ -28,6 +28,7 @@ import { getPayload } from "payload";
 import { exigirAlmacen } from "../blob/exigirAlmacen";
 
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
+import { buscarPorMarca } from "../../src/lib/portada/porMarca";
 
 const modo = process.argv.slice(2).find((a) => a === "sembrar" || a === "retirar");
 if (!modo) {
@@ -80,15 +81,8 @@ const TARJETAS: [slug: string, icono: Icono, foto: string][] = [
 ];
 const ENLACE_TARJETA = "/repuestos-maquinaria-pesada-colombia/";
 
-async function imagenesDePrueba() {
-  const r = await payload.find({
-    collection: "media",
-    where: { alt: { like: MARCA } },
-    depth: 0,
-    limit: 100,
-    overrideAccess: true,
-  });
-  return r.docs.filter((m) => m.alt?.startsWith(MARCA));
+function imagenesDePrueba() {
+  return buscarPorMarca(payload, "media", "alt", MARCA);
 }
 
 async function portada() {

@@ -24,6 +24,7 @@ import { getPayload } from "payload";
 
 import { exigirAlmacen } from "../blob/exigirAlmacen";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
+import { buscarPorMarca } from "../../src/lib/portada/porMarca";
 
 const modo = process.argv.slice(2).find((a) => a === "sembrar" || a === "retirar");
 if (!modo) {
@@ -165,16 +166,7 @@ const SEDES: {
   },
 ];
 
-const fotos = async () =>
-  (
-    await payload.find({
-      collection: "media",
-      where: { alt: { like: MARCA } },
-      depth: 0,
-      limit: 20,
-      overrideAccess: true,
-    })
-  ).docs.filter((m) => m.alt?.startsWith(MARCA));
+const fotos = () => buscarPorMarca(payload, "media", "alt", MARCA);
 
 const sedesDePrueba = async () => {
   const ids = new Set((await fotos()).map((f) => f.id));

@@ -25,6 +25,7 @@ import { getPayload } from "payload";
 import { exigirAlmacen } from "../blob/exigirAlmacen";
 
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
+import { buscarPorMarca } from "../../src/lib/portada/porMarca";
 
 const modo = process.argv.slice(2).find((a) => a === "sembrar" || a === "retirar");
 if (!modo) {
@@ -113,27 +114,10 @@ async function portada() {
   return doc;
 }
 
-const imagenes = async () =>
-  (
-    await payload.find({
-      collection: "media",
-      where: { alt: { like: MARCA } },
-      depth: 0,
-      limit: 20,
-      overrideAccess: true,
-    })
-  ).docs.filter((m) => m.alt?.startsWith(MARCA));
+const imagenes = () => buscarPorMarca(payload, "media", "alt", MARCA);
 
-const testimonios = async () =>
-  (
-    await payload.find({
-      collection: "testimonios",
-      where: { referenciaAutorizacion: { like: MARCA } },
-      depth: 0,
-      limit: 20,
-      overrideAccess: true,
-    })
-  ).docs;
+// Antes sin filtro de prefijo: la retirada podía borrar testimonios ajenos.
+const testimonios = () => buscarPorMarca(payload, "testimonios", "referenciaAutorizacion", MARCA);
 
 async function subir(fichero: string, alt: string) {
   const ya = (await imagenes()).find((m) => m.alt === alt);

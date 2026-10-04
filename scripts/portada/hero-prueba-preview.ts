@@ -53,6 +53,7 @@ import {
   puedeTocarHeroDePrueba,
   sinDiapositivasDePrueba,
 } from "../../src/lib/portada/heroPrueba";
+import { buscarPorMarca } from "../../src/lib/portada/porMarca";
 import { SLUG_EXCAVADORAS } from "../../src/lib/portada/secciones";
 
 const args = process.argv.slice(2);
@@ -118,14 +119,8 @@ function rutaDeFichero(nombre: string): string {
  * ese nombre, Payload lo renombraría y la siguiente siembra lo duplicaría.
  */
 async function mediaDePrueba() {
-  const r = await payload.find({
-    collection: "media",
-    where: { alt: { like: MARCA_PRUEBA } },
-    depth: 0,
-    limit: 100,
-    overrideAccess: true,
-  });
-  return r.docs.filter((m) => TODAS.some((i) => i.alt === m.alt));
+  const docs = await buscarPorMarca(payload, "media", "alt", MARCA_PRUEBA);
+  return docs.filter((m) => TODAS.some((i) => i.alt === m.alt));
 }
 
 async function portada() {

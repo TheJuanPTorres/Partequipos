@@ -19,6 +19,9 @@ import { escrituraContenido, publico } from "../lib/seguridad/acceso";
  * aquí sus mismos valores. La razón social y el NIT siguen en `config.ts`,
  * pendientes del cliente (CLAUDE.md §10.3).
  *
+ * LOGO (2026-10-04, §10.8): campo «Logo» en «Imágenes». Vacío, cada sitio usa
+ * el de siempre (`src/lib/seo/logo.ts`); la migración solo crea la columna.
+ *
  * Al guardar se revalida todo el sitio: el JSON-LD va en varias páginas.
  */
 export const Seo: GlobalConfig = {
@@ -27,7 +30,7 @@ export const Seo: GlobalConfig = {
   admin: {
     group: "Configuración",
     description:
-      "Datos de la empresa que usan los buscadores y el sitio. Hoy: el horario de atención.",
+      "Datos de la empresa que usan los buscadores y el sitio: el horario de atención, el logo y el contacto.",
   },
   access: { read: publico, update: escrituraContenido },
   hooks: {
@@ -80,6 +83,23 @@ export const Seo: GlobalConfig = {
               admin: { width: "50%", placeholder: "17:30" },
             },
           ],
+        },
+      ],
+    },
+    {
+      type: "collapsible",
+      label: "Imágenes",
+      admin: { initCollapsed: false },
+      fields: [
+        {
+          name: "logo",
+          type: "upload",
+          relationTo: "media",
+          label: "Logo",
+          admin: {
+            description:
+              "Sale en la cabecera, el pie, la información que leen los buscadores y al compartir en redes las páginas sin imagen propia. Usa un PNG con fondo transparente y letras oscuras, de al menos 520 px de ancho. Si lo dejas vacío, se usa el logo de siempre.",
+          },
         },
       ],
     },

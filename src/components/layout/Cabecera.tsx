@@ -7,6 +7,7 @@ import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 
 import { useMovimientoReducido } from "@/components/movimiento/useMovimiento";
+import type { ImagenLogo } from "@/lib/seo/logo";
 
 import estilos from "./cabecera.module.css";
 
@@ -35,6 +36,8 @@ type Props = {
   /** Botón de la cabecera (global `cabecera`). Sin él, no se pinta. */
   contacto: Enlace | null;
   whatsapp: string;
+  /** Logo del panel o el de siempre (`getLogo().sitio`). */
+  logo: ImagenLogo;
   nombreSitio: string;
   tituloPortada: string;
 };
@@ -48,20 +51,22 @@ const UMBRAL_VELO = 60;
 const UMBRAL_ESCONDER = 500;
 
 function Logo({
+  logo,
   esPortada,
   nombreSitio,
   tituloPortada,
 }: {
+  logo: ImagenLogo;
   esPortada: boolean;
   nombreSitio: string;
   tituloPortada: string;
 }) {
   const imagen = (
     <Image
-      src="/logo-partequipos.png"
+      src={logo.src}
       alt={esPortada ? tituloPortada : nombreSitio}
-      width={187}
-      height={51}
+      width={logo.width}
+      height={logo.height}
       className={estilos.logo}
       preload
     />
@@ -82,7 +87,7 @@ function Logo({
   );
 }
 
-export function Cabecera({ enlaces, contacto, whatsapp, nombreSitio, tituloPortada }: Props) {
+export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, tituloPortada }: Props) {
   const esPortada = useSelectedLayoutSegment() === null;
   const ruta = usePathname();
   const reducido = useMovimientoReducido();
@@ -172,7 +177,12 @@ export function Cabecera({ enlaces, contacto, whatsapp, nombreSitio, tituloPorta
           <IconHeadset aria-hidden="true" focusable="false" stroke={1.5} />
         </a>
         <div className={estilos.logoCol}>
-          <Logo esPortada={esPortada} nombreSitio={nombreSitio} tituloPortada={tituloPortada} />
+          <Logo
+            logo={logo}
+            esPortada={esPortada}
+            nombreSitio={nombreSitio}
+            tituloPortada={tituloPortada}
+          />
         </div>
         <nav className={estilos.nav} aria-label="Navegación principal">
           {listaEnlaces}

@@ -10,7 +10,7 @@ import {
   getEquiposDeTipos,
 } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const categoria = await getCategoriaMaquinariaPorSlug(slug);
   if (!categoria) return {};
 
-  return buildMetadata({
+  return metadataDe({
     nombre: tituloPorDefecto.categoriaNueva(categoria.nombre),
     path: rutas.categoriaNueva(categoria.slug),
     descripcion: categoria.descripcion,

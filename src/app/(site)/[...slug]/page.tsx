@@ -19,7 +19,7 @@ import {
 import { getEmpresa, getHorario } from "@/lib/queries/getSeo";
 import { getVideoPorId } from "@/lib/queries/getVideos";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { textoDias, textoHora } from "@/lib/seo/horario";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
@@ -95,7 +95,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (resuelto.tipo === "articulo") {
     const { articulo } = resuelto;
-    return buildMetadata({
+    return metadataDe({
       nombre: articulo.titulo,
       path: rutas.articulo(articulo.slug),
       descripcion: articulo.entradilla,
@@ -108,7 +108,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   const { pagina } = resuelto;
-  return buildMetadata({
+  return metadataDe({
     nombre: pagina.titulo,
     path: `/${pagina.slug}`,
     descripcion: pagina.entradilla,

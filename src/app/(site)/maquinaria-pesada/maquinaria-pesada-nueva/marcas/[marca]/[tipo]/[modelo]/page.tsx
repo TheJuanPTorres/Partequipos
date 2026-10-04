@@ -14,7 +14,7 @@ import {
   getTipoMaquinariaPorSlug,
 } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { marca, tipo, equipo } = data;
   const imagenes = Array.isArray(equipo.imagenes) ? equipo.imagenes : [];
 
-  return buildMetadata({
+  return metadataDe({
     nombre: equipo.nombre,
     path: rutas.equipoNuevo(marca.slug, tipo.slug, equipo.slug),
     descripcion: equipo.entradilla,

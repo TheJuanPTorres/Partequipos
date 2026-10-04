@@ -1,6 +1,6 @@
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { getCabecera } from "@/lib/queries/getCabecera";
-import { getEmpresa } from "@/lib/queries/getSeo";
+import { getEmpresa, getLogo } from "@/lib/queries/getSeo";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { seoConfig } from "@/lib/seo/config";
 
@@ -13,16 +13,18 @@ import { Cabecera } from "./Cabecera";
  * `Cabecera` (cliente). Consultas memoizadas por petición.
  */
 export async function Header() {
-  const [portada, cabecera, empresa] = await Promise.all([
+  const [portada, cabecera, empresa, logo] = await Promise.all([
     getPaginaPorSlug(SLUG_PORTADA),
     getCabecera(),
     getEmpresa(),
+    getLogo(),
   ]);
   return (
     <Cabecera
       enlaces={cabecera.enlaces}
       contacto={cabecera.boton}
       whatsapp={enlaceWhatsApp(empresa.whatsapp)}
+      logo={logo.sitio}
       nombreSitio={seoConfig.siteName}
       tituloPortada={portada?.titulo ?? seoConfig.siteName}
     />

@@ -5,7 +5,7 @@ import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getMarcas } from "@/lib/queries/getMarcas";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
@@ -13,8 +13,8 @@ const TITULO = "Marcas de repuestos para maquinaria pesada";
 const DESCRIPCION =
   "Encuentra repuestos por marca de maquinaria pesada. Cada marca reúne sus tipos de equipo y los modelos disponibles.";
 
-export function generateMetadata(): Metadata {
-  return buildMetadata({ nombre: TITULO, path: rutas.marcas(), descripcion: DESCRIPCION });
+export async function generateMetadata(): Promise<Metadata> {
+  return metadataDe({ nombre: TITULO, path: rutas.marcas(), descripcion: DESCRIPCION });
 }
 
 export default async function MarcasIndexPage() {

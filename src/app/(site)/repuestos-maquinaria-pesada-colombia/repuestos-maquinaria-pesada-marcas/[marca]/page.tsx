@@ -8,7 +8,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { getMarcaPorSlug, getMarcas } from "@/lib/queries/getMarcas";
 import { getTiposDeMarca } from "@/lib/queries/getTipos";
 import { rutas } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const marca = await getMarcaPorSlug(marcaSlug);
   if (!marca) return {};
 
-  return buildMetadata({
+  return metadataDe({
     nombre: `Repuestos para maquinaria pesada ${marca.nombre}`,
     path: rutas.marca(marca.slug),
     descripcion: marca.descripcion,

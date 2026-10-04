@@ -2325,6 +2325,10 @@ export interface Seo {
       }[]
     | null;
   /**
+   * Sale en la cabecera, el pie, la información que leen los buscadores y al compartir en redes las páginas sin imagen propia. Usa un PNG con fondo transparente y letras oscuras, de al menos 520 px de ancho. Si lo dejas vacío, se usa el logo de siempre.
+   */
+  logo?: (number | null) | Media;
+  /**
    * Sale en el pie, la cabecera, el botón de WhatsApp y la información que leen los buscadores. Si dejas un campo vacío, se usa el dato de siempre.
    */
   empresa?: {
@@ -2415,6 +2419,7 @@ export interface SeoSelect<T extends boolean = true> {
         cierra?: T;
         id?: T;
       };
+  logo?: T;
   empresa?:
     | T
     | {

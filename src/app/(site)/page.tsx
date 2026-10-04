@@ -31,9 +31,9 @@ import {
   getMarcasDePortada,
 } from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
-import { getEmpresa, getHorario } from "@/lib/queries/getSeo";
+import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
-import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { metadataDe } from "@/lib/seo/metadata";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
@@ -45,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const pagina = await getPaginaPorSlug(SLUG_PORTADA);
   if (!pagina) return {};
 
-  return buildMetadata({
+  return metadataDe({
     nombre: pagina.titulo,
     path: "/",
     descripcion: pagina.entradilla,
@@ -78,6 +78,7 @@ export default async function HomePage() {
     horario,
     sedes,
     empresa,
+    logo,
   ] = await Promise.all([
     getMarcasDePortada(),
     getEquiposUsadosDePortada(),
@@ -88,6 +89,7 @@ export default async function HomePage() {
     getHorario(),
     getSedesDePortada(),
     getEmpresa(),
+    getLogo(),
   ]);
   const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
   const maquinaUsada = imagenDeMedia(pagina.seccionUsada?.imagen, "");
@@ -105,7 +107,7 @@ export default async function HomePage() {
      * (docs/diseno/decisiones-home-ux9.md §22).
      */
     <main>
-      <JsonLd data={buildOrganizationJsonLd(horario, empresa)} />
+      <JsonLd data={buildOrganizationJsonLd(horario, empresa, logo.buscadores)} />
 
       {/* Sección 1 de ux-9. Sin diapositivas en Payload, no se pinta. */}
       {diapositivas.length > 0 ? <HeroPortada diapositivas={diapositivas} /> : null}

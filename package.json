@@ -64,6 +64,7 @@
     "qa:acceso-portada": "payload run scripts/qa/verificar-acceso-portada.ts",
     "qa:marca-tipo": "payload run scripts/qa/verificar-marca-tipo.ts",
     "qa:slug-paginas": "payload run scripts/qa/verificar-slug-paginas.ts",
+    "panel:revision": "tsx scripts/preview/con-entorno.ts npx -y -p playwright-core@1.63.0 node scripts/qa/revision-panel.mjs",
     "rol": "payload run scripts/usuarios/asignar-rol.ts",
     "rol:admin": "payload run scripts/usuarios/asignar-rol.ts",
     "prefs:menu": "payload run scripts/usuarios/preferencias-menu.ts",

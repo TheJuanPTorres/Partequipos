@@ -83,7 +83,20 @@ const email = process.env.RESEND_API_KEY
 function conVerEnElSitio(colecciones: CollectionConfig[]): CollectionConfig[] {
   return colecciones.map((c) =>
     c.slug in RUTAS_EN_EL_SITIO
-      ? { ...c, admin: { ...c.admin, preview: verEnElSitio(c.slug as CollectionSlug) } }
+      ? {
+          ...c,
+          admin: {
+            ...c.admin,
+            preview: verEnElSitio(c.slug as CollectionSlug),
+            components: {
+              ...c.admin?.components,
+              edit: {
+                ...c.admin?.components?.edit,
+                PreviewButton: "/components/admin/VerEnElSitio",
+              },
+            },
+          },
+        }
       : c,
   );
 }

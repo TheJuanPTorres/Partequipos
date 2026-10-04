@@ -159,6 +159,12 @@ Aprobado por dirección. Sin esquema.
 - **Cuándo no hay botón:** sin slug, o si no se encuentra la relación (marca o
   tipo). Así no se enlaza a un 404. Colecciones sin página propia (usados,
   sedes, testimonios, solicitudes…): no lo tienen.
+- **Botón con texto:** el `PreviewButton` de Payload es solo un icono, con el
+  texto en `title`, y en la primera captura no se entendía qué hacía. Se
+  sustituye por `src/components/admin/VerEnElSitio.tsx`: el `Button` de
+  Payload como enlace, con «Ver en el sitio», el icono y la misma URL. En
+  móvil (≤ 768 px) queda el icono, y el texto pasa a ser solo para lectores de
+  pantalla.
 - `rutaDePagina` (la portada `inicio` es `/`) se movió aquí desde
   `revalidateHooks.ts`, que ahora la importa: la ruta de una página la decide
   un solo sitio.

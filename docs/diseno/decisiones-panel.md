@@ -142,3 +142,29 @@ Aprobados por dirección. Sin esquema. Cada uno se vio en las capturas de
 | 3   | «Buscar por Nombre **O** Código»                       | La traducción `general.or` de Payload es «O»                                                                                                          | `i18n.translations.es.general.or = "o"`; en el constructor de filtros, donde empieza línea, vuelve la mayúscula por CSS      |
 | 4   | Móvil: en Modelos no se veían los números de página    | La barra de selección de Payload va fija abajo con fondo opaco aunque esté vacía, y tapaba la paginación (comprobado con `elementFromPoint` a 390 px) | Se oculta cuando no hay nada seleccionado (`:has(... :empty:only-child)`)                                                    |
 | 5   | Móvil: «Creado:» cortado por la derecha                | La barra de fechas tiene altura fija y `overflow: hidden`; no puede bajar de línea                                                                    | ≤ 768 px: solo «Última modificación»                                                                                         |
+
+## 7. «Ver en el sitio» (2026-10-04, rama `feat/panel-ver-en-el-sitio`)
+
+Aprobado por dirección. Sin esquema.
+
+- **Qué es:** el `admin.preview` de Payload, que pinta en el formulario un
+  enlace con `target="_blank"`. Lo pone `conVerEnElSitio` en
+  `payload.config.ts` en las 13 colecciones con página pública. La ruta la
+  calcula `src/lib/panel/verEnElSitio.ts` con las mismas `rutas` del sitio.
+  El texto del botón es «Ver en el sitio»; Payload decía «Vista previa», y
+  aquí no hay borradores que previsualizar.
+- **Ruta relativa a propósito:** el panel y el sitio son la misma app, así que
+  el enlace abre la página del mismo despliegue. En un preview `NEXT_PUBLIC_SERVER_URL`
+  apunta a producción (§10.21) y el enlace llevaría a otra base.
+- **Cuándo no hay botón:** sin slug, o si no se encuentra la relación (marca o
+  tipo). Así no se enlaza a un 404. Colecciones sin página propia (usados,
+  sedes, testimonios, solicitudes…): no lo tienen.
+- **Botón con texto:** el `PreviewButton` de Payload es solo un icono, con el
+  texto en `title`, y en la primera captura no se entendía qué hacía. Se
+  sustituye por `src/components/admin/VerEnElSitio.tsx`: el `Button` de
+  Payload como enlace, con «Ver en el sitio», el icono y la misma URL. En
+  móvil (≤ 768 px) queda el icono, y el texto pasa a ser solo para lectores de
+  pantalla.
+- `rutaDePagina` (la portada `inicio` es `/`) se movió aquí desde
+  `revalidateHooks.ts`, que ahora la importa: la ruta de una página la decide
+  un solo sitio.

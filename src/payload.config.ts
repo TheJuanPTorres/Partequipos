@@ -12,10 +12,16 @@ import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
  * es exactamente el riesgo de CLAUDE.md §10.5.
  */
 import { es } from "@payloadcms/translations/languages/es";
-import { buildConfig, type CollectionConfig, type GlobalConfig } from "payload";
+import {
+  buildConfig,
+  type CollectionConfig,
+  type CollectionSlug,
+  type GlobalConfig,
+} from "payload";
 import sharp from "sharp";
 
 import { pushPermitido } from "./lib/db/pushEsquema";
+import { RUTAS_EN_EL_SITIO, verEnElSitio } from "./lib/panel/verEnElSitio";
 
 import { Articulo } from "./collections/Articulo";
 import { Cabecera } from "./globals/Cabecera";
@@ -68,6 +74,32 @@ const email = process.env.RESEND_API_KEY
       defaultFromName: process.env.RESEND_FROM_NAME || "Partequipos",
     })
   : undefined;
+
+/*
+ * «Ver en el sitio»: en las colecciones con página pública, el formulario
+ * enseña un enlace a esa página que abre en una pestaña nueva
+ * (`admin.preview` de Payload). Ver `src/lib/panel/verEnElSitio.ts`.
+ */
+function conVerEnElSitio(colecciones: CollectionConfig[]): CollectionConfig[] {
+  return colecciones.map((c) =>
+    c.slug in RUTAS_EN_EL_SITIO
+      ? {
+          ...c,
+          admin: {
+            ...c.admin,
+            preview: verEnElSitio(c.slug as CollectionSlug),
+            components: {
+              ...c.admin?.components,
+              edit: {
+                ...c.admin?.components?.edit,
+                PreviewButton: "/components/admin/VerEnElSitio",
+              },
+            },
+          },
+        }
+      : c,
+  );
+}
 
 /*
  * Sin la pestaña «API» en los formularios del panel: enseñaba al editor el
@@ -135,41 +167,43 @@ export default buildConfig({
    * quedar sin `admin.group`: caería en «Colecciones», el grupo por defecto, que
    * es el cajón de sastre que esta agrupación eliminó.
    */
-  collections: sinPestanaApi([
-    // Leads de los formularios publicos. Unica coleccion con datos personales:
-    // su control de acceso de lectura es privado, no publico como el catalogo.
-    // Primero en el menu: es lo mas urgente de revisar (CLAUDE.md §10.11).
-    Solicitud,
-    // Repuestos.
-    Marca,
-    TipoEquipo,
-    ModeloRepuesto,
-    CategoriaTecnica,
-    // Maquinaria (ADR 0007): colecciones propias, separadas de las de repuestos.
-    MarcaMaquinaria,
-    TipoMaquinaria,
-    EquipoNuevo,
-    CategoriaMaquinaria,
-    CategoriaUsada,
-    EquipoUsado,
-    // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.
-    MarcaLubricante,
-    CategoriaLubricante,
-    // Contenido. Los articulos se sirven en la raiz /{slug}/, igual que las
-    // paginas institucionales: de ahi el guardarrail de unicidad entre ambas.
-    PaginaInstitucional,
-    Articulo,
-    CategoriaBlog,
-    Media,
-    // Portada (home de ux-9, fase B). Sin URL propia: se muestran en el inicio.
-    Video,
-    Sede,
-    Testimonio,
-    PreguntaFrecuente,
-    // Configuracion.
-    Users,
-    Redirects,
-  ]),
+  collections: sinPestanaApi(
+    conVerEnElSitio([
+      // Leads de los formularios publicos. Unica coleccion con datos personales:
+      // su control de acceso de lectura es privado, no publico como el catalogo.
+      // Primero en el menu: es lo mas urgente de revisar (CLAUDE.md §10.11).
+      Solicitud,
+      // Repuestos.
+      Marca,
+      TipoEquipo,
+      ModeloRepuesto,
+      CategoriaTecnica,
+      // Maquinaria (ADR 0007): colecciones propias, separadas de las de repuestos.
+      MarcaMaquinaria,
+      TipoMaquinaria,
+      EquipoNuevo,
+      CategoriaMaquinaria,
+      CategoriaUsada,
+      EquipoUsado,
+      // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.
+      MarcaLubricante,
+      CategoriaLubricante,
+      // Contenido. Los articulos se sirven en la raiz /{slug}/, igual que las
+      // paginas institucionales: de ahi el guardarrail de unicidad entre ambas.
+      PaginaInstitucional,
+      Articulo,
+      CategoriaBlog,
+      Media,
+      // Portada (home de ux-9, fase B). Sin URL propia: se muestran en el inicio.
+      Video,
+      Sede,
+      Testimonio,
+      PreguntaFrecuente,
+      // Configuracion.
+      Users,
+      Redirects,
+    ]),
+  ),
   // Globales: contenido único, no listas. El pie de todas las páginas (§13 de
   // docs/diseno/decisiones-home-ux9.md).
   globals: sinPestanaApi([Cabecera, Pie, Seo]),
@@ -192,7 +226,13 @@ export default buildConfig({
      * las listas la usa en mitad de frase («Buscar por Nombre O Código»).
      * Donde empieza línea (filtros) la mayúscula vuelve por CSS: custom.scss.
      */
-    translations: { es: { general: { or: "o" } } },
+    translations: {
+      es: {
+        general: { or: "o" },
+        // El botón de `admin.preview`: abre la página pública, no un borrador.
+        version: { preview: "Ver en el sitio" },
+      },
+    },
   },
   email,
   secret: process.env.PAYLOAD_SECRET || "",

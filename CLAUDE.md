@@ -546,7 +546,7 @@ veredicto, que va en el informe.
 > | SEO              | 69    | 69         |
 >
 > - **SEO** solo falla por el `noindex` puesto a propósito (§10.6).
-> - **Accesibilidad** solo falla por el contraste del antetítulo rojo sobre gris (3,98:1), un fallo de ux-9 pendiente de Andrés.
+> - **Accesibilidad** solo falla por el contraste del antetítulo rojo sobre gris (3,98:1). **Decisión de dirección (2026-10-05): se queda el rojo del diseño**, aceptando ese contraste (`decisiones-home-ux9.md` §27.2).
 >
 > **Pendientes, por prioridad:**
 >

@@ -2196,3 +2196,18 @@ aunque el widget publicado los pinte a la izquierda (no imprime
 
 **Para Andrés:** la web publicada no coincide con su export en estos títulos.
 Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.
+
+### 27.2 Rojo de los antetítulos: se queda el del diseño — DECISIÓN DE DIRECCIÓN
+
+- **Qué:** el antetítulo rojo de marca (`#E5242D`) sobre el gris de sección
+  (`#F0F0F0`), en las secciones 3 y 5.
+- **Contraste medido: 3,98:1.** No llega al 4,5:1 de WCAG 2.2 AA para texto
+  normal (1.4.3). Es lo único que baja la nota de accesibilidad de Lighthouse
+  (97 de 100).
+- **Decisión de dirección (2026-10-05):** **se queda el rojo del diseño**, sin
+  oscurecerlo ni cambiar el fondo. Se acepta el incumplimiento en ese uso, a
+  sabiendas, por fidelidad a la marca.
+- **Alcance:** solo el antetítulo. El resto de textos rojos del sitio cumplen o
+  están anotados aparte (`pendientes-andres.md` §2.2).
+- **Sin cambios de código.** Ya no se pregunta a Andrés
+  (`pendientes-andres.md` §2.1, cerrado).

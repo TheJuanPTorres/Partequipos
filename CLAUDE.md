@@ -3389,6 +3389,28 @@ propuesta está en §10.20.
 > que esos dos seguirían necesitando un fichero —PNG o SVG servido— aunque la
 > cabecera pase a componente. El componente solo resuelve lo que se pinta en el
 > navegador.
+>
+> **ACTUALIZADO 2026-10-05 — el logo y la imagen social ya se editan en el
+> panel** (global `seo`, sección «Imágenes»; PR #62 y #64,
+> `src/lib/seo/logo.ts`). Vacíos, cada sitio usa el de siempre: lo de arriba
+> sigue valiendo para el **logo**, porque su campo **sigue vacío** en
+> producción.
+>
+> **Imagen al compartir: EJECUTADO por dirección el 2026-10-04** con el
+> runbook del logo (`Desktop\partequipos-cierre\runbook-logo-produccion.md`):
+>
+> - Subida `compartir-liugong-placa-1200x630.jpg` (Media **id 71**,
+>   1200 × 630, JPG sin transparencia): foto LiuGong 856H del cliente con velo
+>   y el logo original sobre placa blanca.
+> - Comprobado por dirección y, en solo lectura, por el agente C:
+>   `og:image` y `twitter:image` la usan en `/` y `/maquinaria-pesada/`; la
+>   cabecera, el pie y el JSON-LD siguen con el logo de siempre.
+> - **Guardar el global revalidó el sitio sin redeploy** (lo que el
+>   verificador del PR #62 no pudo comprobar).
+> - **Si Andrés entrega un logo oficial para fondo oscuro**, la imagen se
+>   regenera con `Desktop\partequipos-cierre\imagen-compartir\componer.mjs`
+>   (con ese fichero tal cual, sin recolorear) y se vuelve a subir con el
+>   runbook. La pregunta está en `imagen-compartir\NOTAS.md`.
 
 ### 10.11 PENDIENTE PRE-LANZAMIENTO · PRIORIDAD ALTA — claves de producción
 

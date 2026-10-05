@@ -144,8 +144,9 @@ Ninguna bloquea el lanzamiento, salvo donde se indica.
 
 1. **Contraste del antetítulo rojo sobre gris** (secciones 3 y 5). El rojo
    #E5242D sobre #F0F0F0 da **3,98:1**, por debajo del 4,5:1 mínimo. Es lo único
-   que baja la nota de accesibilidad (97 de 100). ¿Oscurecemos el rojo en ese
-   uso, aclaramos el fondo o lo deja como está? **[No bloquea]**
+   que baja la nota de accesibilidad (97 de 100). **DECIDIDO por dirección el
+   2026-10-05: se queda el rojo del diseño** (`decisiones-home-ux9.md` §27.2).
+   Ya no hace falta su respuesta.
 2. **Otros contrastes de su diseño que no llegan al mínimo** y no hemos tocado:
    - teléfono rojo sobre #EBEBEB en la ficha del globo: 3,81:1;
    - texto blanco sobre el vídeo de la sección 7 con velo al 21 %: de 1,6 a

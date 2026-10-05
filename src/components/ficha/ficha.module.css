@@ -264,36 +264,36 @@
 
 /* Datos con icono: pastillas de vidrio de 190 × 55. */
 .datos {
-  display: flex;
-  flex-wrap: wrap;
+  /*
+   * Columnas FIJAS y texto a la izquierda: Inter llega sin precarga (§10.36) y,
+   * con pastillas que se ajustan al texto o texto centrado, cada dato se movía
+   * unos píxeles al cambiar la fuente (CLS). Así nada cambia de sitio.
+   */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(190px, 270px));
   gap: 20px;
-  max-width: 600px;
   margin: 0;
   padding: 10px;
   list-style: none;
 }
 
+/*
+ * DESVIACIÓN: ux-9 las fija en 190 px con datos cortos («Peso: 1.7») y el texto
+ * centrado. Con los de la ficha técnica («Peso operativo: 8,4 t») miden hasta
+ * 270 px, con el icono y el texto a la izquierda.
+ */
 .datos li {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  /*
-   * DESVIACIÓN: ux-9 las fija en 190 px con datos cortos («Peso: 1.7»). Con
-   * los de la ficha técnica («Peso operativo: 8,4 t») crecen hasta caber en
-   * una línea, desde esos 190 px.
-   */
-  min-width: 190px;
-  max-width: 100%;
   min-height: 55px;
-  padding: 10px;
+  padding: 10px 16px;
   border: 1px solid rgb(255 255 255 / 0.25);
   border-radius: var(--ficha-radio);
   background: rgb(255 255 255 / 0.12);
   box-shadow: 0 8px 32px rgb(0 0 0 / 0.08);
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
-  text-align: center;
 }
 
 .iconoDato {
@@ -630,7 +630,8 @@
   }
 
   .datos {
-    max-width: none;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    width: 100%;
   }
 
   .botones {
@@ -693,13 +694,14 @@
   }
 
   .datos {
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+    width: 100%;
     padding: 0;
   }
 
   .datos li {
-    min-width: 0;
-    width: calc(50% - 5px);
+    padding: 10px 12px;
   }
 
   .botones {

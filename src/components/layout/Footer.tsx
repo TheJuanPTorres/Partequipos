@@ -12,12 +12,13 @@ import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { enlaceWhatsApp } from "@/lib/navegacion";
-import { columnasDelPie, hrefTelefono, redDelPie, type ColumnaPie, type RedPie } from "@/lib/pie";
+import { columnasDelPie, hrefTelefono, redesDelPie, type ColumnaPie, type RedPie } from "@/lib/pie";
 import { getPie } from "@/lib/queries/getPie";
 import { getEmpresa, getLogo } from "@/lib/queries/getSeo";
 import { imagenDeMedia } from "@/lib/utils/relations";
 import { seoConfig } from "@/lib/seo/config";
 
+import { BuscadorPie } from "./BuscadorPie";
 import estilos from "./pie.module.css";
 
 /**
@@ -30,17 +31,21 @@ import estilos from "./pie.module.css";
  * JSON-LD `Organization`.
  *
  * Lo que se aparta de ux-9 (docs/diseno/decisiones-home-ux9.md §13):
- * - Enlaces SIN destino no se pintan: «Trabaja con nosotros», «Zona de
- *   clientes» y «Financiación» esperan su URL (pendiente del cliente).
+ * - Enlaces SIN destino no se pintan. «Trabaja con nosotros», «Zona de
+ *   clientes» y «Financiación» esperan su URL del cliente: en el preview van a
+ *   /contactanos/ como destino provisional (datos del global, no código).
  * - Redes: las del panel que el pie sabe pintar (las cinco de ux-9 y
- *   Instagram), con su nombre real; el export trae etiquetas cruzadas. Iconos
- *   RELLENOS de Tabler, como los de marca de ux-9.
+ *   Instagram), con su nombre real; el export trae etiquetas cruzadas. En el
+ *   orden de ux-9 (LinkedIn, X, Facebook, TikTok, YouTube; Instagram al final).
+ *   Iconos RELLENOS de Tabler, los equivalentes de los Font Awesome de ux-9
+ *   (Font Awesome sería una dependencia nueva).
  * - Franja legal inferior (Ley 1581), con dirección, teléfono y correo (el
  *   correo, desde la fase 6: antes solo estaba en el bloque previo de la home).
  * - «Somos una empresa…» es párrafo, no `<h3>`: los títulos de columna son
  *   `<h2>`, el nivel siguiente al `<h1>` de cualquier página.
- * - Sin buscador hasta aprobar su construcción: un cuadro que no busca es un
- *   defecto. Su hueco se conserva vacío para que las filas caigan como en ux-9.
+ * - Buscador PROVISIONAL (dirección, 2026-10-05): el campo y el botón de
+ *   ux-9, pero solo anuncian «Buscador disponible pronto» y no navegan
+ *   (`BuscadorPie`), hasta que se apruebe el buscador.
  * - La máquina decorativa NO está en el repositorio (es público): se sube a
  *   `Media` y se elige en el global `pie`. Con §10.38 activa, la de ux-9.
  */
@@ -102,10 +107,8 @@ export async function Footer() {
       ? [{ etiqueta: l.etiqueta.trim(), href: l.enlace.trim() }]
       : [],
   );
-  const redes = empresa.redes.flatMap((url) => {
-    const nombre = redDelPie(url);
-    return nombre ? [{ nombre, Icono: ICONOS[nombre], url }] : [];
-  });
+  // En el orden de ux-9, escriba el panel el que escriba (`ORDEN_REDES`).
+  const redes = redesDelPie(empresa.redes).map((r) => ({ ...r, Icono: ICONOS[r.nombre] }));
 
   return (
     <footer className={estilos.pie} data-con-imagen={decorativa ? "" : undefined}>
@@ -160,7 +163,9 @@ export async function Footer() {
             {pie.empresaTexto ? <p className={estilos.textoEmpresa}>{pie.empresaTexto}</p> : null}
           </div>
         </div>
-        <div className={estilos.hueco} />
+        <div className={estilos.hueco}>
+          <BuscadorPie />
+        </div>
 
         <div className={estilos.columnas}>
           {columnas.map((c, i) => (

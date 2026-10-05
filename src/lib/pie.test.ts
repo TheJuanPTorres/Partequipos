@@ -1,7 +1,15 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { PIE_INICIAL, columnasDelPie, hrefTelefono, redDelPie, validarDestinoPie } from "./pie";
+import {
+  ORDEN_REDES,
+  PIE_INICIAL,
+  columnasDelPie,
+  hrefTelefono,
+  redDelPie,
+  redesDelPie,
+  validarDestinoPie,
+} from "./pie";
 
 describe("pie: columnas", () => {
   it("el contenido inicial da las tres columnas de ux-9, con el teléfono de seoConfig", () => {
@@ -69,5 +77,38 @@ describe("pie: redes", () => {
     assert.equal(redDelPie("https://box.com/partequipos"), null);
     assert.equal(redDelPie("https://www.pinterest.com/partequipos/"), null);
     assert.equal(redDelPie("http://www.facebook.com/partequip0s"), null);
+  });
+});
+
+describe("pie: orden de las redes (ux-9)", () => {
+  it("LinkedIn, X, Facebook, TikTok, YouTube y después Instagram, se escriban como se escriban", () => {
+    const urls = [
+      "https://www.youtube.com/@partequipos",
+      "https://www.instagram.com/partequipos_sas/",
+      "https://www.facebook.com/partequip0s",
+      "https://www.tiktok.com/@partequipos",
+      "https://x.com/partequipos",
+      "https://www.linkedin.com/company/partequipos/",
+    ];
+    assert.deepEqual(
+      redesDelPie(urls).map((r) => r.nombre),
+      ["LinkedIn", "X", "Facebook", "TikTok", "YouTube", "Instagram"],
+    );
+    assert.deepEqual([...ORDEN_REDES].slice(0, 5), [
+      "LinkedIn",
+      "X",
+      "Facebook",
+      "TikTok",
+      "YouTube",
+    ]);
+  });
+
+  it("sin repetidas (sale la primera) y sin las que el pie no pinta", () => {
+    const r = redesDelPie([
+      " https://www.facebook.com/primera ",
+      "https://www.facebook.com/segunda",
+      "https://www.pinterest.com/partequipos/",
+    ]);
+    assert.deepEqual(r, [{ nombre: "Facebook", url: "https://www.facebook.com/primera" }]);
   });
 });

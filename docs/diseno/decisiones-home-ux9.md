@@ -906,6 +906,42 @@ caso (1025) es robusta.
 
 **El coste:** a 1280 y 1440 añade 100 px de blanco donde hoy no hace falta.
 
+### 13.9 El pie como en el WordPress (2026-10-05, agente C, decisión de dirección)
+
+Medido en ux-9 publicado (`partequipos.uxdesign.website`) a 1440, 1010 y 390,
+y en el export 2178 del 2026-10-05.
+
+- **Buscador: PROVISIONAL, hasta que se apruebe el buscador** (alcance
+  adicional, CLAUDE.md §10.33 p.9).
+  - Campo y botón de ux-9 en el hueco que estaba reservado (`BuscadorPie.tsx`).
+  - Al pulsar «Buscar» o Enter, anuncia «Buscador disponible pronto» bajo el
+    campo, en una región `role="status"`. **No navega.**
+  - **Sin `<form>`** a propósito: antes de hidratar, un Enter no envía nada.
+  - Medidas: 476 × 58 alineado a la derecha (centrado en tablet; 367 × 56 a
+    390); campo blanco con borde `#cdcdcd`, radio 30, Inter 20 · 1,3 (18 en
+    móvil); botón rojo del kit de 93 × 58, radio 50, Inter 16 · 500, a 8 px.
+  - **Desviación conocida:** el borde del campo, `#cdcdcd` sobre blanco
+    (1,5:1), queda por debajo del 3:1 de WCAG 1.4.11. Se replica lo pintado;
+    el campo se identifica por el texto de ayuda (6,9:1) y por el botón.
+    Pendiente de Andrés.
+- **«Trabaja con nosotros», «Zona de clientes» y «Financiación»:** sin
+  código. Son enlaces del global `pie`, que el pie ya pinta si tienen destino.
+  En el **preview** van a `/contactanos/` como destino provisional, en su
+  columna de ux-9 (los dos primeros en «Navegación», el tercero en
+  «Contacto»). En **producción** los carga dirección con
+  `partequipos-cierre
+unbook-pie-enlaces-redes.md`, con la URL real del
+  cliente o `/contactanos/` mientras tanto.
+- **Redes:** el pie las pinta **siempre en el orden de ux-9** (LinkedIn, X,
+  Facebook, TikTok, YouTube), escriba el panel el que escriba
+  (`ORDEN_REDES` y `redesDelPie` en `src/lib/pie.ts`, con pruebas). Instagram,
+  que ux-9 no tiene pero el cliente sí, va al final.
+  - Iconos: los rellenos de Tabler, equivalentes de los Font Awesome de ux-9
+    (Font Awesome sería una dependencia nueva).
+  - En el **preview**, LinkedIn, X y TikTok llevan **URL de ejemplo**
+    (`…ejemplo-ux9…`). **No se copian a producción:** también van al JSON-LD
+    `sameAs`. Se quitan con el modo `quitar` del script del agente C.
+
 ---
 
 ## 14. Fase 2 — verificación, ajuste fino y cabecera (2026-09-29)

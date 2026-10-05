@@ -34,6 +34,37 @@ export function redDelPie(url: string): RedPie | null {
   return PATRONES_RED.find(([patron]) => patron.test(limpia))?.[1] ?? null;
 }
 
+/**
+ * Orden de las redes en el pie: el de ux-9 (LinkedIn, X, Facebook, TikTok y
+ * YouTube, export 2178 del 2026-10-05) y después Instagram, que ux-9 no pinta
+ * pero el cliente tiene. No depende del orden en que se escriban en el panel.
+ */
+export const ORDEN_REDES: readonly RedPie[] = [
+  "LinkedIn",
+  "X",
+  "Facebook",
+  "TikTok",
+  "YouTube",
+  "Instagram",
+];
+
+/**
+ * Las redes del panel que el pie pinta, en el orden de ux-9. Si una red se
+ * repite, sale la primera; las que el pie no sabe pintar se quedan solo en el
+ * JSON-LD `sameAs`.
+ */
+export function redesDelPie(urls: readonly string[]): { nombre: RedPie; url: string }[] {
+  const porRed = new Map<RedPie, string>();
+  for (const url of urls) {
+    const nombre = redDelPie(url);
+    if (nombre && !porRed.has(nombre)) porRed.set(nombre, url.trim());
+  }
+  return ORDEN_REDES.flatMap((nombre) => {
+    const url = porRed.get(nombre);
+    return url ? [{ nombre, url }] : [];
+  });
+}
+
 /** `href` de un teléfono publicado: `tel:+573176707071`. */
 export function hrefTelefono(telefono: string): string {
   return `tel:${telefono.replace(/[^\d+]/g, "")}`;

@@ -77,6 +77,8 @@
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  /* 20 px entre columnas (y entre filas, en tablet y móvil), como en ux-9. */
+  gap: 20px;
   min-height: 65vh;
   margin: 0 var(--ficha-margen) var(--ficha-margen);
   overflow: hidden;
@@ -179,13 +181,21 @@
 }
 
 /* Miniaturas: 150 × 140, radio 10, en dos columnas bajo la foto (escritorio). */
+/*
+ * Miniaturas: celdas de 190 × 160 con 10 px de hueco, y dentro la foto de
+ * 150 × 140 arriba a la izquierda (relleno 10), como `remote_tabs` en ux-9.
+ */
 .miniaturas {
   display: grid;
-  grid-template-columns: repeat(2, 150px);
-  gap: 30px 50px;
+  grid-template-columns: repeat(2, 190px);
+  gap: 10px;
   margin: 0;
-  padding: 10px;
+  padding: 0;
   list-style: none;
+}
+
+.miniaturas li {
+  padding: 10px;
 }
 
 .miniatura {
@@ -614,7 +624,7 @@
   }
 
   .columnaGaleria {
-    padding: 2.82cqi 2.82cqi 0;
+    padding: 2.82cqi;
   }
 
   .visor {
@@ -622,7 +632,7 @@
   }
 
   .miniaturas {
-    grid-template-columns: repeat(auto-fit, 150px);
+    grid-template-columns: repeat(auto-fit, 190px);
     justify-content: center;
   }
 
@@ -669,16 +679,20 @@
 
 @media (max-width: 767px) {
   .columnaGaleria {
-    padding: 4.7cqi 4.7cqi 0;
+    padding: 4.7cqi;
   }
 
   .visor {
     height: 400px;
   }
 
+  /* En móvil, celdas de 91 con la foto de 71 × 73 sin relleno. */
   .miniaturas {
-    grid-template-columns: repeat(3, 71px);
-    gap: 10px 30px;
+    grid-template-columns: repeat(auto-fit, 91px);
+  }
+
+  .miniaturas li {
+    padding: 0;
   }
 
   .miniatura {

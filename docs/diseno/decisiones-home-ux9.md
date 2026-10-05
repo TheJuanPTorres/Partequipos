@@ -2038,7 +2038,7 @@ workers `blob:`).
 Decisión de dirección: **lo pintado manda**. Se midió ux-9 con el navegador a
 1440, 1010 y 390, y se compararon las mismas cajas en nuestro preview.
 
-### 24.1 Títulos animados — PENDIENTE DE CONFIRMAR CON ANDRÉS
+### 24.1 Títulos animados — SUSTITUIDO por §27.1 (manda el diseño)
 
 | Ancho    | ux-9 publicado                                                                                                                                  | Antes                                                                                       | Ahora                      |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | -------------------------- |
@@ -2175,3 +2175,24 @@ CSV del cliente aparecerán solas.
   porque el menú va en todas las páginas. Editar otra cosa no lo dispara.
 - **Coste en el build:** seis consultas ligeras por página (solo nombre, slug y
   marca, `depth: 0`), memoizadas por petición (§10.10).
+
+## 27. Cambios de dirección en la home tras la prueba en móvil (2026-10-05)
+
+Decisiones de dirección del 2026-10-05, cada una en su PR. Las que se apartan
+de ux-9 publicado van marcadas para Andrés.
+
+### 27.1 Títulos animados: manda el DISEÑO, no la web publicada
+
+**Deshace §24.1.** Cada título va como dice el `text_align` del export 2516,
+aunque el widget publicado los pinte a la izquierda (no imprime
+`data-text-align`):
+
+| Título                                                                                                                                              | Export                   | Aquí                                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------- |
+| Encuentra Maquinaria y Repuestos (sec. 5), Nuestra Compañía y su texto (sec. 6–8), Encuentra la maquinaria… (catálogo), La confianza… (testimonios) | Centro                   | **Centrados** en todos los anchos                                                           |
+| Maquinaria pesada usada (sec. 3)                                                                                                                    | Derecha; Centro en móvil | **A la derecha**, centrado en móvil                                                         |
+| Maquinaria pesada nueva, Marcas que Respaldan…                                                                                                      | Izquierda                | **A la izquierda**, también en móvil (antes se centraban en móvil, como lo publicado)       |
+| Lema del pie («Ofrecemos Soluciones…», export 2178)                                                                                                 | Centro                   | Lo aplica C en su PR del pie, que está tocando `pie.module.css` (coordinado en `ESTADO.md`) |
+
+**Para Andrés:** la web publicada no coincide con su export en estos títulos.
+Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.

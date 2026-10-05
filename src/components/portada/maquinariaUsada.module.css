@@ -84,6 +84,14 @@
   .seccion {
     --s3-maquina-factor: 0.72;
     --s3-der: 100%;
+    /*
+     * MEDIDO en ux-9 pintado a 390 (2026-10-05, decisiones-home-ux9.md §27.4):
+     * el espaciador tras «Ver todas las excavadoras» mide 10 px y el de arriba
+     * de la columna derecha, 20; el export dice 93 y 55, que es lo que pinta a
+     * 1010. Del botón a «Venta de maquinaria» quedan 80 px, como en ux-9.
+     */
+    --s3-espacio-final: 10px;
+    --s3-espacio-der: 20px;
   }
 }
 

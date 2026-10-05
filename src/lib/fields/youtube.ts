@@ -52,10 +52,14 @@ export function validarYouTube(valor: unknown): true | string {
 
 /**
  * El iframe SIEMPRE desde el dominio sin cookies, y solo se crea al pulsar
- * (fase H, D20): hasta entonces no se carga nada de YouTube.
+ * NUESTRO botón de reproducir (fase H, D20; §27.6): hasta entonces no se carga
+ * nada de YouTube. `autoplay=1` arranca el vídeo que la persona acaba de
+ * pedir; nada arranca solo. `rel=0`: al acabar, solo vídeos del mismo canal.
+ * `playsinline=1`: en iPhone, dentro de la ventana y no a pantalla completa.
+ * `iv_load_policy=3`: sin anotaciones encima del vídeo.
  */
 export function urlInsercion(v: VideoYouTube): string {
-  const q = new URLSearchParams({ autoplay: "1", rel: "0" });
+  const q = new URLSearchParams({ autoplay: "1", rel: "0", playsinline: "1", iv_load_policy: "3" });
   if (v.inicio) q.set("start", String(v.inicio));
   return `https://www.youtube-nocookie.com/embed/${v.id}?${q.toString()}`;
 }

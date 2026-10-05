@@ -53,11 +53,11 @@ describe("YouTube", () => {
   it("el iframe va al dominio sin cookies, con inicio si lo hay", () => {
     assert.equal(
       urlInsercion({ id: "hBeMsx5WEko", inicio: 21 }),
-      "https://www.youtube-nocookie.com/embed/hBeMsx5WEko?autoplay=1&rel=0&start=21",
+      "https://www.youtube-nocookie.com/embed/hBeMsx5WEko?autoplay=1&rel=0&playsinline=1&iv_load_policy=3&start=21",
     );
     assert.equal(
       urlInsercion({ id: "lcIx96OBAWU", inicio: null }),
-      "https://www.youtube-nocookie.com/embed/lcIx96OBAWU?autoplay=1&rel=0",
+      "https://www.youtube-nocookie.com/embed/lcIx96OBAWU?autoplay=1&rel=0&playsinline=1&iv_load_policy=3",
     );
   });
 });

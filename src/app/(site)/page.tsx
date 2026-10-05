@@ -166,7 +166,6 @@ export default async function HomePage() {
       />
       <SeccionCatalogo
         whatsapp={enlaceWhatsApp(empresa.whatsapp)}
-        sobreVideo={videoCompania !== null}
         textos={{
           titulo: tx(catalogo?.titulo),
           catalogoTexto: tx(catalogo?.catalogoTexto),

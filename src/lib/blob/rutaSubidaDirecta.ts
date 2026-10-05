@@ -74,7 +74,17 @@ export function rutaSubidaDirecta(token: string): PayloadHandler {
   };
 }
 
-/** Plugin: sustituye el manejador del adaptador por el endurecido. */
+/** El manejador del navegador del adaptador, y el nuestro (con el aviso previo). */
+export const MANEJADOR_ADAPTADOR =
+  "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler";
+export const MANEJADOR_PROPIO = "/components/admin/ManejadorSubidaDirecta#ManejadorSubidaDirecta";
+
+/**
+ * Plugin, DESPUÉS del adaptador en `plugins`: sustituye su ruta del permiso
+ * por la endurecida y su manejador del navegador por el nuestro. Si una
+ * actualización de Payload cambia cualquiera de los dos nombres, la prueba
+ * `rutaSubidaDirecta.test.ts` falla (decisión de dirección).
+ */
 export const endurecerSubidaDirecta =
   (token: string): Plugin =>
   (config: Config): Config => ({
@@ -82,4 +92,19 @@ export const endurecerSubidaDirecta =
     endpoints: (config.endpoints ?? []).map((e) =>
       e.path?.startsWith(RUTA_SUBIDA_DIRECTA) ? { ...e, handler: rutaSubidaDirecta(token) } : e,
     ),
+    admin: {
+      ...config.admin,
+      components: {
+        ...config.admin?.components,
+        providers: (config.admin?.components?.providers ?? []).map((p) =>
+          typeof p === "object" && p !== null && "path" in p && p.path === MANEJADOR_ADAPTADOR
+            ? { ...p, path: MANEJADOR_PROPIO }
+            : p,
+        ),
+      },
+      dependencies: {
+        ...config.admin?.dependencies,
+        [MANEJADOR_PROPIO]: { type: "function", path: MANEJADOR_PROPIO },
+      },
+    },
   });

@@ -1,13 +1,15 @@
 /**
- * SUBIDA DIRECTA AL BLOB DESDE EL NAVEGADOR — PROTOTIPO (estudio del
- * 2026-10-05, propuesta en `partequipos-cierre\propuestas\2026-10-05-subida-directa.md`).
+ * SUBIDA DIRECTA AL BLOB DESDE EL NAVEGADOR (CLAUDE.md §10.39; propuesta del
+ * 2026-10-05 aprobada por dirección). Lógica PURA, sin Node: la usan el
+ * servidor (permiso de subida) y el navegador (aviso antes de subir).
  *
  * POR QUÉ: una subida normal del panel pasa por una función de Vercel, que corta
- * el cuerpo de la petición en 4,5 MB (CLAUDE.md §10.39). Con `clientUploads`
- * del adaptador, el navegador sube el fichero DIRECTAMENTE al Blob con un
- * permiso de un solo uso, y la función solo recibe el nombre.
+ * el cuerpo de la petición en 4,5 MB. Con `clientUploads` del adaptador, el
+ * navegador sube el fichero DIRECTAMENTE al Blob con un permiso de un solo
+ * uso, y la función solo recibe el nombre.
  *
- * Lo que el adaptador 3.89.0 NO protege, y se cierra aquí (lógica pura):
+ * Lo que el adaptador 3.89.0 NO protege, y se cierra aquí y en
+ * `rutaSubidaDirecta.ts`:
  * - El permiso que firma no limita ni el TIPO ni el TAMAÑO, y permite
  *   SOBRESCRIBIR cualquier blob del almacén con el nombre que elija el
  *   navegador. Aquí: tipo y tope por colección, sin sobrescribir, sufijo
@@ -19,20 +21,33 @@
 export type ReglaDeSubida = {
   /** Tipos que el permiso de Vercel deja subir (lo comprueba Vercel). */
   tipos: string[];
-  /** Tope en bytes (lo comprueba Vercel al subir y nuestro gancho después). */
+  /** Tope en bytes (lo comprueba el navegador antes, Vercel al subir y el gancho después). */
   maximo: number;
   /** Extensión que tiene que llevar el nombre. */
   extension: RegExp;
+  /** Cómo se llama el tipo en los mensajes. */
+  nombreTipo: string;
 };
 
 const MB = 1024 * 1024;
 
 /**
- * COLECCIONES CON SUBIDA DIRECTA. Solo documentos en el prototipo; vídeos e
- * imágenes son la propuesta, no están activados.
+ * COLECCIONES CON SUBIDA DIRECTA (decisión de dirección del 2026-10-05).
+ * `videos` se queda fuera: 4 MB por la vía de siempre.
  */
 export const REGLAS_SUBIDA_DIRECTA: Readonly<Record<string, ReglaDeSubida>> = {
-  documentos: { tipos: ["application/pdf"], maximo: 25 * MB, extension: /\.pdf$/i },
+  documentos: {
+    tipos: ["application/pdf"],
+    maximo: 25 * MB,
+    extension: /\.pdf$/i,
+    nombreTipo: "un PDF",
+  },
+  media: {
+    tipos: ["image/jpeg", "image/png", "image/webp"],
+    maximo: 15 * MB,
+    extension: /\.(jpe?g|png|webp)$/i,
+    nombreTipo: "una imagen JPEG, PNG o WebP",
+  },
 };
 
 /** Nombre aceptable: un solo segmento, sin rutas ni caracteres raros. */
@@ -64,4 +79,33 @@ export function permisoDeSubida(coleccion: string | null, nombre: string): Permi
     addRandomSuffix: true,
     allowOverwrite: false,
   };
+}
+
+const enMb = (bytes: number) => (bytes / MB).toFixed(1).replace(".", ",").replace(/,0$/, "");
+
+/**
+ * EL AVISO DEL NAVEGADOR, ANTES DE PEDIR EL PERMISO (decisión de dirección):
+ * tipo y tamaño, con nuestro texto. `null` si se puede subir. El tope de
+ * Vercel queda como red de seguridad, y el gancho del servidor mira el
+ * contenido después.
+ */
+export function avisoAntesDeSubir(
+  coleccion: string,
+  fichero: { name: string; type: string; size: number },
+): string | null {
+  const regla = REGLAS_SUBIDA_DIRECTA[coleccion];
+  if (!regla) return null;
+  if (!regla.tipos.includes(fichero.type) || !regla.extension.test(fichero.name)) {
+    return `«${fichero.name}» no es ${regla.nombreTipo}. Elige un fichero de ese tipo.`;
+  }
+  if (fichero.size > regla.maximo) {
+    return (
+      `«${fichero.name}» pesa ${enMb(fichero.size)} MB y el máximo es ${enMb(regla.maximo)} MB. ` +
+      `Redúcelo (por ejemplo, al exportarlo) y vuelve a intentarlo. No se ha subido nada.`
+    );
+  }
+  if (!NOMBRE_SIMPLE.test(fichero.name) || fichero.name.startsWith(".")) {
+    return `El nombre «${fichero.name}» tiene caracteres que no se admiten. Cámbialo y vuelve a intentarlo.`;
+  }
+  return null;
 }

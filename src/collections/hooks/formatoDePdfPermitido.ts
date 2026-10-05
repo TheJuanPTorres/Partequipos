@@ -1,7 +1,6 @@
-import { del } from "@vercel/blob";
 import { APIError, type CollectionBeforeOperationHook } from "payload";
 
-import { almacenDeToken } from "../../lib/blob/almacen";
+import { borrarHuerfanoRechazado, llegoPorSubidaDirecta } from "../../lib/blob/huerfanoRechazado";
 import { muestraDelFichero } from "../../lib/blob/muestraDelFichero";
 import { REGLAS_SUBIDA_DIRECTA } from "../../lib/blob/subidaDirecta";
 
@@ -17,9 +16,9 @@ import { REGLAS_SUBIDA_DIRECTA } from "../../lib/blob/subidaDirecta";
  *   (`validatePDF`, que va después y da el error en inglés): firma `%PDF-` en
  *   el byte 0 y, en el último KB, `%%EOF` y la tabla `xref`. Un fichero
  *   renombrado a `.pdf` no pasa; uno cortado a medias, tampoco.
- * - **Tope de 25 MB** con la SUBIDA DIRECTA al Blob (prototipo, §10.39): el
- *   fichero ya no pasa por una función de Vercel. Una subida normal sigue
- *   cortada en 4,5 MB por Vercel antes de llegar aquí.
+ * - **Tope de 25 MB** con la SUBIDA DIRECTA al Blob (§10.39): el fichero ya no
+ *   pasa por una función de Vercel. Una subida por la API sigue cortada en
+ *   4,5 MB por Vercel antes de llegar aquí.
  *
  * SUBIDA DIRECTA: `req.file.data` llega vacío y el fichero está en un temporal
  * (`muestraDelFichero` lo lee). Si se rechaza, el fichero YA está en el Blob:
@@ -36,20 +35,6 @@ export function veredictoPdf(inicio: Buffer, final: Buffer = inicio): VeredictoP
   return cola.includes("%%EOF") && cola.includes("xref") ? "pdf" : "incompleto";
 }
 
-/** Borra del Blob un fichero que se subió directo y se ha rechazado. */
-async function borrarHuerfano(nombre: string): Promise<void> {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
-  const almacen = almacenDeToken(token);
-  if (!token || !almacen) return;
-  try {
-    await del(`https://${almacen}.public.blob.vercel-storage.com/${encodeURIComponent(nombre)}`, {
-      token,
-    });
-  } catch (error) {
-    console.error(`[subida-directa] no se pudo borrar el fichero rechazado «${nombre}»:`, error);
-  }
-}
-
 export const formatoDePdfPermitido: CollectionBeforeOperationHook = async ({
   args,
   operation,
@@ -60,10 +45,10 @@ export const formatoDePdfPermitido: CollectionBeforeOperationHook = async ({
   const file = req.file;
   const muestra = muestraDelFichero(file, 1024);
   if (!file || !muestra) return args;
-  const directa = !(Buffer.isBuffer(file.data) && file.data.length > 0);
+  const directa = llegoPorSubidaDirecta(file);
 
   const rechazar = async (mensaje: string): Promise<never> => {
-    if (directa) await borrarHuerfano(file.name);
+    if (directa) await borrarHuerfanoRechazado(file.name);
     throw new APIError(mensaje, 400);
   };
 

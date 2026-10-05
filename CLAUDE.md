@@ -1045,17 +1045,40 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > (`clientUploads` de `@payloadcms/storage-vercel-blob` 3.89.0). El navegador
 > sube con un permiso de un solo uso y la función solo recibe el nombre.
 >
-> **EN ESTUDIO, sin fusionar** (rama `estudio/subida-directa`). Tal cual viene
-> tiene agujeros que hay que cerrar antes:
+> **APROBADA Y ACTIVA desde el 2026-10-05 (PR #82), con estos topes:**
 >
-> - firma cualquier tipo y tamaño, y permite sobrescribir;
-> - basta con tener sesión;
-> - nuestros ganchos de formato no miraban nada (el fichero llega vacío).
+> | Colección      | Vía                         | Tope      |
+> | -------------- | --------------------------- | --------- |
+> | **Documentos** | subida directa              | **25 MB** |
+> | **Imágenes**   | subida directa              | **15 MB** |
+> | Vídeos         | la de siempre (por función) | 4 MB      |
+> | Animaciones    | la de siempre (por función) | 4 MB      |
 >
-> Propuesta y pruebas en
-> `partequipos-cierre\propuestas\2026-10-05-subida-directa.md`. **No subir el
-> tope de ninguna colección sin esa vía**: una subida normal de más de 4,5 MB
-> falla con un error en inglés del propio Vercel.
+> **Tal cual viene, el adaptador tenía agujeros, y se cerraron así:**
+>
+> | Agujero del adaptador                                    | Cierre                                                                                                                                                   |
+> | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+> | Firmaba cualquier tipo y tamaño, y permitía sobrescribir | Nuestro plugin `endurecerSubidaDirecta` sustituye su ruta: el permiso lleva tipos, tope, `addRandomSuffix` y **sin sobrescribir** (`subidaDirecta.ts`)   |
+> | Bastaba con tener sesión                                 | La ruta exige además el **permiso de crear** de la colección (403)                                                                                       |
+> | Los ganchos de formato no miraban nada (llegaba vacío)   | Leen el **temporal** donde Payload deja el fichero (`muestraDelFichero`), guardan el tamaño REAL y, si rechazan, **borran el fichero del Blob**          |
+> | El aviso de tope era el de Vercel, en inglés             | Nuestro manejador del navegador (`ManejadorSubidaDirecta`) comprueba tipo y tamaño **antes de pedir el permiso** y avisa en español; Vercel queda de red |
+>
+> **Lo que depende de nombres internos del adaptador** —su ruta
+> `/vercel-blob-client-upload-route` y su manejador
+> `@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler`— lo
+> vigila `src/lib/blob/rutaSubidaDirecta.test.ts`: falla si una actualización
+> de Payload los renombra o cambia su forma (demostrado renombrando la ruta).
+>
+> **Huérfanos:** el navegador sube ANTES de que se guarde el registro, así que
+> un guardado que falle por otro motivo deja el fichero sin registro.
+> `npm run blob:huerfanos` los **lista, sin borrar**. Contra el almacén del
+> preview hay que ejecutarlo con las dos bases (preview y `development`, que lo
+> comparten, §10.4). **El borrado, por runbook de dirección.**
+>
+> **No subir el tope de una colección por la vía normal:** una subida de más
+> de 4,5 MB falla con un error en inglés del propio Vercel. Para pasar de ahí,
+> la colección entra en la segunda instancia de `vercelBlobStorage` de
+> `payload.config.ts` y en `REGLAS_SUBIDA_DIRECTA`.
 
 ### 10.38 EXCEPCIÓN TEMPORAL DE DEMOSTRACIÓN — la home completa en producción (2026-10-02) · ACTIVA
 
@@ -3319,6 +3342,7 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Imagen del pie sin tapar contenido       | La imagen decorativa del pie (sobresale por encima) tapando texto de una plantilla. Mide con los píxeles opacos del recorte, no con su caja (§10.33 p.11)                                                                               | `npm run qa:vuelo-pie` (`scripts/qa/vuelo-pie.mjs`, con `npx`: necesita navegador)                                                       | **A mano**, contra producción         |
 | Ficha: solo PDF y máximo 4 destacadas    | Un fichero que no es PDF (o uno cortado) en `documentos`, o más de 4 filas destacadas en la ficha técnica de un equipo nuevo                                                                                                            | `formatoDePdfPermitido` y `validarDestacadas` + sus pruebas; por efecto, `npm run qa:ficha`                                              | CI, cada subida y **a mano**          |
 | Siembra que encuentra solo lo suyo       | Un script de siembra que busca por su marca con `like` (Payload la parte en palabras: «PRUEBA FASE F —» casaba con todas las fases) o con un `limit` que corta antes del filtro, y retira lo de otra fase o deja huérfanos (2026-10-03) | `buscarPorMarca` (`src/lib/portada/porMarca.ts`) + `porMarca.test.ts`, que prohíbe `like:` y la marca en un `where` en `scripts/portada` | CI, en cada push                      |
+| Nombres internos de la subida directa    | Una actualización de Payload que renombra o cambia la ruta del permiso o el manejador del navegador del adaptador del Blob: nuestro endurecimiento dejaría de aplicarse sin error (§10.39)                                              | `src/lib/blob/rutaSubidaDirecta.test.ts`, con el adaptador real                                                                          | CI, en cada push                      |     | Subida directa: tipo y tamaño reales | Un fichero subido directo al Blob que no es lo que dice o pasa del tope, y que se quedaría en el almacén (§10.39) | `formatoDePdfPermitido` y `formatoDeImagenPermitido`, que leen el temporal y borran el rechazado + sus pruebas | CI y subida |     | Ficheros del Blob sin registro | Ficheros que la subida directa dejó en el almacén cuando el guardado falló (§10.39). Solo lista | `npm run blob:huerfanos` | **A mano** |
 
 **«Deriva de esquema» se colgó dos veces; está blindada (fase 5).**
 

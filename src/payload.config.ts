@@ -278,12 +278,6 @@ export default buildConfig({
     vercelBlobStorage({
       enabled: true,
       collections: {
-        // `disablePayloadAccessControl: true` hace que `doc.url` sea la URL
-        // pública del CDN del Blob en vez de la ruta interna /api/media/file/...
-        // Las imágenes de catálogo son públicas (Media tiene `read: () => true`)
-        // y servirlas desde el CDN evita dos saltos de serverless por foto,
-        // lo que pesa en Core Web Vitals y por tanto en SEO. Ver ADR 0003.
-        [Media.slug]: { disablePayloadAccessControl: true },
         // Igual para los vídeos, y aquí es OBLIGATORIO: servidos por
         // /api/videos/file/… pasarían por una función, que corta la RESPUESTA en
         // 4,5 MB igual que la petición (docs de Vercel, «Request body size»).
@@ -295,16 +289,23 @@ export default buildConfig({
       token: process.env.BLOB_READ_WRITE_TOKEN || "",
     }),
     /*
-     * SUBIDA DIRECTA (prototipo, §10.39): los PDF suben del navegador al Blob
-     * sin pasar por una función, que corta en 4,5 MB. Instancia aparte para
-     * poner `clientUploads` y el sufijo aleatorio SOLO aquí; la ruta que firma
-     * el permiso la endurece el plugin siguiente.
+     * SUBIDA DIRECTA (§10.39): imágenes (hasta 15 MB) y PDF (hasta 25 MB)
+     * suben del navegador al Blob sin pasar por una función, que corta en
+     * 4,5 MB. Instancia aparte para poner `clientUploads` y el sufijo aleatorio
+     * SOLO aquí; la ruta del permiso y el manejador del navegador los
+     * sustituye el plugin siguiente por los endurecidos.
      */
     vercelBlobStorage({
       enabled: true,
       clientUploads: true,
       addRandomSuffix: true,
       collections: {
+        // `disablePayloadAccessControl: true` hace que `doc.url` sea la URL
+        // pública del CDN del Blob en vez de la ruta interna /api/media/file/...
+        // Las imágenes de catálogo son públicas (Media tiene `read: () => true`)
+        // y servirlas desde el CDN evita dos saltos de serverless por foto,
+        // lo que pesa en Core Web Vitals y por tanto en SEO. Ver ADR 0003.
+        [Media.slug]: { disablePayloadAccessControl: true },
         // Los PDF se descargan desde el CDN, sin pasar por una función.
         [Documento.slug]: { disablePayloadAccessControl: true },
       },

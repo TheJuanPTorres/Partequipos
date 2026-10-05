@@ -18,7 +18,7 @@ export const Media: CollectionConfig = {
   admin: {
     group: "Contenido",
     description:
-      "Fotos y logos del sitio, en JPEG, PNG o WebP. El texto alternativo describe la imagen a quien no la ve.",
+      "Fotos y logos del sitio, en JPEG, PNG o WebP, de hasta 15 MB (suben directo al almacén). El texto alternativo describe la imagen a quien no la ve.",
     // El texto alternativo en la lista, para ver de un vistazo cuáles están flojos.
     defaultColumns: ["filename", "alt", "updatedAt"],
     listSearchableFields: ["filename", "alt"],

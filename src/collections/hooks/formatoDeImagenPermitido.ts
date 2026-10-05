@@ -1,5 +1,9 @@
 import { APIError, type CollectionBeforeOperationHook } from "payload";
 
+import { borrarHuerfanoRechazado, llegoPorSubidaDirecta } from "../../lib/blob/huerfanoRechazado";
+import { muestraDelFichero } from "../../lib/blob/muestraDelFichero";
+import { REGLAS_SUBIDA_DIRECTA } from "../../lib/blob/subidaDirecta";
+
 /**
  * Rechaza subidas cuyo CONTENIDO no es JPEG, PNG o WebP, con un mensaje en
  * español.
@@ -19,7 +23,14 @@ import { APIError, type CollectionBeforeOperationHook } from "payload";
  *
  * Los formatos permitidos son los del sitio, y la lista viva está en
  * `Media.upload.mimeTypes`; aquí van sus firmas.
+ *
+ * SUBIDA DIRECTA (§10.39): las imágenes suben del navegador al Blob, hasta
+ * 15 MB. `req.file.data` llega VACÍO y el fichero está en un temporal: se lee de
+ * ahí (`muestraDelFichero`), se guarda el tamaño REAL y, si se rechaza, se
+ * borra del Blob.
  */
+export const TOPE_IMAGEN_BYTES = REGLAS_SUBIDA_DIRECTA.media?.maximo ?? 15 * 1024 * 1024;
+
 const FIRMAS: { comprobar: (b: Buffer) => boolean; nombre: string }[] = [
   {
     nombre: "JPEG",
@@ -48,7 +59,7 @@ const FIRMAS: { comprobar: (b: Buffer) => boolean; nombre: string }[] = [
   },
 ];
 
-export const formatoDeImagenPermitido: CollectionBeforeOperationHook = ({
+export const formatoDeImagenPermitido: CollectionBeforeOperationHook = async ({
   args,
   operation,
   req,
@@ -58,11 +69,8 @@ export const formatoDeImagenPermitido: CollectionBeforeOperationHook = ({
   }
 
   const file = req.file;
-  if (!file?.data || !Buffer.isBuffer(file.data) || file.data.length === 0) {
-    return args;
-  }
-
-  if (FIRMAS.some(({ comprobar }) => comprobar(file.data))) {
+  const muestra = muestraDelFichero(file, 16);
+  if (!file || !muestra) {
     return args;
   }
 
@@ -70,10 +78,28 @@ export const formatoDeImagenPermitido: CollectionBeforeOperationHook = ({
    * 400 y no 500: es un dato de entrada incorrecto, no un fallo del servidor
    * (CLAUDE.md §8: no exponer trazas al usuario final).
    */
-  throw new APIError(
-    `«${file.name}» no es una imagen JPEG, PNG ni WebP. El sitio solo publica esos tres formatos; ` +
-      `conviértela y vuelve a subirla. Si el nombre acaba en .jpg o .png pero el contenido es de otro ` +
-      `formato, también se rechaza.`,
-    400,
-  );
+  const rechazar = async (mensaje: string): Promise<never> => {
+    if (llegoPorSubidaDirecta(file)) await borrarHuerfanoRechazado(file.name);
+    throw new APIError(mensaje, 400);
+  };
+
+  if (!FIRMAS.some(({ comprobar }) => comprobar(muestra.inicio))) {
+    await rechazar(
+      `«${file.name}» no es una imagen JPEG, PNG ni WebP. El sitio solo publica esos tres formatos; ` +
+        `conviértela y vuelve a subirla. Si el nombre acaba en .jpg o .png pero el contenido es de otro ` +
+        `formato, también se rechaza.`,
+    );
+  }
+
+  if (muestra.tamano > TOPE_IMAGEN_BYTES) {
+    const mb = (muestra.tamano / (1024 * 1024)).toFixed(1).replace(".", ",");
+    await rechazar(
+      `«${file.name}» pesa ${mb} MB y el máximo es ${Math.round(TOPE_IMAGEN_BYTES / (1024 * 1024))} MB. ` +
+        `Redúcela (por ejemplo, al exportarla) y vuelve a subirla.`,
+    );
+  }
+
+  // El tamaño que se guarda es el REAL, no el que dijo el navegador.
+  file.size = muestra.tamano;
+  return args;
 };

@@ -5,6 +5,7 @@ import { postgresAdapter } from "@payloadcms/db-postgres";
 import { resendAdapter } from "@payloadcms/email-resend";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
+import { endurecerSubidaDirecta } from "./lib/blob/rutaSubidaDirecta";
 /*
  * @payloadcms/translations NO está en package.json a propósito. Payload 3.88.0
  * la declara como dependencia exacta en su misma versión, así que su presencia
@@ -290,10 +291,25 @@ export default buildConfig({
         // Las animaciones Lottie las pide el navegador con `fetch` desde el CDN
         // (el Blob responde con `Access-Control-Allow-Origin: *`).
         [Animacion.slug]: { disablePayloadAccessControl: true },
+      },
+      token: process.env.BLOB_READ_WRITE_TOKEN || "",
+    }),
+    /*
+     * SUBIDA DIRECTA (prototipo, §10.39): los PDF suben del navegador al Blob
+     * sin pasar por una función, que corta en 4,5 MB. Instancia aparte para
+     * poner `clientUploads` y el sufijo aleatorio SOLO aquí; la ruta que firma
+     * el permiso la endurece el plugin siguiente.
+     */
+    vercelBlobStorage({
+      enabled: true,
+      clientUploads: true,
+      addRandomSuffix: true,
+      collections: {
         // Los PDF se descargan desde el CDN, sin pasar por una función.
         [Documento.slug]: { disablePayloadAccessControl: true },
       },
       token: process.env.BLOB_READ_WRITE_TOKEN || "",
     }),
+    endurecerSubidaDirecta(process.env.BLOB_READ_WRITE_TOKEN || ""),
   ],
 });

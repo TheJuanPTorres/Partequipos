@@ -1027,6 +1027,36 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     Comprobar también el pie entre 1025 y 1279 px SIN imagen decorativa: la
     reserva de 170 px de §10.33 p.11 no debe dejar hueco.
 
+### 10.39 LÍMITE — una subida del panel no puede pasar de 4,5 MB (2026-10-05)
+
+> **Qué es.** Toda subida normal del panel (imagen, vídeo, PDF, animación)
+> viaja en el cuerpo de una petición a una función de Vercel, y Vercel corta
+> ese cuerpo en **4,5 MB** en todos los planes: responde **413
+> `FUNCTION_PAYLOAD_TOO_LARGE`** antes de que nuestro código lo vea. Lo mismo
+> pasa con la RESPUESTA, así que un fichero servido por `/api/<colección>/file/…`
+> tampoco puede pasar de 4,5 MB (por eso `media`, `videos`, `animaciones` y
+> `documentos` se sirven desde el CDN del Blob, `disablePayloadAccessControl`).
+>
+> **Topes de hoy, por debajo del límite:** vídeos **4 MB**
+> (`formatoDeVideoPermitido`) y PDF **4 MB** (`formatoDePdfPermitido`). Una
+> ficha técnica de fabricante o un vídeo de testimonio pueden pasar de ahí.
+>
+> **La salida que existe: la SUBIDA DIRECTA del navegador al Blob**
+> (`clientUploads` de `@payloadcms/storage-vercel-blob` 3.89.0). El navegador
+> sube con un permiso de un solo uso y la función solo recibe el nombre.
+>
+> **EN ESTUDIO, sin fusionar** (rama `estudio/subida-directa`). Tal cual viene
+> tiene agujeros que hay que cerrar antes:
+>
+> - firma cualquier tipo y tamaño, y permite sobrescribir;
+> - basta con tener sesión;
+> - nuestros ganchos de formato no miraban nada (el fichero llega vacío).
+>
+> Propuesta y pruebas en
+> `partequipos-cierre\propuestas\2026-10-05-subida-directa.md`. **No subir el
+> tope de ninguna colección sin esa vía**: una subida normal de más de 4,5 MB
+> falla con un error en inglés del propio Vercel.
+
 ### 10.38 EXCEPCIÓN TEMPORAL DE DEMOSTRACIÓN — la home completa en producción (2026-10-02) · ACTIVA
 
 > **Decisión de dirección del 2026-10-02.** Para enseñar el avance, la home de

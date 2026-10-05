@@ -1,4 +1,9 @@
+import { del } from "@vercel/blob";
 import { APIError, type CollectionBeforeOperationHook } from "payload";
+
+import { almacenDeToken } from "../../lib/blob/almacen";
+import { muestraDelFichero } from "../../lib/blob/muestraDelFichero";
+import { REGLAS_SUBIDA_DIRECTA } from "../../lib/blob/subidaDirecta";
 
 /**
  * Rechaza subidas a `documentos` que no sean un PDF POR CONTENIDO, o que pasen
@@ -12,50 +17,79 @@ import { APIError, type CollectionBeforeOperationHook } from "payload";
  *   (`validatePDF`, que va después y da el error en inglés): firma `%PDF-` en
  *   el byte 0 y, en el último KB, `%%EOF` y la tabla `xref`. Un fichero
  *   renombrado a `.pdf` no pasa; uno cortado a medias, tampoco.
- * - **Tope de 4 MB**: la subida del panel pasa por una función de Vercel, que
- *   corta el cuerpo en 4,5 MB (el mismo límite que los vídeos). Una ficha
- *   técnica de fabricante cabe de sobra; si no, hay que comprimirla.
+ * - **Tope de 25 MB** con la SUBIDA DIRECTA al Blob (prototipo, §10.39): el
+ *   fichero ya no pasa por una función de Vercel. Una subida normal sigue
+ *   cortada en 4,5 MB por Vercel antes de llegar aquí.
+ *
+ * SUBIDA DIRECTA: `req.file.data` llega vacío y el fichero está en un temporal
+ * (`muestraDelFichero` lo lee). Si se rechaza, el fichero YA está en el Blob:
+ * se borra, para no dejar huérfanos.
  */
 
-export const TOPE_PDF_BYTES = 4 * 1024 * 1024;
+export const TOPE_PDF_BYTES = REGLAS_SUBIDA_DIRECTA.documentos?.maximo ?? 25 * 1024 * 1024;
 
 export type VeredictoPdf = "pdf" | "no-pdf" | "incompleto";
 
-export function veredictoPdf(b: Buffer): VeredictoPdf {
-  if (b.subarray(0, 5).toString("latin1") !== "%PDF-") return "no-pdf";
-  const final = b.subarray(Math.max(0, b.length - 1024)).toString("latin1");
-  return final.includes("%%EOF") && final.includes("xref") ? "pdf" : "incompleto";
+export function veredictoPdf(inicio: Buffer, final: Buffer = inicio): VeredictoPdf {
+  if (inicio.subarray(0, 5).toString("latin1") !== "%PDF-") return "no-pdf";
+  const cola = final.subarray(Math.max(0, final.length - 1024)).toString("latin1");
+  return cola.includes("%%EOF") && cola.includes("xref") ? "pdf" : "incompleto";
 }
 
-export const formatoDePdfPermitido: CollectionBeforeOperationHook = ({ args, operation, req }) => {
+/** Borra del Blob un fichero que se subió directo y se ha rechazado. */
+async function borrarHuerfano(nombre: string): Promise<void> {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const almacen = almacenDeToken(token);
+  if (!token || !almacen) return;
+  try {
+    await del(`https://${almacen}.public.blob.vercel-storage.com/${encodeURIComponent(nombre)}`, {
+      token,
+    });
+  } catch (error) {
+    console.error(`[subida-directa] no se pudo borrar el fichero rechazado «${nombre}»:`, error);
+  }
+}
+
+export const formatoDePdfPermitido: CollectionBeforeOperationHook = async ({
+  args,
+  operation,
+  req,
+}) => {
   if (operation !== "create" && operation !== "update") return args;
 
   const file = req.file;
-  if (!file?.data || !Buffer.isBuffer(file.data) || file.data.length === 0) return args;
+  const muestra = muestraDelFichero(file, 1024);
+  if (!file || !muestra) return args;
+  const directa = !(Buffer.isBuffer(file.data) && file.data.length > 0);
 
-  const v = veredictoPdf(file.data);
+  const rechazar = async (mensaje: string): Promise<never> => {
+    if (directa) await borrarHuerfano(file.name);
+    throw new APIError(mensaje, 400);
+  };
+
+  const v = veredictoPdf(muestra.inicio, muestra.final);
   if (v === "no-pdf") {
-    throw new APIError(
+    await rechazar(
       `«${file.name}» no es un PDF. Si el nombre acaba en .pdf pero el contenido es de otro ` +
         `formato, también se rechaza.`,
-      400,
     );
   }
   if (v === "incompleto") {
-    throw new APIError(
+    await rechazar(
       `«${file.name}» parece un PDF dañado o incompleto. Hay que volver a exportarlo o descargarlo.`,
-      400,
     );
   }
 
-  if (file.data.length > TOPE_PDF_BYTES) {
-    const mb = (file.data.length / (1024 * 1024)).toFixed(1).replace(".", ",");
-    throw new APIError(
-      `«${file.name}» pesa ${mb} MB y el máximo es 4 MB. Hay que comprimirlo (por ejemplo, ` +
+  if (muestra.tamano > TOPE_PDF_BYTES) {
+    const mb = (muestra.tamano / (1024 * 1024)).toFixed(1).replace(".", ",");
+    const tope = Math.round(TOPE_PDF_BYTES / (1024 * 1024));
+    await rechazar(
+      `«${file.name}» pesa ${mb} MB y el máximo es ${tope} MB. Hay que comprimirlo (por ejemplo, ` +
         `«Reducir tamaño» al exportar) y volver a subirlo.`,
-      400,
     );
   }
 
+  // El tamaño que se guarda es el REAL, no el que dijo el navegador.
+  file.size = muestra.tamano;
   return args;
 };

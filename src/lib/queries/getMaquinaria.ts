@@ -138,6 +138,24 @@ export const getEquipoNuevoPorSlug = cache(
   },
 );
 
+/**
+ * «Otras referencias de esta categoría» de la ficha V2: hasta 3 equipos del
+ * mismo tipo, sin el de la página. `depth: 1` puebla la primera imagen y el PDF.
+ */
+export const getOtrasReferencias = cache(
+  async (tipoId: number, excluirId: number): Promise<EquiposNuevo[]> => {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "equipos-nuevos",
+      where: { and: [{ tipo: { equals: tipoId } }, { id: { not_equals: excluirId } }] },
+      sort: "nombre",
+      depth: 1,
+      limit: 3,
+    });
+    return docs;
+  },
+);
+
 /** Equipos de varios tipos a la vez: alimenta las categorías transversales. */
 export const getEquiposDeTipos = cache(async (tipoIds: number[]): Promise<EquiposNuevo[]> => {
   if (tipoIds.length === 0) return [];

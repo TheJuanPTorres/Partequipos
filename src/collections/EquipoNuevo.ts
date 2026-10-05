@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { ICONOS_FICHA, validarDestacadas, type FilaFicha } from "../lib/maquinaria/fichaTecnica";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
@@ -119,8 +120,11 @@ export const EquipoNuevo: CollectionConfig = {
       labels: { singular: "Especificación", plural: "Especificaciones" },
       admin: {
         description:
-          "Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera.",
+          "Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. Marca «Destacar» en hasta 4 filas: salen con su icono junto al título de la ficha (y las 3 primeras, en las tarjetas de otras referencias).",
       },
+      // Las 4 primeras marcadas son las que caben en la tarjeta (fichaTecnica.ts).
+      validate: (filas: unknown) =>
+        validarDestacadas(Array.isArray(filas) ? (filas as FilaFicha[]) : []),
       fields: [
         {
           name: "etiqueta",
@@ -136,7 +140,43 @@ export const EquipoNuevo: CollectionConfig = {
           label: "Valor",
           admin: { description: "Incluir la unidad: «20.500 kg», «122 kW»." },
         },
+        {
+          type: "row",
+          fields: [
+            {
+              name: "destacar",
+              type: "checkbox",
+              label: "Destacar",
+              defaultValue: false,
+              admin: {
+                width: "30%",
+                description: "Junto al título de la ficha, con icono. Máximo 4.",
+              },
+            },
+            {
+              name: "icono",
+              type: "select",
+              label: "Icono",
+              options: ICONOS_FICHA.map((i) => ({ value: i.value, label: i.label })),
+              admin: {
+                width: "70%",
+                condition: (_, fila) => Boolean((fila as FilaFicha | undefined)?.destacar),
+                description: "Sin elegir, se usa «Otro dato».",
+              },
+            },
+          ],
+        },
       ],
+    },
+    {
+      name: "fichaTecnicaPdf",
+      type: "upload",
+      relationTo: "documentos",
+      label: "Ficha técnica completa (PDF)",
+      admin: {
+        description:
+          "Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Los PDF se suben en «Documentos».",
+      },
     },
     /*
      * Documentación descargable. `Media` solo admite JPEG, PNG y WebP
@@ -149,10 +189,10 @@ export const EquipoNuevo: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       hasMany: true,
-      label: "Documentos",
+      label: "Imágenes de folletos",
       admin: {
         description:
-          "Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). Los PDF no se admiten todavía. Hoy no se muestran en el sitio.",
+          "Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). No se muestran en el sitio. El PDF de la ficha técnica va en «Ficha técnica completa (PDF)».",
       },
     },
     seoField(),

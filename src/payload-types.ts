@@ -85,6 +85,7 @@ export interface Config {
     'categorias-blog': CategoriasBlog;
     media: Media;
     animaciones: Animacion;
+    documentos: Documento;
     videos: Video;
     sedes: Sede;
     testimonios: Testimonio;
@@ -116,6 +117,7 @@ export interface Config {
     'categorias-blog': CategoriasBlogSelect<false> | CategoriasBlogSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     animaciones: AnimacionesSelect<false> | AnimacionesSelect<true>;
+    documentos: DocumentosSelect<false> | DocumentosSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     sedes: SedesSelect<false> | SedesSelect<true>;
     testimonios: TestimoniosSelect<false> | TestimoniosSelect<true>;
@@ -135,11 +137,13 @@ export interface Config {
     cabecera: Cabecera;
     pie: Pie;
     seo: Seo;
+    'ficha-producto': FichaProducto;
   };
   globalsSelect: {
     cabecera: CabeceraSelect<false> | CabeceraSelect<true>;
     pie: PieSelect<false> | PieSelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
+    'ficha-producto': FichaProductoSelect<false> | FichaProductoSelect<true>;
   };
   locale: null;
   widgets: {
@@ -263,7 +267,7 @@ export interface EquiposNuevo {
    */
   imagenes?: (number | Media)[] | null;
   /**
-   * Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera.
+   * Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. Marca «Destacar» en hasta 4 filas: salen con su icono junto al título de la ficha (y las 3 primeras, en las tarjetas de otras referencias).
    */
   fichaTecnica?:
     | {
@@ -275,11 +279,23 @@ export interface EquiposNuevo {
          * Incluir la unidad: «20.500 kg», «122 kW».
          */
         valor: string;
+        /**
+         * Junto al título de la ficha, con icono. Máximo 4.
+         */
+        destacar?: boolean | null;
+        /**
+         * Sin elegir, se usa «Otro dato».
+         */
+        icono?: ('peso' | 'potencia' | 'motor' | 'capacidad' | 'alcance' | 'profundidad' | 'velocidad' | 'otro') | null;
         id?: string | null;
       }[]
     | null;
   /**
-   * Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). Los PDF no se admiten todavía. Hoy no se muestran en el sitio.
+   * Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Los PDF se suben en «Documentos».
+   */
+  fichaTecnicaPdf?: (number | null) | Documento;
+  /**
+   * Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). No se muestran en el sitio. El PDF de la ficha técnica va en «Ficha técnica completa (PDF)».
    */
   documentos?: (number | Media)[] | null;
   /**
@@ -372,6 +388,28 @@ export interface TiposMaquinaria {
   };
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 4 MB. Las imágenes van en «Imágenes».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documentos".
+ */
+export interface Documento {
+  id: number;
+  /**
+   * Para el panel. Ej. «Ficha técnica Hitachi ZX130-7H».
+   */
+  titulo: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1454,6 +1492,10 @@ export interface PayloadLockedDocument {
         value: number | Animacion;
       } | null)
     | ({
+        relationTo: 'documentos';
+        value: number | Documento;
+      } | null)
+    | ({
         relationTo: 'videos';
         value: number | Video;
       } | null)
@@ -1677,8 +1719,11 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
     | {
         etiqueta?: T;
         valor?: T;
+        destacar?: T;
+        icono?: T;
         id?: T;
       };
+  fichaTecnicaPdf?: T;
   documentos?: T;
   seo?:
     | T
@@ -2085,6 +2130,22 @@ export interface AnimacionesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documentos_select".
+ */
+export interface DocumentosSelect<T extends boolean = true> {
+  titulo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "videos_select".
  */
 export interface VideosSelect<T extends boolean = true> {
@@ -2358,6 +2419,21 @@ export interface Seo {
   createdAt?: string | null;
 }
 /**
+ * Lo que comparten todas las fichas de maquinaria nueva.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ficha-producto".
+ */
+export interface FichaProducto {
+  id: number;
+  /**
+   * Opcional. Persona o máquina recortada (PNG transparente) a la derecha del recuadro de contacto, al final de cada ficha. Vacío: el recuadro sin imagen.
+   */
+  imagenContacto?: (number | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cabecera_select".
  */
@@ -2440,6 +2516,16 @@ export interface SeoSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ficha-producto_select".
+ */
+export interface FichaProductoSelect<T extends boolean = true> {
+  imagenContacto?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

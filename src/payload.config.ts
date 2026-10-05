@@ -50,6 +50,8 @@ import { TipoMaquinaria } from "./collections/TipoMaquinaria";
 import { Users } from "./collections/Users";
 import { Video } from "./collections/Video";
 import { Animacion } from "./collections/Animacion";
+import { Documento } from "./collections/Documento";
+import { FichaProducto } from "./globals/FichaProducto";
 import { seoConfig } from "./lib/seo/config";
 
 const filename = fileURLToPath(import.meta.url);
@@ -196,6 +198,8 @@ export default buildConfig({
       CategoriaBlog,
       Media,
       Animacion,
+      // PDF descargables (ficha técnica de los equipos nuevos). Nunca en Media.
+      Documento,
       // Portada (home de ux-9, fase B). Sin URL propia: se muestran en el inicio.
       Video,
       Sede,
@@ -208,7 +212,7 @@ export default buildConfig({
   ),
   // Globales: contenido único, no listas. El pie de todas las páginas (§13 de
   // docs/diseno/decisiones-home-ux9.md).
-  globals: sinPestanaApi([Cabecera, Pie, Seo]),
+  globals: sinPestanaApi([Cabecera, Pie, Seo, FichaProducto]),
   editor: lexicalEditor(),
   /*
    * Panel en español (CLAUDE.md §5: textos de interfaz en español).
@@ -286,6 +290,8 @@ export default buildConfig({
         // Las animaciones Lottie las pide el navegador con `fetch` desde el CDN
         // (el Blob responde con `Access-Control-Allow-Origin: *`).
         [Animacion.slug]: { disablePayloadAccessControl: true },
+        // Los PDF se descargan desde el CDN, sin pasar por una función.
+        [Documento.slug]: { disablePayloadAccessControl: true },
       },
       token: process.env.BLOB_READ_WRITE_TOKEN || "",
     }),

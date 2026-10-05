@@ -104,13 +104,17 @@
 }
 
 .columnaGaleria {
-  position: relative;
-  z-index: 1;
+  /*
+   * SIN posición a propósito: el fondo desenfocado (dentro de la galería) se
+   * coloca respecto a la TARJETA y la cubre entera, también bajo los datos.
+   */
   /* 3 % de la tarjeta a los lados (40,6 px a 1440). */
   padding: 0 2.82cqi;
 }
 
 .galeria {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;

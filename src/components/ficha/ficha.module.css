@@ -267,7 +267,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  max-width: 520px;
+  max-width: 600px;
   margin: 0;
   padding: 10px;
   list-style: none;
@@ -278,7 +278,13 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 190px;
+  /*
+   * DESVIACIÓN: ux-9 las fija en 190 px con datos cortos («Peso: 1.7»). Con
+   * los de la ficha técnica («Peso operativo: 8,4 t») crecen hasta caber en
+   * una línea, desde esos 190 px.
+   */
+  min-width: 190px;
+  max-width: 100%;
   min-height: 55px;
   padding: 10px;
   border: 1px solid rgb(255 255 255 / 0.25);
@@ -692,6 +698,7 @@
   }
 
   .datos li {
+    min-width: 0;
     width: calc(50% - 5px);
   }
 

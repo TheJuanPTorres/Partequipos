@@ -2247,3 +2247,20 @@ Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.
 
 - **Para Andrés:** es un efecto de su página, no un ajuste de su widget. Si
   prefiere el `top 95 %` / `top 85 %` exacto, se quitan los adelantos.
+- **Cómo medir ux-9:** bajando desde arriba, como un visitante. Si se salta
+  parte de la página, su arranque cambia (lo vio el verificador del #78).
+
+### 27.4 Hueco antes de «Venta de maquinaria» en móvil
+
+- **Qué pidió dirección:** en móvil, «Venta de maquinaria» (columna derecha de
+  la sección 3) quedaba mucho más abajo de lo debido tras «Ver todas las
+  excavadoras».
+- **Medido en ux-9 pintado a 390 (2026-10-05):** del final del botón al
+  antetítulo hay **80 px**; en el nuestro, **198**.
+- **Causa:** dos espaciadores. El export pone 93 px (tras el botón) y 55 px
+  (arriba de la columna derecha), y así los pinta ux-9 a 1010. Pero a 390
+  pinta **10 y 20 px**. El nuestro usaba los del export en todos los anchos.
+- **Arreglo:** a menos de 768 px, 10 y 20 px. Tablet y escritorio, sin cambios.
+- **Corrige §14.4 y §10.36:** allí se dio por hecho que los ~190 px de hueco a
+  390 eran de la maqueta de ux-9. No lo eran: ux-9 pinta otra cosa que su
+  export.

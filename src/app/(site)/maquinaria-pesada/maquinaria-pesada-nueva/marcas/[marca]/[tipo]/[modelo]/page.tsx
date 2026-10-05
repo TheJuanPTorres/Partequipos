@@ -96,15 +96,27 @@ function urlPdf(equipo: EquiposNuevo): string | null {
   return poblado<Documento>(equipo.fichaTecnicaPdf)?.url ?? null;
 }
 
-/** Datos con icono: la tarjeta principal (4) y las de otras referencias (3). */
-function ListaDatos({ datos, clase }: { datos: DatoDestacado[]; clase: string }) {
+/**
+ * Datos con icono: la tarjeta principal (4) y las de otras referencias (3).
+ * En la tarjeta principal la etiqueta y el valor van en líneas aparte
+ * (`apilado`): así, al llegar Inter, el valor no salta de línea (CLS).
+ */
+function ListaDatos({
+  datos,
+  clase,
+  apilado = false,
+}: {
+  datos: DatoDestacado[];
+  clase: string;
+  apilado?: boolean;
+}) {
   if (datos.length === 0) return null;
   return (
     <ul className={clase}>
       {datos.map((d) => (
         <li key={`${d.etiqueta}-${d.valor}`}>
           <IconoDato icono={d.icono} className={estilos.iconoDato} />
-          <span>
+          <span className={apilado ? estilos.datoApilado : undefined}>
             <b>{d.etiqueta}:</b> {d.valor}
           </span>
         </li>
@@ -205,7 +217,7 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
             {equipo.nombre}
           </h1>
 
-          <ListaDatos datos={datos} clase={`${estilos.datos} texto-destacado`} />
+          <ListaDatos datos={datos} clase={`${estilos.datos} texto-destacado`} apilado />
 
           <div className={`${estilos.botones} ${estilos.noImprimir}`}>
             <a href={`#${ANCLA_COTIZAR}`} className={`${estilos.boton} texto-etiqueta`}>

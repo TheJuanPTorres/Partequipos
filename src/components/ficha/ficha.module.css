@@ -300,6 +300,11 @@
   backdrop-filter: blur(18px);
 }
 
+.datoApilado {
+  display: flex;
+  flex-direction: column;
+}
+
 .iconoDato {
   width: 1em;
   height: 1lh;

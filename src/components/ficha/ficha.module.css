@@ -284,9 +284,13 @@
  */
 .datos li {
   display: flex;
-  align-items: center;
+  /*
+   * Arriba y con alto mínimo de dos líneas: si al llegar Inter el dato cambia
+   * de línea, ni la primera línea ni la fila se mueven (CLS).
+   */
+  align-items: flex-start;
   gap: 8px;
-  min-height: 55px;
+  min-height: calc(2lh + 20px);
   padding: 10px 16px;
   border: 1px solid rgb(255 255 255 / 0.25);
   border-radius: var(--ficha-radio);
@@ -298,7 +302,7 @@
 
 .iconoDato {
   width: 1em;
-  height: 1em;
+  height: 1lh;
   flex: none;
   color: var(--color-marca);
 }

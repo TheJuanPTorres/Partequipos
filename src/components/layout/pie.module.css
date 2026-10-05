@@ -180,8 +180,12 @@
  */
 .hueco {
   flex: 0 0 59%;
+  /* Sin esto, el `min-width: auto` del elemento flexible se estira hasta los
+     476 px del buscador y en móvil se sale del panel (medido a 390). */
+  min-width: 0;
   min-height: 56px;
   display: flex;
+  align-items: flex-start;
   justify-content: flex-end;
 }
 

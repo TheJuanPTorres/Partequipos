@@ -206,7 +206,37 @@
   color: var(--color-marca);
 }
 
+/*
+ * Entrada con megamenú (export 2162 del 2026-10-05): un BOTÓN con flecha que
+ * abre el panel. Abierto, en rojo y con la flecha hacia arriba, como en ux-9.
+ */
+.disparador {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.disparador svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.disparador[aria-expanded="true"],
+.disparador[data-actual="si"] {
+  color: var(--color-marca);
+}
+
+.disparador[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
 .enlace:focus-visible,
+.disparador:focus-visible,
 .icono:focus-visible,
 .hamburguesa:focus-visible {
   outline: 2px solid var(--color-marca);

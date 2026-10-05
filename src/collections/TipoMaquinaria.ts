@@ -4,6 +4,9 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarTipoMaquinaria, revalidarTipoMaquinariaBorrado } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { revalidarMegamenu } from "./hooks/megamenuHooks";
+
+const menu = revalidarMegamenu("tipos-maquinaria");
 
 /**
  * Tipo de equipo dentro de una marca de maquinaria nueva
@@ -23,7 +26,10 @@ export const TipoMaquinaria: CollectionConfig = {
     update: escrituraContenido,
     delete: borradoAdmin,
   },
-  hooks: { afterChange: [revalidarTipoMaquinaria], afterDelete: [revalidarTipoMaquinariaBorrado] },
+  hooks: {
+    afterChange: [revalidarTipoMaquinaria, menu.afterChange],
+    afterDelete: [revalidarTipoMaquinariaBorrado, menu.afterDelete],
+  },
   /*
    * Unicidad del slug POR MARCA, igual que en repuestos: `excavadoras` existe
    * bajo Case y bajo Hitachi, y la URL las distingue. Con unicidad global la

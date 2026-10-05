@@ -1,0 +1,186 @@
+/*
+ * MEGAMENÚ — export 2162 del 2026-10-05 de Andrés, MEDIDO en ux-9 pintado a
+ * 1440 (decisiones-home-ux9.md §26):
+ * - Caja blanca de 500 px centrada en la ventana, 39 px de relleno, esquinas
+ *   inferiores de 30 px, que empieza 4 px por encima del borde de la barra.
+ * - Entra con un fundido desde arriba de 550 ms (`fade_in_top`).
+ * - Nivel 1: recuadro de 1 px #d5d8dc, radio 10, relleno 15, 10 px entre
+ *   ellos, texto 16 px en peso 500.
+ * - Niveles 2 y 3: sin recuadro, relleno 10, filete inferior #fafafa, 400.
+ * - Abierto: título en el rojo de marca y «−» en lugar de «+».
+ * - Hojas: marca roja, texto 16 px peso 300 en el gris `secondary`, 5 px entre
+ *   ellas.
+ * Solo en escritorio (≥ 1025 px): por debajo, la cabecera es la móvil.
+ */
+
+.panel {
+  --mega-arriba: 96px;
+
+  position: fixed;
+  z-index: 49;
+  top: var(--mega-arriba);
+  left: 50%;
+  width: 500px;
+  max-width: calc(100vw - 40px);
+  visibility: hidden;
+  opacity: 0;
+  transform: translate(-50%, -12px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease,
+    visibility 0s linear 0.55s,
+    top 0.4s ease-in-out;
+}
+
+/* Encogida, la barra mide 70 px: el panel sube con ella. */
+.panel[data-encogida="si"] {
+  --mega-arriba: 66px;
+}
+
+.panel[data-abierto="si"] {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease,
+    visibility 0s linear 0s,
+    top 0.4s ease-in-out;
+}
+
+@media (max-width: 1024px) {
+  .panel {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panel[data-abierto="si"] {
+    transform: translate(-50%, 0);
+    transition: none;
+  }
+}
+
+.caja {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Un panel largo (repuestos con el CSV) se desplaza por dentro. */
+  max-height: calc(100vh - var(--mega-arriba) - 20px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 39px;
+  border-radius: 0 0 30px 30px;
+  background: var(--color-fondo);
+}
+
+.verTodo {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  padding: 4px 0;
+  color: var(--color-marca);
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.verTodo svg {
+  width: 16px;
+  height: 16px;
+}
+
+.verTodo:hover {
+  text-decoration: underline;
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-bottom: 1px solid #fafafa;
+  background: none;
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4; /* 43 px de alto, como ux-9 */
+  text-align: left;
+  cursor: pointer;
+}
+
+.titulo svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.titulo:hover,
+.acordeon[data-abierto="si"] > .titulo {
+  color: var(--color-marca);
+}
+
+/* Nivel 1: el recuadro del diseño. */
+.acordeon[data-nivel="1"] > .titulo {
+  padding: 15px;
+  border: 1px solid #d5d8dc;
+  border-radius: 10px;
+  font-weight: 500;
+  line-height: 1; /* 48 px de alto, como ux-9 */
+}
+
+.contenido {
+  padding: 10px 0 0 10px;
+}
+
+.acordeon[data-nivel="1"] > .contenido {
+  padding: 10px 10px 0;
+}
+
+.contenido[hidden] {
+  display: none;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 10px;
+  list-style: none;
+}
+
+.hoja {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-texto-suave);
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.hoja svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--color-marca);
+}
+
+.hoja:hover {
+  color: var(--color-marca);
+}
+
+.verTodo:focus-visible,
+.titulo:focus-visible,
+.hoja:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

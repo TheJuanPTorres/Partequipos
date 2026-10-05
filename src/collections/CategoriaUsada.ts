@@ -4,6 +4,9 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarCategoriaUsada, revalidarCategoriaUsadaBorrada } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { revalidarMegamenu } from "./hooks/megamenuHooks";
+
+const menu = revalidarMegamenu("categorias-usada");
 
 /**
  * Categorías de la línea USADA: las 9 rutas indexadas bajo
@@ -28,7 +31,10 @@ export const CategoriaUsada: CollectionConfig = {
     update: escrituraContenido,
     delete: borradoAdmin,
   },
-  hooks: { afterChange: [revalidarCategoriaUsada], afterDelete: [revalidarCategoriaUsadaBorrada] },
+  hooks: {
+    afterChange: [revalidarCategoriaUsada, menu.afterChange],
+    afterDelete: [revalidarCategoriaUsadaBorrada, menu.afterDelete],
+  },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
     slugField({ unique: true }),

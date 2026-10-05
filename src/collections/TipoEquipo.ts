@@ -4,6 +4,9 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarTipo, revalidarTipoBorrado } from "./hooks/revalidateHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { revalidarMegamenu } from "./hooks/megamenuHooks";
+
+const menu = revalidarMegamenu("tipos-equipo");
 
 /**
  * Tipo de equipo dentro de una marca (ej. "Excavadora" de CAT).
@@ -31,8 +34,8 @@ export const TipoEquipo: CollectionConfig = {
   indexes: [{ fields: ["marca", "slug"], unique: true }],
   // ISR: revalida el tipo, la página de su marca y las fichas de sus modelos.
   hooks: {
-    afterChange: [revalidarTipo],
-    afterDelete: [revalidarTipoBorrado],
+    afterChange: [revalidarTipo, menu.afterChange],
+    afterDelete: [revalidarTipoBorrado, menu.afterDelete],
   },
   fields: [
     {

@@ -3,6 +3,9 @@ import type { CollectionConfig } from "payload";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarMarca, revalidarMarcaBorrada } from "./hooks/revalidateHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { revalidarMegamenu } from "./hooks/megamenuHooks";
+
+const menu = revalidarMegamenu("marcas");
 
 /**
  * Marcas de maquinaria y repuestos (Caterpillar, CASE, etc.).
@@ -26,8 +29,8 @@ export const Marca: CollectionConfig = {
   },
   // ISR: revalida la marca, los índices y su subárbol. Ver lib/revalidation.ts.
   hooks: {
-    afterChange: [revalidarMarca],
-    afterDelete: [revalidarMarcaBorrada],
+    afterChange: [revalidarMarca, menu.afterChange],
+    afterDelete: [revalidarMarcaBorrada, menu.afterDelete],
   },
   fields: [
     {

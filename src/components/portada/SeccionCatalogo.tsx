@@ -2,7 +2,6 @@ import { IconBrandWhatsapp, IconTruck } from "@tabler/icons-react";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
-import { ADELANTOS } from "@/components/movimiento/ritmos";
 
 import estilos from "./catalogo.module.css";
 
@@ -28,18 +27,13 @@ export type TextosCatalogo = {
   whatsappTexto: string;
 };
 
-type Props = { whatsapp: string; sobreVideo: boolean; textos: TextosCatalogo };
+type Props = { whatsapp: string; textos: TextosCatalogo };
 
-export function SeccionCatalogo({ whatsapp, sobreVideo, textos }: Props) {
+export function SeccionCatalogo({ whatsapp, textos }: Props) {
   return (
-    <section
-      className={estilos.seccion}
-      aria-labelledby="portada-catalogo-titulo"
-      data-sin-video={sobreVideo ? undefined : ""}
-    >
+    <section className={estilos.seccion} aria-labelledby="portada-catalogo-titulo">
       {textos.titulo ? (
         <Revelado
-          adelanto={ADELANTOS.bajo}
           como="h2"
           id="portada-catalogo-titulo"
           texto={textos.titulo}

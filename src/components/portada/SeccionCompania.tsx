@@ -18,12 +18,20 @@ import { DialogoYouTube } from "./DialogoYouTube";
  * SECCIONES 6 Y 7 DE LA PORTADA — «Nuestra Compañía» (ux-9).
  *
  * La 6 de ux-9 no pinta nada: es el código del efecto. Aquí ese efecto va
- * dentro de esta sección, sin GSAP (docs/diseno/decisiones-home-ux9.md §19):
+ * dentro de esta sección, sin GSAP (docs/diseno/decisiones-home-ux9.md §19).
  *
- * - El vídeo se FIJA 350 px de scroll (CSS `sticky`) y se encoge a 0,4 con
- *   radio 32, lineal. Una capa blanca fija entra en el primer 8 % del recorrido
- *   y se apaga del 75 al 100 %. Detrás, un texto en movimiento a 90 px/s.
- * - Solo por encima de 768 px, como ux-9 (`matchMedia('(max-width: 768px)')`).
+ * COREOGRAFÍA (decisión de dirección del 2026-10-05, §27.5), por scroll y en
+ * TODOS los anchos:
+ * 1. El vídeo se FIJA (CSS `sticky`) 700 px de scroll y se encoge a 0,4 (0,55 en
+ *    móvil) con radio 32, en la primera mitad del recorrido.
+ * 2. Mientras termina de encogerse, aparece el texto infinito que tiene detrás.
+ * 3. Al soltarse el fijado entra la sección 8, DEBAJO (nunca encima del vídeo),
+ *    y su título hace su barrido al entrar.
+ * Una capa blanca fija entra en el primer 8 % del recorrido y se apaga del 75 al
+ * 100 %, como ux-9. Con movimiento reducido, todo estático en su sitio: el
+ * vídeo a tamaño completo, el texto debajo y quieto, sin fijado.
+ * Sin CLS: el alto del recorrido es fijo en el CSS y solo se mueven
+ * `transform` y `opacity`.
  *
  * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): reproduce y pausa el
  * vídeo, escucha el scroll y mide el texto en movimiento.
@@ -38,9 +46,15 @@ import { DialogoYouTube } from "./DialogoYouTube";
  *   en oscuro con su texto. Sin YouTube, sin botón de reproducir.
  */
 
-/** ux-9: `SCROLL_DIST`, `END_SCALE`, `END_RADIUS`. */
-const RECORRIDO_PX = 350;
+/** El recorrido fijado (el `.recorrido` del CSS suma estos 700 px). */
+const RECORRIDO_PX = 700;
+/** Fases, en fracción del recorrido: encogido y aparición del texto infinito. */
+const FIN_ENCOGIDO = 0.5;
+const TEXTO_DESDE = 0.35;
+const TEXTO_HASTA = 0.65;
+/** ux-9: `END_SCALE` y `END_RADIUS`; en móvil se queda más grande para que se vea. */
 const ESCALA_FINAL = 0.4;
+const ESCALA_FINAL_MOVIL = 0.55;
 const RADIO_FINAL_PX = 32;
 /** ux-9: `scrub: 0.6` — el efecto alcanza al scroll en ~0,6 s. */
 const ALCANCE_S = 0.6;
@@ -65,12 +79,16 @@ function opacidadFondo(p: number): number {
   return 1 - (p - 0.75) / 0.25;
 }
 
+const tramo = (p: number, desde: number, hasta: number) =>
+  Math.min(1, Math.max(0, (p - desde) / (hasta - desde)));
+
 export function SeccionCompania({ video, youtube, textos }: Props) {
   const recorrido = useRef<HTMLDivElement>(null);
   const encoge = useRef<HTMLDivElement>(null);
   const fondo = useRef<HTMLDivElement>(null);
   const tarjeta = useRef<HTMLDivElement>(null);
   const pista = useRef<HTMLDivElement>(null);
+  const marquee = useRef<HTMLDivElement>(null);
   const grupo = useRef<HTMLDivElement>(null);
   const elVideo = useRef<HTMLVideoElement>(null);
   const reducido = useMovimientoReducido();
@@ -109,19 +127,19 @@ export function SeccionCompania({ video, youtube, textos }: Props) {
     return () => removeEventListener("resize", medir);
   }, []);
 
-  // Encogido ligado al scroll, solo > 768 px y con movimiento.
+  // Coreografía ligada al scroll, en todos los anchos, si hay movimiento.
   useEffect(() => {
     const zona = recorrido.current;
     const caja = encoge.current;
     const blanco = fondo.current;
-    if (!zona || !caja || !blanco || reducido) return;
-    const mq = matchMedia("(max-width: 768px)");
+    const texto = marquee.current;
+    if (!zona || !caja || !blanco || !texto || reducido) return;
+    const mq = matchMedia("(max-width: 767px)");
     let frame = 0;
     let actual = 0;
     let antes = 0;
 
     const objetivo = () => {
-      if (mq.matches) return 0;
       const inicio = zona.getBoundingClientRect().top + scrollY;
       return Math.min(1, Math.max(0, (scrollY - inicio) / RECORRIDO_PX));
     };
@@ -132,8 +150,11 @@ export function SeccionCompania({ video, youtube, textos }: Props) {
       // Alcanza a la meta en ~0,6 s, como el `scrub` de ux-9.
       actual += (meta - actual) * Math.min(1, dt / (ALCANCE_S / 4));
       if (Math.abs(meta - actual) < 0.001) actual = meta;
-      caja.style.setProperty("--compania-escala", String(1 - (1 - ESCALA_FINAL) * actual));
-      caja.style.setProperty("--compania-radio", `${RADIO_FINAL_PX * actual}px`);
+      const encogido = tramo(actual, 0, FIN_ENCOGIDO);
+      const final = mq.matches ? ESCALA_FINAL_MOVIL : ESCALA_FINAL;
+      caja.style.setProperty("--compania-escala", String(1 - (1 - final) * encogido));
+      caja.style.setProperty("--compania-radio", `${RADIO_FINAL_PX * encogido}px`);
+      texto.style.opacity = String(tramo(actual, TEXTO_DESDE, TEXTO_HASTA));
       blanco.style.opacity = String(opacidadFondo(actual));
       frame = actual === meta ? 0 : requestAnimationFrame(pintar);
     };
@@ -164,6 +185,7 @@ export function SeccionCompania({ video, youtube, textos }: Props) {
       if (frame) cancelAnimationFrame(frame);
       caja.style.removeProperty("--compania-escala");
       caja.style.removeProperty("--compania-radio");
+      texto.style.removeProperty("opacity");
       blanco.style.opacity = "0";
     };
   }, [reducido]);
@@ -195,6 +217,7 @@ export function SeccionCompania({ video, youtube, textos }: Props) {
         <div className={estilos.fijado}>
           {/* Detrás del vídeo: se descubre al encogerse. Decorativo para el lector (D21). */}
           <div
+            ref={marquee}
             className={estilos.marquee}
             aria-hidden="true"
             data-pausado={pausado ? "" : undefined}

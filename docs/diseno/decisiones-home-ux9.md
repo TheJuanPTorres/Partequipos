@@ -2264,3 +2264,34 @@ Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.
 - **Corrige §14.4 y §10.36:** allí se dio por hecho que los ~190 px de hueco a
   390 eran de la maqueta de ux-9. No lo eran: ux-9 pinta otra cosa que su
   export.
+
+### 27.5 Secciones 6–8: coreografía nueva por scroll — DESVIACIÓN DE ux-9 POR DECISIÓN DE DIRECCIÓN
+
+- **Qué pidió dirección:** el título oscuro de la sección 8 («Encuentra la
+  maquinaria…») va DEBAJO del vídeo, nunca encima. En móvil quedaba sobre el
+  final del vídeo, porque la sección 8 sube 180 px, como en ux-9.
+- **Coreografía, en todos los anchos** (antes, solo por encima de 768 px, como
+  ux-9):
+  1. El vídeo se fija **700 px de scroll** (antes 350) y en la primera mitad se
+     encoge a **0,4** (**0,55 en móvil**, para que siga viéndose), con radio 32.
+  2. Del 35 % al 65 % del recorrido **aparece el texto infinito** que tiene
+     detrás. Antes se descubría sin más, al encogerse el vídeo.
+  3. Al soltarse el fijado entra la sección 8 **debajo**, a 40 px y sin el
+     margen de −180 px. Su título hace el barrido al entrar, **sin adelanto**
+     (§27.3): tiene que esperar al final de la coreografía.
+  - La capa blanca fija de ux-9 sigue: entra en el primer 8 % y se apaga del
+    75 al 100 %.
+- **Movimiento reducido:** todo estático en su sitio. Sin fijado ni encogido;
+  el vídeo (su póster) a tamaño completo, el texto infinito quieto debajo, y
+  los títulos visibles.
+- **CLS 0:** el alto del recorrido es fijo en el CSS (`100svh` + 700 px, sin
+  saltos por la barra del navegador del móvil), y solo se mueven `transform`
+  y `opacity`. Medido a 390, 1010 y 1440.
+- **Comprobado** en local y en el preview, con 11 fotogramas por ancho: el
+  título de la 8 nunca coincide con el vídeo en pantalla.
+- **Capturas para dirección:** `partequipos-cierre\capturas\home-coreografia\`.
+- **Para Andrés:**
+  - es otra coreografía que la suya (tres fases ligadas al scroll, también en
+    móvil);
+  - la sección 8 ya no se monta sobre la 7;
+  - en móvil el vídeo se queda al 55 % y no al 40 %.

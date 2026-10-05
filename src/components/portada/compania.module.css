@@ -22,9 +22,14 @@
   pointer-events: none;
 }
 
-/* El recorrido del fijado: el alto de la pantalla más los 350 px del efecto. */
+/*
+ * El recorrido del fijado: el alto de la pantalla más los 700 px de la
+ * coreografía (§27.5). `svh` para que la barra del navegador del móvil, al
+ * aparecer y desaparecer, no cambie el alto (sin CLS).
+ */
 .recorrido {
-  height: calc(100vh + 350px);
+  height: calc(100vh + 700px);
+  height: calc(100svh + 700px);
 }
 
 .fijado {
@@ -32,6 +37,7 @@
   top: 0;
   z-index: 2;
   height: 100vh;
+  height: 100svh;
 }
 
 .encoge {
@@ -51,6 +57,7 @@
   display: flex;
   box-sizing: border-box;
   min-height: 100vh;
+  min-height: 100svh;
   padding: 10px;
   overflow: hidden;
   align-items: center;
@@ -153,6 +160,10 @@
 
 /* ------------------------------------------------- texto en movimiento */
 
+/*
+ * Detrás del vídeo y oculto hasta la fase 2 de la coreografía (la opacidad la
+ * pone el componente). Sin JavaScript no se ve: el vídeo lo tapa igual.
+ */
 .marquee {
   position: absolute;
   inset: 0;
@@ -160,6 +171,7 @@
   display: flex;
   overflow: hidden;
   align-items: center;
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -223,10 +235,12 @@
   }
 }
 
-/* ---------------------------------------------------- 768 px o menos */
-
-/* Como ux-9: sin fijado, sin encogido y sin texto en movimiento. */
-@media (max-width: 768px) {
+/*
+ * MOVIMIENTO REDUCIDO (§27.5): todo estático en su sitio. Sin fijado ni
+ * encogido; el vídeo (el póster) a tamaño completo y, debajo, el texto
+ * infinito quieto, en una línea.
+ */
+@media (prefers-reduced-motion: reduce) {
   .recorrido {
     height: auto;
   }
@@ -236,27 +250,19 @@
     height: auto;
   }
 
-  /* Sin capas: la sección 8 sube encima del final del vídeo, como en ux-9. */
   .encoge {
-    z-index: auto;
     height: auto;
     transform: none;
   }
 
-  .marquee,
   .fondoBlanco {
     display: none;
   }
 
-  /* Arriba: abajo lo tapa el título de la sección 8, que sube sobre el vídeo. */
-  .pausa {
-    top: 24px;
-    bottom: auto;
-  }
-
-  /* Sin vídeo no se mueve nada: no hay qué pausar. */
-  .seccion:not([data-con-video]) .pausa {
-    display: none;
+  .marquee {
+    position: static;
+    padding: 24px 0;
+    opacity: 1;
   }
 }
 

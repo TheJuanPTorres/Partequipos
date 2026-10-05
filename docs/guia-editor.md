@@ -178,7 +178,10 @@ oficial, no lo pongas.
 
 ### 5.9 Menú, pie y datos de la empresa
 
-- **Cabecera:** enlaces del menú y botón.
+- **Cabecera:** enlaces del menú y botón. Los desplegables de «Maquinaria
+  Pesada» y «Repuestos» se llenan **solos** con las marcas, los tipos y las
+  categorías del catálogo: al crear una marca o un tipo, sale en el menú sin
+  hacer nada más.
 - **Pie de página:** columnas de enlaces, lema y textos.
 - Los enlaces son rutas del sitio que empiezan por «/» (p. ej.
   `/contactanos/`) o direcciones completas `https://…`.

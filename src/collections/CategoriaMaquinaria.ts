@@ -4,6 +4,9 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarCategoriaNueva, revalidarCategoriaNuevaBorrada } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { revalidarMegamenu } from "./hooks/megamenuHooks";
+
+const menu = revalidarMegamenu("categorias-maquinaria");
 
 /**
  * Categorías transversales de la línea NUEVA
@@ -31,7 +34,10 @@ export const CategoriaMaquinaria: CollectionConfig = {
     update: escrituraContenido,
     delete: borradoAdmin,
   },
-  hooks: { afterChange: [revalidarCategoriaNueva], afterDelete: [revalidarCategoriaNuevaBorrada] },
+  hooks: {
+    afterChange: [revalidarCategoriaNueva, menu.afterChange],
+    afterDelete: [revalidarCategoriaNuevaBorrada, menu.afterDelete],
+  },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
     slugField({ unique: true }),

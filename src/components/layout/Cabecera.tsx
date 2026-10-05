@@ -1,15 +1,17 @@
 "use client";
 
-import { IconHeadset, IconMail, IconMenu2, IconX } from "@tabler/icons-react";
+import { IconChevronDown, IconHeadset, IconMail, IconMenu2, IconX } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSelectedLayoutSegment } from "next/navigation";
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { Fragment, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 
 import { useMovimientoReducido } from "@/components/movimiento/useMovimiento";
+import { claveDeEnlace, type PanelMenu } from "@/lib/megamenu";
 import type { ImagenLogo } from "@/lib/seo/logo";
 
 import estilos from "./cabecera.module.css";
+import { Megamenu } from "./Megamenu";
 
 /**
  * CABECERA DEL SITIO (ux-9, export 2629 = plantilla 2162). Valores en `cabecera.module.css`.
@@ -27,6 +29,10 @@ import estilos from "./cabecera.module.css";
  *   movimiento reducido no se esconde.
  * - Menú móvil: Escape lo cierra y devuelve el foco al botón; al abrir, el foco
  *   va al primer enlace.
+ * - MEGAMENÚ de escritorio (§26): los enlaces del global cuya ruta tiene panel
+ *   (maquinaria y repuestos) son BOTONES que lo abren —con el ratón al pasar,
+ *   con clic o con Intro/Espacio—; Escape lo cierra y devuelve el foco. El
+ *   menú móvil no cambia: ahí siguen siendo enlaces.
  */
 
 type Enlace = { etiqueta: string; href: string };
@@ -40,7 +46,15 @@ type Props = {
   logo: ImagenLogo;
   nombreSitio: string;
   tituloPortada: string;
+  /** Paneles del megamenú por clave de enlace (`getMegamenu`). */
+  paneles: Readonly<Record<string, PanelMenu>>;
 };
+
+/** Margen para cruzar del botón al panel con el ratón sin que se cierre. */
+const RETARDO_CIERRE = 200;
+
+/** Id del panel de una clave de enlace: `/maquinaria-pesada/` → `mega-maquinariapesada`. */
+const idPanel = (clave: string) => `mega-${clave.replace(/[^a-z0-9]+/gi, "")}`;
 
 /*
  * Umbrales de ux-9, MEDIDOS en su plugin («Sticky Header Effects» 2.2.3): el
@@ -87,7 +101,15 @@ function Logo({
   );
 }
 
-export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, tituloPortada }: Props) {
+export function Cabecera({
+  enlaces,
+  contacto,
+  whatsapp,
+  logo,
+  nombreSitio,
+  tituloPortada,
+  paneles,
+}: Props) {
   const esPortada = useSelectedLayoutSegment() === null;
   const ruta = usePathname();
   const reducido = useMovimientoReducido();
@@ -99,6 +121,13 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, titul
   const abierto = abiertoEn === ruta;
   const boton = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
+  const cabecera = useRef<HTMLElement>(null);
+  // Megamenú: qué panel está abierto y en qué ruta (como el menú móvil).
+  const [mega, setMega] = useState<{ clave: string; ruta: string } | null>(null);
+  const megaAbierto = mega?.ruta === ruta ? mega.clave : null;
+  const disparadores = useRef<Record<string, HTMLButtonElement | null>>({});
+  const paneMega = useRef<Record<string, HTMLElement | null>>({});
+  const temporizador = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     let ultimo = window.scrollY;
@@ -125,14 +154,72 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, titul
     boton.current?.focus();
   };
 
+  // Clic fuera de la cabecera y del panel: se cierra el megamenú.
+  useEffect(() => {
+    if (!megaAbierto) return;
+    const fuera = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (cabecera.current?.contains(t) || paneMega.current[megaAbierto]?.contains(t)) return;
+      setMega(null);
+    };
+    document.addEventListener("pointerdown", fuera);
+    return () => document.removeEventListener("pointerdown", fuera);
+  }, [megaAbierto]);
+
+  useEffect(() => () => window.clearTimeout(temporizador.current), []);
+
+  const abrirMega = (clave: string) => {
+    window.clearTimeout(temporizador.current);
+    setMega({ clave, ruta });
+  };
+
+  const cerrarMegaLuego = () => {
+    window.clearTimeout(temporizador.current);
+    temporizador.current = window.setTimeout(() => setMega(null), RETARDO_CIERRE);
+  };
+
+  const cerrarMega = (foco: "boton" | "siguiente" | null) => {
+    const clave = megaAbierto;
+    window.clearTimeout(temporizador.current);
+    setMega(null);
+    if (!clave || !foco) return;
+    const disparador = disparadores.current[clave];
+    if (foco === "boton" || !disparador) {
+      disparador?.focus();
+      return;
+    }
+    // Lo enfocable que sigue al botón dentro de la cabecera.
+    const enfocables = [
+      ...(cabecera.current?.querySelectorAll<HTMLElement>("a[href], button") ?? []),
+    ].filter((el) => el.offsetParent !== null);
+    enfocables[enfocables.indexOf(disparador) + 1]?.focus();
+  };
+
+  const alPulsarDisparador = (clave: string) => (e: MouseEvent<HTMLButtonElement>) => {
+    // Con el teclado (Intro o Espacio) el clic llega con `detail` 0.
+    const conTeclado = e.detail === 0;
+    if (megaAbierto === clave && conTeclado) {
+      setMega(null);
+      return;
+    }
+    abrirMega(clave);
+    if (conTeclado) {
+      window.setTimeout(() => paneMega.current[clave]?.querySelector<HTMLElement>("a")?.focus(), 0);
+    }
+  };
+
   const alTeclado = (e: KeyboardEvent<HTMLElement>) => {
-    if (e.key === "Escape" && abierto) {
+    if (e.key !== "Escape") return;
+    if (megaAbierto) {
+      e.preventDefault();
+      cerrarMega("boton");
+    } else if (abierto) {
       e.preventDefault();
       cerrar();
     }
   };
 
-  const esconder = oculta && !abierto && !reducido;
+  const esconder = oculta && !abierto && !megaAbierto && !reducido;
   const actual = (href: string) => (ruta === href || ruta.startsWith(href) ? "page" : undefined);
 
   const listaEnlaces = (
@@ -147,6 +234,42 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, titul
     </ul>
   );
 
+  // Escritorio: las entradas con panel son botones; el resto, enlaces.
+  const listaEscritorio = (
+    <ul className={estilos.lista}>
+      {enlaces.map((e) => {
+        const clave = claveDeEnlace(e.href);
+        if (!paneles[clave]) {
+          return (
+            <li key={e.href}>
+              <Link href={e.href} className={estilos.enlace} aria-current={actual(e.href)}>
+                {e.etiqueta}
+              </Link>
+            </li>
+          );
+        }
+        return (
+          <li key={e.href} onMouseEnter={() => abrirMega(clave)} onMouseLeave={cerrarMegaLuego}>
+            <button
+              ref={(el) => {
+                disparadores.current[clave] = el;
+              }}
+              type="button"
+              className={`${estilos.enlace} ${estilos.disparador}`}
+              aria-expanded={megaAbierto === clave}
+              aria-controls={idPanel(clave)}
+              data-actual={actual(e.href) ? "si" : undefined}
+              onClick={alPulsarDisparador(clave)}
+            >
+              {e.etiqueta}
+              <IconChevronDown aria-hidden="true" focusable="false" stroke={2} />
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+
   const botonContacto = contacto ? (
     <Link href={contacto.href} className={`${estilos.boton} texto-etiqueta`}>
       <IconMail aria-hidden="true" focusable="false" stroke={1.75} />
@@ -155,60 +278,86 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, titul
   ) : null;
 
   return (
-    <header
-      className={estilos.cabecera}
-      data-portada={esPortada ? "si" : "no"}
-      data-modo={!esPortada || abierto ? "solido" : arriba ? "transparente" : "velo"}
-      data-encogida={arriba ? "no" : "si"}
-      data-oculta={esconder ? "si" : "no"}
-      // El foco de teclado la hace reaparecer (decisión 5).
-      onFocusCapture={() => setOculta(false)}
-      onKeyDown={alTeclado}
-    >
-      {/* UNA fila y UN logo: el `<h1>` de la portada no puede quedar oculto en ningún ancho. */}
-      <div className={estilos.fila}>
-        <a
-          href={whatsapp}
-          className={`${estilos.icono} ${estilos.soloMovil}`}
-          aria-label="Atención al cliente por WhatsApp"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <IconHeadset aria-hidden="true" focusable="false" stroke={1.5} />
-        </a>
-        <div className={estilos.logoCol}>
-          <Logo
-            logo={logo}
-            esPortada={esPortada}
-            nombreSitio={nombreSitio}
-            tituloPortada={tituloPortada}
-          />
+    <Fragment>
+      <header
+        ref={cabecera}
+        className={estilos.cabecera}
+        data-portada={esPortada ? "si" : "no"}
+        data-modo={!esPortada || abierto ? "solido" : arriba ? "transparente" : "velo"}
+        data-encogida={arriba ? "no" : "si"}
+        data-oculta={esconder ? "si" : "no"}
+        // El foco de teclado la hace reaparecer (decisión 5).
+        onFocusCapture={() => setOculta(false)}
+        onKeyDown={alTeclado}
+      >
+        {/* UNA fila y UN logo: el `<h1>` de la portada no puede quedar oculto en ningún ancho. */}
+        <div className={estilos.fila}>
+          <a
+            href={whatsapp}
+            className={`${estilos.icono} ${estilos.soloMovil}`}
+            aria-label="Atención al cliente por WhatsApp"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconHeadset aria-hidden="true" focusable="false" stroke={1.5} />
+          </a>
+          <div className={estilos.logoCol}>
+            <Logo
+              logo={logo}
+              esPortada={esPortada}
+              nombreSitio={nombreSitio}
+              tituloPortada={tituloPortada}
+            />
+          </div>
+          <nav className={estilos.nav} aria-label="Navegación principal">
+            {listaEscritorio}
+          </nav>
+          <div className={estilos.accionCol}>{botonContacto}</div>
+          <button
+            ref={boton}
+            type="button"
+            className={`${estilos.hamburguesa} ${estilos.soloMovil}`}
+            aria-expanded={abierto}
+            aria-controls="menu-movil"
+            aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
+            onClick={() => setAbiertoEn(abierto ? null : ruta)}
+          >
+            {abierto ? (
+              <IconX aria-hidden="true" focusable="false" stroke={1.5} />
+            ) : (
+              <IconMenu2 aria-hidden="true" focusable="false" stroke={1.5} />
+            )}
+          </button>
         </div>
-        <nav className={estilos.nav} aria-label="Navegación principal">
-          {listaEnlaces}
-        </nav>
-        <div className={estilos.accionCol}>{botonContacto}</div>
-        <button
-          ref={boton}
-          type="button"
-          className={`${estilos.hamburguesa} ${estilos.soloMovil}`}
-          aria-expanded={abierto}
-          aria-controls="menu-movil"
-          aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
-          onClick={() => setAbiertoEn(abierto ? null : ruta)}
-        >
-          {abierto ? (
-            <IconX aria-hidden="true" focusable="false" stroke={1.5} />
-          ) : (
-            <IconMenu2 aria-hidden="true" focusable="false" stroke={1.5} />
-          )}
-        </button>
-      </div>
 
-      <div ref={panel} id="menu-movil" className={estilos.panel} hidden={!abierto}>
-        <nav aria-label="Menú">{listaEnlaces}</nav>
-        {botonContacto}
-      </div>
-    </header>
+        <div ref={panel} id="menu-movil" className={estilos.panel} hidden={!abierto}>
+          <nav aria-label="Menú">{listaEnlaces}</nav>
+          {botonContacto}
+        </div>
+      </header>
+
+      {/* Fuera de la cabecera: su `clip-path` recortaría el panel (§26). */}
+      {enlaces.flatMap((e) => {
+        const clave = claveDeEnlace(e.href);
+        const datos = paneles[clave];
+        if (!datos) return [];
+        return [
+          <Megamenu
+            key={clave}
+            ref={(el) => {
+              paneMega.current[clave] = el;
+            }}
+            id={idPanel(clave)}
+            etiqueta={e.etiqueta}
+            panel={datos}
+            abierto={megaAbierto === clave}
+            encogida={!arriba}
+            alCerrar={cerrarMega}
+            alEntrar={() => abrirMega(clave)}
+            alSalir={cerrarMegaLuego}
+          />,
+        ];
+      })}
+    </Fragment>
   );
 }

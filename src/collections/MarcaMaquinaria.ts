@@ -5,8 +5,11 @@ import { slugField } from "../lib/fields/slugField";
 import { revalidarMarcaMaquinaria, revalidarMarcaMaquinariaBorrada } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { revalidarPortada } from "./hooks/portadaHooks";
+import { revalidarMegamenu } from "./hooks/megamenuHooks";
 
 const portada = revalidarPortada("marcas-maquinaria");
+
+const menu = revalidarMegamenu("marcas-maquinaria");
 
 /**
  * Marcas de la línea de maquinaria NUEVA (Case Construction, Dynapac, Hitachi,
@@ -34,8 +37,8 @@ export const MarcaMaquinaria: CollectionConfig = {
     delete: borradoAdmin,
   },
   hooks: {
-    afterChange: [revalidarMarcaMaquinaria, portada.afterChange],
-    afterDelete: [revalidarMarcaMaquinariaBorrada, portada.afterDelete],
+    afterChange: [revalidarMarcaMaquinaria, portada.afterChange, menu.afterChange],
+    afterDelete: [revalidarMarcaMaquinariaBorrada, portada.afterDelete, menu.afterDelete],
   },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },

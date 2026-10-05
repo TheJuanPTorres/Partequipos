@@ -2080,4 +2080,62 @@ por posición en el árbol).
   - el panel de «Repuestos» repite los títulos de maquinaria;
   - «Aditamentos para maquinaria pesada» no tiene página.
 
-  No se replica hasta tener el contenido y los destinos.
+  No se replica hasta tener el contenido y los destinos. **RESUELTO el
+  2026-10-05:** construido con el contenido real del sitio (§26).
+  «Aditamentos» sí tenía página: es una «marca» de maquinaria nueva.
+
+## 26. Megamenú de escritorio (export 2162 del 2026-10-05) — PENDIENTE DE VALIDAR CON ANDRÉS
+
+Propuesta aprobada por dirección el 2026-10-05
+(`partequipos-cierre\propuestas\2026-10-05-megamenu.md`). Se respeta la FORMA
+del export de Andrés y el contenido sale del catálogo de Payload
+(`src/lib/megamenu.ts` y `getMegamenu`): las marcas de repuestos que traiga el
+CSV del cliente aparecerán solas.
+
+### 26.1 Lo que se replica (medido en ux-9 pintado a 1440)
+
+| Qué                | Valor                                                                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Entradas con panel | «Maquinaria Pesada» y «Repuestos», con flecha. Abiertas: en rojo y con la flecha hacia arriba                                        |
+| Caja               | Blanca, 500 px, centrada en la ventana, 39 px de relleno, esquinas inferiores de 30 px; empieza en y = 96 (66 con la barra encogida) |
+| Entrada            | Fundido desde arriba de 550 ms (`fade_in_top`). Con movimiento reducido, sin animación                                               |
+| Nivel 1            | Recuadro de 1 px #d5d8dc, radio 10, relleno 15, 48 px de alto, 10 px entre ellos, peso 500                                           |
+| Niveles 2 y 3      | Sin recuadro, relleno 10, 43 px de alto, filete inferior #fafafa                                                                     |
+| Abierto            | Título rojo y «−»; cerrado, «+»                                                                                                      |
+| Hojas              | Marca roja, 16 px, peso 300, gris `secondary`, 5 px entre ellas                                                                      |
+
+### 26.2 Decisiones (dirección, 2026-10-05)
+
+| #   | En el diseño                                                                    | Aquí                                                                                                                                                                                | Por qué                                                                                                           |
+| --- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| M1  | El título de la cabecera es un enlace que abre al pasar                         | Es un **botón** que abre el panel (al pasar, con clic o con Intro). Dentro, el primer enlace es «Ver toda la…» a la página de la sección, y cada acordeón empieza por su «Ver todo» | Decisión de dirección: con teclado y en pantallas táctiles, un enlace que también abre no se puede usar           |
+| M2  | «Aditamentos para maquinaria pesada» en el nivel 1 y otra vez dentro de «nueva» | **Una sola vez**, en el nivel 1                                                                                                                                                     | En el sitio, «Aditamentos» es una de las marcas de maquinaria nueva: las dos entradas llevarían a la misma página |
+| M3  | Dentro de «nueva», un segundo «Maquinaria pesada nueva»                         | **«Por tipo de máquina»**, con las 3 categorías de la nueva                                                                                                                         | Es la única otra vía real a la maquinaria nueva                                                                   |
+| M4  | «Maquinaria pesada usada» repite las marcas de la nueva                         | **Sin nivel de marcas**: sus 8 tipos                                                                                                                                                | La usada del sitio solo se organiza por tipo                                                                      |
+| M5  | «Repuestos» copia el panel de maquinaria                                        | **Solo «Repuestos por marca»** (marca → tipos)                                                                                                                                      | «Por categoría» queda fuera hasta que existan páginas de categoría técnica (propuesta de las 32 URL)              |
+| M6  | Iconos de Font Awesome (+, −, ✓)                                                | Tabler (`plus`, `minus`, `check`)                                                                                                                                                   | D6, licencia L2                                                                                                   |
+| M7  | Hojas de Dynapac                                                                | Las 7 tal como están en el catálogo                                                                                                                                                 | Lo decide el cliente (dos pares se solapan)                                                                       |
+
+### 26.3 Accesibilidad y SEO
+
+- **Divulgación, no `role="menu"`.** Cada título es un `<button>` con
+  `aria-expanded` y `aria-controls`, y lo mismo en los acordeones.
+- **Teclado:**
+  - Intro abre y lleva el foco al primer enlace.
+  - Tab recorre el panel; desde el último, cierra y pasa al siguiente enlace de la cabecera.
+  - Mayús+Tab desde el primero vuelve al botón.
+  - Escape cierra y devuelve el foco.
+  - El foco se ve en todo: contorno rojo de 2 px.
+- **Ratón:** se abre al pasar y se cierra al salir (200 ms de margen para cruzar
+  al panel) o con un clic fuera.
+- **Sin CLS:** el panel es `position: fixed` y va fuera de `<header>`, porque el
+  `clip-path` del encogido lo recortaría dentro. Medido: 0 al abrir y cerrar.
+- **SEO:** los enlaces están en el HTML del servidor aunque el panel esté
+  cerrado (`visibility: hidden`, sin JavaScript para pintarlos).
+- **Solo escritorio (≥ 1025 px).** El menú móvil no cambia: sigue con enlaces
+  directos.
+- **Al día solo:** si una marca, un tipo o una categoría cambia de nombre o de
+  slug, se crea o se borra, se revalida todo el sitio (`megamenuHooks.ts`),
+  porque el menú va en todas las páginas. Editar otra cosa no lo dispara.
+- **Coste en el build:** seis consultas ligeras por página (solo nombre, slug y
+  marca, `depth: 0`), memoizadas por petición (§10.10).

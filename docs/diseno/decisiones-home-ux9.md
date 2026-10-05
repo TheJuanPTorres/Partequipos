@@ -2037,3 +2037,47 @@ El hueco del buscador se conserva **vacío**, con su ancho (59 %) y el alto de
 su botón (56 px), para que las filas del pie caigan como en ux-9
 (`pie.module.css`, `.hueco`). Cuando el cliente apruebe el buscador (fuera de
 la cola, CLAUDE.md §10.33 p.9), va en ese hueco.
+
+## 25. Cabecera y pie contra ux-9 publicado y el export del 2026-10-05
+
+Comparado lo pintado en producción con `partequipos.uxdesign.website` a 390,
+600, 800, 1010 y 1440, y los exports 2162 y 2178 del 2026-10-02 con los
+nuevos de `wordpress\cabecera-pie-2026-10-05\` (ids distintos: se compararon
+por posición en el árbol).
+
+### 25.1 Pie: aplicado (export 2178 del 2026-10-05)
+
+| Qué                           | ux-9 pintado                                                  | Antes                                                                      | Ahora                                                                                                           |
+| ----------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Columnas en tablet (768–1024) | Las tres en una fila, 30 · 25 · 39 %, relleno 20              | «Maquinaria pesada» sola a la derecha y las otras dos debajo, relleno 30   | Igual que ux-9 (a 1010: 273 · 227 · 355 px)                                                                     |
+| Empresa en tablet             | A todo el ancho, centrada; logo 39 % con techo de 285 px      | 39 % a la izquierda; logo de 140 px                                        | Igual que ux-9 (281 px a 800, 285 a 1010)                                                                       |
+| Columnas en móvil             | 48 % y 46 %, «Contacto» a todo el ancho; radio y relleno 20   | Dos por fila (también «Contacto»), radio y relleno 30                      | Igual que ux-9                                                                                                  |
+| Empresa en móvil              | Relleno 30, logo al 75 %, texto a todo el ancho               | Sin relleno; logo con techo de 280; texto con techo de 418                 | Igual que ux-9                                                                                                  |
+| Redes                         | Caja de 35 (25 en tablet y móvil), icono de 18, glifo relleno | Caja de 35 siempre, icono 23 al 80 %, de contorno                          | Igual que ux-9, con los iconos rellenos de Tabler (D6)                                                          |
+| Qué redes                     | LinkedIn, X, Facebook, TikTok y YouTube (todas a `#`)         | Solo Facebook, Instagram y YouTube: cualquier otra del panel se descartaba | Las seis (las cinco de ux-9 e Instagram), las que haya en el panel; `redDelPie` en `src/lib/pie.ts`, con prueba |
+
+**Sin igualar, a propósito:**
+
+- **Alto de las tarjetas:** en ux-9 son más altas porque llevan
+  «Trabaja con nosotros», «Zona de clientes», «Financiación» y cinco redes
+  (P1). Llegarán con las URL y las redes del cliente.
+- **Logo a 1010:** en ux-9 sale 90 px a la izquierda del centro, y a 800,
+  centrado. Se deja centrado en todo el tablet (`align_tablet: center` del
+  export).
+- **Redes:** en ux-9 empiezan 5 px más a la derecha (margen del widget).
+
+### 25.2 Cabecera
+
+- **Sin cambios de código.** Logo, menú, «Contáctanos», velo con desenfoque y
+  encogido al bajar coinciden a 1440; a 390 y 1010, la cabecera móvil
+  (atención al cliente, logo, hamburguesa) también. Los iconos siguen siendo
+  de Tabler (D6) y el menú móvil, el provisional (en ux-9 la hamburguesa no
+  abre nada).
+- **PENDIENTE DE ANDRÉS — megamenú.** El export nuevo convierte «Maquinaria
+  Pesada» y «Repuestos» en desplegables (flecha y panel blanco con acordeones
+  anidados). Pero el contenido es de **relleno**:
+  - las listas finales dicen «Elemento de lista nº1», sin enlaces;
+  - el panel de «Repuestos» repite los títulos de maquinaria;
+  - «Aditamentos para maquinaria pesada» no tiene página.
+
+  No se replica hasta tener el contenido y los destinos.

@@ -1,15 +1,18 @@
 import {
-  IconBrandFacebook,
-  IconBrandInstagram,
+  IconBrandFacebookFilled,
+  IconBrandInstagramFilled,
+  IconBrandLinkedinFilled,
+  IconBrandTiktokFilled,
   IconBrandWhatsapp,
-  IconBrandYoutube,
+  IconBrandXFilled,
+  IconBrandYoutubeFilled,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { enlaceWhatsApp } from "@/lib/navegacion";
-import { columnasDelPie, hrefTelefono, type ColumnaPie } from "@/lib/pie";
+import { columnasDelPie, hrefTelefono, redDelPie, type ColumnaPie, type RedPie } from "@/lib/pie";
 import { getPie } from "@/lib/queries/getPie";
 import { getEmpresa, getLogo } from "@/lib/queries/getSeo";
 import { imagenDeMedia } from "@/lib/utils/relations";
@@ -29,8 +32,9 @@ import estilos from "./pie.module.css";
  * Lo que se aparta de ux-9 (docs/diseno/decisiones-home-ux9.md §13):
  * - Enlaces SIN destino no se pintan: «Trabaja con nosotros», «Zona de
  *   clientes» y «Financiación» esperan su URL (pendiente del cliente).
- * - Redes: solo las de `seoConfig`, con su nombre real; el export trae
- *   etiquetas cruzadas. Iconos de Tabler.
+ * - Redes: las del panel que el pie sabe pintar (las cinco de ux-9 y
+ *   Instagram), con su nombre real; el export trae etiquetas cruzadas. Iconos
+ *   RELLENOS de Tabler, como los de marca de ux-9.
  * - Franja legal inferior (Ley 1581), con dirección, teléfono y correo (el
  *   correo, desde la fase 6: antes solo estaba en el bloque previo de la home).
  * - «Somos una empresa…» es párrafo, no `<h3>`: los títulos de columna son
@@ -41,11 +45,15 @@ import estilos from "./pie.module.css";
  *   `Media` y se elige en el global `pie`. Con §10.38 activa, la de ux-9.
  */
 
-const REDES = [
-  { patron: /facebook\./i, nombre: "Facebook", Icono: IconBrandFacebook },
-  { patron: /instagram\./i, nombre: "Instagram", Icono: IconBrandInstagram },
-  { patron: /youtube\./i, nombre: "YouTube", Icono: IconBrandYoutube },
-] as const;
+// ux-9 pinta LinkedIn, X, Facebook, TikTok y YouTube; Instagram es nuestra.
+const ICONOS: Record<RedPie, typeof IconBrandFacebookFilled> = {
+  LinkedIn: IconBrandLinkedinFilled,
+  X: IconBrandXFilled,
+  Facebook: IconBrandFacebookFilled,
+  Instagram: IconBrandInstagramFilled,
+  TikTok: IconBrandTiktokFilled,
+  YouTube: IconBrandYoutubeFilled,
+};
 
 function Columna({
   columna,
@@ -95,8 +103,8 @@ export async function Footer() {
       : [],
   );
   const redes = empresa.redes.flatMap((url) => {
-    const red = REDES.find((r) => r.patron.test(url));
-    return red ? [{ ...red, url }] : [];
+    const nombre = redDelPie(url);
+    return nombre ? [{ nombre, Icono: ICONOS[nombre], url }] : [];
   });
 
   return (
@@ -169,7 +177,7 @@ export async function Footer() {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <Icono aria-hidden="true" focusable="false" stroke={1.5} />
+                        <Icono aria-hidden="true" focusable="false" />
                       </a>
                     </li>
                   ))}

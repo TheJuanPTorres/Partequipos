@@ -1,6 +1,7 @@
 /*
- * PIE DEL SITIO — ux-9, export `elementor-2178-2026-10-02.json` de Andrés (sustituye
- * al 2696; solo cambia la imagen decorativa).
+ * PIE DEL SITIO — ux-9, export `elementor-2178` de Andrés: el del 2026-10-02
+ * (sustituye al 2696; solo cambia la imagen decorativa) y, para tablet y móvil,
+ * el del 2026-10-05 (columnas, rellenos, radios y redes).
  * Colores de las REFERENCIAS GLOBALES (`__globals__`), resueltas contra
  * site-settings.json; el valor fijo solo donde no hay global (CLAUDE.md §10.33,
  * decisiones-home-ux9.md §12). Lo que se aparta, marcado DESVIACIÓN y en §13.
@@ -288,11 +289,11 @@
   top: 0;
 }
 
+/* Icono de 18 px (export 2178 del 2026-10-05; antes 23 al 80 %). */
 .red svg {
   position: relative;
-  width: 23px;
-  height: 23px;
-  transform: scale(0.8);
+  width: 18px;
+  height: 18px;
   transition: all 0.35s cubic-bezier(0.31, -0.105, 0.43, 1.59);
 }
 
@@ -301,31 +302,89 @@
   color: var(--color-fondo);
 }
 
-/* Tablet: logo y texto de la empresa centrados (`align_tablet` center). */
+/*
+ * Tablet — export 2178 del 2026-10-05, MEDIDO en ux-9 pintado a 800 y 1010:
+ * la empresa ocupa todo el ancho, centrada; el logo al 39 % con techo de
+ * 285 px (281 a 800, 285 a 1010); las tres columnas en una fila al 30 · 25 ·
+ * 39 %, con 20 px de relleno; y las redes en cajas de 25 px.
+ */
 @media (max-width: 1024px) {
   .empresa {
+    flex-basis: 100%;
     align-items: center;
     text-align: center;
   }
+
+  .logo {
+    max-width: 285px;
+  }
+
+  /* El buscador de ux-9 ocupa aquí su propia fila: su hueco también. */
+  .hueco {
+    flex-basis: 100%;
+  }
+
+  .columna {
+    padding: 20px;
+  }
+
+  .columna:nth-child(1) {
+    flex-basis: 30%;
+  }
+
+  .columna:nth-child(2) {
+    flex-basis: 25%;
+  }
+
+  .columna:nth-child(3) {
+    flex-basis: 39%;
+  }
+
+  .red {
+    width: 25px;
+    height: 25px;
+  }
 }
 
-/* Móvil: empresa a todo el ancho; columnas de dos en dos, como ux-9 a 390. */
+/*
+ * Móvil — MEDIDO a 390 y 600: la empresa con 30 px de relleno y el logo al
+ * 75 % de lo que queda; las dos primeras columnas al 48 y 46 % y «Contacto» a
+ * todo el ancho; radio y relleno de 20 px.
+ */
 @media (max-width: 767px) {
   .panel {
     padding: 3%;
   }
 
   .empresa {
-    flex-basis: 100%;
+    padding: 30px;
   }
 
   .logo {
     width: 75%;
-    max-width: 280px;
+    max-width: none;
+  }
+
+  /* El texto de la empresa ocupa todo el ancho (504 px a 600, como ux-9). */
+  .lemaEmpresa,
+  .textoEmpresa {
+    max-width: none;
   }
 
   .columna {
-    flex-basis: calc((100% - 20px) / 2);
+    border-radius: 20px;
+  }
+
+  .columna:nth-child(1) {
+    flex-basis: 48%;
+  }
+
+  .columna:nth-child(2) {
+    flex-basis: 46%;
+  }
+
+  .columna:nth-child(3) {
+    flex-basis: 100%;
   }
 }
 

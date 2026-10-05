@@ -90,3 +90,29 @@ Solo preview (guardián de base y almacén).
 
 En producción, la imagen de Andrés de la llamada a contactar va con el permiso
 temporal de §10.38, cargada por dirección desde el panel.
+
+## 8. Verificación (preview, 2026-10-05)
+
+| Qué                                    | Resultado                                                                                                                                    |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<h1>`                                 | Uno (el nombre del equipo), a 390, 1010 y 1440                                                                                               |
+| JSON-LD                                | `Product` con marca, 3 imágenes y 6 `additionalProperty`; `BreadcrumbList` con los 7 niveles                                                 |
+| Otras referencias visibles             | 3 (1440), 2 (1010), 1 (390)                                                                                                                  |
+| Desbordamiento horizontal              | 0 px en los tres anchos                                                                                                                      |
+| Galería con teclado                    | Miniatura → cambia la foto (las demás, `inert`); pantalla completa se abre y, al cerrar, el foco vuelve al botón                             |
+| Movimiento reducido                    | Sin transiciones (galería y botones)                                                                                                         |
+| Impresión                              | Sin cabecera, pie ni botones; primera foto, título, datos, descripción y ficha técnica                                                       |
+| Panel, por efecto (`npm run qa:ficha`) | `documentos` rechaza un PNG llamado .pdf y un PDF cortado (en español) y acepta uno válido; la ficha técnica rechaza 5 destacadas y acepta 4 |
+| **CLS**                                | **0,00011 (390) · 0,0002 (1010) · 0,00011 (1440)**                                                                                           |
+
+**CLS ACEPTADO, mismo criterio que Nosotros (decisión 6 de
+`decisiones-nosotros.md`).** Es la llegada de Inter (sin precarga, §10.36):
+los separadores de las migas, los dos puntos de los datos y el elemento del
+menú de la cabecera se corren unos píxeles dentro de su línea. Antes de las
+columnas fijas y de la etiqueta y el valor en líneas aparte (F11) era 0,003,
+porque los datos cambiaban de línea al llegar la fuente.
+
+**Sin revisar en pantalla:** el formulario del panel con «Destacar» e
+«Icono». `npm run panel:revision` necesita `.env.editor-preview.local`, que no
+está en esta copia de trabajo; ya incluye las pantallas nuevas (Documentos,
+global «Ficha de producto» y un equipo con PDF).

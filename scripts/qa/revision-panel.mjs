@@ -15,8 +15,9 @@
  *   cargado por `scripts/preview/con-entorno.ts`) va en una cabecera y solo a
  *   ese origen.
  * - Capturas a 1440 y a 390 de: portada del panel, Imágenes, Páginas, Modelos,
- *   el global «SEO y datos de la empresa» y el formulario de edición del primer
- *   modelo y de la primera categoría técnica. Se guardan FUERA del
+ *   el global «SEO y datos de la empresa», Documentos, el global «Ficha de
+ *   producto» y el formulario de edición del primer modelo, de la primera
+ *   categoría técnica y de un equipo nuevo con PDF. Se guardan FUERA del
  *   repositorio, en `Desktop/partequipos-cierre/capturas/panel-<fecha>/`.
  * - Además lista los textos visibles que parecen inglés (palabras de una lista
  *   corta), los errores de consola y las peticiones que fallan (solo host y
@@ -109,12 +110,21 @@ const PANTALLAS = [
   { nombre: "modelos", ruta: "/admin/collections/modelos-repuesto" },
   // El global con el horario, las imágenes (logo e imagen al compartir) y el contacto.
   { nombre: "seo-empresa", ruta: "/admin/globals/seo" },
+  // Ficha de producto V2: los PDF y lo común a todas las fichas.
+  { nombre: "documentos", ruta: "/admin/collections/documentos" },
+  { nombre: "ficha-producto", ruta: "/admin/globals/ficha-producto" },
 ];
 // Formularios de edición: el primer registro de cada lista.
 const FORMULARIOS = [
   { nombre: "formulario-modelo", coleccion: "modelos-repuesto" },
   // Sin página propia: el SEO guiado tiene que decirlo.
   { nombre: "formulario-categoria-tecnica", coleccion: "categorias-tecnicas" },
+  // Un equipo con ficha técnica («Destacar» e «Icono») y PDF, si lo hay.
+  {
+    nombre: "formulario-equipo-nuevo",
+    coleccion: "equipos-nuevos",
+    filtro: "?where[fichaTecnicaPdf][exists]=true",
+  },
 ];
 // Palabras inglesas que no deberían verse en un panel en español.
 const INGLES =
@@ -189,7 +199,9 @@ try {
     for (const p of PANTALLAS) await visitar(p.nombre, p.ruta);
 
     for (const f of FORMULARIOS) {
-      await pagina.goto(`${base}/admin/collections/${f.coleccion}`, { waitUntil: "networkidle" });
+      await pagina.goto(`${base}/admin/collections/${f.coleccion}${f.filtro ?? ""}`, {
+        waitUntil: "networkidle",
+      });
       // Un enlace de FILA de la tabla: el primero de la página es el de «Crear».
       const enlaces = await pagina
         .locator(`table a[href*="/admin/collections/${f.coleccion}/"]`)

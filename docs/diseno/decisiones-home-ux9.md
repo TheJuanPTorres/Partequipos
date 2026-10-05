@@ -2187,12 +2187,12 @@ de ux-9 publicado van marcadas para Andrés.
 aunque el widget publicado los pinte a la izquierda (no imprime
 `data-text-align`):
 
-| Título                                                                                                                                              | Export                   | Aquí                                                                                        |
-| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------- |
-| Encuentra Maquinaria y Repuestos (sec. 5), Nuestra Compañía y su texto (sec. 6–8), Encuentra la maquinaria… (catálogo), La confianza… (testimonios) | Centro                   | **Centrados** en todos los anchos                                                           |
-| Maquinaria pesada usada (sec. 3)                                                                                                                    | Derecha; Centro en móvil | **A la derecha**, centrado en móvil                                                         |
-| Maquinaria pesada nueva, Marcas que Respaldan…                                                                                                      | Izquierda                | **A la izquierda**, también en móvil (antes se centraban en móvil, como lo publicado)       |
-| Lema del pie («Ofrecemos Soluciones…», export 2178)                                                                                                 | Centro                   | Lo aplica C en su PR del pie, que está tocando `pie.module.css` (coordinado en `ESTADO.md`) |
+| Título                                                                                                                                              | Export                   | Aquí                                                                                  |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------- |
+| Encuentra Maquinaria y Repuestos (sec. 5), Nuestra Compañía y su texto (sec. 6–8), Encuentra la maquinaria… (catálogo), La confianza… (testimonios) | Centro                   | **Centrados** en todos los anchos                                                     |
+| Maquinaria pesada usada (sec. 3)                                                                                                                    | Derecha; Centro en móvil | **A la derecha**, centrado en móvil                                                   |
+| Maquinaria pesada nueva, Marcas que Respaldan…                                                                                                      | Izquierda                | **A la izquierda**, también en móvil (antes se centraban en móvil, como lo publicado) |
+| Lema del pie («Ofrecemos Soluciones…», export 2178)                                                                                                 | Centro                   | **Centrado** en todos los anchos                                                      |
 
 **Para Andrés:** la web publicada no coincide con su export en estos títulos.
 Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.

@@ -20,6 +20,8 @@ export type ProductJsonLdInput = {
   codigo?: string | null;
   /** Imágenes de la ficha (URLs absolutas del CDN o rutas relativas). */
   imagenes?: string[];
+  /** Especificaciones (ficha técnica): salen como `additionalProperty`. */
+  propiedades?: { nombre: string; valor: string }[];
 };
 
 /**
@@ -28,7 +30,7 @@ export type ProductJsonLdInput = {
  * no un e-commerce; declarar ofertas falsas sería incorrecto.
  */
 export function buildProductJsonLd(input: ProductJsonLdInput): JsonLdObject {
-  const { nombre, path, descripcion, marca, codigo, imagenes } = input;
+  const { nombre, path, descripcion, marca, codigo, imagenes, propiedades } = input;
 
   const jsonLd: JsonLdObject = {
     "@context": "https://schema.org",
@@ -43,6 +45,15 @@ export function buildProductJsonLd(input: ProductJsonLdInput): JsonLdObject {
 
   const images = (imagenes ?? []).filter((u) => u?.trim()).map((u) => absoluteUrl(u));
   if (images.length > 0) jsonLd.image = images;
+
+  const props = (propiedades ?? []).filter((p) => p.nombre.trim() && p.valor.trim());
+  if (props.length > 0) {
+    jsonLd.additionalProperty = props.map((p) => ({
+      "@type": "PropertyValue",
+      name: p.nombre.trim(),
+      value: p.valor.trim(),
+    }));
+  }
 
   return jsonLd;
 }

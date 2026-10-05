@@ -156,18 +156,39 @@ export function rutasDeTipoMaquinaria(
   return paths;
 }
 
-/** Rutas afectadas por un cambio en un EQUIPO nuevo. */
+/**
+ * Rutas afectadas por un cambio en un EQUIPO nuevo. Las fichas de los demás
+ * equipos del mismo tipo también: lo enseñan en «Otras referencias de esta
+ * categoría» (ficha V2, docs/diseno/decisiones-ficha.md).
+ */
 export function rutasDeEquipoNuevo(
   marcaSlug: string,
   tipoSlug: string,
   equipoSlug: string,
   categoriaSlugs: string[],
+  hermanoSlugs: string[] = [],
 ): string[] {
   return [
     rutas.tipoMaquinaria(marcaSlug, tipoSlug),
     rutas.equipoNuevo(marcaSlug, tipoSlug, equipoSlug),
+    ...hermanoSlugs.map((slug) => rutas.equipoNuevo(marcaSlug, tipoSlug, slug)),
     ...categoriaSlugs.map((slug) => rutas.categoriaNueva(slug)),
   ];
+}
+
+/**
+ * Todas las fichas de equipo nuevo, por el patrón de la ruta: para lo que
+ * comparten todas (el global `ficha-producto`). Nunca relanza.
+ */
+export function revalidarFichasNuevas(motivo: string): void {
+  try {
+    revalidatePath(
+      "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
+      "page",
+    );
+  } catch (error) {
+    console.error(`[revalidación] fallaron las fichas de equipo nuevo (${motivo}):`, error);
+  }
 }
 
 /** Rutas afectadas por un cambio en una categoría de la línea nueva. */

@@ -124,6 +124,20 @@ export const revalidarTipoMaquinariaBorrado: CollectionAfterDeleteHook = async (
   return doc;
 };
 
+/** Id del tipo de un equipo, venga poblado o como id. */
+function idDeTipo(rel: unknown): number | null {
+  const tipo = poblado<{ id: number }>(rel as number | { id: number });
+  if (tipo?.id) return tipo.id;
+  return typeof rel === "number" ? rel : null;
+}
+
+/** Fichas de los demás equipos del tipo: lo enseñan en «Otras referencias». */
+async function hermanosDe(req: PayloadRequest, doc: { slug: string; tipo: unknown }) {
+  const tipoId = idDeTipo(doc.tipo);
+  if (!tipoId) return [];
+  return (await equiposDeTipo(req, tipoId)).filter((slug) => slug !== doc.slug);
+}
+
 export const revalidarEquipoNuevo: CollectionAfterChangeHook = async ({ doc, req }) => {
   try {
     const marcaSlug = await slugPorId(req, "marcas-maquinaria", doc.marca);
@@ -131,11 +145,45 @@ export const revalidarEquipoNuevo: CollectionAfterChangeHook = async ({ doc, req
     if (!marcaSlug || !tipoSlug) return doc;
 
     revalidarRutas(
-      rutasDeEquipoNuevo(marcaSlug, tipoSlug, doc.slug, await todasLasCategorias(req)),
+      rutasDeEquipoNuevo(
+        marcaSlug,
+        tipoSlug,
+        doc.slug,
+        await todasLasCategorias(req),
+        await hermanosDe(req, doc),
+      ),
       `equipo nuevo ${doc.slug}`,
     );
   } catch (error) {
     console.error("[revalidación] hook de EquipoNuevo falló:", error);
+  }
+  return doc;
+};
+
+/**
+ * Un documento PDF cambiado (un fichero nuevo lleva otro nombre, §10.32):
+ * se revalidan las fichas que lo enlazan y las de su tipo, que enlazan su PDF
+ * desde «Otras referencias».
+ */
+export const revalidarDocumento: CollectionAfterChangeHook = async ({ doc, req }) => {
+  try {
+    const { docs } = await req.payload.find({
+      collection: "equipos-nuevos",
+      where: { fichaTecnicaPdf: { equals: doc.id } },
+      depth: 0,
+      limit: 0,
+    });
+    for (const equipo of docs) {
+      const marcaSlug = await slugPorId(req, "marcas-maquinaria", equipo.marca);
+      const tipoSlug = await slugPorId(req, "tipos-maquinaria", equipo.tipo);
+      if (!marcaSlug || !tipoSlug) continue;
+      revalidarRutas(
+        rutasDeEquipoNuevo(marcaSlug, tipoSlug, equipo.slug, [], await hermanosDe(req, equipo)),
+        `documento ${doc.id}`,
+      );
+    }
+  } catch (error) {
+    console.error("[revalidación] hook de Documento falló:", error);
   }
   return doc;
 };
@@ -147,8 +195,9 @@ export const revalidarEquipoNuevoBorrado: CollectionAfterDeleteHook = async ({ d
     if (!marcaSlug || !tipoSlug) return doc;
 
     const categorias = await todasLasCategorias(req).catch(() => []);
+    const hermanos = await hermanosDe(req, doc).catch(() => []);
     revalidarRutas(
-      rutasDeEquipoNuevo(marcaSlug, tipoSlug, doc.slug, categorias),
+      rutasDeEquipoNuevo(marcaSlug, tipoSlug, doc.slug, categorias, hermanos),
       `equipo nuevo borrado ${doc.slug}`,
     );
   } catch (error) {

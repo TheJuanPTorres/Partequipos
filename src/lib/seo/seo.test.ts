@@ -152,6 +152,21 @@ describe("buildProductJsonLd", () => {
     assert.equal("sku" in jsonLd, false);
     assert.equal("image" in jsonLd, false);
     assert.equal("description" in jsonLd, false);
+    assert.equal("additionalProperty" in jsonLd, false);
+  });
+
+  it("emite la ficha técnica como additionalProperty, sin filas vacías", () => {
+    const jsonLd = buildProductJsonLd({
+      nombre: "Hitachi ZX130-7H",
+      path: "/m",
+      propiedades: [
+        { nombre: "Peso operativo", valor: "13.200 kg" },
+        { nombre: " ", valor: "x" },
+      ],
+    });
+    assert.deepEqual(jsonLd.additionalProperty, [
+      { "@type": "PropertyValue", name: "Peso operativo", value: "13.200 kg" },
+    ]);
   });
 
   it("es serializable a JSON", () => {

@@ -332,16 +332,11 @@
 }
 
 /*
- * TÍTULOS ANIMADOS COMO SE PINTAN EN UX-9 (decisión de dirección, 2026-10-02;
- * decisiones-home-ux9.md §24, pendiente de Andrés): a la izquierda dentro de su
- * caja a partir de 768 px; en móvil, centrados en la caja medida a 390.
+ * TÍTULOS ANIMADOS: manda el DISEÑO (decisión de dirección del 2026-10-05,
+ * decisiones-home-ux9.md §27.1). Aquí el export dice «Izquierda» en todos los
+ * anchos: en móvil ya no se centran. Se conserva la caja medida a 390.
  */
 @media (max-width: 767px) {
-  .antetitulo,
-  .titulo {
-    text-align: center;
-  }
-
   .titulo {
     box-sizing: border-box;
     padding-inline: 20px;

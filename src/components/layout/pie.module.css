@@ -516,15 +516,10 @@
 }
 
 /*
- * TÍTULOS ANIMADOS COMO SE PINTAN EN UX-9 (decisión de dirección, 2026-10-02;
- * decisiones-home-ux9.md §24, pendiente de Andrés): a la izquierda dentro de su
- * caja a partir de 768 px; en móvil, centrados en la caja medida a 390.
+ * TÍTULOS ANIMADOS: los manda el DISEÑO (decisión de dirección del 2026-10-05,
+ * decisiones-home-ux9.md §27.1). El lema va centrado, como en el export 2178:
+ * lo hace la regla de la tarjeta (`text-align: center`).
  */
-@media (min-width: 768px) {
-  .lema {
-    text-align: left;
-  }
-}
 
 /* Buscador provisional en móvil: 56 px de alto e Inter 18 (medido a 390). */
 @media (max-width: 767px) {

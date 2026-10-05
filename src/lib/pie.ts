@@ -4,12 +4,35 @@ import { validarEnlace } from "./fields/reglasPortada";
 
 /**
  * PIE DEL SITIO — lógica pura del global `pie` (docs/diseno/decisiones-home-ux9.md
- * §13). Las redes y el contacto NO están aquí: salen de `seoConfig`, que es la
- * fuente única del JSON-LD `Organization`.
+ * §13). Las redes y el contacto salen del global `seo` (`getEmpresa`), que es la
+ * fuente única del JSON-LD `Organization`; aquí solo se decide qué red es cada
+ * dirección (`redDelPie`).
  */
 
 export type EnlacePie = { etiqueta: string; href: string; interno: boolean };
 export type ColumnaPie = { titulo: string; enlaces: EnlacePie[] };
+
+/** Redes que el pie sabe pintar: las cinco de ux-9 y Instagram. */
+export type RedPie = "LinkedIn" | "X" | "Facebook" | "Instagram" | "TikTok" | "YouTube";
+
+const PATRONES_RED: ReadonlyArray<readonly [RegExp, RedPie]> = [
+  [/^https:\/\/([a-z]+\.)?linkedin\.com\//i, "LinkedIn"],
+  [/^https:\/\/(www\.)?(x|twitter)\.com\//i, "X"],
+  [/^https:\/\/([a-z]+\.)?facebook\.com\//i, "Facebook"],
+  [/^https:\/\/(www\.)?instagram\.com\//i, "Instagram"],
+  [/^https:\/\/(www\.)?tiktok\.com\//i, "TikTok"],
+  [/^https:\/\/(www\.)?youtube\.com\//i, "YouTube"],
+];
+
+/**
+ * Qué red es una dirección del panel, o `null` si el pie no la pinta (sigue
+ * en el JSON-LD `sameAs`). Mira el HOST, no cualquier parte de la URL: un
+ * `https://ejemplo.com/facebook.html` no es Facebook.
+ */
+export function redDelPie(url: string): RedPie | null {
+  const limpia = url.trim();
+  return PATRONES_RED.find(([patron]) => patron.test(limpia))?.[1] ?? null;
+}
 
 /** `href` de un teléfono publicado: `tel:+573176707071`. */
 export function hrefTelefono(telefono: string): string {

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { PIE_INICIAL, columnasDelPie, hrefTelefono, validarDestinoPie } from "./pie";
+import { PIE_INICIAL, columnasDelPie, hrefTelefono, redDelPie, validarDestinoPie } from "./pie";
 
 describe("pie: columnas", () => {
   it("el contenido inicial da las tres columnas de ux-9, con el teléfono de seoConfig", () => {
@@ -46,5 +46,28 @@ describe("pie: validación del destino", () => {
 
   it("el href de teléfono conserva solo el + y los dígitos", () => {
     assert.equal(hrefTelefono("+57 317 670 7071"), "tel:+573176707071");
+  });
+});
+
+describe("pie: redes", () => {
+  it("reconoce las cinco redes de ux-9 y la nuestra (Instagram), por su host", () => {
+    assert.equal(redDelPie("https://www.linkedin.com/company/partequipos/"), "LinkedIn");
+    assert.equal(redDelPie("https://co.linkedin.com/company/partequipos/"), "LinkedIn");
+    assert.equal(redDelPie("https://x.com/partequipos"), "X");
+    assert.equal(redDelPie("https://twitter.com/partequipos"), "X");
+    assert.equal(redDelPie("https://www.facebook.com/partequip0s"), "Facebook");
+    assert.equal(redDelPie("https://www.instagram.com/partequipos_sas/"), "Instagram");
+    assert.equal(redDelPie("https://www.tiktok.com/@partequipos"), "TikTok");
+    assert.equal(
+      redDelPie(" https://www.youtube.com/channel/UCiUU1dE8QvchvTKv47KuDVw "),
+      "YouTube",
+    );
+  });
+
+  it("no confunde una red con otra dirección que la nombra", () => {
+    assert.equal(redDelPie("https://ejemplo.com/facebook.html"), null);
+    assert.equal(redDelPie("https://box.com/partequipos"), null);
+    assert.equal(redDelPie("https://www.pinterest.com/partequipos/"), null);
+    assert.equal(redDelPie("http://www.facebook.com/partequip0s"), null);
   });
 });

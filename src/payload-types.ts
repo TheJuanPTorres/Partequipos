@@ -2345,7 +2345,7 @@ export interface Seo {
     direccion?: string | null;
     ciudad?: string | null;
     /**
-     * La dirección completa de cada perfil oficial. En el pie salen Facebook, Instagram y YouTube; las demás (p. ej. LinkedIn) solo las leen los buscadores.
+     * La dirección completa de cada perfil oficial. En el pie salen LinkedIn, X, Facebook, Instagram, TikTok y YouTube, en el orden en que estén aquí; las demás solo las leen los buscadores.
      */
     redes?:
       | {

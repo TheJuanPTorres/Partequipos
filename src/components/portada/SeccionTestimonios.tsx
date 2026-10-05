@@ -120,6 +120,7 @@ export function SeccionTestimonios({ tarjetas, textos }: Props) {
                   video={t.youtube}
                   etiqueta={`Ver el vídeo de ${t.titulo}`}
                   titulo={`Testimonio de ${t.titulo}`}
+                  miniatura={t.foto}
                   className={estilos.ver}
                 >
                   <IconPlayerPlayFilled aria-hidden="true" focusable="false" />

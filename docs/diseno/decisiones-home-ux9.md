@@ -2295,3 +2295,23 @@ Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.
     móvil);
   - la sección 8 ya no se monta sobre la 7;
   - en móvil el vídeo se queda al 55 % y no al 40 %.
+
+### 27.6 Vídeo de los testimonios: centrado y en la versión más limpia de YouTube
+
+- **Centrado:** la ventana del vídeo salía pegada arriba. El reset de Tailwind
+  pone `margin: 0` a todo y le quitaba al `<dialog>` modal su `margin: auto`.
+  Ahora va centrada en los dos ejes y nunca pasa del alto de la pantalla.
+- **YouTube, lo más limpio posible:**
+  - **Nada de YouTube hasta pulsar reproducir.** Al abrir la ventana se ve
+    NUESTRA miniatura (la foto del testimonio) con nuestro botón rojo. El
+    iframe se crea al pulsarlo y se destruye al cerrar.
+  - Siempre desde `youtube-nocookie.com`, con `rel=0`, `playsinline=1` e
+    `iv_load_policy=3` (sin anotaciones).
+  - El único `autoplay` es el del clic de la persona: nada arranca solo.
+  - **Nada tapa la interfaz de YouTube:** la fachada desaparece en cuanto entra
+    el iframe, y el botón de cerrar va fuera del marco.
+- **También en la sección 7** («Nuestra Compañía»), que usa la misma ventana:
+  allí no hay miniatura propia y la fachada es el fondo oscuro con el botón.
+- **Para Andrés:** su widget abre el vídeo directamente en la ventana. Aquí hay
+  un paso más, el de pulsar reproducir sobre nuestra miniatura: es lo que pidió
+  dirección para no cargar nada de YouTube sin permiso.

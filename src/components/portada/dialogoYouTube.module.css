@@ -4,9 +4,17 @@
  * y 10.
  */
 .dialogo {
+  /*
+   * CENTRADA (§27.6): el reset de Tailwind pone `margin: 0` a todo, y eso le
+   * quitaba al `<dialog>` modal su `margin: auto`: salía pegado arriba.
+   */
+  inset: 0;
   width: min(1100px, calc(100vw - 32px));
   max-width: none;
-  padding: 0;
+  height: fit-content;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 52px 0 0;
   border: 0;
   background: transparent;
   overflow: visible;
@@ -30,6 +38,7 @@
   border-radius: 14px;
 }
 
+/* Cerrar: FUERA del marco, para no tapar nunca la interfaz de YouTube. */
 .cerrar {
   position: absolute;
   top: -52px;
@@ -50,7 +59,61 @@
   height: 22px;
 }
 
-.cerrar:focus-visible {
+.cerrar:focus-visible,
+.fachada:focus-visible {
   outline: 3px solid var(--color-marca);
   outline-offset: 3px;
+}
+
+/*
+ * FACHADA: nuestra miniatura con nuestro botón, hasta que se pulse. Ocupa el
+ * marco entero y desaparece en cuanto entra el iframe (nada encima de él).
+ */
+.fachada {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: var(--color-texto);
+  cursor: pointer;
+}
+
+.miniatura {
+  object-fit: cover;
+}
+
+/* El botón de reproducir: el de la tarjeta de compañía (80 px, rojo de marca). */
+.play {
+  position: relative;
+  display: grid;
+  width: 80px;
+  height: 80px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  transition: transform 0.3s ease;
+}
+
+.play svg {
+  width: 24px;
+  height: 24px;
+}
+
+.fachada:hover .play {
+  transform: scale(1.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play {
+    transition: none;
+  }
+
+  .fachada:hover .play {
+    transform: none;
+  }
 }

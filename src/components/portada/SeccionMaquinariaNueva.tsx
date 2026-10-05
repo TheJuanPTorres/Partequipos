@@ -2,6 +2,7 @@ import { IconSettings } from "@tabler/icons-react";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
+import { ADELANTOS } from "@/components/movimiento/ritmos";
 import type { TarjetaMarca } from "@/lib/portada/secciones";
 
 import { CarruselMarcas } from "./diferidos";
@@ -39,6 +40,7 @@ export function SeccionMaquinariaNueva({
         ) : null}
         {textos.titulo ? (
           <Revelado
+            adelanto={ADELANTOS.alto}
             como="h2"
             id="portada-nueva-titulo"
             texto={textos.titulo}

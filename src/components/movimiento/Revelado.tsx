@@ -4,6 +4,7 @@ import { Fragment, useEffect, useRef, type CSSProperties } from "react";
 
 import estilos from "./movimiento.module.css";
 import {
+  adelantoPara,
   curvaAproximada,
   curvaCss,
   margenDeDisparo,
@@ -11,6 +12,7 @@ import {
   pasoElDisparo,
   resolverRitmo,
   textoPlano,
+  type Adelanto,
   type NombreRitmo,
   type Ritmo,
 } from "./ritmos";
@@ -34,6 +36,8 @@ type Props = Partial<Ritmo> & {
    * revelado). Ver «LIMITACIÓN» abajo, que es lo que esto resuelve.
    */
   alCargar?: boolean;
+  /** Píxeles de más (o de menos) sobre el disparo, por ancho (`ADELANTOS`). */
+  adelanto?: Adelanto;
 };
 
 const ES_ENCABEZADO = new Set<Etiqueta>(["h1", "h2", "h3", "h4"]);
@@ -73,6 +77,7 @@ export function Revelado({
   className,
   id,
   alCargar = false,
+  adelanto,
   ...ajustes
 }: Props) {
   const ref = useRef<HTMLElement>(null);
@@ -90,22 +95,33 @@ export function Revelado({
     }
 
     el.dataset.revelado = "preparado";
+    const extra = () => adelantoPara(innerWidth, adelanto);
     const decidir = () => {
-      const dentro = pasoElDisparo(el.getBoundingClientRect().top, innerHeight, r.disparo);
+      const dentro = pasoElDisparo(el.getBoundingClientRect().top, innerHeight, r.disparo, extra());
       if (dentro) el.dataset.revelado = "visible";
       else if (!r.unaVez) el.dataset.revelado = "preparado";
       return dentro;
     };
 
-    const observador = new IntersectionObserver(
-      () => {
-        if (decidir() && r.unaVez) observador.disconnect();
-      },
-      { rootMargin: margenDeDisparo(r.disparo) },
-    );
-    observador.observe(el);
-    return () => observador.disconnect();
-  }, [reducido, r.disparo, r.unaVez, alCargar]);
+    // El margen va en píxeles: se rehace si la ventana cambia de tamaño.
+    let observador: IntersectionObserver | null = null;
+    const observar = () => {
+      observador?.disconnect();
+      observador = new IntersectionObserver(
+        () => {
+          if (decidir() && r.unaVez) observador?.disconnect();
+        },
+        { rootMargin: margenDeDisparo(r.disparo, innerHeight, extra()) },
+      );
+      observador.observe(el);
+    };
+    observar();
+    window.addEventListener("resize", observar);
+    return () => {
+      window.removeEventListener("resize", observar);
+      observador?.disconnect();
+    };
+  }, [reducido, r.disparo, r.unaVez, alCargar, adelanto]);
 
   const variables = {
     "--revelado-escalon": `${r.escalon}s`,

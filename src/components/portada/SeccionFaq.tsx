@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
+import { ADELANTOS } from "@/components/movimiento/ritmos";
 import { JsonLd } from "@/components/seo/JsonLd";
 import type { Pregunta } from "@/lib/portada/seccionesH";
 import { buildFaqJsonLd } from "@/lib/seo/jsonLd";
@@ -47,6 +48,7 @@ export function SeccionFaq({ preguntas, imagen, textos }: Props) {
         <div className={estilos.izq}>
           {textos.titulo ? (
             <Revelado
+              adelanto={ADELANTOS.bajo}
               como="h2"
               id="portada-faq-titulo"
               texto={textos.titulo}

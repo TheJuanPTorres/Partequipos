@@ -2211,3 +2211,39 @@ Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.
   están anotados aparte (`pendientes-andres.md` §2.2).
 - **Sin cambios de código.** Ya no se pregunta a Andrés
   (`pendientes-andres.md` §2.1, cerrado).
+
+### 27.3 Arranque del barrido de los títulos: el de ux-9 pintado, medido
+
+- **Qué pidió dirección:** el barrido empezaba tarde comparado con el
+  WordPress. Había que medir dónde arranca allí y replicarlo.
+- **Cómo se midió (2026-10-05):** en ux-9 publicado y en el nuestro, a 390,
+  1010 y 1440. Para cada título, el borde superior se lleva por debajo de la
+  ventana y se sube de 12 en 12 px hasta que su primera palabra empieza a
+  aparecer. La medida es la posición del borde en ese momento, como fracción
+  del alto de la ventana. Repetido dos veces a 390, con el mismo resultado.
+
+| Títulos                            | Nominal (widget) | ux-9 a 390 | ux-9 a 1010 | ux-9 a 1440 | El nuestro, antes |
+| ---------------------------------- | ---------------- | ---------- | ----------- | ----------- | ----------------- |
+| Nueva, Marcas que respaldan, Usada | top 95 %         | 0,94       | 0,94        | 0,83        | 0,95              |
+| Trabajamos con fabricantes…        | top 85 %         | 0,84       | 0,85        | 0,73        | 0,85              |
+| Repuestos (sec. 5)                 | top 95 %         | **1,28**   | **1,15**    | **1,04**    | 0,95              |
+| Nuestra Compañía y su texto        | top 85 %         | **1,18**   | **1,04**    | **0,93**    | 0,85              |
+| Catálogo, Testimonios              | top 95 %         | **1,28**   | **1,53**    | **1,41**    | 0,95              |
+| Preguntas frecuentes, lema del pie | top 85 %         | **1,17**   | **1,43**    | **1,32**    | 0,85              |
+
+- **Por qué ux-9 no cumple su propio `top 95 %`:** ScrollTrigger calcula las
+  posiciones al cargar, y después la página crece: la sección 6–8 se fija y
+  alarga el recorrido, y las imágenes cargan tarde. Desde la sección 5 los
+  títulos arrancan **antes** de entrar en pantalla (más de 1,0), y a 1440 los
+  de las secciones 2–4, algo **después**. Es lo que se ve en el WordPress.
+- **Cómo se replica:** con un **adelanto en píxeles** sobre el disparo
+  nominal, por tramo de ancho (`ADELANTOS` en `ritmos.ts`):
+
+| Grupo                                                    | < 768   | 768–1024 | ≥ 1025  |
+| -------------------------------------------------------- | ------- | -------- | ------- |
+| `alto` (secciones 2–4)                                   | 0       | 0        | −110 px |
+| `medio` (sección 5 y compañía)                           | +280 px | +175 px  | +75 px  |
+| `bajo` (catálogo, testimonios, preguntas y lema del pie) | +270 px | +520 px  | +420 px |
+
+- **Para Andrés:** es un efecto de su página, no un ajuste de su widget. Si
+  prefiere el `top 95 %` / `top 85 %` exacto, se quitan los adelantos.

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
+import { ADELANTOS } from "@/components/movimiento/ritmos";
 import type { DatoFicha, Pestana, TarjetaEquipo } from "@/lib/portada/secciones";
 import type { ImagenLista } from "@/lib/utils/relations";
 
@@ -136,6 +137,7 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras, tex
         )}
         {textos.marcasTitulo ? (
           <Revelado
+            adelanto={ADELANTOS.alto}
             como="h2"
             texto={textos.marcasTitulo}
             ritmo="titulo"
@@ -145,6 +147,7 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras, tex
         ) : null}
         {textos.marcasTexto ? (
           <Revelado
+            adelanto={ADELANTOS.alto}
             como="p"
             texto={textos.marcasTexto}
             ritmo="pausado"
@@ -169,6 +172,7 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras, tex
         ) : null}
         {textos.titulo ? (
           <Revelado
+            adelanto={ADELANTOS.alto}
             como="h2"
             id="portada-usada-titulo"
             texto={textos.titulo}

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, type CSSProperties, type PointerEvent } from "react";
 
 import { Revelado } from "@/components/movimiento/Revelado";
+import { ADELANTOS } from "@/components/movimiento/ritmos";
 import { tarjetaInicial, type TarjetaTestimonio } from "@/lib/portada/seccionesH";
 
 import { DialogoYouTube } from "./DialogoYouTube";
@@ -55,6 +56,7 @@ export function SeccionTestimonios({ tarjetas, textos }: Props) {
     <section className={estilos.seccion} aria-labelledby="portada-testimonios-titulo">
       {textos.titulo ? (
         <Revelado
+          adelanto={ADELANTOS.bajo}
           como="h2"
           id="portada-testimonios-titulo"
           texto={textos.titulo}

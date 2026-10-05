@@ -6,6 +6,8 @@ import {
   RITMOS,
   curvaCss,
   evaluarCurva,
+  ADELANTOS,
+  adelantoPara,
   margenDeDisparo,
   partirEnPalabras,
   pasoElDisparo,
@@ -53,9 +55,29 @@ describe("disparo", () => {
   });
 
   it("el margen del observador recorta lo que queda por debajo de la línea", () => {
-    assert.equal(margenDeDisparo(0.85), "0px 0px -15% 0px");
-    assert.equal(margenDeDisparo(0.95), "0px 0px -5% 0px");
-    assert.equal(margenDeDisparo(1), "0px 0px -0% 0px");
+    assert.equal(margenDeDisparo(0.85, 900), "0px 0px -135px 0px");
+    assert.equal(margenDeDisparo(0.95, 900), "0px 0px -45px 0px");
+    assert.equal(margenDeDisparo(1, 900), "0px 0px 0px 0px");
+  });
+
+  it("con adelanto, la línea baja (antes) o sube (después) esos píxeles", () => {
+    // Medido en ux-9 a 390: la sección 5 arranca 280 px antes de su «top 95%».
+    assert.equal(pasoElDisparo(1000, 844, 0.95, 280), true); // línea en 1081,8
+    assert.equal(pasoElDisparo(1100, 844, 0.95, 280), false);
+    assert.equal(pasoElDisparo(800, 900, 0.95, -110), false); // línea en 745
+    assert.equal(margenDeDisparo(0.95, 844, 280), "0px 0px 238px 0px");
+    assert.equal(margenDeDisparo(0.95, 900, -110), "0px 0px -155px 0px");
+  });
+
+  it("el adelanto que toca por ancho: móvil < 768, tablet < 1025, escritorio", () => {
+    assert.equal(adelantoPara(390, ADELANTOS.medio), 280);
+    assert.equal(adelantoPara(767, ADELANTOS.medio), 280);
+    assert.equal(adelantoPara(768, ADELANTOS.medio), 175);
+    assert.equal(adelantoPara(1024, ADELANTOS.bajo), 520);
+    assert.equal(adelantoPara(1025, ADELANTOS.bajo), 420);
+    assert.equal(adelantoPara(390, ADELANTOS.alto), 0);
+    assert.equal(adelantoPara(1440, ADELANTOS.alto), -110);
+    assert.equal(adelantoPara(1440, undefined), 0);
   });
 });
 

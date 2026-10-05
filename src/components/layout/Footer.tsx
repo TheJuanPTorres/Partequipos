@@ -11,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
+import { ADELANTOS } from "@/components/movimiento/ritmos";
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { columnasDelPie, hrefTelefono, redesDelPie, type ColumnaPie, type RedPie } from "@/lib/pie";
 import { getPie } from "@/lib/queries/getPie";
@@ -129,6 +130,7 @@ export async function Footer() {
               />
             ) : null}
             <Revelado
+              adelanto={ADELANTOS.bajo}
               como="p"
               texto={pie.lema}
               ritmo="titulo"

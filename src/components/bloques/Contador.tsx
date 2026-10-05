@@ -81,7 +81,7 @@ export function Contador({ numero, prefijo, sufijo }: Props) {
           arrancar();
         }
       },
-      { rootMargin: margenDeDisparo(DISPARO) },
+      { rootMargin: margenDeDisparo(DISPARO, innerHeight) },
     );
     observador.observe(el);
     return () => {

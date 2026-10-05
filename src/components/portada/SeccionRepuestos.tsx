@@ -10,6 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
+import { ADELANTOS } from "@/components/movimiento/ritmos";
 import type { IconoCategoria, TarjetaRepuesto } from "@/lib/portada/seccionesE";
 
 import estilos from "./repuestos.module.css";
@@ -119,6 +120,7 @@ export function SeccionRepuestos({
         ) : null}
         {textos.titulo ? (
           <Revelado
+            adelanto={ADELANTOS.medio}
             como="h2"
             id="portada-repuestos-titulo"
             texto={textos.titulo}

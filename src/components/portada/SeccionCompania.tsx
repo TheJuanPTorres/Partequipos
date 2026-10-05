@@ -6,6 +6,7 @@ import { useEffect, useId, useRef } from "react";
 
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { Revelado } from "@/components/movimiento/Revelado";
+import { ADELANTOS } from "@/components/movimiento/ritmos";
 import { useMovimientoReducido, usePausa } from "@/components/movimiento/useMovimiento";
 import type { VideoYouTube } from "@/lib/fields/youtube";
 import type { VideoCompania } from "@/lib/portada/seccionesF";
@@ -230,6 +231,7 @@ export function SeccionCompania({ video, youtube, textos }: Props) {
               ) : null}
               <div className={estilos.contenido}>
                 <Revelado
+                  adelanto={ADELANTOS.medio}
                   como="h2"
                   id="portada-compania-titulo"
                   texto={textos.titulo}
@@ -238,6 +240,7 @@ export function SeccionCompania({ video, youtube, textos }: Props) {
                   className={`${estilos.titulo} texto-titulo-seccion`}
                 />
                 <Revelado
+                  adelanto={ADELANTOS.medio}
                   como="p"
                   texto={textos.texto}
                   ritmo="pausado"

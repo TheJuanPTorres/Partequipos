@@ -72,14 +72,48 @@ export function pasoElDisparo(
   bordeSuperior: number,
   altoVentana: number,
   disparo: number,
+  adelanto = 0,
 ): boolean {
-  return bordeSuperior <= altoVentana * disparo;
+  return bordeSuperior <= altoVentana * disparo + adelanto;
 }
 
-/** `rootMargin` del IntersectionObserver para que avise al cruzar la línea. */
-export function margenDeDisparo(disparo: number): string {
-  const recorte = Math.round((1 - disparo) * 10000) / 100;
-  return `0px 0px -${recorte}% 0px`;
+/**
+ * `rootMargin` del IntersectionObserver para que avise al cruzar la línea.
+ * En píxeles, porque el adelanto lo es (un mismo lado no mezcla % y px).
+ */
+export function margenDeDisparo(disparo: number, altoVentana: number, adelanto = 0): string {
+  const inferior = Math.round(adelanto - (1 - disparo) * altoVentana);
+  return `0px 0px ${inferior}px 0px`;
+}
+
+/**
+ * ADELANTO DEL DISPARO, en píxeles y por ancho (decisiones-home-ux9.md §27.3).
+ *
+ * MEDIDO en ux-9 pintado el 2026-10-05 a 390, 1010 y 1440: los títulos NO
+ * arrancan en su `top 95%` / `top 85%` nominal. ScrollTrigger calcula las
+ * posiciones al cargar y la página crece después (la sección 6–8 se fija y
+ * alarga el recorrido, y las imágenes cargan tarde), así que desde la sección 5
+ * los títulos arrancan ANTES de entrar en pantalla, y a 1440 los de las
+ * secciones 2–4, algo DESPUÉS. Dirección pidió replicarlo: positivo, arranca
+ * antes; negativo, después.
+ */
+export type Adelanto = { movil?: number; tablet?: number; escritorio?: number };
+
+export const ADELANTOS = {
+  /** Secciones 2 a 4: nominal en móvil y tablet; 110 px más tarde a 1440. */
+  alto: { escritorio: -110 },
+  /** Sección 5 (repuestos) y 6–8 (compañía). */
+  medio: { movil: 280, tablet: 175, escritorio: 75 },
+  /** Catálogo, testimonios y preguntas frecuentes. */
+  bajo: { movil: 270, tablet: 520, escritorio: 420 },
+} as const satisfies Record<string, Adelanto>;
+
+/** El adelanto que toca a un ancho de ventana (cortes de 768 y 1025 px). */
+export function adelantoPara(ancho: number, adelanto?: Adelanto): number {
+  if (!adelanto) return 0;
+  if (ancho < 768) return adelanto.movil ?? 0;
+  if (ancho < 1025) return adelanto.tablet ?? 0;
+  return adelanto.escritorio ?? 0;
 }
 
 /**

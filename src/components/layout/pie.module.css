@@ -171,13 +171,83 @@
 }
 
 /*
- * DESVIACIÓN (buscador fuera de la cola): el hueco del buscador se conserva
- * vacío, con su ancho y el alto de su botón, para que las filas caigan igual
- * que en ux-9. Cuando se apruebe el buscador, va aquí.
+ * BUSCADOR PROVISIONAL (dirección, 2026-10-05; `BuscadorPie.tsx`): el campo y
+ * el botón de ux-9, que solo anuncian «Buscador disponible pronto». MEDIDO en
+ * ux-9 publicado a 1440, 1010 y 390: 476 × 58 alineado a la derecha (centrado
+ * en tablet; 367 × 56 a 390); campo blanco, borde #cdcdcd, radio 30, Inter
+ * 20 · 1,3 (18 en móvil), relleno 16 · 28 · 16 · 16; botón rojo del kit de
+ * 93 × 58, radio 50, Inter 16 · 500, a 8 px del campo.
  */
 .hueco {
   flex: 0 0 59%;
+  /* Sin esto, el `min-width: auto` del elemento flexible se estira hasta los
+     476 px del buscador y en móvil se sale del panel (medido a 390). */
+  min-width: 0;
   min-height: 56px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.buscador {
+  display: flex;
+  width: 476px;
+  max-width: 100%;
+  flex-direction: column;
+}
+
+.buscadorFila {
+  display: flex;
+  gap: 8px;
+}
+
+.buscadorCampo {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 58px;
+  box-sizing: border-box;
+  padding: 16px 28px 16px 16px;
+  border: 1px solid #cdcdcd; /* medido en ux-9 */
+  border-radius: 30px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font: 400 20px / 1.3 var(--font-sans);
+}
+
+.buscadorCampo::placeholder {
+  color: #515962; /* medido en ux-9: 6,9:1 sobre blanco */
+  opacity: 1;
+}
+
+.buscadorBoton {
+  flex: none;
+  height: 58px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 50px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  font: 500 16px / 1 var(--font-sans);
+  cursor: pointer;
+}
+
+.buscadorCampo:focus-visible,
+.buscadorBoton:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+}
+
+/* El aviso, bajo el campo. Vacío no ocupa nada: no mueve el pie al cargar. */
+.buscadorAviso {
+  margin: 8px 0 0;
+  color: var(--color-texto);
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.buscadorAviso:empty {
+  margin: 0;
 }
 
 /* El `<h3>` del texto de la empresa: estilo H3 del tema, medido 28 · 1,2 · 500. */
@@ -319,9 +389,14 @@
     max-width: 285px;
   }
 
-  /* El buscador de ux-9 ocupa aquí su propia fila: su hueco también. */
+  /* El buscador de ux-9 ocupa aquí su propia fila, centrado (medido a 1010). */
   .hueco {
     flex-basis: 100%;
+    justify-content: center;
+  }
+
+  .buscadorAviso {
+    text-align: center;
   }
 
   .columna {
@@ -448,5 +523,17 @@
 @media (min-width: 768px) {
   .lema {
     text-align: left;
+  }
+}
+
+/* Buscador provisional en móvil: 56 px de alto e Inter 18 (medido a 390). */
+@media (max-width: 767px) {
+  .buscadorCampo {
+    height: 56px;
+    font-size: 18px;
+  }
+
+  .buscadorBoton {
+    height: 56px;
   }
 }

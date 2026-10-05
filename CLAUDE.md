@@ -599,6 +599,7 @@ veredicto, que va en el informe.
 - **Texto alternativo de las imágenes (2026-10-04):** `Media` rechaza al guardar los textos flojos (vacíos, de menos de 5 letras, genéricos o el nombre del fichero; `src/lib/media/altFlojo.ts`), la lista de «Imágenes» avisa de las ya guardadas y `npm run media:alt-flojos` las cuenta; por efecto con `npm run qa:alt`; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §14.
 - **Ficha de producto V2 de ux-9 (2026-10-05):** las 80 fichas de maquinaria nueva con galería sincronizada, datos destacados con icono (casilla «Destacar» en la ficha técnica, máximo 4), PDF descargable (colección `documentos`, solo PDF), compartir sin terceros, otras referencias del mismo tipo, llamada a contactar con imagen del global `ficha-producto` y estilos de impresión; migración `20261005_142945_ficha_producto`. Detalle y desviaciones en `docs/diseno/decisiones-ficha.md`.
 - **SEO de las categorías técnicas y revisión de pantallas (2026-10-04):** el bloque SEO de las categorías técnicas avisa de que hoy no tienen página (`seoField({ sinPagina: true })`, sin esquema); `panel:revision` añade el global SEO, una categoría técnica y las peticiones fallidas. **Hallazgo:** las 32 URL de categoría técnica del sitio actual dan 404 y están sin decidir (`docs/redirects-map.csv`). Detalle en `docs/diseno/decisiones-panel.md` §15.
+- **El pie como en el WordPress (2026-10-05):** buscador **provisional** de ux-9 (anuncia «Buscador disponible pronto», no navega; `BuscadorPie.tsx`), redes en el orden de ux-9 (`redesDelPie`) y, en el preview, «Trabaja con nosotros», «Zona de clientes» y «Financiación» a `/contactanos/` y redes de ejemplo; producción, con `runbook-pie-enlaces-redes.md`; sin esquema. Detalle en `docs/diseno/decisiones-home-ux9.md` §13.9.
 
 ### 10.0 Qué está construido y qué falta
 
@@ -675,15 +676,17 @@ detalle en `docs/diseno/decisiones-home-ux9.md` §13):
 
 | Pendiente                                                                                     | De quién                      | Mientras tanto                                                                                                     |
 | --------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | No se pinta                                                                                                        |
-| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | No se pinta                                                                                                        |
-| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | No se pinta                                                                                                        |
+| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | Preview: `/contactanos/` provisional. Producción: dirección, con `runbook-pie-enlaces-redes.md`                    |
+| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | Preview: `/contactanos/` provisional. Producción: dirección, con `runbook-pie-enlaces-redes.md`                    |
+| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | Preview: `/contactanos/` provisional. Producción: dirección, con `runbook-pie-enlaces-redes.md`                    |
 | **Imagen decorativa** `Partequipos3553.png` (brazo de excavadora): licencia de banco (**L3**) | Andrés (procedencia), cliente | Retirada de producción el 2026-09-28 (§10.33); sin imagen hasta que se licencie o se reemplace; nunca en `public/` |
 | **HelveticaNeue** del texto de la empresa: licencia web (**L1**)                              | Cliente, vía Andrés           | Inter                                                                                                              |
 | Redacción: «Ayudamos sectores…» → «Ayudamos **a** sectores…»                                  | Andrés (para su maqueta)      | Corregido en el sitio                                                                                              |
 
 Cuando lleguen las URL, se añaden en el panel (global **Pie de página**), sin
-tocar código.
+tocar código. **Desde el 2026-10-05**, el pie tiene además el **buscador
+provisional** de ux-9 (solo anuncia «Buscador disponible pronto», no navega)
+y pinta las redes en el orden de ux-9 (`decisiones-home-ux9.md` §13.9).
 
 **FOTOS DEL HERO ENVIADAS POR EL CLIENTE (2026-09-30):** **derecho de uso
 confirmado por el cliente**; dirección conserva la confirmación. Son otras que

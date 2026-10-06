@@ -166,6 +166,12 @@ export default buildConfig({
        */
       views: {
         login: { Component: "/components/admin/acceso/Acceso" },
+        /*
+         * Portada propia (F2 del rediseño): avisos, una tarjeta por grupo del
+         * menú, accesos rápidos y lo último modificado. Respeta los permisos;
+         * de «solicitudes» solo cuenta. docs/diseno/decisiones-panel.md §23.
+         */
+        dashboard: { Component: "/components/admin/portada/Portada" },
       },
     },
   },

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "next dev -H 127.0.0.1",
-    "build": "next build",
+    "build": "next build && tsx scripts/qa/fuente-respaldo.ts",
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",

@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import type { CollectionConfig } from "payload";
 
 import { ICONOS_DE_GRUPO } from "../components/admin/Nav/iconos";
+import { GRUPOS_DEL_MENU } from "../lib/panel/menu";
 
 /**
  * Una colección sin `admin.group` no da error: Payload la mete en silencio en
@@ -14,14 +15,8 @@ import { ICONOS_DE_GRUPO } from "../components/admin/Nav/iconos";
  * agrupación del menú eliminó (2026-09-17). Esta prueba convierte ese olvido en
  * un fallo de CI.
  */
-const GRUPOS_APROBADOS = [
-  "Comercial",
-  "Repuestos",
-  "Maquinaria",
-  "Lubricantes",
-  "Contenido",
-  "Configuración",
-];
+// Desde la F1 del rediseño (2026-10-06): los 8 grupos de `src/lib/panel/menu.ts`.
+const GRUPOS_APROBADOS: string[] = [...GRUPOS_DEL_MENU];
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -65,6 +60,38 @@ describe("grupos del menú del panel", () => {
     }
   });
 
+  /*
+   * Los globales también salen en el menú (F1: «Partes del sitio» es solo de
+   * globales). Un global sin grupo aprobado caería igual en otro cajón.
+   */
+  it("todo global tiene un grupo aprobado", async () => {
+    // Todos los ficheros de `src/globals`, no una lista a mano: uno nuevo
+    // queda cubierto sin tocar la prueba.
+    const carpeta = path.join(dir, "..", "globals");
+    const ficheros = readdirSync(carpeta).filter(
+      (f) => f.endsWith(".ts") && !f.endsWith(".test.ts"),
+    );
+    const globales: { slug?: string; admin?: { group?: unknown } }[] = [];
+    for (const fichero of ficheros) {
+      const modulo: Record<string, unknown> = await import(
+        pathToFileURL(path.join(carpeta, fichero)).href
+      );
+      for (const exportado of Object.values(modulo)) {
+        if (typeof exportado === "object" && exportado !== null && "slug" in exportado) {
+          globales.push(exportado as { slug?: string; admin?: { group?: unknown } });
+        }
+      }
+    }
+    assert.ok(globales.length >= 4, "no encuentra los globales");
+    for (const global of globales) {
+      const grupo = global?.admin?.group;
+      assert.ok(
+        typeof grupo === "string" && GRUPOS_APROBADOS.includes(grupo),
+        `el global «${global?.slug}» tiene grupo ${JSON.stringify(grupo)}`,
+      );
+    }
+  });
+
   it("detecta una colección sin grupo (comprobación del propio guardián)", () => {
     const sinGrupo = { slug: "inventada", admin: {} } as CollectionConfig;
     const grupo = sinGrupo.admin?.group;
@@ -78,7 +105,10 @@ describe("grupos del menú del panel", () => {
    */
   it("todo grupo aprobado tiene icono en el menú", () => {
     for (const grupo of GRUPOS_APROBADOS) {
-      assert.ok(ICONOS_DE_GRUPO[grupo], `el grupo «${grupo}» no tiene icono asignado`);
+      assert.ok(
+        (ICONOS_DE_GRUPO as Record<string, unknown>)[grupo],
+        `el grupo «${grupo}» no tiene icono asignado`,
+      );
     }
   });
 
@@ -91,7 +121,10 @@ describe("grupos del menú del panel", () => {
   it("detecta un grupo sin icono (comprobación del propio guardián)", () => {
     // Si esto empezara a pasar, el mapa tendría una entrada comodín y la
     // comprobación de arriba dejaría de proteger nada.
-    assert.equal(ICONOS_DE_GRUPO["Grupo inventado para la prueba"], undefined);
+    assert.equal(
+      (ICONOS_DE_GRUPO as Record<string, unknown>)["Grupo inventado para la prueba"],
+      undefined,
+    );
   });
 });
 

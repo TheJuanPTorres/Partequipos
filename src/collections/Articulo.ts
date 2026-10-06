@@ -26,7 +26,7 @@ export const Articulo: CollectionConfig = {
   admin: {
     useAsTitle: "titulo",
     defaultColumns: ["titulo", "categoria", "fechaPublicacion", "slug"],
-    group: "Contenido",
+    group: "Páginas y blog",
     description:
       "Cada artículo vive en partequipos.com/<slug>/. Su slug no puede repetir el de una página.",
   },

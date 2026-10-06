@@ -1,6 +1,6 @@
 "use client";
 
-import { IconChevronDown } from "@tabler/icons-react";
+import { IconChevronDown, type Icon } from "@tabler/icons-react";
 import { AnimateHeight, useNav, usePreferences } from "@payloadcms/ui";
 import { PREFERENCE_KEYS } from "payload/shared";
 import { useState } from "react";
@@ -46,7 +46,8 @@ export function GrupoNav({
   const { setPreference } = usePreferences();
   const { navOpen } = useNav();
 
-  const Icono = ICONOS_DE_GRUPO[nombre];
+  // Un grupo desconocido sale sin icono (lo vigila `grupos.test.ts`).
+  const Icono: Icon | undefined = (ICONOS_DE_GRUPO as Record<string, Icon>)[nombre];
   const idContenido = `nav-grupo-contenido-${nombre}`;
 
   function alternar() {

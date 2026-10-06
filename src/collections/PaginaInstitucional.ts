@@ -34,7 +34,7 @@ export const PaginaInstitucional: CollectionConfig = {
   admin: {
     useAsTitle: "titulo",
     defaultColumns: ["titulo", "slug", "tipoPagina"],
-    group: "Contenido",
+    group: "Páginas y blog",
     description:
       "Páginas fijas del sitio (Nosotros, Contacto, textos legales…) y la portada. No cambies la ruta de una página publicada: Google ya conoce esa dirección.",
   },

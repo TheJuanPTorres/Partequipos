@@ -1,5 +1,5 @@
-import { default as default_5c55248894877e0ef25c11c535b2b5bf } from '../../../components/admin/VerEnElSitio'
 import { default as default_137d3220b5ae877ef2c31422510baf68 } from '../../../components/admin/SeoGuiado'
+import { default as default_5c55248894877e0ef25c11c535b2b5bf } from '../../../components/admin/VerEnElSitio'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -36,8 +36,8 @@ import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e
 
 /** @type import('payload').ImportMap */
 export const importMap = {
-  "/components/admin/VerEnElSitio#default": default_5c55248894877e0ef25c11c535b2b5bf,
   "/components/admin/SeoGuiado#default": default_137d3220b5ae877ef2c31422510baf68,
+  "/components/admin/VerEnElSitio#default": default_5c55248894877e0ef25c11c535b2b5bf,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,

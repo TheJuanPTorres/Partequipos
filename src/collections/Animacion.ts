@@ -26,7 +26,7 @@ export const Animacion: CollectionConfig = {
   admin: {
     useAsTitle: "descripcion",
     defaultColumns: ["filename", "descripcion", "ancho", "alto"],
-    group: "Contenido",
+    group: "Archivos",
     description:
       "Animaciones Lottie (.json exportado con Bodymovin, sin expresiones), máximo 4 MB. Se reproducen una vez al llegar con el scroll.",
   },

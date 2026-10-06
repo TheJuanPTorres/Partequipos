@@ -23,6 +23,9 @@
  *   corta), los errores de consola y las peticiones que fallan (solo host y
  *   ruta), para no depender solo de mirar.
  * - Navegador: Chrome instalado (otra ruta con `CHROME_PATH`).
+ * - Modos (tercer argumento): `ficha` (aviso de más de 4 «Destacar»), `acceso`
+ *   (la pantalla de acceso, §17–§19 de decisiones-panel.md) y `oscuro` (la
+ *   pasada normal con el tema oscuro). Sin modo, la pasada normal en claro.
  * - No escribe nada en el panel: solo navega y lee. En modo `ficha` pulsa
  *   «Guardar» con 5 «Destacar» marcados, que la validación rechaza, y comprueba
  *   después en la API que no se guardó nada.
@@ -64,7 +67,7 @@ function fallar(mensaje) {
 
 // --- Preview --------------------------------------------------------------
 const base = (process.argv[2] ?? "").replace(/\/$/, "");
-if (!base) fallar("Uso: npm run panel:revision -- <url del preview> [ficha]");
+if (!base) fallar("Uso: npm run panel:revision -- <url del preview> [ficha|acceso|oscuro]");
 // `ficha`: además, el aviso de más de 4 «Destacar» y la vista de subir un PDF.
 const MODO = process.argv[3] ?? "";
 const { hostname, origin } = new URL(base);
@@ -93,7 +96,7 @@ if (!claveCorreo || !claveClave || !cuenta[claveCorreo] || !cuenta[claveClave]) 
 }
 
 // --- Capturas -------------------------------------------------------------
-const fecha = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
+const fecha = `${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}${MODO ? `-${MODO}` : ""}`;
 const salida = path.join(
   os.homedir(),
   "Desktop",
@@ -157,6 +160,11 @@ try {
         headers: { ...r.request().headers(), "x-vercel-protection-bypass": bypass },
       }),
     );
+    // Modo `oscuro`: la misma pasada con el tema oscuro, como entra el usuario
+    // (cookie `payload-theme`, CLAUDE.md §10.23). Sin modo, el claro.
+    await contexto.addCookies([
+      { name: "payload-theme", value: MODO === "oscuro" ? "dark" : "light", url: origin },
+    ]);
     let pagina = await contexto.newPage();
     const errores = [];
     pagina.on("console", (m) => m.type() === "error" && errores.push(m.text().slice(0, 200)));

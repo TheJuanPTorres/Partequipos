@@ -68,30 +68,30 @@ export interface Config {
   blocks: {};
   collections: {
     solicitudes: Solicitude;
+    'modelos-repuesto': ModelosRepuesto;
     marcas: Marca;
     'tipos-equipo': TiposEquipo;
-    'modelos-repuesto': ModelosRepuesto;
     'categorias-tecnicas': CategoriasTecnica;
+    'equipos-nuevos': EquiposNuevo;
+    'equipos-usados': EquiposUsado;
     'marcas-maquinaria': MarcasMaquinaria;
     'tipos-maquinaria': TiposMaquinaria;
-    'equipos-nuevos': EquiposNuevo;
     'categorias-maquinaria': CategoriasMaquinaria;
     'categorias-usada': CategoriasUsada;
-    'equipos-usados': EquiposUsado;
     'marcas-lubricante': MarcasLubricante;
     'categorias-lubricante': CategoriasLubricante;
     paginas: Pagina;
     articulos: Articulo;
     'categorias-blog': CategoriasBlog;
+    'preguntas-frecuentes': PreguntasFrecuente;
+    testimonios: Testimonio;
+    sedes: Sede;
     media: Media;
-    animaciones: Animacion;
     documentos: Documento;
     videos: Video;
-    sedes: Sede;
-    testimonios: Testimonio;
-    'preguntas-frecuentes': PreguntasFrecuente;
-    users: User;
+    animaciones: Animacion;
     redirects: Redirect;
+    users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -100,30 +100,30 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     solicitudes: SolicitudesSelect<false> | SolicitudesSelect<true>;
+    'modelos-repuesto': ModelosRepuestoSelect<false> | ModelosRepuestoSelect<true>;
     marcas: MarcasSelect<false> | MarcasSelect<true>;
     'tipos-equipo': TiposEquipoSelect<false> | TiposEquipoSelect<true>;
-    'modelos-repuesto': ModelosRepuestoSelect<false> | ModelosRepuestoSelect<true>;
     'categorias-tecnicas': CategoriasTecnicasSelect<false> | CategoriasTecnicasSelect<true>;
+    'equipos-nuevos': EquiposNuevosSelect<false> | EquiposNuevosSelect<true>;
+    'equipos-usados': EquiposUsadosSelect<false> | EquiposUsadosSelect<true>;
     'marcas-maquinaria': MarcasMaquinariaSelect<false> | MarcasMaquinariaSelect<true>;
     'tipos-maquinaria': TiposMaquinariaSelect<false> | TiposMaquinariaSelect<true>;
-    'equipos-nuevos': EquiposNuevosSelect<false> | EquiposNuevosSelect<true>;
     'categorias-maquinaria': CategoriasMaquinariaSelect<false> | CategoriasMaquinariaSelect<true>;
     'categorias-usada': CategoriasUsadaSelect<false> | CategoriasUsadaSelect<true>;
-    'equipos-usados': EquiposUsadosSelect<false> | EquiposUsadosSelect<true>;
     'marcas-lubricante': MarcasLubricanteSelect<false> | MarcasLubricanteSelect<true>;
     'categorias-lubricante': CategoriasLubricanteSelect<false> | CategoriasLubricanteSelect<true>;
     paginas: PaginasSelect<false> | PaginasSelect<true>;
     articulos: ArticulosSelect<false> | ArticulosSelect<true>;
     'categorias-blog': CategoriasBlogSelect<false> | CategoriasBlogSelect<true>;
+    'preguntas-frecuentes': PreguntasFrecuentesSelect<false> | PreguntasFrecuentesSelect<true>;
+    testimonios: TestimoniosSelect<false> | TestimoniosSelect<true>;
+    sedes: SedesSelect<false> | SedesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    animaciones: AnimacionesSelect<false> | AnimacionesSelect<true>;
     documentos: DocumentosSelect<false> | DocumentosSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
-    sedes: SedesSelect<false> | SedesSelect<true>;
-    testimonios: TestimoniosSelect<false> | TestimoniosSelect<true>;
-    'preguntas-frecuentes': PreguntasFrecuentesSelect<false> | PreguntasFrecuentesSelect<true>;
-    users: UsersSelect<false> | UsersSelect<true>;
+    animaciones: AnimacionesSelect<false> | AnimacionesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -525,56 +525,6 @@ export interface CategoriasTecnica {
   createdAt: string;
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categorias-maquinaria".
- */
-export interface CategoriasMaquinaria {
-  id: number;
-  nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  descripcion?: string | null;
-  /**
-   * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
-   */
-  tiposIncluidos?: (number | TiposMaquinaria)[] | null;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categorias-usada".
- */
-export interface CategoriasUsada {
-  id: number;
-  nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  descripcion?: string | null;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * Inventario de maquinaria usada. Se muestra dentro de la página de su categoría; no genera URLs propias.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -617,6 +567,56 @@ export interface EquiposUsado {
    */
   disponible?: boolean | null;
   pestanaPortada?: ('categoria' | 'aditamentos') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-usada".
+ */
+export interface CategoriasUsada {
+  id: number;
+  nombre: string;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  descripcion?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-maquinaria".
+ */
+export interface CategoriasMaquinaria {
+  id: number;
+  nombre: string;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  descripcion?: string | null;
+  /**
+   * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
+   */
+  tiposIncluidos?: (number | TiposMaquinaria)[] | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -1171,7 +1171,7 @@ export interface Articulo {
    */
   fechaPublicacion: string;
   /**
-   * Firma que aparece en el artículo.
+   * Firma que aparece en el artículo. Vacío: «Partequipos». Con un nombre de persona, los buscadores lo leen como autor (persona); con «Partequipos», como la empresa.
    */
   autor?: string | null;
   /**
@@ -1232,6 +1232,54 @@ export interface CategoriasBlog {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "preguntas-frecuentes".
+ */
+export interface PreguntasFrecuente {
+  id: number;
+  pregunta: string;
+  respuesta: string;
+  orden?: number | null;
+  publicada?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Testimonios de la portada. Un testimonio no se publica sin la autorización de uso de la persona.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonios".
+ */
+export interface Testimonio {
+  id: number;
+  nombre: string;
+  empresa?: string | null;
+  ciudad?: string | null;
+  cita: string;
+  foto?: (number | null) | Media;
+  /**
+   * Opcional. Un MP4 propio; para YouTube, el campo de abajo.
+   */
+  video?: (number | null) | Video;
+  /**
+   * Opcional. Enlace de YouTube; si lleva «&t=21s», empieza en ese segundo.
+   */
+  youtube?: string | null;
+  autorizacionUso?: boolean | null;
+  fechaAutorizacion?: string | null;
+  /**
+   * Para poder encontrarlo si la persona pide retirar su testimonio.
+   */
+  referenciaAutorizacion?: string | null;
+  /**
+   * Solo se puede marcar con la autorización de uso marcada.
+   */
+  publicado?: boolean | null;
+  orden?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Sedes del mapa de la portada. No generan URLs propias.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1280,50 +1328,35 @@ export interface Sede {
   createdAt: string;
 }
 /**
- * Testimonios de la portada. Un testimonio no se publica sin la autorización de uso de la persona.
+ * Redirecciones de URLs antiguas hacia las vigentes. Evita perder posicionamiento cuando una URL cambia.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonios".
+ * via the `definition` "redirects".
  */
-export interface Testimonio {
+export interface Redirect {
   id: number;
-  nombre: string;
-  empresa?: string | null;
-  ciudad?: string | null;
-  cita: string;
-  foto?: (number | null) | Media;
   /**
-   * Opcional. Un MP4 propio; para YouTube, el campo de abajo.
+   * Ruta antigua, empezando por «/». Ej: /repuestos-viejo/modelo-x
    */
-  video?: (number | null) | Video;
+  desde: string;
   /**
-   * Opcional. Enlace de YouTube; si lleva «&t=21s», empieza en ese segundo.
+   * Ruta vigente o URL absoluta a la que se redirige.
    */
-  youtube?: string | null;
-  autorizacionUso?: boolean | null;
-  fechaAutorizacion?: string | null;
+  hacia: string;
   /**
-   * Para poder encontrarlo si la persona pide retirar su testimonio.
+   * 301 salvo que la redirección sea realmente temporal.
    */
-  referenciaAutorizacion?: string | null;
+  tipo: '301' | '302';
   /**
-   * Solo se puede marcar con la autorización de uso marcada.
+   * Cómo se creó esta redirección. Las automáticas no deben editarse a la ligera.
    */
-  publicado?: boolean | null;
-  orden?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "preguntas-frecuentes".
- */
-export interface PreguntasFrecuente {
-  id: number;
-  pregunta: string;
-  respuesta: string;
-  orden?: number | null;
-  publicada?: boolean | null;
+  origen: 'manual' | 'cambio-de-slug' | 'migracion';
+  notas?: string | null;
+  /**
+   * Lo actualiza el equipo técnico al revisar las redirecciones. «Sin contenido» es normal mientras se migra; «No corresponde a ninguna ruta» hay que corregirlo antes de publicar.
+   */
+  estadoDestino?: ('sin-verificar' | 'resuelve' | 'sin-contenido' | 'sin-ruta' | 'externa') | null;
+  destinoVerificadoEn?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1363,39 +1396,6 @@ export interface User {
   collection: 'users';
 }
 /**
- * Redirecciones de URLs antiguas hacia las vigentes. Evita perder posicionamiento cuando una URL cambia.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects".
- */
-export interface Redirect {
-  id: number;
-  /**
-   * Ruta antigua, empezando por «/». Ej: /repuestos-viejo/modelo-x
-   */
-  desde: string;
-  /**
-   * Ruta vigente o URL absoluta a la que se redirige.
-   */
-  hacia: string;
-  /**
-   * 301 salvo que la redirección sea realmente temporal.
-   */
-  tipo: '301' | '302';
-  /**
-   * Cómo se creó esta redirección. Las automáticas no deben editarse a la ligera.
-   */
-  origen: 'manual' | 'cambio-de-slug' | 'migracion';
-  notas?: string | null;
-  /**
-   * Lo actualiza el equipo técnico al revisar las redirecciones. «Sin contenido» es normal mientras se migra; «No corresponde a ninguna ruta» hay que corregirlo antes de publicar.
-   */
-  estadoDestino?: ('sin-verificar' | 'resuelve' | 'sin-contenido' | 'sin-ruta' | 'externa') | null;
-  destinoVerificadoEn?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1424,6 +1424,10 @@ export interface PayloadLockedDocument {
         value: number | Solicitude;
       } | null)
     | ({
+        relationTo: 'modelos-repuesto';
+        value: number | ModelosRepuesto;
+      } | null)
+    | ({
         relationTo: 'marcas';
         value: number | Marca;
       } | null)
@@ -1432,12 +1436,16 @@ export interface PayloadLockedDocument {
         value: number | TiposEquipo;
       } | null)
     | ({
-        relationTo: 'modelos-repuesto';
-        value: number | ModelosRepuesto;
-      } | null)
-    | ({
         relationTo: 'categorias-tecnicas';
         value: number | CategoriasTecnica;
+      } | null)
+    | ({
+        relationTo: 'equipos-nuevos';
+        value: number | EquiposNuevo;
+      } | null)
+    | ({
+        relationTo: 'equipos-usados';
+        value: number | EquiposUsado;
       } | null)
     | ({
         relationTo: 'marcas-maquinaria';
@@ -1448,20 +1456,12 @@ export interface PayloadLockedDocument {
         value: number | TiposMaquinaria;
       } | null)
     | ({
-        relationTo: 'equipos-nuevos';
-        value: number | EquiposNuevo;
-      } | null)
-    | ({
         relationTo: 'categorias-maquinaria';
         value: number | CategoriasMaquinaria;
       } | null)
     | ({
         relationTo: 'categorias-usada';
         value: number | CategoriasUsada;
-      } | null)
-    | ({
-        relationTo: 'equipos-usados';
-        value: number | EquiposUsado;
       } | null)
     | ({
         relationTo: 'marcas-lubricante';
@@ -1484,12 +1484,20 @@ export interface PayloadLockedDocument {
         value: number | CategoriasBlog;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
+        relationTo: 'preguntas-frecuentes';
+        value: number | PreguntasFrecuente;
       } | null)
     | ({
-        relationTo: 'animaciones';
-        value: number | Animacion;
+        relationTo: 'testimonios';
+        value: number | Testimonio;
+      } | null)
+    | ({
+        relationTo: 'sedes';
+        value: number | Sede;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'documentos';
@@ -1500,24 +1508,16 @@ export interface PayloadLockedDocument {
         value: number | Video;
       } | null)
     | ({
-        relationTo: 'sedes';
-        value: number | Sede;
-      } | null)
-    | ({
-        relationTo: 'testimonios';
-        value: number | Testimonio;
-      } | null)
-    | ({
-        relationTo: 'preguntas-frecuentes';
-        value: number | PreguntasFrecuente;
-      } | null)
-    | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'animaciones';
+        value: number | Animacion;
       } | null)
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1581,6 +1581,28 @@ export interface SolicitudesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modelos-repuesto_select".
+ */
+export interface ModelosRepuestoSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  marca?: T;
+  tipo?: T;
+  codigo?: T;
+  descripcion?: T;
+  imagenes?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "marcas_select".
  */
 export interface MarcasSelect<T extends boolean = true> {
@@ -1612,28 +1634,6 @@ export interface TiposEquipoSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "modelos-repuesto_select".
- */
-export interface ModelosRepuestoSelect<T extends boolean = true> {
-  nombre?: T;
-  slug?: T;
-  marca?: T;
-  tipo?: T;
-  codigo?: T;
-  descripcion?: T;
-  imagenes?: T;
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categorias-tecnicas_select".
  */
 export interface CategoriasTecnicasSelect<T extends boolean = true> {
@@ -1645,46 +1645,6 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   tituloPortada?: T;
   enlace?: T;
   ordenPortada?: T;
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "marcas-maquinaria_select".
- */
-export interface MarcasMaquinariaSelect<T extends boolean = true> {
-  nombre?: T;
-  slug?: T;
-  descripcion?: T;
-  logo?: T;
-  imagenTarjeta?: T;
-  ordenPortada?: T;
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        ogImage?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tipos-maquinaria_select".
- */
-export interface TiposMaquinariaSelect<T extends boolean = true> {
-  nombre?: T;
-  slug?: T;
-  marca?: T;
-  descripcion?: T;
   seo?:
     | T
     | {
@@ -1737,6 +1697,68 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "equipos-usados_select".
+ */
+export interface EquiposUsadosSelect<T extends boolean = true> {
+  nombre?: T;
+  categoria?: T;
+  marca?: T;
+  modelo?: T;
+  anio?: T;
+  horometro?: T;
+  ubicacion?: T;
+  pesoOperativo?: T;
+  potencia?: T;
+  motor?: T;
+  descripcion?: T;
+  imagenes?: T;
+  disponible?: T;
+  pestanaPortada?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcas-maquinaria_select".
+ */
+export interface MarcasMaquinariaSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  descripcion?: T;
+  logo?: T;
+  imagenTarjeta?: T;
+  ordenPortada?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tipos-maquinaria_select".
+ */
+export interface TiposMaquinariaSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  marca?: T;
+  descripcion?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categorias-maquinaria_select".
  */
 export interface CategoriasMaquinariaSelect<T extends boolean = true> {
@@ -1769,28 +1791,6 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "equipos-usados_select".
- */
-export interface EquiposUsadosSelect<T extends boolean = true> {
-  nombre?: T;
-  categoria?: T;
-  marca?: T;
-  modelo?: T;
-  anio?: T;
-  horometro?: T;
-  ubicacion?: T;
-  pesoOperativo?: T;
-  potencia?: T;
-  motor?: T;
-  descripcion?: T;
-  imagenes?: T;
-  disponible?: T;
-  pestanaPortada?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2094,6 +2094,62 @@ export interface CategoriasBlogSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "preguntas-frecuentes_select".
+ */
+export interface PreguntasFrecuentesSelect<T extends boolean = true> {
+  pregunta?: T;
+  respuesta?: T;
+  orden?: T;
+  publicada?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonios_select".
+ */
+export interface TestimoniosSelect<T extends boolean = true> {
+  nombre?: T;
+  empresa?: T;
+  ciudad?: T;
+  cita?: T;
+  foto?: T;
+  video?: T;
+  youtube?: T;
+  autorizacionUso?: T;
+  fechaAutorizacion?: T;
+  referenciaAutorizacion?: T;
+  publicado?: T;
+  orden?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sedes_select".
+ */
+export interface SedesSelect<T extends boolean = true> {
+  nombre?: T;
+  ciudad?: T;
+  departamento?: T;
+  latitud?: T;
+  longitud?: T;
+  lineas?:
+    | T
+    | {
+        linea?: T;
+        localidad?: T;
+        direccion?: T;
+        telefono?: T;
+        id?: T;
+      };
+  foto?: T;
+  orden?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
@@ -2109,24 +2165,6 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "animaciones_select".
- */
-export interface AnimacionesSelect<T extends boolean = true> {
-  descripcion?: T;
-  ancho?: T;
-  alto?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2164,57 +2202,34 @@ export interface VideosSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "sedes_select".
+ * via the `definition` "animaciones_select".
  */
-export interface SedesSelect<T extends boolean = true> {
-  nombre?: T;
-  ciudad?: T;
-  departamento?: T;
-  latitud?: T;
-  longitud?: T;
-  lineas?:
-    | T
-    | {
-        linea?: T;
-        localidad?: T;
-        direccion?: T;
-        telefono?: T;
-        id?: T;
-      };
-  foto?: T;
-  orden?: T;
+export interface AnimacionesSelect<T extends boolean = true> {
+  descripcion?: T;
+  ancho?: T;
+  alto?: T;
   updatedAt?: T;
   createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonios_select".
+ * via the `definition` "redirects_select".
  */
-export interface TestimoniosSelect<T extends boolean = true> {
-  nombre?: T;
-  empresa?: T;
-  ciudad?: T;
-  cita?: T;
-  foto?: T;
-  video?: T;
-  youtube?: T;
-  autorizacionUso?: T;
-  fechaAutorizacion?: T;
-  referenciaAutorizacion?: T;
-  publicado?: T;
-  orden?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "preguntas-frecuentes_select".
- */
-export interface PreguntasFrecuentesSelect<T extends boolean = true> {
-  pregunta?: T;
-  respuesta?: T;
-  orden?: T;
-  publicada?: T;
+export interface RedirectsSelect<T extends boolean = true> {
+  desde?: T;
+  hacia?: T;
+  tipo?: T;
+  origen?: T;
+  notas?: T;
+  estadoDestino?: T;
+  destinoVerificadoEn?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2241,21 +2256,6 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects_select".
- */
-export interface RedirectsSelect<T extends boolean = true> {
-  desde?: T;
-  hacia?: T;
-  tipo?: T;
-  origen?: T;
-  notas?: T;
-  estadoDestino?: T;
-  destinoVerificadoEn?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

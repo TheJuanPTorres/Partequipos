@@ -565,3 +565,68 @@ y el móvil sin panel visual ni tarjeta.
 `acceso-panel-m0mQ….webp` (1254 × 1254) elegida en «Imagen de la pantalla de
 acceso»; el logo sigue vacío y la imagen al compartir, intacta. La pantalla ya
 pinta el telón.
+
+## 20. Rediseño del panel, F1: menú en 8 grupos y fundamentos que faltaban (2026-10-06, rama `feat/panel-f1-menu`)
+
+Fase 1 de la propuesta `partequipos-cierre\propuestas\2026-10-06-panel-sistema-diseno.md`,
+aprobada por dirección. **Sin esquema y sin dependencias nuevas.**
+
+**Menú: de 6 grupos a 8, ordenados por uso** (`src/lib/panel/menu.ts`, con pruebas):
+
+| Grupo            | Icono de Tabler | Entradas, en orden                                                                                                 |
+| ---------------- | --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Solicitudes      | `IconInbox`     | Solicitudes                                                                                                        |
+| Repuestos        | `IconTool`      | Modelos · Marcas · Tipos de equipo · Categorías técnicas                                                           |
+| Maquinaria       | `IconBulldozer` | Equipos nuevos · Equipos usados · Marcas · Tipos · Categorías de maquinaria nueva · Categorías de maquinaria usada |
+| Lubricantes      | `IconDroplet`   | Marcas de lubricante · Categorías de lubricante                                                                    |
+| Páginas y blog   | `IconArticle`   | Páginas institucionales · Artículos · Categorías del blog · Preguntas frecuentes · Testimonios · Sedes             |
+| Archivos         | `IconPhoto`     | Imágenes · Documentos · Vídeos · Animaciones                                                                       |
+| Partes del sitio | `IconLayout`    | Cabecera · Pie de página · Ficha de producto                                                                       |
+| Configuración    | `IconSettings`  | SEO y datos de la empresa · Redirecciones · Usuarios                                                               |
+
+- **El orden lo fija `menu.ts`, no el array de la config.** Payload agrupa por
+  orden de aparición y pone los globales detrás de las colecciones, así que
+  «Partes del sitio» (solo globales) habría salido detrás de «Configuración».
+  `ordenarMenu` reordena grupos y entradas, y lo desconocido va al final, sin
+  perderse. El array de `payload.config.ts` sigue el mismo orden para que la
+  portada de Payload salga parecida. **Límite:** en la portada, «Partes del
+  sitio» sigue saliendo detrás de «Configuración», por la misma razón; se
+  arregla con la portada propia (F2), si se aprueba.
+- **«Categorías de usada» pasa a «Categorías de maquinaria usada»** (solo la
+  etiqueta).
+- **Guardarraíl (`grupos.test.ts`)**: los grupos aprobados salen de
+  `GRUPOS_DEL_MENU`; ahora también comprueba **los globales** (antes solo las
+  colecciones), leyendo la carpeta y no una lista a mano. El mapa de iconos se
+  tipa con `GrupoDelMenu`, así que un grupo sin icono no compila.
+- La preferencia de grupos abiertos o cerrados va por nombre de grupo: con los
+  nombres nuevos, cada usuario los ve abiertos la primera vez.
+
+**Fundamentos del sistema que faltaban** (sus páginas de Dimensiones,
+Elevación, Motion y Contenido):
+
+| Fundamento                           | Qué se aplicó                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Elevación                            | Las tarjetas de la portada pierden la sombra: solo anillo de 1 px al 10 %, en claro y oscuro. Al pasar el ratón, anillo al 20 % y fondo `accent` (antes, sombra más grande). Lo flotante (menús, diálogos) es de Payload y no se toca                                                                                                                                           |
+| Movimiento                           | Variable `--pq-transicion: 150ms ease`, que pasa a `0s` con movimiento reducido. La usan las transiciones propias: chevron del menú (antes 200 ms), tarjetas y botones de la pantalla de acceso. Las de Payload no se tocan                                                                                                                                                     |
+| Dimensiones (4 px)                   | Revisado: los espaciados propios ya van en múltiplos de 2 o 4 px. Quedan dos valores impares a propósito y documentados: 5 px en los campos (alto 32 − línea 20 − borde 2) y 2,5 px en los enlaces del menú (densidad, §8 de `design-tokens.md`)                                                                                                                                |
+| Contenido (mayúscula solo al inicio) | La traducción de Payload traía 58 textos con mayúsculas de título («Panel de Control», «Guardar Cambios», «Nueva Contraseña»…). Se convierten al cargar la config (`src/lib/panel/oracion.ts`, con pruebas que incluyen la traducción real): respeta siglas (API, URL…), variables `{{…}}`, HTML, comillas e inicios de frase. Si Payload añade textos, la regla los cubre sola |
+
+**`panel:revision` con modo `oscuro`**: la pasada normal con el tema oscuro
+(cookie `payload-theme`), para revisar en los dos temas.
+
+## 21. Incoherencias del sistema de diseño del cliente: manda lo que pinta su web
+
+Decisión de dirección (2026-10-06): **donde la documentación del sistema y lo
+que pinta su web no coinciden, manda lo pintado.** Quedan como **preguntas para
+quien mantenga el sistema de diseño** (ui.partequipos.com):
+
+| #   | Su documentación dice                                | Su web pinta (medido 2026-10-05/06)                                | Qué usa el panel                                                         |
+| --- | ---------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| 1   | Tipografía «Instrument Sans» para interfaz y títulos | **Rubik**                                                          | Rubik                                                                    |
+| 2   | `--radius` de **0.35rem**                            | **0.45rem** (su `theme.json` y el radio 2xl, 12,96 px)             | 0.45rem (7,2 px)                                                         |
+| 3   | Cuerpo de interfaz `text-xs` (12 px)                 | **14 px**                                                          | 14 px                                                                    |
+| 4   | —                                                    | El ejemplo de `empty` está en **inglés** («No projects yet»)       | Textos en español con su guía de contenido                               |
+| 5   | —                                                    | Su foco (`ring-ring/30`) da **2,52:1**, bajo el 3:1 de WCAG 1.4.11 | Foco de 2 px en `primary` (4,71:1), ya documentado en `design-tokens.md` |
+
+Además, la «tarjeta» en la que se ve `login-screen` en su web es el marco de la
+documentación, no el componente (§19).

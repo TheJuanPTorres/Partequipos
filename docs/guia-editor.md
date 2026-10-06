@@ -109,7 +109,8 @@ Al entrar ves el **panel de control**:
   lista. El **+** crea una ficha nueva en esa lista.
 - **Lo último modificado:** las últimas fichas que se han tocado, quién y cuándo
   (pasa el ratón por la fecha para ver la exacta). Si sale «—», la ficha se
-  modificó antes de que el panel guardara quién edita. Las solicitudes no salen
+  modificó antes de que el panel guardara quién edita, o esa persona ya no
+  tiene usuario. Las solicitudes no salen
   aquí.
 
 Solo ves lo que tu usuario puede abrir.

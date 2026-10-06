@@ -6,9 +6,14 @@
  *
  * Con la sesión de un usuario (acceso real, `overrideAccess: false`), crea una
  * pregunta frecuente de prueba MANDANDO un editor falso y comprueba que se
- * guarda el usuario de la sesión; que un cliente no lo puede borrar; que un
- * cambio sin sesión (un script) no lo borra; y que Solicitudes y Usuarios no
- * tienen el campo. Al final borra la pregunta de prueba.
+ * guarda el usuario de la sesión; que un cliente no lo puede borrar; que sin
+ * sesión y saltándose el acceso un editor falso tampoco entra (lo impide el
+ * gancho); y que Solicitudes y Usuarios no tienen el campo. Al final borra la
+ * pregunta de prueba.
+ *
+ * LÍMITE: la garantía la da el gancho, que siempre escribe el usuario de la
+ * sesión o el anterior. El acceso cerrado del campo es una segunda barrera que
+ * este script NO demuestra por separado (el gancho la tapa).
  */
 import { getPayload, type Payload } from "payload";
 
@@ -82,15 +87,21 @@ try {
     `guardado: ${String(editorDe(tras))}`,
   );
 
-  // Un script: sin sesión.
-  await payload.update({ collection: "preguntas-frecuentes", id: creada.id, data: { orden: 99 } });
+  // Un script: sin sesión, saltándose el acceso y MANDANDO un editor falso.
+  // Lo único que lo impide es el gancho (el acceso no se aplica aquí): prueba
+  // que el valor nunca sale de lo que llega.
+  await payload.update({
+    collection: "preguntas-frecuentes",
+    id: creada.id,
+    data: { orden: 99, [CAMPO_ULTIMO_EDITOR]: 999999 } as never,
+  });
   const script = await payload.findByID({
     collection: "preguntas-frecuentes",
     id: creada.id,
     depth: 0,
   });
   comprobar(
-    "un cambio sin sesión (script) conserva el último editor",
+    "sin sesión ni acceso, un editor falso tampoco entra: se conserva el anterior",
     editorDe(script) === usuario.id,
     `guardado: ${String(editorDe(script))}`,
   );

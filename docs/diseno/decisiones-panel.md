@@ -799,11 +799,12 @@ Aprobado por dirección. **Cambio de esquema**, con la ventana de migraciones.
 - **Campo `actualizadoPor`** (relación con Usuarios, `src/lib/fields/ultimoEditor.ts`)
   en las 23 colecciones de contenido, **nunca en Solicitudes ni en Usuarios**
   (`conUltimoEditor` en `payload.config.ts`). Oculto en el formulario.
-- **Lo pone solo el servidor.** El acceso de escritura del campo está cerrado,
-  así que Payload descarta lo que mande el cliente (en 3.89, el acceso de campo
-  se aplica en `beforeValidate`, antes que los ganchos de `beforeChange`), y un
-  gancho `beforeChange` escribe el usuario de la sesión. Sin sesión (un script
-  de datos), conserva el anterior: un script no se apunta ni lo borra.
+- **Lo pone solo el servidor.** La garantía es el gancho `beforeChange`: escribe
+  SIEMPRE el usuario de la sesión o, sin sesión (un script de datos), el valor
+  anterior; nunca lo que llegue en la petición. Además, el acceso de escritura
+  del campo está cerrado, así que Payload descarta lo que mande el cliente
+  antes del gancho (en 3.89, el acceso de campo se aplica en `beforeValidate`):
+  es una segunda barrera.
 - **Migración `20261006_224101_ultimo_editor`, solo esquema:** 23 columnas
   `actualizado_por_id`, cada una con su clave foránea a `users`
   (`ON DELETE set null`: si se borra un usuario, sus ediciones quedan en «—»)
@@ -816,7 +817,9 @@ Aprobado por dirección. **Cambio de esquema**, con la ventana de migraciones.
 - **Por efecto:** `npm run qa:ultimo-editor` contra `development` (se niega con
   la base real). Con la sesión de un usuario crea una pregunta de prueba
   mandando un editor falso, y comprueba en la base que se guarda el de la
-  sesión, que un cliente no lo borra, que un guardado sin sesión lo conserva y
-  que Solicitudes y Usuarios no tienen el campo; al final la borra. 5 de 5.
+  sesión, que un cliente no lo borra, que sin sesión y saltándose el acceso un
+  editor falso tampoco entra y que Solicitudes y Usuarios no tienen el campo;
+  al final la borra. 5 de 5. **Límite:** demuestra el gancho; el acceso cerrado
+  del campo no se puede demostrar por separado con él (el gancho lo tapa).
   `development` se puso al día con `payload migrate` y `db:check` antes y
   después.

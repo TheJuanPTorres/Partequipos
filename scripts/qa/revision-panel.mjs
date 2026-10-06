@@ -23,7 +23,9 @@
  *   corta), los errores de consola y las peticiones que fallan (solo host y
  *   ruta), para no depender solo de mirar.
  * - Navegador: Chrome instalado (otra ruta con `CHROME_PATH`).
- * - No escribe nada en el panel: solo navega y lee.
+ * - No escribe nada en el panel: solo navega y lee. En modo `ficha` pulsa
+ *   «Guardar» con 5 «Destacar» marcados, que la validación rechaza, y comprueba
+ *   después en la API que no se guardó nada.
  */
 import fs from "node:fs";
 import { createRequire } from "node:module";
@@ -62,7 +64,9 @@ function fallar(mensaje) {
 
 // --- Preview --------------------------------------------------------------
 const base = (process.argv[2] ?? "").replace(/\/$/, "");
-if (!base) fallar("Uso: npm run panel:revision -- <url del preview>");
+if (!base) fallar("Uso: npm run panel:revision -- <url del preview> [ficha]");
+// `ficha`: además, el aviso de más de 4 «Destacar» y la vista de subir un PDF.
+const MODO = process.argv[3] ?? "";
 const { hostname, origin } = new URL(base);
 if (hostname === DOMINIO_PRODUCCION || !/^partequipos-[a-z0-9-]+\.vercel\.app$/.test(hostname)) {
   fallar(`Solo contra un preview del proyecto (*.vercel.app), no «${hostname}».`);
@@ -153,7 +157,7 @@ try {
         headers: { ...r.request().headers(), "x-vercel-protection-bypass": bypass },
       }),
     );
-    const pagina = await contexto.newPage();
+    let pagina = await contexto.newPage();
     const errores = [];
     pagina.on("console", (m) => m.type() === "error" && errores.push(m.text().slice(0, 200)));
     // Peticiones que fallan (p. ej. una miniatura que no carga y sale como icono).
@@ -198,6 +202,7 @@ try {
 
     for (const p of PANTALLAS) await visitar(p.nombre, p.ruta);
 
+    const fichas = {};
     for (const f of FORMULARIOS) {
       await pagina.goto(`${base}/admin/collections/${f.coleccion}${f.filtro ?? ""}`, {
         waitUntil: "networkidle",
@@ -207,8 +212,85 @@ try {
         .locator(`table a[href*="/admin/collections/${f.coleccion}/"]`)
         .evaluateAll((as) => as.map((a) => a.getAttribute("href")));
       const enlace = enlaces.find((h) => h && !/\/create\/?$/.test(h));
-      if (enlace) await visitar(f.nombre, new URL(enlace, base).pathname);
-      else decir(`· sin registros en ${f.coleccion}: no hay formulario (${ancho.nombre})`);
+      if (enlace) {
+        fichas[f.coleccion] = new URL(enlace, base).pathname;
+        await visitar(f.nombre, fichas[f.coleccion]);
+      } else decir(`· sin registros en ${f.coleccion}: no hay formulario (${ancho.nombre})`);
+    }
+
+    /*
+     * Modo `ficha` (opcional: `npm run panel:revision -- <preview> ficha`):
+     * la ficha técnica de un equipo nuevo con más de 4 «Destacar» y la vista
+     * de subir un PDF. Marca la 5.ª fila y pulsa «Guardar»: la validación lo
+     * RECHAZA, así que no se escribe nada; después lo comprueba leyendo el
+     * equipo por la API (§10.15). Nunca guarda con 4 o menos.
+     */
+    if (MODO === "ficha" && fichas["equipos-nuevos"]) {
+      const ruta = fichas["equipos-nuevos"];
+      const id = ruta.split("/").filter(Boolean).pop();
+      // Desde la página: así pasa por el interceptor que añade el token del preview.
+      const leer = async () =>
+        pagina.evaluate(
+          async (u) => (await fetch(u, { credentials: "include" })).json(),
+          `/api/equipos-nuevos/${id}?depth=0`,
+        );
+      const antes = (await leer()).fichaTecnica ?? [];
+      const marcadasAntes = antes.filter((f) => f.destacar).length;
+      await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });
+      await pagina.waitForTimeout(1500);
+      const casillas = pagina.locator(
+        'input[type="checkbox"][id^="field-fichaTecnica__"][id$="__destacar"]',
+      );
+      const total = await casillas.count();
+      let marcadas = 0;
+      for (let i = 0; i < total; i++) if (await casillas.nth(i).isChecked()) marcadas++;
+      for (let i = 0; i < total && marcadas <= 4; i++) {
+        if (!(await casillas.nth(i).isChecked())) {
+          await casillas.nth(i).check({ force: true });
+          marcadas++;
+        }
+      }
+      if (marcadas <= 4) {
+        decir(
+          `· ficha: el equipo tiene ${total} filas; hacen falta 5 para ver el aviso (${ancho.nombre})`,
+        );
+      } else {
+        await pagina.locator("#action-save").click();
+        await pagina.waitForTimeout(2500);
+        const avisos = await pagina.locator(".payload-toast-container").allInnerTexts();
+        // Junto a cada casilla: el tooltip de error de Payload y la casilla en error.
+        const junto = await pagina.evaluate(() => ({
+          casillasEnError: document.querySelectorAll(".checkbox.error, .field-type.checkbox.error")
+            .length,
+          tooltips: [...document.querySelectorAll(".field-error")].map((e) => ({
+            texto: e.textContent.trim(),
+            visible:
+              e.getBoundingClientRect().height > 0 && getComputedStyle(e).visibility !== "hidden",
+          })),
+        }));
+        const fichero = path.join(salida, `ficha-aviso-mas-de-4-${ancho.nombre}.png`);
+        await pagina.screenshot({ path: fichero, fullPage: true });
+        const despues = (await leer()).fichaTecnica ?? [];
+        const marcadasDespues = despues.filter((f) => f.destacar).length;
+        hallazgos.push({
+          pantalla: "ficha-aviso-mas-de-4",
+          ancho: ancho.nombre,
+          avisos: [...new Set(avisos.map((a) => a.trim()).filter(Boolean))],
+          junto,
+          destacadasAntes: marcadasAntes,
+          destacadasDespues: marcadasDespues,
+        });
+        decir(
+          `✓ ficha: aviso con ${marcadas} marcadas → ${path.basename(fichero)} · en la base ${marcadasAntes} antes y ${marcadasDespues} después (${ancho.nombre})`,
+        );
+        if (marcadasDespues !== marcadasAntes)
+          fallar("La ficha técnica SE GUARDÓ con más de 4: revisar a mano.");
+      }
+      // Página nueva: la anterior tiene cambios sin guardar y no se navega desde ella.
+      await pagina.close();
+      pagina = await contexto.newPage();
+      pagina.on("console", (m) => m.type() === "error" && errores.push(m.text().slice(0, 200)));
+      await visitar("documentos-crear", "/admin/collections/documentos/create");
     }
 
     hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });

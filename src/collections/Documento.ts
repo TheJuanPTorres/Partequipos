@@ -23,10 +23,12 @@ export const Documento: CollectionConfig = {
   labels: { singular: "Documento", plural: "Documentos" },
   admin: {
     useAsTitle: "titulo",
-    defaultColumns: ["titulo", "filename", "filesize", "updatedAt"],
+    // Sin «Tamaño del archivo»: la lista lo da en bytes sin unidad («714»). El
+    // tamaño, legible, sale al abrir el documento.
+    defaultColumns: ["titulo", "filename", "updatedAt"],
     group: "Contenido",
     description:
-      "Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 25 MB: el PDF sube directo al almacén, sin pasar por el servidor. Las imágenes van en «Imágenes».",
+      "Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 25 MB. Las imágenes van en «Imágenes».",
   },
   access: {
     read: publico,

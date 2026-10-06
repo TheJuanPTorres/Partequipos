@@ -1344,3 +1344,22 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
     margin-top: calc(var(--base) * 0.25);
   }
 }
+
+/*
+ * Contador de «Destacar» de la ficha técnica (`ContadorDestacadas.tsx`), bajo
+ * el array. En rojo si hay más de 4: con el color de error del propio panel.
+ */
+.pq-destacadas {
+  margin: calc(var(--base) * -0.5) 0 calc(var(--base) * 1.5);
+  color: var(--theme-elevation-800);
+  font-size: 0.95rem;
+
+  &--error {
+    padding: calc(var(--base) * 0.5) calc(var(--base) * 0.75);
+    border-left: 4px solid var(--theme-error-500);
+    border-radius: var(--style-radius-s);
+    background: var(--theme-error-50);
+    color: var(--theme-error-750, var(--theme-elevation-1000));
+    font-weight: 600;
+  }
+}

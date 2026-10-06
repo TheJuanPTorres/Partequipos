@@ -291,7 +291,7 @@ export interface EquiposNuevo {
       }[]
     | null;
   /**
-   * Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Los PDF se suben en «Documentos».
+   * Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 25 MB) o elige uno ya subido en «Documentos».
    */
   fichaTecnicaPdf?: (number | null) | Documento;
   /**
@@ -342,7 +342,7 @@ export interface MarcasMaquinaria {
   createdAt: string;
 }
 /**
- * Fotos y logos del sitio, en JPEG, PNG o WebP. El texto alternativo describe la imagen a quien no la ve.
+ * Fotos y logos del sitio, en JPEG, PNG o WebP, de hasta 15 MB (suben directo al almacén). El texto alternativo describe la imagen a quien no la ve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -390,7 +390,7 @@ export interface TiposMaquinaria {
   createdAt: string;
 }
 /**
- * Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 4 MB. Las imágenes van en «Imágenes».
+ * Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 25 MB. Las imágenes van en «Imágenes».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "documentos".

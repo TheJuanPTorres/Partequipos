@@ -69,3 +69,23 @@ export function validarDestacadas(filas: FilaFicha[] | null | undefined): true |
   if (n <= MAX_DESTACADAS) return true;
   return `Solo caben ${MAX_DESTACADAS} datos destacados en la ficha y hay ${n} marcados. Quita «Destacar» en ${n - MAX_DESTACADAS}.`;
 }
+
+/** Cuántas casillas «Destacar» están marcadas (valores tal cual del formulario). */
+export function contarDestacadas(valores: readonly unknown[]): number {
+  return valores.filter((v) => v === true).length;
+}
+
+/**
+ * Validación de la casilla «Destacar» de CADA fila: el mismo criterio que
+ * `validarDestacadas`, pero el mensaje sale junto a la casilla marcada. Puesto
+ * en el array, Payload solo enseñaba «El siguiente campo es inválido: Ficha
+ * técnica» y el editor no veía qué corregir (revisión en pantalla del
+ * 2026-10-06). Solo las casillas marcadas pueden ser el error.
+ */
+export function validarDestacarFila(
+  valor: unknown,
+  { data }: { data?: { fichaTecnica?: FilaFicha[] | null } | null },
+): true | string {
+  if (valor !== true) return true;
+  return validarDestacadas(data?.fichaTecnica);
+}

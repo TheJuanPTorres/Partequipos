@@ -108,6 +108,21 @@ tipo. Además llevan puntos destacados y ficha técnica: copia los datos tal
 como los publica el fabricante, con su unidad («20.500 kg»). Si no hay dato
 oficial, no lo pongas.
 
+- **«Destacar» en la ficha técnica:** marca **hasta 4 filas**. Salen con su
+  icono junto al título de la ficha, y las 3 primeras, en las tarjetas de
+  «otras referencias». Al marcarla aparece **«Icono»**: elige el que mejor
+  encaje («Peso», «Potencia», «Motor»…); si no eliges, sale «Otro dato». Bajo
+  la ficha técnica, un contador dice cuántas llevas («Filas destacadas: 3 de
+  4»). Con una quinta marcada se pone en rojo y te dice cuántas quitar; si
+  guardas así, el panel no lo deja y el aviso de arriba nombra las casillas.
+- **«Ficha técnica completa (PDF)»:** súbelo ahí mismo con **«Crear»**, o
+  elige uno ya subido. Solo PDF, **máximo 25 MB**. Sale en la ficha como
+  «Descargar ficha técnica completa»; sin PDF, el botón no aparece. Los PDF
+  quedan en **Contenido → Documentos**.
+- **La imagen del recuadro «Contáctanos para recibir asesoría»**, al final de
+  todas las fichas, es la misma para todas: está en **Contenido → Ficha de
+  producto**.
+
 ### 5.3 Equipos usados
 
 - **Maquinaria → Equipos usados.** No tienen página propia: salen dentro de la
@@ -263,6 +278,7 @@ hasta que la tengan. El propio bloque lo avisa.
 | Mensaje (resumido)                                                                           | Qué hacer                                                          |
 | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | «El tipo … es de otra marca»                                                                 | Elige un tipo de la marca seleccionada, o cambia la marca          |
+| «Solo caben 4 datos destacados en la ficha…»                                                 | Quita «Destacar» en las filas que sobren (§5.2)                    |
 | «El slug … ya lo usa una página / un artículo»                                               | Cambia el slug antes de guardar                                    |
 | «… no es una imagen JPEG, PNG ni WebP»                                                       | Convierte la imagen y vuelve a subirla                             |
 | «… pesa … MB y el máximo es 4 MB»                                                            | Exporta el vídeo con más compresión                                |

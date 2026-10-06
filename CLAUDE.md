@@ -676,9 +676,10 @@ detalle en `docs/diseno/decisiones-home-ux9.md` §13):
 
 | Pendiente                                                                                     | De quién                      | Mientras tanto                                                                                                     |
 | --------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | Preview: `/contactanos/` provisional. Producción: dirección, con `runbook-pie-enlaces-redes.md`                    |
-| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | Preview: `/contactanos/` provisional. Producción: dirección, con `runbook-pie-enlaces-redes.md`                    |
-| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | Preview: `/contactanos/` provisional. Producción: dirección, con `runbook-pie-enlaces-redes.md`                    |
+| URL de **«Trabaja con nosotros»** (portal de empleo)                                          | Cliente                       | **`/contactanos/` provisional**, en preview y en producción (cargado por dirección el 2026-10-05)                  |
+| URL de **«Zona de clientes»** (SAP de repuestos y de maquinaria)                              | Cliente                       | **`/contactanos/` provisional**, en preview y en producción (cargado por dirección el 2026-10-05)                  |
+| **«Financiación»**: no hay página. ¿Se crea, se enlaza a un tercero o se quita?               | Cliente                       | **`/contactanos/` provisional**, en preview y en producción (cargado por dirección el 2026-10-05)                  |
+| URL reales de **LinkedIn, X y TikTok** (perfiles oficiales; LinkedIn también en §10.3 p.2)    | Cliente                       | **Sin cargar en producción**: no salen en el pie ni en el JSON-LD. En el preview, URL de ejemplo (`…ejemplo-ux9…`) |
 | **Imagen decorativa** `Partequipos3553.png` (brazo de excavadora): licencia de banco (**L3**) | Andrés (procedencia), cliente | Retirada de producción el 2026-09-28 (§10.33); sin imagen hasta que se licencie o se reemplace; nunca en `public/` |
 | **HelveticaNeue** del texto de la empresa: licencia web (**L1**)                              | Cliente, vía Andrés           | Inter                                                                                                              |
 | Redacción: «Ayudamos sectores…» → «Ayudamos **a** sectores…»                                  | Andrés (para su maqueta)      | Corregido en el sitio                                                                                              |
@@ -687,6 +688,13 @@ Cuando lleguen las URL, se añaden en el panel (global **Pie de página**), sin
 tocar código. **Desde el 2026-10-05**, el pie tiene además el **buscador
 provisional** de ux-9 (solo anuncia «Buscador disponible pronto», no navega)
 y pinta las redes en el orden de ux-9 (`decisiones-home-ux9.md` §13.9).
+
+**Runbook `runbook-pie-enlaces-redes.md`: EJECUTADO EN PARTE por dirección el
+2026-10-05.** Solo los enlaces: los tres, con destino provisional
+`/contactanos/`, comprobados en el HTML y a la vista. Las redes de LinkedIn, X
+y TikTok **no** se cargaron: esperan las URL reales del cliente, y se cargan
+con los pasos 3 a 5 del mismo runbook. Cuando lleguen las URL de los enlaces,
+se cambia su destino en el panel (global **Pie de página**).
 
 **FOTOS DEL HERO ENVIADAS POR EL CLIENTE (2026-09-30):** **derecho de uso
 confirmado por el cliente**; dirección conserva la confirmación. Son otras que

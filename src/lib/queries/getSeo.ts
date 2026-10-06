@@ -15,7 +15,8 @@ import {
 
 /**
  * El global `seo`, UNA consulta por petición para todo lo de abajo. `depth: 1`
- * para poblar el logo (las demás relaciones del global no existen).
+ * para poblar las imágenes del global (logo, imagen al compartir y la de la
+ * pantalla de acceso).
  */
 const getSeoGlobal = cache(async () => {
   const payload = await getPayload({ config });

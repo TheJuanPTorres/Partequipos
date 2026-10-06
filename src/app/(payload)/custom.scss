@@ -1383,6 +1383,13 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  * ========================================================================= */
 
 /* La plantilla mínima de Payload centra una caja de 480 px: aquí ocupa todo. */
+/* En oscuro, la página va en el fondo y la tarjeta en --pq-card, como en el sistema. */
+html[data-theme="dark"] .pq-acceso {
+  @media (min-width: 1024px) {
+    background: var(--pq-background);
+  }
+}
+
 .login.template-minimal:has(.pq-acceso) {
   display: block;
   padding: 0;
@@ -1392,11 +1399,16 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   }
 }
 
+/*
+ * TARJETA (2026-10-05, decisiones-panel.md §19). En escritorio todo va en una
+ * tarjeta centrada, como se pinta el componente en la página del sistema
+ * (medido a 1280, 1440 y 1920): 928 px de ancho (1056 desde 1536 px), borde
+ * de 1 px, radio xl (10 px), 24 px de relleno y al menos 608 px de alto, sobre
+ * el fondo atenuado de la página (en oscuro, el fondo y la tarjeta en --pq-card).
+ * En móvil, como antes: sin tarjeta y a pantalla completa.
+ */
 .pq-acceso {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
   min-height: 100dvh;
-  padding: 16px;
   background: var(--pq-background);
   color: var(--pq-foreground);
   font-family: var(--font-body);
@@ -1404,8 +1416,32 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   line-height: 20px;
 
   @media (min-width: 1024px) {
-    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
-    padding: 24px;
+    display: grid;
+    place-items: center;
+    padding: 48px;
+    background: var(--pq-muted);
+  }
+
+  &__tarjeta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 100dvh;
+    padding: 16px;
+
+    @media (min-width: 1024px) {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+      width: 100%;
+      max-width: 928px;
+      min-height: 610px; /* 608 del componente + el borde, como en el original */
+      padding: 24px;
+      border: 1px solid var(--pq-border);
+      border-radius: var(--pq-radius-xl);
+      background: var(--pq-card);
+    }
+
+    @media (min-width: 1536px) {
+      max-width: 1056px;
+    }
   }
 
   :is(a, button, input):focus-visible {

@@ -41,6 +41,7 @@ convertirlo con `convertHTMLToLexical` de Payload, se aplana:
 - **Contenedores fuera** (`div`, `section`, `span`, `figure`…): se quedan sus hijos.
 - **Imágenes:** cada una pasa a un marcador que después es un nodo `upload` de la `Media`. Si va dentro de un enlace a la propia imagen, el enlace también se quita.
 - **Tablas:** el editor del sitio no tiene tablas, así que cada fila pasa a un párrafo «celda · celda».
+- **Widgets de plugins que no son del artículo:** las estrellas de valoración («5/5 - (1 voto)», kk-star-ratings, en las 53 entradas) se quitan.
 - **Shortcodes que quedan como texto** (`[if …]`, `[endif]`): se quitan.
 - **Enlaces a `partequipos.com`:** pasan a rutas relativas. Las URL del sitio nuevo son las mismas.
 - **Fuera:** `<h1>` del cuerpo (pasa a `<h2>`), `style`, `script`, `iframe`, `video` y formularios. Todo se cuenta en el informe; hoy no hay ninguno.

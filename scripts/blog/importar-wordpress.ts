@@ -284,6 +284,9 @@ const DESENVOLVER = new Set([
   "FONT",
 ]);
 
+/** Bloques de plugins de WordPress que se quitan del contenido (selector → nombre en el informe). */
+const PLUGINS: [string, string][] = [[".kk-star-ratings", "valoración (kk-star-ratings)"]];
+
 type Aplanado = {
   html: string;
   imagenes: Imagen[];
@@ -302,6 +305,15 @@ function aplanar(html: string): Aplanado {
   let tablas = 0;
 
   for (const e of [...cuerpo.querySelectorAll("style, script, noscript, link, meta")]) e.remove();
+
+  // Widgets de plugins que no son del artículo: las estrellas de valoración
+  // («5/5 - (1 voto)», kk-star-ratings) van en las 53 entradas.
+  for (const [sel, nombre] of PLUGINS) {
+    for (const e of [...cuerpo.querySelectorAll(sel)]) {
+      otros.push(nombre);
+      e.remove();
+    }
+  }
 
   // Imágenes → marcador (si van dentro de un enlace a la propia imagen, el enlace también).
   for (const img of [...cuerpo.querySelectorAll("img")]) {
@@ -677,7 +689,7 @@ log(
   `destacadas: ${JSON.stringify(informe.reduce<Record<string, number>>((a, e) => ({ ...a, [e.destacada.split(":")[0]!]: (a[e.destacada.split(":")[0]!] ?? 0) + 1 }), {}))}`,
 );
 log(
-  `tablas pasadas a párrafos: ${suma((e) => e.tablasAParrafos)} · shortcodes quitados: ${suma((e) => e.shortcodesQuitados.length)} · no convertibles: ${suma((e) => e.noConvertibles.length)}`,
+  `tablas pasadas a párrafos: ${suma((e) => e.tablasAParrafos)} · shortcodes quitados: ${suma((e) => e.shortcodesQuitados.length)} · quitados o no convertibles: ${JSON.stringify(informe.flatMap((e) => e.noConvertibles).reduce<Record<string, number>>((a, n) => ({ ...a, [n]: (a[n] ?? 0) + 1 }), {}))}`,
 );
 log(`texto conservado (mín.): ${Math.min(...informe.map((e) => e.textoConservado))} %`);
 log(

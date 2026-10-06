@@ -63,6 +63,27 @@
   outline-offset: 3px;
 }
 
+/*
+ * MÓVIL (dirección, 2026-10-06): todo en la misma pantalla. La sección sube
+ * sobre el final del recorrido fijado de «Nuestra Compañía» para que, al
+ * soltarse, el título quede 24 px bajo el vídeo encogido y dentro de la
+ * pantalla. El vídeo encogido (escala 0,55, `ESCALA_FINAL_MOVIL` de
+ * `SeccionCompania.tsx`, anclado arriba a un 6 % del alto, `BAJADA_MOVIL`)
+ * deja libre abajo 1 − 0,06 − 0,55 del alto de la pantalla; se descuenta el
+ * relleno superior de 40 px. Valores fijos en el
+ * CSS: sin CLS. Por encima del velo blanco fijo (z-index 1).
+ * Con movimiento reducido no hay encogido: no sube.
+ */
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  .seccion {
+    --s8-video-final: 0.61; /* 0,06 de bajada + 0,55 de escala */
+    --s8-bajo-video: 24px;
+    z-index: 2;
+    margin-top: calc((var(--s8-video-final) - 1) * 100vh + var(--s8-bajo-video) - 40px);
+    margin-top: calc((var(--s8-video-final) - 1) * 100svh + var(--s8-bajo-video) - 40px);
+  }
+}
+
 @media (max-width: 767px) {
   .titulo {
     box-sizing: border-box;

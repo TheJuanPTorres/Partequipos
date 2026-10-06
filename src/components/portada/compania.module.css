@@ -52,6 +52,21 @@
   transform-origin: center center;
 }
 
+/*
+ * MÓVIL (dirección, 2026-10-06): el vídeo se encoge anclado arriba y baja hasta
+ * un 6 % del alto (`BAJADA_MOVIL` de `SeccionCompania.tsx`). Centrado dejaba
+ * debajo un 22,5 % de la pantalla, poco para el título de la sección 8 (hasta
+ * 4 líneas, ~200 px); así quedan libres 1 − 0,06 − 0,55 = 39 %. Solo
+ * `transform`: sin CLS.
+ */
+@media (max-width: 767px) {
+  .encoge {
+    transform: translateY(calc(var(--compania-encogido, 0) * 6vh)) scale(var(--compania-escala, 1));
+    transform: translateY(calc(var(--compania-encogido, 0) * 6svh)) scale(var(--compania-escala, 1));
+    transform-origin: 50% 0;
+  }
+}
+
 .tarjeta {
   position: relative;
   display: flex;

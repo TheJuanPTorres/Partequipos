@@ -27,6 +27,11 @@ import { DialogoYouTube } from "./DialogoYouTube";
  * 2. Mientras termina de encogerse, aparece el texto infinito que tiene detrás.
  * 3. Al soltarse el fijado entra la sección 8, DEBAJO (nunca encima del vídeo),
  *    y su título hace su barrido al entrar.
+ *    EN MÓVIL (dirección, 2026-10-06) todo pasa en la misma pantalla: la
+ *    vídeo se encoge anclado arriba (a un 6 % del alto) para dejar sitio
+ *    debajo; la sección 8 sube para que su título acabe 24 px bajo él
+ *    (`catalogo.module.css`), y el encogido termina justo cuando ese título
+ *    empieza a entrar por abajo, con la sección todavía fija.
  * Una capa blanca fija entra en el primer 8 % del recorrido y se apaga del 75 al
  * 100 %, como ux-9. Con movimiento reducido, todo estático en su sitio: el
  * vídeo a tamaño completo, el texto debajo y quieto, sin fijado.
@@ -56,6 +61,23 @@ const TEXTO_HASTA = 0.65;
 const ESCALA_FINAL = 0.4;
 const ESCALA_FINAL_MOVIL = 0.55;
 const RADIO_FINAL_PX = 32;
+/** Móvil: del pie del vídeo encogido al título de la sección 8 (igual en el CSS). */
+const TITULO_BAJO_VIDEO_PX = 24;
+/**
+ * Móvil: el vídeo se encoge anclado ARRIBA y baja hasta este 6 % del alto
+ * (`compania.module.css`), para dejar debajo sitio al título de la 8.
+ */
+const BAJADA_MOVIL = 0.06;
+
+/**
+ * En móvil, la fracción del recorrido en la que acaba el encogido: cuando el
+ * título de la sección 8 asoma por abajo. Le quedan por subir lo que mide la
+ * franja libre bajo el vídeo encogido menos su hueco.
+ */
+function finEncogidoMovil(alto: number): number {
+  const subida = (1 - BAJADA_MOVIL - ESCALA_FINAL_MOVIL) * alto - TITULO_BAJO_VIDEO_PX;
+  return Math.min(0.9, Math.max(FIN_ENCOGIDO, 1 - subida / RECORRIDO_PX));
+}
 /** ux-9: `scrub: 0.6` — el efecto alcanza al scroll en ~0,6 s. */
 const ALCANCE_S = 0.6;
 /** ux-9: `MQ_SPEED`. */
@@ -150,11 +172,16 @@ export function SeccionCompania({ video, youtube, textos }: Props) {
       // Alcanza a la meta en ~0,6 s, como el `scrub` de ux-9.
       actual += (meta - actual) * Math.min(1, dt / (ALCANCE_S / 4));
       if (Math.abs(meta - actual) < 0.001) actual = meta;
-      const encogido = tramo(actual, 0, FIN_ENCOGIDO);
+      const fin = mq.matches ? finEncogidoMovil(innerHeight) : FIN_ENCOGIDO;
+      // El texto infinito aparece alrededor del final del encogido (0,35–0,65 en escritorio).
+      const desdeTexto = fin - (FIN_ENCOGIDO - TEXTO_DESDE);
+      const hastaTexto = Math.min(1, fin + (TEXTO_HASTA - FIN_ENCOGIDO));
+      const encogido = tramo(actual, 0, fin);
       const final = mq.matches ? ESCALA_FINAL_MOVIL : ESCALA_FINAL;
       caja.style.setProperty("--compania-escala", String(1 - (1 - final) * encogido));
+      caja.style.setProperty("--compania-encogido", String(encogido));
       caja.style.setProperty("--compania-radio", `${RADIO_FINAL_PX * encogido}px`);
-      texto.style.opacity = String(tramo(actual, TEXTO_DESDE, TEXTO_HASTA));
+      texto.style.opacity = String(tramo(actual, desdeTexto, hastaTexto));
       blanco.style.opacity = String(opacidadFondo(actual));
       frame = actual === meta ? 0 : requestAnimationFrame(pintar);
     };
@@ -184,6 +211,7 @@ export function SeccionCompania({ video, youtube, textos }: Props) {
       mq.removeEventListener("change", alScroll);
       if (frame) cancelAnimationFrame(frame);
       caja.style.removeProperty("--compania-escala");
+      caja.style.removeProperty("--compania-encogido");
       caja.style.removeProperty("--compania-radio");
       texto.style.removeProperty("opacity");
       blanco.style.opacity = "0";

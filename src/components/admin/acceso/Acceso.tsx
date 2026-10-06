@@ -6,7 +6,7 @@ import { formatAdminURL, getSafeRedirect } from "payload/shared";
 import { MicrosoftLogo } from "@/components/ui/microsoft-logo";
 import { PartequiposWordmark } from "@/components/ui/partequipos-wordmark";
 import { minutosDeBloqueo, urlMicrosoft, VARIABLE_MICROSOFT } from "@/lib/panel/acceso";
-import { getImagenAcceso } from "@/lib/queries/getImagenAcceso";
+import { getImagenAcceso } from "@/lib/queries/getSeo";
 
 import FormularioAcceso from "./FormularioAcceso";
 

@@ -10,12 +10,13 @@
  *   repositorio en `Desktop/partequipos-diseno/acceso/acceso-panel.webp`.
  * - SOLO preview: el guardián de base y almacén (`puedeTocarHeroDePrueba`) y la
  *   guarda del almacén (§10.37), antes de cargar Payload.
- * - El almacén añade un sufijo aleatorio al nombre; la pantalla lo reconoce
- *   (`esImagenAcceso`).
- * - Idempotente: si ya hay un registro con ese nombre de fichero, no sube otro.
- *   `retirar` lo borra y comprueba que el fichero sale del Blob.
- * - En producción la sube dirección desde el panel (runbook
- *   `runbook-imagen-acceso.md`); la pantalla la encuentra por el nombre.
+ * - `subir` la sube a `Media` (se reconoce por su texto alternativo exacto) y
+ *   la elige en «SEO y datos de la empresa» → «Imágenes» → «Imagen de la
+ *   pantalla de acceso» (`imagenAcceso`). Idempotente.
+ * - `retirar` vacía ese campo, borra la imagen y comprueba que el fichero sale
+ *   del Blob.
+ * - En producción la sube y la elige dirección desde el panel (runbook
+ *   `runbook-imagen-acceso.md`).
  */
 import os from "node:os";
 import path from "node:path";
@@ -24,7 +25,6 @@ import { getPayload } from "payload";
 
 import { exigirAlmacen } from "../blob/exigirAlmacen";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
-import { esImagenAcceso, IMAGEN_ACCESO, PREFIJO_IMAGEN_ACCESO } from "../../src/lib/panel/acceso";
 
 const modo = process.argv.slice(2).find((a) => a === "subir" || a === "retirar");
 if (!modo) {
@@ -49,47 +49,71 @@ const { default: config } = await import("../../src/payload.config");
 const payload = await getPayload({ config });
 
 const log = (m: string) => process.stdout.write(`[acceso] ${m}\n`);
-const FICHERO = path.join(os.homedir(), "Desktop", "partequipos-diseno", "acceso", IMAGEN_ACCESO);
+const FICHERO = path.join(
+  os.homedir(),
+  "Desktop",
+  "partequipos-diseno",
+  "acceso",
+  "acceso-panel.webp",
+);
+/** Texto alternativo exacto: así se reconoce la imagen que sube este script. */
+const ALT = "Telón rojo de fondo de la pantalla de acceso al panel";
 
 const existentes = async () =>
   (
     await payload.find({
       collection: "media",
-      where: { filename: { contains: PREFIJO_IMAGEN_ACCESO } },
+      where: { alt: { equals: ALT } },
       depth: 0,
       limit: 20,
       overrideAccess: true,
     })
-  ).docs.filter((d) => esImagenAcceso(d.filename));
+  ).docs;
+
+const elegida = async () => {
+  const seo = await payload.findGlobal({ slug: "seo", depth: 0, overrideAccess: true });
+  return typeof seo.imagenAcceso === "number" ? seo.imagenAcceso : null;
+};
 
 if (modo === "subir") {
-  const ya = await existentes();
-  if (ya.length > 0) {
-    log(`ya estaba (id ${ya.map((d) => d.id).join(", ")})`);
+  const actual = await elegida();
+  if (actual !== null) {
+    log(`ya elegida en el global seo (media ${actual})`);
   } else {
-    const media = await payload.create({
-      collection: "media",
-      data: {
-        alt: "Telón rojo de fondo de la pantalla de acceso al panel",
-        focalX: 50,
-        focalY: 50,
-      },
-      filePath: FICHERO,
+    const [ya] = await existentes();
+    const media =
+      ya ??
+      (await payload.create({
+        collection: "media",
+        data: { alt: ALT, focalX: 50, focalY: 50 },
+        filePath: FICHERO,
+        overrideAccess: true,
+      }));
+    log(
+      `${ya ? "ya estaba" : "subida"}: media ${media.id}, ${media.filename}, ${media.width}×${media.height}`,
+    );
+    await payload.updateGlobal({
+      slug: "seo",
+      data: { imagenAcceso: media.id },
       overrideAccess: true,
     });
-    log(`subida: id ${media.id}, ${media.filename}, ${media.width}×${media.height}`);
-    if (!esImagenAcceso(media.filename)) {
-      const e = new Error(`[acceso] ✗ se guardó como «${media.filename}»: la pantalla no la verá`);
+    if ((await elegida()) !== media.id) {
+      const e = new Error("[acceso] ✗ el global seo no quedó con la imagen elegida");
       e.stack = e.message;
       throw e;
     }
+    log(`✓ elegida en «Imagen de la pantalla de acceso» (media ${media.id})`);
   }
 } else {
+  if ((await elegida()) !== null) {
+    await payload.updateGlobal({ slug: "seo", data: { imagenAcceso: null }, overrideAccess: true });
+    log("campo «Imagen de la pantalla de acceso» vaciado");
+  }
   const urls: string[] = [];
   for (const m of await existentes()) {
     if (m.url) urls.push(m.url);
     await payload.delete({ collection: "media", id: m.id, overrideAccess: true });
-    log(`borrada: id ${m.id}`);
+    log(`borrada: media ${m.id}`);
   }
   if (urls.length > 0) {
     log("espero 70 s (propagación del Blob)");

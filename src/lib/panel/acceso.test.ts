@@ -1,26 +1,27 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { esImagenAcceso, mensajeDeError, minutosDeBloqueo, urlMicrosoft } from "./acceso";
+import { imagenDeAcceso, mensajeDeError, minutosDeBloqueo, urlMicrosoft } from "./acceso";
 
-describe("esImagenAcceso", () => {
-  it("reconoce el nombre con y sin el sufijo aleatorio del almacén", () => {
-    assert.ok(esImagenAcceso("acceso-panel.webp"));
-    assert.ok(esImagenAcceso("acceso-panel-zfmyVmgfG85W7ipUuIbR7ciZbec1Lr.webp"));
-    assert.ok(esImagenAcceso("acceso-panel.JPG"));
+describe("imagenDeAcceso", () => {
+  it("con la imagen elegida y poblada, la devuelve", () => {
+    assert.deepEqual(imagenDeAcceso({ url: "https://x/a.webp", width: 1254, height: 1254 }), {
+      url: "https://x/a.webp",
+      width: 1254,
+      height: 1254,
+    });
   });
 
-  it("no confunde otros ficheros que solo contienen el nombre", () => {
-    for (const otro of [
-      "acceso-panel-viejo.webp",
-      "acceso-panel-viejo-2.webp",
-      "mi-acceso-panel.webp",
-      "acceso-panel.svg",
-      "acceso-panel.webp.png",
-      "",
+  it("vacía, sin poblar o sin medidas: null (degradado)", () => {
+    for (const v of [
       null,
+      undefined,
+      7,
+      {},
+      { url: "", width: 1, height: 1 },
+      { url: "https://x/a", width: 0, height: 9 },
     ]) {
-      assert.equal(esImagenAcceso(otro), false, String(otro));
+      assert.equal(imagenDeAcceso(v), null, JSON.stringify(v));
     }
   });
 });

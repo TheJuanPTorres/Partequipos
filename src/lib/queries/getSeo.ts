@@ -3,6 +3,7 @@ import { cache } from "react";
 
 import config from "@payload-config";
 
+import { imagenDeAcceso, type ImagenAcceso } from "../panel/acceso";
 import { datosEmpresa, type Empresa } from "../seo/empresa";
 import { tramosValidos, type Tramo } from "../seo/horario";
 import {
@@ -14,7 +15,8 @@ import {
 
 /**
  * El global `seo`, UNA consulta por petición para todo lo de abajo. `depth: 1`
- * para poblar el logo (las demás relaciones del global no existen).
+ * para poblar las imágenes del global (logo, imagen al compartir y la de la
+ * pantalla de acceso).
  */
 const getSeoGlobal = cache(async () => {
   const payload = await getPayload({ config });
@@ -53,3 +55,17 @@ export const getLogo = cache(
     };
   },
 );
+
+/**
+ * Imagen del panel visual de la pantalla de acceso al panel (`imagenAcceso`
+ * del global `seo`), o `null` si está vacía o si falla la consulta: el acceso
+ * nunca depende de una imagen, así que un fallo aquí pinta el degradado.
+ */
+export const getImagenAcceso = cache(async (): Promise<ImagenAcceso | null> => {
+  try {
+    return imagenDeAcceso((await getSeoGlobal()).imagenAcceso);
+  } catch (error) {
+    console.error("[acceso] no se pudo leer la imagen de la pantalla de acceso:", error);
+    return null;
+  }
+});

@@ -467,18 +467,11 @@ tocar la autenticación de Payload, y no se ha hecho.
 | `login-bg.webp` (1254 × 1254) | En `Media`, nunca en `public/`. Ver abajo                                                                                   |
 | Spinner con «Loading»         | `IconLoader2` de Tabler (ya instalado) y el texto «Ingresando…» en el botón                                                 |
 
-**Imagen del panel visual.** No hay campo para elegirla (sin esquema): la
-pantalla toma la imagen más reciente de `Media` cuyo fichero se llama
-`acceso-panel` (`getImagenAcceso`). Desde la subida directa (PR #82) el
-almacén **añade un sufijo aleatorio** al nombre, así que se reconoce el
-nombre con o sin sufijo (`esImagenAcceso`, con pruebas), no el exacto. Sin
-imagen, o si la consulta falla, un degradado rojo hacia negro: **el acceso
-nunca depende de una imagen.**
-
-- **Preview:** subida con `npm run preview:acceso:subir` (id 131); `retirar`
-  la quita y comprueba el 404 en el Blob.
-- **Producción:** la sube dirección desde el panel, con el runbook
-  `Desktop\partequipos-cierre\runbook-imagen-acceso.md`.
+**Imagen del panel visual.** Se elige en el campo «Imagen de la pantalla de
+acceso» del global `seo` (§18). Sin imagen, o si la consulta falla, un
+degradado rojo hacia negro: **el acceso nunca depende de una imagen.** _(En
+el PR #89 se buscaba por el nombre de fichero `acceso-panel`; lo sustituyó el
+campo del §18.)_
 
 **Desviaciones del diseño, a propósito:**
 
@@ -503,3 +496,35 @@ captura la pantalla en claro y en oscuro (cookie `payload-theme`) a 1440 y
 en móvil, un error con un correo que **no existe** (no suma intentos a
 ninguna cuenta), el orden del tabulador, y al entrar comprueba que respeta
 `?redirect=` y que `/admin/login` con sesión redirige al panel.
+
+## 18. Campo «Imagen de la pantalla de acceso» (2026-10-05, rama `feat/panel-imagen-acceso`)
+
+Petición de dirección tras fusionar el PR #89: sustituir la búsqueda de la
+imagen por el nombre de fichero (`acceso-panel`, con el sufijo aleatorio del
+almacén) por un **campo explícito**. Cambio de esquema, con la ventana de
+migraciones.
+
+- **Dónde:** global «SEO y datos de la empresa» → sección «Imágenes», junto al
+  logo y la imagen al compartir. Es donde ya están las imágenes de marca que
+  se eligen una vez; no merecía un global nuevo.
+- **Campo:** `imagenAcceso`, subida a `Media`. Migración
+  `20261006_024440_imagen_acceso`, **solo esquema** (columna, clave foránea con
+  `ON DELETE set null` e índice).
+- **Lectura:** `getImagenAcceso` en `src/lib/queries/getSeo.ts`, con la misma
+  consulta memoizada del global; `imagenDeAcceso` (`src/lib/panel/acceso.ts`,
+  con pruebas) decide si la imagen sirve. Vacía, sin poblar, sin medidas o con
+  la consulta caída: el degradado, como antes.
+- **Quitado:** la búsqueda por prefijo (`esImagenAcceso`,
+  `PREFIJO_IMAGEN_ACCESO` y `getImagenAcceso.ts`).
+- **Preview:** `npm run preview:acceso:subir` sube la imagen (si no estaba) y
+  la elige en el campo; `retirar` vacía el campo, borra la imagen y comprueba
+  el 404 en el Blob.
+- **Producción:** dirección la sube y la elige desde el panel, con
+  `Desktop\partequipos-cierre
+unbook-imagen-acceso.md`.
+
+**Riesgo conocido y aceptado (bajo):** la pantalla da un único mensaje para
+contraseña mala, correo inexistente y cuenta bloqueada, pero la **API**
+(`POST /api/users/login`) sigue devolviendo el texto de Payload, que en el caso
+de cuenta bloqueada solo sale si el correo existe. Cerrarlo exige tocar la
+autenticación de Payload; no se ha hecho.

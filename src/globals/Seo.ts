@@ -26,6 +26,10 @@ import { escrituraContenido, publico } from "../lib/seguridad/acceso";
  * LOGO (2026-10-04, §10.8): campo «Logo» en «Imágenes». Vacío, cada sitio usa
  * el de siempre (`src/lib/seo/logo.ts`); la migración solo crea la columna.
  *
+ * IMAGEN DE LA PANTALLA DE ACCESO (2026-10-05): panel visual de `/admin/login`
+ * (`getImagenAcceso`). Vacía, un degradado. Sustituye a la búsqueda por el
+ * nombre de fichero del PR #89; la migración solo crea la columna.
+ *
  * Al guardar se revalida todo el sitio: el JSON-LD va en varias páginas.
  */
 export const Seo: GlobalConfig = {
@@ -113,6 +117,21 @@ export const Seo: GlobalConfig = {
           admin: {
             description:
               "La que sale al compartir en redes (WhatsApp, Facebook, LinkedIn…) las páginas que no tienen imagen propia. Usa una imagen opaca, sin transparencia, de 1200 × 630 px. Si la dejas vacía, se usa el logo.",
+          },
+        },
+        {
+          /*
+           * Panel visual de la pantalla de acceso al panel (`/admin/login`,
+           * decisiones-panel.md §18). Vacía, un degradado rojo hacia negro.
+           * Solo se ve en escritorio.
+           */
+          name: "imagenAcceso",
+          type: "upload",
+          relationTo: "media",
+          label: "Imagen de la pantalla de acceso",
+          admin: {
+            description:
+              "La que sale a la izquierda de la pantalla para entrar al panel, solo en computador. Mejor una imagen cuadrada o vertical y oscura, porque lleva texto blanco encima. Si la dejas vacía, sale un fondo rojo degradado.",
           },
         },
       ],

@@ -3517,6 +3517,23 @@ Ese comportamiento es correcto para desarrollar —permite probar sin cuenta de
 Cloudflare— y **peligroso en producción**. Hacen falta las claves reales del
 cliente; al ponerlas no hay que tocar código.
 
+> **CORREGIDO 2026-10-06 — en producción ya NO se usan las claves de prueba.**
+> Dirección vio el formulario de la ficha publicada con la clave de prueba
+> `1x00000000000000000000AA`. Venía del **código**: `turnstileSiteKey()` y
+> `verificarTurnstile()` caían a las de prueba en cualquier entorno si faltaba
+> la variable.
+>
+> **Ahora** (`modoTurnstile` en `src/lib/turnstile.ts`, con pruebas):
+>
+> | Entorno                              | Sin claves, o con las de prueba                                                                 | Con claves reales               |
+> | ------------------------------------ | ----------------------------------------------------------------------------------------------- | ------------------------------- |
+> | Local y preview                      | Claves de prueba, como antes                                                                    | Widget y verificación de verdad |
+> | Producción (`VERCEL_ENV=production`) | **Sin widget**; el envío se acepta sin verificar y se registra un `console.error` `[turnstile]` | Widget y verificación de verdad |
+>
+> El formulario sigue **sin protección anti-bot** hasta que lleguen las claves
+> del cliente, pero ya no lo aparenta. Las claves de prueba se reconocen
+> también si alguien las pone en las variables.
+
 > **PROBADO DE PUNTA A PUNTA el 2026-10-03, con las claves de prueba de
 > Cloudflare** ([documentación](https://developers.cloudflare.com/turnstile/troubleshooting/testing/)).
 > Las claves se pasaron en línea al comando, sin escribirlas en ningún `.env`.

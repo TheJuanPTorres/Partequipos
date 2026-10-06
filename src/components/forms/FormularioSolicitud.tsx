@@ -33,7 +33,8 @@ type Props = {
   tipo: TipoSolicitud;
   /** Ruta desde la que se envía; se guarda con la solicitud. */
   origen: string;
-  siteKey: string;
+  /** Clave del widget de Turnstile; `null` en producción sin claves reales: sin widget. */
+  siteKey: string | null;
   /** Teléfono de contacto en formato E.164 para el enlace de WhatsApp. */
   whatsapp?: { href: string; etiqueta: string };
   referencia?: Referencia;
@@ -220,8 +221,12 @@ export function FormularioSolicitud({
           )}
         </Campo>
 
-        {/* Cada respuesta del servidor reinicia el reto: el token es de un solo uso. */}
-        <Turnstile siteKey={siteKey} reinicio={estado} />
+        {/*
+         * Cada respuesta del servidor reinicia el reto: el token es de un solo
+         * uso. Sin clave (producción sin claves reales) no se pinta: un widget
+         * con la clave de prueba sería una protección falsa (§10.11).
+         */}
+        {siteKey ? <Turnstile siteKey={siteKey} reinicio={estado} /> : null}
 
         <div className="flex flex-wrap items-center gap-4 pt-2">
           {/*

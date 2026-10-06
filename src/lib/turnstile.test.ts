@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "node:test";
 
-import { turnstileEnModoPrueba, turnstileSiteKey, verificarTurnstile } from "./turnstile";
+import {
+  modoTurnstile,
+  turnstileEnModoPrueba,
+  turnstileSiteKey,
+  verificarTurnstile,
+} from "./turnstile";
 
 /*
  * Los tres casos de §10.11, con las claves de PRUEBA públicas de Cloudflare
@@ -22,7 +27,7 @@ const SECRETO_RECHAZA = "2x0000000000000000000000000000000AA";
 const SITE_APRUEBA = "1x00000000000000000000AA";
 const TOKEN_PRUEBA = "XXXX.DUMMY.TOKEN.XXXX";
 
-const VARIABLES = ["NEXT_PUBLIC_TURNSTILE_SITE_KEY", "TURNSTILE_SECRET_KEY"] as const;
+const VARIABLES = ["NEXT_PUBLIC_TURNSTILE_SITE_KEY", "TURNSTILE_SECRET_KEY", "VERCEL_ENV"] as const;
 const fetchOriginal = globalThis.fetch;
 const guardadas = Object.fromEntries(VARIABLES.map((v) => [v, process.env[v]]));
 let secretosEnviados: string[] = [];
@@ -62,7 +67,8 @@ describe("Turnstile: los tres casos de §10.11", () => {
 
     assert.equal(await verificarTurnstile(TOKEN_PRUEBA), true);
     assert.deepEqual(secretosEnviados, [SECRETO_APRUEBA]);
-    assert.equal(turnstileEnModoPrueba(), false);
+    // Son las claves de PRUEBA aunque vengan en las variables.
+    assert.equal(turnstileEnModoPrueba(), true);
   });
 
   it("2. clave que siempre rechaza: el envío NO pasa", async () => {
@@ -85,7 +91,77 @@ describe("Turnstile: los tres casos de §10.11", () => {
 
   it("con las claves reales puestas, la clave del widget es la configurada", () => {
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "  clave-del-sitio  ";
+    process.env.TURNSTILE_SECRET_KEY = "secreto-real";
     assert.equal(turnstileSiteKey(), "clave-del-sitio");
+    assert.equal(modoTurnstile().modo, "real");
+  });
+  it("en el preview (VERCEL_ENV=preview) sin claves, también las de prueba", () => {
+    process.env.VERCEL_ENV = "preview";
+    assert.equal(turnstileSiteKey(), SITE_APRUEBA);
+    assert.equal(turnstileEnModoPrueba(), true);
+  });
+});
+
+/*
+ * HALLAZGO del 2026-10-06: la ficha publicada pintaba el widget con la clave de
+ * PRUEBA (aprueba siempre). En producción, sin claves reales —o con las de
+ * prueba en las variables—, ni widget ni verificación fingida: se acepta como
+ * en §10.11 y se avisa en el registro.
+ */
+describe("Turnstile en producción: nunca las claves de prueba", () => {
+  const errores: string[] = [];
+  const consolaOriginal = console.error;
+  beforeEach(() => {
+    process.env.VERCEL_ENV = "production";
+    errores.length = 0;
+    console.error = (...a: unknown[]) => void errores.push(a.join(" "));
+  });
+  afterEach(() => {
+    console.error = consolaOriginal;
+  });
+
+  it("sin claves: sin widget, el envío se acepta sin llamar a Cloudflare y queda en el registro", async () => {
+    cloudflareDePrueba();
+    assert.equal(turnstileSiteKey(), null);
+    assert.equal(modoTurnstile().modo, "sin-claves");
+    assert.equal(await verificarTurnstile(undefined), true);
+    assert.deepEqual(secretosEnviados, []);
+    assert.match(errores.join(" "), /\[turnstile\].*SIN verificación/);
+  });
+
+  it("con las claves de PRUEBA en las variables: igual que sin claves", async () => {
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = SITE_APRUEBA;
+    process.env.TURNSTILE_SECRET_KEY = SECRETO_APRUEBA;
+    cloudflareDePrueba();
+    assert.equal(turnstileSiteKey(), null);
+    assert.equal(await verificarTurnstile(TOKEN_PRUEBA), true);
+    assert.deepEqual(secretosEnviados, []);
+    assert.match(errores.join(" "), /son las de PRUEBA/);
+  });
+
+  it("una sola de las dos es de prueba (sitio real y secreto 3x, o al revés): sin widget", () => {
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "0x4AAAAAAA-clave-real";
+    process.env.TURNSTILE_SECRET_KEY = "3x0000000000000000000000000000000AA";
+    assert.equal(turnstileSiteKey(), null);
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "2x00000000000000000000AB";
+    process.env.TURNSTILE_SECRET_KEY = "0x4AAAAAAA-secreto-real";
+    assert.equal(turnstileSiteKey(), null);
+  });
+
+  it("solo la clave del sitio, sin secreto: sin widget", () => {
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "clave-real";
+    assert.equal(turnstileSiteKey(), null);
+  });
+
+  it("con claves reales: widget y verificación de verdad, con el secreto real", async () => {
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "0x4AAAAAAA-clave-real";
+    process.env.TURNSTILE_SECRET_KEY = "0x4AAAAAAA-secreto-real";
+    cloudflareDePrueba();
+    assert.equal(turnstileSiteKey(), "0x4AAAAAAA-clave-real");
+    assert.equal(await verificarTurnstile(undefined), false);
+    await verificarTurnstile(TOKEN_PRUEBA);
+    assert.deepEqual(secretosEnviados, ["0x4AAAAAAA-secreto-real"]);
+    assert.deepEqual(errores, []);
   });
 });
 

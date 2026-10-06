@@ -219,7 +219,7 @@ export interface EquiposNuevo {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   /**
@@ -317,7 +317,7 @@ export interface MarcasMaquinaria {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -373,7 +373,7 @@ export interface TiposMaquinaria {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   marca: number | MarcasMaquinaria;
@@ -419,7 +419,7 @@ export interface ModelosRepuesto {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   /**
@@ -455,7 +455,7 @@ export interface Marca {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -471,7 +471,7 @@ export interface TiposEquipo {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   marca: number | Marca;
@@ -495,7 +495,7 @@ export interface CategoriasTecnica {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -578,7 +578,7 @@ export interface CategoriasUsada {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -601,7 +601,7 @@ export interface CategoriasMaquinaria {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -628,7 +628,7 @@ export interface MarcasLubricante {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   /**
@@ -670,7 +670,7 @@ export interface CategoriasLubricante {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   marca: number | MarcasLubricante;
@@ -728,7 +728,7 @@ export interface Pagina {
   id: number;
   titulo: string;
   /**
-   * La dirección de la página, sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio». Después de crearla ya no se puede cambiar; si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * La dirección de la página, sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio». Después de crearla ya no se puede cambiar; si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   /**
@@ -1150,7 +1150,7 @@ export interface BloqueTarjetasExpandibles {
   blockType: 'tarjetasExpandibles';
 }
 /**
- * Cada artículo vive en partequipos.com/<slug>/. Su slug no puede repetir el de una página.
+ * Cada artículo tiene su dirección en partequipos.com/<dirección>/, y no puede repetir la de una página.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articulos".
@@ -1159,7 +1159,7 @@ export interface Articulo {
   id: number;
   titulo: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   /**
@@ -1216,7 +1216,7 @@ export interface CategoriasBlog {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
   descripcion?: string | null;
@@ -1373,7 +1373,7 @@ export interface User {
    */
   rol: 'administrador' | 'editor';
   /**
-   * Permite cambiar el slug de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.
+   * Permite cambiar la dirección web de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.
    */
   puedeEditarSlugs?: boolean | null;
   updatedAt: string;

@@ -630,3 +630,60 @@ quien mantenga el sistema de diseño** (ui.partequipos.com):
 
 Además, la «tarjeta» en la que se ve `login-screen` en su web es el marco de la
 documentación, no el componente (§19).
+
+## 22. Rediseño del panel, F4: avisos y ayudas en los campos (2026-10-06, rama `feat/panel-f4-avisos`)
+
+Fase 4 de la propuesta, aprobada por dirección con sus 8 puntos. **Sin
+esquema** (todo son campos `ui`, que no crean columna; deriva en cero) **y sin
+dependencias.**
+
+**1. Un solo aviso para todo el panel** (`src/components/admin/aviso/Aviso.tsx`).
+Réplica del `alert` del sistema del cliente sin `class-variance-authority` ni
+Tailwind: rejilla icono + texto, borde del tono al 32 %, fondo al 4 %, radio
+xl, 12 × 14 px de relleno, título en peso 500 y texto atenuado. Cuatro tonos
+(`info`, `aviso`, `error`, `exito`) con icono de Tabler.
+
+- **Desviación:** el icono va en el `-foreground` del tono (amber-700, blue-700…;
+  en oscuro, el 400) y no en el tono puro, que en ámbar da 2:1 sobre blanco. Es
+  decorativo (`aria-hidden`), pero así se distingue también con poca vista.
+- **Rol:** `note` por defecto (no interrumpe), `status` en lo que cambia
+  mientras se edita y ninguno dentro de una región que ya anuncia.
+- Tokens nuevos del sistema en `custom.scss`: `--pq-info` y los `-foreground`
+  de info, success y warning, en claro y oscuro (su `theme.json`).
+- Los avisos que ya existían pasan a usarlo: textos alternativos flojos
+  (Imágenes), bloques de Páginas y el contador de «Destacar» con más de 4.
+
+**2–7. Avisos nuevos:**
+
+| Dónde                                    | Cuándo                                                                                                                  | Componente           |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| Equipos nuevos, equipos usados y modelos | En vivo, si la galería está vacía: «Esta ficha no tiene fotos»                                                          | `AvisoSinFotos`      |
+| Equipos usados                           | En vivo, con «Disponible» desmarcado: no sale en su categoría ni en la portada (las consultas filtran por `disponible`) | `AvisoNoDisponible`  |
+| Testimonios, junto a «Publicado»         | En vivo, sin la autorización marcada (antes solo se sabía al guardar)                                                   | `AvisoAutorizacion`  |
+| SEO y datos de la empresa                | Mientras `indexacionPermitida()` sea falso (§10.6)                                                                      | `AvisoBuscadores`    |
+| Cada redirección                         | Siempre: ejemplo de «Desde» y «Hacia»                                                                                   | `AvisoRedirecciones` |
+| Lista de Solicitudes (`beforeList`)      | Siempre: cómo atenderlas. **Solo texto**: no lee filas ni toca el acceso                                                | `AvisoSolicitudes`   |
+
+Los campos `ui` se crean con `avisoField` (`src/lib/fields/avisoField.ts`). La
+cuenta de filas de la galería, que Payload da como número o como lista, está
+en `cuantasFilas` (`src/lib/panel/avisos.ts`, con pruebas).
+
+**8. Ayudas sin jerga** (guía de contenido del cliente): «slug» desaparece de
+lo que ve el editor.
+
+| Antes                                           | Ahora                                                                       |
+| ----------------------------------------------- | --------------------------------------------------------------------------- |
+| «Slug (dirección web)» / «Ruta (dirección web)» | «Dirección web»                                                             |
+| Permiso «Puede editar slugs ya publicados»      | «Puede cambiar direcciones web ya publicadas»                               |
+| Origen de redirección «Cambio de slug»          | «Cambio de dirección web» (el valor guardado sigue siendo `cambio-de-slug`) |
+| «El slug … ya lo usa …»                         | «La dirección web … ya la usa …»                                            |
+| Nota de las redirecciones automáticas           | «…al cambiar la dirección web»                                              |
+
+Solo cambian etiquetas y textos: los nombres de campo y los valores guardados
+son los mismos. La guía del editor se actualizó para que coincida (§7 y la
+tabla de errores) y tiene una tabla nueva de los avisos.
+
+**`panel:revision` con modo `avisos`** (`… -- <preview> avisos` y `… avisos
+oscuro`): abre cada pantalla con aviso y captura la página y cada aviso. No
+guarda nada; las solicitudes se abren con un filtro que no encuentra ninguna.
+El contador de «Destacar» se captura con el modo `ficha`.

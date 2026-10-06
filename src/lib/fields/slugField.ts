@@ -47,13 +47,13 @@ export function slugField({ from = "nombre", unique = false }: SlugFieldOptions 
     required: true,
     unique,
     index: true,
-    label: "Slug (dirección web)",
+    label: "Dirección web",
     admin: {
       position: "sidebar",
       description:
         "Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. " +
         "Después ya no se puede cambiar, porque Google ya conoce esa dirección. " +
-        "Si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: " +
+        "Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: " +
         "la dirección antigua seguirá llevando a la nueva.",
     },
     access: { update: slugEditable },

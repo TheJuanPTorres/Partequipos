@@ -107,11 +107,11 @@ export const Users: CollectionConfig = {
       name: "puedeEditarSlugs",
       type: "checkbox",
       defaultValue: false,
-      label: "Puede editar slugs ya publicados",
+      label: "Puede cambiar direcciones web ya publicadas",
       admin: {
         position: "sidebar",
         description:
-          "Permite cambiar el slug de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.",
+          "Permite cambiar la dirección web de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.",
       },
       // Mismo motivo que `rol`: es un permiso, no una preferencia.
       access: { create: campoSoloAdmin, update: campoSoloAdmin },

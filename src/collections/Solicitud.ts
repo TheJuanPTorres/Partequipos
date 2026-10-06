@@ -20,6 +20,8 @@ export const Solicitud: CollectionConfig = {
     description:
       "Formularios enviados desde el sitio. Contienen datos personales: no se publican y solo son visibles aquí.",
     listSearchableFields: ["nombre", "correo", "empresa", "mensaje"],
+    // Ayuda arriba de la lista (F4). Solo texto: no lee filas ni cambia el acceso.
+    components: { beforeList: ["/components/admin/aviso/AvisoSolicitudes"] },
   },
 
   // Lo más nuevo primero: esto es una bandeja de entrada, no un catálogo.

@@ -4,6 +4,7 @@ import { validarTelefono, validarUrlRed } from "../lib/seo/empresa";
 import { DIAS, NOMBRE_DIA, validarHora } from "../lib/seo/horario";
 import { revalidarTodoElSitio } from "../lib/revalidation";
 import { escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { avisoField } from "../lib/fields/avisoField";
 
 /**
  * SEO Y DATOS DE LA EMPRESA, editable (fase 6).
@@ -50,6 +51,8 @@ export const Seo: GlobalConfig = {
     ],
   },
   fields: [
+    // «El sitio está cerrado a buscadores» mientras dure §10.6 (F4).
+    avisoField("avisoBuscadores", "AvisoBuscadores"),
     {
       name: "horario",
       type: "array",

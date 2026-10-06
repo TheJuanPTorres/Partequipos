@@ -24,8 +24,9 @@
  *   ruta), para no depender solo de mirar.
  * - Navegador: Chrome instalado (otra ruta con `CHROME_PATH`).
  * - Modos (tercer argumento): `ficha` (aviso de más de 4 «Destacar»), `acceso`
- *   (la pantalla de acceso, §17–§19 de decisiones-panel.md) y `oscuro` (la
- *   pasada normal con el tema oscuro). Sin modo, la pasada normal en claro.
+ *   (la pantalla de acceso, §17–§19 de decisiones-panel.md), `avisos` (los
+ *   avisos del panel, §22) y `oscuro`, solo o detrás de otro modo
+ *   («avisos oscuro»). Sin modo, la pasada normal en claro.
  * - No escribe nada en el panel: solo navega y lee. En modo `ficha` pulsa
  *   «Guardar» con 5 «Destacar» marcados, que la validación rechaza, y comprueba
  *   después en la API que no se guardó nada.
@@ -69,7 +70,9 @@ function fallar(mensaje) {
 const base = (process.argv[2] ?? "").replace(/\/$/, "");
 if (!base) fallar("Uso: npm run panel:revision -- <url del preview> [ficha|acceso|oscuro]");
 // `ficha`: además, el aviso de más de 4 «Destacar» y la vista de subir un PDF.
-const MODO = process.argv[3] ?? "";
+// `oscuro` puede ir solo o detrás de otro modo («avisos oscuro»).
+const OSCURO = process.argv.slice(3).includes("oscuro");
+const MODO = (process.argv.slice(3).find((a) => a !== "oscuro") ?? "").trim();
 const { hostname, origin } = new URL(base);
 if (hostname === DOMINIO_PRODUCCION || !/^partequipos-[a-z0-9-]+\.vercel\.app$/.test(hostname)) {
   fallar(`Solo contra un preview del proyecto (*.vercel.app), no «${hostname}».`);
@@ -96,7 +99,7 @@ if (!claveCorreo || !claveClave || !cuenta[claveCorreo] || !cuenta[claveClave]) 
 }
 
 // --- Capturas -------------------------------------------------------------
-const fecha = `${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}${MODO ? `-${MODO}` : ""}`;
+const fecha = `${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}${MODO ? `-${MODO}` : ""}${OSCURO ? "-oscuro" : ""}`;
 const salida = path.join(
   os.homedir(),
   "Desktop",
@@ -163,7 +166,7 @@ try {
     // Modo `oscuro`: la misma pasada con el tema oscuro, como entra el usuario
     // (cookie `payload-theme`, CLAUDE.md §10.23). Sin modo, el claro.
     await contexto.addCookies([
-      { name: "payload-theme", value: MODO === "oscuro" ? "dark" : "light", url: origin },
+      { name: "payload-theme", value: OSCURO ? "dark" : "light", url: origin },
     ]);
     let pagina = await contexto.newPage();
     const errores = [];
@@ -271,6 +274,74 @@ try {
         `✓ entrada (${ancho.nombre}): llega a ${llegada}; /admin/login con sesión → ${conSesion}`,
       );
       if (llegada !== REDIRECCION) fallar(`No respetó la redirección: llegó a ${llegada}.`);
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `avisos` (F4, decisiones-panel.md §22): abre cada pantalla donde sale
+     * un aviso del panel y captura la página y cada aviso. No guarda nada: en
+     * las vistas de crear solo se mira (y en el equipo usado se desmarca
+     * «Disponible» SIN guardar). Las solicitudes se abren con un filtro que no
+     * encuentra ninguna, así que no se carga ninguna fila con datos personales.
+     */
+    if (MODO === "avisos") {
+      const primero = async (coleccion, filtro = "") => {
+        await pagina.goto(`${base}/admin/collections/${coleccion}${filtro}`, {
+          waitUntil: "networkidle",
+        });
+        const hrefs = await pagina
+          .locator(`table a[href*="/admin/collections/${coleccion}/"]`)
+          .evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+        return hrefs.find((h) => h && !/\/create\/?$/.test(h)) ?? null;
+      };
+      const paginaNosotros = await primero("paginas", "?where[slug][equals]=nosotros");
+      const redireccion = await primero("redirects");
+      const CASOS = [
+        { nombre: "aviso-alt-flojos", ruta: "/admin/collections/media" },
+        { nombre: "aviso-sin-fotos-equipo", ruta: "/admin/collections/equipos-nuevos/create" },
+        { nombre: "aviso-sin-fotos-modelo", ruta: "/admin/collections/modelos-repuesto/create" },
+        {
+          nombre: "aviso-no-disponible",
+          ruta: "/admin/collections/equipos-usados/create",
+          antes: async () => {
+            const casilla = pagina.locator("#field-disponible");
+            if (await casilla.isChecked()) await casilla.uncheck({ force: true });
+          },
+        },
+        { nombre: "aviso-autorizacion", ruta: "/admin/collections/testimonios/create" },
+        { nombre: "aviso-buscadores", ruta: "/admin/globals/seo" },
+        ...(redireccion ? [{ nombre: "aviso-redirecciones", ruta: redireccion }] : []),
+        // Filtro imposible: la lista sale vacía y no se piden filas.
+        { nombre: "aviso-solicitudes", ruta: "/admin/collections/solicitudes?where[id][equals]=0" },
+        ...(paginaNosotros ? [{ nombre: "aviso-bloques", ruta: paginaNosotros }] : []),
+      ];
+      for (const caso of CASOS) {
+        await pagina.goto(`${base}${caso.ruta}`, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(1500);
+        if (caso.antes) {
+          await caso.antes();
+          await pagina.waitForTimeout(500);
+        }
+        const avisos = pagina.locator(".pq-aviso");
+        const n = await avisos.count();
+        await pagina.screenshot({
+          path: path.join(salida, `${caso.nombre}-${ancho.nombre}.png`),
+          fullPage: true,
+        });
+        for (let i = 0; i < n; i++) {
+          await avisos
+            .nth(i)
+            .screenshot({ path: path.join(salida, `${caso.nombre}-${ancho.nombre}-${i + 1}.png`) })
+            .catch(() => {});
+        }
+        const textos = await avisos.allInnerTexts();
+        hallazgos.push({ pantalla: caso.nombre, ancho: ancho.nombre, avisos: n, textos });
+        decir(`${n ? "✓" : "·"} ${caso.nombre} (${ancho.nombre}): ${n} aviso(s)`);
+      }
+      // Pasa por las páginas con cambios sin guardar: se cierra sin guardar.
       hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
       hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
       await contexto.close();

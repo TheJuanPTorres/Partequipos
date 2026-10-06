@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { revalidarEquipoUsado, revalidarEquipoUsadoBorrado } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { revalidarPortada } from "./hooks/portadaHooks";
+import { avisoField } from "../lib/fields/avisoField";
 
 const portada = revalidarPortada("equipos-usados");
 
@@ -42,6 +43,9 @@ export const EquipoUsado: CollectionConfig = {
     afterDelete: [revalidarEquipoUsadoBorrado, portada.afterDelete],
   },
   fields: [
+    // Avisos en vivo (F4): sin fotos, y «no sale en el sitio» si no está disponible.
+    avisoField("avisoNoDisponible", "AvisoNoDisponible"),
+    avisoField("avisoSinFotos", "AvisoSinFotos"),
     {
       name: "nombre",
       type: "text",

@@ -5,6 +5,7 @@ import { slugField } from "../lib/fields/slugField";
 import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
 import { revalidarModelo, revalidarModeloBorrado } from "./hooks/revalidateHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { avisoField } from "../lib/fields/avisoField";
 
 /**
  * Modelo concreto dentro de un tipo de equipo (ej. "CAT 320D" en Excavadora).
@@ -39,6 +40,8 @@ export const ModeloRepuesto: CollectionConfig = {
     afterDelete: [revalidarModeloBorrado],
   },
   fields: [
+    // Aviso en vivo si la galería está vacía (F4).
+    avisoField("avisoSinFotos", "AvisoSinFotos"),
     {
       name: "nombre",
       type: "text",

@@ -6,6 +6,7 @@ import { slugField } from "../lib/fields/slugField";
 import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
 import { revalidarEquipoNuevo, revalidarEquipoNuevoBorrado } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { avisoField } from "../lib/fields/avisoField";
 
 /**
  * Ficha de un equipo de la línea NUEVA. Es una página de **venta**, no una
@@ -38,6 +39,8 @@ export const EquipoNuevo: CollectionConfig = {
   // Unicidad por tipo; el tipo ya implica una marca. Igual que en repuestos.
   indexes: [{ fields: ["tipo", "slug"], unique: true }],
   fields: [
+    // Aviso en vivo si la galería está vacía (F4).
+    avisoField("avisoSinFotos", "AvisoSinFotos"),
     { name: "nombre", type: "text", required: true, label: "Nombre" },
     slugField(),
     {

@@ -28,7 +28,7 @@ export const Articulo: CollectionConfig = {
     defaultColumns: ["titulo", "categoria", "fechaPublicacion", "slug"],
     group: "Páginas y blog",
     description:
-      "Cada artículo vive en partequipos.com/<slug>/. Su slug no puede repetir el de una página.",
+      "Cada artículo tiene su dirección en partequipos.com/<dirección>/, y no puede repetir la de una página.",
   },
   access: {
     read: publico,

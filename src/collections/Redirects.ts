@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { normalizarRuta } from "../lib/redirects/normalizar";
 import { soloAdmin, soloPersonal } from "../lib/seguridad/acceso";
 import { aplanarCadenas, marcarDestinoSinVerificar, validarRedirect } from "./hooks/redirectHooks";
+import { avisoField } from "../lib/fields/avisoField";
 
 /**
  * Redirecciones 301/302 (ADR 0005).
@@ -50,6 +51,8 @@ export const Redirects: CollectionConfig = {
     afterChange: [aplanarCadenas],
   },
   fields: [
+    // Ejemplo de «Desde» y «Hacia» válidos (F4).
+    avisoField("ayudaRedireccion", "AvisoRedirecciones"),
     {
       name: "desde",
       type: "text",
@@ -105,7 +108,7 @@ export const Redirects: CollectionConfig = {
       label: "Origen",
       options: [
         { label: "Manual", value: "manual" },
-        { label: "Cambio de slug", value: "cambio-de-slug" },
+        { label: "Cambio de dirección web", value: "cambio-de-slug" },
         { label: "Migración", value: "migracion" },
       ],
       admin: {

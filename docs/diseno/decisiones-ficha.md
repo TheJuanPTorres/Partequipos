@@ -91,8 +91,7 @@ Solo preview (guardián de base y almacén).
 
 En producción, la imagen de Andrés de la llamada a contactar va con el permiso
 temporal de §10.38 (en su lista). **Cargada por dirección desde el panel el
-2026-10-06** con `partequipos-cierre
-unbook-ficha-imagen-contacto.md`
+2026-10-06** con `partequipos-cierre\runbook-ficha-imagen-contacto.md`
 (ejecutado: imagen subida, global guardado y la foto se ve en la ficha).
 
 ## 8. Verificación (preview, 2026-10-05)

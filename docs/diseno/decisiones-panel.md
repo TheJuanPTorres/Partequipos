@@ -573,16 +573,16 @@ aprobada por dirección. **Sin esquema y sin dependencias nuevas.**
 
 **Menú: de 6 grupos a 8, ordenados por uso** (`src/lib/panel/menu.ts`, con pruebas):
 
-| Grupo            | Icono de Tabler | Entradas, en orden                                                                                                 |
-| ---------------- | --------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Solicitudes      | `IconInbox`     | Solicitudes                                                                                                        |
-| Repuestos        | `IconTool`      | Modelos · Marcas · Tipos de equipo · Categorías técnicas                                                           |
-| Maquinaria       | `IconBulldozer` | Equipos nuevos · Equipos usados · Marcas · Tipos · Categorías de maquinaria nueva · Categorías de maquinaria usada |
-| Lubricantes      | `IconDroplet`   | Marcas de lubricante · Categorías de lubricante                                                                    |
-| Páginas y blog   | `IconArticle`   | Páginas institucionales · Artículos · Categorías del blog · Preguntas frecuentes · Testimonios · Sedes             |
-| Archivos         | `IconPhoto`     | Imágenes · Documentos · Vídeos · Animaciones                                                                       |
-| Partes del sitio | `IconLayout`    | Cabecera · Pie de página · Ficha de producto                                                                       |
-| Configuración    | `IconSettings`  | SEO y datos de la empresa · Redirecciones · Usuarios                                                               |
+| Grupo            | Icono de Tabler | Entradas, en orden                                                                                                                             |
+| ---------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Solicitudes      | `IconInbox`     | Solicitudes                                                                                                                                    |
+| Repuestos        | `IconTool`      | Modelos · Marcas · Tipos de equipo · Categorías técnicas                                                                                       |
+| Maquinaria       | `IconBulldozer` | Equipos nuevos · Equipos usados · Marcas de maquinaria · Tipos de maquinaria · Categorías de maquinaria nueva · Categorías de maquinaria usada |
+| Lubricantes      | `IconDroplet`   | Marcas de lubricante · Categorías de lubricante                                                                                                |
+| Páginas y blog   | `IconArticle`   | Páginas institucionales · Artículos · Categorías del blog · Preguntas frecuentes · Testimonios · Sedes                                         |
+| Archivos         | `IconPhoto`     | Imágenes · Documentos · Vídeos · Animaciones                                                                                                   |
+| Partes del sitio | `IconLayout`    | Cabecera · Pie de página · Ficha de producto                                                                                                   |
+| Configuración    | `IconSettings`  | SEO y datos de la empresa · Redirecciones · Usuarios                                                                                           |
 
 - **El orden lo fija `menu.ts`, no el array de la config.** Payload agrupa por
   orden de aparición y pone los globales detrás de las colecciones, así que
@@ -606,7 +606,7 @@ Elevación, Motion y Contenido):
 
 | Fundamento                           | Qué se aplicó                                                                                                                                                                                                                                                                                                                                                                   |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Elevación                            | Las tarjetas de la portada pierden la sombra: solo anillo de 1 px al 10 %, en claro y oscuro. Al pasar el ratón, anillo al 20 % y fondo `accent` (antes, sombra más grande). Lo flotante (menús, diálogos) es de Payload y no se toca                                                                                                                                           |
+| Elevación                            | Las tarjetas de la portada pierden la sombra proyectada: anillo de 1 px al 10 %, en claro y oscuro, más el brillo interior de 1 px del borde superior (`specular-edge` del sistema, que ya estaba). Al pasar el ratón, anillo al 20 % y fondo `accent` (antes, sombra más grande). Lo flotante (menús, diálogos) es de Payload y no se toca                                     |
 | Movimiento                           | Variable `--pq-transicion: 150ms ease`, que pasa a `0s` con movimiento reducido. La usan las transiciones propias: chevron del menú (antes 200 ms), tarjetas y botones de la pantalla de acceso. Las de Payload no se tocan                                                                                                                                                     |
 | Dimensiones (4 px)                   | Revisado: los espaciados propios ya van en múltiplos de 2 o 4 px. Quedan dos valores impares a propósito y documentados: 5 px en los campos (alto 32 − línea 20 − borde 2) y 2,5 px en los enlaces del menú (densidad, §8 de `design-tokens.md`)                                                                                                                                |
 | Contenido (mayúscula solo al inicio) | La traducción de Payload traía 58 textos con mayúsculas de título («Panel de Control», «Guardar Cambios», «Nueva Contraseña»…). Se convierten al cargar la config (`src/lib/panel/oracion.ts`, con pruebas que incluyen la traducción real): respeta siglas (API, URL…), variables `{{…}}`, HTML, comillas e inicios de frase. Si Payload añade textos, la regla los cubre sola |

@@ -2315,3 +2315,24 @@ Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.
 - **Para Andrés:** su widget abre el vídeo directamente en la ventana. Aquí hay
   un paso más, el de pulsar reproducir sobre nuestra miniatura: es lo que pidió
   dirección para no cargar nada de YouTube sin permiso.
+
+## 28. Arreglos en móvil tras la prueba de dirección (2026-10-06)
+
+### 28.1 Sección 2 → 3: la máquina ya no tapa «Ver todo» — DESVIACIÓN DE ux-9
+
+- **Qué pasaba:** en móvil, la máquina de la sección 3 sube 140 px sobre el
+  final de la sección 2, como en ux-9, y su caja tapaba el botón «Ver todo» de
+  «Maquinaria pesada nueva». Medido en la home publicada: la caja empezaba
+  **108 a 112 px por encima** del pie del botón, a 360, 390, 414 y 430.
+- **Arreglo (solo ≤ 767 px y solo con máquina):** la sección 3 baja lo justo
+  para que la caja de la imagen quede **24 px por debajo del botón**. La máquina
+  sigue asomando 140 px sobre el gris, como en el diseño.
+- **Cómo se calcula:** las dos secciones ya las separan el relleno inferior de
+  la 2 (5 % del ancho) y el de su pie (10 px). El margen es
+  `24 + 140 − 10 − 5 %`, y el `%` de un margen también se toma del ancho, así
+  que da 24 px en todos los anchos.
+- **Medido en el preview:** hueco de **24 px** a 360, 390, 414 y 430; la
+  máquina asoma 140 px; CLS 0. Capturas antes y después en
+  `partequipos-cierre\capturas\movil-s2-s3\`.
+- **Para Andrés:** en su maqueta móvil el brazo pisa el botón. Aquí la
+  sección 3 empieza 136 px más abajo.

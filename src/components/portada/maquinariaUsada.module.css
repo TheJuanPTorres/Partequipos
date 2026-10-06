@@ -95,6 +95,22 @@
   }
 }
 
+/*
+ * DESVIACIÓN (dirección 2026-10-06, decisiones-home-ux9.md §28.1): en móvil la máquina sube 140 px y en
+ * ux-9 tapaba el botón «Ver todo» de la sección 2 (medido: −110 px a 360–430).
+ * La sección baja lo justo para dejar 24 px entre el botón y la caja de la
+ * imagen, y la máquina sigue asomando 140 px sobre el gris. Lo que ya separa
+ * las dos secciones es el relleno inferior de la 2 (5 % del ancho) más el de
+ * su pie (10 px): 24 + 140 − 10 = 154 px, menos ese 5 % (el `%` de un margen
+ * también es del ancho del contenedor, así que vale en todos los anchos).
+ */
+@media (max-width: 767px) {
+  .conMaquina {
+    --s3-hueco-boton: 24px;
+    margin-top: calc(var(--s3-hueco-boton) - var(--s3-maquina-solape) - 10px - 5%);
+  }
+}
+
 /* --- Columna izquierda ------------------------------------------------------ */
 
 .izq {

@@ -117,7 +117,10 @@ type Props = {
 export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras, textos }: Props) {
   if (pestanas.length === 0) return null;
   return (
-    <section className={estilos.seccion} aria-labelledby="portada-usada-titulo">
+    <section
+      className={maquina ? `${estilos.seccion} ${estilos.conMaquina}` : estilos.seccion}
+      aria-labelledby="portada-usada-titulo"
+    >
       <div className={estilos.izq}>
         {/* Sin máquina no se reserva su sitio: la columna arranca a la altura de la derecha. */}
         {maquina ? (

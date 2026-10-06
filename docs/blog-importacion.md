@@ -184,27 +184,47 @@ Resultado al reimportar: **12 enlaces a su equivalente y 7 quitados**; **rutas s
 
 **Lo que se queda plano, a sabiendas:** listas de títulos sin marca, como «Retrocargadoras · Cargadores frontales · Minicargadores» bajo «¿En qué maquinaria debemos prestar especial atención?», quedan todas en h2. No hay señal fiable de que sean subapartados, y un h2 de más no rompe nada.
 
-### Plantilla de artículo (medida a 390 y 1440)
+### Plantilla de artículo: arreglo mínimo (APLICADO, 2026-10-06)
 
-Medida con dos artículos largos: `tornamesa-de-excavadora-…` (52 párrafos, 5 imágenes) y `tier-4-en-colombia-…` (encabezados y una tabla convertida). Capturas en `Desktop\partequipos-cierre\capturas\blog-calidad\`.
+**Decisión de dirección:** arreglo mínimo ya, sin rediseño; el diseño de Andrés irá encima. Todo en `src/components/layout/RichText.tsx`, así que vale también para las páginas institucionales, lubricantes y la descripción de la ficha de maquinaria.
 
-| Qué                          | Medido                                                         | Valoración                                                                                                                                                  |
-| ---------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ancho del texto              | 358 px a 390 · 672 px a 1440 (`max-w-2xl`)                     | Bien                                                                                                                                                        |
-| Longitud de línea            | 37 caracteres a 390 · 76 a 1440                                | Bien (lo ideal, 45–75; a 1440, justo en el límite)                                                                                                          |
-| Texto                        | Inter 16/24, gris oscuro sobre blanco                          | Bien                                                                                                                                                        |
-| **Espacio entre párrafos**   | **0 px**                                                       | **Falla**: los párrafos se leen como un bloque. El `space-y-4` del `RichText` no llega a los párrafos, que no son hijos directos                            |
-| **Jerarquía de encabezados** | h2 20 px/500 · **h3 16 px/500, igual que el texto**            | **Falla**: el h3 casi no se distingue                                                                                                                       |
-| **Imágenes del cuerpo**      | `<img>` directa al Blob, sin `next/image` y sin carga diferida | **Falla**: en móvil se descarga la de 1024 px aunque se pinte a 358, y todas se cargan al abrir la página. Llevan ancho y alto, así que el CLS es 0         |
-| Tablas                       | Pasadas a párrafos «celda · celda»                             | Se leen, pero se pierde la tabla. Con el editor de tablas de Lexical (`EXPERIMENTAL_TableFeature`) se podrían conservar: cambia la configuración del editor |
-| Desbordamiento · CLS         | 0 · 0                                                          | Bien                                                                                                                                                        |
+| Qué                    | Antes                                                                                    | Ahora                                                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Espacio entre párrafos | **0 px** (el `space-y-4` no llegaba: los párrafos iban dentro del contenedor de Payload) | **16 px**: se pinta sin ese contenedor (`disableContainer`) y el texto pasa a 16/26                                              |
+| h2                     | 20 px / 500                                                                              | **24 px / 600**, 40 px por encima                                                                                                |
+| h3                     | **16 px / 500**, igual que el texto                                                      | **20 px / 600**, 32 px por encima (h4: 18 px / 600)                                                                              |
+| Imágenes del cuerpo    | `<img>` directa al Blob, sin carga diferida                                              | **`next/image`**: ancho y alto del registro, `sizes` hasta 672 px y carga diferida. No se estiran las más estrechas que el texto |
+| URL largas como texto  | Desbordaban (111 px en `el-origen-de-hitachi-…` a 390)                                   | Se parten (`break-words`)                                                                                                        |
 
-**La plantilla de artículo todavía no tiene el diseño de ux-9.** Las tres fallas son de la plantilla, no del importador: se arreglan con un convertidor propio del nodo `upload` del `RichText` (con `next/image`) y con espacios y tamaños en sus clases. Quedan como propuesta.
+**Verificado en el preview** (`partequipos-o187au0v9…`, último commit), recorriendo los 53 artículos a 390 y a 1440 y bajando por toda la página:
+
+- **0 imágenes sin `next/image`** y **0 rotas**;
+- **ningún desplazamiento que nazca en el cuerpo** (contando solo los que tienen todas sus fuentes dentro del texto);
+- **0 desbordamientos**: el único, el de la URL larga, ya está arreglado.
+
+Medidas de detalle en `tornamesa-de-excavadora-…` (5 imágenes) y `cuidado-del-tren-de-rodaje-…` (h2 y h3):
+
+- 16 px entre párrafos;
+- 4 de 4 imágenes con `next/image` y `loading="lazy"`;
+- en móvil, 124 kB de imágenes en lugar de las originales de 1024 px.
+
+Capturas en `Desktop\partequipos-cierre\capturas\blog-estructura\`.
+
+**Hallazgo, ANTERIOR a este cambio y fuera del cuerpo:** a 390 px, 11 de los 53 artículos tienen un CLS de más de 0,01 (hasta **0,21**) en la **cabecera** del artículo:
+
+- **Qué pasa:** al llegar Inter, el título largo o la línea «fecha · Por Partequipos · Noticias» ocupan una línea menos que con la fuente de respaldo, y todo lo de debajo sube.
+- **Es anterior:** se midió igual en el preview anterior (0,1588 en `cuidado-del-tren-de-rodaje-…`, idéntico).
+- **Causa:** Inter sin precarga, la decisión (b) de §10.36.
+- A 1440, 2 artículos con 0,039.
+- **No se toca aquí:** cambiar la carga de la fuente afecta al LCP de todo el sitio. Queda para dirección.
+
+### Tablas
+
+Siguen pasadas a párrafos «celda · celda». Se leen, pero se pierde la tabla. Con el editor de tablas de Lexical (`EXPERIMENTAL_TableFeature`) se podrían conservar; eso cambia la configuración del editor.
 
 ## Pendiente
 
-- **Las 47 imágenes marcadas:** revisarlas en el panel («Imágenes», buscando «Ilustración»), y también las 6 que salen del título de la imagen.
-- **Los 14 enlaces sin destino y los 170 títulos en negrita:** propuestas de arriba, pendientes de decisión.
-- **La plantilla de artículo:** espacio entre párrafos, jerarquía de encabezados e imágenes con `next/image`.
+- **Las 47 imágenes marcadas «Ilustración…»:** las revisa el editor **en producción, después de la migración**; es el paso 8 del runbook, con la lista de los 14 artículos. En la misma pasada, los 7 textos que salen del título de la imagen.
+- **CLS de la cabecera del artículo en móvil** (hallazgo de arriba): decisión de dirección.
 - **El SEO repetido de Yoast** (23 títulos y 28 descripciones sin importar): redactarlos si se quiere uno propio. Mientras tanto, el sitio usa el título y la entradilla.
 - **Producción:** con el runbook, cerca del lanzamiento.

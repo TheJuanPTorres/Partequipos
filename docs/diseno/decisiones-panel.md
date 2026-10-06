@@ -750,3 +750,39 @@ reutiliza la F3. Datos: `src/lib/queries/getPortadaPanel.ts`.
 
 Capturas de antes y después, en claro y oscuro, a 1440 y en móvil:
 `partequipos-cierre\capturas\f2-portada-antes-despues\`.
+
+## 24. Rediseño del panel, F3: listas más legibles (2026-10-06, rama `feat/panel-f3-listas`)
+
+Aprobada por dirección. **Solo celdas y columnas**: las tablas, el orden, los
+filtros y la búsqueda siguen siendo los de Payload. **Sin esquema ni
+dependencias** (deriva en cero).
+
+| Qué                    | Dónde                                                                                                                                                      | Cómo                                                                                                                                                                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Insignias de estado    | Disponible (equipos usados), Publicado/Borrador (testimonios, preguntas), autorización (testimonios), estado de la solicitud, destino de las redirecciones | `admin.components.Cell` del campo, con `insigniaDe` (`src/lib/panel/insignias.ts`, con pruebas). **Siempre con texto**: el color va en un punto decorativo y el texto en el color normal, así que el contraste no depende del tono (WCAG 1.4.1) |
+| Fechas relativas       | «Última modificación» de Imágenes y Documentos, «Creado» de Solicitudes y la fecha de publicación de Artículos                                             | `CeldaFecha`: «hace 2 días», enfocable con el teclado, y la fecha exacta en una burbuja al pasar el ratón **o al enfocar**, además de en el texto para el lector de pantalla                                                                    |
+| Miniaturas             | Equipos nuevos, equipos usados, modelos (galería) y artículos (imagen destacada), en una columna nueva tras el nombre                                      | `CeldaMiniatura`, de servidor: pide solo `url` y medidas de la primera imagen y la pinta con `next/image` a 40 px, `loading="lazy"`. Sin foto, «Sin foto»                                                                                       |
+| Miniaturas de Imágenes | La lista de Imágenes y las vistas previas de los campos de imagen                                                                                          | `upload.adminThumbnail`: la miniatura de Payload usaba el ORIGINAL (hasta 15 MB); ahora pasa por el optimizador de Next a 128 px (`urlMiniatura`). Es la de Payload, así que no lleva `loading="lazy"`, pero pesa unos pocos kB                 |
+
+- **Fechas automáticas.** Para poner la celda a `updatedAt` y `createdAt` se
+  declaran igual que las añade Payload 3.89 (`date`, indexadas, ocultas en el
+  formulario y sin edición en lote, `src/lib/fields/fechasDeLista.ts`); al
+  estar declaradas, Payload no añade las suyas. El guardarraíl de deriva
+  confirma que el esquema no cambia. **Revisar en cada actualización de
+  Payload** que su versión de estos dos campos siga siendo la misma.
+- **Solicitudes:** solo se cambia cómo se pinta el estado y la fecha en la
+  lista; ni el acceso ni los datos.
+- **Columnas:** la miniatura entra en las columnas por defecto
+  (`defaultColumns`). Quien ya hubiera elegido sus columnas en el panel
+  conserva su elección y puede añadirla con «Columnas».
+- **Coste del optimizador:** cada miniatura se transforma una vez y se cachea;
+  suma transformaciones al límite del plan de Vercel (como las del sitio).
+
+**Ordenar, filtrar y buscar, comprobado igual antes y después** con
+`panel:revision -- <preview> listas` (y `listas oscuro`), que guarda las
+primeras filas y el total de: equipos por nombre (ascendente y descendente),
+imágenes por última modificación, usados disponibles, equipos sin fotos y las
+búsquedas «320» en modelos y «excavadora» en artículos.
+
+Capturas de antes y después, en claro y oscuro:
+`partequipos-cierre\capturas\f3-listas-antes-despues\`.

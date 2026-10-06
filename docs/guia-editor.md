@@ -79,6 +79,11 @@ A la izquierda, en grupos:
 Dentro de cada grupo, primero va lo que más se edita (los modelos, los
 equipos) y después sus clasificaciones.
 
+En los listados, los **estados** salen como etiquetas de color con su
+texto («Disponible», «Borrador», «Nueva»…), las **fechas** como «hace 2 días»
+(pasa el ratón o llega con el tabulador para ver la fecha exacta) y los
+equipos, modelos y artículos llevan una **miniatura** de su primera foto.
+
 En cada listado puedes **buscar** (en modelos y equipos nuevos, también por
 código, p. ej. «320D»), **ordenar** pulsando en una columna y **filtrar** con
 el botón «Filtros».

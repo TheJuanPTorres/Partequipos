@@ -2082,3 +2082,124 @@ html[data-theme="dark"] .pq-acceso {
     color: var(--pq-muted-foreground);
   }
 }
+
+/* =========================================================================
+ * LISTAS MÁS LEGIBLES (`components/admin/celdas/`, F3, decisiones-panel §24)
+ *
+ * Solo celdas: las tablas, el orden, los filtros y la búsqueda son de Payload.
+ * ========================================================================= */
+
+/*
+ * INSIGNIA: el `badge` del sistema (píldora, 12 px, peso 500) con un punto del
+ * color del tono y el texto en el color normal, así el contraste no depende del
+ * tono (el punto es decorativo: el estado lo dice el texto).
+ */
+.pq-insignia {
+  --pq-insignia-tono: var(--pq-muted-foreground);
+
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--pq-insignia-tono) 12%, var(--pq-background));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--pq-insignia-tono) 32%, transparent);
+  color: var(--pq-foreground);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+
+  &--exito {
+    --pq-insignia-tono: var(--pq-success);
+  }
+
+  &--aviso {
+    --pq-insignia-tono: var(--pq-warning);
+  }
+
+  &--error {
+    --pq-insignia-tono: var(--pq-destructive);
+  }
+
+  &--info {
+    --pq-insignia-tono: var(--pq-info);
+  }
+
+  &__punto {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--pq-insignia-tono);
+  }
+}
+
+/*
+ * FECHA RELATIVA con la exacta al pasar el ratón o al ENFOCAR: una burbuja que
+ * aparece con :hover y :focus-visible. Fuera de ellas, la exacta sigue en el
+ * texto (visualmente oculta) para el lector de pantalla.
+ */
+.pq-fecha {
+  position: relative;
+  border-radius: var(--pq-radius-md);
+  white-space: nowrap;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--pq-muted-foreground);
+  text-underline-offset: 3px;
+  cursor: help;
+
+  &:focus-visible {
+    outline: var(--accessibility-outline);
+    outline-offset: var(--accessibility-outline-offset);
+  }
+
+  &__exacta {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  &:hover &__exacta,
+  &:focus-visible &__exacta {
+    z-index: 10;
+    top: calc(100% + 6px);
+    left: 0;
+    width: auto;
+    height: auto;
+    padding: 4px 8px;
+    border-radius: var(--pq-radius-lg);
+    background: var(--pq-foreground);
+    color: var(--pq-background);
+    font-size: 12px;
+    clip-path: none;
+  }
+}
+
+/* MINIATURA: 40 px, radio del sistema, anillo fino; «Sin foto» atenuado. */
+.pq-miniatura {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: var(--pq-radius-lg);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 10%, transparent);
+  vertical-align: middle;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+
+  &--vacia {
+    align-items: center;
+    justify-content: center;
+    background: var(--pq-muted);
+    color: var(--pq-muted-foreground);
+    font-size: 10px;
+    line-height: 12px;
+    text-align: center;
+  }
+}

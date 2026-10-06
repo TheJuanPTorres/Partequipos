@@ -25,7 +25,7 @@ export const Articulo: CollectionConfig = {
   labels: { singular: "Artículo", plural: "Artículos" },
   admin: {
     useAsTitle: "titulo",
-    defaultColumns: ["titulo", "categoria", "fechaPublicacion", "slug"],
+    defaultColumns: ["titulo", "imagenDestacada", "categoria", "fechaPublicacion", "slug"],
     group: "Páginas y blog",
     description:
       "Cada artículo tiene su dirección en partequipos.com/<dirección>/, y no puede repetir la de una página.",
@@ -59,6 +59,7 @@ export const Articulo: CollectionConfig = {
       required: true,
       label: "Fecha de publicación",
       admin: {
+        components: { Cell: "/components/admin/celdas/CeldaFecha" },
         position: "sidebar",
         description:
           "Ordena el blog (lo más reciente primero) y es la fecha que ven los buscadores.",
@@ -94,7 +95,10 @@ export const Articulo: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       label: "Imagen destacada",
-      admin: { description: "Se usa en el índice y como imagen social." },
+      admin: {
+        components: { Cell: "/components/admin/celdas/CeldaMiniatura" },
+        description: "Se usa en el índice y como imagen social.",
+      },
     },
     { name: "contenido", type: "richText", label: "Contenido" },
     seoField(),

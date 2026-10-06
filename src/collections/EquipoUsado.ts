@@ -26,7 +26,7 @@ export const EquipoUsado: CollectionConfig = {
   labels: { singular: "Equipo usado", plural: "Equipos usados" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "categoria", "anio", "disponible"],
+    defaultColumns: ["nombre", "imagenes", "categoria", "anio", "disponible"],
     group: "Maquinaria",
     listSearchableFields: ["nombre", "marca", "modelo"],
     description:
@@ -130,6 +130,7 @@ export const EquipoUsado: CollectionConfig = {
       relationTo: "media",
       hasMany: true,
       label: "Imágenes",
+      admin: { components: { Cell: "/components/admin/celdas/CeldaMiniatura" } },
     },
     /*
      * Sin precio a propósito: la venta de maquinaria pesada es por cotización y
@@ -142,6 +143,7 @@ export const EquipoUsado: CollectionConfig = {
       defaultValue: true,
       label: "Disponible",
       admin: {
+        components: { Cell: "/components/admin/celdas/CeldaDisponible" },
         position: "sidebar",
         description:
           "Al venderse, desmarcar en vez de borrar: conserva el historial y permite deshacer.",

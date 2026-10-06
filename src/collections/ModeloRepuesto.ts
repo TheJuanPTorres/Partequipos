@@ -19,7 +19,7 @@ export const ModeloRepuesto: CollectionConfig = {
   },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "marca", "tipo", "slug"],
+    defaultColumns: ["nombre", "imagenes", "marca", "tipo", "slug"],
     group: "Repuestos",
     // El código («320D») es como busca un comercial; el nombre solo no basta.
     listSearchableFields: ["nombre", "codigo"],
@@ -96,6 +96,7 @@ export const ModeloRepuesto: CollectionConfig = {
       relationTo: "media",
       hasMany: true,
       label: "Imágenes (galería)",
+      admin: { components: { Cell: "/components/admin/celdas/CeldaMiniatura" } },
     },
     seoField(),
   ],

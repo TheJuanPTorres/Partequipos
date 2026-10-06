@@ -6,6 +6,7 @@ import { formatoDePdfPermitido } from "./hooks/formatoDePdfPermitido";
 import { revalidarDocumento } from "./hooks/maquinariaHooks";
 import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
 import { sinRecorte } from "./hooks/sinRecorte";
+import { fechaActualizado } from "../lib/fields/fechasDeLista";
 
 /**
  * Documentos descargables en PDF: hoy, la ficha técnica completa de cada
@@ -49,6 +50,8 @@ export const Documento: CollectionConfig = {
     afterChange: [revalidarDocumento],
   },
   fields: [
+    // «Última modificación» como fecha relativa en la lista (F3).
+    fechaActualizado,
     {
       name: "titulo",
       type: "text",

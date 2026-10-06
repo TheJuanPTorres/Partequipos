@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { notificarSolicitud } from "./hooks/notificarSolicitud";
 import { escrituraContenido, soloAdmin, soloPersonal } from "../lib/seguridad/acceso";
+import { fechaCreado } from "../lib/fields/fechasDeLista";
 
 /**
  * Solicitudes enviadas desde los formularios públicos: el lead comercial, que es
@@ -54,6 +55,8 @@ export const Solicitud: CollectionConfig = {
   },
 
   fields: [
+    // «Creado» como fecha relativa en la lista (F3). Solo la celda: ni datos ni acceso.
+    fechaCreado,
     {
       name: "tipo",
       type: "select",
@@ -78,6 +81,7 @@ export const Solicitud: CollectionConfig = {
         { label: "Atendida", value: "atendida" },
       ],
       admin: {
+        components: { Cell: "/components/admin/celdas/CeldaSolicitud" },
         position: "sidebar",
         description: "Marcar como atendida en vez de borrar: conserva el historial.",
       },

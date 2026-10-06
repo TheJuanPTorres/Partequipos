@@ -143,6 +143,7 @@ export const Testimonio: CollectionConfig = {
           label:
             "Tengo la autorización firmada de esta persona para publicar su nombre, foto y testimonio",
           defaultValue: false,
+          admin: { components: { Cell: "/components/admin/celdas/CeldaAutorizacion" } },
         },
         {
           name: "fechaAutorizacion",
@@ -178,6 +179,7 @@ export const Testimonio: CollectionConfig = {
       validate: (valor: unknown, { siblingData }: { siblingData: { autorizacionUso?: boolean } }) =>
         validarPublicacionTestimonio(valor, siblingData?.autorizacionUso),
       admin: {
+        components: { Cell: "/components/admin/celdas/CeldaPublicado" },
         position: "sidebar",
         description: "Solo se puede marcar con la autorización de uso marcada.",
       },

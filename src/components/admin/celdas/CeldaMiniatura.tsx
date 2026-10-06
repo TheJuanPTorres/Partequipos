@@ -5,8 +5,8 @@ import { cache } from "react";
 import { primeraImagen } from "@/lib/panel/miniatura";
 
 /*
- * Una consulta por imagen y petición (`cache`): solo `url`, `width`, `height`
- * y `alt`, sin poblar nada. Media es de lectura pública.
+ * Una consulta por imagen y petición (`cache`): solo `url`, `filename` y las
+ * medidas, sin poblar nada. Media es de lectura pública.
  */
 const leerImagen = cache(
   async (payload: DefaultServerCellComponentProps["payload"], id: number | string) => {
@@ -15,7 +15,8 @@ const leerImagen = cache(
         collection: "media",
         id,
         depth: 0,
-        select: { url: true, width: true, height: true, alt: true },
+        // `filename` hace falta: `url` es virtual y sale de él (sin él, llega null).
+        select: { url: true, filename: true, width: true, height: true },
       });
     } catch {
       return null;

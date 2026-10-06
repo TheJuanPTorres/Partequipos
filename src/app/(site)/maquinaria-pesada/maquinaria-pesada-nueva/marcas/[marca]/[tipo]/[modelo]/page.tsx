@@ -10,6 +10,7 @@ import { GaleriaFicha, type FotoFicha } from "@/components/ficha/GaleriaFicha";
 import { IconoDato } from "@/components/ficha/IconoDato";
 import estilos from "@/components/ficha/ficha.module.css";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
+import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
@@ -181,6 +182,8 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
   return (
     <main className={estilos.pagina}>
       <JsonLd data={[productJsonLd, buildBreadcrumbJsonLd(breadcrumbs)]} />
+      {/* La ficha ya tiene su llamada a la acción: el pie no pinta la tarjeta roja. */}
+      <PieSinTarjeta />
 
       {/* 1. TARJETA PRINCIPAL: galería, migas, título, datos y botones. */}
       <section

@@ -27,6 +27,13 @@ const ACCESOS: { slug: string; texto: string; icono: Icon }[] = [
 
 const formatoNumero = new Intl.NumberFormat("es-CO");
 
+/*
+ * SIN PRECARGA en los enlaces (`prefetch={false}`): la portada tiene unos 60, y
+ * con la precarga de Next cada uno pedía su página al servidor nada más abrir
+ * el panel (medido en el preview: decenas de GET a /admin/collections/…). La
+ * navegación sigue siendo de cliente al pulsar.
+ */
+
 /**
  * PORTADA PROPIA DEL PANEL (`admin.components.views.dashboard`, F2 del
  * rediseño, 2026-10-06; decisiones-panel.md §23). Sustituye la cuadrícula de
@@ -73,7 +80,12 @@ export default async function Portada(props: DashboardViewServerProps) {
               <li key={a.clave}>
                 <Aviso className="pq-portada__aviso" tono={a.tono}>
                   <p>
-                    {a.texto} {a.enlace ? <Link href={a.enlace.href}>{a.enlace.texto}</Link> : null}
+                    {a.texto}{" "}
+                    {a.enlace ? (
+                      <Link prefetch={false} href={a.enlace.href}>
+                        {a.enlace.texto}
+                      </Link>
+                    ) : null}
                   </p>
                 </Aviso>
               </li>
@@ -94,7 +106,7 @@ export default async function Portada(props: DashboardViewServerProps) {
           <ul className="pq-portada__accesos">
             {accesos.map(({ slug, texto, icono: Icono }) => (
               <li key={slug}>
-                <Link className="pq-portada__acceso" href={rutaCrear(slug)}>
+                <Link prefetch={false} className="pq-portada__acceso" href={rutaCrear(slug)}>
                   <Icono aria-hidden="true" size={16} />
                   {texto}
                 </Link>
@@ -121,7 +133,7 @@ export default async function Portada(props: DashboardViewServerProps) {
                 <ul className="pq-portada__entradas">
                   {t.entradas.map((e) => (
                     <li className="pq-portada__entrada" key={e.slug}>
-                      <Link className="pq-portada__entrada-enlace" href={e.href}>
+                      <Link prefetch={false} className="pq-portada__entrada-enlace" href={e.href}>
                         <span className="pq-portada__entrada-nombre">{e.etiqueta}</span>
                         {e.contador !== null ? (
                           <span className="pq-portada__contador">
@@ -132,6 +144,7 @@ export default async function Portada(props: DashboardViewServerProps) {
                       {e.detalle ? <span className="pq-portada__detalle">{e.detalle}</span> : null}
                       {e.hrefCrear ? (
                         <Link
+                          prefetch={false}
                           aria-label={`Crear en ${e.etiqueta}`}
                           className="pq-portada__crear"
                           href={e.hrefCrear}
@@ -157,7 +170,7 @@ export default async function Portada(props: DashboardViewServerProps) {
           <ol className="pq-portada__recientes">
             {recientes.map((r) => (
               <li className="pq-portada__reciente" key={`${r.slug}-${r.href}`}>
-                <Link className="pq-portada__reciente-titulo" href={r.href}>
+                <Link prefetch={false} className="pq-portada__reciente-titulo" href={r.href}>
                   {r.titulo}
                 </Link>
                 <span className="pq-portada__reciente-coleccion">{r.coleccion}</span>

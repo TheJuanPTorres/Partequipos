@@ -96,7 +96,7 @@
 }
 
 /*
- * DESVIACIÓN (D16, dirección 2026-10-06): en móvil la máquina sube 140 px y en
+ * DESVIACIÓN (dirección 2026-10-06, decisiones-home-ux9.md §28.1): en móvil la máquina sube 140 px y en
  * ux-9 tapaba el botón «Ver todo» de la sección 2 (medido: −110 px a 360–430).
  * La sección baja lo justo para dejar 24 px entre el botón y la caja de la
  * imagen, y la máquina sigue asomando 140 px sobre el gris. Lo que ya separa

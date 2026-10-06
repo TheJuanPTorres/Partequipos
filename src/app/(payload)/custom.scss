@@ -1051,6 +1051,13 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   position: sticky;
   bottom: 0;
   z-index: 1;
+  /*
+   * A TODO EL ANCHO (F1, 2026-10-06). `.nav__wrap` alinea sus hijos al inicio,
+   * así que el pie medía solo lo que su icono y el texto de las entradas asomaba
+   * a su derecha al desplazar. No se notaba mientras el menú cabía en la
+   * ventana; con 8 grupos y 29 entradas ya no cabe (1106 px a 1440 × 900).
+   */
+  align-self: stretch;
   background: var(--theme-bg);
   border-top: 1px solid var(--pq-sidebar-border);
   padding-block: 12px;

@@ -2394,6 +2394,10 @@ export interface Seo {
    */
   imagenSocial?: (number | null) | Media;
   /**
+   * La que sale a la izquierda de la pantalla para entrar al panel, solo en computador. Mejor una imagen cuadrada o vertical y oscura, porque lleva texto blanco encima. Si la dejas vacía, sale un fondo rojo degradado.
+   */
+  imagenAcceso?: (number | null) | Media;
+  /**
    * Sale en el pie, la cabecera, el botón de WhatsApp y la información que leen los buscadores. Si dejas un campo vacío, se usa el dato de siempre.
    */
   empresa?: {
@@ -2501,6 +2505,7 @@ export interface SeoSelect<T extends boolean = true> {
       };
   logo?: T;
   imagenSocial?: T;
+  imagenAcceso?: T;
   empresa?:
     | T
     | {

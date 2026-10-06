@@ -223,6 +223,10 @@ vacío no rompe nada: el sitio usa el dato de siempre.**
     Imagen **opaca** (sin transparencia), de **1200 × 630 px**. Si la dejas
     vacía, se usa el logo; pero algunas redes pintan la transparencia del logo
     en negro, así que conviene subirla.
+  - **Imagen de la pantalla de acceso:** la que sale a la izquierda de la
+    pantalla para entrar al panel, solo en computador. Mejor cuadrada o
+    vertical y oscura, porque lleva texto blanco encima. Si la dejas vacía,
+    sale un fondo rojo degradado.
 - **Contacto de la empresa:** teléfono, WhatsApp, correo, dirección, ciudad y
   redes sociales. Salen en el pie, la cabecera, el botón de WhatsApp, la página
   de contacto y la información que leen los buscadores.

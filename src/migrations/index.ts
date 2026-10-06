@@ -24,6 +24,7 @@ import * as migration_20261004_175926_empresa_contacto from './20261004_175926_e
 import * as migration_20261004_191621_logo_institucional from './20261004_191621_logo_institucional';
 import * as migration_20261004_205655_imagen_social from './20261004_205655_imagen_social';
 import * as migration_20261005_142945_ficha_producto from './20261005_142945_ficha_producto';
+import * as migration_20261006_024440_imagen_acceso from './20261006_024440_imagen_acceso';
 
 export const migrations = [
   {
@@ -154,6 +155,11 @@ export const migrations = [
   {
     up: migration_20261005_142945_ficha_producto.up,
     down: migration_20261005_142945_ficha_producto.down,
-    name: '20261005_142945_ficha_producto'
+    name: '20261005_142945_ficha_producto',
+  },
+  {
+    up: migration_20261006_024440_imagen_acceso.up,
+    down: migration_20261006_024440_imagen_acceso.down,
+    name: '20261006_024440_imagen_acceso'
   },
 ];

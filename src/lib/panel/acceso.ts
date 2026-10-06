@@ -7,22 +7,26 @@
  * de Microsoft está activo. Detalle en `docs/diseno/decisiones-panel.md` §17.
  */
 
-/** Nombre con el que se sube la imagen del panel visual a `Media`. */
-export const IMAGEN_ACCESO = "acceso-panel.webp";
+/** Lo que llega del campo `imagenAcceso` del global `seo` con `depth: 1`. */
+export type ImagenAccesoGlobal =
+  | number
+  | { url?: string | null; width?: number | null; height?: number | null }
+  | null
+  | undefined;
 
-/** Lo que se busca en `filename` (luego se filtra con `esImagenAcceso`). */
-export const PREFIJO_IMAGEN_ACCESO = "acceso-panel";
+export type ImagenAcceso = { url: string; width: number; height: number };
 
 /**
- * ¿Es este fichero de `Media` la imagen de la pantalla de acceso?
- *
- * Desde la subida directa (PR #82) el almacén añade un SUFIJO ALEATORIO al
- * nombre (`acceso-panel-zfmyV….webp`), así que no se puede buscar el nombre
- * exacto. Vale `acceso-panel` con o sin sufijo y en WebP, JPEG o PNG; no vale
- * otro nombre que solo lo contenga (`acceso-panel-viejo-2.webp`, `mi-acceso-panel.webp`).
+ * La imagen del panel visual, elegida en «SEO y datos de la empresa» →
+ * «Imágenes» → «Imagen de la pantalla de acceso». Si el campo está vacío, sin
+ * poblar o sin medidas, `null`: la pantalla pinta el degradado.
  */
-export function esImagenAcceso(nombre: string | null | undefined): boolean {
-  return /^acceso-panel(?:-[A-Za-z0-9]{20,40})?\.(?:webp|jpe?g|png)$/i.test(nombre ?? "");
+export function imagenDeAcceso(valor: ImagenAccesoGlobal): ImagenAcceso | null {
+  if (!valor || typeof valor !== "object") return null;
+  const url = valor.url?.trim();
+  const { width, height } = valor;
+  if (!url || !width || !height || width <= 0 || height <= 0) return null;
+  return { url, width, height };
 }
 
 /**

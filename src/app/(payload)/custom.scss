@@ -1363,3 +1363,354 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
     font-weight: 600;
   }
 }
+
+/* =========================================================================
+ * PANTALLA DE ACCESO (`components/admin/acceso/`, decisiones-panel.md §17)
+ *
+ * Réplica de `login-screen` del sistema del cliente, medida en su demo
+ * publicada (ui.partequipos.com/components/login-screen) a 1440 y 390 en
+ * claro y oscuro. Sin Base UI ni Tailwind: elementos nativos con los tokens
+ * --pq-* de este fichero, así claro y oscuro son los del propio panel.
+ *
+ * Desviaciones, a propósito y anotadas en §17:
+ * - campos con BORDE de 3:1 (el sistema no lo pinta en claro), como el resto
+ *   de campos del panel (apartado 6);
+ * - ETIQUETAS visibles encima de los campos (el sistema solo usa el texto de
+ *   ayuda de dentro, que desaparece al escribir);
+ * - el foco es el del panel (2 px de --pq-primary), no el anillo al 30 %;
+ * - un velo oscuro bajo el lema del panel visual, para que el texto blanco no
+ *   dependa de cómo sea la foto.
+ * ========================================================================= */
+
+/* La plantilla mínima de Payload centra una caja de 480 px: aquí ocupa todo. */
+.login.template-minimal:has(.pq-acceso) {
+  display: block;
+  padding: 0;
+
+  .template-minimal__wrap {
+    max-width: none;
+  }
+}
+
+.pq-acceso {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100dvh;
+  padding: 16px;
+  background: var(--pq-background);
+  color: var(--pq-foreground);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 20px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    padding: 24px;
+  }
+
+  :is(a, button, input):focus-visible {
+    outline: var(--accessibility-outline);
+    outline-offset: var(--accessibility-outline-offset);
+  }
+
+  /* ---- Panel visual (solo escritorio) ---------------------------------- */
+  &__visual {
+    display: none;
+
+    @media (min-width: 1024px) {
+      position: relative;
+      display: flex;
+      overflow: hidden;
+      border-radius: min(var(--pq-radius-4xl), 24px);
+      /* Respaldo si no hay imagen en Media: rojo de marca hacia negro. */
+      background: radial-gradient(120% 80% at 50% 0%, #c81e1e 0%, #6b0d0d 45%, #140404 100%);
+      box-shadow: 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 10%, transparent);
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0;
+        height: 55%;
+        background: linear-gradient(to top, rgb(0 0 0 / 0.6), transparent);
+        pointer-events: none;
+      }
+    }
+  }
+
+  &__imagen {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__visual-contenido {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 32px;
+  }
+
+  &__marca svg {
+    display: block;
+    width: auto;
+    height: 24px;
+  }
+
+  &__lema {
+    max-width: 28rem;
+  }
+
+  &__lema-titulo {
+    margin: 0;
+    color: #fff;
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 36px;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  &__lema-texto {
+    margin: 12px 0 0;
+    color: rgb(255 255 255 / 0.78);
+  }
+
+  /* ---- Formulario ------------------------------------------------------ */
+  &__principal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 8px;
+
+    @media (min-width: 1024px) {
+      padding: 40px 24px;
+    }
+  }
+
+  &__caja {
+    width: 100%;
+    max-width: 384px;
+  }
+
+  &__marca-movil {
+    display: block;
+    margin-bottom: 40px;
+
+    svg {
+      display: block;
+      width: auto;
+      height: 20px;
+    }
+
+    @media (min-width: 1024px) {
+      display: none;
+    }
+  }
+
+  &__cabecera {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 32px;
+  }
+
+  &__titulo {
+    margin: 0;
+    color: var(--pq-foreground);
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 36px;
+    letter-spacing: -0.025em;
+  }
+
+  &__descripcion {
+    margin: 0;
+    color: var(--pq-muted-foreground);
+  }
+
+  &__boton {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    border-radius: var(--pq-radius-2xl);
+    font: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &--secundario {
+      background: var(--pq-secondary);
+      color: var(--pq-secondary-foreground);
+
+      &:hover:not(:disabled) {
+        background: color-mix(in oklab, var(--pq-secondary) 88%, var(--pq-foreground));
+      }
+
+      /*
+       * Desactivado: atenuado pero LEGIBLE (el color atenuado del sistema, que
+       * cumple 4,5:1) y con el «Próximamente» a la vista.
+       */
+      &:disabled {
+        color: var(--pq-muted-foreground);
+        cursor: not-allowed;
+      }
+    }
+
+    &--primario {
+      margin-top: 4px;
+      background: var(--pq-primary);
+      color: var(--pq-on-primary);
+
+      &:hover {
+        background: color-mix(in oklab, var(--pq-primary) 85%, oklch(0 0 0));
+      }
+
+      &[aria-disabled="true"] {
+        cursor: progress;
+      }
+    }
+  }
+
+  &__logo-ms {
+    width: 16px;
+    height: 16px;
+  }
+
+  &__boton:disabled &__logo-ms {
+    opacity: 0.6;
+  }
+
+  &__pronto {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--pq-background);
+    color: var(--pq-foreground);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+  }
+
+  &__separador {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin: 24px 0;
+    color: var(--pq-muted-foreground);
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  &__riel {
+    flex: 1;
+    height: 1px;
+    border-radius: 999px;
+    background: var(--pq-border);
+  }
+
+  &__formulario {
+    display: grid;
+    gap: 12px;
+  }
+
+  &__alerta {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 8px 12px;
+    border-radius: var(--pq-radius-lg);
+    background: color-mix(in oklab, var(--pq-destructive) 10%, var(--pq-background));
+    color: color-mix(in oklab, var(--pq-destructive) 80%, var(--pq-foreground));
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  &__alerta-icono {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+  }
+
+  &__campo {
+    display: grid;
+    gap: 6px;
+  }
+
+  &__fila-etiqueta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  &__etiqueta {
+    color: var(--pq-foreground);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  &__olvido {
+    color: var(--pq-muted-foreground);
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: var(--pq-foreground);
+    }
+  }
+
+  &__input {
+    width: 100%;
+    height: 44px;
+    padding: 4px 10px;
+    border: 1px solid var(--pq-campo-borde);
+    border-radius: var(--pq-radius-2xl);
+    background: var(--pq-campo-fondo);
+    color: var(--pq-foreground);
+    font: inherit;
+    /* 16 px en móvil: con menos, Safari de iPhone amplía la página al enfocar. */
+    font-size: 16px;
+
+    @media (min-width: 1024px) {
+      font-size: 14px;
+    }
+
+    &::placeholder {
+      color: var(--pq-muted-foreground);
+    }
+
+    &[aria-invalid="true"] {
+      border-color: var(--pq-destructive);
+    }
+  }
+
+  &__girando {
+    width: 16px;
+    height: 16px;
+    animation: pq-acceso-girar 0.8s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@keyframes pq-acceso-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}

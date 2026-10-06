@@ -30,6 +30,7 @@ import { default as default_965175d01b56876a09418037afb35340 } from '../../../co
 import { default as default_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { default as default_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { ManejadorSubidaDirecta as ManejadorSubidaDirecta_50ab0ed780cf9cdd6f7f88ce54f9a956 } from '../../../components/admin/ManejadorSubidaDirecta'
+import { default as default_f96219a7d8f8d4b4be2a5fe5a468a16d } from '../../../components/admin/acceso/Acceso'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
 
@@ -67,6 +68,7 @@ export const importMap = {
   "/components/admin/Icon#default": default_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#default": default_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/ManejadorSubidaDirecta#ManejadorSubidaDirecta": ManejadorSubidaDirecta_50ab0ed780cf9cdd6f7f88ce54f9a956,
+  "/components/admin/acceso/Acceso#default": default_f96219a7d8f8d4b4be2a5fe5a468a16d,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e
 }

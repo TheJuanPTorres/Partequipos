@@ -175,7 +175,70 @@ try {
       (r) => r.status() >= 400 && fallidas.push(`${sinQuery(r.url())} — HTTP ${r.status()}`),
     );
 
-    await pagina.goto(`${base}/admin/login`, { waitUntil: "networkidle" });
+    /*
+     * Modo `acceso` (`npm run panel:revision -- <preview> acceso`): la
+     * pantalla de acceso en claro y en oscuro (cookie `payload-theme`, como
+     * entra el usuario, §10.23), un error con un correo que NO existe (no
+     * suma intentos a ninguna cuenta), el orden del tabulador y, al entrar,
+     * que respeta la redirección pedida.
+     */
+    const REDIRECCION = "/admin/collections/media";
+    if (MODO === "acceso") {
+      for (const tema of ["light", "dark"]) {
+        await contexto.addCookies([{ name: "payload-theme", value: tema, url: origin }]);
+        await pagina.goto(`${base}/admin/login`, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(1500);
+        const fichero = path.join(salida, `acceso-${tema}-${ancho.nombre}.png`);
+        await pagina.screenshot({ path: fichero, fullPage: true });
+        decir(`✓ acceso ${tema} (${ancho.nombre}) → ${path.basename(fichero)}`);
+        if (tema === "light") {
+          const tabulador = [];
+          await pagina.locator("body").focus();
+          for (let i = 0; i < 6; i++) {
+            await pagina.keyboard.press("Tab");
+            tabulador.push(
+              await pagina.evaluate(() => {
+                const e = document.activeElement;
+                const etiqueta = e?.labels?.[0]?.textContent ?? e?.textContent ?? "";
+                return `${e?.tagName.toLowerCase()} «${etiqueta.trim().slice(0, 40)}»`;
+              }),
+            );
+          }
+          const estado = await pagina.evaluate(() => ({
+            h1: [...document.querySelectorAll("h1")].map((h) => h.textContent.trim()),
+            microsoft: [...document.querySelectorAll(".pq-acceso__boton--secundario")].map((b) => ({
+              texto: b.textContent.trim(),
+              desactivado: b.disabled === true,
+            })),
+            etiquetas: [...document.querySelectorAll(".pq-acceso input")].map(
+              (i) => i.labels?.[0]?.textContent.trim() ?? "(sin etiqueta)",
+            ),
+          }));
+          hallazgos.push({ pantalla: "acceso", ancho: ancho.nombre, tabulador, ...estado });
+        }
+      }
+      await contexto.addCookies([{ name: "payload-theme", value: "light", url: origin }]);
+      await pagina.locator('input[name="email"]').fill("revision-acceso@ejemplo.invalid");
+      await pagina.locator('input[name="password"]').fill("no-es-la-clave");
+      await pagina.locator('button[type="submit"]').click();
+      await pagina.locator(".pq-acceso__alerta:not(:empty)").waitFor({ timeout: 20_000 });
+      await pagina.waitForTimeout(500);
+      const fichero = path.join(salida, `acceso-error-${ancho.nombre}.png`);
+      await pagina.screenshot({ path: fichero, fullPage: true });
+      const error = await pagina.evaluate(() => ({
+        alerta: document.querySelector(".pq-acceso__alerta")?.textContent.trim(),
+        rol: document.querySelector(".pq-acceso__alerta")?.getAttribute("role"),
+        camposInvalidos: document.querySelectorAll('.pq-acceso input[aria-invalid="true"]').length,
+        url: location.pathname,
+      }));
+      hallazgos.push({ pantalla: "acceso-error", ancho: ancho.nombre, ...error });
+      decir(`✓ acceso con error (${ancho.nombre}) → ${path.basename(fichero)}`);
+      await pagina.goto(`${base}/admin/login?redirect=${encodeURIComponent(REDIRECCION)}`, {
+        waitUntil: "networkidle",
+      });
+    } else {
+      await pagina.goto(`${base}/admin/login`, { waitUntil: "networkidle" });
+    }
     // Con mensaje fijo: la traza de un error de Playwright podría llevar lo
     // tecleado, y la contraseña no puede salir de este proceso.
     try {
@@ -188,6 +251,23 @@ try {
       pagina.waitForURL((u) => !u.pathname.includes("/login"), { timeout: 30_000 }),
       pagina.locator('button[type="submit"]').click(),
     ]).catch(() => fallar(`No se pudo iniciar sesión (${ancho.nombre}).`));
+
+    if (MODO === "acceso") {
+      await pagina.waitForLoadState("networkidle");
+      const llegada = new URL(pagina.url()).pathname.replace(/\/$/, "");
+      // Con sesión abierta, /admin/login no se pinta: redirige al panel.
+      await pagina.goto(`${base}/admin/login`, { waitUntil: "networkidle" });
+      const conSesion = new URL(pagina.url()).pathname.replace(/\/$/, "");
+      hallazgos.push({ pantalla: "acceso-entrada", ancho: ancho.nombre, llegada, conSesion });
+      decir(
+        `✓ entrada (${ancho.nombre}): llega a ${llegada}; /admin/login con sesión → ${conSesion}`,
+      );
+      if (llegada !== REDIRECCION) fallar(`No respetó la redirección: llegó a ${llegada}.`);
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
 
     const visitar = async (nombre, ruta) => {
       await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });

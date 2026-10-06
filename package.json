@@ -49,6 +49,8 @@
     "demo:prueba:ejecutar": "tsx scripts/demo/con-entorno-prueba.ts",
     "preview:fase-g:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-g-preview.ts sembrar",
     "preview:fase-g:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-g-preview.ts retirar",
+    "preview:acceso:subir": "tsx scripts/preview/con-entorno.ts payload run scripts/panel/imagen-acceso-preview.ts subir",
+    "preview:acceso:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/panel/imagen-acceso-preview.ts retirar",
     "preview:fase-h:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-h-preview.ts sembrar",
     "preview:fase-h:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/fase-h-preview.ts retirar",
     "preview:nosotros:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/nosotros/nosotros-preview.ts sembrar",

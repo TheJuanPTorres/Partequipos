@@ -91,6 +91,22 @@ página en otra pestaña. Sale cuando la ficha ya está guardada; en móvil es s
 el icono. Lo que no tiene página propia (equipos usados, categorías técnicas,
 sedes, testimonios, solicitudes…) no lo lleva.
 
+### La portada del panel
+
+Al entrar ves el **panel de control**:
+
+- **Necesita atención:** solo lo que hay que mirar (solicitudes nuevas, fichas
+  sin fotos, imágenes con el texto alternativo flojo…), cada cosa con un enlace
+  a la lista ya filtrada. Si no hay nada, dice «Todo en orden».
+- **Accesos rápidos:** nueva máquina, nuevo artículo, subir imagen y subir
+  documento.
+- **Secciones:** una tarjeta por grupo del menú, con cuántas fichas hay en cada
+  lista. El **+** crea una ficha nueva en esa lista.
+- **Lo último modificado:** las últimas fichas que se han tocado y cuándo (pasa
+  el ratón por la fecha para ver la exacta). Las solicitudes no salen aquí.
+
+Solo ves lo que tu usuario puede abrir.
+
 ### Los avisos del panel
 
 Algunas pantallas muestran un **recuadro de aviso** (con un icono a la

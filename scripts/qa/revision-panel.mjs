@@ -361,9 +361,35 @@ try {
 
     for (const p of PANTALLAS) await visitar(p.nombre, p.ruta);
 
+    // La PORTADA PROPIA (F2): estructura y que de «solicitudes» no haya
+    // ningún enlace a una solicitud concreta (solo contadores).
+    await pagina.goto(`${base}/admin`, { waitUntil: "networkidle" });
+    const portada = await pagina.evaluate(() => ({
+      h1: [...document.querySelectorAll("h1")].map((h) => h.textContent.trim()),
+      secciones: [...document.querySelectorAll(".pq-portada h2")].map((h) => h.textContent.trim()),
+      tarjetas: [...document.querySelectorAll(".pq-portada__tarjeta h3")].map((h) =>
+        h.textContent.trim(),
+      ),
+      avisos: [...document.querySelectorAll(".pq-portada .pq-aviso")].map((a) =>
+        a.textContent.trim(),
+      ),
+      accesos: [...document.querySelectorAll(".pq-portada__acceso")].map((a) =>
+        a.textContent.trim(),
+      ),
+      recientes: document.querySelectorAll(".pq-portada__reciente").length,
+      enlacesASolicitudes: [...document.querySelectorAll('a[href*="/collections/solicitudes"]')]
+        .map((a) => a.getAttribute("href") ?? "")
+        // Una solicitud concreta es /collections/solicitudes/<id>; la lista
+        // (con o sin barra y filtros) y «crear» no cuentan.
+        .filter((h) => /\/collections\/solicitudes\/(?!create)[^/?#]+/.test(h)),
+    }));
+    hallazgos.push({ pantalla: "portada-estructura", ancho: ancho.nombre, ...portada });
+    if (portada.enlacesASolicitudes.length) {
+      fallar("La portada enlaza a solicitudes concretas: solo debe haber contadores.");
+    }
+
     // El MENÚ LATERAL desplegado (F1 del rediseño): se abre con su botón y se
     // captura la ventana visible, que es donde vive el menú.
-    await pagina.goto(`${base}/admin`, { waitUntil: "networkidle" });
     // En escritorio el botón está junto a las migas; en móvil, en la cabecera.
     const toggler = pagina
       .locator(ancho.movil ? ".app-header__mobile-nav-toggler" : ".template-default__nav-toggler")

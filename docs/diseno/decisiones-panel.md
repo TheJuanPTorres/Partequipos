@@ -737,7 +737,8 @@ exactas para el lector de pantalla. Claro y oscuro con los tokens del panel; en
 móvil, una columna.
 
 **Pendiente, y no se hace sin decisión: «con quién».** Payload no guarda quién
-modificó un documento: ninguna colección tiene versiones ni campo de autor.
+modificó un documento: ninguna colección tiene versiones ni un campo que lo
+registre (el `autor` de Artículos es la firma editorial, texto libre).
 Mostrarlo exige un campo nuevo (`actualizadoPor`, relación con Usuarios,
 de solo lectura y puesto por un gancho al guardar) en las colecciones de
 contenido, es decir, **cambio de esquema** con su migración y la ventana. Solo

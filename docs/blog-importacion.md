@@ -124,18 +124,18 @@ Revisión de los 53 artículos ya importados en el preview. Lo mecánico se arre
 | **Sin destino** (ya dan 404 hoy en WordPress) | **9 rutas** en 14 enlaces (abajo)                                                         |
 | Externos                                      | 44, tal cual (`pe-partsshop.com` en 11 entradas, `hitachicm.com`)                         |
 
-**Rutas sin destino, con la propuesta (NO aplicada):**
+**Rutas sin destino, APLICADO (decisión de dirección del 2026-10-06):** la propuesta aprobada; donde no hay equivalente real **se quita el enlace y queda el texto**, sin mandarlo a un índice genérico. Tabla `ENLACES_VIEJOS` de `src/lib/blog/wordpress.ts`, con pruebas; el importador ya no pregunta a WordPress por esas rutas.
 
-| Ruta vieja                                                                                      | Enlaces | Propuesta                                                                                          |
-| ----------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------- |
-| `/maquinaria/maquinaria-nueva/excavadoras/` (una con `#hitachi`)                                | 5       | `/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/`                                          |
-| `/maquinaria/maquinaria-nueva/cargadores/`                                                      | 2       | `/maquinaria-pesada/maquinaria-pesada-nueva/cargadores/`                                           |
-| `/maquinaria/maquinaria-nueva/miniexcavadoras/`                                                 | 3       | `/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/` (no hay categoría propia)                |
-| `/maquinaria/maquinaria-nueva/{bulldozer, minicargadores, motoniveladoras, retrocargadores}/`   | 7       | `/maquinaria-pesada/maquinaria-pesada-nueva/` (no hay categoría propia) o la marca correspondiente |
-| `/maquinaria-pesada/maquinaria-pesada-nueva/nuestras-marcas/case-construction/retrocargadores/` | 1       | `/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/`             |
-| `/lubricantes/` (403 en WordPress)                                                              | 1       | `/lubricantes/lubricantes-eni/`                                                                    |
+| Ruta vieja                                                                                      | Enlaces | Ahora                                                                                  |
+| ----------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------- |
+| `/maquinaria/maquinaria-nueva/excavadoras/` (una con `#hitachi`, que se conserva)               | 5       | `/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/`                              |
+| `/maquinaria/maquinaria-nueva/cargadores/`                                                      | 2       | `/maquinaria-pesada/maquinaria-pesada-nueva/cargadores/`                               |
+| `/maquinaria/maquinaria-nueva/miniexcavadoras/`                                                 | 3       | `/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/`                              |
+| `/maquinaria-pesada/maquinaria-pesada-nueva/nuestras-marcas/case-construction/retrocargadores/` | 1       | `/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/` |
+| `/lubricantes/` (403 en WordPress)                                                              | 1       | `/lubricantes/lubricantes-eni/`                                                        |
+| `/maquinaria/maquinaria-nueva/{bulldozer, minicargadores, motoniveladoras, retrocargadores}/`   | 7       | **Sin enlace**, queda el texto: el sitio no tiene esas categorías                      |
 
-Esos 14 enlaces ya están rotos hoy en WordPress. Si se aprueba la propuesta, son 9 filas en una tabla del importador (o 9 redirects en `Redirects`).
+Resultado al reimportar: **12 enlaces a su equivalente y 7 quitados**; **rutas sin destino: ninguna**. (El «14» de la primera revisión contaba pares artículo–ruta; son 19 enlaces.)
 
 ### Textos alternativos de las 165 imágenes
 
@@ -152,15 +152,37 @@ Esos 14 enlaces ya están rotos hoy en WordPress. Si se aprueba la propuesta, so
 
 ### Restos de WordPress
 
-| Qué                                | Resultado                                                                                                                                                                                                             |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Shortcodes                         | 2 (`[if]`, `[endif]`), quitados                                                                                                                                                                                       |
-| Estilos en línea                   | 0 en el texto; **5 alineaciones** (2 `justify`, 3 `center`), **quitadas**                                                                                                                                             |
-| iframes, vídeos, formularios       | 0                                                                                                                                                                                                                     |
-| Párrafos vacíos                    | **2, quitados**                                                                                                                                                                                                       |
-| Encabezados que se saltan niveles  | **4 artículos** empezaban en h3 o h4: **corregidos** (empiezan en h2, sin saltos)                                                                                                                                     |
-| **Artículos sin encabezados**      | **42.** 26 de ellos usan **170 párrafos cortos en negrita** como títulos. **Propuesta (NO aplicada):** convertirlos en h2 o h3. Cambia la estructura del texto y cómo lo lee un buscador, así que lo decide dirección |
-| Saltos de línea dentro de párrafos | 188, de listas escritas a mano con `<br>`. Se quedan                                                                                                                                                                  |
+| Qué                                | Resultado                                                                                                                                                                    |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shortcodes                         | 2 (`[if]`, `[endif]`), quitados                                                                                                                                              |
+| Estilos en línea                   | 0 en el texto; **5 alineaciones** (2 `justify`, 3 `center`), **quitadas**                                                                                                    |
+| iframes, vídeos, formularios       | 0                                                                                                                                                                            |
+| Párrafos vacíos                    | **2, quitados**                                                                                                                                                              |
+| Encabezados que se saltan niveles  | **4 artículos** empezaban en h3 o h4: **corregidos** (empiezan en h2, sin saltos)                                                                                            |
+| **Artículos sin encabezados**      | **42.** 26 de ellos usaban **170 párrafos cortos en negrita** como títulos. **APLICADO** con el criterio de dirección (abajo): ahora quedan **27** artículos sin encabezados |
+| Saltos de línea dentro de párrafos | 188, de listas escritas a mano con `<br>`. Se quedan                                                                                                                         |
+
+### Párrafos en negrita → títulos (APLICADO, 2026-10-06)
+
+**Criterio de dirección:** solo cuando está claro: párrafo **corto** (hasta 90 caracteres), **entero en negrita** y **sin punto final**, respetando la jerarquía del artículo. Lo dudoso se queda como está. Funciones `tituloEnNegrita`, `esSubapartado` y `nivelTituloNegrita` de `src/lib/blog/wordpress.ts`, con pruebas. Solo se miran los párrafos del nivel superior del artículo, nunca los de una lista o una cita.
+
+| Resultado                        | Cuántos | Por qué                                                                                               |
+| -------------------------------- | ------- | ----------------------------------------------------------------------------------------------------- |
+| **Convertidos en título**        | **112** | En 15 artículos                                                                                       |
+| Dejados: acaban en dos puntos    | 47      | «Características:», «Beneficios:»: presentan la lista que sigue, son una etiqueta y no un título      |
+| Dejados: largos (más de 90)      | 18      | Son frases destacadas, no títulos                                                                     |
+| Dejados: punto final             | 14      | Son frases                                                                                            |
+| Dejados: con un salto de línea   | 2       | Juntan dos cosas en un párrafo                                                                        |
+| **Total de párrafos en negrita** | 193     | (El «170» de la primera revisión contaba en el Lexical los de menos de 90 caracteres; mismo conjunto) |
+
+**Jerarquía:**
+
+- Sin un encabezado real de WordPress antes: **h2**. Con uno: un nivel por debajo de él.
+- Los que empiezan por una viñeta (🔹, •, ▪…) o un número («1. ») son **subapartados**: un nivel por debajo del título anterior. Así «6 Tips clave…» queda en h2 y «🔹 1. Ajusta la tensión de la cadena» en h3.
+- Después, `limpiarLexical` quita cualquier salto de nivel. Resultado en los 53: **124 h2, 39 h3 y 1 h4**, sin saltos, y todos empiezan en h2.
+- Se quita la negrita del texto del título (el estilo lo pone la plantilla) y los espacios de los extremos.
+
+**Lo que se queda plano, a sabiendas:** listas de títulos sin marca, como «Retrocargadoras · Cargadores frontales · Minicargadores» bajo «¿En qué maquinaria debemos prestar especial atención?», quedan todas en h2. No hay señal fiable de que sean subapartados, y un h2 de más no rompe nada.
 
 ### Plantilla de artículo (medida a 390 y 1440)
 

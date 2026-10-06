@@ -5,6 +5,8 @@ import { formatoDeImagenPermitido } from "./hooks/formatoDeImagenPermitido";
 import { almacenEsperado } from "./hooks/almacenEsperado";
 import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
 import { sinRecorte } from "./hooks/sinRecorte";
+import { fechaActualizado } from "../lib/fields/fechasDeLista";
+import { urlMiniatura } from "../lib/panel/miniatura";
 
 /**
  * Archivos subidos (imágenes, logos, etc.).
@@ -57,6 +59,13 @@ export const Media: CollectionConfig = {
      */
     pasteURL: false,
     /*
+     * MINIATURA PEQUEÑA EN EL PANEL (F3, decisiones-panel.md §24): la lista y
+     * los campos de imagen usaban el ORIGINAL (hasta 15 MB) como miniatura. Pasa
+     * por el optimizador de Next a 128 px. No toca el esquema: `thumbnailURL`
+     * se calcula al leer.
+     */
+    adminThumbnail: ({ doc }) => urlMiniatura(typeof doc.url === "string" ? doc.url : null),
+    /*
      * RECORTE DESACTIVADO (CLAUDE.md §10.32): sobrescribía el fichero con el
      * mismo nombre y la caché de un año seguía sirviendo el original con las
      * medidas del recorte. `crop: false` quita el botón; el gancho `sinRecorte`
@@ -81,6 +90,8 @@ export const Media: CollectionConfig = {
     beforeOperation: [almacenEsperado, sinDescargaRemota, sinRecorte, formatoDeImagenPermitido],
   },
   fields: [
+    // «Última modificación» como fecha relativa en la lista (F3).
+    fechaActualizado,
     {
       name: "alt",
       type: "text",

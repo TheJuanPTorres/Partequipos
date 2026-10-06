@@ -181,6 +181,7 @@ export interface UserAuthOperations {
  */
 export interface Solicitude {
   id: number;
+  createdAt: string;
   tipo: 'contacto' | 'cotizacion' | 'repuesto';
   /**
    * Marcar como atendida en vez de borrar: conserva el historial.
@@ -209,7 +210,6 @@ export interface Solicitude {
    */
   origen?: string | null;
   updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -349,11 +349,11 @@ export interface MarcasMaquinaria {
  */
 export interface Media {
   id: number;
+  updatedAt: string;
   /**
    * Describe lo que se ve, como se lo contarías a alguien por teléfono: «Excavadora Hitachi ZX200 trabajando en una obra». Ni «foto1», ni «imagen», ni el nombre del fichero.
    */
   alt: string;
-  updatedAt: string;
   createdAt: string;
   url?: string | null;
   thumbnailURL?: string | null;
@@ -397,11 +397,11 @@ export interface TiposMaquinaria {
  */
 export interface Documento {
   id: number;
+  updatedAt: string;
   /**
    * Para el panel. Ej. «Ficha técnica Hitachi ZX130-7H».
    */
   titulo: string;
-  updatedAt: string;
   createdAt: string;
   url?: string | null;
   thumbnailURL?: string | null;
@@ -1566,6 +1566,7 @@ export interface PayloadMigration {
  * via the `definition` "solicitudes_select".
  */
 export interface SolicitudesSelect<T extends boolean = true> {
+  createdAt?: T;
   tipo?: T;
   estado?: T;
   nombre?: T;
@@ -1577,7 +1578,6 @@ export interface SolicitudesSelect<T extends boolean = true> {
   referenciaTexto?: T;
   origen?: T;
   updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2153,8 +2153,8 @@ export interface SedesSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
   updatedAt?: T;
+  alt?: T;
   createdAt?: T;
   url?: T;
   thumbnailURL?: T;
@@ -2171,8 +2171,8 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "documentos_select".
  */
 export interface DocumentosSelect<T extends boolean = true> {
-  titulo?: T;
   updatedAt?: T;
+  titulo?: T;
   createdAt?: T;
   url?: T;
   thumbnailURL?: T;

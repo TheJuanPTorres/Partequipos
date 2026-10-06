@@ -1,5 +1,8 @@
+import { default as default_7d4eccb57b337121abb97170a6625d97 } from '../../../components/admin/celdas/CeldaFecha'
+import { default as default_4fdf05aabfcf02e659803b82d700369d } from '../../../components/admin/celdas/CeldaSolicitud'
 import { default as default_0c32825fe60d0fe4ee2f9fbf6df19841 } from '../../../components/admin/aviso/AvisoSolicitudes'
 import { default as default_c9f64be0d161498ee822e08aa62ffab9 } from '../../../components/admin/aviso/AvisoSinFotos'
+import { default as default_40a9883d727ab65fdd0e9c9df10e79e2 } from '../../../components/admin/celdas/CeldaMiniatura'
 import { default as default_137d3220b5ae877ef2c31422510baf68 } from '../../../components/admin/SeoGuiado'
 import { default as default_5c55248894877e0ef25c11c535b2b5bf } from '../../../components/admin/VerEnElSitio'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -27,10 +30,14 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_ee64598c7457a4d9197213cdb580e4d5 } from '../../../components/admin/ContadorDestacadas'
 import { default as default_6dd5387c7f2e5f0ef6f0dcb5c3b7a99a } from '../../../components/admin/aviso/AvisoNoDisponible'
+import { default as default_9381d73c54a9c03b46798bb778a3bdc0 } from '../../../components/admin/celdas/CeldaDisponible'
 import { default as default_7afa784110d90c3c093bacc977ecd19b } from '../../../components/admin/AvisoBloques'
+import { default as default_c9d56b0835087f2ddee9688731704ee9 } from '../../../components/admin/celdas/CeldaPublicado'
+import { default as default_38155e6ccfa1f9d03d1b91a6c770c6b5 } from '../../../components/admin/celdas/CeldaAutorizacion'
 import { default as default_7a6e305d8e2e86840bb8274b902265b1 } from '../../../components/admin/aviso/AvisoAutorizacion'
 import { default as default_0fd5939e7377923b57680e833dbb83a0 } from '../../../components/admin/AltFlojos'
 import { default as default_5e454bdf69bfb354952f5c8e3b0d94e6 } from '../../../components/admin/aviso/AvisoRedirecciones'
+import { default as default_26ab6d6832a1a0f01610473a5c49ccf3 } from '../../../components/admin/celdas/CeldaDestino'
 import { default as default_2f5078d45d23f67b4dc8ace54c1bd9c9 } from '../../../components/admin/aviso/AvisoBuscadores'
 import { default as default_965175d01b56876a09418037afb35340 } from '../../../components/admin/Nav'
 import { default as default_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
@@ -43,8 +50,11 @@ import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "/components/admin/celdas/CeldaFecha#default": default_7d4eccb57b337121abb97170a6625d97,
+  "/components/admin/celdas/CeldaSolicitud#default": default_4fdf05aabfcf02e659803b82d700369d,
   "/components/admin/aviso/AvisoSolicitudes#default": default_0c32825fe60d0fe4ee2f9fbf6df19841,
   "/components/admin/aviso/AvisoSinFotos#default": default_c9f64be0d161498ee822e08aa62ffab9,
+  "/components/admin/celdas/CeldaMiniatura#default": default_40a9883d727ab65fdd0e9c9df10e79e2,
   "/components/admin/SeoGuiado#default": default_137d3220b5ae877ef2c31422510baf68,
   "/components/admin/VerEnElSitio#default": default_5c55248894877e0ef25c11c535b2b5bf,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -72,10 +82,14 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/ContadorDestacadas#default": default_ee64598c7457a4d9197213cdb580e4d5,
   "/components/admin/aviso/AvisoNoDisponible#default": default_6dd5387c7f2e5f0ef6f0dcb5c3b7a99a,
+  "/components/admin/celdas/CeldaDisponible#default": default_9381d73c54a9c03b46798bb778a3bdc0,
   "/components/admin/AvisoBloques#default": default_7afa784110d90c3c093bacc977ecd19b,
+  "/components/admin/celdas/CeldaPublicado#default": default_c9d56b0835087f2ddee9688731704ee9,
+  "/components/admin/celdas/CeldaAutorizacion#default": default_38155e6ccfa1f9d03d1b91a6c770c6b5,
   "/components/admin/aviso/AvisoAutorizacion#default": default_7a6e305d8e2e86840bb8274b902265b1,
   "/components/admin/AltFlojos#default": default_0fd5939e7377923b57680e833dbb83a0,
   "/components/admin/aviso/AvisoRedirecciones#default": default_5e454bdf69bfb354952f5c8e3b0d94e6,
+  "/components/admin/celdas/CeldaDestino#default": default_26ab6d6832a1a0f01610473a5c49ccf3,
   "/components/admin/aviso/AvisoBuscadores#default": default_2f5078d45d23f67b4dc8ace54c1bd9c9,
   "/components/admin/Nav#default": default_965175d01b56876a09418037afb35340,
   "/components/admin/Icon#default": default_dfe4008080d895d460898c3a6155e9ba,

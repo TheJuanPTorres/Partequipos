@@ -25,7 +25,8 @@
  * - Navegador: Chrome instalado (otra ruta con `CHROME_PATH`).
  * - Modos (tercer argumento): `ficha` (aviso de más de 4 «Destacar»), `acceso`
  *   (la pantalla de acceso, §17–§19 de decisiones-panel.md), `avisos` (los
- *   avisos del panel, §22) y `oscuro`, solo o detrás de otro modo
+ *   avisos del panel, §22), `listas` (estados, fechas, miniaturas y ordenar,
+ *   filtrar y buscar, §24) y `oscuro`, solo o detrás de otro modo
  *   («avisos oscuro»). Sin modo, la pasada normal en claro.
  * - No escribe nada en el panel: solo navega y lee. En modo `ficha` pulsa
  *   «Guardar» con 5 «Destacar» marcados, que la validación rechaza, y comprueba
@@ -174,9 +175,12 @@ try {
     // Peticiones que fallan (p. ej. una miniatura que no carga y sale como icono).
     // Solo host y ruta: sin query, que podría llevar algo que no debe salir.
     const fallidas = [];
+    // El host solo si es el del preview: de otros orígenes (el Blob, por
+    // ejemplo) se anota «otro-origen», para que ningún fichero de hallazgos
+    // lleve el nombre de un almacén.
     const sinQuery = (u) => {
       const x = new URL(u);
-      return `${x.host}${x.pathname}`;
+      return `${x.origin === origin ? x.host : "otro-origen"}${x.pathname}`;
     };
     pagina.on("requestfailed", (r) =>
       fallidas.push(`${sinQuery(r.url())} — ${r.failure()?.errorText ?? "fallo"}`),
@@ -274,6 +278,92 @@ try {
         `✓ entrada (${ancho.nombre}): llega a ${llegada}; /admin/login con sesión → ${conSesion}`,
       );
       if (llegada !== REDIRECCION) fallar(`No respetó la redirección: llegó a ${llegada}.`);
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `listas` (F3, decisiones-panel.md §24): captura las listas con
+     * estados, fechas y miniaturas, y registra el resultado de ORDENAR, FILTRAR
+     * y BUSCAR (las primeras filas) para comparar antes y después. Solo lee.
+     * Solicitudes, con un filtro que no encuentra nada: no carga datos personales.
+     */
+    if (MODO === "listas") {
+      const LISTAS = [
+        ["lista-equipos-nuevos", "/admin/collections/equipos-nuevos"],
+        ["lista-equipos-usados", "/admin/collections/equipos-usados"],
+        ["lista-modelos", "/admin/collections/modelos-repuesto"],
+        ["lista-articulos", "/admin/collections/articulos"],
+        ["lista-imagenes", "/admin/collections/media"],
+        ["lista-documentos", "/admin/collections/documentos"],
+        ["lista-testimonios", "/admin/collections/testimonios"],
+        ["lista-preguntas", "/admin/collections/preguntas-frecuentes"],
+        ["lista-redirecciones", "/admin/collections/redirects"],
+        ["lista-solicitudes-vacia", "/admin/collections/solicitudes?where[id][equals]=0"],
+      ];
+      const filas = () =>
+        pagina.evaluate(() =>
+          [...document.querySelectorAll("table tbody tr")]
+            .slice(0, 5)
+            .map((tr) => tr.querySelector("td:nth-child(2)")?.textContent?.trim().slice(0, 60)),
+        );
+      for (const [nombre, ruta] of LISTAS) {
+        await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(1500);
+        await pagina.screenshot({
+          path: path.join(salida, `${nombre}-${ancho.nombre}.png`),
+          fullPage: true,
+        });
+        const celdas = await pagina.evaluate(() => ({
+          insignias: [...document.querySelectorAll(".pq-insignia")].map((e) =>
+            e.textContent.trim(),
+          ),
+          fechas: [...document.querySelectorAll(".pq-fecha")].slice(0, 3).map((e) => ({
+            texto: e.textContent.trim(),
+            title: e.getAttribute("title"),
+            tabIndex: e.tabIndex,
+          })),
+          miniaturas: [...document.querySelectorAll(".pq-miniatura img, .file__thumbnail img")]
+            .slice(0, 3)
+            .map((i) => ({
+              loading: i.getAttribute("loading"),
+              // Solo SI pasa por el optimizador: la URL lleva dentro el host
+              // del almacén, que no debe acabar en ningún fichero de hallazgos.
+              optimizada: (i.getAttribute("src") ?? "").startsWith("/_next/image"),
+            })),
+          columnas: [...document.querySelectorAll("table thead th")].map((th) =>
+            th.textContent.trim(),
+          ),
+        }));
+        hallazgos.push({ pantalla: nombre, ancho: ancho.nombre, ...celdas });
+        decir(`✓ ${nombre} (${ancho.nombre})`);
+      }
+      // ORDENAR, FILTRAR y BUSCAR: mismas URL antes y después; se comparan las filas.
+      const PRUEBAS = [
+        ["orden-nombre-asc", "/admin/collections/equipos-nuevos?sort=nombre"],
+        ["orden-nombre-desc", "/admin/collections/equipos-nuevos?sort=-nombre"],
+        ["orden-actualizado", "/admin/collections/media?sort=-updatedAt"],
+        ["filtro-disponible", "/admin/collections/equipos-usados?where[disponible][equals]=true"],
+        ["filtro-sin-fotos", "/admin/collections/equipos-nuevos?where[imagenes][exists]=false"],
+        ["busqueda-modelos", "/admin/collections/modelos-repuesto?search=320"],
+        ["busqueda-articulos", "/admin/collections/articulos?search=excavadora"],
+      ];
+      const resultados = {};
+      for (const [nombre, ruta] of PRUEBAS) {
+        await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(1000);
+        resultados[nombre] = {
+          filas: await filas(),
+          total: await pagina
+            .locator(".page-controls__page-info")
+            .first()
+            .textContent()
+            .catch(() => null),
+        };
+      }
+      hallazgos.push({ pantalla: "ordenar-filtrar-buscar", ancho: ancho.nombre, resultados });
       hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
       hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
       await contexto.close();

@@ -41,7 +41,10 @@ export const PreguntaFrecuente: CollectionConfig = {
       type: "checkbox",
       label: "Publicada",
       defaultValue: true,
-      admin: { position: "sidebar" },
+      admin: {
+        components: { Cell: "/components/admin/celdas/CeldaPublicado" },
+        position: "sidebar",
+      },
     },
   ],
 };

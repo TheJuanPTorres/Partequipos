@@ -151,6 +151,7 @@ export const Redirects: CollectionConfig = {
         { label: "Externa (no se comprueba)", value: "externa" },
       ],
       admin: {
+        components: { Cell: "/components/admin/celdas/CeldaDestino" },
         position: "sidebar",
         readOnly: true,
         description:

@@ -20,7 +20,7 @@ export const EquipoNuevo: CollectionConfig = {
   labels: { singular: "Equipo nuevo", plural: "Equipos nuevos" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "marca", "tipo", "slug"],
+    defaultColumns: ["nombre", "imagenes", "marca", "tipo", "slug"],
     group: "Maquinaria",
     listSearchableFields: ["nombre", "codigo"],
   },
@@ -102,7 +102,10 @@ export const EquipoNuevo: CollectionConfig = {
       relationTo: "media",
       hasMany: true,
       label: "Galería",
-      admin: { description: "La primera imagen se usa como portada y como imagen social." },
+      admin: {
+        components: { Cell: "/components/admin/celdas/CeldaMiniatura" },
+        description: "La primera imagen se usa como portada y como imagen social.",
+      },
     },
     /*
      * FICHA TÉCNICA como pares etiqueta/valor, NO como campos fijos.

@@ -56,6 +56,9 @@ export const sinDescargaRemota: CollectionBeforeOperationHook = ({ args, operati
   if (operation !== "create" && operation !== "update") return args;
   // Con fichero en la petición, Payload usa ese fichero y no descarga nada.
   if (req.file?.data && Buffer.isBuffer(req.file.data) && req.file.data.length > 0) return args;
+  // Subida directa (§10.39): el fichero ya está en NUESTRO Blob y Payload lo
+  // trae a un temporal con su propio manejador, no por una url del cliente.
+  if (req.file?.tempFilePath) return args;
 
   const url = (args as { data?: { url?: unknown } }).data?.url;
   if (urlDeSubidaPermitida(url, hostDeBlob(process.env.BLOB_READ_WRITE_TOKEN))) return args;

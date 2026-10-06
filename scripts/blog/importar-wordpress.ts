@@ -65,16 +65,20 @@ import {
   altParaMedia,
   entradillaDeExtracto,
   enlaceInterno,
+  enlaceViejo,
   esAltGenerado,
   esAvif,
   esMismaImagen,
+  esSubapartado,
   extraerJsonWp,
   formatoPorExtension,
   limpiarLexical,
+  nivelTituloNegrita,
   nombreDeFicheroWp,
   normalizarRuta,
   quitarShortcodes,
   textoPlano,
+  tituloEnNegrita,
   type OrigenAlt,
   urlImagenCorregida,
   valoresUnicos,
@@ -337,6 +341,8 @@ for (const post of posts) {
     const rel = enlaceInterno(m[1]!.replace(/&amp;/g, "&"));
     if (!rel.startsWith("/")) continue;
     const ruta = normalizarRuta(rel.split(/[?#]/)[0]!);
+    // Las rutas viejas ya decididas (ENLACES_VIEJOS) no se preguntan.
+    if (enlaceViejo(ruta)) continue;
     if (rutasMapa.has(ruta) || destinoEnlace.has(ruta) || sinDestino.has(ruta)) {
       sinDestino.get(ruta)?.add(post.slug);
       continue;
@@ -545,6 +551,8 @@ const DESENVOLVER = new Set([
 
 let enlacesInternos = 0;
 let enlacesRedirigidos = 0;
+let enlacesViejosCambiados = 0;
+let enlacesViejosQuitados = 0;
 
 /** Bloques de plugins de WordPress que se quitan del contenido (selector → nombre en el informe). */
 const PLUGINS: [string, string][] = [[".kk-star-ratings", "valoración (kk-star-ratings)"]];
@@ -555,6 +563,7 @@ type Aplanado = {
   tablas: number;
   shortcodes: string[];
   otros: string[];
+  negritas: { convertidos: number; dejados: Record<string, number> };
 };
 
 function aplanar(html: string): Aplanado {
@@ -647,6 +656,19 @@ function aplanar(html: string): Aplanado {
   // del mapa, a esa ruta (`destinoEnlace`, resuelto arriba).
   for (const a of [...cuerpo.querySelectorAll("a[href]")]) {
     const rel = enlaceInterno(a.getAttribute("href") ?? "");
+    // Rutas viejas ya decididas: a su equivalente, o sin enlace (queda el texto).
+    const viejo = rel.startsWith("/") ? enlaceViejo(rel) : null;
+    if (viejo && "quitar" in viejo) {
+      a.replaceWith(...[...a.childNodes]);
+      enlacesViejosQuitados++;
+      continue;
+    }
+    if (viejo) {
+      a.setAttribute("href", viejo.destino);
+      enlacesInternos++;
+      enlacesViejosCambiados++;
+      continue;
+    }
     if (rel.startsWith("/")) {
       const [ruta, resto] = [rel.split(/[?#]/)[0]!, rel.slice(rel.split(/[?#]/)[0]!.length)];
       const destino = destinoEnlace.get(normalizarRuta(ruta));
@@ -658,12 +680,32 @@ function aplanar(html: string): Aplanado {
     }
   }
 
+  // Encabezados de WordPress sin negrita dentro: el estilo lo pone la plantilla.
+  for (const h of [...cuerpo.querySelectorAll("h1, h2, h3, h4, h5, h6")]) {
+    for (const b of [...h.querySelectorAll("strong, b")]) b.replaceWith(...[...b.childNodes]);
+  }
+
   // h1 dentro del contenido → h2 (el <h1> de la página es el título).
   for (const h of [...cuerpo.querySelectorAll("h1")]) {
     const h2 = doc.createElement("h2");
     h2.innerHTML = h.innerHTML;
     h.replaceWith(h2);
   }
+
+  // Un <div> que solo lleva texto es un párrafo: si se desenvolviera a secas,
+  // dos seguidos quedarían pegados en uno («Capacidades de la línea» y
+  // «80/40» → «línea80/40»).
+  const BLOQUES =
+    "p, div, section, article, ul, ol, li, table, h1, h2, h3, h4, h5, h6, blockquote, figure, pre, hr";
+  let divsAParrafo = 0;
+  for (const d of [...cuerpo.querySelectorAll("div")].reverse()) {
+    if (d.querySelector(BLOQUES) || !textoPlano(d.innerHTML)) continue;
+    const p = doc.createElement("p");
+    p.innerHTML = d.innerHTML;
+    d.replaceWith(p);
+    divsAParrafo++;
+  }
+  if (divsAParrafo) otros.push(`div con solo texto → párrafo (${divsAParrafo})`);
 
   // Fuera los contenedores de Elementor: se quedan sus hijos.
   let cambio = true;
@@ -677,10 +719,43 @@ function aplanar(html: string): Aplanado {
     }
   }
 
+  // Párrafos enteros en negrita usados como títulos → h2/h3, solo los claros
+  // (`tituloEnNegrita`), bajo el encabezado real anterior. Solo los del nivel
+  // superior del artículo: dentro de una lista o una cita no son títulos.
+  const negritas = { convertidos: 0, dejados: {} as Record<string, number> };
+  let encabezadoReal: number | null = null;
+  let tituloAnterior: number | null = null;
+  for (const e of [...cuerpo.children]) {
+    if (/^H[1-6]$/.test(e.tagName)) {
+      encabezadoReal = Number(e.tagName[1]);
+      tituloAnterior = encabezadoReal;
+      continue;
+    }
+    if (e.tagName !== "P") continue;
+    const veredicto = tituloEnNegrita({
+      texto: textoPlano(e.innerHTML),
+      negrita: [...e.querySelectorAll("strong, b")].map((b) => textoPlano(b.innerHTML)).join(" "),
+      saltos: !!e.querySelector("br"),
+    });
+    if (!veredicto) continue;
+    if (!veredicto.titulo) {
+      negritas.dejados[veredicto.motivo] = (negritas.dejados[veredicto.motivo] ?? 0) + 1;
+      continue;
+    }
+    for (const b of [...e.querySelectorAll("strong, b")]) b.replaceWith(...[...b.childNodes]);
+    const sub = esSubapartado(textoPlano(e.innerHTML));
+    const nivel = nivelTituloNegrita(encabezadoReal, sub, tituloAnterior);
+    if (!sub) tituloAnterior = nivel;
+    const h = doc.createElement(`h${nivel}`);
+    h.innerHTML = e.innerHTML.replace(/^(\s|&nbsp;)+|(\s|&nbsp;)+$/g, "");
+    e.replaceWith(h);
+    negritas.convertidos++;
+  }
+
   const { texto, quitados } = quitarShortcodes(cuerpo.innerHTML);
   // Párrafos vacíos fuera.
   const limpio = texto.replace(/<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "");
-  return { html: limpio, imagenes, tablas, shortcodes: quitados, otros };
+  return { html: limpio, imagenes, tablas, shortcodes: quitados, otros, negritas };
 }
 
 type NodoLexical = { type: string; text?: string; children?: NodoLexical[]; [k: string]: unknown };
@@ -788,6 +863,7 @@ type Entrada = {
   alt: Partial<Record<OrigenAlt, number>>;
   altRehechos: number;
   limpieza: { alineaciones: number; vacios: number; niveles: number };
+  negritas: { convertidos: number; dejados: Record<string, number> };
 };
 const informe: Entrada[] = [];
 
@@ -826,10 +902,12 @@ for (const post of [...posts].sort((a, b) => a.date_gmt.localeCompare(b.date_gmt
     alt: {},
     altRehechos: 0,
     limpieza: { alineaciones: 0, vacios: 0, niveles: 0 },
+    negritas: { convertidos: 0, dejados: {} },
   };
   try {
     const plano = aplanar(post.content.rendered);
     entrada.tablasAParrafos = plano.tablas;
+    entrada.negritas = plano.negritas;
     entrada.shortcodesQuitados = plano.shortcodes;
     entrada.noConvertibles = plano.otros;
 
@@ -1031,6 +1109,17 @@ log(
       return a;
     }, {}),
   )} · rehechos: ${suma((e) => e.altRehechos)}`,
+);
+log(
+  `párrafos en negrita → título: ${suma((e) => e.negritas.convertidos)} (en ${informe.filter((e) => e.negritas.convertidos).length} artículos) · dejados como párrafo: ${JSON.stringify(
+    informe.reduce<Record<string, number>>((a, e) => {
+      for (const [k, v] of Object.entries(e.negritas.dejados)) a[k] = (a[k] ?? 0) + v;
+      return a;
+    }, {}),
+  )}`,
+);
+log(
+  `rutas viejas (ENLACES_VIEJOS): ${enlacesViejosCambiados} enlaces a su equivalente · ${enlacesViejosQuitados} quitados (queda el texto)`,
 );
 log(
   `enlaces internos: ${enlacesInternos} · a la ruta del mapa por redirección de WordPress: ${enlacesRedirigidos} · rutas sin destino: ${[...sinDestino.keys()].join(", ") || "ninguna"}`,

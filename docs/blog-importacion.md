@@ -124,18 +124,18 @@ Revisión de los 53 artículos ya importados en el preview. Lo mecánico se arre
 | **Sin destino** (ya dan 404 hoy en WordPress) | **9 rutas** en 14 enlaces (abajo)                                                         |
 | Externos                                      | 44, tal cual (`pe-partsshop.com` en 11 entradas, `hitachicm.com`)                         |
 
-**Rutas sin destino, con la propuesta (NO aplicada):**
+**Rutas sin destino, APLICADO (decisión de dirección del 2026-10-06):** la propuesta aprobada; donde no hay equivalente real **se quita el enlace y queda el texto**, sin mandarlo a un índice genérico. Tabla `ENLACES_VIEJOS` de `src/lib/blog/wordpress.ts`, con pruebas; el importador ya no pregunta a WordPress por esas rutas.
 
-| Ruta vieja                                                                                      | Enlaces | Propuesta                                                                                          |
-| ----------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------- |
-| `/maquinaria/maquinaria-nueva/excavadoras/` (una con `#hitachi`)                                | 5       | `/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/`                                          |
-| `/maquinaria/maquinaria-nueva/cargadores/`                                                      | 2       | `/maquinaria-pesada/maquinaria-pesada-nueva/cargadores/`                                           |
-| `/maquinaria/maquinaria-nueva/miniexcavadoras/`                                                 | 3       | `/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/` (no hay categoría propia)                |
-| `/maquinaria/maquinaria-nueva/{bulldozer, minicargadores, motoniveladoras, retrocargadores}/`   | 7       | `/maquinaria-pesada/maquinaria-pesada-nueva/` (no hay categoría propia) o la marca correspondiente |
-| `/maquinaria-pesada/maquinaria-pesada-nueva/nuestras-marcas/case-construction/retrocargadores/` | 1       | `/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/`             |
-| `/lubricantes/` (403 en WordPress)                                                              | 1       | `/lubricantes/lubricantes-eni/`                                                                    |
+| Ruta vieja                                                                                      | Enlaces | Ahora                                                                                  |
+| ----------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------- |
+| `/maquinaria/maquinaria-nueva/excavadoras/` (una con `#hitachi`, que se conserva)               | 5       | `/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/`                              |
+| `/maquinaria/maquinaria-nueva/cargadores/`                                                      | 2       | `/maquinaria-pesada/maquinaria-pesada-nueva/cargadores/`                               |
+| `/maquinaria/maquinaria-nueva/miniexcavadoras/`                                                 | 3       | `/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/`                              |
+| `/maquinaria-pesada/maquinaria-pesada-nueva/nuestras-marcas/case-construction/retrocargadores/` | 1       | `/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/` |
+| `/lubricantes/` (403 en WordPress)                                                              | 1       | `/lubricantes/lubricantes-eni/`                                                        |
+| `/maquinaria/maquinaria-nueva/{bulldozer, minicargadores, motoniveladoras, retrocargadores}/`   | 7       | **Sin enlace**, queda el texto: el sitio no tiene esas categorías                      |
 
-Esos 14 enlaces ya están rotos hoy en WordPress. Si se aprueba la propuesta, son 9 filas en una tabla del importador (o 9 redirects en `Redirects`).
+Resultado al reimportar: **12 enlaces a su equivalente y 7 quitados**; **rutas sin destino: ninguna**. (El «14» de la primera revisión contaba pares artículo–ruta; son 19 enlaces.)
 
 ### Textos alternativos de las 165 imágenes
 
@@ -152,37 +152,85 @@ Esos 14 enlaces ya están rotos hoy en WordPress. Si se aprueba la propuesta, so
 
 ### Restos de WordPress
 
-| Qué                                | Resultado                                                                                                                                                                                                             |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Shortcodes                         | 2 (`[if]`, `[endif]`), quitados                                                                                                                                                                                       |
-| Estilos en línea                   | 0 en el texto; **5 alineaciones** (2 `justify`, 3 `center`), **quitadas**                                                                                                                                             |
-| iframes, vídeos, formularios       | 0                                                                                                                                                                                                                     |
-| Párrafos vacíos                    | **2, quitados**                                                                                                                                                                                                       |
-| Encabezados que se saltan niveles  | **4 artículos** empezaban en h3 o h4: **corregidos** (empiezan en h2, sin saltos)                                                                                                                                     |
-| **Artículos sin encabezados**      | **42.** 26 de ellos usan **170 párrafos cortos en negrita** como títulos. **Propuesta (NO aplicada):** convertirlos en h2 o h3. Cambia la estructura del texto y cómo lo lee un buscador, así que lo decide dirección |
-| Saltos de línea dentro de párrafos | 188, de listas escritas a mano con `<br>`. Se quedan                                                                                                                                                                  |
+| Qué                                | Resultado                                                                                                                                                                    |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shortcodes                         | 2 (`[if]`, `[endif]`), quitados                                                                                                                                              |
+| Estilos en línea                   | 0 en el texto; **5 alineaciones** (2 `justify`, 3 `center`), **quitadas**                                                                                                    |
+| iframes, vídeos, formularios       | 0                                                                                                                                                                            |
+| Párrafos vacíos                    | **11, quitados** (2 antes de pasar los `<div>` de solo texto a párrafo)                                                                                                      |
+| Encabezados que se saltan niveles  | **4 artículos** empezaban en h3 o h4: **corregidos** (empiezan en h2, sin saltos)                                                                                            |
+| **Artículos sin encabezados**      | **42.** 26 de ellos usaban **170 párrafos cortos en negrita** como títulos. **APLICADO** con el criterio de dirección (abajo): ahora quedan **26** artículos sin encabezados |
+| Saltos de línea dentro de párrafos | 188, de listas escritas a mano con `<br>`. Se quedan                                                                                                                         |
 
-### Plantilla de artículo (medida a 390 y 1440)
+### Párrafos en negrita → títulos (APLICADO, 2026-10-06)
 
-Medida con dos artículos largos: `tornamesa-de-excavadora-…` (52 párrafos, 5 imágenes) y `tier-4-en-colombia-…` (encabezados y una tabla convertida). Capturas en `Desktop\partequipos-cierre\capturas\blog-calidad\`.
+**Criterio de dirección:** solo cuando está claro: párrafo **corto** (hasta 90 caracteres), **entero en negrita** y **sin punto final**, respetando la jerarquía del artículo. Lo dudoso se queda como está. Funciones `tituloEnNegrita`, `esSubapartado` y `nivelTituloNegrita` de `src/lib/blog/wordpress.ts`, con pruebas. Solo se miran los párrafos del nivel superior del artículo, nunca los de una lista o una cita.
 
-| Qué                          | Medido                                                         | Valoración                                                                                                                                                  |
-| ---------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ancho del texto              | 358 px a 390 · 672 px a 1440 (`max-w-2xl`)                     | Bien                                                                                                                                                        |
-| Longitud de línea            | 37 caracteres a 390 · 76 a 1440                                | Bien (lo ideal, 45–75; a 1440, justo en el límite)                                                                                                          |
-| Texto                        | Inter 16/24, gris oscuro sobre blanco                          | Bien                                                                                                                                                        |
-| **Espacio entre párrafos**   | **0 px**                                                       | **Falla**: los párrafos se leen como un bloque. El `space-y-4` del `RichText` no llega a los párrafos, que no son hijos directos                            |
-| **Jerarquía de encabezados** | h2 20 px/500 · **h3 16 px/500, igual que el texto**            | **Falla**: el h3 casi no se distingue                                                                                                                       |
-| **Imágenes del cuerpo**      | `<img>` directa al Blob, sin `next/image` y sin carga diferida | **Falla**: en móvil se descarga la de 1024 px aunque se pinte a 358, y todas se cargan al abrir la página. Llevan ancho y alto, así que el CLS es 0         |
-| Tablas                       | Pasadas a párrafos «celda · celda»                             | Se leen, pero se pierde la tabla. Con el editor de tablas de Lexical (`EXPERIMENTAL_TableFeature`) se podrían conservar: cambia la configuración del editor |
-| Desbordamiento · CLS         | 0 · 0                                                          | Bien                                                                                                                                                        |
+| Resultado                        | Cuántos | Por qué                                                                                          |
+| -------------------------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| **Convertidos en título**        | **137** | En 16 artículos                                                                                  |
+| Dejados: acaban en dos puntos    | 47      | «Características:», «Beneficios:»: presentan la lista que sigue, son una etiqueta y no un título |
+| Dejados: largos (más de 90)      | 20      | Son frases destacadas, no títulos                                                                |
+| Dejados: punto final             | 15      | Son frases                                                                                       |
+| Dejados: con un salto de línea   | 2       | Juntan dos cosas en un párrafo                                                                   |
+| **Total de párrafos en negrita** | 221     | (El «170» de la primera revisión contaba en el Lexical los de menos de 90 caracteres)            |
 
-**La plantilla de artículo todavía no tiene el diseño de ux-9.** Las tres fallas son de la plantilla, no del importador: se arreglan con un convertidor propio del nodo `upload` del `RichText` (con `next/image`) y con espacios y tamaños en sus clases. Quedan como propuesta.
+**Jerarquía:**
+
+- Sin un encabezado real de WordPress antes: **h2**. Con uno: un nivel por debajo de él.
+- Los que empiezan por una viñeta (🔹, •, ▪…) o un número («1. ») son **subapartados**: un nivel por debajo del título anterior. Así «6 Tips clave…» queda en h2 y «🔹 1. Ajusta la tensión de la cadena» en h3.
+- Después, `limpiarLexical` quita cualquier salto de nivel. Resultado en los 53: **145 h2, 43 h3 y 1 h4**, sin saltos, y todos empiezan en h2.
+- Se quita la negrita del texto del título (el estilo lo pone la plantilla) y los espacios de los extremos.
+
+**Dos arreglos que salieron de la verificación** (el verificador refutó dos cifras de la primera versión):
+
+- **Los encabezados que ya venían de WordPress conservaban la negrita** (21 títulos en 9 artículos). Ahora se les quita a todos, no solo a los convertidos: **0 títulos con negrita**.
+- **Un `<div>` con solo texto pasa a párrafo antes de desenvolver los contenedores.** Sin eso, dos seguidos quedaban pegados en uno («Capacidades de la línea» + «80/40» → «línea80/40»). Afecta a 2 artículos (64 bloques). En `bombas-de-alta-presion-…` recupera la estructura entera, que antes salía en unos pocos párrafos largos. Además, la comparación de la negrita ignora los espacios, porque puede venir partida en varios `<strong>`.
+- **En el límite, aceptado por el criterio:** en `bombas-de-alta-presion-…` los modelos («80/40», «100/40»…) salen como título sobre su lista de capacidades, y la línea «80/40, 100/40… y 250/40» también.
+
+**Lo que se queda plano, a sabiendas:** listas de títulos sin marca, como «Retrocargadoras · Cargadores frontales · Minicargadores» bajo «¿En qué maquinaria debemos prestar especial atención?», quedan todas en h2. No hay señal fiable de que sean subapartados, y un h2 de más no rompe nada.
+
+### Plantilla de artículo: arreglo mínimo (APLICADO, 2026-10-06)
+
+**Decisión de dirección:** arreglo mínimo ya, sin rediseño; el diseño de Andrés irá encima. Todo en `src/components/layout/RichText.tsx`, así que vale también para las páginas institucionales, lubricantes y la descripción de la ficha de maquinaria.
+
+| Qué                    | Antes                                                                                    | Ahora                                                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Espacio entre párrafos | **0 px** (el `space-y-4` no llegaba: los párrafos iban dentro del contenedor de Payload) | **16 px**: se pinta sin ese contenedor (`disableContainer`) y el texto pasa a 16/26                                              |
+| h2                     | 20 px / 500                                                                              | **24 px / 600**, 40 px por encima                                                                                                |
+| h3                     | **16 px / 500**, igual que el texto                                                      | **20 px / 600**, 32 px por encima (h4: 18 px / 600)                                                                              |
+| Imágenes del cuerpo    | `<img>` directa al Blob, sin carga diferida                                              | **`next/image`**: ancho y alto del registro, `sizes` hasta 672 px y carga diferida. No se estiran las más estrechas que el texto |
+| URL largas como texto  | Desbordaban (111 px en `el-origen-de-hitachi-…` a 390)                                   | Se parten (`break-words`)                                                                                                        |
+
+**Verificado en el preview** (`partequipos-o187au0v9…`, último commit), recorriendo los 53 artículos a 390 y a 1440 y bajando por toda la página:
+
+- **0 imágenes sin `next/image`** y **0 rotas**;
+- **ningún desplazamiento que nazca en el cuerpo** (contando solo los que tienen todas sus fuentes dentro del texto);
+- **0 desbordamientos**: el único, el de la URL larga, ya está arreglado.
+
+Medidas de detalle en `tornamesa-de-excavadora-…` (5 imágenes) y `cuidado-del-tren-de-rodaje-…` (h2 y h3):
+
+- 16 px entre párrafos;
+- 4 de 4 imágenes con `next/image` y `loading="lazy"`;
+- en móvil, 124 kB de imágenes en lugar de las originales de 1024 px.
+
+Capturas en `Desktop\partequipos-cierre\capturas\blog-estructura\`.
+
+**Hallazgo, ANTERIOR a este cambio y fuera del cuerpo:** a 390 px, 11 de los 53 artículos tienen un CLS de más de 0,01 (hasta **0,21**) en la **cabecera** del artículo:
+
+- **Qué pasa:** al llegar Inter, el título largo o la línea «fecha · Por Partequipos · Noticias» ocupan una línea menos que con la fuente de respaldo, y todo lo de debajo sube.
+- **Es anterior:** se midió igual en el preview anterior (0,1588 en `cuidado-del-tren-de-rodaje-…`, idéntico).
+- **Causa:** Inter sin precarga, la decisión (b) de §10.36.
+- A 1440, 2 artículos con 0,039.
+- **No se toca aquí:** cambiar la carga de la fuente afecta al LCP de todo el sitio. Queda para dirección.
+
+### Tablas
+
+Siguen pasadas a párrafos «celda · celda». Se leen, pero se pierde la tabla. Con el editor de tablas de Lexical (`EXPERIMENTAL_TableFeature`) se podrían conservar; eso cambia la configuración del editor.
 
 ## Pendiente
 
-- **Las 47 imágenes marcadas:** revisarlas en el panel («Imágenes», buscando «Ilustración»), y también las 6 que salen del título de la imagen.
-- **Los 14 enlaces sin destino y los 170 títulos en negrita:** propuestas de arriba, pendientes de decisión.
-- **La plantilla de artículo:** espacio entre párrafos, jerarquía de encabezados e imágenes con `next/image`.
+- **Las 47 imágenes marcadas «Ilustración…»:** las revisa el editor **en producción, después de la migración**; es el paso 8 del runbook, con la lista de los 14 artículos. En la misma pasada, los 7 textos que salen del título de la imagen.
+- **CLS de la cabecera del artículo en móvil** (hallazgo de arriba): decisión de dirección.
 - **El SEO repetido de Yoast** (23 títulos y 28 descripciones sin importar): redactarlos si se quiere uno propio. Mientras tanto, el sitio usa el título y la entradilla.
 - **Producción:** con el runbook, cerca del lanzamiento.

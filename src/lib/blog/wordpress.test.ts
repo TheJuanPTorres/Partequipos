@@ -5,18 +5,23 @@ import {
   altParaMedia,
   decodificarEntidades,
   enlaceInterno,
+  enlaceViejo,
+  ENLACES_VIEJOS,
   entradillaDeExtracto,
   esAltGenerado,
   esAvif,
   esMismaImagen,
+  esSubapartado,
   extraerJsonWp,
   formatoPorExtension,
   limpiarLexical,
+  nivelTituloNegrita,
   nombreDeFicheroWp,
   normalizarRuta,
   quitarShortcodes,
   textoDescriptivo,
   textoPlano,
+  tituloEnNegrita,
   urlImagenCorregida,
   valoresUnicos,
 } from "./wordpress";
@@ -213,5 +218,60 @@ describe("importador del blog: piezas puras", () => {
   it("valores únicos: lo repetido no se importa", () => {
     const u = valoresUnicos(["A", "B", "A", " ", null, "C"]);
     assert.deepEqual([...u].sort(), ["B", "C"]);
+  });
+  it("rutas viejas: las aprobadas a su equivalente, con su ancla; las demás, sin enlace", () => {
+    assert.deepEqual(enlaceViejo("/maquinaria/maquinaria-nueva/excavadoras/#hitachi"), {
+      destino: "/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/#hitachi",
+    });
+    assert.deepEqual(enlaceViejo("/maquinaria/maquinaria-nueva/miniexcavadoras"), {
+      destino: "/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/",
+    });
+    assert.deepEqual(enlaceViejo("/lubricantes/"), { destino: "/lubricantes/lubricantes-eni/" });
+    assert.deepEqual(enlaceViejo("/maquinaria/maquinaria-nueva/bulldozer/"), { quitar: true });
+    assert.equal(enlaceViejo("/lubricantes/lubricantes-eni/"), null);
+    // Ninguna ruta vieja manda a un índice genérico ni a otra ruta vieja.
+    for (const destino of Object.values(ENLACES_VIEJOS)) {
+      if (destino === null) continue;
+      assert.notEqual(destino, "/maquinaria-pesada/");
+      assert.equal(destino in ENLACES_VIEJOS, false);
+    }
+  });
+
+  it("párrafo en negrita → título solo si es corto, entero en negrita y sin punto final", () => {
+    const p = (texto: string, negrita = texto, saltos = false) =>
+      tituloEnNegrita({ texto, negrita, saltos });
+    assert.deepEqual(p("Ventajas de la excavadora Hitachi"), { titulo: true });
+    assert.deepEqual(p("¿Qué es una tornamesa?"), { titulo: true });
+    assert.equal(p("Texto con solo una parte", "solo una parte"), null);
+    // Negrita partida en dos <strong> sin espacio entre ellos.
+    assert.deepEqual(p("Capacidades de la línea80/40", "Capacidades de la línea 80/40"), {
+      titulo: true,
+    });
+    assert.equal(p("   "), null);
+    assert.deepEqual(p("Revisa el aceite cada semana."), { titulo: false, motivo: "punto final" });
+    assert.deepEqual(p("Características:"), { titulo: false, motivo: "dos puntos" });
+    assert.deepEqual(p("Uno Dos", "Uno Dos", true), { titulo: false, motivo: "salto de línea" });
+    assert.deepEqual(p("x".repeat(91)), { titulo: false, motivo: "largo" });
+  });
+
+  it("el título en negrita queda bajo el encabezado real anterior", () => {
+    assert.equal(nivelTituloNegrita(null), 2);
+    assert.equal(nivelTituloNegrita(2), 3);
+    assert.equal(nivelTituloNegrita(3), 4);
+    assert.equal(nivelTituloNegrita(4), 4);
+    // Subapartados: bajo el título anterior, aunque ese título fuera convertido.
+    assert.equal(nivelTituloNegrita(null, true, 2), 3);
+    assert.equal(nivelTituloNegrita(null, true, null), 2);
+    assert.equal(nivelTituloNegrita(2, true, 3), 4);
+  });
+
+  it("reconoce los subapartados por su viñeta o su número", () => {
+    assert.equal(esSubapartado("🔹 1. Ajusta correctamente la tensión"), true);
+    assert.equal(esSubapartado("🔹 Miniexcavadoras CASE"), true);
+    assert.equal(esSubapartado("2) Limpia el tren de rodaje"), true);
+    assert.equal(esSubapartado("• Compactadores"), true);
+    assert.equal(esSubapartado("6 Tips clave para cuidar el tren de rodaje"), false);
+    assert.equal(esSubapartado("🚜 Maquinaria CASE disponible"), false);
+    assert.equal(esSubapartado("Retrocargadoras"), false);
   });
 });

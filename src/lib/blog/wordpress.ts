@@ -265,6 +265,97 @@ export function normalizarRuta(ruta: string): string {
   return r;
 }
 
+/**
+ * Rutas viejas del sitio actual que ya dan 404 en WordPress y que ningún
+ * redirect resuelve (decisión de dirección, 2026-10-06). Con destino: el
+ * equivalente real en el sitio nuevo. `null`: no hay equivalente, así que se
+ * quita el enlace y se deja su texto (nada de mandarlas a un índice genérico).
+ */
+export const ENLACES_VIEJOS: Readonly<Record<string, string | null>> = {
+  "/maquinaria/maquinaria-nueva/excavadoras/":
+    "/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/",
+  "/maquinaria/maquinaria-nueva/miniexcavadoras/":
+    "/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/",
+  "/maquinaria/maquinaria-nueva/cargadores/":
+    "/maquinaria-pesada/maquinaria-pesada-nueva/cargadores/",
+  "/maquinaria-pesada/maquinaria-pesada-nueva/nuestras-marcas/case-construction/retrocargadores/":
+    "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/",
+  "/lubricantes/": "/lubricantes/lubricantes-eni/",
+  "/maquinaria/maquinaria-nueva/bulldozer/": null,
+  "/maquinaria/maquinaria-nueva/minicargadores/": null,
+  "/maquinaria/maquinaria-nueva/motoniveladoras/": null,
+  "/maquinaria/maquinaria-nueva/retrocargadores/": null,
+};
+
+/**
+ * Qué hacer con un enlace a una ruta vieja: `{ destino }` (con el ancla o la
+ * consulta del original), `{ quitar: true }`, o `null` si no es una de ellas.
+ */
+export function enlaceViejo(rel: string): { destino: string } | { quitar: true } | null {
+  const ruta = rel.split(/[?#]/)[0]!;
+  const clave = normalizarRuta(ruta);
+  if (!(clave in ENLACES_VIEJOS)) return null;
+  const destino = ENLACES_VIEJOS[clave];
+  return destino === null ? { quitar: true } : { destino: `${destino}${rel.slice(ruta.length)}` };
+}
+
+/** Un párrafo «corto» para pasar a título: como mucho esto, en caracteres. */
+export const MAX_TITULO_NEGRITA = 90;
+
+export type VeredictoNegrita =
+  | { titulo: true }
+  | { titulo: false; motivo: "largo" | "punto final" | "dos puntos" | "salto de línea" };
+
+/**
+ * ¿Un párrafo entero en negrita es un título? Solo cuando está claro
+ * (decisión de dirección, 2026-10-06): corto, entero en negrita y sin punto
+ * final. Lo dudoso se queda como párrafo: con un salto de línea dentro (son
+ * dos cosas), o acabado en dos puntos (es una etiqueta que presenta lo que
+ * sigue, no un título). `null` si no está entero en negrita: no es candidato.
+ */
+export function tituloEnNegrita(p: {
+  texto: string;
+  negrita: string;
+  saltos: boolean;
+}): VeredictoNegrita | null {
+  const texto = p.texto.replace(/\s+/g, " ").trim();
+  const negrita = p.negrita.replace(/\s+/g, " ").trim();
+  // Sin espacios al comparar: la negrita puede venir partida en varios
+  // <strong> sin espacio entre ellos («la línea» + «80/40»).
+  if (!texto || negrita.replace(/\s/g, "") !== texto.replace(/\s/g, "")) return null;
+  if (texto.length > MAX_TITULO_NEGRITA) return { titulo: false, motivo: "largo" };
+  if (p.saltos) return { titulo: false, motivo: "salto de línea" };
+  if (/[.…]$/.test(texto)) return { titulo: false, motivo: "punto final" };
+  if (/:$/.test(texto)) return { titulo: false, motivo: "dos puntos" };
+  return { titulo: true };
+}
+
+const VINETA = "[\\u{1F536}-\\u{1F539}•▪▫◆◇►▶]\\uFE0F?";
+
+/**
+ * ¿El título es un subapartado? Los que empiezan por una viñeta (🔹, •, ▪…) o
+ * un número («1. », «2) ») enumeran dentro del apartado anterior.
+ */
+export const esSubapartado = (texto: string) =>
+  new RegExp(`^\\s*(${VINETA}|(${VINETA}\\s*)?\\d+[.)]\\s)`, "u").test(texto);
+
+/**
+ * Nivel del título que sale de un párrafo en negrita, respetando la jerarquía
+ * del artículo. `encabezadoReal`: el último encabezado de WordPress antes de
+ * él; `tituloAnterior`: el último título, real o convertido, que no sea un
+ * subapartado. Un subapartado va un nivel por debajo del título anterior; el
+ * resto, un nivel por debajo del encabezado real (h2 si no lo hay). Como mucho
+ * h4; `limpiarLexical` quita después cualquier salto.
+ */
+export function nivelTituloNegrita(
+  encabezadoReal: number | null,
+  sub = false,
+  tituloAnterior: number | null = encabezadoReal,
+): number {
+  const base = sub ? tituloAnterior : encabezadoReal;
+  return base ? Math.min(base + 1, 4) : 2;
+}
+
 type NodoLx = { type: string; tag?: string; format?: unknown; text?: string; children?: NodoLx[] };
 
 const textoNodo = (n: NodoLx): string =>

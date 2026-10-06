@@ -17,9 +17,10 @@ equipo técnico: la guía se corrige, no tú.
 - **La sesión dura 8 horas.** Después vuelve a pedirte la contraseña.
 - **5 intentos fallidos bloquean la cuenta 30 minutos.** Si te pasa, espera o
   pide ayuda a un administrador. La pantalla no dice si la cuenta está
-  bloqueada (así no revela qué correos existen): si estás seguro de la
-  contraseña y sigue saliendo «Correo o contraseña incorrectos», es el
-  bloqueo.
+  bloqueada (así no revela qué correos existen): da el mismo «Correo o
+  contraseña incorrectos» con una contraseña mala, un correo mal escrito o la
+  cuenta bloqueada. Si después de comprobar los dos sigue saliendo, espera
+  30 minutos o pide ayuda a un administrador.
 - **«Continuar con Microsoft»** sale con «Próximamente»: todavía no funciona.
   Se entra con correo y contraseña.
 - **¿Olvidaste la contraseña?** Hoy el aviso por correo no está activado, así

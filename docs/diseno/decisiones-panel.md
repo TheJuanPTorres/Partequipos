@@ -449,7 +449,7 @@ hace la `LoginView` de Payload 3.89, leída en su código:
 **Errores que no revelan si un correo existe.** Payload responde 401 en los
 dos casos, pero con textos distintos, y el de «cuenta bloqueada» solo sale si
 el correo existe. La pantalla **no muestra el texto del servidor**: cualquier
-401 da «Correo o contraseña incorrectos. Tras 5 intentos fallidos seguidos, el
+401 (o 403) da «Correo o contraseña incorrectos. Tras 5 intentos fallidos seguidos, el
 acceso se bloquea 30 minutos.», y un fallo de red o del servidor, un mensaje
 que no habla de credenciales. **Límite:** la API (`/api/users/login`) sigue
 devolviendo el texto de Payload a quien la llame directamente; cerrarlo exige

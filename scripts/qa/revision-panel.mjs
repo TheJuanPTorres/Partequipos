@@ -329,7 +329,9 @@ try {
             .slice(0, 3)
             .map((i) => ({
               loading: i.getAttribute("loading"),
-              src: (i.getAttribute("src") ?? "").slice(0, 60),
+              // Solo SI pasa por el optimizador: la URL lleva dentro el host
+              // del almacén, que no debe acabar en ningún fichero de hallazgos.
+              optimizada: (i.getAttribute("src") ?? "").startsWith("/_next/image"),
             })),
           columnas: [...document.querySelectorAll("table thead th")].map((th) =>
             th.textContent.trim(),

@@ -761,7 +761,7 @@ dependencias** (deriva en cero).
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Insignias de estado    | Disponible (equipos usados), Publicado/Borrador (testimonios, preguntas), autorización (testimonios), estado de la solicitud, destino de las redirecciones | `admin.components.Cell` del campo, con `insigniaDe` (`src/lib/panel/insignias.ts`, con pruebas). **Siempre con texto**: el color va en un punto decorativo y el texto en el color normal, así que el contraste no depende del tono (WCAG 1.4.1) |
 | Fechas relativas       | «Última modificación» de Imágenes y Documentos, «Creado» de Solicitudes y la fecha de publicación de Artículos                                             | `CeldaFecha`: «hace 2 días», enfocable con el teclado, y la fecha exacta en una burbuja al pasar el ratón **o al enfocar**, además de en el texto para el lector de pantalla                                                                    |
-| Miniaturas             | Equipos nuevos, equipos usados, modelos (galería) y artículos (imagen destacada), en una columna nueva tras el nombre                                      | `CeldaMiniatura`, de servidor: pide solo `url` y medidas de la primera imagen y la pinta con `next/image` a 40 px, `loading="lazy"`. Sin foto, «Sin foto»                                                                                       |
+| Miniaturas             | Equipos nuevos, equipos usados, modelos (galería) y artículos (imagen destacada), en una columna nueva tras el nombre                                      | `CeldaMiniatura`, de servidor: pide solo `url`, `filename` (sin él, `url` llega vacía: es virtual) y las medidas de la primera imagen y la pinta con `next/image` a 40 px, `loading="lazy"`. Sin foto, «Sin foto»                               |
 | Miniaturas de Imágenes | La lista de Imágenes y las vistas previas de los campos de imagen                                                                                          | `upload.adminThumbnail`: la miniatura de Payload usaba el ORIGINAL (hasta 15 MB); ahora pasa por el optimizador de Next a 128 px (`urlMiniatura`). Es la de Payload, así que no lleva `loading="lazy"`, pero pesa unos pocos kB                 |
 
 - **Fechas automáticas.** Para poner la celda a `updatedAt` y `createdAt` se
@@ -786,3 +786,8 @@ búsquedas «320» en modelos y «excavadora» en artículos.
 
 Capturas de antes y después, en claro y oscuro:
 `partequipos-cierre\capturas\f3-listas-antes-despues\`.
+
+**Límite visto en la revisión:** en móvil, la lista de Redirecciones solo enseña
+«Desde» y «Hacia»; el estado del destino queda a la derecha y hay que
+desplazar la tabla en horizontal. Es el comportamiento de la tabla de Payload,
+que no se toca.

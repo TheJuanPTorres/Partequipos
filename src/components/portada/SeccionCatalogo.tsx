@@ -8,10 +8,10 @@ import estilos from "./catalogo.module.css";
 /**
  * SECCIÓN 8 DE LA PORTADA — llamada a la acción tras «Nuestra Compañía» (ux-9).
  *
- * Componente de SERVIDOR: título y dos botones. Sube 180 px sobre la sección
- * anterior, como ux-9 (`margin-top: -180px`). Por encima de 768 px el recorrido
- * del vídeo deja ese hueco libre; a 768 o menos el título queda SOBRE el final
- * del vídeo, como en ux-9.
+ * Componente de SERVIDOR: título y dos botones. Va DEBAJO del vídeo de
+ * «Nuestra Compañía», nunca encima (§27.5). En móvil sube sobre el final del
+ * recorrido fijado para que el título entre bajo el vídeo encogido en la misma
+ * pantalla (`catalogo.module.css`, dirección 2026-10-06).
  *
  * Lo que se aparta (docs/diseno/decisiones-home-ux9.md §19):
  * - D1: título en `<h2>` (en ux-9, `<div>`).

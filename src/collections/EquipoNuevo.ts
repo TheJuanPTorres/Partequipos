@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { ICONOS_FICHA, validarDestacadas, type FilaFicha } from "../lib/maquinaria/fichaTecnica";
+import { ICONOS_FICHA, validarDestacarFila, type FilaFicha } from "../lib/maquinaria/fichaTecnica";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
@@ -122,9 +122,6 @@ export const EquipoNuevo: CollectionConfig = {
         description:
           "Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. Marca «Destacar» en hasta 4 filas: salen con su icono junto al título de la ficha (y las 3 primeras, en las tarjetas de otras referencias).",
       },
-      // Las 4 primeras marcadas son las que caben en la tarjeta (fichaTecnica.ts).
-      validate: (filas: unknown) =>
-        validarDestacadas(Array.isArray(filas) ? (filas as FilaFicha[]) : []),
       fields: [
         {
           name: "etiqueta",
@@ -148,6 +145,9 @@ export const EquipoNuevo: CollectionConfig = {
               type: "checkbox",
               label: "Destacar",
               defaultValue: false,
+              // Máximo 4 en toda la ficha (fichaTecnica.ts). En la casilla, y no en
+              // el array, para que el editor vea el mensaje junto a lo que marcó.
+              validate: validarDestacarFila,
               admin: {
                 width: "30%",
                 description: "Junto al título de la ficha, con icono. Máximo 4.",
@@ -175,7 +175,7 @@ export const EquipoNuevo: CollectionConfig = {
       label: "Ficha técnica completa (PDF)",
       admin: {
         description:
-          "Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Los PDF se suben en «Documentos».",
+          "Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 25 MB) o elige uno ya subido en «Documentos».",
       },
     },
     /*

@@ -7,6 +7,7 @@ import {
   destacadas,
   filasCompletas,
   validarDestacadas,
+  validarDestacarFila,
   type FilaFicha,
 } from "./fichaTecnica";
 
@@ -60,5 +61,23 @@ describe("ficha técnica: datos destacados", () => {
     const msg = validarDestacadas([...cuatro, fila(5, { destacar: true })]);
     assert.equal(typeof msg, "string");
     assert.match(String(msg), /hay 5 marcados/);
+  });
+});
+
+describe("validarDestacarFila (la casilla «Destacar»)", () => {
+  const cinco = [1, 2, 3, 4, 5].map((n) => fila(n, { destacar: true }));
+  it("con 5 marcadas, el mensaje sale en cada casilla marcada", () => {
+    assert.match(
+      String(validarDestacarFila(true, { data: { fichaTecnica: cinco } })),
+      /Solo caben 4/,
+    );
+  });
+  it("una casilla sin marcar nunca es el error", () => {
+    assert.equal(validarDestacarFila(false, { data: { fichaTecnica: cinco } }), true);
+    assert.equal(validarDestacarFila(undefined, { data: { fichaTecnica: cinco } }), true);
+  });
+  it("con 4 o menos, o sin datos, vale", () => {
+    assert.equal(validarDestacarFila(true, { data: { fichaTecnica: cinco.slice(0, 4) } }), true);
+    assert.equal(validarDestacarFila(true, { data: null }), true);
   });
 });

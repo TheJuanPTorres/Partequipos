@@ -380,3 +380,37 @@ Mejora 3 de las tres aprobadas. Sin esquema.
   registra esas peticiones fallidas, no son un defecto del panel.
 - La guía (§8 y §9) lo recoge; «IMG_1234» se cambia por «foto 3» como ejemplo
   de genérico (el primero se rechaza por corto).
+
+## 16. Revisión en pantalla de la ficha de producto V2 (2026-10-06, rama `feat/panel-revision-ficha`)
+
+Petición de dirección: revisar el panel de la ficha V2 de B (PR #74 y la
+subida directa del #82) con `panel:revision` y la cuenta de editor del
+preview, a 1440 y en móvil. Coordinado con B en `ESTADO.md` (la colección es
+suya). Sin esquema.
+
+**`panel:revision` con modo `ficha`** (`npm run panel:revision -- <preview> ficha`):
+
+- abre un equipo nuevo con PDF, marca una quinta fila «Destacar» y pulsa
+  «Guardar»;
+- la validación lo rechaza, así que no se escribe nada, y después lo
+  comprueba leyendo el equipo por la API: 4 marcadas antes y 4 después;
+- captura además la vista de subir un PDF en «Documentos».
+
+**Hallazgos y arreglos:**
+
+| Hallazgo                                                                                                                                                                        | Arreglo                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Con 5 «Destacar», el editor solo veía el aviso genérico de Payload «El siguiente campo es inválido: Ficha técnica». El mensaje de B («Solo caben 4…») no salía en ninguna parte | La validación pasa del array a **cada casilla marcada** (`validarDestacarFila`, con pruebas): el mensaje sale junto a ella |
+| La lista de «Documentos» daba el tamaño en bytes y sin unidad («714»)                                                                                                           | Columna quitada de las de por defecto; el tamaño legible sale al abrir el documento                                        |
+| Ayuda de «Documentos» con jerga: «sube directo al almacén, sin pasar por el servidor»                                                                                           | «Máximo 25 MB.»                                                                                                            |
+| La ayuda del PDF del equipo decía «Los PDF se suben en "Documentos"», pero el campo tiene su propio «Crear»                                                                     | «Súbelo aquí con "Crear" (PDF, máximo 25 MB) o elige uno ya subido en "Documentos".»                                       |
+| La guía no explicaba «Destacar», «Icono», el PDF ni el global «Ficha de producto»                                                                                               | `docs/guia-editor.md` §5.2 y una fila nueva en §9                                                                          |
+
+**Sin hallazgos:** ningún texto en inglés, ningún error de consola, el
+global «Ficha de producto» se entiende, y la vista de subir un PDF está bien
+en los dos anchos. Las peticiones fallidas son `ERR_BLOCKED_BY_ORB` del Chrome
+automatizado (§15, cerrado).
+
+**Por efecto:** `npm run qa:ficha` de B, contra `development`, sigue en verde
+con la validación en la casilla. Para eso `development` se puso al día con
+`payload migrate` y `db:check` antes y después.

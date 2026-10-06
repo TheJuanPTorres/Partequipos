@@ -224,6 +224,44 @@ Capturas en `Desktop\partequipos-cierre\capturas\blog-estructura\`.
 - A 1440, 2 artículos con 0,039.
 - **No se toca aquí:** cambiar la carga de la fuente afecta al LCP de todo el sitio. Queda para dirección.
 
+### Cabecera del artículo sin desplazamiento al llegar Inter (APLICADO, 2026-10-06)
+
+**Decisión de dirección:** arreglarlo solo en esa cabecera, sin tocar la carga de la fuente del sitio (Inter sigue sin precarga, CLAUDE.md §10.36). Objetivo: CLS < 0,05 en los 53 artículos a 390 sin empeorar escritorio.
+
+**Por qué no bastaba lo del hero:** allí el título cambiaba de **ancho** y se fijó con `width: 100%` (`decisiones-home-ux9.md` §21 b). Aquí cambia el **número de líneas**: con la fuente de respaldo y con Inter cambian de alto el título (6 de 53 artículos a 390), la línea de fecha (6) y la entradilla (6), en las dos direcciones.
+
+**Cómo:** cada bloque lleva una **copia invisible** de su texto (`::after` con `content: attr(data-reserva)` y `visibility: hidden`) en la misma celda de una rejilla. La copia va en la fuente de respaldo de next/font, «Inter Fallback», que no cambia al llegar Inter, y **ensanchada 0,04 em** para que mida siempre al menos lo que el texto visible en cualquiera de las dos fuentes. Así el alto es siempre el de la copia. `src/components/blog/cabeceraArticulo.module.css`.
+
+- **No es texto de la página:** es contenido generado y oculto. No se lee en voz alta, no se selecciona y los buscadores no lo indexan como texto.
+- **La línea de fecha pasa a ser texto en línea** («fecha · Por Partequipos · Noticias», con un espacio de media eme a cada lado del punto) para que su copia sea idéntica.
+
+**Prototipo, a 390 en los 53 (alto de la cabecera con respaldo frente a Inter):**
+
+| Copia                                            | Cabeceras que aún cambian de alto |
+| ------------------------------------------------ | --------------------------------- |
+| Arial, sin ensanchar                             | 18                                |
+| Arial, 0,03 em                                   | 11                                |
+| «Inter Fallback», 0,02 em                        | 1                                 |
+| **«Inter Fallback», 0,04 em (el que se aplica)** | **0**                             |
+
+**Medido en el preview, los 53 artículos, cargas sin caché y bajando por la página:**
+
+| Ancho | Antes (máximo · artículos > 0,01) | Ahora                                                                                          |
+| ----- | --------------------------------- | ---------------------------------------------------------------------------------------------- |
+| 390   | **0,21** · 11                     | **0,0165** · 2. Ninguno llega a 0,05                                                           |
+| 1440  | 0,039 · 2                         | 0,039 · 2, los mismos artículos y por otra causa. `radiadores-…`, repetido 3 veces: 0,0009 → 0 |
+
+**Lo que queda:**
+
+- **0,0165** en `miniexcavadoras-yanmar-compactas-…`: igual que antes, y no viene de la cabecera.
+- **0,0117** en `descubre-los-beneficios-…donaldson…`: «Noticias» pasa de la segunda línea a la primera **dentro** de la línea de fecha, que ya no cambia de alto.
+
+**Coste visible:** cuando Inter necesita menos líneas que la copia, queda una línea en blanco bajo el título o la entradilla (por ejemplo, a 390, un título de 5 líneas con el sitio de 6).
+
+**Guardarraíl:** el nombre «Inter Fallback» es un detalle interno de Next. En Turbopack lo genera su código en Rust, así que no se puede vigilar leyendo el JavaScript de Next. Lo vigila `scripts/qa/fuente-respaldo.ts`, que corre **después de cada `next build`** (`npm run build`). Si ningún CSS del build declara esa familia, el build falla, también en los preview. Por eso una actualización de Next que la renombre se ve en su propio PR. La decisión está en `src/lib/blog/fuenteRespaldo.ts`, y sus pruebas comprueban también que falla cuando debe. En el build del preview: «declarada en 1 de 11 CSS del build».
+
+**Límite, sin medir:** en Android no hay Arial, así que la fuente de respaldo es Roboto. La copia usa la misma pila de fuentes (`"Inter Fallback", ui-sans-serif, system-ui, sans-serif`), así que la idea se mantiene. Pero todo lo de arriba se midió en Chrome de escritorio emulando un móvil, no en un dispositivo Android.
+
 ### Tablas
 
 Siguen pasadas a párrafos «celda · celda». Se leen, pero se pierde la tabla. Con el editor de tablas de Lexical (`EXPERIMENTAL_TableFeature`) se podrían conservar; eso cambia la configuración del editor.
@@ -231,6 +269,5 @@ Siguen pasadas a párrafos «celda · celda». Se leen, pero se pierde la tabla.
 ## Pendiente
 
 - **Las 47 imágenes marcadas «Ilustración…»:** las revisa el editor **en producción, después de la migración**; es el paso 8 del runbook, con la lista de los 14 artículos. En la misma pasada, los 7 textos que salen del título de la imagen.
-- **CLS de la cabecera del artículo en móvil** (hallazgo de arriba): decisión de dirección.
 - **El SEO repetido de Yoast** (23 títulos y 28 descripciones sin importar): redactarlos si se quiere uno propio. Mientras tanto, el sitio usa el título y la entradilla.
 - **Producción:** con el runbook, cerca del lanzamiento.

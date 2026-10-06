@@ -151,7 +151,31 @@ export type Reciente = {
   titulo: string;
   href: string;
   actualizado: string;
+  /** Quién lo guardó por última vez, ya en texto («—» si no consta). */
+  editor: string;
 };
+
+/**
+ * Texto del último editor para la portada (§25), respetando el acceso a
+ * Usuarios: el campo llega poblado (con su correo) solo si quien mira puede
+ * leer a ese usuario; si no, llega el id. Nunca se piden datos de un usuario
+ * que el rol no puede ver.
+ * - Uno mismo: «ti».
+ * - Otro usuario legible: su correo.
+ * - Otro usuario no legible (un editor mirando lo de otro): «otra persona del equipo».
+ * - Sin dato (ediciones anteriores al campo, scripts, globales): «—».
+ */
+export function etiquetaEditor(valor: unknown, yo: number | string): string {
+  if (valor === null || valor === undefined || valor === "") return "—";
+  const id =
+    typeof valor === "object" && "id" in (valor as object) ? (valor as { id: unknown }).id : valor;
+  if (id === yo) return "ti";
+  if (typeof valor === "object") {
+    const correo = (valor as { email?: unknown }).email;
+    if (typeof correo === "string" && correo) return correo;
+  }
+  return typeof id === "number" || typeof id === "string" ? "otra persona del equipo" : "—";
+}
 
 /** Junta lo de cada colección y se queda con los `n` más recientes. */
 export function ultimosModificados(listas: Reciente[][], n = 8): Reciente[] {

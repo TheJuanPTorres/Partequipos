@@ -7,6 +7,7 @@ import type {
   Where,
 } from "payload";
 
+import { CAMPO_ULTIMO_EDITOR } from "../fields/ultimoEditor";
 import { motivoAltFlojo } from "../media/altFlojo";
 import {
   avisosDePortada,
@@ -14,6 +15,7 @@ import {
   FUERA_DE_RECIENTES,
   rutaGlobal,
   tarjetasDePortada,
+  etiquetaEditor,
   ultimosModificados,
   type AvisoPortada,
   type ConGaleria,
@@ -118,12 +120,19 @@ export async function getPortadaPanel(
           .map((c) =>
             seguro(`recientes ${c.slug}`, async () => {
               const campo = c.admin?.useAsTitle ?? (c.upload ? "filename" : "id");
+              // Último editor (§25), poblado solo si el rol puede leer a ese
+              // usuario (depth 1 sobre lo seleccionado, con su acceso).
+              const conEditor = c.fields.some((f) => "name" in f && f.name === CAMPO_ULTIMO_EDITOR);
               const { docs } = await payload.find({
                 collection: c.slug as CollectionSlug,
-                depth: 0,
+                depth: conEditor ? 1 : 0,
                 limit: 5,
                 sort: "-updatedAt",
-                select: { [campo]: true, updatedAt: true },
+                select: {
+                  [campo]: true,
+                  updatedAt: true,
+                  ...(conEditor ? { [CAMPO_ULTIMO_EDITOR]: true } : {}),
+                },
                 ...acceso,
               });
               const coleccion = texto(c.labels?.plural, c.slug);
@@ -133,6 +142,10 @@ export async function getPortadaPanel(
                 titulo: texto((d as unknown as Record<string, unknown>)[campo], `#${d.id}`),
                 href: `/admin/collections/${c.slug}/${d.id}`,
                 actualizado: texto((d as { updatedAt?: unknown }).updatedAt, ""),
+                editor: etiquetaEditor(
+                  (d as unknown as Record<string, unknown>)[CAMPO_ULTIMO_EDITOR],
+                  user.id,
+                ),
               }));
             }),
           ),
@@ -154,6 +167,8 @@ export async function getPortadaPanel(
                 titulo: etiqueta,
                 href: rutaGlobal(g.slug),
                 actualizado: texto((doc as { updatedAt?: unknown }).updatedAt, ""),
+                // Los globales no llevan último editor (§25): «—».
+                editor: "—",
               } satisfies Reciente,
             ];
           }),

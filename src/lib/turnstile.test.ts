@@ -139,6 +139,15 @@ describe("Turnstile en producción: nunca las claves de prueba", () => {
     assert.match(errores.join(" "), /son las de PRUEBA/);
   });
 
+  it("una sola de las dos es de prueba (sitio real y secreto 3x, o al revés): sin widget", () => {
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "0x4AAAAAAA-clave-real";
+    process.env.TURNSTILE_SECRET_KEY = "3x0000000000000000000000000000000AA";
+    assert.equal(turnstileSiteKey(), null);
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "2x00000000000000000000AB";
+    process.env.TURNSTILE_SECRET_KEY = "0x4AAAAAAA-secreto-real";
+    assert.equal(turnstileSiteKey(), null);
+  });
+
   it("solo la clave del sitio, sin secreto: sin widget", () => {
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "clave-real";
     assert.equal(turnstileSiteKey(), null);

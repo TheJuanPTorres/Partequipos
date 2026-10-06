@@ -111,8 +111,10 @@ oficial, no lo pongas.
 - **«Destacar» en la ficha técnica:** marca **hasta 4 filas**. Salen con su
   icono junto al título de la ficha, y las 3 primeras, en las tarjetas de
   «otras referencias». Al marcarla aparece **«Icono»**: elige el que mejor
-  encaje («Peso», «Potencia», «Motor»…); si no eliges, sale «Otro dato». Con
-  una quinta marcada, el panel no deja guardar y lo dice junto a cada casilla.
+  encaje («Peso», «Potencia», «Motor»…); si no eliges, sale «Otro dato». Bajo
+  la ficha técnica, un contador dice cuántas llevas («Filas destacadas: 3 de
+  4»). Con una quinta marcada se pone en rojo y te dice cuántas quitar; si
+  guardas así, el panel no lo deja y el aviso de arriba nombra las casillas.
 - **«Ficha técnica completa (PDF)»:** súbelo ahí mismo con **«Crear»**, o
   elige uno ya subido. Solo PDF, **máximo 25 MB**. Sale en la ficha como
   «Descargar ficha técnica completa»; sin PDF, el botón no aparece. Los PDF

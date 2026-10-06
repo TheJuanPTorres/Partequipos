@@ -412,9 +412,10 @@ el DOM, a 1440 y en móvil). La validación previa del formulario no lo detecta:
 recibe la ficha como número de filas, así que solo rechaza el servidor (400) y
 el error no vuelve a cada casilla. Por eso el contador en vivo.
 
-**Sin hallazgos:** ningún texto en inglés, ningún error de consola, el
-global «Ficha de producto» se entiende, y la vista de subir un PDF está bien
-en los dos anchos. Las peticiones fallidas son `ERR_BLOCKED_BY_ORB` del Chrome
+**Sin hallazgos:** ningún texto en inglés; un único error de consola, el 400
+del guardado que se rechaza a propósito con 5 «Destacar»; el global «Ficha de
+producto» se entiende, y la vista de subir un PDF está bien en los dos
+anchos. Las peticiones fallidas son `ERR_BLOCKED_BY_ORB` del Chrome
 automatizado (§15, cerrado).
 
 **Por efecto:** `npm run qa:ficha` de B, contra `development`, sigue en verde

@@ -4,6 +4,8 @@ import { useFormFields } from "@payloadcms/ui";
 
 import { contarDestacadas, MAX_DESTACADAS } from "@/lib/maquinaria/fichaTecnica";
 
+import { Aviso } from "./aviso/Aviso";
+
 /**
  * Contador EN VIVO de las filas «Destacar» de la ficha técnica de un equipo
  * nuevo (campo `ui`: no guarda nada ni tiene columna).
@@ -25,11 +27,19 @@ export default function ContadorDestacadas() {
   );
   const sobran = marcadas - MAX_DESTACADAS;
 
+  // La región `status` es siempre la misma (así se anuncia el cambio); dentro,
+  // el texto o, con más de 4, el aviso de error común (F4).
   return (
-    <p role="status" className={`pq-destacadas${sobran > 0 ? " pq-destacadas--error" : ""}`}>
-      {sobran > 0
-        ? `Hay ${marcadas} filas con «Destacar» y solo caben ${MAX_DESTACADAS}: quita «Destacar» en ${sobran === 1 ? "una" : sobran}. Si no, no se podrá guardar.`
-        : `Filas destacadas: ${marcadas} de ${MAX_DESTACADAS}.`}
-    </p>
+    <div className="pq-destacadas" role="status">
+      {sobran > 0 ? (
+        <Aviso rol="ninguno" tono="error">
+          <p>
+            {`Hay ${marcadas} filas con «Destacar» y solo caben ${MAX_DESTACADAS}: quita «Destacar» en ${sobran === 1 ? "una" : sobran}. Si no, no se podrá guardar.`}
+          </p>
+        </Aviso>
+      ) : (
+        <p>{`Filas destacadas: ${marcadas} de ${MAX_DESTACADAS}.`}</p>
+      )}
+    </div>
   );
 }

@@ -91,6 +91,23 @@ página en otra pestaña. Sale cuando la ficha ya está guardada; en móvil es s
 el icono. Lo que no tiene página propia (equipos usados, categorías técnicas,
 sedes, testimonios, solicitudes…) no lo lleva.
 
+### Los avisos del panel
+
+Algunas pantallas muestran un **recuadro de aviso** (con un icono a la
+izquierda) cuando algo merece tu atención. Ninguno bloquea nada; solo avisan:
+
+| Dónde                                      | Qué dice                                                                   |
+| ------------------------------------------ | -------------------------------------------------------------------------- |
+| Equipos nuevos, equipos usados y modelos   | «Esta ficha no tiene fotos»: en el sitio sale sin imagen                   |
+| Equipos usados con «Disponible» desmarcado | «Este equipo no sale en el sitio» hasta que lo vuelvas a marcar            |
+| Testimonios sin la autorización marcada    | Que primero hay que marcar la autorización firmada para poder publicarlo   |
+| Imágenes                                   | Cuántas tienen el texto alternativo flojo y cuáles                         |
+| Páginas con bloques                        | Que «Contenido» y «Secciones con ancla» no se muestran                     |
+| Ficha técnica de un equipo nuevo           | Cuántas filas llevan «Destacar» (máximo 4), en rojo si pasas de 4          |
+| SEO y datos de la empresa                  | «El sitio todavía está cerrado a buscadores» mientras dure la demostración |
+| Redirecciones                              | Un ejemplo de cómo se escriben «Desde» y «Hacia»                           |
+| Solicitudes                                | Cómo atenderlas: por tu canal habitual y cambiando el estado a «Atendida»  |
+
 ## 5. Tareas frecuentes
 
 ### 5.1 Atender una solicitud
@@ -106,7 +123,7 @@ Ley 1581 de 2012. No se borran: marcarlas atendidas conserva el historial.
 ### 5.2 Añadir un modelo de repuesto
 
 1. **Repuestos → Modelos → Crear.**
-2. **Nombre** (p. ej. «CAT 320D»). El **slug** se crea solo al guardar.
+2. **Nombre** (p. ej. «CAT 320D»). La **dirección web** se crea sola al guardar.
 3. **Primero la marca, después el tipo de equipo.** El desplegable de tipos
    solo enseña los de la marca elegida. Si cambias la marca, vuelve a elegir
    el tipo: el panel no deja guardar un tipo de otra marca.
@@ -151,8 +168,8 @@ oficial, no lo pongas.
    publicación** (ordena el blog y es la que ven los buscadores).
 3. **Entradilla:** el resumen que sale en el listado y al compartir.
 4. **Imagen destacada:** sale en el listado y al compartir en redes.
-5. El slug sale del título. **No puede repetir el de una página** del sitio
-   (artículos y páginas comparten las direcciones `partequipos.com/<slug>/`);
+5. La dirección web sale del título. **No puede repetir la de una página** del sitio
+   (artículos y páginas comparten las direcciones `partequipos.com/<dirección>/`);
    si coincide, el panel te lo dice y tienes que elegir otro.
 
 ### 5.5 Subir imágenes
@@ -251,17 +268,19 @@ vacío no rompe nada: el sitio usa el dato de siempre.**
 | Solicitud atendida   | Estado «Atendida»            |
 | Cualquier otra cosa  | Pedírselo a un administrador |
 
-## 7. El slug (la dirección web)
+## 7. La dirección web
 
 - Es la última parte de la dirección de una página: en
-  `…/repuestos-…/caterpillar/excavadora/cat-320d/`, el slug es `cat-320d`.
-- **Se crea solo** a partir del nombre: minúsculas, sin tildes y con guiones.
+  `…/repuestos-…/caterpillar/excavadora/cat-320d/`, es `cat-320d`. En el
+  panel, el campo se llama **«Dirección web»**.
+- **Se crea sola** a partir del nombre: minúsculas, sin tildes y con guiones.
 - **Después de guardar ya no se puede cambiar**, porque Google ya conoce esa
   dirección. Si tiene una errata, un administrador puede darte el permiso
-  «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a
-  la nueva.
-- En las **páginas** (Páginas y blog → Páginas) se llama «Ruta (dirección web)» y
-  funciona igual.
+  «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá
+  llevando a la nueva (el sitio crea solo una redirección de origen «Cambio de
+  dirección web»).
+- En las **páginas** (Páginas y blog → Páginas) funciona igual, y puede llevar
+  más de un tramo («nosotros/trabaja-con-nosotros»).
 
 ## 8. Buscadores y redes sociales
 
@@ -294,7 +313,7 @@ hasta que la tengan. El propio bloque lo avisa.
 | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | «El tipo … es de otra marca»                                                                 | Elige un tipo de la marca seleccionada, o cambia la marca          |
 | «Solo caben 4 datos destacados en la ficha…»                                                 | Quita «Destacar» en las filas que sobren (§5.2)                    |
-| «El slug … ya lo usa una página / un artículo»                                               | Cambia el slug antes de guardar                                    |
+| «La dirección web … ya la usa una página / un artículo»                                      | Cambia la dirección web antes de guardar                           |
 | «… no es una imagen JPEG, PNG ni WebP»                                                       | Convierte la imagen y vuelve a subirla                             |
 | «… pesa … MB y el máximo es 4 MB»                                                            | Exporta el vídeo con más compresión                                |
 | «… pesa … MB y el máximo es 15 MB» (imagen) o «… 25 MB» (PDF)                                | Reduce la imagen o el PDF y vuelve a subirlo                       |
@@ -305,7 +324,7 @@ hasta que la tengan. El propio bloque lo avisa.
 | «Escribe el número completo, con indicativo…»                                                | Escribe el teléfono entero: `+57 317 670 7071`                     |
 | «Tiene que empezar por https://…»                                                            | Copia la dirección del perfil desde el navegador, con `https://`   |
 | «No es una dirección válida…»                                                                | Pega la dirección completa del perfil, no solo el nombre           |
-| El slug aparece gris y no se puede escribir                                                  | Es normal tras crear la ficha: ver §7                              |
+| La dirección web aparece gris y no se puede escribir                                         | Es normal tras crear la ficha: ver §7                              |
 
 Si ves un error que no está aquí, haz una captura con la hora y envíasela al
 equipo técnico.

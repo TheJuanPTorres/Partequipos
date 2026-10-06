@@ -18,7 +18,7 @@ describe("comprobarSlugLibre — dirección artículo → página institucional"
   it("rechaza un artículo que taparía una página institucional", async () => {
     const error = await comprobarSlugLibre("nosotros", "una página institucional", paginas);
     assert.ok(error, "debería rechazarlo");
-    assert.match(error, /ya lo usa una página institucional/);
+    assert.match(error, /ya la usa una página institucional/);
     assert.match(error, /nosotros/);
   });
 
@@ -36,7 +36,7 @@ describe("comprobarSlugLibre — dirección página institucional → artículo"
   it("rechaza una página que taparía un artículo", async () => {
     const error = await comprobarSlugLibre("usas-la-grasa-correcta", "un artículo", articulos);
     assert.ok(error, "debería rechazarlo");
-    assert.match(error, /ya lo usa un artículo/);
+    assert.match(error, /ya la usa un artículo/);
   });
 
   it("acepta una página cuyo slug está libre", async () => {

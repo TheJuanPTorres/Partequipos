@@ -2,6 +2,10 @@
 
 import { useFormFields } from "@payloadcms/ui";
 
+import { cuantasFilas } from "@/lib/panel/avisos";
+
+import { Aviso } from "./aviso/Aviso";
+
 type Props = { texto?: string };
 
 /**
@@ -14,16 +18,18 @@ type Props = { texto?: string };
  */
 export default function AvisoBloques({ texto }: Props) {
   const filas = useFormFields(([campos]) => campos?.bloques?.value);
-  const conBloques =
-    (typeof filas === "number" ? filas : Array.isArray(filas) ? filas.length : 0) > 0;
+  const conBloques = cuantasFilas(filas) > 0;
 
   return (
     <div className="field-description">
       {texto ? <p style={{ margin: 0 }}>{texto}</p> : null}
       {conBloques ? (
-        <p role="note" style={{ margin: texto ? "4px 0 0" : 0, fontWeight: 600 }}>
-          Esta página tiene bloques: se compone con ellos y este campo NO se muestra en el sitio.
-        </p>
+        // Desde la F4, con el aviso común (tono de advertencia).
+        <Aviso className="pq-aviso--en-campo" tono="aviso">
+          <p>
+            Esta página tiene bloques: se compone con ellos y este campo no se muestra en el sitio.
+          </p>
+        </Aviso>
       ) : null}
     </div>
   );

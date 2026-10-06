@@ -69,6 +69,15 @@
   --pq-success: oklch(0.696 0.17 162.48); /* #00bc7d */
   --pq-warning: oklch(0.769 0.188 70.08); /* #fe9a00 */
   /*
+   * Pares de estado del sistema (su `theme.json`: info, success y warning con su
+   * `-foreground`, que son colores de Tailwind v4). Los usa el aviso del panel
+   * (`.pq-aviso`, F4). En oscuro, los `-foreground` cambian: ver 1b.
+   */
+  --pq-info: oklch(0.623 0.214 259.815); /* blue-500 */
+  --pq-info-foreground: oklch(0.488 0.243 264.376); /* blue-700 */
+  --pq-success-foreground: oklch(0.508 0.118 165.612); /* emerald-700 */
+  --pq-warning-foreground: oklch(0.555 0.163 48.998); /* amber-700 */
+  /*
    * --radius del sistema: .45rem. Se escribe en PX (7,2 px) y NO en rem.
    *
    * CORREGIDO el 2026-09-16, medido: el panel de Payload tiene la raíz a 13 px
@@ -145,6 +154,9 @@
  * panel anunciaba data-theme="dark" y pintaba en claro.
  * ----------------------------------------------------------------------- */
 html[data-theme="dark"] {
+  --pq-info-foreground: oklch(0.707 0.165 254.624); /* blue-400 */
+  --pq-success-foreground: oklch(0.765 0.177 163.223); /* emerald-400 */
+  --pq-warning-foreground: oklch(0.828 0.189 84.429); /* amber-400 */
   --pq-background: oklch(0.1822 0 113.1); /* #121212 */
   --pq-foreground: oklch(0.9288 0.0126 255.44); /* #e2e8f0 */
   --pq-secondary: oklch(0.29 0 113.31); /* #2b2b2b */
@@ -1332,39 +1344,6 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 }
 
 /*
- * Aviso de textos alternativos flojos, encima de la lista de «Imágenes»
- * (`src/components/admin/AltFlojos.tsx`). Borde de aviso de Payload y el fondo y
- * el texto de las superficies, que tienen contraste medido en claro y oscuro.
- */
-.pq-alt-flojos {
-  margin: 0 0 calc(var(--base) * 1);
-  padding: calc(var(--base) * 0.75) calc(var(--base) * 1);
-  border: 1px solid var(--theme-warning-500);
-  border-radius: var(--style-radius-m);
-  border-left-width: 4px;
-  background: var(--theme-elevation-50);
-  color: var(--theme-elevation-1000);
-
-  p {
-    margin: 0;
-  }
-
-  &__lista {
-    margin: calc(var(--base) * 0.5) 0 0;
-    padding-left: calc(var(--base) * 1.25);
-  }
-
-  a {
-    color: inherit;
-    text-decoration: underline;
-  }
-
-  &__resto {
-    margin-top: calc(var(--base) * 0.25);
-  }
-}
-
-/*
  * Contador de «Destacar» de la ficha técnica (`ContadorDestacadas.tsx`), bajo
  * el array. En rojo si hay más de 4: con el color de error del propio panel.
  */
@@ -1373,13 +1352,13 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   color: var(--theme-elevation-800);
   font-size: 0.95rem;
 
-  &--error {
-    padding: calc(var(--base) * 0.5) calc(var(--base) * 0.75);
-    border-left: 4px solid var(--theme-error-500);
-    border-radius: var(--style-radius-s);
-    background: var(--theme-error-50);
-    color: var(--theme-error-750, var(--theme-elevation-1000));
-    font-weight: 600;
+  p {
+    margin: 0;
+  }
+
+  /* Con más de 4, el aviso de error común (F4, `.pq-aviso--error`). */
+  .pq-aviso {
+    margin: 0;
   }
 }
 
@@ -1769,3 +1748,89 @@ html[data-theme="dark"] .pq-acceso {
     transform: rotate(360deg);
   }
 }
+
+/* =========================================================================
+ * AVISO DEL PANEL (`components/admin/aviso/Aviso.tsx`, F4, decisiones-panel §22)
+ *
+ * Réplica del `alert` del sistema: `rounded-xl border px-3.5 py-3 text-sm`,
+ * rejilla icono + texto con `gap-x-2`, borde del tono al 32 % y fondo al 4 %,
+ * título `font-medium` y texto atenuado. El icono va en el `-foreground` del
+ * tono y no en el tono puro (el sistema pinta el ámbar puro, 2:1 sobre blanco):
+ * es decorativo, pero así se distingue también con poca vista.
+ * ========================================================================= */
+.pq-aviso {
+  --pq-aviso-tono: var(--pq-info);
+  --pq-aviso-icono: var(--pq-info-foreground);
+
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 2px 8px;
+  align-items: start;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in oklab, var(--pq-aviso-tono) 32%, transparent);
+  border-radius: var(--pq-radius-xl);
+  background: color-mix(in oklab, var(--pq-aviso-tono) 4%, var(--pq-background));
+  color: var(--pq-foreground);
+  font-size: 14px;
+  line-height: 20px;
+
+  &--aviso {
+    --pq-aviso-tono: var(--pq-warning);
+    --pq-aviso-icono: var(--pq-warning-foreground);
+  }
+
+  &--error {
+    --pq-aviso-tono: var(--pq-destructive);
+    --pq-aviso-icono: var(--pq-destructive);
+  }
+
+  &--exito {
+    --pq-aviso-tono: var(--pq-success);
+    --pq-aviso-icono: var(--pq-success-foreground);
+  }
+
+  &__icono {
+    margin-top: 2px;
+    color: var(--pq-aviso-icono);
+  }
+
+  &__titulo {
+    margin: 0;
+    font-weight: 500;
+  }
+
+  &__texto {
+    color: var(--pq-muted-foreground);
+
+    p {
+      margin: 0;
+    }
+
+    p + p,
+    ul {
+      margin: 4px 0 0;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    a {
+      color: var(--pq-foreground);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  }
+
+  /* Dentro de la descripción de un campo (aviso de bloques de Páginas). */
+  &--en-campo {
+    margin: 4px 0 0;
+  }
+
+  /* En el error, el texto también en el color del tono: tiene que leerse ya. */
+  &--error &__texto {
+    color: color-mix(in oklab, var(--pq-destructive) 80%, var(--pq-foreground));
+  }
+}
+

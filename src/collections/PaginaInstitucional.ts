@@ -64,12 +64,12 @@ export const PaginaInstitucional: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
-      label: "Ruta (dirección web)",
+      label: "Dirección web",
       admin: {
         position: "sidebar",
         description:
           "La dirección de la página, sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio». " +
-          "Después de crearla ya no se puede cambiar; si tiene una errata, pide a un administrador el permiso «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a la nueva.",
+          "Después de crearla ya no se puede cambiar; si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.",
       },
       // Igual que el resto de slugs (ADR 0005, parte B): solo al crear, o con el
       // permiso. El 301 desde la ruta anterior ya lo crea `revalidarPagina`.

@@ -55,7 +55,7 @@ export async function crearRedirectPorCambioDeSlug(
       hacia,
       tipo: "301" as const,
       origen: "cambio-de-slug" as const,
-      notas: `Creado automáticamente al cambiar el slug (${new Date().toISOString()}).`,
+      notas: `Creado automáticamente al cambiar la dirección web (${new Date().toISOString()}).`,
     };
 
     const anterior = existente.docs[0];

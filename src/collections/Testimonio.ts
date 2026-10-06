@@ -14,6 +14,7 @@ import {
 import { borradoAdmin, esPersonal, escrituraContenido } from "../lib/seguridad/acceso";
 import { validarYouTube } from "../lib/fields/youtube";
 import { revalidarPortada } from "./hooks/portadaHooks";
+import { avisoField } from "../lib/fields/avisoField";
 
 const portada = revalidarPortada("testimonios");
 
@@ -167,6 +168,8 @@ export const Testimonio: CollectionConfig = {
         },
       ],
     },
+    // Junto a «Publicado»: sin la autorización no se puede publicar (F4).
+    avisoField("avisoAutorizacion", "AvisoAutorizacion", { sidebar: true }),
     {
       name: "publicado",
       type: "checkbox",

@@ -94,3 +94,16 @@ export function ordenarMenu<G extends { nombre: string; entradas: { slug: string
     entradas: estable(g.entradas, (e) => posicion(ORDEN_DE_ENTRADAS, e.slug)),
   }));
 }
+
+/**
+ * Clave de un grupo para `id` y clases: «Páginas y blog» → «paginas-y-blog».
+ * Sin espacios, porque `aria-controls` es una lista de ids separados por ellos.
+ */
+export function idDeGrupo(nombre: string): string {
+  return nombre
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}

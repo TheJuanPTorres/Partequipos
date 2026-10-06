@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { GRUPOS_DEL_MENU, ORDEN_DE_ENTRADAS, ordenarMenu } from "./menu";
+import { GRUPOS_DEL_MENU, idDeGrupo, ORDEN_DE_ENTRADAS, ordenarMenu } from "./menu";
 
 const g = (nombre: string, ...slugs: string[]) => ({
   nombre,
@@ -57,5 +57,15 @@ describe("ordenarMenu", () => {
   it("no hay duplicados en las listas", () => {
     assert.equal(new Set(GRUPOS_DEL_MENU).size, GRUPOS_DEL_MENU.length);
     assert.equal(new Set(ORDEN_DE_ENTRADAS).size, ORDEN_DE_ENTRADAS.length);
+  });
+});
+
+describe("idDeGrupo", () => {
+  it("da ids sin espacios ni tildes, distintos para cada grupo", () => {
+    assert.equal(idDeGrupo("Páginas y blog"), "paginas-y-blog");
+    assert.equal(idDeGrupo("Configuración"), "configuracion");
+    const ids = GRUPOS_DEL_MENU.map(idDeGrupo);
+    assert.equal(new Set(ids).size, ids.length);
+    for (const id of ids) assert.match(id, /^[a-z0-9-]+$/);
   });
 });

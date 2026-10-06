@@ -290,6 +290,24 @@ try {
 
     for (const p of PANTALLAS) await visitar(p.nombre, p.ruta);
 
+    // El MENÚ LATERAL desplegado (F1 del rediseño): se abre con su botón y se
+    // captura la ventana visible, que es donde vive el menú.
+    await pagina.goto(`${base}/admin`, { waitUntil: "networkidle" });
+    const toggler = pagina.locator(".template-default__nav-toggler").first();
+    if (!(await pagina.locator(".nav--nav-open").count())) await toggler.click().catch(() => {});
+    await pagina.waitForTimeout(1500);
+    const ficheroMenu = path.join(salida, `menu-${ancho.nombre}.png`);
+    await pagina.screenshot({ path: ficheroMenu });
+    const menu = await pagina.evaluate(() =>
+      [...document.querySelectorAll(".nav-group")].map((g) => ({
+        grupo: g.querySelector(".nav-group__label, button")?.textContent?.trim(),
+        entradas: [...g.querySelectorAll("a")].map((a) => a.textContent.trim()),
+        icono: Boolean(g.querySelector("svg")),
+      })),
+    );
+    hallazgos.push({ pantalla: "menu", ancho: ancho.nombre, menu });
+    decir(`✓ menú (${ancho.nombre}) → ${path.basename(ficheroMenu)}`);
+
     const fichas = {};
     for (const f of FORMULARIOS) {
       await pagina.goto(`${base}/admin/collections/${f.coleccion}${f.filtro ?? ""}`, {

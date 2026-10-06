@@ -5,6 +5,8 @@ import { AnimateHeight, useNav, usePreferences } from "@payloadcms/ui";
 import { PREFERENCE_KEYS } from "payload/shared";
 import { useState } from "react";
 
+import { idDeGrupo } from "@/lib/panel/menu";
+
 import { ICONOS_DE_GRUPO, TAMANO_ICONO } from "./iconos";
 
 /**
@@ -48,7 +50,13 @@ export function GrupoNav({
 
   // Un grupo desconocido sale sin icono (lo vigila `grupos.test.ts`).
   const Icono: Icon | undefined = (ICONOS_DE_GRUPO as Record<string, Icon>)[nombre];
-  const idContenido = `nav-grupo-contenido-${nombre}`;
+  /*
+   * Identificador sin espacios ni tildes: desde la F1 hay grupos de varias
+   * palabras («Páginas y blog»), y un `id` con espacios rompería
+   * `aria-controls`, que es una LISTA de ids separados por espacios.
+   */
+  const clave = idDeGrupo(nombre);
+  const idContenido = `nav-grupo-contenido-${clave}`;
 
   function alternar() {
     setAnimar(true);
@@ -59,8 +67,10 @@ export function GrupoNav({
 
   return (
     <div
-      className={["nav-group", nombre, plegado && "nav-group--collapsed"].filter(Boolean).join(" ")}
-      id={`nav-group-${nombre}`}
+      className={["nav-group", `nav-group--${clave}`, plegado && "nav-group--collapsed"]
+        .filter(Boolean)
+        .join(" ")}
+      id={`nav-group-${clave}`}
     >
       <button
         aria-controls={idContenido}
@@ -82,7 +92,7 @@ export function GrupoNav({
           />
         </div>
       </button>
-      <AnimateHeight duration={animar ? 200 : 0} height={plegado ? 0 : "auto"} id={idContenido}>
+      <AnimateHeight duration={animar ? 150 : 0} height={plegado ? 0 : "auto"} id={idContenido}>
         <div className="nav-group__content">{children}</div>
       </AnimateHeight>
     </div>

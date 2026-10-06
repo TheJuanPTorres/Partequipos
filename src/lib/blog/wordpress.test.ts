@@ -243,6 +243,10 @@ describe("importador del blog: piezas puras", () => {
     assert.deepEqual(p("Ventajas de la excavadora Hitachi"), { titulo: true });
     assert.deepEqual(p("¿Qué es una tornamesa?"), { titulo: true });
     assert.equal(p("Texto con solo una parte", "solo una parte"), null);
+    // Negrita partida en dos <strong> sin espacio entre ellos.
+    assert.deepEqual(p("Capacidades de la línea80/40", "Capacidades de la línea 80/40"), {
+      titulo: true,
+    });
     assert.equal(p("   "), null);
     assert.deepEqual(p("Revisa el aceite cada semana."), { titulo: false, motivo: "punto final" });
     assert.deepEqual(p("Características:"), { titulo: false, motivo: "dos puntos" });

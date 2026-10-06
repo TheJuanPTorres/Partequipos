@@ -680,12 +680,32 @@ function aplanar(html: string): Aplanado {
     }
   }
 
+  // Encabezados de WordPress sin negrita dentro: el estilo lo pone la plantilla.
+  for (const h of [...cuerpo.querySelectorAll("h1, h2, h3, h4, h5, h6")]) {
+    for (const b of [...h.querySelectorAll("strong, b")]) b.replaceWith(...[...b.childNodes]);
+  }
+
   // h1 dentro del contenido → h2 (el <h1> de la página es el título).
   for (const h of [...cuerpo.querySelectorAll("h1")]) {
     const h2 = doc.createElement("h2");
     h2.innerHTML = h.innerHTML;
     h.replaceWith(h2);
   }
+
+  // Un <div> que solo lleva texto es un párrafo: si se desenvolviera a secas,
+  // dos seguidos quedarían pegados en uno («Capacidades de la línea» y
+  // «80/40» → «línea80/40»).
+  const BLOQUES =
+    "p, div, section, article, ul, ol, li, table, h1, h2, h3, h4, h5, h6, blockquote, figure, pre, hr";
+  let divsAParrafo = 0;
+  for (const d of [...cuerpo.querySelectorAll("div")].reverse()) {
+    if (d.querySelector(BLOQUES) || !textoPlano(d.innerHTML)) continue;
+    const p = doc.createElement("p");
+    p.innerHTML = d.innerHTML;
+    d.replaceWith(p);
+    divsAParrafo++;
+  }
+  if (divsAParrafo) otros.push(`div con solo texto → párrafo (${divsAParrafo})`);
 
   // Fuera los contenedores de Elementor: se quedan sus hijos.
   let cambio = true;

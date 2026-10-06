@@ -157,30 +157,36 @@ Resultado al reimportar: **12 enlaces a su equivalente y 7 quitados**; **rutas s
 | Shortcodes                         | 2 (`[if]`, `[endif]`), quitados                                                                                                                                              |
 | Estilos en línea                   | 0 en el texto; **5 alineaciones** (2 `justify`, 3 `center`), **quitadas**                                                                                                    |
 | iframes, vídeos, formularios       | 0                                                                                                                                                                            |
-| Párrafos vacíos                    | **2, quitados**                                                                                                                                                              |
+| Párrafos vacíos                    | **11, quitados** (2 antes de pasar los `<div>` de solo texto a párrafo)                                                                                                      |
 | Encabezados que se saltan niveles  | **4 artículos** empezaban en h3 o h4: **corregidos** (empiezan en h2, sin saltos)                                                                                            |
-| **Artículos sin encabezados**      | **42.** 26 de ellos usaban **170 párrafos cortos en negrita** como títulos. **APLICADO** con el criterio de dirección (abajo): ahora quedan **27** artículos sin encabezados |
+| **Artículos sin encabezados**      | **42.** 26 de ellos usaban **170 párrafos cortos en negrita** como títulos. **APLICADO** con el criterio de dirección (abajo): ahora quedan **26** artículos sin encabezados |
 | Saltos de línea dentro de párrafos | 188, de listas escritas a mano con `<br>`. Se quedan                                                                                                                         |
 
 ### Párrafos en negrita → títulos (APLICADO, 2026-10-06)
 
 **Criterio de dirección:** solo cuando está claro: párrafo **corto** (hasta 90 caracteres), **entero en negrita** y **sin punto final**, respetando la jerarquía del artículo. Lo dudoso se queda como está. Funciones `tituloEnNegrita`, `esSubapartado` y `nivelTituloNegrita` de `src/lib/blog/wordpress.ts`, con pruebas. Solo se miran los párrafos del nivel superior del artículo, nunca los de una lista o una cita.
 
-| Resultado                        | Cuántos | Por qué                                                                                               |
-| -------------------------------- | ------- | ----------------------------------------------------------------------------------------------------- |
-| **Convertidos en título**        | **112** | En 15 artículos                                                                                       |
-| Dejados: acaban en dos puntos    | 47      | «Características:», «Beneficios:»: presentan la lista que sigue, son una etiqueta y no un título      |
-| Dejados: largos (más de 90)      | 18      | Son frases destacadas, no títulos                                                                     |
-| Dejados: punto final             | 14      | Son frases                                                                                            |
-| Dejados: con un salto de línea   | 2       | Juntan dos cosas en un párrafo                                                                        |
-| **Total de párrafos en negrita** | 193     | (El «170» de la primera revisión contaba en el Lexical los de menos de 90 caracteres; mismo conjunto) |
+| Resultado                        | Cuántos | Por qué                                                                                          |
+| -------------------------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| **Convertidos en título**        | **137** | En 16 artículos                                                                                  |
+| Dejados: acaban en dos puntos    | 47      | «Características:», «Beneficios:»: presentan la lista que sigue, son una etiqueta y no un título |
+| Dejados: largos (más de 90)      | 20      | Son frases destacadas, no títulos                                                                |
+| Dejados: punto final             | 15      | Son frases                                                                                       |
+| Dejados: con un salto de línea   | 2       | Juntan dos cosas en un párrafo                                                                   |
+| **Total de párrafos en negrita** | 221     | (El «170» de la primera revisión contaba en el Lexical los de menos de 90 caracteres)            |
 
 **Jerarquía:**
 
 - Sin un encabezado real de WordPress antes: **h2**. Con uno: un nivel por debajo de él.
 - Los que empiezan por una viñeta (🔹, •, ▪…) o un número («1. ») son **subapartados**: un nivel por debajo del título anterior. Así «6 Tips clave…» queda en h2 y «🔹 1. Ajusta la tensión de la cadena» en h3.
-- Después, `limpiarLexical` quita cualquier salto de nivel. Resultado en los 53: **124 h2, 39 h3 y 1 h4**, sin saltos, y todos empiezan en h2.
+- Después, `limpiarLexical` quita cualquier salto de nivel. Resultado en los 53: **145 h2, 43 h3 y 1 h4**, sin saltos, y todos empiezan en h2.
 - Se quita la negrita del texto del título (el estilo lo pone la plantilla) y los espacios de los extremos.
+
+**Dos arreglos que salieron de la verificación** (el verificador refutó dos cifras de la primera versión):
+
+- **Los encabezados que ya venían de WordPress conservaban la negrita** (21 títulos en 9 artículos). Ahora se les quita a todos, no solo a los convertidos: **0 títulos con negrita**.
+- **Un `<div>` con solo texto pasa a párrafo antes de desenvolver los contenedores.** Sin eso, dos seguidos quedaban pegados en uno («Capacidades de la línea» + «80/40» → «línea80/40»). Afecta a 2 artículos (64 bloques). En `bombas-de-alta-presion-…` recupera la estructura entera, que antes salía en unos pocos párrafos largos. Además, la comparación de la negrita ignora los espacios, porque puede venir partida en varios `<strong>`.
+- **En el límite, aceptado por el criterio:** en `bombas-de-alta-presion-…` los modelos («80/40», «100/40»…) salen como título sobre su lista de capacidades, y la línea «80/40, 100/40… y 250/40» también.
 
 **Lo que se queda plano, a sabiendas:** listas de títulos sin marca, como «Retrocargadoras · Cargadores frontales · Minicargadores» bajo «¿En qué maquinaria debemos prestar especial atención?», quedan todas en h2. No hay señal fiable de que sean subapartados, y un h2 de más no rompe nada.
 

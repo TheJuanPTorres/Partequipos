@@ -320,7 +320,9 @@ export function tituloEnNegrita(p: {
 }): VeredictoNegrita | null {
   const texto = p.texto.replace(/\s+/g, " ").trim();
   const negrita = p.negrita.replace(/\s+/g, " ").trim();
-  if (!texto || negrita !== texto) return null;
+  // Sin espacios al comparar: la negrita puede venir partida en varios
+  // <strong> sin espacio entre ellos («la línea» + «80/40»).
+  if (!texto || negrita.replace(/\s/g, "") !== texto.replace(/\s/g, "")) return null;
   if (texto.length > MAX_TITULO_NEGRITA) return { titulo: false, motivo: "largo" };
   if (p.saltos) return { titulo: false, motivo: "salto de línea" };
   if (/[.…]$/.test(texto)) return { titulo: false, motivo: "punto final" };

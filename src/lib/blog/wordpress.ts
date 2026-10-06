@@ -140,36 +140,175 @@ export function esMismaImagen(guardado: string, determinista: string): boolean {
   );
 }
 
+/** Palabras que delatan una frase en español (para no usar títulos en inglés como alt). */
+const PALABRAS_ES = new Set([
+  "de",
+  "del",
+  "la",
+  "las",
+  "el",
+  "los",
+  "para",
+  "en",
+  "y",
+  "con",
+  "por",
+  "un",
+  "una",
+  "sus",
+]);
+
 /**
- * Texto alternativo para la `Media`: el de WordPress si sirve; si no (vacío,
- * genérico o el nombre del fichero), uno de respaldo con el título del
- * artículo, que hay que revisar en el panel (sale en el informe).
+ * El TÍTULO o el PIE DE FOTO de la imagen en WordPress como texto alternativo,
+ * solo si describe algo: al menos tres palabras, alguna en español, sin
+ * identificadores sueltos (`IMG_0556`, `a0ce467c-…`, `Gemini_Generated_Image…`).
+ * Medido el 2026-10-06: casi todos los títulos son el nombre del fichero; unos
+ * pocos sí describen (`sistema-hidráulico-del-pistón…`).
  */
-export function altParaMedia(
-  altWp: string | null | undefined,
-  titulo: string,
-  n: number,
-  fichero: string,
-): { alt: string; deRespaldo: boolean } {
-  const propio = textoPlano(altWp ?? "");
-  if (!motivoAltFlojo(propio, fichero)) return { alt: propio, deRespaldo: false };
+export function textoDescriptivo(bruto: string | null | undefined): string | null {
+  const t = textoPlano(bruto ?? "")
+    .replace(/\.(jpe?g|png|webp|avif|svg|gif)$/i, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+\d+x\d+$|\s+\d+$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!t) return null;
+  if (/[0-9a-f]{8}|gemini|^img|^images?|^dsc|^version/i.test(t)) return null;
+  const palabras = t
+    .toLowerCase()
+    .split(" ")
+    .filter((w) => /\p{L}{2,}/u.test(w));
+  if (palabras.length < 3 || !palabras.some((w) => PALABRAS_ES.has(w))) return null;
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+export type OrigenAlt =
+  "wordpress" | "pie de foto" | "título de la imagen" | "sección" | "respaldo";
+
+/**
+ * Texto alternativo para la `Media`, de mejor a peor fuente:
+ *
+ * 1. el `alt` de WordPress, si sirve (regla de `altFlojo`, #67);
+ * 2. el pie de foto o el título de la imagen en WordPress, si describen algo;
+ * 3. el encabezado de la sección del artículo donde va la imagen;
+ * 4. uno de respaldo con el título del artículo.
+ *
+ * Los dos últimos empiezan por «Ilustración» y quedan MARCADOS para que el
+ * editor los revise (se buscan así en «Imágenes»).
+ */
+export function altParaMedia(p: {
+  altWp?: string | null;
+  pieWp?: string | null;
+  tituloWp?: string | null;
+  seccion?: string | null;
+  titulo: string;
+  n: number;
+  fichero: string;
+}): { alt: string; origen: OrigenAlt; marcado: boolean } {
+  const propio = textoPlano(p.altWp ?? "");
+  if (!motivoAltFlojo(propio, p.fichero))
+    return { alt: propio, origen: "wordpress", marcado: false };
+  for (const [bruto, origen] of [
+    [p.pieWp, "pie de foto"],
+    [p.tituloWp, "título de la imagen"],
+  ] as const) {
+    const t = textoDescriptivo(bruto);
+    if (t && !motivoAltFlojo(t, p.fichero)) return { alt: t, origen, marcado: false };
+  }
+  const seccion = textoPlano(p.seccion ?? "").replace(/[:.]+$/, "");
+  if (seccion && seccion.length <= 120) {
+    return {
+      alt: `Ilustración de «${seccion}», en el artículo «${p.titulo}»`,
+      origen: "sección",
+      marcado: true,
+    };
+  }
   return {
-    alt: `Ilustración del artículo «${titulo}»${n > 1 ? ` (${n})` : ""}`,
-    deRespaldo: true,
+    alt: `Ilustración del artículo «${p.titulo}»${p.n > 1 ? ` (${p.n})` : ""}`,
+    origen: "respaldo",
+    marcado: true,
   };
 }
 
-/** Enlace interno del sitio actual → ruta relativa (las URL del sitio nuevo son las mismas). */
+/** ¿Lo escribió el importador (y se puede rehacer), o ya lo tocó un editor? */
+export const esAltGenerado = (alt: string | null | undefined) =>
+  /^Ilustración (del artículo|de «)/.test(alt ?? "");
+
+/**
+ * Enlace interno del sitio actual → RUTA RELATIVA (las URL del sitio nuevo son
+ * las mismas), sin codificar y con la barra final de las URL del sitio
+ * (`trailingSlash`). Los enlaces a ficheros (`/wp-content/…`), a otros sitios,
+ * anclas y `mailto:` quedan tal cual.
+ */
 export function enlaceInterno(href: string): string {
   try {
     const u = new URL(href);
     if (/^(www\.)?partequipos\.com$/i.test(u.hostname) && !/\/wp-content\//.test(u.pathname)) {
-      return `${u.pathname}${u.search}${u.hash}`;
+      return `${normalizarRuta(u.pathname)}${u.search}${u.hash}`;
     }
   } catch {
     // Relativo, ancla o `mailto:`: tal cual.
   }
   return href;
+}
+
+/** `/a/b` → `/a/b/`, decodificada; un fichero (con extensión) sin barra. */
+export function normalizarRuta(ruta: string): string {
+  let r = ruta;
+  try {
+    r = decodeURIComponent(ruta);
+  } catch {
+    // Mal codificada: tal cual.
+  }
+  if (!r.startsWith("/")) r = `/${r}`;
+  if (!r.endsWith("/") && !/\.[a-z0-9]{2,5}$/i.test(r)) r = `${r}/`;
+  return r;
+}
+
+type NodoLx = { type: string; tag?: string; format?: unknown; text?: string; children?: NodoLx[] };
+
+const textoNodo = (n: NodoLx): string =>
+  typeof n.text === "string" ? n.text : (n.children ?? []).map(textoNodo).join("");
+
+/**
+ * Limpieza mecánica del contenido ya convertido a Lexical (2026-10-06):
+ * fuera las alineaciones heredadas (`justify` y `center`, de estilos en línea
+ * de WordPress), fuera los párrafos vacíos, y encabezados sin saltos de nivel:
+ * el primero es un h2 (el h1 es el título de la página) y ninguno baja más de
+ * un nivel respecto al anterior.
+ */
+export function limpiarLexical(raiz: { children?: NodoLx[] }): {
+  alineaciones: number;
+  vacios: number;
+  niveles: number;
+} {
+  const r = { alineaciones: 0, vacios: 0, niveles: 0 };
+  const visitar = (n: NodoLx) => {
+    if ((n.type === "paragraph" || n.type === "heading") && n.format) {
+      n.format = "";
+      r.alineaciones++;
+    }
+    (n.children ?? []).forEach(visitar);
+  };
+  const hijos = (raiz.children ?? []).filter((n) => {
+    const vacio = n.type === "paragraph" && !textoNodo(n).trim();
+    if (vacio) r.vacios++;
+    return !vacio;
+  });
+  hijos.forEach(visitar);
+  let anterior = 1;
+  for (const n of hijos) {
+    if (n.type !== "heading" || !n.tag) continue;
+    const nivel = Number(n.tag.slice(1));
+    const nuevo = Math.max(2, Math.min(nivel, anterior + 1));
+    if (nuevo !== nivel) {
+      n.tag = `h${nuevo}`;
+      r.niveles++;
+    }
+    anterior = nuevo;
+  }
+  raiz.children = hijos;
+  return r;
 }
 
 /** Shortcodes de WordPress que quedan como texto (`[if …]`, `[endif]`…): se quitan y se cuentan. */

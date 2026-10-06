@@ -65,13 +65,17 @@ import {
   altParaMedia,
   entradillaDeExtracto,
   enlaceInterno,
+  esAltGenerado,
   esAvif,
   esMismaImagen,
   extraerJsonWp,
   formatoPorExtension,
+  limpiarLexical,
   nombreDeFicheroWp,
+  normalizarRuta,
   quitarShortcodes,
   textoPlano,
+  type OrigenAlt,
   urlImagenCorregida,
   valoresUnicos,
 } from "../../src/lib/blog/wordpress";
@@ -271,7 +275,14 @@ type PostWp = {
     og_image?: { url: string }[];
   };
 };
-type MediaWp = { id: number; source_url: string; alt_text: string; mime_type: string };
+type MediaWp = {
+  id: number;
+  source_url: string;
+  alt_text: string;
+  mime_type: string;
+  title?: { rendered: string };
+  caption?: { rendered: string };
+};
 type CategoriaWp = { id: number; slug: string; name: string; description: string };
 
 const posts = (await pedirJson(`${WP}/posts?per_page=100&status=publish`)) as PostWp[];
@@ -289,6 +300,65 @@ for (let i = 0; i < idsMedia.length; i += 100) {
   for (const m of lote) mediaWp.set(m.id, m);
 }
 
+// Título y pie de foto de las imágenes del CUERPO (llevan la clase `wp-image-N`).
+const idsCuerpo = [
+  ...new Set(
+    posts.flatMap((p) =>
+      [...p.content.rendered.matchAll(/wp-image-(\d+)/g)].map((m) => Number(m[1])),
+    ),
+  ),
+].filter((id) => !mediaWp.has(id));
+for (let i = 0; i < idsCuerpo.length; i += 100) {
+  const lote = (await pedirJson(
+    `${WP}/media?include=${idsCuerpo.slice(i, i + 100).join(",")}&per_page=100`,
+  )) as MediaWp[];
+  for (const m of lote) mediaWp.set(m.id, m);
+}
+
+// Todas las rutas de url-map.csv (650): destino de los enlaces internos.
+const rutasMapa = new Set(
+  fs
+    .readFileSync(path.join(process.cwd(), "docs", "url-map.csv"), "utf8")
+    .split(/\r?\n/)
+    .slice(1)
+    .filter((l) => l.trim())
+    .map((l) => normalizarRuta(new URL(l.split('","')[0]!.replace(/^"/, "")).pathname)),
+);
+
+/*
+ * ENLACES INTERNOS a rutas que no están en url-map.csv: se pregunta a
+ * WordPress (HEAD, sin seguir) adónde las lleva hoy. Si las redirige a una
+ * ruta del mapa, el enlace pasa a esa ruta; si no, se queda y va al informe.
+ */
+const destinoEnlace = new Map<string, string>();
+const sinDestino = new Map<string, Set<string>>();
+for (const post of posts) {
+  for (const m of post.content.rendered.matchAll(/<a\s[^>]*href="([^"]+)"/g)) {
+    const rel = enlaceInterno(m[1]!.replace(/&amp;/g, "&"));
+    if (!rel.startsWith("/")) continue;
+    const ruta = normalizarRuta(rel.split(/[?#]/)[0]!);
+    if (rutasMapa.has(ruta) || destinoEnlace.has(ruta) || sinDestino.has(ruta)) {
+      sinDestino.get(ruta)?.add(post.slug);
+      continue;
+    }
+    await turno();
+    const r = await fetch(`https://partequipos.com${ruta}`, {
+      method: "HEAD",
+      redirect: "manual",
+      headers: { "User-Agent": AGENTE },
+    }).catch(() => null);
+    const hacia = r?.headers.get("location");
+    const destino = hacia
+      ? normalizarRuta(new URL(hacia, "https://partequipos.com").pathname)
+      : null;
+    if (destino && rutasMapa.has(destino)) destinoEnlace.set(ruta, destino);
+    else sinDestino.set(ruta, new Set([post.slug]));
+  }
+}
+log(
+  `enlaces internos fuera del mapa: ${destinoEnlace.size} redirigidos por WordPress a una ruta del mapa, ${sinDestino.size} sin destino`,
+);
+
 const mapa = new Set(
   fs
     .readFileSync(path.join(process.cwd(), "docs", "url-map.csv"), "utf8")
@@ -301,7 +371,7 @@ const descripcionesUnicas = valoresUnicos(posts.map((p) => p.yoast_head_json?.de
 
 // ---------- Imágenes ----------
 
-type Imagen = { urlWp: string; alt: string | null };
+type Imagen = { urlWp: string; alt: string | null; idWp: number | null; seccion: string | null };
 type ResultadoImagen =
   | {
       estado: "subida" | "reutilizada" | "simulada";
@@ -309,10 +379,14 @@ type ResultadoImagen =
       deRespaldo: boolean;
       corregida: boolean;
       convertida: boolean;
+      origen: OrigenAlt;
+      altRehecho: boolean;
     }
   | { estado: "omitida"; motivo: string; urlWp: string };
 
 const porFichero = new Map<string, number>();
+/** Texto alternativo actual de cada `Media` encontrada (para rehacer solo los generados). */
+const altActual = new Map<number, string>();
 /** Copias repetidas de una misma imagen de WordPress (se borran al final, ver abajo). */
 const duplicadas = new Map<number, string>();
 
@@ -335,6 +409,7 @@ async function mediaPorFichero(fichero: string): Promise<number | null> {
   });
   const iguales = r.docs.filter((d) => d.filename && esMismaImagen(d.filename, fichero));
   const id = iguales[0]?.id ?? null;
+  if (iguales[0]) altActual.set(iguales[0].id, iguales[0].alt ?? "");
   for (const d of iguales.slice(1)) duplicadas.set(d.id, d.filename ?? "");
   if (id) porFichero.set(fichero, id);
   return id;
@@ -353,14 +428,53 @@ async function imagenAMedia(img: Imagen, titulo: string, n: number): Promise<Res
   }
   // Un AVIF se guarda como WebP: el nombre determinista lleva ya la extensión nueva.
   const fichero = nombreDeFicheroWp(url).replace(/\.avif$/i, ".webp");
-  const { alt, deRespaldo } = altParaMedia(img.alt, titulo, n, fichero);
+  const wp = img.idWp ? mediaWp.get(img.idWp) : undefined;
+  const {
+    alt,
+    origen,
+    marcado: deRespaldo,
+  } = altParaMedia({
+    altWp: img.alt,
+    pieWp: wp?.caption?.rendered,
+    tituloWp: wp?.title?.rendered,
+    seccion: img.seccion,
+    titulo,
+    n,
+    fichero,
+  });
   const ya = await mediaPorFichero(fichero);
-  if (ya) return { estado: "reutilizada", id: ya, deRespaldo, corregida, convertida: avif };
+  if (ya) {
+    // Solo se rehace un alt que escribió el importador: lo que tocó un editor, no.
+    const actual = altActual.get(ya) ?? "";
+    let altRehecho = false;
+    if (modo === "importar" && esAltGenerado(actual) && actual !== alt) {
+      await payload.update({ collection: "media", id: ya, data: { alt }, overrideAccess: true });
+      altActual.set(ya, alt);
+      altRehecho = true;
+    }
+    return {
+      estado: "reutilizada",
+      id: ya,
+      deRespaldo,
+      corregida,
+      convertida: avif,
+      origen,
+      altRehecho,
+    };
+  }
   if (modo === "simular") {
     const fallo = await existe(url);
     if (fallo)
       return { estado: "omitida", motivo: `no se puede descargar (${fallo})`, urlWp: img.urlWp };
-    return { estado: "simulada", id: null, deRespaldo, corregida, convertida: avif };
+    return {
+      estado: "simulada",
+      id: null,
+      deRespaldo,
+      corregida,
+      convertida: avif,
+      origen,
+      altRehecho: false,
+    };
   }
   const d = await descargar(url);
   if ("error" in d)
@@ -385,7 +499,15 @@ async function imagenAMedia(img: Imagen, titulo: string, n: number): Promise<Res
       url: doc.url ?? "",
     });
     guardarManifiesto();
-    return { estado: "subida", id: doc.id, deRespaldo, corregida, convertida: avif };
+    return {
+      estado: "subida",
+      id: doc.id,
+      deRespaldo,
+      corregida,
+      convertida: avif,
+      origen,
+      altRehecho: false,
+    };
   } catch (e) {
     return {
       estado: "omitida",
@@ -421,6 +543,9 @@ const DESENVOLVER = new Set([
   "FONT",
 ]);
 
+let enlacesInternos = 0;
+let enlacesRedirigidos = 0;
+
 /** Bloques de plugins de WordPress que se quitan del contenido (selector → nombre en el informe). */
 const PLUGINS: [string, string][] = [[".kk-star-ratings", "valoración (kk-star-ratings)"]];
 
@@ -452,6 +577,24 @@ function aplanar(html: string): Aplanado {
     }
   }
 
+  // La SECCIÓN de cada imagen: el último encabezado (o párrafo corto todo en
+  // negrita, que es como titulan casi todas las entradas) antes de ella.
+  const seccionDe = new Map<unknown, string>();
+  let seccion: string | null = null;
+  for (const e of [...cuerpo.querySelectorAll("h1, h2, h3, h4, h5, h6, p, img")]) {
+    if (e.tagName === "IMG") {
+      if (seccion) seccionDe.set(e, seccion);
+      continue;
+    }
+    const texto = textoPlano(e.innerHTML);
+    const negrita = [...e.querySelectorAll("strong, b")]
+      .map((b) => textoPlano(b.innerHTML))
+      .join(" ");
+    const esTitulo =
+      e.tagName !== "P" || (texto.length > 0 && texto.length < 90 && negrita.trim() === texto);
+    if (esTitulo && texto) seccion = texto;
+  }
+
   // Imágenes → marcador (si van dentro de un enlace a la propia imagen, el enlace también).
   for (const img of [...cuerpo.querySelectorAll("img")]) {
     const src = img.getAttribute("src") ?? "";
@@ -459,7 +602,13 @@ function aplanar(html: string): Aplanado {
       img.remove();
       continue;
     }
-    imagenes.push({ urlWp: src, alt: img.getAttribute("alt") });
+    const idWp = Number((img.getAttribute("class") ?? "").match(/wp-image-(\d+)/)?.[1]) || null;
+    imagenes.push({
+      urlWp: src,
+      alt: img.getAttribute("alt"),
+      idWp,
+      seccion: seccionDe.get(img) ?? null,
+    });
     const marca = doc.createElement("p");
     marca.textContent = MARCA_IMG(imagenes.length);
     const enlace = img.closest("a");
@@ -494,9 +643,19 @@ function aplanar(html: string): Aplanado {
     }
   }
 
-  // Enlaces internos → rutas relativas.
+  // Enlaces internos → rutas relativas; las que WordPress redirige a una ruta
+  // del mapa, a esa ruta (`destinoEnlace`, resuelto arriba).
   for (const a of [...cuerpo.querySelectorAll("a[href]")]) {
-    a.setAttribute("href", enlaceInterno(a.getAttribute("href") ?? ""));
+    const rel = enlaceInterno(a.getAttribute("href") ?? "");
+    if (rel.startsWith("/")) {
+      const [ruta, resto] = [rel.split(/[?#]/)[0]!, rel.slice(rel.split(/[?#]/)[0]!.length)];
+      const destino = destinoEnlace.get(normalizarRuta(ruta));
+      a.setAttribute("href", destino ? `${destino}${resto}` : rel);
+      enlacesInternos++;
+      if (destino) enlacesRedirigidos++;
+    } else {
+      a.setAttribute("href", rel);
+    }
   }
 
   // h1 dentro del contenido → h2 (el <h1> de la página es el título).
@@ -626,6 +785,9 @@ type Entrada = {
   noConvertibles: string[];
   textoConservado: number;
   seo: { titulo: boolean; descripcion: boolean };
+  alt: Partial<Record<OrigenAlt, number>>;
+  altRehechos: number;
+  limpieza: { alineaciones: number; vacios: number; niveles: number };
 };
 const informe: Entrada[] = [];
 
@@ -661,6 +823,9 @@ for (const post of [...posts].sort((a, b) => a.date_gmt.localeCompare(b.date_gmt
     noConvertibles: [],
     textoConservado: 0,
     seo: { titulo: false, descripcion: false },
+    alt: {},
+    altRehechos: 0,
+    limpieza: { alineaciones: 0, vacios: 0, niveles: 0 },
   };
   try {
     const plano = aplanar(post.content.rendered);
@@ -686,12 +851,15 @@ for (const post of [...posts].sort((a, b) => a.date_gmt.localeCompare(b.date_gmt
       if (r.deRespaldo) entrada.imagenes.altDeRespaldo++;
       if (r.corregida) entrada.imagenes.urlCorregidas++;
       if (r.convertida) entrada.imagenes.avifAWebp++;
+      entrada.alt[r.origen] = (entrada.alt[r.origen] ?? 0) + 1;
+      if (r.altRehecho) entrada.altRehechos++;
       ids.push(r.id);
     }
 
     const estado = convertHTMLToLexical({ editorConfig, html: plano.html, JSDOM: DomFeliz });
     const raiz = estado.root as unknown as NodoLexical;
     ponerImagenes(raiz, ids);
+    entrada.limpieza = limpiarLexical(raiz as never);
 
     const antes = textoPlano(plano.html.replace(/@@IMAGEN-\d+@@/g, "")).replace(/\s/g, "").length;
     const despues = textoDeLexical(raiz).replace(/\s/g, "").length;
@@ -700,10 +868,16 @@ for (const post of [...posts].sort((a, b) => a.date_gmt.localeCompare(b.date_gmt
     let destacada: number | null = null;
     const m = mediaWp.get(post.featured_media);
     if (m) {
-      const r = await imagenAMedia({ urlWp: m.source_url, alt: m.alt_text }, titulo, 1);
+      const r = await imagenAMedia(
+        { urlWp: m.source_url, alt: m.alt_text, idWp: m.id, seccion: null },
+        titulo,
+        1,
+      );
       if (r.estado === "omitida") entrada.destacada = `omitida: ${r.motivo}`;
       else {
         entrada.destacada = r.convertida ? `${r.estado} (AVIF → WebP)` : r.estado;
+        entrada.alt[r.origen] = (entrada.alt[r.origen] ?? 0) + 1;
+        if (r.altRehecho) entrada.altRehechos++;
         destacada = r.id;
       }
     }
@@ -805,7 +979,18 @@ if (modo === "importar" && duplicadas.size > 0) {
 
 fs.mkdirSync(CARPETA, { recursive: true });
 const fichero = path.join(CARPETA, `informe-${modo}-${destino}.json`);
-fs.writeFileSync(fichero, JSON.stringify(informe, null, 2));
+fs.writeFileSync(
+  fichero,
+  JSON.stringify(
+    {
+      entradas: informe,
+      enlacesRedirigidos: Object.fromEntries(destinoEnlace),
+      enlacesSinDestino: Object.fromEntries([...sinDestino].map(([k, v]) => [k, [...v]])),
+    },
+    null,
+    2,
+  ),
+);
 
 const ok = informe.filter((e) => e.estado === "ok");
 const suma = (f: (e: Entrada) => number) => informe.reduce((s, e) => s + f(e), 0);
@@ -836,6 +1021,20 @@ log(
   `tablas pasadas a párrafos: ${suma((e) => e.tablasAParrafos)} · shortcodes quitados: ${suma((e) => e.shortcodesQuitados.length)} · quitados o no convertibles: ${cuenta(informe.flatMap((e) => e.noConvertibles))}`,
 );
 log(`texto conservado (mín.): ${Math.min(...informe.map((e) => e.textoConservado))} %`);
+log(
+  `limpieza: alineaciones ${suma((e) => e.limpieza.alineaciones)} · párrafos vacíos ${suma((e) => e.limpieza.vacios)} · niveles de encabezado ${suma((e) => e.limpieza.niveles)}`,
+);
+log(
+  `alt por origen (imágenes del cuerpo y destacadas): ${JSON.stringify(
+    informe.reduce<Record<string, number>>((a, e) => {
+      for (const [k, v] of Object.entries(e.alt)) a[k] = (a[k] ?? 0) + (v ?? 0);
+      return a;
+    }, {}),
+  )} · rehechos: ${suma((e) => e.altRehechos)}`,
+);
+log(
+  `enlaces internos: ${enlacesInternos} · a la ruta del mapa por redirección de WordPress: ${enlacesRedirigidos} · rutas sin destino: ${[...sinDestino.keys()].join(", ") || "ninguna"}`,
+);
 log(
   `SEO de Yoast importado: título ${informe.filter((e) => e.seo.titulo).length} · descripción ${informe.filter((e) => e.seo.descripcion).length}`,
 );

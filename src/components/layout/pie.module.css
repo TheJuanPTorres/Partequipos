@@ -96,6 +96,19 @@
   }
 }
 
+/*
+ * PÁGINAS CON SU PROPIA LLAMADA A LA ACCIÓN: sin la tarjeta roja, y sin la
+ * reserva del vuelo de su imagen (va dentro de la tarjeta). El marcador lo
+ * pinta la página desde el servidor (`PieSinTarjeta.tsx`).
+ */
+:global(body:has([data-pie-sin-tarjeta])) .marco {
+  display: none;
+}
+
+:global(body:has([data-pie-sin-tarjeta])) .pie[data-con-imagen] {
+  margin-top: var(--pie-margen);
+}
+
 .lema {
   max-width: 610px;
   margin: 0;

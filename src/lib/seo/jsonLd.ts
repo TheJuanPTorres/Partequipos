@@ -156,11 +156,24 @@ export type ArticleJsonLdInput = {
 };
 
 /**
+ * Autor de un artículo (decisión de dirección, 2026-10-06): sin firma, o con
+ * la de la empresa, es la `Organization` («Partequipos»); con un nombre de
+ * persona escrito en el panel, una `Person`.
+ */
+export function autorJsonLd(autor: string | null | undefined): JsonLdObject {
+  const nombre = autor?.trim();
+  if (!nombre || nombre.toLowerCase() === seoConfig.siteName.toLowerCase()) {
+    return { "@type": "Organization", name: seoConfig.siteName, url: absoluteUrl("/") };
+  }
+  return { "@type": "Person", name: nombre };
+}
+
+/**
  * JSON-LD `Article` para las fichas del blog.
  *
  * Los campos ausentes se **omiten** en vez de emitirse vacíos, igual que en el
- * resto de constructores: un `author` con cadena vacía es peor que no declarar
- * autor, porque afirma algo falso.
+ * resto de constructores. El autor siempre está: sin firma, la empresa
+ * (`autorJsonLd`).
  *
  * El `publisher` sale de `Organization`, que ya construye este módulo desde
  * `seoConfig`: no se repiten aquí los datos de la empresa.
@@ -185,7 +198,7 @@ export function buildArticleJsonLd(input: ArticleJsonLdInput): JsonLdObject {
 
   if (descripcion?.trim()) jsonLd.description = descripcion.trim();
   if (fechaModificacion?.trim()) jsonLd.dateModified = fechaModificacion.trim();
-  if (autor?.trim()) jsonLd.author = { "@type": "Person", name: autor.trim() };
+  jsonLd.author = autorJsonLd(autor);
   if (imagenUrl?.trim()) jsonLd.image = [absoluteUrl(imagenUrl.trim())];
 
   return jsonLd;

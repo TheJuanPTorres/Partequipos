@@ -6,6 +6,7 @@ import {
   decodificarEntidades,
   enlaceInterno,
   entradillaDeExtracto,
+  esAvif,
   esMismaImagen,
   extraerJsonWp,
   formatoPorExtension,
@@ -59,6 +60,12 @@ describe("importador del blog: piezas puras", () => {
     for (const e of ["avif", "gif", "svg", ""]) {
       assert.equal(formatoPorExtension(`https://x/a.${e}`), null);
     }
+  });
+
+  it("reconoce AVIF por la extensión, con o sin consulta", () => {
+    assert.equal(esAvif("https://x/a/foto-1024x576.avif"), true);
+    assert.equal(esAvif("https://x/a/foto.AVIF?ver=2"), true);
+    assert.equal(esAvif("https://x/a/foto.webp"), false);
   });
 
   it("nombre de fichero determinista con año y mes, sin tildes ni puntos dobles", () => {

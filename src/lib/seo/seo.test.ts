@@ -3,7 +3,13 @@ import { describe, it } from "node:test";
 
 import { buildMetadata } from "./buildMetadata";
 import { absoluteUrl, seoConfig } from "./config";
-import { buildBreadcrumbJsonLd, buildOrganizationJsonLd, buildProductJsonLd } from "./jsonLd";
+import {
+  autorJsonLd,
+  buildArticleJsonLd,
+  buildBreadcrumbJsonLd,
+  buildOrganizationJsonLd,
+  buildProductJsonLd,
+} from "./jsonLd";
 
 // Las pruebas fijan la base para que las URLs absolutas sean deterministas.
 process.env.NEXT_PUBLIC_SERVER_URL = "https://partequipos.com";
@@ -172,6 +178,25 @@ describe("buildProductJsonLd", () => {
   it("es serializable a JSON", () => {
     const jsonLd = buildProductJsonLd({ nombre: "M", path: "/m" });
     assert.doesNotThrow(() => JSON.stringify(jsonLd));
+  });
+});
+
+describe("autor del Article", () => {
+  it("sin firma o con la de la empresa es la Organization «Partequipos»", () => {
+    for (const autor of [undefined, null, "", "  ", "Partequipos", "PARTEQUIPOS"]) {
+      const a = autorJsonLd(autor);
+      assert.equal(a["@type"], "Organization");
+      assert.equal(a.name, "Partequipos");
+    }
+  });
+
+  it("con un nombre de persona es una Person", () => {
+    assert.deepEqual(autorJsonLd(" Ana Gómez "), { "@type": "Person", name: "Ana Gómez" });
+  });
+
+  it("el Article siempre lleva autor", () => {
+    const a = buildArticleJsonLd({ titulo: "T", path: "/t", fechaPublicacion: "2026-01-01" });
+    assert.equal((a.author as Record<string, unknown>)["@type"], "Organization");
   });
 });
 

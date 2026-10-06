@@ -77,7 +77,11 @@ export const Articulo: CollectionConfig = {
       name: "autor",
       type: "text",
       label: "Autor",
-      admin: { position: "sidebar", description: "Firma que aparece en el artículo." },
+      admin: {
+        position: "sidebar",
+        description:
+          "Firma que aparece en el artículo. Vacío: «Partequipos». Con un nombre de persona, los buscadores lo leen como autor (persona); con «Partequipos», como la empresa.",
+      },
     },
     {
       name: "entradilla",

@@ -7,6 +7,13 @@ import { motivoAltFlojo } from "../media/altFlojo";
  */
 
 /**
+ * Firma de los artículos importados (decisión de dirección, 2026-10-06): en
+ * WordPress todas dicen «Analista.Mercadeo». Se cambia por artículo en el
+ * panel; en el JSON-LD, «Partequipos» es una `Organization`.
+ */
+export const FIRMA_POR_DEFECTO = "Partequipos";
+
+/**
  * La API REST del WordPress de partequipos.com antepone a cada respuesta JSON
  * los `<style>` de Elementor de cada entrada (un plugin escribe en la salida).
  * Se lee desde el primer `[` o `{` que abre el JSON de verdad.
@@ -92,6 +99,11 @@ export function formatoPorExtension(url: string): FormatoImagen | null {
   if (ext === "png") return "png";
   if (ext === "webp") return "webp";
   return null;
+}
+
+/** AVIF: `Media` no lo admite de entrada (§10.28); el importador lo convierte a WebP. */
+export function esAvif(url: string): boolean {
+  return /\.avif$/i.test(url.split(/[?#]/)[0]!);
 }
 
 /**

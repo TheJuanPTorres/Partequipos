@@ -1,25 +1,40 @@
 /**
  * IMPORTADOR DEL BLOG desde el WordPress actual (partequipos.com) a Payload.
- * SOLO PREVIEW. Lee la API REST pública de WordPress, SIN credenciales.
+ * Lee la API REST pública de WordPress, SIN credenciales.
  *
- *   npm run preview:blog:simular     (no escribe nada; informe de lo que haría)
- *   npm run preview:blog:importar    (crea o actualiza; repetirlo no duplica)
+ *   npx payload run scripts/blog/importar-wordpress.ts <modo> <destino> [manifiesto=<ruta>]
+ *
+ *   modo:     simular  → no escribe nada; informe de lo que haría
+ *             importar → crea o actualiza; repetirlo no duplica
+ *             retirar  → deshace EXACTAMENTE lo que hizo la importación (manifiesto)
+ *   destino:  preview    → base y Blob del preview (`npm run preview:blog:*`)
+ *             produccion → base Y token del almacén de producción (solo dirección, con runbook)
+ *             prueba     → una base desechable y el almacén del preview
+ *
+ * Argumentos POSICIONALES: `payload run` descarta las banderas con guiones.
  *
  * Qué trae de cada entrada: título, slug (el mismo, para que la URL no cambie),
- * fecha, autor, categoría, extracto (→ entradilla), contenido (→ Lexical, con
- * las imágenes del cuerpo copiadas a `Media`), imagen destacada con su texto
+ * fecha, categoría, extracto (→ entradilla), contenido (→ Lexical, con las
+ * imágenes del cuerpo copiadas a `Media`), imagen destacada con su texto
  * alternativo y el SEO de Yoast (solo el que no está repetido, ver
- * `valoresUnicos`).
+ * `valoresUnicos`). La firma es «Partequipos» (decisión de dirección): en
+ * WordPress todas dicen «Analista.Mercadeo»; se cambia por artículo en el panel.
  *
- * - SOLO preview: guardián de base y almacén (`puedeTocarHeroDePrueba`) y la
- *   guarda del almacén (§10.37), antes de cargar Payload. También al simular,
- *   porque lee la base para decir qué crearía y qué actualizaría.
+ * - DESTINO EXPLÍCITO y validado contra la base y el almacén de la sesión
+ *   ANTES de cargar Payload (`veredictoDestino`, el mismo de la copia de
+ *   demostración), más la guarda del almacén (§10.37).
  * - EDUCADO con el servidor: una petición cada 700 ms como mucho, con un
- *   User-Agent que dice qué es. Las entradas, las categorías y las imágenes
- *   destacadas van en una petición cada una (listas con `include`).
+ *   User-Agent que dice qué es.
  * - IDEMPOTENTE: el artículo se busca por slug (se actualiza si existe) y cada
- *   imagen por un nombre de fichero determinista (`wp-AAAA-MM-<nombre>`), que
- *   se reutiliza si ya está en `Media`.
+ *   imagen por un nombre determinista (`wp-AAAA-MM-<nombre>`, que el Blob
+ *   alarga con un sufijo aleatorio: `esMismaImagen`).
+ * - AVIF → WebP con sharp (decisión de dirección): `Media` no admite AVIF de
+ *   entrada (§10.28); se convierte AQUÍ, en el script, con imágenes del propio
+ *   WordPress del cliente, nunca en el servidor del sitio.
+ * - EL MANIFIESTO (JSON, por defecto en `Desktop/partequipos-cierre/`) apunta
+ *   lo que la importación CREA (artículos, imágenes, categorías) y el valor
+ *   ANTERIOR de cada artículo que ya existía. Se escribe tras cada paso: si se
+ *   corta, se repite y sigue. `retirar` lo usa para dejarlo todo como estaba.
  * - El informe (JSON) se guarda FUERA del repositorio, en
  *   `Desktop/partequipos-diseno/wordpress/blog/`.
  *
@@ -27,7 +42,7 @@
  * texto). Antes de convertir se aplana: fuera los contenedores, cada imagen se
  * cambia por un marcador que después pasa a ser un nodo `upload`, las tablas
  * (el editor del sitio no tiene tablas) pasan a párrafos «celda · celda» y los
- * shortcodes que quedan como texto se quitan. Todo eso se cuenta en el informe.
+ * shortcodes y widgets de plugins se quitan. Todo eso se cuenta en el informe.
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -42,12 +57,15 @@ import { convertHTMLToLexical, editorConfigFactory } from "@payloadcms/richtext-
  */
 import { Window } from "happy-dom";
 import { getPayload } from "payload";
+import sharp from "sharp";
 
 import { exigirAlmacen } from "../blob/exigirAlmacen";
 import {
+  FIRMA_POR_DEFECTO,
   altParaMedia,
   entradillaDeExtracto,
   enlaceInterno,
+  esAvif,
   esMismaImagen,
   extraerJsonWp,
   formatoPorExtension,
@@ -57,22 +75,36 @@ import {
   urlImagenCorregida,
   valoresUnicos,
 } from "../../src/lib/blog/wordpress";
+import { veredictoDestino } from "../../src/lib/demo/copiaDemo";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 
-const modo = process.argv.slice(2).find((a) => a === "simular" || a === "importar");
-if (!modo) {
-  console.error("[blog] indica el modo: «simular» o «importar».");
-  process.exit(1);
-}
-const veredicto = puedeTocarHeroDePrueba(
-  process.env.DATABASE_URI,
-  process.env.BLOB_READ_WRITE_TOKEN,
-);
-if (!veredicto.permitido) {
-  console.error(`[blog] NO se hace nada: ${veredicto.motivo}`);
-  process.exit(1);
+// ---------- Argumentos y destino (antes de cargar Payload) ----------
+
+const args = process.argv.slice(2);
+const modo = args.find((a) => a === "simular" || a === "importar" || a === "retirar");
+const destino = args.find((a) => a === "preview" || a === "produccion" || a === "prueba");
+const valorDe = (k: string) => args.find((a) => a.startsWith(`${k}=`))?.slice(k.length + 1);
+const fallar = (m: string): never => {
+  const e = new Error(`[blog] ✗ ${m}`);
+  e.stack = e.message;
+  throw e;
+};
+if (!modo) fallar("indica el modo: simular, importar o retirar");
+if (!destino) fallar("indica el destino: preview, produccion o prueba");
+if (destino === "preview") {
+  const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
+  if (!v.permitido) fallar(`NO se hace nada: ${v.motivo}`);
+} else {
+  const v = veredictoDestino(destino, process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
+  if (!v.valido) fallar(`destino no válido, no se hace nada: ${v.motivo}`);
+  // La guarda de las colecciones (§10.37) espera, fuera de Vercel, el almacén
+  // del preview: aquí se DECLARA el del destino, ya validado con su base.
+  if (v.valido) process.env.ALMACEN_BLOB_ESPERADO = v.almacen;
 }
 exigirAlmacen("[blog]");
+const MANIFIESTO =
+  valorDe("manifiesto") ??
+  path.join(os.homedir(), "Desktop", "partequipos-cierre", `manifiesto-blog-${destino}.json`);
 
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
@@ -85,6 +117,101 @@ const AGENTE = "Partequipos-migracion/1.0 (importador del blog; solo lectura)";
 const PAUSA_MS = 700;
 const CARPETA = path.join(os.homedir(), "Desktop", "partequipos-diseno", "wordpress", "blog");
 const log = (m: string) => process.stdout.write(`[blog] ${m}\n`);
+
+// ---------- Manifiesto ----------
+
+/** Campos de un artículo que la importación escribe (y la retirada devuelve). */
+const CAMPOS = [
+  "titulo",
+  "slug",
+  "fechaPublicacion",
+  "autor",
+  "entradilla",
+  "categoria",
+  "imagenDestacada",
+  "contenido",
+  "seo",
+] as const;
+type Anterior = Record<(typeof CAMPOS)[number], unknown>;
+type Manifiesto = {
+  destino: string;
+  creado: {
+    articulos: number[];
+    media: { id: number; filename: string; url: string }[];
+    categorias: number[];
+  };
+  anteriores: Record<string, Anterior>;
+};
+const manifiesto: Manifiesto = fs.existsSync(MANIFIESTO)
+  ? (JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto)
+  : { destino: destino!, creado: { articulos: [], media: [], categorias: [] }, anteriores: {} };
+if (manifiesto.destino !== destino) {
+  fallar(`el manifiesto ${MANIFIESTO} es del destino «${manifiesto.destino}», no de «${destino}»`);
+}
+function guardarManifiesto() {
+  if (modo !== "importar") return;
+  fs.mkdirSync(path.dirname(MANIFIESTO), { recursive: true });
+  fs.writeFileSync(MANIFIESTO, JSON.stringify(manifiesto, null, 2));
+}
+
+// ---------- Retirada ----------
+
+/**
+ * Deshace EXACTAMENTE lo que apunta el manifiesto: devuelve cada artículo que
+ * ya existía a su valor anterior, borra los artículos, las imágenes y las
+ * categorías que creó la importación, y comprueba que los ficheros salen del
+ * Blob. Lo que no creó la importación no se borra nunca.
+ */
+async function retirar(): Promise<void> {
+  if (!fs.existsSync(MANIFIESTO)) fallar(`no hay manifiesto (${MANIFIESTO}): nada que retirar`);
+  let devueltos = 0;
+  for (const [id, anterior] of Object.entries(manifiesto.anteriores)) {
+    await payload.update({
+      collection: "articulos",
+      id: Number(id),
+      data: anterior as never,
+      overrideAccess: true,
+    });
+    devueltos++;
+  }
+  log(`artículos devueltos a su valor anterior: ${devueltos}`);
+  let borrados = 0;
+  for (const id of manifiesto.creado.articulos) {
+    const r = await payload
+      .delete({ collection: "articulos", id, overrideAccess: true })
+      .catch(() => null);
+    if (r) borrados++;
+  }
+  log(`artículos creados y borrados: ${borrados} de ${manifiesto.creado.articulos.length}`);
+  const urls: string[] = [];
+  for (const m of manifiesto.creado.media) {
+    const r = await payload
+      .delete({ collection: "media", id: m.id, overrideAccess: true })
+      .catch(() => null);
+    if (r && m.url) urls.push(m.url);
+  }
+  log(`imágenes creadas y borradas: ${urls.length} de ${manifiesto.creado.media.length}`);
+  let categorias = 0;
+  for (const id of manifiesto.creado.categorias) {
+    const r = await payload
+      .delete({ collection: "categorias-blog", id, overrideAccess: true })
+      .catch(() => null);
+    if (r) categorias++;
+  }
+  log(`categorías creadas y borradas: ${categorias} de ${manifiesto.creado.categorias.length}`);
+  fs.renameSync(MANIFIESTO, MANIFIESTO.replace(/\.json$/, `.retirado-${Date.now()}.json`));
+  log("manifiesto retirado; espero 70 s (propagación del Blob)");
+  await new Promise((r) => setTimeout(r, 70_000));
+  const vivos: string[] = [];
+  for (const u of urls) if ((await fetch(u, { method: "HEAD" })).status !== 404) vivos.push(u);
+  if (vivos.length) fallar(`${vivos.length} ficheros siguen en el Blob`);
+  log(`✓ los ${urls.length} ficheros dan 404`);
+}
+
+if (modo === "retirar") {
+  await retirar();
+  process.exit(0);
+}
 
 // ---------- Red, con turno ----------
 
@@ -181,6 +308,7 @@ type ResultadoImagen =
       id: number | null;
       deRespaldo: boolean;
       corregida: boolean;
+      convertida: boolean;
     }
   | { estado: "omitida"; motivo: string; urlWp: string };
 
@@ -214,7 +342,8 @@ async function mediaPorFichero(fichero: string): Promise<number | null> {
 
 async function imagenAMedia(img: Imagen, titulo: string, n: number): Promise<ResultadoImagen> {
   const { url, corregida } = urlImagenCorregida(img.urlWp);
-  const formato = formatoPorExtension(url);
+  const avif = esAvif(url);
+  const formato = avif ? "webp" : formatoPorExtension(url);
   if (!formato) {
     return {
       estado: "omitida",
@@ -222,33 +351,41 @@ async function imagenAMedia(img: Imagen, titulo: string, n: number): Promise<Res
       urlWp: img.urlWp,
     };
   }
-  const fichero = nombreDeFicheroWp(url);
+  // Un AVIF se guarda como WebP: el nombre determinista lleva ya la extensión nueva.
+  const fichero = nombreDeFicheroWp(url).replace(/\.avif$/i, ".webp");
   const { alt, deRespaldo } = altParaMedia(img.alt, titulo, n, fichero);
   const ya = await mediaPorFichero(fichero);
-  if (ya) return { estado: "reutilizada", id: ya, deRespaldo, corregida };
+  if (ya) return { estado: "reutilizada", id: ya, deRespaldo, corregida, convertida: avif };
   if (modo === "simular") {
     const fallo = await existe(url);
     if (fallo)
       return { estado: "omitida", motivo: `no se puede descargar (${fallo})`, urlWp: img.urlWp };
-    return { estado: "simulada", id: null, deRespaldo, corregida };
+    return { estado: "simulada", id: null, deRespaldo, corregida, convertida: avif };
   }
   const d = await descargar(url);
   if ("error" in d)
     return { estado: "omitida", motivo: `no se puede descargar (${d.error})`, urlWp: img.urlWp };
   try {
+    const datos = avif ? await sharp(d.datos).webp({ quality: 85 }).toBuffer() : d.datos;
     const doc = await payload.create({
       collection: "media",
       data: { alt, focalX: 50, focalY: 50 },
       file: {
-        data: d.datos,
+        data: datos,
         mimetype: `image/${formato}`,
         name: fichero,
-        size: d.datos.length,
+        size: datos.length,
       },
       overrideAccess: true,
     });
     porFichero.set(fichero, doc.id);
-    return { estado: "subida", id: doc.id, deRespaldo, corregida };
+    manifiesto.creado.media.push({
+      id: doc.id,
+      filename: doc.filename ?? fichero,
+      url: doc.url ?? "",
+    });
+    guardarManifiesto();
+    return { estado: "subida", id: doc.id, deRespaldo, corregida, convertida: avif };
   } catch (e) {
     return {
       estado: "omitida",
@@ -394,10 +531,19 @@ function textoDeLexical(n: NodoLexical): string {
   return (n.children ?? []).map(textoDeLexical).join(" ");
 }
 
-function idDeNodo(): string {
-  return [...crypto.getRandomValues(new Uint8Array(12))]
+function nodoImagen(id: number): NodoLexical {
+  const idNodo = [...crypto.getRandomValues(new Uint8Array(12))]
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
+  return {
+    type: "upload",
+    version: 3,
+    format: "",
+    id: idNodo,
+    fields: null,
+    relationTo: "media",
+    value: id,
+  };
 }
 
 /** Los párrafos con el marcador de una imagen pasan a ser nodos `upload` (o desaparecen si se omitió). */
@@ -408,17 +554,7 @@ function ponerImagenes(raiz: NodoLexical, ids: (number | null)[]): void {
     const m = t.match(/^@@IMAGEN-(\d+)@@$/);
     if (n.type === "paragraph" && m) {
       const id = ids[Number(m[1]) - 1];
-      if (id) {
-        hijos.push({
-          type: "upload",
-          version: 3,
-          format: "",
-          id: idDeNodo(),
-          fields: null,
-          relationTo: "media",
-          value: id,
-        });
-      }
+      if (id) hijos.push(nodoImagen(id));
       continue;
     }
     if (/@@IMAGEN-\d+@@/.test(t)) {
@@ -426,18 +562,7 @@ function ponerImagenes(raiz: NodoLexical, ids: (number | null)[]): void {
       const sueltos = [...t.matchAll(/@@IMAGEN-(\d+)@@/g)].map((x) => ids[Number(x[1]) - 1]);
       quitarMarcadores(n);
       hijos.push(n);
-      for (const id of sueltos) {
-        if (id)
-          hijos.push({
-            type: "upload",
-            version: 3,
-            format: "",
-            id: idDeNodo(),
-            fields: null,
-            relationTo: "media",
-            value: id,
-          });
-      }
+      for (const id of sueltos) if (id) hijos.push(nodoImagen(id));
       continue;
     }
     hijos.push(n);
@@ -471,6 +596,8 @@ async function categoriaBlog(c: CategoriaWp): Promise<number | null> {
     },
     overrideAccess: true,
   });
+  manifiesto.creado.categorias.push(nueva.id);
+  guardarManifiesto();
   log(`categoría «${c.slug}» creada`);
   return nueva.id;
 }
@@ -491,6 +618,7 @@ type Entrada = {
     omitidas: { url: string; motivo: string }[];
     altDeRespaldo: number;
     urlCorregidas: number;
+    avifAWebp: number;
   };
   destacada: string;
   tablasAParrafos: number;
@@ -511,11 +639,12 @@ for (const post of [...posts].sort((a, b) => a.date_gmt.localeCompare(b.date_gmt
     limit: 1,
     overrideAccess: true,
   });
+  const previo = existente.docs[0];
   const entrada: Entrada = {
     slug,
     titulo,
     enUrlMap: mapa.has(slug),
-    accion: existente.docs[0] ? "actualizar" : "crear",
+    accion: previo ? "actualizar" : "crear",
     estado: "ok",
     imagenes: {
       subidas: 0,
@@ -524,6 +653,7 @@ for (const post of [...posts].sort((a, b) => a.date_gmt.localeCompare(b.date_gmt
       omitidas: [],
       altDeRespaldo: 0,
       urlCorregidas: 0,
+      avifAWebp: 0,
     },
     destacada: "ninguna",
     tablasAParrafos: 0,
@@ -555,6 +685,7 @@ for (const post of [...posts].sort((a, b) => a.date_gmt.localeCompare(b.date_gmt
       ]++;
       if (r.deRespaldo) entrada.imagenes.altDeRespaldo++;
       if (r.corregida) entrada.imagenes.urlCorregidas++;
+      if (r.convertida) entrada.imagenes.avifAWebp++;
       ids.push(r.id);
     }
 
@@ -572,17 +703,16 @@ for (const post of [...posts].sort((a, b) => a.date_gmt.localeCompare(b.date_gmt
       const r = await imagenAMedia({ urlWp: m.source_url, alt: m.alt_text }, titulo, 1);
       if (r.estado === "omitida") entrada.destacada = `omitida: ${r.motivo}`;
       else {
-        entrada.destacada = r.estado;
+        entrada.destacada = r.convertida ? `${r.estado} (AVIF → WebP)` : r.estado;
         destacada = r.id;
       }
     }
 
     const y = post.yoast_head_json ?? {};
-    const metaTitle =
-      y.title && titulosUnicos.has(y.title.trim()) ? decodeEntidadesSeguro(y.title) : null;
+    const metaTitle = y.title && titulosUnicos.has(y.title.trim()) ? textoPlano(y.title) : null;
     const metaDescription =
       y.description && descripcionesUnicas.has(y.description.trim())
-        ? decodeEntidadesSeguro(y.description)
+        ? textoPlano(y.description)
         : null;
     entrada.seo = { titulo: Boolean(metaTitle), descripcion: Boolean(metaDescription) };
 
@@ -594,21 +724,36 @@ for (const post of [...posts].sort((a, b) => a.date_gmt.localeCompare(b.date_gmt
         titulo,
         slug,
         fechaPublicacion: post.date_gmt.endsWith("Z") ? post.date_gmt : `${post.date_gmt}Z`,
-        autor: y.author ? textoPlano(y.author) : undefined,
+        autor: FIRMA_POR_DEFECTO,
         entradilla: entradillaDeExtracto(post.excerpt.rendered),
         categoria: categoria ?? undefined,
         imagenDestacada: destacada ?? undefined,
         contenido: estado as never,
         seo: { metaTitle, metaDescription },
       };
-      const doc = existente.docs[0]
+      if (
+        previo &&
+        !manifiesto.creado.articulos.includes(previo.id) &&
+        !manifiesto.anteriores[String(previo.id)]
+      ) {
+        // Lo que tenía ANTES de la primera importación: es lo que devuelve `retirar`.
+        manifiesto.anteriores[String(previo.id)] = Object.fromEntries(
+          CAMPOS.map((c) => [c, (previo as unknown as Record<string, unknown>)[c] ?? null]),
+        ) as Anterior;
+        guardarManifiesto();
+      }
+      const doc = previo
         ? await payload.update({
             collection: "articulos",
-            id: existente.docs[0].id,
+            id: previo.id,
             data,
             overrideAccess: true,
           })
         : await payload.create({ collection: "articulos", data, overrideAccess: true });
+      if (!previo) {
+        manifiesto.creado.articulos.push(doc.id);
+        guardarManifiesto();
+      }
       if (doc.slug !== slug)
         throw new Error(`el slug guardado («${doc.slug}») no es el de WordPress`);
     }
@@ -622,17 +767,12 @@ for (const post of [...posts].sort((a, b) => a.date_gmt.localeCompare(b.date_gmt
   );
 }
 
-function decodeEntidadesSeguro(t: string): string {
-  return textoPlano(t);
-}
-
 // ---------- Copias repetidas ----------
 
 /*
  * Copias de una misma imagen que ya no usa ningún artículo (las dejó una pasada
- * anterior a esta comprobación). Solo se borran si NADA las referencia: se
- * mira en todos los artículos (destacada y contenido) y en el resto de la base
- * por la relación de `Media`.
+ * anterior). Solo se borran las `wp-…` que NINGÚN artículo usa (destacada ni
+ * contenido).
  */
 let borradas = 0;
 if (modo === "importar" && duplicadas.size > 0) {
@@ -654,22 +794,28 @@ if (modo === "importar" && duplicadas.size > 0) {
   for (const [id, nombre] of duplicadas) {
     if (usadas.has(id) || !nombre.startsWith("wp-")) continue;
     await payload.delete({ collection: "media", id, overrideAccess: true });
+    manifiesto.creado.media = manifiesto.creado.media.filter((m) => m.id !== id);
     borradas++;
   }
   log(`copias repetidas borradas: ${borradas} de ${duplicadas.size}`);
+  guardarManifiesto();
 }
 
 // ---------- Resumen ----------
 
 fs.mkdirSync(CARPETA, { recursive: true });
-const fichero = path.join(CARPETA, `informe-${modo}.json`);
+const fichero = path.join(CARPETA, `informe-${modo}-${destino}.json`);
 fs.writeFileSync(fichero, JSON.stringify(informe, null, 2));
 
 const ok = informe.filter((e) => e.estado === "ok");
 const suma = (f: (e: Entrada) => number) => informe.reduce((s, e) => s + f(e), 0);
+const cuenta = (lista: string[]) =>
+  JSON.stringify(
+    lista.reduce<Record<string, number>>((a, n) => ({ ...a, [n]: (a[n] ?? 0) + 1 }), {}),
+  );
 log("──────── resumen ────────");
 log(
-  `modo: ${modo} · entradas: ${informe.length} · bien: ${ok.length} · fallan: ${informe.length - ok.length}`,
+  `modo: ${modo} · destino: ${destino} · entradas: ${informe.length} · bien: ${ok.length} · fallan: ${informe.length - ok.length}`,
 );
 log(
   `crear: ${informe.filter((e) => e.accion === "crear").length} · actualizar: ${informe.filter((e) => e.accion === "actualizar").length}`,
@@ -683,21 +829,22 @@ log(
   }`,
 );
 log(
-  `imágenes del cuerpo: subidas ${suma((e) => e.imagenes.subidas)} · reutilizadas ${suma((e) => e.imagenes.reutilizadas)} · por subir ${suma((e) => e.imagenes.simuladas)} · omitidas ${suma((e) => e.imagenes.omitidas.length)} · alt de respaldo ${suma((e) => e.imagenes.altDeRespaldo)} · URL corregidas ${suma((e) => e.imagenes.urlCorregidas)}`,
+  `imágenes del cuerpo: subidas ${suma((e) => e.imagenes.subidas)} · reutilizadas ${suma((e) => e.imagenes.reutilizadas)} · por subir ${suma((e) => e.imagenes.simuladas)} · omitidas ${suma((e) => e.imagenes.omitidas.length)} · alt de respaldo ${suma((e) => e.imagenes.altDeRespaldo)} · URL corregidas ${suma((e) => e.imagenes.urlCorregidas)} · AVIF → WebP ${suma((e) => e.imagenes.avifAWebp)}`,
 );
+log(`destacadas: ${cuenta(informe.map((e) => e.destacada.split(":")[0]!))}`);
 log(
-  `destacadas: ${JSON.stringify(informe.reduce<Record<string, number>>((a, e) => ({ ...a, [e.destacada.split(":")[0]!]: (a[e.destacada.split(":")[0]!] ?? 0) + 1 }), {}))}`,
-);
-log(
-  `tablas pasadas a párrafos: ${suma((e) => e.tablasAParrafos)} · shortcodes quitados: ${suma((e) => e.shortcodesQuitados.length)} · quitados o no convertibles: ${JSON.stringify(informe.flatMap((e) => e.noConvertibles).reduce<Record<string, number>>((a, n) => ({ ...a, [n]: (a[n] ?? 0) + 1 }), {}))}`,
+  `tablas pasadas a párrafos: ${suma((e) => e.tablasAParrafos)} · shortcodes quitados: ${suma((e) => e.shortcodesQuitados.length)} · quitados o no convertibles: ${cuenta(informe.flatMap((e) => e.noConvertibles))}`,
 );
 log(`texto conservado (mín.): ${Math.min(...informe.map((e) => e.textoConservado))} %`);
 log(
   `SEO de Yoast importado: título ${informe.filter((e) => e.seo.titulo).length} · descripción ${informe.filter((e) => e.seo.descripcion).length}`,
 );
 log(`informe: ${fichero}`);
+if (modo === "importar") {
+  log(
+    `manifiesto: ${MANIFIESTO} (creados: ${manifiesto.creado.articulos.length} artículos, ${manifiesto.creado.media.length} imágenes, ${manifiesto.creado.categorias.length} categorías; anteriores: ${Object.keys(manifiesto.anteriores).length})`,
+  );
+}
 if (informe.length - ok.length > 0) {
-  const e = new Error(`[blog] ✗ ${informe.length - ok.length} entradas fallaron (ver el informe)`);
-  e.stack = e.message;
-  throw e;
+  fallar(`${informe.length - ok.length} entradas fallaron (ver el informe)`);
 }

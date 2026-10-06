@@ -6,7 +6,8 @@
  * cadena de respuestas—, separada de la red para poder probar que **falla
  * cuando debe**. La red vive en `scripts/lanzamiento/comprobar-urls.ts`.
  *
- * La fuente es `docs/url-map.csv` (648 URLs vivas del rastreo, §10.1) y la
+ * La fuente es `docs/url-map.csv` (648 URLs vivas del rastreo, §10.1, más 2
+ * entradas del blog publicadas después) y la
  * clasificación, `docs/redirects-cobertura.md`:
  *
  *   conservada  la ruta es idéntica en el sitio nuevo   -> 200 sin saltos

@@ -691,3 +691,61 @@ tabla de errores) y tiene una tabla nueva de los avisos.
 oscuro`): abre cada pantalla con aviso y captura la página y cada aviso. No
 guarda nada; las solicitudes se abren con un filtro que no encuentra ninguna.
 El contador de «Destacar» se captura con el modo `ficha`.
+
+## 23. Rediseño del panel, F2: portada propia (2026-10-06, rama `feat/panel-f2-portada`)
+
+Aprobada por dirección. Sustituye la vista de inicio de Payload con
+`admin.components.views.dashboard` (punto estable; los widgets de
+`admin.dashboard` siguen marcados `@experimental` en 3.89 y no se usan). La
+plantilla, el menú y la cabecera siguen siendo de Payload. **Sin esquema ni
+dependencias.**
+
+**Qué tiene** (`src/components/admin/portada/Portada.tsx`, componente de
+servidor, sin JavaScript de cliente):
+
+| Bloque               | Qué muestra                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Necesita atención    | Con el aviso común de la F4 y enlace a la lista FILTRADA con el mismo criterio que cuenta: solicitudes nuevas (`estado = nueva`), redirecciones que no llevan a ninguna ruta, fichas sin fotos (`imagenes` vacía) en equipos nuevos, usados y modelos, imágenes con texto alternativo flojo y el sitio cerrado a buscadores. Solo sale lo que tiene algo; sin nada, «Todo en orden» |
+| Accesos rápidos      | Nueva máquina, nuevo artículo, subir imagen y subir documento, solo si el rol puede crear                                                                                                                                                                                                                                                                                           |
+| Secciones            | Una tarjeta por grupo del menú, **en el orden del menú** (`ordenarMenu`): «Partes del sitio» ya sale antes que «Configuración». Cada entrada con su contador y, si se puede crear, un botón «+» con nombre accesible («Crear en Modelos»)                                                                                                                                           |
+| Lo último modificado | Las 8 últimas ediciones (colecciones y globales), **sin solicitudes ni usuarios**, con su colección y la fecha relativa; la exacta en `title` y, para el lector de pantalla, dentro del propio `<time>`                                                                                                                                                                             |
+
+**Solicitudes: solo contadores.** El total y las nuevas, con `count`. No se
+lee ninguna fila, no hay enlaces a solicitudes concretas (lo comprueba
+`panel:revision`, que falla si aparece uno) y no se toca su acceso.
+
+**Permisos.** Todo con `overrideAccess: false` y el usuario de la sesión: cada
+uno cuenta y ve solo lo que puede leer, y lo que no puede leer ni se pide
+(`permissions` y `visibleEntities` que Payload pasa a la vista). Los «+» y los
+accesos rápidos salen solo con permiso de crear.
+
+**Rápida.**
+
+- Los contadores son `count` (un COUNT, sin documentos).
+- «Lo último modificado» pide solo título y fecha (`select`, 5 por colección).
+- La única lectura de filas es `alt` y `filename` de Imágenes, la misma que ya
+  hace la lista de Imágenes.
+- Todo en paralelo, y un fallo de una consulta deja ese dato vacío sin tumbar
+  la portada (`[portada]` en el registro).
+- **Enlaces sin precarga** (`prefetch={false}`): con la precarga de Next, la
+  portada pedía al servidor unas 60 páginas del panel nada más abrirse (medido
+  en los registros del preview) y la red no quedaba nunca en reposo.
+
+**Accesible.** Un `<h1>`, secciones con su `<h2>`/`<h3>`, listas, foco visible
+del panel, los «+» con nombre, iconos decorativos (`aria-hidden`) y fechas
+exactas para el lector de pantalla. Claro y oscuro con los tokens del panel; en
+móvil, una columna.
+
+**Pendiente, y no se hace sin decisión: «con quién».** Payload no guarda quién
+modificó un documento: ninguna colección tiene versiones ni campo de autor.
+Mostrarlo exige un campo nuevo (`actualizadoPor`, relación con Usuarios,
+de solo lectura y puesto por un gancho al guardar) en las colecciones de
+contenido, es decir, **cambio de esquema** con su migración y la ventana. Solo
+registraría las ediciones posteriores a ese cambio. Propuesta en el informe.
+
+Lógica pura con pruebas: `src/lib/panel/portada.ts` (avisos, tarjetas, últimos)
+y `src/lib/panel/fechas.ts` (relativa y exacta, en la hora de Colombia), que
+reutiliza la F3. Datos: `src/lib/queries/getPortadaPanel.ts`.
+
+Capturas de antes y después, en claro y oscuro, a 1440 y en móvil:
+`partequipos-cierre\capturas\f2-portada-antes-despues\`.

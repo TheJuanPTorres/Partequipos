@@ -377,9 +377,11 @@ try {
         a.textContent.trim(),
       ),
       recientes: document.querySelectorAll(".pq-portada__reciente").length,
-      enlacesASolicitudes: [...document.querySelectorAll('a[href*="/collections/solicitudes/"]')]
-        .map((a) => a.getAttribute("href"))
-        .filter((h) => !/\/create\/?$/.test(h ?? "")),
+      enlacesASolicitudes: [...document.querySelectorAll('a[href*="/collections/solicitudes"]')]
+        .map((a) => a.getAttribute("href") ?? "")
+        // Una solicitud concreta es /collections/solicitudes/<id>; la lista
+        // (con o sin barra y filtros) y «crear» no cuentan.
+        .filter((h) => /\/collections\/solicitudes\/(?!create)[^/?#]+/.test(h)),
     }));
     hallazgos.push({ pantalla: "portada-estructura", ancho: ancho.nombre, ...portada });
     if (portada.enlacesASolicitudes.length) {

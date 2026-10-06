@@ -1037,9 +1037,9 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > tampoco puede pasar de 4,5 MB (por eso `media`, `videos`, `animaciones` y
 > `documentos` se sirven desde el CDN del Blob, `disablePayloadAccessControl`).
 >
-> **Topes de hoy, por debajo del límite:** vídeos **4 MB**
-> (`formatoDeVideoPermitido`) y PDF **4 MB** (`formatoDePdfPermitido`). Una
-> ficha técnica de fabricante o un vídeo de testimonio pueden pasar de ahí.
+> **Hasta el PR #82 los topes eran de 4 MB** en vídeos
+> (`formatoDeVideoPermitido`) y PDF (`formatoDePdfPermitido`), por debajo del
+> límite. Los topes vigentes, en la tabla de abajo.
 >
 > **La salida que existe: la SUBIDA DIRECTA del navegador al Blob**
 > (`clientUploads` de `@payloadcms/storage-vercel-blob` 3.89.0). El navegador
@@ -3342,7 +3342,9 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Imagen del pie sin tapar contenido       | La imagen decorativa del pie (sobresale por encima) tapando texto de una plantilla. Mide con los píxeles opacos del recorte, no con su caja (§10.33 p.11)                                                                               | `npm run qa:vuelo-pie` (`scripts/qa/vuelo-pie.mjs`, con `npx`: necesita navegador)                                                       | **A mano**, contra producción         |
 | Ficha: solo PDF y máximo 4 destacadas    | Un fichero que no es PDF (o uno cortado) en `documentos`, o más de 4 filas destacadas en la ficha técnica de un equipo nuevo                                                                                                            | `formatoDePdfPermitido` y `validarDestacadas` + sus pruebas; por efecto, `npm run qa:ficha`                                              | CI, cada subida y **a mano**          |
 | Siembra que encuentra solo lo suyo       | Un script de siembra que busca por su marca con `like` (Payload la parte en palabras: «PRUEBA FASE F —» casaba con todas las fases) o con un `limit` que corta antes del filtro, y retira lo de otra fase o deja huérfanos (2026-10-03) | `buscarPorMarca` (`src/lib/portada/porMarca.ts`) + `porMarca.test.ts`, que prohíbe `like:` y la marca en un `where` en `scripts/portada` | CI, en cada push                      |
-| Nombres internos de la subida directa    | Una actualización de Payload que renombra o cambia la ruta del permiso o el manejador del navegador del adaptador del Blob: nuestro endurecimiento dejaría de aplicarse sin error (§10.39)                                              | `src/lib/blob/rutaSubidaDirecta.test.ts`, con el adaptador real                                                                          | CI, en cada push                      |     | Subida directa: tipo y tamaño reales | Un fichero subido directo al Blob que no es lo que dice o pasa del tope, y que se quedaría en el almacén (§10.39) | `formatoDePdfPermitido` y `formatoDeImagenPermitido`, que leen el temporal y borran el rechazado + sus pruebas | CI y subida |     | Ficheros del Blob sin registro | Ficheros que la subida directa dejó en el almacén cuando el guardado falló (§10.39). Solo lista | `npm run blob:huerfanos` | **A mano** |
+| Nombres internos de la subida directa    | Una actualización de Payload que renombra o cambia la ruta del permiso o el manejador del navegador del adaptador del Blob: nuestro endurecimiento dejaría de aplicarse sin error (§10.39)                                              | `src/lib/blob/rutaSubidaDirecta.test.ts`, con el adaptador real                                                                          | CI, en cada push                      |
+| Subida directa: tipo y tamaño reales     | Un fichero subido directo al Blob que no es lo que dice o pasa del tope, y que se quedaría en el almacén (§10.39)                                                                                                                       | `formatoDePdfPermitido` y `formatoDeImagenPermitido`, que leen el temporal y borran el rechazado + sus pruebas                           | CI y subida                           |
+| Ficheros del Blob sin registro           | Ficheros que la subida directa dejó en el almacén cuando el guardado falló (§10.39). Solo lista                                                                                                                                         | `npm run blob:huerfanos`                                                                                                                 | **A mano**                            |
 
 **«Deriva de esquema» se colgó dos veces; está blindada (fase 5).**
 

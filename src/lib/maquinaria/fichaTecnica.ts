@@ -70,6 +70,11 @@ export function validarDestacadas(filas: FilaFicha[] | null | undefined): true |
   return `Solo caben ${MAX_DESTACADAS} datos destacados en la ficha y hay ${n} marcados. Quita «Destacar» en ${n - MAX_DESTACADAS}.`;
 }
 
+/** Cuántas casillas «Destacar» están marcadas (valores tal cual del formulario). */
+export function contarDestacadas(valores: readonly unknown[]): number {
+  return valores.filter((v) => v === true).length;
+}
+
 /**
  * Validación de la casilla «Destacar» de CADA fila: el mismo criterio que
  * `validarDestacadas`, pero el mensaje sale junto a la casilla marcada. Puesto

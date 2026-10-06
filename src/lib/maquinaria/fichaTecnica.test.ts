@@ -8,6 +8,7 @@ import {
   filasCompletas,
   validarDestacadas,
   validarDestacarFila,
+  contarDestacadas,
   type FilaFicha,
 } from "./fichaTecnica";
 
@@ -79,5 +80,12 @@ describe("validarDestacarFila (la casilla «Destacar»)", () => {
   it("con 4 o menos, o sin datos, vale", () => {
     assert.equal(validarDestacarFila(true, { data: { fichaTecnica: cinco.slice(0, 4) } }), true);
     assert.equal(validarDestacarFila(true, { data: null }), true);
+  });
+});
+
+describe("contarDestacadas (el contador del panel)", () => {
+  it("cuenta solo los true", () => {
+    assert.equal(contarDestacadas([true, false, undefined, null, true, "true", 1]), 2);
+    assert.equal(contarDestacadas([]), 0);
   });
 });

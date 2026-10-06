@@ -257,9 +257,17 @@ try {
       } else {
         await pagina.locator("#action-save").click();
         await pagina.waitForTimeout(2500);
-        const avisos = await pagina
-          .locator('.payload-toast-container, .field-error, [class*="tooltip"], .error-message')
-          .allInnerTexts();
+        const avisos = await pagina.locator(".payload-toast-container").allInnerTexts();
+        // Junto a cada casilla: el tooltip de error de Payload y la casilla en error.
+        const junto = await pagina.evaluate(() => ({
+          casillasEnError: document.querySelectorAll(".checkbox.error, .field-type.checkbox.error")
+            .length,
+          tooltips: [...document.querySelectorAll(".field-error")].map((e) => ({
+            texto: e.textContent.trim(),
+            visible:
+              e.getBoundingClientRect().height > 0 && getComputedStyle(e).visibility !== "hidden",
+          })),
+        }));
         const fichero = path.join(salida, `ficha-aviso-mas-de-4-${ancho.nombre}.png`);
         await pagina.screenshot({ path: fichero, fullPage: true });
         const despues = (await leer()).fichaTecnica ?? [];
@@ -268,6 +276,7 @@ try {
           pantalla: "ficha-aviso-mas-de-4",
           ancho: ancho.nombre,
           avisos: [...new Set(avisos.map((a) => a.trim()).filter(Boolean))],
+          junto,
           destacadasAntes: marcadasAntes,
           destacadasDespues: marcadasDespues,
         });

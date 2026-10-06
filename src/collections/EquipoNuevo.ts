@@ -168,6 +168,13 @@ export const EquipoNuevo: CollectionConfig = {
         },
       ],
     },
+    // Contador en vivo de «Destacar» (campo `ui`, sin columna): avisa antes de
+    // guardar si hay más de 4 (revisión en pantalla del 2026-10-06).
+    {
+      name: "contadorDestacadas",
+      type: "ui",
+      admin: { components: { Field: "/components/admin/ContadorDestacadas" } },
+    },
     {
       name: "fichaTecnicaPdf",
       type: "upload",

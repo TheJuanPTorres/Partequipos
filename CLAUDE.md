@@ -1094,11 +1094,12 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > **Decisión de dirección del 2026-10-02.** Para enseñar el avance, la home de
 > producción puede llevar los assets que hasta ahora solo iban al preview:
 >
-> | Assets                                                                                         | Base del permiso                                                             |
-> | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-> | Imágenes, vídeo y póster de ux-9 (secciones 2, 3 y 5; vídeo de 6–8; imagen decorativa del pie) | **Permiso temporal** comunicado a dirección                                  |
-> | Logos de fabricantes (sección 4)                                                               | **Permiso del cliente**, temporal                                            |
-> | Testimonios (sección 10)                                                                       | Son del cliente; la autorización de las personas es **responsabilidad suya** |
+> | Assets                                                                                                                                      | Base del permiso                                                             |
+> | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+> | Imágenes, vídeo y póster de ux-9 (secciones 2, 3 y 5; vídeo de 6–8; imagen decorativa del pie)                                              | **Permiso temporal** comunicado a dirección                                  |
+> | Imagen de «Contáctanos para recibir asesoría» de la ficha de producto (`CTA-contactoi.png`, global `ficha-producto`; cargada el 2026-10-06) | **Permiso temporal** comunicado a dirección                                  |
+> | Logos de fabricantes (sección 4)                                                                                                            | **Permiso del cliente**, temporal                                            |
+> | Testimonios (sección 10)                                                                                                                    | Son del cliente; la autorización de las personas es **responsabilidad suya** |
 >
 > **Reglas mientras esté activa:**
 >

@@ -6,12 +6,16 @@ import {
   decodificarEntidades,
   enlaceInterno,
   entradillaDeExtracto,
+  esAltGenerado,
   esAvif,
   esMismaImagen,
   extraerJsonWp,
   formatoPorExtension,
+  limpiarLexical,
   nombreDeFicheroWp,
+  normalizarRuta,
   quitarShortcodes,
+  textoDescriptivo,
   textoPlano,
   urlImagenCorregida,
   valoresUnicos,
@@ -76,23 +80,72 @@ describe("importador del blog: piezas puras", () => {
     assert.equal(nombreDeFicheroWp("https://partequipos.com/otra/foto.jpg"), "wp-foto.jpg");
   });
 
-  it("usa el alt de WordPress si sirve y, si no, uno de respaldo que el panel acepta", () => {
-    assert.deepEqual(altParaMedia("Excavadora Hitachi en obra", "T", 1, "x.jpg"), {
+  it("alt: el de WordPress si sirve; si no, pie, título de la imagen, sección o respaldo", () => {
+    const base = { titulo: "Fuga de aceite", n: 2, fichero: "wp-2024-05-zx350.jpg" };
+    assert.deepEqual(altParaMedia({ ...base, altWp: "Excavadora Hitachi en obra" }), {
       alt: "Excavadora Hitachi en obra",
-      deRespaldo: false,
+      origen: "wordpress",
+      marcado: false,
+    });
+    assert.deepEqual(
+      altParaMedia({
+        ...base,
+        altWp: "",
+        tituloWp: "sistema-hidráulico-del-pistón-para-tractores",
+      }),
+      {
+        alt: "Sistema hidráulico del pistón para tractores",
+        origen: "título de la imagen",
+        marcado: false,
+      },
+    );
+    assert.deepEqual(altParaMedia({ ...base, tituloWp: "IMG_0556", seccion: "Causas comunes:" }), {
+      alt: "Ilustración de «Causas comunes», en el artículo «Fuga de aceite»",
+      origen: "sección",
+      marcado: true,
     });
     for (const flojo of ["", "imagen", "zx350"]) {
-      const r = altParaMedia(flojo, "Fuga de aceite", 2, "zx350.jpg");
-      assert.equal(r.deRespaldo, true);
+      const r = altParaMedia({ ...base, altWp: flojo });
+      assert.equal(r.marcado, true);
       assert.equal(r.alt, "Ilustración del artículo «Fuga de aceite» (2)");
     }
   });
 
-  it("los enlaces al sitio actual pasan a rutas relativas; los demás, tal cual", () => {
+  it("título o pie de la imagen: solo si describe algo, en español y sin identificadores", () => {
+    assert.equal(
+      textoDescriptivo("fuga-de-aceite-FUSO-canter-senales-comunes"),
+      "Fuga de aceite FUSO canter senales comunes",
+    );
+    assert.equal(textoDescriptivo("rodillo-ca6500d-dynapac-frontal-600&#215;600"), null);
+    for (const malo of [
+      "IMG_0556",
+      "images (10)",
+      "Gemini_Generated_Image_bjsohjbjsohjbjso",
+      "a0ce467c-3ceb-4ebf-b62f-ef380f2755dd-2026-07-28",
+      "Version 1.0.0",
+      "crawler-excavators-cx210c",
+      "handok logo",
+      "",
+    ]) {
+      assert.equal(textoDescriptivo(malo), null, malo);
+    }
+  });
+
+  it("reconoce los alt que escribió el importador (y que puede rehacer)", () => {
+    assert.equal(esAltGenerado("Ilustración del artículo «X» (2)"), true);
+    assert.equal(esAltGenerado("Ilustración de «Causas», en el artículo «X»"), true);
+    assert.equal(esAltGenerado("Excavadora en obra"), false);
+    assert.equal(esAltGenerado(null), false);
+  });
+
+  it("los enlaces al sitio actual pasan a rutas relativas, con barra final y sin codificar", () => {
     assert.equal(
       enlaceInterno("https://partequipos.com/contactanos/?a=1#f"),
       "/contactanos/?a=1#f",
     );
+    assert.equal(enlaceInterno("https://partequipos.com"), "/");
+    assert.equal(enlaceInterno("http://www.partequipos.com/maquinaria"), "/maquinaria/");
+    assert.equal(normalizarRuta("/tama%C3%B1o/a.pdf"), "/tamaño/a.pdf");
     assert.equal(
       enlaceInterno("https://partequipos.com/wp-content/uploads/2024/05/a.pdf"),
       "https://partequipos.com/wp-content/uploads/2024/05/a.pdf",
@@ -122,6 +175,38 @@ describe("importador del blog: piezas puras", () => {
     assert.equal(
       esMismaImagen("wp-2024-05-zx350.lc-extra-nq9mcBWeeSmCupWXpPDZFDwJ1hBu3P.jpg", d),
       false,
+    );
+  });
+
+  it("limpia el Lexical: alineaciones, párrafos vacíos y saltos de nivel", () => {
+    const p = (texto: string, format = "") => ({
+      type: "paragraph",
+      format,
+      children: texto ? [{ type: "text", text: texto }] : [],
+    });
+    const h = (tag: string) => ({
+      type: "heading",
+      tag,
+      format: "",
+      children: [{ type: "text", text: tag }],
+    });
+    const raiz = {
+      children: [
+        h("h4"),
+        p("uno", "justify"),
+        p(""),
+        h("h5"),
+        h("h2"),
+        h("h4"),
+        p("dos", "center"),
+      ],
+    };
+    assert.deepEqual(limpiarLexical(raiz), { alineaciones: 2, vacios: 1, niveles: 3 });
+    assert.deepEqual(
+      (raiz.children as { type: string; tag?: string; format?: string }[]).map((n) =>
+        n.type === "heading" ? n.tag : n.format,
+      ),
+      ["h2", "", "h3", "h2", "h3", ""],
     );
   });
 

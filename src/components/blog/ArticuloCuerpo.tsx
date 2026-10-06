@@ -6,6 +6,7 @@ import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getLogo } from "@/lib/queries/getSeo";
 import { rutas } from "@/lib/routes";
+import { seoConfig } from "@/lib/seo/config";
 import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import type { Articulo, CategoriasBlog } from "@/payload-types";
@@ -80,12 +81,9 @@ export async function ArticuloCuerpo({ articulo }: { articulo: Articulo }) {
             <time dateTime={articulo.fechaPublicacion}>
               {fechaLegible(articulo.fechaPublicacion)}
             </time>
-            {articulo.autor ? (
-              <>
-                <span aria-hidden="true">·</span>
-                <span>Por {articulo.autor}</span>
-              </>
-            ) : null}
+            {/* Sin firma, la de la empresa (decisión de dirección, 2026-10-06). */}
+            <span aria-hidden="true">·</span>
+            <span>Por {articulo.autor?.trim() || seoConfig.siteName}</span>
             {categoria ? (
               <>
                 <span aria-hidden="true">·</span>

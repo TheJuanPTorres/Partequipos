@@ -47,7 +47,9 @@ describe("clasificar", () => {
     assert.deepEqual(mapa.get("/inicio2025/"), { tipo: "basura" });
   });
 
-  it("con los ficheros reales: 648 rutas, 10 redirects, 14 pendientes y 6 basura", () => {
+  // 650 desde el 2026-10-06: las 648 del rastreo más 2 entradas del blog
+  // publicadas después (docs/crawl-reporte.md, «Añadidas después del rastreo»).
+  it("con los ficheros reales: 650 rutas, 10 redirects, 14 pendientes y 6 basura", () => {
     const raiz = process.cwd();
     const urls = parsearCsv(fs.readFileSync(path.join(raiz, "docs/url-map.csv"), "utf8")).map(
       (f) => f.url ?? "",
@@ -58,11 +60,11 @@ describe("clasificar", () => {
     const mapa = clasificar(urls, redirects);
     const cuenta = (tipo: Esperado["tipo"]) =>
       [...mapa.values()].filter((e) => e.tipo === tipo).length;
-    assert.equal(mapa.size, 648);
+    assert.equal(mapa.size, 650);
     assert.equal(cuenta("redirect"), 10);
     assert.equal(cuenta("pendiente"), 14);
     assert.equal(cuenta("basura"), 6);
-    assert.equal(cuenta("conservada"), 618);
+    assert.equal(cuenta("conservada"), 620);
   });
 });
 

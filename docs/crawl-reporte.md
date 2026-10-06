@@ -70,3 +70,16 @@ Fuente: sitemaps (Yoast/RankMath) declarados en robots.txt.
   - (otro/desconocido) https://partequipos.com/lubricantes/lubricantes-eni/engranajes/
   - (otro/desconocido) https://partequipos.com/lubricantes/lubricantes-eni/motos-scooter/
 
+
+## 6. Añadidas después del rastreo
+
+El rastreo es del 2026-07-27 (648 URL). El 2026-10-06, al importar el blog
+desde la API de WordPress, aparecieron **2 entradas publicadas después** y se
+añadieron a `docs/url-map.csv` (decisión de dirección). Ahora son **650**:
+
+| URL                                                                                                         | Publicada  |
+| ----------------------------------------------------------------------------------------------------------- | ---------- |
+| `/motor-de-giro-de-excavadora-sintomas-de-falla-causas-y-repuestos/`                                        | 2026-07-28 |
+| `/que-significa-una-protuberancia-en-una-llanta-de-maquinaria-pesada-y-por-que-debes-prestarle-atencion/` | 2026-09-25 |
+
+Título y descripción, tal como los sirve hoy WordPress: los de Yoast, que son los de otra entrada copiados (ver `docs/blog-importacion.md`). Esta sección no la genera `npm run crawl`: si se repite el rastreo, hay que conservarla.

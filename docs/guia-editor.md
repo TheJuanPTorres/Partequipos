@@ -65,14 +65,19 @@ Consecuencias prácticas:
 
 A la izquierda, en grupos:
 
-| Grupo         | Qué hay                                                                                      |
-| ------------- | -------------------------------------------------------------------------------------------- |
-| Comercial     | **Solicitudes** que llegan de los formularios del sitio                                      |
-| Repuestos     | Marcas, tipos de equipo, modelos y categorías técnicas                                       |
-| Maquinaria    | Marcas, tipos y equipos nuevos; categorías y equipos usados                                  |
-| Lubricantes   | Marcas y categorías de lubricante                                                            |
-| Contenido     | Páginas, artículos del blog, imágenes, vídeos, sedes, testimonios, preguntas, cabecera y pie |
-| Configuración | Usuarios, redirecciones y «SEO y datos de la empresa» (horario, imágenes y contacto)         |
+| Grupo            | Qué hay                                                                              |
+| ---------------- | ------------------------------------------------------------------------------------ |
+| Solicitudes      | Las **solicitudes** que llegan de los formularios del sitio                          |
+| Repuestos        | Modelos, marcas, tipos de equipo y categorías técnicas                               |
+| Maquinaria       | Equipos nuevos y usados; marcas, tipos y categorías de maquinaria nueva y usada      |
+| Lubricantes      | Marcas y categorías de lubricante                                                    |
+| Páginas y blog   | Páginas, artículos y categorías del blog, preguntas frecuentes, testimonios y sedes  |
+| Archivos         | Imágenes, documentos (PDF), vídeos y animaciones                                     |
+| Partes del sitio | Cabecera, pie de página y ficha de producto: lo que se repite en muchas páginas      |
+| Configuración    | «SEO y datos de la empresa» (horario, imágenes y contacto), redirecciones y usuarios |
+
+Dentro de cada grupo, primero va lo que más se edita (los modelos, los
+equipos) y después sus clasificaciones.
 
 En cada listado puedes **buscar** (en modelos y equipos nuevos, también por
 código, p. ej. «320D»), **ordenar** pulsando en una columna y **filtrar** con
@@ -90,7 +95,7 @@ sedes, testimonios, solicitudes…) no lo lleva.
 
 ### 5.1 Atender una solicitud
 
-1. **Comercial → Solicitudes.** Lo más nuevo sale primero.
+1. **Solicitudes → Solicitudes.** Lo más nuevo sale primero.
 2. Ábrela, atiende al cliente por tu canal habitual.
 3. Cambia **Estado** a **Atendida** y guarda.
 
@@ -124,9 +129,9 @@ oficial, no lo pongas.
 - **«Ficha técnica completa (PDF)»:** súbelo ahí mismo con **«Crear»**, o
   elige uno ya subido. Solo PDF, **máximo 25 MB**. Sale en la ficha como
   «Descargar ficha técnica completa»; sin PDF, el botón no aparece. Los PDF
-  quedan en **Contenido → Documentos**.
+  quedan en **Archivos → Documentos**.
 - **La imagen del recuadro «Contáctanos para recibir asesoría»**, al final de
-  todas las fichas, es la misma para todas: está en **Contenido → Ficha de
+  todas las fichas, es la misma para todas: está en **Partes del sitio → Ficha de
   producto**.
 
 ### 5.3 Equipos usados
@@ -142,7 +147,7 @@ oficial, no lo pongas.
 ### 5.4 Escribir un artículo del blog
 
 1. **Recuerda §3: se publica al guardar.** Tenlo terminado antes.
-2. **Contenido → Artículos → Crear.** Título, categoría y **fecha de
+2. **Páginas y blog → Artículos → Crear.** Título, categoría y **fecha de
    publicación** (ordena el blog y es la que ven los buscadores).
 3. **Entradilla:** el resumen que sale en el listado y al compartir.
 4. **Imagen destacada:** sale en el listado y al compartir en redes.
@@ -152,7 +157,7 @@ oficial, no lo pongas.
 
 ### 5.5 Subir imágenes
 
-- **Contenido → Imágenes**, o directamente desde el campo de imagen de una
+- **Archivos → Imágenes**, o directamente desde el campo de imagen de una
   ficha.
 - **Formatos: JPEG, PNG o WebP.** Ni SVG, ni PDF, ni AVIF, ni HEIC (las fotos
   del iPhone): conviértelas antes. El panel lo comprueba por el contenido, no
@@ -176,7 +181,7 @@ oficial, no lo pongas.
 
 ### 5.6 Subir vídeos
 
-- **Contenido → Vídeos.** MP4 o WebM, **máximo 4 MB**. Si pesa más, hay que
+- **Archivos → Vídeos.** MP4 o WebM, **máximo 4 MB**. Si pesa más, hay que
   exportarlo con más compresión.
 - **Imagen de póster, obligatoria:** es lo que se ve antes de que cargue y para
   quien tiene el movimiento reducido activado.
@@ -193,7 +198,7 @@ oficial, no lo pongas.
 
 ### 5.8 La portada
 
-- Es la página de tipo «Portada» (ruta `inicio`) en **Contenido → Páginas**.
+- Es la página de tipo «Portada» (ruta `inicio`) en **Páginas y blog → Páginas**.
 - **Hero (carrusel):** cada diapositiva lleva título, párrafo, imagen de fondo,
   una versión **vertical para móvil** (recomendada: el móvil carga mucho más
   rápido) y, si quieres, la máquina recortada en PNG transparente.
@@ -255,7 +260,7 @@ vacío no rompe nada: el sitio usa el dato de siempre.**
   dirección. Si tiene una errata, un administrador puede darte el permiso
   «Puede editar slugs ya publicados»: la dirección antigua seguirá llevando a
   la nueva.
-- En las **páginas** (Contenido → Páginas) se llama «Ruta (dirección web)» y
+- En las **páginas** (Páginas y blog → Páginas) se llama «Ruta (dirección web)» y
   funciona igual.
 
 ## 8. Buscadores y redes sociales

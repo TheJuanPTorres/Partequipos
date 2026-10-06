@@ -16,7 +16,7 @@ export const Cabecera: GlobalConfig = {
   slug: "cabecera",
   label: "Cabecera",
   admin: {
-    group: "Contenido",
+    group: "Partes del sitio",
     description: "Menú y botón de la cabecera de todas las páginas.",
   },
   access: { read: publico, update: escrituraContenido },

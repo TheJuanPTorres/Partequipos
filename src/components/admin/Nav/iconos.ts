@@ -3,10 +3,14 @@ import {
   IconBulldozer,
   IconDroplet,
   IconInbox,
+  IconLayout,
+  IconPhoto,
   IconSettings,
   IconTool,
   type Icon,
 } from "@tabler/icons-react";
+
+import type { GrupoDelMenu } from "@/lib/panel/menu";
 
 /**
  * Iconos de los grupos del menú, del sistema de diseño del cliente
@@ -15,20 +19,24 @@ import {
  * también son de Tabler, no los de Payload.
  *
  * Los iconos van SOLO en los grupos (primer nivel). Las entradas no llevan: son
- * 19 y un icono por cada una obligaría a inventar metáforas para «Categorías de
- * usada» frente a «Categorías de maquinaria nueva», que es ruido, no ayuda.
+ * 29 y un icono por cada una obligaría a inventar metáforas para «Categorías de
+ * maquinaria usada» frente a «Categorías de maquinaria nueva», que es ruido.
  *
- * La clave es el NOMBRE del grupo, que es el `admin.group` de las colecciones.
+ * La clave es el NOMBRE del grupo, que es el `admin.group` de las colecciones
+ * y los globales. Los grupos y su orden están en `src/lib/panel/menu.ts`
+ * (F1 del rediseño, 2026-10-06); el tipo obliga a que estén todos.
  * `src/collections/grupos.test.ts` comprueba que todo grupo aprobado tiene su
  * icono aquí: si alguien renombra un grupo, CI lo para en vez de dejar una
  * entrada sin icono.
  */
-export const ICONOS_DE_GRUPO: Record<string, Icon> = {
-  Comercial: IconInbox,
+export const ICONOS_DE_GRUPO: Record<GrupoDelMenu, Icon> = {
+  Solicitudes: IconInbox,
   Repuestos: IconTool,
   Maquinaria: IconBulldozer,
   Lubricantes: IconDroplet,
-  Contenido: IconArticle,
+  "Páginas y blog": IconArticle,
+  Archivos: IconPhoto,
+  "Partes del sitio": IconLayout,
   Configuración: IconSettings,
 };
 

@@ -16,7 +16,7 @@ export const Solicitud: CollectionConfig = {
   admin: {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "tipo", "estado", "correo", "telefono", "createdAt"],
-    group: "Comercial",
+    group: "Solicitudes",
     description:
       "Formularios enviados desde el sitio. Contienen datos personales: no se publican y solo son visibles aquí.",
     listSearchableFields: ["nombre", "correo", "empresa", "mensaje"],

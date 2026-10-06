@@ -29,6 +29,16 @@ era falso, aparece como `--tw-shadow`._
 **Y una corrección en sentido contrario: el sistema SÍ define escala de
 radios propia** (§5). Estaba en esta lista por error.
 
+> **ACTUALIZADO 2026-10-06 (F1 del rediseño del panel).** El sistema publica
+> ahora páginas de **Dimensiones, Elevación y Motion** en
+> `ui.partequipos.com/foundations`. No añaden tokens nuevos —la escala de
+> espaciado sigue siendo la de Tailwind (4 px) y la elevación son las
+> utilidades `ring-*`—, pero sí **reglas**: espaciado en múltiplos de 4 px
+> (incrementos de 0,5), jerarquía con **anillos y no con sombras**
+> (`ring-foreground/10`; sombra solo en lo flotante) y transiciones de
+> **~150 ms** con movimiento reducido. Aplicadas al panel en la F1:
+> `docs/diseno/decisiones-panel.md` §20.
+
 **4. Las plantillas públicas usan colores fijos, no tokens.** Medido en
 `src/app/(site)` y `src/components`, sin el panel: **188 ocurrencias en 31
 ficheros**. Una versión anterior decía 182: aquel patrón dejaba fuera 4 `ring-*`

@@ -19,7 +19,7 @@ const menu = revalidarMegamenu("categorias-usada");
  */
 export const CategoriaUsada: CollectionConfig = {
   slug: "categorias-usada",
-  labels: { singular: "Categoría de usada", plural: "Categorías de usada" },
+  labels: { singular: "Categoría de maquinaria usada", plural: "Categorías de maquinaria usada" },
   admin: {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "slug"],

@@ -23,6 +23,9 @@
  *   corta), los errores de consola y las peticiones que fallan (solo host y
  *   ruta), para no depender solo de mirar.
  * - Navegador: Chrome instalado (otra ruta con `CHROME_PATH`).
+ * - Modos (tercer argumento): `ficha` (aviso de más de 4 «Destacar»), `acceso`
+ *   (la pantalla de acceso, §17–§19 de decisiones-panel.md) y `oscuro` (la
+ *   pasada normal con el tema oscuro). Sin modo, la pasada normal en claro.
  * - No escribe nada en el panel: solo navega y lee. En modo `ficha` pulsa
  *   «Guardar» con 5 «Destacar» marcados, que la validación rechaza, y comprueba
  *   después en la API que no se guardó nada.
@@ -64,7 +67,7 @@ function fallar(mensaje) {
 
 // --- Preview --------------------------------------------------------------
 const base = (process.argv[2] ?? "").replace(/\/$/, "");
-if (!base) fallar("Uso: npm run panel:revision -- <url del preview> [ficha]");
+if (!base) fallar("Uso: npm run panel:revision -- <url del preview> [ficha|acceso|oscuro]");
 // `ficha`: además, el aviso de más de 4 «Destacar» y la vista de subir un PDF.
 const MODO = process.argv[3] ?? "";
 const { hostname, origin } = new URL(base);
@@ -93,7 +96,7 @@ if (!claveCorreo || !claveClave || !cuenta[claveCorreo] || !cuenta[claveClave]) 
 }
 
 // --- Capturas -------------------------------------------------------------
-const fecha = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
+const fecha = `${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}${MODO ? `-${MODO}` : ""}`;
 const salida = path.join(
   os.homedir(),
   "Desktop",
@@ -157,6 +160,11 @@ try {
         headers: { ...r.request().headers(), "x-vercel-protection-bypass": bypass },
       }),
     );
+    // Modo `oscuro`: la misma pasada con el tema oscuro, como entra el usuario
+    // (cookie `payload-theme`, CLAUDE.md §10.23). Sin modo, el claro.
+    await contexto.addCookies([
+      { name: "payload-theme", value: MODO === "oscuro" ? "dark" : "light", url: origin },
+    ]);
     let pagina = await contexto.newPage();
     const errores = [];
     pagina.on("console", (m) => m.type() === "error" && errores.push(m.text().slice(0, 200)));
@@ -281,6 +289,69 @@ try {
     };
 
     for (const p of PANTALLAS) await visitar(p.nombre, p.ruta);
+
+    // El MENÚ LATERAL desplegado (F1 del rediseño): se abre con su botón y se
+    // captura la ventana visible, que es donde vive el menú.
+    await pagina.goto(`${base}/admin`, { waitUntil: "networkidle" });
+    // En escritorio el botón está junto a las migas; en móvil, en la cabecera.
+    const toggler = pagina
+      .locator(ancho.movil ? ".app-header__mobile-nav-toggler" : ".template-default__nav-toggler")
+      .first();
+    if (!(await pagina.locator(".nav--nav-open").count())) await toggler.click().catch(() => {});
+    await pagina.waitForTimeout(1500);
+    const ficheroMenu = path.join(salida, `menu-${ancho.nombre}.png`);
+    await pagina.screenshot({ path: ficheroMenu });
+    const menu = await pagina.evaluate(() => {
+      const caja = (e) => {
+        if (!e) return null;
+        const r = e.getBoundingClientRect();
+        return { top: Math.round(r.top), bottom: Math.round(r.bottom), h: Math.round(r.height) };
+      };
+      const scroll = document.querySelector(".nav__scroll");
+      const controles = document.querySelector(".nav__controls");
+      return {
+        abierto: Boolean(document.querySelector(".nav--nav-open")),
+        grupos: [...document.querySelectorAll(".nav-group")].map((g) => ({
+          grupo: g.querySelector(".nav-group__label")?.textContent?.trim(),
+          id: g.id,
+          entradas: [...g.querySelectorAll("a")].map((a) => a.textContent.trim()),
+          icono: Boolean(g.querySelector(".nav-group__label svg")),
+        })),
+        // ¿Se puede llegar a la última entrada? El pie («Salir») va fijo abajo.
+        scroll: scroll && { alto: scroll.clientHeight, contenido: scroll.scrollHeight },
+        controles: controles && {
+          ...caja(controles),
+          fondo: getComputedStyle(controles).backgroundColor,
+          position: getComputedStyle(controles).position,
+        },
+      };
+    });
+    // Desplaza el menú hasta el final y captura: la última entrada no puede
+    // quedar debajo del pie.
+    await pagina.evaluate(() => {
+      const s = document.querySelector(".nav__scroll");
+      if (s) s.scrollTop = s.scrollHeight;
+    });
+    await pagina.waitForTimeout(500);
+    menu.final = await pagina.evaluate(() => {
+      const enlaces = [...document.querySelectorAll(".nav-group a")];
+      const ultimo = enlaces[enlaces.length - 1];
+      const pie = document.querySelector(".nav__controls");
+      const u = ultimo?.getBoundingClientRect();
+      const p = pie?.getBoundingClientRect();
+      return {
+        ultimo: ultimo?.textContent.trim(),
+        ultimoBottom: u && Math.round(u.bottom),
+        pieTop: p && Math.round(p.top),
+        anchoPie: p && Math.round(p.width),
+        anchoMenu: Math.round(
+          document.querySelector(".nav__scroll")?.getBoundingClientRect().width ?? 0,
+        ),
+      };
+    });
+    await pagina.screenshot({ path: path.join(salida, `menu-final-${ancho.nombre}.png`) });
+    hallazgos.push({ pantalla: "menu", ancho: ancho.nombre, menu });
+    decir(`✓ menú (${ancho.nombre}) → ${path.basename(ficheroMenu)}`);
 
     const fichas = {};
     for (const f of FORMULARIOS) {

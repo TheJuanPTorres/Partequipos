@@ -22,6 +22,7 @@ import {
 import sharp from "sharp";
 
 import { pushPermitido } from "./lib/db/pushEsquema";
+import { fusionarTraducciones, traduccionesEnOracion } from "./lib/panel/oracion";
 import { RUTAS_EN_EL_SITIO, verEnElSitio } from "./lib/panel/verEnElSitio";
 
 import { Articulo } from "./collections/Articulo";
@@ -169,15 +170,13 @@ export default buildConfig({
     },
   },
   /*
-   * EL ORDEN DE ESTE ARRAY ES EL ORDEN DEL MENÚ DEL PANEL. Payload
-   * (groupNavItems, 3.88) crea cada grupo de `admin.group` en el orden en que
-   * aparece por primera vez, y ordena las entradas dentro del grupo igual. No
-   * afecta al esquema: las tablas se generan por slug.
-   *
-   * Grupos aprobados por dirección (2026-09-17): Comercial · Repuestos ·
-   * Maquinaria · Lubricantes · Contenido · Configuración. Ninguna colección debe
-   * quedar sin `admin.group`: caería en «Colecciones», el grupo por defecto, que
-   * es el cajón de sastre que esta agrupación eliminó.
+   * ORDEN DEL MENÚ: lo fija `src/lib/panel/menu.ts` (F1 del rediseño,
+   * 2026-10-06), con 8 grupos: Solicitudes · Repuestos · Maquinaria ·
+   * Lubricantes · Páginas y blog · Archivos · Partes del sitio · Configuración.
+   * Este array sigue el mismo orden para que la portada de Payload —que agrupa
+   * por orden de aparición— salga igual; los globales van siempre detrás. No
+   * afecta al esquema: las tablas se generan por slug. Ninguna colección ni
+   * global puede quedar sin `admin.group` aprobado (`grupos.test.ts`).
    */
   collections: sinPestanaApi(
     conVerEnElSitio([
@@ -185,38 +184,37 @@ export default buildConfig({
       // su control de acceso de lectura es privado, no publico como el catalogo.
       // Primero en el menu: es lo mas urgente de revisar (CLAUDE.md §10.11).
       Solicitud,
-      // Repuestos.
+      // Repuestos: la ficha primero, luego sus clasificaciones.
+      ModeloRepuesto,
       Marca,
       TipoEquipo,
-      ModeloRepuesto,
       CategoriaTecnica,
       // Maquinaria (ADR 0007): colecciones propias, separadas de las de repuestos.
+      EquipoNuevo,
+      EquipoUsado,
       MarcaMaquinaria,
       TipoMaquinaria,
-      EquipoNuevo,
       CategoriaMaquinaria,
       CategoriaUsada,
-      EquipoUsado,
       // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.
       MarcaLubricante,
       CategoriaLubricante,
-      // Contenido. Los articulos se sirven en la raiz /{slug}/, igual que las
+      // Páginas y blog. Los articulos se sirven en la raiz /{slug}/, igual que las
       // paginas institucionales: de ahi el guardarrail de unicidad entre ambas.
       PaginaInstitucional,
       Articulo,
       CategoriaBlog,
-      Media,
-      Animacion,
-      // PDF descargables (ficha técnica de los equipos nuevos). Nunca en Media.
-      Documento,
-      // Portada (home de ux-9, fase B). Sin URL propia: se muestran en el inicio.
-      Video,
-      Sede,
-      Testimonio,
       PreguntaFrecuente,
-      // Configuracion.
-      Users,
+      Testimonio,
+      Sede,
+      // Archivos. Los PDF (ficha técnica de los equipos nuevos) nunca en Media.
+      Media,
+      Documento,
+      Video,
+      Animacion,
+      // Configuracion (el global de SEO va el primero del grupo en el menú).
       Redirects,
+      Users,
     ]),
   ),
   // Globales: contenido único, no listas. El pie de todas las páginas (§13 de
@@ -242,11 +240,17 @@ export default buildConfig({
      * Donde empieza línea (filtros) la mayúscula vuelve por CSS: custom.scss.
      */
     translations: {
-      es: {
+      /*
+       * Mayúscula solo al inicio (fundamento «Contenido» del cliente, F1 del
+       * rediseño): «Panel de control», «Guardar cambios»… sobre TODA la
+       * traducción de Payload (`src/lib/panel/oracion.ts`), y encima los
+       * cambios a mano de siempre.
+       */
+      es: fusionarTraducciones(traduccionesEnOracion(es.translations), {
         general: { or: "o" },
         // El botón de `admin.preview`: abre la página pública, no un borrador.
         version: { preview: "Ver en el sitio" },
-      },
+      }),
     },
   },
   email,

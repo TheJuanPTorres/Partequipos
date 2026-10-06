@@ -22,7 +22,7 @@ export const PreguntaFrecuente: CollectionConfig = {
   admin: {
     useAsTitle: "pregunta",
     defaultColumns: ["pregunta", "orden", "publicada"],
-    group: "Contenido",
+    group: "Páginas y blog",
   },
   access: {
     read: leerPreguntas,

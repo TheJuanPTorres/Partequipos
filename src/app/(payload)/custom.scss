@@ -111,6 +111,19 @@
    * cliente siga siendo trazable. Ver docs/design-tokens.md §8.
    */
   --pq-on-primary: oklch(1 0 0); /* #ffffff */
+
+  /*
+   * MOVIMIENTO (F1 del rediseño; fundamento «Motion» del cliente): «la duración
+   * por defecto ronda los 150ms», siempre respetando el movimiento reducido.
+   * Para las transiciones PROPIAS del panel; las de Payload no se tocan.
+   */
+  --pq-transicion: 150ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pq-transicion: 0s;
+  }
 }
 
 /* -------------------------------------------------------------------------
@@ -343,26 +356,28 @@ $pasos-estado: 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 7
  *   shadow-sm  ring-1 ring-foreground/5  dark:ring-foreground/10
  *   [--card-spacing:--spacing(5)]  specular-edge
  *
- * Sin borde: el contorno lo hacen la sombra y un anillo de 1 px al 5 % del
- * texto. Los px son los que el sistema obtiene con su raíz de 16 px; se ponen
- * en px y no en rem porque la raíz del panel de Payload NO es de 16 px, y en rem
- * saldrían más pequeños que en el sistema.
+ * Sin borde: el contorno lo hace un anillo de 1 px. Los px son los que el
+ * sistema obtiene con su raíz de 16 px; se ponen en px y no en rem porque la
+ * raíz del panel de Payload NO es de 16 px, y en rem saldrían más pequeños.
+ *
+ * ELEVACIÓN (F1 del rediseño, 2026-10-06; fundamento «Elevación» del cliente):
+ * «la jerarquía se logra con anillos (ring-foreground/10), no con sombras
+ * pesadas». Se quita la sombra de las tarjetas y el anillo pasa al 10 %, en
+ * claro y en oscuro. Las sombras quedan solo para lo flotante (menús, diálogos),
+ * que son de Payload y no se tocan.
  * ----------------------------------------------------------------------- */
 .card {
-  /* shadow-sm de Tailwind v4, literal del bundle del sistema. */
-  --pq-card-sombra: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
-  --pq-card-anillo: 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 5%, transparent);
+  --pq-card-anillo: 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 10%, transparent);
 
   background: var(--pq-card);
   border-color: transparent;
   border-radius: min(var(--pq-radius-4xl), 24px);
   padding: 20px; /* --spacing(5) */
   gap: 20px;
-  box-shadow: var(--pq-card-anillo), var(--pq-card-sombra);
-}
-
-html[data-theme="dark"] .card {
-  --pq-card-anillo: 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 10%, transparent);
+  box-shadow: var(--pq-card-anillo);
+  transition:
+    background-color var(--pq-transicion),
+    box-shadow var(--pq-transicion);
 }
 
 /*
@@ -386,17 +401,14 @@ html[data-theme="dark"] .card {
 /*
  * HOVER. El sistema no define hover en la tarjeta: la acción está en botones
  * internos. En Payload la tarjeta ENTERA es un enlace, y quitarle la respuesta
- * al paso del ratón empeoraría el uso (regla 10). Se conserva, subiendo al
- * siguiente escalón de la escala de sombras de Tailwind que usa el sistema
- * (shadow-md) y al anillo del 10 %. No se inventa ningún valor.
+ * al paso del ratón empeoraría el uso (regla 10). Desde la F1, sin sombra (ver
+ * «Elevación» arriba): el anillo sube al 20 % y el fondo pasa a `accent`, que es
+ * el fondo de hover del propio sistema en ítems y menús.
  */
 .card--has-onclick:hover {
-  background: var(--pq-card);
+  background: var(--pq-sidebar-accent);
   border-color: transparent;
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--pq-foreground) 10%, transparent),
-    0 4px 6px -1px #0000001a,
-    0 2px 4px -2px #0000001a;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 20%, transparent);
 }
 
 /* card-title del sistema: font-heading text-base font-medium (16 px, 500). */
@@ -1006,7 +1018,7 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  * cambiaba de dirección por prop. Con `prefers-reduced-motion` no gira, salta.
  */
 .nav-group__chevron {
-  transition: transform 200ms ease;
+  transition: transform var(--pq-transicion);
 }
 
 .nav-group__chevron--abierto {
@@ -1039,6 +1051,13 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   position: sticky;
   bottom: 0;
   z-index: 1;
+  /*
+   * A TODO EL ANCHO (F1, 2026-10-06). `.nav__wrap` alinea sus hijos al inicio,
+   * así que el pie medía solo lo que su icono y el texto de las entradas asomaba
+   * a su derecha al desplazar. No se notaba mientras el menú cabía en la
+   * ventana; con 8 grupos y 29 entradas ya no cabe (1106 px a 1440 × 900).
+   */
+  align-self: stretch;
   background: var(--theme-bg);
   border-top: 1px solid var(--pq-sidebar-border);
   padding-block: 12px;
@@ -1582,7 +1601,7 @@ html[data-theme="dark"] .pq-acceso {
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: background-color var(--pq-transicion);
 
     &--secundario {
       background: var(--pq-secondary);

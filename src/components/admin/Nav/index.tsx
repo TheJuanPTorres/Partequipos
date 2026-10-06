@@ -4,6 +4,8 @@ import { type EntityToGroup, EntityType, groupNavItems } from "@payloadcms/ui/sh
 import type { PayloadRequest, ServerProps } from "payload";
 import { PREFERENCE_KEYS } from "payload/shared";
 
+import { ordenarMenu } from "@/lib/panel/menu";
+
 import { MenuCliente, type GrupoMenu } from "./MenuCliente";
 import { Salir } from "./Salir";
 
@@ -134,19 +136,22 @@ export default async function Nav(props: { req?: PayloadRequest } & ServerProps)
 
   const preferencia = await leerPreferenciaNav(req);
 
-  const grupos: GrupoMenu[] = gruposDePayload.map((grupo) => {
-    const nombre = typeof grupo.label === "string" ? grupo.label : String(grupo.label);
-    const guardado = preferencia?.groups?.[nombre]?.open;
-    return {
-      abierto: guardado ?? ABIERTO_POR_DEFECTO,
-      entradas: grupo.entities.map((entidad) => ({
-        label: typeof entidad.label === "string" ? entidad.label : String(entidad.label),
-        slug: entidad.slug,
-        type: entidad.type,
-      })),
-      nombre,
-    };
-  });
+  // Orden de grupos y entradas del rediseño (F1): `src/lib/panel/menu.ts`.
+  const grupos: GrupoMenu[] = ordenarMenu(
+    gruposDePayload.map((grupo) => {
+      const nombre = typeof grupo.label === "string" ? grupo.label : String(grupo.label);
+      const guardado = preferencia?.groups?.[nombre]?.open;
+      return {
+        abierto: guardado ?? ABIERTO_POR_DEFECTO,
+        entradas: grupo.entities.map((entidad) => ({
+          label: typeof entidad.label === "string" ? entidad.label : String(entidad.label),
+          slug: entidad.slug,
+          type: entidad.type,
+        })),
+        nombre,
+      };
+    }),
+  );
 
   const serverProps = { i18n, locale, params, payload, permissions, searchParams, user };
   const clientProps = { documentSubViewType, viewType };

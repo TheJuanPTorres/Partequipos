@@ -19,7 +19,7 @@ export const Pie: GlobalConfig = {
   slug: "pie",
   label: "Pie de página",
   admin: {
-    group: "Contenido",
+    group: "Partes del sitio",
     description:
       "Texto y enlaces del pie de todas las páginas. Las redes y el contacto se editan en la configuración de la empresa, no aquí.",
   },

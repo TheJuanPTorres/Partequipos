@@ -14,7 +14,7 @@ export const FichaProducto: GlobalConfig = {
   slug: "ficha-producto",
   label: "Ficha de producto",
   admin: {
-    group: "Contenido",
+    group: "Partes del sitio",
     description: "Lo que comparten todas las fichas de maquinaria nueva.",
   },
   access: { read: publico, update: escrituraContenido },

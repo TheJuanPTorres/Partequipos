@@ -35,7 +35,7 @@ export const Sede: CollectionConfig = {
   admin: {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "orden"],
-    group: "Contenido",
+    group: "Páginas y blog",
     description: "Sedes del mapa de la portada. No generan URLs propias.",
   },
   access: {

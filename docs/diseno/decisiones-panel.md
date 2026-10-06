@@ -528,3 +528,40 @@ contraseña mala, correo inexistente y cuenta bloqueada, pero la **API**
 (`POST /api/users/login`) sigue devolviendo el texto de Payload, que en el caso
 de cuenta bloqueada solo sale si el correo existe. Cerrarlo exige tocar la
 autenticación de Payload; no se ha hecho.
+
+## 19. La pantalla de acceso, en tarjeta como en el original (2026-10-05, rama `fix/panel-acceso-tarjeta`)
+
+Petición de dirección: en una pantalla de ~1900 px el panel visual ocupaba casi
+media pantalla y el formulario se iba a la derecha. En la página del sistema
+del cliente todo va en una **tarjeta centrada**. Sin esquema.
+
+**Hallazgo, para que conste:** esa tarjeta es el **marco de la documentación**
+del sistema (`data-slot="example-content"`, dentro de su `example-wrapper`
+con `max-w-5xl` y `2xl:max-w-6xl`), no parte del componente: `login-screen`
+por sí solo ocupa toda la pantalla (`min-h-svh`), que es lo que se replicó en
+el PR #89. Se replica lo que se ve en esa página, a petición de dirección.
+
+**Medido en el original y replicado** (1280, 1440 y 1920, claro y oscuro):
+
+| Medida                      | Original                                  | Nuestro (local y preview)        |
+| --------------------------- | ----------------------------------------- | -------------------------------- |
+| Tarjeta                     | 928 × 610 (1056 × 610 a 1920)             | Igual                            |
+| Borde y radio de la tarjeta | 1 px `--border`, 10,08 px                 | `--pq-border`, `--pq-radius-xl`  |
+| Relleno de la tarjeta       | 24 px                                     | Igual                            |
+| Panel visual                | 319 × 560 (366 × 560 a 1920), radio 18,72 | Igual                            |
+| Columna del formulario      | 559 (640 a 1920), relleno 40/24           | Igual                            |
+| Caja del formulario         | 384                                       | Igual                            |
+| Fondo de la página          | claro: muted · oscuro: background         | `--pq-muted` · `--pq-background` |
+| Fondo de la tarjeta         | card                                      | `--pq-card`                      |
+
+La tarjeta crece a 1056 px desde 1536 px de ancho (el `2xl` del original) y va
+centrada en vertical y horizontal con 48 px de margen mínimo.
+
+**Se mantiene:** etiquetas visibles, borde de los campos (3,11:1 en claro y
+3,21:1 en oscuro, medido sobre el fondo de la tarjeta), foco, claro y oscuro,
+y el móvil sin panel visual ni tarjeta.
+
+**Runbook de la imagen: EJECUTADO por dirección en producción** (2026-10-05):
+`acceso-panel-m0mQ….webp` (1254 × 1254) elegida en «Imagen de la pantalla de
+acceso»; el logo sigue vacío y la imagen al compartir, intacta. La pantalla ya
+pinta el telón.

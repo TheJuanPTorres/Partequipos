@@ -50,89 +50,96 @@ export default async function Acceso({ initPageResult, searchParams }: AdminView
 
   return (
     <div className="pq-acceso">
-      <aside className="pq-acceso__visual">
-        {imagen ? (
-          <Image
-            alt=""
-            className="pq-acceso__imagen"
-            height={imagen.height}
-            sizes="(min-width: 1024px) 36vw, 1px"
-            src={imagen.url}
-            width={imagen.width}
-          />
-        ) : null}
-        <div className="pq-acceso__visual-contenido">
-          <span aria-label="Partequipos" className="pq-acceso__marca" role="img">
-            {/*
-             * Sobre la imagen, en blanco; el ojal de las letras con un negro
-             * translúcido, como en el registro: así sigue leyendo como hueco.
-             */}
-            <PartequiposWordmark holeColor="rgba(0,0,0,0.3)" pColor="white" textColor="white" />
-          </span>
-          <div className="pq-acceso__lema">
-            <p className="pq-acceso__lema-titulo">
-              Acceso único a las herramientas de Partequipos.
-            </p>
-            <p className="pq-acceso__lema-texto">Una sola cuenta.</p>
-          </div>
-        </div>
-      </aside>
-
-      <main className="pq-acceso__principal">
-        <div className="pq-acceso__caja">
-          <span aria-label="Partequipos" className="pq-acceso__marca-movil" role="img">
-            <PartequiposWordmark
-              holeColor="var(--pq-background)"
-              textColor="var(--pq-foreground)"
+      {/*
+       * Tarjeta centrada en escritorio, como se ve el componente en la página del
+       * sistema del cliente (decisiones-panel.md §19). En móvil no se nota: sin
+       * borde ni fondo propio.
+       */}
+      <div className="pq-acceso__tarjeta">
+        <aside className="pq-acceso__visual">
+          {imagen ? (
+            <Image
+              alt=""
+              className="pq-acceso__imagen"
+              height={imagen.height}
+              sizes="(min-width: 1024px) 36vw, 1px"
+              src={imagen.url}
+              width={imagen.width}
             />
-          </span>
-
-          <div className="pq-acceso__cabecera">
-            <h1 className="pq-acceso__titulo">Iniciar sesión</h1>
-            <p className="pq-acceso__descripcion">
-              Accede con tu cuenta corporativa de Partequipos para continuar.
-            </p>
+          ) : null}
+          <div className="pq-acceso__visual-contenido">
+            <span aria-label="Partequipos" className="pq-acceso__marca" role="img">
+              {/*
+               * Sobre la imagen, en blanco; el ojal de las letras con un negro
+               * translúcido, como en el registro: así sigue leyendo como hueco.
+               */}
+              <PartequiposWordmark holeColor="rgba(0,0,0,0.3)" pColor="white" textColor="white" />
+            </span>
+            <div className="pq-acceso__lema">
+              <p className="pq-acceso__lema-titulo">
+                Acceso único a las herramientas de Partequipos.
+              </p>
+              <p className="pq-acceso__lema-texto">Una sola cuenta.</p>
+            </div>
           </div>
+        </aside>
 
-          {microsoft ? (
-            <a className="pq-acceso__boton pq-acceso__boton--secundario" href={microsoft}>
-              <MicrosoftLogo className="pq-acceso__logo-ms" />
-              Continuar con Microsoft
-            </a>
-          ) : (
-            /*
-             * DESACTIVADO mientras no exista el inicio de sesión con Microsoft
-             * (Auth Central, §10.29). Se activa solo con la variable
-             * PANEL_ACCESO_MICROSOFT_URL; este código no llama a Auth Central.
-             */
-            <button
-              className="pq-acceso__boton pq-acceso__boton--secundario"
-              disabled
-              type="button"
-            >
-              <MicrosoftLogo className="pq-acceso__logo-ms" />
-              Continuar con Microsoft
-              <span className="pq-acceso__pronto">Próximamente</span>
-            </button>
-          )}
+        <main className="pq-acceso__principal">
+          <div className="pq-acceso__caja">
+            <span aria-label="Partequipos" className="pq-acceso__marca-movil" role="img">
+              <PartequiposWordmark
+                holeColor="var(--pq-background)"
+                textColor="var(--pq-foreground)"
+              />
+            </span>
 
-          <div className="pq-acceso__separador">
-            <span aria-hidden="true" className="pq-acceso__riel" />
-            <span>o con correo y contraseña</span>
-            <span aria-hidden="true" className="pq-acceso__riel" />
+            <div className="pq-acceso__cabecera">
+              <h1 className="pq-acceso__titulo">Iniciar sesión</h1>
+              <p className="pq-acceso__descripcion">
+                Accede con tu cuenta corporativa de Partequipos para continuar.
+              </p>
+            </div>
+
+            {microsoft ? (
+              <a className="pq-acceso__boton pq-acceso__boton--secundario" href={microsoft}>
+                <MicrosoftLogo className="pq-acceso__logo-ms" />
+                Continuar con Microsoft
+              </a>
+            ) : (
+              /*
+               * DESACTIVADO mientras no exista el inicio de sesión con Microsoft
+               * (Auth Central, §10.29). Se activa solo con la variable
+               * PANEL_ACCESO_MICROSOFT_URL; este código no llama a Auth Central.
+               */
+              <button
+                className="pq-acceso__boton pq-acceso__boton--secundario"
+                disabled
+                type="button"
+              >
+                <MicrosoftLogo className="pq-acceso__logo-ms" />
+                Continuar con Microsoft
+                <span className="pq-acceso__pronto">Próximamente</span>
+              </button>
+            )}
+
+            <div className="pq-acceso__separador">
+              <span aria-hidden="true" className="pq-acceso__riel" />
+              <span>o con correo y contraseña</span>
+              <span aria-hidden="true" className="pq-acceso__riel" />
+            </div>
+
+            <FormularioAcceso
+              accion={formatAdminURL({
+                apiRoute: config.routes.api,
+                path: `/${config.admin.user}/login`,
+              })}
+              bloqueo={bloqueo}
+              olvido={formatAdminURL({ adminRoute, path: config.admin.routes.forgot })}
+              redireccion={redireccion}
+            />
           </div>
-
-          <FormularioAcceso
-            accion={formatAdminURL({
-              apiRoute: config.routes.api,
-              path: `/${config.admin.user}/login`,
-            })}
-            bloqueo={bloqueo}
-            olvido={formatAdminURL({ adminRoute, path: config.admin.routes.forgot })}
-            redireccion={redireccion}
-          />
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

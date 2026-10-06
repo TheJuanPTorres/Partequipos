@@ -2336,3 +2336,40 @@ Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.
   `partequipos-cierre\capturas\movil-s2-s3\`.
 - **Para Andrés:** en su maqueta móvil el brazo pisa el botón. Aquí la
   sección 3 empieza 136 px más abajo.
+
+### 28.2 Secciones 6–8 en móvil: todo en la misma pantalla — amplía §27.5
+
+- **Qué pasaba:** en móvil, el título de la sección 8 hacía su barrido por
+  debajo de la pantalla. Solo entraba después de soltarse el fijado.
+- **Ahora (solo ≤ 767 px):**
+  1. La sección queda fija mientras el vídeo se encoge a 0,55. En móvil se
+     encoge **anclado arriba** y baja hasta un 6 % del alto, en vez de quedarse
+     centrado. Centrado solo dejaba libre debajo el 22,5 % de la pantalla, y el
+     título (hasta 4 líneas, unos 200 px) no cabía. Así queda libre el 39 %.
+  2. El encogido termina justo cuando el título de la sección 8 asoma por
+     abajo, con la sección **todavía fija**. El título entra con su barrido y
+     queda **24 px bajo el vídeo**, dentro de la pantalla, sin seguir bajando.
+     El texto infinito aparece alrededor de ese final, como en escritorio.
+  3. Al terminar el recorrido, la página sigue con normalidad.
+- **Cómo:** la sección 8 sube `−39 % del alto + 24 − 40 px` (CSS fijo, sin
+  CLS). El momento del final del encogido lo calcula el componente con el alto
+  real de la pantalla.
+- **Escritorio, sin cambios.** Con **movimiento reducido** no hay encogido, la
+  sección 8 no sube y todo queda estático y visible.
+- **Sin JavaScript** el vídeo se queda a tamaño completo, y en móvil el título
+  de la 8 se montaría sobre su parte baja. Pasa igual antes de hidratar, pero
+  entonces la persona está en lo alto de la página. Se acepta para mantener el
+  CLS en 0.
+- **Medido en el preview** a 390×844, 360×740 y 430×932:
+  - el título asoma con la sección fija (`top` 0) justo cuando acaba el
+    encogido;
+  - termina su barrido dentro de la pantalla, 24 px bajo el vídeo (por
+    ejemplo, de 539 a 726 en un alto de 844);
+  - después la sección se suelta;
+  - CLS 0.
+  - A 1440 la sección 8 no sube; con movimiento reducido, todo visible.
+- **Capturas y vídeo:** `partequipos-cierre\capturas\movil-s8\` y
+  `home-coreografia\efecto-390.webm`, regrabado.
+- **Para Andrés:** en móvil el vídeo encogido va arriba y no centrado, y la
+  sección 8 se monta sobre el final del recorrido. Es la misma regla de §27.5:
+  nunca encima del vídeo.

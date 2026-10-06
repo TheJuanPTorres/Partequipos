@@ -21,6 +21,7 @@ import {
 } from "payload";
 import sharp from "sharp";
 
+import { conUltimoEditor } from "./lib/fields/ultimoEditor";
 import { pushPermitido } from "./lib/db/pushEsquema";
 import { fusionarTraducciones, traduccionesEnOracion } from "./lib/panel/oracion";
 import { RUTAS_EN_EL_SITIO, verEnElSitio } from "./lib/panel/verEnElSitio";
@@ -184,44 +185,47 @@ export default buildConfig({
    * afecta al esquema: las tablas se generan por slug. Ninguna colección ni
    * global puede quedar sin `admin.group` aprobado (`grupos.test.ts`).
    */
+  // Último editor en las de contenido (§25), nunca en Solicitudes ni Usuarios.
   collections: sinPestanaApi(
-    conVerEnElSitio([
-      // Leads de los formularios publicos. Unica coleccion con datos personales:
-      // su control de acceso de lectura es privado, no publico como el catalogo.
-      // Primero en el menu: es lo mas urgente de revisar (CLAUDE.md §10.11).
-      Solicitud,
-      // Repuestos: la ficha primero, luego sus clasificaciones.
-      ModeloRepuesto,
-      Marca,
-      TipoEquipo,
-      CategoriaTecnica,
-      // Maquinaria (ADR 0007): colecciones propias, separadas de las de repuestos.
-      EquipoNuevo,
-      EquipoUsado,
-      MarcaMaquinaria,
-      TipoMaquinaria,
-      CategoriaMaquinaria,
-      CategoriaUsada,
-      // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.
-      MarcaLubricante,
-      CategoriaLubricante,
-      // Páginas y blog. Los articulos se sirven en la raiz /{slug}/, igual que las
-      // paginas institucionales: de ahi el guardarrail de unicidad entre ambas.
-      PaginaInstitucional,
-      Articulo,
-      CategoriaBlog,
-      PreguntaFrecuente,
-      Testimonio,
-      Sede,
-      // Archivos. Los PDF (ficha técnica de los equipos nuevos) nunca en Media.
-      Media,
-      Documento,
-      Video,
-      Animacion,
-      // Configuracion (el global de SEO va el primero del grupo en el menú).
-      Redirects,
-      Users,
-    ]),
+    conUltimoEditor(
+      conVerEnElSitio([
+        // Leads de los formularios publicos. Unica coleccion con datos personales:
+        // su control de acceso de lectura es privado, no publico como el catalogo.
+        // Primero en el menu: es lo mas urgente de revisar (CLAUDE.md §10.11).
+        Solicitud,
+        // Repuestos: la ficha primero, luego sus clasificaciones.
+        ModeloRepuesto,
+        Marca,
+        TipoEquipo,
+        CategoriaTecnica,
+        // Maquinaria (ADR 0007): colecciones propias, separadas de las de repuestos.
+        EquipoNuevo,
+        EquipoUsado,
+        MarcaMaquinaria,
+        TipoMaquinaria,
+        CategoriaMaquinaria,
+        CategoriaUsada,
+        // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.
+        MarcaLubricante,
+        CategoriaLubricante,
+        // Páginas y blog. Los articulos se sirven en la raiz /{slug}/, igual que las
+        // paginas institucionales: de ahi el guardarrail de unicidad entre ambas.
+        PaginaInstitucional,
+        Articulo,
+        CategoriaBlog,
+        PreguntaFrecuente,
+        Testimonio,
+        Sede,
+        // Archivos. Los PDF (ficha técnica de los equipos nuevos) nunca en Media.
+        Media,
+        Documento,
+        Video,
+        Animacion,
+        // Configuracion (el global de SEO va el primero del grupo en el menú).
+        Redirects,
+        Users,
+      ]),
+    ),
   ),
   // Globales: contenido único, no listas. El pie de todas las páginas (§13 de
   // docs/diseno/decisiones-home-ux9.md).

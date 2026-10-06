@@ -73,6 +73,7 @@
     "qa:marca-tipo": "payload run scripts/qa/verificar-marca-tipo.ts",
     "qa:slug-paginas": "payload run scripts/qa/verificar-slug-paginas.ts",
     "qa:alt": "payload run scripts/qa/verificar-alt.ts",
+    "qa:ultimo-editor": "payload run scripts/qa/verificar-ultimo-editor.ts",
     "qa:ficha": "payload run scripts/qa/verificar-ficha.ts",
     "media:alt-flojos": "payload run scripts/media/alt-flojos.ts",
     "panel:revision": "tsx scripts/preview/con-entorno.ts npx -y -p playwright-core@1.63.0 node scripts/qa/revision-panel.mjs",

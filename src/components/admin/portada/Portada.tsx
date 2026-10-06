@@ -173,7 +173,12 @@ export default async function Portada(props: DashboardViewServerProps) {
                 <Link prefetch={false} className="pq-portada__reciente-titulo" href={r.href}>
                   {r.titulo}
                 </Link>
-                <span className="pq-portada__reciente-coleccion">{r.coleccion}</span>
+                <span className="pq-portada__reciente-coleccion">
+                  {r.coleccion}
+                  <span className="pq-portada__reciente-editor">
+                    {r.editor === "—" ? " · —" : ` · por ${r.editor}`}
+                  </span>
+                </span>
                 <time
                   className="pq-portada__reciente-fecha"
                   dateTime={r.actualizado}

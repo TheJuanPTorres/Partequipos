@@ -306,6 +306,7 @@ export interface EquiposNuevo {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -338,6 +339,7 @@ export interface MarcasMaquinaria {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -354,6 +356,7 @@ export interface Media {
    * Describe lo que se ve, como se lo contarías a alguien por teléfono: «Excavadora Hitachi ZX200 trabajando en una obra». Ni «foto1», ni «imagen», ni el nombre del fichero.
    */
   alt: string;
+  actualizadoPor?: (number | null) | User;
   createdAt: string;
   url?: string | null;
   thumbnailURL?: string | null;
@@ -364,6 +367,41 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * Cuentas con acceso al panel. Solo un administrador puede crear usuarios o cambiar roles.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  /**
+   * El editor no puede crear usuarios, cambiar roles ni borrar registros. Solo un administrador cambia este campo.
+   */
+  rol: 'administrador' | 'editor';
+  /**
+   * Permite cambiar la dirección web de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.
+   */
+  puedeEditarSlugs?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -386,6 +424,7 @@ export interface TiposMaquinaria {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -402,6 +441,7 @@ export interface Documento {
    * Para el panel. Ej. «Ficha técnica Hitachi ZX130-7H».
    */
   titulo: string;
+  actualizadoPor?: (number | null) | User;
   createdAt: string;
   url?: string | null;
   thumbnailURL?: string | null;
@@ -444,6 +484,7 @@ export interface ModelosRepuesto {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -460,6 +501,7 @@ export interface Marca {
   slug: string;
   descripcion?: string | null;
   logo?: (number | null) | Media;
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -484,6 +526,7 @@ export interface TiposEquipo {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -521,6 +564,7 @@ export interface CategoriasTecnica {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -567,6 +611,7 @@ export interface EquiposUsado {
    */
   disponible?: boolean | null;
   pestanaPortada?: ('categoria' | 'aditamentos') | null;
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -590,6 +635,7 @@ export interface CategoriasUsada {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -617,6 +663,7 @@ export interface CategoriasMaquinaria {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -659,6 +706,7 @@ export interface MarcasLubricante {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -715,6 +763,7 @@ export interface CategoriasLubricante {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -934,6 +983,7 @@ export interface Pagina {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -982,6 +1032,7 @@ export interface Video {
    * Un vídeo de fondo sin información se oculta a los lectores de pantalla.
    */
   decorativo?: boolean | null;
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1051,6 +1102,7 @@ export interface Animacion {
    */
   ancho?: number | null;
   alto?: number | null;
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1205,6 +1257,7 @@ export interface Articulo {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -1228,6 +1281,7 @@ export interface CategoriasBlog {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -1241,6 +1295,7 @@ export interface PreguntasFrecuente {
   respuesta: string;
   orden?: number | null;
   publicada?: boolean | null;
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -1276,6 +1331,7 @@ export interface Testimonio {
    */
   publicado?: boolean | null;
   orden?: number | null;
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -1324,6 +1380,7 @@ export interface Sede {
    * Menor primero.
    */
   orden?: number | null;
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -1357,43 +1414,9 @@ export interface Redirect {
    */
   estadoDestino?: ('sin-verificar' | 'resuelve' | 'sin-contenido' | 'sin-ruta' | 'externa') | null;
   destinoVerificadoEn?: string | null;
+  actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * Cuentas con acceso al panel. Solo un administrador puede crear usuarios o cambiar roles.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number;
-  /**
-   * El editor no puede crear usuarios, cambiar roles ni borrar registros. Solo un administrador cambia este campo.
-   */
-  rol: 'administrador' | 'editor';
-  /**
-   * Permite cambiar la dirección web de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.
-   */
-  puedeEditarSlugs?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1598,6 +1621,7 @@ export interface ModelosRepuestoSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1610,6 +1634,7 @@ export interface MarcasSelect<T extends boolean = true> {
   slug?: T;
   descripcion?: T;
   logo?: T;
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1629,6 +1654,7 @@ export interface TiposEquipoSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1652,6 +1678,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1692,6 +1719,7 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1714,6 +1742,7 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
   imagenes?: T;
   disponible?: T;
   pestanaPortada?: T;
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1735,6 +1764,7 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1754,6 +1784,7 @@ export interface TiposMaquinariaSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1773,6 +1804,7 @@ export interface CategoriasMaquinariaSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1791,6 +1823,7 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1811,6 +1844,7 @@ export interface MarcasLubricanteSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1839,6 +1873,7 @@ export interface CategoriasLubricanteSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1972,6 +2007,7 @@ export interface PaginasSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2071,6 +2107,7 @@ export interface ArticulosSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2089,6 +2126,7 @@ export interface CategoriasBlogSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2101,6 +2139,7 @@ export interface PreguntasFrecuentesSelect<T extends boolean = true> {
   respuesta?: T;
   orden?: T;
   publicada?: T;
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2121,6 +2160,7 @@ export interface TestimoniosSelect<T extends boolean = true> {
   referenciaAutorizacion?: T;
   publicado?: T;
   orden?: T;
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2145,6 +2185,7 @@ export interface SedesSelect<T extends boolean = true> {
       };
   foto?: T;
   orden?: T;
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2155,6 +2196,7 @@ export interface SedesSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   updatedAt?: T;
   alt?: T;
+  actualizadoPor?: T;
   createdAt?: T;
   url?: T;
   thumbnailURL?: T;
@@ -2173,6 +2215,7 @@ export interface MediaSelect<T extends boolean = true> {
 export interface DocumentosSelect<T extends boolean = true> {
   updatedAt?: T;
   titulo?: T;
+  actualizadoPor?: T;
   createdAt?: T;
   url?: T;
   thumbnailURL?: T;
@@ -2190,6 +2233,7 @@ export interface VideosSelect<T extends boolean = true> {
   descripcion?: T;
   poster?: T;
   decorativo?: T;
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -2208,6 +2252,7 @@ export interface AnimacionesSelect<T extends boolean = true> {
   descripcion?: T;
   ancho?: T;
   alto?: T;
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -2230,6 +2275,7 @@ export interface RedirectsSelect<T extends boolean = true> {
   notas?: T;
   estadoDestino?: T;
   destinoVerificadoEn?: T;
+  actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
 }

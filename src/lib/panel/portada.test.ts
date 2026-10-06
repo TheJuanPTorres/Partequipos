@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 
 import {
   avisosDePortada,
+  etiquetaEditor,
   tarjetasDePortada,
   ultimosModificados,
   type EntidadPortada,
@@ -91,6 +92,7 @@ describe("ultimosModificados", () => {
     titulo: slug,
     href: `/admin/collections/${slug}/1`,
     actualizado,
+    editor: "—",
   });
 
   it("junta, ordena por fecha y deja fuera solicitudes y usuarios", () => {
@@ -106,5 +108,16 @@ describe("ultimosModificados", () => {
       u.map((x) => x.slug),
       ["media", "articulos"],
     );
+  });
+});
+
+describe("etiquetaEditor", () => {
+  it("uno mismo, un usuario legible, uno no legible y sin dato", () => {
+    assert.equal(etiquetaEditor(5, 5), "ti");
+    assert.equal(etiquetaEditor({ id: 5, email: "yo@x.co" }, 5), "ti");
+    assert.equal(etiquetaEditor({ id: 7, email: "otra@x.co" }, 5), "otra@x.co");
+    assert.equal(etiquetaEditor(7, 5), "otra persona del equipo");
+    assert.equal(etiquetaEditor(null, 5), "—");
+    assert.equal(etiquetaEditor(undefined, 5), "—");
   });
 });

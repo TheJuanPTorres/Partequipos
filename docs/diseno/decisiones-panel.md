@@ -643,11 +643,14 @@ Tailwind: rejilla icono + texto, borde del tono al 32 %, fondo al 4 %, radio
 xl, 12 × 14 px de relleno, título en peso 500 y texto atenuado. Cuatro tonos
 (`info`, `aviso`, `error`, `exito`) con icono de Tabler.
 
-- **Desviación:** el icono va en el `-foreground` del tono (amber-700, blue-700…;
-  en oscuro, el 400) y no en el tono puro, que en ámbar da 2:1 sobre blanco. Es
-  decorativo (`aria-hidden`), pero así se distingue también con poca vista.
-- **Rol:** `note` por defecto (no interrumpe), `status` en lo que cambia
-  mientras se edita y ninguno dentro de una región que ya anuncia.
+- **Desviación:** en info, aviso y éxito, el icono va en el `-foreground` del tono
+  (amber-700, blue-700…; en oscuro, el 400) y no en el tono puro; en error, en
+  `--pq-destructive`, que ya contrasta. El tono puro, en ámbar, da 2:1 sobre
+  blanco. El icono es decorativo (`aria-hidden`), pero así se distingue también
+  con poca vista.
+- **Rol:** `note` por defecto (no interrumpe), `status` en el aviso de textos
+  alternativos de Imágenes (como antes) y ninguno dentro de una región que ya
+  anuncia (el contador de «Destacar», que es `status` él mismo).
 - Tokens nuevos del sistema en `custom.scss`: `--pq-info` y los `-foreground`
   de info, success y warning, en claro y oscuro (su `theme.json`).
 - Los avisos que ya existían pasan a usarlo: textos alternativos flojos
@@ -680,7 +683,8 @@ lo que ve el editor.
 | Nota de las redirecciones automáticas           | «…al cambiar la dirección web»                                              |
 
 Solo cambian etiquetas y textos: los nombres de campo y los valores guardados
-son los mismos. La guía del editor se actualizó para que coincida (§7 y la
+son los mismos. Las **notas de las redirecciones automáticas ya guardadas**
+conservan su texto («…al cambiar el slug»): son datos, no interfaz. La guía del editor se actualizó para que coincida (§7 y la
 tabla de errores) y tiene una tabla nueva de los avisos.
 
 **`panel:revision` con modo `avisos`** (`… -- <preview> avisos` y `… avisos

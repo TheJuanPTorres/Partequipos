@@ -158,6 +158,14 @@ export default buildConfig({
        * no se exporta y este menú no lo pinta. Hay una prueba que lo vigila.
        */
       Nav: "/components/admin/Nav",
+      /*
+       * Pantalla de acceso con el diseño `login-screen` del sistema del cliente.
+       * La autenticación sigue siendo la de Payload; ver el componente y
+       * docs/diseno/decisiones-panel.md §17.
+       */
+      views: {
+        login: { Component: "/components/admin/acceso/Acceso" },
+      },
     },
   },
   /*

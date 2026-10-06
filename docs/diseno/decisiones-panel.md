@@ -421,3 +421,85 @@ automatizado (§15, cerrado).
 **Por efecto:** `npm run qa:ficha` de B, contra `development`, sigue en verde
 con la validación en la casilla. Para eso `development` se puso al día con
 `payload migrate` y `db:check` antes y después.
+
+## 17. Pantalla de acceso con el diseño del cliente (2026-10-05, rama `feat/panel-login`)
+
+Petición de dirección: sustituir el login del panel por
+[`login-screen`](https://ui.partequipos.com/components/login-screen), en su
+variante principal (panel visual a la izquierda y formulario a la derecha).
+**Sin esquema y sin dependencias nuevas.** PR sin fusionar: lo revisa
+dirección antes, porque es la entrada al panel.
+
+**Cómo se sustituye.** Vista propia en `admin.components.views.login`
+(`src/components/admin/acceso/`). Payload la sigue envolviendo en su
+plantilla mínima (`.login.template-minimal`, caja de 480 px), que el SCSS
+amplía a toda la pantalla cuando contiene la nuestra. La vista replica lo que
+hace la `LoginView` de Payload 3.89, leída en su código:
+
+| Qué                           | Cómo                                                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Autenticación                 | La de Payload: `POST /api/users/login`, cookie de sesión y `setUser`, como su `LoginForm`                           |
+| Bloqueo por intentos          | Lo aplica el servidor (`Users.auth`: 5 intentos, 30 min). La pantalla lee esos dos valores para el mensaje          |
+| Redirección después de entrar | `getSafeRedirect` de Payload en el servidor: solo rutas del propio sitio                                            |
+| Ya hay sesión                 | Redirige sin pintar nada, como Payload                                                                              |
+| «¿Olvidaste tu contraseña?»   | Enlace a la vista `forgot` de Payload, sin cambios                                                                  |
+| Mensajes de error             | **Uno solo** para contraseña mala y cuenta bloqueada (`mensajeDeError`, con pruebas). Ver abajo                     |
+| «Continuar con Microsoft»     | Desactivado con «Próximamente». Se activa solo con `PANEL_ACCESO_MICROSOFT_URL` (`https://`); hoy en ningún entorno |
+
+**Errores que no revelan si un correo existe.** Payload responde 401 en los
+dos casos, pero con textos distintos, y el de «cuenta bloqueada» solo sale si
+el correo existe. La pantalla **no muestra el texto del servidor**: cualquier
+401 (o 403) da «Correo o contraseña incorrectos. Tras 5 intentos fallidos seguidos, el
+acceso se bloquea 30 minutos.», y un fallo de red o del servidor, un mensaje
+que no habla de credenciales. **Límite:** la API (`/api/users/login`) sigue
+devolviendo el texto de Payload a quien la llame directamente; cerrarlo exige
+tocar la autenticación de Payload, y no se ha hecho.
+
+**Lo que se copió del registro y lo que no:**
+
+| Pieza del registro            | Decisión                                                                                                                    |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `button`, `input`, `spinner`  | **No.** Traen Base UI, `cva`, `clsx` y `tailwind-merge`. Se replican con `<button>` e `<input>` nativos y el SCSS del panel |
+| `microsoft-logo`              | **Sí**, byte a byte (`src/components/ui/`, fuera de Prettier, §10.27). Un SVG sin dependencias                              |
+| `partequipos-wordmark`        | Ya estaba en el repositorio                                                                                                 |
+| `use-auth`                    | **No.** Es el flujo de Auth Central (§10.29), que no se construye aquí                                                      |
+| Fuente Rubik                  | La que ya carga el panel                                                                                                    |
+| `login-bg.webp` (1254 × 1254) | En `Media`, nunca en `public/`. Ver abajo                                                                                   |
+| Spinner con «Loading»         | `IconLoader2` de Tabler (ya instalado) y el texto «Ingresando…» en el botón                                                 |
+
+**Imagen del panel visual.** No hay campo para elegirla (sin esquema): la
+pantalla toma la imagen más reciente de `Media` cuyo fichero se llama
+`acceso-panel` (`getImagenAcceso`). Desde la subida directa (PR #82) el
+almacén **añade un sufijo aleatorio** al nombre, así que se reconoce el
+nombre con o sin sufijo (`esImagenAcceso`, con pruebas), no el exacto. Sin
+imagen, o si la consulta falla, un degradado rojo hacia negro: **el acceso
+nunca depende de una imagen.**
+
+- **Preview:** subida con `npm run preview:acceso:subir` (id 131); `retirar`
+  la quita y comprueba el 404 en el Blob.
+- **Producción:** la sube dirección desde el panel, con el runbook
+  `Desktop\partequipos-cierre\runbook-imagen-acceso.md`.
+
+**Desviaciones del diseño, a propósito:**
+
+| Desviación                                                       | Motivo                                                                                                    |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Etiquetas visibles** «Correo» y «Contraseña» sobre los campos  | El diseño solo tiene el texto de ayuda de dentro, que desaparece al escribir (WCAG 3.3.2)                 |
+| **Borde de los campos** de 3:1                                   | En claro, el diseño no lo pinta (fondo gris al 50 % sin borde). Es el borde del resto de campos del panel |
+| **Foco** de 2 px en el rojo de marca                             | El del panel (§10 de `design-tokens.md`): el anillo al 30 % del sistema no llega a 3:1                    |
+| «¿Olvidaste tu contraseña?» junto a la etiqueta de la contraseña | El diseño no lo tiene; dirección lo pidió                                                                 |
+| «Próximamente» en el botón de Microsoft                          | Lo pidió dirección: el botón se ve pero no funciona                                                       |
+| Velo oscuro bajo el lema del panel visual                        | Para que el texto blanco se lea sea cual sea la foto                                                      |
+
+**Accesibilidad:** un solo `<h1>`; región de error `role="alert"` siempre
+presente (se anuncia al llenarse) y campos con `aria-invalid` y
+`aria-describedby` hacia el error; foco visible en todo; orden del tabulador
+correo → «¿Olvidaste…?» → contraseña → «Iniciar sesión» (el botón de Microsoft,
+desactivado, no recibe foco); el spinner no gira con movimiento reducido;
+campos a 16 px en móvil para que Safari no amplíe al enfocar.
+
+**`panel:revision` con modo `acceso`** (`npm run panel:revision -- <preview> acceso`):
+captura la pantalla en claro y en oscuro (cookie `payload-theme`) a 1440 y
+en móvil, un error con un correo que **no existe** (no suma intentos a
+ninguna cuenta), el orden del tabulador, y al entrar comprueba que respeta
+`?redirect=` y que `/admin/login` con sesión redirige al panel.

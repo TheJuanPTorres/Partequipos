@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
+import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getMarcaPorSlug } from "@/lib/queries/getMarcas";
 import { getModeloPorSlug, getModelos } from "@/lib/queries/getModelos";
@@ -99,6 +100,8 @@ export default async function ModeloPage({ params }: { params: Promise<Params> }
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <JsonLd data={[productJsonLd, buildBreadcrumbJsonLd(breadcrumbs)]} />
+      {/* La ficha ya tiene su formulario de solicitud: el pie no pinta la tarjeta roja. */}
+      <PieSinTarjeta />
       <Breadcrumbs items={breadcrumbs} />
 
       <h1 className="text-3xl font-semibold text-gray-900">Repuestos {modelo.nombre}</h1>

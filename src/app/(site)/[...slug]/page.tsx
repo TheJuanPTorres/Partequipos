@@ -6,6 +6,7 @@ import { ArticuloCuerpo } from "@/components/blog/ArticuloCuerpo";
 import { PaginaConBloques } from "@/components/bloques/PaginaConBloques";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
+import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { idsDeVideos, vistaDeBloques } from "@/lib/bloques/desdePayload";
@@ -159,6 +160,8 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
+      {/* /contactanos/ ya tiene su formulario: el pie no pinta la tarjeta roja. */}
+      {clave === SLUG_CONTACTO ? <PieSinTarjeta /> : null}
       <Breadcrumbs items={breadcrumbs} />
 
       <h1 className="text-3xl font-semibold text-gray-900">{pagina.titulo}</h1>

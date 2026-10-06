@@ -15,9 +15,15 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const raiz = path.resolve(dir, "../../..");
 const css = readFileSync(path.join(dir, "pie.module.css"), "utf8");
 
-/** Páginas que piden el pie sin tarjeta (decisión de dirección, 2026-10-06). */
+/**
+ * Páginas que piden el pie sin tarjeta (decisiones de dirección, 2026-10-06):
+ * las fichas de maquinaria nueva, las de modelo de repuesto y /contactanos/
+ * (en la ruta comodín, solo para esa página).
+ */
 const PAGINAS = [
   "src/app/(site)/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]/page.tsx",
+  "src/app/(site)/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]/[modelo]/page.tsx",
+  "src/app/(site)/[...slug]/page.tsx",
 ];
 
 describe("pie sin la tarjeta roja", () => {
@@ -35,9 +41,13 @@ describe("pie sin la tarjeta roja", () => {
   });
 
   for (const pagina of PAGINAS) {
-    it(`${path.basename(path.dirname(pagina))} pinta el marcador`, () => {
+    it(`${path.relative("src/app/(site)", path.dirname(pagina))} pinta el marcador`, () => {
       const fuente = readFileSync(path.join(raiz, pagina), "utf8");
       assert.match(fuente, /<PieSinTarjeta \/>/);
+      if (pagina.includes("[...slug]")) {
+        // En la ruta comodín, solo en /contactanos/: el resto de páginas lo conserva.
+        assert.match(fuente, /clave === SLUG_CONTACTO \? <PieSinTarjeta \/> : null/);
+      }
     });
   }
 

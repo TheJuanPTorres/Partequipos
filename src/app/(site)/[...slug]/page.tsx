@@ -26,6 +26,7 @@ import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
+import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 /**
  * Ruta raíz comodín: sirve DOS cosas distintas.
@@ -92,7 +93,8 @@ const aSlug = (segs: string[]) => segs.filter(Boolean).join("/");
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
   const resuelto = await resolver(aSlug(slug));
-  if (!resuelto) return {};
+  // Sin registro, la página termina en la 404: su título y descripción (I3).
+  if (!resuelto) return METADATA_404;
 
   if (resuelto.tipo === "articulo") {
     const { articulo } = resuelto;

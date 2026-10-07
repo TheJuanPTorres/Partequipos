@@ -4,7 +4,12 @@ import { useDocumentInfo, useFormFields, useLivePreviewContext } from "@payloadc
 import { useEffect, useState } from "react";
 
 import { seoConfig } from "@/lib/seo/config";
-import { RECOMENDADO, recortarDescripcion } from "@/lib/seo/porDefecto";
+import {
+  RECOMENDADO,
+  SUFIJO_MARCA,
+  recortarDescripcion,
+  tituloConMarca,
+} from "@/lib/seo/porDefecto";
 import { SEO_POR_COLECCION, estadoLongitud, type Nombres } from "@/lib/seo/seoPanel";
 
 /**
@@ -13,7 +18,9 @@ import { SEO_POR_COLECCION, estadoLongitud, type Nombres } from "@/lib/seo/seoPa
  *
  * - cómo se verá la página en Google, con lo que usará DE VERDAD el sitio:
  *   lo escrito aquí o, si está vacío, lo mismo que pone su `generateMetadata`
- *   (las plantillas son las de `src/lib/seo/porDefecto.ts`, compartidas);
+ *   (las plantillas son las de `src/lib/seo/porDefecto.ts`, compartidas), y
+ *   el título con la marca al final por la misma `tituloConMarca` que
+ *   `buildMetadata` (auditoría I2);
  * - un contador de caracteres para el título y la descripción, con la
  *   longitud recomendada;
  * - qué se usa si cada campo se deja vacío, y qué imagen gana a la social.
@@ -99,6 +106,9 @@ export default function SeoGuiado() {
 
   const tituloPorDefecto = valores.nombre ? regla.titulo(valores.nombre, nombres) : null;
   const titulo = valores.metaTitle.trim() || tituloPorDefecto || "";
+  // La ruta de «Ver en el sitio» es relativa: «/» solo en la portada, que es
+  // lo único que `tituloConMarca` mira de ella.
+  const tituloPublicado = titulo ? tituloConMarca(titulo, previewURL ?? "") : "";
   const descripcionPorDefecto = valores.base.trim()
     ? recortarDescripcion(valores.base)
     : seoConfig.defaultDescription;
@@ -117,7 +127,7 @@ export default function SeoGuiado() {
           {dominio}
           {migas ? ` › ${migas}` : ""}
         </span>
-        <span className="pq-seo__google-titulo">{titulo || "(sin título todavía)"}</span>
+        <span className="pq-seo__google-titulo">{tituloPublicado || "(sin título todavía)"}</span>
         <span className="pq-seo__google-descripcion">{descripcion}</span>
       </div>
 
@@ -126,8 +136,9 @@ export default function SeoGuiado() {
           <strong>Título para buscadores:</strong>{" "}
           <Contador largo={valores.metaTitle.trim().length} rango={RECOMENDADO.titulo} />
           <br />
-          Recomendado: hasta {RECOMENDADO.titulo.max} caracteres; Google corta lo que pase. No se le
-          añade nada: si quieres «Partequipos», escríbelo.
+          Recomendado: hasta {RECOMENDADO.titulo.max} caracteres; Google corta lo que pase. El sitio
+          le añade «{SUFIJO_MARCA.trim()}» al final si con ella no pasa de {RECOMENDADO.titulo.max}{" "}
+          y no la lleva ya (en la portada, nunca); no hace falta escribirla.
           <br />
           Si lo dejas vacío: «{tituloPorDefecto ?? "el nombre, cuando lo escribas"}».
         </li>

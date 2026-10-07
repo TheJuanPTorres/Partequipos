@@ -340,6 +340,11 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 - Toda decisión relevante se documenta como ADR en `docs/decisions/`.
 - **Idioma:** todos los mensajes al chat, informes, documentación, PR y
   commits se escriben en español.
+- **Datos reales del cliente (2026-10-07):** nunca se copian datos reales de
+  las exportaciones del cliente (seriales, nombres, correos, teléfonos) en
+  código, comentarios, pruebas, documentación ni commits; los ejemplos se
+  inventan. Motivo: el repositorio es público y lo que entra en un commit
+  queda en su historial (pasó con seriales en comentarios del PR #115).
 
 ### Modo de trabajo (2026-09-28)
 

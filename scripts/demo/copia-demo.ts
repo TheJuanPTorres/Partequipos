@@ -63,6 +63,7 @@ import {
   veredictoSubida,
 } from "../../src/lib/demo/copiaDemo";
 import { almacenDeUrl } from "../../src/lib/blob/almacen";
+import { fetchAlPreview } from "../../src/lib/preview/derivacion.mjs";
 import { FICHERO_ENTORNO_PREVIEW, leerFicheroEntorno } from "../../src/lib/preview/entornoPreview";
 
 // ------------------------------------------------------------------ argumentos
@@ -353,9 +354,8 @@ if (modo === "simular" || modo === "copiar") {
     : undefined;
   if (!bypass) fallar(`falta el secreto de derivación del preview en ${FICHERO_ENTORNO_PREVIEW}`);
   const get = async <T>(ruta: string): Promise<T> => {
-    const r = await fetch(origen + ruta, {
-      headers: { "x-vercel-protection-bypass": bypass ?? "" },
-    });
+    // Solo al origen del preview y sin seguir redirecciones (`derivacion.mjs`).
+    const r = await fetchAlPreview(origen + ruta, origen, bypass);
     if (!r.ok) fallar(`origen ${ruta}: HTTP ${r.status}`);
     return (await r.json()) as T;
   };

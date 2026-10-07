@@ -216,8 +216,8 @@ async function retirar(): Promise<void> {
     });
     devueltos++;
   }
-  const nombre = contenido === "paginas" ? "páginas" : "artículos";
-  log(`${nombre} devueltos a su valor anterior: ${devueltos}`);
+  const [nombre, o] = contenido === "paginas" ? ["páginas", "a"] : ["artículos", "o"];
+  log(`${nombre} devuelt${o}s a su valor anterior: ${devueltos}`);
   let borrados = 0;
   for (const id of creados) {
     const r = await payload
@@ -225,7 +225,7 @@ async function retirar(): Promise<void> {
       .catch(() => null);
     if (r) borrados++;
   }
-  log(`${nombre} creados y borrados: ${borrados} de ${creados.length}`);
+  log(`${nombre} cread${o}s y borrad${o}s: ${borrados} de ${creados.length}`);
   const urls: string[] = [];
   for (const d of manifiesto.creado.documentos!) {
     const r = await payload
@@ -1254,7 +1254,9 @@ for (const pagina of contenido === "paginas" ? posts : []) {
         tipoPagina:
           previo?.tipoPagina ??
           (/^(politica|tratamiento|terminos|codigo)/.test(slug) ? "legal" : "institucional"),
-        entradilla: entradillaDeExtracto(pagina.excerpt.rendered) || null,
+        // Las páginas de WordPress no tienen extracto propio: el de la API es
+        // el principio del texto, y repetirlo como entradilla lo duplicaría.
+        entradilla: null,
         contenido: estadoContenido as never,
         secciones: secciones as never,
         seo: { metaTitle, metaDescription },

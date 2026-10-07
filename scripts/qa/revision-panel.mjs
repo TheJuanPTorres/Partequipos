@@ -434,15 +434,56 @@ try {
       continue;
     }
 
-    const visitar = async (nombre, ruta) => {
+    /*
+     * Payload 3.89 solo pinta un grupo de campos cuando llega a 1000 px de la
+     * pantalla (`RenderIfInViewport`, `rootMargin: "1000px"`): una captura de
+     * página completa SIN desplazarse deja vacío lo que quede más abajo (la
+     * sección SEO de un equipo nuevo largo salía con su título y sin campos).
+     * Se recorre la página hasta el final, hasta que deja de crecer, y se
+     * vuelve arriba antes de capturar.
+     */
+    const pintarTodo = async () => {
+      let alto = 0;
+      for (let vuelta = 0; vuelta < 10; vuelta++) {
+        const nuevo = await pagina.evaluate(() => document.documentElement.scrollHeight);
+        if (nuevo === alto) break;
+        alto = nuevo;
+        for (let y = 0; y <= alto; y += 600) {
+          await pagina.evaluate((v) => window.scrollTo(0, v), y);
+          await pagina.waitForTimeout(80);
+        }
+        await pagina.waitForTimeout(500);
+      }
+      await pagina.evaluate(() => window.scrollTo(0, 0));
+      await pagina.waitForTimeout(500);
+    };
+
+    const visitar = async (nombre, ruta, { formulario = false } = {}) => {
       await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });
       await pagina.waitForTimeout(1500); // dejar asentar (CLAUDE.md §10.24)
+      // Control: si los campos SEO ya estaban antes de recorrer la página.
+      const seoSinRecorrer = formulario
+        ? await pagina.evaluate(() => Boolean(document.querySelector("#field-seo__metaTitle")))
+        : undefined;
+      await pintarTodo();
       const fichero = path.join(salida, `${nombre}-${ancho.nombre}.png`);
       await pagina.screenshot({ path: fichero, fullPage: true });
       const texto = await pagina.locator("body").innerText();
       const ingles = [...new Set(texto.split(/\n+/).filter((l) => INGLES.test(l)))].slice(0, 15);
-      hallazgos.push({ pantalla: nombre, ancho: ancho.nombre, ingles });
-      decir(`✓ ${nombre} (${ancho.nombre}) → ${path.basename(fichero)}`);
+      // En un formulario, que la sección SEO llegó a pintarse con sus campos.
+      const seo = formulario
+        ? await pagina.evaluate(() => ({
+            titulo: Boolean(document.querySelector("#field-seo__metaTitle")),
+            descripcion: Boolean(document.querySelector("#field-seo__metaDescription")),
+            vistaGoogle: document.querySelector(".pq-seo__google-titulo")?.textContent ?? null,
+          }))
+        : undefined;
+      if (seo) seo.sinRecorrer = seoSinRecorrer;
+      hallazgos.push({ pantalla: nombre, ancho: ancho.nombre, ingles, ...(seo ? { seo } : {}) });
+      const marcaSeo = seo
+        ? ` · SEO ${seo.titulo && seo.descripcion ? "con campos" : "SIN CAMPOS"}`
+        : "";
+      decir(`✓ ${nombre} (${ancho.nombre}) → ${path.basename(fichero)}${marcaSeo}`);
     };
 
     for (const p of PANTALLAS) await visitar(p.nombre, p.ruta);
@@ -548,7 +589,7 @@ try {
       const enlace = enlaces.find((h) => h && !/\/create\/?$/.test(h));
       if (enlace) {
         fichas[f.coleccion] = new URL(enlace, base).pathname;
-        await visitar(f.nombre, fichas[f.coleccion]);
+        await visitar(f.nombre, fichas[f.coleccion], { formulario: true });
       } else decir(`· sin registros en ${f.coleccion}: no hay formulario (${ancho.nombre})`);
     }
 

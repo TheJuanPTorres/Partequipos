@@ -846,3 +846,37 @@ editor veía un resultado distinto del real y podía escribir la marca dos veces
 
 **Sin esquema ni dependencias.** Solo es la vista: lo que se publica lo decide
 `buildMetadata`, que no se toca.
+
+## 27. `panel:revision` recorre el formulario antes de capturar (2026-10-07, rama `fix/panel-revision-formulario-completo`)
+
+**Síntoma.** En las capturas, la sección «Buscadores y redes sociales» del
+equipo nuevo con PDF salía con su título y sin campos. En el modelo, con el
+mismo `seoField`, sí se pintaba.
+
+**Causa: era la captura, no el panel.** Payload 3.89 pinta los campos de un
+formulario solo cuando su bloque llega a 1000 px de la pantalla
+(`RenderIfInViewport` de `@payloadcms/ui`, `rootMargin: "1000px"`; una vez
+pintado, se queda). Una captura de página completa no desplaza la vista, así
+que en un formulario largo, como el equipo nuevo con su ficha técnica, lo que
+quedaba lejos no llegaba a pintarse. Quien edita sí lo ve, porque se desplaza.
+
+**Comprobado en el preview** (`partequipos-km4tl7z6m-…`, con la cuenta de
+editor de `panel:revision`), leyendo el formulario de verdad y no la captura:
+
+| Formulario   | Campos SEO sin desplazar | Tras recorrer la página |
+| ------------ | ------------------------ | ----------------------- |
+| Modelo       | sí                       | sí                      |
+| Cat. técnica | sí                       | sí                      |
+| Equipo nuevo | **no**                   | **sí**                  |
+
+Igual a 1440 y a 390.
+
+**Cambio** (`scripts/qa/revision-panel.mjs`): antes de cada captura de
+página, el script recorre la página hasta el final, hasta que deja de crecer,
+y vuelve arriba. En los formularios anota además en `hallazgos.json` si los
+campos SEO existen antes y después, y el título de la vista de Google. La
+consola dice «SEO con campos» o «SEO SIN CAMPOS».
+
+**De paso:** queda pintado el caso del §26 que faltaba. Con el título vacío,
+la vista del equipo nuevo dice «Excavadora Hitachi ZX350LC-5B | Partequipos»,
+con la marca añadida.

@@ -1,0 +1,111 @@
+/*
+ * PÁGINA 404 (auditoría de C, I3). Sin diseño propio en ux-9: usa las piezas
+ * del kit que ya están en el sitio. Antetítulo rojo en mayúsculas, título de
+ * sección, texto suave, botón rojo de radio 30 (como «Ver todo») y enlaces
+ * con filete gris.
+ */
+.seccion {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 80px 20px 100px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.antetitulo {
+  margin: 0;
+  color: var(--color-marca);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto-fuerte);
+  line-height: 1.1;
+}
+
+.texto {
+  max-width: 560px;
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.inicio {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--boton-relleno);
+  border: 1px solid var(--color-marca);
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.inicio svg {
+  width: 16px;
+  height: 16px;
+}
+
+.inicio:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.secciones {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.lista {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  list-style: none;
+}
+
+.enlace {
+  display: flex;
+  min-height: 44px;
+  padding: 12px 0;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-fondo-seccion);
+  color: var(--color-texto);
+  font-size: 18px;
+  text-decoration: none;
+}
+
+.enlace svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--color-marca);
+}
+
+.enlace:hover {
+  color: var(--color-marca);
+}
+
+.inicio:focus-visible,
+.enlace:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inicio {
+    transition: none;
+  }
+}

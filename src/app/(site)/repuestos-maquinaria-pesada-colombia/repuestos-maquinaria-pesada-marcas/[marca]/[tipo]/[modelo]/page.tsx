@@ -19,6 +19,7 @@ import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import type { Marca, TiposEquipo } from "@/payload-types";
+import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 type Params = { marca: string; tipo: string; modelo: string };
 
@@ -53,7 +54,7 @@ async function resolver(params: Params) {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const data = await resolver(await params);
-  if (!data) return {};
+  if (!data) return METADATA_404;
 
   const { marca, tipo, modelo } = data;
   const imagenes = Array.isArray(modelo.imagenes) ? modelo.imagenes : [];

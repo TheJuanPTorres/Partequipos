@@ -15,6 +15,7 @@ import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
+import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 type Params = { marca: string };
 
@@ -26,7 +27,7 @@ export async function generateStaticParams(): Promise<Params[]> {
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { marca: slug } = await params;
   const marca = await getMarcaMaquinariaPorSlug(slug);
-  if (!marca) return {};
+  if (!marca) return METADATA_404;
 
   return metadataDe({
     nombre: tituloPorDefecto.marcaMaquinaria(marca.nombre),

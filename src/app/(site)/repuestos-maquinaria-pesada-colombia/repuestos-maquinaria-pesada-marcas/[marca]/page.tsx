@@ -11,6 +11,7 @@ import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
+import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 type Params = { marca: string };
 
@@ -22,7 +23,7 @@ export async function generateStaticParams(): Promise<Params[]> {
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { marca: marcaSlug } = await params;
   const marca = await getMarcaPorSlug(marcaSlug);
-  if (!marca) return {};
+  if (!marca) return METADATA_404;
 
   return metadataDe({
     nombre: `Repuestos para maquinaria pesada ${marca.nombre}`,

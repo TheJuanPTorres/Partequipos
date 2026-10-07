@@ -13,6 +13,7 @@ import {
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
+import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 /**
  * Archivo de categoría del blog: `/category/{slug}/`.
@@ -34,7 +35,7 @@ export async function generateStaticParams(): Promise<Params[]> {
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { categoria: slug } = await params;
   const categoria = await getCategoriaBlogPorSlug(slug);
-  if (!categoria) return {};
+  if (!categoria) return METADATA_404;
 
   return metadataDe({
     nombre: categoria.nombre,

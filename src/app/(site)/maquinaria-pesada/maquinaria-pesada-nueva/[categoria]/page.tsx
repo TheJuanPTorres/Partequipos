@@ -15,6 +15,7 @@ import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import type { MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
+import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 /**
  * Categoría transversal de la línea nueva (`/…/nueva/excavadoras/`).
@@ -33,7 +34,7 @@ export async function generateStaticParams(): Promise<Params[]> {
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { categoria: slug } = await params;
   const categoria = await getCategoriaMaquinariaPorSlug(slug);
-  if (!categoria) return {};
+  if (!categoria) return METADATA_404;
 
   return metadataDe({
     nombre: tituloPorDefecto.categoriaNueva(categoria.nombre),

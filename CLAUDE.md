@@ -550,7 +550,7 @@ veredicto, que va en el informe.
 >
 > **Pendientes, por prioridad:**
 >
-> 1. **Fase G (sedes):** construida (2026-10-02). Sin token de Mapbox se ve la lista de sedes; el globo se activa con `NEXT_PUBLIC_MAPBOX_TOKEN` de la cuenta del cliente (L5). **El globo no se ha podido probar sin ese token.**
+> 1. **Fase G (sedes):** construida (2026-10-02). Sin token de Mapbox se ve la lista de sedes; el globo se activa con `NEXT_PUBLIC_MAPBOX_TOKEN` de la cuenta del cliente (L5). **Globo activo y verificado en producción el 2026-10-06** contra ux-9 a 390, 1010 y 1440 (`decisiones-home-ux9.md` §23). El token de hoy es el público por defecto: antes de lanzar, medio de pago y token restringido a `partequipos.com` (runbook de lanzamiento).
 >
 > **§10.38 ACTIVA:** excepción temporal de demostración con la home completa en producción. Bloquea el lanzamiento: retirarla o confirmar las licencias. 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview. 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
 >

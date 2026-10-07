@@ -2196,6 +2196,50 @@ CSV del cliente aparecerán solas.
 - **Coste en el build:** seis consultas ligeras por página (solo nombre, slug y
   marca, `depth: 0`), memoizadas por petición (§10.10).
 
+### 26.1 Logos de marca — DESVIACIÓN PEDIDA POR EL CLIENTE (2026-10-06)
+
+- **Qué pidió el cliente:** que cada entrada de MARCA lleve su logo junto al
+  nombre, para reconocerla más rápido. Aplica a maquinaria (dentro de
+  «Por marca») y a repuestos (dentro de «Repuestos por marca»). **El diseño de
+  Andrés no lleva logos.**
+- **Cómo:**
+  - El logo va **con** el nombre, nunca en su lugar. Es **decorativo**
+    (`alt=""`), porque el nombre ya dice la marca.
+  - Sale del campo «Logo» de cada marca del catálogo. Si una marca no tiene,
+    va solo el nombre, sin hueco.
+  - Todos a **24 px de alto** con su proporción real; los muy anchos se
+    quedan en 96 px sin deformarse.
+  - `next/image` con las medidas a ese tamaño y carga diferida. Como van
+    dentro de un acordeón cerrado, **no se descargan hasta abrirlo**, ni
+    siquiera al abrir el panel.
+  - «Aditamentos» no es una marca de verdad: va sin logo.
+  - Cambiar el logo de una marca revalida el sitio, como cambiar su nombre
+    (`megamenuHooks.ts`).
+- **Coste en el build:** las dos consultas de marcas pasan a `depth: 1`, pero
+  de la imagen solo traen url, ancho y alto (`populate`).
+- **Solo escritorio (≥ 1025 px), como todo el megamenú.** A 1010 la cabecera
+  es la móvil y su menú no tiene marcas: no cambia nada.
+- **Marcas SIN logo hoy en producción** (para pedírselos al cliente):
+  - **maquinaria:** Dynapac;
+  - **repuestos:** las cinco, que son Bobcat, Caterpillar, Hitachi, Komatsu y
+    Volvo.
+  - Los de Case, Hitachi y Yanmar de maquinaria son los de la copia de
+    demostración (§10.38). **Son imágenes CUADRADAS** (una caja de color con
+    el nombre dentro): a 24 px el texto no se lee. Hay que pedir al cliente
+    **logos horizontales**, en SVG o PNG transparente, que se lean bien sobre
+    blanco.
+- **Fondo del panel:** blanco siempre. El sitio no tiene modo oscuro (§10.14).
+  Los tres logos actuales se ven sobre él.
+- **Medido en el preview** (1440 y 1010):
+  - 3 logos en el HTML, todos con `alt=""` y `loading="lazy"`;
+  - **0 descargados** al cargar la página y al abrir el panel; se descargan al
+    abrir «Por marca»;
+  - todos a 24 px de alto, centrados igual, y filas de 43 px con y sin logo;
+  - CLS 0;
+  - a 1010, ningún logo descargado.
+  - Capturas en `partequipos-cierre\capturas\megamenu-logos\`.
+- **Para Andrés:** es una adición al export 2162 por petición del cliente.
+
 ## 27. Cambios de dirección en la home tras la prueba en móvil (2026-10-05)
 
 Decisiones de dirección del 2026-10-05, cada una en su PR. Las que se apartan

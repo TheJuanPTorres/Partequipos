@@ -1,6 +1,7 @@
 "use client";
 
 import { IconCheck, IconChevronRight, IconMinus, IconPlus } from "@tabler/icons-react";
+import Image from "next/image";
 import Link from "next/link";
 import { forwardRef, useId, useState, type KeyboardEvent } from "react";
 
@@ -58,6 +59,22 @@ function Acordeon({
         ) : (
           <IconPlus aria-hidden="true" focusable="false" stroke={2.5} />
         )}
+        {/*
+         * Logo de la marca (petición del cliente, §26): DECORATIVO, el nombre
+         * ya dice la marca. Va dentro de un acordeón cerrado (`hidden`), así
+         * que la carga diferida no lo descarga hasta que se abre. Medidas
+         * explícitas: sin CLS.
+         */}
+        {grupo.logo ? (
+          <Image
+            src={grupo.logo.url}
+            alt=""
+            width={grupo.logo.width}
+            height={grupo.logo.height}
+            loading="lazy"
+            className={estilos.logo}
+          />
+        ) : null}
         {grupo.titulo}
       </button>
       <div id={id} className={estilos.contenido} hidden={!abierto}>

@@ -16,6 +16,14 @@ describe("megamenú: cuándo hay que revalidar el sitio", () => {
     assert.equal(cambiaElMenu("update", { ...antes, marca: 4 }, antes), true);
   });
 
+  it("si se pone, se cambia o se quita el logo de una marca", () => {
+    const conLogo = { ...antes, logo: 7 };
+    assert.equal(cambiaElMenu("update", conLogo, antes), true);
+    assert.equal(cambiaElMenu("update", { ...antes, logo: 8 }, conLogo), true);
+    assert.equal(cambiaElMenu("update", { ...antes, logo: null }, conLogo), true);
+    assert.equal(cambiaElMenu("update", { ...antes, logo: { id: 7 } }, conLogo), false);
+  });
+
   it("la marca poblada y su id cuentan como la misma", () => {
     assert.equal(cambiaElMenu("update", { ...antes, marca: { id: 3 } }, antes), false);
   });

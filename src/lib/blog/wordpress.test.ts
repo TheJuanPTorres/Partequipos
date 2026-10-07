@@ -3,6 +3,11 @@ import { describe, it } from "node:test";
 
 import {
   altParaMedia,
+  clasificarPaginaWp,
+  fuentePdfPoster,
+  fuentesDflip,
+  repartirEnSecciones,
+  SECCIONES_PAGINAS,
   decodificarEntidades,
   enlaceInterno,
   enlaceViejo,
@@ -206,7 +211,12 @@ describe("importador del blog: piezas puras", () => {
         p("dos", "center"),
       ],
     };
-    assert.deepEqual(limpiarLexical(raiz), { alineaciones: 2, vacios: 1, niveles: 3 });
+    assert.deepEqual(limpiarLexical(raiz), {
+      alineaciones: 2,
+      vacios: 1,
+      niveles: 3,
+      encabezadosQuitados: 0,
+    });
     assert.deepEqual(
       (raiz.children as { type: string; tag?: string; format?: string }[]).map((n) =>
         n.type === "heading" ? n.tag : n.format,
@@ -273,5 +283,107 @@ describe("importador del blog: piezas puras", () => {
     assert.equal(esSubapartado("6 Tips clave para cuidar el tren de rodaje"), false);
     assert.equal(esSubapartado("🚜 Maquinaria CASE disponible"), false);
     assert.equal(esSubapartado("Retrocargadoras"), false);
+  });
+  it("limpiarLexical en páginas: nivel mínimo 3 y fuera los encabezados sin contenido", () => {
+    const h = (tag: string, text: string) => ({
+      type: "heading",
+      tag,
+      children: [{ type: "text", text }],
+    });
+    const p = (text: string) => ({ type: "paragraph", children: [{ type: "text", text }] });
+    const raiz = {
+      children: [
+        h("h3", "Suelto"),
+        h("h2", "Real"),
+        p("texto"),
+        h("h3", ""),
+        p("más"),
+        h("h4", "Final"),
+      ],
+    };
+    const r = limpiarLexical(raiz, { nivelMinimo: 3, encabezadosSinContenido: true });
+    assert.deepEqual(
+      raiz.children.map((n) => ("tag" in n ? n.tag : "p")),
+      ["h3", "p", "p"],
+    );
+    assert.equal(r.encabezadosQuitados, 3);
+    // Sin las opciones, como en el blog: no quita encabezados y empieza en h2.
+    const blog = { children: [h("h3", "Suelto"), h("h2", "Real"), p("texto")] };
+    limpiarLexical(blog);
+    assert.deepEqual(
+      blog.children.map((n) => ("tag" in n ? n.tag : "p")),
+      ["h2", "h2", "p"],
+    );
+  });
+
+  it("clasifica las páginas de WordPress: texto frente a Elementor", () => {
+    const w = (t: string) => `<div data-widget_type="${t}.default"></div>`;
+    assert.deepEqual(
+      clasificarPaginaWp({ html: w("heading") + w("text-editor") + "<p>Política</p>" }).texto,
+      true,
+    );
+    const landing = clasificarPaginaWp({
+      html: w("heading") + "<p>Hola</p>",
+      plantilla: "elementor_canvas",
+    });
+    assert.equal(landing.texto, false);
+    const form = clasificarPaginaWp({ html: w("heading") + w("form") + "<p>Hola</p>" });
+    assert.ok(!form.texto && form.motivo.includes("form"));
+    assert.equal(clasificarPaginaWp({ html: w("heading") }).texto, false);
+    // Solo un visor de PDF también se migra (el código de ética es eso).
+    assert.equal(
+      clasificarPaginaWp({
+        html: w("text-editor") + '<div class="wp-block-pdfp-pdf-poster"></div>',
+      }).texto,
+      true,
+    );
+  });
+
+  it("lee el PDF de los visores dFlip y PDF Poster", () => {
+    const html =
+      'x<script>window.option_df_51096 = {"outline":[],"source":"https:\/\/partequipos.com\/wp-content\/uploads\/2026\/03\/garantia.pdf","wpOptions":"true"}; if(1){}</script>';
+    assert.equal(
+      fuentesDflip(html).get("df_51096"),
+      "https://partequipos.com/wp-content/uploads/2026/03/garantia.pdf",
+    );
+    assert.deepEqual(fuentePdfPoster('{"file":"https://x/a.pdf","title":"C\u00f3digo v4"}'), {
+      url: "https://x/a.pdf",
+      titulo: "Código v4",
+    });
+    assert.equal(fuentePdfPoster("roto"), null);
+  });
+
+  it("reparte la página de garantías en #GARANTIA y #Devoluciones por su nombre", () => {
+    const b = (tag: string, texto: string) => ({ tag, texto, html: texto });
+    const bloques = [
+      b("H1", "Política de garantía de repuestos"),
+      b("P", "@@PDF-1@@"),
+      b("H1", "Política de devolución de repuestos"),
+      b("P", "@@PDF-2@@"),
+      b("H2", "POLÍTICA DE GARANTÍA DE REPUESTOS"),
+      b("P", "texto de garantía"),
+      b("H2", "POLITICAS DE DEVOLUCION DE REPUESTOS A DISCRECION DE PARTEQUIPOS"),
+      b("P", "texto de devolución"),
+    ];
+    const r = repartirEnSecciones(bloques, SECCIONES_PAGINAS["politica-de-garantia-de-repuestos"]);
+    assert.deepEqual(r.contenido, []);
+    assert.deepEqual(
+      r.secciones.map((s) => s.ancla),
+      ["GARANTIA", "Devoluciones"],
+    );
+    assert.deepEqual(
+      r.secciones[0]!.bloques.map((x) => x.texto),
+      ["@@PDF-1@@", "texto de garantía"],
+    );
+    assert.deepEqual(
+      r.secciones[1]!.bloques.map((x) => x.texto),
+      [
+        "@@PDF-2@@",
+        "POLITICAS DE DEVOLUCION DE REPUESTOS A DISCRECION DE PARTEQUIPOS",
+        "texto de devolución",
+      ],
+    );
+    // Sin receta, todo al contenido.
+    assert.equal(repartirEnSecciones(bloques).contenido.length, bloques.length);
   });
 });

@@ -33,7 +33,8 @@ import estilos from "./hero.module.css";
  * `hero.module.css`.
  *
  * Lo que se aparta de ux-9, todo documentado en docs/diseno/decisiones-home-ux9.md:
- * - D1: el título va en `<h2>`; el `<h1>` de la portada es el logo.
+ * - D1: el título va en `<h2>`; el `<h1>` de la portada es el título
+ *   descriptivo oculto de `page.tsx` (auditoría de C, I1).
  * - D3: el vidrio no sale de la tarjeta por debajo de 1024 px.
  * - D4: las flechas son botones que funcionan; con una diapositiva no se pintan.
  * - D13 (carrusel, versión «premium» pedida por dirección): fundido cruzado,

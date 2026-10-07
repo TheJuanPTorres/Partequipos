@@ -3655,11 +3655,27 @@ queda guardada. Cuando sale bien, el registro deja el `messageId`
 **Guarda del preview:** fuera de producción, sin `SOLICITUDES_EMAIL_TO` **no se
 envía nada** (antes caía al correo real del cliente, §10.21).
 
-**Qué falta para PRODUCCIÓN — lo pone el cliente:** los valores reales de las
-siete `SMTP_*` y `SOLICITUDES_EMAIL_TO` en Vercel, **solo en Production**, y
-redesplegar. Sin `SOLICITUDES_EMAIL_TO`, en producción el aviso va al correo de
-contacto del panel (global `seo`). El remitente tiene que poder enviar desde
-ese servidor (SPF/DKIM del dominio del remitente), o el correo acabará en spam.
+**PROBADO DE PUNTA A PUNTA en un preview el 2026-10-07**, con las 8 variables
+de prueba de dirección (solo en Preview; `SMTP_PASS` como Sensitive):
+
+- Un envío real de `/contactanos/` con datos inventados (marca `a102911`).
+- El aviso «Nueva solicitud (contacto) de PRUEBA SMTP AGENTE A a102911»
+  **llegó a la bandeja de entrada** de dirección, con todos los campos
+  correctos.
+- La fila de prueba se borró del preview después.
+
+**Qué falta para PRODUCCIÓN — lo pone el cliente:**
+
+1. **Las variables SMTP reales en Vercel, solo en Production:** las siete
+   `SMTP_*` y `SOLICITUDES_EMAIL_TO`. Después, redesplegar: las variables solo
+   aplican a despliegues nuevos. Sin `SOLICITUDES_EMAIL_TO`, en producción el
+   aviso va al correo de contacto del panel (global `seo`).
+2. **Revisar SPF y DKIM del dominio remitente** (el de `SMTP_FROM_ADDRESS`).
+   Tienen que autorizar a ese servidor SMTP a enviar en nombre del dominio; si
+   no, el aviso acabará en spam o se rechazará. La prueba del preview llegó a
+   la bandeja de entrada, pero **eso no certifica la configuración del
+   remitente de producción**.
+
 Mientras falten, la única forma de ver los leads es entrar a `/admin`.
 
 ### 10.7 PENDIENTE bloqueante — infraestructura de base de datos

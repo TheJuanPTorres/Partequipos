@@ -13,8 +13,28 @@ import type { Articulo, CategoriasBlog } from "@/payload-types";
 
 import cabecera from "./cabeceraArticulo.module.css";
 
-/** Entre fecha, firma y categoría: «·» con un espacio de media eme a cada lado. */
-const SEPARADOR = " · ";
+/*
+ * Separadores de la línea de fecha. Lo visible lleva huecos FIJOS en píxeles
+ * (`mx-3`, los 12 px del `gap-x-3` de antes): un espacio cambiaría de ancho
+ * con la fuente y movería en horizontal lo que va detrás al llegar Inter
+ * (medido: +0,004 de CLS a 1440). El espacio de ancho cero deja cortar la
+ * línea tras el punto. La copia invisible solo fija el alto y tiene que medir
+ * AL MENOS lo visible, así que lleva espacios de una eme, más anchos.
+ */
+const ESPACIO_EME = String.fromCharCode(0x2003);
+const ESPACIO_CERO = String.fromCharCode(0x200b);
+const SEPARADOR_COPIA = `${ESPACIO_EME}·${ESPACIO_EME}`;
+
+function Separador() {
+  return (
+    <>
+      <span aria-hidden="true" className="mx-3">
+        ·
+      </span>
+      {ESPACIO_CERO}
+    </>
+  );
+}
 
 /**
  * Cuerpo de un artículo del blog.
@@ -41,7 +61,7 @@ export async function ArticuloCuerpo({ articulo }: { articulo: Articulo }) {
   const fecha = fechaLegible(articulo.fechaPublicacion);
   const autor = articulo.autor?.trim() || seoConfig.siteName;
   /* El texto de la línea de fecha, tal como se ve: es su copia invisible. */
-  const meta = [fecha, `Por ${autor}`, categoria?.nombre].filter(Boolean).join(SEPARADOR);
+  const meta = [fecha, `Por ${autor}`, categoria?.nombre].filter(Boolean).join(SEPARADOR_COPIA);
 
   /*
    * La miga de la categoría se omite cuando su nombre coincide con el del
@@ -86,7 +106,8 @@ export async function ArticuloCuerpo({ articulo }: { articulo: Articulo }) {
         {/*
          * Título, línea de fecha y entradilla con su alto fijado por una copia
          * invisible del texto (`data-reserva`): así no se desplazan al llegar
-         * Inter. La copia tiene que decir EXACTAMENTE lo mismo que lo visible.
+         * Inter. La copia dice lo mismo que lo visible; en la línea de fecha, con
+         * separadores más anchos (ver `SEPARADOR_COPIA`).
          */}
         <header>
           <h1
@@ -99,12 +120,12 @@ export async function ArticuloCuerpo({ articulo }: { articulo: Articulo }) {
           <p className={`${cabecera.reserva} mt-3 text-sm text-gray-600`} data-reserva={meta}>
             <span>
               <time dateTime={articulo.fechaPublicacion}>{fecha}</time>
-              <span aria-hidden="true">{SEPARADOR}</span>
+              <Separador />
               {/* Sin firma, la de la empresa (decisión de dirección, 2026-10-06). */}
               <span>Por {autor}</span>
               {categoria ? (
                 <>
-                  <span aria-hidden="true">{SEPARADOR}</span>
+                  <Separador />
                   <Link href={`${rutas.categoriaBlog(categoria.slug)}/`} className="underline">
                     {categoria.nombre}
                   </Link>

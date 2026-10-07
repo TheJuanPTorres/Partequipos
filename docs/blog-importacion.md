@@ -233,7 +233,7 @@ Capturas en `Desktop\partequipos-cierre\capturas\blog-estructura\`.
 **Cómo:** cada bloque lleva una **copia invisible** de su texto (`::after` con `content: attr(data-reserva)` y `visibility: hidden`) en la misma celda de una rejilla. La copia va en la fuente de respaldo de next/font, «Inter Fallback», que no cambia al llegar Inter, y **ensanchada 0,04 em** para que mida siempre al menos lo que el texto visible en cualquiera de las dos fuentes. Así el alto es siempre el de la copia. `src/components/blog/cabeceraArticulo.module.css`.
 
 - **No es texto de la página:** es contenido generado y oculto. No se lee en voz alta, no se selecciona y los buscadores no lo indexan como texto.
-- **La línea de fecha pasa a ser texto en línea** («fecha · Por Partequipos · Noticias», con un espacio de media eme a cada lado del punto) para que su copia sea idéntica.
+- **La línea de fecha pasa a ser texto en línea.** Lo visible conserva los huecos fijos de 12 px alrededor del «·»: un espacio cambiaría de ancho con la fuente y movería en horizontal lo que va detrás. La primera versión usaba espacios y el verificador midió en `radiadores-y-enfriadores-el-equilibrio-…` 0,0097 → 0,0136 a 1440, por «Noticias» desplazándose. La copia invisible lleva espacios de una eme, más anchos, porque solo tiene que medir al menos lo visible.
 
 **Prototipo, a 390 en los 53 (alto de la cabecera con respaldo frente a Inter):**
 

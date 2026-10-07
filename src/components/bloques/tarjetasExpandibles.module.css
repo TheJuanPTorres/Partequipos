@@ -62,7 +62,15 @@
   border-radius: 30px;
   background: var(--color-marca);
   cursor: pointer;
-  transition: all var(--tarjetas-transicion) var(--tarjetas-curva);
+  /*
+   * El contorno de foco, SIN transición (auditoría I4, 2026-10-07): con `all`
+   * aparecía en 0,8 s y, justo al pulsar TAB, no se veía. En una lista de
+   * transiciones, la última de cada propiedad manda.
+   */
+  transition:
+    all var(--tarjetas-transicion) var(--tarjetas-curva),
+    outline 0s,
+    outline-offset 0s;
 }
 
 .tarjeta[data-abierta] {

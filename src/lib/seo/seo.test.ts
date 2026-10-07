@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { buildMetadata } from "./buildMetadata";
+import { tituloConMarca } from "./porDefecto";
 import { absoluteUrl, seoConfig } from "./config";
 import {
   autorJsonLd,
@@ -44,7 +45,7 @@ describe("buildMetadata", () => {
       seo: { metaTitle: "Título SEO", metaDescription: "Descripción SEO." },
     });
 
-    assert.equal(meta.title, "Título SEO");
+    assert.equal(meta.title, "Título SEO | Partequipos");
     assert.equal(meta.description, "Descripción SEO.");
   });
 
@@ -55,7 +56,7 @@ describe("buildMetadata", () => {
       descripcion: "Repuestos para excavadora.",
     });
 
-    assert.equal(meta.title, "Caterpillar 320D");
+    assert.equal(meta.title, "Caterpillar 320D | Partequipos");
     assert.equal(meta.description, "Repuestos para excavadora.");
   });
 
@@ -72,7 +73,7 @@ describe("buildMetadata", () => {
       seo: { metaTitle: "   ", metaDescription: "" },
     });
 
-    assert.equal(meta.title, "Komatsu");
+    assert.equal(meta.title, "Komatsu | Partequipos");
     assert.equal(meta.description, "Desc entidad.");
   });
 
@@ -287,5 +288,32 @@ describe("buildOrganizationJsonLd", () => {
     assert.equal("taxID" in jsonLd, Boolean(seoConfig.taxId));
     if ("legalName" in jsonLd) assert.notEqual(jsonLd.legalName, "");
     if ("taxID" in jsonLd) assert.notEqual(jsonLd.taxID, "");
+  });
+});
+
+describe("tituloConMarca (auditoría I2)", () => {
+  it("añade « | Partequipos» al final", () => {
+    assert.equal(tituloConMarca("Excavadoras nuevas", "/x/"), "Excavadoras nuevas | Partequipos");
+  });
+  it("no en la portada ni si ya lleva la marca", () => {
+    assert.equal(
+      tituloConMarca("Repuestos y maquinaria pesada", "/"),
+      "Repuestos y maquinaria pesada",
+    );
+    assert.equal(
+      tituloConMarca("Política de Garantías de Repuestos - Partequipos", "/p/"),
+      "Política de Garantías de Repuestos - Partequipos",
+    );
+    assert.equal(tituloConMarca("PARTEQUIPOS en Colombia", "/p/"), "PARTEQUIPOS en Colombia");
+  });
+  it("no si con ella pasa de 60 caracteres (queda entero, sin marca)", () => {
+    const t46 = "x".repeat(46);
+    assert.equal(tituloConMarca(t46, "/p/"), `${t46} | Partequipos`); // 60 justos
+    const t47 = "x".repeat(47);
+    assert.equal(tituloConMarca(t47, "/p/"), t47); // serían 61
+  });
+  it("en Open Graph el título va sin la marca", () => {
+    const meta = buildMetadata({ nombre: "Komatsu", path: "/k/" });
+    assert.equal((meta.openGraph as { title?: string }).title, "Komatsu");
   });
 });

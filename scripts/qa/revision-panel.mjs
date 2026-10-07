@@ -37,6 +37,8 @@ import { createRequire } from "node:module";
 import os from "node:os";
 import path from "node:path";
 
+import { instalarDerivacion } from "../../src/lib/preview/derivacion.mjs";
+
 /*
  * `playwright-core` NO está en node_modules: lo trae `npx -p`, igual que
  * `puppeteer-core` en `vuelo-pie.mjs`. Un `import` de ES no mira en la carpeta
@@ -156,14 +158,8 @@ try {
       hasTouch: ancho.movil,
       locale: "es-CO",
     });
-    // El token solo a ese origen, nunca a terceros. Se intercepta SOLO ese
-    // origen: interceptar también las imágenes del Blob (otro dominio) las
-    // hacía fallar con ERR_BLOCKED_BY_ORB y las miniaturas salían como icono.
-    await contexto.route(`${origin}/**`, (r) =>
-      r.continue({
-        headers: { ...r.request().headers(), "x-vercel-protection-bypass": bypass },
-      }),
-    );
+    // El token solo a ese origen, nunca a terceros (`derivacion.mjs`).
+    await instalarDerivacion(contexto, origin, bypass);
     // Modo `oscuro`: la misma pasada con el tema oscuro, como entra el usuario
     // (cookie `payload-theme`, CLAUDE.md §10.23). Sin modo, el claro.
     await contexto.addCookies([

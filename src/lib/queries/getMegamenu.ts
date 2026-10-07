@@ -20,7 +20,9 @@ export const getMegamenu = cache(async (): Promise<Record<string, PanelMenu>> =>
     ...base,
     depth: 1,
     select: { nombre: true, slug: true, logo: true },
-    populate: { media: { url: true, width: true, height: true } },
+    // `filename` hace falta aunque no se pinte: la `url` la calcula un gancho
+    // de lectura a partir de él, y sin él sale `null` (medido en el preview).
+    populate: { media: { url: true, filename: true, width: true, height: true } },
   } as const;
 
   const [

@@ -2,7 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { resendAdapter } from "@payloadcms/email-resend";
+import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { endurecerSubidaDirecta } from "./lib/blob/rutaSubidaDirecta";
@@ -55,31 +55,35 @@ import { Video } from "./collections/Video";
 import { Animacion } from "./collections/Animacion";
 import { Documento } from "./collections/Documento";
 import { FichaProducto } from "./globals/FichaProducto";
+import { modoCorreo, opcionesTransporte } from "./lib/correo/smtp";
 import { seoConfig } from "./lib/seo/config";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 /*
- * Adaptador de correo (Resend), OPCIONAL a propósito.
+ * Adaptador de correo (SMTP con nodemailer), OPCIONAL a propósito.
  *
- * Sin `RESEND_API_KEY` no se configura ningún adaptador: Payload deja entonces
- * `sendEmail` como una operación que solo registra el intento. El aviso de una
- * solicitud nueva se pierde, pero **la solicitud se guarda igual** — el hook que
- * notifica captura su propio error y nunca lo relanza.
+ * Sin SMTP completo (`modoCorreo`, `src/lib/correo/smtp.ts`) no se configura
+ * ningún adaptador. OJO: el de nodemailer SIN `transportOptions` crearía una
+ * cuenta de prueba de ethereal.email e imprimiría sus credenciales; por eso
+ * solo se monta con la configuración completa. `skipVerify`: no se abre una
+ * conexión SMTP en cada arranque en frío del lambda; el envío ya informa si
+ * falla.
  *
- * Es deliberado y es lo que hay que preservar al tocar esto: una caída del
- * correo, una clave caducada o una cuota agotada no pueden costar un lead, que
- * es el objetivo comercial del proyecto. Ver `notificarSolicitud.ts`.
+ * DEGRADACIÓN: el aviso nunca cuesta un lead. Si el correo falla, la solicitud
+ * ya está guardada y el gancho solo lo registra (`notificarSolicitud.ts`).
  */
-const email = process.env.RESEND_API_KEY
-  ? resendAdapter({
-      apiKey: process.env.RESEND_API_KEY,
-      // Resend exige que el remitente sea de un dominio verificado en la cuenta.
-      defaultFromAddress: process.env.RESEND_FROM_EMAIL || "",
-      defaultFromName: process.env.RESEND_FROM_NAME || "Partequipos",
-    })
-  : undefined;
+const correo = modoCorreo();
+const email =
+  correo.modo === "smtp"
+    ? nodemailerAdapter({
+        defaultFromAddress: correo.config.fromAddress,
+        defaultFromName: correo.config.fromName,
+        skipVerify: true,
+        transportOptions: opcionesTransporte(correo.config),
+      })
+    : undefined;
 
 /*
  * «Ver en el sitio»: en las colecciones con página pública, el formulario

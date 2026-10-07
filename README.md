@@ -61,8 +61,9 @@ panel del proyecto.
 | `SENTRY_DSN`                                              | **no existe todavía**   | **no existe**             | **no existe**                                                                                             |
 | `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT`     | **no existe todavía**   | **no existe**             | **no existe**                                                                                             |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | opcional                | sí                        | sí                                                                                                        |
-| `RESEND_API_KEY`                                          | opcional                | sí                        | sí                                                                                                        |
-| `RESEND_FROM_EMAIL` / `RESEND_FROM_NAME`                  | opcional                | sí                        | sí                                                                                                        |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE`                 | opcional                | valores de prueba         | valores del cliente                                                                                       |
+| `SMTP_USER` / `SMTP_PASS`                                 | opcional                | valores de prueba         | valores del cliente                                                                                       |
+| `SMTP_FROM_ADDRESS` / `SMTP_FROM_NAME`                    | opcional                | valores de prueba         | valores del cliente                                                                                       |
 | `SOLICITUDES_EMAIL_TO`                                    | opcional                | sí                        | sí                                                                                                        |
 
 Reglas:
@@ -318,30 +319,25 @@ públicas de Cloudflare**, que aceptan cualquier token: los formularios
 funcionan pero **no están protegidos**. Al recibir las claves reales basta
 rellenar las dos variables; no hay que tocar código.
 
-### Aviso por correo: Resend
+### Aviso por correo: SMTP
 
-Al entrar una solicitud se envía un aviso a `SOLICITUDES_EMAIL_TO` (o, si está
-vacía, a la dirección de contacto de `seoConfig`).
+Al entrar una solicitud se envía un aviso por SMTP (`@payloadcms/email-nodemailer`)
+a `SOLICITUDES_EMAIL_TO`. En producción, si está vacía, va al correo de
+contacto del panel; **fuera de producción, sin ella no se envía nada**, para que
+un preview no escriba al cliente. Variables y detalle: CLAUDE.md §10.11.
 
-**Sin `RESEND_API_KEY` el sitio sigue funcionando.** No se configura adaptador y
+**Sin SMTP completo el sitio sigue funcionando.** No se configura adaptador y
 el hook lo detecta: la solicitud **se guarda igual** y se registra una
-advertencia indicando que ese lead quedó sin aviso. Lo mismo si Resend falla o
-agota la cuota: el error se registra y no se propaga.
+advertencia con los nombres de las variables que faltan. Lo mismo si el
+servidor falla o rechaza el envío: el error se registra y no se propaga.
 
 Es una decisión deliberada, no un descuido: perder el aviso es molesto; perder
 el lead es perder el objetivo comercial del sitio.
 
-```
-WARN: Solicitud guardada SIN aviso por correo: falta RESEND_API_KEY.
-      El lead está en /admin y no se ha perdido.
-```
-
-Para activarlo hacen falta tres cosas:
-
-1. Una cuenta de Resend y su clave de API.
-2. El **dominio verificado** en esa cuenta — Resend rechaza remitentes de
-   dominios sin verificar.
-3. `RESEND_FROM_EMAIL` con una dirección de ese dominio.
+Para activarlo: `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`,
+`SMTP_PASS`, `SMTP_FROM_ADDRESS`, `SMTP_FROM_NAME` y `SOLICITUDES_EMAIL_TO` en
+Vercel, y redesplegar. El remitente tiene que poder enviar desde ese servidor
+(SPF/DKIM), o el aviso acabará en spam.
 
 ---
 

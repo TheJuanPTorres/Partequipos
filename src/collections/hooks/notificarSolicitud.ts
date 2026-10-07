@@ -1,44 +1,50 @@
 import type { CollectionAfterChangeHook } from "payload";
 
+import { destinoAvisos, modoCorreo } from "@/lib/correo/smtp";
 import { datosEmpresa } from "@/lib/seo/empresa";
 
 /**
- * Avisa por correo cuando entra una solicitud nueva (Resend).
+ * Avisa por correo cuando entra una solicitud nueva (SMTP, `src/lib/correo/smtp.ts`).
  *
  * DEGRADACIÓN CONTROLADA — es la regla de esta función y lo que hay que
- * preservar al tocarla: **el aviso nunca puede costar un lead**. Si no hay clave
- * configurada, si Resend está caído o si la cuota se agotó, la solicitud YA está
- * guardada (esto es un `afterChange`) y aquí solo se deja constancia. Nunca se
- * relanza el error: hacerlo devolvería un fallo al usuario por algo que, desde
- * su punto de vista, salió bien.
+ * preservar al tocarla: **el aviso nunca puede costar un lead**. Si no hay SMTP
+ * configurado, si el servidor está caído o rechaza el envío, la solicitud YA
+ * está guardada (esto es un `afterChange`) y aquí solo se deja constancia.
+ * Nunca se relanza el error: hacerlo devolvería un fallo al usuario por algo
+ * que, desde su punto de vista, salió bien.
  *
  * Solo avisa al crear: marcar una solicitud como atendida no vuelve a notificar.
  */
 export const notificarSolicitud: CollectionAfterChangeHook = async ({ doc, operation, req }) => {
   if (operation !== "create") return doc;
 
-  // Sin destino propio, el correo de contacto de la empresa (global `seo`,
-  // con respaldo en `seoConfig`).
+  // Sin destino propio, en producción, el correo de contacto de la empresa
+  // (global `seo`, con respaldo en `seoConfig`). Fuera de producción, solo el
+  // destino explícito: un preview no escribe al cliente (§10.21).
   const seo = await req.payload.findGlobal({ slug: "seo", depth: 0, req });
-  const destino = process.env.SOLICITUDES_EMAIL_TO?.trim() || datosEmpresa(seo.empresa).correo;
+  const destino = destinoAvisos(datosEmpresa(seo.empresa).correo);
 
   /*
-   * Sin clave no hay adaptador (ver payload.config.ts). Se comprueba de forma
-   * explícita en vez de dejar que `sendEmail` lo registre por su cuenta: así el
-   * mensaje dice qué solicitud quedó sin avisar y qué falta para arreglarlo, en
-   * vez de un aviso genérico de Payload que no permite recuperar el lead.
+   * Sin SMTP o sin destino no hay envío. Se comprueba de forma explícita en vez
+   * de dejar que `sendEmail` lo registre por su cuenta: así el mensaje dice qué
+   * solicitud quedó sin avisar y qué falta para arreglarlo. Solo NOMBRES de
+   * variables, nunca valores.
    */
-  if (!process.env.RESEND_API_KEY) {
+  const correo = modoCorreo();
+  if (correo.modo !== "smtp" || !destino) {
+    const falta =
+      correo.modo !== "smtp"
+        ? correo.motivo
+        : "falta SOLICITUDES_EMAIL_TO (fuera de producción no se avisa al cliente)";
     req.payload.logger.warn(
-      { solicitud: doc.id, destino },
-      "Solicitud guardada SIN aviso por correo: falta RESEND_API_KEY. " +
-        "El lead está en /admin y no se ha perdido.",
+      { solicitud: doc.id },
+      `Solicitud guardada SIN aviso por correo: ${falta}. El lead está en /admin y no se ha perdido.`,
     );
     return doc;
   }
 
   try {
-    await req.payload.sendEmail({
+    const enviado = (await req.payload.sendEmail({
       to: destino,
       subject: `Nueva solicitud (${doc.tipo}) de ${doc.nombre}`,
       text: [
@@ -53,10 +59,15 @@ export const notificarSolicitud: CollectionAfterChangeHook = async ({ doc, opera
         "Mensaje:",
         doc.mensaje,
       ].join("\n"),
-    });
+    })) as { messageId?: string } | undefined;
+    // El identificador del mensaje, para seguirlo si no llega (sin datos personales).
+    req.payload.logger.info(
+      { solicitud: doc.id, messageId: enviado?.messageId },
+      "[avisos] Aviso de solicitud enviado por SMTP.",
+    );
   } catch (error) {
     req.payload.logger.error(
-      { err: error, solicitud: doc.id, destino },
+      { err: error, solicitud: doc.id },
       "Solicitud guardada pero el aviso por correo FALLÓ. El lead está en /admin.",
     );
   }

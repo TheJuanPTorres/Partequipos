@@ -2224,7 +2224,20 @@ CSV del cliente aparecerán solas.
   - **repuestos:** las cinco, que son Bobcat, Caterpillar, Hitachi, Komatsu y
     Volvo.
   - Los de Case, Hitachi y Yanmar de maquinaria son los de la copia de
-    demostración (§10.38).
+    demostración (§10.38). **Son imágenes CUADRADAS** (una caja de color con
+    el nombre dentro): a 24 px el texto no se lee. Hay que pedir al cliente
+    **logos horizontales**, en SVG o PNG transparente, que se lean bien sobre
+    blanco.
+- **Fondo del panel:** blanco siempre. El sitio no tiene modo oscuro (§10.14).
+  Los tres logos actuales se ven sobre él.
+- **Medido en el preview** (1440 y 1010):
+  - 3 logos en el HTML, todos con `alt=""` y `loading="lazy"`;
+  - **0 descargados** al cargar la página y al abrir el panel; se descargan al
+    abrir «Por marca»;
+  - todos a 24 px de alto, centrados igual, y filas de 43 px con y sin logo;
+  - CLS 0;
+  - a 1010, ningún logo descargado.
+  - Capturas en `partequipos-cierre\capturas\megamenu-logos\`.
 - **Para Andrés:** es una adición al export 2162 por petición del cliente.
 
 ## 27. Cambios de dirección en la home tras la prueba en móvil (2026-10-05)

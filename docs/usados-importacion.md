@@ -66,7 +66,7 @@ unidades. Aquí:
 | Nombre del fichero   | `nombreDeFicheroUsado`: `wp-usado-<id del adjunto>-<nombre de la unidad>.jpg`. El id es único y estable                               |
 | Registros de consola | El script identifica cada unidad por su id de WordPress, nunca por el serial                                                          |
 
-`contieneSerial` lo busca también pegado o con espacios («X 1999», «snx1999»).
+`contieneSerial` lo busca también pegado o con espacios («X 9876», «snx9876»).
 Medido sobre las 128: **0** descripciones y **0** textos alternativos con el
 serial.
 

@@ -128,7 +128,7 @@ export function nombreCompuesto(
 }
 
 /**
- * El serial como patrón: tolera espacios entre caracteres («X 1999», «X1999»)
+ * El serial como patrón: tolera espacios entre caracteres («X 9876», «X9876»)
  * y mayúsculas. Un serial vacío no casa con nada.
  */
 export function patronSerial(serial: string, banderas = "gi"): RegExp | null {
@@ -142,7 +142,7 @@ export function patronSerial(serial: string, banderas = "gi"): RegExp | null {
   );
 }
 
-/** ¿Queda el serial en el texto? (también pegado: «snx1372», «-x1372-»). */
+/** ¿Queda el serial en el texto? (también pegado: «snx9876», «-x9876-»). */
 export function contieneSerial(texto: string, serial: string): boolean {
   const letras = serial.replace(/\s+/g, "").toLowerCase();
   if (!letras) return false;
@@ -150,8 +150,8 @@ export function contieneSerial(texto: string, serial: string): boolean {
 }
 
 /**
- * Quita el serial y lo que lo presenta: «y serial X1372», «, serial X 0773»,
- * «SN X05903», «-SN X1234-», «S/N X1». Deja la puntuación limpia.
+ * Quita el serial y lo que lo presenta: «y serial X9876», «, serial X 9876»,
+ * «SN X9876», «-SN X9876-», «S/N X1». Deja la puntuación limpia.
  */
 export function quitarSerial(texto: string, serial: string): string {
   const p = patronSerial(serial);
@@ -219,7 +219,7 @@ const EXTENSIONES: Record<string, string> = { jpg: "jpg", jpeg: "jpg", png: "png
 
 /**
  * Nombre determinista de una foto en `Media`, SIN el serial (los ficheros de
- * WordPress lo llevan: «Excavadora-HITACHI-ZX225USR-6-SN-X09083-5.jpg»). Lleva
+ * WordPress lo llevan: «Excavadora-HITACHI-ZX9876USR-6-SN-X9876-5.jpg»). Lleva
  * el id del adjunto, que es único y estable, y el nombre de la unidad para que
  * se reconozca en el panel. `null` si no es una foto (hay `.zip`).
  */

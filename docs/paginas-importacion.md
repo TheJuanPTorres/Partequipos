@@ -45,6 +45,13 @@ Las 4 existían ya en el preview con textos de relleno (`tipoPagina: legal`): se
 - Las 4 responden 200 con un solo `<h1>`, los 5 PDF dan 200 desde el Blob del preview y no queda ningún resto de WordPress en el HTML.
 - La segunda pasada no duplica: reutiliza los 5 PDF.
 - **Ciclo de retirada:** retirar devuelve las 4 páginas a su valor anterior (4 de 4, idénticas al manifiesto) y los 5 PDF dan 404. Al volver a importar, el estado es idéntico al de antes, salvo el sufijo aleatorio que el Blob añade a cada PDF.
+
+**Fallo encontrado por el verificador y corregido (2026-10-07):** los enlaces «Descargar en PDF» de los documentos recién creados daban **404**.
+
+- **Causa:** `payload.create` devuelve la URL con el nombre pedido, y el Blob le añade después un sufijo aleatorio (§10.39).
+- **Arreglo:** tras subir, se relee el registro (`ficheroGuardado`) y se usa su URL real, también en el manifiesto.
+- **Afectaba también al blog:** el manifiesto de imágenes guardaba esas URL, y la comprobación «los ficheros dan 404» de la retirada pasaba sin demostrar nada, porque esas URL nunca existieron.
+- **Comprobado ahora:** se anotaron las 5 URL reales; tras retirar, las 5 dan 404, y la propia comprobación de la retirada pasa con las URL reales. Además, si algún fichero aún responde a los 70 s (pasó con 1 de 5, por la caché del Blob), la retirada vuelve a mirar hasta 3 veces antes de dar la alarma.
 - El blog no cambia: su simulación da las mismas cifras que antes de este cambio.
 
 ## Las 36 que NO se importan (Elementor o sin página)

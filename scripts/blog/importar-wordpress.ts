@@ -111,7 +111,7 @@ const contenido: "blog" | "paginas" = args.includes("paginas") ? "paginas" : "bl
 const COLECCION = contenido === "paginas" ? "paginas" : "articulos";
 const valorDe = (k: string) => args.find((a) => a.startsWith(`${k}=`))?.slice(k.length + 1);
 const fallar = (m: string): never => {
-  const e = new Error(`[blog] ✗ ${m}`);
+  const e = new Error(`[${args.includes("paginas") ? "paginas" : "blog"}] ✗ ${m}`);
   e.stack = e.message;
   throw e;
 };
@@ -256,9 +256,19 @@ async function retirar(): Promise<void> {
   fs.renameSync(MANIFIESTO, MANIFIESTO.replace(/\.json$/, `.retirado-${Date.now()}.json`));
   log("manifiesto retirado; espero 70 s (propagación del Blob)");
   await new Promise((r) => setTimeout(r, 70_000));
-  const vivos: string[] = [];
-  for (const u of urls) if ((await fetch(u, { method: "HEAD" })).status !== 404) vivos.push(u);
-  if (vivos.length) fallar(`${vivos.length} ficheros siguen en el Blob`);
+  // La caché del Blob puede tardar algo más de 60 s en algún fichero (medido el
+  // 2026-10-07: 1 de 5 seguía a los 70 s y daba 404 poco después): se vuelve a
+  // mirar hasta 3 veces, cada 30 s, antes de dar la alarma.
+  let vivos = [...urls];
+  for (let intento = 0; ; intento++) {
+    const quedan: string[] = [];
+    for (const u of vivos) if ((await fetch(u, { method: "HEAD" })).status !== 404) quedan.push(u);
+    vivos = quedan;
+    if (!vivos.length || intento === 3) break;
+    log(`${vivos.length} ficheros aún responden; vuelvo a mirar en 30 s`);
+    await new Promise((r) => setTimeout(r, 30_000));
+  }
+  if (vivos.length) fallar(`${vivos.length} ficheros siguen en el Blob: ${vivos.join(" ")}`);
   log(`✓ los ${urls.length} ficheros dan 404`);
 }
 
@@ -533,6 +543,23 @@ async function mediaPorFichero(fichero: string): Promise<number | null> {
   return id;
 }
 
+/**
+ * El nombre y la URL REALES de un fichero recién subido. La respuesta de
+ * `payload.create` lleva el nombre que se pidió, pero el Blob le añade un
+ * sufijo aleatorio (§10.39) y el registro se corrige justo después. Con la URL
+ * de la respuesta, el enlace de una página y la comprobación de la retirada
+ * apuntarían a un fichero que no existe (detectado por el verificador del
+ * PR #106: 5 PDF en 404).
+ */
+async function ficheroGuardado(
+  coleccion: "media" | "documentos",
+  id: number,
+  pedido: string,
+): Promise<Fichero> {
+  const d = await payload.findByID({ collection: coleccion, id, depth: 0, overrideAccess: true });
+  return { id, filename: d.filename ?? pedido, url: d.url ?? "" };
+}
+
 async function imagenAMedia(img: Imagen, titulo: string, n: number): Promise<ResultadoImagen> {
   const { url, corregida } = urlImagenCorregida(img.urlWp);
   const avif = esAvif(url);
@@ -611,11 +638,7 @@ async function imagenAMedia(img: Imagen, titulo: string, n: number): Promise<Res
       overrideAccess: true,
     });
     porFichero.set(fichero, doc.id);
-    manifiesto.creado.media.push({
-      id: doc.id,
-      filename: doc.filename ?? fichero,
-      url: doc.url ?? "",
-    });
+    manifiesto.creado.media.push(await ficheroGuardado("media", doc.id, fichero));
     guardarManifiesto();
     return {
       estado: "subida",
@@ -1077,14 +1100,12 @@ async function pdfADocumento(pdf: Pdf, tituloPagina: string): Promise<ResultadoP
       file: { data: d.datos, mimetype: "application/pdf", name: fichero, size: d.datos.length },
       overrideAccess: true,
     });
-    documentosPorFichero.set(fichero, { id: doc.id, url: doc.url ?? "" });
-    manifiesto.creado.documentos!.push({
-      id: doc.id,
-      filename: doc.filename ?? fichero,
-      url: doc.url ?? "",
-    });
+    const guardado = await ficheroGuardado("documentos", doc.id, fichero);
+    if (!guardado.url) throw new Error("el documento se guardó sin URL");
+    documentosPorFichero.set(fichero, { id: doc.id, url: guardado.url });
+    manifiesto.creado.documentos!.push(guardado);
     guardarManifiesto();
-    return { estado: "subido", url: doc.url ?? "", titulo };
+    return { estado: "subido", url: guardado.url, titulo };
   } catch (e) {
     return { estado: "omitido", motivo: `Documentos lo rechaza: ${(e as Error).message}` };
   }

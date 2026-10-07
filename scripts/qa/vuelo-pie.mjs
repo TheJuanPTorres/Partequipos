@@ -30,6 +30,8 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 
+import { conDerivacion } from "../../src/lib/preview/derivacion.mjs";
+
 /*
  * `puppeteer-core` NO está en node_modules: lo trae `npx -p`, que deja su
  * `node_modules/.bin` en el PATH. Un `import` de ES no mira ahí (medido:
@@ -179,7 +181,7 @@ for (const ruta of rutas) {
       await pagina.setRequestInterception(true);
       pagina.on("request", (q) =>
         new URL(q.url()).origin === origen
-          ? q.continue({ headers: { ...q.headers(), "x-vercel-protection-bypass": bypass } })
+          ? q.continue({ headers: conDerivacion(q.headers(), q.url(), origen, bypass) })
           : q.continue(),
       );
     }

@@ -338,6 +338,8 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 - Ante ambigüedad o una decisión de arquitectura no cubierta aquí:
   **detenerse y preguntar**, no improvisar.
 - Toda decisión relevante se documenta como ADR en `docs/decisions/`.
+- **Idioma:** todos los mensajes al chat, informes, documentación, PR y
+  commits se escriben en español.
 
 ### Modo de trabajo (2026-09-28)
 
@@ -609,6 +611,7 @@ veredicto, que va en el informe.
 - **Rediseño del panel, F2 (2026-10-06):** portada propia (`admin.components.views.dashboard`, `src/components/admin/portada/`): avisos con enlace a la lista filtrada, una tarjeta por grupo en el orden del menú, accesos rápidos y lo último modificado (sin solicitudes ni usuarios); todo con el acceso del usuario, contadores con `count`, enlaces sin precarga; de solicitudes, solo contadores. «Con quién» requeriría esquema (pendiente de decisión). Detalle en `docs/diseno/decisiones-panel.md` §23.
 - **Rediseño del panel, F3 (2026-10-06):** listas más legibles solo con celdas y columnas: insignias de estado con texto, fechas relativas con la exacta al pasar el ratón o enfocar, miniaturas pequeñas y diferidas (`src/components/admin/celdas/`) y la miniatura de Imágenes por el optimizador (`adminThumbnail`); ordenar, filtrar y buscar comprobados iguales; sin esquema ni dependencias. Detalle en `docs/diseno/decisiones-panel.md` §24.
 - **Último editor (2026-10-06):** campo `actualizadoPor` en las 23 colecciones de contenido (nunca en Solicitudes ni Usuarios), puesto solo por el servidor al guardar (`src/lib/fields/ultimoEditor.ts`); migración `20261006_224101_ultimo_editor`, solo esquema; la portada lo muestra en «Lo último modificado» respetando el acceso a Usuarios, «—» sin dato; por efecto con `npm run qa:ultimo-editor`. Detalle en `docs/diseno/decisiones-panel.md` §25.
+- **Vista de Google con la marca (2026-10-06):** la vista de «Buscadores y redes sociales» pinta el título con `tituloConMarca`, la misma función que el `<title>` publicado desde el #111 (« | Partequipos» salvo en la portada, si ya la lleva o si pasa de 60); la ayuda ya no dice que no se añade nada; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §26.
 
 ### 10.0 Qué está construido y qué falta
 
@@ -1043,6 +1046,43 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
     sin hueco cuando falta la imagen.
     Comprobar también el pie entre 1025 y 1279 px SIN imagen decorativa: la
     reserva de 170 px de §10.33 p.11 no debe dejar hueco.
+
+### 10.40 INCIDENTE 2026-10-06 — el secreto de derivación del preview salió a terceros
+
+> **Qué pasó.** Para medir la foto de las sedes en un preview, un script local
+> del agente A usó `extraHTTPHeaders` de Playwright. Esa opción añade la
+> cabecera `x-vercel-protection-bypass` a **todas** las peticiones de la
+> página, no solo a las del preview. La página carga el globo de sedes, así que
+> el secreto (`VERCEL_AUTOMATION_BYPASS_SECRET`) llegó a `api.mapbox.com` y,
+> probablemente, al CDN del Blob y a Google Fonts. **Se rota.**
+>
+> **Segundo camino, encontrado al revisar:** `copia-demo.ts` hacía `fetch` con
+> el secreto **siguiendo redirecciones**. Con un secreto caducado, la
+> protección responde 302 hacia `vercel.com`, y el secreto habría viajado
+> allí.
+>
+> **Corrección — un solo módulo** (`src/lib/preview/derivacion.mjs`, en JS
+> para que lo usen los `.ts` y los `.mjs`):
+>
+> - La cabecera solo va si el origen de la petición es **exactamente** el de
+>   un preview del proyecto (`https://partequipos-…vercel.app`, sin puerto ni
+>   usuario). Producción y otros hosts, nunca.
+> - Playwright: `instalarDerivacion(contexto, origen, secreto)`, que solo
+>   intercepta ese origen. Puppeteer: `conDerivacion(...)`. `fetch`:
+>   `fetchAlPreview(...)`, que **no sigue redirecciones**.
+> - Lo usan `humo.ts`, `copia-demo.ts`, `revision-panel.mjs`
+>   (`panel:revision`) y `vuelo-pie.mjs`.
+>
+> **Guardarraíl** (`derivacion.test.ts`, en CI): falla si la cabecera puede
+> llegar a otro host (Mapbox, el Blob, Google Fonts, `vercel.com`, producción
+> o URLs con trucos), si un `fetch` sigue una redirección con ella, si algún
+> fichero de `scripts/` o `src/` usa `extraHTTPHeaders` o
+> `setExtraHTTPHeaders`, o si escribe la cabecera por su cuenta en vez de usar
+> el módulo. Antes del arreglo, la última regla listaba los 4 scripts.
+>
+> **LA REGLA, también para los scripts locales que no van al repositorio:**
+> el secreto de derivación solo se pone con `derivacion.mjs`. Nunca con
+> `extraHTTPHeaders`, nunca en un `fetch` que siga redirecciones.
 
 ### 10.39 LÍMITE — una subida del panel no puede pasar de 4,5 MB (2026-10-05)
 
@@ -3363,6 +3403,7 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Nombres internos de la subida directa    | Una actualización de Payload que renombra o cambia la ruta del permiso o el manejador del navegador del adaptador del Blob: nuestro endurecimiento dejaría de aplicarse sin error (§10.39)                                              | `src/lib/blob/rutaSubidaDirecta.test.ts`, con el adaptador real                                                                          | CI, en cada push                      |
 | Subida directa: tipo y tamaño reales     | Un fichero subido directo al Blob que no es lo que dice o pasa del tope, y que se quedaría en el almacén (§10.39)                                                                                                                       | `formatoDePdfPermitido` y `formatoDeImagenPermitido`, que leen el temporal y borran el rechazado + sus pruebas                           | CI y subida                           |
 | Ficheros del Blob sin registro           | Ficheros que la subida directa dejó en el almacén cuando el guardado falló (§10.39). Solo lista                                                                                                                                         | `npm run blob:huerfanos`                                                                                                                 | **A mano**                            |
+| Secreto de derivación solo al preview    | Un script que manda `x-vercel-protection-bypass` a otro host: `extraHTTPHeaders`, un `fetch` que sigue redirecciones o la cabecera escrita a mano (§10.40)                                                                              | `src/lib/preview/derivacion.mjs` + `derivacion.test.ts`, que también recorre `scripts/` y `src/`                                         | CI, en cada push                      |
 | Fuente de respaldo de Inter              | next/font renombra «Inter Fallback» (detalle interno de Turbopack) y la cabecera del artículo vuelve a desplazarse al llegar Inter, sin ningún error                                                                                    | `scripts/qa/fuente-respaldo.ts` tras `next build` + `src/lib/blog/fuenteRespaldo.test.ts`                                                | Cada build (también preview) y CI     |
 
 **«Deriva de esquema» se colgó dos veces; está blindada (fase 5).**

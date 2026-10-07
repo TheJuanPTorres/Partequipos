@@ -33,7 +33,8 @@ import estilos from "./hero.module.css";
  * `hero.module.css`.
  *
  * Lo que se aparta de ux-9, todo documentado en docs/diseno/decisiones-home-ux9.md:
- * - D1: el título va en `<h2>`; el `<h1>` de la portada es el logo.
+ * - D1: el título va en `<h2>`; el `<h1>` de la portada es el título
+ *   descriptivo oculto de `page.tsx` (auditoría de C, I1).
  * - D3: el vidrio no sale de la tarjeta por debajo de 1024 px.
  * - D4: las flechas son botones que funcionan; con una diapositiva no se pintan.
  * - D13 (carrusel, versión «premium» pedida por dirección): fundido cruzado,
@@ -446,7 +447,12 @@ export function HeroPortada({ diapositivas }: Props) {
 
         {/* VIDRIO: oculto en móvil por CSS, como en el diseño. */}
         {d.parrafo || d.enlace ? (
-          <aside className={`${estilos.vidrio} ${estilos.capaParallax}`}>
+          <div className={`${estilos.vidrio} ${estilos.capaParallax}`}>
+            {/*
+             * `<div>` y no `<aside>` (auditoría de C, M8): el vidrio es parte
+             * del hero, no contenido complementario, y un `<aside>` dentro de
+             * otra región no es de primer nivel (axe).
+             */}
             {/*
              * TODOS los párrafos en la misma celda y solo el activo visible: el
              * vidrio mide siempre lo del más largo y no cambia de alto al pasar
@@ -475,7 +481,7 @@ export function HeroPortada({ diapositivas }: Props) {
                 <IconCirclePlus focusable="false" stroke={1.5} />
               </span>
             ) : null}
-          </aside>
+          </div>
         ) : null}
       </div>
 

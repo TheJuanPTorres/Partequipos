@@ -823,3 +823,26 @@ Aprobado por dirección. **Cambio de esquema**, con la ventana de migraciones.
   del campo no se puede demostrar por separado con él (el gancho lo tapa).
   `development` se puso al día con `payload migrate` y `db:check` antes y
   después.
+
+## 26. La vista de Google lleva la marca, como el título publicado (2026-10-06, rama `fix/panel-vista-google-marca`)
+
+**Por qué.** Desde el PR #111 (auditoría I2, agente B), el `<title>` del sitio
+termina en « | Partequipos» mediante `tituloConMarca` (`src/lib/seo/porDefecto.ts`).
+La vista de Google del panel (§8) seguía pintando el título sin ella y la ayuda
+decía «No se le añade nada: si quieres «Partequipos», escríbelo», así que el
+editor veía un resultado distinto del real y podía escribir la marca dos veces.
+
+**Qué cambia** (`src/components/admin/SeoGuiado.tsx`):
+
+- El título de la vista pasa por **la misma función** que `buildMetadata`, con
+  la ruta de «Ver en el sitio» (`previewURL`, relativa): «/» solo en la
+  portada. Así las tres excepciones salen igual que en el sitio: la portada sin
+  marca, un título que ya la lleva sin duplicarla, y un título que con ella
+  pasaría de 60 caracteres, entero y sin marca.
+- La ayuda del título explica que el sitio añade la marca y cuándo no, en vez
+  de pedir que se escriba.
+- El contador sigue midiendo lo que escribe el editor (el campo), no el título
+  con la marca.
+
+**Sin esquema ni dependencias.** Solo es la vista: lo que se publica lo decide
+`buildMetadata`, que no se toca.

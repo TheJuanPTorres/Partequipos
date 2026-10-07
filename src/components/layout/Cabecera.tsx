@@ -20,9 +20,11 @@ import { Megamenu } from "./Megamenu";
  * cambia de modo al salir del hero y abre el menú móvil. Los enlaces están en
  * el HTML prerenderizado.
  *
- * - El logo es el `<h1>` SOLO en la portada (D1), con el criterio que tenía
- *   `LogoCabecera`: `useSelectedLayoutSegment`, no `usePathname`, porque al
- *   regenerarse la portada `usePathname` devuelve `/index`.
+ * - El logo NO es el `<h1>` (auditoría de C, I1, 2026-10-06): en la portada,
+ *   el `<h1>` es el título descriptivo de la página, oculto a la vista, en
+ *   `page.tsx`. Aquí solo se marca `aria-current` en la portada, con el
+ *   criterio de `useSelectedLayoutSegment` (no `usePathname`, que al
+ *   regenerarse la portada devuelve `/index`).
  * - En el flujo (`sticky`), encima del hero, como en ux-9. Portada: sin fondo
  *   arriba; al bajar, el velo de Andrés. Resto de páginas: fondo blanco.
  * - Se esconde al bajar y reaparece al subir o al recibir el foco; con
@@ -45,7 +47,6 @@ type Props = {
   /** Logo del panel o el de siempre (`getLogo().sitio`). */
   logo: ImagenLogo;
   nombreSitio: string;
-  tituloPortada: string;
   /** Paneles del megamenú por clave de enlace (`getMegamenu`). */
   paneles: Readonly<Record<string, PanelMenu>>;
 };
@@ -68,48 +69,30 @@ function Logo({
   logo,
   esPortada,
   nombreSitio,
-  tituloPortada,
 }: {
   logo: ImagenLogo;
   esPortada: boolean;
   nombreSitio: string;
-  tituloPortada: string;
 }) {
-  const imagen = (
-    <Image
-      src={logo.src}
-      alt={esPortada ? tituloPortada : nombreSitio}
-      width={logo.width}
-      height={logo.height}
-      className={estilos.logo}
-      preload
-    />
-  );
-  if (esPortada) {
-    return (
-      <h1 className="m-0">
-        <Link href="/" aria-current="page">
-          {imagen}
-        </Link>
-      </h1>
-    );
-  }
   return (
-    <Link href="/" aria-label={`${nombreSitio} — Inicio`}>
-      {imagen}
+    <Link
+      href="/"
+      aria-label={`${nombreSitio} — Inicio`}
+      aria-current={esPortada ? "page" : undefined}
+    >
+      <Image
+        src={logo.src}
+        alt={nombreSitio}
+        width={logo.width}
+        height={logo.height}
+        className={estilos.logo}
+        preload
+      />
     </Link>
   );
 }
 
-export function Cabecera({
-  enlaces,
-  contacto,
-  whatsapp,
-  logo,
-  nombreSitio,
-  tituloPortada,
-  paneles,
-}: Props) {
+export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, paneles }: Props) {
   const esPortada = useSelectedLayoutSegment() === null;
   const ruta = usePathname();
   const reducido = useMovimientoReducido();
@@ -290,7 +273,7 @@ export function Cabecera({
         onFocusCapture={() => setOculta(false)}
         onKeyDown={alTeclado}
       >
-        {/* UNA fila y UN logo: el `<h1>` de la portada no puede quedar oculto en ningún ancho. */}
+        {/* UNA fila y UN logo. */}
         <div className={estilos.fila}>
           <a
             href={whatsapp}
@@ -302,12 +285,7 @@ export function Cabecera({
             <IconHeadset aria-hidden="true" focusable="false" stroke={1.5} />
           </a>
           <div className={estilos.logoCol}>
-            <Logo
-              logo={logo}
-              esPortada={esPortada}
-              nombreSitio={nombreSitio}
-              tituloPortada={tituloPortada}
-            />
+            <Logo logo={logo} esPortada={esPortada} nombreSitio={nombreSitio} />
           </div>
           <nav className={estilos.nav} aria-label="Navegación principal">
             {listaEscritorio}

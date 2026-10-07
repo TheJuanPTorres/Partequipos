@@ -2196,6 +2196,50 @@ CSV del cliente aparecerán solas.
 - **Coste en el build:** seis consultas ligeras por página (solo nombre, slug y
   marca, `depth: 0`), memoizadas por petición (§10.10).
 
+### 26.1 Logos de marca — DESVIACIÓN PEDIDA POR EL CLIENTE (2026-10-06)
+
+- **Qué pidió el cliente:** que cada entrada de MARCA lleve su logo junto al
+  nombre, para reconocerla más rápido. Aplica a maquinaria (dentro de
+  «Por marca») y a repuestos (dentro de «Repuestos por marca»). **El diseño de
+  Andrés no lleva logos.**
+- **Cómo:**
+  - El logo va **con** el nombre, nunca en su lugar. Es **decorativo**
+    (`alt=""`), porque el nombre ya dice la marca.
+  - Sale del campo «Logo» de cada marca del catálogo. Si una marca no tiene,
+    va solo el nombre, sin hueco.
+  - Todos a **24 px de alto** con su proporción real; los muy anchos se
+    quedan en 96 px sin deformarse.
+  - `next/image` con las medidas a ese tamaño y carga diferida. Como van
+    dentro de un acordeón cerrado, **no se descargan hasta abrirlo**, ni
+    siquiera al abrir el panel.
+  - «Aditamentos» no es una marca de verdad: va sin logo.
+  - Cambiar el logo de una marca revalida el sitio, como cambiar su nombre
+    (`megamenuHooks.ts`).
+- **Coste en el build:** las dos consultas de marcas pasan a `depth: 1`, pero
+  de la imagen solo traen url, ancho y alto (`populate`).
+- **Solo escritorio (≥ 1025 px), como todo el megamenú.** A 1010 la cabecera
+  es la móvil y su menú no tiene marcas: no cambia nada.
+- **Marcas SIN logo hoy en producción** (para pedírselos al cliente):
+  - **maquinaria:** Dynapac;
+  - **repuestos:** las cinco, que son Bobcat, Caterpillar, Hitachi, Komatsu y
+    Volvo.
+  - Los de Case, Hitachi y Yanmar de maquinaria son los de la copia de
+    demostración (§10.38). **Son imágenes CUADRADAS** (una caja de color con
+    el nombre dentro): a 24 px el texto no se lee. Hay que pedir al cliente
+    **logos horizontales**, en SVG o PNG transparente, que se lean bien sobre
+    blanco.
+- **Fondo del panel:** blanco siempre. El sitio no tiene modo oscuro (§10.14).
+  Los tres logos actuales se ven sobre él.
+- **Medido en el preview** (1440 y 1010):
+  - 3 logos en el HTML, todos con `alt=""` y `loading="lazy"`;
+  - **0 descargados** al cargar la página y al abrir el panel; se descargan al
+    abrir «Por marca»;
+  - todos a 24 px de alto, centrados igual, y filas de 43 px con y sin logo;
+  - CLS 0;
+  - a 1010, ningún logo descargado.
+  - Capturas en `partequipos-cierre\capturas\megamenu-logos\`.
+- **Para Andrés:** es una adición al export 2162 por petición del cliente.
+
 ## 27. Cambios de dirección en la home tras la prueba en móvil (2026-10-05)
 
 Decisiones de dirección del 2026-10-05, cada una en su PR. Las que se apartan
@@ -2393,3 +2437,32 @@ Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.
 - **Para Andrés:** en móvil el vídeo encogido va arriba y no centrado, y la
   sección 8 se monta sobre el final del recorrido. Es la misma regla de §27.5:
   nunca encima del vídeo.
+
+## 29. Accesibilidad tras la auditoría de C (2026-10-06)
+
+Auditoría: `partequipos-cierre\informes\2026-10-06-auditoria-a11y-seo.md`. Lo
+que toca al diseño, para Andrés:
+
+| #   | Qué                                  | ux-9               | Aquí                               | Por qué                                                                                                     |
+| --- | ------------------------------------ | ------------------ | ---------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| I5  | Títulos de columna del pie, en móvil | 18 px en negrita   | **19 px** en negrita               | El rojo sobre el gris da 3,99:1. A 19 px en negrita cuenta como texto grande, que pide 3:1                  |
+| I8  | Teléfonos de las sedes               | 15 px, peso 600    | **19 px, peso 700**                | El rojo sobre el gris del panel da 3,81:1. Igual: como texto grande cumple. Encaja como llamada a la acción |
+| I1  | Título principal de la portada       | El logo es el `h1` | `h1` descriptivo oculto a la vista | SEO: el título principal de la página más importante no puede ser solo el nombre de la empresa              |
+
+- **El color del diseño se mantiene en los tres casos.**
+- **Pines del mapa (M7):** Mapbox les ponía `role="img"`, que no está
+  permitido en un botón. Se quita después de crearlos. Sin ese rol, axe evalúa
+  también su tamaño. A 390, con el globo alejado, los pines van muy juntos y no
+  llegan a 24 px. Se acoge a la excepción **«equivalente»** de WCAG 2.5.8: lo
+  mismo se hace con las flechas y el carril del panel de sedes, que sí
+  cumplen.
+- **Enlaces de las columnas del pie (I6) — DESVIACIÓN APROBADA por dirección
+  el 2026-10-07:**
+  - En ux-9 las líneas van a **18,2 px** a 390 y a **22,4 px** a 1440. Con
+    menos de 24 px entre líneas, las zonas pulsables de 24 px se pisarían
+    (WCAG 2.5.8).
+  - Ahora cada enlace mide justo 24 px de alto, uno debajo de otro: las
+    líneas crecen **+5,8 px a 390** y **+1,6 px a 1440**, lo justo.
+  - Los enlaces de la franja legal ya tenían 24 px, sin cambio visual.
+  - **Para Andrés:** las columnas del pie son algo más altas que en su
+    maqueta móvil.

@@ -36,6 +36,7 @@ import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 import type { Documento, EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
+import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 /*
  * FICHA DE EQUIPO NUEVO — ficha de producto V2 de ux-9 (export 3166,
@@ -78,7 +79,7 @@ async function resolver(params: Params) {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const data = await resolver(await params);
-  if (!data) return {};
+  if (!data) return METADATA_404;
 
   const { marca, tipo, equipo } = data;
   const imagenes = Array.isArray(equipo.imagenes) ? equipo.imagenes : [];

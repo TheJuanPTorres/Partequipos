@@ -22,13 +22,52 @@ import { rutas } from "./routes";
 
 export type EnlaceMenu = { etiqueta: string; href: string };
 
-/** Un acordeón: su título, sus enlaces (el primero, «Ver todo») y sus acordeones hijos. */
-export type GrupoMenu = { titulo: string; enlaces: EnlaceMenu[]; grupos: GrupoMenu[] };
+/** El logo de una marca, ya a la medida con la que se pinta (alto fijo). */
+export type LogoMenu = { url: string; width: number; height: number };
+
+/**
+ * Un acordeón: su título, sus enlaces (el primero, «Ver todo») y sus acordeones
+ * hijos. Los de MARCA llevan además su logo, si lo tiene (petición del cliente
+ * del 2026-10-06, decisiones-home-ux9.md §26).
+ */
+export type GrupoMenu = {
+  titulo: string;
+  enlaces: EnlaceMenu[];
+  grupos: GrupoMenu[];
+  logo?: LogoMenu;
+};
 
 export type PanelMenu = { verTodo: EnlaceMenu; grupos: GrupoMenu[] };
 
+/** El logo tal como llega de Payload (`depth: 1`, solo url y medidas). */
+type LogoCatalogo = { url?: string | null; width?: number | null; height?: number | null };
+
 /** Lo mínimo de cada registro del catálogo que el menú necesita. */
-export type ItemCatalogo = { id: number; nombre: string; slug: string };
+export type ItemCatalogo = {
+  id: number;
+  nombre: string;
+  slug: string;
+  logo?: number | LogoCatalogo | null;
+};
+
+/** Alto con el que se pinta el logo de una marca en el menú (px). */
+export const ALTO_LOGO_MENU = 24;
+
+/**
+ * El logo de una marca a la medida del menú: alto fijo y el ancho que le toca
+ * por su proporción real. Sin logo, o sin url o medidas, nada: la marca va
+ * solo con su nombre, sin hueco.
+ */
+export function logoDeMenu(logo: ItemCatalogo["logo"]): LogoMenu | undefined {
+  if (!logo || typeof logo !== "object") return undefined;
+  const { url, width, height } = logo;
+  if (!url || !width || !height) return undefined;
+  return {
+    url,
+    width: Math.max(1, Math.round((ALTO_LOGO_MENU * width) / height)),
+    height: ALTO_LOGO_MENU,
+  };
+}
 export type TipoCatalogo = ItemCatalogo & { marca: number | { id: number } | null | undefined };
 
 export type DatosMegamenu = {
@@ -66,9 +105,12 @@ function grupoDeMarca(
   hrefMarca: (m: string) => string,
   hrefTipo: (m: string, t: string) => string,
   titulo = marca.nombre,
+  conLogo = true,
 ): GrupoMenu {
+  const logo = conLogo ? logoDeMenu(marca.logo) : undefined;
   return {
     titulo,
+    ...(logo ? { logo } : {}),
     enlaces: [
       { etiqueta: `Ver todo ${marca.nombre}`, href: conBarra(hrefMarca(marca.slug)) },
       ...tiposDe(marca, tipos).map((t) => ({
@@ -84,7 +126,15 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
   const marcas = [...d.marcasMaquinaria].sort(porNombre);
   const aditamentos = marcas.find((m) => m.slug === SLUG_ADITAMENTOS);
   const deMarca = (m: ItemCatalogo, titulo?: string) =>
-    grupoDeMarca(m, d.tiposMaquinaria, rutas.marcaMaquinaria, rutas.tipoMaquinaria, titulo);
+    grupoDeMarca(
+      m,
+      d.tiposMaquinaria,
+      rutas.marcaMaquinaria,
+      rutas.tipoMaquinaria,
+      titulo,
+      // «Aditamentos» no es una marca de verdad: va sin logo.
+      m.slug !== SLUG_ADITAMENTOS,
+    );
 
   const porMarca: GrupoMenu = {
     titulo: "Por marca",

@@ -301,6 +301,18 @@
   color: var(--color-marca);
 }
 
+/*
+ * CONTRASTE (auditoría de C, I5, 2026-10-06): el rojo sobre el gris da 3,99:1.
+ * A 18 px en negrita (móvil) es texto normal y pide 4,5:1; a partir de
+ * 18,66 px en negrita es texto GRANDE y basta 3:1. Se mantiene el color del
+ * diseño y se sube 1 px en móvil. A 768 px o más ya va a 20 px.
+ */
+@media (max-width: 767px) {
+  .tituloColumna {
+    font-size: 19px;
+  }
+}
+
 /* Enlaces: el gris `secondary` del tema, sin hueco (interlineado 1,4). */
 .lista {
   display: flex;
@@ -311,6 +323,15 @@
 }
 
 .enlace {
+  /*
+   * ZONA PULSABLE DE 24 PX (auditoría de C, I6; WCAG 2.5.8), APROBADO por
+   * dirección el 2026-10-07 con el cambio visual mínimo: cada enlace mide justo
+   * 24 px de alto, uno debajo de otro, sin pisarse. Antes las líneas iban a
+   * 18,2 px (390) y a 22,4 px (1440). Ahora cada línea crece lo justo, +5,8 y
+   * +1,6 px. `1lh` es el interlineado del propio enlace.
+   */
+  display: inline-block;
+  padding-block: max(0px, calc((24px - 1lh) / 2));
   color: var(--color-texto-suave);
   text-decoration: none;
 }
@@ -505,6 +526,13 @@
 
 .legal a {
   color: var(--color-texto-suave);
+  /*
+   * ZONA PULSABLE de 24 px (auditoría de C, I6; WCAG 2.5.8) sin cambio
+   * visual: en un elemento en línea el relleno vertical agranda la caja y no
+   * mueve las líneas. 13 px de letra dan una caja de 16; con 4 + 4, 24. Entre
+   * filas hay 25,5 px, así que no se pisan.
+   */
+  padding-block: 4px;
 }
 
 .legal a:hover {

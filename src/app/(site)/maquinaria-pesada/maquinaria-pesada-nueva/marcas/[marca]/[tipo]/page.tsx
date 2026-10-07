@@ -16,6 +16,7 @@ import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import type { MarcasMaquinaria } from "@/payload-types";
+import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 type Params = { marca: string; tipo: string };
 
@@ -40,7 +41,7 @@ async function resolver(params: Params) {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const data = await resolver(await params);
-  if (!data) return {};
+  if (!data) return METADATA_404;
 
   const { marca, tipo } = data;
   return metadataDe({

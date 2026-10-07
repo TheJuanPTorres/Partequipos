@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { absoluteUrl, seoConfig } from "./config";
-import { recortarDescripcion } from "./porDefecto";
+import { recortarDescripcion, tituloConMarca } from "./porDefecto";
 
 /**
  * Grupo `seo` tal como lo define `seoField()` en las colecciones de Payload.
@@ -43,7 +43,8 @@ function ogImageUrl(ogImage: SeoGroup extends null ? never : NonNullable<SeoGrou
  * Un solo patrón para Marca, Tipo, Modelo y Categoría (CLAUDE.md §3.4).
  *
  * Prioridad de datos:
- *   title       -> seo.metaTitle        | nombre
+ *   title       -> seo.metaTitle        | nombre   (en <title>, con « | Partequipos»:
+ *                                                    `tituloConMarca`; Open Graph sin ella)
  *   description -> seo.metaDescription  | descripcion | descripción por defecto
  *   imagen      -> imageUrl | seo.ogImage | imagenPorDefecto (logo) | config.ts
  */
@@ -64,7 +65,7 @@ export function buildMetadata(input: BuildMetadataInput): Metadata {
   );
 
   return {
-    title,
+    title: tituloConMarca(title, path),
     description,
     alternates: { canonical },
     openGraph: {

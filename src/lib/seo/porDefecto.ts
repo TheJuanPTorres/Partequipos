@@ -45,3 +45,19 @@ export const RECOMENDADO = {
   titulo: { max: 60 },
   descripcion: { min: 120, max: MAX_DESCRIPCION },
 } as const;
+
+/** La marca al final del `<title>` (auditoría I2, decisión de dirección del 2026-10-07). */
+export const SUFIJO_MARCA = " | Partequipos";
+
+/**
+ * El `<title>` que sale publicado: el título con « | Partequipos» al final,
+ * salvo en la portada, si ya lleva la marca (no «… - Partequipos | Partequipos»)
+ * o si con ella pasaría de los 60 caracteres que enseña Google: entonces va
+ * sin marca, entero. Lo usan `buildMetadata` y la vista de Google del panel.
+ */
+export function tituloConMarca(titulo: string, path: string): string {
+  const t = titulo.replace(/\s+/g, " ").trim();
+  if (path === "/" || /partequipos/i.test(t)) return t;
+  const conMarca = `${t}${SUFIJO_MARCA}`;
+  return conMarca.length <= RECOMENDADO.titulo.max ? conMarca : t;
+}

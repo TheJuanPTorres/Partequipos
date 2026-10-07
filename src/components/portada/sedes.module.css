@@ -113,8 +113,14 @@
 .telefono {
   width: fit-content;
   color: var(--sedes-cta);
-  font-size: 0.9375em;
-  font-weight: 600;
+  /*
+   * CONTRASTE (auditoría de C, I8, 2026-10-06): el rojo sobre el gris del
+   * panel da 3,81:1. A 15 px es texto normal y pide 4,5:1. Se mantiene el
+   * color del diseño y se pasa a texto GRANDE (≥ 18,66 px en negrita), donde
+   * basta 3:1: 19 px en 700.
+   */
+  font-size: 19px;
+  font-weight: 700;
   line-height: 1.5;
   text-decoration: none;
   text-underline-offset: 0.2em;

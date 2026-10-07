@@ -261,6 +261,10 @@ export function GloboSedes({ token, sedes, children }: Props) {
                 new gl.Marker({ element: pin, anchor: "center" })
                   .setLngLat([s.lng, s.lat])
                   .addTo(m);
+                // Mapbox pone `role="img"` al marcador, y en un botón no está
+                // permitido (auditoría de C, M7; axe `aria-allowed-role`). Sin
+                // él, el pin vuelve a ser un botón con su nombre.
+                pin.removeAttribute("role");
                 return pin;
               });
               pines.current[0]?.setAttribute("data-activo", "");

@@ -14,6 +14,7 @@ import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
+import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 /**
  * Categoría de maquinaria USADA.
@@ -32,7 +33,7 @@ export async function generateStaticParams(): Promise<Params[]> {
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { categoria: slug } = await params;
   const categoria = await getCategoriaUsadaPorSlug(slug);
-  if (!categoria) return {};
+  if (!categoria) return METADATA_404;
 
   return metadataDe({
     nombre: tituloPorDefecto.categoriaUsada(categoria.nombre),

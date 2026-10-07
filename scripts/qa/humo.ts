@@ -9,10 +9,12 @@
  * La DECISIÓN vive en `src/lib/qa/humo.ts` y tiene pruebas que comprueban que
  * **falla** con un 500, con un 3xx y con la red caída. Aquí queda la red.
  *
- * EL TOKEN NO SE IMPRIME NUNCA. Va en la cabecera
- * `x-vercel-protection-bypass` —no en la URL, que acabaría en los registros— y
+ * EL TOKEN NO SE IMPRIME NUNCA. Va en la cabecera de derivación
+ * (`src/lib/preview/derivacion.mjs`) —no en la URL, que acabaría en los
+ * registros—, solo al origen del preview, y
  * de este script solo sale si está presente o no.
  */
+import { conDerivacion } from "../../src/lib/preview/derivacion.mjs";
 import {
   debeReintentar,
   esperaMs,
@@ -57,10 +59,14 @@ async function comprobar(ruta: Ruta): Promise<Resultado> {
 
   while (intentos < 99) {
     intentos += 1;
-    const cabeceras: Record<string, string> = { ...(ruta.cabeceras ?? {}) };
-    if (bypass) {
-      cabeceras["x-vercel-protection-bypass"] = bypass;
-    }
+    // El secreto solo si `base` es un preview y la petición va a su origen
+    // (`derivacion.mjs`); en producción va vacío.
+    const cabeceras = conDerivacion(
+      { ...(ruta.cabeceras ?? {}) },
+      `${base}${ruta.ruta}`,
+      base!,
+      bypass,
+    );
 
     try {
       const respuesta = await fetch(`${base}${ruta.ruta}`, {

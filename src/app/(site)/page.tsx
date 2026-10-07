@@ -107,6 +107,13 @@ export default async function HomePage() {
      * (docs/diseno/decisiones-home-ux9.md §22).
      */
     <main>
+      {/*
+       * El `<h1>` de la portada (auditoría de C, I1, 2026-10-06): descriptivo
+       * y oculto a la vista, porque el diseño no pinta ningún título así. Sale
+       * del campo «Título» de la página «inicio» del panel. El carrusel sigue
+       * con sus `<h2>`.
+       */}
+      <h1 className="sr-only">{pagina.titulo}</h1>
       <JsonLd data={buildOrganizationJsonLd(horario, empresa, logo.buscadores)} />
 
       {/* Sección 1 de ux-9. Sin diapositivas en Payload, no se pinta. */}

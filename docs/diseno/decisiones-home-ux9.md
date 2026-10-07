@@ -2028,10 +2028,30 @@ Andrés: no se usa ni entra al repositorio.
 | G6  | Pines como `<div>`                      | Pines como `<button>` con nombre accesible                         | Teclado y lector de pantalla      |
 | G7  | Fotos de ciudad                         | Solo en el preview; producción sin foto, sin hueco                 | §10.38 no las cubre               |
 
-**Pendiente:** el modo globo **no se ha probado**, porque no hay token de la
-cuenta del cliente (L5). Con él: verificar pintado contra ux-9 a 390, 1010 y
-1440, y la CSP (ya incluye `api.mapbox.com`, `events.mapbox.com` y los
-workers `blob:`).
+**VERIFICADO EN PRODUCCIÓN el 2026-10-06, con el token puesto por dirección**
+(el público por defecto de la cuenta; ver el runbook de lanzamiento, fila 7).
+Se midió en producción y en ux-9 publicado, a 390, 1010 y 1440:
+
+| Qué                 | ux-9                                        | Producción                                            |
+| ------------------- | ------------------------------------------- | ----------------------------------------------------- |
+| Mapa                | 390×390 · 1010×900 · 1440×900               | **Igual**                                             |
+| Panel               | 390×589 bajo el mapa · 416×868 a la derecha | **Igual**                                             |
+| Encuadre del globo  | Colombia, con los pines                     | **Igual** (capturas casi idénticas)                   |
+| Pines               | **14**: cada sede pintada DOS veces         | 7, uno por sede (error de ux-9, no se replica)        |
+| Carga de Mapbox     | Al cargar la página                         | **Solo al acercarse la sección** (0 peticiones antes) |
+| Atribución y logo   | Ocultos                                     | **Visibles** (G2): botón «i» compacto y logo          |
+| CSP                 | —                                           | Sin violaciones                                       |
+| CLS                 | 1,97 a 1010 y 1,91 a 1440                   | **0** en los tres anchos                              |
+| Movimiento reducido | —                                           | Cambio de sede instantáneo; CLS 0                     |
+
+- **Sección a 390:** 1043 px frente a 1037 (6 px más).
+- **Corregido en el mismo PR:** la foto de cada sede se encuadra por arriba
+  (`object-position: 50% 0`). En ux-9 la imagen es más alta que su caja y se ve
+  la parte de arriba, el cielo y la ciudad; aquí se veía el centro, la avenida.
+- **Para Andrés:** en la captura de ux-9 a 1440 no se ven las flechas
+  anterior/siguiente junto a «1 / 7»; aquí sí. No se ha investigado si ux-9
+  las oculta a propósito.
+- Capturas en `partequipos-cierre\capturas\sedes-mapbox\`.
 
 ## 24. La home medida contra ux-9 publicado (2026-10-02)
 

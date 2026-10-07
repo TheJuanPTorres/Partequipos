@@ -129,6 +129,9 @@
   width: auto;
   max-width: 96px;
   height: 24px;
+  /* El logo mide 24 px, algo más que la línea de 22,4: sin esto la fila con
+     logo pasaría de 43 a 45 px (medido) y las marcas no quedarían iguales. */
+  margin-block: -1px;
   object-fit: contain;
 }
 

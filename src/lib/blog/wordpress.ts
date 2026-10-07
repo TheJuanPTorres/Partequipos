@@ -588,3 +588,15 @@ export function repartirEnSecciones(
   }
   return { contenido, secciones };
 }
+
+/**
+ * El título de Yoast SIN la marca del final (« - Partequipos», « | Partequipos»…),
+ * porque el sitio la añade él mismo con `tituloConMarca` (decisión de dirección
+ * del 2026-10-07). Si no queda nada, `null`.
+ */
+export function tituloSinMarca(titulo: string): string | null {
+  const t = textoPlano(titulo)
+    .replace(/\s*[-–—|·:]\s*partequipos\s*$/i, "")
+    .trim();
+  return t || null;
+}

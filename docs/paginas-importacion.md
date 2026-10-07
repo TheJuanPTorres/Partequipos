@@ -38,7 +38,7 @@ Las 4 existían ya en el preview con textos de relleno (`tipoPagina: legal`): se
 - **Tablas:** 8, en la página de garantías, pasan a párrafos «celda · celda», como en el blog.
 - **Texto conservado:** 100 % en tres páginas y 99,4 % en la de garantías. Lo que falta son el encabezado suelto y el texto de carga.
 - **Entradilla:** vacía. Las páginas de WordPress no tienen extracto propio; el de la API es el principio del texto.
-- **SEO de Yoast:** los 4 títulos, que son únicos. Las descripciones no: van repetidas por parejas (código de ética = garantías; términos = tratamiento).
+- **SEO de Yoast:** los 4 títulos, que son únicos, **sin la marca del final** («… - Partequipos»): la pone el sitio con `tituloConMarca` (decisión de dirección del 2026-10-07, `tituloSinMarca`; vale también para el blog). Las descripciones no: van repetidas por parejas (código de ética = garantías; términos = tratamiento).
 
 **Comprobado:**
 

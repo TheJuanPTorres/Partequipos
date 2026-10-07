@@ -27,6 +27,7 @@ import {
   textoDescriptivo,
   textoPlano,
   tituloEnNegrita,
+  tituloSinMarca,
   urlImagenCorregida,
   valoresUnicos,
 } from "./wordpress";
@@ -385,5 +386,19 @@ describe("importador del blog: piezas puras", () => {
     );
     // Sin receta, todo al contenido.
     assert.equal(repartirEnSecciones(bloques).contenido.length, bloques.length);
+  });
+  it("quita la marca del final de los títulos de Yoast", () => {
+    assert.equal(
+      tituloSinMarca("Código de ética Partequipos - Partequipos"),
+      "Código de ética Partequipos",
+    );
+    assert.equal(
+      tituloSinMarca("Política de Garantías de Repuestos | Partequipos"),
+      "Política de Garantías de Repuestos",
+    );
+    assert.equal(tituloSinMarca("TRATAMIENTO DE DATOS"), "TRATAMIENTO DE DATOS");
+    // La marca en medio no se toca; solo el final.
+    assert.equal(tituloSinMarca("Partequipos en Colombia"), "Partequipos en Colombia");
+    assert.equal(tituloSinMarca(" - Partequipos"), null);
   });
 });

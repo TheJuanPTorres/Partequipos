@@ -94,6 +94,7 @@ import {
   quitarShortcodes,
   textoPlano,
   tituloEnNegrita,
+  tituloSinMarca,
   type OrigenAlt,
   urlImagenCorregida,
   valoresUnicos,
@@ -1261,7 +1262,7 @@ for (const pagina of contenido === "paginas" ? posts : []) {
     entrada.anclasPerdidas = entrada.anclasWp!.filter((a) => !entrada.secciones!.includes(a));
 
     const y = pagina.yoast_head_json ?? {};
-    const metaTitle = y.title && titulosUnicos.has(y.title.trim()) ? textoPlano(y.title) : null;
+    const metaTitle = y.title && titulosUnicos.has(y.title.trim()) ? tituloSinMarca(y.title) : null;
     const metaDescription =
       y.description && descripcionesUnicas.has(y.description.trim())
         ? textoPlano(y.description)
@@ -1411,7 +1412,7 @@ for (const post of contenido === "blog"
     }
 
     const y = post.yoast_head_json ?? {};
-    const metaTitle = y.title && titulosUnicos.has(y.title.trim()) ? textoPlano(y.title) : null;
+    const metaTitle = y.title && titulosUnicos.has(y.title.trim()) ? tituloSinMarca(y.title) : null;
     const metaDescription =
       y.description && descripcionesUnicas.has(y.description.trim())
         ? textoPlano(y.description)

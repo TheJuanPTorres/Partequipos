@@ -9,7 +9,8 @@ import { revalidarTodoElSitio } from "../../lib/revalidation";
  * refrescarse, no solo las páginas de ese registro.
  *
  * Revalidar el sitio entero es caro, así que SOLO cuando cambia lo que el menú
- * pinta (nombre, slug, marca): editar una descripción no lo dispara. Se AÑADE
+ * pinta (nombre, slug, marca y, en las marcas, el logo): editar una
+ * descripción no lo dispara. Se AÑADE
  * a los ganchos de cada colección; nunca relanza.
  */
 
@@ -25,7 +26,8 @@ export function cambiaElMenu(operacion: string, doc: Registro, anterior: Registr
   return (
     doc.nombre !== anterior.nombre ||
     doc.slug !== anterior.slug ||
-    idDe(doc.marca) !== idDe(anterior.marca)
+    idDe(doc.marca) !== idDe(anterior.marca) ||
+    idDe(doc.logo) !== idDe(anterior.logo)
   );
 }
 

@@ -120,6 +120,18 @@
   height: 14px;
 }
 
+/*
+ * Logo de marca (petición del cliente del 2026-10-06, §26): todos a 24 px de
+ * alto, con su proporción; los muy anchos se quedan en 96 px sin deformarse.
+ */
+.logo {
+  flex: none;
+  width: auto;
+  max-width: 96px;
+  height: 24px;
+  object-fit: contain;
+}
+
 .titulo:hover,
 .acordeon[data-abierto="si"] > .titulo {
   color: var(--color-marca);

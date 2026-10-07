@@ -5,6 +5,7 @@ import {
   SLUG_ADITAMENTOS,
   claveDeEnlace,
   construirMegamenu,
+  logoDeMenu,
   panelMaquinaria,
   panelRepuestos,
   type DatosMegamenu,
@@ -154,5 +155,43 @@ describe("megamenú: qué enlace de la cabecera abre qué panel", () => {
     assert.ok(m[claveDeEnlace("/repuestos-maquinaria-pesada-colombia/")]);
     assert.equal(m[claveDeEnlace("/lubricantes/lubricantes-eni/")], undefined);
     assert.equal(m[claveDeEnlace("/servicio-tecnico/")], undefined);
+  });
+});
+
+describe("megamenú: logos de marca (petición del cliente, 2026-10-06)", () => {
+  const LOGO = {
+    url: "https://x.public.blob.vercel-storage.com/logo.png",
+    width: 400,
+    height: 100,
+  };
+
+  it("el logo se pinta a 24 px de alto con su proporción; sin logo o sin medidas, nada", () => {
+    assert.deepEqual(logoDeMenu(LOGO), { url: LOGO.url, width: 96, height: 24 });
+    assert.equal(logoDeMenu(null), undefined);
+    assert.equal(logoDeMenu(7), undefined); // sin poblar
+    assert.equal(logoDeMenu({ url: LOGO.url, width: null, height: 100 }), undefined);
+    assert.equal(logoDeMenu({ url: null, width: 400, height: 100 }), undefined);
+  });
+
+  it("las marcas con logo lo llevan; las que no, solo el nombre; Aditamentos, nunca", () => {
+    const datos: DatosMegamenu = {
+      ...DATOS,
+      marcasMaquinaria: [
+        { id: 1, nombre: "Yanmar", slug: "yanmar", logo: LOGO },
+        { id: 2, nombre: "Aditamentos", slug: SLUG_ADITAMENTOS, logo: LOGO },
+        { id: 3, nombre: "Case Construction", slug: "case-construction", logo: null },
+      ],
+      marcasRepuestos: [{ ...DATOS.marcasRepuestos[0]!, logo: LOGO }],
+    };
+    const maquinaria = panelMaquinaria(datos);
+    const porMarca = maquinaria.grupos[0]!.grupos.find((g) => g.titulo === "Por marca")!;
+    const yanmar = porMarca.grupos.find((g) => g.titulo === "Yanmar")!;
+    const caseC = porMarca.grupos.find((g) => g.titulo === "Case Construction")!;
+    assert.equal(yanmar.logo?.height, 24);
+    assert.equal("logo" in caseC, false);
+    const aditamentos = maquinaria.grupos.find((g) => g.titulo.startsWith("Aditamentos"))!;
+    assert.equal(aditamentos.logo, undefined);
+    const caterpillar = panelRepuestos(datos).grupos[0]!.grupos[0]!;
+    assert.equal(caterpillar.logo?.url, LOGO.url);
   });
 });

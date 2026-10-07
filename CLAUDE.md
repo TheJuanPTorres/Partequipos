@@ -338,6 +338,8 @@ Una tarea no está terminada hasta que cumple **todo** esto:
 - Ante ambigüedad o una decisión de arquitectura no cubierta aquí:
   **detenerse y preguntar**, no improvisar.
 - Toda decisión relevante se documenta como ADR en `docs/decisions/`.
+- **Idioma:** todos los mensajes al chat, informes, documentación, PR y
+  commits se escriben en español.
 
 ### Modo de trabajo (2026-09-28)
 
@@ -609,6 +611,7 @@ veredicto, que va en el informe.
 - **Rediseño del panel, F2 (2026-10-06):** portada propia (`admin.components.views.dashboard`, `src/components/admin/portada/`): avisos con enlace a la lista filtrada, una tarjeta por grupo en el orden del menú, accesos rápidos y lo último modificado (sin solicitudes ni usuarios); todo con el acceso del usuario, contadores con `count`, enlaces sin precarga; de solicitudes, solo contadores. «Con quién» requeriría esquema (pendiente de decisión). Detalle en `docs/diseno/decisiones-panel.md` §23.
 - **Rediseño del panel, F3 (2026-10-06):** listas más legibles solo con celdas y columnas: insignias de estado con texto, fechas relativas con la exacta al pasar el ratón o enfocar, miniaturas pequeñas y diferidas (`src/components/admin/celdas/`) y la miniatura de Imágenes por el optimizador (`adminThumbnail`); ordenar, filtrar y buscar comprobados iguales; sin esquema ni dependencias. Detalle en `docs/diseno/decisiones-panel.md` §24.
 - **Último editor (2026-10-06):** campo `actualizadoPor` en las 23 colecciones de contenido (nunca en Solicitudes ni Usuarios), puesto solo por el servidor al guardar (`src/lib/fields/ultimoEditor.ts`); migración `20261006_224101_ultimo_editor`, solo esquema; la portada lo muestra en «Lo último modificado» respetando el acceso a Usuarios, «—» sin dato; por efecto con `npm run qa:ultimo-editor`. Detalle en `docs/diseno/decisiones-panel.md` §25.
+- **Vista de Google con la marca (2026-10-06):** la vista de «Buscadores y redes sociales» pinta el título con `tituloConMarca`, la misma función que el `<title>` publicado desde el #111 (« | Partequipos» salvo en la portada, si ya la lleva o si pasa de 60); la ayuda ya no dice que no se añade nada; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §26.
 
 ### 10.0 Qué está construido y qué falta
 

@@ -11,6 +11,31 @@ import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import type { Articulo, CategoriasBlog } from "@/payload-types";
 
+import cabecera from "./cabeceraArticulo.module.css";
+
+/*
+ * Separadores de la línea de fecha. Lo visible lleva huecos FIJOS en píxeles
+ * (`mx-3`, los 12 px del `gap-x-3` de antes): un espacio cambiaría de ancho
+ * con la fuente y movería en horizontal lo que va detrás al llegar Inter
+ * (medido: +0,004 de CLS a 1440). El espacio de ancho cero deja cortar la
+ * línea tras el punto. La copia invisible solo fija el alto y tiene que medir
+ * AL MENOS lo visible, así que lleva espacios de una eme, más anchos.
+ */
+const ESPACIO_EME = String.fromCharCode(0x2003);
+const ESPACIO_CERO = String.fromCharCode(0x200b);
+const SEPARADOR_COPIA = `${ESPACIO_EME}·${ESPACIO_EME}`;
+
+function Separador() {
+  return (
+    <>
+      <span aria-hidden="true" className="mx-3">
+        ·
+      </span>
+      {ESPACIO_CERO}
+    </>
+  );
+}
+
 /**
  * Cuerpo de un artículo del blog.
  *
@@ -33,6 +58,10 @@ export async function ArticuloCuerpo({ articulo }: { articulo: Articulo }) {
   const logo = await getLogo();
   const categoria = poblado<CategoriasBlog>(articulo.categoria);
   const imagen = imagenDeMedia(articulo.imagenDestacada, articulo.titulo);
+  const fecha = fechaLegible(articulo.fechaPublicacion);
+  const autor = articulo.autor?.trim() || seoConfig.siteName;
+  /* El texto de la línea de fecha, tal como se ve: es su copia invisible. */
+  const meta = [fecha, `Por ${autor}`, categoria?.nombre].filter(Boolean).join(SEPARADOR_COPIA);
 
   /*
    * La miga de la categoría se omite cuando su nombre coincide con el del
@@ -74,28 +103,44 @@ export async function ArticuloCuerpo({ articulo }: { articulo: Articulo }) {
 
       {/* `<article>` porque es contenido autónomo, no una sección de la página. */}
       <article>
+        {/*
+         * Título, línea de fecha y entradilla con su alto fijado por una copia
+         * invisible del texto (`data-reserva`): así no se desplazan al llegar
+         * Inter. La copia dice lo mismo que lo visible; en la línea de fecha, con
+         * separadores más anchos (ver `SEPARADOR_COPIA`).
+         */}
         <header>
-          <h1 className="text-3xl font-semibold text-gray-900">{articulo.titulo}</h1>
+          <h1
+            className={`${cabecera.reserva} text-3xl font-semibold text-gray-900`}
+            data-reserva={articulo.titulo}
+          >
+            <span>{articulo.titulo}</span>
+          </h1>
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
-            <time dateTime={articulo.fechaPublicacion}>
-              {fechaLegible(articulo.fechaPublicacion)}
-            </time>
-            {/* Sin firma, la de la empresa (decisión de dirección, 2026-10-06). */}
-            <span aria-hidden="true">·</span>
-            <span>Por {articulo.autor?.trim() || seoConfig.siteName}</span>
-            {categoria ? (
-              <>
-                <span aria-hidden="true">·</span>
-                <Link href={`${rutas.categoriaBlog(categoria.slug)}/`} className="underline">
-                  {categoria.nombre}
-                </Link>
-              </>
-            ) : null}
-          </div>
+          <p className={`${cabecera.reserva} mt-3 text-sm text-gray-600`} data-reserva={meta}>
+            <span>
+              <time dateTime={articulo.fechaPublicacion}>{fecha}</time>
+              <Separador />
+              {/* Sin firma, la de la empresa (decisión de dirección, 2026-10-06). */}
+              <span>Por {autor}</span>
+              {categoria ? (
+                <>
+                  <Separador />
+                  <Link href={`${rutas.categoriaBlog(categoria.slug)}/`} className="underline">
+                    {categoria.nombre}
+                  </Link>
+                </>
+              ) : null}
+            </span>
+          </p>
 
           {articulo.entradilla ? (
-            <p className="mt-4 text-lg text-gray-700">{articulo.entradilla}</p>
+            <p
+              className={`${cabecera.reserva} mt-4 text-lg text-gray-700`}
+              data-reserva={articulo.entradilla}
+            >
+              <span>{articulo.entradilla}</span>
+            </p>
           ) : null}
         </header>
 

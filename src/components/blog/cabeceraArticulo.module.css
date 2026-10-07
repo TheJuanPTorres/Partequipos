@@ -1,0 +1,38 @@
+/*
+ * Cabecera del artículo sin desplazamiento al llegar Inter (2026-10-06).
+ *
+ * Inter se carga sin precarga (CLAUDE.md §10.36): el primer pintado va con la
+ * fuente de respaldo y, al llegar Inter, el título, la línea de fecha y la
+ * entradilla pueden ganar o perder una línea. Medido a 390 px: CLS de hasta
+ * 0,21 en 11 de los 53 artículos.
+ *
+ * Misma idea que el título del hero (decisiones-home-ux9.md §21 b): que la
+ * caja no dependa de Inter. Aquí cambia el número de líneas, así que el alto
+ * lo fija una COPIA INVISIBLE del texto (`::after`, con `data-reserva`) en la
+ * fuente de respaldo, que no cambia, ensanchada 0,04 em para que mida siempre
+ * al menos lo que el texto visible en cualquiera de las dos fuentes. Las dos
+ * van en la misma celda de una rejilla: el alto es el mayor de los dos, y ese
+ * es siempre el de la copia. Medido: 53 de 53 sin cambio de alto a 390.
+ *
+ * La copia es contenido generado con `visibility: hidden`: no se lee en voz
+ * alta, no se selecciona y no es texto de la página para los buscadores.
+ * El nombre de la fuente lo vigila `scripts/qa/fuente-respaldo.ts` en cada
+ * build. Límite: en Android no hay Arial y el respaldo es Roboto; la copia usa
+ * la misma pila, así que la idea vale, pero no se ha medido en un dispositivo.
+ */
+.reserva {
+  display: grid;
+}
+
+.reserva > *,
+.reserva::after {
+  grid-area: 1 / 1;
+}
+
+.reserva::after {
+  content: attr(data-reserva);
+  visibility: hidden;
+  pointer-events: none;
+  font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+}

@@ -368,12 +368,26 @@ const textoNodo = (n: NodoLx): string =>
  * el primero es un h2 (el h1 es el título de la página) y ninguno baja más de
  * un nivel respecto al anterior.
  */
-export function limpiarLexical(raiz: { children?: NodoLx[] }): {
+export function limpiarLexical(
+  raiz: { children?: NodoLx[] },
+  opciones: {
+    /** Nivel del primer encabezado: 2 en un artículo; 3 dentro de una sección con su propio h2. */
+    nivelMinimo?: number;
+    /**
+     * Quitar los encabezados sin contenido: vacíos, o seguidos directamente de
+     * otro de su nivel o superior (en las páginas de WordPress quedan títulos
+     * sueltos copiados de otra plantilla). El blog no lo usa.
+     */
+    encabezadosSinContenido?: boolean;
+  } = {},
+): {
   alineaciones: number;
   vacios: number;
   niveles: number;
+  encabezadosQuitados: number;
 } {
-  const r = { alineaciones: 0, vacios: 0, niveles: 0 };
+  const minimo = opciones.nivelMinimo ?? 2;
+  const r = { alineaciones: 0, vacios: 0, niveles: 0, encabezadosQuitados: 0 };
   const visitar = (n: NodoLx) => {
     if ((n.type === "paragraph" || n.type === "heading") && n.format) {
       n.format = "";
@@ -387,11 +401,29 @@ export function limpiarLexical(raiz: { children?: NodoLx[] }): {
     return !vacio;
   });
   hijos.forEach(visitar);
-  let anterior = 1;
+  if (opciones.encabezadosSinContenido) {
+    const nivelDe = (n: NodoLx | undefined) =>
+      n?.type === "heading" && n.tag ? Number(n.tag.slice(1)) : null;
+    for (let i = hijos.length - 1; i >= 0; i--) {
+      const n = hijos[i]!;
+      const nivel = nivelDe(n);
+      if (nivel === null) continue;
+      const siguiente = nivelDe(hijos[i + 1]);
+      const sinContenido =
+        !textoNodo(n).trim() ||
+        i === hijos.length - 1 ||
+        (siguiente !== null && siguiente <= nivel);
+      if (sinContenido) {
+        hijos.splice(i, 1);
+        r.encabezadosQuitados++;
+      }
+    }
+  }
+  let anterior = minimo - 1;
   for (const n of hijos) {
     if (n.type !== "heading" || !n.tag) continue;
     const nivel = Number(n.tag.slice(1));
-    const nuevo = Math.max(2, Math.min(nivel, anterior + 1));
+    const nuevo = Math.max(minimo, Math.min(nivel, anterior + 1));
     if (nuevo !== nivel) {
       n.tag = `h${nuevo}`;
       r.niveles++;
@@ -425,4 +457,146 @@ export function valoresUnicos(valores: (string | null | undefined)[]): Set<strin
     if (k) cuenta.set(k, (cuenta.get(k) ?? 0) + 1);
   }
   return new Set([...cuenta].filter(([, n]) => n === 1).map(([k]) => k));
+}
+
+// ---------- Páginas de texto (2026-10-07) ----------
+
+/** Widgets de Elementor que solo llevan texto: una página hecha SOLO con ellos es «de texto». */
+const WIDGETS_DE_TEXTO = new Set(["heading", "jkit_heading", "text-editor", "spacer", "divider"]);
+
+export type ClasePaginaWp =
+  { texto: true; widgets: string[] } | { texto: false; motivo: string; widgets: string[] };
+
+/**
+ * ¿Es una página de TEXTO (políticas, términos…) o una montada con Elementor
+ * (landing, campaña, portada)? En el WordPress del cliente casi todas las
+ * páginas se editan con Elementor (597 de 599 tienen `_elementor_data`), así
+ * que eso no distingue nada: lo que distingue es QUÉ widgets usa. De texto =
+ * solo títulos, editor de texto, espaciadores y separadores, fuera de la
+ * plantilla de lienzo (`elementor_canvas`, la de las landings), y con algo que
+ * migrar: texto o un visor de PDF.
+ */
+export function clasificarPaginaWp(p: { html: string; plantilla?: string }): ClasePaginaWp {
+  const widgets = [
+    ...new Set([...p.html.matchAll(/data-widget_type="([^".]+)/g)].map((m) => m[1]!)),
+  ].sort();
+  if (p.plantilla === "elementor_canvas")
+    return { texto: false, motivo: "plantilla de lienzo (landing)", widgets };
+  const otros = widgets.filter((w) => !WIDGETS_DE_TEXTO.has(w));
+  if (otros.length) return { texto: false, motivo: `widgets: ${otros.join(", ")}`, widgets };
+  const visor = /_df_book|wp-block-pdfp-pdf-poster/.test(p.html);
+  const texto = textoPlano(p.html.replace(/<(style|script)[\s\S]*?<\/\1>/gi, ""));
+  if (!texto && !visor) return { texto: false, motivo: "vacía", widgets };
+  return { texto: true, widgets };
+}
+
+/**
+ * Los PDF de los visores dFlip de una página: el visor (`id="df_N"`) lleva su
+ * fichero en un `<script>` aparte (`window.option_df_N = {…"source":"…"}`).
+ */
+export function fuentesDflip(html: string): Map<string, string> {
+  const r = new Map<string, string>();
+  for (const m of html.matchAll(/option_(df_\d+)\s*=\s*(\{[^<]*?\});/g)) {
+    try {
+      const o = JSON.parse(m[2]!) as { source?: string };
+      if (o.source) r.set(m[1]!, o.source);
+    } catch {
+      // Opciones ilegibles: el visor sale como «sin PDF» en el informe.
+    }
+  }
+  return r;
+}
+
+/** El PDF del visor «PDF Poster» (`data-attributes` en JSON, con `file` y `title`). */
+export function fuentePdfPoster(atributos: string): { url: string; titulo: string } | null {
+  try {
+    const o = JSON.parse(atributos) as { file?: string; title?: string };
+    return o.file ? { url: o.file, titulo: textoPlano(o.title ?? "") } : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Mismo texto sin mayúsculas, tildes ni espacios de más (para comparar títulos). */
+export const textoComparable = (t: string) =>
+  textoPlano(t).normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/\s+/g, " ").trim();
+
+/**
+ * SECCIONES CON ANCLA de las páginas que las tienen (decisión del 2026-10-07).
+ * Las anclas del sitio actual (`#GARANTIA`, `#Devoluciones`) están indexadas y
+ * se conservan EXACTAS. En WordPress cada ancla va en un contenedor de
+ * Elementor, pero no donde dice su nombre: `#GARANTIA` está en el bloque del
+ * título «Política de devolución de repuestos». Aquí cada sección se arma con
+ * los trozos que le corresponden por su NOMBRE: cada trozo empieza en un
+ * encabezado de la lista y llega hasta el siguiente encabezado de la lista.
+ */
+export const SECCIONES_PAGINAS: Readonly<
+  Record<string, readonly { ancla: string; titulo: string; empiezaEn: readonly string[] }[]>
+> = {
+  "politica-de-garantia-de-repuestos": [
+    {
+      ancla: "GARANTIA",
+      titulo: "Política de garantía de repuestos",
+      empiezaEn: ["Política de garantía de repuestos"],
+    },
+    {
+      ancla: "Devoluciones",
+      titulo: "Política de devolución de repuestos",
+      empiezaEn: [
+        "Política de devolución de repuestos",
+        // En WordPress sigue: «… A DISCRECIÓN DE PARTEQUIPOS» (cuenta por prefijo).
+        "Políticas de devolución de repuestos",
+      ],
+    },
+  ],
+};
+
+export type Bloque = { tag: string; texto: string; html: string };
+
+/**
+ * Reparte los bloques de primer nivel de una página (ya aplanada) entre el
+ * contenido general y sus secciones con ancla, según `SECCIONES_PAGINAS`. Un
+ * encabezado que solo repite el título de su sección se quita (lo pinta la
+ * plantilla). Sin receta, todo va al contenido.
+ */
+export function repartirEnSecciones(
+  bloques: Bloque[],
+  receta: readonly { ancla: string; titulo: string; empiezaEn: readonly string[] }[] = [],
+): { contenido: Bloque[]; secciones: { ancla: string; titulo: string; bloques: Bloque[] }[] } {
+  const inicio = new Map<string, number>();
+  receta.forEach((s, i) => s.empiezaEn.forEach((t) => inicio.set(textoComparable(t), i)));
+  const esEncabezado = (b: Bloque) => /^H[1-6]$/.test(b.tag);
+  const secciones = receta.map((s) => ({
+    ancla: s.ancla,
+    titulo: s.titulo,
+    bloques: [] as Bloque[],
+  }));
+  const contenido: Bloque[] = [];
+  let actual: number | null = null;
+  for (const b of bloques) {
+    if (esEncabezado(b)) {
+      // Un encabezado de la receta abre su trozo; también por prefijo, porque
+      // en WordPress los títulos largos siguen («… A DISCRECIÓN DE PARTEQUIPOS»).
+      const t = textoComparable(b.texto);
+      const i = inicio.get(t) ?? [...inicio].find(([k]) => t.startsWith(k))?.[1];
+      if (i !== undefined) {
+        actual = i;
+        if (t === textoComparable(receta[i]!.titulo)) continue;
+      }
+    }
+    (actual === null ? contenido : secciones[actual]!.bloques).push(b);
+  }
+  return { contenido, secciones };
+}
+
+/**
+ * El título de Yoast SIN la marca del final (« - Partequipos», « | Partequipos»…),
+ * porque el sitio la añade él mismo con `tituloConMarca` (decisión de dirección
+ * del 2026-10-07). Si no queda nada, `null`.
+ */
+export function tituloSinMarca(titulo: string): string | null {
+  const t = textoPlano(titulo)
+    .replace(/\s*[-–—|·:]\s*partequipos\s*$/i, "")
+    .trim();
+  return t || null;
 }

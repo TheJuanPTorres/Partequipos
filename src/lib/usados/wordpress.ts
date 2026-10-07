@@ -73,6 +73,21 @@ export function normalizarAnio(anio: string | null): number | null {
   return n >= 1950 && n <= 2100 ? n : null;
 }
 
+/**
+ * Año de la unidad: el de la taxonomía y, si falta, el de la descripción
+ * («año 2003»), como el horómetro. Hay una unidad así.
+ */
+export function anioDeUnidad(
+  anioWp: string | null,
+  descripcionHtml: string,
+): { valor: number | null; origen: "campo" | "descripcion" | "sin dato" } {
+  const delCampo = normalizarAnio(anioWp);
+  if (delCampo !== null) return { valor: delCampo, origen: "campo" };
+  const enTexto = textoPlano(descripcionHtml).match(/\ba[ñn]o\s*:?\s*(\d{4})\b/i)?.[1];
+  const valor = normalizarAnio(enTexto ?? null);
+  return valor !== null ? { valor, origen: "descripcion" } : { valor: null, origen: "sin dato" };
+}
+
 /** Horas escritas como entero («6313») o con punto de miles («4.219», «12.500»). */
 function horasDeTexto(t: string): number | null {
   const h = t.replace(/\s+/g, "");
@@ -142,7 +157,8 @@ export function quitarSerial(texto: string, serial: string): string {
   const p = patronSerial(serial);
   if (!p) return texto;
   const presentacion = new RegExp(
-    `(?:\\s*,\\s*|\\s+y\\s+|\\s*-\\s*|\\s+)?(?:(?:n[uú]mero\\s+de\\s+)?serial|serie|s\\/?n)?\\s*[:#.]?\\s*-?\\s*${p.source}`,
+    // «, y serial», «con serial», «y con serial»: los enlaces se van con el serial.
+    `(?:\\s*,)?(?:\\s+y\\b)?(?:\\s+con\\b)?(?:\\s*-\\s*|\\s+)?(?:(?:n[uú]mero\\s+de\\s+)?serial|serie|s\\/?n)?\\s*[:#.]?\\s*-?\\s*${p.source}`,
     "gi",
   );
   return texto

@@ -33,7 +33,6 @@ import path from "node:path";
 import { getPayload } from "payload";
 
 import { exigirAlmacen } from "../blob/exigirAlmacen";
-import { esMismaImagen } from "../../src/lib/blog/wordpress";
 import { veredictoDestino } from "../../src/lib/demo/copiaDemo";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 import {
@@ -44,7 +43,7 @@ import {
   nombreCompuesto,
   nombreDeFicheroUsado,
   nombreDeMarca,
-  normalizarAnio,
+  anioDeUnidad,
   normalizarHoras,
   normalizarPeso,
 } from "../../src/lib/usados/wordpress";
@@ -79,6 +78,8 @@ const TANDA = Number(valorDe("tanda") ?? 10);
 if (!Number.isInteger(TANDA) || TANDA < 1) fallar("tanda=<n> tiene que ser un entero positivo");
 /** Con `fotos`, la simulación comprueba además que cada foto se puede descargar (~17 min). */
 const COMPROBAR_FOTOS = args.includes("fotos");
+/** Con `actualizar`, la importación vuelve a aplicar los datos a las unidades ya importadas (sin volver a subir fotos). */
+const ACTUALIZAR = args.includes("actualizar");
 
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
@@ -248,7 +249,13 @@ for (const u of unidades) {
     omitidas.push({ idWp: u.idWp, motivo: `categoría «${u.categoria ?? ""}» sin equivalente` });
     continue;
   }
-  const anio = normalizarAnio(u.anio);
+  const anioUnidad = anioDeUnidad(u.anio, u.descripcionequipo);
+  const anio = anioUnidad.valor;
+  if (anioUnidad.origen !== "campo") {
+    avisos.push(
+      `${u.idWp}: sin año en WordPress; ${anio ? `${anio}, de la descripción` : "va sin año"}`,
+    );
+  }
   const nombre = nombreCompuesto(categoria.tipo, marca, modelo, anio);
   const horas = normalizarHoras(u.horas, u.descripcionequipo);
   const descripcion = descripcionSinSerial(u.descripcionequipo, u.serial);
@@ -376,17 +383,34 @@ if (modo === "simular") {
 
 // ---------- Importación, por tandas ----------
 
-async function mediaExistente(fichero: string): Promise<number | null> {
-  const raiz = fichero.slice(0, fichero.lastIndexOf("."));
+/** Copias repetidas de una foto, creadas por esta importación (se borran al final). */
+const sobrantes = new Set<number>();
+
+/**
+ * La foto ya subida: la más antigua cuyo nombre empieza por `wp-usado-<id del
+ * adjunto>-`. Se busca por el id y no por el nombre entero, porque el nombre
+ * lleva el de la unidad y este puede cambiar (un año que aparece, una
+ * referencia corregida): así no se sube otra copia.
+ */
+async function mediaExistente(fichero: string): Promise<{ id: number; alt: string } | null> {
+  const prefijo = fichero.match(/^wp-usado-\d+-/)?.[0];
+  if (!prefijo) return null;
   const r = await payload.find({
     collection: "media",
-    where: { filename: { contains: raiz } },
+    where: { filename: { contains: prefijo } },
     sort: "createdAt",
     depth: 0,
     pagination: false,
     overrideAccess: true,
   });
-  return r.docs.find((d) => d.filename && esMismaImagen(d.filename, fichero))?.id ?? null;
+  const d = r.docs.find((x) => x.filename?.toLowerCase().startsWith(prefijo));
+  // Otras copias de la misma foto que creó esta importación (p. ej. tras cambiar el
+  // nombre de la unidad): se borran al final de la tanda.
+  const nuestras = new Set(manifiesto.creado.media.map((m) => m.id));
+  for (const x of r.docs)
+    if (x.id !== d?.id && x.filename?.toLowerCase().startsWith(prefijo) && nuestras.has(x.id))
+      sobrantes.add(x.id);
+  return d ? { id: d.id, alt: d.alt ?? "" } : null;
 }
 
 /** El nombre y la URL REALES tras subir (el Blob añade un sufijo, como en el blog). */
@@ -397,7 +421,19 @@ async function ficheroGuardado(id: number, pedido: string): Promise<Fichero> {
 
 async function fotoAMedia(f: Foto): Promise<number | { error: string }> {
   const ya = await mediaExistente(f.fichero);
-  if (ya) return ya;
+  if (ya) {
+    // Solo con `actualizar` se rehace el texto alternativo: sin ella, lo que haya
+    // cambiado un editor se respeta.
+    if (ACTUALIZAR && ya.alt !== f.alt) {
+      await payload.update({
+        collection: "media",
+        id: ya.id,
+        data: { alt: f.alt },
+        overrideAccess: true,
+      });
+    }
+    return ya.id;
+  }
   const d = await descargar(f.url);
   if ("error" in d) return { error: `no se puede descargar (${d.error})` };
   const ext = f.fichero.split(".").pop();
@@ -442,7 +478,7 @@ async function unidadExistente(p: Plan, primeraFoto: number | null): Promise<num
 }
 
 const hechas = new Set(manifiesto.creado.usados.map((u) => u.idWp));
-const pendientes = planes.filter((p) => !hechas.has(p.idWp));
+const pendientes = ACTUALIZAR ? planes : planes.filter((p) => !hechas.has(p.idWp));
 const tanda = pendientes.slice(0, TANDA);
 log(
   `importadas antes: ${hechas.size} · esta tanda: ${tanda.length} · quedan después: ${pendientes.length - tanda.length}`,
@@ -482,6 +518,22 @@ for (const p of tanda) {
     log(`creada ${p.idWp} → ${doc.id}: «${p.datos.nombre}» (${ids.length} fotos)`);
   }
   guardarManifiesto();
+}
+// Las copias sobrantes ya no las usa ninguna unidad de esta tanda: se borran
+// (solo las que creó esta importación) y salen del manifiesto.
+for (const id of sobrantes) {
+  const usada = await payload.find({
+    collection: "equipos-usados",
+    where: { imagenes: { in: [id] } },
+    depth: 0,
+    limit: 1,
+    overrideAccess: true,
+  });
+  if (usada.docs.length) continue;
+  await payload.delete({ collection: "media", id, overrideAccess: true });
+  manifiesto.creado.media = manifiesto.creado.media.filter((m) => m.id !== id);
+  guardarManifiesto();
+  log(`copia repetida borrada: media ${id}`);
 }
 log(
   `tanda terminada · fotos omitidas: ${fallosFotos} · unidades en el manifiesto: ${manifiesto.creado.usados.length} de ${planes.length}`,

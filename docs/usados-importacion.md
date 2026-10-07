@@ -31,7 +31,7 @@ un dato personal pero no se publica: hace falta para quitarlo.
 | Título («EXCAVADORA HITACHI») | `nombre`         | **Compuesto:** tipo, marca, modelo y año. «Excavadora Hitachi ZX350H-5B 2016». Sin año, sin año                                                               |
 | `marcas`                      | `marca`          | «Hitachi», «LiuGong»                                                                                                                                          |
 | `referencia`                  | `modelo`         | Sin espacios sobrantes ni la marca delante («HITACHI ZX40U-5 » → «ZX40U-5»)                                                                                   |
-| `ano`                         | `anio`           | Cuatro cifras, o vacío                                                                                                                                        |
+| `ano`                         | `anio`           | Cuatro cifras; si falta, el de la descripción («año 2003»), o vacío                                                                                           |
 | `horas`                       | `horometro`      | «6313» y «4.219» (punto de miles) → número. **«PENDIENTE» → vacío** (3). Si el campo no se entiende («4.92»), el número de la descripción («4.926 horas») (1) |
 | `peso`                        | `pesoOperativo`  | «7,5» y «7.5» → 7,5 t. Es la clase de peso de WordPress                                                                                                       |
 | `descripcionequipo`           | `descripcion`    | **Texto plano y sin el serial.** Los emojis que WordPress pinta como imagen (📞) vuelven a ser su carácter                                                    |
@@ -84,6 +84,7 @@ El script los imprime en la simulación; se importa el campo de WordPress.
 | 53674          | Horas: 4643 en el campo y «46431» en la descripción                             |
 | 54694          | Horas: 2195 en el campo y 6313 en la descripción (texto copiado de otra unidad) |
 | 50298          | La referencia «ZX35U5-A» no aparece en la descripción (¿«ZX35U-5A»?)            |
+| 54487          | Sin año en WordPress; 2003, tomado de su descripción                            |
 | 3 unidades     | Horas «PENDIENTE»: van sin horómetro                                            |
 
 Además, en WordPress hay «excavadoras» de 3,5 y 4 t, el mismo peso que algunas
@@ -96,17 +97,24 @@ npm run preview:usados:simular             # no escribe ni pide nada a WordPress
 npm run preview:usados:simular -- fotos    # además, comprueba cada foto (~17 min)
 npm run preview:usados:importar            # una tanda de 10 unidades
 npm run preview:usados:importar -- tanda=20
+npm run preview:usados:importar -- tanda=200 actualizar   # reaplica los datos a las ya importadas
 npm run preview:usados:retirar
 ```
 
 - **Por tandas:** cada ejecución importa como mucho `tanda` unidades y termina;
   la siguiente sigue donde se quedó. La memoria del proceso no crece con las
   1.493 fotos.
-- **Idempotente:** cada foto se busca por su nombre determinista
-  (`esMismaImagen`, por el sufijo aleatorio del Blob) y cada unidad por el
-  manifiesto o, sin él, por su primera foto. Una unidad ya importada se
-  actualiza, no se duplica. Probado con un manifiesto al que le faltaba una
-  unidad: la actualizó y no subió ninguna foto.
+- **Idempotente:** cada foto se busca por el **id de su adjunto**
+  (`wp-usado-<id>-…`), no por el nombre entero, que lleva el de la unidad y
+  puede cambiar; cada unidad, por el manifiesto o, sin él, por su primera foto.
+  Una unidad ya importada se actualiza, no se duplica. Probado con un
+  manifiesto al que le faltaba una unidad: la actualizó y no subió ninguna
+  foto.
+- **`actualizar`:** vuelve a aplicar los datos a las unidades ya importadas
+  (tras corregir una regla) y rehace su texto alternativo. Sin ella, el texto
+  alternativo que haya cambiado un editor se respeta. Si una pasada anterior
+  dejó dos copias de una foto, borra la que creó la importación y ya no usa
+  ninguna unidad (pasó una vez en el preview, con la unidad que ganó el año).
 - **Manifiesto:** `Desktop\partequipos-cierre\manifiesto-usados-<destino>.json`
   (unidades con su id de WordPress, fotos con su URL real y la categoría).
 - **Retirada:** borra exactamente lo del manifiesto y comprueba que los

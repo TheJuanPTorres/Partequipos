@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 
 import {
   altDeFoto,
+  anioDeUnidad,
   categoriaDeUnidad,
   contieneSerial,
   descripcionSinSerial,
@@ -47,6 +48,15 @@ describe("normalización de los campos de WordPress", () => {
     assert.equal(normalizarAnio(""), null);
     assert.equal(normalizarAnio(null), null);
     assert.equal(normalizarAnio("16"), null);
+  });
+
+  it("año: la taxonomía y, si falta, el de la descripción", () => {
+    assert.deepEqual(anioDeUnidad("2016", "año 2019"), { valor: 2016, origen: "campo" });
+    assert.deepEqual(anioDeUnidad(null, "<p>HITACHI ZX330 , año 2003 , con</p>"), {
+      valor: 2003,
+      origen: "descripcion",
+    });
+    assert.deepEqual(anioDeUnidad(null, "sin año"), { valor: null, origen: "sin dato" });
   });
 
   it("marca y referencia", () => {
@@ -110,6 +120,19 @@ describe("el número de serie no se publica", () => {
       quitarSerial("Hitachi ZX200-6-SN X9876-001 (1)", SERIAL),
       "Hitachi ZX200-6-001 (1)",
     );
+  });
+
+  it("se lleva también el «con» o el «, y» que lo enlazaban", () => {
+    assert.equal(
+      quitarSerial("ZX330 , año 2003 , con serial X9876. Equipo", SERIAL),
+      "ZX330, año 2003. Equipo",
+    );
+    assert.equal(
+      quitarSerial("ZX30U-5A, año 2015 , y serial X 9876 . Equipo", SERIAL),
+      "ZX30U-5A, año 2015. Equipo",
+    );
+    // Un «con» que no presenta el serial se queda.
+    assert.equal(quitarSerial("con 900 horas y serial X9876.", SERIAL), "con 900 horas.");
   });
 
   it("no toca un número que solo empieza igual", () => {

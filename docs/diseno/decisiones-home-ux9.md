@@ -2437,3 +2437,29 @@ Si lo que quiere es lo publicado, que lo diga y se vuelve a §24.1.
 - **Para Andrés:** en móvil el vídeo encogido va arriba y no centrado, y la
   sección 8 se monta sobre el final del recorrido. Es la misma regla de §27.5:
   nunca encima del vídeo.
+
+## 29. Accesibilidad tras la auditoría de C (2026-10-06)
+
+Auditoría: `partequipos-cierre\informes\2026-10-06-auditoria-a11y-seo.md`. Lo
+que toca al diseño, para Andrés:
+
+| #   | Qué                                  | ux-9               | Aquí                               | Por qué                                                                                                     |
+| --- | ------------------------------------ | ------------------ | ---------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| I5  | Títulos de columna del pie, en móvil | 18 px en negrita   | **19 px** en negrita               | El rojo sobre el gris da 3,99:1. A 19 px en negrita cuenta como texto grande, que pide 3:1                  |
+| I8  | Teléfonos de las sedes               | 15 px, peso 600    | **19 px, peso 700**                | El rojo sobre el gris del panel da 3,81:1. Igual: como texto grande cumple. Encaja como llamada a la acción |
+| I1  | Título principal de la portada       | El logo es el `h1` | `h1` descriptivo oculto a la vista | SEO: el título principal de la página más importante no puede ser solo el nombre de la empresa              |
+
+- **El color del diseño se mantiene en los tres casos.**
+- **Pines del mapa (M7):** Mapbox les ponía `role="img"`, que no está
+  permitido en un botón. Se quita después de crearlos. Sin ese rol, axe evalúa
+  también su tamaño. A 390, con el globo alejado, los pines van muy juntos y no
+  llegan a 24 px. Se acoge a la excepción **«equivalente»** de WCAG 2.5.8: lo
+  mismo se hace con las flechas y el carril del panel de sedes, que sí
+  cumplen.
+- **Enlaces de las columnas del pie (I6), SIN RESOLVER — parada para
+  dirección:**
+  - Las líneas están a **18,2 px** a 390 y a **22,4 px** a 1440. Con menos de
+    24 px entre líneas, las zonas pulsables de 24 px se pisarían.
+  - Cumplir WCAG 2.5.8 exige separarlas: **+5,8 px por línea a 390** y
+    **+1,6 px a 1440**. Es un cambio visual.
+  - Los enlaces de la franja legal sí tienen ya 24 px, sin cambio visual.

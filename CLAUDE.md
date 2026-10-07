@@ -25,23 +25,23 @@ Volumen: **648 URLs públicas**, generadas desde ~22 componentes de ruta.
 
 ## 2. Stack (no cambiar sin aprobación)
 
-| Capa          | Tecnología                                                                          |
-| ------------- | ----------------------------------------------------------------------------------- |
-| Framework     | Next.js **16.3.5** · App Router · React **19.2.4**                                  |
-| Lenguaje      | TypeScript 5.9 (modo estricto)                                                      |
-| CMS           | Payload **3.89.0** (integrado en el mismo proyecto, no como servicio aparte)        |
-| Base de datos | PostgreSQL (Neon), por el host _pooled_                                             |
-| Estilos       | Tailwind CSS **v4.3.3** (ver la corrección de abajo)                                |
-| Fuente        | **Inter** variable con `next/font` (desde 2026-09-23; **antes Arial**, ver abajo)   |
-| Hosting       | Vercel                                                                              |
-| Archivos      | **Vercel Blob**. Cloudflare R2 **no se usa**: era alternativa, no está configurado  |
-| Errores       | **`console.error` a los registros de Vercel** — Sentry NO está (§10.31)             |
-| Validación    | **Zod** 4, en el servidor, en los formularios públicos (§5)                         |
-| Imágenes      | **sharp** 0.35, lo usa Payload al subir; su carga tumba medio sitio (§10.18/§10.19) |
-| Editor        | **Lexical** (`@payloadcms/richtext-lexical` 3.89.0), el texto enriquecido del panel |
-| Correo        | **Resend** (`@payloadcms/email-resend`). **Sin clave en producción** (§10.11)       |
-| Anti-bot      | **Cloudflare Turnstile**, por script, sin dependencia. **Sin claves en producción** |
-| Panel         | SCSS propio compilado con **sass 1.77.4**, declarado exacto desde 2026-09-23        |
+| Capa          | Tecnología                                                                               |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| Framework     | Next.js **16.3.5** · App Router · React **19.2.4**                                       |
+| Lenguaje      | TypeScript 5.9 (modo estricto)                                                           |
+| CMS           | Payload **3.89.0** (integrado en el mismo proyecto, no como servicio aparte)             |
+| Base de datos | PostgreSQL (Neon), por el host _pooled_                                                  |
+| Estilos       | Tailwind CSS **v4.3.3** (ver la corrección de abajo)                                     |
+| Fuente        | **Inter** variable con `next/font` (desde 2026-09-23; **antes Arial**, ver abajo)        |
+| Hosting       | Vercel                                                                                   |
+| Archivos      | **Vercel Blob**. Cloudflare R2 **no se usa**: era alternativa, no está configurado       |
+| Errores       | **`console.error` a los registros de Vercel** — Sentry NO está (§10.31)                  |
+| Validación    | **Zod** 4, en el servidor, en los formularios públicos (§5)                              |
+| Imágenes      | **sharp** 0.35, lo usa Payload al subir; su carga tumba medio sitio (§10.18/§10.19)      |
+| Editor        | **Lexical** (`@payloadcms/richtext-lexical` 3.89.0), el texto enriquecido del panel      |
+| Correo        | **SMTP** (`@payloadcms/email-nodemailer` 3.89.0). **Sin valores en producción** (§10.11) |
+| Anti-bot      | **Cloudflare Turnstile**, por script, sin dependencia. **Sin claves en producción**      |
+| Panel         | SCSS propio compilado con **sass 1.77.4**, declarado exacto desde 2026-09-23             |
 
 > **REVISIÓN COMPLETA DE ESTA TABLA — 2026-09-23.** Tercera afirmación falsa
 > sobre el stack en dos semanas (shadcn/ui, Sentry y la fuente), así que se
@@ -3577,20 +3577,48 @@ cliente; al ponerlas no hay que tocar código.
 >   - **Comprobado de punta a punta** en local, con el secreto que siempre rechaza y Playwright sobre un Chrome de perfil temporal: dos envíos seguidos, los 5 campos conservados, token nuevo tras cada rechazo y 0 filas guardadas.
 > - En `next dev`, los primeros clics en «Enviar» no hicieron nada (0 peticiones) hasta pasados unos segundos. Lo más probable es la hidratación en desarrollo. **No se ha comprobado en producción.**
 
-**2. Resend — `RESEND_API_KEY` (más `RESEND_FROM_EMAIL`).**
+**2. Aviso por correo — SMTP (desde el 2026-10-06; antes, Resend).**
 
-Sin ella no se configura adaptador de correo: la solicitud **se guarda igual**
-—eso está probado y es deliberado, un fallo del correo no puede costar un lead—
-pero **nadie se entera de que entró**. El registro lo deja escrito:
+> **CAMBIO 2026-10-06 (aprobado por dirección):** los avisos van por **SMTP**
+> con el adaptador oficial `@payloadcms/email-nodemailer` **3.89.0** (versión
+> exacta). Sustituye a Resend, que nunca llegó a configurarse; el paquete de
+> Resend sale del proyecto. La decisión vive en `src/lib/correo/smtp.ts`, con
+> pruebas.
+
+| Variable               | Qué es                                                                                 |
+| ---------------------- | -------------------------------------------------------------------------------------- |
+| `SMTP_HOST`            | Servidor SMTP                                                                          |
+| `SMTP_PORT`            | Puerto; por defecto 587                                                                |
+| `SMTP_SECURE`          | `true` = TLS desde el principio (465). Si no, STARTTLS **obligatorio**: nunca en claro |
+| `SMTP_USER`            | Usuario                                                                                |
+| `SMTP_PASS`            | Contraseña                                                                             |
+| `SMTP_FROM_ADDRESS`    | Remitente (dirección)                                                                  |
+| `SMTP_FROM_NAME`       | Remitente (nombre); por defecto «Partequipos»                                          |
+| `SOLICITUDES_EMAIL_TO` | Destinatarios, separados por comas                                                     |
+
+Sin SMTP completo (host, usuario, contraseña y remitente) no se configura
+adaptador: la solicitud **se guarda igual** —está probado y es deliberado, un
+fallo del correo no puede costar un lead— pero **nadie se entera de que
+entró**. El registro lo deja escrito, con los NOMBRES de lo que falta:
 
 ```
-WARN: Solicitud guardada SIN aviso por correo: falta RESEND_API_KEY.
+WARN: Solicitud guardada SIN aviso por correo: faltan SMTP_HOST, SMTP_USER, …
       El lead está en /admin y no se ha perdido.
 ```
 
-Mientras esto siga así, la única forma de ver los leads es entrar a `/admin`. Un
-lead comercial que nadie mira durante tres días es un lead perdido, así que esto
-es tan urgente como el captcha. Requiere además **dominio verificado** en Resend.
+Si el servidor SMTP falla o rechaza el envío, igual: se registra y la solicitud
+queda guardada. Cuando sale bien, el registro deja el `messageId`
+(`[avisos] Aviso de solicitud enviado por SMTP.`), sin datos personales.
+
+**Guarda del preview:** fuera de producción, sin `SOLICITUDES_EMAIL_TO` **no se
+envía nada** (antes caía al correo real del cliente, §10.21).
+
+**Qué falta para PRODUCCIÓN — lo pone el cliente:** los valores reales de las
+siete `SMTP_*` y `SOLICITUDES_EMAIL_TO` en Vercel, **solo en Production**, y
+redesplegar. Sin `SOLICITUDES_EMAIL_TO`, en producción el aviso va al correo de
+contacto del panel (global `seo`). El remitente tiene que poder enviar desde
+ese servidor (SPF/DKIM del dominio del remitente), o el correo acabará en spam.
+Mientras falten, la única forma de ver los leads es entrar a `/admin`.
 
 ### 10.7 PENDIENTE bloqueante — infraestructura de base de datos
 

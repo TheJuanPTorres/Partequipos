@@ -44,6 +44,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /*
+   * Encuadre de ux-9, MEDIDO pintado (2026-10-06): su foto es más alta que la
+   * caja y se recorta por abajo, así que se ve la parte de ARRIBA (cielo y
+   * ciudad). Centrada se veía solo la avenida.
+   */
+  object-position: 50% 0;
 }
 
 .cabecera {

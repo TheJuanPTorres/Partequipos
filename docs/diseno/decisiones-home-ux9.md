@@ -2456,10 +2456,13 @@ que toca al diseño, para Andrés:
   llegan a 24 px. Se acoge a la excepción **«equivalente»** de WCAG 2.5.8: lo
   mismo se hace con las flechas y el carril del panel de sedes, que sí
   cumplen.
-- **Enlaces de las columnas del pie (I6), SIN RESOLVER — parada para
-  dirección:**
-  - Las líneas están a **18,2 px** a 390 y a **22,4 px** a 1440. Con menos de
-    24 px entre líneas, las zonas pulsables de 24 px se pisarían.
-  - Cumplir WCAG 2.5.8 exige separarlas: **+5,8 px por línea a 390** y
-    **+1,6 px a 1440**. Es un cambio visual.
-  - Los enlaces de la franja legal sí tienen ya 24 px, sin cambio visual.
+- **Enlaces de las columnas del pie (I6) — DESVIACIÓN APROBADA por dirección
+  el 2026-10-07:**
+  - En ux-9 las líneas van a **18,2 px** a 390 y a **22,4 px** a 1440. Con
+    menos de 24 px entre líneas, las zonas pulsables de 24 px se pisarían
+    (WCAG 2.5.8).
+  - Ahora cada enlace mide justo 24 px de alto, uno debajo de otro: las
+    líneas crecen **+5,8 px a 390** y **+1,6 px a 1440**, lo justo.
+  - Los enlaces de la franja legal ya tenían 24 px, sin cambio visual.
+  - **Para Andrés:** las columnas del pie son algo más altas que en su
+    maqueta móvil.

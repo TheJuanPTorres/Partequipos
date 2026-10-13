@@ -25,6 +25,9 @@ import { METADATA_404 } from "@/lib/seo/noEncontrada";
  */
 type Params = { categoria: string };
 
+/** Ancho con el que se piden las miniaturas de las tarjetas (ver el `<Image>`). */
+const ANCHO_MINIATURA = 400;
+
 export async function generateStaticParams(): Promise<Params[]> {
   const categorias = await getCategoriasUsada();
   return categorias.map((c) => ({ categoria: c.slug }));
@@ -92,13 +95,14 @@ export default async function CategoriaUsadaPage({ params }: { params: Promise<P
                     <Image
                       src={imagen.url}
                       alt={imagen.alt}
-                      width={imagen.width}
-                      height={imagen.height}
-                      // Ancho pintado: una columna bajo 640 px (100vw menos los
-                      // márgenes de main y de la tarjeta) y dos dentro de
-                      // max-w-4xl (~394 px). Sin `sizes`, el srcset salía del
-                      // ancho original y pedía hasta 4 veces de más.
-                      sizes="(max-width: 639px) calc(100vw - 64px), 400px"
+                      // Ancho de MINIATURA, no el original: el srcset de 1x/2x
+                      // sale de aquí (640 y 828 px), y la tarjeta pinta como
+                      // mucho ~394 px de ancho y 160 de alto. Con el ancho
+                      // original pedía hasta 4 veces de más; con `sizes`, cada
+                      // tarjeta llevaba 12 anchos en el srcset y el HTML del
+                      // listado crecía ~65 % (medido en el preview, 2026-10-13).
+                      width={ANCHO_MINIATURA}
+                      height={Math.round((ANCHO_MINIATURA * imagen.height) / imagen.width)}
                       className="mb-3 h-40 w-full object-contain"
                     />
                   ) : null}

@@ -60,7 +60,8 @@ export default async function PaginaCategoriaUsada({ params }: { params: Promise
   if (!r) notFound();
   const { categoria, pagina } = r;
   // La página 1 tiene una sola URL: la de la categoría.
-  if (pagina === 1) permanentRedirect(rutas.categoriaUsada(categoria.slug));
+  // Con la barra final: sin ella, `trailingSlash` añadiría un segundo salto.
+  if (pagina === 1) permanentRedirect(`${rutas.categoriaUsada(categoria.slug)}/`);
 
   const datos = await getEquiposUsadosDeCategoria(categoria.id, pagina);
   if (pagina > datos.paginas) notFound();

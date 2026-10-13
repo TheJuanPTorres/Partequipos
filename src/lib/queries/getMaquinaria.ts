@@ -25,6 +25,7 @@ import type {
 } from "@/payload-types";
 
 import { SLUG_EXCAVADORAS, TARJETAS_POR_PESTANA } from "../portada/secciones";
+import { POR_PAGINA, totalPaginas } from "../usados/paginacion";
 import { conPrimeraImagen, idsDePrimeraImagen } from "../usados/primeraImagen";
 
 /**
@@ -221,11 +222,22 @@ export const getCategoriaUsadaPorSlug = cache(
   },
 );
 
-/** Unidades DISPONIBLES de una categoría. Las vendidas no se listan. */
+/** Una página del listado de usados de una categoría. */
+export type PaginaDeUsados = {
+  unidades: EquiposUsado[];
+  /** Unidades disponibles en TODA la categoría, no solo en esta página. */
+  total: number;
+  paginas: number;
+};
+
+/**
+ * Unidades DISPONIBLES de una categoría, una página cada vez (las vendidas no
+ * se listan). Paginación en `src/lib/usados/paginacion.ts`.
+ */
 export const getEquiposUsadosDeCategoria = cache(
-  async (categoriaId: number): Promise<EquiposUsado[]> => {
+  async (categoriaId: number, pagina: number = 1): Promise<PaginaDeUsados> => {
     const payload = await getPayload({ config });
-    const { docs } = await payload.find({
+    const { docs, totalDocs } = await payload.find({
       collection: "equipos-usados",
       where: {
         and: [{ categoria: { equals: categoriaId } }, { disponible: { equals: true } }],
@@ -233,8 +245,11 @@ export const getEquiposUsadosDeCategoria = cache(
       // Sin poblar: solo se pinta la primera foto, y `depth: 1` traía todas
       // (src/lib/usados/primeraImagen.ts).
       depth: 0,
-      limit: 0,
-      sort: "-anio",
+      limit: POR_PAGINA,
+      page: pagina,
+      // El id desempata: con años repetidos, el orden tiene que ser el mismo en
+      // cada página, o una unidad saldría en dos y otra en ninguna.
+      sort: ["-anio", "id"],
     });
     const ids = idsDePrimeraImagen(docs);
     const fotos = ids.length
@@ -248,9 +263,28 @@ export const getEquiposUsadosDeCategoria = cache(
           })
         ).docs
       : [];
-    return conPrimeraImagen(docs, fotos);
+    return {
+      unidades: conPrimeraImagen(docs, fotos),
+      total: totalDocs,
+      paginas: totalPaginas(totalDocs),
+    };
   },
 );
+
+/** Páginas del listado de cada categoría de usada, para `generateStaticParams`. */
+export const getPaginasDeUsados = cache(async (): Promise<{ slug: string; paginas: number }[]> => {
+  const payload = await getPayload({ config });
+  const categorias = await getCategoriasUsada();
+  return Promise.all(
+    categorias.map(async (c) => {
+      const { totalDocs } = await payload.count({
+        collection: "equipos-usados",
+        where: { and: [{ categoria: { equals: c.id } }, { disponible: { equals: true } }] },
+      });
+      return { slug: c.slug, paginas: totalPaginas(totalDocs) };
+    }),
+  );
+});
 
 // --- Portada (fase D: secciones 2 y 3 de ux-9) --------------------------------
 /** Marcas con foto de tarjeta, para el carrusel de la sección 2. */

@@ -94,6 +94,11 @@ export default async function CategoriaUsadaPage({ params }: { params: Promise<P
                       alt={imagen.alt}
                       width={imagen.width}
                       height={imagen.height}
+                      // Ancho pintado: una columna bajo 640 px (100vw menos los
+                      // márgenes de main y de la tarjeta) y dos dentro de
+                      // max-w-4xl (~394 px). Sin `sizes`, el srcset salía del
+                      // ancho original y pedía hasta 4 veces de más.
+                      sizes="(max-width: 639px) calc(100vw - 64px), 400px"
                       className="mb-3 h-40 w-full object-contain"
                     />
                   ) : null}

@@ -25,6 +25,7 @@ import type {
 } from "@/payload-types";
 
 import { SLUG_EXCAVADORAS, TARJETAS_POR_PESTANA } from "../portada/secciones";
+import { conPrimeraImagen, idsDePrimeraImagen } from "../usados/primeraImagen";
 
 /**
  * Acceso a datos de la sección maquinaria (API local de Payload, CLAUDE.md §3.2).
@@ -229,11 +230,25 @@ export const getEquiposUsadosDeCategoria = cache(
       where: {
         and: [{ categoria: { equals: categoriaId } }, { disponible: { equals: true } }],
       },
-      depth: 1,
+      // Sin poblar: solo se pinta la primera foto, y `depth: 1` traía todas
+      // (src/lib/usados/primeraImagen.ts).
+      depth: 0,
       limit: 0,
       sort: "-anio",
     });
-    return docs;
+    const ids = idsDePrimeraImagen(docs);
+    const fotos = ids.length
+      ? (
+          await payload.find({
+            collection: "media",
+            where: { id: { in: ids } },
+            depth: 0,
+            limit: 0,
+            pagination: false,
+          })
+        ).docs
+      : [];
+    return conPrimeraImagen(docs, fotos);
   },
 );
 

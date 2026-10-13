@@ -295,12 +295,22 @@ const modelosNuevos = modelos.filter((m) => {
   return !idT || !claveModelo.has(`${idT}/${m.slug}`);
 });
 // Lo que hay en el preview y no está en WordPress (la demo de §10.6): la importación no lo toca.
-const slugsWp = {
+// Se compara por la misma clave que la importación (marca/tipo/slug), no solo por el slug: un
+// modelo de la demo con el slug de WordPress pero bajo otro tipo quedaría duplicado.
+const slugMarca = new Map(enMarcas.map((m) => [m.id, m.slug]));
+const claveWpTipo = (t: { marca: number; slug: string }) => `${slugMarca.get(t.marca)}/${t.slug}`;
+const tipoDe = new Map(enTipos.map((t) => [t.id, claveWpTipo(t)]));
+const wp = {
   marcas: new Set(marcas.map((m) => m.slug)),
-  modelos: new Set(modelos.map((m) => m.slug)),
+  tipos: new Set(tipos.map((t) => `${t.marca}/${t.slug}`)),
+  modelos: new Set(modelos.map((m) => `${m.marca}/${m.tipo}/${m.slug}`)),
 };
-const demoMarcas = enMarcas.filter((m) => !slugsWp.marcas.has(m.slug)).map((m) => m.slug);
-const demoModelos = enModelos.filter((m) => !slugsWp.modelos.has(m.slug)).length;
+const demoMarcas = enMarcas.filter((m) => !wp.marcas.has(m.slug)).map((m) => m.slug);
+const demoTipos = enTipos.filter((t) => !wp.tipos.has(claveWpTipo(t))).map(claveWpTipo);
+const demoModelos = enModelos.filter((m) => !wp.modelos.has(`${tipoDe.get(m.tipo)}/${m.slug}`));
+const demoModelosConSlugDeWp = demoModelos.filter((m) =>
+  modelos.some((x) => x.slug === m.slug),
+).length;
 
 // ---------- Subidas al Blob que supondría ----------
 
@@ -393,7 +403,17 @@ const resumen = {
     redirecciones301: redirecciones.length,
     fotosGenericas: [...genericas],
   },
-  enElPreviewSinEquivalente: { marcas: demoMarcas, modelos: demoModelos },
+  enElPreview: {
+    marcas: enMarcas.length,
+    tipos: enTipos.length,
+    modelos: enModelos.length,
+    sinEquivalente: {
+      marcas: demoMarcas,
+      tipos: demoTipos,
+      modelos: demoModelos.length,
+      modelosConSlugDeWpEnOtroTipo: demoModelosConSlugDeWp,
+    },
+  },
   blob: {
     subidas: aSubir.length,
     porFormatoDeOrigen: porFormato(aSubir),
@@ -419,9 +439,7 @@ log(`marcas: ${JSON.stringify(resumen.marcas)}`);
 log(`tipos: ${JSON.stringify(resumen.tipos)}`);
 log(`modelos: ${JSON.stringify(resumen.modelos)}`);
 log(`no se importan: ${JSON.stringify({ ...resumen.noSeImportan })}`);
-log(
-  `en el preview sin equivalente en WordPress: ${JSON.stringify(resumen.enElPreviewSinEquivalente)}`,
-);
+log(`en el preview: ${JSON.stringify(resumen.enElPreview)}`);
 log(`BLOB: ${JSON.stringify(resumen.blob)}`);
 log(`fotos: ${JSON.stringify(resumen.comprobacionFotos)}`);
 for (const f of comprobacion.fallos) log(`foto ${f.idWp}: ${f.error}`);

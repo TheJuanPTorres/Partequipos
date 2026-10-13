@@ -94,8 +94,16 @@ simulación lo avisa.
 - **SEO:** 311 modelos y 18 tipos guardarían su título actual porque difiere
   del título por defecto (p. ej. el título de WordPress dice «Minexcavadora» y
   el `<title>` publicado, «Miniexcavador»). Meta descripción en los 347.
-- **En el preview sin equivalente en WordPress:** 4 modelos de la demo. La
-  importación no los toca; en producción la demo se vacía antes (§10.6).
+- **La demo del preview** (5 marcas, 10 tipos y 81 modelos) se compara por la
+  misma clave que la importación (marca / tipo / slug):
+  - **2 tipos de Caterpillar no existen en WordPress**: `…-bulldozer-caterpillar`
+    y `…-retrocargadora-caterpillar` (WordPress escribe `buldozer` y
+    `retrocargador`).
+  - **25 modelos de la demo cuelgan de ellos**, y 21 tienen el mismo slug que un
+    modelo real de WordPress. Importar sin más los dejaría **duplicados bajo el
+    tipo equivocado**. Antes de importar en el preview hay que retirar esos 2
+    tipos y sus 25 modelos (pendiente de dirección). En producción la demo se
+    vacía entera antes (§10.6).
 
 ### Operaciones del Blob
 

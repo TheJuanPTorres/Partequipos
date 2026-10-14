@@ -203,6 +203,15 @@ export const revalidarDocumento: CollectionAfterChangeHook = async ({ doc, req }
   return doc;
 };
 
+/**
+ * Un documento PDF BORRADO: la tarjeta del listado de nueva no puede seguir
+ * enlazando un fichero que ya no existe (las fichas se revalidan al guardarse).
+ */
+export const revalidarDocumentoBorrado: CollectionAfterDeleteHook = ({ doc }) => {
+  revalidarDatos(ETIQUETAS_DATOS.nueva, `documento borrado ${doc.id}`);
+  return doc;
+};
+
 export const revalidarEquipoNuevoBorrado: CollectionAfterDeleteHook = async ({ doc, req }) => {
   try {
     // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).

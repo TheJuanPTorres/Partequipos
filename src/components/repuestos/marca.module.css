@@ -77,7 +77,6 @@
 
 .placa {
   display: flex;
-  width: 131px;
   padding: 0 20px;
   align-items: center;
   justify-content: center;
@@ -85,8 +84,9 @@
   background: var(--color-fondo);
 }
 
+/* El logo mide 131 de ancho y, como mucho, 87 de alto (medido); la placa blanca le suma 20 a cada lado. */
 .logo {
-  width: 100%;
+  width: 131px;
   height: auto;
   max-height: 87px;
   object-fit: contain;
@@ -178,6 +178,10 @@
 }
 
 @media (max-width: 767px) {
+  .hero {
+    min-height: 670px;
+  }
+
   .heroContenido {
     padding-inline: 14.4vw;
   }
@@ -303,11 +307,17 @@ a.pildora:hover {
 /* --- Tarjetas ---------------------------------------------------------------- */
 
 .tarjetas {
+  --rejilla-relleno: 82px;
   /* Asoma bajo las esquinas redondeadas del amarillo. */
   margin-top: -50px;
   padding: 120px 82px 144px;
   border-radius: 0 0 var(--marca-radio) var(--marca-radio);
   background: var(--color-fondo);
+}
+
+/* El título tiene su propio relleno (10 px), menor que el de la rejilla. */
+.tarjetas > .tituloSeccion {
+  margin-inline: calc(-1 * (var(--rejilla-relleno) - 10px));
 }
 
 .rejilla {
@@ -392,7 +402,8 @@ a.pildora:hover {
 
 @media (max-width: 1024px) {
   .tarjetas {
-    padding: 120px calc(5vw + 10px) 101px;
+    --rejilla-relleno: calc(5vw + 10px);
+    padding: 120px var(--rejilla-relleno) 101px;
   }
 
   .rejilla {
@@ -407,7 +418,8 @@ a.pildora:hover {
 
 @media (max-width: 767px) {
   .tarjetas {
-    padding: 120px 30px 60px;
+    --rejilla-relleno: 30px;
+    padding: 120px var(--rejilla-relleno) 60px;
   }
 
   .rejilla {

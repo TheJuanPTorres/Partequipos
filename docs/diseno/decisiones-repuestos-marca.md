@@ -1,67 +1,62 @@
-# Página de marca de repuestos (ux-9) — inventario y mapa a Payload
+# Página de marca de repuestos (ux-9) — inventario, decisiones y desviaciones
 
-Agente D, 2026-10-13. **Paso 1: solo inventario y mapa; sin código ni esquema.**
+Agente D, 2026-10-13. Plantilla 3373 del kit de ux-9 (`wordpress/repuestos-marca/elementor-3373-2026-10-13.json`);
+referencia pintada: `partequipos.uxdesign.website/repuestos-para-maquinaria-pesada-caterpillar/`.
 
-- Diseño: `partequipos-diseno\wordpress\repuestos-marca\elementor-3373-2026-10-13.json`.
-- Referencia pintada: `partequipos.uxdesign.website/repuestos-para-maquinaria-pesada-caterpillar/`
-  (aún sin medir; la medición va en el paso 3, con turno en `MEDICION.md`).
-- Rutas: las 13 marcas de `url-map.csv`, sin cambiar slugs:
-  `/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/<marca>/`.
-  Hoy la sirve `…/[marca]/page.tsx` (migas, logo, `h1`, descripción y lista de tipos).
+Sirve a las 13 marcas, en `…/repuestos-maquinaria-pesada-marcas/<marca>/` (los slugs de `url-map.csv`, sin
+cambiar). Código: `src/app/(site)/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/page.tsx`,
+`src/components/repuestos/` y la lógica pura en `src/lib/repuestos/marca.ts` (con pruebas).
 
-## 1. Secciones del diseño (6 contenedores de primer nivel)
+## 1. Secciones y de dónde sale cada dato
 
-| #   | Sección                         | Contenido                                                                                                                                                                                                                                                                                                                                                                                                      | Ocultos                                                                       |
-| --- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| 1   | Hero                            | Fondo `ZX130-7H_working_jobsite-14-scaled-2.jpg`; imagen frontal `Mesa-de-trabajo-7-copia-2.png`; título revelado «Repuestos para maquinaria pesada» + «CATERPILLAR En Colombia»; párrafo («En PARTEQUIPOS, ofrecemos una amplia variedad de repuestos originales y genéricos para mantener su maquinaria pesada CATERPILLAR en óptimas condiciones en todo Colombia.»); icono de ratón de scroll (ancla `#1`) | —                                                                             |
-| 2   | Categorías                      | `h2` «Nuestras categorías de repuestos» + 7 `icon-list` de una fila cada una: Tren de Rodaje, filtración, Baldes y herramienta de corte, lubricantes, Misceláneos, Componentes Mayores, Repuestos para Motor Diesel. **Sin enlace** en el diseño                                                                                                                                                               | las filas 1, 4, 5, 6 y 7 se ocultan en móvil → en móvil solo salen 2          |
-| 3   | Repuestos según tipo de máquina | `h2` + 3 tarjetas (bulldozer, excavadora, retrocargadora) con imagen, título «Repuestos para maquinaria pesada <tipo> CATERPILLAR» y «Ver todo →»                                                                                                                                                                                                                                                              | la 3.ª se oculta en tableta                                                   |
-| 4   | Segunda fila de tarjetas        | Cargador frontal (tipo), «Maquinaria pesada usada» y «Aditamentos» (las dos últimas, al marketplace)                                                                                                                                                                                                                                                                                                           | **todo el contenedor se oculta en móvil**; «Aditamentos» se oculta en tableta |
-| 5   | Contacto                        | Títulos revelados «Contacto Partequipos» / «Si deseas más info, contáctanos» + formulario                                                                                                                                                                                                                                                                                                                      | —                                                                             |
-| 6   | Testimonios                     | Título revelado «Testimonios reales» + acordeón con vídeo (`play_text` «Ver Video»; 3+ ítems: imagen, nombre, ciudad, descripción, URL de YouTube)                                                                                                                                                                                                                                                             | —                                                                             |
+| #   | Sección                          | Qué se pinta                                                                                                                                                          | De dónde sale                                                                                                                                      |
+| --- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Encabezado                       | Tarjeta redondeada con foto de fondo y velo, **logo de la marca** en placa blanca, `<h1>` en dos líneas, presentación e icono de ratón (`animated_mouse_scroll_icon`) | `Marca.fondoHero` (nuevo), `Marca.logo`, `Marca.descripcion`; textos del global `repuestos-marca` (`tituloHero`, `subtituloHero`)                  |
+| 2   | Nuestras categorías de repuestos | Franja amarilla con una píldora por categoría técnica y su icono                                                                                                      | `categorias-tecnicas` (comunes a las 13 marcas), orden por `ordenMarca` (nuevo), `icono` (3 valores nuevos), `enlace` si lo hay; título del global |
+| 3   | Repuestos según tipo de máquina  | Una tarjeta por tipo de la marca con «Ver todo» a la página del tipo; al final, usadas y aditamentos (marketplace)                                                    | `tipos-equipo` de la marca + `TipoEquipo.imagen` (nuevo); las dos tarjetas del marketplace, en el global                                           |
+| 4   | Contacto                         | Antetítulo, título revelado y formulario con «Estoy interesado en» y «Quién soy»                                                                                      | `FormularioSolicitud` (Zod, Turnstile y aviso por SMTP); `Solicitud.interes` y `Solicitud.perfil` (nuevos, opcionales)                             |
+| 5   | Testimonios                      | El acordeón de vídeos de la portada                                                                                                                                   | Colección `testimonios` (los mismos que la portada), componente `SeccionTestimonios`                                                               |
 
-Decisión estándar «lo oculto en los tres tamaños no existe»: no hay ningún elemento
-oculto en los tres a la vez. Las ocultaciones de arriba son por tamaño y se replican.
+Cabecera y pie son los globales del sitio.
 
-## 2. Mapa a lo que ya existe
+**El «Mesa-de-trabajo-7-copia-2.png» del diseño es el logo de Caterpillar**, no una máquina (se confundió en el
+inventario inicial): por eso no hay campo de «máquina recortada» y se usa el `logo` que la marca ya tenía.
 
-| Pieza del diseño                                                                    | Existe  | Cómo se resuelve                                                                                                                                                                               |
-| ----------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Títulos revelados por palabras (widget `bangluxor_titulo_revelado_palabras_scroll`) | Sí      | `components/movimiento/Revelado.tsx` (ya lo usan home y bloques)                                                                                                                               |
-| Acordeón con vídeo (testimonios)                                                    | Sí      | `SeccionTestimonios` + colección `Testimonio`, que la home ya pinta. **A confirmar:** que se pueda reutilizar fuera de la home                                                                 |
-| Formulario                                                                          | Sí      | `FormularioSolicitud` (Zod, Turnstile y aviso por SMTP). Los `radio` del diseño («interes», «perfil») no los tiene: **a decidir** si se añaden o se dejan fuera                                |
-| Icono de ratón de scroll (`animated_mouse_scroll_icon`)                             | **No**  | Widget nuevo. Es CSS/SVG; el zip está en `wordpress\widgtes\`. Pausa/`prefers-reduced-motion` según §9                                                                                         |
-| Tarjetas de tipo                                                                    | Parcial | `getTiposDeMarca` ya da los tipos de la marca; falta la **imagen** y el enlace «Ver todo» a `rutas.tipo(marca, tipo)`                                                                          |
-| Categorías técnicas                                                                 | Parcial | `CategoriaTecnica` tiene nombre e icono (6 valores), pero **no tiene página** (las 32 URL son huérfanas, §10.3) y la relación con la marca no existe. Hoy son transversales a todas las marcas |
-| Tarjetas «usada» y «Aditamentos»                                                    | No      | Enlazan al marketplace; el diseño las pone solo en la 2.ª fila                                                                                                                                 |
-| Fondo e imagen frontal del hero                                                     | No      | La marca solo tiene `logo`                                                                                                                                                                     |
+## 2. Esquema (una sola migración, `20261014_004138_repuestos_marca`, solo opcionales)
 
-## 3. Lo que exige esquema (PARADA tras el paso 1)
+- `marcas.fondo_hero_id`, `tipos_equipo.imagen_id`: imágenes opcionales. **No rompen el importador de marcas y tipos (agente B).**
+- `categorias_tecnicas`: `orden_marca` y tres iconos más (`miscelaneos`, `componentes`, `diesel`; iconos de Tabler).
+- `solicitudes.interes` y `solicitudes.perfil`: listas cerradas, sin texto libre; los demás formularios no los envían.
+- Global `repuestos-marca`: títulos de las secciones y las dos tarjetas del marketplace. La migración **siembra los
+  textos de ux-9 con SQL explícito** (§3.5), sin imágenes (L3).
 
-Para no tener datos quemados (§7.5) harían falta, **todos cambios de esquema**:
+## 3. Decisiones de dirección (2026-10-13)
 
-1. `Marca`: imagen de fondo del hero, imagen frontal opcional, texto de presentación
-   (la `descripcion` actual sirve para el párrafo; el `h1` y su segunda línea salen del nombre).
-2. `TipoEquipo`: `imagen` para la tarjeta.
-3. `CategoriaTecnica`: más iconos (`Misceláneos`, `Componentes Mayores`, `Motor Diesel`
-   no tienen valor; el `select` es un enum de Postgres) y su relación con la marca,
-   o bien decidir que las categorías son las mismas para todas las marcas.
-4. Dos tarjetas de marketplace (usada y aditamentos): imagen y título editables,
-   probablemente en un global.
+1. Las categorías son **comunes a las 13 marcas**; sin página, la píldora va **sin enlace** y se enlaza sola cuando se
+   rellena su «Enlace».
+2. Se construye con lo que haya y contenido de ejemplo marcado «EJEMPLO UX-9 —» (`npm run preview:repuestos-marca:sembrar`
+   / `:retirar`, solo preview, con manifiesto para restaurar lo previo).
+3. Imágenes de ux-9 solo al preview, a `Media` por script (§10.38). A producción irán con la copia de demostración.
+4. `interes` y `perfil` opcionales en `Solicitud`.
+5. Usadas y aditamentos ocultas en móvil, como en el diseño.
 
-**Antes de pedir la ventana de migraciones** (§9, «sin esperas dentro de la ventana»)
-necesito de dirección las decisiones de la sección 4. Hoy `VENTANA.md` está libre y
-no la he tomado.
+## 4. Desviaciones del diseño (para Andrés)
 
-## 4. Preguntas para dirección
+| #   | Qué                                                                                                                                                                                                                                                            |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Las dos líneas del título van en un solo `<h1>` (en ux-9, dos `<h2>`).                                                                                                                                                                                         |
+| D2  | Las tarjetas salen de los tipos de la marca (en ux-9, seis fijas). ux-9 oculta por posición la 4.ª a la 6.ª en móvil y la 3.ª y la 6.ª en tablet; aquí **ningún tipo se oculta** (sus enlaces siguen visibles). Solo usadas y aditamentos se ocultan en móvil. |
+| D3  | El panel de la tarjeta crece con el título; en ux-9 tiene alto fijo y, con tres líneas, el botón asoma por debajo del panel (errata). Los paneles de una fila miden lo mismo.                                                                                  |
+| D4  | En móvil ux-9 deja ver solo la 2.ª y la 3.ª categoría (`hide_mobile` por posición). Se replica por posición: como no llevan enlace, no se pierde ningún enlace rastreable.                                                                                     |
+| D5  | Iconos de Tabler en vez de los SVG del kit (Flaticon, L2).                                                                                                                                                                                                     |
+| D6  | La rueda del icono de ratón se mueve 2 veces (4,4 s) y se queda quieta; el widget la repite sin fin (WCAG 2.2.2). Con `prefers-reduced-motion`, quieta.                                                                                                        |
+| D7  | El formulario no tiene «Empresa» (en el diseño es una opción de «Quién soy»), muestra los errores campo a campo y conserva lo escrito. Las etiquetas quedan para lectores de pantalla (el diseño usa placeholders).                                            |
+| D8  | El logo lleva `alt` con el nombre de la marca (en ux-9, vacío); la foto de las tarjetas es decorativa y «Ver todo» describe su tarjeta con `aria-describedby`.                                                                                                 |
+| D9  | Migas solo para lectores de pantalla (ux-9 no las pinta); el `BreadcrumbList` sigue.                                                                                                                                                                           |
 
-1. **Categorías (sección 2)**: ¿las 7 son comunes a las 13 marcas o cambian por marca?
-   El diseño no las enlaza. ¿Se pintan sin enlace hasta que haya página de categoría?
-2. **Contenido de ejemplo**: B todavía no importa los 347 modelos (PR #116, pendiente).
-   ¿Construyo con los tipos que haya hoy en `development`/preview más imágenes de
-   ejemplo marcadas «EJEMPLO UX-9 —» (§10.38)?
-3. **Imágenes de ux-9** (fondo, frontal, tarjetas): son de Andrés, con licencia L3
-   pendiente → solo preview, vía `Media` por script (nunca al repositorio).
-4. **Radios del formulario** («interes», «perfil»): ¿se replican? Requieren campos nuevos
-   en `Solicitud` (esquema).
-5. **Ocultar «usada» y «Aditamentos» en móvil** es lo que pinta el diseño; ¿se respeta?
+## 5. Pendiente
+
+- Imágenes reales de fondo (por marca) y de cada tipo: el cliente o el editor, desde el panel.
+- `ordenMarca` y `enlace` de las categorías técnicas: en el panel (el ejemplo del preview pone el orden de ux-9).
+- La copia de demostración a producción (`copia-demo.ts`, agente A) debe llevar `marcas.fondoHero`,
+  `tipos-equipo.imagen`, `categorias-tecnicas.ordenMarca`/`icono` y el global `repuestos-marca`.

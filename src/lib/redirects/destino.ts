@@ -1,5 +1,6 @@
 import {
   SEGMENTO_BLOG_CATEGORIA,
+  SEGMENTO_CATEGORIAS_REPUESTOS,
   SEGMENTO_BLOG_INDICE,
   SEGMENTO_LUBRICANTES,
   SEGMENTO_MAQUINARIA,
@@ -27,6 +28,7 @@ import {
 /** Colecciones que pueden respaldar una ruta pública. */
 export type ColeccionDestino =
   | "marcas"
+  | "categorias-tecnicas"
   | "tipos-equipo"
   | "modelos-repuesto"
   | "marcas-maquinaria"
@@ -63,6 +65,7 @@ const ESTATICAS = new Set([
   "",
   SEGMENTO_REPUESTOS,
   `${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}`,
+  `${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}`,
   SEGMENTO_MAQUINARIA,
   `${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}`,
   `${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${SEGMENTO_MARCAS_MAQUINARIA}`,
@@ -91,6 +94,12 @@ export function clasificarDestino(destino: string): Destino {
     slug,
     padres,
   });
+
+  // --- Categorías técnicas de repuestos ---------------------------------------
+  if (seg(0) === SEGMENTO_REPUESTOS && seg(1) === SEGMENTO_CATEGORIAS_REPUESTOS) {
+    if (partes.length === 3) return din(["categorias-tecnicas"], seg(2));
+    return { clase: "sin-ruta" };
+  }
 
   // --- Repuestos ------------------------------------------------------------
   if (seg(0) === SEGMENTO_REPUESTOS && seg(1) === SEGMENTO_MARCAS) {

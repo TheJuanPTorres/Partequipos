@@ -1502,6 +1502,47 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
       con el token) y falla si no es del almacén esperado. Contra producción
       desde una máquina local hay que declarar `ALMACEN_BLOB_ESPERADO`
       (README §9.2).
+- **CONFIGURACIÓN DE LOS ALMACENES DEL BLOB (2026-10-13, ya en Vercel Pro).**
+  - **Por qué Pro:** el 2026-10-08, la importación de usados al preview
+    agotó las 2.000 operaciones avanzadas al mes del plan Hobby. Ese cupo es
+    de **toda la cuenta**, así que se bloquearon los dos almacenes y las
+    fotos de producción también cayeron. Presupuesto de operaciones en
+    `Desktop\partequipos-cierre\informes\2026-10-13-blob-y-listados.md`.
+  - **Conexiones en Vercel:**
+
+    | Almacén                 | Conectado a      | Quién lo usa                                                                   |
+    | ----------------------- | ---------------- | ------------------------------------------------------------------------------ |
+    | `parte-equipos-preview` | **solo Preview** | Previews; `development` (`.env.local`) y los scripts locales, con su token     |
+    | `parte-equipos`         | **ninguno**      | Producción, con su `BLOB_READ_WRITE_TOKEN` propio, puesto a mano en Production |
+
+    Hasta el 2026-10-13 el almacén del preview estaba conectado también a
+    «Production». Lo quitó dirección y producción se redesplegó después.
+    **Un almacén nunca se conecta a otro entorno que el suyo.**
+
+  - **El token NO se revoca ni se sustituye, aunque Vercel lo recomiende.**
+    Vercel aconseja dejar los tokens estáticos y conectar el almacén, que
+    autentica dentro de Vercel. Pero el token estático lo usa todo lo que
+    corre **fuera** de Vercel:
+    - los importadores y scripts por `preview:ejecutar`;
+    - `blob:almacen`, `blob:huerfanos` y `backup:blob`;
+    - los runbooks de dirección.
+
+    Además, la guarda del almacén (§10.37) identifica el almacén **por el id
+    que lleva el propio token**. Revocarlo dejaría sin almacén a todos los
+    scripts, y sin la comprobación previa de la guarda.
+
+  - **Comprobado en solo lectura el 2026-10-13**, con el HTML y 3 imágenes de
+    `/`, `/nosotros/` y una ficha:
+    - **sitio publicado:** imágenes en 200, todas de un almacén que no es el
+      del preview;
+    - **preview:** imágenes en 200, todas del almacén del preview;
+    - **`npm run blob:almacen`,** con `.env.local` y con el entorno del
+      preview: `lsndnc29nh4ws7eh`, el esperado.
+
+    **No verificado:**
+    - la guarda dentro de producción: solo actúa al escribir, y el token de
+      producción no entra en la sesión;
+    - la lista de variables de Vercel: la API respondió 403 a la integración.
 - **CUIDADO al desplegar — `payload migrate` es interactivo:** si
   `payload_migrations` contiene el marcador `dev` (`batch -1`, que deja el push
   de desarrollo), el comando abre un prompt —

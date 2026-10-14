@@ -26,6 +26,7 @@ export const tituloPorDefecto = {
   tipoMaquinaria: (tipo: string, marca: string) => `${tipo} ${marca}`,
   categoriaNueva: (categoria: string) => `${categoria} ${concuerda(categoria, "nuevas", "nuevos")}`,
   categoriaUsada: (categoria: string) => `${categoria} ${concuerda(categoria, "usadas", "usados")}`,
+  marcaUsada: (marca: string) => `Maquinaria ${marca} usada`,
   marcaLubricante: (marca: string) => `Lubricantes ${marca}`,
   categoriaLubricante: (categoria: string, marca: string) => `${categoria} | Lubricantes ${marca}`,
 } as const;

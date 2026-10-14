@@ -1,5 +1,5 @@
 import { compararNumeros } from "../filtros/aplicar";
-import type { Catalogo, Tramo } from "../filtros/tipos";
+import type { Catalogo, Faceta, Tramo } from "../filtros/tipos";
 import { formatSlug } from "../utils/formatSlug";
 
 /**
@@ -16,6 +16,10 @@ import { formatSlug } from "../utils/formatSlug";
 /** Lo que necesitan los filtros de una unidad. */
 export type UnidadFiltrable = {
   id: number;
+  /** La marca de usada (relación), si la tiene. Gana al texto. */
+  marcaRef?: { slug: string; nombre: string } | null;
+  /** La categoría, para filtrar por ella en las páginas de marca. */
+  categoriaRef?: { slug: string; nombre: string } | null;
   marca?: string | null;
   anio?: number | null;
   horometro?: number | null;
@@ -23,9 +27,10 @@ export type UnidadFiltrable = {
 };
 
 /**
- * La marca como opción. Hasta que exista la colección de marcas de usados
- * (paso b), sale del texto libre: el valor es su slug, así «LiuGong» y
- * «Liugong» caen en la misma opción.
+ * La marca como opción a partir del TEXTO: el valor es su slug, así «LiuGong»
+ * y «Liugong» caen en la misma opción. Es el respaldo de las unidades sin la
+ * relación con su marca (paso b): el slug coincide con el de la marca que
+ * crearía el gancho `marcaUsadaSincronizada`.
  */
 export function marcaDeUnidad(marca: string | null | undefined) {
   const etiqueta = marca?.trim();
@@ -53,55 +58,87 @@ export const TRAMOS_PESO: readonly Tramo[] = [
 
 const porId = (a: UnidadFiltrable, b: UnidadFiltrable) => a.id - b.id;
 
+/** La marca de una unidad: la de la relación o, sin ella, la del texto. */
+export function opcionDeMarca(u: UnidadFiltrable) {
+  return u.marcaRef
+    ? { valor: u.marcaRef.slug, etiqueta: u.marcaRef.nombre }
+    : marcaDeUnidad(u.marca);
+}
+
+const FACETA_MARCA: Faceta<UnidadFiltrable> = {
+  tipo: "lista",
+  clave: "marca",
+  etiqueta: "Marca",
+  de: opcionDeMarca,
+};
+
+const FACETA_CATEGORIA: Faceta<UnidadFiltrable> = {
+  tipo: "lista",
+  clave: "categoria",
+  etiqueta: "Tipo de máquina",
+  de: (u) =>
+    u.categoriaRef ? { valor: u.categoriaRef.slug, etiqueta: u.categoriaRef.nombre } : null,
+};
+
+const FACETAS_COMUNES: Faceta<UnidadFiltrable>[] = [
+  {
+    tipo: "lista",
+    clave: "anio",
+    etiqueta: "Año",
+    ordenOpciones: "valor-desc",
+    de: (u) =>
+      typeof u.anio === "number" && Number.isInteger(u.anio)
+        ? { valor: String(u.anio), etiqueta: String(u.anio) }
+        : null,
+  },
+  {
+    tipo: "tramos",
+    clave: "horas",
+    etiqueta: "Horas de uso",
+    tramos: TRAMOS_HORAS,
+    de: (u) => u.horometro ?? null,
+  },
+  {
+    tipo: "tramos",
+    clave: "peso",
+    etiqueta: "Peso operativo",
+    tramos: TRAMOS_PESO,
+    de: (u) => u.pesoOperativo ?? null,
+  },
+];
+
+// El primero es el de siempre del listado (año descendente, el id desempata).
+const ORDENES: Catalogo<UnidadFiltrable>["ordenes"] = [
+  {
+    valor: "recientes",
+    etiqueta: "Más recientes",
+    comparar: (a, b) => compararNumeros(a.anio, b.anio, "desc") || porId(a, b),
+  },
+  {
+    valor: "menos-horas",
+    etiqueta: "Menos horas de uso",
+    comparar: (a, b) => compararNumeros(a.horometro, b.horometro, "asc") || porId(a, b),
+  },
+  {
+    valor: "menor-peso",
+    etiqueta: "Menor peso",
+    comparar: (a, b) => compararNumeros(a.pesoOperativo, b.pesoOperativo, "asc") || porId(a, b),
+  },
+  {
+    valor: "mayor-peso",
+    etiqueta: "Mayor peso",
+    comparar: (a, b) => compararNumeros(a.pesoOperativo, b.pesoOperativo, "desc") || porId(a, b),
+  },
+];
+
+/** Listados de una CATEGORÍA de usada: se filtra por marca. */
 export const CATALOGO_USADOS: Catalogo<UnidadFiltrable> = {
-  facetas: [
-    { tipo: "lista", clave: "marca", etiqueta: "Marca", de: (u) => marcaDeUnidad(u.marca) },
-    {
-      tipo: "lista",
-      clave: "anio",
-      etiqueta: "Año",
-      ordenOpciones: "valor-desc",
-      de: (u) =>
-        typeof u.anio === "number" && Number.isInteger(u.anio)
-          ? { valor: String(u.anio), etiqueta: String(u.anio) }
-          : null,
-    },
-    {
-      tipo: "tramos",
-      clave: "horas",
-      etiqueta: "Horas de uso",
-      tramos: TRAMOS_HORAS,
-      de: (u) => u.horometro ?? null,
-    },
-    {
-      tipo: "tramos",
-      clave: "peso",
-      etiqueta: "Peso operativo",
-      tramos: TRAMOS_PESO,
-      de: (u) => u.pesoOperativo ?? null,
-    },
-  ],
-  // El primero es el de siempre del listado (año descendente, el id desempata).
-  ordenes: [
-    {
-      valor: "recientes",
-      etiqueta: "Más recientes",
-      comparar: (a, b) => compararNumeros(a.anio, b.anio, "desc") || porId(a, b),
-    },
-    {
-      valor: "menos-horas",
-      etiqueta: "Menos horas de uso",
-      comparar: (a, b) => compararNumeros(a.horometro, b.horometro, "asc") || porId(a, b),
-    },
-    {
-      valor: "menor-peso",
-      etiqueta: "Menor peso",
-      comparar: (a, b) => compararNumeros(a.pesoOperativo, b.pesoOperativo, "asc") || porId(a, b),
-    },
-    {
-      valor: "mayor-peso",
-      etiqueta: "Mayor peso",
-      comparar: (a, b) => compararNumeros(a.pesoOperativo, b.pesoOperativo, "desc") || porId(a, b),
-    },
-  ],
+  facetas: [FACETA_MARCA, ...FACETAS_COMUNES],
+  ordenes: ORDENES,
+};
+
+/** Listados de una MARCA de usada: se filtra por tipo de máquina (la categoría). */
+export const CATALOGO_USADOS_MARCA: Catalogo<UnidadFiltrable> = {
+  facetas: [FACETA_CATEGORIA, ...FACETAS_COMUNES],
+  ordenes: ORDENES,
 };

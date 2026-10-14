@@ -26,6 +26,8 @@ export type SitemapInput = {
   equiposNuevos: ModeloLike[];
   categoriasNueva: ConSlug[];
   categoriasUsada: ConSlug[];
+  /** Marcas de usada con unidades disponibles (D4: las vacías no van). */
+  marcasUsada: ConSlug[];
   /** Lubricantes: marca → categoría de aplicación. Sin índice de sección. */
   marcasLubricante: ConSlug[];
   categoriasLubricante: TipoLike[];
@@ -63,6 +65,7 @@ export const PATRONES_SITEMAP = [
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
   "/maquinaria-pesada/maquinaria-pesada-usada",
   "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]",
+  "/maquinaria-pesada/maquinaria-pesada-usada/marcas/[marca]",
   /*
    * Lubricantes. No hay patrón "/lubricantes" a secas: esa página NO existe en
    * el sitio actual, así que tampoco aquí. Ver SEGMENTO_LUBRICANTES.
@@ -97,6 +100,8 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
    */
   "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]":
     "paginación: se llega desde la página 1 de la categoría",
+  "/maquinaria-pesada/maquinaria-pesada-usada/marcas/[marca]/pagina/[pagina]":
+    "paginación: se llega desde la página 1 de la marca",
 } as const;
 
 /** Slug reservado de la portada dentro de la colección de páginas. */
@@ -141,6 +146,7 @@ export function buildSitemapEntries(
     equiposNuevos,
     categoriasNueva,
     categoriasUsada,
+    marcasUsada,
     marcasLubricante,
     categoriasLubricante,
     articulos,
@@ -254,7 +260,7 @@ export function buildSitemapEntries(
     {
       url: absoluteUrl(rutas.usada()),
       // El inventario de usada rota rápido: una unidad se vende y desaparece.
-      lastModified: masReciente(categoriasUsada, ahora),
+      lastModified: masReciente([...categoriasUsada, ...marcasUsada], ahora),
       changeFrequency: "daily",
       priority: 0.8,
     },
@@ -302,6 +308,15 @@ export function buildSitemapEntries(
       lastModified: fecha(categoria.updatedAt, ahora),
       changeFrequency: "daily",
       priority: 0.7,
+    });
+  }
+
+  for (const marca of marcasUsada) {
+    entradas.push({
+      url: absoluteUrl(rutas.marcaUsada(marca.slug)),
+      lastModified: fecha(marca.updatedAt, ahora),
+      changeFrequency: "daily",
+      priority: 0.6,
     });
   }
 

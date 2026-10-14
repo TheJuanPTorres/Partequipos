@@ -7,6 +7,7 @@ import {
   getCategoriasUsada,
   getEquiposNuevos,
   getInventarioUsados,
+  getMarcasUsada,
   getMarcasMaquinaria,
   getTiposMaquinaria,
 } from "@/lib/queries/getMaquinaria";
@@ -63,6 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     articulos,
     categoriasBlog,
     inventarioUsados,
+    marcasUsada,
   ] = await Promise.all([
     getMarcas(),
     getTipos(),
@@ -78,6 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getArticulos(),
     getCategoriasBlog(),
     getInventarioUsados(),
+    getMarcasUsada(),
   ]);
 
   return buildSitemapEntries({
@@ -142,6 +145,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ),
       )
       .map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
+
+    // D4: una marca de usada solo con unidades disponibles (ninguna es heredada).
+    marcasUsada: marcasUsada
+      .filter((m) => inventarioUsados.some((u) => u.marcaUsada === m.id))
+      .map((m) => ({ slug: m.slug, updatedAt: m.updatedAt })),
 
     // --- Lubricantes --------------------------------------------------------
     marcasLubricante: marcasLubricante.map((m) => ({ slug: m.slug, updatedAt: m.updatedAt })),

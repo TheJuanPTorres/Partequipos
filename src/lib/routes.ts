@@ -76,6 +76,14 @@ export const rutas = {
     pagina <= 1
       ? `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${slug}`
       : `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${slug}/pagina/${pagina}`,
+  /** Página de una marca de usada (D1, 2026-10-13); `marcas` está reservada en las categorías. */
+  marcaUsada: (slug: string) =>
+    `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${SEGMENTO_MARCAS_MAQUINARIA}/${slug}`,
+  /** Página n del listado de una marca de usada; la 1 es la propia marca. */
+  marcaUsadaPagina: (slug: string, pagina: number) =>
+    pagina <= 1
+      ? `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${SEGMENTO_MARCAS_MAQUINARIA}/${slug}`
+      : `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${SEGMENTO_MARCAS_MAQUINARIA}/${slug}/pagina/${pagina}`,
   marcasMaquinaria: () => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${SEGMENTO_MARCAS_MAQUINARIA}`,
   marcaMaquinaria: (marcaSlug: string) =>
     `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${SEGMENTO_MARCAS_MAQUINARIA}/${marcaSlug}`,

@@ -84,6 +84,10 @@
    * diapositivas (D15). Abajo se reserva la fila de controles más el aire.
    */
   --hero-texto-arriba: 124px;
+  /* Título partido, en escritorio: 35 px, como la diapositiva 2 del diseño (medido a 1440). */
+  --hero-texto-arriba-partido: 35px;
+  /* Y su máquina sube 48 px sobre la caja del título: en el diseño empieza 139 px bajo el borde. */
+  --hero-maquina-roce-partido: -48px;
   --hero-texto-abajo: 98px;
 
   /* --- Velo sobre la foto (D14, ver `.marco::after`). --- */
@@ -416,6 +420,20 @@
     z-index: 2;
     width: min(var(--hero-maquina-ancho-sobre), 100%);
     margin-top: var(--hero-maquina-cruce);
+  }
+
+  /*
+   * TÍTULO PARTIDO (diapositiva 2 del diseño; decisión de dirección del
+   * 2026-10-14, S1): sube como en el diseño, aunque no quede a la altura de
+   * las demás, y la máquina sube con él hasta rozar su borde de abajo, para
+   * que recupere su tamaño (762 px a 1440).
+   */
+  .capaTexto[data-partido] {
+    padding-top: var(--hero-texto-arriba-partido);
+  }
+
+  .capaTexto[data-partido][data-maquina="debajo"] .capaMaquina {
+    margin-top: var(--hero-maquina-roce-partido);
   }
 }
 

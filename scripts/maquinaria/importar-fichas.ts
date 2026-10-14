@@ -51,6 +51,8 @@ import { enlaceInterno, textoPlano } from "../../src/lib/blog/wordpress";
 import type { EquiposNuevo } from "../../src/payload-types";
 import {
   CORRECCIONES_WP,
+  descripcionSeoDeFicha,
+  type OrigenDescripcion,
   clasificarTexto,
   enlacesDe,
   fotoDeFicha,
@@ -215,6 +217,13 @@ const documentosYa = new Set(
 
 // ---------- Plan (sin red ni escrituras) ----------
 
+/** Cuántas fichas llevan cada meta descripción de WordPress (las repetidas no se usan). */
+const metasRepetidas = new Map<string, number>();
+for (const f of fichas) {
+  const d = textoPlano(vivo.get(f.ruta)?.descripcion ?? "");
+  if (d) metasRepetidas.set(d, (metasRepetidas.get(d) ?? 0) + 1);
+}
+
 const avisos: string[] = [];
 const fotosDe = (f: FichaWp) => (f.galeria.length ? f.galeria : f.imagenes);
 const genericas = fotosGenericas(fichas.map((f) => ({ fotos: fotosDe(f) })));
@@ -247,7 +256,11 @@ type Plan = {
   enlaces: string[];
   fotos: PlanFoto[];
   pdf: { url: string; fichero: string } | null;
-  seo: { metaTitle: string | null; metaDescription: string | null };
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    origenDescripcion: OrigenDescripcion;
+  };
   /** Errores de WordPress corregidos al importar (`CORRECCIONES_WP`). */
   correcciones: string[];
   avisos: string[];
@@ -337,6 +350,20 @@ for (const f of fichas) {
     htmlDescripcion.replace(/href="([^"]+)"/gi, (_, h: string) => `href="${enlaceInterno(h)}"`),
   );
   const v = vivo.get(f.ruta);
+  const codigo = codigoDeModelo(nombre, marca?.nombre ?? marcaSlug, slug).valor;
+  // Unas 50 fichas llevan en WordPress la meta descripción de otro modelo:
+  // la de WordPress solo si nombra este; si no, la primera frase del texto o una
+  // generada (decisión de dirección, 2026-10-14; `descripcionSeoDeFicha`).
+  const descripcionBuscadores = descripcionSeoDeFicha({
+    metaWp: descripcionSeo(v?.descripcion),
+    htmlDescripcion,
+    nombre,
+    codigo,
+    // Una descripción de WordPress que llevan varias fichas no es de ninguna.
+    descartarWp:
+      Boolean(correccion.sinDescripcionSeo) ||
+      (metasRepetidas.get(textoPlano(v?.descripcion ?? "")) ?? 0) > 1,
+  });
   planes.push({
     ruta: f.ruta,
     slug,
@@ -347,7 +374,7 @@ for (const f of fichas) {
     enAlcance: alcance.has(f.ruta),
     maquetacion: f.galeria.length ? "nueva" : "antigua",
     nombre,
-    codigo: codigoDeModelo(nombre, marca?.nombre ?? marcaSlug, slug).valor,
+    codigo,
     fichaTecnica,
     pesoKg: pesoOperativoKg(fichaTecnica),
     descripcion: {
@@ -361,7 +388,8 @@ for (const f of fichas) {
     pdf: urlPdf && pdfPlan ? { url: urlPdf, fichero: pdfPlan.fichero } : null,
     seo: {
       metaTitle: correccion.sinTituloSeo ? null : tituloSeo(v?.titulo, nombre),
-      metaDescription: correccion.sinDescripcionSeo ? null : descripcionSeo(v?.descripcion),
+      metaDescription: descripcionBuscadores.texto,
+      origenDescripcion: descripcionBuscadores.origen,
     },
     correcciones,
     avisos: avisosFicha,
@@ -487,6 +515,7 @@ const resumen = {
   },
   conAvisos: planes.filter((p) => p.avisos.length).length,
   correcciones: planes.flatMap((p) => p.correcciones.map((c) => `${p.slug}: ${c}`)),
+  descripcionBuscadores: cuenta(planes, (p) => p.seo.origenDescripcion),
   comprobacion: COMPROBAR ? comprobacion : "no pedida (añade «comprobar»)",
   avisos,
 };

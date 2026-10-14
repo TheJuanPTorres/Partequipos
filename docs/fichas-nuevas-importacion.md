@@ -84,3 +84,20 @@ en su web** mientras siga publicada:
 
 Un folleto de fabricante pesa 27,7 MB. Dirección subió el tope de
 `documentos` de 25 a 30 MB (2026-10-13; CLAUDE.md §10.39).
+
+## 6. Descripción para buscadores (decisión de dirección, 2026-10-14)
+
+Unas 50 fichas llevan en WordPress la meta descripción de **otro** modelo,
+copiada de plantilla (todas las Dynapac y casi todas las Hitachi decían «la
+excavadora Hitachi ZX200LC-5G»). Regla (`descripcionSeoDeFicha`, con pruebas):
+
+1. **La de WordPress**, solo si nombra el modelo de la ficha (por su código,
+   también partido: «SR 175B») y ninguna otra ficha lleva la misma.
+2. Si no, **la primera frase del texto de la propia ficha**, si nombra el modelo.
+3. Si tampoco, **una generada con sus datos**:
+   «<nombre>: ficha técnica, fotos y cotización en Partequipos, Colombia.»,
+   distinta en cada ficha y de menos de 160 caracteres.
+
+Resultado con la exportación del 2026-10-07: **16 de WordPress, 57 frases y 7
+generadas**; las 80, distintas. Las que pasan de 160 caracteres (textos largos
+del propio WordPress) las recorta el sitio al pintar (`recortarDescripcion`).

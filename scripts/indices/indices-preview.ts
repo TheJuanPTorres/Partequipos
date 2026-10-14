@@ -12,9 +12,9 @@
  *   prefijo `indices-`:
  *     · las FOTOS DE LAS TARJETAS, de la web original del cliente
  *       (partequipos.com): son suyas, con su texto alternativo real;
- *     · las de ANDRÉS (fondos de los encabezados, foto de Contáctanos y máquina
- *       decorativa), con licencia pendiente (L3, excepción de demostración
- *       §10.38) y el texto «EJEMPLO UX-9 —».
+ *     · los fondos de los encabezados, la foto de Contáctanos y la máquina
+ *       decorativa: también de la web original del cliente (las de Andrés, L3,
+ *       ya no se usan).
  * - Las tarjetas se emparejan POR ORDEN con las del global (las seis que sembró
  *   la migración): no se cambian sus títulos ni enlaces, solo la foto.
  * - Antes de tocar nada guarda en un MANIFIESTO (fuera del repositorio) la foto
@@ -62,7 +62,6 @@ const RAIZ = path.join(os.homedir(), "Desktop", "partequipos-diseno", "wordpress
 const CARPETA = path.join(RAIZ, "assets");
 const MANIFIESTO = path.join(RAIZ, "manifiesto-preview.json");
 const PREFIJO = "indices-";
-const EJEMPLO = "EJEMPLO UX-9 — ";
 
 type Imagen = { origen: string; alt: string };
 const IMAGENES = {
@@ -83,22 +82,23 @@ const IMAGENES = {
     origen: "servicio-tecnico.jpg",
     alt: "Técnico revisando un componente de una excavadora",
   },
-  // De Andrés (L3, solo preview).
+  // Del cliente, de su web original (partequipos.com): fondos de los encabezados,
+  // foto de Contáctanos (recorte vertical de la del técnico) y máquina decorativa.
   heroRepuestos: {
-    origen: "hero-repuestos.jpg",
-    alt: `${EJEMPLO}Cabina de una excavadora vista desde dentro`,
+    origen: "real-hero-repuestos.jpg",
+    alt: "Cadena y eslabones de tren de rodaje de maquinaria pesada",
   },
   heroMaquinaria: {
-    origen: "hero-maquinaria.jpg",
-    alt: `${EJEMPLO}Excavadora Hitachi en una mina de carbón`,
+    origen: "real-hero-maquinaria.jpg",
+    alt: "Excavadora Hitachi naranja en un patio, junto a árboles",
   },
   contactoFoto: {
-    origen: "contacto-foto.jpg",
-    alt: `${EJEMPLO}Dos asesores de Partequipos con cascos amarillos`,
+    origen: "real-contacto-foto.jpg",
+    alt: "Técnico de Partequipos revisando un componente en el taller",
   },
   contactoDecorativa: {
-    origen: "contacto-decorativa.png",
-    alt: `${EJEMPLO}Compactador de neumáticos amarillo`,
+    origen: "real-contacto-decorativa-case.png",
+    alt: "Motoniveladora CASE naranja",
   },
 } satisfies Record<string, Imagen>;
 type Clave = keyof typeof IMAGENES;

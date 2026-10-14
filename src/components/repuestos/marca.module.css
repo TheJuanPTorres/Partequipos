@@ -42,7 +42,7 @@
 .hero {
   position: relative;
   display: flex;
-  min-height: 560px;
+  min-height: 630px;
   overflow: hidden;
   flex-direction: column;
   border-radius: var(--marca-radio);
@@ -66,9 +66,10 @@
   position: relative;
   display: flex;
   width: 100%;
-  padding: 46px 2.9vw 40px;
+  padding: 50px 2.9vw;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 20px;
   color: #fff;
   text-align: center;
@@ -169,12 +170,27 @@
   }
 }
 
+/* Anchos del texto del encabezado medidos: 880 a 1010 y 278 a 390. */
+@media (max-width: 1024px) {
+  .heroContenido {
+    padding-inline: 6.4vw;
+  }
+}
+
+@media (max-width: 767px) {
+  .heroContenido {
+    padding-inline: 14.4vw;
+  }
+}
+
 /* --- Categorías ------------------------------------------------------------ */
 
 .categorias {
   position: relative;
   z-index: 1;
   padding: 10px 10px 38px;
+  /* Mismo texto que el de la píldora: 16 px en los tres anchos (medido). */
+  font-size: 16px;
   border-radius: 0 0 var(--marca-radio) var(--marca-radio);
   background: var(--marca-amarillo);
 }
@@ -209,7 +225,7 @@
   border-radius: 30px;
   background: #fafafa;
   color: var(--color-texto-suave);
-  font-size: var(--texto-cuerpo);
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.2;
   text-align: left;
@@ -236,8 +252,13 @@ a.pildora:hover {
 }
 
 @media (max-width: 1024px) {
+  .categorias {
+    padding-bottom: 29px;
+  }
+
   .pildoras {
-    gap: 24px 30px;
+    margin-top: 40px;
+    gap: 40px 60px;
   }
 }
 
@@ -248,9 +269,34 @@ a.pildora:hover {
     display: none;
   }
 
+  /* Dos cajas iguales en una fila, del alto de la mayor (medido a 390). */
+  .categorias {
+    padding-bottom: 18px;
+  }
+
   .pildoras {
-    margin-top: 20px;
-    gap: 16px 20px;
+    margin-top: 27px;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .pildoraCaja {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+
+  .pildora {
+    width: 100%;
+    min-height: 65px;
+    padding: 0 14px;
+    gap: 10px;
+    font-size: 15px;
+  }
+
+  .pildoraIcono {
+    width: 30px;
+    height: 30px;
   }
 }
 
@@ -346,7 +392,7 @@ a.pildora:hover {
 
 @media (max-width: 1024px) {
   .tarjetas {
-    padding: 100px 5vw 80px;
+    padding: 120px calc(5vw + 10px) 101px;
   }
 
   .rejilla {
@@ -355,17 +401,29 @@ a.pildora:hover {
   }
 
   .panel {
-    margin-inline: 20px;
+    margin-inline: 18%;
   }
 }
 
 @media (max-width: 767px) {
   .tarjetas {
-    padding: 60px 30px 60px;
+    padding: 120px 30px 60px;
   }
 
   .rejilla {
     grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .panel {
+    margin-inline: 30px;
+    padding: 20px 20px 12px;
+    gap: 10px;
+  }
+
+  .botonTarjeta {
+    min-width: 130px;
+    min-height: 37px;
   }
 
   .soloEscritorio {

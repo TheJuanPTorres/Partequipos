@@ -179,4 +179,4 @@ las 33 de tipo (todo lo visible en escritorio; las plantillas comunes que incrus
 
 - 32 imágenes subidas y 32 tipos con su imagen; quitado el fondo de ejemplo de Caterpillar.
 - Segunda pasada: 0 subidas, mismos números.
-- RETIRADA_PREVIEW
+- devolvió los 69 registros y las 33 imágenes cambiadas a su valor de antes (el fondo de ejemplo de Caterpillar, las imágenes de ejemplo de los tipos de la demo) y los 45 ficheros dieron 404; después se volvió a importar (32 de 32 tipos con su imagen)

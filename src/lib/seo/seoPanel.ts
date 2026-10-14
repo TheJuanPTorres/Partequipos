@@ -32,6 +32,17 @@ const conMarca = (f: (nombre: string, marca: string) => string) => (nombre: stri
 const tal = (nombre: string) => nombre;
 
 export const SEO_POR_COLECCION: Partial<Record<CollectionSlug, ReglaSeo>> = {
+  /*
+   * Marcas de repuestos (bloque SEO desde 2026-10-13). Su logo NO gana a la
+   * imagen al compartir: los logos del cliente son blancos y transparentes, y
+   * al compartir no se verían; sin imagen elegida, la del sitio por defecto.
+   */
+  marcas: {
+    campoNombre: "nombre",
+    titulo: tituloPorDefecto.marcaRepuesto,
+    campoDescripcion: "descripcion",
+    imagen: null,
+  },
   "tipos-equipo": {
     campoNombre: "nombre",
     relaciones: { marca: "marcas" },

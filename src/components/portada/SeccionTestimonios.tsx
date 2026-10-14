@@ -53,7 +53,14 @@ export function SeccionTestimonios({ tarjetas, textos }: Props) {
   const conRaton = (e: PointerEvent) => e.pointerType === "mouse";
 
   return (
-    <section className={estilos.seccion} aria-labelledby="portada-testimonios-titulo">
+    <section
+      className={estilos.seccion}
+      // Sin título, sin `aria-labelledby`: apuntaría a un id que no existe
+      // (verificador del #132). La sección queda con el nombre de «Testimonios».
+      {...(textos.titulo
+        ? { "aria-labelledby": "portada-testimonios-titulo" }
+        : { "aria-label": "Testimonios" })}
+    >
       {textos.titulo ? (
         <Revelado
           adelanto={ADELANTOS.bajo}

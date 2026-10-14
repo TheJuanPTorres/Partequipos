@@ -47,6 +47,15 @@ describe("enlacesDeModelos", () => {
     assert.match(r[0]?.href ?? "", /caterpillar\/excavadora\/320d\/?$/);
   });
 
+  it("no repite el código cuando el nombre ya lo contiene", () => {
+    const r = enlacesDeModelos(marca, tipo, [
+      modelo(1, "Excavadora CATERPILLAR 311B", "311b", "311b"),
+      modelo(2, "Excavadora CATERPILLAR 311", "311", "311"),
+    ]);
+    assert.equal(r[0]?.codigo, null);
+    assert.equal(r[1]?.codigo, null);
+  });
+
   it("descarta los que no tienen nombre o slug", () => {
     assert.equal(
       enlacesDeModelos(marca, tipo, [modelo(1, " ", "a"), modelo(2, "B", "")]).length,

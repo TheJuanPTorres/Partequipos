@@ -37,7 +37,7 @@ export function vistaEncabezadoTipo(
 export type ModeloEnlace = {
   id: number;
   nombre: string;
-  /** Código de fabricante, si lo hay: acompaña al nombre. */
+  /** Código de fabricante, si lo hay y el nombre no lo lleva ya: acompaña al nombre. */
   codigo: string | null;
   href: string;
 };
@@ -50,10 +50,15 @@ export function enlacesDeModelos(
 ): ModeloEnlace[] {
   return modelos
     .filter((m) => m.nombre?.trim() && m.slug?.trim())
-    .map((m) => ({
-      id: m.id,
-      nombre: m.nombre.trim(),
-      codigo: texto(m.codigo) || null,
-      href: rutas.modelo(marca.slug, tipo.slug, m.slug),
-    }));
+    .map((m) => {
+      const nombre = m.nombre.trim();
+      const codigo = texto(m.codigo);
+      return {
+        id: m.id,
+        nombre,
+        // Un código que el nombre ya lleva («Excavadora CATERPILLAR 311» y «311») no se repite.
+        codigo: codigo && !nombre.toLowerCase().includes(codigo.toLowerCase()) ? codigo : null,
+        href: rutas.modelo(marca.slug, tipo.slug, m.slug),
+      };
+    });
 }

@@ -15,9 +15,11 @@ const texto = (v: string | null | undefined) => v?.trim() ?? "";
 // --- Encabezado --------------------------------------------------------------
 
 export type VistaEncabezado = {
+  /** Línea en negrita sobre el título (solo las páginas índice la llevan). */
+  antetitulo?: string;
   /** Primera línea del `<h1>`: «Repuestos para maquinaria pesada». */
   linea1: string;
-  /** Segunda: «CATERPILLAR En Colombia». */
+  /** Segunda: «CATERPILLAR En Colombia». Vacía: no se pinta. */
   linea2: string;
   /** Texto de presentación: la descripción de la marca. */
   descripcion: string;

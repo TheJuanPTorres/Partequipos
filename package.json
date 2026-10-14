@@ -57,6 +57,8 @@
     "preview:nosotros:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/nosotros/nosotros-preview.ts retirar",
     "preview:repuestos-marca:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/repuestos/marca-preview.ts sembrar",
     "preview:repuestos-marca:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/repuestos/marca-preview.ts retirar",
+    "preview:indices:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/indices/indices-preview.ts sembrar",
+    "preview:indices:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/indices/indices-preview.ts retirar",
     "preview:blog:simular": "tsx scripts/preview/con-entorno.ts payload run scripts/blog/importar-wordpress.ts simular preview",
     "preview:blog:importar": "tsx scripts/preview/con-entorno.ts payload run scripts/blog/importar-wordpress.ts importar preview",
     "preview:blog:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/blog/importar-wordpress.ts retirar preview",

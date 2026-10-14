@@ -66,6 +66,7 @@ export const ORDEN_DE_ENTRADAS = [
   "pie",
   "ficha-producto",
   "repuestos-marca",
+  "paginas-indice",
   // Configuración
   "seo",
   "redirects",

@@ -87,24 +87,37 @@ al de `/maquinaria/`, sin tocar ninguna base. **Desviación del diseño de Andr�
 no se usa). El enlace «Trabaja con nosotros» del pie sigue siendo el que ponga el panel (hoy `/contactanos/`): cuando
 dirección quiera, se apunta al portal.
 
-## 5. Esquema necesario (PARADA): un global nuevo
+## 5. Esquema (APROBADO por dirección el 2026-10-14, una sola migración)
 
-Para no dejar texto, enlaces ni imágenes quemados en el código (§7.5) hace falta **un global**
-`paginas-indice` («Páginas índice y contacto»), en el grupo «Partes del sitio», **solo opcionales**:
+Global `paginas-indice` («Páginas índice y contacto», grupo «Partes del sitio»), **solo opcionales** salvo el título y
+el enlace de cada tarjeta. Migración `20261014_054118_paginas_indice`: crea las tablas y **siembra con SQL explícito
+los textos y las seis tarjetas de cada página** (título y enlace), sin imágenes.
 
-- `repuestos` y `maquinaria` (dos grupos iguales): `antetitulo`, `titulo`, `texto` (solo repuestos), `fondo`
-  (imagen) y `tarjetas` (hasta 6: `titulo`, `enlace`, `imagen`).
-- `contacto`: `antetitulo`, `titulo`, `tituloCanales`, `etiquetaTelefono`, `etiquetaCorreo`, `etiquetaDireccion`,
-  `foto` e `imagenDecorativa`.
-- **Una sola migración**, con la siembra por SQL explícito de los textos y de las tarjetas (título y enlace) de arriba,
-  **sin imágenes**; las imágenes de la web original las sube un script al preview (`Media`, manifiesto para retirarlas)
-  y con la copia de demostración irán a producción.
+- `repuestos` y `maquinaria` (dos grupos iguales): `antetitulo`, `titulo`, `texto`, `fondo` y `tarjetas` (hasta 6:
+  `titulo`, `enlace`, `imagen`).
+- `contacto`: `antetitulo`, `titulo`, `tituloCanales`, las tres etiquetas de los canales, `tituloHorario`, `foto` e
+  `imagenDecorativa`. Teléfono, correo y dirección salen del **global de la empresa**.
 
-**Sin esquema:** el 301 de «Trabaja con nosotros» (hecho) y el cambio de encabezado (`antetitulo` opcional en
-`VistaEncabezado`).
+## 6. Decisiones de dirección (2026-10-14) y desviaciones del diseño
 
-## 6. Coordinación
+| #   | Decisión / desviación                                                                                                                                                                                                                                                        |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | `/maquinaria-pesada/` pasa a la plantilla de seis tarjetas (antes, una lista de dos enlaces).                                                                                                                                                                                |
+| D2  | **Título de repuestos: el PINTADO** («Repuestos para Maquinaria pesada»). El JSON exportado dice «Encuentra Maquinaria y Repuestos Rápido y Fácil» (que es el de la página de maquinaria): **diferencia JSON / pintado para Andrés.**                                        |
+| D3  | El antetítulo de «Categoría principal» pintado es «Venta de repuestos» (relleno que no corresponde a maquinaria): se propone «Maquinaria nueva y usada».                                                                                                                     |
+| D4  | Seis tarjetas **reales** (marcas, categorías, tren de rodaje, filtración, GETS, lubricantes / nueva, usada, aditamentos, repuestos, lubricantes, servicio técnico) en vez de las tres repetidas de Andrés; ninguna se oculta en móvil. Fotos de la web original del cliente. |
+| D5  | La principal de repuestos ya no enlaza directamente a cada marca y cada categoría (lo hacía la versión provisional anterior): enlaza a los dos índices y a tres categorías; el resto, a un clic de distancia.                                                                |
+| D6  | Contáctanos: el título es el `<h1>` (en ux-9, `<h2>`); errata «con nosotro» corregida; el horario de atención se conserva bajo las tarjetas de canales; el teléfono y el correo son enlaces; la foto se oculta en móvil, como en ux-9.                                       |
+| D7  | Contáctanos **pinta la tarjeta roja del pie**, como la plantilla (antes se ocultaba, decisión del 2026-10-06 para la ficha de producto).                                                                                                                                     |
+| D8  | «Trabaja con nosotros» **NO se construye**: `/nosotros/trabaja-con-nosotros/` redirige con 301 a `https://partequipos.buk.co/trabaja-con-nosotros` (mapa de alcance), en `next.config.ts`. La plantilla de Andrés no se usa.                                                 |
 
-- `/maquinaria-pesada/` es la sección de **B** (hoy `maquinaria-pesada/page.tsx`: una lista de dos enlaces). B está con
-  «Categoría secundaria» (PR #140), que no toca esa página: aviso en `ESTADO.md` de que la reemplazo por la plantilla.
-- La ventana de migraciones la pediré cuando dirección lo diga (B y C ya terminaron las suyas).
+## 7. Imágenes
+
+`npm run preview:indices:sembrar` / `:retirar` (solo preview, con manifiesto): sube las fotos de las tarjetas **de la web
+original** (suyas) y las de Andrés (fondos, foto y máquina de Contáctanos: L3, «EJEMPLO UX-9 —»). **Para producción**:
+`runbook-indices-produccion.md` (en `partequipos-cierre`), con los ficheros listos en
+`partequipos-diseno\wordpress\indices\assets\`.
+
+## 8. Coordinación
+
+- `/maquinaria-pesada/` es la sección de **B**: avisado en `ESTADO.md`. Su #140 (categoría secundaria) no la toca.

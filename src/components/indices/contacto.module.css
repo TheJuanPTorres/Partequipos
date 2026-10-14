@@ -1,0 +1,231 @@
+/*
+ * PÁGINA «CONTÁCTANOS» — plantilla de Andrés (`contacto`). Valores MEDIDOS
+ * pintados en la referencia a 1440, 1010 y 390
+ * (docs/diseno/decisiones-indices-contacto.md). El formulario usa la piel de la
+ * página de marca (`.formulario` de `repuestos/marca.module.css`).
+ */
+.pagina {
+  position: relative;
+  display: flex;
+  padding: 30px 72px 58px;
+  flex-direction: column;
+  background: var(--color-fondo-seccion);
+}
+
+.antetitulo {
+  margin: 0 0 20px 10px;
+  color: #111;
+  font-size: var(--texto-cuerpo);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-seccion);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* La foto y el formulario: 418 y 809 de 1276 a 1440, con 49 de hueco (los mismos a 1010). */
+.cuerpo {
+  display: grid;
+  margin-top: 40px;
+  grid-template-columns: minmax(0, 418fr) minmax(0, 809fr);
+  column-gap: 49px;
+  align-items: start;
+}
+
+.cuerpo:not(:has(.foto)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.foto {
+  position: relative;
+  aspect-ratio: 418 / 560;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #1f1d1b;
+}
+
+.fotoImg {
+  object-fit: cover;
+}
+
+/* --- Canales adicionales ------------------------------------------------- */
+
+.canales {
+  position: relative;
+  display: grid;
+  margin-top: 106px;
+  grid-template-columns: 272px minmax(0, 1fr);
+  column-gap: 28px;
+  align-items: center;
+}
+
+.tituloCanales {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--color-marca);
+  font-size: var(--texto-titulo-4);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.tarjetas {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  list-style: none;
+}
+
+.canal {
+  min-height: 130px;
+  box-sizing: border-box;
+  padding: 28px;
+  border-radius: 20px;
+  background: #f6f6f6;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
+}
+
+.etiqueta {
+  margin: 0 0 18px;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-destacado);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.valor {
+  display: flex;
+  margin: 0;
+  align-items: flex-start;
+  gap: 8px;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.icono {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 2px;
+  color: var(--color-marca);
+}
+
+.valorEnlace {
+  color: inherit;
+  text-decoration: none;
+}
+
+.valorEnlace:hover {
+  text-decoration: underline;
+}
+
+/* La máquina asoma tras la tercera tarjeta; las tarjetas van por encima. */
+.decorativa {
+  position: absolute;
+  z-index: 0;
+  top: -140px;
+  right: 2%;
+  width: 30%;
+  height: auto;
+  pointer-events: none;
+}
+
+/* --- Horario ---------------------------------------------------------------- */
+
+.horario {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  margin-top: 60px;
+  grid-template-columns: 272px minmax(0, 1fr);
+  column-gap: 28px;
+}
+
+.tituloHorario {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-4);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.lista {
+  display: grid;
+  margin: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 28px;
+  color: #333;
+  font-size: 16px;
+}
+
+.dias::first-letter {
+  text-transform: uppercase;
+}
+
+@media (max-width: 1024px) {
+  .pagina {
+    padding: 30px 5vw 40px;
+  }
+
+  .canales {
+    margin-top: 80px;
+  }
+
+  .decorativa {
+    top: -110px;
+    width: 34%;
+  }
+
+  .horario {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 14px;
+  }
+
+  .canales {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .pagina {
+    padding: 30px 20px 40px;
+  }
+
+  /* La foto se oculta en móvil, como en ux-9. */
+  .cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .foto {
+    display: none;
+  }
+
+  .tarjetas {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .canales {
+    margin-top: 60px;
+    padding-bottom: 110px;
+  }
+
+  .decorativa {
+    top: auto;
+    right: 10%;
+    bottom: -30px;
+    width: 80%;
+  }
+}

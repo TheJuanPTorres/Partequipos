@@ -29,19 +29,32 @@ export function TarjetasMarca({
   titulo,
   verTodo,
   tarjetas,
+  indice = false,
+  etiqueta = "Páginas de la sección",
 }: {
   id: string;
-  titulo: string;
+  /** Sin título (las páginas índice no lo llevan) la sección se nombra con `etiqueta`. */
+  titulo?: string;
   verTodo: string;
   tarjetas: TarjetaMarca[];
+  /** Variante de las páginas índice: sección blanca de esquinas redondeadas, sin título. */
+  indice?: boolean;
+  etiqueta?: string;
 }) {
-  if (!titulo || tarjetas.length === 0) return null;
+  if ((!titulo && !indice) || tarjetas.length === 0) return null;
   const idTitulo = `${id}-titulo`;
   return (
-    <section className={estilos.tarjetas} aria-labelledby={idTitulo}>
-      <h2 id={idTitulo} className={estilos.tituloSeccion}>
-        {titulo}
-      </h2>
+    <section
+      id={id}
+      className={`${estilos.tarjetas} ${indice ? estilos.tarjetasIndice : ""}`}
+      aria-labelledby={titulo ? idTitulo : undefined}
+      aria-label={titulo ? undefined : etiqueta}
+    >
+      {titulo ? (
+        <h2 id={idTitulo} className={estilos.tituloSeccion}>
+          {titulo}
+        </h2>
+      ) : null}
       <ul className={estilos.rejilla}>
         {tarjetas.map((t) => {
           const idT = `${id}-${t.clave}`;

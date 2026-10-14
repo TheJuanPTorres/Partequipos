@@ -2466,3 +2466,31 @@ que toca al diseño, para Andrés:
   - Los enlaces de la franja legal ya tenían 24 px, sin cambio visual.
   - **Para Andrés:** las columnas del pie son algo más altas que en su
     maqueta móvil.
+
+## 30. «Preguntas frecuentes» rediseñada por Andrés (2026-10-14)
+
+**Fuente:** la home de ux-9 actualizada (`partequipos.uxdesign.website/`, antes
+`/ux-9/`), contenedores `f1d0233`, `088a702` (tarjeta) y `411ec15` (lista).
+Andrés quita la máquina recortada.
+
+| Pieza               | Diseño                                                      | Aquí                                                                                 |
+| ------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Tarjeta (izquierda) | 40 %, radio 30, relleno 5 %, foto de fondo, contenido abajo | Igual. Alto mínimo 440 px para que la foto se vea con una lista corta                |
+| Texto de la tarjeta | Título, texto y botón en blanco                             | Igual, abajo a la izquierda también en móvil                                         |
+| Lista (derecha)     | 60 %, relleno 5 %, `space-between`                          | **Centrada en vertical** respecto a la tarjeta (pedido de Andrés por dirección)      |
+| Icono               | Bocadillo                                                   | **Círculo con interrogación** (`IconHelpCircle` de Tabler), en la misma baldosa roja |
+| Móvil               | Tarjeta arriba (120 px de margen) y lista debajo            | Tarjeta arriba (alto mínimo 420, radio 24) y lista debajo, 30 px entre ellas         |
+
+**Foto:** no la de Andrés, sino la **real del técnico de la sede de Guarne**
+(web original, la misma que usa Contáctanos), punto focal en su cara
+(52 %, 30 %). La pone el importador del contenido real (`faq-tarjeta`).
+Campo del panel: «Imagen de la tarjeta» (antes «Máquina recortada»), sin
+cambio de esquema.
+
+**Desviaciones:**
+
+| #   | Diseño                                            | Aquí                                                   | Por qué                                                                  |
+| --- | ------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------ |
+| F1  | Velo gris `#3A3A3A` al 50 % en multiplicar, plano | Degradado oscuro, más intenso abajo, donde va el texto | Contraste AA del texto blanco sobre cualquier foto (pedido de dirección) |
+| F2  | Botón: al pasar, fondo `text` (oscuro)            | Al pasar, fondo blanco y texto oscuro                  | Sobre la foto oscura, el oscuro no se distinguiría                       |
+| F3  | En móvil el texto de la tarjeta va centrado       | A la izquierda, como en escritorio                     | Pedido de dirección: «abajo a la izquierda»                              |

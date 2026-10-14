@@ -1,41 +1,64 @@
 /*
- * SECCIÓN 11 — preguntas frecuentes. Export: contenedor `1945efcb` (relleno
- * 16 % · 0 · 11 % · 0, fondo #F0F0F0), columnas `709b7472` (40 %, relleno 5 %,
- * alto mínimo 60vh en móvil) y `69024d18` (60 %, relleno 5 %; en móvil
- * 10 % · 5 %), imagen `68ccfda2` (64 %, −22,777 % · −29 %, volteada, −13°,
- * brillo 70, contraste 94, saturación 115, z-index 1). El acordeón
- * `5a2d8e5d` se MIDIÓ pintado (no trae su CSS en el JSON).
+ * SECCIÓN 11 — preguntas frecuentes, REDISEÑO DE ANDRÉS (2026-10-14; home de
+ * ux-9, contenedores `f1d0233`, `088a702` y `411ec15`): sección con relleno
+ * 5 % · 3 % y fondo #F0F0F0; a la izquierda una TARJETA (40 %, radio 30, relleno
+ * 5 %, contenido abajo) con foto de fondo y velo; a la derecha la lista (60 %,
+ * relleno 5 %), centrada en vertical. Ya no hay máquina recortada.
  */
 .seccion {
   position: relative;
-  padding: 16% 0 11%;
+  padding: 5% 3%;
   background: var(--color-fondo-seccion);
-}
-
-.maquina {
-  position: absolute;
-  top: -29%;
-  left: -22.777%;
-  z-index: 1;
-  width: 64%;
-  height: auto;
-  transform: rotate(-13deg) scaleX(-1);
-  filter: brightness(0.7) contrast(0.94) saturate(1.15);
-  pointer-events: none;
 }
 
 .fila {
   display: flex;
+  align-items: stretch;
 }
 
-.izq {
+/*
+ * LA TARJETA. Alto mínimo para que la foto se vea aunque la lista sea corta;
+ * con la lista más alta, crece con ella (la fila estira las dos columnas).
+ * Sin foto, el fondo oscuro del sitio: el texto blanco se sigue leyendo.
+ */
+.tarjeta {
+  position: relative;
   display: flex;
   box-sizing: border-box;
   width: 40%;
+  min-height: 440px;
   padding: 5%;
   flex-direction: column;
+  justify-content: flex-end;
   align-items: flex-start;
   gap: 20px;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 30px;
+  background: var(--color-texto);
+}
+
+.foto {
+  z-index: -2;
+  object-fit: cover;
+}
+
+/*
+ * VELO EN DEGRADADO (desviación anotada: en ux-9 es un gris #3A3A3A al 50 % en
+ * multiplicar, plano). Más oscuro abajo, donde va el texto, para el contraste
+ * AA del blanco sobre cualquier foto; arriba deja ver la foto.
+ */
+.tarjeta::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgb(16 15 15 / 88%) 0%,
+    rgb(16 15 15 / 70%) 40%,
+    rgb(16 15 15 / 25%) 100%
+  );
+  content: "";
 }
 
 .der {
@@ -44,29 +67,25 @@
   width: 60%;
   padding: 5%;
   flex-direction: column;
-  justify-content: space-between;
+  /* Centrada en vertical respecto a la tarjeta (pedido de Andrés). */
+  justify-content: center;
 }
 
 .titulo {
   width: 100%;
   max-width: 412px;
   margin: 0;
-  color: var(--color-texto);
+  color: #fff;
 }
 
-/*
- * Tipografía `text` (el global gana a HelveticaNeue 400), color #56545A. El
- * margen de abajo es el del `<p>` de Elementor (0,9rem): sin él, el botón
- * queda 14 px más arriba que en ux-9.
- */
 .intro {
   margin: 0 0 0.9rem;
-  color: var(--color-texto-suave);
+  color: #fff;
   font-weight: 300;
   line-height: 1.4;
 }
 
-/* `79788c69`: radio 8, borde 1 px, `primary`; al pasar, `text`. */
+/* `d68a030`: radio 8, borde 1 px, `primary`. Sobre la foto, al pasar, blanco. */
 .boton {
   display: inline-flex;
   padding: var(--boton-relleno);
@@ -78,16 +97,18 @@
   text-decoration: none;
   transition:
     background-color 0.3s,
-    border-color 0.3s;
+    border-color 0.3s,
+    color 0.3s;
 }
 
 .boton:hover {
-  border-color: var(--color-texto);
-  background: var(--color-texto);
+  border-color: #fff;
+  background: #fff;
+  color: var(--color-texto);
 }
 
 .boton:focus-visible {
-  outline: 3px solid var(--color-texto);
+  outline: 3px solid #fff;
   outline-offset: 3px;
 }
 
@@ -209,31 +230,26 @@
 
 /* ---------------------------------------------------------------- móvil */
 
+/* La tarjeta arriba, a todo el ancho, y la lista debajo. */
 @media (max-width: 767px) {
-  .maquina {
-    top: -4%;
-    left: -15%;
+  .seccion {
+    padding: 10% 5%;
   }
 
   .fila {
     flex-direction: column;
+    gap: 30px;
   }
 
-  /*
-   * Como se PINTA en ux-9 a 390 (2026-10-02): sin relleno lateral, del alto
-   * de su contenido (el `60vh` del export no se aplica en lo publicado), con
-   * 120 px encima y 30 debajo, y todo centrado: título, entradilla y botón.
-   */
-  .izq {
+  .tarjeta {
     width: 100%;
-    margin: 120px 0 30px;
-    padding: 0;
-    align-items: center;
-    text-align: center;
+    min-height: 420px;
+    padding: 30px 24px;
+    border-radius: 24px;
   }
 
   .der {
     width: 100%;
-    padding: 10% 5%;
+    padding: 0;
   }
 }

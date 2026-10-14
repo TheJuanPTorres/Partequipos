@@ -1,4 +1,4 @@
-import { IconMessageQuestion } from "@tabler/icons-react";
+import { IconHelpCircle } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -23,6 +23,12 @@ import estilos from "./faq.module.css";
  * - D6: icono de Tabler (en ux-9, un SVG del kit) y +/− dibujados con CSS (en
  *   ux-9, Font Awesome).
  * - JSON-LD `FAQPage` con las mismas preguntas.
+ *
+ * REDISEÑO DE ANDRÉS (2026-10-14; decisiones-home-ux9.md §30): sin la máquina
+ * recortada. A la izquierda, una TARJETA con foto de fondo y velo oscuro, con
+ * título, texto y botón en blanco abajo a la izquierda; a la derecha, la lista
+ * centrada en vertical respecto a la tarjeta. Icono de círculo con
+ * interrogación. En móvil, la tarjeta arriba y la lista debajo.
  */
 export type TextosFaq = { titulo: string; intro: string; botonTexto: string; botonEnlace: string };
 
@@ -34,18 +40,19 @@ export function SeccionFaq({ preguntas, imagen, textos }: Props) {
   return (
     <section className={estilos.seccion} aria-labelledby="portada-faq-titulo">
       {jsonLd ? <JsonLd data={jsonLd} /> : null}
-      {imagen ? (
-        <Image
-          src={imagen.url}
-          alt=""
-          width={imagen.width}
-          height={imagen.height}
-          sizes="64vw"
-          className={estilos.maquina}
-        />
-      ) : null}
       <div className={estilos.fila}>
-        <div className={estilos.izq}>
+        <div className={estilos.tarjeta}>
+          {/* Foto decorativa: el título dice qué es la sección. Sin foto, fondo oscuro. */}
+          {imagen ? (
+            <Image
+              src={imagen.url}
+              alt=""
+              fill
+              sizes="(max-width: 767px) 100vw, 40vw"
+              className={estilos.foto}
+              style={{ objectPosition: imagen.posicion }}
+            />
+          ) : null}
           {textos.titulo ? (
             <Revelado
               adelanto={ADELANTOS.bajo}
@@ -72,7 +79,7 @@ export function SeccionFaq({ preguntas, imagen, textos }: Props) {
             <details key={p.id} name="portada-faq" className={estilos.item}>
               <summary className={estilos.cabecera}>
                 <span className={estilos.icono} aria-hidden="true">
-                  <IconMessageQuestion focusable="false" stroke={1.75} />
+                  <IconHelpCircle focusable="false" stroke={1.75} />
                 </span>
                 <span className={`${estilos.pregunta} texto-destacado`}>{p.pregunta}</span>
                 <span className={estilos.indicador} aria-hidden="true" />

@@ -55,6 +55,23 @@ inventario inicial): por eso no hay campo de «máquina recortada» y se usa el 
 | D9  | Migas solo para lectores de pantalla (ux-9 no las pinta); el `BreadcrumbList` sigue.                                                                                                                                                                           |
 | D10 | El logo va sobre una **placa oscura**, no blanca: los logos que entrega el cliente son blancos y no se ven sobre fondo claro (decisión de dirección, 2026-10-13). Con las versiones en color se vuelve a la placa blanca de ux-9.                              |
 
+## 6. Página de TIPO (PROVISIONAL hasta el diseño de Andrés)
+
+Decisión de dirección (2026-10-13): la página de tipo (p. ej. «Excavadora Caterpillar») usa el **mismo lenguaje
+visual que la de marca**, mientras Andrés no entregue su diseño. **Es una desviación provisional**: se reemplaza
+cuando llegue la plantilla.
+
+- Ruta: `…/repuestos-maquinaria-pesada-marcas/<marca>/<tipo>/` (sin cambiar slugs). Código en
+  `[marca]/[tipo]/page.tsx`, `src/components/repuestos/ModelosTipo.tsx` y `src/lib/repuestos/tipo.ts` (con pruebas).
+- Encabezado: el de la marca (`HeroMarca`) con «Repuestos para <tipo>» y «<MARCA> En Colombia», la descripción del
+  tipo, el logo de la marca en placa oscura y, de fondo, el `fondoHero` de la marca (si no lo tiene, la imagen del tipo).
+- Franja amarilla «Modelos de <tipo> <MARCA>» con **una píldora-enlace por modelo** (nombre y código) a su ficha;
+  sin modelos, un aviso.
+- Después, el contacto y los testimonios de la página de marca (el formulario guarda como origen la página del tipo).
+- Sin esquema ni migración. Los datos son los que importó B (32 tipos, 344 modelos).
+- Los textos «Repuestos para <tipo>» y «Modelos de <tipo> <MARCA>» se componen en el código (no hay campo de panel
+  para ellos): por eso es provisional.
+
 ## 5. Pendiente
 
 - Imágenes reales de fondo (por marca) y de cada tipo: el cliente o el editor, desde el panel.

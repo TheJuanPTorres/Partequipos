@@ -290,14 +290,13 @@ function PanelFiltrosNueva({
                   <li key={o.valor}>
                     <label className={estilos.marca}>
                       {logo?.url && logo.width && logo.height ? (
-                        <span className={estilos.logo} style={{ position: "static" }}>
-                          <Image
-                            src={logo.url}
-                            alt=""
-                            width={104}
-                            height={Math.round((104 * logo.height) / logo.width)}
-                          />
-                        </span>
+                        <Image
+                          src={logo.url}
+                          alt=""
+                          width={112}
+                          height={Math.round((112 * logo.height) / logo.width)}
+                          className={estilos.marcaLogo}
+                        />
                       ) : null}
                       <span>
                         {o.etiqueta}{" "}

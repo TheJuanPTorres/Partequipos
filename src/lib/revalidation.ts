@@ -1,6 +1,6 @@
 import { revalidatePath } from "next/cache";
 
-import { rutas } from "./routes";
+import { rutas, SEGMENTO_MARCAS, SEGMENTO_REPUESTOS } from "./routes";
 
 /**
  * Revalidación granular del catálogo (ISR), disparada por hooks de Payload.
@@ -188,6 +188,19 @@ export function revalidarFichasNuevas(motivo: string): void {
     );
   } catch (error) {
     console.error(`[revalidación] fallaron las fichas de equipo nuevo (${motivo}):`, error);
+  }
+}
+
+/**
+ * Revalida TODAS las páginas de marca de repuestos. Para lo que comparten: el
+ * global `repuestos-marca` y las categorías técnicas (comunes a las marcas).
+ * Nunca relanza.
+ */
+export function revalidarMarcasDeRepuestos(motivo: string): void {
+  try {
+    revalidatePath(`/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]`, "page");
+  } catch (error) {
+    console.error(`[revalidación] fallaron las páginas de marca de repuestos (${motivo}):`, error);
   }
 }
 

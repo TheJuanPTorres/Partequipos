@@ -30,7 +30,7 @@ export const ESTADO_INICIAL: EstadoFormulario = { estado: "inicial" };
 /** Los campos que escribe el usuario (no los ocultos ni el token). */
 export const CAMPOS_VISIBLES = ["nombre", "correo", "telefono", "empresa", "mensaje"] as const;
 export type CampoVisible = (typeof CAMPOS_VISIBLES)[number];
-export type ValoresFormulario = Partial<Record<CampoVisible, string>>;
+export type ValoresFormulario = Partial<Record<CampoVisible | "interes" | "perfil", string>>;
 
 /**
  * Valores para volver a rellenar el formulario tras un error.
@@ -44,6 +44,11 @@ export function valoresParaReintento(formData: FormData): ValoresFormulario {
   for (const campo of CAMPOS_VISIBLES) {
     const v = formData.get(campo);
     if (typeof v === "string" && v !== "") valores[campo] = v.slice(0, MAX[campo]);
+  }
+  // Las dos clasificaciones son de lista cerrada: se devuelven cortas, sin más.
+  for (const campo of ["interes", "perfil"] as const) {
+    const v = formData.get(campo);
+    if (typeof v === "string" && v !== "") valores[campo] = v.slice(0, 40);
   }
   return valores;
 }

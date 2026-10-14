@@ -1,0 +1,596 @@
+/*
+ * PÁGINA DE MARCA DE REPUESTOS — ux-9, plantilla 3373. Valores MEDIDOS pintados
+ * en la referencia a 1440, 1010 y 390 (docs/diseno/decisiones-repuestos-marca.md).
+ *
+ * Las tres franjas de color van una sobre otra: el hero sobre la franja
+ * amarilla, el amarillo con las esquinas de abajo redondeadas sobre el blanco
+ * de las tarjetas, y el blanco con las suyas sobre el gris del contacto.
+ */
+.pagina {
+  --marca-amarillo: #f2bc2e;
+  --marca-radio: 30px;
+  background: var(--color-fondo-seccion);
+}
+
+/* Migas solo para lectores de pantalla: ux-9 no las pinta (decisión estándar de réplica). */
+.migas {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.tituloSeccion {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-3);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* --- Encabezado ---------------------------------------------------------- */
+
+.heroSeccion {
+  padding: 0 1.5vw 1.5vw;
+  /* La mitad de abajo de la franja de color asoma a los lados de la tarjeta. */
+  background: linear-gradient(var(--color-fondo-seccion) 50%, var(--marca-amarillo) 50%);
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  min-height: 630px;
+  overflow: hidden;
+  flex-direction: column;
+  border-radius: var(--marca-radio);
+  /* Mientras llega la foto —o sin ella—, el tono oscuro del velo: el texto blanco se lee. */
+  background: #1f1d1b;
+}
+
+.fondo {
+  object-fit: cover;
+}
+
+.velo {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0.45;
+  mix-blend-mode: multiply;
+}
+
+.heroContenido {
+  position: relative;
+  display: flex;
+  width: 100%;
+  padding: 50px 2.9vw;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  color: #fff;
+  text-align: center;
+}
+
+.placa {
+  display: flex;
+  padding: 0 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--color-fondo);
+}
+
+/* El logo mide 131 de ancho y, como mucho, 87 de alto (medido); la placa blanca le suma 20 a cada lado. */
+.logo {
+  width: 131px;
+  height: auto;
+  max-height: 87px;
+  object-fit: contain;
+}
+
+.h1 {
+  display: flex;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0;
+  flex-direction: column;
+  gap: 20px;
+  font-weight: 500;
+}
+
+.linea1 {
+  display: block;
+  font-size: var(--texto-titulo-seccion);
+  line-height: 1.2;
+}
+
+.linea2 {
+  display: block;
+  font-size: var(--texto-titulo-3);
+  line-height: 1.2;
+}
+
+.presentacion {
+  width: 100%;
+  max-width: 650px;
+  margin: 0;
+  font-size: var(--texto-cuerpo);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+/* Icono de ratón: 25 × 40, borde de 2 px, rueda roja de 3 × 10 (widget de ux-9). */
+.raton {
+  display: inline-block;
+  margin-top: 15px;
+  line-height: 0;
+}
+
+.ratonCuerpo {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 25px;
+  height: 40px;
+  padding-top: 8px;
+  border: 2px solid #fff;
+  border-radius: 50px;
+  text-align: center;
+}
+
+.ratonRueda {
+  display: inline-block;
+  width: 3px;
+  height: 10px;
+  border-radius: 50px;
+  background: var(--color-marca);
+  animation: ratonRueda 2.2s cubic-bezier(0.15, 0.41, 0.69, 0.94) 2;
+}
+
+@keyframes ratonRueda {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ratonRueda {
+    animation: none;
+  }
+}
+
+/* Anchos del texto del encabezado medidos: 880 a 1010 y 278 a 390. */
+@media (max-width: 1024px) {
+  .heroContenido {
+    padding-inline: 6.4vw;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    min-height: 670px;
+  }
+
+  .heroContenido {
+    padding-inline: 14.4vw;
+  }
+}
+
+/* --- Categorías ------------------------------------------------------------ */
+
+.categorias {
+  position: relative;
+  z-index: 1;
+  padding: 10px 10px 38px;
+  /* Mismo texto que el de la píldora: 16 px en los tres anchos (medido). */
+  font-size: 16px;
+  border-radius: 0 0 var(--marca-radio) var(--marca-radio);
+  background: var(--marca-amarillo);
+}
+
+.pildoras {
+  display: flex;
+  max-width: 1240px;
+  margin: 47px auto 0;
+  padding: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px 70px;
+  list-style: none;
+}
+
+/* Ancho natural; la última fila queda centrada. */
+.pildoraCaja {
+  display: flex;
+  box-sizing: border-box;
+  max-width: 100%;
+  justify-content: center;
+}
+
+.pildora {
+  display: inline-flex;
+  min-height: 40px;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 0 26px 0 30px;
+  align-items: center;
+  gap: 24px;
+  border-radius: 30px;
+  background: #fafafa;
+  color: var(--color-texto-suave);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  text-decoration: none;
+}
+
+a.pildora:hover {
+  background: var(--color-marca);
+  color: var(--color-fondo);
+}
+
+.pildoraIcono {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.pildoraIcono svg {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 1024px) {
+  .categorias {
+    padding-bottom: 29px;
+  }
+
+  .pildoras {
+    margin-top: 40px;
+    gap: 40px 60px;
+  }
+}
+
+/* ux-9 deja ver solo la 2.ª y la 3.ª en móvil (las otras tienen `hide_mobile`). */
+@media (max-width: 767px) {
+  .pildoraCaja:nth-child(1),
+  .pildoraCaja:nth-child(n + 4) {
+    display: none;
+  }
+
+  /* Dos cajas iguales en una fila, del alto de la mayor (medido a 390). */
+  .categorias {
+    padding-bottom: 18px;
+  }
+
+  .pildoras {
+    margin-top: 27px;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .pildoraCaja {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+
+  .pildora {
+    width: 100%;
+    min-height: 65px;
+    padding: 0 14px;
+    gap: 10px;
+    font-size: 15px;
+  }
+
+  .pildoraIcono {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* --- Tarjetas ---------------------------------------------------------------- */
+
+.tarjetas {
+  --rejilla-relleno: 82px;
+  /* Asoma bajo las esquinas redondeadas del amarillo. */
+  margin-top: -50px;
+  padding: 120px 82px 144px;
+  border-radius: 0 0 var(--marca-radio) var(--marca-radio);
+  background: var(--color-fondo);
+}
+
+/* El título tiene su propio relleno (10 px), menor que el de la rejilla. */
+.tarjetas > .tituloSeccion {
+  margin-inline: calc(-1 * (var(--rejilla-relleno) - 10px));
+}
+
+.rejilla {
+  display: grid;
+  margin: 40px 0 0;
+  padding: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 10px 40px;
+  list-style: none;
+}
+
+.tarjeta {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.foto {
+  position: relative;
+  aspect-ratio: 399 / 266;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.fotoImg {
+  object-fit: cover;
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  margin: -10px 20px 0;
+  padding: 30px 20px 20px;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  border-radius: 30px;
+  background: var(--color-fondo);
+  box-shadow: 0 -4px 24px rgb(0 0 0 / 0.08);
+}
+
+/* Sin foto, el panel es la tarjeta entera. */
+.panel:not([data-con-foto]) {
+  margin: 0;
+  padding-top: 20px;
+}
+
+.tituloTarjeta {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-destacado);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.botonTarjeta {
+  display: inline-flex;
+  min-width: 145px;
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 0 25px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.botonTarjeta:hover {
+  background: var(--color-texto);
+}
+
+@media (max-width: 1024px) {
+  .tarjetas {
+    --rejilla-relleno: calc(5vw + 10px);
+    padding: 120px var(--rejilla-relleno) 101px;
+  }
+
+  .rejilla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .panel {
+    margin-inline: 18%;
+  }
+}
+
+@media (max-width: 767px) {
+  .tarjetas {
+    --rejilla-relleno: 30px;
+    padding: 120px var(--rejilla-relleno) 60px;
+  }
+
+  .rejilla {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .panel {
+    margin-inline: 30px;
+    padding: 20px 20px 12px;
+    gap: 10px;
+  }
+
+  .botonTarjeta {
+    min-width: 130px;
+    min-height: 37px;
+  }
+
+  .soloEscritorio {
+    display: none;
+  }
+}
+
+/* --- Contacto ------------------------------------------------------------------ */
+
+.contacto {
+  display: flex;
+  padding: 30px 72px 58px;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.antetitulo {
+  margin: 0;
+  color: #111;
+  font-size: var(--texto-cuerpo);
+  font-weight: 300;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.tituloContacto {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-seccion);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.formulario {
+  max-width: 1256px;
+  margin: 20px auto 0;
+  width: 100%;
+}
+
+/* El formulario común, con la piel de ux-9: etiquetas como texto de ayuda, campos en píldora. */
+.formulario form {
+  margin-top: 0;
+  font-size: 15px;
+}
+
+.formulario legend {
+  margin-bottom: 4px;
+  color: var(--color-texto);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.formulario legend span {
+  display: none;
+}
+
+.formulario fieldset {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.formulario fieldset label {
+  display: inline-flex;
+  min-height: 37px;
+  box-sizing: border-box;
+  padding: 0 20px;
+  align-items: center;
+  border: 1px solid rgb(16 15 15 / 0.45);
+  border-radius: 18px;
+  color: #302f2d;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.formulario fieldset label:has(input:checked) {
+  border-color: var(--color-marca);
+  background: var(--color-marca-tenue);
+}
+
+.formulario fieldset label:focus-within {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 2px;
+}
+
+/* El radio queda para teclado y lectores de pantalla; lo que se ve es la píldora. */
+.formulario fieldset input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Los textos de ayuda de cada campo sobran con placeholders; siguen enlazados con `aria-describedby`. */
+.formulario [id$="-ayuda"] {
+  display: none;
+}
+
+.formulario :global(.grid) {
+  column-gap: 35px;
+}
+
+/* Las etiquetas de los campos se quedan solo para lectores de pantalla: el diseño usa placeholders. */
+.formulario form > div label,
+.formulario form > div > div label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.formulario input[type="text"],
+.formulario input[type="email"],
+.formulario input[type="tel"],
+.formulario textarea {
+  width: 100%;
+  min-height: 47px;
+  box-sizing: border-box;
+  padding: 0 20px;
+  border: 1px solid rgb(16 15 15 / 0.45);
+  border-radius: 30px;
+  background: transparent;
+  color: var(--color-texto);
+  font-size: 15px;
+}
+
+.formulario textarea {
+  min-height: 98px;
+  padding-top: 14px;
+}
+
+.formulario button[type="submit"] {
+  min-height: 40px;
+  padding: 0 28px;
+  border-radius: 30px;
+  background: var(--color-marca);
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+}
+
+.formulario button[type="submit"]:hover:not(:disabled) {
+  background: var(--color-texto);
+}
+
+@media (max-width: 1024px) {
+  .contacto {
+    padding: 30px 5vw 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .contacto {
+    padding: 30px 20px 40px;
+  }
+}

@@ -6,7 +6,7 @@ import { Campo, claseControl } from "@/components/forms/Campo";
 import { Turnstile } from "@/components/forms/Turnstile";
 import { ESTADO_INICIAL } from "@/lib/actions/estadoFormulario";
 import { enviarSolicitud } from "@/lib/actions/solicitudes";
-import type { TipoSolicitud } from "@/lib/validation/solicitud";
+import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/solicitud";
 
 /**
  * Formulario de solicitud. Sirve a los tres casos (contacto, cotización de
@@ -42,7 +42,22 @@ type Props = {
   descripcion?: string;
   /** Texto del botón. Cambia según el caso: "Enviar", "Pedir cotización"… */
   textoBoton: string;
+  /**
+   * Añade las dos preguntas de clasificación opcionales («Estoy interesado
+   * en», «Quién soy»). Solo la página de marca de repuestos las usa.
+   */
+  clasificacion?: boolean;
+  /**
+   * `plano`: sin tarjeta ni margen propios y con el título solo para lectores
+   * de pantalla; la página que lo aloja pone el título visible y el marco.
+   */
+  variante?: "tarjeta" | "plano";
 };
+
+const OPCIONES = {
+  interes: { pregunta: "Estoy interesado en:", opciones: INTERESES },
+  perfil: { pregunta: "Quién soy", opciones: PERFILES },
+} as const;
 
 export function FormularioSolicitud({
   tipo,
@@ -53,11 +68,16 @@ export function FormularioSolicitud({
   titulo,
   descripcion,
   textoBoton,
+  clasificacion = false,
+  variante = "tarjeta",
 }: Props) {
   const [estado, accion, enviando] = useActionState(enviarSolicitud, ESTADO_INICIAL);
 
   const idBase = useId();
   const campo = (n: string) => `${idBase}-${n}`;
+
+  const claseSeccion = variante === "plano" ? "" : "mt-10 rounded-lg border border-gray-200 p-6";
+  const claseTitulo = variante === "plano" ? "sr-only" : "text-xl font-medium text-gray-900";
 
   const resumenRef = useRef<HTMLDivElement>(null);
   const confirmacionRef = useRef<HTMLDivElement>(null);
@@ -75,8 +95,8 @@ export function FormularioSolicitud({
 
   if (estado.estado === "ok") {
     return (
-      <section aria-labelledby={idTitulo} className="mt-10 rounded-lg border border-gray-200 p-6">
-        <h2 id={idTitulo} className="text-xl font-medium text-gray-900">
+      <section aria-labelledby={idTitulo} className={claseSeccion}>
+        <h2 id={idTitulo} className={claseTitulo}>
           {titulo}
         </h2>
         <div
@@ -110,9 +130,74 @@ export function FormularioSolicitud({
   // React restablece el formulario al terminar la acción y, sin esto, lo vaciaría.
   const previo = estado.estado === "error" ? (estado.valores ?? {}) : {};
 
+  const campoNombre = (
+    <Campo id={campo("nombre")} etiqueta="Nombre" obligatorio error={err.nombre}>
+      {(p) => (
+        <input
+          {...p}
+          name="nombre"
+          defaultValue={previo.nombre}
+          type="text"
+          autoComplete="name"
+          placeholder={variante === "plano" ? "Nombre" : undefined}
+          className={claseControl}
+        />
+      )}
+    </Campo>
+  );
+  const campoCorreo = (
+    <Campo id={campo("correo")} etiqueta="Correo" obligatorio error={err.correo}>
+      {(p) => (
+        <input
+          {...p}
+          name="correo"
+          defaultValue={previo.correo}
+          type="email"
+          autoComplete="email"
+          placeholder={variante === "plano" ? "Correo electrónico" : undefined}
+          className={claseControl}
+        />
+      )}
+    </Campo>
+  );
+  const campoTelefono = (
+    <Campo
+      id={campo("telefono")}
+      etiqueta="Teléfono"
+      error={err.telefono}
+      ayuda="Con indicativo si es fijo."
+    >
+      {(p) => (
+        <input
+          {...p}
+          name="telefono"
+          defaultValue={previo.telefono}
+          type="tel"
+          autoComplete="tel"
+          placeholder={variante === "plano" ? "Teléfono" : undefined}
+          className={claseControl}
+        />
+      )}
+    </Campo>
+  );
+  const campoEmpresa = (
+    <Campo id={campo("empresa")} etiqueta="Empresa" error={err.empresa}>
+      {(p) => (
+        <input
+          {...p}
+          name="empresa"
+          defaultValue={previo.empresa}
+          type="text"
+          autoComplete="organization"
+          className={claseControl}
+        />
+      )}
+    </Campo>
+  );
+
   return (
-    <section aria-labelledby={idTitulo} className="mt-10 rounded-lg border border-gray-200 p-6">
-      <h2 id={idTitulo} className="text-xl font-medium text-gray-900">
+    <section aria-labelledby={idTitulo} className={claseSeccion}>
+      <h2 id={idTitulo} className={claseTitulo}>
         {titulo}
       </h2>
       {descripcion ? <p className="mt-2 text-sm text-gray-600">{descripcion}</p> : null}
@@ -150,64 +235,46 @@ export function FormularioSolicitud({
           </>
         ) : null}
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Campo id={campo("nombre")} etiqueta="Nombre" obligatorio error={err.nombre}>
-            {(p) => (
-              <input
-                {...p}
-                name="nombre"
-                defaultValue={previo.nombre}
-                type="text"
-                autoComplete="name"
-                className={claseControl}
-              />
-            )}
-          </Campo>
+        {clasificacion
+          ? (["interes", "perfil"] as const).map((nombre) => (
+              <fieldset key={nombre}>
+                <legend className="block text-sm font-medium text-gray-900">
+                  {OPCIONES[nombre].pregunta}
+                  <span className="ml-1 font-normal text-gray-500">(opcional)</span>
+                </legend>
+                <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+                  {OPCIONES[nombre].opciones.map((o) => (
+                    <label key={o.valor} className="flex items-center gap-2 text-sm text-gray-800">
+                      <input
+                        type="radio"
+                        name={nombre}
+                        value={o.valor}
+                        defaultChecked={previo[nombre] === o.valor}
+                      />
+                      {o.etiqueta}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))
+          : null}
 
-          <Campo id={campo("correo")} etiqueta="Correo" obligatorio error={err.correo}>
-            {(p) => (
-              <input
-                {...p}
-                name="correo"
-                defaultValue={previo.correo}
-                type="email"
-                autoComplete="email"
-                className={claseControl}
-              />
-            )}
-          </Campo>
-
-          <Campo
-            id={campo("telefono")}
-            etiqueta="Teléfono"
-            error={err.telefono}
-            ayuda="Con indicativo si es fijo."
-          >
-            {(p) => (
-              <input
-                {...p}
-                name="telefono"
-                defaultValue={previo.telefono}
-                type="tel"
-                autoComplete="tel"
-                className={claseControl}
-              />
-            )}
-          </Campo>
-
-          <Campo id={campo("empresa")} etiqueta="Empresa" error={err.empresa}>
-            {(p) => (
-              <input
-                {...p}
-                name="empresa"
-                defaultValue={previo.empresa}
-                type="text"
-                autoComplete="organization"
-                className={claseControl}
-              />
-            )}
-          </Campo>
-        </div>
+        {clasificacion ? (
+          // Orden del diseño de ux-9: nombre y teléfono en una fila, el correo debajo.
+          // Sin «Empresa»: ahí es una opción de «Quién soy».
+          <div className="grid gap-4 sm:grid-cols-2">
+            {campoNombre}
+            {campoTelefono}
+            <div className="sm:col-span-2">{campoCorreo}</div>
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {campoNombre}
+            {campoCorreo}
+            {campoTelefono}
+            {campoEmpresa}
+          </div>
+        )}
 
         <Campo id={campo("mensaje")} etiqueta="Mensaje" obligatorio error={err.mensaje}>
           {(p) => (
@@ -216,6 +283,7 @@ export function FormularioSolicitud({
               name="mensaje"
               rows={5}
               defaultValue={previo.mensaje}
+              placeholder={variante === "plano" ? "Mensaje" : undefined}
               className={claseControl}
             />
           )}

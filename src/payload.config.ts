@@ -56,6 +56,7 @@ import { Video } from "./collections/Video";
 import { Animacion } from "./collections/Animacion";
 import { Documento } from "./collections/Documento";
 import { FichaProducto } from "./globals/FichaProducto";
+import { PaginasIndice } from "./globals/PaginasIndice";
 import { RepuestosMarca } from "./globals/RepuestosMarca";
 import { modoCorreo, opcionesTransporte } from "./lib/correo/smtp";
 import { seoConfig } from "./lib/seo/config";
@@ -236,7 +237,7 @@ export default buildConfig({
   ),
   // Globales: contenido único, no listas. El pie de todas las páginas (§13 de
   // docs/diseno/decisiones-home-ux9.md).
-  globals: sinPestanaApi([Cabecera, Pie, Seo, FichaProducto, RepuestosMarca]),
+  globals: sinPestanaApi([Cabecera, Pie, Seo, FichaProducto, RepuestosMarca, PaginasIndice]),
   editor: lexicalEditor(),
   /*
    * Panel en español (CLAUDE.md §5: textos de interfaz en español).

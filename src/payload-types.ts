@@ -141,6 +141,7 @@ export interface Config {
     seo: Seo;
     'ficha-producto': FichaProducto;
     'repuestos-marca': RepuestosMarca;
+    'paginas-indice': PaginasIndice;
   };
   globalsSelect: {
     cabecera: CabeceraSelect<false> | CabeceraSelect<true>;
@@ -148,6 +149,7 @@ export interface Config {
     seo: SeoSelect<false> | SeoSelect<true>;
     'ficha-producto': FichaProductoSelect<false> | FichaProductoSelect<true>;
     'repuestos-marca': RepuestosMarcaSelect<false> | RepuestosMarcaSelect<true>;
+    'paginas-indice': PaginasIndiceSelect<false> | PaginasIndiceSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1017,6 +1019,10 @@ export interface Pagina {
      * En bucle y sin sonido. MP4 H.264 de 8 bits, máximo 4 MB.
      */
     video?: (number | null) | Video;
+    /**
+     * Se ve solo cuando no hay vídeo. Una foto horizontal; se recorta para llenar la tarjeta.
+     */
+    imagen?: (number | null) | Media;
     /**
      * Opcional. Se abre en una ventana, desde youtube-nocookie.com, solo al pulsar.
      */
@@ -2095,6 +2101,7 @@ export interface PaginasSelect<T extends boolean = true> {
     | T
     | {
         video?: T;
+        imagen?: T;
         youtube?: T;
         titulo?: T;
         texto?: T;
@@ -2677,6 +2684,86 @@ export interface RepuestosMarca {
   createdAt?: string | null;
 }
 /**
+ * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "paginas-indice".
+ */
+export interface PaginasIndice {
+  id: number;
+  repuestos?: {
+    antetitulo?: string | null;
+    titulo?: string | null;
+    texto?: string | null;
+    /**
+     * Opcional. Foto de obra a todo el ancho; sin ella, el encabezado queda en un tono oscuro.
+     */
+    fondo?: (number | null) | Media;
+    /**
+     * Hasta seis, de tres en tres. Cada una lleva un título, la página a la que lleva y, si se quiere, una foto (sin foto, la tarjeta se pinta solo con el título).
+     */
+    tarjetas?:
+      | {
+          titulo: string;
+          /**
+           * Ruta del sitio (/…) o https://
+           */
+          enlace: string;
+          /**
+           * Opcional. Horizontal, de unos 800 × 530 píxeles.
+           */
+          imagen?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  maquinaria?: {
+    antetitulo?: string | null;
+    titulo?: string | null;
+    texto?: string | null;
+    /**
+     * Opcional. Foto de obra a todo el ancho; sin ella, el encabezado queda en un tono oscuro.
+     */
+    fondo?: (number | null) | Media;
+    /**
+     * Hasta seis, de tres en tres. Cada una lleva un título, la página a la que lleva y, si se quiere, una foto (sin foto, la tarjeta se pinta solo con el título).
+     */
+    tarjetas?:
+      | {
+          titulo: string;
+          /**
+           * Ruta del sitio (/…) o https://
+           */
+          enlace: string;
+          /**
+           * Opcional. Horizontal, de unos 800 × 530 píxeles.
+           */
+          imagen?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  contacto?: {
+    antetitulo?: string | null;
+    titulo?: string | null;
+    tituloCanales?: string | null;
+    etiquetaTelefono?: string | null;
+    etiquetaCorreo?: string | null;
+    etiquetaDireccion?: string | null;
+    tituloHorario?: string | null;
+    /**
+     * Opcional. Vertical, en una tarjeta redondeada.
+     */
+    foto?: (number | null) | Media;
+    /**
+     * Opcional. Máquina recortada (PNG o WebP con transparencia) que asoma tras las tarjetas de canales.
+     */
+    imagenDecorativa?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cabecera_select".
  */
@@ -2803,6 +2890,60 @@ export interface RepuestosMarcaSelect<T extends boolean = true> {
   contactoBoton?: T;
   testimoniosTitulo?: T;
   verVideoTexto?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "paginas-indice_select".
+ */
+export interface PaginasIndiceSelect<T extends boolean = true> {
+  repuestos?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        texto?: T;
+        fondo?: T;
+        tarjetas?:
+          | T
+          | {
+              titulo?: T;
+              enlace?: T;
+              imagen?: T;
+              id?: T;
+            };
+      };
+  maquinaria?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        texto?: T;
+        fondo?: T;
+        tarjetas?:
+          | T
+          | {
+              titulo?: T;
+              enlace?: T;
+              imagen?: T;
+              id?: T;
+            };
+      };
+  contacto?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        tituloCanales?: T;
+        etiquetaTelefono?: T;
+        etiquetaCorreo?: T;
+        etiquetaDireccion?: T;
+        tituloHorario?: T;
+        foto?: T;
+        imagenDecorativa?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

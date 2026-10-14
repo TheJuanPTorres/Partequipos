@@ -9,6 +9,7 @@ import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
 import { useMovimientoReducido, usePausa } from "@/components/movimiento/useMovimiento";
 import type { VideoYouTube } from "@/lib/fields/youtube";
+import type { ImagenLista } from "@/lib/utils/relations";
 import type { VideoCompania } from "@/lib/portada/seccionesF";
 
 import estilos from "./compania.module.css";
@@ -47,8 +48,9 @@ import { DialogoYouTube } from "./DialogoYouTube";
  *   reducido, ni vídeo ni encogido ni texto en movimiento: el póster.
  * - D21: el texto en movimiento no recibe foco (en ux-9 su primer enlace sí,
  *   y queda invisible tras el vídeo). Sigue siendo un enlace con el ratón.
- * - Sin vídeo (producción, mientras el de ux-9 siga en L3): la tarjeta se pinta
- *   en oscuro con su texto. Sin YouTube, sin botón de reproducir.
+ * - Sin vídeo: la IMAGEN de fondo de la sección, si la hay (decisión de dirección
+ *   del 2026-10-14: el contenido real de la web original no tiene vídeo); sin
+ *   imagen, la tarjeta en oscuro con su texto. Sin YouTube, sin botón de reproducir.
  */
 
 /** El recorrido fijado (el `.recorrido` del CSS suma estos 700 px). */
@@ -91,7 +93,13 @@ export type TextosCompania = {
   marquesinaEnlace: string;
 };
 
-type Props = { video: VideoCompania | null; youtube: VideoYouTube | null; textos: TextosCompania };
+type Props = {
+  video: VideoCompania | null;
+  /** Solo sin vídeo: la foto de fondo (decorativa). */
+  imagen?: ImagenLista | null;
+  youtube: VideoYouTube | null;
+  textos: TextosCompania;
+};
 
 /** La capa blanca de ux-9: entra en el primer 8 %, se apaga del 75 % al 100 %. */
 function opacidadFondo(p: number): number {
@@ -104,7 +112,7 @@ function opacidadFondo(p: number): number {
 const tramo = (p: number, desde: number, hasta: number) =>
   Math.min(1, Math.max(0, (p - desde) / (hasta - desde)));
 
-export function SeccionCompania({ video, youtube, textos }: Props) {
+export function SeccionCompania({ video, imagen = null, youtube, textos }: Props) {
   const recorrido = useRef<HTMLDivElement>(null);
   const encoge = useRef<HTMLDivElement>(null);
   const fondo = useRef<HTMLDivElement>(null);
@@ -116,6 +124,8 @@ export function SeccionCompania({ video, youtube, textos }: Props) {
   const reducido = useMovimientoReducido();
   const { pausado, alternar } = usePausa();
   const idTarjeta = useId();
+  // El póster del vídeo o, sin vídeo, la imagen de la sección.
+  const foto = video ? video.poster : imagen;
 
   // Vídeo: solo suena a la vista y si nadie lo ha pausado.
   useEffect(() => {
@@ -257,14 +267,14 @@ export function SeccionCompania({ video, youtube, textos }: Props) {
           </div>
           <div ref={encoge} className={estilos.encoge}>
             <div ref={tarjeta} id={idTarjeta} className={estilos.tarjeta}>
-              {video?.poster ? (
+              {foto ? (
                 <Image
-                  src={video.poster.url}
+                  src={foto.url}
                   alt=""
                   fill
                   sizes="100vw"
                   className={estilos.medio}
-                  style={{ objectPosition: video.poster.posicion }}
+                  style={{ objectPosition: foto.posicion }}
                 />
               ) : null}
               {video ? (

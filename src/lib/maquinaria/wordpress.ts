@@ -182,7 +182,7 @@ export function pesoOperativoKg(pares: Par[]): number | null {
   const m = fila.valor.match(/(\d[\d.,]*)\s*(t|ton|toneladas|kg|lb|lbs)\b/i);
   if (!m) return null;
   const unidad = m[2]!.toLowerCase();
-  const numero = numeroEs(m[1]!, unidad.startsWith("t"));
+  const numero = unidad.startsWith("t") ? numeroEs(m[1]!, true) : numeroEnteroEs(m[1]!);
   if (numero === null) return null;
   const kg = unidad.startsWith("t")
     ? numero * 1000
@@ -203,6 +203,18 @@ function numeroEs(texto: string, toneladas: boolean): number | null {
   t = t.replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", ".");
   const n = Number(t);
   return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Cantidad en kg o lb: en las fichas de WordPress el separador de miles es
+ * el punto o la COMA, indistintamente («31.134 kg», «1,700kg»). Solo vale un
+ * número entero con grupos de 3 cifras; cualquier otra cosa («20,4000kg»,
+ * «14,3 kg») es ambigua y da `null`: nunca se adivina.
+ */
+function numeroEnteroEs(texto: string): number | null {
+  const t = texto.replace(/[.,]$/, "");
+  if (!/^\d{1,3}([.,]\d{3})*$/.test(t) && !/^\d+$/.test(t)) return null;
+  return Number(t.replace(/[.,]/g, ""));
 }
 
 /** Los enlaces (`href`) de un trozo de HTML, en orden y sin repetir. */

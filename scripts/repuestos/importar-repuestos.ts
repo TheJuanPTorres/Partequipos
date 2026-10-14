@@ -1,18 +1,25 @@
 /**
  * Importación del catálogo de REPUESTOS de WordPress (marcas, tipos y modelos)
- * a `marcas`, `tipos-equipo` y `modelos-repuesto`, con la foto de cada modelo
- * en `Media`. Detalle y decisiones: `docs/repuestos-importacion.md`.
+ * a `marcas`, `tipos-equipo` y `modelos-repuesto`, como DATOS, con el logo de
+ * cada marca en `Media`. Mismo método que los usados: simulación,
+ * idempotencia, manifiesto y retirada exacta. Detalle y decisiones:
+ * `docs/repuestos-importacion.md`.
  *
  *   npm run preview:repuestos:simular           # sin escribir en la base ni en el Blob
- *   npm run preview:repuestos:simular -- fotos  # además, comprueba las fotos en WordPress
- *                                               # y convierte las AVIF en memoria
+ *   npm run preview:repuestos:simular -- fotos  # además, comprueba en WordPress las fotos
+ *                                               # de los modelos y convierte las AVIF en memoria
+ *   npm run preview:repuestos:importar          # escribe en el preview
+ *   npm run preview:repuestos:retirar           # deshace lo del manifiesto
  *
- * SOLO SIMULACIÓN (dirección, 2026-10-13): los almacenes del Blob están
- * bloqueados por el límite de operaciones del plan Hobby. Este script no
- * escribe en la base ni en el Blob: lee la base del preview para saber qué
- * crearía y qué actualizaría, y cuenta las subidas que supondría. La
- * importación real se añade cuando dirección confirme el plan Pro y el
- * almacén desbloqueado.
+ * LAS FOTOS DE LOS MODELOS NO SE IMPORTAN (dirección, 2026-10-13): los
+ * modelos son enlaces dentro de su tipo; las fotos, solo si el cliente
+ * confirma que tendrán página propia. La simulación las sigue contando.
+ *
+ * ANTES DE IMPORTAR se retiran de la demo del preview los tipos y modelos que
+ * no existen en WordPress (2 tipos y 25 modelos, dirección, 2026-10-13): 21
+ * de esos modelos tienen el slug de un modelo real y quedarían duplicados bajo
+ * el tipo equivocado. Sus datos quedan en el manifiesto; la retirada de la
+ * importación NO los vuelve a crear.
  *
  * Doble cierre en la simulación: tras validar el destino se vacía el token del
  * Blob (la guarda `almacenEsperado` de `Media` rechazaría cualquier subida) y
@@ -21,8 +28,10 @@
  * FUENTE: el JSON que saca `scripts/repuestos/extraer-xml.py` de la
  * exportación XML, FUERA del repositorio
  * (`Desktop/partequipos-cierre/repuestos-wordpress.json`, o `fuente=<ruta>`).
- * El informe de la simulación se guarda junto a ella
- * (`simulacion-repuestos.json`).
+ * El informe y el manifiesto se guardan en `Desktop/partequipos-cierre/`.
+ *
+ * DESTINO: solo el preview, validado antes de cargar Payload. La carga en
+ * producción irá por runbook de dirección.
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -30,18 +39,24 @@ import path from "node:path";
 
 import { getPayload } from "payload";
 
+import { exigirAlmacen } from "../blob/exigirAlmacen";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
+import { normalizarRuta } from "../../src/lib/redirects/normalizar";
+import { formatSlug } from "../../src/lib/utils/formatSlug";
 import {
   altDeRepuesto,
   codigoDeModelo,
   descripcionSeo,
   esBorradorCopia,
   fotoDeRepuesto,
+  ficheroDeLogo,
   fotosGenericas,
+  LOGOS_DE_MARCA,
   nivelDePagina,
   nombreDeModelo,
   nombreDeTipo,
   pareceDatoDeContacto,
+  rutaMadre,
   textoDePagina,
   tituloPorDefectoModelo,
   tituloSeo,
@@ -61,20 +76,22 @@ const fallar = (m: string): never => {
   e.stack = e.message;
   throw e;
 };
-if (modo !== "simular") {
-  fallar(
-    "solo existe el modo «simular»: el Blob está bloqueado por el límite del plan y la importación real espera la confirmación de dirección",
-  );
-}
+if (!modo) fallar("indica el modo: simular, importar o retirar");
 if (!destino) fallar("indica el destino: preview");
 const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
 if (!v.permitido) fallar(`NO se hace nada: ${v.motivo}`);
-// Simulación: sin token, nada puede llegar al Blob.
-process.env.BLOB_READ_WRITE_TOKEN = "";
+if (modo === "simular") {
+  // Simulación: sin token, nada puede llegar al Blob.
+  process.env.BLOB_READ_WRITE_TOKEN = "";
+} else {
+  exigirAlmacen("[repuestos]");
+}
 
 const CIERRE = path.join(os.homedir(), "Desktop", "partequipos-cierre");
 const FUENTE = valorDe("fuente") ?? path.join(CIERRE, "repuestos-wordpress.json");
-const INFORME = path.join(path.dirname(FUENTE), "simulacion-repuestos.json");
+const INFORME = path.join(CIERRE, `${modo}-repuestos-${destino}.json`);
+const MANIFIESTO =
+  valorDe("manifiesto") ?? path.join(CIERRE, `manifiesto-repuestos-${destino}.json`);
 const COMPROBAR_FOTOS = args.includes("fotos");
 /** Marcas sin modelos que van por 301 al índice de marcas (dirección, 2026-10-13; pendiente del cliente). */
 const MARCAS_A_REDIRIGIR = [
@@ -87,12 +104,122 @@ process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 const { default: config } = await import("../../src/payload.config");
 const payload = await getPayload({ config });
-for (const op of ["create", "update", "delete", "updateGlobal"] as const) {
-  (payload as unknown as Record<string, unknown>)[op] = () =>
-    fallar(`simulación: «${op}» no está permitido`);
+if (modo === "simular") {
+  for (const op of ["create", "update", "delete", "updateGlobal"] as const) {
+    (payload as unknown as Record<string, unknown>)[op] = () =>
+      fallar(`simulación: «${op}» no está permitido`);
+  }
 }
 
 const log = (m: string) => process.stdout.write(`[repuestos] ${m}\n`);
+
+// ---------- Manifiesto ----------
+
+type Coleccion = "marcas" | "tipos-equipo" | "modelos-repuesto";
+type Fichero = { id: number; filename: string; url: string };
+type Manifiesto = {
+  destino: string;
+  creado: {
+    marcas: { clave: string; id: number }[];
+    tipos: { clave: string; id: number }[];
+    modelos: { clave: string; id: number }[];
+    redirects: { desde: string; id: number }[];
+    media: Fichero[];
+  };
+  /** Lo que ya existía y la importación cambió: sus valores ANTES, para devolverlos al retirar. */
+  actualizado: { coleccion: Coleccion; id: number; antes: Record<string, unknown> }[];
+  /** La demo retirada antes de importar (no vuelve al retirar la importación). */
+  retiradoDeLaDemo: { coleccion: Coleccion; id: number; datos: Record<string, unknown> }[];
+};
+const manifiesto: Manifiesto = fs.existsSync(MANIFIESTO)
+  ? (JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto)
+  : {
+      destino: destino!,
+      creado: { marcas: [], tipos: [], modelos: [], redirects: [], media: [] },
+      actualizado: [],
+      retiradoDeLaDemo: [],
+    };
+if (manifiesto.destino !== destino) {
+  fallar(`el manifiesto ${MANIFIESTO} es del destino «${manifiesto.destino}», no de «${destino}»`);
+}
+function guardarManifiesto() {
+  if (modo !== "importar") return;
+  fs.mkdirSync(path.dirname(MANIFIESTO), { recursive: true });
+  fs.writeFileSync(MANIFIESTO, JSON.stringify(manifiesto, null, 2));
+}
+
+// ---------- Retirada ----------
+
+/**
+ * Deshace EXACTAMENTE lo que apunta el manifiesto: borra lo que creó la
+ * importación y devuelve lo que actualizó a sus valores de antes. Comprueba
+ * que los logos salen del Blob. La demo retirada antes de importar no se
+ * vuelve a crear.
+ */
+async function retirar(): Promise<void> {
+  if (!fs.existsSync(MANIFIESTO)) fallar(`no hay manifiesto (${MANIFIESTO}): nada que retirar`);
+  const borrar = async (collection: Coleccion | "redirects" | "media", ids: number[]) => {
+    let n = 0;
+    for (const id of ids) {
+      const hecho = await payload
+        .delete({ collection, id, overrideAccess: true })
+        .catch(() => null);
+      if (hecho) n++;
+    }
+    log(`${collection}: creados y borrados ${n} de ${ids.length}`);
+  };
+  await borrar(
+    "modelos-repuesto",
+    manifiesto.creado.modelos.map((x) => x.id),
+  );
+  // Lo actualizado vuelve a su estado ANTES de borrar los tipos y las marcas
+  // creados: un registro actualizado puede apuntar a uno de ellos.
+  let devueltos = 0;
+  for (const a of manifiesto.actualizado) {
+    const hecho = await payload
+      .update({ collection: a.coleccion, id: a.id, data: a.antes as never, overrideAccess: true })
+      .catch((e: Error) => log(`no se pudo devolver ${a.coleccion} ${a.id}: ${e.message}`));
+    if (hecho) devueltos++;
+  }
+  log(`actualizados devueltos a como estaban: ${devueltos} de ${manifiesto.actualizado.length}`);
+  await borrar(
+    "tipos-equipo",
+    manifiesto.creado.tipos.map((x) => x.id),
+  );
+  await borrar(
+    "marcas",
+    manifiesto.creado.marcas.map((x) => x.id),
+  );
+  await borrar(
+    "redirects",
+    manifiesto.creado.redirects.map((x) => x.id),
+  );
+  const urls = manifiesto.creado.media.map((m) => m.url).filter(Boolean);
+  await borrar(
+    "media",
+    manifiesto.creado.media.map((m) => m.id),
+  );
+  fs.renameSync(MANIFIESTO, MANIFIESTO.replace(/\.json$/, `.retirado-${Date.now()}.json`));
+  if (!urls.length) return;
+  log("manifiesto retirado; espero 70 s (propagación del Blob)");
+  await new Promise((r) => setTimeout(r, 70_000));
+  let vivos = [...urls];
+  for (let intento = 0; ; intento++) {
+    const quedan: string[] = [];
+    for (const u of vivos) if ((await fetch(u, { method: "HEAD" })).status !== 404) quedan.push(u);
+    vivos = quedan;
+    if (!vivos.length || intento === 3) break;
+    log(`${vivos.length} ficheros aún responden; vuelvo a mirar en 30 s`);
+    await new Promise((r) => setTimeout(r, 30_000));
+  }
+  if (vivos.length) fallar(`${vivos.length} ficheros siguen en el Blob: ${vivos.join(" ")}`);
+  log(`✓ los ${urls.length} ficheros dan 404`);
+}
+
+if (modo === "retirar") {
+  await retirar();
+  process.exit(0);
+}
 
 // ---------- Fuentes ----------
 
@@ -131,7 +258,8 @@ const conNivel = paginas.map((p) => ({ ...p, nivel: nivelDePagina(p.segmentos) }
 const modelosWp = conNivel.filter((p) => p.nivel === "modelo");
 const genericas = fotosGenericas(modelosWp);
 
-type PlanMarca = { slug: string; nombre: string; descripcion: string | null; fotosWp: number };
+type PlanLogo = { idWp: number; url: string; fichero: string; alt: string };
+type PlanMarca = { slug: string; nombre: string; descripcion: string | null; logo: PlanLogo };
 type PlanTipo = {
   marca: string;
   slug: string;
@@ -163,7 +291,18 @@ for (const p of conNivel.filter((x) => x.nivel === "marca")) {
     avisos.push(`marca ${slug}: no está en el inventario; se omite`);
     continue;
   }
-  marcas.push({ slug, nombre, descripcion: textoDePagina(p.texto), fotosWp: p.fotos.length });
+  const logo = LOGOS_DE_MARCA[slug] ?? fallar(`marca ${slug}: no tiene logo en LOGOS_DE_MARCA`);
+  marcas.push({
+    slug,
+    nombre,
+    descripcion: textoDePagina(p.texto),
+    logo: {
+      idWp: logo.idWp,
+      url: `https://partequipos.com/wp-content/uploads/${logo.archivo}`,
+      fichero: ficheroDeLogo(logo.idWp, nombre),
+      alt: `Logo de ${nombre}`,
+    },
+  });
 }
 // Todo lo que cuelga de una marca redirigida (su página, sus tipos) va al índice de marcas.
 for (const p of conNivel) {
@@ -198,10 +337,25 @@ const tipoPorClave = new Map(tipos.map((t) => [`${t.marca}/${t.slug}`, t]));
 
 const modelos: PlanModelo[] = [];
 const borradores: string[] = [];
+/**
+ * Slugs que el campo `slug` no puede guardar tal cual («…-d6k_»): `formatSlug`
+ * quitaría el guion bajo y la URL cambiaría, y eso exige aprobación (§3.3).
+ * Quedan PENDIENTES de dirección y no se importan.
+ */
+const slugsPendientes: { clave: string; ruta: string; seGuardariaComo: string }[] = [];
 for (const p of modelosWp) {
   const [mSlug = "", tSlug = "", slug = ""] = p.segmentos ?? [];
   if (esBorradorCopia(slug)) {
     borradores.push(p.ruta);
+    continue;
+  }
+  if (formatSlug(slug) !== slug) {
+    slugsPendientes.push({
+      clave: `${mSlug}/${tSlug}/${slug}`,
+      ruta: p.ruta,
+      seGuardariaComo: formatSlug(slug),
+    });
+    avisos.push(`modelo ${slug}: el slug no se puede guardar tal cual; PENDIENTE de dirección`);
     continue;
   }
   const marca = marcaPorSlug.get(mSlug);
@@ -258,20 +412,44 @@ for (const p of modelosWp) {
   });
 }
 const sinRuta = conNivel.filter((p) => p.nivel === "sinRuta").map((p) => p.ruta);
+// Las 4 de CASE con un nivel de más: 301 a su página madre, que sí se migra (dirección, 2026-10-13).
+for (const ruta of sinRuta) redirecciones.push({ origen: ruta, destino: rutaMadre(ruta) });
 
 // ---------- Lo que ya hay en el preview (solo lectura) ----------
 
 const todo = async <T>(collection: "marcas" | "tipos-equipo" | "modelos-repuesto" | "media") =>
   (await payload.find({ collection, depth: 0, pagination: false, overrideAccess: true }))
     .docs as unknown as T[];
-const enMarcas = await todo<{ id: number; slug: string; logo?: number | null }>("marcas");
-const enTipos = await todo<{ id: number; slug: string; marca: number }>("tipos-equipo");
-const enModelos = await todo<{
+type Seo = { metaTitle?: string | null; metaDescription?: string | null; ogImage?: unknown };
+type DocMarca = {
   id: number;
   slug: string;
+  nombre: string;
+  descripcion?: string | null;
+  logo?: number | null;
+};
+type DocTipo = {
+  id: number;
+  slug: string;
+  marca: number;
+  nombre: string;
+  descripcion?: string | null;
+  seo?: Seo | null;
+};
+type DocModelo = {
+  id: number;
+  slug: string;
+  marca: number;
   tipo: number;
+  nombre: string;
+  codigo?: string | null;
+  descripcion?: string | null;
+  seo?: Seo | null;
   imagenes?: number[] | null;
-}>("modelos-repuesto");
+};
+const enMarcas = await todo<DocMarca>("marcas");
+const enTipos = await todo<DocTipo>("tipos-equipo");
+const enModelos = await todo<DocModelo>("modelos-repuesto");
 const enMedia = await todo<{ id: number; filename?: string | null }>("media");
 
 const idMarca = new Map(enMarcas.map((m) => [m.slug, m.id]));
@@ -307,12 +485,27 @@ const wp = {
 };
 const demoMarcas = enMarcas.filter((m) => !wp.marcas.has(m.slug)).map((m) => m.slug);
 const demoTipos = enTipos.filter((t) => !wp.tipos.has(claveWpTipo(t))).map(claveWpTipo);
-const demoModelos = enModelos.filter((m) => !wp.modelos.has(`${tipoDe.get(m.tipo)}/${m.slug}`));
+// Lo que creó esta importación nunca es demo (p. ej. un modelo de slug pendiente que se quita aparte).
+const creadosAqui = new Set(manifiesto.creado.modelos.map((x) => x.id));
+const demoModelos = enModelos.filter(
+  (m) => !creadosAqui.has(m.id) && !wp.modelos.has(`${tipoDe.get(m.tipo)}/${m.slug}`),
+);
 const demoModelosConSlugDeWp = demoModelos.filter((m) =>
   modelos.some((x) => x.slug === m.slug),
 ).length;
 
-// ---------- Subidas al Blob que supondría ----------
+// ---------- Subidas al Blob ----------
+
+// Logos (lo único que se sube): uno por marca, por id de adjunto.
+const logosYa = new Set(
+  enMedia
+    .map((m) => m.filename?.match(/^wp-logo-(\d+)-/)?.[1])
+    .filter(Boolean)
+    .map(Number),
+);
+const logosASubir = marcas.filter((m) => !logosYa.has(m.logo.idWp));
+
+// Fotos de los modelos: NO se importan; se cuentan por si el cliente las confirma.
 
 // Una foto compartida por dos modelos se sube una vez (nombre por id de adjunto).
 const fotosUnicas = new Map<number, PlanFoto>();
@@ -401,6 +594,7 @@ const resumen = {
     borradoresCopia: borradores.length,
     sinRutaEnElSitioNuevo: sinRuta.length,
     redirecciones301: redirecciones.length,
+    slugsPendientesDeDireccion: slugsPendientes.length,
     fotosGenericas: [...genericas],
   },
   enElPreview: {
@@ -414,12 +608,16 @@ const resumen = {
       modelosConSlugDeWpEnOtroTipo: demoModelosConSlugDeWp,
     },
   },
+  retiradaDeLaDemo: { tipos: demoTipos.length, modelos: demoModelos.length },
   blob: {
-    subidas: aSubir.length,
+    subidasDeLogos: logosASubir.length,
+    logosYaSubidos: marcas.length - logosASubir.length,
+    otrasOperaciones: 0,
+  },
+  fotosDeModelosNoSeImportan: {
+    serian: aSubir.length,
     porFormatoDeOrigen: porFormato(aSubir),
     aConvertirAWebp: aSubir.filter((f) => f.convertir).length,
-    yaSubidas: fotosUnicas.size - aSubir.length,
-    otrasOperaciones: 0,
   },
   comprobacionFotos: COMPROBAR_FOTOS
     ? { comprobadas: aSubir.length, fallos: comprobacion.fallos.length }
@@ -428,7 +626,18 @@ const resumen = {
 fs.writeFileSync(
   INFORME,
   JSON.stringify(
-    { resumen, avisos, redirecciones, sinRuta, borradores, comprobacion, marcas, tipos, modelos },
+    {
+      resumen,
+      avisos,
+      redirecciones,
+      sinRuta,
+      borradores,
+      slugsPendientes,
+      comprobacion,
+      marcas,
+      tipos,
+      modelos,
+    },
     null,
     1,
   ),
@@ -440,7 +649,9 @@ log(`tipos: ${JSON.stringify(resumen.tipos)}`);
 log(`modelos: ${JSON.stringify(resumen.modelos)}`);
 log(`no se importan: ${JSON.stringify({ ...resumen.noSeImportan })}`);
 log(`en el preview: ${JSON.stringify(resumen.enElPreview)}`);
+log(`retirada de la demo: ${JSON.stringify(resumen.retiradaDeLaDemo)}`);
 log(`BLOB: ${JSON.stringify(resumen.blob)}`);
+log(`fotos de modelos (NO se importan): ${JSON.stringify(resumen.fotosDeModelosNoSeImportan)}`);
 log(`fotos: ${JSON.stringify(resumen.comprobacionFotos)}`);
 for (const f of comprobacion.fallos) log(`foto ${f.idWp}: ${f.error}`);
 log(`avisos: ${avisos.length} (en el informe)`);
@@ -448,5 +659,281 @@ for (const m of modelos.slice(0, 3)) {
   log(`ejemplo: «${m.nombre}» · código ${m.codigo ?? "—"} · ${m.foto?.fichero ?? m.motivoSinFoto}`);
 }
 log(`informe: ${INFORME}`);
-log("simulación terminada: no se ha escrito nada en la base ni en el Blob");
+if (modo === "simular") {
+  log("simulación terminada: no se ha escrito nada en la base ni en el Blob");
+  process.exit(0);
+}
+
+// ---------- Importación ----------
+
+const AGENTE = "Partequipos-migracion/1.0 (importador de repuestos; solo lectura)";
+const recordarAntes = (coleccion: Coleccion, id: number, antes: Record<string, unknown>) => {
+  // Solo la PRIMERA vez: una segunda ejecución no pisa el estado original.
+  if (manifiesto.actualizado.some((a) => a.coleccion === coleccion && a.id === id)) return;
+  if (manifiesto.creado.marcas.some((x) => x.id === id) && coleccion === "marcas") return;
+  if (manifiesto.creado.tipos.some((x) => x.id === id) && coleccion === "tipos-equipo") return;
+  if (manifiesto.creado.modelos.some((x) => x.id === id) && coleccion === "modelos-repuesto")
+    return;
+  manifiesto.actualizado.push({ coleccion, id, antes });
+  guardarManifiesto();
+};
+const seoDe = (doc: { seo?: Seo | null } | undefined) => ({
+  metaTitle: doc?.seo?.metaTitle ?? null,
+  metaDescription: doc?.seo?.metaDescription ?? null,
+});
+
+// 1. La demo que no existe en WordPress, fuera (dirección, 2026-10-13).
+// Dirección aprobó retirar 2 tipos y 25 modelos (simulación del 2026-10-13). Si el preview ha
+// cambiado y salen otros números, se para: hay que volver a simular y a preguntar.
+const aprobado = (tiposN: number, modelosN: number) =>
+  (tiposN === 2 && modelosN === 25) || (tiposN === 0 && modelosN === 0);
+if (!aprobado(demoTipos.length, demoModelos.length)) {
+  fallar(
+    `la demo a retirar no es la aprobada (2 tipos y 25 modelos): salen ${demoTipos.length} y ${demoModelos.length}`,
+  );
+}
+const idsDemoModelos = demoModelos.map((m) => m.id);
+if (idsDemoModelos.length) {
+  const conSolicitud = await payload.find({
+    collection: "solicitudes",
+    where: {
+      and: [
+        { "referencia.relationTo": { equals: "modelos-repuesto" } },
+        { "referencia.value": { in: idsDemoModelos } },
+      ],
+    },
+    depth: 0,
+    limit: 1,
+    overrideAccess: true,
+  });
+  if (conSolicitud.totalDocs) {
+    fallar(`hay solicitudes que apuntan a modelos de la demo a retirar: no se hace nada`);
+  }
+}
+for (const m of demoModelos) {
+  await payload.delete({ collection: "modelos-repuesto", id: m.id, overrideAccess: true });
+  manifiesto.retiradoDeLaDemo.push({ coleccion: "modelos-repuesto", id: m.id, datos: m });
+  guardarManifiesto();
+}
+const tiposDemo = enTipos.filter((t) => !wp.tipos.has(claveWpTipo(t)));
+for (const t of tiposDemo) {
+  const quedan = await payload.count({
+    collection: "modelos-repuesto",
+    where: { tipo: { equals: t.id } },
+    overrideAccess: true,
+  });
+  if (quedan.totalDocs) fallar(`el tipo de la demo ${t.slug} aún tiene modelos: no se borra`);
+  await payload.delete({ collection: "tipos-equipo", id: t.id, overrideAccess: true });
+  manifiesto.retiradoDeLaDemo.push({ coleccion: "tipos-equipo", id: t.id, datos: t });
+  guardarManifiesto();
+}
+log(`demo retirada: ${tiposDemo.length} tipos y ${demoModelos.length} modelos`);
+
+// 2. Logos (lo único que va al Blob).
+let ultima = 0;
+async function descargar(url: string): Promise<Buffer> {
+  const espera = ultima + 700 - Date.now();
+  if (espera > 0) await new Promise((r) => setTimeout(r, espera));
+  ultima = Date.now();
+  const r = await fetch(url, { headers: { "User-Agent": AGENTE } });
+  if (!r.ok) fallar(`no se puede descargar ${url}: HTTP ${r.status}`);
+  return Buffer.from(await r.arrayBuffer());
+}
+async function logoEnMedia(l: PlanLogo): Promise<number> {
+  const prefijo = `wp-logo-${l.idWp}-`;
+  const ya = await payload.find({
+    collection: "media",
+    where: { filename: { contains: prefijo } },
+    sort: "createdAt",
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+  });
+  const existente = ya.docs.find((d) => d.filename?.toLowerCase().startsWith(prefijo));
+  if (existente) return existente.id;
+  const datos = await descargar(l.url);
+  const doc = await payload.create({
+    collection: "media",
+    data: { alt: l.alt, focalX: 50, focalY: 50 },
+    file: { data: datos, mimetype: "image/png", name: l.fichero, size: datos.length },
+    overrideAccess: true,
+  });
+  const guardado = await payload.findByID({
+    collection: "media",
+    id: doc.id,
+    depth: 0,
+    overrideAccess: true,
+  });
+  manifiesto.creado.media.push({
+    id: doc.id,
+    filename: guardado.filename ?? l.fichero,
+    url: guardado.url ?? "",
+  });
+  guardarManifiesto();
+  return doc.id;
+}
+
+// 3. Marcas.
+const idMarcaFinal = new Map<string, number>();
+for (const m of marcas) {
+  const logo = await logoEnMedia(m.logo);
+  const data = { nombre: m.nombre, slug: m.slug, descripcion: m.descripcion, logo };
+  const doc = enMarcas.find((x) => x.slug === m.slug);
+  if (doc) {
+    recordarAntes("marcas", doc.id, {
+      nombre: doc.nombre,
+      descripcion: doc.descripcion ?? null,
+      logo: doc.logo ?? null,
+    });
+    await payload.update({ collection: "marcas", id: doc.id, data, overrideAccess: true });
+    idMarcaFinal.set(m.slug, doc.id);
+  } else {
+    const creado = await payload.create({ collection: "marcas", data, overrideAccess: true });
+    manifiesto.creado.marcas.push({ clave: m.slug, id: creado.id });
+    guardarManifiesto();
+    idMarcaFinal.set(m.slug, creado.id);
+  }
+}
+log(`marcas: ${marcas.length} (logos subidos: ${manifiesto.creado.media.length})`);
+
+// 4. Tipos (por marca + slug, el índice único).
+const idTipoFinal = new Map<string, number>();
+const tiposAhora = (
+  await payload.find({
+    collection: "tipos-equipo",
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+  })
+).docs as unknown as DocTipo[];
+for (const t of tipos) {
+  const marca = idMarcaFinal.get(t.marca)!;
+  const doc = tiposAhora.find((x) => x.marca === marca && x.slug === t.slug);
+  const data = {
+    nombre: t.nombre,
+    slug: t.slug,
+    marca,
+    descripcion: t.descripcion,
+    seo: { ...(doc?.seo ?? {}), ...t.seo },
+  };
+  if (doc) {
+    recordarAntes("tipos-equipo", doc.id, {
+      nombre: doc.nombre,
+      descripcion: doc.descripcion ?? null,
+      seo: { ...(doc.seo ?? {}), ...seoDe(doc) },
+    });
+    await payload.update({
+      collection: "tipos-equipo",
+      id: doc.id,
+      data: data as never,
+      overrideAccess: true,
+    });
+    idTipoFinal.set(`${t.marca}/${t.slug}`, doc.id);
+  } else {
+    const creado = await payload.create({
+      collection: "tipos-equipo",
+      data: data as never,
+      overrideAccess: true,
+    });
+    manifiesto.creado.tipos.push({ clave: `${t.marca}/${t.slug}`, id: creado.id });
+    guardarManifiesto();
+    idTipoFinal.set(`${t.marca}/${t.slug}`, creado.id);
+  }
+}
+log(`tipos: ${tipos.length}`);
+
+// Los de slug pendiente que una ejecución anterior llegó a crear (con el slug
+// ya cambiado por `formatSlug`) se quitan: su URL no es la de WordPress.
+for (const pendiente of slugsPendientes) {
+  const creado = manifiesto.creado.modelos.find((x) => x.clave === pendiente.clave);
+  if (!creado) continue;
+  await payload.delete({ collection: "modelos-repuesto", id: creado.id, overrideAccess: true });
+  manifiesto.creado.modelos = manifiesto.creado.modelos.filter((x) => x !== creado);
+  guardarManifiesto();
+  log(`quitado el modelo ${creado.id}: se creó como «${pendiente.seGuardariaComo}», no con su URL`);
+}
+
+// 5. Modelos (por tipo + slug, el índice único). Sin fotos.
+const modelosAhora = (
+  await payload.find({
+    collection: "modelos-repuesto",
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+  })
+).docs as unknown as DocModelo[];
+let hechos = 0;
+for (const m of modelos) {
+  const marca = idMarcaFinal.get(m.marca)!;
+  const tipo = idTipoFinal.get(`${m.marca}/${m.tipo}`)!;
+  const doc = modelosAhora.find((x) => x.tipo === tipo && x.slug === m.slug);
+  const data = {
+    nombre: m.nombre,
+    slug: m.slug,
+    marca,
+    tipo,
+    codigo: m.codigo,
+    descripcion: m.descripcion,
+    seo: { ...(doc?.seo ?? {}), ...m.seo },
+  };
+  const clave = `${m.marca}/${m.tipo}/${m.slug}`;
+  if (doc) {
+    recordarAntes("modelos-repuesto", doc.id, {
+      nombre: doc.nombre,
+      codigo: doc.codigo ?? null,
+      descripcion: doc.descripcion ?? null,
+      seo: { ...(doc.seo ?? {}), ...seoDe(doc) },
+    });
+    await payload.update({
+      collection: "modelos-repuesto",
+      id: doc.id,
+      data: data as never,
+      overrideAccess: true,
+    });
+  } else {
+    const creado = await payload.create({
+      collection: "modelos-repuesto",
+      data: data as never,
+      overrideAccess: true,
+    });
+    manifiesto.creado.modelos.push({ clave, id: creado.id });
+    guardarManifiesto();
+  }
+  if (++hechos % 50 === 0) log(`modelos: ${hechos} de ${modelos.length}`);
+}
+log(`modelos: ${modelos.length}`);
+
+// 6. Redirecciones 301 (Ammann y PES al índice de marcas; las 4 de CASE a su página madre).
+for (const r of redirecciones) {
+  const desde = normalizarRuta(r.origen);
+  const ya = await payload.find({
+    collection: "redirects",
+    where: { desde: { equals: desde } },
+    depth: 0,
+    limit: 1,
+    overrideAccess: true,
+  });
+  if (ya.docs[0]) {
+    log(`redirección ya existente, no se toca: ${desde}`);
+    continue;
+  }
+  const creado = await payload.create({
+    collection: "redirects",
+    data: {
+      desde,
+      hacia: r.destino,
+      tipo: "301",
+      origen: "migracion",
+      notas: "Importación de repuestos de WordPress (2026-10-13).",
+    },
+    overrideAccess: true,
+  });
+  manifiesto.creado.redirects.push({ desde, id: creado.id });
+  guardarManifiesto();
+}
+log(`redirecciones: ${manifiesto.creado.redirects.length} creadas`);
+log(
+  `importación terminada · creados: ${manifiesto.creado.marcas.length} marcas, ${manifiesto.creado.tipos.length} tipos, ${manifiesto.creado.modelos.length} modelos, ${manifiesto.creado.media.length} logos · actualizados: ${manifiesto.actualizado.length} · demo retirada: ${manifiesto.retiradoDeLaDemo.length}`,
+);
+log(`manifiesto: ${MANIFIESTO}`);
 process.exit(0);

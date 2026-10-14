@@ -91,6 +91,35 @@ export const Solicitud: CollectionConfig = {
     { name: "correo", type: "email", required: true, label: "Correo" },
     { name: "telefono", type: "text", label: "Teléfono" },
     { name: "empresa", type: "text", label: "Empresa" },
+    /*
+     * Clasificación opcional del formulario de la página de marca de repuestos
+     * (ux-9). Solo estos dos campos y solo de elección cerrada: ningún dato
+     * personal nuevo. Los demás formularios no los envían.
+     */
+    {
+      name: "interes",
+      type: "select",
+      label: "Interesado en",
+      options: [
+        { label: "Cotizar productos", value: "cotizar" },
+        { label: "Muestras / prototipos", value: "muestras" },
+        { label: "Asesoría general", value: "asesoria" },
+        { label: "Otro", value: "otro" },
+      ],
+    },
+    {
+      name: "perfil",
+      type: "select",
+      label: "Perfil",
+      options: [
+        { label: "Empresa", value: "empresa" },
+        { label: "Comprador", value: "comprador" },
+        { label: "Emprendedor", value: "emprendedor" },
+        { label: "Proveedor", value: "proveedor" },
+        { label: "Empleado", value: "empleado" },
+        { label: "Otro", value: "otro" },
+      ],
+    },
     { name: "mensaje", type: "textarea", required: true, label: "Mensaje" },
 
     /*

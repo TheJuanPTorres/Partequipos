@@ -58,6 +58,19 @@ export const TipoEquipo: CollectionConfig = {
       type: "textarea",
       label: "Descripción",
     },
+    /*
+     * Foto de la tarjeta «Repuestos según tipo de máquina» de la página de la
+     * marca. Opcional: sin ella la tarjeta se pinta solo con el título.
+     */
+    {
+      name: "imagen",
+      type: "upload",
+      relationTo: "media",
+      label: "Imagen de la tarjeta",
+      admin: {
+        description: "Opcional. Foto del tipo de máquina para la tarjeta de la página de la marca.",
+      },
+    },
     seoField(),
   ],
 };

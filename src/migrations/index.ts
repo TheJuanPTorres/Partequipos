@@ -26,6 +26,7 @@ import * as migration_20261004_205655_imagen_social from './20261004_205655_imag
 import * as migration_20261005_142945_ficha_producto from './20261005_142945_ficha_producto';
 import * as migration_20261006_024440_imagen_acceso from './20261006_024440_imagen_acceso';
 import * as migration_20261006_224101_ultimo_editor from './20261006_224101_ultimo_editor';
+import * as migration_20261014_004138_repuestos_marca from './20261014_004138_repuestos_marca';
 
 export const migrations = [
   {
@@ -166,6 +167,11 @@ export const migrations = [
   {
     up: migration_20261006_224101_ultimo_editor.up,
     down: migration_20261006_224101_ultimo_editor.down,
-    name: '20261006_224101_ultimo_editor'
+    name: '20261006_224101_ultimo_editor',
+  },
+  {
+    up: migration_20261014_004138_repuestos_marca.up,
+    down: migration_20261014_004138_repuestos_marca.down,
+    name: '20261014_004138_repuestos_marca'
   },
 ];

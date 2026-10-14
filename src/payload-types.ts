@@ -140,12 +140,14 @@ export interface Config {
     pie: Pie;
     seo: Seo;
     'ficha-producto': FichaProducto;
+    'repuestos-marca': RepuestosMarca;
   };
   globalsSelect: {
     cabecera: CabeceraSelect<false> | CabeceraSelect<true>;
     pie: PieSelect<false> | PieSelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
     'ficha-producto': FichaProductoSelect<false> | FichaProductoSelect<true>;
+    'repuestos-marca': RepuestosMarcaSelect<false> | RepuestosMarcaSelect<true>;
   };
   locale: null;
   widgets: {
@@ -193,6 +195,8 @@ export interface Solicitude {
   correo: string;
   telefono?: string | null;
   empresa?: string | null;
+  interes?: ('cotizar' | 'muestras' | 'asesoria' | 'otro') | null;
+  perfil?: ('empresa' | 'comprador' | 'emprendedor' | 'proveedor' | 'empleado' | 'otro') | null;
   mensaje: string;
   /**
    * Se rellena solo cuando la solicitud sale de una ficha.
@@ -503,6 +507,10 @@ export interface Marca {
   slug: string;
   descripcion?: string | null;
   logo?: (number | null) | Media;
+  /**
+   * Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.
+   */
+  fondoHero?: (number | null) | Media;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -520,6 +528,10 @@ export interface TiposEquipo {
   slug: string;
   marca: number | Marca;
   descripcion?: string | null;
+  /**
+   * Opcional. Foto del tipo de máquina para la tarjeta de la página de la marca.
+   */
+  imagen?: (number | null) | Media;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -545,7 +557,9 @@ export interface CategoriasTecnica {
   slug: string;
   descripcion?: string | null;
   imagen?: (number | null) | Media;
-  icono?: ('corte' | 'llanta' | 'lubricante' | 'filtro' | 'motor' | 'rodaje') | null;
+  icono?:
+    | ('corte' | 'llanta' | 'lubricante' | 'filtro' | 'motor' | 'rodaje' | 'miscelaneos' | 'componentes' | 'diesel')
+    | null;
   /**
    * Opcional. Vacío: la tarjeta de la portada usa el nombre de la categoría.
    */
@@ -558,6 +572,10 @@ export interface CategoriasTecnica {
    * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».
    */
   ordenPortada?: number | null;
+  /**
+   * Orden en «Nuestras categorías de repuestos» de cada página de marca. Vacío: al final, por nombre.
+   */
+  ordenMarca?: number | null;
   /**
    * Hoy estas fichas no tienen página propia en el sitio, así que esto no sale en Google. Se guarda para cuando la tengan.
    */
@@ -1641,6 +1659,8 @@ export interface SolicitudesSelect<T extends boolean = true> {
   correo?: T;
   telefono?: T;
   empresa?: T;
+  interes?: T;
+  perfil?: T;
   mensaje?: T;
   referencia?: T;
   referenciaTexto?: T;
@@ -1679,6 +1699,7 @@ export interface MarcasSelect<T extends boolean = true> {
   slug?: T;
   descripcion?: T;
   logo?: T;
+  fondoHero?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1692,6 +1713,7 @@ export interface TiposEquipoSelect<T extends boolean = true> {
   slug?: T;
   marca?: T;
   descripcion?: T;
+  imagen?: T;
   seo?:
     | T
     | {
@@ -1716,6 +1738,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   tituloPortada?: T;
   enlace?: T;
   ordenPortada?: T;
+  ordenMarca?: T;
   seo?:
     | T
     | {
@@ -2552,6 +2575,58 @@ export interface FichaProducto {
   createdAt?: string | null;
 }
 /**
+ * Títulos y tarjetas comunes a las páginas de cada marca de repuestos (Caterpillar, Case…).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "repuestos-marca".
+ */
+export interface RepuestosMarca {
+  id: number;
+  /**
+   * Ej.: «Repuestos para maquinaria pesada». La segunda línea es la marca.
+   */
+  tituloHero?: string | null;
+  /**
+   * Ej.: «En Colombia» → «CATERPILLAR En Colombia».
+   */
+  subtituloHero?: string | null;
+  tituloCategorias?: string | null;
+  tituloTipos?: string | null;
+  /**
+   * Ej.: «Ver todo».
+   */
+  verTodoTexto?: string | null;
+  tarjetaUsadas?: {
+    titulo?: string | null;
+    /**
+     * Ruta del sitio (/…) o https://. Vacío: la tarjeta no se pinta (no hay enlaces rotos).
+     */
+    enlace?: string | null;
+    /**
+     * Opcional. Sin imagen, la tarjeta se pinta solo con el título.
+     */
+    imagen?: (number | null) | Media;
+  };
+  tarjetaAditamentos?: {
+    titulo?: string | null;
+    /**
+     * Ruta del sitio (/…) o https://. Vacío: la tarjeta no se pinta (no hay enlaces rotos).
+     */
+    enlace?: string | null;
+    /**
+     * Opcional. Sin imagen, la tarjeta se pinta solo con el título.
+     */
+    imagen?: (number | null) | Media;
+  };
+  contactoTitulo?: string | null;
+  contactoSubtitulo?: string | null;
+  contactoBoton?: string | null;
+  testimoniosTitulo?: string | null;
+  verVideoTexto?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cabecera_select".
  */
@@ -2645,6 +2720,39 @@ export interface SeoSelect<T extends boolean = true> {
  */
 export interface FichaProductoSelect<T extends boolean = true> {
   imagenContacto?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "repuestos-marca_select".
+ */
+export interface RepuestosMarcaSelect<T extends boolean = true> {
+  tituloHero?: T;
+  subtituloHero?: T;
+  tituloCategorias?: T;
+  tituloTipos?: T;
+  verTodoTexto?: T;
+  tarjetaUsadas?:
+    | T
+    | {
+        titulo?: T;
+        enlace?: T;
+        imagen?: T;
+      };
+  tarjetaAditamentos?:
+    | T
+    | {
+        titulo?: T;
+        enlace?: T;
+        imagen?: T;
+      };
+  contactoTitulo?: T;
+  contactoSubtitulo?: T;
+  contactoBoton?: T;
+  testimoniosTitulo?: T;
+  verVideoTexto?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

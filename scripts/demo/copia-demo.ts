@@ -126,7 +126,7 @@ type Manifiesto = {
   origen: string;
   inicio: string;
   estado: "en-curso" | "completa" | "retirada";
-  /** El hero del destino ANTES de la copia: la retirada comprueba que sigue igual. */
+  /** El hero del destino ANTES de la copia. La retirada avisa si cambió y comprueba que ella no lo toca. */
   hero: string;
   media: Record<string, Id>;
   videos: Record<string, Id>;
@@ -222,6 +222,15 @@ if (modo === "retirar") {
   if (m.estado === "retirada") {
     log("el manifiesto ya está retirado: nada que hacer");
   } else {
+    /*
+     * EL HERO: la copia no lo toca y la retirada tampoco. Se compara el de
+     * ANTES de esta retirada con el de después. Si cambió desde la copia (lo
+     * puede cambiar dirección en el panel, como el 2026-10-14), solo se avisa:
+     * no es cosa de la retirada, y exigir el de la copia la dejaba a medias.
+     */
+    const heroAntes = await huellaHero();
+    if (heroAntes !== m.hero)
+      log("aviso: el hero cambió desde la copia (no lo hizo la copia); la retirada no lo toca");
     // 1. Devolver lo modificado a su valor anterior.
     const p = m.antes.portada;
     if (p) {
@@ -323,9 +332,8 @@ if (modo === "retirar") {
 
     // 3. Comprobaciones.
     const hero = await huellaHero();
-    if (hero !== m.hero)
-      fallar("el HERO del destino ya no es el de antes de la copia: revisar a mano");
-    log("hero: idéntico al de antes de la copia ✓");
+    if (hero !== heroAntes) fallar("la retirada ha CAMBIADO el hero del destino: revisar a mano");
+    log("hero: idéntico al de antes de la retirada ✓");
     if (noBorrados.length)
       fallar(
         `NO se borran ${noBorrados.length} ficheros (fuera del manifiesto o sin el prefijo ${PREFIJO_COPIA}); revisar a mano: ${noBorrados.join(" · ")}`,

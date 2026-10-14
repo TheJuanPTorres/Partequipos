@@ -1,0 +1,179 @@
+/*
+ * RESULTADOS DE BÚSQUEDA. Sin diseño propio en ux-9: usa las piezas del kit que ya
+ * están en el sitio (campo y botón del buscador del pie: pastilla de radio 30,
+ * borde #CDCDCD, botón rojo).
+ */
+.seccion {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 60px 20px 100px;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto-fuerte);
+  line-height: 1.1;
+}
+
+.formulario {
+  display: flex;
+  gap: 8px;
+}
+
+.campo {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 58px;
+  box-sizing: border-box;
+  padding: 16px 28px 16px 20px;
+  border: 1px solid #cdcdcd;
+  border-radius: 30px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font: 400 18px / 1.3 var(--font-sans);
+}
+
+.campo::placeholder {
+  color: #515962;
+  opacity: 1;
+}
+
+.boton {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 58px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 50px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.boton:hover {
+  background: var(--color-texto);
+}
+
+.boton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.campo:focus-visible,
+.boton:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+}
+
+.estado {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.grupos {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.grupoTitulo {
+  margin: 0 0 8px;
+  color: var(--color-texto-fuerte);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.cuenta {
+  color: var(--color-texto-suave);
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.lista {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  list-style: none;
+}
+
+.resultado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--color-fondo-seccion);
+  color: var(--color-texto);
+  text-decoration: none;
+}
+
+.resultado:hover {
+  color: var(--color-marca);
+}
+
+.resultado:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+}
+
+.resultado svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.resultadoTexto {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.resultadoTitulo {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.resultadoDetalle {
+  color: var(--color-texto-suave);
+  font-size: 14px;
+}
+
+.mas {
+  margin: 10px 0 0;
+  color: var(--color-texto-suave);
+  font-size: 14px;
+}
+
+.seccionesTitulo {
+  margin: 0 0 8px;
+  color: var(--color-texto-suave);
+  font-size: 18px;
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    padding-top: 40px;
+  }
+
+  .formulario {
+    flex-wrap: wrap;
+  }
+
+  .campo {
+    flex-basis: 100%;
+  }
+}

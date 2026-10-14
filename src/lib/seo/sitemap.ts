@@ -95,6 +95,11 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
    */
   "/laboratorio/movimiento": "banco de pruebas, 404 en producción",
   /*
+   * Resultados de búsqueda (`?q=…`): `noindex, follow`. Una página por cada texto
+   * que alguien escriba no es contenido que indexar.
+   */
+  "/buscar": "resultados de búsqueda: noindex, fuera del sitemap",
+  /*
    * Páginas 2 y siguientes del listado de usados (src/lib/usados/paginacion.ts).
    * Son indexables, con canónica propia, y se descubren por los enlaces de la
    * página 1, que sí está en el sitemap. Cambian con el inventario: listarlas

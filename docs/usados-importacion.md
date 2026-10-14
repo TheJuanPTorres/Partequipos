@@ -67,8 +67,23 @@ unidades. Aquí:
 | Registros de consola | El script identifica cada unidad por su id de WordPress, nunca por el serial                                                          |
 
 `contieneSerial` lo busca también pegado o con espacios («X 9876», «snx9876»).
-Medido sobre las 128: **0** descripciones y **0** textos alternativos con el
-serial.
+
+**Corregido el 2026-10-14: cualquier «serial <código>», no solo el del campo.**
+Un agente encontró en el preview 2 descripciones que conservaban la palabra
+«serial» con un código:
+
+- en una, el código era **la parte final** del serial de su ficha;
+- en la otra, **un código distinto** del que guarda la ficha.
+
+La limpieza solo buscaba el serial completo del campo. Ahora `quitarSerial`
+quita además cualquier mención con su código (`MENCION_SERIAL`): «serial A1234»,
+«serial X 98765», «S/N 12345», «número de serie 4321». El código tiene que
+llevar al menos un dígito, así que «serial y motor» o «serie ZX» no se tocan.
+Si después quedara una mención (`mencionaSerial`), la unidad va sin descripción.
+
+Medido sobre las 128 con la limpieza nueva: **0** descripciones y **0** textos
+alternativos con el serial o con una mención de serial; ninguna unidad pierde
+la descripción.
 
 **Texto alternativo:** 1.423 de las 1.493 fotos lo traen («EXCAVADORA HITACHI
 ZX200-6 SN …»); las 70 restantes usan el nombre de la unidad. Se añade «foto n

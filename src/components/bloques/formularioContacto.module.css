@@ -1,0 +1,36 @@
+/*
+ * BLOQUE «FORMULARIO DE CONTACTO» — PROVISIONAL hasta el diseño de Andrés: una
+ * tarjeta blanca centrada, de 760 px como máximo, sobre el fondo de la página.
+ */
+.seccion {
+  padding: 40px 3vw 64px;
+}
+
+.tarjeta {
+  max-width: 760px;
+  margin: 0 auto;
+  border-radius: 8px;
+  padding: 32px;
+  background: #fff;
+}
+
+.antetitulo {
+  margin: 0 0 8px;
+  color: var(--color-marca);
+}
+
+.titulo {
+  margin: 0 0 12px;
+  color: var(--color-texto);
+}
+
+.texto {
+  margin: 0 0 20px;
+  color: var(--color-texto-suave);
+}
+
+@media (max-width: 767px) {
+  .tarjeta {
+    padding: 20px 16px;
+  }
+}

@@ -254,22 +254,12 @@ export function rutasDeCategoriaUsada(slug: string): string[] {
 // --- Lubricantes ------------------------------------------------------------
 
 /**
- * Rutas que caduca un cambio de MARCA de lubricantes: su propia página y la de
- * cada categoría, porque todas muestran el nombre de la marca en las migas.
+ * Rutas que caduca un cambio de MARCA de lubricantes, o de una de sus
+ * categorías: solo la página de la marca. Desde el 2026-10-14 las categorías
+ * son secciones de esa página y ya no tienen ruta propia.
  */
-export function rutasDeMarcaLubricante(marcaSlug: string, categoriaSlugs: string[]): string[] {
-  return [
-    rutas.marcaLubricante(marcaSlug),
-    ...categoriaSlugs.map((slug) => rutas.categoriaLubricante(marcaSlug, slug)),
-  ];
-}
-
-/**
- * Rutas que caduca un cambio de CATEGORÍA: la suya y la de su marca, que la
- * lista.
- */
-export function rutasDeCategoriaLubricante(marcaSlug: string, categoriaSlug: string): string[] {
-  return [rutas.categoriaLubricante(marcaSlug, categoriaSlug), rutas.marcaLubricante(marcaSlug)];
+export function rutasDeMarcaLubricante(marcaSlug: string): string[] {
+  return [rutas.marcaLubricante(marcaSlug)];
 }
 
 // --- Blog -------------------------------------------------------------------

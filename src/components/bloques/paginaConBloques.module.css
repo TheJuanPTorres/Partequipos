@@ -21,3 +21,8 @@
   font-weight: 500;
   line-height: 1.2;
 }
+
+/* Un bloque con ancla: al saltar a él, que no quede bajo la cabecera fija. */
+.ancla {
+  scroll-margin-top: 110px;
+}

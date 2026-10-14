@@ -1,7 +1,7 @@
 /**
  * FORMA DE DATOS DE LOS BLOQUES DE PÁGINA — lo que reciben los componentes.
  *
- * Son los cinco bloques reutilizables del campo `bloques` de `paginas`
+ * Son los bloques reutilizables del campo `bloques` de `paginas`
  * (docs/diseno/decisiones-nosotros.md §3). Cada tipo lleva el `blockType` y
  * los nombres de campo que tendrá el bloque en Payload; la única diferencia
  * es que aquí las relaciones (`media`, `videos`) ya vienen RESUELTAS a lo que
@@ -38,6 +38,8 @@ export type AnimacionBloque = { url: string; ancho: number; alto: number };
 export type VistaCabeceraVideo = {
   blockType: "cabeceraVideo";
   id?: string | null;
+  /** Ancla del bloque, sin «#»: `/pagina/#ancla` lleva a él. */
+  ancla?: string | null;
   antetitulo?: string | null;
   /** El `<h1>` de la página. */
   titulo: string;
@@ -49,6 +51,8 @@ export type VistaCabeceraVideo = {
 export type VistaPresentacionImagen = {
   blockType: "presentacionImagen";
   id?: string | null;
+  /** Ancla del bloque, sin «#»: `/pagina/#ancla` lleva a él. */
+  ancla?: string | null;
   imagen: ImagenBloque | null;
   /** Sustituye a la imagen mientras se reproduce; la imagen queda para movimiento reducido y fallos. */
   animacion: AnimacionBloque | null;
@@ -69,12 +73,16 @@ export type Cifra = {
 export type VistaCifras = {
   blockType: "cifras";
   id?: string | null;
+  /** Ancla del bloque, sin «#»: `/pagina/#ancla` lleva a él. */
+  ancla?: string | null;
   cifras: Cifra[];
 };
 
 export type VistaFranjaMarquee = {
   blockType: "franjaMarquee";
   id?: string | null;
+  /** Ancla del bloque, sin «#»: `/pagina/#ancla` lleva a él. */
+  ancla?: string | null;
   /** El texto que se repite en movimiento, p. ej. «Marcas aliadas». */
   texto: string;
   imagenFondo: ImagenBloque | null;
@@ -93,10 +101,44 @@ export type TarjetaExpandible = {
 export type VistaTarjetasExpandibles = {
   blockType: "tarjetasExpandibles";
   id?: string | null;
+  /** Ancla del bloque, sin «#»: `/pagina/#ancla` lleva a él. */
+  ancla?: string | null;
   antetitulo?: string | null;
   titulo: string;
   tarjetas: TarjetaExpandible[];
   boton: EnlaceBloque | null;
+};
+
+export type VistaGaleria = {
+  blockType: "galeria";
+  id?: string | null;
+  ancla?: string | null;
+  antetitulo?: string | null;
+  /** Sin título, la galería se anuncia solo a lectores de pantalla. */
+  titulo?: string | null;
+  imagenes: ImagenBloque[];
+};
+
+export type VistaVideoYoutube = {
+  blockType: "videoYoutube";
+  id?: string | null;
+  ancla?: string | null;
+  antetitulo?: string | null;
+  titulo: string;
+  texto: SerializedEditorState | null;
+  /** Id de 11 caracteres y segundo de inicio, ya validados. */
+  video: { id: string; inicio: number | null };
+  miniatura: ImagenBloque | null;
+};
+
+export type VistaFormularioContacto = {
+  blockType: "formularioContacto";
+  id?: string | null;
+  ancla?: string | null;
+  antetitulo?: string | null;
+  titulo: string;
+  texto?: string | null;
+  botonTexto?: string | null;
 };
 
 export type VistaBloque =
@@ -104,7 +146,10 @@ export type VistaBloque =
   | VistaPresentacionImagen
   | VistaCifras
   | VistaFranjaMarquee
-  | VistaTarjetasExpandibles;
+  | VistaTarjetasExpandibles
+  | VistaGaleria
+  | VistaVideoYoutube
+  | VistaFormularioContacto;
 
 /**
  * Formato de las cifras como en ux-9: separador de miles «,» (el que pone el

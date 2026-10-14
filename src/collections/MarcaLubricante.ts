@@ -52,6 +52,16 @@ export const MarcaLubricante: CollectionConfig = {
       relationTo: "media",
       label: "Logo",
     },
+    {
+      name: "imagenCabecera",
+      type: "upload",
+      relationTo: "media",
+      label: "Imagen de cabecera",
+      admin: {
+        description:
+          "Foto de fondo de la cabecera de la página. Opcional: sin ella, un fondo oscuro.",
+      },
+    },
     seoField(),
   ],
 };

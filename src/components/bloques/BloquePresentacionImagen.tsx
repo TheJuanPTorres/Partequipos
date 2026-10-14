@@ -38,35 +38,38 @@ export function BloquePresentacionImagen({
 }: Datos) {
   return (
     <section className={estilos.seccion}>
-      <div className={estilos.columnaImagen}>
-        {animacion ? (
-          <AnimacionLottie
-            src={animacion.url}
-            proporcion={imagen ? imagen.width / imagen.height : animacion.ancho / animacion.alto}
-            que="la animación del mapa"
-          >
-            {imagen ? (
-              <Image
-                src={imagen.url}
-                alt={imagen.alt}
-                width={imagen.width}
-                height={imagen.height}
-                sizes={SIZES}
-                className={estilos.imagenEnCaja}
-              />
-            ) : null}
-          </AnimacionLottie>
-        ) : imagen ? (
-          <Image
-            src={imagen.url}
-            alt={imagen.alt}
-            width={imagen.width}
-            height={imagen.height}
-            sizes={SIZES}
-            className={estilos.imagen}
-          />
-        ) : null}
-      </div>
+      {/* Sin imagen ni animación no hay columna: el texto ocupa el ancho. */}
+      {imagen || animacion ? (
+        <div className={estilos.columnaImagen}>
+          {animacion ? (
+            <AnimacionLottie
+              src={animacion.url}
+              proporcion={imagen ? imagen.width / imagen.height : animacion.ancho / animacion.alto}
+              que="la animación del mapa"
+            >
+              {imagen ? (
+                <Image
+                  src={imagen.url}
+                  alt={imagen.alt}
+                  width={imagen.width}
+                  height={imagen.height}
+                  sizes={SIZES}
+                  className={estilos.imagenEnCaja}
+                />
+              ) : null}
+            </AnimacionLottie>
+          ) : imagen ? (
+            <Image
+              src={imagen.url}
+              alt={imagen.alt}
+              width={imagen.width}
+              height={imagen.height}
+              sizes={SIZES}
+              className={estilos.imagen}
+            />
+          ) : null}
+        </div>
+      ) : null}
       <div className={estilos.columnaTexto}>
         {antetitulo ? (
           <Revelado

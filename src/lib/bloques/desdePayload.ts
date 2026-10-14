@@ -2,6 +2,8 @@ import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical
 
 import type { Animacion, Media, Pagina, Video } from "@/payload-types";
 
+import { anclaValida } from "../fields/ancla";
+import { videoDeYouTube } from "../fields/youtube";
 import { imagenDeMedia, poblado } from "../utils/relations";
 import type { AnimacionBloque, EnlaceBloque, VideoBloque, VistaBloque } from "./vista";
 
@@ -57,10 +59,21 @@ function animacion(rel: number | Animacion | null | undefined): AnimacionBloque 
   return { url: doc.url, ancho: doc.ancho, alto: doc.alto };
 }
 
+/** El ancla guardada, si es válida; si no, ninguna (un `id` roto no se pinta). */
+function ancla(valor: string | null | undefined): string | null {
+  const a = valor?.trim();
+  return a && anclaValida(a) ? a : null;
+}
+
 export function vistaDeBloque(
   b: BloqueDoc,
   videos: ReadonlyMap<number, Video> = new Map(),
 ): VistaBloque | null {
+  const vista = vistaSinAncla(b, videos);
+  return vista ? { ...vista, ancla: ancla(b.ancla) } : null;
+}
+
+function vistaSinAncla(b: BloqueDoc, videos: ReadonlyMap<number, Video>): VistaBloque | null {
   switch (b.blockType) {
     case "cabeceraVideo":
       return {
@@ -123,6 +136,41 @@ export function vistaDeBloque(
           }
         : null;
     }
+    case "galeria": {
+      const imagenes = (b.imagenes ?? []).flatMap((fila) => imagenDeMedia(fila.imagen, "") ?? []);
+      return imagenes.length
+        ? {
+            blockType: b.blockType,
+            id: b.id,
+            antetitulo: b.antetitulo,
+            titulo: b.titulo?.trim() || null,
+            imagenes,
+          }
+        : null;
+    }
+    case "videoYoutube": {
+      const v = videoDeYouTube(b.youtube);
+      return v
+        ? {
+            blockType: b.blockType,
+            id: b.id,
+            antetitulo: b.antetitulo,
+            titulo: b.titulo,
+            texto: b.texto ? (b.texto as unknown as SerializedEditorState) : null,
+            video: v,
+            miniatura: imagenDeMedia(b.miniatura, ""),
+          }
+        : null;
+    }
+    case "formularioContacto":
+      return {
+        blockType: b.blockType,
+        id: b.id,
+        antetitulo: b.antetitulo,
+        titulo: b.titulo,
+        texto: b.texto?.trim() || null,
+        botonTexto: b.botonTexto?.trim() || null,
+      };
   }
 }
 

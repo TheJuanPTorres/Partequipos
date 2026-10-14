@@ -1,0 +1,51 @@
+/*
+ * BLOQUE «GALERÍA» — PROVISIONAL hasta el diseño de Andrés, con el lenguaje de
+ * los demás bloques: 3vw a los lados, el fondo de la página y esquinas de 8 px.
+ */
+.seccion {
+  padding: 40px 3vw;
+}
+
+.antetitulo {
+  margin: 0 0 8px;
+  color: var(--color-marca);
+}
+
+.titulo {
+  margin: 0 0 24px;
+  color: var(--color-texto);
+}
+
+.rejilla {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.celda {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #e5e5e5;
+  aspect-ratio: 4 / 3;
+}
+
+.foto {
+  object-fit: cover;
+}
+
+@media (max-width: 1279px) {
+  .rejilla {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .rejilla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+}

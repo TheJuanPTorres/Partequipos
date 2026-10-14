@@ -32,7 +32,6 @@ export type SitemapInput = {
   marcasUsada: ConSlug[];
   /** Lubricantes: marca → categoría de aplicación. Sin índice de sección. */
   marcasLubricante: ConSlug[];
-  categoriasLubricante: TipoLike[];
   /** Blog. Los artículos van en la raíz, sin prefijo. */
   articulos: ConSlug[];
   categoriasBlog: ConSlug[];
@@ -75,7 +74,6 @@ export const PATRONES_SITEMAP = [
    * el sitio actual, así que tampoco aquí. Ver SEGMENTO_LUBRICANTES.
    */
   "/lubricantes/[marca]",
-  "/lubricantes/[marca]/[categoria]",
   /*
    * Blog. Los ARTÍCULOS no aparecen aquí: se sirven desde `[...slug]`, que ya
    * está declarado arriba, porque viven en la raíz igual que las páginas
@@ -162,7 +160,6 @@ export function buildSitemapEntries(
     categoriasUsada,
     marcasUsada,
     marcasLubricante,
-    categoriasLubricante,
     articulos,
     categoriasBlog,
   }: SitemapInput,
@@ -362,15 +359,6 @@ export function buildSitemapEntries(
       lastModified: fecha(marca.updatedAt, ahora),
       changeFrequency: "monthly",
       priority: 0.8,
-    });
-  }
-
-  for (const categoria of categoriasLubricante) {
-    entradas.push({
-      url: absoluteUrl(rutas.categoriaLubricante(categoria.marcaSlug, categoria.slug)),
-      lastModified: fecha(categoria.updatedAt, ahora),
-      changeFrequency: "monthly",
-      priority: 0.7,
     });
   }
 

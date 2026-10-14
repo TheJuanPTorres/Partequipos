@@ -5,9 +5,12 @@ import { buildBreadcrumbJsonLd, type BreadcrumbItem } from "@/lib/seo/jsonLd";
 
 import { BloqueCabeceraVideo } from "./BloqueCabeceraVideo";
 import { BloqueCifras } from "./BloqueCifras";
+import { BloqueFormularioContacto, type ContextoFormulario } from "./BloqueFormularioContacto";
 import { BloqueFranjaMarquee } from "./BloqueFranjaMarquee";
+import { BloqueGaleria } from "./BloqueGaleria";
 import { BloquePresentacionImagen } from "./BloquePresentacionImagen";
 import { BloqueTarjetasExpandibles } from "./BloqueTarjetasExpandibles";
+import { BloqueVideoYoutube } from "./BloqueVideoYoutube";
 import estilos from "./paginaConBloques.module.css";
 
 type Props = {
@@ -15,7 +18,30 @@ type Props = {
   titulo: string;
   migas: BreadcrumbItem[];
   bloques: VistaBloque[];
+  /** Origen, Turnstile y WhatsApp del bloque «Formulario de contacto». */
+  formulario: ContextoFormulario;
 };
+
+function bloque(b: VistaBloque, clave: string, formulario: ContextoFormulario) {
+  switch (b.blockType) {
+    case "cabeceraVideo":
+      return <BloqueCabeceraVideo key={clave} {...b} />;
+    case "presentacionImagen":
+      return <BloquePresentacionImagen key={clave} {...b} />;
+    case "cifras":
+      return <BloqueCifras key={clave} {...b} />;
+    case "franjaMarquee":
+      return <BloqueFranjaMarquee key={clave} {...b} />;
+    case "tarjetasExpandibles":
+      return <BloqueTarjetasExpandibles key={clave} {...b} />;
+    case "galeria":
+      return <BloqueGaleria key={clave} {...b} />;
+    case "videoYoutube":
+      return <BloqueVideoYoutube key={clave} {...b} />;
+    case "formularioContacto":
+      return <BloqueFormularioContacto key={clave} {...b} contexto={formulario} />;
+  }
+}
 
 /**
  * UNA PÁGINA COMPUESTA CON BLOQUES: migas, JSON-LD de las migas y los bloques,
@@ -25,7 +51,7 @@ type Props = {
  * UN SOLO `<h1>`: el del bloque de cabecera; si la página no tiene cabecera,
  * el título de la página.
  */
-export function PaginaConBloques({ titulo, migas, bloques }: Props) {
+export function PaginaConBloques({ titulo, migas, bloques, formulario }: Props) {
   return (
     <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(migas)} />
@@ -40,18 +66,17 @@ export function PaginaConBloques({ titulo, migas, bloques }: Props) {
       {tieneCabecera(bloques) ? null : <h1 className={estilos.titulo}>{titulo}</h1>}
       {bloques.map((b, i) => {
         const clave = b.id ?? `${b.blockType}-${i}`;
-        switch (b.blockType) {
-          case "cabeceraVideo":
-            return <BloqueCabeceraVideo key={clave} {...b} />;
-          case "presentacionImagen":
-            return <BloquePresentacionImagen key={clave} {...b} />;
-          case "cifras":
-            return <BloqueCifras key={clave} {...b} />;
-          case "franjaMarquee":
-            return <BloqueFranjaMarquee key={clave} {...b} />;
-          case "tarjetasExpandibles":
-            return <BloqueTarjetasExpandibles key={clave} {...b} />;
-        }
+        /*
+         * Con ancla, el bloque va dentro de un `<div id>`: `/pagina/#ancla`
+         * lleva a él, con margen para la cabecera fija (`scroll-margin-top`).
+         */
+        return b.ancla ? (
+          <div key={clave} id={b.ancla} className={estilos.ancla}>
+            {bloque(b, clave, formulario)}
+          </div>
+        ) : (
+          bloque(b, clave, formulario)
+        );
       })}
     </main>
   );

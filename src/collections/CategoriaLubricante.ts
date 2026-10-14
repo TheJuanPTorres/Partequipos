@@ -15,6 +15,10 @@ import {
  * Son las 4 del rastreo (auto liviano, auto pesado, engranajes, motos &
  * scooter): agrupan por **uso**, no por producto. En el sitio actual no hay ni
  * una ficha de producto individual, así que no se modela ninguna.
+ *
+ * DESDE EL 2026-10-14 SON SECCIONES DE LA PÁGINA DE LA MARCA (decisión de
+ * dirección): su ancla es su `slug` (`/lubricantes/lubricantes-eni/#auto-liviano`)
+ * y su URL antigua lleva un 301 a esa ancla. Ya no tienen página propia.
  */
 export const CategoriaLubricante: CollectionConfig = {
   slug: "categorias-lubricante",
@@ -58,30 +62,62 @@ export const CategoriaLubricante: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       label: "Imagen",
-      admin: { description: "Se usa también como imagen social." },
+      admin: { description: "Fondo de su tarjeta en la página de la marca." },
     },
     /*
-     * Líneas de producto, en texto libre y OPCIONALES.
-     *
-     * Queda vacío en los datos de demostración a propósito: no tenemos el
-     * catálogo real de Eni y publicar viscosidades o especificaciones API/ACEA
-     * inventadas sobre un lubricante real sería peor que no publicar nada. El
-     * campo existe para que el cliente lo rellene con su catálogo.
+     * Productos de la línea, como en el sitio actual: nombre comercial, grado
+     * (viscosidad o variante), foto y ficha técnica en PDF del fabricante.
+     * Nada de especificaciones inventadas: solo lo que publica el fabricante.
+     * El grupo los agrupa bajo un subtítulo (p. ej. «Compresores»).
      */
     {
       name: "productos",
       type: "array",
-      label: "Líneas de producto",
+      label: "Productos",
       labels: { singular: "Producto", plural: "Productos" },
       admin: {
         description:
-          "Nombre comercial y descripción tal como los publica el fabricante. No inventar especificaciones.",
+          "En este orden en la página. Nombre y grado tal como los publica el fabricante; no inventes especificaciones.",
       },
       fields: [
-        { name: "nombre", type: "text", required: true, label: "Nombre" },
+        {
+          type: "row",
+          fields: [
+            {
+              name: "nombre",
+              type: "text",
+              required: true,
+              label: "Nombre",
+              admin: { width: "50%", description: "Ej. «I-SINT»." },
+            },
+            {
+              name: "grado",
+              type: "text",
+              label: "Grado o variante",
+              admin: { width: "50%", description: "Ej. «0W-20» o «DOT 4». Opcional." },
+            },
+          ],
+        },
+        {
+          name: "grupo",
+          type: "text",
+          label: "Grupo",
+          admin: {
+            description:
+              "Opcional. Los productos seguidos con el mismo grupo salen bajo ese subtítulo (p. ej. «Compresores»).",
+          },
+        },
+        { name: "imagen", type: "upload", relationTo: "media", label: "Foto del producto" },
+        {
+          name: "ficha",
+          type: "upload",
+          relationTo: "documentos",
+          label: "Ficha técnica (PDF)",
+          admin: { description: "El PDF del fabricante. Sale como «Ficha técnica»." },
+        },
         { name: "descripcion", type: "textarea", label: "Descripción" },
       ],
     },
-    seoField(),
+    seoField({ sinPagina: true }),
   ],
 };

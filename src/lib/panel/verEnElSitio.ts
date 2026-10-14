@@ -125,7 +125,8 @@ export async function rutaEnElSitio(
   if (!generar) return null;
   const ruta = await generar(doc, buscar);
   if (!ruta) return null;
-  return ruta.endsWith("/") ? ruta : `${ruta}/`;
+  // Con ancla (las categorías de lubricante son secciones), la barra ya va antes del «#».
+  return ruta.endsWith("/") || ruta.includes("#") ? ruta : `${ruta}/`;
 }
 
 /** `admin.preview` para una colección: busca las relaciones con la API local. */

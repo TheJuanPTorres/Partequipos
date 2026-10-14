@@ -20,8 +20,8 @@ import type { CategoriasLubricante, MarcasLubricante } from "@/payload-types";
 /**
  * Acceso a datos de lubricantes (API local de Payload, CLAUDE.md §3.2).
  *
- * Jerarquía de dos niveles: marca -> categoría de aplicación. No hay fichas de
- * producto porque el sitio actual no publica ninguna.
+ * Una página por marca; sus categorías de aplicación son secciones de esa
+ * página (desde el 2026-10-14), con sus productos dentro.
  */
 
 export const getMarcasLubricante = cache(async (): Promise<MarcasLubricante[]> => {
@@ -48,17 +48,6 @@ export const getMarcaLubricantePorSlug = cache(
   },
 );
 
-export const getCategoriasLubricante = cache(async (): Promise<CategoriasLubricante[]> => {
-  const payload = await getPayload({ config });
-  const { docs } = await payload.find({
-    collection: "categorias-lubricante",
-    depth: 1,
-    limit: 0,
-    sort: "nombre",
-  });
-  return docs;
-});
-
 export const getCategoriasDeMarcaLubricante = cache(
   async (marcaId: number): Promise<CategoriasLubricante[]> => {
     const payload = await getPayload({ config });
@@ -70,22 +59,5 @@ export const getCategoriasDeMarcaLubricante = cache(
       sort: "nombre",
     });
     return docs;
-  },
-);
-
-/**
- * Una categoría por slug DENTRO de una marca. La unicidad es compuesta
- * (marca + slug), así que buscar solo por slug devolvería la de otra marca.
- */
-export const getCategoriaLubricantePorSlug = cache(
-  async (marcaId: number, slug: string): Promise<CategoriasLubricante | null> => {
-    const payload = await getPayload({ config });
-    const { docs } = await payload.find({
-      collection: "categorias-lubricante",
-      where: { and: [{ marca: { equals: marcaId } }, { slug: { equals: slug } }] },
-      depth: 2,
-      limit: 1,
-    });
-    return docs[0] ?? null;
   },
 );

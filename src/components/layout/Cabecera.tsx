@@ -168,9 +168,17 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
     boton.current?.focus();
   };
 
-  // Al abrir el buscador el foco pasa al campo.
+  // Al abrir el buscador el foco pasa al campo; al cerrarlo, vuelve a la lupa. La
+  // lupa está oculta (`display: none`) mientras la barra está abierta, así que el
+  // foco se devuelve DESPUÉS de renderizar el cierre, no al pulsar.
+  const devolverFoco = useRef(false);
   useEffect(() => {
-    if (buscando) campo.current?.focus();
+    if (buscando) {
+      campo.current?.focus();
+    } else if (devolverFoco.current) {
+      devolverFoco.current = false;
+      abridor.current?.focus();
+    }
   }, [buscando]);
 
   const abrirBusqueda = (e: FormEvent<HTMLFormElement>) => {
@@ -184,9 +192,9 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
   };
 
   const cerrarBusqueda = () => {
+    devolverFoco.current = true;
     setBuscandoEn(null);
     setAltoFila(null);
-    abridor.current?.focus();
   };
 
   // Clic fuera de la cabecera y del panel: se cierra el megamenú.

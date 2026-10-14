@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { motivoAltFlojo } from "../media/altFlojo";
 import {
   altDeRepuesto,
   altDeTipo,
@@ -8,11 +9,13 @@ import {
   descripcionSeo,
   esBorradorCopia,
   ficheroDeLogo,
+  ficheroDeTarjeta,
   ficheroDeTipo,
   formatoDeImagen,
   LOGOS_DE_MARCA,
   fotoDeRepuesto,
   fotosGenericas,
+  IMAGENES_TARJETAS,
   nivelDePagina,
   nombreDeModelo,
   nombreDeTipo,
@@ -255,5 +258,20 @@ describe("imagen de los tipos (2026-10-14)", () => {
     assert.equal(puedeSustituirImagen("wp-tipo-9-excavadora-volvo.jpg", PREFIJO_IMAGEN_TIPO), true);
     assert.equal(puedeSustituirImagen("foto-que-subio-el-editor.jpg", PREFIJO_IMAGEN_TIPO), false);
     assert.equal(puedeSustituirImagen("wp-logo-1-volvo.png", PREFIJO_IMAGEN_TIPO), false);
+  });
+});
+
+describe("imágenes de las tarjetas usadas y aditamentos (2026-10-14)", () => {
+  it("nombre por id de adjunto, sin el fichero de WordPress", () => {
+    assert.equal(ficheroDeTarjeta(1437, "aditamentos"), "wp-tarjeta-1437-aditamentos");
+  });
+
+  it("los textos alternativos pasan la regla de Media", () => {
+    for (const t of Object.values(IMAGENES_TARJETAS)) assert.equal(motivoAltFlojo(t.alt), null);
+  });
+
+  it("ningún fichero de origen lleva un número de serie (CLAUDE.md §9)", () => {
+    for (const t of Object.values(IMAGENES_TARJETAS))
+      assert.doesNotMatch(t.archivo, /(^|[-_/])s\/?n[-_]/i);
   });
 });

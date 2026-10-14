@@ -19,6 +19,10 @@
  * los tres tamaños): el de EJEMPLO de ux-9 se quita. Lo de antes de cada campo
  * queda en el manifiesto (`imagenes`) y la retirada lo devuelve.
  *
+ * TARJETAS «MAQUINARIA PESADA USADA» Y «ADITAMENTOS» (global `repuestos-marca`,
+ * dirección, 2026-10-14): una foto real en lugar de la de ejemplo de ux-9
+ * (`IMAGENES_TARJETAS`), con la misma regla: no se pisa la de un editor.
+ *
  * LAS FOTOS DE LOS MODELOS NO SE IMPORTAN (dirección, 2026-10-13): los
  * modelos son enlaces dentro de su tipo; las fotos, solo si el cliente
  * confirma que tendrán página propia. La simulación las sigue contando.
@@ -63,15 +67,18 @@ import {
   esBorradorCopia,
   fotoDeRepuesto,
   ficheroDeLogo,
+  ficheroDeTarjeta,
   ficheroDeTipo,
   formatoDeImagen,
   fotosGenericas,
+  IMAGENES_TARJETAS,
   LOGOS_DE_MARCA,
   nivelDePagina,
   nombreDeModelo,
   nombreDeTipo,
   pareceDatoDeContacto,
   PREFIJO_EJEMPLO_MARCA,
+  PREFIJO_IMAGEN_TARJETA,
   PREFIJO_IMAGEN_TIPO,
   puedeSustituirImagen,
   rutaMadre,
@@ -162,12 +169,20 @@ type Manifiesto = {
    */
   imagenes?: CambioImagen[];
 };
-type CambioImagen = {
-  coleccion: "marcas" | "tipos-equipo";
-  id: number;
-  campo: "fondoHero" | "imagen";
-  antes: number | null;
-};
+type CambioImagen =
+  | {
+      coleccion: "marcas" | "tipos-equipo";
+      id: number;
+      campo: "fondoHero" | "imagen";
+      antes: number | null;
+    }
+  | {
+      /** El global: `id` es siempre 0. */
+      coleccion: "repuestos-marca";
+      id: 0;
+      campo: "tarjetaUsadas" | "tarjetaAditamentos";
+      antes: number | null;
+    };
 const manifiesto: Manifiesto = fs.existsSync(MANIFIESTO)
   ? (JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto)
   : {
@@ -222,16 +237,26 @@ async function retirar(): Promise<void> {
   // Las imágenes cambiadas, a su valor de antes, ANTES de borrar las subidas.
   let imagenesDevueltas = 0;
   for (const c of manifiesto.imagenes ?? []) {
-    const hecho = await payload
-      .update({
-        collection: c.coleccion,
-        id: c.id,
-        data: { [c.campo]: c.antes } as never,
-        overrideAccess: true,
-      })
-      .catch((e: Error) =>
-        log(`no se pudo devolver ${c.coleccion} ${c.id} ${c.campo}: ${e.message}`),
-      );
+    const hecho = await (
+      c.coleccion === "repuestos-marca"
+        ? payload
+            .findGlobal({ slug: "repuestos-marca", depth: 0, overrideAccess: true })
+            .then((g) =>
+              payload.updateGlobal({
+                slug: "repuestos-marca",
+                data: { [c.campo]: { ...g[c.campo], imagen: c.antes } } as never,
+                overrideAccess: true,
+              }),
+            )
+        : payload.update({
+            collection: c.coleccion,
+            id: c.id,
+            data: { [c.campo]: c.antes } as never,
+            overrideAccess: true,
+          })
+    ).catch((e: Error) =>
+      log(`no se pudo devolver ${c.coleccion} ${c.id} ${c.campo}: ${e.message}`),
+    );
     if (hecho) imagenesDevueltas++;
   }
   log(
@@ -599,6 +624,41 @@ const imagenTipoYa = new Set(
 const imagenesTipo = new Map<number, PlanImagen>();
 for (const t of tipos) if (t.imagen) imagenesTipo.set(t.imagen.idWp, t.imagen);
 const imagenesTipoASubir = [...imagenesTipo.values()].filter((i) => !imagenTipoYa.has(i.idWp));
+// Las dos tarjetas del global (usadas y aditamentos).
+type CampoTarjeta = "tarjetaUsadas" | "tarjetaAditamentos";
+const globalAntes = await payload.findGlobal({
+  slug: "repuestos-marca",
+  depth: 0,
+  overrideAccess: true,
+});
+const tarjetas = (
+  [
+    ["tarjetaUsadas", IMAGENES_TARJETAS.usadas],
+    ["tarjetaAditamentos", IMAGENES_TARJETAS.aditamentos],
+  ] as const
+).map(([campo, t]) => {
+  const actual = (globalAntes[campo]?.imagen as number | null | undefined) ?? null;
+  return {
+    campo: campo as CampoTarjeta,
+    actual,
+    sustituir: puedeSustituirImagen(
+      actual ? ficheroDeMedia.get(actual) : null,
+      PREFIJO_IMAGEN_TARJETA,
+    ),
+    imagen: {
+      idWp: t.idWp,
+      url: `https://partequipos.com/wp-content/uploads/${t.archivo}`,
+      fichero: ficheroDeTarjeta(t.idWp, t.nombre),
+      alt: t.alt,
+    } satisfies PlanImagen,
+  };
+});
+const tarjetasASubir = tarjetas
+  .filter((t) => t.sustituir)
+  .map((t) => t.imagen)
+  .filter(
+    (i) => !enMedia.some((m) => m.filename?.startsWith(`${PREFIJO_IMAGEN_TARJETA}${i.idWp}-`)),
+  );
 /** Tipos que hoy tienen una imagen que eligió un editor: la importación no la toca. */
 const tiposConImagenDeEditor = tipos
   .filter((t) => {
@@ -670,8 +730,8 @@ if (COMPROBAR_FOTOS) {
       comprobacion.fallos.push({ idWp: f.idWp, error: (e as Error).message });
     }
   }
-  // Imágenes de los tipos: se descargan y se mira su formato REAL (los bytes); no se guarda nada.
-  for (const i of imagenesTipoASubir) {
+  // Imágenes de los tipos y de las tarjetas: se descargan y se mira su formato REAL (los bytes); no se guarda nada.
+  for (const i of [...imagenesTipoASubir, ...tarjetasASubir]) {
     await turno();
     try {
       const r = await fetch(i.url, { headers: { "User-Agent": AGENTE } });
@@ -717,6 +777,11 @@ const resumen = {
     conImagenDeEditor: tiposConImagenDeEditor,
   },
   marcasConFondoDeEjemploQueSeQuita: fondosDeEjemplo,
+  tarjetasDelGlobal: tarjetas.map((t) => ({
+    campo: t.campo,
+    hoy: t.actual ? (ficheroDeMedia.get(t.actual) ?? t.actual) : null,
+    seSustituye: t.sustituir,
+  })),
   modelos: {
     total: modelos.length,
     nuevos: modelosNuevos.length,
@@ -754,6 +819,7 @@ const resumen = {
     subidasDeLogos: logosASubir.length,
     logosYaSubidos: marcas.length - logosASubir.length,
     subidasDeImagenesDeTipo: imagenesTipoASubir.length,
+    subidasDeImagenesDeTarjeta: tarjetasASubir.length,
     imagenesDeTipoYaSubidas: imagenesTipo.size - imagenesTipoASubir.length,
     otrasOperaciones: 0,
   },
@@ -764,7 +830,7 @@ const resumen = {
   },
   comprobacionFotos: COMPROBAR_FOTOS
     ? {
-        comprobadas: aSubir.length + imagenesTipoASubir.length,
+        comprobadas: aSubir.length + imagenesTipoASubir.length + tarjetasASubir.length,
         fallos: comprobacion.fallos.length,
         imagenesDeTipoAWebp: comprobacion.imagenesTipo.filter((i) => i.aWebp).length,
       }
@@ -794,6 +860,7 @@ log(`fuente: ${resumen.fuente} · ${paginas.length} páginas`);
 log(`marcas: ${JSON.stringify(resumen.marcas)}`);
 log(`tipos: ${JSON.stringify(resumen.tipos)}`);
 log(`marcas con fondo de ejemplo (se quita): ${JSON.stringify(fondosDeEjemplo)}`);
+log(`tarjetas del global: ${JSON.stringify(resumen.tarjetasDelGlobal)}`);
 log(`modelos: ${JSON.stringify(resumen.modelos)}`);
 log(`no se importan: ${JSON.stringify({ ...resumen.noSeImportan })}`);
 log(`en el preview: ${JSON.stringify(resumen.enElPreview)}`);
@@ -932,12 +999,13 @@ async function logoEnMedia(l: PlanLogo): Promise<number> {
 }
 
 /**
- * La imagen de un tipo en `Media`: por id de adjunto (una segunda ejecución no
- * la vuelve a subir). El formato sale de los BYTES, no de la extensión: AVIF y
- * HEIF se convierten a WebP en esta máquina (`Media` no admite AVIF).
+ * Una imagen de WordPress en `Media` (la de un tipo o la de una tarjeta): por
+ * su nombre, que lleva el id de adjunto (una segunda ejecución no la vuelve a
+ * subir). El formato sale de los BYTES, no de la extensión: AVIF y HEIF se
+ * convierten a WebP en esta máquina (`Media` no admite AVIF).
  */
-async function imagenDeTipoEnMedia(i: PlanImagen): Promise<number> {
-  const prefijo = `${PREFIJO_IMAGEN_TIPO}${i.idWp}-`;
+async function imagenEnMedia(i: PlanImagen): Promise<number> {
+  const prefijo = i.fichero.slice(0, i.fichero.indexOf(`${i.idWp}-`) + `${i.idWp}-`.length);
   const ya = await payload.find({
     collection: "media",
     where: { filename: { contains: prefijo } },
@@ -1036,7 +1104,7 @@ for (const t of tipos) {
     t.imagen &&
     puedeSustituirImagen(actual ? ficheroDeMedia.get(actual) : null, PREFIJO_IMAGEN_TIPO)
   ) {
-    imagen = await imagenDeTipoEnMedia(t.imagen);
+    imagen = await imagenEnMedia(t.imagen);
     if (doc && actual !== imagen) {
       recordarImagen({ coleccion: "tipos-equipo", id: doc.id, campo: "imagen", antes: actual });
     }
@@ -1127,6 +1195,30 @@ for (const m of modelos) {
 }
 log(`modelos: ${modelos.length}`);
 
+// 5b. Tarjetas «Maquinaria pesada usada» y «Aditamentos» del global (salvo la de un editor).
+const globalAhora = await payload.findGlobal({
+  slug: "repuestos-marca",
+  depth: 0,
+  overrideAccess: true,
+});
+const datosGlobal: Record<string, unknown> = {};
+for (const t of tarjetas.filter((x) => x.sustituir)) {
+  const id = await imagenEnMedia(t.imagen);
+  if (t.actual === id) continue;
+  recordarImagen({ coleccion: "repuestos-marca", id: 0, campo: t.campo, antes: t.actual });
+  datosGlobal[t.campo] = { ...globalAhora[t.campo], imagen: id };
+}
+if (Object.keys(datosGlobal).length) {
+  await payload.updateGlobal({
+    slug: "repuestos-marca",
+    data: datosGlobal as never,
+    overrideAccess: true,
+  });
+}
+log(
+  `tarjetas del global: ${Object.keys(datosGlobal).length} cambiadas (imágenes subidas: ${manifiesto.creado.media.filter((x) => x.filename.startsWith(PREFIJO_IMAGEN_TARJETA)).length}; de editor, sin tocar: ${tarjetas.filter((x) => !x.sustituir).length})`,
+);
+
 // 6. Redirecciones 301 (Ammann y PES al índice de marcas; las 4 de CASE a su página madre).
 for (const r of redirecciones) {
   const desde = normalizarRuta(r.origen);
@@ -1157,7 +1249,7 @@ for (const r of redirecciones) {
 }
 log(`redirecciones: ${manifiesto.creado.redirects.length} creadas`);
 log(
-  `importación terminada · creados: ${manifiesto.creado.marcas.length} marcas, ${manifiesto.creado.tipos.length} tipos, ${manifiesto.creado.modelos.length} modelos, ${manifiesto.creado.media.length} imágenes (logos y tipos) · actualizados: ${manifiesto.actualizado.length} · imágenes cambiadas: ${(manifiesto.imagenes ?? []).length} · demo retirada: ${manifiesto.retiradoDeLaDemo.length}`,
+  `importación terminada · creados: ${manifiesto.creado.marcas.length} marcas, ${manifiesto.creado.tipos.length} tipos, ${manifiesto.creado.modelos.length} modelos, ${manifiesto.creado.media.length} imágenes (logos, tipos y tarjetas) · actualizados: ${manifiesto.actualizado.length} · imágenes cambiadas: ${(manifiesto.imagenes ?? []).length} · demo retirada: ${manifiesto.retiradoDeLaDemo.length}`,
 );
 log(`manifiesto: ${MANIFIESTO}`);
 process.exit(0);

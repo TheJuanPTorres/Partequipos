@@ -337,3 +337,39 @@ export function puedeSustituirImagen(
   if (!ficheroActual) return true;
   return ficheroActual.startsWith(PREFIJO_EJEMPLO_MARCA) || ficheroActual.startsWith(prefijoPropio);
 }
+
+/** Prefijo de las imágenes de las tarjetas del global `repuestos-marca` en `Media`. */
+export const PREFIJO_IMAGEN_TARJETA = "wp-tarjeta-";
+
+/**
+ * Las imágenes REALES de las dos tarjetas del marketplace de la página de marca
+ * (global `repuestos-marca`), en lugar de las de ejemplo de ux-9 (dirección,
+ * 2026-10-14). Esas tarjetas no existen en WordPress, así que la foto sale de
+ * donde llevan:
+ *
+ * - **usadas:** la primera foto de una de las 128 unidades de maquinaria usada
+ *   importadas (una excavadora Hitachi en patio, sin datos de la unidad a la
+ *   vista ni en el nombre del fichero);
+ * - **aditamentos:** la primera tarjeta visible de la página de aditamentos de
+ *   WordPress (`…/maquinaria-pesada-nueva/marcas/aditamentos/`): un martillo
+ *   hidráulico Okada montado en una excavadora.
+ */
+export const IMAGENES_TARJETAS = {
+  usadas: {
+    idWp: 47286,
+    archivo: "2025/11/002.jpg",
+    nombre: "maquinaria-pesada-usada",
+    alt: "Excavadora Hitachi usada en el patio",
+  },
+  aditamentos: {
+    idWp: 1437,
+    archivo: "2022/03/02-Martillo-hidraulico-OKADA.jpeg",
+    nombre: "aditamentos",
+    alt: "Martillo hidráulico Okada montado en una excavadora",
+  },
+} as const;
+
+/** Nombre determinista de la imagen de una tarjeta en `Media` (sin extensión: la pone el formato real). */
+export function ficheroDeTarjeta(idAdjunto: number, nombre: string): string {
+  return `${PREFIJO_IMAGEN_TARJETA}${idAdjunto}-${nombre}`;
+}

@@ -388,15 +388,25 @@ for (const c of m.categorias) {
   });
 }
 if (m.global) {
-  const g = await payload.findGlobal({ slug: "repuestos-marca", depth: 0, overrideAccess: true });
-  await payload.updateGlobal({
-    slug: "repuestos-marca",
-    data: {
-      tarjetaUsadas: { ...g.tarjetaUsadas, imagen: m.global.usadas },
-      tarjetaAditamentos: { ...g.tarjetaAditamentos, imagen: m.global.aditamentos },
-    },
-    overrideAccess: true,
-  });
+  // Cada tarjeta, solo si sigue con la imagen de ejemplo: la importación de
+  // repuestos pone la real (`wp-tarjeta-…`), y esa no se toca.
+  const g = await payload.findGlobal({ slug: "repuestos-marca", depth: 1, overrideAccess: true });
+  const deEjemplo = (v: unknown) =>
+    !!v && typeof v === "object" && !!(v as { filename?: string }).filename?.startsWith(PREFIJO);
+  const data: Record<string, unknown> = {};
+  if (deEjemplo(g.tarjetaUsadas?.imagen)) {
+    data.tarjetaUsadas = { ...g.tarjetaUsadas, imagen: m.global.usadas };
+  }
+  if (deEjemplo(g.tarjetaAditamentos?.imagen)) {
+    data.tarjetaAditamentos = { ...g.tarjetaAditamentos, imagen: m.global.aditamentos };
+  }
+  if (Object.keys(data).length) {
+    await payload.updateGlobal({
+      slug: "repuestos-marca",
+      data: data as never,
+      overrideAccess: true,
+    });
+  }
 }
 log("valores previos restaurados");
 

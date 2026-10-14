@@ -175,6 +175,15 @@ las 33 de tipo (todo lo visible en escritorio; las plantillas comunes que incrus
 - **Manifiesto:** el valor de antes de cada campo cambiado (imagen del tipo, fondo de la marca) queda en `imagenes`, solo la primera vez. La retirada lo devuelve antes de borrar las subidas.
 - **El ejemplo de ux-9** (`npm run preview:repuestos-marca:retirar`, de D) solo devuelve el fondo y la imagen de los tipos si **siguen** siendo los de ejemplo: ya no deja los tipos sin su imagen real.
 
+**Las tarjetas «Maquinaria pesada usada» y «Aditamentos»** (global `repuestos-marca`) **no existen en WordPress**:
+allí no tienen imagen propia. Por decisión de dirección (2026-10-14), en lugar de las de ejemplo de ux-9 llevan una foto
+real (`IMAGENES_TARJETAS`, `wp-tarjeta-<adjunto>-…`), con la misma regla de no pisar a un editor y su valor de antes en
+el manifiesto:
+
+- **usadas:** la primera foto de una de las 128 unidades importadas (una excavadora Hitachi en patio). Se descartaron
+  las que llevan el número de serie en el nombre del fichero (§9; lo comprueba una prueba);
+- **aditamentos:** la primera tarjeta visible de la página de aditamentos de WordPress (un martillo hidráulico Okada).
+
 **Resultado en el preview (2026-10-14):**
 
 - 32 imágenes subidas y 32 tipos con su imagen; quitado el fondo de ejemplo de Caterpillar.

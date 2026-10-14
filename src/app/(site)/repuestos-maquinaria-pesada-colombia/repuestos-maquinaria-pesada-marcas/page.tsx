@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
+import { CierreRepuestos } from "@/components/repuestos/CierreRepuestos";
+import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { PlacasMarcas } from "@/components/repuestos/PlacasMarcas";
+import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getMarcas } from "@/lib/queries/getMarcas";
+import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
+import { fondoDeRespaldo, placasDeMarcas, vistaEncabezadoIndice } from "@/lib/repuestos/categoria";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
-import { imagenDeMedia } from "@/lib/utils/relations";
 
 const TITULO = "Marcas de repuestos para maquinaria pesada";
 const DESCRIPCION =
@@ -17,33 +21,42 @@ export async function generateMetadata(): Promise<Metadata> {
   return metadataDe({ nombre: TITULO, path: rutas.marcas(), descripcion: DESCRIPCION });
 }
 
-export default async function MarcasIndexPage() {
-  const marcas = await getMarcas();
+const ANCLA = "marcas-repuestos";
 
+/**
+ * ÍNDICE DE MARCAS DE REPUESTOS — PROVISIONAL hasta el diseño de Andrés
+ * (docs/diseno/decisiones-repuestos-marca.md §7): encabezado, una placa oscura
+ * con el logo de cada marca (sus logos son blancos) con enlace a su página,
+ * contacto y testimonios.
+ */
+export default async function MarcasIndexPage() {
+  const [global, marcas] = await Promise.all([getRepuestosMarca(), getMarcas()]);
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
     { nombre: "Repuestos", path: rutas.repuestos() },
     { nombre: "Marcas", path: rutas.marcas() },
   ];
 
-  const items = marcas.map((marca) => ({
-    href: rutas.marca(marca.slug),
-    titulo: marca.nombre,
-    descripcion: marca.descripcion,
-    imagen: imagenDeMedia(marca.logo, `Logo de ${marca.nombre}`),
-  }));
-
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <Breadcrumbs items={breadcrumbs} />
-
-      <h1 className="text-3xl font-semibold text-gray-900">{TITULO}</h1>
-      <p className="mt-3 max-w-2xl text-gray-600">{DESCRIPCION}</p>
-
-      <div className="mt-8">
-        <ListaEnlaces items={items} vacio="No hay marcas publicadas todavía." />
+      <div className={estilos.migas}>
+        <Breadcrumbs items={breadcrumbs} />
       </div>
+
+      <HeroMarca
+        vista={vistaEncabezadoIndice(
+          global.tituloHero?.trim() || "Repuestos para maquinaria pesada",
+          "Marcas",
+          DESCRIPCION,
+          fondoDeRespaldo(marcas),
+        )}
+        anclaSiguiente={ANCLA}
+      />
+
+      <PlacasMarcas id={ANCLA} titulo="Repuestos por marca" marcas={placasDeMarcas(marcas)} />
+
+      <CierreRepuestos origen={rutas.marcas()} sobre="repuestos por marca" />
     </main>
   );
 }

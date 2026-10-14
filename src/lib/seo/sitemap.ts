@@ -16,6 +16,8 @@ type ModeloLike = ConSlug & { marcaSlug: string; tipoSlug: string };
 
 export type SitemapInput = {
   marcas: ConSlug[];
+  /** Categorías técnicas de repuestos: índice y una página por categoría. */
+  categoriasRepuestos: ConSlug[];
   tipos: TipoLike[];
   modelos: ModeloLike[];
   /** Páginas institucionales. El slug `inicio` corresponde a la portada `/`. */
@@ -53,6 +55,8 @@ export const PATRONES_SITEMAP = [
   "/[...slug]",
   "/repuestos-maquinaria-pesada-colombia",
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas",
+  "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada",
+  "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/[categoria]",
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]",
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]",
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]/[modelo]",
@@ -138,6 +142,7 @@ function masReciente(items: ConSlug[], porDefecto: Date): Date {
 export function buildSitemapEntries(
   {
     marcas,
+    categoriasRepuestos,
     tipos,
     modelos,
     paginas,
@@ -184,7 +189,22 @@ export function buildSitemapEntries(
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    {
+      url: absoluteUrl(rutas.categoriasRepuestos()),
+      lastModified: masReciente(categoriasRepuestos, ahora),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
   );
+
+  for (const categoria of categoriasRepuestos) {
+    entradas.push({
+      url: absoluteUrl(rutas.categoriaRepuestos(categoria.slug)),
+      lastModified: fecha(categoria.updatedAt, ahora),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    });
+  }
 
   // Páginas institucionales y legales. Cambian poco, de ahí `monthly`.
   for (const pagina of institucionales) {

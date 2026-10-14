@@ -15,6 +15,13 @@ export const SEGMENTO_REPUESTOS = "repuestos-maquinaria-pesada-colombia";
 export const SEGMENTO_MARCAS = "repuestos-maquinaria-pesada-marcas";
 
 /**
+ * Categorías técnicas de repuestos (Tren de rodaje, Filtración…): un índice y una
+ * página por categoría, al mismo nivel que las marcas. Copiado del rastreo
+ * (`docs/url-map.csv`): `/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/`.
+ */
+export const SEGMENTO_CATEGORIAS_REPUESTOS = "categoria-repuestos-para-maquinaria-pesada";
+
+/**
  * Segmentos de la sección de maquinaria, copiados literalmente del rastreo:
  *
  *   /maquinaria-pesada/
@@ -59,6 +66,9 @@ export const SEGMENTO_BLOG_CATEGORIA = "category";
 export const rutas = {
   repuestos: () => `/${SEGMENTO_REPUESTOS}`,
   marcas: () => `/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}`,
+  categoriasRepuestos: () => `/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}`,
+  categoriaRepuestos: (slug: string) =>
+    `/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/${slug}`,
   marca: (marcaSlug: string) => `/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/${marcaSlug}`,
   tipo: (marcaSlug: string, tipoSlug: string) =>
     `/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/${marcaSlug}/${tipoSlug}`,

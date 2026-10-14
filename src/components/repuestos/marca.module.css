@@ -662,3 +662,91 @@ a.pildora:hover {
     gap: 10px;
   }
 }
+
+/* --- Placas de marca y variante gris de las categorías (índices, PROVISIONAL) -------- */
+
+/* Los logos del cliente son blancos: cada marca va sobre su placa oscura (D10). */
+.placasLista {
+  display: flex;
+  max-width: 1240px;
+  margin: 40px auto 0;
+  padding: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  list-style: none;
+}
+
+.placaMarca {
+  display: flex;
+  width: 190px;
+  min-height: 84px;
+  box-sizing: border-box;
+  padding: 14px 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--color-texto);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.placaMarca:hover,
+.placaMarca:focus-visible {
+  background: var(--color-marca);
+}
+
+.placaLogo {
+  width: 100%;
+  max-width: 131px;
+  height: auto;
+  max-height: 56px;
+  object-fit: contain;
+}
+
+/* Categorías sobre el gris de la página (la amarilla solo va tras el encabezado). */
+.categoriasGris {
+  background: var(--color-fondo-seccion);
+}
+
+.categoriasGris .pildora {
+  background: var(--color-fondo);
+}
+
+/* Franja blanca de las placas (cuando la amarilla ya la pone la sección de arriba). */
+.modelosBlanca {
+  z-index: 0;
+  margin-top: -50px;
+  padding-top: 80px;
+  background: var(--color-fondo);
+}
+
+/* La gris de las categorías, tras una franja amarilla de esquinas redondeadas. */
+.categoriasGris {
+  z-index: 0;
+  margin-top: -50px;
+  padding-top: 70px;
+  border-radius: 0;
+}
+
+/* El enlace a la página principal de una sección, debajo de las placas. */
+.verTodas {
+  display: flex;
+  margin: 30px 0 0;
+  justify-content: center;
+}
+
+@media (max-width: 767px) {
+  .placasLista {
+    margin-top: 27px;
+    gap: 12px;
+  }
+
+  .placaMarca {
+    width: calc(50% - 6px);
+  }
+}

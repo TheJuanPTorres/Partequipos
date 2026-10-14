@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
+import { CierreRepuestos } from "@/components/repuestos/CierreRepuestos";
+import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { PlacasMarcas } from "@/components/repuestos/PlacasMarcas";
+import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
 import { getMarcas } from "@/lib/queries/getMarcas";
+import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
+import { fondoDeRespaldo, placasDeMarcas, vistaEncabezadoIndice } from "@/lib/repuestos/categoria";
+import { categoriasDeMarca } from "@/lib/repuestos/marca";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
@@ -17,9 +25,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return metadataDe({ nombre: TITULO, path: rutas.repuestos(), descripcion: DESCRIPCION });
 }
 
+const ANCLA = "repuestos-por-marca";
+
+/**
+ * PÁGINA PRINCIPAL DE REPUESTOS — PROVISIONAL hasta el diseño de Andrés
+ * (docs/diseno/decisiones-repuestos-marca.md §7). Enlaza DIRECTAMENTE a cada
+ * marca y a cada categoría técnica (y a sus dos índices), no solo al índice.
+ */
 export default async function RepuestosIndexPage() {
-  const [marcas, horario, empresa, logo] = await Promise.all([
+  const [global, marcas, categorias, horario, empresa, logo] = await Promise.all([
+    getRepuestosMarca(),
     getMarcas(),
+    getCategoriasRepuestos(),
     getHorario(),
     getEmpresa(),
     getLogo(),
@@ -31,30 +48,43 @@ export default async function RepuestosIndexPage() {
   ];
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className={estilos.pagina}>
       <JsonLd
         data={[
           buildOrganizationJsonLd(horario, empresa, logo.buscadores),
           buildBreadcrumbJsonLd(breadcrumbs),
         ]}
       />
-      <Breadcrumbs items={breadcrumbs} />
+      <div className={estilos.migas}>
+        <Breadcrumbs items={breadcrumbs} />
+      </div>
 
-      <h1 className="text-3xl font-semibold text-gray-900">{TITULO}</h1>
-      <p className="mt-3 max-w-2xl text-gray-600">{DESCRIPCION}</p>
+      <HeroMarca
+        vista={vistaEncabezadoIndice(
+          global.tituloHero?.trim() || "Repuestos para maquinaria pesada",
+          "En Colombia",
+          DESCRIPCION,
+          fondoDeRespaldo(marcas),
+        )}
+        anclaSiguiente={ANCLA}
+      />
 
-      <section className="mt-8" aria-labelledby="marcas-heading">
-        <h2 id="marcas-heading" className="text-xl font-medium text-gray-900">
-          Repuestos por marca
-        </h2>
-        <p className="mt-2 text-gray-600">
-          {marcas.length} {marcas.length === 1 ? "marca disponible" : "marcas disponibles"}.{" "}
-          <Link href={rutas.marcas()} className="underline hover:text-gray-900">
-            Ver todas las marcas
-          </Link>
-          .
-        </p>
-      </section>
+      <PlacasMarcas
+        id={ANCLA}
+        titulo="Repuestos por marca"
+        marcas={placasDeMarcas(marcas)}
+        enlaceTodas={{ href: rutas.marcas(), texto: "Ver todas las marcas" }}
+      />
+
+      <CategoriasMarca
+        id="repuestos-por-categoria"
+        titulo={global.tituloCategorias?.trim() || "Nuestras categorías de repuestos"}
+        categorias={categoriasDeMarca(categorias)}
+        fondo="gris"
+        enlaceTodas={{ href: rutas.categoriasRepuestos(), texto: "Ver todas las categorías" }}
+      />
+
+      <CierreRepuestos origen={rutas.repuestos()} sobre="repuestos" />
     </main>
   );
 }

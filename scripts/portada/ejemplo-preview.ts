@@ -120,10 +120,10 @@ const TEXTOS_MARCAS: Record<string, string> = {
 
 /** «Título en portada» de las 4 tarjetas de repuestos de ux-9 (export 2516, sección 5). */
 const TITULOS_REPUESTOS: Record<string, string> = {
-  "herramienta-de-corte-gets": "Blades y corte",
-  "llantas-y-rines": "Llantas y rines",
-  lubricantes: "Lubricantes",
-  filtracion: "Filtración",
+  "herramienta-de-corte-gets-para-maquinaria-pesada": "Blades y corte",
+  "llantas-y-rines-para-maquinaria-pesada": "Llantas y rines",
+  "lubricantes-para-maquinaria-pesada": "Lubricantes",
+  "filtracion-para-maquinaria-pesada": "Filtración",
 };
 
 async function categoriaTecnica(slug: string) {

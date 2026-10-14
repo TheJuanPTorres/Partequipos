@@ -4,6 +4,7 @@ import {
   revalidarRutas,
   rutasDeCategoriaNueva,
   rutasDeCategoriaUsada,
+  revalidarPaginasUsadas,
   rutasDeEquipoNuevo,
   rutasDeMarcaMaquinaria,
   rutasDeTipoMaquinaria,
@@ -227,6 +228,7 @@ function revalidarCategoriaUsadaCore(doc: { slug: string }) {
     // (`src/lib/cacheDatos.ts`); las rutas, por el índice y la portada.
     revalidarDatos(ETIQUETAS_DATOS.usados, `categoría usada ${doc.slug}`);
     revalidarRutas(rutasDeCategoriaUsada(doc.slug), `categoría usada ${doc.slug}`);
+    revalidarPaginasUsadas(`categoría usada ${doc.slug}`);
   } catch (error) {
     console.error("[revalidación] hook de CategoriaUsada falló:", error);
   }
@@ -272,6 +274,7 @@ async function revalidarEquipoUsadoCore(
 
     if (categoriaSlug) {
       revalidarRutas(rutasDeCategoriaUsada(categoriaSlug), `equipo usado ${doc.id}`);
+      revalidarPaginasUsadas(`equipo usado ${doc.id}`);
     }
   } catch (error) {
     console.error("[revalidación] hook de EquipoUsado falló:", error);

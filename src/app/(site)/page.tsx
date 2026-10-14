@@ -98,6 +98,8 @@ export default async function HomePage() {
   const videoCompania = videoDeCompania({
     video: idVideo ? await getVideoPorId(idVideo) : null,
   });
+  // Sin vídeo, la foto de fondo de la sección (decorativa: el texto va encima).
+  const imagenCompania = videoCompania ? null : imagenDeMedia(pagina.seccionCompania?.imagen, "");
 
   return (
     /*
@@ -163,6 +165,7 @@ export default async function HomePage() {
       {/* Secciones 6, 7 y 8 de ux-9 (fase F). Sin vídeo, la tarjeta va en oscuro. */}
       <SeccionCompania
         video={videoCompania}
+        imagen={imagenCompania}
         youtube={videoDeYouTube(compania?.youtube)}
         textos={{
           titulo: tx(compania?.titulo),

@@ -104,7 +104,7 @@ los textos y las seis tarjetas de cada página** (título y enlace), sin imágen
 | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | D1  | `/maquinaria-pesada/` pasa a la plantilla de seis tarjetas (antes, una lista de dos enlaces).                                                                                                                                                                                |
 | D2  | **Título de repuestos: el PINTADO** («Repuestos para Maquinaria pesada»). El JSON exportado dice «Encuentra Maquinaria y Repuestos Rápido y Fácil» (que es el de la página de maquinaria): **diferencia JSON / pintado para Andrés.**                                        |
-| D3  | El antetítulo de «Categoría principal» pintado es «Venta de repuestos» (relleno que no corresponde a maquinaria): se propone «Maquinaria nueva y usada».                                                                                                                     |
+| D3  | El antetítulo de «Categoría principal» pintado es «Venta de repuestos» (relleno que no corresponde a maquinaria): **decidido por dirección (2026-10-14): «Maquinaria nueva y usada»** (ya sembrado por la migración).                                                        |
 | D4  | Seis tarjetas **reales** (marcas, categorías, tren de rodaje, filtración, GETS, lubricantes / nueva, usada, aditamentos, repuestos, lubricantes, servicio técnico) en vez de las tres repetidas de Andrés; ninguna se oculta en móvil. Fotos de la web original del cliente. |
 | D5  | La principal de repuestos ya no enlaza directamente a cada marca y cada categoría (lo hacía la versión provisional anterior): enlaza a los dos índices y a tres categorías; el resto, a un clic de distancia.                                                                |
 | D6  | Contáctanos: el título es el `<h1>` (en ux-9, `<h2>`); errata «con nosotro» corregida; el horario de atención se conserva bajo las tarjetas de canales; el teléfono y el correo son enlaces; la foto se oculta en móvil, como en ux-9.                                       |
@@ -114,9 +114,13 @@ los textos y las seis tarjetas de cada página** (título y enlace), sin imágen
 ## 7. Imágenes
 
 `npm run preview:indices:sembrar` / `:retirar` (solo preview, con manifiesto): sube las fotos de las tarjetas **de la web
-original** (suyas) y las de Andrés (fondos, foto y máquina de Contáctanos: L3, «EJEMPLO UX-9 —»). **Para producción**:
-`runbook-indices-produccion.md` (en `partequipos-cierre`), con los ficheros listos en
-`partequipos-diseno\wordpress\indices\assets\`.
+original** (suyas) y las de Andrés (fondos, foto y máquina de Contáctanos: L3, «EJEMPLO UX-9 —»), para ver el diseño
+completo en el preview.
+
+**En PRODUCCIÓN, solo las 10 fotos del cliente** (decisión de dirección, 2026-10-14): las 4 de Andrés (L3) no se suben;
+«contenido real, y donde no haya foto real, sin foto». Las páginas lo toleran: el encabezado queda en tono oscuro y
+Contáctanos pinta el formulario a todo el ancho, sin foto ni máquina. Pasos en `runbook-indices-produccion.md` (en
+`partequipos-cierre`), con los ficheros listos en `partequipos-diseno\wordpress\indices\assets\`.
 
 ## 8. Coordinación
 

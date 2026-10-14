@@ -68,9 +68,7 @@ export default async function BuscarPage({ searchParams }: Props) {
   const consulta = normalizarConsulta(q);
   const texto = consulta.estado === "vacia" ? "" : consulta.texto;
   const resultados = consulta.estado === "valida" ? await buscar(consulta.texto) : null;
-  const total = resultados
-    ? GRUPOS.reduce((suma, g) => suma + resultados[g.clave].total, 0)
-    : 0;
+  const total = resultados ? GRUPOS.reduce((suma, g) => suma + resultados[g.clave].total, 0) : 0;
 
   // Sin resultados se ofrecen las secciones del menú (global `cabecera` del panel).
   const { enlaces, boton } =

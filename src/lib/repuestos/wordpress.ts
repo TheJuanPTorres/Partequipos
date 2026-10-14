@@ -219,3 +219,52 @@ export function altDeRepuesto(altWp: string, nombre: string, ficheroWp?: string)
     .trim();
   return motivoAltFlojo(limpio, ficheroWp) ? nombre : limpio;
 }
+
+/**
+ * Logo de cada marca: la serie uniforme del propio sitio del cliente
+ * («MARCA-NN.png», 2023), la única que cubre las 13. Son logos BLANCOS sobre
+ * transparente, pensados para fondo oscuro: sobre fondo claro no se ven
+ * (`docs/repuestos-importacion.md`). El de Hitachi se llama «OKADA-07» en
+ * WordPress; su texto alternativo allí dice Hitachi, y lo es.
+ */
+export const LOGOS_DE_MARCA: Record<string, { idWp: number; archivo: string }> = {
+  "repuestos-para-maquinaria-pesada-bobcat": { idWp: 16268, archivo: "2023/12/BOBCAT-11.png" },
+  "repuestos-para-maquinaria-pesada-case-construction": {
+    idWp: 15831,
+    archivo: "2023/11/CASE-06.png",
+  },
+  "repuestos-para-maquinaria-pesada-caterpillar": { idWp: 16198, archivo: "2023/12/CAT-09.png" },
+  "repuestos-para-maquinaria-pesada-doosan": { idWp: 15807, archivo: "2023/11/DOOSAN-05.png" },
+  "repuestos-para-maquinaria-pesada-hitachi": { idWp: 16146, archivo: "2023/12/OKADA-07.png" },
+  "repuestos-para-maquinaria-pesada-hyundai": { idWp: 16274, archivo: "2023/12/HYUNDAI-12.png" },
+  "repuestos-para-maquinaria-pesada-kobelco": { idWp: 16297, archivo: "2023/12/KOBELCO-14.png" },
+  "repuestos-para-maquinaria-pesada-komatsu": { idWp: 16178, archivo: "2023/12/KOMATSU-08.png" },
+  "repuestos-para-maquinaria-pesada-link-belt": {
+    idWp: 15798,
+    archivo: "2023/11/LINK-BELT-04.png",
+  },
+  "repuestos-para-maquinaria-pesada-liugong": { idWp: 15783, archivo: "2023/11/LIUGONG-03.png" },
+  "repuestos-para-maquinaria-pesada-okada": { idWp: 15757, archivo: "2023/11/OKADA-01.png" },
+  "repuestos-para-maquinaria-pesada-volvo": { idWp: 16289, archivo: "2023/12/VOLVO-13.png" },
+  "repuestos-para-maquinaria-pesada-yanmar": { idWp: 15770, archivo: "2023/11/YANMAR-02.png" },
+};
+
+/** Nombre determinista del logo en `Media` (por id de adjunto, para no subirlo dos veces). */
+export function ficheroDeLogo(idAdjunto: number, marca: string): string {
+  const base = marca
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `wp-logo-${idAdjunto}-${base}.png`;
+}
+
+/**
+ * La página de destino de las URL que cuelgan un nivel de más (las 4 de CASE):
+ * su página madre, que sí se migra (dirección, 2026-10-13).
+ */
+export function rutaMadre(ruta: string): string {
+  const partes = ruta.split("/").filter(Boolean);
+  return `/${partes.slice(0, -1).join("/")}/`;
+}

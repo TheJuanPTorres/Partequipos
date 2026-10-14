@@ -1,22 +1,25 @@
 # Importación del catálogo de repuestos de WordPress
 
 Las marcas, los tipos de equipo y los **modelos de repuestos** del WordPress
-actual, con la foto de cada modelo, a `marcas`, `tipos-equipo`,
-`modelos-repuesto` y `Media`. Estudio previo y decisiones de dirección:
+actual, como **datos**, con el **logo de cada marca**, a `marcas`,
+`tipos-equipo`, `modelos-repuesto` y `Media`. Mismo método que los usados:
+simulación, idempotencia, manifiesto y retirada exacta. Estudio previo y
+decisiones de dirección:
 `Desktop\partequipos-cierre\informes\2026-10-13-repuestos-wordpress-estudio.md`.
 
-> **HOY SOLO HAY SIMULACIÓN (dirección, 2026-10-13).** Los almacenes del Blob
-> están bloqueados por el límite de operaciones del plan Hobby: el consumo es
-> de 2.240 operaciones avanzadas de 2.000, casi todo de la importación de
-> usados del 8 de octubre. El script **no escribe en la base ni en el Blob**.
-> La importación real (modos `importar` y `retirar`, por tandas, con
-> manifiesto, como los usados) se añade cuando dirección confirme el plan Pro y
-> el almacén desbloqueado.
+```
+npm run preview:repuestos:simular            # sin escribir en la base ni en el Blob
+npm run preview:repuestos:simular -- fotos   # además, comprueba en WordPress las fotos de los modelos
+npm run preview:repuestos:importar           # escribe en el preview
+npm run preview:repuestos:retirar            # deshace lo del manifiesto
+```
 
-```
-npm run preview:repuestos:simular            # lee la base del preview y cuenta
-npm run preview:repuestos:simular -- fotos   # además, comprueba las fotos en WordPress
-```
+Solo el **preview**: la carga en producción irá por runbook de dirección (§6).
+
+> **LAS FOTOS DE LOS MODELOS NO SE IMPORTAN (dirección, 2026-10-13).** Según
+> el mapa de navegación, los modelos son enlaces dentro de su tipo; sus fotos,
+> solo si el cliente confirma que tendrán página propia. La simulación las
+> sigue contando (§5) para cuando se decida.
 
 ## 1. Fuente: páginas de Elementor, extraídas del XML
 
@@ -44,95 +47,97 @@ en escritorio y lleva un título. Así quedan fuera:
 
 | WordPress                                          | Nuestro campo                   | Regla                                                                                                                                                                                        |
 | -------------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ruta                                               | marca, tipo, modelo             | Por profundidad bajo `repuestos-maquinaria-pesada-marcas/`. Los slugs, **tal cual** (§3.3)                                                                                                   |
+| Ruta                                               | marca, tipo, modelo             | Por profundidad bajo `repuestos-maquinaria-pesada-marcas/`. Los slugs, **tal cual** (§3.3); los que no se pueden guardar tal cual quedan pendientes (§4)                                     |
 | Nombre de la marca                                 | `marcas.nombre`                 | El de `docs/inventario-repuestos.csv` («Case Construction», no «CASE CONSTRUCTION»)                                                                                                          |
+| Logo de la marca                                   | `marcas.logo`                   | La serie «MARCA-NN.png» del sitio del cliente (§3)                                                                                                                                           |
 | Título de la página de tipo                        | `tipos-equipo.nombre`           | Sin «Repuestos para maquinaria pesada» ni la marca del final: «Miniexcavadora»                                                                                                               |
 | Título de la página de modelo                      | `modelos-repuesto.nombre`       | Sin «Repuestos (para)», con la escritura del cliente: «Excavadora CATERPILLAR 320B». Así el título por defecto del sitio nuevo, «Repuestos {nombre}», es el título de la página en WordPress |
 | Lo que sigue a la marca en el nombre               | `codigo`                        | «320B». Con la marca entera o su primera palabra («CASE»). Si no aparece, del slug                                                                                                           |
-| Texto de la sección principal                      | `descripcion`                   | **Tal cual** (dirección): texto plano, un párrafo por línea en blanco. Es de plantilla, 43 variantes para 347 modelos                                                                        |
+| Texto de la sección principal                      | `descripcion`                   | **Tal cual** (dirección): texto plano, un párrafo por línea en blanco. Es de plantilla, 43 variantes                                                                                         |
 | `<title>` que hoy publica el sitio (`url-map.csv`) | `seo.metaTitle` (tipo y modelo) | Sin el sufijo «- Partequipos» (el sitio nuevo añade « \| Partequipos»). **Vacío si coincide con el título por defecto**                                                                      |
 | Meta descripción que hoy publica el sitio          | `seo.metaDescription`           | Tal cual. Es de plantilla, pero lleva el nombre de cada página y es la que ve Google                                                                                                         |
-| Imagen de la sección principal                     | `imagenes` (una)                | La primera que no sea genérica. **AVIF → WebP** al importar (dirección), con `sharp`                                                                                                         |
-| Texto alternativo del adjunto                      | `alt`                           | Sin restos de numeración («(1)», «-01»). Si queda flojo para `Media` (`motivoAltFlojo`), el nombre del modelo                                                                                |
 | Lista «Repuestos disponibles para…»                | —                               | **No es un dato** (dirección): es la misma en todos; la pinta la plantilla                                                                                                                   |
-| Fotos de marcas y tipos                            | —                               | No se importan: casi ninguna página las tiene en la sección principal (ninguna de las 13 marcas, 4 de los 32 tipos) y los logos de las marcas del preview se conservan                       |
+| Imagen de la sección principal del modelo          | —                               | **No se importa** (ver arriba)                                                                                                                                                               |
 
-**Nombre del fichero en `Media`:** `wp-repuesto-<id del adjunto>-<nombre>.<ext>`.
-El id del adjunto lo hace único y estable: una foto compartida por dos modelos
-se sube una vez, y una segunda ejecución no la vuelve a subir.
+## 3. Los logos: blancos, para fondo oscuro
 
-**La conversión de AVIF es en la máquina que importa, no en el lambda.**
-`Media` sigue sin admitir AVIF (§10.28). El fallo de `libheif` de aquel aviso
-afecta a 1.22.0–1.23.1; el `sharp` 0.35.4 del proyecto lleva libheif 1.23.2,
-la versión corregida.
+La única serie que cubre las 13 marcas es la del propio sitio del cliente,
+«MARCA-NN.png» (2023, 419–872 px de ancho): `LOGOS_DE_MARCA` en
+`src/lib/repuestos/wordpress.ts`. **Son logos BLANCOS sobre transparente**,
+pensados para fondo oscuro: **sobre fondo claro no se ven**. Quien pinte las
+páginas de repuestos (el agente D) tiene que ponerlos sobre fondo oscuro o
+pedir otra versión al cliente. Tampoco sirven como imagen al compartir
+(`og:image`) sobre fondo blanco.
 
-## 3. Lo que no se importa
+- El de Hitachi se llama «OKADA-07.png» en WordPress; su texto alternativo allí
+  dice Hitachi, y lo es (comprobado a la vista).
+- Nombre en `Media`: `wp-logo-<id del adjunto>-<marca>.png`; texto alternativo
+  «Logo de {marca}». Una segunda ejecución no los vuelve a subir.
 
-| Qué                                                                                                                                               | Cuántas | Por qué                                                                                                                                          |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Borradores `-copy`                                                                                                                                | 2       | ADR 0004                                                                                                                                         |
-| Ammann (marca y su tipo) y PES Parts Equipment Solutions                                                                                          | 3 URL   | Sin modelos. **301 al índice de marcas de repuestos** (dirección, pendiente de confirmar con el cliente). Son 3 filas en `Redirects`, sin código |
-| Modelos CASE con un nivel de más (`…/cargador-frontal-case-construction/repuestos-para-maquinaria-pesada-excavadora-case-construction/<modelo>/`) | 4       | No tienen ruta en el sitio nuevo (tres niveles); `docs/redirects-map.csv` las marca huérfanas. Pendiente de decidir                              |
-| La imagen de relleno que repiten 23 páginas de modelo                                                                                             | 1       | No es foto del equipo: los 21 modelos que solo tienen esa van sin foto                                                                           |
-| Las 32 páginas de categoría técnica                                                                                                               | 32      | Necesitan plantilla y ruta nuevas (fuera de esta tarea; hoy dan 404)                                                                             |
+## 4. Lo que no se importa, y lo pendiente
+
+| Qué                                                                                                                                               | Cuántas | Qué se hace                                                                                                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Borradores `-copy`                                                                                                                                | 2       | Nada (ADR 0004)                                                                                                                                                                                                          |
+| Ammann (marca y su tipo) y PES Parts Equipment Solutions                                                                                          | 3 URL   | **301 al índice de marcas de repuestos** (dirección; pendiente de confirmar con el cliente)                                                                                                                              |
+| Modelos CASE con un nivel de más (`…/cargador-frontal-case-construction/repuestos-para-maquinaria-pesada-excavadora-case-construction/<modelo>/`) | 4       | **301 a su página madre**, la «Excavadora» de CASE, que sí se migra (dirección)                                                                                                                                          |
+| **Modelos con guion bajo en el slug** (`…-d6k_`, `…-dx225lca-cebdx_`, `…-dx340lca_`)                                                              | 3       | **PENDIENTES DE DIRECCIÓN.** `formatSlug` quita el `_` y la URL cambiaría (§3.3). `…-dx340lca_` duplica a `…-dx340lca`; los otros dos no tienen gemelo. `redirects-map.csv` decía «ruta conservada idéntica», y no lo es |
+| Fotos de los modelos                                                                                                                              | 324     | No se importan (dirección)                                                                                                                                                                                               |
+| Las 32 páginas de categoría técnica                                                                                                               | 32      | Necesitan plantilla y ruta nuevas (hoy dan 404)                                                                                                                                                                          |
+
+Las 7 redirecciones se crean en `Redirects` con origen «Migración». **En un
+preview no se pueden comprobar** (§10.22): se comprueban en producción.
 
 **La página CASE «Excavadora» colocada como modelo** (bajo «Cargador
 frontal»): es una página de tipo en el nivel de modelo. Va como modelo
-«Excavadora CASE CONSTRUCTION», sin código, para que su URL siga viva; la
-simulación lo avisa.
+«Excavadora CASE CONSTRUCTION», sin código, para que su URL siga viva.
 
-## 4. Lo que da la simulación (preview, 2026-10-13)
+**La demo del preview que no existe en WordPress** (dirección: se retira antes
+de importar): 2 tipos de Caterpillar (`…-bulldozer-caterpillar` y
+`…-retrocargadora-caterpillar`; WordPress escribe `buldozer` y
+`retrocargador`) y sus 25 modelos, 21 con el slug de un modelo real que
+habrían quedado duplicados bajo el tipo equivocado. El script **se para** si la
+demo a retirar no es exactamente esa (o nada, en una segunda ejecución), y
+también si alguna solicitud apunta a uno de esos modelos. Sus datos quedan en
+el manifiesto; **la retirada de la importación no los vuelve a crear**. En
+producción la demo se vacía entera antes (§10.6).
 
-| Colección          | En WordPress | Nuevos | Actualizados (ya en el preview, por slug) |
-| ------------------ | ------------ | ------ | ----------------------------------------- |
-| `marcas`           | 13           | 8      | 5                                         |
-| `tipos-equipo`     | 32           | 24     | 8                                         |
-| `modelos-repuesto` | 347          | 291    | 56                                        |
+## 5. Resultado en el preview (2026-10-13)
 
-- **Modelos:** 325 con foto, 22 sin foto (21 solo con la de relleno, 1 sin
-  ninguna); 347 con texto; código sacado del nombre en 346.
-- **SEO:** 311 modelos y 18 tipos guardarían su título actual porque difiere
-  del título por defecto (p. ej. el título de WordPress dice «Minexcavadora» y
-  el `<title>` publicado, «Miniexcavador»). Meta descripción en los 347.
-- **La demo del preview** (5 marcas, 10 tipos y 81 modelos) se compara por la
-  misma clave que la importación (marca / tipo / slug):
-  - **2 tipos de Caterpillar no existen en WordPress**: `…-bulldozer-caterpillar`
-    y `…-retrocargadora-caterpillar` (WordPress escribe `buldozer` y
-    `retrocargador`).
-  - **25 modelos de la demo cuelgan de ellos**, y 21 tienen el mismo slug que un
-    modelo real de WordPress. Importar sin más los dejaría **duplicados bajo el
-    tipo equivocado**. Antes de importar en el preview hay que retirar esos 2
-    tipos y sus 25 modelos (pendiente de dirección). En producción la demo se
-    vacía entera antes (§10.6).
+| Colección          | Total | Creados | Actualizados (de la demo) |
+| ------------------ | ----- | ------- | ------------------------- |
+| `marcas`           | 13    | 8       | 5                         |
+| `tipos-equipo`     | 32    | 24      | 8                         |
+| `modelos-repuesto` | 344   | 288     | 56                        |
+| Logos en `Media`   | 13    | 13      | —                         |
+| `redirects`        | 7     | 7       | —                         |
 
-### Operaciones del Blob
+- **Modelos:** 344 de los 347 de WordPress (los 3 de slug pendiente fuera); 344
+  con texto; código sacado del nombre en 343 (sin código, la «Excavadora» de
+  CASE). Sin duplicados de tipo + slug.
+- **SEO:** 308 modelos y 18 tipos guardan su título actual porque difiere del
+  título por defecto (p. ej. el título de WordPress dice «Minexcavadora» y el
+  `<title>` publicado, «Miniexcavador»). Meta descripción en los 344.
+- **Blob:** 13 subidas (los logos). Nada más.
+- **Retirada probada de punta a punta:** borró los 288 modelos, 24 tipos, 8
+  marcas, 7 redirecciones y 13 logos creados, devolvió los 69 registros
+  actualizados a sus valores de antes (5 marcas, 8 tipos y 56 modelos, con sus
+  textos y SEO de la demo) y los 13 logos dieron 404. Después se volvió a
+  importar.
+- **Un script no revalida el sitio** (los `revalidatePath` de los ganchos
+  fallan fuera de Next, «static generation store missing»): las páginas
+  prerenderizadas toman los datos en el siguiente despliegue.
 
-El adaptador (`@payloadcms/storage-vercel-blob` 3.89.0, `uploadFile.js`) hace
-**un `put` por fichero**. `Media` no tiene tamaños derivados y el `put` no va
-por partes, así que **cada foto es una operación de subida**.
+**Fotos de los modelos, por si el cliente las confirma:** serían 324 subidas
+(30 AVIF que pasan a WebP con `sharp` en la máquina que importa; `Media` sigue
+sin admitir AVIF, §10.28; el `sharp` 0.35.4 lleva libheif 1.23.2, la versión
+corregida del aviso). Con `fotos`, las 324 responden en WordPress y las AVIF se
+convierten sin error (7,8 MB → 4,3 MB). El adaptador del Blob hace **un `put`
+por fichero** (`uploadFile.js`; `Media` sin tamaños derivados ni subida por
+partes).
 
-| Qué                        | Operaciones |
-| -------------------------- | ----------- |
-| Fotos únicas a subir       | **324**     |
-| — de ellas, AVIF a WebP    | 30          |
-| Borrados, listados, copias | 0           |
+## 6. Para producción
 
-**Con `fotos`:** las 324 responden en WordPress (0 fallos), y las 30 AVIF se
-convierten a WebP en memoria sin error: 7,8 MB en AVIF pasan a 4,3 MB en WebP
-(calidad 82, mismas medidas). No se guarda nada.
-
-Las lecturas de las fotos al visitar el sitio son operaciones aparte (simples),
-no de esta cuenta. Una retirada costaría 324 borrados más.
-
-## 5. Antes de la importación real
-
-1. Dirección confirma el plan Pro y el almacén desbloqueado.
-2. Se añaden `importar` (por tandas, con manifiesto) y `retirar`, con el método
-   de `scripts/usados/importar-usados.ts`. La simulación se vuelve a ejecutar
-   antes de la primera tanda.
-3. Verificación: las 394 URL importables en 200 en el preview, ruta a ruta
-   (la raíz, el índice de marcas, 13 marcas, 32 tipos y 347 modelos), y las 3
-   redirecciones en 301; el sitemap; pintado
-   de un modelo con foto, uno sin foto y uno con AVIF a 390 y 1440; el
-   verificador.
-4. Runbook para la carga definitiva, sin ejecutar.
+Runbook de dirección, sin ejecutar todavía: vaciar la demo (§10.6), importar
+con el destino de producción y comprobar las 7 redirecciones allí. Falta antes
+la decisión de los 3 slugs con guion bajo.

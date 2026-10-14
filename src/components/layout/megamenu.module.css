@@ -1,8 +1,8 @@
 /*
  * MEGAMENÚ — export 2162 del 2026-10-05 de Andrés, MEDIDO en ux-9 pintado a
  * 1440 (decisiones-home-ux9.md §26):
- * - Caja blanca de 500 px centrada en la ventana, 39 px de relleno, esquinas
- *   inferiores de 30 px, que empieza 4 px por encima del borde de la barra.
+ * - Caja de 500 px centrada en la ventana, 39 px de relleno, esquinas
+ *   inferiores de 30 px, pegada a la barra.
  * - Entra con un fundido desde arriba de 550 ms (`fade_in_top`).
  * - Nivel 1: recuadro de 1 px #d5d8dc, radio 10, relleno 15, 10 px entre
  *   ellos, texto 16 px en peso 500.
@@ -11,41 +11,80 @@
  * - Hojas: marca roja, texto 16 px peso 300 en el gris `secondary`, 5 px entre
  *   ellas.
  * Solo en escritorio (≥ 1025 px): por debajo, la cabecera es la móvil.
+ *
+ * PETICIÓN DE ANDRÉS (2026-10-14), docs/diseno/decisiones-cabecera.md:
+ * 1. VIDRIO ESMERILADO como la barra: mismo `blur(20px) saturate(1.8)`. La
+ *    transparencia NO es la misma (27 %): con un velo tan ligero el texto no
+ *    llega a AA sobre una foto oscura (medido, 3,8:1 el gris y 2,3:1 el rojo
+ *    con el 72 %). El vidrio del panel es blanco al 86 %, y el rojo de los
+ *    textos del panel baja a #be1620: en el peor caso (fondo negro) 13,8:1 el
+ *    texto, 5,4:1 el gris y 4,56:1 el rojo; sobre blanco, 6,3:1 el rojo.
+ * 2. ESQUINAS SUPERIORES INVERTIDAS: donde el panel se une a la cabecera, en
+ *    vez de un ángulo de 90°, una curva CÓNCAVA que se abre hacia fuera, como
+ *    las pestañas de Chrome al unirse a su barra. El vidrio y el filete siguen
+ *    exactamente esa forma con una MÁSCARA de gradientes (sin JavaScript ni
+ *    medidas: vale con cualquier alto y ancho). La construcción está explicada
+ *    en `.panel` y se genera con la fórmula de decisiones-cabecera.md.
+ *
+ * ORDEN: las variantes `-webkit-` van SIEMPRE antes que las estándar (si no,
+ * lightningcss se queda con la última y se pierde la prefijada, CLAUDE.md
+ * §10.35).
  */
 
 .panel {
-  --mega-arriba: 96px;
+  /* Dónde acaba la cabecera (px): la fija `Cabecera` con su alto MEDIDO. */
+  --mega-arriba: 100px;
+  /* Radio de la curva cóncava de arriba y de las esquinas convexas de abajo. */
+  --mega-curva: 20px;
+  --mega-radio: 30px;
+  --mega-filete-ancho: 1px;
+  /* Vidrio: blanco al 86 %, AA con cualquier fondo (ver arriba). */
+  --mega-vidrio: rgb(255 255 255 / 86%);
+  --mega-filete: rgb(16 15 15 / 18%);
+  --mega-rojo: #be1620;
 
   position: fixed;
   z-index: 49;
-  top: var(--mega-arriba);
+  /* Un píxel por debajo de la cabecera: sin costura entre las dos. */
+  top: calc(var(--mega-arriba) - 1px);
   left: 50%;
   width: 500px;
   max-width: calc(100vw - 40px);
   visibility: hidden;
-  opacity: 0;
   transform: translate(-50%, -12px);
   transition:
-    opacity 0.55s ease,
     transform 0.55s ease,
     visibility 0s linear 0.55s,
     top 0.4s ease-in-out;
 }
 
-/* Encogida, la barra mide 70 px: el panel sube con ella. */
-.panel[data-encogida="si"] {
-  --mega-arriba: 66px;
-}
-
 .panel[data-abierto="si"] {
   visibility: visible;
-  opacity: 1;
   transform: translate(-50%, 0);
   transition:
-    opacity 0.55s ease,
     transform 0.55s ease,
     visibility 0s linear 0s,
     top 0.4s ease-in-out;
+}
+
+/*
+ * EL FUNDIDO va en las capas y en el contenido, NO en el panel: un ancestro con
+ * `opacity` menor que 1 es «raíz de fondo» y el `backdrop-filter` de sus hijos
+ * solo vería lo de dentro (el vidrio perdería el desenfoque durante los 550 ms y
+ * lo ganaría de golpe al acabar). Con la opacidad en el propio elemento, el
+ * desenfoque está desde el primer fotograma.
+ */
+.caja,
+.panel::before,
+.panel::after {
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+
+.panel[data-abierto="si"] .caja,
+.panel[data-abierto="si"]::before,
+.panel[data-abierto="si"]::after {
+  opacity: 1;
 }
 
 @media (max-width: 1024px) {
@@ -60,8 +99,16 @@
     transform: translate(-50%, 0);
     transition: none;
   }
+
+  /* El contenido y las capas no se desplazan: solo aparecen, sin fundido. */
+  .caja,
+  .panel::before,
+  .panel::after {
+    transition: none;
+  }
 }
 
+/* Sin máscaras ni desenfoque: la caja blanca de siempre, con sus esquinas de abajo de 30 px. */
 .caja {
   display: flex;
   flex-direction: column;
@@ -71,8 +118,165 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 39px;
-  border-radius: 0 0 30px 30px;
+  border-radius: 0 0 var(--mega-radio) var(--mega-radio);
   background: var(--color-fondo);
+}
+
+/*
+ * CON máscaras (todos los navegadores actuales): el panel mide 500 + 2 × curva
+ * y la caja de contenido va en el centro, entre las dos pestañas invertidas.
+ *
+ *   ┌── cabecera ──────────────────────┐
+ *   ╯ ╭──────────────────────────╮ ╰    ← la curva cóncava une el panel a la barra
+ *     │          contenido       │
+ *     ╰──────────────────────────╯      ← esquinas de abajo convexas de 30 px
+ *
+ * Tres capas, todas con la MISMA forma salvo el grosor del filete:
+ * - `::before` FILETE: forma exterior MENOS forma interior (anillo de 1 px),
+ *   con `mask-composite`: las capas interiores restan (`subtract`) y las
+ *   exteriores suman (`add`). Arriba no hay filete: ahí se une a la cabecera.
+ * - `::after` VIDRIO: forma interior, con `backdrop-filter`.
+ * - `.caja`: el contenido, encima, sin fondo.
+ * La forma son 6 capas de gradiente (columna central, franja de abajo, dos
+ * cuartos de círculo convexos y las dos curvas cóncavas); con el filete en 0
+ * es la exterior y con 1 px la interior, desplazada hacia dentro.
+ */
+@supports (
+  (mask-image: linear-gradient(#000, #000)) or (-webkit-mask-image: linear-gradient(#000, #000))
+) {
+  .panel {
+    --ci: calc(var(--mega-curva) + var(--mega-filete-ancho));
+    --rbi: calc(var(--mega-radio) - var(--mega-filete-ancho));
+
+    /* Forma EXTERIOR (sin filete). */
+    --ext-img:
+      linear-gradient(#000, #000), linear-gradient(#000, #000),
+      radial-gradient(
+        circle at 100% 0,
+        #000 calc(var(--mega-radio) - 0.5px),
+        #0000 calc(var(--mega-radio) + 0.5px)
+      ),
+      radial-gradient(
+        circle at 0 0,
+        #000 calc(var(--mega-radio) - 0.5px),
+        #0000 calc(var(--mega-radio) + 0.5px)
+      ),
+      radial-gradient(
+        circle at 0 100%,
+        #0000 calc(var(--mega-curva) - 0.5px),
+        #000 calc(var(--mega-curva) + 0.5px)
+      ),
+      radial-gradient(
+        circle at 100% 100%,
+        #0000 calc(var(--mega-curva) - 0.5px),
+        #000 calc(var(--mega-curva) + 0.5px)
+      );
+    --ext-tam:
+      calc(100% - 2 * var(--mega-curva)) calc(100% - var(--mega-radio)),
+      calc(100% - 2 * (var(--mega-curva) + var(--mega-radio))) var(--mega-radio),
+      var(--mega-radio) var(--mega-radio), var(--mega-radio) var(--mega-radio),
+      var(--mega-curva) var(--mega-curva), var(--mega-curva) var(--mega-curva);
+    --ext-pos:
+      left var(--mega-curva) top 0, left calc(var(--mega-curva) + var(--mega-radio)) bottom 0,
+      left var(--mega-curva) bottom 0, right var(--mega-curva) bottom 0, left 0 top 0, right 0 top 0;
+
+    /* Forma INTERIOR: la exterior desplazada hacia dentro el grosor del filete. */
+    --int-img:
+      linear-gradient(#000, #000), linear-gradient(#000, #000),
+      radial-gradient(
+        circle at 100% 0,
+        #000 calc(var(--rbi) - 0.5px),
+        #0000 calc(var(--rbi) + 0.5px)
+      ),
+      radial-gradient(circle at 0 0, #000 calc(var(--rbi) - 0.5px), #0000 calc(var(--rbi) + 0.5px)),
+      radial-gradient(
+        circle at 0 100%,
+        #0000 calc(var(--ci) - 0.5px),
+        #000 calc(var(--ci) + 0.5px)
+      ),
+      radial-gradient(
+        circle at 100% 100%,
+        #0000 calc(var(--ci) - 0.5px),
+        #000 calc(var(--ci) + 0.5px)
+      );
+    --int-tam:
+      calc(100% - 2 * var(--ci)) calc(100% - var(--mega-radio)),
+      calc(100% - 2 * (var(--mega-curva) + var(--mega-radio))) var(--rbi), var(--rbi) var(--rbi),
+      var(--rbi) var(--rbi), var(--ci) var(--mega-curva), var(--ci) var(--mega-curva);
+    --int-pos:
+      left var(--ci) top 0,
+      left calc(var(--mega-curva) + var(--mega-radio)) bottom var(--mega-filete-ancho),
+      left var(--ci) bottom var(--mega-filete-ancho),
+      right var(--ci) bottom var(--mega-filete-ancho), left 0 top 0, right 0 top 0;
+
+    width: calc(500px + 2 * var(--mega-curva));
+    max-width: calc(100vw - 20px);
+  }
+
+  .panel::before,
+  .panel::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    pointer-events: none;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+
+  /* FILETE: exterior menos interior. Las seis capas de arriba restan; las seis de abajo suman. */
+  .panel::before {
+    background: var(--mega-filete);
+    -webkit-mask-image: var(--int-img), var(--ext-img);
+    -webkit-mask-size: var(--int-tam), var(--ext-tam);
+    -webkit-mask-position: var(--int-pos), var(--ext-pos);
+    -webkit-mask-composite:
+      source-out, source-out, source-out, source-out, source-out, source-out, source-over,
+      source-over, source-over, source-over, source-over, source-over;
+    mask-image: var(--int-img), var(--ext-img);
+    mask-size: var(--int-tam), var(--ext-tam);
+    mask-position: var(--int-pos), var(--ext-pos);
+    mask-composite:
+      subtract, subtract, subtract, subtract, subtract, subtract, add, add, add, add, add, add;
+  }
+
+  /* VIDRIO: la forma interior, con el desenfoque de la barra. */
+  .panel::after {
+    background: var(--mega-vidrio);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-mask-image: var(--int-img);
+    -webkit-mask-size: var(--int-tam);
+    -webkit-mask-position: var(--int-pos);
+    mask-image: var(--int-img);
+    mask-size: var(--int-tam);
+    mask-position: var(--int-pos);
+  }
+
+  .caja {
+    position: relative;
+    z-index: 1;
+    /* Entre las dos pestañas invertidas. */
+    margin-inline: var(--mega-curva);
+    border-radius: 0;
+    background: none;
+  }
+}
+
+/* Sin desenfoque: el vidrio pasa a casi opaco, para que el texto se lea igual. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .panel::after {
+    background: rgb(255 255 255 / 98%);
+  }
+}
+
+/* Con transparencia reducida del sistema, también opaco (y sin desenfoque). */
+@media (prefers-reduced-transparency: reduce) {
+  .panel::after {
+    background: rgb(255 255 255 / 98%);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .verTodo {
@@ -81,7 +285,7 @@
   align-self: flex-start;
   gap: 6px;
   padding: 4px 0;
-  color: var(--color-marca);
+  color: var(--mega-rojo);
   font-size: 16px;
   font-weight: 500;
   text-decoration: none;
@@ -137,7 +341,7 @@
 
 .titulo:hover,
 .acordeon[data-abierto="si"] > .titulo {
-  color: var(--color-marca);
+  color: var(--mega-rojo);
 }
 
 /* Nivel 1: el recuadro del diseño. */
@@ -189,7 +393,7 @@
 }
 
 .hoja:hover {
-  color: var(--color-marca);
+  color: var(--mega-rojo);
 }
 
 .verTodo:focus-visible,

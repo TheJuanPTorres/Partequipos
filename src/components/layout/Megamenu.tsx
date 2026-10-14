@@ -3,7 +3,7 @@
 import { IconCheck, IconChevronRight, IconMinus, IconPlus } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
-import { forwardRef, useId, useState, type KeyboardEvent } from "react";
+import { forwardRef, useId, useState, type CSSProperties, type KeyboardEvent } from "react";
 
 import type { EnlaceMenu, GrupoMenu, PanelMenu } from "@/lib/megamenu";
 
@@ -92,7 +92,8 @@ type Props = {
   etiqueta: string;
   panel: PanelMenu;
   abierto: boolean;
-  encogida: boolean;
+  /** Dónde acaba la cabecera (px): el panel empieza ahí. `null`: el valor de reserva del CSS. */
+  arriba: number | null;
   /**
    * Cerrar: al elegir un enlace (`null`), con Escape o Mayús+Tab desde el
    * primero (`"boton"`), o con Tab desde el último (`"siguiente"`).
@@ -103,7 +104,7 @@ type Props = {
 };
 
 export const Megamenu = forwardRef<HTMLElement, Props>(function Megamenu(
-  { id, etiqueta, panel, abierto, encogida, alCerrar, alEntrar, alSalir },
+  { id, etiqueta, panel, abierto, arriba, alCerrar, alEntrar, alSalir },
   ref,
 ) {
   /*
@@ -140,7 +141,7 @@ export const Megamenu = forwardRef<HTMLElement, Props>(function Megamenu(
       aria-label={etiqueta}
       className={estilos.panel}
       data-abierto={abierto ? "si" : "no"}
-      data-encogida={encogida ? "si" : "no"}
+      style={arriba === null ? undefined : ({ "--mega-arriba": `${arriba}px` } as CSSProperties)}
       onKeyDown={alTeclado}
       onMouseEnter={alEntrar}
       onMouseLeave={alSalir}

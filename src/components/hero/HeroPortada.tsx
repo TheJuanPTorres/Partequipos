@@ -40,10 +40,12 @@ import estilos from "./hero.module.css";
  * - D13 (carrusel, versión «premium» pedida por dirección): fundido cruzado,
  *   Ken Burns, 7 s por diapositiva, texto que entra con fundido y línea de
  *   progreso en el punto activo. ux-9 no tiene carrusel en el hero.
- * - D15 (dirección, pendiente de Andrés): el título va SIEMPRE centrado y en el
- *   mismo sitio, haya o no máquina recortada: en un carrusel el texto no salta.
- *   La máquina se adapta al texto: su caja empieza bajo el título y queda a la
- *   izquierda del vidrio (en ux-9, el título arriba y la máquina debajo).
+ * - D15 (dirección): el título va SIEMPRE en el mismo sitio, haya o no máquina:
+ *   en un carrusel el texto no salta. Desde el diseño de sliders de Andrés
+ *   (2026-10-14, docs/diseno/decisiones-hero-sliders.md) ese sitio es ARRIBA y
+ *   la máquina va debajo, en el mismo flujo; con «sobre», en escritorio cruza
+ *   el título. El título puede ir en varias líneas o partido en escritorio, y
+ *   cada diapositiva puede llevar un texto circular decorativo.
  *
  * EL TIEMPO LO MARCA LA LÍNEA DE PROGRESO: cuando su animación CSS termina,
  * pasa la diapositiva. Así la pausa (botón, ratón o foco dentro) detiene a la
@@ -58,6 +60,12 @@ type Props = { diapositivas: DiapositivaHero[] };
 
 /** Desplazamiento mínimo del dedo para contar como gesto, en px. */
 const GESTO_PX = 50;
+/**
+ * Letras a partir de las que el párrafo se considera largo: en el diseño de
+ * sliders, el de Hitachi (128) va en un vidrio de 400 px y el de CASE (131), en
+ * uno de 500.
+ */
+const PARRAFO_LARGO = 130;
 /** Lo que dura el fundido (`--hero-fundido` en el CSS), para soltar la saliente. */
 const FUNDIDO_MS = 1200;
 
@@ -72,6 +80,34 @@ function IconoFlecha({ hacia }: { hacia: "anterior" | "siguiente" }) {
         strokeLinejoin="round"
       />
     </svg>
+  );
+}
+
+/**
+ * TEXTO CIRCULAR (el `text-path` de la diapositiva 1 del diseño): el texto
+ * repetido alrededor de un círculo, girando despacio. Decorativo: oculto al
+ * lector. El giro lo para la pausa del hero y «reducir movimiento» (CSS).
+ * `textLength` reparte el texto en la vuelta entera, sea cual sea su largo.
+ */
+function TextoCircular({ texto }: { texto: string }) {
+  const id = useId();
+  const radio = 40;
+  return (
+    <div className={estilos.circular} aria-hidden="true">
+      <svg viewBox="0 0 100 100" focusable="false">
+        <defs>
+          <path
+            id={id}
+            d={`M 50,50 m -${radio},0 a ${radio},${radio} 0 1,1 ${radio * 2},0 a ${radio},${radio} 0 1,1 -${radio * 2},0`}
+          />
+        </defs>
+        <text>
+          <textPath href={`#${id}`} textLength={String(Math.floor(2 * Math.PI * radio) - 2)}>
+            {`${texto} `}
+          </textPath>
+        </text>
+      </svg>
+    </div>
   );
 }
 
@@ -310,9 +346,40 @@ export function HeroPortada({ diapositivas }: Props) {
   const estadoDe = (i: number) =>
     i === activo ? "activa" : i === saliente ? "saliente" : "oculta";
   const entra = cambiado ? ` ${estilos.entra}` : "";
+  /*
+   * TÍTULO: el lector oye `d.titulo` (una línea); lo pintado va oculto a él.
+   * Las líneas del panel se pintan con su salto; con título partido, en
+   * escritorio se pinta la parte de arriba aquí y la de abajo sobre la máquina.
+   */
+  const letras = Math.max(...d.tituloLineas.map((l) => l.length));
+  const palabra = Math.max(...d.titulo.split(" ").map((p) => p.length));
   const titulo = (
-    <h2 key={`titulo-${activo}`} id={idTitulo} className={`${estilos.titulo}${entra}`}>
-      {d.titulo}
+    <h2
+      key={`titulo-${activo}`}
+      id={idTitulo}
+      className={`${estilos.titulo}${entra}`}
+      data-partido={d.tituloPartido ? "" : undefined}
+      style={{
+        ["--hero-titulo-letras" as string]: String(letras),
+        ["--hero-titulo-letras-escritorio" as string]: String(
+          d.tituloPartido ? d.tituloPartido.arriba.length : letras,
+        ),
+        ["--hero-titulo-palabra" as string]: String(palabra),
+      }}
+    >
+      <span className={estilos.soloLector}>{d.titulo}</span>
+      <span aria-hidden="true" className={estilos.tituloEntero}>
+        {d.tituloLineas.map((l, i) => (
+          <span key={i} className={estilos.tituloLinea}>
+            {l}
+          </span>
+        ))}
+      </span>
+      {d.tituloPartido ? (
+        <span aria-hidden="true" className={estilos.tituloArriba}>
+          {d.tituloPartido.arriba}
+        </span>
+      ) : null}
     </h2>
   );
 
@@ -322,8 +389,12 @@ export function HeroPortada({ diapositivas }: Props) {
       className={estilos.hero}
       aria-roledescription={hayVarias ? "carrusel" : undefined}
       aria-labelledby={idTitulo}
-      // Todo lo que se mueve solo se detiene aquí: línea, Ken Burns y pase.
+      // Todo lo que se mueve solo se detiene aquí: línea, Ken Burns, pase y texto circular.
       data-pausado={pausado || dentro ? "" : undefined}
+      // Un párrafo largo ensancha el vidrio en escritorio, como en el diseño (uno para todas).
+      data-vidrio-largo={
+        diapositivas.some((s) => (s.parrafo?.length ?? 0) > PARRAFO_LARGO) ? "" : undefined
+      }
       onKeyDown={alPulsar}
       onMouseEnter={() => setDentro(true)}
       onMouseLeave={() => setDentro(false)}
@@ -358,44 +429,51 @@ export function HeroPortada({ diapositivas }: Props) {
           )}
         </div>
 
-        {/* Fila y hueco en el flujo: conservan el alto de la tarjeta de ux-9. */}
-        <div className={estilos.filaTitulo} aria-hidden="true" />
-
-        {/* TÍTULO EN <h2> (D1): siempre centrado y en el mismo sitio (D15). */}
-        <div
-          className={`${estilos.capaTexto} ${estilos.capaParallax}`}
-          // Letras del título activo: el CSS encoge solo el que no cabe.
-          style={{ ["--hero-titulo-letras" as string]: String(d.titulo.length) }}
-        >
-          {titulo}
-        </div>
-
-        <div className={estilos.hueco} aria-hidden="true" />
-
         {/*
-         * MÁQUINA RECORTADA: en su propia caja, que se adapta al texto (D15):
-         * empieza bajo el bloque del título, a la izquierda del vidrio y por
-         * encima de los controles. Nunca se solapa con el texto.
+         * TÍTULO EN <h2> (D1), ARRIBA Y SIEMPRE EN EL MISMO SITIO (D15), y la
+         * MÁQUINA debajo, en el mismo flujo (hero de sliders de Andrés): ocupa lo
+         * que queda hasta los controles, así se adapta a un título de varias
+         * líneas. Con «sobre», en escritorio sube y cruza el título.
          */}
-        <div className={estilos.capaMaquina}>
-          {diapositivas.map((s, i) =>
-            s.frontal && cargadas.has(i) ? (
-              <div
-                key={`${s.frontal.url}-${i}`}
-                className={estilos.capaFrontal}
-                hidden={i !== activo}
-              >
-                <Image
-                  src={s.frontal.url}
-                  alt={s.frontal.alt}
-                  fill
-                  sizes="(max-width: 767px) 100vw, (max-width: 1024px) 60vw, 940px"
-                  className={estilos.frontal}
-                />
-              </div>
-            ) : null,
-          )}
+        <div className={estilos.capaTexto} data-maquina={d.posicionMaquina}>
+          <div className={estilos.capaParallax}>{titulo}</div>
+          <div className={estilos.capaMaquina}>
+            {diapositivas.map((s, i) =>
+              s.frontal && cargadas.has(i) ? (
+                <div
+                  key={`${s.frontal.url}-${i}`}
+                  className={estilos.capaFrontal}
+                  hidden={i !== activo}
+                >
+                  <Image
+                    src={s.frontal.url}
+                    alt={s.frontal.alt}
+                    fill
+                    sizes="(max-width: 767px) 100vw, (max-width: 1024px) 631px, 1000px"
+                    className={estilos.frontal}
+                  />
+                </div>
+              ) : null,
+            )}
+          </div>
         </div>
+
+        {/* Escritorio, título partido: la parte de abajo, sobre la máquina. */}
+        {d.tituloPartido ? (
+          <p
+            key={`abajo-${activo}`}
+            aria-hidden="true"
+            className={`${estilos.tituloAbajo}${entra}`}
+            style={{ ["--hero-titulo-letras" as string]: String(d.tituloPartido.abajo.length) }}
+          >
+            {d.tituloPartido.abajo}
+          </p>
+        ) : null}
+
+        {/* TEXTO CIRCULAR: decorativo; gira despacio y se para con la pausa. */}
+        {d.textoCircular ? (
+          <TextoCircular key={`circular-${activo}`} texto={d.textoCircular} />
+        ) : null}
 
         {/* Con una diapositiva no hay controles; la fila conserva su alto. */}
         <div className={estilos.fila}>
@@ -445,7 +523,7 @@ export function HeroPortada({ diapositivas }: Props) {
           ) : null}
         </div>
 
-        {/* VIDRIO: oculto en móvil por CSS, como en el diseño. */}
+        {/* VIDRIO: también en móvil (diseño de sliders), encima de los controles. */}
         {d.parrafo || d.enlace ? (
           <div className={`${estilos.vidrio} ${estilos.capaParallax}`}>
             {/*

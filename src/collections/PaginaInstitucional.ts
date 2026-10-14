@@ -189,10 +189,43 @@ export const PaginaInstitucional: CollectionConfig = {
           fields: [
             {
               name: "titulo",
-              type: "text",
+              type: "textarea",
               required: true,
               label: "Título",
-              admin: { description: "Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño." },
+              admin: {
+                rows: 2,
+                description:
+                  "Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas.",
+              },
+            },
+            {
+              /*
+               * TÍTULO PARTIDO EN ESCRITORIO (hero de sliders de Andrés, 2026-10-14):
+               * en la diapositiva de CASE, a ≥ 1025 px el título va en dos piezas,
+               * una arriba y otra abajo, sobre la máquina. Por debajo, el «Título».
+               * Lo que lee un lector de pantalla es siempre el «Título».
+               */
+              type: "row",
+              fields: [
+                {
+                  name: "tituloArriba",
+                  type: "text",
+                  label: "Escritorio: parte de arriba",
+                  admin: {
+                    width: "50%",
+                    description: "Opcional. Solo a 1025 px o más, encima de la máquina.",
+                  },
+                },
+                {
+                  name: "tituloAbajo",
+                  type: "text",
+                  label: "Escritorio: parte de abajo",
+                  admin: {
+                    width: "50%",
+                    description: "Opcional. Solo a 1025 px o más, abajo, sobre la máquina.",
+                  },
+                },
+              ],
             },
             {
               name: "parrafo",
@@ -229,6 +262,37 @@ export const PaginaInstitucional: CollectionConfig = {
               relationTo: "media",
               label: "Máquina recortada (PNG transparente)",
               admin: { description: "Opcional: va delante del título." },
+            },
+            {
+              type: "row",
+              fields: [
+                {
+                  name: "posicionMaquina",
+                  type: "select",
+                  label: "Posición de la máquina",
+                  defaultValue: "debajo",
+                  options: [
+                    { label: "Debajo del título", value: "debajo" },
+                    { label: "Sobre el título (lo cruza, en escritorio)", value: "sobre" },
+                  ],
+                  admin: {
+                    width: "50%",
+                    description:
+                      "«Sobre» cruza el título a 1025 px o más; en tablet y móvil va debajo. El título sigue en el texto de la página.",
+                  },
+                },
+                {
+                  name: "textoCircular",
+                  type: "text",
+                  label: "Texto circular",
+                  maxLength: 60,
+                  admin: {
+                    width: "50%",
+                    description:
+                      "Opcional. Gira despacio (quieto con «reducir movimiento» o al pausar). Decorativo: los lectores de pantalla no lo leen.",
+                  },
+                },
+              ],
             },
             {
               type: "row",

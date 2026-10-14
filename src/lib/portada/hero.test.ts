@@ -55,6 +55,42 @@ describe("diapositivas del hero", () => {
     assert.equal(roto?.fondoMovil, null, "imagen borrada (llega el id): como si no hubiera");
   });
 
+  it("título en varias líneas: se pintan las líneas y se lee en una", () => {
+    const [d] = diapositivasDeHero({
+      diapositivas: [{ titulo: " Línea uno \n\n  Línea   dos ", imagenFondo: media(1) }],
+    });
+    assert.deepEqual(d?.tituloLineas, ["Línea uno", "Línea dos"]);
+    assert.equal(d?.titulo, "Línea uno Línea dos");
+  });
+
+  it("título partido en escritorio: los dos trozos o ninguno", () => {
+    const base = { titulo: "Uno. Dos. Tres.", imagenFondo: media(1) };
+    const [con] = diapositivasDeHero({
+      diapositivas: [{ ...base, tituloArriba: " Uno. Dos ", tituloAbajo: "Tres." }],
+    });
+    assert.deepEqual(con?.tituloPartido, { arriba: "Uno. Dos", abajo: "Tres." });
+    const [solo] = diapositivasDeHero({ diapositivas: [{ ...base, tituloArriba: "Uno." }] });
+    assert.equal(solo?.tituloPartido, null, "con un solo trozo, el título entero");
+  });
+
+  it("máquina debajo por defecto; texto circular opcional", () => {
+    const [d] = diapositivasDeHero({ diapositivas: [{ titulo: "X", imagenFondo: media(1) }] });
+    assert.equal(d?.posicionMaquina, "debajo");
+    assert.equal(d?.textoCircular, null);
+    const [s] = diapositivasDeHero({
+      diapositivas: [
+        {
+          titulo: "X",
+          imagenFondo: media(1),
+          posicionMaquina: "sobre",
+          textoCircular: " Uno. Dos. ",
+        },
+      ],
+    });
+    assert.equal(s?.posicionMaquina, "sobre");
+    assert.equal(s?.textoCircular, "Uno. Dos.");
+  });
+
   it("descarta la diapositiva sin fondo utilizable (p. ej. imagen borrada: llega el id)", () => {
     assert.deepEqual(diapositivasDeHero({ diapositivas: [{ titulo: "X", imagenFondo: 7 }] }), []);
   });

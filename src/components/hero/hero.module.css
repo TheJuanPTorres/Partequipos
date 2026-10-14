@@ -41,20 +41,23 @@
   --hero-titulo-peso: 600;
   --hero-titulo-interlineado: 1.4;
   --hero-titulo-espaciado: normal;
-  /* El solape con la máquina. Medido en su página, no estimado. */
-  --hero-titulo-margen-abajo: -250px;
-  /*
-   * Ajuste de la posición de las letras, MEDIDO en ux-9 pintado (carga limpia,
-   * scroll 0, letras pintadas en magenta; 2026-09-30): allí quedan 13 px bajo
-   * el borde de la tarjeta a 1440, 96 a 1010 y 90 a 390. Sin ajuste, aquí 66,
-   * 159 y 65. Se corrige solo lo que se ve (`top` relativo): la maquetación, la
-   * máquina y el vidrio no se mueven.
-   */
-  --hero-titulo-ajuste: -53px;
+  /* La parte de abajo del título partido (escritorio, diapositiva de CASE). */
+  --hero-titulo-abajo-tam: 85px;
+  --hero-titulo-abajo: 165px;
 
-  /* --- Hueco de la máquina: ancho pintado; la altura, la proporción 1476×1057. --- */
-  --hero-imagen-ancho: 809px;
-  --hero-imagen-margen-arriba: 100px;
+  /* --- Máquina recortada: ancho del diseño (debajo / sobre el título). --- */
+  --hero-maquina-ancho: 762px;
+  --hero-maquina-ancho-sobre: 1000px;
+  --hero-maquina-aire: 16px;
+  --hero-maquina-lado: 20px;
+  /* «Sobre»: la máquina sube hasta 38 px bajo el borde de arriba del título (medido a 1440). */
+  --hero-maquina-cruce: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado) * -0.77);
+
+  /* --- Texto circular: tamaño y sitio del diseño (desde la esquina de abajo a la izquierda). --- */
+  --hero-circular-tam: 120px;
+  --hero-circular-izquierda: 94px;
+  --hero-circular-abajo: 110px;
+  --hero-circular-vuelta: 20s;
 
   /* --- Flechas --- */
   --hero-flecha-tam: 42px;
@@ -76,27 +79,12 @@
   --hero-texto-retraso: 300ms;
   --hero-texto-subida: 12px;
   /*
-   * --- Posición del título (D15, dirección; PENDIENTE DE ANDRÉS) ---
-   * Centrado en la tarjeta, un poco por encima del centro: el hueco de abajo
-   * es mayor que el de arriba. Arriba, al menos 64 px (40 en móvil).
+   * --- Posición del título: ARRIBA, como en el diseño de sliders (medido a
+   * 1440: 124 px bajo el borde de la tarjeta), y en el mismo sitio en todas las
+   * diapositivas (D15). Abajo se reserva la fila de controles más el aire.
    */
-  --hero-texto-arriba: 64px;
-  /* En `cqi` (ancho de la tarjeta) para que la caja de la máquina use el mismo número. */
-  --hero-texto-abajo: 22cqi;
-  /* Media altura del bloque del título: una línea de `--hero-titulo-tam` × 1,4. */
-  --hero-titulo-medio: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado) / 2);
-  /* Caja de la máquina (ver `.capaMaquina`). */
-  --hero-maquina-aire: 16px;
-  --hero-maquina-izquierda: var(--hero-relleno);
-  --hero-maquina-derecha: calc(var(--hero-vidrio-derecha) + var(--hero-vidrio-ancho) + 16px);
-  /*
-   * Abajo: por encima de flechas y puntos más el aire. La fila NO va pegada al
-   * borde: el contenido se centra en la tarjeta, así que su sitio depende del
-   * alto. Controles desde abajo = relleno + (alto − contenido) / 2 + 72 px;
-   * con el contenido de escritorio (719 px + 20 de relleno) sale 50 % − 287,5,
-   * y con 16 de aire, 50 % − 271,5. MEDIDO: coincide a 1025–1920.
-   */
-  --hero-maquina-abajo: calc(50% - 271.5px);
+  --hero-texto-arriba: 124px;
+  --hero-texto-abajo: 98px;
 
   /* --- Velo sobre la foto (D14, ver `.marco::after`). --- */
   /* Sobre el global `text` (#100F0F): el kit no tiene negro. */
@@ -271,40 +259,41 @@
 
 /* ----------------------------------------------------------------- título */
 
-.filaTitulo {
-  z-index: 0;
-  width: 100%;
-  /*
-   * Alto FIJO de una línea al tamaño del diseño, aunque el título encoja para
-   * caber: si no, cada diapositiva tendría una tarjeta de altura distinta y
-   * todo saltaría al cambiar.
-   */
-  min-height: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado));
-  /* Aquí está el solape: el título cede 250 px al elemento siguiente. */
-  margin-bottom: var(--hero-titulo-margen-abajo);
-}
-
 /*
- * AJUSTE AL ANCHO — añadido nuestro. El diseño asume un título corto
- * («POTENCIA HITACHI», 16 letras). «POTENCIA CATERPILLAR» (20) no cabe a
- * 120 px, parte en dos líneas y la tarjeta crece: todo salta al cambiar de
- * diapositiva. Se vio pintado.
- *
- * El tamaño es el MENOR entre el del diseño y el que cabe en la tarjeta,
- * calculado con el número de letras (lo pone el componente) y el ancho medio
- * de una mayúscula de Inter seminegrita: medido 0,59 em, se usa 0,62 de margen.
- * Un título que cabe conserva sus 120 px exactos; solo encoge el que no.
+ * HERO DE SLIDERS DE ANDRÉS (2026-10-14; docs/diseno/decisiones-hero-sliders.md).
+ * El título va ARRIBA, en el mismo sitio en todas las diapositivas (D15), y la
+ * máquina debajo, en el mismo flujo: ocupa lo que queda hasta los controles,
+ * así un título de varias líneas no se solapa con ella. Todo dentro de una capa
+ * absoluta: la tarjeta no cambia de alto entre diapositivas (CLS 0).
  */
 .tarjeta {
+  justify-content: flex-end;
+  /* El tamaño del título se calcula con el ancho de la tarjeta (`cqi`). */
   container-type: inline-size;
 }
 
+.capaTexto {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  inset: 0;
+  padding: var(--hero-texto-arriba) var(--hero-maquina-lado) var(--hero-texto-abajo);
+  pointer-events: none;
+}
+
+/*
+ * AJUSTE AL ANCHO (añadido nuestro, de antes): el tamaño es el MENOR entre el
+ * del diseño y el que cabe, con el número de letras de la línea más larga (lo
+ * pone el componente) y el ancho medio de una mayúscula de Inter seminegrita
+ * (medido 0,59 em; se usa 0,62 de margen).
+ */
 .titulo {
   position: relative;
-  top: var(--hero-titulo-ajuste);
-  width: fit-content;
-  max-width: 100%;
-  margin: 0 auto;
+  z-index: 1;
+  width: 100%;
+  margin: 0;
   color: #fff;
   font-size: min(
     var(--hero-titulo-tam),
@@ -318,40 +307,56 @@
   text-align: center;
 }
 
+/* Cada línea del panel, en su línea (y si no cabe, parte por palabras). */
+.tituloLinea {
+  display: block;
+}
+
+/* La parte de arriba del título partido: solo en escritorio (ver abajo). */
+.tituloArriba {
+  display: none;
+}
+
 /*
- * CAPA DEL TEXTO (D15): el título, centrado en la tarjeta con un sesgo hacia
- * arriba. No recibe clics: los controles quedan por encima de todos modos.
+ * LA PARTE DE ABAJO del título partido (diapositiva de CASE): en escritorio,
+ * abajo y por encima de la máquina, como en el diseño. Por debajo, oculta.
  */
-.capaTexto {
+.tituloAbajo {
   position: absolute;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  inset: 0;
-  padding: var(--hero-texto-arriba) 20px var(--hero-texto-abajo);
+  z-index: 3;
+  right: 0;
+  bottom: var(--hero-titulo-abajo);
+  left: 0;
+  display: none;
+  margin: 0;
+  color: #fff;
+  font-size: min(
+    var(--hero-titulo-abajo-tam),
+    calc((100cqi - 40px) / (var(--hero-titulo-letras, 16) * 0.62))
+  );
+  font-weight: var(--hero-titulo-peso);
+  line-height: var(--hero-titulo-interlineado);
+  text-align: center;
+  text-transform: uppercase;
   pointer-events: none;
 }
 
-.capaTexto .titulo {
-  top: 0;
-  /*
-   * ANCHO FIJO (fase 5): con `fit-content` la caja se encogía de 1047 a 991 px
-   * al llegar Inter tras el primer pintado (fuente de respaldo más ancha) y,
-   * al estar centrada, se desplazaba 28 px: 0,0027 de CLS en la mitad de las
-   * cargas sin caché. A todo el ancho, la caja no cambia; el texto sigue
-   * centrado (`justify-content` y `text-align`).
-   */
-  width: 100%;
-  /*
-   * ALTO FIJO: el del bloque a tamaño completo. Un título que encoge para caber
-   * se centra dentro, así que la caja (y la máquina, que se mide con ella)
-   * queda en la misma y en todas las diapositivas.
-   */
-  display: flex;
-  min-height: calc(var(--hero-titulo-medio) * 2);
-  align-items: center;
-  justify-content: center;
+@media (min-width: 1025px) {
+  .titulo {
+    font-size: min(
+      var(--hero-titulo-tam),
+      calc((100cqi - 40px) / (var(--hero-titulo-letras-escritorio, 16) * 0.62))
+    );
+  }
+
+  .titulo[data-partido] .tituloEntero {
+    display: none;
+  }
+
+  .titulo[data-partido] .tituloArriba,
+  .tituloAbajo {
+    display: block;
+  }
 }
 
 /* ENTRADA DEL TEXTO: al cambiar de diapositiva (la primera se pinta quieta). */
@@ -371,39 +376,27 @@
   }
 }
 
-/* -------------------------------------------------------- hueco de la máquina */
+/* ---------------------------------------------------------------- máquina */
 
 /*
- * Mide lo mismo con o sin imagen recortada: por eso existe como caja propia y
- * no se deja que la imagen le dé el tamaño.
- */
-.hueco {
-  position: relative;
-  z-index: 1;
-  width: min(var(--hero-imagen-ancho), 100%);
-  margin-top: var(--hero-imagen-margen-arriba);
-  aspect-ratio: 1476 / 1057;
-}
-
-/*
- * CAJA DE LA MÁQUINA (D15): se adapta al texto, que no se mueve.
- * - Arriba: el borde inferior del bloque del título (mismo cálculo que el
- *   centrado de `.capaTexto`) más `--hero-maquina-aire`.
- * - Derecha: deja libre el vidrio (en móvil no hay vidrio).
- * - Abajo: por encima de flechas y puntos.
- * Absoluta: no ocupa sitio, así que la tarjeta no cambia de alto (CLS 0).
+ * La caja de la máquina: lo que queda bajo el título hasta los controles. La
+ * imagen va contenida y arriba, centrada, con el ancho del diseño como tope.
  */
 .capaMaquina {
-  position: absolute;
-  z-index: 1;
-  top: calc(
-    (var(--hero-texto-arriba) + 100% - var(--hero-texto-abajo)) / 2 + var(--hero-titulo-medio) +
-      var(--hero-maquina-aire)
-  );
-  right: var(--hero-maquina-derecha);
-  bottom: var(--hero-maquina-abajo);
-  left: var(--hero-maquina-izquierda);
-  pointer-events: none;
+  position: relative;
+  width: min(var(--hero-maquina-ancho), 100%);
+  min-height: 0;
+  flex: 1;
+  margin-top: var(--hero-maquina-aire);
+}
+
+/* «SOBRE»: en escritorio la máquina sube y cruza el título (diapositiva 1). */
+@media (min-width: 1025px) {
+  .capaTexto[data-maquina="sobre"] .capaMaquina {
+    z-index: 2;
+    width: min(var(--hero-maquina-ancho-sobre), 100%);
+    margin-top: var(--hero-maquina-cruce);
+  }
 }
 
 .capaFrontal {
@@ -411,10 +404,45 @@
   inset: 0;
 }
 
-/* Contenida en su caja y apoyada abajo: la máquina «pisa el suelo». */
 .frontal {
   object-fit: contain;
-  object-position: center bottom;
+  object-position: center top;
+}
+
+/* ----------------------------------------------------------- texto circular */
+
+.circular {
+  position: absolute;
+  z-index: 2;
+  bottom: var(--hero-circular-abajo);
+  left: var(--hero-circular-izquierda);
+  width: var(--hero-circular-tam);
+  height: var(--hero-circular-tam);
+  pointer-events: none;
+}
+
+.circular svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: girar var(--hero-circular-vuelta) linear infinite;
+}
+
+.circular text {
+  fill: #fff;
+  font-size: 13px;
+  font-weight: 300;
+  text-transform: none;
+}
+
+.hero[data-pausado] .circular svg {
+  animation-play-state: paused;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* --------------------------------------------------------- fila inferior */
@@ -654,8 +682,7 @@
   will-change: transform;
 }
 
-.filaTitulo.capaParallax,
-.capaTexto.capaParallax {
+.capaTexto > .capaParallax {
   --hero-parallax: calc(var(--hero-parallax-base, 0) * var(--hero-parallax-titulo));
 }
 
@@ -677,7 +704,8 @@
      tiempo, y sin pase automático (empieza en pausa) está quieta. */
   .fondo,
   .capaFondo[data-estado] .fondo,
-  .entra {
+  .entra,
+  .circular svg {
     animation: none;
   }
 
@@ -688,16 +716,24 @@
 
 /* ---------------------------------------------------------- adaptaciones */
 
-/* ≤1024 px: los valores que la dirección midió a 1010 px. */
+/* Escritorio con un párrafo largo: vidrio de 500 px, como la diapositiva de CASE. */
+@media (min-width: 1025px) {
+  .hero[data-vidrio-largo] {
+    --hero-vidrio-ancho: 500px;
+  }
+}
+
+/* ≤1024 px: los valores del diseño de sliders medidos a 1010 px. */
 @media (max-width: 1024px) {
   .hero {
-    --hero-titulo-tam: 70px;
-    --hero-titulo-ajuste: -63px;
-    --hero-imagen-ancho: 631px;
+    --hero-titulo-tam: 65px;
     --hero-relleno: 50px 30px 30px;
-    --hero-maquina-izquierda: 30px;
-    /* Tablet: contenido 522 px + 80 de relleno → 50 % − 199 + 16 de aire. */
-    --hero-maquina-abajo: calc(50% - 183px);
+    --hero-texto-arriba: 50px;
+    --hero-maquina-ancho: 631px;
+    --hero-maquina-lado: 30px;
+    --hero-circular-tam: 100px;
+    --hero-circular-izquierda: 49px;
+    --hero-circular-abajo: 178px;
     /*
      * DESVIACIÓN NUESTRA, DECIDIDA (2026-09-23) — el vidrio va DENTRO.
      *
@@ -707,58 +743,52 @@
      * sobre blanco—, en su página y en la nuestra.
      *
      * Criterio de dirección, el mismo del panel: LEGIBILIDAD ANTES QUE
-     * FIDELIDAD. Su valor era `right: -20px; bottom: -113px` respecto a su
-     * columna (−73 px medidos respecto a la tarjeta). Ver docs/design-tokens.md
-     * §11.8.
+     * FIDELIDAD. Ver docs/design-tokens.md §11.8.
      */
     --hero-vidrio-derecha: 20px;
     --hero-vidrio-abajo: 30px;
   }
 }
 
-/* ≤767 px: el vidrio desaparece y el título pasa a proporcional. */
+/*
+ * ≤767 px: el título pasa a proporcional y el VIDRIO SE VE (el diseño de
+ * sliders lo pinta en móvil; el de ux-9 lo ocultaba). Va encima de la fila de
+ * controles, para no taparlos, y la máquina deja su sitio.
+ */
 @media (max-width: 767px) {
   .hero {
     --hero-titulo-tam: 12vw;
-    --hero-titulo-ajuste: 25px;
-    --hero-texto-arriba: 40px;
-    /* En móvil el título va en DOS líneas (una palabra por línea). */
-    --hero-titulo-medio: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado));
-    /* Sin vidrio en móvil: la máquina usa todo el ancho. */
-    --hero-maquina-derecha: var(--hero-maquina-izquierda);
-    /* Móvil: la fila va abajo (space-between): 30 + 62 + 16 de aire. */
-    --hero-maquina-abajo: 108px;
+    --hero-texto-arriba: 50px;
+    /* Controles (42 + 20) + aire + el vidrio (~120) + aire. */
+    --hero-vidrio-abajo: 70px;
+    --hero-vidrio-derecha: 20px;
+    --hero-texto-abajo: 210px;
+    --hero-maquina-lado: 20px;
     --hero-alto-min: 85vh;
-    --hero-imagen-margen-arriba: 200px;
     --hero-parrafo-tam: 13px;
+    --hero-vidrio-relleno: 20px;
     --hero-flecha-icono: 15px;
-    /*
-     * El solape de −250 px se MANTIENE en móvil, como en su diseño. Aquí hubo
-     * un −120 puesto por suposición («se comería la máquina»); medido contra su
-     * página a 390 px, con −250 las dos tarjetas miden 717 px y la máquina cae
-     * en el mismo sitio. La suposición era falsa.
-     */
-  }
-
-  .tarjeta {
-    justify-content: space-between;
+    --hero-circular-tam: 70px;
+    --hero-circular-izquierda: calc(50% - 35px);
+    --hero-circular-abajo: 284px;
   }
 
   /*
-   * En móvil el diseño SÍ parte el título en dos líneas («POTENCIA» / marca),
-   * así que el ajuste al ancho no aplica: encogería el título a una línea de
-   * 34 px. Cada palabra cabe sola a 12vw, incluida «CATERPILLAR».
+   * En móvil el título parte por palabras: el tamaño es el MENOR entre el del
+   * diseño (12vw) y el que deja caber la palabra más larga.
    */
   .titulo {
-    font-size: var(--hero-titulo-tam);
+    font-size: min(
+      var(--hero-titulo-tam),
+      calc((100cqi - 40px) / (var(--hero-titulo-palabra, 10) * 0.62))
+    );
   }
 
   .fila {
     --hero-fila-relleno: 0px;
   }
 
-  /* Igual que en el diseño: `elementor-hidden-mobile` sobre el vidrio. */
   .vidrio {
-    display: none;
+    width: min(280px, 100% - 2 * var(--hero-vidrio-derecha));
   }
 }

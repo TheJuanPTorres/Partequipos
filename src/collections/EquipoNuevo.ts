@@ -188,7 +188,7 @@ export const EquipoNuevo: CollectionConfig = {
       label: "Ficha técnica completa (PDF)",
       admin: {
         description:
-          "Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 25 MB) o elige uno ya subido en «Documentos».",
+          "Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 30 MB) o elige uno ya subido en «Documentos».",
       },
     },
     /*

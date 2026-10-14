@@ -318,7 +318,7 @@ export default buildConfig({
       token: process.env.BLOB_READ_WRITE_TOKEN || "",
     }),
     /*
-     * SUBIDA DIRECTA (§10.39): imágenes (hasta 15 MB) y PDF (hasta 25 MB)
+     * SUBIDA DIRECTA (§10.39): imágenes (hasta 15 MB) y PDF (hasta 30 MB)
      * suben del navegador al Blob sin pasar por una función, que corta en
      * 4,5 MB. Instancia aparte para poner `clientUploads` y el sufijo aleatorio
      * SOLO aquí; la ruta del permiso y el manejador del navegador los

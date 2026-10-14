@@ -16,7 +16,7 @@ import { REGLAS_SUBIDA_DIRECTA } from "../../lib/blob/subidaDirecta";
  *   (`validatePDF`, que va después y da el error en inglés): firma `%PDF-` en
  *   el byte 0 y, en el último KB, `%%EOF` y la tabla `xref`. Un fichero
  *   renombrado a `.pdf` no pasa; uno cortado a medias, tampoco.
- * - **Tope de 25 MB** con la SUBIDA DIRECTA al Blob (§10.39): el fichero ya no
+ * - **Tope de 30 MB** (25 hasta el 2026-10-13) con la SUBIDA DIRECTA al Blob (§10.39): el fichero ya no
  *   pasa por una función de Vercel. Una subida por la API sigue cortada en
  *   4,5 MB por Vercel antes de llegar aquí.
  *
@@ -25,7 +25,7 @@ import { REGLAS_SUBIDA_DIRECTA } from "../../lib/blob/subidaDirecta";
  * se borra, para no dejar huérfanos.
  */
 
-export const TOPE_PDF_BYTES = REGLAS_SUBIDA_DIRECTA.documentos?.maximo ?? 25 * 1024 * 1024;
+export const TOPE_PDF_BYTES = REGLAS_SUBIDA_DIRECTA.documentos?.maximo ?? 30 * 1024 * 1024;
 
 export type VeredictoPdf = "pdf" | "no-pdf" | "incompleto";
 

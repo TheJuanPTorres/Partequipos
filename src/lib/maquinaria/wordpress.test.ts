@@ -143,6 +143,16 @@ describe("pesoOperativoKg", () => {
     assert.equal(pesoOperativoKg([{ etiqueta: "Potencia", valor: "100 hp" }]), null);
     assert.equal(pesoOperativoKg(conPeso("según configuración")), null);
   });
+  it("en kg y lb, la coma también separa miles (como escribe WordPress)", () => {
+    assert.equal(pesoOperativoKg(conPeso("1,900kg")), 1900);
+    assert.equal(pesoOperativoKg(conPeso("12,345 kg")), 12345);
+    assert.equal(pesoOperativoKg(conPeso("1,234,567 kg")), 1234567);
+    assert.equal(pesoOperativoKg(conPeso("4,000 lb")), 1814);
+  });
+  it("en kg, lo ambiguo da null: nunca se adivina", () => {
+    assert.equal(pesoOperativoKg(conPeso("30,5000kg")), null);
+    assert.equal(pesoOperativoKg(conPeso("14,3 kg")), null);
+  });
 });
 
 describe("nombres de ficheros y de la ficha", () => {

@@ -102,7 +102,10 @@ visual** que marca y tipo. **Provisional**: se reemplaza cuando llegue la planti
 
 ## 5. Pendiente
 
-- Imágenes reales de fondo (por marca) y de cada tipo: el cliente o el editor, desde el panel.
+- ~~Imágenes reales de fondo (por marca) y de cada tipo~~ **HECHO el 2026-10-14 (agente C):** la imagen de cada tipo es la
+  de su tarjeta en WordPress, importada (`docs/repuestos-importacion.md` §7). **El fondo por marca no existe en
+  WordPress** (el encabezado visible no tiene foto): queda vacío y se quitó el de ejemplo de Caterpillar. Si se quiere
+  uno, desde el panel.
 - `ordenMarca` y `enlace` de las categorías técnicas: en el panel (el ejemplo del preview pone el orden de ux-9).
 - La copia de demostración a producción (`copia-demo.ts`, agente A) debe llevar `marcas.fondoHero`,
   `tipos-equipo.imagen`, `categorias-tecnicas.ordenMarca`/`icono` y el global `repuestos-marca`.

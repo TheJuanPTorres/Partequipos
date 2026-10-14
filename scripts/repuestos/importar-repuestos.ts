@@ -11,6 +11,14 @@
  *   npm run preview:repuestos:importar          # escribe en el preview
  *   npm run preview:repuestos:retirar           # deshace lo del manifiesto
  *
+ * IMAGEN DE CADA TIPO Y FONDO DE LAS MARCAS (2026-10-14): cada tipo lleva la
+ * foto real de su tarjeta en WordPress (`wp-tipo-<adjunto>-…`; AVIF a WebP por
+ * el formato real del fichero). Solo se pone si el campo está vacío, es de
+ * EJEMPLO de ux-9 o ya es suya: lo que eligió un editor no se pisa. El fondo
+ * del encabezado de las marcas no existe en WordPress (solo una foto oculta en
+ * los tres tamaños): el de EJEMPLO de ux-9 se quita. Lo de antes de cada campo
+ * queda en el manifiesto (`imagenes`) y la retirada lo devuelve.
+ *
  * LAS FOTOS DE LOS MODELOS NO SE IMPORTAN (dirección, 2026-10-13): los
  * modelos son enlaces dentro de su tipo; las fotos, solo si el cliente
  * confirma que tendrán página propia. La simulación las sigue contando.
@@ -49,17 +57,23 @@ import { normalizarRuta } from "../../src/lib/redirects/normalizar";
 import { formatSlug } from "../../src/lib/utils/formatSlug";
 import {
   altDeRepuesto,
+  altDeTipo,
   codigoDeModelo,
   descripcionSeo,
   esBorradorCopia,
   fotoDeRepuesto,
   ficheroDeLogo,
+  ficheroDeTipo,
+  formatoDeImagen,
   fotosGenericas,
   LOGOS_DE_MARCA,
   nivelDePagina,
   nombreDeModelo,
   nombreDeTipo,
   pareceDatoDeContacto,
+  PREFIJO_EJEMPLO_MARCA,
+  PREFIJO_IMAGEN_TIPO,
+  puedeSustituirImagen,
   rutaMadre,
   textoDePagina,
   tituloPorDefectoModelo,
@@ -141,6 +155,18 @@ type Manifiesto = {
   actualizado: { coleccion: Coleccion; id: number; antes: Record<string, unknown> }[];
   /** La demo retirada antes de importar (no vuelve al retirar la importación). */
   retiradoDeLaDemo: { coleccion: Coleccion; id: number; datos: Record<string, unknown> }[];
+  /**
+   * Imágenes que cambió la importación (imagen del tipo, fondo de la marca): el
+   * valor ANTES de la primera vez, para devolverlo al retirar. Opcional: los
+   * manifiestos anteriores al 2026-10-14 no lo tienen.
+   */
+  imagenes?: CambioImagen[];
+};
+type CambioImagen = {
+  coleccion: "marcas" | "tipos-equipo";
+  id: number;
+  campo: "fondoHero" | "imagen";
+  antes: number | null;
 };
 const manifiesto: Manifiesto = fs.existsSync(MANIFIESTO)
   ? (JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto)
@@ -193,6 +219,24 @@ async function retirar(): Promise<void> {
     if (hecho) devueltos++;
   }
   log(`actualizados devueltos a como estaban: ${devueltos} de ${manifiesto.actualizado.length}`);
+  // Las imágenes cambiadas, a su valor de antes, ANTES de borrar las subidas.
+  let imagenesDevueltas = 0;
+  for (const c of manifiesto.imagenes ?? []) {
+    const hecho = await payload
+      .update({
+        collection: c.coleccion,
+        id: c.id,
+        data: { [c.campo]: c.antes } as never,
+        overrideAccess: true,
+      })
+      .catch((e: Error) =>
+        log(`no se pudo devolver ${c.coleccion} ${c.id} ${c.campo}: ${e.message}`),
+      );
+    if (hecho) imagenesDevueltas++;
+  }
+  log(
+    `imágenes devueltas a como estaban: ${imagenesDevueltas} de ${(manifiesto.imagenes ?? []).length}`,
+  );
   await borrar(
     "tipos-equipo",
     manifiesto.creado.tipos.map((x) => x.id),
@@ -243,6 +287,8 @@ type PaginaWp = {
   titulos: string[];
   texto: string;
   fotos: FotoWp[];
+  /** La foto de la primera tarjeta visible (no la de WhatsApp): en un tipo, la suya. */
+  tarjeta?: FotoWp | null;
 };
 if (!fs.existsSync(FUENTE)) fallar(`no está la fuente ${FUENTE} (ver extraer-xml.py)`);
 const { paginas } = JSON.parse(fs.readFileSync(FUENTE, "utf8")) as { paginas: PaginaWp[] };
@@ -271,12 +317,14 @@ const genericas = fotosGenericas(modelosWp);
 
 type PlanLogo = { idWp: number; url: string; fichero: string; alt: string };
 type PlanMarca = { slug: string; nombre: string; descripcion: string | null; logo: PlanLogo };
+type PlanImagen = { idWp: number; url: string; fichero: string; alt: string };
 type PlanTipo = {
   marca: string;
   slug: string;
   nombre: string;
   descripcion: string | null;
   seo: { metaTitle: string | null; metaDescription: string | null };
+  imagen: PlanImagen | null;
 };
 type PlanFoto = FotoPlan & { idWp: number; url: string; alt: string };
 type PlanModelo = {
@@ -333,6 +381,13 @@ for (const p of conNivel.filter((x) => x.nivel === "tipo")) {
     continue;
   }
   const viva = vivo.get(p.ruta);
+  if (p.tarjeta === undefined) {
+    fallar(
+      "la fuente no trae «tarjeta» (es anterior al 2026-10-14): vuelve a ejecutar extraer-xml.py",
+    );
+  }
+  const t = p.tarjeta;
+  if (!t?.url) avisos.push(`tipo ${slug}: sin foto de tarjeta en WordPress`);
   tipos.push({
     marca: mSlug,
     slug,
@@ -342,6 +397,14 @@ for (const p of conNivel.filter((x) => x.nivel === "tipo")) {
       metaTitle: tituloSeo(viva?.titulo, tituloPorDefecto.tipoRepuesto(nombre, marca.nombre)),
       metaDescription: descripcionSeo(viva?.descripcion),
     },
+    imagen: t?.url
+      ? {
+          idWp: t.idWp,
+          url: t.url,
+          fichero: ficheroDeTipo(t.idWp, nombre, marca.nombre),
+          alt: altDeTipo(nombre, marca.nombre),
+        }
+      : null,
   });
 }
 const tipoPorClave = new Map(tipos.map((t) => [`${t.marca}/${t.slug}`, t]));
@@ -445,6 +508,7 @@ type DocMarca = {
   nombre: string;
   descripcion?: string | null;
   logo?: number | null;
+  fondoHero?: number | null;
 };
 type DocTipo = {
   id: number;
@@ -453,6 +517,7 @@ type DocTipo = {
   nombre: string;
   descripcion?: string | null;
   seo?: Seo | null;
+  imagen?: number | null;
 };
 type DocModelo = {
   id: number;
@@ -523,6 +588,32 @@ const logosYa = new Set(
 );
 const logosASubir = marcas.filter((m) => !logosYa.has(m.logo.idWp));
 
+// Imagen de cada tipo (una por adjunto) y fondo de EJEMPLO de las marcas.
+const ficheroDeMedia = new Map(enMedia.map((m) => [m.id, m.filename ?? ""]));
+const imagenTipoYa = new Set(
+  enMedia
+    .map((m) => m.filename?.match(new RegExp(`^${PREFIJO_IMAGEN_TIPO}(\\d+)-`))?.[1])
+    .filter(Boolean)
+    .map(Number),
+);
+const imagenesTipo = new Map<number, PlanImagen>();
+for (const t of tipos) if (t.imagen) imagenesTipo.set(t.imagen.idWp, t.imagen);
+const imagenesTipoASubir = [...imagenesTipo.values()].filter((i) => !imagenTipoYa.has(i.idWp));
+/** Tipos que hoy tienen una imagen que eligió un editor: la importación no la toca. */
+const tiposConImagenDeEditor = tipos
+  .filter((t) => {
+    const doc = enTipos.find((x) => x.marca === idMarca.get(t.marca) && x.slug === t.slug);
+    return (
+      t.imagen &&
+      doc?.imagen &&
+      !puedeSustituirImagen(ficheroDeMedia.get(doc.imagen), PREFIJO_IMAGEN_TIPO)
+    );
+  })
+  .map((t) => t.slug);
+const fondosDeEjemplo = enMarcas
+  .filter((m) => m.fondoHero && ficheroDeMedia.get(m.fondoHero)?.startsWith(PREFIJO_EJEMPLO_MARCA))
+  .map((m) => m.slug);
+
 // Fotos de los modelos: NO se importan; se cuentan por si el cliente las confirma.
 
 // Una foto compartida por dos modelos se sube una vez (nombre por id de adjunto).
@@ -537,8 +628,12 @@ const porFormato = (fs_: PlanFoto[]) =>
 
 // ---------- Fotos en WordPress (opcional: red, sin escribir nada) ----------
 
-type Comprobacion = { fallos: { idWp: number; error: string }[]; avif: Record<string, unknown>[] };
-const comprobacion: Comprobacion = { fallos: [], avif: [] };
+type Comprobacion = {
+  fallos: { idWp: number; error: string }[];
+  avif: Record<string, unknown>[];
+  imagenesTipo: Record<string, unknown>[];
+};
+const comprobacion: Comprobacion = { fallos: [], avif: [], imagenesTipo: [] };
 if (COMPROBAR_FOTOS) {
   const { default: sharp } = await import("sharp");
   const AGENTE = "Partequipos-migracion/1.0 (simulación de repuestos; solo lectura)";
@@ -575,6 +670,31 @@ if (COMPROBAR_FOTOS) {
       comprobacion.fallos.push({ idWp: f.idWp, error: (e as Error).message });
     }
   }
+  // Imágenes de los tipos: se descargan y se mira su formato REAL (los bytes); no se guarda nada.
+  for (const i of imagenesTipoASubir) {
+    await turno();
+    try {
+      const r = await fetch(i.url, { headers: { "User-Agent": AGENTE } });
+      if (!r.ok) {
+        comprobacion.fallos.push({ idWp: i.idWp, error: `HTTP ${r.status}` });
+        continue;
+      }
+      const datos = Buffer.from(await r.arrayBuffer());
+      const meta = await sharp(datos).metadata();
+      const f = formatoDeImagen(meta.format);
+      if (!f) comprobacion.fallos.push({ idWp: i.idWp, error: `formato ${meta.format}` });
+      comprobacion.imagenesTipo.push({
+        idWp: i.idWp,
+        fichero: f ? `${i.fichero}.${f.ext}` : null,
+        formatoReal: meta.format,
+        aWebp: f?.convertir ?? false,
+        kB: Math.round(datos.length / 1024),
+        medidas: `${meta.width}×${meta.height}`,
+      });
+    } catch (e) {
+      comprobacion.fallos.push({ idWp: i.idWp, error: (e as Error).message });
+    }
+  }
 }
 
 // ---------- Informe ----------
@@ -593,7 +713,10 @@ const resumen = {
     nuevos: tiposNuevos.length,
     actualizados: tipos.length - tiposNuevos.length,
     conTituloSeoPropio: tipos.filter((t) => t.seo.metaTitle).length,
+    conImagen: tipos.filter((t) => t.imagen).length,
+    conImagenDeEditor: tiposConImagenDeEditor,
   },
+  marcasConFondoDeEjemploQueSeQuita: fondosDeEjemplo,
   modelos: {
     total: modelos.length,
     nuevos: modelosNuevos.length,
@@ -630,6 +753,8 @@ const resumen = {
   blob: {
     subidasDeLogos: logosASubir.length,
     logosYaSubidos: marcas.length - logosASubir.length,
+    subidasDeImagenesDeTipo: imagenesTipoASubir.length,
+    imagenesDeTipoYaSubidas: imagenesTipo.size - imagenesTipoASubir.length,
     otrasOperaciones: 0,
   },
   fotosDeModelosNoSeImportan: {
@@ -638,7 +763,11 @@ const resumen = {
     aConvertirAWebp: aSubir.filter((f) => f.convertir).length,
   },
   comprobacionFotos: COMPROBAR_FOTOS
-    ? { comprobadas: aSubir.length, fallos: comprobacion.fallos.length }
+    ? {
+        comprobadas: aSubir.length + imagenesTipoASubir.length,
+        fallos: comprobacion.fallos.length,
+        imagenesDeTipoAWebp: comprobacion.imagenesTipo.filter((i) => i.aWebp).length,
+      }
     : "sin comprobar (añade «fotos»)",
 };
 fs.writeFileSync(
@@ -664,6 +793,7 @@ fs.writeFileSync(
 log(`fuente: ${resumen.fuente} · ${paginas.length} páginas`);
 log(`marcas: ${JSON.stringify(resumen.marcas)}`);
 log(`tipos: ${JSON.stringify(resumen.tipos)}`);
+log(`marcas con fondo de ejemplo (se quita): ${JSON.stringify(fondosDeEjemplo)}`);
 log(`modelos: ${JSON.stringify(resumen.modelos)}`);
 log(`no se importan: ${JSON.stringify({ ...resumen.noSeImportan })}`);
 log(`en el preview: ${JSON.stringify(resumen.enElPreview)}`);
@@ -693,6 +823,16 @@ const recordarAntes = (coleccion: Coleccion, id: number, antes: Record<string, u
   if (manifiesto.creado.modelos.some((x) => x.id === id) && coleccion === "modelos-repuesto")
     return;
   manifiesto.actualizado.push({ coleccion, id, antes });
+  guardarManifiesto();
+};
+/** Guarda el valor de antes de un campo de imagen, SOLO la primera vez que se cambia. */
+const recordarImagen = (c: CambioImagen) => {
+  manifiesto.imagenes ??= [];
+  const ya = manifiesto.imagenes.some(
+    (x) => x.coleccion === c.coleccion && x.id === c.id && x.campo === c.campo,
+  );
+  if (ya) return;
+  manifiesto.imagenes.push(c);
   guardarManifiesto();
 };
 const seoDe = (doc: { seo?: Seo | null } | undefined) => ({
@@ -791,12 +931,72 @@ async function logoEnMedia(l: PlanLogo): Promise<number> {
   return doc.id;
 }
 
-// 3. Marcas.
+/**
+ * La imagen de un tipo en `Media`: por id de adjunto (una segunda ejecución no
+ * la vuelve a subir). El formato sale de los BYTES, no de la extensión: AVIF y
+ * HEIF se convierten a WebP en esta máquina (`Media` no admite AVIF).
+ */
+async function imagenDeTipoEnMedia(i: PlanImagen): Promise<number> {
+  const prefijo = `${PREFIJO_IMAGEN_TIPO}${i.idWp}-`;
+  const ya = await payload.find({
+    collection: "media",
+    where: { filename: { contains: prefijo } },
+    sort: "createdAt",
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+  });
+  const existente = ya.docs.find((d) => d.filename?.toLowerCase().startsWith(prefijo));
+  if (existente) return existente.id;
+  const { default: sharp } = await import("sharp");
+  let datos = await descargar(i.url);
+  const f =
+    formatoDeImagen((await sharp(datos).metadata()).format) ??
+    fallar(`imagen del tipo (adjunto ${i.idWp}): formato que Media no admite`);
+  if (f.convertir) datos = await sharp(datos).webp({ quality: 82 }).toBuffer();
+  const nombre = `${i.fichero}.${f.ext}`;
+  const doc = await payload.create({
+    collection: "media",
+    data: { alt: i.alt, focalX: 50, focalY: 50 },
+    file: { data: datos, mimetype: f.mimetype, name: nombre, size: datos.length },
+    overrideAccess: true,
+  });
+  const guardado = await payload.findByID({
+    collection: "media",
+    id: doc.id,
+    depth: 0,
+    overrideAccess: true,
+  });
+  manifiesto.creado.media.push({
+    id: doc.id,
+    filename: guardado.filename ?? nombre,
+    url: guardado.url ?? "",
+  });
+  guardarManifiesto();
+  return doc.id;
+}
+
+// 3. Marcas. El fondo de EJEMPLO de ux-9 se quita: WordPress no tiene fondo visible.
 const idMarcaFinal = new Map<string, number>();
 for (const m of marcas) {
   const logo = await logoEnMedia(m.logo);
-  const data = { nombre: m.nombre, slug: m.slug, descripcion: m.descripcion, logo };
   const doc = enMarcas.find((x) => x.slug === m.slug);
+  const quitarFondo = !!doc && fondosDeEjemplo.includes(m.slug);
+  if (doc && quitarFondo) {
+    recordarImagen({
+      coleccion: "marcas",
+      id: doc.id,
+      campo: "fondoHero",
+      antes: doc.fondoHero ?? null,
+    });
+  }
+  const data = {
+    nombre: m.nombre,
+    slug: m.slug,
+    descripcion: m.descripcion,
+    logo,
+    ...(quitarFondo ? { fondoHero: null } : {}),
+  };
   if (doc) {
     recordarAntes("marcas", doc.id, {
       nombre: doc.nombre,
@@ -812,7 +1012,9 @@ for (const m of marcas) {
     idMarcaFinal.set(m.slug, creado.id);
   }
 }
-log(`marcas: ${marcas.length} (logos subidos: ${manifiesto.creado.media.length})`);
+log(
+  `marcas: ${marcas.length} (logos subidos: ${manifiesto.creado.media.filter((x) => x.filename.startsWith("wp-logo-")).length}; fondo de ejemplo quitado: ${fondosDeEjemplo.length})`,
+);
 
 // 4. Tipos (por marca + slug, el índice único).
 const idTipoFinal = new Map<string, number>();
@@ -827,12 +1029,25 @@ const tiposAhora = (
 for (const t of tipos) {
   const marca = idMarcaFinal.get(t.marca)!;
   const doc = tiposAhora.find((x) => x.marca === marca && x.slug === t.slug);
+  // La imagen: la real, salvo que la haya elegido un editor (`puedeSustituirImagen`).
+  let imagen: number | undefined;
+  const actual = doc?.imagen ?? null;
+  if (
+    t.imagen &&
+    puedeSustituirImagen(actual ? ficheroDeMedia.get(actual) : null, PREFIJO_IMAGEN_TIPO)
+  ) {
+    imagen = await imagenDeTipoEnMedia(t.imagen);
+    if (doc && actual !== imagen) {
+      recordarImagen({ coleccion: "tipos-equipo", id: doc.id, campo: "imagen", antes: actual });
+    }
+  }
   const data = {
     nombre: t.nombre,
     slug: t.slug,
     marca,
     descripcion: t.descripcion,
     seo: { ...(doc?.seo ?? {}), ...t.seo },
+    ...(imagen ? { imagen } : {}),
   };
   if (doc) {
     recordarAntes("tipos-equipo", doc.id, {
@@ -858,7 +1073,9 @@ for (const t of tipos) {
     idTipoFinal.set(`${t.marca}/${t.slug}`, creado.id);
   }
 }
-log(`tipos: ${tipos.length}`);
+log(
+  `tipos: ${tipos.length} (imágenes subidas: ${manifiesto.creado.media.filter((x) => x.filename.startsWith(PREFIJO_IMAGEN_TIPO)).length}; con imagen de editor, sin tocar: ${tiposConImagenDeEditor.length})`,
+);
 
 // 5. Modelos (por tipo + slug, el índice único). Sin fotos.
 const modelosAhora = (
@@ -940,7 +1157,7 @@ for (const r of redirecciones) {
 }
 log(`redirecciones: ${manifiesto.creado.redirects.length} creadas`);
 log(
-  `importación terminada · creados: ${manifiesto.creado.marcas.length} marcas, ${manifiesto.creado.tipos.length} tipos, ${manifiesto.creado.modelos.length} modelos, ${manifiesto.creado.media.length} logos · actualizados: ${manifiesto.actualizado.length} · demo retirada: ${manifiesto.retiradoDeLaDemo.length}`,
+  `importación terminada · creados: ${manifiesto.creado.marcas.length} marcas, ${manifiesto.creado.tipos.length} tipos, ${manifiesto.creado.modelos.length} modelos, ${manifiesto.creado.media.length} imágenes (logos y tipos) · actualizados: ${manifiesto.actualizado.length} · imágenes cambiadas: ${(manifiesto.imagenes ?? []).length} · demo retirada: ${manifiesto.retiradoDeLaDemo.length}`,
 );
 log(`manifiesto: ${MANIFIESTO}`);
 process.exit(0);

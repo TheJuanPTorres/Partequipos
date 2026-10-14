@@ -74,4 +74,31 @@ describe("redirects de las URL heredadas de categoría", () => {
       assert.notEqual(d.clase, "sin-ruta", `${h} no corresponde a ninguna ruta`);
     }
   });
+
+  it("la copia literal de la migración coincide con la lista, fila por fila y en orden", () => {
+    const carpeta = path.resolve(aqui, "../../migrations");
+    const nombre = fs
+      .readdirSync(carpeta)
+      .find((f) => f.endsWith("_redirects_categorias_heredadas.ts"));
+    assert.ok(nombre, "no existe la migración _redirects_categorias_heredadas");
+    const codigo = fs.readFileSync(path.join(carpeta, nombre), "utf8");
+    const copia = [...codigo.matchAll(/^\s*\['([^']+)', '([^']+)'\],?$/gm)].map((m) => [
+      m[1],
+      m[2],
+    ]);
+    assert.deepEqual(
+      copia,
+      REDIRECTS_HEREDADAS.map(([d, h]) => [d, h]),
+    );
+  });
+
+  it("la migración es idempotente y no toca el esquema", () => {
+    const carpeta = path.resolve(aqui, "../../migrations");
+    const nombre = fs
+      .readdirSync(carpeta)
+      .find((f) => f.endsWith("_redirects_categorias_heredadas.ts"));
+    const codigo = fs.readFileSync(path.join(carpeta, nombre ?? ""), "utf8");
+    assert.match(codigo, /ON CONFLICT \("desde"\) DO NOTHING/);
+    assert.doesNotMatch(codigo, /CREATE |ALTER |DROP /);
+  });
 });

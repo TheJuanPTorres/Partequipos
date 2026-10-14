@@ -6,6 +6,8 @@ import {
   getCategoriasMaquinaria,
   getCategoriasUsada,
   getEquiposNuevos,
+  getInventarioUsados,
+  getMarcasUsada,
   getMarcasMaquinaria,
   getTiposMaquinaria,
 } from "@/lib/queries/getMaquinaria";
@@ -14,6 +16,7 @@ import { getModelos } from "@/lib/queries/getModelos";
 import { getPaginas } from "@/lib/queries/getPaginas";
 import { getTipos } from "@/lib/queries/getTipos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
+import { categoriaUsadaIndexable } from "@/lib/usados/heredadas";
 import { poblado } from "@/lib/utils/relations";
 import type {
   Marca,
@@ -60,6 +63,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     categoriasLubricante,
     articulos,
     categoriasBlog,
+    inventarioUsados,
+    marcasUsada,
   ] = await Promise.all([
     getMarcas(),
     getTipos(),
@@ -74,6 +79,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getCategoriasLubricante(),
     getArticulos(),
     getCategoriasBlog(),
+    getInventarioUsados(),
+    getMarcasUsada(),
   ]);
 
   return buildSitemapEntries({
@@ -128,7 +135,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     categoriasNueva: categoriasNueva.map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
 
-    categoriasUsada: categoriasUsada.map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
+    // D4 (dirección, 2026-10-13): una categoría creada en el panel y sin
+    // unidades no se indexa ni sale aquí; las heredadas del sitio actual, sí.
+    categoriasUsada: categoriasUsada
+      .filter((c) =>
+        categoriaUsadaIndexable(
+          c.slug,
+          inventarioUsados.filter((u) => u.categoria === c.id).length,
+        ),
+      )
+      .map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
+
+    // D4: una marca de usada solo con unidades disponibles (ninguna es heredada).
+    marcasUsada: marcasUsada
+      .filter((m) => inventarioUsados.some((u) => u.marcaUsada === m.id))
+      .map((m) => ({ slug: m.slug, updatedAt: m.updatedAt })),
 
     // --- Lubricantes --------------------------------------------------------
     marcasLubricante: marcasLubricante.map((m) => ({ slug: m.slug, updatedAt: m.updatedAt })),

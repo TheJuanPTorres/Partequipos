@@ -635,6 +635,11 @@ veredicto, que va en el informe.
 - **Último editor (2026-10-06):** campo `actualizadoPor` en las 23 colecciones de contenido (nunca en Solicitudes ni Usuarios), puesto solo por el servidor al guardar (`src/lib/fields/ultimoEditor.ts`); migración `20261006_224101_ultimo_editor`, solo esquema; la portada lo muestra en «Lo último modificado» respetando el acceso a Usuarios, «—» sin dato; por efecto con `npm run qa:ultimo-editor`. Detalle en `docs/diseno/decisiones-panel.md` §25.
 - **Vista de Google con la marca (2026-10-06):** la vista de «Buscadores y redes sociales» pinta el título con `tituloConMarca`, la misma función que el `<title>` publicado desde el #111 (« | Partequipos» salvo en la portada, si ya la lleva o si pasa de 60); la ayuda ya no dice que no se añade nada; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §26.
 - **`panel:revision` con el formulario completo (2026-10-07):** Payload 3.89 pinta los campos solo a menos de 1000 px de la pantalla (`RenderIfInViewport`), así que la captura del equipo nuevo dejaba la sección SEO sin campos; el script recorre la página antes de capturar y anota si los campos SEO existen. Era la captura, no el panel. Detalle en `docs/diseno/decisiones-panel.md` §27.
+- **Filtros del marketplace de usados, paso (a) (2026-10-13):** módulo común de filtros (`src/lib/filtros/`, puro y con pruebas; componentes sin JavaScript en `src/components/catalog/filtros/`) para usada y, después, nueva (adaptador de B); las categorías de usada filtran por marca, año, horas y peso con la query (`?marca=hitachi&anio=2019`), y pasan a dinámicas con los datos en caché etiquetada (`src/lib/cacheDatos.ts`, con el id del despliegue en la clave); con filtros, `noindex, follow` y canónica sin filtros, y otra forma de la query, 308 a la canónica; una categoría creada en el panel y vacía no se indexa ni sale en el sitemap (D4); sin esquema. Detalle en `docs/marketplace-usados.md`.
+- **301 del listado de usados de WordPress (D7, 2026-10-13):** `/excavadoras/` → categoría «Excavadoras» de usados y `/elementor-48399/` → índice de usados, creadas desde el panel de producción por dirección con `runbook-redirects-usados.md` (EJECUTADO y comprobado el 2026-10-13); son datos, no código.
+- **Marcas de usados, paso (b) (2026-10-13):** colección `marcas-usada` con su página `/maquinaria-pesada/maquinaria-pesada-usada/marcas/<marca>/` (filtros por tipo de máquina, año, horas y peso; vacía, sin indexar ni sitemap) y relación «Marca» en los equipos usados; el gancho `marcaUsadaSincronizada` la rellena desde el texto (busca o crea la marca), así el importador no cambia; «marcas» reservada como dirección de categoría; migración `20261014_020810_marcas_usada` con relleno en SQL desde el texto. Detalle en `docs/marketplace-usados.md` §6.
+- **Tiempo de servidor de los listados de usados (2026-10-13), ACEPTADO por dirección:** al pasar a dinámicos (D3), la mediana del TTFB sube unos 100–140 ms (Excavadoras, página 1: 181 → 284 ms; página 2: 160 → 299 ms; 5 cargas por ruta, del preview del #117 al del #120), porque ya no los sirve la CDN. No se toca `proxy.ts` ni se activa Cache Components: **se revisará después del lanzamiento, con tráfico real**. La reversión de la migración `20261014_020810_marcas_usada` lleva `IF EXISTS` (la generada por Payload fallaba tras el `DROP TABLE … CASCADE`; probado en un Postgres en memoria).
+- **El panel al día con usados y repuestos (2026-10-13):** `panel:revision -- <preview> nuevos` (solo lo nuevo); ayudas y etiquetas («Marcas de repuestos», «Marcas/Tipos de maquinaria nueva»), descripción por defecto propia de las páginas de usados (`descripcionPorDefecto`, sitio y panel), el editor de texto en la letra del sitio (`--font-serif`) y la guía del editor al día; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §28.
 
 ### 10.0 Qué está construido y qué falta
 
@@ -1505,6 +1510,47 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
       con el token) y falla si no es del almacén esperado. Contra producción
       desde una máquina local hay que declarar `ALMACEN_BLOB_ESPERADO`
       (README §9.2).
+- **CONFIGURACIÓN DE LOS ALMACENES DEL BLOB (2026-10-13, ya en Vercel Pro).**
+  - **Por qué Pro:** el 2026-10-08, la importación de usados al preview
+    agotó las 2.000 operaciones avanzadas al mes del plan Hobby. Ese cupo es
+    de **toda la cuenta**, así que se bloquearon los dos almacenes y las
+    fotos de producción también cayeron. Presupuesto de operaciones en
+    `Desktop\partequipos-cierre\informes\2026-10-13-blob-y-listados.md`.
+  - **Conexiones en Vercel:**
+
+    | Almacén                 | Conectado a      | Quién lo usa                                                                   |
+    | ----------------------- | ---------------- | ------------------------------------------------------------------------------ |
+    | `parte-equipos-preview` | **solo Preview** | Previews; `development` (`.env.local`) y los scripts locales, con su token     |
+    | `parte-equipos`         | **ninguno**      | Producción, con su `BLOB_READ_WRITE_TOKEN` propio, puesto a mano en Production |
+
+    Hasta el 2026-10-13 el almacén del preview estaba conectado también a
+    «Production». Lo quitó dirección y producción se redesplegó después.
+    **Un almacén nunca se conecta a otro entorno que el suyo.**
+
+  - **El token NO se revoca ni se sustituye, aunque Vercel lo recomiende.**
+    Vercel aconseja dejar los tokens estáticos y conectar el almacén, que
+    autentica dentro de Vercel. Pero el token estático lo usa todo lo que
+    corre **fuera** de Vercel:
+    - los importadores y scripts por `preview:ejecutar`;
+    - `blob:almacen`, `blob:huerfanos` y `backup:blob`;
+    - los runbooks de dirección.
+
+    Además, la guarda del almacén (§10.37) identifica el almacén **por el id
+    que lleva el propio token**. Revocarlo dejaría sin almacén a todos los
+    scripts, y sin la comprobación previa de la guarda.
+
+  - **Comprobado en solo lectura el 2026-10-13**, con el HTML y 3 imágenes de
+    `/`, `/nosotros/` y una ficha:
+    - **sitio publicado:** imágenes en 200, todas de un almacén que no es el
+      del preview;
+    - **preview:** imágenes en 200, todas del almacén del preview;
+    - **`npm run blob:almacen`,** con `.env.local` y con el entorno del
+      preview: `lsndnc29nh4ws7eh`, el esperado.
+
+    **No verificado:**
+    - la guarda dentro de producción: solo actúa al escribir, y el token de
+      producción no entra en la sesión;
+    - la lista de variables de Vercel: la API respondió 403 a la integración.
 - **CUIDADO al desplegar — `payload migrate` es interactivo:** si
   `payload_migrations` contiene el marcador `dev` (`batch -1`, que deja el push
   de desarrollo), el comando abre un prompt —
@@ -3431,6 +3477,8 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Ficheros del Blob sin registro           | Ficheros que la subida directa dejó en el almacén cuando el guardado falló (§10.39). Solo lista                                                                                                                                         | `npm run blob:huerfanos`                                                                                                                 | **A mano**                            |
 | Secreto de derivación solo al preview    | Un script que manda `x-vercel-protection-bypass` a otro host: `extraHTTPHeaders`, un `fetch` que sigue redirecciones o la cabecera escrita a mano (§10.40)                                                                              | `src/lib/preview/derivacion.mjs` + `derivacion.test.ts`, que también recorre `scripts/` y `src/`                                         | CI, en cada push                      |
 | Fuente de respaldo de Inter              | next/font renombra «Inter Fallback» (detalle interno de Turbopack) y la cabecera del artículo vuelve a desplazarse al llegar Inter, sin ningún error                                                                                    | `scripts/qa/fuente-respaldo.ts` tras `next build` + `src/lib/blog/fuenteRespaldo.test.ts`                                                | Cada build (también preview) y CI     |
+| Filtros: una sola URL por combinación    | Una query de filtros escrita de dos formas (mayúsculas, otro orden, un valor inexistente) que daría dos páginas iguales; o una combinación filtrada indexable                                                                           | `src/lib/filtros/` + `filtros.test.ts` (308 a la forma canónica, `noindex` con canónica sin filtros)                                     | CI, en cada push                      |
+| Categorías de usada heredadas            | Que la regla «vacía no se indexa» (D4) saque del índice una categoría que ya está indexada en el sitio actual                                                                                                                           | `src/lib/usados/heredadas.ts` + su prueba, que la compara con `docs/url-map.csv`                                                         | CI, en cada push                      |
 
 **«Deriva de esquema» se colgó dos veces; está blindada (fase 5).**
 

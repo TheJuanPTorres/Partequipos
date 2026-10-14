@@ -57,6 +57,10 @@ export const TipoEquipo: CollectionConfig = {
       name: "descripcion",
       type: "textarea",
       label: "Descripción",
+      admin: {
+        description:
+          "Texto bajo el título de la página del tipo. También sirve de descripción en Google si no hay otra.",
+      },
     },
     /*
      * Foto de la tarjeta «Repuestos según tipo de máquina» de la página de la

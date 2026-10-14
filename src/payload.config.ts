@@ -35,6 +35,7 @@ import { CategoriaLubricante } from "./collections/CategoriaLubricante";
 import { CategoriaMaquinaria } from "./collections/CategoriaMaquinaria";
 import { CategoriaTecnica } from "./collections/CategoriaTecnica";
 import { CategoriaUsada } from "./collections/CategoriaUsada";
+import { MarcaUsada } from "./collections/MarcaUsada";
 import { EquipoNuevo } from "./collections/EquipoNuevo";
 import { EquipoUsado } from "./collections/EquipoUsado";
 import { Marca } from "./collections/Marca";
@@ -210,6 +211,7 @@ export default buildConfig({
         TipoMaquinaria,
         CategoriaMaquinaria,
         CategoriaUsada,
+        MarcaUsada,
         // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.
         MarcaLubricante,
         CategoriaLubricante,

@@ -4,6 +4,7 @@ import { revalidarEquipoUsado, revalidarEquipoUsadoBorrado } from "./hooks/maqui
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { revalidarPortada } from "./hooks/portadaHooks";
 import { avisoField } from "../lib/fields/avisoField";
+import { marcaUsadaSincronizada } from "./hooks/marcaUsada";
 
 const portada = revalidarPortada("equipos-usados");
 
@@ -26,11 +27,11 @@ export const EquipoUsado: CollectionConfig = {
   labels: { singular: "Equipo usado", plural: "Equipos usados" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "imagenes", "categoria", "anio", "disponible"],
+    defaultColumns: ["nombre", "imagenes", "categoria", "marcaUsada", "anio", "disponible"],
     group: "Maquinaria",
     listSearchableFields: ["nombre", "marca", "modelo"],
     description:
-      "Inventario de maquinaria usada. Se muestra dentro de la página de su categoría; no genera URLs propias.",
+      "Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros; no tiene página propia.",
   },
   access: {
     read: publico,
@@ -39,6 +40,7 @@ export const EquipoUsado: CollectionConfig = {
     delete: borradoAdmin,
   },
   hooks: {
+    beforeChange: [marcaUsadaSincronizada],
     afterChange: [revalidarEquipoUsado, portada.afterChange],
     afterDelete: [revalidarEquipoUsadoBorrado, portada.afterDelete],
   },
@@ -59,15 +61,34 @@ export const EquipoUsado: CollectionConfig = {
       relationTo: "categorias-usada",
       required: true,
       label: "Categoría",
-      admin: { description: "Determina en qué página aparece la unidad." },
+      admin: { description: "Determina en qué listado de categoría aparece la unidad." },
     },
     /*
-     * `marca` y `modelo` son texto libre, no relaciones: en usada entra
-     * cualquier marca, incluidas las que no distribuimos (Caterpillar, Komatsu,
-     * Volvo…). Obligar a una relación con `MarcaMaquinaria` impediría cargar una
-     * unidad de una marca que no está en la línea nueva.
+     * MARCA (paso b del marketplace, 2026-10-13): relación con las marcas de
+     * USADA, no con las de nueva ni las de repuestos (en usada entra cualquier
+     * marca: Caterpillar, Komatsu, LiuGong…). Cada marca tiene su página.
+     *
+     * El texto `marca` se conserva oculto mientras lo escriba el importador de
+     * WordPress: el gancho `marcaUsadaSincronizada` mantiene los dos de
+     * acuerdo y, si solo llega el texto, busca o crea la marca. Se retirará
+     * con su migración.
      */
-    { name: "marca", type: "text", label: "Marca" },
+    {
+      name: "marcaUsada",
+      type: "relationship",
+      relationTo: "marcas-usada",
+      label: "Marca",
+      admin: {
+        description:
+          "Si la marca no está en la lista, créala aquí mismo: tendrá su propia página en el sitio.",
+      },
+    },
+    {
+      name: "marca",
+      type: "text",
+      label: "Marca",
+      admin: { hidden: true },
+    },
     { name: "modelo", type: "text", label: "Modelo" },
     {
       name: "anio",

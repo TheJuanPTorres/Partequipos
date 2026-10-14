@@ -83,6 +83,16 @@ describe("clasificarDestino — maquinaria", () => {
     assert.deepEqual(d.colecciones, ["categorias-usada"]);
   });
 
+  it("la marca de usada (paso b): /…/maquinaria-pesada-usada/marcas/<marca>/", () => {
+    const d = clasificarDestino("/maquinaria-pesada/maquinaria-pesada-usada/marcas/hitachi/");
+    assert.ok(d.clase === "dinamica");
+    assert.deepEqual(d.colecciones, ["marcas-usada"]);
+    assert.equal(
+      clasificarDestino("/maquinaria-pesada/maquinaria-pesada-usada/marcas/hitachi/x/").clase,
+      "sin-ruta",
+    );
+  });
+
   it("rechaza una rama inventada de maquinaria", () => {
     assert.equal(clasificarDestino("/maquinaria-pesada/inventada/x/").clase, "sin-ruta");
   });

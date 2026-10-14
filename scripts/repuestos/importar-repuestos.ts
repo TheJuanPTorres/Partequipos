@@ -338,25 +338,32 @@ const tipoPorClave = new Map(tipos.map((t) => [`${t.marca}/${t.slug}`, t]));
 const modelos: PlanModelo[] = [];
 const borradores: string[] = [];
 /**
- * Slugs que el campo `slug` no puede guardar tal cual («…-d6k_»): `formatSlug`
- * quitaría el guion bajo y la URL cambiaría, y eso exige aprobación (§3.3).
- * Quedan PENDIENTES de dirección y no se importan.
+ * Slugs que el sitio no admite tal cual («…-d6k_»): el `_` no se permite en
+ * los slugs (dirección, 2026-10-13). Se guardan como los deja `formatSlug`, con
+ * un 301 desde la URL de WordPress; si con eso coinciden con otro modelo del
+ * mismo tipo («…-dx340lca_» y «…-dx340lca», la misma página), no se crean: solo
+ * el 301 a ese modelo.
  */
-const slugsPendientes: { clave: string; ruta: string; seGuardariaComo: string }[] = [];
+const slugsCambiados: { ruta: string; slug: string; duplicado: boolean }[] = [];
+const slugsDelTipo = new Set(
+  modelosWp.map((x) => (x.segmentos ?? []).join("/")).filter((k) => k.split("/").length === 3),
+);
 for (const p of modelosWp) {
-  const [mSlug = "", tSlug = "", slug = ""] = p.segmentos ?? [];
-  if (esBorradorCopia(slug)) {
+  const [mSlug = "", tSlug = "", slugWp = ""] = p.segmentos ?? [];
+  if (esBorradorCopia(slugWp)) {
     borradores.push(p.ruta);
     continue;
   }
-  if (formatSlug(slug) !== slug) {
-    slugsPendientes.push({
-      clave: `${mSlug}/${tSlug}/${slug}`,
-      ruta: p.ruta,
-      seGuardariaComo: formatSlug(slug),
-    });
-    avisos.push(`modelo ${slug}: el slug no se puede guardar tal cual; PENDIENTE de dirección`);
-    continue;
+  const slug = formatSlug(slugWp);
+  if (slug !== slugWp) {
+    const destino = `${rutaMadre(p.ruta)}${slug}/`;
+    redirecciones.push({ origen: p.ruta, destino });
+    const duplicado = slugsDelTipo.has(`${mSlug}/${tSlug}/${slug}`);
+    slugsCambiados.push({ ruta: p.ruta, slug, duplicado });
+    avisos.push(
+      `modelo ${slugWp}: va como «${slug}» con 301 desde su URL${duplicado ? " (ya existe: solo el 301)" : ""}`,
+    );
+    if (duplicado) continue;
   }
   const marca = marcaPorSlug.get(mSlug);
   if (!marca || !tipoPorClave.has(`${mSlug}/${tSlug}`)) {
@@ -594,7 +601,7 @@ const resumen = {
     borradoresCopia: borradores.length,
     sinRutaEnElSitioNuevo: sinRuta.length,
     redirecciones301: redirecciones.length,
-    slugsPendientesDeDireccion: slugsPendientes.length,
+    slugsSinGuionBajo: slugsCambiados.length,
     fotosGenericas: [...genericas],
   },
   enElPreview: {
@@ -632,7 +639,7 @@ fs.writeFileSync(
       redirecciones,
       sinRuta,
       borradores,
-      slugsPendientes,
+      slugsCambiados,
       comprobacion,
       marcas,
       tipos,
@@ -841,17 +848,6 @@ for (const t of tipos) {
   }
 }
 log(`tipos: ${tipos.length}`);
-
-// Los de slug pendiente que una ejecución anterior llegó a crear (con el slug
-// ya cambiado por `formatSlug`) se quitan: su URL no es la de WordPress.
-for (const pendiente of slugsPendientes) {
-  const creado = manifiesto.creado.modelos.find((x) => x.clave === pendiente.clave);
-  if (!creado) continue;
-  await payload.delete({ collection: "modelos-repuesto", id: creado.id, overrideAccess: true });
-  manifiesto.creado.modelos = manifiesto.creado.modelos.filter((x) => x !== creado);
-  guardarManifiesto();
-  log(`quitado el modelo ${creado.id}: se creó como «${pendiente.seGuardariaComo}», no con su URL`);
-}
 
 // 5. Modelos (por tipo + slug, el índice único). Sin fotos.
 const modelosAhora = (

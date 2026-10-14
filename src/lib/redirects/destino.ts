@@ -34,6 +34,7 @@ export type ColeccionDestino =
   | "equipos-nuevos"
   | "categorias-maquinaria"
   | "categorias-usada"
+  | "marcas-usada"
   | "marcas-lubricante"
   | "categorias-lubricante"
   | "categorias-blog"
@@ -103,6 +104,9 @@ export function clasificarDestino(destino: string): Destino {
   if (seg(0) === SEGMENTO_MAQUINARIA) {
     if (seg(1) === SEGMENTO_USADA && partes.length === 3) {
       return din(["categorias-usada"], seg(2));
+    }
+    if (seg(1) === SEGMENTO_USADA && seg(2) === SEGMENTO_MARCAS_MAQUINARIA && partes.length === 4) {
+      return din(["marcas-usada"], seg(3));
     }
     if (seg(1) === SEGMENTO_NUEVA) {
       if (seg(2) === SEGMENTO_MARCAS_MAQUINARIA) {

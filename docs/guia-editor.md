@@ -65,16 +65,16 @@ Consecuencias prácticas:
 
 A la izquierda, en grupos:
 
-| Grupo            | Qué hay                                                                              |
-| ---------------- | ------------------------------------------------------------------------------------ |
-| Solicitudes      | Las **solicitudes** que llegan de los formularios del sitio                          |
-| Repuestos        | Modelos, marcas, tipos de equipo y categorías técnicas                               |
-| Maquinaria       | Equipos nuevos y usados; marcas, tipos y categorías de maquinaria nueva y usada      |
-| Lubricantes      | Marcas y categorías de lubricante                                                    |
-| Páginas y blog   | Páginas, artículos y categorías del blog, preguntas frecuentes, testimonios y sedes  |
-| Archivos         | Imágenes, documentos (PDF), vídeos y animaciones                                     |
-| Partes del sitio | Cabecera, pie de página y ficha de producto: lo que se repite en muchas páginas      |
-| Configuración    | «SEO y datos de la empresa» (horario, imágenes y contacto), redirecciones y usuarios |
+| Grupo            | Qué hay                                                                                              |
+| ---------------- | ---------------------------------------------------------------------------------------------------- |
+| Solicitudes      | Las **solicitudes** que llegan de los formularios del sitio                                          |
+| Repuestos        | Modelos, marcas de repuestos, tipos de equipo y categorías técnicas                                  |
+| Maquinaria       | Equipos nuevos y usados; marcas, tipos y categorías de nueva; categorías y marcas de usada           |
+| Lubricantes      | Marcas y categorías de lubricante                                                                    |
+| Páginas y blog   | Páginas, artículos y categorías del blog, preguntas frecuentes, testimonios y sedes                  |
+| Archivos         | Imágenes, documentos (PDF), vídeos y animaciones                                                     |
+| Partes del sitio | Cabecera, pie, ficha de producto y páginas de marca de repuestos: lo que se repite en muchas páginas |
+| Configuración    | «SEO y datos de la empresa» (horario, imágenes y contacto), redirecciones y usuarios                 |
 
 Dentro de cada grupo, primero va lo que más se edita (los modelos, los
 equipos) y después sus clasificaciones.
@@ -90,8 +90,8 @@ el botón «Filtros».
 
 **Ver en el sitio:** en las fichas con página pública (marcas, tipos y
 modelos de repuesto; marcas, tipos y equipos nuevos de maquinaria; categorías
-de maquinaria nueva y usada; lubricantes; páginas, artículos y categorías del
-blog), arriba del formulario hay un botón **«Ver en el sitio»** que abre esa
+de maquinaria nueva y usada; marcas de maquinaria usada; lubricantes;
+páginas, artículos y categorías del blog), arriba del formulario hay un botón **«Ver en el sitio»** que abre esa
 página en otra pestaña. Sale cuando la ficha ya está guardada; en móvil es solo
 el icono. Lo que no tiene página propia (equipos usados, categorías técnicas,
 sedes, testimonios, solicitudes…) no lo lleva.
@@ -175,15 +175,44 @@ oficial, no lo pongas.
   todas las fichas, es la misma para todas: está en **Partes del sitio → Ficha de
   producto**.
 
-### 5.3 Equipos usados
+### 5.3 Equipos usados y sus marcas
 
-- **Maquinaria → Equipos usados.** No tienen página propia: salen dentro de la
-  página de su **categoría**.
-- Marca y modelo son texto libre: entra cualquier marca.
+- **Maquinaria → Equipos usados.** No tienen página propia: salen en la
+  página de su **categoría** y en la de su **marca**, donde el visitante puede
+  filtrar por marca o tipo de máquina, año, horas de uso y peso, y ordenar.
+  Por eso conviene rellenar **año, horómetro y peso operativo**: una unidad
+  sin año, por ejemplo, no sale al filtrar por año.
+- **«Marca»** es una lista: elige la marca. Si no está, créala ahí mismo con
+  el **«+»**; tendrá su propia página. El **modelo** es texto libre.
+- **Maquinaria → Marcas de maquinaria usada:** cada marca tiene su página
+  (`…/maquinaria-pesada-usada/marcas/<marca>/`), con sus unidades
+  disponibles. Puedes escribir su descripción, su SEO y, si la vendemos
+  nueva o tenemos repuestos, enlazarla a esa marca (su página enlazará a la
+  otra). Una marca **sin unidades disponibles** no sale en Google ni en el
+  índice de usados hasta que tenga alguna.
+- Ninguna categoría de usados puede llamarse «marcas»: esa dirección web es
+  la de las páginas de marca.
 - **Al venderse, desmarca «Disponible»** en vez de borrarlo. Si fue un error,
   se vuelve a marcar.
 - «Pestaña en la portada»: por defecto, según su categoría; elige
   «Aditamentos» si es un aditamento.
+
+### 5.3 bis Páginas de marca de repuestos
+
+- Cada **marca de repuestos** (**Repuestos → Marcas de repuestos**) tiene su
+  página. En la ficha de la marca: **descripción** (la presentación bajo el
+  título), **logo** (fondo transparente; hoy va sobre una placa oscura,
+  porque los logos del cliente son blancos) y **fondo del encabezado** (foto
+  de obra, opcional).
+- Los **tipos de equipo** llevan una **imagen de la tarjeta** opcional: la
+  foto de su tarjeta en la página de la marca.
+- Las **categorías técnicas** son las mismas en todas las marcas: su
+  **icono**, su **enlace** y su **posición en las páginas de marca** se
+  editan en cada categoría (**Repuestos → Categorías técnicas**).
+- Lo común a todas las páginas de marca (títulos de las secciones, las
+  tarjetas de usada y aditamentos, el contacto y los testimonios) está en
+  **Partes del sitio → Páginas de marca de repuestos**. Un título vacío
+  esconde su sección: cada campo dice cuál.
 
 ### 5.4 Escribir un artículo del blog
 
@@ -314,8 +343,9 @@ mientras escribes, un **contador de caracteres** y **qué se usa si lo dejas
 vacío**.
 
 - **Título para buscadores:** lo que sale en azul en Google. Hasta unos 60
-  caracteres; Google corta lo que pase. **No se le añade nada**: si quieres
-  que diga «Partequipos», escríbelo tú.
+  caracteres; Google corta lo que pase. El sitio le añade **« | Partequipos»**
+  al final si con ella no pasa de 60 y no la lleva ya (en la portada, nunca):
+  no hace falta escribirla. La vista de Google del bloque ya la enseña.
 - **Descripción para buscadores:** el texto bajo el título en Google. Entre
   120 y 160 caracteres; a partir de 160 se corta con «…».
 - **Imagen al compartir en redes:** la que sale al pegar el enlace en
@@ -325,7 +355,10 @@ vacío**.
   defecto** de «SEO y datos de la empresa» (§5.9).
 
 Si dejas un campo vacío, el sitio usa el nombre o la descripción de la ficha;
-el bloque te enseña exactamente qué texto.
+el bloque te enseña exactamente qué texto. En las **categorías y marcas de
+maquinaria usada** sin descripción, la de Google es una propia del
+marketplace («Excavadoras usadas en venta en Colombia: unidades revisadas…»),
+no el texto general del sitio.
 
 En las **categorías técnicas** el bloque también está, pero hoy no tienen
 página propia en el sitio: lo que escribas se guarda y no sale en Google

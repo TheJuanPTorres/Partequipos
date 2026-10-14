@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { concuerda, recortarDescripcion, tituloPorDefecto } from "./porDefecto";
+import {
+  concuerda,
+  descripcionPorDefecto,
+  recortarDescripcion,
+  tituloPorDefecto,
+} from "./porDefecto";
 import { SEO_POR_COLECCION, estadoLongitud } from "./seoPanel";
 
 describe("tituloPorDefecto", () => {
@@ -40,6 +45,7 @@ describe("SEO_POR_COLECCION", () => {
       "equipos-nuevos",
       "marcas-lubricante",
       "marcas-maquinaria",
+      "marcas-usada",
       "modelos-repuesto",
       "paginas",
       "tipos-equipo",
@@ -89,5 +95,31 @@ describe("concordancia de nuevas/usadas", () => {
     assert.equal(concuerda("Grúas TELESCÓPICAS", "f", "m"), "f");
     assert.equal(concuerda("Equipos de compactación", "f", "m"), "m");
     assert.equal(concuerda("bulldozer", "f", "m"), "m");
+  });
+});
+
+describe("descripcionPorDefecto de usados", () => {
+  it("habla de maquinaria usada (no de repuestos) y cabe en 160 con nombres normales", () => {
+    for (const d of [
+      descripcionPorDefecto.categoriaUsada("Excavadoras"),
+      descripcionPorDefecto.categoriaUsada("Retrocargadoras"),
+      descripcionPorDefecto.marcaUsada("Case Construction"),
+    ]) {
+      assert.ok(d.length <= 160, d);
+      assert.match(d, /usad[ao]s?\b/i);
+      assert.doesNotMatch(d, /repuesto/i);
+    }
+    assert.ok(descripcionPorDefecto.marcaUsada("Hitachi").startsWith("Maquinaria Hitachi usada "));
+  });
+
+  it("el panel la usa como respaldo en las dos colecciones de usados", () => {
+    assert.equal(
+      SEO_POR_COLECCION["categorias-usada"]?.descripcion?.("Excavadoras"),
+      descripcionPorDefecto.categoriaUsada("Excavadoras"),
+    );
+    assert.equal(
+      SEO_POR_COLECCION["marcas-usada"]?.descripcion?.("Hitachi"),
+      descripcionPorDefecto.marcaUsada("Hitachi"),
+    );
   });
 });

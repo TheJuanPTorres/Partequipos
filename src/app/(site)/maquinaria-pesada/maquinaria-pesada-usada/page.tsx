@@ -3,7 +3,11 @@ import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getCategoriasUsada } from "@/lib/queries/getMaquinaria";
+import {
+  getCategoriasUsada,
+  getInventarioUsados,
+  getMarcasUsada,
+} from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -17,7 +21,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function UsadaIndexPage() {
-  const categorias = await getCategoriasUsada();
+  const [categorias, marcas, inventario] = await Promise.all([
+    getCategoriasUsada(),
+    getMarcasUsada(),
+    getInventarioUsados(),
+  ]);
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -31,6 +39,18 @@ export default async function UsadaIndexPage() {
     descripcion: c.descripcion,
     imagen: null,
   }));
+
+  // Marcas con unidades disponibles (paso b del marketplace): cada una tiene
+  // su página. Las que no tienen unidades no se enlazan (D4: no se indexan).
+  const marcasConUnidades = marcas
+    .map((m) => ({ m, n: inventario.filter((u) => u.marcaUsada === m.id).length }))
+    .filter(({ n }) => n > 0)
+    .map(({ m, n }) => ({
+      href: `${rutas.marcaUsada(m.slug)}/`,
+      titulo: m.nombre,
+      descripcion: `${n} ${n === 1 ? "unidad disponible" : "unidades disponibles"}`,
+      imagen: null,
+    }));
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
@@ -48,6 +68,17 @@ export default async function UsadaIndexPage() {
           <ListaEnlaces items={items} vacio="Todavía no hay categorías publicadas." />
         </div>
       </section>
+
+      {marcasConUnidades.length ? (
+        <section className="mt-10" aria-labelledby="marcas-heading">
+          <h2 id="marcas-heading" className="text-xl font-medium text-gray-900">
+            Marcas
+          </h2>
+          <div className="mt-4">
+            <ListaEnlaces items={marcasConUnidades} vacio="" />
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }

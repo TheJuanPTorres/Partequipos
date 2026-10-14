@@ -26,8 +26,25 @@ export const tituloPorDefecto = {
   tipoMaquinaria: (tipo: string, marca: string) => `${tipo} ${marca}`,
   categoriaNueva: (categoria: string) => `${categoria} ${concuerda(categoria, "nuevas", "nuevos")}`,
   categoriaUsada: (categoria: string) => `${categoria} ${concuerda(categoria, "usadas", "usados")}`,
+  marcaUsada: (marca: string) => `Maquinaria ${marca} usada`,
   marcaLubricante: (marca: string) => `Lubricantes ${marca}`,
   categoriaLubricante: (categoria: string, marca: string) => `${categoria} | Lubricantes ${marca}`,
+} as const;
+
+/**
+ * Descripción por defecto de las páginas del marketplace de usados, cuando ni
+ * el grupo SEO ni la «Descripción» del registro tienen texto. Sin esto, salía
+ * el texto general del sitio, que habla de REPUESTOS (revisión del panel,
+ * 2026-10-13). Sin cifras: así la vista de Google del panel dice lo mismo que
+ * la página publicada, aunque cambie el inventario.
+ */
+const COLA_USADOS =
+  "en venta en Colombia: unidades revisadas, con fotos, año, horas de uso y peso. Consulta la disponibilidad con Partequipos.";
+
+export const descripcionPorDefecto = {
+  categoriaUsada: (categoria: string) =>
+    `${tituloPorDefecto.categoriaUsada(categoria)} ${COLA_USADOS}`,
+  marcaUsada: (marca: string) => `${tituloPorDefecto.marcaUsada(marca)} ${COLA_USADOS}`,
 } as const;
 
 /** Largo máximo de la meta descripción: lo que pase se corta con «…». */

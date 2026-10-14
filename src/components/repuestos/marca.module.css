@@ -75,13 +75,18 @@
   text-align: center;
 }
 
+/*
+ * Placa OSCURA: los logos que entrega el cliente son BLANCOS y no se ven sobre
+ * fondo claro (decisión de dirección, 2026-10-13). Cuando lleguen las versiones
+ * en color, se vuelve a la placa blanca de ux-9.
+ */
 .placa {
   display: flex;
-  padding: 0 20px;
+  padding: 12px 20px;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: var(--color-fondo);
+  background: var(--color-texto);
 }
 
 /* El logo mide 131 de ancho y, como mucho, 87 de alto (medido); la placa blanca le suma 20 a cada lado. */
@@ -592,5 +597,68 @@ a.pildora:hover {
 @media (max-width: 767px) {
   .contacto {
     padding: 30px 20px 40px;
+  }
+}
+
+/* --- Modelos del tipo (página de tipo, PROVISIONAL) ------------------------------ */
+
+.modelos {
+  position: relative;
+  z-index: 1;
+  padding: 10px 10px 50px;
+  border-radius: 0 0 var(--marca-radio) var(--marca-radio);
+  background: var(--marca-amarillo);
+}
+
+.modelosLista {
+  display: flex;
+  max-width: 1240px;
+  margin: 40px auto 0;
+  padding: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 20px;
+  list-style: none;
+}
+
+.modelo {
+  display: inline-flex;
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 0 22px;
+  align-items: center;
+  gap: 10px;
+  border-radius: 30px;
+  background: #fafafa;
+  color: var(--color-texto-suave);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.modelo:hover {
+  background: var(--color-marca);
+  color: var(--color-fondo);
+}
+
+.modeloCodigo {
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.modelosVacio {
+  max-width: 640px;
+  margin: 30px auto 0;
+  color: var(--color-texto);
+  font-size: var(--texto-cuerpo);
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .modelosLista {
+    margin-top: 27px;
+    gap: 10px;
   }
 }

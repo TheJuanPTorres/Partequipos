@@ -47,7 +47,7 @@ en escritorio y lleva un título. Así quedan fuera:
 
 | WordPress                                          | Nuestro campo                   | Regla                                                                                                                                                                                        |
 | -------------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ruta                                               | marca, tipo, modelo             | Por profundidad bajo `repuestos-maquinaria-pesada-marcas/`. Los slugs, **tal cual** (§3.3); los que no se pueden guardar tal cual quedan pendientes (§4)                                     |
+| Ruta                                               | marca, tipo, modelo             | Por profundidad bajo `repuestos-maquinaria-pesada-marcas/`. Los slugs, **tal cual** (§3.3), salvo los 3 con guion bajo (§4)                                                                  |
 | Nombre de la marca                                 | `marcas.nombre`                 | El de `docs/inventario-repuestos.csv` («Case Construction», no «CASE CONSTRUCTION»)                                                                                                          |
 | Logo de la marca                                   | `marcas.logo`                   | La serie «MARCA-NN.png» del sitio del cliente (§3)                                                                                                                                           |
 | Título de la página de tipo                        | `tipos-equipo.nombre`           | Sin «Repuestos para maquinaria pesada» ni la marca del final: «Miniexcavadora»                                                                                                               |
@@ -64,9 +64,9 @@ en escritorio y lleva un título. Así quedan fuera:
 La única serie que cubre las 13 marcas es la del propio sitio del cliente,
 «MARCA-NN.png» (2023, 419–872 px de ancho): `LOGOS_DE_MARCA` en
 `src/lib/repuestos/wordpress.ts`. **Son logos BLANCOS sobre transparente**,
-pensados para fondo oscuro: **sobre fondo claro no se ven**. Quien pinte las
-páginas de repuestos (el agente D) tiene que ponerlos sobre fondo oscuro o
-pedir otra versión al cliente. Tampoco sirven como imagen al compartir
+pensados para fondo oscuro: **sobre fondo claro no se ven**. Dirección los pide
+al cliente **en color**; mientras tanto, las páginas de repuestos los pintan
+sobre una placa oscura (PR #125). Tampoco sirven como imagen al compartir
 (`og:image`) sobre fondo blanco.
 
 - El de Hitachi se llama «OKADA-07.png» en WordPress; su texto alternativo allí
@@ -74,18 +74,19 @@ pedir otra versión al cliente. Tampoco sirven como imagen al compartir
 - Nombre en `Media`: `wp-logo-<id del adjunto>-<marca>.png`; texto alternativo
   «Logo de {marca}». Una segunda ejecución no los vuelve a subir.
 
-## 4. Lo que no se importa, y lo pendiente
+## 4. Lo que no se importa, y las redirecciones
 
-| Qué                                                                                                                                               | Cuántas | Qué se hace                                                                                                                                                                                                              |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Borradores `-copy`                                                                                                                                | 2       | Nada (ADR 0004)                                                                                                                                                                                                          |
-| Ammann (marca y su tipo) y PES Parts Equipment Solutions                                                                                          | 3 URL   | **301 al índice de marcas de repuestos** (dirección; pendiente de confirmar con el cliente)                                                                                                                              |
-| Modelos CASE con un nivel de más (`…/cargador-frontal-case-construction/repuestos-para-maquinaria-pesada-excavadora-case-construction/<modelo>/`) | 4       | **301 a su página madre**, la «Excavadora» de CASE, que sí se migra (dirección)                                                                                                                                          |
-| **Modelos con guion bajo en el slug** (`…-d6k_`, `…-dx225lca-cebdx_`, `…-dx340lca_`)                                                              | 3       | **PENDIENTES DE DIRECCIÓN.** `formatSlug` quita el `_` y la URL cambiaría (§3.3). `…-dx340lca_` duplica a `…-dx340lca`; los otros dos no tienen gemelo. `redirects-map.csv` decía «ruta conservada idéntica», y no lo es |
-| Fotos de los modelos                                                                                                                              | 324     | No se importan (dirección)                                                                                                                                                                                               |
-| Las 32 páginas de categoría técnica                                                                                                               | 32      | Necesitan plantilla y ruta nuevas (hoy dan 404)                                                                                                                                                                          |
+| Qué                                                                                                                                               | Cuántas | Qué se hace                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Borradores `-copy`                                                                                                                                | 2       | Nada (ADR 0004)                                                                                                                                                                                                                                                                                 |
+| Ammann (marca y su tipo) y PES Parts Equipment Solutions                                                                                          | 3 URL   | **301 al índice de marcas de repuestos** (dirección; pendiente de confirmar con el cliente)                                                                                                                                                                                                     |
+| Modelos CASE con un nivel de más (`…/cargador-frontal-case-construction/repuestos-para-maquinaria-pesada-excavadora-case-construction/<modelo>/`) | 4       | **301 a su página madre**, la «Excavadora» de CASE, que sí se migra (dirección)                                                                                                                                                                                                                 |
+| **Modelos con guion bajo en el slug** (`…-d6k_`, `…-dx225lca-cebdx_`, `…-dx340lca_`)                                                              | 3       | **El `_` no se permite en los slugs del sitio** (dirección, 2026-10-13). `…-d6k_` y `…-dx225lca-cebdx_` se guardan sin él, con **301 desde la URL de WordPress**; `…-dx340lca_` es la misma página que `…-dx340lca`: no se crea, solo el **301 a `…-dx340lca`**. `redirects-map.csv`, corregido |
+| Fotos de los modelos                                                                                                                              | 324     | No se importan (dirección)                                                                                                                                                                                                                                                                      |
+| Las 32 páginas de categoría técnica                                                                                                               | 32      | Necesitan plantilla y ruta nuevas (hoy dan 404)                                                                                                                                                                                                                                                 |
 
-Las 7 redirecciones se crean en `Redirects` con origen «Migración». **En un
+Las 10 redirecciones (3 de Ammann y PES, 4 de CASE y 3 de los slugs con guion
+bajo) se crean en `Redirects` con origen «Migración». **En un
 preview no se pueden comprobar** (§10.22): se comprueban en producción.
 
 **La página CASE «Excavadora» colocada como modelo** (bajo «Cargador
@@ -108,16 +109,18 @@ producción la demo se vacía entera antes (§10.6).
 | ------------------ | ----- | ------- | ------------------------- |
 | `marcas`           | 13    | 8       | 5                         |
 | `tipos-equipo`     | 32    | 24      | 8                         |
-| `modelos-repuesto` | 344   | 288     | 56                        |
+| `modelos-repuesto` | 346   | 290     | 56                        |
 | Logos en `Media`   | 13    | 13      | —                         |
-| `redirects`        | 7     | 7       | —                         |
+| `redirects`        | 10    | 10      | —                         |
 
-- **Modelos:** 344 de los 347 de WordPress (los 3 de slug pendiente fuera); 344
-  con texto; código sacado del nombre en 343 (sin código, la «Excavadora» de
-  CASE). Sin duplicados de tipo + slug.
-- **SEO:** 308 modelos y 18 tipos guardan su título actual porque difiere del
+- **Modelos:** 346 de los 347 de WordPress (`…-dx340lca_` va por 301 a
+  `…-dx340lca`); 346 con texto; código sacado del nombre en 345 (sin código, la
+  «Excavadora» de CASE). Sin duplicados de tipo + slug.
+- **SEO:** 310 modelos y 18 tipos guardan su título actual porque difiere del
   título por defecto (p. ej. el título de WordPress dice «Minexcavadora» y el
-  `<title>` publicado, «Miniexcavador»). Meta descripción en los 344.
+  `<title>` publicado, «Miniexcavador»). Meta descripción en los 346.
+- **Los slugs con guion bajo** se añadieron después (PR de seguimiento): 2
+  modelos y 3 redirecciones más sobre la importación del PR #124.
 - **Blob:** 13 subidas (los logos). Nada más.
 - **Retirada probada de punta a punta:** borró los 288 modelos, 24 tipos, 8
   marcas, 7 redirecciones y 13 logos creados, devolvió los 69 registros
@@ -139,5 +142,4 @@ partes).
 ## 6. Para producción
 
 Runbook de dirección, sin ejecutar todavía: vaciar la demo (§10.6), importar
-con el destino de producción y comprobar las 7 redirecciones allí. Falta antes
-la decisión de los 3 slugs con guion bajo.
+con el destino de producción y comprobar las 10 redirecciones allí.

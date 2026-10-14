@@ -81,6 +81,10 @@ export const CategoriaTecnica: CollectionConfig = {
       name: "icono",
       type: "select",
       label: "Icono",
+      admin: {
+        description:
+          "Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de marca.",
+      },
       options: [
         { label: "Corte (cuchillas, puntas)", value: "corte" },
         { label: "Llantas y rines", value: "llanta" },
@@ -111,7 +115,10 @@ export const CategoriaTecnica: CollectionConfig = {
       type: "text",
       label: "Enlace de la tarjeta",
       validate: validarEnlace,
-      admin: { description: "Ruta del sitio (/…) o https://" },
+      admin: {
+        description:
+          "A dónde llevan la tarjeta de la portada y la categoría en las páginas de marca. Ruta del sitio (/…) o https://.",
+      },
     },
     /*
      * Fase E: QUÉ categorías salen en la sección 5 de la portada y en qué

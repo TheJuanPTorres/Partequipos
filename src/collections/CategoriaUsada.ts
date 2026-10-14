@@ -5,6 +5,7 @@ import { slugField } from "../lib/fields/slugField";
 import { revalidarCategoriaUsada, revalidarCategoriaUsadaBorrada } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { revalidarMegamenu } from "./hooks/megamenuHooks";
+import { slugCategoriaUsadaNoReservado } from "../lib/usados/slugsReservados";
 
 const menu = revalidarMegamenu("categorias-usada");
 
@@ -37,7 +38,8 @@ export const CategoriaUsada: CollectionConfig = {
   },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
-    slugField({ unique: true }),
+    // «marcas» está reservada: la usan las páginas de marca (D1).
+    slugField({ unique: true, validate: slugCategoriaUsadaNoReservado }),
     { name: "descripcion", type: "textarea", label: "Descripción" },
     seoField(),
   ],

@@ -46,8 +46,9 @@ describe("grupos del menú del panel", () => {
   // preguntas-frecuentes. Si este número cambia, revisa que la nueva tenga grupo.
   // 24 desde el mapa animado de Nosotros (2026-10-04): animaciones.
   // 25 desde la ficha de producto V2 (2026-10-05): documentos.
-  it("encuentra las 25 colecciones", async () => {
-    assert.equal((await cargarColecciones()).length, 25);
+  // 26 desde las marcas de usados (paso b del marketplace, 2026-10-13): marcas-usada.
+  it("encuentra las 26 colecciones", async () => {
+    assert.equal((await cargarColecciones()).length, 26);
   });
 
   it("toda colección tiene un grupo aprobado", async () => {

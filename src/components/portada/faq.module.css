@@ -46,7 +46,8 @@
 /*
  * VELO EN DEGRADADO (desviación anotada: en ux-9 es un gris #3A3A3A al 50 % en
  * multiplicar, plano). Más oscuro abajo, donde va el texto, para el contraste
- * AA del blanco sobre cualquier foto; arriba deja ver la foto.
+ * AA del blanco sobre cualquier foto (medido: el título, texto grande, ≥ 3:1 en su
+ * píxel más claro; el párrafo ≥ 4,5:1); arriba deja ver algo más la foto.
  */
 .tarjeta::before {
   position: absolute;
@@ -54,9 +55,9 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgb(16 15 15 / 88%) 0%,
-    rgb(16 15 15 / 70%) 40%,
-    rgb(16 15 15 / 25%) 100%
+    rgb(16 15 15 / 90%) 0%,
+    rgb(16 15 15 / 78%) 50%,
+    rgb(16 15 15 / 50%) 100%
   );
   content: "";
 }

@@ -14,6 +14,7 @@ import {
   normalizarAnio,
   normalizarHoras,
   normalizarPeso,
+  mencionaSerial,
   quitarSerial,
 } from "./wordpress";
 
@@ -133,6 +134,33 @@ describe("el número de serie no se publica", () => {
     );
     // Un «con» que no presenta el serial se queda.
     assert.equal(quitarSerial("con 900 horas y serial X9876.", SERIAL), "con 900 horas.");
+  });
+
+  it("quita también un «serial <código>» que no es el del campo (parte del serial u otro)", () => {
+    // Seriales INVENTADOS. El campo dice X9876; la descripción cita otro código.
+    assert.equal(
+      quitarSerial("2020, con 9.000 horas y serial B 54321. Equipo revisado", SERIAL),
+      "2020, con 9.000 horas. Equipo revisado",
+    );
+    assert.equal(quitarSerial("horas y serial A1234. Listo", SERIAL), "horas. Listo");
+    assert.equal(quitarSerial("Motor revisado, S/N 55555.", SERIAL), "Motor revisado.");
+    assert.equal(quitarSerial("número de serie 4321 y cabina", SERIAL), "y cabina");
+    // Sin serial en el campo, también.
+    assert.equal(quitarSerial("horas y serial A1234. Listo", ""), "horas. Listo");
+  });
+
+  it("no toca «serial» sin código ni la «serie» de un modelo", () => {
+    assert.equal(quitarSerial("placa de serial y motor", SERIAL), "placa de serial y motor");
+    assert.equal(quitarSerial("de la serie ZX", SERIAL), "de la serie ZX");
+    assert.equal(mencionaSerial("placa de serial y motor"), false);
+    assert.equal(mencionaSerial("serial X 98765"), true);
+  });
+
+  it("una descripción sin serial queda igual", () => {
+    assert.equal(
+      descripcionSinSerial("<p>Equipo con 900 horas.</p>", SERIAL),
+      "Equipo con 900 horas",
+    );
   });
 
   it("no toca un número que solo empieza igual", () => {

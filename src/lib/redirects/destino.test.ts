@@ -63,6 +63,26 @@ describe("clasificarDestino — repuestos", () => {
   });
 });
 
+describe("clasificarDestino — categorías técnicas de repuestos", () => {
+  const C = "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada";
+
+  it("el índice es una ruta estática", () => {
+    assert.equal(clasificarDestino(`${C}/`).clase, "estatica");
+  });
+
+  it("una categoría se busca en categorias-tecnicas por su slug", () => {
+    const d = clasificarDestino(`${C}/filtracion-para-maquinaria-pesada/`);
+    assert.ok(d.clase === "dinamica");
+    assert.deepEqual(d.colecciones, ["categorias-tecnicas"]);
+    assert.equal(d.slug, "filtracion-para-maquinaria-pesada");
+    assert.deepEqual(d.padres, []);
+  });
+
+  it("un nivel de más no es una ruta (los subniveles heredados ya no existen)", () => {
+    assert.equal(clasificarDestino(`${C}/tren-de-rodaje/tren-de-rodaje-itr/`).clase, "sin-ruta");
+  });
+});
+
 describe("clasificarDestino — maquinaria", () => {
   it("equipo nuevo", () => {
     const d = clasificarDestino(`${M}/hitachi/excavadoras-hitachi/zx350lc/`);

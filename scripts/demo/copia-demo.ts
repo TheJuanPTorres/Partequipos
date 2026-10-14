@@ -14,6 +14,14 @@
  * valor anterior de los bloques del destino va al
  * manifiesto y `retirar` lo devuelve.
  *
+ * Y lo de las PÁGINAS DE MARCA DE REPUESTOS (D, 2026-10-13): el fondo del
+ * encabezado de cada marca (`marcas.fondoHero`), la imagen de la tarjeta de
+ * cada tipo (`tipos-equipo.imagen`), la posición de las categorías técnicas en
+ * esas páginas (`ordenMarca`, junto a su icono) y el global `repuestos-marca`.
+ * Marcas y tipos se emparejan por slug (los tipos, además, por el de su marca);
+ * lo que no existe en el destino se omite y se lista. El valor anterior va al
+ * manifiesto y `retirar` lo devuelve.
+ *
  * Todo lo que CREA es contenido de EJEMPLO de ux-9: el manifiesto lo apunta en
  * `ejemplo`, y `retirar` lo quita de una vez.
  *
@@ -46,7 +54,7 @@ import path from "node:path";
 
 import { getPayload } from "payload";
 
-import type { CategoriasTecnica, Pagina } from "@/payload-types";
+import type { CategoriasTecnica, Pagina, RepuestosMarca } from "@/payload-types";
 
 import { exigirAlmacen } from "../blob/exigirAlmacen";
 import {
@@ -120,6 +128,25 @@ type VideoOrigen = MediaOrigen & {
   decorativo?: boolean | null;
   poster?: MediaOrigen | null;
 };
+/** El global `repuestos-marca` con las imágenes de sus tarjetas como id (para guardarlo y devolverlo). */
+type TarjetaRM = { titulo: string | null; enlace: string | null; imagen: Id | null };
+type GlobalRepuestosMarca = Omit<
+  RepuestosMarca,
+  "id" | "tarjetaUsadas" | "tarjetaAditamentos" | "updatedAt" | "createdAt"
+> & { tarjetaUsadas: TarjetaRM; tarjetaAditamentos: TarjetaRM };
+const TEXTOS_RM = [
+  "tituloHero",
+  "subtituloHero",
+  "tituloCategorias",
+  "tituloTipos",
+  "verTodoTexto",
+  "contactoTitulo",
+  "contactoSubtitulo",
+  "contactoBoton",
+  "testimoniosTitulo",
+  "verVideoTexto",
+] as const;
+
 type Manifiesto = {
   version: 1;
   destino: string;
@@ -157,8 +184,16 @@ type Manifiesto = {
         imagen: Id | null;
         enlace: string | null;
         tituloPortada?: string | null;
+        /** Páginas de marca de repuestos (D, 2026-10-13). Opcional: los manifiestos anteriores no lo tienen. */
+        ordenMarca?: number | null;
       }
     >;
+    /** Páginas de marca de repuestos (D): fondo del encabezado de cada marca (`marcas`). */
+    marcasRepuestos?: Record<string, { fondoHero: Id | null }>;
+    /** Páginas de marca de repuestos (D): imagen de la tarjeta de cada tipo (`tipos-equipo`). */
+    tiposEquipo?: Record<string, { imagen: Id | null }>;
+    /** Páginas de marca de repuestos (D): el global `repuestos-marca` entero, con las imágenes como id. */
+    repuestosMarca?: GlobalRepuestosMarca;
     portada?: {
       id: Id;
       seccionUsada: { imagen: Id | null };
@@ -275,6 +310,27 @@ if (modo === "retirar") {
       });
     }
     log(`marcas de maquinaria devueltas: ${Object.keys(m.antes.marcas).length}`);
+    for (const [id, a] of Object.entries(m.antes.marcasRepuestos ?? {})) {
+      await payload.update({ collection: "marcas", id: Number(id), data: a, overrideAccess: true });
+    }
+    log(`marcas de repuestos devueltas: ${Object.keys(m.antes.marcasRepuestos ?? {}).length}`);
+    for (const [id, a] of Object.entries(m.antes.tiposEquipo ?? {})) {
+      await payload.update({
+        collection: "tipos-equipo",
+        id: Number(id),
+        data: a,
+        overrideAccess: true,
+      });
+    }
+    log(`tipos de equipo devueltos: ${Object.keys(m.antes.tiposEquipo ?? {}).length}`);
+    if (m.antes.repuestosMarca) {
+      await payload.updateGlobal({
+        slug: "repuestos-marca",
+        data: m.antes.repuestosMarca,
+        overrideAccess: true,
+      });
+      log("global repuestos-marca: devuelto a su valor anterior");
+    }
 
     // 2. Borrar lo creado: primero lo que apunta a ficheros, después los ficheros.
     for (const col of ["sedes", "preguntas-frecuentes", "testimonios", "equipos-usados"] as const) {
@@ -388,10 +444,30 @@ if (modo === "simular" || modo === "copiar") {
     imagen?: MediaOrigen | null;
     enlace?: string | null;
     tituloPortada?: string | null;
+    ordenMarca?: number | null;
   };
+  // Las de la portada (sección 5) y, desde las páginas de marca de repuestos
+  // (D), las que tienen posición en esas páginas.
   const catsO = (await get<Lista<CatO>>("/api/categorias-tecnicas/?depth=1&limit=100")).docs.filter(
-    (x) => typeof x.ordenPortada === "number",
+    (x) => typeof x.ordenPortada === "number" || typeof x.ordenMarca === "number",
   );
+  // Páginas de marca de repuestos (D, 2026-10-13): fondo del encabezado de cada
+  // marca, imagen de la tarjeta de cada tipo y el global común.
+  type MarcaRepO = { slug: string; fondoHero?: MediaOrigen | null };
+  const marcasRepO = (await get<Lista<MarcaRepO>>("/api/marcas/?depth=1&limit=100")).docs.filter(
+    (x) => x.fondoHero && typeof x.fondoHero === "object",
+  );
+  type TipoO = { slug: string; marca?: { slug: string } | null; imagen?: MediaOrigen | null };
+  const tiposO = (await get<Lista<TipoO>>("/api/tipos-equipo/?depth=1&limit=500")).docs.filter(
+    (x) => x.imagen && typeof x.imagen === "object" && x.marca?.slug,
+  );
+  type TarjetaO = { titulo?: string | null; enlace?: string | null; imagen?: MediaOrigen | null };
+  const rmO = await get<
+    Partial<Record<(typeof TEXTOS_RM)[number], string | null>> & {
+      tarjetaUsadas?: TarjetaO | null;
+      tarjetaAditamentos?: TarjetaO | null;
+    }
+  >("/api/globals/repuestos-marca?depth=1");
   type EquipoO = {
     nombre: string;
     categoria?: { slug: string } | null;
@@ -487,6 +563,10 @@ if (modo === "simular" || modo === "copiar") {
   anotar(pO.seccionFaq?.imagen);
   marcasO.forEach((x) => (anotar(x.logo), anotar(x.imagenTarjeta)));
   catsO.forEach((x) => anotar(x.imagen));
+  marcasRepO.forEach((x) => anotar(x.fondoHero));
+  tiposO.forEach((x) => anotar(x.imagen));
+  anotar(rmO.tarjetaUsadas?.imagen);
+  anotar(rmO.tarjetaAditamentos?.imagen);
   equiposO.forEach((x) => (x.imagenes ?? []).forEach(anotar));
   testO.forEach((x) => anotar(x.foto));
   sedesO.forEach((x) => anotar(x.foto));
@@ -552,6 +632,17 @@ if (modo === "simular" || modo === "copiar") {
       await payload.find({
         collection: "categorias-usada",
         limit: 500,
+        depth: 0,
+        overrideAccess: true,
+      })
+    ).docs,
+    marcasRepuestos: (
+      await payload.find({ collection: "marcas", limit: 500, depth: 0, overrideAccess: true })
+    ).docs,
+    tiposEquipo: (
+      await payload.find({
+        collection: "tipos-equipo",
+        limit: 1000,
         depth: 0,
         overrideAccess: true,
       })
@@ -659,7 +750,34 @@ if (modo === "simular" || modo === "copiar") {
       : (plan.push(`  ! categoría «${x.slug}» no existe en el destino: se omite`), []);
   });
   plan.push(
-    `CATEGORÍAS TÉCNICAS a modificar (posición, icono, imagen, enlace y título en portada): ${catsMod.map((x) => x.o.slug).join(", ") || "ninguna"}`,
+    `CATEGORÍAS TÉCNICAS a modificar (posición en portada y en las páginas de marca, icono, imagen, enlace y título en portada): ${catsMod.map((x) => x.o.slug).join(", ") || "ninguna"}`,
+  );
+  const marcasRepMod = marcasRepO.flatMap((x) => {
+    const d = existentes.marcasRepuestos.find((y) => y.slug === x.slug);
+    return d
+      ? [{ o: x, d }]
+      : (plan.push(`  ! marca de repuestos «${x.slug}» no existe en el destino: se omite`), []);
+  });
+  plan.push(
+    `MARCAS DE REPUESTOS a modificar (fondo del encabezado): ${marcasRepMod.map((x) => x.o.slug).join(", ") || "ninguna"}`,
+  );
+  // Un tipo se reconoce por su slug Y el de su marca (el mismo slug puede estar en dos marcas).
+  const slugMarcaRep = new Map(existentes.marcasRepuestos.map((x) => [x.id, x.slug]));
+  const tiposMod = tiposO.flatMap((x) => {
+    const d = existentes.tiposEquipo.find(
+      (y) =>
+        y.slug === x.slug &&
+        slugMarcaRep.get(typeof y.marca === "number" ? y.marca : y.marca.id) === x.marca?.slug,
+    );
+    return d
+      ? [{ o: x, d }]
+      : (plan.push(`  ! tipo «${x.marca?.slug}/${x.slug}» no existe en el destino: se omite`), []);
+  });
+  plan.push(
+    `TIPOS DE EQUIPO a modificar (imagen de la tarjeta): ${tiposMod.map((x) => `${x.o.marca?.slug}/${x.o.slug}`).join(", ") || "ninguno"}`,
+  );
+  plan.push(
+    "GLOBAL repuestos-marca: títulos, textos y las dos tarjetas (con su imagen) se copian del origen",
   );
   plan.push(
     `PORTADA a modificar: sección 3 (imagen), sección 4 (${(pO.seccionLogos?.logos ?? []).length} logos), sección 6–8 (vídeo y YouTube), sección 11 (imagen). EL HERO NO SE TOCA.`,
@@ -854,7 +972,12 @@ if (modo === "simular" || modo === "copiar") {
         imagen: idDe(d.imagen as Rel),
         enlace: d.enlace ?? null,
         tituloPortada: d.tituloPortada ?? null,
+        ordenMarca: d.ordenMarca ?? null,
       };
+      // Un manifiesto de una copia anterior no tenía `ordenMarca`: se apunta
+      // ahora el valor de antes de ESTA copia, para que la retirada lo devuelva.
+      const antesCat = m.antes.categorias[String(d.id)]!;
+      if (!("ordenMarca" in antesCat)) antesCat.ordenMarca = d.ordenMarca ?? null;
       guardar(m);
       await payload.update({
         collection: "categorias-tecnicas",
@@ -865,11 +988,75 @@ if (modo === "simular" || modo === "copiar") {
           imagen: await copiarMedia(o.imagen),
           enlace: o.enlace ?? null,
           tituloPortada: o.tituloPortada ?? null,
+          ordenMarca: o.ordenMarca ?? null,
         },
         overrideAccess: true,
       });
     }
     log(`categorías técnicas: ${catsMod.length}`);
+
+    // Páginas de marca de repuestos (D): fondos, imágenes de los tipos y el global.
+    m.antes.marcasRepuestos ??= {};
+    for (const { o, d } of marcasRepMod) {
+      m.antes.marcasRepuestos[String(d.id)] ??= { fondoHero: idDe(d.fondoHero as Rel) };
+      guardar(m);
+      await payload.update({
+        collection: "marcas",
+        id: d.id,
+        data: { fondoHero: await copiarMedia(o.fondoHero) },
+        overrideAccess: true,
+      });
+    }
+    log(`marcas de repuestos: ${marcasRepMod.length}`);
+    m.antes.tiposEquipo ??= {};
+    for (const { o, d } of tiposMod) {
+      m.antes.tiposEquipo[String(d.id)] ??= { imagen: idDe(d.imagen as Rel) };
+      guardar(m);
+      await payload.update({
+        collection: "tipos-equipo",
+        id: d.id,
+        data: { imagen: await copiarMedia(o.imagen) },
+        overrideAccess: true,
+      });
+    }
+    log(`tipos de equipo: ${tiposMod.length}`);
+    const tarjetaDe = (t: {
+      titulo?: string | null;
+      enlace?: string | null;
+      imagen?: unknown;
+    }) => ({
+      titulo: t.titulo ?? null,
+      enlace: t.enlace ?? null,
+      imagen: idDe(t.imagen as Rel),
+    });
+    if (!m.antes.repuestosMarca) {
+      const rmD = await payload.findGlobal({
+        slug: "repuestos-marca",
+        depth: 0,
+        overrideAccess: true,
+      });
+      m.antes.repuestosMarca = {
+        ...Object.fromEntries(TEXTOS_RM.map((k) => [k, rmD[k] ?? null])),
+        tarjetaUsadas: tarjetaDe(rmD.tarjetaUsadas ?? {}),
+        tarjetaAditamentos: tarjetaDe(rmD.tarjetaAditamentos ?? {}),
+      };
+      guardar(m);
+    }
+    const tarjetaCopiada = async (t: TarjetaO | null | undefined) => ({
+      titulo: t?.titulo ?? null,
+      enlace: t?.enlace ?? null,
+      imagen: await copiarMedia(t?.imagen),
+    });
+    await payload.updateGlobal({
+      slug: "repuestos-marca",
+      data: {
+        ...Object.fromEntries(TEXTOS_RM.map((k) => [k, rmO[k] ?? null])),
+        tarjetaUsadas: await tarjetaCopiada(rmO.tarjetaUsadas),
+        tarjetaAditamentos: await tarjetaCopiada(rmO.tarjetaAditamentos),
+      },
+      overrideAccess: true,
+    });
+    log("global repuestos-marca: textos y tarjetas");
 
     for (const e of equiposNuevos) {
       const cat = existentes.categoriasUsada.find((c) => c.slug === e.categoria?.slug);

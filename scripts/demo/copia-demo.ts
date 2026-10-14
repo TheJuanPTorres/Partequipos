@@ -22,8 +22,6 @@
  *   modo:     simular  → lista exactamente qué crearía y qué cambiaría; no escribe
  *             copiar    → hace la copia; idempotente (dos veces no duplica)
  *             retirar   → deshace EXACTAMENTE lo que hizo la copia (con el manifiesto)
- *             retirar-usados → retirada PARCIAL: solo las fichas de usados de ejemplo
- *                         (antes de importar los usados reales); sin `origen`
  *   destino:  produccion → exige base Y token del almacén de producción
  *             prueba     → exige una base LOCAL desechable Y el almacén del preview
  *   origen:   URL FIJA de un despliegue de preview (no el alias).
@@ -70,9 +68,7 @@ import { FICHERO_ENTORNO_PREVIEW, leerFicheroEntorno } from "../../src/lib/previ
 
 // ------------------------------------------------------------------ argumentos
 const args = process.argv.slice(2);
-const modo = args.find(
-  (a) => a === "simular" || a === "copiar" || a === "retirar" || a === "retirar-usados",
-);
+const modo = args.find((a) => a === "simular" || a === "copiar" || a === "retirar");
 const destino = args.find((a) => a === "produccion" || a === "prueba");
 const valorDe = (k: string) => args.find((a) => a.startsWith(`${k}=`))?.slice(k.length + 1);
 const fallar = (m: string): never => {
@@ -81,7 +77,7 @@ const fallar = (m: string): never => {
   throw e;
 };
 
-if (!modo) fallar("indica el modo: simular, copiar, retirar o retirar-usados");
+if (!modo) fallar("indica el modo: simular, copiar o retirar");
 const v = veredictoDestino(destino, process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
 if (!v.valido) fallar(`destino no válido, no se hace nada: ${v.motivo}`);
 if (!v.valido) process.exit(1); // (para el compilador)
@@ -218,52 +214,6 @@ const huellaNosotros = (p: Pagina) => {
   for (const k of ["bloques", "updatedAt", "createdAt"]) delete resto[k];
   return JSON.stringify(resto);
 };
-
-// ================================================================== RETIRAR-USADOS
-/*
- * RETIRADA PARCIAL (2026-10-13): solo las fichas de equipos usados de ejemplo
- * («EJEMPLO UX-9 —») que creó la copia, antes de importar los usados reales.
- * Las saca del manifiesto, así que la retirada completa de §10.38 sigue
- * funcionando después y no las vuelve a buscar. Sus IMÁGENES se quedan: siguen
- * en el manifiesto y se van con la retirada completa (comprobar aquí que nada
- * más las usa exigiría revisar todas las relaciones con `media`).
- */
-if (modo === "retirar-usados") {
-  const m = leerManifiesto() ?? fallar(`no hay manifiesto en ${MANIFIESTO}: nada que retirar`);
-  if (m.destino !== destino) fallar(`el manifiesto es del destino «${m.destino}»`);
-  if (m.estado === "retirada") fallar("el manifiesto ya está retirado entero: nada que hacer");
-  const ids = m.creados["equipos-usados"];
-  let borrados = 0;
-  for (const id of ids) {
-    const doc = await payload
-      .findByID({ collection: "equipos-usados", id, depth: 0, overrideAccess: true })
-      .catch(() => null);
-    if (!doc) {
-      log(`  equipos-usados ${id}: no estaba`);
-      continue;
-    }
-    // Solo las de ejemplo: si una ficha de la copia ya no lleva la marca, no se toca.
-    if (!JSON.stringify(doc).includes("EJEMPLO UX-9")) {
-      fallar(
-        `la ficha ${id} no lleva la marca «EJEMPLO UX-9»: revisar a mano, no se borra nada más`,
-      );
-    }
-    await payload.delete({ collection: "equipos-usados", id, overrideAccess: true });
-    borrados++;
-  }
-  m.creados["equipos-usados"] = [];
-  if (m.ejemplo?.["equipos-usados"]) m.ejemplo["equipos-usados"] = [];
-  guardar(m);
-  log(`equipos usados de ejemplo borrados: ${borrados} de ${ids.length}`);
-  const quedan = await payload.count({
-    collection: "equipos-usados",
-    where: { descripcion: { contains: "EJEMPLO UX-9" } },
-    overrideAccess: true,
-  });
-  if (quedan.totalDocs) fallar(`siguen ${quedan.totalDocs} equipos usados con «EJEMPLO UX-9»`);
-  log("✓ ningún equipo usado de ejemplo · el resto de la copia sigue en el manifiesto");
-  process.exit(0);
-}
 
 // ================================================================== RETIRAR
 if (modo === "retirar") {

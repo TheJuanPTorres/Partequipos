@@ -18,8 +18,12 @@
  *    página). En el resto, fondo blanco desde el inicio.
  * 2. Menú móvil provisional y accesible.
  * 3. Iconos de Tabler en vez de Flaticon (L2).
- * 5. Se esconde al bajar y reaparece al subir o con el foco; con movimiento
- *    reducido no se esconde. Sin CLS: solo `transform`.
+ * 5. (2026-09-24) Se escondía al bajar y reaparecía al subir. QUITADO el
+ *    2026-10-14 a petición de Andrés: la cabecera es SIEMPRE visible y fija
+ *    arriba, en TODOS los anchos (antes, por debajo de 1025 px se iba con la
+ *    página). Sin CLS: `sticky` conserva su caja en el flujo. Los anclajes no
+ *    quedan tapados: `scroll-padding-top` de `globals.css`.
+ *    docs/diseno/decisiones-cabecera.md.
  */
 
 .cabecera {
@@ -32,12 +36,8 @@
   --cab-icono: 30px;
   --cab-velo: rgb(255 255 255 / 27%); /* #FFFFFF45 */
   --cab-col-relleno: 10px; /* relleno de cada contenedor de Elementor */
-  /*
-   * Movimiento MEDIDO en ux-9 pintado (plugin «Sticky Header Effects» 2.2.3,
-   * 2026-09-30): esconder y mostrar con `transform` 0,4 s ease-in-out hasta
-   * −110vh; el velo, el logo y el alto, también 0,4 s ease-in-out.
-   */
-  --cab-transicion: transform 0.4s ease-in-out;
+  /* Con un megamenú abierto la barra toma el vidrio del panel (blanco al 86 %): una sola pieza. */
+  --cab-velo-mega: rgb(255 255 255 / 86%);
 
   --cab-texto: var(--color-texto);
   --cab-fondo: var(--color-fondo);
@@ -52,7 +52,6 @@
   box-shadow: 0 1px 0 var(--color-fondo-seccion);
   color: var(--cab-texto);
   transition:
-    var(--cab-transicion),
     background-color 0.4s ease-in-out,
     clip-path 0.4s ease-in-out;
 }
@@ -77,6 +76,11 @@
   box-shadow: none;
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   backdrop-filter: blur(20px) saturate(1.8);
+}
+
+/* Con un megamenú abierto: el mismo vidrio que el panel, para que se unan sin diferencia de tono. */
+.cabecera[data-mega="si"][data-modo="velo"] {
+  background: var(--cab-velo-mega);
 }
 
 /* Sin soporte de desenfoque: fondo casi opaco, para que el menú se lea. */
@@ -120,11 +124,6 @@
       var(--cab-fondo) 70px
     );
   }
-}
-
-/* Esconder: −110vh, como en ux-9 (con 0,4 s sale de la vista en ~75 ms). */
-.cabecera[data-oculta="si"] {
-  transform: translateY(-110vh);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -318,25 +317,12 @@
 
 @media (max-width: 1024px) {
   /*
-   * NO fija por debajo de 1025 px, como ux-9 (MEDIDO a 1024, 1010, 800 y 390;
-   * confirmado por Andrés como intencional): se va con la página, sin velo,
-   * sin encogido y sin esconderse.
+   * FIJA también aquí (petición de Andrés, 2026-10-14). ux-9 NO la fijaba por
+   * debajo de 1025 px (medido a 1024, 1010, 800 y 390, y confirmado entonces
+   * como intencional): se iba con la página. Ahora es `sticky` en todos los
+   * anchos, con el mismo velo de vidrio al bajar en la portada y sin encogerse
+   * (ni se recorta ni cambia su alto).
    */
-  .cabecera,
-  .cabecera[data-modo="velo"],
-  .cabecera[data-oculta="si"] {
-    position: relative;
-    transform: none;
-    background: var(--cab-fondo);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-
-  .cabecera[data-modo="transparente"],
-  .cabecera[data-modo="velo"] {
-    background: transparent;
-  }
-
   .cabecera[data-encogida="si"] .logo {
     transform: none;
   }
@@ -382,6 +368,10 @@
   background: var(--color-fondo);
   color: var(--color-texto);
   padding: 8px 4% 20px;
+  /* La cabecera es fija: un menú largo se desplaza por dentro, no se sale de la pantalla. */
+  max-height: calc(100dvh - 72px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .panel[hidden] {

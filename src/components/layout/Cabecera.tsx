@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 import { Fragment, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 
-import { useMovimientoReducido } from "@/components/movimiento/useMovimiento";
+import { inicioDelPanel, modoCabecera } from "@/lib/cabecera/modo";
 import { claveDeEnlace, type PanelMenu } from "@/lib/megamenu";
 import type { ImagenLogo } from "@/lib/seo/logo";
 
@@ -16,8 +16,8 @@ import { Megamenu } from "./Megamenu";
 /**
  * CABECERA DEL SITIO (ux-9, export 2629 = plantilla 2162). Valores en `cabecera.module.css`.
  *
- * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): se esconde con el scroll,
- * cambia de modo al salir del hero y abre el menú móvil. Los enlaces están en
+ * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): cambia de modo al salir
+ * del hero, mide su alto para el megamenú y abre los menús. Los enlaces están en
  * el HTML prerenderizado.
  *
  * - El logo NO es el `<h1>` (auditoría de C, I1, 2026-10-06): en la portada,
@@ -27,8 +27,8 @@ import { Megamenu } from "./Megamenu";
  *   regenerarse la portada devuelve `/index`).
  * - En el flujo (`sticky`), encima del hero, como en ux-9. Portada: sin fondo
  *   arriba; al bajar, el velo de Andrés. Resto de páginas: fondo blanco.
- * - Se esconde al bajar y reaparece al subir o al recibir el foco; con
- *   movimiento reducido no se esconde.
+ * - SIEMPRE visible y fija arriba, en todos los anchos: NO se esconde al bajar
+ *   (petición de Andrés, 2026-10-14, docs/diseno/decisiones-cabecera.md).
  * - Menú móvil: Escape lo cierra y devuelve el foco al botón; al abrir, el foco
  *   va al primer enlace.
  * - MEGAMENÚ de escritorio (§26): los enlaces del global cuya ruta tiene panel
@@ -58,12 +58,11 @@ const RETARDO_CIERRE = 200;
 const idPanel = (clave: string) => `mega-${clave.replace(/[^a-z0-9]+/gi, "")}`;
 
 /*
- * Umbrales de ux-9, MEDIDOS en su plugin («Sticky Header Effects» 2.2.3): el
- * velo y el encogido entran con el scroll ≥ 60 px, y se esconde al bajar
- * cuando la posición anterior pasa de 500 px (y reaparece al subir).
+ * Umbral de ux-9, MEDIDO en su plugin («Sticky Header Effects» 2.2.3): el velo y
+ * el encogido entran con el scroll ≥ 60 px. (Se escondía al bajar pasados 500 px;
+ * quitado el 2026-10-14.)
  */
 const UMBRAL_VELO = 60;
-const UMBRAL_ESCONDER = 500;
 
 function Logo({
   logo,
@@ -95,9 +94,9 @@ function Logo({
 export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, paneles }: Props) {
   const esPortada = useSelectedLayoutSegment() === null;
   const ruta = usePathname();
-  const reducido = useMovimientoReducido();
   const [arriba, setArriba] = useState(true);
-  const [oculta, setOculta] = useState(false);
+  // Alto de la barra, medido: el panel del megamenú empieza justo donde acaba.
+  const [alto, setAlto] = useState<number | null>(null);
   // El menú guarda la ruta en la que se abrió: al cambiar de página deja de
   // contar como abierto, sin un efecto que lo cierre.
   const [abiertoEn, setAbiertoEn] = useState<string | null>(null);
@@ -113,19 +112,21 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
   const temporizador = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    let ultimo = window.scrollY;
-    const alDesplazar = () => {
-      const y = window.scrollY;
-      setArriba(y < UMBRAL_VELO);
-      if (ultimo > UMBRAL_ESCONDER) {
-        if (y > ultimo) setOculta(true);
-        else if (y < ultimo) setOculta(false);
-      } else if (y < ultimo) setOculta(false);
-      ultimo = y;
-    };
+    const alDesplazar = () => setArriba(window.scrollY < UMBRAL_VELO);
     alDesplazar();
     window.addEventListener("scroll", alDesplazar, { passive: true });
     return () => window.removeEventListener("scroll", alDesplazar);
+  }, []);
+
+  // El alto cambia con el ancho (el logo encoge entre 1025 y ~1335 px): se vuelve a medir.
+  useEffect(() => {
+    const el = cabecera.current;
+    if (!el) return;
+    const medir = () => setAlto(el.offsetHeight);
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(el);
+    return () => observador.disconnect();
   }, []);
 
   useEffect(() => {
@@ -202,7 +203,6 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
     }
   };
 
-  const esconder = oculta && !abierto && !megaAbierto && !reducido;
   const actual = (href: string) => (ruta === href || ruta.startsWith(href) ? "page" : undefined);
 
   const listaEnlaces = (
@@ -266,11 +266,14 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
         ref={cabecera}
         className={estilos.cabecera}
         data-portada={esPortada ? "si" : "no"}
-        data-modo={!esPortada || abierto ? "solido" : arriba ? "transparente" : "velo"}
+        data-modo={modoCabecera({
+          esPortada,
+          arriba,
+          menuMovilAbierto: abierto,
+          megaAbierto: megaAbierto !== null,
+        })}
         data-encogida={arriba ? "no" : "si"}
-        data-oculta={esconder ? "si" : "no"}
-        // El foco de teclado la hace reaparecer (decisión 5).
-        onFocusCapture={() => setOculta(false)}
+        data-mega={megaAbierto ? "si" : "no"}
         onKeyDown={alTeclado}
       >
         {/* UNA fila y UN logo. */}
@@ -329,7 +332,7 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
             etiqueta={e.etiqueta}
             panel={datos}
             abierto={megaAbierto === clave}
-            encogida={!arriba}
+            arriba={inicioDelPanel(alto, !arriba)}
             alCerrar={cerrarMega}
             alEntrar={() => abrirMega(clave)}
             alSalir={cerrarMegaLuego}

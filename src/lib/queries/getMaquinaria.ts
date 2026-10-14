@@ -247,7 +247,8 @@ const marcasUsadaEnCache = unstable_cache(
       populate: {
         "marcas-maquinaria": { slug: true, nombre: true },
         marcas: { slug: true, nombre: true },
-        media: { url: true, alt: true, width: true, height: true },
+        // `filename` hace falta: sin él, la URL del logo sale null (Payload la calcula con él).
+        media: { url: true, filename: true, alt: true, width: true, height: true },
       },
     });
     return docs;
@@ -323,7 +324,17 @@ const inventarioUsadosEnCache = unstable_cache(
             depth: 0,
             limit: 0,
             pagination: false,
-            select: { url: true, alt: true, width: true, height: true, focalX: true, focalY: true },
+            // Con `select`, la URL de la foto sale null si no se pide `filename`
+            // (Payload la calcula con él): las tarjetas se quedaban sin foto.
+            select: {
+              url: true,
+              filename: true,
+              alt: true,
+              width: true,
+              height: true,
+              focalX: true,
+              focalY: true,
+            },
           })
         ).docs
       : [];

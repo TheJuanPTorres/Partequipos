@@ -204,12 +204,12 @@
   min-height: 40px;
   box-sizing: border-box;
   max-width: 100%;
-  padding: 4px 22px 4px 14px;
+  padding: 0 26px 0 30px;
   align-items: center;
-  gap: 10px;
+  gap: 24px;
   border-radius: 30px;
-  background: var(--color-fondo);
-  color: var(--color-texto-fuerte);
+  background: #fafafa;
+  color: var(--color-texto-suave);
   font-size: var(--texto-cuerpo);
   font-weight: 600;
   line-height: 1.2;
@@ -224,8 +224,8 @@ a.pildora:hover {
 
 .pildoraIcono {
   display: inline-flex;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   flex: none;
   align-items: center;
   justify-content: center;
@@ -296,14 +296,14 @@ a.pildora:hover {
 .panel {
   position: relative;
   display: flex;
-  margin: -30px 41px 0;
-  padding: 50px 20px 20px;
+  margin: -10px 20px 0;
+  padding: 30px 20px 20px;
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  border-radius: 20px;
+  border-radius: 30px;
   background: var(--color-fondo);
-  box-shadow: 0 10px 30px rgb(0 0 0 / 0.1);
+  box-shadow: 0 -4px 24px rgb(0 0 0 / 0.08);
 }
 
 /* Sin foto, el panel es la tarjeta entera. */
@@ -355,7 +355,7 @@ a.pildora:hover {
   }
 
   .panel {
-    margin-inline: 8%;
+    margin-inline: 20px;
   }
 }
 
@@ -434,13 +434,12 @@ a.pildora:hover {
   display: inline-flex;
   min-height: 37px;
   box-sizing: border-box;
-  padding: 0 14px;
+  padding: 0 20px;
   align-items: center;
-  gap: 8px;
   border: 1px solid rgb(16 15 15 / 0.45);
   border-radius: 18px;
   color: #302f2d;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -454,8 +453,21 @@ a.pildora:hover {
   outline-offset: 2px;
 }
 
+/* El radio queda para teclado y lectores de pantalla; lo que se ve es la píldora. */
 .formulario fieldset input[type="radio"] {
-  accent-color: var(--color-marca);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Los textos de ayuda de cada campo sobran con placeholders; siguen enlazados con `aria-describedby`. */
+.formulario [id$="-ayuda"] {
+  display: none;
+}
+
+.formulario :global(.grid) {
+  column-gap: 35px;
 }
 
 /* Las etiquetas de los campos se quedan solo para lectores de pantalla: el diseño usa placeholders. */

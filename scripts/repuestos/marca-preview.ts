@@ -12,12 +12,12 @@
  *   las imágenes de ux-9 (licencia pendiente, L3; excepción de demostración
  *   §10.38) con el prefijo `repuestos-marca-` y el texto alternativo
  *   «EJEMPLO UX-9 — …»:
- *     · el fondo del encabezado y, si la marca no tiene, su logo;
+ *     · el fondo del encabezado y el logo de la marca (el de ux-9);
  *     · la imagen de la tarjeta de cada tipo de la marca (se empareja por
  *       nombre: bulldozer, excavadora, retrocargadora, cargador frontal);
  *     · las de las tarjetas de maquinaria usada y aditamentos (global
  *       `repuestos-marca`);
- *     · la posición de las categorías técnicas en la página (`ordenMarca`).
+ *     · la posición (`ordenMarca`) y, si no tenían, el icono de las categorías técnicas.
  * - NO inventa datos de la marca ni de los tipos: usa los que haya (los
  *   importará el agente B). Sin marca «caterpillar» en el preview, se niega.
  * - Antes de tocar nada guarda en un MANIFIESTO (fuera del repositorio) los
@@ -134,14 +134,25 @@ const TIPO_A_IMAGEN: [RegExp, string][] = [
 ];
 
 /** Posición de cada categoría técnica en la página, por su nombre (el orden de ux-9). */
-const CATEGORIA_A_ORDEN: [RegExp, number][] = [
-  [/rodaje/, 1],
-  [/filtraci/, 2],
-  [/corte|baldes|gets/, 3],
-  [/lubricante/, 4],
-  [/miscel/, 5],
-  [/componentes mayores|mayores/, 6],
-  [/diesel|motor/, 7],
+type Icono =
+  | "corte"
+  | "llanta"
+  | "lubricante"
+  | "filtro"
+  | "motor"
+  | "rodaje"
+  | "miscelaneos"
+  | "componentes"
+  | "diesel";
+const CATEGORIA_A_ORDEN: [RegExp, number, Icono][] = [
+  [/rodaje/, 1, "rodaje"],
+  [/filtraci/, 2, "filtro"],
+  [/corte|baldes|gets/, 3, "corte"],
+  [/lubricante/, 4, "lubricante"],
+  [/miscel/, 5, "miscelaneos"],
+  [/componentes mayores|mayores/, 6, "componentes"],
+  [/diesel|motor/, 7, "diesel"],
+  [/llantas|rines/, 8, "llanta"],
 ];
 
 const normal = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -149,7 +160,7 @@ const normal = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/
 type Manifiesto = {
   marca: { id: number; fondoHero: number | null; logo: number | null } | null;
   tipos: { id: number; imagen: number | null }[];
-  categorias: { id: number; ordenMarca: number | null }[];
+  categorias: { id: number; ordenMarca: number | null; icono?: Icono | null }[];
   global: { usadas: number | null; aditamentos: number | null } | null;
 };
 const idDe = (v: unknown): number | null =>
@@ -240,7 +251,11 @@ if (modo === "sembrar") {
     const m: Manifiesto = {
       marca: { id: marca.id, fondoHero: idDe(marca.fondoHero), logo: idDe(marca.logo) },
       tipos: tipos.map((t) => ({ id: t.id, imagen: idDe(t.imagen) })),
-      categorias: categorias.map((c) => ({ id: c.id, ordenMarca: c.ordenMarca ?? null })),
+      categorias: categorias.map((c) => ({
+        id: c.id,
+        ordenMarca: c.ordenMarca ?? null,
+        icono: c.icono ?? null,
+      })),
       global: {
         usadas: idDe(global.tarjetaUsadas?.imagen),
         aditamentos: idDe(global.tarjetaAditamentos?.imagen),
@@ -248,16 +263,29 @@ if (modo === "sembrar") {
     };
     fs.writeFileSync(MANIFIESTO, JSON.stringify(m, null, 2));
     log(`manifiesto guardado (${MANIFIESTO})`);
-  } else log("manifiesto previo conservado");
+  } else {
+    // Un manifiesto de una versión anterior del script no guardaba el icono: se completa con lo
+    // que hay ahora, que sigue siendo lo previo mientras no se haya puesto ninguno.
+    const previo = JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto;
+    let completado = false;
+    for (const c of previo.categorias) {
+      if (!("icono" in c)) {
+        c.icono = categorias.find((x) => x.id === c.id)?.icono ?? null;
+        completado = true;
+      }
+    }
+    if (completado) fs.writeFileSync(MANIFIESTO, JSON.stringify(previo, null, 2));
+    log("manifiesto previo conservado");
+  }
 
   // 3. Marca: fondo siempre; el logo solo si no tenía.
   await payload.update({
     collection: "marcas",
     id: marca.id,
-    data: { fondoHero: ids.fondo, ...(marca.logo ? {} : { logo: ids.logo }) },
+    data: { fondoHero: ids.fondo, logo: ids.logo },
     overrideAccess: true,
   });
-  log(`marca «${marca.nombre}» (id ${marca.id}): fondo puesto${marca.logo ? "" : " y logo"}`);
+  log(`marca «${marca.nombre}» (id ${marca.id}): fondo y logo puestos`);
 
   // 4. Tipos: la imagen que corresponda a su nombre.
   let conImagen = 0;
@@ -280,12 +308,13 @@ if (modo === "sembrar") {
   // 5. Categorías: su posición.
   let ordenadas = 0;
   for (const c of categorias) {
-    const orden = CATEGORIA_A_ORDEN.find(([re]) => re.test(normal(c.nombre)))?.[1];
-    if (!orden) continue;
+    const regla = CATEGORIA_A_ORDEN.find(([re]) => re.test(normal(c.nombre)));
+    if (!regla) continue;
     await payload.update({
       collection: "categorias-tecnicas",
       id: c.id,
-      data: { ordenMarca: orden },
+      // El icono solo se pone si la categoría no tenía uno (el de la portada manda).
+      data: { ordenMarca: regla[1], ...(c.icono ? {} : { icono: regla[2] }) },
       overrideAccess: true,
     });
     ordenadas++;
@@ -335,7 +364,7 @@ for (const c of m.categorias) {
   await payload.update({
     collection: "categorias-tecnicas",
     id: c.id,
-    data: { ordenMarca: c.ordenMarca },
+    data: { ordenMarca: c.ordenMarca, icono: c.icono },
     overrideAccess: true,
   });
 }

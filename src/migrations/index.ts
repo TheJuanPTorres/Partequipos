@@ -35,6 +35,7 @@ import * as migration_20261014_045109_redirects_categorias_heredadas from './202
 import * as migration_20261014_054118_paginas_indice from './20261014_054118_paginas_indice';
 import * as migration_20261014_064003_compania_imagen from './20261014_064003_compania_imagen';
 import * as migration_20261014_072558_servicio_lubricantes from './20261014_072558_servicio_lubricantes';
+import * as migration_20261014_083213_hero_sliders from './20261014_083213_hero_sliders';
 
 export const migrations = [
   {
@@ -220,6 +221,11 @@ export const migrations = [
   {
     up: migration_20261014_072558_servicio_lubricantes.up,
     down: migration_20261014_072558_servicio_lubricantes.down,
-    name: '20261014_072558_servicio_lubricantes'
+    name: '20261014_072558_servicio_lubricantes',
+  },
+  {
+    up: migration_20261014_083213_hero_sliders.up,
+    down: migration_20261014_083213_hero_sliders.down,
+    name: '20261014_083213_hero_sliders'
   },
 ];

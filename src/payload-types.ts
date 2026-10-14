@@ -961,9 +961,17 @@ export interface Pagina {
     diapositivas?:
       | {
           /**
-           * Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño.
+           * Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas.
            */
           titulo: string;
+          /**
+           * Opcional. Solo a 1025 px o más, encima de la máquina.
+           */
+          tituloArriba?: string | null;
+          /**
+           * Opcional. Solo a 1025 px o más, abajo, sobre la máquina.
+           */
+          tituloAbajo?: string | null;
           /**
            * El texto del recuadro de vidrio. No se muestra en móvil.
            */
@@ -977,6 +985,14 @@ export interface Pagina {
            * Opcional: va delante del título.
            */
           imagenFrontal?: (number | null) | Media;
+          /**
+           * «Sobre» cruza el título a 1025 px o más; en tablet y móvil va debajo. El título sigue en el texto de la página.
+           */
+          posicionMaquina?: ('debajo' | 'sobre') | null;
+          /**
+           * Opcional. Gira despacio (quieto con «reducir movimiento» o al pausar). Decorativo: los lectores de pantalla no lo leen.
+           */
+          textoCircular?: string | null;
           /**
            * Ruta del sitio (/…) o https://
            */
@@ -2198,10 +2214,14 @@ export interface PaginasSelect<T extends boolean = true> {
           | T
           | {
               titulo?: T;
+              tituloArriba?: T;
+              tituloAbajo?: T;
               parrafo?: T;
               imagenFondo?: T;
               imagenFondoMovil?: T;
               imagenFrontal?: T;
+              posicionMaquina?: T;
+              textoCircular?: T;
               enlace?: T;
               enlaceNombre?: T;
               id?: T;

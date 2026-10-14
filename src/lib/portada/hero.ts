@@ -4,7 +4,16 @@ import { validarEnlace } from "../fields/reglasPortada";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
 export type DiapositivaHero = {
+  /** El título en una línea: lo que lee un lector de pantalla y el nombre de la diapositiva. */
   titulo: string;
+  /** Las líneas que se pintan (un salto de línea en el panel parte el título). */
+  tituloLineas: string[];
+  /** Solo en escritorio (≥ 1025 px): el título partido arriba y abajo. Los dos o ninguno. */
+  tituloPartido: { arriba: string; abajo: string } | null;
+  /** «sobre»: la máquina cruza el título en escritorio. */
+  posicionMaquina: "debajo" | "sobre";
+  /** Texto circular decorativo (oculto a los lectores de pantalla). */
+  textoCircular: string | null;
   parrafo: string | null;
   /** Decorativa: `alt` vacío, el título ya dice qué es (ADR 0009). */
   fondo: ImagenLista;
@@ -30,13 +39,23 @@ export function diapositivasDeHero(hero: Pagina["hero"]): DiapositivaHero[] {
   return (hero?.diapositivas ?? []).flatMap((d) => {
     const fondo = imagenDeMedia(d.imagenFondo, "");
     const movil = imagenDeMedia(d.imagenFondoMovil, "");
-    const titulo = d.titulo?.trim();
+    const tituloLineas = (d.titulo ?? "")
+      .split(/\r?\n/)
+      .map((l) => l.replace(/\s+/g, " ").trim())
+      .filter(Boolean);
+    const titulo = tituloLineas.join(" ");
     if (!fondo || !titulo) return [];
     const href = d.enlace?.trim();
     const nombre = d.enlaceNombre?.trim();
+    const arriba = d.tituloArriba?.trim();
+    const abajo = d.tituloAbajo?.trim();
     return [
       {
         titulo,
+        tituloLineas,
+        tituloPartido: arriba && abajo ? { arriba, abajo } : null,
+        posicionMaquina: d.posicionMaquina === "sobre" ? "sobre" : "debajo",
+        textoCircular: d.textoCircular?.trim() || null,
         parrafo: d.parrafo?.trim() || null,
         fondo: { ...fondo, alt: "" },
         fondoMovil: movil ? { ...movil, alt: "" } : null,

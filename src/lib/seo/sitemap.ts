@@ -89,6 +89,14 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
    * PRODUCCIÓN (`VERCEL_ENV`): solo existe en local y en los preview.
    */
   "/laboratorio/movimiento": "banco de pruebas, 404 en producción",
+  /*
+   * Páginas 2 y siguientes del listado de usados (src/lib/usados/paginacion.ts).
+   * Son indexables, con canónica propia, y se descubren por los enlaces de la
+   * página 1, que sí está en el sitemap. Cambian con el inventario: listarlas
+   * aquí daría URL que desaparecen en cuanto se vende una unidad.
+   */
+  "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]":
+    "paginación: se llega desde la página 1 de la categoría",
 } as const;
 
 /** Slug reservado de la portada dentro de la colección de páginas. */

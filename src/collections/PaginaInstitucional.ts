@@ -405,6 +405,16 @@ export const PaginaInstitucional: CollectionConfig = {
           admin: { description: "En bucle y sin sonido. MP4 H.264 de 8 bits, máximo 4 MB." },
         },
         {
+          name: "imagen",
+          type: "upload",
+          relationTo: "media",
+          label: "Imagen de fondo (si no hay vídeo)",
+          admin: {
+            description:
+              "Se ve solo cuando no hay vídeo. Una foto horizontal; se recorta para llenar la tarjeta.",
+          },
+        },
+        {
           name: "youtube",
           type: "text",
           label: "Vídeo de YouTube del botón «reproducir»",

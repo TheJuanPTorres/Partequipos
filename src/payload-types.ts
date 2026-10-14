@@ -1020,6 +1020,10 @@ export interface Pagina {
      */
     video?: (number | null) | Video;
     /**
+     * Se ve solo cuando no hay vídeo. Una foto horizontal; se recorta para llenar la tarjeta.
+     */
+    imagen?: (number | null) | Media;
+    /**
      * Opcional. Se abre en una ventana, desde youtube-nocookie.com, solo al pulsar.
      */
     youtube?: string | null;
@@ -2097,6 +2101,7 @@ export interface PaginasSelect<T extends boolean = true> {
     | T
     | {
         video?: T;
+        imagen?: T;
         youtube?: T;
         titulo?: T;
         texto?: T;

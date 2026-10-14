@@ -33,6 +33,7 @@ import * as migration_20261014_031623_nueva_peso_operativo from './20261014_0316
 import * as migration_20261014_033314_seo_marcas_repuestos from './20261014_033314_seo_marcas_repuestos';
 import * as migration_20261014_045109_redirects_categorias_heredadas from './20261014_045109_redirects_categorias_heredadas';
 import * as migration_20261014_054118_paginas_indice from './20261014_054118_paginas_indice';
+import * as migration_20261014_064003_compania_imagen from './20261014_064003_compania_imagen';
 
 export const migrations = [
   {
@@ -208,6 +209,11 @@ export const migrations = [
   {
     up: migration_20261014_054118_paginas_indice.up,
     down: migration_20261014_054118_paginas_indice.down,
-    name: '20261014_054118_paginas_indice'
+    name: '20261014_054118_paginas_indice',
+  },
+  {
+    up: migration_20261014_064003_compania_imagen.up,
+    down: migration_20261014_064003_compania_imagen.down,
+    name: '20261014_064003_compania_imagen'
   },
 ];

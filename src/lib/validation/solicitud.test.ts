@@ -134,3 +134,43 @@ describe("desdeFormData", () => {
     assert.equal(r.ok, true);
   });
 });
+
+describe("validarSolicitud — clasificación opcional (página de marca de repuestos)", () => {
+  it("sin interés ni perfil sigue siendo válida (los demás formularios no cambian)", () => {
+    const r = valida();
+    assert.ok(r.ok);
+    assert.equal(r.datos.interes, undefined);
+    assert.equal(r.datos.perfil, undefined);
+  });
+
+  it("acepta una opción de cada lista", () => {
+    const r = valida({ interes: "cotizar", perfil: "empresa" });
+    assert.ok(r.ok);
+    assert.equal(r.datos.interes, "cotizar");
+    assert.equal(r.datos.perfil, "empresa");
+  });
+
+  it("trata la cadena vacía como ausente", () => {
+    const r = valida({ interes: "", perfil: "" });
+    assert.ok(r.ok);
+    assert.equal(r.datos.interes, undefined);
+    assert.equal(r.datos.perfil, undefined);
+  });
+
+  it("rechaza un valor que no está en la lista", () => {
+    const r = valida({ interes: "otra-cosa" });
+    assert.equal(r.ok, false);
+    assert.ok(!r.ok && r.errores.interes);
+    const p = valida({ perfil: "x".repeat(500) });
+    assert.equal(p.ok, false);
+  });
+
+  it("desdeFormData lee los dos campos", () => {
+    const fd = new FormData();
+    fd.set("interes", "asesoria");
+    fd.set("perfil", "comprador");
+    const datos = desdeFormData(fd);
+    assert.equal(datos.interes, "asesoria");
+    assert.equal(datos.perfil, "comprador");
+  });
+});

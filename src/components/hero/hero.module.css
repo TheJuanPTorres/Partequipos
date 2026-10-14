@@ -689,6 +689,11 @@
   will-change: transform;
 }
 
+/* A todo el ancho: si encogiera a su contenido, cambiaría de caja al llegar Inter. */
+.capaTexto > .capaParallax {
+  width: 100%;
+}
+
 .capaTexto > .capaParallax {
   --hero-parallax: calc(var(--hero-parallax-base, 0) * var(--hero-parallax-titulo));
 }
@@ -817,6 +822,8 @@
   .vidrio {
     top: calc(100% - var(--hero-texto-abajo) + 16px);
     bottom: auto;
+    /* El «+» arriba: centrado, se movería si el párrafo cambia de alto. */
+    align-items: flex-start;
     width: min(280px, 100% - 2 * var(--hero-vidrio-derecha));
   }
 }

@@ -76,15 +76,18 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+  /*
+   * `DROP TABLE … CASCADE` ya se lleva las claves foráneas que apuntan a
+   * `marcas_usada`; con `IF EXISTS` lo que sigue no falla por eso (la versión
+   * generada por Payload hacía `DROP CONSTRAINT` de una clave ya borrada).
+   */
   await db.execute(sql`
    ALTER TABLE "marcas_usada" DISABLE ROW LEVEL SECURITY;
   DROP TABLE "marcas_usada" CASCADE;
-  ALTER TABLE "equipos_usados" DROP CONSTRAINT "equipos_usados_marca_usada_id_marcas_usada_id_fk";
-  
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_marcas_usada_fk";
-  
-  DROP INDEX "equipos_usados_marca_usada_idx";
-  DROP INDEX "payload_locked_documents_rels_marcas_usada_id_idx";
-  ALTER TABLE "equipos_usados" DROP COLUMN "marca_usada_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "marcas_usada_id";`)
+  ALTER TABLE "equipos_usados" DROP CONSTRAINT IF EXISTS "equipos_usados_marca_usada_id_marcas_usada_id_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_marcas_usada_fk";
+  DROP INDEX IF EXISTS "equipos_usados_marca_usada_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_marcas_usada_id_idx";
+  ALTER TABLE "equipos_usados" DROP COLUMN IF EXISTS "marca_usada_id";
+  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "marcas_usada_id";`)
 }

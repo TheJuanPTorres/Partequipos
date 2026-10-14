@@ -450,7 +450,8 @@
 
 .circular text {
   fill: #fff;
-  font-size: 13px;
+  /* En unidades del dibujo (100 × 100): ~16 px de letra en el círculo de 120 px. */
+  font-size: 16px;
   font-weight: 300;
   text-transform: none;
 }

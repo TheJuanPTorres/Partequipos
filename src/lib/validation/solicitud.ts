@@ -11,6 +11,28 @@ import { z } from "zod";
 
 /** Tipos de solicitud; deben coincidir con el `select` de la colección. */
 export const TIPOS_SOLICITUD = ["contacto", "cotizacion", "repuesto"] as const;
+
+/**
+ * Clasificación opcional del formulario de la página de marca de repuestos.
+ * Valores y etiquetas, en el orden del diseño; deben coincidir con los
+ * `select` `interes` y `perfil` de la colección `solicitudes`.
+ */
+export const INTERESES = [
+  { valor: "cotizar", etiqueta: "Cotizar productos" },
+  { valor: "muestras", etiqueta: "Muestras/prototipos" },
+  { valor: "asesoria", etiqueta: "Asesoría general" },
+  { valor: "otro", etiqueta: "Otro" },
+] as const;
+export const PERFILES = [
+  { valor: "empresa", etiqueta: "Empresa" },
+  { valor: "comprador", etiqueta: "Comprador" },
+  { valor: "emprendedor", etiqueta: "Emprendedor" },
+  { valor: "proveedor", etiqueta: "Proveedor" },
+  { valor: "empleado", etiqueta: "Empleado" },
+  { valor: "otro", etiqueta: "Otro" },
+] as const;
+const VALORES_INTERES = INTERESES.map((i) => i.valor) as [string, ...string[]];
+const VALORES_PERFIL = PERFILES.map((p) => p.valor) as [string, ...string[]];
 export type TipoSolicitud = (typeof TIPOS_SOLICITUD)[number];
 
 /** Longitudes máximas. Cortan el abuso antes de llegar a la base. */
@@ -75,6 +97,19 @@ export const esquemaSolicitud = z.object({
   ),
 
   /*
+   * Clasificación opcional: solo una opción de lista cerrada, ningún texto
+   * libre. Un valor desconocido se rechaza; ausente o vacío, se ignora.
+   */
+  interes: z
+    .enum(VALORES_INTERES, { message: "Elige una opción de la lista." })
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  perfil: z
+    .enum(VALORES_PERFIL, { message: "Elige una opción de la lista." })
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+
+  /*
    * Campos que NO escribe el usuario: los pone la página. Se validan igual,
    * porque llegan por el mismo POST y nada impide manipularlos.
    */
@@ -123,6 +158,8 @@ export function desdeFormData(formData: FormData): Record<string, unknown> {
     telefono: leer("telefono"),
     empresa: leer("empresa"),
     mensaje: leer("mensaje"),
+    interes: leer("interes"),
+    perfil: leer("perfil"),
     referenciaTipo: leer("referenciaTipo"),
     referenciaId: leer("referenciaId"),
     referenciaTexto: leer("referenciaTexto"),

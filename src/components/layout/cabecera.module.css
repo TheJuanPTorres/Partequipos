@@ -78,14 +78,21 @@
   backdrop-filter: blur(20px) saturate(1.8);
 }
 
-/* Con un megamenú abierto: el mismo vidrio que el panel, para que se unan sin diferencia de tono. */
-.cabecera[data-mega="si"][data-modo="velo"] {
+/*
+ * Con un megamenú abierto, en CUALQUIER modo de la barra: el mismo vidrio que el panel y
+ * sus curvas (mismo tinte, mismo desenfoque), para que sean una sola pieza. En el modo
+ * sólido la barra pasaba a ser blanco opaco y el panel, vidrio: no casaban.
+ */
+.cabecera[data-mega="si"] {
   background: var(--cab-velo-mega);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  backdrop-filter: blur(20px) saturate(1.8);
 }
 
 /* Sin soporte de desenfoque: fondo casi opaco, para que el menú se lea. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .cabecera[data-modo="velo"] {
+  .cabecera[data-modo="velo"],
+  .cabecera[data-mega="si"] {
     background: rgb(255 255 255 / 92%);
   }
 }

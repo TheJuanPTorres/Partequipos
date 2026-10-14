@@ -29,7 +29,7 @@ export const Documento: CollectionConfig = {
     defaultColumns: ["titulo", "filename", "updatedAt"],
     group: "Archivos",
     description:
-      "Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 25 MB. Las imágenes van en «Imágenes».",
+      "Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 30 MB. Las imágenes van en «Imágenes».",
   },
   access: {
     read: publico,

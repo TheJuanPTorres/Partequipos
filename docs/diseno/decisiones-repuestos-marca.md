@@ -72,6 +72,34 @@ cuando llegue la plantilla.
 - Los textos «Repuestos para <tipo>» y «Modelos de <tipo> <MARCA>» se componen en el código (no hay campo de panel
   para ellos): por eso es provisional.
 
+## 7. Índices, categorías técnicas y principal de repuestos (PROVISIONAL hasta el diseño de Andrés)
+
+Decisión de dirección (2026-10-13): completar la sección de repuestos del mapa de alcance con el **mismo lenguaje
+visual** que marca y tipo. **Provisional**: se reemplaza cuando llegue la plantilla.
+
+| Página                 | Ruta                                                        | Qué lleva                                                                                                                                                                                 |
+| ---------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Principal de repuestos | `/repuestos-maquinaria-pesada-colombia/`                    | Encabezado, **cada marca** (placa oscura con su logo y enlace) con «Ver todas las marcas», **cada categoría** (píldora con enlace) con «Ver todas las categorías», contacto y testimonios |
+| Índice de marcas       | `…/repuestos-maquinaria-pesada-marcas/`                     | Encabezado, las 13 marcas en placa oscura con enlace a su página, contacto y testimonios                                                                                                  |
+| Índice de categorías   | `…/categoria-repuestos-para-maquinaria-pesada/`             | Encabezado, las categorías técnicas (píldoras con enlace), las marcas con las que trabajamos, contacto y testimonios                                                                      |
+| Categoría técnica      | `…/categoria-repuestos-para-maquinaria-pesada/<categoría>/` | Encabezado con nombre, descripción e imagen de `CategoriaTecnica`, las marcas con las que trabajamos, contacto y testimonios                                                              |
+
+- Las 10 categorías y sus URL salen de `docs/url-map.csv`. **Sin esquema**: una migración de DATOS
+  (`20261014_023900_categorias_url_exacta`, SQL explícito) renombra los slugs sembrados a la URL exacta
+  (`tren-de-rodaje` → `tren-de-rodaje-para-maquinaria-pesada`…) y siembra el campo «Enlace» de cada una. Esas URL
+  daban 404, así que no hay redirección que crear.
+- **Discrepancia a decidir por dirección:** el mapa de alcance da el motor diésel como
+  `repuestos-motor-diesel-para-maquinaria-pesada`, pero esa URL no existe en el sitio vivo; la viva (200 en el
+  rastreo) es `motor-diesel-para-maquinaria-pesada`. Se usó la VIVA (§3.3, y «manda la medición»). Cambiarla es una
+  sola fila de la migración y un 301.
+- Las 15 URL de categoría que el rastreo tiene además de las 10 (duplicadas con otro slug —`filtros-maquinaria-pesada`,
+  `llantas`, `herramientas-de-corte`, `tren-de-rodaje`…— y los niveles inferiores como `tren-de-rodaje-itr`) siguen
+  **sin decidir** (`docs/redirects-map.csv`, «HUÉRFANA»): no se tocan.
+- Las páginas entran en el sitemap (índice y una URL por categoría) y las categorías de la página de marca y de la
+  portada se enlazan solas (antes iban sin enlace). Se revalidan al guardar una categoría.
+- Los textos «Marcas con las que trabajamos» y «Repuestos por marca» se componen en el código (no hay campo de panel):
+  una razón más de que sea provisional.
+
 ## 5. Pendiente
 
 - Imágenes reales de fondo (por marca) y de cada tipo: el cliente o el editor, desde el panel.

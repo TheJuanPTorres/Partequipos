@@ -30,8 +30,11 @@
  * (`Desktop/partequipos-cierre/repuestos-wordpress.json`, o `fuente=<ruta>`).
  * El informe y el manifiesto se guardan en `Desktop/partequipos-cierre/`.
  *
- * DESTINO: solo el preview, validado antes de cargar Payload. La carga en
- * producción irá por runbook de dirección.
+ * DESTINO: `preview` o `produccion`, validado antes de cargar Payload: el
+ * preview con sus guardas (`puedeTocarHeroDePrueba`); producción, solo con la
+ * base Y el almacén de producción (`veredictoDestino`). La carga en producción
+ * la ejecuta dirección con su runbook
+ * (`Desktop/partequipos-cierre/runbook-importar-repuestos-produccion.md`).
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -40,6 +43,7 @@ import path from "node:path";
 import { getPayload } from "payload";
 
 import { exigirAlmacen } from "../blob/exigirAlmacen";
+import { veredictoDestino } from "../../src/lib/demo/copiaDemo";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 import { normalizarRuta } from "../../src/lib/redirects/normalizar";
 import { formatSlug } from "../../src/lib/utils/formatSlug";
@@ -69,7 +73,7 @@ import { leerCsv } from "../../src/lib/utils/csv";
 
 const args = process.argv.slice(2);
 const modo = args.find((a) => a === "simular" || a === "importar" || a === "retirar");
-const destino = args.find((a) => a === "preview");
+const destino = args.find((a) => a === "preview" || a === "produccion");
 const valorDe = (k: string) => args.find((a) => a.startsWith(`${k}=`))?.slice(k.length + 1);
 const fallar = (m: string): never => {
   const e = new Error(`[repuestos] ✗ ${m}`);
@@ -77,9 +81,16 @@ const fallar = (m: string): never => {
   throw e;
 };
 if (!modo) fallar("indica el modo: simular, importar o retirar");
-if (!destino) fallar("indica el destino: preview");
-const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
-if (!v.permitido) fallar(`NO se hace nada: ${v.motivo}`);
+if (!destino) fallar("indica el destino: preview o produccion");
+if (destino === "preview") {
+  const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
+  if (!v.permitido) fallar(`NO se hace nada: ${v.motivo}`);
+} else {
+  // Producción: base Y almacén de producción, o no se hace nada (mismo guardián que usados y blog).
+  const v = veredictoDestino(destino, process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
+  if (!v.valido) fallar(`destino no válido, no se hace nada: ${v.motivo}`);
+  if (v.valido) process.env.ALMACEN_BLOB_ESPERADO = v.almacen;
+}
 if (modo === "simular") {
   // Simulación: sin token, nada puede llegar al Blob.
   process.env.BLOB_READ_WRITE_TOKEN = "";

@@ -6,11 +6,11 @@ import { REGLAS_SUBIDA_DIRECTA, avisoAntesDeSubir, permisoDeSubida } from "./sub
 const MB = 1024 * 1024;
 
 describe("subida directa: el permiso que se firma", () => {
-  it("documentos: solo PDF, hasta 25 MB, sin sobrescribir y con sufijo aleatorio", () => {
+  it("documentos: solo PDF, hasta 30 MB, sin sobrescribir y con sufijo aleatorio", () => {
     assert.deepEqual(permisoDeSubida("documentos", "ficha-tecnica.pdf"), {
       ok: true,
       allowedContentTypes: ["application/pdf"],
-      maximumSizeInBytes: 25 * MB,
+      maximumSizeInBytes: 30 * MB,
       addRandomSuffix: true,
       allowOverwrite: false,
     });
@@ -58,9 +58,9 @@ describe("subida directa: el aviso en español ANTES de subir", () => {
     const pdf = avisoAntesDeSubir("documentos", {
       name: "f.pdf",
       type: "application/pdf",
-      size: 30 * MB,
+      size: 35 * MB,
     });
-    assert.match(pdf ?? "", /pesa 30[\s\S]*máximo es 25 MB[\s\S]*No se ha subido nada/);
+    assert.match(pdf ?? "", /pesa 35[\s\S]*máximo es 30 MB[\s\S]*No se ha subido nada/);
     const img = avisoAntesDeSubir("media", { name: "f.png", type: "image/png", size: 20 * MB });
     assert.match(img ?? "", /pesa 20[\s\S]*máximo es 15 MB/);
   });

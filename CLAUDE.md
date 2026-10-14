@@ -1134,10 +1134,13 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 >
 > | Colección      | Vía                         | Tope      |
 > | -------------- | --------------------------- | --------- |
-> | **Documentos** | subida directa              | **25 MB** |
+> | **Documentos** | subida directa              | **30 MB** |
 > | **Imágenes**   | subida directa              | **15 MB** |
 > | Vídeos         | la de siempre (por función) | 4 MB      |
 > | Animaciones    | la de siempre (por función) | 4 MB      |
+>
+> **Documentos sube de 25 a 30 MB el 2026-10-13** (dirección): un folleto de
+> fabricante de las fichas importadas de WordPress pesa 27,7 MB.
 >
 > **Tal cual viene, el adaptador tenía agujeros, y se cerraron así:**
 >

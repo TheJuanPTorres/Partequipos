@@ -241,6 +241,10 @@ export interface EquiposNuevo {
    */
   codigo?: string | null;
   /**
+   * En kilogramos, sin puntos: 8400 para 8,4 t. Sirve para filtrar y ordenar el listado; vacío, el equipo no sale en los filtros de peso.
+   */
+  pesoOperativoKg?: number | null;
+  /**
    * Resumen de una o dos líneas, bajo el título.
    */
   entradilla?: string | null;
@@ -297,7 +301,7 @@ export interface EquiposNuevo {
       }[]
     | null;
   /**
-   * Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 25 MB) o elige uno ya subido en «Documentos».
+   * Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 30 MB) o elige uno ya subido en «Documentos».
    */
   fichaTecnicaPdf?: (number | null) | Documento;
   /**
@@ -435,7 +439,7 @@ export interface TiposMaquinaria {
   createdAt: string;
 }
 /**
- * Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 25 MB. Las imágenes van en «Imágenes».
+ * Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 30 MB. Las imágenes van en «Imágenes».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "documentos".
@@ -597,7 +601,7 @@ export interface CategoriasTecnica {
    */
   ordenMarca?: number | null;
   /**
-   * Hoy estas fichas no tienen página propia en el sitio, así que esto no sale en Google. Se guarda para cuando la tengan.
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
     metaTitle?: string | null;
@@ -1793,6 +1797,7 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
   marca?: T;
   tipo?: T;
   codigo?: T;
+  pesoOperativoKg?: T;
   entradilla?: T;
   descripcion?: T;
   destacados?:

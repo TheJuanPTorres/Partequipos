@@ -24,15 +24,25 @@ export function CategoriasMarca({
   id,
   titulo,
   categorias,
+  fondo = "amarillo",
+  enlaceTodas,
 }: {
   id: string;
   titulo: string;
   categorias: CategoriaMarca[];
+  /** `gris`: para cuando la franja amarilla ya la pone otra sección (la principal de repuestos). */
+  fondo?: "amarillo" | "gris";
+  /** El enlace al índice de categorías, debajo de las píldoras. */
+  enlaceTodas?: { href: string; texto: string };
 }) {
   if (!titulo || categorias.length === 0) return null;
   const idTitulo = `${id}-titulo`;
   return (
-    <section id={id} className={estilos.categorias} aria-labelledby={idTitulo}>
+    <section
+      id={id}
+      className={`${estilos.categorias} ${fondo === "gris" ? estilos.categoriasGris : ""}`}
+      aria-labelledby={idTitulo}
+    >
       <h2 id={idTitulo} className={estilos.tituloSeccion}>
         {titulo}
       </h2>
@@ -62,6 +72,13 @@ export function CategoriasMarca({
           );
         })}
       </ul>
+      {enlaceTodas ? (
+        <p className={estilos.verTodas}>
+          <Link href={enlaceTodas.href} className={estilos.botonTarjeta}>
+            {enlaceTodas.texto}
+          </Link>
+        </p>
+      ) : null}
     </section>
   );
 }

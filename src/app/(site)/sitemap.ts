@@ -15,6 +15,7 @@ import { getMarcas } from "@/lib/queries/getMarcas";
 import { getModelos } from "@/lib/queries/getModelos";
 import { getPaginas } from "@/lib/queries/getPaginas";
 import { getTipos } from "@/lib/queries/getTipos";
+import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
 import { categoriaUsadaIndexable } from "@/lib/usados/heredadas";
 import { poblado } from "@/lib/utils/relations";
@@ -51,6 +52,7 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [
     marcas,
+    categoriasRepuestos,
     tipos,
     modelos,
     paginas,
@@ -67,6 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     marcasUsada,
   ] = await Promise.all([
     getMarcas(),
+    getCategoriasRepuestos(),
     getTipos(),
     getModelos(),
     getPaginas(),
@@ -87,6 +90,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     paginas: paginas.map((pagina) => ({ slug: pagina.slug, updatedAt: pagina.updatedAt })),
 
     marcas: marcas.map((marca) => ({ slug: marca.slug, updatedAt: marca.updatedAt })),
+
+    categoriasRepuestos: categoriasRepuestos.map((c) => ({
+      slug: c.slug,
+      updatedAt: c.updatedAt,
+    })),
 
     tipos: tipos.flatMap((tipo) => {
       const marca = poblado<Marca>(tipo.marca);

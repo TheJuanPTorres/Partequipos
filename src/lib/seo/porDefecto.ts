@@ -23,6 +23,7 @@ export const tituloPorDefecto = {
   tipoRepuesto: (tipo: string, marca: string) => `Repuestos para ${tipo.toLowerCase()} ${marca}`,
   modeloRepuesto: (modelo: string) => `Repuestos ${modelo}`,
   marcaRepuesto: (marca: string) => `Repuestos para maquinaria pesada ${marca}`,
+  categoriaRepuestos: (categoria: string) => `${categoria} para maquinaria pesada`,
   marcaMaquinaria: (marca: string) => `Maquinaria pesada ${marca}`,
   tipoMaquinaria: (tipo: string, marca: string) => `${tipo} ${marca}`,
   categoriaNueva: (categoria: string) => `${categoria} ${concuerda(categoria, "nuevas", "nuevos")}`,

@@ -150,23 +150,42 @@ export function contieneSerial(texto: string, serial: string): boolean {
 }
 
 /**
+ * Una mención de serial con su código, sea cual sea: «serial A1234», «serial X
+ * 98765», «S/N 12345», «número de serie 4321». El código lleva al menos un
+ * dígito, así que «serial y motor» o «serie ZX» no casan. Con el enlace que lo
+ * presenta («, y serial …»), que se va con él.
+ */
+const MENCION_SERIAL =
+  /(?:\s*,)?(?:\s+y\b)?(?:\s+con\b)?\s*(?:\bn[uú]mero\s+de\s+serie|\bserial|\bs\/n)\s*[:#.]?\s*-?\s*(?=(?:[A-Za-z]{1,3}[\s-]?)?[A-Za-z0-9-]*\d)(?:[A-Za-z]{1,3}[\s-]?)?[A-Za-z0-9-]{2,}/gi;
+
+/** ¿Queda alguna mención de serial con código en el texto? */
+export function mencionaSerial(texto: string): boolean {
+  return new RegExp(MENCION_SERIAL.source, "i").test(texto);
+}
+
+/**
  * Quita el serial y lo que lo presenta: «y serial X9876», «, serial X 9876»,
  * «SN X9876», «-SN X9876-», «S/N X1». Deja la puntuación limpia.
  */
 export function quitarSerial(texto: string, serial: string): string {
   const p = patronSerial(serial);
-  if (!p) return texto;
-  const presentacion = new RegExp(
-    // «, y serial», «con serial», «y con serial»: los enlaces se van con el serial.
-    `(?:\\s*,)?(?:\\s+y\\b)?(?:\\s+con\\b)?(?:\\s*-\\s*|\\s+)?(?:(?:n[uú]mero\\s+de\\s+)?serial|serie|s\\/?n)?\\s*[:#.]?\\s*-?\\s*${p.source}`,
-    "gi",
+  const presentacion = p
+    ? new RegExp(
+        // «, y serial», «con serial», «y con serial»: los enlaces se van con el serial.
+        `(?:\\s*,)?(?:\\s+y\\b)?(?:\\s+con\\b)?(?:\\s*-\\s*|\\s+)?(?:(?:n[uú]mero\\s+de\\s+)?serial|serie|s\\/?n)?\\s*[:#.]?\\s*-?\\s*${p.source}`,
+        "gi",
+      )
+    : null;
+  return (
+    (presentacion ? texto.replace(presentacion, "") : texto)
+      // Y CUALQUIER otro «serial <código>», aunque no sea el del campo: una parte
+      // del serial («serial A1234») o uno distinto («serial X 98765»). 2026-10-14.
+      .replace(MENCION_SERIAL, "")
+      .replace(/\s+([,.;:])/g, "$1")
+      .replace(/,\s*\./g, ".")
+      .replace(/\s{2,}/g, " ")
+      .trim()
   );
-  return texto
-    .replace(presentacion, "")
-    .replace(/\s+([,.;:])/g, "$1")
-    .replace(/,\s*\./g, ".")
-    .replace(/\s{2,}/g, " ")
-    .trim();
 }
 
 /**
@@ -186,7 +205,7 @@ export function descripcionSinSerial(html: string, serial: string): string | nul
     .replace(/^\s*\.\s*/, "")
     .replace(/\s*\.\s*$/, "");
   const limpio = quitarSerial(texto, serial).replace(/\s*\.\s*\./g, ".");
-  if (contieneSerial(limpio, serial)) return null;
+  if (contieneSerial(limpio, serial) || mencionaSerial(limpio)) return null;
   return limpio || null;
 }
 

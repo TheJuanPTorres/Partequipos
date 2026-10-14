@@ -1,19 +1,27 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { motivoAltFlojo } from "../media/altFlojo";
 import {
   altDeRepuesto,
+  altDeTipo,
   codigoDeModelo,
   descripcionSeo,
   esBorradorCopia,
   ficheroDeLogo,
+  ficheroDeTarjeta,
+  ficheroDeTipo,
+  formatoDeImagen,
   LOGOS_DE_MARCA,
   fotoDeRepuesto,
   fotosGenericas,
+  IMAGENES_TARJETAS,
   nivelDePagina,
   nombreDeModelo,
   nombreDeTipo,
   pareceDatoDeContacto,
+  PREFIJO_IMAGEN_TIPO,
+  puedeSustituirImagen,
   rutaMadre,
   textoDePagina,
   tituloPorDefectoModelo,
@@ -202,5 +210,68 @@ describe("logos y redirecciones", () => {
   it("la ruta madre de una URL con un nivel de más", () => {
     assert.equal(rutaMadre("/a/b/c/d/"), "/a/b/c/");
     assert.equal(rutaMadre("/a/b/c/d"), "/a/b/c/");
+  });
+});
+
+describe("imagen de los tipos (2026-10-14)", () => {
+  it("nombre por id de adjunto, tipo y marca, sin el fichero de WordPress", () => {
+    assert.equal(
+      ficheroDeTipo(123, "Cargador frontal", "Case Construction"),
+      "wp-tipo-123-cargador-frontal-case-construction",
+    );
+    assert.equal(ficheroDeTipo(7, "Motoniveladora", "Liugóng"), "wp-tipo-7-motoniveladora-liugong");
+  });
+
+  it("texto alternativo: tipo y marca (el de WordPress no describe la foto)", () => {
+    assert.equal(altDeTipo("Excavadora", "Volvo"), "Excavadora Volvo");
+  });
+
+  it("el formato sale de los bytes: AVIF y HEIF a WebP, los demás tal cual", () => {
+    assert.deepEqual(formatoDeImagen("jpeg"), {
+      ext: "jpg",
+      mimetype: "image/jpeg",
+      convertir: false,
+    });
+    assert.deepEqual(formatoDeImagen("png"), {
+      ext: "png",
+      mimetype: "image/png",
+      convertir: false,
+    });
+    assert.deepEqual(formatoDeImagen("webp"), {
+      ext: "webp",
+      mimetype: "image/webp",
+      convertir: false,
+    });
+    assert.equal(formatoDeImagen("heif")?.convertir, true);
+    assert.equal(formatoDeImagen("avif")?.ext, "webp");
+    assert.equal(formatoDeImagen("gif"), null);
+    assert.equal(formatoDeImagen(undefined), null);
+  });
+
+  it("solo sustituye un campo vacío, de EJEMPLO o ya suyo: nunca lo que eligió un editor", () => {
+    assert.equal(puedeSustituirImagen(null, PREFIJO_IMAGEN_TIPO), true);
+    assert.equal(puedeSustituirImagen("", PREFIJO_IMAGEN_TIPO), true);
+    assert.equal(
+      puedeSustituirImagen("repuestos-marca-tipo-excavadora.jpg", PREFIJO_IMAGEN_TIPO),
+      true,
+    );
+    assert.equal(puedeSustituirImagen("wp-tipo-9-excavadora-volvo.jpg", PREFIJO_IMAGEN_TIPO), true);
+    assert.equal(puedeSustituirImagen("foto-que-subio-el-editor.jpg", PREFIJO_IMAGEN_TIPO), false);
+    assert.equal(puedeSustituirImagen("wp-logo-1-volvo.png", PREFIJO_IMAGEN_TIPO), false);
+  });
+});
+
+describe("imágenes de las tarjetas usadas y aditamentos (2026-10-14)", () => {
+  it("nombre por id de adjunto, sin el fichero de WordPress", () => {
+    assert.equal(ficheroDeTarjeta(1437, "aditamentos"), "wp-tarjeta-1437-aditamentos");
+  });
+
+  it("los textos alternativos pasan la regla de Media", () => {
+    for (const t of Object.values(IMAGENES_TARJETAS)) assert.equal(motivoAltFlojo(t.alt), null);
+  });
+
+  it("ningún fichero de origen lleva un número de serie (CLAUDE.md §9)", () => {
+    for (const t of Object.values(IMAGENES_TARJETAS))
+      assert.doesNotMatch(t.archivo, /(^|[-_/])s\/?n[-_]/i);
   });
 });

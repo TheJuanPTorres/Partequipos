@@ -349,14 +349,29 @@ if (m.marca) {
   });
   const logoActual = typeof actual.logo === "object" && actual.logo ? actual.logo : null;
   const esDeEjemplo = !!logoActual?.filename?.startsWith(PREFIJO);
+  // Igual con el fondo: solo si sigue siendo el de ejemplo. La importación de
+  // repuestos (agente C, 2026-10-14) lo quita y guarda lo previo en su manifiesto.
+  const fondoActual =
+    typeof actual.fondoHero === "object" && actual.fondoHero ? actual.fondoHero : null;
+  const fondoDeEjemplo = !!fondoActual?.filename?.startsWith(PREFIJO);
   await payload.update({
     collection: "marcas",
     id: m.marca.id,
-    data: { fondoHero: m.marca.fondoHero, ...(esDeEjemplo ? { logo: m.marca.logo } : {}) },
+    data: {
+      ...(fondoDeEjemplo ? { fondoHero: m.marca.fondoHero } : {}),
+      ...(esDeEjemplo ? { logo: m.marca.logo } : {}),
+    },
     overrideAccess: true,
   });
 }
 for (const t of m.tipos) {
+  // Solo si sigue con la imagen de ejemplo: la importación de repuestos pone la
+  // real de WordPress (`wp-tipo-…`), y esa no se toca.
+  const actual = await payload
+    .findByID({ collection: "tipos-equipo", id: t.id, depth: 1, overrideAccess: true })
+    .catch(() => null);
+  const imagen = actual && typeof actual.imagen === "object" ? actual.imagen : null;
+  if (!imagen?.filename?.startsWith(PREFIJO)) continue;
   await payload.update({
     collection: "tipos-equipo",
     id: t.id,
@@ -373,15 +388,25 @@ for (const c of m.categorias) {
   });
 }
 if (m.global) {
-  const g = await payload.findGlobal({ slug: "repuestos-marca", depth: 0, overrideAccess: true });
-  await payload.updateGlobal({
-    slug: "repuestos-marca",
-    data: {
-      tarjetaUsadas: { ...g.tarjetaUsadas, imagen: m.global.usadas },
-      tarjetaAditamentos: { ...g.tarjetaAditamentos, imagen: m.global.aditamentos },
-    },
-    overrideAccess: true,
-  });
+  // Cada tarjeta, solo si sigue con la imagen de ejemplo: la importación de
+  // repuestos pone la real (`wp-tarjeta-…`), y esa no se toca.
+  const g = await payload.findGlobal({ slug: "repuestos-marca", depth: 1, overrideAccess: true });
+  const deEjemplo = (v: unknown) =>
+    !!v && typeof v === "object" && !!(v as { filename?: string }).filename?.startsWith(PREFIJO);
+  const data: Record<string, unknown> = {};
+  if (deEjemplo(g.tarjetaUsadas?.imagen)) {
+    data.tarjetaUsadas = { ...g.tarjetaUsadas, imagen: m.global.usadas };
+  }
+  if (deEjemplo(g.tarjetaAditamentos?.imagen)) {
+    data.tarjetaAditamentos = { ...g.tarjetaAditamentos, imagen: m.global.aditamentos };
+  }
+  if (Object.keys(data).length) {
+    await payload.updateGlobal({
+      slug: "repuestos-marca",
+      data: data as never,
+      overrideAccess: true,
+    });
+  }
 }
 log("valores previos restaurados");
 

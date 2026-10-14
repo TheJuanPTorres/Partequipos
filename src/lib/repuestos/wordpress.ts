@@ -268,3 +268,108 @@ export function rutaMadre(ruta: string): string {
   const partes = ruta.split("/").filter(Boolean);
   return `/${partes.slice(0, -1).join("/")}/`;
 }
+
+// ---------- Imagen de los tipos y fondo de las marcas (2026-10-14) ----------
+
+/** Prefijo de las imágenes de cada tipo en `Media`, por id de adjunto de WordPress. */
+export const PREFIJO_IMAGEN_TIPO = "wp-tipo-";
+/** Prefijo del contenido de EJEMPLO de ux-9 de la página de marca (`scripts/repuestos/marca-preview.ts`). */
+export const PREFIJO_EJEMPLO_MARCA = "repuestos-marca-";
+
+/**
+ * Nombre determinista de la imagen de un tipo en `Media`: el id del adjunto
+ * (para no subirla dos veces) y el tipo y la marca, para reconocerla en el
+ * panel. Nunca el nombre del fichero de WordPress. La extensión la decide el
+ * formato REAL del fichero al descargarlo (`formatoDeImagen`).
+ */
+export function ficheroDeTipo(idAdjunto: number, tipo: string, marca: string): string {
+  const base = `${tipo} ${marca}`
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `${PREFIJO_IMAGEN_TIPO}${idAdjunto}-${base}`;
+}
+
+/**
+ * Texto alternativo de la imagen de un tipo: «Excavadora Caterpillar». El de
+ * WordPress no sirve: en estas fotos es de relleno y a veces describe otra
+ * máquina («retroescavadora» en la de un bulldozer).
+ */
+export function altDeTipo(tipo: string, marca: string): string {
+  return `${tipo} ${marca}`;
+}
+
+/**
+ * Qué se sube a `Media` según el formato REAL del fichero (sus bytes, no la
+ * extensión): JPEG, PNG y WebP tal cual; AVIF/HEIF, convertido a WebP
+ * (`Media` no admite AVIF, CLAUDE.md §10.28). `null`: un formato que no se sube.
+ */
+export function formatoDeImagen(
+  formatoReal: string | undefined,
+): { ext: string; mimetype: string; convertir: boolean } | null {
+  switch (formatoReal) {
+    case "jpeg":
+      return { ext: "jpg", mimetype: "image/jpeg", convertir: false };
+    case "png":
+      return { ext: "png", mimetype: "image/png", convertir: false };
+    case "webp":
+      return { ext: "webp", mimetype: "image/webp", convertir: false };
+    case "heif":
+    case "avif":
+      return { ext: "webp", mimetype: "image/webp", convertir: true };
+    default:
+      return null;
+  }
+}
+
+/**
+ * ¿Puede la importación poner su imagen en un campo que ya tiene una?
+ * Solo si está vacío, si es contenido de EJEMPLO de ux-9 o si ya es una de
+ * las suyas. Una imagen que eligió un editor en el panel NO se pisa: volver a
+ * ejecutar la importación (el runbook de producción) no deshace su trabajo.
+ */
+export function puedeSustituirImagen(
+  ficheroActual: string | null | undefined,
+  prefijoPropio: string,
+): boolean {
+  if (!ficheroActual) return true;
+  return ficheroActual.startsWith(PREFIJO_EJEMPLO_MARCA) || ficheroActual.startsWith(prefijoPropio);
+}
+
+/** Prefijo de las imágenes de las tarjetas del global `repuestos-marca` en `Media`. */
+export const PREFIJO_IMAGEN_TARJETA = "wp-tarjeta-";
+
+/**
+ * Las imágenes REALES de las dos tarjetas del marketplace de la página de marca
+ * (global `repuestos-marca`), en lugar de las de ejemplo de ux-9 (dirección,
+ * 2026-10-14). Esas tarjetas no existen en WordPress, así que la foto sale de
+ * donde llevan:
+ *
+ * - **usadas:** la primera foto de una de las 128 unidades de maquinaria usada
+ *   importadas (una excavadora Hitachi en patio, sin datos de la unidad a la
+ *   vista ni en el nombre del fichero);
+ * - **aditamentos:** la primera tarjeta visible de la página de aditamentos de
+ *   WordPress (`…/maquinaria-pesada-nueva/marcas/aditamentos/`): un martillo
+ *   hidráulico Okada montado en una excavadora.
+ */
+export const IMAGENES_TARJETAS = {
+  usadas: {
+    idWp: 47286,
+    archivo: "2025/11/002.jpg",
+    nombre: "maquinaria-pesada-usada",
+    alt: "Excavadora Hitachi usada en el patio",
+  },
+  aditamentos: {
+    idWp: 1437,
+    archivo: "2022/03/02-Martillo-hidraulico-OKADA.jpeg",
+    nombre: "aditamentos",
+    alt: "Martillo hidráulico Okada montado en una excavadora",
+  },
+} as const;
+
+/** Nombre determinista de la imagen de una tarjeta en `Media` (sin extensión: la pone el formato real). */
+export function ficheroDeTarjeta(idAdjunto: number, nombre: string): string {
+  return `${PREFIJO_IMAGEN_TARJETA}${idAdjunto}-${nombre}`;
+}

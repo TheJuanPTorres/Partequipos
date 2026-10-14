@@ -141,5 +141,51 @@ partes).
 
 ## 6. Para producción
 
-Runbook de dirección, sin ejecutar todavía: vaciar la demo (§10.6), importar
-con el destino de producción y comprobar las 10 redirecciones allí.
+Runbook de dirección (`Desktop\partequipos-cierre\runbook-importar-repuestos-produccion.md`),
+**EJECUTADO el 2026-10-14**. Volver a ejecutarlo (pasos 1 a 7) solo añade
+las imágenes de los tipos (§7): 32 subidas al Blob; el resto, sin cambios.
+
+## 7. Imagen de los tipos y fondo de las marcas (agente C, 2026-10-14)
+
+Para que las páginas de marca y de tipo usen las imágenes y textos **reales**
+de WordPress y no los de ejemplo de ux-9. Estudio de las 15 páginas de marca y
+las 33 de tipo (todo lo visible en escritorio; las plantillas comunes que incrustan, en una muestra):
+
+| Qué hay en WordPress                                                                                           | Campo de D                    | Qué se hace                                                                                                                                                         |
+| -------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| La foto de cada tipo: la tarjeta «Repuestos para maquinaria pesada excavadora CATERPILLAR» (`call-to-action`)  | `tipos-equipo.imagen`         | **Se importa**: la primera tarjeta visible de la página del tipo que no es la de WhatsApp. Las 32                                                                   |
+| Fondo del encabezado de la marca                                                                               | `marcas.fondoHero`            | **No existe**: el encabezado visible no tiene foto; la única («Banner-principal-2») está oculta en los tres tamaños. Se deja vacío y se quita el de EJEMPLO de ux-9 |
+| Título y presentación del encabezado («REPUESTOS PARA MAQUINARIA PESADA CATERPILLAR En Colombia» y su párrafo) | `marcas.descripcion` y global | Ya se importaban (§2); el global ya dice lo mismo                                                                                                                   |
+| La página de tipo repite el encabezado y el párrafo de su marca                                                | `tipos-equipo.descripcion`    | Ya se importaba (§2)                                                                                                                                                |
+| «Repuestos según tipo de máquina», «Nuestras categorías de repuestos», «Testimonios reales»                    | Global `repuestos-marca`      | Ya coinciden. El enlace de la tarjeta dice «VER MÁS» en WordPress y «Ver todo» en ux-9: manda ux-9                                                                  |
+
+**Sin campo en el sitio nuevo** (no se importan; sin esquema):
+
+- «Por qué elegirnos»: lista común y una frase con la marca, con una foto de banco.
+- Las tarjetas de WhatsApp («Estamos aquí para ayudarlo»), algunas con una foto de la marca.
+- «Nuestros productos y servicios» y las plantillas comunes de categorías, formulario y sedes.
+
+**Cómo se importa la imagen del tipo:**
+
+- **Fuente:** `extraer-xml.py` añade `tarjeta` a cada página. Una fuente anterior al 2026-10-14 no lo lleva, y la importación se para y pide extraerla de nuevo.
+- **Formato:** sale de los **bytes**, no de la extensión. JPEG, PNG y WebP van tal cual; AVIF y HEIF pasan a WebP (`formatoDeImagen`). Hoy son 29 JPEG, 2 WebP y 1 PNG, de 62 kB a 1,6 MB.
+- **Nombre en `Media`:** `wp-tipo-<id del adjunto>-<tipo>-<marca>`, nunca el nombre del fichero de WordPress. Una segunda ejecución no la vuelve a subir.
+- **Texto alternativo:** «Excavadora Caterpillar». El de WordPress no sirve: es de relleno y a veces describe otra máquina («retroescavadora» en un bulldozer).
+- **No pisa a un editor:** la imagen se pone solo si el campo está vacío, es de EJEMPLO de ux-9 (`repuestos-marca-…`) o ya es una `wp-tipo-…` (`puedeSustituirImagen`). La simulación lista en `conImagenDeEditor` los tipos que no toca.
+- **Manifiesto:** el valor de antes de cada campo cambiado (imagen del tipo, fondo de la marca) queda en `imagenes`, solo la primera vez. La retirada lo devuelve antes de borrar las subidas.
+- **El ejemplo de ux-9** (`npm run preview:repuestos-marca:retirar`, de D) solo devuelve el fondo y la imagen de los tipos si **siguen** siendo los de ejemplo: ya no deja los tipos sin su imagen real.
+
+**Las tarjetas «Maquinaria pesada usada» y «Aditamentos»** (global `repuestos-marca`) **no existen en WordPress**:
+allí no tienen imagen propia. Por decisión de dirección (2026-10-14), en lugar de las de ejemplo de ux-9 llevan una foto
+real (`IMAGENES_TARJETAS`, `wp-tarjeta-<adjunto>-…`), con la misma regla de no pisar a un editor y su valor de antes en
+el manifiesto:
+
+- **usadas:** la primera foto de una de las 128 unidades importadas (una excavadora Hitachi en patio). Se descartaron
+  las que llevan el número de serie en el nombre del fichero (§9; lo comprueba una prueba);
+- **aditamentos:** la primera tarjeta visible de la página de aditamentos de WordPress (un martillo hidráulico Okada).
+
+**Resultado en el preview (2026-10-14):**
+
+- 32 imágenes subidas y 32 tipos con su imagen; quitado el fondo de ejemplo de Caterpillar.
+- Segunda pasada: 0 subidas, mismos números.
+- **Retirada completa:** devolvió los 69 registros y las 33 imágenes cambiadas a su valor de antes (el fondo de ejemplo de Caterpillar, las imágenes de ejemplo de los tipos de la demo) y los 45 ficheros dieron 404; después se volvió a importar (32 de 32 tipos con su imagen)

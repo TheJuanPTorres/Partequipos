@@ -241,6 +241,10 @@ export interface EquiposNuevo {
    */
   codigo?: string | null;
   /**
+   * En kilogramos, sin puntos: 8400 para 8,4 t. Sirve para filtrar y ordenar el listado; vacío, el equipo no sale en los filtros de peso.
+   */
+  pesoOperativoKg?: number | null;
+  /**
    * Resumen de una o dos líneas, bajo el título.
    */
   entradilla?: string | null;
@@ -505,12 +509,26 @@ export interface Marca {
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
+  /**
+   * Presentación bajo el título de la página de la marca. También sirve de descripción en Google si no hay otra.
+   */
   descripcion?: string | null;
+  /**
+   * Con fondo transparente (PNG o WebP). En la página de la marca va sobre una placa oscura, porque los logos actuales del cliente son blancos.
+   */
   logo?: (number | null) | Media;
   /**
    * Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.
    */
   fondoHero?: (number | null) | Media;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -527,6 +545,9 @@ export interface TiposEquipo {
    */
   slug: string;
   marca: number | Marca;
+  /**
+   * Texto bajo el título de la página del tipo. También sirve de descripción en Google si no hay otra.
+   */
   descripcion?: string | null;
   /**
    * Opcional. Foto del tipo de máquina para la tarjeta de la página de la marca.
@@ -557,6 +578,9 @@ export interface CategoriasTecnica {
   slug: string;
   descripcion?: string | null;
   imagen?: (number | null) | Media;
+  /**
+   * Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de marca.
+   */
   icono?:
     | ('corte' | 'llanta' | 'lubricante' | 'filtro' | 'motor' | 'rodaje' | 'miscelaneos' | 'componentes' | 'diesel')
     | null;
@@ -565,7 +589,7 @@ export interface CategoriasTecnica {
    */
   tituloPortada?: string | null;
   /**
-   * Ruta del sitio (/…) o https://
+   * A dónde llevan la tarjeta de la portada y la categoría en las páginas de marca. Ruta del sitio (/…) o https://.
    */
   enlace?: string | null;
   /**
@@ -589,7 +613,7 @@ export interface CategoriasTecnica {
   createdAt: string;
 }
 /**
- * Inventario de maquinaria usada. Se muestra dentro de la página de su categoría; no genera URLs propias.
+ * Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros; no tiene página propia.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "equipos-usados".
@@ -601,7 +625,7 @@ export interface EquiposUsado {
    */
   nombre: string;
   /**
-   * Determina en qué página aparece la unidad.
+   * Determina en qué listado de categoría aparece la unidad.
    */
   categoria: number | CategoriasUsada;
   /**
@@ -676,7 +700,13 @@ export interface MarcasUsada {
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
+  /**
+   * Texto bajo el título de la página de la marca. También sirve de descripción en Google si no escribes una abajo.
+   */
   descripcion?: string | null;
+  /**
+   * Opcional. Todavía no sale en la página de la marca: se guarda para cuando tenga su diseño.
+   */
   logo?: (number | null) | Media;
   /**
    * Opcional. Si la vendemos nueva, su página enlaza a la de nueva.
@@ -1700,6 +1730,13 @@ export interface MarcasSelect<T extends boolean = true> {
   descripcion?: T;
   logo?: T;
   fondoHero?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1760,6 +1797,7 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
   marca?: T;
   tipo?: T;
   codigo?: T;
+  pesoOperativoKg?: T;
   entradilla?: T;
   descripcion?: T;
   destacados?:
@@ -2590,7 +2628,13 @@ export interface RepuestosMarca {
    * Ej.: «En Colombia» → «CATERPILLAR En Colombia».
    */
   subtituloHero?: string | null;
+  /**
+   * Vacío: la franja de categorías no se pinta.
+   */
   tituloCategorias?: string | null;
+  /**
+   * Vacío: no se pintan las tarjetas de tipos de máquina, ni las de usada y aditamentos (van en la misma sección).
+   */
   tituloTipos?: string | null;
   /**
    * Ej.: «Ver todo».
@@ -2619,8 +2663,14 @@ export interface RepuestosMarca {
     imagen?: (number | null) | Media;
   };
   contactoTitulo?: string | null;
+  /**
+   * Vacío: el formulario de contacto no se pinta.
+   */
   contactoSubtitulo?: string | null;
   contactoBoton?: string | null;
+  /**
+   * Vacío: los testimonios salen sin título (sin testimonios publicados, la sección no se pinta).
+   */
   testimoniosTitulo?: string | null;
   verVideoTexto?: string | null;
   updatedAt?: string | null;

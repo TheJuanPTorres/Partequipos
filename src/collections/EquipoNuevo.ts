@@ -72,6 +72,25 @@ export const EquipoNuevo: CollectionConfig = {
       label: "Código / referencia",
       admin: { description: "Referencia del fabricante, ej. 1150M o ZX350LC-6." },
     },
+    /*
+     * PESO OPERATIVO NUMÉRICO (2026-10-14, aprobado por dirección): para filtrar
+     * y ordenar el listado por tramos de toneladas («Categoría secundaria» de
+     * ux-9). En KILOGRAMOS y entero, porque así lo saca de la ficha técnica el
+     * importador de WordPress (`pesoOperativoKg`, que rellena el primer campo
+     * numérico cuyo nombre empieza por «peso»). El sitio lo pinta en toneladas.
+     * La fila «Peso operativo» de la ficha técnica sigue siendo el texto visible.
+     */
+    {
+      name: "pesoOperativoKg",
+      type: "number",
+      label: "Peso operativo (kg)",
+      min: 0,
+      admin: {
+        step: 1,
+        description:
+          "En kilogramos, sin puntos: 8400 para 8,4 t. Sirve para filtrar y ordenar el listado; vacío, el equipo no sale en los filtros de peso.",
+      },
+    },
     {
       name: "entradilla",
       type: "textarea",

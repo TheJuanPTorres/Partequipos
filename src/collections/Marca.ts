@@ -1,5 +1,7 @@
 import type { CollectionConfig } from "payload";
 
+import { seoField } from "../lib/fields/seoField";
+
 import { slugField } from "../lib/fields/slugField";
 import { revalidarMarca, revalidarMarcaBorrada } from "./hooks/revalidateHooks";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
@@ -76,5 +78,9 @@ export const Marca: CollectionConfig = {
           "Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.",
       },
     },
+    // Buscadores y redes sociales (2026-10-13, aprobado por dirección): las
+    // 13 páginas de marca del mapa de alcance no tenían título ni descripción
+    // editables.
+    seoField(),
   ],
 };

@@ -226,3 +226,105 @@ export const CORRECCIONES_WP: Readonly<
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/retrocargadora-case-construction-851-fx-tier4/":
     { sinDescripcionSeo: "la meta descripción de WordPress habla de otro modelo (570 ST)" },
 };
+
+// ---------- Descripción para buscadores (decisión de dirección, 2026-10-14) ----------
+
+/** Pasa a mayúsculas y quita espacios, guiones y tildes: «CX-130D» y «cx 130d» comparan igual. */
+const plegar = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toUpperCase()
+    .replace(/[\s-]+/g, "");
+
+/**
+ * El código del modelo que identifica la ficha, plegado: los trozos del código
+ * hasta el primero con una cifra («1150M Tier4» → «1150M», «CX 130D Tier4» →
+ * «CX130D»), o la última palabra del nombre si no hay código.
+ */
+export function codigoClave(codigo: string | null | undefined, nombre: string): string {
+  const trozos = (codigo ?? "").trim().split(/\s+/).filter(Boolean);
+  let base = "";
+  for (const t of trozos) {
+    base += t;
+    if (/\d/.test(t)) break;
+  }
+  return plegar(base || nombre.trim().split(/\s+/).at(-1) || "");
+}
+
+/**
+ * ¿El texto nombra ESE modelo? Busca el código como palabra, y también partido
+ * en dos («SR 175B»). No vale como parte de otro código: «VIO50-6» no está en
+ * un texto que dice «VIO50-6A».
+ */
+export function mencionaModelo(texto: string, clave: string): boolean {
+  if (!clave) return false;
+  const palabras = texto
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toUpperCase()
+    .split(/[^A-Z0-9-]+/)
+    .filter(Boolean)
+    .map((p) => p.replace(/-/g, ""));
+  for (let i = 0; i < palabras.length; i++) {
+    if (palabras[i] === clave) return true;
+    if (palabras[i]! + (palabras[i + 1] ?? "") === clave) return true;
+  }
+  return false;
+}
+
+/** La primera frase del primer párrafo con texto de la descripción (sin títulos ni plantillas). */
+export function primeraFrase(html: string): string | null {
+  for (const p of html.match(/<p[\s\S]*?<\/p>/gi) ?? []) {
+    const plano = textoPlano(p.replace(/\[elementor-template[^\]]*\]/g, ""))
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!plano) continue;
+    const frase = plano.match(/^[\s\S]+?[.!?](?=\s|$)/)?.[0] ?? plano;
+    return frase.trim();
+  }
+  return null;
+}
+
+/** Máximo de la descripción generada (dirección: menos de 160 caracteres). */
+export const MAX_DESCRIPCION_GENERADA = 159;
+
+/**
+ * Descripción generada con los datos de la ficha: distinta en cada una porque
+ * lleva su nombre («Excavadora Hitachi ZX130-5B»), y de menos de 160
+ * caracteres. Si el nombre es muy largo, una versión más corta.
+ */
+export function descripcionGenerada(nombre: string): string {
+  const larga = `${nombre}: ficha técnica, fotos y cotización en Partequipos, Colombia.`;
+  if (larga.length <= MAX_DESCRIPCION_GENERADA) return larga;
+  const corta = `${nombre}: ficha técnica y cotización en Partequipos.`;
+  return corta.length <= MAX_DESCRIPCION_GENERADA
+    ? corta
+    : `${nombre.slice(0, MAX_DESCRIPCION_GENERADA - 1).trimEnd()}…`;
+}
+
+export type OrigenDescripcion = "wordpress" | "frase" | "generada";
+
+/**
+ * Descripción para buscadores de una ficha (decisión de dirección, 2026-10-14).
+ * Unas 50 fichas llevan en WordPress la de otro modelo, copiada de plantilla:
+ * 1. la de WordPress, si nombra el modelo de la ficha (y no hay corrección que
+ *    la descarte ni la lleva otra ficha: `descartarWp`);
+ * 2. si no, la primera frase del texto de la propia ficha, si nombra el modelo;
+ * 3. si tampoco, una generada con los datos de la ficha.
+ */
+export function descripcionSeoDeFicha(p: {
+  metaWp: string | null;
+  htmlDescripcion: string;
+  nombre: string;
+  codigo: string | null;
+  descartarWp?: boolean;
+}): { texto: string; origen: OrigenDescripcion } {
+  const clave = codigoClave(p.codigo, p.nombre);
+  if (p.metaWp && !p.descartarWp && mencionaModelo(p.metaWp, clave)) {
+    return { texto: p.metaWp, origen: "wordpress" };
+  }
+  const frase = primeraFrase(p.htmlDescripcion);
+  if (frase && mencionaModelo(frase, clave)) return { texto: frase, origen: "frase" };
+  return { texto: descripcionGenerada(p.nombre), origen: "generada" };
+}

@@ -43,6 +43,7 @@ describe("SEO_POR_COLECCION", () => {
       "categorias-maquinaria",
       "categorias-usada",
       "equipos-nuevos",
+      "marcas",
       "marcas-lubricante",
       "marcas-maquinaria",
       "marcas-usada",

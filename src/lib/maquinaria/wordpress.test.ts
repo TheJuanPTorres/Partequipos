@@ -3,6 +3,12 @@ import { describe, it } from "node:test";
 
 import {
   CORRECCIONES_WP,
+  MAX_DESCRIPCION_GENERADA,
+  codigoClave,
+  descripcionGenerada,
+  descripcionSeoDeFicha,
+  mencionaModelo,
+  primeraFrase,
   ETIQUETAS_CORREGIDAS,
   clasificarTexto,
   enlacesDe,
@@ -177,5 +183,67 @@ describe("CORRECCIONES_WP", () => {
       );
       assert.ok(c.sinPdf || c.sinTituloSeo || c.sinDescripcionSeo, ruta);
     }
+  });
+});
+
+describe("descripción para buscadores", () => {
+  it("codigoClave: el primer trozo del código, plegado; sin código, la última palabra del nombre", () => {
+    assert.equal(codigoClave("CX-130D Tier4", "x"), "CX130D");
+    assert.equal(codigoClave("CX 130D Tier4", "x"), "CX130D");
+    assert.equal(codigoClave("845C Tier 4", "x"), "845C");
+    assert.equal(codigoClave(null, "Rodillo Ejemplo RX-9"), "RX9");
+  });
+
+  it("mencionaModelo: como palabra, junto o partido en dos; nunca como parte de otro", () => {
+    assert.equal(mencionaModelo("La excavadora cx-130d de ejemplo", "CX130D"), true);
+    assert.equal(mencionaModelo("El minicargador SR 175B de ejemplo", "SR175B"), true);
+    assert.equal(mencionaModelo("La miniexcavadora VIO50-6A", "VIO506"), false);
+    assert.equal(mencionaModelo("La excavadora ZX200LC-5G", "ZX1305B"), false);
+  });
+
+  it("primeraFrase: el primer párrafo con texto, sin títulos ni plantillas", () => {
+    const html =
+      '<h3>Un título</h3><p>[elementor-template id="1"]</p><p>La RX-9 compacta. Segunda frase.</p>';
+    assert.equal(primeraFrase(html), "La RX-9 compacta.");
+    assert.equal(primeraFrase("<h3>Solo título</h3>"), null);
+  });
+
+  it("descripcionGenerada: lleva el nombre y no pasa de 159 caracteres", () => {
+    assert.equal(
+      descripcionGenerada("Rodillo Ejemplo RX-9"),
+      "Rodillo Ejemplo RX-9: ficha técnica, fotos y cotización en Partequipos, Colombia.",
+    );
+    assert.ok(descripcionGenerada("X".repeat(200)).length <= MAX_DESCRIPCION_GENERADA);
+    assert.notEqual(descripcionGenerada("Modelo A1"), descripcionGenerada("Modelo B2"));
+  });
+
+  it("descripcionSeoDeFicha: WordPress si nombra el modelo; si no, la frase; si no, la generada", () => {
+    const base = { nombre: "Rodillo Ejemplo RX-9", codigo: "RX-9" };
+    assert.deepEqual(
+      descripcionSeoDeFicha({ ...base, metaWp: "El RX-9 de ejemplo.", htmlDescripcion: "" }),
+      { texto: "El RX-9 de ejemplo.", origen: "wordpress" },
+    );
+    assert.deepEqual(
+      descripcionSeoDeFicha({
+        ...base,
+        metaWp: "La excavadora QZ-1 de otro modelo.",
+        htmlDescripcion: "<p>El rodillo RX-9 compacta bien. Más.</p>",
+      }),
+      { texto: "El rodillo RX-9 compacta bien.", origen: "frase" },
+    );
+    assert.equal(
+      descripcionSeoDeFicha({
+        ...base,
+        metaWp: "La excavadora QZ-1.",
+        htmlDescripcion: "<p>Otro texto sin el modelo.</p>",
+      }).origen,
+      "generada",
+    );
+    // Una corrección que descarta la de WordPress, aunque nombre el modelo.
+    assert.equal(
+      descripcionSeoDeFicha({ ...base, metaWp: "El RX-9.", htmlDescripcion: "", descartarWp: true })
+        .origen,
+      "generada",
+    );
   });
 });

@@ -42,8 +42,25 @@ export const MarcaUsada: CollectionConfig = {
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
     slugField({ unique: true }),
-    { name: "descripcion", type: "textarea", label: "Descripción" },
-    { name: "logo", type: "upload", relationTo: "media", label: "Logo" },
+    {
+      name: "descripcion",
+      type: "textarea",
+      label: "Descripción",
+      admin: {
+        description:
+          "Texto bajo el título de la página de la marca. También sirve de descripción en Google si no escribes una abajo.",
+      },
+    },
+    {
+      name: "logo",
+      type: "upload",
+      relationTo: "media",
+      label: "Logo",
+      admin: {
+        description:
+          "Opcional. Todavía no sale en la página de la marca: se guarda para cuando tenga su diseño.",
+      },
+    },
     {
       type: "row",
       fields: [

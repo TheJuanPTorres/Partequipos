@@ -13,8 +13,8 @@ const menu = revalidarMegamenu("marcas");
 export const Marca: CollectionConfig = {
   slug: "marcas",
   labels: {
-    singular: "Marca",
-    plural: "Marcas",
+    singular: "Marca de repuestos",
+    plural: "Marcas de repuestos",
   },
   admin: {
     useAsTitle: "nombre",

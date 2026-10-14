@@ -31,7 +31,7 @@ export const EquipoUsado: CollectionConfig = {
     group: "Maquinaria",
     listSearchableFields: ["nombre", "marca", "modelo"],
     description:
-      "Inventario de maquinaria usada. Se muestra dentro de la página de su categoría; no genera URLs propias.",
+      "Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros; no tiene página propia.",
   },
   access: {
     read: publico,
@@ -61,7 +61,7 @@ export const EquipoUsado: CollectionConfig = {
       relationTo: "categorias-usada",
       required: true,
       label: "Categoría",
-      admin: { description: "Determina en qué página aparece la unidad." },
+      admin: { description: "Determina en qué listado de categoría aparece la unidad." },
     },
     /*
      * MARCA (paso b del marketplace, 2026-10-13): relación con las marcas de
@@ -86,7 +86,7 @@ export const EquipoUsado: CollectionConfig = {
     {
       name: "marca",
       type: "text",
-      label: "Marca (texto)",
+      label: "Marca",
       admin: { hidden: true },
     },
     { name: "modelo", type: "text", label: "Modelo" },

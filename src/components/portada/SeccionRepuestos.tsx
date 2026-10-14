@@ -1,18 +1,12 @@
-import {
-  IconAssembly,
-  IconBucketDroplet,
-  IconEngine,
-  IconFilter,
-  IconSettings,
-  IconWheel,
-} from "@tabler/icons-react";
+import { IconEngine } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
-import type { IconoCategoria, TarjetaRepuesto } from "@/lib/portada/seccionesE";
+import type { TarjetaRepuesto } from "@/lib/portada/seccionesE";
 
+import { ICONOS_CATEGORIA } from "./iconosCategoria";
 import estilos from "./repuestos.module.css";
 import { TarjetasApiladas } from "./diferidos";
 
@@ -30,15 +24,6 @@ import { TarjetasApiladas } from "./diferidos";
  * - D17: «Ver más» solo si la categoría tiene enlace (ux-9 enlaza «#»).
  */
 
-const ICONOS: Record<IconoCategoria, typeof IconSettings> = {
-  corte: IconSettings,
-  llanta: IconWheel,
-  lubricante: IconBucketDroplet,
-  filtro: IconFilter,
-  motor: IconEngine,
-  rodaje: IconAssembly,
-};
-
 /** Ancho pintado de la foto: 40 % de la tarjeta (456 px a 1440); en móvil, toda. */
 const SIZES_FOTO = "(max-width: 767px) calc(100vw - 20px), (max-width: 1024px) 40vw, 456px";
 
@@ -51,7 +36,7 @@ function Tarjeta({
   idTitulo: string;
   verMas: string;
 }) {
-  const Icono = t.icono ? ICONOS[t.icono] : null;
+  const Icono = t.icono ? ICONOS_CATEGORIA[t.icono] : null;
   return (
     <article
       className={estilos.tarjeta}

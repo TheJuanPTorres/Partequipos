@@ -31,7 +31,8 @@
 
 /* Foto apaisada sin animación: la caja mide lo que la foto, y la foto, toda la columna. */
 .columnaApaisada {
-  min-height: 0;
+  /* «auto» y no 0: en móvil, con flex en columna, 0 aplastaba la caja bajo el texto. */
+  min-height: auto;
 }
 
 .columnaApaisada .imagen {

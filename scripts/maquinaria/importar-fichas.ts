@@ -11,6 +11,8 @@
  *   npm run preview:fichas:retirar              # deshace EXACTAMENTE lo del manifiesto
  *
  * IMPORTACIÓN AL PREVIEW APROBADA por dirección (2026-10-13), tras la simulación.
+ * Para el sitio publicado, destino `produccion` con su base y su almacén, solo
+ * por runbook de dirección (`runbook-importar-fichas-lanzamiento.md`).
  * Como los usados: por tandas, con MANIFIESTO (`manifiesto-fichas-preview.json`,
  * fuera del repositorio) y RETIRADA EXACTA: borra lo que creó y devuelve a las
  * fichas que ya existían (las de demostración) sus valores de antes.
@@ -58,6 +60,7 @@ import {
   pesoOperativoKg,
   type Par,
 } from "../../src/lib/maquinaria/wordpress";
+import { veredictoDestino } from "../../src/lib/demo/copiaDemo";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 import {
   altDeRepuesto,
@@ -73,7 +76,7 @@ import { leerCsv } from "../../src/lib/utils/csv";
 
 const args = process.argv.slice(2);
 const modo = args.find((a) => a === "simular" || a === "importar" || a === "retirar");
-const destino = args.find((a) => a === "preview");
+const destino = args.find((a) => a === "preview" || a === "produccion" || a === "prueba");
 const valorDe = (k: string) => args.find((a) => a.startsWith(`${k}=`))?.slice(k.length + 1);
 const fallar = (m: string): never => {
   const e = new Error(`[fichas] ✗ ${m}`);
@@ -81,9 +84,17 @@ const fallar = (m: string): never => {
   throw e;
 };
 if (!modo) fallar("indica el modo: simular, importar o retirar");
-if (!destino) fallar("indica el destino: preview");
-const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
-if (!v.permitido) fallar(`NO se hace nada: ${v.motivo}`);
+if (!destino) fallar("indica el destino: preview, produccion o prueba");
+// Como los usados: `preview` solo con la base y el Blob del preview; los otros
+// destinos, con SU base y SU almacén (el almacén se declara para la guarda).
+if (destino === "preview") {
+  const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
+  if (!v.permitido) fallar(`NO se hace nada: ${v.motivo}`);
+} else {
+  const v = veredictoDestino(destino, process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
+  if (!v.valido) fallar(`destino no válido, no se hace nada: ${v.motivo}`);
+  if (v.valido) process.env.ALMACEN_BLOB_ESPERADO = v.almacen;
+}
 // Simulación: sin token, nada puede llegar al Blob. Importar y retirar: el almacén, comprobado antes.
 if (modo === "simular") process.env.BLOB_READ_WRITE_TOKEN = "";
 else exigirAlmacen("[fichas]");

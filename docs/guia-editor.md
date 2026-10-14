@@ -202,8 +202,11 @@ oficial, no lo pongas.
 - Cada **marca de repuestos** (**Repuestos → Marcas de repuestos**) tiene su
   página. En la ficha de la marca: **descripción** (la presentación bajo el
   título), **logo** (fondo transparente; hoy va sobre una placa oscura,
-  porque los logos del cliente son blancos) y **fondo del encabezado** (foto
-  de obra, opcional).
+  porque los logos del cliente son blancos), **fondo del encabezado** (foto
+  de obra, opcional) y **Buscadores y redes sociales** (§8). Al compartir la
+  página en WhatsApp o LinkedIn sale la imagen que elijas en ese bloque o, si
+  no eliges ninguna, la imagen al compartir por defecto del sitio: el logo no,
+  porque es blanco y no se vería.
 - Los **tipos de equipo** llevan una **imagen de la tarjeta** opcional: la
   foto de su tarjeta en la página de la marca.
 - Las **categorías técnicas** son las mismas en todas las marcas: su

@@ -23,8 +23,8 @@ import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
+import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { turnstileSiteKey } from "@/lib/turnstile";
-import { imagenDeMedia } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 
 type Params = { marca: string };
@@ -39,11 +39,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const marca = await getMarcaPorSlug(marcaSlug);
   if (!marca) return METADATA_404;
 
+  // Título y descripción del bloque SEO de la marca o, vacíos, los de
+  // siempre. Imagen al compartir: la del bloque o, sin ella, la del sitio por
+  // defecto. El logo ya no: los del cliente son blancos y transparentes, y en
+  // WhatsApp o LinkedIn no se verían (2026-10-13).
   return metadataDe({
-    nombre: `Repuestos para maquinaria pesada ${marca.nombre}`,
+    nombre: tituloPorDefecto.marcaRepuesto(marca.nombre),
     path: rutas.marca(marca.slug),
     descripcion: marca.descripcion,
-    imageUrl: imagenDeMedia(marca.logo, marca.nombre)?.url,
+    seo: marca.seo,
   });
 }
 

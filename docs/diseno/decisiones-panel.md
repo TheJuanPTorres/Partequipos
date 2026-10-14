@@ -906,3 +906,11 @@ una ficha nueva importada por A). Se pasó a 1440 y en móvil, con el turno de
 - **Para B:** 2 descripciones de usados disponibles del preview conservan la palabra «serial» con un código. No se copia aquí.
 - **Para A:** la ficha «Retrocargadora Case Construction 851 FX Tier4» trae una descripción para buscadores de otro modelo.
 - **Para dirección:** las marcas de repuestos no tenían bloque SEO. Dirección aprobó añadirlo, con su migración, en un PR aparte. Los tipos de repuestos ya lo tienen.
+
+**Bloque SEO en las marcas de repuestos (PR aparte, con migración
+`20261014_033314_seo_marcas_repuestos`):**
+
+- `seoField()` en `Marca`, con el título por defecto de siempre («Repuestos para maquinaria pesada <marca>», `tituloPorDefecto.marcaRepuesto`).
+- La página de la marca usa el bloque.
+- **Imagen al compartir:** la del bloque o, sin ella, la del sitio por defecto. El logo deja de serlo, por decisión de dirección: los logos del cliente son blancos y transparentes, y no se verían en WhatsApp ni en LinkedIn.
+- **De paso:** la sección de testimonios sin título ya no apunta con `aria-labelledby` a un id que no existe (lo señaló el verificador del #132).

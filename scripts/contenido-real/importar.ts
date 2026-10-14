@@ -412,7 +412,7 @@ for (const [clave, img] of Object.entries(fuente.imagenes)) {
   const { datos, tipo } = await descargar(img.url);
   const doc = await payload.create({
     collection: "media",
-    data: { alt: img.alt },
+    data: { alt: img.alt, ...(img.foco ? { focalX: img.foco[0], focalY: img.foco[1] } : {}) },
     file: {
       data: datos,
       mimetype: tipo.split(";")[0] || "image/jpeg",
@@ -444,8 +444,8 @@ const datosPortada = {
     imagen: img(p.compania.imagen),
     youtube: p.compania.youtube,
   },
-  // Sin recorte real de máquina: la sección de preguntas va sin imagen (decisión de dirección).
-  seccionFaq: { ...antes.seccionFaq, imagen: null },
+  // Tarjeta de las preguntas (rediseño de Andrés): la foto real del técnico.
+  seccionFaq: { ...antes.seccionFaq, imagen: img(p.faqImagen) },
   seo: { ...antes.seo, metaDescription: p.metaDescripcion },
 };
 

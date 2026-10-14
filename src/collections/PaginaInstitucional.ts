@@ -558,8 +558,11 @@ export const PaginaInstitucional: CollectionConfig = {
           name: "imagen",
           type: "upload",
           relationTo: "media",
-          label: "Máquina recortada (PNG transparente)",
-          admin: { description: "Decorativa: asoma arriba a la izquierda. Opcional." },
+          label: "Imagen de la tarjeta",
+          admin: {
+            description:
+              "La foto de fondo de la tarjeta de la izquierda, con el título, el texto y el botón encima (un velo oscuro asegura que se lean). Una foto, no un recorte; se ajusta a la tarjeta con su punto focal. Sin foto, la tarjeta va en oscuro.",
+          },
         },
         texto("titulo", "Título", "Preguntas frecuentes"),
         parrafo(

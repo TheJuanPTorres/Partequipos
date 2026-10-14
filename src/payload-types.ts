@@ -1102,7 +1102,7 @@ export interface Pagina {
   };
   seccionFaq?: {
     /**
-     * Decorativa: asoma arriba a la izquierda. Opcional.
+     * La foto de fondo de la tarjeta de la izquierda, con el título, el texto y el botón encima (un velo oscuro asegura que se lean). Una foto, no un recorte; se ajusta a la tarjeta con su punto focal. Sin foto, la tarjeta va en oscuro.
      */
     imagen?: (number | null) | Media;
     titulo?: string | null;

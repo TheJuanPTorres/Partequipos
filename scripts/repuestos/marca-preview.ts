@@ -12,7 +12,7 @@
  *   las imágenes de ux-9 (licencia pendiente, L3; excepción de demostración
  *   §10.38) con el prefijo `repuestos-marca-` y el texto alternativo
  *   «EJEMPLO UX-9 — …»:
- *     · el fondo del encabezado y el logo de la marca (el de ux-9);
+ *     · el fondo del encabezado (el logo es el de la marca, el que importó B);
  *     · la imagen de la tarjeta de cada tipo de la marca (se empareja por
  *       nombre: bulldozer, excavadora, retrocargadora, cargador frontal);
  *     · las de las tarjetas de maquinaria usada y aditamentos (global
@@ -80,12 +80,6 @@ const IMAGENES: Record<string, Imagen> = {
     nombre: `${PREFIJO}fondo.jpg`,
     alt: "EJEMPLO UX-9 — Excavadora trabajando en una obra",
     mime: "image/jpeg",
-  },
-  logo: {
-    origen: "Mesa-de-trabajo-7-copia-2.png",
-    nombre: `${PREFIJO}logo-caterpillar.png`,
-    alt: "EJEMPLO UX-9 — Logo de Caterpillar",
-    mime: "image/png",
   },
   bulldozer: {
     origen: "images-1.jpeg",
@@ -278,14 +272,14 @@ if (modo === "sembrar") {
     log("manifiesto previo conservado");
   }
 
-  // 3. Marca: fondo siempre; el logo solo si no tenía.
+  // 3. Marca: solo el fondo (el logo es el que importó B).
   await payload.update({
     collection: "marcas",
     id: marca.id,
-    data: { fondoHero: ids.fondo, logo: ids.logo },
+    data: { fondoHero: ids.fondo },
     overrideAccess: true,
   });
-  log(`marca «${marca.nombre}» (id ${marca.id}): fondo y logo puestos`);
+  log(`marca «${marca.nombre}» (id ${marca.id}): fondo puesto (el logo es el que importó B)`);
 
   // 4. Tipos: la imagen que corresponda a su nombre.
   let conImagen = 0;
@@ -345,10 +339,20 @@ if (!fs.existsSync(MANIFIESTO)) {
 const m = JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto;
 // Primero se sueltan las referencias, después se borran las imágenes.
 if (m.marca) {
+  // El logo solo se restaura si sigue siendo el de ejemplo de una versión anterior del script:
+  // si no, es el que importó el agente B y no se toca.
+  const actual = await payload.findByID({
+    collection: "marcas",
+    id: m.marca.id,
+    depth: 1,
+    overrideAccess: true,
+  });
+  const logoActual = typeof actual.logo === "object" && actual.logo ? actual.logo : null;
+  const esDeEjemplo = !!logoActual?.filename?.startsWith(PREFIJO);
   await payload.update({
     collection: "marcas",
     id: m.marca.id,
-    data: { fondoHero: m.marca.fondoHero, logo: m.marca.logo },
+    data: { fondoHero: m.marca.fondoHero, ...(esDeEjemplo ? { logo: m.marca.logo } : {}) },
     overrideAccess: true,
   });
 }

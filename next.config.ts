@@ -86,8 +86,26 @@ const nextConfig: NextConfig = {
    * porque no es una URL del sitio viejo, y así vale en todos los entornos
    * sin escribir en ninguna base. Si llega a ser una página, se quita esto.
    */
+  /*
+   * `/nosotros/trabaja-con-nosotros/` → el portal de empleo del cliente
+   * (decisión de dirección, 2026-10-14). El mapa de alcance lo redirige con 301
+   * a https://partequipos.buk.co/trabaja-con-nosotros en vez de ser una página
+   * propia, así que NO se construye la plantilla «Trabaja con nosotros» de
+   * Andrés: es una desviación del diseño anotada en
+   * docs/diseno/decisiones-indices-contacto.md. Es una URL del sitio actual
+   * (200 en el rastreo), pero va aquí y no en la colección `Redirects` porque
+   * el destino es externo y fijo, y así vale en todos los entornos sin tocar
+   * ninguna base. Si algún día es una página, se quita esto.
+   */
   async redirects() {
-    return [{ source: "/maquinaria/", destination: "/maquinaria-pesada/", statusCode: 301 }];
+    return [
+      { source: "/maquinaria/", destination: "/maquinaria-pesada/", statusCode: 301 },
+      {
+        source: "/nosotros/trabaja-con-nosotros/",
+        destination: "https://partequipos.buk.co/trabaja-con-nosotros",
+        statusCode: 301,
+      },
+    ];
   },
   async headers() {
     /*

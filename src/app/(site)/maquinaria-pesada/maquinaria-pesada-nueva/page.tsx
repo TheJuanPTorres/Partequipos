@@ -1,75 +1,25 @@
 import type { Metadata } from "next";
 
-import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
-import { JsonLd } from "@/components/seo/JsonLd";
-import { getCategoriasMaquinaria, getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
-import { rutas } from "@/lib/routes";
-import { metadataDe } from "@/lib/seo/metadata";
-import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
+import { ListadoNueva } from "@/components/nueva/ListadoNueva";
+import type { ParametrosURL } from "@/lib/filtros";
+import { cargarListadoNueva, metadataListadoNueva } from "@/lib/nueva/listado";
 
-const TITULO = "Maquinaria pesada nueva";
-const DESCRIPCION =
-  "Equipos nuevos organizados por marca y tipo, con ficha técnica y solicitud de cotización.";
+/**
+ * Índice de maquinaria NUEVA con la plantilla «Categoría secundaria» de ux-9
+ * (decisión de dirección, 2026-10-14): todos los equipos, con pestañas por
+ * categoría y los filtros del módulo común (`src/lib/nueva/listado.ts`). Las
+ * páginas siguientes viven en `pagina/[pagina]`.
+ *
+ * DINÁMICO a propósito, como los listados de usados: lee la query. Los datos
+ * salen de la caché de datos (`datos:nueva`), no de una consulta por visita.
+ */
+type Props = { searchParams: Promise<ParametrosURL> };
 
-export async function generateMetadata(): Promise<Metadata> {
-  return metadataDe({ nombre: TITULO, path: rutas.nueva(), descripcion: DESCRIPCION });
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  return metadataListadoNueva("indice", null, 1, await searchParams);
 }
 
-export default async function NuevaIndexPage() {
-  const [categorias, marcas] = await Promise.all([
-    getCategoriasMaquinaria(),
-    getMarcasMaquinaria(),
-  ]);
-
-  const breadcrumbs = [
-    { nombre: "Inicio", path: "/" },
-    { nombre: "Maquinaria pesada", path: rutas.maquinaria() },
-    { nombre: "Nueva", path: rutas.nueva() },
-  ];
-
-  const items = categorias.map((c) => ({
-    href: `${rutas.categoriaNueva(c.slug)}/`,
-    titulo: c.nombre,
-    descripcion: c.descripcion,
-    imagen: null,
-  }));
-
-  return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <Breadcrumbs items={breadcrumbs} />
-
-      <h1 className="text-3xl font-semibold text-gray-900">{TITULO}</h1>
-      <p className="mt-3 max-w-2xl text-gray-600">{DESCRIPCION}</p>
-
-      <section className="mt-8" aria-labelledby="categorias-heading">
-        <h2 id="categorias-heading" className="text-xl font-medium text-gray-900">
-          Por tipo de equipo
-        </h2>
-        <div className="mt-4">
-          <ListaEnlaces items={items} vacio="Todavía no hay categorías publicadas." />
-        </div>
-      </section>
-
-      <section className="mt-10" aria-labelledby="marcas-heading">
-        <h2 id="marcas-heading" className="text-xl font-medium text-gray-900">
-          Por marca
-        </h2>
-        <div className="mt-4">
-          <ListaEnlaces
-            items={[
-              {
-                href: `${rutas.marcasMaquinaria()}/`,
-                titulo: "Todas las marcas",
-                descripcion: `${marcas.length} ${marcas.length === 1 ? "marca disponible" : "marcas disponibles"}.`,
-                imagen: null,
-              },
-            ]}
-            vacio="Todavía no hay marcas publicadas."
-          />
-        </div>
-      </section>
-    </main>
-  );
+export default async function NuevaIndexPage({ searchParams }: Props) {
+  const { ambito, listado } = await cargarListadoNueva("indice", null, 1, await searchParams);
+  return <ListadoNueva ambito={ambito} pagina={1} listado={listado} />;
 }

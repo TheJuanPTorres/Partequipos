@@ -43,7 +43,16 @@ export const tituloPorDefecto = {
 const COLA_USADOS =
   "en venta en Colombia: unidades revisadas, con fotos, año, horas de uso y peso. Consulta la disponibilidad con Partequipos.";
 
+/**
+ * Lo mismo para los listados de maquinaria NUEVA («Categoría secundaria»,
+ * 2026-10-14): sin texto propio, no sale el general del sitio.
+ */
+const COLA_NUEVA =
+  "en Colombia: equipos con ficha técnica, peso operativo, potencia y motor. Cotiza con Partequipos.";
+
 export const descripcionPorDefecto = {
+  categoriaNueva: (categoria: string) =>
+    `${tituloPorDefecto.categoriaNueva(categoria)} ${COLA_NUEVA}`,
   categoriaUsada: (categoria: string) =>
     `${tituloPorDefecto.categoriaUsada(categoria)} ${COLA_USADOS}`,
   marcaUsada: (marca: string) => `${tituloPorDefecto.marcaUsada(marca)} ${COLA_USADOS}`,

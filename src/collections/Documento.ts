@@ -3,7 +3,7 @@ import type { CollectionConfig } from "payload";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
 import { almacenEsperado } from "./hooks/almacenEsperado";
 import { formatoDePdfPermitido } from "./hooks/formatoDePdfPermitido";
-import { revalidarDocumento } from "./hooks/maquinariaHooks";
+import { revalidarDocumento, revalidarDocumentoBorrado } from "./hooks/maquinariaHooks";
 import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
 import { sinRecorte } from "./hooks/sinRecorte";
 import { fechaActualizado } from "../lib/fields/fechasDeLista";
@@ -48,6 +48,7 @@ export const Documento: CollectionConfig = {
     beforeOperation: [almacenEsperado, sinDescargaRemota, sinRecorte, formatoDePdfPermitido],
     // Un PDF nuevo cambia de nombre (§10.32): las fichas que lo enlazan se revalidan.
     afterChange: [revalidarDocumento],
+    afterDelete: [revalidarDocumentoBorrado],
   },
   fields: [
     // «Última modificación» como fecha relativa en la lista (F3).

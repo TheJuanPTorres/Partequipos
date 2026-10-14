@@ -18,6 +18,12 @@ import { revalidateTag } from "next/cache";
 export const ETIQUETAS_DATOS = {
   /** Unidades usadas disponibles (con su primera foto) y categorías de usada. */
   usados: "datos:usados",
+  /**
+   * Equipos nuevos con lo que pinta su tarjeta (foto, logo de la marca, datos
+   * de la ficha, PDF), marcas, tipos y categorías de maquinaria nueva: el
+   * listado de «Categoría secundaria» (índice de nueva y sus categorías).
+   */
+  nueva: "datos:nueva",
 } as const;
 
 /**

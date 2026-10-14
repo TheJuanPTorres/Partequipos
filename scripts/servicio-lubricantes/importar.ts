@@ -243,6 +243,8 @@ async function existe(url: string): Promise<void> {
 
 const cuenta = { subidos: 0, reutilizados: 0, simulados: 0, dudosasSaltadas: 0 };
 const yaVistos = new Map<string, number>();
+/** Al simular, cada fichero se comprueba y se cuenta una sola vez aunque lo usen varios productos. */
+const simulados = new Set<string>();
 
 async function buscarFichero(
   coleccion: "media" | "videos" | "documentos",
@@ -285,8 +287,11 @@ async function imagen(foto: Foto, altSiVacio: string): Promise<number | null> {
     return ya;
   }
   if (modo === "simular") {
-    await existe(foto.url);
-    cuenta.simulados++;
+    if (!simulados.has(foto.url)) {
+      await existe(foto.url);
+      simulados.add(foto.url);
+      cuenta.simulados++;
+    }
     return null;
   }
   const bytes = await descargar(foto.url);
@@ -312,8 +317,11 @@ async function pdf(url: string | null, titulo: string): Promise<number | null> {
     return ya;
   }
   if (modo === "simular") {
-    await existe(url);
-    cuenta.simulados++;
+    if (!simulados.has(url)) {
+      await existe(url);
+      simulados.add(url);
+      cuenta.simulados++;
+    }
     return null;
   }
   const bytes = await descargar(url);
@@ -338,8 +346,11 @@ async function video(url: string, poster: number | null, descripcion: string) {
     return ya;
   }
   if (modo === "simular") {
-    await existe(url);
-    cuenta.simulados++;
+    if (!simulados.has(url)) {
+      await existe(url);
+      simulados.add(url);
+      cuenta.simulados++;
+    }
     return null;
   }
   if (!poster) fallar("el vídeo de cabecera necesita su póster");

@@ -319,6 +319,19 @@
   width: 100%;
 }
 
+/*
+ * Centrado con flex y no con text-align: así lo hacía el título de antes, que
+ * midió CLS 0 al llegar Inter (con text-align, Chrome cuenta el texto
+ * recentrado como desplazamiento: 0,0006–0,004 medido).
+ */
+.tituloLinea,
+.tituloArriba,
+.tituloAbajo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 /* La parte de arriba del título partido: solo en escritorio (ver abajo). */
 .titulo .tituloArriba {
   display: none;
@@ -362,7 +375,7 @@
 
   .titulo[data-partido] .tituloArriba,
   .tituloAbajo {
-    display: block;
+    display: flex;
   }
 }
 

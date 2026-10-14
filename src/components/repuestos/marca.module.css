@@ -146,7 +146,7 @@
   height: 10px;
   border-radius: 50px;
   background: var(--color-marca);
-  animation: ratonRueda 2.2s cubic-bezier(0.15, 0.41, 0.69, 0.94) 2 both;
+  animation: ratonRueda 2.2s cubic-bezier(0.15, 0.41, 0.69, 0.94) 2;
 }
 
 @keyframes ratonRueda {
@@ -186,16 +186,15 @@
   padding: 0;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 40px 0;
+  gap: 40px 70px;
   list-style: none;
 }
 
-/* Cuatro por fila, como ux-9; la última fila queda centrada. */
+/* Ancho natural; la última fila queda centrada. */
 .pildoraCaja {
   display: flex;
   box-sizing: border-box;
-  width: 25%;
-  padding: 0 10px;
+  max-width: 100%;
   justify-content: center;
 }
 
@@ -238,16 +237,12 @@ a.pildora:hover {
 
 @media (max-width: 1024px) {
   .pildoras {
-    gap: 24px 0;
+    gap: 24px 30px;
   }
 }
 
 /* ux-9 deja ver solo la 2.ª y la 3.ª en móvil (las otras tienen `hide_mobile`). */
 @media (max-width: 767px) {
-  .pildoraCaja {
-    width: 50%;
-  }
-
   .pildoraCaja:nth-child(1),
   .pildoraCaja:nth-child(n + 4) {
     display: none;
@@ -255,6 +250,7 @@ a.pildora:hover {
 
   .pildoras {
     margin-top: 20px;
+    gap: 16px 20px;
   }
 }
 
@@ -273,13 +269,15 @@ a.pildora:hover {
   margin: 40px 0 0;
   padding: 0;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: start;
+  align-items: stretch;
   gap: 10px 40px;
   list-style: none;
 }
 
 .tarjeta {
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .foto {
@@ -296,6 +294,8 @@ a.pildora:hover {
 .panel {
   position: relative;
   display: flex;
+  flex: 1;
+  justify-content: space-between;
   margin: -10px 20px 0;
   padding: 30px 20px 20px;
   flex-direction: column;
@@ -425,7 +425,6 @@ a.pildora:hover {
 
 .formulario fieldset {
   min-width: 0;
-  margin: 0;
   padding: 0;
   border: 0;
 }

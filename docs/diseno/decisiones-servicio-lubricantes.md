@@ -95,3 +95,11 @@ Llevan `dudosa: true` en el JSON del extractor e **importar las salta en cualqui
 - **Además, por el mismo criterio:** las fotos de 3 tarjetas de lubricantes. Por su nombre son de banco o de terceros: dos de Freepik y una de DeviantArt.
 
 **Para levantarlo:** el cliente confirma la licencia y se repite la importación en el sitio publicado, que ya no las saltaría si se quitan de `DUDOSAS`.
+
+## 5. Medido en el preview (2026-10-14)
+
+- **Importación:** 73 imágenes, 1 vídeo y 67 PDF; la segunda pasada no sube nada (155 reutilizados).
+- **HTML:** un `<h1>` por página; las anclas `taller`, `alistamiento`, `posventa`, `Siniestros` y `contacto` en servicio técnico, y las 4 líneas en lubricantes, con 67 fichas.
+- **Sitemap:** sin las subpáginas. Los 301 no se pueden comprobar en un preview (§10.22): allí las subpáginas dan 404.
+- **Pintado a 390, 1010 y 1440:** sin imágenes rotas, sin desborde horizontal y sin errores de consola. Nosotros, igual.
+- **Fallo encontrado al pintar y corregido:** la columna de imagen de «Presentación con imagen» tiene un alto mínimo de 677 px, medido para el mapa de Nosotros. Con una foto apaisada dejaba un hueco grande. Ahora, foto apaisada sin animación: sin ese alto mínimo y a todo el ancho de su columna. El mapa de Nosotros es vertical y no cambia.

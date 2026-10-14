@@ -307,13 +307,20 @@
   text-align: center;
 }
 
-/* Cada línea del panel, en su línea (y si no cabe, parte por palabras). */
+/*
+ * Cada línea del panel, en su línea (y si no cabe, parte por palabras). En
+ * BLOQUE y a todo el ancho: al llegar Inter el texto se re-centra dentro de su
+ * caja, pero la caja no se mueve (CLS 0, como en la fase 5).
+ */
+.tituloEntero,
+.tituloArriba,
 .tituloLinea {
   display: block;
+  width: 100%;
 }
 
 /* La parte de arriba del título partido: solo en escritorio (ver abajo). */
-.tituloArriba {
+.titulo .tituloArriba {
   display: none;
 }
 
@@ -748,6 +755,19 @@
     --hero-vidrio-derecha: 20px;
     --hero-vidrio-abajo: 30px;
   }
+
+  /*
+   * Por debajo de escritorio el título parte por palabras y, como en el diseño,
+   * cuanto más largo, más pequeño: a 1010, 65 px con 16 letras y 55 con 34
+   * (≈ 190cqi / letras). Y nunca más que la palabra más larga en su línea.
+   */
+  .titulo {
+    font-size: min(
+      var(--hero-titulo-tam),
+      calc(190cqi / var(--hero-titulo-total, 16)),
+      calc((100cqi - 40px) / (var(--hero-titulo-palabra, 10) * 0.62))
+    );
+  }
 }
 
 /*
@@ -759,10 +779,10 @@
   .hero {
     --hero-titulo-tam: 12vw;
     --hero-texto-arriba: 50px;
-    /* Controles (42 + 20) + aire + el vidrio (~120) + aire. */
+    /* Controles (42 + 20) + aire + el vidrio + aire. */
     --hero-vidrio-abajo: 70px;
     --hero-vidrio-derecha: 20px;
-    --hero-texto-abajo: 210px;
+    --hero-texto-abajo: 300px;
     --hero-maquina-lado: 20px;
     --hero-alto-min: 85vh;
     --hero-parrafo-tam: 13px;
@@ -780,6 +800,7 @@
   .titulo {
     font-size: min(
       var(--hero-titulo-tam),
+      calc(350cqi / var(--hero-titulo-total, 16)),
       calc((100cqi - 40px) / (var(--hero-titulo-palabra, 10) * 0.62))
     );
   }
@@ -788,7 +809,14 @@
     --hero-fila-relleno: 0px;
   }
 
+  /*
+   * Anclado por ARRIBA: al llegar Inter el párrafo puede ganar o perder una
+   * línea; así el vidrio crece hacia abajo y su esquina no se mueve (CLS 0).
+   * Abajo le quedan los controles: 300 − 70 de sitio.
+   */
   .vidrio {
+    top: calc(100% - var(--hero-texto-abajo) + 16px);
+    bottom: auto;
     width: min(280px, 100% - 2 * var(--hero-vidrio-derecha));
   }
 }

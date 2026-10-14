@@ -365,6 +365,7 @@ export function HeroPortada({ diapositivas }: Props) {
           d.tituloPartido ? d.tituloPartido.arriba.length : letras,
         ),
         ["--hero-titulo-palabra" as string]: String(palabra),
+        ["--hero-titulo-total" as string]: String(d.titulo.length),
       }}
     >
       <span className={estilos.soloLector}>{d.titulo}</span>

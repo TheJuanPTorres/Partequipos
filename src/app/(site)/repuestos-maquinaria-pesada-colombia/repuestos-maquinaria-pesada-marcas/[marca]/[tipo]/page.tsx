@@ -2,18 +2,29 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
+import { SeccionTestimonios } from "@/components/portada/diferidos";
+import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
+import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { ModelosTipo } from "@/components/repuestos/ModelosTipo";
+import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
+import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getMarcaPorSlug } from "@/lib/queries/getMarcas";
 import { getModelosDeTipo } from "@/lib/queries/getModelos";
+import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
+import { getEmpresa } from "@/lib/queries/getSeo";
 import { getTipoPorSlug, getTipos } from "@/lib/queries/getTipos";
+import { enlacesDeModelos, vistaEncabezadoTipo } from "@/lib/repuestos/tipo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
-import { imagenDeMedia, poblado } from "@/lib/utils/relations";
-import type { Marca } from "@/payload-types";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
+import { turnstileSiteKey } from "@/lib/turnstile";
+import { poblado } from "@/lib/utils/relations";
+import { enlaceWhatsApp } from "@/lib/whatsapp";
+import type { Marca } from "@/payload-types";
 
 type Params = { marca: string; tipo: string };
 
@@ -54,13 +65,29 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
+/** Ancla de la franja de modelos: a ella baja el icono de ratón del encabezado. */
+const ANCLA_MODELOS = "modelos-repuestos";
+
+/**
+ * PÁGINA DE TIPO — PROVISIONAL hasta el diseño de Andrés
+ * (docs/diseno/decisiones-repuestos-marca.md §6): el mismo lenguaje visual que
+ * la página de marca (encabezado, franja amarilla, contacto y testimonios),
+ * con los modelos del tipo como enlaces a sus fichas.
+ */
 export default async function TipoPage({ params }: { params: Promise<Params> }) {
   const data = await resolver(await params);
   if (!data) notFound();
 
   const { marca, tipo } = data;
-  const modelos = await getModelosDeTipo(tipo.id);
+  const [global, modelos, testimonios, empresa] = await Promise.all([
+    getRepuestosMarca(),
+    getModelosDeTipo(tipo.id),
+    getTestimoniosDePortada(),
+    getEmpresa(),
+  ]);
 
+  const texto = (v: string | null | undefined) => v?.trim() ?? "";
+  const nombreTipo = tipo.nombre.toLowerCase();
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
     { nombre: "Repuestos", path: rutas.repuestos() },
@@ -69,38 +96,39 @@ export default async function TipoPage({ params }: { params: Promise<Params> }) 
     { nombre: tipo.nombre, path: rutas.tipo(marca.slug, tipo.slug) },
   ];
 
-  const items = modelos.map((modelo) => {
-    const primeraImagen = Array.isArray(modelo.imagenes) ? modelo.imagenes[0] : null;
-    return {
-      href: rutas.modelo(marca.slug, tipo.slug, modelo.slug),
-      titulo: modelo.nombre,
-      descripcion: modelo.codigo ? `Código ${modelo.codigo}` : null,
-      imagen: imagenDeMedia(primeraImagen, modelo.nombre),
-    };
-  });
-
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <Breadcrumbs items={breadcrumbs} />
+      <div className={estilos.migas}>
+        <Breadcrumbs items={breadcrumbs} />
+      </div>
 
-      <h1 className="text-3xl font-semibold text-gray-900">
-        Repuestos para {tipo.nombre.toLowerCase()} {marca.nombre}
-      </h1>
+      <HeroMarca vista={vistaEncabezadoTipo(marca, tipo, global)} anclaSiguiente={ANCLA_MODELOS} />
 
-      {tipo.descripcion ? <p className="mt-3 max-w-2xl text-gray-600">{tipo.descripcion}</p> : null}
+      <ModelosTipo
+        id={ANCLA_MODELOS}
+        titulo={`Modelos de ${nombreTipo} ${marca.nombre}`}
+        modelos={enlacesDeModelos(marca, tipo, modelos)}
+        vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
+      />
 
-      <section className="mt-8" aria-labelledby="modelos-heading">
-        <h2 id="modelos-heading" className="text-xl font-medium text-gray-900">
-          Modelos de {tipo.nombre.toLowerCase()} {marca.nombre}
-        </h2>
-        <div className="mt-4">
-          <ListaEnlaces
-            items={items}
-            vacio={`Todavía no hay modelos publicados para ${tipo.nombre.toLowerCase()} ${marca.nombre}.`}
-          />
-        </div>
-      </section>
+      <ContactoMarca
+        titulo={texto(global.contactoTitulo)}
+        subtitulo={texto(global.contactoSubtitulo)}
+        boton={texto(global.contactoBoton)}
+        origen={rutas.tipo(marca.slug, tipo.slug)}
+        siteKey={turnstileSiteKey()}
+        whatsapp={empresa ? enlaceWhatsApp(empresa.whatsapp) : undefined}
+        marca={`${nombreTipo} ${marca.nombre}`}
+      />
+
+      <SeccionTestimonios
+        tarjetas={tarjetasDeTestimonios(testimonios)}
+        textos={{
+          titulo: texto(global.testimoniosTitulo),
+          verVideoTexto: texto(global.verVideoTexto),
+        }}
+      />
     </main>
   );
 }

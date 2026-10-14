@@ -746,7 +746,13 @@ a.pildora:hover {
     gap: 12px;
   }
 
+  /* Dos por fila: el ancho es del <li>, la placa lo llena. */
+  .placasLista > li {
+    display: flex;
+    flex: 0 0 calc(50% - 6px);
+  }
+
   .placaMarca {
-    width: calc(50% - 6px);
+    width: 100%;
   }
 }

@@ -113,14 +113,27 @@ los textos y las seis tarjetas de cada página** (título y enlace), sin imágen
 
 ## 7. Imágenes
 
-`npm run preview:indices:sembrar` / `:retirar` (solo preview, con manifiesto): sube las fotos de las tarjetas **de la web
-original** (suyas) y las de Andrés (fondos, foto y máquina de Contáctanos: L3, «EJEMPLO UX-9 —»), para ver el diseño
-completo en el preview.
+`npm run preview:indices:sembrar` / `:retirar` (solo preview, con manifiesto): sube las fotos de las tarjetas y las
+cuatro de los huecos (fondos de los encabezados, foto y máquina de Contáctanos), **todas de la web original del
+cliente** (`partequipos.com`). Las de Andrés (L3) ya no se usan.
 
-**En PRODUCCIÓN, solo las 10 fotos del cliente** (decisión de dirección, 2026-10-14): las 4 de Andrés (L3) no se suben;
-«contenido real, y donde no haya foto real, sin foto». Las páginas lo toleran: el encabezado queda en tono oscuro y
-Contáctanos pinta el formulario a todo el ancho, sin foto ni máquina. Pasos en `runbook-indices-produccion.md` (en
-`partequipos-cierre`), con los ficheros listos en `partequipos-diseno\wordpress\indices\assets\`.
+**Fotos reales de los huecos** (propuesta del agente D, 2026-10-14; buscadas en la biblioteca completa de la web original,
+20.002 imágenes, sin las galerías de unidades usadas):
+
+| Hueco               | Elegida                                                          | Por qué                                                                                 | Descartadas                                                                                                                 |
+| ------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Fondo de repuestos  | `PARA-REPUESTOS-BANNER-PPAL` (2022/04), cadena de tren de rodaje | Es el banner principal de repuestos de su web; oscura y metálica, deja leer texto claro | Baldes en bodega, filtros STAL (fondo blanco: no sirve bajo texto claro)                                                    |
+| Fondo de maquinaria | `maquinaria-hitachi-001` (2024/05), Hitachi en un patio          | Es su banner de maquinaria; máquina del color de marca                                  | Retroexcavadora CASE, CAT 966H sobre fondo blanco                                                                           |
+| Foto de Contáctanos | `Tecnico-partequipos-Sede-guarne` (2022/05), recorte vertical    | Única foto **de su gente trabajando** que cabe en un retrato                            | Equipo con camisas rojas (horizontal: en vertical se cortan personas); fotos de _call center_ y manos con piezas (de banco) |
+| Máquina decorativa  | `pc210lc-10.png`, excavadora Komatsu                             | PNG con **transparencia real**, 1280 × 830                                              | Los otros recortes con alfa son de baja resolución o conservan fondo blanco                                                 |
+
+**Avisos:** la Komatsu es probablemente foto de catálogo del fabricante (confirmar con el cliente); la del técnico ya la
+usa la tarjeta de servicio técnico (misma persona, otro recorte). **No hay** foto de asesores comerciales en retrato: si
+se quiere una mejor, la tiene que hacer el cliente.
+
+**En PRODUCCIÓN:** las 10 de las tarjetas, y las 4 de los huecos **si dirección las aprueba** (runbook §1b); si no, esos
+huecos quedan vacíos y las páginas lo toleran. Pasos en `runbook-indices-produccion.md` (en `partequipos-cierre`), con
+los ficheros listos en `partequipos-diseno\wordpress\indices\assets\`.
 
 ## 8. Coordinación
 

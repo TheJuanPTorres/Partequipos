@@ -270,6 +270,8 @@ $posiciones: (
    * así que aquí tampoco se altera la del panel.
    * ------------------------------------------------------------------- */
   --font-body: var(--pq-font-sans), ui-sans-serif, system-ui, sans-serif;
+  /* El editor de texto enriquecido de Payload usa --font-serif; el sitio pinta ese texto en Inter: el editor ve la misma letra que se publica (2026-10-13). */
+  --font-serif: var(--font-body);
   --font-mono: var(--pq-font-mono), ui-monospace, monospace;
 
   /* ---------------------------------------------------------------------

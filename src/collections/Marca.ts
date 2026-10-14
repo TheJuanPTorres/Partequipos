@@ -13,8 +13,8 @@ const menu = revalidarMegamenu("marcas");
 export const Marca: CollectionConfig = {
   slug: "marcas",
   labels: {
-    singular: "Marca",
-    plural: "Marcas",
+    singular: "Marca de repuestos",
+    plural: "Marcas de repuestos",
   },
   admin: {
     useAsTitle: "nombre",
@@ -45,12 +45,20 @@ export const Marca: CollectionConfig = {
       name: "descripcion",
       type: "textarea",
       label: "Descripción",
+      admin: {
+        description:
+          "Presentación bajo el título de la página de la marca. También sirve de descripción en Google si no hay otra.",
+      },
     },
     {
       name: "logo",
       type: "upload",
       relationTo: "media",
       label: "Logo",
+      admin: {
+        description:
+          "Con fondo transparente (PNG o WebP). En la página de la marca va sobre una placa oscura, porque los logos actuales del cliente son blancos.",
+      },
     },
     /*
      * Página de marca de ux-9 (docs/diseno/decisiones-repuestos-marca.md).

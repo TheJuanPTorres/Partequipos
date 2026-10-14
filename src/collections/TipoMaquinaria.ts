@@ -14,7 +14,7 @@ const menu = revalidarMegamenu("tipos-maquinaria");
  */
 export const TipoMaquinaria: CollectionConfig = {
   slug: "tipos-maquinaria",
-  labels: { singular: "Tipo de maquinaria", plural: "Tipos de maquinaria" },
+  labels: { singular: "Tipo de maquinaria nueva", plural: "Tipos de maquinaria nueva" },
   admin: {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "marca", "slug"],

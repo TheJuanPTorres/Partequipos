@@ -109,9 +109,13 @@ export default function SeoGuiado() {
   // La ruta de «Ver en el sitio» es relativa: «/» solo en la portada, que es
   // lo único que `tituloConMarca` mira de ella.
   const tituloPublicado = titulo ? tituloConMarca(titulo, previewURL ?? "") : "";
+  // Lo mismo que la página: el campo de descripción, o la propia de la
+  // colección (usados), o la general del sitio.
+  const descripcionPropia =
+    regla.descripcion && valores.nombre.trim() ? regla.descripcion(valores.nombre.trim()) : null;
   const descripcionPorDefecto = valores.base.trim()
     ? recortarDescripcion(valores.base)
-    : seoConfig.defaultDescription;
+    : (descripcionPropia ?? seoConfig.defaultDescription);
   const descripcion = recortarDescripcion(valores.metaDescription.trim() || descripcionPorDefecto);
 
   const dominio = (process.env.NEXT_PUBLIC_SERVER_URL ?? "https://partequipos.com")
@@ -152,7 +156,9 @@ export default function SeoGuiado() {
           Si la dejas vacía:{" "}
           {valores.base.trim()
             ? `el texto de «${ETIQUETA_CAMPO[regla.campoDescripcion]}»`
-            : `el texto general del sitio («${seoConfig.defaultDescription}»)`}
+            : descripcionPropia
+              ? `«${descripcionPropia}»`
+              : `el texto general del sitio («${seoConfig.defaultDescription}»)`}
           .
         </li>
         <li>

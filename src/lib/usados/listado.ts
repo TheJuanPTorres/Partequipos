@@ -25,7 +25,7 @@ import { rutas } from "../routes";
 import { absoluteUrl, indexacionPermitida } from "../seo/config";
 import { metadataDe } from "../seo/metadata";
 import { METADATA_404 } from "../seo/noEncontrada";
-import { tituloPorDefecto } from "../seo/porDefecto";
+import { descripcionPorDefecto, tituloPorDefecto } from "../seo/porDefecto";
 import { CATALOGO_USADOS, CATALOGO_USADOS_MARCA, type UnidadFiltrable } from "./filtros";
 import { categoriaUsadaIndexable } from "./heredadas";
 import { POR_PAGINA } from "./paginacion";
@@ -165,19 +165,26 @@ export async function metadataListadoUsado(
   const ambito = await ambitoDe(tipo, slug);
   if (!ambito) return METADATA_404;
   const { registro, titulo } = ambito;
+  // Sin descripción del registro, la propia del marketplace (no la general
+  // del sitio, que habla de repuestos). La misma que enseña el panel.
+  const descripcionBase =
+    registro.descripcion?.trim() ||
+    (tipo === "categoria"
+      ? descripcionPorDefecto.categoriaUsada(registro.nombre)
+      : descripcionPorDefecto.marcaUsada(registro.nombre));
 
   let base: Metadata;
   if (pagina === 1) {
     base = await metadataDe({
       nombre: titulo,
       path: ambito.ruta(1),
-      descripcion: registro.descripcion,
+      descripcion: descripcionBase,
       seo: registro.seo,
     });
   } else {
     // Sin «página n», Google vería varias URL con el mismo título.
     const tituloBase = registro.seo?.metaTitle?.trim() || titulo;
-    const descripcion = registro.seo?.metaDescription?.trim() || registro.descripcion;
+    const descripcion = registro.seo?.metaDescription?.trim() || descripcionBase;
     base = await metadataDe({
       nombre: `${tituloBase} · página ${pagina}`,
       path: ambito.ruta(pagina),

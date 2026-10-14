@@ -116,7 +116,7 @@ const ANCHOS = [
   { nombre: "1440", viewport: { width: 1440, height: 900 }, movil: false },
   { nombre: "movil", viewport: { width: 390, height: 844 }, movil: true },
 ];
-const PANTALLAS = [
+const PANTALLAS_TODAS = [
   { nombre: "portada", ruta: "/admin" },
   { nombre: "imagenes", ruta: "/admin/collections/media" },
   { nombre: "paginas", ruta: "/admin/collections/paginas" },
@@ -128,7 +128,7 @@ const PANTALLAS = [
   { nombre: "ficha-producto", ruta: "/admin/globals/ficha-producto" },
 ];
 // Formularios de edición: el primer registro de cada lista.
-const FORMULARIOS = [
+const FORMULARIOS_TODOS = [
   { nombre: "formulario-modelo", coleccion: "modelos-repuesto" },
   // Sin página propia: el SEO guiado tiene que decirlo.
   { nombre: "formulario-categoria-tecnica", coleccion: "categorias-tecnicas" },
@@ -139,6 +139,30 @@ const FORMULARIOS = [
     filtro: "?where[fichaTecnicaPdf][exists]=true",
   },
 ];
+/*
+ * Modo `nuevos` (`npm run panel:revision -- <preview> nuevos`): solo lo que ha
+ * entrado en el panel desde la última revisión (2026-10-13): las marcas de
+ * usados y su campo en los equipos, y lo nuevo de repuestos (fondo de la
+ * marca, imagen del tipo, orden e icono de las categorías técnicas y el
+ * global de las páginas de marca). Menos pantallas: menos memoria y tiempo.
+ */
+const PANTALLAS_NUEVAS = [
+  { nombre: "portada", ruta: "/admin" },
+  { nombre: "lista-marcas-usada", ruta: "/admin/collections/marcas-usada" },
+  { nombre: "lista-equipos-usados", ruta: "/admin/collections/equipos-usados" },
+  { nombre: "lista-categorias-tecnicas", ruta: "/admin/collections/categorias-tecnicas" },
+  { nombre: "repuestos-marca", ruta: "/admin/globals/repuestos-marca" },
+];
+const FORMULARIOS_NUEVOS = [
+  { nombre: "formulario-marca-usada", coleccion: "marcas-usada" },
+  { nombre: "formulario-equipo-usado", coleccion: "equipos-usados" },
+  { nombre: "formulario-marca-repuestos", coleccion: "marcas" },
+  { nombre: "formulario-tipo-repuestos", coleccion: "tipos-equipo" },
+  { nombre: "formulario-categoria-tecnica", coleccion: "categorias-tecnicas" },
+  { nombre: "formulario-equipo-nuevo", coleccion: "equipos-nuevos" },
+];
+const PANTALLAS = MODO === "nuevos" ? PANTALLAS_NUEVAS : PANTALLAS_TODAS;
+const FORMULARIOS = MODO === "nuevos" ? FORMULARIOS_NUEVOS : FORMULARIOS_TODOS;
 // Palabras inglesas que no deberían verse en un panel en español.
 const INGLES =
   /\b(Create New|Search|Filters?|Columns|Loading|Save|Delete|Upload|Collections|Globals|Dashboard|Log ?out|Sign in|Login|No results|Nothing found|Per Page|Sort|Edit|Back|Settings|Previous|Next)\b/;

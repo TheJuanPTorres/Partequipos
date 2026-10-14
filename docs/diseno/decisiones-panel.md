@@ -880,3 +880,29 @@ consola dice «SEO con campos» o «SEO SIN CAMPOS».
 **De paso:** queda pintado el caso del §26 que faltaba. Con el título vacío,
 la vista del equipo nuevo dice «Excavadora Hitachi ZX350LC-5B | Partequipos»,
 con la marca añadida.
+
+## 28. El panel al día con el marketplace de usados y las páginas de marca de repuestos (2026-10-13)
+
+Revisión con `npm run panel:revision -- <preview> nuevos`. Es un modo nuevo:
+solo recorre lo que ha entrado (marcas de usados, equipos usados, marca y
+tipo de repuestos, categorías técnicas, el global de las páginas de marca y
+una ficha nueva importada por A). Se pasó a 1440 y en móvil, con el turno de
+`MEDICION.md`. Capturas en `partequipos-cierre\capturas\panel-2026-10-14-02-36-nuevos`.
+
+| Qué se vio                                                                                                                       | Arreglo (sin esquema)                                                                                |
+| -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| La ayuda de «Equipos usados» decía «no genera URLs propias» y «su categoría»                                                     | Ahora: sale en la página de su categoría y en la de su marca, con filtros                            |
+| El buscador decía «Buscar por … Marca (texto)»                                                                                   | El campo oculto se llama «Marca»                                                                     |
+| Tres colecciones de marcas y dos de tipos con nombres parecidos                                                                  | «Marcas de repuestos», «Marcas de maquinaria nueva», «Tipos de maquinaria nueva» (solo etiquetas)    |
+| La descripción de Google por defecto de las páginas de usados hablaba de repuestos                                               | `descripcionPorDefecto` en `porDefecto.ts`, la misma en el sitio y en la vista de Google del panel   |
+| Sin ayuda: descripción y logo de las marcas (usada y repuestos), descripción del tipo, icono y enlace de las categorías técnicas | Ayudas que dicen dónde sale cada cosa. El logo de la marca usada aún no se pinta, y la ayuda lo dice |
+| El global de las páginas de marca no decía qué pasa con un título vacío                                                          | Cada campo dice qué sección esconde (comprobado en sus componentes)                                  |
+| El editor de texto enriquecido pinta en una letra con remates (`--font-serif` de Payload) y el sitio, en Inter                   | `--font-serif: var(--font-body)` en `custom.scss`: el editor ve la letra que se publica              |
+
+**La portada del panel** ya contaba bien lo nuevo: «Marcas de maquinaria usada», «Equipos usados» con sus disponibles y el global «Páginas de marca de repuestos». Se arma desde la configuración.
+
+**Hallazgos que no son del panel** (en `ESTADO.md`, para su dueño):
+
+- **Para B:** 2 descripciones de usados disponibles del preview conservan la palabra «serial» con un código. No se copia aquí.
+- **Para A:** la ficha «Retrocargadora Case Construction 851 FX Tier4» trae una descripción para buscadores de otro modelo.
+- **Para dirección:** las marcas de repuestos no tenían bloque SEO. Dirección aprobó añadirlo, con su migración, en un PR aparte. Los tipos de repuestos ya lo tienen.

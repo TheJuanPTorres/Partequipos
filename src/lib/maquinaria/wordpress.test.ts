@@ -175,7 +175,7 @@ describe("CORRECCIONES_WP", () => {
         ruta,
         /^\/maquinaria-pesada\/maquinaria-pesada-nueva\/marcas\/[^/]+\/[^/]+\/[^/]+\/$/,
       );
-      assert.ok(c.sinPdf || c.sinTituloSeo, ruta);
+      assert.ok(c.sinPdf || c.sinTituloSeo || c.sinDescripcionSeo, ruta);
     }
   });
 });

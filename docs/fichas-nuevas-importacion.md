@@ -74,10 +74,11 @@ Decisión de dirección (2026-10-13): se corrigen aquí (`CORRECCIONES_WP` en
 `src/lib/maquinaria/wordpress.ts`) y **el cliente debería corregirlos también
 en su web** mientras siga publicada:
 
-| Ficha                                          | Error en WordPress                               | Al importar                                   |
-| ---------------------------------------------- | ------------------------------------------------ | --------------------------------------------- |
-| `bulldozer-case-construction-1150m`            | El botón «Ficha técnica» abre el PDF de la 1650M | Sin PDF                                       |
-| `retrocargadora-case-construction-580sv-tier4` | El `<title>` dice «580N»                         | Sin título propio: sale el nombre de la ficha |
+| Ficha                                           | Error en WordPress                                     | Al importar                                    |
+| ----------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------- |
+| `bulldozer-case-construction-1150m`             | El botón «Ficha técnica» abre el PDF de la 1650M       | Sin PDF                                        |
+| `retrocargadora-case-construction-580sv-tier4`  | El `<title>` dice «580N»                               | Sin título propio: sale el nombre de la ficha  |
+| `retrocargadora-case-construction-851-fx-tier4` | La meta descripción habla de la 570 ST (hallazgo de C) | Sin descripción propia: sale la de por defecto |
 
 ## 5. Tope de los PDF: 30 MB
 

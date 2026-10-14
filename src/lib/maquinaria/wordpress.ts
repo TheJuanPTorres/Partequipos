@@ -215,10 +215,14 @@ export function enlacesDe(html: string): string[] {
  * dirección, 2026-10-13). Están anotados para que el cliente los corrija
  * también en su web (`docs/fichas-nuevas-importacion.md`). Por ruta.
  */
-export const CORRECCIONES_WP: Readonly<Record<string, { sinPdf?: string; sinTituloSeo?: string }>> =
-  {
-    "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/bulldozer/bulldozer-case-construction-1150m/":
-      { sinPdf: "WordPress enlaza el PDF de otro modelo (1650M)" },
-    "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/retrocargadora-case-construction-580sv-tier4/":
-      { sinTituloSeo: "el <title> de WordPress nombra otro modelo (580N)" },
-  };
+export const CORRECCIONES_WP: Readonly<
+  Record<string, { sinPdf?: string; sinTituloSeo?: string; sinDescripcionSeo?: string }>
+> = {
+  "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/bulldozer/bulldozer-case-construction-1150m/":
+    { sinPdf: "WordPress enlaza el PDF de otro modelo (1650M)" },
+  "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/retrocargadora-case-construction-580sv-tier4/":
+    { sinTituloSeo: "el <title> de WordPress nombra otro modelo (580N)" },
+  // Hallazgo de C (2026-10-13): su meta descripción es la de la 570 ST.
+  "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/retrocargadora-case-construction-851-fx-tier4/":
+    { sinDescripcionSeo: "la meta descripción de WordPress habla de otro modelo (570 ST)" },
+};

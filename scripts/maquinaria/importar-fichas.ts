@@ -321,9 +321,11 @@ for (const f of fichas) {
   if (!fotos.length) avisosFicha.push("sin fotos");
 
   const correccion = CORRECCIONES_WP[f.ruta] ?? {};
-  const correcciones = [correccion.sinPdf, correccion.sinTituloSeo].filter((c): c is string =>
-    Boolean(c),
-  );
+  const correcciones = [
+    correccion.sinPdf,
+    correccion.sinTituloSeo,
+    correccion.sinDescripcionSeo,
+  ].filter((c): c is string => Boolean(c));
   const urlPdf = correccion.sinPdf
     ? null
     : (f.botones.find((b) => /\.pdf(\?|$)/i.test(b.url))?.url ?? null);
@@ -359,7 +361,7 @@ for (const f of fichas) {
     pdf: urlPdf && pdfPlan ? { url: urlPdf, fichero: pdfPlan.fichero } : null,
     seo: {
       metaTitle: correccion.sinTituloSeo ? null : tituloSeo(v?.titulo, nombre),
-      metaDescription: descripcionSeo(v?.descripcion),
+      metaDescription: correccion.sinDescripcionSeo ? null : descripcionSeo(v?.descripcion),
     },
     correcciones,
     avisos: avisosFicha,
@@ -784,8 +786,11 @@ for (const p of tanda) {
   // Ya existía (por el plan, o creada en una tanda anterior): se actualiza.
   const creadaAntes = manifiesto.creado.equipos.find((e) => e.ruta === p.ruta)?.id ?? null;
   const id = p.idActual ?? creadaAntes;
+  // Solo las que existían ANTES de la importación tienen valor de antes que
+  // devolver; las que creó una tanda anterior se retiran borrándolas.
+  const yaExistia = p.idActual !== null && creadaAntes === null;
   if (id !== null) {
-    if (p.idActual !== null && !manifiesto.anteriores[String(id)]) {
+    if (yaExistia && !manifiesto.anteriores[String(id)]) {
       const antes = await payload.findByID({
         collection: "equipos-nuevos",
         id,
@@ -810,7 +815,7 @@ for (const p of tanda) {
       guardarManifiesto();
     }
     await payload.update({ collection: "equipos-nuevos", id, data, overrideAccess: true });
-    if (p.idActual !== null && !manifiesto.actualizados.some((e) => e.id === id)) {
+    if (yaExistia && !manifiesto.actualizados.some((e) => e.id === id)) {
       manifiesto.actualizados.push({ ruta: p.ruta, id });
     }
     guardarManifiesto();

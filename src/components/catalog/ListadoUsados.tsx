@@ -64,10 +64,13 @@ export function ListadoUsados({
   if (pagina > 1) {
     breadcrumbs.push({ nombre: `Página ${pagina}`, path: ambito.ruta(pagina) });
   }
+  // Sin ninguna unidad (no por los filtros): un estado vacío amable en lugar
+  // de «0 unidades disponibles», con el camino a contactar.
+  const sinUnidades = totalSinFiltros === 0;
   const vacio =
     ambito.tipo === "categoria"
-      ? "No hay unidades disponibles en esta categoría ahora mismo. El inventario cambia con frecuencia: escríbenos y te avisamos cuando entre una."
-      : "No hay unidades disponibles de esta marca ahora mismo. El inventario cambia con frecuencia: escríbenos y te avisamos cuando entre una.";
+      ? "Por ahora no hay unidades disponibles en esta categoría"
+      : "Por ahora no hay unidades disponibles de esta marca";
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
@@ -111,9 +114,11 @@ export function ListadoUsados({
         <section aria-labelledby="unidades-heading" className="mt-6 lg:col-start-2 lg:mt-0">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 id="unidades-heading" className="text-xl font-medium text-gray-900">
-              {listado.filtrado && total !== totalSinFiltros
-                ? `${total} de ${totalSinFiltros} ${totalSinFiltros === 1 ? "unidad disponible" : "unidades disponibles"}`
-                : `${total} ${total === 1 ? "unidad disponible" : "unidades disponibles"}`}
+              {sinUnidades
+                ? vacio
+                : listado.filtrado && total !== totalSinFiltros
+                  ? `${total} de ${totalSinFiltros} ${totalSinFiltros === 1 ? "unidad disponible" : "unidades disponibles"}`
+                  : `${total} ${total === 1 ? "unidad disponible" : "unidades disponibles"}`}
               {paginas > 1 ? (
                 <span className="font-normal text-gray-600">
                   {" "}
@@ -131,11 +136,22 @@ export function ListadoUsados({
             />
           </div>
 
-          {unidades.length === 0 ? (
+          {sinUnidades ? (
+            <div className="mt-4 rounded border border-dashed border-gray-300 p-6 text-center text-gray-600">
+              <p>
+                El inventario cambia con frecuencia. Cuéntanos qué máquina buscas y te avisamos
+                cuando entre una.
+              </p>
+              <Link
+                href="/contactanos/"
+                className="mt-3 inline-block font-medium text-gray-900 underline underline-offset-2"
+              >
+                Contáctanos
+              </Link>
+            </div>
+          ) : unidades.length === 0 ? (
             <p className="mt-4 rounded border border-dashed border-gray-300 p-6 text-center text-gray-600">
-              {totalSinFiltros === 0
-                ? vacio
-                : "Ninguna unidad cumple estos filtros. Quita alguno para ver más."}
+              Ninguna unidad cumple estos filtros. Quita alguno para ver más.
             </p>
           ) : (
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">

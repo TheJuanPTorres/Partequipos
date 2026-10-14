@@ -75,13 +75,18 @@
   text-align: center;
 }
 
+/*
+ * Placa OSCURA: los logos que entrega el cliente son BLANCOS y no se ven sobre
+ * fondo claro (decisión de dirección, 2026-10-13). Cuando lleguen las versiones
+ * en color, se vuelve a la placa blanca de ux-9.
+ */
 .placa {
   display: flex;
-  padding: 0 20px;
+  padding: 12px 20px;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: var(--color-fondo);
+  background: var(--color-texto);
 }
 
 /* El logo mide 131 de ancho y, como mucho, 87 de alto (medido); la placa blanca le suma 20 a cada lado. */

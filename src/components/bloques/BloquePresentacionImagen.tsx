@@ -40,7 +40,13 @@ export function BloquePresentacionImagen({
     <section className={estilos.seccion}>
       {/* Sin imagen ni animación no hay columna: el texto ocupa el ancho. */}
       {imagen || animacion ? (
-        <div className={estilos.columnaImagen}>
+        <div
+          className={`${estilos.columnaImagen} ${
+            // Foto apaisada sin animación (servicio técnico): sin el alto mínimo
+            // de la caja del mapa de Nosotros, que dejaba un hueco grande.
+            imagen && !animacion && imagen.width > imagen.height ? estilos.columnaApaisada : ""
+          }`}
+        >
           {animacion ? (
             <AnimacionLottie
               src={animacion.url}

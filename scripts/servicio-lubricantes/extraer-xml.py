@@ -265,7 +265,7 @@ def lubricantes(paginas):
     for slug in ("auto-liviano", "auto-pesado", "engranajes", "motos-scooter"):
         productos, entradilla = productos_de(slug, paginas[slug])
         # Engranajes y motos repiten el texto de la marca: no es suyo.
-        if entradilla and entradilla[:60] == texto_marca[:60]:
+        if entradilla and entradilla[:60].lower() == texto_marca[:60].lower():
             entradilla = None
         categorias.append(
             {

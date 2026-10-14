@@ -29,6 +29,16 @@
   justify-content: center;
 }
 
+/* Foto apaisada sin animación: la caja mide lo que la foto, y la foto, toda la columna. */
+.columnaApaisada {
+  min-height: 0;
+}
+
+.columnaApaisada .imagen {
+  width: 100%;
+  border-radius: 8px;
+}
+
 .imagen {
   width: 455px;
   max-width: 100%;

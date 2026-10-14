@@ -48,6 +48,9 @@ export async function enviarSolicitud(
           correo: datos.correo,
           telefono: datos.telefono,
           empresa: datos.empresa,
+          interes: datos.interes as "cotizar" | "muestras" | "asesoria" | "otro" | undefined,
+          perfil: datos.perfil as
+            "empresa" | "comprador" | "emprendedor" | "proveedor" | "empleado" | "otro" | undefined,
           mensaje: datos.mensaje,
           referenciaTexto: datos.referenciaTexto,
           origen: datos.origen,

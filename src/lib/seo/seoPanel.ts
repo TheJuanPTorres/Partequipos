@@ -1,6 +1,6 @@
 import type { CollectionSlug } from "payload";
 
-import { tituloPorDefecto } from "./porDefecto";
+import { descripcionPorDefecto, tituloPorDefecto } from "./porDefecto";
 
 /**
  * Para el panel: de dónde saca cada página su título, su descripción y su
@@ -21,6 +21,8 @@ export type ReglaSeo = {
   titulo: (nombre: string, n: Nombres) => string | null;
   /** Campo cuyo texto es la descripción por defecto. */
   campoDescripcion: "descripcion" | "entradilla";
+  /** Si ese campo también está vacío: una descripción propia (si no, la general del sitio). */
+  descripcion?: (nombre: string) => string;
   /** Qué imagen gana a «Imagen al compartir en redes», dicho para el editor. */
   imagen: string | null;
 };
@@ -72,12 +74,14 @@ export const SEO_POR_COLECCION: Partial<Record<CollectionSlug, ReglaSeo>> = {
     campoNombre: "nombre",
     titulo: tituloPorDefecto.categoriaUsada,
     campoDescripcion: "descripcion",
+    descripcion: descripcionPorDefecto.categoriaUsada,
     imagen: null,
   },
   "marcas-usada": {
     campoNombre: "nombre",
     titulo: tituloPorDefecto.marcaUsada,
     campoDescripcion: "descripcion",
+    descripcion: descripcionPorDefecto.marcaUsada,
     imagen: null,
   },
   "marcas-lubricante": {

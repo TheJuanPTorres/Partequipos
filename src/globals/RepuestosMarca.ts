@@ -73,8 +73,21 @@ export const RepuestosMarca: GlobalConfig = {
       label: "Segunda línea, tras el nombre de la marca",
       admin: { description: "Ej.: «En Colombia» → «CATERPILLAR En Colombia»." },
     },
-    { name: "tituloCategorias", type: "text", label: "Título de las categorías" },
-    { name: "tituloTipos", type: "text", label: "Título de los tipos de máquina" },
+    {
+      name: "tituloCategorias",
+      type: "text",
+      label: "Título de las categorías",
+      admin: { description: "Vacío: la franja de categorías no se pinta." },
+    },
+    {
+      name: "tituloTipos",
+      type: "text",
+      label: "Título de los tipos de máquina",
+      admin: {
+        description:
+          "Vacío: no se pintan las tarjetas de tipos de máquina, ni las de usada y aditamentos (van en la misma sección).",
+      },
+    },
     {
       name: "verTodoTexto",
       type: "text",
@@ -84,9 +97,22 @@ export const RepuestosMarca: GlobalConfig = {
     tarjeta("tarjetaUsadas", "Tarjeta «Maquinaria pesada usada»"),
     tarjeta("tarjetaAditamentos", "Tarjeta «Aditamentos»"),
     { name: "contactoTitulo", type: "text", label: "Contacto: título" },
-    { name: "contactoSubtitulo", type: "text", label: "Contacto: subtítulo" },
+    {
+      name: "contactoSubtitulo",
+      type: "text",
+      label: "Contacto: subtítulo",
+      admin: { description: "Vacío: el formulario de contacto no se pinta." },
+    },
     { name: "contactoBoton", type: "text", label: "Contacto: texto del botón" },
-    { name: "testimoniosTitulo", type: "text", label: "Testimonios: título" },
+    {
+      name: "testimoniosTitulo",
+      type: "text",
+      label: "Testimonios: título",
+      admin: {
+        description:
+          "Vacío: los testimonios salen sin título (sin testimonios publicados, la sección no se pinta).",
+      },
+    },
     { name: "verVideoTexto", type: "text", label: "Testimonios: texto «Ver video»" },
   ],
 };

@@ -507,7 +507,17 @@ const listadoNuevaEnCache = unstable_cache(
             depth: 0,
             limit: 0,
             pagination: false,
-            select: { url: true, alt: true, width: true, height: true, focalX: true, focalY: true },
+            // Con `select`, la URL de un fichero sale null si no se pide `filename`
+            // (Payload la calcula con él).
+            select: {
+              url: true,
+              filename: true,
+              alt: true,
+              width: true,
+              height: true,
+              focalX: true,
+              focalY: true,
+            },
           })
         : Promise.resolve({ docs: [] as Media[] }),
       idsPdf.length
@@ -517,7 +527,7 @@ const listadoNuevaEnCache = unstable_cache(
             depth: 0,
             limit: 0,
             pagination: false,
-            select: { url: true },
+            select: { url: true, filename: true },
           })
         : Promise.resolve({ docs: [] as { id: number; url?: string | null }[] }),
     ]);

@@ -134,7 +134,7 @@
 .decorativa {
   position: absolute;
   z-index: 0;
-  top: -140px;
+  top: -88px;
   right: 2%;
   width: 30%;
   height: auto;
@@ -183,7 +183,7 @@
   }
 
   .decorativa {
-    top: -110px;
+    top: -80px;
     width: 34%;
   }
 

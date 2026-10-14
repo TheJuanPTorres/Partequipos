@@ -4,7 +4,7 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
-import { revalidarMarcasDeRepuestos } from "../lib/revalidation";
+import { revalidarCategoriasDeRepuestos, revalidarMarcasDeRepuestos } from "../lib/revalidation";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("categorias-tecnicas");
@@ -38,6 +38,7 @@ export const CategoriaTecnica: CollectionConfig = {
       portada.afterChange,
       ({ doc }) => {
         revalidarMarcasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""}`);
+        revalidarCategoriasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""}`);
         return doc;
       },
     ],
@@ -45,6 +46,7 @@ export const CategoriaTecnica: CollectionConfig = {
       portada.afterDelete,
       ({ doc }) => {
         revalidarMarcasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""} borrada`);
+        revalidarCategoriasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""} borrada`);
         return doc;
       },
     ],
@@ -152,8 +154,8 @@ export const CategoriaTecnica: CollectionConfig = {
           "Orden en «Nuestras categorías de repuestos» de cada página de marca. Vacío: al final, por nombre.",
       },
     },
-    // Sin página propia hoy: las 32 URL de categoría del sitio actual están
-    // pendientes de decisión (docs/redirects-map.csv, «HUÉRFANA»).
-    seoField({ sinPagina: true }),
+    // Tiene página propia desde el 2026-10-13 (provisional hasta el diseño de Andrés). Las URL
+    // heredadas de segundo nivel y las duplicadas siguen sin decidir (docs/redirects-map.csv).
+    seoField(),
   ],
 };

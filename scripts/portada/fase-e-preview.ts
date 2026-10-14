@@ -74,10 +74,22 @@ const LOGOS: [fichero: string, nombre: string][] = [
 type Icono = "corte" | "llanta" | "lubricante" | "filtro";
 /** Las 4 tarjetas de ux-9, en su orden, sobre las categorías que ya existen. */
 const TARJETAS: [slug: string, icono: Icono, foto: string][] = [
-  ["herramienta-de-corte-gets", "corte", "235553.jpg"],
-  ["llantas-y-rines", "llanta", "hf_20260914_202250_1bca5eef-162c-464d-a803-daf5e2392e50.jpg"],
-  ["lubricantes", "lubricante", "hf_20260914_202415_d9a38261-e2c7-4506-aa58-f7dfc0eae28e.jpg"],
-  ["filtracion", "filtro", "hf_20260914_202425_e32f9a5b-2aae-4c6a-be03-a8b5ba798e60.jpg"],
+  ["herramienta-de-corte-gets-para-maquinaria-pesada", "corte", "235553.jpg"],
+  [
+    "llantas-y-rines-para-maquinaria-pesada",
+    "llanta",
+    "hf_20260914_202250_1bca5eef-162c-464d-a803-daf5e2392e50.jpg",
+  ],
+  [
+    "lubricantes-para-maquinaria-pesada",
+    "lubricante",
+    "hf_20260914_202415_d9a38261-e2c7-4506-aa58-f7dfc0eae28e.jpg",
+  ],
+  [
+    "filtracion-para-maquinaria-pesada",
+    "filtro",
+    "hf_20260914_202425_e32f9a5b-2aae-4c6a-be03-a8b5ba798e60.jpg",
+  ],
 ];
 const ENLACE_TARJETA = "/repuestos-maquinaria-pesada-colombia/";
 

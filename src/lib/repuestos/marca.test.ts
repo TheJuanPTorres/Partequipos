@@ -55,10 +55,18 @@ describe("categoriasDeMarca", () => {
     );
   });
 
-  it("sin enlace no hay href (nada de enlaces rotos); con enlace, se enlaza sola", () => {
-    const r = categoriasDeMarca([cat(1, "Sin", 1), cat(2, "Con", 2, " /ruta/ ")]);
+  it("enlaza a la página de la categoría; sin slug no hay página y no hay enlace", () => {
+    const conSlug = {
+      ...cat(2, "Con", 2),
+      slug: "con-para-maquinaria-pesada",
+    } as CategoriasTecnica;
+    const sinSlug = { ...cat(1, "Sin", 1), slug: " " } as CategoriasTecnica;
+    const r = categoriasDeMarca([sinSlug, conSlug]);
     assert.equal(r[0]?.href, null);
-    assert.equal(r[1]?.href, "/ruta/");
+    assert.match(
+      r[1]?.href ?? "",
+      /categoria-repuestos-para-maquinaria-pesada\/con-para-maquinaria-pesada\/?$/,
+    );
   });
 
   it("descarta las que no tienen nombre", () => {

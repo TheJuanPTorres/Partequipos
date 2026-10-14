@@ -50,6 +50,7 @@ function rutasDeclaradas(): Set<string> {
  * que añadir una sección nueva no obligue a tocar cada prueba.
  */
 const SIN_MAQUINARIA = {
+  categoriasRepuestos: [],
   marcasMaquinaria: [],
   tiposMaquinaria: [],
   equiposNuevos: [],
@@ -102,9 +103,10 @@ const datosConMaquinaria = {
 describe("buildSitemapEntries", () => {
   it("incluye portada, índices y una entrada por entidad", () => {
     const e = buildSitemapEntries(datos, AHORA);
-    // 1 portada + 2 índices de repuestos + 4 índices de maquinaria
-    // + 1 índice de blog + 1 institucional + 1 marca + 1 tipo + 1 modelo
-    assert.equal(e.length, 12);
+    // 1 portada + 3 índices de repuestos (principal, marcas y categorías)
+    // + 4 índices de maquinaria + 1 índice de blog + 1 institucional
+    // + 1 marca + 1 tipo + 1 modelo
+    assert.equal(e.length, 13);
   });
 
   it("emite solo URLs absolutas", () => {
@@ -184,10 +186,10 @@ describe("buildSitemapEntries", () => {
       AHORA,
     );
 
-    // Sin documento de portada no se lista `/`: quedan los 2 índices de
+    // Sin documento de portada no se lista `/`: quedan los 3 índices de
     // repuestos, los 4 de maquinaria y el del blog, que son rutas estáticas y
     // existen aunque no haya contenido.
-    assert.equal(e.length, 7);
+    assert.equal(e.length, 8);
     assert.equal(e[0]?.lastModified.getTime(), AHORA.getTime());
     for (const entrada of e) assert.match(entrada.url, /^https:\/\//);
   });
@@ -243,6 +245,36 @@ describe("cobertura del sitemap frente a las rutas construidas", () => {
       construidas.filter((r) => !cubiertas.has(r)),
       [inventada],
     );
+  });
+});
+
+describe("categorías técnicas de repuestos en el sitemap", () => {
+  const conCategorias = {
+    ...datos,
+    categoriasRepuestos: [
+      { slug: "tren-de-rodaje-para-maquinaria-pesada", updatedAt: "2026-07-15T10:00:00.000Z" },
+      { slug: "filtracion-para-maquinaria-pesada", updatedAt: "2026-07-16T10:00:00.000Z" },
+    ],
+  };
+
+  it("emite el índice y una URL por categoría, con su ruta exacta", () => {
+    const urls = buildSitemapEntries(conCategorias, AHORA).map((x) => x.url);
+    const base =
+      "https://partequipos.com/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/";
+    assert.ok(urls.includes(base));
+    assert.ok(urls.includes(base + "tren-de-rodaje-para-maquinaria-pesada/"));
+    assert.ok(urls.includes(base + "filtracion-para-maquinaria-pesada/"));
+  });
+
+  it("el índice toma la fecha de la categoría más reciente", () => {
+    const e = buildSitemapEntries(conCategorias, AHORA);
+    const indice = e.find((x) => x.url.endsWith("/categoria-repuestos-para-maquinaria-pesada/"));
+    assert.equal(indice?.lastModified.toISOString(), "2026-07-16T10:00:00.000Z");
+  });
+
+  it("no genera URLs duplicadas", () => {
+    const e = buildSitemapEntries(conCategorias, AHORA);
+    assert.equal(new Set(e.map((x) => x.url)).size, e.length);
   });
 });
 

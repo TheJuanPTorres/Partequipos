@@ -49,7 +49,7 @@ export type CategoriaMarca = {
   id: number;
   nombre: string;
   icono: CategoriasTecnica["icono"];
-  /** Solo si la categoría tiene página. Sin ella se pinta SIN enlace (nada de enlaces rotos). */
+  /** Su página de categoría. Sin slug no hay página y se pinta SIN enlace (nada de enlaces rotos). */
   href: string | null;
 };
 
@@ -70,7 +70,7 @@ export function categoriasDeMarca(categorias: CategoriasTecnica[]): CategoriaMar
       id: c.id,
       nombre: c.nombre.trim(),
       icono: c.icono ?? null,
-      href: texto(c.enlace) || null,
+      href: texto(c.slug) ? rutas.categoriaRepuestos(texto(c.slug)) : null,
     }));
 }
 

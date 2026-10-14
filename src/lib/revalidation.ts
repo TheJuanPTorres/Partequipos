@@ -1,6 +1,11 @@
 import { revalidatePath } from "next/cache";
 
-import { rutas, SEGMENTO_MARCAS, SEGMENTO_REPUESTOS } from "./routes";
+import {
+  rutas,
+  SEGMENTO_CATEGORIAS_REPUESTOS,
+  SEGMENTO_MARCAS,
+  SEGMENTO_REPUESTOS,
+} from "./routes";
 
 /**
  * Revalidación granular del catálogo (ISR), disparada por hooks de Payload.
@@ -201,6 +206,23 @@ export function revalidarMarcasDeRepuestos(motivo: string): void {
     revalidatePath(`/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]`, "page");
   } catch (error) {
     console.error(`[revalidación] fallaron las páginas de marca de repuestos (${motivo}):`, error);
+  }
+}
+
+/**
+ * Revalida el índice y TODAS las páginas de categoría técnica de repuestos, y
+ * las de marca y tipo (que enlazan a ellas). Nunca relanza.
+ */
+export function revalidarCategoriasDeRepuestos(motivo: string): void {
+  try {
+    revalidatePath(rutas.categoriasRepuestos());
+    revalidatePath(`/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]`, "page");
+    revalidatePath(rutas.repuestos());
+  } catch (error) {
+    console.error(
+      `[revalidación] fallaron las páginas de categoría de repuestos (${motivo}):`,
+      error,
+    );
   }
 }
 

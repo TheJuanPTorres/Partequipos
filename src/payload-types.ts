@@ -577,7 +577,7 @@ export interface CategoriasTecnica {
    */
   ordenMarca?: number | null;
   /**
-   * Hoy estas fichas no tienen página propia en el sitio, así que esto no sale en Google. Se guarda para cuando la tengan.
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
     metaTitle?: string | null;

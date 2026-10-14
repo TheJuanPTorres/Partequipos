@@ -244,10 +244,12 @@
   cursor: pointer;
 }
 
+/* El `:focus-visible` global pone `border-radius: 2px`: se conserva la forma de pastilla. */
 .buscadorCampo:focus-visible,
 .buscadorBoton:focus-visible {
   outline: 2px solid var(--color-marca);
   outline-offset: 2px;
+  border-radius: 30px;
 }
 
 /* El aviso, bajo el campo. Vacío no ocupa nada: no mueve el pie al cargar. */

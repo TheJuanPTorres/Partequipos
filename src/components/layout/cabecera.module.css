@@ -83,7 +83,8 @@
  * sus curvas (mismo tinte, mismo desenfoque), para que sean una sola pieza. En el modo
  * sólido la barra pasaba a ser blanco opaco y el panel, vidrio: no casaban.
  */
-.cabecera[data-mega="si"] {
+.cabecera[data-mega="si"],
+.cabecera[data-buscando="si"] {
   background: var(--cab-velo-mega);
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   backdrop-filter: blur(20px) saturate(1.8);
@@ -92,7 +93,8 @@
 /* Sin soporte de desenfoque: fondo casi opaco, para que el menú se lea. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .cabecera[data-modo="velo"],
-  .cabecera[data-mega="si"] {
+  .cabecera[data-mega="si"],
+  .cabecera[data-buscando="si"] {
     background: rgb(255 255 255 / 92%);
   }
 }
@@ -129,6 +131,18 @@
       var(--cab-fondo) 69px,
       var(--color-fondo-seccion) 69px 70px,
       var(--cab-fondo) 70px
+    );
+  }
+}
+
+/* Con el megamenú o el buscador abiertos, el filete de la barra encogida va sobre el vidrio. */
+@media (min-width: 1025px) {
+  .cabecera[data-encogida="si"][data-modo="solido"][data-mega="si"],
+  .cabecera[data-encogida="si"][data-modo="solido"][data-buscando="si"] {
+    background: linear-gradient(
+      var(--cab-velo-mega) 69px,
+      var(--color-fondo-seccion) 69px 70px,
+      var(--cab-velo-mega) 70px
     );
   }
 }
@@ -244,7 +258,9 @@
 .enlace:focus-visible,
 .disparador:focus-visible,
 .icono:focus-visible,
-.hamburguesa:focus-visible {
+.hamburguesa:focus-visible,
+.lupa:focus-visible,
+.busquedaCerrar:focus-visible {
   outline: 2px solid var(--color-marca);
   outline-offset: 2px;
   border-radius: 4px;
@@ -295,6 +311,143 @@
 .boton svg {
   width: 16px;
   height: 16px;
+}
+
+/* --- Buscador (petición del cliente, 2026-10-14) --- */
+
+/* La lupa y «Contáctanos», juntos y centrados en su columna. */
+.acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lupaForm {
+  display: flex;
+  margin: 0;
+}
+
+.lupa {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--cab-texto);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.lupa:hover,
+.lupa[aria-expanded="true"] {
+  color: var(--color-marca);
+}
+
+.lupa svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* La barra de búsqueda: ocupa el sitio del menú y de las acciones. */
+.busqueda {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: var(--cab-col-relleno);
+}
+
+.busqueda[hidden] {
+  display: none;
+}
+
+.busquedaCampo {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-overflow: ellipsis;
+  height: 50px;
+  box-sizing: border-box;
+  padding: 12px 24px 12px 20px;
+  border: 1px solid #cdcdcd; /* el del buscador del pie, medido en ux-9 */
+  border-radius: 30px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font: 400 16px / 1.3 var(--font-sans);
+}
+
+.busquedaCampo::placeholder {
+  color: #515962;
+  opacity: 1;
+}
+
+.busquedaBoton {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.busquedaBoton:hover {
+  background: var(--color-texto);
+}
+
+.busquedaBoton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.busquedaCerrar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-texto-suave);
+  cursor: pointer;
+}
+
+.busquedaCerrar svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* El `:focus-visible` global pone `border-radius: 2px`: se conserva la forma de pastilla. */
+.busquedaCampo:focus-visible,
+.busquedaBoton:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+  border-radius: 30px;
+}
+
+/* Con la barra abierta, la fila solo lleva el logo y el formulario. */
+.cabecera[data-buscando="si"] .nav,
+.cabecera[data-buscando="si"] .accionCol,
+.cabecera[data-buscando="si"] .icono,
+.cabecera[data-buscando="si"] .derechaMovil {
+  display: none;
+}
+
+/* La lupa móvil y el menú, juntos a la derecha (solo hasta 1024 px). */
+.derechaMovil {
+  display: none;
 }
 
 /* --- Tablet y móvil: atención al cliente · logo · menú --- */
@@ -358,14 +511,44 @@
     transform-origin: center;
   }
 
-  .hamburguesa {
+  .derechaMovil {
+    display: flex;
+    align-items: center;
     justify-self: end;
+  }
+
+  /* Con la barra abierta: logo y formulario (en móvil, solo el formulario). */
+  .cabecera[data-buscando="si"] .fila {
+    grid-template-columns: auto minmax(0, 1fr);
   }
 }
 
 @media (max-width: 767px) {
   .logo {
     width: var(--cab-logo-movil);
+  }
+
+  /* Sin sitio para el logo: la barra de búsqueda ocupa toda la fila. */
+  .cabecera[data-buscando="si"] .fila {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cabecera[data-buscando="si"] .logoCol {
+    display: none;
+  }
+
+  .busqueda {
+    padding: 8px 0;
+  }
+
+  .busquedaCampo {
+    height: 44px;
+    padding: 10px 16px;
+  }
+
+  .busquedaBoton {
+    height: 44px;
+    padding: 0 16px;
   }
 }
 

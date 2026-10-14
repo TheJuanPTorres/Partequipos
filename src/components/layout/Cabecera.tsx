@@ -1,10 +1,25 @@
 "use client";
 
-import { IconChevronDown, IconHeadset, IconMail, IconMenu2, IconX } from "@tabler/icons-react";
+import {
+  IconChevronDown,
+  IconHeadset,
+  IconMail,
+  IconMenu2,
+  IconSearch,
+  IconX,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSelectedLayoutSegment } from "next/navigation";
-import { Fragment, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import {
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+  type MouseEvent,
+} from "react";
 
 import { inicioDelPanel, modoCabecera } from "@/lib/cabecera/modo";
 import { claveDeEnlace, type PanelMenu } from "@/lib/megamenu";
@@ -31,6 +46,13 @@ import { Megamenu } from "./Megamenu";
  *   (petición de Andrés, 2026-10-14, docs/diseno/decisiones-cabecera.md).
  * - Menú móvil: Escape lo cierra y devuelve el foco al botón; al abrir, el foco
  *   va al primer enlace.
+ * - BUSCADOR (petición del cliente, diseño de Andrés, 2026-10-14): una lupa a la
+ *   izquierda de «Contáctanos» (en móvil, junto al menú) que transforma la barra
+ *   en un formulario de búsqueda: logo, campo, «Buscar» y una X. Es un
+ *   formulario GET a `/buscar/` que funciona sin JavaScript (la lupa también es
+ *   un formulario: sin JS lleva a la página de resultados). Con JS, el foco pasa
+ *   al campo; Escape y la X cierran y devuelven el foco a la lupa. La fila
+ *   conserva su alto (`min-height` fijado al abrir): sin CLS.
  * - MEGAMENÚ de escritorio (§26): los enlaces del global cuya ruta tiene panel
  *   (maquinaria y repuestos) son BOTONES que lo abren —con el ratón al pasar,
  *   con clic o con Intro/Espacio—; Escape lo cierra y devuelve el foco. El
@@ -104,6 +126,14 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
   const boton = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const cabecera = useRef<HTMLElement>(null);
+  // Buscador: la ruta en la que se abrió (cambiar de página lo cierra), el alto de
+  // la fila al abrir (para que la barra no cambie de alto) y quién lo abrió.
+  const [buscandoEn, setBuscandoEn] = useState<string | null>(null);
+  const buscando = buscandoEn === ruta;
+  const [altoFila, setAltoFila] = useState<number | null>(null);
+  const fila = useRef<HTMLDivElement>(null);
+  const campo = useRef<HTMLInputElement>(null);
+  const abridor = useRef<HTMLButtonElement | null>(null);
   // Megamenú: qué panel está abierto y en qué ruta (como el menú móvil).
   const [mega, setMega] = useState<{ clave: string; ruta: string } | null>(null);
   const megaAbierto = mega?.ruta === ruta ? mega.clave : null;
@@ -136,6 +166,35 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
   const cerrar = () => {
     setAbiertoEn(null);
     boton.current?.focus();
+  };
+
+  // Al abrir el buscador el foco pasa al campo; al cerrarlo, vuelve a la lupa. La
+  // lupa está oculta (`display: none`) mientras la barra está abierta, así que el
+  // foco se devuelve DESPUÉS de renderizar el cierre, no al pulsar.
+  const devolverFoco = useRef(false);
+  useEffect(() => {
+    if (buscando) {
+      campo.current?.focus();
+    } else if (devolverFoco.current) {
+      devolverFoco.current = false;
+      abridor.current?.focus();
+    }
+  }, [buscando]);
+
+  const abrirBusqueda = (e: FormEvent<HTMLFormElement>) => {
+    // Con JavaScript la lupa abre la barra; sin él, el formulario lleva a `/buscar/`.
+    e.preventDefault();
+    abridor.current = e.currentTarget.querySelector("button");
+    setAltoFila(fila.current?.offsetHeight ?? null);
+    setMega(null);
+    setAbiertoEn(null);
+    setBuscandoEn(ruta);
+  };
+
+  const cerrarBusqueda = () => {
+    devolverFoco.current = true;
+    setBuscandoEn(null);
+    setAltoFila(null);
   };
 
   // Clic fuera de la cabecera y del panel: se cierra el megamenú.
@@ -194,7 +253,10 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
 
   const alTeclado = (e: KeyboardEvent<HTMLElement>) => {
     if (e.key !== "Escape") return;
-    if (megaAbierto) {
+    if (buscando) {
+      e.preventDefault();
+      cerrarBusqueda();
+    } else if (megaAbierto) {
       e.preventDefault();
       cerrarMega("boton");
     } else if (abierto) {
@@ -260,6 +322,20 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
     </Link>
   ) : null;
 
+  const lupa = (
+    <form action="/buscar/" method="get" className={estilos.lupaForm} onSubmit={abrirBusqueda}>
+      <button
+        type="submit"
+        className={estilos.lupa}
+        aria-label="Buscar"
+        aria-expanded={buscando}
+        aria-controls="cab-busqueda"
+      >
+        <IconSearch aria-hidden="true" focusable="false" stroke={1.75} />
+      </button>
+    </form>
+  );
+
   return (
     <Fragment>
       <header
@@ -274,10 +350,15 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
         })}
         data-encogida={arriba ? "no" : "si"}
         data-mega={megaAbierto ? "si" : "no"}
+        data-buscando={buscando ? "si" : "no"}
         onKeyDown={alTeclado}
       >
         {/* UNA fila y UN logo. */}
-        <div className={estilos.fila}>
+        <div
+          ref={fila}
+          className={estilos.fila}
+          style={altoFila ? { minHeight: altoFila } : undefined}
+        >
           <a
             href={whatsapp}
             className={`${estilos.icono} ${estilos.soloMovil}`}
@@ -293,22 +374,65 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
           <nav className={estilos.nav} aria-label="Navegación principal">
             {listaEscritorio}
           </nav>
-          <div className={estilos.accionCol}>{botonContacto}</div>
-          <button
-            ref={boton}
-            type="button"
-            className={`${estilos.hamburguesa} ${estilos.soloMovil}`}
-            aria-expanded={abierto}
-            aria-controls="menu-movil"
-            aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
-            onClick={() => setAbiertoEn(abierto ? null : ruta)}
+          <div className={estilos.accionCol}>
+            <div className={estilos.acciones}>
+              {lupa}
+              {botonContacto}
+            </div>
+          </div>
+          <form
+            id="cab-busqueda"
+            role="search"
+            aria-label="Buscar en el sitio"
+            action="/buscar/"
+            method="get"
+            className={estilos.busqueda}
+            hidden={!buscando}
           >
-            {abierto ? (
-              <IconX aria-hidden="true" focusable="false" stroke={1.5} />
-            ) : (
-              <IconMenu2 aria-hidden="true" focusable="false" stroke={1.5} />
-            )}
-          </button>
+            <label htmlFor="cab-buscar" className="sr-only">
+              Buscar en el sitio
+            </label>
+            <input
+              ref={campo}
+              id="cab-buscar"
+              name="q"
+              type="search"
+              className={estilos.busquedaCampo}
+              placeholder="Escribe los términos de búsqueda…"
+              autoComplete="off"
+              maxLength={80}
+            />
+            <button type="submit" className={`${estilos.busquedaBoton} texto-etiqueta`}>
+              <IconSearch aria-hidden="true" focusable="false" stroke={1.75} />
+              Buscar
+            </button>
+            <button
+              type="button"
+              className={estilos.busquedaCerrar}
+              aria-label="Cerrar búsqueda"
+              onClick={cerrarBusqueda}
+            >
+              <IconX aria-hidden="true" focusable="false" stroke={1.75} />
+            </button>
+          </form>
+          <div className={estilos.derechaMovil}>
+            {lupa}
+            <button
+              ref={boton}
+              type="button"
+              className={estilos.hamburguesa}
+              aria-expanded={abierto}
+              aria-controls="menu-movil"
+              aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
+              onClick={() => setAbiertoEn(abierto ? null : ruta)}
+            >
+              {abierto ? (
+                <IconX aria-hidden="true" focusable="false" stroke={1.5} />
+              ) : (
+                <IconMenu2 aria-hidden="true" focusable="false" stroke={1.5} />
+              )}
+            </button>
+          </div>
         </div>
 
         <div ref={panel} id="menu-movil" className={estilos.panel} hidden={!abierto}>

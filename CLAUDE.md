@@ -852,6 +852,10 @@ educidas\`). Originales en `Desktop\partequipos-diseno\cliente-hero\`, **nunca e
 > **REGLA DEL BUSCADOR:** fuera de la cola de trabajo **hasta que el cliente
 > apruebe por escrito una cotización de alcance adicional**.
 >
+> **LEVANTADA el 2026-10-14 por orden expresa de dirección** (petición del
+> cliente, diseño de Andrés): buscador en la cabecera y página `/buscar/` (el
+> pie enlaza a ella). Detalle en `docs/diseno/decisiones-cabecera.md` §6.
+>
 > **Hallazgo del reconocimiento (fase 0, 2026-09-28), RESUELTO el mismo
 > día:** la rama remota `proto/hero-andres` contenía dos fotos L3 del kit
 > (`Fondo.jpg` y `Hero-1.png`, como `public/prototipo/hero-fondo.jpg` y

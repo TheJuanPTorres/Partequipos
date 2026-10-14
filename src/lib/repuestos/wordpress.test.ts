@@ -6,12 +6,15 @@ import {
   codigoDeModelo,
   descripcionSeo,
   esBorradorCopia,
+  ficheroDeLogo,
+  LOGOS_DE_MARCA,
   fotoDeRepuesto,
   fotosGenericas,
   nivelDePagina,
   nombreDeModelo,
   nombreDeTipo,
   pareceDatoDeContacto,
+  rutaMadre,
   textoDePagina,
   tituloPorDefectoModelo,
   tituloSeo,
@@ -184,5 +187,20 @@ describe("fotos", () => {
       altDeRepuesto("excavadora-x1", "Excavadora X 1", "excavadora-x1.jpg"),
       "Excavadora X 1",
     );
+  });
+});
+
+describe("logos y redirecciones", () => {
+  it("un logo por cada una de las 13 marcas, todos PNG", () => {
+    assert.equal(Object.keys(LOGOS_DE_MARCA).length, 13);
+    for (const l of Object.values(LOGOS_DE_MARCA)) assert.match(l.archivo, /.png$/);
+    assert.equal(new Set(Object.values(LOGOS_DE_MARCA).map((l) => l.idWp)).size, 13);
+  });
+  it("nombre del logo por id de adjunto", () => {
+    assert.equal(ficheroDeLogo(7, "Case Construction"), "wp-logo-7-case-construction.png");
+  });
+  it("la ruta madre de una URL con un nivel de más", () => {
+    assert.equal(rutaMadre("/a/b/c/d/"), "/a/b/c/");
+    assert.equal(rutaMadre("/a/b/c/d"), "/a/b/c/");
   });
 });

@@ -1,17 +1,31 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
+import { SeccionTestimonios } from "@/components/portada/diferidos";
+import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
+import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
+import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
+import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
+import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getMarcaPorSlug, getMarcas } from "@/lib/queries/getMarcas";
-import { getTiposDeMarca } from "@/lib/queries/getTipos";
+import {
+  getCategoriasParaMarca,
+  getRepuestosMarca,
+  getTiposDeMarcaConImagen,
+} from "@/lib/queries/getRepuestosMarca";
+import { getEmpresa } from "@/lib/queries/getSeo";
+import { categoriasDeMarca, tarjetasDeLaPagina, vistaEncabezado } from "@/lib/repuestos/marca";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
-import { imagenDeMedia } from "@/lib/utils/relations";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
+import { turnstileSiteKey } from "@/lib/turnstile";
+import { imagenDeMedia } from "@/lib/utils/relations";
+import { enlaceWhatsApp } from "@/lib/whatsapp";
 
 type Params = { marca: string };
 
@@ -33,14 +47,23 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
+/** Ancla de la franja de categorías: a ella baja el icono de ratón del encabezado. */
+const ANCLA_CATEGORIAS = "categorias-repuestos";
+
 export default async function MarcaPage({ params }: { params: Promise<Params> }) {
   const { marca: marcaSlug } = await params;
   const marca = await getMarcaPorSlug(marcaSlug);
   if (!marca) notFound();
 
-  const tipos = await getTiposDeMarca(marca.id);
-  const logo = imagenDeMedia(marca.logo, `Logo de ${marca.nombre}`);
+  const [global, tipos, categorias, testimonios, empresa] = await Promise.all([
+    getRepuestosMarca(),
+    getTiposDeMarcaConImagen(marca.id),
+    getCategoriasParaMarca(),
+    getTestimoniosDePortada(),
+    getEmpresa(),
+  ]);
 
+  const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
     { nombre: "Repuestos", path: rutas.repuestos() },
@@ -48,49 +71,45 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
     { nombre: marca.nombre, path: rutas.marca(marca.slug) },
   ];
 
-  const items = tipos.map((tipo) => ({
-    href: rutas.tipo(marca.slug, tipo.slug),
-    titulo: tipo.nombre,
-    descripcion: tipo.descripcion,
-    imagen: null,
-  }));
-
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <Breadcrumbs items={breadcrumbs} />
-
-      <div className="flex items-center gap-4">
-        {logo ? (
-          <Image
-            src={logo.url}
-            alt={logo.alt}
-            width={logo.width}
-            height={logo.height}
-            className="h-14 w-auto object-contain"
-            preload
-          />
-        ) : null}
-        <h1 className="text-3xl font-semibold text-gray-900">
-          Repuestos para maquinaria pesada {marca.nombre}
-        </h1>
+      <div className={estilos.migas}>
+        <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      {marca.descripcion ? (
-        <p className="mt-3 max-w-2xl text-gray-600">{marca.descripcion}</p>
-      ) : null}
+      <HeroMarca vista={vistaEncabezado(marca, global)} anclaSiguiente={ANCLA_CATEGORIAS} />
 
-      <section className="mt-8" aria-labelledby="tipos-heading">
-        <h2 id="tipos-heading" className="text-xl font-medium text-gray-900">
-          Tipos de equipo {marca.nombre}
-        </h2>
-        <div className="mt-4">
-          <ListaEnlaces
-            items={items}
-            vacio={`Todavía no hay tipos de equipo publicados para ${marca.nombre}.`}
-          />
-        </div>
-      </section>
+      <CategoriasMarca
+        id={ANCLA_CATEGORIAS}
+        titulo={texto(global.tituloCategorias)}
+        categorias={categoriasDeMarca(categorias)}
+      />
+
+      <TarjetasMarca
+        id="repuestos-marca-tipos"
+        titulo={texto(global.tituloTipos)}
+        verTodo={texto(global.verTodoTexto)}
+        tarjetas={tarjetasDeLaPagina(marca, tipos, global)}
+      />
+
+      <ContactoMarca
+        titulo={texto(global.contactoTitulo)}
+        subtitulo={texto(global.contactoSubtitulo)}
+        boton={texto(global.contactoBoton)}
+        origen={rutas.marca(marca.slug)}
+        siteKey={turnstileSiteKey()}
+        whatsapp={empresa ? enlaceWhatsApp(empresa.whatsapp) : undefined}
+        marca={marca.nombre}
+      />
+
+      <SeccionTestimonios
+        tarjetas={tarjetasDeTestimonios(testimonios)}
+        textos={{
+          titulo: texto(global.testimoniosTitulo),
+          verVideoTexto: texto(global.verVideoTexto),
+        }}
+      />
     </main>
   );
 }

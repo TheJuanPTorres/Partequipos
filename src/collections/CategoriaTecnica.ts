@@ -4,6 +4,7 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { revalidarMarcasDeRepuestos } from "../lib/revalidation";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("categorias-tecnicas");
@@ -31,7 +32,23 @@ export const CategoriaTecnica: CollectionConfig = {
     update: escrituraContenido,
     delete: borradoAdmin,
   },
-  hooks: { afterChange: [portada.afterChange], afterDelete: [portada.afterDelete] },
+  // La portada y las páginas de marca (las categorías son comunes a las marcas).
+  hooks: {
+    afterChange: [
+      portada.afterChange,
+      ({ doc }) => {
+        revalidarMarcasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""}`);
+        return doc;
+      },
+    ],
+    afterDelete: [
+      portada.afterDelete,
+      ({ doc }) => {
+        revalidarMarcasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""} borrada`);
+        return doc;
+      },
+    ],
+  },
   fields: [
     {
       name: "nombre",
@@ -71,6 +88,9 @@ export const CategoriaTecnica: CollectionConfig = {
         { label: "Filtración", value: "filtro" },
         { label: "Motor", value: "motor" },
         { label: "Tren de rodaje", value: "rodaje" },
+        { label: "Misceláneos (herramientas)", value: "miscelaneos" },
+        { label: "Componentes mayores", value: "componentes" },
+        { label: "Motor diésel", value: "diesel" },
       ],
     },
     /*
@@ -107,6 +127,22 @@ export const CategoriaTecnica: CollectionConfig = {
         position: "sidebar",
         description:
           "Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».",
+      },
+    },
+    /*
+     * Páginas de marca de repuestos: las categorías son COMUNES a todas las
+     * marcas (decisión de dirección, 2026-10-13). Aquí solo el ORDEN: vacío,
+     * van al final por nombre. Sin relación con la marca.
+     */
+    {
+      name: "ordenMarca",
+      type: "number",
+      min: 1,
+      label: "Posición en las páginas de marca",
+      admin: {
+        position: "sidebar",
+        description:
+          "Orden en «Nuestras categorías de repuestos» de cada página de marca. Vacío: al final, por nombre.",
       },
     },
     // Sin página propia hoy: las 32 URL de categoría del sitio actual están

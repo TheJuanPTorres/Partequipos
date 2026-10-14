@@ -106,6 +106,15 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
     "paginación: se llega desde la página 1 de la categoría",
   "/maquinaria-pesada/maquinaria-pesada-usada/marcas/[marca]/pagina/[pagina]":
     "paginación: se llega desde la página 1 de la marca",
+  /*
+   * Lo mismo en los listados de maquinaria NUEVA («Categoría secundaria»,
+   * src/lib/nueva/listado.ts): el índice y cada categoría están en el
+   * sitemap; sus páginas siguientes se descubren desde la 1.
+   */
+  "/maquinaria-pesada/maquinaria-pesada-nueva/pagina/[pagina]":
+    "paginación: se llega desde la página 1 del índice de nueva",
+  "/maquinaria-pesada/maquinaria-pesada-nueva/[categoria]/pagina/[pagina]":
+    "paginación: se llega desde la página 1 de la categoría",
 } as const;
 
 /** Slug reservado de la portada dentro de la colección de páginas. */

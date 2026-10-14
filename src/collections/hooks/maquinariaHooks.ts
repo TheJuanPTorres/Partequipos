@@ -76,6 +76,8 @@ async function todasLasCategorias(req: PayloadRequest): Promise<string[]> {
 
 export const revalidarMarcaMaquinaria: CollectionAfterChangeHook = async ({ doc, req }) => {
   try {
+    // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
+    revalidarDatos(ETIQUETAS_DATOS.nueva, `marca maquinaria ${doc.slug}`);
     revalidarRutas(
       rutasDeMarcaMaquinaria(doc.slug, await hijosDeMarca(req, doc.id)),
       `marca maquinaria ${doc.slug}`,
@@ -88,6 +90,8 @@ export const revalidarMarcaMaquinaria: CollectionAfterChangeHook = async ({ doc,
 
 export const revalidarMarcaMaquinariaBorrada: CollectionAfterDeleteHook = async ({ doc, req }) => {
   try {
+    // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
+    revalidarDatos(ETIQUETAS_DATOS.nueva, `marca maquinaria borrada ${doc.slug}`);
     const hijos = await hijosDeMarca(req, doc.id).catch(() => []);
     revalidarRutas(rutasDeMarcaMaquinaria(doc.slug, hijos), `marca maquinaria borrada ${doc.slug}`);
   } catch (error) {
@@ -98,6 +102,8 @@ export const revalidarMarcaMaquinariaBorrada: CollectionAfterDeleteHook = async 
 
 export const revalidarTipoMaquinaria: CollectionAfterChangeHook = async ({ doc, req }) => {
   try {
+    // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
+    revalidarDatos(ETIQUETAS_DATOS.nueva, `tipo maquinaria ${doc.slug}`);
     const marcaSlug = await slugPorId(req, "marcas-maquinaria", doc.marca);
     if (!marcaSlug) return doc;
 
@@ -113,6 +119,8 @@ export const revalidarTipoMaquinaria: CollectionAfterChangeHook = async ({ doc, 
 
 export const revalidarTipoMaquinariaBorrado: CollectionAfterDeleteHook = async ({ doc, req }) => {
   try {
+    // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
+    revalidarDatos(ETIQUETAS_DATOS.nueva, `tipo maquinaria borrado ${doc.slug}`);
     const marcaSlug = await slugPorId(req, "marcas-maquinaria", doc.marca);
     if (!marcaSlug) return doc;
 
@@ -143,6 +151,8 @@ async function hermanosDe(req: PayloadRequest, doc: { slug: string; tipo: unknow
 
 export const revalidarEquipoNuevo: CollectionAfterChangeHook = async ({ doc, req }) => {
   try {
+    // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
+    revalidarDatos(ETIQUETAS_DATOS.nueva, `equipo nuevo ${doc.slug}`);
     const marcaSlug = await slugPorId(req, "marcas-maquinaria", doc.marca);
     const tipoSlug = await slugPorId(req, "tipos-maquinaria", doc.tipo);
     if (!marcaSlug || !tipoSlug) return doc;
@@ -170,6 +180,8 @@ export const revalidarEquipoNuevo: CollectionAfterChangeHook = async ({ doc, req
  */
 export const revalidarDocumento: CollectionAfterChangeHook = async ({ doc, req }) => {
   try {
+    // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
+    revalidarDatos(ETIQUETAS_DATOS.nueva, `documento ${doc.id}`);
     const { docs } = await req.payload.find({
       collection: "equipos-nuevos",
       where: { fichaTecnicaPdf: { equals: doc.id } },
@@ -193,6 +205,8 @@ export const revalidarDocumento: CollectionAfterChangeHook = async ({ doc, req }
 
 export const revalidarEquipoNuevoBorrado: CollectionAfterDeleteHook = async ({ doc, req }) => {
   try {
+    // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
+    revalidarDatos(ETIQUETAS_DATOS.nueva, `equipo nuevo borrado ${doc.slug}`);
     const marcaSlug = await slugPorId(req, "marcas-maquinaria", doc.marca);
     const tipoSlug = await slugPorId(req, "tipos-maquinaria", doc.tipo);
     if (!marcaSlug || !tipoSlug) return doc;
@@ -216,6 +230,8 @@ export const revalidarEquipoNuevoBorrado: CollectionAfterDeleteHook = async ({ d
  */
 function revalidarCategoriaNuevaCore(doc: { slug: string }) {
   try {
+    // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
+    revalidarDatos(ETIQUETAS_DATOS.nueva, `categoría nueva ${doc.slug}`);
     revalidarRutas(rutasDeCategoriaNueva(doc.slug), `categoría nueva ${doc.slug}`);
   } catch (error) {
     console.error("[revalidación] hook de CategoriaMaquinaria falló:", error);

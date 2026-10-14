@@ -65,6 +65,8 @@
     "preview:usados:importar": "tsx scripts/preview/con-entorno.ts payload run scripts/usados/importar-usados.ts importar preview",
     "preview:usados:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/usados/importar-usados.ts retirar preview",
     "preview:repuestos:simular": "tsx scripts/preview/con-entorno.ts payload run scripts/repuestos/importar-repuestos.ts simular preview",
+    "preview:repuestos:importar": "tsx scripts/preview/con-entorno.ts payload run scripts/repuestos/importar-repuestos.ts importar preview",
+    "preview:repuestos:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/repuestos/importar-repuestos.ts retirar preview",
     "preview:ficha:sembrar": "tsx scripts/preview/con-entorno.ts payload run scripts/ficha/ficha-preview.ts sembrar",
     "preview:ficha:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/ficha/ficha-preview.ts retirar",
     "deploy:migrate": "npm run db:check && payload migrate",

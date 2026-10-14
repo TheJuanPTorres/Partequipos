@@ -12,6 +12,8 @@ import estilos from "./presentacionImagen.module.css";
 const RITMO = { escalon: 0.08, duracion: 0.75 } as const;
 
 const SIZES = "(max-width: 767px) 92vw, 455px";
+/** La foto apaisada ocupa su columna entera (media página menos márgenes). */
+const SIZES_APAISADA = "(max-width: 767px) 92vw, 47vw";
 
 /**
  * BLOQUE «PRESENTACIÓN CON IMAGEN» — imagen a un lado, antetítulo, título,
@@ -70,7 +72,7 @@ export function BloquePresentacionImagen({
               alt={imagen.alt}
               width={imagen.width}
               height={imagen.height}
-              sizes={SIZES}
+              sizes={imagen.width > imagen.height ? SIZES_APAISADA : SIZES}
               className={estilos.imagen}
             />
           ) : null}

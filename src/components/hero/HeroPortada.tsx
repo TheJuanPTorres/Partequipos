@@ -436,7 +436,11 @@ export function HeroPortada({ diapositivas }: Props) {
          * que queda hasta los controles, así se adapta a un título de varias
          * líneas. Con «sobre», en escritorio sube y cruza el título.
          */}
-        <div className={estilos.capaTexto} data-maquina={d.posicionMaquina}>
+        <div
+          className={estilos.capaTexto}
+          data-maquina={d.posicionMaquina}
+          data-partido={d.tituloPartido ? "" : undefined}
+        >
           <div className={estilos.capaParallax}>{titulo}</div>
           <div className={estilos.capaMaquina}>
             {diapositivas.map((s, i) =>

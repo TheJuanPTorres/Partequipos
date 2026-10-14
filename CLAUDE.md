@@ -371,7 +371,8 @@ pruebas; los guardas de cada script (`puedeTocarHeroDePrueba`) siguen mandando.
 
 - **DÓNDE VIVEN (desde el 2026-10-02): `Desktop\partequipos-claude\`**,
   compartida por todas las copias de trabajo (`Devs\Partequipos`,
-  `Devs\Partequipos-nosotros`, `Devs\Partequipos-panel`). Ahí están
+  `Devs\Partequipos-nosotros`, `Devs\Partequipos-panel` y, desde el
+  2026-10-13, `Devs\Partequipos-repuestos`). Ahí están
   `hooks\barrera.mjs` y `agents\verificador.md`. El `.claude\settings.local.json`
   de cada copia apunta al hook con **ruta absoluta**, y su `.claude\agents` es
   un enlace (junction) a la carpeta compartida. Así un cambio de la barrera
@@ -483,9 +484,24 @@ dirección.**
     (por ejemplo, la rama de prueba de Neon). La ventana se toma solo cuando
     se puede trabajar en ella sin esperas. Motivo: una ventana estuvo 11 h
     ocupada esperando una rama, con otro agente bloqueado detrás.
+- **`MEDICION.md` (desde el 2026-10-13): turno de mediciones con
+  navegador**, con el mismo protocolo que `VENTANA.md`. **Solo un agente a la
+  vez** mide con navegador: Lighthouse, capturas, Playwright (`panel:revision`,
+  `qa:vuelo-pie`, scripts locales). Motivo: la memoria del equipo; dos
+  navegadores a la vez la agotan y las medidas de rendimiento salen falseadas.
+  1. Leerlo. Si está ocupado, no se lanza ningún navegador: se espera.
+  2. Si está libre, escribir el nombre propio, la hora y qué se mide.
+  3. **Releerlo** para confirmar que es el nombre propio.
+  4. **Liberarlo al terminar** las mediciones, no al fusionar.
+  - Ocupado **más de 4 h** sin cambios: se avisa a dirección.
+  - **Nunca se libera el turno de otro agente.**
+  - Las peticiones sin navegador (`curl`, `fetch`, la prueba de humo, `qa`)
+    no necesitan turno.
 - **`ESTADO.md`**: una línea por agente (copia, rama, en qué está y qué
   espera). Cada uno actualiza **solo la suya**, al empezar y al terminar cada
-  tarea.
+  tarea. Agentes a 2026-10-13: A (`Devs\Partequipos`), B
+  (`Devs\Partequipos-nosotros`), C (`Devs\Partequipos-panel`) y D
+  (`Devs\Partequipos-repuestos`, páginas de repuestos).
 
 **Decisiones estándar de réplica (desde el 2026-10-02): se aplican sin
 preguntar.** Al replicar un diseño (ux-9 y lo que venga):

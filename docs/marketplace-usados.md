@@ -95,6 +95,9 @@ prueba compara esa lista con `docs/url-map.csv`.
 - `/excavadoras/` → categoría «Excavadoras» de usados.
 - `/elementor-48399/` → índice de usados.
 
-Son datos del panel: las crea dirección en producción con
+Son datos del panel, no código: las creó dirección en producción con
 `Desktop\partequipos-cierre\runbook-redirects-usados.md`. En los preview no se
 aplican (§10.22).
+
+**EJECUTADO por dirección el 2026-10-13:** las dos 301 creadas desde el panel
+de producción y comprobadas.

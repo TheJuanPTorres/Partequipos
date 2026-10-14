@@ -45,9 +45,9 @@ describe("formato de documento PDF", () => {
     await assert.rejects(llamar(cortado), /dañado o incompleto/);
   });
 
-  it("rechaza un PDF que pasa del tope de 25 MB", async () => {
+  it("rechaza un PDF que pasa del tope de 30 MB", async () => {
     const grande = Buffer.concat([PDF.subarray(0, 9), Buffer.alloc(TOPE_PDF_BYTES), PDF]);
-    await assert.rejects(llamar(grande), /máximo es 25 MB/);
+    await assert.rejects(llamar(grande), /máximo es 30 MB/);
   });
 
   it("no mira nada si la operación no lleva fichero o no es crear ni actualizar", async () => {

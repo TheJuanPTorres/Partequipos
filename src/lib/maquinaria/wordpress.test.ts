@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  CORRECCIONES_WP,
+  ETIQUETAS_CORREGIDAS,
   clasificarTexto,
   enlacesDe,
   etiquetaLegible,
@@ -28,6 +30,15 @@ describe("clasificarTexto", () => {
     assert.equal(clasificarTexto("<p>Una máquina de ejemplo.</p>"), "texto");
     // Una lista sin etiqueta en negrita es texto (argumentos de venta), no ficha técnica.
     assert.equal(clasificarTexto("<ul><li>Cabina amplia</li></ul>"), "texto");
+  });
+});
+
+describe("ETIQUETAS_CORREGIDAS", () => {
+  it("cada corrección es distinta de su original y no se encadena", () => {
+    for (const [de, a] of Object.entries(ETIQUETAS_CORREGIDAS)) {
+      assert.notEqual(de, a);
+      assert.equal(ETIQUETAS_CORREGIDAS[a], undefined, `«${a}» volvería a corregirse`);
+    }
   });
 });
 
@@ -88,6 +99,24 @@ describe("paresDeEspecificaciones", () => {
     ]);
   });
 
+  it("negrita mal cerrada: devuelve al valor lo que se llevó", () => {
+    const html =
+      "<ul><li><strong>ANCHO DE RODADURA: 1</strong>500 mm</li><li><strong>MOTOR: </strong>Motor X1</li></ul>";
+    assert.deepEqual(paresDeEspecificaciones(html), [
+      { etiqueta: "Ancho de rodadura", valor: "1500 mm" },
+      { etiqueta: "Motor", valor: "Motor X1" },
+    ]);
+  });
+
+  it("aplica la tabla de etiquetas corregidas, y solo a las que están", () => {
+    const html =
+      "<table><tr><td>Alcance maximo en el suelo</td><td>5 m</td><td>Peso operacional</td><td>9 t</td></tr></table>";
+    assert.deepEqual(paresDeEspecificaciones(html), [
+      { etiqueta: "Alcance máximo en el suelo", valor: "5 m" },
+      { etiqueta: "Peso operacional", valor: "9 t" },
+    ]);
+  });
+
   it("descarta las filas sin valor: no inventa nada", () => {
     const html = "<table><tr><td><strong>MOTOR</strong></td><td> </td></tr></table>";
     assert.deepEqual(paresDeEspecificaciones(html), []);
@@ -136,5 +165,17 @@ describe("nombres de ficheros y de la ficha", () => {
       enlacesDe('<a href="/a/">x</a> <a href="/a/">y</a> <a href="https://b.invalid">z</a>'),
       ["/a/", "https://b.invalid"],
     );
+  });
+});
+
+describe("CORRECCIONES_WP", () => {
+  it("cada corrección es de una ficha (ruta de maquinaria nueva con barra final) y dice por qué", () => {
+    for (const [ruta, c] of Object.entries(CORRECCIONES_WP)) {
+      assert.match(
+        ruta,
+        /^\/maquinaria-pesada\/maquinaria-pesada-nueva\/marcas\/[^/]+\/[^/]+\/[^/]+\/$/,
+      );
+      assert.ok(c.sinPdf || c.sinTituloSeo, ruta);
+    }
   });
 });

@@ -38,7 +38,8 @@ const MB = 1024 * 1024;
 export const REGLAS_SUBIDA_DIRECTA: Readonly<Record<string, ReglaDeSubida>> = {
   documentos: {
     tipos: ["application/pdf"],
-    maximo: 25 * MB,
+    // 30 MB desde el 2026-10-13 (dirección): un folleto de fabricante pesa 27,7 MB.
+    maximo: 30 * MB,
     extension: /\.pdf$/i,
     nombreTipo: "un PDF",
   },

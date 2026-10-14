@@ -5,10 +5,18 @@
  *
  *   npm run preview:fichas:simular              # sin escribir en la base ni en el Blob
  *   npm run preview:fichas:simular -- comprobar # además, comprueba fotos y PDF en WordPress
+ *   npm run preview:fichas:importar             # una tanda (20 fichas); repetir hasta acabar
+ *   npm run preview:fichas:importar -- tanda=80
+ *   npm run preview:fichas:importar -- actualizar  # vuelve a aplicar los datos a las ya importadas
+ *   npm run preview:fichas:retirar              # deshace EXACTAMENTE lo del manifiesto
  *
- * HOY SOLO HAY SIMULACIÓN (dirección, 2026-10-13): la importación real
- * (`importar` y `retirar`, por tandas y con manifiesto, como los usados) se
- * añade cuando dirección apruebe el informe de la simulación.
+ * IMPORTACIÓN AL PREVIEW APROBADA por dirección (2026-10-13), tras la simulación.
+ * Como los usados: por tandas, con MANIFIESTO (`manifiesto-fichas-preview.json`,
+ * fuera del repositorio) y RETIRADA EXACTA: borra lo que creó y devuelve a las
+ * fichas que ya existían (las de demostración) sus valores de antes.
+ *
+ * `actualizar` sirve también para rellenar el peso numérico cuando exista el
+ * campo en `equipos-nuevos` (lo añade B): el script lo detecta solo.
  *
  * Doble cierre en la simulación: tras validar el destino se vacía el token del
  * Blob (la guarda `almacenEsperado` rechazaría cualquier subida) y `create`,
@@ -33,9 +41,14 @@ import { convertHTMLToLexical, editorConfigFactory } from "@payloadcms/richtext-
  */
 import { Window } from "happy-dom";
 import { getPayload } from "payload";
+import sharp from "sharp";
+
+import { exigirAlmacen } from "../blob/exigirAlmacen";
 
 import { enlaceInterno, textoPlano } from "../../src/lib/blog/wordpress";
+import type { EquiposNuevo } from "../../src/payload-types";
 import {
+  CORRECCIONES_WP,
   clasificarTexto,
   enlacesDe,
   fotoDeFicha,
@@ -67,28 +80,33 @@ const fallar = (m: string): never => {
   e.stack = e.message;
   throw e;
 };
-if (modo !== "simular") {
-  fallar("solo existe el modo «simular»: la importación real espera la aprobación de dirección");
-}
+if (!modo) fallar("indica el modo: simular, importar o retirar");
 if (!destino) fallar("indica el destino: preview");
 const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
 if (!v.permitido) fallar(`NO se hace nada: ${v.motivo}`);
-// Simulación: sin token, nada puede llegar al Blob.
-process.env.BLOB_READ_WRITE_TOKEN = "";
+// Simulación: sin token, nada puede llegar al Blob. Importar y retirar: el almacén, comprobado antes.
+if (modo === "simular") process.env.BLOB_READ_WRITE_TOKEN = "";
+else exigirAlmacen("[fichas]");
 
 const CIERRE = path.join(os.homedir(), "Desktop", "partequipos-cierre");
 const FUENTE = valorDe("fuente") ?? path.join(CIERRE, "maquinaria-nueva-wordpress.json");
 const ALCANCE = valorDe("alcance") ?? path.join(CIERRE, "alcance-fichas-nuevas.txt");
 const INFORME = path.join(path.dirname(FUENTE), "simulacion-fichas.json");
 const COMPROBAR = args.includes("comprobar");
+const MANIFIESTO = valorDe("manifiesto") ?? path.join(CIERRE, `manifiesto-fichas-${destino}.json`);
+const TANDA = Number(valorDe("tanda") ?? 20);
+if (!Number.isInteger(TANDA) || TANDA < 1) fallar("tanda=<n> tiene que ser un entero positivo");
+const ACTUALIZAR = args.includes("actualizar");
 
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 const { default: config } = await import("../../src/payload.config");
 const payload = await getPayload({ config });
-for (const op of ["create", "update", "delete", "updateGlobal"] as const) {
-  (payload as unknown as Record<string, unknown>)[op] = () =>
-    fallar(`simulación: «${op}» no está permitido`);
+if (modo === "simular") {
+  for (const op of ["create", "update", "delete", "updateGlobal"] as const) {
+    (payload as unknown as Record<string, unknown>)[op] = () =>
+      fallar(`simulación: «${op}» no está permitido`);
+  }
 }
 const editorConfig = await editorConfigFactory.default({ config: payload.config });
 
@@ -156,6 +174,7 @@ const tipoDe = (marcaId: number, slug: string) =>
 const equipos = (
   await payload.find({ collection: "equipos-nuevos", depth: 0, limit: 0, pagination: false })
 ).docs;
+// El Blob añade un sufijo aleatorio al nombre: lo ya subido se reconoce por el PREFIJO.
 const mediaYa = new Set(
   (
     await payload.find({
@@ -189,9 +208,22 @@ const avisos: string[] = [];
 const fotosDe = (f: FichaWp) => (f.galeria.length ? f.galeria : f.imagenes);
 const genericas = fotosGenericas(fichas.map((f) => ({ fotos: fotosDe(f) })));
 
-type PlanFoto = { idWp: number; url: string; fichero: string; convertir: boolean; alt: string };
+type PlanFoto = {
+  idWp: number;
+  url: string;
+  fichero: string;
+  mimetype: string;
+  convertir: boolean;
+  alt: string;
+};
+/** Prefijo estable de una foto en `Media` (el id del adjunto) y de un PDF (su nombre sin extensión). */
+const prefijoFoto = (idWp: number) => `wp-ficha-${idWp}-`;
+const prefijoPdf = (fichero: string) => fichero.replace(/\.pdf$/i, "");
 type Plan = {
   ruta: string;
+  slug: string;
+  marcaId: number | null;
+  tipoId: number | null;
   accion: "crear" | "actualizar" | "sin-destino";
   idActual: number | null;
   enAlcance: boolean;
@@ -205,8 +237,12 @@ type Plan = {
   fotos: PlanFoto[];
   pdf: { url: string; fichero: string } | null;
   seo: { metaTitle: string | null; metaDescription: string | null };
+  /** Errores de WordPress corregidos al importar (`CORRECCIONES_WP`). */
+  correcciones: string[];
   avisos: string[];
 };
+/** El HTML de la descripción de cada ficha, con los enlaces ya relativos (no va al informe). */
+const htmlDe = new Map<string, string>();
 
 const planes: Plan[] = [];
 for (const f of fichas) {
@@ -266,18 +302,33 @@ for (const f of fichas) {
       idWp: foto.idWp,
       url: foto.url,
       fichero: p.fichero,
+      mimetype: p.mimetype,
       convertir: p.convertir,
       alt: altDeRepuesto(foto.alt, nombre),
     });
   }
   if (!fotos.length) avisosFicha.push("sin fotos");
 
-  const urlPdf = f.botones.find((b) => /\.pdf(\?|$)/i.test(b.url))?.url ?? null;
+  const correccion = CORRECCIONES_WP[f.ruta] ?? {};
+  const correcciones = [correccion.sinPdf, correccion.sinTituloSeo].filter((c): c is string =>
+    Boolean(c),
+  );
+  const urlPdf = correccion.sinPdf
+    ? null
+    : (f.botones.find((b) => /\.pdf(\?|$)/i.test(b.url))?.url ?? null);
   const pdfPlan = urlPdf ? pdfDeFicha(urlPdf) : null;
 
+  // Los enlaces al dominio de WordPress pasan a rutas relativas (las URL del sitio nuevo son las mismas).
+  htmlDe.set(
+    f.ruta,
+    htmlDescripcion.replace(/href="([^"]+)"/gi, (_, h: string) => `href="${enlaceInterno(h)}"`),
+  );
   const v = vivo.get(f.ruta);
   planes.push({
     ruta: f.ruta,
+    slug,
+    marcaId: marca?.id ?? null,
+    tipoId: tipo?.id ?? null,
     accion: !tipo ? "sin-destino" : actual ? "actualizar" : "crear",
     idActual: actual?.id ?? null,
     enAlcance: alcance.has(f.ruta),
@@ -296,9 +347,10 @@ for (const f of fichas) {
     fotos,
     pdf: urlPdf && pdfPlan ? { url: urlPdf, fichero: pdfPlan.fichero } : null,
     seo: {
-      metaTitle: tituloSeo(v?.titulo, nombre),
+      metaTitle: correccion.sinTituloSeo ? null : tituloSeo(v?.titulo, nombre),
       metaDescription: descripcionSeo(v?.descripcion),
     },
+    correcciones,
     avisos: avisosFicha,
   });
 }
@@ -316,8 +368,13 @@ for (const p of planes)
   if (p.accion !== "sin-destino") for (const f of p.fotos) fotosUnicas.set(f.idWp, f);
 const pdfsUnicos = new Map<string, { url: string; fichero: string }>();
 for (const p of planes) if (p.accion !== "sin-destino" && p.pdf) pdfsUnicos.set(p.pdf.url, p.pdf);
-const fotosASubir = [...fotosUnicas.values()].filter((f) => !mediaYa.has(f.fichero));
-const pdfsASubir = [...pdfsUnicos.values()].filter((d) => !documentosYa.has(d.fichero));
+const yaSubido = (hay: Set<string>, prefijo: string) => [...hay].some((f) => f.startsWith(prefijo));
+const fotosASubir = [...fotosUnicas.values()].filter(
+  (f) => !yaSubido(mediaYa, prefijoFoto(f.idWp)),
+);
+const pdfsASubir = [...pdfsUnicos.values()].filter(
+  (d) => !yaSubido(documentosYa, prefijoPdf(d.fichero)),
+);
 const pdfsCompartidos = [...pdfsUnicos.keys()].filter(
   (u) => planes.filter((p) => p.pdf?.url === u).length > 1,
 );
@@ -330,7 +387,7 @@ type Comprobacion = {
   mbFotoMax: number;
   mbFotosTotal: number;
   mbPdfTotal: number;
-  /** PDF que pasan del tope de `documentos` (25 MB, §10.39): no se pueden subir tal cual. */
+  /** PDF que pasan del tope de `documentos` (30 MB, §10.39): no se pueden subir tal cual. */
   pdfSobreTope: { fichero: string; mb: number; fichas: string[] }[];
 };
 const comprobacion: Comprobacion = {
@@ -372,7 +429,7 @@ if (COMPROBAR) {
     const mb = await cabeza(d.url);
     comprobacion.mbPdfTotal += mb;
     comprobacion.mbPdfMax = Math.max(comprobacion.mbPdfMax, mb);
-    if (mb > 25) {
+    if (mb > 30) {
       const usan = planes.filter((p) => p.pdf?.url === d.url).map((p) => p.ruta);
       comprobacion.pdfSobreTope.push({
         fichero: d.fichero,
@@ -416,21 +473,356 @@ const resumen = {
     soloEnPreview: soloPreview.length,
   },
   conAvisos: planes.filter((p) => p.avisos.length).length,
+  correcciones: planes.flatMap((p) => p.correcciones.map((c) => `${p.slug}: ${c}`)),
   comprobacion: COMPROBAR ? comprobacion : "no pedida (añade «comprobar»)",
   avisos,
 };
-fs.writeFileSync(
-  INFORME,
-  JSON.stringify(
-    {
-      resumen,
-      planes,
-      soloEnPreview: soloPreview.map((e) => ({ id: e.id, slug: e.slug, nombre: e.nombre })),
-      pdfsCompartidos,
-    },
-    null,
-    1,
-  ),
+if (modo === "simular") {
+  fs.writeFileSync(
+    INFORME,
+    JSON.stringify(
+      {
+        resumen,
+        planes,
+        soloEnPreview: soloPreview.map((e) => ({ id: e.id, slug: e.slug, nombre: e.nombre })),
+        pdfsCompartidos,
+      },
+      null,
+      1,
+    ),
+  );
+  log(`simulación: nada escrito. Informe completo: ${INFORME}`);
+  log(JSON.stringify(resumen, null, 1));
+  process.exit(0);
+}
+
+// ---------- Manifiesto ----------
+
+type Fichero = { id: number; filename: string; url: string };
+/** Lo que la importación sobrescribe en una ficha que ya existía: se devuelve al retirar. */
+type Anterior = Pick<
+  EquiposNuevo,
+  | "nombre"
+  | "codigo"
+  | "entradilla"
+  | "descripcion"
+  | "destacados"
+  | "imagenes"
+  | "fichaTecnica"
+  | "fichaTecnicaPdf"
+  | "documentos"
+  | "seo"
+> &
+  Record<string, unknown>;
+type Manifiesto = {
+  destino: string;
+  creado: {
+    equipos: { ruta: string; id: number }[];
+    media: (Fichero & { idWp: number })[];
+    documentos: (Fichero & { urlWp: string })[];
+  };
+  /** Fichas que ya existían (las de demostración) y su valor de antes, por id. */
+  actualizados: { ruta: string; id: number }[];
+  anteriores: Record<string, Anterior>;
+};
+const manifiesto: Manifiesto = fs.existsSync(MANIFIESTO)
+  ? (JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto)
+  : {
+      destino: destino!,
+      creado: { equipos: [], media: [], documentos: [] },
+      actualizados: [],
+      anteriores: {},
+    };
+if (manifiesto.destino !== destino) {
+  fallar(`el manifiesto ${MANIFIESTO} es del destino «${manifiesto.destino}», no de «${destino}»`);
+}
+function guardarManifiesto() {
+  fs.mkdirSync(path.dirname(MANIFIESTO), { recursive: true });
+  fs.writeFileSync(MANIFIESTO, JSON.stringify(manifiesto, null, 2));
+}
+
+/** El id de una relación (poblada o no). */
+const idDe = (x: unknown): number | null =>
+  typeof x === "number" ? x : x && typeof x === "object" && "id" in x ? Number(x.id) : null;
+const ids = (xs: unknown[] | null | undefined) =>
+  (xs ?? []).map(idDe).filter((x): x is number => x !== null);
+/** Las filas de un array sin su `id` (Payload las vuelve a numerar al guardar). */
+const sinIds = <T extends { id?: unknown }>(filas: T[] | null | undefined) =>
+  (filas ?? []).map((fila) => {
+    const resto = { ...fila };
+    delete resto.id;
+    return resto;
+  });
+
+// ---------- Peso numérico (campo de B, si ya existe) ----------
+
+/** El campo numérico de peso de `equipos-nuevos`, si ya está en el esquema (lo añade B). */
+const campoPeso =
+  payload.collections["equipos-nuevos"].config.flattenedFields.find(
+    (c) => c.type === "number" && /^peso/i.test(c.name),
+  )?.name ?? null;
+
+// ---------- Retirada ----------
+
+/**
+ * Deshace EXACTAMENTE lo que apunta el manifiesto: devuelve a las fichas que ya
+ * existían sus valores de antes, borra las fichas, fotos y PDF que creó la
+ * importación y comprueba que los ficheros salen del Blob. Lo que no creó la
+ * importación no se borra nunca.
+ */
+async function retirar(): Promise<void> {
+  if (!fs.existsSync(MANIFIESTO)) fallar(`no hay manifiesto (${MANIFIESTO}): nada que retirar`);
+  let devueltas = 0;
+  for (const { id } of manifiesto.actualizados) {
+    const a = manifiesto.anteriores[String(id)];
+    if (!a) continue;
+    await payload.update({
+      collection: "equipos-nuevos",
+      id,
+      data: {
+        nombre: a.nombre,
+        codigo: a.codigo ?? null,
+        entradilla: a.entradilla ?? null,
+        descripcion: a.descripcion ?? null,
+        destacados: sinIds(a.destacados),
+        imagenes: ids(a.imagenes),
+        fichaTecnica: sinIds(a.fichaTecnica),
+        fichaTecnicaPdf: idDe(a.fichaTecnicaPdf),
+        documentos: ids(a.documentos),
+        seo: a.seo ? { ...a.seo, ogImage: idDe(a.seo.ogImage) } : undefined,
+        ...(campoPeso ? { [campoPeso]: a[campoPeso] ?? null } : {}),
+      },
+      overrideAccess: true,
+    });
+    devueltas++;
+  }
+  log(
+    `fichas que ya existían, devueltas a su valor de antes: ${devueltas} de ${manifiesto.actualizados.length}`,
+  );
+  let equiposBorrados = 0;
+  for (const { id } of manifiesto.creado.equipos) {
+    const r = await payload
+      .delete({ collection: "equipos-nuevos", id, overrideAccess: true })
+      .catch(() => null);
+    if (r) equiposBorrados++;
+  }
+  log(`fichas creadas y borradas: ${equiposBorrados} de ${manifiesto.creado.equipos.length}`);
+  const urls: string[] = [];
+  const porColeccion = [
+    ["media", manifiesto.creado.media],
+    ["documentos", manifiesto.creado.documentos],
+  ] as const;
+  for (const [coleccion, lista] of porColeccion) {
+    let n = 0;
+    for (const m of lista) {
+      const r = await payload
+        .delete({ collection: coleccion, id: m.id, overrideAccess: true })
+        .catch(() => null);
+      if (r) {
+        n++;
+        if (m.url) urls.push(m.url);
+      }
+    }
+    log(`${coleccion} creados y borrados: ${n} de ${lista.length}`);
+  }
+  fs.renameSync(MANIFIESTO, MANIFIESTO.replace(/\.json$/, `.retirado-${Date.now()}.json`));
+  log("manifiesto retirado; espero 70 s (propagación del Blob)");
+  await new Promise((r) => setTimeout(r, 70_000));
+  // Como en los usados: algún fichero tarda algo más de 60 s; hasta 3 vueltas más, cada 30 s.
+  let vivos = [...urls];
+  for (let intento = 0; ; intento++) {
+    const quedan: string[] = [];
+    for (const u of vivos) if ((await fetch(u, { method: "HEAD" })).status !== 404) quedan.push(u);
+    vivos = quedan;
+    if (!vivos.length || intento === 3) break;
+    log(`${vivos.length} ficheros aún responden; vuelvo a mirar en 30 s`);
+    await new Promise((r) => setTimeout(r, 30_000));
+  }
+  if (vivos.length) fallar(`${vivos.length} ficheros siguen en el Blob: ${vivos.join(" ")}`);
+  log(`✓ los ${urls.length} ficheros dan 404`);
+}
+
+if (modo === "retirar") {
+  await retirar();
+  process.exit(0);
+}
+
+// ---------- Red, con turno ----------
+
+const AGENTE = "Partequipos-migracion/1.0 (importador de fichas de maquinaria; solo lectura)";
+let ultima = 0;
+async function turno() {
+  const espera = ultima + 700 - Date.now();
+  if (espera > 0) await new Promise((r) => setTimeout(r, espera));
+  ultima = Date.now();
+}
+async function descargar(url: string): Promise<Buffer> {
+  await turno();
+  const r = await fetch(url, { headers: { "User-Agent": AGENTE } });
+  if (!r.ok) throw new Error(`HTTP ${r.status} al descargar ${url}`);
+  return Buffer.from(await r.arrayBuffer());
+}
+
+/** El fichero ya subido con ese prefijo, si lo hay (el más antiguo). */
+async function yaEnColeccion(
+  coleccion: "media" | "documentos",
+  prefijo: string,
+): Promise<Fichero | null> {
+  const r = await payload.find({
+    collection: coleccion,
+    where: { filename: { like: prefijo } },
+    sort: "createdAt",
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+  });
+  const d = r.docs.find((x) => (x.filename ?? "").startsWith(prefijo));
+  return d ? { id: d.id, filename: d.filename ?? "", url: d.url ?? "" } : null;
+}
+
+async function fotoAMedia(f: PlanFoto): Promise<number> {
+  const ya = await yaEnColeccion("media", prefijoFoto(f.idWp));
+  if (ya) return ya.id;
+  const origen = await descargar(f.url);
+  // AVIF → WebP en esta máquina, no en el lambda (como los repuestos).
+  const datos = f.convertir ? await sharp(origen).webp({ quality: 82 }).toBuffer() : origen;
+  const doc = await payload.create({
+    collection: "media",
+    data: { alt: f.alt },
+    file: { data: datos, mimetype: f.mimetype, name: f.fichero, size: datos.length },
+    overrideAccess: true,
+  });
+  manifiesto.creado.media.push({
+    idWp: f.idWp,
+    id: doc.id,
+    filename: doc.filename ?? f.fichero,
+    url: doc.url ?? "",
+  });
+  guardarManifiesto();
+  return doc.id;
+}
+
+async function pdfADocumento(
+  pdf: { url: string; fichero: string },
+  nombre: string,
+): Promise<number> {
+  const ya = await yaEnColeccion("documentos", prefijoPdf(pdf.fichero));
+  if (ya) return ya.id;
+  const datos = await descargar(pdf.url);
+  const doc = await payload.create({
+    collection: "documentos",
+    data: { titulo: `Ficha técnica ${nombre}` },
+    file: { data: datos, mimetype: "application/pdf", name: pdf.fichero, size: datos.length },
+    overrideAccess: true,
+  });
+  manifiesto.creado.documentos.push({
+    urlWp: pdf.url,
+    id: doc.id,
+    filename: doc.filename ?? pdf.fichero,
+    url: doc.url ?? "",
+  });
+  guardarManifiesto();
+  return doc.id;
+}
+
+// ---------- Importación, por tandas ----------
+
+const hecha = (ruta: string) =>
+  manifiesto.creado.equipos.some((e) => e.ruta === ruta) ||
+  manifiesto.actualizados.some((e) => e.ruta === ruta);
+const conDestino = planes.filter((p) => p.accion !== "sin-destino");
+for (const p of planes.filter((p) => p.accion === "sin-destino")) {
+  log(`SIN DESTINO, no se importa: ${p.ruta} (${p.avisos.join("; ")})`);
+}
+const pendientes = conDestino.filter((p) => ACTUALIZAR || !hecha(p.ruta));
+const tanda = pendientes.slice(0, TANDA);
+log(
+  `ya importadas: ${conDestino.filter((p) => hecha(p.ruta)).length} · esta tanda: ${tanda.length} · quedan después: ${pendientes.length - tanda.length}`,
 );
-log(`simulación: nada escrito. Informe completo: ${INFORME}`);
-log(JSON.stringify(resumen, null, 1));
+log(
+  campoPeso
+    ? `peso numérico: se rellena el campo «${campoPeso}»`
+    : "peso numérico: el campo aún no existe; se rellenará con «actualizar» cuando esté",
+);
+
+for (const p of tanda) {
+  const imagenes: number[] = [];
+  for (const f of p.fotos) imagenes.push(await fotoAMedia(f));
+  const fichaTecnicaPdf = p.pdf ? await pdfADocumento(p.pdf, p.nombre) : null;
+  const html = htmlDe.get(p.ruta) ?? "";
+  const descripcion = textoPlano(html)
+    ? (convertHTMLToLexical({ editorConfig, html, JSDOM: DomFeliz }) as EquiposNuevo["descripcion"])
+    : null;
+  const data = {
+    nombre: p.nombre,
+    codigo: p.codigo,
+    // WordPress no tiene entradilla ni puntos destacados: en las fichas de
+    // demostración se vacía el relleno.
+    entradilla: null,
+    descripcion,
+    destacados: [],
+    imagenes,
+    // «Destacar», sin marcar: lo decide el editor.
+    fichaTecnica: p.fichaTecnica.map((f) => ({ ...f, destacar: false })),
+    fichaTecnicaPdf,
+    documentos: [],
+    seo: { metaTitle: p.seo.metaTitle, metaDescription: p.seo.metaDescription },
+    ...(campoPeso ? { [campoPeso]: p.pesoKg } : {}),
+  };
+
+  // Ya existía (por el plan, o creada en una tanda anterior): se actualiza.
+  const creadaAntes = manifiesto.creado.equipos.find((e) => e.ruta === p.ruta)?.id ?? null;
+  const id = p.idActual ?? creadaAntes;
+  if (id !== null) {
+    if (p.idActual !== null && !manifiesto.anteriores[String(id)]) {
+      const antes = await payload.findByID({
+        collection: "equipos-nuevos",
+        id,
+        depth: 0,
+        overrideAccess: true,
+      });
+      manifiesto.anteriores[String(id)] = {
+        nombre: antes.nombre,
+        codigo: antes.codigo,
+        entradilla: antes.entradilla,
+        descripcion: antes.descripcion,
+        destacados: antes.destacados,
+        imagenes: antes.imagenes,
+        fichaTecnica: antes.fichaTecnica,
+        fichaTecnicaPdf: antes.fichaTecnicaPdf,
+        documentos: antes.documentos,
+        seo: antes.seo,
+        ...(campoPeso
+          ? { [campoPeso]: (antes as unknown as Record<string, unknown>)[campoPeso] ?? null }
+          : {}),
+      };
+      guardarManifiesto();
+    }
+    await payload.update({ collection: "equipos-nuevos", id, data, overrideAccess: true });
+    if (p.idActual !== null && !manifiesto.actualizados.some((e) => e.id === id)) {
+      manifiesto.actualizados.push({ ruta: p.ruta, id });
+    }
+    guardarManifiesto();
+    log(
+      `actualizada ${p.slug} (id ${id}) · ${imagenes.length} fotos · ${p.fichaTecnica.length} filas · PDF ${fichaTecnicaPdf ? "sí" : "no"}`,
+    );
+    continue;
+  }
+  const doc = await payload.create({
+    collection: "equipos-nuevos",
+    data: { ...data, slug: p.slug, marca: p.marcaId!, tipo: p.tipoId! },
+    overrideAccess: true,
+  });
+  manifiesto.creado.equipos.push({ ruta: p.ruta, id: doc.id });
+  guardarManifiesto();
+  if (doc.slug !== p.slug) {
+    fallar(`la ficha ${p.ruta} se guardó con otro slug («${doc.slug}»): revisar`);
+  }
+  log(
+    `creada ${p.slug} (id ${doc.id}) · ${imagenes.length} fotos · ${p.fichaTecnica.length} filas · PDF ${fichaTecnicaPdf ? "sí" : "no"}`,
+  );
+}
+log(
+  `tanda terminada · en el manifiesto: ${manifiesto.creado.equipos.length} creadas, ${manifiesto.actualizados.length} actualizadas, ${manifiesto.creado.media.length} fotos, ${manifiesto.creado.documentos.length} PDF`,
+);
+if (pendientes.length > tanda.length) log("quedan fichas: vuelve a ejecutar la importación");

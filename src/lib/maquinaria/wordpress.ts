@@ -36,10 +36,61 @@ const limpio = (html: string) =>
     .trim();
 
 /**
+ * ETIQUETAS CORREGIDAS (decisión de dirección, 2026-10-13): solo tildes,
+ * erratas y mayúsculas sueltas en medio de la etiqueta. Los sinónimos NO se
+ * unifican («Peso operacional» y «Peso operativo» siguen siendo dos): eso
+ * cambiaría lo que dice el fabricante. La clave es la etiqueta tal como sale
+ * de `etiquetaLegible`; se aplica en `etiquetaCorregida`.
+ */
+export const ETIQUETAS_CORREGIDAS: Readonly<Record<string, string>> = {
+  "Alance maximo en el suelo": "Alcance máximo en el suelo",
+  "Alcance maximo en el suelo": "Alcance máximo en el suelo",
+  "Alcance Máximo horizontal": "Alcance máximo horizontal",
+  "Altura de Transporte": "Altura de transporte",
+  "Altura maxima de descarga con angulo de articulacion de 45°":
+    "Altura máxima de descarga con ángulo de articulación de 45°",
+  "Altura máxima de descarga con ángulo de articulación de 45º":
+    "Altura máxima de descarga con ángulo de articulación de 45°",
+  "Ancho de Transporte": "Ancho de transporte",
+  "Bomba de los implementos hidraulicos": "Bomba de los implementos hidráulicos",
+  "Bomba de ﬂujo variable": "Bomba de flujo variable",
+  "Capacidad maxima de la cucharón colmado": "Capacidad máxima del cucharón colmado",
+  "Elevación del braz de excavación a 3.660 mm (12’)":
+    "Elevación del brazo de excavación a 3.660 mm (12’)",
+  "Fabricante del Motor": "Fabricante del motor",
+  "Fuerza de Arranque": "Fuerza de arranque",
+  "Fuerza de excavacion del balde trasero (estándar)":
+    "Fuerza de excavación del balde trasero (estándar)",
+  "Fuerza de excavacion del brazo de penetracion (estándar)":
+    "Fuerza de excavación del brazo de penetración (estándar)",
+  "Largura de la hoja": "Largo de la hoja",
+  "Longitud de Transporte": "Longitud de transporte",
+  "Longitud total con brazo de penetracion estándar":
+    "Longitud total con brazo de penetración estándar",
+  "Maxima profundidad de excavacion (estándar)": "Máxima profundidad de excavación (estándar)",
+  "Peso de Operación": "Peso de operación",
+  "Potencia Bruta": "Potencia bruta",
+  "Potencia Bruta (ISO 14396)": "Potencia bruta (ISO 14396)",
+  "Potencia Bruta (SAE J1995)": "Potencia bruta (SAE J1995)",
+  "Potencia Bruta SAE J1995 a 2500 rpm": "Potencia bruta SAE J1995 a 2500 rpm",
+  "Potencia Neta": "Potencia neta",
+  "Potencia Neta (SAE J1349)": "Potencia neta (SAE J1349)",
+  "Potencia Neta SAE J1349 a 2500 rpm": "Potencia neta SAE J1349 a 2500 rpm",
+  "Potência neta (SAE J1349)": "Potencia neta (SAE J1349)",
+  "Presión de alívio principal (estándar)": "Presión de alivio principal (estándar)",
+  "Profundidad maxima excavacion": "Profundidad máxima de excavación",
+  "Rotación del circulo": "Rotación del círculo",
+  "Tipo del Motor": "Tipo del motor",
+  "Velocidad maxima de desplazamiento (avance)": "Velocidad máxima de desplazamiento (avance)",
+  "Velocidad máxima de desplazamiento (Avance)": "Velocidad máxima de desplazamiento (avance)",
+  "Área da la oruga no solo": "Área de la oruga en el suelo",
+};
+
+/**
  * Etiqueta legible: sin los dos puntos del final y, si viene TODA en
  * mayúsculas («POTENCIA NETA»), en minúscula con la primera en mayúscula
- * («Potencia neta»). Si ya trae mayúsculas y minúsculas, tal cual. No se
- * corrige la ortografía: lo que escribió el cliente se respeta.
+ * («Potencia neta»). Si ya trae mayúsculas y minúsculas, tal cual. La
+ * ortografía solo se toca con la tabla `ETIQUETAS_CORREGIDAS`.
  */
 export function etiquetaLegible(texto: string): string {
   const t = texto.replace(/\s*:\s*$/, "").trim();
@@ -48,6 +99,12 @@ export function etiquetaLegible(texto: string): string {
   return min.charAt(0).toLocaleUpperCase("es") + min.slice(1);
 }
 
+/** La etiqueta legible, con la corrección de la tabla si la tiene. */
+export const etiquetaCorregida = (texto: string) => {
+  const e = etiquetaLegible(texto);
+  return ETIQUETAS_CORREGIDAS[e] ?? e;
+};
+
 /**
  * Pares etiqueta/valor de un bloque de especificaciones. Tres formas en las
  * fichas de WordPress:
@@ -55,13 +112,14 @@ export function etiquetaLegible(texto: string): string {
  *   siguiente (la celda de la etiqueta suele ir en negrita, pero no siempre);
  * - tabla del fabricante con `<th>` y una celda de grupo con `rowspan`
  *   («Motor» abarcando sus filas): el grupo no es un dato y se salta;
- * - lista con `<li><strong>ETIQUETA:</strong> valor</li>`.
- * Las celdas vacías y los pares sin valor se descartan: no se inventa nada.
+ * - lista con `<li><strong>ETIQUETA:</strong> valor</li>` (si la negrita se
+ *   cerró tarde y se llevó el principio del valor, se le devuelve).
+ * Las etiquetas pasan por `etiquetaCorregida`. Las celdas vacías y los pares sin valor se descartan: no se inventa nada.
  */
 export function paresDeEspecificaciones(html: string): Par[] {
   const pares: Par[] = [];
   const anadir = (etiqueta: string, valor: string) => {
-    const e = etiquetaLegible(limpio(etiqueta));
+    const e = etiquetaCorregida(limpio(etiqueta));
     const v = limpio(valor);
     if (e && v) pares.push({ etiqueta: e, valor: v });
   };
@@ -75,7 +133,14 @@ export function paresDeEspecificaciones(html: string): Par[] {
   }
   for (const li of html.match(/<li[\s\S]*?<\/li>/gi) ?? []) {
     const m = li.match(/<strong>([\s\S]*?)<\/strong>([\s\S]*)<\/li>/i);
-    if (m) anadir(m[1]!, m[2]!);
+    if (!m) continue;
+    // Negrita mal cerrada: «ANCHO: 1</strong>676 mm» → «Ancho» y «1676 mm».
+    const partida = limpio(m[1]!).match(/^(.*?):\s*(\S.*)$/);
+    if (partida) {
+      const resto = limpio(m[2]!);
+      const junto = /\d$/.test(partida[2]!) && /^\d/.test(resto);
+      anadir(partida[1]!, `${partida[2]}${junto ? "" : " "}${resto}`);
+    } else anadir(m[1]!, m[2]!);
   }
   return pares;
 }
@@ -144,3 +209,16 @@ function numeroEs(texto: string, toneladas: boolean): number | null {
 export function enlacesDe(html: string): string[] {
   return [...new Set([...html.matchAll(/href="([^"]+)"/gi)].map((m) => m[1]!))];
 }
+
+/**
+ * ERRORES DEL PROPIO WORDPRESS que se corrigen al importar (decisión de
+ * dirección, 2026-10-13). Están anotados para que el cliente los corrija
+ * también en su web (`docs/fichas-nuevas-importacion.md`). Por ruta.
+ */
+export const CORRECCIONES_WP: Readonly<Record<string, { sinPdf?: string; sinTituloSeo?: string }>> =
+  {
+    "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/bulldozer/bulldozer-case-construction-1150m/":
+      { sinPdf: "WordPress enlaza el PDF de otro modelo (1650M)" },
+    "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/retrocargadora-case-construction-580sv-tier4/":
+      { sinTituloSeo: "el <title> de WordPress nombra otro modelo (580N)" },
+  };

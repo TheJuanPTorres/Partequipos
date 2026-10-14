@@ -168,7 +168,7 @@ oficial, no lo pongas.
   4»). Con una quinta marcada se pone en rojo y te dice cuántas quitar; si
   guardas así, el panel no lo deja y el aviso de arriba nombra las casillas.
 - **«Ficha técnica completa (PDF)»:** súbelo ahí mismo con **«Crear»**, o
-  elige uno ya subido. Solo PDF, **máximo 25 MB**. Sale en la ficha como
+  elige uno ya subido. Solo PDF, **máximo 30 MB**. Sale en la ficha como
   «Descargar ficha técnica completa»; sin PDF, el botón no aparece. Los PDF
   quedan en **Archivos → Documentos**.
 - **La imagen del recuadro «Contáctanos para recibir asesoría»**, al final de
@@ -205,7 +205,7 @@ oficial, no lo pongas.
   por el nombre del fichero.
 - **Máximo 15 MB por imagen.** Si pesa más, el panel avisa antes de empezar a
   subir y no sube nada: redúcela al exportarla. Las fichas en PDF
-  (**Documentos**) admiten hasta **25 MB**.
+  (**Documentos**) admiten hasta **30 MB**.
 - **Texto alternativo, obligatorio:** describe lo que se ve, como se lo
   contarías a alguien por teléfono. «Excavadora Hitachi ZX200 trabajando en una
   obra», no «foto1» ni «imagen». Lo leen los lectores de pantalla y los
@@ -340,7 +340,7 @@ hasta que la tengan. El propio bloque lo avisa.
 | «La dirección web … ya la usa una página / un artículo»                                      | Cambia la dirección web antes de guardar                           |
 | «… no es una imagen JPEG, PNG ni WebP»                                                       | Convierte la imagen y vuelve a subirla                             |
 | «… pesa … MB y el máximo es 4 MB»                                                            | Exporta el vídeo con más compresión                                |
-| «… pesa … MB y el máximo es 15 MB» (imagen) o «… 25 MB» (PDF)                                | Reduce la imagen o el PDF y vuelve a subirlo                       |
+| «… pesa … MB y el máximo es 15 MB» (imagen) o «… 30 MB» (PDF)                                | Reduce la imagen o el PDF y vuelve a subirlo                       |
 | «Está vacío.», «Es demasiado corto…», «Es una palabra genérica…», «Es el nombre del fichero» | Describe lo que se ve en la imagen (§5.5)                          |
 | «El recorte está desactivado»                                                                | Recorta la imagen en tu equipo antes de subirla                    |
 | «No se puede publicar sin la autorización de uso marcada»                                    | Marca la autorización (si la tienes firmada) o déjalo sin publicar |

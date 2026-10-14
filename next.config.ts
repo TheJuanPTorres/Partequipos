@@ -78,6 +78,17 @@ const nextConfig: NextConfig = {
    * Se lee la variable en tiempo de build, igual que las otras dos vías: las
    * tres se activan y desactivan juntas con el mismo valor.
    */
+  /*
+   * `/maquinaria/` → `/maquinaria-pesada/` (decisión de dirección, 2026-10-13).
+   * El mapa de navegación del cliente pide `/maquinaria/` como página, pero no
+   * existe ni en el WordPress ni aquí. Hasta que Andrés aclare qué es, un 301
+   * a la sección que sí existe. Va aquí y no en la colección `Redirects`
+   * porque no es una URL del sitio viejo, y así vale en todos los entornos
+   * sin escribir en ninguna base. Si llega a ser una página, se quita esto.
+   */
+  async redirects() {
+    return [{ source: "/maquinaria/", destination: "/maquinaria-pesada/", statusCode: 301 }];
+  },
   async headers() {
     /*
      * CABECERAS DE SEGURIDAD.

@@ -5,6 +5,7 @@ import { Fragment } from "react";
 import { ArticuloCuerpo } from "@/components/blog/ArticuloCuerpo";
 import { PaginaConBloques } from "@/components/bloques/PaginaConBloques";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { ContactoPagina } from "@/components/indices/ContactoPagina";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { RichText } from "@/components/layout/RichText";
@@ -17,6 +18,8 @@ import {
   getPaginaPorSlug,
   getPaginas,
 } from "@/lib/queries/getPaginas";
+import { canalesDeContacto } from "@/lib/indices/paginasIndice";
+import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
 import { getEmpresa, getHorario } from "@/lib/queries/getSeo";
 import { getVideoPorId } from "@/lib/queries/getVideos";
 import { rutas } from "@/lib/routes";
@@ -156,6 +159,37 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
         migas={breadcrumbs}
         bloques={vistaDeBloques(pagina.bloques, porId)}
       />
+    );
+  }
+
+  /*
+   * /contactanos/: la plantilla «Contáctanos» de Andrés
+   * (docs/diseno/decisiones-indices-contacto.md). Los datos de contacto salen del
+   * global de la empresa y los textos y fotos, de `paginas-indice`. El pie SÍ
+   * pinta su tarjeta roja, como en la plantilla.
+   */
+  if (clave === SLUG_CONTACTO && empresa) {
+    const indice = await getPaginasIndice();
+    const c = indice.contacto;
+    return (
+      <main>
+        <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
+        <ContactoPagina
+          antetitulo={c?.antetitulo?.trim() ?? ""}
+          titulo={c?.titulo?.trim() || pagina.titulo}
+          tituloCanales={c?.tituloCanales?.trim() ?? ""}
+          tituloHorario={c?.tituloHorario?.trim() ?? ""}
+          foto={imagenDeMedia(c?.foto, "")}
+          decorativa={imagenDeMedia(c?.imagenDecorativa, "")}
+          canales={canalesDeContacto(c, empresa)}
+          horario={horario}
+          formulario={{
+            origen: `/${pagina.slug}`,
+            siteKey: turnstileSiteKey(),
+            whatsapp: enlaceWhatsApp(empresa.whatsapp),
+          }}
+        />
+      </main>
     );
   }
 

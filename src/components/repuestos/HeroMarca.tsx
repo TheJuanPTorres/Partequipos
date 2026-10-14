@@ -25,13 +25,16 @@ import estilos from "./marca.module.css";
 export function HeroMarca({
   vista,
   anclaSiguiente,
+  franja = true,
 }: {
   vista: VistaEncabezado;
   anclaSiguiente: string;
+  /** `false`: sin la franja amarilla tras la tarjeta (las páginas índice). */
+  franja?: boolean;
 }) {
   const { fondo, logo } = vista;
   return (
-    <section className={estilos.heroSeccion}>
+    <section className={`${estilos.heroSeccion} ${franja ? "" : estilos.heroSeccionPlano}`}>
       <div className={estilos.hero}>
         {fondo ? (
           <Image
@@ -60,6 +63,8 @@ export function HeroMarca({
             </div>
           ) : null}
 
+          {vista.antetitulo ? <p className={estilos.antetituloHero}>{vista.antetitulo}</p> : null}
+
           <h1 className={estilos.h1}>
             <Revelado
               como="span"
@@ -68,13 +73,15 @@ export function HeroMarca({
               texto={vista.linea1}
               className={estilos.linea1}
             />
-            <Revelado
-              como="span"
-              alCargar
-              ritmo="titulo"
-              texto={vista.linea2}
-              className={estilos.linea2}
-            />
+            {vista.linea2 ? (
+              <Revelado
+                como="span"
+                alCargar
+                ritmo="titulo"
+                texto={vista.linea2}
+                className={estilos.linea2}
+              />
+            ) : null}
           </h1>
 
           {vista.descripcion ? <p className={estilos.presentacion}>{vista.descripcion}</p> : null}

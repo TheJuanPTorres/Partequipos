@@ -756,3 +756,49 @@ a.pildora:hover {
     width: 100%;
   }
 }
+
+/* --- Páginas índice con tarjetas (repuestos y maquinaria, plantilla de Andrés) ---------- */
+
+/* Sin la franja amarilla tras la tarjeta del encabezado: el fondo es el gris de la página. */
+.heroSeccionPlano {
+  background: var(--color-fondo-seccion);
+}
+
+/* La línea en negrita sobre el título. */
+.antetituloHero {
+  margin: 0;
+  font-size: var(--texto-cuerpo);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* La sección blanca de las tarjetas, sin título y con todas las esquinas redondeadas. */
+/* 72 de relleno de la sección más 10 del contenedor: la foto empieza 82 px más abajo (medido). */
+.tarjetasIndice {
+  margin-top: 0;
+  padding-top: 82px;
+  border-radius: var(--marca-radio);
+}
+
+.tarjetasIndice .rejilla {
+  margin-top: 0;
+}
+
+/* Entre filas no hay hueco: el panel ya trae el suyo (paso de fila de 389 px, medido a 1440). */
+@media (min-width: 1025px) {
+  .tarjetasIndice .rejilla {
+    row-gap: 0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .tarjetasIndice {
+    padding-top: 82px;
+  }
+}
+
+@media (max-width: 767px) {
+  .tarjetasIndice {
+    padding-top: 30px;
+  }
+}

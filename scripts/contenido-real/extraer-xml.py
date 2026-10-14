@@ -69,7 +69,12 @@ IMAGENES = {
     "tarjeta-nueva": ("2025/03/Hitachi-FOTOS-02-scaled.jpg", "Excavadora Hitachi nueva en una obra"),
     "tarjeta-usada": ("2025/03/USADOS-FOTOS-scaled.jpg", "Bulldozer usado sobre un acopio de material"),
     "tarjeta-repuestos": ("2025/07/Tren-de-RODAJE-SEP-2025.jpg", "Repuestos de tren de rodaje para maquinaria pesada"),
+    # Tarjeta de las preguntas frecuentes (rediseño de Andrés, 2026-10-14): la foto
+    # del técnico de la sede de Guarne, la misma que usa D en Contáctanos.
+    "faq-tarjeta": ("2022/05/Tecnico-partequipos-Sede-guarne-scaled.jpg", "Técnico de Partequipos revisando un componente en el taller"),
 }
+# Punto focal de las fotos que se recortan mucho (porcentajes): la cara del técnico.
+FOCOS = {"faq-tarjeta": (52, 30)}
 # Las 4 categorías técnicas de la sección 5: su imagen (la de la plantilla 40343) y,
 # porque la retirada de la copia de demostración los devuelve a vacío, su orden
 # en la portada y su icono (los de hoy en el preview; son del diseño, no de WordPress).
@@ -154,7 +159,7 @@ faltan = [f for f in quiero if f not in adjuntos]
 if faltan:
     sys.exit(f"✗ adjuntos que no están en la exportación: {faltan}")
 imagenes = {
-    clave: {"url": BASE_UPLOADS + f, "idWp": adjuntos[f]["idWp"], "alt": alt}
+    clave: {"url": BASE_UPLOADS + f, "idWp": adjuntos[f]["idWp"], "alt": alt, **({"foco": list(FOCOS[clave])} if clave in FOCOS else {})}
     for clave, (f, alt) in IMAGENES.items()
 }
 
@@ -273,6 +278,7 @@ fuente = {
         "usadaImagen": "usada",
         "categorias": categorias,
         "compania": {"imagen": "compania", "youtube": YOUTUBE_COMPANIA},
+        "faqImagen": "faq-tarjeta",
         "metaDescripcion": metas[ID_HOME],
     },
     "sedes": sedes,

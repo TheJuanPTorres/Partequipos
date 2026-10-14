@@ -270,14 +270,11 @@
   }
 }
 
-/* Con transparencia reducida del sistema, también opaco (y sin desenfoque). */
-@media (prefers-reduced-transparency: reduce) {
-  .panel::after {
-    background: rgb(255 255 255 / 98%);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
+/*
+ * La transparencia reducida del sistema NO cambia el vidrio: la barra no lo cambia, y
+ * panel y curvas tienen que verse igual que ella (dirección, 2026-10-14). El tinte del 86 %
+ * ya cumple AA sin el desenfoque (D1), así que no hace falta un respaldo más opaco.
+ */
 
 .verTodo {
   display: inline-flex;

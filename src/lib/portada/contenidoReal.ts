@@ -66,7 +66,7 @@ export type ClaveTarjeta = keyof typeof ENLACES_TARJETAS;
 
 /** Lo que saca `scripts/contenido-real/extraer-xml.py` del XML de WordPress. */
 export type FuenteContenidoReal = {
-  imagenes: Record<string, { url: string; idWp: number; alt: string }>;
+  imagenes: Record<string, { url: string; idWp: number; alt: string; foco?: [number, number] }>;
   portada: {
     marcas: { slug: string; logo: string; tarjeta: string; orden: number; descripcion: string }[];
     logos: { nombre: string; logo: string }[];
@@ -80,6 +80,8 @@ export type FuenteContenidoReal = {
       icono: string;
     }[];
     compania: { imagen: string; youtube: string };
+    /** La foto de la tarjeta de las preguntas frecuentes. */
+    faqImagen: string;
     metaDescripcion: string;
   };
   sedes: {

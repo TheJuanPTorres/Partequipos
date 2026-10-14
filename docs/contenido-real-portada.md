@@ -25,7 +25,7 @@ npm run preview:real:retirar
 ## 2. Qué se sustituye y por qué
 
 Las imágenes son ficheros de la propia web original; la tabla completa, con su
-ruta en WordPress, está en `IMAGENES` del extractor. Son **22**, una subida al
+ruta en WordPress, está en `IMAGENES` del extractor. Son **23**, una subida al
 Blob cada una (Media no genera tamaños derivados).
 
 | Dónde              | Antes (ux-9)                                     | Ahora (WordPress)                                                                                                                                                                                      |
@@ -38,7 +38,7 @@ Blob cada una (Media no genera tamaños derivados).
 | Sec. 6–8, compañía | Vídeo de ux-9 y un YouTube que no es del cliente | **Imagen** de WP (sin vídeo) y el YouTube que pinta Nosotros en WP                                                                                                                                     |
 | Sec. 9, sedes      | 7 sedes de la maqueta, con foto                  | Las sedes de «NUESTRAS sedes» de WP, agrupadas como su mapa (Antioquia = Caucasia, Guarne y Medellín). **Sin foto**: WP no tiene fotos de sedes                                                        |
 | Sec. 10 y 11       | Testimonios y preguntas de la maqueta            | **No se tocan**: los reales los gestiona dirección con el cliente. Sin datos, las secciones no se pintan                                                                                               |
-| Sec. 11, imagen    | Máquina recortada                                | **Sin imagen** (no hay recorte en WP)                                                                                                                                                                  |
+| Sec. 11, imagen    | Máquina recortada                                | **Foto del técnico** de la sede de Guarne (la misma que usa Contáctanos), de fondo de la tarjeta del rediseño de Andrés (2026-10-14)                                                                   |
 | Pie                | Cargador recortado                               | **Sin imagen** decorativa                                                                                                                                                                              |
 | Nosotros           | Vídeo, animación, cifras y textos de la maqueta  | Imagen de cabecera, párrafo y mapa de sedes reales, «+26 Años de experiencia», franja «Marcas aliadas» con foto de WP (sin máquina recortada) y tarjetas con la meta descripción de cada sección de WP |
 | SEO                | Textos de la siembra                             | Meta descripción de WP en la home y Nosotros                                                                                                                                                           |
@@ -49,7 +49,7 @@ escribe todo en mayúsculas pasan a mayúscula inicial («OFRECEMOS SOLUCIONES�
 quiere, y un lector de pantalla puede deletrear un texto en mayúsculas.
 
 **Huecos** (sin equivalente en WP, aceptados «sin imagen» por dirección si la
-sección se ve bien): fotos de las sedes, máquina de las preguntas, imagen del
+sección se ve bien): fotos de las sedes, imagen del
 pie, máquina de la franja de Nosotros, vídeo de cabecera de Nosotros,
 animación del mapa y 2 de las 3 cifras de Nosotros (en WP son texto, sin
 número). Las sedes de Antioquia e Ibagué llevan las coordenadas del centro de

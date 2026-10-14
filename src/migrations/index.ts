@@ -30,6 +30,7 @@ import * as migration_20261014_004138_repuestos_marca from './20261014_004138_re
 import * as migration_20261014_020810_marcas_usada from './20261014_020810_marcas_usada';
 import * as migration_20261014_023900_categorias_url_exacta from './20261014_023900_categorias_url_exacta';
 import * as migration_20261014_031623_nueva_peso_operativo from './20261014_031623_nueva_peso_operativo';
+import * as migration_20261014_033314_seo_marcas_repuestos from './20261014_033314_seo_marcas_repuestos';
 
 export const migrations = [
   {
@@ -190,6 +191,11 @@ export const migrations = [
   {
     up: migration_20261014_031623_nueva_peso_operativo.up,
     down: migration_20261014_031623_nueva_peso_operativo.down,
-    name: '20261014_031623_nueva_peso_operativo'
+    name: '20261014_031623_nueva_peso_operativo',
+  },
+  {
+    up: migration_20261014_033314_seo_marcas_repuestos.up,
+    down: migration_20261014_033314_seo_marcas_repuestos.down,
+    name: '20261014_033314_seo_marcas_repuestos'
   },
 ];

@@ -521,6 +521,14 @@ export interface Marca {
    * Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.
    */
   fondoHero?: (number | null) | Media;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -1722,6 +1730,13 @@ export interface MarcasSelect<T extends boolean = true> {
   descripcion?: T;
   logo?: T;
   fondoHero?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;

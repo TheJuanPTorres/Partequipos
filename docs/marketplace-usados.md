@@ -9,7 +9,7 @@ dirección del 2026-10-13 (D1–D7) están en
 | Paso | Qué                                                                                           | Estado                                      |
 | ---- | --------------------------------------------------------------------------------------------- | ------------------------------------------- |
 | (a)  | Módulo común de filtros y su uso en las categorías de usados, sin esquema                     | Este documento                              |
-| (b)  | Marcas de usados (colección, migración y página `/…/maquinaria-pesada-usada/marcas/<marca>/`) | Pendiente                                   |
+| (b)  | Marcas de usados (colección, migración y página `/…/maquinaria-pesada-usada/marcas/<marca>/`) | Este documento, §6                          |
 | —    | Maquinaria nueva con el mismo módulo y su adaptador (agente B), con el peso numérico (D6)     | Pendiente (B)                               |
 | —    | Aditamentos (D2)                                                                              | Lo decide el cliente; sus 4 URL no se tocan |
 
@@ -101,3 +101,42 @@ aplican (§10.22).
 
 **EJECUTADO por dirección el 2026-10-13:** las dos 301 creadas desde el panel
 de producción y comprobadas.
+
+## 6. Marcas de usados (paso b, D1)
+
+**Colección «Marcas de maquinaria usada»** (`marcas-usada`, menú
+Maquinaria):
+
+- nombre, dirección web, descripción y logo;
+- enlaces opcionales a la misma marca en maquinaria nueva y en repuestos (su página los enlaza);
+- SEO, con el título por defecto «Maquinaria Hitachi usada».
+
+**Crear una marca crea su página:**
+`/maquinaria-pesada/maquinaria-pesada-usada/marcas/<marca>/`. Pagina como
+las categorías y filtra por tipo de máquina, año, horas y peso
+(`CATALOGO_USADOS_MARCA`). Sin unidades disponibles, no se indexa ni sale en
+el sitemap (D4). El índice de usados enlaza las marcas que tienen unidades.
+
+**La marca de una unidad** es la relación «Marca»
+(`equipos-usados.marcaUsada`). El texto de antes (`marca`) sigue, oculto. El
+gancho `marcaUsadaSincronizada` los mantiene de acuerdo:
+
+- **con relación**, el texto pasa a ser su nombre;
+- **solo con texto** (el importador de WordPress o un editor), busca la marca por el slug del texto y, si no existe, **la crea**.
+
+Por eso el importador no cambia. En los filtros de las categorías, la marca
+sale de la relación o, sin ella, del slug del texto, que es el mismo.
+
+**Migración** `20261014_020810_marcas_usada`:
+
+- el esquema generado;
+- un **relleno con SQL explícito** (§3.5): una marca por cada valor distinto del texto, con el slug de `formatSlug`, y cada unidad apuntando a la suya.
+
+El slug del SQL se comprobó contra `formatSlug` con las 7 marcas del preview
+y 3 casos inventados (tildes, eñe y barra).
+
+**«marcas» queda reservada** como dirección web de una categoría de usada
+(`src/lib/usados/slugsReservados.ts`). La página de marca la tendría tapada:
+el panel lo dice en español al guardar.
+
+**Pendiente:** retirar el texto `marca` y `pestanaPortada` con su migración (M3 de la propuesta), cuando producción esté migrada y sin unidades sin marca.

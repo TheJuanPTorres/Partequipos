@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { normalizarRuta } from "../lib/redirects/normalizar";
+import { normalizarDestino, normalizarRuta } from "../lib/redirects/normalizar";
 import { soloAdmin, soloPersonal } from "../lib/seguridad/acceso";
 import { aplanarCadenas, marcarDestinoSinVerificar, validarRedirect } from "./hooks/redirectHooks";
 import { avisoField } from "../lib/fields/avisoField";
@@ -81,7 +81,7 @@ export const Redirects: CollectionConfig = {
         beforeValidate: [
           ({ value }) =>
             typeof value === "string" && !/^https?:\/\//i.test(value.trim())
-              ? normalizarRuta(value)
+              ? normalizarDestino(value)
               : value,
         ],
       },

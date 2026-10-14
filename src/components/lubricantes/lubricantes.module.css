@@ -1,0 +1,166 @@
+/*
+ * LÍNEAS DE PRODUCTO DE LUBRICANTES — PROVISIONAL hasta el diseño de Andrés,
+ * con el lenguaje de la página de marca de repuestos: fondo gris claro de la
+ * página, tarjetas blancas de 8 px, rojo de marca en los botones.
+ */
+.descripcion {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 3vw 8px;
+  color: var(--color-texto-suave);
+}
+
+.descripcion p {
+  margin: 0 0 0.9rem;
+}
+
+.seccion {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 3vw;
+  scroll-margin-top: 110px;
+}
+
+.cabeceraSeccion {
+  display: flex;
+  margin-bottom: 24px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tituloSeccion {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-seccion);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.entradilla {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: var(--color-texto-suave);
+}
+
+.cotizar {
+  display: inline-flex;
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 10px 24px;
+  background: var(--color-marca);
+  color: #fff;
+  font-weight: 600;
+  align-items: center;
+  text-decoration: none;
+  transition: filter 150ms ease;
+}
+
+.cotizar:hover {
+  filter: brightness(0.9);
+}
+
+.cotizar:focus-visible,
+.ficha:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 3px;
+}
+
+.grupo + .grupo {
+  margin-top: 32px;
+}
+
+.tituloGrupo {
+  margin: 0 0 16px;
+  color: var(--color-texto);
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.productos {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.producto {
+  display: flex;
+  border-radius: 8px;
+  padding: 16px;
+  background: #fff;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.fotoCaja {
+  display: flex;
+  width: 100%;
+  margin-bottom: 12px;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+}
+
+.foto {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.nombre {
+  margin: 0;
+  color: var(--color-texto);
+  font-weight: 700;
+}
+
+.grado {
+  margin: 2px 0 0;
+  color: var(--color-marca);
+  font-weight: 600;
+}
+
+.ficha {
+  display: inline-flex;
+  min-height: 44px;
+  margin-top: auto;
+  padding-top: 12px;
+  color: var(--color-texto);
+  font-size: 0.875rem;
+  font-weight: 600;
+  align-items: center;
+  gap: 6px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ficha svg {
+  width: 20px;
+  height: 20px;
+  color: var(--color-marca);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cotizar {
+    transition: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .productos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .producto {
+    padding: 12px 8px;
+  }
+}

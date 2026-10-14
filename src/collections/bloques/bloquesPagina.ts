@@ -1,9 +1,11 @@
 import type { Block, Field } from "payload";
 
+import { validarAncla } from "../../lib/fields/ancla";
 import { validarEnlace } from "../../lib/fields/reglasPortada";
+import { validarYouTube } from "../../lib/fields/youtube";
 
 /**
- * BLOQUES DE PÁGINA — los cinco tipos reutilizables del campo `bloques` de
+ * BLOQUES DE PÁGINA — los tipos reutilizables del campo `bloques` de
  * `paginas` (decisión de dirección del 2026-10-02; docs/diseno/decisiones-nosotros.md).
  * Nacieron con Nosotros de ux-9, pero no llevan nada de esa página: sirven a
  * cualquier página institucional.
@@ -35,6 +37,21 @@ const boton = (etiqueta: string): Field => ({
   ],
 });
 
+/**
+ * Ancla opcional de cualquier bloque: `/servicio-tecnico/#taller` lleva a él.
+ * Se copia EXACTA del sitio actual (distingue mayúsculas: «Siniestros»).
+ */
+const ancla: Field = {
+  name: "ancla",
+  type: "text",
+  label: "Ancla",
+  validate: validarAncla,
+  admin: {
+    description:
+      "Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.",
+  },
+};
+
 const antetitulo: Field = {
   name: "antetitulo",
   type: "text",
@@ -47,6 +64,7 @@ export const BloqueCabeceraVideo: Block = {
   interfaceName: "BloqueCabeceraVideo",
   labels: { singular: "Cabecera con vídeo", plural: "Cabeceras con vídeo" },
   fields: [
+    ancla,
     antetitulo,
     {
       name: "titulo",
@@ -83,6 +101,7 @@ export const BloquePresentacionImagen: Block = {
   interfaceName: "BloquePresentacionImagen",
   labels: { singular: "Presentación con imagen", plural: "Presentaciones con imagen" },
   fields: [
+    ancla,
     {
       name: "imagen",
       type: "upload",
@@ -117,6 +136,7 @@ export const BloqueCifras: Block = {
   interfaceName: "BloqueCifras",
   labels: { singular: "Cifras", plural: "Cifras" },
   fields: [
+    ancla,
     {
       name: "cifras",
       type: "array",
@@ -162,6 +182,7 @@ export const BloqueFranjaMarquee: Block = {
   interfaceName: "BloqueFranjaMarquee",
   labels: { singular: "Franja con texto en movimiento", plural: "Franjas con texto en movimiento" },
   fields: [
+    ancla,
     {
       name: "texto",
       type: "text",
@@ -197,6 +218,7 @@ export const BloqueTarjetasExpandibles: Block = {
   interfaceName: "BloqueTarjetasExpandibles",
   labels: { singular: "Tarjetas expandibles", plural: "Tarjetas expandibles" },
   fields: [
+    ancla,
     antetitulo,
     { name: "titulo", type: "text", required: true, label: "Título" },
     {
@@ -231,10 +253,101 @@ export const BloqueTarjetasExpandibles: Block = {
   ],
 };
 
+export const BloqueGaleria: Block = {
+  slug: "galeria",
+  interfaceName: "BloqueGaleria",
+  labels: { singular: "Galería", plural: "Galerías" },
+  fields: [
+    ancla,
+    antetitulo,
+    {
+      name: "titulo",
+      type: "text",
+      label: "Título",
+      admin: {
+        description: "Opcional. Sin título, la galería se anuncia solo a lectores de pantalla.",
+      },
+    },
+    {
+      name: "imagenes",
+      type: "array",
+      label: "Imágenes",
+      labels: { singular: "Imagen", plural: "Imágenes" },
+      minRows: 1,
+      admin: {
+        description: "En este orden, en una rejilla. Cuida el texto alternativo de cada una.",
+      },
+      fields: [
+        { name: "imagen", type: "upload", relationTo: "media", required: true, label: "Imagen" },
+      ],
+    },
+  ],
+};
+
+export const BloqueVideoYoutube: Block = {
+  slug: "videoYoutube",
+  interfaceName: "BloqueVideoYoutube",
+  labels: { singular: "Vídeo de YouTube", plural: "Vídeos de YouTube" },
+  fields: [
+    ancla,
+    antetitulo,
+    { name: "titulo", type: "text", required: true, label: "Título" },
+    { name: "texto", type: "richText", label: "Texto" },
+    {
+      name: "youtube",
+      type: "text",
+      required: true,
+      label: "Enlace de YouTube",
+      validate: validarYouTube,
+      admin: {
+        description:
+          "Se abre en una ventana desde youtube-nocookie.com, y solo al pulsar «reproducir»: hasta entonces no se carga nada de YouTube.",
+      },
+    },
+    {
+      name: "miniatura",
+      type: "upload",
+      relationTo: "media",
+      label: "Imagen de portada del vídeo",
+      admin: {
+        description: "La que se ve antes de reproducir. Sin ella, un fondo oscuro con el botón.",
+      },
+    },
+  ],
+};
+
+export const BloqueFormularioContacto: Block = {
+  slug: "formularioContacto",
+  interfaceName: "BloqueFormularioContacto",
+  labels: { singular: "Formulario de contacto", plural: "Formularios de contacto" },
+  fields: [
+    ancla,
+    antetitulo,
+    { name: "titulo", type: "text", required: true, label: "Título" },
+    {
+      name: "texto",
+      type: "textarea",
+      label: "Texto",
+      admin: { description: "Opcional: una o dos líneas bajo el título." },
+    },
+    {
+      name: "botonTexto",
+      type: "text",
+      label: "Texto del botón",
+      admin: {
+        description: "Vacío: «Enviar solicitud». Las solicitudes llegan a «Solicitudes» del panel.",
+      },
+    },
+  ],
+};
+
 export const BLOQUES_PAGINA: Block[] = [
   BloqueCabeceraVideo,
   BloquePresentacionImagen,
   BloqueCifras,
   BloqueFranjaMarquee,
   BloqueTarjetasExpandibles,
+  BloqueGaleria,
+  BloqueVideoYoutube,
+  BloqueFormularioContacto,
 ];

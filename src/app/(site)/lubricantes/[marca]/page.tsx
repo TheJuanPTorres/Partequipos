@@ -1,30 +1,35 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 
-import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
+import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { RichText } from "@/components/layout/RichText";
+import { SeccionesLubricante } from "@/components/lubricantes/SeccionesLubricante";
+import estilosLubricantes from "@/components/lubricantes/lubricantes.module.css";
+import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
+import estilosMarca from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { seccionesDeCategorias } from "@/lib/lubricantes/marca";
 import {
   getCategoriasDeMarcaLubricante,
   getMarcaLubricantePorSlug,
   getMarcasLubricante,
 } from "@/lib/queries/getLubricantes";
+import { getEmpresa } from "@/lib/queries/getSeo";
 import { rutas } from "@/lib/routes";
-import { metadataDe } from "@/lib/seo/metadata";
-import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
-import { imagenDeMedia } from "@/lib/utils/relations";
+import { metadataDe } from "@/lib/seo/metadata";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
+import { tituloPorDefecto } from "@/lib/seo/porDefecto";
+import { turnstileSiteKey } from "@/lib/turnstile";
+import { imagenDeMedia } from "@/lib/utils/relations";
+import { enlaceWhatsApp } from "@/lib/whatsapp";
 
-/**
- * Marca de lubricantes: `/lubricantes/{marca}/`.
- *
- * Es la raíz de la sección. NO hay índice en `/lubricantes/`: el rastreo no
- * encuentra esa página, así que ese path responde 404 igual que hoy.
- */
 type Params = { marca: string };
+
+/** Ancla de la primera sección bajo la cabecera y del formulario. */
+const ANCLA_LINEAS = "lineas";
+const ANCLA_CONTACTO = "contacto";
 
 export async function generateStaticParams(): Promise<Params[]> {
   const marcas = await getMarcasLubricante();
@@ -41,62 +46,91 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     path: rutas.marcaLubricante(marca.slug),
     descripcion: marca.entradilla,
     seo: marca.seo,
-    imageUrl: imagenDeMedia(marca.logo, marca.nombre)?.url,
+    imageUrl: (imagenDeMedia(marca.imagenCabecera, "") ?? imagenDeMedia(marca.logo, marca.nombre))
+      ?.url,
   });
 }
 
+/**
+ * PÁGINA DE UNA MARCA DE LUBRICANTES (`/lubricantes/lubricantes-eni/`) —
+ * PROVISIONAL hasta el diseño de Andrés, con el lenguaje de la página de marca
+ * de repuestos de D: su cabecera y sus tarjetas, y el formulario al final.
+ *
+ * Las 4 subpáginas de WordPress (auto liviano, auto pesado, engranajes, motos y
+ * scooter) son SECCIONES de esta página desde el 2026-10-14, con su `slug`
+ * como ancla y un 301 desde la URL antigua (decisión de dirección; detalle en
+ * docs/diseno/decisiones-servicio-lubricantes.md).
+ */
 export default async function MarcaLubricantePage({ params }: { params: Promise<Params> }) {
   const { marca: slug } = await params;
   const marca = await getMarcaLubricantePorSlug(slug);
   if (!marca) notFound();
 
-  const categorias = await getCategoriasDeMarcaLubricante(marca.id);
-  const logo = imagenDeMedia(marca.logo, marca.nombre);
+  const [categorias, empresa] = await Promise.all([
+    getCategoriasDeMarcaLubricante(marca.id),
+    getEmpresa(),
+  ]);
+  const secciones = seccionesDeCategorias(categorias);
+  const titulo = `Lubricantes ${marca.nombre}`;
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
-    { nombre: `Lubricantes ${marca.nombre}`, path: rutas.marcaLubricante(marca.slug) },
+    { nombre: titulo, path: rutas.marcaLubricante(marca.slug) },
   ];
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <Breadcrumbs items={breadcrumbs} />
+      <HeroMarca
+        vista={{
+          linea1: "Lubricantes",
+          linea2: marca.nombre,
+          descripcion: marca.entradilla?.trim() ?? "",
+          fondo: imagenDeMedia(marca.imagenCabecera, ""),
+          logo: imagenDeMedia(marca.logo, marca.nombre),
+        }}
+        anclaSiguiente={ANCLA_LINEAS}
+      />
 
-      <h1 className="text-3xl font-semibold text-gray-900">Lubricantes {marca.nombre}</h1>
-
-      {marca.entradilla ? <p className="mt-3 max-w-2xl text-gray-600">{marca.entradilla}</p> : null}
-
-      {logo ? (
-        <Image
-          src={logo.url}
-          alt={logo.alt}
-          width={logo.width}
-          height={logo.height}
-          className="mt-6 h-20 w-auto object-contain"
-        />
-      ) : null}
+      <TarjetasMarca
+        id={ANCLA_LINEAS}
+        titulo="Líneas de producto"
+        verTodo="Ver productos"
+        tarjetas={secciones.map((s) => ({
+          clave: s.ancla,
+          titulo: s.nombre,
+          href: `#${s.ancla}`,
+          imagen: s.imagen,
+          soloEscritorio: false,
+        }))}
+      />
 
       {marca.descripcion ? (
-        <div className="mt-6">
+        <div className={`${estilosLubricantes.descripcion} texto-cuerpo`}>
           <RichText data={marca.descripcion} />
         </div>
       ) : null}
 
-      <section className="mt-10" aria-labelledby="categorias-heading">
-        <h2 id="categorias-heading" className="text-xl font-medium text-gray-900">
-          {categorias.length} {categorias.length === 1 ? "línea disponible" : "líneas disponibles"}
-        </h2>
+      <SeccionesLubricante secciones={secciones} anclaContacto={ANCLA_CONTACTO} />
 
-        <div className="mt-4">
-          <ListaEnlaces
-            vacio={`Todavía no hay líneas publicadas para ${marca.nombre}.`}
-            items={categorias.map((categoria) => ({
-              href: `${rutas.categoriaLubricante(marca.slug, categoria.slug)}/`,
-              titulo: categoria.nombre,
-              descripcion: categoria.entradilla,
-              imagen: imagenDeMedia(categoria.imagen, categoria.nombre),
-            }))}
+      <section
+        id={ANCLA_CONTACTO}
+        className={estilosMarca.contacto}
+        aria-labelledby={`${ANCLA_CONTACTO}-titulo`}
+        style={{ scrollMarginTop: 110 }}
+      >
+        <h2 id={`${ANCLA_CONTACTO}-titulo`} className={estilosMarca.tituloContacto}>
+          Más información sobre {titulo}
+        </h2>
+        <div className={estilosMarca.formulario}>
+          <FormularioSolicitud
+            tipo="contacto"
+            origen={`${rutas.marcaLubricante(marca.slug)}/`}
+            siteKey={turnstileSiteKey()}
+            whatsapp={enlaceWhatsApp(empresa.whatsapp)}
+            titulo={`Más información sobre ${titulo}`}
+            textoBoton="Obtener más información"
+            variante="plano"
           />
         </div>
       </section>

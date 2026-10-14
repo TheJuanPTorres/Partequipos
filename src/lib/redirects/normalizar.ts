@@ -19,6 +19,27 @@ export function normalizarRuta(ruta: string): string {
 }
 
 /**
+ * Como `normalizarRuta`, pero para el DESTINO de un redirect: conserva el
+ * ancla (`/lubricantes/lubricantes-eni#auto-liviano`), que lleva a una sección
+ * de la página. El ancla no cuenta para comparar ni para validar el destino:
+ * solo viaja en la respuesta. Un ancla vacía o con espacios se descarta.
+ */
+export function normalizarDestino(ruta: string): string {
+  const crudo = (ruta ?? "").trim();
+  const i = crudo.indexOf("#");
+  if (i < 0) return normalizarRuta(crudo);
+  const base = normalizarRuta(crudo.slice(0, i));
+  const ancla = crudo.slice(i + 1);
+  return /^[A-Za-z][\w-]*$/.test(ancla) ? `${base}#${ancla}` : base;
+}
+
+/** Separa el ancla de un destino guardado: `["/a/b", "seccion"]` o `["/a/b", null]`. */
+export function separarAncla(destino: string): [string, string | null] {
+  const i = destino.indexOf("#");
+  return i < 0 ? [destino, null] : [destino.slice(0, i), destino.slice(i + 1) || null];
+}
+
+/**
  * Convierte una ruta interna a su forma CANÓNICA servida por el sitio, que
  * lleva barra final (`trailingSlash: true`, ADR 0006).
  *

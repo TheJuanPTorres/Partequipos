@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getArticulos, getCategoriasBlog } from "@/lib/queries/getBlog";
-import { getCategoriasLubricante, getMarcasLubricante } from "@/lib/queries/getLubricantes";
+import { getMarcasLubricante } from "@/lib/queries/getLubricantes";
 import {
   getCategoriasMaquinaria,
   getCategoriasUsada,
@@ -19,13 +19,7 @@ import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
 import { categoriaUsadaIndexable } from "@/lib/usados/heredadas";
 import { poblado } from "@/lib/utils/relations";
-import type {
-  Marca,
-  MarcasLubricante,
-  MarcasMaquinaria,
-  TiposEquipo,
-  TiposMaquinaria,
-} from "@/payload-types";
+import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/payload-types";
 
 /**
  * Sitemap dinámico generado desde Payload (nunca escrito a mano).
@@ -62,7 +56,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     categoriasNueva,
     categoriasUsada,
     marcasLubricante,
-    categoriasLubricante,
     articulos,
     categoriasBlog,
     inventarioUsados,
@@ -79,7 +72,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getCategoriasMaquinaria(),
     getCategoriasUsada(),
     getMarcasLubricante(),
-    getCategoriasLubricante(),
     getArticulos(),
     getCategoriasBlog(),
     getInventarioUsados(),
@@ -161,13 +153,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // --- Lubricantes --------------------------------------------------------
     marcasLubricante: marcasLubricante.map((m) => ({ slug: m.slug, updatedAt: m.updatedAt })),
-
-    categoriasLubricante: categoriasLubricante.flatMap((categoria) => {
-      const marca = poblado<MarcasLubricante>(categoria.marca);
-      return marca
-        ? [{ slug: categoria.slug, updatedAt: categoria.updatedAt, marcaSlug: marca.slug }]
-        : [];
-    }),
 
     // --- Blog ---------------------------------------------------------------
     articulos: articulos.map((a) => ({ slug: a.slug, updatedAt: a.updatedAt })),

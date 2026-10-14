@@ -1,0 +1,100 @@
+/*
+ * BLOQUE «VÍDEO DE YOUTUBE» — PROVISIONAL hasta el diseño de Andrés, con la
+ * composición de «Presentación con imagen»: dos mitades y 3vw a los lados; en
+ * móvil, una debajo de la otra.
+ */
+.seccion {
+  display: flex;
+  padding: 40px 3vw;
+  align-items: center;
+  gap: 32px;
+}
+
+.columnaTexto,
+.columnaVideo {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.columnaTexto {
+  gap: 20px;
+}
+
+.antetitulo {
+  margin: 0;
+  color: var(--color-marca);
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto);
+}
+
+.texto {
+  color: var(--color-texto-suave);
+}
+
+.texto p {
+  margin: 0 0 0.9rem;
+}
+
+.portada {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  padding: 0;
+  background: #1a1a1a;
+  cursor: pointer;
+  aspect-ratio: 16 / 9;
+}
+
+.portada:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 3px;
+}
+
+.imagen {
+  object-fit: cover;
+}
+
+.play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-marca);
+  color: #fff;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  transition: transform 150ms ease;
+}
+
+.play svg {
+  width: 32px;
+  height: 32px;
+}
+
+.portada:hover .play {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play {
+    transition: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

@@ -12,6 +12,8 @@ import estilos from "./presentacionImagen.module.css";
 const RITMO = { escalon: 0.08, duracion: 0.75 } as const;
 
 const SIZES = "(max-width: 767px) 92vw, 455px";
+/** La foto apaisada ocupa su columna entera (media página menos márgenes). */
+const SIZES_APAISADA = "(max-width: 767px) 92vw, 47vw";
 
 /**
  * BLOQUE «PRESENTACIÓN CON IMAGEN» — imagen a un lado, antetítulo, título,
@@ -38,35 +40,44 @@ export function BloquePresentacionImagen({
 }: Datos) {
   return (
     <section className={estilos.seccion}>
-      <div className={estilos.columnaImagen}>
-        {animacion ? (
-          <AnimacionLottie
-            src={animacion.url}
-            proporcion={imagen ? imagen.width / imagen.height : animacion.ancho / animacion.alto}
-            que="la animación del mapa"
-          >
-            {imagen ? (
-              <Image
-                src={imagen.url}
-                alt={imagen.alt}
-                width={imagen.width}
-                height={imagen.height}
-                sizes={SIZES}
-                className={estilos.imagenEnCaja}
-              />
-            ) : null}
-          </AnimacionLottie>
-        ) : imagen ? (
-          <Image
-            src={imagen.url}
-            alt={imagen.alt}
-            width={imagen.width}
-            height={imagen.height}
-            sizes={SIZES}
-            className={estilos.imagen}
-          />
-        ) : null}
-      </div>
+      {/* Sin imagen ni animación no hay columna: el texto ocupa el ancho. */}
+      {imagen || animacion ? (
+        <div
+          className={`${estilos.columnaImagen} ${
+            // Foto apaisada sin animación (servicio técnico): sin el alto mínimo
+            // de la caja del mapa de Nosotros, que dejaba un hueco grande.
+            imagen && !animacion && imagen.width > imagen.height ? estilos.columnaApaisada : ""
+          }`}
+        >
+          {animacion ? (
+            <AnimacionLottie
+              src={animacion.url}
+              proporcion={imagen ? imagen.width / imagen.height : animacion.ancho / animacion.alto}
+              que="la animación del mapa"
+            >
+              {imagen ? (
+                <Image
+                  src={imagen.url}
+                  alt={imagen.alt}
+                  width={imagen.width}
+                  height={imagen.height}
+                  sizes={SIZES}
+                  className={estilos.imagenEnCaja}
+                />
+              ) : null}
+            </AnimacionLottie>
+          ) : imagen ? (
+            <Image
+              src={imagen.url}
+              alt={imagen.alt}
+              width={imagen.width}
+              height={imagen.height}
+              sizes={imagen.width > imagen.height ? SIZES_APAISADA : SIZES}
+              className={estilos.imagen}
+            />
+          ) : null}
+        </div>
+      ) : null}
       <div className={estilos.columnaTexto}>
         {antetitulo ? (
           <Revelado

@@ -153,11 +153,20 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
   if (pagina.bloques?.length) {
     const videos = await Promise.all(idsDeVideos(pagina.bloques).map((id) => getVideoPorId(id)));
     const porId = new Map(videos.flatMap((v) => (v ? [[v.id, v] as const] : [])));
+    const vistas = vistaDeBloques(pagina.bloques, porId);
+    // El WhatsApp del formulario solo se pide si la página lo lleva.
+    const conFormulario = vistas.some((b) => b.blockType === "formularioContacto");
+    const datosEmpresa = conFormulario ? await getEmpresa() : null;
     return (
       <PaginaConBloques
         titulo={pagina.titulo}
         migas={breadcrumbs}
-        bloques={vistaDeBloques(pagina.bloques, porId)}
+        bloques={vistas}
+        formulario={{
+          origen: `/${pagina.slug}`,
+          siteKey: turnstileSiteKey(),
+          whatsapp: datosEmpresa ? enlaceWhatsApp(datosEmpresa.whatsapp) : undefined,
+        }}
       />
     );
   }

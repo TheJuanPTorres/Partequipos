@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { aRutaCanonica, cadenasAAplanar, creaBucle, normalizarRuta } from "./normalizar";
+import {
+  aRutaCanonica,
+  cadenasAAplanar,
+  creaBucle,
+  normalizarDestino,
+  normalizarRuta,
+  separarAncla,
+} from "./normalizar";
 
 describe("aRutaCanonica", () => {
   it("emite con barra final, que es la forma que sirve el sitio", () => {
@@ -120,5 +127,41 @@ describe("cadenasAAplanar", () => {
     const existentes = [{ desde: "/c", hacia: "/b" }];
     const aplanar = cadenasAAplanar({ desde: "/b", hacia: "/c" }, existentes);
     assert.deepEqual(aplanar, []);
+  });
+});
+
+describe("destino con ancla (secciones de una página)", () => {
+  it("conserva el ancla y normaliza la ruta", () => {
+    assert.equal(
+      normalizarDestino("lubricantes/lubricantes-eni/#auto-liviano"),
+      "/lubricantes/lubricantes-eni#auto-liviano",
+    );
+    assert.equal(
+      normalizarDestino("/servicio-tecnico/#Siniestros"),
+      "/servicio-tecnico#Siniestros",
+    );
+  });
+
+  it("sin ancla, igual que normalizarRuta", () => {
+    assert.equal(normalizarDestino("/a/b/?x=1"), "/a/b");
+  });
+
+  it("descarta un ancla vacía o con caracteres raros", () => {
+    assert.equal(normalizarDestino("/a/b#"), "/a/b");
+    assert.equal(normalizarDestino("/a/b#con espacio"), "/a/b");
+    assert.equal(normalizarDestino("/a/b#<x>"), "/a/b");
+  });
+
+  it("el ancla no cuenta para comparar (bucles y emparejamiento)", () => {
+    assert.equal(normalizarRuta("/a/b#c"), "/a/b");
+  });
+
+  it("separa ruta y ancla para emitir el 301", () => {
+    assert.deepEqual(separarAncla("/lubricantes/lubricantes-eni#motos-scooter"), [
+      "/lubricantes/lubricantes-eni",
+      "motos-scooter",
+    ]);
+    assert.deepEqual(separarAncla("/a/b"), ["/a/b", null]);
+    assert.equal(aRutaCanonica(separarAncla("/a/b#c")[0]), "/a/b/");
   });
 });

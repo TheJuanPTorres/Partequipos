@@ -790,6 +790,10 @@ export interface MarcasLubricante {
   } | null;
   logo?: (number | null) | Media;
   /**
+   * Foto de fondo de la cabecera de la página. Opcional: sin ella, un fondo oscuro.
+   */
+  imagenCabecera?: (number | null) | Media;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -833,21 +837,37 @@ export interface CategoriasLubricante {
     [k: string]: unknown;
   } | null;
   /**
-   * Se usa también como imagen social.
+   * Fondo de su tarjeta en la página de la marca.
    */
   imagen?: (number | null) | Media;
   /**
-   * Nombre comercial y descripción tal como los publica el fabricante. No inventar especificaciones.
+   * En este orden en la página. Nombre y grado tal como los publica el fabricante; no inventes especificaciones.
    */
   productos?:
     | {
+        /**
+         * Ej. «I-SINT».
+         */
         nombre: string;
+        /**
+         * Ej. «0W-20» o «DOT 4». Opcional.
+         */
+        grado?: string | null;
+        /**
+         * Opcional. Los productos seguidos con el mismo grupo salen bajo ese subtítulo (p. ej. «Compresores»).
+         */
+        grupo?: string | null;
+        imagen?: (number | null) | Media;
+        /**
+         * El PDF del fabricante. Sale como «Ficha técnica».
+         */
+        ficha?: (number | null) | Documento;
         descripcion?: string | null;
         id?: string | null;
       }[]
     | null;
   /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   * Hoy estas fichas no tienen página propia en el sitio, así que esto no sale en Google. Se guarda para cuando la tengan.
    */
   seo?: {
     metaTitle?: string | null;
@@ -924,7 +944,14 @@ export interface Pagina {
    */
   bloques?:
     | (
-        BloqueCabeceraVideo | BloquePresentacionImagen | BloqueCifras | BloqueFranjaMarquee | BloqueTarjetasExpandibles
+        | BloqueCabeceraVideo
+        | BloquePresentacionImagen
+        | BloqueCifras
+        | BloqueFranjaMarquee
+        | BloqueTarjetasExpandibles
+        | BloqueGaleria
+        | BloqueVideoYoutube
+        | BloqueFormularioContacto
       )[]
     | null;
   /**
@@ -1088,6 +1115,10 @@ export interface Pagina {
  */
 export interface BloqueCabeceraVideo {
   /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
+  /**
    * Texto corto encima del título. Opcional.
    */
   antetitulo?: string | null;
@@ -1143,6 +1174,10 @@ export interface Video {
  * via the `definition` "BloquePresentacionImagen".
  */
 export interface BloquePresentacionImagen {
+  /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
   /**
    * A un lado del texto (debajo en móvil). Si transmite información, como un mapa, cuida su texto alternativo.
    */
@@ -1214,6 +1249,10 @@ export interface Animacion {
  */
 export interface BloqueCifras {
   /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
+  /**
    * El número cuenta desde cero al llegar con el scroll.
    */
   cifras?:
@@ -1244,6 +1283,10 @@ export interface BloqueCifras {
  */
 export interface BloqueFranjaMarquee {
   /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
+  /**
    * Se repite de lado a lado, en mayúsculas. Ej. «Marcas aliadas».
    */
   texto: string;
@@ -1264,6 +1307,10 @@ export interface BloqueFranjaMarquee {
  * via the `definition` "BloqueTarjetasExpandibles".
  */
 export interface BloqueTarjetasExpandibles {
+  /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
   /**
    * Texto corto encima del título. Opcional.
    */
@@ -1295,6 +1342,103 @@ export interface BloqueTarjetasExpandibles {
   id?: string | null;
   blockName?: string | null;
   blockType: 'tarjetasExpandibles';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueGaleria".
+ */
+export interface BloqueGaleria {
+  /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
+  /**
+   * Texto corto encima del título. Opcional.
+   */
+  antetitulo?: string | null;
+  /**
+   * Opcional. Sin título, la galería se anuncia solo a lectores de pantalla.
+   */
+  titulo?: string | null;
+  /**
+   * En este orden, en una rejilla. Cuida el texto alternativo de cada una.
+   */
+  imagenes?:
+    | {
+        imagen: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'galeria';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueVideoYoutube".
+ */
+export interface BloqueVideoYoutube {
+  /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
+  /**
+   * Texto corto encima del título. Opcional.
+   */
+  antetitulo?: string | null;
+  titulo: string;
+  texto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Se abre en una ventana desde youtube-nocookie.com, y solo al pulsar «reproducir»: hasta entonces no se carga nada de YouTube.
+   */
+  youtube: string;
+  /**
+   * La que se ve antes de reproducir. Sin ella, un fondo oscuro con el botón.
+   */
+  miniatura?: (number | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'videoYoutube';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueFormularioContacto".
+ */
+export interface BloqueFormularioContacto {
+  /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
+  /**
+   * Texto corto encima del título. Opcional.
+   */
+  antetitulo?: string | null;
+  titulo: string;
+  /**
+   * Opcional: una o dos líneas bajo el título.
+   */
+  texto?: string | null;
+  /**
+   * Vacío: «Enviar solicitud». Las solicitudes llegan a «Solicitudes» del panel.
+   */
+  botonTexto?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'formularioContacto';
 }
 /**
  * Cada artículo tiene su dirección en partequipos.com/<dirección>/, y no puede repetir la de una página.
@@ -1972,6 +2116,7 @@ export interface MarcasLubricanteSelect<T extends boolean = true> {
   entradilla?: T;
   descripcion?: T;
   logo?: T;
+  imagenCabecera?: T;
   seo?:
     | T
     | {
@@ -1998,6 +2143,10 @@ export interface CategoriasLubricanteSelect<T extends boolean = true> {
     | T
     | {
         nombre?: T;
+        grado?: T;
+        grupo?: T;
+        imagen?: T;
+        ficha?: T;
         descripcion?: T;
         id?: T;
       };
@@ -2038,6 +2187,9 @@ export interface PaginasSelect<T extends boolean = true> {
         cifras?: T | BloqueCifrasSelect<T>;
         franjaMarquee?: T | BloqueFranjaMarqueeSelect<T>;
         tarjetasExpandibles?: T | BloqueTarjetasExpandiblesSelect<T>;
+        galeria?: T | BloqueGaleriaSelect<T>;
+        videoYoutube?: T | BloqueVideoYoutubeSelect<T>;
+        formularioContacto?: T | BloqueFormularioContactoSelect<T>;
       };
   hero?:
     | T
@@ -2152,6 +2304,7 @@ export interface PaginasSelect<T extends boolean = true> {
  * via the `definition` "BloqueCabeceraVideo_select".
  */
 export interface BloqueCabeceraVideoSelect<T extends boolean = true> {
+  ancla?: T;
   antetitulo?: T;
   titulo?: T;
   video?: T;
@@ -2164,6 +2317,7 @@ export interface BloqueCabeceraVideoSelect<T extends boolean = true> {
  * via the `definition` "BloquePresentacionImagen_select".
  */
 export interface BloquePresentacionImagenSelect<T extends boolean = true> {
+  ancla?: T;
   imagen?: T;
   lottie?: T;
   antetitulo?: T;
@@ -2179,6 +2333,7 @@ export interface BloquePresentacionImagenSelect<T extends boolean = true> {
  * via the `definition` "BloqueCifras_select".
  */
 export interface BloqueCifrasSelect<T extends boolean = true> {
+  ancla?: T;
   cifras?:
     | T
     | {
@@ -2196,6 +2351,7 @@ export interface BloqueCifrasSelect<T extends boolean = true> {
  * via the `definition` "BloqueFranjaMarquee_select".
  */
 export interface BloqueFranjaMarqueeSelect<T extends boolean = true> {
+  ancla?: T;
   texto?: T;
   imagenFondo?: T;
   imagenFrontal?: T;
@@ -2207,6 +2363,7 @@ export interface BloqueFranjaMarqueeSelect<T extends boolean = true> {
  * via the `definition` "BloqueTarjetasExpandibles_select".
  */
 export interface BloqueTarjetasExpandiblesSelect<T extends boolean = true> {
+  ancla?: T;
   antetitulo?: T;
   titulo?: T;
   tarjetas?:
@@ -2220,6 +2377,50 @@ export interface BloqueTarjetasExpandiblesSelect<T extends boolean = true> {
       };
   botonTexto?: T;
   botonEnlace?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueGaleria_select".
+ */
+export interface BloqueGaleriaSelect<T extends boolean = true> {
+  ancla?: T;
+  antetitulo?: T;
+  titulo?: T;
+  imagenes?:
+    | T
+    | {
+        imagen?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueVideoYoutube_select".
+ */
+export interface BloqueVideoYoutubeSelect<T extends boolean = true> {
+  ancla?: T;
+  antetitulo?: T;
+  titulo?: T;
+  texto?: T;
+  youtube?: T;
+  miniatura?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueFormularioContacto_select".
+ */
+export interface BloqueFormularioContactoSelect<T extends boolean = true> {
+  ancla?: T;
+  antetitulo?: T;
+  titulo?: T;
+  texto?: T;
+  botonTexto?: T;
   id?: T;
   blockName?: T;
 }

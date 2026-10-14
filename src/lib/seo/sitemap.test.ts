@@ -58,7 +58,6 @@ const SIN_MAQUINARIA = {
   categoriasUsada: [],
   marcasUsada: [],
   marcasLubricante: [],
-  categoriasLubricante: [],
   articulos: [],
   categoriasBlog: [],
 };
@@ -315,42 +314,22 @@ describe("lubricantes en el sitemap", () => {
   const datosConLubricantes = {
     ...datos,
     marcasLubricante: [{ slug: "lubricantes-eni", updatedAt: "2026-07-17T10:00:00.000Z" }],
-    categoriasLubricante: [
-      {
-        slug: "auto-liviano",
-        updatedAt: "2026-07-16T10:00:00.000Z",
-        marcaSlug: "lubricantes-eni",
-      },
-    ],
   };
 
-  it("emite la marca y su categoría", () => {
+  it("emite la marca, que lleva sus categorías como secciones", () => {
     const urls = buildSitemapEntries(datosConLubricantes, AHORA).map((x) => x.url);
 
     assert.ok(urls.includes("https://partequipos.com/lubricantes/lubricantes-eni/"));
-    assert.ok(
-      urls.includes("https://partequipos.com/lubricantes/lubricantes-eni/auto-liviano/"),
-      "falta la categoría",
+    assert.equal(
+      urls.some((u) => u.includes("/lubricantes-eni/auto-liviano")),
+      false,
+      "las categorías ya no tienen URL propia (301 a su ancla)",
     );
   });
 
   it("NO emite un índice en /lubricantes/, que no existe en el sitio", () => {
     const urls = buildSitemapEntries(datosConLubricantes, AHORA).map((x) => x.url);
     assert.equal(urls.includes("https://partequipos.com/lubricantes/"), false);
-  });
-
-  it("omite la categoría si su marca no se pudo resolver", () => {
-    // `categoriasLubricante` exige `marcaSlug`; sin marca la ruta del sitemap
-    // saldría rota, así que la fuente (sitemap.ts) filtra antes de llegar aquí.
-    const urls = buildSitemapEntries(
-      { ...datosConLubricantes, categoriasLubricante: [] },
-      AHORA,
-    ).map((x) => x.url);
-
-    assert.equal(
-      urls.some((u) => u.includes("/auto-liviano/")),
-      false,
-    );
   });
 
   it("toma lastModified del updatedAt real", () => {

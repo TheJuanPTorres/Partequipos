@@ -53,3 +53,6 @@ scripts/crawl/progress.jsonl
 respaldos/
 
 .vercel
+
+# Python (los extractores de WordPress)
+__pycache__/

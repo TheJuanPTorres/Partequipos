@@ -78,6 +78,7 @@ export interface Config {
     'tipos-maquinaria': TiposMaquinaria;
     'categorias-maquinaria': CategoriasMaquinaria;
     'categorias-usada': CategoriasUsada;
+    'marcas-usada': MarcasUsada;
     'marcas-lubricante': MarcasLubricante;
     'categorias-lubricante': CategoriasLubricante;
     paginas: Pagina;
@@ -110,6 +111,7 @@ export interface Config {
     'tipos-maquinaria': TiposMaquinariaSelect<false> | TiposMaquinariaSelect<true>;
     'categorias-maquinaria': CategoriasMaquinariaSelect<false> | CategoriasMaquinariaSelect<true>;
     'categorias-usada': CategoriasUsadaSelect<false> | CategoriasUsadaSelect<true>;
+    'marcas-usada': MarcasUsadaSelect<false> | MarcasUsadaSelect<true>;
     'marcas-lubricante': MarcasLubricanteSelect<false> | MarcasLubricanteSelect<true>;
     'categorias-lubricante': CategoriasLubricanteSelect<false> | CategoriasLubricanteSelect<true>;
     paginas: PaginasSelect<false> | PaginasSelect<true>;
@@ -584,6 +586,10 @@ export interface EquiposUsado {
    * Determina en qué página aparece la unidad.
    */
   categoria: number | CategoriasUsada;
+  /**
+   * Si la marca no está en la lista, créala aquí mismo: tendrá su propia página en el sitio.
+   */
+  marcaUsada?: (number | null) | MarcasUsada;
   marca?: string | null;
   modelo?: string | null;
   /**
@@ -627,6 +633,41 @@ export interface CategoriasUsada {
    */
   slug: string;
   descripcion?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cada marca tiene su página con las unidades usadas disponibles. Se crea sola al guardar una unidad con una marca nueva.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcas-usada".
+ */
+export interface MarcasUsada {
+  id: number;
+  nombre: string;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  descripcion?: string | null;
+  logo?: (number | null) | Media;
+  /**
+   * Opcional. Si la vendemos nueva, su página enlaza a la de nueva.
+   */
+  marcaNueva?: (number | null) | MarcasMaquinaria;
+  /**
+   * Opcional. Si tenemos repuestos, su página enlaza a la de repuestos.
+   */
+  marcaRepuestos?: (number | null) | Marca;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -1487,6 +1528,10 @@ export interface PayloadLockedDocument {
         value: number | CategoriasUsada;
       } | null)
     | ({
+        relationTo: 'marcas-usada';
+        value: number | MarcasUsada;
+      } | null)
+    | ({
         relationTo: 'marcas-lubricante';
         value: number | MarcasLubricante;
       } | null)
@@ -1730,6 +1775,7 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
 export interface EquiposUsadosSelect<T extends boolean = true> {
   nombre?: T;
   categoria?: T;
+  marcaUsada?: T;
   marca?: T;
   modelo?: T;
   anio?: T;
@@ -1816,6 +1862,28 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
   nombre?: T;
   slug?: T;
   descripcion?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  actualizadoPor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcas-usada_select".
+ */
+export interface MarcasUsadaSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  descripcion?: T;
+  logo?: T;
+  marcaNueva?: T;
+  marcaRepuestos?: T;
   seo?:
     | T
     | {

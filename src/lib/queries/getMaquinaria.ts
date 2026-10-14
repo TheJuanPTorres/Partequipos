@@ -22,6 +22,7 @@ import type {
   EquiposNuevo,
   EquiposUsado,
   MarcasMaquinaria,
+  MarcasUsada,
   Media,
   TiposMaquinaria,
 } from "@/payload-types";
@@ -230,6 +231,37 @@ export const getCategoriaUsadaPorSlug = cache(
     (await getCategoriasUsada()).find((c) => c.slug === slug) ?? null,
 );
 
+const marcasUsadaEnCache = unstable_cache(
+  async (): Promise<MarcasUsada[]> => {
+    const payload = await getPayload({ config });
+    // `depth: 1` con `populate` acotado: de la marca de nueva y de la de
+    // repuestos solo hace falta la dirección para enlazarlas, y del logo, lo
+    // que pinta `next/image`.
+    const { docs } = await payload.find({
+      collection: "marcas-usada",
+      depth: 1,
+      limit: 0,
+      sort: "nombre",
+      populate: {
+        "marcas-maquinaria": { slug: true, nombre: true },
+        marcas: { slug: true, nombre: true },
+        media: { url: true, alt: true, width: true, height: true },
+      },
+    });
+    return docs;
+  },
+  ["marcas-usada", CLAVE_DESPLIEGUE],
+  { tags: [ETIQUETAS_DATOS.usados] },
+);
+
+/** Las marcas de usada (paso b del marketplace), por nombre. */
+export const getMarcasUsada = cache(() => marcasUsadaEnCache());
+
+export const getMarcaUsadaPorSlug = cache(
+  async (slug: string): Promise<MarcasUsada | null> =>
+    (await getMarcasUsada()).find((m) => m.slug === slug) ?? null,
+);
+
 /** La primera foto de una unidad, lo justo para la tarjeta. */
 export type FotoDeTarjeta = Pick<
   Media,
@@ -240,6 +272,7 @@ export type FotoDeTarjeta = Pick<
 export type UnidadUsada = UnidadFiltrable & {
   nombre: string;
   categoria: number;
+  marcaUsada: number | null;
   modelo?: string | null;
   ubicacion?: string | null;
   descripcion?: string | null;
@@ -268,6 +301,7 @@ const inventarioUsadosEnCache = unstable_cache(
       select: {
         nombre: true,
         categoria: true,
+        marcaUsada: true,
         marca: true,
         modelo: true,
         anio: true,
@@ -292,14 +326,33 @@ const inventarioUsadosEnCache = unstable_cache(
         ).docs
       : [];
     const porId = new Map(fotos.map((f) => [f.id, f]));
+    const [categorias, marcas] = await Promise.all([
+      categoriasUsadaEnCache(),
+      marcasUsadaEnCache(),
+    ]);
+    const ref = (d: { slug: string; nombre: string } | undefined) =>
+      d ? { slug: d.slug, nombre: d.nombre } : null;
+    const categoriaPorId = new Map(categorias.map((c) => [c.id, c]));
+    const marcaPorId = new Map(marcas.map((m) => [m.id, m]));
+    const idRel = (v: unknown): number | null =>
+      typeof v === "number"
+        ? v
+        : v && typeof v === "object" && "id" in v
+          ? (v as { id: number }).id
+          : null;
     return docs.map((u) => {
+      const categoriaId = idRel(u.categoria)!;
+      const marcaId = idRel(u.marcaUsada);
       const primera = Array.isArray(u.imagenes) ? u.imagenes[0] : null;
       const idFoto = primera == null ? null : typeof primera === "object" ? primera.id : primera;
       const foto = idFoto == null ? undefined : porId.get(idFoto);
       return {
         id: u.id,
         nombre: u.nombre,
-        categoria: typeof u.categoria === "object" ? u.categoria.id : u.categoria,
+        categoria: categoriaId,
+        categoriaRef: ref(categoriaPorId.get(categoriaId)),
+        marcaUsada: marcaId,
+        marcaRef: marcaId === null ? null : ref(marcaPorId.get(marcaId)),
         marca: u.marca,
         modelo: u.modelo,
         anio: u.anio,
@@ -326,6 +379,11 @@ const inventarioUsadosEnCache = unstable_cache(
 );
 
 export const getInventarioUsados = cache(() => inventarioUsadosEnCache());
+
+/** Las unidades disponibles de una marca. */
+export const getUnidadesDeMarcaUsada = cache(async (marcaId: number): Promise<UnidadUsada[]> =>
+  (await getInventarioUsados()).filter((u) => u.marcaUsada === marcaId),
+);
 
 /** Las unidades disponibles de una categoría. */
 export const getUnidadesDeCategoriaUsada = cache(

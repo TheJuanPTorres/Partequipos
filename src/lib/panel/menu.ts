@@ -45,6 +45,7 @@ export const ORDEN_DE_ENTRADAS = [
   "tipos-maquinaria",
   "categorias-maquinaria",
   "categorias-usada",
+  "marcas-usada",
   // Lubricantes
   "marcas-lubricante",
   "categorias-lubricante",

@@ -40,6 +40,7 @@ describe("SEO_POR_COLECCION", () => {
       "equipos-nuevos",
       "marcas-lubricante",
       "marcas-maquinaria",
+      "marcas-usada",
       "modelos-repuesto",
       "paginas",
       "tipos-equipo",

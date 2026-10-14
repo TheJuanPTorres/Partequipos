@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { Ordenar } from "@/components/catalog/filtros/Ordenar";
@@ -17,31 +18,28 @@ import {
 import type { UnidadUsada } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
-import { tituloPorDefecto } from "@/lib/seo/porDefecto";
-import { CATALOGO_USADOS } from "@/lib/usados/filtros";
-import { rutaDePaginaUsada } from "@/lib/usados/listado";
+import type { Ambito } from "@/lib/usados/listado";
 import { posicionFocal } from "@/lib/utils/relations";
-import type { CategoriasUsada } from "@/payload-types";
 
 /** Ancho con el que se piden las miniaturas de las tarjetas (ver el `<Image>`). */
 const ANCHO_MINIATURA = 400;
 
 /**
- * El listado de una categoría de maquinaria USADA, una página cada vez, con
- * los filtros del módulo común (`src/lib/filtros/`, componentes en
- * `./filtros/`). Lo comparten la página 1 (la URL de la categoría) y
- * `…/pagina/<n>/`.
+ * El listado de maquinaria USADA de una categoría o de una marca, una página
+ * cada vez, con los filtros del módulo común (`src/lib/filtros/`, componentes
+ * en `./filtros/`). Lo comparten la página 1 (la URL del registro) y
+ * `…/pagina/<n>/` (`src/lib/usados/listado.ts`).
  *
  * Aquí sí se renderiza el inventario: las unidades no tienen URL propia
  * (ADR 0007), así que esta ruta es su único escaparate. Solo se listan las
  * disponibles; las vendidas se marcan, no se borran.
  */
 export function ListadoUsados({
-  categoria,
+  ambito,
   pagina,
   listado,
 }: {
-  categoria: CategoriasUsada;
+  ambito: Ambito;
   pagina: number;
   listado: Extract<ResultadoListado<UnidadUsada>, { tipo: "listado" }>;
 }) {
@@ -54,19 +52,22 @@ export function ListadoUsados({
     facetas,
     consulta,
   } = listado;
-  const rutaBase = rutaDePaginaUsada(categoria.slug, 1);
+  const { registro, catalogo } = ambito;
+  const rutaDe = (n: number) => `${ambito.ruta(n)}/`;
+  const rutaBase = rutaDe(1);
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
     { nombre: "Maquinaria pesada", path: rutas.maquinaria() },
     { nombre: "Usada", path: rutas.usada() },
-    { nombre: categoria.nombre, path: rutas.categoriaUsada(categoria.slug) },
+    { nombre: registro.nombre, path: ambito.ruta(1) },
   ];
   if (pagina > 1) {
-    breadcrumbs.push({
-      nombre: `Página ${pagina}`,
-      path: rutas.categoriaUsadaPagina(categoria.slug, pagina),
-    });
+    breadcrumbs.push({ nombre: `Página ${pagina}`, path: ambito.ruta(pagina) });
   }
+  const vacio =
+    ambito.tipo === "categoria"
+      ? "No hay unidades disponibles en esta categoría ahora mismo. El inventario cambia con frecuencia: escríbenos y te avisamos cuando entre una."
+      : "No hay unidades disponibles de esta marca ahora mismo. El inventario cambia con frecuencia: escríbenos y te avisamos cuando entre una.";
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
@@ -74,12 +75,24 @@ export function ListadoUsados({
       <Breadcrumbs items={breadcrumbs} />
 
       <h1 className="text-3xl font-semibold text-gray-900">
-        {tituloPorDefecto.categoriaUsada(categoria.nombre)}
+        {ambito.titulo}
         {pagina > 1 ? <span className="font-normal text-gray-600"> · página {pagina}</span> : null}
       </h1>
 
-      {categoria.descripcion ? (
-        <p className="mt-3 max-w-2xl text-gray-600">{categoria.descripcion}</p>
+      {registro.descripcion ? (
+        <p className="mt-3 max-w-2xl text-gray-600">{registro.descripcion}</p>
+      ) : null}
+
+      {ambito.enlaces.length ? (
+        <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+          {ambito.enlaces.map((e) => (
+            <li key={e.href}>
+              <Link href={e.href} className="text-gray-900 underline underline-offset-2">
+                {e.texto}
+              </Link>
+            </li>
+          ))}
+        </ul>
       ) : null}
 
       <div className="mt-8 gap-8 lg:grid lg:grid-cols-[15rem_1fr]">
@@ -89,7 +102,7 @@ export function ListadoUsados({
               accion={rutaBase}
               facetas={facetas}
               orden={seleccion.orden}
-              ordenPorDefecto={CATALOGO_USADOS.ordenes[0].valor}
+              ordenPorDefecto={catalogo.ordenes[0].valor}
               activos={valoresElegidos(seleccion)}
             />
           </aside>
@@ -108,22 +121,20 @@ export function ListadoUsados({
                 </span>
               ) : null}
             </h2>
-            {total > 1 ? (
-              <Ordenar opciones={ordenesDe(rutaBase, CATALOGO_USADOS, seleccion)} />
-            ) : null}
+            {total > 1 ? <Ordenar opciones={ordenesDe(rutaBase, catalogo, seleccion)} /> : null}
           </div>
 
           <div className="mt-3">
             <SeleccionActual
-              chips={chipsDe(rutaBase, CATALOGO_USADOS, seleccion, facetas)}
-              limpiar={enlaceCon(rutaBase, CATALOGO_USADOS, seleccion, { limpiar: true })}
+              chips={chipsDe(rutaBase, catalogo, seleccion, facetas)}
+              limpiar={enlaceCon(rutaBase, catalogo, seleccion, { limpiar: true })}
             />
           </div>
 
           {unidades.length === 0 ? (
             <p className="mt-4 rounded border border-dashed border-gray-300 p-6 text-center text-gray-600">
               {totalSinFiltros === 0
-                ? "No hay unidades disponibles en esta categoría ahora mismo. El inventario cambia con frecuencia: escríbenos y te avisamos cuando entre una."
+                ? vacio
                 : "Ninguna unidad cumple estos filtros. Quita alguno para ver más."}
             </p>
           ) : (
@@ -137,7 +148,7 @@ export function ListadoUsados({
           <Paginacion
             actual={pagina}
             total={paginas}
-            hrefDe={(n) => conConsulta(rutaDePaginaUsada(categoria.slug, n), consulta)}
+            hrefDe={(n) => conConsulta(rutaDe(n), consulta)}
           />
         </section>
       </div>

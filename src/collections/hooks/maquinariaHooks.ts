@@ -10,6 +10,7 @@ import {
   rutasDeTipoMaquinaria,
 } from "@/lib/revalidation";
 import { ETIQUETAS_DATOS, revalidarDatos } from "@/lib/cacheDatos";
+import { rutas } from "@/lib/routes";
 import { poblado } from "@/lib/utils/relations";
 
 /**
@@ -246,6 +247,26 @@ export const revalidarCategoriaUsada: CollectionAfterChangeHook = ({ doc }) =>
 
 export const revalidarCategoriaUsadaBorrada: CollectionAfterDeleteHook = ({ doc }) =>
   revalidarCategoriaUsadaCore(doc);
+
+/**
+ * Una marca de usada sale en su página (dinámica: se invalidan sus DATOS), en
+ * los filtros de los listados de usada y en el índice de usada (estático).
+ */
+function revalidarMarcaUsadaCore(doc: { slug: string }) {
+  try {
+    revalidarDatos(ETIQUETAS_DATOS.usados, `marca usada ${doc.slug}`);
+    revalidarRutas([rutas.usada()], `marca usada ${doc.slug}`);
+  } catch (error) {
+    console.error("[revalidación] hook de MarcaUsada falló:", error);
+  }
+  return doc;
+}
+
+export const revalidarMarcaUsada: CollectionAfterChangeHook = ({ doc }) =>
+  revalidarMarcaUsadaCore(doc);
+
+export const revalidarMarcaUsadaBorrada: CollectionAfterDeleteHook = ({ doc }) =>
+  revalidarMarcaUsadaCore(doc);
 
 /** Una unidad de inventario afecta a los listados de usada (y a la portada, por su gancho). */
 async function revalidarEquipoUsadoCore(

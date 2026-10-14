@@ -88,6 +88,10 @@ export const RUTAS_EN_EL_SITIO: Partial<Record<CollectionSlug, Generador>> = {
     const s = slugPropio(doc);
     return s ? rutas.categoriaUsada(s) : null;
   },
+  "marcas-usada": async (doc) => {
+    const s = slugPropio(doc);
+    return s ? rutas.marcaUsada(s) : null;
+  },
   "marcas-lubricante": async (doc) => {
     const s = slugPropio(doc);
     return s ? rutas.marcaLubricante(s) : null;

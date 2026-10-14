@@ -1,4 +1,4 @@
-import type { Field, FieldAccess } from "payload";
+import type { Field, FieldAccess, TextFieldSingleValidation } from "payload";
 
 import { formatSlugHook } from "../utils/formatSlug";
 
@@ -11,6 +11,12 @@ type SlugFieldOptions = {
    * se define como índice compuesto en la colección (ej. marca+slug), no aquí.
    */
   unique?: boolean;
+  /**
+   * Validación propia (p. ej. direcciones reservadas). Sustituye a la de
+   * Payload: tiene que llamar a `text` de `payload/shared` para conservar el
+   * «obligatorio».
+   */
+  validate?: TextFieldSingleValidation;
 };
 
 /**
@@ -40,10 +46,15 @@ export const slugEditable: FieldAccess = ({ req, doc }) => {
  * con guiones) y queda editable manualmente. Comparte `formatSlugHook` con
  * todas las colecciones para no duplicar lógica (ver Marca, TipoEquipo, etc.).
  */
-export function slugField({ from = "nombre", unique = false }: SlugFieldOptions = {}): Field {
+export function slugField({
+  from = "nombre",
+  unique = false,
+  validate,
+}: SlugFieldOptions = {}): Field {
   return {
     name: "slug",
     type: "text",
+    ...(validate ? { validate } : {}),
     required: true,
     unique,
     index: true,

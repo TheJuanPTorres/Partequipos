@@ -79,6 +79,7 @@ describe("rutaEnElSitio", () => {
       "marcas",
       "marcas-lubricante",
       "marcas-maquinaria",
+      "marcas-usada",
       "modelos-repuesto",
       "paginas",
       "tipos-equipo",

@@ -55,6 +55,7 @@ const SIN_MAQUINARIA = {
   equiposNuevos: [],
   categoriasNueva: [],
   categoriasUsada: [],
+  marcasUsada: [],
   marcasLubricante: [],
   categoriasLubricante: [],
   articulos: [],
@@ -95,6 +96,7 @@ const datosConMaquinaria = {
   ],
   categoriasNueva: [{ slug: "categoria-n", updatedAt: "2026-07-19T10:00:00.000Z" }],
   categoriasUsada: [{ slug: "categoria-u", updatedAt: "2026-07-18T10:00:00.000Z" }],
+  marcasUsada: [{ slug: "marca-u", updatedAt: "2026-07-18T10:00:00.000Z" }],
 };
 
 describe("buildSitemapEntries", () => {
@@ -259,6 +261,7 @@ describe("maquinaria en el sitemap", () => {
       `${base}/maquinaria-pesada-nueva/marcas/marca-m/tipo-m/equipo-m/`,
       `${base}/maquinaria-pesada-usada/`,
       `${base}/maquinaria-pesada-usada/categoria-u/`,
+      `${base}/maquinaria-pesada-usada/marcas/marca-u/`,
     ]) {
       assert.ok(urls.includes(esperada), `falta ${esperada}`);
     }

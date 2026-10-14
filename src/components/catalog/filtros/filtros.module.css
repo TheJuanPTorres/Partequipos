@@ -1,0 +1,43 @@
+/*
+ * El panel de filtros: plegado en móvil, abierto en escritorio.
+ *
+ * Un `<details>` cerrado oculta su contenido aunque el CSS diga otra cosa;
+ * `::details-content` es lo que permite abrirlo solo con CSS. Donde el
+ * navegador no lo entiende, el panel sigue plegado también en escritorio con
+ * su botón «Filtrar» visible: se puede usar igual, solo que plegado.
+ */
+.panel {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.75rem;
+}
+
+.resumen {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  padding: 0 1rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+@media (min-width: 1024px) {
+  .panel {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  @supports selector(::details-content) {
+    .panel::details-content {
+      content-visibility: visible;
+      display: block;
+      block-size: auto;
+    }
+
+    .resumen {
+      display: none;
+    }
+  }
+}

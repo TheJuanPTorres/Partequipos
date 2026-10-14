@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import config from "@payload-config";
 import { getPayload, type Where } from "payload";
 
@@ -21,12 +22,14 @@ import type {
   EquiposNuevo,
   EquiposUsado,
   MarcasMaquinaria,
+  Media,
   TiposMaquinaria,
 } from "@/payload-types";
 
 import { SLUG_EXCAVADORAS, TARJETAS_POR_PESTANA } from "../portada/secciones";
-import { POR_PAGINA, totalPaginas } from "../usados/paginacion";
-import { conPrimeraImagen, idsDePrimeraImagen } from "../usados/primeraImagen";
+import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "../cacheDatos";
+import type { UnidadFiltrable } from "../usados/filtros";
+import { idsDePrimeraImagen } from "../usados/primeraImagen";
 
 /**
  * Acceso a datos de la sección maquinaria (API local de Payload, CLAUDE.md §3.2).
@@ -198,58 +201,82 @@ export const getCategoriaMaquinariaPorSlug = cache(
 );
 
 // --- Línea usada ------------------------------------------------------------
-export const getCategoriasUsada = cache(async (): Promise<CategoriasUsada[]> => {
-  const payload = await getPayload({ config });
-  const { docs } = await payload.find({
-    collection: "categorias-usada",
-    depth: 0,
-    limit: 0,
-    sort: "nombre",
-  });
-  return docs;
-});
-
-export const getCategoriaUsadaPorSlug = cache(
-  async (slug: string): Promise<CategoriasUsada | null> => {
+/*
+ * Los listados de usada se pintan en cada petición (leen los filtros de la
+ * URL), así que sus datos van en la caché de datos (`src/lib/cacheDatos.ts`),
+ * etiquetada: la invalidan los ganchos de `equipos-usados` y
+ * `categorias-usada`. Dentro de `unstable_cache` no se puede usar `cache()`
+ * de React, y no hace falta: la entrada ya se comparte entre peticiones.
+ */
+const categoriasUsadaEnCache = unstable_cache(
+  async (): Promise<CategoriasUsada[]> => {
     const payload = await getPayload({ config });
     const { docs } = await payload.find({
       collection: "categorias-usada",
-      where: { slug: { equals: slug } },
       depth: 0,
-      limit: 1,
+      limit: 0,
+      sort: "nombre",
     });
-    return docs[0] ?? null;
+    return docs;
   },
+  ["categorias-usada", CLAVE_DESPLIEGUE],
+  { tags: [ETIQUETAS_DATOS.usados] },
 );
 
-/** Una página del listado de usados de una categoría. */
-export type PaginaDeUsados = {
-  unidades: EquiposUsado[];
-  /** Unidades disponibles en TODA la categoría, no solo en esta página. */
-  total: number;
-  paginas: number;
+export const getCategoriasUsada = cache(() => categoriasUsadaEnCache());
+
+export const getCategoriaUsadaPorSlug = cache(
+  async (slug: string): Promise<CategoriasUsada | null> =>
+    (await getCategoriasUsada()).find((c) => c.slug === slug) ?? null,
+);
+
+/** La primera foto de una unidad, lo justo para la tarjeta. */
+export type FotoDeTarjeta = Pick<
+  Media,
+  "id" | "url" | "alt" | "width" | "height" | "focalX" | "focalY"
+>;
+
+/** Una unidad usada DISPONIBLE, con lo que pintan la tarjeta y los filtros. */
+export type UnidadUsada = UnidadFiltrable & {
+  nombre: string;
+  categoria: number;
+  modelo?: string | null;
+  ubicacion?: string | null;
+  descripcion?: string | null;
+  foto: FotoDeTarjeta | null;
 };
 
 /**
- * Unidades DISPONIBLES de una categoría, una página cada vez (las vendidas no
- * se listan). Paginación en `src/lib/usados/paginacion.ts`.
+ * TODAS las unidades usadas DISPONIBLES (las vendidas no se listan), con su
+ * primera foto ya resuelta. Dos consultas por entrada de caché, no por
+ * petición: el listado filtra, cuenta, ordena y pagina en memoria
+ * (`src/lib/filtros/`). Con ~150 unidades (y ~500 previstas) la entrada
+ * sigue muy por debajo del límite de la caché de datos.
+ *
+ * Solo la primera foto: `depth: 1` traía todas (1.247 registros de `Media`
+ * para pintar 113 tarjetas, `src/lib/usados/primeraImagen.ts`).
  */
-export const getEquiposUsadosDeCategoria = cache(
-  async (categoriaId: number, pagina: number = 1): Promise<PaginaDeUsados> => {
+const inventarioUsadosEnCache = unstable_cache(
+  async (): Promise<UnidadUsada[]> => {
     const payload = await getPayload({ config });
-    const { docs, totalDocs } = await payload.find({
+    const { docs } = await payload.find({
       collection: "equipos-usados",
-      where: {
-        and: [{ categoria: { equals: categoriaId } }, { disponible: { equals: true } }],
-      },
-      // Sin poblar: solo se pinta la primera foto, y `depth: 1` traía todas
-      // (src/lib/usados/primeraImagen.ts).
+      where: { disponible: { equals: true } },
       depth: 0,
-      limit: POR_PAGINA,
-      page: pagina,
-      // El id desempata: con años repetidos, el orden tiene que ser el mismo en
-      // cada página, o una unidad saldría en dos y otra en ninguna.
-      sort: ["-anio", "id"],
+      limit: 0,
+      pagination: false,
+      select: {
+        nombre: true,
+        categoria: true,
+        marca: true,
+        modelo: true,
+        anio: true,
+        horometro: true,
+        pesoOperativo: true,
+        ubicacion: true,
+        descripcion: true,
+        imagenes: true,
+      },
     });
     const ids = idsDePrimeraImagen(docs);
     const fotos = ids.length
@@ -260,31 +287,51 @@ export const getEquiposUsadosDeCategoria = cache(
             depth: 0,
             limit: 0,
             pagination: false,
+            select: { url: true, alt: true, width: true, height: true, focalX: true, focalY: true },
           })
         ).docs
       : [];
-    return {
-      unidades: conPrimeraImagen(docs, fotos),
-      total: totalDocs,
-      paginas: totalPaginas(totalDocs),
-    };
+    const porId = new Map(fotos.map((f) => [f.id, f]));
+    return docs.map((u) => {
+      const primera = Array.isArray(u.imagenes) ? u.imagenes[0] : null;
+      const idFoto = primera == null ? null : typeof primera === "object" ? primera.id : primera;
+      const foto = idFoto == null ? undefined : porId.get(idFoto);
+      return {
+        id: u.id,
+        nombre: u.nombre,
+        categoria: typeof u.categoria === "object" ? u.categoria.id : u.categoria,
+        marca: u.marca,
+        modelo: u.modelo,
+        anio: u.anio,
+        horometro: u.horometro,
+        pesoOperativo: u.pesoOperativo,
+        ubicacion: u.ubicacion,
+        descripcion: u.descripcion,
+        foto: foto
+          ? {
+              id: foto.id,
+              url: foto.url,
+              alt: foto.alt,
+              width: foto.width,
+              height: foto.height,
+              focalX: foto.focalX,
+              focalY: foto.focalY,
+            }
+          : null,
+      };
+    });
   },
+  ["inventario-usados", CLAVE_DESPLIEGUE],
+  { tags: [ETIQUETAS_DATOS.usados] },
 );
 
-/** Páginas del listado de cada categoría de usada, para `generateStaticParams`. */
-export const getPaginasDeUsados = cache(async (): Promise<{ slug: string; paginas: number }[]> => {
-  const payload = await getPayload({ config });
-  const categorias = await getCategoriasUsada();
-  return Promise.all(
-    categorias.map(async (c) => {
-      const { totalDocs } = await payload.count({
-        collection: "equipos-usados",
-        where: { and: [{ categoria: { equals: c.id } }, { disponible: { equals: true } }] },
-      });
-      return { slug: c.slug, paginas: totalPaginas(totalDocs) };
-    }),
-  );
-});
+export const getInventarioUsados = cache(() => inventarioUsadosEnCache());
+
+/** Las unidades disponibles de una categoría. */
+export const getUnidadesDeCategoriaUsada = cache(
+  async (categoriaId: number): Promise<UnidadUsada[]> =>
+    (await getInventarioUsados()).filter((u) => u.categoria === categoriaId),
+);
 
 // --- Portada (fase D: secciones 2 y 3 de ux-9) --------------------------------
 /** Marcas con foto de tarjeta, para el carrusel de la sección 2. */

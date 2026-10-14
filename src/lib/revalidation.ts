@@ -196,21 +196,6 @@ export function rutasDeCategoriaNueva(slug: string): string[] {
   return [rutas.nueva(), rutas.categoriaNueva(slug)];
 }
 
-/**
- * Las páginas 2 y siguientes de los listados de usados, por el patrón de la
- * ruta: al entrar o salir una unidad se corren todas. Nunca relanza.
- */
-export function revalidarPaginasUsadas(motivo: string): void {
-  try {
-    revalidatePath(
-      "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]",
-      "page",
-    );
-  } catch (error) {
-    console.error(`[revalidación] fallaron las páginas de usados (${motivo}):`, error);
-  }
-}
-
 /** Rutas afectadas por un cambio en una categoría de usada. */
 export function rutasDeCategoriaUsada(slug: string): string[] {
   return [rutas.maquinaria(), rutas.usada(), rutas.categoriaUsada(slug)];

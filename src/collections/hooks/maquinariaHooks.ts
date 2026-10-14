@@ -4,11 +4,11 @@ import {
   revalidarRutas,
   rutasDeCategoriaNueva,
   rutasDeCategoriaUsada,
-  revalidarPaginasUsadas,
   rutasDeEquipoNuevo,
   rutasDeMarcaMaquinaria,
   rutasDeTipoMaquinaria,
 } from "@/lib/revalidation";
+import { ETIQUETAS_DATOS, revalidarDatos } from "@/lib/cacheDatos";
 import { poblado } from "@/lib/utils/relations";
 
 /**
@@ -223,8 +223,10 @@ function revalidarCategoriaNuevaCore(doc: { slug: string }) {
 
 function revalidarCategoriaUsadaCore(doc: { slug: string }) {
   try {
+    // Los listados de usada son dinámicos: lo que se invalida son sus DATOS
+    // (`src/lib/cacheDatos.ts`); las rutas, por el índice y la portada.
+    revalidarDatos(ETIQUETAS_DATOS.usados, `categoría usada ${doc.slug}`);
     revalidarRutas(rutasDeCategoriaUsada(doc.slug), `categoría usada ${doc.slug}`);
-    revalidarPaginasUsadas(`categoría usada ${doc.slug}`);
   } catch (error) {
     console.error("[revalidación] hook de CategoriaUsada falló:", error);
   }
@@ -243,12 +245,15 @@ export const revalidarCategoriaUsada: CollectionAfterChangeHook = ({ doc }) =>
 export const revalidarCategoriaUsadaBorrada: CollectionAfterDeleteHook = ({ doc }) =>
   revalidarCategoriaUsadaCore(doc);
 
-/** Una unidad de inventario solo afecta a la página de su categoría. */
+/** Una unidad de inventario afecta a los listados de usada (y a la portada, por su gancho). */
 async function revalidarEquipoUsadoCore(
   doc: { id: number; categoria: unknown },
   req: PayloadRequest,
 ) {
   try {
+    // Antes que nada: los datos de los listados (dinámicos) de TODAS las
+    // categorías, también la anterior si la unidad cambió de categoría.
+    revalidarDatos(ETIQUETAS_DATOS.usados, `equipo usado ${doc.id}`);
     const categoria = poblado<{ id: number; slug: string }>(
       doc.categoria as number | { id: number; slug: string },
     );
@@ -267,7 +272,6 @@ async function revalidarEquipoUsadoCore(
 
     if (categoriaSlug) {
       revalidarRutas(rutasDeCategoriaUsada(categoriaSlug), `equipo usado ${doc.id}`);
-      revalidarPaginasUsadas(`equipo usado ${doc.id}`);
     }
   } catch (error) {
     console.error("[revalidación] hook de EquipoUsado falló:", error);

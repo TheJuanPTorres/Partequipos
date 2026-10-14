@@ -125,9 +125,10 @@ cliente** (`partequipos.com`). Las de Andrés (L3) ya no se usan.
 | Fondo de repuestos  | `PARA-REPUESTOS-BANNER-PPAL` (2022/04), cadena de tren de rodaje | Es el banner principal de repuestos de su web; oscura y metálica, deja leer texto claro | Baldes en bodega, filtros STAL (fondo blanco: no sirve bajo texto claro)                                                    |
 | Fondo de maquinaria | `maquinaria-hitachi-001` (2024/05), Hitachi en un patio          | Es su banner de maquinaria; máquina del color de marca                                  | Retroexcavadora CASE, CAT 966H sobre fondo blanco                                                                           |
 | Foto de Contáctanos | `Tecnico-partequipos-Sede-guarne` (2022/05), recorte vertical    | Única foto **de su gente trabajando** que cabe en un retrato                            | Equipo con camisas rojas (horizontal: en vertical se cortan personas); fotos de _call center_ y manos con piezas (de banco) |
-| Máquina decorativa  | `pc210lc-10.png`, excavadora Komatsu                             | PNG con **transparencia real**, 1280 × 830                                              | Los otros recortes con alfa son de baja resolución o conservan fondo blanco                                                 |
+| Máquina decorativa  | `865c.png`, motoniveladora CASE (marca que representa)           | PNG con **transparencia real**, 2000 × 1614, recorte limpio                             | Komatsu `pc210lc-10` (sustituida por decisión de dirección); baldes y piezas del cliente (no son una máquina)               |
 
-**Avisos:** la Komatsu es probablemente foto de catálogo del fabricante (confirmar con el cliente); la del técnico ya la
+**Avisos:** la CASE (y la Hitachi del fondo de maquinaria) son fotos de catálogo del fabricante: **el cliente debe
+confirmar su licencia** (la web original no tiene una máquina recortada propia); la del técnico, aprobada por dirección, ya la
 usa la tarjeta de servicio técnico (misma persona, otro recorte). **No hay** foto de asesores comerciales en retrato: si
 se quiere una mejor, la tiene que hacer el cliente.
 

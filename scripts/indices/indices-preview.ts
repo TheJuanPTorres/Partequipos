@@ -97,8 +97,8 @@ const IMAGENES = {
     alt: "Técnico de Partequipos revisando un componente en el taller",
   },
   contactoDecorativa: {
-    origen: "real-contacto-decorativa.png",
-    alt: "Excavadora Komatsu amarilla",
+    origen: "real-contacto-decorativa-case.png",
+    alt: "Motoniveladora CASE naranja",
   },
 } satisfies Record<string, Imagen>;
 type Clave = keyof typeof IMAGENES;

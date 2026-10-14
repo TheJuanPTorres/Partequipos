@@ -5,9 +5,10 @@ import { CategoriaUsada } from "../../collections/CategoriaUsada";
 import { MENSAJE_SLUG_RESERVADO, slugCategoriaUsadaNoReservado } from "./slugsReservados";
 
 // Lo mínimo de los argumentos de una validación de Payload para un campo de texto obligatorio.
-const args = { required: true, req: { payload: { config: {} }, t: (k: string) => k } } as unknown as Parameters<
-  typeof slugCategoriaUsadaNoReservado
->[1];
+const args = {
+  required: true,
+  req: { payload: { config: {} }, t: (k: string) => k },
+} as unknown as Parameters<typeof slugCategoriaUsadaNoReservado>[1];
 
 describe("slugCategoriaUsadaNoReservado", () => {
   it("rechaza «marcas» (la usan las páginas de marca), escrita como sea", () => {

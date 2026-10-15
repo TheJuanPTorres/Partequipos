@@ -6,7 +6,7 @@ import { Campo, claseControl } from "@/components/forms/Campo";
 import { Turnstile } from "@/components/forms/Turnstile";
 import { ESTADO_INICIAL } from "@/lib/actions/estadoFormulario";
 import { enviarSolicitud } from "@/lib/actions/solicitudes";
-import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/solicitud";
+import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/opcionesSolicitud";
 
 /**
  * Formulario de solicitud. Sirve a los tres casos (contacto, cotización de

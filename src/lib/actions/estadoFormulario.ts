@@ -1,4 +1,4 @@
-import { MAX, type ErroresCampo } from "@/lib/validation/solicitud";
+import { MAX, type ErroresCampo } from "@/lib/validation/opcionesSolicitud";
 
 /**
  * Estado del formulario, compartido entre la Server Action y el componente.

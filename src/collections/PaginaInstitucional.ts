@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { avisoField } from "../lib/fields/avisoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { seoField } from "../lib/fields/seoField";
 import { BLOQUES_PAGINA } from "./bloques/bloquesPagina";
@@ -240,6 +241,8 @@ export const PaginaInstitucional: CollectionConfig = {
               required: true,
               label: "Imagen de fondo",
             },
+            // Aviso en vivo si hay fondo y falta el recorte para móvil (2026-10-14).
+            avisoField("avisoRecorteMovil", "AvisoRecorteMovil"),
             {
               /*
                * RECORTE VERTICAL PARA MÓVIL (CLAUDE.md §10.36): por debajo de

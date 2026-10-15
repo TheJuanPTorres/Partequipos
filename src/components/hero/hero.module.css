@@ -501,8 +501,15 @@
   padding: var(--hero-fila-relleno);
 }
 
+/*
+ * Nunca más ancha que la tarjeta: con muchas diapositivas los puntos pasan a
+ * otra línea en vez de desbordar la página (a 390, 7 diapositivas sumaban
+ * 382 px y la portada se desplazaba 28 px en horizontal).
+ */
 .flechas {
   display: flex;
+  min-width: 0;
+  max-width: 100%;
   align-items: center;
   gap: 4px;
   margin-bottom: var(--hero-flechas-margen-abajo);
@@ -555,6 +562,8 @@
  */
 .puntos {
   display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
   align-items: center;
   margin: 0 0 0 12px;
   padding: 0;
@@ -844,6 +853,22 @@
 
   .fila {
     --hero-fila-relleno: 0px;
+  }
+
+  /*
+   * Controles más juntos: hasta 7 diapositivas caben en una línea a 390. El
+   * objetivo de cada punto queda en 24 px, el mínimo de WCAG 2.5.8.
+   */
+  .flechas .pausa {
+    margin-left: 4px;
+  }
+
+  .puntos {
+    margin-left: 4px;
+  }
+
+  .punto {
+    width: 24px;
   }
 
   /*

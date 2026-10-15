@@ -161,8 +161,8 @@ export function ListadoUsados({
             </p>
           ) : (
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-              {unidades.map((unidad, indice) => (
-                <TarjetaUsada key={unidad.id} unidad={unidad} primera={indice === 0} />
+              {unidades.map((unidad) => (
+                <TarjetaUsada key={unidad.id} unidad={unidad} />
               ))}
             </ul>
           )}
@@ -178,7 +178,7 @@ export function ListadoUsados({
   );
 }
 
-function TarjetaUsada({ unidad, primera }: { unidad: UnidadUsada; primera: boolean }) {
+function TarjetaUsada({ unidad }: { unidad: UnidadUsada }) {
   const { foto } = unidad;
   return (
     <li className="rounded-lg border border-gray-200 p-4">
@@ -193,10 +193,6 @@ function TarjetaUsada({ unidad, primera }: { unidad: UnidadUsada; primera: boole
           // listado crecía ~65 % (medido en el preview, 2026-10-13).
           width={ANCHO_MINIATURA}
           height={Math.round((ANCHO_MINIATURA * foto.height) / foto.width)}
-          // La primera tarjeta es el LCP del listado en móvil: sin diferir y
-          // con prioridad. Las demás, diferidas como siempre.
-          loading={primera ? "eager" : "lazy"}
-          fetchPriority={primera ? "high" : "auto"}
           className="mb-3 h-40 w-full object-contain"
           style={{ objectPosition: posicionFocal(foto.focalX, foto.focalY) }}
         />

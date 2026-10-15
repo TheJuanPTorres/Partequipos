@@ -355,20 +355,28 @@ equivocado o un 500.
 
 Un **302, 303 o 307** en cualquier cadena bloquea: no transfiere autoridad.
 
-**Los redirects que hay hoy en producción** (colección «Redirecciones»):
+**Qué redirects da por esperados** (desde el PR de este cambio, 2026-10-14):
 
-- los 10 de `scripts/import/data/redirects.csv`;
-- los 10 del importador de repuestos;
-- los 4 de las subpáginas de lubricantes, que crea la migración `20261014_072558_servicio_lubricantes`;
-- los 2 del listado de usados de WordPress (D7, creados desde el panel).
+- los de `scripts/import/data/redirects.csv`;
+- los fijos de `next.config.ts` (`src/lib/redirects/fijos.ts`): `/maquinaria/` y `/nosotros/trabaja-con-nosotros/`, este al portal de empleo externo;
+- **los que sirve el propio dominio** en `/api/redirects-map/`, la lista que aplica el proxy. Ahí están los de los importadores (repuestos), los de la migración de lubricantes y los creados en el panel (D7).
 
-> **PENDIENTE ANTES DEL LANZAMIENTO (agente):** el comprobador solo conoce
-> los 10 de `redirects.csv`. Las URL de `url-map.csv` que la base redirige
-> por otra vía (las de repuestos y las 4 de lubricantes) las trata como
-> «conservadas», y su 301 saldría como «redirect inesperado», que **bloquea**.
-> Leído en el código, sin ejecutarlo contra producción. Hay que darle al
-> comprobador la lista completa de redirects antes de la primera pasada. Va
-> en su propio PR.
+Notas:
+
+- Si no puede leer esa lista (un preview protegido, o un mapa vacío por un fallo de la base), **no sigue**.
+- Un origen con destino distinto en el fichero y en la base es un **conflicto**, y bloquea.
+- Los orígenes de redirect que no están en `url-map.csv` también se recorren: tienen que llegar a un 200.
+
+> **Medido el 2026-10-14 contra `https://partequipos.vercel.app`**, en
+> estricto, código 0:
+>
+> - 650 URL más 1 origen fuera del mapa (`/maquinaria/`);
+> - 49 redirects esperados: 10 del fichero, 2 fijos y 47 de la base;
+> - **0 bloqueantes**: 584 conservadas en 200 y 49 redirects ok;
+> - 13 pendientes y 5 basura en 404, informativas.
+>
+> Antes del arreglo, ese mismo sitio habría dado **36 bloqueos falsos**: 35
+> redirects de la base y el del portal de empleo.
 
 **Criterio:** con `LANZAMIENTO_ESTRICTO=true` sale con código **0**. Se ejecuta:
 

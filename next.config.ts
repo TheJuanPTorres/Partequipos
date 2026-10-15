@@ -1,6 +1,8 @@
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
+import { REDIRECTS_FIJOS } from "./src/lib/redirects/fijos";
+
 const nextConfig: NextConfig = {
   // `turbopack: {}` evita el warning de configuración webpack/Turbopack que
   // introduce withPayload (CLAUDE.md: Turbopack es el bundler por defecto en Next 16).
@@ -79,33 +81,12 @@ const nextConfig: NextConfig = {
    * tres se activan y desactivan juntas con el mismo valor.
    */
   /*
-   * `/maquinaria/` → `/maquinaria-pesada/` (decisión de dirección, 2026-10-13).
-   * El mapa de navegación del cliente pide `/maquinaria/` como página, pero no
-   * existe ni en el WordPress ni aquí. Hasta que Andrés aclare qué es, un 301
-   * a la sección que sí existe. Va aquí y no en la colección `Redirects`
-   * porque no es una URL del sitio viejo, y así vale en todos los entornos
-   * sin escribir en ninguna base. Si llega a ser una página, se quita esto.
-   */
-  /*
-   * `/nosotros/trabaja-con-nosotros/` → el portal de empleo del cliente
-   * (decisión de dirección, 2026-10-14). El mapa de alcance lo redirige con 301
-   * a https://partequipos.buk.co/trabaja-con-nosotros en vez de ser una página
-   * propia, así que NO se construye la plantilla «Trabaja con nosotros» de
-   * Andrés: es una desviación del diseño anotada en
-   * docs/diseno/decisiones-indices-contacto.md. Es una URL del sitio actual
-   * (200 en el rastreo), pero va aquí y no en la colección `Redirects` porque
-   * el destino es externo y fijo, y así vale en todos los entornos sin tocar
-   * ninguna base. Si algún día es una página, se quita esto.
+   * Redirects fijos que no son datos de la colección `Redirects`: viven en
+   * `src/lib/redirects/fijos.ts` (allí el porqué de cada uno), que comparte
+   * con `npm run lanzamiento:urls` para que los dé por esperados.
    */
   async redirects() {
-    return [
-      { source: "/maquinaria/", destination: "/maquinaria-pesada/", statusCode: 301 },
-      {
-        source: "/nosotros/trabaja-con-nosotros/",
-        destination: "https://partequipos.buk.co/trabaja-con-nosotros",
-        statusCode: 301,
-      },
-    ];
+    return REDIRECTS_FIJOS.map((r) => ({ ...r, statusCode: 301 as const }));
   },
   async headers() {
     /*

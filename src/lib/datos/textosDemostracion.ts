@@ -18,9 +18,10 @@
  * - Las categorías de usada y de nueva no tienen introducción, solo el listado
  *   de unidades, así que se vacían. (Excavadoras nueva tiene al pie una lista
  *   de palabras clave, que no es una descripción.)
- * - Aditamentos: su encabezado. Dynapac: sus cuatro párrafos de introducción,
- *   con punto al final de cada uno. SV208: su párrafo, con la tilde de
- *   «Encuéntrala» corregida.
+ * - Aditamentos: su encabezado. SV208: su párrafo, con la tilde de
+ *   «Encuéntrala» corregida. Dynapac: el mismo texto que le pone el importador
+ *   de contenido real (`scripts/contenido-real`, el primer párrafo de su página
+ *   que nombra la marca), para que el runbook de contenido real no lo cambie.
  *
  * ESTA LISTA ES LA FUENTE DE LA MIGRACIÓN `…_huerfanas_y_textos_demo`, que
  * lleva una copia literal (CLAUDE.md §3.5); `textosDemostracion.test.ts` exige
@@ -121,7 +122,7 @@ export const TEXTOS_DEMOSTRACION: TextoDemostracion[] = [
     slug: "dynapac",
     demo: `Compactacion y pavimentacion: rodillos de suelo, de llantas, de doble rodillo, pavimentadoras y reglas vibratorias.${DEMO}`,
     nuevo:
-      "Lideramos el mercado en maquinaria pesada para compactación y pavimentación. Descubre la nueva línea de equipos Dynapac con respaldo exclusivo de Partequipos Colombia. Tu mejor inversión en compactadores de suelos, compactadores de asfalto, pavimentadoras y reglas de extendido. ¿Estás buscando maquinaria pesada eficiente, confiable y con respaldo garantizado? En Partequipos, somos distribuidores autorizados Dynapac y te traemos la nueva generación de equipos de compactación y pavimentación que están revolucionando las obras en Colombia y América Latina.",
+      "Descubre la nueva línea de equipos Dynapac con respaldo exclusivo de Partequipos Colombia.",
   },
   // --- Tipo de maquinaria nueva con la nota interna ---
   {

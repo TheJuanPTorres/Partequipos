@@ -33,7 +33,10 @@ export type Ruta = {
 export const RUTAS: Ruta[] = [
   { motivo: "carga la config de Payload; es lo que cayó en §10.18", ruta: "/admin/" },
   { motivo: "API REST contra la base", ruta: "/api/marcas/" },
-  { motivo: "ruta dinámica con consulta", ruta: "/sitemap.xml" },
+  {
+    motivo: "sitemap de todo el catálogo (generado en el build y regenerado por ISR)",
+    ruta: "/sitemap.xml",
+  },
   { motivo: "control: si esto cae, es otra cosa", ruta: "/" },
   {
     cabeceras: { "x-proxy-internal": "1" },

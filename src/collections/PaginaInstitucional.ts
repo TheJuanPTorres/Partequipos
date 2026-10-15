@@ -193,7 +193,8 @@ export const PaginaInstitucional: CollectionConfig = {
                * texto de la diapositiva se puede quitar. MARCADAS por defecto:
                * las diapositivas que ya existían no cambian (la migración rellena
                * `true`). El título oculto se queda en el HTML para lectores de
-               * pantalla; el texto circular y el recuadro, fuera del HTML.
+               * pantalla (lo pintado reserva su sitio, invisible, para que nada salte
+               * entre diapositivas); el texto circular y el recuadro, fuera del HTML.
                */
               type: "row",
               fields: [

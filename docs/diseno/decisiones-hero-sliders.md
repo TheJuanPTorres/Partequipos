@@ -28,15 +28,15 @@ Tres casillas por diapositiva, **marcadas por defecto** (la migración
 `20261015_150333_hero_solo_fondo` rellena `true` en las existentes, y una fila
 con `null` se pinta como siempre):
 
-| Casilla                             | Desmarcada                                                                                                                                                                      |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Mostrar título**                  | El `<h2>` se queda con su id y el texto **solo para lectores** (`soloLector`); lo pintado y el título partido no salen en el HTML. La máquina empieza arriba, sin aire ni cruce |
-| **Mostrar texto circular**          | El texto circular no sale en el HTML                                                                                                                                            |
-| **Mostrar recuadro de descripción** | El vidrio con el párrafo y el «+» no sale en el HTML (como una diapositiva sin párrafo ni enlace)                                                                               |
+| Casilla                             | Desmarcada                                                                                                                                                                                                                                                                                                                         |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Mostrar título**                  | El `<h2>` se queda, con su id y el texto **para lectores** (`soloLector`). Lo pintado conserva su sitio **invisible** (`visibility: hidden`, ya era `aria-hidden`) y sin título partido: la máquina queda donde estaría con título. Medido: quitándolo del flujo, el pase automático movía la caja de la máquina (CLS 0,069 a 390) |
+| **Mostrar texto circular**          | El texto circular no sale en el HTML                                                                                                                                                                                                                                                                                               |
+| **Mostrar recuadro de descripción** | El vidrio con el párrafo y el «+» no sale en el HTML (como una diapositiva sin párrafo ni enlace)                                                                                                                                                                                                                                  |
 
 - El **título sigue obligatorio** en el panel: nombra la región, los puntos
   del carrusel y el anuncio al cambiar de diapositiva.
-- Los **controles del carrusel** no cambian.
+- Los **controles del carrusel** no cambian (misma caja a 390 y 1440, medida).
 - En el panel, los campos de cada pieza se esconden con su casilla
   desmarcada; los datos no se borran.
 - El importador del contenido real y la copia y retirada de la demo **no

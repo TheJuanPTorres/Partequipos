@@ -354,19 +354,19 @@ export function HeroPortada({ diapositivas }: Props) {
   const letras = Math.max(...d.tituloLineas.map((l) => l.length));
   const palabra = Math.max(...d.titulo.split(" ").map((p) => p.length));
   /*
-   * TÍTULO OCULTO («Mostrar título» desmarcado): el `<h2>` se queda, con su id
-   * (nombra la región) y el texto SOLO para lectores de pantalla; lo pintado no
-   * sale en el HTML. Sin contenido en el flujo, no ocupa alto.
+   * TÍTULO OCULTO («Mostrar título» desmarcado, 2026-10-15): el `<h2>` se
+   * queda, con su id (nombra la región) y el texto para lectores de pantalla.
+   * Lo pintado SE RESERVA invisible (`data-oculto`: `visibility: hidden`, y ya
+   * era `aria-hidden`): así la máquina queda donde estaría con título y el pase
+   * no mueve su caja. Medido: con el título quitado del flujo, el pase a la
+   * diapositiva siguiente desplazaba la caja de la máquina (CLS 0,069 a 390).
    */
-  const titulo = !d.tituloVisible ? (
-    <h2 key={`titulo-${activo}`} id={idTitulo} className={estilos.titulo}>
-      <span className={estilos.soloLector}>{d.titulo}</span>
-    </h2>
-  ) : (
+  const titulo = (
     <h2
       key={`titulo-${activo}`}
       id={idTitulo}
-      className={`${estilos.titulo}${entra}`}
+      className={`${estilos.titulo}${d.tituloVisible ? entra : ""}`}
+      data-oculto={d.tituloVisible ? undefined : ""}
       data-partido={d.tituloPartido ? "" : undefined}
       style={{
         ["--hero-titulo-letras" as string]: String(letras),
@@ -449,7 +449,6 @@ export function HeroPortada({ diapositivas }: Props) {
           className={estilos.capaTexto}
           data-maquina={d.posicionMaquina}
           data-partido={d.tituloPartido ? "" : undefined}
-          data-sin-titulo={d.tituloVisible ? undefined : ""}
         >
           <div className={estilos.capaParallax}>{titulo}</div>
           <div className={estilos.capaMaquina}>

@@ -327,7 +327,7 @@ export function FormularioSolicitud({
           ) : null}
         </div>
 
-        <p className="pt-2 text-xs text-gray-500">
+        <p className="pt-2 text-xs text-gray-600">
           Los campos marcados con <span aria-hidden="true">*</span> son obligatorios. Usaremos tus
           datos únicamente para responder esta solicitud.
         </p>

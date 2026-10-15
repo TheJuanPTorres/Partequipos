@@ -19,13 +19,22 @@ import estilos from "./buscar.module.css";
  *   del título de una página del sitio no aporta nada y no se refleja.
  * - Dinámica por construcción (lee `searchParams`).
  */
-export const metadata: Metadata = {
-  title: "Buscar | Partequipos",
-  description: "Busca maquinaria pesada, repuestos y noticias en Partequipos.",
-  robots: { index: false, follow: true },
-};
-
 type Props = { searchParams: Promise<{ q?: string | string[] }> };
+
+/**
+ * Con una búsqueda hecha el título cambia («Resultados de la búsqueda»): quien
+ * usa lector de pantalla oye el cambio de página (WCAG 2.4.2) sin que el título
+ * repita el texto del visitante.
+ */
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const { q } = await searchParams;
+  const buscando = normalizarConsulta(q).estado !== "vacia";
+  return {
+    title: buscando ? "Resultados de la búsqueda | Partequipos" : "Buscar | Partequipos",
+    description: "Busca maquinaria pesada, repuestos y noticias en Partequipos.",
+    robots: { index: false, follow: true },
+  };
+}
 
 const GRUPOS: { clave: "nuevos" | "usados" | "modelos" | "articulos"; titulo: string }[] = [
   { clave: "nuevos", titulo: "Maquinaria nueva" },

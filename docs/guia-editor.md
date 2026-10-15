@@ -275,6 +275,11 @@ oficial, no lo pongas.
 - **Hero (carrusel):** cada diapositiva lleva título, párrafo, imagen de fondo,
   una versión **vertical para móvil** (recomendada: el móvil carga mucho más
   rápido) y, si quieres, la máquina recortada en PNG transparente.
+- **Si una diapositiva no tiene la versión vertical, el panel lo avisa** encima
+  del campo. En la primera es importante: es lo primero que se ve, y sin ella
+  el teléfono descarga la foto de escritorio en grande (la portada llegó a
+  tardar 7 s en móvil). Sube un recorte vertical de la misma foto, por ejemplo
+  de 1080 × 1620.
 - Cada sección de la portada tiene su bloque en esa página. Lo que dejes vacío
   no se pinta.
 

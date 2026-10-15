@@ -33,7 +33,7 @@ export function ListaArticulos({ articulos, vacio }: { articulos: Articulo[]; va
 
   return (
     <ul className="grid gap-6 sm:grid-cols-2">
-      {articulos.map((articulo, indice) => {
+      {articulos.map((articulo) => {
         const imagen = imagenDeMedia(articulo.imagenDestacada, articulo.titulo);
         const categoria = poblado<CategoriasBlog>(articulo.categoria);
 
@@ -45,10 +45,6 @@ export function ListaArticulos({ articulos, vacio }: { articulos: Articulo[]; va
                 alt={imagen.alt}
                 width={ANCHO_MINIATURA}
                 height={Math.round((ANCHO_MINIATURA * imagen.height) / imagen.width)}
-                // La primera tarjeta es el LCP del índice en móvil: sin diferir
-                // y con prioridad. Las demás, diferidas como siempre.
-                loading={indice === 0 ? "eager" : "lazy"}
-                fetchPriority={indice === 0 ? "high" : "auto"}
                 className="mb-3 h-40 w-full rounded object-cover"
                 // Punto focal del panel: qué parte se ve en el recorte de 160 px.
                 style={{ objectPosition: imagen.posicion }}

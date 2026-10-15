@@ -531,6 +531,9 @@ autenticación de Payload; no se ha hecho.
 
 ## 19. La pantalla de acceso, en tarjeta como en el original (2026-10-05, rama `fix/panel-acceso-tarjeta`)
 
+> **REVERTIDO el 2026-10-15 (§29):** la pantalla vuelve a ocupar toda la
+> pantalla. Lo que sigue se conserva como registro.
+
 Petición de dirección: en una pantalla de ~1900 px el panel visual ocupaba casi
 media pantalla y el formulario se iba a la derecha. En la página del sistema
 del cliente todo va en una **tarjeta centrada**. Sin esquema.
@@ -914,3 +917,22 @@ una ficha nueva importada por A). Se pasó a 1440 y en móvil, con el turno de
 - La página de la marca usa el bloque.
 - **Imagen al compartir:** la del bloque o, sin ella, la del sitio por defecto. El logo deja de serlo, por decisión de dirección: los logos del cliente son blancos y transparentes, y no se verían en WhatsApp ni en LinkedIn.
 - **De paso:** la sección de testimonios sin título ya no apunta con `aria-labelledby` a un id que no existe (lo señaló el verificador del #132).
+
+## 29. La pantalla de acceso, a pantalla completa (2026-10-15, rama `fix/panel-acceso-pantalla-completa`)
+
+Petición urgente de dirección: la pantalla de acceso deja la tarjeta centrada
+del §19 y ocupa **toda la pantalla, de borde a borde**. Es como pinta
+`login-screen` por sí solo, sin el marco de la página de muestra del sistema
+(leído en el registro, `ui.partequipos.com/r/login-screen.json`:
+`min-h-svh`, `p-4 lg:p-6` y `lg:grid-cols-[4fr_7fr]`). Sin esquema ni
+dependencias.
+
+- **Qué cambia:** se quita el envoltorio `pq-acceso__tarjeta` y sus estilos
+  (ancho máximo, borde, radio, fondo atenuado). El marcado vuelve a ser el del
+  PR #89, idéntico línea a línea.
+- **En escritorio:** panel visual a la izquierda (4/11 del ancho útil), a toda
+  la altura menos los 24 px de margen, y el formulario de 384 px centrado en
+  su columna (7/11).
+- **Se mantiene:** etiquetas visibles, borde de los campos de 3:1, foco del
+  panel, claro y oscuro, la imagen del campo «Imagen de la pantalla de acceso»
+  (o el degradado sin ella) y el móvil sin panel visual.

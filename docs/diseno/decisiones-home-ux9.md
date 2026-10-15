@@ -2494,3 +2494,30 @@ cambio de esquema.
 | F1  | Velo gris `#3A3A3A` al 50 % en multiplicar, plano | Degradado oscuro, más intenso abajo, donde va el texto | Contraste AA del texto blanco sobre cualquier foto (pedido de dirección) |
 | F2  | Botón: al pasar, fondo `text` (oscuro)            | Al pasar, fondo blanco y texto oscuro                  | Sobre la foto oscura, el oscuro no se distinguiría                       |
 | F3  | En móvil el texto de la tarjeta va centrado       | A la izquierda, como en escritorio                     | Pedido de dirección: «abajo a la izquierda»                              |
+
+## 31. «Maquinaria pesada nueva» de la Home V2 de Andrés (2026-10-15)
+
+Fuente: el export `elementor-3519-2026-10-15.json`
+(`Desktop\partequipos-diseno\wordpress\home-v2\`) y la referencia pintada
+(`partequipos.uxdesign.website`), medida a 390 · 1010 · 1440. Sustituye a las
+desviaciones D7 y D8 de §11 en esta sección.
+
+| Qué                 | Home V2 (medido)                                                                                | Aquí                                                                                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tarjetas a la vista | 4 · 2 · 1                                                                                       | Igual (`--s2-por-vista`)                                                                                                                              |
+| Avance              | Automático cada 5 s, en bucle, 0,5 s de transición                                              | Igual, con una copia inerte de las tarjetas detrás para el bucle                                                                                      |
+| Flechas             | Sí                                                                                              | **No** (dirección)                                                                                                                                    |
+| Puntos              | 6 px, 18 px entre centros, pulsables                                                            | Botones de 24 px con el punto de 6 dentro: «Ir a <marca>», `aria-current` (WCAG 2.5.8)                                                                |
+| Pausa               | Ninguna                                                                                         | Con el puntero encima, con el foco dentro, fuera de la vista y con «reducir movimiento»; botón de pausa junto a los puntos, como el hero (WCAG 2.2.2) |
+| Tarjeta             | 450 px de alto mínimo, radio 30, 30 px entre tarjetas                                           | Igual                                                                                                                                                 |
+| Logo                | Encima del texto y a la izquierda, a 30 px del borde; 30 % del ancho (máx. 120), 70 px en móvil | Igual (antes: al lado del texto en escritorio y centrado en móvil)                                                                                    |
+| Texto               | 16 · 14 · 13 px, peso 300, interlineado 1,4                                                     | Igual                                                                                                                                                 |
+| Marcas              | Hitachi, CASE, Dynapac, Yanmar                                                                  | Las del panel con posición en la portada y foto de tarjeta, en el orden de esa posición; el texto, la descripción de la marca                         |
+
+Al tabular hasta una tarjeta que no se ve, se trae al frente. Sin JavaScript se
+ven las primeras tarjetas con sus enlaces; el resto de marcas sigue en «Ver todo».
+
+**Dynapac:** el importador de contenido real (`scripts/contenido-real`) usaba
+como foto de tarjeta un logo (`Dynapac-logo-02.jpg`); pasa a la foto del diseño,
+`2025/10/CA25D-CIELO.jpg`, que está en la exportación de WordPress del cliente.
+El orden de las marcas pasa a ser el de la Home V2.

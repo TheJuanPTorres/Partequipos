@@ -51,7 +51,8 @@ IMAGENES = {
     "marca-hitachi": ("2025/03/Hitachi-FOTOS-01-scaled.jpg", "Excavadora Hitachi trabajando en una cantera"),
     "marca-case": ("2025/03/CASE-FOTOS-01-scaled.jpg", "Retrocargadora CASE moviendo tierra en una obra"),
     "marca-yanmar": ("2025/03/Yanmar-FOTOS-01-scaled.jpg", "Miniexcavadora Yanmar en una obra"),
-    "marca-dynapac": ("2025/10/Dynapac-logo-02.jpg", "Compactador de suelo Dynapac en una obra"),
+    # La de la Home V2 de Andrés (2026-10-15). La de antes, Dynapac-logo-02.jpg, era un logo.
+    "marca-dynapac": ("2025/10/CA25D-CIELO.jpg", "Compactador de suelo Dynapac CA25D en una vía en obra"),
     "usada": ("2025/03/USADOS-FOTOS-02-scaled.jpg", "Excavadoras usadas en un patio de maquinaria"),
     "cat-corte": ("2025/07/Conjunto-ppal-1-600x600-SEP-2025.jpg", "Baldes y dientes para maquinaria pesada"),
     "cat-llantas": ("2025/04/CATEGORIA-Llantas.jpg", "Llantas y rines para maquinaria pesada"),
@@ -84,9 +85,9 @@ CATEGORIAS = {
     "lubricantes-para-maquinaria-pesada": ("cat-lubricantes", 3, "lubricante"),
     "filtracion-para-maquinaria-pesada": ("cat-filtracion", 4, "filtro"),
 }
-# Sección 2: las 4 marcas de WordPress, en su orden.
+# Sección 2: las 4 marcas, en el orden de la Home V2 de Andrés (2026-10-15).
 MARCAS = [("hitachi", "logo-hitachi", "marca-hitachi"), ("case-construction", "logo-case", "marca-case"),
-          ("yanmar", "logo-yanmar", "marca-yanmar"), ("dynapac", "logo-dynapac", "marca-dynapac")]
+          ("dynapac", "logo-dynapac", "marca-dynapac"), ("yanmar", "logo-yanmar", "marca-yanmar")]
 # La página de cada marca en WordPress: de ahí sale la descripción de su tarjeta.
 RUTAS_MARCAS = {s: f"/maquinaria-pesada/maquinaria-pesada-nueva/marcas/{s}/" for s, _, _ in MARCAS}
 NOMBRES_MARCAS = {"hitachi": "Hitachi", "case-construction": "CASE", "yanmar": "Yanmar", "dynapac": "Dynapac"}

@@ -17,7 +17,6 @@ import { getPaginas } from "@/lib/queries/getPaginas";
 import { getTipos } from "@/lib/queries/getTipos";
 import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
-import { categoriaUsadaIndexable } from "@/lib/usados/heredadas";
 import { poblado } from "@/lib/utils/relations";
 import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/payload-types";
 
@@ -135,18 +134,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     categoriasNueva: categoriasNueva.map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
 
-    // D4 (dirección, 2026-10-13): una categoría creada en el panel y sin
-    // unidades no se indexa ni sale aquí; las heredadas del sitio actual, sí.
+    // D4 (dirección, 2026-10-13 y 2026-10-14): una categoría de usada sin
+    // unidades disponibles no sale aquí, tampoco las heredadas del sitio
+    // actual. Vuelve en cuanto tenga una.
     categoriasUsada: categoriasUsada
-      .filter((c) =>
-        categoriaUsadaIndexable(
-          c.slug,
-          inventarioUsados.filter((u) => u.categoria === c.id).length,
-        ),
-      )
+      .filter((c) => inventarioUsados.some((u) => u.categoria === c.id))
       .map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
 
-    // D4: una marca de usada solo con unidades disponibles (ninguna es heredada).
+    // D4: una marca de usada solo con unidades disponibles.
     marcasUsada: marcasUsada
       .filter((m) => inventarioUsados.some((u) => u.marcaUsada === m.id))
       .map((m) => ({ slug: m.slug, updatedAt: m.updatedAt })),

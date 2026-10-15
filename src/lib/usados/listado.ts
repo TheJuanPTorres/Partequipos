@@ -27,7 +27,6 @@ import { metadataDe } from "../seo/metadata";
 import { METADATA_404 } from "../seo/noEncontrada";
 import { descripcionPorDefecto, tituloPorDefecto } from "../seo/porDefecto";
 import { CATALOGO_USADOS, CATALOGO_USADOS_MARCA, type UnidadFiltrable } from "./filtros";
-import { categoriaUsadaIndexable } from "./heredadas";
 import { POR_PAGINA } from "./paginacion";
 
 /**
@@ -80,7 +79,8 @@ async function ambitoDe(tipo: TipoListadoUsado, slug: string): Promise<Ambito | 
       catalogo: CATALOGO_USADOS,
       unidades,
       ruta: (n) => rutas.categoriaUsadaPagina(categoria.slug, n),
-      indexable: categoriaUsadaIndexable(categoria.slug, unidades.length),
+      // Sin unidades, no se indexa; vuelve sola con la primera (D4).
+      indexable: unidades.length > 0,
       enlaces: [],
     };
   }
@@ -94,7 +94,7 @@ async function ambitoDe(tipo: TipoListadoUsado, slug: string): Promise<Ambito | 
     catalogo: CATALOGO_USADOS_MARCA,
     unidades,
     ruta: (n) => rutas.marcaUsadaPagina(marca.slug, n),
-    // Una marca no es heredada: sin unidades, no se indexa (D4).
+    // Sin unidades, no se indexa (D4).
     indexable: unidades.length > 0,
     enlaces: [
       ...(slugPoblado(marca.marcaNueva)
@@ -154,7 +154,8 @@ export async function cargarListadoUsado(
  * - página n sin filtros: título y descripción con «página n», canónica propia;
  * - con filtros u otro orden: no se indexa, y la canónica es la página 1 sin
  *   filtros (`metadataFiltrada`);
- * - sin unidades y sin ser heredada: no se indexa (D4).
+ * - sin unidades: no se indexa (D4), aunque la categoría sea heredada del
+ *   sitio actual; con la primera unidad vuelve a indexarse sola.
  */
 export async function metadataListadoUsado(
   tipo: TipoListadoUsado,

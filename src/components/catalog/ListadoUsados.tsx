@@ -21,8 +21,14 @@ import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import type { Ambito } from "@/lib/usados/listado";
 import { posicionFocal } from "@/lib/utils/relations";
 
-/** Ancho con el que se piden las miniaturas de las tarjetas (ver el `<Image>`). */
-const ANCHO_MINIATURA = 400;
+/**
+ * Ancho con el que se piden las miniaturas de las tarjetas (ver el `<Image>`).
+ * Con `object-contain` en 160 px de alto, una foto 4:3 se pinta a ~213 px de
+ * ancho en todos los tamaños. Con 256, el srcset de 1x/2x sale de 256 y 640 px:
+ * basta para una pantalla de densidad 3. Con 400 salía de 640 y 828, unas 3
+ * veces de más en escritorio (medido en el sitio publicado, 2026-10-14).
+ */
+const ANCHO_MINIATURA = 256;
 
 /**
  * El listado de maquinaria USADA de una categoría o de una marca, una página
@@ -155,8 +161,8 @@ export function ListadoUsados({
             </p>
           ) : (
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-              {unidades.map((unidad) => (
-                <TarjetaUsada key={unidad.id} unidad={unidad} />
+              {unidades.map((unidad, indice) => (
+                <TarjetaUsada key={unidad.id} unidad={unidad} primera={indice === 0} />
               ))}
             </ul>
           )}
@@ -172,7 +178,7 @@ export function ListadoUsados({
   );
 }
 
-function TarjetaUsada({ unidad }: { unidad: UnidadUsada }) {
+function TarjetaUsada({ unidad, primera }: { unidad: UnidadUsada; primera: boolean }) {
   const { foto } = unidad;
   return (
     <li className="rounded-lg border border-gray-200 p-4">
@@ -181,12 +187,16 @@ function TarjetaUsada({ unidad }: { unidad: UnidadUsada }) {
           src={foto.url}
           alt={foto.alt || unidad.nombre}
           // Ancho de MINIATURA, no el original: el srcset de 1x/2x sale de aquí
-          // (640 y 828 px), y la tarjeta pinta como mucho ~394 px de ancho y
-          // 160 de alto. Con el ancho original pedía hasta 4 veces de más; con
+          // (256 y 640 px), y la tarjeta pinta la foto a ~213 × 160 px. Con el
+          // ancho original pedía hasta 4 veces de más; con
           // `sizes`, cada tarjeta llevaba 12 anchos en el srcset y el HTML del
           // listado crecía ~65 % (medido en el preview, 2026-10-13).
           width={ANCHO_MINIATURA}
           height={Math.round((ANCHO_MINIATURA * foto.height) / foto.width)}
+          // La primera tarjeta es el LCP del listado en móvil: sin diferir y
+          // con prioridad. Las demás, diferidas como siempre.
+          loading={primera ? "eager" : "lazy"}
+          fetchPriority={primera ? "high" : "auto"}
           className="mb-3 h-40 w-full object-contain"
           style={{ objectPosition: posicionFocal(foto.focalX, foto.focalY) }}
         />

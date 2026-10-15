@@ -7,7 +7,8 @@
  *   npm run preview:fichas:simular -- comprobar # además, comprueba fotos y PDF en WordPress
  *   npm run preview:fichas:importar             # una tanda (20 fichas); repetir hasta acabar
  *   npm run preview:fichas:importar -- tanda=80
- *   npm run preview:fichas:importar -- actualizar  # vuelve a aplicar los datos a las ya importadas
+ *   npm run preview:fichas:importar -- actualizar  # vuelve a aplicar los datos a las ya importadas,
+ *                                                 # por tandas que avanzan (`reiniciar`: desde la primera)
  *   npm run preview:fichas:retirar              # deshace EXACTAMENTE lo del manifiesto
  *
  * IMPORTACIÓN AL PREVIEW APROBADA por dirección (2026-10-13), tras la simulación.
@@ -31,6 +32,7 @@
  *   ruta por línea (o `alcance=<ruta>`; opcional).
  * El informe se guarda junto a la fuente (`simulacion-fichas.json`).
  */
+import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -63,6 +65,11 @@ import {
   type Par,
 } from "../../src/lib/maquinaria/wordpress";
 import { veredictoDestino } from "../../src/lib/demo/copiaDemo";
+import {
+  marcarActualizada,
+  pendientesDeActualizar,
+  type EstadoActualizacion,
+} from "../../src/lib/importacion/actualizacion";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 import {
   altDeRepuesto,
@@ -110,6 +117,8 @@ const MANIFIESTO = valorDe("manifiesto") ?? path.join(CIERRE, `manifiesto-fichas
 const TANDA = Number(valorDe("tanda") ?? 20);
 if (!Number.isInteger(TANDA) || TANDA < 1) fallar("tanda=<n> tiene que ser un entero positivo");
 const ACTUALIZAR = args.includes("actualizar");
+/** Con `actualizar reiniciar`, la actualización empieza de cero aunque la fuente sea la misma. */
+const REINICIAR = args.includes("reiniciar");
 
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
@@ -566,6 +575,8 @@ type Manifiesto = {
   /** Fichas que ya existían (las de demostración) y su valor de antes, por id. */
   actualizados: { ruta: string; id: number }[];
   anteriores: Record<string, Anterior>;
+  /** Por dónde va `actualizar` con la fuente actual (`src/lib/importacion/actualizacion.ts`). */
+  actualizacion?: EstadoActualizacion;
 };
 const manifiesto: Manifiesto = fs.existsSync(MANIFIESTO)
   ? (JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto)
@@ -776,8 +787,33 @@ const conDestino = planes.filter((p) => p.accion !== "sin-destino");
 for (const p of planes.filter((p) => p.accion === "sin-destino")) {
   log(`SIN DESTINO, no se importa: ${p.ruta} (${p.avisos.join("; ")})`);
 }
-const pendientes = conDestino.filter((p) => ACTUALIZAR || !hecha(p.ruta));
+// Con `actualizar`, la tanda avanza por las que aún no se actualizaron con
+// ESTA fuente (antes tomaba siempre las primeras N y no pasaba de ahí).
+let actualizacion: EstadoActualizacion | null = null;
+let pendientes: typeof conDestino;
+if (ACTUALIZAR) {
+  const huella = crypto.createHash("sha256").update(fs.readFileSync(FUENTE)).digest("hex");
+  const r = pendientesDeActualizar(
+    conDestino,
+    (p) => p.ruta,
+    manifiesto.actualizacion,
+    huella,
+    REINICIAR,
+  );
+  if (r.reiniciada) log("actualizar: fuente nueva o «reiniciar», empieza desde la primera");
+  actualizacion = r.estado;
+  pendientes = r.pendientes;
+  log(`actualizar: ya actualizadas con esta fuente: ${conDestino.length - pendientes.length}`);
+} else {
+  pendientes = conDestino.filter((p) => !hecha(p.ruta));
+}
 const tanda = pendientes.slice(0, TANDA);
+/** Apunta la ficha como actualizada con esta fuente (solo con `actualizar`). */
+const apuntarActualizada = (ruta: string) => {
+  if (!actualizacion) return;
+  marcarActualizada(actualizacion, ruta);
+  manifiesto.actualizacion = actualizacion;
+};
 log(
   `ya importadas: ${conDestino.filter((p) => hecha(p.ruta)).length} · esta tanda: ${tanda.length} · quedan después: ${pendientes.length - tanda.length}`,
 );
@@ -847,6 +883,7 @@ for (const p of tanda) {
     if (yaExistia && !manifiesto.actualizados.some((e) => e.id === id)) {
       manifiesto.actualizados.push({ ruta: p.ruta, id });
     }
+    apuntarActualizada(p.ruta);
     guardarManifiesto();
     log(
       `actualizada ${p.slug} (id ${id}) · ${imagenes.length} fotos · ${p.fichaTecnica.length} filas · PDF ${fichaTecnicaPdf ? "sí" : "no"}`,
@@ -859,6 +896,7 @@ for (const p of tanda) {
     overrideAccess: true,
   });
   manifiesto.creado.equipos.push({ ruta: p.ruta, id: doc.id });
+  apuntarActualizada(p.ruta);
   guardarManifiesto();
   if (doc.slug !== p.slug) {
     fallar(`la ficha ${p.ruta} se guardó con otro slug («${doc.slug}»): revisar`);

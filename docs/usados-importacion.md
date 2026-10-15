@@ -126,7 +126,11 @@ npm run preview:usados:retirar
   manifiesto al que le faltaba una unidad: la actualizó y no subió ninguna
   foto.
 - **`actualizar`:** vuelve a aplicar los datos a las unidades ya importadas
-  (tras corregir una regla) y rehace su texto alternativo. Sin ella, el texto
+  (tras corregir una regla) y rehace su texto alternativo. **Avanza por
+  tandas** (desde el 2026-10-14): el manifiesto guarda en `actualizacion` qué
+  unidades se actualizaron ya con esa fuente (por el hash del JSON), y cada
+  ejecución sigue por donde iba. Con otra fuente empieza de cero;
+  `actualizar reiniciar` lo fuerza. Antes repetía siempre las primeras 10. Sin ella, el texto
   alternativo que haya cambiado un editor se respeta. Si una pasada anterior
   dejó dos copias de una foto, borra la que creó la importación y ya no usa
   ninguna unidad (pasó una vez en el preview, con la unidad que ganó el año).

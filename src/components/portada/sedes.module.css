@@ -377,6 +377,12 @@
   outline-offset: 0.375em;
 }
 
+/* Pin solapado con otro: inactivo (`inert`), lo cubren las flechas
+ * anterior/siguiente (WCAG 2.5.8, control equivalente; ver GloboSedes). */
+.globo :global(.sedes-pin[data-amontonado]) {
+  cursor: default;
+}
+
 .globo :global(.sedes-pin:focus-visible) {
   outline: 2px solid var(--sedes-tinta);
   outline-offset: 4px;

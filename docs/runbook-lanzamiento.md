@@ -635,7 +635,7 @@ retira a mano desde el panel.
 
 **Dos avisos que salen de esa lectura:**
 
-- **`actualizar` en usados y fichas toma siempre los primeros N** (10 y 20 por defecto) y no avanza entre ejecuciones. Para repasarlos todos, se pasa `tanda=` **mayor que el total** (por ejemplo, `tanda=200`). Sin `actualizar`, la tanda sí avanza.
+- **`actualizar` en usados y fichas avanza por tandas** (desde el 2026-10-14): el manifiesto guarda qué registros se actualizaron ya con esa fuente, y cada ejecución sigue por donde iba hasta que no queda ninguno. Con una exportación nueva (otro fichero fuente) empieza de cero sola; `reiniciar` lo fuerza con la misma. Antes tomaba siempre los primeros 10 o 20.
 - **Repuestos puede negarse a ejecutarse** si un tipo creado en la primera importación ya no está en la exportación nueva: lo cuenta como «demo» y la comprobación solo acepta la demo aprobada (inferido del código, no probado). **Si la simulación se niega, se para y se avisa al agente.**
 
 **Lo que cambia la regla de «sobrescribe»:** cualquier corrección hecha
@@ -652,18 +652,18 @@ Cada runbook, completo y con su comprobación final, antes del siguiente.
 Todos desde `Devs\Partequipos-runbooks` (0) y con la exportación nueva en la
 variable `$XML` del runbook.
 
-| #   | Runbook (en `Desktop\partequipos-cierre\`)               | Estado a 2026-10-14                    | Qué hacer con la exportación nueva                                                                                        |
-| --- | -------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Servicio técnico y lubricantes (B)                       | Sin ejecutar                           | Ejecutarlo directamente con la exportación nueva                                                                          |
-| 2   | Fotos de los índices (D), por el panel                   | Sin ejecutar                           | No depende del XML                                                                                                        |
-| 3   | Retirada de la copia de demostración (c)                 | Sin ejecutar                           | No depende del XML. **Antes del 5**: el contenido real se niega si queda copia                                            |
-| 4   | Repuestos (1)                                            | Ejecutado (exportación del 2026-10-07) | Extraer, **simular**, importar. Revisar en la simulación lo creado y lo cambiado                                          |
-| 5   | Contenido real de home y Nosotros                        | Sin ejecutar                           | Ejecutarlo con la exportación nueva. Necesita las marcas y categorías de 4                                                |
-| 6   | Fichas de maquinaria nueva                               | Ejecutado (exportación del 2026-10-07) | Simular, importar las nuevas y, si cambiaron datos, `actualizar` con `tanda=200`                                          |
-| 7   | Usados (3)                                               | Ejecutado (exportación del 2026-10-07) | Simular, importar las nuevas (por tandas) y, si cambiaron, `actualizar` con `tanda=200`. Las vendidas, a mano en el panel |
-| 8   | Blog y páginas de texto (2)                              | Ejecutado (API del 2026-10-14)         | Volver a ejecutar **mientras el WordPress siga en el dominio**: lee la API en vivo                                        |
-| 9   | Redeploy sin caché de build, `db:check` y prueba de humo | —                                      | Una sola vez al final: los scripts no revalidan lo prerenderizado                                                         |
-| 10  | Las 650 URL contra `vercel.app` (f)                      | —                                      | Código 0 en estricto                                                                                                      |
+| #   | Runbook (en `Desktop\partequipos-cierre\`)               | Estado a 2026-10-14                    | Qué hacer con la exportación nueva                                                                                                            |
+| --- | -------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Servicio técnico y lubricantes (B)                       | Sin ejecutar                           | Ejecutarlo directamente con la exportación nueva                                                                                              |
+| 2   | Fotos de los índices (D), por el panel                   | Sin ejecutar                           | No depende del XML                                                                                                                            |
+| 3   | Retirada de la copia de demostración (c)                 | Sin ejecutar                           | No depende del XML. **Antes del 5**: el contenido real se niega si queda copia                                                                |
+| 4   | Repuestos (1)                                            | Ejecutado (exportación del 2026-10-07) | Extraer, **simular**, importar. Revisar en la simulación lo creado y lo cambiado                                                              |
+| 5   | Contenido real de home y Nosotros                        | Sin ejecutar                           | Ejecutarlo con la exportación nueva. Necesita las marcas y categorías de 4                                                                    |
+| 6   | Fichas de maquinaria nueva                               | Ejecutado (exportación del 2026-10-07) | Simular, importar las nuevas y, si cambiaron datos, `actualizar` (repetir hasta «quedan después: 0»)                                          |
+| 7   | Usados (3)                                               | Ejecutado (exportación del 2026-10-07) | Simular, importar las nuevas (por tandas) y, si cambiaron, `actualizar` (repetir hasta «quedan después: 0»). Las vendidas, a mano en el panel |
+| 8   | Blog y páginas de texto (2)                              | Ejecutado (API del 2026-10-14)         | Volver a ejecutar **mientras el WordPress siga en el dominio**: lee la API en vivo                                                            |
+| 9   | Redeploy sin caché de build, `db:check` y prueba de humo | —                                      | Una sola vez al final: los scripts no revalidan lo prerenderizado                                                                             |
+| 10  | Las 650 URL contra `vercel.app` (f)                      | —                                      | Código 0 en estricto                                                                                                                          |
 
 **Presupuesto del Blob:** solo se suben las imágenes nuevas; las ya subidas se
 reutilizan. Con Pro no hay cupo que agotar (a.2).

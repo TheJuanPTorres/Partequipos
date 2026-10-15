@@ -14,7 +14,8 @@ python -I scripts/maquinaria/extraer-xml.py <exportacion.xml> <salida.json>
 npm run preview:fichas:simular              # lee la base del preview y cuenta; no escribe
 npm run preview:fichas:simular -- comprobar # además, comprueba fotos y PDF en WordPress
 npm run preview:fichas:importar             # una tanda de 20 fichas; repetir hasta acabar
-npm run preview:fichas:importar -- actualizar  # vuelve a aplicar los datos (p. ej. el peso)
+npm run preview:fichas:importar -- actualizar  # vuelve a aplicar los datos (p. ej. el peso), por tandas que avanzan
+npm run preview:fichas:importar -- actualizar reiniciar  # vuelve a empezar con la misma fuente
 npm run preview:fichas:retirar              # deshace exactamente lo del manifiesto
 ```
 

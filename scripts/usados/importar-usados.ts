@@ -26,6 +26,7 @@
  * DESTINO validado antes de cargar Payload, como el blog: `preview` solo con
  * la base y el Blob del preview; los otros destinos, con su base y su almacén.
  */
+import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -34,6 +35,11 @@ import { getPayload } from "payload";
 
 import { exigirAlmacen } from "../blob/exigirAlmacen";
 import { veredictoDestino } from "../../src/lib/demo/copiaDemo";
+import {
+  marcarActualizada,
+  pendientesDeActualizar,
+  type EstadoActualizacion,
+} from "../../src/lib/importacion/actualizacion";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 import {
   altDeFoto,
@@ -80,6 +86,8 @@ if (!Number.isInteger(TANDA) || TANDA < 1) fallar("tanda=<n> tiene que ser un en
 const COMPROBAR_FOTOS = args.includes("fotos");
 /** Con `actualizar`, la importación vuelve a aplicar los datos a las unidades ya importadas (sin volver a subir fotos). */
 const ACTUALIZAR = args.includes("actualizar");
+/** Con `actualizar reiniciar`, la actualización empieza de cero aunque la fuente sea la misma. */
+const REINICIAR = args.includes("reiniciar");
 
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
@@ -101,6 +109,8 @@ type Manifiesto = {
     media: Fichero[];
     categorias: number[];
   };
+  /** Por dónde va `actualizar` con la fuente actual (`src/lib/importacion/actualizacion.ts`). */
+  actualizacion?: EstadoActualizacion;
 };
 const manifiesto: Manifiesto = fs.existsSync(MANIFIESTO)
   ? (JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto)
@@ -478,7 +488,26 @@ async function unidadExistente(p: Plan, primeraFoto: number | null): Promise<num
 }
 
 const hechas = new Set(manifiesto.creado.usados.map((u) => u.idWp));
-const pendientes = ACTUALIZAR ? planes : planes.filter((p) => !hechas.has(p.idWp));
+// Con `actualizar`, la tanda avanza por las que aún no se actualizaron con
+// ESTA fuente (antes tomaba siempre las primeras N y no pasaba de ahí).
+let actualizacion: EstadoActualizacion | null = null;
+let pendientes: Plan[];
+if (ACTUALIZAR) {
+  const huella = crypto.createHash("sha256").update(fs.readFileSync(FUENTE)).digest("hex");
+  const r = pendientesDeActualizar(
+    planes,
+    (p) => String(p.idWp),
+    manifiesto.actualizacion,
+    huella,
+    REINICIAR,
+  );
+  if (r.reiniciada) log("actualizar: fuente nueva o «reiniciar», empieza desde la primera");
+  actualizacion = r.estado;
+  pendientes = r.pendientes;
+  log(`actualizar: ya actualizadas con esta fuente: ${planes.length - pendientes.length}`);
+} else {
+  pendientes = planes.filter((p) => !hechas.has(p.idWp));
+}
 const tanda = pendientes.slice(0, TANDA);
 log(
   `importadas antes: ${hechas.size} · esta tanda: ${tanda.length} · quedan después: ${pendientes.length - tanda.length}`,
@@ -516,6 +545,10 @@ for (const p of tanda) {
     const doc = await payload.create({ collection: "equipos-usados", data, overrideAccess: true });
     manifiesto.creado.usados.push({ idWp: p.idWp, id: doc.id });
     log(`creada ${p.idWp} → ${doc.id}: «${p.datos.nombre}» (${ids.length} fotos)`);
+  }
+  if (actualizacion) {
+    marcarActualizada(actualizacion, String(p.idWp));
+    manifiesto.actualizacion = actualizacion;
   }
   guardarManifiesto();
 }

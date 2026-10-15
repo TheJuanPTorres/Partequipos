@@ -57,12 +57,17 @@ const ICONO_PESTANA: Record<string, Icon> = {
 };
 
 /**
- * Ancho con el que se piden las fotos de las tarjetas. La caja más ancha es la
- * de la lista (unos 343 px en escritorio y el ancho de la columna en móvil), y
- * la foto va con `contain`, así que nunca se pinta más ancha. 384 es uno de los
- * anchos del optimizador: se pide w=384 (y w=828 en pantallas 2×) en vez de
- * w=640 y w=1080, que es lo que pedía con 420 (medición de C, 2026-10-14).
+ * Tamaño en que se pinta la foto de la tarjeta, para que el optimizador sirva
+ * la que toca (medición de C, 2026-10-14). La foto va con `contain` en una
+ * caja que, desde 640 px de pantalla, no pasa de 343 px (columna de 391 px
+ * menos 48 de relleno; entre 640 y 1024, unos 341). Por debajo de 640, la
+ * tarjeta ocupa la columna: pantalla − 100 px (márgenes y relleno). La rejilla
+ * pinta más pequeño, así que también queda cubierta.
+ * Sin `sizes`, con un ancho fijo de 420, se pedía w=640 (y w=1080 en 2×) en
+ * cualquier pantalla.
  */
+const SIZES_FOTO = "(min-width: 640px) 343px, calc(100vw - 100px)";
+/** Solo para la proporción de la foto: el ancho que se pide lo decide `sizes`. */
 const ANCHO_FOTO = 384;
 const ID_TARJETAS = "tarjetas-nueva";
 
@@ -419,6 +424,7 @@ function TarjetaEquipo({ equipo, prioridad }: { equipo: EquipoNuevoListado; prio
             alt={foto.alt || equipo.nombre}
             width={ANCHO_FOTO}
             height={Math.round((ANCHO_FOTO * foto.height) / foto.width)}
+            sizes={SIZES_FOTO}
             priority={prioridad}
           />
         ) : null}

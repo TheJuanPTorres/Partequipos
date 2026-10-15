@@ -1,5 +1,18 @@
 import { z } from "zod";
 
+import {
+  INTERESES,
+  MAX,
+  PERFILES,
+  TIPOS_SOLICITUD,
+  type ErroresCampo,
+} from "@/lib/validation/opcionesSolicitud";
+
+// Siguen exportándose desde aquí para el servidor; el CLIENTE las importa de
+// `opcionesSolicitud.ts`, que no carga Zod.
+export { INTERESES, MAX, PERFILES, TIPOS_SOLICITUD };
+export type { ErroresCampo, TipoSolicitud } from "@/lib/validation/opcionesSolicitud";
+
 /**
  * Validación de los formularios públicos.
  *
@@ -9,34 +22,8 @@ import { z } from "zod";
  * enviar un POST a la acción saltándose el formulario.
  */
 
-/** Tipos de solicitud; deben coincidir con el `select` de la colección. */
-export const TIPOS_SOLICITUD = ["contacto", "cotizacion", "repuesto"] as const;
-
-/**
- * Clasificación opcional del formulario de la página de marca de repuestos.
- * Valores y etiquetas, en el orden del diseño; deben coincidir con los
- * `select` `interes` y `perfil` de la colección `solicitudes`.
- */
-export const INTERESES = [
-  { valor: "cotizar", etiqueta: "Cotizar productos" },
-  { valor: "muestras", etiqueta: "Muestras/prototipos" },
-  { valor: "asesoria", etiqueta: "Asesoría general" },
-  { valor: "otro", etiqueta: "Otro" },
-] as const;
-export const PERFILES = [
-  { valor: "empresa", etiqueta: "Empresa" },
-  { valor: "comprador", etiqueta: "Comprador" },
-  { valor: "emprendedor", etiqueta: "Emprendedor" },
-  { valor: "proveedor", etiqueta: "Proveedor" },
-  { valor: "empleado", etiqueta: "Empleado" },
-  { valor: "otro", etiqueta: "Otro" },
-] as const;
 const VALORES_INTERES = INTERESES.map((i) => i.valor) as [string, ...string[]];
 const VALORES_PERFIL = PERFILES.map((p) => p.valor) as [string, ...string[]];
-export type TipoSolicitud = (typeof TIPOS_SOLICITUD)[number];
-
-/** Longitudes máximas. Cortan el abuso antes de llegar a la base. */
-export const MAX = { nombre: 120, correo: 200, telefono: 40, empresa: 160, mensaje: 4000 } as const;
 
 /*
  * Teléfono: se acepta cualquier combinación de dígitos, espacios, guiones,
@@ -120,9 +107,6 @@ export const esquemaSolicitud = z.object({
 });
 
 export type DatosSolicitud = z.infer<typeof esquemaSolicitud>;
-
-/** Errores por campo, en la forma que consume el formulario. */
-export type ErroresCampo = Partial<Record<string, string>>;
 
 /**
  * Valida y devuelve o los datos o los errores por campo.

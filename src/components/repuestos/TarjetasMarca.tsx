@@ -43,6 +43,8 @@ export function TarjetasMarca({
 }) {
   if ((!titulo && !indice) || tarjetas.length === 0) return null;
   const idTitulo = `${id}-titulo`;
+  // Sin título de sección (páginas índice) las tarjetas cuelgan del h1: h2, no h3.
+  const Nivel = titulo ? "h3" : "h2";
   return (
     <section
       id={id}
@@ -76,9 +78,9 @@ export function TarjetasMarca({
                 </div>
               ) : null}
               <div className={estilos.panel} data-con-foto={t.imagen ? "" : undefined}>
-                <h3 id={idT} className={estilos.tituloTarjeta}>
+                <Nivel id={idT} className={estilos.tituloTarjeta}>
                   {t.titulo}
-                </h3>
+                </Nivel>
                 {verTodo ? (
                   <Link href={t.href} aria-describedby={idT} className={estilos.botonTarjeta}>
                     <IconArrowRight aria-hidden="true" focusable="false" stroke={2} size={14} />

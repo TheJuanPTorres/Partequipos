@@ -10,7 +10,9 @@ import {
   getTipoMaquinariaPorSlug,
   getTiposMaquinaria,
 } from "@/lib/queries/getMaquinaria";
+import { metadataSinIndexar } from "@/lib/filtros/seo";
 import { rutas } from "@/lib/routes";
+import { indexacionPermitida } from "@/lib/seo/config";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -44,12 +46,16 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!data) return METADATA_404;
 
   const { marca, tipo } = data;
-  return metadataDe({
+  const base = await metadataDe({
     nombre: tituloPorDefecto.tipoMaquinaria(tipo.nombre, marca.nombre),
     path: rutas.tipoMaquinaria(marca.slug, tipo.slug),
     descripcion: tipo.descripcion,
     seo: tipo.seo,
   });
+  // D4 (dirección, 2026-10-14): sin equipos, no se indexa; vuelve sola con el
+  // primero, que revalida esta página. La URL sigue en 200 con su estado vacío.
+  const equipos = await getEquiposDeTipo(tipo.id);
+  return equipos.length > 0 ? base : metadataSinIndexar(base, indexacionPermitida());
 }
 
 export default async function TipoMaquinariaPage({ params }: { params: Promise<Params> }) {

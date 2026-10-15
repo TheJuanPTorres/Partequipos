@@ -284,6 +284,11 @@ oficial, no lo pongas.
   diapositiva en los puntos del carrusel. Al desmarcar una casilla, sus campos
   se esconden en el panel, pero lo escrito no se borra: si vuelves a
   marcarla, reaparece.
+- **Si una diapositiva no tiene la versión vertical, el panel lo avisa** encima
+  del campo. En la primera es importante: es lo primero que se ve, y sin ella
+  el teléfono descarga la foto de escritorio en grande (la portada llegó a
+  tardar 7 s en móvil). Sube un recorte vertical de la misma foto, por ejemplo
+  de 1080 × 1620.
 - Cada sección de la portada tiene su bloque en esa página. Lo que dejes vacío
   no se pinta.
 

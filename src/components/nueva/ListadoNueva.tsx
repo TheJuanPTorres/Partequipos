@@ -56,8 +56,14 @@ const ICONO_PESTANA: Record<string, Icon> = {
   Aditamentos: IconTools,
 };
 
-/** Ancho con el que se piden las fotos de las tarjetas: la de lista pinta hasta ~343 px. */
-const ANCHO_FOTO = 420;
+/**
+ * Ancho con el que se piden las fotos de las tarjetas. La caja más ancha es la
+ * de la lista (unos 343 px en escritorio y el ancho de la columna en móvil), y
+ * la foto va con `contain`, así que nunca se pinta más ancha. 384 es uno de los
+ * anchos del optimizador: se pide w=384 (y w=828 en pantallas 2×) en vez de
+ * w=640 y w=1080, que es lo que pedía con 420 (medición de C, 2026-10-14).
+ */
+const ANCHO_FOTO = 384;
 const ID_TARJETAS = "tarjetas-nueva";
 
 export function ListadoNueva({

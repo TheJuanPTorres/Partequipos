@@ -8,6 +8,8 @@ import {
   clasificar,
   normalizarRuta,
   parsearCsv,
+  rutasAComprobar,
+  unirRedirects,
   veredicto,
   type Esperado,
 } from "./urlMap";
@@ -20,6 +22,24 @@ describe("normalizarRuta", () => {
     assert.equal(normalizarRuta("https://partequipos.com/gracias?x=1"), "/gracias/");
     assert.equal(normalizarRuta("/contactanos/"), "/contactanos/");
     assert.equal(normalizarRuta("https://partequipos.com/"), "/");
+  });
+
+  it("conserva el origen de una URL de otro sitio, salvo el dominio comprobado", () => {
+    assert.equal(
+      normalizarRuta("https://partequipos.buk.co/trabaja-con-nosotros"),
+      "https://partequipos.buk.co/trabaja-con-nosotros/",
+    );
+    assert.equal(
+      normalizarRuta(
+        "https://partequipos.vercel.app/contactanos",
+        "https://partequipos.vercel.app",
+      ),
+      "/contactanos/",
+    );
+    assert.equal(
+      normalizarRuta("/lubricantes/lubricantes-eni#engranajes"),
+      "/lubricantes/lubricantes-eni/",
+    );
   });
 });
 
@@ -68,6 +88,118 @@ describe("clasificar", () => {
   });
 });
 
+describe("unirRedirects", () => {
+  it("suma los de la base a los del fichero, sin duplicar los que coinciden", () => {
+    const { conflictos, redirects } = unirRedirects(
+      [{ desde: "/gracias/", hacia: "/contactanos/" }],
+      [
+        // En la base se guardan sin barra final.
+        { desde: "/gracias", hacia: "/contactanos" },
+        { desde: "/excavadoras", hacia: "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras" },
+      ],
+    );
+    assert.deepEqual(conflictos, []);
+    assert.equal(redirects.length, 2);
+  });
+
+  it("un destino distinto para el mismo origen es un conflicto", () => {
+    const { conflictos } = unirRedirects(
+      [{ desde: "/gracias/", hacia: "/contactanos/" }],
+      [{ desde: "/gracias", hacia: "/" }],
+    );
+    assert.deepEqual(conflictos, [{ desde: "/gracias/", enBase: "/", enFichero: "/contactanos/" }]);
+  });
+
+  it("el ancla del destino no cuenta como diferencia", () => {
+    const { conflictos } = unirRedirects(
+      [
+        {
+          desde: "/lubricantes/lubricantes-eni/engranajes/",
+          hacia: "/lubricantes/lubricantes-eni/",
+        },
+      ],
+      [
+        {
+          desde: "/lubricantes/lubricantes-eni/engranajes",
+          hacia: "/lubricantes/lubricantes-eni#engranajes",
+        },
+      ],
+    );
+    assert.deepEqual(conflictos, []);
+  });
+});
+
+describe("clasificar con los redirects de la base", () => {
+  // El fallo de antes: un 301 creado por un importador (no está en
+  // redirects.csv) sobre una URL de url-map se esperaba «conservada» y su 301
+  // salía como «redirect-inesperado», que bloquea.
+  const urls = ["https://partequipos.com/repuestos-viejo/", "https://partequipos.com/nosotros/"];
+  const base = [
+    { desde: "/repuestos-viejo", hacia: "/repuestos-nuevo" },
+    { desde: "/solo-en-la-base", hacia: "/contactanos" },
+  ];
+  const saltos = [{ estado: 301, location: "/repuestos-nuevo/" }, { estado: 200 }];
+
+  it("sin la base, ese 301 bloquea (el comportamiento que se corrige)", () => {
+    const mapa = clasificar(urls, []);
+    const esperado = mapa.get("/repuestos-viejo/");
+    assert.ok(esperado);
+    assert.equal(veredicto("/repuestos-viejo/", esperado, saltos), "redirect-inesperado");
+    assert.equal(bloquea(esperado, "redirect-inesperado"), true);
+  });
+
+  it("con la base, el mismo 301 es ok", () => {
+    const { redirects } = unirRedirects([], base);
+    const mapa = clasificar(rutasAComprobar(urls, redirects), redirects);
+    const esperado = mapa.get("/repuestos-viejo/");
+    assert.ok(esperado);
+    assert.equal(veredicto("/repuestos-viejo/", esperado, saltos), "ok");
+  });
+
+  it("los redirects que solo están en la base también se recorren", () => {
+    const { redirects } = unirRedirects([], base);
+    const mapa = clasificar(rutasAComprobar(urls, redirects), redirects);
+    assert.deepEqual(mapa.get("/solo-en-la-base/"), { hacia: "/contactanos/", tipo: "redirect" });
+    assert.equal(mapa.size, 3);
+  });
+
+  it("y siguen fallando si su destino da 404", () => {
+    const { redirects } = unirRedirects([], base);
+    const mapa = clasificar(rutasAComprobar(urls, redirects), redirects);
+    const esperado = mapa.get("/solo-en-la-base/");
+    assert.ok(esperado);
+    const v = veredicto("/solo-en-la-base/", esperado, [
+      { estado: 301, location: "/contactanos/" },
+      { estado: 404 },
+    ]);
+    assert.equal(v, "no-encontrada");
+    assert.equal(bloquea(esperado, v), true);
+  });
+});
+
+describe("redirect a otro sitio", () => {
+  const esperado: Esperado = {
+    hacia: normalizarRuta("https://partequipos.buk.co/trabaja-con-nosotros"),
+    tipo: "redirect",
+  };
+
+  it("ok si llega a ese sitio y da 200", () => {
+    const v = veredicto("/nosotros/trabaja-con-nosotros/", esperado, [
+      { estado: 301, location: "https://partequipos.buk.co/trabaja-con-nosotros" },
+      { estado: 200 },
+    ]);
+    assert.equal(v, "ok");
+  });
+
+  it("destino equivocado si va a una ruta propia que se llama igual", () => {
+    const v = veredicto("/nosotros/trabaja-con-nosotros/", esperado, [
+      { estado: 301, location: "/trabaja-con-nosotros/" },
+      { estado: 200 },
+    ]);
+    assert.equal(v, "destino-equivocado");
+  });
+});
+
 describe("veredicto", () => {
   it("conservada en 200 directo: ok", () => {
     assert.equal(veredicto("/", conservada, [{ estado: 200 }]), "ok");
@@ -84,11 +216,15 @@ describe("veredicto", () => {
   });
 
   it("redirect cargado: 301 a su destino y 200", () => {
+    // `location` absoluta con el dominio que se comprueba.
     assert.equal(
-      veredicto("/gracias/", redirect, [
-        { estado: 301, location: "https://nuevo.example/contactanos/" },
-        { estado: 200 },
-      ]),
+      veredicto(
+        "/gracias/",
+        redirect,
+        [{ estado: 301, location: "https://nuevo.example/contactanos/" }, { estado: 200 }],
+        undefined,
+        "https://nuevo.example",
+      ),
       "ok",
     );
   });

@@ -41,3 +41,27 @@ ningún fragmento contiene Zod.
 
 **La validación no cambia:** sigue en el servidor con el mismo esquema
 (§5); la del navegador era y sigue siendo cortesía.
+
+## 2. Miniaturas del blog a su tamaño (2026-10-15, PR #169)
+
+**Qué pasaba:** las tarjetas de `/noticias/` y de los archivos de categoría
+(`ListaArticulos.tsx`) pasaban a `next/image` el ancho ORIGINAL de la foto.
+Sin `sizes`, el srcset de 1x/2x salía de ese ancho: hasta 1920 px en
+escritorio y 3840 en móvil para una foto que se pinta a ~386 × 160 px.
+
+**Arreglo:** `ANCHO_MINIATURA = 384` y el alto en proporción. El srcset sale
+de 384 y 828 px.
+
+**Prioridad de la primera tarjeta: probada y QUITADA.** Con `eager` y
+`fetchPriority="high"` el LCP no mejoró y el TBT simulado subió. El LCP del
+índice no es la foto.
+
+**Medido** (9 contra 9, A = `main`, B = el PR):
+
+| Ancho | Imágenes de la carga inicial | Peso total    | LCP                      | TBT simulado            |
+| ----- | ---------------------------- | ------------- | ------------------------ | ----------------------- |
+| 390   | 507 → 270 KiB                | 949 → 712 KiB | 2,59 → 2,50 s (en ruido) | 545 → 577 ms (en ruido) |
+| 1440  | 1103 → 177 KiB               | —             | 0,68 → 0,65 s            | —                       |
+
+A 1440 se midió la primera versión, con la prioridad en la primera tarjeta.
+La prioridad no cambia los bytes; la versión final se midió a 390.

@@ -41,3 +41,51 @@ ningún fragmento contiene Zod.
 
 **La validación no cambia:** sigue en el servidor con el mismo esquema
 (§5); la del navegador era y sigue siendo cortesía.
+
+## 2. Miniaturas del blog a su tamaño (2026-10-15, PR #169)
+
+**Qué pasaba:** las tarjetas de `/noticias/` y de los archivos de categoría
+(`ListaArticulos.tsx`) pasaban a `next/image` el ancho ORIGINAL de la foto.
+Sin `sizes`, el srcset de 1x/2x salía de ese ancho: hasta 1920 px en
+escritorio y 3840 en móvil para una foto que se pinta a ~386 × 160 px.
+
+**Arreglo:** `ANCHO_MINIATURA = 384` y el alto en proporción. El srcset sale
+de 384 y 828 px.
+
+**Prioridad de la primera tarjeta: probada y QUITADA.** Con `eager` y
+`fetchPriority="high"` el LCP no mejoró y el TBT simulado subió. El LCP del
+índice no es la foto.
+
+**Medido** (9 contra 9, A = `main`, B = el PR):
+
+| Ancho | Imágenes de la carga inicial | Peso total    | LCP                      | TBT simulado            |
+| ----- | ---------------------------- | ------------- | ------------------------ | ----------------------- |
+| 390   | 507 → 270 KiB                | 949 → 712 KiB | 2,59 → 2,50 s (en ruido) | 545 → 577 ms (en ruido) |
+| 1440  | 1103 → 177 KiB               | —             | 0,68 → 0,65 s            | —                       |
+
+A 1440 se midió la primera versión, con la prioridad en la primera tarjeta.
+La prioridad no cambia los bytes; la versión final se midió a 390.
+
+## 3. Miniaturas de usados a su tamaño (2026-10-15, PR #170)
+
+**Qué pasaba:** las tarjetas de los listados de usados (`ListadoUsados.tsx`)
+pedían la miniatura con `width={400}`. El srcset de 1x/2x salía de 640 y
+828 px para una foto que, con `object-contain` en 160 px de alto, se pinta a
+~213 × 160 px.
+
+**Arreglo:** `ANCHO_MINIATURA = 256`, así que el srcset sale de 256 y 640 px.
+Esos 640 bastan para una pantalla de densidad 3.
+
+**Prioridad de la primera tarjeta: probada y QUITADA**, como en el blog. En
+las 18 corridas a 390, el LCP del listado es el párrafo de la cabecera, no la
+foto.
+
+**Medido** en Excavadoras (9 contra 9, A = `main`, B = el PR, versión final):
+
+| Ancho | Imágenes de la carga inicial | Peso total    | LCP                      |
+| ----- | ---------------------------- | ------------- | ------------------------ |
+| 390   | 262 → 188 KiB                | 579 → 505 KiB | 2,49 → 2,58 s (en ruido) |
+| 1440  | 405 → 109 KiB                | 868 → 573 KiB | 0,69 → 0,68 s            |
+
+**Recorriendo la página entera** (Playwright, sin caché), las imágenes bajan
+de 735 a 544 KiB a 390 y de 543 a 141 KiB a 1440. Ninguna imagen rota.

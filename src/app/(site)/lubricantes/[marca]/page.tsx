@@ -128,7 +128,9 @@ export default async function MarcaLubricantePage({ params }: { params: Promise<
             origen={`${rutas.marcaLubricante(marca.slug)}/`}
             siteKey={turnstileSiteKey()}
             whatsapp={enlaceWhatsApp(empresa.whatsapp)}
-            titulo={`Más información sobre ${titulo}`}
+            // Nombre propio para su región: con el mismo que la sección que lo
+            // aloja, axe marca landmark-unique (auditoría de D, 2026-10-14).
+            titulo={`Formulario de contacto sobre ${titulo}`}
             textoBoton="Obtener más información"
             variante="plano"
           />

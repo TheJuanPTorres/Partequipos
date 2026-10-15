@@ -16,6 +16,7 @@ import { getModelos } from "@/lib/queries/getModelos";
 import { getPaginas } from "@/lib/queries/getPaginas";
 import { getTipos } from "@/lib/queries/getTipos";
 import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
+import { tiposConEquipos } from "@/lib/nueva/tiposConEquipos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
 import { poblado } from "@/lib/utils/relations";
 import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/payload-types";
@@ -77,6 +78,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getMarcasUsada(),
   ]);
 
+  const conEquipos = tiposConEquipos(equiposNuevos);
+
   return buildSitemapEntries({
     paginas: paginas.map((pagina) => ({ slug: pagina.slug, updatedAt: pagina.updatedAt })),
 
@@ -113,9 +116,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       updatedAt: marca.updatedAt,
     })),
 
+    // D4 (dirección, 2026-10-14): un tipo de nueva sin equipos no sale aquí.
+    // Vuelve en cuanto tenga uno.
     tiposMaquinaria: tiposMaquinaria.flatMap((tipo) => {
       const marca = poblado<MarcasMaquinaria>(tipo.marca);
-      return marca ? [{ slug: tipo.slug, updatedAt: tipo.updatedAt, marcaSlug: marca.slug }] : [];
+      if (!marca || !conEquipos.has(tipo.id)) return [];
+      return [{ slug: tipo.slug, updatedAt: tipo.updatedAt, marcaSlug: marca.slug }];
     }),
 
     equiposNuevos: equiposNuevos.flatMap((equipo) => {

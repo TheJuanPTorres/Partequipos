@@ -85,10 +85,17 @@ una consulta por visita: van en `unstable_cache` (`src/lib/cacheDatos.ts`).
 
 ## 4. Páginas vacías (D4)
 
-Una categoría de usada **creada en el panel** y sin unidades disponibles no
-se indexa ni sale en el sitemap. Las 8 heredadas del sitio actual
-(`src/lib/usados/heredadas.ts`) siguen indexables aunque se queden vacías. La
-prueba compara esa lista con `docs/url-map.csv`.
+Una categoría o marca de usada **sin unidades disponibles** no se indexa
+(`noindex, follow`) ni sale en el sitemap. La URL sigue respondiendo 200, con
+el estado vacío («Por ahora no hay unidades disponibles…» y el enlace a
+contactar). En cuanto entra una unidad disponible vuelve a indexarse y al
+sitemap **sola**: los ganchos de `equipos-usados` invalidan `datos:usados`, y
+la página y el sitemap son dinámicos.
+
+**Vale también para las 8 categorías heredadas del sitio actual**
+(decisión de dirección del 2026-10-14). Hasta esa fecha seguían indexables
+aunque estuvieran vacías (lista en `src/lib/usados/heredadas.ts`, ya
+retirada).
 
 ## 5. Redirecciones del listado de WordPress (D7)
 

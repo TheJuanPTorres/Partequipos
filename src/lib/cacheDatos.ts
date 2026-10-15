@@ -24,6 +24,15 @@ export const ETIQUETAS_DATOS = {
    * listado de «Categoría secundaria» (índice de nueva y sus categorías).
    */
   nueva: "datos:nueva",
+  /**
+   * El MARCO de todas las páginas: globales `cabecera`, `pie` y `seo` (empresa,
+   * logo, horario) y el megamenú. Sin caché, cada visita a una página dinámica
+   * (listados, buscador, 404) hacía unas 10 consultas solo para pintarlo
+   * (`propuestas/2026-10-15-consumo-base.md`). La invalida
+   * `revalidarTodoElSitio`, que ya llaman los ganchos de los tres globales y de
+   * las 6 colecciones del megamenú.
+   */
+  marco: "datos:marco",
 } as const;
 
 /**
@@ -38,7 +47,7 @@ export const CLAVE_DESPLIEGUE =
 
 /*
  * SIN vigencia por tiempo (`revalidate`), a propósito: la portada y el índice
- * de usada, que son estáticos, también leen estos datos, y Next les pasaría
+ * de usada (y, con el marco, TODAS las páginas), que son estáticos, también leen estos datos, y Next les pasaría
  * esa vigencia (con una hora, el build los marcaba «Revalidate 1h»). Las
  * entradas se renuevan por etiqueta (los ganchos) y por despliegue.
  */

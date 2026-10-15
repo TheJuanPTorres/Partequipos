@@ -37,6 +37,7 @@ import * as migration_20261014_064003_compania_imagen from './20261014_064003_co
 import * as migration_20261014_072558_servicio_lubricantes from './20261014_072558_servicio_lubricantes';
 import * as migration_20261014_083213_hero_sliders from './20261014_083213_hero_sliders';
 import * as migration_20261014_223000_huerfanas_y_textos_demo from './20261014_223000_huerfanas_y_textos_demo';
+import * as migration_20261015_150333_hero_solo_fondo from './20261015_150333_hero_solo_fondo';
 
 export const migrations = [
   {
@@ -232,6 +233,11 @@ export const migrations = [
   {
     up: migration_20261014_223000_huerfanas_y_textos_demo.up,
     down: migration_20261014_223000_huerfanas_y_textos_demo.down,
-    name: '20261014_223000_huerfanas_y_textos_demo'
+    name: '20261014_223000_huerfanas_y_textos_demo',
+  },
+  {
+    up: migration_20261015_150333_hero_solo_fondo.up,
+    down: migration_20261015_150333_hero_solo_fondo.down,
+    name: '20261015_150333_hero_solo_fondo'
   },
 ];

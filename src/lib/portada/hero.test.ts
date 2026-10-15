@@ -34,6 +34,77 @@ describe("diapositivas del hero", () => {
     assert.deepEqual(d?.enlace, { href: "/maquinaria-pesada/", nombre: "Ver maquinaria Hitachi" });
   });
 
+  describe("solo la imagen de fondo (casillas «Mostrar …», 2026-10-15)", () => {
+    const completa = {
+      titulo: "Potencia Hitachi",
+      tituloArriba: "Potencia",
+      tituloAbajo: "Hitachi",
+      textoCircular: "Partequipos",
+      parrafo: "Texto",
+      imagenFondo: media(1),
+      imagenFrontal: media(2),
+      enlace: "/maquinaria-pesada/",
+      enlaceNombre: "Ver maquinaria Hitachi",
+    };
+
+    it("sin las casillas (filas de antes de la migración, null): todo se pinta, como siempre", () => {
+      const [d] = diapositivasDeHero({ diapositivas: [{ ...completa }] });
+      assert.equal(d?.tituloVisible, true);
+      assert.deepEqual(d?.tituloPartido, { arriba: "Potencia", abajo: "Hitachi" });
+      assert.equal(d?.textoCircular, "Partequipos");
+      assert.equal(d?.parrafo, "Texto");
+      assert.ok(d?.enlace);
+      const [n] = diapositivasDeHero({
+        diapositivas: [
+          {
+            ...completa,
+            mostrarTitulo: null,
+            mostrarTextoCircular: null,
+            mostrarDescripcion: null,
+          },
+        ],
+      });
+      assert.equal(n?.tituloVisible, true, "null no oculta nada");
+      assert.ok(n?.textoCircular && n.parrafo && n.enlace);
+    });
+
+    it("las tres desmarcadas: queda el fondo (y la máquina); el título, solo para lectores", () => {
+      const [d] = diapositivasDeHero({
+        diapositivas: [
+          {
+            ...completa,
+            mostrarTitulo: false,
+            mostrarTextoCircular: false,
+            mostrarDescripcion: false,
+          },
+        ],
+      });
+      assert.equal(d?.titulo, "Potencia Hitachi", "el título no se borra: nombra la diapositiva");
+      assert.equal(d?.tituloVisible, false);
+      assert.equal(d?.tituloPartido, null, "sin título visible no hay título partido");
+      assert.equal(d?.textoCircular, null);
+      assert.equal(d?.parrafo, null);
+      assert.equal(d?.enlace, null, "el «+» es parte del recuadro");
+      assert.equal(d?.frontal?.url, "https://x/2.jpg", "la máquina sigue");
+      assert.equal(d?.fondo.url, "https://x/1.jpg");
+    });
+
+    it("cada casilla quita solo su pieza", () => {
+      const una = (extra: object) =>
+        diapositivasDeHero({ diapositivas: [{ ...completa, ...extra }] })[0]!;
+      const sinCirculo = una({ mostrarTextoCircular: false });
+      assert.equal(sinCirculo.textoCircular, null);
+      assert.ok(sinCirculo.tituloVisible && sinCirculo.parrafo && sinCirculo.enlace);
+      const sinRecuadro = una({ mostrarDescripcion: false });
+      assert.equal(sinRecuadro.parrafo, null);
+      assert.equal(sinRecuadro.enlace, null);
+      assert.ok(sinRecuadro.tituloVisible && sinRecuadro.textoCircular);
+      const sinTitulo = una({ mostrarTitulo: false });
+      assert.equal(sinTitulo.tituloVisible, false);
+      assert.ok(sinTitulo.textoCircular && sinTitulo.parrafo && sinTitulo.enlace);
+    });
+  });
+
   it("el recorte para móvil es opcional y decorativo", () => {
     const [sin] = diapositivasDeHero({ diapositivas: [{ titulo: "X", imagenFondo: media(1) }] });
     assert.equal(sin?.fondoMovil, null, "sin recorte: el móvil usa el fondo de escritorio");

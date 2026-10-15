@@ -6,6 +6,12 @@ import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 export type DiapositivaHero = {
   /** El título en una línea: lo que lee un lector de pantalla y el nombre de la diapositiva. */
   titulo: string;
+  /**
+   * `false`: el título no se pinta y queda solo para lectores de pantalla
+   * («Mostrar título» desmarcado en el panel). Nunca se borra: nombra la
+   * diapositiva (`aria-labelledby`, puntos del carrusel, anuncios).
+   */
+  tituloVisible: boolean;
   /** Las líneas que se pintan (un salto de línea en el panel parte el título). */
   tituloLineas: string[];
   /** Solo en escritorio (≥ 1025 px): el título partido arriba y abajo. Los dos o ninguno. */
@@ -34,6 +40,13 @@ export type DiapositivaHero = {
  * solo se admite con nombre accesible —el «+» no tiene texto visible— y con un
  * destino válido, aunque ya lo valide el panel: los datos pueden venir de antes
  * de la validación.
+ *
+ * SOLO LA IMAGEN DE FONDO (2026-10-15): las casillas «Mostrar …» del panel
+ * quitan cada pieza. Solo `false` la quita: una fila anterior a la migración
+ * (`null`) se pinta como siempre. Con el texto circular o el recuadro
+ * desmarcados, sus datos llegan vacíos y la pieza no sale en el HTML; con el
+ * título desmarcado, `tituloVisible: false` (sigue para lectores) y sin título
+ * partido.
  */
 export function diapositivasDeHero(hero: Pagina["hero"]): DiapositivaHero[] {
   return (hero?.diapositivas ?? []).flatMap((d) => {
@@ -49,18 +62,24 @@ export function diapositivasDeHero(hero: Pagina["hero"]): DiapositivaHero[] {
     const nombre = d.enlaceNombre?.trim();
     const arriba = d.tituloArriba?.trim();
     const abajo = d.tituloAbajo?.trim();
+    const tituloVisible = d.mostrarTitulo !== false;
+    const conDescripcion = d.mostrarDescripcion !== false;
     return [
       {
         titulo,
+        tituloVisible,
         tituloLineas,
-        tituloPartido: arriba && abajo ? { arriba, abajo } : null,
+        tituloPartido: tituloVisible && arriba && abajo ? { arriba, abajo } : null,
         posicionMaquina: d.posicionMaquina === "sobre" ? "sobre" : "debajo",
-        textoCircular: d.textoCircular?.trim() || null,
-        parrafo: d.parrafo?.trim() || null,
+        textoCircular: d.mostrarTextoCircular !== false ? d.textoCircular?.trim() || null : null,
+        parrafo: conDescripcion ? d.parrafo?.trim() || null : null,
         fondo: { ...fondo, alt: "" },
         fondoMovil: movil ? { ...movil, alt: "" } : null,
         frontal: imagenDeMedia(d.imagenFrontal, titulo),
-        enlace: href && nombre && validarEnlace(href) === true ? { href, nombre } : null,
+        enlace:
+          conDescripcion && href && nombre && validarEnlace(href) === true
+            ? { href, nombre }
+            : null,
       },
     ];
   });

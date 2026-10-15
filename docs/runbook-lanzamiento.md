@@ -605,9 +605,16 @@ perder ese contenido.
 ### k.2) Qué hace cada importador al repetirse
 
 **Leído en el código el 2026-10-14.** Todos son **idempotentes** (sin
-duplicados) y **ninguno borra lo que desaparece** de la exportación nueva. Lo
-que el cliente quitó de WordPress se queda en el sitio nuevo, y se retira a
-mano desde el panel.
+duplicados) y, en general, **no borran lo que desaparece** de la exportación
+nueva. Lo que el cliente quitó de WordPress se queda en el sitio nuevo, y se
+retira a mano desde el panel.
+
+**Dos excepciones que sí borran:**
+
+- **Contenido real:** las sedes que no están en la fuente.
+- **Repuestos:** los tipos y modelos que no existen en WordPress (la demo).
+  Está acotado a la demo aprobada (2 tipos y 25 modelos, o ninguno); con
+  cualquier otro recuento se para.
 
 | Importador (runbook)               | Fuente                                                | Existentes                                                                                                                                            | Nuevos               | Imágenes ya subidas                                                          |
 | ---------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------- |

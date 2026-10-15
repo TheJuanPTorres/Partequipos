@@ -3,7 +3,7 @@ import type { GlobalConfig } from "payload";
 import { validarTelefono, validarUrlRed } from "../lib/seo/empresa";
 import { DIAS, NOMBRE_DIA, validarHora } from "../lib/seo/horario";
 import { revalidarTodoElSitio } from "../lib/revalidation";
-import { escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { avisoField } from "../lib/fields/avisoField";
 
 /**
@@ -41,7 +41,7 @@ export const Seo: GlobalConfig = {
     description:
       "Datos de la empresa que usan los buscadores y el sitio: el horario de atención, el logo y el contacto.",
   },
-  access: { read: publico, update: escrituraContenido },
+  access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
     afterChange: [
       ({ doc }) => {

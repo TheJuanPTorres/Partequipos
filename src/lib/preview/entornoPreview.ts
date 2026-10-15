@@ -20,6 +20,8 @@ export const CLAVES_PREVIEW = [
   "DATABASE_URI",
   "BLOB_READ_WRITE_TOKEN",
   "VERCEL_AUTOMATION_BYPASS_SECRET",
+  // Token de lectura de la API del preview (2026-10-15, `src/lib/seguridad/lecturaApi.ts`).
+  "API_LECTURA_TOKEN",
 ] as const;
 type Clave = (typeof CLAVES_PREVIEW)[number];
 

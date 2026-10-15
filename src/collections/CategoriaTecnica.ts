@@ -3,7 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarCategoriasDeRepuestos, revalidarMarcasDeRepuestos } from "../lib/revalidation";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
@@ -27,7 +27,7 @@ export const CategoriaTecnica: CollectionConfig = {
     group: "Repuestos",
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

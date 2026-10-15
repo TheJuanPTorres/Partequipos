@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { almacenEsperado } from "./hooks/almacenEsperado";
 import { formatoDePdfPermitido } from "./hooks/formatoDePdfPermitido";
 import { revalidarDocumento, revalidarDocumentoBorrado } from "./hooks/maquinariaHooks";
@@ -32,7 +32,7 @@ export const Documento: CollectionConfig = {
       "Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 30 MB. Las imágenes van en «Imágenes».",
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

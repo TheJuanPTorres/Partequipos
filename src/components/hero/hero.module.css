@@ -437,6 +437,23 @@
   }
 }
 
+/*
+ * SIN TÍTULO VISIBLE («Mostrar título» desmarcado, 2026-10-15): la máquina no
+ * deja el aire bajo el título ni sube a cruzarlo; empieza donde empezaría el
+ * título y ocupa hasta los controles. El `<h2>` solo lleva texto para
+ * lectores (absoluto), así que no mide alto.
+ */
+.capaTexto[data-sin-titulo] .capaMaquina {
+  margin-top: 0;
+}
+
+@media (min-width: 1025px) {
+  /* «Sobre» conserva su ancho; solo pierde el cruce, que no tiene qué cruzar. */
+  .capaTexto[data-sin-titulo][data-maquina="sobre"] .capaMaquina {
+    margin-top: 0;
+  }
+}
+
 .capaFrontal {
   position: absolute;
   inset: 0;

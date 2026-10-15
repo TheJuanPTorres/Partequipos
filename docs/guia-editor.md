@@ -275,6 +275,15 @@ oficial, no lo pongas.
 - **Hero (carrusel):** cada diapositiva lleva título, párrafo, imagen de fondo,
   una versión **vertical para móvil** (recomendada: el móvil carga mucho más
   rápido) y, si quieres, la máquina recortada en PNG transparente.
+- **Diapositiva solo con la foto:** arriba de cada diapositiva hay tres
+  casillas, marcadas por defecto: **Mostrar título**, **Mostrar texto
+  circular** y **Mostrar recuadro de descripción** (el vidrio con el párrafo y
+  el «+»). Desmarca las tres y la diapositiva se ve solo con su foto de fondo
+  (y la máquina, si la pusiste). El **título sigue siendo obligatorio**
+  aunque no se vea: lo leen los lectores de pantalla y da nombre a la
+  diapositiva en los puntos del carrusel. Al desmarcar una casilla, sus campos
+  se esconden en el panel, pero lo escrito no se borra: si vuelves a
+  marcarla, reaparece.
 - Cada sección de la portada tiene su bloque en esa página. Lo que dejes vacío
   no se pinta.
 

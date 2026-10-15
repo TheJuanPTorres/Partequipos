@@ -353,7 +353,16 @@ export function HeroPortada({ diapositivas }: Props) {
    */
   const letras = Math.max(...d.tituloLineas.map((l) => l.length));
   const palabra = Math.max(...d.titulo.split(" ").map((p) => p.length));
-  const titulo = (
+  /*
+   * TÍTULO OCULTO («Mostrar título» desmarcado): el `<h2>` se queda, con su id
+   * (nombra la región) y el texto SOLO para lectores de pantalla; lo pintado no
+   * sale en el HTML. Sin contenido en el flujo, no ocupa alto.
+   */
+  const titulo = !d.tituloVisible ? (
+    <h2 key={`titulo-${activo}`} id={idTitulo} className={estilos.titulo}>
+      <span className={estilos.soloLector}>{d.titulo}</span>
+    </h2>
+  ) : (
     <h2
       key={`titulo-${activo}`}
       id={idTitulo}
@@ -440,6 +449,7 @@ export function HeroPortada({ diapositivas }: Props) {
           className={estilos.capaTexto}
           data-maquina={d.posicionMaquina}
           data-partido={d.tituloPartido ? "" : undefined}
+          data-sin-titulo={d.tituloVisible ? undefined : ""}
         >
           <div className={estilos.capaParallax}>{titulo}</div>
           <div className={estilos.capaMaquina}>

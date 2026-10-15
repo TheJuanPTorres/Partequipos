@@ -65,3 +65,27 @@ de 384 y 828 px.
 
 A 1440 se midió la primera versión, con la prioridad en la primera tarjeta.
 La prioridad no cambia los bytes; la versión final se midió a 390.
+
+## 3. Miniaturas de usados a su tamaño (2026-10-15, PR #170)
+
+**Qué pasaba:** las tarjetas de los listados de usados (`ListadoUsados.tsx`)
+pedían la miniatura con `width={400}`. El srcset de 1x/2x salía de 640 y
+828 px para una foto que, con `object-contain` en 160 px de alto, se pinta a
+~213 × 160 px.
+
+**Arreglo:** `ANCHO_MINIATURA = 256`, así que el srcset sale de 256 y 640 px.
+Esos 640 bastan para una pantalla de densidad 3.
+
+**Prioridad de la primera tarjeta: probada y QUITADA**, como en el blog. En
+las 18 corridas a 390, el LCP del listado es el párrafo de la cabecera, no la
+foto.
+
+**Medido** en Excavadoras (9 contra 9, A = `main`, B = el PR, versión final):
+
+| Ancho | Imágenes de la carga inicial | Peso total    | LCP                      |
+| ----- | ---------------------------- | ------------- | ------------------------ |
+| 390   | 262 → 188 KiB                | 579 → 505 KiB | 2,49 → 2,58 s (en ruido) |
+| 1440  | 405 → 109 KiB                | 868 → 573 KiB | 0,69 → 0,68 s            |
+
+**Recorriendo la página entera** (Playwright, sin caché), las imágenes bajan
+de 735 a 544 KiB a 390 y de 543 a 141 KiB a 1440. Ninguna imagen rota.

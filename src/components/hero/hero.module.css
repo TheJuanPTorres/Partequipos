@@ -52,10 +52,13 @@
   --hero-maquina-aire: 16px;
   --hero-maquina-lado: 20px;
   /*
-   * «Sobre»: la máquina empieza 15 px bajo el borde de arriba del título, como
-   * la Home V2 medida a 1440 (168 − 153). Antes, 38 px (diseño de sliders).
+   * «Sobre»: la máquina vuelve a la ALTURA DE ANTES DEL #184 (dirección,
+   * 2026-10-16): empieza 163 px bajo el borde de la tarjeta, como antes, aunque
+   * el título haya subido a 47 px. Sube sobre la caja del título (una línea).
    */
-  --hero-maquina-cruce: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado) * -0.91);
+  --hero-maquina-cruce: calc(
+    163px - var(--hero-texto-arriba) - var(--hero-titulo-tam) * var(--hero-titulo-interlineado)
+  );
 
   /* --- Texto circular: tamaño y sitio del diseño (desde la esquina de abajo a la izquierda). --- */
   --hero-circular-tam: 120px;
@@ -436,6 +439,13 @@
     z-index: 2;
     width: min(var(--hero-maquina-ancho-sobre), 100%);
     margin-top: var(--hero-maquina-cruce);
+  }
+}
+
+/* En móvil, «sobre» sigue debajo del título, pero a la altura de antes del #184. */
+@media (max-width: 767px) {
+  .capaTexto[data-maquina="sobre"] .capaMaquina {
+    margin-top: var(--hero-maquina-aire-sobre);
   }
 }
 
@@ -831,9 +841,11 @@
     --hero-relleno: 50px 30px 30px;
     --hero-texto-arriba: 103px;
     --hero-maquina-ancho: 631px;
-    /* «Sobre» en tablet: 631 px, empezando 55 px POR ENCIMA del título (V2 a 1010). */
+    /* «Sobre» en tablet: 631 px y a 157 px del borde, su altura de antes del #184. */
     --hero-maquina-ancho-sobre: 631px;
-    --hero-maquina-cruce: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado) * -1.56);
+    --hero-maquina-cruce: calc(
+      157px - var(--hero-texto-arriba) - var(--hero-titulo-tam) * var(--hero-titulo-interlineado)
+    );
     /* Flechas: a 50 px del borde izquierdo y 106 del de abajo (V2 a 1010). */
     --hero-flechas-margen-abajo: 66px;
     --hero-maquina-lado: 30px;
@@ -880,6 +892,11 @@
     /* Home V2 a 390 (2026-10-16): título a 74 px; la máquina, 52 px debajo. */
     --hero-texto-arriba: 74px;
     --hero-maquina-aire: 52px;
+    /*
+     * «Sobre» en móvil: a 197 px del borde, su altura de antes del #184
+     * (dirección, 2026-10-16): 74 del título + 131 de sus dos líneas − 8.
+     */
+    --hero-maquina-aire-sobre: -8px;
     /* Controles (42 + 20) + aire + el vidrio + aire. */
     --hero-vidrio-abajo: 70px;
     --hero-vidrio-derecha: 20px;

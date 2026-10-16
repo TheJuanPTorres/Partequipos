@@ -1,5 +1,6 @@
 import type { PreguntasFrecuente, Testimonio } from "@/payload-types";
 
+import { exentoDeAutorizacion, publicadoEfectivo } from "../fields/reglasPortada";
 import { videoDeYouTube, type VideoYouTube } from "../fields/youtube";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
@@ -16,7 +17,8 @@ export type TarjetaTestimonio = {
   titulo: string;
   /** El pequeño, la ciudad («Cali»). */
   subtitulo: string | null;
-  texto: string;
+  /** La frase; `null` en un vídeo del cliente que aún no tiene (no se inventa). */
+  texto: string | null;
   /** Es una persona: su `alt` la nombra. */
   foto: ImagenLista | null;
   youtube: VideoYouTube | null;
@@ -28,20 +30,26 @@ export type TarjetaTestimonio = {
  * se puede publicar sin la autorización de uso (L4, gancho de la colección).
  */
 export function tarjetasDeTestimonios(docs: Testimonio[]): TarjetaTestimonio[] {
-  return docs
-    .filter((t) => t.publicado === true && t.nombre?.trim() && t.cita?.trim())
-    .map((t) => {
-      const nombre = t.nombre.trim();
-      const foto = imagenDeMedia(t.foto, nombre);
-      return {
+  return docs.flatMap((t) => {
+    const youtube = videoDeYouTube(t.youtube);
+    // Un vídeo que el cliente ya publicó en su canal no necesita frase ni autorización.
+    const exento = exentoDeAutorizacion(t.videoDelCliente, youtube !== null);
+    const cita = t.cita?.trim() || null;
+    if (!publicadoEfectivo(t.publicado, t.autorizacionUso, exento)) return [];
+    if (!t.nombre?.trim() || (!cita && !exento)) return [];
+    const nombre = t.nombre.trim();
+    const foto = imagenDeMedia(t.foto, nombre);
+    return [
+      {
         id: t.id,
         titulo: t.empresa?.trim() || nombre,
         subtitulo: t.ciudad?.trim() || null,
-        texto: t.cita.trim(),
+        texto: cita,
         foto: foto ? { ...foto, alt: nombre } : null,
-        youtube: videoDeYouTube(t.youtube),
-      };
-    });
+        youtube,
+      },
+    ];
+  });
 }
 
 /** ux-9 abre la SEGUNDA al cargar; con una sola, esa. */

@@ -1,5 +1,8 @@
+import { unstable_cache } from "next/cache";
 import config from "@payload-config";
 import { getPayload, type Where } from "payload";
+
+import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 
 import { TOPE_POR_GRUPO } from "@/lib/buscador/consulta";
 import { rutas } from "@/lib/routes";
@@ -17,9 +20,15 @@ import type {
  * código, donde lo hay— en equipos nuevos, equipos usados disponibles, modelos
  * de repuesto y artículos del blog. API local de Payload (CLAUDE.md §3.2).
  *
- * SIN `cache()` ni caché de datos: la consulta cambia en cada petición y la
- * página es dinámica. Una consulta por grupo, con tope (`TOPE_POR_GRUPO`).
- * `contains` es un `ILIKE '%…%'`: no distingue mayúsculas, pero sí tildes.
+ * Una consulta por grupo, con tope (`TOPE_POR_GRUPO`). `contains` es un
+ * `ILIKE '%…%'`: no distingue mayúsculas, pero sí tildes.
+ *
+ * EN LA CACHÉ DE DATOS desde el 2026-10-15 (`datos:busqueda`, con el id del
+ * despliegue en la clave): las búsquedas se repiten, y sin caché cada una
+ * eran cuatro `ILIKE` contra la base. La clave es la consulta EN MINÚSCULAS
+ * (el resultado no cambia, por el `ILIKE`), así que «CAT» y «cat» comparten
+ * entrada. Vigencia de 10 min además de la etiqueta: lee cuatro colecciones y
+ * no todos sus ganchos la invalidan (`revalidarIndices`).
  */
 
 export type ResultadoBusqueda = {
@@ -49,7 +58,10 @@ const porNombreOCodigo = (texto: string): Where => ({
   or: [{ nombre: { contains: texto } }, { codigo: { contains: texto } }],
 });
 
-export async function buscar(texto: string): Promise<ResultadosBusqueda> {
+/** Vigencia de los resultados en caché, en segundos. */
+export const VIGENCIA_BUSQUEDA = 600;
+
+async function buscarEnLaBase(texto: string): Promise<ResultadosBusqueda> {
   const payload = await getPayload({ config });
   const comun = { depth: 1, limit: TOPE_POR_GRUPO, sort: "nombre", pagination: true } as const;
 
@@ -139,4 +151,14 @@ export async function buscar(texto: string): Promise<ResultadosBusqueda> {
       })),
     },
   };
+}
+
+const busquedaEnCache = unstable_cache(buscarEnLaBase, ["busqueda", CLAVE_DESPLIEGUE], {
+  revalidate: VIGENCIA_BUSQUEDA,
+  tags: [ETIQUETAS_DATOS.busqueda],
+});
+
+/** Busca `texto` (ya normalizado con `normalizarConsulta`). */
+export function buscar(texto: string): Promise<ResultadosBusqueda> {
+  return busquedaEnCache(texto.toLocaleLowerCase("es"));
 }

@@ -656,6 +656,7 @@ veredicto, que va en el informe.
 - **Testimonios y llamada al catálogo de la Home V2 (2026-10-15):** medidos a 390, 1010 y 1440 contra la referencia de Andrés: ya coinciden (fila a todo el ancho con las laterales desenfocadas; teclado, estado sin depender del desenfoque y «reducir movimiento» comprobados), sin cambio de código; «Catálgo» de la V2 anotado para Andrés. Tres de las cuatro tarjetas publicadas repiten nombre (dato del panel). Detalle en `docs/diseno/decisiones-home-ux9.md` §32.
 - **API REST sin lectura anónima (2026-10-15, por la cuota de Neon):** la API de Payload ya no se lee sin sesión; los runbooks y scripts leen con el token `API_LECTURA_TOKEN` en la cabecera `x-partequipos-lectura` (solo lectura de lo que antes era público; `solicitudes`, `users` y `redirects` siguen cerradas). GraphQL apagado. La prueba de humo exige **403** en `/api/marcas/`. El sitio no cambia: lee con la API local. Detalle en `src/lib/seguridad/lecturaApi.ts` y `Desktop\partequipos-cierre\propuestas\2026-10-15-consumo-base.md`.
 - **El marco en caché (2026-10-15, por la cuota de Neon):** cabecera, pie, global `seo` (empresa, logo, horario) y megamenú en `unstable_cache` con la etiqueta `datos:marco` y el id del despliegue en la clave, sin vigencia por tiempo; la invalida `revalidarTodoElSitio`, que ya llamaban los tres globales y las 6 colecciones del megamenú. Antes, cada visita a una página dinámica (listados, buscador, 404) hacía unas 10 consultas solo para el marco. Tras una importación por script, como siempre, redesplegar. Detalle en `src/lib/cacheDatos.ts`.
+- **Sitemap y buscador en caché (2026-10-15, por la cuota de Neon):** el sitemap deja de ser `force-dynamic` (eran 15 consultas por petición, con los 351 modelos): se genera en el build y se regenera cuando un gancho del catálogo llama a `revalidarIndices` (`revalidarRutas`, categorías de repuestos, y usados y nueva por `revalidarDatos`), con vigencia de 1 h como red. Los resultados de `/buscar/` van en `unstable_cache` por consulta en minúsculas (`datos:busqueda`, 10 min de vigencia). Detalle en `src/lib/cacheDatos.ts`.
 
 ### 10.0 Qué está construido y qué falta
 
@@ -2176,13 +2177,13 @@ Una prueba de humo **contra la URL desplegada**, disparada **automáticamente**
 al terminar cada despliegue —preview incluido—, que pida las rutas que solo
 fallan en tiempo de petición y exija 200:
 
-| Ruta                  | Por qué está en la lista                          |
-| --------------------- | ------------------------------------------------- |
-| `/admin/`             | carga la config de Payload; es lo que cayó        |
-| `/api/marcas/`        | API REST contra la base                           |
-| `/sitemap.xml`        | ruta dinámica con consulta                        |
-| `/api/redirects-map/` | con `x-proxy-internal: 1`; sostiene los redirects |
-| `/`                   | control: si esto cae, es otra cosa                |
+| Ruta                  | Por qué está en la lista                           |
+| --------------------- | -------------------------------------------------- |
+| `/admin/`             | carga la config de Payload; es lo que cayó         |
+| `/api/marcas/`        | API REST contra la base                            |
+| `/sitemap.xml`        | sitemap de todo el catálogo (ISR desde 2026-10-15) |
+| `/api/redirects-map/` | con `x-proxy-internal: 1`; sostiene los redirects  |
+| `/`                   | control: si esto cae, es otra cosa                 |
 
 Cuatro propiedades que la hacen valer, y que son el motivo de la propuesta:
 
@@ -3498,6 +3499,7 @@ fichero, cero dependencias, cero imports, solo marcado.
 | Secreto de derivación solo al preview    | Un script que manda `x-vercel-protection-bypass` a otro host: `extraHTTPHeaders`, un `fetch` que sigue redirecciones o la cabecera escrita a mano (§10.40)                                                                              | `src/lib/preview/derivacion.mjs` + `derivacion.test.ts`, que también recorre `scripts/` y `src/`                                                                                         | CI, en cada push                      |
 | Fuente de respaldo de Inter              | next/font renombra «Inter Fallback» (detalle interno de Turbopack) y la cabecera del artículo vuelve a desplazarse al llegar Inter, sin ningún error                                                                                    | `scripts/qa/fuente-respaldo.ts` tras `next build` + `src/lib/blog/fuenteRespaldo.test.ts`                                                                                                | Cada build (también preview) y CI     |
 | Filtros: una sola URL por combinación    | Una query de filtros escrita de dos formas (mayúsculas, otro orden, un valor inexistente) que daría dos páginas iguales; o una combinación filtrada indexable                                                                           | `src/lib/filtros/` + `filtros.test.ts` (308 a la forma canónica, `noindex` con canónica sin filtros)                                                                                     | CI, en cada push                      |
+| Sitemap y buscador se invalidan          | Un cambio de catálogo que no regenera el sitemap ni el buscador hasta su vigencia, o un sitemap que vuelve a `force-dynamic` sin querer (2026-10-15)                                                                                    | `src/lib/indicesEnCache.test.ts`                                                                                                                                                         | CI, en cada push                      |
 | El marco se invalida                     | Un global o una colección del megamenú que cambia en el panel sin invalidar `datos:marco`: todas las páginas seguirían con la cabecera vieja hasta el siguiente despliegue, sin error (2026-10-15)                                      | `src/lib/marcoEnCache.test.ts` (las 4 consultas en caché con su etiqueta; `revalidarTodoElSitio` la invalida antes que las rutas; los 3 globales y las 6 colecciones llevan sus ganchos) | CI, en cada push                      |
 | API sin lectura anónima                  | Una colección o global nuevo con `read: () => true` (o sin `read`): la API REST serviría la colección entera sin sesión, con su coste en la base (2026-10-15)                                                                           | `lecturaContenido` / `lecturaFiltrada` (`src/lib/seguridad/acceso.ts`, `lecturaApi.ts`) + `lecturaApi.test.ts`, que evalúa el `read` real de las 26 colecciones y 6 globales             | CI, en cada push                      |
 | Zod solo en el servidor                  | Un componente con `"use client"` que importa, directa o transitivamente, un módulo con `zod` y lo mete entero en el navegador (~98 KiB)                                                                                                 | `src/lib/validation/clienteSinZod.test.ts` (se detiene en los `"use server"`)                                                                                                            | CI, en cada push                      |

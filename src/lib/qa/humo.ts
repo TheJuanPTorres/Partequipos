@@ -40,14 +40,16 @@ export const RUTAS: Ruta[] = [
      * (`src/lib/seguridad/lecturaApi.ts`). Sigue sirviendo para lo que estaba
      * aquí: para responder 403, Payload tiene que cargar su config (y `sharp`),
      * que es lo que cayó en §10.18; un 500 sigue saliendo en rojo. Y un 200
-     * avisaría de que la API volvió a quedar abierta. La base la ejercitan
-     * `/admin/` y `/sitemap.xml`.
+     * avisaría de que la API volvió a quedar abierta.
      */
     esperado: 403,
     motivo: "API REST: carga la config de Payload y está cerrada a anónimos",
     ruta: "/api/marcas/",
   },
-  { motivo: "ruta dinámica con consulta", ruta: "/sitemap.xml" },
+  {
+    motivo: "sitemap de todo el catálogo (generado en el build y regenerado por ISR)",
+    ruta: "/sitemap.xml",
+  },
   { motivo: "control: si esto cae, es otra cosa", ruta: "/" },
   {
     cabeceras: { "x-proxy-internal": "1" },

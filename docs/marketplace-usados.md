@@ -89,8 +89,10 @@ Una categoría o marca de usada **sin unidades disponibles** no se indexa
 (`noindex, follow`) ni sale en el sitemap. La URL sigue respondiendo 200, con
 el estado vacío («Por ahora no hay unidades disponibles…» y el enlace a
 contactar). En cuanto entra una unidad disponible vuelve a indexarse y al
-sitemap **sola**: los ganchos de `equipos-usados` invalidan `datos:usados`, y
-la página y el sitemap son dinámicos.
+sitemap **sola**: los ganchos de `equipos-usados` invalidan `datos:usados`, la
+página es dinámica y, desde el 2026-10-15, esa misma invalidación regenera el
+sitemap (que ya no es dinámico: se cachea, con vigencia de 1 h como red;
+`revalidarIndices` en `src/lib/cacheDatos.ts`).
 
 **Vale también para las 8 categorías heredadas del sitio actual**
 (decisión de dirección del 2026-10-14). Hasta esa fecha seguían indexables

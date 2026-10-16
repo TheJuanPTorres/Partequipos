@@ -1,4 +1,4 @@
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 /**
  * CACHÉ DE DATOS de los listados DINÁMICOS (2026-10-13).
@@ -33,6 +33,12 @@ export const ETIQUETAS_DATOS = {
    * las 6 colecciones del megamenú.
    */
   marco: "datos:marco",
+  /**
+   * Resultados del buscador (`/buscar/`), por consulta. Llevan además vigencia
+   * de 10 min (`getBusqueda.ts`): leen cuatro colecciones y no todos sus
+   * ganchos pasan por aquí. La invalida `revalidarIndices`.
+   */
+  busqueda: "datos:busqueda",
 } as const;
 
 /**
@@ -62,5 +68,25 @@ export function revalidarDatos(etiqueta: string, motivo: string): void {
     revalidateTag(etiqueta, { expire: 0 });
   } catch (error) {
     console.error(`[revalidación] falló la etiqueta ${etiqueta} (${motivo}):`, error);
+  }
+  // Usados y nueva también salen en el buscador y en el sitemap.
+  if (etiqueta === ETIQUETAS_DATOS.usados || etiqueta === ETIQUETAS_DATOS.nueva) {
+    revalidarIndices(motivo);
+  }
+}
+
+/**
+ * Lo que lista TODO el catálogo: el sitemap (ruta con vigencia de 1 h desde el
+ * 2026-10-15) y los resultados del buscador. Lo llaman las funciones de
+ * `revalidation.ts` que usan los ganchos del catálogo y, para usados y nueva,
+ * `revalidarDatos`. La vigencia por tiempo cubre cualquier gancho que no pase
+ * por aquí. Nunca relanza.
+ */
+export function revalidarIndices(motivo: string): void {
+  try {
+    revalidateTag(ETIQUETAS_DATOS.busqueda, { expire: 0 });
+    revalidatePath("/sitemap.xml");
+  } catch (error) {
+    console.error(`[revalidación] fallaron el sitemap o el buscador (${motivo}):`, error);
   }
 }

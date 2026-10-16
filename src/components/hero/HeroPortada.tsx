@@ -458,8 +458,15 @@ export function HeroPortada({ diapositivas }: Props) {
          * MÁQUINA debajo, en el mismo flujo (hero de sliders de Andrés): ocupa lo
          * que queda hasta los controles, así se adapta a un título de varias
          * líneas. Con «sobre», en escritorio sube y cruza el título.
+         *
+         * UNA CAPA NUEVA POR DIAPOSITIVA (`key`): la caja de la máquina cambia
+         * de sitio entre diapositivas (sobre/debajo, títulos de distinto alto) y,
+         * con el pase automático, que no es una entrada del usuario, ese cambio
+         * contaba como CLS (medido a 1010: 0,018 por pase). Un elemento nuevo no
+         * cuenta como desplazamiento.
          */}
         <div
+          key={`texto-${activo}`}
           className={estilos.capaTexto}
           data-maquina={d.posicionMaquina}
           data-partido={d.tituloPartido ? "" : undefined}

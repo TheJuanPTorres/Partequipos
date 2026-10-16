@@ -3,7 +3,7 @@
 import { IconCheck, IconChevronRight, IconMinus, IconPlus } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
-import { forwardRef, useId, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { forwardRef, memo, useId, useState, type CSSProperties, type KeyboardEvent } from "react";
 
 import type { EnlaceMenu, GrupoMenu, PanelMenu } from "@/lib/megamenu";
 
@@ -98,63 +98,71 @@ type Props = {
    * Cerrar: al elegir un enlace (`null`), con Escape o Mayús+Tab desde el
    * primero (`"boton"`), o con Tab desde el último (`"siguiente"`).
    */
-  alCerrar: (foco: "boton" | "siguiente" | null) => void;
-  alEntrar: () => void;
+  alCerrar: (clave: string, foco: "boton" | "siguiente" | null) => void;
+  alEntrar: (clave: string) => void;
   alSalir: () => void;
+  /** Clave del panel: las funciones de arriba son comunes y estables, así que el panel no se vuelve a pintar con cada cambio de la cabecera. */
+  clave: string;
 };
 
-export const Megamenu = forwardRef<HTMLElement, Props>(function Megamenu(
-  { id, etiqueta, panel, abierto, arriba, alCerrar, alEntrar, alSalir },
-  ref,
-) {
-  /*
-   * El panel va DESPUÉS de la cabecera en el DOM (el `clip-path` del encogido
-   * lo recortaría dentro). Para que el orden del tabulador siga siendo el de
-   * la cabecera: al salir con Tab por el final, se cierra y el foco pasa al
-   * enlace que sigue al botón; con Mayús+Tab desde el primero, vuelve al botón.
-   */
-  const alTeclado = (e: KeyboardEvent<HTMLElement>) => {
-    if (e.key === "Escape") {
-      e.preventDefault();
-      alCerrar("boton");
-      return;
-    }
-    if (e.key !== "Tab") return;
-    const enfocables = [
-      ...e.currentTarget.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
-    ].filter((el) => el.offsetParent !== null);
-    const primero = enfocables[0];
-    const ultimo = enfocables[enfocables.length - 1];
-    if (e.shiftKey && document.activeElement === primero) {
-      e.preventDefault();
-      alCerrar("boton");
-    } else if (!e.shiftKey && document.activeElement === ultimo) {
-      e.preventDefault();
-      alCerrar("siguiente");
-    }
-  };
+export const Megamenu = memo(
+  forwardRef<HTMLElement, Props>(function Megamenu(
+    { id, etiqueta, panel, abierto, arriba, alCerrar, alEntrar, alSalir, clave },
+    ref,
+  ) {
+    /*
+     * El panel va DESPUÉS de la cabecera en el DOM (el `clip-path` del encogido
+     * lo recortaría dentro). Para que el orden del tabulador siga siendo el de
+     * la cabecera: al salir con Tab por el final, se cierra y el foco pasa al
+     * enlace que sigue al botón; con Mayús+Tab desde el primero, vuelve al botón.
+     */
+    const alTeclado = (e: KeyboardEvent<HTMLElement>) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        alCerrar(clave, "boton");
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const enfocables = [
+        ...e.currentTarget.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
+      ].filter((el) => el.offsetParent !== null);
+      const primero = enfocables[0];
+      const ultimo = enfocables[enfocables.length - 1];
+      if (e.shiftKey && document.activeElement === primero) {
+        e.preventDefault();
+        alCerrar(clave, "boton");
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
+        e.preventDefault();
+        alCerrar(clave, "siguiente");
+      }
+    };
 
-  return (
-    <nav
-      ref={ref}
-      id={id}
-      aria-label={etiqueta}
-      className={estilos.panel}
-      data-abierto={abierto ? "si" : "no"}
-      style={arriba === null ? undefined : ({ "--mega-arriba": `${arriba}px` } as CSSProperties)}
-      onKeyDown={alTeclado}
-      onMouseEnter={alEntrar}
-      onMouseLeave={alSalir}
-    >
-      <div className={estilos.caja}>
-        <Link href={panel.verTodo.href} className={estilos.verTodo} onClick={() => alCerrar(null)}>
-          {panel.verTodo.etiqueta}
-          <IconChevronRight aria-hidden="true" focusable="false" stroke={2} />
-        </Link>
-        {panel.grupos.map((g) => (
-          <Acordeon key={g.titulo} grupo={g} nivel={1} alElegir={() => alCerrar(null)} />
-        ))}
-      </div>
-    </nav>
-  );
-});
+    return (
+      <nav
+        ref={ref}
+        id={id}
+        aria-label={etiqueta}
+        className={estilos.panel}
+        data-abierto={abierto ? "si" : "no"}
+        style={arriba === null ? undefined : ({ "--mega-arriba": `${arriba}px` } as CSSProperties)}
+        onKeyDown={alTeclado}
+        onMouseEnter={() => alEntrar(clave)}
+        onMouseLeave={alSalir}
+      >
+        <div className={estilos.caja}>
+          <Link
+            href={panel.verTodo.href}
+            className={estilos.verTodo}
+            onClick={() => alCerrar(clave, null)}
+          >
+            {panel.verTodo.etiqueta}
+            <IconChevronRight aria-hidden="true" focusable="false" stroke={2} />
+          </Link>
+          {panel.grupos.map((g) => (
+            <Acordeon key={g.titulo} grupo={g} nivel={1} alElegir={() => alCerrar(clave, null)} />
+          ))}
+        </div>
+      </nav>
+    );
+  }),
+);

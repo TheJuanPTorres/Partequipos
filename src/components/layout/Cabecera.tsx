@@ -13,6 +13,7 @@ import Link from "next/link";
 import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 import {
   Fragment,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -211,18 +212,22 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
 
   useEffect(() => () => window.clearTimeout(temporizador.current), []);
 
-  const abrirMega = (clave: string) => {
-    window.clearTimeout(temporizador.current);
-    setMega({ clave, ruta });
-  };
+  // Estables (no cambian al abrir el buscador ni al hacer scroll): así los paneles del
+  // megamenú, que son memoizados, no se vuelven a pintar con cada cambio de la cabecera.
+  const abrirMega = useCallback(
+    (clave: string) => {
+      window.clearTimeout(temporizador.current);
+      setMega({ clave, ruta });
+    },
+    [ruta],
+  );
 
-  const cerrarMegaLuego = () => {
+  const cerrarMegaLuego = useCallback(() => {
     window.clearTimeout(temporizador.current);
     temporizador.current = window.setTimeout(() => setMega(null), RETARDO_CIERRE);
-  };
+  }, []);
 
-  const cerrarMega = (foco: "boton" | "siguiente" | null) => {
-    const clave = megaAbierto;
+  const cerrarMega = useCallback((clave: string | null, foco: "boton" | "siguiente" | null) => {
     window.clearTimeout(temporizador.current);
     setMega(null);
     if (!clave || !foco) return;
@@ -236,7 +241,14 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
       ...(cabecera.current?.querySelectorAll<HTMLElement>("a[href], button") ?? []),
     ].filter((el) => el.offsetParent !== null);
     enfocables[enfocables.indexOf(disparador) + 1]?.focus();
-  };
+  }, []);
+
+  // Una función por panel, siempre la misma (un `ref` nuevo en cada pintado lo haría cambiar).
+  const refsPanel = useRef<Record<string, (el: HTMLElement | null) => void>>({});
+  const refDelPanel = (clave: string) =>
+    (refsPanel.current[clave] ??= (el) => {
+      paneMega.current[clave] = el;
+    });
 
   const alPulsarDisparador = (clave: string) => (e: MouseEvent<HTMLButtonElement>) => {
     // Con el teclado (Intro o Espacio) el clic llega con `detail` 0.
@@ -258,7 +270,7 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
       cerrarBusqueda();
     } else if (megaAbierto) {
       e.preventDefault();
-      cerrarMega("boton");
+      cerrarMega(megaAbierto, "boton");
     } else if (abierto) {
       e.preventDefault();
       cerrar();
@@ -449,16 +461,15 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
         return [
           <Megamenu
             key={clave}
-            ref={(el) => {
-              paneMega.current[clave] = el;
-            }}
+            ref={refDelPanel(clave)}
+            clave={clave}
             id={idPanel(clave)}
             etiqueta={e.etiqueta}
             panel={datos}
             abierto={megaAbierto === clave}
             arriba={inicioDelPanel(alto, !arriba)}
             alCerrar={cerrarMega}
-            alEntrar={() => abrirMega(clave)}
+            alEntrar={abrirMega}
             alSalir={cerrarMegaLuego}
           />,
         ];

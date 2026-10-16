@@ -1,13 +1,12 @@
-import type { Access, CollectionConfig } from "payload";
+import type { CollectionConfig } from "payload";
 
-import { borradoAdmin, esPersonal, escrituraContenido } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaFiltrada } from "../lib/seguridad/acceso";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("preguntas-frecuentes");
 
-/** El público solo lee las publicadas; el personal, todas. */
-const leerPreguntas: Access = ({ req }) =>
-  esPersonal(req.user) ? true : { publicada: { equals: true } };
+/** Por la API, el personal lee todas; con el token de lectura, solo las publicadas. */
+const leerPreguntas = lecturaFiltrada({ publicada: { equals: true } });
 
 /**
  * Preguntas frecuentes: la sección 11 de la home de ux-9.

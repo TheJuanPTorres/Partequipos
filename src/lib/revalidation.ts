@@ -1,6 +1,6 @@
 import { revalidatePath } from "next/cache";
 
-import { revalidarIndices } from "./cacheDatos";
+import { ETIQUETAS_DATOS, revalidarDatos, revalidarIndices } from "./cacheDatos";
 
 import {
   rutas,
@@ -295,8 +295,12 @@ export function rutasDeCategoriaBlog(slug: string, articuloSlugs: string[]): str
 /**
  * Revalida TODO el sitio: cada página lleva el pie (y la cabecera) en el layout.
  * Para cambios en globales como `pie`. Nunca relanza.
+ *
+ * PRIMERO la caché del marco (`datos:marco`): si no, las páginas se volverían
+ * a pintar con la cabecera y el pie viejos que siguen en la caché de datos.
  */
 export function revalidarTodoElSitio(motivo: string): void {
+  revalidarDatos(ETIQUETAS_DATOS.marco, motivo);
   try {
     revalidatePath("/", "layout");
   } catch (error) {

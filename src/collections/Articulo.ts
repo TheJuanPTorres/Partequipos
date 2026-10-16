@@ -4,7 +4,7 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarArticulo, revalidarArticuloBorrado } from "./hooks/blogHooks";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 
 /**
  * Artículo del blog. Se sirve en `/{slug}/`, **en la raíz**.
@@ -31,7 +31,7 @@ export const Articulo: CollectionConfig = {
       "Cada artículo tiene su dirección en partequipos.com/<dirección>/, y no puede repetir la de una página.",
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

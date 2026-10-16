@@ -437,6 +437,15 @@
   }
 }
 
+/*
+ * TÍTULO OCULTO («Mostrar título» desmarcado, 2026-10-15): lo pintado no se ve
+ * pero conserva su sitio, así la máquina y los controles no se mueven entre
+ * diapositivas (CLS 0 en el pase). El texto para lectores es `.soloLector`.
+ */
+.titulo[data-oculto] .tituloEntero {
+  visibility: hidden;
+}
+
 .capaFrontal {
   position: absolute;
   inset: 0;

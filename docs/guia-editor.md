@@ -184,6 +184,10 @@ oficial, no lo pongas.
   sin año, por ejemplo, no sale al filtrar por año.
 - **«Marca»** es una lista: elige la marca. Si no está, créala ahí mismo con
   el **«+»**; tendrá su propia página. El **modelo** es texto libre.
+- **«Ficha técnica (PDF)»** es opcional. Con un PDF, la tarjeta de la unidad
+  en la portada muestra el botón **«Ficha técnica»**; sin él, el botón no
+  sale. En la portada salen las tres unidades disponibles modificadas más
+  recientemente de cada pestaña (Excavadoras, Otros y Aditamentos).
 - **Maquinaria → Marcas de maquinaria usada:** cada marca tiene su página
   (`…/maquinaria-pesada-usada/marcas/<marca>/`), con sus unidades
   disponibles. Puedes escribir su descripción, su SEO y, si la vendemos
@@ -275,6 +279,20 @@ oficial, no lo pongas.
 - **Hero (carrusel):** cada diapositiva lleva título, párrafo, imagen de fondo,
   una versión **vertical para móvil** (recomendada: el móvil carga mucho más
   rápido) y, si quieres, la máquina recortada en PNG transparente.
+- **Diapositiva solo con la foto:** arriba de cada diapositiva hay tres
+  casillas, marcadas por defecto: **Mostrar título**, **Mostrar texto
+  circular** y **Mostrar recuadro de descripción** (el vidrio con el párrafo y
+  el «+»). Desmarca las tres y la diapositiva se ve solo con su foto de fondo
+  (y la máquina, si la pusiste). El **título sigue siendo obligatorio**
+  aunque no se vea: lo leen los lectores de pantalla y da nombre a la
+  diapositiva en los puntos del carrusel. Al desmarcar una casilla, sus campos
+  se esconden en el panel, pero lo escrito no se borra: si vuelves a
+  marcarla, reaparece.
+- **Si una diapositiva no tiene la versión vertical, el panel lo avisa** encima
+  del campo. En la primera es importante: es lo primero que se ve, y sin ella
+  el teléfono descarga la foto de escritorio en grande (la portada llegó a
+  tardar 7 s en móvil). Sube un recorte vertical de la misma foto, por ejemplo
+  de 1080 × 1620.
 - Cada sección de la portada tiene su bloque en esa página. Lo que dejes vacío
   no se pinta.
 

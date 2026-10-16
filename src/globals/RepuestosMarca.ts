@@ -1,7 +1,7 @@
 import type { Field, GlobalConfig } from "payload";
 
 import { validarEnlace } from "../lib/fields/reglasPortada";
-import { escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMarcasDeRepuestos } from "../lib/revalidation";
 
 /**
@@ -49,7 +49,7 @@ export const RepuestosMarca: GlobalConfig = {
     description:
       "Títulos y tarjetas comunes a las páginas de cada marca de repuestos (Caterpillar, Case…).",
   },
-  access: { read: publico, update: escrituraContenido },
+  access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
     afterChange: [
       ({ doc }) => {

@@ -2,174 +2,202 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 
+import { BotonPausa } from "@/components/movimiento/BotonPausa";
+import { usePausa } from "@/components/movimiento/useMovimiento";
+import {
+  INTERVALO_MS,
+  TRANSICION_MS,
+  alFrente,
+  avanzaSolo,
+  hayQueVolver,
+  siguiente,
+} from "@/lib/portada/carruselMarcas";
 import type { TarjetaMarca } from "@/lib/portada/secciones";
 
 import estilos from "./maquinariaNueva.module.css";
 
 /**
- * CARRUSEL DE MARCAS — sección 2 de ux-9, con `scroll-snap` y sin Swiper.
+ * CARRUSEL DE MARCAS — sección «Maquinaria pesada nueva» de la Home V2 de
+ * Andrés (2026-10-15): 4 tarjetas a la vista en escritorio, 2 en tablet y 1 en
+ * móvil, que avanzan solas cada 5 s en bucle, sin flechas.
  *
- * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): las flechas desplazan la
- * pista y los puntos siguen la posición. Las tarjetas están enteras en el HTML
- * prerenderizado, con sus enlaces: sin JavaScript se desplaza con el gesto y
- * se tabula igual.
+ * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): el avance automático, los
+ * puntos y la pausa. Las tarjetas están enteras en el HTML prerenderizado, con
+ * sus enlaces; la posición la pone el CSS (`--indice`), así que no hay salto al
+ * hidratar.
  *
- * Lo que se aparta de ux-9 (docs/diseno/decisiones-home-ux9.md §11):
- * - D7: sin bucle. Si todas las tarjetas caben, no hay flechas ni puntos: no
- *   habría adónde ir. En ux-9 Swiper las duplica para dar la vuelta.
- * - D8: los puntos indican, no se pulsan (ver el CSS).
- * - D9: cada tarjeta ENLAZA a su marca. En ux-9 no lleva a ninguna parte.
+ * El bucle (como Swiper): detrás de las tarjetas va una copia, inerte y oculta
+ * a los lectores de pantalla; la pista avanza hasta la copia de la primera y
+ * vuelve sin animar a la original (`src/lib/portada/carruselMarcas.ts`).
+ *
+ * Accesibilidad del avance automático (WCAG 2.2.2): se para con el puntero
+ * encima, con el foco dentro, fuera de la vista y con «reducir movimiento»; y
+ * lleva botón de pausa junto a los puntos, como el hero. Los puntos son
+ * botones de 24 px («Ir a <marca>», `aria-current`), no los 6 px del diseño
+ * (WCAG 2.5.8); se ven igual. Cada tarjeta ENLAZA a su marca (D9).
  */
 
 type Props = { tarjetas: TarjetaMarca[]; etiqueta: string };
 
-function Chevron({ hacia }: { hacia: "anterior" | "siguiente" }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-      <path
-        d={hacia === "siguiente" ? "M9 4l8 8-8 8" : "M15 4l-8 8 8 8"}
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-/** `sizes` de la foto de fondo: el ancho de una diapositiva en cada corte. */
-const SIZES_FONDO = "(max-width: 767px) 94vw, (max-width: 1024px) 47vw, 31vw";
+/** `sizes` de la foto de fondo: el ancho de una tarjeta en cada corte (4 · 2 · 1). */
+const SIZES_FONDO = "(max-width: 767px) 94vw, (max-width: 1024px) 47vw, 24vw";
 
 export function CarruselMarcas({ tarjetas, etiqueta }: Props) {
-  const pista = useRef<HTMLUListElement>(null);
-  const [posicion, setPosicion] = useState({ indice: 0, pasos: 1 });
+  const total = tarjetas.length;
+  const region = useRef<HTMLDivElement>(null);
+  const [indice, setIndice] = useState(0);
+  const [animar, setAnimar] = useState(true);
+  const [dentro, setDentro] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const { pausado, alternar } = usePausa();
+  const inicioGesto = useRef<number | null>(null);
 
-  const medir = useCallback(() => {
-    const el = pista.current;
-    const primera = el?.firstElementChild as HTMLElement | null;
-    if (!el || !primera) return;
-    // Paso = ancho de una diapositiva + el hueco entre diapositivas.
-    const ancho =
-      primera.getBoundingClientRect().width + parseFloat(getComputedStyle(el).columnGap || "0");
-    if (!ancho) return;
-    const porVista = Math.max(
-      1,
-      Math.round((el.clientWidth + ancho - primera.getBoundingClientRect().width) / ancho),
-    );
-    const pasos = Math.max(1, tarjetas.length - porVista + 1);
-    const indice = Math.min(pasos - 1, Math.round(el.scrollLeft / ancho));
-    setPosicion((p) => (p.indice === indice && p.pasos === pasos ? p : { indice, pasos }));
-  }, [tarjetas.length]);
-
+  // Fuera de la vista no avanza: nadie lo ve y gasta batería.
   useEffect(() => {
-    const el = pista.current;
+    const el = region.current;
     if (!el) return;
-    medir();
-    el.addEventListener("scroll", medir, { passive: true });
-    const observador = new ResizeObserver(medir);
+    const observador = new IntersectionObserver(([e]) => setVisible(Boolean(e?.isIntersecting)));
     observador.observe(el);
-    return () => {
-      el.removeEventListener("scroll", medir);
-      observador.disconnect();
-    };
-  }, [medir]);
+    return () => observador.disconnect();
+  }, []);
 
-  const mover = (sentido: -1 | 1) => {
-    const el = pista.current;
-    const primera = el?.firstElementChild as HTMLElement | null;
-    if (!el || !primera) return;
-    // El `scroll-behavior` del CSS decide si anima: con movimiento reducido, no.
-    const paso =
-      primera.getBoundingClientRect().width + parseFloat(getComputedStyle(el).columnGap || "0");
-    el.scrollBy({ left: sentido * paso });
+  const avanza = avanzaSolo({ total, pausado, dentro, visible });
+  useEffect(() => {
+    if (!avanza) return;
+    const reloj = setInterval(() => {
+      setAnimar(true);
+      setIndice((i) => siguiente(i, total));
+    }, INTERVALO_MS);
+    return () => clearInterval(reloj);
+  }, [avanza, total]);
+
+  // En la copia de la primera: tras la transición, a la original sin animar.
+  useEffect(() => {
+    if (!hayQueVolver(indice, total)) return;
+    const t = setTimeout(() => {
+      setAnimar(false);
+      setIndice(0);
+    }, TRANSICION_MS);
+    return () => clearTimeout(t);
+  }, [indice, total]);
+
+  const ir = (i: number) => {
+    setAnimar(true);
+    setIndice(i);
   };
 
-  const hayMas = posicion.pasos > 1;
+  // Gesto en móvil: deslizar a un lado u otro mueve una tarjeta.
+  const alSoltar = (x: number) => {
+    const desde = inicioGesto.current;
+    inicioGesto.current = null;
+    if (desde === null || Math.abs(x - desde) < 40) return;
+    const frente = alFrente(indice, total);
+    ir(x < desde ? siguiente(frente, total) : (frente - 1 + total) % total);
+  };
+
+  const frente = alFrente(indice, total);
+  const estiloPista = { "--indice": indice } as CSSProperties;
+
+  const tarjeta = (t: TarjetaMarca, i: number, copia: boolean) => (
+    <li
+      key={`${copia ? "copia" : "t"}-${t.id}`}
+      className={estilos.diapositiva}
+      aria-hidden={copia || undefined}
+      inert={copia || undefined}
+      role={copia ? undefined : "group"}
+      aria-roledescription={copia ? undefined : "tarjeta"}
+      aria-label={copia ? undefined : `${i + 1} de ${total}: ${t.nombre}`}
+      // Al tabular hasta una tarjeta que no se ve, se trae al frente.
+      onFocus={copia ? undefined : () => i !== frente && ir(i)}
+    >
+      <Link href={t.href} className={estilos.tarjeta} tabIndex={copia ? -1 : undefined}>
+        <Image
+          src={t.fondo.url}
+          alt=""
+          fill
+          sizes={SIZES_FONDO}
+          className={estilos.fondo}
+          style={{ objectPosition: t.fondo.posicion }}
+          loading="lazy"
+        />
+        {t.logo ? (
+          <span className={estilos.logoCol}>
+            <Image
+              src={t.logo.url}
+              alt={copia ? "" : t.logo.alt}
+              width={t.logo.width}
+              height={t.logo.height}
+              sizes="120px"
+              className={estilos.logo}
+            />
+          </span>
+        ) : (
+          // Sin logo, el nombre: la tarjeta no puede quedar sin nombre accesible.
+          <span className="sr-only">{t.nombre}</span>
+        )}
+        {t.texto ? <span className={`${estilos.texto} block`}>{t.texto}</span> : null}
+      </Link>
+    </li>
+  );
 
   return (
     <div
+      ref={region}
       className={estilos.carrusel}
       role="region"
       aria-roledescription="carrusel"
       aria-label={etiqueta}
+      onMouseEnter={() => setDentro(true)}
+      onMouseLeave={() => setDentro(false)}
+      onFocus={() => setDentro(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDentro(false);
+      }}
     >
-      <div className={estilos.marco}>
-        <ul ref={pista} className={estilos.pista}>
-          {tarjetas.map((t) => (
-            <li key={t.id} className={estilos.diapositiva}>
-              <Link href={t.href} className={estilos.tarjeta}>
-                <Image
-                  src={t.fondo.url}
-                  alt=""
-                  fill
-                  sizes={SIZES_FONDO}
-                  className={estilos.fondo}
-                  style={{ objectPosition: t.fondo.posicion }}
-                  loading="lazy"
-                />
-                <span className={estilos.fila}>
-                  <span className={estilos.logoCol}>
-                    {t.logo ? (
-                      <Image
-                        src={t.logo.url}
-                        alt={t.logo.alt}
-                        width={t.logo.width}
-                        height={t.logo.height}
-                        sizes="120px"
-                        className={estilos.logo}
-                      />
-                    ) : (
-                      // Sin logo, el nombre: la tarjeta no puede quedar sin nombre accesible.
-                      <span className="sr-only">{t.nombre}</span>
-                    )}
-                  </span>
-                  <span className={estilos.textoCol}>
-                    {t.texto ? (
-                      <span className={`${estilos.texto} texto-cuerpo block`}>{t.texto}</span>
-                    ) : null}
-                  </span>
-                </span>
-              </Link>
-            </li>
-          ))}
+      <div
+        className={estilos.marco}
+        onPointerDown={(e) => (inicioGesto.current = e.clientX)}
+        onPointerUp={(e) => alSoltar(e.clientX)}
+        onPointerCancel={() => (inicioGesto.current = null)}
+      >
+        <ul
+          id="portada-marcas-pista"
+          className={`${estilos.pista} ${animar ? "" : estilos.sinTransicion}`}
+          style={estiloPista}
+        >
+          {tarjetas.map((t, i) => tarjeta(t, i, false))}
+          {total > 1 ? tarjetas.map((t, i) => tarjeta(t, i, true)) : null}
         </ul>
-
-        {hayMas ? (
+      </div>
+      {/* Siempre en el marcado: reserva el alto de los controles y no hay salto al hidratar. */}
+      <div className={estilos.controles}>
+        {total > 1 ? (
           <>
-            <button
-              type="button"
-              className={`${estilos.flecha} ${estilos.anterior}`}
-              onClick={() => mover(-1)}
-              disabled={posicion.indice === 0}
-              aria-label="Marcas anteriores"
-            >
-              <Chevron hacia="anterior" />
-            </button>
-            <button
-              type="button"
-              className={`${estilos.flecha} ${estilos.siguiente}`}
-              onClick={() => mover(1)}
-              disabled={posicion.indice >= posicion.pasos - 1}
-              aria-label="Marcas siguientes"
-            >
-              <Chevron hacia="siguiente" />
-            </button>
+            <ul className={estilos.puntos}>
+              {tarjetas.map((t, i) => (
+                <li key={t.id}>
+                  <button
+                    type="button"
+                    className={estilos.punto}
+                    onClick={() => ir(i)}
+                    aria-label={`Ir a ${t.nombre}`}
+                    aria-current={i === frente ? "true" : undefined}
+                    aria-controls="portada-marcas-pista"
+                  />
+                </li>
+              ))}
+            </ul>
+            <BotonPausa
+              pausado={pausado}
+              alPulsar={alternar}
+              que="el carrusel de marcas"
+              controla="portada-marcas-pista"
+              className={estilos.pausa}
+            />
           </>
         ) : null}
-      </div>
-      {/* Siempre en el marcado: reserva el alto de los puntos, como ux-9, y así
-          no hay salto al hidratar cuando aparecen. */}
-      <div className={estilos.puntos} aria-hidden="true">
-        {hayMas
-          ? Array.from({ length: posicion.pasos }, (_, i) => (
-              <span
-                key={i}
-                className={`${estilos.punto} ${i === posicion.indice ? estilos.puntoActivo : ""}`}
-              />
-            ))
-          : null}
       </div>
     </div>
   );

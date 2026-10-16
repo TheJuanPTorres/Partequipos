@@ -17,6 +17,8 @@ export type Entorno = "preview" | "production";
 export type Ruta = {
   /** Cabeceras propias de la ruta, aparte del token de derivación. */
   cabeceras?: Record<string, string>;
+  /** Código que tiene que dar. Sin él, 200. */
+  esperado?: number;
   /** Por qué está en la lista. Se imprime al fallar. */
   motivo: string;
   ruta: string;
@@ -32,7 +34,18 @@ export type Ruta = {
  */
 export const RUTAS: Ruta[] = [
   { motivo: "carga la config de Payload; es lo que cayó en §10.18", ruta: "/admin/" },
-  { motivo: "API REST contra la base", ruta: "/api/marcas/" },
+  {
+    /*
+     * 403 desde el 2026-10-15: la API REST ya no se lee sin sesión ni token
+     * (`src/lib/seguridad/lecturaApi.ts`). Sigue sirviendo para lo que estaba
+     * aquí: para responder 403, Payload tiene que cargar su config (y `sharp`),
+     * que es lo que cayó en §10.18; un 500 sigue saliendo en rojo. Y un 200
+     * avisaría de que la API volvió a quedar abierta.
+     */
+    esperado: 403,
+    motivo: "API REST: carga la config de Payload y está cerrada a anónimos",
+    ruta: "/api/marcas/",
+  },
   {
     motivo: "sitemap de todo el catálogo (generado en el build y regenerado por ISR)",
     ruta: "/sitemap.xml",
@@ -62,6 +75,8 @@ export type Resultado = {
   /** Mensaje de red, si la petición no llegó a responder. */
   error?: string;
   estado?: number;
+  /** Código exigido (el de su `Ruta`); sin él, 200. */
+  esperado?: number;
   intentos: number;
   ruta: string;
 };
@@ -104,14 +119,16 @@ export type Veredicto = {
 };
 
 /**
- * Exige **200** en todas las rutas. Cualquier otra cosa es fallo, incluidos los
- * 3xx: un redirect en `/admin/` significaría que la protección no se derivó, y
- * dar eso por bueno es cómo una prueba de humo se vuelve decorativa.
+ * Exige el código EXACTO de cada ruta: **200** salvo que la ruta diga otro
+ * (`/api/marcas/`, 403). Cualquier otra cosa es fallo, incluidos los 3xx: un
+ * redirect en `/admin/` significaría que la protección no se derivó, y dar eso
+ * por bueno es cómo una prueba de humo se vuelve decorativa.
  */
 export function veredicto(resultados: Resultado[]): Veredicto {
-  const fallos = resultados.filter((r) => r.estado !== 200);
+  const bien = (r: Resultado) => r.estado === (r.esperado ?? 200);
+  const fallos = resultados.filter((r) => !bien(r));
   const lineas = resultados.map((r) => {
-    const marca = r.estado === 200 ? "✓" : "✗";
+    const marca = bien(r) ? "✓" : "✗";
     const detalle = r.error !== undefined ? `error de red: ${r.error}` : `HTTP ${r.estado}`;
     const reintentos = r.intentos > 1 ? ` (${r.intentos} intentos)` : "";
     return `${marca} ${r.ruta} — ${detalle}${reintentos}`;

@@ -12,7 +12,8 @@ export function avisoField(
     | "AvisoNoDisponible"
     | "AvisoAutorizacion"
     | "AvisoBuscadores"
-    | "AvisoRedirecciones",
+    | "AvisoRedirecciones"
+    | "AvisoRecorteMovil",
   { sidebar = false }: { sidebar?: boolean } = {},
 ): Field {
   return {

@@ -531,6 +531,9 @@ autenticación de Payload; no se ha hecho.
 
 ## 19. La pantalla de acceso, en tarjeta como en el original (2026-10-05, rama `fix/panel-acceso-tarjeta`)
 
+> **REVERTIDO el 2026-10-15 (§29):** la pantalla vuelve a ocupar toda la
+> pantalla. Lo que sigue se conserva como registro.
+
 Petición de dirección: en una pantalla de ~1900 px el panel visual ocupaba casi
 media pantalla y el formulario se iba a la derecha. En la página del sistema
 del cliente todo va en una **tarjeta centrada**. Sin esquema.
@@ -914,3 +917,55 @@ una ficha nueva importada por A). Se pasó a 1440 y en móvil, con el turno de
 - La página de la marca usa el bloque.
 - **Imagen al compartir:** la del bloque o, sin ella, la del sitio por defecto. El logo deja de serlo, por decisión de dirección: los logos del cliente son blancos y transparentes, y no se verían en WhatsApp ni en LinkedIn.
 - **De paso:** la sección de testimonios sin título ya no apunta con `aria-labelledby` a un id que no existe (lo señaló el verificador del #132).
+
+## 29. La pantalla de acceso, a pantalla completa (2026-10-15, rama `fix/panel-acceso-pantalla-completa`)
+
+Petición urgente de dirección: la pantalla de acceso deja la tarjeta centrada
+del §19 y ocupa **toda la pantalla, de borde a borde**. Es como pinta
+`login-screen` por sí solo, sin el marco de la página de muestra del sistema
+(leído en el registro, `ui.partequipos.com/r/login-screen.json`:
+`min-h-svh`, `p-4 lg:p-6` y `lg:grid-cols-[4fr_7fr]`). Sin esquema ni
+dependencias.
+
+- **Qué cambia:** se quita el envoltorio `pq-acceso__tarjeta` y sus estilos
+  (ancho máximo, borde, radio, fondo atenuado). El marcado vuelve a ser el del
+  PR #89, idéntico línea a línea.
+- **En escritorio:** panel visual a la izquierda (4/11 del ancho útil), a toda
+  la altura menos los 24 px de margen, y el formulario de 384 px centrado en
+  su columna (7/11).
+- **Se mantiene:** etiquetas visibles, borde de los campos de 3:1, foco del
+  panel, claro y oscuro, la imagen del campo «Imagen de la pantalla de acceso»
+  (o el degradado sin ella) y el móvil sin panel visual.
+
+## 30. Aviso en la diapositiva del hero sin imagen para móvil (2026-10-14, rama `perf/aviso-hero-sin-recorte`)
+
+**Por qué.** La medición del sitio publicado del 2026-10-14 (informe `2026-10-14-rendimiento-sitio-publicado.md`) encontró la portada a **7,06 s de LCP en móvil**. Antes, con recortes en todas las diapositivas, estaba en 2,83 s (CLAUDE.md §10.36). La causa: la primera diapositiva, «Hitachi LANDCROS», no tenía «Imagen de fondo para móvil (vertical)».
+
+- En un teléfono en vertical, el fondo cubre todo el alto del hero. Con `sizes` de 155vh y densidad 1,75 se piden unos 2290 px, y el srcset salta a **3840**: 320 KiB en el elemento LCP.
+- **Nada lo avisaba.** El campo es opcional, a propósito.
+
+**Qué hace.** Un campo `ui` (`avisoRecorteMovil`) en cada diapositiva, justo encima de «Imagen de fondo para móvil (vertical)».
+
+| Caso                                            | Aviso                                                         |
+| ----------------------------------------------- | ------------------------------------------------------------- |
+| Hay fondo y falta el recorte, en la **primera** | «aviso»: «La primera diapositiva no tiene imagen para móvil.» |
+| Lo mismo en otra diapositiva                    | «info» (se carga después, pesa menos en lo que se ve primero) |
+| Sin fondo, o con recorte                        | nada                                                          |
+
+- **Ruta de la fila:** el componente la saca de su `path` (`hero.diapositivas.<n>.avisoRecorteMovil`).
+- **Lógica:** lee en vivo los dos campos hermanos. La decisión (`filaDeDiapositiva` y `tieneSubida`) está en `src/lib/panel/avisos.ts`, con pruebas.
+- **Esquema:** ninguno (campo `ui`, `db:deriva` sin cambios). `importMap.js` regenerado.
+- **Revisión en pantalla:** `npm run panel:revision -- <preview> avisos` abre ahora también la portada (`aviso-recorte-movil`) y la recorre antes de contar, porque Payload pinta cada diapositiva al acercarse. En el preview del PR (2026-10-15) la portada tiene 7 diapositivas, y las 1–3 no tienen recorte. Salieron 3 avisos a 1440 y en móvil: el de tono «aviso» en la 1.ª y el informativo en la 2.ª y la 3.ª. Ninguno en las 4–7.
+
+**No se hizo:** bajar el `sizes` del fondo cuando falta el recorte. Para cubrir la caja con `object-cover`, la foto de escritorio necesita de verdad esos píxeles, así que pedir menos la dejaría borrosa. El arreglo es el recorte, y lo pide dirección a Andrés.
+
+## 31. El icono de la pestaña del panel, del mismo origen (2026-10-15, rama `fix/panel-favicon-mismo-origen`)
+
+**Qué pasaba.** `panel:revision` registraba en las pantallas con sesión peticiones bloqueadas por ORB (`net::ERR_BLOCKED_BY_ORB`) a `logo-partequipos.png` de otro origen: 33 en `panel:revision avisos` del 2026-10-15. Era el icono de la pestaña: `admin.meta.icons` apuntaba a la URL fija del Blob de producción (`seoConfig.logoPath`, la deuda de CLAUDE.md §10.8), así que todos los paneles, también los de los previews, lo pedían a otro origen.
+
+- **El fichero NO está caído.** En el login (sin sesión) la misma petición responde 200 `image/png` y no se bloquea. El bloqueo solo aparece en las pantallas con sesión; **el mecanismo no se aisló**: con el icono del mismo origen, ORB no se aplica y el bloqueo desaparece.
+- **Medido el 2026-10-15** (`panel:revision avisos`, 1440 y móvil): preview de `main`, 33 bloqueadas; preview del PR, 0. Queda en los dos el `ERR_ABORTED` de `/admin/`, que es una navegación interrumpida y no tiene que ver.
+
+**Qué cambia.** El icono pasa a ser `public/logo-partequipos.png` (`LOGO_SITIO_RESPALDO.src`, el logo transparente de Andrés que ya usan la cabecera y el pie), servido por el propio despliegue. Misma forma que antes (tira horizontal): el icono cuadrado sigue pendiente del cliente (§10.3 p.15). Sin esquema ni dependencias.
+
+**Lo que no se toca.** El JSON-LD `Organization` y la imagen social por defecto siguen usando `seoConfig.logoPath` cuando el campo «Logo» del global `seo` está vacío (§10.8).

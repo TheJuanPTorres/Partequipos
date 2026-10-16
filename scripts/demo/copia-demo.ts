@@ -64,6 +64,7 @@ import {
 } from "../../src/lib/demo/copiaDemo";
 import { almacenDeUrl } from "../../src/lib/blob/almacen";
 import { fetchAlPreview } from "../../src/lib/preview/derivacion.mjs";
+import { CABECERA_LECTURA } from "../../src/lib/seguridad/lecturaApi";
 import { FICHERO_ENTORNO_PREVIEW, leerFicheroEntorno } from "../../src/lib/preview/entornoPreview";
 
 // ------------------------------------------------------------------ argumentos
@@ -357,13 +358,21 @@ if (modo === "simular" || modo === "copiar") {
   const origen =
     origenValido(valorDe("origen")) ?? fallar("origen=<URL fija de un preview> obligatorio");
   const ficheroPreview = path.resolve(FICHERO_ENTORNO_PREVIEW);
-  const bypass = fs.existsSync(ficheroPreview)
-    ? leerFicheroEntorno(fs.readFileSync(ficheroPreview, "utf8")).VERCEL_AUTOMATION_BYPASS_SECRET
-    : undefined;
+  const entornoPreview = fs.existsSync(ficheroPreview)
+    ? leerFicheroEntorno(fs.readFileSync(ficheroPreview, "utf8"))
+    : {};
+  const bypass = entornoPreview.VERCEL_AUTOMATION_BYPASS_SECRET;
   if (!bypass) fallar(`falta el secreto de derivación del preview en ${FICHERO_ENTORNO_PREVIEW}`);
+  // Desde el 2026-10-15 la API no se lee sin sesión: token de lectura del preview
+  // (`src/lib/seguridad/lecturaApi.ts`). Va solo al origen del preview, como el secreto.
+  const lectura =
+    entornoPreview.API_LECTURA_TOKEN ||
+    fallar(`falta API_LECTURA_TOKEN (el del preview) en ${FICHERO_ENTORNO_PREVIEW}`);
   const get = async <T>(ruta: string): Promise<T> => {
     // Solo al origen del preview y sin seguir redirecciones (`derivacion.mjs`).
-    const r = await fetchAlPreview(origen + ruta, origen, bypass);
+    const r = await fetchAlPreview(origen + ruta, origen, bypass, {
+      headers: { [CABECERA_LECTURA]: lectura },
+    });
     if (!r.ok) fallar(`origen ${ruta}: HTTP ${r.status}`);
     return (await r.json()) as T;
   };

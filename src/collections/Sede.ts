@@ -1,7 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { validarLatitud, validarLongitud } from "../lib/fields/reglasPortada";
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("sedes");
@@ -39,7 +39,7 @@ export const Sede: CollectionConfig = {
     description: "Sedes del mapa de la portada. No generan URLs propias.",
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

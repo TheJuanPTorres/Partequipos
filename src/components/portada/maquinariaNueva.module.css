@@ -42,6 +42,12 @@
   --s2-logo-radio: 10px;
   --s2-logo-relleno: 8%;
   /*
+   * DESVIACIÓN (cliente, 2026-10-16): baldosa SEMITRANSPARENTE, la misma en las
+   * cuatro (blanco al 80 % con desenfoque: la foto se intuye y el logo se lee).
+   */
+  --s2-logo-fondo: rgb(255 255 255 / 0.8);
+  --s2-logo-desenfoque: blur(8px);
+  /*
    * Alto mínimo del texto, en líneas: con textos de largo distinto, el logo de
    * cada tarjeta queda a la misma altura (el contenido va abajo).
    */
@@ -179,12 +185,11 @@
 /*
  * Logo encima del texto, a la izquierda: columna del 30 % con 10 px de relleno.
  *
- * DESVIACIÓN (cliente, sesión del 2026-10-14): los logos en una CAJA COMÚN, la
- * baldosa cuadrada y blanca de radio 10 que pinta el diseño (sus logos son
- * capturas casi cuadradas). Los reales tienen proporciones muy distintas
- * (Hitachi apaisado, CASE y Yanmar en un lienzo cuadrado, Dynapac con fondo
- * blanco): dentro de la baldosa, con `contain`, quedan del mismo ancho visual
- * y se leen sobre la foto oscurecida.
+ * DESVIACIÓN (cliente, sesiones del 2026-10-14 y 2026-10-16): los logos en una
+ * CAJA COMÚN, la baldosa cuadrada de radio 10 que pinta el diseño (sus logos
+ * son capturas casi cuadradas), semitransparente e igual en las cuatro. Los
+ * ficheros van sin placa propia (el dibujo sobre transparente): la placa la
+ * pone la baldosa. Con `contain`, los logos quedan del mismo ancho visual.
  */
 .logoCol {
   width: var(--s2-logo-col);
@@ -200,7 +205,10 @@
   aspect-ratio: 1;
   padding: var(--s2-logo-relleno);
   border-radius: var(--s2-logo-radio);
-  background: var(--color-fondo);
+  background: var(--s2-logo-fondo);
+  /* La variante -webkit- SIEMPRE antes que la estándar (CLAUDE.md §10.35). */
+  -webkit-backdrop-filter: var(--s2-logo-desenfoque);
+  backdrop-filter: var(--s2-logo-desenfoque);
   object-fit: contain;
 }
 

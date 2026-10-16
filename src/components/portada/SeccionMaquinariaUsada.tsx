@@ -1,4 +1,4 @@
-import { IconEngine, IconGauge, IconSettings, IconWeight } from "@tabler/icons-react";
+import { IconCalendar, IconClock, IconSettings, IconWeight } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -27,12 +27,14 @@ import { PestanasUsada } from "./diferidos";
  *   dirección.
  * - «Ficha técnica» solo si la unidad tiene PDF; sin él, no se pinta.
  * - Iconos de Tabler en vez de los de Flaticon (L2).
+ * - La ficha lleva peso operativo, año y horómetro (cliente, 2026-10-16), no
+ *   el peso, la potencia y el motor de la Home V2.
  */
 
 const ICONOS: Record<DatoFicha["clave"], typeof IconWeight> = {
   peso: IconWeight,
-  potencia: IconGauge,
-  motor: IconEngine,
+  anio: IconCalendar,
+  horometro: IconClock,
 };
 
 /** Ancho pintado de la foto: la tarjeta menos su relleno (1 columna en móvil, 3 en el resto). */

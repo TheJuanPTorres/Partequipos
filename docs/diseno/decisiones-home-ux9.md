@@ -2628,6 +2628,30 @@ de WordPress, que es una foto normal.
     no trae diccionarios de partición y deja ríos de espacio; con la
     partición del navegador deberían reducirse, sin comprobar.
 
+### 33.2 Segunda tanda del cliente (2026-10-16, tarde)
+
+- **Baldosa de los logos SEMITRANSPARENTE e igual en las cuatro** (§31):
+  blanco al 80 % con desenfoque de 8 px (`--s2-logo-fondo`,
+  `--s2-logo-desenfoque`), en lugar del blanco opaco del #191. Motivo: los
+  logos «Marcas Partequipos» del panel traen su placa dentro del fichero; la de
+  Hitachi es naranja OPACA y llenaba la baldosa, la de CASE es naranja al 20 %
+  y las de Dynapac y Yanmar, gris al 20 %. Se preparan los cuatro ficheros
+  **sin placa** (el dibujo sobre transparente, recortado): la placa la pone la
+  baldosa, igual para todos. Sin quitar las placas, CASE seguiría tintado.
+  - Cómo se quitan sin perder calidad: Hitachi es negro sobre naranja, así que
+    el alfa sale exacto del canal rojo; en los otros tres se deshace la
+    composición sobre la placa al 20 %. Misma resolución que el original
+    (300 × 150 de lienzo).
+  - Los ficheros no van al repositorio: los cambia dirección en el panel
+    (`Desktop/partequipos-cierre/runbook-logos-marcas.md`).
+- **Franja de logos (sección 4):** los de Yanmar (lienzo cuadrado de 2560 con
+  márgenes transparentes) y Dynapac (JPG con márgenes blancos) se recortan al
+  dibujo, sin tocar sus píxeles; mismo runbook.
+- **Tarjetas de usada:** la ficha pasa a **peso operativo, año y horómetro**
+  (horas con separador de miles), en ese orden, con iconos de Tabler (pesa,
+  calendario, reloj) y sin línea si falta el dato. La Home V2 pinta peso,
+  potencia y motor, que casi ninguna unidad importada trae.
+
 ## 34. Auditoría de D (2026-10-14): pines de las sedes y título de la portada
 
 ### 34.1 Pines de las sedes a 390 (axe `target-size` ×6)

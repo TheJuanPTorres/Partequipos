@@ -15,6 +15,12 @@ export type LineaSede = {
   telefono: { texto: string; href: string } | null;
 };
 
+/** Enlace de búsqueda de Google Maps por dirección (sin clave de API): «dirección, ciudad». */
+export function urlGoogleMaps(direccion: string, ciudad: string): string {
+  const consulta = `${direccion.trim()}, ${ciudad.trim()}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(consulta)}`;
+}
+
 export type SedeLista = {
   id: number;
   /** «Sede Bogotá». */

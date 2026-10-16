@@ -1,9 +1,15 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import type { CategoriasUsada, EquiposUsado, MarcasMaquinaria, Media } from "@/payload-types";
+import type {
+  CategoriasUsada,
+  Documento,
+  EquiposUsado,
+  MarcasMaquinaria,
+  Media,
+} from "@/payload-types";
 
-import { fichaDeEquipo, lineasDeNombre, pestanasDeUsada, tarjetasDeMarcas } from "./secciones";
+import { fichaDeEquipo, pestanasDeUsada, tarjetasDeMarcas } from "./secciones";
 
 const media = (id: number, alt = ""): Media =>
   ({ id, url: `/m/${id}.jpg`, alt, width: 800, height: 600 }) as Media;
@@ -72,27 +78,6 @@ describe("sección 2: tarjetas de marca", () => {
   });
 });
 
-describe("sección 3: nombre en dos líneas", () => {
-  it("quita el modelo del final del nombre", () => {
-    assert.deepEqual(lineasDeNombre("Excavadora Hitachi ZX75US-7", "ZX75US-7"), {
-      principal: "Excavadora Hitachi",
-      modelo: "ZX75US-7",
-    });
-  });
-
-  it("si el nombre no acaba en el modelo, lo deja entero", () => {
-    assert.deepEqual(lineasDeNombre("Excavadora Hitachi", "ZX75"), {
-      principal: "Excavadora Hitachi",
-      modelo: "ZX75",
-    });
-  });
-
-  it("sin modelo, una sola línea; y nunca deja la principal vacía", () => {
-    assert.deepEqual(lineasDeNombre("PC200", null), { principal: "PC200", modelo: null });
-    assert.deepEqual(lineasDeNombre("PC200", "pc200"), { principal: "PC200", modelo: "pc200" });
-  });
-});
-
 describe("sección 3: ficha", () => {
   it("peso, potencia y motor, en orden, con coma decimal", () => {
     assert.deepEqual(
@@ -112,19 +97,37 @@ describe("sección 3: pestañas", () => {
   const exc = cat("excavadoras", "Excavadoras");
   const mini = cat("minicargadores", "Minicargadores");
 
-  it("Excavadoras y Otros, dos tarjetas como máximo en cada una", () => {
+  it("Excavadoras y Otros, tres tarjetas como máximo en cada una (Home V2)", () => {
     const r = pestanasDeUsada([
       equipo(1, exc),
       equipo(2, mini),
       equipo(3, exc),
       equipo(4, exc),
       equipo(5, cat("cargadores", "Cargadores")),
+      equipo(6, exc),
     ]);
     assert.deepEqual(
       r.map((p) => [p.etiqueta, p.equipos.map((e) => e.id)]),
       [
-        ["Excavadoras", [1, 3]],
+        ["Excavadoras", [1, 3, 4]],
         ["Otros", [2, 5]],
+      ],
+    );
+  });
+
+  it("nombre entero; «Ficha técnica» solo con el PDF poblado", () => {
+    const pdf = { id: 9, url: "/d/ficha.pdf" } as Documento;
+    const [p] = pestanasDeUsada([
+      equipo(1, exc, { nombre: "Excavadora Hitachi ZX350H-5B 2016", fichaTecnicaPdf: pdf }),
+      equipo(2, exc, { fichaTecnicaPdf: 9 }),
+      equipo(3, exc),
+    ]);
+    assert.deepEqual(
+      p!.equipos.map((e) => [e.nombre, e.fichaPdf]),
+      [
+        ["Excavadora Hitachi ZX350H-5B 2016", "/d/ficha.pdf"],
+        ["Equipo 2", null],
+        ["Equipo 3", null],
       ],
     );
   });

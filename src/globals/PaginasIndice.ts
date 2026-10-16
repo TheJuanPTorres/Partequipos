@@ -1,7 +1,7 @@
 import type { Field, GlobalConfig } from "payload";
 
 import { validarEnlace } from "../lib/fields/reglasPortada";
-import { escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarRutas } from "../lib/revalidation";
 
 /**
@@ -60,7 +60,7 @@ export const PaginasIndice: GlobalConfig = {
     description:
       "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos».",
   },
-  access: { read: publico, update: escrituraContenido },
+  access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
     afterChange: [
       ({ doc }) => {

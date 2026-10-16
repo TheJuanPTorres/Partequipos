@@ -1,197 +1,143 @@
 /*
- * SECCIÓN 3 DE LA PORTADA — «Maquinaria pesada usada» + «Marcas que respaldan
- * nuestro trabajo» (ux-9, 1717.json [3]).
+ * «MAQUINARIA PESADA USADA» DE LA PORTADA — Home V2 de Andrés (2026-10-15):
+ * cabecera (sección 3, `511c5618`) y pestañas con tarjetas (sección 4,
+ * `a185c47`) de `elementor-3519-2026-10-15.json`.
  *
  * ================== LOS VALORES DE ANDRÉS VIVEN AQUÍ ==================
- * Medidos en su página pintada a 390 · 1010 · 1440 (2026-09-24). Todo va en
- * variables en `.seccion`. Lo que se aparta está marcado «DESVIACIÓN» y
- * documentado en docs/diseno/decisiones-home-ux9.md §11.
+ * Medidos en su página pintada (partequipos.uxdesign.website) a 390 · 1010 ·
+ * 1440 el 2026-10-15. Todo va en variables en `.seccion`. Lo que se aparta
+ * está marcado «DESVIACIÓN» y documentado en
+ * docs/diseno/decisiones-home-ux9.md §33.
  * ======================================================================
  */
 
 .seccion {
-  /* Contenedor: fila, relleno derecho 3 %, radio 30, fondo gris de sección. */
+  /* Cabecera: fila, relleno derecho 3 %, radio 30, fondo gris de sección. */
   --s3-relleno: 0 3% 0 0;
   --s3-radio: 30px;
   --s3-gap: 20px;
 
-  /* Columna izquierda 45 %. Máquina que SUBE 140 px sobre la sección 2. */
+  /* Columna izquierda 45 %: la máquina SUBE 140 px y BAJA 69 por fuera. */
   --s3-izq: 45%;
   /*
-   * Proporción de la máquina sobre su contenedor, que en ux-9 no pasa de
-   * 800 px (MEDIDO 2026-09-30: a 1010 el contenedor mide 800 de 980 y la
-   * imagen, el 46 % de 800 = 368 px). Por eso el factor multiplica
-   * `min(100%, 800px)` y no la columna.
+   * Proporción de la máquina sobre su columna, que no pasa de 800 px: 82 %
+   * en escritorio (515 de 629 a 1440), 46 % de 800 en tablet (368 a 1010) y
+   * 72 % en móvil. Por eso el factor multiplica `min(100%, 800px)`.
    */
-  --s3-maquina-factor: 1;
-  --s3-maquina-solape: -140px;
-  --s3-espacio-maquina: 139px;
-  --s3-espacio-final: 93px;
-  /* Titular de marcas: 536 px de caja con el texto a 9 % de ella. */
-  --s3-marcas-ancho: 536px;
-  --s3-marcas-sangria: 0.09;
-  /* Frase: 510 px de caja; relleno 0 · 4 % · 4 % · 11 % de esa caja. */
-  --s3-frase-ancho: 510px;
-  --s3-boton-sangria: 8%;
+  --s3-maquina-factor: 0.82;
+  --s3-maquina-arriba: -140px;
+  --s3-maquina-abajo: -69px;
 
-  /* Columna derecha 54 %, relleno 10. */
+  /* Columna derecha 54 %, relleno 10; 55 px antes del antetítulo. */
   --s3-der: 54%;
   --s3-der-relleno: 10px;
   --s3-espacio-der: 55px;
-  --s3-titulo-ancho: 418px;
+  /* Cajas de los textos, alineadas a la derecha (medidas a 1440). */
+  --s3-titulo-ancho: 731px;
+  --s3-subtitulo-ancho: 651px;
+  --s3-frase-ancho: 541px;
+  /* El espaciador de 30 px es un elemento más: 20 + 30 + 20 hasta el botón. */
+  --s3-boton-arriba: 50px;
 
-  /* Pestañas: relleno 15 · 35, radio 6, hueco 10. */
+  /* Pestañas: píldoras centradas, relleno 15 · 35, hueco 10, 20 px arriba. */
   --s3-pestana-relleno: 15px 35px;
-  --s3-pestana-radio: 6px;
   --s3-pestana-hueco: 10px;
   --s3-pestana-interlineado: 16px;
 
-  /* Tarjeta de equipo: 95 % del panel, a la derecha; 30 px sobre cada una. */
-  --s3-tarjeta-ancho: 95%;
-  --s3-tarjeta-arriba: 30px;
-  --s3-tarjeta-hueco: 24px;
-  --s3-img-col: 38%;
-  --s3-img-relleno: 15px;
-  --s3-img-ancho: 96%;
-  --s3-texto-col: 58%;
-  --s3-texto-relleno: 20px 29px 29px;
-  --s3-texto-hueco: 10px;
-  --s3-nombre: 18px;
-  /* Icono de la ficha: 20 px en un círculo rojo al 9 %. */
-  --s3-icono: 20px;
-  --s3-icono-caja: 44px;
-  --s3-boton-icono: 16px;
-  --s3-boton-hueco: 16px;
+  /* Catálogo: relleno 0 · 3 % · 5 % · 3 %; panel con 10 px; tarjetas a 3 columnas, 20 de hueco. */
+  --s3-catalogo-relleno: 0 3% 5%;
+  --s3-columnas: 3;
+  --s3-tarjeta-relleno: 25px;
+  --s3-botones-arriba: 50px;
 
-  display: flex;
-  padding: var(--s3-relleno);
-  border-radius: var(--s3-radio);
-  background: var(--color-fondo-seccion);
   color: var(--color-texto);
 }
 
 @media (max-width: 1024px) {
   .seccion {
     --s3-maquina-factor: 0.46;
-    --s3-espacio-maquina: 1px;
     --s3-pestana-interlineado: 13px;
-    --s3-boton-icono: 13px;
-    flex-direction: column;
   }
 }
 
 @media (max-width: 767px) {
   .seccion {
     --s3-maquina-factor: 0.72;
-    --s3-der: 100%;
-    /*
-     * MEDIDO en ux-9 pintado a 390 (2026-10-05, decisiones-home-ux9.md §27.4):
-     * el espaciador tras «Ver todas las excavadoras» mide 10 px y el de arriba
-     * de la columna derecha, 20; el export dice 93 y 55, que es lo que pinta a
-     * 1010. Del botón a «Venta de maquinaria» quedan 80 px, como en ux-9.
-     */
-    --s3-espacio-final: 10px;
+    --s3-maquina-arriba: -100px;
+    --s3-maquina-abajo: 0px;
     --s3-espacio-der: 20px;
+    --s3-columnas: 1;
+  }
+}
+
+/* --- Cabecera ---------------------------------------------------------------- */
+
+.cabecera {
+  display: flex;
+  padding: var(--s3-relleno);
+  border-radius: var(--s3-radio);
+  background: var(--color-fondo-seccion);
+}
+
+@media (max-width: 1024px) {
+  .cabecera {
+    flex-direction: column;
   }
 }
 
 /*
- * DESVIACIÓN (dirección 2026-10-06, decisiones-home-ux9.md §28.1): en móvil la máquina sube 140 px y en
- * ux-9 tapaba el botón «Ver todo» de la sección 2 (medido: −110 px a 360–430).
- * La sección baja lo justo para dejar 24 px entre el botón y la caja de la
- * imagen, y la máquina sigue asomando 140 px sobre el gris. Lo que ya separa
- * las dos secciones es el relleno inferior de la 2 (5 % del ancho) más el de
- * su pie (10 px): 24 + 140 − 10 = 154 px, menos ese 5 % (el `%` de un margen
- * también es del ancho del contenedor, así que vale en todos los anchos).
+ * DESVIACIÓN (dirección 2026-10-06, decisiones-home-ux9.md §28.1, se
+ * conserva): en móvil la máquina sube sobre el botón de la sección 2. La
+ * sección baja lo justo para dejar 24 px entre ese botón y la imagen.
  */
 @media (max-width: 767px) {
   .conMaquina {
     --s3-hueco-boton: 24px;
-    margin-top: calc(var(--s3-hueco-boton) - var(--s3-maquina-solape) - 10px - 5%);
+    margin-top: calc(var(--s3-hueco-boton) - var(--s3-maquina-arriba) - 10px - 5%);
   }
 }
 
-/* --- Columna izquierda ------------------------------------------------------ */
-
 .izq {
-  display: flex;
   flex: 0 0 var(--s3-izq);
-  flex-direction: column;
-  gap: var(--s3-gap);
   min-width: 0;
 }
 
-@media (max-width: 1024px) {
-  .izq {
-    flex-basis: auto;
-  }
-}
-
 .maquina {
+  position: relative;
+  z-index: 1;
   display: block;
   width: calc(min(100%, 800px) * var(--s3-maquina-factor));
   height: auto;
-  margin-top: var(--s3-maquina-solape);
+  margin-top: var(--s3-maquina-arriba);
+  margin-bottom: var(--s3-maquina-abajo);
 }
-
-.espacioMaquina {
-  height: var(--s3-espacio-maquina);
-}
-
-/*
- * Sin máquina (sin imagen en la portada): ni solape ni reserva de 139 px. En
- * escritorio el título arranca a la altura del antetítulo de la derecha (su
- * relleno más su espacio); en columna, como con máquina.
- */
-.espacioSinMaquina {
-  height: calc(var(--s3-espacio-der) + var(--s3-der-relleno));
-}
-
-@media (max-width: 1024px) {
-  .espacioSinMaquina {
-    height: var(--s3-espacio-maquina);
-  }
-}
-
-.espacioFinal {
-  height: var(--s3-espacio-final);
-}
-
-.tituloMarcas {
-  width: min(var(--s3-marcas-ancho), 100%);
-  margin: 0;
-  padding-left: calc(min(var(--s3-marcas-ancho), 100%) * var(--s3-marcas-sangria));
-  color: var(--color-texto-fuerte);
-}
-
-.frase {
-  width: min(var(--s3-frase-ancho), 100%);
-  margin: 0;
-  padding: 0 calc(min(var(--s3-frase-ancho), 100%) * 0.04)
-    calc(min(var(--s3-frase-ancho), 100%) * 0.04) calc(min(var(--s3-frase-ancho), 100%) * 0.11);
-  color: var(--color-texto-suave);
-}
-
-.botonIzq {
-  padding-left: var(--s3-boton-sangria);
-}
-
-/* --- Columna derecha -------------------------------------------------------- */
 
 .der {
   display: flex;
   flex: 0 0 var(--s3-der);
   flex-direction: column;
+  align-items: flex-end;
   gap: var(--s3-gap);
   min-width: 0;
   padding: var(--s3-der-relleno);
+  text-align: right;
 }
 
+/*
+ * DESVIACIÓN (errata, para Andrés): en tablet la cabecera pasa a columna, pero
+ * la columna de textos conserva su 54 % y queda pegada a la izquierda con la
+ * mitad derecha vacía (medido a 1010: textos de x = 10 a 519 de 1010). Aquí
+ * ocupa todo el ancho, con los textos a la derecha como en escritorio.
+ */
 @media (max-width: 1024px) {
   .der {
     flex-basis: auto;
-    width: var(--s3-der);
   }
+}
+
+/* Sin máquina, los textos ocupan toda la cabecera. */
+.der:only-child {
+  flex: 1 1 auto;
 }
 
 .espacioDer {
@@ -201,53 +147,79 @@
 .antetitulo {
   margin: 0;
   color: var(--color-marca);
-  text-align: right;
 }
 
-.tituloUsada {
-  align-self: flex-end;
-  max-width: var(--s3-titulo-ancho);
+.titulo {
+  max-width: min(var(--s3-titulo-ancho), 100%);
   margin: 0;
   color: var(--color-texto);
-  text-align: right;
 }
 
+.subtitulo {
+  max-width: min(var(--s3-subtitulo-ancho), 100%);
+  margin: 0;
+  color: var(--color-texto-fuerte);
+}
+
+.frase {
+  max-width: min(var(--s3-frase-ancho), 100%);
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+.verTodo {
+  padding-top: var(--s3-boton-arriba);
+}
+
+/* Móvil: antetítulo y título centrados (`text_align_mobile`); el resto, a la derecha. */
 @media (max-width: 767px) {
   .antetitulo {
-    text-align: center;
+    align-self: center;
   }
 
-  /* Export 3e5a53cb: `text_align_mobile` «Centro»; medido centrado a 390. */
-  .tituloUsada {
+  .titulo {
+    box-sizing: border-box;
     align-self: center;
+    padding-inline: 20px;
     text-align: center;
   }
 }
 
-/* --- Pestañas --------------------------------------------------------------- */
+/* --- Pestañas y tarjetas ----------------------------------------------------- */
+
+.catalogo {
+  padding: var(--s3-catalogo-relleno);
+  background: var(--color-fondo-seccion);
+}
 
 .pestanas {
-  margin-top: var(--s3-gap);
+  padding-top: var(--s3-gap);
 }
 
 .lista {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: var(--s3-pestana-hueco);
 }
 
 .pestana {
   padding: var(--s3-pestana-relleno);
   border: 0;
-  border-radius: var(--s3-pestana-radio);
+  border-radius: 50px;
   background: var(--color-marca-tenue);
-  color: var(--color-texto-suave);
+  color: var(--color-texto);
   font: inherit;
-  /* Medido en ux-9: 16 px en escritorio y 13 en tablet y móvil. */
-  font-size: var(--texto-etiqueta);
+  /* Medido: 16 px en los tres anchos; el interlineado, 16 en escritorio y 13 en el resto. */
+  font-size: 16px;
   font-weight: 500;
   line-height: var(--s3-pestana-interlineado);
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pestana:hover {
+  background: var(--color-marca);
+  color: var(--color-fondo);
 }
 
 .pestana[aria-selected="true"] {
@@ -261,10 +233,10 @@
 }
 
 /*
- * DESVIACIÓN (D10): en móvil ux-9 convierte las pestañas en acordeón y deja
- * «Otros» y «Aditamentos» DEBAJO del contenido abierto. Aquí siguen siendo
- * pestañas: las tres arriba, a todo el ancho y con el mismo aspecto. El patrón
- * ARIA de pestañas exige que la lista vaya junta; partirla lo rompe.
+ * DESVIACIÓN (D10, se conserva): en móvil el diseño convierte las pestañas en
+ * acordeón y deja «Otros» y «Aditamentos» DEBAJO del contenido abierto. Aquí
+ * siguen siendo pestañas: las tres arriba, a todo el ancho, con el mismo
+ * aspecto. El patrón ARIA de pestañas exige que la lista vaya junta.
  */
 @media (max-width: 767px) {
   .lista {
@@ -273,13 +245,13 @@
 }
 
 .panel {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(var(--s3-columnas), minmax(0, 1fr));
   gap: var(--s3-gap);
-  padding: var(--s3-der-relleno);
+  padding: 10px;
 }
 
-/* `display: flex` taparía el `hidden` de los paneles inactivos. */
+/* `display: grid` taparía el `hidden` de los paneles inactivos. */
 .panel[hidden] {
   display: none;
 }
@@ -300,105 +272,35 @@
   }
 }
 
-/* --- Tarjeta de equipo ------------------------------------------------------- */
-
 .tarjeta {
   display: flex;
-  align-self: flex-end;
-  justify-content: space-between;
-  gap: var(--s3-tarjeta-hueco);
-  width: var(--s3-tarjeta-ancho);
-  margin-top: var(--s3-tarjeta-arriba);
+  flex-direction: column;
+  gap: var(--s3-gap);
+  min-width: 0;
+  padding: var(--s3-tarjeta-relleno);
   border-radius: var(--s3-radio);
   background: var(--color-fondo);
 }
 
-.imgCol {
-  display: flex;
-  flex: 0 0 var(--s3-img-col);
-  flex-direction: column;
-  justify-content: center;
-  padding: var(--s3-img-relleno);
+/* La foto, a 3:2 y con radio 30 (en el diseño, 800 × 533 a todo el ancho). */
+.foto {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3 / 2;
   border-radius: var(--s3-radio);
 }
 
 .img {
-  display: block;
-  width: var(--s3-img-ancho);
-  height: auto;
-  transition: transform 0.3s;
-}
-
-.img:hover {
-  transform: scale(1.1);
-}
-
-.textoCol {
-  display: flex;
-  flex: 0 0 var(--s3-texto-col);
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--s3-texto-hueco);
-  min-width: 0;
-  padding: var(--s3-texto-relleno);
-}
-
-/* Tarjeta sin foto: el texto ocupa todo su ancho, sin columna vacía. */
-.textoCol:only-child {
-  flex: 1 1 auto;
-}
-
-/*
- * DESVIACIÓN (D5): en móvil ux-9 deja la tarjeta en fila, y la columna de
- * texto se sale por la derecha de la pantalla (medido: empieza en x = 382 de
- * 390). Nombre, ficha y botón quedan INVISIBLES. Aquí la tarjeta se apila:
- * la imagen arriba y el texto debajo, con los mismos valores.
- */
-@media (max-width: 767px) {
-  .tarjeta {
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .imgCol,
-  .textoCol {
-    flex-basis: auto;
-  }
+  object-fit: cover;
 }
 
 .nombre {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
   margin: 0;
-}
-
-.principal {
-  margin-bottom: 10px;
-  font-size: var(--s3-nombre);
-  font-weight: 700;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.modelo {
   color: var(--color-texto-suave);
 }
 
-.filete {
-  padding: 15px 0;
-}
-
-.filete::before {
-  content: "";
-  display: block;
-  border-top: 1px solid var(--color-texto-suave);
-}
-
+/* Lista con filete entre filas: 7,5 px a cada lado de un borde de 1 px. */
 .ficha {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s3-texto-hueco);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -407,42 +309,57 @@
 .dato {
   display: flex;
   align-items: center;
-  gap: var(--s3-texto-hueco);
+  gap: 8px;
+  padding-block: 7.5px;
   color: var(--color-texto-suave);
 }
 
+.dato:first-child {
+  padding-top: 0;
+}
+
+.dato:last-child {
+  padding-bottom: 0;
+}
+
+.dato + .dato {
+  border-top: 1px solid #ddd;
+}
+
 .icono {
-  display: grid;
   flex: 0 0 auto;
-  place-items: center;
-  width: var(--s3-icono-caja);
-  height: calc(var(--s3-icono-caja) + 1px);
-  border-radius: 80px;
-  background: var(--color-marca-tenue);
+  width: 16px;
+  height: 16px;
   color: var(--color-marca);
 }
 
-.icono svg {
-  width: var(--s3-icono);
-  height: var(--s3-icono);
-}
-
-/* En ux-9 es un <strong> a peso 400: más que el 300 del valor, no negrita. */
+/* En el diseño es un <b>; pintado se ve a peso normal frente al 300 del valor. */
 .etiquetaDato {
   font-weight: 400;
 }
 
-/* --- Botones --------------------------------------------------------------- */
+/* Los botones, abajo del todo: las tarjetas de una fila miden lo mismo. */
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: var(--s3-botones-arriba);
+}
+
+/* --- Botones ------------------------------------------------------------------ */
 
 .boton {
   display: inline-flex;
   align-items: center;
-  gap: var(--s3-boton-hueco);
+  gap: 12px;
   padding: var(--boton-relleno);
   border: var(--boton-borde) solid var(--color-marca);
   border-radius: var(--s3-radio);
   background: var(--color-marca);
   color: var(--color-fondo);
+  white-space: nowrap;
   text-decoration: none;
   transition:
     background-color 0.3s,
@@ -450,8 +367,8 @@
 }
 
 .boton svg {
-  width: var(--s3-boton-icono);
-  height: var(--s3-boton-icono);
+  width: 1em;
+  height: 1em;
 }
 
 .boton:hover {
@@ -459,19 +376,19 @@
   background: var(--color-texto);
 }
 
+.botonOscuro {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.botonOscuro:hover {
+  border-color: var(--color-marca);
+  background: var(--color-marca);
+}
+
 .boton:focus-visible {
   outline: 3px solid var(--color-texto);
   outline-offset: 3px;
-}
-
-.botonIzq .boton {
-  gap: 12px;
-}
-
-.botonTarjeta {
-  align-self: flex-start;
-  margin-top: 20px;
-  border: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -479,23 +396,8 @@
     animation: none;
   }
 
-  .img,
+  .pestana,
   .boton {
     transition: none;
   }
-
-  .img:hover {
-    transform: none;
-  }
 }
-@media (max-width: 767px) {
-  .tituloUsada {
-    box-sizing: border-box;
-    padding-inline: 20px;
-  }
-}
-
-/*
- * TÍTULOS ANIMADOS: los manda el DISEÑO (export 2516), no la web publicada
- * (decisión de dirección del 2026-10-05, decisiones-home-ux9.md §27.1).
- */

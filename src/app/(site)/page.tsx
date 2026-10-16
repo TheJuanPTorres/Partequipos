@@ -12,12 +12,7 @@ import { SeccionSedes } from "@/components/portada/SeccionSedes";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { diapositivasDeHero } from "@/lib/portada/hero";
-import {
-  SLUG_EXCAVADORAS,
-  hrefDeCategoriaUsada,
-  pestanasDeUsada,
-  tarjetasDeMarcas,
-} from "@/lib/portada/secciones";
+import { RUTA_USADA, pestanasDeUsada, tarjetasDeMarcas } from "@/lib/portada/secciones";
 import { logosDeMarcas, tarjetasDeRepuestos } from "@/lib/portada/seccionesE";
 import { videoDeCompania, videoDeYouTube } from "@/lib/portada/seccionesF";
 import { preguntasDeFaq, tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
@@ -25,11 +20,7 @@ import { sedesDePortada, tokenMapbox } from "@/lib/portada/sedes";
 import { getCategoriasTecnicasDePortada } from "@/lib/queries/getCategoriasTecnicas";
 import { getPreguntasDePortada, getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getVideoPorId } from "@/lib/queries/getVideos";
-import {
-  getCategoriaUsadaPorSlug,
-  getEquiposUsadosDePortada,
-  getMarcasDePortada,
-} from "@/lib/queries/getMaquinaria";
+import { getEquiposUsadosDePortada, getMarcasDePortada } from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
@@ -71,7 +62,6 @@ export default async function HomePage() {
   const [
     marcas,
     usados,
-    excavadoras,
     categoriasTecnicas,
     testimonios,
     preguntas,
@@ -82,7 +72,6 @@ export default async function HomePage() {
   ] = await Promise.all([
     getMarcasDePortada(),
     getEquiposUsadosDePortada(),
-    getCategoriaUsadaPorSlug(SLUG_EXCAVADORAS),
     getCategoriasTecnicasDePortada(),
     getTestimoniosDePortada(),
     getPreguntasDePortada(),
@@ -138,7 +127,7 @@ export default async function HomePage() {
           aditamentos: usada?.pestanaAditamentos,
         })}
         maquina={maquinaUsada ? { ...maquinaUsada, alt: "" } : null}
-        hrefExcavadoras={excavadoras ? hrefDeCategoriaUsada(excavadoras.slug) : null}
+        hrefVerTodo={RUTA_USADA}
         textos={{
           antetitulo: tx(usada?.antetitulo),
           titulo: tx(usada?.titulo),

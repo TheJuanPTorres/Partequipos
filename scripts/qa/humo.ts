@@ -74,9 +74,19 @@ async function comprobar(ruta: Ruta): Promise<Resultado> {
         // `manual`: seguir un 3xx escondería que la protección no se derivó.
         redirect: "manual",
       });
-      resultado = { estado: respuesta.status, intentos, ruta: ruta.ruta };
+      resultado = {
+        esperado: ruta.esperado,
+        estado: respuesta.status,
+        intentos,
+        ruta: ruta.ruta,
+      };
     } catch (error) {
-      resultado = { error: (error as Error).message, intentos, ruta: ruta.ruta };
+      resultado = {
+        error: (error as Error).message,
+        esperado: ruta.esperado,
+        intentos,
+        ruta: ruta.ruta,
+      };
     }
 
     if (!debeReintentar(resultado)) {
@@ -102,7 +112,7 @@ const v = veredicto(resultados);
 v.lineas.forEach((l) => console.log(l));
 
 if (v.codigo === 0) {
-  console.log(`\n✓ Las ${v.total} rutas responden 200.`);
+  console.log(`\n✓ Las ${v.total} rutas responden lo esperado.`);
   process.exit(0);
 }
 
@@ -110,7 +120,9 @@ console.error(`\n✗ FALLÓ la prueba de humo: ${v.fallos.length} de ${v.total} 
 for (const fallo of v.fallos) {
   const ruta = rutas.find((r) => r.ruta === fallo.ruta);
   const detalle =
-    fallo.error !== undefined ? `error de red (${fallo.error})` : `HTTP ${fallo.estado}`;
+    fallo.error !== undefined
+      ? `error de red (${fallo.error})`
+      : `HTTP ${fallo.estado} (se esperaba ${fallo.esperado ?? 200})`;
   console.error(`  · ${fallo.ruta} → ${detalle} tras ${fallo.intentos} intento(s)`);
   console.error(`    Está en la lista porque ${ruta?.motivo}`);
 }

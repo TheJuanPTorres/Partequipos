@@ -26,10 +26,11 @@
   --s2-carrusel-relleno: 10px;
   --s2-diapositiva-relleno: 10px;
   --s2-entre-diapositivas: 10px;
-  --s2-por-vista: 3;
+  --s2-por-vista: 4;
+  --s2-texto: 16px;
 
-  /* Tarjeta: alto mínimo 30vh, radio 30, relleno 10; contenido abajo. */
-  --s2-tarjeta-alto: 30vh;
+  /* Tarjeta: alto mínimo 450 px (Home V2), radio 30, relleno 10; contenido abajo. */
+  --s2-tarjeta-alto: 450px;
   --s2-tarjeta-relleno: 10px;
   /* Velo: degradado blanco → #535353 al 81 % en MULTIPLICAR. */
   --s2-velo: linear-gradient(#fff 0%, #535353 100%);
@@ -37,16 +38,12 @@
   /* Fila logo 30 % / texto 70 %, hueco 20, 10 px de relleno en cada columna. */
   --s2-logo-col: 30%;
   --s2-logo-max: 120px;
+  --s2-logo-movil: 70px;
   --s2-logo-radio: 10px;
   --s2-col-relleno: 10px;
 
-  /* Flechas: chevron de 25 px en gris claro al 90 %. Puntos de 6 px. */
-  --s2-flecha: 25px;
-  --s2-flecha-color: rgb(238 238 238 / 90%);
-  /* Su centro queda 7 px por ENCIMA del de la tarjeta (medido a 1440). */
-  --s2-flecha-desfase: -7px;
+  /* Puntos de 6 px; sin flechas en la Home V2. */
   --s2-punto: 6px;
-  --s2-punto-margen: 6px;
   --s2-puntos-arriba: 10px;
 
   /* Botón «Ver todo»: radio 30, borde 1 px rojo; icono y hueco de 12. */
@@ -66,6 +63,7 @@
 @media (max-width: 1024px) {
   .seccion {
     --s2-por-vista: 2;
+    --s2-texto: 14px;
     --s2-boton-icono: 13px;
   }
 }
@@ -73,6 +71,7 @@
 @media (max-width: 767px) {
   .seccion {
     --s2-por-vista: 1;
+    --s2-texto: 13px;
   }
 }
 
@@ -95,39 +94,45 @@
   color: var(--color-texto);
 }
 
-/* --- Carrusel ----------------------------------------------------------- */
+/* --- Carrusel (Home V2 de Andrés, 2026-10-15) ----------------------------- */
 
+/*
+ * Medido en la referencia pintada (partequipos.uxdesign.website) a 390 · 1010
+ * · 1440: 4 · 2 · 1 tarjetas a la vista, 450 px de alto, 30 px entre tarjetas
+ * (10 de relleno por lado y 10 de hueco), el logo encima del texto y a la
+ * izquierda (a 30 px del borde de la diapositiva), texto 16 · 14 · 13 px en
+ * peso 300 con interlineado 1,4, puntos de 6 px. Avanza solo cada 5 s en 0,5 s.
+ */
 .carrusel {
   position: relative;
   padding: var(--s2-carrusel-relleno);
 }
 
 .marco {
-  position: relative;
+  overflow: hidden;
+  /* El gesto horizontal lo lleva el carrusel; el vertical sigue siendo de la página. */
+  touch-action: pan-y;
 }
 
 .pista {
+  --s2-paso: calc((100% + var(--s2-entre-diapositivas)) / var(--s2-por-vista));
   display: flex;
   gap: var(--s2-entre-diapositivas);
   margin: 0;
   padding: 0;
   list-style: none;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  /* La barra de desplazamiento no está en ux-9; el gesto y las flechas, sí. */
-  scrollbar-width: none;
+  transform: translateX(calc(var(--indice, 0) * var(--s2-paso) * -1));
+  transition: transform 0.5s ease;
 }
 
-.pista::-webkit-scrollbar {
-  display: none;
+.sinTransicion {
+  transition: none;
 }
 
 .diapositiva {
   flex: 0 0
     calc((100% - (var(--s2-por-vista) - 1) * var(--s2-entre-diapositivas)) / var(--s2-por-vista));
-  padding: var(--s2-diapositiva-relleno);
-  scroll-snap-align: start;
+  padding: 0 var(--s2-diapositiva-relleno);
 }
 
 .tarjeta {
@@ -162,16 +167,12 @@
 
 .tarjeta:focus-visible {
   outline: 3px solid var(--color-marca);
-  outline-offset: 3px;
+  outline-offset: -3px;
 }
 
-.fila {
-  display: flex;
-  gap: var(--s2-gap);
-}
-
+/* Logo encima del texto, a la izquierda: columna del 30 % con 10 px de relleno. */
 .logoCol {
-  flex: 0 0 calc((100% - var(--s2-gap)) * 0.3);
+  width: var(--s2-logo-col);
   padding: var(--s2-col-relleno);
 }
 
@@ -183,97 +184,80 @@
   border-radius: var(--s2-logo-radio);
 }
 
-.textoCol {
-  flex: 1 1 0;
-  min-width: 0;
-  padding: var(--s2-col-relleno);
-}
-
 .texto {
-  margin: 0 0 0.9em;
+  margin: 0;
+  padding: var(--s2-col-relleno);
+  font-size: var(--s2-texto);
+  font-weight: 300;
+  line-height: 1.4;
 }
 
-/* Móvil: el logo encima, centrado a 120 px; el texto debajo a todo el ancho. */
+/* Móvil: el logo a 70 px, igual a la izquierda. */
 @media (max-width: 767px) {
-  .fila {
-    flex-direction: column;
-  }
-
   .logoCol {
-    flex-basis: auto;
-    display: flex;
-    justify-content: center;
+    width: auto;
   }
 
   .logo {
-    width: var(--s2-logo-max);
+    width: var(--s2-logo-movil);
   }
 }
 
-.flecha {
-  position: absolute;
-  top: calc(50% + var(--s2-flecha-desfase));
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: var(--s2-flecha);
-  height: var(--s2-flecha);
-  margin-top: calc(var(--s2-flecha) / -2);
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--s2-flecha-color);
-  cursor: pointer;
-}
-
-.flecha svg {
-  width: 100%;
-  height: 100%;
-}
-
-.flecha:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-
-.flecha:focus-visible {
-  outline: 2px solid var(--color-marca);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-.anterior {
-  left: 0;
-}
-
-.siguiente {
-  right: 0;
-}
-
-/*
- * DESVIACIÓN (D8): los puntos son INDICADOR, no botones. En ux-9 se pueden
- * pulsar, pero miden 6 px con 18 px entre centros: por debajo del mínimo de
- * 24 px de WCAG 2.5.8 sin forma de cumplirlo sin cambiar su aspecto. Las
- * flechas y el gesto ya navegan.
- */
-.puntos {
+/* Puntos y pausa, debajo y centrados. */
+.controles {
   display: flex;
   justify-content: center;
-  min-height: var(--s2-punto);
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
   margin-top: var(--s2-puntos-arriba);
 }
 
+.puntos {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * DESVIACIÓN: en el diseño los puntos miden 6 px con 18 px entre centros. Aquí
+ * son botones de 24 px (WCAG 2.5.8) con el mismo punto de 6 px dibujado dentro:
+ * se ven igual, a 24 px entre centros.
+ */
 .punto {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.punto::before {
+  content: "";
   width: var(--s2-punto);
   height: var(--s2-punto);
-  margin: 0 var(--s2-punto-margen);
   border-radius: 50%;
   background: #000;
   opacity: 0.2;
 }
 
-.puntoActivo {
+.punto[aria-current="true"]::before {
   opacity: 1;
+}
+
+.punto:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: -2px;
+  border-radius: 50%;
+}
+
+.pausa {
+  width: 24px;
+  height: 24px;
 }
 
 /* --- Botón ---------------------------------------------------------------- */
@@ -323,7 +307,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pista {
-    scroll-behavior: auto;
+    transition: none;
   }
 
   .boton {

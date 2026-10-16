@@ -1,4 +1,6 @@
-import type { Access, FieldAccess } from "payload";
+import type { Access, FieldAccess, Where } from "payload";
+
+import { tokenDeLecturaValido } from "./lecturaApi";
 
 /**
  * Roles del panel y control de acceso derivado.
@@ -42,8 +44,27 @@ export function esPersonal(user: unknown): boolean {
 
 // --- Access de colección -----------------------------------------------------
 
-/** Lectura pública: catálogo y contenido que el sitio publica igualmente. */
-export const publico: Access = () => true;
+/**
+ * Lectura del contenido que el sitio publica (catálogo, páginas, globales).
+ *
+ * Hasta el 2026-10-15 era `() => true`: la API REST y GraphQL servían todo sin
+ * sesión. Ahora, por la API, solo el personal del panel o quien traiga el
+ * token de lectura (`lecturaApi.ts`). El sitio no cambia: lee con la API
+ * local, que no evalúa este acceso.
+ */
+export const lecturaContenido: Access = ({ req }) =>
+  esPersonal(usuario(req)) || tokenDeLecturaValido(req.headers);
+
+/**
+ * Lectura con filtro para el público (testimonios y preguntas): el personal ve
+ * todo; con el token, solo lo que filtra `consulta`; sin nada, nada.
+ */
+export function lecturaFiltrada(consulta: Where): Access {
+  return ({ req }) => {
+    if (esPersonal(usuario(req))) return true;
+    return tokenDeLecturaValido(req.headers) ? consulta : false;
+  };
+}
 
 /** Solo personal autenticado. */
 export const soloPersonal: Access = ({ req }) => esPersonal(usuario(req));

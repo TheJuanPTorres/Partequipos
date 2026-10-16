@@ -4,7 +4,7 @@ import { seoField } from "../lib/fields/seoField";
 
 import { slugField } from "../lib/fields/slugField";
 import { revalidarMarca, revalidarMarcaBorrada } from "./hooks/revalidateHooks";
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMegamenu } from "./hooks/megamenuHooks";
 
 const menu = revalidarMegamenu("marcas");
@@ -24,7 +24,7 @@ export const Marca: CollectionConfig = {
     group: "Repuestos",
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

@@ -2,7 +2,7 @@ import type { GlobalConfig } from "payload";
 
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { revalidarTodoElSitio } from "../lib/revalidation";
-import { escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 
 /**
  * CABECERA DEL SITIO, editable (ux-9, export 2162: el «megamenú» de Unlimited
@@ -19,7 +19,7 @@ export const Cabecera: GlobalConfig = {
     group: "Partes del sitio",
     description: "Menú y botón de la cabecera de todas las páginas.",
   },
-  access: { read: publico, update: escrituraContenido },
+  access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
     afterChange: [
       ({ doc }) => {

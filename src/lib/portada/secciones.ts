@@ -1,4 +1,4 @@
-import type { CategoriasUsada, EquiposUsado, MarcasMaquinaria } from "@/payload-types";
+import type { CategoriasUsada, Documento, EquiposUsado, MarcasMaquinaria } from "@/payload-types";
 
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 
@@ -14,8 +14,8 @@ export const RUTA_USADA = "/maquinaria-pesada/maquinaria-pesada-usada/";
 /** La categoría que lleva pestaña propia y el botón «Ver todas las excavadoras». */
 export const SLUG_EXCAVADORAS = "excavadoras";
 
-/** ux-9 enseña dos tarjetas por pestaña (seis en tres pestañas). */
-export const TARJETAS_POR_PESTANA = 2;
+/** La Home V2 enseña tres tarjetas por pestaña, en fila en escritorio y tablet. */
+export const TARJETAS_POR_PESTANA = 3;
 
 // --- Sección 2: tarjetas de marca -------------------------------------------
 
@@ -63,33 +63,17 @@ export type DatoFicha = { clave: "peso" | "potencia" | "motor"; etiqueta: string
 
 export type TarjetaEquipo = {
   id: number;
-  /** «Excavadora Hitachi»: la primera línea, en mayúsculas por diseño. */
-  principal: string;
-  /** «ZX75US-7»: la segunda línea. */
-  modelo: string | null;
+  /** El nombre entero («Excavadora Hitachi ZX350H-5B 2016»), en una línea como la Home V2. */
+  nombre: string;
   imagen: ImagenLista | null;
   ficha: DatoFicha[];
-  /** El equipo usado no tiene URL propia (ADR 0007): se enlaza su categoría. */
+  /** El equipo usado no tiene URL propia (ADR 0007): «Ver más» lleva a su categoría. */
   href: string;
+  /** URL del PDF de la unidad; sin él, la tarjeta no pinta «Ficha técnica». */
+  fichaPdf: string | null;
 };
 
 export type Pestana = { clave: string; etiqueta: string; equipos: TarjetaEquipo[] };
-
-/**
- * El nombre se parte en dos líneas como en ux-9 («EXCAVADORA HITACHI» /
- * «ZX75US-7»). Si el nombre ACABA en el modelo, se le quita; si no, el nombre
- * va entero y el modelo debajo. Nada se inventa: sin modelo, una sola línea.
- */
-export function lineasDeNombre(
-  nombre: string,
-  modelo: string | null | undefined,
-): { principal: string; modelo: string | null } {
-  const n = nombre.trim();
-  const m = modelo?.trim() || null;
-  if (!m) return { principal: n, modelo: null };
-  const sinModelo = n.toLowerCase().endsWith(m.toLowerCase()) ? n.slice(0, -m.length).trim() : n;
-  return { principal: sinModelo || n, modelo: m };
-}
 
 const numero = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 1 });
 
@@ -156,14 +140,13 @@ export function pestanasDeUsada(
     const categoria = poblado<CategoriasUsada>(e.categoria);
     const nombre = e.nombre?.trim();
     if (!categoria?.slug || !nombre) continue;
-    const { principal, modelo } = lineasDeNombre(nombre, e.modelo);
     const tarjeta: TarjetaEquipo = {
       id: e.id,
-      principal,
-      modelo,
+      nombre,
       imagen: imagenDeMedia(Array.isArray(e.imagenes) ? e.imagenes[0] : null, nombre),
       ficha: fichaDeEquipo(e),
       href: hrefDeCategoriaUsada(categoria.slug),
+      fichaPdf: poblado<Documento>(e.fichaTecnicaPdf)?.url || null,
     };
     if (e.pestanaPortada === "aditamentos") {
       aditamentos.push(tarjeta);

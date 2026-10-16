@@ -657,6 +657,10 @@ export interface EquiposUsado {
   descripcion?: string | null;
   imagenes?: (number | Media)[] | null;
   /**
+   * Opcional. Sale como «Ficha técnica» en la tarjeta de la portada. Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 30 MB) o elige uno ya subido en «Documentos».
+   */
+  fichaTecnicaPdf?: (number | null) | Documento;
+  /**
    * Al venderse, desmarcar en vez de borrar: conserva el historial y permite deshacer.
    */
   disponible?: boolean | null;
@@ -961,7 +965,19 @@ export interface Pagina {
     diapositivas?:
       | {
           /**
-           * Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas.
+           * Desmárcalo para dejar la foto limpia. El título sigue siendo obligatorio: no se ve, pero lo leen los lectores de pantalla y nombra la diapositiva.
+           */
+          mostrarTitulo?: boolean | null;
+          /**
+           * El texto que gira. Desmarcado, no se pinta aunque esté escrito.
+           */
+          mostrarTextoCircular?: boolean | null;
+          /**
+           * El recuadro de vidrio con el párrafo y el «+». Desmarcado, no se pinta ninguno de los dos.
+           */
+          mostrarDescripcion?: boolean | null;
+          /**
+           * Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas. Obligatorio aunque esté oculto: lo usan los lectores de pantalla.
            */
           titulo: string;
           /**
@@ -1024,11 +1040,14 @@ export interface Pagina {
     pestanaExcavadoras?: string | null;
     pestanaOtros?: string | null;
     pestanaAditamentos?: string | null;
+    /**
+     * Lleva al listado de la categoría del equipo (las unidades usadas no tienen página propia).
+     */
     verProductoTexto?: string | null;
     marcasTitulo?: string | null;
     marcasTexto?: string | null;
     /**
-     * El botón lleva a la categoría «excavadoras» de usados.
+     * El botón lleva al índice de maquinaria usada.
      */
     botonTexto?: string | null;
   };
@@ -2013,6 +2032,7 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
   motor?: T;
   descripcion?: T;
   imagenes?: T;
+  fichaTecnicaPdf?: T;
   disponible?: T;
   pestanaPortada?: T;
   actualizadoPor?: T;
@@ -2213,6 +2233,9 @@ export interface PaginasSelect<T extends boolean = true> {
         diapositivas?:
           | T
           | {
+              mostrarTitulo?: T;
+              mostrarTextoCircular?: T;
+              mostrarDescripcion?: T;
               titulo?: T;
               tituloArriba?: T;
               tituloAbajo?: T;

@@ -606,7 +606,17 @@ const datosPortada = todo
           img(p.faqImagen),
         ),
       },
-      seo: { ...antes.seo, metaDescription: p.metaDescripcion },
+      seo: {
+        ...antes.seo,
+        // La imagen al compartir: la de antes, salvo que se haya elegido otra en el panel.
+        ogImage: await oElegido(
+          "portada: imagen al compartir",
+          grupo(portada, "seo").ogImage,
+          antes.seo?.ogImage,
+          idDe(antes.seo?.ogImage),
+        ),
+        metaDescription: p.metaDescripcion,
+      },
     }
   : null;
 
@@ -725,6 +735,18 @@ const bloquesNosotros =
       ]
     : [];
 
+const ogNosotros =
+  todo && nosotros
+    ? await oElegido(
+        "Nosotros: imagen al compartir",
+        grupo(nosotros, "seo").ogImage,
+        (manifiesto.antes!.nosotros?.datos.seo as Record<string, unknown> | undefined)?.ogImage,
+        idDe(
+          (manifiesto.antes!.nosotros?.datos.seo as Record<string, unknown> | undefined)?.ogImage,
+        ),
+      )
+    : null;
+
 const informe = {
   destino,
   solo: SOLO ?? "todo",
@@ -833,6 +855,7 @@ if (todo) {
         bloques: bloquesNosotros,
         seo: {
           ...((manifiesto.antes!.nosotros?.datos.seo as object) ?? {}),
+          ogImage: ogNosotros,
           metaDescription: n.metaDescripcion,
         },
       } as never,

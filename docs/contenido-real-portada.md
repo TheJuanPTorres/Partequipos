@@ -118,9 +118,10 @@ Ni se sustituye ni se vacía. La simulación las lista en `conservadosDelPanel` 
 - las fotos de las categorías;
 - la imagen decorativa del pie;
 - las fotos de las sedes;
-- las imágenes, el vídeo y la animación de Nosotros.
+- las imágenes, el vídeo y la animación de Nosotros;
+- la imagen al compartir (`seo.ogImage`) de la portada y de Nosotros.
 
-**Lo que NO cubre:** los TEXTOS. En el modo completo se vuelven a escribir los de la portada, las marcas, las sedes y Nosotros. Además, se borra una sede que no esté en la fuente.
+**Lo que NO cubre:** los TEXTOS. En el modo completo se vuelven a escribir los de la portada, las marcas, las sedes y Nosotros. Además, se borra una sede que no esté en la fuente, y los bloques de Nosotros se sustituyen enteros: un bloque añadido en el panel se perdería.
 
 **`solo=categorias`:** solo las categorías técnicas de la portada y las fotos que usan. No toca marcas, portada, pie, sedes ni Nosotros. Es el modo de la segunda pasada para las 10 categorías.
 

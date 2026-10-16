@@ -176,8 +176,13 @@ los datos):
   llevando a la categoría.
 - **Redirecciones:** `npm run preview:usados:redirects-simular | redirects |
 redirects-retirar` leen el slug de la base y el `enlace` de la fuente.
-  Idempotentes, con manifiesto propio. En el sitio publicado, junto al
-  importador.
+  Idempotentes, con manifiesto propio. En el sitio publicado (donde las 128
+  ya estaban desde el 2026-10-14), con `runbook-importar-aditamentos-lanzamiento.md`.
+- **El importador pone la dirección web (2026-10-16):** cada unidad se crea
+  con el `slug` de `direccionesDeUnidades`, calculado sobre todas. Una unidad
+  ya importada la conserva al actualizarla y, si no coincide, se avisa.
+  - **Las 128 de hoy** (preview y sitio publicado) la recibieron por SQL de la migración del #193: las repetidas llevan el id de la base, no el de WordPress.
+  - Los 301 leen la base, así que apuntan a lo que se sirve (`docs/aditamentos-importacion.md` §4).
 - **Hay que redesplegar** tras importar (el script no revalida).
 
 ## 8. Lo que NO se hace todavía

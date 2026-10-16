@@ -240,6 +240,7 @@ Hay dos salidas, y hay que elegir una:
 - **Retirada:** `Desktop\partequipos-cierre\runbook-retirada-demo-produccion.md`. Deshace exactamente la copia y está probado de punta a punta (§10.38). **Requisito: el PR #157, en `main` desde el 2026-10-14 (`e3b46e3`).**
   - **Final:** `demo-copia en media 0`, los ficheros del manifiesto en **404** pasados 60–70 s (§10.32), y la home pinta sin huecos.
 - 🟥 **CLIENTE: confirmación escrita de las licencias** L1–L5, los logos de fabricantes y la autorización de los testimonios. Se guarda fuera del repositorio y se anota en §10.38 como **cerrada**.
+  - **Desde el 2026-10-16, también:** las fotos de los **aditamentos** importados de WordPress. Varias parecen de catálogo de fabricante (Okada, NPK, CASE, Link Belt). Detalle en `docs/aditamentos-importacion.md` §5.
 
 **Contenido de EJEMPLO:** se retira **en los dos casos** (fichas «EJEMPLO
 UX-9 —», testimonios, sedes y preguntas).

@@ -184,6 +184,10 @@ oficial, no lo pongas.
   sin año, por ejemplo, no sale al filtrar por año.
 - **«Marca»** es una lista: elige la marca. Si no está, créala ahí mismo con
   el **«+»**; tendrá su propia página. El **modelo** es texto libre.
+- **«Ficha técnica (PDF)»** es opcional. Con un PDF, la tarjeta de la unidad
+  en la portada muestra el botón **«Ficha técnica»**; sin él, el botón no
+  sale. En la portada salen las tres unidades disponibles modificadas más
+  recientemente de cada pestaña (Excavadoras, Otros y Aditamentos).
 - **Maquinaria → Marcas de maquinaria usada:** cada marca tiene su página
   (`…/maquinaria-pesada-usada/marcas/<marca>/`), con sus unidades
   disponibles. Puedes escribir su descripción, su SEO y, si la vendemos

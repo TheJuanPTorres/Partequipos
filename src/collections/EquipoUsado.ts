@@ -154,6 +154,21 @@ export const EquipoUsado: CollectionConfig = {
       admin: { components: { Cell: "/components/admin/celdas/CeldaMiniatura" } },
     },
     /*
+     * PDF de la unidad (Home V2, sección «Maquinaria pesada usada»): la tarjeta
+     * de la portada pinta «Ficha técnica» SOLO si lo hay. Los PDF van en
+     * `documentos`, nunca en `Media` (CLAUDE.md §10.28).
+     */
+    {
+      name: "fichaTecnicaPdf",
+      type: "upload",
+      relationTo: "documentos",
+      label: "Ficha técnica (PDF)",
+      admin: {
+        description:
+          "Opcional. Sale como «Ficha técnica» en la tarjeta de la portada. Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 30 MB) o elige uno ya subido en «Documentos».",
+      },
+    },
+    /*
      * Sin precio a propósito: la venta de maquinaria pesada es por cotización y
      * publicar una cifra desactualizada es peor que no publicarla. Si el negocio
      * decide mostrarlo, se añade entonces con su moneda y su vigencia.

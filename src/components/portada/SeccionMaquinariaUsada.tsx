@@ -1,4 +1,4 @@
-import { IconEngine, IconFileText, IconGauge, IconSettings, IconWeight } from "@tabler/icons-react";
+import { IconEngine, IconGauge, IconSettings, IconWeight } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,19 +11,22 @@ import estilos from "./maquinariaUsada.module.css";
 import { PestanasUsada } from "./diferidos";
 
 /**
- * SECCIÓN 3 DE LA PORTADA — «Maquinaria pesada usada» (ux-9).
+ * «MAQUINARIA PESADA USADA» DE LA PORTADA — Home V2 de Andrés (2026-10-15),
+ * secciones 3 (cabecera) y 4 (pestañas) de `elementor-3519`.
  *
  * Componente de SERVIDOR: las tarjetas se pintan aquí y llegan ya hechas a las
- * pestañas (cliente). Los textos de la sección son de interfaz; las tarjetas
- * salen de `equipos-usados` y la máquina decorativa, de la portada en Payload.
+ * pestañas (cliente). Los textos son del panel (página «inicio»); las
+ * tarjetas, de `equipos-usados`; la máquina decorativa, de la portada.
  *
- * Lo que se aparta de ux-9 (docs/diseno/decisiones-home-ux9.md §11):
- * - D1: los dos títulos en `<h2>`, la frase en `<p>` y el nombre de cada
- *   tarjeta en `<h3>` (en ux-9: `<div>`, `<h2>` y `<h2>`).
- * - D5: en móvil la tarjeta se apila (ver el CSS).
- * - D6: iconos de Tabler en vez de los de Flaticon, pendientes de licencia (L2).
- * - D10: en móvil siguen siendo pestañas, no acordeón (ver el CSS).
- * - D11: sin pestaña «Aditamentos»: no tiene fuente en la línea usada.
+ * Lo que se aparta del diseño (docs/diseno/decisiones-home-ux9.md §32):
+ * - El título en `<h2>` y el subtítulo y la frase en `<p>` (en el diseño,
+ *   `<div>` y `<h3>`); el nombre de cada tarjeta en `<h3>`.
+ * - D10: en móvil siguen siendo pestañas, no acordeón.
+ * - Las tres pestañas con tarjetas verticales (el diseño solo rediseña la
+ *   primera; «Otros» y «Aditamentos» conservan las de ux-9), por petición de
+ *   dirección.
+ * - «Ficha técnica» solo si la unidad tiene PDF; sin él, no se pinta.
+ * - Iconos de Tabler en vez de los de Flaticon (L2).
  */
 
 const ICONOS: Record<DatoFicha["clave"], typeof IconWeight> = {
@@ -32,8 +35,8 @@ const ICONOS: Record<DatoFicha["clave"], typeof IconWeight> = {
   motor: IconEngine,
 };
 
-/** Ancho pintado de la imagen de la tarjeta: 96 % de su columna. */
-const SIZES_TARJETA = "(max-width: 767px) 90vw, (max-width: 1024px) 150px, 230px";
+/** Ancho pintado de la foto: la tarjeta menos su relleno (1 columna en móvil, 3 en el resto). */
+const SIZES_TARJETA = "(max-width: 767px) calc(100vw - 93px), calc(32vw - 76px)";
 
 /** `idNombre` sale de la posición, no del id de la base: no se exponen ids (CLAUDE.md §8). */
 function Tarjeta({
@@ -47,52 +50,60 @@ function Tarjeta({
 }) {
   return (
     <article className={estilos.tarjeta} aria-labelledby={idNombre}>
-      {/* Sin foto no se reserva su columna: el texto ocupa la tarjeta. */}
+      {/* Sin foto no se reserva su hueco: el texto sube. */}
       {equipo.imagen ? (
-        <div className={estilos.imgCol}>
+        <div className={estilos.foto}>
           <Image
             src={equipo.imagen.url}
             alt={equipo.imagen.alt}
-            width={equipo.imagen.width}
-            height={equipo.imagen.height}
+            fill
             sizes={SIZES_TARJETA}
             className={estilos.img}
+            style={{ objectPosition: equipo.imagen.posicion }}
           />
         </div>
       ) : null}
-      <div className={estilos.textoCol}>
-        <h3 id={idNombre} className={estilos.nombre}>
-          <span className={estilos.principal}>{equipo.principal}</span>
-          {equipo.modelo ? (
-            <span className={`${estilos.modelo} texto-etiqueta`}>{equipo.modelo}</span>
-          ) : null}
-        </h3>
-        <div className={estilos.filete} aria-hidden="true" />
-        {equipo.ficha.length > 0 ? (
-          <ul className={estilos.ficha}>
-            {equipo.ficha.map((d) => {
-              const Icono = ICONOS[d.clave];
-              return (
-                <li key={d.clave} className={`${estilos.dato} texto-cuerpo`}>
-                  <span className={estilos.icono} aria-hidden="true">
-                    <Icono focusable="false" stroke={1.75} />
-                  </span>
-                  <span>
-                    <span className={estilos.etiquetaDato}>{d.etiqueta}:</span> {d.valor}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+      <h3 id={idNombre} className={`${estilos.nombre} texto-destacado-negrita`}>
+        {equipo.nombre}
+      </h3>
+      {equipo.ficha.length > 0 ? (
+        <ul className={estilos.ficha}>
+          {equipo.ficha.map((d) => {
+            const Icono = ICONOS[d.clave];
+            return (
+              <li key={d.clave} className={`${estilos.dato} texto-cuerpo`}>
+                <Icono
+                  aria-hidden="true"
+                  focusable="false"
+                  stroke={1.75}
+                  className={estilos.icono}
+                />
+                <span>
+                  <span className={estilos.etiquetaDato}>{d.etiqueta}:</span> {d.valor}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+      <div className={estilos.botones}>
+        {verTexto ? (
+          <Link
+            href={equipo.href}
+            aria-describedby={idNombre}
+            className={`${estilos.boton} texto-etiqueta`}
+          >
+            {verTexto}
+          </Link>
         ) : null}
-        <Link
-          href={equipo.href}
-          aria-describedby={idNombre}
-          className={`${estilos.boton} ${estilos.botonTarjeta} texto-etiqueta`}
-        >
-          <IconFileText aria-hidden="true" focusable="false" stroke={1.75} />
-          {verTexto}
-        </Link>
+        {equipo.fichaPdf ? (
+          <a
+            href={equipo.fichaPdf}
+            className={`${estilos.boton} ${estilos.botonOscuro} texto-etiqueta`}
+          >
+            Ficha técnica<span className="sr-only"> de {equipo.nombre} (PDF)</span>
+          </a>
+        ) : null}
       </div>
     </article>
   );
@@ -110,21 +121,18 @@ export type TextosUsada = {
 type Props = {
   pestanas: Pestana[];
   maquina: ImagenLista | null;
-  hrefExcavadoras: string | null;
+  hrefVerTodo: string;
   textos: TextosUsada;
 };
 
-export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras, textos }: Props) {
+export function SeccionMaquinariaUsada({ pestanas, maquina, hrefVerTodo, textos }: Props) {
   if (pestanas.length === 0) return null;
   return (
-    <section
-      className={maquina ? `${estilos.seccion} ${estilos.conMaquina}` : estilos.seccion}
-      aria-labelledby="portada-usada-titulo"
-    >
-      <div className={estilos.izq}>
-        {/* Sin máquina no se reserva su sitio: la columna arranca a la altura de la derecha. */}
+    <section className={estilos.seccion} aria-labelledby="portada-usada-titulo">
+      <div className={maquina ? `${estilos.cabecera} ${estilos.conMaquina}` : estilos.cabecera}>
+        {/* Sin máquina no se reserva su columna: los textos ocupan la cabecera. */}
         {maquina ? (
-          <>
+          <div className={estilos.izq}>
             <Image
               src={maquina.url}
               alt=""
@@ -133,57 +141,55 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefExcavadoras, tex
               sizes="(max-width: 767px) 72vw, (max-width: 1024px) min(46vw, 368px), 45vw"
               className={estilos.maquina}
             />
-            <div className={estilos.espacioMaquina} />
-          </>
-        ) : (
-          <div className={estilos.espacioSinMaquina} />
-        )}
-        {textos.marcasTitulo ? (
-          <Revelado
-            adelanto={ADELANTOS.alto}
-            como="h2"
-            texto={textos.marcasTitulo}
-            ritmo="titulo"
-            disparo={0.95}
-            className={`${estilos.tituloMarcas} texto-titulo-bloque`}
-          />
-        ) : null}
-        {textos.marcasTexto ? (
-          <Revelado
-            adelanto={ADELANTOS.alto}
-            como="p"
-            texto={textos.marcasTexto}
-            ritmo="pausado"
-            className={`${estilos.frase} texto-destacado`}
-          />
-        ) : null}
-        {hrefExcavadoras && textos.botonTexto ? (
-          <div className={estilos.botonIzq}>
-            <Link href={hrefExcavadoras} className={`${estilos.boton} texto-etiqueta`}>
-              <IconSettings aria-hidden="true" focusable="false" stroke={1.75} />
-              {textos.botonTexto}
-            </Link>
           </div>
         ) : null}
-        <div className={estilos.espacioFinal} />
+        <div className={estilos.der}>
+          <div className={estilos.espacioDer} />
+          {textos.antetitulo ? (
+            <p className={`${estilos.antetitulo} texto-etiqueta`}>{textos.antetitulo}</p>
+          ) : null}
+          {textos.titulo ? (
+            <Revelado
+              adelanto={ADELANTOS.alto}
+              como="h2"
+              id="portada-usada-titulo"
+              texto={textos.titulo}
+              ritmo="titulo"
+              disparo={0.95}
+              className={`${estilos.titulo} texto-titulo-seccion`}
+            />
+          ) : null}
+          {textos.marcasTitulo ? (
+            <Revelado
+              adelanto={ADELANTOS.alto}
+              como="p"
+              texto={textos.marcasTitulo}
+              ritmo="titulo"
+              disparo={0.95}
+              className={`${estilos.subtitulo} texto-titulo-4`}
+            />
+          ) : null}
+          {textos.marcasTexto ? (
+            <Revelado
+              adelanto={ADELANTOS.alto}
+              como="p"
+              texto={textos.marcasTexto}
+              ritmo="pausado"
+              className={`${estilos.frase} texto-destacado`}
+            />
+          ) : null}
+          {textos.botonTexto ? (
+            <div className={estilos.verTodo}>
+              <Link href={hrefVerTodo} className={`${estilos.boton} texto-etiqueta`}>
+                <IconSettings aria-hidden="true" focusable="false" stroke={1.75} />
+                {textos.botonTexto}
+              </Link>
+            </div>
+          ) : null}
+        </div>
       </div>
 
-      <div className={estilos.der}>
-        <div className={estilos.espacioDer} />
-        {textos.antetitulo ? (
-          <p className={`${estilos.antetitulo} texto-etiqueta`}>{textos.antetitulo}</p>
-        ) : null}
-        {textos.titulo ? (
-          <Revelado
-            adelanto={ADELANTOS.alto}
-            como="h2"
-            id="portada-usada-titulo"
-            texto={textos.titulo}
-            ritmo="titulo"
-            disparo={0.95}
-            className={`${estilos.tituloUsada} texto-titulo-seccion`}
-          />
-        ) : null}
+      <div className={estilos.catalogo}>
         <PestanasUsada
           etiquetadoPor="portada-usada-titulo"
           pestanas={pestanas.map(({ clave, etiqueta }) => ({ clave, etiqueta }))}

@@ -2521,3 +2521,45 @@ ven las primeras tarjetas con sus enlaces; el resto de marcas sigue en «Ver tod
 como foto de tarjeta un logo (`Dynapac-logo-02.jpg`); pasa a la foto del diseño,
 `2025/10/CA25D-CIELO.jpg`, que está en la exportación de WordPress del cliente.
 El orden de las marcas pasa a ser el de la Home V2.
+
+## 32. «Maquinaria pesada usada» de la Home V2 de Andrés (2026-10-15)
+
+Fuente: las secciones 3 (cabecera, `511c5618`) y 4 (pestañas, `a185c47`) del
+export `elementor-3519-2026-10-15.json` y la referencia pintada, medidas a
+390 · 1010 · 1440. Sustituye a §11 en esta sección (D5 y D11 dejan de aplicar).
+
+| Qué             | Home V2 (medido)                                                                                                                                    | Aquí                                                                                                                |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Cabecera        | Máquina a la izquierda (45 %, sube 140 px y baja 69 por fuera; en móvil sube 100); a la derecha antetítulo, título, subtítulo, frase y «Ver todo»   | Igual. La máquina es la del panel («Máquina recortada»)                                                             |
+| «Ver todo»      | Enlace vacío (`#`)                                                                                                                                  | Al índice de maquinaria usada; el texto, del panel                                                                  |
+| Pestañas        | Píldoras centradas (radio 50, relleno 15 · 35), activa en `#2E2E2E`, el resto en el rojo al 9 %                                                     | Igual                                                                                                               |
+| Tarjetas        | 3 verticales en fila en escritorio y tablet, 1 en móvil; radio 30, relleno 25; foto 3:2 con radio 30; nombre, ficha con filetes y dos botones abajo | Igual, con los datos de las unidades disponibles (las 3 últimas actualizadas de cada pestaña)                       |
+| Nombre          | «Hitachi ZX130-7H»                                                                                                                                  | El nombre de la unidad entero (p. ej. «Excavadora Hitachi ZX350H-5B 2016»)                                          |
+| Ficha           | Peso, potencia y motor                                                                                                                              | Lo mismo, omitiendo lo que la unidad no tenga                                                                       |
+| «Ver más»       | —                                                                                                                                                   | Al listado de la categoría de la unidad, como el listado de usados: las unidades no tienen página propia (ADR 0007) |
+| «Ficha técnica» | Siempre                                                                                                                                             | **Solo si la unidad tiene PDF** (campo nuevo «Ficha técnica (PDF)», en `documentos`). Sin PDF, no se pinta          |
+
+**Desviaciones:**
+
+- **Las tres pestañas con tarjetas verticales.** El diseño solo rediseña la
+  primera; «Otros» y «Aditamentos» conservan las tarjetas horizontales de ux-9.
+  Dirección pidió las verticales en las tres.
+- **Tablet, errata para Andrés:** la cabecera pasa a columna, pero los textos
+  conservan su 54 % y quedan a la izquierda, con la mitad derecha vacía (a
+  1010, de x = 10 a 519). Aquí ocupan todo el ancho, alineados a la derecha.
+- **Botones en una línea:** a 1010 el diseño parte «Ver más» y «Ficha técnica»
+  en dos líneas (50 px de alto). Aquí, en una (caben).
+- **El icono de carga** (`Loading_icon.gif`) que el diseño pinta bajo las
+  tarjetas no se replica: no carga nada.
+- **D10 se conserva:** en móvil, pestañas y no acordeón.
+- **Títulos:** el subtítulo y la frase van en `<p>` (en el diseño, `<div>` y
+  `<h3>`): la sección tiene un solo `<h2>` y cada tarjeta, su `<h3>`.
+
+**Panel:** los textos por defecto pasan a «Ver más» y «Ver todo» (la migración
+`20261016_041733_ficha_pdf_usados` cambia la portada solo si conserva
+exactamente los de ux-9: «Ver producto» y «Ver todas las excavadoras»).
+
+**Aditamentos:** la pestaña sale de las unidades marcadas con «Pestaña en la
+portada: Aditamentos». Ninguna de las 128 unidades importadas de WordPress lo
+es, así que con el contenido real esa pestaña no se pinta (en el preview la
+llenan dos unidades de ejemplo de ux-9).

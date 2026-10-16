@@ -18,6 +18,24 @@ export function ficheroReal(clave: string, urlWp: string): string {
 }
 
 /**
+ * ¿Lo eligió alguien en el PANEL? Entonces la importación NO lo pisa (dirección,
+ * 2026-10-16: logos transparentes de las marcas, máquina recortada de usados).
+ *
+ * Es del panel un fichero que no está vacío, que no es de esta importación (sin
+ * `PREFIJO_REAL`) y que no es el que había antes de la primera pasada
+ * (`idAntes`, del manifiesto). Lo vacío, lo propio y lo de antes, sí se
+ * sustituye. Un id que ya no existe (`fichero` null) cuenta como vacío.
+ */
+export function elegidoEnElPanel(
+  actual: { id: number; fichero: string | null } | null,
+  idAntes: number | null,
+): boolean {
+  if (!actual || actual.fichero === null) return false;
+  if (actual.id === idAntes) return false;
+  return !actual.fichero.startsWith(PREFIJO_REAL);
+}
+
+/**
  * Los ficheros de la copia de demostración que aún quedan (imágenes, vídeos o
  * animaciones con su prefijo). En el sitio publicado, el contenido real solo
  * entra cuando no queda ninguno: la retirada de la copia va ANTES.

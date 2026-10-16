@@ -48,6 +48,7 @@ import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 import {
   ENLACES_TARJETAS,
   PREFIJO_REAL,
+  elegidoEnElPanel,
   ficheroReal,
   type FuenteContenidoReal,
   type ManifiestoContenidoReal,
@@ -66,6 +67,11 @@ const fallar = (m: string): never => {
   throw e;
 };
 if (!modo) fallar("indica el modo: simular, importar o retirar");
+// `solo=categorias`: solo las categorías técnicas de la portada (y sus fotos). Así una
+// pasada para añadir categorías no toca marcas, portada, sedes, Nosotros ni el pie.
+const SOLO = valorDe("solo");
+if (SOLO !== undefined && SOLO !== "categorias")
+  fallar(`«solo» solo admite «categorias», no «${SOLO}»`);
 if (!destino) fallar("indica el destino: preview, produccion o prueba");
 if (destino === "preview") {
   const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
@@ -427,7 +433,11 @@ const ya = new Map(
 );
 const subidas: string[] = [];
 const ids: Record<string, Id> = {};
-for (const [clave, img] of Object.entries(fuente.imagenes)) {
+const clavesCategorias = new Set(fuente.portada.categorias.map((c) => c.imagen));
+const imagenesAUsar = Object.entries(fuente.imagenes).filter(
+  ([clave]) => SOLO !== "categorias" || clavesCategorias.has(clave),
+);
+for (const [clave, img] of imagenesAUsar) {
   const fichero = ficheroReal(clave, img.url);
   // El Blob añade un sufijo aleatorio: lo ya subido se reconoce por el nombre sin extensión.
   const base = fichero.replace(/\.\w+$/, "");
@@ -460,89 +470,311 @@ for (const [clave, img] of Object.entries(fuente.imagenes)) {
 }
 const img = (clave: string) => ids[clave] ?? fallar(`la fuente no tiene la imagen «${clave}»`);
 
+// ---------- Lo elegido en el panel NO se pisa (dirección, 2026-10-16) ----------
+// Cada imagen, vídeo o animación que escribe la importación se queda como está si la
+// eligió alguien en el panel (`elegidoEnElPanel`): ni se sustituye ni se vacía.
+
+const ficheros = new Map<string, string | null>();
+async function ficheroDe(
+  coleccion: "media" | "videos" | "animaciones",
+  id: Id,
+): Promise<string | null> {
+  const k = `${coleccion}:${id}`;
+  if (!ficheros.has(k)) {
+    try {
+      const d = await payload.findByID({
+        collection: coleccion,
+        id,
+        depth: 0,
+        overrideAccess: true,
+      });
+      ficheros.set(k, (d as { filename?: string | null }).filename ?? null);
+    } catch {
+      ficheros.set(k, null);
+    }
+  }
+  return ficheros.get(k) ?? null;
+}
+const conservados: string[] = [];
+async function oElegido(
+  donde: string,
+  actual: unknown,
+  deAntes: unknown,
+  nuevo: Id | null,
+  coleccion: "media" | "videos" | "animaciones" = "media",
+): Promise<Id | null> {
+  const id = idDe(actual);
+  if (
+    id !== null &&
+    elegidoEnElPanel({ id, fichero: await ficheroDe(coleccion, id) }, idDe(deAntes))
+  ) {
+    conservados.push(donde);
+    return id;
+  }
+  return nuevo;
+}
+const filas = (x: unknown): Record<string, unknown>[] =>
+  Array.isArray(x) ? (x as Record<string, unknown>[]) : [];
+const grupo = (doc: Doc | null, k: string) =>
+  (doc?.[k] as Record<string, unknown> | undefined) ?? {};
+const bloque = (lista: unknown, tipo: string) =>
+  filas(lista).find((b) => b.blockType === tipo) ?? ({} as Record<string, unknown>);
+
 // ---------- Lo que se aplica ----------
 
 const p = fuente.portada;
 const antes = manifiesto.antes!.portada.datos as Record<string, Record<string, unknown>>;
-const datosPortada = {
-  // Vacía hasta que haya una máquina recortada real (dirección, 2026-10-16): ni la de
-  // ux-9 ni una foto normal de WordPress.
-  seccionUsada: { ...antes.seccionUsada, imagen: null },
-  // Fila de categorías de la Home V2: el enlace de cada tarjeta dice «Ver todo».
-  seccionRepuestos: { ...antes.seccionRepuestos, verMasTexto: "Ver todo" },
-  seccionLogos: {
-    ...antes.seccionLogos,
-    logos: p.logos.map((l) => ({ nombre: l.nombre, logo: img(l.logo) })),
-  },
-  seccionCompania: {
-    ...antes.seccionCompania,
-    video: null,
-    imagen: img(p.compania.imagen),
-    youtube: p.compania.youtube,
-  },
-  // Tarjeta de las preguntas (rediseño de Andrés): la foto real del técnico.
-  seccionFaq: { ...antes.seccionFaq, imagen: img(p.faqImagen) },
-  seo: { ...antes.seo, metaDescription: p.metaDescripcion },
-};
+const todo = SOLO !== "categorias";
+
+const antesCategorias = manifiesto.antes!.categorias as Record<string, Record<string, unknown>>;
+const datosCategorias: { id: Id; data: Record<string, unknown> }[] = [];
+for (const c of p.categorias) {
+  const doc = categorias.find((x) => x.slug === c.slug)!;
+  datosCategorias.push({
+    id: doc.id,
+    // Orden e icono también: la retirada de la copia de demostración los deja vacíos.
+    data: {
+      imagen: await oElegido(
+        `categoría ${c.slug}: foto`,
+        doc.imagen,
+        antesCategorias[String(doc.id)]?.imagen,
+        img(c.imagen),
+      ),
+      tituloPortada: c.titulo,
+      enlace: c.enlace,
+      ordenPortada: c.orden,
+      icono: c.icono,
+    },
+  });
+}
+
+const logosActuales = filas(grupo(portada, "seccionLogos").logos);
+const logosAntes = filas(antes.seccionLogos?.logos);
+const datosPortada = todo
+  ? {
+      // Vacía hasta que haya una máquina recortada real (dirección, 2026-10-16): ni la de
+      // ux-9 ni una foto normal de WordPress. La que se elija en el panel, se queda.
+      seccionUsada: {
+        ...antes.seccionUsada,
+        imagen: await oElegido(
+          "portada: máquina recortada de «Maquinaria pesada usada»",
+          grupo(portada, "seccionUsada").imagen,
+          antes.seccionUsada?.imagen,
+          null,
+        ),
+      },
+      // El enlace de cada categoría de la sección de repuestos dice «Ver todo».
+      seccionRepuestos: { ...antes.seccionRepuestos, verMasTexto: "Ver todo" },
+      seccionLogos: {
+        ...antes.seccionLogos,
+        logos: await Promise.all(
+          p.logos.map(async (l, i) => ({
+            nombre: l.nombre,
+            logo: await oElegido(
+              `portada: logo ${i + 1} de «Nuestras marcas»`,
+              logosActuales[i]?.logo,
+              logosAntes[i]?.logo,
+              img(l.logo),
+            ),
+          })),
+        ),
+      },
+      seccionCompania: {
+        ...antes.seccionCompania,
+        video: await oElegido(
+          "portada: vídeo de «Nuestra Compañía»",
+          grupo(portada, "seccionCompania").video,
+          antes.seccionCompania?.video,
+          null,
+          "videos",
+        ),
+        imagen: await oElegido(
+          "portada: foto de «Nuestra Compañía»",
+          grupo(portada, "seccionCompania").imagen,
+          antes.seccionCompania?.imagen,
+          img(p.compania.imagen),
+        ),
+        youtube: p.compania.youtube,
+      },
+      // Tarjeta de las preguntas (rediseño de Andrés): la foto real del técnico.
+      seccionFaq: {
+        ...antes.seccionFaq,
+        imagen: await oElegido(
+          "portada: foto de las preguntas frecuentes",
+          grupo(portada, "seccionFaq").imagen,
+          antes.seccionFaq?.imagen,
+          img(p.faqImagen),
+        ),
+      },
+      seo: {
+        ...antes.seo,
+        // La imagen al compartir: la de antes, salvo que se haya elegido otra en el panel.
+        ogImage: await oElegido(
+          "portada: imagen al compartir",
+          grupo(portada, "seo").ogImage,
+          antes.seo?.ogImage,
+          idDe(antes.seo?.ogImage),
+        ),
+        metaDescription: p.metaDescripcion,
+      },
+    }
+  : null;
+
+const antesMarcas = manifiesto.antes!.marcas as Record<string, Record<string, unknown>>;
+const datosMarcas: { id: Id; data: Record<string, unknown> }[] = [];
+if (todo)
+  for (const m of p.marcas) {
+    const doc = marcas.find((x) => x.slug === m.slug)!;
+    const a = antesMarcas[String(doc.id)] ?? {};
+    datosMarcas.push({
+      id: doc.id,
+      data: {
+        logo: await oElegido(`marca ${m.slug}: logo`, doc.logo, a.logo, img(m.logo)),
+        imagenTarjeta: await oElegido(
+          `marca ${m.slug}: foto de la tarjeta`,
+          doc.imagenTarjeta,
+          a.imagenTarjeta,
+          img(m.tarjeta),
+        ),
+        ordenPortada: m.orden,
+        descripcion: m.descripcion,
+      },
+    });
+  }
+
+const imagenPie = todo
+  ? await oElegido(
+      "pie: imagen decorativa",
+      pie.imagenDecorativa,
+      (manifiesto.antes!.pie as Record<string, unknown>).imagenDecorativa,
+      null,
+    )
+  : null;
+
+const antesSedes = manifiesto.antes!.sedesActualizadas as Record<string, Record<string, unknown>>;
+const fotosSedes = new Map<string, Id | null>();
+if (todo)
+  for (const s of fuente.sedes) {
+    const existente = sedes.find((x) => x.nombre === s.nombre);
+    fotosSedes.set(
+      s.nombre,
+      existente
+        ? await oElegido(
+            `sede ${s.nombre}: foto`,
+            existente.foto,
+            antesSedes[String(existente.id)]?.foto,
+            null,
+          )
+        : null,
+    );
+  }
 
 const n = fuente.nosotros;
+const bloquesActuales = nosotros?.bloques;
+const bloquesAntes = manifiesto.antes!.nosotros?.datos.bloques;
+const deNosotros = (
+  tipo: string,
+  campo: string,
+  nuevo: Id | null,
+  coleccion: "media" | "videos" | "animaciones" = "media",
+) =>
+  oElegido(
+    `Nosotros, ${tipo}: ${campo}`,
+    bloque(bloquesActuales, tipo)[campo],
+    bloque(bloquesAntes, tipo)[campo],
+    nuevo,
+    coleccion,
+  );
+const tarjetasActuales = filas(bloque(bloquesActuales, "tarjetasExpandibles").tarjetas);
+const tarjetasAntes = filas(bloque(bloquesAntes, "tarjetasExpandibles").tarjetas);
 const parrafo = convertHTMLToLexical({ editorConfig, html: n.parrafoHtml, JSDOM: DomFeliz });
-const bloquesNosotros = [
-  {
-    blockType: "cabeceraVideo",
-    antetitulo: n.cabecera.antetitulo,
-    titulo: n.cabecera.titulo,
-    video: null,
-    imagen: img("nosotros-cabecera"),
-  },
-  {
-    blockType: "presentacionImagen",
-    antetitulo: n.antetitulo,
-    titulo: n.titulo,
-    texto: parrafo,
-    botonTexto: n.boton.texto,
-    botonEnlace: n.boton.enlace,
-    imagen: img("nosotros-mapa"),
-    lottie: null,
-  },
-  ...(n.cifras.length ? [{ blockType: "cifras", cifras: n.cifras }] : []),
-  {
-    blockType: "franjaMarquee",
-    texto: n.franja,
-    imagenFondo: img("nosotros-franja"),
-    imagenFrontal: null,
-  },
-  {
-    blockType: "tarjetasExpandibles",
-    titulo: n.tarjetasTitulo,
-    tarjetas: n.tarjetas.map((t) => ({
-      titulo: t.titulo,
-      texto: t.texto,
-      imagen: img(t.imagen),
-      enlace: ENLACES_TARJETAS[t.clave],
-    })),
-  },
-];
+const bloquesNosotros =
+  todo && nosotros
+    ? [
+        {
+          blockType: "cabeceraVideo",
+          antetitulo: n.cabecera.antetitulo,
+          titulo: n.cabecera.titulo,
+          video: await deNosotros("cabeceraVideo", "video", null, "videos"),
+          imagen: await deNosotros("cabeceraVideo", "imagen", img("nosotros-cabecera")),
+        },
+        {
+          blockType: "presentacionImagen",
+          antetitulo: n.antetitulo,
+          titulo: n.titulo,
+          texto: parrafo,
+          botonTexto: n.boton.texto,
+          botonEnlace: n.boton.enlace,
+          imagen: await deNosotros("presentacionImagen", "imagen", img("nosotros-mapa")),
+          lottie: await deNosotros("presentacionImagen", "lottie", null, "animaciones"),
+        },
+        ...(n.cifras.length ? [{ blockType: "cifras", cifras: n.cifras }] : []),
+        {
+          blockType: "franjaMarquee",
+          texto: n.franja,
+          imagenFondo: await deNosotros("franjaMarquee", "imagenFondo", img("nosotros-franja")),
+          imagenFrontal: await deNosotros("franjaMarquee", "imagenFrontal", null),
+        },
+        {
+          blockType: "tarjetasExpandibles",
+          titulo: n.tarjetasTitulo,
+          tarjetas: await Promise.all(
+            n.tarjetas.map(async (t, i) => ({
+              titulo: t.titulo,
+              texto: t.texto,
+              imagen: await oElegido(
+                `Nosotros, tarjeta ${i + 1}: imagen`,
+                tarjetasActuales[i]?.imagen,
+                tarjetasAntes[i]?.imagen,
+                img(t.imagen),
+              ),
+              enlace: ENLACES_TARJETAS[t.clave],
+            })),
+          ),
+        },
+      ]
+    : [];
+
+const ogNosotros =
+  todo && nosotros
+    ? await oElegido(
+        "Nosotros: imagen al compartir",
+        grupo(nosotros, "seo").ogImage,
+        (manifiesto.antes!.nosotros?.datos.seo as Record<string, unknown> | undefined)?.ogImage,
+        idDe(
+          (manifiesto.antes!.nosotros?.datos.seo as Record<string, unknown> | undefined)?.ogImage,
+        ),
+      )
+    : null;
 
 const informe = {
   destino,
+  solo: SOLO ?? "todo",
   subidasBlob: subidas.length,
-  yaEnElAlmacen: Object.keys(fuente.imagenes).length - subidas.length,
-  portada: Object.keys(datosPortada),
-  marcas: p.marcas.map((m) => `${m.slug} (orden ${m.orden})`),
+  yaEnElAlmacen: imagenesAUsar.length - subidas.length,
+  conservadosDelPanel: conservados,
   categorias: p.categorias.map((c) => `${c.slug}: «${c.titulo}» → ${c.enlace}`),
-  sedes: {
-    crear: fuente.sedes
-      .filter((s) => !sedes.some((x) => x.nombre === s.nombre))
-      .map((s) => s.nombre),
-    actualizar: fuente.sedes
-      .filter((s) => sedes.some((x) => x.nombre === s.nombre))
-      .map((s) => s.nombre),
-    quitar: sedes
-      .filter((x) => !fuente.sedes.some((s) => s.nombre === x.nombre))
-      .map((x) => String(x.nombre)),
-  },
-  nosotros: nosotros ? bloquesNosotros.map((b) => b.blockType) : "sin página «nosotros»",
+  portada: datosPortada ? Object.keys(datosPortada) : "no se toca",
+  marcas: todo ? p.marcas.map((m) => `${m.slug} (orden ${m.orden})`) : "no se tocan",
+  sedes: todo
+    ? {
+        crear: fuente.sedes
+          .filter((s) => !sedes.some((x) => x.nombre === s.nombre))
+          .map((s) => s.nombre),
+        actualizar: fuente.sedes
+          .filter((s) => sedes.some((x) => x.nombre === s.nombre))
+          .map((s) => s.nombre),
+        quitar: sedes
+          .filter((x) => !fuente.sedes.some((s) => s.nombre === x.nombre))
+          .map((x) => String(x.nombre)),
+      }
+    : "no se tocan",
+  nosotros: !todo
+    ? "no se toca"
+    : nosotros
+      ? bloquesNosotros.map((b) => b.blockType)
+      : "sin página «nosotros»",
+  pie: todo ? "imagen decorativa" : "no se toca",
   avisosDeLaFuente: fuente.avisos,
 };
 if (modo === "simular") {
@@ -551,93 +783,86 @@ if (modo === "simular") {
   process.exit(0);
 }
 
-await payload.update({
-  collection: "paginas",
-  id: portada.id,
-  data: datosPortada as never,
-  overrideAccess: true,
-});
-log("portada: secciones 3, 4, «Nuestra Compañía», preguntas y meta descripción");
-for (const m of p.marcas) {
-  const id = marcas.find((x) => x.slug === m.slug)!.id;
-  await payload.update({
-    collection: "marcas-maquinaria",
-    id,
-    data: {
-      logo: img(m.logo),
-      imagenTarjeta: img(m.tarjeta),
-      ordenPortada: m.orden,
-      descripcion: m.descripcion,
-    },
-    overrideAccess: true,
-  });
-}
-log(`marcas: ${p.marcas.length}`);
-for (const c of p.categorias) {
-  const id = categorias.find((x) => x.slug === c.slug)!.id;
+for (const c of datosCategorias)
   await payload.update({
     collection: "categorias-tecnicas",
-    id,
-    // Orden e icono también: la retirada de la copia de demostración los deja vacíos.
-    data: {
-      imagen: img(c.imagen),
-      tituloPortada: c.titulo,
-      enlace: c.enlace,
-      ordenPortada: c.orden,
-      icono: c.icono as never,
-    },
+    id: c.id,
+    data: c.data as never,
     overrideAccess: true,
   });
-}
-log(`categorías: ${p.categorias.length}`);
-await payload.updateGlobal({ slug: "pie", data: { imagenDecorativa: null }, overrideAccess: true });
-log("pie: sin imagen decorativa");
+log(`categorías: ${datosCategorias.length}`);
+for (const d of conservados) log(`elegido en el panel, no se toca: ${d}`);
 
-for (const [i, s] of fuente.sedes.entries()) {
-  const datos = {
-    nombre: s.nombre,
-    ciudad: s.ciudad,
-    departamento: s.departamento,
-    latitud: s.coordenadas[0],
-    longitud: s.coordenadas[1],
-    lineas: s.lineas,
-    foto: null,
-    orden: i + 1,
-  };
-  const existente = sedes.find((x) => x.nombre === s.nombre);
-  if (existente) {
-    await payload.update({
-      collection: "sedes",
-      id: existente.id,
-      data: datos,
-      overrideAccess: true,
-    });
-  } else {
-    const doc = await payload.create({ collection: "sedes", data: datos, overrideAccess: true });
-    manifiesto.creado.sedes.push(doc.id);
-    guardar();
-  }
-}
-for (const s of sedes.filter((x) => !fuente.sedes.some((f) => f.nombre === x.nombre)))
-  await payload.delete({ collection: "sedes", id: s.id, overrideAccess: true });
-log(
-  `sedes: ${fuente.sedes.length} (${informe.sedes.crear.length} nuevas, ${informe.sedes.quitar.length} quitadas)`,
-);
-
-if (nosotros) {
+if (todo) {
   await payload.update({
     collection: "paginas",
-    id: nosotros.id,
-    data: {
-      bloques: bloquesNosotros,
-      seo: {
-        ...((manifiesto.antes!.nosotros?.datos.seo as object) ?? {}),
-        metaDescription: n.metaDescripcion,
-      },
-    } as never,
+    id: portada.id,
+    data: datosPortada as never,
     overrideAccess: true,
   });
-  log(`nosotros: ${bloquesNosotros.length} bloques`);
+  log("portada: secciones 3, 4, «Nuestra Compañía», preguntas y meta descripción");
+  for (const m of datosMarcas)
+    await payload.update({
+      collection: "marcas-maquinaria",
+      id: m.id,
+      data: m.data as never,
+      overrideAccess: true,
+    });
+  log(`marcas: ${datosMarcas.length}`);
+  await payload.updateGlobal({
+    slug: "pie",
+    data: { imagenDecorativa: imagenPie },
+    overrideAccess: true,
+  });
+  log(imagenPie === null ? "pie: sin imagen decorativa" : "pie: la imagen decorativa del panel");
+
+  const nuevas = fuente.sedes.filter((s) => !sedes.some((x) => x.nombre === s.nombre)).length;
+  for (const [i, s] of fuente.sedes.entries()) {
+    const datos = {
+      nombre: s.nombre,
+      ciudad: s.ciudad,
+      departamento: s.departamento,
+      latitud: s.coordenadas[0],
+      longitud: s.coordenadas[1],
+      lineas: s.lineas,
+      foto: fotosSedes.get(s.nombre) ?? null,
+      orden: i + 1,
+    };
+    const existente = sedes.find((x) => x.nombre === s.nombre);
+    if (existente) {
+      await payload.update({
+        collection: "sedes",
+        id: existente.id,
+        data: datos,
+        overrideAccess: true,
+      });
+    } else {
+      const doc = await payload.create({ collection: "sedes", data: datos, overrideAccess: true });
+      manifiesto.creado.sedes.push(doc.id);
+      guardar();
+    }
+  }
+  const quitadas = sedes.filter((x) => !fuente.sedes.some((f) => f.nombre === x.nombre));
+  for (const s of quitadas)
+    await payload.delete({ collection: "sedes", id: s.id, overrideAccess: true });
+  log(`sedes: ${fuente.sedes.length} (${nuevas} nuevas, ${quitadas.length} quitadas)`);
+
+  if (nosotros) {
+    await payload.update({
+      collection: "paginas",
+      id: nosotros.id,
+      data: {
+        bloques: bloquesNosotros,
+        seo: {
+          ...((manifiesto.antes!.nosotros?.datos.seo as object) ?? {}),
+          ogImage: ogNosotros,
+          metaDescription: n.metaDescripcion,
+        },
+      } as never,
+      overrideAccess: true,
+    });
+    log(`nosotros: ${bloquesNosotros.length} bloques`);
+  }
 }
 manifiesto.completo = new Date().toISOString();
 guardar();

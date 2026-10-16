@@ -59,7 +59,7 @@ export function tarjetasDeMarcas(marcas: MarcasMaquinaria[]): TarjetaMarca[] {
 
 // --- Sección 3: pestañas de equipo usado --------------------------------------
 
-export type DatoFicha = { clave: "peso" | "potencia" | "motor"; etiqueta: string; valor: string };
+export type DatoFicha = { clave: "peso" | "anio" | "horometro"; etiqueta: string; valor: string };
 
 export type TarjetaEquipo = {
   id: number;
@@ -76,13 +76,17 @@ export type TarjetaEquipo = {
 export type Pestana = { clave: string; etiqueta: string; equipos: TarjetaEquipo[] };
 
 const numero = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 1 });
+/** Horas con separador de miles SIEMPRE («4.500 h»), también con cuatro cifras. */
+const horas = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 0, useGrouping: "always" });
 
 /**
- * Ficha de la tarjeta: peso, potencia y motor, EN ESE ORDEN y omitiendo lo que
- * falte. El decimal va con coma (es-CO), no con el punto de ux-9 («8.4 t»).
+ * Ficha de la tarjeta: peso operativo, año y horómetro, EN ESE ORDEN y
+ * omitiendo lo que falte (cliente, 2026-10-16: los datos que de verdad tienen
+ * las unidades importadas; la Home V2 pinta peso, potencia y motor, que casi
+ * ninguna trae). El decimal va con coma (es-CO), no con el punto de ux-9.
  */
 export function fichaDeEquipo(
-  e: Pick<EquiposUsado, "pesoOperativo" | "potencia" | "motor">,
+  e: Pick<EquiposUsado, "pesoOperativo" | "anio" | "horometro">,
 ): DatoFicha[] {
   const ficha: DatoFicha[] = [];
   const valido = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v) && v > 0;
@@ -93,15 +97,16 @@ export function fichaDeEquipo(
       valor: `${numero.format(e.pesoOperativo)} t`,
     });
   }
-  if (valido(e.potencia)) {
+  if (valido(e.anio) && Number.isInteger(e.anio)) {
+    ficha.push({ clave: "anio", etiqueta: "Año", valor: String(e.anio) });
+  }
+  if (valido(e.horometro)) {
     ficha.push({
-      clave: "potencia",
-      etiqueta: "Potencia",
-      valor: `${numero.format(e.potencia)} hp`,
+      clave: "horometro",
+      etiqueta: "Horómetro",
+      valor: `${horas.format(e.horometro)} h`,
     });
   }
-  const motor = e.motor?.trim();
-  if (motor) ficha.push({ clave: "motor", etiqueta: "Motor", valor: motor });
   return ficha;
 }
 

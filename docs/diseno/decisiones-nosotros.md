@@ -197,9 +197,9 @@ y caja del `<main>` idénticos, y cada ancla lleva a su sección.
   tarjeta (relleno 0 en móvil). Se replicó tal cual hasta el 2026-10-16;
   **desde entonces, 20 px a cada lado** (petición del cliente), la caja de los
   títulos de la portada a 390. Medido en el preview: el texto a 20 px del
-  borde, CLS 0. Nota: la referencia pintada de hoy CENTRA los textos de la
+  borde, CLS 0. La referencia pintada del 2026-10-16 CENTRA los textos de la
   cabecera en los tres anchos (antes, a la izquierda: ver el punto de abajo);
-  aquí siguen a la izquierda.
+  **desde el mismo día, centrados aquí también** (dirección).
 - Las tres tarjetas llevan el mismo texto, de Dynapac: contenido de ejemplo.
 - Alineación «Centro» en los revelados del export: el widget no la aplica
   (espera `center`) y se pintan a la izquierda; se replica lo pintado.

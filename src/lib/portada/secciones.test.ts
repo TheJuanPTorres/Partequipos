@@ -79,17 +79,24 @@ describe("sección 2: tarjetas de marca", () => {
 });
 
 describe("sección 3: ficha", () => {
-  it("peso, potencia y motor, en orden, con coma decimal", () => {
+  it("peso, año y horómetro, en orden, con coma decimal y separador de miles", () => {
     assert.deepEqual(
-      fichaDeEquipo({ pesoOperativo: 8.4, potencia: 64, motor: " YANMAR 4TNV98CT " }).map(
+      fichaDeEquipo({ pesoOperativo: 8.4, anio: 2016, horometro: 12500 }).map(
         (d) => `${d.etiqueta}: ${d.valor}`,
       ),
-      ["Peso operativo: 8,4 t", "Potencia: 64 hp", "Motor: YANMAR 4TNV98CT"],
+      ["Peso operativo: 8,4 t", "Año: 2016", "Horómetro: 12.500 h"],
+    );
+  });
+
+  it("separador de miles también con cuatro cifras", () => {
+    assert.deepEqual(
+      fichaDeEquipo({ pesoOperativo: null, anio: null, horometro: 4500 }).map((d) => d.valor),
+      ["4.500 h"],
     );
   });
 
   it("omite lo que falta o no tiene sentido (0, negativo, vacío)", () => {
-    assert.deepEqual(fichaDeEquipo({ pesoOperativo: 0, potencia: null, motor: "  " }), []);
+    assert.deepEqual(fichaDeEquipo({ pesoOperativo: 0, anio: null, horometro: -3 }), []);
   });
 });
 

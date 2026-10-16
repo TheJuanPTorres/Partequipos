@@ -6,6 +6,9 @@
  * Tarjeta de radio 30 con 1,5vw de margen a los lados y abajo; alto mínimo
  * 540 px (450 en móvil); relleno 2,9vw (0 en móvil); el texto en una caja de
  * 680 px centrada. Velo negro al 45 % en `multiply`, como el de Elementor.
+ *
+ * El texto, CENTRADO en los tres anchos, como la referencia de Andrés del
+ * 2026-10-16 (decisiones-nosotros.md §7; antes iba a la izquierda).
  */
 .seccion {
   padding: 0 1.5vw 1.5vw;
@@ -48,6 +51,7 @@
   margin: 0 auto;
   flex-direction: column;
   gap: 20px;
+  text-align: center;
 }
 
 .texto {
@@ -70,8 +74,8 @@
 
   /*
    * DESVIACIÓN (cliente, sesión del 2026-10-14): ux-9 deja la tarjeta sin
-   * relleno en móvil y el texto, a la izquierda, quedaba pegado al borde de la
-   * foto. 20 px a cada lado, la caja de los títulos de la portada a 390
+   * relleno en móvil y el texto quedaba pegado al borde de la foto. 20 px a
+   * cada lado, la caja de los títulos de la portada a 390
    * (decisiones-home-ux9.md §27.1). Estático: sin CLS.
    */
   .contenido {

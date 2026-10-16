@@ -97,12 +97,17 @@
   justify-content: center;
 }
 
-/* La foto mide 225 px como máximo; en una tarjeta más estrecha se ajusta. */
+/*
+ * Hueco cuadrado de 225 px como máximo (en la referencia, recortes cuadrados
+ * de producto); las fotos reales, apaisadas, se recortan al cuadrado con su
+ * punto focal. En una tarjeta más estrecha se ajusta.
+ */
 .img {
   width: 225px;
   max-width: 100%;
   height: auto;
-  object-fit: contain;
+  aspect-ratio: 1;
+  object-fit: cover;
 }
 
 /* Tipografía `2e6cf84` del kit: Inter 20 px negrita (18 en móvil), interlínea 1,2. */
@@ -241,9 +246,7 @@
   }
 
   .destacada {
-    width: 100%;
     height: auto;
-    margin-inline: 0;
     flex-direction: column;
   }
 

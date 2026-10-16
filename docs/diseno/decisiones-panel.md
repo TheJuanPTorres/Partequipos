@@ -961,7 +961,10 @@ dependencias.
 
 ## 31. El icono de la pestaña del panel, del mismo origen (2026-10-15, rama `fix/panel-favicon-mismo-origen`)
 
-**Qué pasaba.** `panel:revision` registraba en cada pantalla del panel una petición bloqueada por ORB a `logo-partequipos.png` (16 a 1440 y 17 en móvil). Era el icono de la pestaña: `admin.meta.icons` apuntaba a la URL fija del Blob de producción (`seoConfig.logoPath`, la deuda de CLAUDE.md §10.8), así que todos los paneles, también los de los previews, lo pedían a otro origen. El navegador bloquea por ORB una respuesta de otro origen que no es una imagen.
+**Qué pasaba.** `panel:revision` registraba en las pantallas con sesión peticiones bloqueadas por ORB (`net::ERR_BLOCKED_BY_ORB`) a `logo-partequipos.png` de otro origen: 33 en `panel:revision avisos` del 2026-10-15. Era el icono de la pestaña: `admin.meta.icons` apuntaba a la URL fija del Blob de producción (`seoConfig.logoPath`, la deuda de CLAUDE.md §10.8), así que todos los paneles, también los de los previews, lo pedían a otro origen.
+
+- **El fichero NO está caído.** En el login (sin sesión) la misma petición responde 200 `image/png` y no se bloquea. El bloqueo solo aparece en las pantallas con sesión; **el mecanismo no se aisló**: con el icono del mismo origen, ORB no se aplica y el bloqueo desaparece.
+- **Medido el 2026-10-15** (`panel:revision avisos`, 1440 y móvil): preview de `main`, 33 bloqueadas; preview del PR, 0. Queda en los dos el `ERR_ABORTED` de `/admin/`, que es una navegación interrumpida y no tiene que ver.
 
 **Qué cambia.** El icono pasa a ser `public/logo-partequipos.png` (`LOGO_SITIO_RESPALDO.src`, el logo transparente de Andrés que ya usan la cabecera y el pie), servido por el propio despliegue. Misma forma que antes (tira horizontal): el icono cuadrado sigue pendiente del cliente (§10.3 p.15). Sin esquema ni dependencias.
 

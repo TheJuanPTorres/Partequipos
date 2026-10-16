@@ -150,7 +150,7 @@ export default buildConfig({
        * Icono de la pestaña: el logo de `public/`, del MISMO origen que el
        * panel (2026-10-15). Antes era la URL fija del Blob de producción
        * (§10.8): en cada pantalla del panel, también en los previews, el
-       * navegador la bloqueaba por ORB.
+       * navegador la bloqueaba por ORB en las pantallas con sesión.
        */
       icons: [{ rel: "icon", type: "image/png", url: LOGO_SITIO_RESPALDO.src }],
       // El panel nunca debe indexarse, esté abierto el sitio o no.

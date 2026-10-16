@@ -22,17 +22,23 @@ import { poblado } from "@/lib/utils/relations";
 import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/payload-types";
 
 /**
- * Sitemap dinámico generado desde Payload (nunca escrito a mano).
+ * Sitemap generado desde Payload (nunca escrito a mano).
  *
- * REFLEJA CAMBIOS SIN REBUILD: la ruta es dinámica, así que se construye en cada
- * petición leyendo la base. Un modelo publicado en el panel aparece en el
- * sitemap de inmediato, en coherencia con el ISR del catálogo.
+ * CACHEADO desde el 2026-10-15 (antes, `force-dynamic`). Era dinámico porque
+ * «lo piden pocos rastreadores y son 3 consultas»: en realidad son **15
+ * consultas**, entre ellas los 351 modelos de repuesto, y cada rastreador que
+ * lo pedía las repetía contra la base (`propuestas/2026-10-15-consumo-base.md`).
  *
- * Por qué dinámica y no cacheada: el sitemap lo piden **rastreadores**, no
- * visitantes — son unas pocas peticiones al día. El coste (3 consultas) es
- * irrelevante frente a la ventaja de que nunca quede obsoleto. Cachearlo
- * obligaría además a invalidarlo desde los hooks de las tres colecciones, sin
- * ganancia real.
+ * Ahora se genera en el build y se regenera:
+ *
+ * - cuando un gancho del catálogo lo invalida (`revalidarIndices` en
+ *   `src/lib/cacheDatos.ts`, que llaman `revalidarRutas` y los de usados y
+ *   nueva), en la visita siguiente;
+ * - y, como red, cada hora como mucho (`revalidate`), por si algún gancho no
+ *   pasa por ahí.
+ *
+ * Una página nueva puede tardar hasta una hora en salir aquí si su gancho no
+ * lo invalida: para un sitemap, que Google lee cada varios días, sobra.
  *
  * SOBRE EL LÍMITE DE 50.000 URLs: hoy son ~96 (y ~400 con los datos reales, 648
  * contando toda la migración), menos del 1,5 % del límite —y muy lejos también
@@ -41,7 +47,7 @@ import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/pa
  * Cuando se acerque a las 50.000 URLs, Next ofrece `generateSitemaps()` para
  * partirlo por sección sin cambiar el resto del diseño.
  */
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [

@@ -1,8 +1,10 @@
+import { unstable_cache } from "next/cache";
 import { getPayload } from "payload";
 import { cache } from "react";
 
 import config from "@payload-config";
 
+import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "../cacheDatos";
 import { imagenDeAcceso, type ImagenAcceso } from "../panel/acceso";
 import { datosEmpresa, type Empresa } from "../seo/empresa";
 import { tramosValidos, type Tramo } from "../seo/horario";
@@ -14,14 +16,21 @@ import {
 } from "../seo/logo";
 
 /**
- * El global `seo`, UNA consulta por petición para todo lo de abajo. `depth: 1`
- * para poblar las imágenes del global (logo, imagen al compartir y la de la
- * pantalla de acceso).
+ * El global `seo`, UNA consulta para todo lo de abajo. `depth: 1` para poblar
+ * las imágenes del global (logo, imagen al compartir y la de la pantalla de
+ * acceso). En la caché de datos del MARCO (`datos:marco`): la cabecera y el
+ * pie de todas las páginas leen de aquí la empresa y el logo.
  */
-const getSeoGlobal = cache(async () => {
-  const payload = await getPayload({ config });
-  return payload.findGlobal({ slug: "seo", depth: 1 });
-});
+const seoEnCache = unstable_cache(
+  async () => {
+    const payload = await getPayload({ config });
+    return payload.findGlobal({ slug: "seo", depth: 1 });
+  },
+  ["seo", CLAVE_DESPLIEGUE],
+  { tags: [ETIQUETAS_DATOS.marco] },
+);
+
+const getSeoGlobal = cache(() => seoEnCache());
 
 /**
  * Horario de atención del global `seo` (fase 6), listo para usar. Memoizado

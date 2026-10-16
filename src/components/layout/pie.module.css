@@ -46,14 +46,18 @@
   text-align: center;
 }
 
-/* Marca de agua: el isotipo, abajo a la izquierda, contenido, al 11 %. */
+/*
+ * Marca de agua: el isotipo, abajo a la izquierda, contenido, al 11 %.
+ * SVG de dirección (2026-10-16, ajuste del cliente): el PNG anterior no
+ * tenía la «P». Blanco y con el viewBox ajustado al dibujo, como el PNG.
+ */
 .tarjeta::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: url("/isotipo-partequipos.png") left bottom / contain no-repeat;
+  background: url("/isotipo-partequipos.svg") left bottom / contain no-repeat;
   opacity: 0.11;
 }
 

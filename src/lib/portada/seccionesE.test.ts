@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import type { CategoriasTecnica, Media, Pagina } from "@/payload-types";
 
-import { logosDeMarcas, tarjetasDeRepuestos } from "./seccionesE";
+import { enTarjetas, logosDeMarcas, tarjetasDeRepuestos } from "./seccionesE";
 
 const media = (id: number, alt = ""): Media =>
   ({ id, url: `/m/${id}.png`, alt, width: 605, height: 404 }) as Media;
@@ -93,5 +93,28 @@ describe("sección 5: tarjetas de repuestos", () => {
     assert.equal(t!.texto, null);
     assert.equal(t!.icono, null);
     assert.equal(t!.href, null);
+  });
+});
+
+describe("sección de repuestos: tarjetas apiladas de 5", () => {
+  const n = (k: number) => Array.from({ length: k }, (_, i) => i + 1);
+
+  it("las 10 de la Home V2 van en dos tarjetas de 5, en su orden", () => {
+    assert.deepEqual(enTarjetas(n(10)), [
+      [1, 2, 3, 4, 5],
+      [6, 7, 8, 9, 10],
+    ]);
+  });
+
+  it("con menos de 6, una sola tarjeta; con 7, la segunda lleva las 2 que sobran", () => {
+    assert.deepEqual(enTarjetas(n(4)), [[1, 2, 3, 4]]);
+    assert.deepEqual(enTarjetas(n(7)), [
+      [1, 2, 3, 4, 5],
+      [6, 7],
+    ]);
+  });
+
+  it("sin categorías, ninguna tarjeta", () => {
+    assert.deepEqual(enTarjetas([]), []);
   });
 });

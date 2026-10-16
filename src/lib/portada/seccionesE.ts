@@ -67,3 +67,14 @@ export function tarjetasDeRepuestos(categorias: CategoriasTecnica[]): TarjetaRep
       };
     });
 }
+
+/** Categorías por tarjeta apilada: la Home V2 lleva dos tarjetas de 5 (2026-10-16). */
+export const CATEGORIAS_POR_TARJETA = 5;
+
+/** Las tarjetas de la sección, en su orden, repartidas en grupos de `CATEGORIAS_POR_TARJETA`. */
+export function enTarjetas<T>(categorias: T[]): T[][] {
+  const grupos: T[][] = [];
+  for (let i = 0; i < categorias.length; i += CATEGORIAS_POR_TARJETA)
+    grupos.push(categorias.slice(i, i + CATEGORIAS_POR_TARJETA));
+  return grupos;
+}

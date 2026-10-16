@@ -52,6 +52,7 @@ type Mapa = {
   fitBounds: (b: unknown, o: Record<string, unknown>) => void;
   getStyle: () => { layers?: Capa[] } | undefined;
   setPaintProperty: (id: string, prop: string, valor: unknown) => void;
+  setLayoutProperty: (id: string, prop: string, valor: unknown) => void;
   getSource: (id: string) => unknown;
   addSource: (id: string, s: Record<string, unknown>) => void;
   getLayer: (id: string) => unknown;
@@ -438,6 +439,8 @@ function pintarColores(m: Mapa) {
     for (const l of m.getStyle()?.layers ?? []) {
       if (l.type === "background") m.setPaintProperty(l.id, "background-color", c.mar);
       if (l.type === "fill") m.setPaintProperty(l.id, "fill-color", c.mar);
+      // Solo salen los nombres de las sedes (los pines propios), no los de Mapbox.
+      if (l.type === "symbol") m.setLayoutProperty(l.id, "visibility", "none");
       if (!antes && l.type !== "background" && l.type !== "fill") antes = l.id;
     }
     if (!m.getSource("paises")) {

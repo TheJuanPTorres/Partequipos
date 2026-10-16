@@ -212,14 +212,15 @@ recomprimido).
 
 Para que actualice su maqueta. **Ninguna bloquea.**
 
-| Dónde                    | En su diseño                                                        | En el sitio                                         |
-| ------------------------ | ------------------------------------------------------------------- | --------------------------------------------------- |
-| Home, sección 8, botón   | «Ver Catálgo»                                                       | «Ver Catálogo»                                      |
-| Home, sección 5, botón   | «Ver todas los repuestos»                                           | «Ver todos los repuestos»                           |
-| Pie, texto de la empresa | «Ayudamos sectores…»                                                | «Ayudamos **a** sectores…»                          |
-| Pie, redes sociales      | «Google Plus» con el icono de LinkedIn y «Tiktok» con el de YouTube | Facebook, Instagram y YouTube, cada una con el suyo |
-| Nosotros, cabecera       | «Quienes somos»                                                     | «Quiénes somos»                                     |
-| Nosotros, cifras         | «Respuestos disponibles»                                            | «Repuestos disponibles»                             |
+| Dónde                     | En su diseño                                                        | En el sitio                                         |
+| ------------------------- | ------------------------------------------------------------------- | --------------------------------------------------- |
+| Home, sección 8, botón    | «Ver Catálgo»                                                       | «Ver Catálogo»                                      |
+| Home V2, sección 9, botón | «Catálgo» (se repite en la V2)                                      | «Catálogo»                                          |
+| Home, sección 5, botón    | «Ver todas los repuestos»                                           | «Ver todos los repuestos»                           |
+| Pie, texto de la empresa  | «Ayudamos sectores…»                                                | «Ayudamos **a** sectores…»                          |
+| Pie, redes sociales       | «Google Plus» con el icono de LinkedIn y «Tiktok» con el de YouTube | Facebook, Instagram y YouTube, cada una con el suyo |
+| Nosotros, cabecera        | «Quienes somos»                                                     | «Quiénes somos»                                     |
+| Nosotros, cifras          | «Respuestos disponibles»                                            | «Repuestos disponibles»                             |
 
 Y tres detalles del kit, solo para que los sepa:
 

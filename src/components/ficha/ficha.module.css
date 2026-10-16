@@ -275,22 +275,26 @@
 }
 
 /*
- * DESDE TABLET, LAS MIGAS EN UNA SOLA LÍNEA (F15, 2026-10-16). Con una ruta
- * que llena justo la línea («… / Aditamentos para excavadoras / Pontones para
+ * EN TABLET, LAS MIGAS EN UNA SOLA LÍNEA (F15, 2026-10-16). Con una ruta que
+ * llena justo la línea («… / Aditamentos para excavadoras / Pontones para
  * excavadoras» a 1010), la fuente de respaldo la partía en dos y, al llegar
  * Inter, volvía a una: todo lo de debajo subía 20 px (CLS 0,155). En una
  * línea el alto ya no depende de la fuente. Si no cabe, se recorta con «…» la
- * ÚLTIMA miga, que es el nombre de la página, el `<h1>` de justo debajo. En
- * móvil siguen partiéndose: allí ninguna ruta llena la línea por poco.
+ * ÚLTIMA miga, que es el nombre de la página, el `<h1>` de justo debajo.
+ * - Solo en tablet: allí la columna ocupa todo el ancho y la ruta casi
+ *   siempre cabe. En escritorio la columna es estrecha, la ruta ocupa dos
+ *   líneas con las dos fuentes y en una se perderían migas (medido: CLS ≤
+ *   0,027). En móvil, igual que antes.
  */
-@media (min-width: 768px) {
+@media (min-width: 768px) and (max-width: 1024px) {
   /*
-   * Sin esto, el ancho mínimo de la columna de la rejilla sería la ruta entera
-   * en una línea, y la columna cambiaría de ancho con la fuente (otro CLS).
+   * Sin esto, el ancho mínimo de la columna sería la ruta entera en una línea:
+   * cambiaría de ancho con la fuente (otro CLS) y la píldora se saldría.
    */
   .columnaDatos,
   .migas {
     min-width: 0;
+    max-width: 100%;
   }
 
   .migas ol {

@@ -56,8 +56,19 @@ const ICONO_PESTANA: Record<string, Icon> = {
   Aditamentos: IconTools,
 };
 
-/** Ancho con el que se piden las fotos de las tarjetas: la de lista pinta hasta ~343 px. */
-const ANCHO_FOTO = 420;
+/**
+ * Tamaño en que se pinta la foto de la tarjeta, para que el optimizador sirva
+ * la que toca (medición de C, 2026-10-14). La foto va con `contain` en una
+ * caja que, desde 640 px de pantalla, no pasa de 343 px (columna de 391 px
+ * menos 48 de relleno; entre 640 y 1024, unos 341). Por debajo de 640, la
+ * tarjeta ocupa la columna: pantalla − 100 px (márgenes y relleno). La rejilla
+ * pinta más pequeño, así que también queda cubierta.
+ * Sin `sizes`, con un ancho fijo de 420, se pedía w=640 (y w=1080 en 2×) en
+ * cualquier pantalla.
+ */
+const SIZES_FOTO = "(min-width: 640px) 343px, calc(100vw - 100px)";
+/** Solo para la proporción de la foto: el ancho que se pide lo decide `sizes`. */
+const ANCHO_FOTO = 384;
 const ID_TARJETAS = "tarjetas-nueva";
 
 export function ListadoNueva({
@@ -413,6 +424,7 @@ function TarjetaEquipo({ equipo, prioridad }: { equipo: EquipoNuevoListado; prio
             alt={foto.alt || equipo.nombre}
             width={ANCHO_FOTO}
             height={Math.round((ANCHO_FOTO * foto.height) / foto.width)}
+            sizes={SIZES_FOTO}
             priority={prioridad}
           />
         ) : null}

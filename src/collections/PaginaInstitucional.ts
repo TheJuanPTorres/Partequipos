@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { avisoField } from "../lib/fields/avisoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { seoField } from "../lib/fields/seoField";
 import { BLOQUES_PAGINA } from "./bloques/bloquesPagina";
@@ -188,6 +189,51 @@ export const PaginaInstitucional: CollectionConfig = {
           labels: { singular: "Diapositiva", plural: "Diapositivas" },
           fields: [
             {
+              /*
+               * SOLO LA IMAGEN DE FONDO (dirección, 2026-10-15): cada pieza de
+               * texto de la diapositiva se puede quitar. MARCADAS por defecto:
+               * las diapositivas que ya existían no cambian (la migración rellena
+               * `true`). El título oculto se queda en el HTML para lectores de
+               * pantalla (lo pintado reserva su sitio, invisible, para que nada salte
+               * entre diapositivas); el texto circular y el recuadro, fuera del HTML.
+               */
+              type: "row",
+              fields: [
+                {
+                  name: "mostrarTitulo",
+                  type: "checkbox",
+                  label: "Mostrar título",
+                  defaultValue: true,
+                  admin: {
+                    width: "33%",
+                    description:
+                      "Desmárcalo para dejar la foto limpia. El título sigue siendo obligatorio: no se ve, pero lo leen los lectores de pantalla y nombra la diapositiva.",
+                  },
+                },
+                {
+                  name: "mostrarTextoCircular",
+                  type: "checkbox",
+                  label: "Mostrar texto circular",
+                  defaultValue: true,
+                  admin: {
+                    width: "33%",
+                    description: "El texto que gira. Desmarcado, no se pinta aunque esté escrito.",
+                  },
+                },
+                {
+                  name: "mostrarDescripcion",
+                  type: "checkbox",
+                  label: "Mostrar recuadro de descripción",
+                  defaultValue: true,
+                  admin: {
+                    width: "33%",
+                    description:
+                      "El recuadro de vidrio con el párrafo y el «+». Desmarcado, no se pinta ninguno de los dos.",
+                  },
+                },
+              ],
+            },
+            {
               name: "titulo",
               type: "textarea",
               required: true,
@@ -195,7 +241,7 @@ export const PaginaInstitucional: CollectionConfig = {
               admin: {
                 rows: 2,
                 description:
-                  "Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas.",
+                  "Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas. Obligatorio aunque esté oculto: lo usan los lectores de pantalla.",
               },
             },
             {
@@ -206,6 +252,10 @@ export const PaginaInstitucional: CollectionConfig = {
                * Lo que lee un lector de pantalla es siempre el «Título».
                */
               type: "row",
+              admin: {
+                condition: (_: unknown, hermanos: { mostrarTitulo?: boolean }) =>
+                  hermanos?.mostrarTitulo !== false,
+              },
               fields: [
                 {
                   name: "tituloArriba",
@@ -231,7 +281,11 @@ export const PaginaInstitucional: CollectionConfig = {
               name: "parrafo",
               type: "textarea",
               label: "Párrafo",
-              admin: { description: "El texto del recuadro de vidrio. No se muestra en móvil." },
+              admin: {
+                condition: (_: unknown, hermanos: { mostrarDescripcion?: boolean }) =>
+                  hermanos?.mostrarDescripcion !== false,
+                description: "El texto del recuadro de vidrio. No se muestra en móvil.",
+              },
             },
             {
               name: "imagenFondo",
@@ -240,6 +294,8 @@ export const PaginaInstitucional: CollectionConfig = {
               required: true,
               label: "Imagen de fondo",
             },
+            // Aviso en vivo si hay fondo y falta el recorte para móvil (2026-10-14).
+            avisoField("avisoRecorteMovil", "AvisoRecorteMovil"),
             {
               /*
                * RECORTE VERTICAL PARA MÓVIL (CLAUDE.md §10.36): por debajo de
@@ -287,6 +343,8 @@ export const PaginaInstitucional: CollectionConfig = {
                   label: "Texto circular",
                   maxLength: 60,
                   admin: {
+                    condition: (_: unknown, hermanos: { mostrarTextoCircular?: boolean }) =>
+                      hermanos?.mostrarTextoCircular !== false,
                     width: "50%",
                     description:
                       "Opcional. Gira despacio (quieto con «reducir movimiento» o al pausar). Decorativo: los lectores de pantalla no lo leen.",
@@ -296,6 +354,10 @@ export const PaginaInstitucional: CollectionConfig = {
             },
             {
               type: "row",
+              admin: {
+                condition: (_: unknown, hermanos: { mostrarDescripcion?: boolean }) =>
+                  hermanos?.mostrarDescripcion !== false,
+              },
               fields: [
                 {
                   name: "enlace",

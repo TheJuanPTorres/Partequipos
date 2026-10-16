@@ -961,7 +961,19 @@ export interface Pagina {
     diapositivas?:
       | {
           /**
-           * Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas.
+           * Desmárcalo para dejar la foto limpia. El título sigue siendo obligatorio: no se ve, pero lo leen los lectores de pantalla y nombra la diapositiva.
+           */
+          mostrarTitulo?: boolean | null;
+          /**
+           * El texto que gira. Desmarcado, no se pinta aunque esté escrito.
+           */
+          mostrarTextoCircular?: boolean | null;
+          /**
+           * El recuadro de vidrio con el párrafo y el «+». Desmarcado, no se pinta ninguno de los dos.
+           */
+          mostrarDescripcion?: boolean | null;
+          /**
+           * Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas. Obligatorio aunque esté oculto: lo usan los lectores de pantalla.
            */
           titulo: string;
           /**
@@ -2213,6 +2225,9 @@ export interface PaginasSelect<T extends boolean = true> {
         diapositivas?:
           | T
           | {
+              mostrarTitulo?: T;
+              mostrarTextoCircular?: T;
+              mostrarDescripcion?: T;
               titulo?: T;
               tituloArriba?: T;
               tituloAbajo?: T;

@@ -6,6 +6,15 @@ import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import type { Articulo, CategoriasBlog } from "@/payload-types";
 
 /**
+ * Ancho con el que se piden las miniaturas (ver el `<Image>`). La tarjeta pinta
+ * la foto a ~386 × 160 px en escritorio y ~324 × 160 en móvil: con 384, el
+ * srcset de 1x/2x sale de 384 y 828 px. Antes se pasaba el ancho ORIGINAL y se
+ * pedían hasta 1920 px en escritorio y 3840 en móvil: 3,8 MB de imágenes al
+ * recorrer `/noticias/` (medido en el sitio publicado, 2026-10-14).
+ */
+const ANCHO_MINIATURA = 384;
+
+/**
  * Lista de artículos para el índice y los archivos de categoría.
  *
  * SIN PAGINACIÓN, a propósito: el sitio actual no tiene ni una URL paginada
@@ -34,8 +43,8 @@ export function ListaArticulos({ articulos, vacio }: { articulos: Articulo[]; va
               <Image
                 src={imagen.url}
                 alt={imagen.alt}
-                width={imagen.width}
-                height={imagen.height}
+                width={ANCHO_MINIATURA}
+                height={Math.round((ANCHO_MINIATURA * imagen.height) / imagen.width)}
                 className="mb-3 h-40 w-full rounded object-cover"
                 // Punto focal del panel: qué parte se ve en el recorte de 160 px.
                 style={{ objectPosition: imagen.posicion }}

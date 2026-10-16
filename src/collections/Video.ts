@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { formatoDeVideoPermitido } from "./hooks/formatoDeVideoPermitido";
 import { almacenEsperado } from "./hooks/almacenEsperado";
 import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
@@ -40,7 +40,7 @@ export const Video: CollectionConfig = {
     description: "Vídeos del sitio: MP4 o WebM, máximo 4 MB, con imagen de póster obligatoria.",
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { validarAlt } from "../lib/media/altFlojo";
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { formatoDeImagenPermitido } from "./hooks/formatoDeImagenPermitido";
 import { almacenEsperado } from "./hooks/almacenEsperado";
 import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
@@ -29,7 +29,7 @@ export const Media: CollectionConfig = {
     components: { beforeListTable: ["/components/admin/AltFlojos"] },
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

@@ -18,7 +18,7 @@ import { PestanasUsada } from "./diferidos";
  * pestañas (cliente). Los textos son del panel (página «inicio»); las
  * tarjetas, de `equipos-usados`; la máquina decorativa, de la portada.
  *
- * Lo que se aparta del diseño (docs/diseno/decisiones-home-ux9.md §32):
+ * Lo que se aparta del diseño (docs/diseno/decisiones-home-ux9.md §33):
  * - El título en `<h2>` y el subtítulo y la frase en `<p>` (en el diseño,
  *   `<div>` y `<h3>`); el nombre de cada tarjeta en `<h3>`.
  * - D10: en móvil siguen siendo pestañas, no acordeón.

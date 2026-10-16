@@ -2522,7 +2522,47 @@ como foto de tarjeta un logo (`Dynapac-logo-02.jpg`); pasa a la foto del diseño
 `2025/10/CA25D-CIELO.jpg`, que está en la exportación de WordPress del cliente.
 El orden de las marcas pasa a ser el de la Home V2.
 
-## 32. «Maquinaria pesada usada» de la Home V2 de Andrés (2026-10-15)
+## 32. Testimonios y llamada al catálogo de la Home V2 (2026-10-15)
+
+Fuente: el mismo export `elementor-3519-2026-10-15.json` (secciones 9 y 11) y
+la referencia pintada, medidas a 390 · 1010 · 1440 contra el sitio publicado
+(`8eab1e4`), con `MEDICION.md` tomado.
+
+**Resultado: las dos ya están como en la Home V2. No cambia código.**
+
+**Testimonios (sección 11 de la V2; aquí, la 10 de §20).** La V2 usa el mismo
+widget («Acordeón de vídeo con popup») en un contenedor a todo el ancho
+(`content_width: full`, relleno 3 %), que es lo que ya pinta el sitio:
+
+| Ancho | Home V2 (tarjetas visibles, x)                               | Publicado       |
+| ----- | ------------------------------------------------------------ | --------------- |
+| 1440  | 43–263 · 275–934 (abierta, 659 × 560) · 946–1165 · 1177–1397 | Igual, al píxel |
+| 1010  | Abierta 195–652 (457 × 560); cerradas desenfocadas 14 px     | Igual           |
+| 390   | Apiladas: cerradas de 96–110 px, abierta de 460              | Igual           |
+
+Accesibilidad, comprobada en la página pintada a 1440 y 390:
+
+- **Teclado:** se tabula por las cuatro tarjetas (botón con `aria-expanded`)
+  y, solo en la abierta, por «Ver el vídeo de …». Enter abre la tarjeta; el
+  foco se ve con un borde rojo de 3 px en la parte visible.
+- **Sin depender del desenfoque:** la abierta se distingue por el tamaño
+  (659 frente a 220 px de ancho; en móvil, 460 frente a 96 de alto), por su
+  nombre y su texto, que solo ella enseña, y por `aria-expanded`.
+- **Reducir movimiento:** las transiciones pasan a 0 s; el cambio de tarjeta
+  es inmediato.
+
+**Llamada al catálogo (sección 9 de la V2; aquí, la 8 de §19).** Mismos
+valores que ux-9 (título de 735 px, botones de radio 7 y 20 px entre ellos).
+El botón vuelve a decir «Catálgo» en la V2; aquí sigue «Catálogo» (D16),
+anotado para Andrés en `pendientes-andres.md` §3. El margen de −180 px sigue
+sin replicarse (§27.5).
+
+**Hallazgo de datos, no de código:** en el sitio publicado, tres de las cuatro
+tarjetas de testimonios llevan el mismo nombre (la 1.ª, la 3.ª y la 4.ª), con
+fotos distintas; en la V2 son cuatro testimonios distintos. Es contenido del
+panel (colección de testimonios), no de esta sección.
+
+## 33. «Maquinaria pesada usada» de la Home V2 de Andrés (2026-10-15)
 
 Fuente: las secciones 3 (cabecera, `511c5618`) y 4 (pestañas, `a185c47`) del
 export `elementor-3519-2026-10-15.json` y la referencia pintada, medidas a

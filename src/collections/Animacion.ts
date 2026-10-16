@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { almacenEsperado } from "./hooks/almacenEsperado";
 import { formatoDeAnimacionPermitido } from "./hooks/formatoDeAnimacionPermitido";
 import { sinDescargaRemota } from "./hooks/sinDescargaRemota";
@@ -31,7 +31,7 @@ export const Animacion: CollectionConfig = {
       "Animaciones Lottie (.json exportado con Bodymovin, sin expresiones), máximo 4 MB. Se reproducen una vez al llegar con el scroll.",
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

@@ -2599,10 +2599,14 @@ export `elementor-3519-2026-10-15.json` y la referencia pintada, medidas a
 `20261016_041733_ficha_pdf_usados` cambia la portada solo si conserva
 exactamente los de ux-9: «Ver producto» y «Ver todas las excavadoras»).
 
-**Aditamentos:** la pestaña sale de las unidades marcadas con «Pestaña en la
-portada: Aditamentos». Ninguna de las 128 unidades importadas de WordPress lo
-es, así que con el contenido real esa pestaña no se pinta (en el preview la
-llenan dos unidades de ejemplo de ux-9).
+**Aditamentos (dirección, 2026-10-16):** la pestaña sale de las unidades
+marcadas con «Pestaña en la portada: Aditamentos» y **no se pinta** mientras no
+haya unidades reales marcadas. Ninguna de las 128 de WordPress lo es; las dos de
+ejemplo de ux-9 se retiraron del preview. Se decidirá con el cliente.
+
+**Máquina de la cabecera (dirección, 2026-10-16):** vacía hasta que haya un PNG
+recortado real. El importador de contenido real ya no pone ahí la foto del patio
+de WordPress, que es una foto normal.
 
 ## 34. Auditoría de D (2026-10-14): pines de las sedes y título de la portada
 

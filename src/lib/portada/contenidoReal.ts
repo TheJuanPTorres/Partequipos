@@ -70,7 +70,6 @@ export type FuenteContenidoReal = {
   portada: {
     marcas: { slug: string; logo: string; tarjeta: string; orden: number; descripcion: string }[];
     logos: { nombre: string; logo: string }[];
-    usadaImagen: string;
     categorias: {
       slug: string;
       enlace: string;

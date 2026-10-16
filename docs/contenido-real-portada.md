@@ -25,14 +25,14 @@ npm run preview:real:retirar
 ## 2. Qué se sustituye y por qué
 
 Las imágenes son ficheros de la propia web original; la tabla completa, con su
-ruta en WordPress, está en `IMAGENES` del extractor. Son **23**, una subida al
+ruta en WordPress, está en `IMAGENES` del extractor. Son **22**, una subida al
 Blob cada una (Media no genera tamaños derivados).
 
 | Dónde              | Antes (ux-9)                                     | Ahora (WordPress)                                                                                                                                                                                      |
 | ------------------ | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Hero               | —                                                | **No se toca**: ya son fotos del cliente                                                                                                                                                               |
 | Sec. 2, marcas     | Logos y fotos de la maqueta; 3 marcas            | Logo y foto de cada marca de la home de WP; **4 marcas, con Dynapac** (decisión de dirección)                                                                                                          |
-| Sec. 3, usados     | Brazo de excavadora recortado                    | Foto de usados de WP. Las fichas de ejemplo las retira la copia; las pestañas se llenan con las unidades reales                                                                                        |
+| Sec. 3, usados     | Brazo de excavadora recortado                    | **Sin máquina** (dirección, 2026-10-16: el campo espera un PNG recortado y WP no tiene ninguno). Las fichas de ejemplo las retira la copia; las pestañas se llenan con las unidades reales             |
 | Sec. 4, logos      | 9 logos                                          | Los **6 de «Nuestras Marcas»** de WP (decisión de dirección)                                                                                                                                           |
 | Sec. 5, repuestos  | 4 imágenes de la maqueta                         | Las 4 de la plantilla de categorías de WP, con su título y su enlace a la página de categoría. Corrige la errata «Blades y corte» → «Baldes y herramienta de corte»                                    |
 | Sec. 6–8, compañía | Vídeo de ux-9 y un YouTube que no es del cliente | **Imagen** de WP (sin vídeo) y el YouTube que pinta Nosotros en WP                                                                                                                                     |
@@ -49,7 +49,7 @@ escribe todo en mayúsculas pasan a mayúscula inicial («OFRECEMOS SOLUCIONES�
 quiere, y un lector de pantalla puede deletrear un texto en mayúsculas.
 
 **Huecos** (sin equivalente en WP, aceptados «sin imagen» por dirección si la
-sección se ve bien): fotos de las sedes, imagen del
+sección se ve bien): fotos de las sedes, máquina de la cabecera de usados, imagen del
 pie, máquina de la franja de Nosotros, vídeo de cabecera de Nosotros,
 animación del mapa y 2 de las 3 cifras de Nosotros (en WP son texto, sin
 número). Las sedes de Antioquia e Ibagué llevan las coordenadas del centro de
@@ -60,6 +60,10 @@ de su página en WP, **solo si nombra la marca**. La de Dynapac en WP es la de
 CASE, copiada de plantilla. Para Dynapac va el primer párrafo de su página que
 la nombra, el mismo criterio que con las fichas (`docs/fichas-nuevas-importacion.md` §6).
 **Para el cliente:** corregir la meta descripción de la página de Dynapac en su web.
+
+**Desde el 2026-10-16** (dirección, Home V2), Dynapac lleva el texto del diseño
+V2, fijo en el extractor (`DESCRIPCIONES_V2`), para que las reimportaciones lo
+conserven; su foto de tarjeta es `CA25D-CIELO.jpg` y va tercera.
 
 **Orden e icono de las categorías técnicas:** el importador los fija (los de
 hoy en el preview), porque la retirada de la copia de demostración los

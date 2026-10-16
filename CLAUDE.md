@@ -575,7 +575,7 @@ veredicto, que va en el informe.
 >
 > 1. **Fase G (sedes):** construida (2026-10-02). Sin token de Mapbox se ve la lista de sedes; el globo se activa con `NEXT_PUBLIC_MAPBOX_TOKEN` de la cuenta del cliente (L5). **Globo activo y verificado en producción el 2026-10-06** contra ux-9 a 390, 1010 y 1440 (`decisiones-home-ux9.md` §23). El token de hoy es el público por defecto: antes de lanzar, medio de pago y token restringido a `partequipos.com` (runbook de lanzamiento).
 >
-> **§10.38 CERRADA EN LA PORTADA Y EN NOSOTROS (2026-10-16):** copia de demostración retirada y contenido real puesto en el sitio publicado. Para el resto del sitio, ver §10.38 antes del lanzamiento. 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview. 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
+> **§10.38 CERRADA DEL TODO (2026-10-16):** copia de demostración retirada, contenido real puesto en la portada y en Nosotros, y la imagen de Andrés de la ficha sustituida por una foto real y borrada. Ya no queda ninguna imagen de Andrés en el sitio publicado. 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview. 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
 >
 > **Bloque anterior al diseño: QUITADO (fase 6).** La home tiene un solo `<main>` con las secciones de ux-9; el correo pasa al pie (desviación menor, pendiente de Andrés). El horario pasa al global `seo` de Payload (editable, con su migración): va en el JSON-LD `Organization` (`contactPoint.hoursAvailable`) y en `/contactanos/`. Detalle en `decisiones-home-ux9.md` §22.
 >
@@ -1191,7 +1191,7 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > la colección entra en la segunda instancia de `vercelBlobStorage` de
 > `payload.config.ts` y en `REGLAS_SUBIDA_DIRECTA`.
 
-### 10.38 EXCEPCIÓN TEMPORAL DE DEMOSTRACIÓN — la home completa en producción (2026-10-02) · CERRADA EN LA PORTADA Y EN NOSOTROS (2026-10-16)
+### 10.38 EXCEPCIÓN TEMPORAL DE DEMOSTRACIÓN — la home completa en producción (2026-10-02) · CERRADA DEL TODO (2026-10-16)
 
 > **CERRADA en la portada y en Nosotros el 2026-10-16.** Dirección ejecutó en el
 > sitio publicado los dos runbooks, en este orden:
@@ -1220,10 +1220,24 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > se pinta, porque la sección no sale sin preguntas. Testimonios y preguntas
 > reales siguen pendientes del cliente.
 >
-> **Sigue pendiente antes del lanzamiento:** la imagen de la ficha de producto
-> de la tabla de abajo no la tocan esos runbooks. Hay que confirmar su licencia
-> o sustituirla (hoy se sirve `contacto-asesor-…png`, de origen sin comprobar).
-> Con eso queda cerrado el paso 0 de README §7.
+> **CERRADA DEL TODO el mismo día, con la ficha de producto.** Dirección
+> ejecutó `runbook-ficha-foto-real-contacto.md` (del agente B, tras el #191):
+>
+> - el global «Ficha de producto» lleva la foto real del técnico de Guarne
+>   (`wp-real-faq-tarjeta-…jpg`, la misma de Contáctanos), y la ficha la sirve;
+> - la imagen de Andrés (`ficha-contacto-asesor-…png`) está **borrada** de
+>   «Imágenes»: 0 en la API y 0 en la ficha.
+>
+> Era la última imagen de Andrés en el sitio publicado. Comprobado por Claude
+> en solo lectura: ni `demo-copia-`, ni `contacto-asesor`, ni otros nombres de
+> la copia en el HTML de la portada, Nosotros, Contáctanos, los índices de
+> maquinaria, el blog y una ficha. **Queda cumplido el paso 0 de README §7**
+> («retirar §10.38 o confirmar las licencias»).
+>
+> **Hallazgo al cerrar:** guardar el global no refrescó la ficha hasta un
+> redeploy. Causa probable, leída en Next 16.3.5: `revalidatePath` con patrón
+> no lleva el grupo `(site)`, y la etiqueta de la página sí. Ver el PR del
+> arreglo, #194 (sin fusionar).
 
 > **Decisión de dirección del 2026-10-02.** Para enseñar el avance, la home de
 > producción puede llevar los assets que hasta ahora solo iban al preview:

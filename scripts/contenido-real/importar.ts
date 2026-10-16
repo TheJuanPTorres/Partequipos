@@ -376,6 +376,28 @@ if (!manifiesto.antes) {
   }
 }
 
+// Las categorías que una pasada anterior no tocaba (de 4 a 10 el 2026-10-16, dos tarjetas
+// apiladas de 5): su valor de ahora es el original, así la retirada también las devuelve.
+{
+  const antesCat = manifiesto.antes!.categorias as Record<string, unknown>;
+  let nuevas = 0;
+  for (const c of categorias)
+    if (!(String(c.id) in antesCat)) {
+      antesCat[String(c.id)] = {
+        imagen: idDe(c.imagen),
+        tituloPortada: c.tituloPortada ?? null,
+        enlace: c.enlace ?? null,
+        ordenPortada: c.ordenPortada ?? null,
+        icono: c.icono ?? null,
+      };
+      nuevas++;
+    }
+  if (nuevas) {
+    log(`categorías nuevas en el manifiesto: ${nuevas}`);
+    guardar();
+  }
+}
+
 // ---------- Imágenes: de WordPress al Blob, una cada 0,7 s, sin repetir ----------
 
 const AGENTE = "Partequipos-migracion/1.0 (importador de contenido real; solo lectura)";

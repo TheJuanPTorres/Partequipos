@@ -1,14 +1,40 @@
 /*
- * «Venta de repuestos» — fila de categorías de la Home V2 (plantilla 3474 del
- * export `elementor-3519`; título, antetítulo y botón son los de ux-9, §18).
+ * «Venta de repuestos» — Home V2 de Andrés (sección 6 de `elementor-3519`):
+ * DOS TARJETAS APILADAS de cinco categorías técnicas (2026-10-16, dirección).
+ * Medido en la referencia pintada a 390, 1010 y 1440: tarjetas de 400 px, radio
+ * 20 y sombra `0 10px 40px`, fijadas a 150 / 60 / 40 px del borde, cada una
+ * 20 px más abajo que la anterior; la tapada encoge a 0,97 y se agrisa un 30 %
+ * (eso lo pone `TarjetasApiladas`). Título, antetítulo y botón, los de ux-9 (§18).
  */
 .seccion {
+  --rep-alto: 400px;
+  --rep-fijada: 150px;
+  --rep-escalon: 20px;
+  /* Entre tarjetas, el recorrido en el que la segunda sube sobre la primera (120 en la referencia). */
+  --rep-hueco: 120px;
+  --rep-foto: 180px;
+
   padding: 70px 10px 30px;
   background: var(--color-fondo-seccion);
   color: var(--color-texto);
 }
 
-/* Contenedor de 1200 px (el separador y las dos tarjetas grandes); la fila va a 1140. Huecos de 20 entre widgets. */
+@media (max-width: 1024px) {
+  .seccion {
+    --rep-fijada: 60px;
+    --rep-foto: 140px;
+  }
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    --rep-fijada: 40px;
+    --rep-foto: 72px;
+    --rep-hueco: 80px;
+  }
+}
+
+/* Contenedor de 1200 px. Huecos de 20 entre widgets. */
 .caja {
   display: flex;
   max-width: 1200px;
@@ -41,54 +67,80 @@
   text-align: center;
 }
 
-/* ---------------------------------------------------------------- tarjetas */
+/* ------------------------------------------------------- tarjetas apiladas */
 
-/*
- * Fila de categorías (plantilla 3474 de la Home V2): contenedor en fila,
- * centrado, que envuelve en móvil; cada tarjeta mide el 24 % del contenedor.
- */
-.lista {
-  display: flex;
-  max-width: 1140px;
-  margin: 0 auto;
+.apiladas {
+  display: grid;
+  margin: 0;
   padding: 0;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  gap: var(--rep-hueco);
   list-style: none;
 }
 
-/* Blanca, radio 30, relleno 30; al pasar el ratón cambia de fondo. */
+/*
+ * Cada <li> se fija arriba; su relleno superior crece 20 px por tarjeta, así
+ * que las apiladas asoman escalonadas (como en la referencia). La primera
+ * queda así a 40 px del título.
+ */
+.item {
+  position: sticky;
+  top: var(--rep-fijada);
+  padding-top: calc(var(--rep-escalon) * (var(--apilada-i) + 1));
+  transform: scale(var(--apilada-escala, 1));
+  transform-origin: top center;
+  filter: grayscale(var(--apilada-gris, 0%));
+}
+
+/*
+ * TECLADO: el foco dentro de una tarjeta tapada la sube por encima de la que la
+ * tapa, para que el enlace enfocado se vea (WCAG 2.4.11).
+ */
+.item:focus-within {
+  z-index: 1;
+}
+
+/* «Reducir movimiento»: sin barrido; una tarjeta tras otra. */
+@media (prefers-reduced-motion: reduce) {
+  .apiladas {
+    gap: 20px;
+  }
+
+  .item {
+    position: static;
+    padding-top: 0;
+  }
+}
+
+/* La tarjeta: blanca, 400 px, cinco categorías en fila. */
 .tarjeta {
   display: flex;
   box-sizing: border-box;
-  width: calc((100% - 30px) / 4);
+  height: var(--rep-alto);
+  margin: 0;
+  padding: 30px;
+  gap: 10px;
+  border-radius: 20px;
+  background: var(--color-fondo);
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.3);
+  list-style: none;
+}
+
+/* Cada categoría: foto, título y «Ver todo» abajo; al pasar el ratón cambia de fondo (medido). */
+.categoria {
+  display: flex;
+  box-sizing: border-box;
+  min-width: 0;
   padding: 20px;
+  flex: 1 1 0;
   flex-direction: column;
   align-items: center;
   gap: 20px;
   border-radius: 30px;
-  background: var(--color-fondo);
   transition: background-color 0.3s;
 }
 
-.tarjeta:hover {
+.categoria:hover {
   background: #fafafa;
-}
-
-/*
- * Tarjeta blanca que envuelve la fila (primera tarjeta del widget de la
- * referencia): 1200 px, radio 20 y la misma sombra que la grande.
- */
-.fila {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 1200px;
-  margin: 20px auto 0;
-  padding: 13px 30px;
-  border-radius: 20px;
-  background: var(--color-fondo);
-  box-shadow: 0 10px 40px rgb(0 0 0 / 0.3);
 }
 
 .foto {
@@ -97,21 +149,25 @@
   justify-content: center;
 }
 
-/*
- * Hueco cuadrado de 225 px como máximo (en la referencia, recortes cuadrados
- * de producto); las fotos reales, apaisadas, se recortan al cuadrado con su
- * punto focal. En una tarjeta más estrecha se ajusta.
- */
+/* Hueco cuadrado (180 px a 1440, 140 a 1010); la foto se recorta con su punto focal. */
 .img {
-  width: 225px;
+  width: var(--rep-foto);
   max-width: 100%;
   height: auto;
   aspect-ratio: 1;
   object-fit: cover;
 }
 
+.textoCategoria {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
 /* Tipografía `2e6cf84` del kit: Inter 20 px negrita (18 en móvil), interlínea 1,2. */
-.tituloTarjeta {
+.tituloCategoria {
   margin: 0;
   color: var(--color-texto);
   font-size: var(--texto-destacado);
@@ -130,6 +186,7 @@
   background: var(--color-marca);
   color: var(--color-fondo);
   line-height: 1;
+  white-space: nowrap;
   text-decoration: none;
   transition:
     background-color 0.3s,
@@ -147,124 +204,66 @@
   outline-offset: 3px;
 }
 
-/*
- * Tarjeta grande bajo la fila (widget «Stacking Cards» de la referencia, sin
- * apilado): alto 400, sombra y radio como las de ux-9. Medidas de la referencia a 390, 1010 y 1440.
- */
-.destacada {
-  display: flex;
-  width: 100%;
-  max-width: 1200px;
-  margin: 100px auto 0;
-  height: 400px;
-  overflow: hidden;
-  border-radius: 20px;
-  background: var(--color-fondo);
-  box-shadow: 0 10px 40px rgb(0 0 0 / 0.3);
-}
-
-.destacadaTexto {
-  display: flex;
-  box-sizing: border-box;
-  flex: 1 1 auto;
-  padding: 40px;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.destacada[data-con-foto] .destacadaTexto {
-  flex: 0 0 60%;
-}
-
-.icono {
-  display: grid;
-  width: 50px;
-  height: 50px;
-  flex: none;
-  place-items: center;
-  border-radius: 10px;
-  background: var(--color-marca);
-  color: var(--color-fondo);
-}
-
-.icono svg {
-  width: 26px;
-  height: 26px;
-}
-
-.destacadaTitulo {
-  margin: 0;
-  color: var(--color-texto);
-  font-size: var(--texto-titulo-bloque);
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-.destacadaDescripcion {
-  margin: 0;
-  color: #333;
-  font-weight: 300;
-  line-height: 1.42;
-}
-
-.destacadaFoto {
-  position: relative;
-  flex: 0 0 40%;
-}
-
-.destacadaImg {
-  object-fit: cover;
-}
-
-/* Hasta 1220 px la tarjeta ocupa todo el ancho de la ventana. */
+/* Hasta 1220 px la tarjeta ocupa todo el ancho de la ventana, como en la referencia. */
 @media (max-width: 1220px) {
-  .fila,
-  .destacada {
+  .tarjeta {
     width: calc(100% + 20px);
-    max-width: none;
     margin-inline: -10px;
   }
+}
 
-  .fila {
-    padding-inline: 10px;
+@media (max-width: 1024px) {
+  .tarjeta {
+    padding: 20px;
+    gap: 6px;
+  }
+
+  .categoria {
+    padding: 10px;
+    gap: 16px;
   }
 }
 
-/* Móvil: una tarjeta por fila, sin la tarjeta que las envuelve. */
+/*
+ * Móvil: cada categoría en una fila, la foto pequeña a la izquierda, y la
+ * tarjeta mide lo que su contenido (en la referencia, una por fila a todo el
+ * ancho, desbordan la tarjeta de 400 px).
+ */
 @media (max-width: 767px) {
-  .fila {
-    width: 100%;
-    margin-inline: 0;
-    padding: 0;
-    background: none;
-    box-shadow: none;
-  }
-
   .tarjeta {
-    width: 100%;
-  }
-
-  .destacada {
     height: auto;
+    padding: 20px;
     flex-direction: column;
+    gap: 8px;
   }
 
-  .destacada[data-con-foto] .destacadaTexto {
-    flex: 1 1 auto;
-    gap: 20px;
+  .categoria {
+    padding: 8px;
+    flex-direction: row;
+    gap: 16px;
   }
 
-  .destacadaFoto {
-    flex: 0 0 120px;
+  .foto {
+    width: auto;
+    flex: none;
+  }
+
+  .textoCategoria {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .tituloCategoria {
+    text-align: left;
   }
 }
 
 /* ------------------------------------------------------------------- botón */
 
+/* «Ver todos los repuestos», a 40 px de las tarjetas (en la referencia, 120; dirección lo quiere más cerca). */
 .pie {
   display: flex;
-  margin-top: 100px;
+  margin-top: 20px;
   justify-content: center;
 }
 
@@ -294,6 +293,7 @@
   border-color: var(--color-texto);
   background: var(--color-texto);
 }
+
 @media (max-width: 767px) {
   .titulo {
     box-sizing: border-box;

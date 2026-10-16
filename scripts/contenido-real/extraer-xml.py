@@ -9,7 +9,7 @@
 # - «NUESTRAS sedes» (plantilla 35576, la pinta /contactanos/): ciudades,
 #   líneas, direcciones, teléfonos y coordenadas de su enlace de Google Maps;
 # - «Repuestos maquinaria pesada - Categorías» (40343, la pinta la home):
-#   título y enlace de cada categoría;
+#   título, enlace e imagen de las 10 categorías técnicas;
 # - las meta descripciones (Yoast) de la home, Nosotros y los índices de
 #   maquinaria nueva, usada y repuestos;
 # - los adjuntos elegidos en `IMAGENES` (URL y texto alternativo).
@@ -59,6 +59,13 @@ IMAGENES = {
     "cat-llantas": ("2025/04/CATEGORIA-Llantas.jpg", "Llantas y rines para maquinaria pesada"),
     "cat-lubricantes": ("2025/04/Recurso-2-.png", "Lubricantes Eni para maquinaria pesada"),
     "cat-filtracion": ("2025/07/Aceite-600x600-1.png", "Filtros para maquinaria pesada"),
+    # Las otras 6 de la plantilla 40343 (2026-10-16): la sección de repuestos de la Home V2
+    # son dos tarjetas apiladas de 5 categorías cada una.
+    "cat-miscelaneos": ("2025/07/2.0-CONJUNTO-MISCELANEOS-PPAL.jpg", "Repuestos misceláneos para maquinaria pesada"),
+    "cat-componentes": ("2025/07/3.0-CATEGORIA-Componentes-mayores-sep-2025.jpg", "Componentes mayores para maquinaria pesada"),
+    "cat-motor": ("2025/05/AMOH1279-ABL_01.webp", "Repuestos de motor diésel para maquinaria pesada"),
+    "cat-transmision": ("2025/07/CATEGORIA-transmision-600x600-1.jpg", "Repuestos de transmisión para maquinaria pesada"),
+    "cat-hidraulicos": ("2025/07/Flutek-y-repuestos.jpg", "Componentes hidráulicos para maquinaria pesada"),
     "compania": ("2024/08/case-construction-equipment-range.jpg", "Maquinaria CASE trabajando en una cantera"),
     "nosotros-cabecera": ("2024/04/Cattura-1.jpg", "Excavadora Hitachi trabajando en una obra"),
     "nosotros-mapa": (
@@ -77,14 +84,31 @@ IMAGENES = {
 }
 # Punto focal de las fotos que se recortan mucho (porcentajes): la cara del técnico.
 FOCOS = {"faq-tarjeta": (52, 30)}
-# Las 4 categorías técnicas de la sección 5: su imagen (la de la plantilla 40343) y,
-# porque la retirada de la copia de demostración los devuelve a vacío, su orden
-# en la portada y su icono (los de hoy en el preview; son del diseño, no de WordPress).
+# Las 10 categorías técnicas de la sección de repuestos (2026-10-16, dirección: dos
+# tarjetas apiladas de 5), en el orden de la plantilla 40343, el de la página de
+# categorías de WordPress: su imagen, su orden en la portada y su icono (del panel;
+# transmisión e hidráulicos no tienen uno propio). Antes eran 4.
 CATEGORIAS = {
-    "herramienta-de-corte-gets-para-maquinaria-pesada": ("cat-corte", 1, "corte"),
-    "llantas-y-rines-para-maquinaria-pesada": ("cat-llantas", 2, "llanta"),
-    "lubricantes-para-maquinaria-pesada": ("cat-lubricantes", 3, "lubricante"),
-    "filtracion-para-maquinaria-pesada": ("cat-filtracion", 4, "filtro"),
+    # La misma foto que la tarjeta de repuestos de Nosotros: no se sube dos veces.
+    "tren-de-rodaje-para-maquinaria-pesada": ("tarjeta-repuestos", 1, "rodaje"),
+    "filtracion-para-maquinaria-pesada": ("cat-filtracion", 2, "filtro"),
+    "herramienta-de-corte-gets-para-maquinaria-pesada": ("cat-corte", 3, "corte"),
+    "lubricantes-para-maquinaria-pesada": ("cat-lubricantes", 4, "lubricante"),
+    "llantas-y-rines-para-maquinaria-pesada": ("cat-llantas", 5, "llanta"),
+    "miscelaneos-para-maquinaria-pesada": ("cat-miscelaneos", 6, "miscelaneos"),
+    "componentes-mayores-para-maquinaria-pesada": ("cat-componentes", 7, "componentes"),
+    "motor-diesel-para-maquinaria-pesada": ("cat-motor", 8, "diesel"),
+    "transmision-para-maquinaria-pesada": ("cat-transmision", 9, None),
+    "componentes-hidraulicos-para-maquinaria-pesada": ("cat-hidraulicos", 10, None),
+}
+# Títulos que no se toman tal cual de la plantilla: el de hidráulicos está partido (solo
+# pinta «hidráulicos»); los otros, en mayúsculas de título, pasan a mayúscula solo al
+# inicio, como el resto («Llantas y rines»), y «diésel» con su tilde.
+TITULOS_CATEGORIA = {
+    "componentes-hidraulicos-para-maquinaria-pesada": "Componentes hidráulicos",
+    "tren-de-rodaje-para-maquinaria-pesada": "Tren de rodaje",
+    "componentes-mayores-para-maquinaria-pesada": "Componentes mayores",
+    "motor-diesel-para-maquinaria-pesada": "Motor diésel",
 }
 # Sección 2: las 4 marcas, en el orden de la Home V2 de Andrés (2026-10-15).
 MARCAS = [("hitachi", "logo-hitachi", "marca-hitachi"), ("case-construction", "logo-case", "marca-case"),
@@ -276,7 +300,8 @@ for e in todos(arboles[ID_CATEGORIAS]):
         titulosCat.setdefault(slug, pendiente[:1].upper() + pendiente[1:])
         pendiente = None
 for c in categorias:
-    c["titulo"] = oracion(titulosCat[c["slug"]])
+    c["titulo"] = TITULOS_CATEGORIA.get(c["slug"]) or oracion(titulosCat[c["slug"]])
+categorias.sort(key=lambda c: c["orden"])
 if len(categorias) != len(CATEGORIAS):
     sys.exit(f"✗ categorías encontradas: {len(categorias)} de {len(CATEGORIAS)}")
 

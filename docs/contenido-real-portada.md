@@ -97,3 +97,36 @@ repositorio, lo ejecuta dirección).
 - **Igual que antes, no lo trae el contenido real:**
   - la cabecera de Nosotros a 390, con el texto pegado al borde;
   - la cifra pegada al botón.
+
+## 5. Lo elegido en el panel no se pisa, y `solo=categorias` (2026-10-16)
+
+**Por qué:** cada pasada del importador volvía a escribir TODO. Eso incluía las fotos y los logos de las 4 marcas, la máquina recortada de usados (la dejaba vacía), la portada, el pie, las sedes y Nosotros. Dirección ya había elegido en el panel los logos transparentes de las marcas y va a poner la máquina recortada. Una segunda pasada los habría pisado.
+
+**Regla** (`elegidoEnElPanel`, `src/lib/portada/contenidoReal.ts`, con pruebas): cada imagen, vídeo o animación que escribe el importador se queda como está si la eligió alguien en el panel, es decir, si:
+
+- no está vacía;
+- no es de la importación (no lleva `wp-real-`);
+- no es la que había antes de la primera pasada (la del manifiesto).
+
+Ni se sustituye ni se vacía. La simulación las lista en `conservadosDelPanel` y la importación las anota («elegido en el panel, no se toca»). Cubre:
+
+- logos y fotos de tarjeta de las marcas;
+- la máquina recortada de usados;
+- los logos de «Nuestras marcas»;
+- la foto y el vídeo de «Nuestra Compañía»;
+- la foto de las preguntas;
+- las fotos de las categorías;
+- la imagen decorativa del pie;
+- las fotos de las sedes;
+- las imágenes, el vídeo y la animación de Nosotros.
+
+**Lo que NO cubre:** los TEXTOS. En el modo completo se vuelven a escribir los de la portada, las marcas, las sedes y Nosotros. Además, se borra una sede que no esté en la fuente.
+
+**`solo=categorias`:** solo las categorías técnicas de la portada y las fotos que usan. No toca marcas, portada, pie, sedes ni Nosotros. Es el modo de la segunda pasada para las 10 categorías.
+
+**Probado por su efecto en el preview:**
+
+1. Se eligieron, como en el panel, otro logo para Hitachi y una máquina recortada.
+2. La importación completa los conservó: «elegido en el panel, no se toca» y los mismos ids después.
+3. Se devolvieron los valores de antes.
+4. La simulación `solo=categorias` da 10 categorías, 0 subidas y «no se toca» en lo demás.

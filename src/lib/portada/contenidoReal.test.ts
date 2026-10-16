@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import {
   ENLACES_TARJETAS,
   PREFIJO_REAL,
+  elegidoEnElPanel,
   ficheroReal,
   quedaCopiaDemo,
   restoDeLaCopia,
@@ -48,5 +49,25 @@ describe("quedaCopiaDemo", () => {
 describe("ENLACES_TARJETAS", () => {
   it("rutas del sitio con barra final", () => {
     for (const enlace of Object.values(ENLACES_TARJETAS)) assert.match(enlace, /^\/[a-z-/]+\/$/);
+  });
+});
+
+describe("elegidoEnElPanel: lo que eligió un editor no se pisa", () => {
+  const f = (id: number, fichero: string | null) => ({ id, fichero });
+
+  it("un logo subido desde el panel, distinto del de antes, se conserva", () => {
+    assert.equal(elegidoEnElPanel(f(9, "logo-hitachi-transparente.png"), 3), true);
+    // La máquina recortada puesta en el panel cuando el importador la dejó vacía.
+    assert.equal(elegidoEnElPanel(f(12, "brazo-excavadora.png"), null), true);
+  });
+
+  it("vacío, propio de la importación o el de antes de la primera pasada: se sustituye", () => {
+    assert.equal(elegidoEnElPanel(null, 3), false);
+    assert.equal(elegidoEnElPanel(f(7, `${PREFIJO_REAL}logo-hitachi.png`), 3), false);
+    assert.equal(elegidoEnElPanel(f(3, "demo-copia-logo.png"), 3), false);
+  });
+
+  it("un id que ya no existe en Media cuenta como vacío", () => {
+    assert.equal(elegidoEnElPanel(f(44, null), 3), false);
   });
 });

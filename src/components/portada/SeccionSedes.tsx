@@ -56,7 +56,7 @@ function Ficha({ sede, i }: { sede: SedeLista; i: number }) {
                 </a>
               ) : null}
               <a
-                className={estilos.mapa}
+                className={estilos.verMapa}
                 href={urlGoogleMaps(l.direccion, sede.ciudad)}
                 target="_blank"
                 rel="noopener noreferrer"

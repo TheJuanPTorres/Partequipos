@@ -17,6 +17,12 @@ type SlugFieldOptions = {
    * «obligatorio».
    */
   validate?: TextFieldSingleValidation;
+  /**
+   * `false` quita el «obligatorio» del ESQUEMA (la columna admite nulos y el
+   * tipo generado lo deja opcional); la colección que lo use tiene que
+   * rellenarlo con un gancho y exigirlo en su `validate`. Por defecto, `true`.
+   */
+  requerido?: boolean;
 };
 
 /**
@@ -50,12 +56,13 @@ export function slugField({
   from = "nombre",
   unique = false,
   validate,
+  requerido = true,
 }: SlugFieldOptions = {}): Field {
   return {
     name: "slug",
     type: "text",
     ...(validate ? { validate } : {}),
-    required: true,
+    required: requerido,
     unique,
     index: true,
     label: "Dirección web",

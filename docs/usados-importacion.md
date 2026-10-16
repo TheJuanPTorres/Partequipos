@@ -146,11 +146,41 @@ Para el sitio publicado, el runbook
 `Desktop\partequipos-cierre\runbook-importar-usados-lanzamiento.md` (sin
 ejecutar), con una exportación nueva cerca del lanzamiento.
 
-## 7. Lo que NO se hace todavía
+## 7. Página de cada unidad (2026-10-16, decisión de dirección)
 
-- **Página propia por unidad:** lo decide el cliente. Mientras, las unidades se
-  ven en el listado de su categoría (ADR 0007).
-- **Las 128 URL antiguas** (`/maquinaria-pesada-usada/<slug>/`): no están en
-  `url-map.csv` y siguen sin destino. Sus 301 dependen de la decisión anterior.
+Cada unidad DISPONIBLE tiene su página, con **la misma plantilla** que la ficha
+de producto V2 de nueva (`src/components/ficha/FichaProducto.tsx`; cambian solo
+los datos):
+
+- **URL:** `/maquinaria-pesada/maquinaria-pesada-usada/<categoria>/<dirección web>/`
+  (ruta `[categoria]/[unidad]`). La dirección web es el campo `slug` de
+  `equipos-usados`, único **dentro de la categoría**; `pagina` y `marcas`
+  están reservadas (chocarían con la paginación y con las páginas de marca).
+- **Por qué no se conserva la de WordPress:** el slug antiguo de 86 de las 128
+  unidades lleva el número de serie (que nunca se publica). El nuevo sale del
+  nombre compuesto («excavadora-hitachi-zx350h-5b-2016»), con el id de WordPress
+  al final solo si dos de la misma categoría chocan
+  (`src/lib/usados/direcciones.ts`). Las 128 antiguas
+  (`/maquinaria-pesada-usada/<slug>/`) llevan **301** a la nueva.
+- **Prueba del serial:** `src/lib/usados/direcciones.test.ts` comprueba, contra
+  el JSON real y los 126 seriales distintos, que ninguna dirección nueva
+  contiene un serial. Se omite sin el JSON (CI): ejecutarla a mano antes de
+  importar a producción.
+- **Datos:** peso, año, horómetro y ubicación (los que haya); sin ficha técnica
+  en filas; «Descargar ficha técnica completa» solo si la unidad tiene PDF;
+  «Cotizar» y «Habla con un experto» como en nueva; JSON-LD `Product` sin precio
+  y con `itemCondition` usada. Cotizar guarda el nombre de la unidad como
+  referencia de texto (`referenciaTexto`).
+- **No disponible:** `permanentRedirect` a su categoría; fuera del sitemap.
+- **Enlaces:** «Ficha técnica» (home y listados) → la página; «Ver más» sigue
+  llevando a la categoría.
+- **Redirecciones:** `npm run preview:usados:redirects-simular | redirects |
+redirects-retirar` leen el slug de la base y el `enlace` de la fuente.
+  Idempotentes, con manifiesto propio. En el sitio publicado, junto al
+  importador.
+- **Hay que redesplegar** tras importar (el script no revalida).
+
+## 8. Lo que NO se hace todavía
+
 - **Sincronización:** es una importación de una vez. Después, el inventario se
   lleva en el panel.

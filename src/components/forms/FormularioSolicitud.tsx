@@ -23,8 +23,9 @@ import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/opcion
  */
 
 type Referencia = {
-  tipo: "equipos-nuevos" | "modelos-repuesto";
-  id: number;
+  /** Sin `tipo` ni `id` (una unidad usada), la solicitud guarda solo el texto de la referencia. */
+  tipo?: "equipos-nuevos" | "modelos-repuesto";
+  id?: number;
   /** Texto legible: "Excavadora Hitachi ZX350LC-5B". */
   texto: string;
 };
@@ -229,8 +230,12 @@ export function FormularioSolicitud({
         <input type="hidden" name="origen" value={origen} />
         {referencia ? (
           <>
-            <input type="hidden" name="referenciaTipo" value={referencia.tipo} />
-            <input type="hidden" name="referenciaId" value={referencia.id} />
+            {referencia.tipo && referencia.id !== undefined ? (
+              <>
+                <input type="hidden" name="referenciaTipo" value={referencia.tipo} />
+                <input type="hidden" name="referenciaId" value={referencia.id} />
+              </>
+            ) : null}
             <input type="hidden" name="referenciaTexto" value={referencia.texto} />
           </>
         ) : null}

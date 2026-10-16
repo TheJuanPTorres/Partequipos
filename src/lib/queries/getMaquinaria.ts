@@ -274,6 +274,9 @@ export type FotoDeTarjeta = Pick<
 /** Una unidad usada DISPONIBLE, con lo que pintan la tarjeta y los filtros. */
 export type UnidadUsada = UnidadFiltrable & {
   nombre: string;
+  /** Dirección web de la unidad (su página); `null` si aún no la tiene. */
+  slug: string | null;
+  updatedAt: string;
   categoria: number;
   marcaUsada: number | null;
   modelo?: string | null;
@@ -303,6 +306,8 @@ const inventarioUsadosEnCache = unstable_cache(
       pagination: false,
       select: {
         nombre: true,
+        slug: true,
+        updatedAt: true,
         categoria: true,
         marcaUsada: true,
         marca: true,
@@ -362,6 +367,8 @@ const inventarioUsadosEnCache = unstable_cache(
       return {
         id: u.id,
         nombre: u.nombre,
+        slug: u.slug ?? null,
+        updatedAt: u.updatedAt,
         categoria: categoriaId,
         categoriaRef: ref(categoriaPorId.get(categoriaId)),
         marcaUsada: marcaId,
@@ -651,3 +658,28 @@ export const getEquiposUsadosDePortada = cache(async (): Promise<EquiposUsado[]>
   ]);
   return [...excavadoras.docs, ...otros.docs, ...aditamentos.docs];
 });
+
+/**
+ * Una unidad usada por su dirección web DENTRO de su categoría, con lo que
+ * pinta su página (fotos, PDF y marca ya poblados). Trae también las no
+ * disponibles: la página las redirige a su categoría en vez de dar 404. Solo
+ * una combinación categoría + unidad que no existe da `null`.
+ */
+export const getUnidadUsadaPorSlug = cache(
+  async (
+    categoriaSlug: string,
+    slug: string,
+  ): Promise<{ unidad: EquiposUsado; categoria: CategoriasUsada } | null> => {
+    const categoria = await getCategoriaUsadaPorSlug(categoriaSlug);
+    if (!categoria) return null;
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "equipos-usados",
+      where: { and: [{ categoria: { equals: categoria.id } }, { slug: { equals: slug } }] },
+      depth: 1,
+      limit: 1,
+    });
+    const unidad = docs[0];
+    return unidad ? { unidad, categoria } : null;
+  },
+);

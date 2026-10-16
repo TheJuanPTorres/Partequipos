@@ -111,15 +111,17 @@ async function buscarEnLaBase(texto: string): Promise<ResultadosBusqueda> {
     usados: {
       total: usados.totalDocs,
       items: usados.docs.flatMap((u) => {
-        // Las unidades usadas no tienen página propia (decisión del cliente):
-        // el resultado lleva a su categoría, donde se listan.
+        // Cada unidad tiene su página (2026-10-16); sin dirección web aún, el
+        // resultado lleva a su categoría, donde se lista.
         const categoria = poblado<CategoriasUsada>(u.categoria);
         if (!categoria) return [];
         return [
           {
             id: u.id,
             titulo: u.nombre,
-            href: rutas.categoriaUsada(categoria.slug),
+            href: u.slug
+              ? rutas.unidadUsada(categoria.slug, u.slug)
+              : rutas.categoriaUsada(categoria.slug),
             detalle: `Maquinaria usada · ${categoria.nombre}`,
           },
         ];

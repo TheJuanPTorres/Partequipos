@@ -575,7 +575,7 @@ veredicto, que va en el informe.
 >
 > 1. **Fase G (sedes):** construida (2026-10-02). Sin token de Mapbox se ve la lista de sedes; el globo se activa con `NEXT_PUBLIC_MAPBOX_TOKEN` de la cuenta del cliente (L5). **Globo activo y verificado en producción el 2026-10-06** contra ux-9 a 390, 1010 y 1440 (`decisiones-home-ux9.md` §23). El token de hoy es el público por defecto: antes de lanzar, medio de pago y token restringido a `partequipos.com` (runbook de lanzamiento).
 >
-> **§10.38 CERRADA EN LA PORTADA Y EN NOSOTROS (2026-10-16):** copia de demostración retirada y contenido real puesto en el sitio publicado. Para el resto del sitio, ver §10.38 antes del lanzamiento. 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview. 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
+> **§10.38 CERRADA DEL TODO (2026-10-16):** copia de demostración retirada, contenido real puesto en la portada y en Nosotros, y la imagen de Andrés de la ficha sustituida por una foto real y borrada. Ya no queda ninguna imagen de Andrés en el sitio publicado. 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview. 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
 >
 > **Bloque anterior al diseño: QUITADO (fase 6).** La home tiene un solo `<main>` con las secciones de ux-9; el correo pasa al pie (desviación menor, pendiente de Andrés). El horario pasa al global `seo` de Payload (editable, con su migración): va en el JSON-LD `Organization` (`contactPoint.hoursAvailable`) y en `/contactanos/`. Detalle en `decisiones-home-ux9.md` §22.
 >
@@ -625,7 +625,7 @@ veredicto, que va en el informe.
 - **«Categoría secundaria» de ux-9 (2026-10-14):** el índice de nueva y cada categoría con pestañas, «Ordenar», lista o rejilla, lateral de filtros y paginación (`…/pagina/<n>/`); filtros con el módulo común de C (#120) y el adaptador `src/lib/nueva/filtros.ts` (marca, peso desde `pesoOperativoKg`, tipo y modelo; sin «Año»); datos en la caché de datos (`datos:nueva`); las filtradas no se indexan. Detalle, erratas y desviaciones en `docs/diseno/decisiones-categoria-secundaria.md`.
 - **«Maquinaria pesada usada» de la Home V2 (2026-10-15):** cabecera con la máquina y los textos a la derecha, y pestañas en píldora con 3 tarjetas verticales de las unidades disponibles (foto, nombre, ficha, «Ver más» a su categoría y «Ficha técnica» solo con PDF: campo nuevo `fichaTecnicaPdf` → `documentos`); migración `20261016_041733_ficha_pdf_usados` (esquema, y «Ver más»/«Ver todo» en la portada solo si conserva los textos de ux-9). Detalle en `docs/diseno/decisiones-home-ux9.md` §33.
 - **Servicio técnico y Lubricantes ENI (2026-10-14, PR #148), PROVISIONALES hasta el diseño de Andrés:** contenido real del XML (`scripts/servicio-lubricantes/extraer-xml.py` e `importar.ts`); ancla opcional en todos los bloques de página y bloques «Galería», «Vídeo de YouTube» y «Formulario de contacto»; productos de lubricante con grado, grupo, foto y ficha en PDF; las 4 subpáginas de lubricantes son secciones de la marca con 301 a su ancla (el destino de un redirect admite `#ancla`) y su ruta `[categoria]` desaparece; las fotos de licencia dudosa solo en el preview; migración `20261014_072558_servicio_lubricantes`. Detalle en `docs/diseno/decisiones-servicio-lubricantes.md`.
-- **Maquinaria usada importada de WordPress (2026-10-07, sin fusionar):** las 128 unidades del tipo «maquinaria» con sus 1.493 fotos, en el preview con `npm run preview:usados:importar` (por tandas); fuente: el JSON que saca `scripts/usados/extraer-xml.py` de la exportación XML, guardado fuera del repositorio sin datos personales. Nombre compuesto («Excavadora Hitachi ZX350H-5B 2016»), horas «PENDIENTE» vacías y **sin el número de serie** en nombre, descripción, texto alternativo ni fichero (`src/lib/usados/wordpress.ts`); categoría «Miniexcavadoras» como dato, sin esquema. Sin página por unidad (lo decide el cliente). Para el sitio publicado, `runbook-importar-usados-lanzamiento.md` (sin ejecutar). Detalle en `docs/usados-importacion.md`.
+- **Maquinaria usada importada de WordPress (2026-10-07, sin fusionar):** las 128 unidades del tipo «maquinaria» con sus 1.493 fotos, en el preview con `npm run preview:usados:importar` (por tandas); fuente: el JSON que saca `scripts/usados/extraer-xml.py` de la exportación XML, guardado fuera del repositorio sin datos personales. Nombre compuesto («Excavadora Hitachi ZX350H-5B 2016»), horas «PENDIENTE» vacías y **sin el número de serie** en nombre, descripción, texto alternativo ni fichero (`src/lib/usados/wordpress.ts`); categoría «Miniexcavadoras» como dato, sin esquema. **Desde el 2026-10-16, cada unidad tiene su página** (misma ficha V2 que nueva, `FichaProducto`; URL `/maquinaria-pesada/maquinaria-pesada-usada/<categoria>/<slug>/` con slug sin serial y 301 desde las 128 de WordPress; migración `20261016_170244_usados_url_slug_seo`). Para el sitio publicado, `runbook-importar-usados-lanzamiento.md` (sin ejecutar). Detalle en `docs/usados-importacion.md`.
 - **Cabecera del artículo sin desplazamiento (2026-10-06):** título, línea de fecha y entradilla con el alto fijado por una copia invisible (`::after`) en «Inter Fallback» ensanchada 0,04 em; sin tocar la carga de Inter. CLS a 390 de 0,21 a 0,0165 en los 53; escritorio igual. `npm run build` falla si next/font renombra la fuente (`scripts/qa/fuente-respaldo.ts`). Límite: Android (Roboto) sin medir. Detalle en `docs/blog-importacion.md`.
 - **SEO de las categorías técnicas y revisión de pantallas (2026-10-04):** el bloque SEO de las categorías técnicas avisa de que hoy no tienen página (`seoField({ sinPagina: true })`, sin esquema); `panel:revision` añade el global SEO, una categoría técnica y las peticiones fallidas. **Hallazgo:** las 32 URL de categoría técnica del sitio actual dan 404 y están sin decidir (`docs/redirects-map.csv`). Detalle en `docs/diseno/decisiones-panel.md` §15.
 - **El pie como en el WordPress (2026-10-05):** buscador **provisional** de ux-9 (anuncia «Buscador disponible pronto», no navega; `BuscadorPie.tsx`), redes en el orden de ux-9 (`redesDelPie`) y, en el preview, «Trabaja con nosotros», «Zona de clientes» y «Financiación» a `/contactanos/` y redes de ejemplo; producción, con `runbook-pie-enlaces-redes.md`; sin esquema. Detalle en `docs/diseno/decisiones-home-ux9.md` §13.9.
@@ -1191,7 +1191,7 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > la colección entra en la segunda instancia de `vercelBlobStorage` de
 > `payload.config.ts` y en `REGLAS_SUBIDA_DIRECTA`.
 
-### 10.38 EXCEPCIÓN TEMPORAL DE DEMOSTRACIÓN — la home completa en producción (2026-10-02) · CERRADA EN LA PORTADA Y EN NOSOTROS (2026-10-16)
+### 10.38 EXCEPCIÓN TEMPORAL DE DEMOSTRACIÓN — la home completa en producción (2026-10-02) · CERRADA DEL TODO (2026-10-16)
 
 > **CERRADA en la portada y en Nosotros el 2026-10-16.** Dirección ejecutó en el
 > sitio publicado los dos runbooks, en este orden:
@@ -1220,10 +1220,24 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > se pinta, porque la sección no sale sin preguntas. Testimonios y preguntas
 > reales siguen pendientes del cliente.
 >
-> **Sigue pendiente antes del lanzamiento:** la imagen de la ficha de producto
-> de la tabla de abajo no la tocan esos runbooks. Hay que confirmar su licencia
-> o sustituirla (hoy se sirve `contacto-asesor-…png`, de origen sin comprobar).
-> Con eso queda cerrado el paso 0 de README §7.
+> **CERRADA DEL TODO el mismo día, con la ficha de producto.** Dirección
+> ejecutó `runbook-ficha-foto-real-contacto.md` (del agente B, tras el #191):
+>
+> - el global «Ficha de producto» lleva la foto real del técnico de Guarne
+>   (`wp-real-faq-tarjeta-…jpg`, la misma de Contáctanos), y la ficha la sirve;
+> - la imagen de Andrés (`ficha-contacto-asesor-…png`) está **borrada** de
+>   «Imágenes»: 0 en la API y 0 en la ficha.
+>
+> Era la última imagen de Andrés en el sitio publicado. Comprobado por Claude
+> en solo lectura: ni `demo-copia-`, ni `contacto-asesor`, ni otros nombres de
+> la copia en el HTML de la portada, Nosotros, Contáctanos, los índices de
+> maquinaria, el blog y una ficha. **Queda cumplido el paso 0 de README §7**
+> («retirar §10.38 o confirmar las licencias»).
+>
+> **Hallazgo al cerrar:** guardar el global no refrescó la ficha hasta un
+> redeploy. Causa probable, leída en Next 16.3.5: `revalidatePath` con patrón
+> no lleva el grupo `(site)`, y la etiqueta de la página sí. Ver el PR del
+> arreglo, #194 (sin fusionar).
 
 > **Decisión de dirección del 2026-10-02.** Para enseñar el avance, la home de
 > producción puede llevar los assets que hasta ahora solo iban al preview:

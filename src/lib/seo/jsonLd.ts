@@ -22,6 +22,8 @@ export type ProductJsonLdInput = {
   imagenes?: string[];
   /** Especificaciones (ficha técnica): salen como `additionalProperty`. */
   propiedades?: { nombre: string; valor: string }[];
+  /** `usada`: añade `itemCondition` (unidades de maquinaria usada). Nunca hay precio. */
+  condicion?: "usada";
 };
 
 /**
@@ -30,7 +32,7 @@ export type ProductJsonLdInput = {
  * no un e-commerce; declarar ofertas falsas sería incorrecto.
  */
 export function buildProductJsonLd(input: ProductJsonLdInput): JsonLdObject {
-  const { nombre, path, descripcion, marca, codigo, imagenes, propiedades } = input;
+  const { nombre, path, descripcion, marca, codigo, imagenes, propiedades, condicion } = input;
 
   const jsonLd: JsonLdObject = {
     "@context": "https://schema.org",
@@ -42,6 +44,7 @@ export function buildProductJsonLd(input: ProductJsonLdInput): JsonLdObject {
   if (descripcion?.trim()) jsonLd.description = descripcion.trim();
   if (marca?.trim()) jsonLd.brand = { "@type": "Brand", name: marca.trim() };
   if (codigo?.trim()) jsonLd.sku = codigo.trim();
+  if (condicion === "usada") jsonLd.itemCondition = "https://schema.org/UsedCondition";
 
   const images = (imagenes ?? []).filter((u) => u?.trim()).map((u) => absoluteUrl(u));
   if (images.length > 0) jsonLd.image = images;

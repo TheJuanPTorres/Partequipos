@@ -295,7 +295,7 @@ export const revalidarMarcaUsadaBorrada: CollectionAfterDeleteHook = ({ doc }) =
 
 /** Una unidad de inventario afecta a los listados de usada (y a la portada, por su gancho). */
 async function revalidarEquipoUsadoCore(
-  doc: { id: number; categoria: unknown },
+  doc: { id: number; categoria: unknown; slug?: string | null },
   req: PayloadRequest,
 ) {
   try {
@@ -319,7 +319,14 @@ async function revalidarEquipoUsadoCore(
         : null);
 
     if (categoriaSlug) {
-      revalidarRutas(rutasDeCategoriaUsada(categoriaSlug), `equipo usado ${doc.id}`);
+      // Y la página de la propia unidad (vendida, redirige a su categoría).
+      revalidarRutas(
+        [
+          ...rutasDeCategoriaUsada(categoriaSlug),
+          ...(doc.slug ? [rutas.unidadUsada(categoriaSlug, doc.slug)] : []),
+        ],
+        `equipo usado ${doc.id}`,
+      );
       revalidarPaginasUsadas(`equipo usado ${doc.id}`);
     }
   } catch (error) {

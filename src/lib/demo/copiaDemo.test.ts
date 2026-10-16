@@ -17,6 +17,7 @@ import {
   urlEnAlmacen,
   veredictoCreado,
   veredictoDestino,
+  veredictoNosotrosRetirada,
   veredictoSubida,
 } from "./copiaDemo";
 
@@ -215,5 +216,48 @@ describe("copia de demostración: nombre propio de los ficheros", () => {
       false,
     );
     assert.equal(puedeRetirar(prevista, [prevista]), true);
+  });
+});
+
+describe("retirada: la página «nosotros» (2026-10-16)", () => {
+  // La huella del manifiesto de producción (2026-10-04) no tiene los campos que
+  // el esquema ganó después; la página de hoy, sí.
+  const copia = JSON.stringify({ titulo: "Nosotros", seccionCompania: { video: null } });
+  const hoy = JSON.stringify({
+    titulo: "Nosotros",
+    seccionCompania: { video: null, imagen: null },
+    actualizadoPor: 1,
+  });
+
+  it("campos nuevos desde la copia: aviso, no error (antes la dejaba a medias)", () => {
+    const v = veredictoNosotrosRetirada({
+      huellaCopia: copia,
+      huellaAntes: hoy,
+      huellaDespues: hoy,
+    });
+    assert.equal(v.error, null);
+    assert.ok(v.aviso?.includes("cambió"));
+  });
+
+  it("sin cambios desde la copia: ni aviso ni error", () => {
+    assert.deepEqual(
+      veredictoNosotrosRetirada({ huellaCopia: copia, huellaAntes: copia, huellaDespues: copia }),
+      { aviso: null, error: null },
+    );
+  });
+
+  it("si la retirada cambia algo fuera de los bloques, error", () => {
+    const otro = JSON.stringify({ titulo: "Otra cosa" });
+    assert.ok(
+      veredictoNosotrosRetirada({ huellaCopia: copia, huellaAntes: hoy, huellaDespues: otro })
+        .error,
+    );
+  });
+
+  it("sin la página en el destino, error ANTES de tocar nada", () => {
+    assert.ok(
+      veredictoNosotrosRetirada({ huellaCopia: copia, huellaAntes: null, huellaDespues: null })
+        .error,
+    );
   });
 });

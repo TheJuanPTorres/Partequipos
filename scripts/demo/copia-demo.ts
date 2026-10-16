@@ -60,6 +60,7 @@ import {
   urlEnAlmacen,
   veredictoCreado,
   veredictoDestino,
+  veredictoNosotrosRetirada,
   veredictoSubida,
 } from "../../src/lib/demo/copiaDemo";
 import { almacenDeUrl } from "../../src/lib/blob/almacen";
@@ -232,6 +233,19 @@ if (modo === "retirar") {
     const heroAntes = await huellaHero();
     if (heroAntes !== m.hero)
       log("aviso: el hero cambió desde la copia (no lo hizo la copia); la retirada no lo toca");
+    // «nosotros», ANTES de escribir nada: sin la página se para aquí, no a medias.
+    const n = m.antes.nosotros;
+    const nosotrosAntes = n ? await nosotrosDestino() : null;
+    const huellaNosotrosAntes = nosotrosAntes ? huellaNosotros(nosotrosAntes) : null;
+    if (n) {
+      const { aviso, error } = veredictoNosotrosRetirada({
+        huellaCopia: n.huella,
+        huellaAntes: huellaNosotrosAntes,
+        huellaDespues: huellaNosotrosAntes,
+      });
+      if (error) fallar(`${error} (no se ha tocado nada)`);
+      if (aviso) log(`aviso: ${aviso}`);
+    }
     // 1. Devolver lo modificado a su valor anterior.
     const p = m.antes.portada;
     if (p) {
@@ -248,7 +262,6 @@ if (modo === "retirar") {
       });
       log("portada: secciones devueltas a su valor anterior");
     }
-    const n = m.antes.nosotros;
     if (n) {
       await payload.update({
         collection: "paginas",
@@ -257,10 +270,14 @@ if (modo === "retirar") {
         overrideAccess: true,
       });
       const ahora = await nosotrosDestino();
-      if (!ahora || huellaNosotros(ahora) !== n.huella)
-        fallar("la página «nosotros» del destino no es la de antes de la copia: revisar a mano");
+      const { error } = veredictoNosotrosRetirada({
+        huellaCopia: n.huella,
+        huellaAntes: huellaNosotrosAntes,
+        huellaDespues: ahora ? huellaNosotros(ahora) : null,
+      });
+      if (error) fallar(error);
       log(
-        `nosotros: bloques devueltos a su valor anterior (${(n.bloques ?? []).length}); resto de la página idéntico ✓`,
+        `nosotros: bloques devueltos a su valor anterior (${(n.bloques ?? []).length}); resto de la página igual que antes de retirar ✓`,
       );
     }
     if (m.antes.pie) {

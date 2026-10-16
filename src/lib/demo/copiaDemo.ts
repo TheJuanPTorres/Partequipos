@@ -176,6 +176,34 @@ export function veredictoCreado(p: {
   return { valido: true };
 }
 
+/**
+ * La página «nosotros» en la RETIRADA: la retirada solo le devuelve los
+ * bloques, así que el resto de la página tiene que quedar igual que justo
+ * ANTES de retirar. Que haya cambiado desde la COPIA no es cosa de la
+ * retirada: el esquema gana campos con cada migración (`actualizadoPor`,
+ * `seccionCompania.imagen`…) y un editor puede tocar la página en el panel.
+ * Exigir la huella de la copia dejaba la retirada A MEDIAS: fallaba ya con los
+ * bloques vaciados (2026-10-16). Por eso es solo un aviso, como el hero (#157).
+ */
+export function veredictoNosotrosRetirada(p: {
+  huellaCopia: string;
+  huellaAntes: string | null;
+  huellaDespues: string | null;
+}): { aviso: string | null; error: string | null } {
+  if (p.huellaAntes === null)
+    return { aviso: null, error: "el destino ya no tiene la página «nosotros»: revisar a mano" };
+  const aviso =
+    p.huellaAntes === p.huellaCopia
+      ? null
+      : "«nosotros» cambió fuera de sus bloques desde la copia (campos nuevos o el panel); la retirada solo toca sus bloques";
+  if (p.huellaDespues !== p.huellaAntes)
+    return {
+      aviso,
+      error: "la retirada ha cambiado «nosotros» fuera de sus bloques: revisar a mano",
+    };
+  return { aviso, error: null };
+}
+
 /** La retirada solo borra lo que está en su manifiesto Y lleva el prefijo. */
 export function puedeRetirar(url: string | null | undefined, urlsDelManifiesto: string[]): boolean {
   if (!url) return false;

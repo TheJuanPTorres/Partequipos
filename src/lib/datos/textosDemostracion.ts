@@ -22,6 +22,9 @@
  *   «Encuéntrala» corregida. Dynapac: el mismo texto que le pone el importador
  *   de contenido real (`scripts/contenido-real`, el primer párrafo de su página
  *   que nombra la marca), para que el runbook de contenido real no lo cambie.
+ *   Desde el 2026-10-16 el importador le pone el texto de la Home V2
+ *   (`DESCRIPCIONES_V2` de `extraer-xml.py`); esta migración ya está aplicada
+ *   y no se toca.
  *
  * ESTA LISTA ES LA FUENTE DE LA MIGRACIÓN `…_huerfanas_y_textos_demo`, que
  * lleva una copia literal (CLAUDE.md §3.5); `textosDemostracion.test.ts` exige

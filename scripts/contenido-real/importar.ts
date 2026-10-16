@@ -433,7 +433,9 @@ const img = (clave: string) => ids[clave] ?? fallar(`la fuente no tiene la image
 const p = fuente.portada;
 const antes = manifiesto.antes!.portada.datos as Record<string, Record<string, unknown>>;
 const datosPortada = {
-  seccionUsada: { ...antes.seccionUsada, imagen: img(p.usadaImagen) },
+  // Vacía hasta que haya una máquina recortada real (dirección, 2026-10-16): ni la de
+  // ux-9 ni una foto normal de WordPress.
+  seccionUsada: { ...antes.seccionUsada, imagen: null },
   seccionLogos: {
     ...antes.seccionLogos,
     logos: p.logos.map((l) => ({ nombre: l.nombre, logo: img(l.logo) })),

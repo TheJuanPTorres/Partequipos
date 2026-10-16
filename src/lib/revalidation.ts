@@ -55,6 +55,27 @@ import {
  * y el subárbol, porque las URLs hijas cuelgan del slug del padre.
  */
 
+/**
+ * Patrones de página para `revalidatePath(patrón, "page")`, que invalidan
+ * TODAS las URL de una ruta dinámica.
+ *
+ * **Llevan el grupo `(site)`.** Next etiqueta cada página con su fichero de
+ * ruta tal cual, grupos incluidos (`/(site)/…/[modelo]/page`), y el patrón se
+ * compara letra a letra con esa etiqueta: sin el grupo no casa con nada y no
+ * revalida, sin ningún error (2026-10-16: guardar el global «Ficha de
+ * producto» no refrescó las fichas hasta un redeploy). Leído en Next 16.3.5,
+ * `getImplicitTags(workStore.page, …)` y `revalidatePath`. Las rutas literales
+ * (`/nosotros/`) no tienen este problema: casan con la URL.
+ *
+ * `revalidation.test.ts` exige que cada patrón sea un `page.tsx` que existe.
+ */
+export const PATRONES_DE_PAGINA = {
+  fichasNuevas: "/(site)/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
+  marcasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]`,
+  categoriasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]`,
+  paginasUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]",
+} as const;
+
 /** Ejecuta `revalidatePath` sin permitir que un fallo rompa el guardado. */
 function revalidar(path: string, motivo: string): void {
   try {
@@ -194,10 +215,7 @@ export function rutasDeEquipoNuevo(
  */
 export function revalidarFichasNuevas(motivo: string): void {
   try {
-    revalidatePath(
-      "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
-      "page",
-    );
+    revalidatePath(PATRONES_DE_PAGINA.fichasNuevas, "page");
   } catch (error) {
     console.error(`[revalidación] fallaron las fichas de equipo nuevo (${motivo}):`, error);
   }
@@ -210,7 +228,7 @@ export function revalidarFichasNuevas(motivo: string): void {
  */
 export function revalidarMarcasDeRepuestos(motivo: string): void {
   try {
-    revalidatePath(`/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]`, "page");
+    revalidatePath(PATRONES_DE_PAGINA.marcasDeRepuestos, "page");
   } catch (error) {
     console.error(`[revalidación] fallaron las páginas de marca de repuestos (${motivo}):`, error);
   }
@@ -223,7 +241,7 @@ export function revalidarMarcasDeRepuestos(motivo: string): void {
 export function revalidarCategoriasDeRepuestos(motivo: string): void {
   try {
     revalidatePath(rutas.categoriasRepuestos());
-    revalidatePath(`/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]`, "page");
+    revalidatePath(PATRONES_DE_PAGINA.categoriasDeRepuestos, "page");
     revalidatePath(rutas.repuestos());
     revalidarIndices(motivo);
   } catch (error) {
@@ -245,10 +263,7 @@ export function rutasDeCategoriaNueva(slug: string): string[] {
  */
 export function revalidarPaginasUsadas(motivo: string): void {
   try {
-    revalidatePath(
-      "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]",
-      "page",
-    );
+    revalidatePath(PATRONES_DE_PAGINA.paginasUsadas, "page");
   } catch (error) {
     console.error(`[revalidación] fallaron las páginas de usados (${motivo}):`, error);
   }

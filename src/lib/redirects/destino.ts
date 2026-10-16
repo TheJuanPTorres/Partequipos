@@ -37,6 +37,7 @@ export type ColeccionDestino =
   | "categorias-maquinaria"
   | "categorias-usada"
   | "marcas-usada"
+  | "equipos-usados"
   | "marcas-lubricante"
   | "categorias-lubricante"
   | "categorias-blog"
@@ -113,6 +114,11 @@ export function clasificarDestino(destino: string): Destino {
   if (seg(0) === SEGMENTO_MAQUINARIA) {
     if (seg(1) === SEGMENTO_USADA && partes.length === 3) {
       return din(["categorias-usada"], seg(2));
+    }
+    // Una unidad: /<categoria>/<unidad>. «marcas» es el segmento fijo de las marcas
+    // (partes.length 4 con seg(2) = marcas se resuelve más abajo, como marca).
+    if (seg(1) === SEGMENTO_USADA && seg(2) !== SEGMENTO_MARCAS_MAQUINARIA && partes.length === 4) {
+      return din(["equipos-usados"], seg(3), [seg(2)]);
     }
     if (seg(1) === SEGMENTO_USADA && seg(2) === SEGMENTO_MARCAS_MAQUINARIA && partes.length === 4) {
       return din(["marcas-usada"], seg(3));

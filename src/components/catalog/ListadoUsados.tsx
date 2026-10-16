@@ -230,6 +230,16 @@ function TarjetaUsada({ unidad }: { unidad: UnidadUsada }) {
       {unidad.descripcion ? (
         <p className="mt-2 text-sm text-gray-700">{unidad.descripcion}</p>
       ) : null}
+
+      {/* La página de la unidad (2026-10-16); sin dirección web aún, no hay botón. */}
+      {unidad.slug && unidad.categoriaRef ? (
+        <Link
+          href={`${rutas.unidadUsada(unidad.categoriaRef.slug, unidad.slug)}/`}
+          className="mt-3 inline-flex min-h-11 items-center rounded-full border border-gray-900 px-4 text-sm font-medium text-gray-900 hover:bg-gray-900 hover:text-white"
+        >
+          Ficha técnica<span className="sr-only"> de {unidad.nombre}</span>
+        </Link>
+      ) : null}
     </li>
   );
 }

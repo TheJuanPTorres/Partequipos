@@ -91,6 +91,13 @@ export const rutas = {
     pagina <= 1
       ? `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${slug}`
       : `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${slug}/pagina/${pagina}`,
+  /**
+   * Página de UNA unidad usada (2026-10-16, decisión de dirección): cuelga de su
+   * categoría. `pagina` y `marcas` no pueden ser el slug de una unidad
+   * (`src/lib/usados/urls.ts`).
+   */
+  unidadUsada: (categoriaSlug: string, unidadSlug: string) =>
+    `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${categoriaSlug}/${unidadSlug}`,
   /** Página n del listado de una categoría de usada; la 1 es la propia categoría. */
   categoriaUsadaPagina: (slug: string, pagina: number) =>
     pagina <= 1

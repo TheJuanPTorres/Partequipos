@@ -1,13 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import type {
-  CategoriasUsada,
-  Documento,
-  EquiposUsado,
-  MarcasMaquinaria,
-  Media,
-} from "@/payload-types";
+import type { CategoriasUsada, EquiposUsado, MarcasMaquinaria, Media } from "@/payload-types";
 
 import { fichaDeEquipo, pestanasDeUsada, tarjetasDeMarcas } from "./secciones";
 
@@ -122,19 +116,20 @@ describe("sección 3: pestañas", () => {
     );
   });
 
-  it("nombre entero; «Ficha técnica» solo con el PDF poblado", () => {
-    const pdf = { id: 9, url: "/d/ficha.pdf" } as Documento;
+  it("nombre entero; «Ficha técnica» lleva a la página de la unidad, «Ver más» a su categoría", () => {
     const [p] = pestanasDeUsada([
-      equipo(1, exc, { nombre: "Excavadora Hitachi ZX350H-5B 2016", fichaTecnicaPdf: pdf }),
-      equipo(2, exc, { fichaTecnicaPdf: 9 }),
-      equipo(3, exc),
+      equipo(1, exc, { nombre: "Excavadora Hitachi ZX350H-5B 2016", slug: "excavadora-hitachi-1" }),
+      equipo(2, exc),
     ]);
     assert.deepEqual(
-      p!.equipos.map((e) => [e.nombre, e.fichaPdf]),
+      p!.equipos.map((e) => [e.nombre, e.href, e.hrefFicha]),
       [
-        ["Excavadora Hitachi ZX350H-5B 2016", "/d/ficha.pdf"],
-        ["Equipo 2", null],
-        ["Equipo 3", null],
+        [
+          "Excavadora Hitachi ZX350H-5B 2016",
+          "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/",
+          "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/excavadora-hitachi-1/",
+        ],
+        ["Equipo 2", "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/", null],
       ],
     );
   });

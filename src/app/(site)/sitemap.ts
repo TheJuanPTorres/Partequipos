@@ -153,6 +153,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((c) => inventarioUsados.some((u) => u.categoria === c.id))
       .map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
 
+    // Las unidades DISPONIBLES con dirección web; el inventario ya excluye las vendidas.
+    unidadesUsada: inventarioUsados.flatMap((u) =>
+      u.slug && u.categoriaRef
+        ? [{ slug: u.slug, categoriaSlug: u.categoriaRef.slug, updatedAt: u.updatedAt }]
+        : [],
+    ),
+
     // D4: una marca de usada solo con unidades disponibles.
     marcasUsada: marcasUsada
       .filter((m) => inventarioUsados.some((u) => u.marcaUsada === m.id))

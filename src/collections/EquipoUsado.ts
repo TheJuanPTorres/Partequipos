@@ -5,22 +5,25 @@ import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/segur
 import { revalidarPortada } from "./hooks/portadaHooks";
 import { avisoField } from "../lib/fields/avisoField";
 import { marcaUsadaSincronizada } from "./hooks/marcaUsada";
+import { slugUnidadUsada, validarSlugUnidadUsada } from "./hooks/slugUnidadUsada";
+import { seoField } from "../lib/fields/seoField";
+import { slugField } from "../lib/fields/slugField";
 
 const portada = revalidarPortada("equipos-usados");
 
 /**
  * Unidad del inventario de maquinaria USADA (el «marketplace»).
  *
- * **No tiene URL propia** — y es deliberado: el rastreo no muestra ni una sola
- * ficha individual de usada, solo las 9 categorías. Cada unidad se lista dentro
- * de la página de su categoría. Darle ruta propia inventaría URLs que hoy no
- * existen y que nadie ha indexado.
- *
- * Por eso tampoco lleva `slug` ni campos SEO: no es una página.
+ * **Tiene página propia desde el 2026-10-16** (decisión de dirección): la ficha
+ * de producto V2 de nueva con los datos de la unidad, en
+ * `/maquinaria-pesada/maquinaria-pesada-usada/<categoria>/<dirección web>/`.
+ * La dirección web NO es la de WordPress (86 de las 128 llevaban el número de
+ * serie): sale del nombre y las antiguas llevan un 301.
  *
  * El inventario de usada rota (una máquina se vende y desaparece), así que los
  * campos apuntan a lo que necesita quien compara unidades: qué es, de qué año,
- * cuánto ha trabajado y en qué estado está.
+ * cuánto ha trabajado y en qué estado está. Una unidad no disponible no sale en
+ * el sitemap y su página redirige a su categoría.
  */
 export const EquipoUsado: CollectionConfig = {
   slug: "equipos-usados",
@@ -31,7 +34,7 @@ export const EquipoUsado: CollectionConfig = {
     group: "Maquinaria",
     listSearchableFields: ["nombre", "marca", "modelo"],
     description:
-      "Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros; no tiene página propia.",
+      "Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros, y tiene su propia página.",
   },
   access: {
     read: lecturaContenido,
@@ -39,7 +42,10 @@ export const EquipoUsado: CollectionConfig = {
     update: escrituraContenido,
     delete: borradoAdmin,
   },
+  // La dirección web es única dentro de la categoría (la ruta lleva categoría y unidad).
+  indexes: [{ fields: ["categoria", "slug"], unique: true }],
   hooks: {
+    beforeValidate: [slugUnidadUsada],
     beforeChange: [marcaUsadaSincronizada],
     afterChange: [revalidarEquipoUsado, portada.afterChange],
     afterDelete: [revalidarEquipoUsadoBorrado, portada.afterDelete],
@@ -55,6 +61,13 @@ export const EquipoUsado: CollectionConfig = {
       label: "Nombre",
       admin: { description: "Ej. «Excavadora Hitachi ZX200-3»." },
     },
+    /*
+     * `required: false` en el esquema a propósito: el gancho `slugUnidadUsada`
+     * la rellena siempre y la validación exige que no esté vacía, pero así los
+     * scripts de siembra que crean unidades (hasta cinco) no tienen que
+     * conocer la dirección web para compilar.
+     */
+    slugField({ validate: validarSlugUnidadUsada, requerido: false }),
     {
       name: "categoria",
       type: "relationship",
@@ -203,5 +216,6 @@ export const EquipoUsado: CollectionConfig = {
       ],
       admin: { position: "sidebar" },
     },
+    seoField(),
   ],
 };

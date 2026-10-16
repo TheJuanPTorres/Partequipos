@@ -47,14 +47,20 @@ async function slugsOcupados(
  */
 export const slugUnidadUsada: CollectionBeforeValidateHook = async ({ data, originalDoc, req }) => {
   if (!data) return data;
-  const escrito = typeof data.slug === "string" ? formatSlug(data.slug) : "";
-  if (escrito) return { ...data, slug: escrito };
   // Editando, un slug ya guardado no se regenera aunque la petición no lo traiga.
-  if (typeof originalDoc?.slug === "string" && originalDoc.slug) return data;
+  if (typeof originalDoc?.slug === "string" && originalDoc.slug) {
+    return typeof data.slug === "string" ? { ...data, slug: formatSlug(data.slug) } : data;
+  }
 
-  const nombre = typeof data.nombre === "string" ? data.nombre : (originalDoc?.nombre ?? "");
+  const escrito = typeof data.slug === "string" ? formatSlug(data.slug) : "";
+  const nombre = typeof data.nombre === "string" ? data.nombre : "";
   const base = slugDeUnidad(nombre);
   const categoria = idDe(data.categoria ?? originalDoc?.categoria);
+  // El gancho del propio campo ya rellena el slug desde el nombre ANTES de este:
+  // un slug igual al que saldría del nombre es el automático y puede chocar.
+  // Uno distinto lo puso una persona o el importador: se respeta y lo valida el campo.
+  const esAutomatico = !escrito || escrito === base;
+  if (!esAutomatico) return { ...data, slug: escrito };
   if (!base || categoria === null) return data;
   const ocupados = await slugsOcupados(req, categoria, originalDoc?.id);
   return { ...data, slug: slugLibre(base, ocupados) };

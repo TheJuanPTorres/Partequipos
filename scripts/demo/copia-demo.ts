@@ -60,6 +60,7 @@ import {
   urlEnAlmacen,
   veredictoCreado,
   veredictoDestino,
+  veredictoNosotrosRetirada,
   veredictoSubida,
 } from "../../src/lib/demo/copiaDemo";
 import { almacenDeUrl } from "../../src/lib/blob/almacen";
@@ -232,6 +233,19 @@ if (modo === "retirar") {
     const heroAntes = await huellaHero();
     if (heroAntes !== m.hero)
       log("aviso: el hero cambió desde la copia (no lo hizo la copia); la retirada no lo toca");
+    // «nosotros», ANTES de escribir nada: sin la página se para aquí, no a medias.
+    const n = m.antes.nosotros;
+    const nosotrosAntes = n ? await nosotrosDestino() : null;
+    const huellaNosotrosAntes = nosotrosAntes ? huellaNosotros(nosotrosAntes) : null;
+    if (n) {
+      const { aviso, error } = veredictoNosotrosRetirada({
+        huellaCopia: n.huella,
+        huellaAntes: huellaNosotrosAntes,
+        huellaDespues: huellaNosotrosAntes,
+      });
+      if (error) fallar(`${error} (no se ha tocado nada)`);
+      if (aviso) log(`aviso: ${aviso}`);
+    }
     // 1. Devolver lo modificado a su valor anterior.
     const p = m.antes.portada;
     if (p) {
@@ -248,7 +262,6 @@ if (modo === "retirar") {
       });
       log("portada: secciones devueltas a su valor anterior");
     }
-    const n = m.antes.nosotros;
     if (n) {
       await payload.update({
         collection: "paginas",
@@ -257,10 +270,14 @@ if (modo === "retirar") {
         overrideAccess: true,
       });
       const ahora = await nosotrosDestino();
-      if (!ahora || huellaNosotros(ahora) !== n.huella)
-        fallar("la página «nosotros» del destino no es la de antes de la copia: revisar a mano");
+      const { error } = veredictoNosotrosRetirada({
+        huellaCopia: n.huella,
+        huellaAntes: huellaNosotrosAntes,
+        huellaDespues: ahora ? huellaNosotros(ahora) : null,
+      });
+      if (error) fallar(error);
       log(
-        `nosotros: bloques devueltos a su valor anterior (${(n.bloques ?? []).length}); resto de la página idéntico ✓`,
+        `nosotros: bloques devueltos a su valor anterior (${(n.bloques ?? []).length}); resto de la página igual que antes de retirar ✓`,
       );
     }
     if (m.antes.pie) {
@@ -464,7 +481,7 @@ if (modo === "simular" || modo === "copiar") {
     foto?: MediaOrigen | null;
   };
   const sedesO = (await get<Lista<SedeO>>("/api/sedes/?depth=1&limit=100")).docs;
-  const pieO = await get<{ imagenDecorativa?: MediaOrigen | null }>("/api/globals/pie?depth=1");
+  const pieO = await get<{ imagenDecorativa?: MediaOrigen | null }>("/api/globals/pie/?depth=1");
   // Página «nosotros»: sus bloques con los medios y el póster del vídeo poblados (depth 2).
   type ImgO = MediaOrigen | null | undefined;
   type BloqueO = {
@@ -735,6 +752,17 @@ if (modo === "simular" || modo === "copiar") {
       if (!r.ok) fallar(`no se pudo leer ${f.url}: HTTP ${r.status}`);
       return { nombre, data: Buffer.from(await r.arrayBuffer()) };
     };
+    /*
+     * La URL del registro RELEÍDO, no la que devuelve `create`: con
+     * `addRandomSuffix` el adaptador del Blob sube el fichero con un sufijo,
+     * pero `create` devuelve la URL sin él (medido el 2026-10-16). Con la de
+     * `create`, el manifiesto apuntaba a ficheros que no existen: la retirada
+     * daba los reales por «fuera del manifiesto» y su comprobación de 404
+     * pasaba siempre.
+     */
+    const urlGuardada = async (coleccion: "media" | "videos" | "animaciones", id: Id) =>
+      (await payload.findByID({ collection: coleccion, id, depth: 0, overrideAccess: true })).url ??
+      null;
     const comprobarCreado = (f: MediaOrigen, urlCreada: string | null | undefined) => {
       const despues = veredictoCreado({ urlOrigen: f.url, urlCreada });
       if (!despues.valido) fallar(`${f.filename}: ${despues.motivo} (${urlCreada ?? "sin URL"})`);
@@ -753,9 +781,10 @@ if (modo === "simular" || modo === "copiar") {
         overrideAccess: true,
       });
       m.media[String(f.id)] = doc.id;
-      if (doc.url) m.urlsCreadas.push(doc.url);
+      const url = await urlGuardada("media", doc.id);
+      if (url) m.urlsCreadas.push(url);
       guardar(m);
-      comprobarCreado(f, doc.url);
+      comprobarCreado(f, url);
       log(`  media ${f.filename} → ${doc.filename} (id ${doc.id})`);
       return doc.id;
     };
@@ -796,9 +825,10 @@ if (modo === "simular" || modo === "copiar") {
         overrideAccess: true,
       });
       m.videos[String(v.id)] = doc.id;
-      if (doc.url) m.urlsCreadas.push(doc.url);
+      const url = await urlGuardada("videos", doc.id);
+      if (url) m.urlsCreadas.push(url);
       guardar(m);
-      comprobarCreado(v, doc.url);
+      comprobarCreado(v, url);
       log(`  vídeo ${v.filename} → ${doc.filename} (id ${doc.id})`);
       return doc.id;
     };
@@ -816,9 +846,10 @@ if (modo === "simular" || modo === "copiar") {
         overrideAccess: true,
       });
       animacionesCopiadas[String(a.id)] = doc.id;
-      if (doc.url) m.urlsCreadas.push(doc.url);
+      const url = await urlGuardada("animaciones", doc.id);
+      if (url) m.urlsCreadas.push(url);
       guardar(m);
-      comprobarCreado(a, doc.url);
+      comprobarCreado(a, url);
       log(`  animación ${a.filename} → ${doc.filename} (id ${doc.id})`);
       return doc.id;
     };

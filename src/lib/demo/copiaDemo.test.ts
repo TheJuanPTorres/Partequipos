@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { describe, it } from "node:test";
 
 import { ALMACEN_PREVIEW, ALMACEN_PRODUCCION } from "../blob/almacen";
@@ -17,6 +18,7 @@ import {
   urlEnAlmacen,
   veredictoCreado,
   veredictoDestino,
+  veredictoNosotrosRetirada,
   veredictoSubida,
 } from "./copiaDemo";
 
@@ -215,5 +217,62 @@ describe("copia de demostración: nombre propio de los ficheros", () => {
       false,
     );
     assert.equal(puedeRetirar(prevista, [prevista]), true);
+  });
+});
+
+describe("retirada: la página «nosotros» (2026-10-16)", () => {
+  // La huella del manifiesto de producción (2026-10-04) no tiene los campos que
+  // el esquema ganó después; la página de hoy, sí.
+  const copia = JSON.stringify({ titulo: "Nosotros", seccionCompania: { video: null } });
+  const hoy = JSON.stringify({
+    titulo: "Nosotros",
+    seccionCompania: { video: null, imagen: null },
+    actualizadoPor: 1,
+  });
+
+  it("campos nuevos desde la copia: aviso, no error (antes la dejaba a medias)", () => {
+    const v = veredictoNosotrosRetirada({
+      huellaCopia: copia,
+      huellaAntes: hoy,
+      huellaDespues: hoy,
+    });
+    assert.equal(v.error, null);
+    assert.ok(v.aviso?.includes("cambió"));
+  });
+
+  it("sin cambios desde la copia: ni aviso ni error", () => {
+    assert.deepEqual(
+      veredictoNosotrosRetirada({ huellaCopia: copia, huellaAntes: copia, huellaDespues: copia }),
+      { aviso: null, error: null },
+    );
+  });
+
+  it("si la retirada cambia algo fuera de los bloques, error", () => {
+    const otro = JSON.stringify({ titulo: "Otra cosa" });
+    assert.ok(
+      veredictoNosotrosRetirada({ huellaCopia: copia, huellaAntes: hoy, huellaDespues: otro })
+        .error,
+    );
+  });
+
+  it("sin la página en el destino, error ANTES de tocar nada", () => {
+    assert.ok(
+      veredictoNosotrosRetirada({ huellaCopia: copia, huellaAntes: null, huellaDespues: null })
+        .error,
+    );
+  });
+});
+
+describe("copia: rutas de la API con la barra final (2026-10-16)", () => {
+  // `fetchAlPreview` no sigue redirecciones (§10.40), y con `trailingSlash` una
+  // ruta sin barra responde 308: la copia se quedaba en «HTTP 308» al leer el pie.
+  it("ninguna ruta /api/… sin barra antes de la query", () => {
+    const sin = (texto: string) => texto.match(/["`]\/api\/[^"`?\s]*[^/"`?\s]\?/g) ?? [];
+    assert.deepEqual(sin(fs.readFileSync("scripts/demo/copia-demo.ts", "utf8")), []);
+    assert.deepEqual(
+      sin('get("/api/globals/pie?depth=1")'),
+      ['"/api/globals/pie?'],
+      "el guardián detecta el caso",
+    );
   });
 });

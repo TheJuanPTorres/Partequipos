@@ -575,7 +575,7 @@ veredicto, que va en el informe.
 >
 > 1. **Fase G (sedes):** construida (2026-10-02). Sin token de Mapbox se ve la lista de sedes; el globo se activa con `NEXT_PUBLIC_MAPBOX_TOKEN` de la cuenta del cliente (L5). **Globo activo y verificado en producción el 2026-10-06** contra ux-9 a 390, 1010 y 1440 (`decisiones-home-ux9.md` §23). El token de hoy es el público por defecto: antes de lanzar, medio de pago y token restringido a `partequipos.com` (runbook de lanzamiento).
 >
-> **§10.38 ACTIVA:** excepción temporal de demostración con la home completa en producción. Bloquea el lanzamiento: retirarla o confirmar las licencias. 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview. 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
+> **§10.38 CERRADA EN LA PORTADA Y EN NOSOTROS (2026-10-16):** copia de demostración retirada y contenido real puesto en el sitio publicado. Para el resto del sitio, ver §10.38 antes del lanzamiento. 2. **Licencias L1–L5 y logos de fabricantes:** sin ellas, los assets no pasan del preview. 3. **Vídeo de la sección 7:** probarlo en Safari de iPhone real.
 >
 > **Bloque anterior al diseño: QUITADO (fase 6).** La home tiene un solo `<main>` con las secciones de ux-9; el correo pasa al pie (desviación menor, pendiente de Andrés). El horario pasa al global `seo` de Payload (editable, con su migración): va en el JSON-LD `Organization` (`contactPoint.hoursAvailable`) y en `/contactanos/`. Detalle en `decisiones-home-ux9.md` §22.
 >
@@ -644,7 +644,7 @@ veredicto, que va en el informe.
 - **Tiempo de servidor de los listados de usados (2026-10-13), ACEPTADO por dirección:** al pasar a dinámicos (D3), la mediana del TTFB sube unos 100–140 ms (Excavadoras, página 1: 181 → 284 ms; página 2: 160 → 299 ms; 5 cargas por ruta, del preview del #117 al del #120), porque ya no los sirve la CDN. No se toca `proxy.ts` ni se activa Cache Components: **se revisará después del lanzamiento, con tráfico real**. La reversión de la migración `20261014_020810_marcas_usada` lleva `IF EXISTS` (la generada por Payload fallaba tras el `DROP TABLE … CASCADE`; probado en un Postgres en memoria).
 - **El panel al día con usados y repuestos (2026-10-13):** `panel:revision -- <preview> nuevos` (solo lo nuevo); ayudas y etiquetas («Marcas de repuestos», «Marcas/Tipos de maquinaria nueva»), descripción por defecto propia de las páginas de usados (`descripcionPorDefecto`, sitio y panel), el editor de texto en la letra del sitio (`--font-serif`) y la guía del editor al día; sin esquema. Detalle en `docs/diseno/decisiones-panel.md` §28.
 - **Hero de sliders de Andrés (2026-10-14):** por diapositiva, máquina «debajo» o «sobre» el título (lo cruza en escritorio), texto circular decorativo, título en varias líneas y partido en escritorio; título arriba y máquina debajo en el mismo flujo; vidrio también en móvil. Migración `20261014_083213_hero_sliders`, solo esquema. Diapositivas 1 y 2 del diseño solo en el preview (`npm run preview:hero-sliders`; licencia de sus imágenes sin confirmar). Medidas, CLS 0 y desviaciones en `docs/diseno/decisiones-hero-sliders.md`.
-- **Contenido real de la home y de Nosotros (2026-10-14, decisión de dirección):** sustituye la copia de demostración de ux-9 por el contenido de la web original. `scripts/contenido-real/` extrae del XML 22 imágenes, las sedes de su página de contacto, los textos y las metas, e importa con manifiesto y retirada exacta (`npm run preview:real:*`). «Nuestra Compañía» admite una imagen sin vídeo (`seccionCompania.imagen`, PR #146). Huecos sin imagen aceptados; testimonios y preguntas reales, pendientes del cliente. **En el preview, hecho.** En el sitio publicado, `runbook-contenido-real-lanzamiento.md`, **después** de la retirada de la copia: así se cierra §10.38 en estas dos páginas. Detalle en `docs/contenido-real-portada.md`.
+- **Contenido real de la home y de Nosotros (2026-10-14, decisión de dirección):** sustituye la copia de demostración de ux-9 por el contenido de la web original. `scripts/contenido-real/` extrae del XML 22 imágenes, las sedes de su página de contacto, los textos y las metas, e importa con manifiesto y retirada exacta (`npm run preview:real:*`). «Nuestra Compañía» admite una imagen sin vídeo (`seccionCompania.imagen`, PR #146). Huecos sin imagen aceptados; testimonios y preguntas reales, pendientes del cliente. **En el preview, hecho.** **En el sitio publicado, EJECUTADO por dirección el 2026-10-16** (`runbook-contenido-real-lanzamiento.md`, después de la retirada de la copia), y con ello §10.38 cerrada en estas dos páginas. Detalle en `docs/contenido-real-portada.md`.
 - **SEO de las marcas de repuestos (2026-10-13, aprobado por dirección):** bloque «Buscadores y redes sociales» en `marcas` (migración `20261014_033314_seo_marcas_repuestos`, solo esquema) para sus 13 páginas; título por defecto «Repuestos para maquinaria pesada <marca>»; imagen al compartir: la del bloque o la del sitio por defecto (el logo ya no: los del cliente son blancos y transparentes). Los tipos de repuestos ya tenían su bloque. Detalle en `docs/diseno/decisiones-panel.md` §28.
 - **Imágenes reales en las páginas de marca y tipo de repuestos (2026-10-14):** el importador de repuestos trae la foto de la tarjeta de cada tipo en WordPress a `tipos-equipo.imagen` (32, `wp-tipo-…`, formato por los bytes y AVIF a WebP) y quita el fondo de EJEMPLO de ux-9 de las marcas: en WordPress el encabezado no tiene foto visible. Las tarjetas «Maquinaria pesada usada» y «Aditamentos» (no existen en WordPress) llevan una foto real en lugar de la de ux-9 (dirección): una de las unidades de usados y la de la página de aditamentos. No pisa una imagen elegida por un editor, y la retirada devuelve cada campo a su valor de antes; los textos ya venían de WordPress; sin esquema. Volver a ejecutar el runbook de producción solo añade esas 34 imágenes. Detalle en `docs/repuestos-importacion.md` §7.
 - **Hero: diapositiva solo con la foto (2026-10-15, dirección):** casillas «Mostrar título», «Mostrar texto circular» y «Mostrar recuadro de descripción» por diapositiva, marcadas por defecto (migración `20261015_150333_hero_solo_fondo`, solo esquema, `DEFAULT true`); el título oculto queda solo para lectores y las otras dos piezas salen del HTML. Detalle en `docs/diseno/decisiones-hero-sliders.md` §1.1.
@@ -1191,7 +1191,39 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > la colección entra en la segunda instancia de `vercelBlobStorage` de
 > `payload.config.ts` y en `REGLAS_SUBIDA_DIRECTA`.
 
-### 10.38 EXCEPCIÓN TEMPORAL DE DEMOSTRACIÓN — la home completa en producción (2026-10-02) · ACTIVA
+### 10.38 EXCEPCIÓN TEMPORAL DE DEMOSTRACIÓN — la home completa en producción (2026-10-02) · CERRADA EN LA PORTADA Y EN NOSOTROS (2026-10-16)
+
+> **CERRADA en la portada y en Nosotros el 2026-10-16.** Dirección ejecutó en el
+> sitio publicado los dos runbooks, en este orden:
+>
+> 1. **`runbook-retirada-demo-produccion.md`**, con el #186:
+>    - salida `RETIRADA COMPLETA`, con los 46 ficheros en 404;
+>    - tras el redeploy, `demo-copia` en 0, y sedes, testimonios y preguntas en 0.
+> 2. **`runbook-contenido-real-lanzamiento.md`:**
+>    - 22 imágenes `wp-real-` y 8 sedes de la web original;
+>    - Nosotros con 5 bloques;
+>    - después, los logos «Marcas Partequipos» de las 4 marcas, elegidos de nuevo en el panel.
+>
+> **Comprobación final de Claude** (pintadas a 390, 1010 y 1440, solo lectura):
+>
+> | Comprobado                            | Resultado                                                  |
+> | ------------------------------------- | ---------------------------------------------------------- |
+> | Imágenes `demo-copia-`                | Ninguna, ni en el HTML ni pintada                          |
+> | Ficheros `wp-real-`                   | Los 21 que se pintan, en 200                               |
+> | Marcas                                | Orden Hitachi, CASE, Dynapac, Yanmar, cada una con su logo |
+> | «Nuestra Compañía»                    | Con su foto                                                |
+> | Sedes                                 | Las 8                                                      |
+> | Errores y desbordamiento              | Sin errores de consola ni desbordamiento horizontal        |
+> | Prueba de humo del despliegue servido | En verde                                                   |
+>
+> **Por qué se ven 21 de 22:** la foto de la tarjeta de «Preguntas frecuentes» no
+> se pinta, porque la sección no sale sin preguntas. Testimonios y preguntas
+> reales siguen pendientes del cliente.
+>
+> **Sigue pendiente antes del lanzamiento:** la imagen de la ficha de producto
+> de la tabla de abajo no la tocan esos runbooks. Hay que confirmar su licencia
+> o sustituirla (hoy se sirve `contacto-asesor-…png`, de origen sin comprobar).
+> Con eso queda cerrado el paso 0 de README §7.
 
 > **Decisión de dirección del 2026-10-02.** Para enseñar el avance, la home de
 > producción puede llevar los assets que hasta ahora solo iban al preview:

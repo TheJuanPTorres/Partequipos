@@ -958,3 +958,11 @@ dependencias.
 - **Revisión en pantalla:** `npm run panel:revision -- <preview> avisos` abre ahora también la portada (`aviso-recorte-movil`) y la recorre antes de contar, porque Payload pinta cada diapositiva al acercarse. En el preview del PR (2026-10-15) la portada tiene 7 diapositivas, y las 1–3 no tienen recorte. Salieron 3 avisos a 1440 y en móvil: el de tono «aviso» en la 1.ª y el informativo en la 2.ª y la 3.ª. Ninguno en las 4–7.
 
 **No se hizo:** bajar el `sizes` del fondo cuando falta el recorte. Para cubrir la caja con `object-cover`, la foto de escritorio necesita de verdad esos píxeles, así que pedir menos la dejaría borrosa. El arreglo es el recorte, y lo pide dirección a Andrés.
+
+## 31. El icono de la pestaña del panel, del mismo origen (2026-10-15, rama `fix/panel-favicon-mismo-origen`)
+
+**Qué pasaba.** `panel:revision` registraba en cada pantalla del panel una petición bloqueada por ORB a `logo-partequipos.png` (16 a 1440 y 17 en móvil). Era el icono de la pestaña: `admin.meta.icons` apuntaba a la URL fija del Blob de producción (`seoConfig.logoPath`, la deuda de CLAUDE.md §10.8), así que todos los paneles, también los de los previews, lo pedían a otro origen. El navegador bloquea por ORB una respuesta de otro origen que no es una imagen.
+
+**Qué cambia.** El icono pasa a ser `public/logo-partequipos.png` (`LOGO_SITIO_RESPALDO.src`, el logo transparente de Andrés que ya usan la cabecera y el pie), servido por el propio despliegue. Misma forma que antes (tira horizontal): el icono cuadrado sigue pendiente del cliente (§10.3 p.15). Sin esquema ni dependencias.
+
+**Lo que no se toca.** El JSON-LD `Organization` y la imagen social por defecto siguen usando `seoConfig.logoPath` cuando el campo «Logo» del global `seo` está vacío (§10.8).

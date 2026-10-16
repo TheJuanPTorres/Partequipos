@@ -59,7 +59,7 @@ import { FichaProducto } from "./globals/FichaProducto";
 import { PaginasIndice } from "./globals/PaginasIndice";
 import { RepuestosMarca } from "./globals/RepuestosMarca";
 import { modoCorreo, opcionesTransporte } from "./lib/correo/smtp";
-import { seoConfig } from "./lib/seo/config";
+import { LOGO_SITIO_RESPALDO } from "./lib/seo/logo";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -146,7 +146,13 @@ export default buildConfig({
       title: "Panel",
       titleSuffix: "· Partequipos",
       description: "Gestión de contenido de partequipos.com",
-      icons: [{ rel: "icon", type: "image/png", url: seoConfig.logoPath }],
+      /*
+       * Icono de la pestaña: el logo de `public/`, del MISMO origen que el
+       * panel (2026-10-15). Antes era la URL fija del Blob de producción
+       * (§10.8): en cada pantalla del panel, también en los previews, el
+       * navegador la bloqueaba por ORB.
+       */
+      icons: [{ rel: "icon", type: "image/png", url: LOGO_SITIO_RESPALDO.src }],
       // El panel nunca debe indexarse, esté abierto el sitio o no.
       robots: "noindex, nofollow",
     },

@@ -319,6 +319,7 @@ if (!manifiesto.antes) {
       id: portada.id,
       datos: {
         seccionUsada: grupo("seccionUsada"),
+        seccionRepuestos: grupo("seccionRepuestos"),
         seccionLogos,
         seccionCompania: grupo("seccionCompania"),
         seccionFaq: grupo("seccionFaq"),
@@ -364,6 +365,15 @@ if (!manifiesto.antes) {
     sedesQuitadas: sedes.filter((s) => !nombres.has(String(s.nombre))).map(sedeDatos),
   };
   guardar();
+}
+// Una importación anterior a la fila de categorías no guardó «Repuestos»: su valor de
+// ahora es el original, porque hasta este cambio el importador no lo tocaba.
+{
+  const datos = manifiesto.antes!.portada.datos as Record<string, unknown>;
+  if (!datos.seccionRepuestos) {
+    datos.seccionRepuestos = { ...((portada.seccionRepuestos as Record<string, unknown>) ?? {}) };
+    guardar();
+  }
 }
 
 // ---------- Imágenes: de WordPress al Blob, una cada 0,7 s, sin repetir ----------
@@ -434,6 +444,8 @@ const p = fuente.portada;
 const antes = manifiesto.antes!.portada.datos as Record<string, Record<string, unknown>>;
 const datosPortada = {
   seccionUsada: { ...antes.seccionUsada, imagen: img(p.usadaImagen) },
+  // Fila de categorías de la Home V2: el enlace de cada tarjeta dice «Ver todo».
+  seccionRepuestos: { ...antes.seccionRepuestos, verMasTexto: "Ver todo" },
   seccionLogos: {
     ...antes.seccionLogos,
     logos: p.logos.map((l) => ({ nombre: l.nombre, logo: img(l.logo) })),

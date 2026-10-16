@@ -1,14 +1,15 @@
 import type { GlobalConfig } from "payload";
 
 import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
-import { revalidarFichasNuevas } from "../lib/revalidation";
+import { revalidarFichasDeProducto } from "../lib/revalidation";
 
 /**
  * Lo COMÚN a todas las fichas de equipo nuevo (ficha de producto V2 de ux-9,
  * docs/diseno/decisiones-ficha.md): hoy, la imagen de la llamada a contactar
  * («Contáctanos para recibir asesoría»), que es la misma en cada ficha.
  *
- * Al guardar se revalidan las fichas de equipo nuevo.
+ * Al guardar se revalidan las fichas de equipo nuevo y las páginas de las
+ * unidades usadas, que pintan la misma ficha.
  */
 export const FichaProducto: GlobalConfig = {
   slug: "ficha-producto",
@@ -21,7 +22,7 @@ export const FichaProducto: GlobalConfig = {
   hooks: {
     afterChange: [
       ({ doc }) => {
-        revalidarFichasNuevas("global ficha-producto");
+        revalidarFichasDeProducto("global ficha-producto");
         return doc;
       },
     ],

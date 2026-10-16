@@ -71,6 +71,7 @@ import {
  */
 export const PATRONES_DE_PAGINA = {
   fichasNuevas: "/(site)/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
+  unidadesUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/[unidad]",
   marcasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]`,
   categoriasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]`,
   paginasUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]",
@@ -210,14 +211,17 @@ export function rutasDeEquipoNuevo(
 }
 
 /**
- * Todas las fichas de equipo nuevo, por el patrón de la ruta: para lo que
- * comparten todas (el global `ficha-producto`). Nunca relanza.
+ * Todas las fichas de producto, por el patrón de la ruta: las de equipo nuevo
+ * y, desde el #193, las páginas de cada unidad usada, que pintan la misma
+ * ficha. Para lo que comparten todas (el global `ficha-producto`). Nunca
+ * relanza.
  */
-export function revalidarFichasNuevas(motivo: string): void {
+export function revalidarFichasDeProducto(motivo: string): void {
   try {
     revalidatePath(PATRONES_DE_PAGINA.fichasNuevas, "page");
+    revalidatePath(PATRONES_DE_PAGINA.unidadesUsadas, "page");
   } catch (error) {
-    console.error(`[revalidación] fallaron las fichas de equipo nuevo (${motivo}):`, error);
+    console.error(`[revalidación] fallaron las fichas de producto (${motivo}):`, error);
   }
 }
 

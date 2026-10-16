@@ -814,7 +814,7 @@ Sin desbordes ni errores de consola.
 | P8  | Máquina decorativa `Partequipos3553.png`, girada 90°, solo escritorio                                        | **Campo opcional «Imagen decorativa» del global `pie`**, en `Media`. Vacío: la tarjeta va sin imagen | Foto de banco con licencia pendiente (**L3**), y el repositorio es **público**: no puede ir a `public/`. En producción solo para la demo (CLAUDE.md §10.33) |
 
 El isotipo de la marca de agua (`Icon.png`) sí va, en `public/`: es el isotipo
-del cliente.
+del cliente. **Desde el 2026-10-16, el SVG de dirección, con la «P» (§35).**
 
 ### Propuesta: el pie en un global de Payload
 
@@ -2647,3 +2647,35 @@ Lo cambia dirección desde el panel de producción, con
 runbook del contenido real:** ese importador guarda el SEO de la portada tal
 como estaba antes de su primera ejecución y lo vuelve a aplicar al repetirse.
 Si se cambiara después, una repetición devolvería el título de 69 caracteres.
+
+## 35. Isotipo de la tarjeta «Ofrecemos soluciones» del pie (2026-10-16, ajuste del cliente)
+
+**Qué pidió el cliente** (sesión del 14/10): a la marca de agua de la tarjeta
+roja del pie le faltaba la «P». Dirección dejó el asset bueno en
+`partequipos-disenoassetsofrecemos-solucioneslogo PE CTA.svg`.
+
+**De dónde sale:** no es de un campo del panel. Es el `::before` de
+`.tarjeta` en `pie.module.css` (en ux-9, la superposición `Icon.png` del
+contenedor 5fcda963: abajo a la izquierda, `contain`, opacidad 0,11). Así que
+se cambia en el código: `public/isotipo-partequipos.svg` sustituye a
+`isotipo-partequipos.png`, que se borra (no lo usaba nada más).
+
+**Optimizado:**
+
+- Sin DTD ni metadatos. Ocupa 1,2 kB; el PNG ocupaba 4,1 kB.
+- El relleno pasa a **blanco**, como el PNG: el original viene en negro.
+- El `viewBox` se ajusta al dibujo: 146 × 205, casi la proporción del PNG
+  (123 × 179). Así el dibujo se apoya en la misma esquina.
+- Es un fondo decorativo de CSS, sin nombre accesible.
+
+**Medido pintado** con Playwright: el sitio publicado (antes) contra el preview
+del PR #188 (después), en claro.
+
+| Ancho | Tarjeta    | Antes   | Después | CLS (antes = después)            |
+| ----- | ---------- | ------- | ------- | -------------------------------- |
+| 390   | 359 × 250  | sin «P» | con «P» | 0                                |
+| 1010  | 929 × 282  | sin «P» | con «P» | 0                                |
+| 1440  | 1325 × 360 | sin «P» | con «P» | 0,0000062 (el conocido del menú) |
+
+Mismo color de fondo (`#e5242d`), misma posición y misma opacidad. El SVG se
+sirve en 200 como `image/svg+xml`, y el PNG viejo da 404.

@@ -3,7 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarMarcaUsada, revalidarMarcaUsadaBorrada } from "./hooks/maquinariaHooks";
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 
 /**
  * Marcas de la línea USADA (paso b del marketplace; decisión D1 de dirección,
@@ -30,7 +30,7 @@ export const MarcaUsada: CollectionConfig = {
       "Cada marca tiene su página con las unidades usadas disponibles. Se crea sola al guardar una unidad con una marca nueva.",
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

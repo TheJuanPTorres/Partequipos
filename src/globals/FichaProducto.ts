@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload";
 
-import { escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarFichasNuevas } from "../lib/revalidation";
 
 /**
@@ -17,7 +17,7 @@ export const FichaProducto: GlobalConfig = {
     group: "Partes del sitio",
     description: "Lo que comparten todas las fichas de maquinaria nueva.",
   },
-  access: { read: publico, update: escrituraContenido },
+  access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
     afterChange: [
       ({ doc }) => {

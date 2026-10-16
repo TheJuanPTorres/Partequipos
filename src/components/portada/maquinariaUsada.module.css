@@ -48,7 +48,11 @@
   --s3-catalogo-relleno: 0 3% 5%;
   --s3-columnas: 3;
   --s3-tarjeta-relleno: 25px;
-  --s3-botones-arriba: 50px;
+  /*
+   * DESVIACIÓN (cliente, sesión del 2026-10-14): 10 px y no los 50 de la Home
+   * V2 entre la ficha y los botones: con el hueco de la tarjeta, 30 px.
+   */
+  --s3-botones-arriba: 10px;
 
   color: var(--color-texto);
 }

@@ -29,6 +29,8 @@ export type ManifiestoTestimoniosFaq = {
   };
   /** Preguntas que existían y se despublicaron (solo con `despublicar`); la retirada las devuelve. */
   despublicadas: number[];
+  /** Lo mismo con los testimonios de ejemplo del preview. */
+  testimoniosDespublicados?: number[];
 };
 
 export const PREFIJO_TESTIMONIO = "wp-real-testimonio-";

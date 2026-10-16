@@ -119,6 +119,14 @@ if (modo === "retirar") {
       overrideAccess: true,
     });
   log(`preguntas devueltas a publicadas: ${manifiesto.despublicadas.length}`);
+  for (const id of manifiesto.testimoniosDespublicados ?? [])
+    await payload.update({
+      collection: "testimonios",
+      id,
+      data: { publicado: true },
+      overrideAccess: true,
+    });
+  log(`testimonios devueltos a publicados: ${manifiesto.testimoniosDespublicados?.length ?? 0}`);
   for (const id of manifiesto.creado.testimonios)
     await payload.delete({ collection: "testimonios", id, overrideAccess: true }).catch(() => null);
   log(`testimonios borrados: ${manifiesto.creado.testimonios.length}`);
@@ -209,6 +217,23 @@ if (despublicar) {
       guardar();
     }
     log(`${modo === "simular" ? "se despublicaría" : "despublicada"} la pregunta ${e.id}`);
+  }
+}
+if (despublicar) {
+  for (const e of testimoniosExistentes) {
+    if (e.publicado !== true || manifiesto.testimoniosDespublicados?.includes(e.id)) continue;
+    if (fuente.testimonios.some((t) => t.youtube === e.youtube)) continue;
+    if (modo === "importar") {
+      await payload.update({
+        collection: "testimonios",
+        id: e.id,
+        data: { publicado: false },
+        overrideAccess: true,
+      });
+      (manifiesto.testimoniosDespublicados ??= []).push(e.id);
+      guardar();
+    }
+    log(`${modo === "simular" ? "se despublicaría" : "despublicado"} el testimonio ${e.id}`);
   }
 }
 for (const q of nuevasPreguntas) {

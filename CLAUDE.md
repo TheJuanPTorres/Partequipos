@@ -1238,6 +1238,22 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > redeploy. Causa probable, leída en Next 16.3.5: `revalidatePath` con patrón
 > no lleva el grupo `(site)`, y la etiqueta de la página sí. Ver el PR del
 > arreglo, #194 (sin fusionar).
+>
+> **EXCEPCIÓN TEMPORAL, UNA SOLA IMAGEN (decisión de dirección, 2026-10-16):**
+> el **brazo de excavadora recortado** de Andrés vuelve a la cabecera de
+> «Maquinaria pesada usada» de la portada (campo «Máquina recortada» de
+> `seccionUsada`), mientras el cliente entrega la suya.
+>
+> - **El fichero:** `potentes-excavadoras-…-construccion-1.png` del kit de
+>   ux-9, el mismo que pinta la Home V2 y el que llevaba la copia de
+>   demostración. Su licencia sigue pendiente (L3).
+> - **Cómo llega:** se sube como `usada-brazo-excavadora.png`, desde el panel,
+>   con `runbook-brazo-usada.md` (en `Desktop\partequipos-cierre\`). Nunca
+>   entra en el repositorio ni en `public/`.
+> - **Cuándo sale:** cuando llegue la imagen del cliente se elige en el mismo
+>   campo y el brazo se borra de «Imágenes».
+> - **Reabre el paso 0 de README §7 solo para esta imagen:** antes del
+>   lanzamiento, se sustituye o se licencia. El resto de §10.38 sigue cerrado.
 
 > **Decisión de dirección del 2026-10-02.** Para enseñar el avance, la home de
 > producción puede llevar los assets que hasta ahora solo iban al preview:

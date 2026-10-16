@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
+import { pinesAmontonados } from "@/lib/portada/pinesSedes";
+
 import estilos from "./sedes.module.css";
 
 /**
@@ -97,6 +99,27 @@ function cargarMapbox(): Promise<MapboxGL> {
 
 const esMovil = () => window.matchMedia("(max-width: 991px)").matches;
 const sinMovimiento = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * Deja inactivos (`inert`) los pines que chocan con otro, y activos los demás
+ * (`src/lib/portada/pinesSedes.ts`): en la vista general del móvil se solapan
+ * todos y el control equivalente son las flechas anterior/siguiente.
+ */
+function ajustarPines(pines: HTMLButtonElement[]) {
+  const cajas = pines.map((p) => {
+    const r = p.getBoundingClientRect();
+    return { alto: r.height, ancho: r.width, x: r.left, y: r.top };
+  });
+  const centros = pines.map((p): [number, number] => {
+    const r = (p.querySelector(".sedes-pin__punto") ?? p).getBoundingClientRect();
+    return [r.left + r.width / 2, r.top + r.height / 2];
+  });
+  pinesAmontonados(cajas, centros).forEach((amontonado, i) => {
+    const pin = pines[i]!;
+    pin.inert = amontonado;
+    pin.toggleAttribute("data-amontonado", amontonado);
+  });
+}
 
 type Props = { token: string; sedes: PuntoSede[]; children: ReactNode };
 
@@ -268,7 +291,10 @@ export function GloboSedes({ token, sedes, children }: Props) {
                 return pin;
               });
               pines.current[0]?.setAttribute("data-activo", "");
+              // Tras cada movimiento (vista general, vuelo, cambio de tamaño).
+              m.on("moveend", () => ajustarPines(pines.current));
               vistaGeneral(false, 0);
+              ajustarPines(pines.current);
             });
           })
           .catch((e: unknown) => console.error("[sedes] el globo no cargó; queda la lista:", e));

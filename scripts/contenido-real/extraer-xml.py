@@ -53,7 +53,8 @@ IMAGENES = {
     "marca-yanmar": ("2025/03/Yanmar-FOTOS-01-scaled.jpg", "Miniexcavadora Yanmar en una obra"),
     # La de la Home V2 de Andrés (2026-10-15). La de antes, Dynapac-logo-02.jpg, era un logo.
     "marca-dynapac": ("2025/10/CA25D-CIELO.jpg", "Compactador de suelo Dynapac CA25D en una vía en obra"),
-    "usada": ("2025/03/USADOS-FOTOS-02-scaled.jpg", "Excavadoras usadas en un patio de maquinaria"),
+    # Sin imagen para la cabecera de «Maquinaria pesada usada» (dirección, 2026-10-16): el
+    # campo espera una máquina RECORTADA en PNG transparente, y WordPress no tiene ninguna.
     "cat-corte": ("2025/07/Conjunto-ppal-1-600x600-SEP-2025.jpg", "Baldes y dientes para maquinaria pesada"),
     "cat-llantas": ("2025/04/CATEGORIA-Llantas.jpg", "Llantas y rines para maquinaria pesada"),
     "cat-lubricantes": ("2025/04/Recurso-2-.png", "Lubricantes Eni para maquinaria pesada"),
@@ -167,7 +168,18 @@ imagenes = {
 # --- Descripción de cada marca (tarjeta de la sección 2): la meta descripción de su
 # página SOLO si nombra la marca (en WordPress, la de Dynapac es la de CASE, copiada
 # de plantilla); si no, el primer párrafo visible de su página que la nombra.
+# Textos de marca que manda la Home V2 de Andrés (dirección, 2026-10-16): van en lugar del
+# de WordPress, para que las reimportaciones los conserven.
+DESCRIPCIONES_V2 = {
+    "dynapac": "Equipos nuevos Dynapac, reconocidos por su tecnología, eficiencia y alto "
+    "rendimiento en aplicaciones de compactación, pavimentación y construcción de "
+    "infraestructura vial.",
+}
+
+
 def descripcion_de_marca(slug):
+    if slug in DESCRIPCIONES_V2:
+        return DESCRIPCIONES_V2[slug]
     nombre = NOMBRES_MARCAS[slug]
     nombra = lambda t: re.search(rf"\b{re.escape(nombre)}\b", t, re.I)
     meta = re.sub(r"\s+", " ", metas.get(RUTAS_MARCAS[slug], "")).strip()
@@ -276,7 +288,6 @@ fuente = {
             for i, (s, l, t) in enumerate(MARCAS)
         ],
         "logos": [{"nombre": n, "logo": l} for n, l in LOGOS],
-        "usadaImagen": "usada",
         "categorias": categorias,
         "compania": {"imagen": "compania", "youtube": YOUTUBE_COMPANIA},
         "faqImagen": "faq-tarjeta",

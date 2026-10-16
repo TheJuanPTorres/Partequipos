@@ -40,6 +40,12 @@
   --s2-logo-max: 120px;
   --s2-logo-movil: 70px;
   --s2-logo-radio: 10px;
+  --s2-logo-relleno: 8%;
+  /*
+   * Alto mínimo del texto, en líneas: con textos de largo distinto, el logo de
+   * cada tarjeta queda a la misma altura (el contenido va abajo).
+   */
+  --s2-texto-lineas: 6;
   --s2-col-relleno: 10px;
 
   /* Puntos de 6 px; sin flechas en la Home V2. */
@@ -170,36 +176,58 @@
   outline-offset: -3px;
 }
 
-/* Logo encima del texto, a la izquierda: columna del 30 % con 10 px de relleno. */
+/*
+ * Logo encima del texto, a la izquierda: columna del 30 % con 10 px de relleno.
+ *
+ * DESVIACIÓN (cliente, sesión del 2026-10-14): los logos en una CAJA COMÚN, la
+ * baldosa cuadrada y blanca de radio 10 que pinta el diseño (sus logos son
+ * capturas casi cuadradas). Los reales tienen proporciones muy distintas
+ * (Hitachi apaisado, CASE y Yanmar en un lienzo cuadrado, Dynapac con fondo
+ * blanco): dentro de la baldosa, con `contain`, quedan del mismo ancho visual
+ * y se leen sobre la foto oscurecida.
+ */
 .logoCol {
   width: var(--s2-logo-col);
+  max-width: calc(var(--s2-logo-max) + 2 * var(--s2-col-relleno));
   padding: var(--s2-col-relleno);
 }
 
 .logo {
   display: block;
+  box-sizing: border-box;
   width: 100%;
-  max-width: var(--s2-logo-max);
   height: auto;
+  aspect-ratio: 1;
+  padding: var(--s2-logo-relleno);
   border-radius: var(--s2-logo-radio);
+  background: var(--color-fondo);
+  object-fit: contain;
 }
 
+/*
+ * DESVIACIÓN (cliente, sesión del 2026-10-14): texto JUSTIFICADO, con partición
+ * silábica para que la columna estrecha no abra huecos entre palabras. Hace
+ * falta el idioma: `lang="es"` va en el propio texto (además del de `<html>`),
+ * porque sin idioma `hyphens: auto` no parte nada.
+ */
 .texto {
   margin: 0;
   padding: var(--s2-col-relleno);
   font-size: var(--s2-texto);
   font-weight: 300;
   line-height: 1.4;
+  min-height: calc(var(--s2-texto-lineas) * 1.4em + 2 * var(--s2-col-relleno));
+  box-sizing: border-box;
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
 }
 
 /* Móvil: el logo a 70 px, igual a la izquierda. */
 @media (max-width: 767px) {
   .logoCol {
-    width: auto;
-  }
-
-  .logo {
-    width: var(--s2-logo-movil);
+    width: calc(var(--s2-logo-movil) + 2 * var(--s2-col-relleno));
   }
 }
 

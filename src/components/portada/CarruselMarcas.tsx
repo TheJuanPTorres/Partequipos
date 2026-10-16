@@ -137,7 +137,11 @@ export function CarruselMarcas({ tarjetas, etiqueta }: Props) {
           // Sin logo, el nombre: la tarjeta no puede quedar sin nombre accesible.
           <span className="sr-only">{t.nombre}</span>
         )}
-        {t.texto ? <span className={`${estilos.texto} block`}>{t.texto}</span> : null}
+        {t.texto ? (
+          <span lang="es" className={`${estilos.texto} block`}>
+            {t.texto}
+          </span>
+        ) : null}
       </Link>
     </li>
   );

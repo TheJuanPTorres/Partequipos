@@ -34,7 +34,7 @@ export const FichaProducto: GlobalConfig = {
       label: "Imagen de «Contáctanos para recibir asesoría»",
       admin: {
         description:
-          "Opcional. Persona o máquina recortada (PNG transparente) a la derecha del recuadro de contacto, al final de cada ficha. Vacío: el recuadro sin imagen.",
+          "Opcional. A la derecha del recuadro de contacto, al final de cada ficha. Una persona o máquina recortada (PNG transparente) sobresale por arriba; una foto (JPG o WebP) llena esa mitad del recuadro. Vacío: el recuadro sin imagen.",
       },
     },
   ],

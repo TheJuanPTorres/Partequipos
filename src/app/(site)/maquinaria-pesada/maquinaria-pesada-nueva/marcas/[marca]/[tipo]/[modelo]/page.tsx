@@ -35,7 +35,13 @@ import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
-import type { Documento, EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
+import type {
+  Documento,
+  EquiposNuevo,
+  MarcasMaquinaria,
+  Media,
+  TiposMaquinaria,
+} from "@/payload-types";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 /*
@@ -152,6 +158,8 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
   const pdf = urlPdf(equipo);
   const logo = imagenDeMedia(marca.logo, marca.nombre);
   const imagenContacto = imagenDeMedia(ficha.imagenContacto, "");
+  // Un PNG es el recorte de ux-9 (sobresale del recuadro); otra cosa, una foto que lo llena.
+  const contactoEsFoto = poblado<Media>(ficha.imagenContacto)?.mimeType !== "image/png";
 
   const experto = enlaceWhatsApp(
     empresa.whatsapp,
@@ -406,19 +414,33 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
               ) : null}
             </div>
           </div>
-          <div className={estilos.imagenContacto}>
-            <EngranajeMarca className={estilos.engranaje} />
-            {imagenContacto ? (
+          {imagenContacto && contactoEsFoto ? (
+            <div className={`${estilos.imagenContacto} ${estilos.imagenContactoFoto}`}>
               <Image
                 src={imagenContacto.url}
                 alt=""
                 width={imagenContacto.width}
                 height={imagenContacto.height}
-                sizes="(min-width: 1025px) 430px, (min-width: 768px) 305px, 210px"
-                className={estilos.fotoContacto}
+                sizes="(min-width: 768px) 46vw, 90vw"
+                className={estilos.fotoContactoLlena}
+                style={{ objectPosition: imagenContacto.posicion }}
               />
-            ) : null}
-          </div>
+            </div>
+          ) : (
+            <div className={estilos.imagenContacto}>
+              <EngranajeMarca className={estilos.engranaje} />
+              {imagenContacto ? (
+                <Image
+                  src={imagenContacto.url}
+                  alt=""
+                  width={imagenContacto.width}
+                  height={imagenContacto.height}
+                  sizes="(min-width: 1025px) 430px, (min-width: 768px) 305px, 210px"
+                  className={estilos.fotoContacto}
+                />
+              ) : null}
+            </div>
+          )}
         </div>
 
         <div id={ANCLA_COTIZAR} className={estilos.formulario}>

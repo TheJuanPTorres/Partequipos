@@ -67,4 +67,15 @@
     min-height: 450px;
     padding: 0;
   }
+
+  /*
+   * DESVIACIÓN (cliente, sesión del 2026-10-14): ux-9 deja la tarjeta sin
+   * relleno en móvil y el texto, a la izquierda, quedaba pegado al borde de la
+   * foto. 20 px a cada lado, la caja de los títulos de la portada a 390
+   * (decisiones-home-ux9.md §27.1). Estático: sin CLS.
+   */
+  .contenido {
+    box-sizing: border-box;
+    padding-inline: 20px;
+  }
 }

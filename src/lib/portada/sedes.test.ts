@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import type { Sede } from "@/payload-types";
 
-import { sedesDePortada, tokenMapbox } from "./sedes";
+import { sedesDePortada, tokenMapbox, urlGoogleMaps } from "./sedes";
 
 const sede = (over: Partial<Sede>) =>
   ({
@@ -59,5 +59,14 @@ describe("sección 9: token de Mapbox", () => {
     assert.equal(tokenMapbox("pk.eyJ1IjoiYSJ9.abc-DEF_1"), "pk.eyJ1IjoiYSJ9.abc-DEF_1");
     for (const t of [undefined, "", "  ", "sk.eyJ1.abc", "pk.sinpunto", "token"])
       assert.equal(tokenMapbox(t), null, String(t));
+  });
+});
+
+describe("urlGoogleMaps", () => {
+  it("busca por dirección y ciudad, codificadas", () => {
+    const url = new URL(urlGoogleMaps("Calle 1 # 2-3 & Bodega", "Bogotá"));
+    assert.equal(url.origin + url.pathname, "https://www.google.com/maps/search/");
+    assert.equal(url.searchParams.get("api"), "1");
+    assert.equal(url.searchParams.get("query"), "Calle 1 # 2-3 & Bodega, Bogotá");
   });
 });

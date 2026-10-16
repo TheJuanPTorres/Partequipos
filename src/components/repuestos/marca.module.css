@@ -34,7 +34,8 @@
 /* --- Encabezado ---------------------------------------------------------- */
 
 .heroSeccion {
-  padding: 0 1.5vw 1.5vw;
+  /* Aire bajo la cabecera fija (petición del cliente): el hero ya no queda pegado a ella. */
+  padding: 24px 1.5vw 1.5vw;
   /* La mitad de abajo de la franja de color asoma a los lados de la tarjeta. */
   background: linear-gradient(var(--color-fondo-seccion) 50%, var(--marca-amarillo) 50%);
 }

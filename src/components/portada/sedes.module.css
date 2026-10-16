@@ -127,6 +127,37 @@
   transition: color 0.25s ease;
 }
 
+/* «Ver en Google Maps»: botón de contorno, con área táctil de 44 px (axe target-size). */
+.verMapa {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 44px;
+  margin-top: 0.375em;
+  padding: 0 1.125em;
+  align-items: center;
+  border: 2px solid var(--sedes-tinta);
+  border-radius: 999px;
+  color: var(--sedes-tinta);
+  font-size: 0.9375em;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.verMapa:hover,
+.verMapa:focus-visible {
+  background: var(--sedes-tinta);
+  color: #fff;
+}
+
+.verMapa:focus-visible {
+  outline: 2px solid var(--sedes-tinta);
+  outline-offset: 2px;
+}
+
 .telefono:hover,
 .telefono:focus-visible {
   color: var(--sedes-cta-hover);
@@ -527,6 +558,7 @@
   .nav,
   .reabrir,
   .telefono,
+  .verMapa,
   .cerrar,
   .globo :global(.sedes-pin__punto),
   .globo :global(.sedes-pin__etiqueta) {

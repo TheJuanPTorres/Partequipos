@@ -76,7 +76,7 @@ export type FuenteContenidoReal = {
       imagen: string;
       titulo: string;
       orden: number;
-      icono: string;
+      icono: string | null;
     }[];
     compania: { imagen: string; youtube: string };
     /** La foto de la tarjeta de las preguntas frecuentes. */

@@ -4,29 +4,34 @@ import Link from "next/link";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
-import type { TarjetaRepuesto } from "@/lib/portada/seccionesE";
+import { CATEGORIAS_POR_TARJETA, enTarjetas, type TarjetaRepuesto } from "@/lib/portada/seccionesE";
 
-import { ICONOS_CATEGORIA } from "./iconosCategoria";
+import { TarjetasApiladas } from "./diferidos";
 import estilos from "./repuestos.module.css";
 
 /**
- * SECCIÓN «Venta de repuestos» de la portada — fila de categorías (Home V2 de
- * Andrés, plantilla 3474; sustituye a las tarjetas apiladas de ux-9).
+ * SECCIÓN «Venta de repuestos» de la portada — Home V2 de Andrés (sección 6 de
+ * `elementor-3519`): widget «Stacking Cards» con DOS tarjetas apiladas. Al
+ * bajar, la segunda sube y tapa a la primera (decisión de dirección del
+ * 2026-10-16, que corrige la fila de 4 y la tarjeta grande del #182).
  *
- * Componente de SERVIDOR, sin JavaScript de cliente. Una tarjeta blanca por
- * categoría técnica con posición en la portada: foto, título y «Ver todo».
+ * Cada tarjeta lleva CINCO categorías técnicas, en el orden de su posición en
+ * la portada (las 10 de la página de categorías de WordPress: 5 y 5). Las
+ * tarjetas se pintan aquí, en el servidor; el envoltorio de cliente
+ * (`TarjetasApiladas`) solo calcula la escala ligada al scroll.
  *
  * Lo que se aparta del diseño (docs/diseno/decisiones-home-v2-repuestos.md):
- * - Título en `<h2>` y cada tarjeta en `<h3>` (en el diseño, `<h2>` en todas).
- * - Las categorías salen de `categorias-tecnicas` y sus fotos son las reales:
- *   la fila de la referencia lleva cuatro de maqueta («Baldes y…» cortado).
+ * - Título en `<h2>` y cada categoría en `<h3>` (en el diseño, `<h2>`).
  * - «Ver todo» solo si la categoría tiene enlace (el diseño enlaza «#»).
+ * - En móvil, cada categoría en una fila (foto pequeña a la izquierda): la
+ *   referencia pone una por fila a todo el ancho y desborda la tarjeta.
+ * - Con «reducir movimiento», sin barrido: una tarjeta tras otra.
  */
 
-/** Ancho pintado de la foto: 225 px como máximo, o lo que deje la tarjeta. */
-const SIZES_FOTO = "(max-width: 767px) 225px, (max-width: 1024px) 40vw, 225px";
+/** Ancho pintado de la foto: 160 px a 1440, ~140 a 1010 y 72 en móvil. */
+const SIZES_FOTO = "(max-width: 767px) 72px, (max-width: 1024px) 18vw, 160px";
 
-function Tarjeta({
+function Categoria({
   t,
   idTitulo,
   verMas,
@@ -36,68 +41,25 @@ function Tarjeta({
   verMas: string;
 }) {
   return (
-    <li className={estilos.tarjeta} data-con-foto={t.imagen ? "" : undefined}>
+    <li className={estilos.categoria} data-con-foto={t.imagen ? "" : undefined}>
       {/* Sin foto no se reserva su hueco: la tarjeta se ajusta al texto. */}
       {t.imagen ? (
         <div className={estilos.foto}>
           <Image
             src={t.imagen.url}
             alt=""
-            width={225}
-            height={225}
+            width={160}
+            height={160}
             sizes={SIZES_FOTO}
             className={estilos.img}
             style={{ objectPosition: t.imagen.posicion }}
           />
         </div>
       ) : null}
-      <h3 id={idTitulo} className={estilos.tituloTarjeta}>
-        {t.titulo}
-      </h3>
-      {t.href && verMas ? (
-        <Link
-          href={t.href}
-          aria-describedby={idTitulo}
-          className={`${estilos.verMas} texto-etiqueta`}
-        >
-          {verMas}
-        </Link>
-      ) : null}
-    </li>
-  );
-}
-
-/**
- * Tarjeta grande bajo la fila («Blades y corte» en la referencia): la primera
- * categoría de la portada, con su descripción y su foto del panel. Sin
- * descripción no se pinta: repetir solo el título no aporta nada.
- */
-function Destacada({
-  t,
-  idTitulo,
-  verMas,
-}: {
-  t: TarjetaRepuesto;
-  idTitulo: string;
-  verMas: string;
-}) {
-  const Icono = t.icono ? ICONOS_CATEGORIA[t.icono] : null;
-  return (
-    <article
-      className={estilos.destacada}
-      data-con-foto={t.imagen ? "" : undefined}
-      aria-labelledby={idTitulo}
-    >
-      <div className={estilos.destacadaTexto}>
-        {Icono ? (
-          <span className={estilos.icono} aria-hidden="true">
-            <Icono focusable="false" stroke={1.75} />
-          </span>
-        ) : null}
-        <h3 id={idTitulo} className={estilos.destacadaTitulo}>
+      <div className={estilos.textoCategoria}>
+        <h3 id={idTitulo} className={estilos.tituloCategoria}>
           {t.titulo}
         </h3>
-        <p className={`${estilos.destacadaDescripcion} texto-cuerpo`}>{t.texto}</p>
         {t.href && verMas ? (
           <Link
             href={t.href}
@@ -108,19 +70,7 @@ function Destacada({
           </Link>
         ) : null}
       </div>
-      {t.imagen ? (
-        <div className={estilos.destacadaFoto}>
-          <Image
-            src={t.imagen.url}
-            alt=""
-            fill
-            sizes="(max-width: 767px) calc(100vw - 20px), (max-width: 1024px) 40vw, 456px"
-            className={estilos.destacadaImg}
-            style={{ objectPosition: t.imagen.posicion }}
-          />
-        </div>
-      ) : null}
-    </article>
+    </li>
   );
 }
 
@@ -158,26 +108,24 @@ export function SeccionRepuestos({
             className={`${estilos.titulo} texto-titulo-seccion`}
           />
         ) : null}
-        <div className={estilos.fila}>
-          <ul className={estilos.lista}>
-            {tarjetas.map((t, i) => (
-              // El id sale de la posición, no de la base: no se exponen ids (CLAUDE.md §8).
-              <Tarjeta
-                key={t.id}
-                t={t}
-                idTitulo={`portada-repuesto-${i + 1}`}
-                verMas={textos.verMasTexto}
-              />
-            ))}
-          </ul>
-        </div>
-        {tarjetas[0]?.texto ? (
-          <Destacada
-            t={tarjetas[0]}
-            idTitulo="portada-repuesto-destacada"
-            verMas={textos.verMasTexto}
-          />
-        ) : null}
+        <TarjetasApiladas className={estilos.apiladas} claseItem={estilos.item}>
+          {enTarjetas(tarjetas).map((grupo, g) => (
+            <ul key={g} className={estilos.tarjeta}>
+              {grupo.map((t, i) => {
+                const n = g * CATEGORIAS_POR_TARJETA + i + 1;
+                // El id sale de la posición, no de la base: no se exponen ids (CLAUDE.md §8).
+                return (
+                  <Categoria
+                    key={t.id}
+                    t={t}
+                    idTitulo={`portada-repuesto-${n}`}
+                    verMas={textos.verMasTexto}
+                  />
+                );
+              })}
+            </ul>
+          ))}
+        </TarjetasApiladas>
         {textos.botonTexto && textos.botonEnlace ? (
           <div className={estilos.pie}>
             <Link href={textos.botonEnlace} className={`${estilos.boton} texto-etiqueta`}>

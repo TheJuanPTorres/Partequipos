@@ -9,7 +9,7 @@ import { enlace, parrafo, texto } from "../lib/fields/textosPortada";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
 import { slugEditable } from "../lib/fields/slugField";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 
 /**
  * Páginas institucionales y legales (nosotros, contacto, servicio técnico,
@@ -40,7 +40,7 @@ export const PaginaInstitucional: CollectionConfig = {
       "Páginas fijas del sitio (Nosotros, Contacto, textos legales…) y la portada. No cambies la ruta de una página publicada: Google ya conoce esa dirección.",
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

@@ -5,7 +5,7 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
 import { revalidarEquipoNuevo, revalidarEquipoNuevoBorrado } from "./hooks/maquinariaHooks";
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { avisoField } from "../lib/fields/avisoField";
 
 /**
@@ -25,7 +25,7 @@ export const EquipoNuevo: CollectionConfig = {
     listSearchableFields: ["nombre", "codigo"],
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

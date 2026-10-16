@@ -1,9 +1,9 @@
 import {
   ValidationError,
-  type Access,
   type CollectionBeforeChangeHook,
   type CollectionBeforeValidateHook,
   type CollectionConfig,
+  type Where,
 } from "payload";
 
 import {
@@ -11,7 +11,7 @@ import {
   publicadoEfectivo,
   validarPublicacionTestimonio,
 } from "../lib/fields/reglasPortada";
-import { borradoAdmin, esPersonal, escrituraContenido } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaFiltrada } from "../lib/seguridad/acceso";
 import { validarYouTube } from "../lib/fields/youtube";
 import { revalidarPortada } from "./hooks/portadaHooks";
 import { avisoField } from "../lib/fields/avisoField";
@@ -19,12 +19,12 @@ import { avisoField } from "../lib/fields/avisoField";
 const portada = revalidarPortada("testimonios");
 
 /**
- * El personal del panel lee todo; el público, SOLO lo publicado y autorizado.
- * Se devuelve una CONSULTA, no `false`: la respuesta sale en 200 con menos
+ * Por la API, el personal del panel lee todo; con el token de lectura, SOLO lo
+ * publicado y autorizado; sin sesión ni token, nada (`lecturaFiltrada`).
+ * Con el token se devuelve una CONSULTA, no `false`: la respuesta sale en 200 con menos
  * filas, así que esto se verifica por el efecto, no por el código (§10.15).
  */
-const leerTestimonios: Access = ({ req }) =>
-  esPersonal(req.user) ? true : (TESTIMONIOS_PUBLICOS as unknown as ReturnType<Access>);
+const leerTestimonios = lecturaFiltrada(TESTIMONIOS_PUBLICOS as unknown as Where);
 
 /**
  * RECHAZA, con error visible, la petición que pide publicar sin autorización.

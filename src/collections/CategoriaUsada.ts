@@ -3,7 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarCategoriaUsada, revalidarCategoriaUsadaBorrada } from "./hooks/maquinariaHooks";
-import { borradoAdmin, escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMegamenu } from "./hooks/megamenuHooks";
 import { slugCategoriaUsadaNoReservado } from "../lib/usados/slugsReservados";
 
@@ -27,7 +27,7 @@ export const CategoriaUsada: CollectionConfig = {
     group: "Maquinaria",
   },
   access: {
-    read: publico,
+    read: lecturaContenido,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,

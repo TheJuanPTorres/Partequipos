@@ -104,6 +104,16 @@ describe("veredicto (comprobación de que la prueba FALLA cuando debe)", () => {
     assert.match(v.lineas[0]!, /error de red/);
   });
 
+  it("la API REST exige 403: cerrada a anónimos desde el 2026-10-15", () => {
+    const api = RUTAS.find((r) => r.ruta === "/api/marcas/");
+    assert.equal(api?.esperado, 403);
+    const conEstado = (estado: number) =>
+      veredicto([{ esperado: 403, estado, intentos: 1, ruta: "/api/marcas/" }]).codigo;
+    assert.equal(conEstado(403), 0);
+    assert.equal(conEstado(200), 1, "un 200 —la API abierta otra vez— pasó como bueno");
+    assert.equal(conEstado(500), 1, "un 500 —la config de Payload caída— pasó como bueno");
+  });
+
   it("dice QUÉ ruta y QUÉ código, que es lo que se lee al fallar", () => {
     const v = veredicto([{ estado: 503, intentos: 4, ruta: "/sitemap.xml" }]);
     assert.match(v.lineas[0]!, /✗ \/sitemap\.xml — HTTP 503 \(4 intentos\)/);

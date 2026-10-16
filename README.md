@@ -275,6 +275,9 @@ al rastreador la lista completa de URLs que se intenta ocultar.
    activa, **no se abre a buscadores**. Antes del paso 1: **retirar §10.38**
    (runbook de retirada) **o confirmar por escrito las licencias** de los
    assets que cubre. Si no, no se sigue.
+   **Desde el 2026-10-16** queda una sola imagen: el brazo de excavadora de
+   «Maquinaria pesada usada» de la portada (`usada-brazo-excavadora.png`).
+   Sustituirla por la del cliente o licenciarla.
 1. En Vercel → Settings → Environment Variables, poner
    `NEXT_PUBLIC_PERMITIR_INDEXACION=true` en **Production**.
 2. Redesplegar. La variable es `NEXT_PUBLIC_*`, o sea que se incrusta en el

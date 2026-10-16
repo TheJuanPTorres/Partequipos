@@ -284,6 +284,15 @@
  * móvil siguen partiéndose: allí ninguna ruta llena la línea por poco.
  */
 @media (min-width: 768px) {
+  /*
+   * Sin esto, el ancho mínimo de la columna de la rejilla sería la ruta entera
+   * en una línea, y la columna cambiaría de ancho con la fuente (otro CLS).
+   */
+  .columnaDatos,
+  .migas {
+    min-width: 0;
+  }
+
   .migas ol {
     flex-wrap: nowrap;
     overflow: hidden;

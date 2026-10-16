@@ -339,8 +339,9 @@ export default buildConfig({
       collections: {
         // `disablePayloadAccessControl: true` hace que `doc.url` sea la URL
         // pública del CDN del Blob en vez de la ruta interna /api/media/file/...
-        // Las imágenes de catálogo son públicas (Media tiene `read: () => true`)
-        // y servirlas desde el CDN evita dos saltos de serverless por foto,
+        // Las imágenes de catálogo son públicas (la API de Media se lee con
+        // `lecturaContenido`, pero el fichero no pasa por ella), y servirlas
+        // desde el CDN evita dos saltos de serverless por foto,
         // lo que pesa en Core Web Vitals y por tanto en SEO. Ver ADR 0003.
         [Media.slug]: { disablePayloadAccessControl: true },
         // Los PDF se descargan desde el CDN, sin pasar por una función.

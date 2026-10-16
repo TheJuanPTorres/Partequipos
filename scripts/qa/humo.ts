@@ -112,7 +112,7 @@ const v = veredicto(resultados);
 v.lineas.forEach((l) => console.log(l));
 
 if (v.codigo === 0) {
-  console.log(`\n✓ Las ${v.total} rutas responden 200.`);
+  console.log(`\n✓ Las ${v.total} rutas responden lo esperado.`);
   process.exit(0);
 }
 

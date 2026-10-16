@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { describe, it } from "node:test";
 
 import { ALMACEN_PREVIEW, ALMACEN_PRODUCCION } from "../blob/almacen";
@@ -258,6 +259,20 @@ describe("retirada: la página «nosotros» (2026-10-16)", () => {
     assert.ok(
       veredictoNosotrosRetirada({ huellaCopia: copia, huellaAntes: null, huellaDespues: null })
         .error,
+    );
+  });
+});
+
+describe("copia: rutas de la API con la barra final (2026-10-16)", () => {
+  // `fetchAlPreview` no sigue redirecciones (§10.40), y con `trailingSlash` una
+  // ruta sin barra responde 308: la copia se quedaba en «HTTP 308» al leer el pie.
+  it("ninguna ruta /api/… sin barra antes de la query", () => {
+    const sin = (texto: string) => texto.match(/["`]\/api\/[^"`?\s]*[^/"`?\s]\?/g) ?? [];
+    assert.deepEqual(sin(fs.readFileSync("scripts/demo/copia-demo.ts", "utf8")), []);
+    assert.deepEqual(
+      sin('get("/api/globals/pie?depth=1")'),
+      ['"/api/globals/pie?'],
+      "el guardián detecta el caso",
     );
   });
 });

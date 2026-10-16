@@ -113,6 +113,16 @@ describe("clasificarDestino — maquinaria", () => {
     );
   });
 
+  it("una unidad de usada: /…/maquinaria-pesada-usada/<categoria>/<unidad>/", () => {
+    const d = clasificarDestino(
+      "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/excavadora-hitachi-zx350h-5b-2016/",
+    );
+    assert.ok(d.clase === "dinamica");
+    assert.deepEqual(d.colecciones, ["equipos-usados"]);
+    assert.equal(d.slug, "excavadora-hitachi-zx350h-5b-2016");
+    assert.deepEqual(d.padres, ["excavadoras"]);
+  });
+
   it("rechaza una rama inventada de maquinaria", () => {
     assert.equal(clasificarDestino("/maquinaria-pesada/inventada/x/").clase, "sin-ruta");
   });

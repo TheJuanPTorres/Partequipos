@@ -28,6 +28,8 @@ export type SitemapInput = {
   equiposNuevos: ModeloLike[];
   categoriasNueva: ConSlug[];
   categoriasUsada: ConSlug[];
+  /** Unidades usadas DISPONIBLES con su página (las vendidas redirigen y no van). */
+  unidadesUsada: (ConSlug & { categoriaSlug: string })[];
   /** Marcas de usada con unidades disponibles (D4: las vacías no van). */
   marcasUsada: ConSlug[];
   /** Lubricantes: marca → categoría de aplicación. Sin índice de sección. */
@@ -68,6 +70,7 @@ export const PATRONES_SITEMAP = [
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
   "/maquinaria-pesada/maquinaria-pesada-usada",
   "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]",
+  "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/[unidad]",
   "/maquinaria-pesada/maquinaria-pesada-usada/marcas/[marca]",
   /*
    * Lubricantes. No hay patrón "/lubricantes" a secas: esa página NO existe en
@@ -163,6 +166,7 @@ export function buildSitemapEntries(
     equiposNuevos,
     categoriasNueva,
     categoriasUsada,
+    unidadesUsada,
     marcasUsada,
     marcasLubricante,
     articulos,
@@ -339,6 +343,17 @@ export function buildSitemapEntries(
       lastModified: fecha(categoria.updatedAt, ahora),
       changeFrequency: "daily",
       priority: 0.7,
+    });
+  }
+
+  // Cada unidad disponible tiene su página (2026-10-16); una vendida redirige a su
+  // categoría y no se lista. Cambian a diario con el inventario.
+  for (const unidad of unidadesUsada) {
+    entradas.push({
+      url: absoluteUrl(rutas.unidadUsada(unidad.categoriaSlug, unidad.slug)),
+      lastModified: fecha(unidad.updatedAt, ahora),
+      changeFrequency: "weekly",
+      priority: 0.5,
     });
   }
 

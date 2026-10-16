@@ -76,6 +76,7 @@ describe("rutaEnElSitio", () => {
       "categorias-maquinaria",
       "categorias-usada",
       "equipos-nuevos",
+      "equipos-usados",
       "marcas",
       "marcas-lubricante",
       "marcas-maquinaria",

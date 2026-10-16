@@ -89,6 +89,12 @@ export const SEO_POR_COLECCION: Partial<Record<CollectionSlug, ReglaSeo>> = {
     descripcion: descripcionPorDefecto.categoriaUsada,
     imagen: null,
   },
+  "equipos-usados": {
+    campoNombre: "nombre",
+    titulo: tal,
+    campoDescripcion: "descripcion",
+    imagen: "Si la unidad tiene imágenes, se usa la primera de la galería.",
+  },
   "marcas-usada": {
     campoNombre: "nombre",
     titulo: tituloPorDefecto.marcaUsada,

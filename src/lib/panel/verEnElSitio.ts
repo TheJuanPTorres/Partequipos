@@ -88,6 +88,11 @@ export const RUTAS_EN_EL_SITIO: Partial<Record<CollectionSlug, Generador>> = {
     const s = slugPropio(doc);
     return s ? rutas.categoriaUsada(s) : null;
   },
+  "equipos-usados": async (doc, buscar) => {
+    const s = slugPropio(doc);
+    const categoria = await slugDe(doc.categoria, "categorias-usada", buscar);
+    return s && categoria ? rutas.unidadUsada(categoria, s) : null;
+  },
   "marcas-usada": async (doc) => {
     const s = slugPropio(doc);
     return s ? rutas.marcaUsada(s) : null;

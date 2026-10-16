@@ -25,7 +25,7 @@ import { PestanasUsada } from "./diferidos";
  * - Las tres pestañas con tarjetas verticales (el diseño solo rediseña la
  *   primera; «Otros» y «Aditamentos» conservan las de ux-9), por petición de
  *   dirección.
- * - «Ficha técnica» solo si la unidad tiene PDF; sin él, no se pinta.
+ * - «Ficha técnica» lleva a la página de la unidad (antes, a su PDF).
  * - Iconos de Tabler en vez de los de Flaticon (L2).
  */
 
@@ -96,13 +96,13 @@ function Tarjeta({
             {verTexto}
           </Link>
         ) : null}
-        {equipo.fichaPdf ? (
-          <a
-            href={equipo.fichaPdf}
+        {equipo.hrefFicha ? (
+          <Link
+            href={equipo.hrefFicha}
             className={`${estilos.boton} ${estilos.botonOscuro} texto-etiqueta`}
           >
-            Ficha técnica<span className="sr-only"> de {equipo.nombre} (PDF)</span>
-          </a>
+            Ficha técnica<span className="sr-only"> de {equipo.nombre}</span>
+          </Link>
         ) : null}
       </div>
     </article>

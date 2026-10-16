@@ -36,7 +36,14 @@ export type FilaFicha = {
   icono?: string | null;
 };
 
-export type DatoDestacado = { etiqueta: string; valor: string; icono: IconoFicha };
+/**
+ * Iconos que puede pintar la ficha: los del panel (equipos nuevos) y tres más
+ * que solo usan las unidades de usada, cuyos datos destacados no salen de una
+ * ficha técnica en filas sino de sus campos (`src/lib/usados/ficha.ts`).
+ */
+export type IconoDatoFicha = IconoFicha | "anio" | "horas" | "ubicacion";
+
+export type DatoDestacado = { etiqueta: string; valor: string; icono: IconoDatoFicha };
 
 const esIcono = (v: unknown): v is IconoFicha => ICONOS_FICHA.some((i) => i.value === v);
 

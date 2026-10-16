@@ -39,6 +39,7 @@ import * as migration_20261014_083213_hero_sliders from './20261014_083213_hero_
 import * as migration_20261014_223000_huerfanas_y_textos_demo from './20261014_223000_huerfanas_y_textos_demo';
 import * as migration_20261015_150333_hero_solo_fondo from './20261015_150333_hero_solo_fondo';
 import * as migration_20261016_041733_ficha_pdf_usados from './20261016_041733_ficha_pdf_usados';
+import * as migration_20261016_170244_usados_url_slug_seo from './20261016_170244_usados_url_slug_seo';
 
 export const migrations = [
   {
@@ -244,6 +245,11 @@ export const migrations = [
   {
     up: migration_20261016_041733_ficha_pdf_usados.up,
     down: migration_20261016_041733_ficha_pdf_usados.down,
-    name: '20261016_041733_ficha_pdf_usados'
+    name: '20261016_041733_ficha_pdf_usados',
+  },
+  {
+    up: migration_20261016_170244_usados_url_slug_seo.up,
+    down: migration_20261016_170244_usados_url_slug_seo.down,
+    name: '20261016_170244_usados_url_slug_seo'
   },
 ];

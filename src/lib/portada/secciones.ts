@@ -1,4 +1,4 @@
-import type { CategoriasUsada, Documento, EquiposUsado, MarcasMaquinaria } from "@/payload-types";
+import type { CategoriasUsada, EquiposUsado, MarcasMaquinaria } from "@/payload-types";
 
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 
@@ -67,10 +67,14 @@ export type TarjetaEquipo = {
   nombre: string;
   imagen: ImagenLista | null;
   ficha: DatoFicha[];
-  /** El equipo usado no tiene URL propia (ADR 0007): «Ver más» lleva a su categoría. */
+  /** «Ver más» lleva al listado de su categoría. */
   href: string;
-  /** URL del PDF de la unidad; sin él, la tarjeta no pinta «Ficha técnica». */
-  fichaPdf: string | null;
+  /**
+   * «Ficha técnica» lleva a la PÁGINA de la unidad (2026-10-16, antes era su PDF,
+   * que ahora se descarga desde esa página). Una unidad aún sin dirección web no
+   * pinta el botón.
+   */
+  hrefFicha: string | null;
 };
 
 export type Pestana = { clave: string; etiqueta: string; equipos: TarjetaEquipo[] };
@@ -146,7 +150,7 @@ export function pestanasDeUsada(
       imagen: imagenDeMedia(Array.isArray(e.imagenes) ? e.imagenes[0] : null, nombre),
       ficha: fichaDeEquipo(e),
       href: hrefDeCategoriaUsada(categoria.slug),
-      fichaPdf: poblado<Documento>(e.fichaTecnicaPdf)?.url || null,
+      hrefFicha: e.slug ? `${hrefDeCategoriaUsada(categoria.slug)}${e.slug}/` : null,
     };
     if (e.pestanaPortada === "aditamentos") {
       aditamentos.push(tarjeta);

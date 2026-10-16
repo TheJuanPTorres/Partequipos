@@ -257,3 +257,27 @@ export function nombreDeFicheroUsado(
     .replace(/^-+|-+$/g, "");
   return `wp-usado-${idAdjunto}-${base}.${ext}`;
 }
+
+/**
+ * Nombre compuesto y categoría de una unidad de la exportación, con las mismas
+ * reglas que el importador (`scripts/usados/importar-usados.ts`): de ahí sale la
+ * dirección web de cada unidad. `null` si la categoría no tiene equivalente.
+ */
+export function nombreYCategoriaDeUnidad(u: {
+  categoria: string | null;
+  marca: string | null;
+  referencia: string;
+  peso: string;
+  anio: string | null;
+  descripcionequipo: string;
+}): { nombre: string; categoria: string } | null {
+  const marca = nombreDeMarca(u.marca);
+  const modelo = limpiarReferencia(u.referencia, marca);
+  const categoria = categoriaDeUnidad(u.categoria, normalizarPeso(u.peso));
+  if (!categoria) return null;
+  const anio = anioDeUnidad(u.anio, u.descripcionequipo).valor;
+  return {
+    nombre: nombreCompuesto(categoria.tipo, marca, modelo, anio),
+    categoria: categoria.slug,
+  };
+}

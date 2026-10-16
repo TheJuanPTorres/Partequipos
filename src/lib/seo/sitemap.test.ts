@@ -56,6 +56,7 @@ const SIN_MAQUINARIA = {
   equiposNuevos: [],
   categoriasNueva: [],
   categoriasUsada: [],
+  unidadesUsada: [],
   marcasUsada: [],
   marcasLubricante: [],
   articulos: [],
@@ -96,6 +97,7 @@ const datosConMaquinaria = {
   ],
   categoriasNueva: [{ slug: "categoria-n", updatedAt: "2026-07-19T10:00:00.000Z" }],
   categoriasUsada: [{ slug: "categoria-u", updatedAt: "2026-07-18T10:00:00.000Z" }],
+  unidadesUsada: [],
   marcasUsada: [{ slug: "marca-u", updatedAt: "2026-07-18T10:00:00.000Z" }],
 };
 
@@ -106,6 +108,27 @@ describe("buildSitemapEntries", () => {
     // + 4 índices de maquinaria + 1 índice de blog + 1 institucional
     // + 1 marca + 1 tipo + 1 modelo
     assert.equal(e.length, 13);
+  });
+
+  it("lista la página de cada unidad usada disponible, bajo su categoría", () => {
+    const e = buildSitemapEntries(
+      {
+        ...datos,
+        unidadesUsada: [
+          { slug: "unidad-1", categoriaSlug: "categoria-u", updatedAt: "2026-07-30T10:00:00.000Z" },
+        ],
+      },
+      AHORA,
+    );
+    const unidad = e.find((x) => x.url.endsWith("/categoria-u/unidad-1/"));
+    assert.ok(unidad);
+    assert.equal(unidad.url.includes("/maquinaria-pesada/maquinaria-pesada-usada/"), true);
+    assert.equal(unidad.lastModified.toISOString(), "2026-07-30T10:00:00.000Z");
+    // Sin unidades (o vendidas, que el sitemap no recibe), no hay entradas de unidad.
+    assert.equal(
+      buildSitemapEntries(datos, AHORA).some((x) => x.url.includes("unidad-1")),
+      false,
+    );
   });
 
   it("emite solo URLs absolutas", () => {

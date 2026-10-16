@@ -70,6 +70,21 @@ async function cadenaCoherente(colecciones: string[], slug: string, padres: stri
     return false;
   }
 
+  // Una unidad usada cuelga de su categoría (no de una marca).
+  if (coleccion === "equipos-usados") {
+    const { docs } = await payload.find({
+      collection: "categorias-usada",
+      where: { slug: { equals: padres[0] } },
+      limit: 1,
+      depth: 0,
+    });
+    const categoria = docs[0];
+    if (!categoria) return false;
+    return existe("equipos-usados", {
+      and: [{ categoria: { equals: categoria.id } }, { slug: { equals: slug } }],
+    });
+  }
+
   // Repuestos y maquinaria comparten la forma marca -> tipo -> hoja.
   const esRepuestos = coleccion === "tipos-equipo" || coleccion === "modelos-repuesto";
   const marcaCol = (esRepuestos ? "marcas" : "marcas-maquinaria") as CollectionSlug;

@@ -615,7 +615,7 @@ export interface CategoriasTecnica {
   createdAt: string;
 }
 /**
- * Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros; no tiene página propia.
+ * Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros, y tiene su propia página.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "equipos-usados".
@@ -626,6 +626,10 @@ export interface EquiposUsado {
    * Ej. «Excavadora Hitachi ZX200-3».
    */
   nombre: string;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug?: string | null;
   /**
    * Determina en qué listado de categoría aparece la unidad.
    */
@@ -665,6 +669,14 @@ export interface EquiposUsado {
    */
   disponible?: boolean | null;
   pestanaPortada?: ('categoria' | 'aditamentos') | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -2020,6 +2032,7 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
  */
 export interface EquiposUsadosSelect<T extends boolean = true> {
   nombre?: T;
+  slug?: T;
   categoria?: T;
   marcaUsada?: T;
   marca?: T;
@@ -2035,6 +2048,13 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
   fichaTecnicaPdf?: T;
   disponible?: T;
   pestanaPortada?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;

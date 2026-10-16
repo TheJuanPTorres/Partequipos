@@ -97,3 +97,20 @@ repositorio, lo ejecuta dirección).
 - **Igual que antes, no lo trae el contenido real:**
   - la cabecera de Nosotros a 390, con el texto pegado al borde;
   - la cifra pegada al botón.
+
+## 6. Preguntas frecuentes y testimonios reales (2026-10-16)
+
+Vuelven las secciones 10 y 11 de la home, que no se pintaban sin contenido.
+
+**Preguntas frecuentes (6).** Redactadas a partir de la web original (páginas «Nosotros», «Contáctanos», «Servicio técnico» y la política de garantía y devolución) y aprobadas por dirección el 2026-10-16. Sin cifras de garantía: la quinta remite a `/politica-de-garantia-de-repuestos/` y a su ancla `#Devoluciones`. Dynapac se cita como marca de maquinaria nueva, sin «distribuidor oficial».
+
+- La respuesta sigue siendo texto plano (alimenta el JSON-LD `FAQPage`) y admite enlaces con `[texto](/ruta/)` o `[texto](https://…)` (`src/lib/portada/respuestaFaq.ts`). Solo valen los destinos de `validarEnlace`: ni `javascript:` ni `//otro.com`. El JSON-LD lleva el texto sin la sintaxis.
+
+**Testimonios (4 vídeos del canal @partequipos_sas).** Son los de «Testimonios reales» de la web original (sus miniaturas son las de esa web; tres se comprobaron por huella exacta contra la miniatura de YouTube). Se muestran con el vídeo y el nombre de la empresa que sale en él. **No se inventa ninguna frase.**
+
+- Campo nuevo `videoDelCliente` («Vídeo ya publicado por el cliente en su canal de YouTube»). Con la casilla **y** un enlace de YouTube válido, la frase y la autorización de uso son opcionales y el testimonio se puede publicar (`exentoDeAutorizacion`, `reglasPortada.ts`). Sin la casilla, todo sigue como antes.
+- `cita` deja de ser obligatoria en la base (migración `20261016_193118_testimonios_video_cliente`); la obligación pasa a una validación que la exime solo en ese caso.
+- Cuando el cliente mande la frase y la autorización, se añaden en el panel; el testimonio las usa sin más cambios.
+- El quinto vídeo del widget original («Potenciamos el desarrollo de infraestructura en Colombia») es institucional, sin cliente, y no entra.
+
+**Importador:** `scripts/contenido-real/testimonios-faq.ts` (`npm run preview:testimonios-faq:{simular,importar,retirar}`). Fuente fuera del repositorio (`Desktop/partequipos-cierre/testimonios-faq-fuente.json`: lleva nombres de empresas clientes, §9). Idempotente (las preguntas por su texto, los testimonios por su vídeo), no pisa lo editado en el panel, manifiesto y retirada exacta. Solo en el preview, `despublicar` oculta las preguntas de ejemplo de ux-9 (la retirada las devuelve). Para el sitio publicado: `runbook-testimonios-faq-lanzamiento.md`.

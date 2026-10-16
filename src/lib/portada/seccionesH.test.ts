@@ -15,6 +15,7 @@ const testimonio = (over: Partial<Testimonio>): Testimonio =>
     nombre: "Alejandro Morales",
     cita: "Muy buen servicio.",
     publicado: true,
+    autorizacionUso: true,
     ...over,
   }) as Testimonio;
 
@@ -53,6 +54,36 @@ describe("sección 10: testimonios", () => {
     ]);
     assert.deepEqual(a!.youtube, { id: "hBeMsx5WEko", inicio: 21 });
     assert.equal(b!.youtube, null);
+  });
+
+  it("sin autorización de uso no sale, aunque esté publicado", () => {
+    assert.deepEqual(tarjetasDeTestimonios([testimonio({ autorizacionUso: false })]), []);
+  });
+
+  it("un vídeo ya publicado por el cliente sale sin frase y sin autorización", () => {
+    const [t] = tarjetasDeTestimonios([
+      testimonio({
+        nombre: "Obras Ejemplo SAS",
+        empresa: "Obras Ejemplo SAS",
+        cita: null,
+        autorizacionUso: false,
+        videoDelCliente: true,
+        youtube: "https://www.youtube.com/watch?v=abcdefghijk",
+      }),
+    ]);
+    assert.equal(t!.titulo, "Obras Ejemplo SAS");
+    assert.equal(t!.texto, null);
+    assert.deepEqual(t!.youtube, { id: "abcdefghijk", inicio: null });
+  });
+
+  it("la casilla del cliente sin un YouTube válido no exime de nada", () => {
+    assert.deepEqual(
+      tarjetasDeTestimonios([
+        testimonio({ cita: null, autorizacionUso: false, videoDelCliente: true, youtube: null }),
+        testimonio({ id: 2, cita: null, videoDelCliente: false }),
+      ]),
+      [],
+    );
   });
 
   it("la abierta al cargar es la segunda, o la única", () => {

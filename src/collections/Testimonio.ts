@@ -8,11 +8,14 @@ import {
 
 import {
   TESTIMONIOS_PUBLICOS,
+  exentoDeAutorizacion,
   publicadoEfectivo,
+  validarCita,
   validarPublicacionTestimonio,
+  validarVideoDelCliente,
 } from "../lib/fields/reglasPortada";
 import { borradoAdmin, escrituraContenido, lecturaFiltrada } from "../lib/seguridad/acceso";
-import { validarYouTube } from "../lib/fields/youtube";
+import { validarYouTube, videoDeYouTube } from "../lib/fields/youtube";
 import { revalidarPortada } from "./hooks/portadaHooks";
 import { avisoField } from "../lib/fields/avisoField";
 
@@ -44,7 +47,11 @@ const leerTestimonios = lecturaFiltrada(TESTIMONIOS_PUBLICOS as unknown as Where
 const noPublicarSinAutorizacion: CollectionBeforeValidateHook = ({ data, originalDoc, req }) => {
   if (data?.publicado !== true || originalDoc?.publicado === true) return data;
   const autorizado = data.autorizacionUso ?? originalDoc?.autorizacionUso;
-  const veredicto = validarPublicacionTestimonio(true, autorizado);
+  const exento = exentoDeAutorizacion(
+    data.videoDelCliente ?? originalDoc?.videoDelCliente,
+    !!videoDeYouTube(data.youtube ?? originalDoc?.youtube),
+  );
+  const veredicto = validarPublicacionTestimonio(true, autorizado, exento);
   if (veredicto === true) return data;
   throw new ValidationError({
     collection: "testimonios",
@@ -63,6 +70,10 @@ const sinAutorizacionNoSePublica: CollectionBeforeChangeHook = ({ data, original
   publicado: publicadoEfectivo(
     data.publicado ?? originalDoc?.publicado,
     data.autorizacionUso ?? originalDoc?.autorizacionUso,
+    exentoDeAutorizacion(
+      data.videoDelCliente ?? originalDoc?.videoDelCliente,
+      !!videoDeYouTube(data.youtube ?? originalDoc?.youtube),
+    ),
   ),
 });
 
@@ -107,7 +118,26 @@ export const Testimonio: CollectionConfig = {
     { name: "nombre", type: "text", required: true, label: "Nombre de la persona" },
     { name: "empresa", type: "text", label: "Empresa" },
     { name: "ciudad", type: "text", label: "Ciudad o departamento" },
-    { name: "cita", type: "textarea", required: true, label: "Testimonio" },
+    {
+      name: "cita",
+      type: "textarea",
+      label: "Testimonio",
+      validate: (
+        valor: unknown,
+        { siblingData }: { siblingData: { videoDelCliente?: boolean; youtube?: string } },
+      ) =>
+        validarCita(
+          valor,
+          exentoDeAutorizacion(
+            siblingData?.videoDelCliente,
+            !!videoDeYouTube(siblingData?.youtube),
+          ),
+        ),
+      admin: {
+        description:
+          "La frase de la persona. Es opcional solo en un vídeo que el cliente ya publicó en su canal (casilla de abajo).",
+      },
+    },
     { name: "foto", type: "upload", relationTo: "media", label: "Foto" },
     {
       name: "video",
@@ -130,6 +160,18 @@ export const Testimonio: CollectionConfig = {
       validate: validarYouTube,
       admin: {
         description: "Opcional. Enlace de YouTube; si lleva «&t=21s», empieza en ese segundo.",
+      },
+    },
+    {
+      name: "videoDelCliente",
+      type: "checkbox",
+      label: "Vídeo ya publicado por el cliente en su canal de YouTube",
+      defaultValue: false,
+      validate: (valor: unknown, { siblingData }: { siblingData: { youtube?: string } }) =>
+        validarVideoDelCliente(valor, !!videoDeYouTube(siblingData?.youtube)),
+      admin: {
+        description:
+          "Márcala solo si el vídeo del enlace de YouTube ya está publicado en el canal de Partequipos. Entonces la frase y la autorización de uso son opcionales. Si más adelante llegan, añádelas aquí.",
       },
     },
     {
@@ -176,12 +218,27 @@ export const Testimonio: CollectionConfig = {
       type: "checkbox",
       label: "Publicado",
       defaultValue: false,
-      validate: (valor: unknown, { siblingData }: { siblingData: { autorizacionUso?: boolean } }) =>
-        validarPublicacionTestimonio(valor, siblingData?.autorizacionUso),
+      validate: (
+        valor: unknown,
+        {
+          siblingData,
+        }: {
+          siblingData: { autorizacionUso?: boolean; videoDelCliente?: boolean; youtube?: string };
+        },
+      ) =>
+        validarPublicacionTestimonio(
+          valor,
+          siblingData?.autorizacionUso,
+          exentoDeAutorizacion(
+            siblingData?.videoDelCliente,
+            !!videoDeYouTube(siblingData?.youtube),
+          ),
+        ),
       admin: {
         components: { Cell: "/components/admin/celdas/CeldaPublicado" },
         position: "sidebar",
-        description: "Solo se puede marcar con la autorización de uso marcada.",
+        description:
+          "Solo se puede marcar con la autorización de uso marcada, o con la casilla del vídeo ya publicado por el cliente.",
       },
     },
     { name: "orden", type: "number", label: "Orden", admin: { position: "sidebar" } },

@@ -3,6 +3,9 @@ import { describe, it } from "node:test";
 
 import {
   TESTIMONIOS_PUBLICOS,
+  exentoDeAutorizacion,
+  validarCita,
+  validarVideoDelCliente,
   publicadoEfectivo,
   validarEnlace,
   validarLatitud,
@@ -49,10 +52,36 @@ describe("testimonios: no se publican sin autorización", () => {
     assert.equal(publicadoEfectivo(false, true), false);
   });
 
-  it("el filtro público exige las dos cosas", () => {
+  it("el filtro público exige publicado y (autorización o vídeo del cliente)", () => {
     assert.deepEqual(TESTIMONIOS_PUBLICOS.and, [
       { publicado: { equals: true } },
-      { autorizacionUso: { equals: true } },
+      { or: [{ autorizacionUso: { equals: true } }, { videoDelCliente: { equals: true } }] },
     ]);
+  });
+
+  it("la excepción del vídeo del cliente exige la casilla Y un YouTube válido", () => {
+    assert.equal(exentoDeAutorizacion(true, true), true);
+    assert.equal(exentoDeAutorizacion(true, false), false);
+    assert.equal(exentoDeAutorizacion(false, true), false);
+    assert.equal(exentoDeAutorizacion(undefined, true), false);
+    assert.notEqual(validarVideoDelCliente(true, false), true);
+    assert.equal(validarVideoDelCliente(true, true), true);
+    assert.equal(validarVideoDelCliente(false, false), true);
+  });
+
+  it("con la excepción se publica sin autorización; sin ella, no", () => {
+    assert.equal(validarPublicacionTestimonio(true, false, true), true);
+    assert.notEqual(validarPublicacionTestimonio(true, false, false), true);
+    assert.equal(publicadoEfectivo(true, false, true), true);
+    assert.equal(publicadoEfectivo(true, undefined, false), false);
+  });
+
+  it("la frase es obligatoria salvo en el vídeo del cliente", () => {
+    assert.notEqual(validarCita("", false), true);
+    assert.notEqual(validarCita("   ", false), true);
+    assert.notEqual(validarCita(undefined, false), true);
+    assert.equal(validarCita("Muy bien.", false), true);
+    assert.equal(validarCita("", true), true);
+    assert.equal(validarCita(null, true), true);
   });
 });

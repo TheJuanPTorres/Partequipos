@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { partesDeRespuesta, respuestaEnTextoPlano } from "@/lib/portada/respuestaFaq";
 import type { Pregunta } from "@/lib/portada/seccionesH";
 import { buildFaqJsonLd } from "@/lib/seo/jsonLd";
 import type { ImagenLista } from "@/lib/utils/relations";
@@ -36,7 +37,9 @@ type Props = { preguntas: Pregunta[]; imagen: ImagenLista | null; textos: Textos
 
 export function SeccionFaq({ preguntas, imagen, textos }: Props) {
   if (preguntas.length === 0) return null;
-  const jsonLd = buildFaqJsonLd(preguntas);
+  const jsonLd = buildFaqJsonLd(
+    preguntas.map((p) => ({ ...p, respuesta: respuestaEnTextoPlano(p.respuesta) })),
+  );
   return (
     <section className={estilos.seccion} aria-labelledby="portada-faq-titulo">
       {jsonLd ? <JsonLd data={jsonLd} /> : null}
@@ -84,7 +87,17 @@ export function SeccionFaq({ preguntas, imagen, textos }: Props) {
                 <span className={`${estilos.pregunta} texto-destacado`}>{p.pregunta}</span>
                 <span className={estilos.indicador} aria-hidden="true" />
               </summary>
-              <div className={`${estilos.respuesta} texto-cuerpo`}>{p.respuesta}</div>
+              <div className={`${estilos.respuesta} texto-cuerpo`}>
+                {partesDeRespuesta(p.respuesta).map((parte, i) =>
+                  typeof parte === "string" ? (
+                    parte
+                  ) : (
+                    <Link key={i} href={parte.href} className={estilos.enlace}>
+                      {parte.texto}
+                    </Link>
+                  ),
+                )}
+              </div>
             </details>
           ))}
         </div>

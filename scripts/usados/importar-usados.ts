@@ -25,6 +25,13 @@
  *
  * DESTINO validado antes de cargar Payload, como el blog: `preview` solo con
  * la base y el Blob del preview; los otros destinos, con su base y su almacén.
+ *
+ * DIRECCIÓN WEB (2026-10-16): cada unidad nueva se crea con su `slug` de
+ * `direccionesDeUnidades` (`src/lib/usados/direcciones.ts`), el mismo cálculo
+ * que la prueba contra la exportación: así el sitio publicado tiene las mismas
+ * direcciones que el preview. Después, los 301 desde las de WordPress con
+ * `scripts/usados/redirects-usados.ts`. Una unidad ya importada CONSERVA su
+ * dirección al actualizarla (puede tener enlaces): si no coincide, se avisa.
  */
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -53,6 +60,7 @@ import {
   normalizarHoras,
   normalizarPeso,
 } from "../../src/lib/usados/wordpress";
+import { direccionesDeUnidades } from "../../src/lib/usados/direcciones";
 
 // ---------- Argumentos y destino (antes de cargar Payload) ----------
 
@@ -313,6 +321,18 @@ for (const u of unidades) {
   });
 }
 
+// Dirección web de cada unidad, calculada sobre TODAS (el desempate por id de WordPress depende de las demás).
+const slugDe = new Map(
+  direccionesDeUnidades(
+    planes.map((p) => ({
+      idWp: p.idWp,
+      enlace: p.enlace,
+      categoria: p.categoria,
+      nombre: p.datos.nombre,
+    })),
+  ).map((d) => [d.idWp, d.slug]),
+);
+
 const cuenta = (f: (p: Plan) => string) =>
   planes.reduce<Record<string, number>>((a, p) => ({ ...a, [f(p)]: (a[f(p)] ?? 0) + 1 }), {});
 log(`fuente: ${path.basename(FUENTE)} · ${unidades.length} unidades`);
@@ -370,7 +390,7 @@ if (modo === "simular") {
   );
   for (const p of planes.slice(0, 3)) {
     log(
-      `ejemplo ${p.idWp}: «${p.datos.nombre}» · ${p.datos.horometro ?? "—"} h · ${p.datos.pesoOperativo ?? "—"} t · ${p.fotos.length} fotos`,
+      `ejemplo ${p.idWp}: «${p.datos.nombre}» → ${p.categoria}/${slugDe.get(p.idWp)} · ${p.datos.horometro ?? "—"} h · ${p.datos.pesoOperativo ?? "—"} t · ${p.fotos.length} fotos`,
     );
     log(`  descripción: ${(p.datos.descripcion ?? "—").slice(0, 160)}…`);
     log(`  1.ª foto: ${p.fotos[0]?.fichero} · «${p.fotos[0]?.alt}»`);
@@ -531,18 +551,27 @@ for (const p of tanda) {
   };
   const existente = await unidadExistente(p, ids[0] ?? null);
   if (existente) {
-    await payload.update({
+    const antes = await payload.update({
       collection: "equipos-usados",
       id: existente,
       data,
       overrideAccess: true,
     });
+    if (antes.slug !== slugDe.get(p.idWp)) {
+      log(
+        `aviso ${p.idWp}: conserva su dirección «${antes.slug}» (el cálculo da «${slugDe.get(p.idWp)}»)`,
+      );
+    }
     if (!manifiesto.creado.usados.some((u) => u.idWp === p.idWp)) {
       manifiesto.creado.usados.push({ idWp: p.idWp, id: existente });
     }
     log(`actualizada ${p.idWp} → ${existente}: «${p.datos.nombre}» (${ids.length} fotos)`);
   } else {
-    const doc = await payload.create({ collection: "equipos-usados", data, overrideAccess: true });
+    const doc = await payload.create({
+      collection: "equipos-usados",
+      data: { ...data, slug: slugDe.get(p.idWp)! },
+      overrideAccess: true,
+    });
     manifiesto.creado.usados.push({ idWp: p.idWp, id: doc.id });
     log(`creada ${p.idWp} → ${doc.id}: «${p.datos.nombre}» (${ids.length} fotos)`);
   }

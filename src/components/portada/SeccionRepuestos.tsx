@@ -28,8 +28,8 @@ import estilos from "./repuestos.module.css";
  * - Con «reducir movimiento», sin barrido: una tarjeta tras otra.
  */
 
-/** Ancho pintado de la foto: 180 px a 1440, ~140 a 1010 y 72 en móvil. */
-const SIZES_FOTO = "(max-width: 767px) 72px, (max-width: 1024px) 18vw, 180px";
+/** Ancho pintado de la foto: 160 px a 1440, ~140 a 1010 y 72 en móvil. */
+const SIZES_FOTO = "(max-width: 767px) 72px, (max-width: 1024px) 18vw, 160px";
 
 function Categoria({
   t,
@@ -48,8 +48,8 @@ function Categoria({
           <Image
             src={t.imagen.url}
             alt=""
-            width={180}
-            height={180}
+            width={160}
+            height={160}
             sizes={SIZES_FOTO}
             className={estilos.img}
             style={{ objectPosition: t.imagen.posicion }}

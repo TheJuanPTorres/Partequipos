@@ -12,7 +12,7 @@
   --rep-escalon: 20px;
   /* Entre tarjetas, el recorrido en el que la segunda sube sobre la primera (120 en la referencia). */
   --rep-hueco: 120px;
-  --rep-foto: 180px;
+  --rep-foto: 160px;
 
   padding: 70px 10px 30px;
   background: var(--color-fondo-seccion);
@@ -117,7 +117,7 @@
   box-sizing: border-box;
   height: var(--rep-alto);
   margin: 0;
-  padding: 30px;
+  padding: 20px 30px;
   gap: 10px;
   border-radius: 20px;
   background: var(--color-fondo);
@@ -130,7 +130,7 @@
   display: flex;
   box-sizing: border-box;
   min-width: 0;
-  padding: 20px;
+  padding: 16px 10px;
   flex: 1 1 0;
   flex-direction: column;
   align-items: center;
@@ -149,7 +149,7 @@
   justify-content: center;
 }
 
-/* Hueco cuadrado (180 px a 1440, 140 a 1010); la foto se recorta con su punto focal. */
+/* Hueco cuadrado (160 px a 1440, 140 a 1010); la foto se recorta con su punto focal. */
 .img {
   width: var(--rep-foto);
   max-width: 100%;

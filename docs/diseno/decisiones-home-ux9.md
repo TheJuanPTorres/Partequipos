@@ -2608,6 +2608,26 @@ ejemplo de ux-9 se retiraron del preview. Se decidirá con el cliente.
 recortado real. El importador de contenido real ya no pone ahí la foto del patio
 de WordPress, que es una foto normal.
 
+### 33.1 Ajustes del cliente (2026-10-16)
+
+- **Botones más cerca de la ficha:** 10 px de relleno sobre los botones en
+  lugar de 50; con el hueco de la tarjeta, 30 px (antes 70). Medido en el
+  preview del #191: 31 px a 390, 1010 y 1440 en las tarjetas más altas de la
+  fila; CLS 0.
+- **«Maquinaria pesada nueva» (§31), en el mismo PR:**
+  - Logos en una **caja común**: la baldosa del diseño (cuadrada, blanca,
+    radio 10; 70 · 106 · 66 px a 390 · 1010 · 1440), con el logo en
+    `contain`. Los del cliente tienen proporciones muy distintas y no hay
+    margen que recortar por CSS; dentro de la baldosa quedan del mismo ancho
+    visual. Dynapac y Yanmar, muy apaisados, se ven pequeños.
+  - Logos **a la misma altura**: el texto tiene un alto mínimo de 6 líneas
+    (`--s2-texto-lineas`), así los textos cortos no los bajan. Medido: misma
+    y en las 4 tarjetas a 1440 y en las 2 de 1010.
+  - Texto **justificado** con partición silábica (`hyphens: auto`,
+    `lang="es"` en el propio texto). El Chrome sin interfaz de las mediciones
+    no trae diccionarios de partición y deja ríos de espacio; con la
+    partición del navegador deberían reducirse, sin comprobar.
+
 ## 34. Auditoría de D (2026-10-14): pines de las sedes y título de la portada
 
 ### 34.1 Pines de las sedes a 390 (axe `target-size` ×6)

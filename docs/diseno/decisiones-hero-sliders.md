@@ -161,3 +161,30 @@ elemento que cambiaba de sitio entre diapositivas («sobre» o «debajo», títu
 de distinto alto), y el pase no es una entrada del usuario. Ahora la capa del
 título y la máquina se monta nueva en cada diapositiva (`key`), y un elemento
 nuevo no cuenta como desplazamiento.
+
+### 6.1 La máquina «sobre» vuelve a su altura de antes del #184 (2026-10-16, dirección)
+
+En la diapositiva 1 (Hitachi LANDCROS, la única con la máquina «sobre»), el
+#184 subió la máquina recortada a la altura de la V2. **Dirección pide la
+altura de antes**, sin tocar el resto del hero: el título sigue a la altura de
+la V2 y la máquina conserva su ancho de la V2.
+
+Borde de arriba de la máquina PINTADA, respecto a la tarjeta. Medido en los
+previews de `8f16bc6` (antes), de `main` y del PR:
+
+| Ancho | Antes del #184 | #184 | Ahora   | Ancho de la máquina |
+| ----- | -------------- | ---- | ------- | ------------------- |
+| 1440  | 163            | 62   | **163** | 809 (antes, 1000)   |
+| 1010  | 157            | 48   | **157** | 631                 |
+| 390   | 197            | 257  | **197** | 318 (antes, 338)    |
+
+- **Escritorio y tablet:** `--hero-maquina-cruce` deja de ir ligado a la V2. Es
+  `163px` (o `157px`) menos el alto hasta el final del título, de una línea.
+- **Móvil:** «sobre» sigue debajo del título, pero con
+  `--hero-maquina-aire-sobre: -8px` en vez de los 52 px de aire de las demás.
+- **Lo demás no cambia:** el título, las flechas, el texto circular y las otras
+  seis diapositivas, comparadas por nombre con las medidas del #184, quedan
+  igual en los tres anchos.
+- **CLS:** 0 en la carga y en el pase manual (0,00001 a 1440, el conocido).
+- **A 1010** la máquina vuelve a montar sobre la parte de abajo del título,
+  como antes.

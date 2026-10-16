@@ -32,6 +32,7 @@ import { default as default_ee64598c7457a4d9197213cdb580e4d5 } from '../../../co
 import { default as default_6dd5387c7f2e5f0ef6f0dcb5c3b7a99a } from '../../../components/admin/aviso/AvisoNoDisponible'
 import { default as default_9381d73c54a9c03b46798bb778a3bdc0 } from '../../../components/admin/celdas/CeldaDisponible'
 import { default as default_7afa784110d90c3c093bacc977ecd19b } from '../../../components/admin/AvisoBloques'
+import { default as default_6b3563e09f348391483892d49429a65e } from '../../../components/admin/aviso/AvisoRecorteMovil'
 import { default as default_c9d56b0835087f2ddee9688731704ee9 } from '../../../components/admin/celdas/CeldaPublicado'
 import { default as default_38155e6ccfa1f9d03d1b91a6c770c6b5 } from '../../../components/admin/celdas/CeldaAutorizacion'
 import { default as default_7a6e305d8e2e86840bb8274b902265b1 } from '../../../components/admin/aviso/AvisoAutorizacion'
@@ -84,6 +85,7 @@ export const importMap = {
   "/components/admin/aviso/AvisoNoDisponible#default": default_6dd5387c7f2e5f0ef6f0dcb5c3b7a99a,
   "/components/admin/celdas/CeldaDisponible#default": default_9381d73c54a9c03b46798bb778a3bdc0,
   "/components/admin/AvisoBloques#default": default_7afa784110d90c3c093bacc977ecd19b,
+  "/components/admin/aviso/AvisoRecorteMovil#default": default_6b3563e09f348391483892d49429a65e,
   "/components/admin/celdas/CeldaPublicado#default": default_c9d56b0835087f2ddee9688731704ee9,
   "/components/admin/celdas/CeldaAutorizacion#default": default_38155e6ccfa1f9d03d1b91a6c770c6b5,
   "/components/admin/aviso/AvisoAutorizacion#default": default_7a6e305d8e2e86840bb8274b902265b1,

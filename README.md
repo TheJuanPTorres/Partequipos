@@ -52,19 +52,20 @@ Nunca se versionan valores reales. La plantilla es [`.env.example`](./.env.examp
 en local se copia a `.env.local` (ignorado por git) y en Vercel se cargan en el
 panel del proyecto.
 
-| Variable                                                  | Local (`.env.local`)    | Preview (Vercel)          | Producción (Vercel)                                                                                       |
-| --------------------------------------------------------- | ----------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URI`                                            | rama **dev** de Neon    | rama **preview**          | rama **producción**                                                                                       |
-| `PAYLOAD_SECRET`                                          | cualquiera, largo       | propio                    | **propio y distinto**                                                                                     |
-| `NEXT_PUBLIC_SERVER_URL`                                  | `http://localhost:3000` | la de Producción (§10.21) | hoy `https://partequipos.vercel.app`; `https://partequipos.com` al lanzar (`docs/runbook-lanzamiento.md`) |
-| `BLOB_READ_WRITE_TOKEN`                                   | store de pruebas        | store de pruebas          | store de producción                                                                                       |
-| `SENTRY_DSN`                                              | **no existe todavía**   | **no existe**             | **no existe**                                                                                             |
-| `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT`     | **no existe todavía**   | **no existe**             | **no existe**                                                                                             |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | opcional                | sí                        | sí                                                                                                        |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE`                 | opcional                | valores de prueba         | valores del cliente                                                                                       |
-| `SMTP_USER` / `SMTP_PASS`                                 | opcional                | valores de prueba         | valores del cliente                                                                                       |
-| `SMTP_FROM_ADDRESS` / `SMTP_FROM_NAME`                    | opcional                | valores de prueba         | valores del cliente                                                                                       |
-| `SOLICITUDES_EMAIL_TO`                                    | opcional                | sí                        | sí                                                                                                        |
+| Variable                                                  | Local (`.env.local`)    | Preview (Vercel)                   | Producción (Vercel)                                                                                       |
+| --------------------------------------------------------- | ----------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URI`                                            | rama **dev** de Neon    | rama **preview**                   | rama **producción**                                                                                       |
+| `PAYLOAD_SECRET`                                          | cualquiera, largo       | propio                             | **propio y distinto**                                                                                     |
+| `NEXT_PUBLIC_SERVER_URL`                                  | `http://localhost:3000` | la de Producción (§10.21)          | hoy `https://partequipos.vercel.app`; `https://partequipos.com` al lanzar (`docs/runbook-lanzamiento.md`) |
+| `BLOB_READ_WRITE_TOKEN`                                   | store de pruebas        | store de pruebas                   | store de producción                                                                                       |
+| `SENTRY_DSN`                                              | **no existe todavía**   | **no existe**                      | **no existe**                                                                                             |
+| `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT`     | **no existe todavía**   | **no existe**                      | **no existe**                                                                                             |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | opcional                | sí                                 | sí                                                                                                        |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE`                 | opcional                | valores de prueba                  | valores del cliente                                                                                       |
+| `SMTP_USER` / `SMTP_PASS`                                 | opcional                | valores de prueba                  | valores del cliente                                                                                       |
+| `SMTP_FROM_ADDRESS` / `SMTP_FROM_NAME`                    | opcional                | valores de prueba                  | valores del cliente                                                                                       |
+| `SOLICITUDES_EMAIL_TO`                                    | opcional                | sí                                 | sí                                                                                                        |
+| `API_LECTURA_TOKEN`                                       | opcional                | propio (y en `.env.preview.local`) | propio y distinto; **Sensitive**. Sin él, la API REST solo se lee con sesión del panel (ver abajo)        |
 
 Reglas:
 
@@ -80,6 +81,15 @@ Reglas:
   `docs/sprint-0.md` y no se retomaron. **Cuando entren será `SENTRY_DSN`, no
   `NEXT_PUBLIC_SENTRY_DSN`**: el plan aprobado es SDK **solo de servidor**, así
   que el DSN no se expone al navegador.
+- **La API REST de Payload ya no se lee sin sesión (2026-10-15).** El sitio
+  lee con la API local y no la necesita; abierta, permitía bajarse el catálogo
+  entero en una petición (`?limit=0&depth=2`). Ahora lee el personal del panel
+  o quien mande la cabecera `x-partequipos-lectura` con el valor de
+  `API_LECTURA_TOKEN` (runbooks y scripts de comprobación). Solo abre la
+  **lectura** de lo que antes era público: `solicitudes`, `users` y
+  `redirects` siguen cerradas, y testimonios y preguntas, filtrados. Sin la
+  variable, nadie lee sin sesión. GraphQL está apagado (`/api/graphql` da
+  404). Detalle en `src/lib/seguridad/lecturaApi.ts`.
 
 ---
 

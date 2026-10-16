@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import reserva from "@/components/blog/cabeceraArticulo.module.css";
 import type { ModeloEnlace } from "@/lib/repuestos/tipo";
 
 import estilos from "./marca.module.css";
@@ -9,6 +10,11 @@ import estilos from "./marca.module.css";
  * diseño de Andrés): la franja amarilla que sigue al encabezado, con un enlace
  * en píldora por modelo, a su ficha de repuestos. Mismo lenguaje que las
  * categorías de la página de marca.
+ *
+ * Sin desplazamiento al llegar Inter (CLS 0,073 a 1440 en la medición de C): cada
+ * texto de la píldora reserva su ancho con una copia invisible en la fuente de
+ * respaldo (la técnica de la cabecera del artículo), así las filas de la lista
+ * no se reparten distinto con una fuente y con otra.
  *
  * Sin modelos publicados, un aviso en vez de una franja vacía.
  */
@@ -36,8 +42,20 @@ export function ModelosTipo({
           {modelos.map((m) => (
             <li key={m.id}>
               <Link href={m.href} className={estilos.modelo}>
-                <span>{m.nombre}</span>
-                {m.codigo ? <span className={estilos.modeloCodigo}>{m.codigo}</span> : null}
+                <span
+                  className={`${reserva.reserva} ${estilos.modeloTexto}`}
+                  data-reserva={m.nombre}
+                >
+                  <span>{m.nombre}</span>
+                </span>
+                {m.codigo ? (
+                  <span
+                    className={`${reserva.reserva} ${estilos.modeloTexto} ${estilos.modeloCodigo}`}
+                    data-reserva={m.codigo}
+                  >
+                    <span>{m.codigo}</span>
+                  </span>
+                ) : null}
               </Link>
             </li>
           ))}

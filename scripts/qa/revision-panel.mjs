@@ -408,6 +408,8 @@ try {
         return hrefs.find((h) => h && !/\/create\/?$/.test(h)) ?? null;
       };
       const paginaNosotros = await primero("paginas", "?where[slug][equals]=nosotros");
+      // La portada: el aviso de diapositiva sin imagen para móvil (§30).
+      const paginaPortada = await primero("paginas", "?where[slug][equals]=inicio");
       const redireccion = await primero("redirects");
       const CASOS = [
         { nombre: "aviso-alt-flojos", ruta: "/admin/collections/media" },
@@ -427,6 +429,24 @@ try {
         // Filtro imposible: la lista sale vacía y no se piden filas.
         { nombre: "aviso-solicitudes", ruta: "/admin/collections/solicitudes?where[id][equals]=0" },
         ...(paginaNosotros ? [{ nombre: "aviso-bloques", ruta: paginaNosotros }] : []),
+        ...(paginaPortada
+          ? [
+              {
+                nombre: "aviso-recorte-movil",
+                ruta: paginaPortada,
+                // Payload pinta cada diapositiva al acercarse (`RenderIfInViewport`):
+                // se recorre la página antes de contar los avisos.
+                antes: async () => {
+                  const alto = await pagina.evaluate(() => document.documentElement.scrollHeight);
+                  for (let y = 0; y <= alto; y += 600) {
+                    await pagina.evaluate((v) => window.scrollTo(0, v), y);
+                    await pagina.waitForTimeout(80);
+                  }
+                  await pagina.evaluate(() => window.scrollTo(0, 0));
+                },
+              },
+            ]
+          : []),
       ];
       for (const caso of CASOS) {
         await pagina.goto(`${base}${caso.ruta}`, { waitUntil: "networkidle" });

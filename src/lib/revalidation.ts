@@ -1,5 +1,7 @@
 import { revalidatePath } from "next/cache";
 
+import { ETIQUETAS_DATOS, revalidarDatos, revalidarIndices } from "./cacheDatos";
+
 import {
   rutas,
   SEGMENTO_CATEGORIAS_REPUESTOS,
@@ -64,11 +66,16 @@ function revalidar(path: string, motivo: string): void {
   }
 }
 
-/** Revalida una lista de rutas, deduplicando. */
+/**
+ * Revalida una lista de rutas, deduplicando. Y el sitemap y el buscador
+ * (`revalidarIndices`): lo que cambia una página del catálogo puede cambiar
+ * también su entrada en los dos.
+ */
 export function revalidarRutas(paths: string[], motivo: string): void {
   for (const path of new Set(paths)) {
     revalidar(path, motivo);
   }
+  revalidarIndices(motivo);
 }
 
 /** Rutas afectadas por un cambio en una MARCA. */
@@ -218,6 +225,7 @@ export function revalidarCategoriasDeRepuestos(motivo: string): void {
     revalidatePath(rutas.categoriasRepuestos());
     revalidatePath(`/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]`, "page");
     revalidatePath(rutas.repuestos());
+    revalidarIndices(motivo);
   } catch (error) {
     console.error(
       `[revalidación] fallaron las páginas de categoría de repuestos (${motivo}):`,
@@ -287,8 +295,12 @@ export function rutasDeCategoriaBlog(slug: string, articuloSlugs: string[]): str
 /**
  * Revalida TODO el sitio: cada página lleva el pie (y la cabecera) en el layout.
  * Para cambios en globales como `pie`. Nunca relanza.
+ *
+ * PRIMERO la caché del marco (`datos:marco`): si no, las páginas se volverían
+ * a pintar con la cabecera y el pie viejos que siguen en la caché de datos.
  */
 export function revalidarTodoElSitio(motivo: string): void {
+  revalidarDatos(ETIQUETAS_DATOS.marco, motivo);
   try {
     revalidatePath("/", "layout");
   } catch (error) {

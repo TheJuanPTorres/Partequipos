@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload";
 
-import { escrituraContenido, publico } from "../lib/seguridad/acceso";
+import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { validarDestinoPie } from "../lib/pie";
 import { revalidarTodoElSitio } from "../lib/revalidation";
@@ -23,7 +23,7 @@ export const Pie: GlobalConfig = {
     description:
       "Texto y enlaces del pie de todas las páginas. Las redes y el contacto se editan en la configuración de la empresa, no aquí.",
   },
-  access: { read: publico, update: escrituraContenido },
+  access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
     afterChange: [
       ({ doc }) => {

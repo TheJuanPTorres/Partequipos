@@ -47,11 +47,15 @@
 
   /* --- Máquina recortada: ancho del diseño (debajo / sobre el título). --- */
   --hero-maquina-ancho: 762px;
-  --hero-maquina-ancho-sobre: 1000px;
+  /* «Sobre»: 809 px, como la Home V2 (2026-10-16; antes, 1000 del diseño de sliders). */
+  --hero-maquina-ancho-sobre: 809px;
   --hero-maquina-aire: 16px;
   --hero-maquina-lado: 20px;
-  /* «Sobre»: la máquina sube hasta 38 px bajo el borde de arriba del título (medido a 1440). */
-  --hero-maquina-cruce: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado) * -0.77);
+  /*
+   * «Sobre»: la máquina empieza 15 px bajo el borde de arriba del título, como
+   * la Home V2 medida a 1440 (168 − 153). Antes, 38 px (diseño de sliders).
+   */
+  --hero-maquina-cruce: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado) * -0.91);
 
   /* --- Texto circular: tamaño y sitio del diseño (desde la esquina de abajo a la izquierda). --- */
   --hero-circular-tam: 120px;
@@ -59,11 +63,18 @@
   --hero-circular-abajo: 110px;
   --hero-circular-vuelta: 20s;
 
-  /* --- Flechas --- */
+  /*
+   * --- Flechas de la Home V2 (2026-10-16): círculo de 42 px, chevrón macizo de
+   * 21 px de alto, 20 px entre las dos; la primera, a 30 px del borde izquierdo
+   * de la tarjeta y a 51 del de abajo (medido a 1440). Al pasar el ratón, fondo
+   * rojo y chevrón blanco.
+   */
   --hero-flecha-tam: 42px;
   --hero-flecha-icono: 21px;
   --hero-flecha-fondo: rgb(255 255 255 / 58%);
-  --hero-flechas-margen-abajo: 20px;
+  --hero-flechas-hueco: 20px;
+  --hero-flechas-izquierda: 10px;
+  --hero-flechas-margen-abajo: 31px;
 
   /*
    * --- Carrusel «premium» (D13, pedido por dirección el 2026-09-30) ---
@@ -79,11 +90,12 @@
   --hero-texto-retraso: 300ms;
   --hero-texto-subida: 12px;
   /*
-   * --- Posición del título: ARRIBA, como en el diseño de sliders (medido a
-   * 1440: 124 px bajo el borde de la tarjeta), y en el mismo sitio en todas las
-   * diapositivas (D15). Abajo se reserva la fila de controles más el aire.
+   * --- Posición del título: ARRIBA, en el mismo sitio en todas las
+   * diapositivas (D15). Desde la Home V2 (2026-10-16, dirección), a 47 px bajo
+   * el borde de la tarjeta (medido a 1440; antes, 124 del diseño de sliders).
+   * Abajo se reserva la fila de controles más el aire.
    */
-  --hero-texto-arriba: 124px;
+  --hero-texto-arriba: 47px;
   /* Título partido, en escritorio: 35 px, como la diapositiva 2 del diseño (medido a 1440). */
   --hero-texto-arriba-partido: 35px;
   /* Y su máquina sube 48 px sobre la caja del título: en el diseño empieza 139 px bajo el borde. */
@@ -414,14 +426,20 @@
   margin-top: var(--hero-maquina-aire);
 }
 
-/* «SOBRE»: en escritorio la máquina sube y cruza el título (diapositiva 1). */
-@media (min-width: 1025px) {
+/*
+ * «SOBRE»: la máquina sube y cruza el título. En escritorio y, desde la Home V2
+ * (2026-10-16), también en tablet, donde la V2 la pinta por encima del título.
+ * En móvil va siempre debajo.
+ */
+@media (min-width: 768px) {
   .capaTexto[data-maquina="sobre"] .capaMaquina {
     z-index: 2;
     width: min(var(--hero-maquina-ancho-sobre), 100%);
     margin-top: var(--hero-maquina-cruce);
   }
+}
 
+@media (min-width: 1025px) {
   /*
    * TÍTULO PARTIDO (diapositiva 2 del diseño; decisión de dirección del
    * 2026-10-14, S1): sube como en el diseño, aunque no quede a la altura de
@@ -522,6 +540,7 @@
   align-items: center;
   gap: 4px;
   margin-bottom: var(--hero-flechas-margen-abajo);
+  margin-left: var(--hero-flechas-izquierda);
 }
 
 /*
@@ -539,11 +558,26 @@
   background: var(--hero-flecha-fondo);
   color: var(--hero-rojo);
   cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
+.flecha + .flecha {
+  margin-left: calc(var(--hero-flechas-hueco) - 4px);
+}
+
+/* El chevrón: su alto es el tamaño del icono; el ancho sale de su proporción. */
 .flecha svg {
-  width: var(--hero-flecha-icono);
+  width: auto;
   height: var(--hero-flecha-icono);
+}
+
+/* Como la Home V2: al pasar el ratón, fondo rojo y chevrón blanco. */
+.flecha:hover,
+.flechas .pausa:hover {
+  background: var(--hero-rojo);
+  color: var(--color-fondo);
 }
 
 /*
@@ -558,6 +592,9 @@
   border-radius: 50%;
   background: var(--hero-flecha-fondo);
   color: var(--hero-rojo);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 .flechas .pausa svg {
@@ -637,7 +674,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .punto::before {
+  .punto::before,
+  .flecha,
+  .flechas .pausa {
     transition: none;
   }
 }
@@ -706,14 +745,13 @@
 }
 
 /*
- * Icono de Tabler (L2: el «add» del kit de Andrés es de Flaticon). Su aro mide
- * 18 de 24 unidades; con la escala 1,28 y el trazo 1,5 se pinta como el de
- * ux-9: aro de ~30 px y trazo de 2 px, sin cambiar la caja de 30 px del enlace.
+ * El «+» de la Home V2 (2026-10-16): aro de 30 px con trazo de 2,5 y la cruz
+ * de 10 px, dibujado en el componente (el `add.svg` del kit es de Flaticon,
+ * L2). Solo se pinta con enlace (S2).
  */
 .mas svg {
   width: 30px;
   height: 30px;
-  transform: scale(1.28);
 }
 
 /* --------------------------------------------------- anuncio para lectores */
@@ -788,10 +826,16 @@
 /* ≤1024 px: los valores del diseño de sliders medidos a 1010 px. */
 @media (max-width: 1024px) {
   .hero {
-    --hero-titulo-tam: 65px;
+    /* Home V2 a 1010 (2026-10-16): título de 70 px a 103 px del borde; antes, 65 y 50. */
+    --hero-titulo-tam: 70px;
     --hero-relleno: 50px 30px 30px;
-    --hero-texto-arriba: 50px;
+    --hero-texto-arriba: 103px;
     --hero-maquina-ancho: 631px;
+    /* «Sobre» en tablet: 631 px, empezando 55 px POR ENCIMA del título (V2 a 1010). */
+    --hero-maquina-ancho-sobre: 631px;
+    --hero-maquina-cruce: calc(var(--hero-titulo-tam) * var(--hero-titulo-interlineado) * -1.56);
+    /* Flechas: a 50 px del borde izquierdo y 106 del de abajo (V2 a 1010). */
+    --hero-flechas-margen-abajo: 66px;
     --hero-maquina-lado: 30px;
     --hero-circular-tam: 100px;
     --hero-circular-izquierda: 49px;
@@ -833,16 +877,21 @@
 @media (max-width: 767px) {
   .hero {
     --hero-titulo-tam: 12vw;
-    --hero-texto-arriba: 50px;
+    /* Home V2 a 390 (2026-10-16): título a 74 px; la máquina, 52 px debajo. */
+    --hero-texto-arriba: 74px;
+    --hero-maquina-aire: 52px;
     /* Controles (42 + 20) + aire + el vidrio + aire. */
     --hero-vidrio-abajo: 70px;
     --hero-vidrio-derecha: 20px;
     --hero-texto-abajo: 300px;
-    --hero-maquina-lado: 20px;
+    --hero-maquina-lado: 30px;
     --hero-alto-min: 85vh;
     --hero-parrafo-tam: 13px;
     --hero-vidrio-relleno: 20px;
+    /* Flechas de 30 px con chevrón de 15, a 40 px del borde izquierdo y 66 del de abajo (V2). */
+    --hero-flecha-tam: 30px;
     --hero-flecha-icono: 15px;
+    --hero-flechas-margen-abajo: 36px;
     --hero-circular-tam: 70px;
     --hero-circular-izquierda: calc(50% - 35px);
     --hero-circular-abajo: 284px;

@@ -1,6 +1,5 @@
 "use client";
 
-import { IconCirclePlus } from "@tabler/icons-react";
 import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import {
@@ -69,16 +68,31 @@ const PARRAFO_LARGO = 130;
 /** Lo que dura el fundido (`--hero-fundido` en el CSS), para soltar la saliente. */
 const FUNDIDO_MS = 1200;
 
+/**
+ * CHEVRÓN MACIZO de las flechas de la Home V2 (2026-10-16): la misma silueta
+ * que el de su diseño (Font Awesome, que no usamos), dibujada aquí con un
+ * trazo grueso y redondeado en su caja de 320 × 512.
+ */
 function IconoFlecha({ hacia }: { hacia: "anterior" | "siguiente" }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 320 512" fill="none" aria-hidden="true" focusable="false">
       <path
-        d={hacia === "siguiente" ? "M9 5l7 7-7 7" : "M15 5l-7 7 7 7"}
+        d={hacia === "siguiente" ? "M74 84l170 172-170 172" : "M246 84 76 256l170 172"}
         stroke="currentColor"
-        strokeWidth="2.5"
+        strokeWidth="80"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+/** El «+» de la Home V2: aro y cruz con trazo de 2 (de 24), redondeados. */
+function IconoMas() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="2" />
+      <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -444,8 +458,15 @@ export function HeroPortada({ diapositivas }: Props) {
          * MÁQUINA debajo, en el mismo flujo (hero de sliders de Andrés): ocupa lo
          * que queda hasta los controles, así se adapta a un título de varias
          * líneas. Con «sobre», en escritorio sube y cruza el título.
+         *
+         * UNA CAPA NUEVA POR DIAPOSITIVA (`key`): la caja de la máquina cambia
+         * de sitio entre diapositivas (sobre/debajo, títulos de distinto alto) y,
+         * con el pase automático, que no es una entrada del usuario, ese cambio
+         * contaba como CLS (medido a 1010: 0,018 por pase). Un elemento nuevo no
+         * cuenta como desplazamiento.
          */}
         <div
+          key={`texto-${activo}`}
           className={estilos.capaTexto}
           data-maquina={d.posicionMaquina}
           data-partido={d.tituloPartido ? "" : undefined}
@@ -565,12 +586,12 @@ export function HeroPortada({ diapositivas }: Props) {
             </div>
             {d.enlace ? (
               <Link href={d.enlace.href} className={estilos.mas} aria-label={d.enlace.nombre}>
-                <IconCirclePlus aria-hidden="true" focusable="false" stroke={1.5} />
+                <IconoMas />
               </Link>
             ) : hayEnlaces ? (
               // Hueco del «+» si otra diapositiva lo tiene: el párrafo no cambia de ancho.
               <span className={`${estilos.mas} ${estilos.masVacio}`} aria-hidden="true">
-                <IconCirclePlus focusable="false" stroke={1.5} />
+                <IconoMas />
               </span>
             ) : null}
           </div>

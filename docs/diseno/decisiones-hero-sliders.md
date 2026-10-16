@@ -46,9 +46,9 @@ con `null` se pinta como siempre):
 
 ## 2. Maquetación
 
-- **El título va ARRIBA.** Antes iba centrado (D15). Sigue en el mismo sitio en todas las diapositivas, que era el objetivo de D15: en un carrusel el texto no salta.
+- **El título va ARRIBA** (desde el 2026-10-16, a la altura de la Home V2: §6). Antes iba centrado (D15). Sigue en el mismo sitio en todas las diapositivas, que era el objetivo de D15: en un carrusel el texto no salta.
 - **La máquina va debajo, en el mismo flujo.** Ocupa lo que queda hasta los controles, así un título de varias líneas no se le monta encima.
-- **Con «sobre»**, en escritorio sube y cruza el título, a 38 px bajo su borde de arriba, medido a 1440.
+- **Con «sobre»**, sube y cruza el título: desde el 2026-10-16, como la Home V2 (§6), a 15 px bajo su borde de arriba a 1440 y también en tablet. Antes, 38 px y solo en escritorio.
 - **El vidrio se ve también en móvil**, como en el diseño; el de ux-9 lo ocultaba. Va encima de la fila de controles, para no taparlos.
 - **Vidrio ancho:** con un párrafo largo (más de 130 letras), el vidrio de escritorio mide 500 px en vez de 400, como la diapositiva 2. Es uno para todas las diapositivas: así no cambia de tamaño al pasar.
 
@@ -107,3 +107,57 @@ versión publicada.
   recentrado con `text-align`. Centrado con flex, como el título de antes: 0.
 - El vidrio en móvil, anclado por abajo, se movía si el párrafo ganaba una
   línea. Anclado por arriba: 0.
+
+## 6. Título, máquina, flechas y «+» de la Home V2 (2026-10-16)
+
+**Fuente:** la sección 1 de `elementor-3519-2026-10-15.json`
+(`Desktop\partequipos-diseno\wordpress\home-v2\`) y su página pintada,
+`https://partequipos.uxdesign.website/`, medidas a 390, 1010 y 1440. Es el hero
+de ux-9 con una sola diapositiva; aquí se aplica a todas.
+
+**Decisión de dirección (2026-10-16):** el título y la máquina toman la altura
+y el tamaño de la V2 (sustituyen a las medidas del §5 en esos dos puntos); el
+«+» se queda **solo con enlace** (S2). Se conservan las casillas del §1.1, el
+título partido (S1), la máquina «debajo», el texto circular, el vidrio en
+móvil (S7), la pausa y los puntos.
+
+Posiciones respecto a la tarjeta, en px, medidas en el preview del PR:
+
+| Ancho | Pieza           | Home V2                                      | Aquí (antes → ahora)                    |
+| ----- | --------------- | -------------------------------------------- | --------------------------------------- |
+| 1440  | Título          | y 47, 120 px                                 | y 124 → **47**, 120 px                  |
+| 1440  | Máquina «sobre» | x 294, y 62, 809 px                          | 1000 px en y 163 → **x 294, y 62, 809** |
+| 1440  | Flechas         | x 30, 51 px sobre el borde, 62 entre centros | x 20, 40, 46 → **x 30, 51, 62**         |
+| 1010  | Título          | y 103, 70 px                                 | y 50, 65 px → **y 103, 70 px**          |
+| 1010  | Máquina «sobre» | y 48 (cruza el título), 631 px               | debajo, y 157 → **y 48, 631**           |
+| 1010  | Flechas         | x 50, 106 px sobre el borde                  | x 40, 60 → **x 50, 106**                |
+| 390   | Título          | y 74                                         | y 50 → **74**                           |
+| 390   | Máquina         | y 257, 318 px de ancho                       | y 197, 338 → **y 257, 318**             |
+| 390   | Flechas         | 30 px, x 40, 66 px sobre el borde            | 42 px, x 30 → **30 px, x 40, 66**       |
+
+- **Flechas:** chevrón macizo de 21 px de alto (15 en móvil), dibujado aquí con
+  la silueta del de la V2 (Font Awesome, que no usamos); 20 px entre las dos;
+  al pasar el ratón, fondo rojo y chevrón blanco, también en la pausa.
+- **«+»:** el aro de 30 px de la V2 (trazo 2,5, cruz de 10 px), dibujado aquí
+  (el `add.svg` del kit es de Flaticon, L2). Sigue siendo un enlace con nombre
+  accesible, y sin enlace no se pinta (S2).
+- **Máquina «sobre» en tablet:** como la V2 a 1010, empieza 55 px por encima
+  del título. **Con la foto de LANDCROS del preview (vista desde arriba y
+  opaca) tapa buena parte del título a 1010**; si molesta, esa diapositiva se
+  pasa a «Debajo del título» en el panel. El texto entero sigue en el `<h2>`.
+- **Móvil:** la máquina queda en 318 × 160 (la V2, 318 × 228): la V2 no pinta
+  el vidrio en móvil y aquí sí (S7), así que le queda menos alto.
+
+**CLS** (preview del PR, sin tocar nada):
+
+| Ancho | Carga   | Pase automático, una vuelta de 7 | `main`, pase automático |
+| ----- | ------- | -------------------------------- | ----------------------- |
+| 390   | 0       | 0,00001                          | 0,0035                  |
+| 1010  | 0       | 0                                | 0,035                   |
+| 1440  | 0,00001 | 0,00001                          | 0,105                   |
+
+El pase automático **ya daba CLS en `main`**: la caja de la máquina era un solo
+elemento que cambiaba de sitio entre diapositivas («sobre» o «debajo», títulos
+de distinto alto), y el pase no es una entrada del usuario. Ahora la capa del
+título y la máquina se monta nueva en cada diapositiva (`key`), y un elemento
+nuevo no cuenta como desplazamiento.

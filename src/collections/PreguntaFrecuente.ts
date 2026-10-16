@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { borradoAdmin, escrituraContenido, lecturaFiltrada } from "../lib/seguridad/acceso";
+import { validarRespuestaFaq } from "../lib/portada/respuestaFaq";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("preguntas-frecuentes");
@@ -12,8 +13,8 @@ const leerPreguntas = lecturaFiltrada({ publicada: { equals: true } });
  * Preguntas frecuentes: la sección 11 de la home de ux-9.
  *
  * La respuesta es TEXTO PLANO a propósito, no texto enriquecido: alimenta el
- * JSON-LD `FAQPage`, que pide texto, y en ux-9 las respuestas son párrafos sin
- * enlaces ni formato.
+ * JSON-LD `FAQPage`, que pide texto. Admite enlaces con `[texto](/ruta/)`
+ * (`respuestaFaq.ts`).
  */
 export const PreguntaFrecuente: CollectionConfig = {
   slug: "preguntas-frecuentes",
@@ -33,7 +34,17 @@ export const PreguntaFrecuente: CollectionConfig = {
   defaultSort: "orden",
   fields: [
     { name: "pregunta", type: "text", required: true, label: "Pregunta" },
-    { name: "respuesta", type: "textarea", required: true, label: "Respuesta" },
+    {
+      name: "respuesta",
+      type: "textarea",
+      required: true,
+      label: "Respuesta",
+      validate: validarRespuestaFaq,
+      admin: {
+        description:
+          "Texto sin formato. Para enlazar a otra página escribe [texto del enlace](/ruta/) o [texto](https://…).",
+      },
+    },
     { name: "orden", type: "number", label: "Orden", admin: { position: "sidebar" } },
     {
       name: "publicada",

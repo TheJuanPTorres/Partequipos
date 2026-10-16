@@ -11,12 +11,14 @@ import { Aviso } from "./Aviso";
  */
 export default function AvisoAutorizacion() {
   const autorizado = useFormFields(([campos]) => campos?.autorizacionUso?.value);
-  if (autorizado === true) return null;
+  const delCliente = useFormFields(([campos]) => campos?.videoDelCliente?.value);
+  if (autorizado === true || delCliente === true) return null;
   return (
     <Aviso tono="aviso">
       <p>
         Para publicarlo, primero marca en «Autorización de uso» que tienes la autorización firmada
-        de la persona.
+        de la persona (o, si es un vídeo que el cliente ya publicó en su canal, la casilla «Vídeo ya
+        publicado por el cliente»).
       </p>
     </Aviso>
   );

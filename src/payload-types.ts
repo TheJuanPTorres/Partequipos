@@ -1578,6 +1578,9 @@ export interface CategoriasBlog {
 export interface PreguntasFrecuente {
   id: number;
   pregunta: string;
+  /**
+   * Texto sin formato. Para enlazar a otra página escribe [texto del enlace](/ruta/) o [texto](https://…).
+   */
   respuesta: string;
   orden?: number | null;
   publicada?: boolean | null;
@@ -1596,7 +1599,10 @@ export interface Testimonio {
   nombre: string;
   empresa?: string | null;
   ciudad?: string | null;
-  cita: string;
+  /**
+   * La frase de la persona. Es opcional solo en un vídeo que el cliente ya publicó en su canal (casilla de abajo).
+   */
+  cita?: string | null;
   foto?: (number | null) | Media;
   /**
    * Opcional. Un MP4 propio; para YouTube, el campo de abajo.
@@ -1606,6 +1612,10 @@ export interface Testimonio {
    * Opcional. Enlace de YouTube; si lleva «&t=21s», empieza en ese segundo.
    */
   youtube?: string | null;
+  /**
+   * Márcala solo si el vídeo del enlace de YouTube ya está publicado en el canal de Partequipos. Entonces la frase y la autorización de uso son opcionales. Si más adelante llegan, añádelas aquí.
+   */
+  videoDelCliente?: boolean | null;
   autorizacionUso?: boolean | null;
   fechaAutorizacion?: string | null;
   /**
@@ -1613,7 +1623,7 @@ export interface Testimonio {
    */
   referenciaAutorizacion?: string | null;
   /**
-   * Solo se puede marcar con la autorización de uso marcada.
+   * Solo se puede marcar con la autorización de uso marcada, o con la casilla del vídeo ya publicado por el cliente.
    */
   publicado?: boolean | null;
   orden?: number | null;
@@ -2555,6 +2565,7 @@ export interface TestimoniosSelect<T extends boolean = true> {
   foto?: T;
   video?: T;
   youtube?: T;
+  videoDelCliente?: T;
   autorizacionUso?: T;
   fechaAutorizacion?: T;
   referenciaAutorizacion?: T;

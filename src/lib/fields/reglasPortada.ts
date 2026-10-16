@@ -35,13 +35,38 @@ export function validarLongitud(valor: unknown): true | string {
  * (docs/diseno/decisiones-home-ux9.md, licencia L4; Ley 1581 de 2012).
  */
 
-/** Validación del campo `publicado`: no se puede marcar sin autorización. */
+/*
+ * EXCEPCIÓN (2026-10-16, decisión de dirección): un testimonio en VÍDEO que el
+ * cliente ya publicó en su canal de YouTube (`videoDelCliente`) no necesita la
+ * autorización de uso ni la frase: la persona ya dio la cara en el canal del
+ * cliente. Cualquier otro testimonio sigue exigiendo la autorización.
+ */
+
+/** ¿Está libre de pedir autorización? Solo con la casilla Y un enlace de YouTube válido. */
+export function exentoDeAutorizacion(videoDelCliente: unknown, youtubeValido: boolean): boolean {
+  return videoDelCliente === true && youtubeValido;
+}
+
+/** Validación de la casilla «vídeo del cliente»: sin enlace de YouTube no vale. */
+export function validarVideoDelCliente(valor: unknown, youtubeValido: boolean): true | string {
+  if (valor !== true || youtubeValido) return true;
+  return "Para marcar el vídeo del cliente hace falta el enlace de YouTube del vídeo.";
+}
+
+/** La frase es obligatoria salvo en un vídeo ya publicado por el cliente. */
+export function validarCita(cita: unknown, exento: boolean): true | string {
+  if (exento) return true;
+  return typeof cita === "string" && cita.trim() ? true : "Escribe el testimonio.";
+}
+
+/** Validación del campo `publicado`: no se puede marcar sin autorización (o sin la excepción). */
 export function validarPublicacionTestimonio(
   publicado: unknown,
   autorizacionUso: unknown,
+  exento = false,
 ): true | string {
   if (publicado !== true) return true;
-  return autorizacionUso === true
+  return autorizacionUso === true || exento
     ? true
     : "No se puede publicar sin la autorización de uso marcada: el testimonio es de una persona real.";
 }
@@ -49,10 +74,15 @@ export function validarPublicacionTestimonio(
 /**
  * Estado que se GUARDA. Aunque la validación falle o se salte (API local con
  * datos a mano), el servidor nunca deja publicado un testimonio sin
- * autorización: si se retira la autorización, se despublica.
+ * autorización (salvo la excepción del vídeo del cliente): si se retira la
+ * autorización, se despublica.
  */
-export function publicadoEfectivo(publicado: unknown, autorizacionUso: unknown): boolean {
-  return publicado === true && autorizacionUso === true;
+export function publicadoEfectivo(
+  publicado: unknown,
+  autorizacionUso: unknown,
+  exento = false,
+): boolean {
+  return publicado === true && (autorizacionUso === true || exento);
 }
 
 /**
@@ -61,5 +91,8 @@ export function publicadoEfectivo(publicado: unknown, autorizacionUso: unknown):
  * usen exactamente el mismo filtro.
  */
 export const TESTIMONIOS_PUBLICOS = {
-  and: [{ publicado: { equals: true } }, { autorizacionUso: { equals: true } }],
+  and: [
+    { publicado: { equals: true } },
+    { or: [{ autorizacionUso: { equals: true } }, { videoDelCliente: { equals: true } }] },
+  ],
 } as const;

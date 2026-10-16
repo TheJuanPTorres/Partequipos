@@ -139,7 +139,7 @@ export function SeccionTestimonios({ tarjetas, textos }: Props) {
                   {t.titulo}
                 </h3>
                 {t.subtitulo ? <p className={estilos.lugar}>{t.subtitulo}</p> : null}
-                <p className={estilos.texto}>{t.texto}</p>
+                {t.texto ? <p className={estilos.texto}>{t.texto}</p> : null}
               </div>
             </article>
           );

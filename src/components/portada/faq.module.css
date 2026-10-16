@@ -223,6 +223,14 @@
   line-height: 1.4;
 }
 
+/* Enlaces dentro de la respuesta: subrayados y con contraste de sobra sobre blanco. */
+.enlace {
+  color: #a8141f;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .item::details-content {
     transition: none;

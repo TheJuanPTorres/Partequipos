@@ -2603,3 +2603,43 @@ exactamente los de ux-9: «Ver producto» y «Ver todas las excavadoras»).
 portada: Aditamentos». Ninguna de las 128 unidades importadas de WordPress lo
 es, así que con el contenido real esa pestaña no se pinta (en el preview la
 llenan dos unidades de ejemplo de ux-9).
+
+## 34. Auditoría de D (2026-10-14): pines de las sedes y título de la portada
+
+### 34.1 Pines de las sedes a 390 (axe `target-size` ×6)
+
+**Medido en el sitio publicado a 390:** en la vista general del móvil, el
+encuadre del diseño deja los pines en la parte baja del mapa, en una franja de
+unos 35 px. Los 7 pines caben en unos 30 × 35 px y se solapan entre sí. axe
+dio 6 fallos de `target-size`; el «espacio libre» de los pines iba de 0 a
+11 px. A 1440 están separados y no falla ninguno.
+
+**Ningún tamaño de pin lo arregla:** el problema es que están amontonados, no
+que sean pequeños. Cambiar el encuadre se apartaría de ux-9 (§23).
+
+**Arreglo:**
+
+- Un pin que choca con otro (su caja toca la de otro, o su punto está a menos de 24 px) queda **inactivo** (`inert`): fuera del orden de tabulación y sin clic. La decisión está en `src/lib/portada/pinesSedes.ts`, con pruebas.
+- Se recalcula tras cada movimiento del mapa. Al volar a una sede, los pines se separan y vuelven a estar activos.
+- Lo cubre la **excepción «equivalente»** de WCAG 2.5.8: las flechas «Sede anterior/siguiente» (32 × 32) llevan a cada sede, igual que el pin.
+- **A la vista no cambia nada:** el pin se sigue viendo, solo deja de responder mientras está solapado.
+
+### 34.2 Título de la portada (69 caracteres, marca dos veces)
+
+Hoy: «Partequipos — Repuestos y maquinaria pesada en Colombia | Partequipos»
+(69). Es un **dato** del panel (página «inicio» → Buscadores y redes sociales
+→ título), no código. En la portada, `tituloConMarca` no añade la marca, así
+que el texto sale tal cual.
+
+**Propuesta (55 caracteres):** «Maquinaria pesada y repuestos en Colombia |
+Partequipos».
+
+- Empieza por lo que decía el WordPress («Maquinaria Pesada en Colombia - Partequipos», el título que hoy está indexado). Conserva la palabra clave con la que se posiciona la portada.
+- Añade «repuestos», que es la otra mitad del negocio.
+- Lleva la marca una sola vez, al final, como el resto del sitio.
+
+Lo cambia dirección desde el panel de producción, con
+`Desktop\partequipos-cierre\runbook-titulo-portada.md`. **Va antes del
+runbook del contenido real:** ese importador guarda el SEO de la portada tal
+como estaba antes de su primera ejecución y lo vuelve a aplicar al repetirse.
+Si se cambiara después, una repetición devolvería el título de 69 caracteres.

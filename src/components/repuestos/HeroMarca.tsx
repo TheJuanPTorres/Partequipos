@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import reserva from "@/components/blog/cabeceraArticulo.module.css";
 import { Revelado } from "@/components/movimiento/Revelado";
 import type { VistaEncabezado } from "@/lib/repuestos/marca";
 
@@ -84,7 +85,19 @@ export function HeroMarca({
             ) : null}
           </h1>
 
-          {vista.descripcion ? <p className={estilos.presentacion}>{vista.descripcion}</p> : null}
+          {/*
+           * Sin desplazamiento al llegar Inter (medido: CLS 0,073 a 1440 en el tipo
+           * de repuestos): el alto lo fija una copia invisible del texto en la
+           * fuente de respaldo, la técnica de la cabecera del artículo.
+           */}
+          {vista.descripcion ? (
+            <p
+              className={`${estilos.presentacion} ${reserva.reserva}`}
+              data-reserva={vista.descripcion}
+            >
+              <span>{vista.descripcion}</span>
+            </p>
+          ) : null}
 
           <IconoRaton href={`#${anclaSiguiente}`} />
         </div>

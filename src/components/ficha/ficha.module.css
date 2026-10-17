@@ -134,7 +134,12 @@
 
 .visor {
   position: relative;
-  height: 500px;
+  /*
+   * 500 px MENOS el relleno de arriba de la columna (2026-10-17): así la columna
+   * de la galería mide lo mismo que antes, la tarjeta no crece y el título, que va
+   * centrado en vertical, no se mueve cuando la galería es la columna más alta.
+   */
+  height: calc(500px - 2.82cqi);
   overflow: hidden;
   border-radius: 32px;
   touch-action: pan-y;

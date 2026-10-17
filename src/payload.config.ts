@@ -54,6 +54,7 @@ import { TipoMaquinaria } from "./collections/TipoMaquinaria";
 import { Users } from "./collections/Users";
 import { Video } from "./collections/Video";
 import { Animacion } from "./collections/Animacion";
+import { Fuente } from "./collections/Fuente";
 import { Documento } from "./collections/Documento";
 import { FichaProducto } from "./globals/FichaProducto";
 import { PaginasIndice } from "./globals/PaginasIndice";
@@ -235,6 +236,7 @@ export default buildConfig({
         Documento,
         Video,
         Animacion,
+        Fuente,
         // Configuracion (el global de SEO va el primero del grupo en el menú).
         Redirects,
         Users,
@@ -328,6 +330,8 @@ export default buildConfig({
         // Las animaciones Lottie las pide el navegador con `fetch` desde el CDN
         // (el Blob responde con `Access-Control-Allow-Origin: *`).
         [Animacion.slug]: { disablePayloadAccessControl: true },
+        // Las fuentes del hero, igual: el navegador las pide al CDN con CORS (`@font-face`).
+        [Fuente.slug]: { disablePayloadAccessControl: true },
       },
       token: process.env.BLOB_READ_WRITE_TOKEN || "",
     }),

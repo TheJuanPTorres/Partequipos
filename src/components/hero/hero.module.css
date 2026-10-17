@@ -313,17 +313,22 @@
   z-index: 1;
   width: 100%;
   margin: 0;
-  color: #fff;
+  /*
+   * Las variables --titulo-* las pone la «Tipografía del título» del panel
+   * (2026-10-17, src/lib/portada/tipografia.ts); vacías, el estilo de siempre.
+   */
+  color: var(--titulo-color, #fff);
+  font-family: var(--titulo-fuente, inherit);
   font-size: min(
     var(--hero-titulo-tam),
     calc((100cqi - 40px) / (var(--hero-titulo-letras, 16) * 0.62))
   );
-  font-weight: var(--hero-titulo-peso);
-  line-height: var(--hero-titulo-interlineado);
-  letter-spacing: var(--hero-titulo-espaciado);
+  font-weight: var(--titulo-peso, var(--hero-titulo-peso));
+  line-height: var(--titulo-interlineado, var(--hero-titulo-interlineado));
+  letter-spacing: var(--titulo-interletrado, var(--hero-titulo-espaciado));
   /* MAYÚSCULAS SOLO POR CSS: en el HTML el texto va en caso normal. */
-  text-transform: uppercase;
-  text-align: center;
+  text-transform: var(--titulo-mayusculas, uppercase);
+  text-align: var(--titulo-texto, center);
 }
 
 /*
@@ -348,7 +353,7 @@
 .tituloAbajo {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: var(--titulo-alinear, center);
 }
 
 /* La parte de arriba del título partido: solo en escritorio (ver abajo). */
@@ -368,15 +373,18 @@
   left: 0;
   display: none;
   margin: 0;
-  color: #fff;
+  /* La parte de abajo lleva la misma tipografía del panel, salvo el tamaño. */
+  color: var(--titulo-color, #fff);
+  font-family: var(--titulo-fuente, inherit);
   font-size: min(
     var(--hero-titulo-abajo-tam),
     calc((100cqi - 40px) / (var(--hero-titulo-letras, 16) * 0.62))
   );
-  font-weight: var(--hero-titulo-peso);
-  line-height: var(--hero-titulo-interlineado);
-  text-align: center;
-  text-transform: uppercase;
+  font-weight: var(--titulo-peso, var(--hero-titulo-peso));
+  line-height: var(--titulo-interlineado, var(--hero-titulo-interlineado));
+  letter-spacing: var(--titulo-interletrado, var(--hero-titulo-espaciado));
+  text-align: var(--titulo-texto, center);
+  text-transform: var(--titulo-mayusculas, uppercase);
   pointer-events: none;
 }
 
@@ -957,5 +965,105 @@
     /* El «+» arriba: centrado, se movería si el párrafo cambia de alto. */
     align-items: flex-start;
     width: min(280px, 100% - 2 * var(--hero-vidrio-derecha));
+  }
+}
+
+/* ------------------------------------------- tipografía del panel (título) */
+
+/*
+ * TIPOGRAFÍA DEL TÍTULO DESDE EL PANEL (2026-10-17, pedido del cliente;
+ * src/lib/portada/tipografia.ts). Van al FINAL para ganar a las reglas de
+ * tamaño de cada pantalla de arriba.
+ *
+ * TAMAÑO: el del panel en su pantalla, pero, como el de siempre, nunca más del
+ * que cabe a lo ancho (la línea más larga en escritorio; la palabra más larga
+ * en tablet y móvil). Lo que se quita es la reducción por título largo del
+ * diseño: si el cliente pone un tamaño, se respeta mientras quepa.
+ */
+@media (min-width: 1025px) {
+  .titulo[data-tam-e] {
+    font-size: min(
+      var(--titulo-tam-e),
+      calc((100cqi - 40px) / (var(--hero-titulo-letras-escritorio, 16) * 0.62))
+    );
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .titulo[data-tam-t] {
+    font-size: min(
+      var(--titulo-tam-t),
+      calc((100cqi - 40px) / (var(--hero-titulo-palabra, 10) * 0.62))
+    );
+  }
+}
+
+@media (max-width: 767px) {
+  .titulo[data-tam-m] {
+    font-size: min(
+      var(--titulo-tam-m),
+      calc((100cqi - 40px) / (var(--hero-titulo-palabra, 10) * 0.62))
+    );
+  }
+}
+
+/*
+ * POSICIÓN: en la pantalla que la tiene, la capa del título sale del flujo y
+ * se coloca en % del área útil (el margen lateral es el de la máquina); con
+ * `translate` (no `transform`, que es el del parallax) se desplaza su propio
+ * %, así 0 la pega a un borde y 100 al otro sin salirse. Un eje sin valor, como
+ * siempre: centrado, y arriba a su altura. En su sitio queda la RESERVA: el
+ * título del estilo de siempre, invisible, para que la máquina no se mueva.
+ */
+.reserva {
+  display: none;
+  visibility: hidden;
+}
+
+@media (min-width: 1025px) {
+  .capaTexto > .capaParallax[data-pos-e] {
+    position: absolute;
+    z-index: 1;
+    top: var(--pos-top-e, var(--hero-texto-arriba));
+    left: var(--pos-left-e, 50%);
+    width: max-content;
+    max-width: calc(100% - 2 * var(--hero-maquina-lado));
+    translate: var(--pos-tx-e, -50%) var(--pos-ty-e, 0);
+  }
+
+  .reserva[data-pos-e] {
+    display: block;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .capaTexto > .capaParallax[data-pos-t] {
+    position: absolute;
+    z-index: 1;
+    top: var(--pos-top-t, var(--hero-texto-arriba));
+    left: var(--pos-left-t, 50%);
+    width: max-content;
+    max-width: calc(100% - 2 * var(--hero-maquina-lado));
+    translate: var(--pos-tx-t, -50%) var(--pos-ty-t, 0);
+  }
+
+  .reserva[data-pos-t] {
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .capaTexto > .capaParallax[data-pos-m] {
+    position: absolute;
+    z-index: 1;
+    top: var(--pos-top-m, var(--hero-texto-arriba));
+    left: var(--pos-left-m, 50%);
+    width: max-content;
+    max-width: calc(100% - 2 * var(--hero-maquina-lado));
+    translate: var(--pos-tx-m, -50%) var(--pos-ty-m, 0);
+  }
+
+  .reserva[data-pos-m] {
+    display: block;
   }
 }

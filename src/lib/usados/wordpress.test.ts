@@ -14,6 +14,7 @@ import {
   normalizarAnio,
   normalizarHoras,
   normalizarPeso,
+  altSinSerial,
   mencionaSerial,
   quitarSerial,
 } from "./wordpress";
@@ -149,6 +150,73 @@ describe("el número de serie no se publica", () => {
     assert.equal(quitarSerial("horas y serial A1234. Listo", ""), "horas. Listo");
   });
 
+  it("quita «SN <código>» y sus variantes aunque el código no sea el del campo (2026-10-17)", () => {
+    // Seriales INVENTADOS. El campo dice X9876; el texto cita otro código.
+    const base = "Maquinaria pesada usada excavadora Hitachi ZX200-6";
+    for (const sn of [
+      "SN Q4321",
+      "SN: Q4321",
+      "SN:Q4321",
+      "SN. Q4321",
+      "S.N. Q4321",
+      "S.N.Q4321",
+      "S N Q4321",
+      "SNQ4321",
+      "sn q4321",
+      "S/N Q4321",
+      "SN Q 4321",
+      "SN #Q4321",
+    ]) {
+      assert.equal(quitarSerial(`${base} ${sn}, foto 1 de 6`, SERIAL), `${base}, foto 1 de 6`, sn);
+      assert.equal(mencionaSerial(`${base} ${sn}`), true, sn);
+    }
+    // Pegado al modelo con guion, como en los ficheros de WordPress.
+    assert.equal(
+      quitarSerial("Hitachi ZX200-6-SN Q4321, foto 2 de 3", ""),
+      "Hitachi ZX200-6, foto 2 de 3",
+    );
+    // Sin serial en el campo, también.
+    assert.equal(quitarSerial(`${base} SN Q4321, foto 1 de 6`, ""), `${base}, foto 1 de 6`);
+  });
+
+  it("altSinSerial: limpia un texto ya guardado y nunca lo deja vacío", () => {
+    // Seriales INVENTADOS.
+    const lista = ["Q4321", "X9876"];
+    const base = "Maquinaria pesada usada excavadora Hitachi ZX490LCH-5A";
+    assert.equal(altSinSerial(`${base} SN Q4321, foto 1 de 6`, lista), `${base}, foto 1 de 6`);
+    // Un serial de la lista sin presentación también se va.
+    assert.equal(altSinSerial(`${base} X9876, foto 2 de 6`, lista), `${base}, foto 2 de 6`);
+    // Uno que no está en la lista pero va presentado con «SN», también.
+    assert.equal(altSinSerial(`${base} S.N. B77777`, lista), base);
+    // Sin nada que quitar, igual.
+    assert.equal(altSinSerial(`${base}, foto 3 de 6`, lista), `${base}, foto 3 de 6`);
+    // Si solo quedaría el serial o algo flojo: null, nunca vacío.
+    assert.equal(altSinSerial("SN Q4321", lista), null);
+    assert.equal(altSinSerial("Foto SN Q4321", lista), null);
+    // Metido en otra palabra: no se puede cortar con seguridad.
+    assert.equal(altSinSerial(`${base} abcQ4321def`, lista), null);
+  });
+
+  it("«SN» sin código, o el principio de una palabra, se queda", () => {
+    for (const t of [
+      "Snorkel S3219",
+      "Plataforma Snorkel TB42",
+      "snack bar",
+      "placa SN sin leer",
+      "SN y motor",
+      // «SN» de un modelo de Case, con datos detrás.
+      "Retroexcavadora Case 580 SN 4x4",
+      "Retroexcavadora Case 580 SN 2015",
+      "Case 580 SN WT",
+      // Sufijos aleatorios de un fichero (inventados).
+      "wp-ficha-case-580-sn-ficha-tecnica-partequipos-4cdVxvPVkzDlq3P71RHw.pdf",
+      "wp-eni-oso-46-partequipos-sNhu3NMEAw7CK123UJyB.jpg",
+    ]) {
+      assert.equal(mencionaSerial(t), false, t);
+      assert.equal(quitarSerial(t, SERIAL), t, t);
+    }
+  });
+
   it("no toca «serial» sin código ni la «serie» de un modelo", () => {
     assert.equal(quitarSerial("placa de serial y motor", SERIAL), "placa de serial y motor");
     assert.equal(quitarSerial("de la serie ZX", SERIAL), "de la serie ZX");
@@ -187,7 +255,10 @@ describe("el número de serie no se publica", () => {
   });
 
   it("si el serial no se puede quitar, no hay descripción", () => {
-    assert.equal(descripcionSinSerial("<p>código snx9876</p>", SERIAL), null);
+    // Metido dentro de otra palabra: no hay forma segura de cortarlo.
+    assert.equal(descripcionSinSerial("<p>código abcx9876def</p>", SERIAL), null);
+    // «snx9876» sí se quita desde el 2026-10-17 («SN» pegado al código).
+    assert.equal(descripcionSinSerial("<p>código snx9876</p>", SERIAL), "código");
   });
 
   it("texto alternativo sin serial ni numeración, con el número de foto", () => {

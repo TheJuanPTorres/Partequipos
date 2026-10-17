@@ -145,27 +145,30 @@ export function FichaProducto({
         ) : null}
 
         <div className={estilos.columnaDatos}>
-          {/* Migas: la ruta COMPLETA en la píldora (desviación aprobada, decisiones-ficha.md). */}
-          <nav aria-label="Ruta de navegación" className={estilos.migas}>
-            <ol>
-              {migas.map((m, i) =>
-                i === migas.length - 1 ? (
-                  <li key={m.path}>
-                    <span aria-current="page">{m.nombre}</span>
-                  </li>
-                ) : (
-                  <li key={m.path}>
-                    <Link href={`${m.path}${m.path.endsWith("/") ? "" : "/"}`}>{m.nombre}</Link>
-                    <span aria-hidden="true"> / </span>
-                  </li>
-                ),
-              )}
-            </ol>
-          </nav>
+          {/* Cabecera (migas + título): en móvil lleva un velo oscuro para que el título blanco se lea con cualquier foto. */}
+          <div className={estilos.cabeceraDatos}>
+            {/* Migas: la ruta COMPLETA en la píldora (desviación aprobada, decisiones-ficha.md). */}
+            <nav aria-label="Ruta de navegación" className={estilos.migas}>
+              <ol>
+                {migas.map((m, i) =>
+                  i === migas.length - 1 ? (
+                    <li key={m.path}>
+                      <span aria-current="page">{m.nombre}</span>
+                    </li>
+                  ) : (
+                    <li key={m.path}>
+                      <Link href={`${m.path}${m.path.endsWith("/") ? "" : "/"}`}>{m.nombre}</Link>
+                      <span aria-hidden="true"> / </span>
+                    </li>
+                  ),
+                )}
+              </ol>
+            </nav>
 
-          <h1 id="ficha-titulo" className={`${estilos.titulo} texto-titulo-bloque`}>
-            {nombre}
-          </h1>
+            <h1 id="ficha-titulo" className={`${estilos.titulo} texto-titulo-bloque`}>
+              {nombre}
+            </h1>
+          </div>
 
           <ListaDatos datos={datos} clase={`${estilos.datos} texto-destacado`} apilado />
 

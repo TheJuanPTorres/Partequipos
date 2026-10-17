@@ -315,6 +315,14 @@
   }
 }
 
+/*
+ * Envoltorio de migas + título. En escritorio y tablet no existe como caja
+ * (`contents`): el diseño es exactamente el de antes. En móvil lleva el velo.
+ */
+.cabeceraDatos {
+  display: contents;
+}
+
 .titulo {
   margin: 0;
   color: var(--color-texto);
@@ -770,6 +778,48 @@
   .columnaDatos {
     padding: 4.7cqi;
     background: linear-gradient(0deg, #ffffff 22%, rgb(255 255 255 / 0) 49%);
+  }
+
+  /*
+   * VELO (2026-10-17, hallazgo de B): con fotos claras de estudio (aditamentos)
+   * el título blanco sobre la foto desenfocada casi no se leía. Degradado oscuro
+   * detrás de las migas y el título: negro del kit al 70 % arriba, que sobre un
+   * blanco puro da ~6,5:1 con el texto blanco (AA exige 4,5), y se desvanece
+   * por debajo del título. Es un pseudo-elemento absoluto: no mueve nada (CLS 0).
+   */
+  .cabeceraDatos {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .cabeceraDatos::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -4.7cqi -4.7cqi -28px;
+    background: linear-gradient(
+      180deg,
+      rgb(16 15 15 / 0.72) 0,
+      rgb(16 15 15 / 0.68) calc(100% - 28px),
+      rgb(16 15 15 / 0) 100%
+    );
+    pointer-events: none;
+  }
+
+  .principal[data-sin-fotos] .cabeceraDatos::before {
+    content: none;
+  }
+
+  /* Sobre el velo, las migas van en blanco (sin fotos, siguen oscuras). */
+  .principal:not([data-sin-fotos]) .migas ol {
+    border-color: rgb(255 255 255 / 0.7);
+    background: rgb(255 255 255 / 0.1);
+    color: var(--color-fondo);
   }
 
   /* En ux-9 el título va en blanco sobre el fondo desenfocado. */

@@ -12,9 +12,9 @@ export type ModoCabecera = "solido" | "transparente" | "velo";
  * - `solido`: fondo blanco (todas las páginas menos la portada, y la portada con
  *   el menú móvil abierto).
  * - `transparente`: SOLO la portada y arriba del todo, sobre el fondo claro.
- * - `velo`: el vidrio esmerilado de ux-9 (portada al bajar). También con un
- *   megamenú abierto en la portada: así la barra y el panel, que es de vidrio,
- *   se leen como una sola pieza.
+ * - `velo`: portada al bajar, y con un megamenú abierto en la portada. Era el
+ *   vidrio esmerilado de ux-9; desde el 2026-10-17 es blanco sólido, sin filete
+ *   (dirección), como el panel del megamenú.
  */
 export function modoCabecera(estado: {
   esPortada: boolean;

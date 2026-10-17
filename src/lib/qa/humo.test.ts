@@ -34,6 +34,12 @@ describe("rutas de la prueba de humo", () => {
     }
   });
 
+  it("un 301 real de la base, SOLO en producción (proxy con resumen, 2026-10-17)", () => {
+    const r = rutasPara("production").find((x) => x.ruta === "/gracias/");
+    assert.equal(r?.esperado, 301);
+    assert.ok(!rutasPara("preview").some((x) => x.ruta === "/gracias/"));
+  });
+
   it("el mapa de redirects se mide SOLO en producción (§10.22)", () => {
     assert.ok(rutasPara("production").some((r) => r.ruta === "/api/redirects-map/"));
     assert.ok(

@@ -1,3 +1,4 @@
+import { REDIRECTS_FIJOS } from "../redirects/fijos";
 import { rutas } from "../routes";
 import { absoluteUrl } from "./config";
 
@@ -417,5 +418,10 @@ export function buildSitemapEntries(
     });
   }
 
-  return entradas;
+  // Una URL que redirige no se anuncia (2026-10-17, dirección): la página
+  // institucional `nosotros/trabaja-con-nosotros` sigue en la base, pero
+  // `REDIRECTS_FIJOS` la manda al portal de empleo del cliente.
+  const conBarra = (ruta: string) => (ruta.endsWith("/") ? ruta : `${ruta}/`);
+  const redirigidas = new Set(REDIRECTS_FIJOS.map((r) => conBarra(r.source)));
+  return entradas.filter((e) => !redirigidas.has(conBarra(new URL(e.url).pathname)));
 }

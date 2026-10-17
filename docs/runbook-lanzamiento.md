@@ -481,6 +481,11 @@ comprobadas.**
 
    - Esperado: `x-vercel-id` presente y **ni** `Server: LiteSpeed` **ni** `X-Powered-By: PHP`.
    - **El WordPress no se apaga** hasta pasadas las 72 h de i: es la vuelta atrás. Mientras tanto sigue en `45.89.205.198`.
+   - **La prueba de humo pasa a mirar el dominio nuevo** (#224). Los 301 de la base (`/gracias/`) se comprueban en el dominio publicado, que hoy es `https://partequipos.vercel.app` (`DOMINIO_PUBLICADO` en `src/lib/qa/humo.ts`). Con el DNS ya en Vercel:
+     - **en CI:** un PR que cambie esa constante a `https://partequipos.com`, por la rutina de §9. Es lo que usa el workflow `humo.yml`, que no fija `HUMO_DOMINIO`;
+     - **a mano:** `$env:HUMO_DOMINIO="https://partequipos.com"` antes de `npm run humo` (lo usa h.1).
+     - **Final:** la prueba de humo del despliegue de `main` con ese cambio, en verde, con `/gracias/` en 301 desde `partequipos.com`.
+     - Si no se cambia, el humo sigue mirando `vercel.app`, que tras la redirección de j al dominio puede dejar de dar el 301 esperado y salir en rojo.
 
 ---
 
@@ -488,16 +493,16 @@ comprobadas.**
 
 ### Prueba de humo del lanzamiento (agente y dirección, justo después de g.6)
 
-| #   | Comprobación               | Orden                                                                                   | Esperado                                                    |
-| --- | -------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| 1   | Humo del lambda            | `$env:HUMO_URL="https://partequipos.com"; $env:HUMO_ENTORNO="production"; npm run humo` | Las 5 rutas en 200                                          |
-| 2   | Las 650 URL                | Paso f, en estricto, contra `https://partequipos.com`                                   | Código 0                                                    |
-| 3   | QA del HTML                | `$env:QA_BASE="https://partequipos.com"; npm run qa`                                    | 0 errores                                                   |
-| 4   | Robots, canónico y sitemap | Paso e, final (después de abrir la indexación)                                          | Todo `partequipos.com`                                      |
-| 5   | Formulario real            | Un envío desde `/contactanos/` con datos evidentes de prueba («PRUEBA LANZAMIENTO»)     | Se pinta y pasa Turnstile, se guarda y llega el correo SMTP |
-| 6   | Panel                      | `/admin/` con la cuenta de administración                                               | Entra                                                       |
-| 7   | Correo de la empresa       | Un correo cualquiera al buzón del cliente                                               | Llega (el MX no se tocó)                                    |
-| 8   | Mapa de sedes              | La portada, en la sección de sedes                                                      | El globo con el token nuevo, sin errores de consola         |
+| #   | Comprobación               | Orden                                                                                                                                | Esperado                                                    |
+| --- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| 1   | Humo del lambda            | `$env:HUMO_URL="https://partequipos.com"; $env:HUMO_ENTORNO="production"; $env:HUMO_DOMINIO="https://partequipos.com"; npm run humo` | Las 5 rutas en 200                                          |
+| 2   | Las 650 URL                | Paso f, en estricto, contra `https://partequipos.com`                                                                                | Código 0                                                    |
+| 3   | QA del HTML                | `$env:QA_BASE="https://partequipos.com"; npm run qa`                                                                                 | 0 errores                                                   |
+| 4   | Robots, canónico y sitemap | Paso e, final (después de abrir la indexación)                                                                                       | Todo `partequipos.com`                                      |
+| 5   | Formulario real            | Un envío desde `/contactanos/` con datos evidentes de prueba («PRUEBA LANZAMIENTO»)                                                  | Se pinta y pasa Turnstile, se guarda y llega el correo SMTP |
+| 6   | Panel                      | `/admin/` con la cuenta de administración                                                                                            | Entra                                                       |
+| 7   | Correo de la empresa       | Un correo cualquiera al buzón del cliente                                                                                            | Llega (el MX no se tocó)                                    |
+| 8   | Mapa de sedes              | La portada, en la sección de sedes                                                                                                   | El globo con el token nuevo, sin errores de consola         |
 
 El envío de prueba (5) se borra después **desde el panel** (dirección).
 

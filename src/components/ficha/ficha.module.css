@@ -757,6 +757,12 @@
     height: 270px;
   }
 
+  /* En tablet la foto grande mide 270 px: la miniatura, un alto fijo menor. */
+  .miniatura {
+    height: 110px;
+    aspect-ratio: auto;
+  }
+
   .columnaDatos {
     gap: 10px;
     padding: 4.7cqi;

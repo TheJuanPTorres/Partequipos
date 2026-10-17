@@ -34,7 +34,6 @@
   --cab-enlace-tam: 16px;
   --cab-enlace-relleno: 8px;
   --cab-icono: 30px;
-  --cab-velo: rgb(255 255 255 / 27%); /* #FFFFFF45 */
   --cab-col-relleno: 10px; /* relleno de cada contenedor de Elementor */
   /* Fondo de la barra con el submenú o el buscador abiertos: SÓLIDO (dirección,
      2026-10-17), el mismo que el panel del megamenú. */
@@ -64,19 +63,12 @@
 }
 
 /*
- * Portada al bajar: el velo #FFFFFF45 con el desenfoque de Andrés, MEDIDO en
- * ux-9 pintado: `blur(20px) saturate(1.8)`.
- *
- * EL ORDEN IMPORTA, no `var()` (CLAUDE.md §10.35): si `backdrop-filter` va
- * ANTES que `-webkit-backdrop-filter`, lightningcss las fusiona y se queda con
- * la última, la prefijada, que Chrome no aplica (así se perdió el velo el
- * 2026-09-24). La variante `-webkit-` va SIEMPRE primero.
+ * Portada al bajar: fondo blanco SÓLIDO (dirección, 2026-10-17). Hasta entonces era
+ * el velo #FFFFFF45 de Andrés con `blur(20px) saturate(1.8)`, medido en ux-9.
  */
 .cabecera[data-modo="velo"] {
-  background: var(--cab-velo);
+  background: var(--color-fondo);
   box-shadow: none;
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  backdrop-filter: blur(20px) saturate(1.8);
 }
 
 /*
@@ -87,17 +79,8 @@
 .cabecera[data-mega="si"],
 .cabecera[data-buscando="si"] {
   background: var(--cab-fondo-mega);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
   /* Sólido al instante al abrir (sin el fundido de 0,4 s del fondo); al cerrar, sí se funde. */
   transition: clip-path 0.4s ease-in-out;
-}
-
-/* Sin soporte de desenfoque: fondo casi opaco, para que el menú se lea. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .cabecera[data-modo="velo"]:not([data-mega="si"], [data-buscando="si"]) {
-    background: rgb(255 255 255 / 92%);
-  }
 }
 
 /*
@@ -481,7 +464,7 @@
    * FIJA también aquí (petición de Andrés, 2026-10-14). ux-9 NO la fijaba por
    * debajo de 1025 px (medido a 1024, 1010, 800 y 390, y confirmado entonces
    * como intencional): se iba con la página. Ahora es `sticky` en todos los
-   * anchos, con el mismo velo de vidrio al bajar en la portada y sin encogerse
+   * anchos, con el mismo fondo sólido al bajar en la portada y sin encogerse
    * (ni se recorta ni cambia su alto).
    */
   .cabecera[data-encogida="si"] .logo {

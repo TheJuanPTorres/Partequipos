@@ -46,10 +46,11 @@ const CFG = {
   ] as [[number, number], [number, number]],
   anchoMaxGrados: 34,
   /*
-   * El hueco del panel ya lo reserva `relleno` (derechaExtra). Sin
-   * desplazamientos añadidos: las sedes quedan centradas en el área libre
-   * (en móvil el mapa va sobre el panel, no debajo, así que no hay nada que
-   * esquivar).
+   * El hueco del panel lo reserva `relleno` (derechaExtra). Sin desplazamientos
+   * añadidos (en ux-9, −0,2 de ancho a la izquierda y 0,5 de alto en móvil): las
+   * sedes quedan centradas en el área libre. En móvil el mapa va ENCIMA del
+   * panel, no detrás, así que no hay nada que esquivar (el 0,5 de alto lo
+   * llevaba a zoom 1,2: el planeta entero).
    */
   desplazamiento: { x: 0, y: 0 },
   desplazamientoMovil: { x: 0, y: 0 },
@@ -180,21 +181,22 @@ export function GloboSedes({ token, sedes, children }: Props) {
   );
 
   const vistaGeneral = useCallback(
-    (duracion: number) => {
-      // El hueco del panel ya está en el relleno del mapa (`setPadding`): aquí solo el margen.
+    (estaPlegado: boolean, duracion: number) => {
       const m = mapa.current;
       const gl = window.mapboxgl;
       if (!m || !gl || sedes.length === 0) return;
       const limites = new gl.LngLatBounds();
       sedes.forEach((s) => limites.extend([s.lng, s.lat]));
+      // El `padding` de `fitBounds` SUSTITUYE al del mapa (no se suma): lleva el hueco del panel.
+      const p = relleno(anchoPanel(estaPlegado));
       const g = esMovil() ? CFG.margenVistaMovil : CFG.margenVista;
       m.fitBounds(limites, {
-        padding: { top: g, bottom: g, left: g, right: g },
+        padding: { top: p.top + g, bottom: p.bottom + g, left: p.left + g, right: p.right + g },
         duration: sinMovimiento() ? 0 : duracion,
         essential: true,
       });
     },
-    [sedes],
+    [sedes, relleno, anchoPanel],
   );
 
   const volarA = useCallback(
@@ -320,7 +322,7 @@ export function GloboSedes({ token, sedes, children }: Props) {
               pines.current[0]?.setAttribute("data-activo", "");
               // Tras cada movimiento (vista general, vuelo, cambio de tamaño).
               m.on("moveend", () => ajustarPines(pines.current));
-              vistaGeneral(0);
+              vistaGeneral(false, 0);
               ajustarPines(pines.current);
             });
           })
@@ -342,7 +344,7 @@ export function GloboSedes({ token, sedes, children }: Props) {
     const m = mapa.current;
     if (!m) return;
     m.setPadding(relleno(anchoPanel(plegado)));
-    if (plegado) vistaGeneral(CFG.duracion);
+    if (plegado) vistaGeneral(true, CFG.duracion);
   }, [plegado, relleno, anchoPanel, vistaGeneral]);
 
   // Cambio de tamaño.

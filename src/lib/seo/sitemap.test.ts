@@ -110,6 +110,23 @@ describe("buildSitemapEntries", () => {
     assert.equal(e.length, 13);
   });
 
+  it("no anuncia una página que redirige con REDIRECTS_FIJOS (2026-10-17)", () => {
+    const e = buildSitemapEntries(
+      {
+        ...datos,
+        paginas: [...datos.paginas, { slug: "nosotros/trabaja-con-nosotros", updatedAt: null }],
+      },
+      AHORA,
+    );
+    assert.equal(
+      e.some((x) => new URL(x.url).pathname === "/nosotros/trabaja-con-nosotros/"),
+      false,
+    );
+    // Las demás institucionales siguen.
+    assert.ok(e.some((x) => new URL(x.url).pathname === "/nosotros/"));
+    assert.equal(e.length, 13);
+  });
+
   it("lista la página de cada unidad usada disponible, bajo su categoría", () => {
     const e = buildSitemapEntries(
       {

@@ -22,14 +22,14 @@ y 1440:
 
 **Aquí:**
 
-| Pieza                     | Valor                                                                                        |
-| ------------------------- | -------------------------------------------------------------------------------------------- |
-| Tarjetas                  | 2 de 5 categorías (`enTarjetas`, `src/lib/portada/seccionesE.ts`), en el orden de la portada |
-| Tarjeta                   | 400 px, 1200 de ancho (todo el ancho hasta 1220), radio 20, la sombra de la referencia       |
-| Categoría                 | Foto cuadrada de 160 px (140 a 1010), título Inter negrita 20 px y «Ver todo» abajo          |
-| Fijadas                   | 150 · 60 · 40 px, escalón de 20; recorrido de 120 entre tarjetas (80 en móvil)               |
-| Tapada                    | Escala 0,97 y 30 % de gris, ligadas al scroll                                                |
-| «Ver todos los repuestos» | **40 px bajo las tarjetas** (en la referencia, 120: dirección lo quiere mucho más cerca)     |
+| Pieza                     | Valor                                                                                                                              |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Tarjetas                  | 2 de 5 categorías (`enTarjetas`, `src/lib/portada/seccionesE.ts`), en el orden de la portada                                       |
+| Tarjeta                   | 400 px, 1200 de ancho (todo el ancho hasta 1220), radio 20, la sombra de la referencia                                             |
+| Categoría                 | Foto cuadrada de 160 px (140 a 1010), título Inter negrita 20 px y «Ver todo» abajo                                                |
+| Fijadas                   | 150 · 60 · 40 px, escalón de 20; **sin recorrido entre tarjetas** (antes 120 y 80): quedan a 40 px                                 |
+| Tapada                    | Escala 0,97 y 30 % de gris, ligadas al scroll                                                                                      |
+| «Ver todos los repuestos» | **40 px bajo las tarjetas** (en la referencia, 120: dirección lo quiere mucho más cerca); **70 px** de relleno debajo, como arriba |
 
 **Las 10 categorías**, en el orden de la plantilla 40343 de WordPress (la de su
 página de categorías):
@@ -79,6 +79,11 @@ contenido real.
   que la tapa (`:focus-within`), para que el enlace enfocado se vea (WCAG 2.4.11).
 - Sin la tarjeta grande «Blades y corte» del #182: dirección pide 5 categorías
   en cada tarjeta.
+
+### Ajuste de dirección (2026-10-17)
+
+- **Hueco entre las tarjetas:** antes de que la segunda subiera se veía un hueco de 160 px a 1440 (120 a 390), el recorrido de la referencia más los escalones. Ahora es 0 y la segunda queda a 40 px de la primera, los dos escalones de 20. El barrido es el mismo: la primera se fija y la segunda sube y la tapa. «Reducir movimiento» (20 px, sin fijar) y el teclado no cambian.
+- **Botón y «Nuestra Compañía»:** el relleno de abajo de la sección pasa de 30 a 70 px, el mismo que arriba. «Nuestra Compañía» no lleva relleno superior, así que es toda la separación.
 
 ## Versión del #182 (sustituida)
 

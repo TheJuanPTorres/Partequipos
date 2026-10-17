@@ -10,11 +10,19 @@
   --rep-alto: 400px;
   --rep-fijada: 150px;
   --rep-escalon: 20px;
-  /* Entre tarjetas, el recorrido en el que la segunda sube sobre la primera (120 en la referencia). */
-  --rep-hueco: 120px;
+  /*
+   * Entre tarjetas: 0 (dirección, 2026-10-17; la referencia tenía 120 y se veía
+   * un hueco grande antes del barrido). Quedan a 40 px, los dos escalones de
+   * 20; el barrido sigue igual: la primera se fija y la segunda sube y la tapa.
+   */
+  --rep-hueco: 0px;
   --rep-foto: 160px;
 
-  padding: 70px 10px 30px;
+  /*
+   * Abajo, 70 como arriba (dirección, 2026-10-17: con 30, «Ver todos los
+   * repuestos» quedaba pegado a «Nuestra Compañía», que no lleva relleno arriba).
+   */
+  padding: 70px 10px;
   background: var(--color-fondo-seccion);
   color: var(--color-texto);
 }
@@ -30,7 +38,6 @@
   .seccion {
     --rep-fijada: 40px;
     --rep-foto: 72px;
-    --rep-hueco: 80px;
   }
 }
 

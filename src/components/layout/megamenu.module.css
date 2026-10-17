@@ -13,7 +13,8 @@
  * Solo en escritorio (≥ 1025 px): por debajo, la cabecera es la móvil.
  *
  * PETICIÓN DE ANDRÉS (2026-10-14), docs/diseno/decisiones-cabecera.md:
- * 1. VIDRIO ESMERILADO como la barra: mismo `blur(20px) saturate(1.8)`. La
+ * 1. (SUSTITUIDO el 2026-10-17: dirección pasa el panel a FONDO SÓLIDO blanco,
+ *    sin desenfoque; el rojo #be1620 sobre blanco da 6,3:1.) VIDRIO ESMERILADO como la barra: mismo `blur(20px) saturate(1.8)`. La
  *    transparencia NO es la misma (27 %): con un velo tan ligero el texto no
  *    llega a AA sobre una foto oscura (medido, 3,8:1 el gris y 2,3:1 el rojo
  *    con el 72 %). El vidrio del panel es blanco al 86 %, y el rojo de los
@@ -38,8 +39,8 @@
   --mega-curva: 20px;
   --mega-radio: 30px;
   --mega-filete-ancho: 1px;
-  /* Vidrio: blanco al 86 %, AA con cualquier fondo (ver arriba). */
-  --mega-vidrio: rgb(255 255 255 / 86%);
+  /* Fondo SÓLIDO (dirección, 2026-10-17); antes, vidrio blanco al 86 %. */
+  --mega-fondo: var(--color-fondo);
   --mega-filete: rgb(16 15 15 / 18%);
   --mega-rojo: #be1620;
 
@@ -123,6 +124,40 @@
 }
 
 /*
+ * Barra de desplazamiento MINIMALISTA (dirección, 2026-10-17): fina, redondeada y
+ * discreta; se intensifica al pasar el ratón. La rueda, el táctil y el teclado no
+ * cambian: solo se pinta la barra. `scrollbar-*` es el estándar (Firefox y Chrome
+ * ≥ 121, que entonces ignora `::-webkit-scrollbar`); `::-webkit-scrollbar`, Safari.
+ */
+.caja {
+  --barra: rgb(16 15 15 / 18%);
+  --barra-activa: rgb(16 15 15 / 45%);
+  scrollbar-width: thin;
+  scrollbar-color: var(--barra) transparent;
+}
+
+.caja:hover {
+  scrollbar-color: var(--barra-activa) transparent;
+}
+
+.caja::-webkit-scrollbar {
+  width: 6px;
+}
+
+.caja::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.caja::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--barra);
+}
+
+.caja:hover::-webkit-scrollbar-thumb {
+  background: var(--barra-activa);
+}
+
+/*
  * CON máscaras (todos los navegadores actuales): el panel mide 500 + 2 × curva
  * y la caja de contenido va en el centro, entre las dos pestañas invertidas.
  *
@@ -135,7 +170,7 @@
  * - `::before` FILETE: forma exterior MENOS forma interior (anillo de 1 px),
  *   con `mask-composite`: las capas interiores restan (`subtract`) y las
  *   exteriores suman (`add`). Arriba no hay filete: ahí se une a la cabecera.
- * - `::after` VIDRIO: forma interior, con `backdrop-filter`.
+ * - `::after` FONDO: forma interior, sólida.
  * - `.caja`: el contenido, encima, sin fondo.
  * La forma son 6 capas de gradiente (columna central, franja de abajo, dos
  * cuartos de círculo convexos y las dos curvas cóncavas); con el filete en 0
@@ -240,11 +275,9 @@
       subtract, subtract, subtract, subtract, subtract, subtract, add, add, add, add, add, add;
   }
 
-  /* VIDRIO: la forma interior, con el desenfoque de la barra. */
+  /* FONDO: la forma interior, sólida como la barra abierta. */
   .panel::after {
-    background: var(--mega-vidrio);
-    -webkit-backdrop-filter: blur(20px) saturate(1.8);
-    backdrop-filter: blur(20px) saturate(1.8);
+    background: var(--mega-fondo);
     -webkit-mask-image: var(--int-img);
     -webkit-mask-size: var(--int-tam);
     -webkit-mask-position: var(--int-pos);
@@ -262,19 +295,6 @@
     background: none;
   }
 }
-
-/* Sin desenfoque: el vidrio pasa a casi opaco, para que el texto se lea igual. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .panel::after {
-    background: rgb(255 255 255 / 98%);
-  }
-}
-
-/*
- * La transparencia reducida del sistema NO cambia el vidrio: la barra no lo cambia, y
- * panel y curvas tienen que verse igual que ella (dirección, 2026-10-14). El tinte del 86 %
- * ya cumple AA sin el desenfoque (D1), así que no hace falta un respaldo más opaco.
- */
 
 .verTodo {
   display: inline-flex;
@@ -331,7 +351,7 @@
   width: 96px;
   height: 24px;
   object-position: left center;
-  /* Los logos del cliente son blancos: sobre el vidrio claro no se ven. Se pintan
+  /* Los logos del cliente son blancos: sobre el fondo blanco no se ven. Se pintan
      en una sola tinta oscura (silueta), legible y pareja entre marcas. */
   filter: brightness(0);
   opacity: 0.85;

@@ -91,6 +91,7 @@ export interface Config {
     documentos: Documento;
     videos: Video;
     animaciones: Animacion;
+    fuentes: Fuente;
     redirects: Redirect;
     users: User;
     'payload-kv': PayloadKv;
@@ -124,6 +125,7 @@ export interface Config {
     documentos: DocumentosSelect<false> | DocumentosSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     animaciones: AnimacionesSelect<false> | AnimacionesSelect<true>;
+    fuentes: FuentesSelect<false> | FuentesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -1001,6 +1003,57 @@ export interface Pagina {
            */
           tituloAbajo?: string | null;
           /**
+           * Todo opcional: lo que dejes vacío conserva el estilo de siempre (Inter, seminegrita, mayúsculas, centrado y blanco, arriba).
+           */
+          tipografia?: {
+            /**
+             * Vacía: Inter, la del sitio. Las demás son las que se suben en «Archivos › Fuentes». Solo se descarga si la diapositiva se ve.
+             */
+            fuente?: (number | null) | Fuente;
+            /**
+             * Vacío: 600. Con una fuente subida, solo cambia si la fuente es variable o es de ese grosor.
+             */
+            peso?: ('100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900') | null;
+            /**
+             * Pantallas de 1025 px o más. Si el título no cabe a lo ancho, se reduce solo.
+             */
+            tamanoEscritorio?: number | null;
+            /**
+             * Pantallas de 768 a 1024 px. Si el título no cabe a lo ancho, se reduce solo.
+             */
+            tamanoTablet?: number | null;
+            /**
+             * Pantallas de menos de 768 px. Si el título no cabe a lo ancho, se reduce solo.
+             */
+            tamanoMovil?: number | null;
+            /**
+             * Alto de cada línea, en veces el tamaño de la letra. Vacío: 1,4.
+             */
+            interlineado?: number | null;
+            /**
+             * Espacio entre letras, en % del tamaño. Vacío: 0. Negativo las junta.
+             */
+            interletrado?: number | null;
+            /**
+             * Vacío: blanco.
+             */
+            color?: string | null;
+            /**
+             * Vacío: todo en mayúsculas.
+             */
+            mayusculas?: ('mayusculas' | 'normal' | 'minusculas' | 'palabras') | null;
+            /**
+             * Vacío: centrado.
+             */
+            alineacion?: ('izquierda' | 'centro' | 'derecha') | null;
+            posicionXEscritorio?: number | null;
+            posicionYEscritorio?: number | null;
+            posicionXTablet?: number | null;
+            posicionYTablet?: number | null;
+            posicionXMovil?: number | null;
+            posicionYMovil?: number | null;
+          };
+          /**
            * El texto del recuadro de vidrio. No se muestra en móvil.
            */
           parrafo?: string | null;
@@ -1488,6 +1541,33 @@ export interface BloqueFormularioContacto {
   blockType: 'formularioContacto';
 }
 /**
+ * Tipos de letra propios para el título del hero (WOFF2, o WOFF/TTF; máximo 4 MB). Después se eligen en «Tipografía del título» de cada diapositiva. Comprueba que la licencia permite usarla en una web.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fuentes".
+ */
+export interface Fuente {
+  id: number;
+  /**
+   * Cómo aparece en la lista de fuentes del hero (p. ej. «Helvetica Neue Bold»). Solo para el panel.
+   */
+  nombre: string;
+  /**
+   * Lo lee del fichero al subirlo.
+   */
+  formato?: ('woff2' | 'woff' | 'truetype') | null;
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+}
+/**
  * Cada artículo tiene su dirección en partequipos.com/<dirección>/, y no puede repetir la de una página.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1833,6 +1913,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'animaciones';
         value: number | Animacion;
+      } | null)
+    | ({
+        relationTo: 'fuentes';
+        value: number | Fuente;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2269,6 +2353,26 @@ export interface PaginasSelect<T extends boolean = true> {
               titulo?: T;
               tituloArriba?: T;
               tituloAbajo?: T;
+              tipografia?:
+                | T
+                | {
+                    fuente?: T;
+                    peso?: T;
+                    tamanoEscritorio?: T;
+                    tamanoTablet?: T;
+                    tamanoMovil?: T;
+                    interlineado?: T;
+                    interletrado?: T;
+                    color?: T;
+                    mayusculas?: T;
+                    alineacion?: T;
+                    posicionXEscritorio?: T;
+                    posicionYEscritorio?: T;
+                    posicionXTablet?: T;
+                    posicionYTablet?: T;
+                    posicionXMovil?: T;
+                    posicionYMovil?: T;
+                  };
               parrafo?: T;
               imagenFondo?: T;
               imagenFondoMovil?: T;
@@ -2663,6 +2767,24 @@ export interface AnimacionesSelect<T extends boolean = true> {
   descripcion?: T;
   ancho?: T;
   alto?: T;
+  actualizadoPor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fuentes_select".
+ */
+export interface FuentesSelect<T extends boolean = true> {
+  nombre?: T;
+  formato?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;

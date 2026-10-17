@@ -648,7 +648,9 @@ export const getEquiposUsadosDePortada = cache(async (): Promise<EquiposUsado[]>
       where: { and: [{ disponible: { equals: true } }, categoria] },
       depth: 1,
       limit: TARJETAS_POR_PESTANA,
-      sort: "-updatedAt",
+      // Primero las más recientes. No guardamos la fecha de WordPress: manda la de creación
+      // (las nuevas del panel salen antes que las importadas).
+      sort: "-createdAt",
     });
   const noAditamento: Where = { pestanaPortada: { not_equals: "aditamentos" } };
   const [excavadoras, otros, aditamentos] = await Promise.all([

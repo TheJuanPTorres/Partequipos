@@ -15,7 +15,7 @@ export const RUTA_USADA = "/maquinaria-pesada/maquinaria-pesada-usada/";
 export const SLUG_EXCAVADORAS = "excavadoras";
 
 /** La Home V2 enseña tres tarjetas por pestaña, en fila en escritorio y tablet. */
-export const TARJETAS_POR_PESTANA = 3;
+export const TARJETAS_POR_PESTANA = 6;
 
 // --- Sección 2: tarjetas de marca -------------------------------------------
 

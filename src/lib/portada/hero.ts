@@ -2,6 +2,7 @@ import type { Pagina } from "@/payload-types";
 
 import { validarEnlace } from "../fields/reglasPortada";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
+import { tipografiaDe, type TipografiaGuardada, type TipografiaTitulo } from "./tipografia";
 
 export type DiapositivaHero = {
   /** El título en una línea: lo que lee un lector de pantalla y el nombre de la diapositiva. */
@@ -30,6 +31,11 @@ export type DiapositivaHero = {
   fondoMovil: ImagenLista | null;
   frontal: ImagenLista | null;
   enlace: { href: string; nombre: string } | null;
+  /**
+   * «Tipografía del título» del panel (2026-10-17). `null`: el estilo de
+   * siempre (todo vacío, o el título oculto).
+   */
+  tipografia: TipografiaTitulo | null;
 };
 
 /**
@@ -80,6 +86,7 @@ export function diapositivasDeHero(hero: Pagina["hero"]): DiapositivaHero[] {
           conDescripcion && href && nombre && validarEnlace(href) === true
             ? { href, nombre }
             : null,
+        tipografia: tituloVisible ? tipografiaDe(d.tipografia as TipografiaGuardada) : null,
       },
     ];
   });

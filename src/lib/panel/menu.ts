@@ -61,6 +61,7 @@ export const ORDEN_DE_ENTRADAS = [
   "documentos",
   "videos",
   "animaciones",
+  "fuentes",
   // Partes del sitio (globales)
   "cabecera",
   "pie",

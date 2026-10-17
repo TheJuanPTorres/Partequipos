@@ -513,7 +513,12 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 12px 24px;
-  padding: 20px 5%;
+  /*
+   * Abajo, el sitio del botón flotante de WhatsApp (2026-10-17): 16 + 56 + 16 px
+   * y la zona segura. Al final de la página la franja queda por encima de él y
+   * no la tapa.
+   */
+  padding: 20px 5% calc(88px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-fondo-seccion);
   background: var(--color-fondo);
   color: var(--color-texto-suave);

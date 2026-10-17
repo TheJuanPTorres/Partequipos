@@ -2723,3 +2723,35 @@ del PR #188 (después), en claro.
 
 Mismo color de fondo (`#e5242d`), misma posición y misma opacidad. El SVG se
 sirve en 200 como `image/svg+xml`, y el PNG viejo da 404.
+
+## 36. Botón flotante de WhatsApp (2026-10-17, dirección)
+
+En todo el sitio público (layout de `(site)`; no en el panel), fijo abajo a la
+izquierda: `src/components/layout/WhatsApp.tsx` (servidor) y
+`WhatsAppFlotante.tsx` (cliente).
+
+- **Logo:** el SVG del cliente (`partequipos-diseno/assets/whatsapp/`),
+  incrustado sin los grupos vacíos de SVGRepo y con el `viewBox` ajustado al
+  círculo. No hace ninguna petición a otro dominio.
+- **Enlace:** `wa.me` con el número del global de la empresa (el de «Habla con
+  un experto») y el mensaje «Hola, vengo de la web de Partequipos y quiero más
+  información.».
+  - Se abre en una pestaña nueva, con `noopener noreferrer`.
+  - Sin un número válido, no se pinta.
+- **Accesibilidad:**
+  - `aria-label` «Escríbenos por WhatsApp»;
+  - 56 px, por encima del mínimo táctil de 44;
+  - foco con un anillo oscuro y un borde blanco, visible sobre cualquier fondo.
+- **Capas:** el botón está en `z-index` 40. Queda por debajo de la cabecera y
+  su menú móvil (50), del megamenú (49) y de los `<dialog>`, que van en la
+  capa superior.
+- **Zona segura:** `env(safe-area-inset-*)` en su posición. Sin
+  `viewport-fit=cover` valen 0, porque el navegador ya deja el contenido
+  dentro de la zona segura.
+- **No tapa:**
+  - **Los controles del hero**, que van abajo a la izquierda de su tarjeta.
+    Llevan `data-evita-flotante`, y si caen donde está el botón, este sube lo
+    justo con `transform`, 8 px por encima de ellos. Un elemento fijo que se
+    mueve así no cuenta como CLS.
+  - **El pie:** la franja legal reserva 88 px abajo (16 + 56 + 16) más la
+    zona segura. Al final de la página queda por encima del botón.

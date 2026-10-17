@@ -279,12 +279,12 @@
   background: var(--color-fondo);
 }
 
-/* La foto, a 3:2 y con 3 px menos de radio que la tarjeta (ajuste de dirección, 2026-10-17). */
+/* La foto, a 3:2 y con radio de 16 px, 14 menos que la tarjeta (ajuste de dirección, 2026-10-17). */
 .foto {
   position: relative;
   overflow: hidden;
   aspect-ratio: 3 / 2;
-  border-radius: calc(var(--s3-radio) - 3px);
+  border-radius: 16px;
 }
 
 .img {

@@ -204,6 +204,13 @@ describe("el número de serie no se publica", () => {
       "snack bar",
       "placa SN sin leer",
       "SN y motor",
+      // «SN» de un modelo de Case, con datos detrás.
+      "Retroexcavadora Case 580 SN 4x4",
+      "Retroexcavadora Case 580 SN 2015",
+      "Case 580 SN WT",
+      // Sufijos aleatorios de un fichero (inventados).
+      "wp-ficha-case-580-sn-ficha-tecnica-partequipos-4cdVxvPVkzDlq3P71RHw.pdf",
+      "wp-eni-oso-46-partequipos-sNhu3NMEAw7CK123UJyB.jpg",
     ]) {
       assert.equal(mencionaSerial(t), false, t);
       assert.equal(quitarSerial(t, SERIAL), t, t);

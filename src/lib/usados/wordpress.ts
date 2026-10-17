@@ -158,6 +158,17 @@ export function contieneSerial(texto: string, serial: string): boolean {
  */
 const ABREVIATURA_SN = String.raw`s(?:\s?[\/.]\s?|\s)?n\.?(?![A-Za-z]{4})`;
 
+/** Lo mismo sin «S/N», que va con el código de siempre en `MENCION_SERIAL`. */
+const SN_SIN_BARRA = String.raw`s(?:\s?\.\s?|\s)?n\.?(?![A-Za-z]{4})`;
+
+/**
+ * El código detrás de «SN», más estricto que el de «serial»: «SN» es también
+ * parte de modelos («Case 580 SN 4x4») y aparece en los sufijos aleatorios de
+ * los ficheros («-SnM4L2u…»). Hasta 3 letras, al menos 4 cifras seguidas, un
+ * final corto y nada pegado detrás; un año suelto («SN 2015») no cuenta.
+ */
+const CODIGO_SN = String.raw`(?:[A-Za-z]{1,3}[\s-]?(?=\d)|(?!(?:19|20)\d{2}(?![0-9])))\d{4,}(?:-?[A-Za-z0-9]{1,4})?(?![A-Za-z0-9])`;
+
 /**
  * Una mención de serial con su código, sea cual sea: «serial A1234», «serial X
  * 98765», «S/N 12345», «SN: A1234», «S.N. A1234», «SNA1234», «número de serie
@@ -166,7 +177,7 @@ const ABREVIATURA_SN = String.raw`s(?:\s?[\/.]\s?|\s)?n\.?(?![A-Za-z]{4})`;
  * que se va con él.
  */
 const MENCION_SERIAL = new RegExp(
-  String.raw`(?:\s*,)?(?:\s+y\b)?(?:\s+con\b)?(?:\s*-\s*|\s*)(?:\bn[uú]mero\s+de\s+serie|\bserial|\b${ABREVIATURA_SN})\s*[:#.]?\s*-?\s*(?=(?:[A-Za-z]{1,3}[\s-]?)?[A-Za-z0-9-]*\d)(?:[A-Za-z]{1,3}[\s-]?)?[A-Za-z0-9-]{2,}`,
+  String.raw`(?:\s*,)?(?:\s+y\b)?(?:\s+con\b)?(?:\s*-\s*|\s*)(?:(?:\bn[uú]mero\s+de\s+serie|\bserial|\bs\/n)\s*[:#.]?\s*-?\s*(?=(?:[A-Za-z]{1,3}[\s-]?)?[A-Za-z0-9-]*\d)(?:[A-Za-z]{1,3}[\s-]?)?[A-Za-z0-9-]{2,}|\b${SN_SIN_BARRA}\s*[:#.]?\s*-?\s*${CODIGO_SN})`,
   "gi",
 );
 

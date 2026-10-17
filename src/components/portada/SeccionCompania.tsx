@@ -28,7 +28,9 @@ import { DialogoYouTube } from "./DialogoYouTube";
  *    móvil) con radio 32, en la primera mitad del recorrido.
  * 2. Mientras termina de encogerse, aparece el texto infinito que tiene detrás.
  * 3. Al soltarse el fijado entra la sección 8, DEBAJO (nunca encima del vídeo),
- *    y su título hace su barrido al entrar.
+ *    y su título hace su barrido al entrar. En escritorio y tablet sube sobre
+ *    el hueco que deja el vídeo encogido: su título acaba 72 px bajo él
+ *    (`catalogo.module.css`, dirección, 2026-10-17).
  *    EN MÓVIL (dirección, 2026-10-06) todo pasa en la misma pantalla: la
  *    vídeo se encoge anclado arriba (a un 6 % del alto) para dejar sitio
  *    debajo; la sección 8 sube para que su título acabe 24 px bajo él

@@ -338,6 +338,10 @@ export interface MarcasMaquinaria {
   descripcion?: string | null;
   logo?: (number | null) | Media;
   /**
+   * Márcala si el logo es blanco o muy claro: en el menú de la cabecera, que es blanco, se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.
+   */
+  logoOscuroEnMenu?: boolean | null;
+  /**
    * Fondo de la tarjeta de esta marca en el inicio.
    */
   imagenTarjeta?: (number | null) | Media;
@@ -521,6 +525,10 @@ export interface Marca {
    * Con fondo transparente (PNG o WebP). En la página de la marca va sobre una placa oscura, porque los logos actuales del cliente son blancos.
    */
   logo?: (number | null) | Media;
+  /**
+   * Márcala si el logo es blanco o muy claro: en el menú de la cabecera, que es blanco, se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.
+   */
+  logoOscuroEnMenu?: boolean | null;
   /**
    * Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.
    */
@@ -1243,7 +1251,7 @@ export interface BloqueCabeceraVideo {
   blockType: 'cabeceraVideo';
 }
 /**
- * Vídeos del sitio: MP4 o WebM, máximo 4 MB, con imagen de póster obligatoria.
+ * Vídeos del sitio: MP4 o WebM, máximo 10 MB, con imagen de póster obligatoria.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "videos".
@@ -2024,6 +2032,7 @@ export interface MarcasSelect<T extends boolean = true> {
   slug?: T;
   descripcion?: T;
   logo?: T;
+  logoOscuroEnMenu?: T;
   fondoHero?: T;
   seo?:
     | T
@@ -2167,6 +2176,7 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
   slug?: T;
   descripcion?: T;
   logo?: T;
+  logoOscuroEnMenu?: T;
   imagenTarjeta?: T;
   ordenPortada?: T;
   seo?:

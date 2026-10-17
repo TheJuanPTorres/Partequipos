@@ -352,14 +352,20 @@
   width: 96px;
   height: 24px;
   object-position: left center;
-  /* Los logos del cliente son blancos: sobre el fondo blanco no se ven. Se pintan
-     en una sola tinta oscura (silueta), legible y pareja entre marcas. */
-  filter: brightness(0);
-  opacity: 0.85;
   /* El logo mide 24 px, algo más que la línea de 22,4: sin esto la fila con
      logo pasaría de 43 a 45 px (medido) y las marcas no quedarían iguales. */
   margin-block: -1px;
   object-fit: contain;
+}
+
+/*
+ * Cada logo sale con SUS colores (2026-10-17): el submenú es blanco sólido
+ * desde el #205. Solo el que la marca marca con «Pintar el logo en oscuro en el
+ * menú» (los blancos o muy claros) se pinta en una sola tinta oscura.
+ */
+.logo[data-oscuro] {
+  filter: brightness(0);
+  opacity: 0.85;
 }
 
 .titulo:hover,

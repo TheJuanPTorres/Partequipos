@@ -194,4 +194,17 @@ describe("megamenú: logos de marca (petición del cliente, 2026-10-06)", () => 
     const caterpillar = panelRepuestos(datos).grupos[0]!.grupos[0]!;
     assert.equal(caterpillar.logo?.url, LOGO.url);
   });
+
+  it("en oscuro solo si la marca lo pide; si no, con sus colores (2026-10-17)", () => {
+    assert.equal(logoDeMenu(LOGO)?.oscuro, undefined);
+    assert.equal(logoDeMenu(LOGO, false)?.oscuro, undefined);
+    assert.equal(logoDeMenu(LOGO, null)?.oscuro, undefined);
+    assert.equal(logoDeMenu(LOGO, true)?.oscuro, true);
+    assert.equal(logoDeMenu(null, true), undefined);
+    const datos: DatosMegamenu = {
+      ...DATOS,
+      marcasRepuestos: [{ ...DATOS.marcasRepuestos[0]!, logo: LOGO, logoOscuroEnMenu: true }],
+    };
+    assert.equal(panelRepuestos(datos).grupos[0]!.grupos[0]!.logo?.oscuro, true);
+  });
 });

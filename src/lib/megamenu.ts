@@ -22,8 +22,13 @@ import { rutas } from "./routes";
 
 export type EnlaceMenu = { etiqueta: string; href: string };
 
-/** El logo de una marca, ya a la medida con la que se pinta (alto fijo). */
-export type LogoMenu = { url: string; width: number; height: number };
+/**
+ * El logo de una marca, ya a la medida con la que se pinta (alto fijo).
+ * `oscuro`: la casilla «Pintar el logo en oscuro en el menú» de la marca
+ * (2026-10-17): solo entonces se pinta en una tinta oscura; si no, con sus
+ * colores, porque el submenú es blanco sólido desde el #205.
+ */
+export type LogoMenu = { url: string; width: number; height: number; oscuro?: true };
 
 /**
  * Un acordeón: su título, sus enlaces (el primero, «Ver todo») y sus acordeones
@@ -48,6 +53,7 @@ export type ItemCatalogo = {
   nombre: string;
   slug: string;
   logo?: number | LogoCatalogo | null;
+  logoOscuroEnMenu?: boolean | null;
 };
 
 /** Alto con el que se pinta el logo de una marca en el menú (px). */
@@ -58,7 +64,10 @@ export const ALTO_LOGO_MENU = 24;
  * por su proporción real. Sin logo, o sin url o medidas, nada: la marca va
  * solo con su nombre, sin hueco.
  */
-export function logoDeMenu(logo: ItemCatalogo["logo"]): LogoMenu | undefined {
+export function logoDeMenu(
+  logo: ItemCatalogo["logo"],
+  oscuro?: ItemCatalogo["logoOscuroEnMenu"],
+): LogoMenu | undefined {
   if (!logo || typeof logo !== "object") return undefined;
   const { url, width, height } = logo;
   if (!url || !width || !height) return undefined;
@@ -66,6 +75,7 @@ export function logoDeMenu(logo: ItemCatalogo["logo"]): LogoMenu | undefined {
     url,
     width: Math.max(1, Math.round((ALTO_LOGO_MENU * width) / height)),
     height: ALTO_LOGO_MENU,
+    ...(oscuro ? { oscuro: true as const } : {}),
   };
 }
 export type TipoCatalogo = ItemCatalogo & { marca: number | { id: number } | null | undefined };
@@ -107,7 +117,7 @@ function grupoDeMarca(
   titulo = marca.nombre,
   conLogo = true,
 ): GrupoMenu {
-  const logo = conLogo ? logoDeMenu(marca.logo) : undefined;
+  const logo = conLogo ? logoDeMenu(marca.logo, marca.logoOscuroEnMenu) : undefined;
   return {
     titulo,
     ...(logo ? { logo } : {}),

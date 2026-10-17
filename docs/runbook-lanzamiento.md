@@ -342,6 +342,24 @@ $env:LANZAMIENTO_INFORME = "$env:TEMP\lanzamiento-urls.json"
 npm run lanzamiento:urls
 ```
 
+**Los 301 de la base que no están en `url-map.csv`** (las 128 URL antiguas de las unidades usadas, entre otras):
+
+- Desde el 2026-10-17, el mapa del dominio ya no lleva las URL antiguas, solo un resumen con clave de cada una. Así que el comprobador pregunta por las rutas que conoce.
+- Para que las compruebe todas, dirección escribe antes la lista desde la base, con el entorno de un runbook, y la pasa en `LANZAMIENTO_RUTAS_EXTRA`:
+
+```powershell
+# Con DATABASE_URI y BLOB_READ_WRITE_TOKEN de la sesión del runbook (solo lectura).
+$EXTRA = "$HOME\Desktop\partequipos-cierre\origenes-redirects.txt"
+npx tsx scripts/redirects/origenes.ts produccion "salida=$EXTRA"
+$env:LANZAMIENTO_RUTAS_EXTRA = $EXTRA
+npm run lanzamiento:urls
+Remove-Item $EXTRA, Env:LANZAMIENTO_RUTAS_EXTRA
+```
+
+**Esperado:** `Redirects de la base: N; comprobados N. Todos.`
+
+**Cuidado:** algunas de esas rutas llevan el serial de una unidad, y las líneas «✗» las imprimen. Esa salida no se pega en ningún sitio público, y el fichero se borra después.
+
 Recorre las **650 URL** de `docs/url-map.csv`: las 648 del rastreo más 2
 entradas del blog. Sigue cada redirect hasta 5 saltos, sin dejar que `fetch`
 los siga solo. La decisión está en `src/lib/lanzamiento/urlMap.ts`, con

@@ -76,9 +76,9 @@ const tablas = (
 /*
  * La URL ANTIGUA de un 301 (`redirects.desde`) es la de WordPress, y 86 de las
  * 128 de usados llevaban el serial: tiene que estar tal cual para que el 301
- * funcione. Ninguna página la pinta (el sitio responde con el destino), pero
- * se puede leer en `/api/redirects-map/` con su cabecera interna, que no es
- * secreta; y hoy sigue publicada en el WordPress. Se cuenta aparte.
+ * funcione. Ninguna página la pinta (el sitio responde con el destino) y el
+ * mapa de `/api/redirects-map/` solo lleva su resumen con clave (2026-10-17);
+ * hoy sigue publicada en el WordPress. Se cuenta aparte.
  */
 const esRutaAntigua = (t: string, col: string) => t === "redirects" && col === "desde";
 
@@ -101,7 +101,10 @@ for (const t of tablas) {
       const texto = typeof valor === "string" ? valor : JSON.stringify(valor);
       const s = patrones.some((p) => p.test(texto));
       const m = mencionaSerial(texto);
-      const g = !s && seriales.some((x) => contieneSerial(texto, x));
+      // Sin el sufijo aleatorio de 30 caracteres que el Blob añade a cada fichero:
+      // ahí un serial corto aparece por azar (la imagen 796 de producción, 2026-10-17).
+      const sinSufijo = texto.replace(/-[A-Za-z0-9]{30}(?=\.[A-Za-z0-9]{2,5}\b)/g, "");
+      const g = !s && seriales.some((x) => contieneSerial(sinSufijo, x));
       if (!s && !m && !g) continue;
       if (esRutaAntigua(t, col)) {
         total.rutasAntiguas++;

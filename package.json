@@ -77,6 +77,7 @@
     "preview:usados:alt-simular": "tsx scripts/preview/con-entorno.ts payload run scripts/usados/limpiar-alt-serial.ts simular preview",
     "preview:usados:alt-limpiar": "tsx scripts/preview/con-entorno.ts payload run scripts/usados/limpiar-alt-serial.ts limpiar preview",
     "preview:usados:seriales-buscar": "tsx scripts/preview/con-entorno.ts tsx scripts/usados/buscar-seriales.ts preview",
+    "preview:redirects:origenes": "tsx scripts/preview/con-entorno.ts tsx scripts/redirects/origenes.ts preview",
     "preview:aditamentos:simular": "tsx scripts/preview/con-entorno.ts payload run scripts/aditamentos/importar.ts simular preview",
     "preview:aditamentos:importar": "tsx scripts/preview/con-entorno.ts payload run scripts/aditamentos/importar.ts importar preview",
     "preview:aditamentos:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/aditamentos/importar.ts retirar preview",

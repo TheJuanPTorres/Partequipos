@@ -13,6 +13,11 @@
  *   LANZAMIENTO_BASE=https://partequipos.com npm run lanzamiento:urls
  *   LANZAMIENTO_ESTRICTO=true  ...   sale con 1 si algo bloquea
  *   LANZAMIENTO_INFORME=<fichero.json>  guarda el detalle de cada URL
+ *   LANZAMIENTO_RUTAS_EXTRA=<fichero>   orígenes de 301 fuera de url-map.csv, uno por línea
+ *
+ * Los redirects de la base se piden por POST para las rutas que se conocen
+ * (las de url-map.csv, el fichero, los fijos y las extra): desde el 2026-10-17
+ * el mapa del dominio no lleva las URL antiguas, solo su resumen con clave.
  *
  * Solo hace peticiones GET de lectura. No lleva token de derivación: es para
  * dominios públicos; un preview protegido respondería 302 a todo.
@@ -27,6 +32,7 @@ import {
   bloquea,
   clasificar,
   MAX_SALTOS,
+  normalizarRuta,
   parsearCsv,
   rutasAComprobar,
   unirRedirects,
@@ -56,38 +62,76 @@ const delFichero = parsearCsv(
   fs.readFileSync(path.join(raiz, "scripts/import/data/redirects.csv"), "utf8"),
 ).map((f) => ({ desde: f.desde ?? "", hacia: f.hacia ?? "" }));
 
-/**
- * El mapa que aplica el proxy. La cabecera es la misma que pone `proxy.ts`
- * (higiene, no autenticación: ver la ruta). Un preview protegido responde
- * 302 y un mapa vacío es la degradación de la ruta ante un fallo de la base:
- * los dos se tratan como «no se pudo leer».
+// Los fijos de `next.config.ts` cuentan como del fichero: viven en el código.
+const fijos = REDIRECTS_FIJOS.map((r) => ({ desde: r.source, hacia: r.destination }));
+
+/*
+ * Orígenes de redirect que no están en `url-map.csv` (p. ej. las URL antiguas de
+ * las unidades usadas): una ruta por línea en el fichero de
+ * `LANZAMIENTO_RUTAS_EXTRA`. Desde el 2026-10-17 el mapa del dominio no lleva
+ * las URL antiguas (solo su resumen con clave), así que el comprobador solo
+ * puede preguntar por las que conoce.
  */
-async function leerMapa(): Promise<Redirect[]> {
+const extra = process.env.LANZAMIENTO_RUTAS_EXTRA?.trim();
+const rutasExtra = extra
+  ? fs
+      .readFileSync(extra, "utf8")
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter((l) => l.startsWith("/"))
+  : [];
+
+/**
+ * Los redirects de la base que aplica el proxy, por las rutas que conocemos:
+ * POST a `/api/redirects-map/` con la cabecera de `proxy.ts` (higiene, no
+ * autenticación: ver la ruta). Devuelve el destino de cada ruta que redirige y
+ * cuántos redirects hay en total. Un preview protegido responde 302: se trata
+ * como «no se pudo leer».
+ */
+async function consultarMapa(rutas: string[]): Promise<{ deLaBase: Redirect[]; total: number }> {
   const url = `${base}/api/redirects-map/`;
   const r = await fetch(url, {
-    headers: { "x-proxy-internal": "1" },
+    method: "POST",
+    headers: { "x-proxy-internal": "1", "content-type": "application/json" },
+    body: JSON.stringify({ rutas }),
     redirect: "manual",
-    signal: AbortSignal.timeout(20000),
+    signal: AbortSignal.timeout(30000),
   });
   if (r.status !== 200 || !r.headers.get("content-type")?.includes("application/json")) {
     throw new Error(`HTTP ${r.status} en ${url}`);
   }
-  const cuerpo = (await r.json()) as { redirects?: { desde?: string; hacia?: string }[] };
-  const lista = (cuerpo.redirects ?? []).filter((x) => x.desde && x.hacia);
-  if (lista.length === 0) throw new Error(`mapa vacío en ${url}`);
-  return lista.map((x) => ({ desde: x.desde ?? "", hacia: x.hacia ?? "" }));
+  const cuerpo = (await r.json()) as {
+    encontrados?: { ruta?: string; hacia?: string }[];
+    total?: number;
+  };
+  if (!cuerpo.total) throw new Error(`mapa vacío en ${url}`);
+  return {
+    deLaBase: (cuerpo.encontrados ?? [])
+      .filter((x) => x.ruta && x.hacia)
+      .map((x) => ({ desde: x.ruta ?? "", hacia: x.hacia ?? "" })),
+    total: cuerpo.total,
+  };
 }
 
 let deLaBase: Redirect[];
+let totalBase: number;
 try {
-  deLaBase = await leerMapa();
+  // Rutas propias, sin host (url-map.csv guarda URL absolutas de partequipos.com).
+  const conocidas = [
+    ...new Set(
+      [...urls, ...rutasExtra, ...delFichero.map((r) => r.desde), ...fijos.map((r) => r.desde)]
+        .map((u) => normalizarRuta(u, base))
+        .filter((r) => r.startsWith("/")),
+    ),
+  ];
+  ({ deLaBase, total: totalBase } = await consultarMapa(conocidas));
 } catch (error) {
-  console.error(`✗ No se pudo leer el mapa de redirects del dominio: ${(error as Error).message}`);
+  console.error(
+    `✗ No se pudo consultar el mapa de redirects del dominio: ${(error as Error).message}`,
+  );
   console.error("  Sin él, los 301 de los importadores y del panel saldrían como bloqueantes.");
   process.exit(1);
 }
-// Los fijos de `next.config.ts` cuentan como del fichero: viven en el código.
-const fijos = REDIRECTS_FIJOS.map((r) => ({ desde: r.source, hacia: r.destination }));
 const { conflictos, redirects } = unirRedirects([...delFichero, ...fijos], deLaBase);
 const rutas = rutasAComprobar(urls, redirects);
 const mapa = clasificar(rutas, redirects);
@@ -154,7 +198,13 @@ console.log(
   `Dominio: ${base} · ${urls.length} URLs de docs/url-map.csv + ${rutas.length - urls.length} orígenes de redirect que no están en él`,
 );
 console.log(
-  `Redirects esperados: ${redirects.length} (${delFichero.length} del fichero, ${fijos.length} de next.config.ts, ${deLaBase.length} de la base)\n`,
+  `Redirects esperados: ${redirects.length} (${delFichero.length} del fichero, ${fijos.length} de next.config.ts, ${deLaBase.length} de la base)`,
+);
+console.log(
+  `Redirects de la base: ${totalBase}; comprobados ${deLaBase.length}. ` +
+    (totalBase > deLaBase.length
+      ? `Los otros ${totalBase - deLaBase.length} no están en url-map.csv ni en LANZAMIENTO_RUTAS_EXTRA: no se comprueban.\n`
+      : "Todos.\n"),
 );
 for (const [clave, n] of [...cuenta.entries()].sort())
   console.log(`  ${String(n).padStart(4)}  ${clave}`);

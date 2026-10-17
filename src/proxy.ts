@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { resumenDeRuta, type EntradaMapa } from "@/lib/redirects/mapaConClave";
 import { aRutaCanonica, normalizarRuta, separarAncla } from "@/lib/redirects/normalizar";
 
 /**
@@ -23,7 +24,11 @@ import { aRutaCanonica, normalizarRuta, separarAncla } from "@/lib/redirects/nor
  *     sistema de redirects nunca puede tumbar el sitio.
  */
 
-type RedirectEntry = { desde: string; hacia: string; tipo: string };
+/*
+ * Cada entrada va por el RESUMEN con clave de su ruta antigua, no por la ruta
+ * (`mapaConClave`, 2026-10-17): el mapa no lleva las URL antiguas.
+ */
+type RedirectEntry = EntradaMapa;
 
 const TTL_MS = 60_000;
 
@@ -71,7 +76,7 @@ async function cargarMapa(origin: string): Promise<Map<string, RedirectEntry>> {
   const datos = (await respuesta.json()) as { redirects?: RedirectEntry[] };
   const mapa = new Map<string, RedirectEntry>();
   for (const entrada of datos.redirects ?? []) {
-    mapa.set(normalizarRuta(entrada.desde), entrada);
+    if (entrada.clave) mapa.set(entrada.clave, entrada);
   }
   return mapa;
 }
@@ -98,7 +103,8 @@ export async function proxy(request: NextRequest) {
 
   try {
     const mapa = await obtenerMapa(request.nextUrl.origin);
-    const entrada = mapa.get(ruta);
+    if (mapa.size === 0) return NextResponse.next();
+    const entrada = mapa.get(await resumenDeRuta(ruta, process.env.PAYLOAD_SECRET));
     if (!entrada) return NextResponse.next();
 
     // El destino se emite en su forma CANÓNICA (con barra final, ADR 0006).

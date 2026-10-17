@@ -19,11 +19,9 @@ const portada = revalidarPortada("videos");
  * WebM, comprobados POR CONTENIDO (`formatoDeVideoPermitido`, que además
  * rechaza un AVIF disfrazado de MP4).
  *
- * TAMAÑO: máximo 4 MB, porque la subida pasa por una función de Vercel y estas
- * cortan el cuerpo en 4,5 MB. El MP4 de ux-9 pesa 6,5 MB, y hay que reexportarlo
- * igualmente (H.264 de 8 bits, pendiente antes de la fase F). La subida directa
- * del navegador a Blob se estudió y se descartó de momento: ver
- * docs/diseno/decisiones-home-ux9.md §9.
+ * TAMAÑO: máximo 10 MB desde el 2026-10-17 (dirección), por la SUBIDA DIRECTA
+ * del navegador al Blob (§10.39, `REGLAS_SUBIDA_DIRECTA`): la vía normal pasa por
+ * una función de Vercel, que corta el cuerpo en 4,5 MB. Hasta entonces, 4 MB.
  *
  * El control de pausa NO es un campo: es del componente y siempre está
  * (desviación D2). Un editor no puede quitarlo.
@@ -37,7 +35,7 @@ export const Video: CollectionConfig = {
     useAsTitle: "descripcion",
     defaultColumns: ["filename", "descripcion", "decorativo"],
     group: "Archivos",
-    description: "Vídeos del sitio: MP4 o WebM, máximo 4 MB, con imagen de póster obligatoria.",
+    description: "Vídeos del sitio: MP4 o WebM, máximo 10 MB, con imagen de póster obligatoria.",
   },
   access: {
     read: lecturaContenido,
@@ -54,7 +52,7 @@ export const Video: CollectionConfig = {
     focalPoint: false,
   },
   hooks: {
-    // Sin el cierre, un vídeo traído por url se saltaría el tope de 4 MB (§10.32).
+    // Sin el cierre, un vídeo traído por url se saltaría el tope de 10 MB (§10.32).
     beforeOperation: [almacenEsperado, sinDescargaRemota, sinRecorte, formatoDeVideoPermitido],
     afterChange: [portada.afterChange],
     afterDelete: [portada.afterDelete],

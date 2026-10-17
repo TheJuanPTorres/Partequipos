@@ -7,6 +7,7 @@ import { useEffect, useId, useRef } from "react";
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
+import { useAhorroDeDatos } from "@/components/movimiento/useAhorroDeDatos";
 import { useMovimientoReducido, usePausa } from "@/components/movimiento/useMovimiento";
 import type { VideoYouTube } from "@/lib/fields/youtube";
 import type { ImagenLista } from "@/lib/utils/relations";
@@ -126,6 +127,9 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
   const idTarjeta = useId();
   // El póster del vídeo o, sin vídeo, la imagen de la sección.
   const foto = video ? video.poster : imagen;
+  const ahorro = useAhorroDeDatos();
+  // Sin vídeo con «reducir movimiento» ni con ahorro de datos: queda el póster.
+  const conVideo = video !== null && !reducido && !ahorro;
 
   // Vídeo: solo suena a la vista y si nadie lo ha pausado.
   useEffect(() => {
@@ -142,7 +146,7 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
     });
     observador.observe(t);
     return () => observador.disconnect();
-  }, [pausado]);
+  }, [pausado, conVideo]);
 
   // Texto en movimiento a 90 px/s: la duración sale del ancho real del grupo.
   useEffect(() => {
@@ -277,7 +281,7 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
                   style={{ objectPosition: foto.posicion }}
                 />
               ) : null}
-              {video ? (
+              {video && conVideo ? (
                 <video
                   ref={elVideo}
                   className={estilos.medio}

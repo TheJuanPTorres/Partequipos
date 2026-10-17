@@ -33,7 +33,7 @@ const MB = 1024 * 1024;
 
 /**
  * COLECCIONES CON SUBIDA DIRECTA (decisión de dirección del 2026-10-05).
- * `videos` se queda fuera: 4 MB por la vía de siempre.
+ * `videos` entra el 2026-10-17 (dirección), con tope de 10 MB.
  */
 export const REGLAS_SUBIDA_DIRECTA: Readonly<Record<string, ReglaDeSubida>> = {
   documentos: {
@@ -48,6 +48,13 @@ export const REGLAS_SUBIDA_DIRECTA: Readonly<Record<string, ReglaDeSubida>> = {
     maximo: 15 * MB,
     extension: /\.(jpe?g|png|webp)$/i,
     nombreTipo: "una imagen JPEG, PNG o WebP",
+  },
+  videos: {
+    tipos: ["video/mp4", "video/webm"],
+    // 10 MB desde el 2026-10-17 (dirección); antes, 4 MB por la vía normal.
+    maximo: 10 * MB,
+    extension: /\.(mp4|webm)$/i,
+    nombreTipo: "un vídeo MP4 o WebM",
   },
 };
 

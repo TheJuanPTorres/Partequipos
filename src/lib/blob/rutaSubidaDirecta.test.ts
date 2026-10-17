@@ -137,7 +137,7 @@ describe("subida directa: el permiso que firma la ruta endurecida", () => {
   });
 
   it("colección sin regla o nombre con carpeta: 400", async () => {
-    assert.equal(await estado(peticion(cuerpo("clip.mp4", "videos"), { id: 1 }, true)), 400);
+    assert.equal(await estado(peticion(cuerpo("anim.json", "animaciones"), { id: 1 }, true)), 400);
     assert.equal(await estado(peticion(cuerpo("a/b.pdf", "documentos"), { id: 1 }, true)), 400);
   });
 

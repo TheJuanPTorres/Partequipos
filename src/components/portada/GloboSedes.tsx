@@ -33,8 +33,27 @@ const CFG = {
   zoomAlejado: 5.2,
   duracion: 2200,
   margenVista: 80,
-  desplazamiento: { x: -0.2, y: 0.25 },
-  desplazamientoMovil: { x: 0, y: 0.5 },
+  margenVistaMovil: 44,
+  /*
+   * Hasta dónde se puede alejar (2026-10-17, dirección): el globo entero no se
+   * ve nunca. El mapa se limita a Colombia y su entorno, y nunca enseña más de
+   * `anchoMaxGrados` de longitud (Colombia mide unos 12°): lo calcula
+   * `zoomMinimo` según el ancho del mapa. Acercarse a cada sede sigue libre.
+   */
+  limites: [
+    [-82.5, -6],
+    [-63, 14.5],
+  ] as [[number, number], [number, number]],
+  anchoMaxGrados: 34,
+  /*
+   * El hueco del panel lo reserva `relleno` (derechaExtra). Sin desplazamientos
+   * añadidos (en ux-9, −0,2 de ancho a la izquierda y 0,5 de alto en móvil): las
+   * sedes quedan centradas en el área libre. En móvil el mapa va ENCIMA del
+   * panel, no detrás, así que no hay nada que esquivar (el 0,5 de alto lo
+   * llevaba a zoom 1,2: el planeta entero).
+   */
+  desplazamiento: { x: 0, y: 0 },
+  desplazamientoMovil: { x: 0, y: 0 },
   colores: { mar: "#FFFFFF", tierra: "#F4F4F4", fronteras: "#000000", iso: "CO" },
 };
 
@@ -48,6 +67,7 @@ type Mapa = {
   addControl: (c: unknown) => void;
   scrollZoom: { disable: () => void };
   setPadding: (p: Padding) => void;
+  setMinZoom: (z: number) => void;
   flyTo: (o: Record<string, unknown>) => void;
   fitBounds: (b: unknown, o: Record<string, unknown>) => void;
   getStyle: () => { layers?: Capa[] } | undefined;
@@ -96,6 +116,11 @@ function cargarMapbox(): Promise<MapboxGL> {
     document.head.appendChild(s);
   });
   return cargaMapbox;
+}
+
+/** Zoom mínimo para que el mapa no abarque más de `anchoMaxGrados` de longitud (teselas de 512 px). */
+function zoomMinimo(anchoPx: number): number {
+  return Math.max(2.5, Math.log2((Math.max(anchoPx, 1) * 360) / (CFG.anchoMaxGrados * 512)));
 }
 
 const esMovil = () => window.matchMedia("(max-width: 991px)").matches;
@@ -162,8 +187,9 @@ export function GloboSedes({ token, sedes, children }: Props) {
       if (!m || !gl || sedes.length === 0) return;
       const limites = new gl.LngLatBounds();
       sedes.forEach((s) => limites.extend([s.lng, s.lat]));
+      // El `padding` de `fitBounds` SUSTITUYE al del mapa (no se suma): lleva el hueco del panel.
       const p = relleno(anchoPanel(estaPlegado));
-      const g = CFG.margenVista;
+      const g = esMovil() ? CFG.margenVistaMovil : CFG.margenVista;
       m.fitBounds(limites, {
         padding: { top: p.top + g, bottom: p.bottom + g, left: p.left + g, right: p.right + g },
         duration: sinMovimiento() ? 0 : duracion,
@@ -257,6 +283,8 @@ export function GloboSedes({ token, sedes, children }: Props) {
               style: CFG.estilo,
               center: CFG.centro,
               zoom: esMovil() ? CFG.zoomMovil : CFG.zoom,
+              minZoom: zoomMinimo(cont.offsetWidth),
+              maxBounds: CFG.limites,
               projection: "globe",
               attributionControl: false,
               cooperativeGestures: false,
@@ -326,6 +354,7 @@ export function GloboSedes({ token, sedes, children }: Props) {
       const m = mapa.current;
       if (!m) return;
       m.resize();
+      m.setMinZoom(zoomMinimo(contenedorMapa.current?.offsetWidth ?? 0));
       m.setPadding(relleno(anchoPanel(plegado)));
     };
     const alCambiar = () => {

@@ -65,19 +65,13 @@ export const RUTAS: Ruta[] = [
     ruta: "/api/redirects-map/",
     soloEn: "production",
   },
-  {
-    /*
-     * Un 301 REAL de la colección `Redirects` (de `scripts/import/data/redirects.csv`),
-     * que aplica el proxy por el resumen con clave de la ruta (2026-10-17). Si el
-     * proxy no pudiera calcularlo (sin `PAYLOAD_SECRET`, por ejemplo), dejaría
-     * pasar la petición y TODOS los 301 se perderían sin error: aquí daría 404.
-     * Solo en producción, por lo mismo que el mapa (§10.22).
-     */
-    esperado: 301,
-    motivo: "un 301 de la base: prueba que el proxy aplica el mapa con resumen",
-    ruta: "/gracias/",
-    soloEn: "production",
-  },
+  /*
+   * NO hay aquí un 301 de la base (probado y quitado el 2026-10-17, #218): la
+   * prueba pide la URL PROPIA del despliegue, y en ella el proxy pide el mapa a
+   * ese mismo origen sin token; la protección le responde 302 y el mapa llega
+   * vacío (§10.22). Un 301 de la base solo se ve en el dominio publicado:
+   * `npm run lanzamiento:urls` contra él, después de cada cambio del proxy.
+   */
 ];
 
 export function rutasPara(entorno: Entorno): Ruta[] {

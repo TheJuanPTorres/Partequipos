@@ -586,7 +586,8 @@ export function HeroPortada({ diapositivas }: Props) {
         {/* Con una diapositiva no hay controles; la fila conserva su alto. */}
         <div className={estilos.fila}>
           {hayVarias ? (
-            <div className={estilos.flechas}>
+            // Los controles van abajo a la izquierda: el botón de WhatsApp los esquiva.
+            <div className={estilos.flechas} data-evita-flotante="">
               <button
                 type="button"
                 className={estilos.flecha}

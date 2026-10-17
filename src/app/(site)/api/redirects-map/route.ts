@@ -40,8 +40,16 @@ export async function GET(peticion: Request) {
     return NextResponse.json({ redirects: mapa }, { headers: { "cache-control": "no-store" } });
   } catch (error) {
     console.error("[redirects] no se pudo construir el mapa:", error);
-    // Degradación elegante: un mapa vacío deja pasar las peticiones.
-    return NextResponse.json({ redirects: [] }, { status: 200 });
+    /*
+     * 503, NO un mapa vacío con 200 (2026-10-17): el proxy guardaría ese vacío
+     * 60 s como si fuera bueno y no aplicaría ningún 301. Con el 503 no lo
+     * guarda, reintenta en la petición siguiente y, si tenía un mapa anterior,
+     * sigue con él. La degradación (dejar pasar la petición) la hace el proxy.
+     */
+    return NextResponse.json(
+      { error: "mapa no disponible" },
+      { headers: { "cache-control": "no-store" }, status: 503 },
+    );
   }
 }
 

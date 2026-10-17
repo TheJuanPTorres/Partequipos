@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { crearCacheMapa } from "@/lib/redirects/cacheMapa";
 import { resumenDeRuta, type EntradaMapa } from "@/lib/redirects/mapaConClave";
 import { aRutaCanonica, normalizarRuta, separarAncla } from "@/lib/redirects/normalizar";
 
@@ -22,6 +23,9 @@ import { aRutaCanonica, normalizarRuta, separarAncla } from "@/lib/redirects/nor
  *     escenarios: si el global sobrevive, coste ~0; si no, una petición cacheable.
  *  4. Si el mapa no se puede cargar, se deja pasar la petición. Un fallo del
  *     sistema de redirects nunca puede tumbar el sitio.
+ *  5. Un fallo NO se guarda (2026-10-17, `crearCacheMapa`): la ruta responde
+ *     503 si la base falla y la petición siguiente reintenta; con un mapa bueno
+ *     anterior en memoria, se sigue usando ese.
  */
 
 /*
@@ -30,10 +34,7 @@ import { aRutaCanonica, normalizarRuta, separarAncla } from "@/lib/redirects/nor
  */
 type RedirectEntry = EntradaMapa;
 
-const TTL_MS = 60_000;
-
-let cache: { mapa: Map<string, RedirectEntry>; expiraEn: number } | null = null;
-let cargaEnCurso: Promise<Map<string, RedirectEntry>> | null = null;
+const cacheMapa = crearCacheMapa<Map<string, RedirectEntry>>({ ttlMs: 60_000 });
 
 async function cargarMapa(origin: string): Promise<Map<string, RedirectEntry>> {
   /*
@@ -81,21 +82,8 @@ async function cargarMapa(origin: string): Promise<Map<string, RedirectEntry>> {
   return mapa;
 }
 
-async function obtenerMapa(origin: string): Promise<Map<string, RedirectEntry>> {
-  const ahora = Date.now();
-  if (cache && cache.expiraEn > ahora) return cache.mapa;
-
-  // Evita una estampida de peticiones si varias llegan con la caché vencida.
-  cargaEnCurso ??= cargarMapa(origin)
-    .then((mapa) => {
-      cache = { mapa, expiraEn: Date.now() + TTL_MS };
-      return mapa;
-    })
-    .finally(() => {
-      cargaEnCurso = null;
-    });
-
-  return cargaEnCurso;
+function obtenerMapa(origin: string): Promise<Map<string, RedirectEntry>> {
+  return cacheMapa.obtener(() => cargarMapa(origin));
 }
 
 export async function proxy(request: NextRequest) {

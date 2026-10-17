@@ -89,6 +89,8 @@
   background: var(--cab-fondo-mega);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
+  /* Sólido al instante al abrir (sin el fundido de 0,4 s del fondo); al cerrar, sí se funde. */
+  transition: clip-path 0.4s ease-in-out;
 }
 
 /* Sin soporte de desenfoque: fondo casi opaco, para que el menú se lea. */

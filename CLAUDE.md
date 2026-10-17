@@ -2609,6 +2609,26 @@ tocar producción»): **la ruta de redirects no se puede validar en un preview.*
 Hay que verificarla en producción tras promocionar, o resolver antes la
 derivación de la protección para las peticiones internas.
 
+#### Y tampoco en la URL propia del despliegue de producción (2026-10-17)
+
+La prueba de humo de `main` daba **404 en `/gracias/`** pidiéndolo a la URL del
+despliegue (`partequipos-<id>-….vercel.app`), mientras el dominio publicado
+daba **301** hacia `/contactanos/`. Las demás rutas, bien. Arreglar la caché
+del mapa (#221: un fallo ya no se guarda) **no lo cambió**, así que la causa
+no era esa: en la URL del despliegue, la petición interna del proxy a
+`${origin}/api/redirects-map/` no consigue el mapa (desde fuera, esa URL
+responde 302 de la protección). Cuando la instancia ya lo tenía en memoria
+—cargado por el dominio—, también redirigía: por eso el #218 salió verde al
+segundo intento. No se confirmó en los registros de producción.
+
+**Decisión de dirección:** los 301 de la base se comprueban en el **dominio
+publicado** (`DOMINIO_PUBLICADO` en `src/lib/qa/humo.ts`, `enDominio` en la
+ruta), que es lo que ve un visitante, con reintentos ante cualquier respuesta
+inesperada cada 10 s **hasta ~2 min**, por si el dominio aún apunta al
+despliegue anterior. El resto de rutas, en la URL del despliegue, como
+siempre. El día del lanzamiento, `HUMO_DOMINIO` o la constante pasan a
+`partequipos.com`.
+
 ### 10.23 LECCIÓN — cambiar el tema a mano no es cambiar el tema
 
 > **Qué pasó (2026-09-16).** Para medir el contraste del panel en claro y en

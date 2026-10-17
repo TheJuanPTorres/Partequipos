@@ -28,7 +28,7 @@ const megamenuEnCache = unstable_cache(
     const marcas = {
       ...base,
       depth: 1,
-      select: { nombre: true, slug: true, logo: true },
+      select: { nombre: true, slug: true, logo: true, logoOscuroEnMenu: true },
       // `filename` hace falta aunque no se pinte: la `url` la calcula un gancho
       // de lectura a partir de él, y sin él sale `null` (medido en el preview).
       populate: { media: { url: true, filename: true, width: true, height: true } },

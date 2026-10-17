@@ -310,6 +310,9 @@ oficial, no lo pongas.
   Pesada» y «Repuestos» se llenan **solos** con las marcas, los tipos y las
   categorías del catálogo: al crear una marca o un tipo, sale en el menú sin
   hacer nada más.
+  - **Logos de marca en el menú:** salen con sus colores. Si el logo de una
+    marca es blanco o muy claro, marca en esa marca la casilla «Pintar el logo
+    en oscuro en el menú»: así se ve sobre el fondo blanco del menú.
 - **Pie de página:** columnas de enlaces, lema y textos.
 - Los enlaces son rutas del sitio que empiezan por «/» (p. ej.
   `/contactanos/`) o direcciones completas `https://…`.

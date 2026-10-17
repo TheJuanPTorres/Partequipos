@@ -73,6 +73,7 @@ function Acordeon({
             height={grupo.logo.height}
             loading="lazy"
             className={estilos.logo}
+            data-oscuro={grupo.logo.oscuro ? "" : undefined}
           />
         ) : null}
         {grupo.titulo}

@@ -2241,6 +2241,22 @@ CSV del cliente aparecerán solas.
   - Capturas en `partequipos-cierre\capturas\megamenu-logos\`.
 - **Para Andrés:** es una adición al export 2162 por petición del cliente.
 
+#### 26.1.1 Cada logo con sus colores; en oscuro solo si la marca lo pide (2026-10-17, dirección)
+
+- **Antes:** todos los logos se pintaban en una sola tinta oscura con
+  `filter: brightness(0)` (#189), de cuando el submenú era de vidrio. Un logo
+  subido en color salía negro.
+- **Ahora el submenú es blanco sólido (#205)**, así que **cada logo sale con
+  sus colores**. La tinta oscura queda solo para la marca que marca la casilla
+  **«Pintar el logo en oscuro en el menú»** (en las marcas de repuestos y de
+  maquinaria nueva; ayuda: «Márcala si el logo es blanco o muy claro»).
+- **Migración `20261017_170845_logo_oscuro_menu`:** la casilla, desmarcada por
+  defecto, y **marcada solo** en las marcas cuyo logo es uno de los blancos de
+  WordPress (`wp-logo-…`, los de repuestos), con SQL explícito. Así esos siguen
+  viéndose sobre blanco sin que nadie toque el panel.
+- **Sin cambios** en la caja común (96 × 24, `object-fit: contain`) ni en la
+  proporción del #189.
+
 ## 27. Cambios de dirección en la home tras la prueba en móvil (2026-10-05)
 
 Decisiones de dirección del 2026-10-05, cada una en su PR. Las que se apartan

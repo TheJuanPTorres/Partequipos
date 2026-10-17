@@ -24,6 +24,8 @@ export type UnidadFiltrable = {
   anio?: number | null;
   horometro?: number | null;
   pesoOperativo?: number | null;
+  /** Fecha de publicación (ISO), la que ordena «Más recientes». */
+  fechaPublicacion?: string | null;
 };
 
 /**
@@ -107,11 +109,23 @@ const FACETAS_COMUNES: Faceta<UnidadFiltrable>[] = [
   },
 ];
 
-// El primero es el de siempre del listado (año descendente, el id desempata).
+/** Fecha de publicación como número; sin fecha, la más antigua. */
+const publicadaEn = (u: UnidadFiltrable) =>
+  u.fechaPublicacion ? Date.parse(u.fechaPublicacion) : 0;
+
+// El primero es el del listado: la fecha de publicación, de la más reciente a la más
+// antigua (2026-10-17); a igual fecha, el año y, al final, el id más nuevo.
+// «Año más reciente» conserva el orden de antes (por año del equipo).
 const ORDENES: Catalogo<UnidadFiltrable>["ordenes"] = [
   {
     valor: "recientes",
     etiqueta: "Más recientes",
+    comparar: (a, b) =>
+      publicadaEn(b) - publicadaEn(a) || compararNumeros(a.anio, b.anio, "desc") || porId(b, a),
+  },
+  {
+    valor: "anio",
+    etiqueta: "Año más reciente",
     comparar: (a, b) => compararNumeros(a.anio, b.anio, "desc") || porId(a, b),
   },
   {

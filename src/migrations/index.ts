@@ -42,6 +42,7 @@ import * as migration_20261016_041733_ficha_pdf_usados from './20261016_041733_f
 import * as migration_20261016_170244_usados_url_slug_seo from './20261016_170244_usados_url_slug_seo';
 import * as migration_20261016_193118_testimonios_video_cliente from './20261016_193118_testimonios_video_cliente';
 import * as migration_20261017_060430_hero_tipografia_titulo from './20261017_060430_hero_tipografia_titulo';
+import * as migration_20261017_142401_fecha_publicacion_usados from './20261017_142401_fecha_publicacion_usados';
 
 export const migrations = [
   {
@@ -262,6 +263,11 @@ export const migrations = [
   {
     up: migration_20261017_060430_hero_tipografia_titulo.up,
     down: migration_20261017_060430_hero_tipografia_titulo.down,
-    name: '20261017_060430_hero_tipografia_titulo'
+    name: '20261017_060430_hero_tipografia_titulo',
+  },
+  {
+    up: migration_20261017_142401_fecha_publicacion_usados.up,
+    down: migration_20261017_142401_fecha_publicacion_usados.down,
+    name: '20261017_142401_fecha_publicacion_usados'
   },
 ];

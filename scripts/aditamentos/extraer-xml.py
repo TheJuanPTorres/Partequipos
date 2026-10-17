@@ -41,6 +41,7 @@ def al_pagina(el):
             for pm in el.findall("{http://wordpress.org/export/1.2/}postmeta")
         }
         paginas[pid] = {
+            "fechaGmt": el.findtext("{http://wordpress.org/export/1.2/}post_date_gmt") or "",
             "enlace": el.findtext("link") or "",
             "metadesc": meta.get("_yoast_wpseo_metadesc") or "",
             "arbol": arbol_elementor(el),
@@ -146,7 +147,12 @@ for col in columnas(paginas[ID_USADOS]["arbol"]):
 
 datos = {
     "fuente": os.path.basename(fichero),
-    "categoriaUsada": {"enlace": paginas[ID_USADOS]["enlace"], "metadesc": paginas[ID_USADOS]["metadesc"]},
+    # Las 4 unidades no tienen página propia: comparten la fecha de la página que las lista.
+    "categoriaUsada": {
+        "enlace": paginas[ID_USADOS]["enlace"],
+        "metadesc": paginas[ID_USADOS]["metadesc"],
+        "fechaGmt": paginas[ID_USADOS]["fechaGmt"],
+    },
     "nuevos": nuevos,
     "usados": usados,
 }

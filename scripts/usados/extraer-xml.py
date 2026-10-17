@@ -41,6 +41,8 @@ for _, el in ET.iterparse(fichero, events=("end",)):
             unidades.append({
                 "idWp": int(el.findtext(WP + "post_id")),
                 "slug": el.findtext(WP + "post_name"),
+                # Fecha original del anuncio (GMT); `fechaDeWordPress` la pasa a ISO.
+                "fechaGmt": el.findtext(WP + "post_date_gmt"),
                 "enlace": el.findtext("link"),
                 "categoria": primero("categorias"),
                 "marca": primero("marcas"),

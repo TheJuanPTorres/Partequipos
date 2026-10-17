@@ -112,3 +112,33 @@ describe("CATALOGO_USADOS_MARCA", () => {
     );
   });
 });
+
+describe("«Más recientes» ordena por la fecha de publicación", () => {
+  const u = (id: number, anio: number, fechaPublicacion?: string) => ({
+    id,
+    anio,
+    fechaPublicacion,
+  });
+  const lista = [
+    u(1, 2022, "2025-12-16T17:34:51.000Z"),
+    u(2, 2015, "2026-10-05T14:11:43.000Z"),
+    u(3, 2020, "2025-12-16T17:34:51.000Z"),
+    u(4, 2024),
+  ];
+
+  it("la más reciente primero; a igual fecha, el año; sin fecha, al final", () => {
+    const s = leerSeleccion({}, CATALOGO_USADOS);
+    assert.deepEqual(
+      ordenar(lista, CATALOGO_USADOS, s).map((x) => x.id),
+      [2, 1, 3, 4],
+    );
+  });
+
+  it("«Año más reciente» conserva el orden de antes", () => {
+    const s = leerSeleccion({ orden: "anio" }, CATALOGO_USADOS);
+    assert.deepEqual(
+      ordenar(lista, CATALOGO_USADOS, s).map((x) => x.id),
+      [4, 1, 3, 2],
+    );
+  });
+});

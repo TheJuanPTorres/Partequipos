@@ -36,8 +36,9 @@
   --cab-icono: 30px;
   --cab-velo: rgb(255 255 255 / 27%); /* #FFFFFF45 */
   --cab-col-relleno: 10px; /* relleno de cada contenedor de Elementor */
-  /* Con un megamenú abierto la barra toma el vidrio del panel (blanco al 86 %): una sola pieza. */
-  --cab-velo-mega: rgb(255 255 255 / 86%);
+  /* Fondo de la barra con el submenú o el buscador abiertos: SÓLIDO (dirección,
+     2026-10-17), el mismo que el panel del megamenú. */
+  --cab-fondo-mega: var(--color-fondo);
 
   --cab-texto: var(--color-texto);
   --cab-fondo: var(--color-fondo);
@@ -79,22 +80,20 @@
 }
 
 /*
- * Con un megamenú abierto, en CUALQUIER modo de la barra: el mismo vidrio que el panel y
- * sus curvas (mismo tinte, mismo desenfoque), para que sean una sola pieza. En el modo
- * sólido la barra pasaba a ser blanco opaco y el panel, vidrio: no casaban.
+ * Con un megamenú o el buscador abiertos, en CUALQUIER modo de la barra: el mismo fondo
+ * SÓLIDO que el panel y sus curvas, para que sean una sola pieza. Hasta el 2026-10-17
+ * era vidrio (petición de Andrés del 2026-10-14); dirección lo pasa a sólido.
  */
 .cabecera[data-mega="si"],
 .cabecera[data-buscando="si"] {
-  background: var(--cab-velo-mega);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  backdrop-filter: blur(20px) saturate(1.8);
+  background: var(--cab-fondo-mega);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /* Sin soporte de desenfoque: fondo casi opaco, para que el menú se lea. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .cabecera[data-modo="velo"],
-  .cabecera[data-mega="si"],
-  .cabecera[data-buscando="si"] {
+  .cabecera[data-modo="velo"]:not([data-mega="si"], [data-buscando="si"]) {
     background: rgb(255 255 255 / 92%);
   }
 }
@@ -135,14 +134,14 @@
   }
 }
 
-/* Con el megamenú o el buscador abiertos, el filete de la barra encogida va sobre el vidrio. */
+/* Con el megamenú o el buscador abiertos, el filete de la barra encogida va sobre su fondo sólido. */
 @media (min-width: 1025px) {
   .cabecera[data-encogida="si"][data-modo="solido"][data-mega="si"],
   .cabecera[data-encogida="si"][data-modo="solido"][data-buscando="si"] {
     background: linear-gradient(
-      var(--cab-velo-mega) 69px,
+      var(--cab-fondo-mega) 69px,
       var(--color-fondo-seccion) 69px 70px,
-      var(--cab-velo-mega) 70px
+      var(--cab-fondo-mega) 70px
     );
   }
 }
@@ -566,6 +565,40 @@
 
 .panel[hidden] {
   display: none;
+}
+
+/*
+ * Barra de desplazamiento MINIMALISTA (dirección, 2026-10-17): fina, redondeada y
+ * discreta; se intensifica al pasar el ratón. La rueda, el táctil y el teclado no
+ * cambian: solo se pinta la barra. `scrollbar-*` es el estándar (Firefox y Chrome
+ * ≥ 121, que entonces ignora `::-webkit-scrollbar`); `::-webkit-scrollbar`, Safari.
+ */
+.panel {
+  --barra: rgb(16 15 15 / 18%);
+  --barra-activa: rgb(16 15 15 / 45%);
+  scrollbar-width: thin;
+  scrollbar-color: var(--barra) transparent;
+}
+
+.panel:hover {
+  scrollbar-color: var(--barra-activa) transparent;
+}
+
+.panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--barra);
+}
+
+.panel:hover::-webkit-scrollbar-thumb {
+  background: var(--barra-activa);
 }
 
 @media (min-width: 1025px) {

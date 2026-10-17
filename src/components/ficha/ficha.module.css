@@ -117,8 +117,11 @@
    * SIN posición a propósito: el fondo desenfocado (dentro de la galería) se
    * coloca respecto a la TARJETA y la cubre entera, también bajo los datos.
    */
-  /* 3 % de la tarjeta a los lados (40,6 px a 1440). */
-  padding: 0 2.82cqi;
+  /*
+   * 3 % de la tarjeta a los lados (40,6 px a 1440) y, desde el 2026-10-17
+   * (dirección), también arriba: la foto quedaba pegada al borde superior.
+   */
+  padding: 2.82cqi 2.82cqi 0;
 }
 
 .galeria {

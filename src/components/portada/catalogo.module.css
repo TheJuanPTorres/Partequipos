@@ -64,6 +64,35 @@
 }
 
 /*
+ * ESCRITORIO Y TABLET (dirección, 2026-10-17): el vídeo encogido conserva su
+ * caja de pantalla completa y dejaba debajo un hueco blanco de ~30 % del alto.
+ * La sección sube sobre el final del recorrido fijado para que, al soltarse,
+ * su título quede a 72 px (el relleno de las secciones de la portada) del pie
+ * VISIBLE del vídeo. El vídeo se encoge desde el centro a 0,4
+ * (`ESCALA_FINAL` de `SeccionCompania.tsx`) y su tarjeta se ve hasta el
+ * relleno inferior de 1,5 % del ancho (`.encoge`): debajo quedan libres
+ * (1 − 0,4) / 2 del alto más 0,4 × 1,5 % del ancho. Se descuenta el relleno
+ * superior de 40 px. El efecto no cambia; valores fijos en el CSS: sin CLS.
+ * Por encima del velo blanco fijo (z-index 1), que aún no se ha apagado
+ * cuando el título entra. Con movimiento reducido no hay encogido: no sube.
+ */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .seccion {
+    --s8-escala-video: 0.4;
+    --s8-bajo-video: 72px;
+    z-index: 2;
+    margin-top: calc(
+      (var(--s8-escala-video) - 1) / 2 * 100vh - var(--s8-escala-video) * 1.5vw +
+        var(--s8-bajo-video) - 40px
+    );
+    margin-top: calc(
+      (var(--s8-escala-video) - 1) / 2 * 100svh - var(--s8-escala-video) * 1.5vw +
+        var(--s8-bajo-video) - 40px
+    );
+  }
+}
+
+/*
  * MÓVIL (dirección, 2026-10-06): todo en la misma pantalla. La sección sube
  * sobre el final del recorrido fijado de «Nuestra Compañía» para que, al
  * soltarse, el título quede 24 px bajo el vídeo encogido y dentro de la

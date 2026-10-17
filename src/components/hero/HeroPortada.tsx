@@ -586,7 +586,7 @@ export function HeroPortada({ diapositivas }: Props) {
         {/* Con una diapositiva no hay controles; la fila conserva su alto. */}
         <div className={estilos.fila}>
           {hayVarias ? (
-            // Los controles van abajo a la izquierda: el botón de WhatsApp los esquiva.
+            // Los controles (en móvil, los puntos llegan a la derecha): el botón de WhatsApp los esquiva.
             <div className={estilos.flechas} data-evita-flotante="">
               <button
                 type="button"
@@ -634,7 +634,8 @@ export function HeroPortada({ diapositivas }: Props) {
 
         {/* VIDRIO: también en móvil (diseño de sliders), encima de los controles. */}
         {d.parrafo || d.enlace ? (
-          <div className={`${estilos.vidrio} ${estilos.capaParallax}`}>
+          // El recuadro y el «+» van abajo a la derecha: el botón de WhatsApp los esquiva.
+          <div className={`${estilos.vidrio} ${estilos.capaParallax}`} data-evita-flotante="">
             {/*
              * `<div>` y no `<aside>` (auditoría de C, M8): el vidrio es parte
              * del hero, no contenido complementario, y un `<aside>` dentro de

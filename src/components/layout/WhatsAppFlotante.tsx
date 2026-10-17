@@ -11,11 +11,12 @@ import estilos from "./whatsappFlotante.module.css";
  * «Habla con un experto», en una pestaña nueva.
  *
  * El logo es el SVG del cliente (`partequipos-diseno/assets/whatsapp/`),
- * OPTIMIZADO e INCRUSTADO: sin los grupos vacíos de SVGRepo y con el `viewBox`
- * ajustado al círculo. Ninguna petición a otro dominio.
+ * OPTIMIZADO e INCRUSTADO: sin los grupos vacíos de SVGRepo, el círculo verde
+ * pasa al fondo del enlace y el `viewBox` se ajusta al logo blanco, que se
+ * pinta al 57 % del círculo (dirección: más aire dentro). Ninguna petición a otro dominio.
  *
- * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): para NO TAPAR los
- * controles del hero, que van abajo a la izquierda de su tarjeta. Cualquier
+ * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): para NO TAPAR el
+ * recuadro de descripción con su «+» y los controles del hero. Cualquier
  * elemento con `data-evita-flotante` que caiga donde está el botón lo hace
  * subir lo justo (con `transform`: un elemento fijo que se desplaza así no
  * cuenta como CLS). El pie no lo necesita: la franja legal reserva su sitio
@@ -77,8 +78,7 @@ export function WhatsAppFlotante({ href }: { href: string }) {
       aria-label="Escríbenos por WhatsApp"
       className={estilos.flotante}
     >
-      <svg viewBox="-8 -8 471.73 471.73" aria-hidden="true" focusable="false">
-        <circle cx="227.865" cy="227.865" r="235.865" fill="#1BD741" />
+      <svg viewBox="68 68 320 320" aria-hidden="true" focusable="false">
         <path
           fill="#fff"
           d="M68.494,387.41l22.323-79.284c-14.355-24.387-21.913-52.134-21.913-80.638 c0-87.765,71.402-159.167,159.167-159.167s159.166,71.402,159.166,159.167c0,87.765-71.401,159.167-159.166,159.167 c-27.347,0-54.125-7-77.814-20.292L68.494,387.41z M154.437,337.406l4.872,2.975c20.654,12.609,44.432,19.274,68.762,19.274 c72.877,0,132.166-59.29,132.166-132.167S300.948,95.321,228.071,95.321S95.904,154.611,95.904,227.488 c0,25.393,7.217,50.052,20.869,71.311l3.281,5.109l-12.855,45.658L154.437,337.406z"

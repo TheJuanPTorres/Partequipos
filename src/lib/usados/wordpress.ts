@@ -9,6 +9,7 @@
  * `contieneSerial` comprueba que no quede.
  */
 import { textoPlano } from "../blog/wordpress";
+import { motivoAltFlojo } from "../media/altFlojo";
 
 /** Categoría de WordPress → la nuestra (slug de `categorias-usada`) y el tipo en singular. */
 const EXCAVADORA = { slug: "excavadoras", tipo: "Excavadora" };
@@ -150,13 +151,24 @@ export function contieneSerial(texto: string, serial: string): boolean {
 }
 
 /**
- * Una mención de serial con su código, sea cual sea: «serial A1234», «serial X
- * 98765», «S/N 12345», «número de serie 4321». El código lleva al menos un
- * dígito, así que «serial y motor» o «serie ZX» no casan. Con el enlace que lo
- * presenta («, y serial …»), que se va con él.
+ * Las abreviaturas de «número de serie»: «S/N», «SN», «S.N.», «SN.», «S N».
+ * Tras el #200 se vio que «SN <código>» pasaba cuando el código no era el del
+ * campo de la unidad (2026-10-17): 18 textos alternativos publicados. Sin
+ * cuatro letras seguidas detrás, para no confundir «Snorkel» (una marca).
  */
-const MENCION_SERIAL =
-  /(?:\s*,)?(?:\s+y\b)?(?:\s+con\b)?\s*(?:\bn[uú]mero\s+de\s+serie|\bserial|\bs\/n)\s*[:#.]?\s*-?\s*(?=(?:[A-Za-z]{1,3}[\s-]?)?[A-Za-z0-9-]*\d)(?:[A-Za-z]{1,3}[\s-]?)?[A-Za-z0-9-]{2,}/gi;
+const ABREVIATURA_SN = String.raw`s(?:\s?[\/.]\s?|\s)?n\.?(?![A-Za-z]{4})`;
+
+/**
+ * Una mención de serial con su código, sea cual sea: «serial A1234», «serial X
+ * 98765», «S/N 12345», «SN: A1234», «S.N. A1234», «SNA1234», «número de serie
+ * 4321». El código lleva al menos un dígito, así que «serial y motor», «serie
+ * ZX» o «snorkel» no casan. Con el enlace que lo presenta («, y serial …»),
+ * que se va con él.
+ */
+const MENCION_SERIAL = new RegExp(
+  String.raw`(?:\s*,)?(?:\s+y\b)?(?:\s+con\b)?(?:\s*-\s*|\s*)(?:\bn[uú]mero\s+de\s+serie|\bserial|\b${ABREVIATURA_SN})\s*[:#.]?\s*-?\s*(?=(?:[A-Za-z]{1,3}[\s-]?)?[A-Za-z0-9-]*\d)(?:[A-Za-z]{1,3}[\s-]?)?[A-Za-z0-9-]{2,}`,
+  "gi",
+);
 
 /** ¿Queda alguna mención de serial con código en el texto? */
 export function mencionaSerial(texto: string): boolean {
@@ -172,7 +184,7 @@ export function quitarSerial(texto: string, serial: string): string {
   const presentacion = p
     ? new RegExp(
         // «, y serial», «con serial», «y con serial»: los enlaces se van con el serial.
-        `(?:\\s*,)?(?:\\s+y\\b)?(?:\\s+con\\b)?(?:\\s*-\\s*|\\s+)?(?:(?:n[uú]mero\\s+de\\s+)?serial|serie|s\\/?n)?\\s*[:#.]?\\s*-?\\s*${p.source}`,
+        `(?:\\s*,)?(?:\\s+y\\b)?(?:\\s+con\\b)?(?:\\s*-\\s*|\\s+)?(?:(?:n[uú]mero\\s+de\\s+)?serial|serie|${ABREVIATURA_SN})?\\s*[:#.]?\\s*-?\\s*${p.source}`,
         "gi",
       )
     : null;
@@ -231,6 +243,24 @@ export function altDeFoto(
   const util = limpio.replace(/[^\p{L}]/gu, "").length >= 5 && !contieneSerial(limpio, serial);
   const base = util ? limpio : nombre;
   return total > 1 ? `${base}, foto ${n} de ${total}` : base;
+}
+
+/**
+ * Un texto alternativo YA GUARDADO, sin ninguna mención de serial ni ninguno
+ * de los seriales dados (2026-10-17: limpieza de los 18 publicados). Devuelve
+ * el mismo texto si no había nada que quitar, y `null` si quitarlo lo deja
+ * flojo o no se puede cortar con seguridad: nunca un texto vacío.
+ */
+export function altSinSerial(alt: string, seriales: readonly string[]): string | null {
+  // `contieneSerial` también lo ve pegado a otra palabra, donde no se puede cortar.
+  const presentes = seriales.filter((s) => contieneSerial(alt, s));
+  if (!presentes.length && !mencionaSerial(alt)) return alt;
+  let limpio = alt;
+  for (const s of presentes) limpio = quitarSerial(limpio, s);
+  limpio = quitarSerial(limpio, "");
+  const queda = mencionaSerial(limpio) || seriales.some((s) => contieneSerial(limpio, s));
+  if (queda || limpio.replace(/[^\p{L}]/gu, "").length < 5 || motivoAltFlojo(limpio)) return null;
+  return limpio;
 }
 
 /** Extensiones de foto que admite `Media` (sin AVIF: aquí no hay). */

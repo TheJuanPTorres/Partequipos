@@ -188,3 +188,83 @@ previews de `8f16bc6` (antes), de `main` y del PR:
 - **CLS:** 0 en la carga y en el pase manual (0,00001 a 1440, el conocido).
 - **A 1010** la máquina vuelve a montar sobre la parte de abajo del título,
   como antes.
+
+## 7. Tipografía del título desde el panel (2026-10-17, pedido del cliente)
+
+El cliente quiere **control total del título** de cada diapositiva. Cada
+diapositiva tiene el grupo **«Tipografía del título»**, que solo aparece con
+«Mostrar título» marcado. **Todo es opcional**: lo que se deja vacío conserva
+el estilo de siempre (Inter seminegrita, mayúsculas, centrado, blanco y
+arriba).
+
+| Campo        | Qué hace                                                                                             |
+| ------------ | ---------------------------------------------------------------------------------------------------- |
+| Fuente       | Vacía: Inter. Si no, una de **Archivos › Fuentes**                                                   |
+| Grosor       | 100–900. Con una fuente subida, solo cambia algo si la fuente es variable o tiene ese grosor         |
+| Tamaño (3)   | Escritorio (≥ 1025), tablet (768–1024) y móvil (< 768), en px. Si no cabe a lo ancho, se reduce solo |
+| Interlineado | En veces el tamaño (vacío: 1,4)                                                                      |
+| Interletrado | En % del tamaño (se pinta en `em`)                                                                   |
+| Mayúsculas   | TODO MAYÚSCULAS · como está escrito · minúsculas · Cada Palabra                                      |
+| Alineación   | Izquierda, centro o derecha                                                                          |
+| Color        | `#RRGGBB`, con el selector del navegador al lado (`CampoColor`)                                      |
+| Posición (6) | Horizontal y vertical en %, por pantalla (0 = izquierda/arriba, 100 = derecha/abajo)                 |
+
+**Cómo se pinta** (`src/lib/portada/tipografia.ts`, con pruebas):
+
+- Los campos se traducen a variables CSS (`--titulo-*`) en el propio `<h2>`.
+  `hero.module.css` las usa con el valor de siempre como respaldo, así que con
+  todo vacío el HTML y el CSS pintan lo mismo que antes.
+- **Tamaño:** se respeta el del panel mientras quepa. Si no cabe a lo ancho,
+  se aplica el mismo tope de siempre, que usa la línea más larga en escritorio
+  y la palabra más larga en tablet y móvil. En cambio, la reducción del diseño
+  por título largo (`190cqi` / `350cqi`) no se aplica cuando hay tamaño.
+- **Posición:** en la pantalla que la tiene, la capa del título sale del flujo
+  y se coloca en % del área útil. El margen lateral es el de la máquina. Se
+  mueve con `translate`, porque `transform` es el del parallax, y se desplaza
+  su propio %, así que no se sale de la tarjeta.
+  - En su sitio queda una **reserva** invisible con el título del estilo de
+    siempre, para que **la máquina no se mueva**.
+  - Un eje sin valor queda como siempre: centrado en horizontal y, en
+    vertical, arriba a su altura.
+- **Título partido:** la parte de abajo lleva la misma fuente, el mismo color y
+  el resto de la tipografía. **El tamaño no**: conserva el suyo (85 px).
+
+**Fuentes propias** (colección `fuentes`, en «Archivos»):
+
+- **Qué se admite:** WOFF2, WOFF o TTF, comprobados por la firma del contenido
+  y con la extensión correcta (`formatoDeFuentePermitido`), hasta 4 MB.
+- **Dónde viven:** se sirven desde el CDN del Blob, que responde con
+  `Access-Control-Allow-Origin: *`. `font-src` de la CSP admite el Blob.
+- **Qué se carga:** solo se escriben los `@font-face` de las fuentes que usa
+  el hero, con la familia `pq-fuente-<id>` y `font-display: swap`. Declararlas
+  no las descarga: el navegador pide una cuando pinta un título que la usa, y
+  en el HTML solo está el título de la diapositiva activa.
+  - La de la **primera** diapositiva se **precarga**.
+  - La de la **siguiente** se pide con `document.fonts.load` junto con su foto,
+    para que haya llegado cuando se vea. Es el mismo criterio que con las
+    fotos: la activa y la siguiente, nunca todas.
+- **Protección del CSS:** la URL tiene que ser del CDN del Blob y no puede
+  llevar comillas, paréntesis ni espacios, porque acaba dentro de una hoja de
+  estilos.
+- **Grosor:** el `@font-face` declara `font-weight: 100 900`. Así el fichero
+  vale para cualquier grosor y el navegador no fabrica una negrita falsa.
+
+**Aviso de contraste** (`AvisoContrasteTitulo`, `src/lib/portada/contraste.ts`):
+
+- **Cuándo sale:** solo si se elige un color. Avisa si el peor contraste en la
+  zona del título baja de **3:1**, el mínimo de WCAG para texto grande.
+- **Cómo lo estima:**
+  - toma una miniatura de 128 px de la foto, a través de `/_next/image`, que
+    es del mismo origen que el panel y por eso permite leer sus píxeles;
+  - le aplica el velo del hero (`--hero-velo`);
+  - mira el percentil 10 y el 90 de la luminancia en la zona donde cae el
+    título, según su posición.
+- **Qué fotos mira:** la de escritorio con la posición de escritorio y, si hay
+  recorte para móvil, ese recorte con la posición de móvil.
+- **No bloquea el guardado.**
+- **Dato útil:** con el velo, el blanco da al menos 3,2:1 incluso sobre una
+  foto blanca, así que con el color de siempre no avisa nunca.
+
+Migración `20261017_060430_hero_tipografia_titulo`: solo esquema.
+Script de prueba: `npm run preview:tipografia -- sembrar|retirar`, solo en el
+preview y con manifiesto.

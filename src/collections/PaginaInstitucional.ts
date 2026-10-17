@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { avisoField } from "../lib/fields/avisoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { seoField } from "../lib/fields/seoField";
+import { tipografiaTituloField } from "../lib/fields/tipografiaTitulo";
 import { BLOQUES_PAGINA } from "./bloques/bloquesPagina";
 import { validarYouTube } from "../lib/fields/youtube";
 import { enlace, parrafo, texto } from "../lib/fields/textosPortada";
@@ -277,6 +278,8 @@ export const PaginaInstitucional: CollectionConfig = {
                 },
               ],
             },
+            // Fuente, tamaños, color, posición… del título (2026-10-17). Todo opcional.
+            tipografiaTituloField,
             {
               name: "parrafo",
               type: "textarea",

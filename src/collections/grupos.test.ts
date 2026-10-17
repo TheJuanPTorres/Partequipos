@@ -47,8 +47,9 @@ describe("grupos del menú del panel", () => {
   // 24 desde el mapa animado de Nosotros (2026-10-04): animaciones.
   // 25 desde la ficha de producto V2 (2026-10-05): documentos.
   // 26 desde las marcas de usados (paso b del marketplace, 2026-10-13): marcas-usada.
-  it("encuentra las 26 colecciones", async () => {
-    assert.equal((await cargarColecciones()).length, 26);
+  // 27 desde la tipografía del título del hero (2026-10-17): fuentes.
+  it("encuentra las 27 colecciones", async () => {
+    assert.equal((await cargarColecciones()).length, 27);
   });
 
   it("toda colección tiene un grupo aprobado", async () => {

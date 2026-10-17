@@ -288,6 +288,14 @@ oficial, no lo pongas.
   diapositiva en los puntos del carrusel. Al desmarcar una casilla, sus campos
   se esconden en el panel, pero lo escrito no se borra: si vuelves a
   marcarla, reaparece.
+- **Tipografía del título:** cada diapositiva tiene el grupo «Tipografía del
+  título» para cambiar la fuente, el grosor, el tamaño (escritorio, tablet y
+  móvil), el interlineado, el interletrado, las mayúsculas, la alineación, el
+  color y la posición del título en cada tamaño de pantalla. **Todo es
+  opcional:** lo que dejes vacío se queda como siempre. Para usar una fuente
+  propia, súbela antes en **Archivos → Fuentes** (WOFF2, o WOFF/TTF, y con
+  licencia para web). Si eliges un color que puede leerse mal sobre la foto,
+  el panel te avisa, pero no te impide guardar.
 - **Si una diapositiva no tiene la versión vertical, el panel lo avisa** encima
   del campo. En la primera es importante: es lo primero que se ve, y sin ella
   el teléfono descarga la foto de escritorio en grande (la portada llegó a

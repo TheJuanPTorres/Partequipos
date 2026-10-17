@@ -13,7 +13,8 @@ export function avisoField(
     | "AvisoAutorizacion"
     | "AvisoBuscadores"
     | "AvisoRedirecciones"
-    | "AvisoRecorteMovil",
+    | "AvisoRecorteMovil"
+    | "AvisoContrasteTitulo",
   { sidebar = false }: { sidebar?: boolean } = {},
 ): Field {
   return {

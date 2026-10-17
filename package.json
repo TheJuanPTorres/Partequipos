@@ -84,6 +84,7 @@
     "preview:servicio-lubricantes:importar": "tsx scripts/preview/con-entorno.ts payload run scripts/servicio-lubricantes/importar.ts importar preview",
     "preview:servicio-lubricantes:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/servicio-lubricantes/importar.ts retirar preview",
     "preview:hero-sliders": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/hero-sliders-preview.ts",
+    "preview:tipografia": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/tipografia-preview.ts",
     "preview:real:simular": "tsx scripts/preview/con-entorno.ts payload run scripts/contenido-real/importar.ts simular preview",
     "preview:real:importar": "tsx scripts/preview/con-entorno.ts payload run scripts/contenido-real/importar.ts importar preview",
     "preview:testimonios-faq:simular": "tsx scripts/preview/con-entorno.ts payload run scripts/contenido-real/testimonios-faq.ts simular preview despublicar",

@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type AnimationEvent,
@@ -17,6 +18,14 @@ import { preload } from "react-dom";
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { useMovimientoReducido, usePausa } from "@/components/movimiento/useMovimiento";
 import { sizesFondoHero, type DiapositivaHero } from "@/lib/portada/hero";
+import {
+  MIME_FUENTE,
+  fuentesDelHero,
+  posicionDelTitulo,
+  reglasFontFace,
+  tamanosDelTitulo,
+  variablesDeLetra,
+} from "@/lib/portada/tipografia";
 
 import estilos from "./hero.module.css";
 
@@ -251,6 +260,21 @@ export function HeroPortada({ diapositivas }: Props) {
   const hayVarias = total > 1;
   const hayEnlaces = diapositivas.some((s) => s.enlace);
   const d = diapositivas[activo];
+  /*
+   * FUENTES PROPIAS DEL TÍTULO (2026-10-17): se DECLARAN las del hero, pero el
+   * navegador solo descarga la que pinta el título visible. La de la primera
+   * se precarga (es lo primero que se ve); la de la siguiente se pide junto a
+   * su foto (ver el efecto de abajo), así llega antes de que se vea.
+   */
+  const fuentes = useMemo(() => fuentesDelHero(diapositivas), [diapositivas]);
+  const primeraFuente = diapositivas[0]?.tipografia?.fuente;
+  if (primeraFuente) {
+    preload(primeraFuente.url, {
+      as: "font",
+      type: MIME_FUENTE[primeraFuente.formato],
+      crossOrigin: "anonymous",
+    });
+  }
 
   const cargar = useCallback((...indices: number[]) => {
     setCargadas((antes) => {
@@ -297,6 +321,16 @@ export function HeroPortada({ diapositivas }: Props) {
     const t = window.setTimeout(() => setSaliente(null), reducido ? 0 : FUNDIDO_MS);
     return () => window.clearTimeout(t);
   }, [reducido, saliente]);
+
+  /* La fuente de cada diapositiva cargada (la activa y la siguiente), antes de que se vea. */
+  useEffect(() => {
+    if (typeof document === "undefined" || !document.fonts) return;
+    for (const i of cargadas) {
+      const t = diapositivas[i]?.tipografia;
+      if (!t?.fuente) continue;
+      document.fonts.load(`${t.peso ?? 600} 1em "${t.fuente.familia}"`).catch(() => {});
+    }
+  }, [cargadas, diapositivas]);
 
   /*
    * PRECARGA DIFERIDA: la segunda foto, solo cuando la primera ha terminado de
@@ -375,23 +409,17 @@ export function HeroPortada({ diapositivas }: Props) {
    * no mueve su caja. Medido: con el título quitado del flujo, el pase a la
    * diapositiva siguiente desplazaba la caja de la máquina (CLS 0,069 a 390).
    */
-  const titulo = (
-    <h2
-      key={`titulo-${activo}`}
-      id={idTitulo}
-      className={`${estilos.titulo}${d.tituloVisible ? entra : ""}`}
-      data-oculto={d.tituloVisible ? undefined : ""}
-      data-partido={d.tituloPartido ? "" : undefined}
-      style={{
-        ["--hero-titulo-letras" as string]: String(letras),
-        ["--hero-titulo-letras-escritorio" as string]: String(
-          d.tituloPartido ? d.tituloPartido.arriba.length : letras,
-        ),
-        ["--hero-titulo-palabra" as string]: String(palabra),
-        ["--hero-titulo-total" as string]: String(d.titulo.length),
-      }}
-    >
-      <span className={estilos.soloLector}>{d.titulo}</span>
+  const medidas = {
+    ["--hero-titulo-letras" as string]: String(letras),
+    ["--hero-titulo-letras-escritorio" as string]: String(
+      d.tituloPartido ? d.tituloPartido.arriba.length : letras,
+    ),
+    ["--hero-titulo-palabra" as string]: String(palabra),
+    ["--hero-titulo-total" as string]: String(d.titulo.length),
+  };
+  /* Lo pintado del título: las líneas y, en escritorio, la parte de arriba del partido. */
+  const lineas = (
+    <>
       <span aria-hidden="true" className={estilos.tituloEntero}>
         {d.tituloLineas.map((l, i) => (
           <span key={i} className={estilos.tituloLinea}>
@@ -404,8 +432,31 @@ export function HeroPortada({ diapositivas }: Props) {
           {d.tituloPartido.arriba}
         </span>
       ) : null}
+    </>
+  );
+  /*
+   * TIPOGRAFÍA DEL PANEL (2026-10-17): variables CSS en el título; vacías, el
+   * estilo de siempre (`hero.module.css`). Tamaño por pantalla con su atributo.
+   */
+  const letra = variablesDeLetra(d.tipografia);
+  const tamanos = tamanosDelTitulo(d.tipografia);
+  const posicion = posicionDelTitulo(d.tipografia);
+  const titulo = (
+    <h2
+      key={`titulo-${activo}`}
+      id={idTitulo}
+      className={`${estilos.titulo}${d.tituloVisible ? entra : ""}`}
+      data-oculto={d.tituloVisible ? undefined : ""}
+      data-partido={d.tituloPartido ? "" : undefined}
+      {...tamanos.datos}
+      style={{ ...medidas, ...letra, ...tamanos.estilo }}
+    >
+      <span className={estilos.soloLector}>{d.titulo}</span>
+      {lineas}
     </h2>
   );
+
+  const fontFace = reglasFontFace(fuentes);
 
   return (
     <section
@@ -471,7 +522,26 @@ export function HeroPortada({ diapositivas }: Props) {
           data-maquina={d.posicionMaquina}
           data-partido={d.tituloPartido ? "" : undefined}
         >
-          <div className={estilos.capaParallax}>{titulo}</div>
+          {/*
+           * POSICIÓN DEL PANEL (2026-10-17): en las pantallas que la tienen, la
+           * capa del título sale del flujo y va donde diga el panel, y en su
+           * sitio queda una RESERVA invisible con el título del estilo de
+           * siempre: la máquina se queda donde estaba.
+           */}
+          <div className={estilos.capaParallax} {...posicion.datos} style={posicion.estilo}>
+            {titulo}
+          </div>
+          {Object.keys(posicion.datos).length > 0 ? (
+            <div
+              className={`${estilos.titulo} ${estilos.reserva}`}
+              aria-hidden="true"
+              data-partido={d.tituloPartido ? "" : undefined}
+              {...posicion.datos}
+              style={medidas}
+            >
+              {lineas}
+            </div>
+          ) : null}
           <div className={estilos.capaMaquina}>
             {diapositivas.map((s, i) =>
               s.frontal && cargadas.has(i) ? (
@@ -499,7 +569,10 @@ export function HeroPortada({ diapositivas }: Props) {
             key={`abajo-${activo}`}
             aria-hidden="true"
             className={`${estilos.tituloAbajo}${entra}`}
-            style={{ ["--hero-titulo-letras" as string]: String(d.tituloPartido.abajo.length) }}
+            style={{
+              ["--hero-titulo-letras" as string]: String(d.tituloPartido.abajo.length),
+              ...letra,
+            }}
           >
             {d.tituloPartido.abajo}
           </p>
@@ -597,6 +670,9 @@ export function HeroPortada({ diapositivas }: Props) {
           </div>
         ) : null}
       </div>
+
+      {/* Las fuentes propias del hero: declararlas no las descarga (ver arriba). */}
+      {fontFace ? <style dangerouslySetInnerHTML={{ __html: fontFace }} /> : null}
 
       {hayVarias ? (
         <p className={estilos.soloLector} aria-live="polite" aria-atomic="true">

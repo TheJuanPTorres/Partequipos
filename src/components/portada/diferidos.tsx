@@ -20,6 +20,7 @@ export const CarruselMarcas = dynamic(() =>
 export const TarjetasApiladas = dynamic(() =>
   import("./TarjetasApiladas").then((m) => m.TarjetasApiladas),
 );
+export const CarruselUsada = dynamic(() => import("./CarruselUsada").then((m) => m.CarruselUsada));
 export const PestanasUsada = dynamic(() => import("./PestanasUsada").then((m) => m.PestanasUsada));
 export const CarruselLogos = dynamic(() => import("./CarruselLogos").then((m) => m.CarruselLogos));
 export const SeccionCompania = dynamic(() =>

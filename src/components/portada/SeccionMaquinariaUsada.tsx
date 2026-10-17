@@ -8,7 +8,7 @@ import type { DatoFicha, Pestana, TarjetaEquipo } from "@/lib/portada/secciones"
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import estilos from "./maquinariaUsada.module.css";
-import { PestanasUsada } from "./diferidos";
+import { CarruselUsada, PestanasUsada } from "./diferidos";
 
 /**
  * «MAQUINARIA PESADA USADA» DE LA PORTADA — Home V2 de Andrés (2026-10-15),
@@ -37,8 +37,9 @@ const ICONOS: Record<DatoFicha["clave"], typeof IconWeight> = {
   horometro: IconClock,
 };
 
-/** Ancho pintado de la foto: la tarjeta menos su relleno (1 columna en móvil, 3 en el resto). */
-const SIZES_TARJETA = "(max-width: 767px) calc(100vw - 93px), calc(32vw - 76px)";
+/** Ancho pintado de la foto: la tarjeta menos su relleno (1 columna en móvil, 3 en escritorio y 2 en tablet). */
+const SIZES_TARJETA =
+  "(max-width: 767px) calc(100vw - 93px), (max-width: 1024px) calc(47vw - 76px), calc(32vw - 76px)";
 
 /** `idNombre` sale de la posición, no del id de la base: no se exponen ids (CLAUDE.md §8). */
 function Tarjeta({
@@ -195,16 +196,27 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefVerTodo, textos 
         <PestanasUsada
           etiquetadoPor="portada-usada-titulo"
           pestanas={pestanas.map(({ clave, etiqueta }) => ({ clave, etiqueta }))}
-          paneles={pestanas.map((p) =>
-            p.equipos.map((e, i) => (
-              <Tarjeta
-                key={e.id}
-                equipo={e}
-                idNombre={`portada-usada-${p.clave}-${i + 1}`}
-                verTexto={textos.verProductoTexto}
+          paneles={pestanas.map((p) => {
+            const hechas = (sufijo: string) =>
+              p.equipos.map((e, i) => (
+                <Tarjeta
+                  key={e.id}
+                  equipo={e}
+                  idNombre={`portada-usada-${p.clave}${sufijo}-${i + 1}`}
+                  verTexto={textos.verProductoTexto}
+                />
+              ));
+            return (
+              <CarruselUsada
+                key={p.clave}
+                id={`portada-usada-${p.clave}`}
+                etiqueta={`Unidades usadas: ${p.etiqueta}`}
+                nombres={p.equipos.map((e) => e.nombre)}
+                tarjetas={hechas("")}
+                copias={hechas("-copia")}
               />
-            )),
-          )}
+            );
+          })}
         />
       </div>
     </section>

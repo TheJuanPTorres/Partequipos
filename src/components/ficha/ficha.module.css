@@ -813,6 +813,11 @@
     height: 400px;
   }
 
+  .miniatura {
+    height: auto;
+    aspect-ratio: 150 / 140;
+  }
+
   .columnaDatos {
     padding: 4.7cqi;
     background: linear-gradient(0deg, #ffffff 22%, rgb(255 255 255 / 0) 49%);

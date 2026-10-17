@@ -35,6 +35,7 @@ import estilos from "./ficha.module.css";
 export type FotoFicha = { url: string; alt: string; width: number; height: number };
 
 const INTERVALO_MS = 3000;
+const MINIATURAS_VISIBLES = 3;
 
 export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: string }) {
   const [actual, setActual] = useState(0);
@@ -44,6 +45,11 @@ export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: st
   const inicioToque = useRef<number | null>(null);
   const total = fotos.length;
 
+  const carril = useRef<HTMLUListElement>(null);
+  const [hayAnteriores, setHayAnteriores] = useState(false);
+  const [haySiguientes, setHaySiguientes] = useState(total > MINIATURAS_VISIBLES);
+  const conFlechas = total > MINIATURAS_VISIBLES;
+
   const ir = useCallback((i: number) => setActual(((i % total) + total) % total), [total]);
 
   useEffect(() => {
@@ -51,6 +57,43 @@ export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: st
     const t = window.setInterval(() => setActual((i) => (i + 1) % total), INTERVALO_MS);
     return () => window.clearInterval(t);
   }, [reproduciendo, total]);
+
+  const medirCarril = useCallback(() => {
+    const c = carril.current;
+    if (!c) return;
+    setHayAnteriores(c.scrollLeft > 4);
+    setHaySiguientes(c.scrollLeft + c.clientWidth < c.scrollWidth - 4);
+  }, []);
+
+  // Lleva el carril al grupo de 3 que contiene la miniatura `i` (solo en horizontal).
+  const mostrarGrupo = useCallback((grupo: number) => {
+    const c = carril.current;
+    const li = c?.children[grupo * MINIATURAS_VISIBLES] as HTMLElement | undefined;
+    if (!c || !li) return;
+    const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    c.scrollTo({ left: li.offsetLeft - 3, behavior: reducido ? "auto" : "smooth" });
+  }, []);
+
+  const pasarMiniaturas = (sentido: 1 | -1) => {
+    const c = carril.current;
+    if (!c) return;
+    const li = c.children[0] as HTMLElement | undefined;
+    const paso = li ? (li.offsetWidth + 10) * MINIATURAS_VISIBLES : c.clientWidth;
+    const grupo = Math.round(c.scrollLeft / paso) + sentido;
+    mostrarGrupo(Math.max(0, Math.min(grupo, Math.ceil(total / MINIATURAS_VISIBLES) - 1)));
+  };
+
+  // Al cambiar la foto grande, el carril muestra la miniatura activa.
+  useEffect(() => {
+    const c = carril.current;
+    if (!c || total <= MINIATURAS_VISIBLES) return;
+    const li = c.children[actual] as HTMLElement | undefined;
+    if (!li) return;
+    const visible =
+      li.offsetLeft - 3 >= c.scrollLeft - 1 &&
+      li.offsetLeft + li.offsetWidth <= c.scrollLeft + c.clientWidth + 4;
+    if (!visible) mostrarGrupo(Math.floor(actual / MINIATURAS_VISIBLES));
+  }, [actual, total, mostrarGrupo]);
 
   const abrir = () => {
     setReproduciendo(false);
@@ -142,30 +185,54 @@ export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: st
         </div>
 
         {total > 1 ? (
-          <ul className={estilos.miniaturas} aria-label="Elegir foto">
-            {fotos.map((f, i) => (
-              <li key={f.url}>
-                <button
-                  type="button"
-                  className={estilos.miniatura}
-                  aria-current={i === actual ? "true" : undefined}
-                  aria-label={`Ver la foto ${i + 1} de ${total}`}
-                  onClick={() => {
-                    setReproduciendo(false);
-                    ir(i);
-                  }}
-                >
-                  <Image
-                    src={f.url}
-                    alt=""
-                    fill
-                    sizes="(max-width: 767px) 71px, 150px"
-                    className={estilos.fotoMiniatura}
-                  />
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className={estilos.miniaturas} role="group" aria-label="Elegir foto">
+            {conFlechas ? (
+              <button
+                type="button"
+                className={estilos.flechaMiniaturas}
+                onClick={() => pasarMiniaturas(-1)}
+                disabled={!hayAnteriores}
+                aria-label="Miniaturas anteriores"
+              >
+                <IconChevronLeft aria-hidden="true" stroke={2} />
+              </button>
+            ) : null}
+            <ul ref={carril} className={estilos.carrilMiniaturas} onScroll={medirCarril}>
+              {fotos.map((f, i) => (
+                <li key={f.url}>
+                  <button
+                    type="button"
+                    className={estilos.miniatura}
+                    aria-current={i === actual ? "true" : undefined}
+                    aria-label={`Ver la foto ${i + 1} de ${total}`}
+                    onClick={() => {
+                      setReproduciendo(false);
+                      ir(i);
+                    }}
+                  >
+                    <Image
+                      src={f.url}
+                      alt=""
+                      fill
+                      sizes="(max-width: 767px) 30vw, 180px"
+                      className={estilos.fotoMiniatura}
+                    />
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {conFlechas ? (
+              <button
+                type="button"
+                className={estilos.flechaMiniaturas}
+                onClick={() => pasarMiniaturas(1)}
+                disabled={!haySiguientes}
+                aria-label="Miniaturas siguientes"
+              >
+                <IconChevronRight aria-hidden="true" stroke={2} />
+              </button>
+            ) : null}
+          </div>
         ) : null}
       </div>
 

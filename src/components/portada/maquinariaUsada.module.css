@@ -59,6 +59,7 @@
 
 @media (max-width: 1024px) {
   .seccion {
+    --s3-columnas: 2;
     --s3-maquina-factor: 0.46;
     --s3-pestana-interlineado: 13px;
   }
@@ -249,15 +250,7 @@
 }
 
 .panel {
-  display: grid;
-  grid-template-columns: repeat(var(--s3-columnas), minmax(0, 1fr));
-  gap: var(--s3-gap);
   padding: 10px;
-}
-
-/* `display: grid` taparía el `hidden` de los paneles inactivos. */
-.panel[hidden] {
-  display: none;
 }
 
 .panel:focus-visible {
@@ -402,6 +395,143 @@
 
   .pestana,
   .boton {
+    transition: none;
+  }
+}
+
+/* --- Carrusel de las pestañas (2026-10-17) ---------------------------------- */
+
+/*
+ * 3 tarjetas a la vista en escritorio, 2 en tablet y 1 en móvil (`--s3-columnas`),
+ * con el hueco de siempre (`--s3-gap`). La pista se desplaza con `--indice`, como
+ * la de «Maquinaria pesada nueva».
+ */
+.carrusel {
+  position: relative;
+}
+
+.marco {
+  overflow: hidden;
+  /* El gesto horizontal lo lleva el carrusel; el vertical sigue siendo de la página. */
+  touch-action: pan-y;
+}
+
+.pista {
+  display: flex;
+  align-items: stretch;
+  gap: var(--s3-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform: translateX(calc(var(--indice, 0) * (100% + var(--s3-gap)) / var(--s3-columnas) * -1));
+  transition: transform 0.5s ease;
+}
+
+.sinTransicion {
+  transition: none;
+}
+
+.diapositiva {
+  display: flex;
+  flex: 0 0 calc((100% - (var(--s3-columnas) - 1) * var(--s3-gap)) / var(--s3-columnas));
+  min-width: 0;
+}
+
+/* Todas las tarjetas del mismo alto: la del texto más largo manda. */
+.diapositiva > .tarjeta {
+  flex: 1;
+}
+
+/* Puntos y pausa, debajo y centrados. */
+.controles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
+  margin-top: 10px;
+}
+
+.puntos {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Botones de 24 px (WCAG 2.5.8) con el punto de 6 px dibujado dentro. */
+.punto {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.punto::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #000;
+  opacity: 0.2;
+}
+
+.punto[aria-current="true"]::before {
+  opacity: 1;
+}
+
+.punto:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: -2px;
+  border-radius: 50%;
+}
+
+.pausa {
+  width: 24px;
+  height: 24px;
+}
+
+/*
+ * Con tantas tarjetas como caben (o menos) no hay movimiento: sin copias y con
+ * los controles invisibles pero con su alto, para que nada se desplace (CLS).
+ * El número de tarjetas a la vista cambia con el corte.
+ */
+@media (min-width: 1025px) {
+  .carrusel:is([data-total="1"], [data-total="2"], [data-total="3"]) .copia {
+    display: none;
+  }
+
+  .carrusel:is([data-total="1"], [data-total="2"], [data-total="3"]) .controles {
+    visibility: hidden;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .carrusel:is([data-total="1"], [data-total="2"]) .copia {
+    display: none;
+  }
+
+  .carrusel:is([data-total="1"], [data-total="2"]) .controles {
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 767px) {
+  .carrusel[data-total="1"] .copia {
+    display: none;
+  }
+
+  .carrusel[data-total="1"] .controles {
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pista {
     transition: none;
   }
 }

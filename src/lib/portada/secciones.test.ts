@@ -98,20 +98,16 @@ describe("sección 3: pestañas", () => {
   const exc = cat("excavadoras", "Excavadoras");
   const mini = cat("minicargadores", "Minicargadores");
 
-  it("Excavadoras y Otros, tres tarjetas como máximo en cada una (Home V2)", () => {
+  it("Excavadoras y Otros, seis tarjetas como máximo en cada una (carrusel)", () => {
     const r = pestanasDeUsada([
-      equipo(1, exc),
-      equipo(2, mini),
-      equipo(3, exc),
-      equipo(4, exc),
-      equipo(5, cat("cargadores", "Cargadores")),
-      equipo(6, exc),
+      ...[1, 2, 3, 4, 5, 6, 7, 8].map((id) => equipo(id, exc)),
+      ...[9, 10].map((id) => equipo(id, mini)),
     ]);
     assert.deepEqual(
       r.map((p) => [p.etiqueta, p.equipos.map((e) => e.id)]),
       [
-        ["Excavadoras", [1, 3, 4]],
-        ["Otros", [2, 5]],
+        ["Excavadoras", [1, 2, 3, 4, 5, 6]],
+        ["Otros", [9, 10]],
       ],
     );
   });

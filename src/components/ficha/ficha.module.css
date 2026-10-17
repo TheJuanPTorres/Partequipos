@@ -195,29 +195,72 @@
   height: 18px;
 }
 
-/* Miniaturas: 150 × 140, radio 10, en dos columnas bajo la foto (escritorio). */
 /*
- * Miniaturas: celdas de 190 × 160 con 10 px de hueco, y dentro la foto de
- * 150 × 140 arriba a la izquierda (relleno 10), como `remote_tabs` en ux-9.
+ * Miniaturas (2026-10-17, dirección): UNA SOLA FILA del ancho de la foto grande,
+ * con 3 a la vista. Con más de 3 es un carrusel de 3 en 3 (flechas y
+ * deslizamiento); nunca crece hacia abajo. El alto sale de la proporción de cada
+ * miniatura, así que no hay desplazamiento al cargar.
  */
 .miniaturas {
-  display: grid;
-  grid-template-columns: repeat(2, 190px);
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.miniaturas li {
-  padding: 10px;
+.carrilMiniaturas {
+  position: relative;
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  /* 3 px de aire para que el borde de la miniatura activa no se recorte. */
+  padding: 3px;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 3px;
+  scrollbar-width: none;
+}
+
+.carrilMiniaturas::-webkit-scrollbar {
+  display: none;
+}
+
+.carrilMiniaturas li {
+  flex: 0 0 calc((100% - 20px) / 3);
+  scroll-snap-align: start;
+}
+
+.flechaMiniaturas {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(16 15 15 / 0.55);
+  color: var(--color-fondo);
+  cursor: pointer;
+}
+
+.flechaMiniaturas:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.flechaMiniaturas svg {
+  width: 18px;
+  height: 18px;
 }
 
 .miniatura {
   position: relative;
   display: block;
-  width: 150px;
-  height: 140px;
+  width: 100%;
+  aspect-ratio: 150 / 140;
   padding: 0;
   overflow: hidden;
   border: 0;
@@ -714,9 +757,10 @@
     height: 270px;
   }
 
-  .miniaturas {
-    grid-template-columns: repeat(auto-fit, 190px);
-    justify-content: center;
+  /* En tablet la foto grande mide 270 px: la miniatura, un alto fijo menor. */
+  .miniatura {
+    height: 110px;
+    aspect-ratio: auto;
   }
 
   .columnaDatos {
@@ -769,18 +813,9 @@
     height: 400px;
   }
 
-  /* En móvil, celdas de 91 con la foto de 71 × 73 sin relleno. */
-  .miniaturas {
-    grid-template-columns: repeat(auto-fit, 91px);
-  }
-
-  .miniaturas li {
-    padding: 0;
-  }
-
   .miniatura {
-    width: 71px;
-    height: 73px;
+    height: auto;
+    aspect-ratio: 150 / 140;
   }
 
   .columnaDatos {

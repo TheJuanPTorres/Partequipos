@@ -13,7 +13,8 @@
  * Solo en escritorio (≥ 1025 px): por debajo, la cabecera es la móvil.
  *
  * PETICIÓN DE ANDRÉS (2026-10-14), docs/diseno/decisiones-cabecera.md:
- * 1. VIDRIO ESMERILADO como la barra: mismo `blur(20px) saturate(1.8)`. La
+ * 1. (SUSTITUIDO el 2026-10-17: dirección pasa el panel a FONDO SÓLIDO blanco,
+ *    sin desenfoque; el rojo #be1620 sobre blanco da 6,3:1.) VIDRIO ESMERILADO como la barra: mismo `blur(20px) saturate(1.8)`. La
  *    transparencia NO es la misma (27 %): con un velo tan ligero el texto no
  *    llega a AA sobre una foto oscura (medido, 3,8:1 el gris y 2,3:1 el rojo
  *    con el 72 %). El vidrio del panel es blanco al 86 %, y el rojo de los
@@ -38,8 +39,8 @@
   --mega-curva: 20px;
   --mega-radio: 30px;
   --mega-filete-ancho: 1px;
-  /* Vidrio: blanco al 86 %, AA con cualquier fondo (ver arriba). */
-  --mega-vidrio: rgb(255 255 255 / 86%);
+  /* Fondo SÓLIDO (dirección, 2026-10-17); antes, vidrio blanco al 86 %. */
+  --mega-fondo: var(--color-fondo);
   --mega-filete: rgb(16 15 15 / 18%);
   --mega-rojo: #be1620;
 
@@ -68,22 +69,17 @@
 }
 
 /*
- * EL FUNDIDO va en las capas y en el contenido, NO en el panel: un ancestro con
- * `opacity` menor que 1 es «raíz de fondo» y el `backdrop-filter` de sus hijos
- * solo vería lo de dentro (el vidrio perdería el desenfoque durante los 550 ms y
- * lo ganaría de golpe al acabar). Con la opacidad en el propio elemento, el
- * desenfoque está desde el primer fotograma.
+ * EL FUNDIDO va SOLO en el contenido. El fondo (`::after`) y el filete (`::before`)
+ * no se funden: el panel es blanco SÓLIDO desde el primer fotograma, al abrirse y
+ * en reposo (dirección, 2026-10-17; con el fundido se veía translúcido al abrir).
+ * Cerrado, lo oculta `visibility` del panel.
  */
-.caja,
-.panel::before,
-.panel::after {
+.caja {
   opacity: 0;
   transition: opacity 0.55s ease;
 }
 
-.panel[data-abierto="si"] .caja,
-.panel[data-abierto="si"]::before,
-.panel[data-abierto="si"]::after {
+.panel[data-abierto="si"] .caja {
   opacity: 1;
 }
 
@@ -100,10 +96,8 @@
     transition: none;
   }
 
-  /* El contenido y las capas no se desplazan: solo aparecen, sin fundido. */
-  .caja,
-  .panel::before,
-  .panel::after {
+  /* El contenido no se desplaza: solo aparece, sin fundido. */
+  .caja {
     transition: none;
   }
 }
@@ -117,9 +111,51 @@
   max-height: calc(100vh - var(--mega-arriba) - 20px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 39px;
+  /*
+   * 39 px de relleno, de ellos 30 (el radio de las esquinas) como borde
+   * TRANSPARENTE arriba y abajo: la barra de desplazamiento vive en la caja de
+   * relleno, así que no llega a las esquinas redondeadas en ningún navegador
+   * (Chrome ≥ 121 y Firefox ignoran el `margin` de `::-webkit-scrollbar-track`).
+   * El fondo sigue pintándose debajo del borde.
+   */
+  padding: calc(39px - var(--mega-radio)) 39px;
+  border-block: var(--mega-radio) solid transparent;
   border-radius: 0 0 var(--mega-radio) var(--mega-radio);
   background: var(--color-fondo);
+}
+
+/*
+ * Barra de desplazamiento MINIMALISTA (dirección, 2026-10-17): fina, redondeada y
+ * discreta; se intensifica al pasar el ratón. La rueda, el táctil y el teclado no
+ * cambian: solo se pinta la barra. `scrollbar-*` es el estándar (Firefox y Chrome
+ * ≥ 121, que entonces ignora `::-webkit-scrollbar`); `::-webkit-scrollbar`, Safari.
+ */
+.caja {
+  --barra: rgb(16 15 15 / 18%);
+  --barra-activa: rgb(16 15 15 / 45%);
+  scrollbar-width: thin;
+  scrollbar-color: var(--barra) transparent;
+}
+
+.caja:hover {
+  scrollbar-color: var(--barra-activa) transparent;
+}
+
+.caja::-webkit-scrollbar {
+  width: 6px;
+}
+
+.caja::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.caja::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--barra);
+}
+
+.caja:hover::-webkit-scrollbar-thumb {
+  background: var(--barra-activa);
 }
 
 /*
@@ -135,7 +171,7 @@
  * - `::before` FILETE: forma exterior MENOS forma interior (anillo de 1 px),
  *   con `mask-composite`: las capas interiores restan (`subtract`) y las
  *   exteriores suman (`add`). Arriba no hay filete: ahí se une a la cabecera.
- * - `::after` VIDRIO: forma interior, con `backdrop-filter`.
+ * - `::after` FONDO: forma interior, sólida.
  * - `.caja`: el contenido, encima, sin fondo.
  * La forma son 6 capas de gradiente (columna central, franja de abajo, dos
  * cuartos de círculo convexos y las dos curvas cóncavas); con el filete en 0
@@ -240,11 +276,9 @@
       subtract, subtract, subtract, subtract, subtract, subtract, add, add, add, add, add, add;
   }
 
-  /* VIDRIO: la forma interior, con el desenfoque de la barra. */
+  /* FONDO: la forma interior, sólida como la barra abierta. */
   .panel::after {
-    background: var(--mega-vidrio);
-    -webkit-backdrop-filter: blur(20px) saturate(1.8);
-    backdrop-filter: blur(20px) saturate(1.8);
+    background: var(--mega-fondo);
     -webkit-mask-image: var(--int-img);
     -webkit-mask-size: var(--int-tam);
     -webkit-mask-position: var(--int-pos);
@@ -262,19 +296,6 @@
     background: none;
   }
 }
-
-/* Sin desenfoque: el vidrio pasa a casi opaco, para que el texto se lea igual. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .panel::after {
-    background: rgb(255 255 255 / 98%);
-  }
-}
-
-/*
- * La transparencia reducida del sistema NO cambia el vidrio: la barra no lo cambia, y
- * panel y curvas tienen que verse igual que ella (dirección, 2026-10-14). El tinte del 86 %
- * ya cumple AA sin el desenfoque (D1), así que no hace falta un respaldo más opaco.
- */
 
 .verTodo {
   display: inline-flex;
@@ -331,7 +352,7 @@
   width: 96px;
   height: 24px;
   object-position: left center;
-  /* Los logos del cliente son blancos: sobre el vidrio claro no se ven. Se pintan
+  /* Los logos del cliente son blancos: sobre el fondo blanco no se ven. Se pintan
      en una sola tinta oscura (silueta), legible y pareja entre marcas. */
   filter: brightness(0);
   opacity: 0.85;

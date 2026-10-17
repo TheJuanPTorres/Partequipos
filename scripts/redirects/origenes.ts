@@ -31,7 +31,10 @@ const fallar = (m: string): never => {
 if (!destino) fallar("indica el destino: preview, produccion o prueba");
 if (!salida) fallar('indica el fichero: "salida=<ruta>"');
 const raiz = path.resolve(import.meta.dirname, "../..");
-if (path.resolve(salida!).startsWith(raiz)) fallar("el fichero va fuera del repositorio");
+// En Windows las rutas no distinguen mayúsculas: se comparan en minúsculas.
+const comparable = (p: string) => (process.platform === "win32" ? p.toLowerCase() : p);
+if (comparable(path.resolve(salida!)).startsWith(comparable(raiz)))
+  fallar("el fichero va fuera del repositorio");
 if (destino === "preview") {
   const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
   if (!v.permitido) fallar(`NO se hace nada: ${v.motivo}`);

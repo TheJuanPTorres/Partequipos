@@ -2727,12 +2727,14 @@ sirve en 200 como `image/svg+xml`, y el PNG viejo da 404.
 ## 36. Botón flotante de WhatsApp (2026-10-17, dirección)
 
 En todo el sitio público (layout de `(site)`; no en el panel), fijo abajo a la
-izquierda: `src/components/layout/WhatsApp.tsx` (servidor) y
+**derecha** (dirección lo cambió el mismo día; el #214 lo puso a la izquierda): `src/components/layout/WhatsApp.tsx` (servidor) y
 `WhatsAppFlotante.tsx` (cliente).
 
 - **Logo:** el SVG del cliente (`partequipos-diseno/assets/whatsapp/`),
-  incrustado sin los grupos vacíos de SVGRepo y con el `viewBox` ajustado al
-  círculo. No hace ninguna petición a otro dominio.
+  incrustado sin los grupos vacíos de SVGRepo. El círculo verde (#1BD741) es el
+  fondo del enlace, y el logo blanco, con el `viewBox` ajustado a él, ocupa el
+  **57 %** del diámetro, centrado (dirección: se veía apretado). No hace
+  ninguna petición a otro dominio.
 - **Enlace:** `wa.me` con el número del global de la empresa (el de «Habla con
   un experto») y el mensaje «Hola, vengo de la web de Partequipos y quiero más
   información.».
@@ -2749,8 +2751,9 @@ izquierda: `src/components/layout/WhatsApp.tsx` (servidor) y
   `viewport-fit=cover` valen 0, porque el navegador ya deja el contenido
   dentro de la zona segura.
 - **No tapa:**
-  - **Los controles del hero**, que van abajo a la izquierda de su tarjeta.
-    Llevan `data-evita-flotante`, y si caen donde está el botón, este sube lo
+  - **El recuadro de descripción con su «+»**, abajo a la derecha del hero, y
+    **los controles** (en móvil, los puntos llegan a la derecha). Llevan
+    `data-evita-flotante`, y si caen donde está el botón, este sube lo
     justo con `transform`, 8 px por encima de ellos. Un elemento fijo que se
     mueve así no cuenta como CLS.
   - **El pie:** la franja legal reserva 88 px abajo (16 + 56 + 16) más la

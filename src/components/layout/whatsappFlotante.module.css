@@ -1,6 +1,8 @@
 /*
  * Botón flotante de WhatsApp (2026-10-17). 56 px (el mínimo táctil es 44),
- * a 16 px de la esquina inferior izquierda, más la zona segura del móvil.
+ * a 16 px de la esquina inferior DERECHA (dirección, el mismo día; antes, la
+ * izquierda), más la zona segura del móvil. El círculo verde es el propio
+ * enlace y el logo blanco ocupa el 57 % de su diámetro, centrado.
  * Por debajo de la cabecera y su menú (50), del megamenú (49) y de los
  * `<dialog>` (capa superior); por encima del contenido.
  */
@@ -10,11 +12,13 @@
   position: fixed;
   z-index: 40;
   bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  left: calc(16px + env(safe-area-inset-left, 0px));
-  display: block;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  display: grid;
+  place-items: center;
   width: var(--flotante-tam);
   height: var(--flotante-tam);
   border-radius: 50%;
+  background: #1bd741;
   box-shadow: 0 4px 14px rgb(16 15 15 / 0.28);
   transform: translateY(var(--flotante-subida, 0px));
   transition: transform 0.2s ease;
@@ -22,8 +26,8 @@
 
 .flotante svg {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 57%;
+  height: 57%;
 }
 
 /* Foco visible sobre cualquier fondo: anillo oscuro con un borde blanco. */

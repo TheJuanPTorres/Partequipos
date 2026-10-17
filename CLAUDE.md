@@ -1265,6 +1265,23 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 >   campo y el brazo se borra de «Imágenes».
 > - **Reabre el paso 0 de README §7 solo para esta imagen:** antes del
 >   lanzamiento, se sustituye o se licencia. El resto de §10.38 sigue cerrado.
+>
+> **SEGUNDA EXCEPCIÓN TEMPORAL (decisión de dirección, 2026-10-17): las 7 FOTOS
+> DE CIUDAD** de las tarjetas de las sedes (sección 9 de la portada), las de la
+> copia de demostración de Andrés (licencia **L3** sin confirmar), hasta que el
+> cliente mande las suyas.
+>
+> - **Qué:** `Bogota`, `Antioquia` (Medellín), `Cali`, `Bucaramanga`,
+>   `Monteria`, `Istmina` e `Ibague`. **Barranquilla no lleva foto** (la copia no
+>   la tenía) y su tarjeta no reserva el hueco.
+> - **Cómo llegan:** se suben a «Imágenes» desde el panel y se asignan en el
+>   campo «Foto» de cada sede, con `runbook-sedes-fotos-ciudad.md` (en
+>   `Desktop\partequipos-cierre\`, con las fotos en `sedes-fotos-ciudad\`).
+>   Nunca entran en el repositorio ni en `public/`.
+> - **Cuándo salen:** cuando llegue la foto del cliente se elige en el mismo
+>   campo y la de Andrés se borra de «Imágenes».
+> - **Reabre el paso 0 de README §7 solo para estas 7 imágenes:** antes del
+>   lanzamiento, se sustituyen o se licencian.
 
 > **Decisión de dirección del 2026-10-02.** Para enseñar el avance, la home de
 > producción puede llevar los assets que hasta ahora solo iban al preview:

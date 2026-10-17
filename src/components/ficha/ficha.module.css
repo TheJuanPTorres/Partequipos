@@ -117,8 +117,11 @@
    * SIN posición a propósito: el fondo desenfocado (dentro de la galería) se
    * coloca respecto a la TARJETA y la cubre entera, también bajo los datos.
    */
-  /* 3 % de la tarjeta a los lados (40,6 px a 1440). */
-  padding: 0 2.82cqi;
+  /*
+   * 3 % de la tarjeta a los lados (40,6 px a 1440) y, desde el 2026-10-17
+   * (dirección), también arriba: la foto quedaba pegada al borde superior.
+   */
+  padding: 2.82cqi 2.82cqi 0;
 }
 
 .galeria {
@@ -131,7 +134,12 @@
 
 .visor {
   position: relative;
-  height: 500px;
+  /*
+   * 500 px MENOS el relleno de arriba de la columna (2026-10-17): así la columna
+   * de la galería mide lo mismo que antes, la tarjeta no crece y el título, que va
+   * centrado en vertical, no se mueve cuando la galería es la columna más alta.
+   */
+  height: calc(500px - 2.82cqi);
   overflow: hidden;
   border-radius: 32px;
   touch-action: pan-y;

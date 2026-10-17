@@ -19,6 +19,11 @@ export type Ruta = {
   cabeceras?: Record<string, string>;
   /** Código que tiene que dar. Sin él, 200. */
   esperado?: number;
+  /**
+   * Se pide al DOMINIO PUBLICADO y no a la URL del despliegue (ver
+   * `DOMINIO_PUBLICADO`), con reintentos de `reintentoDominioMs`.
+   */
+  enDominio?: true;
   /** Por qué está en la lista. Se imprime al fallar. */
   motivo: string;
   ruta: string;
@@ -72,13 +77,41 @@ export const RUTAS: Ruta[] = [
      * proxy no pudiera calcularlo (sin `PAYLOAD_SECRET`, por ejemplo), dejaría
      * pasar la petición y TODOS los 301 se perderían sin error: aquí daría 404.
      * Solo en producción, por lo mismo que el mapa (§10.22).
+     *
+     * EN EL DOMINIO PUBLICADO, no en la URL del despliegue (dirección,
+     * 2026-10-17): en la URL propia del despliegue, la petición interna del
+     * proxy al mapa no lo consigue y daba 404 mientras el dominio daba 301
+     * (CLAUDE.md §10.22). El dominio es lo que ve un visitante.
      */
+    enDominio: true,
     esperado: 301,
     motivo: "un 301 de la base: prueba que el proxy aplica el mapa con resumen",
     ruta: "/gracias/",
     soloEn: "production",
   },
 ];
+
+/**
+ * El dominio que ven los visitantes. Las rutas `enDominio` se piden aquí.
+ * `HUMO_DOMINIO` lo cambia (el día del lanzamiento, `partequipos.com`).
+ */
+export const DOMINIO_PUBLICADO = "https://partequipos.vercel.app";
+
+/**
+ * Justo al desplegar, el dominio puede seguir unos segundos en el despliegue
+ * ANTERIOR. Una ruta `enDominio` se reintenta ante CUALQUIER respuesta
+ * inesperada (también un 404) cada `ESPERA_DOMINIO_MS`, hasta ~2 min.
+ */
+export const REINTENTO_DOMINIO_MS = 120_000;
+export const ESPERA_DOMINIO_MS = 10_000;
+
+/** ¿Se reintenta una ruta del dominio? Mientras no dé lo esperado y quede tiempo. */
+export function debeReintentarEnDominio(resultado: Resultado, transcurridoMs: number): boolean {
+  if (resultado.estado === (resultado.esperado ?? 200)) {
+    return false;
+  }
+  return transcurridoMs + ESPERA_DOMINIO_MS <= REINTENTO_DOMINIO_MS;
+}
 
 export function rutasPara(entorno: Entorno): Ruta[] {
   return RUTAS.filter((r) => !r.soloEn || r.soloEn === entorno);

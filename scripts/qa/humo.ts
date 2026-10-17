@@ -17,6 +17,9 @@
 import { conDerivacion } from "../../src/lib/preview/derivacion.mjs";
 import {
   debeReintentar,
+  debeReintentarEnDominio,
+  DOMINIO_PUBLICADO,
+  ESPERA_DOMINIO_MS,
   esperaMs,
   rutasPara,
   veredicto,
@@ -28,6 +31,7 @@ import {
 const base = process.env.HUMO_URL?.trim().replace(/\/$/, "");
 const entorno = (process.env.HUMO_ENTORNO?.trim() || "preview") as Entorno;
 const bypass = process.env.HUMO_BYPASS?.trim();
+const dominio = (process.env.HUMO_DOMINIO?.trim() || DOMINIO_PUBLICADO).replace(/\/$/, "");
 
 if (!base) {
   console.error("✗ Falta HUMO_URL: la URL del despliegue que se va a comprobar.");
@@ -54,6 +58,9 @@ if (entorno === "preview" && !bypass) {
 const dormir = (ms: number) => new Promise((listo) => setTimeout(listo, ms));
 
 async function comprobar(ruta: Ruta): Promise<Resultado> {
+  // Las rutas `enDominio` van al dominio publicado (src/lib/qa/humo.ts).
+  const origen = ruta.enDominio ? dominio : base!;
+  const inicio = Date.now();
   let intentos = 0;
   let resultado: Resultado = { intentos: 0, ruta: ruta.ruta };
 
@@ -63,13 +70,13 @@ async function comprobar(ruta: Ruta): Promise<Resultado> {
     // (`derivacion.mjs`); en producción va vacío.
     const cabeceras = conDerivacion(
       { ...(ruta.cabeceras ?? {}) },
-      `${base}${ruta.ruta}`,
-      base!,
+      `${origen}${ruta.ruta}`,
+      origen,
       bypass,
     );
 
     try {
-      const respuesta = await fetch(`${base}${ruta.ruta}`, {
+      const respuesta = await fetch(`${origen}${ruta.ruta}`, {
         headers: cabeceras,
         // `manual`: seguir un 3xx escondería que la protección no se derivó.
         redirect: "manual",
@@ -89,6 +96,13 @@ async function comprobar(ruta: Ruta): Promise<Resultado> {
       };
     }
 
+    if (ruta.enDominio) {
+      if (!debeReintentarEnDominio(resultado, Date.now() - inicio)) {
+        return resultado;
+      }
+      await dormir(ESPERA_DOMINIO_MS);
+      continue;
+    }
     if (!debeReintentar(resultado)) {
       return resultado;
     }
@@ -100,7 +114,11 @@ async function comprobar(ruta: Ruta): Promise<Resultado> {
 
 const host = new URL(base).hostname;
 console.log(`PRUEBA DE HUMO · ${entorno} · ${host}`);
-console.log(`Token de derivación: ${bypass ? "presente" : "no hace falta"}\n`);
+console.log(`Token de derivación: ${bypass ? "presente" : "no hace falta"}`);
+if (rutasPara(entorno).some((r) => r.enDominio)) {
+  console.log(`Rutas del dominio publicado: ${new URL(dominio).hostname}`);
+}
+console.log("");
 
 const rutas = rutasPara(entorno);
 const resultados: Resultado[] = [];
@@ -119,11 +137,12 @@ if (v.codigo === 0) {
 console.error(`\n✗ FALLÓ la prueba de humo: ${v.fallos.length} de ${v.total} rutas.`);
 for (const fallo of v.fallos) {
   const ruta = rutas.find((r) => r.ruta === fallo.ruta);
+  const donde = ruta?.enDominio ? ` (en ${new URL(dominio).hostname})` : "";
   const detalle =
     fallo.error !== undefined
       ? `error de red (${fallo.error})`
       : `HTTP ${fallo.estado} (se esperaba ${fallo.esperado ?? 200})`;
-  console.error(`  · ${fallo.ruta} → ${detalle} tras ${fallo.intentos} intento(s)`);
+  console.error(`  · ${fallo.ruta}${donde} → ${detalle} tras ${fallo.intentos} intento(s)`);
   console.error(`    Está en la lista porque ${ruta?.motivo}`);
 }
 console.error("\n  Un 500 aquí es el modo de fallo de CLAUDE.md §10.18: el build pasa en");

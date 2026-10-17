@@ -3,6 +3,9 @@ import { describe, it } from "node:test";
 
 import {
   debeReintentar,
+  debeReintentarEnDominio,
+  DOMINIO_PUBLICADO,
+  ESPERA_DOMINIO_MS,
   esperaMs,
   INTENTOS_MAXIMOS,
   RUTAS,
@@ -38,6 +41,12 @@ describe("rutas de la prueba de humo", () => {
     const r = rutasPara("production").find((x) => x.ruta === "/gracias/");
     assert.equal(r?.esperado, 301);
     assert.ok(!rutasPara("preview").some((x) => x.ruta === "/gracias/"));
+  });
+
+  it("los 301 de la base se piden al DOMINIO publicado; el resto, al despliegue (§10.22)", () => {
+    assert.equal(DOMINIO_PUBLICADO, "https://partequipos.vercel.app");
+    const enDominio = RUTAS.filter((r) => r.enDominio).map((r) => r.ruta);
+    assert.deepEqual(enDominio, ["/gracias/"]);
   });
 
   it("el mapa de redirects se mide SOLO en producción (§10.22)", () => {
@@ -80,6 +89,24 @@ describe("reintentos acotados", () => {
       esperas.reduce((a, b) => a + b, 0),
       7000,
     );
+  });
+});
+
+describe("reintentos en el dominio publicado (hasta ~2 min)", () => {
+  const r404: Resultado = { esperado: 301, estado: 404, intentos: 1, ruta: "/gracias/" };
+
+  it("reintenta un 404: el dominio puede seguir en el despliegue anterior", () => {
+    assert.equal(debeReintentarEnDominio(r404, 0), true);
+  });
+
+  it("no reintenta si ya dio lo esperado", () => {
+    assert.equal(debeReintentarEnDominio({ ...r404, estado: 301 }, 0), false);
+  });
+
+  it("para a los 2 minutos: el fallo real sale en rojo", () => {
+    assert.equal(debeReintentarEnDominio(r404, 120_000 - ESPERA_DOMINIO_MS), true);
+    assert.equal(debeReintentarEnDominio(r404, 120_000 - ESPERA_DOMINIO_MS + 1), false);
+    assert.equal(veredicto([r404]).codigo, 1);
   });
 });
 

@@ -1238,9 +1238,14 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 > («retirar §10.38 o confirmar las licencias»).
 >
 > **Hallazgo al cerrar:** guardar el global no refrescó la ficha hasta un
-> redeploy. Causa probable, leída en Next 16.3.5: `revalidatePath` con patrón
-> no lleva el grupo `(site)`, y la etiqueta de la página sí. Ver el PR del
-> arreglo, #194 (sin fusionar).
+> redeploy. Causa, leída en Next 16.3.5: `revalidatePath` con patrón no
+> llevaba el grupo `(site)`, y la etiqueta de la página sí. **Arreglado en el
+> #194 (fusionado, `27af8b1`)** para las fichas nuevas y de usados, las marcas
+> y categorías de repuestos y las páginas de usados (`PATRONES_DE_PAGINA`,
+> guardarraíl `revalidation.test.ts`). Comprobado por efecto en un preview: el
+> gancho real del global da `REVALIDATED` en la CDN a los 6 s; el patrón sin
+> `(site)`, nada. **Al probarlo desde el panel, guardar CON un cambio:** en
+> Payload 3.89 «Guardar» está desactivado sin cambios y no envía nada.
 >
 > **EXCEPCIÓN TEMPORAL, UNA SOLA IMAGEN (decisión de dirección, 2026-10-16):**
 > el **brazo de excavadora recortado** de Andrés vuelve a la cabecera de

@@ -28,9 +28,16 @@ import { DialogoYouTube } from "./DialogoYouTube";
  *    móvil) con radio 32, en la primera mitad del recorrido.
  * 2. Mientras termina de encogerse, aparece el texto infinito que tiene detrás.
  * 3. Al soltarse el fijado entra la sección 8, DEBAJO (nunca encima del vídeo),
- *    y su título hace su barrido al entrar. En escritorio y tablet sube sobre
- *    el hueco que deja el vídeo encogido: su título acaba 72 px bajo él
- *    (`catalogo.module.css`, dirección, 2026-10-17).
+ *    En escritorio y tablet sube sobre el hueco que deja el vídeo encogido:
+ *    su título acaba 72 px bajo él (`catalogo.module.css`, dirección,
+ *    2026-10-17).
+ * 4. LA LLAMADA APARECE A MITAD DEL EFECTO (dirección, 2026-10-17): mientras
+ *    dura el fijado, la sección 8 se queda FIJA (`sticky`) en su sitio final,
+ *    oculta; cuando el vídeo encogido ya no tapa el sitio de su título
+ *    (calculado en cada fotograma, no un valor fijo), aparece ahí con un
+ *    fundido y unos px de desplazamiento, y después los botones, escalonados.
+ *    Lo activa `data-llamada` en esta sección; sin JavaScript o con
+ *    movimiento reducido, la llamada se ve siempre, en su sitio.
  *    EN MÓVIL (dirección, 2026-10-06) todo pasa en la misma pantalla: la
  *    vídeo se encoge anclado arriba (a un 6 % del alto) para dejar sitio
  *    debajo; la sección 8 sube para que su título acabe 24 px bajo él
@@ -83,6 +90,9 @@ function finEncogidoMovil(alto: number): number {
   const subida = (1 - BAJADA_MOVIL - ESCALA_FINAL_MOVIL) * alto - TITULO_BAJO_VIDEO_PX;
   return Math.min(0.9, Math.max(FIN_ENCOGIDO, 1 - subida / RECORRIDO_PX));
 }
+/** Aire mínimo entre el pie del vídeo y el título de la llamada para mostrarla. */
+const LLAMADA_AIRE_PX = 16;
+
 /** ux-9: `scrub: 0.6` — el efecto alcanza al scroll en ~0,6 s. */
 const ALCANCE_S = 0.6;
 /** ux-9: `MQ_SPEED`. */
@@ -116,6 +126,7 @@ const tramo = (p: number, desde: number, hasta: number) =>
   Math.min(1, Math.max(0, (p - desde) / (hasta - desde)));
 
 export function SeccionCompania({ video, imagen = null, youtube, textos }: Props) {
+  const seccion = useRef<HTMLElement>(null);
   const recorrido = useRef<HTMLDivElement>(null);
   const encoge = useRef<HTMLDivElement>(null);
   const fondo = useRef<HTMLDivElement>(null);
@@ -171,11 +182,42 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
     const caja = encoge.current;
     const blanco = fondo.current;
     const texto = marquee.current;
-    if (!zona || !caja || !blanco || !texto || reducido) return;
+    const sec = seccion.current;
+    if (!zona || !caja || !blanco || !texto || !sec || reducido) return;
     const mq = matchMedia("(max-width: 767px)");
     let frame = 0;
     let actual = 0;
     let antes = 0;
+
+    // La llamada (sección 8), si va justo detrás: fija en su sitio final y oculta
+    // hasta que el vídeo deja libre el sitio de su título.
+    const siguiente = sec.nextElementSibling;
+    const llamada =
+      siguiente instanceof HTMLElement && siguiente.hasAttribute("data-llamada-compania")
+        ? siguiente
+        : null;
+    const tituloLlamada = llamada?.querySelector<HTMLElement>("h2") ?? null;
+    let tituloFinal = Infinity;
+    const medirLlamada = () => {
+      if (!llamada) return;
+      // Al soltarse el fijado, la sección empieza en el pie del recorrido más
+      // su margen (negativo); `sticky` con este `bottom` la deja ahí todo el rato.
+      const alto = document.documentElement.clientHeight;
+      const arriba =
+        zona.lastElementChild instanceof HTMLElement
+          ? zona.lastElementChild.offsetHeight + parseFloat(getComputedStyle(llamada).marginTop)
+          : 0;
+      llamada.style.setProperty("--llamada-abajo", `${alto - arriba - llamada.offsetHeight}px`);
+      tituloFinal = arriba + (tituloLlamada?.offsetTop ?? 0);
+    };
+    const decidirLlamada = () => {
+      if (!llamada) return;
+      // Pie VISIBLE del vídeo: la caja escalada menos su relleno inferior escalado.
+      const r = caja.getBoundingClientRect();
+      const escala = r.height / (caja.offsetHeight || 1);
+      const pie = r.bottom - parseFloat(getComputedStyle(caja).paddingBottom) * escala;
+      sec.dataset.llamada = pie + LLAMADA_AIRE_PX <= tituloFinal ? "visible" : "oculta";
+    };
 
     const objetivo = () => {
       const inicio = zona.getBoundingClientRect().top + scrollY;
@@ -199,6 +241,7 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
       caja.style.setProperty("--compania-radio", `${RADIO_FINAL_PX * encogido}px`);
       texto.style.opacity = String(tramo(actual, desdeTexto, hastaTexto));
       blanco.style.opacity = String(opacidadFondo(actual));
+      decidirLlamada();
       frame = actual === meta ? 0 : requestAnimationFrame(pintar);
     };
     const alScroll = () => {
@@ -217,14 +260,33 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
       } else if (!e?.isIntersecting && escuchando) {
         removeEventListener("scroll", alScroll);
         escuchando = false;
+        // Fuera del recorrido: pasado, la llamada se ve; por llegar, oculta.
+        if (llamada)
+          sec.dataset.llamada = zona.getBoundingClientRect().bottom <= 0 ? "visible" : "oculta";
       }
     });
+    const alCambiarTamano = () => {
+      medirLlamada();
+      alScroll();
+    };
+    medirLlamada();
+    if (llamada) {
+      sec.dataset.llamada = "oculta";
+      decidirLlamada();
+    }
+    const tamano = new ResizeObserver(alCambiarTamano);
+    if (llamada) tamano.observe(llamada);
     observador.observe(zona);
     mq.addEventListener("change", alScroll);
+    addEventListener("resize", alCambiarTamano);
     return () => {
       observador.disconnect();
+      tamano.disconnect();
       removeEventListener("scroll", alScroll);
+      removeEventListener("resize", alCambiarTamano);
       mq.removeEventListener("change", alScroll);
+      delete sec.dataset.llamada;
+      llamada?.style.removeProperty("--llamada-abajo");
       if (frame) cancelAnimationFrame(frame);
       caja.style.removeProperty("--compania-escala");
       caja.style.removeProperty("--compania-encogido");
@@ -252,6 +314,7 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
 
   return (
     <section
+      ref={seccion}
       className={estilos.seccion}
       aria-labelledby="portada-compania-titulo"
       data-con-video={video ? "" : undefined}

@@ -1,8 +1,6 @@
 import { IconBrandWhatsapp, IconTruck } from "@tabler/icons-react";
 import Link from "next/link";
 
-import { Revelado } from "@/components/movimiento/Revelado";
-
 import estilos from "./catalogo.module.css";
 
 /**
@@ -12,6 +10,11 @@ import estilos from "./catalogo.module.css";
  * «Nuestra Compañía», nunca encima (§27.5). En móvil sube sobre el final del
  * recorrido fijado para que el título entre bajo el vídeo encogido en la misma
  * pantalla (`catalogo.module.css`, dirección 2026-10-06).
+ *
+ * Aparece a MITAD del encogido, ya en su sitio final (dirección, 2026-10-17):
+ * lo decide `SeccionCompania` con `data-llamada`, que busca esta sección por
+ * `data-llamada-compania`. Por eso el título es un `<h2>` normal y no un
+ * `Revelado`: su entrada es el fundido de `catalogo.module.css`.
  *
  * Lo que se aparta (docs/diseno/decisiones-home-ux9.md §19):
  * - D1: título en `<h2>` (en ux-9, `<div>`).
@@ -31,16 +34,15 @@ type Props = { whatsapp: string; textos: TextosCatalogo };
 
 export function SeccionCatalogo({ whatsapp, textos }: Props) {
   return (
-    <section className={estilos.seccion} aria-labelledby="portada-catalogo-titulo">
+    <section
+      className={estilos.seccion}
+      aria-labelledby="portada-catalogo-titulo"
+      data-llamada-compania=""
+    >
       {textos.titulo ? (
-        <Revelado
-          como="h2"
-          id="portada-catalogo-titulo"
-          texto={textos.titulo}
-          ritmo="titulo"
-          disparo={0.95}
-          className={`${estilos.titulo} texto-titulo-seccion`}
-        />
+        <h2 id="portada-catalogo-titulo" className={`${estilos.titulo} texto-titulo-seccion`}>
+          {textos.titulo}
+        </h2>
       ) : null}
       <div className={estilos.botones}>
         {textos.catalogoTexto && textos.catalogoEnlace ? (

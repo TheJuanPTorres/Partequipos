@@ -113,6 +113,57 @@
   }
 }
 
+/*
+ * APARECE A MITAD DEL EFECTO (dirección, 2026-10-17). Solo cuando
+ * `SeccionCompania` pone `data-llamada` (hay JavaScript y movimiento): la
+ * sección se queda FIJA en su sitio final (`sticky` con el `bottom` que mide el
+ * componente, `--llamada-abajo`) mientras dura el fijado del vídeo, y al
+ * soltarse sigue el scroll como siempre. Oculta (`visibility`: ni se ve ni
+ * recibe foco ni clics) hasta que el vídeo encogido deja libre el sitio del
+ * título; entonces el título entra con un fundido y 12 px de desplazamiento, y
+ * los botones detrás, a 0,15 y 0,3 s. Solo `opacity` y `transform`: sin CLS.
+ */
+:global([data-llamada]) + .seccion {
+  position: sticky;
+  bottom: var(--llamada-abajo, 0px);
+}
+
+:global([data-llamada="oculta"]) + .seccion {
+  pointer-events: none;
+}
+
+:global([data-llamada]) + .seccion .titulo,
+:global([data-llamada]) + .seccion .boton {
+  transition:
+    opacity 0.6s ease var(--llamada-retraso, 0s),
+    transform 0.6s ease var(--llamada-retraso, 0s),
+    visibility 0s linear var(--llamada-retraso, 0s),
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+:global([data-llamada]) + .seccion .boton:nth-child(1) {
+  --llamada-retraso: 0.15s;
+}
+
+:global([data-llamada]) + .seccion .boton:nth-child(2) {
+  --llamada-retraso: 0.3s;
+}
+
+/* Al ocultarse (volviendo hacia arriba), rápido y sin escalón. */
+:global([data-llamada="oculta"]) + .seccion .titulo,
+:global([data-llamada="oculta"]) + .seccion .boton {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0s linear 0.2s,
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
 @media (max-width: 767px) {
   .titulo {
     box-sizing: border-box;

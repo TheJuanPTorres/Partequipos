@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  fechaDeWordPress,
   altDeFoto,
   anioDeUnidad,
   categoriaDeUnidad,
@@ -299,5 +300,20 @@ describe("el número de serie no se publica", () => {
       "wp-usado-48211-excavadora-hitachi-zx225usr-6-2018.jpg",
     );
     assert.equal(nombreDeFicheroUsado("https://x/uploads/fotos.zip", 1, "N"), null);
+  });
+});
+
+describe("fecha de publicación de WordPress", () => {
+  it("pasa la fecha GMT a ISO en UTC", () => {
+    assert.equal(fechaDeWordPress("2025-12-16 17:34:51"), "2025-12-16T17:34:51.000Z");
+    assert.equal(fechaDeWordPress(" 2026-10-05 14:11:43 "), "2026-10-05T14:11:43.000Z");
+  });
+
+  it("sin fecha válida, null (borradores, vacío, imposible)", () => {
+    assert.equal(fechaDeWordPress("0000-00-00 00:00:00"), null);
+    assert.equal(fechaDeWordPress(""), null);
+    assert.equal(fechaDeWordPress(undefined), null);
+    assert.equal(fechaDeWordPress("2025-02-31 10:00:00"), null);
+    assert.equal(fechaDeWordPress("ayer"), null);
   });
 });

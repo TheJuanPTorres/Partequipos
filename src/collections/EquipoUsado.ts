@@ -199,6 +199,24 @@ export const EquipoUsado: CollectionConfig = {
       },
     },
     /*
+     * FECHA DE PUBLICACIÓN (2026-10-17, dirección): ordena el carrusel de la
+     * portada y los listados de usados, de la más reciente a la más antigua. Por
+     * defecto, el momento de crear la unidad; en las importadas de WordPress, la
+     * fecha original de cada anuncio (el importador la rellena). Editable.
+     */
+    {
+      name: "fechaPublicacion",
+      type: "date",
+      label: "Fecha de publicación",
+      defaultValue: () => new Date().toISOString(),
+      admin: {
+        position: "sidebar",
+        date: { pickerAppearance: "dayAndTime", displayFormat: "d MMM yyyy, HH:mm" },
+        description:
+          "Ordena la portada y los listados: primero la más reciente. Por defecto, hoy; se puede cambiar.",
+      },
+    },
+    /*
      * PESTAÑA DE LA PORTADA (sección 3 de ux-9: «Excavadoras», «Otros» y
      * «Aditamentos»). En la línea usada no hay categoría de aditamentos —solo
      * existen en la nueva y en repuestos—, y crearla añadiría una URL que el

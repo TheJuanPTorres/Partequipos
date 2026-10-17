@@ -53,6 +53,7 @@ import {
 import { veredictoDestino } from "../../src/lib/demo/copiaDemo";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 import { direccionesDeUnidades } from "../../src/lib/usados/direcciones";
+import { fechaDeWordPress } from "../../src/lib/usados/wordpress";
 import { formatSlug } from "../../src/lib/utils/formatSlug";
 
 // ---------- Argumentos y destino (antes de cargar Payload) ----------
@@ -211,7 +212,7 @@ async function huella(clave: string, datos: Buffer): Promise<HuellaFoto> {
 
 type FotoWp = { idWp: number; url: string; alt: string };
 type Fuente = {
-  categoriaUsada: { enlace: string; metadesc: string };
+  categoriaUsada: { enlace: string; metadesc: string; fechaGmt?: string };
   nuevos: { tipo: TipoAditamento; titulo: string; fotos: FotoWp[] }[];
   usados: { idWp: number; categoria: string; modelo: string; datos: string[]; fotos: FotoWp[] }[];
 };
@@ -494,6 +495,10 @@ for (const p of planUsados) {
     horometro: p.ficha.horometro,
     pesoOperativo: p.ficha.pesoOperativo,
     descripcion: p.ficha.descripcion,
+    // Fecha original de la página que las lista (WordPress no tiene la de cada unidad).
+    ...(fechaDeWordPress(fuente.categoriaUsada.fechaGmt)
+      ? { fechaPublicacion: fechaDeWordPress(fuente.categoriaUsada.fechaGmt)! }
+      : {}),
     imagenes,
     disponible: true,
     pestanaPortada: "aditamentos" as const,

@@ -308,6 +308,8 @@ const inventarioUsadosEnCache = unstable_cache(
         nombre: true,
         slug: true,
         updatedAt: true,
+        createdAt: true,
+        fechaPublicacion: true,
         categoria: true,
         marcaUsada: true,
         marca: true,
@@ -369,6 +371,7 @@ const inventarioUsadosEnCache = unstable_cache(
         nombre: u.nombre,
         slug: u.slug ?? null,
         updatedAt: u.updatedAt,
+        fechaPublicacion: u.fechaPublicacion ?? u.createdAt,
         categoria: categoriaId,
         categoriaRef: ref(categoriaPorId.get(categoriaId)),
         marcaUsada: marcaId,
@@ -648,9 +651,8 @@ export const getEquiposUsadosDePortada = cache(async (): Promise<EquiposUsado[]>
       where: { and: [{ disponible: { equals: true } }, categoria] },
       depth: 1,
       limit: TARJETAS_POR_PESTANA,
-      // Primero las más recientes. No guardamos la fecha de WordPress: manda la de creación
-      // (las nuevas del panel salen antes que las importadas).
-      sort: "-createdAt",
+      // Primero las más recientes por su fecha de publicación (la de WordPress en las importadas).
+      sort: ["-fechaPublicacion", "-createdAt"],
     });
   const noAditamento: Where = { pestanaPortada: { not_equals: "aditamentos" } };
   const [excavadoras, otros, aditamentos] = await Promise.all([

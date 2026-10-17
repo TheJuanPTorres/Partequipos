@@ -56,6 +56,7 @@ import {
   nombreCompuesto,
   nombreDeFicheroUsado,
   nombreDeMarca,
+  fechaDeWordPress,
   anioDeUnidad,
   normalizarHoras,
   normalizarPeso,
@@ -223,6 +224,8 @@ type UnidadWp = {
   idWp: number;
   slug: string;
   enlace: string;
+  /** `post_date_gmt` de WordPress: la fecha de publicación original. */
+  fechaGmt?: string;
   categoria: string | null;
   marca: string | null;
   anio: string | null;
@@ -250,6 +253,8 @@ type Plan = {
     horometro: number | null;
     pesoOperativo: number | null;
     descripcion: string | null;
+    /** Fecha original del anuncio (ISO); sin ella, la unidad conserva la suya. */
+    fechaPublicacion?: string;
   };
   origenHoras: string;
   fotos: Foto[];
@@ -310,6 +315,7 @@ for (const u of unidades) {
       horometro: horas.valor,
       pesoOperativo: peso,
       descripcion,
+      ...(fechaDeWordPress(u.fechaGmt) ? { fechaPublicacion: fechaDeWordPress(u.fechaGmt)! } : {}),
     },
     origenHoras: horas.origen,
     fotos: fotosValidas.map(({ f, fichero }, i) => ({

@@ -322,3 +322,18 @@ export function nombreYCategoriaDeUnidad(u: {
     categoria: categoria.slug,
   };
 }
+
+/**
+ * Fecha de publicación de un anuncio de WordPress, en ISO 8601 (UTC), desde su
+ * `post_date_gmt` («2025-12-16 17:34:51»). `null` si no hay fecha válida
+ * (WordPress escribe «0000-00-00 00:00:00» en los borradores sin publicar).
+ */
+export function fechaDeWordPress(gmt: string | null | undefined): string | null {
+  const m = (gmt ?? "").trim().match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})$/);
+  if (!m || m[1] === "0000") return null;
+  const t = Date.UTC(+m[1]!, +m[2]! - 1, +m[3]!, +m[4]!, +m[5]!, +m[6]!);
+  const d = new Date(t);
+  // Date.UTC corrige los meses o días imposibles (31 de febrero): se rechazan.
+  if (Number.isNaN(t) || d.getUTCMonth() !== +m[2]! - 1 || d.getUTCDate() !== +m[3]!) return null;
+  return d.toISOString();
+}

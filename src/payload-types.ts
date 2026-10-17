@@ -670,6 +670,10 @@ export interface EquiposUsado {
    * Al venderse, desmarcar en vez de borrar: conserva el historial y permite deshacer.
    */
   disponible?: boolean | null;
+  /**
+   * Ordena la portada y los listados: primero la más reciente. Por defecto, hoy; se puede cambiar.
+   */
+  fechaPublicacion?: string | null;
   pestanaPortada?: ('categoria' | 'aditamentos') | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
@@ -2141,6 +2145,7 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
   imagenes?: T;
   fichaTecnicaPdf?: T;
   disponible?: T;
+  fechaPublicacion?: T;
   pestanaPortada?: T;
   seo?:
     | T

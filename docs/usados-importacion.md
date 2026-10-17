@@ -183,6 +183,9 @@ redirects-retirar` leen el slug de la base y el `enlace` de la fuente.
   ya importada la conserva al actualizarla y, si no coincide, se avisa.
   - **Las 128 de hoy** (preview y sitio publicado) la recibieron por SQL de la migración del #193: las repetidas llevan el id de la base, no el de WordPress.
   - Los 301 leen la base, así que apuntan a lo que se sirve (`docs/aditamentos-importacion.md` §4).
+- **Fecha de publicación (2026-10-17):** campo `fechaPublicacion` en `equipos-usados` (migración `20261017_142401_fecha_publicacion_usados`: por defecto, la fecha de creación; las que ya existían la toman de `created_at`). **Ordena** el carrusel de la portada y la opción «Más recientes» de los listados (a igual fecha, el año; «Año más reciente» conserva el orden de antes).
+  - **La fecha de WordPress** es el `post_date_gmt` del XML (`extraer-xml.py` la saca como `fechaGmt`; `fechaDeWordPress` la pasa a ISO). Los dos importadores la ponen al crear y al actualizar. Las 4 unidades de aditamentos no tienen página propia: **comparten la fecha de la página que las lista** (2022-03-22), así que son las más antiguas y entre ellas manda la fecha de creación.
+  - **Para lo ya importado:** `npm run preview:usados:fechas-simular | fechas | fechas-retirar` (`scripts/usados/fechas-publicacion.ts`), con los manifiestos de las dos importaciones y las fuentes re-extraídas (`usados-wordpress-fechas.json`, `aditamentos-wordpress-fechas.json`, fuera del repositorio). Idempotente; la retirada devuelve la fecha de creación. Para el sitio publicado, `runbook-fechas-publicacion-usados.md`.
 - **Hay que redesplegar** tras importar (el script no revalida).
 
 ## 8. Lo que NO se hace todavía

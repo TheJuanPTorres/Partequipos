@@ -1,5 +1,9 @@
 import { APIError, type CollectionBeforeOperationHook } from "payload";
 
+import { borrarHuerfanoRechazado, llegoPorSubidaDirecta } from "../../lib/blob/huerfanoRechazado";
+import { muestraDelFichero } from "../../lib/blob/muestraDelFichero";
+import { REGLAS_SUBIDA_DIRECTA } from "../../lib/blob/subidaDirecta";
+
 /**
  * Rechaza subidas a `videos` que no sean MP4 o WebM POR CONTENIDO, o que pasen
  * del tope de tamaño, con mensajes en español. Mismo criterio que
@@ -45,15 +49,15 @@ export function esVideoPermitido(b: Buffer): "MP4" | "WebM" | null {
 }
 
 /**
- * TOPE DE TAMAÑO: 4 MiB. Las funciones de Vercel cortan el cuerpo de la
- * petición en 4,5 MB (413 `FUNCTION_PAYLOAD_TOO_LARGE`, en todos los planes), y
- * la subida del panel pasa por una función. Con margen para la cabecera
- * multipart. Por encima de 4,5 MB este hook ni siquiera llega a ejecutarse:
- * Vercel corta antes. Ver docs/diseno/decisiones-home-ux9.md §4.
+ * TOPE DE TAMAÑO: 10 MB desde el 2026-10-17 (dirección). Los vídeos suben por la
+ * SUBIDA DIRECTA del navegador al Blob (§10.39), porque la vía normal pasa por una
+ * función y Vercel la corta en 4,5 MB. Con subida directa `req.file.data` llega
+ * VACÍO y el fichero está en un temporal: se lee de ahí (`muestraDelFichero`), se
+ * guarda el tamaño REAL y, si se rechaza, se borra del Blob.
  */
-export const TOPE_VIDEO_BYTES = 4 * 1024 * 1024;
+export const TOPE_VIDEO_BYTES = REGLAS_SUBIDA_DIRECTA.videos?.maximo ?? 10 * 1024 * 1024;
 
-export const formatoDeVideoPermitido: CollectionBeforeOperationHook = ({
+export const formatoDeVideoPermitido: CollectionBeforeOperationHook = async ({
   args,
   operation,
   req,
@@ -61,24 +65,31 @@ export const formatoDeVideoPermitido: CollectionBeforeOperationHook = ({
   if (operation !== "create" && operation !== "update") return args;
 
   const file = req.file;
-  if (!file?.data || !Buffer.isBuffer(file.data) || file.data.length === 0) return args;
+  const muestra = muestraDelFichero(file, 64);
+  if (!file || !muestra) return args;
 
-  if (!esVideoPermitido(file.data)) {
-    throw new APIError(
+  const rechazar = async (mensaje: string): Promise<never> => {
+    if (llegoPorSubidaDirecta(file)) await borrarHuerfanoRechazado(file.name);
+    throw new APIError(mensaje, 400);
+  };
+
+  if (!esVideoPermitido(muestra.inicio)) {
+    await rechazar(
       `«${file.name}» no es un vídeo MP4 ni WebM. Si el nombre acaba en .mp4 pero el contenido es ` +
         `de otro formato, también se rechaza.`,
-      400,
     );
   }
 
-  if (file.data.length > TOPE_VIDEO_BYTES) {
-    const mb = (file.data.length / (1024 * 1024)).toFixed(1).replace(".", ",");
-    throw new APIError(
-      `«${file.name}» pesa ${mb} MB y el máximo es 4 MB. Un vídeo de fondo no necesita más: ` +
-        `hay que exportarlo con más compresión (H.264 de 8 bits) y volver a subirlo.`,
-      400,
+  if (muestra.tamano > TOPE_VIDEO_BYTES) {
+    const mb = (muestra.tamano / (1024 * 1024)).toFixed(1).replace(".", ",");
+    await rechazar(
+      `«${file.name}» pesa ${mb} MB y el máximo es ${Math.round(TOPE_VIDEO_BYTES / (1024 * 1024))} MB. ` +
+        `Un vídeo de fondo no necesita más: hay que exportarlo con más compresión (H.264 de 8 bits) ` +
+        `y volver a subirlo.`,
     );
   }
 
+  // El tamaño que se guarda es el REAL, no el que dijo el navegador.
+  file.size = muestra.tamano;
   return args;
 };

@@ -27,10 +27,18 @@ describe("subida directa: el permiso que se firma", () => {
     assert.equal(permisoDeSubida("media", "foto.gif").ok, false);
   });
 
-  it("vídeos y cualquier otra colección se quedan sin subida directa (4 MB por la vía normal)", () => {
-    assert.equal(permisoDeSubida("videos", "clip.mp4").ok, false);
+  it("vídeos: MP4 o WebM hasta 10 MB; otra colección, sin subida directa", () => {
+    const v = permisoDeSubida("videos", "clip.mp4");
+    assert.ok(v.ok);
+    assert.equal(v.ok && v.maximumSizeInBytes, 10 * 1024 * 1024);
+    assert.deepEqual(v.ok && v.allowedContentTypes, ["video/mp4", "video/webm"]);
+    assert.equal(permisoDeSubida("videos", "clip.mov").ok, false);
+    assert.ok(
+      avisoAntesDeSubir("videos", { name: "clip.mp4", type: "video/mp4", size: 11 * 1024 * 1024 }),
+    );
+    assert.equal(permisoDeSubida("animaciones", "anim.json").ok, false);
     assert.equal(permisoDeSubida(null, "ficha.pdf").ok, false);
-    assert.deepEqual(Object.keys(REGLAS_SUBIDA_DIRECTA).sort(), ["documentos", "media"]);
+    assert.deepEqual(Object.keys(REGLAS_SUBIDA_DIRECTA).sort(), ["documentos", "media", "videos"]);
   });
 
   it("nombres con carpetas, ocultos o con otra extensión: no", () => {

@@ -50,20 +50,28 @@ describe("formato de vídeo por contenido", () => {
     assert.equal(esVideoPermitido(CABECERAS.gif), null);
   });
 
-  it("el hook deja pasar un MP4 pequeño", () => {
-    assert.doesNotThrow(() => llamar(CABECERAS.mp4));
+  it("el hook deja pasar un MP4 pequeño", async () => {
+    await assert.doesNotReject(async () => llamar(CABECERAS.mp4));
   });
 
-  it("el hook rechaza un AVIF renombrado a .mp4, en español", () => {
-    assert.throws(() => llamar(CABECERAS.avif, "truco.mp4"), /no es un vídeo MP4 ni WebM/);
+  it("el hook rechaza un AVIF renombrado a .mp4, en español", async () => {
+    await assert.rejects(
+      async () => llamar(CABECERAS.avif, "truco.mp4"),
+      /no es un vídeo MP4 ni WebM/,
+    );
   });
 
-  it("el hook rechaza un MP4 por encima del tope, con el tamaño", () => {
+  it("el hook deja pasar un MP4 de 8 MB, por debajo del tope", async () => {
+    const ocho = Buffer.concat([CABECERAS.mp4, Buffer.alloc(8 * 1024 * 1024)]);
+    await assert.doesNotReject(async () => llamar(ocho));
+  });
+
+  it("el hook rechaza un MP4 por encima del tope, con el tamaño", async () => {
     const grande = Buffer.concat([CABECERAS.mp4, Buffer.alloc(TOPE_VIDEO_BYTES)]);
-    assert.throws(() => llamar(grande), /el máximo es 4 MB/);
+    await assert.rejects(async () => llamar(grande), /el máximo es 10 MB/);
   });
 
-  it("el tope queda por debajo del límite de 4,5 MB de Vercel", () => {
-    assert.ok(TOPE_VIDEO_BYTES < 4_500_000);
+  it("el tope es de 10 MB: pasa de 4,5 MB, así que los vídeos van por subida directa", () => {
+    assert.equal(TOPE_VIDEO_BYTES, 10 * 1024 * 1024);
   });
 });

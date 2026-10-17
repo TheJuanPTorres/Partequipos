@@ -5,6 +5,7 @@ import { useEffect, useId, useRef } from "react";
 
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { Revelado } from "@/components/movimiento/Revelado";
+import { useAhorroDeDatos } from "@/components/movimiento/useAhorroDeDatos";
 import { useMovimientoReducido, usePausa } from "@/components/movimiento/useMovimiento";
 import type { VistaCabeceraVideo as Datos } from "@/lib/bloques/vista";
 
@@ -31,7 +32,9 @@ export function BloqueCabeceraVideo({ antetitulo, titulo, video, imagen }: Datos
   const { pausado, alternar } = usePausa();
   const idTarjeta = useId();
   const fondo = video?.poster ?? imagen;
-  const conVideo = video !== null && !reducido;
+  const ahorro = useAhorroDeDatos();
+  // Sin vídeo con «reducir movimiento» ni con ahorro de datos: queda el póster.
+  const conVideo = video !== null && !reducido && !ahorro;
 
   useEffect(() => {
     const v = elVideo.current;

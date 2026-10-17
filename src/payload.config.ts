@@ -323,10 +323,6 @@ export default buildConfig({
     vercelBlobStorage({
       enabled: true,
       collections: {
-        // Igual para los vídeos, y aquí es OBLIGATORIO: servidos por
-        // /api/videos/file/… pasarían por una función, que corta la RESPUESTA en
-        // 4,5 MB igual que la petición (docs de Vercel, «Request body size»).
-        [Video.slug]: { disablePayloadAccessControl: true },
         // Las animaciones Lottie las pide el navegador con `fetch` desde el CDN
         // (el Blob responde con `Access-Control-Allow-Origin: *`).
         [Animacion.slug]: { disablePayloadAccessControl: true },
@@ -336,8 +332,8 @@ export default buildConfig({
       token: process.env.BLOB_READ_WRITE_TOKEN || "",
     }),
     /*
-     * SUBIDA DIRECTA (§10.39): imágenes (hasta 15 MB) y PDF (hasta 30 MB)
-     * suben del navegador al Blob sin pasar por una función, que corta en
+     * SUBIDA DIRECTA (§10.39): imágenes (hasta 15 MB), PDF (hasta 30 MB) y,
+     * desde el 2026-10-17, vídeos (hasta 10 MB) suben del navegador al Blob sin pasar por una función, que corta en
      * 4,5 MB. Instancia aparte para poner `clientUploads` y el sufijo aleatorio
      * SOLO aquí; la ruta del permiso y el manejador del navegador los
      * sustituye el plugin siguiente por los endurecidos.
@@ -356,6 +352,10 @@ export default buildConfig({
         [Media.slug]: { disablePayloadAccessControl: true },
         // Los PDF se descargan desde el CDN, sin pasar por una función.
         [Documento.slug]: { disablePayloadAccessControl: true },
+        // Los vídeos también, y aquí es OBLIGATORIO: servidos por /api/videos/file/…
+        // pasarían por una función, que corta la RESPUESTA en 4,5 MB igual que la
+        // petición (docs de Vercel, «Request body size»).
+        [Video.slug]: { disablePayloadAccessControl: true },
       },
       token: process.env.BLOB_READ_WRITE_TOKEN || "",
     }),

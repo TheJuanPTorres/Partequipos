@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
+import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { ModelosTipo } from "@/components/repuestos/ModelosTipo";
+import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  enlacesDeEquipos,
+  gruposDeEnlaces,
+  tituloFranja,
+  vistaEncabezadoTipoNueva,
+} from "@/lib/nueva/paginaTipo";
 import { gruposDeSubtipos, subtiposDe } from "@/lib/nueva/subtipos";
 import {
   getEquiposDeTipo,
@@ -19,11 +26,14 @@ import { indexacionPermitida } from "@/lib/seo/config";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
-import { imagenDeMedia, poblado } from "@/lib/utils/relations";
-import type { EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
+import { poblado } from "@/lib/utils/relations";
+import type { MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
 type Params = { marca: string; tipo: string };
+
+/** Ancla de la franja de equipos: a ella baja el icono de ratón del encabezado. */
+const ANCLA_MODELOS = "modelos-nueva";
 
 export async function generateStaticParams(): Promise<Params[]> {
   const tipos = await getTiposMaquinaria();
@@ -90,55 +100,30 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
   ];
 
   // La ficha cuelga del tipo del equipo (en un paraguas, su subtipo).
-  const itemsDe = (lista: EquiposNuevo[], tipoSlug: string) =>
-    lista.map((equipo) => {
-      const primera = Array.isArray(equipo.imagenes) ? equipo.imagenes[0] : null;
-      return {
-        href: `${rutas.equipoNuevo(marca.slug, tipoSlug, equipo.slug)}/`,
-        titulo: equipo.nombre,
-        descripcion: equipo.entradilla ?? (equipo.codigo ? `Código ${equipo.codigo}` : null),
-        imagen: imagenDeMedia(primera, equipo.nombre),
-      };
-    });
-  const vacio = `Todavía no hay equipos publicados para ${tituloPorDefecto.tipoMaquinaria(tipo.nombre, marca.nombre)}.`;
+  const modelos = grupos
+    ? grupos.flatMap((g) => enlacesDeEquipos(marca, g.tipo.slug, g.equipos))
+    : enlacesDeEquipos(marca, tipo.slug, equipos);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <Breadcrumbs items={breadcrumbs} />
+      <div className={estilos.migas}>
+        <Breadcrumbs items={breadcrumbs} />
+      </div>
 
-      <h1 className="text-3xl font-semibold text-gray-900">
-        {tituloPorDefecto.tipoMaquinaria(tipo.nombre, marca.nombre)}
-      </h1>
+      <HeroMarca
+        vista={vistaEncabezadoTipoNueva(marca, tipo, equipos)}
+        anclaSiguiente={ANCLA_MODELOS}
+        bajaSinFoto
+      />
 
-      {tipo.descripcion ? <p className="mt-3 max-w-2xl text-gray-600">{tipo.descripcion}</p> : null}
-
-      <section className="mt-8" aria-labelledby="equipos-heading">
-        <h2 id="equipos-heading" className="text-xl font-medium text-gray-900">
-          Equipos disponibles
-        </h2>
-        {grupos && grupos.length > 0 ? (
-          grupos.map((grupo) => (
-            <div key={grupo.tipo.id} className="mt-6">
-              <h3 className="text-lg font-medium text-gray-900">
-                <Link
-                  href={`${rutas.tipoMaquinaria(marca.slug, grupo.tipo.slug)}/`}
-                  className="hover:underline"
-                >
-                  {grupo.tipo.nombre}
-                </Link>
-              </h3>
-              <div className="mt-3">
-                <ListaEnlaces items={itemsDe(grupo.equipos, grupo.tipo.slug)} vacio={vacio} />
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="mt-4">
-            <ListaEnlaces items={grupos ? [] : itemsDe(equipos, tipo.slug)} vacio={vacio} />
-          </div>
-        )}
-      </section>
+      <ModelosTipo
+        id={ANCLA_MODELOS}
+        titulo={tituloFranja(marca, tipo)}
+        modelos={modelos}
+        grupos={grupos ? gruposDeEnlaces(marca, grupos) : null}
+        vacio={`Todavía no hay equipos publicados para ${tituloPorDefecto.tipoMaquinaria(tipo.nombre, marca.nombre)}.`}
+      />
     </main>
   );
 }

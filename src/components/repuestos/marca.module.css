@@ -892,10 +892,14 @@ a.modelo:hover {
   background: var(--color-fondo-seccion);
 }
 
-/* La línea sobre el título: en rojo, 16 px y peso 500 («Plantilla 1», 2026-10-18). */
+/*
+ * La línea sobre el título: 16 px y peso 500 («Plantilla 1», 2026-10-18). En
+ * BLANCO, con foto y sin ella (dirección, 2026-10-18: el rojo del diseño no se
+ * leía sobre la foto), como el resto del texto de la cabecera.
+ */
 .antetituloHero {
   margin: 0;
-  color: var(--color-marca);
+  color: #fff;
   font-size: 16px;
   font-weight: 500;
   line-height: 1;
@@ -912,6 +916,16 @@ a.modelo:hover {
 
 .heroIndice .heroContenido {
   flex: 1;
+}
+
+/*
+ * Velo más fuerte en la cabecera de la «Plantilla 1» (2026-10-18, dirección):
+ * con el antetítulo en blanco, el 45 % de siempre dejaba el fondo detrás hasta
+ * en rgb(140,140,140) sobre las fotos claras (3,4:1, sin AA). Al 60 %, el
+ * antetítulo cumple AA en las 7 páginas (medido, decisiones-indices-contacto.md §9).
+ */
+.heroIndice .velo {
+  opacity: 0.6;
 }
 
 /* La sección blanca de las tarjetas, sin título y con todas las esquinas redondeadas. */

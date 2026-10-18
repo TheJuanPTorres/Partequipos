@@ -178,3 +178,11 @@ debajo; la caja recorta con `overflow: hidden` y `clip-path: inset(0 round 20px)
 1,08 y sin animación. **Medido a 1440 en las 7 páginas** (cada tarjeta, ratón fuera, a mitad de la animación y encima):
 escala 1,08 → 1, la foto cubre la caja en los tres momentos, radio de 20 px en las 4 esquinas; el recuadro con el scroll
 igual que en el #249; con «reducir movimiento», 1,08 fija y el recuadro quieto.
+
+**Antetítulo de la cabecera en blanco (2026-10-18, dirección).** «Somos tu socio confiable…» pasa del rojo del diseño a
+**blanco**, con foto y sin ella: el rojo no se leía sobre la foto (desviación del diseño, anotar para Andrés). En blanco,
+con el velo de siempre (negro al 45 %), no llegaba a AA sobre las fotos claras (3,38–3,97:1: el fondo detrás llegaba a
+rgb(140,140,140)); el velo de la cabecera de la «Plantilla 1» pasa al **60 %** (solo `.heroIndice`; las cabeceras de
+marca y tipo de repuestos no cambian). **Medido contra el píxel más claro de su fondo real (texto oculto), 7 páginas × 390,
+1010 y 1440:** 5,78:1 como mínimo con foto; 19:1 en la cabecera oscura sin foto (Aditamentos). Captura a 1440 en
+`capturas-2026-10-18-plantilla1/antetitulo-*-1440-despues.png`.

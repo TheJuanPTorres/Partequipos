@@ -22,7 +22,9 @@ const REDIRECTS = [
   ['/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/aditamentos-para-maquinaria-pesada', '/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos'],
   ['/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/baldes-y-protectores', '/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/herramienta-de-corte-gets-para-maquinaria-pesada'],
   ['/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/baldes-y-protectores/baldes-para-excavadoras', '/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/herramienta-de-corte-gets-para-maquinaria-pesada'],
-  ['/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/baldes-y-protectores/motores-nuevo', '/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/herramienta-de-corte-gets-para-maquinaria-pesada'],
+  // Corregido el 2026-10-17 (auditoría de estructura): a motor diésel. Las bases
+  // que ya tenían la migración se corrigen con el runbook de dirección.
+  ['/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/baldes-y-protectores/motores-nuevo', '/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/motor-diesel-para-maquinaria-pesada'],
   ['/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/componentes-electricos', '/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/miscelaneos-para-maquinaria-pesada'],
   ['/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/componentes-para-motores-diesel', '/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/motor-diesel-para-maquinaria-pesada'],
   ['/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/elementos-de-ajuste', '/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/miscelaneos-para-maquinaria-pesada'],

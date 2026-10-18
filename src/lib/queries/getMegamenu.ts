@@ -8,14 +8,14 @@ import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 import { construirMegamenu, type PanelMenu } from "@/lib/megamenu";
 
 /**
- * Datos del megamenú (`src/lib/megamenu.ts`): seis consultas LIGERAS —solo
+ * Datos del megamenú (`src/lib/megamenu.ts`): siete consultas LIGERAS —solo
  * nombre, slug y marca, `depth: 0`— porque la cabecera va en todas las
  * páginas y esto se ejecuta en cada una al construir el sitio (CLAUDE.md
  * §10.10). Las dos de MARCAS llevan además el logo con `depth: 1`, pero de
  * la imagen solo url, ancho y alto (`populate`).
  *
  * En la caché de datos del MARCO (`datos:marco`, `src/lib/cacheDatos.ts`): sin
- * ella, cada visita a una página dinámica repetía las 6 consultas. La
+ * ella, cada visita a una página dinámica repetía las 7 consultas. La
  * invalidan los ganchos de las 6 colecciones (`megamenuHooks.ts`) a través de
  * `revalidarTodoElSitio`.
  */
@@ -41,6 +41,7 @@ const megamenuEnCache = unstable_cache(
       categoriasUsada,
       marcasRepuestos,
       tiposRepuestos,
+      equiposNuevos,
     ] = await Promise.all([
       payload.find({ collection: "marcas-maquinaria", ...marcas }),
       payload.find({ collection: "tipos-maquinaria", ...base, select: conMarca }),
@@ -52,6 +53,8 @@ const megamenuEnCache = unstable_cache(
         ...base,
         select: { ...conMarca, slugPadre: true },
       }),
+      // Solo el tipo de cada equipo: el menú no enlaza a los tipos de maquinaria nueva sin equipos.
+      payload.find({ collection: "equipos-nuevos", ...base, select: { tipo: true } }),
     ]);
 
     return construirMegamenu({
@@ -61,6 +64,7 @@ const megamenuEnCache = unstable_cache(
       categoriasUsada: categoriasUsada.docs,
       marcasRepuestos: marcasRepuestos.docs,
       tiposRepuestos: tiposRepuestos.docs,
+      equiposNuevos: equiposNuevos.docs,
     });
   },
   ["megamenu", CLAVE_DESPLIEGUE],

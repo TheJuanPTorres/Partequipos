@@ -41,6 +41,8 @@ const DATOS: DatosMegamenu = {
       marca: 40,
     },
   ],
+  // Todos los tipos de maquinaria nueva tienen equipos salvo el 14 (sin marca).
+  equiposNuevos: [{ tipo: 10 }, { tipo: 10 }, { tipo: { id: 11 } }, { tipo: 12 }, { tipo: 13 }],
 };
 
 const titulos = (g: GrupoMenu[]) => g.map((x) => x.titulo);
@@ -106,6 +108,24 @@ describe("megamenú: maquinaria", () => {
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos/excavadoras/",
       },
     ]);
+  });
+
+  it("no enlaza a los tipos sin equipos, y vuelven solos con el primero (2026-10-18)", () => {
+    const enlaces = (d: DatosMegamenu) =>
+      JSON.stringify(panelMaquinaria(d)).match(
+        /maquinaria-pesada-nueva\/marcas\/[a-z-]+\/[a-z-]+\//g,
+      ) ?? [];
+    const sinBulldozer = DATOS.equiposNuevos.filter((e) => e.tipo !== 12);
+    assert.ok(enlaces(DATOS).some((h) => h.endsWith("/case-construction/bulldozer/")));
+    const sin = enlaces({ ...DATOS, equiposNuevos: sinBulldozer });
+    assert.ok(!sin.some((h) => h.endsWith("/case-construction/bulldozer/")));
+    assert.ok(sin.some((h) => h.endsWith("/case-construction/retrocargadoras/")));
+    const vuelve = enlaces({ ...DATOS, equiposNuevos: [...sinBulldozer, { tipo: { id: 12 } }] });
+    assert.ok(vuelve.some((h) => h.endsWith("/case-construction/bulldozer/")));
+    // «Ver todo <marca>» se queda aunque la marca no tenga ningún tipo con equipos.
+    const sinNada = JSON.stringify(panelMaquinaria({ ...DATOS, equiposNuevos: [] }));
+    assert.ok(sinNada.includes("Ver todo Yanmar"));
+    assert.ok(!sinNada.includes("Miniexcavadoras"));
   });
 
   it("sin la marca de aditamentos, el acordeón no sale; sin categorías, tampoco «Por tipo»", () => {

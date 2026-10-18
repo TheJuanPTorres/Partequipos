@@ -12,7 +12,7 @@
  * el slug de ese padre (`slugPadre`). Su SEGMENTO en la URL es entonces
  * `<slugPadre>/<slug>`, y `rutas.tipo` / `rutas.modelo` lo componen sin
  * cambiar. Un solo nivel: un tipo con padre no puede ser padre.
- * Detalle en docs/repuestos-importacion.md §9.
+ * Detalle en docs/repuestos-importacion.md §11.
  */
 
 type ConSlug = { slug: string; slugPadre?: string | null };

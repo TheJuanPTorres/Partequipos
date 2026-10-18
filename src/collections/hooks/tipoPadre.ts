@@ -5,7 +5,7 @@ import { comprobarPadre } from "../../lib/repuestos/anidado";
 import { idDeRelacion } from "./marcaDelTipo";
 
 /**
- * «Cuelga de» de un tipo de repuestos (docs/repuestos-importacion.md §9).
+ * «Cuelga de» de un tipo de repuestos (docs/repuestos-importacion.md §11).
  *
  * `beforeValidate`: comprueba el padre (`comprobarPadre`) y pone `slugPadre`,
  * el slug del padre desnormalizado, que es lo que compone la URL. Lo pone

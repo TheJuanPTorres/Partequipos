@@ -22,9 +22,10 @@
  * - Sus 4 categorías: entradilla, imagen de la tarjeta y los productos con su
  *   foto y su ficha técnica en PDF.
  *
- * FOTOS DE LICENCIA DUDOSA (`dudosa: true` en el JSON; decisión de dirección
- * del 2026-10-14): SOLO en el preview. En cualquier otro destino se saltan y
- * el bloque o la tarjeta se pinta sin ellas.
+ * FOTOS «DUDOSAS» (`dudosa: true` en el JSON): del 2026-10-14 al 2026-10-17
+ * solo iban al preview. DECISIÓN DEL CLIENTE (2026-10-17): se migra todo el
+ * contenido de su web, así que van a CUALQUIER destino; su contenido es su
+ * responsabilidad (CLAUDE.md §10.38). La marca queda en el JSON como lista.
  *
  * DESTINO validado contra la base y el almacén ANTES de cargar Payload, más la
  * guarda del almacén (§10.37), como el importador del blog. Educado con el
@@ -71,9 +72,6 @@ if (destino === "preview") {
   if (v.valido) process.env.ALMACEN_BLOB_ESPERADO = v.almacen;
 }
 exigirAlmacen("[servicio-lubricantes]");
-
-/** Las fotos de licencia dudosa solo van al preview. */
-const CON_DUDOSAS = destino === "preview";
 
 const CIERRE = path.join(os.homedir(), "Desktop", "partequipos-cierre");
 const MANIFIESTO =
@@ -241,7 +239,7 @@ async function existe(url: string): Promise<void> {
 
 // ---------- Ficheros: idempotentes por su nombre determinista ----------
 
-const cuenta = { subidos: 0, reutilizados: 0, simulados: 0, dudosasSaltadas: 0 };
+const cuenta = { subidos: 0, reutilizados: 0, simulados: 0 };
 const yaVistos = new Map<string, number>();
 /** Al simular, cada fichero se comprueba y se cuenta una sola vez aunque lo usen varios productos. */
 const simulados = new Set<string>();
@@ -271,13 +269,9 @@ async function guardado(coleccion: "media" | "videos" | "documentos", id: number
   return { id, filename: d.filename ?? pedido, url: d.url ?? "" };
 }
 
-/** Una foto a `Media`. Devuelve su id, o null si se salta (dudosa fuera del preview, o simulando). */
+/** Una foto a `Media`. Devuelve su id, o null si no hay foto o se está simulando. */
 async function imagen(foto: Foto, altSiVacio: string): Promise<number | null> {
   if (!foto) return null;
-  if (foto.dudosa && !CON_DUDOSAS) {
-    cuenta.dudosasSaltadas++;
-    return null;
-  }
   const formato = formatoPorExtension(foto.url);
   if (!formato) fallar(`formato no admitido en Media: ${foto.url}`);
   const fichero = nombreDeFicheroWp(foto.url);
@@ -516,9 +510,7 @@ await actualizar("paginas", pagina!.id, {
   secciones: [],
   bloques,
 });
-log(
-  `servicio técnico: ${bloques.length} bloques (galería: ${galeria.length} fotos${CON_DUDOSAS ? "" : ", sin las dudosas"})`,
-);
+log(`servicio técnico: ${bloques.length} bloques (galería: ${galeria.length} fotos)`);
 
 // ---------- Lubricantes ----------
 
@@ -579,7 +571,7 @@ for (const c of l.categorias) {
 
 log(`modo: ${modo} · destino: ${destino} · productos: ${productos} · fichas: ${fichas}`);
 log(
-  `ficheros: subidos ${cuenta.subidos} · reutilizados ${cuenta.reutilizados} · por subir ${cuenta.simulados} · dudosas saltadas ${cuenta.dudosasSaltadas}`,
+  `ficheros: subidos ${cuenta.subidos} · reutilizados ${cuenta.reutilizados} · por subir ${cuenta.simulados}`,
 );
 log(`erratas del sitio actual (para el cliente): ${datos.erratas.length}`);
 for (const e of datos.erratas) log(`  · ${e}`);

@@ -3,7 +3,7 @@
  * en WordPress cuelga de «Cargador frontal» y tiene 4 modelos con su página
  * (CX210B, CX220C, CX350B y CX350C), pasa de ser UN MODELO del cargador (con
  * 301 desde las 4) a ser un TIPO con sus 4 modelos en sus URL de WordPress.
- * Detalle en docs/repuestos-importacion.md §9 y src/lib/repuestos/anidado.ts.
+ * Detalle en docs/repuestos-importacion.md §11 y src/lib/repuestos/anidado.ts.
  *
  *   npm run preview:repuestos:anidado:simular   # no escribe nada: el plan
  *   npm run preview:repuestos:anidado:aplicar

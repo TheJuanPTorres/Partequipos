@@ -176,6 +176,20 @@
   }
 }
 
+/*
+ * Cabecera BAJA sin foto (página de marca de maquinaria nueva, 2026-10-17): sin
+ * foto, 630 px de tarjeta oscura eran un hueco; se queda en 380 (420 en móvil) y
+ * el contenido se centra en vertical. La regla de móvil de abajo no la pisa
+ * porque esta va después y con más especificidad.
+ */
+.hero.heroBajo {
+  min-height: 380px;
+}
+
+.heroBajo .heroContenido {
+  flex: 1;
+}
+
 /* Anchos del texto del encabezado medidos: 880 a 1010 y 278 a 390. */
 @media (max-width: 1024px) {
   .heroContenido {
@@ -186,6 +200,10 @@
 @media (max-width: 767px) {
   .hero {
     min-height: 670px;
+  }
+
+  .hero.heroBajo {
+    min-height: 420px;
   }
 
   .heroContenido {

@@ -3,7 +3,12 @@ import { describe, it } from "node:test";
 
 import type { EquiposNuevo, MarcasMaquinaria, Media, TiposMaquinaria } from "@/payload-types";
 
-import { primeraFotoPorTipo, tarjetasDeTiposNueva, vistaEncabezadoMarcaNueva } from "./paginaMarca";
+import {
+  equiposPorTipo,
+  primeraFotoPorTipo,
+  tarjetasDeTiposNueva,
+  vistaEncabezadoMarcaNueva,
+} from "./paginaMarca";
 
 const foto = (id: number, url = `https://ejemplo.test/${id}.jpg`): Media =>
   ({ id, url, alt: "Foto de ejemplo", width: 800, height: 600 }) as Media;
@@ -50,6 +55,11 @@ describe("página de marca de maquinaria nueva", () => {
       marca(),
       [tipo(1, { imagen: foto(9) }), tipo(2), tipo(3)],
       fotos,
+      new Map([
+        [1, 1],
+        [2, 1],
+        [3, 2],
+      ]),
     );
     assert.deepEqual(
       t.map((x) => x.imagen?.url ?? null),
@@ -60,5 +70,17 @@ describe("página de marca de maquinaria nueva", () => {
       "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/marca-ejemplo/tipo-1/",
     );
     assert.ok(t.every((x) => !x.soloEscritorio));
+  });
+
+  it("los tipos sin equipos (vacíos o que solo agrupan otros) no se pintan", () => {
+    const equipos = [equipo(1, []), equipo(1, []), equipo(3, [])];
+    const cuenta = equiposPorTipo(equipos);
+    assert.equal(cuenta.get(1), 2);
+    assert.equal(cuenta.get(2), undefined);
+    const t = tarjetasDeTiposNueva(marca(), [tipo(1), tipo(2), tipo(3)], new Map(), cuenta);
+    assert.deepEqual(
+      t.map((x) => x.titulo),
+      ["Tipo 1", "Tipo 3"],
+    );
   });
 });

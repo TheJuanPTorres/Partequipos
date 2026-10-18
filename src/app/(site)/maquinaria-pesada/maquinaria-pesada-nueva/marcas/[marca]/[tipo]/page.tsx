@@ -90,7 +90,7 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
       <Breadcrumbs items={breadcrumbs} />
 
       <h1 className="text-3xl font-semibold text-gray-900">
-        {tipo.nombre} {marca.nombre}
+        {tituloPorDefecto.tipoMaquinaria(tipo.nombre, marca.nombre)}
       </h1>
 
       {tipo.descripcion ? <p className="mt-3 max-w-2xl text-gray-600">{tipo.descripcion}</p> : null}
@@ -102,7 +102,7 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
         <div className="mt-4">
           <ListaEnlaces
             items={items}
-            vacio={`Todavía no hay equipos publicados para ${tipo.nombre} ${marca.nombre}.`}
+            vacio={`Todavía no hay equipos publicados para ${tituloPorDefecto.tipoMaquinaria(tipo.nombre, marca.nombre)}.`}
           />
         </div>
       </section>

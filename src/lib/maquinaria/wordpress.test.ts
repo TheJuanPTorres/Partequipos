@@ -9,10 +9,10 @@ import {
   descripcionSeoDeFicha,
   mencionaModelo,
   primeraFrase,
-  ETIQUETAS_CORREGIDAS,
   clasificarTexto,
   enlacesDe,
   etiquetaLegible,
+  etiquetasTalCual,
   fotoDeFicha,
   nombreDeFicha,
   paresDeEspecificaciones,
@@ -39,20 +39,11 @@ describe("clasificarTexto", () => {
   });
 });
 
-describe("ETIQUETAS_CORREGIDAS", () => {
-  it("cada corrección es distinta de su original y no se encadena", () => {
-    for (const [de, a] of Object.entries(ETIQUETAS_CORREGIDAS)) {
-      assert.notEqual(de, a);
-      assert.equal(ETIQUETAS_CORREGIDAS[a], undefined, `«${a}» volvería a corregirse`);
-    }
-  });
-});
-
 describe("etiquetaLegible", () => {
-  it("pasa a minúsculas solo lo que viene todo en mayúsculas", () => {
-    assert.equal(etiquetaLegible("POTENCIA NETA"), "Potencia neta");
-    assert.equal(etiquetaLegible("ANCHO MÁXIMO:"), "Ancho máximo");
-    assert.equal(etiquetaLegible("Marca y modelo del motor"), "Marca y modelo del motor");
+  it("deja la etiqueta como en WordPress, sin los dos puntos (decisión del cliente)", () => {
+    assert.equal(etiquetaLegible("POTENCIA NETA"), "POTENCIA NETA");
+    assert.equal(etiquetaLegible("ANCHO MAXIMO:"), "ANCHO MAXIMO");
+    assert.equal(etiquetaLegible("Alcanse maximo "), "Alcanse maximo");
     assert.equal(etiquetaLegible("Peso CE"), "Peso CE");
   });
 });
@@ -65,9 +56,9 @@ describe("paresDeEspecificaciones", () => {
       '<tr><td><strong>MOTOR</strong></td><td colspan="2">Motor X1</td><td> </td></tr>' +
       "</tbody></table>";
     assert.deepEqual(paresDeEspecificaciones(html), [
-      { etiqueta: "Potencia neta", valor: "100 hp" },
-      { etiqueta: "Alcance", valor: "5,5 m" },
-      { etiqueta: "Motor", valor: "Motor X1" },
+      { etiqueta: "POTENCIA NETA", valor: "100 hp" },
+      { etiqueta: "ALCANCE", valor: "5,5 m" },
+      { etiqueta: "MOTOR", valor: "Motor X1" },
     ]);
   });
 
@@ -86,8 +77,8 @@ describe("paresDeEspecificaciones", () => {
     const html =
       "<ul><li><strong>ANCHO B&#193;SICO:</strong> 1.500 mm</li><li><strong>USO:</strong> Obra</li></ul>";
     assert.deepEqual(paresDeEspecificaciones(html), [
-      { etiqueta: "Ancho básico", valor: "1.500 mm" },
-      { etiqueta: "Uso", valor: "Obra" },
+      { etiqueta: "ANCHO BÁSICO", valor: "1.500 mm" },
+      { etiqueta: "USO", valor: "Obra" },
     ]);
   });
 
@@ -109,16 +100,16 @@ describe("paresDeEspecificaciones", () => {
     const html =
       "<ul><li><strong>ANCHO DE RODADURA: 1</strong>500 mm</li><li><strong>MOTOR: </strong>Motor X1</li></ul>";
     assert.deepEqual(paresDeEspecificaciones(html), [
-      { etiqueta: "Ancho de rodadura", valor: "1500 mm" },
-      { etiqueta: "Motor", valor: "Motor X1" },
+      { etiqueta: "ANCHO DE RODADURA", valor: "1500 mm" },
+      { etiqueta: "MOTOR", valor: "Motor X1" },
     ]);
   });
 
-  it("aplica la tabla de etiquetas corregidas, y solo a las que están", () => {
+  it("no corrige la ortografía de las etiquetas (decisión del cliente)", () => {
     const html =
       "<table><tr><td>Alcance maximo en el suelo</td><td>5 m</td><td>Peso operacional</td><td>9 t</td></tr></table>";
     assert.deepEqual(paresDeEspecificaciones(html), [
-      { etiqueta: "Alcance máximo en el suelo", valor: "5 m" },
+      { etiqueta: "Alcance maximo en el suelo", valor: "5 m" },
       { etiqueta: "Peso operacional", valor: "9 t" },
     ]);
   });
@@ -259,6 +250,48 @@ describe("descripción para buscadores", () => {
       descripcionSeoDeFicha({ ...base, metaWp: "El RX-9.", htmlDescripcion: "", descartarWp: true })
         .origen,
       "generada",
+    );
+  });
+});
+
+describe("etiquetasTalCual", () => {
+  const wp = [
+    { etiqueta: "POTENCIA NETA", valor: "100 hp" },
+    { etiqueta: "Alcanse maximo", valor: "5 m" },
+  ];
+  it("pone la etiqueta de WordPress y conserva id, valor y «Destacar»", () => {
+    const r = etiquetasTalCual(
+      [
+        { id: "a", etiqueta: "Potencia neta", valor: "100 hp", destacar: true },
+        { id: "b", etiqueta: "Alcance máximo", valor: "5 m", destacar: false },
+      ],
+      wp,
+    );
+    assert.deepEqual(r, [
+      { id: "a", etiqueta: "POTENCIA NETA", valor: "100 hp", destacar: true },
+      { id: "b", etiqueta: "Alcanse maximo", valor: "5 m", destacar: false },
+    ]);
+  });
+  it("«igual» si ya están como en WordPress", () => {
+    assert.equal(
+      etiquetasTalCual(
+        wp.map((f) => ({ ...f })),
+        wp,
+      ),
+      "igual",
+    );
+  });
+  it("no toca una ficha que un editor cambió (otras filas u otro valor)", () => {
+    assert.equal(etiquetasTalCual([{ etiqueta: "Potencia neta", valor: "100 hp" }], wp), null);
+    assert.equal(
+      etiquetasTalCual(
+        [
+          { etiqueta: "Potencia neta", valor: "110 hp" },
+          { etiqueta: "Alcance máximo", valor: "5 m" },
+        ],
+        wp,
+      ),
+      null,
     );
   });
 });

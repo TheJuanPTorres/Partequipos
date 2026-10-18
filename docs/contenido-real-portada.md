@@ -34,7 +34,7 @@ Blob cada una (Media no genera tamaños derivados).
 | Sec. 2, marcas     | Logos y fotos de la maqueta; 3 marcas            | Logo y foto de cada marca de la home de WP; **4 marcas, con Dynapac** (decisión de dirección)                                                                                                                                                                                                |
 | Sec. 3, usados     | Brazo de excavadora recortado                    | **El brazo de Andrés, como excepción temporal** (dirección, 2026-10-16, CLAUDE.md §10.38): WP no tiene ningún PNG recortado; se sube por `runbook-brazo-usada.md` hasta que llegue el del cliente. Las fichas de ejemplo las retira la copia; las pestañas se llenan con las unidades reales |
 | Sec. 4, logos      | 9 logos                                          | Los **6 de «Nuestras Marcas»** de WP (decisión de dirección)                                                                                                                                                                                                                                 |
-| Sec. 5, repuestos  | 4 imágenes de la maqueta                         | Las 4 de la plantilla de categorías de WP, con su título y su enlace a la página de categoría. Corrige la errata «Blades y corte» → «Baldes y herramienta de corte»                                                                                                                          |
+| Sec. 5, repuestos  | 4 imágenes de la maqueta                         | Las 4 de la plantilla de categorías de WP, con su título y su enlace a la página de categoría. «Blades y corte» era de la maqueta de ux-9, no de WordPress: va el título de WP                                                                                                               |
 | Sec. 6–8, compañía | Vídeo de ux-9 y un YouTube que no es del cliente | **Imagen** de WP (sin vídeo) y el YouTube que pinta Nosotros en WP                                                                                                                                                                                                                           |
 | Sec. 9, sedes      | 7 sedes de la maqueta, con foto                  | Las sedes de «NUESTRAS sedes» de WP, agrupadas como su mapa (Antioquia = Caucasia, Guarne y Medellín). **Sin foto**: WP no tiene fotos de sedes                                                                                                                                              |
 | Sec. 10 y 11       | Testimonios y preguntas de la maqueta            | **No se tocan**: los reales los gestiona dirección con el cliente. Sin datos, las secciones no se pintan                                                                                                                                                                                     |
@@ -43,10 +43,14 @@ Blob cada una (Media no genera tamaños derivados).
 | Nosotros           | Vídeo, animación, cifras y textos de la maqueta  | Imagen de cabecera, párrafo y mapa de sedes reales, «+26 Años de experiencia», franja «Marcas aliadas» con foto de WP (sin máquina recortada) y tarjetas con la meta descripción de cada sección de WP                                                                                       |
 | SEO                | Textos de la siembra                             | Meta descripción de WP en la home y Nosotros                                                                                                                                                                                                                                                 |
 
-**Normalizado al importar** (y anotado para Andrés): los títulos que WordPress
-escribe todo en mayúsculas pasan a mayúscula inicial («OFRECEMOS SOLUCIONES…»
-→ «Ofrecemos soluciones…»); el diseño pone las mayúsculas por CSS donde las
-quiere, y un lector de pantalla puede deletrear un texto en mayúsculas.
+**Títulos tal cual, como los pinta WordPress** (decisión del cliente,
+2026-10-18): con su texto y en mayúsculas cuando WordPress los escribe así o
+los pinta así por CSS (`typography_text_transform`, `pintado` del extractor).
+Así las 10 categorías de repuestos salen como en su web («REPUESTOS PARA MOTOR
+DIESEL», «HIDRÁULICOS», «BALDES Y HERRAMIENTA DE CORTE»), y Nosotros con
+«OFRECEMOS SOLUCIONES PARA TUS PROYECTOS». Hasta entonces se pasaban a
+mayúscula inicial y se corregían cuatro títulos («Motor diésel»,
+«Componentes hidráulicos»…).
 
 **Huecos** (sin equivalente en WP, aceptados «sin imagen» por dirección si la
 sección se ve bien): fotos de las sedes, máquina de la cabecera de usados, imagen del

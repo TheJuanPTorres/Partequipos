@@ -1308,6 +1308,15 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 >   (`docs/repuestos-importacion.md` §10).
 > - **No reabre el paso 0 de README §7** para estas fotos: no son de la copia
 >   de demostración, y la decisión de publicarlas es del cliente.
+> - **Las erratas, tal cual (2026-10-18, dirección):** los importadores ya no
+>   corrigen textos ni mayúsculas (etiquetas de las fichas técnicas, títulos de
+>   lubricantes, de aditamentos, de las categorías de la portada y de Nosotros,
+>   como los pinta WordPress). **No se copian**, por decisión de dirección: los
+>   3 PDF de otro producto (1150M y dos lubricantes), los títulos y descripciones
+>   para buscadores que nombran otro modelo, y el texto de relleno de la
+>   cabecera de Servicio técnico. Lista para el cliente:
+>   `informes/2026-10-18-erratas-wordpress-para-el-cliente.md`; sitio
+>   publicado por `runbook-erratas-tal-cual.md`.
 
 > **Decisión de dirección del 2026-10-02.** Para enseñar el avance, la home de
 > producción puede llevar los assets que hasta ahora solo iban al preview:

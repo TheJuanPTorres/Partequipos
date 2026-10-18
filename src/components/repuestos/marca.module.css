@@ -971,6 +971,21 @@ a.modelo:hover {
 }
 
 /*
+ * El recuadro se desplaza con el scroll, como el export (`RecuadrosConScroll`
+ * pone la variable): con `transform`, que no mueve nada más ni cuenta como CLS.
+ * Con «reducir movimiento», quieto.
+ */
+.tarjetasIndice .panel[data-recuadro-scroll] {
+  transform: translateY(var(--recuadro-desplazamiento, 0px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjetasIndice .panel[data-recuadro-scroll] {
+    transform: none;
+  }
+}
+
+/*
  * La caja de la foto se ve entera: con las cuatro esquinas redondeadas y el
  * borde de arriba alineado en toda la fila, también con las fotos de producto
  * sobre fondo blanco (filtros, cadenas…), que sobre la sección blanca parecían

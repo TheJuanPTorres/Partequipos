@@ -892,10 +892,14 @@ a.modelo:hover {
   background: var(--color-fondo-seccion);
 }
 
-/* La línea sobre el título: en rojo, 16 px y peso 500 («Plantilla 1», 2026-10-18). */
+/*
+ * La línea sobre el título: 16 px y peso 500 («Plantilla 1», 2026-10-18). En
+ * BLANCO, con foto y sin ella (dirección, 2026-10-18: el rojo del diseño no se
+ * leía sobre la foto), como el resto del texto de la cabecera.
+ */
 .antetituloHero {
   margin: 0;
-  color: var(--color-marca);
+  color: #fff;
   font-size: 16px;
   font-weight: 500;
   line-height: 1;

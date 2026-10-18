@@ -334,6 +334,11 @@ extracción de WordPress:
 
 Idempotente; la retirada (`manifiesto-tipo-anidado-<destino>.json`) lo deshace al revés y vuelve a crear la madre y las 301. No revalida: después, redesplegar. Sitio publicado: `Desktop/partequipos-cierre/runbook-case-excavadora.md`.
 
+**Resultado en el preview (2026-10-18):** simulación y aplicación con la madre borrada, el tipo creado (`wp-tipo-15850-…`),
+los 4 modelos con su foto (`wp-repuesto-40793/40797/40804/40808-…`) y las 4 301 borradas; segunda pasada sin cambios;
+**retirada probada** (4 modelos y el tipo borrados, la madre y las 4 301 vueltas a crear, las 5 fotos en 404) y vuelto a
+aplicar. La simulación del importador da «retirada de la demo: 0 tipos y 0 modelos»: no se para.
+
 ## 10. Fotos de los modelos (agente A, 2026-10-17, decisión del cliente)
 
 **El cliente decide migrar toda la información de su web**, aunque esté mal o

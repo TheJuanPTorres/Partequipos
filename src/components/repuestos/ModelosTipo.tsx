@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import reserva from "@/components/blog/cabeceraArticulo.module.css";
+import type { GrupoDeModelos } from "@/lib/repuestos/series";
 import type { ModeloEnlace } from "@/lib/repuestos/tipo";
 
 import estilos from "./marca.module.css";
@@ -17,17 +18,22 @@ import estilos from "./marca.module.css";
  * no se reparten distinto con una fuente y con otra.
  *
  * Sin modelos publicados, un aviso en vez de una franja vacía.
+ *
+ * Con `grupos` (un tipo con SERIES, como Hitachi), un subtítulo por serie con
+ * su ancla, a la que baja la tarjeta de la serie en la página de la marca.
  */
 export function ModelosTipo({
   id,
   titulo,
   modelos,
   vacio,
+  grupos,
 }: {
   id: string;
   titulo: string;
   modelos: ModeloEnlace[];
   vacio: string;
+  grupos?: GrupoDeModelos<ModeloEnlace>[] | null;
 }) {
   const idTitulo = `${id}-titulo`;
   return (
@@ -37,30 +43,40 @@ export function ModelosTipo({
       </h2>
       {modelos.length === 0 ? (
         <p className={estilos.modelosVacio}>{vacio}</p>
+      ) : grupos ? (
+        grupos.map((g) => (
+          <div key={g.ancla ?? "otros"} id={g.ancla ?? undefined} className={estilos.modelosGrupo}>
+            <h3 className={estilos.modelosSerie}>{g.titulo}</h3>
+            <ListaModelos modelos={g.modelos} />
+          </div>
+        ))
       ) : (
-        <ul className={estilos.modelosLista}>
-          {modelos.map((m) => (
-            <li key={m.id}>
-              <Link href={m.href} className={estilos.modelo}>
-                <span
-                  className={`${reserva.reserva} ${estilos.modeloTexto}`}
-                  data-reserva={m.nombre}
-                >
-                  <span>{m.nombre}</span>
-                </span>
-                {m.codigo ? (
-                  <span
-                    className={`${reserva.reserva} ${estilos.modeloTexto} ${estilos.modeloCodigo}`}
-                    data-reserva={m.codigo}
-                  >
-                    <span>{m.codigo}</span>
-                  </span>
-                ) : null}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <ListaModelos modelos={modelos} />
       )}
     </section>
+  );
+}
+
+function ListaModelos({ modelos }: { modelos: ModeloEnlace[] }) {
+  return (
+    <ul className={estilos.modelosLista}>
+      {modelos.map((m) => (
+        <li key={m.id}>
+          <Link href={m.href} className={estilos.modelo}>
+            <span className={`${reserva.reserva} ${estilos.modeloTexto}`} data-reserva={m.nombre}>
+              <span>{m.nombre}</span>
+            </span>
+            {m.codigo ? (
+              <span
+                className={`${reserva.reserva} ${estilos.modeloTexto} ${estilos.modeloCodigo}`}
+                data-reserva={m.codigo}
+              >
+                <span>{m.codigo}</span>
+              </span>
+            ) : null}
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }

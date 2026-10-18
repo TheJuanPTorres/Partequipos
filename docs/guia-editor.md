@@ -213,11 +213,19 @@ oficial, no lo pongas.
   porque es blanco y no se vería.
 - Los **tipos de equipo** llevan una **imagen de la tarjeta** opcional: la
   foto de su tarjeta en la página de la marca.
+- **Series** (opcional, en el tipo de equipo): si los modelos de un tipo se
+  reparten por serie del fabricante —como Hitachi, con **EX** y **ZAXIS**—,
+  añade una fila por serie, con su nombre y su foto, en el orden en que
+  quieras las tarjetas. La página de la marca pinta entonces **una tarjeta por
+  serie** en lugar de la del tipo, y la página del tipo agrupa los modelos por
+  serie. En cada **modelo**, el campo **Serie** dice a cuál pertenece (tiene
+  que ser una de las de su tipo; si no, no deja guardar). Un modelo sin serie
+  sale al final, en «Otros modelos».
 - Las **categorías técnicas** son las mismas en todas las marcas: su
   **icono**, su **enlace** y su **posición en las páginas de marca** se
   editan en cada categoría (**Repuestos → Categorías técnicas**).
-- Lo común a todas las páginas de marca (títulos de las secciones, las
-  tarjetas de usada y aditamentos, el contacto y los testimonios) está en
+- Lo común a todas las páginas de marca (títulos de las secciones, el
+  contacto y los testimonios) está en
   **Partes del sitio → Páginas de marca de repuestos**. Un título vacío
   esconde su sección: cada campo dice cuál.
 

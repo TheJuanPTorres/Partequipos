@@ -189,3 +189,44 @@ el manifiesto:
 - 32 imágenes subidas y 32 tipos con su imagen; quitado el fondo de ejemplo de Caterpillar.
 - Segunda pasada: 0 subidas, mismos números.
 - **Retirada completa:** devolvió los 69 registros y las 33 imágenes cambiadas a su valor de antes (el fondo de ejemplo de Caterpillar, las imágenes de ejemplo de los tipos de la demo) y los 45 ficheros dieron 404; después se volvió a importar (32 de 32 tipos con su imagen)
+
+## 8. Series de un tipo: Hitachi EX y ZAXIS (agente C, 2026-10-17)
+
+**Qué había en WordPress.** La página de marca de Hitachi (y sus dos páginas de tipo) no pintaba una tarjeta por tipo,
+sino **cuatro por serie**: «excavadora HITACHI EX», «… ZAXIS», «miniexcavadora HITACHI EX» y «… ZAXIS». Cada una era una
+tarjeta de Elementor **sin enlace**, con un botón «VER MÁS» que desplegaba una lista de modelos **en texto, sin enlaces**.
+No tenían URL, texto ni SEO propios: los modelos cuelgan de los dos tipos (excavadora y miniexcavadora), como los
+importamos. Revisadas las 13 páginas de marca y las 33 de tipo publicadas: **solo Hitachi** tiene el caso.
+
+> Las 4 páginas «de nivel 4» de la extracción **no** eran las series de Hitachi: son las 4 excavadoras de CASE (§4).
+
+**Cómo se recupera (decisión de dirección):**
+
+| Pieza           | Qué                                                                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Esquema         | «Series» (array opcional: nombre y foto; el orden es el de las filas) en `tipos-equipo`, y «Serie» (texto validado contra las de su tipo) en el modelo  |
+| Migración       | `20261018_033818_series_repuestos`, solo esquema                                                                                                        |
+| Página de marca | Un tipo con series pinta una tarjeta por serie (título de WordPress y su foto, o la del tipo) que enlaza a `…/<tipo>/#serie-<nombre>`                   |
+| Página de tipo  | Los modelos se agrupan bajo «Serie EX», «Serie ZAXIS»…, con su ancla; los que no tienen serie, al final en «Otros modelos». Una serie vacía no se pinta |
+| URL y SEO       | **Sin URL nuevas, sin 301 y sin bloque SEO por serie**: WordPress no los tenía                                                                          |
+
+Lógica pura en `src/lib/repuestos/series.ts` (con pruebas); las otras 12 marcas, sin series, se pintan como siempre.
+
+**Datos:** `scripts/repuestos/series.ts` (`npm run preview:repuestos:series:simular|aplicar|retirar`), con el plan en
+`src/lib/repuestos/seriesHitachi.ts`:
+
+- EX y ZAXIS, en ese orden, en los 2 tipos. EX usa la foto del tipo (la misma de WordPress); las 2 de ZAXIS se
+  descargan del WordPress del cliente como `wp-serie-…-zaxis` (dirección: como las demás fotos de tipo). Texto
+  alternativo corregido: en WordPress la de excavadora ZAXIS decía «Hitachi CX 200».
+- La serie de cada modelo, **por el prefijo de su código** (EX… → EX, ZX… → ZAXIS). Así se corrige la errata de
+  WordPress, que listaba la ZX450LC-5 como «EX450LC-5» entre las miniexcavadoras EX. Reparto: excavadora 11 EX ·
+  15 ZAXIS; miniexcavadora 6 EX · 14 ZAXIS.
+- Manifiesto `Desktop/partequipos-cierre/manifiesto-series-<destino>.json` con lo de antes; la retirada lo devuelve y
+  borra las fotos (comprueba el 404). Idempotente. No revalida: después, redesplegar.
+
+Sitio publicado: `Desktop/partequipos-cierre/runbook-series-hitachi.md` (dirección).
+
+**Resultado en el preview (2026-10-17):** simulación con 11 · 15 y 6 · 14; aplicado; segunda pasada «(ya estaban)» y
+sin fotos nuevas; **retirada probada** (46 modelos y 2 tipos devueltos, las 2 fotos en 404) y vuelto a aplicar. Las
+líneas `[revalidación] falló … static generation store missing` son las de siempre al escribir fuera de Next: no
+revalida, por eso se redespliega.

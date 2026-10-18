@@ -47,6 +47,20 @@ export const TipoMaquinaria: CollectionConfig = {
       label: "Marca",
     },
     { name: "descripcion", type: "textarea", label: "Descripción" },
+    /*
+     * Foto de la tarjeta del tipo en la página de su marca (2026-10-17). Vacía,
+     * la tarjeta usa la primera foto del primer equipo del tipo.
+     */
+    {
+      name: "imagen",
+      type: "upload",
+      relationTo: "media",
+      label: "Imagen de la tarjeta",
+      admin: {
+        description:
+          "Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.",
+      },
+    },
     seoField(),
   ],
 };

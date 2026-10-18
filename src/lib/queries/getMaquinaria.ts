@@ -83,7 +83,8 @@ export const getTiposDeMarcaMaquinaria = cache(
     const { docs } = await payload.find({
       collection: "tipos-maquinaria",
       where: { marca: { equals: marcaId } },
-      depth: 0,
+      // `depth: 1` puebla la imagen de la tarjeta del tipo.
+      depth: 1,
       limit: 0,
       sort: "nombre",
     });

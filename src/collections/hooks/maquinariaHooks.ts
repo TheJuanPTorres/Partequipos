@@ -2,6 +2,7 @@ import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadReque
 
 import {
   revalidarRutas,
+  revalidarTodoElSitio,
   rutasDeCategoriaNueva,
   rutasDeCategoriaUsada,
   revalidarPaginasUsadas,
@@ -10,6 +11,7 @@ import {
   rutasDeTipoMaquinaria,
 } from "@/lib/revalidation";
 import { ETIQUETAS_DATOS, revalidarDatos } from "@/lib/cacheDatos";
+import { cambiaElMenuPorEquipo } from "@/lib/nueva/tiposConEquipos";
 import { rutas } from "@/lib/routes";
 import { poblado } from "@/lib/utils/relations";
 
@@ -149,10 +151,57 @@ async function hermanosDe(req: PayloadRequest, doc: { slug: string; tipo: unknow
   return (await equiposDeTipo(req, tipoId)).filter((slug) => slug !== doc.slug);
 }
 
-export const revalidarEquipoNuevo: CollectionAfterChangeHook = async ({ doc, req }) => {
+/**
+ * El megamenú solo enlaza a los tipos de maquinaria nueva CON equipos: si este
+ * equipo hace que un tipo aparezca o desaparezca, el menú de todo el sitio se
+ * refresca (y solo entonces: no se revalida el sitio por cada equipo).
+ */
+async function refrescarMenuSiCambia(
+  req: PayloadRequest,
+  operacion: "create" | "update" | "delete",
+  doc: { id?: unknown; slug?: string; tipo?: unknown },
+  anterior?: { tipo?: unknown } | null,
+): Promise<void> {
+  const idTipo = (t: unknown) => {
+    const p = poblado<{ id: number }>(t as number | { id: number } | null | undefined);
+    return typeof t === "number" ? t : (p?.id ?? null);
+  };
+  const tipo = idTipo(doc.tipo);
+  const { totalDocs } =
+    tipo === null
+      ? { totalDocs: 0 }
+      : await req.payload.count({
+          collection: "equipos-nuevos",
+          where: { tipo: { equals: tipo } },
+          req,
+        });
+  if (
+    cambiaElMenuPorEquipo({
+      operacion,
+      tipo,
+      tipoAnterior: anterior ? idTipo(anterior.tipo) : null,
+      equiposDelTipo: totalDocs,
+    })
+  ) {
+    revalidarTodoElSitio(`equipo nuevo ${doc.slug ?? doc.id ?? ""} (megamenú)`);
+  }
+}
+
+export const revalidarEquipoNuevo: CollectionAfterChangeHook = async ({
+  doc,
+  previousDoc,
+  operation,
+  req,
+}) => {
   try {
     // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
     revalidarDatos(ETIQUETAS_DATOS.nueva, `equipo nuevo ${doc.slug}`);
+    await refrescarMenuSiCambia(
+      req,
+      operation === "create" ? "create" : "update",
+      doc,
+      previousDoc,
+    );
     const marcaSlug = await slugPorId(req, "marcas-maquinaria", doc.marca);
     const tipoSlug = await slugPorId(req, "tipos-maquinaria", doc.tipo);
     if (!marcaSlug || !tipoSlug) return doc;
@@ -216,6 +265,7 @@ export const revalidarEquipoNuevoBorrado: CollectionAfterDeleteHook = async ({ d
   try {
     // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
     revalidarDatos(ETIQUETAS_DATOS.nueva, `equipo nuevo borrado ${doc.slug}`);
+    await refrescarMenuSiCambia(req, "delete", doc);
     const marcaSlug = await slugPorId(req, "marcas-maquinaria", doc.marca);
     const tipoSlug = await slugPorId(req, "tipos-maquinaria", doc.tipo);
     if (!marcaSlug || !tipoSlug) return doc;

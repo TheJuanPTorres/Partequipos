@@ -119,18 +119,43 @@ async function cadenaCoherente(colecciones: string[], slug: string, padres: stri
     });
   }
 
+  // Repuestos con tipo ANIDADO (src/lib/repuestos/anidado.ts): con 3 padres,
+  // el tipo es el tercero y cuelga del segundo.
+  const anidado = esRepuestos && padres.length === 3;
   const { docs: tipos } = await payload.find({
     collection: tipoCol,
-    where: { and: [{ marca: { equals: marca.id } }, { slug: { equals: padres[1] } }] },
+    where: {
+      and: [
+        { marca: { equals: marca.id } },
+        { slug: { equals: anidado ? padres[2] : padres[1] } },
+        ...(anidado ? [{ slugPadre: { equals: padres[1] } }] : []),
+      ],
+    },
     limit: 1,
     depth: 0,
   });
   const tipo = tipos[0];
   if (!tipo) return false;
 
-  return existe(coleccion as CollectionSlug, {
-    and: [{ tipo: { equals: tipo.id } }, { slug: { equals: slug } }],
-  });
+  if (
+    await existe(coleccion as CollectionSlug, {
+      and: [{ tipo: { equals: tipo.id } }, { slug: { equals: slug } }],
+    })
+  ) {
+    return true;
+  }
+  // Con 2 padres en repuestos, también puede ser un tipo anidado bajo `padres[1]`.
+  return (
+    esRepuestos &&
+    colecciones.includes("tipos-equipo") &&
+    existe(tipoCol, {
+      and: [
+        { marca: { equals: marca.id } },
+        { slug: { equals: slug } },
+        { slugPadre: { equals: padres[1] } },
+      ],
+    })
+  );
 }
 
 type Veredicto = "resuelve" | "sin-contenido" | "sin-ruta" | "externa";

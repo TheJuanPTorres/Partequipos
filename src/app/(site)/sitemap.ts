@@ -19,6 +19,7 @@ import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
 import { tiposConEquipos } from "@/lib/nueva/tiposConEquipos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
 import { poblado } from "@/lib/utils/relations";
+import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/payload-types";
 
 /**
@@ -99,7 +100,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     tipos: tipos.flatMap((tipo) => {
       const marca = poblado<Marca>(tipo.marca);
       // Sin marca poblada no se puede construir la URL: se omite.
-      return marca ? [{ slug: tipo.slug, updatedAt: tipo.updatedAt, marcaSlug: marca.slug }] : [];
+      // Un tipo anidado (src/lib/repuestos/anidado.ts) lleva el slug de su padre delante.
+      return marca
+        ? [{ slug: segmentoDeTipo(tipo), updatedAt: tipo.updatedAt, marcaSlug: marca.slug }]
+        : [];
     }),
 
     modelos: modelos.flatMap((modelo) => {
@@ -111,7 +115,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           slug: modelo.slug,
           updatedAt: modelo.updatedAt,
           marcaSlug: marca.slug,
-          tipoSlug: tipo.slug,
+          tipoSlug: segmentoDeTipo(tipo),
         },
       ];
     }),

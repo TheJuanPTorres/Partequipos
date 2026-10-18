@@ -200,6 +200,8 @@ export function pesoOperativoKg(pares: Par[]): number | null {
 function numeroEs(texto: string, toneladas: boolean): number | null {
   let t = texto.replace(/[.,]$/, "");
   if (toneladas && /^\d+\.\d{1,2}$/.test(t)) return Number(t);
+  // Ningún grupo de miles empieza por 0: «0.717 t» son 717 kg (Ammann ARW 65).
+  if (/^0[.,]\d+$/.test(t)) return Number(t.replace(",", "."));
   t = t.replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", ".");
   const n = Number(t);
   return Number.isFinite(n) ? n : null;

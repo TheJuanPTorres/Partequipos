@@ -48,6 +48,7 @@ import * as migration_20261018_003210_tipo_maquinaria_imagen from './20261018_00
 import * as migration_20261018_033818_series_repuestos from './20261018_033818_series_repuestos';
 import * as migration_20261018_040447_grupos_categorias_tecnicas from './20261018_040447_grupos_categorias_tecnicas';
 import * as migration_20261018_042119_tipo_maquinaria_subtipos_pestana from './20261018_042119_tipo_maquinaria_subtipos_pestana';
+import * as migration_20261018_044941_tipo_anidado_repuestos from './20261018_044941_tipo_anidado_repuestos';
 
 export const migrations = [
   {
@@ -298,6 +299,11 @@ export const migrations = [
   {
     up: migration_20261018_042119_tipo_maquinaria_subtipos_pestana.up,
     down: migration_20261018_042119_tipo_maquinaria_subtipos_pestana.down,
-    name: '20261018_042119_tipo_maquinaria_subtipos_pestana'
+    name: '20261018_042119_tipo_maquinaria_subtipos_pestana',
+  },
+  {
+    up: migration_20261018_044941_tipo_anidado_repuestos.up,
+    down: migration_20261018_044941_tipo_anidado_repuestos.down,
+    name: '20261018_044941_tipo_anidado_repuestos'
   },
 ];

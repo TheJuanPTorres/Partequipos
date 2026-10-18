@@ -2,6 +2,7 @@ import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadReque
 
 import { revalidarRutas, rutasDeMarca, rutasDeModelo, rutasDeTipo } from "@/lib/revalidation";
 import { rutas } from "@/lib/routes";
+import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { poblado } from "@/lib/utils/relations";
 import type { Marca, TiposEquipo } from "@/payload-types";
 
@@ -17,14 +18,17 @@ import { crearRedirectPorCambioDeSlug } from "./autoRedirect";
  * revalidación falla, el documento ya quedó guardado igualmente (criterio 5).
  */
 
-/** Slug de una relación que puede venir como id o como documento poblado. */
-async function slugDeRelacion<T extends { id: number; slug: string }>(
+/**
+ * Slug de una relación que puede venir como id o como documento poblado. De un
+ * tipo anidado, su segmento con el padre delante (src/lib/repuestos/anidado.ts).
+ */
+async function slugDeRelacion<T extends { id: number; slug: string; slugPadre?: string | null }>(
   req: PayloadRequest,
   collection: "marcas" | "tipos-equipo",
   rel: number | T | null | undefined,
 ): Promise<string | null> {
   const doc = poblado<T>(rel);
-  if (doc?.slug) return doc.slug;
+  if (doc?.slug) return segmentoDeTipo(doc);
   if (typeof rel !== "number") return null;
 
   const encontrado = await req.payload.findByID({
@@ -33,7 +37,12 @@ async function slugDeRelacion<T extends { id: number; slug: string }>(
     depth: 0,
     disableErrors: true,
   });
-  return encontrado && "slug" in encontrado ? String(encontrado.slug) : null;
+  if (!encontrado || !("slug" in encontrado)) return null;
+  const slugPadre = "slugPadre" in encontrado ? encontrado.slugPadre : null;
+  return segmentoDeTipo({
+    slug: String(encontrado.slug),
+    slugPadre: typeof slugPadre === "string" ? slugPadre : null,
+  });
 }
 
 /** Slugs de los tipos de una marca, con los slugs de sus modelos. */
@@ -47,7 +56,7 @@ async function hijosDeMarca(req: PayloadRequest, marcaId: number) {
 
   return Promise.all(
     tipos.map(async (tipo) => ({
-      tipoSlug: tipo.slug,
+      tipoSlug: segmentoDeTipo(tipo),
       modeloSlugs: await modelosDeTipo(req, tipo.id),
     })),
   );
@@ -121,22 +130,25 @@ export const revalidarTipo: CollectionAfterChangeHook = async ({ doc, previousDo
     if (!marcaSlug) return doc;
 
     const modeloSlugs = await modelosDeTipo(req, doc.id);
-    const paths = rutasDeTipo(marcaSlug, doc.slug, modeloSlugs);
+    // El segmento de la URL: el slug o, en un tipo anidado, `<slugPadre>/<slug>`.
+    const segmento = segmentoDeTipo(doc);
+    const segmentoAnterior = previousDoc?.slug ? segmentoDeTipo(previousDoc) : null;
+    const paths = rutasDeTipo(marcaSlug, segmento, modeloSlugs);
 
-    if (previousDoc?.slug && previousDoc.slug !== doc.slug) {
-      paths.push(...rutasDeTipo(marcaSlug, previousDoc.slug, modeloSlugs));
+    if (segmentoAnterior && segmentoAnterior !== segmento) {
+      paths.push(...rutasDeTipo(marcaSlug, segmentoAnterior, modeloSlugs));
 
       // ADR 0005: 301 del tipo y de las fichas que colgaban de él.
       await crearRedirectPorCambioDeSlug(
         req,
-        rutas.tipo(marcaSlug, previousDoc.slug),
-        rutas.tipo(marcaSlug, doc.slug),
+        rutas.tipo(marcaSlug, segmentoAnterior),
+        rutas.tipo(marcaSlug, segmento),
       );
       for (const modeloSlug of modeloSlugs) {
         await crearRedirectPorCambioDeSlug(
           req,
-          rutas.modelo(marcaSlug, previousDoc.slug, modeloSlug),
-          rutas.modelo(marcaSlug, doc.slug, modeloSlug),
+          rutas.modelo(marcaSlug, segmentoAnterior, modeloSlug),
+          rutas.modelo(marcaSlug, segmento, modeloSlug),
         );
       }
     }
@@ -144,7 +156,7 @@ export const revalidarTipo: CollectionAfterChangeHook = async ({ doc, previousDo
     // Si el tipo se movió de marca, la marca anterior también cambia su listado.
     const marcaAnterior = await slugDeRelacion<Marca>(req, "marcas", previousDoc?.marca);
     if (marcaAnterior && marcaAnterior !== marcaSlug) {
-      paths.push(...rutasDeTipo(marcaAnterior, previousDoc.slug ?? doc.slug, modeloSlugs));
+      paths.push(...rutasDeTipo(marcaAnterior, segmentoAnterior ?? segmento, modeloSlugs));
     }
 
     revalidarRutas(paths, `tipo ${doc.slug}`);
@@ -160,7 +172,10 @@ export const revalidarTipoBorrado: CollectionAfterDeleteHook = async ({ doc, req
     if (!marcaSlug) return doc;
 
     const modeloSlugs = await modelosDeTipo(req, doc.id).catch(() => []);
-    revalidarRutas(rutasDeTipo(marcaSlug, doc.slug, modeloSlugs), `tipo borrado ${doc.slug}`);
+    revalidarRutas(
+      rutasDeTipo(marcaSlug, segmentoDeTipo(doc), modeloSlugs),
+      `tipo borrado ${doc.slug}`,
+    );
   } catch (error) {
     console.error("[revalidación] hook de borrado de TipoEquipo falló:", error);
   }

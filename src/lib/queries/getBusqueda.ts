@@ -5,6 +5,7 @@ import { getPayload, type Where } from "payload";
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 
 import { TOPE_POR_GRUPO } from "@/lib/buscador/consulta";
+import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { rutas } from "@/lib/routes";
 import { poblado } from "@/lib/utils/relations";
 import type {
@@ -137,7 +138,7 @@ async function buscarEnLaBase(texto: string): Promise<ResultadosBusqueda> {
           {
             id: m.id,
             titulo: m.nombre,
-            href: rutas.modelo(marca.slug, tipo.slug, m.slug),
+            href: rutas.modelo(marca.slug, segmentoDeTipo(tipo), m.slug),
             detalle: `Repuestos · ${marca.nombre} · ${tipo.nombre}`,
           },
         ];

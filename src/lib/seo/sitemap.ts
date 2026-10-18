@@ -62,6 +62,8 @@ export const PATRONES_SITEMAP = [
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]",
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]",
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]/[modelo]",
+  // Fichas de un tipo ANIDADO (las excavadoras de CASE, src/lib/repuestos/anidado.ts).
+  "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]/[modelo]/[submodelo]",
   "/maquinaria-pesada",
   "/maquinaria-pesada/maquinaria-pesada-nueva",
   "/maquinaria-pesada/maquinaria-pesada-nueva/[categoria]",

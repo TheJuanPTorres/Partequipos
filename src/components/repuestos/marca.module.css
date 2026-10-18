@@ -190,6 +190,15 @@
   flex: 1;
 }
 
+/* El icono del ratón, al pie de la tarjeta: así lo centrado es el título con su texto. */
+.heroBajo .raton {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  margin-top: 0;
+  transform: translateX(-50%);
+}
+
 /* Anchos del texto del encabezado medidos: 880 a 1010 y 278 a 390. */
 @media (max-width: 1024px) {
   .heroContenido {

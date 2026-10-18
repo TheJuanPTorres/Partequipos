@@ -1,16 +1,24 @@
 import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
+import { IndiceTarjetas } from "@/components/indices/IndiceTarjetas";
+import estilos from "@/components/repuestos/marca.module.css";
+import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { vistaEncabezadoDeIndice } from "@/lib/indices/paginasIndice";
 import {
   getCategoriasUsada,
   getInventarioUsados,
   getMarcasUsada,
 } from "@/lib/queries/getMaquinaria";
+import { getMarcas } from "@/lib/queries/getMarcas";
+import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
+import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
+import { fondoDeRespaldo } from "@/lib/repuestos/categoria";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
+import { tarjetasDeCategoriasUsada, tarjetasDeMarcasUsada } from "@/lib/usados/indice";
 
 const TITULO = "Maquinaria pesada usada";
 const DESCRIPCION =
@@ -20,11 +28,24 @@ export async function generateMetadata(): Promise<Metadata> {
   return metadataDe({ nombre: TITULO, path: rutas.usada(), descripcion: DESCRIPCION });
 }
 
+const ANCLA = "usada-categorias";
+
+/**
+ * ÍNDICE DE USADOS con la «Plantilla 1» de Andrés (2026-10-18, petición del
+ * cliente), el mismo componente que el índice de Maquinaria (`IndiceTarjetas`):
+ * la cabecera con los textos del global `paginas-indice` (grupo «usada»; vacíos,
+ * los de siempre), una tarjeta por categoría con unidades y, debajo, el bloque
+ * «Marcas» con una tarjeta por marca con unidades y su número. Las categorías y
+ * marcas sin unidades no salen (D4). Fotos: `lib/usados/indice.ts`.
+ */
 export default async function UsadaIndexPage() {
-  const [categorias, marcas, inventario] = await Promise.all([
+  const [categorias, marcasUsada, inventario, indice, global, marcas] = await Promise.all([
     getCategoriasUsada(),
     getMarcasUsada(),
     getInventarioUsados(),
+    getPaginasIndice(),
+    getRepuestosMarca(),
+    getMarcas(),
   ]);
 
   const breadcrumbs = [
@@ -33,52 +54,30 @@ export default async function UsadaIndexPage() {
     { nombre: "Usada", path: rutas.usada() },
   ];
 
-  const items = categorias.map((c) => ({
-    href: `${rutas.categoriaUsada(c.slug)}/`,
-    titulo: c.nombre,
-    descripcion: c.descripcion,
-    imagen: null,
-  }));
-
-  // Marcas con unidades disponibles (paso b del marketplace): cada una tiene
-  // su página. Las que no tienen unidades no se enlazan (D4: no se indexan).
-  const marcasConUnidades = marcas
-    .map((m) => ({ m, n: inventario.filter((u) => u.marcaUsada === m.id).length }))
-    .filter(({ n }) => n > 0)
-    .map(({ m, n }) => ({
-      href: `${rutas.marcaUsada(m.slug)}/`,
-      titulo: m.nombre,
-      descripcion: `${n} ${n === 1 ? "unidad disponible" : "unidades disponibles"}`,
-      imagen: null,
-    }));
+  const vista = vistaEncabezadoDeIndice(indice.usada, TITULO, fondoDeRespaldo(marcas));
+  const verTodo = global.verTodoTexto?.trim() || "Ver todo";
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <Breadcrumbs items={breadcrumbs} />
+      <div className={estilos.migas}>
+        <Breadcrumbs items={breadcrumbs} />
+      </div>
 
-      <h1 className="text-3xl font-semibold text-gray-900">{TITULO}</h1>
-      <p className="mt-3 max-w-2xl text-gray-600">{DESCRIPCION}</p>
-
-      <section className="mt-8" aria-labelledby="categorias-heading">
-        <h2 id="categorias-heading" className="text-xl font-medium text-gray-900">
-          Categorías
-        </h2>
-        <div className="mt-4">
-          <ListaEnlaces items={items} vacio="Todavía no hay categorías publicadas." />
-        </div>
-      </section>
-
-      {marcasConUnidades.length ? (
-        <section className="mt-10" aria-labelledby="marcas-heading">
-          <h2 id="marcas-heading" className="text-xl font-medium text-gray-900">
-            Marcas
-          </h2>
-          <div className="mt-4">
-            <ListaEnlaces items={marcasConUnidades} vacio="" />
-          </div>
-        </section>
-      ) : null}
+      <IndiceTarjetas
+        id={ANCLA}
+        vista={{ ...vista, descripcion: vista.descripcion || DESCRIPCION }}
+        tarjetas={tarjetasDeCategoriasUsada(categorias, inventario, rutas.categoriaUsada)}
+        verTodo={verTodo}
+        etiqueta="Categorías de maquinaria usada"
+      />
+      <TarjetasMarca
+        id="usada-marcas"
+        titulo="Marcas"
+        indice
+        verTodo={verTodo}
+        tarjetas={tarjetasDeMarcasUsada(marcasUsada, inventario, rutas.marcaUsada)}
+      />
     </main>
   );
 }

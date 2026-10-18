@@ -50,6 +50,7 @@ import * as migration_20261018_040447_grupos_categorias_tecnicas from './2026101
 import * as migration_20261018_042119_tipo_maquinaria_subtipos_pestana from './20261018_042119_tipo_maquinaria_subtipos_pestana';
 import * as migration_20261018_044941_tipo_anidado_repuestos from './20261018_044941_tipo_anidado_repuestos';
 import * as migration_20261018_051818_otras_entradas_tipos from './20261018_051818_otras_entradas_tipos';
+import * as migration_20261018_230020_indice_usados_plantilla from './20261018_230020_indice_usados_plantilla';
 
 export const migrations = [
   {
@@ -310,6 +311,11 @@ export const migrations = [
   {
     up: migration_20261018_051818_otras_entradas_tipos.up,
     down: migration_20261018_051818_otras_entradas_tipos.down,
-    name: '20261018_051818_otras_entradas_tipos'
+    name: '20261018_051818_otras_entradas_tipos',
+  },
+  {
+    up: migration_20261018_230020_indice_usados_plantilla.up,
+    down: migration_20261018_230020_indice_usados_plantilla.down,
+    name: '20261018_230020_indice_usados_plantilla'
   },
 ];

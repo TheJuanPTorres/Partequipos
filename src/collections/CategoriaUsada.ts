@@ -41,6 +41,16 @@ export const CategoriaUsada: CollectionConfig = {
     // «marcas» está reservada: la usan las páginas de marca (D1).
     slugField({ unique: true, validate: slugCategoriaUsadaNoReservado }),
     { name: "descripcion", type: "textarea", label: "Descripción" },
+    {
+      name: "imagen",
+      type: "upload",
+      relationTo: "media",
+      label: "Imagen de la tarjeta",
+      admin: {
+        description:
+          "Opcional. La foto de la tarjeta de esta categoría en la página «Maquinaria pesada usada». Vacía, sale la primera foto de su unidad más reciente.",
+      },
+    },
     seoField(),
   ],
 };

@@ -73,7 +73,7 @@ export function TarjetasMarca({
                     alt=""
                     fill
                     sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
-                    className={estilos.fotoImg}
+                    className={`${estilos.fotoImg} ${t.logo ? estilos.fotoLogo : ""}`}
                     style={{ objectPosition: t.imagen.posicion }}
                   />
                 </div>
@@ -87,6 +87,7 @@ export function TarjetasMarca({
                 <Nivel id={idT} className={estilos.tituloTarjeta}>
                   {t.titulo}
                 </Nivel>
+                {t.detalle ? <p className={estilos.detalleTarjeta}>{t.detalle}</p> : null}
                 {verTodo ? (
                   <Link href={t.href} aria-describedby={idT} className={estilos.botonTarjeta}>
                     {/* En los índices, la flecha maciza del export (fa-arrow-right) a su tamaño. */}

@@ -215,11 +215,25 @@ export const getCategoriaMaquinariaPorSlug = cache(
 const categoriasUsadaEnCache = unstable_cache(
   async (): Promise<CategoriasUsada[]> => {
     const payload = await getPayload({ config });
+    // `depth: 1` para la «Imagen de la tarjeta» del índice de usados, con
+    // `populate` acotado a lo que pinta `next/image`.
     const { docs } = await payload.find({
       collection: "categorias-usada",
-      depth: 0,
+      depth: 1,
       limit: 0,
       sort: "nombre",
+      populate: {
+        // `filename` hace falta: sin él, la URL sale null (Payload la calcula con él).
+        media: {
+          url: true,
+          filename: true,
+          alt: true,
+          width: true,
+          height: true,
+          focalX: true,
+          focalY: true,
+        },
+      },
     });
     return docs;
   },

@@ -24,6 +24,15 @@ describe("leerFicheroEntorno", () => {
       VERCEL_AUTOMATION_BYPASS_SECRET: "",
     });
   });
+  it("lee los tokens de lectura y de revalidación del preview", () => {
+    const e = leerFicheroEntorno(
+      "API_LECTURA_TOKEN=lectura-inventado\nREVALIDACION_TOKEN=revalidar-inventado\n",
+    );
+    assert.deepEqual(e, {
+      API_LECTURA_TOKEN: "lectura-inventado",
+      REVALIDACION_TOKEN: "revalidar-inventado",
+    });
+  });
 });
 
 describe("veredictoEntornoPreview: solo la base y el Blob del preview", () => {

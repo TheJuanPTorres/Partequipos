@@ -439,6 +439,14 @@ export interface TiposMaquinaria {
    */
   imagen?: (number | null) | Media;
   /**
+   * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Compactadores» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
+   */
+  subtipos?: (number | TiposMaquinaria)[] | null;
+  /**
+   * Marcada, el índice de maquinaria nueva enseña una pestaña con el nombre de este tipo que lleva a su página. Solo sale si el tipo tiene equipos.
+   */
+  pestanaIndiceNueva?: boolean | null;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -2266,6 +2274,8 @@ export interface TiposMaquinariaSelect<T extends boolean = true> {
   marca?: T;
   descripcion?: T;
   imagen?: T;
+  subtipos?: T;
+  pestanaIndiceNueva?: T;
   seo?:
     | T
     | {

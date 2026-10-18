@@ -83,7 +83,13 @@ export function TarjetasMarca({
                 </Nivel>
                 {verTodo ? (
                   <Link href={t.href} aria-describedby={idT} className={estilos.botonTarjeta}>
-                    <IconArrowRight aria-hidden="true" focusable="false" stroke={2} size={14} />
+                    {/* En los índices, la flecha maciza del export (fa-arrow-right) a su tamaño. */}
+                    <IconArrowRight
+                      aria-hidden="true"
+                      focusable="false"
+                      stroke={indice ? 3 : 2}
+                      size={indice ? 16 : 14}
+                    />
                     {verTodo}
                   </Link>
                 ) : null}

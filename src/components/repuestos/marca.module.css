@@ -892,12 +892,26 @@ a.modelo:hover {
   background: var(--color-fondo-seccion);
 }
 
-/* La línea en negrita sobre el título. */
+/* La línea sobre el título: en rojo, 16 px y peso 500 («Plantilla 1», 2026-10-18). */
 .antetituloHero {
   margin: 0;
-  font-size: var(--texto-cuerpo);
-  font-weight: 700;
-  line-height: 1.4;
+  color: var(--color-marca);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/*
+ * CABECERA DE LA «PLANTILLA 1» (2026-10-18): el 70 % del alto de la ventana en
+ * los tres tamaños, con el contenido centrado en vertical y en horizontal. La
+ * cabecera baja sin foto (`heroBajo`) no lleva esta clase.
+ */
+.hero.heroIndice {
+  min-height: 70vh;
+}
+
+.heroIndice .heroContenido {
+  flex: 1;
 }
 
 /* La sección blanca de las tarjetas, sin título y con todas las esquinas redondeadas. */
@@ -912,6 +926,44 @@ a.modelo:hover {
   margin-top: 0;
 }
 
+/*
+ * TARJETAS DE LA «PLANTILLA 1» (2026-10-18): la foto a todo el ancho de la
+ * columna y un recuadro blanco al 90 % que sube 54 px sobre ella, con relleno
+ * 30/20/10/20, en los tres tamaños; 20 px entre columnas y la sección con un 5 %
+ * de relleno (10 % abajo). La foto se encoge un poco al pasar el ratón (la
+ * animación «shrink» del export), salvo con movimiento reducido.
+ */
+.tarjetasIndice {
+  padding: 5% 5% 10%;
+}
+
+.tarjetasIndice .rejilla {
+  column-gap: 20px;
+}
+
+.tarjetasIndice .panel[data-con-foto] {
+  margin: -54px 5% 0;
+  padding: 30px 20px 10px;
+}
+
+.tarjetasIndice .fotoImg {
+  transition: transform 0.3s;
+}
+
+.tarjetasIndice .tarjeta:hover .fotoImg {
+  transform: scale(0.95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjetasIndice .fotoImg {
+    transition: none;
+  }
+
+  .tarjetasIndice .tarjeta:hover .fotoImg {
+    transform: none;
+  }
+}
+
 /* Entre filas no hay hueco: el panel ya trae el suyo (paso de fila de 389 px, medido a 1440). */
 @media (min-width: 1025px) {
   .tarjetasIndice .rejilla {
@@ -921,12 +973,21 @@ a.modelo:hover {
 
 @media (max-width: 1024px) {
   .tarjetasIndice {
-    padding-top: 82px;
+    padding: 5% 5% 10%;
+  }
+
+  .tarjetasIndice .panel[data-con-foto] {
+    margin-inline: 5%;
   }
 }
 
 @media (max-width: 767px) {
   .tarjetasIndice {
-    padding-top: 30px;
+    padding: 5% 5% 10%;
+  }
+
+  .tarjetasIndice .panel[data-con-foto] {
+    margin-inline: 5%;
+    padding: 30px 20px 10px;
   }
 }

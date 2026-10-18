@@ -17,6 +17,8 @@ import {
   getMarcasMaquinaria,
   getTiposDeMarcaMaquinaria,
 } from "@/lib/queries/getMaquinaria";
+import { vistaEncabezadoDeIndice } from "@/lib/indices/paginasIndice";
+import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
@@ -58,9 +60,10 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
   const marca = await getMarcaMaquinariaPorSlug(slug);
   if (!marca) notFound();
 
-  const [tipos, global] = await Promise.all([
+  const [tipos, global, indice] = await Promise.all([
     getTiposDeMarcaMaquinaria(marca.id),
     getRepuestosMarca(),
+    getPaginasIndice(),
   ]);
   // Los equipos de todos los tipos: cuántos tiene cada uno (los vacíos no se
   // pintan) y la foto de su primer equipo, para los que no tienen imagen propia.
@@ -86,7 +89,10 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
 
       <IndiceTarjetas
         id={ANCLA}
-        vista={vistaEncabezadoMarcaNueva(marca)}
+        vista={vistaEncabezadoMarcaNueva(
+          marca,
+          vistaEncabezadoDeIndice(indice.maquinaria, "", null).antetitulo,
+        )}
         tarjetas={tarjetas}
         verTodo={global.verTodoTexto?.trim() || "Ver todo"}
         etiqueta={`Tipos de equipo ${marca.nombre}`}

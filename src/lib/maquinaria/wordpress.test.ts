@@ -133,6 +133,9 @@ describe("pesoOperativoKg", () => {
   const conPeso = (valor: string, etiqueta = "Peso operativo") => [{ etiqueta, valor }];
   it("entiende t, kg y lb con la escritura española", () => {
     assert.equal(pesoOperativoKg(conPeso("12,5 t")), 12500);
+    // Un «0.» nunca es separador de miles (tarjeta del Ammann ARW 65, 2026-10-18).
+    assert.equal(pesoOperativoKg(conPeso("0.717 TON")), 717);
+    assert.equal(pesoOperativoKg(conPeso("10.11 TON")), 10110);
     assert.equal(pesoOperativoKg(conPeso("12.5 t")), 12500);
     assert.equal(pesoOperativoKg(conPeso("20.100 kg")), 20100);
     assert.equal(pesoOperativoKg(conPeso("10.000 lb", "Peso operacional")), 4536);

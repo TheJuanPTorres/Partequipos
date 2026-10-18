@@ -13,9 +13,16 @@ import estilos from "./marca.module.css";
  * - Con `prefers-reduced-motion` no se mueve.
  * - El enlace es un enlace (en el widget lleva `role="button"` aunque navega).
  */
-export function IconoRaton({ href }: { href: string }) {
+export function IconoRaton({
+  href,
+  etiqueta = "Ir a las categorías de repuestos",
+}: {
+  href: string;
+  /** Nombre accesible del enlace: dice adónde lleva. */
+  etiqueta?: string;
+}) {
   return (
-    <a href={href} className={estilos.raton} aria-label="Ir a las categorías de repuestos">
+    <a href={href} className={estilos.raton} aria-label={etiqueta}>
       <span className={estilos.ratonCuerpo} aria-hidden="true">
         <span className={estilos.ratonRueda} />
       </span>

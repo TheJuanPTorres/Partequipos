@@ -58,7 +58,7 @@ export const MarcaUsada: CollectionConfig = {
       label: "Logo",
       admin: {
         description:
-          "Opcional. Todavía no sale en la página de la marca: se guarda para cuando tenga su diseño.",
+          "Opcional. Sale en la tarjeta de la marca en la página «Maquinaria pesada usada» (entero, sobre gris claro: mejor un logo de color). Vacío, sale la primera foto de su unidad más reciente. Todavía no sale en la página de la marca.",
       },
     },
     {

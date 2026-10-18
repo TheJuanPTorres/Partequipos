@@ -785,6 +785,10 @@ export interface CategoriasUsada {
   slug: string;
   descripcion?: string | null;
   /**
+   * Opcional. La foto de la tarjeta de esta categoría en la página «Maquinaria pesada usada». Vacía, sale la primera foto de su unidad más reciente.
+   */
+  imagen?: (number | null) | Media;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -814,7 +818,7 @@ export interface MarcasUsada {
    */
   descripcion?: string | null;
   /**
-   * Opcional. Todavía no sale en la página de la marca: se guarda para cuando tenga su diseño.
+   * Opcional. Sale en la tarjeta de la marca en la página «Maquinaria pesada usada» (entero, sobre gris claro: mejor un logo de color). Vacío, sale la primera foto de su unidad más reciente. Todavía no sale en la página de la marca.
    */
   logo?: (number | null) | Media;
   /**
@@ -2350,6 +2354,7 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
   nombre?: T;
   slug?: T;
   descripcion?: T;
+  imagen?: T;
   seo?:
     | T
     | {
@@ -3208,7 +3213,7 @@ export interface RepuestosMarca {
   createdAt?: string | null;
 }
 /**
- * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos».
+ * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "paginas-indice".
@@ -3266,6 +3271,18 @@ export interface PaginasIndice {
           id?: string | null;
         }[]
       | null;
+  };
+  /**
+   * Solo el encabezado: las tarjetas salen solas, una por categoría y una por marca con unidades disponibles.
+   */
+  usada?: {
+    antetitulo?: string | null;
+    titulo?: string | null;
+    texto?: string | null;
+    /**
+     * Opcional. Foto de obra a todo el ancho; sin ella, la misma de respaldo que «Maquinaria pesada».
+     */
+    fondo?: (number | null) | Media;
   };
   contacto?: {
     antetitulo?: string | null;
@@ -3454,6 +3471,14 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
               imagen?: T;
               id?: T;
             };
+      };
+  usada?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        texto?: T;
+        fondo?: T;
       };
   contacto?:
     | T

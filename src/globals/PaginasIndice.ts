@@ -5,7 +5,7 @@ import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarRutas } from "../lib/revalidation";
 
 /**
- * Las páginas ÍNDICE de repuestos y de maquinaria y la de CONTÁCTANOS (plantillas
+ * Las páginas ÍNDICE de repuestos, de maquinaria y de usados y la de CONTÁCTANOS (plantillas
  * de Andrés, docs/diseno/decisiones-indices-contacto.md): sus textos, sus seis
  * tarjetas con foto y enlace, y las fotos de Contáctanos.
  *
@@ -58,14 +58,19 @@ export const PaginasIndice: GlobalConfig = {
   admin: {
     group: "Partes del sitio",
     description:
-      "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos».",
+      "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada».",
   },
   access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
     afterChange: [
       ({ doc }) => {
         revalidarRutas(
-          ["/repuestos-maquinaria-pesada-colombia", "/maquinaria-pesada", "/contactanos"],
+          [
+            "/repuestos-maquinaria-pesada-colombia",
+            "/maquinaria-pesada",
+            "/maquinaria-pesada/maquinaria-pesada-usada",
+            "/contactanos",
+          ],
           "global paginas-indice",
         );
         return doc;
@@ -103,6 +108,27 @@ export const PaginasIndice: GlobalConfig = {
           "Opcional. Foto de obra a todo el ancho; sin ella, el encabezado queda en un tono oscuro.",
         ),
         tarjetas(),
+      ],
+    },
+    {
+      // Sin tarjetas: las de este índice salen solas de las categorías y las
+      // marcas con unidades disponibles (2026-10-18, petición del cliente).
+      name: "usada",
+      type: "group",
+      label: "Página «Maquinaria pesada usada»",
+      admin: {
+        description:
+          "Solo el encabezado: las tarjetas salen solas, una por categoría y una por marca con unidades disponibles.",
+      },
+      fields: [
+        { name: "antetitulo", type: "text", label: "Antetítulo" },
+        { name: "titulo", type: "text", label: "Título" },
+        { name: "texto", type: "textarea", label: "Texto de presentación" },
+        imagen(
+          "fondo",
+          "Foto de fondo del encabezado",
+          "Opcional. Foto de obra a todo el ancho; sin ella, la misma de respaldo que «Maquinaria pesada».",
+        ),
       ],
     },
     {

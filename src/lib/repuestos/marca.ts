@@ -88,6 +88,10 @@ export type TarjetaMarca = {
   imagen: ImagenLista | null;
   /** Las del marketplace se ocultan en móvil, como en ux-9. */
   soloEscritorio: boolean;
+  /** Línea bajo el título (p. ej. «3 unidades disponibles» en el índice de usados). */
+  detalle?: string;
+  /** La imagen es un logo: se pinta entero, sin recortar (índice de usados). */
+  logo?: boolean;
 };
 
 /**

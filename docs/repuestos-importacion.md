@@ -212,3 +212,17 @@ tenía: **sin migración**. La ficha del modelo ya pinta esa galería.
 - **Sitio publicado:** `runbook-repuestos-fotos-modelos.md` (en
   `Desktop\partequipos-cierre\`, lo ejecuta dirección): la misma importación
   de siempre, que ahora añade las fotos.
+
+**Hecho en el preview el 2026-10-17:**
+
+- **Importación:** 324 modelos con foto y 323 ficheros.
+- **Segunda pasada:** `subidas 0 · yaSubidas 323`.
+- **Manifiesto:** 370 ficheros (los 47 de antes y las 323 fotos) y 67 imágenes cambiadas (las 11 de antes y la galería, vacía, de los 56 modelos que no creó la importación).
+
+**Incidente al probarlo, resuelto en el preview:** parar desde Claude Code la primera ejecución en segundo plano **no paró el proceso de Node** (Windows), y corrieron dos importaciones a la vez:
+
+- quedaron **216 fotos duplicadas** sin usar;
+- un modelo con la copia repetida de la foto compartida;
+- el manifiesto, pisado por los dos procesos.
+
+Un script de un solo uso borró los duplicados (por Payload, que los quita también del Blob), unificó la foto y completó el manifiesto. La segunda pasada lo confirmó. **Regla: nunca dos ejecuciones del importador a la vez**, y tras cortar una, comprobar que no queda ningún `node` con `importar-repuestos` antes de relanzar.

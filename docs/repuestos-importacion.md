@@ -400,6 +400,9 @@ Con otras entradas, la lista del tipo se ordena por texto (con los números en s
 `src/lib/repuestos/entradasWp.ts`); la de Hitachi necesita antes las series (§8). Conserva las entradas de un editor.
 Sitio publicado: `Desktop/partequipos-cierre/runbook-repuestos-listas-wp.md` (sustituye a `runbook-series-hitachi.md`).
 
+**Resultado en el preview (2026-10-18):** las 5 entradas en sus 5 tipos (la de Hitachi en la serie EX, enlazando a la
+ficha de la ZX450LC-5); segunda pasada «ya estaban»; retirada probada (5 tipos devueltos) y vuelto a aplicar.
+
 ### Erratas de WordPress que se migran tal cual (lista para el cliente)
 
 | Dónde                                           | Errata                                                                                                                     |

@@ -3,12 +3,7 @@ import { describe, it } from "node:test";
 
 import type { CategoriasTecnica, Marca, RepuestosMarca, TiposEquipo } from "@/payload-types";
 
-import {
-  categoriasDeMarca,
-  tarjetaDeMarketplace,
-  tarjetasDeLaPagina,
-  vistaEncabezado,
-} from "./marca";
+import { categoriasDeMarca, tarjetasDeTipos, vistaEncabezado } from "./marca";
 
 const marca = {
   id: 1,
@@ -76,33 +71,14 @@ describe("categoriasDeMarca", () => {
 
 describe("tarjetas", () => {
   it("una por tipo, con el título de ux-9 y el enlace a la página del tipo", () => {
-    const t = tarjetasDeLaPagina(marca, [tipo(1, "Bulldozer", "bulldozer")], global);
+    const t = tarjetasDeTipos(marca, [tipo(1, "Bulldozer", "bulldozer")]);
     assert.equal(t.length, 1);
     assert.equal(t[0]?.titulo, "Repuestos para maquinaria pesada bulldozer CATERPILLAR");
     assert.match(t[0]?.href ?? "", /caterpillar\/bulldozer\/?$/);
     assert.equal(t[0]?.soloEscritorio, false);
   });
 
-  it("usadas y aditamentos van al final, solo escritorio, y solo si tienen título y enlace", () => {
-    const g = {
-      ...global,
-      tarjetaUsadas: { titulo: "Maquinaria pesada usada", enlace: "/usada/" },
-      tarjetaAditamentos: { titulo: "Aditamentos", enlace: "" },
-    } as RepuestosMarca;
-    const t = tarjetasDeLaPagina(marca, [tipo(1, "Excavadora", "excavadora")], g);
-    assert.deepEqual(
-      t.map((x) => x.clave),
-      ["tipo-1", "usadas"],
-    );
-    assert.equal(t[1]?.soloEscritorio, true);
-  });
-
-  it("tarjetaDeMarketplace sin datos es null", () => {
-    assert.equal(tarjetaDeMarketplace("x", null), null);
-    assert.equal(tarjetaDeMarketplace("x", { titulo: "A" }), null);
-  });
-
   it("un tipo sin slug no sale", () => {
-    assert.equal(tarjetasDeLaPagina(marca, [tipo(1, "X", "")], global).length, 0);
+    assert.equal(tarjetasDeTipos(marca, [tipo(1, "X", "")]).length, 0);
   });
 });

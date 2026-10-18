@@ -36,7 +36,8 @@ describe("vistaEncabezadoDeIndice", () => {
   it("sin grupo el título no queda vacío (una página sin h1 sería peor)", () => {
     const v = vistaEncabezadoDeIndice(null, "Respaldo", null);
     assert.equal(v.linea1, "Respaldo");
-    assert.equal(v.antetitulo, "");
+    // Sin antetítulo propio, el de la «Plantilla 1» de Andrés.
+    assert.equal(v.antetitulo, "Somos tu socio confiable en maquinaria pesada y repuestos");
   });
 });
 

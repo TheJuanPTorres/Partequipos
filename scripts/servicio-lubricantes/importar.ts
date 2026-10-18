@@ -485,7 +485,8 @@ const bloques = [
       parrafo({ negrita: s.siniestros.intro }),
       ...s.siniestros.apartados.map((a) =>
         parrafo(
-          { negrita: `${a.etiqueta.charAt(0)}${a.etiqueta.slice(1).toLowerCase()}: ` },
+          // La etiqueta, tal cual (en mayúsculas en WordPress; decisión del cliente, 2026-10-18).
+          { negrita: `${a.etiqueta}: ` },
           a.texto,
         ),
       ),

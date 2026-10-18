@@ -31,9 +31,10 @@ la quiere como «Puntos destacados», es un cambio del extractor.
 («excavadoras» o «minicargadores»), una foto cada uno.
 
 - **Nombre:** el título de WordPress sin «para maquinaria pesada» y con el tipo
-  («MARTILLO PARA MAQUINARIA PESADA» → «Martillo para minicargadores»).
+  («MARTILLO PARA MAQUINARIA PESADA» → «MARTILLO PARA MINICARGADORES»).
   - Así los dos martillos y los dos brazos se distinguen en el panel, el buscador y la pestaña del navegador.
-  - **Errata corregida:** «ACOPLE RAPIDO» → «Acople rápido».
+  - **Tal cual, en mayúsculas y con sus erratas** («ACOPLE RAPIDO»), decisión del cliente del 2026-10-18. Hasta entonces iban con mayúscula inicial y «rápido» corregido. La URL no cambia.
+  - Los usados, igual: tipo y modelo en mayúsculas («MARTILLO NPK 2015») y las líneas de la lista tal cual en la descripción.
 - **URL:** `/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos/<tipo>/<nombre>/`. Son nuevas: en WordPress los productos no tenían URL, así que no hay 301.
 - **Indexación:** los tipos «excavadoras» y «minicargadores» de aditamentos estaban vacíos y fuera del sitemap. Con equipos dentro, entran solos (`tiposConEquipos`).
 

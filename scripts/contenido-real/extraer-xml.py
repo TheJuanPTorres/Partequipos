@@ -101,15 +101,6 @@ CATEGORIAS = {
     "transmision-para-maquinaria-pesada": ("cat-transmision", 9, None),
     "componentes-hidraulicos-para-maquinaria-pesada": ("cat-hidraulicos", 10, None),
 }
-# Títulos que no se toman tal cual de la plantilla: el de hidráulicos está partido (solo
-# pinta «hidráulicos»); los otros, en mayúsculas de título, pasan a mayúscula solo al
-# inicio, como el resto («Llantas y rines»), y «diésel» con su tilde.
-TITULOS_CATEGORIA = {
-    "componentes-hidraulicos-para-maquinaria-pesada": "Componentes hidráulicos",
-    "tren-de-rodaje-para-maquinaria-pesada": "Tren de rodaje",
-    "componentes-mayores-para-maquinaria-pesada": "Componentes mayores",
-    "motor-diesel-para-maquinaria-pesada": "Motor diésel",
-}
 # Sección 2: las 4 marcas, en el orden de la Home V2 de Andrés (2026-10-15).
 MARCAS = [("hitachi", "logo-hitachi", "marca-hitachi"), ("case-construction", "logo-case", "marca-case"),
           ("dynapac", "logo-dynapac", "marca-dynapac"), ("yanmar", "logo-yanmar", "marca-yanmar")]
@@ -138,11 +129,20 @@ SEDE_AGRUPADA = {"Antioquia": {"ciudad": "Medellín", "departamento": "Antioquia
 limpio = lambda s: re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", s or ""))).strip()
 
 
-def oracion(s):
-    """Un texto escrito TODO EN MAYÚSCULAS en WordPress pasa a mayúscula solo al inicio
-    (el diseño pone las mayúsculas por CSS donde las quiere; un lector de pantalla
-    puede deletrear un texto en mayúsculas)."""
-    return s[:1].upper() + s[1:].lower() if s.isupper() else s[:1].upper() + s[1:]
+def pintado(e):
+    """El título de un widget como lo PINTA WordPress (decisión del cliente, 2026-10-18:
+    todo tal cual): su texto, con la transformación de mayúsculas de su tipografía
+    («filtración» con `uppercase` → «FILTRACIÓN»). Hasta entonces se pasaba a mayúscula
+    solo al inicio y se corregían títulos («Motor diésel»)."""
+    t = limpio(ajustes(e).get("title"))
+    modo = ajustes(e).get("typography_text_transform")
+    if modo == "uppercase":
+        return t.upper()
+    if modo == "lowercase":
+        return t.lower()
+    if modo == "capitalize":
+        return re.sub(r"\w\S*", lambda m: m.group(0)[:1].upper() + m.group(0)[1:], t)
+    return t
 
 
 def todos(nodos):
@@ -220,7 +220,7 @@ def descripcion_de_marca(slug):
 
 # --- Nosotros: el primer bloque visible con título, párrafo y botón; y las cifras.
 w = [e for e in todos(arboles[ID_NOSOTROS])]
-titulos = [limpio(ajustes(e).get("title")) for e in w if tipo_de(e) == "heading"]
+titulos = [pintado(e) for e in w if tipo_de(e) == "heading"]
 parrafo = next(ajustes(e).get("editor") for e in w if tipo_de(e) == "text-editor")
 boton = next(ajustes(e) for e in w if tipo_de(e) == "button")
 cifras = []
@@ -237,7 +237,7 @@ for e in w:
 
 # --- Home: el título sobre las tres columnas (nueva, usada, repuestos) y el de cada una.
 wh = [e for e in todos(arboles[ID_HOME])]
-titulosHome = [limpio(ajustes(e).get("title")) for e in wh if tipo_de(e) == "heading"]
+titulosHome = [pintado(e) for e in wh if tipo_de(e) == "heading"]
 iTarjetas = next(i for i, x in enumerate(titulosHome) if x.lower().startswith("venta de maquinaria pesada y repuestos"))
 titulosColumnas = titulosHome[iTarjetas - 3 : iTarjetas]
 franja = next(x for x in titulos if x.lower() == "marcas aliadas")
@@ -294,13 +294,13 @@ titulosCat = {}
 pendiente = None
 for e in todos(arboles[ID_CATEGORIAS]):
     if tipo_de(e) == "heading":
-        pendiente = re.sub(r"\s*-+\s*$", "", limpio(ajustes(e).get("title")))
+        pendiente = re.sub(r"\s*-+\s*$", "", pintado(e))
     elif tipo_de(e) == "button" and pendiente:
         slug = ((ajustes(e).get("link") or {}).get("url") or "").rstrip("/").rsplit("/", 1)[-1]
-        titulosCat.setdefault(slug, pendiente[:1].upper() + pendiente[1:])
+        titulosCat.setdefault(slug, pendiente)
         pendiente = None
 for c in categorias:
-    c["titulo"] = TITULOS_CATEGORIA.get(c["slug"]) or oracion(titulosCat[c["slug"]])
+    c["titulo"] = titulosCat[c["slug"]]
 categorias.sort(key=lambda c: c["orden"])
 if len(categorias) != len(CATEGORIAS):
     sys.exit(f"✗ categorías encontradas: {len(categorias)} de {len(CATEGORIAS)}")
@@ -320,16 +320,16 @@ fuente = {
     },
     "sedes": sedes,
     "nosotros": {
-        "antetitulo": oracion(titulos[0]),
-        "titulo": oracion(titulos[1]),
+        "antetitulo": titulos[0],
+        "titulo": titulos[1],
         "parrafoHtml": parrafo,
-        "boton": {"texto": oracion(limpio(boton.get("text"))), "enlace": re.sub(r"^https?://[^/]+", "", (boton.get("link") or {}).get("url") or "")},
+        "boton": {"texto": limpio(boton.get("text")), "enlace": re.sub(r"^https?://[^/]+", "", (boton.get("link") or {}).get("url") or "")},
         "cifras": cifras,
         "cabecera": {"antetitulo": "Partequipos", "titulo": tituloNosotros},
-        "franja": oracion(franja),
-        "tarjetasTitulo": oracion(titulosHome[iTarjetas].replace("Maquinaria", "maquinaria")),
+        "franja": franja,
+        "tarjetasTitulo": titulosHome[iTarjetas],
         "tarjetas": [
-            {"clave": k, "titulo": oracion(titulosColumnas[i]), "texto": metas[RUTAS_META[k]], "imagen": f"tarjeta-{k}"}
+            {"clave": k, "titulo": titulosColumnas[i], "texto": metas[RUTAS_META[k]], "imagen": f"tarjeta-{k}"}
             for i, k in enumerate(("nueva", "usada", "repuestos"))
         ],
         "metaDescripcion": re.sub(r"^Nosotros\s+", "", metas[ID_NOSOTROS]),

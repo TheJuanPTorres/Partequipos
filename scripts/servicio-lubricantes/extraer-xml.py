@@ -16,8 +16,10 @@ PDF. Lo lee `importar.ts`.
 
 Reglas de la réplica (CLAUDE.md §9, «Decisiones estándar»):
 - Lo oculto en los tres tamaños no existe: se salta.
-- Las erratas se corrigen y se anotan (`erratas` del JSON).
-- Una ficha técnica que es la de OTRO producto no se copia (`erratas`).
+- Los textos van TAL CUAL, con sus erratas y mayúsculas (decisión del cliente,
+  2026-10-18); la lista para el cliente las recoge.
+- Una ficha técnica que es la de OTRO producto no se copia (`erratas`; dirección,
+  confirmado el 2026-10-18).
 - Las fotos de licencia dudosa llevan `dudosa: true`, como lista. Desde el
   2026-10-17 van a todos los destinos (decisión del cliente, CLAUDE.md §10.38).
 """
@@ -59,24 +61,25 @@ DUDOSAS = {
     "2024/03/engranaje_png_by_turnlastsong_d80aede-fullview.png",
 }
 
-# Títulos de sección y de grupo como se escriben (en WordPress van en
-# mayúsculas en el propio texto; el diseño ya los pinta como toque).
-NOMBRES = {
-    "AUTO LIVIANO": "Auto liviano",
-    "AUTO PESADO/DIESEL": "Auto pesado / diésel",
-    "mOTO & SCOOTER": "Moto & scooter",
-    "REFRIGERACIÓN": "Refrigeración",
-    "TRANSMISIONES": "Transmisiones",
-    "INDUSTRIALES": "Industriales",
-    "ENGRANAJES": "Engranajes",
-    "COMPRESORES": "Compresores",
-    "TÉRMICOS": "Térmicos",
-    "HIDRÁULICOS": "Hidráulicos",
-    "OSO": "OSO",
-    "ARNICA": "ARNICA",
-    "COMPLEMENTARIOS": "Complementarios",
-    "REFRIGERANTE": "Refrigerante",
-    "LÍQUIDO DE FRENOS": "Líquido de frenos",
+# Títulos de sección y de grupo de las páginas de lubricantes, TAL CUAL
+# (decisión del cliente, 2026-10-18: con sus mayúsculas y la errata
+# «mOTO & SCOOTER»). Sirven para reconocer los títulos de grupo.
+GRUPOS = {
+    "AUTO LIVIANO",
+    "AUTO PESADO/DIESEL",
+    "mOTO & SCOOTER",
+    "REFRIGERACIÓN",
+    "TRANSMISIONES",
+    "INDUSTRIALES",
+    "ENGRANAJES",
+    "COMPRESORES",
+    "TÉRMICOS",
+    "HIDRÁULICOS",
+    "OSO",
+    "ARNICA",
+    "COMPLEMENTARIOS",
+    "REFRIGERANTE",
+    "LÍQUIDO DE FRENOS",
 }
 
 # Productos cuyo botón «FICHA TÉCNICA» abre el PDF de OTRO producto (revisado
@@ -91,15 +94,6 @@ erratas = []
 
 def texto(s):
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", s or ""))).strip()
-
-
-def oracion(s):
-    """«CONTAMOS CON UN EXCELENTE SERVICIO TÉCNICO» → «Contamos con un excelente servicio técnico»."""
-    s = s.strip()
-    if s != s.upper():
-        return s[:1].upper() + s[1:]
-    s = s.lower()
-    return s[:1].upper() + s[1:]
 
 
 def subida(url):
@@ -162,7 +156,11 @@ def secuencia(nodos):
     def visita(n, s):
         w = n.get("widgetType")
         if w == "heading":
-            out.append(("H", texto(s.get("title"))))
+            # Como lo PINTA WordPress: con la transformación de mayúsculas de su
+            # tipografía («¿Tuviste un» con `uppercase` → «¿TUVISTE UN»).
+            t = texto(s.get("title"))
+            modo = s.get("typography_text_transform")
+            out.append(("H", t.upper() if modo == "uppercase" else t.lower() if modo == "lowercase" else t))
         elif w == "button":
             enlace = s.get("link") if isinstance(s.get("link"), dict) else {}
             out.append(("B", texto(s.get("text")), enlace.get("url", "")))
@@ -230,12 +228,12 @@ def productos_de(slug, nodos):
             continue
         if e[0] == "H":
             siguiente = sec[i + 1] if i + 1 < len(sec) else None
-            nombre = NOMBRES.get(e[1], e[1])
+            nombre = e[1]
             # Título de sección: le sigue «COTIZAR» (a veces tras «VER TODOS»).
             botones = [x for x in sec[i + 1 : i + 3] if x[0] == "B"]
             if siguiente and siguiente[0] == "B" and any("COTIZAR" in b[1].upper() for b in botones):
                 seccion, sub = nombre, None
-            elif e[1] in NOMBRES:
+            elif e[1] in GRUPOS:
                 sub = nombre
         i += 1
     # En las páginas de una sola sección el grupo sobra: es la propia línea.
@@ -348,8 +346,8 @@ def servicio(paginas):
             ),
         },
         "taller": {
-            "antetitulo": oracion(taller[0][1]).replace("partequipos", "Partequipos"),
-            "titulo": oracion(taller[1][1]),
+            "antetitulo": taller[0][1],
+            "titulo": taller[1][1],
             "parrafos": [texto(taller[2][1])],
             "destacado": taller[3][1],
             "imagen": fichero(
@@ -358,7 +356,7 @@ def servicio(paginas):
             ),
         },
         "alistamiento": {
-            "titulo": oracion(alistamiento[0][1]),
+            "titulo": alistamiento[0][1],
             "parrafos": [texto(alistamiento[1][1]), alistamiento[2][1]],
             "youtube": youtube,
             "miniatura": fichero(poster, "Alistamiento de maquinaria en el taller de Partequipos"),
@@ -373,7 +371,7 @@ def servicio(paginas):
             ),
         },
         "siniestros": {
-            "titulo": f"{siniestros[0][1]} {siniestros[1][1].lower()}",
+            "titulo": f"{siniestros[0][1]} {siniestros[1][1]}",
             "intro": texto(siniestros[2][1]),
             "apartados": [
                 {

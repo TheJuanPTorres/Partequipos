@@ -15,21 +15,21 @@ describe("nombreDeAditamentoNuevo", () => {
   it("quita «para maquinaria pesada» y añade el tipo", () => {
     assert.equal(
       nombreDeAditamentoNuevo("MARTILLO PARA MAQUINARIA PESADA", "minicargadores"),
-      "Martillo para minicargadores",
+      "MARTILLO PARA MINICARGADORES",
     );
     assert.equal(
       nombreDeAditamentoNuevo("BRAZO LARGO PARA MAQUINARIA PESADA ", "excavadoras"),
-      "Brazo largo para excavadoras",
+      "BRAZO LARGO PARA EXCAVADORAS",
     );
   });
-  it("conserva las tildes y corrige «rapido»", () => {
+  it("deja las tildes y las erratas como en WordPress («RAPIDO»)", () => {
     assert.equal(
       nombreDeAditamentoNuevo("LÍNEA HÚMEDA PARA MAQUINARIA PESADA", "minicargadores"),
-      "Línea húmeda para minicargadores",
+      "LÍNEA HÚMEDA PARA MINICARGADORES",
     );
     assert.equal(
       nombreDeAditamentoNuevo("ACOPLE RAPIDO PARA MAQUINARIA PESADA", "excavadoras"),
-      "Acople rápido para excavadoras",
+      "ACOPLE RAPIDO PARA EXCAVADORAS",
     );
   });
 });
@@ -38,22 +38,22 @@ describe("datosDeTitulos y nombreDeAditamentoUsado", () => {
   it("la marca como primer título y repetida en el modelo", () => {
     const d = datosDeTitulos("OKADA", "OKADA TOP 100");
     assert.deepEqual(d, { tipo: null, marca: "Okada", modelo: "TOP 100" });
-    assert.equal(nombreDeAditamentoUsado(d, null), "Okada TOP 100");
+    assert.equal(nombreDeAditamentoUsado(d, null), "OKADA TOP 100");
   });
   it("tipo y marca; marca y modelo en el segundo título", () => {
     assert.equal(
       nombreDeAditamentoUsado(datosDeTitulos("MARTILLO", "NPK"), 2015),
-      "Martillo NPK 2015",
+      "MARTILLO NPK 2015",
     );
     assert.equal(
       nombreDeAditamentoUsado(datosDeTitulos("CRUSHER", "NPK G-17"), 2012),
-      "Crusher NPK G-17 2012",
+      "CRUSHER NPK G-17 2012",
     );
   });
   it("«AFTER MARKET» no es una marca", () => {
     const d = datosDeTitulos("AFTER MARKET", "ACOPLE RÁPIDO PARA EXCAVADORA");
-    assert.deepEqual(d, { tipo: "Acople rápido para excavadora", marca: null, modelo: null });
-    assert.equal(nombreDeAditamentoUsado(d, null), "Acople rápido para excavadora");
+    assert.deepEqual(d, { tipo: "ACOPLE RÁPIDO PARA EXCAVADORA", marca: null, modelo: null });
+    assert.equal(nombreDeAditamentoUsado(d, null), "ACOPLE RÁPIDO PARA EXCAVADORA");
   });
 });
 
@@ -69,19 +69,19 @@ describe("fichaDeUsado", () => {
     assert.equal(f.pesoOperativo, null);
     assert.equal(f.anio, 2012);
   });
-  it("lo demás pasa a la descripción, con la errata de la lista corregida", () => {
+  it("lo demás pasa a la descripción, tal cual, como la escribe WordPress", () => {
     assert.deepEqual(
       fichaDeUsado(["Para maquinaria de: 20 toneladas", "Horas: - N/A", "Año: 2015"]),
       {
         pesoOperativo: null,
         anio: 2015,
         horometro: null,
-        descripcion: "Para maquinaria de 20 toneladas.",
+        descripcion: "Para maquinaria de: 20 toneladas",
       },
     );
     assert.equal(
       fichaDeUsado(["Para Excavadoras de 7- 9 y 12 toneladas"]).descripcion,
-      "Para excavadoras de 7, 9 y 12 toneladas.",
+      "Para Excavadoras de 7- 9 y 12 toneladas",
     );
   });
   it("una línea de serial nunca llega a la descripción", () => {
@@ -95,7 +95,7 @@ describe("ficheros y texto alternativo", () => {
       nombreDeFicheroAditamento(
         "https://x/uploads/2025/04/a.JPG",
         41,
-        "Línea húmeda para minicargadores",
+        "LÍNEA HÚMEDA PARA MINICARGADORES",
       ),
       "wp-aditamento-41-linea-humeda-para-minicargadores.jpg",
     );

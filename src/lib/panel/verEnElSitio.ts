@@ -1,5 +1,6 @@
 import type { CollectionSlug, GeneratePreviewURL, PayloadRequest } from "payload";
 
+import { segmentoDeTipo } from "../repuestos/anidado";
 import { rutas } from "../routes";
 
 /**
@@ -24,15 +25,23 @@ function slugPropio(doc: Doc): string | null {
   return typeof doc.slug === "string" && doc.slug.trim() ? doc.slug.trim() : null;
 }
 
-/** Slug de una relación, venga como id o como documento (con `depth`). */
+/**
+ * Slug de una relación, venga como id o como documento (con `depth`). De un
+ * tipo de repuestos anidado, su segmento con el padre delante (`anidado.ts`).
+ */
 async function slugDe(
   valor: unknown,
   coleccion: CollectionSlug,
   buscar: BuscarSlug,
 ): Promise<string | null> {
   if (valor && typeof valor === "object") {
-    const rel = valor as { slug?: unknown; id?: unknown };
-    if (typeof rel.slug === "string" && rel.slug) return rel.slug;
+    const rel = valor as { slug?: unknown; id?: unknown; slugPadre?: unknown };
+    if (typeof rel.slug === "string" && rel.slug) {
+      return segmentoDeTipo({
+        slug: rel.slug,
+        slugPadre: typeof rel.slugPadre === "string" ? rel.slugPadre : null,
+      });
+    }
     if (typeof rel.id === "number" || typeof rel.id === "string") return buscar(coleccion, rel.id);
     return null;
   }
@@ -57,7 +66,9 @@ export const RUTAS_EN_EL_SITIO: Partial<Record<CollectionSlug, Generador>> = {
   "tipos-equipo": async (doc, buscar) => {
     const s = slugPropio(doc);
     const marca = await slugDe(doc.marca, "marcas", buscar);
-    return s && marca ? rutas.tipo(marca, s) : null;
+    // Un tipo anidado (src/lib/repuestos/anidado.ts) lleva el slug de su padre delante.
+    const padre = typeof doc.slugPadre === "string" ? doc.slugPadre : null;
+    return s && marca ? rutas.tipo(marca, segmentoDeTipo({ slug: s, slugPadre: padre })) : null;
   },
   "modelos-repuesto": async (doc, buscar) => {
     const s = slugPropio(doc);
@@ -144,7 +155,11 @@ export function verEnElSitio(coleccion: CollectionSlug): GeneratePreviewURL {
         depth: 0,
         disableErrors: true,
         req,
-      })) as { slug?: unknown } | null;
-      return d && typeof d.slug === "string" && d.slug ? d.slug : null;
+      })) as { slug?: unknown; slugPadre?: unknown } | null;
+      if (!d || typeof d.slug !== "string" || !d.slug) return null;
+      return segmentoDeTipo({
+        slug: d.slug,
+        slugPadre: typeof d.slugPadre === "string" ? d.slugPadre : null,
+      });
     });
 }

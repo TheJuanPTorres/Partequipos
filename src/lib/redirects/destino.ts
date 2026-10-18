@@ -106,7 +106,12 @@ export function clasificarDestino(destino: string): Destino {
   if (seg(0) === SEGMENTO_REPUESTOS && seg(1) === SEGMENTO_MARCAS) {
     if (partes.length === 3) return din(["marcas"], seg(2));
     if (partes.length === 4) return din(["tipos-equipo"], seg(3), [seg(2)]);
-    if (partes.length === 5) return din(["modelos-repuesto"], seg(4), [seg(2), seg(3)]);
+    // Un modelo o, bajo su tipo padre, un tipo ANIDADO (src/lib/repuestos/anidado.ts).
+    if (partes.length === 5) {
+      return din(["modelos-repuesto", "tipos-equipo"], seg(4), [seg(2), seg(3)]);
+    }
+    // Un modelo de un tipo anidado (las excavadoras de CASE): marca, padre y tipo.
+    if (partes.length === 6) return din(["modelos-repuesto"], seg(5), [seg(2), seg(3), seg(4)]);
     return { clase: "sin-ruta" };
   }
 

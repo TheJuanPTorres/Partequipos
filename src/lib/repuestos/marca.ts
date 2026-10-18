@@ -2,6 +2,7 @@ import type { CategoriasTecnica, Marca, RepuestosMarca, TiposEquipo } from "@/pa
 
 import { rutas } from "../routes";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
+import { segmentoDeTipo } from "./anidado";
 import { claveSerie, seriesDeTipo } from "./series";
 
 /**
@@ -104,7 +105,7 @@ export function tarjetasDeTipos(marca: Marca, tipos: TiposEquipo[]): TarjetaMarc
     .filter((t) => t.nombre?.trim() && t.slug?.trim())
     .flatMap((t) => {
       const titulo = `Repuestos para maquinaria pesada ${t.nombre.trim().toLowerCase()} ${nombreMarca}`;
-      const href = rutas.tipo(marca.slug, t.slug);
+      const href = rutas.tipo(marca.slug, segmentoDeTipo(t));
       const imagenTipo = imagenDeMedia(t.imagen, "");
       const series = seriesDeTipo(t);
       if (series.length === 0) {

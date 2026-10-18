@@ -3,6 +3,7 @@ import type { Marca, ModelosRepuesto, RepuestosMarca, TiposEquipo } from "@/payl
 import { rutas } from "../routes";
 import { imagenDeMedia } from "../utils/relations";
 
+import { segmentoDeTipo } from "./anidado";
 import type { VistaEncabezado } from "./marca";
 import { agruparPorSerie, seriesDeTipo, type GrupoDeModelos } from "./series";
 
@@ -63,7 +64,7 @@ export function enlacesDeModelos(
         nombre,
         // Un código que el nombre ya lleva («Excavadora CATERPILLAR 311» y «311») no se repite.
         codigo: codigo && !nombre.toLowerCase().includes(codigo.toLowerCase()) ? codigo : null,
-        href: rutas.modelo(marca.slug, tipo.slug, m.slug),
+        href: rutas.modelo(marca.slug, segmentoDeTipo(tipo), m.slug),
         serie: texto(m.serie) || null,
       };
     });

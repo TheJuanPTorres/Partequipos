@@ -48,7 +48,11 @@ const megamenuEnCache = unstable_cache(
       payload.find({ collection: "categorias-maquinaria", ...base, select: sinMarca }),
       payload.find({ collection: "categorias-usada", ...base, select: sinMarca }),
       payload.find({ collection: "marcas", ...marcas }),
-      payload.find({ collection: "tipos-equipo", ...base, select: conMarca }),
+      payload.find({
+        collection: "tipos-equipo",
+        ...base,
+        select: { ...conMarca, slugPadre: true },
+      }),
       // Solo el tipo de cada equipo: el menú no enlaza a los tipos de maquinaria nueva sin equipos.
       payload.find({ collection: "equipos-nuevos", ...base, select: { tipo: true } }),
     ]);

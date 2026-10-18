@@ -54,12 +54,19 @@ describe("clasificarDestino — repuestos", () => {
   it("modelo, con marca y tipo como padres", () => {
     const d = clasificarDestino(`${R}/hitachi/excavadoras/zx350/`);
     assert.ok(d.clase === "dinamica");
-    assert.deepEqual(d.colecciones, ["modelos-repuesto"]);
+    assert.deepEqual(d.colecciones, ["modelos-repuesto", "tipos-equipo"]);
     assert.deepEqual(d.padres, ["hitachi", "excavadoras"]);
   });
 
+  it("modelo de un tipo anidado (CASE: cargador frontal → excavadora → CX210B)", () => {
+    const d = clasificarDestino(`${R}/case/cargador/excavadora/cx210b/`);
+    assert.ok(d.clase === "dinamica");
+    assert.deepEqual(d.colecciones, ["modelos-repuesto"]);
+    assert.deepEqual(d.padres, ["case", "cargador", "excavadora"]);
+  });
+
   it("rechaza un nivel de más", () => {
-    assert.equal(clasificarDestino(`${R}/a/b/c/d/`).clase, "sin-ruta");
+    assert.equal(clasificarDestino(`${R}/a/b/c/d/e/`).clase, "sin-ruta");
   });
 });
 

@@ -566,6 +566,11 @@ export interface TiposEquipo {
   slug: string;
   marca: number | Marca;
   /**
+   * Casi siempre vacío. Solo para conservar una dirección web antigua en la que este tipo colgaba de otro tipo de la misma marca: la página del tipo quedará bajo la de ese tipo. Cambiarlo cambia la dirección web (se crea la redirección).
+   */
+  tipoPadre?: (number | null) | TiposEquipo;
+  slugPadre?: string | null;
+  /**
    * Texto bajo el título de la página del tipo. También sirve de descripción en Google si no hay otra.
    */
   descripcion?: string | null;
@@ -2078,6 +2083,8 @@ export interface TiposEquipoSelect<T extends boolean = true> {
   nombre?: T;
   slug?: T;
   marca?: T;
+  tipoPadre?: T;
+  slugPadre?: T;
   descripcion?: T;
   imagen?: T;
   series?:

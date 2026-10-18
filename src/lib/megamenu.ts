@@ -1,3 +1,4 @@
+import { segmentoDeTipo } from "./repuestos/anidado";
 import { rutas } from "./routes";
 
 /**
@@ -78,7 +79,11 @@ export function logoDeMenu(
     ...(oscuro ? { oscuro: true as const } : {}),
   };
 }
-export type TipoCatalogo = ItemCatalogo & { marca: number | { id: number } | null | undefined };
+export type TipoCatalogo = ItemCatalogo & {
+  marca: number | { id: number } | null | undefined;
+  /** Solo los tipos de repuestos anidados (src/lib/repuestos/anidado.ts). */
+  slugPadre?: string | null;
+};
 
 export type DatosMegamenu = {
   marcasMaquinaria: ItemCatalogo[];
@@ -125,7 +130,7 @@ function grupoDeMarca(
       { etiqueta: `Ver todo ${marca.nombre}`, href: conBarra(hrefMarca(marca.slug)) },
       ...tiposDe(marca, tipos).map((t) => ({
         etiqueta: t.nombre,
-        href: conBarra(hrefTipo(marca.slug, t.slug)),
+        href: conBarra(hrefTipo(marca.slug, segmentoDeTipo(t))),
       })),
     ],
     grupos: [],

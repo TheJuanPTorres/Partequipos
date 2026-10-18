@@ -18,6 +18,28 @@ export function concuerda(nombre: string, femenino: string, masculino: string): 
   return ultima.endsWith("as") ? femenino : masculino;
 }
 
+/**
+ * «<tipo> <marca>», sin repetir la marca si el nombre del tipo ya la lleva
+ * (auditoría de estructura, 2026-10-17: salía «Pavimentadoras Dynapac Dynapac»
+ * y «Aditamentos Aditamentos»).
+ */
+export function tipoConMarca(tipo: string, marca: string): string {
+  const t = tipo.trim();
+  const m = marca.trim();
+  const sinTildes = (s: string) =>
+    s
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  const palabras = sinTildes(t).split(/[^a-z0-9]+/);
+  const yaLaLleva =
+    m !== "" &&
+    sinTildes(m)
+      .split(/\s+/)
+      .every((p) => palabras.includes(p));
+  return yaLaLleva || !m ? t : `${t} ${m}`;
+}
+
 /** Título por defecto de cada página del catálogo, a partir de sus nombres. */
 export const tituloPorDefecto = {
   tipoRepuesto: (tipo: string, marca: string) => `Repuestos para ${tipo.toLowerCase()} ${marca}`,
@@ -25,7 +47,7 @@ export const tituloPorDefecto = {
   marcaRepuesto: (marca: string) => `Repuestos para maquinaria pesada ${marca}`,
   categoriaRepuestos: (categoria: string) => `${categoria} para maquinaria pesada`,
   marcaMaquinaria: (marca: string) => `Maquinaria pesada ${marca}`,
-  tipoMaquinaria: (tipo: string, marca: string) => `${tipo} ${marca}`,
+  tipoMaquinaria: (tipo: string, marca: string) => tipoConMarca(tipo, marca),
   categoriaNueva: (categoria: string) => `${categoria} ${concuerda(categoria, "nuevas", "nuevos")}`,
   categoriaUsada: (categoria: string) => `${categoria} ${concuerda(categoria, "usadas", "usados")}`,
   marcaUsada: (marca: string) => `Maquinaria ${marca} usada`,

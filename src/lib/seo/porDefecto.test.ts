@@ -18,6 +18,20 @@ describe("tituloPorDefecto", () => {
     assert.equal(tituloPorDefecto.modeloRepuesto("CAT 320D"), "Repuestos CAT 320D");
     assert.equal(tituloPorDefecto.marcaMaquinaria("Hitachi"), "Maquinaria pesada Hitachi");
     assert.equal(tituloPorDefecto.tipoMaquinaria("Excavadoras", "Hitachi"), "Excavadoras Hitachi");
+    // Sin repetir la marca si el tipo ya la nombra (auditoría, 2026-10-17).
+    assert.equal(
+      tituloPorDefecto.tipoMaquinaria("Pavimentadoras Dynapac", "Dynapac"),
+      "Pavimentadoras Dynapac",
+    );
+    assert.equal(tituloPorDefecto.tipoMaquinaria("Aditamentos", "Aditamentos"), "Aditamentos");
+    assert.equal(
+      tituloPorDefecto.tipoMaquinaria("Minicargadores CASE", "Case Construction"),
+      "Minicargadores CASE Case Construction",
+    );
+    assert.equal(
+      tituloPorDefecto.tipoMaquinaria("Vibrocompactador SV208", "Case Construction"),
+      "Vibrocompactador SV208 Case Construction",
+    );
     assert.equal(tituloPorDefecto.categoriaNueva("Excavadoras"), "Excavadoras nuevas");
     assert.equal(tituloPorDefecto.categoriaUsada("Excavadoras"), "Excavadoras usadas");
     assert.equal(tituloPorDefecto.marcaLubricante("Eni"), "Lubricantes Eni");

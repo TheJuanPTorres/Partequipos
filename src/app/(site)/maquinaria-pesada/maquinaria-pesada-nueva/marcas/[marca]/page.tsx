@@ -6,6 +6,7 @@ import { IndiceTarjetas } from "@/components/indices/IndiceTarjetas";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
+  equiposPorTipo,
   primeraFotoPorTipo,
   tarjetasDeTiposNueva,
   vistaEncabezadoMarcaNueva,
@@ -61,9 +62,10 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
     getTiposDeMarcaMaquinaria(marca.id),
     getRepuestosMarca(),
   ]);
-  // La foto del primer equipo solo hace falta para los tipos sin imagen propia.
-  const sinImagen = tipos.filter((t) => !imagenDeMedia(t.imagen, "")).map((t) => t.id);
-  const fotos = primeraFotoPorTipo(await getEquiposDeTipos(sinImagen));
+  // Los equipos de todos los tipos: cuántos tiene cada uno (los vacíos no se
+  // pintan) y la foto de su primer equipo, para los que no tienen imagen propia.
+  const equipos = await getEquiposDeTipos(tipos.map((t) => t.id));
+  const fotos = primeraFotoPorTipo(equipos);
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -73,7 +75,7 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
     { nombre: marca.nombre, path: rutas.marcaMaquinaria(marca.slug) },
   ];
 
-  const tarjetas = tarjetasDeTiposNueva(marca, tipos, fotos);
+  const tarjetas = tarjetasDeTiposNueva(marca, tipos, fotos, equiposPorTipo(equipos));
 
   return (
     <main className={estilos.pagina}>
@@ -88,6 +90,7 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
         tarjetas={tarjetas}
         verTodo={global.verTodoTexto?.trim() || "Ver todo"}
         etiqueta={`Tipos de equipo ${marca.nombre}`}
+        cabeceraBajaSinFoto
       />
       {tarjetas.length === 0 ? (
         <p id={ANCLA} className="mx-auto max-w-4xl px-4 py-10 text-gray-600">

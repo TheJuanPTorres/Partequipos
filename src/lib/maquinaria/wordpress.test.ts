@@ -187,9 +187,11 @@ describe("nombres de ficheros y de la ficha", () => {
 describe("CORRECCIONES_WP", () => {
   it("cada corrección es de una ficha (ruta de maquinaria nueva con barra final) y dice por qué", () => {
     for (const [ruta, c] of Object.entries(CORRECCIONES_WP)) {
+      // Tres niveles (marca, tipo y ficha) o dos: la ficha del SV208 cuelga en
+      // WordPress donde van los tipos.
       assert.match(
         ruta,
-        /^\/maquinaria-pesada\/maquinaria-pesada-nueva\/marcas\/[^/]+\/[^/]+\/[^/]+\/$/,
+        /^\/maquinaria-pesada\/maquinaria-pesada-nueva\/marcas\/[^/]+\/[^/]+\/(?:[^/]+\/)?$/,
       );
       assert.ok(c.sinPdf || c.sinTituloSeo || c.sinDescripcionSeo, ruta);
     }

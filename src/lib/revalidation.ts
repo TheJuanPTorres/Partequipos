@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import { ETIQUETAS_DATOS, revalidarDatos, revalidarIndices } from "./cacheDatos";
 
@@ -325,4 +325,41 @@ export function revalidarTodoElSitio(motivo: string): void {
   } catch (error) {
     console.error(`[revalidación] falló el sitio entero (${motivo}):`, error);
   }
+}
+
+/**
+ * Vacía TODA la caché del sitio desplegado: cada etiqueta de la caché de datos
+ * (`ETIQUETAS_DATOS`, todas, también las que se añadan) y todas las páginas,
+ * con las rutas dinámicas y los 404 que quedaron en caché de una URL que aún no
+ * existía (`revalidatePath("/", "layout")`). Para el final de cada importación
+ * por script, que corre fuera de Next y no puede revalidar (2026-10-18; la
+ * llama `POST /api/revalidar/`). Las etiquetas van PRIMERO, como en
+ * `revalidarTodoElSitio`. Devuelve qué se revalidó; un fallo se registra y
+ * se devuelve, nunca relanza.
+ */
+export function revalidarCachesDelSitio(motivo: string): {
+  etiquetas: string[];
+  paginas: boolean;
+  fallos: string[];
+} {
+  const fallos: string[] = [];
+  const etiquetas = Object.values(ETIQUETAS_DATOS);
+  for (const etiqueta of etiquetas) {
+    try {
+      revalidateTag(etiqueta, { expire: 0 });
+    } catch (error) {
+      console.error(`[revalidación] falló la etiqueta ${etiqueta} (${motivo}):`, error);
+      fallos.push(etiqueta);
+    }
+  }
+  let paginas = true;
+  try {
+    revalidatePath("/", "layout");
+    revalidatePath("/sitemap.xml");
+  } catch (error) {
+    console.error(`[revalidación] falló el sitio entero (${motivo}):`, error);
+    paginas = false;
+    fallos.push("/");
+  }
+  return { etiquetas, paginas, fallos };
 }

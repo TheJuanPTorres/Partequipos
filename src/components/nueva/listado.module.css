@@ -491,6 +491,9 @@
   align-items: center;
   gap: 10px;
 }
+.dato {
+  min-width: 0;
+}
 .circulo {
   display: inline-grid;
   place-items: center;
@@ -537,20 +540,63 @@
   display: none;
 }
 
-/* Vista en REJILLA (el icono de cuadrícula): tarjetas pequeñas en columnas. */
+/*
+ * Vista en REJILLA (el icono de cuadrícula). Con 4 por fila las tarjetas
+ * quedaban estrechas y desalineadas (dirección, 2026-10-18): ahora 1 por fila
+ * en móvil, 2 en tablet y como mucho 3 en escritorio (2 si no caben a 260 px).
+ * Todas las de una fila miden lo mismo: la foto va en una caja de proporción
+ * fija (así el logo y el título empiezan a la misma altura), el título ocupa
+ * siempre dos líneas, cada dato como mucho tres (con «…»; el completo está en
+ * la ficha) y los botones bajan al pie de la tarjeta.
+ */
 .tarjetas[data-vista="rejilla"] {
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 768px) {
+  .tarjetas[data-vista="rejilla"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1025px) {
+  .tarjetas[data-vista="rejilla"] {
+    grid-template-columns: repeat(auto-fill, minmax(max(260px, calc((100% - 20px) / 3)), 1fr));
+  }
 }
 .tarjetas[data-vista="rejilla"] .tarjeta {
+  display: flex;
+  flex-direction: column;
   border-radius: 30px;
   background: #fff;
   gap: 0;
 }
+.tarjetas[data-vista="rejilla"] .foto {
+  display: block;
+  aspect-ratio: 4 / 3;
+  min-height: 0;
+  padding: 0;
+}
+.tarjetas[data-vista="rejilla"] .foto > img:first-child {
+  position: absolute;
+  inset: 24px;
+  width: calc(100% - 48px);
+  height: calc(100% - 48px);
+  object-fit: contain;
+  object-position: center;
+}
 .tarjetas[data-vista="rejilla"] .datos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   background: transparent;
   padding: 8px 20px 24px;
 }
 .tarjetas[data-vista="rejilla"] .nombre {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.4em;
   text-transform: none;
   font-size: 18px;
   line-height: 1.2;
@@ -558,11 +604,16 @@
 .tarjetas[data-vista="rejilla"] .linea {
   margin: 14px 0;
 }
-.tarjetas[data-vista="rejilla"] .foto {
-  min-height: 180px;
+.tarjetas[data-vista="rejilla"] .dato {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
 }
-.tarjetas[data-vista="rejilla"] .foto > img:first-child {
-  height: 150px;
+.tarjetas[data-vista="rejilla"] .botones {
+  margin-top: auto;
+  padding-top: 22px;
 }
 
 @media (min-width: 640px) {

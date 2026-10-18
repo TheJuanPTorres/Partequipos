@@ -69,9 +69,12 @@ const fallar = (m: string): never => {
 if (!modo) fallar("indica el modo: simular, importar o retirar");
 // `solo=categorias`: solo las categorías técnicas de la portada (y sus fotos). Así una
 // pasada para añadir categorías no toca marcas, portada, sedes, Nosotros ni el pie.
+// `solo=nosotros` (2026-10-18, decisión del cliente: textos tal cual WordPress): solo
+// los TEXTOS de los bloques de Nosotros que ya existen (títulos, franja, botón y
+// tarjetas), sin subir nada ni tocar fotos, portada, marcas, sedes ni el pie.
 const SOLO = valorDe("solo");
-if (SOLO !== undefined && SOLO !== "categorias")
-  fallar(`«solo» solo admite «categorias», no «${SOLO}»`);
+if (SOLO !== undefined && SOLO !== "categorias" && SOLO !== "nosotros")
+  fallar(`«solo» solo admite «categorias» o «nosotros», no «${SOLO}»`);
 if (!destino) fallar("indica el destino: preview, produccion o prueba");
 if (destino === "preview") {
   const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
@@ -435,7 +438,7 @@ const subidas: string[] = [];
 const ids: Record<string, Id> = {};
 const clavesCategorias = new Set(fuente.portada.categorias.map((c) => c.imagen));
 const imagenesAUsar = Object.entries(fuente.imagenes).filter(
-  ([clave]) => SOLO !== "categorias" || clavesCategorias.has(clave),
+  ([clave]) => SOLO === undefined || (SOLO === "categorias" && clavesCategorias.has(clave)),
 );
 for (const [clave, img] of imagenesAUsar) {
   const fichero = ficheroReal(clave, img.url);
@@ -520,11 +523,54 @@ const grupo = (doc: Doc | null, k: string) =>
 const bloque = (lista: unknown, tipo: string) =>
   filas(lista).find((b) => b.blockType === tipo) ?? ({} as Record<string, unknown>);
 
+if (SOLO === "nosotros") {
+  if (!nosotros) fallar("no hay página Nosotros");
+  const cambios: string[] = [];
+  const poner = (b: Record<string, unknown>, campo: string, valor: unknown, donde: string) => {
+    if (b[campo] !== valor) {
+      cambios.push(`${donde}.${campo}: «${String(b[campo])}» → «${String(valor)}»`);
+      b[campo] = valor;
+    }
+  };
+  const bloques = filas(nosotros?.bloques).map((b) => ({ ...b }));
+  const de = (tipo: string) => bloques.find((b) => b.blockType === tipo);
+  const presentacion = de("presentacionImagen");
+  if (presentacion) {
+    poner(presentacion, "antetitulo", fuente.nosotros.antetitulo, "presentacionImagen");
+    poner(presentacion, "titulo", fuente.nosotros.titulo, "presentacionImagen");
+    poner(presentacion, "botonTexto", fuente.nosotros.boton.texto, "presentacionImagen");
+  }
+  const franja = de("franjaMarquee");
+  if (franja) poner(franja, "texto", fuente.nosotros.franja, "franjaMarquee");
+  const tarjetas = de("tarjetasExpandibles");
+  if (tarjetas) {
+    poner(tarjetas, "titulo", fuente.nosotros.tarjetasTitulo, "tarjetasExpandibles");
+    tarjetas.tarjetas = filas(tarjetas.tarjetas).map((t, i) => {
+      const fila = { ...t };
+      if (fuente.nosotros.tarjetas[i])
+        poner(fila, "titulo", fuente.nosotros.tarjetas[i]!.titulo, `tarjeta ${i + 1}`);
+      return fila;
+    });
+  }
+  for (const c of cambios) log(`  · ${c}`);
+  if (modo === "importar" && cambios.length) {
+    await payload.update({
+      collection: "paginas",
+      id: nosotros!.id,
+      data: { bloques } as never,
+      overrideAccess: true,
+    });
+  }
+  log(`nosotros (${modo}, solo textos): ${cambios.length} cambios`);
+  log("Los scripts no revalidan: redesplegar (o guardar Nosotros en el panel).");
+  process.exit(0);
+}
+
 // ---------- Lo que se aplica ----------
 
 const p = fuente.portada;
 const antes = manifiesto.antes!.portada.datos as Record<string, Record<string, unknown>>;
-const todo = SOLO !== "categorias";
+const todo = SOLO === undefined;
 
 const antesCategorias = manifiesto.antes!.categorias as Record<string, Record<string, unknown>>;
 const datosCategorias: { id: Id; data: Record<string, unknown> }[] = [];
@@ -671,6 +717,7 @@ if (todo)
 
 const n = fuente.nosotros;
 const bloquesActuales = nosotros?.bloques;
+
 const bloquesAntes = manifiesto.antes!.nosotros?.datos.bloques;
 const deNosotros = (
   tipo: string,

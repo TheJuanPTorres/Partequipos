@@ -18,29 +18,24 @@ export const SLUG_CATEGORIA_USADA_ADITAMENTOS = "aditamentos";
 export const NOMBRE_CATEGORIA_USADA_ADITAMENTOS = "Aditamentos";
 export type TipoAditamento = "excavadoras" | "minicargadores";
 
-/** Erratas de los títulos de WordPress que se corrigen (y se anotan en el documento). */
-const ERRATAS: Record<string, string> = { rapido: "rápido" };
-
-/** «MARTILLO PARA» → «Martillo para»: mayúscula solo al inicio y las erratas corregidas. */
-function oracion(texto: string): string {
-  const minus = texto
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/\p{L}+/gu, (p) => ERRATAS[p] ?? p);
-  return minus.charAt(0).toUpperCase() + minus.slice(1);
-}
+/**
+ * Texto de WordPress TAL CUAL, con sus mayúsculas y sus erratas («ACOPLE
+ * RAPIDO»), solo con los espacios plegados (decisión del cliente, 2026-10-18;
+ * hasta entonces se pasaba a mayúscula inicial y se corregía «rapido»).
+ */
+const talCual = (texto: string) => texto.replace(/\s+/g, " ").trim();
 
 /**
  * Nombre de un aditamento nuevo: «MARTILLO PARA MAQUINARIA PESADA» en el tipo
- * «minicargadores» → «Martillo para minicargadores». En WordPress todos los
+ * «minicargadores» → «MARTILLO PARA MINICARGADORES». En WordPress todos los
  * títulos acaban en «para maquinaria pesada» y dos se repiten (martillo y
  * brazo) entre los dos tipos; con el tipo en el nombre se distinguen en el
- * panel, en el buscador y en la pestaña del navegador.
+ * panel, en el buscador y en la pestaña del navegador. El resto, tal cual
+ * (en mayúsculas, como en WordPress).
  */
 export function nombreDeAditamentoNuevo(titulo: string, tipo: TipoAditamento): string {
-  const base = oracion(titulo.replace(/\s*para\s+maquinaria\s+pesada\s*$/i, ""));
-  return `${base} para ${tipo}`;
+  const base = talCual(titulo.replace(/\s*para\s+maquinaria\s+pesada\s*$/i, ""));
+  return `${base} PARA ${tipo.toLocaleUpperCase("es")}`;
 }
 
 /** Marcas de los aditamentos usados, con su forma escrita. */
@@ -62,11 +57,13 @@ export type DatosUsado = {
  * - «MARTILLO» / «NPK» → tipo Martillo, marca NPK;
  * - «CRUSHER» / «NPK G-17» → tipo Crusher, marca NPK, modelo «G-17»;
  * - «AFTER MARKET» / «ACOPLE RÁPIDO PARA EXCAVADORA» → solo el tipo.
+ *
+ * Tipo y modelo, tal cual (en mayúsculas); la marca, con su forma escrita.
  */
 export function datosDeTitulos(categoria: string, modelo: string): DatosUsado {
   const cat = categoria.replace(/\s+/g, " ").trim();
   const mod = modelo.replace(/\s+/g, " ").trim();
-  if (SIN_MARCA.has(cat.toLowerCase())) return { tipo: oracion(mod), marca: null, modelo: null };
+  if (SIN_MARCA.has(cat.toLowerCase())) return { tipo: talCual(mod), marca: null, modelo: null };
   const marcaCat = MARCAS[cat.toLowerCase()];
   const primera = mod.split(" ")[0]!.toLowerCase();
   const marcaMod = MARCAS[primera];
@@ -79,12 +76,13 @@ export function datosDeTitulos(categoria: string, modelo: string): DatosUsado {
       modelo: primera === cat.toLowerCase() ? resto(mod) : mod,
     };
   }
-  if (marcaMod) return { tipo: oracion(cat), marca: marcaMod, modelo: resto(mod) };
-  return { tipo: oracion(cat), marca: null, modelo: mod };
+  if (marcaMod) return { tipo: talCual(cat), marca: marcaMod, modelo: resto(mod) };
+  return { tipo: talCual(cat), marca: null, modelo: mod };
 }
 
+/** El nombre, en mayúsculas como en WordPress («OKADA TOP 100»); la marca enlazada sigue «Okada». */
 export function nombreDeAditamentoUsado(d: DatosUsado, anio: number | null): string {
-  return nombreCompuesto(d.tipo ?? "", d.marca, d.modelo, anio);
+  return nombreCompuesto(d.tipo ?? "", d.marca?.toLocaleUpperCase("es") ?? null, d.modelo, anio);
 }
 
 export type FichaUsado = {
@@ -120,17 +118,11 @@ export function fichaDeUsado(lineas: string[]): FichaUsado {
     } else if (/serial/.test(c)) {
       // Nunca se publica (el extractor ya lo descarta; esto es la segunda barrera).
     } else {
-      otras.push(clave ? `${clave.trim()} ${valor.trim()}` : linea);
+      otras.push(linea);
     }
   }
-  const frases = otras
-    .map((o) =>
-      oracion(o)
-        // «7- 9 y 12 toneladas» → «7, 9 y 12 toneladas».
-        .replace(/(\d+)\s*-\s+(\d+)/g, "$1, $2")
-        .replace(/\.?$/, "."),
-    )
-    .filter((o) => o.length > 1);
+  // Las demás líneas, tal cual (decisión del cliente, 2026-10-18).
+  const frases = otras.filter((o) => o.length > 1);
   ficha.descripcion = frases.length ? frases.join(" ") : null;
   return ficha;
 }

@@ -36,74 +36,15 @@ const limpio = (html: string) =>
     .trim();
 
 /**
- * ETIQUETAS CORREGIDAS (decisión de dirección, 2026-10-13): solo tildes,
- * erratas y mayúsculas sueltas en medio de la etiqueta. Los sinónimos NO se
- * unifican («Peso operacional» y «Peso operativo» siguen siendo dos): eso
- * cambiaría lo que dice el fabricante. La clave es la etiqueta tal como sale
- * de `etiquetaLegible`; se aplica en `etiquetaCorregida`.
- */
-export const ETIQUETAS_CORREGIDAS: Readonly<Record<string, string>> = {
-  "Alance maximo en el suelo": "Alcance máximo en el suelo",
-  "Alcance maximo en el suelo": "Alcance máximo en el suelo",
-  "Alcance Máximo horizontal": "Alcance máximo horizontal",
-  "Altura de Transporte": "Altura de transporte",
-  "Altura maxima de descarga con angulo de articulacion de 45°":
-    "Altura máxima de descarga con ángulo de articulación de 45°",
-  "Altura máxima de descarga con ángulo de articulación de 45º":
-    "Altura máxima de descarga con ángulo de articulación de 45°",
-  "Ancho de Transporte": "Ancho de transporte",
-  "Bomba de los implementos hidraulicos": "Bomba de los implementos hidráulicos",
-  "Bomba de ﬂujo variable": "Bomba de flujo variable",
-  "Capacidad maxima de la cucharón colmado": "Capacidad máxima del cucharón colmado",
-  "Elevación del braz de excavación a 3.660 mm (12’)":
-    "Elevación del brazo de excavación a 3.660 mm (12’)",
-  "Fabricante del Motor": "Fabricante del motor",
-  "Fuerza de Arranque": "Fuerza de arranque",
-  "Fuerza de excavacion del balde trasero (estándar)":
-    "Fuerza de excavación del balde trasero (estándar)",
-  "Fuerza de excavacion del brazo de penetracion (estándar)":
-    "Fuerza de excavación del brazo de penetración (estándar)",
-  "Largura de la hoja": "Largo de la hoja",
-  "Longitud de Transporte": "Longitud de transporte",
-  "Longitud total con brazo de penetracion estándar":
-    "Longitud total con brazo de penetración estándar",
-  "Maxima profundidad de excavacion (estándar)": "Máxima profundidad de excavación (estándar)",
-  "Peso de Operación": "Peso de operación",
-  "Potencia Bruta": "Potencia bruta",
-  "Potencia Bruta (ISO 14396)": "Potencia bruta (ISO 14396)",
-  "Potencia Bruta (SAE J1995)": "Potencia bruta (SAE J1995)",
-  "Potencia Bruta SAE J1995 a 2500 rpm": "Potencia bruta SAE J1995 a 2500 rpm",
-  "Potencia Neta": "Potencia neta",
-  "Potencia Neta (SAE J1349)": "Potencia neta (SAE J1349)",
-  "Potencia Neta SAE J1349 a 2500 rpm": "Potencia neta SAE J1349 a 2500 rpm",
-  "Potência neta (SAE J1349)": "Potencia neta (SAE J1349)",
-  "Presión de alívio principal (estándar)": "Presión de alivio principal (estándar)",
-  "Profundidad maxima excavacion": "Profundidad máxima de excavación",
-  "Rotación del circulo": "Rotación del círculo",
-  "Tipo del Motor": "Tipo del motor",
-  "Velocidad maxima de desplazamiento (avance)": "Velocidad máxima de desplazamiento (avance)",
-  "Velocidad máxima de desplazamiento (Avance)": "Velocidad máxima de desplazamiento (avance)",
-  "Área da la oruga no solo": "Área de la oruga en el suelo",
-};
-
-/**
- * Etiqueta legible: sin los dos puntos del final y, si viene TODA en
- * mayúsculas («POTENCIA NETA»), en minúscula con la primera en mayúscula
- * («Potencia neta»). Si ya trae mayúsculas y minúsculas, tal cual. La
- * ortografía solo se toca con la tabla `ETIQUETAS_CORREGIDAS`.
+ * Etiqueta tal como la escribe WordPress, sin los dos puntos del final
+ * («POTENCIA NETA:» → «POTENCIA NETA»). Ni mayúsculas ni ortografía se tocan:
+ * decisión del cliente (2026-10-18), se migra todo como está en su web, con
+ * las erratas, y se le pasa la lista. Hasta entonces se corregían 38 etiquetas
+ * y se pasaban a minúsculas las escritas en mayúsculas.
  */
 export function etiquetaLegible(texto: string): string {
-  const t = texto.replace(/\s*:\s*$/, "").trim();
-  if (!/\p{Lu}/u.test(t) || t !== t.toUpperCase()) return t;
-  const min = t.toLocaleLowerCase("es");
-  return min.charAt(0).toLocaleUpperCase("es") + min.slice(1);
+  return texto.replace(/\s*:\s*$/, "").trim();
 }
-
-/** La etiqueta legible, con la corrección de la tabla si la tiene. */
-export const etiquetaCorregida = (texto: string) => {
-  const e = etiquetaLegible(texto);
-  return ETIQUETAS_CORREGIDAS[e] ?? e;
-};
 
 /**
  * Pares etiqueta/valor de un bloque de especificaciones. Tres formas en las
@@ -114,12 +55,12 @@ export const etiquetaCorregida = (texto: string) => {
  *   («Motor» abarcando sus filas): el grupo no es un dato y se salta;
  * - lista con `<li><strong>ETIQUETA:</strong> valor</li>` (si la negrita se
  *   cerró tarde y se llevó el principio del valor, se le devuelve).
- * Las etiquetas pasan por `etiquetaCorregida`. Las celdas vacías y los pares sin valor se descartan: no se inventa nada.
+ * Las etiquetas pasan por `etiquetaLegible` (tal cual, sin los dos puntos). Las celdas vacías y los pares sin valor se descartan: no se inventa nada.
  */
 export function paresDeEspecificaciones(html: string): Par[] {
   const pares: Par[] = [];
   const anadir = (etiqueta: string, valor: string) => {
-    const e = etiquetaCorregida(limpio(etiqueta));
+    const e = etiquetaLegible(limpio(etiqueta));
     const v = limpio(valor);
     if (e && v) pares.push({ etiqueta: e, valor: v });
   };
@@ -225,9 +166,11 @@ export function enlacesDe(html: string): string[] {
 }
 
 /**
- * ERRORES DEL PROPIO WORDPRESS que se corrigen al importar (decisión de
- * dirección, 2026-10-13). Están anotados para que el cliente los corrija
- * también en su web (`docs/fichas-nuevas-importacion.md`). Por ruta.
+ * ERRORES DEL PROPIO WORDPRESS que NO se copian (decisión de dirección,
+ * 2026-10-13, confirmada el 2026-10-18 aunque el cliente pide migrar todo tal
+ * cual): un PDF de otro modelo, o un título o descripción para buscadores que
+ * nombran otro modelo. Están en la lista para el cliente
+ * (`docs/fichas-nuevas-importacion.md` §4). Por ruta.
  */
 export const CORRECCIONES_WP: Readonly<
   Record<string, { sinPdf?: string; sinTituloSeo?: string; sinDescripcionSeo?: string }>
@@ -242,10 +185,8 @@ export const CORRECCIONES_WP: Readonly<
   // La ficha del SV208 cuelga en WordPress donde van los tipos (auditoría de
   // estructura, 2026-10-17; `scripts/maquinaria/extraer-xml.py`, FICHAS_EN_TIPO).
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/vibrocompactador-case-sv208/":
-    {
-      sinPdf: "el PDF del fabricante que enlaza WordPress responde 403",
-      sinTituloSeo: "el <title> de WordPress escribe «sv 208»; vale el título por defecto",
-    },
+    // Su <title> («sv 208») se copia tal cual (decisión del cliente, 2026-10-18).
+    { sinPdf: "el PDF del fabricante que enlaza WordPress responde 403" },
 };
 
 // ---------- Descripción para buscadores (decisión de dirección, 2026-10-14) ----------
@@ -348,4 +289,30 @@ export function descripcionSeoDeFicha(p: {
   const frase = primeraFrase(p.htmlDescripcion);
   if (frase && mencionaModelo(frase, clave)) return { texto: frase, origen: "frase" };
   return { texto: descripcionGenerada(p.nombre), origen: "generada" };
+}
+
+// ---------- Etiquetas tal cual en fichas ya importadas (decisión del cliente, 2026-10-18) ----------
+
+/** Una fila de la ficha técnica guardada (con su `id` y su «Destacar»). */
+export type FilaGuardada = {
+  id?: string | null;
+  etiqueta: string;
+  valor: string;
+  destacar?: boolean | null;
+};
+
+/**
+ * Las filas guardadas con la etiqueta de WordPress tal cual, conservando su
+ * `id`, su valor y su «Destacar» (lo marca el editor). Solo si la ficha sigue
+ * como la dejó la importación: mismas filas y mismos valores, en el mismo
+ * orden. Si un editor la cambió, `null` (no se toca). Sin cambios, `"igual"`.
+ */
+export function etiquetasTalCual(
+  guardadas: FilaGuardada[],
+  deWordpress: Par[],
+): FilaGuardada[] | "igual" | null {
+  if (guardadas.length !== deWordpress.length) return null;
+  if (guardadas.some((g, i) => g.valor !== deWordpress[i]!.valor)) return null;
+  if (guardadas.every((g, i) => g.etiqueta === deWordpress[i]!.etiqueta)) return "igual";
+  return guardadas.map((g, i) => ({ ...g, etiqueta: deWordpress[i]!.etiqueta }));
 }

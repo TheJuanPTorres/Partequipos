@@ -9,6 +9,7 @@
  *   npm run preview:fichas:importar -- tanda=80
  *   npm run preview:fichas:importar -- actualizar  # vuelve a aplicar los datos a las ya importadas,
  *                                                 # por tandas que avanzan (`reiniciar`: desde la primera)
+ *   npm run preview:fichas:importar -- etiquetas   # solo las etiquetas, tal cual WordPress (2026-10-18)
  *   npm run preview:fichas:retirar              # deshace EXACTAMENTE lo del manifiesto
  *
  * IMPORTACIÓN AL PREVIEW APROBADA por dirección (2026-10-13), tras la simulación.
@@ -53,6 +54,7 @@ import { enlaceInterno, textoPlano } from "../../src/lib/blog/wordpress";
 import type { EquiposNuevo } from "../../src/payload-types";
 import {
   CORRECCIONES_WP,
+  etiquetasTalCual,
   descripcionSeoDeFicha,
   type OrigenDescripcion,
   clasificarTexto,
@@ -119,6 +121,15 @@ if (!Number.isInteger(TANDA) || TANDA < 1) fallar("tanda=<n> tiene que ser un en
 const ACTUALIZAR = args.includes("actualizar");
 /** Con `actualizar reiniciar`, la actualización empieza de cero aunque la fuente sea la misma. */
 const REINICIAR = args.includes("reiniciar");
+/**
+ * Con `etiquetas` (decisión del cliente, 2026-10-18): en las fichas YA
+ * importadas, solo las etiquetas de la ficha técnica pasan a como están en
+ * WordPress (sin corregir ni pasar a minúsculas), y el título para buscadores
+ * vacío se rellena con el de WordPress (el SV208). Conserva «Destacar», los
+ * valores y todo lo demás; no toca una ficha que un editor haya cambiado.
+ * Con `simular`, solo cuenta. No crea nada ni sube nada.
+ */
+const ETIQUETAS = args.includes("etiquetas");
 
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
@@ -528,6 +539,47 @@ const resumen = {
   comprobacion: COMPROBAR ? comprobacion : "no pedida (añade «comprobar»)",
   avisos,
 };
+if (ETIQUETAS) {
+  if (modo === "retirar") fallar("«etiquetas» va con simular o importar");
+  const cuenta = { cambiadas: 0, iguales: 0, editadas: 0, sinFicha: 0, titulos: 0 };
+  for (const p of planes) {
+    if (p.idActual === null) {
+      cuenta.sinFicha++;
+      continue;
+    }
+    const doc = await payload.findByID({
+      collection: "equipos-nuevos",
+      id: p.idActual,
+      depth: 0,
+      overrideAccess: true,
+    });
+    const filas = etiquetasTalCual(doc.fichaTecnica ?? [], p.fichaTecnica);
+    const titulo = !doc.seo?.metaTitle && p.seo.metaTitle ? p.seo.metaTitle : null;
+    if (filas === null) {
+      cuenta.editadas++;
+      log(`no se toca ${p.slug} (id ${p.idActual}): su ficha técnica no es la de la importación`);
+    } else if (filas === "igual") cuenta.iguales++;
+    else cuenta.cambiadas++;
+    if (titulo) cuenta.titulos++;
+    const data = {
+      ...(Array.isArray(filas) ? { fichaTecnica: filas } : {}),
+      ...(titulo ? { seo: { ...doc.seo, metaTitle: titulo } } : {}),
+    };
+    if (modo === "importar" && Object.keys(data).length) {
+      await payload.update({
+        collection: "equipos-nuevos",
+        id: p.idActual,
+        data: data as Partial<EquiposNuevo>,
+        overrideAccess: true,
+      });
+      log(`etiquetas como en WordPress: ${p.slug} (id ${p.idActual})${titulo ? " · título" : ""}`);
+    }
+  }
+  log(
+    `etiquetas (${modo}): cambiadas ${cuenta.cambiadas} · ya iguales ${cuenta.iguales} · editadas, sin tocar ${cuenta.editadas} · sin ficha en la base ${cuenta.sinFicha} · títulos rellenados ${cuenta.titulos}`,
+  );
+  process.exit(0);
+}
 if (modo === "simular") {
   fs.writeFileSync(
     INFORME,

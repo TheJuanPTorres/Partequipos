@@ -221,6 +221,11 @@ oficial, no lo pongas.
   serie. En cada **modelo**, el campo **Serie** dice a cuál pertenece (tiene
   que ser una de las de su tipo; si no, no deja guardar). Un modelo sin serie
   sale al final, en «Otros modelos».
+- **Cuelga de** (en el tipo de equipo): casi siempre vacío. Solo sirve para
+  conservar una dirección web antigua en la que un tipo colgaba de otro, como
+  la **Excavadora de CASE**, que cuelga de **Cargador frontal**: su página y
+  las de sus modelos quedan bajo la de ese tipo. Cambiarlo cambia la dirección
+  web (el sitio crea la redirección).
 - Las **categorías técnicas** son las mismas en todas las marcas: su
   **icono**, su **enlace** y su **posición en las páginas de marca** se
   editan en cada categoría (**Repuestos → Categorías técnicas**).

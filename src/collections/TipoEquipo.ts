@@ -1,4 +1,4 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, Where } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
@@ -6,6 +6,7 @@ import { revalidarTipo, revalidarTipoBorrado } from "./hooks/revalidateHooks";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMegamenu } from "./hooks/megamenuHooks";
 import { validarSeries } from "../lib/repuestos/series";
+import { slugPadreDelTipo, slugPadreDeLosHijos } from "./hooks/tipoPadre";
 
 const menu = revalidarMegamenu("tipos-equipo");
 
@@ -35,7 +36,8 @@ export const TipoEquipo: CollectionConfig = {
   indexes: [{ fields: ["marca", "slug"], unique: true }],
   // ISR: revalida el tipo, la página de su marca y las fichas de sus modelos.
   hooks: {
-    afterChange: [revalidarTipo, menu.afterChange],
+    beforeValidate: [slugPadreDelTipo],
+    afterChange: [slugPadreDeLosHijos, revalidarTipo, menu.afterChange],
     afterDelete: [revalidarTipoBorrado, menu.afterDelete],
   },
   fields: [
@@ -53,6 +55,35 @@ export const TipoEquipo: CollectionConfig = {
       relationTo: "marcas",
       required: true,
       label: "Marca",
+    },
+    /*
+     * «Cuelga de» (2026-10-17, dirección): SOLO para conservar una URL heredada
+     * de WordPress donde un tipo colgaba de otro (la «Excavadora» de CASE, bajo
+     * «Cargador frontal»). Ver `src/lib/repuestos/anidado.ts`.
+     */
+    {
+      name: "tipoPadre",
+      type: "relationship",
+      relationTo: "tipos-equipo",
+      label: "Cuelga de",
+      admin: {
+        description:
+          "Casi siempre vacío. Solo para conservar una dirección web antigua en la que este tipo colgaba de otro tipo de la misma marca: la página del tipo quedará bajo la de ese tipo. Cambiarlo cambia la dirección web (se crea la redirección).",
+      },
+      filterOptions: ({ siblingData, id }) => {
+        const marca = (siblingData as { marca?: number | string | null }).marca;
+        const condiciones: Where[] = [{ tipoPadre: { exists: false } }];
+        if (marca) condiciones.push({ marca: { equals: marca } });
+        if (id) condiciones.push({ id: { not_equals: id } });
+        return { and: condiciones };
+      },
+    },
+    {
+      name: "slugPadre",
+      type: "text",
+      label: "Dirección web del tipo del que cuelga",
+      // La pone el servidor desde «Cuelga de» (`slugPadreDelTipo`); compone la URL.
+      admin: { hidden: true, readOnly: true },
     },
     {
       name: "descripcion",

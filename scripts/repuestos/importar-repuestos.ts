@@ -458,8 +458,21 @@ const slugsCambiados: { ruta: string; slug: string; duplicado: boolean }[] = [];
 const slugsDelTipo = new Set(
   modelosWp.map((x) => (x.segmentos ?? []).join("/")).filter((k) => k.split("/").length === 3),
 );
+/*
+ * TIPO ANIDADO (2026-10-17, dirección): la «Excavadora» de CASE, colgada en
+ * WordPress de «Cargador frontal», es un TIPO con sus 4 modelos un nivel más
+ * abajo (src/lib/repuestos/anidado.ts). Ni esa página va como modelo ni sus 4
+ * modelos llevan 301: los pone `scripts/repuestos/tipo-anidado.ts`, que se
+ * ejecuta DESPUÉS de esta importación (docs/repuestos-importacion.md §11).
+ */
+const rutasSinRuta = conNivel.filter((p) => p.nivel === "sinRuta").map((p) => p.ruta);
+const madresDeAnidados = new Set(rutasSinRuta.map(rutaMadre));
 for (const p of modelosWp) {
   const [mSlug = "", tSlug = "", slugWp = ""] = p.segmentos ?? [];
+  if (madresDeAnidados.has(p.ruta)) {
+    avisos.push(`${slugWp}: es un TIPO anidado; no va como modelo (lo pone tipo-anidado.ts)`);
+    continue;
+  }
   if (esBorradorCopia(slugWp)) {
     borradores.push(p.ruta);
     continue;
@@ -528,9 +541,11 @@ for (const p of modelosWp) {
     motivoSinFoto,
   });
 }
-const sinRuta = conNivel.filter((p) => p.nivel === "sinRuta").map((p) => p.ruta);
-// Las 4 de CASE con un nivel de más: 301 a su página madre, que sí se migra (dirección, 2026-10-13).
-for (const ruta of sinRuta) redirecciones.push({ origen: ruta, destino: rutaMadre(ruta) });
+const sinRuta = rutasSinRuta;
+// Las 4 de CASE con un nivel de más: hasta el 2026-10-17 iban por 301 a su página madre; ahora
+// son los modelos del tipo anidado, con su URL (los pone tipo-anidado.ts). Sin 301.
+for (const ruta of sinRuta)
+  avisos.push(`${ruta}: modelo del tipo anidado (lo pone tipo-anidado.ts)`);
 
 // ---------- Lo que ya hay en el preview (solo lectura) ----------
 
@@ -598,10 +613,24 @@ const modelosNuevos = modelos.filter((m) => {
 const slugMarca = new Map(enMarcas.map((m) => [m.id, m.slug]));
 const claveWpTipo = (t: { marca: number; slug: string }) => `${slugMarca.get(t.marca)}/${t.slug}`;
 const tipoDe = new Map(enTipos.map((t) => [t.id, claveWpTipo(t)]));
+// El tipo anidado de CASE y sus 4 modelos (los pone tipo-anidado.ts) también son de WordPress:
+// no son demo, y una segunda importación no se para por ellos.
+const anidadosWp = conNivel
+  .filter((p) => p.nivel === "sinRuta" && p.segmentos)
+  .map((p) => {
+    const [m = "", , t = "", slug = ""] = p.segmentos!;
+    return { marca: m, tipo: t, slug: formatSlug(slug) };
+  });
 const wp = {
   marcas: new Set(marcas.map((m) => m.slug)),
-  tipos: new Set(tipos.map((t) => `${t.marca}/${t.slug}`)),
-  modelos: new Set(modelos.map((m) => `${m.marca}/${m.tipo}/${m.slug}`)),
+  tipos: new Set([
+    ...tipos.map((t) => `${t.marca}/${t.slug}`),
+    ...anidadosWp.map((x) => `${x.marca}/${x.tipo}`),
+  ]),
+  modelos: new Set([
+    ...modelos.map((m) => `${m.marca}/${m.tipo}/${m.slug}`),
+    ...anidadosWp.map((x) => `${x.marca}/${x.tipo}/${x.slug}`),
+  ]),
 };
 const demoMarcas = enMarcas.filter((m) => !wp.marcas.has(m.slug)).map((m) => m.slug);
 const demoTipos = enTipos.filter((t) => !wp.tipos.has(claveWpTipo(t))).map(claveWpTipo);

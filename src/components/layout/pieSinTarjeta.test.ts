@@ -17,12 +17,14 @@ const css = readFileSync(path.join(dir, "pie.module.css"), "utf8");
 
 /**
  * Páginas que piden el pie sin tarjeta (decisiones de dirección, 2026-10-06):
- * las fichas de maquinaria (nueva y usada, que comparten `FichaProducto`), las de modelo de repuesto y /contactanos/
+ * las fichas de maquinaria (nueva y usada, que comparten `FichaProducto`), las de modelo de repuesto
+ * (`PaginaModeloRepuesto`, común a sus dos rutas) y /contactanos/
  * (en la ruta comodín, solo para esa página).
  */
 const PAGINAS = [
   "src/components/ficha/FichaProducto.tsx",
-  "src/app/(site)/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]/[modelo]/page.tsx",
+  // La ficha de modelo de repuesto, común a sus dos rutas (también la del tipo anidado).
+  "src/components/repuestos/PaginaModeloRepuesto.tsx",
   "src/app/(site)/[...slug]/page.tsx",
 ];
 

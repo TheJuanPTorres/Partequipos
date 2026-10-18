@@ -160,4 +160,14 @@ la página de marca de repuestos siguen igual.
 radio de 20 px en las 4 esquinas; aire entre filas de 30 · 32 · 32 px; **contraste del título contra el píxel más oscuro de
 su fondo real (texto oculto), 16,2:1 como mínimo** (AA pide 4,5); el botón no cambia de colores; sin desbordamiento ni
 errores. Capturas y medidas en `Desktop/partequipos-cierre/informes/capturas-2026-10-18-plantilla1/` (con el lado a lado de
-la referencia a 1440). No se replica el `motion_fx` de desplazamiento del recuadro del export (no lo pidió dirección).
+la referencia a 1440).
+
+**Recuadro que se desplaza con el scroll (2026-10-18, dirección: «sí, como la referencia»).** El export lo trae
+(`motion_fx_translateY`, tipo elemento, velocidad 0,5). Fórmula de Elementor: −(recorrido − 50) × velocidad, donde el
+recorrido es el % de la ventana que la tarjeta lleva atravesado: +25 px al asomar por abajo, 0 en el centro (la posición
+de siempre) y −25 px al salir por arriba (`src/lib/repuestos/desplazamiento.ts`, con pruebas). `RecuadrosConScroll`
+(componente de cliente: depende del scroll) solo mueve los recuadros a la vista, con `transform` y una vez por fotograma.
+Con «reducir movimiento», quieto (en el componente y en el CSS). **Medido en las 7 páginas × 3 anchos:** recorrido +23 · 0 ·
+−10 px con la tarjeta entrando, centrada y arriba; con «reducir movimiento», 0 en las tres; el scroll no suma CLS (el de la
+carga, ≤ 0,0025, es el mismo con y sin «reducir movimiento»); contraste del título con la tarjeta arriba (el recuadro más
+subido sobre la foto) de **8,65:1 como mínimo**; sin errores.

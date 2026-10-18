@@ -15,7 +15,15 @@
 # correo e IP): este script NO los lee, y la salida no los lleva. Ni el XML ni la
 # salida van al repositorio: la salida se guarda en Desktop\partequipos-cierre\.
 #
-# Uso:  python -I scripts/maquinaria/extraer-xml.py <exportacion.xml> <salida.json>
+# FICHAS EN NIVEL DE TIPO (2026-10-17, decisión de dirección tras la auditoría de
+# estructura): el vibrocompactador SV208 de CASE es en WordPress una ficha colgada
+# donde van los tipos (`…/case-construction/vibrocompactador-case-sv208/`, §10.3
+# p.7). Aquí se replicó como tipo, que salía vacío. Se extrae como ficha DENTRO de
+# ese tipo, con el slug de `FICHAS_EN_TIPO`.
+#
+# Uso:  python -I scripts/maquinaria/extraer-xml.py <exportacion.xml> <salida.json> [solo=<ruta de WordPress>]
+#       (`solo=` deja en la salida solo esa ficha: así una ficha nueva se importa
+#       sin volver a tocar las 80 de siempre)
 import json
 import os
 import sys
@@ -25,6 +33,16 @@ from elementor import WP, ajustes, arbol_elementor, recorrer, ruta_de, seccion_p
 
 fichero, salida = sys.argv[1], sys.argv[2]
 RAIZ = "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/"
+SOLO = next((a[len("solo="):] for a in sys.argv[3:] if a.startswith("solo=")), None)
+
+# Ruta de WordPress (marca/tipo) -> slug de la ficha dentro de ese tipo y su nombre
+# (el título de WordPress es «Vibrocompactador Case sv 208»).
+FICHAS_EN_TIPO = {
+    "case-construction/vibrocompactador-case-sv208": {
+        "slug": "vibrocompactador-case-construction-sv208",
+        "titulo": "Vibrocompactador Case Construction SV208",
+    },
+}
 
 fichas = []
 
@@ -34,8 +52,13 @@ def al_pagina(el):
     if not (ruta.startswith(RAIZ) and el.findtext(WP + "status") == "publish"):
         return
     segmentos = [x for x in ruta[len(RAIZ):].split("/") if x]
+    en_tipo = FICHAS_EN_TIPO.get("/".join(segmentos))
+    if en_tipo:
+        segmentos = segmentos + [en_tipo["slug"]]
     if len(segmentos) != 3:
         return  # marcas (1) y tipos (2) no son fichas
+    if SOLO and ruta != SOLO:
+        return
     arbol = arbol_elementor(el)
     principal = seccion_principal(arbol)
     titulos, textos, galeria, imagenes, botones = [], [], [], [], []
@@ -72,7 +95,7 @@ def al_pagina(el):
     fichas.append({
         "idWp": int(el.findtext(WP + "post_id")),
         "ruta": ruta,
-        "titulo": el.findtext("title") or "",
+        "titulo": en_tipo["titulo"] if en_tipo else (el.findtext("title") or ""),
         "segmentos": segmentos,
         "titulos": titulos,
         "textos": textos,

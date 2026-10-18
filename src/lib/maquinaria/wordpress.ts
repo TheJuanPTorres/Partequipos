@@ -237,6 +237,13 @@ export const CORRECCIONES_WP: Readonly<
   // Hallazgo de C (2026-10-13): su meta descripción es la de la 570 ST.
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/retrocargadora-case-construction-851-fx-tier4/":
     { sinDescripcionSeo: "la meta descripción de WordPress habla de otro modelo (570 ST)" },
+  // La ficha del SV208 cuelga en WordPress donde van los tipos (auditoría de
+  // estructura, 2026-10-17; `scripts/maquinaria/extraer-xml.py`, FICHAS_EN_TIPO).
+  "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/vibrocompactador-case-sv208/":
+    {
+      sinPdf: "el PDF del fabricante que enlaza WordPress responde 403",
+      sinTituloSeo: "el <title> de WordPress escribe «sv 208»; vale el título por defecto",
+    },
 };
 
 // ---------- Descripción para buscadores (decisión de dirección, 2026-10-14) ----------

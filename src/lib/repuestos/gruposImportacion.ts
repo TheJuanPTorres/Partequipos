@@ -1,6 +1,6 @@
 /**
  * Reglas puras del importador de «Qué incluye» de las categorías técnicas
- * (`scripts/repuestos/importar-grupos-categorias.ts`, docs/repuestos-importacion.md §8).
+ * (`scripts/repuestos/importar-grupos-categorias.ts`, docs/repuestos-importacion.md §9).
  */
 
 /** Prefijo de las fotos que sube el importador: así se reconocen sin repetirlas. */

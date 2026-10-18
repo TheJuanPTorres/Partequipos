@@ -45,6 +45,20 @@ describe("gruposDeCategoria", () => {
     );
   });
 
+  it("un grupo con «Mostrar en la web» desmarcado no se pinta; sin dato, sí", () => {
+    const r = gruposDeCategoria(
+      categoria([
+        { id: "a", nombre: "Oculto", mostrar: false, productos: [{ texto: "Pieza" }] },
+        { id: "b", nombre: "Visible", mostrar: true, productos: [{ texto: "Pieza" }] },
+        { id: "c", nombre: "Antiguo", productos: [{ texto: "Pieza" }] },
+      ]),
+    );
+    assert.deepEqual(
+      r.map((x) => x.nombre),
+      ["Visible", "Antiguo"],
+    );
+  });
+
   it("una foto sin poblar deja la tarjeta sin foto", () => {
     const r = gruposDeCategoria(
       categoria([{ id: "a", nombre: "Grupo", imagen: 7, productos: [{ texto: "Pieza" }] }]),

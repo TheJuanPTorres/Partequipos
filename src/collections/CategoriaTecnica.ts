@@ -173,6 +173,16 @@ export const CategoriaTecnica: CollectionConfig = {
       fields: [
         { name: "nombre", type: "text", required: true, label: "Nombre del grupo" },
         {
+          name: "mostrar",
+          type: "checkbox",
+          defaultValue: true,
+          label: "Mostrar en la web",
+          admin: {
+            description:
+              "Desmarcada, el grupo se guarda pero no sale en la página. Sirve para tener listo un grupo y activarlo cuando se quiera.",
+          },
+        },
+        {
           name: "imagen",
           type: "upload",
           relationTo: "media",

@@ -10,12 +10,18 @@ export const PREFIJO_GRUPO = "wp-grupo-";
 export type FuenteGrupos = {
   categorias: {
     slug: string;
-    grupos: { nombre: string; imagen: { url: string; alt: string }; productos: string[] }[];
+    grupos: {
+      nombre: string;
+      mostrar: boolean;
+      imagen: { url: string; alt: string };
+      productos: string[];
+    }[];
   }[];
 };
 
 export type GrupoEscrito = {
   nombre: string;
+  mostrar?: boolean;
   imagen?: number | null;
   productos: { texto: string }[];
 };

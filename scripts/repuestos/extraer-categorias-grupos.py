@@ -39,34 +39,11 @@ CATEGORIAS = [
     "transmision-para-maquinaria-pesada",
     "componentes-hidraulicos-para-maquinaria-pesada",
 ]
-SIGLAS = {"otr", "tbr", "pcr"}
-# El título de WordPress va en mayúsculas y sin tildes: se pasa a mayúscula inicial y
-# se ponen las tildes que faltan (solo palabras de estos títulos).
-TILDES = {
-    "hidraulico": "hidráulico", "hidraulica": "hidráulica", "hidraulicos": "hidráulicos",
-    "traslacion": "traslación", "transmision": "transmisión", "transimision": "transmisión", "transimisión": "transmisión",
-    "servotransmision": "servotransmisión", "valvulas": "válvulas", "hidrostatico": "hidrostático",
-    "guia": "guía", "inyeccion": "inyección", "periferico": "periférico", "reparacion": "reparación",
-    "lubricacion": "lubricación", "enfriamento": "enfriamiento", "tornilleria": "tornillería",
-    "direccion": "dirección", "electricos": "eléctricos", "electronicos": "electrónicos",
-    "miscelaneos": "misceláneos", "diesel": "diésel", "sujecion": "sujeción", "liquido": "líquido",
-    "tandem": "tándem", "miscelaneos.": "misceláneos",
-}
 
 
 def limpio(t):
     t = html.unescape(re.sub(r"<[^>]+>", " ", t or ""))
     return re.sub(r"\s+", " ", t).strip()
-
-
-def nombre_de(titulo):
-    t = limpio(titulo).lower()
-    t = re.sub(r"\bpara\s+maquinaria\s*pesada\b", " ", t)
-    t = re.sub(r"^lubricantes\s+", "", t)
-    t = re.sub(r"\s+", " ", t).strip()
-    palabras = [TILDES.get(p, p).upper() if p in SIGLAS else TILDES.get(p, p) for p in t.split(" ")]
-    n = " ".join(palabras)
-    return n[:1].upper() + n[1:]
 
 
 def oculto(e):
@@ -105,35 +82,39 @@ if faltan:
 
 salida_cat, avisos = [], []
 for slug in CATEGORIAS:
-    grupos, vistos = [], set()
-    for c, oc in columnas(paginas[slug]):
-        ws = [w for w in c.get("elements") or [] if isinstance(w, dict)]
-        lista = next((w for w in ws if tipo_de(w) == "icon-list" and "SPARE-texto" in str(ajustes(w).get("_css_classes", ""))), None)
-        titulo = next((w for w in ws if tipo_de(w) == "heading"), None)
-        carrusel = next((w for w in ws if tipo_de(w) == "image-carousel"), None)
-        if not (lista and titulo and carrusel):
-            continue
-        clave = ajustes(lista).get("_css_classes")
-        if oc:
-            # Oculto en escritorio (en los tres tamaños, en estas páginas): no existe (CLAUDE.md §9).
-            avisos.append(f"{slug}: «{nombre_de(ajustes(titulo).get('title'))}» está oculto en WordPress; no se importa")
-            continue
-        if clave in vistos:
-            continue
-        vistos.add(clave)
-        productos = []
-        for it in ajustes(lista).get("icon_list") or []:
-            t = limpio(it.get("text"))
-            if t and t not in productos:
-                productos.append(t)
-        imgs = ajustes(carrusel).get("carousel") or []
-        url = (imgs[0].get("url") if imgs else "") or ""
-        nombre = nombre_de(ajustes(titulo).get("title"))
-        if not url or not productos:
-            avisos.append(f"{slug}: «{nombre}» sin {'imagen' if not url else 'productos'}; se salta")
-            continue
-        grupos.append({"nombre": nombre, "imagen": {"url": url, "alt": f"{nombre} para maquinaria pesada"}, "productos": productos})
-    salida_cat.append({"slug": slug, "grupos": grupos})
+    visibles, ocultos = [], []
+    vistos = set()
+    # Primero lo visible (si una tarjeta está dos veces, manda la que se ve); después lo que
+    # WordPress tiene oculto, que se importa con «mostrar» desmarcado (cliente, 2026-10-18).
+    cols = list(columnas(paginas[slug]))
+    for pasada_oculta in (False, True):
+        for c, oc in cols:
+            if oc != pasada_oculta:
+                continue
+            ws = [w for w in c.get("elements") or [] if isinstance(w, dict)]
+            lista = next((w for w in ws if tipo_de(w) == "icon-list" and "SPARE-texto" in str(ajustes(w).get("_css_classes", ""))), None)
+            titulo = next((w for w in ws if tipo_de(w) == "heading"), None)
+            carrusel = next((w for w in ws if tipo_de(w) == "image-carousel"), None)
+            if not (lista and titulo and carrusel):
+                continue
+            clave = ajustes(lista).get("_css_classes")
+            if clave in vistos:
+                continue
+            vistos.add(clave)
+            productos = [limpio(it.get("text")) for it in ajustes(lista).get("icon_list") or []]
+            productos = [t for t in productos if t]
+            imgs = ajustes(carrusel).get("carousel") or []
+            url = (imgs[0].get("url") if imgs else "") or ""
+            nombre = limpio(ajustes(titulo).get("title"))
+            if not url or not productos:
+                avisos.append(f"{slug}: «{nombre}» sin {'imagen' if not url else 'productos'}; se salta")
+                continue
+            # TAL CUAL está en WordPress (decisión del cliente): nombre y lista sin corregir.
+            g = {"nombre": nombre, "mostrar": not pasada_oculta, "imagen": {"url": url, "alt": nombre}, "productos": productos}
+            (ocultos if pasada_oculta else visibles).append(g)
+            if pasada_oculta:
+                avisos.append(f"{slug}: «{nombre}» está oculto en WordPress; se importa con «Mostrar en la web» desmarcado")
+    salida_cat.append({"slug": slug, "grupos": visibles + ocultos})
 
 with open(salida, "w", encoding="utf-8") as f:
     json.dump({"categorias": salida_cat, "avisos": avisos}, f, ensure_ascii=False, indent=1)

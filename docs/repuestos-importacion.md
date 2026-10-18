@@ -239,13 +239,14 @@ Dirección, a partir de los puntos 7, 8 y 17 de la auditoría de estructura de B
 **Qué se construyó**
 
 - **Panel:** campo «Qué incluye» (`grupos`) en cada categoría técnica: hasta 12
-  grupos, cada uno con **nombre**, **foto** y la **lista de productos** (hasta 40).
+  grupos, cada uno con **nombre**, casilla **«Mostrar en la web»**, **foto** y la **lista de
+  productos** (hasta 40).
   Migración `categorias_tecnicas_grupos` y `categorias_tecnicas_grupos_productos`
   (solo esquema; el contenido lo pone el importador).
 - **Sitio:** la página de categoría pinta una tarjeta por grupo (foto, nombre y
   «Ver productos»), con la lista en un `<details>` nativo: sin JavaScript, con
-  teclado y lector de pantalla, y con la lista en el HTML aunque esté plegada. Sin
-  grupos, el apartado no se pinta. Lógica pura en `src/lib/repuestos/grupos.ts`.
+  teclado y lector de pantalla, y con la lista en el HTML aunque esté plegada. Un
+  grupo con «Mostrar en la web» desmarcado no sale. Sin grupos, el apartado no se pinta. Lógica pura en `src/lib/repuestos/grupos.ts`.
 - **Tipos de repuestos:** la página de tipo reutiliza el bloque «Nuestras categorías
   de repuestos» de las marcas (`CategoriasMarca`, con su título del global), tras los
   modelos y antes del contacto.
@@ -253,26 +254,30 @@ Dirección, a partir de los puntos 7, 8 y 17 de la auditoría de estructura de B
 **De dónde sale el contenido.** Cada categoría de WordPress es una página de
 Elementor con una columna por grupo: un carrusel de fotos, un título, el botón
 «VER MÁS» y una lista de iconos que el botón despliega por JavaScript. Se importa
-la **primera foto** del carrusel, el título (sin «para maquinaria pesada», en
-minúscula con inicial y con las tildes que le faltan) y cada línea de la lista tal
-cual. Extractor: `scripts/repuestos/extraer-categorias-grupos.py` (no lee usuarios
-ni comentarios; la salida va a `Desktop\partequipos-cierre\`, no al repositorio).
+la **primera foto** del carrusel, el título y cada línea de la lista. Extractor:
+`scripts/repuestos/extraer-categorias-grupos.py` (no lee usuarios ni comentarios; la
+salida va a `Desktop\partequipos-cierre\`, no al repositorio).
 
-**Lo oculto no existe** (decisión estándar de réplica, CLAUDE.md §9): las columnas
-ocultas en escritorio (en estas páginas lo están en los tres tamaños) no se importan.
-Casi todas son copias antiguas de tarjetas que sí se ven («Eje», «Mandos finales»,
-«Dirección», «Rines», «Ajuste/sujeción»…). **Pero 8 grupos WordPress los tiene y no
-los enseña**: «Llanta maciza», «Llanta y rin», «Llanta TBR radial» y «Llanta PCR
-radial» (llantas, que queda en 3 grupos), «Sistema de enfriamiento» y «Sistema
-lubricación motor» (motor diésel), «Tándem» (transmisión) y «Líquido de frenos»
-(lubricantes). El extractor los lista como avisos. **Si el cliente quiere esas líneas,
-se añaden en el panel**, sin tocar código.
+**TAL CUAL ESTÁ EN WORDPRESS (decisión del cliente, 2026-10-18: «se migra todo aunque
+esté mal»).** Ni nombres ni listas se corrigen: se conservan las mayúsculas, el «PARA
+MAQUINARIA PESADA» de los títulos y las erratas («ENFRIAMENTO», «TRANSIMISIÓN»,
+«lLANTA», «pCR»…). Solo se quitan las etiquetas HTML y se juntan los espacios. El texto
+alternativo de la foto es el propio nombre del grupo. Las erratas se arreglan desde el
+panel cuando el cliente quiera.
+
+**Lo que WordPress tiene oculto** (en escritorio, en los tres tamaños): casi todo son
+copias de tarjetas que sí se ven (se descartan, manda la visible), pero **8 grupos no se
+enseñan y no tienen copia visible**: «Llanta maciza», «Llanta y rin», «Llanta TBR radial»
+y «Llanta PCR radial» (llantas), «Sistema de enfriamiento» y «Sistema lubricación
+motor» (motor diésel), «Tándem» (transmisión) y «Líquido de frenos» (lubricantes). Se
+importan con la casilla **«Mostrar en la web» desmarcada** (el resto, marcada), para que
+el cliente los active si quiere. El extractor los lista como avisos.
 
 **Resultado de la extracción** (grupos · productos): tren de rodaje 7 · 37, filtración
-6 · 25, herramienta de corte 7 · 33, lubricantes 8 · 27, llantas y rines 3 · 13,
-misceláneos 7 · 61, componentes mayores 6 · 29, motor diésel 4 · 28, transmisión 6 · 38
-y componentes hidráulicos 9 · 54. En total, **63 grupos, 62 fotos distintas** y 345
-productos.
+6 · 25, herramienta de corte 7 · 33, lubricantes 9 · 29, llantas y rines 7 · 26,
+misceláneos 7 · 61, componentes mayores 6 · 29, motor diésel 6 · 34, transmisión 7 · 46
+y componentes hidráulicos 9 · 54. En total, **71 grupos (63 visibles y 8 ocultos), 70
+fotos distintas** y 374 productos.
 
 **Importador** `scripts/repuestos/importar-grupos-categorias.ts`
 (`npm run preview:grupos-categorias:{simular,importar,retirar}`):

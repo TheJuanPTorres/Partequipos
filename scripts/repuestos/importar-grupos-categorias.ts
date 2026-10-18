@@ -123,6 +123,7 @@ const gruposComoDatos = (filas: unknown): GrupoEscrito[] =>
         const f = g as Record<string, unknown>;
         return {
           nombre: String(f.nombre ?? ""),
+          mostrar: f.mostrar !== false,
           imagen: idDe(f.imagen),
           productos: (Array.isArray(f.productos) ? f.productos : []).map((p) => ({
             texto: String((p as Record<string, unknown>).texto ?? ""),
@@ -271,6 +272,7 @@ for (const c of fuente.categorias) {
   for (const [i, g] of c.grupos.entries()) {
     grupos.push({
       nombre: g.nombre,
+      mostrar: g.mostrar,
       imagen: await foto(c.slug, i, g.imagen),
       productos: g.productos.map((texto) => ({ texto })),
     });

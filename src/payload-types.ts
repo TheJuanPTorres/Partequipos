@@ -642,6 +642,10 @@ export interface CategoriasTecnica {
   grupos?:
     | {
         nombre: string;
+        /**
+         * Desmarcada, el grupo se guarda pero no sale en la página. Sirve para tener listo un grupo y activarlo cuando se quiera.
+         */
+        mostrar?: boolean | null;
         imagen?: (number | null) | Media;
         productos?:
           | {
@@ -2132,6 +2136,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
     | T
     | {
         nombre?: T;
+        mostrar?: T;
         imagen?: T;
         productos?:
           | T

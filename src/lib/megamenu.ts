@@ -84,6 +84,8 @@ export type TipoCatalogo = ItemCatalogo & {
   marca: number | { id: number } | null | undefined;
   /** Solo los tipos de repuestos anidados (src/lib/repuestos/anidado.ts). */
   slugPadre?: string | null;
+  /** Solo los tipos «paraguas» de maquinaria nueva («Tipos que agrupa»). */
+  subtipos?: ReadonlyArray<number | { id: number } | null | undefined> | null;
 };
 
 export type DatosMegamenu = {
@@ -143,7 +145,7 @@ function grupoDeMarca(
 export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
   // Un tipo de maquinaria nueva SIN equipos no se enlaza (dirección, 2026-10-18; la misma regla
   // que las páginas de marca, #232): vuelve solo con el primer equipo (`tiposConEquipos`).
-  const conEquipos = tiposConEquipos(d.equiposNuevos);
+  const conEquipos = tiposConEquipos(d.equiposNuevos, d.tiposMaquinaria);
   const tiposConEquiposNuevos = d.tiposMaquinaria.filter((t) => conEquipos.has(t.id));
   const marcas = [...d.marcasMaquinaria].sort(porNombre);
   const aditamentos = marcas.find((m) => m.slug === SLUG_ADITAMENTOS);

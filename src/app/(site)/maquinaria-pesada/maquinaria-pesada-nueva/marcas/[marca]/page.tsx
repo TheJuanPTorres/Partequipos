@@ -67,8 +67,13 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
   ]);
   // Los equipos de todos los tipos: cuántos tiene cada uno (los vacíos no se
   // pintan) y la foto de su primer equipo, para los que no tienen imagen propia.
-  const equipos = await getEquiposDeTipos(tipos.map((t) => t.id));
-  const fotos = primeraFotoPorTipo(equipos);
+  // Un tipo «paraguas» cuenta (y toma la foto de) los equipos de sus subtipos (#238).
+  const idsDeEquipos = new Set(tipos.map((t) => t.id));
+  for (const t of tipos) {
+    for (const s of t.subtipos ?? []) idsDeEquipos.add(typeof s === "number" ? s : s.id);
+  }
+  const equipos = await getEquiposDeTipos([...idsDeEquipos]);
+  const fotos = primeraFotoPorTipo(equipos, tipos);
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -78,7 +83,7 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
     { nombre: marca.nombre, path: rutas.marcaMaquinaria(marca.slug) },
   ];
 
-  const tarjetas = tarjetasDeTiposNueva(marca, tipos, fotos, equiposPorTipo(equipos));
+  const tarjetas = tarjetasDeTiposNueva(marca, tipos, fotos, equiposPorTipo(equipos, tipos));
 
   return (
     <main className={estilos.pagina}>

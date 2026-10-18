@@ -234,7 +234,10 @@ async function foto(
     return previo[1];
   }
   subidas++;
-  if (modo === "simular") return -1;
+  if (modo === "simular") {
+    idsPorUrl.set(img.url, -1);
+    return -1;
+  }
   const { datos, tipo } = await descargar(img.url);
   const doc = await payload.create({
     collection: "media",

@@ -80,7 +80,7 @@ sobre una placa oscura (PR #125). Tampoco sirven como imagen al compartir
 | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Borradores `-copy`                                                                                                                                | 2       | Nada (ADR 0004)                                                                                                                                                                                                                                                                                 |
 | Ammann (marca y su tipo) y PES Parts Equipment Solutions                                                                                          | 3 URL   | **301 al índice de marcas de repuestos** (dirección; pendiente de confirmar con el cliente)                                                                                                                                                                                                     |
-| Modelos CASE con un nivel de más (`…/cargador-frontal-case-construction/repuestos-para-maquinaria-pesada-excavadora-case-construction/<modelo>/`) | 4       | **301 a su página madre**, la «Excavadora» de CASE, que sí se migra (dirección)                                                                                                                                                                                                                 |
+| Modelos CASE con un nivel de más (`…/cargador-frontal-case-construction/repuestos-para-maquinaria-pesada-excavadora-case-construction/<modelo>/`) | 4       | ~~301 a su página madre~~ **Desde el 2026-10-17, modelos del TIPO anidado «Excavadora», con su URL de WordPress, sin 301** (§9)                                                                                                                                                                 |
 | **Modelos con guion bajo en el slug** (`…-d6k_`, `…-dx225lca-cebdx_`, `…-dx340lca_`)                                                              | 3       | **El `_` no se permite en los slugs del sitio** (dirección, 2026-10-13). `…-d6k_` y `…-dx225lca-cebdx_` se guardan sin él, con **301 desde la URL de WordPress**; `…-dx340lca_` es la misma página que `…-dx340lca`: no se crea, solo el **301 a `…-dx340lca`**. `redirects-map.csv`, corregido |
 | Fotos de los modelos                                                                                                                              | 324     | No se importan (dirección)                                                                                                                                                                                                                                                                      |
 | Las 32 páginas de categoría técnica                                                                                                               | 32      | Necesitan plantilla y ruta nuevas (hoy dan 404)                                                                                                                                                                                                                                                 |
@@ -90,8 +90,9 @@ bajo) se crean en `Redirects` con origen «Migración». **En un
 preview no se pueden comprobar** (§10.22): se comprueban en producción.
 
 **La página CASE «Excavadora» colocada como modelo** (bajo «Cargador
-frontal»): es una página de tipo en el nivel de modelo. Va como modelo
-«Excavadora CASE CONSTRUCTION», sin código, para que su URL siga viva.
+frontal»): es una página de tipo en el nivel de modelo. Hasta el 2026-10-17 iba
+como modelo «Excavadora CASE CONSTRUCTION», sin código; **desde entonces es un
+TIPO anidado con sus 4 modelos** (§9).
 
 **La demo del preview que no existe en WordPress** (dirección: se retira antes
 de importar): 2 tipos de Caterpillar (`…-bulldozer-caterpillar` y
@@ -299,3 +300,37 @@ apartados propios (nada en la auditoría lo pide más allá de «recogerlos dent
 apartado»).
 
 **Para el sitio publicado:** `runbook-grupos-categorias-lanzamiento.md`.
+
+## 9. Tipo anidado: la «Excavadora» de CASE (agente C, 2026-10-17)
+
+**Qué hay en WordPress** (auditoría de B, punto 1; decisión de dirección): «Excavadora» de CASE es un **tipo** colgado de
+«Cargador frontal», con **4 modelos** con página propia (CX210B, CX220C, CX350B y CX350C), un nivel más abajo que las demás
+fichas. Son las 4 páginas «de nivel 4» de la extracción:
+
+```
+…/repuestos-para-maquinaria-pesada-case-construction/
+  repuestos-para-maquinaria-pesada-cargador-frontal-case-construction/   ← tipo padre
+    repuestos-para-maquinaria-pesada-excavadora-case-construction/       ← tipo anidado
+      repuestos-excavadora-case-construction-cx210b/                     ← sus modelos
+```
+
+Hasta ahora la madre iba como un **modelo** del cargador y las 4 hijas, por **301** a ella. Ahora:
+
+| Pieza           | Qué                                                                                                                                                                                                            |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Esquema         | «Cuelga de» (`tipoPadre`, mismo marca, un solo nivel) y `slugPadre` (oculto, lo pone el servidor) en `tipos-equipo`. La URL del tipo usa el segmento `<slugPadre>/<slug>` (`src/lib/repuestos/anidado.ts`)     |
+| Rutas           | `[marca]/[tipo]/[modelo]` sirve la ficha **o** la página del tipo anidado; `[marca]/[tipo]/[modelo]/[submodelo]` (nueva) sirve sus fichas. El contenido, común: `PaginaTipoRepuestos` y `PaginaModeloRepuesto` |
+| Resto del sitio | Tarjeta de la marca, megamenú, sitemap, migas (con el tipo padre), revalidación y 301 automáticos, «Ver en el sitio», buscador y destinos de redirección (`clasificarDestino`, 6 segmentos) usan el segmento   |
+| Guardas         | `comprobarPadre`: misma marca, no él mismo, un solo nivel, y que su slug no sea el de un modelo del padre (las dos URL serían la misma). Si cambia el slug del padre, sus hijos se actualizan y dejan su 301   |
+| Importador      | `importar-repuestos.ts` ya no crea la madre como modelo ni las 4 redirecciones: en una base nueva, después se ejecuta `tipo-anidado.ts`                                                                        |
+
+**Datos:** `scripts/repuestos/tipo-anidado.ts` (`npm run preview:repuestos:anidado:simular|aplicar|retirar`), desde la
+extracción de WordPress:
+
+1. guarda en el manifiesto y **borra el modelo madre** (su URL pasa a ser la del tipo);
+2. crea el tipo «Excavadora» bajo «Cargador frontal», con el texto, el SEO de la página viva y la foto de su tarjeta
+   (`wp-tipo-15850-…`);
+3. crea los 4 modelos con su texto y su SEO (sin fotos, como el resto: §4);
+4. guarda y **borra las 4 redirecciones 301** hacia la madre.
+
+Idempotente; la retirada (`manifiesto-tipo-anidado-<destino>.json`) lo deshace al revés y vuelve a crear la madre y las 301. No revalida: después, redesplegar. Sitio publicado: `Desktop/partequipos-cierre/runbook-case-excavadora.md`.

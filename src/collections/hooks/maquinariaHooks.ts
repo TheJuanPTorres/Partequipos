@@ -144,6 +144,28 @@ function idDeTipo(rel: unknown): number | null {
   return typeof rel === "number" ? rel : null;
 }
 
+/**
+ * Las páginas de los tipos «paraguas» que agrupan este tipo (`subtipos`): listan
+ * sus equipos, así que cambian con ellos (auditoría de estructura, 2026-10-17).
+ */
+async function rutasDeParaguas(req: PayloadRequest, tipo: unknown): Promise<string[]> {
+  const tipoId = idDeTipo(tipo);
+  if (!tipoId) return [];
+  const { docs } = await req.payload.find({
+    collection: "tipos-maquinaria",
+    where: { subtipos: { contains: tipoId } },
+    depth: 0,
+    limit: 0,
+    req,
+  });
+  const rutasParaguas: string[] = [];
+  for (const p of docs) {
+    const marcaSlug = await slugPorId(req, "marcas-maquinaria", p.marca);
+    if (marcaSlug) rutasParaguas.push(rutas.tipoMaquinaria(marcaSlug, p.slug));
+  }
+  return rutasParaguas;
+}
+
 /** Fichas de los demás equipos del tipo: lo enseñan en «Otras referencias». */
 async function hermanosDe(req: PayloadRequest, doc: { slug: string; tipo: unknown }) {
   const tipoId = idDeTipo(doc.tipo);
@@ -207,13 +229,16 @@ export const revalidarEquipoNuevo: CollectionAfterChangeHook = async ({
     if (!marcaSlug || !tipoSlug) return doc;
 
     revalidarRutas(
-      rutasDeEquipoNuevo(
-        marcaSlug,
-        tipoSlug,
-        doc.slug,
-        await todasLasCategorias(req),
-        await hermanosDe(req, doc),
-      ),
+      [
+        ...rutasDeEquipoNuevo(
+          marcaSlug,
+          tipoSlug,
+          doc.slug,
+          await todasLasCategorias(req),
+          await hermanosDe(req, doc),
+        ),
+        ...(await rutasDeParaguas(req, doc.tipo)),
+      ],
       `equipo nuevo ${doc.slug}`,
     );
   } catch (error) {
@@ -272,8 +297,9 @@ export const revalidarEquipoNuevoBorrado: CollectionAfterDeleteHook = async ({ d
 
     const categorias = await todasLasCategorias(req).catch(() => []);
     const hermanos = await hermanosDe(req, doc).catch(() => []);
+    const paraguas = await rutasDeParaguas(req, doc.tipo).catch(() => []);
     revalidarRutas(
-      rutasDeEquipoNuevo(marcaSlug, tipoSlug, doc.slug, categorias, hermanos),
+      [...rutasDeEquipoNuevo(marcaSlug, tipoSlug, doc.slug, categorias, hermanos), ...paraguas],
       `equipo nuevo borrado ${doc.slug}`,
     );
   } catch (error) {

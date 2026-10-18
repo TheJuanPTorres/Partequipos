@@ -54,6 +54,7 @@ const ICONO_PESTANA: Record<string, Icon> = {
   Cargadores: IconTruckLoading,
   Compactadores: IconTractor,
   Aditamentos: IconTools,
+  Miniexcavadoras: IconBackhoe,
 };
 
 /**

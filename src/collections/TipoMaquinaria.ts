@@ -1,4 +1,4 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, Where } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
@@ -59,6 +59,39 @@ export const TipoMaquinaria: CollectionConfig = {
       admin: {
         description:
           "Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.",
+      },
+    },
+    /*
+     * TIPOS QUE AGRUPA (auditoría de estructura, 2026-10-17): un tipo «paraguas»
+     * (Compactadores y Pavimentadoras de Dynapac) lista en su página los equipos
+     * de estos tipos, por grupos. No lleva equipos propios, así que no sale como
+     * tarjeta en la página de su marca.
+     */
+    {
+      name: "subtipos",
+      type: "relationship",
+      relationTo: "tipos-maquinaria",
+      hasMany: true,
+      label: "Tipos que agrupa",
+      filterOptions: ({ id, data }): Where => {
+        const misma: Where = {
+          marca: { equals: (data as { marca?: unknown } | undefined)?.marca ?? null },
+        };
+        return id ? { and: [misma, { id: { not_equals: id } }] } : misma;
+      },
+      admin: {
+        description:
+          "Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Compactadores» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.",
+      },
+    },
+    {
+      name: "pestanaIndiceNueva",
+      type: "checkbox",
+      defaultValue: false,
+      label: "Pestaña en el índice de maquinaria nueva",
+      admin: {
+        description:
+          "Marcada, el índice de maquinaria nueva enseña una pestaña con el nombre de este tipo que lleva a su página. Solo sale si el tipo tiene equipos.",
       },
     },
     seoField(),

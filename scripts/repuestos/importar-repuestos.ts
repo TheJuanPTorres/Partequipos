@@ -613,10 +613,24 @@ const modelosNuevos = modelos.filter((m) => {
 const slugMarca = new Map(enMarcas.map((m) => [m.id, m.slug]));
 const claveWpTipo = (t: { marca: number; slug: string }) => `${slugMarca.get(t.marca)}/${t.slug}`;
 const tipoDe = new Map(enTipos.map((t) => [t.id, claveWpTipo(t)]));
+// El tipo anidado de CASE y sus 4 modelos (los pone tipo-anidado.ts) también son de WordPress:
+// no son demo, y una segunda importación no se para por ellos.
+const anidadosWp = conNivel
+  .filter((p) => p.nivel === "sinRuta" && p.segmentos)
+  .map((p) => {
+    const [m = "", , t = "", slug = ""] = p.segmentos!;
+    return { marca: m, tipo: t, slug: formatSlug(slug) };
+  });
 const wp = {
   marcas: new Set(marcas.map((m) => m.slug)),
-  tipos: new Set(tipos.map((t) => `${t.marca}/${t.slug}`)),
-  modelos: new Set(modelos.map((m) => `${m.marca}/${m.tipo}/${m.slug}`)),
+  tipos: new Set([
+    ...tipos.map((t) => `${t.marca}/${t.slug}`),
+    ...anidadosWp.map((x) => `${x.marca}/${x.tipo}`),
+  ]),
+  modelos: new Set([
+    ...modelos.map((m) => `${m.marca}/${m.tipo}/${m.slug}`),
+    ...anidadosWp.map((x) => `${x.marca}/${x.tipo}/${x.slug}`),
+  ]),
 };
 const demoMarcas = enMarcas.filter((m) => !wp.marcas.has(m.slug)).map((m) => m.slug);
 const demoTipos = enTipos.filter((t) => !wp.tipos.has(claveWpTipo(t))).map(claveWpTipo);

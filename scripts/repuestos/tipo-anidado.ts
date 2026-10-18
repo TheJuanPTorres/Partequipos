@@ -18,8 +18,8 @@
  *      CONSTRUCTION», en el cargador): su URL pasa a ser la del tipo;
  *   2. crea el tipo «Excavadora», que cuelga del cargador, con el texto, el
  *      SEO y la foto de su tarjeta de WordPress (`wp-tipo-…`);
- *   3. crea sus 4 modelos con el texto y el SEO de WordPress (sin fotos, como
- *      el resto de modelos importados);
+ *   3. crea sus 4 modelos con el texto, el SEO y la foto de WordPress (el
+ *      criterio de la importación de las fotos de los modelos, de A);
  *   4. guarda y BORRA las 4 redirecciones 301 hacia la madre.
  * Idempotente. La retirada lo deshace en orden inverso y vuelve a crear el
  * modelo madre y las 4 redirecciones como estaban. No revalida: redesplegar.
@@ -35,11 +35,14 @@ import { veredictoDestino } from "../../src/lib/demo/copiaDemo";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 import { normalizarRuta } from "../../src/lib/redirects/normalizar";
 import {
+  altDeRepuesto,
   altDeTipo,
   codigoDeModelo,
   descripcionSeo,
   ficheroDeTipo,
   formatoDeImagen,
+  fotoDeRepuesto,
+  fotosGenericas,
   nivelDePagina,
   nombreDeModelo,
   nombreDeTipo,
@@ -142,12 +145,13 @@ const idDe = (v: unknown): number | null =>
 
 // ---------- Plan, desde la extracción de WordPress ----------
 
-type FotoWp = { idWp: number; url?: string; alt?: string };
+type FotoWp = { idWp: number; url?: string | null; alt?: string };
 type PaginaWp = {
   ruta: string;
   titulo: string;
   segmentos: string[] | null;
   texto: string;
+  fotos?: FotoWp[];
   tarjeta?: FotoWp | null;
 };
 if (!fs.existsSync(FUENTE)) fallar(`no está la fuente ${FUENTE} (ver extraer-xml.py)`);
@@ -160,6 +164,13 @@ const vivo = new Map(
 );
 
 const hijas = paginas.filter((p) => nivelDePagina(p.segmentos) === "sinRuta");
+// Las fotos de relleno que WordPress repite en muchas páginas no son la del modelo (el criterio de
+// la importación de las fotos de los modelos, agente A, docs/repuestos-importacion.md §10).
+const genericas = fotosGenericas(
+  paginas
+    .filter((p) => ["modelo", "sinRuta"].includes(nivelDePagina(p.segmentos) ?? ""))
+    .map((p) => ({ fotos: p.fotos ?? [] })),
+);
 const rutasMadre = [...new Set(hijas.map((p) => rutaMadre(p.ruta)))];
 if (rutasMadre.length !== 1) fallar(`se esperaba UNA página madre y hay ${rutasMadre.length}`);
 const madre = paginas.find((p) => p.ruta === rutasMadre[0]);
@@ -331,7 +342,9 @@ async function aplicar(): Promise<void> {
     log(
       `  modelo ${nombre} (${codigo ?? "sin código"}) → …/${tipoSlug}/${slug}/${ya ? " (ya existe)" : ""}`,
     );
-    if (ya || modo !== "aplicar" || !tipo) continue;
+    if (ya) continue;
+    const foto = await fotoDeModelo(p, nombre);
+    if (modo !== "aplicar" || !tipo) continue;
     const creado = await payload.create({
       collection: "modelos-repuesto",
       data: {
@@ -341,6 +354,7 @@ async function aplicar(): Promise<void> {
         tipo: tipo.id,
         codigo,
         descripcion: textoDePagina(p.texto),
+        ...(foto ? { imagenes: [foto] } : {}),
         seo: {
           metaTitle: tituloSeo(v?.titulo, tituloPorDefectoModelo(nombre)),
           metaDescription: descripcionSeo(v?.descripcion),
@@ -430,6 +444,67 @@ async function imagenDeTipo(t: FotoWp, nombre: string, marca: string): Promise<n
   manifiesto.creado.media.push({
     id: doc.id,
     filename: guardado.filename ?? nombreFichero,
+    url: guardado.url ?? "",
+  });
+  guardar();
+  return doc.id;
+}
+
+/**
+ * La foto del modelo, con el MISMO criterio y el mismo nombre de fichero que la
+ * importación de las fotos de los modelos (`fotoDeRepuesto`,
+ * `wp-repuesto-<adjunto>-<modelo>`): la primera de su página que no sea de
+ * relleno. Si ya está en `Media` (por su adjunto), no se vuelve a subir.
+ */
+async function fotoDeModelo(p: PaginaWp, nombre: string): Promise<number | null> {
+  const propia = (p.fotos ?? []).find((f) => !genericas.has(f.idWp) && f.url);
+  if (!propia) {
+    log("    sin foto propia en WordPress");
+    return null;
+  }
+  const plan = fotoDeRepuesto(propia.url!, propia.idWp, nombre);
+  if (!plan) {
+    log(`    foto en un formato que Media no admite: ${propia.url}`);
+    return null;
+  }
+  const prefijo = `wp-repuesto-${propia.idWp}-`;
+  const ya = await payload.find({
+    collection: "media",
+    where: { filename: { contains: prefijo } },
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+  });
+  const existente = ya.docs.find((d) => d.filename?.toLowerCase().startsWith(prefijo));
+  if (existente) {
+    log(`    foto ${existente.filename} (ya estaba)`);
+    return existente.id;
+  }
+  const r = await fetch(propia.url!, { headers: { "User-Agent": AGENTE } });
+  if (!r.ok) fallar(`no se puede descargar ${propia.url}: HTTP ${r.status}`);
+  let datos = Buffer.from(await r.arrayBuffer());
+  if (plan.convertir) {
+    const { default: sharp } = await import("sharp");
+    datos = await sharp(datos).webp({ quality: 82 }).toBuffer();
+  }
+  log(`    foto ${plan.fichero}: ${Math.round(datos.length / 1024)} kB`);
+  if (modo !== "aplicar") return null;
+  const ficheroWp = propia.url!.split("/").pop();
+  const doc = await payload.create({
+    collection: "media",
+    data: { alt: altDeRepuesto(propia.alt ?? "", nombre, ficheroWp), focalX: 50, focalY: 50 },
+    file: { data: datos, mimetype: plan.mimetype, name: plan.fichero, size: datos.length },
+    overrideAccess: true,
+  });
+  const guardado = await payload.findByID({
+    collection: "media",
+    id: doc.id,
+    depth: 0,
+    overrideAccess: true,
+  });
+  manifiesto.creado.media.push({
+    id: doc.id,
+    filename: guardado.filename ?? plan.fichero,
     url: guardado.url ?? "",
   });
   guardar();

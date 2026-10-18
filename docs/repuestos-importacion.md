@@ -329,7 +329,7 @@ extracción de WordPress:
 1. guarda en el manifiesto y **borra el modelo madre** (su URL pasa a ser la del tipo);
 2. crea el tipo «Excavadora» bajo «Cargador frontal», con el texto, el SEO de la página viva y la foto de su tarjeta
    (`wp-tipo-15850-…`);
-3. crea los 4 modelos con su texto y su SEO (sin fotos, como el resto: §4);
+3. crea los 4 modelos con su texto, su SEO y su foto (`wp-repuesto-<adjunto>-…`, el criterio de las fotos de los modelos de A, §10);
 4. guarda y **borra las 4 redirecciones 301** hacia la madre.
 
 Idempotente; la retirada (`manifiesto-tipo-anidado-<destino>.json`) lo deshace al revés y vuelve a crear la madre y las 301. No revalida: después, redesplegar. Sitio publicado: `Desktop/partequipos-cierre/runbook-case-excavadora.md`.

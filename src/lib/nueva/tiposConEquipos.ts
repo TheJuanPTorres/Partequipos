@@ -4,16 +4,28 @@
  * sitemap; la URL sigue en 200 con su estado vacío. Vuelve sola con el primer
  * equipo: guardarlo revalida la página del tipo y el sitemap es dinámico.
  *
- * Puro, para probarlo sin base: recibe los equipos y devuelve los ids de los
- * tipos que tienen alguno (la relación llega como id o poblada).
+ * Un tipo «paraguas» (con `subtipos`, campo «Tipos que agrupa») lista los equipos
+ * de sus subtipos, así que cuenta como con equipos si alguno de ellos los tiene
+ * (#238; megamenú, páginas de marca y sitemap usan esta misma regla).
+ *
+ * Puro, para probarlo sin base: recibe los equipos (y, opcionalmente, los tipos
+ * con sus subtipos) y devuelve los ids de los tipos que tienen alguno (las
+ * relaciones llegan como id o pobladas).
  */
+type Rel = number | { id: number } | null | undefined;
+const idDe = (r: Rel) => (typeof r === "number" ? r : r && typeof r === "object" ? r.id : null);
+
 export function tiposConEquipos(
-  equipos: ReadonlyArray<{ tipo: number | { id: number } | null | undefined }>,
+  equipos: ReadonlyArray<{ tipo: Rel }>,
+  tipos: ReadonlyArray<{ id: number; subtipos?: ReadonlyArray<Rel> | null }> = [],
 ): Set<number> {
   const ids = new Set<number>();
   for (const { tipo } of equipos) {
-    if (typeof tipo === "number") ids.add(tipo);
-    else if (tipo && typeof tipo === "object") ids.add(tipo.id);
+    const id = idDe(tipo);
+    if (id !== null) ids.add(id);
+  }
+  for (const t of tipos) {
+    if ((t.subtipos ?? []).some((s) => ids.has(idDe(s) ?? -1))) ids.add(t.id);
   }
   return ids;
 }

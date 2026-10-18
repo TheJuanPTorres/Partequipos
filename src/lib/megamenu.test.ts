@@ -110,6 +110,18 @@ describe("megamenú: maquinaria", () => {
     ]);
   });
 
+  it("un tipo paraguas se enlaza si algún subtipo tiene equipos (#238)", () => {
+    const enlaces = (d: DatosMegamenu) => JSON.stringify(panelMaquinaria(d));
+    // Bulldozers (12) hace de paraguas de Retrocargadoras (11); él mismo no tiene equipos.
+    const tipos = DATOS.tiposMaquinaria.map((t) => (t.id === 12 ? { ...t, subtipos: [11] } : t));
+    const equipos = DATOS.equiposNuevos.filter((e) => e.tipo !== 12);
+    assert.ok(
+      !enlaces({ ...DATOS, equiposNuevos: equipos }).includes("/case-construction/bulldozer/"),
+    );
+    const con = enlaces({ ...DATOS, tiposMaquinaria: tipos, equiposNuevos: equipos });
+    assert.ok(con.includes("/case-construction/bulldozer/"));
+  });
+
   it("no enlaza a los tipos sin equipos, y vuelven solos con el primero (2026-10-18)", () => {
     const enlaces = (d: DatosMegamenu) =>
       JSON.stringify(panelMaquinaria(d)).match(

@@ -18,7 +18,7 @@ Solo el **preview**: la carga en producción irá por runbook de dirección (§6
 
 > **LAS FOTOS DE LOS MODELOS SÍ SE IMPORTAN desde el 2026-10-17** (decisión
 > del cliente: se migra toda la información de su web). Del 2026-10-13 al
-> 2026-10-17 no se importaban (dirección). Detalle en §8.
+> 2026-10-17 no se importaban (dirección). Detalle en §10.
 
 ## 1. Fuente: páginas de Elementor, extraídas del XML
 
@@ -81,7 +81,7 @@ sobre una placa oscura (PR #125). Tampoco sirven como imagen al compartir
 | Ammann (marca y su tipo) y PES Parts Equipment Solutions                                                                                          | 3 URL   | **301 al índice de marcas de repuestos** (dirección; pendiente de confirmar con el cliente)                                                                                                                                                                                                     |
 | Modelos CASE con un nivel de más (`…/cargador-frontal-case-construction/repuestos-para-maquinaria-pesada-excavadora-case-construction/<modelo>/`) | 4       | **301 a su página madre**, la «Excavadora» de CASE, que sí se migra (dirección)                                                                                                                                                                                                                 |
 | **Modelos con guion bajo en el slug** (`…-d6k_`, `…-dx225lca-cebdx_`, `…-dx340lca_`)                                                              | 3       | **El `_` no se permite en los slugs del sitio** (dirección, 2026-10-13). `…-d6k_` y `…-dx225lca-cebdx_` se guardan sin él, con **301 desde la URL de WordPress**; `…-dx340lca_` es la misma página que `…-dx340lca`: no se crea, solo el **301 a `…-dx340lca`**. `redirects-map.csv`, corregido |
-| Fotos de los modelos                                                                                                                              | 324     | **Se importan desde el 2026-10-17** (decisión del cliente, §8). Antes no (dirección)                                                                                                                                                                                                            |
+| Fotos de los modelos                                                                                                                              | 324     | **Se importan desde el 2026-10-17** (decisión del cliente, §10). Antes no (dirección)                                                                                                                                                                                                           |
 | Las 32 páginas de categoría técnica                                                                                                               | 32      | Necesitan plantilla y ruta nuevas (hoy dan 404)                                                                                                                                                                                                                                                 |
 
 Las 10 redirecciones (3 de Ammann y PES, 4 de CASE y 3 de los slugs con guion
@@ -130,7 +130,7 @@ producción la demo se vacía entera antes (§10.6).
   fallan fuera de Next, «static generation store missing»): las páginas
   prerenderizadas toman los datos en el siguiente despliegue.
 
-**Fotos de los modelos** (medido el 2026-10-13; se importan desde el 2026-10-17, §8): 324 subidas
+**Fotos de los modelos** (medido el 2026-10-13; se importan desde el 2026-10-17, §10): 324 subidas
 (30 AVIF que pasan a WebP con `sharp` en la máquina que importa; `Media` sigue
 sin admitir AVIF, §10.28; el `sharp` 0.35.4 lleva libheif 1.23.2, la versión
 corregida del aviso). Con `fotos`, las 324 responden en WordPress y las AVIF se
@@ -189,7 +189,117 @@ el manifiesto:
 - Segunda pasada: 0 subidas, mismos números.
 - **Retirada completa:** devolvió los 69 registros y las 33 imágenes cambiadas a su valor de antes (el fondo de ejemplo de Caterpillar, las imágenes de ejemplo de los tipos de la demo) y los 45 ficheros dieron 404; después se volvió a importar (32 de 32 tipos con su imagen)
 
-## 8. Fotos de los modelos (agente A, 2026-10-17, decisión del cliente)
+## 8. Series de un tipo: Hitachi EX y ZAXIS (agente C, 2026-10-17)
+
+**Qué había en WordPress.** La página de marca de Hitachi (y sus dos páginas de tipo) no pintaba una tarjeta por tipo,
+sino **cuatro por serie**: «excavadora HITACHI EX», «… ZAXIS», «miniexcavadora HITACHI EX» y «… ZAXIS». Cada una era una
+tarjeta de Elementor **sin enlace**, con un botón «VER MÁS» que desplegaba una lista de modelos **en texto, sin enlaces**.
+No tenían URL, texto ni SEO propios: los modelos cuelgan de los dos tipos (excavadora y miniexcavadora), como los
+importamos. Revisadas las 13 páginas de marca y las 33 de tipo publicadas: **solo Hitachi** tiene el caso.
+
+> Las 4 páginas «de nivel 4» de la extracción **no** eran las series de Hitachi: son las 4 excavadoras de CASE (§4).
+
+**Cómo se recupera (decisión de dirección):**
+
+| Pieza           | Qué                                                                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Esquema         | «Series» (array opcional: nombre y foto; el orden es el de las filas) en `tipos-equipo`, y «Serie» (texto validado contra las de su tipo) en el modelo  |
+| Migración       | `20261018_033818_series_repuestos`, solo esquema                                                                                                        |
+| Página de marca | Un tipo con series pinta una tarjeta por serie (título de WordPress y su foto, o la del tipo) que enlaza a `…/<tipo>/#serie-<nombre>`                   |
+| Página de tipo  | Los modelos se agrupan bajo «Serie EX», «Serie ZAXIS»…, con su ancla; los que no tienen serie, al final en «Otros modelos». Una serie vacía no se pinta |
+| URL y SEO       | **Sin URL nuevas, sin 301 y sin bloque SEO por serie**: WordPress no los tenía                                                                          |
+
+Lógica pura en `src/lib/repuestos/series.ts` (con pruebas); las otras 12 marcas, sin series, se pintan como siempre.
+
+**Datos:** `scripts/repuestos/series.ts` (`npm run preview:repuestos:series:simular|aplicar|retirar`), con el plan en
+`src/lib/repuestos/seriesHitachi.ts`:
+
+- EX y ZAXIS, en ese orden, en los 2 tipos. EX usa la foto del tipo (la misma de WordPress); las 2 de ZAXIS se
+  descargan del WordPress del cliente como `wp-serie-…-zaxis` (dirección: como las demás fotos de tipo). Texto
+  alternativo corregido: en WordPress la de excavadora ZAXIS decía «Hitachi CX 200».
+- La serie de cada modelo, **por el prefijo de su código** (EX… → EX, ZX… → ZAXIS). Así se corrige la errata de
+  WordPress, que listaba la ZX450LC-5 como «EX450LC-5» entre las miniexcavadoras EX. Reparto: excavadora 11 EX ·
+  15 ZAXIS; miniexcavadora 6 EX · 14 ZAXIS.
+- Manifiesto `Desktop/partequipos-cierre/manifiesto-series-<destino>.json` con lo de antes; la retirada lo devuelve y
+  borra las fotos (comprueba el 404). Idempotente. No revalida: después, redesplegar.
+
+Sitio publicado: `Desktop/partequipos-cierre/runbook-series-hitachi.md` (dirección).
+
+**Resultado en el preview (2026-10-17):** simulación con 11 · 15 y 6 · 14; aplicado; segunda pasada «(ya estaban)» y
+sin fotos nuevas; **retirada probada** (46 modelos y 2 tipos devueltos, las 2 fotos en 404) y vuelto a aplicar. Las
+líneas `[revalidación] falló … static generation store missing` son las de siempre al escribir fuera de Next: no
+revalida, por eso se redespliega.
+
+## 9. «Qué incluye» de las 10 categorías técnicas (agente D, 2026-10-18)
+
+Dirección, a partir de los puntos 7, 8 y 17 de la auditoría de estructura de B
+(`2026-10-17-auditoria-estructura-listados.md`).
+
+**Qué se construyó**
+
+- **Panel:** campo «Qué incluye» (`grupos`) en cada categoría técnica: hasta 12
+  grupos, cada uno con **nombre**, casilla **«Mostrar en la web»**, **foto** y la **lista de
+  productos** (hasta 40).
+  Migración `categorias_tecnicas_grupos` y `categorias_tecnicas_grupos_productos`
+  (solo esquema; el contenido lo pone el importador).
+- **Sitio:** la página de categoría pinta una tarjeta por grupo (foto, nombre y
+  «Ver productos»), con la lista en un `<details>` nativo: sin JavaScript, con
+  teclado y lector de pantalla, y con la lista en el HTML aunque esté plegada. Un
+  grupo con «Mostrar en la web» desmarcado no sale. Sin grupos, el apartado no se pinta. Lógica pura en `src/lib/repuestos/grupos.ts`.
+- **Tipos de repuestos:** la página de tipo reutiliza el bloque «Nuestras categorías
+  de repuestos» de las marcas (`CategoriasMarca`, con su título del global), tras los
+  modelos y antes del contacto.
+
+**De dónde sale el contenido.** Cada categoría de WordPress es una página de
+Elementor con una columna por grupo: un carrusel de fotos, un título, el botón
+«VER MÁS» y una lista de iconos que el botón despliega por JavaScript. Se importa
+la **primera foto** del carrusel, el título y cada línea de la lista. Extractor:
+`scripts/repuestos/extraer-categorias-grupos.py` (no lee usuarios ni comentarios; la
+salida va a `Desktop\partequipos-cierre\`, no al repositorio).
+
+**TAL CUAL ESTÁ EN WORDPRESS (decisión del cliente, 2026-10-18: «se migra todo aunque
+esté mal»).** Ni nombres ni listas se corrigen: se conservan las mayúsculas, el «PARA
+MAQUINARIA PESADA» de los títulos y las erratas («ENFRIAMENTO», «TRANSIMISIÓN»,
+«lLANTA», «pCR»…). Solo se quitan las etiquetas HTML y se juntan los espacios. El texto
+alternativo de la foto es el propio nombre del grupo. Las erratas se arreglan desde el
+panel cuando el cliente quiera.
+
+**Lo que WordPress tiene oculto** (en escritorio, en los tres tamaños): casi todo son
+copias de tarjetas que sí se ven (se descartan, manda la visible), pero **8 grupos no se
+enseñan y no tienen copia visible**: «Llanta maciza», «Llanta y rin», «Llanta TBR radial»
+y «Llanta PCR radial» (llantas), «Sistema de enfriamiento» y «Sistema lubricación
+motor» (motor diésel), «Tándem» (transmisión) y «Líquido de frenos» (lubricantes). Se
+importan con la casilla **«Mostrar en la web» desmarcada** (el resto, marcada), para que
+el cliente los active si quiere. El extractor los lista como avisos.
+
+**Resultado de la extracción** (grupos · productos): tren de rodaje 7 · 37, filtración
+6 · 25, herramienta de corte 7 · 33, lubricantes 9 · 29, llantas y rines 7 · 26,
+misceláneos 7 · 61, componentes mayores 6 · 29, motor diésel 6 · 34, transmisión 7 · 46
+y componentes hidráulicos 9 · 54. En total, **71 grupos (63 visibles y 8 ocultos), 70
+fotos distintas** y 374 productos.
+
+**Importador** `scripts/repuestos/importar-grupos-categorias.ts`
+(`npm run preview:grupos-categorias:{simular,importar,retirar}`):
+
+- como los demás: manifiesto fuera del repositorio, retirada exacta (devuelve cada
+  categoría a su valor de antes, borra las fotos y comprueba que dan 404) y doble
+  cierre en la simulación (sin token del Blob y con `create`/`update`/`delete`
+  bloqueados);
+- **no pisa lo del panel**: una categoría que ya tiene grupos y no son los que escribió
+  esta misma importación se deja como está (`accionGrupos`, con pruebas);
+- idempotente: las fotos ya subidas (`wp-grupo-<categoría>-<n>`) se reconocen por su
+  nombre y no se repiten.
+
+**Subpáginas viejas (punto 17).** Donaldson, Fleetguard, ITR, CF, llantas OTR, los
+baldes y Ammann siguen con su 301 a la categoría. Sus productos ya están en la
+lista de la categoría (p. ej. «Filtro de aire», «Cadena», «Llanta OTR convencional»);
+sus páginas de marca de filtro, tipos de balde o líneas de PES **no** se recrean como
+apartados propios (nada en la auditoría lo pide más allá de «recogerlos dentro de este
+apartado»).
+
+**Para el sitio publicado:** `runbook-grupos-categorias-lanzamiento.md`.
+
+## 10. Fotos de los modelos (agente A, 2026-10-17, decisión del cliente)
 
 **El cliente decide migrar toda la información de su web**, aunque esté mal o
 desactualizada (CLAUDE.md §10.38). Las fotos de los modelos, que no se

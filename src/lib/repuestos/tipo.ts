@@ -4,6 +4,7 @@ import { rutas } from "../routes";
 import { imagenDeMedia } from "../utils/relations";
 
 import type { VistaEncabezado } from "./marca";
+import { agruparPorSerie, seriesDeTipo, type GrupoDeModelos } from "./series";
 
 /**
  * Lógica pura de la página de TIPO de repuestos (PROVISIONAL hasta el diseño
@@ -40,6 +41,8 @@ export type ModeloEnlace = {
   /** Código de fabricante, si lo hay y el nombre no lo lleva ya: acompaña al nombre. */
   codigo: string | null;
   href: string;
+  /** La serie que eligió el editor (solo cuenta si el tipo tiene series). */
+  serie: string | null;
 };
 
 /** Un enlace por modelo, a su ficha. Uno sin nombre o sin slug no sale. */
@@ -59,6 +62,18 @@ export function enlacesDeModelos(
         // Un código que el nombre ya lleva («Excavadora CATERPILLAR 311» y «311») no se repite.
         codigo: codigo && !nombre.toLowerCase().includes(codigo.toLowerCase()) ? codigo : null,
         href: rutas.modelo(marca.slug, tipo.slug, m.slug),
+        serie: texto(m.serie) || null,
       };
     });
+}
+
+/**
+ * Los modelos agrupados por la serie de su tipo (Hitachi: «Serie EX», «Serie
+ * ZAXIS» y, al final, «Otros modelos»). `null` si el tipo no tiene series.
+ */
+export function gruposDeModelos(
+  tipo: TiposEquipo,
+  modelos: ModeloEnlace[],
+): GrupoDeModelos<ModeloEnlace>[] | null {
+  return agruparPorSerie(seriesDeTipo(tipo), modelos, (m) => m.serie);
 }

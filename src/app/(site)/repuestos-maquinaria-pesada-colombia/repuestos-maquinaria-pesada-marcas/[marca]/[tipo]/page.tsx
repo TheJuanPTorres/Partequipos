@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { SeccionTestimonios } from "@/components/portada/diferidos";
+import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { ModelosTipo } from "@/components/repuestos/ModelosTipo";
@@ -12,10 +13,11 @@ import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getMarcaPorSlug } from "@/lib/queries/getMarcas";
 import { getModelosDeTipo } from "@/lib/queries/getModelos";
-import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
+import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { getTipoPorSlug, getTipos } from "@/lib/queries/getTipos";
-import { enlacesDeModelos, vistaEncabezadoTipo } from "@/lib/repuestos/tipo";
+import { categoriasDeMarca } from "@/lib/repuestos/marca";
+import { enlacesDeModelos, gruposDeModelos, vistaEncabezadoTipo } from "@/lib/repuestos/tipo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
@@ -79,14 +81,16 @@ export default async function TipoPage({ params }: { params: Promise<Params> }) 
   if (!data) notFound();
 
   const { marca, tipo } = data;
-  const [global, modelos, testimonios, empresa] = await Promise.all([
+  const [global, modelos, categorias, testimonios, empresa] = await Promise.all([
     getRepuestosMarca(),
     getModelosDeTipo(tipo.id),
+    getCategoriasParaMarca(),
     getTestimoniosDePortada(),
     getEmpresa(),
   ]);
 
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
+  const enlaces = enlacesDeModelos(marca, tipo, modelos);
   const nombreTipo = tipo.nombre.toLowerCase();
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -108,8 +112,16 @@ export default async function TipoPage({ params }: { params: Promise<Params> }) 
       <ModelosTipo
         id={ANCLA_MODELOS}
         titulo={`Modelos de ${nombreTipo} ${marca.nombre}`}
-        modelos={enlacesDeModelos(marca, tipo, modelos)}
+        modelos={enlaces}
+        grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
+      />
+
+      <CategoriasMarca
+        id="categorias-repuestos"
+        titulo={texto(global.tituloCategorias)}
+        categorias={categoriasDeMarca(categorias)}
+        fondo="gris"
       />
 
       <ContactoMarca

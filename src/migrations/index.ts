@@ -45,6 +45,8 @@ import * as migration_20261017_060430_hero_tipografia_titulo from './20261017_06
 import * as migration_20261017_142401_fecha_publicacion_usados from './20261017_142401_fecha_publicacion_usados';
 import * as migration_20261017_170845_logo_oscuro_menu from './20261017_170845_logo_oscuro_menu';
 import * as migration_20261018_003210_tipo_maquinaria_imagen from './20261018_003210_tipo_maquinaria_imagen';
+import * as migration_20261018_033818_series_repuestos from './20261018_033818_series_repuestos';
+import * as migration_20261018_040447_grupos_categorias_tecnicas from './20261018_040447_grupos_categorias_tecnicas';
 
 export const migrations = [
   {
@@ -280,6 +282,16 @@ export const migrations = [
   {
     up: migration_20261018_003210_tipo_maquinaria_imagen.up,
     down: migration_20261018_003210_tipo_maquinaria_imagen.down,
-    name: '20261018_003210_tipo_maquinaria_imagen'
+    name: '20261018_003210_tipo_maquinaria_imagen',
+  },
+  {
+    up: migration_20261018_033818_series_repuestos.up,
+    down: migration_20261018_033818_series_repuestos.down,
+    name: '20261018_033818_series_repuestos',
+  },
+  {
+    up: migration_20261018_040447_grupos_categorias_tecnicas.up,
+    down: migration_20261018_040447_grupos_categorias_tecnicas.down,
+    name: '20261018_040447_grupos_categorias_tecnicas'
   },
 ];

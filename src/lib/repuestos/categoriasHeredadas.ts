@@ -47,7 +47,9 @@ export const REDIRECTS_HEREDADAS: ReadonlyArray<readonly [desde: string, hacia: 
   [desde("aditamentos-para-maquinaria-pesada"), OTROS_DESTINOS.aditamentos],
   [desde("baldes-y-protectores"), categoria("herramienta-de-corte-gets")],
   [desde("baldes-y-protectores/baldes-para-excavadoras"), categoria("herramienta-de-corte-gets")],
-  [desde("baldes-y-protectores/motores-nuevo"), categoria("herramienta-de-corte-gets")],
+  // Es el «Inventario de MOTORES» (30 motores), aunque cuelgue de baldes: a motor
+  // diésel (auditoría de estructura, 2026-10-17; antes iba a herramienta de corte).
+  [desde("baldes-y-protectores/motores-nuevo"), categoria("motor-diesel")],
   [desde("componentes-electricos"), categoria("miscelaneos")],
   [desde("componentes-para-motores-diesel"), categoria("motor-diesel")],
   [desde("elementos-de-ajuste"), categoria("miscelaneos")],

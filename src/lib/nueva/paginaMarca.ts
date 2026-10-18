@@ -47,8 +47,19 @@ export function primeraFotoPorTipo(equipos: EquiposNuevo[]): Map<number, ImagenL
   return fotos;
 }
 
+/** Cuántos equipos tiene cada tipo (para no pintar las tarjetas de los tipos vacíos). */
+export function equiposPorTipo(equipos: EquiposNuevo[]): Map<number, number> {
+  const cuenta = new Map<number, number>();
+  for (const equipo of equipos) {
+    const tipo = typeof equipo.tipo === "number" ? equipo.tipo : equipo.tipo?.id;
+    if (tipo !== undefined) cuenta.set(tipo, (cuenta.get(tipo) ?? 0) + 1);
+  }
+  return cuenta;
+}
+
 /**
- * Una tarjeta por tipo, en su orden: la imagen elegida en el panel para el tipo
+ * Una tarjeta por tipo CON EQUIPOS (decisión de dirección, 2026-10-17: un tipo
+ * vacío, o un tipo que solo agrupa otros, no se pinta), en su orden: la imagen elegida en el panel para el tipo
  * o, si no tiene, la primera foto de su primer equipo; sin ninguna, solo el
  * panel. Ninguna se oculta en móvil (son enlaces del catálogo).
  */
@@ -56,12 +67,15 @@ export function tarjetasDeTiposNueva(
   marca: MarcasMaquinaria,
   tipos: TiposMaquinaria[],
   fotos: Map<number, ImagenLista>,
+  conEquipos: Map<number, number>,
 ): TarjetaMarca[] {
-  return tipos.map((tipo) => ({
-    clave: `tipo-${tipo.id}`,
-    titulo: tipo.nombre,
-    href: `${rutas.tipoMaquinaria(marca.slug, tipo.slug)}/`,
-    imagen: imagenDeMedia(tipo.imagen, "") ?? fotos.get(tipo.id) ?? null,
-    soloEscritorio: false,
-  }));
+  return tipos
+    .filter((tipo) => (conEquipos.get(tipo.id) ?? 0) > 0)
+    .map((tipo) => ({
+      clave: `tipo-${tipo.id}`,
+      titulo: tipo.nombre,
+      href: `${rutas.tipoMaquinaria(marca.slug, tipo.slug)}/`,
+      imagen: imagenDeMedia(tipo.imagen, "") ?? fotos.get(tipo.id) ?? null,
+      soloEscritorio: false,
+    }));
 }

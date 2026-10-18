@@ -5,6 +5,7 @@ import { slugField } from "../lib/fields/slugField";
 import { revalidarTipo, revalidarTipoBorrado } from "./hooks/revalidateHooks";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMegamenu } from "./hooks/megamenuHooks";
+import { validarSeries } from "../lib/repuestos/series";
 
 const menu = revalidarMegamenu("tipos-equipo");
 
@@ -74,6 +75,42 @@ export const TipoEquipo: CollectionConfig = {
       admin: {
         description: "Opcional. Foto del tipo de máquina para la tarjeta de la página de la marca.",
       },
+    },
+    /*
+     * SERIES (2026-10-17, dirección): un tipo puede repartir sus modelos por
+     * serie de fabricante, como Hitachi en WordPress (excavadora EX y ZAXIS).
+     * Con series, la página de la marca pinta una tarjeta por serie (en vez de
+     * la del tipo) que baja al ancla de su serie en la página del tipo, y esta
+     * agrupa los modelos por serie. Sin URL propia ni SEO: WordPress tampoco
+     * los tenía. Vacío, como siempre. El ORDEN es el de las filas (arrastrar).
+     */
+    {
+      name: "series",
+      type: "array",
+      label: "Series",
+      labels: { singular: "Serie", plural: "Series" },
+      validate: validarSeries,
+      admin: {
+        description:
+          "Opcional. Solo si los modelos de este tipo se reparten por serie del fabricante (ej. EX y ZAXIS). La página de la marca pinta una tarjeta por serie, en este orden, y la del tipo agrupa los modelos. Cada modelo elige su serie en su ficha.",
+        initCollapsed: true,
+      },
+      fields: [
+        {
+          name: "nombre",
+          type: "text",
+          required: true,
+          label: "Nombre de la serie",
+          admin: { description: "Como lo escribe el fabricante, ej. «EX» o «ZAXIS»." },
+        },
+        {
+          name: "imagen",
+          type: "upload",
+          relationTo: "media",
+          label: "Foto de la tarjeta",
+          admin: { description: "Opcional. Sin ella, la tarjeta usa la imagen del tipo." },
+        },
+      ],
     },
     seoField(),
   ],

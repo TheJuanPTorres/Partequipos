@@ -496,6 +496,10 @@ export interface ModelosRepuesto {
    * Código del modelo, ej. 320D.
    */
   codigo?: string | null;
+  /**
+   * Solo si su tipo de equipo tiene series: el nombre de una de ellas, ej. «EX» o «ZAXIS». Vacío: el modelo sale en «Otros modelos».
+   */
+  serie?: string | null;
   descripcion?: string | null;
   imagenes?: (number | Media)[] | null;
   /**
@@ -570,6 +574,22 @@ export interface TiposEquipo {
    */
   imagen?: (number | null) | Media;
   /**
+   * Opcional. Solo si los modelos de este tipo se reparten por serie del fabricante (ej. EX y ZAXIS). La página de la marca pinta una tarjeta por serie, en este orden, y la del tipo agrupa los modelos. Cada modelo elige su serie en su ficha.
+   */
+  series?:
+    | {
+        /**
+         * Como lo escribe el fabricante, ej. «EX» o «ZAXIS».
+         */
+        nombre: string;
+        /**
+         * Opcional. Sin ella, la tarjeta usa la imagen del tipo.
+         */
+        imagen?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -616,6 +636,26 @@ export interface CategoriasTecnica {
    * Orden en «Nuestras categorías de repuestos» de cada página de marca. Vacío: al final, por nombre.
    */
   ordenMarca?: number | null;
+  /**
+   * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Qué incluye».
+   */
+  grupos?:
+    | {
+        nombre: string;
+        /**
+         * Desmarcada, el grupo se guarda pero no sale en la página. Sirve para tener listo un grupo y activarlo cuando se quiera.
+         */
+        mostrar?: boolean | null;
+        imagen?: (number | null) | Media;
+        productos?:
+          | {
+              texto: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -2014,6 +2054,7 @@ export interface ModelosRepuestoSelect<T extends boolean = true> {
   marca?: T;
   tipo?: T;
   codigo?: T;
+  serie?: T;
   descripcion?: T;
   imagenes?: T;
   seo?:
@@ -2059,6 +2100,13 @@ export interface TiposEquipoSelect<T extends boolean = true> {
   marca?: T;
   descripcion?: T;
   imagen?: T;
+  series?:
+    | T
+    | {
+        nombre?: T;
+        imagen?: T;
+        id?: T;
+      };
   seo?:
     | T
     | {
@@ -2084,6 +2132,20 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   enlace?: T;
   ordenPortada?: T;
   ordenMarca?: T;
+  grupos?:
+    | T
+    | {
+        nombre?: T;
+        mostrar?: T;
+        imagen?: T;
+        productos?:
+          | T
+          | {
+              texto?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   seo?:
     | T
     | {
@@ -3057,7 +3119,7 @@ export interface RepuestosMarca {
    */
   tituloCategorias?: string | null;
   /**
-   * Vacío: no se pintan las tarjetas de tipos de máquina, ni las de usada y aditamentos (van en la misma sección).
+   * Vacío: no se pintan las tarjetas de tipos de máquina.
    */
   tituloTipos?: string | null;
   /**

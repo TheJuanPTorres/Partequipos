@@ -17,3 +17,23 @@ export function tiposConEquipos(
   }
   return ids;
 }
+
+/**
+ * ¿Cambia el megamenú porque un equipo se crea, se borra o cambia de tipo? Solo si
+ * cambia QUÉ tipos tienen equipos (el menú enlaza únicamente a los que tienen):
+ * - crear: si el tipo se queda con uno solo, acaba de aparecer;
+ * - borrar: si el tipo se queda con ninguno, acaba de desaparecer;
+ * - cambiar de tipo: puede ocurrir en cualquiera de los dos.
+ * Así no se revalida el sitio entero por cada equipo que se guarda.
+ */
+export function cambiaElMenuPorEquipo(datos: {
+  operacion: "create" | "update" | "delete";
+  tipo: number | null | undefined;
+  tipoAnterior?: number | null | undefined;
+  /** Equipos del tipo DESPUÉS de la operación. */
+  equiposDelTipo: number;
+}): boolean {
+  if (datos.operacion === "create") return datos.equiposDelTipo === 1;
+  if (datos.operacion === "delete") return datos.equiposDelTipo === 0;
+  return (datos.tipoAnterior ?? null) !== (datos.tipo ?? null);
+}

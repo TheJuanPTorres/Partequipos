@@ -6,6 +6,7 @@ import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
 import { revalidarModelo, revalidarModeloBorrado } from "./hooks/revalidateHooks";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { avisoField } from "../lib/fields/avisoField";
+import { validarSerieDelModelo } from "../lib/repuestos/series";
 
 /**
  * Modelo concreto dentro de un tipo de equipo (ej. "CAT 320D" en Excavadora).
@@ -83,6 +84,16 @@ export const ModeloRepuesto: CollectionConfig = {
       label: "Código",
       admin: {
         description: "Código del modelo, ej. 320D.",
+      },
+    },
+    {
+      name: "serie",
+      type: "text",
+      label: "Serie",
+      validate: validarSerieDelModelo,
+      admin: {
+        description:
+          "Solo si su tipo de equipo tiene series: el nombre de una de ellas, ej. «EX» o «ZAXIS». Vacío: el modelo sale en «Otros modelos».",
       },
     },
     {

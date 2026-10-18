@@ -22,21 +22,29 @@ import estilos from "./marca.module.css";
  * - Sin foto de fondo, la tarjeta queda en el tono oscuro del velo: el texto
  *   blanco se lee y no hay hueco.
  * - El logo lleva `alt` con el nombre de la marca (en ux-9, vacío).
+ *
+ * `bajaSinFoto` (página de marca de maquinaria nueva, decisión de dirección del
+ * 2026-10-17): sin foto de fondo, la tarjeta es más baja y el título y el texto
+ * quedan centrados en vertical, en lugar de una tarjeta oscura de 630 px.
  */
 export function HeroMarca({
   vista,
   anclaSiguiente,
   franja = true,
+  bajaSinFoto = false,
 }: {
   vista: VistaEncabezado;
   anclaSiguiente: string;
   /** `false`: sin la franja amarilla tras la tarjeta (las páginas índice). */
   franja?: boolean;
+  /** Sin foto de fondo, una tarjeta más baja con el contenido centrado en vertical. */
+  bajaSinFoto?: boolean;
 }) {
   const { fondo, logo } = vista;
+  const baja = bajaSinFoto && !fondo;
   return (
     <section className={`${estilos.heroSeccion} ${franja ? "" : estilos.heroSeccionPlano}`}>
-      <div className={estilos.hero}>
+      <div className={`${estilos.hero} ${baja ? estilos.heroBajo : ""}`}>
         {fondo ? (
           <Image
             src={fondo.url}

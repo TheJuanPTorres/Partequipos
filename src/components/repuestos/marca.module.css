@@ -176,6 +176,29 @@
   }
 }
 
+/*
+ * Cabecera BAJA sin foto (página de marca de maquinaria nueva, 2026-10-17): sin
+ * foto, 630 px de tarjeta oscura eran un hueco; se queda en 380 (420 en móvil) y
+ * el contenido se centra en vertical. La regla de móvil de abajo no la pisa
+ * porque esta va después y con más especificidad.
+ */
+.hero.heroBajo {
+  min-height: 380px;
+}
+
+.heroBajo .heroContenido {
+  flex: 1;
+}
+
+/* El icono del ratón, al pie de la tarjeta: así lo centrado es el título con su texto. */
+.heroBajo .raton {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  margin-top: 0;
+  transform: translateX(-50%);
+}
+
 /* Anchos del texto del encabezado medidos: 880 a 1010 y 278 a 390. */
 @media (max-width: 1024px) {
   .heroContenido {
@@ -186,6 +209,10 @@
 @media (max-width: 767px) {
   .hero {
     min-height: 670px;
+  }
+
+  .hero.heroBajo {
+    min-height: 420px;
   }
 
   .heroContenido {
@@ -449,6 +476,73 @@ a.pildora:hover {
   }
 }
 
+/* --- Qué incluye (página de categoría técnica) --------------------------------- */
+
+/* Las tarjetas no se estiran: al desplegar una, las demás de su fila no cambian. */
+.rejillaGrupos {
+  align-items: start;
+  row-gap: 30px;
+}
+
+.desplegable {
+  width: 100%;
+  text-align: center;
+}
+
+.desplegable > summary {
+  margin-inline: auto;
+  cursor: pointer;
+  list-style: none;
+}
+
+.desplegable > summary::-webkit-details-marker {
+  display: none;
+}
+
+.desplegable > summary svg {
+  transition: transform 0.2s;
+}
+
+.desplegable[open] > summary svg {
+  transform: rotate(180deg);
+}
+
+.desplegable > summary:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.listaProductos {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.listaProductos li {
+  position: relative;
+  padding: 7px 0 7px 18px;
+  border-top: 1px solid rgb(0 0 0 / 0.08);
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  line-height: 1.35;
+}
+
+.listaProductos li::before {
+  position: absolute;
+  top: 7px;
+  left: 0;
+  color: var(--color-marca);
+  content: "›";
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desplegable > summary svg {
+    transition: none;
+  }
+}
+
 /* --- Contacto ------------------------------------------------------------------ */
 
 .contacto {
@@ -652,6 +746,29 @@ a.pildora:hover {
   font-size: 13px;
   font-weight: 400;
   opacity: 0.75;
+}
+
+/* Un tipo con series (Hitachi): un subtítulo por serie, con su ancla. */
+.modelosGrupo {
+  /* El ancla no queda bajo la cabecera fija. */
+  scroll-margin-top: 120px;
+}
+
+.modelosGrupo + .modelosGrupo {
+  margin-top: 40px;
+}
+
+.modelosSerie {
+  margin: 40px 0 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-4);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.modelosSerie + .modelosLista {
+  margin-top: 20px;
 }
 
 .modelosVacio {

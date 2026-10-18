@@ -26,12 +26,19 @@ import estilos from "./marca.module.css";
  * `bajaSinFoto` (página de marca de maquinaria nueva, decisión de dirección del
  * 2026-10-17): sin foto de fondo, la tarjeta es más baja y el título y el texto
  * quedan centrados en vertical, en lugar de una tarjeta oscura de 630 px.
+ *
+ * `indice` («Plantilla 1» de Andrés, 2026-10-18): las páginas índice y las de
+ * marca de nueva. La tarjeta mide el 70 % del alto de la ventana, con el
+ * contenido centrado en vertical y en horizontal, y el antetítulo en rojo. Sin
+ * foto y con `bajaSinFoto`, manda la tarjeta baja.
  */
 export function HeroMarca({
   vista,
   anclaSiguiente,
   franja = true,
   bajaSinFoto = false,
+  indice = false,
+  etiquetaRaton,
 }: {
   vista: VistaEncabezado;
   anclaSiguiente: string;
@@ -39,12 +46,17 @@ export function HeroMarca({
   franja?: boolean;
   /** Sin foto de fondo, una tarjeta más baja con el contenido centrado en vertical. */
   bajaSinFoto?: boolean;
+  /** Variante de las páginas índice («Plantilla 1»): 70 % de la ventana, centrada. */
+  indice?: boolean;
+  /** Nombre accesible del icono del ratón. */
+  etiquetaRaton?: string;
 }) {
   const { fondo, logo } = vista;
   const baja = bajaSinFoto && !fondo;
+  const variante = baja ? estilos.heroBajo : indice ? estilos.heroIndice : "";
   return (
     <section className={`${estilos.heroSeccion} ${franja ? "" : estilos.heroSeccionPlano}`}>
-      <div className={`${estilos.hero} ${baja ? estilos.heroBajo : ""}`}>
+      <div className={`${estilos.hero} ${variante}`}>
         {fondo ? (
           <Image
             src={fondo.url}
@@ -107,7 +119,7 @@ export function HeroMarca({
             </p>
           ) : null}
 
-          <IconoRaton href={`#${anclaSiguiente}`} />
+          <IconoRaton href={`#${anclaSiguiente}`} etiqueta={etiquetaRaton} />
         </div>
       </div>
     </section>

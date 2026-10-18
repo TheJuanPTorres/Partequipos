@@ -17,8 +17,13 @@ const texto = (v: string | null | undefined) => v?.trim() ?? "";
  * descripción de la marca y, de fondo, su foto de tarjeta. Sin foto, el tono
  * oscuro del velo, como los índices. Sin logo, como los índices.
  */
-export function vistaEncabezadoMarcaNueva(marca: MarcasMaquinaria): VistaEncabezado {
+export function vistaEncabezadoMarcaNueva(
+  marca: MarcasMaquinaria,
+  antetitulo = "",
+): VistaEncabezado {
   return {
+    // El del índice de maquinaria («Plantilla 1», 2026-10-18): se edita en un solo sitio.
+    antetitulo,
     linea1: `Maquinaria pesada ${marca.nombre.trim()}`,
     linea2: "",
     descripcion: texto(marca.descripcion),

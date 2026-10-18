@@ -16,6 +16,13 @@ import type { TarjetaMarca, VistaEncabezado } from "@/lib/repuestos/marca";
  *
  * Reutiliza las tarjetas de la página de marca. No lleva franja amarilla tras el
  * encabezado (la plantilla no la tiene) y ninguna tarjeta se oculta en móvil.
+ *
+ * «PLANTILLA 1» de Andrés (2026-10-18), la versión actualizada: cabecera del
+ * 70 % de la ventana con el contenido centrado, antetítulo rojo, título con el
+ * revelado por palabras de la portada e icono del ratón a las tarjetas; y
+ * tarjetas con la foto a todo el ancho y un recuadro blanco al 90 % que sube
+ * 54 px sobre ella, 3 por fila. Cambia a la vez en los dos índices y en las
+ * páginas de marca de nueva.
  */
 export function IndiceTarjetas({
   id,
@@ -41,6 +48,8 @@ export function IndiceTarjetas({
         anclaSiguiente={id}
         franja={false}
         bajaSinFoto={cabeceraBajaSinFoto}
+        indice
+        etiquetaRaton="Ir a las tarjetas"
       />
       <TarjetasMarca id={id} verTodo={verTodo} tarjetas={tarjetas} indice etiqueta={etiqueta} />
     </>

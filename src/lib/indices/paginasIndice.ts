@@ -12,6 +12,12 @@ import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
 const texto = (v: string | null | undefined) => v?.trim() ?? "";
 
+/**
+ * El antetítulo de la «Plantilla 1» de Andrés (2026-10-18). Se edita en el
+ * global «Páginas índice»; vacío, sale este.
+ */
+export const ANTETITULO_INDICE = "Somos tu socio confiable en maquinaria pesada y repuestos";
+
 type GrupoIndice = NonNullable<PaginasIndice["repuestos"]>;
 
 /**
@@ -25,7 +31,7 @@ export function vistaEncabezadoDeIndice(
   respaldo: ImagenLista | null,
 ): VistaEncabezado {
   return {
-    antetitulo: texto(grupo?.antetitulo),
+    antetitulo: texto(grupo?.antetitulo) || ANTETITULO_INDICE,
     // Una página sin `<h1>` sería peor que una con el texto de respaldo (§3.4).
     linea1: texto(grupo?.titulo) || tituloDeRespaldo,
     linea2: "",

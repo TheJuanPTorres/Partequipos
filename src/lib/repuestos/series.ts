@@ -10,7 +10,7 @@ import { formatSlug } from "../utils/formatSlug";
  * repartir sus modelos por serie de fabricante, como Hitachi en WordPress
  * («excavadora HITACHI EX» y «… ZAXIS»). En WordPress eran tarjetas sin URL,
  * así que aquí tampoco tienen página: la tarjeta de la marca baja al ANCLA de
- * su serie en la página del tipo. Detalle en docs/repuestos-importacion.md §10.
+ * su serie en la página del tipo. Detalle en docs/repuestos-importacion.md §8.
  */
 
 export type Serie = { nombre: string; ancla: string };

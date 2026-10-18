@@ -2,7 +2,7 @@
  * SERIES DE HITACHI (2026-10-17, dirección): pone en los dos tipos de Hitachi
  * sus series de WordPress (EX y ZAXIS, en ese orden) y en cada uno de sus 46
  * modelos la serie que le toca por el prefijo de su código (EX… / ZX…), con
- * manifiesto y retirada exacta. Detalle en docs/repuestos-importacion.md §10.
+ * manifiesto y retirada exacta. Detalle en docs/repuestos-importacion.md §8.
  *
  *   npm run preview:repuestos:series:simular   # no escribe nada: el plan y los recuentos
  *   npm run preview:repuestos:series:aplicar

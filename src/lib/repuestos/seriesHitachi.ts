@@ -2,7 +2,7 @@
  * Las series de Hitachi en WordPress (2026-10-17, dirección): las 4 tarjetas
  * de la página de la marca («excavadora HITACHI EX», «… ZAXIS» y las dos de
  * miniexcavadora), sin URL propia. Las usa `scripts/repuestos/series.ts`.
- * Detalle en docs/repuestos-importacion.md §10.
+ * Detalle en docs/repuestos-importacion.md §8.
  */
 
 export const MARCA_HITACHI = "repuestos-para-maquinaria-pesada-hitachi";

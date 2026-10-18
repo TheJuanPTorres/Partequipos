@@ -918,6 +918,16 @@ a.modelo:hover {
   flex: 1;
 }
 
+/*
+ * Velo más fuerte en la cabecera de la «Plantilla 1» (2026-10-18, dirección):
+ * con el antetítulo en blanco, el 45 % de siempre dejaba el fondo detrás hasta
+ * en rgb(140,140,140) sobre las fotos claras (3,4:1, sin AA). Al 60 %, el
+ * antetítulo cumple AA en las 7 páginas (medido, decisiones-indices-contacto.md §9).
+ */
+.heroIndice .velo {
+  opacity: 0.6;
+}
+
 /* La sección blanca de las tarjetas, sin título y con todas las esquinas redondeadas. */
 /* 72 de relleno de la sección más 10 del contenedor: la foto empieza 82 px más abajo (medido). */
 .tarjetasIndice {

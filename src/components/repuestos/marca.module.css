@@ -942,8 +942,59 @@ a.modelo:hover {
 }
 
 .tarjetasIndice .panel[data-con-foto] {
-  margin: -54px 5% 0;
+  /*
+   * Sube 34 px sobre la foto: los −54 del export más los 20 px que Elementor
+   * deja entre la foto y el recuadro (medido en las capturas de la referencia,
+   * unos 28–34 px a 1440).
+   */
+  margin: -34px 5% 0;
   padding: 30px 20px 10px;
+  /*
+   * VIDRIO, como el export (CSS propio del recuadro: blanco al 12 %, borde
+   * blanco al 25 %, desenfoque de 18 px y sombra suave): arriba, la foto se ve
+   * difuminada detrás; abajo, sobre la sección blanca, es blanco. El degradado
+   * pasa al 60 % de blanco donde acaba la foto (34 px) y al blanco del todo a
+   * los 54 px: el título, que empieza a los 30 px, y el botón cumplen AA con
+   * cualquier foto (medido en las 7 páginas, decisiones-indices-contacto.md).
+   * La variante -webkit- va ANTES (§10.35).
+   */
+  border: 1px solid rgb(255 255 255 / 0.25);
+  background: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.12) 0,
+    rgb(255 255 255 / 0.6) 34px,
+    var(--color-fondo) 54px
+  );
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.08);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+/*
+ * La caja de la foto se ve entera: con las cuatro esquinas redondeadas y el
+ * borde de arriba alineado en toda la fila, también con las fotos de producto
+ * sobre fondo blanco (filtros, cadenas…), que sobre la sección blanca parecían
+ * empezar más abajo y sin esquinas. El recorte se mantiene mientras la foto se
+ * encoge al pasar el ratón.
+ */
+.tarjetasIndice .foto {
+  isolation: isolate;
+  background: var(--color-fondo-seccion);
+}
+
+/* El blanco de una foto de producto toma el gris de la caja (las de color apenas cambian, un 6 %). */
+.tarjetasIndice .foto .fotoImg {
+  mix-blend-mode: multiply;
+}
+
+/* El botón como el export: borde de 1 px de su color y la flecha a 12 px del texto. */
+.tarjetasIndice .botonTarjeta {
+  gap: 12px;
+  border: 1px solid var(--color-marca);
+}
+
+.tarjetasIndice .botonTarjeta:hover {
+  border-color: var(--color-texto);
 }
 
 .tarjetasIndice .fotoImg {
@@ -964,11 +1015,9 @@ a.modelo:hover {
   }
 }
 
-/* Entre filas no hay hueco: el panel ya trae el suyo (paso de fila de 389 px, medido a 1440). */
-@media (min-width: 1025px) {
-  .tarjetasIndice .rejilla {
-    row-gap: 0;
-  }
+/* Aire entre filas, como en el diseño (unos 32 px en las capturas de la referencia a 1440). */
+.tarjetasIndice .rejilla {
+  row-gap: 32px;
 }
 
 @media (max-width: 1024px) {
@@ -989,5 +1038,9 @@ a.modelo:hover {
   .tarjetasIndice .panel[data-con-foto] {
     margin-inline: 5%;
     padding: 30px 20px 10px;
+  }
+
+  .tarjetasIndice .rejilla {
+    row-gap: 30px;
   }
 }

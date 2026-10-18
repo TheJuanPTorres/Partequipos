@@ -139,3 +139,25 @@ los ficheros listos en `partequipos-diseno\wordpress\indices\assets\`.
 ## 8. Coordinación
 
 - `/maquinaria-pesada/` es la sección de **B**: avisado en `ESTADO.md`. Su #140 (categoría secundaria) no la toca.
+
+## 9. Tarjetas de la «Plantilla 1» como el diseño (agente C, 2026-10-18)
+
+Dirección comparó las tarjetas del componente común (`IndiceTarjetas` → `TarjetasMarca` con `indice`; los índices de
+Repuestos y Maquinaria y las 5 páginas de marca de nueva) con la referencia de ux-9. La referencia pintada está en
+mantenimiento: se replicó del export (`wordpress/plantilla-1/elementor-3569-2026-10-18.json`) y de las capturas de
+dirección a 1440 (`capturas-andres/plantilla-1/`). Solo cambia la variante de índice (`.tarjetasIndice`); las tarjetas de
+la página de marca de repuestos siguen igual.
+
+| Qué                  | Antes                          | Ahora (como el diseño)                                                                                                                                                                   |
+| -------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Recuadro             | Blanco macizo                  | **Vidrio** del export: blanco al 12 %, borde blanco al 25 %, `backdrop-filter: blur(18px)` y sombra suave, con un degradado al 60 % de blanco donde acaba la foto y a blanco a los 54 px |
+| Solape sobre la foto | 54 px                          | **34 px**: los −54 del export más los 20 px de hueco de Elementor entre foto y recuadro (28–34 px en las capturas)                                                                       |
+| Aire entre filas     | 0 a 1440 (pegadas)             | **32 px** (unos 32 en las capturas; 30 en móvil)                                                                                                                                         |
+| Fotos                | Las de fondo blanco se perdían | Caja gris claro con `mix-blend-mode: multiply`: el blanco de las fotos de producto toma el gris y se ven las 4 esquinas y el borde de arriba alineado; recorte estable al encoger        |
+| Botón                | Flecha de 14 px, sin borde     | Flecha maciza de 16 px a 12 px del texto y borde de 1 px de su color, como el export                                                                                                     |
+
+**Medido en el preview, 7 páginas × 390, 1010 y 1440:** fotos a la misma altura en cada ancho (234 · 296 · 279 px) y con
+radio de 20 px en las 4 esquinas; aire entre filas de 30 · 32 · 32 px; **contraste del título contra el píxel más oscuro de
+su fondo real (texto oculto), 16,2:1 como mínimo** (AA pide 4,5); el botón no cambia de colores; sin desbordamiento ni
+errores. Capturas y medidas en `Desktop/partequipos-cierre/informes/capturas-2026-10-18-plantilla1/` (con el lado a lado de
+la referencia a 1440). No se replica el `motion_fx` de desplazamiento del recuadro del export (no lo pidió dirección).

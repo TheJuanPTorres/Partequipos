@@ -171,3 +171,10 @@ Con «reducir movimiento», quieto (en el componente y en el CSS). **Medido en l
 −10 px con la tarjeta entrando, centrada y arriba; con «reducir movimiento», 0 en las tres; el scroll no suma CLS (el de la
 carga, ≤ 0,0025, es el mismo con y sin «reducir movimiento»); contraste del título con la tarjeta arriba (el recuadro más
 subido sobre la foto) de **8,65:1 como mínimo**; sin errores.
+
+**La foto al pasar el ratón (2026-10-18, dirección).** Antes se encogía a 0,95 y asomaba el gris de la caja con las
+esquinas descuadradas. Ahora llena SIEMPRE la caja: en reposo, `scale(1.08)`; al pasar el ratón, baja a 1, nunca por
+debajo; la caja recorta con `overflow: hidden` y `clip-path: inset(0 round 20px)`. Con «reducir movimiento», quieta a
+1,08 y sin animación. **Medido a 1440 en las 7 páginas** (cada tarjeta, ratón fuera, a mitad de la animación y encima):
+escala 1,08 → 1, la foto cubre la caja en los tres momentos, radio de 20 px en las 4 esquinas; el recuadro con el scroll
+igual que en el #249; con «reducir movimiento», 1,08 fija y el recuadro quieto.

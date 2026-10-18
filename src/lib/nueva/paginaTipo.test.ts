@@ -89,6 +89,11 @@ describe("títulos", () => {
       tituloFranja(marca, tipo({ nombre: "Excavadoras Hitachi" })),
       "Modelos de excavadoras Hitachi",
     );
+    const adit = { ...marca, nombre: "Aditamentos", slug: "aditamentos" } as MarcasMaquinaria;
+    assert.equal(
+      tituloFranja(adit, tipo({ nombre: "Aditamentos para minicargadores" })),
+      "Modelos de aditamentos para minicargadores",
+    );
     const case_ = { ...marca, nombre: "Case Construction" } as MarcasMaquinaria;
     assert.equal(tituloFranja(case_, tipo()), "Modelos de excavadoras Case Construction");
   });

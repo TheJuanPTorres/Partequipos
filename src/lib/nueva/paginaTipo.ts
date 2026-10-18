@@ -104,8 +104,11 @@ export function vistaEncabezadoTipoNueva(
 export function tituloFranja(marca: MarcasMaquinaria, tipo: TiposMaquinaria): string {
   const nombre = marca.nombre.trim();
   const minuscula = tituloPorDefecto.tipoMaquinaria(tipo.nombre, marca.nombre).toLowerCase();
-  const i = minuscula.lastIndexOf(nombre.toLowerCase());
-  const titulo =
-    i < 0 ? minuscula : minuscula.slice(0, i) + nombre + minuscula.slice(i + nombre.length);
+  // La marca recupera su grafía solo si cierra el título («excavadoras Hitachi»); si el tipo la lleva
+  // al principio («aditamentos para minicargadores»), es una palabra más.
+  const i = minuscula.length - nombre.length;
+  const titulo = minuscula.endsWith(nombre.toLowerCase())
+    ? minuscula.slice(0, i) + nombre
+    : minuscula;
   return `Modelos de ${titulo}`;
 }

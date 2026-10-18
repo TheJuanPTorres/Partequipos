@@ -2,7 +2,7 @@
  * «OTRAS ENTRADAS» DE LAS LISTAS DE WORDPRESS (2026-10-17, decisión del
  * cliente): pone en cada tipo las entradas de `ENTRADAS_WP`
  * (src/lib/repuestos/entradasWp.ts), con manifiesto y retirada exacta.
- * Detalle en docs/repuestos-importacion.md §10.
+ * Detalle en docs/repuestos-importacion.md §12.
  *
  *   npm run preview:repuestos:entradas:simular   # no escribe nada
  *   npm run preview:repuestos:entradas:aplicar

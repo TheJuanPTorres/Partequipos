@@ -118,7 +118,7 @@ export const TipoEquipo: CollectionConfig = {
      * modelos de WordPress nombra y NO es un modelo de este tipo: un modelo
      * sin página propia (Caterpillar 326D2), que va como texto sin enlace, o
      * un texto que enlaza a la ficha de otro modelo («EX450LC-5» → la
-     * ZX450LC-5). Detalle en docs/repuestos-importacion.md §10.
+     * ZX450LC-5). Detalle en docs/repuestos-importacion.md §12.
      */
     {
       name: "otrasEntradas",

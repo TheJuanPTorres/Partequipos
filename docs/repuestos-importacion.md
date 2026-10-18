@@ -337,7 +337,7 @@ tenía: **sin migración**. La ficha del modelo ya pinta esa galería.
 
 Un script de un solo uso borró los duplicados (por Payload, que los quita también del Blob), unificó la foto y completó el manifiesto. La segunda pasada lo confirmó. **Regla: nunca dos ejecuciones del importador a la vez**, y tras cortar una, comprobar que no queda ningún `node` con `importar-repuestos` antes de relanzar.
 
-## 10. Las listas de WordPress, tal cual (agente C, 2026-10-17)
+## 12. Las listas de WordPress, tal cual (agente C, 2026-10-17)
 
 **Decisión del cliente (2026-10-17): se migra TODO como está en WordPress, aunque esté mal**, y se le pasa la lista de
 erratas (abajo). En WordPress cada tipo (o serie) tiene, en su página de marca y en la de tipo, una lista desplegable de

@@ -8,7 +8,7 @@
  * - 4 modelos SIN página propia: van como texto, sin enlace.
  * - «EX450LC-5» en la serie EX de miniexcavadora de Hitachi: no existe; la
  *   página real es la excavadora ZX450LC-5, y a ella enlaza (errata anotada
- *   para el cliente, docs/repuestos-importacion.md §10).
+ *   para el cliente, docs/repuestos-importacion.md §12).
  *
  * El resto de diferencias de texto son erratas de modelos que SÍ tienen página
  * («ZX75US-3» por ZX75U-3, «HX340SL» por HX34OSL…): salen con su ficha.

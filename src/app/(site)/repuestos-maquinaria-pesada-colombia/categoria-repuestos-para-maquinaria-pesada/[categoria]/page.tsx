@@ -5,6 +5,7 @@ import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { CierreRepuestos } from "@/components/repuestos/CierreRepuestos";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { PlacasMarcas } from "@/components/repuestos/PlacasMarcas";
+import { QueIncluye } from "@/components/repuestos/QueIncluye";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
@@ -18,6 +19,7 @@ import {
   placasDeMarcas,
   vistaEncabezadoCategoria,
 } from "@/lib/repuestos/categoria";
+import { gruposDeCategoria } from "@/lib/repuestos/grupos";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
@@ -52,7 +54,8 @@ const ANCLA = "marcas-repuestos";
  * PÁGINA DE CATEGORÍA TÉCNICA DE REPUESTOS — PROVISIONAL hasta el diseño de
  * Andrés (docs/diseno/decisiones-repuestos-marca.md §7): encabezado con el
  * nombre, la descripción y la imagen de la categoría, las marcas con las que
- * trabajamos, contacto y testimonios. La URL es la del sitio actual.
+ * trabajamos, «Qué incluye» (los grupos de productos, si los tiene), contacto y
+ * testimonios. La URL es la del sitio actual.
  */
 export default async function CategoriaRepuestosPage({ params }: { params: Promise<Params> }) {
   const { categoria: slug } = await params;
@@ -83,6 +86,12 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
         id={ANCLA}
         titulo="Marcas con las que trabajamos"
         marcas={placasDeMarcas(marcas)}
+      />
+
+      <QueIncluye
+        id="que-incluye"
+        titulo={`Qué incluye ${categoria.nombre.toLowerCase()}`}
+        grupos={gruposDeCategoria(categoria)}
       />
 
       <CierreRepuestos

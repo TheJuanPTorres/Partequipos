@@ -637,6 +637,22 @@ export interface CategoriasTecnica {
    */
   ordenMarca?: number | null;
   /**
+   * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Qué incluye».
+   */
+  grupos?:
+    | {
+        nombre: string;
+        imagen?: (number | null) | Media;
+        productos?:
+          | {
+              texto: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -2112,6 +2128,19 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   enlace?: T;
   ordenPortada?: T;
   ordenMarca?: T;
+  grupos?:
+    | T
+    | {
+        nombre?: T;
+        imagen?: T;
+        productos?:
+          | T
+          | {
+              texto?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   seo?:
     | T
     | {

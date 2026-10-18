@@ -154,6 +154,41 @@ export const CategoriaTecnica: CollectionConfig = {
           "Orden en «Nuestras categorías de repuestos» de cada página de marca. Vacío: al final, por nombre.",
       },
     },
+    /*
+     * «QUÉ INCLUYE» (2026-10-18, dirección): los grupos de productos de la categoría, como
+     * en WordPress: una tarjeta por grupo con su foto, su nombre y la lista de productos
+     * que despliega «Ver productos». Vacío: la página no pinta el apartado.
+     */
+    {
+      name: "grupos",
+      type: "array",
+      label: "Qué incluye",
+      labels: { singular: "Grupo", plural: "Grupos" },
+      maxRows: 12,
+      admin: {
+        initCollapsed: true,
+        description:
+          "Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Qué incluye».",
+      },
+      fields: [
+        { name: "nombre", type: "text", required: true, label: "Nombre del grupo" },
+        {
+          name: "imagen",
+          type: "upload",
+          relationTo: "media",
+          label: "Foto del grupo",
+        },
+        {
+          name: "productos",
+          type: "array",
+          label: "Productos que incluye",
+          labels: { singular: "Producto", plural: "Productos" },
+          maxRows: 40,
+          admin: { initCollapsed: true },
+          fields: [{ name: "texto", type: "text", required: true, label: "Producto" }],
+        },
+      ],
+    },
     // Tiene página propia desde el 2026-10-13 (provisional hasta el diseño de Andrés). Las URL
     // heredadas de segundo nivel y las duplicadas siguen sin decidir (docs/redirects-map.csv).
     seoField(),

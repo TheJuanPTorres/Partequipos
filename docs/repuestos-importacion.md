@@ -376,3 +376,47 @@ tenía: **sin migración**. La ficha del modelo ya pinta esa galería.
 - el manifiesto, pisado por los dos procesos.
 
 Un script de un solo uso borró los duplicados (por Payload, que los quita también del Blob), unificó la foto y completó el manifiesto. La segunda pasada lo confirmó. **Regla: nunca dos ejecuciones del importador a la vez**, y tras cortar una, comprobar que no queda ningún `node` con `importar-repuestos` antes de relanzar.
+
+## 12. Las listas de WordPress, tal cual (agente C, 2026-10-17)
+
+**Decisión del cliente (2026-10-17): se migra TODO como está en WordPress, aunque esté mal**, y se le pasa la lista de
+erratas (abajo). En WordPress cada tipo (o serie) tiene, en su página de marca y en la de tipo, una lista desplegable de
+modelos **en texto, sin enlaces**. Inventario: las listas de las 13 páginas de marca y las 33 de tipo publicadas (las de
+tipo repiten las de la marca), comparadas **por código** con las páginas de modelo de la extracción.
+
+**Lo que nombran y no es un modelo de su tipo** — campo nuevo «Otras entradas de la lista de modelos» del tipo
+(`otrasEntradas`: texto, serie opcional y enlace opcional a otra ficha; `conOtrasEntradas` en `src/lib/repuestos/tipo.ts`):
+
+| Marca · tipo (serie)          | Texto de WordPress               | Cómo sale                                                      |
+| ----------------------------- | -------------------------------- | -------------------------------------------------------------- |
+| Caterpillar · bulldozer       | Bulldozer Caterpillar D6D        | Texto, **sin enlace**: no tiene página                         |
+| Caterpillar · excavadora      | Excavadora Caterpillar 326D2     | Texto, sin enlace                                              |
+| Caterpillar · retrocargadora  | Retrocargadora Caterpillar 426B  | Texto, sin enlace                                              |
+| Yanmar · miniexcavadora       | Miniexcavadora YANMAR VIO 70-3   | Texto, sin enlace                                              |
+| Hitachi · miniexcavadora (EX) | Miniexcavadora Hitachi EX450LC-5 | Con su texto, **enlazando a la excavadora ZX450LC-5** (errata) |
+
+Con otras entradas, la lista del tipo se ordena por texto (con los números en su orden); sin ellas, como siempre. Datos:
+`scripts/repuestos/entradas-wp.ts` (`npm run preview:repuestos:entradas:simular|aplicar|retirar`, plan en
+`src/lib/repuestos/entradasWp.ts`); la de Hitachi necesita antes las series (§8). Conserva las entradas de un editor.
+Sitio publicado: `Desktop/partequipos-cierre/runbook-repuestos-listas-wp.md` (sustituye a `runbook-series-hitachi.md`).
+
+**Resultado en el preview (2026-10-18):** las 5 entradas en sus 5 tipos (la de Hitachi en la serie EX, enlazando a la
+ficha de la ZX450LC-5); segunda pasada «ya estaban»; retirada probada (5 tipos devueltos) y vuelto a aplicar.
+
+### Erratas de WordPress que se migran tal cual (lista para el cliente)
+
+| Dónde                                           | Errata                                                                                                                     |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Hitachi · lista «miniexcavadora EX»             | «EX450LC-5»: no existe; la página real es la **excavadora ZX450LC-5**, que la lista «excavadora ZAXIS» no nombra           |
+| Hitachi · lista «miniexcavadora ZAXIS»          | «ZX75US-3», «ZX75US-A» y «ZX85US-3»; las páginas son ZX75U-3, ZX75U-A y ZX85U-3                                            |
+| Hitachi · lista «miniexcavadora ZAXIS»          | «Minixcavadora» (ZX17U-2)                                                                                                  |
+| Hitachi · lista «excavadora ZAXIS»              | «ZX220LC(GI)»; la página es ZX220LC                                                                                        |
+| Hitachi · foto de la tarjeta «excavadora ZAXIS» | Texto alternativo «Hitachi CX 200» (aquí se corrigió a «Excavadora Hitachi Zaxis», por accesibilidad)                      |
+| Hyundai · excavadora                            | La página se titula «HX34OSL» (con O); la lista dice HX340SL                                                               |
+| Bobcat · los 6 modelos                          | Las páginas se titulan «Minexcavadora»                                                                                     |
+| Yanmar · lista                                  | «VIO 80»; la página es VIO80-1                                                                                             |
+| Liugong · lista de cargador frontal             | «CLG835»; la página es «CLG835 CUMMINS»                                                                                    |
+| Kobelco · lista de excavadora                   | Un solo elemento genérico, «Excavadora KOBELCO»: no nombra ninguno de sus 9 modelos (no se migra como entrada)             |
+| Caterpillar · bulldozer                         | Las páginas D6, D6G, D6K OLD y D8 no salen en la lista                                                                     |
+| Komatsu · página de marca                       | Solo enseña la tarjeta de excavadoras (tiene 4 tipos); las páginas de bulldozer, cargador y motoniveladora no tienen lista |
+| Caterpillar · tipos                             | Las direcciones dicen «buldozer» y «retrocargador»                                                                         |

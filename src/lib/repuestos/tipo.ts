@@ -37,11 +37,13 @@ export function vistaEncabezadoTipo(
 }
 
 export type ModeloEnlace = {
-  id: number;
+  /** Clave de la lista: el id del modelo, o `entrada-<n>` para una «otra entrada». */
+  id: number | string;
   nombre: string;
   /** Código de fabricante, si lo hay y el nombre no lo lleva ya: acompaña al nombre. */
   codigo: string | null;
-  href: string;
+  /** `null`: una entrada sin ficha (WordPress la nombra y no tiene página): va como texto. */
+  href: string | null;
   /** La serie que eligió el editor (solo cuenta si el tipo tiene series). */
   serie: string | null;
 };
@@ -66,6 +68,39 @@ export function enlacesDeModelos(
         serie: texto(m.serie) || null,
       };
     });
+}
+
+/**
+ * La lista de modelos con las «otras entradas» del tipo (decisión del cliente,
+ * 2026-10-17: la lista de WordPress, tal cual): un modelo sin página propia va
+ * como texto, y uno que enlaza a otra ficha («EX450LC-5» → la ZX450LC-5), con
+ * el texto de WordPress. Sin otras entradas, la lista de siempre, sin tocar su
+ * orden; con ellas, todo por orden alfabético (con los números en su orden).
+ * `hrefDeModelo` da la URL de la ficha enlazada, o `null` si ya no existe.
+ */
+export function conOtrasEntradas(
+  tipo: TiposEquipo,
+  modelos: ModeloEnlace[],
+  hrefDeModelo: (id: number) => string | null,
+): ModeloEnlace[] {
+  const otras: ModeloEnlace[] = (tipo.otrasEntradas ?? []).flatMap((e, i) => {
+    const nombre = texto(e.texto);
+    if (!nombre) return [];
+    const id = typeof e.modelo === "number" ? e.modelo : (e.modelo?.id ?? null);
+    return [
+      {
+        id: `entrada-${i}`,
+        nombre,
+        codigo: null,
+        href: id === null ? null : hrefDeModelo(id),
+        serie: texto(e.serie) || null,
+      },
+    ];
+  });
+  if (otras.length === 0) return modelos;
+  return [...modelos, ...otras].sort((a, b) =>
+    a.nombre.localeCompare(b.nombre, "es", { numeric: true, sensitivity: "base" }),
+  );
 }
 
 /**

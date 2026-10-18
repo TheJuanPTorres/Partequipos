@@ -732,9 +732,14 @@ a.pildora:hover {
   text-decoration: none;
 }
 
-.modelo:hover {
+a.modelo:hover {
   background: var(--color-marca);
   color: var(--color-fondo);
+}
+
+/* Un modelo sin ficha (WordPress lo nombra sin página): el mismo aspecto, sin efecto al pasar. */
+.modeloSinFicha {
+  cursor: default;
 }
 
 /* La copia de reserva es más ancha que el texto: el texto va centrado en ella. */

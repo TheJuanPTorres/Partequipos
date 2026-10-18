@@ -69,3 +69,20 @@ export const getModeloPorSlug = cache(
     return docs[0] ?? null;
   },
 );
+
+/**
+ * Modelos por id, con marca y tipo poblados (para construir su URL): las fichas
+ * a las que enlazan las «otras entradas» de la lista de un tipo. Lista vacía,
+ * sin consulta.
+ */
+export async function getModelosPorIds(ids: number[]): Promise<ModelosRepuesto[]> {
+  if (ids.length === 0) return [];
+  const payload = await getPayload({ config });
+  const { docs } = await payload.find({
+    collection: "modelos-repuesto",
+    where: { id: { in: ids } },
+    depth: 1,
+    limit: 0,
+  });
+  return docs;
+}

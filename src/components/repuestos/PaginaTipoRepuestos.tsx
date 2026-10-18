@@ -10,12 +10,17 @@ import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
-import { getModelosDeTipo } from "@/lib/queries/getModelos";
+import { getModelosDeTipo, getModelosPorIds } from "@/lib/queries/getModelos";
 import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { categoriasDeMarca } from "@/lib/repuestos/marca";
-import { enlacesDeModelos, gruposDeModelos, vistaEncabezadoTipo } from "@/lib/repuestos/tipo";
+import {
+  conOtrasEntradas,
+  enlacesDeModelos,
+  gruposDeModelos,
+  vistaEncabezadoTipo,
+} from "@/lib/repuestos/tipo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
@@ -62,7 +67,18 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
   ]);
 
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
-  const enlaces = enlacesDeModelos(marca, tipo, modelos);
+  // Las fichas a las que enlazan las «otras entradas» de la lista (pueden ser de otro tipo).
+  const enlazados = await getModelosPorIds(
+    (tipo.otrasEntradas ?? []).flatMap((e) =>
+      typeof e.modelo === "number" ? [e.modelo] : e.modelo ? [e.modelo.id] : [],
+    ),
+  );
+  const enlaces = conOtrasEntradas(tipo, enlacesDeModelos(marca, tipo, modelos), (id) => {
+    const m = enlazados.find((x) => x.id === id);
+    const mMarca = poblado<Marca>(m?.marca);
+    const mTipo = poblado<TiposEquipo>(m?.tipo);
+    return m && mMarca && mTipo ? rutas.modelo(mMarca.slug, segmentoDeTipo(mTipo), m.slug) : null;
+  });
   const nombreTipo = tipo.nombre.toLowerCase();
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },

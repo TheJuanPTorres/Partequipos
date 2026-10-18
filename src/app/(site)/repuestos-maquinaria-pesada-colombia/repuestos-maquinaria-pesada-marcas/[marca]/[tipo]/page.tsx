@@ -12,12 +12,17 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getMarcaPorSlug } from "@/lib/queries/getMarcas";
-import { getModelosDeTipo } from "@/lib/queries/getModelos";
+import { getModelosDeTipo, getModelosPorIds } from "@/lib/queries/getModelos";
 import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { getTipoPorSlug, getTipos } from "@/lib/queries/getTipos";
 import { categoriasDeMarca } from "@/lib/repuestos/marca";
-import { enlacesDeModelos, gruposDeModelos, vistaEncabezadoTipo } from "@/lib/repuestos/tipo";
+import {
+  conOtrasEntradas,
+  enlacesDeModelos,
+  gruposDeModelos,
+  vistaEncabezadoTipo,
+} from "@/lib/repuestos/tipo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
@@ -26,7 +31,7 @@ import { METADATA_404 } from "@/lib/seo/noEncontrada";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { poblado } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
-import type { Marca } from "@/payload-types";
+import type { Marca, TiposEquipo } from "@/payload-types";
 
 type Params = { marca: string; tipo: string };
 
@@ -90,7 +95,18 @@ export default async function TipoPage({ params }: { params: Promise<Params> }) 
   ]);
 
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
-  const enlaces = enlacesDeModelos(marca, tipo, modelos);
+  // Las fichas a las que enlazan las «otras entradas» de la lista (pueden ser de otro tipo).
+  const enlazados = await getModelosPorIds(
+    (tipo.otrasEntradas ?? []).flatMap((e) =>
+      typeof e.modelo === "number" ? [e.modelo] : e.modelo ? [e.modelo.id] : [],
+    ),
+  );
+  const enlaces = conOtrasEntradas(tipo, enlacesDeModelos(marca, tipo, modelos), (id) => {
+    const m = enlazados.find((x) => x.id === id);
+    const mMarca = poblado<Marca>(m?.marca);
+    const mTipo = poblado<TiposEquipo>(m?.tipo);
+    return m && mMarca && mTipo ? rutas.modelo(mMarca.slug, mTipo.slug, m.slug) : null;
+  });
   const nombreTipo = tipo.nombre.toLowerCase();
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },

@@ -5,7 +5,7 @@ import { slugField } from "../lib/fields/slugField";
 import { revalidarTipo, revalidarTipoBorrado } from "./hooks/revalidateHooks";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMegamenu } from "./hooks/megamenuHooks";
-import { validarSeries } from "../lib/repuestos/series";
+import { validarSerieDeEntrada, validarSeries } from "../lib/repuestos/series";
 
 const menu = revalidarMegamenu("tipos-equipo");
 
@@ -109,6 +109,51 @@ export const TipoEquipo: CollectionConfig = {
           relationTo: "media",
           label: "Foto de la tarjeta",
           admin: { description: "Opcional. Sin ella, la tarjeta usa la imagen del tipo." },
+        },
+      ],
+    },
+    /*
+     * OTRAS ENTRADAS DE LA LISTA (2026-10-17, decisión del cliente: se migra
+     * todo como está en WordPress, erratas incluidas). Lo que la lista de
+     * modelos de WordPress nombra y NO es un modelo de este tipo: un modelo
+     * sin página propia (Caterpillar 326D2), que va como texto sin enlace, o
+     * un texto que enlaza a la ficha de otro modelo («EX450LC-5» → la
+     * ZX450LC-5). Detalle en docs/repuestos-importacion.md §10.
+     */
+    {
+      name: "otrasEntradas",
+      type: "array",
+      label: "Otras entradas de la lista de modelos",
+      labels: { singular: "Entrada", plural: "Entradas" },
+      admin: {
+        description:
+          "Opcional. Modelos que se nombran en la lista de la página del tipo sin ser modelos de este tipo: sin ficha (solo el texto) o con enlace a la ficha de otro modelo.",
+        initCollapsed: true,
+      },
+      fields: [
+        {
+          name: "texto",
+          type: "text",
+          required: true,
+          label: "Texto",
+          admin: { description: "Tal como sale en la lista, ej. «Excavadora Caterpillar 326D2»." },
+        },
+        {
+          name: "serie",
+          type: "text",
+          label: "Serie",
+          validate: validarSerieDeEntrada,
+          admin: {
+            description:
+              "Solo si el tipo tiene series: en cuál sale. Vacía: en «Otros modelos» (o en la lista, si el tipo no tiene series).",
+          },
+        },
+        {
+          name: "modelo",
+          type: "relationship",
+          relationTo: "modelos-repuesto",
+          label: "Enlaza a la ficha de",
+          admin: { description: "Opcional. Vacío: el texto sale sin enlace." },
         },
       ],
     },

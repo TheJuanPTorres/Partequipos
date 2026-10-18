@@ -62,21 +62,36 @@ function ListaModelos({ modelos }: { modelos: ModeloEnlace[] }) {
     <ul className={estilos.modelosLista}>
       {modelos.map((m) => (
         <li key={m.id}>
-          <Link href={m.href} className={estilos.modelo}>
-            <span className={`${reserva.reserva} ${estilos.modeloTexto}`} data-reserva={m.nombre}>
-              <span>{m.nombre}</span>
+          {m.href ? (
+            <Link href={m.href} className={estilos.modelo}>
+              <TextoModelo modelo={m} />
+            </Link>
+          ) : (
+            // Un modelo que WordPress nombra sin página propia: el texto, sin enlace.
+            <span className={`${estilos.modelo} ${estilos.modeloSinFicha}`}>
+              <TextoModelo modelo={m} />
             </span>
-            {m.codigo ? (
-              <span
-                className={`${reserva.reserva} ${estilos.modeloTexto} ${estilos.modeloCodigo}`}
-                data-reserva={m.codigo}
-              >
-                <span>{m.codigo}</span>
-              </span>
-            ) : null}
-          </Link>
+          )}
         </li>
       ))}
     </ul>
+  );
+}
+
+function TextoModelo({ modelo: m }: { modelo: ModeloEnlace }) {
+  return (
+    <>
+      <span className={`${reserva.reserva} ${estilos.modeloTexto}`} data-reserva={m.nombre}>
+        <span>{m.nombre}</span>
+      </span>
+      {m.codigo ? (
+        <span
+          className={`${reserva.reserva} ${estilos.modeloTexto} ${estilos.modeloCodigo}`}
+          data-reserva={m.codigo}
+        >
+          <span>{m.codigo}</span>
+        </span>
+      ) : null}
+    </>
   );
 }

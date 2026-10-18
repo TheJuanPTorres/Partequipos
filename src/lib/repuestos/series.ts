@@ -70,6 +70,18 @@ export const validarSerieDelModelo: TextFieldSingleValidation = async (valor, ar
   return `La serie tiene que ser una de las de su tipo: ${series.map((s) => s.nombre).join(", ")}.`;
 };
 
+/** La serie de una «otra entrada» de la lista: vacía, o una de las del propio tipo. */
+export const validarSerieDeEntrada: TextFieldSingleValidation = (valor, args) => {
+  const base = text(valor, args);
+  if (base !== true) return base;
+  const clave = claveSerie(typeof valor === "string" ? valor : "");
+  if (!clave) return true;
+  const series = seriesDeTipo((args.data ?? {}) as Pick<TiposEquipo, "series">);
+  if (series.length === 0) return "Este tipo no tiene series: deja la serie vacía.";
+  if (series.some((s) => claveSerie(s.nombre) === clave)) return true;
+  return `La serie tiene que ser una de las de este tipo: ${series.map((s) => s.nombre).join(", ")}.`;
+};
+
 function idDe(v: unknown): number | null {
   if (typeof v === "number") return v;
   if (typeof v === "string" && /^\d+$/.test(v)) return Number(v);

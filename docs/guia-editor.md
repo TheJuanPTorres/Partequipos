@@ -221,6 +221,11 @@ oficial, no lo pongas.
   serie. En cada **modelo**, el campo **Serie** dice a cuál pertenece (tiene
   que ser una de las de su tipo; si no, no deja guardar). Un modelo sin serie
   sale al final, en «Otros modelos».
+- **Otras entradas de la lista de modelos** (opcional, en el tipo de equipo):
+  lo que la lista de la página del tipo nombra sin ser un modelo de ese tipo.
+  Con solo el **texto**, sale sin enlace (un modelo que no tiene ficha); con
+  **Enlaza a la ficha de**, enlaza a la ficha de otro modelo. En un tipo con
+  series, la **serie** dice en qué grupo sale.
 - Las **categorías técnicas** son las mismas en todas las marcas: su
   **icono**, su **enlace** y su **posición en las páginas de marca** se
   editan en cada categoría (**Repuestos → Categorías técnicas**).

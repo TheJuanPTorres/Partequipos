@@ -590,6 +590,26 @@ export interface TiposEquipo {
       }[]
     | null;
   /**
+   * Opcional. Modelos que se nombran en la lista de la página del tipo sin ser modelos de este tipo: sin ficha (solo el texto) o con enlace a la ficha de otro modelo.
+   */
+  otrasEntradas?:
+    | {
+        /**
+         * Tal como sale en la lista, ej. «Excavadora Caterpillar 326D2».
+         */
+        texto: string;
+        /**
+         * Solo si el tipo tiene series: en cuál sale. Vacía: en «Otros modelos» (o en la lista, si el tipo no tiene series).
+         */
+        serie?: string | null;
+        /**
+         * Opcional. Vacío: el texto sale sin enlace.
+         */
+        modelo?: (number | null) | ModelosRepuesto;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -2105,6 +2125,14 @@ export interface TiposEquipoSelect<T extends boolean = true> {
     | {
         nombre?: T;
         imagen?: T;
+        id?: T;
+      };
+  otrasEntradas?:
+    | T
+    | {
+        texto?: T;
+        serie?: T;
+        modelo?: T;
         id?: T;
       };
   seo?:

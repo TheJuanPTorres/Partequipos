@@ -1,3 +1,4 @@
+import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { rutas } from "./routes";
 
 /**
@@ -87,6 +88,8 @@ export type DatosMegamenu = {
   categoriasUsada: ItemCatalogo[];
   marcasRepuestos: ItemCatalogo[];
   tiposRepuestos: TipoCatalogo[];
+  /** Los equipos nuevos (solo su tipo): el menú no enlaza a un tipo de maquinaria sin equipos. */
+  equiposNuevos: ReadonlyArray<{ tipo: number | { id: number } | null | undefined }>;
 };
 
 /** La «marca» de maquinaria nueva que en el sitio actual agrupa los aditamentos. */
@@ -133,12 +136,16 @@ function grupoDeMarca(
 }
 
 export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
+  // Un tipo de maquinaria nueva SIN equipos no se enlaza (dirección, 2026-10-18; la misma regla
+  // que las páginas de marca, #232): vuelve solo con el primer equipo (`tiposConEquipos`).
+  const conEquipos = tiposConEquipos(d.equiposNuevos);
+  const tiposConEquiposNuevos = d.tiposMaquinaria.filter((t) => conEquipos.has(t.id));
   const marcas = [...d.marcasMaquinaria].sort(porNombre);
   const aditamentos = marcas.find((m) => m.slug === SLUG_ADITAMENTOS);
   const deMarca = (m: ItemCatalogo, titulo?: string) =>
     grupoDeMarca(
       m,
-      d.tiposMaquinaria,
+      tiposConEquiposNuevos,
       rutas.marcaMaquinaria,
       rutas.tipoMaquinaria,
       titulo,

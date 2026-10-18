@@ -51,7 +51,7 @@ describe("y todo lo que pinta el marco la invalida", () => {
     }
   });
 
-  it("las 6 colecciones del megamenú llevan sus ganchos", () => {
+  it("las 7 colecciones del megamenú llevan sus ganchos", () => {
     const colecciones: Record<string, string> = {
       "categorias-maquinaria": "CategoriaMaquinaria",
       "categorias-usada": "CategoriaUsada",
@@ -64,7 +64,21 @@ describe("y todo lo que pinta el marco la invalida", () => {
     const consultadas = [
       ...leer("src/lib/queries/getMegamenu.ts").matchAll(/collection: "([a-z-]+)"/g),
     ].map((m) => m[1]);
-    assert.deepEqual([...consultadas].sort(), Object.keys(colecciones).sort());
+    // Los equipos nuevos solo cuentan para saber qué tipos tienen equipos: su gancho es otro.
+    assert.deepEqual(
+      [...consultadas].sort(),
+      [...Object.keys(colecciones), "equipos-nuevos"].sort(),
+    );
+    const hooks = leer("src/collections/hooks/maquinariaHooks.ts");
+    for (const gancho of ["revalidarEquipoNuevo", "revalidarEquipoNuevoBorrado"]) {
+      const cuerpo = hooks.slice(hooks.indexOf(`export const ${gancho}`));
+      const siguiente = cuerpo.indexOf("\nexport ", 10);
+      assert.match(
+        siguiente < 0 ? cuerpo : cuerpo.slice(0, siguiente),
+        /refrescarMenuSiCambia\(/,
+        `${gancho}: no refresca el megamenú cuando un tipo aparece o desaparece`,
+      );
+    }
     for (const [slug, fichero] of Object.entries(colecciones)) {
       const s = leer(`src/collections/${fichero}.ts`);
       assert.match(s, new RegExp(`revalidarMegamenu\\("${slug}"\\)`), `${slug} sin ganchos`);

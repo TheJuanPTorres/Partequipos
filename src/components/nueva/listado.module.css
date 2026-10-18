@@ -582,8 +582,15 @@
   .titulo {
     font-size: 56px;
   }
+  /*
+   * En escritorio la tira no tiene barra de desplazamiento: centrada y en una
+   * sola fila, las pestañas de los extremos quedaban fuera de alcance al pasar
+   * de 4 a 8 (pestañas de tipo, 2026-10-17). Se reparten en filas centradas.
+   */
   .pestanas ul {
+    flex-wrap: wrap;
     justify-content: center;
+    overflow-x: visible;
   }
   .pestana {
     min-height: 60px;

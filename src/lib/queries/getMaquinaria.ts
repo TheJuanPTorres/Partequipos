@@ -461,8 +461,15 @@ type CategoriaNueva = Pick<
   tipos: number[];
 };
 
+/** Un tipo con «Pestaña en el índice de maquinaria nueva» y con equipos (2026-10-17). */
+export type PestanaDeTipoNueva = { nombre: string; href: string };
+
 const listadoNuevaEnCache = unstable_cache(
-  async (): Promise<{ equipos: EquipoNuevoListado[]; categorias: CategoriaNueva[] }> => {
+  async (): Promise<{
+    equipos: EquipoNuevoListado[];
+    categorias: CategoriaNueva[];
+    pestanasTipos: PestanaDeTipoNueva[];
+  }> => {
     const payload = await getPayload({ config });
     const [equipos, marcas, tipos, categorias] = await Promise.all([
       payload.find({
@@ -494,7 +501,7 @@ const listadoNuevaEnCache = unstable_cache(
         depth: 0,
         limit: 0,
         pagination: false,
-        select: { slug: true, nombre: true, marca: true },
+        select: { slug: true, nombre: true, marca: true, pestanaIndiceNueva: true },
       }),
       payload.find({
         collection: "categorias-maquinaria",
@@ -607,6 +614,16 @@ const listadoNuevaEnCache = unstable_cache(
         seo: c.seo,
         tipos: (c.tiposIncluidos ?? []).map(idRel).filter((x): x is number => x !== null),
       })),
+      // Pestañas de tipo del índice: los marcados en el panel que tienen equipos.
+      pestanasTipos: tipos.docs
+        .filter((t) => t.pestanaIndiceNueva && lista.some((e) => e.tipoId === t.id))
+        .flatMap((t) => {
+          const marca = marcaPorId.get(idRel(t.marca) ?? -1);
+          return marca
+            ? [{ nombre: t.nombre, href: `${rutas.tipoMaquinaria(marca.slug, t.slug)}/` }]
+            : [];
+        })
+        .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
     };
   },
   ["listado-nueva", CLAVE_DESPLIEGUE],

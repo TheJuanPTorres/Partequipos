@@ -44,6 +44,7 @@ import * as migration_20261016_193118_testimonios_video_cliente from './20261016
 import * as migration_20261017_060430_hero_tipografia_titulo from './20261017_060430_hero_tipografia_titulo';
 import * as migration_20261017_142401_fecha_publicacion_usados from './20261017_142401_fecha_publicacion_usados';
 import * as migration_20261017_170845_logo_oscuro_menu from './20261017_170845_logo_oscuro_menu';
+import * as migration_20261018_003210_tipo_maquinaria_imagen from './20261018_003210_tipo_maquinaria_imagen';
 
 export const migrations = [
   {
@@ -274,6 +275,11 @@ export const migrations = [
   {
     up: migration_20261017_170845_logo_oscuro_menu.up,
     down: migration_20261017_170845_logo_oscuro_menu.down,
-    name: '20261017_170845_logo_oscuro_menu'
+    name: '20261017_170845_logo_oscuro_menu',
+  },
+  {
+    up: migration_20261018_003210_tipo_maquinaria_imagen.up,
+    down: migration_20261018_003210_tipo_maquinaria_imagen.down,
+    name: '20261018_003210_tipo_maquinaria_imagen'
   },
 ];

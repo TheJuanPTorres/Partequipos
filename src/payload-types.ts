@@ -435,6 +435,10 @@ export interface TiposMaquinaria {
   marca: number | MarcasMaquinaria;
   descripcion?: string | null;
   /**
+   * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.
+   */
+  imagen?: (number | null) | Media;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -2199,6 +2203,7 @@ export interface TiposMaquinariaSelect<T extends boolean = true> {
   slug?: T;
   marca?: T;
   descripcion?: T;
+  imagen?: T;
   seo?:
     | T
     | {

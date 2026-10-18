@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
+import { IndiceTarjetas } from "@/components/indices/IndiceTarjetas";
+import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
+  primeraFotoPorTipo,
+  tarjetasDeTiposNueva,
+  vistaEncabezadoMarcaNueva,
+} from "@/lib/nueva/paginaMarca";
+import {
+  getEquiposDeTipos,
   getMarcaMaquinariaPorSlug,
   getMarcasMaquinaria,
   getTiposDeMarcaMaquinaria,
 } from "@/lib/queries/getMaquinaria";
+import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
@@ -38,13 +45,25 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
+const ANCLA = "tipos-de-la-marca";
+
+/**
+ * PÁGINA DE MARCA DE MAQUINARIA NUEVA (2026-10-17, petición del cliente): como
+ * las páginas índice de Andrés (`IndiceTarjetas`): cabecera con la foto de la
+ * marca, título y texto, y una tarjeta con foto por cada tipo de equipo.
+ */
 export default async function MarcaMaquinariaPage({ params }: { params: Promise<Params> }) {
   const { marca: slug } = await params;
   const marca = await getMarcaMaquinariaPorSlug(slug);
   if (!marca) notFound();
 
-  const tipos = await getTiposDeMarcaMaquinaria(marca.id);
-  const logo = imagenDeMedia(marca.logo, `Logo de ${marca.nombre}`);
+  const [tipos, global] = await Promise.all([
+    getTiposDeMarcaMaquinaria(marca.id),
+    getRepuestosMarca(),
+  ]);
+  // La foto del primer equipo solo hace falta para los tipos sin imagen propia.
+  const sinImagen = tipos.filter((t) => !imagenDeMedia(t.imagen, "")).map((t) => t.id);
+  const fotos = primeraFotoPorTipo(await getEquiposDeTipos(sinImagen));
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -54,47 +73,27 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
     { nombre: marca.nombre, path: rutas.marcaMaquinaria(marca.slug) },
   ];
 
-  const items = tipos.map((tipo) => ({
-    href: `${rutas.tipoMaquinaria(marca.slug, tipo.slug)}/`,
-    titulo: tipo.nombre,
-    descripcion: tipo.descripcion,
-    imagen: null,
-  }));
+  const tarjetas = tarjetasDeTiposNueva(marca, tipos, fotos);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <Breadcrumbs items={breadcrumbs} />
-
-      <div className="flex items-center gap-4">
-        {logo ? (
-          <Image
-            src={logo.url}
-            alt={logo.alt}
-            width={logo.width}
-            height={logo.height}
-            className="h-14 w-auto object-contain"
-            preload
-          />
-        ) : null}
-        <h1 className="text-3xl font-semibold text-gray-900">Maquinaria pesada {marca.nombre}</h1>
+      <div className={estilos.migas}>
+        <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      {marca.descripcion ? (
-        <p className="mt-3 max-w-2xl text-gray-600">{marca.descripcion}</p>
+      <IndiceTarjetas
+        id={ANCLA}
+        vista={vistaEncabezadoMarcaNueva(marca)}
+        tarjetas={tarjetas}
+        verTodo={global.verTodoTexto?.trim() || "Ver todo"}
+        etiqueta={`Tipos de equipo ${marca.nombre}`}
+      />
+      {tarjetas.length === 0 ? (
+        <p id={ANCLA} className="mx-auto max-w-4xl px-4 py-10 text-gray-600">
+          Todavía no hay tipos de equipo publicados para {marca.nombre}.
+        </p>
       ) : null}
-
-      <section className="mt-8" aria-labelledby="tipos-heading">
-        <h2 id="tipos-heading" className="text-xl font-medium text-gray-900">
-          Tipos de equipo {marca.nombre}
-        </h2>
-        <div className="mt-4">
-          <ListaEnlaces
-            items={items}
-            vacio={`Todavía no hay tipos de equipo publicados para ${marca.nombre}.`}
-          />
-        </div>
-      </section>
     </main>
   );
 }

@@ -9,7 +9,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import estilos from "./ficha.module.css";
 
@@ -34,12 +34,18 @@ import estilos from "./ficha.module.css";
 
 export type FotoFicha = { url: string; alt: string; width: number; height: number };
 
-const INTERVALO_MS = 3000;
+const INTERVALO_MS = 5000;
 const MINIATURAS_VISIBLES = 3;
 
 export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: string }) {
   const [actual, setActual] = useState(0);
-  const [reproduciendo, setReproduciendo] = useState(false);
+  // Arranca en reproducción (dirección, 2026-10-17); con una sola foto, nada.
+  const [reproduciendo, setReproduciendo] = useState(fotos.length > 1);
+  // Pausas que no tocan el botón: ratón encima, foco de teclado y galería fuera de la vista.
+  const [encima, setEncima] = useState(false);
+  const [conFoco, setConFoco] = useState(false);
+  const [enVista, setEnVista] = useState(false);
+  const raiz = useRef<HTMLDivElement>(null);
   const dialogo = useRef<HTMLDialogElement>(null);
   const botonCompleta = useRef<HTMLButtonElement>(null);
   const inicioToque = useRef<number | null>(null);
@@ -52,11 +58,34 @@ export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: st
 
   const ir = useCallback((i: number) => setActual(((i % total) + total) % total), [total]);
 
+  // Con «reducir movimiento» no avanza sola.
+  const reducido = useSyncExternalStore(
+    (aviso) => {
+      const m = window.matchMedia("(prefers-reduced-motion: reduce)");
+      m.addEventListener("change", aviso);
+      return () => m.removeEventListener("change", aviso);
+    },
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => false,
+  );
+
   useEffect(() => {
-    if (!reproduciendo || total < 2) return;
-    const t = window.setInterval(() => setActual((i) => (i + 1) % total), INTERVALO_MS);
-    return () => window.clearInterval(t);
-  }, [reproduciendo, total]);
+    const el = raiz.current;
+    if (!el || total < 2) return;
+    const o = new IntersectionObserver(([e]) => setEnVista(!!e?.isIntersecting), {
+      threshold: 0.4,
+    });
+    o.observe(el);
+    return () => o.disconnect();
+  }, [total]);
+
+  const sonando = reproduciendo && !reducido;
+  const avanzando = sonando && total > 1 && enVista && !encima && !conFoco;
+  useEffect(() => {
+    if (!avanzando) return;
+    const t = window.setTimeout(() => setActual((i) => (i + 1) % total), INTERVALO_MS);
+    return () => window.clearTimeout(t);
+  }, [avanzando, actual, total]);
 
   const medirCarril = useCallback(() => {
     const c = carril.current;
@@ -77,6 +106,7 @@ export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: st
   const pasarMiniaturas = (sentido: 1 | -1) => {
     const c = carril.current;
     if (!c) return;
+    setReproduciendo(false);
     const li = c.children[0] as HTMLElement | undefined;
     const paso = li ? (li.offsetWidth + 10) * MINIATURAS_VISIBLES : c.clientWidth;
     const grupo = Math.round(c.scrollLeft / paso) + sentido;
@@ -121,7 +151,14 @@ export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: st
         />
       </div>
 
-      <div className={estilos.galeria}>
+      <div
+        ref={raiz}
+        className={estilos.galeria}
+        onPointerEnter={(e) => e.pointerType === "mouse" && setEncima(true)}
+        onPointerLeave={() => setEncima(false)}
+        onFocus={(e) => setConFoco(e.target.matches(":focus-visible"))}
+        onBlur={() => setConFoco(false)}
+      >
         <div
           className={estilos.visor}
           role="region"
@@ -134,7 +171,10 @@ export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: st
             if (inicioToque.current === null) return;
             const dx = e.clientX - inicioToque.current;
             inicioToque.current = null;
-            if (Math.abs(dx) > 40) ir(actual + (dx < 0 ? 1 : -1));
+            if (Math.abs(dx) > 40) {
+              setReproduciendo(false);
+              ir(actual + (dx < 0 ? 1 : -1));
+            }
           }}
         >
           <ul className={estilos.pista} style={{ transform: `translateX(-${actual * 100}%)` }}>
@@ -163,9 +203,9 @@ export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: st
                 type="button"
                 className={estilos.controlVisor}
                 onClick={() => setReproduciendo((r) => !r)}
-                aria-label={reproduciendo ? "Pausar las fotos" : "Pasar las fotos solas"}
+                aria-label={sonando ? "Pausar las fotos" : "Pasar las fotos solas"}
               >
-                {reproduciendo ? (
+                {sonando ? (
                   <IconPlayerPause aria-hidden="true" stroke={2} />
                 ) : (
                   <IconPlayerPlay aria-hidden="true" stroke={2} />

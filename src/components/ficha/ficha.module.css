@@ -121,7 +121,7 @@
    * 3 % de la tarjeta a los lados (40,6 px a 1440) y, desde el 2026-10-17
    * (dirección), también arriba: la foto quedaba pegada al borde superior.
    */
-  padding: 2.82cqi 2.82cqi 0;
+  padding: 2.82cqi 2.82cqi calc(2.82cqi - 3px);
 }
 
 .galeria {
@@ -135,11 +135,13 @@
 .visor {
   position: relative;
   /*
-   * 500 px MENOS el relleno de arriba de la columna (2026-10-17): así la columna
-   * de la galería mide lo mismo que antes, la tarjeta no crece y el título, que va
-   * centrado en vertical, no se mueve cuando la galería es la columna más alta.
+   * 500 px MENOS el relleno de arriba y de abajo de la columna (2026-10-17): así la
+   * columna de la galería mide lo mismo que antes, la tarjeta no crece y el título,
+   * que va centrado en vertical, no se mueve cuando la galería es la columna más
+   * alta. Las miniaturas llevan abajo el mismo margen que la foto a los lados
+   * (menos los 3 px de aire del carril).
    */
-  height: calc(500px - 2.82cqi);
+  height: calc(500px - 5.64cqi + 3px);
   overflow: hidden;
   border-radius: 32px;
   touch-action: pan-y;
@@ -750,7 +752,7 @@
   }
 
   .columnaGaleria {
-    padding: 2.82cqi;
+    padding: 2.82cqi 2.82cqi calc(2.82cqi - 3px);
   }
 
   .visor {
@@ -806,7 +808,7 @@
 
 @media (max-width: 767px) {
   .columnaGaleria {
-    padding: 4.7cqi;
+    padding: 4.7cqi 4.7cqi calc(4.7cqi - 3px);
   }
 
   .visor {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { TarjetaMarca } from "@/lib/repuestos/marca";
 
 import estilos from "./marca.module.css";
+import { RecuadrosConScroll } from "./RecuadrosConScroll";
 
 /**
  * «REPUESTOS SEGÚN TIPO DE MÁQUINA» (ux-9): una tarjeta por tipo de la marca
@@ -77,7 +78,12 @@ export function TarjetasMarca({
                   />
                 </div>
               ) : null}
-              <div className={estilos.panel} data-con-foto={t.imagen ? "" : undefined}>
+              <div
+                className={estilos.panel}
+                data-con-foto={t.imagen ? "" : undefined}
+                // En los índices, el recuadro se desplaza con el scroll (`RecuadrosConScroll`).
+                data-recuadro-scroll={indice && t.imagen ? "" : undefined}
+              >
                 <Nivel id={idT} className={estilos.tituloTarjeta}>
                   {t.titulo}
                 </Nivel>
@@ -98,6 +104,7 @@ export function TarjetasMarca({
           );
         })}
       </ul>
+      {indice ? <RecuadrosConScroll /> : null}
     </section>
   );
 }

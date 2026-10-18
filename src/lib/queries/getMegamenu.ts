@@ -44,7 +44,11 @@ const megamenuEnCache = unstable_cache(
       equiposNuevos,
     ] = await Promise.all([
       payload.find({ collection: "marcas-maquinaria", ...marcas }),
-      payload.find({ collection: "tipos-maquinaria", ...base, select: conMarca }),
+      payload.find({
+        collection: "tipos-maquinaria",
+        ...base,
+        select: { ...conMarca, subtipos: true },
+      }),
       payload.find({ collection: "categorias-maquinaria", ...base, select: sinMarca }),
       payload.find({ collection: "categorias-usada", ...base, select: sinMarca }),
       payload.find({ collection: "marcas", ...marcas }),

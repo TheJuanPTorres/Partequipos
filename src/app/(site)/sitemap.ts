@@ -85,7 +85,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getMarcasUsada(),
   ]);
 
-  const conEquipos = tiposConEquipos(equiposNuevos);
+  const conEquipos = tiposConEquipos(equiposNuevos, tiposMaquinaria);
 
   return buildSitemapEntries({
     paginas: paginas.map((pagina) => ({ slug: pagina.slug, updatedAt: pagina.updatedAt })),

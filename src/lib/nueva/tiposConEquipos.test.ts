@@ -37,3 +37,22 @@ describe("cambiaElMenuPorEquipo", () => {
     assert.equal(cambiaElMenuPorEquipo({ ...base, tipo: 6, tipoAnterior: 5 }), true);
   });
 });
+
+describe("tipos paraguas (#238)", () => {
+  const tipos = [
+    { id: 1, subtipos: [2, { id: 3 }] },
+    { id: 2 },
+    { id: 3 },
+    { id: 4, subtipos: [5] },
+  ];
+
+  it("un paraguas cuenta si algún subtipo tiene equipos, aunque él no tenga ninguno", () => {
+    const r = tiposConEquipos([{ tipo: 3 }], tipos);
+    assert.deepEqual([...r].sort(), [1, 3]);
+  });
+
+  it("un paraguas cuyos subtipos están vacíos sigue fuera", () => {
+    assert.ok(!tiposConEquipos([{ tipo: 2 }], tipos).has(4));
+    assert.ok(!tiposConEquipos([], tipos).has(1));
+  });
+});

@@ -654,6 +654,29 @@ a.pildora:hover {
   opacity: 0.75;
 }
 
+/* Un tipo con series (Hitachi): un subtítulo por serie, con su ancla. */
+.modelosGrupo {
+  /* El ancla no queda bajo la cabecera fija. */
+  scroll-margin-top: 120px;
+}
+
+.modelosGrupo + .modelosGrupo {
+  margin-top: 40px;
+}
+
+.modelosSerie {
+  margin: 40px 0 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-4);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.modelosSerie + .modelosLista {
+  margin-top: 20px;
+}
+
 .modelosVacio {
   max-width: 640px;
   margin: 30px auto 0;

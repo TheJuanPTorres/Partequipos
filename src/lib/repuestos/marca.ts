@@ -2,6 +2,7 @@ import type { CategoriasTecnica, Marca, RepuestosMarca, TiposEquipo } from "@/pa
 
 import { rutas } from "../routes";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
+import { claveSerie, seriesDeTipo } from "./series";
 
 /**
  * Lógica pura de la página de marca de repuestos (ux-9,
@@ -92,16 +93,33 @@ export type TarjetaMarca = {
  * Una tarjeta por tipo de la marca, con su enlace «Ver todo» a la página del
  * tipo. El título es el de ux-9: «Repuestos para maquinaria pesada <tipo>
  * <MARCA>». Un tipo sin nombre o sin slug no sale.
+ *
+ * Un tipo con SERIES (Hitachi: EX y ZAXIS) pinta una tarjeta por serie, en su
+ * orden, con el título de WordPress («… excavadora HITACHI EX»), su foto (o la
+ * del tipo) y el enlace al ancla de la serie en la página del tipo.
  */
 export function tarjetasDeTipos(marca: Marca, tipos: TiposEquipo[]): TarjetaMarca[] {
   const nombreMarca = marca.nombre.trim().toUpperCase();
   return tipos
     .filter((t) => t.nombre?.trim() && t.slug?.trim())
-    .map((t) => ({
-      clave: `tipo-${t.id}`,
-      titulo: `Repuestos para maquinaria pesada ${t.nombre.trim().toLowerCase()} ${nombreMarca}`,
-      href: rutas.tipo(marca.slug, t.slug),
-      imagen: imagenDeMedia(t.imagen, ""),
-      soloEscritorio: false,
-    }));
+    .flatMap((t) => {
+      const titulo = `Repuestos para maquinaria pesada ${t.nombre.trim().toLowerCase()} ${nombreMarca}`;
+      const href = rutas.tipo(marca.slug, t.slug);
+      const imagenTipo = imagenDeMedia(t.imagen, "");
+      const series = seriesDeTipo(t);
+      if (series.length === 0) {
+        return [{ clave: `tipo-${t.id}`, titulo, href, imagen: imagenTipo, soloEscritorio: false }];
+      }
+      return series.map((s) => {
+        const fila = t.series?.find((f) => claveSerie(f.nombre) === claveSerie(s.nombre));
+        return {
+          clave: `tipo-${t.id}-${s.ancla}`,
+          titulo: `${titulo} ${s.nombre.toUpperCase()}`,
+          // Con la barra final: así el ancla no pasa por la redirección de `trailingSlash`.
+          href: `${href}/#${s.ancla}`,
+          imagen: imagenDeMedia(fila?.imagen, "") ?? imagenTipo,
+          soloEscritorio: false,
+        };
+      });
+    });
 }

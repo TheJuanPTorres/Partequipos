@@ -1066,6 +1066,24 @@ a.modelo:hover {
   margin-inline: 0;
 }
 
+/*
+ * Dos secciones de tarjetas seguidas (categorías y marcas del índice de usados)
+ * se pintan como un solo bloque blanco: sin esquinas ni margen negativo entre
+ * ellas y con menos aire en la junta.
+ */
+.tarjetasIndice:has(+ .tarjetasIndice) {
+  padding-bottom: 40px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.tarjetasIndice + .tarjetasIndice {
+  margin-top: 0;
+  padding-top: 40px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 /* Aire entre filas, como en el diseño (unos 32 px en las capturas de la referencia a 1440). */
 .tarjetasIndice .rejilla {
   row-gap: 32px;

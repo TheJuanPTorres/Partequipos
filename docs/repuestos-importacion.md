@@ -16,10 +16,9 @@ npm run preview:repuestos:retirar            # deshace lo del manifiesto
 
 Solo el **preview**: la carga en producción irá por runbook de dirección (§6).
 
-> **LAS FOTOS DE LOS MODELOS NO SE IMPORTAN (dirección, 2026-10-13).** Según
-> el mapa de navegación, los modelos son enlaces dentro de su tipo; sus fotos,
-> solo si el cliente confirma que tendrán página propia. La simulación las
-> sigue contando (§5) para cuando se decida.
+> **LAS FOTOS DE LOS MODELOS SÍ SE IMPORTAN desde el 2026-10-17** (decisión
+> del cliente: se migra toda la información de su web). Del 2026-10-13 al
+> 2026-10-17 no se importaban (dirección). Detalle en §8.
 
 ## 1. Fuente: páginas de Elementor, extraídas del XML
 
@@ -82,7 +81,7 @@ sobre una placa oscura (PR #125). Tampoco sirven como imagen al compartir
 | Ammann (marca y su tipo) y PES Parts Equipment Solutions                                                                                          | 3 URL   | **301 al índice de marcas de repuestos** (dirección; pendiente de confirmar con el cliente)                                                                                                                                                                                                     |
 | Modelos CASE con un nivel de más (`…/cargador-frontal-case-construction/repuestos-para-maquinaria-pesada-excavadora-case-construction/<modelo>/`) | 4       | **301 a su página madre**, la «Excavadora» de CASE, que sí se migra (dirección)                                                                                                                                                                                                                 |
 | **Modelos con guion bajo en el slug** (`…-d6k_`, `…-dx225lca-cebdx_`, `…-dx340lca_`)                                                              | 3       | **El `_` no se permite en los slugs del sitio** (dirección, 2026-10-13). `…-d6k_` y `…-dx225lca-cebdx_` se guardan sin él, con **301 desde la URL de WordPress**; `…-dx340lca_` es la misma página que `…-dx340lca`: no se crea, solo el **301 a `…-dx340lca`**. `redirects-map.csv`, corregido |
-| Fotos de los modelos                                                                                                                              | 324     | No se importan (dirección)                                                                                                                                                                                                                                                                      |
+| Fotos de los modelos                                                                                                                              | 324     | **Se importan desde el 2026-10-17** (decisión del cliente, §8). Antes no (dirección)                                                                                                                                                                                                            |
 | Las 32 páginas de categoría técnica                                                                                                               | 32      | Necesitan plantilla y ruta nuevas (hoy dan 404)                                                                                                                                                                                                                                                 |
 
 Las 10 redirecciones (3 de Ammann y PES, 4 de CASE y 3 de los slugs con guion
@@ -131,7 +130,7 @@ producción la demo se vacía entera antes (§10.6).
   fallan fuera de Next, «static generation store missing»): las páginas
   prerenderizadas toman los datos en el siguiente despliegue.
 
-**Fotos de los modelos, por si el cliente las confirma:** serían 324 subidas
+**Fotos de los modelos** (medido el 2026-10-13; se importan desde el 2026-10-17, §8): 324 subidas
 (30 AVIF que pasan a WebP con `sharp` en la máquina que importa; `Media` sigue
 sin admitir AVIF, §10.28; el `sharp` 0.35.4 lleva libheif 1.23.2, la versión
 corregida del aviso). Con `fotos`, las 324 responden en WordPress y las AVIF se
@@ -189,3 +188,27 @@ el manifiesto:
 - 32 imágenes subidas y 32 tipos con su imagen; quitado el fondo de ejemplo de Caterpillar.
 - Segunda pasada: 0 subidas, mismos números.
 - **Retirada completa:** devolvió los 69 registros y las 33 imágenes cambiadas a su valor de antes (el fondo de ejemplo de Caterpillar, las imágenes de ejemplo de los tipos de la demo) y los 45 ficheros dieron 404; después se volvió a importar (32 de 32 tipos con su imagen)
+
+## 8. Fotos de los modelos (agente A, 2026-10-17, decisión del cliente)
+
+**El cliente decide migrar toda la información de su web**, aunque esté mal o
+desactualizada (CLAUDE.md §10.38). Las fotos de los modelos, que no se
+importaban, pasan al campo **«Imágenes (galería)»** que `modelos-repuesto` ya
+tenía: **sin migración**. La ficha del modelo ya pinta esa galería.
+
+- **Qué foto:** la de la sección principal de su página en WordPress que no sea
+  la **genérica de relleno** (la que sale en 5 páginas o más,
+  `fotosGenericas`; hoy una, en 21 modelos). **324 modelos con foto y 323
+  ficheros**: una foto la comparten dos modelos y se sube una vez.
+- **22 modelos sin foto:** 21 solo tienen la genérica y uno no tiene ninguna.
+- **El fichero:** `wp-repuesto-<adjunto>-<modelo>.<ext>`. El formato sale de
+  los bytes: las 30 AVIF van a WebP en la máquina que importa (`Media` no
+  admite AVIF). Texto alternativo: el de WordPress, o el nombre del modelo si
+  es flojo (`altDeRepuesto`).
+- **No se pisa lo de un editor:** solo se pone si la galería está vacía o
+  solo tiene fotos `wp-repuesto-`. El valor de antes queda en `imagenes` del
+  manifiesto y la retirada lo devuelve antes de borrar las fotos.
+- **Una segunda pasada no sube nada:** cada foto se busca por su adjunto.
+- **Sitio publicado:** `runbook-repuestos-fotos-modelos.md` (en
+  `Desktop\partequipos-cierre\`, lo ejecuta dirección): la misma importación
+  de siempre, que ahora añade las fotos.

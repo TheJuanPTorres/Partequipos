@@ -1284,6 +1284,24 @@ WordPress de `partequipos.com`. El nuestro está **cerrado a buscadores**
 >   campo y la de Andrés se borra de «Imágenes».
 > - **Reabre el paso 0 de README §7 solo para estas 7 imágenes:** antes del
 >   lanzamiento, se sustituyen o se licencian.
+>
+> **DECISIÓN DEL CLIENTE (2026-10-17): se migra TODA la información de su web,
+> aunque esté mal o desactualizada.** Las erratas y los datos erróneos se dejan
+> como en WordPress y se le pasa la lista. **Su contenido es su
+> responsabilidad**, también el de licencia dudosa. No es una excepción
+> temporal de Andrés: son fotos **del propio WordPress del cliente**.
+>
+> - **Las 11 fotos «dudosas» de Servicio técnico y Lubricantes** (las 7 de la
+>   galería de siniestros, el banner de Hitachi de posventa y 3 tarjetas de
+>   lubricantes; lista en `DUDOSAS` de `scripts/servicio-lubricantes/extraer-xml.py`),
+>   que desde el 2026-10-14 solo iban al preview: el importador ya **no las
+>   salta** en ningún destino. Sitio publicado: `runbook-servicio-lubricantes-dudosas.md`
+>   (en `Desktop\partequipos-cierre\`, dirección).
+> - **Las fotos de los 324 modelos de repuestos** (323 ficheros), que no se
+>   importaban desde el 2026-10-13: ahora sí, al campo «Imágenes» del modelo
+>   (`docs/repuestos-importacion.md` §8).
+> - **No reabre el paso 0 de README §7** para estas fotos: no son de la copia
+>   de demostración, y la decisión de publicarlas es del cliente.
 
 > **Decisión de dirección del 2026-10-02.** Para enseñar el avance, la home de
 > producción puede llevar los assets que hasta ahora solo iban al preview:

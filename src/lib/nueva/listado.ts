@@ -59,7 +59,11 @@ export type AmbitoNueva = {
   equipos: EquipoNuevoListado[];
   /** Ruta de la página n, sin barra final (la 1 es la del índice o la categoría). */
   ruta: (pagina: number) => string;
-  /** Las pestañas: una por categoría, más «Aditamentos» (decisión 2). */
+  /**
+   * Las pestañas: una por categoría, una por tipo marcado en el panel («Pestaña
+   * en el índice de maquinaria nueva», 2026-10-17), por orden alfabético, y
+   * «Aditamentos» al final (decisión 2).
+   */
   pestanas: { href: string; texto: string; activa: boolean }[];
 };
 
@@ -67,13 +71,16 @@ export type AmbitoNueva = {
 const SLUG_ADITAMENTOS = "aditamentos";
 
 async function ambitoDe(tipo: TipoListadoNueva, slug: string | null): Promise<AmbitoNueva | null> {
-  const { equipos, categorias } = await getListadoNueva();
+  const { equipos, categorias, pestanasTipos } = await getListadoNueva();
   const pestanas = [
-    ...categorias.map((c) => ({
-      href: `${rutas.categoriaNueva(c.slug)}/`,
-      texto: c.nombre,
-      activa: tipo === "categoria" && c.slug === slug,
-    })),
+    ...[
+      ...categorias.map((c) => ({
+        href: `${rutas.categoriaNueva(c.slug)}/`,
+        texto: c.nombre,
+        activa: tipo === "categoria" && c.slug === slug,
+      })),
+      ...pestanasTipos.map((t) => ({ href: t.href, texto: t.nombre, activa: false })),
+    ].sort((a, b) => a.texto.localeCompare(b.texto, "es")),
     {
       href: `${rutas.marcaMaquinaria(SLUG_ADITAMENTOS)}/`,
       texto: "Aditamentos",

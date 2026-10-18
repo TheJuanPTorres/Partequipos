@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { SeccionTestimonios } from "@/components/portada/diferidos";
+import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { ModelosTipo } from "@/components/repuestos/ModelosTipo";
@@ -10,9 +11,10 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getModelosDeTipo } from "@/lib/queries/getModelos";
-import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
+import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
+import { categoriasDeMarca } from "@/lib/repuestos/marca";
 import { enlacesDeModelos, gruposDeModelos, vistaEncabezadoTipo } from "@/lib/repuestos/tipo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
@@ -51,9 +53,10 @@ const ANCLA_MODELOS = "modelos-repuestos";
 export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo: TiposEquipo }) {
   const seg = segmentoDeTipo(tipo);
   const padre = poblado<TiposEquipo>(tipo.tipoPadre);
-  const [global, modelos, testimonios, empresa] = await Promise.all([
+  const [global, modelos, categorias, testimonios, empresa] = await Promise.all([
     getRepuestosMarca(),
     getModelosDeTipo(tipo.id),
+    getCategoriasParaMarca(),
     getTestimoniosDePortada(),
     getEmpresa(),
   ]);
@@ -88,6 +91,13 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         modelos={enlaces}
         grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
+      />
+
+      <CategoriasMarca
+        id="categorias-repuestos"
+        titulo={texto(global.tituloCategorias)}
+        categorias={categoriasDeMarca(categorias)}
+        fondo="gris"
       />
 
       <ContactoMarca

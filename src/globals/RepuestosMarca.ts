@@ -6,9 +6,12 @@ import { revalidarMarcasDeRepuestos } from "../lib/revalidation";
 
 /**
  * Lo COMÚN a las páginas de marca de repuestos (ux-9,
- * docs/diseno/decisiones-repuestos-marca.md): los títulos de sus secciones y
- * las dos tarjetas que no salen de los datos de la marca (maquinaria usada y
- * aditamentos, que llevan al marketplace).
+ * docs/diseno/decisiones-repuestos-marca.md): los títulos de sus secciones.
+ *
+ * Las tarjetas «Maquinaria pesada usada» y «Aditamentos» ya NO se pintan en
+ * las páginas de marca (cliente, 2026-10-17): sus campos quedan OCULTOS en el
+ * panel, sin borrarlos de la base (no hace falta migración y el importador de
+ * repuestos los sigue rellenando). Si vuelven, basta con quitar `hidden`.
  *
  * Todo opcional: una sección sin su título no se pinta. La migración que crea
  * el global siembra los textos de ux-9 con SQL explícito (CLAUDE.md §3.5).
@@ -19,6 +22,7 @@ const tarjeta = (nombre: string, etiqueta: string): Field => ({
   name: nombre,
   type: "group",
   label: etiqueta,
+  admin: { hidden: true },
   fields: [
     { name: "titulo", type: "text", label: "Título" },
     {
@@ -84,8 +88,7 @@ export const RepuestosMarca: GlobalConfig = {
       type: "text",
       label: "Título de los tipos de máquina",
       admin: {
-        description:
-          "Vacío: no se pintan las tarjetas de tipos de máquina, ni las de usada y aditamentos (van en la misma sección).",
+        description: "Vacío: no se pintan las tarjetas de tipos de máquina.",
       },
     },
     {

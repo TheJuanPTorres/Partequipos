@@ -18,7 +18,7 @@ import {
   getTiposDeMarcaConImagen,
 } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
-import { categoriasDeMarca, tarjetasDeLaPagina, vistaEncabezado } from "@/lib/repuestos/marca";
+import { categoriasDeMarca, tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -94,7 +94,7 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
         id="repuestos-marca-tipos"
         titulo={texto(global.tituloTipos)}
         verTodo={texto(global.verTodoTexto)}
-        tarjetas={tarjetasDeLaPagina(marca, tipos, global)}
+        tarjetas={tarjetasDeTipos(marca, tipos)}
       />
 
       <ContactoMarca

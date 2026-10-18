@@ -105,34 +105,3 @@ export function tarjetasDeTipos(marca: Marca, tipos: TiposEquipo[]): TarjetaMarc
       soloEscritorio: false,
     }));
 }
-
-type TarjetaGlobal = NonNullable<RepuestosMarca["tarjetaUsadas"]>;
-
-/**
- * Las dos tarjetas del marketplace (usada y aditamentos). Sin título o sin
- * enlace no se pintan: nada de tarjetas que lleven a ninguna parte.
- */
-export function tarjetaDeMarketplace(
-  clave: string,
-  t: TarjetaGlobal | null | undefined,
-): TarjetaMarca | null {
-  const titulo = texto(t?.titulo);
-  const href = texto(t?.enlace);
-  if (!titulo || !href) return null;
-  return { clave, titulo, href, imagen: imagenDeMedia(t?.imagen, ""), soloEscritorio: true };
-}
-
-/** Los tipos primero y, al final, usadas y aditamentos (los que existan). */
-export function tarjetasDeLaPagina(
-  marca: Marca,
-  tipos: TiposEquipo[],
-  global: RepuestosMarca,
-): TarjetaMarca[] {
-  return [
-    ...tarjetasDeTipos(marca, tipos),
-    ...[
-      tarjetaDeMarketplace("usadas", global.tarjetaUsadas),
-      tarjetaDeMarketplace("aditamentos", global.tarjetaAditamentos),
-    ].filter((t): t is TarjetaMarca => t !== null),
-  ];
-}

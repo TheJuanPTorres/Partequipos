@@ -22,6 +22,8 @@ export const CLAVES_PREVIEW = [
   "VERCEL_AUTOMATION_BYPASS_SECRET",
   // Token de lectura de la API del preview (2026-10-15, `src/lib/seguridad/lecturaApi.ts`).
   "API_LECTURA_TOKEN",
+  // Secreto de `POST /api/revalidar/` del preview (2026-10-18, `src/lib/seguridad/tokenRevalidacion.ts`).
+  "REVALIDACION_TOKEN",
 ] as const;
 type Clave = (typeof CLAVES_PREVIEW)[number];
 

@@ -23,9 +23,13 @@
  * dirección, 2026-10-14): una foto real en lugar de la de ejemplo de ux-9
  * (`IMAGENES_TARJETAS`), con la misma regla: no se pisa la de un editor.
  *
- * LAS FOTOS DE LOS MODELOS NO SE IMPORTAN (dirección, 2026-10-13): los
- * modelos son enlaces dentro de su tipo; las fotos, solo si el cliente
- * confirma que tendrán página propia. La simulación las sigue contando.
+ * FOTOS DE LOS MODELOS (decisión del cliente, 2026-10-17: se migra todo): la
+ * foto propia de cada modelo en WordPress (la primera que no es la genérica de
+ * relleno) va a su campo «Imágenes» (`wp-repuesto-<adjunto>-…`; una foto
+ * compartida se sube una vez; AVIF a WebP por el formato real). Con la misma
+ * regla que los tipos: solo si el campo está vacío o ya es suyo; lo de un
+ * editor no se pisa. El valor de antes queda en `imagenes` del manifiesto.
+ * Del 2026-10-13 al 2026-10-17 no se importaban (dirección).
  *
  * ANTES DE IMPORTAR se retiran de la demo del preview los tipos y modelos que
  * no existen en WordPress (2 tipos y 25 modelos, dirección, 2026-10-13): 21
@@ -175,6 +179,13 @@ type CambioImagen =
       id: number;
       campo: "fondoHero" | "imagen";
       antes: number | null;
+    }
+  | {
+      /** La galería de un modelo que ya existía (2026-10-17). */
+      coleccion: "modelos-repuesto";
+      id: number;
+      campo: "imagenes";
+      antes: number[] | null;
     }
   | {
       /** El global: `id` es siempre 0. */
@@ -563,6 +574,7 @@ const enMedia = await todo<{ id: number; filename?: string | null }>("media");
 const idMarca = new Map(enMarcas.map((m) => [m.slug, m.id]));
 const claveTipo = new Map(enTipos.map((t) => [`${t.marca}/${t.slug}`, t.id]));
 const claveModelo = new Set(enModelos.map((m) => `${m.tipo}/${m.slug}`));
+const PREFIJO_FOTO_MODELO = "wp-repuesto-";
 const yaSubidas = new Set(
   enMedia
     .map((m) => m.filename?.match(/^wp-repuesto-(\d+)-/)?.[1])
@@ -674,12 +686,23 @@ const fondosDeEjemplo = enMarcas
   .filter((m) => m.fondoHero && ficheroDeMedia.get(m.fondoHero)?.startsWith(PREFIJO_EJEMPLO_MARCA))
   .map((m) => m.slug);
 
-// Fotos de los modelos: NO se importan; se cuentan por si el cliente las confirma.
+// Fotos de los modelos (decisión del cliente, 2026-10-17).
 
 // Una foto compartida por dos modelos se sube una vez (nombre por id de adjunto).
 const fotosUnicas = new Map<number, PlanFoto>();
 for (const m of modelos) if (m.foto) fotosUnicas.set(m.foto.idWp, m.foto);
 const aSubir = [...fotosUnicas.values()].filter((f) => !yaSubidas.has(f.idWp));
+/** La galería de un modelo se puede poner si está vacía o solo tiene fotos de esta importación. */
+const galeriaSustituible = (ids: number[] | null | undefined) =>
+  (ids ?? []).every((id) => (ficheroDeMedia.get(id) ?? "").startsWith(PREFIJO_FOTO_MODELO));
+const modelosConFotoDeEditor = modelos
+  .filter((m) => {
+    if (!m.foto) return false;
+    const idT = claveTipo.get(`${idMarca.get(m.marca)}/${m.tipo}`);
+    const doc = enModelos.find((x) => x.tipo === idT && x.slug === m.slug);
+    return !!doc && !galeriaSustituible(doc.imagenes);
+  })
+  .map((m) => `${m.marca}/${m.tipo}/${m.slug}`);
 const porFormato = (fs_: PlanFoto[]) =>
   fs_.reduce<Record<string, number>>(
     (a, f) => ({ ...a, [f.formatoWp]: (a[f.formatoWp] ?? 0) + 1 }),
@@ -823,8 +846,11 @@ const resumen = {
     imagenesDeTipoYaSubidas: imagenesTipo.size - imagenesTipoASubir.length,
     otrasOperaciones: 0,
   },
-  fotosDeModelosNoSeImportan: {
-    serian: aSubir.length,
+  fotosDeModelos: {
+    modelosConFoto: modelos.filter((m) => m.foto).length,
+    subidas: aSubir.length,
+    yaSubidas: fotosUnicas.size - aSubir.length,
+    conFotoDeEditorSinTocar: modelosConFotoDeEditor,
     porFormatoDeOrigen: porFormato(aSubir),
     aConvertirAWebp: aSubir.filter((f) => f.convertir).length,
   },
@@ -866,7 +892,7 @@ log(`no se importan: ${JSON.stringify({ ...resumen.noSeImportan })}`);
 log(`en el preview: ${JSON.stringify(resumen.enElPreview)}`);
 log(`retirada de la demo: ${JSON.stringify(resumen.retiradaDeLaDemo)}`);
 log(`BLOB: ${JSON.stringify(resumen.blob)}`);
-log(`fotos de modelos (NO se importan): ${JSON.stringify(resumen.fotosDeModelosNoSeImportan)}`);
+log(`fotos de modelos: ${JSON.stringify(resumen.fotosDeModelos)}`);
 log(`fotos: ${JSON.stringify(resumen.comprobacionFotos)}`);
 for (const f of comprobacion.fallos) log(`foto ${f.idWp}: ${f.error}`);
 log(`avisos: ${avisos.length} (en el informe)`);
@@ -1020,7 +1046,7 @@ async function imagenEnMedia(i: PlanImagen): Promise<number> {
   let datos = await descargar(i.url);
   const f =
     formatoDeImagen((await sharp(datos).metadata()).format) ??
-    fallar(`imagen del tipo (adjunto ${i.idWp}): formato que Media no admite`);
+    fallar(`imagen (adjunto ${i.idWp}): formato que Media no admite`);
   if (f.convertir) datos = await sharp(datos).webp({ quality: 82 }).toBuffer();
   const nombre = `${i.fichero}.${f.ext}`;
   const doc = await payload.create({
@@ -1145,7 +1171,7 @@ log(
   `tipos: ${tipos.length} (imágenes subidas: ${manifiesto.creado.media.filter((x) => x.filename.startsWith(PREFIJO_IMAGEN_TIPO)).length}; con imagen de editor, sin tocar: ${tiposConImagenDeEditor.length})`,
 );
 
-// 5. Modelos (por tipo + slug, el índice único). Sin fotos.
+// 5. Modelos (por tipo + slug, el índice único), con su foto si la tienen.
 const modelosAhora = (
   await payload.find({
     collection: "modelos-repuesto",
@@ -1155,10 +1181,35 @@ const modelosAhora = (
   })
 ).docs as unknown as DocModelo[];
 let hechos = 0;
+let fotosPuestas = 0;
 for (const m of modelos) {
   const marca = idMarcaFinal.get(m.marca)!;
   const tipo = idTipoFinal.get(`${m.marca}/${m.tipo}`)!;
   const doc = modelosAhora.find((x) => x.tipo === tipo && x.slug === m.slug);
+  // La foto: en la galería, salvo que un editor haya puesto otras (`galeriaSustituible`).
+  let imagenes: number[] | undefined;
+  if (m.foto && galeriaSustituible(doc?.imagenes)) {
+    const { fichero } = m.foto;
+    const id = await imagenEnMedia({
+      idWp: m.foto.idWp,
+      url: m.foto.url,
+      fichero: fichero.slice(0, fichero.lastIndexOf(".")),
+      alt: m.foto.alt,
+    });
+    imagenes = [id];
+    const antes = doc?.imagenes ?? [];
+    // Un modelo que creó esta importación se borra al retirar: su galería no hace falta apuntarla.
+    const creadoAqui = !!doc && manifiesto.creado.modelos.some((x) => x.id === doc.id);
+    if (doc && !creadoAqui && (antes.length !== 1 || antes[0] !== id)) {
+      recordarImagen({
+        coleccion: "modelos-repuesto",
+        id: doc.id,
+        campo: "imagenes",
+        antes: antes.length ? antes : null,
+      });
+    }
+    fotosPuestas++;
+  }
   const data = {
     nombre: m.nombre,
     slug: m.slug,
@@ -1167,6 +1218,7 @@ for (const m of modelos) {
     codigo: m.codigo,
     descripcion: m.descripcion,
     seo: { ...(doc?.seo ?? {}), ...m.seo },
+    ...(imagenes ? { imagenes } : {}),
   };
   const clave = `${m.marca}/${m.tipo}/${m.slug}`;
   if (doc) {
@@ -1193,7 +1245,9 @@ for (const m of modelos) {
   }
   if (++hechos % 50 === 0) log(`modelos: ${hechos} de ${modelos.length}`);
 }
-log(`modelos: ${modelos.length}`);
+log(
+  `modelos: ${modelos.length} (con foto: ${fotosPuestas}; fotos subidas: ${manifiesto.creado.media.filter((x) => x.filename.startsWith(PREFIJO_FOTO_MODELO)).length}; con fotos de editor, sin tocar: ${modelosConFotoDeEditor.length})`,
+);
 
 // 5b. Tarjetas «Maquinaria pesada usada» y «Aditamentos» del global (salvo la de un editor).
 const globalAhora = await payload.findGlobal({
@@ -1249,7 +1303,7 @@ for (const r of redirecciones) {
 }
 log(`redirecciones: ${manifiesto.creado.redirects.length} creadas`);
 log(
-  `importación terminada · creados: ${manifiesto.creado.marcas.length} marcas, ${manifiesto.creado.tipos.length} tipos, ${manifiesto.creado.modelos.length} modelos, ${manifiesto.creado.media.length} imágenes (logos, tipos y tarjetas) · actualizados: ${manifiesto.actualizado.length} · imágenes cambiadas: ${(manifiesto.imagenes ?? []).length} · demo retirada: ${manifiesto.retiradoDeLaDemo.length}`,
+  `importación terminada · creados: ${manifiesto.creado.marcas.length} marcas, ${manifiesto.creado.tipos.length} tipos, ${manifiesto.creado.modelos.length} modelos, ${manifiesto.creado.media.length} imágenes (logos, tipos, tarjetas y modelos) · actualizados: ${manifiesto.actualizado.length} · imágenes cambiadas: ${(manifiesto.imagenes ?? []).length} · demo retirada: ${manifiesto.retiradoDeLaDemo.length}`,
 );
 log(`manifiesto: ${MANIFIESTO}`);
 process.exit(0);

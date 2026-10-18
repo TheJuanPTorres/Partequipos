@@ -22,7 +22,7 @@ Inventario previo y decisiones: `Desktop\partequipos-cierre\propuestas\2026-10-1
    - ancla en los bloques de página;
    - bloques «Galería» y «Vídeo de YouTube».
 2. **Las 4 subpáginas de lubricantes** (auto liviano, auto pesado, engranajes, motos y scooter) pasan a ser **secciones** de la página de la marca, con un **301** de cada URL antigua a su ancla.
-3. **Fotos de licencia dudosa: solo en el preview** hasta que confirme el cliente:
+3. **Fotos de licencia dudosa: solo en el preview** hasta que confirme el cliente (**levantado el 2026-10-17 por decisión del cliente**, §4):
    - la galería de siniestros;
    - el banner de Hitachi.
 4. **Vídeos:**
@@ -88,13 +88,15 @@ Sus «Contenido» y «Secciones con ancla» de demostración se vacían al impor
 
 ## 4. Fotos de licencia dudosa
 
-Llevan `dudosa: true` en el JSON del extractor e **importar las salta en cualquier destino que no sea el preview**. El bloque o la tarjeta se pinta igual, sin foto.
+> **DECISIÓN DEL CLIENTE (2026-10-17): se importan en todos los destinos.** El cliente decide migrar toda la información de su web tal como está. Su contenido es su responsabilidad (CLAUDE.md §10.38). El importador ya no salta ninguna; `dudosa: true` queda en el JSON solo como lista. Para el sitio publicado, `runbook-servicio-lubricantes-dudosas.md` (en `Desktop\partequipos-cierre\`, lo ejecuta dirección).
+
+Hasta el 2026-10-17 llevaban `dudosa: true` en el JSON del extractor e importar las saltaba en cualquier destino que no fuera el preview; el bloque o la tarjeta se pintaba igual, sin foto. Son 11:
 
 - Las 7 de la galería de siniestros: miniaturas de YouTube, imágenes de Twitter y una de prensa.
 - El banner de Hitachi de posventa.
 - **Además, por el mismo criterio:** las fotos de 3 tarjetas de lubricantes. Por su nombre son de banco o de terceros: dos de Freepik y una de DeviantArt.
 
-**Para levantarlo:** el cliente confirma la licencia y se repite la importación en el sitio publicado, que ya no las saltaría si se quitan de `DUDOSAS`.
+**Cómo se levantó:** se quita el salto del importador y se repite la importación en el sitio publicado (la segunda pasada no duplica: solo sube las 11 y las pone en su bloque o su tarjeta).
 
 ## 5. Medido en el preview (2026-10-14)
 

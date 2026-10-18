@@ -18,8 +18,8 @@ Reglas de la réplica (CLAUDE.md §9, «Decisiones estándar»):
 - Lo oculto en los tres tamaños no existe: se salta.
 - Las erratas se corrigen y se anotan (`erratas` del JSON).
 - Una ficha técnica que es la de OTRO producto no se copia (`erratas`).
-- Las fotos de licencia dudosa llevan `dudosa: true` y solo van al preview
-  (decisión de dirección del 2026-10-14).
+- Las fotos de licencia dudosa llevan `dudosa: true`, como lista. Desde el
+  2026-10-17 van a todos los destinos (decisión del cliente, CLAUDE.md §10.38).
 """
 
 import html
@@ -43,7 +43,8 @@ PAGINAS = {
 
 # Fotos de licencia dudosa: de banco o de terceros por su nombre y procedencia
 # (miniaturas de YouTube, imágenes de Twitter, prensa, Freepik, DeviantArt) y
-# el banner oficial de Hitachi. Solo al preview hasta que confirme el cliente.
+# el banner oficial de Hitachi. Solo se marcan: desde el 2026-10-17 se importan
+# en todos los destinos (decisión del cliente: su contenido, su responsabilidad).
 DUDOSAS = {
     "2022/04/sddefault.jpg",
     "2022/04/retroexcavadora_icononzo.jpeg",

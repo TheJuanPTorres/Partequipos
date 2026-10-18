@@ -977,6 +977,11 @@ a.modelo:hover {
   background: var(--color-fondo-seccion);
 }
 
+/* El blanco de una foto de producto toma el gris de la caja (las de color apenas cambian, un 6 %). */
+.tarjetasIndice .foto .fotoImg {
+  mix-blend-mode: multiply;
+}
+
 /* El botón como el export: borde de 1 px de su color y la flecha a 12 px del texto. */
 .tarjetasIndice .botonTarjeta {
   gap: 12px;

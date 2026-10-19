@@ -42,14 +42,16 @@ export function vistaEncabezadoDeIndice(
 }
 
 /**
- * Las tarjetas del índice, en su orden y hasta seis. Una sin título o sin
+ * Las tarjetas del índice, en su orden y hasta seis. Una con «Mostrar en la
+ * web» desmarcada no sale (cliente, 2026-10-19). Una sin título o sin
  * enlace no sale (nada de tarjetas que lleven a ninguna parte); sin foto, se
  * pinta solo con el panel. Ninguna se oculta en móvil: con contenido real, ocultar
  * una quitaría un enlace (en ux-9 la segunda fila era relleno repetido).
  */
 export function tarjetasDeIndice(grupo: GrupoIndice | null | undefined): TarjetaMarca[] {
   return (grupo?.tarjetas ?? [])
-    .filter((t) => texto(t.titulo) && texto(t.enlace))
+    // `mostrar` desmarcada: oculta sin borrarla (vacía en filas antiguas = se muestra).
+    .filter((t) => t.mostrar !== false && texto(t.titulo) && texto(t.enlace))
     .slice(0, 6)
     .map((t, i) => ({
       clave: t.id ?? `indice-${i}`,

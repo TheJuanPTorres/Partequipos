@@ -1239,6 +1239,41 @@ a.modelo:hover {
   }
 }
 
+/*
+ * La ÚLTIMA FILA INCOMPLETA va CENTRADA (cliente, 2026-10-19), también con solo
+ * 2 tarjetas en total. Una rejilla CSS no centra una fila a medias, así que en
+ * los índices la lista pasa a flex con salto de línea y cada tarjeta mide
+ * exactamente una columna de la rejilla de antes (3, 2 o 1 por fila, con los
+ * mismos 20 px entre columnas): las filas completas no cambian. Las tarjetas de
+ * una fila se siguen igualando en alto (`align-items: stretch` de flex).
+ */
+.tarjetasIndice .rejilla {
+  --columnas: 3;
+  --hueco-columnas: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: var(--hueco-columnas);
+}
+
+.tarjetasIndice .rejilla > .tarjeta {
+  flex: 0 0
+    calc((100% - (var(--columnas) - 1) * var(--hueco-columnas)) / var(--columnas));
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .tarjetasIndice .rejilla {
+    --columnas: 2;
+  }
+}
+
+@media (max-width: 767px) {
+  .tarjetasIndice .rejilla {
+    --columnas: 1;
+  }
+}
+
 /* --- «Qué incluye» sencillo (versión PROVISIONAL, dirección 2026-10-19) ------------------- */
 
 .queIncluyeSencillo {

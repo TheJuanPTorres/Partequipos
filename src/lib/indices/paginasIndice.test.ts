@@ -51,6 +51,20 @@ describe("tarjetasDeIndice", () => {
     assert.equal(t[0]?.href, "/marcas/");
   });
 
+  it("«Mostrar en la web» desmarcada la oculta; vacía (filas antiguas) se muestra", () => {
+    const conCasilla = {
+      tarjetas: [
+        { id: "a", titulo: "Marcas", enlace: "/m/", mostrar: true },
+        { id: "b", titulo: "Categorías", enlace: "/c/", mostrar: null },
+        { id: "c", titulo: "Filtración", enlace: "/f/", mostrar: false },
+      ],
+    } as NonNullable<PaginasIndice["repuestos"]>;
+    assert.deepEqual(
+      tarjetasDeIndice(conCasilla).map((x) => x.titulo),
+      ["Marcas", "Categorías"],
+    );
+  });
+
   it("ninguna se oculta en móvil", () => {
     assert.ok(tarjetasDeIndice(grupo).every((t) => t.soloEscritorio === false));
   });

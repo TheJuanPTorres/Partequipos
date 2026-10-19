@@ -12,8 +12,9 @@ import { sinRecorte } from "./hooks/sinRecorte";
  * «Tipografía del título» de cada diapositiva del hero, además de Inter.
  *
  * COLECCIÓN APARTE, como las animaciones: `Media` sigue solo con imágenes
- * (§10.28). Entra WOFF2, WOFF o TTF, comprobado por su contenido
- * (`formatoDeFuentePermitido`, que deja el formato para el `@font-face`).
+ * (§10.28). Entra WOFF2, WOFF, TTF u OTF, comprobado por su extensión y su
+ * firma (`formatoDeFuentePermitido`, que deja el formato para el `@font-face`
+ * y fija el tipo MIME: el que manda Chrome en Windows no sirve).
  *
  * Se sirve desde el CDN del Blob (que responde con
  * `Access-Control-Allow-Origin: *`, necesario para una fuente de otro
@@ -29,7 +30,7 @@ export const Fuente: CollectionConfig = {
     defaultColumns: ["nombre", "filename", "formato"],
     group: "Archivos",
     description:
-      "Tipos de letra propios para el título del hero (WOFF2, o WOFF/TTF; máximo 4 MB). Después se eligen en «Tipografía del título» de cada diapositiva. Comprueba que la licencia permite usarla en una web.",
+      "Tipos de letra propios para el título del hero (WOFF2, o WOFF/TTF/OTF; máximo 4 MB). Después se eligen en «Tipografía del título» de cada diapositiva. Comprueba que la licencia permite usarla en una web.",
   },
   access: {
     read: lecturaContenido,
@@ -38,8 +39,16 @@ export const Fuente: CollectionConfig = {
     delete: borradoAdmin,
   },
   upload: {
+    // Las extensiones, para el selector de ficheros: Windows no asocia
+    // `.woff2` ni `.ttf` a su tipo, y el diálogo podía esconderlos. Solo cuentan en
+    // el `accept`; la validación de Payload compara tipos MIME.
     mimeTypes: [
+      ".woff2",
+      ".woff",
+      ".ttf",
+      ".otf",
       "font/woff2",
+      "font/otf",
       "font/woff",
       "font/ttf",
       "font/sfnt",
@@ -90,7 +99,10 @@ export const Fuente: CollectionConfig = {
         { label: "WOFF", value: "woff" },
         { label: "TTF", value: "truetype" },
       ],
-      admin: { readOnly: true, description: "Lo lee del fichero al subirlo." },
+      admin: {
+        readOnly: true,
+        description: "Se rellena solo al subir el fichero. OTF sale como TTF.",
+      },
     },
   ],
 };

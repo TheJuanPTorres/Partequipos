@@ -1,0 +1,220 @@
+/* CABECERA «MOSAICO DE MARCAS» del índice de marcas de nueva (diseño propio). */
+
+.seccion {
+  margin: 24px 1.5vw 0;
+  padding: 56px 5% 48px;
+  border-radius: 30px;
+  background: var(--color-fondo);
+}
+
+.cabeza {
+  display: flex;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-3);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.texto {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-cuerpo);
+}
+
+/* Bento de 6 columnas: las dos primeras marcas ocupan 2 × 2; el resto, 1 × 1. */
+.mosaico {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  grid-auto-flow: dense;
+  grid-auto-rows: 210px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  list-style: none;
+}
+
+.pieza {
+  position: relative;
+  transition:
+    transform 0.35s ease,
+    filter 0.35s ease;
+}
+
+.pieza[data-tam="grande"] {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.enlace {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #1f1d1b;
+  color: #fff;
+  text-decoration: none;
+  clip-path: inset(0 round 30px);
+}
+
+.foto {
+  object-fit: cover;
+  transform: scale(1.08);
+  transition: transform 0.6s ease;
+}
+
+.velo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.05) 35%, rgb(0 0 0 / 0.72));
+}
+
+.placa {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.18);
+}
+
+.logo {
+  width: auto;
+  max-width: 120px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.pieza[data-tam="normal"] .logo {
+  max-width: 84px;
+  height: 22px;
+}
+
+.pie {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  left: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.nombre {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.pieza[data-tam="grande"] .nombre {
+  font-size: 32px;
+}
+
+.cuenta {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Al pasar el ratón o enfocar: la pieza crece un poco y las demás se atenúan. */
+.mosaico:has(.enlace:hover, .enlace:focus-visible) .pieza {
+  filter: brightness(0.55) saturate(0.8);
+}
+
+.mosaico .pieza:has(.enlace:hover, .enlace:focus-visible) {
+  z-index: 1;
+  filter: none;
+  transform: scale(1.025);
+}
+
+.pieza:has(.enlace:hover, .enlace:focus-visible) .foto {
+  transform: scale(1);
+}
+
+.enlace:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1024px) {
+  .mosaico {
+    grid-auto-rows: 180px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    padding: 36px 16px 24px;
+  }
+
+  .cabeza {
+    margin-bottom: 20px;
+  }
+
+  .mosaico {
+    grid-auto-rows: 150px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .pieza[data-tam="grande"] {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+
+  .nombre {
+    font-size: 16px;
+  }
+
+  .pieza[data-tam="grande"] .nombre {
+    font-size: 22px;
+  }
+
+  .cuenta {
+    font-size: 12px;
+  }
+
+  .placa {
+    top: 10px;
+    left: 10px;
+    padding: 7px 10px;
+    border-radius: 12px;
+  }
+
+  .logo,
+  .pieza[data-tam="normal"] .logo {
+    max-width: 72px;
+    height: 18px;
+  }
+}
+
+/* Con «reducir movimiento»: sin efectos (ni crecer, ni atenuar, ni zoom de la foto). */
+@media (prefers-reduced-motion: reduce) {
+  .pieza,
+  .foto {
+    transition: none;
+  }
+
+  .mosaico:has(.enlace:hover, .enlace:focus-visible) .pieza,
+  .mosaico .pieza:has(.enlace:hover, .enlace:focus-visible) {
+    filter: none;
+    transform: none;
+  }
+
+  .pieza:has(.enlace:hover, .enlace:focus-visible) .foto {
+    transform: scale(1.08);
+  }
+}

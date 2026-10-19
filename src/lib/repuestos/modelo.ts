@@ -34,6 +34,15 @@ export function vistaModelo(modelo: ModelosRepuesto): VistaModelo {
 }
 
 /**
+ * ¿Se pinta el diseño propio? Solo si el global lo elige expresamente: sin
+ * valor, o con cualquier otro, la versión provisional (dirección, 2026-10-19:
+ * en el sitio publicado solo van diseños de Andrés).
+ */
+export function usaDisenoPropio(global: { disenoModelo?: string | null }): boolean {
+  return global.disenoModelo === "propio";
+}
+
+/**
  * Las categorías de la página de un modelo: las que su tipo eligió en
  * «Categorías en las páginas de sus modelos», en ESE orden. Una que ya no
  * existe (o sin nombre) no sale. `todas` son las categorías técnicas.

@@ -322,6 +322,8 @@ if (modo === "retirar") {
     depth: 0,
     overrideAccess: true,
   });
+  // Solo se informa: el importador carga contenido y nunca cambia el diseño.
+  log(`diseño de las páginas de modelo: ${global.disenoModelo ?? "provisional"} (no se toca)`);
   if (idDe(global.modeloAyudaFoto) !== null) {
     log("tarjeta de ayuda: ya tiene foto, no se toca");
   } else if (!fs.existsSync(FOTO)) {

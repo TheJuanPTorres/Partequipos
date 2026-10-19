@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import type { CategoriasTecnica, ModelosRepuesto } from "@/payload-types";
 
-import { categoriasDelTipo, vistaModelo } from "./modelo";
+import { categoriasDelTipo, usaDisenoPropio, vistaModelo } from "./modelo";
 
 const modelo = (extra: Partial<ModelosRepuesto> = {}) =>
   ({ id: 1, nombre: "Excavadora EJEMPLO X100", ...extra }) as ModelosRepuesto;
@@ -60,5 +60,14 @@ describe("categoriasDelTipo", () => {
 
   it("sin categorías elegidas, ninguna", () => {
     assert.deepEqual(categoriasDelTipo({ categoriasModelo: null }, todas), []);
+  });
+});
+
+describe("usaDisenoPropio", () => {
+  it("solo con «propio» elegido expresamente", () => {
+    assert.equal(usaDisenoPropio({ disenoModelo: "propio" }), true);
+    assert.equal(usaDisenoPropio({ disenoModelo: "provisional" }), false);
+    assert.equal(usaDisenoPropio({ disenoModelo: null }), false);
+    assert.equal(usaDisenoPropio({}), false);
   });
 });

@@ -164,6 +164,26 @@ export const RepuestosMarca: GlobalConfig = {
       label: "Páginas de modelo",
       admin: { initCollapsed: true },
       fields: [
+        /*
+         * Dirección, 2026-10-19: en el sitio publicado solo van diseños de
+         * Andrés. El diseño propio del #267 se queda en el código, apagado,
+         * hasta que llegue el suyo.
+         */
+        {
+          name: "disenoModelo",
+          type: "select",
+          label: "Diseño de las páginas de modelo",
+          defaultValue: "provisional",
+          required: true,
+          options: [
+            { label: "Provisional (sencillo)", value: "provisional" },
+            { label: "Diseño propio (sin plantilla de Andrés)", value: "propio" },
+          ],
+          admin: {
+            description:
+              "«Provisional»: el contenido de WordPress en una página sencilla. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.",
+          },
+        },
         {
           name: "modeloAyudaTitulo",
           type: "text",

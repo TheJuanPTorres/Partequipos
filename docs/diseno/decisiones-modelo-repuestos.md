@@ -7,7 +7,7 @@
 > disponibles para…» con la lista de piezas donde WordPress la pinta y los enlaces a sus categorías, la tarjeta de ayuda
 > en sencillo y el formulario con «Ciudad»). El diseño propio de abajo sigue en el código y se enciende con «Diseño
 > propio»; queda como referencia hasta que llegue la plantilla de Andrés. Migración
-> 20261019_*_diseno_modelo_repuestos (solo esquema, DEFAULT 'provisional').
+> 20261019_181113_diseno_modelo_repuestos (solo esquema, DEFAULT 'provisional').
 
 **Diseño nuestro, sin plantilla de Andrés**, aprobado por dirección el 2026-10-19 tras tres rondas de muestra en el
 laboratorio del preview (EX100, ZX200 y 580SN, a 1440 y 390). Sirve a las ~350 páginas de modelo, con el contenido de

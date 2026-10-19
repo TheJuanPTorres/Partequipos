@@ -57,6 +57,7 @@ import * as migration_20261019_061302_video_cabecera_lubricante from './20261019
 import * as migration_20261019_144109_servicio_tecnico_diseno from './20261019_144109_servicio_tecnico_diseno';
 import * as migration_20261019_150937_pagina_modelo_repuestos from './20261019_150937_pagina_modelo_repuestos';
 import * as migration_20261019_175032_por_que_elegirnos_repuestos from './20261019_175032_por_que_elegirnos_repuestos';
+import * as migration_20261019_181113_diseno_modelo_repuestos from './20261019_181113_diseno_modelo_repuestos';
 
 export const migrations = [
   {
@@ -352,6 +353,11 @@ export const migrations = [
   {
     up: migration_20261019_175032_por_que_elegirnos_repuestos.up,
     down: migration_20261019_175032_por_que_elegirnos_repuestos.down,
-    name: '20261019_175032_por_que_elegirnos_repuestos'
+    name: '20261019_175032_por_que_elegirnos_repuestos',
+  },
+  {
+    up: migration_20261019_181113_diseno_modelo_repuestos.up,
+    down: migration_20261019_181113_diseno_modelo_repuestos.down,
+    name: '20261019_181113_diseno_modelo_repuestos'
   },
 ];

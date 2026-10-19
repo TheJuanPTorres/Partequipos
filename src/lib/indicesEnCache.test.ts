@@ -11,8 +11,8 @@ import { fileURLToPath } from "node:url";
  * ahora van cacheados y se regeneran por `revalidarIndices`. Lo que se
  * vigila:
  *
- * - que el sitemap no vuelva a `force-dynamic` (15 consultas por rastreador)
- *   y conserve su vigencia de red;
+ * - que el sitemap sirva sus entradas desde la caché de datos (sin ella, 15
+ *   consultas por rastreador), con su etiqueta y su vigencia de red;
  * - que el buscador siga en la caché de datos, con su etiqueta y su vigencia;
  * - que las vías por las que pasan los ganchos del catálogo los invaliden.
  *
@@ -32,11 +32,16 @@ const cuerpoDe = (fuente: string, firma: string) => {
 describe("sitemap cacheado", () => {
   const s = leer("src/app/(site)/sitemap.ts");
 
-  it("no es force-dynamic y tiene vigencia de 1 h como mucho", () => {
-    assert.doesNotMatch(s, /export const dynamic\s*=/, "el sitemap vuelve a ser dinámico");
-    const m = s.match(/export const revalidate = (\d+);/);
-    assert.ok(m, "sin `revalidate`: no se regeneraría nunca por tiempo");
-    assert.ok(Number(m[1]) > 0 && Number(m[1]) <= 3600, `revalidate ${m[1]}`);
+  // Desde el 2026-10-19 la ruta es dinámica, pero sus ENTRADAS van en la caché
+  // de datos: en Vercel, `revalidatePath` no regeneraba la copia ISR del sitemap.
+  it("sirve las entradas desde la caché de datos, con su etiqueta y vigencia de 1 h como mucho", () => {
+    assert.match(s, /unstable_cache\(/, "el sitemap volvería a consultar la base en cada petición");
+    assert.match(s, /tags: \[ETIQUETAS_DATOS\.sitemap/);
+    assert.match(s, /CLAVE_DESPLIEGUE/);
+    const m = s.match(/export const VIGENCIA_SITEMAP = (\d+);/);
+    assert.ok(m, "sin vigencia: no se renovaría nunca por tiempo");
+    assert.ok(Number(m[1]) > 0 && Number(m[1]) <= 3600, `vigencia ${m[1]}`);
+    assert.match(s, /revalidate: VIGENCIA_SITEMAP/);
   });
 });
 
@@ -62,7 +67,7 @@ describe("y los ganchos del catálogo los invalidan", () => {
   it("revalidarIndices invalida el buscador y el sitemap", () => {
     const cuerpo = cuerpoDe(datos, "export function revalidarIndices(");
     assert.match(cuerpo, /revalidateTag\(ETIQUETAS_DATOS\.busqueda/);
-    assert.match(cuerpo, /revalidatePath\("\/sitemap\.xml"\)/);
+    assert.match(cuerpo, /revalidateTag\(ETIQUETAS_DATOS\.sitemap/);
   });
 
   it("la llaman revalidarRutas, las categorías de repuestos y usados y nueva", () => {

@@ -24,6 +24,7 @@ import {
   getUnidadesDeMarcaUsada,
   type UnidadUsada,
 } from "../queries/getMaquinaria";
+import { marcaVisible } from "../nueva/visibilidad";
 import { rutas } from "../routes";
 import { absoluteUrl, indexacionPermitida } from "../seo/config";
 import { metadataDe } from "../seo/metadata";
@@ -157,7 +158,7 @@ async function ambitoDe(tipo: TipoListadoUsado, slug: string): Promise<Ambito | 
     // Sin unidades, no se indexa (D4).
     indexable: unidades.length > 0,
     enlaces: [
-      ...(slugPoblado(marca.marcaNueva)
+      ...(slugPoblado(marca.marcaNueva) && marcaVisible(marca.marcaNueva)
         ? [
             {
               href: `${rutas.marcaMaquinaria(slugPoblado(marca.marcaNueva)!)}/`,

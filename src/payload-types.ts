@@ -333,6 +333,14 @@ export interface MarcasMaquinaria {
   id: number;
   nombre: string;
   /**
+   * Desmarcada, la marca, sus tipos y sus equipos desaparecen de toda la web (menú, listados, filtros, portada, buscador y sitemap) sin borrarse del panel, y sus páginas llevan con un 301 a la página de abajo.
+   */
+  mostrarEnWeb?: boolean | null;
+  /**
+   * Categoría de maquinaria nueva a la que redirigen (301) la página de la marca, las de sus tipos y sus fichas. Vacío: el índice de maquinaria nueva.
+   */
+  destinoSiOculta?: (number | null) | CategoriasMaquinaria;
+  /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
@@ -354,6 +362,71 @@ export interface MarcasMaquinaria {
    * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» (en ux-9: Hitachi, CASE y Yanmar). Necesita la foto de la tarjeta.
    */
   ordenPortada?: number | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-maquinaria".
+ */
+export interface CategoriasMaquinaria {
+  id: number;
+  nombre: string;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  descripcion?: string | null;
+  /**
+   * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
+   */
+  tiposIncluidos?: (number | TiposMaquinaria)[] | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tipos-maquinaria".
+ */
+export interface TiposMaquinaria {
+  id: number;
+  nombre: string;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  marca: number | MarcasMaquinaria;
+  descripcion?: string | null;
+  /**
+   * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.
+   */
+  imagen?: (number | null) | Media;
+  /**
+   * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Compactadores» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
+   */
+  subtipos?: (number | TiposMaquinaria)[] | null;
+  /**
+   * Marcada, el índice de maquinaria nueva enseña una pestaña con el nombre de este tipo que lleva a su página. Solo sale si el tipo tiene equipos.
+   */
+  pestanaIndiceNueva?: boolean | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -425,43 +498,6 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tipos-maquinaria".
- */
-export interface TiposMaquinaria {
-  id: number;
-  nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  marca: number | MarcasMaquinaria;
-  descripcion?: string | null;
-  /**
-   * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.
-   */
-  imagen?: (number | null) | Media;
-  /**
-   * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Compactadores» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
-   */
-  subtipos?: (number | TiposMaquinaria)[] | null;
-  /**
-   * Marcada, el índice de maquinaria nueva enseña una pestaña con el nombre de este tipo que lleva a su página. Solo sale si el tipo tiene equipos.
-   */
-  pestanaIndiceNueva?: boolean | null;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  actualizadoPor?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 30 MB. Las imágenes van en «Imágenes».
@@ -870,34 +906,6 @@ export interface MarcasUsada {
    * Opcional. Si tenemos repuestos, su página enlaza a la de repuestos.
    */
   marcaRepuestos?: (number | null) | Marca;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  actualizadoPor?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categorias-maquinaria".
- */
-export interface CategoriasMaquinaria {
-  id: number;
-  nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  descripcion?: string | null;
-  /**
-   * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
-   */
-  tiposIncluidos?: (number | TiposMaquinaria)[] | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -2414,6 +2422,8 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
  */
 export interface MarcasMaquinariaSelect<T extends boolean = true> {
   nombre?: T;
+  mostrarEnWeb?: T;
+  destinoSiOculta?: T;
   slug?: T;
   descripcion?: T;
   logo?: T;

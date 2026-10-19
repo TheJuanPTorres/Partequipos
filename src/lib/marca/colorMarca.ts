@@ -37,6 +37,16 @@ export function tintaSobre(fondo: string): string {
 }
 
 /**
+ * ¿Se ve el logo en BLANCO sobre este color de marca? Sí si la tinta es blanca; con una tinta negra
+ * (un amarillo, un turquesa claro) el blanco no se leería y el logo va en negro. Sin color de
+ * marca vale el amarillo de siempre: negro.
+ */
+export function logoBlancoSobre(valor: string | null | undefined): boolean {
+  const color = colorDeMarca(valor);
+  return color ? tintaSobre(color) === BLANCO : false;
+}
+
+/**
  * Las variables CSS de la página: el color de la franja, la tinta de sus
  * títulos y del foco, y el aspecto de una píldora al pasar el ratón (la tinta
  * sobre el color de la franja: nunca del color de la franja sobre sí mismo).

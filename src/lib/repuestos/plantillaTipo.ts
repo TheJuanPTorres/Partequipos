@@ -38,22 +38,24 @@ export function tarjetasDeCategorias(categorias: CategoriasTecnica[]): TarjetaMa
 
 export type VistaPorQue = {
   titulo: string;
-  imagen: ImagenLista | null;
+  imagen: ImagenLista;
   puntos: { clave: string; titulo: string; texto: string }[];
   cierre: string;
   boton: string;
 };
 
 /**
- * «¿Por qué elegirnos?»: sin título no se pinta. La frase de cierre lleva «{marca}», que se
+ * «¿Por qué elegirnos?»: sin título NO se pinta, y sin foto tampoco (dirección, 2026-10-19: hasta
+ * que el cliente mande una propia no se publica el bloque con un fondo vacío). La frase de cierre lleva «{marca}», que se
  * sustituye por el nombre de la marca de la página. Un punto sin título o sin texto no sale.
  */
 export function vistaPorQue(global: RepuestosMarca, marca: Marca): VistaPorQue | null {
   const titulo = texto(global.porQueTitulo);
-  if (!titulo) return null;
+  const imagen = imagenDeMedia(global.porQueImagen, "");
+  if (!titulo || !imagen) return null;
   return {
     titulo,
-    imagen: imagenDeMedia(global.porQueImagen, ""),
+    imagen,
     puntos: (global.porQuePuntos ?? []).flatMap((p, i) =>
       texto(p.titulo) && texto(p.texto)
         ? [{ clave: p.id ?? `p${i}`, titulo: texto(p.titulo), texto: texto(p.texto) }]

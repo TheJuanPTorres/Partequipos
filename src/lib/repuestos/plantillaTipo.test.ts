@@ -37,7 +37,8 @@ describe("tarjetasDeCategorias", () => {
 
 describe("vistaPorQue", () => {
   const marca = { id: 1, nombre: "Kobelco", slug: "kobelco" } as Marca;
-  const global = (extra: Partial<RepuestosMarca>) => ({ id: 1, ...extra }) as RepuestosMarca;
+  const global = (extra: Partial<RepuestosMarca>) =>
+    ({ id: 1, porQueImagen: media, ...extra }) as RepuestosMarca;
 
   it("sin título, la sección no se pinta", () => {
     assert.equal(vistaPorQue(global({ porQueTitulo: "  " }), marca), null);
@@ -64,6 +65,13 @@ describe("vistaPorQue", () => {
       ["Calidad"],
     );
     assert.equal(v.boton, "Solicita asesoría");
-    assert.equal(v.imagen, null);
+    assert.equal(v.imagen.url, "/f.jpg");
+  });
+
+  it("sin foto, la sección no se pinta (hasta que el cliente mande una)", () => {
+    assert.equal(
+      vistaPorQue(global({ porQueTitulo: "¿Por qué elegirnos?", porQueImagen: null }), marca),
+      null,
+    );
   });
 });

@@ -36,7 +36,8 @@ export const getCategoriasParaMarca = cache(async (): Promise<CategoriasTecnica[
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "categorias-tecnicas",
-    depth: 0,
+    // depth 1: la FOTO de la categoría (las tarjetas de la página de tipo) llega poblada.
+    depth: 1,
     limit: 0,
     sort: "nombre",
   });

@@ -169,7 +169,6 @@ export function PaginaMarcaLubricante({
               <div className={estilos.cabeceraSeccion}>
                 <div>
                   <span className={estilos.etiquetaLinea}>
-                    Línea {String(i + 1).padStart(2, "0")} ·{" "}
                     {plural(cuenta(s), "producto", "productos")}
                   </span>
                   <h2 id={idTitulo} className={estilos.titulo}>

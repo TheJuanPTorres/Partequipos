@@ -1,7 +1,7 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 /**
- * Interruptor «Diseño de las páginas de modelo» del global epuestos-marca
+ * Interruptor «Diseño de las páginas de modelo» del global `repuestos-marca`
  * (dirección, 2026-10-19: en el sitio publicado solo diseños de Andrés). Solo
  * esquema; la fila existente queda en 'provisional' por el DEFAULT.
  */

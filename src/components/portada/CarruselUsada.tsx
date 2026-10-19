@@ -143,13 +143,15 @@ export function CarruselUsada({ id, etiqueta, nombres, tarjetas, copias }: Props
         onPointerUp={(e) => alSoltar(e.clientX)}
         onPointerCancel={() => (inicioGesto.current = null)}
       >
-        <ul
+        {/* Diapositivas en `div` con `role="group"` (patrón de carrusel de WAI-ARIA): un
+            `<li>` con `role="group"` deja una lista con hijos no válidos (Lighthouse, 2026-10-19). */}
+        <div
           id={`${id}-pista`}
           className={`${estilos.pista} ${animar ? "" : estilos.sinTransicion}`}
           style={{ "--indice": seMueve ? indice : 0 } as CSSProperties}
         >
           {tarjetas.map((t, i) => (
-            <li
+            <div
               key={`t-${i}`}
               className={estilos.diapositiva}
               role="group"
@@ -159,21 +161,21 @@ export function CarruselUsada({ id, etiqueta, nombres, tarjetas, copias }: Props
               onFocus={() => seMueve && (i < frente || i >= frente + porVista) && ir(i)}
             >
               {t}
-            </li>
+            </div>
           ))}
           {total > 1
             ? copias.map((t, i) => (
-                <li
+                <div
                   key={`c-${i}`}
                   className={`${estilos.diapositiva} ${estilos.copia}`}
                   aria-hidden
                   inert
                 >
                   {t}
-                </li>
+                </div>
               ))
             : null}
-        </ul>
+        </div>
       </div>
       {/* Siempre en el marcado: reserva el alto de los controles y no hay salto al hidratar. */}
       <div className={estilos.controles}>

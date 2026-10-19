@@ -913,6 +913,18 @@ export interface MarcasLubricante {
    */
   imagenCabecera?: (number | null) | Media;
   /**
+   * Vídeo de fondo de la cabecera (sin sonido, de hasta 4 MB: se carga primero en «Vídeos», con su póster). Se ve solo en pantallas grandes: en móvil, con ahorro de datos o con «reducir movimiento», queda solo la imagen de cabecera.
+   */
+  videoCabecera?: (number | null) | Video;
+  /**
+   * El color de acento de la página (botones, franjas, etiquetas): en ENI, el amarillo. El texto sobre él se pone solo en negro o blanco, el que mejor se lea.
+   */
+  colorPrincipal?: string | null;
+  /**
+   * El fondo oscuro de la cabecera y de la zona de contacto: en ENI, el negro.
+   */
+  colorOscuro?: string | null;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -923,6 +935,37 @@ export interface MarcasLubricante {
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Vídeos del sitio: MP4 o WebM, máximo 10 MB, con imagen de póster obligatoria.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  /**
+   * Para quien no lo ve. Aunque sea decorativo, dilo aquí: es lo que queda en el panel.
+   */
+  descripcion: string;
+  /**
+   * Lo que se ve antes de cargar, con «reducir movimiento» activado, al pausar y si el vídeo no se puede reproducir.
+   */
+  poster: number | Media;
+  /**
+   * Un vídeo de fondo sin información se oculta a los lectores de pantalla.
+   */
+  decorativo?: boolean | null;
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1338,37 +1381,6 @@ export interface BloqueCabeceraVideo {
   id?: string | null;
   blockName?: string | null;
   blockType: 'cabeceraVideo';
-}
-/**
- * Vídeos del sitio: MP4 o WebM, máximo 10 MB, con imagen de póster obligatoria.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "videos".
- */
-export interface Video {
-  id: number;
-  /**
-   * Para quien no lo ve. Aunque sea decorativo, dilo aquí: es lo que queda en el panel.
-   */
-  descripcion: string;
-  /**
-   * Lo que se ve antes de cargar, con «reducir movimiento» activado, al pausar y si el vídeo no se puede reproducir.
-   */
-  poster: number | Media;
-  /**
-   * Un vídeo de fondo sin información se oculta a los lectores de pantalla.
-   */
-  decorativo?: boolean | null;
-  actualizadoPor?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2409,6 +2421,9 @@ export interface MarcasLubricanteSelect<T extends boolean = true> {
   descripcion?: T;
   logo?: T;
   imagenCabecera?: T;
+  videoCabecera?: T;
+  colorPrincipal?: T;
+  colorOscuro?: T;
   seo?:
     | T
     | {

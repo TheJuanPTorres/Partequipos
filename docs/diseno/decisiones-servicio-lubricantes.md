@@ -107,3 +107,39 @@ Hasta el 2026-10-17 llevaban `dudosa: true` en el JSON del extractor e importar 
 - **Sitemap:** sin las subpáginas. Los 301 no se pueden comprobar en un preview (§10.22): allí las subpáginas dan 404.
 - **Pintado a 390, 1010 y 1440:** sin imágenes rotas, sin desborde horizontal y sin errores de consola. Nosotros, igual.
 - **Fallo encontrado al pintar y corregido:** la columna de imagen de «Presentación con imagen» tiene un alto mínimo de 677 px, medido para el mapa de Nosotros. Con una foto apaisada dejaba un hueco grande. Ahora, foto apaisada sin animación: sin ese alto mínimo y a todo el ancho de su columna. El mapa de Nosotros es vertical y no cambia.
+
+## 6. Diseño propio de servicio técnico (aprobado por dirección el 2026-10-19)
+
+Andrés no tiene plantilla para esta página. Dirección aprobó la muestra v2 (PR #262) y se aplica a `/servicio-tecnico/`. Lleva el lenguaje de la web nueva (Inter, rojo del kit, radios de 30 px, vidrio, velos y movimiento suave) con composición propia:
+
+- cabecera con vídeo, el texto abajo a la izquierda y un tablero de vidrio «¿Qué necesitas?» con las 4 secciones;
+- el taller sobre la textura de WordPress, con la frase de garantía como sello;
+- el alistamiento con su vídeo de fondo y los dos vídeos al mismo nivel: el del taller y el corto de YouTube con su miniatura local;
+- la posventa en vidrio sobre la foto;
+- los siniestros como proceso paso a paso y la galería, presentada por «Trabajamos con las principales aseguradoras», en un mosaico sin huecos (`tamanosBento`);
+- la llamada a solicitar un técnico, con formulario y WhatsApp.
+
+**Cómo se edita.** El campo **«Diseño»** de Páginas (`diseno`: «Bloques» o «Servicio técnico») elige la plantilla (`PlantillaServicioTecnico`), que toma cada bloque por su ancla. Campos nuevos, todos opcionales:
+
+| Campo                                                                   | Para qué                                                                                                                                        |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| «Vídeo del taller» y «Vídeo de fondo» en «Vídeo de YouTube»             | Los dos vídeos del alistamiento                                                                                                                 |
+| «Textura de fondo» en «Presentación con imagen» y «Proceso paso a paso» | La textura de las secciones                                                                                                                     |
+| «Texto de presentación» en «Galería»                                    | La frase bajo el titular                                                                                                                        |
+| Bloque nuevo «Proceso paso a paso»                                      | Título, entradilla, pasos (etiqueta y texto), botón y textura. En cualquier otra página se pinta como tarjetas numeradas (`BloqueProcesoPasos`) |
+
+Migración `20261019_144109_servicio_tecnico_diseno`, solo esquema; las demás páginas quedan en «Bloques».
+
+**Lo que faltaba frente a WordPress** (inventario del 2026-10-19), con `importar.ts`:
+
+- la textura `Fondo-2.png`;
+- el vídeo alojado de las etapas, que es otro vídeo, no el corto de YouTube;
+- el vídeo de fondo de #alistamiento;
+- la miniatura del corto de YouTube.
+
+Los dos vídeos van **recomprimidos** por el tope de 4 MB: 480p y sin sonido. Dirección pedirá al cliente subir el de las etapas a YouTube. En WordPress no hay logos de aseguradoras.
+
+**Textos nuestros, editables:**
+
+- «Solicitar un técnico», «¿Qué necesitas?», «Vídeo del taller» y «En YouTube» son de la plantilla;
+- la frase de la galería es el «Texto de presentación» del bloque.

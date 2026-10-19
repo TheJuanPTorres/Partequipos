@@ -124,8 +124,9 @@
 }
 
 @media (max-width: 767px) {
+  /* 26 px: «RETROCARGADORA», la palabra más larga de los títulos de WordPress, cabe entera a 390. */
   .h1Largo .linea1 {
-    font-size: var(--texto-titulo-3);
+    font-size: 26px;
   }
 }
 

@@ -1,0 +1,657 @@
+/*
+ * SERVICIO TÉCNICO CON DISEÑO PROPIO (muestra, 2026-10-19). El lenguaje de la
+ * web nueva —Inter, rojo del kit, radios de 30 px, vidrio, velos y movimiento
+ * suave— con composición propia. Sin alturas que dependan de lo que carga
+ * (fotos con caja de proporción fija, vídeos encima de su foto): CLS 0.
+ * La variante -webkit- va ANTES que la estándar (§10.35).
+ */
+.pagina {
+  --rojo: #e5242d;
+  --negro: #100f0f;
+  --gris: #56545a;
+  --claro: #f4f4f4;
+  --radio: 30px;
+  display: grid;
+  gap: 12px;
+  padding: 8px 8px 40px;
+  color: var(--gris);
+}
+
+/* ---- Piezas comunes --------------------------------------------------- */
+.medio {
+  object-fit: cover;
+}
+video.medio {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.capaVideo {
+  position: absolute;
+  inset: 0;
+}
+.pausa {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 3;
+}
+
+.titulo {
+  margin: 0;
+  color: var(--negro);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.claro {
+  color: #fff;
+}
+.parrafo {
+  margin: 14px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.antetitulo {
+  margin: 0 0 12px;
+  color: var(--rojo);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  margin-top: 24px;
+  padding: 0 24px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+}
+.boton:hover {
+  transform: translateY(-2px);
+}
+.boton:focus-visible,
+.accesos a:focus-visible {
+  outline: 2px solid var(--rojo);
+  outline-offset: 3px;
+}
+.botonRojo {
+  background: var(--rojo);
+  color: #fff;
+}
+.botonNegro {
+  background: var(--negro);
+  color: #fff;
+}
+.botonVidrio {
+  border: 1px solid rgb(255 255 255 / 0.35);
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.botonWhatsapp {
+  background: #25d366;
+  color: #062b14;
+}
+
+.seccion {
+  position: relative;
+  border-radius: var(--radio);
+  background-color: #fff;
+  padding: 48px 20px;
+}
+.conTextura {
+  background-repeat: repeat;
+  background-size: auto;
+}
+
+.foto {
+  object-fit: cover;
+}
+
+/* ---- Cabecera ---------------------------------------------------------- */
+.hero {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  min-height: 620px;
+  border-radius: var(--radio);
+  background: var(--negro);
+  isolation: isolate;
+}
+.veloHero {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(to top, rgb(16 15 15 / 0.9) 0%, rgb(16 15 15 / 0.35) 55%, transparent 100%),
+    radial-gradient(ellipse at 15% 100%, rgb(229 36 45 / 0.35), transparent 55%);
+}
+.heroContenido {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 24px;
+  width: 100%;
+  padding: 120px 20px 28px;
+}
+.chip {
+  display: inline-flex;
+  margin: 0;
+  padding: 6px 14px;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  border-radius: 30px;
+  background: rgb(255 255 255 / 0.12);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.heroTitulo {
+  margin: 16px 0 0;
+  color: #fff;
+  font-size: 46px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.heroLema {
+  max-width: 520px;
+  margin: 16px 0 0;
+  color: rgb(255 255 255 / 0.9);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.acciones .boton {
+  margin-top: 24px;
+}
+
+/* El tablero de acceso rápido: vidrio, con las secciones numeradas. */
+.accesos {
+  padding: 18px;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 24px;
+  background: rgb(255 255 255 / 0.1);
+  color: #fff;
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+.accesosTitulo {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.accesos ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.accesos a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+  font-size: 15px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.accesos a:hover {
+  background: rgb(229 36 45 / 0.85);
+}
+.accesos a svg {
+  margin-left: auto;
+  flex: none;
+}
+.accesoNumero {
+  color: rgb(255 255 255 / 0.6);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Taller ------------------------------------------------------------ */
+.taller {
+  display: grid;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.tallerFoto {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radio);
+}
+.sello {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  border-radius: 20px;
+  background: rgb(16 15 15 / 0.45);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.sello svg {
+  flex: none;
+  color: #fff;
+}
+
+/* ---- Alistamiento ------------------------------------------------------ */
+.alistamiento {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radio);
+  background: var(--negro);
+  isolation: isolate;
+}
+.veloOscuro {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgb(16 15 15 / 0.82), rgb(16 15 15 / 0.92));
+}
+.alistamientoContenido {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 20px;
+}
+.videos {
+  display: grid;
+  gap: 16px;
+}
+.videoEtapas,
+.videoCorto {
+  margin: 0;
+}
+.videoEtapas video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 24px;
+  background: #000;
+  object-fit: cover;
+}
+.videoEtapas figcaption {
+  margin-top: 10px;
+  color: rgb(255 255 255 / 0.75);
+  font-size: 14px;
+}
+.portadaCorto {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgb(229 36 45 / 0.45), transparent 70%),
+    rgb(255 255 255 / 0.06);
+  color: #fff;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.play {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--rojo);
+  color: #fff;
+}
+.play svg {
+  width: 26px;
+  height: 26px;
+}
+.cortoTexto {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ---- Posventa ---------------------------------------------------------- */
+.posventa {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  min-height: 560px;
+  border-radius: var(--radio);
+  background: var(--negro);
+  isolation: isolate;
+}
+.veloLateral {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgb(16 15 15 / 0.85), rgb(16 15 15 / 0.1) 70%);
+}
+.posventaTarjeta {
+  position: relative;
+  z-index: 2;
+  margin: 16px;
+  padding: 24px;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 24px;
+  background: rgb(16 15 15 / 0.35);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+/* ---- Siniestros: el proceso paso a paso -------------------------------- */
+.siniestros {
+  display: grid;
+  gap: 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.siniestrosCabecera {
+  max-width: 760px;
+}
+.entradilla {
+  margin: 14px 0 0;
+  color: var(--negro);
+  font-size: 18px;
+  font-weight: 500;
+}
+.pasos {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: paso;
+}
+.paso {
+  position: relative;
+  padding: 24px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgb(16 15 15 / 0.07);
+}
+.pasoNumero {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--rojo);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.pasoTitulo {
+  margin: 16px 0 0;
+  color: var(--negro);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.paso .parrafo {
+  margin-top: 8px;
+}
+.aseguradoras {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 20px;
+  border-radius: 20px;
+  background: var(--negro);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 500;
+}
+.aseguradoras svg {
+  flex: none;
+  color: var(--rojo);
+}
+
+/* Galería de trabajos: tira con desplazamiento en móvil, mosaico en escritorio. */
+.galeria {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 78%;
+  gap: 12px;
+  margin: 0 -20px;
+  padding: 0 20px 6px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  list-style: none;
+}
+.galeria li {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 20px;
+  scroll-snap-align: start;
+}
+.galeria .foto {
+  transition: transform 0.4s;
+}
+.galeria li:hover .foto {
+  transform: scale(1.04);
+}
+
+/* ---- Solicitar un técnico --------------------------------------------- */
+.contacto {
+  display: grid;
+  gap: 12px;
+}
+.contactoPanel {
+  padding: 40px 24px;
+  border-radius: var(--radio);
+  background:
+    radial-gradient(ellipse at 100% 0%, rgb(229 36 45 / 0.45), transparent 60%), var(--negro);
+}
+.contactoIcono {
+  color: var(--rojo);
+}
+.contactoPanel .titulo {
+  margin-top: 16px;
+}
+.telefono {
+  margin: 12px 0 0;
+  color: rgb(255 255 255 / 0.75);
+  font-size: 15px;
+}
+.contactoFormulario {
+  padding: 24px 20px;
+  border-radius: var(--radio);
+  background: #fff;
+}
+
+/* ---- Aparición suave al entrar en pantalla (sin cambiar la caja: CLS 0) - */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .paso,
+    .tallerFoto,
+    .videos,
+    .posventaTarjeta,
+    .galeria li {
+      animation: aparecer linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .boton,
+  .galeria .foto {
+    transition: none;
+  }
+}
+
+/* ---- Tablet ------------------------------------------------------------ */
+@media (min-width: 768px) {
+  .titulo {
+    font-size: 36px;
+  }
+  .heroTitulo {
+    font-size: 64px;
+  }
+  .pasos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  /* La línea que une los pasos. */
+  .pasos::before {
+    position: absolute;
+    top: 48px;
+    right: 16%;
+    left: 16%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--rojo), rgb(229 36 45 / 0.2));
+    content: "";
+  }
+  .galeria {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-columns: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  .galeriaGrande {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  .galeria li.galeriaGrande {
+    aspect-ratio: auto;
+  }
+  .posventaTarjeta {
+    max-width: 560px;
+    margin: 32px;
+    padding: 32px;
+  }
+}
+
+/* ---- Escritorio -------------------------------------------------------- */
+@media (min-width: 1025px) {
+  .pagina {
+    gap: 16px;
+    padding: 8px 22px 56px;
+  }
+  .hero {
+    min-height: min(82vh, 760px);
+  }
+  .heroContenido {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 140px 56px 56px;
+  }
+  .heroTexto {
+    max-width: 620px;
+  }
+  .heroTitulo {
+    font-size: 84px;
+  }
+  .accesos {
+    width: 340px;
+    flex: none;
+  }
+  .accesos ul {
+    grid-template-columns: 1fr;
+  }
+  .seccion {
+    padding: 88px 56px;
+  }
+  .titulo {
+    font-size: 44px;
+  }
+  .taller {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: 64px;
+  }
+  .alistamientoContenido {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+    align-items: center;
+    gap: 56px;
+    padding: 88px 56px;
+  }
+  .videos {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    align-items: start;
+  }
+  .portadaCorto {
+    aspect-ratio: 9 / 13;
+  }
+  .posventa {
+    min-height: 620px;
+  }
+  .posventaTarjeta {
+    margin: 56px;
+  }
+  .contacto {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 16px;
+  }
+  .contactoPanel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 56px;
+  }
+  .contactoFormulario {
+    padding: 40px 48px;
+  }
+}

@@ -180,3 +180,8 @@ export function vistaDeBloques(
 ): VistaBloque[] {
   return (bloques ?? []).flatMap((b) => vistaDeBloque(b, videos) ?? []);
 }
+
+/** Un documento de «Vídeos» (con su póster poblado) en la forma que pintan los bloques. */
+export function vistaDeVideo(doc: Video | null | undefined): VideoBloque | null {
+  return doc ? video(doc, new Map()) : null;
+}

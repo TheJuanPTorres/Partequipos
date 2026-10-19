@@ -2,7 +2,7 @@
  * IMPORTADOR DE SERVICIO TÉCNICO Y LUBRICANTES ENI — el contenido real del
  * WordPress actual, sacado del XML con `extraer-xml.py`.
  *
- *   npx payload run scripts/servicio-lubricantes/importar.ts <modo> <destino> [contenido=<json>] [manifiesto=<json>]
+ *   npx payload run scripts/servicio-lubricantes/importar.ts <modo> <destino> [contenido=<json>] [manifiesto=<json>] [solo=faltantes] [videos=<carpeta>]
  *
  *   modo:     simular  → no escribe nada; comprueba que cada fichero se puede descargar
  *             importar → escribe; repetirlo no duplica (cada fichero se busca por su nombre)
@@ -26,6 +26,16 @@
  * solo iban al preview. DECISIÓN DEL CLIENTE (2026-10-17): se migra todo el
  * contenido de su web, así que van a CUALQUIER destino; su contenido es su
  * responsabilidad (CLAUDE.md §10.38). La marca queda en el JSON como lista.
+ *
+ * `solo=faltantes` (2026-10-19, inventario frente a WordPress): sube SOLO lo
+ * que la primera importación no traía —la textura de fondo de #taller y
+ * #Siniestros, el vídeo alojado de las etapas del alistamiento y el vídeo de
+ * fondo de esa sección— sin tocar los bloques: dónde se pintan lo decide el
+ * diseño propio de la página (pendiente de aprobación). Los dos vídeos pasan
+ * del tope de 4 MB de `videos`, así que se suben RECOMPRIMIDOS desde
+ * `videos=<carpeta>` (por defecto, `partequipos-diseno/wordpress/
+ * servicio-lubricantes/videos/`, con su LEEME). Van al mismo manifiesto, así
+ * que la retirada también los quita.
  *
  * DESTINO validado contra la base y el almacén ANTES de cargar Payload, más la
  * guarda del almacén (§10.37), como el importador del blog. Educado con el
@@ -76,6 +86,18 @@ exigirAlmacen("[servicio-lubricantes]");
 const CIERRE = path.join(os.homedir(), "Desktop", "partequipos-cierre");
 const MANIFIESTO =
   valorDe("manifiesto") ?? path.join(CIERRE, `manifiesto-servicio-lubricantes-${destino}.json`);
+const SOLO = valorDe("solo");
+if (SOLO && SOLO !== "faltantes") fallar(`solo=${SOLO} no existe (solo hay «solo=faltantes»)`);
+const CARPETA_VIDEOS =
+  valorDe("videos") ??
+  path.join(
+    os.homedir(),
+    "Desktop",
+    "partequipos-diseno",
+    "wordpress",
+    "servicio-lubricantes",
+    "videos",
+  );
 const CONTENIDO =
   valorDe("contenido") ??
   path.join(
@@ -187,7 +209,17 @@ type Contenido = {
       destacado: string;
       imagen: Foto;
     };
-    alistamiento: { titulo: string; parrafos: string[]; youtube: string; miniatura: Foto };
+    alistamiento: {
+      titulo: string;
+      parrafos: string[];
+      youtube: string;
+      miniatura: Foto;
+      /** El vídeo alojado de las etapas y el de fondo de la sección (desde el 2026-10-19). */
+      videoAlojado?: string | null;
+      videoFondo?: string | null;
+    };
+    /** La textura de fondo de #taller y #Siniestros (desde el 2026-10-19). */
+    fondo?: Foto;
     posventa: { titulo: string; parrafos: string[]; imagen: Foto };
     siniestros: {
       titulo: string;
@@ -362,6 +394,77 @@ async function video(url: string, poster: number | null, descripcion: string) {
   return doc.id;
 }
 
+/** Tope de la colección «Vídeos» (`formatoDeVideoPermitido`): 4 MB. */
+const TOPE_VIDEO = 4 * 1024 * 1024;
+
+/**
+ * Un vídeo de WordPress RECOMPRIMIDO (fichero local con el nombre determinista
+ * de su URL) a «Vídeos». Idempotente por el nombre, como los demás.
+ */
+async function videoLocal(
+  url: string,
+  poster: number | null,
+  descripcion: string,
+  decorativo: boolean,
+): Promise<number | null> {
+  const fichero = nombreDeFicheroWp(url);
+  const ya = await buscarFichero("videos", fichero);
+  if (ya) {
+    cuenta.reutilizados++;
+    return ya;
+  }
+  const ruta = path.join(CARPETA_VIDEOS, fichero);
+  if (!fs.existsSync(ruta)) fallar(`falta el vídeo recomprimido ${ruta} (ver su LEEME)`);
+  const bytes = fs.readFileSync(ruta);
+  if (bytes.length > TOPE_VIDEO) {
+    fallar(`${fichero} pesa ${(bytes.length / 1048576).toFixed(1)} MB: pasa del tope de 4 MB`);
+  }
+  if (modo === "simular") {
+    cuenta.simulados++;
+    return null;
+  }
+  if (!poster) fallar(`el vídeo ${fichero} necesita su póster`);
+  const doc = await payload.create({
+    collection: "videos",
+    data: { descripcion, poster: poster!, decorativo },
+    file: { data: bytes, mimetype: "video/mp4", name: fichero, size: bytes.length },
+    overrideAccess: true,
+  });
+  yaVistos.set(`videos:${fichero}`, doc.id);
+  manifiesto.creado.videos.push(await guardado("videos", doc.id, fichero));
+  guardarManifiesto();
+  cuenta.subidos++;
+  return doc.id;
+}
+
+/** El póster local (JPEG) de un vídeo recomprimido, a «Imágenes». */
+async function posterLocal(url: string, alt: string): Promise<number | null> {
+  const fichero = nombreDeFicheroWp(url).replace(/\.mp4$/, "-poster.jpg");
+  const ya = await buscarFichero("media", fichero);
+  if (ya) {
+    cuenta.reutilizados++;
+    return ya;
+  }
+  const ruta = path.join(CARPETA_VIDEOS, fichero);
+  if (!fs.existsSync(ruta)) fallar(`falta el póster ${ruta} (ver el LEEME de los vídeos)`);
+  if (modo === "simular") {
+    cuenta.simulados++;
+    return null;
+  }
+  const bytes = fs.readFileSync(ruta);
+  const doc = await payload.create({
+    collection: "media",
+    data: { alt, focalX: 50, focalY: 50 },
+    file: { data: bytes, mimetype: "image/jpeg", name: fichero, size: bytes.length },
+    overrideAccess: true,
+  });
+  yaVistos.set(`media:${fichero}`, doc.id);
+  manifiesto.creado.media.push(await guardado("media", doc.id, fichero));
+  guardarManifiesto();
+  cuenta.subidos++;
+  return doc.id;
+}
+
 // ---------- Texto enriquecido (Lexical) ----------
 
 type Trozo = string | { negrita: string };
@@ -422,6 +525,39 @@ const pagina = (
   })
 ).docs[0];
 if (!pagina) fallar("no existe la página «servicio-tecnico» en el destino");
+
+if (SOLO === "faltantes") {
+  const a = s.alistamiento;
+  if (!s.fondo || !a.videoAlojado || !a.videoFondo) {
+    fallar("el contenido extraído no trae lo que faltaba: vuelve a ejecutar extraer-xml.py");
+  }
+  const fondo = await imagen(s.fondo!, "Textura gris clara de fondo");
+  const posterEtapas = await imagen(a.miniatura, "Alistamiento de maquinaria en el taller");
+  const etapas = await videoLocal(
+    a.videoAlojado!,
+    posterEtapas,
+    "Las etapas del alistamiento de maquinaria pesada en el taller de Partequipos",
+    false,
+  );
+  const posterFondo = await posterLocal(
+    a.videoFondo!,
+    "Bulldozers trabajando en una obra de movimiento de tierras",
+  );
+  const fondoVideo = await videoLocal(
+    a.videoFondo!,
+    posterFondo,
+    "Maquinaria amarilla trabajando en obra (vídeo de fondo)",
+    true,
+  );
+  log(
+    `faltantes: textura ${fondo ?? "(por subir)"} · vídeo de etapas ${etapas ?? "(por subir)"} · vídeo de fondo ${fondoVideo ?? "(por subir)"} · póster ${posterFondo ?? "(por subir)"}`,
+  );
+  log(
+    `ficheros: subidos ${cuenta.subidos} · reutilizados ${cuenta.reutilizados} · por subir ${cuenta.simulados}`,
+  );
+  if (modo === "importar") log(`manifiesto: ${MANIFIESTO}`);
+  process.exit(0);
+}
 
 const imgCabecera = await imagen(s.cabecera.imagen, "Taller de servicio técnico de Partequipos");
 const vidCabecera = await video(

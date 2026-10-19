@@ -54,6 +54,7 @@ import * as migration_20261018_230020_indice_usados_plantilla from './20261018_2
 import * as migration_20261019_042312_color_marca from './20261019_042312_color_marca';
 import * as migration_20261019_052701_colores_marca_lubricante from './20261019_052701_colores_marca_lubricante';
 import * as migration_20261019_061302_video_cabecera_lubricante from './20261019_061302_video_cabecera_lubricante';
+import * as migration_20261019_142849_por_que_elegirnos_repuestos from './20261019_142849_por_que_elegirnos_repuestos';
 
 export const migrations = [
   {
@@ -334,6 +335,11 @@ export const migrations = [
   {
     up: migration_20261019_061302_video_cabecera_lubricante.up,
     down: migration_20261019_061302_video_cabecera_lubricante.down,
-    name: '20261019_061302_video_cabecera_lubricante'
+    name: '20261019_061302_video_cabecera_lubricante',
+  },
+  {
+    up: migration_20261019_142849_por_que_elegirnos_repuestos.up,
+    down: migration_20261019_142849_por_que_elegirnos_repuestos.down,
+    name: '20261019_142849_por_que_elegirnos_repuestos'
   },
 ];

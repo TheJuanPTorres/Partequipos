@@ -3234,6 +3234,26 @@ export interface RepuestosMarca {
    */
   testimoniosTitulo?: string | null;
   verVideoTexto?: string | null;
+  /**
+   * Vacío: la sección no se pinta.
+   */
+  porQueTitulo?: string | null;
+  /**
+   * Foto de la columna izquierda. Sin ella, un fondo oscuro.
+   */
+  porQueImagen?: (number | null) | Media;
+  porQuePuntos?:
+    | {
+        titulo: string;
+        texto: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * «{marca}» se sustituye por el nombre de la marca de la página.
+   */
+  porQueCierre?: string | null;
+  porQueBoton?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3456,6 +3476,17 @@ export interface RepuestosMarcaSelect<T extends boolean = true> {
   contactoBoton?: T;
   testimoniosTitulo?: T;
   verVideoTexto?: T;
+  porQueTitulo?: T;
+  porQueImagen?: T;
+  porQuePuntos?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+        id?: T;
+      };
+  porQueCierre?: T;
+  porQueBoton?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

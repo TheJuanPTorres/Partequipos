@@ -102,6 +102,8 @@
     "preview:video-lubricantes:simular": "tsx scripts/preview/con-entorno.ts payload run scripts/servicio-lubricantes/video-cabecera.ts simular preview",
     "preview:video-lubricantes:aplicar": "tsx scripts/preview/con-entorno.ts payload run scripts/servicio-lubricantes/video-cabecera.ts aplicar preview",
     "preview:video-lubricantes:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/servicio-lubricantes/video-cabecera.ts retirar preview",
+    "preview:por-que-foto:aplicar": "tsx scripts/preview/con-entorno.ts payload run scripts/repuestos/por-que-foto.ts aplicar preview",
+    "preview:por-que-foto:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/repuestos/por-que-foto.ts retirar preview",
     "preview:hero-sliders": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/hero-sliders-preview.ts",
     "preview:tipografia": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/tipografia-preview.ts",
     "preview:real:simular": "tsx scripts/preview/con-entorno.ts payload run scripts/contenido-real/importar.ts simular preview",

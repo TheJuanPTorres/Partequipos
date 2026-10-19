@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 
 import { SeccionTestimonios } from "@/components/portada/diferidos";
-import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { ModelosTipo } from "@/components/repuestos/ModelosTipo";
+import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
+import { SedesCompactas } from "@/components/repuestos/SedesCompactas";
+import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -15,7 +17,9 @@ import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepu
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
-import { categoriasDeMarca } from "@/lib/repuestos/marca";
+import { tarjetasDeCategorias, vistaPorQue } from "@/lib/repuestos/plantillaTipo";
+import { sedesDePortada } from "@/lib/portada/sedes";
+import { getSedesDePortada } from "@/lib/queries/getSedes";
 import {
   conOtrasEntradas,
   enlacesDeModelos,
@@ -49,6 +53,7 @@ export async function metadataTipoRepuestos(marca: Marca, tipo: TiposEquipo): Pr
 
 /** Ancla de la franja de modelos: a ella baja el icono de ratón del encabezado. */
 const ANCLA_MODELOS = "modelos-repuestos";
+const ANCLA_CONTACTO = "contacto-repuestos";
 
 /**
  * PÁGINA DE TIPO — PROVISIONAL hasta el diseño de Andrés
@@ -59,12 +64,13 @@ const ANCLA_MODELOS = "modelos-repuestos";
 export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo: TiposEquipo }) {
   const seg = segmentoDeTipo(tipo);
   const padre = poblado<TiposEquipo>(tipo.tipoPadre);
-  const [global, modelos, categorias, testimonios, empresa] = await Promise.all([
+  const [global, modelos, categorias, testimonios, empresa, sedes] = await Promise.all([
     getRepuestosMarca(),
     getModelosDeTipo(tipo.id),
     getCategoriasParaMarca(),
     getTestimoniosDePortada(),
     getEmpresa(),
+    getSedesDePortada(),
   ]);
 
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
@@ -110,14 +116,15 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
       />
 
-      <CategoriasMarca
+      <TarjetasMarca
         id="categorias-repuestos"
         titulo={texto(global.tituloCategorias)}
-        categorias={categoriasDeMarca(categorias)}
-        fondo="gris"
+        verTodo={texto(global.verTodoTexto) || "Ver todo"}
+        tarjetas={tarjetasDeCategorias(categorias)}
       />
 
       <ContactoMarca
+        id={ANCLA_CONTACTO}
         titulo={texto(global.contactoTitulo)}
         subtitulo={texto(global.contactoSubtitulo)}
         boton={texto(global.contactoBoton)}
@@ -134,6 +141,14 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
           verVideoTexto: texto(global.verVideoTexto),
         }}
       />
+
+      <PorQueElegirnos
+        id="por-que-elegirnos"
+        vista={vistaPorQue(global, marca)}
+        anclaContacto={ANCLA_CONTACTO}
+      />
+
+      <SedesCompactas id="sedes-repuestos" sedes={sedesDePortada(sedes)} />
     </main>
   );
 }

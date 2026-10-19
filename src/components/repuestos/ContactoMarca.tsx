@@ -24,6 +24,7 @@ export function ContactoMarca({
   siteKey,
   whatsapp,
   marca,
+  id,
 }: {
   titulo: string;
   subtitulo: string;
@@ -32,10 +33,12 @@ export function ContactoMarca({
   siteKey: string | null;
   whatsapp?: { href: string; etiqueta: string };
   marca: string;
+  /** Ancla de la sección (a ella baja «Solicita asesoría»). */
+  id?: string;
 }) {
   if (!subtitulo) return null;
   return (
-    <section className={estilos.contacto} aria-labelledby="repuestos-marca-contacto">
+    <section id={id} className={estilos.contacto} aria-labelledby="repuestos-marca-contacto">
       {titulo ? <p className={estilos.antetitulo}>{titulo}</p> : null}
       <Revelado
         adelanto={ADELANTOS.bajo}

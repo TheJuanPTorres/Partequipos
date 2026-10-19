@@ -96,6 +96,20 @@ describe("megamenú: maquinaria", () => {
     );
   });
 
+  it("usada: todas las categorías; las que no tienen unidades, con su nota", () => {
+    const usada = panelMaquinaria({ ...DATOS, equiposUsados: [{ categoria: 31 }] }).grupos[1]!;
+    assert.deepEqual(
+      usada.enlaces.map((e) => [e.etiqueta, e.nota ?? null]),
+      [
+        ["Ver toda la maquinaria usada", null],
+        ["Bulldozers", null],
+        ["Motoniveladoras", "Sin unidades por ahora"],
+      ],
+    );
+    // Sin el dato de las unidades, ninguna nota.
+    assert.ok(panel.grupos[1]!.enlaces.every((e) => !e.nota));
+  });
+
   it("aditamentos: la «marca» del sitio, con sus tipos", () => {
     const aditamentos = panel.grupos[2]!;
     assert.deepEqual(aditamentos.enlaces, [

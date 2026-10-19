@@ -33,7 +33,13 @@ import { PanelFiltrosListado } from "./PanelFiltrosListado";
  */
 
 export type Miga = { nombre: string; path: string };
-export type Pestana = { href: string; texto: string; activa: boolean };
+export type Pestana = {
+  href: string;
+  texto: string;
+  activa: boolean;
+  /** Marca discreta bajo el texto («Sin unidades por ahora» en las categorías de usados vacías). */
+  nota?: string;
+};
 
 export function PlantillaListado<T>({
   migas,
@@ -135,7 +141,14 @@ export function PlantillaListado<T>({
                     aria-current={p.activa ? "page" : undefined}
                   >
                     <IconoPestana size={30} stroke={1.4} aria-hidden="true" />
-                    {p.texto}
+                    {p.nota ? (
+                      <span className={estilos.pestanaTexto}>
+                        {p.texto}
+                        <small className={estilos.pestanaNota}>{p.nota}</small>
+                      </span>
+                    ) : (
+                      p.texto
+                    )}
                   </Link>
                 </li>
               );
@@ -233,7 +246,12 @@ export function PlantillaListado<T>({
             {elemento.plural.charAt(0).toUpperCase() + elemento.plural.slice(1)}
           </h2>
           {totalSinFiltros === 0 ? (
-            <div className={estilos.vacio}>{vacio}</div>
+            // Un texto, en el recuadro de siempre; un estado vacío diseñado (usados) trae su marco.
+            typeof vacio === "string" ? (
+              <p className={estilos.vacio}>{vacio}</p>
+            ) : (
+              vacio
+            )
           ) : elementos.length === 0 ? (
             <p className={estilos.vacio}>
               Ningún{elemento.singular === "unidad" ? "a" : ""} {elemento.singular} cumple estos

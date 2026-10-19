@@ -18,6 +18,7 @@ import {
   getCategoriasUsada,
   getCategoriaUsadaPorSlug,
   getInventarioUsados,
+  getListadoNueva,
   getMarcaUsadaPorSlug,
   getUnidadesDeCategoriaUsada,
   getUnidadesDeMarcaUsada,
@@ -31,6 +32,48 @@ import { descripcionPorDefecto, tituloPorDefecto } from "../seo/porDefecto";
 import { CATALOGO_USADOS, CATALOGO_USADOS_MARCA, type UnidadFiltrable } from "./filtros";
 import { POR_PAGINA } from "./paginacion";
 import { pestanasDeCategorias, type PestanaListado } from "./pestanas";
+import type { TarjetaMarca } from "../repuestos/marca";
+import { getEmpresa } from "../queries/getSeo";
+import { enlaceWhatsApp, type EnlaceWhatsApp } from "../whatsapp";
+import { tarjetasDeCategoriasUsada } from "./indice";
+import { alternativasEnNueva, mensajeSinUnidades } from "./vacia";
+
+/**
+ * Lo que pinta el ESTADO VACÍO de un listado sin unidades (petición del
+ * cliente, 2026-10-18): el titular, las alternativas en nueva y en otras
+ * categorías de usados con unidades, y el WhatsApp con un mensaje ya escrito.
+ */
+export type DatosVacio = {
+  mensaje: string;
+  /** Lo que se pide en el formulario («Cargadores usados»). */
+  referencia: string;
+  nueva: TarjetaMarca[];
+  otras: TarjetaMarca[];
+  whatsapp?: EnlaceWhatsApp;
+};
+
+async function datosVacio(ambito: Ambito): Promise<DatosVacio> {
+  const [listadoNueva, categorias, inventario, empresa] = await Promise.all([
+    getListadoNueva(),
+    getCategoriasUsada(),
+    getInventarioUsados(),
+    getEmpresa(),
+  ]);
+  const { nombre } = ambito.registro;
+  return {
+    mensaje: mensajeSinUnidades(ambito.tipo, ambito.titulo, nombre),
+    referencia: ambito.titulo,
+    nueva:
+      ambito.tipo === "categoria"
+        ? alternativasEnNueva(nombre, listadoNueva.categorias, listadoNueva.equipos, rutas)
+        : [],
+    otras: tarjetasDeCategoriasUsada(categorias, inventario, rutas.categoriaUsada).slice(0, 6),
+    whatsapp: enlaceWhatsApp(
+      empresa.whatsapp,
+      `Hola, busco ${ambito.titulo.charAt(0).toLowerCase()}${ambito.titulo.slice(1)}. Avísenme cuando llegue una.`,
+    ),
+  };
+}
 
 /**
  * Los listados de USADA con filtros: el de una CATEGORÍA
@@ -163,7 +206,9 @@ export async function cargarListadoUsado(
   });
   if (listado.tipo === "redirigir") permanentRedirect(listado.destino);
   if (listado.tipo === "no-existe") notFound();
-  return { ambito, listado };
+  // Solo sin ninguna unidad (no por los filtros): el estado vacío diseñado.
+  const vacio = ambito.unidades.length === 0 ? await datosVacio(ambito) : null;
+  return { ambito, listado, vacio };
 }
 
 /**

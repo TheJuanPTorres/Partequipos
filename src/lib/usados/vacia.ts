@@ -1,0 +1,138 @@
+import type { TarjetaMarca } from "../repuestos/marca";
+import { tipoConMarca, tituloPorDefecto } from "../seo/porDefecto";
+import { posicionFocal, type ImagenLista } from "../utils/relations";
+
+/**
+ * Lógica pura del ESTADO VACÍO de una categoría de usados (petición del
+ * cliente, 2026-10-18): la categoría existe y se ve aunque no tenga unidades,
+ * y su página invita a seguir mirando. Aquí, las ALTERNATIVAS en maquinaria
+ * NUEVA: la misma categoría de nueva si existe (p. ej. «Cargadores nuevos») y,
+ * si no, los tipos de nueva con equipos que se llaman igual (p. ej. las
+ * Motoniveladoras de Case). Las de usados con unidades salen de
+ * `tarjetasDeCategoriasUsada`.
+ */
+
+/** La marca discreta de las categorías de usados sin unidades. */
+export const SIN_UNIDADES = "Sin unidades por ahora";
+
+/**
+ * Nombre comparable: minúsculas, sin tildes y en singular aproximado
+ * («Motoniveladoras» → «motoniveladora», «Cargadores» → «cargador»,
+ * «Bulldozers» → «bulldozer»).
+ */
+export function nombreComparable(nombre: string): string {
+  const base = nombre
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ");
+  if (/(or|dor)es$/.test(base)) return base.slice(0, -2);
+  if (base.endsWith("s")) return base.slice(0, -1);
+  return base;
+}
+
+type Foto = {
+  url?: string | null;
+  alt?: string | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+} | null;
+
+/** Lo que hace falta de cada equipo nuevo. */
+export type EquipoNuevoAlternativa = {
+  tipoId: number;
+  tipoRef: { slug: string; nombre: string } | null;
+  marcaRef: { slug: string; nombre: string } | null;
+  foto: Foto;
+};
+
+export type CategoriaNuevaAlternativa = { slug: string; nombre: string; tipos: number[] };
+
+const imagenDe = (foto: Foto): ImagenLista | null =>
+  foto?.url && foto.width && foto.height
+    ? {
+        url: foto.url,
+        alt: foto.alt ?? "",
+        width: foto.width,
+        height: foto.height,
+        posicion: posicionFocal(foto.focalX, foto.focalY),
+      }
+    : null;
+
+const primeraFoto = (equipos: EquipoNuevoAlternativa[]) =>
+  imagenDe(equipos.find((e) => imagenDe(e.foto))?.foto ?? null);
+
+const equiposTexto = (n: number) => `${n} ${n === 1 ? "equipo nuevo" : "equipos nuevos"}`;
+
+/**
+ * Las alternativas en maquinaria nueva de una categoría de usados: la
+ * categoría de nueva con el mismo nombre (si tiene equipos) o, si no hay, cada
+ * tipo de nueva con equipos que se llame igual. Hasta `tope` tarjetas.
+ */
+export function alternativasEnNueva(
+  nombreCategoria: string,
+  categorias: CategoriaNuevaAlternativa[],
+  equipos: EquipoNuevoAlternativa[],
+  rutas: {
+    categoriaNueva: (slug: string) => string;
+    tipoMaquinaria: (marca: string, tipo: string) => string;
+  },
+  tope = 3,
+): TarjetaMarca[] {
+  const buscado = nombreComparable(nombreCategoria);
+  if (!buscado) return [];
+
+  const categoria = categorias.find((c) => nombreComparable(c.nombre) === buscado);
+  if (categoria) {
+    const tipos = new Set(categoria.tipos);
+    const suyos = equipos.filter((e) => tipos.has(e.tipoId));
+    if (suyos.length) {
+      return [
+        {
+          clave: `nueva-categoria-${categoria.slug}`,
+          titulo: tituloPorDefecto.categoriaNueva(categoria.nombre),
+          href: `${rutas.categoriaNueva(categoria.slug)}/`,
+          imagen: primeraFoto(suyos),
+          soloEscritorio: false,
+          detalle: equiposTexto(suyos.length),
+        },
+      ];
+    }
+  }
+
+  const porTipo = new Map<number, EquipoNuevoAlternativa[]>();
+  for (const e of equipos) {
+    if (!e.tipoRef || !e.marcaRef || nombreComparable(e.tipoRef.nombre) !== buscado) continue;
+    porTipo.set(e.tipoId, [...(porTipo.get(e.tipoId) ?? []), e]);
+  }
+  return [...porTipo.values()]
+    .map((suyos) => {
+      const { tipoRef, marcaRef } = suyos[0]!;
+      return {
+        clave: `nueva-tipo-${marcaRef!.slug}-${tipoRef!.slug}`,
+        titulo: tipoConMarca(tipoRef!.nombre, marcaRef!.nombre),
+        href: `${rutas.tipoMaquinaria(marcaRef!.slug, tipoRef!.slug)}/`,
+        imagen: primeraFoto(suyos),
+        soloEscritorio: false,
+        detalle: equiposTexto(suyos.length),
+      };
+    })
+    .sort((a, b) => a.titulo.localeCompare(b.titulo, "es"))
+    .slice(0, tope);
+}
+
+/**
+ * El titular del estado vacío: «Ahora mismo no tenemos cargadores usados
+ * disponibles» (el título de la página, en minúscula salvo las marcas).
+ */
+export function mensajeSinUnidades(
+  tipo: "categoria" | "marca",
+  titulo: string,
+  nombre: string,
+): string {
+  if (tipo === "marca") return `Ahora mismo no tenemos maquinaria ${nombre} usada disponible`;
+  return `Ahora mismo no tenemos ${titulo.charAt(0).toLowerCase()}${titulo.slice(1)} disponibles`;
+}

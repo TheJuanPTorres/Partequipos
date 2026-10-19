@@ -425,6 +425,13 @@
   color: var(--mega-rojo);
 }
 
+/* «Sin unidades por ahora» tras una categoría de usados vacía: discreta, sin perder contraste. */
+.nota {
+  font-size: 13px;
+  font-style: italic;
+  white-space: nowrap;
+}
+
 .verTodo:focus-visible,
 .titulo:focus-visible,
 .hoja:focus-visible {

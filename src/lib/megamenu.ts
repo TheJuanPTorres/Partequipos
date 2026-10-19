@@ -1,6 +1,7 @@
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
 import { rutas } from "./routes";
+import { SIN_UNIDADES } from "./usados/vacia";
 
 /**
  * MEGAMENÚ DE ESCRITORIO — lógica pura (decisiones-home-ux9.md §26; propuesta
@@ -22,7 +23,12 @@ import { rutas } from "./routes";
  *   hasta que existan páginas de categoría técnica.
  */
 
-export type EnlaceMenu = { etiqueta: string; href: string };
+export type EnlaceMenu = {
+  etiqueta: string;
+  href: string;
+  /** Marca discreta tras la etiqueta (las categorías de usados sin unidades, 2026-10-18). */
+  nota?: string;
+};
 
 /**
  * El logo de una marca, ya a la medida con la que se pinta (alto fijo).
@@ -97,6 +103,12 @@ export type DatosMegamenu = {
   tiposRepuestos: TipoCatalogo[];
   /** Los equipos nuevos (solo su tipo): el menú no enlaza a un tipo de maquinaria sin equipos. */
   equiposNuevos: ReadonlyArray<{ tipo: number | { id: number } | null | undefined }>;
+  /**
+   * Las unidades usadas DISPONIBLES (solo su categoría): las categorías de
+   * usados se enlazan todas, y las que no tienen ninguna llevan «Sin unidades
+   * por ahora» (petición del cliente, 2026-10-18). Sin el dato, ninguna nota.
+   */
+  equiposUsados?: ReadonlyArray<{ categoria: number | { id: number } | null | undefined }>;
 };
 
 /** La «marca» de maquinaria nueva que en el sitio actual agrupa los aditamentos. */
@@ -182,6 +194,13 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
       ...(porTipo.enlaces.length > 0 ? [porTipo] : []),
     ],
   };
+  const conUnidades = d.equiposUsados
+    ? new Set(
+        d.equiposUsados.map((u) =>
+          typeof u.categoria === "object" ? u.categoria?.id : u.categoria,
+        ),
+      )
+    : null;
   const usada: GrupoMenu = {
     titulo: "Maquinaria pesada usada",
     enlaces: [
@@ -189,6 +208,7 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
       ...[...d.categoriasUsada].sort(porNombre).map((c) => ({
         etiqueta: c.nombre,
         href: conBarra(rutas.categoriaUsada(c.slug)),
+        ...(conUnidades && !conUnidades.has(c.id) ? { nota: SIN_UNIDADES } : {}),
       })),
     ],
     grupos: [],

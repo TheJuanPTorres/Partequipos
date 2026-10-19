@@ -370,14 +370,49 @@ export const revalidarMarcaUsadaBorrada: CollectionAfterDeleteHook = ({ doc }) =
   revalidarMarcaUsadaCore(doc);
 
 /** Una unidad de inventario afecta a los listados de usada (y a la portada, por su gancho). */
+/**
+ * Las categorías de usados salen TODAS en el megamenú, y las vacías con «Sin
+ * unidades por ahora» (2026-10-18). Si una unidad deja a su categoría (o a la
+ * anterior, si cambió de categoría) con 0 o 1 unidades disponibles, la nota
+ * puede haber cambiado: se refresca el menú de todo el sitio. Con más, no.
+ */
+async function refrescarMenuSiCambiaUsado(
+  req: PayloadRequest,
+  doc: { id?: unknown; categoria?: unknown },
+  anterior?: { categoria?: unknown } | null,
+): Promise<void> {
+  const idCategoria = (c: unknown) => {
+    const p = poblado<{ id: number }>(c as number | { id: number } | null | undefined);
+    return typeof c === "number" ? c : (p?.id ?? null);
+  };
+  const categorias = new Set(
+    [idCategoria(doc.categoria), anterior ? idCategoria(anterior.categoria) : null].filter(
+      (c): c is number => c !== null,
+    ),
+  );
+  for (const categoria of categorias) {
+    const { totalDocs } = await req.payload.count({
+      collection: "equipos-usados",
+      where: { and: [{ categoria: { equals: categoria } }, { disponible: { equals: true } }] },
+      req,
+    });
+    if (totalDocs <= 1) {
+      revalidarTodoElSitio(`equipo usado ${doc.id ?? ""} (megamenú)`);
+      return;
+    }
+  }
+}
+
 async function revalidarEquipoUsadoCore(
   doc: { id: number; categoria: unknown; slug?: string | null },
   req: PayloadRequest,
+  anterior?: { categoria?: unknown } | null,
 ) {
   try {
     // Antes que nada: los datos de los listados (dinámicos) de TODAS las
     // categorías, también la anterior si la unidad cambió de categoría.
     revalidarDatos(ETIQUETAS_DATOS.usados, `equipo usado ${doc.id}`);
+    await refrescarMenuSiCambiaUsado(req, doc, anterior);
     const categoria = poblado<{ id: number; slug: string }>(
       doc.categoria as number | { id: number; slug: string },
     );
@@ -411,8 +446,8 @@ async function revalidarEquipoUsadoCore(
   return doc;
 }
 
-export const revalidarEquipoUsado: CollectionAfterChangeHook = ({ doc, req }) =>
-  revalidarEquipoUsadoCore(doc, req);
+export const revalidarEquipoUsado: CollectionAfterChangeHook = ({ doc, req, previousDoc }) =>
+  revalidarEquipoUsadoCore(doc, req, previousDoc);
 
 export const revalidarEquipoUsadoBorrado: CollectionAfterDeleteHook = ({ doc, req }) =>
   revalidarEquipoUsadoCore(doc, req);

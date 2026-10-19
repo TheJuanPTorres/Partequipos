@@ -1,10 +1,4 @@
-import {
-  IconAdjustmentsHorizontal,
-  IconBulldozer,
-  IconChevronDown,
-  IconX,
-  type Icon,
-} from "@tabler/icons-react";
+import { IconAdjustmentsHorizontal, IconChevronDown, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -22,6 +16,7 @@ import type { FotoDeTarjeta } from "@/lib/queries/getMaquinaria";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 
 import { CambioDeVista } from "./CambioDeVista";
+import { iconoDePestana } from "./iconos";
 import estilos from "./listado.module.css";
 import { PanelFiltrosListado } from "./PanelFiltrosListado";
 
@@ -48,7 +43,6 @@ export function PlantillaListado<T>({
   enlaces = [],
   pestanas = [],
   etiquetaPestanas,
-  iconoPestana,
   catalogo,
   listado,
   rutaDe,
@@ -67,7 +61,6 @@ export function PlantillaListado<T>({
   enlaces?: { href: string; texto: string }[];
   pestanas?: Pestana[];
   etiquetaPestanas?: string;
-  iconoPestana?: (texto: string) => Icon | undefined;
   catalogo: Catalogo<T>;
   listado: Extract<ResultadoListado<T>, { tipo: "listado" }>;
   /** Ruta de la página n, CON su barra final. */
@@ -133,7 +126,7 @@ export function PlantillaListado<T>({
         <nav aria-label={etiquetaPestanas} className={estilos.pestanas}>
           <ul>
             {pestanas.map((p) => {
-              const IconoPestana = iconoPestana?.(p.texto) ?? IconBulldozer;
+              const IconoPestana = iconoDePestana(p.texto);
               return (
                 <li key={p.href}>
                   <Link
@@ -153,70 +146,73 @@ export function PlantillaListado<T>({
         <div className={estilos.sinPestanas} />
       )}
 
-      <div className={estilos.barra}>
-        <p className={estilos.resumen} aria-live="polite">
-          {chips.length ? <strong>Selección actual:</strong> : null}
-          <span>
-            {recuento}
-            {paginas > 1 ? ` · página ${pagina} de ${paginas}` : ""}
-          </span>
-        </p>
-        <div className={estilos.acciones}>
-          {chips.length ? (
-            <>
-              <ul className={estilos.chips} aria-label="Filtros elegidos">
-                {chips.map((c) => (
-                  <li key={c.clave}>
-                    <Link
-                      href={c.href}
-                      prefetch={false}
-                      rel="nofollow"
-                      className={estilos.chip}
-                      aria-label={`Quitar el filtro ${c.etiqueta}`}
-                    >
-                      <IconX size={14} stroke={2.4} aria-hidden="true" />
-                      {c.etiqueta}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href={enlaceCon(rutaBase, catalogo, seleccion, { limpiar: true })}
-                prefetch={false}
-                rel="nofollow"
-                className={estilos.limpiar}
-              >
-                <IconAdjustmentsHorizontal size={18} stroke={1.8} aria-hidden="true" />
-                Limpiar filtro
-              </Link>
-            </>
-          ) : null}
-          {total > 1 && ordenActual ? (
-            <details className={estilos.ordenar}>
-              <summary>
-                Ordenar
-                <span className="sr-only">: {ordenActual.etiqueta}</span>
-                <IconChevronDown size={18} stroke={2} aria-hidden="true" />
-              </summary>
-              <ul>
-                {ordenes.map((o) => (
-                  <li key={o.valor}>
-                    <Link
-                      href={o.href}
-                      prefetch={false}
-                      rel="nofollow"
-                      aria-current={o.activa ? "true" : undefined}
-                    >
-                      {o.etiqueta}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          ) : null}
-          {elementos.length > 1 ? <CambioDeVista idLista={idLista} /> : null}
+      {/* Sin nada que listar, ni recuento ni orden: lo dice el estado vacío. */}
+      {totalSinFiltros > 0 ? (
+        <div className={estilos.barra}>
+          <p className={estilos.resumen} aria-live="polite">
+            {chips.length ? <strong>Selección actual:</strong> : null}
+            <span>
+              {recuento}
+              {paginas > 1 ? ` · página ${pagina} de ${paginas}` : ""}
+            </span>
+          </p>
+          <div className={estilos.acciones}>
+            {chips.length ? (
+              <>
+                <ul className={estilos.chips} aria-label="Filtros elegidos">
+                  {chips.map((c) => (
+                    <li key={c.clave}>
+                      <Link
+                        href={c.href}
+                        prefetch={false}
+                        rel="nofollow"
+                        className={estilos.chip}
+                        aria-label={`Quitar el filtro ${c.etiqueta}`}
+                      >
+                        <IconX size={14} stroke={2.4} aria-hidden="true" />
+                        {c.etiqueta}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href={enlaceCon(rutaBase, catalogo, seleccion, { limpiar: true })}
+                  prefetch={false}
+                  rel="nofollow"
+                  className={estilos.limpiar}
+                >
+                  <IconAdjustmentsHorizontal size={18} stroke={1.8} aria-hidden="true" />
+                  Limpiar filtro
+                </Link>
+              </>
+            ) : null}
+            {total > 1 && ordenActual ? (
+              <details className={estilos.ordenar}>
+                <summary>
+                  Ordenar
+                  <span className="sr-only">: {ordenActual.etiqueta}</span>
+                  <IconChevronDown size={18} stroke={2} aria-hidden="true" />
+                </summary>
+                <ul>
+                  {ordenes.map((o) => (
+                    <li key={o.valor}>
+                      <Link
+                        href={o.href}
+                        prefetch={false}
+                        rel="nofollow"
+                        aria-current={o.activa ? "true" : undefined}
+                      >
+                        {o.etiqueta}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ) : null}
+            {elementos.length > 1 ? <CambioDeVista idLista={idLista} /> : null}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className={estilos.cuerpo}>
         {totalSinFiltros > 0 ? (

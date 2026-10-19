@@ -1,13 +1,4 @@
-import {
-  IconBackhoe,
-  IconBolt,
-  IconEngine,
-  IconTools,
-  IconTractor,
-  IconTruckLoading,
-  IconWeight,
-  type Icon,
-} from "@tabler/icons-react";
+import { IconBolt, IconEngine, IconWeight } from "@tabler/icons-react";
 
 import { PlantillaListado } from "@/components/listado/PlantillaListado";
 import { TarjetaListado } from "@/components/listado/TarjetaListado";
@@ -23,15 +14,6 @@ import { rutas } from "@/lib/routes";
  * (`src/lib/nueva/listado.ts`). La plantilla, el panel de filtros y la
  * tarjeta son los comunes con usada (`src/components/listado/`).
  */
-
-/** Icono de cada pestaña (presentación, como los iconos del menú del panel). */
-const ICONO_PESTANA: Record<string, Icon> = {
-  Excavadoras: IconBackhoe,
-  Cargadores: IconTruckLoading,
-  Compactadores: IconTractor,
-  Aditamentos: IconTools,
-  Miniexcavadoras: IconBackhoe,
-};
 
 export function ListadoNueva({
   ambito,
@@ -65,7 +47,6 @@ export function ListadoNueva({
       pagina={pagina}
       pestanas={ambito.pestanas}
       etiquetaPestanas="Categorías de maquinaria nueva"
-      iconoPestana={(texto) => ICONO_PESTANA[texto]}
       catalogo={CATALOGO_NUEVA}
       listado={listado}
       rutaDe={(n) => `${ambito.ruta(n)}/`}

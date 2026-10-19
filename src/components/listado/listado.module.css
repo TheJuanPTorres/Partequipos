@@ -564,6 +564,10 @@
   padding: 40px 16px;
   text-align: center;
 }
+/* Sin el lateral de filtros (listado vacío), el resultado ocupa todo el ancho. */
+.cuerpo > .resultados:only-child {
+  grid-column: 1 / -1;
+}
 .vacio p + p {
   margin-top: 10px;
 }

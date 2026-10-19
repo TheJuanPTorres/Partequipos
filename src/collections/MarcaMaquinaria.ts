@@ -56,7 +56,7 @@ export const MarcaMaquinaria: CollectionConfig = {
       },
     },
     {
-      name: "destinoSiOculta",
+      name: "destinoOculta",
       type: "relationship",
       relationTo: "categorias-maquinaria",
       label: "Si está oculta, sus páginas llevan a",

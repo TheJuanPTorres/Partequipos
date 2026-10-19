@@ -123,7 +123,7 @@ async function redirectsDeOcultas(guardados: RedirectGuardado[]): Promise<Redire
     depth: 1,
     limit: 0,
     pagination: false,
-    select: { slug: true, destinoSiOculta: true },
+    select: { slug: true, destinoOculta: true },
     populate: { "categorias-maquinaria": { slug: true } },
   });
   if (marcas.length === 0) return [];
@@ -160,7 +160,7 @@ async function redirectsDeOcultas(guardados: RedirectGuardado[]): Promise<Redire
   return redirectsDeMarcasOcultas(
     marcas.map((m) => ({
       slug: m.slug,
-      destino: poblado<CategoriasMaquinaria>(m.destinoSiOculta)?.slug ?? null,
+      destino: poblado<CategoriasMaquinaria>(m.destinoOculta)?.slug ?? null,
     })),
     hijos,
     guardados,

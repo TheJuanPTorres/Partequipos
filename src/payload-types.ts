@@ -339,7 +339,7 @@ export interface MarcasMaquinaria {
   /**
    * Categoría de maquinaria nueva a la que redirigen (301) la página de la marca, las de sus tipos y sus fichas. Vacío: el índice de maquinaria nueva.
    */
-  destinoSiOculta?: (number | null) | CategoriasMaquinaria;
+  destinoOculta?: (number | null) | CategoriasMaquinaria;
   /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
@@ -2427,7 +2427,7 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
 export interface MarcasMaquinariaSelect<T extends boolean = true> {
   nombre?: T;
   mostrarEnWeb?: T;
-  destinoSiOculta?: T;
+  destinoOculta?: T;
   slug?: T;
   descripcion?: T;
   logo?: T;

@@ -42,9 +42,21 @@ export function marcasDelIndice(
   const porTipo = equiposPorTipo(equipos, tipos);
   const marcaDeTipo = new Map(tipos.map((t) => [t.id, idDe(t.marca)]));
   const equiposPorMarca = new Map<number, number>();
+  // Sin «Foto de la tarjeta», la primera foto de su primer equipo (la regla de las páginas de marca).
+  const primeraFoto = new Map<number, ImagenLista>();
   for (const e of equipos) {
     const m = idDe(e.marca) ?? marcaDeTipo.get(idDe(e.tipo) ?? -1) ?? null;
-    if (m !== null) equiposPorMarca.set(m, (equiposPorMarca.get(m) ?? 0) + 1);
+    if (m === null) continue;
+    equiposPorMarca.set(m, (equiposPorMarca.get(m) ?? 0) + 1);
+    if (!primeraFoto.has(m)) {
+      for (const img of e.imagenes ?? []) {
+        const f = imagenDeMedia(img, "");
+        if (f) {
+          primeraFoto.set(m, f);
+          break;
+        }
+      }
+    }
   }
   const orden = (m: MarcasMaquinaria) => ordenDe(m) ?? Number.POSITIVE_INFINITY;
   return marcas
@@ -56,7 +68,7 @@ export function marcasDelIndice(
       href: `${rutas.marcaMaquinaria(m.slug)}/`,
       descripcion: m.descripcion?.trim() ?? "",
       logo: imagenDeMedia(m.logo, `Logo de ${m.nombre.trim()}`),
-      foto: imagenDeMedia(m.imagenTarjeta, ""),
+      foto: imagenDeMedia(m.imagenTarjeta, "") ?? primeraFoto.get(m.id) ?? null,
       equipos: equiposPorMarca.get(m.id) ?? 0,
       tipos: tipos
         .filter((t) => idDe(t.marca) === m.id && (porTipo.get(t.id) ?? 0) > 0)

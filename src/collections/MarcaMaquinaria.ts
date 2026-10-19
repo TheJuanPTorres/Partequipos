@@ -1,3 +1,4 @@
+import { campoColorMarca } from "@/lib/fields/colorMarca";
 import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
@@ -47,14 +48,15 @@ export const MarcaMaquinaria: CollectionConfig = {
     { name: "descripcion", type: "textarea", label: "Descripción" },
     { name: "logo", type: "upload", relationTo: "media", label: "Logo" },
     // Megamenú (2026-10-17): el submenú es blanco sólido desde el #205.
+    campoColorMarca,
     {
       name: "logoOscuroEnMenu",
       type: "checkbox",
       defaultValue: false,
-      label: "Pintar el logo en oscuro en el menú",
+      label: "Pintar el logo en oscuro (menú y cabecera)",
       admin: {
         description:
-          "Márcala si el logo es blanco o muy claro: en el menú de la cabecera, que es blanco, se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.",
+          "Márcala si el logo es blanco o muy claro: en el menú de la cabecera y en la placa clara de la página de la marca se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.",
       },
     },
     // Fase B de la home: fondo de la tarjeta de marca (sección 2). Opcional.

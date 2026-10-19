@@ -72,7 +72,7 @@ export function HeroMarca({
 
         <div className={estilos.heroContenido}>
           {logo ? (
-            <div className={estilos.placa}>
+            <div className={estilos.placa} data-logo-oscuro={vista.logoOscuro ? "" : undefined}>
               <Image
                 src={logo.url}
                 alt={logo.alt}

@@ -6,6 +6,7 @@ import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { ModelosTipo } from "@/components/repuestos/ModelosTipo";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import {
   enlacesDeEquipos,
   gruposDeEnlaces,
@@ -105,7 +106,7 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
     : enlacesDeEquipos(marca, tipo.slug, equipos);
 
   return (
-    <main className={estilos.pagina}>
+    <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
         <Breadcrumbs items={breadcrumbs} />

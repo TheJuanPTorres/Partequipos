@@ -33,6 +33,7 @@ export function vistaEncabezadoTipo(
     descripcion: texto(tipo.descripcion),
     fondo: imagenDeMedia(marca.fondoHero, "") ?? imagenDeMedia(tipo.imagen, ""),
     logo: imagenDeMedia(marca.logo, `Logo de ${nombre}`),
+    logoOscuro: Boolean(marca.logoOscuroEnMenu),
   };
 }
 

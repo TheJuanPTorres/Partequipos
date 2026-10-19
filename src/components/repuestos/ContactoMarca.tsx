@@ -67,7 +67,8 @@ export function ContactoMarca({
           titulo={`Contacto sobre repuestos ${marca}`}
           textoBoton={boton || "Enviar"}
           clasificacion={!modelo}
-          camposModelo={Boolean(modelo)}
+          conCiudad={Boolean(modelo)}
+          etiquetaMensaje={modelo ? "¿En qué estás interesado?" : undefined}
           variante="plano"
         />
       </div>

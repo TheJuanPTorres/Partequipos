@@ -1,0 +1,580 @@
+/*
+ * PÁGINA DE LA MARCA DE LUBRICANTES (ENI) — «sitio dentro del sitio» (2026-10-19, cliente).
+ * Los colores llegan como variables desde el panel (`estiloDeIdentidad`): `--lub-principal` (el
+ * amarillo), `--lub-oscuro` (el negro) y las tintas que mejor se leen sobre cada uno. El
+ * amarillo solo se usa como FONDO con tinta oscura, o como acento sobre el fondo oscuro: nunca
+ * como texto sobre blanco.
+ */
+
+.pagina {
+  --lub-radio: 18px;
+  --lub-ancho: 1240px;
+  --lub-gris: #f4f3ef;
+  --lub-linea: #e3e1da;
+  background: #fff;
+  color: #151515;
+  overflow-x: clip;
+}
+
+.contenedor {
+  width: min(var(--lub-ancho), 100% - 40px);
+  margin-inline: auto;
+}
+
+.boton:focus-visible,
+.tarjetaLinea:focus-visible,
+.ficha:focus-visible {
+  outline: 3px solid var(--lub-oscuro);
+  outline-offset: 3px;
+}
+
+/* En lo oscuro el foco es del amarillo. */
+.hero .boton:focus-visible,
+.contacto .boton:focus-visible {
+  outline-color: var(--lub-principal);
+}
+
+/* --- Cabecera ------------------------------------------------------------------ */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-height: min(640px, 82vh);
+  align-items: center;
+  background: var(--lub-oscuro);
+  color: var(--lub-sobre-oscuro);
+}
+
+.heroFoto {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.heroFotoImg {
+  object-fit: cover;
+  object-position: 70% 50%;
+}
+
+/* El velo: oscuro a la izquierda, donde va el texto, y se abre hacia la foto. */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      90deg,
+      var(--lub-oscuro) 8%,
+      color-mix(in srgb, var(--lub-oscuro) 82%, transparent) 42%,
+      transparent 100%
+    ),
+    linear-gradient(0deg, color-mix(in srgb, var(--lub-oscuro) 70%, transparent), transparent 40%);
+}
+
+/* El bloque, alineado a la izquierda del contenedor, sobre la zona oscura del velo. */
+.heroInterior {
+  display: flex;
+  max-width: 660px;
+  padding: 130px 0 90px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+/* El logo de ENI ya es un rótulo amarillo con su borde: va solo, sin placa ni sombra detrás. */
+.placaLogo {
+  display: flex;
+}
+
+.logo {
+  width: 340px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.h1 {
+  margin: 0;
+  font-size: clamp(2.6rem, 7.2vw, 5.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.h1 em {
+  color: var(--lub-principal);
+  font-style: normal;
+}
+
+.lede {
+  max-width: 600px;
+  margin: 0;
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  line-height: 1.55;
+  opacity: 0.92;
+}
+
+.acciones {
+  display: flex;
+  margin-top: 6px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.boton {
+  display: inline-flex;
+  min-height: 52px;
+  padding: 0 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background-color 150ms,
+    color 150ms,
+    border-color 150ms,
+    transform 150ms;
+}
+
+.botonPrincipal {
+  background: var(--lub-principal);
+  color: var(--lub-sobre-principal);
+}
+
+.botonPrincipal:hover {
+  transform: translateY(-2px);
+  background: #fff;
+  color: #111;
+}
+
+.botonSecundario {
+  border-color: currentcolor;
+  background: transparent;
+  color: inherit;
+}
+
+.botonSecundario:hover {
+  border-color: #fff;
+  background: #fff;
+  color: #111;
+}
+
+/* --- Secciones ------------------------------------------------------------------ */
+
+.bloque {
+  padding: 84px 0;
+}
+
+.titulo {
+  max-width: 820px;
+  margin: 0 0 14px;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+/* La barra del acento bajo los títulos. */
+.titulo::after {
+  content: "";
+  display: block;
+  width: 72px;
+  height: 6px;
+  margin-top: 16px;
+  border-radius: 3px;
+  background: var(--lub-principal);
+}
+
+.subtitulo {
+  max-width: 640px;
+  margin: 0 0 40px;
+  color: #444;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+/* Las cuatro líneas, como tarjetas de foto. */
+.lineas {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  list-style: none;
+}
+
+.tarjetaLinea {
+  position: relative;
+  display: flex;
+  min-height: 360px;
+  padding: 22px;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  border-radius: var(--lub-radio);
+  background: var(--lub-oscuro);
+  color: #fff;
+  isolation: isolate;
+  text-decoration: none;
+}
+
+.tarjetaLineaFoto {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  object-fit: cover;
+  transition: transform 400ms;
+}
+
+.tarjetaLinea::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0.1) 62%);
+}
+
+.tarjetaLinea:hover .tarjetaLineaFoto {
+  transform: scale(1.06);
+}
+
+.nombreLinea {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.cuentaLinea {
+  display: flex;
+  margin-top: 8px;
+  align-items: center;
+  gap: 8px;
+  color: var(--lub-principal);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* --- Sobre la marca ------------------------------------------------------------- */
+
+.sobre {
+  background: var(--lub-gris);
+}
+
+.sobreTexto {
+  max-width: 820px;
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.sobreTexto p {
+  margin: 0 0 1em;
+}
+
+/* --- Catálogo por línea ---------------------------------------------------------- */
+
+.seccion {
+  padding: 84px 0 70px;
+  border-top: 1px solid var(--lub-linea);
+  scroll-margin-top: 90px;
+}
+
+.seccionAlterna {
+  background: var(--lub-gris);
+}
+
+.cabeceraSeccion {
+  display: flex;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.etiquetaLinea {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--lub-oscuro);
+  color: var(--lub-principal);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tituloGrupo {
+  display: flex;
+  margin: 44px 0 20px;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.tituloGrupo::before {
+  content: "";
+  width: 6px;
+  height: 26px;
+  border-radius: 3px;
+  background: var(--lub-principal);
+}
+
+.productos {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  list-style: none;
+}
+
+.producto {
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  border: 1px solid var(--lub-linea);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.fotoCaja {
+  position: relative;
+  border-bottom: 1px solid var(--lub-linea);
+  aspect-ratio: 1 / 1;
+  background: #fff;
+}
+
+.foto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 14px;
+  object-fit: contain;
+}
+
+.productoCuerpo {
+  display: flex;
+  padding: 16px 16px 18px;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.grado {
+  margin: 0;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--lub-oscuro);
+  color: var(--lub-principal);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.nombre {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.ficha {
+  display: inline-flex;
+  margin-top: auto;
+  padding-top: 4px;
+  align-items: center;
+  gap: 6px;
+  color: #151515;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--lub-principal);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+.ficha:hover {
+  background: var(--lub-principal);
+  color: var(--lub-sobre-principal);
+  text-decoration-color: transparent;
+}
+
+/* --- Contacto -------------------------------------------------------------------- */
+
+.contacto {
+  padding: 90px 0;
+  background: var(--lub-oscuro);
+  color: var(--lub-sobre-oscuro);
+  scroll-margin-top: 90px;
+}
+
+.contactoRejilla {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.contactoTitulo {
+  margin: 0 0 16px;
+  font-size: clamp(1.9rem, 4.4vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.contactoTitulo em {
+  color: var(--lub-principal);
+  font-style: normal;
+}
+
+.contactoTexto {
+  max-width: 480px;
+  margin: 0 0 28px;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.formularioCaja {
+  padding: 32px;
+  border-top: 8px solid var(--lub-principal);
+  border-radius: var(--lub-radio);
+  background: #fff;
+  color: #151515;
+}
+
+@media (max-width: 1024px) {
+  .productos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .lineas {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contactoRejilla {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    min-height: 560px;
+    align-items: flex-end;
+  }
+
+  .heroFotoImg {
+    object-position: 62% 50%;
+  }
+
+  .hero::before {
+    background: linear-gradient(
+      0deg,
+      var(--lub-oscuro) 18%,
+      color-mix(in srgb, var(--lub-oscuro) 75%, transparent) 55%,
+      transparent 100%
+    );
+  }
+
+  .heroInterior {
+    padding: 120px 0 56px;
+    gap: 18px;
+  }
+
+  .logo {
+    width: 250px;
+  }
+
+  .acciones .boton {
+    flex: 1 1 100%;
+  }
+
+  .bloque,
+  .seccion {
+    padding: 56px 0 48px;
+  }
+
+  .lineas {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .tarjetaLinea {
+    min-height: 230px;
+    padding: 14px;
+  }
+
+  .nombreLinea {
+    font-size: 1.1rem;
+  }
+
+  .cuentaLinea {
+    font-size: 0.85rem;
+  }
+
+  .productos {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .productoCuerpo {
+    padding: 12px;
+  }
+
+  .formularioCaja {
+    padding: 22px 18px;
+  }
+
+  .contacto {
+    padding: 56px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjetaLineaFoto,
+  .boton {
+    transition: none;
+  }
+
+  .tarjetaLinea:hover .tarjetaLineaFoto {
+    transform: none;
+  }
+}
+
+/* Vídeo de fondo de la cabecera (solo pantallas grandes, sin «reducir movimiento» ni ahorro de datos). */
+.heroVideo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% 50%;
+}
+
+/* Abajo a la izquierda, alineado con el contenido: a la derecha lo taparía el botón de WhatsApp. */
+.pausaVideo {
+  position: absolute;
+  bottom: 20px;
+  left: calc(50% - min(620px, 50% - 20px));
+  z-index: 2;
+}

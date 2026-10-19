@@ -53,12 +53,13 @@ type Props = {
    * de pantalla; la página que lo aloja pone el título visible y el marco.
    */
   variante?: "tarjeta" | "plano";
+  /** Etiqueta del campo de mensaje: «Mensaje» por defecto; lubricantes: «¿Qué necesitas?». */
+  etiquetaMensaje?: string;
   /**
-   * Los campos del formulario de la página de modelo de repuestos de WordPress
-   * (2026-10-19, MUESTRA del laboratorio): «Ciudad» y el mensaje como «¿En qué
-   * estás interesado?». La ciudad aún no se guarda: llega con la migración.
+   * Añade el campo «Ciudad» (opcional; se guarda en la solicitud). Lo usan la
+   * página de modelo de repuestos y Lubricantes ENI.
    */
-  camposModelo?: boolean;
+  conCiudad?: boolean;
 };
 
 const OPCIONES = {
@@ -77,7 +78,8 @@ export function FormularioSolicitud({
   textoBoton,
   clasificacion = false,
   variante = "tarjeta",
-  camposModelo = false,
+  etiquetaMensaje = "Mensaje",
+  conCiudad = false,
 }: Props) {
   const [estado, accion, enviando] = useActionState(enviarSolicitud, ESTADO_INICIAL);
 
@@ -217,7 +219,6 @@ export function FormularioSolicitud({
       )}
     </Campo>
   );
-  const etiquetaMensaje = camposModelo ? "¿En qué estás interesado?" : "Mensaje";
 
   return (
     <section aria-labelledby={idTitulo} className={claseSeccion}>
@@ -287,7 +288,7 @@ export function FormularioSolicitud({
             ))
           : null}
 
-        {camposModelo ? (
+        {conCiudad && !clasificacion ? (
           <div className="grid gap-4 sm:grid-cols-2">
             {campoNombre}
             {campoTelefono}

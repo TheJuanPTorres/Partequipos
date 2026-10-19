@@ -51,6 +51,25 @@ describe("estado vacío de usados", () => {
     );
   });
 
+  it("la foto de la categoría, mejor de un equipo de su mismo tipo (no del aditamento)", () => {
+    const aditamento = {
+      ...equipo(5, "Minicargadores", "minicargadores", "Aditamentos", "aditamentos"),
+      foto: { ...foto, url: "/ahoyador.jpg" },
+    };
+    const cargador = {
+      ...equipo(1, "Cargadores", "cargadores", "Case Construction", "case-construction"),
+      foto: { ...foto, url: "/w20f.jpg" },
+    };
+    const t = alternativasEnNueva(
+      "Cargadores",
+      [{ slug: "cargadores", nombre: "Cargadores", tipos: [5, 1] }],
+      [aditamento, cargador],
+      rutas,
+    );
+    assert.equal(t[0]?.imagen?.url, "/w20f.jpg");
+    assert.equal(t[0]?.detalle, "2 equipos nuevos");
+  });
+
   it("sin categoría de nueva, los tipos con equipos que se llaman igual (las motoniveladoras de Case)", () => {
     const equipos = [
       equipo(

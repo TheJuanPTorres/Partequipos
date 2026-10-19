@@ -89,13 +89,18 @@ export function alternativasEnNueva(
   if (categoria) {
     const tipos = new Set(categoria.tipos);
     const suyos = equipos.filter((e) => tipos.has(e.tipoId));
+    // La foto, mejor de un equipo cuyo tipo se llama como la categoría: en
+    // «Cargadores» entran también aditamentos (el ahoyador) y su foto engaña.
+    const mismoNombre = suyos.filter(
+      (e) => e.tipoRef && nombreComparable(e.tipoRef.nombre) === buscado,
+    );
     if (suyos.length) {
       return [
         {
           clave: `nueva-categoria-${categoria.slug}`,
           titulo: tituloPorDefecto.categoriaNueva(categoria.nombre),
           href: `${rutas.categoriaNueva(categoria.slug)}/`,
-          imagen: primeraFoto(suyos),
+          imagen: primeraFoto(mismoNombre) ?? primeraFoto(suyos),
           soloEscritorio: false,
           detalle: equiposTexto(suyos.length),
         },

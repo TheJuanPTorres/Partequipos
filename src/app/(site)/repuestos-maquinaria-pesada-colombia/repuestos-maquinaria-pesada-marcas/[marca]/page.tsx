@@ -6,6 +6,8 @@ import { SeccionTestimonios } from "@/components/portada/diferidos";
 import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
+import { SedesCompactas } from "@/components/repuestos/SedesCompactas";
 import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -20,6 +22,9 @@ import {
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { categoriasDeMarca, tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
+import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
+import { sedesDePortada } from "@/lib/portada/sedes";
+import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -54,18 +59,20 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 /** Ancla de la franja de categorías: a ella baja el icono de ratón del encabezado. */
 const ANCLA_CATEGORIAS = "categorias-repuestos";
+const ANCLA_CONTACTO = "contacto-repuestos";
 
 export default async function MarcaPage({ params }: { params: Promise<Params> }) {
   const { marca: marcaSlug } = await params;
   const marca = await getMarcaPorSlug(marcaSlug);
   if (!marca) notFound();
 
-  const [global, tipos, categorias, testimonios, empresa] = await Promise.all([
+  const [global, tipos, categorias, testimonios, empresa, sedes] = await Promise.all([
     getRepuestosMarca(),
     getTiposDeMarcaConImagen(marca.id),
     getCategoriasParaMarca(),
     getTestimoniosDePortada(),
     getEmpresa(),
+    getSedesDePortada(),
   ]);
 
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
@@ -99,6 +106,7 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
       />
 
       <ContactoMarca
+        id={ANCLA_CONTACTO}
         titulo={texto(global.contactoTitulo)}
         subtitulo={texto(global.contactoSubtitulo)}
         boton={texto(global.contactoBoton)}
@@ -115,6 +123,14 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
           verVideoTexto: texto(global.verVideoTexto),
         }}
       />
+
+      <PorQueElegirnos
+        id="por-que-elegirnos"
+        vista={vistaPorQue(global, marca)}
+        anclaContacto={ANCLA_CONTACTO}
+      />
+
+      <SedesCompactas id="sedes-repuestos" sedes={sedesDePortada(sedes)} />
     </main>
   );
 }

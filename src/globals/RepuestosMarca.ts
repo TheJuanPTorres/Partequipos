@@ -119,6 +119,42 @@ export const RepuestosMarca: GlobalConfig = {
     },
     { name: "verVideoTexto", type: "text", label: "Testimonios: texto «Ver video»" },
     /*
+     * «¿Por qué elegirnos?» de la plantilla de Andrés para las páginas de marca y de tipo de
+     * repuestos (2026-10-19): una foto a la izquierda y a la derecha el título, unos puntos, el
+     * cierre y el botón «Solicita asesoría» (baja al formulario de contacto).
+     */
+    {
+      name: "porQueTitulo",
+      type: "text",
+      label: "¿Por qué elegirnos?: título",
+      admin: { description: "Vacío: la sección no se pinta." },
+    },
+    {
+      name: "porQueImagen",
+      type: "upload",
+      relationTo: "media",
+      label: "¿Por qué elegirnos?: foto",
+      admin: { description: "Foto de la columna izquierda. Sin ella, un fondo oscuro." },
+    },
+    {
+      name: "porQuePuntos",
+      type: "array",
+      label: "¿Por qué elegirnos?: puntos",
+      maxRows: 6,
+      labels: { singular: "Punto", plural: "Puntos" },
+      fields: [
+        { name: "titulo", type: "text", required: true, label: "Título" },
+        { name: "texto", type: "textarea", required: true, label: "Texto" },
+      ],
+    },
+    {
+      name: "porQueCierre",
+      type: "text",
+      label: "¿Por qué elegirnos?: frase de cierre",
+      admin: { description: "«{marca}» se sustituye por el nombre de la marca de la página." },
+    },
+    { name: "porQueBoton", type: "text", label: "¿Por qué elegirnos?: texto del botón" },
+    /*
      * Lo común a las PÁGINAS DE MODELO de repuestos (2026-10-19): la tarjeta
      * «Estamos aquí para ayudarlo» de WordPress (la misma en todas) y el título
      * del formulario. La migración siembra los textos de WordPress.

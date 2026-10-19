@@ -127,7 +127,8 @@
   align-items: flex-start;
   gap: 14px;
   border-radius: 20px;
-  background: var(--color-fondo-seccion);
+  /* La página es gris: las tarjetas, blancas. */
+  background: #fff;
 }
 
 .sedeIcono {

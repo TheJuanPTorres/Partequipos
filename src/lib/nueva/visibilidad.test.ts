@@ -67,7 +67,8 @@ describe("marcas de nueva ocultas: los 301", () => {
  * las marcas ocultas. Busca cada `collection: "<colección>"` en el código del
  * sitio (fuera de las colecciones del panel, sus ganchos y el mapa de
  * redirects, que lee las ocultas a propósito) y exige el filtro en esa misma
- * llamada a `find`. Una consulta nueva sin él sacaría a Ammann en la web.
+ * llamada (`find`, `count` o `findByID`). No ve un nombre de colección en una
+ * variable: escríbelo literal. Una consulta nueva sin él sacaría a Ammann en la web.
  */
 const RAIZ = path.resolve(process.cwd(), "src");
 const COLECCIONES = ["marcas-maquinaria", "tipos-maquinaria", "equipos-nuevos"];
@@ -87,11 +88,16 @@ function ficheros(dir: string): string[] {
   });
 }
 
-/** El texto de la llamada que contiene `pos`, de su `find(` hasta el paréntesis que la cierra. */
+/**
+ * El texto de la llamada que contiene `pos` (`find`, `count` o `findByID`),
+ * desde su nombre hasta el paréntesis que la cierra.
+ */
 function llamada(texto: string, pos: number): string {
-  const inicio = texto.lastIndexOf(".find(", pos);
+  const inicio = Math.max(
+    ...[".find(", ".count(", ".findByID("].map((f) => texto.lastIndexOf(f, pos)),
+  );
   let nivel = 0;
-  for (let i = inicio + 5; i < texto.length; i++) {
+  for (let i = texto.indexOf("(", inicio); i < texto.length; i++) {
     if (texto[i] === "(") nivel++;
     else if (texto[i] === ")" && --nivel === 0) return texto.slice(inicio, i + 1);
   }
@@ -131,5 +137,11 @@ describe("guardarraíl: las lecturas públicas de nueva filtran las marcas ocult
       "x.ts:2 (equipos-nuevos)",
     ]);
     assert.deepEqual(lecturasSinFiltro([{ ruta: "y.ts", texto: bueno }]), []);
+    const cuenta = `await payload.count({
+  collection: "marcas-maquinaria",
+});`;
+    assert.deepEqual(lecturasSinFiltro([{ ruta: "z.ts", texto: cuenta }]), [
+      "z.ts:2 (marcas-maquinaria)",
+    ]);
   });
 });

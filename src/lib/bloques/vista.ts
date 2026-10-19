@@ -60,6 +60,21 @@ export type VistaPresentacionImagen = {
   titulo: string;
   texto: SerializedEditorState | null;
   boton: EnlaceBloque | null;
+  /** Solo el diseño «Servicio técnico»: imagen clara al pie de la sección. */
+  textura?: ImagenBloque | null;
+};
+
+/** «Proceso paso a paso» (2026-10-19): pasos numerados con etiqueta y texto. */
+export type VistaProcesoPasos = {
+  blockType: "procesoPasos";
+  id?: string | null;
+  ancla?: string | null;
+  antetitulo?: string | null;
+  titulo: string;
+  entradilla: string | null;
+  pasos: { id?: string | null; etiqueta: string; texto: string }[];
+  boton: EnlaceBloque | null;
+  textura?: ImagenBloque | null;
 };
 
 export type Cifra = {
@@ -116,6 +131,8 @@ export type VistaGaleria = {
   antetitulo?: string | null;
   /** Sin título, la galería se anuncia solo a lectores de pantalla. */
   titulo?: string | null;
+  /** Frase que presenta las fotos, bajo el título. */
+  texto?: string | null;
   imagenes: ImagenBloque[];
 };
 
@@ -129,6 +146,9 @@ export type VistaVideoYoutube = {
   /** Id de 11 caracteres y segundo de inicio, ya validados. */
   video: { id: string; inicio: number | null };
   miniatura: ImagenBloque | null;
+  /** Solo el diseño «Servicio técnico»: el vídeo propio del taller y el de fondo. */
+  videoTaller?: VideoBloque | null;
+  videoFondo?: VideoBloque | null;
 };
 
 export type VistaFormularioContacto = {
@@ -149,7 +169,8 @@ export type VistaBloque =
   | VistaTarjetasExpandibles
   | VistaGaleria
   | VistaVideoYoutube
-  | VistaFormularioContacto;
+  | VistaFormularioContacto
+  | VistaProcesoPasos;
 
 /**
  * Formato de las cifras como en ux-9: separador de miles «,» (el que pone el

@@ -9,6 +9,7 @@ import { BloqueFormularioContacto, type ContextoFormulario } from "./BloqueFormu
 import { BloqueFranjaMarquee } from "./BloqueFranjaMarquee";
 import { BloqueGaleria } from "./BloqueGaleria";
 import { BloquePresentacionImagen } from "./BloquePresentacionImagen";
+import { BloqueProcesoPasos } from "./BloqueProcesoPasos";
 import { BloqueTarjetasExpandibles } from "./BloqueTarjetasExpandibles";
 import { BloqueVideoYoutube } from "./BloqueVideoYoutube";
 import estilos from "./paginaConBloques.module.css";
@@ -40,6 +41,8 @@ function bloque(b: VistaBloque, clave: string, formulario: ContextoFormulario) {
       return <BloqueVideoYoutube key={clave} {...b} />;
     case "formularioContacto":
       return <BloqueFormularioContacto key={clave} {...b} contexto={formulario} />;
+    case "procesoPasos":
+      return <BloqueProcesoPasos key={clave} {...b} />;
   }
 }
 

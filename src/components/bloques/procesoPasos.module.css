@@ -1,0 +1,63 @@
+/* BLOQUE «PROCESO PASO A PASO»: el lenguaje de los demás bloques (3vw a los lados, fondo de la página). */
+.seccion {
+  padding: 40px 3vw;
+}
+
+.antetitulo {
+  margin: 0 0 8px;
+  color: var(--color-marca);
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto);
+}
+
+.entradilla {
+  margin: 12px 0 0;
+  max-width: 760px;
+}
+
+.pasos {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.paso {
+  padding: 24px;
+  border-radius: 24px;
+  background: var(--color-fondo);
+  box-shadow: 0 10px 30px rgb(16 15 15 / 0.07);
+}
+
+.numero {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.etiqueta {
+  margin: 14px 0 6px;
+  color: var(--color-texto);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.boton {
+  margin-top: 24px;
+}
+
+@media (min-width: 768px) {
+  .pasos {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}

@@ -10,6 +10,7 @@ import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { PlantillaServicioTecnico } from "@/components/servicioTecnico/PlantillaServicioTecnico";
 import { idsDeVideos, vistaDeBloques } from "@/lib/bloques/desdePayload";
 import { getArticuloPorSlug, getArticulos } from "@/lib/queries/getBlog";
 import {
@@ -26,6 +27,7 @@ import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { textoDias, textoHora } from "@/lib/seo/horario";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
+import { vistaServicioTecnico } from "@/lib/servicioTecnico/vista";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
@@ -154,6 +156,31 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
     const videos = await Promise.all(idsDeVideos(pagina.bloques).map((id) => getVideoPorId(id)));
     const porId = new Map(videos.flatMap((v) => (v ? [[v.id, v] as const] : [])));
     const vistas = vistaDeBloques(pagina.bloques, porId);
+    /*
+     * DISEÑO «SERVICIO TÉCNICO» (aprobado el 2026-10-19): los mismos bloques,
+     * compuestos con su plantilla propia. Migas (solo para lectores) y JSON-LD,
+     * como cualquier página con bloques.
+     */
+    if (pagina.diseno === "servicioTecnico") {
+      const datosEmpresa = await getEmpresa();
+      return (
+        <main>
+          <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
+          <div className="sr-only focus-within:not-sr-only">
+            <Breadcrumbs items={breadcrumbs} />
+          </div>
+          <PlantillaServicioTecnico
+            vista={vistaServicioTecnico(vistas)}
+            whatsapp={enlaceWhatsApp(
+              datosEmpresa.whatsapp,
+              "Hola, necesito un técnico para mi maquinaria.",
+            )}
+            siteKey={turnstileSiteKey()}
+            origen={`/${pagina.slug}`}
+          />
+        </main>
+      );
+    }
     // El WhatsApp del formulario solo se pide si la página lo lleva.
     const conFormulario = vistas.some((b) => b.blockType === "formularioContacto");
     const datosEmpresa = conFormulario ? await getEmpresa() : null;

@@ -19,8 +19,9 @@ import estilos from "./servicio.module.css";
 import { VideoFondo } from "./VideoFondo";
 
 /**
- * SERVICIO TÉCNICO CON DISEÑO PROPIO — muestra del 2026-10-19, pendiente de
- * aprobación de dirección (Andrés no tiene plantilla para esta página).
+ * SERVICIO TÉCNICO CON DISEÑO PROPIO — aprobado por dirección el 2026-10-19
+ * (Andrés no tiene plantilla para esta página). Lo pinta una página con
+ * «Diseño: Servicio técnico» (campo `diseno` de Páginas).
  *
  * El lenguaje de la web nueva (Inter, rojo del kit, radios de 30 px, vidrio,
  * velos y movimiento suave), con identidad de TALLER y sin repetir la
@@ -237,9 +238,7 @@ export function PlantillaServicioTecnico({
                       controls
                       preload="none"
                       playsInline
-                      poster={posterOptimizado(
-                        alistamiento.etapas.poster?.url ?? alistamiento.miniatura?.url,
-                      )}
+                      poster={posterOptimizado(alistamiento.etapas.poster?.url)}
                       src={alistamiento.etapas.url}
                       aria-label={alistamiento.etapas.descripcion || alistamiento.titulo}
                     />
@@ -352,7 +351,9 @@ export function PlantillaServicioTecnico({
                         {siniestros.aseguradoras}
                       </h3>
                     ) : null}
-                    <p className={estilos.parrafo}>{siniestros.galeriaTexto}</p>
+                    {siniestros.galeriaTexto ? (
+                      <p className={estilos.parrafo}>{siniestros.galeriaTexto}</p>
+                    ) : null}
                   </div>
                 </div>
                 <ul

@@ -52,20 +52,20 @@ describe("servicio técnico con diseño propio", () => {
   });
 
   it("saca los pasos de siniestros de sus párrafos «ETIQUETA: texto», tal cual", () => {
-    const v = vistaServicioTecnico(BLOQUES, { etapas: null, fondo: null, textura: null });
+    const v = vistaServicioTecnico(BLOQUES);
     assert.equal(v.siniestros?.intro, "Te acompañamos y asesoramos.");
     assert.deepEqual(v.siniestros?.pasos, [
       { numero: "01", etiqueta: "VALORACIÓN", texto: "Determinamos la cuantía." },
       { numero: "02", etiqueta: "REPARACIÓN", texto: "Reparamos." },
     ]);
-    // «Trabajamos con las principales aseguradoras» pasa a titular de la galería.
+    // Sin título en la galería, «Trabajamos con las principales aseguradoras» es su titular.
     assert.equal(v.siniestros?.aseguradoras, "Trabajamos con las principales aseguradoras");
     assert.deepEqual(v.siniestros?.cierre, []);
     assert.equal(v.siniestros?.galeria.length, 1);
   });
 
   it("la cabecera: el título, el antetítulo y el lema del taller; los accesos por ancla", () => {
-    const v = vistaServicioTecnico(BLOQUES, { etapas: null, fondo: null, textura: null });
+    const v = vistaServicioTecnico(BLOQUES);
     assert.equal(v.hero.titulo, "Servicio técnico");
     assert.equal(v.hero.antetitulo, "EN PARTEQUIPOS");
     assert.equal(v.hero.lema, "Contamos con personal calificado.");
@@ -79,5 +79,41 @@ describe("servicio técnico con diseño propio", () => {
     assert.deepEqual(v.taller?.parrafos, ["Nuestro departamento…"]);
     assert.equal(v.alistamiento, null);
     assert.equal(v.contacto?.botonTexto, "Enviar solicitud");
+  });
+
+  it("con el bloque «Proceso paso a paso» y el título y el texto de la galería", () => {
+    const bloques = [
+      ...BLOQUES.filter((b) => b.ancla !== "Siniestros" && b.blockType !== "galeria"),
+      {
+        blockType: "procesoPasos",
+        ancla: "Siniestros",
+        titulo: "¿TUVISTE UN ACCIDENTE?",
+        entradilla: "Te acompañamos.",
+        pasos: [
+          { etiqueta: "VALORACIÓN", texto: "Determinamos la cuantía." },
+          { etiqueta: "REPARACIÓN", texto: "Reparamos." },
+        ],
+        boton: null,
+        textura: { url: "/t.png", alt: "", width: 10, height: 2 },
+      },
+      {
+        blockType: "galeria",
+        titulo: "Trabajamos con las principales aseguradoras.",
+        texto: "Así llegan.",
+        imagenes: [{ url: "/a.jpg", alt: "a", width: 4, height: 3 }],
+      },
+    ] as unknown as VistaBloque[];
+    const v = vistaServicioTecnico(bloques);
+    assert.equal(v.siniestros?.intro, "Te acompañamos.");
+    assert.deepEqual(
+      v.siniestros?.pasos.map((p) => [p.numero, p.etiqueta]),
+      [
+        ["01", "VALORACIÓN"],
+        ["02", "REPARACIÓN"],
+      ],
+    );
+    assert.equal(v.siniestros?.aseguradoras, "Trabajamos con las principales aseguradoras.");
+    assert.equal(v.siniestros?.galeriaTexto, "Así llegan.");
+    assert.equal(v.textura?.url, "/t.png");
   });
 });

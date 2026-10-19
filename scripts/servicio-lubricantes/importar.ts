@@ -14,10 +14,13 @@
  * Argumentos POSICIONALES: `payload run` descarta las banderas con guiones.
  *
  * Qué escribe:
- * - `/servicio-tecnico/`: sus BLOQUES (cabecera con vídeo, #taller,
- *   #alistamiento con el vídeo de YouTube del cliente, #posventa, #Siniestros
- *   con su galería y el formulario), su entradilla, y vacía su «Contenido» y
- *   sus «Secciones con ancla» de demostración.
+ * - `/servicio-tecnico/`: «Diseño: Servicio técnico» (aprobado el 2026-10-19)
+ *   y sus BLOQUES (cabecera con vídeo; #taller con la textura; #alistamiento
+ *   con el corto de YouTube y su miniatura, el vídeo del taller y el de fondo;
+ *   #posventa; #Siniestros como «Proceso paso a paso»; la galería con
+ *   «Trabajamos con las principales aseguradoras» de titular, y el
+ *   formulario), su entradilla, y vacía su «Contenido» y sus «Secciones con
+ *   ancla» de demostración.
  * - La marca `lubricantes-eni`: entradilla, logo e imagen de cabecera.
  * - Sus 4 categorías: entradilla, imagen de la tarjeta y los productos con su
  *   foto y su ficha técnica en PDF.
@@ -525,14 +528,20 @@ const lexical = (...hijos: object[]) => ({ root: { type: "root", ...base, childr
 
 async function anotarAnterior(coleccion: Coleccion, id: number, campos: string[]) {
   const clave = `${coleccion}:${id}`;
-  if (manifiesto.anteriores[clave]) return; // la primera pasada manda
+  const ya = manifiesto.anteriores[clave];
+  // La primera pasada manda; de un campo que entonces no se tocaba (p. ej.
+  // `diseno`, 2026-10-19) se apunta el valor de ahora, que aún es el de antes.
+  if (ya && campos.every((c) => c in ya)) return;
   const doc = (await payload.findByID({
     collection: coleccion,
     id,
     depth: 0,
     overrideAccess: true,
   })) as unknown as Record<string, unknown>;
-  manifiesto.anteriores[clave] = Object.fromEntries(campos.map((c) => [c, doc[c] ?? null]));
+  manifiesto.anteriores[clave] = {
+    ...Object.fromEntries(campos.map((c) => [c, doc[c] ?? null])),
+    ...ya,
+  };
   guardarManifiesto();
 }
 
@@ -560,7 +569,8 @@ const pagina = (
 ).docs[0];
 if (!pagina) fallar("no existe la página «servicio-tecnico» en el destino");
 
-if (SOLO === "faltantes") {
+/** Sube lo que faltaba frente a WordPress (2026-10-19) y devuelve sus ids. */
+async function subirFaltantes() {
   const a = s.alistamiento;
   if (!s.fondo || !a.videoAlojado || !a.videoFondo) {
     fallar("el contenido extraído no trae lo que faltaba: vuelve a ejecutar extraer-xml.py");
@@ -587,10 +597,14 @@ if (SOLO === "faltantes") {
     a.youtube,
     "Técnico de Partequipos explicando una fase del alistamiento de una máquina",
   );
-  log(`miniatura del vídeo de YouTube: ${miniatura ?? "(por subir)"}`);
   log(
-    `faltantes: textura ${fondo ?? "(por subir)"} · vídeo de etapas ${etapas ?? "(por subir)"} · vídeo de fondo ${fondoVideo ?? "(por subir)"} · póster ${posterFondo ?? "(por subir)"}`,
+    `faltantes: textura ${fondo ?? "(por subir)"} · vídeo de etapas ${etapas ?? "(por subir)"} · vídeo de fondo ${fondoVideo ?? "(por subir)"} · póster ${posterFondo ?? "(por subir)"} · miniatura de YouTube ${miniatura ?? "(por subir)"}`,
   );
+  return { fondo, etapas, fondoVideo, miniatura };
+}
+
+const faltantes = await subirFaltantes();
+if (SOLO === "faltantes") {
   log(
     `ficheros: subidos ${cuenta.subidos} · reutilizados ${cuenta.reutilizados} · por subir ${cuenta.simulados}`,
   );
@@ -617,6 +631,13 @@ for (const f of s.siniestros.galeria) {
 }
 
 const BOTON_CONTACTO = { botonTexto: "Contáctanos", botonEnlace: "/contactanos/" };
+/**
+ * La frase que presenta la galería de siniestros: texto NUESTRO (en WordPress
+ * no hay), aprobado con la muestra; describe las fotos sin decir que son
+ * trabajos propios. Se cambia en el panel.
+ */
+const TEXTO_GALERIA_SINIESTROS =
+  "Así llegan muchas máquinas tras un siniestro. Te acompañamos desde la valoración hasta la reparación y los repuestos.";
 const bloques = [
   {
     blockType: "cabeceraVideo",
@@ -635,6 +656,7 @@ const bloques = [
       parrafo({ negrita: s.taller.destacado }),
     ),
     ...BOTON_CONTACTO,
+    textura: faltantes.fondo,
   },
   {
     blockType: "videoYoutube",
@@ -642,7 +664,11 @@ const bloques = [
     titulo: s.alistamiento.titulo,
     texto: lexical(...s.alistamiento.parrafos.map((p) => parrafo(p))),
     youtube: s.alistamiento.youtube,
-    miniatura: imgAlistamiento,
+    // La portada del corto es SU miniatura de YouTube; el póster de WordPress
+    // (`imgAlistamiento`) es el del vídeo del taller, que ya lo lleva.
+    miniatura: faltantes.miniatura ?? imgAlistamiento,
+    videoTaller: faltantes.etapas,
+    videoFondo: faltantes.fondoVideo,
   },
   {
     blockType: "presentacionImagen",
@@ -653,24 +679,26 @@ const bloques = [
     ...BOTON_CONTACTO,
   },
   {
-    blockType: "presentacionImagen",
+    // El proceso de siniestros, paso a paso (diseño «Servicio técnico», 2026-10-19).
+    blockType: "procesoPasos",
     ancla: "Siniestros",
     titulo: s.siniestros.titulo,
-    texto: lexical(
-      parrafo({ negrita: s.siniestros.intro }),
-      ...s.siniestros.apartados.map((a) =>
-        parrafo(
-          // La etiqueta, tal cual (en mayúsculas en WordPress; decisión del cliente, 2026-10-18).
-          { negrita: `${a.etiqueta}: ` },
-          a.texto,
-        ),
-      ),
-      parrafo({ negrita: `${s.siniestros.aseguradoras}.` }),
-    ),
+    entradilla: s.siniestros.intro,
+    // Las etiquetas, tal cual (en mayúsculas en WordPress; decisión del cliente, 2026-10-18).
+    pasos: s.siniestros.apartados.map((a) => ({ etiqueta: a.etiqueta, texto: a.texto })),
     ...BOTON_CONTACTO,
+    textura: faltantes.fondo,
   },
   ...(galeria.length
-    ? [{ blockType: "galeria", imagenes: galeria.map((id) => ({ imagen: id })) }]
+    ? [
+        {
+          blockType: "galeria",
+          // «Trabajamos con las principales aseguradoras» presenta la galería.
+          titulo: `${s.siniestros.aseguradoras}.`,
+          texto: TEXTO_GALERIA_SINIESTROS,
+          imagenes: galeria.map((id) => ({ imagen: id })),
+        },
+      ]
     : []),
   {
     blockType: "formularioContacto",
@@ -684,6 +712,7 @@ await actualizar("paginas", pagina!.id, {
   entradilla: s.taller.parrafos[0],
   contenido: null,
   secciones: [],
+  diseno: "servicioTecnico",
   bloques,
 });
 log(`servicio técnico: ${bloques.length} bloques (galería: ${galeria.length} fotos)`);

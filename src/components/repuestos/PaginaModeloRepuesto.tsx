@@ -131,9 +131,11 @@ export async function PaginaModeloRepuesto({
                   alt={img.alt}
                   width={img.width}
                   height={img.height}
-                  // La primera foto es el LCP de la ficha del modelo (2026-10-19): se
-                  // precarga en vez de esperar al `lazy` por defecto.
-                  preload={i === 0}
+                  // La primera foto es el LCP de la ficha del modelo (2026-10-19): carga
+                  // inmediata y prioridad alta, como recomienda Next 16 para el LCP. Con
+                  // `preload`, Chrome la pedía con prioridad baja (medido).
+                  loading={i === 0 ? "eager" : "lazy"}
+                  fetchPriority={i === 0 ? "high" : undefined}
                   // `max-w-4xl` en 2 columnas desde 640 px: ~400 px de foto.
                   sizes="(min-width: 896px) 400px, (min-width: 640px) 48vw, 92vw"
                   className="h-auto w-full object-contain"

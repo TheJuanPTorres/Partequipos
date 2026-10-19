@@ -37,7 +37,8 @@ import type { TarjetaMarca } from "../repuestos/marca";
 import { getEmpresa } from "../queries/getSeo";
 import { enlaceWhatsApp, type EnlaceWhatsApp } from "../whatsapp";
 import { tarjetasDeCategoriasUsada } from "./indice";
-import { alternativasEnNueva, mensajeSinUnidades } from "./vacia";
+import { getPaginasIndice } from "../queries/getPaginasIndice";
+import { alternativasEnNueva, mensajeSinUnidades, usaEstadoVacioPropio } from "./vacia";
 
 /**
  * Lo que pinta el ESTADO VACÍO de un listado sin unidades (petición del
@@ -52,6 +53,12 @@ export type DatosVacio = {
   otras: TarjetaMarca[];
   whatsapp?: EnlaceWhatsApp;
 };
+
+/** El aviso provisional de un listado sin unidades: el WhatsApp con su mensaje. */
+export type AvisoVacio = { whatsapp?: EnlaceWhatsApp };
+
+const mensajeWhatsApp = (ambito: Ambito) =>
+  `Hola, busco ${ambito.titulo.charAt(0).toLowerCase()}${ambito.titulo.slice(1)}. Avísenme cuando llegue una.`;
 
 async function datosVacio(ambito: Ambito): Promise<DatosVacio> {
   const [listadoNueva, categorias, inventario, empresa] = await Promise.all([
@@ -69,10 +76,7 @@ async function datosVacio(ambito: Ambito): Promise<DatosVacio> {
         ? alternativasEnNueva(nombre, listadoNueva.categorias, listadoNueva.equipos, rutas)
         : [],
     otras: tarjetasDeCategoriasUsada(categorias, inventario, rutas.categoriaUsada).slice(0, 6),
-    whatsapp: enlaceWhatsApp(
-      empresa.whatsapp,
-      `Hola, busco ${ambito.titulo.charAt(0).toLowerCase()}${ambito.titulo.slice(1)}. Avísenme cuando llegue una.`,
-    ),
+    whatsapp: enlaceWhatsApp(empresa.whatsapp, mensajeWhatsApp(ambito)),
   };
 }
 
@@ -207,9 +211,19 @@ export async function cargarListadoUsado(
   });
   if (listado.tipo === "redirigir") permanentRedirect(listado.destino);
   if (listado.tipo === "no-existe") notFound();
-  // Solo sin ninguna unidad (no por los filtros): el estado vacío diseñado.
-  const vacio = ambito.unidades.length === 0 ? await datosVacio(ambito) : null;
-  return { ambito, listado, vacio };
+  // Solo sin ninguna unidad (no por los filtros): el aviso provisional o, si el
+  // global «Páginas índice» lo elige, el estado vacío diseñado.
+  let vacio: DatosVacio | null = null;
+  let aviso: AvisoVacio | null = null;
+  if (ambito.unidades.length === 0) {
+    const indice = await getPaginasIndice();
+    if (usaEstadoVacioPropio(indice.usada)) vacio = await datosVacio(ambito);
+    else {
+      const empresa = await getEmpresa();
+      aviso = { whatsapp: enlaceWhatsApp(empresa.whatsapp, mensajeWhatsApp(ambito)) };
+    }
+  }
+  return { ambito, listado, vacio, aviso };
 }
 
 /**

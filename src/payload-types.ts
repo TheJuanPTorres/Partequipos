@@ -3500,7 +3500,7 @@ export interface PaginasIndice {
   /**
    * Solo el encabezado: las tarjetas salen solas, una por categoría y una por marca con unidades disponibles.
    */
-  usada?: {
+  usada: {
     antetitulo?: string | null;
     titulo?: string | null;
     texto?: string | null;
@@ -3508,6 +3508,10 @@ export interface PaginasIndice {
      * Opcional. Foto de obra a todo el ancho; sin ella, la misma de respaldo que «Maquinaria pesada».
      */
     fondo?: (number | null) | Media;
+    /**
+     * «Provisional»: «Por ahora no hay unidades disponibles», con enlace a Contáctanos y WhatsApp. «Diseño propio»: el nuestro, con alternativas y «Avísame», sin aprobar para el sitio publicado.
+     */
+    estadoVacio: 'provisional' | 'propio';
   };
   contacto?: {
     antetitulo?: string | null;
@@ -3724,6 +3728,7 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
         titulo?: T;
         texto?: T;
         fondo?: T;
+        estadoVacio?: T;
       };
   contacto?:
     | T

@@ -16,6 +16,18 @@ import { posicionFocal, type ImagenLista } from "../utils/relations";
 export const SIN_UNIDADES = "Sin unidades por ahora";
 
 /**
+ * ¿Se pinta el estado vacío diseñado? Solo si el global lo elige expresamente:
+ * sin valor, o con cualquier otro, el aviso provisional (dirección,
+ * 2026-10-19: en el sitio publicado solo van diseños de Andrés).
+ */
+export function usaEstadoVacioPropio(usada: { estadoVacio?: string | null } | null | undefined) {
+  return usada?.estadoVacio === "propio";
+}
+
+/** El texto del aviso provisional de un listado sin unidades. */
+export const AVISO_SIN_UNIDADES = "Por ahora no hay unidades disponibles.";
+
+/**
  * Nombre comparable: minúsculas, sin tildes y en singular aproximado
  * («Motoniveladoras» → «motoniveladora», «Cargadores» → «cargador»,
  * «Bulldozers» → «bulldozer»).

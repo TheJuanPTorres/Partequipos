@@ -1,12 +1,15 @@
 import { IconCalendar, IconClockHour4, IconWeight } from "@tabler/icons-react";
+import Link from "next/link";
 
 import { PlantillaListado } from "@/components/listado/PlantillaListado";
 import { TarjetaListado } from "@/components/listado/TarjetaListado";
 import type { ResultadoListado } from "@/lib/filtros";
 import type { UnidadUsada } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
+import estilosListado from "@/components/listado/listado.module.css";
 import { EstadoVacioUsados } from "@/components/usados/EstadoVacioUsados";
-import type { Ambito, DatosVacio } from "@/lib/usados/listado";
+import type { Ambito, AvisoVacio, DatosVacio } from "@/lib/usados/listado";
+import { AVISO_SIN_UNIDADES } from "@/lib/usados/vacia";
 
 const numero = (n: number) => n.toLocaleString("es-CO");
 
@@ -19,19 +22,25 @@ const numero = (n: number) => n.toLocaleString("es-CO");
  * Las piezas son las comunes (`src/components/listado/`).
  *
  * Solo se listan las disponibles; las vendidas se marcan, no se borran. Sin
- * ninguna unidad, el estado vacío diseñado (`EstadoVacioUsados`).
+ * ninguna unidad, el AVISO PROVISIONAL («Por ahora no hay unidades
+ * disponibles», con Contáctanos y WhatsApp) o, si el global «Páginas índice»
+ * lo elige, el estado vacío diseñado (`EstadoVacioUsados`). Dirección,
+ * 2026-10-19: en el sitio publicado solo van diseños de Andrés.
  */
 export function ListadoUsados({
   ambito,
   pagina,
   listado,
   vacio,
+  aviso,
 }: {
   ambito: Ambito;
   pagina: number;
   listado: Extract<ResultadoListado<UnidadUsada>, { tipo: "listado" }>;
   /** Sin ninguna unidad: el estado vacío diseñado (alternativas y «Avísame»). */
   vacio: DatosVacio | null;
+  /** Sin ninguna unidad y con el interruptor en «Provisional»: el aviso sencillo. */
+  aviso?: AvisoVacio | null;
 }) {
   const { registro, catalogo } = ambito;
   const migas = [
@@ -59,8 +68,25 @@ export function ListadoUsados({
       vacio={
         vacio ? (
           <EstadoVacioUsados datos={vacio} origen={`${ambito.ruta(pagina)}/`} />
+        ) : aviso ? (
+          <div className={estilosListado.vacio}>
+            <p>{AVISO_SIN_UNIDADES}</p>
+            <p>
+              <Link href="/contactanos/">Contáctanos</Link>
+              {aviso.whatsapp ? (
+                <>
+                  {" o "}
+                  <a href={aviso.whatsapp.href} target="_blank" rel="noopener noreferrer">
+                    escríbenos por WhatsApp
+                    <span className="sr-only"> (se abre en una pestaña nueva)</span>
+                  </a>
+                </>
+              ) : null}{" "}
+              y te avisamos cuando llegue una.
+            </p>
+          </div>
         ) : (
-          "Por ahora no hay unidades disponibles."
+          AVISO_SIN_UNIDADES
         )
       }
     >

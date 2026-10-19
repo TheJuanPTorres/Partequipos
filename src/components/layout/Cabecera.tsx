@@ -108,10 +108,12 @@ function Logo({
         width={logo.width}
         height={logo.height}
         className={estilos.logo}
-        // Ni precarga ni `lazy` (2026-10-19): no es el LCP de ninguna página, y precargado
-        // competía con la imagen que sí lo es. `sizes` con su ancho pintado (`--cab-logo`,
-        // `--cab-logo-movil`): sin él se pedía la versión de 1920 px (CLAUDE.md §2).
+        // Sin precarga y con prioridad BAJA (2026-10-19): no es el LCP de ninguna página.
+        // Precargado competía con la imagen que sí lo es, y con `eager` a secas Chrome lo
+        // sube a «High» al verlo en pantalla (medido). `sizes` con su ancho pintado
+        // (`--cab-logo`, `--cab-logo-movil`); sin él se pedía la versión de 1920 px (CLAUDE.md §2).
         loading="eager"
+        fetchPriority="low"
         sizes="(max-width: 1024px) 170px, 187px"
       />
     </Link>

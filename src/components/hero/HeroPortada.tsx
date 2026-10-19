@@ -60,8 +60,11 @@ import estilos from "./hero.module.css";
  * vez la línea, el Ken Burns y el pase, sin dos relojes que se desincronicen.
  *
  * CARGA DE IMÁGENES: el fondo de la primera diapositiva es el LCP y es el único
- * que se precarga. Los demás NO están en el HTML: se añaden desde código cuando
- * la primera foto ha terminado de cargar, y siempre la siguiente a la activa.
+ * que se precarga. Los demás NO están en el HTML ni se piden al abrir
+ * (2026-10-19): la SIGUIENTE se pide `ANTICIPO_MS` antes de que le toque, con
+ * el pase en marcha, y la de destino al acercarse a una flecha o a un punto.
+ * Si al cambiar la foto de destino aún no ha llegado, el cambio la ESPERA
+ * (hasta `ESPERA_MAX_MS`): nunca se ve la tarjeta en blanco.
  */
 
 type Props = { diapositivas: DiapositivaHero[] };
@@ -76,6 +79,12 @@ const GESTO_PX = 50;
 const PARRAFO_LARGO = 130;
 /** Lo que dura el fundido (`--hero-fundido` en el CSS), para soltar la saliente. */
 const FUNDIDO_MS = 1200;
+/** Lo que dura cada diapositiva (`--hero-pase` en el CSS). */
+const PASE_MS = 7000;
+/** Con cuánta antelación se pide la foto de la siguiente diapositiva. */
+const ANTICIPO_MS = 3000;
+/** Lo máximo que un cambio espera a que llegue la foto de destino; después cambia igual. */
+const ESPERA_MAX_MS = 3000;
 
 /**
  * CHEVRÓN MACIZO de las flechas de la Home V2 (2026-10-16): la misma silueta
@@ -243,6 +252,10 @@ export function HeroPortada({ diapositivas }: Props) {
   const [cambiado, setCambiado] = useState(false);
   /** Fondos que ya pueden pintarse. Al cargar, solo el primero (el LCP). */
   const [cargadas, setCargadas] = useState<ReadonlySet<number>>(() => new Set([0]));
+  /** Fondos cuya foto ya llegó (su `onLoad`). La primera viene en el HTML. */
+  const [listas, setListas] = useState<ReadonlySet<number>>(() => new Set([0]));
+  /** Cambio que espera a que llegue la foto de su destino, y su temporizador de respaldo. */
+  const pendiente = useRef<{ destino: number; porUsuario: boolean; espera: number } | null>(null);
   /** Ratón o foco dentro: el pase espera (no cuenta como pausa del usuario). */
   const [dentro, setDentro] = useState(false);
   /*
@@ -285,11 +298,11 @@ export function HeroPortada({ diapositivas }: Props) {
     });
   }, []);
 
-  const ir = useCallback(
-    (destino: number, porUsuario: boolean) => {
-      const siguiente = (destino + total) % total;
-      if (siguiente === activo) return;
-      cargar(siguiente, (siguiente + 1) % total);
+  /** Cambia ya, con la foto de destino cargada (o tras esperarla). */
+  const cambiar = useCallback(
+    (siguiente: number, porUsuario: boolean) => {
+      if (pendiente.current) window.clearTimeout(pendiente.current.espera);
+      pendiente.current = null;
       setSaliente(activo);
       setActivo(siguiente);
       setCambiado(true);
@@ -299,8 +312,56 @@ export function HeroPortada({ diapositivas }: Props) {
         setAnuncio(`Diapositiva ${siguiente + 1} de ${total}: ${diapositivas[siguiente]!.titulo}`);
       }
     },
-    [activo, cargar, diapositivas, pausar, total],
+    [activo, diapositivas, pausar, total],
   );
+
+  const ir = useCallback(
+    (destino: number, porUsuario: boolean) => {
+      const siguiente = (destino + total) % total;
+      if (siguiente === activo) return;
+      if (listas.has(siguiente)) {
+        cambiar(siguiente, porUsuario);
+        return;
+      }
+      // Su foto aún no ha llegado: se pide y el cambio la espera (sin tarjeta en blanco),
+      // como mucho `ESPERA_MAX_MS`.
+      cargar(siguiente);
+      if (pendiente.current) window.clearTimeout(pendiente.current.espera);
+      pendiente.current = {
+        destino: siguiente,
+        porUsuario,
+        espera: window.setTimeout(() => cambiar(siguiente, porUsuario), ESPERA_MAX_MS),
+      };
+    },
+    [activo, cambiar, cargar, listas, total],
+  );
+
+  /** La foto de una diapositiva llegó: si un cambio la esperaba, se hace ya. */
+  const alLlegar = (i: number) => {
+    setListas((antes) => (antes.has(i) ? antes : new Set(antes).add(i)));
+    if (pendiente.current?.destino === i) cambiar(i, pendiente.current.porUsuario);
+  };
+
+  /* Sin temporizadores colgando al desmontar. */
+  useEffect(
+    () => () => {
+      if (pendiente.current) window.clearTimeout(pendiente.current.espera);
+    },
+    [],
+  );
+
+  /* La foto de la SIGUIENTE se pide `ANTICIPO_MS` antes de que le toque, con el pase en marcha. */
+  useEffect(() => {
+    if (!hayVarias || pausado || dentro) return;
+    const t = window.setTimeout(
+      () => cargar((activo + 1) % total),
+      Math.max(PASE_MS - ANTICIPO_MS, 0),
+    );
+    return () => window.clearTimeout(t);
+  }, [activo, cargar, dentro, hayVarias, pausado, total]);
+
+  /** Al acercarse a una flecha o a un punto, se pide ya la foto de su destino. */
+  const anticipar = (destino: number) => cargar((destino + total) % total);
 
   const mover = (paso: 1 | -1) => ir(activo + paso, true);
 
@@ -331,16 +392,6 @@ export function HeroPortada({ diapositivas }: Props) {
       document.fonts.load(`${t.peso ?? 600} 1em "${t.fuente.familia}"`).catch(() => {});
     }
   }, [cargadas, diapositivas]);
-
-  /*
-   * PRECARGA DIFERIDA: la segunda foto, solo cuando la primera ha terminado de
-   * cargar (el LCP ya se pintó) y el navegador está libre.
-   */
-  const alCargarPrimera = useCallback(() => {
-    if (!hayVarias) return;
-    const ric = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 200));
-    ric(() => cargar(1 % total));
-  }, [cargar, hayVarias, total]);
 
   /* Fin de la línea de progreso del punto activo: pasa a la siguiente. */
   const alTerminarProgreso = (e: AnimationEvent<HTMLElement>) => {
@@ -494,11 +545,7 @@ export function HeroPortada({ diapositivas }: Props) {
                 data-estado={estadoDe(i)}
                 aria-hidden={i !== activo}
               >
-                <FondoHero
-                  diapositiva={s}
-                  primera={i === 0}
-                  alCargar={i === 0 ? alCargarPrimera : undefined}
-                />
+                <FondoHero diapositiva={s} primera={i === 0} alCargar={() => alLlegar(i)} />
               </div>
             ) : null,
           )}
@@ -592,6 +639,8 @@ export function HeroPortada({ diapositivas }: Props) {
                 type="button"
                 className={estilos.flecha}
                 onClick={() => mover(-1)}
+                onPointerEnter={() => anticipar(activo - 1)}
+                onFocus={() => anticipar(activo - 1)}
                 aria-label="Diapositiva anterior"
                 aria-controls={idTitulo}
               >
@@ -601,6 +650,8 @@ export function HeroPortada({ diapositivas }: Props) {
                 type="button"
                 className={estilos.flecha}
                 onClick={() => mover(1)}
+                onPointerEnter={() => anticipar(activo + 1)}
+                onFocus={() => anticipar(activo + 1)}
                 aria-label="Diapositiva siguiente"
                 aria-controls={idTitulo}
               >
@@ -620,6 +671,8 @@ export function HeroPortada({ diapositivas }: Props) {
                       type="button"
                       className={estilos.punto}
                       onClick={() => ir(i, true)}
+                      onPointerEnter={() => anticipar(i)}
+                      onFocus={() => anticipar(i)}
                       onAnimationEnd={i === activo ? alTerminarProgreso : undefined}
                       aria-label={`Diapositiva ${i + 1} de ${total}: ${s.titulo}`}
                       aria-current={i === activo ? "true" : undefined}

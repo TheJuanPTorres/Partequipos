@@ -108,7 +108,7 @@ Hasta el 2026-10-17 llevaban `dudosa: true` en el JSON del extractor e importar 
 - **Pintado a 390, 1010 y 1440:** sin imágenes rotas, sin desborde horizontal y sin errores de consola. Nosotros, igual.
 - **Fallo encontrado al pintar y corregido:** la columna de imagen de «Presentación con imagen» tiene un alto mínimo de 677 px, medido para el mapa de Nosotros. Con una foto apaisada dejaba un hueco grande. Ahora, foto apaisada sin animación: sin ese alto mínimo y a todo el ancho de su columna. El mapa de Nosotros es vertical y no cambia.
 
-## 6. Diseño propio de servicio técnico (aprobado por dirección el 2026-10-19)
+## 6. Diseño propio de servicio técnico (aprobado por dirección el 2026-10-19; SUSTITUIDO por el §7)
 
 Andrés no tiene plantilla para esta página. Dirección aprobó la muestra v2 (PR #262) y se aplica a `/servicio-tecnico/`. Lleva el lenguaje de la web nueva (Inter, rojo del kit, radios de 30 px, vidrio, velos y movimiento suave) con composición propia:
 
@@ -143,3 +143,36 @@ Los dos vídeos van **recomprimidos** por el tope de 4 MB: 480p y sin sonido. Di
 
 - «Solicitar un técnico», «¿Qué necesitas?», «Vídeo del taller» y «En YouTube» son de la plantilla;
 - la frase de la galería es el «Texto de presentación» del bloque.
+
+## 7. Plantilla de Andrés para servicio técnico (aprobada por dirección el 2026-10-19, PR #269)
+
+Andrés mandó su plantilla (`elementor-4010-2026-10-19.json`) y sustituye al diseño propio del §6. La referencia pintada estaba en mantenimiento, así que se replicó del export. Sigue el mismo interruptor: «Diseño: Servicio técnico» en Páginas (`PlantillaServicioTecnico`), con los mismos bloques. **Sin esquema.**
+
+**Lo que replica:**
+
+- cabecera de vídeo con «Partequipos» y «Servicio técnico» revelados por palabras (`Revelado`);
+- cuatro tarjetas con icono que llevan a cada sección. Los iconos son de Tabler; los SVG de Andrés son de su web;
+- cada sección con su línea, su antetítulo (el texto de su tarjeta) y dos columnas: el medio y el texto con «Contáctanos»;
+- **alistamiento:** carrusel con el vídeo de las etapas y el corto de YouTube (`CarruselVideos`) y, al lado, el texto de **posventa**. Así lo compone Andrés: no hay sección de posventa, y la tarjeta «Servicio postventa» lleva a ese texto;
+- **siniestros:** la galería es la de la ficha (`GaleriaFicha`), los 3 pasos van en tarjetas con icono y «Trabajamos con las principales aseguradoras» cierra la sección.
+
+**Decisiones de dirección:**
+
+- la foto de Hitachi de posventa no se pinta (sigue en el bloque);
+- los títulos, en MAYÚSCULAS como en WordPress (migración tal cual);
+- el vídeo de las etapas sigue recomprimido a 480p. **No está en YouTube:** `Fi2WeEeeeFI` es el corto «Proceso de alistamiento Maquinaria Pesada Usada», y `XHOmBV4js_E` es el vídeo de ejemplo de Elementor;
+- **el contacto final es el bloque de las plantillas de Andrés de repuestos** (`ContactoMarca`): antetítulo = título del bloque de formulario («Contacto Partequipos»), título revelado = su texto («Si deseas más información, contáctanos»), con «Ciudad» y el mensaje como «¿Qué necesitas?».
+
+**Se conserva sin estar en la plantilla:** la frase destacada del taller, en negrita bajo su texto.
+
+**Ya no se pintan** (los campos siguen en el panel): la textura, el vídeo de fondo y el texto de la galería. El mosaico (`tamanosBento`) se retiró. `importar.ts` ya solo sube el vídeo de las etapas y la miniatura de YouTube.
+
+**Desviaciones:**
+
+| Desviación                                                         | Motivo                                            |
+| ------------------------------------------------------------------ | ------------------------------------------------- |
+| El carrusel no pasa solo, y sus puntos tienen 24 px de área táctil | Son vídeos: pasar solo los cortaría a mitad       |
+| Las tarjetas van de 2 en 2 en tablet y móvil                       | El export las deja en una fila de 4               |
+| El vídeo de cabecera, solo en escritorio                           | Como en todo el sitio                             |
+| Las tarjetas, en el gris del kit `#F0F0F0`                         | El global `a3f07e1` no está en el kit que tenemos |
+| La galería lleva de fondo la foto desenfocada                      | Es la de la ficha                                 |

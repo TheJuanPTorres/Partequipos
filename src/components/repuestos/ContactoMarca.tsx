@@ -26,6 +26,7 @@ export function ContactoMarca({
   marca,
   id = "repuestos-marca-contacto",
   modelo,
+  formulario,
 }: {
   titulo: string;
   subtitulo: string;
@@ -42,6 +43,11 @@ export function ContactoMarca({
    * de clasificación.
    */
   modelo?: { id: number; nombre: string };
+  /**
+   * Otra página con el mismo bloque (servicio técnico, 2026-10-19): el título
+   * del formulario para lectores y sus campos. Sin esto, el de repuestos.
+   */
+  formulario?: { titulo: string; conCiudad?: boolean; etiquetaMensaje?: string };
 }) {
   if (!subtitulo) return null;
   return (
@@ -64,11 +70,17 @@ export function ContactoMarca({
           referencia={
             modelo ? { tipo: "modelos-repuesto", id: modelo.id, texto: modelo.nombre } : undefined
           }
-          titulo={`Contacto sobre repuestos ${marca}`}
+          titulo={formulario?.titulo ?? `Contacto sobre repuestos ${marca}`}
           textoBoton={boton || "Enviar"}
-          clasificacion={!modelo}
-          conCiudad={Boolean(modelo)}
-          etiquetaMensaje={modelo ? "¿En qué estás interesado?" : undefined}
+          clasificacion={!modelo && !formulario}
+          conCiudad={formulario ? Boolean(formulario.conCiudad) : Boolean(modelo)}
+          etiquetaMensaje={
+            formulario
+              ? formulario.etiquetaMensaje
+              : modelo
+                ? "¿En qué estás interesado?"
+                : undefined
+          }
           variante="plano"
         />
       </div>

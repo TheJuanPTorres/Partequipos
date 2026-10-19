@@ -100,6 +100,8 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
    * PRODUCCIÓN (`VERCEL_ENV`): solo existe en local y en los preview.
    */
   "/laboratorio/movimiento": "banco de pruebas, 404 en producción",
+  "/laboratorio/marcas-nueva-a": "concepto A del índice de marcas de nueva, 404 en producción",
+  "/laboratorio/marcas-nueva-b": "concepto B del índice de marcas de nueva, 404 en producción",
   /*
    * Resultados de búsqueda (`?q=…`): `noindex, follow`. Una página por cada texto
    * que alguien escriba no es contenido que indexar.

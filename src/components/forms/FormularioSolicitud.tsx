@@ -78,11 +78,21 @@ export function FormularioSolicitud({
   titulo,
   descripcion,
   textoBoton,
-  clasificacion = false,
+  clasificacion: clasificacionPagina = false,
   variante = "tarjeta",
-  etiquetaMensaje = "Mensaje",
-  conCiudad = false,
+  etiquetaMensaje: etiquetaPagina = "Mensaje",
+  conCiudad: conCiudadPagina = false,
 }: Props) {
+  /*
+   * La VENTANA EMERGENTE lleva siempre «Ciudad» y «¿Qué necesitas?» (dirección,
+   * 2026-10-19) y no las preguntas de clasificación del diseño de repuestos:
+   * es el mismo formulario corto en cualquier página que la abra.
+   */
+  const emergente = variante === "emergente";
+  const clasificacion = emergente ? false : clasificacionPagina;
+  const conCiudad = emergente || conCiudadPagina;
+  const etiquetaMensaje =
+    emergente && etiquetaPagina === "Mensaje" ? "¿Qué necesitas?" : etiquetaPagina;
   const [estado, accion, enviando] = useActionState(enviarSolicitud, ESTADO_INICIAL);
 
   const idBase = useId();

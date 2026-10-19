@@ -46,6 +46,7 @@ export default async function LaboratorioServicioTecnico() {
     etapas: vistaDeVideo(recursos.etapas),
     fondo: vistaDeVideo(recursos.fondo),
     textura: imagenDeMedia(recursos.textura, ""),
+    miniaturaYoutube: imagenDeMedia(recursos.miniaturaYoutube, ""),
   });
 
   return (

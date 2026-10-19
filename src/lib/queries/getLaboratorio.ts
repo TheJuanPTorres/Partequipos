@@ -36,10 +36,11 @@ async function imagenPorNombre(raiz: string): Promise<Media | null> {
 }
 
 export const getRecursosServicioTecnicoLab = cache(async () => {
-  const [etapas, fondo, textura] = await Promise.all([
+  const [etapas, fondo, textura, miniaturaYoutube] = await Promise.all([
     videoPorNombre("wp-2022-03-partequipos-video-de-alistamiento-de-maquinaria"),
     videoPorNombre("wp-2022-04-whatsapp-video-2022-04-01-at-7.50.39-am"),
     imagenPorNombre("wp-2022-02-fondo-2"),
+    imagenPorNombre("wp-youtube-fi2weeeeefi-miniatura"),
   ]);
-  return { etapas, fondo, textura };
+  return { etapas, fondo, textura, miniaturaYoutube };
 });

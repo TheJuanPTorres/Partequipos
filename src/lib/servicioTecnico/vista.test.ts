@@ -58,7 +58,9 @@ describe("servicio técnico con diseño propio", () => {
       { numero: "01", etiqueta: "VALORACIÓN", texto: "Determinamos la cuantía." },
       { numero: "02", etiqueta: "REPARACIÓN", texto: "Reparamos." },
     ]);
-    assert.deepEqual(v.siniestros?.cierre, ["Trabajamos con las principales aseguradoras"]);
+    // «Trabajamos con las principales aseguradoras» pasa a titular de la galería.
+    assert.equal(v.siniestros?.aseguradoras, "Trabajamos con las principales aseguradoras");
+    assert.deepEqual(v.siniestros?.cierre, []);
     assert.equal(v.siniestros?.galeria.length, 1);
   });
 

@@ -29,8 +29,8 @@
  *
  * `solo=faltantes` (2026-10-19, inventario frente a WordPress): sube SOLO lo
  * que la primera importación no traía —la textura de fondo de #taller y
- * #Siniestros, el vídeo alojado de las etapas del alistamiento y el vídeo de
- * fondo de esa sección— sin tocar los bloques: dónde se pintan lo decide el
+ * #Siniestros, el vídeo alojado de las etapas del alistamiento, el vídeo de
+ * fondo de esa sección y la miniatura del corto de YouTube— sin tocar los bloques: dónde se pintan lo decide el
  * diseño propio de la página (pendiente de aprobación). Los dos vídeos pasan
  * del tope de 4 MB de `videos`, así que se suben RECOMPRIMIDOS desde
  * `videos=<carpeta>` (por defecto, `partequipos-diseno/wordpress/
@@ -437,6 +437,40 @@ async function videoLocal(
   return doc.id;
 }
 
+/**
+ * La MINIATURA de un vídeo de YouTube (la de 1280 × 720 que publica YouTube) a
+ * «Imágenes», para pintarla como portada sin cargar YouTube hasta pulsar
+ * (como los testimonios). Nombre determinista: `wp-youtube-<id>-miniatura.jpg`.
+ */
+async function miniaturaYoutube(enlace: string, alt: string): Promise<number | null> {
+  const id = enlace.match(/(?:youtu\.be\/|v=|shorts\/)([A-Za-z0-9_-]{11})/)?.[1];
+  if (!id) fallar(`no se reconoce el vídeo de YouTube de ${enlace}`);
+  const url = `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
+  const fichero = `wp-youtube-${id!.toLowerCase()}-miniatura.jpg`;
+  const ya = await buscarFichero("media", fichero);
+  if (ya) {
+    cuenta.reutilizados++;
+    return ya;
+  }
+  if (modo === "simular") {
+    await existe(url);
+    cuenta.simulados++;
+    return null;
+  }
+  const bytes = await descargar(url);
+  const doc = await payload.create({
+    collection: "media",
+    data: { alt, focalX: 50, focalY: 50 },
+    file: { data: bytes, mimetype: "image/jpeg", name: fichero, size: bytes.length },
+    overrideAccess: true,
+  });
+  yaVistos.set(`media:${fichero}`, doc.id);
+  manifiesto.creado.media.push(await guardado("media", doc.id, fichero));
+  guardarManifiesto();
+  cuenta.subidos++;
+  return doc.id;
+}
+
 /** El póster local (JPEG) de un vídeo recomprimido, a «Imágenes». */
 async function posterLocal(url: string, alt: string): Promise<number | null> {
   const fichero = nombreDeFicheroWp(url).replace(/\.mp4$/, "-poster.jpg");
@@ -549,6 +583,11 @@ if (SOLO === "faltantes") {
     "Maquinaria amarilla trabajando en obra (vídeo de fondo)",
     true,
   );
+  const miniatura = await miniaturaYoutube(
+    a.youtube,
+    "Técnico de Partequipos explicando una fase del alistamiento de una máquina",
+  );
+  log(`miniatura del vídeo de YouTube: ${miniatura ?? "(por subir)"}`);
   log(
     `faltantes: textura ${fondo ?? "(por subir)"} · vídeo de etapas ${etapas ?? "(por subir)"} · vídeo de fondo ${fondoVideo ?? "(por subir)"} · póster ${posterFondo ?? "(por subir)"}`,
   );

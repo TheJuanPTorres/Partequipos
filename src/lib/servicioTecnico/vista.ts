@@ -76,6 +76,8 @@ export type VistaServicioTecnico = {
     etapas: VideoBloque | null;
     youtube: VistaVideoYoutube["video"];
     miniatura: ImagenBloque | null;
+    /** La miniatura del corto de YouTube, local (no se carga YouTube hasta pulsar). */
+    miniaturaYoutube: ImagenBloque | null;
     fondo: VideoBloque | null;
   } | null;
   posventa: {
@@ -90,7 +92,14 @@ export type VistaServicioTecnico = {
     titulo: string;
     intro: string | null;
     pasos: Paso[];
-    /** Lo que queda (p. ej. «Trabajamos con las principales aseguradoras»). */
+    /**
+     * El titular de la galería: el primer párrafo tras los pasos («Trabajamos
+     * con las principales aseguradoras», tal cual WordPress).
+     */
+    aseguradoras: string | null;
+    /** La frase que presenta la galería (texto nuestro; editable al aplicarlo). */
+    galeriaTexto: string;
+    /** Lo que queda tras el titular de la galería, si algo. */
     cierre: string[];
     galeria: ImagenBloque[];
     boton: EnlaceBloque | null;
@@ -109,9 +118,21 @@ const ETIQUETA_ACCESO: Record<string, string> = {
 
 const texto = (p: Parrafo) => [p.negrita, p.texto].filter(Boolean).join(" ");
 
+/**
+ * La frase que presenta la galería de siniestros. Texto NUESTRO (en WordPress
+ * no hay): describe las fotos sin afirmar que son trabajos propios.
+ */
+export const TEXTO_GALERIA_SINIESTROS =
+  "Así llegan muchas máquinas tras un siniestro. Te acompañamos desde la valoración hasta la reparación y los repuestos.";
+
 export function vistaServicioTecnico(
   bloques: VistaBloque[],
-  extras: { etapas: VideoBloque | null; fondo: VideoBloque | null; textura: ImagenBloque | null },
+  extras: {
+    etapas: VideoBloque | null;
+    fondo: VideoBloque | null;
+    textura: ImagenBloque | null;
+    miniaturaYoutube?: ImagenBloque | null;
+  },
 ): VistaServicioTecnico {
   const porAncla = (ancla: string) =>
     bloques.find((b) => b.ancla?.toLowerCase() === ancla.toLowerCase());
@@ -174,6 +195,7 @@ export function vistaServicioTecnico(
           etapas: extras.etapas,
           youtube: alist.video,
           miniatura: alist.miniatura,
+          miniaturaYoutube: extras.miniaturaYoutube ?? null,
           fondo: extras.fondo,
         }
       : null,
@@ -192,7 +214,9 @@ export function vistaServicioTecnico(
           titulo: siniestros.titulo,
           intro,
           pasos,
-          cierre,
+          aseguradoras: cierre[0] ?? null,
+          galeriaTexto: TEXTO_GALERIA_SINIESTROS,
+          cierre: cierre.slice(1),
           galeria: galeria?.imagenes ?? [],
           boton: siniestros.boton,
         }

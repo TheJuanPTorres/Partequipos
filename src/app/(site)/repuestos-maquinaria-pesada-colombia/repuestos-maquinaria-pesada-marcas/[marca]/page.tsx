@@ -18,6 +18,7 @@ import {
   getTiposDeMarcaConImagen,
 } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
+import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { categoriasDeMarca, tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
@@ -76,7 +77,7 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
   ];
 
   return (
-    <main className={estilos.pagina}>
+    <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
         <Breadcrumbs items={breadcrumbs} />

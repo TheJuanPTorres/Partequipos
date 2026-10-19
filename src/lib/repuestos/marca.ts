@@ -28,6 +28,8 @@ export type VistaEncabezado = {
   fondo: ImagenLista | null;
   /** El logo de la marca va sobre el título, en una placa blanca. */
   logo: ImagenLista | null;
+  /** Logo blanco o muy claro (casilla «Pintar el logo en oscuro»): sobre la placa clara se pinta en tinta oscura. */
+  logoOscuro?: boolean;
 };
 
 /**
@@ -44,6 +46,7 @@ export function vistaEncabezado(marca: Marca, global: RepuestosMarca): VistaEnca
     descripcion: texto(marca.descripcion),
     fondo: imagenDeMedia(marca.fondoHero, ""),
     logo: imagenDeMedia(marca.logo, `Logo de ${nombre}`),
+    logoOscuro: Boolean(marca.logoOscuroEnMenu),
   };
 }
 

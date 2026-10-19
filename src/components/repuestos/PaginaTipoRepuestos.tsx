@@ -14,6 +14,7 @@ import { getModelosDeTipo, getModelosPorIds } from "@/lib/queries/getModelos";
 import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
+import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { categoriasDeMarca } from "@/lib/repuestos/marca";
 import {
   conOtrasEntradas,
@@ -93,7 +94,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
   ];
 
   return (
-    <main className={estilos.pagina}>
+    <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
         <Breadcrumbs items={breadcrumbs} />

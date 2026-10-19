@@ -77,9 +77,9 @@
 }
 
 /*
- * Placa OSCURA: los logos que entrega el cliente son BLANCOS y no se ven sobre
- * fondo claro (decisión de dirección, 2026-10-13). Cuando lleguen las versiones
- * en color, se vuelve a la placa blanca de ux-9.
+ * Placa CLARA (2026-10-18, cliente): los logos ya son en color y sobre oscuro no se
+ * leían; es la placa blanca de ux-9. Un logo blanco o muy claro (casilla «Pintar el
+ * logo en oscuro») se pinta en una sola tinta oscura para verse sobre ella.
  */
 .placa {
   display: flex;
@@ -87,7 +87,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: var(--color-texto);
+  background: #fff;
+}
+
+.placa[data-logo-oscuro] .logo {
+  filter: brightness(0);
 }
 
 /* El logo mide 131 de ancho y, como mucho, 87 de alto (medido); la placa blanca le suma 20 a cada lado. */
@@ -251,6 +255,24 @@
   justify-content: center;
 }
 
+/*
+ * Texto y foco sobre la franja del color de la marca (2026-10-18): `--marca-tinta` es
+ * negro o blanco, el que más contraste da sobre ese color (AA garantizado). Sin color
+ * de marca las variables no existen y queda el aspecto de siempre.
+ */
+.categorias:not(.categoriasGris) .tituloSeccion,
+.modelos .tituloSeccion,
+.modelosSerie,
+.modelosVacio {
+  color: var(--marca-tinta, var(--color-texto));
+}
+
+.pildora:focus-visible,
+.modelo:focus-visible {
+  outline: 3px solid var(--marca-tinta, #000);
+  outline-offset: 3px;
+}
+
 .pildora {
   display: inline-flex;
   min-height: 40px;
@@ -270,8 +292,8 @@
 }
 
 a.pildora:hover {
-  background: var(--color-marca);
-  color: var(--color-fondo);
+  background: var(--marca-hover-fondo, var(--color-marca));
+  color: var(--marca-hover-texto, var(--color-fondo));
 }
 
 .pildoraIcono {
@@ -733,8 +755,8 @@ a.pildora:hover {
 }
 
 a.modelo:hover {
-  background: var(--color-marca);
-  color: var(--color-fondo);
+  background: var(--marca-hover-fondo, var(--color-marca));
+  color: var(--marca-hover-texto, var(--color-fondo));
 }
 
 /* Un modelo sin ficha (WordPress lo nombra sin página): el mismo aspecto, sin efecto al pasar. */
@@ -843,6 +865,11 @@ a.modelo:hover {
 
 .categoriasGris .pildora {
   background: var(--color-fondo);
+}
+
+/* Sobre el gris de la página el foco va siempre en negro, sea cual sea el color de la marca. */
+.categoriasGris .pildora:focus-visible {
+  outline-color: #000;
 }
 
 /* Franja blanca de las placas (cuando la amarilla ya la pone la sección de arriba). */

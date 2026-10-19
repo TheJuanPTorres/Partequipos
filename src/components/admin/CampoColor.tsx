@@ -30,7 +30,7 @@ export default function CampoColor(props: TextFieldClientProps) {
       </div>
       <input
         type="color"
-        aria-label="Elegir el color del título"
+        aria-label="Elegir el color"
         title="Elegir color"
         value={actual ?? "#ffffff"}
         onChange={(e) => setValue(e.target.value.toUpperCase())}

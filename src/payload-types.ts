@@ -338,7 +338,11 @@ export interface MarcasMaquinaria {
   descripcion?: string | null;
   logo?: (number | null) | Media;
   /**
-   * Márcala si el logo es blanco o muy claro: en el menú de la cabecera, que es blanco, se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.
+   * Color de la franja de las páginas de esta marca (y de sus tipos). Vacío: amarillo. El texto de la franja se pone solo en blanco o negro, el que mejor se lea.
+   */
+  colorMarca?: string | null;
+  /**
+   * Márcala si el logo es blanco o muy claro: en el menú de la cabecera y en la placa clara de la página de la marca se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.
    */
   logoOscuroEnMenu?: boolean | null;
   /**
@@ -542,7 +546,11 @@ export interface Marca {
    */
   logo?: (number | null) | Media;
   /**
-   * Márcala si el logo es blanco o muy claro: en el menú de la cabecera, que es blanco, se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.
+   * Color de la franja de las páginas de esta marca (y de sus tipos). Vacío: amarillo. El texto de la franja se pone solo en blanco o negro, el que mejor se lea.
+   */
+  colorMarca?: string | null;
+  /**
+   * Márcala si el logo es blanco o muy claro: en el menú de la cabecera y en la placa clara de la página de la marca se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.
    */
   logoOscuroEnMenu?: boolean | null;
   /**
@@ -2114,6 +2122,7 @@ export interface MarcasSelect<T extends boolean = true> {
   slug?: T;
   descripcion?: T;
   logo?: T;
+  colorMarca?: T;
   logoOscuroEnMenu?: T;
   fondoHero?: T;
   seo?:
@@ -2289,6 +2298,7 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
   slug?: T;
   descripcion?: T;
   logo?: T;
+  colorMarca?: T;
   logoOscuroEnMenu?: T;
   imagenTarjeta?: T;
   ordenPortada?: T;

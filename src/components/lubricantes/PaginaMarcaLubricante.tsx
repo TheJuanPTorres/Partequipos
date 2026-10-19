@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { RichText } from "@/components/layout/RichText";
 import type { SeccionLubricante } from "@/lib/lubricantes/marca";
-import { estiloDeIdentidad, totalesDeCatalogo } from "@/lib/lubricantes/identidad";
+import { estiloDeIdentidad } from "@/lib/lubricantes/identidad";
 import { rutas } from "@/lib/routes";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia } from "@/lib/utils/relations";
@@ -12,6 +12,7 @@ import type { EnlaceWhatsApp } from "@/lib/whatsapp";
 import type { MarcasLubricante } from "@/payload-types";
 
 import estilos from "./marcaLubricante.module.css";
+import { VideoCabecera } from "./VideoCabecera";
 
 /**
  * PÁGINA DE LA MARCA DE LUBRICANTES (`/lubricantes/lubricantes-eni/`) — un «sitio dentro del
@@ -39,10 +40,10 @@ export function PaginaMarcaLubricante({
   whatsapp?: EnlaceWhatsApp;
 }) {
   const titulo = `Lubricantes ${marca.nombre}`;
-  const totales = totalesDeCatalogo(secciones);
   const fondo = imagenDeMedia(marca.imagenCabecera, "");
   const logo = imagenDeMedia(marca.logo, `Logo de ${marca.nombre}`);
   const entradilla = marca.entradilla?.trim() ?? "";
+  const video = typeof marca.videoCabecera === "object" ? (marca.videoCabecera?.url ?? null) : null;
   const cuenta = (s: SeccionLubricante) => s.grupos.reduce((n, g) => n + g.productos.length, 0);
 
   return (
@@ -51,7 +52,7 @@ export function PaginaMarcaLubricante({
       style={estiloDeIdentidad(marca.colorPrincipal, marca.colorOscuro)}
     >
       {/* --- Cabecera --- */}
-      <section className={estilos.hero} aria-labelledby="lub-titulo">
+      <section id="lub-hero" className={estilos.hero} aria-labelledby="lub-titulo">
         {fondo ? (
           <div className={estilos.heroFoto} aria-hidden="true">
             <Image
@@ -64,62 +65,47 @@ export function PaginaMarcaLubricante({
             />
           </div>
         ) : null}
-        <div className={`${estilos.contenedor} ${estilos.heroInterior}`}>
-          {logo ? (
-            <div className={estilos.placaLogo}>
-              <Image
-                src={logo.url}
-                alt={logo.alt}
-                width={logo.width}
-                height={logo.height}
-                priority
-                className={estilos.logo}
-              />
-            </div>
-          ) : null}
-          <p className={estilos.eyebrow}>Distribuidos por Partequipos</p>
-          <h1 id="lub-titulo" className={estilos.h1}>
-            Lubricantes <em>{marca.nombre}</em>
-          </h1>
-          {entradilla ? <p className={estilos.lede}>{entradilla}</p> : null}
-          <div className={estilos.acciones}>
-            <a href={`#${ANCLA_CONTACTO}`} className={`${estilos.boton} ${estilos.botonPrincipal}`}>
-              Pedir cotización
-            </a>
-            {whatsapp ? (
-              <a
-                href={whatsapp.href}
-                className={`${estilos.boton} ${estilos.botonSecundario}`}
-                target="_blank"
-                rel="noopener"
-              >
-                <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={1.8} size={22} />
-                Hablar por WhatsApp
-              </a>
+        {video ? <VideoCabecera url={video} idHero="lub-hero" /> : null}
+        <div className={estilos.contenedor}>
+          <div className={estilos.heroInterior}>
+            {logo ? (
+              <div className={estilos.placaLogo}>
+                <Image
+                  src={logo.url}
+                  alt={logo.alt}
+                  width={logo.width}
+                  height={logo.height}
+                  priority
+                  className={estilos.logo}
+                />
+              </div>
             ) : null}
+            <h1 id="lub-titulo" className={estilos.h1}>
+              Lubricantes <em>{marca.nombre}</em>
+            </h1>
+            {entradilla ? <p className={estilos.lede}>{entradilla}</p> : null}
+            <div className={estilos.acciones}>
+              <a
+                href={`#${ANCLA_CONTACTO}`}
+                className={`${estilos.boton} ${estilos.botonPrincipal}`}
+              >
+                Pedir cotización
+              </a>
+              {whatsapp ? (
+                <a
+                  href={whatsapp.href}
+                  className={`${estilos.boton} ${estilos.botonSecundario}`}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={1.8} size={22} />
+                  Hablar por WhatsApp
+                </a>
+              ) : null}
+            </div>
           </div>
         </div>
       </section>
-
-      {/* --- Cifras del catálogo (salen de los datos) --- */}
-      {totales.productos > 0 ? (
-        <div className={estilos.cifras}>
-          <ul className={`${estilos.contenedor} ${estilos.cifrasLista}`}>
-            <li>
-              <span className={estilos.cifraNumero}>{totales.lineas}</span>
-              <span className={estilos.cifraTexto}>líneas de producto</span>
-            </li>
-            <li>
-              <span className={estilos.cifraNumero}>{totales.productos}</span>
-              <span className={estilos.cifraTexto}>lubricantes</span>
-            </li>
-            <li>
-              <span className={estilos.cifraNumero}>{totales.fichas}</span>
-              <span className={estilos.cifraTexto}>fichas técnicas en PDF</span>
-            </li>
-          </ul>
-        </div>
-      ) : null}
 
       {/* --- Las líneas --- */}
       {secciones.length > 0 ? (
@@ -136,7 +122,7 @@ export function PaginaMarcaLubricante({
               Elige la línea y mira cada producto con su ficha técnica.
             </p>
             <ul className={estilos.lineas}>
-              {secciones.map((s, i) => (
+              {secciones.map((s) => (
                 <li key={s.ancla}>
                   <a href={`#${s.ancla}`} className={estilos.tarjetaLinea}>
                     {s.imagen ? (
@@ -148,9 +134,6 @@ export function PaginaMarcaLubricante({
                         className={estilos.tarjetaLineaFoto}
                       />
                     ) : null}
-                    <span className={estilos.numeroLinea} aria-hidden="true">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
                     <h3 className={estilos.nombreLinea}>{s.nombre}</h3>
                     <span className={estilos.cuentaLinea}>
                       {plural(cuenta(s), "producto", "productos")}
@@ -288,6 +271,7 @@ export function PaginaMarcaLubricante({
               titulo={`Formulario de contacto sobre ${titulo}`}
               textoBoton="Pedir cotización"
               variante="plano"
+              etiquetaMensaje="¿Qué necesitas?"
             />
           </div>
         </div>

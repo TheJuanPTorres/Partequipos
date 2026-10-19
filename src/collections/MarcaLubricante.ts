@@ -63,6 +63,16 @@ export const MarcaLubricante: CollectionConfig = {
           "Foto de fondo de la cabecera de la página. Opcional: sin ella, un fondo oscuro.",
       },
     },
+    {
+      name: "videoCabecera",
+      type: "upload",
+      relationTo: "videos",
+      label: "Vídeo de la cabecera",
+      admin: {
+        description:
+          "Vídeo de fondo de la cabecera (sin sonido, de hasta 4 MB: se carga primero en «Vídeos», con su póster). Se ve solo en pantallas grandes: en móvil, con ahorro de datos o con «reducir movimiento», queda solo la imagen de cabecera.",
+      },
+    },
     /*
      * Identidad de la marca (2026-10-19, cliente): la página de la marca de lubricantes es un
      * «sitio dentro del sitio» con los colores de la marca. Vacíos: amarillo y negro de ENI.

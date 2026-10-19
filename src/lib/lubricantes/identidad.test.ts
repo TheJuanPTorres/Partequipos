@@ -5,7 +5,6 @@ import {
   COLOR_OSCURO_POR_DEFECTO,
   COLOR_PRINCIPAL_POR_DEFECTO,
   estiloDeIdentidad,
-  totalesDeCatalogo,
 } from "./identidad";
 
 const variables = (p?: string | null, o?: string | null) =>
@@ -31,19 +30,5 @@ describe("estiloDeIdentidad", () => {
   it("un valor que no es un color se ignora y queda el de la marca", () => {
     assert.equal(variables("amarillo", "#12")["--lub-principal"], COLOR_PRINCIPAL_POR_DEFECTO);
     assert.equal(variables("amarillo", "#12")["--lub-oscuro"], COLOR_OSCURO_POR_DEFECTO);
-  });
-});
-
-describe("totalesDeCatalogo", () => {
-  it("cuenta líneas, productos y fichas a partir de los datos", () => {
-    const t = totalesDeCatalogo([
-      { grupos: [{ productos: [{ ficha: "a.pdf" }, { ficha: null }] }] },
-      { grupos: [{ productos: [{ ficha: "b.pdf" }] }, { productos: [{ ficha: "c.pdf" }] }] },
-    ]);
-    assert.deepEqual(t, { lineas: 2, productos: 4, fichas: 3 });
-  });
-
-  it("sin líneas, todo a cero", () => {
-    assert.deepEqual(totalesDeCatalogo([]), { lineas: 0, productos: 0, fichas: 0 });
   });
 });

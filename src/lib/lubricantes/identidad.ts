@@ -27,18 +27,3 @@ export function estiloDeIdentidad(
     "--lub-sobre-oscuro": tintaSobre(o),
   } as CSSProperties;
 }
-
-/** Totales que presume la portada, sacados de los datos (nunca escritos a mano). */
-export function totalesDeCatalogo(
-  secciones: { grupos: { productos: { ficha: string | null }[] }[] }[],
-) {
-  let productos = 0;
-  let fichas = 0;
-  for (const s of secciones)
-    for (const g of s.grupos)
-      for (const p of g.productos) {
-        productos++;
-        if (p.ficha) fichas++;
-      }
-  return { lineas: secciones.length, productos, fichas };
-}

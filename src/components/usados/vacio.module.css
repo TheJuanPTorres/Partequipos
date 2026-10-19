@@ -1,0 +1,95 @@
+/*
+ * Estado vacío de los listados de usados (2026-10-18). Con los colores y las
+ * formas de la plantilla del listado (`listado.module.css`): fondo blanco,
+ * esquinas de 30 px y botones en píldora rojos y negros.
+ */
+.vacio {
+  display: grid;
+  gap: 10px;
+}
+
+.cabecera {
+  padding: 40px 20px;
+  border-radius: 30px;
+  background: #fff;
+  text-align: center;
+}
+
+.titulo {
+  margin: 0 auto;
+  max-width: 640px;
+  color: #100f0f;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.texto {
+  margin: 12px auto 0;
+  max-width: 600px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: 30px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.boton:focus-visible {
+  outline: 2px solid #e5242d;
+  outline-offset: 3px;
+}
+
+.botonRojo {
+  background: #e5242d;
+}
+
+.botonNegro {
+  background: #100f0f;
+}
+
+.botonRojo:hover,
+.botonNegro:hover {
+  opacity: 0.9;
+}
+
+/* Las secciones de tarjetas, sin el margen negativo que tienen en las páginas índice. */
+.alternativas > section {
+  margin-top: 0;
+  border-radius: 30px;
+}
+
+.formulario {
+  padding: 10px 20px 30px;
+  border-radius: 30px;
+  background: #fff;
+  scroll-margin-top: 120px;
+}
+
+@media (min-width: 1025px) {
+  .cabecera {
+    padding: 56px 40px;
+  }
+
+  .titulo {
+    font-size: 30px;
+  }
+}

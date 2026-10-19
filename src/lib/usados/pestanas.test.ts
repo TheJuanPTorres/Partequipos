@@ -10,23 +10,16 @@ describe("pestañas de las categorías de usada", () => {
     { id: 3, slug: "excavadoras", nombre: "Excavadoras" },
   ];
 
-  it("solo las categorías con unidades, con la actual marcada", () => {
+  it("todas las categorías, con la actual marcada y las vacías con su nota", () => {
     const p = pestanasDeCategorias(categorias, new Set([1, 3]), 3);
     assert.deepEqual(
-      p.map((x) => [x.texto, x.activa]),
+      p.map((x) => [x.texto, x.activa, x.nota ?? null]),
       [
-        ["Bulldozers", false],
-        ["Excavadoras", true],
+        ["Bulldozers", false, null],
+        ["Cargadores", false, "Sin unidades por ahora"],
+        ["Excavadoras", true, null],
       ],
     );
-    assert.equal(p[1]?.href, "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/");
-  });
-
-  it("la actual sale aunque esté vacía", () => {
-    const p = pestanasDeCategorias(categorias, new Set([1]), 2);
-    assert.deepEqual(
-      p.map((x) => x.texto),
-      ["Bulldozers", "Cargadores"],
-    );
+    assert.equal(p[2]?.href, "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/");
   });
 });

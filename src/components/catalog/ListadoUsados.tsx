@@ -1,12 +1,12 @@
 import { IconCalendar, IconClockHour4, IconWeight } from "@tabler/icons-react";
-import Link from "next/link";
 
 import { PlantillaListado } from "@/components/listado/PlantillaListado";
 import { TarjetaListado } from "@/components/listado/TarjetaListado";
 import type { ResultadoListado } from "@/lib/filtros";
 import type { UnidadUsada } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
-import type { Ambito } from "@/lib/usados/listado";
+import { EstadoVacioUsados } from "@/components/usados/EstadoVacioUsados";
+import type { Ambito, DatosVacio } from "@/lib/usados/listado";
 
 const numero = (n: number) => n.toLocaleString("es-CO");
 
@@ -19,16 +19,19 @@ const numero = (n: number) => n.toLocaleString("es-CO");
  * Las piezas son las comunes (`src/components/listado/`).
  *
  * Solo se listan las disponibles; las vendidas se marcan, no se borran. Sin
- * ninguna unidad, un estado vacío con el camino a contactar.
+ * ninguna unidad, el estado vacío diseñado (`EstadoVacioUsados`).
  */
 export function ListadoUsados({
   ambito,
   pagina,
   listado,
+  vacio,
 }: {
   ambito: Ambito;
   pagina: number;
   listado: Extract<ResultadoListado<UnidadUsada>, { tipo: "listado" }>;
+  /** Sin ninguna unidad: el estado vacío diseñado (alternativas y «Avísame»). */
+  vacio: DatosVacio | null;
 }) {
   const { registro, catalogo } = ambito;
   const migas = [
@@ -54,19 +57,11 @@ export function ListadoUsados({
       elemento={{ singular: "unidad", plural: "unidades" }}
       idLista="tarjetas-usada"
       vacio={
-        <>
-          <p>
-            <strong>
-              {ambito.tipo === "categoria"
-                ? "Por ahora no hay unidades disponibles en esta categoría."
-                : "Por ahora no hay unidades disponibles de esta marca."}
-            </strong>
-          </p>
-          <p>
-            El inventario cambia con frecuencia. Cuéntanos qué máquina buscas y te avisamos cuando
-            entre una. <Link href="/contactanos/">Contáctanos</Link>
-          </p>
-        </>
+        vacio ? (
+          <EstadoVacioUsados datos={vacio} origen={`${ambito.ruta(pagina)}/`} />
+        ) : (
+          "Por ahora no hay unidades disponibles."
+        )
       }
     >
       {listado.elementos.map((u, i) => (

@@ -55,6 +55,25 @@ describe("índice de usados", () => {
     );
   });
 
+  it("en el índice, también las vacías: después y con «Sin unidades por ahora»", () => {
+    const t = tarjetasDeCategoriasUsada(
+      [
+        { id: 3, nombre: "Cargadores", slug: "cargadores", imagen: null },
+        { id: 1, nombre: "Excavadoras", slug: "excavadoras", imagen: null },
+      ],
+      unidades,
+      ruta,
+      { incluirVacias: true },
+    );
+    assert.deepEqual(
+      t.map((x) => [x.titulo, x.detalle, x.imagen?.url ?? null]),
+      [
+        ["Excavadoras", "3 unidades disponibles", "/nueva.jpg"],
+        ["Cargadores", "Sin unidades por ahora", null],
+      ],
+    );
+  });
+
   it("una tarjeta por marca con unidades: el logo si lo tiene; si no, la foto más reciente", () => {
     const t = tarjetasDeMarcasUsada(
       [

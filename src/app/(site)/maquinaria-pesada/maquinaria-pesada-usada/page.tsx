@@ -67,7 +67,9 @@ export default async function UsadaIndexPage() {
       <IndiceTarjetas
         id={ANCLA}
         vista={{ ...vista, descripcion: vista.descripcion || DESCRIPCION }}
-        tarjetas={tarjetasDeCategoriasUsada(categorias, inventario, rutas.categoriaUsada)}
+        tarjetas={tarjetasDeCategoriasUsada(categorias, inventario, rutas.categoriaUsada, {
+          incluirVacias: true,
+        })}
         verTodo={verTodo}
         etiqueta="Categorías de maquinaria usada"
       />

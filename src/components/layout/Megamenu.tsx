@@ -27,6 +27,7 @@ function Lista({ enlaces, alElegir }: { enlaces: EnlaceMenu[]; alElegir: () => v
           <Link href={e.href} className={estilos.hoja} onClick={alElegir}>
             <IconCheck aria-hidden="true" focusable="false" stroke={2.5} />
             {e.etiqueta}
+            {e.nota ? <span className={estilos.nota}> · {e.nota}</span> : null}
           </Link>
         </li>
       ))}

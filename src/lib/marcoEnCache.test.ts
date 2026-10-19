@@ -64,10 +64,11 @@ describe("y todo lo que pinta el marco la invalida", () => {
     const consultadas = [
       ...leer("src/lib/queries/getMegamenu.ts").matchAll(/collection: "([a-z-]+)"/g),
     ].map((m) => m[1]);
-    // Los equipos nuevos solo cuentan para saber qué tipos tienen equipos: su gancho es otro.
+    // Los equipos nuevos solo cuentan para saber qué tipos tienen equipos, y los
+    // usados, qué categorías están vacías: sus ganchos son otros.
     assert.deepEqual(
       [...consultadas].sort(),
-      [...Object.keys(colecciones), "equipos-nuevos"].sort(),
+      [...Object.keys(colecciones), "equipos-nuevos", "equipos-usados"].sort(),
     );
     const hooks = leer("src/collections/hooks/maquinariaHooks.ts");
     for (const gancho of ["revalidarEquipoNuevo", "revalidarEquipoNuevoBorrado"]) {
@@ -79,6 +80,12 @@ describe("y todo lo que pinta el marco la invalida", () => {
         `${gancho}: no refresca el megamenú cuando un tipo aparece o desaparece`,
       );
     }
+    const usado = hooks.slice(hooks.indexOf("async function revalidarEquipoUsadoCore"));
+    assert.match(
+      usado.slice(0, usado.indexOf("\nexport ", 10)),
+      /refrescarMenuSiCambiaUsado\(/,
+      "revalidarEquipoUsadoCore: no refresca el megamenú cuando una categoría se vacía o se llena",
+    );
     for (const [slug, fichero] of Object.entries(colecciones)) {
       const s = leer(`src/collections/${fichero}.ts`);
       assert.match(s, new RegExp(`revalidarMegamenu\\("${slug}"\\)`), `${slug} sin ganchos`);

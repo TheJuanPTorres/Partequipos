@@ -112,6 +112,8 @@
   max-width: 1150px;
 }
 .pestana {
+  /* Contiene el texto solo para lectores de la nota: sin esto se sale de la tira y desborda la página. */
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -127,6 +129,17 @@
 .pestana svg {
   color: var(--rojo);
   flex: none;
+}
+/* Con nota (categoría de usados vacía): el nombre y, debajo, la marca discreta. */
+.pestanaTexto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.pestanaNota {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--gris-texto);
 }
 .pestana:hover,
 .pestana[aria-current="page"] {

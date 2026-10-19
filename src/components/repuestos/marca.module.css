@@ -1078,6 +1078,7 @@ a.modelo:hover {
 /* El título del bloque de marcas, sin el margen negativo de la página de marca. */
 .tarjetasIndice > .tituloSeccion {
   margin-inline: 0;
+  margin-bottom: 32px;
 }
 
 /*

@@ -2,6 +2,7 @@ import type { CategoriasUsada, MarcasUsada, Media } from "@/payload-types";
 
 import type { TarjetaMarca } from "../repuestos/marca";
 import { imagenDeMedia, posicionFocal, type ImagenLista } from "../utils/relations";
+import { SIN_UNIDADES } from "./vacia";
 
 /**
  * Lógica pura del ÍNDICE DE USADOS con la «Plantilla 1» (petición del cliente,
@@ -56,29 +57,35 @@ export const textoUnidades = (n: number) =>
   `${n} ${n === 1 ? "unidad disponible" : "unidades disponibles"}`;
 
 /**
- * Una tarjeta por categoría CON unidades, en el orden recibido (por nombre),
- * enlazando a su listado. Las vacías no salen, como los tipos sin equipos en
- * las marcas de nueva.
+ * Una tarjeta por categoría, en el orden recibido (por nombre), enlazando a su
+ * listado. Por defecto solo las que tienen unidades; con `incluirVacias`
+ * (el índice de usados, petición del cliente del 2026-10-18), también las
+ * vacías, DESPUÉS de las que tienen unidades y con «Sin unidades por ahora».
  */
 export function tarjetasDeCategoriasUsada(
   categorias: Pick<CategoriasUsada, "id" | "nombre" | "slug" | "imagen">[],
   unidades: UnidadDelIndice[],
   ruta: (slug: string) => string,
+  { incluirVacias = false }: { incluirVacias?: boolean } = {},
 ): TarjetaMarca[] {
   const porCategoria = agrupar(unidades, (u) => u.categoria);
-  return categorias
-    .filter((c) => c.nombre && c.slug && porCategoria.get(c.id)?.length)
+  const filas = categorias
+    .filter((c) => c.nombre && c.slug)
     .map((c) => {
       const suyas = porCategoria.get(c.id) ?? [];
-      return {
+      const tarjeta: TarjetaMarca = {
         clave: `categoria-${c.id}`,
         titulo: c.nombre,
         href: `${ruta(c.slug)}/`,
         imagen: imagenDeMedia(c.imagen, "") ?? fotoMasReciente(suyas),
         soloEscritorio: false,
-        detalle: textoUnidades(suyas.length),
+        detalle: suyas.length ? textoUnidades(suyas.length) : SIN_UNIDADES,
       };
+      return { tarjeta, n: suyas.length };
     });
+  const con = filas.filter((f) => f.n > 0);
+  const vacias = incluirVacias ? filas.filter((f) => f.n === 0) : [];
+  return [...con, ...vacias].map((f) => f.tarjeta);
 }
 
 /**

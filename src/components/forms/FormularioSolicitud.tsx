@@ -206,11 +206,12 @@ export function FormularioSolicitud({
   );
 
   const campoCiudad = (
-    <Campo id={campo("ciudad")} etiqueta="Ciudad">
+    <Campo id={campo("ciudad")} etiqueta="Ciudad" error={err.ciudad}>
       {(p) => (
         <input
           {...p}
           name="ciudad"
+          defaultValue={previo.ciudad}
           type="text"
           autoComplete="address-level2"
           placeholder={variante === "plano" ? "Ciudad" : undefined}

@@ -199,6 +199,7 @@ export interface Solicitude {
   correo: string;
   telefono?: string | null;
   empresa?: string | null;
+  ciudad?: string | null;
   interes?: ('cotizar' | 'muestras' | 'asesoria' | 'otro') | null;
   perfil?: ('empresa' | 'comprador' | 'emprendedor' | 'proveedor' | 'empleado' | 'otro') | null;
   mensaje: string;
@@ -512,7 +513,35 @@ export interface ModelosRepuesto {
    * Solo si su tipo de equipo tiene series: el nombre de una de ellas, ej. «EX» o «ZAXIS». Vacío: el modelo sale en «Otros modelos».
    */
   serie?: string | null;
+  /**
+   * El texto de presentación de la página del modelo, junto a su foto. Del WordPress, tal cual.
+   */
   descripcion?: string | null;
+  /**
+   * Sobre el título, ej. «Repuestos para Maquinaria Pesada».
+   */
+  antetitulo?: string | null;
+  /**
+   * El título grande, ej. «HITACHI Excavadora ZX200». Vacío: «Repuestos» y el nombre del modelo.
+   */
+  tituloPagina?: string | null;
+  /**
+   * Sobre las categorías, ej. «repuestos disponibles para excavadora hitachi zx200». Vacío: «Repuestos disponibles para» y el nombre.
+   */
+  tituloDisponibles?: string | null;
+  /**
+   * La lista de WordPress («- Filtros para …»). Solo se ve si marcas la casilla de abajo.
+   */
+  piezas?:
+    | {
+        texto: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * En WordPress la lista solo se ve en algunas páginas; en el resto está guardada pero oculta.
+   */
+  mostrarPiezas?: boolean | null;
   imagenes?: (number | Media)[] | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
@@ -630,6 +659,10 @@ export interface TiposEquipo {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Las categorías de repuestos que se muestran en la página de cada modelo de este tipo, en este orden. Vacío: no se muestra ninguna.
+   */
+  categoriasModelo?: (number | CategoriasTecnica)[] | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -2093,6 +2126,7 @@ export interface SolicitudesSelect<T extends boolean = true> {
   correo?: T;
   telefono?: T;
   empresa?: T;
+  ciudad?: T;
   interes?: T;
   perfil?: T;
   mensaje?: T;
@@ -2113,6 +2147,16 @@ export interface ModelosRepuestoSelect<T extends boolean = true> {
   codigo?: T;
   serie?: T;
   descripcion?: T;
+  antetitulo?: T;
+  tituloPagina?: T;
+  tituloDisponibles?: T;
+  piezas?:
+    | T
+    | {
+        texto?: T;
+        id?: T;
+      };
+  mostrarPiezas?: T;
   imagenes?: T;
   seo?:
     | T
@@ -2175,6 +2219,7 @@ export interface TiposEquipoSelect<T extends boolean = true> {
         modelo?: T;
         id?: T;
       };
+  categoriasModelo?: T;
   seo?:
     | T
     | {
@@ -3234,6 +3279,20 @@ export interface RepuestosMarca {
    */
   testimoniosTitulo?: string | null;
   verVideoTexto?: string | null;
+  /**
+   * Vacío: la tarjeta de WhatsApp no se pinta.
+   */
+  modeloAyudaTitulo?: string | null;
+  modeloAyudaTexto?: string | null;
+  modeloAyudaBoton?: string | null;
+  /**
+   * Opcional. Lleva un velo oscuro encima para que el texto se lea.
+   */
+  modeloAyudaFoto?: (number | null) | Media;
+  /**
+   * Ej. «Si deseas más info, contáctanos».
+   */
+  modeloContactoTitulo?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3456,6 +3515,11 @@ export interface RepuestosMarcaSelect<T extends boolean = true> {
   contactoBoton?: T;
   testimoniosTitulo?: T;
   verVideoTexto?: T;
+  modeloAyudaTitulo?: T;
+  modeloAyudaTexto?: T;
+  modeloAyudaBoton?: T;
+  modeloAyudaFoto?: T;
+  modeloContactoTitulo?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

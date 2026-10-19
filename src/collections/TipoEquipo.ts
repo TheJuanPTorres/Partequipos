@@ -188,6 +188,22 @@ export const TipoEquipo: CollectionConfig = {
         },
       ],
     },
+    /*
+     * Las categorías que pinta la página de CADA MODELO de este tipo, en este
+     * orden. En WordPress eran una plantilla por tipo de máquina (10 en
+     * excavadoras y buldóceres, 4 en miniexcavadoras…): se eligen una vez aquí.
+     */
+    {
+      name: "categoriasModelo",
+      type: "relationship",
+      relationTo: "categorias-tecnicas",
+      hasMany: true,
+      label: "Categorías en las páginas de sus modelos",
+      admin: {
+        description:
+          "Las categorías de repuestos que se muestran en la página de cada modelo de este tipo, en este orden. Vacío: no se muestra ninguna.",
+      },
+    },
     seoField(),
   ],
 };

@@ -73,6 +73,8 @@ export const PATRONES_DE_PAGINA = {
   fichasNuevas: "/(site)/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
   unidadesUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/[unidad]",
   marcasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]`,
+  modelosDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]/[tipo]/[modelo]`,
+  submodelosDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]/[tipo]/[modelo]/[submodelo]`,
   categoriasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]`,
   paginasUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]",
 } as const;
@@ -235,6 +237,21 @@ export function revalidarMarcasDeRepuestos(motivo: string): void {
     revalidatePath(PATRONES_DE_PAGINA.marcasDeRepuestos, "page");
   } catch (error) {
     console.error(`[revalidación] fallaron las páginas de marca de repuestos (${motivo}):`, error);
+  }
+}
+
+/**
+ * Revalida TODAS las páginas de modelo de repuestos (las dos rutas: la normal y
+ * la de los modelos de un tipo anidado). Las usan lo común del global
+ * `repuestos-marca` (la tarjeta de ayuda, el título del formulario) y las
+ * categorías técnicas. Nunca relanza.
+ */
+export function revalidarModelosDeRepuestos(motivo: string): void {
+  try {
+    revalidatePath(PATRONES_DE_PAGINA.modelosDeRepuestos, "page");
+    revalidatePath(PATRONES_DE_PAGINA.submodelosDeRepuestos, "page");
+  } catch (error) {
+    console.error(`[revalidación] fallaron las páginas de modelo de repuestos (${motivo}):`, error);
   }
 }
 

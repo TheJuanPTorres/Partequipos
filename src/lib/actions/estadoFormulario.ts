@@ -28,7 +28,14 @@ export type EstadoFormulario = {
 export const ESTADO_INICIAL: EstadoFormulario = { estado: "inicial" };
 
 /** Los campos que escribe el usuario (no los ocultos ni el token). */
-export const CAMPOS_VISIBLES = ["nombre", "correo", "telefono", "empresa", "mensaje"] as const;
+export const CAMPOS_VISIBLES = [
+  "nombre",
+  "correo",
+  "telefono",
+  "empresa",
+  "ciudad",
+  "mensaje",
+] as const;
 export type CampoVisible = (typeof CAMPOS_VISIBLES)[number];
 export type ValoresFormulario = Partial<Record<CampoVisible | "interes" | "perfil", string>>;
 

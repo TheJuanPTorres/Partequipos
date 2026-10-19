@@ -8,7 +8,7 @@ import estilos from "./modelo.module.css";
 /**
  * «ESTAMOS AQUÍ PARA AYUDARLO» (la tarjeta de WordPress de cada modelo, textos
  * tal cual): foto de fondo con velo, título, «Escríbenos» y el botón de
- * WhatsApp. Sin número de WhatsApp, no se pinta (sería un botón muerto).
+ * WhatsApp. Sin número de WhatsApp (sería un botón muerto) o sin título, no se pinta.
  *
  * Se aparta de WordPress: el botón es verde OSCURO con texto blanco (el verde
  * de WhatsApp con texto blanco no llega a AA).
@@ -26,7 +26,7 @@ export function AyudaWhatsApp({
   href: string | null;
   fondo: ImagenLista | null;
 }) {
-  if (!href) return null;
+  if (!href || !titulo) return null;
   return (
     <section className={estilos.ayuda} aria-labelledby="modelo-ayuda">
       {fondo ? (

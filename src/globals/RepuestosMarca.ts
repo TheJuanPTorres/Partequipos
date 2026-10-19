@@ -2,7 +2,7 @@ import type { Field, GlobalConfig } from "payload";
 
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
-import { revalidarMarcasDeRepuestos } from "../lib/revalidation";
+import { revalidarMarcasDeRepuestos, revalidarModelosDeRepuestos } from "../lib/revalidation";
 
 /**
  * Lo COMÚN a las páginas de marca de repuestos (ux-9,
@@ -16,7 +16,7 @@ import { revalidarMarcasDeRepuestos } from "../lib/revalidation";
  * Todo opcional: una sección sin su título no se pinta. La migración que crea
  * el global siembra los textos de ux-9 con SQL explícito (CLAUDE.md §3.5).
  *
- * Al guardar se revalidan las páginas de marca.
+ * Al guardar se revalidan las páginas de marca y las de modelo.
  */
 const tarjeta = (nombre: string, etiqueta: string): Field => ({
   name: nombre,
@@ -58,6 +58,7 @@ export const RepuestosMarca: GlobalConfig = {
     afterChange: [
       ({ doc }) => {
         revalidarMarcasDeRepuestos("global repuestos-marca");
+        revalidarModelosDeRepuestos("global repuestos-marca");
         return doc;
       },
     ],
@@ -153,5 +154,38 @@ export const RepuestosMarca: GlobalConfig = {
       admin: { description: "«{marca}» se sustituye por el nombre de la marca de la página." },
     },
     { name: "porQueBoton", type: "text", label: "¿Por qué elegirnos?: texto del botón" },
+    /*
+     * Lo común a las PÁGINAS DE MODELO de repuestos (2026-10-19): la tarjeta
+     * «Estamos aquí para ayudarlo» de WordPress (la misma en todas) y el título
+     * del formulario. La migración siembra los textos de WordPress.
+     */
+    {
+      type: "collapsible",
+      label: "Páginas de modelo",
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: "modeloAyudaTitulo",
+          type: "text",
+          label: "Tarjeta de ayuda: título",
+          admin: { description: "Vacío: la tarjeta de WhatsApp no se pinta." },
+        },
+        { name: "modeloAyudaTexto", type: "text", label: "Tarjeta de ayuda: texto" },
+        { name: "modeloAyudaBoton", type: "text", label: "Tarjeta de ayuda: texto del botón" },
+        {
+          name: "modeloAyudaFoto",
+          type: "upload",
+          relationTo: "media",
+          label: "Tarjeta de ayuda: foto de fondo",
+          admin: { description: "Opcional. Lleva un velo oscuro encima para que el texto se lea." },
+        },
+        {
+          name: "modeloContactoTitulo",
+          type: "text",
+          label: "Título del formulario",
+          admin: { description: "Ej. «Si deseas más info, contáctanos»." },
+        },
+      ],
+    },
   ],
 };

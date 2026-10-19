@@ -55,6 +55,11 @@ type Props = {
   variante?: "tarjeta" | "plano";
   /** Etiqueta del campo de mensaje: «Mensaje» por defecto; lubricantes: «¿Qué necesitas?». */
   etiquetaMensaje?: string;
+  /**
+   * Añade el campo «Ciudad» (opcional; se guarda en la solicitud). Lo usan la
+   * página de modelo de repuestos y Lubricantes ENI.
+   */
+  conCiudad?: boolean;
 };
 
 const OPCIONES = {
@@ -74,6 +79,7 @@ export function FormularioSolicitud({
   clasificacion = false,
   variante = "tarjeta",
   etiquetaMensaje = "Mensaje",
+  conCiudad = false,
 }: Props) {
   const [estado, accion, enviando] = useActionState(enviarSolicitud, ESTADO_INICIAL);
 
@@ -199,6 +205,22 @@ export function FormularioSolicitud({
     </Campo>
   );
 
+  const campoCiudad = (
+    <Campo id={campo("ciudad")} etiqueta="Ciudad" error={err.ciudad}>
+      {(p) => (
+        <input
+          {...p}
+          name="ciudad"
+          defaultValue={previo.ciudad}
+          type="text"
+          autoComplete="address-level2"
+          placeholder={variante === "plano" ? "Ciudad" : undefined}
+          className={claseControl}
+        />
+      )}
+    </Campo>
+  );
+
   return (
     <section aria-labelledby={idTitulo} className={claseSeccion}>
       <h2 id={idTitulo} className={claseTitulo}>
@@ -267,7 +289,14 @@ export function FormularioSolicitud({
             ))
           : null}
 
-        {clasificacion ? (
+        {conCiudad && !clasificacion ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {campoNombre}
+            {campoTelefono}
+            {campoCorreo}
+            {campoCiudad}
+          </div>
+        ) : clasificacion ? (
           // Orden del diseño de ux-9: nombre y teléfono en una fila, el correo debajo.
           // Sin «Empresa»: ahí es una opción de «Quién soy».
           <div className="grid gap-4 sm:grid-cols-2">

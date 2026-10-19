@@ -100,6 +100,68 @@ export const ModeloRepuesto: CollectionConfig = {
       name: "descripcion",
       type: "textarea",
       label: "Descripción",
+      admin: {
+        description:
+          "El texto de presentación de la página del modelo, junto a su foto. Del WordPress, tal cual.",
+      },
+    },
+    /*
+     * El resto del contenido de la página de modelo de WordPress (decisión del
+     * cliente, 2026-10-17: se migra todo tal cual, erratas incluidas). Un
+     * `collapsible` no anida en la base: son columnas del modelo.
+     */
+    {
+      type: "collapsible",
+      label: "Textos de la página del modelo",
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: "antetitulo",
+          type: "text",
+          label: "Antetítulo",
+          admin: { description: "Sobre el título, ej. «Repuestos para Maquinaria Pesada»." },
+        },
+        {
+          name: "tituloPagina",
+          type: "text",
+          label: "Título de la página",
+          admin: {
+            description:
+              "El título grande, ej. «HITACHI Excavadora ZX200». Vacío: «Repuestos» y el nombre del modelo.",
+          },
+        },
+        {
+          name: "tituloDisponibles",
+          type: "text",
+          label: "Título de las categorías",
+          admin: {
+            description:
+              "Sobre las categorías, ej. «repuestos disponibles para excavadora hitachi zx200». Vacío: «Repuestos disponibles para» y el nombre.",
+          },
+        },
+        {
+          name: "piezas",
+          type: "array",
+          label: "Lista de piezas",
+          labels: { singular: "Pieza", plural: "Piezas" },
+          admin: {
+            description:
+              "La lista de WordPress («- Filtros para …»). Solo se ve si marcas la casilla de abajo.",
+            initCollapsed: true,
+          },
+          fields: [{ name: "texto", type: "text", required: true, label: "Texto" }],
+        },
+        {
+          name: "mostrarPiezas",
+          type: "checkbox",
+          label: "Mostrar la lista de piezas",
+          defaultValue: false,
+          admin: {
+            description:
+              "En WordPress la lista solo se ve en algunas páginas; en el resto está guardada pero oculta.",
+          },
+        },
+      ],
     },
     {
       name: "imagenes",

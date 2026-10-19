@@ -320,16 +320,19 @@ def servicio(paginas):
 
     recorrer([por_ancla["Siniestros"]], visita)
 
-    # El vídeo de YouTube del canal del cliente y el póster del vídeo alojado.
-    youtube, poster = None, None
+    # El vídeo de YouTube del canal del cliente y el vídeo alojado con su póster.
+    # Son DOS vídeos distintos (2026-10-19): el alojado es el de las etapas del
+    # alistamiento (horizontal, 111 s) y el de YouTube, un corto vertical.
+    youtube, poster, alojado = None, None, None
 
     def videos(n, s):
-        nonlocal youtube, poster
+        nonlocal youtube, poster, alojado
         if n.get("widgetType") != "video":
             return
         # Sin `video_type`, Elementor usa YouTube (su valor por defecto).
         if s.get("video_type") == "hosted":
             poster = (s.get("poster") or {}).get("url")
+            alojado = (s.get("hosted_url") or {}).get("url")
         elif s.get("youtube_url"):
             youtube = s.get("youtube_url")
 
@@ -360,7 +363,19 @@ def servicio(paginas):
             "parrafos": [texto(alistamiento[1][1]), alistamiento[2][1]],
             "youtube": youtube,
             "miniatura": fichero(poster, "Alistamiento de maquinaria en el taller de Partequipos"),
+            # El vídeo alojado de las etapas (24,6 MB) y el de fondo de la sección
+            # (13,5 MB): pasan del tope de 4 MB de `videos`, así que se importan
+            # RECOMPRIMIDOS (runbook), con el mismo contenido.
+            "videoAlojado": alojado,
+            "videoFondo": (por_ancla["alistamiento"].get("settings") or {}).get(
+                "background_video_link"
+            ),
         },
+        # La textura de fondo (la capa de velo de Elementor) de #taller y de #Siniestros.
+        "fondo": fichero(
+            (por_ancla["taller"].get("settings") or {}).get("background_overlay_image", {}).get("url"),
+            "Textura gris clara de fondo de las secciones del taller y de siniestros",
+        ),
         "posventa": {
             "titulo": posventa[0][1],
             "parrafos": [texto(p) for p in re.findall(r"<p>(.*?)</p>", posventa[1][1], re.S)],

@@ -199,6 +199,7 @@ export interface Solicitude {
   correo: string;
   telefono?: string | null;
   empresa?: string | null;
+  ciudad?: string | null;
   interes?: ('cotizar' | 'muestras' | 'asesoria' | 'otro') | null;
   perfil?: ('empresa' | 'comprador' | 'emprendedor' | 'proveedor' | 'empleado' | 'otro') | null;
   mensaje: string;
@@ -512,7 +513,35 @@ export interface ModelosRepuesto {
    * Solo si su tipo de equipo tiene series: el nombre de una de ellas, ej. «EX» o «ZAXIS». Vacío: el modelo sale en «Otros modelos».
    */
   serie?: string | null;
+  /**
+   * El texto de presentación de la página del modelo, junto a su foto. Del WordPress, tal cual.
+   */
   descripcion?: string | null;
+  /**
+   * Sobre el título, ej. «Repuestos para Maquinaria Pesada».
+   */
+  antetitulo?: string | null;
+  /**
+   * El título grande, ej. «HITACHI Excavadora ZX200». Vacío: «Repuestos» y el nombre del modelo.
+   */
+  tituloPagina?: string | null;
+  /**
+   * Sobre las categorías, ej. «repuestos disponibles para excavadora hitachi zx200». Vacío: «Repuestos disponibles para» y el nombre.
+   */
+  tituloDisponibles?: string | null;
+  /**
+   * La lista de WordPress («- Filtros para …»). Solo se ve si marcas la casilla de abajo.
+   */
+  piezas?:
+    | {
+        texto: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * En WordPress la lista solo se ve en algunas páginas; en el resto está guardada pero oculta.
+   */
+  mostrarPiezas?: boolean | null;
   imagenes?: (number | Media)[] | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
@@ -630,6 +659,10 @@ export interface TiposEquipo {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Las categorías de repuestos que se muestran en la página de cada modelo de este tipo, en este orden. Vacío: no se muestra ninguna.
+   */
+  categoriasModelo?: (number | CategoriasTecnica)[] | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -1102,6 +1135,10 @@ export interface Pagina {
       }[]
     | null;
   /**
+   * «Servicio técnico» compone los bloques con su diseño propio, por su ancla: taller, alistamiento, posventa, Siniestros y contacto.
+   */
+  diseno?: ('bloques' | 'servicioTecnico') | null;
+  /**
    * Opcional. Si añades bloques, la página se compone con ellos y dejan de mostrarse «Contenido» y «Secciones con ancla».
    */
   bloques?:
@@ -1114,6 +1151,7 @@ export interface Pagina {
         | BloqueGaleria
         | BloqueVideoYoutube
         | BloqueFormularioContacto
+        | BloqueProcesoPasos
       )[]
     | null;
   /**
@@ -1424,6 +1462,10 @@ export interface BloquePresentacionImagen {
    * Una ruta del sitio (/…/) o una dirección https://. Vacío: sin botón.
    */
   botonEnlace?: string | null;
+  /**
+   * Opcional. Imagen clara que se pinta una vez al pie de la sección, detrás del texto. Solo la usa el diseño «Servicio técnico».
+   */
+  textura?: (number | null) | Media;
   id?: string | null;
   blockName?: string | null;
   blockType: 'presentacionImagen';
@@ -1574,6 +1616,10 @@ export interface BloqueGaleria {
    */
   titulo?: string | null;
   /**
+   * Opcional. Una frase bajo el título que presenta las fotos.
+   */
+  texto?: string | null;
+  /**
    * En este orden, en una rejilla. Cuida el texto alternativo de cada una.
    */
   imagenes?:
@@ -1623,6 +1669,14 @@ export interface BloqueVideoYoutube {
    * La que se ve antes de reproducir. Sin ella, un fondo oscuro con el botón.
    */
   miniatura?: (number | null) | Media;
+  /**
+   * Un vídeo de «Vídeos» que se pinta junto al de YouTube, con sus controles y su póster. Solo lo usa el diseño «Servicio técnico».
+   */
+  videoTaller?: (number | null) | Video;
+  /**
+   * Decorativo, sin sonido: detrás del texto, solo en pantallas grandes y con botón de pausa. Solo lo usa el diseño «Servicio técnico».
+   */
+  videoFondo?: (number | null) | Video;
   id?: string | null;
   blockName?: string | null;
   blockType: 'videoYoutube';
@@ -1654,7 +1708,48 @@ export interface BloqueFormularioContacto {
   blockType: 'formularioContacto';
 }
 /**
- * Tipos de letra propios para el título del hero (WOFF2, o WOFF/TTF; máximo 4 MB). Después se eligen en «Tipografía del título» de cada diapositiva. Comprueba que la licencia permite usarla en una web.
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueProcesoPasos".
+ */
+export interface BloqueProcesoPasos {
+  /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
+  /**
+   * Texto corto encima del título. Opcional.
+   */
+  antetitulo?: string | null;
+  titulo: string;
+  /**
+   * Opcional. Una frase bajo el título.
+   */
+  entradilla?: string | null;
+  /**
+   * En este orden; se numeran solos (01, 02, 03…).
+   */
+  pasos?:
+    | {
+        etiqueta: string;
+        texto: string;
+        id?: string | null;
+      }[]
+    | null;
+  botonTexto?: string | null;
+  /**
+   * Una ruta del sitio (/…/) o una dirección https://. Vacío: sin botón.
+   */
+  botonEnlace?: string | null;
+  /**
+   * Opcional. Imagen clara que se pinta una vez al pie de la sección, detrás del texto. Solo la usa el diseño «Servicio técnico».
+   */
+  textura?: (number | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'procesoPasos';
+}
+/**
+ * Tipos de letra propios para el título del hero (WOFF2, o WOFF/TTF/OTF; máximo 4 MB). Después se eligen en «Tipografía del título» de cada diapositiva. Comprueba que la licencia permite usarla en una web.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "fuentes".
@@ -1666,7 +1761,7 @@ export interface Fuente {
    */
   nombre: string;
   /**
-   * Lo lee del fichero al subirlo.
+   * Se rellena solo al subir el fichero. OTF sale como TTF.
    */
   formato?: ('woff2' | 'woff' | 'truetype') | null;
   actualizadoPor?: (number | null) | User;
@@ -2093,6 +2188,7 @@ export interface SolicitudesSelect<T extends boolean = true> {
   correo?: T;
   telefono?: T;
   empresa?: T;
+  ciudad?: T;
   interes?: T;
   perfil?: T;
   mensaje?: T;
@@ -2113,6 +2209,16 @@ export interface ModelosRepuestoSelect<T extends boolean = true> {
   codigo?: T;
   serie?: T;
   descripcion?: T;
+  antetitulo?: T;
+  tituloPagina?: T;
+  tituloDisponibles?: T;
+  piezas?:
+    | T
+    | {
+        texto?: T;
+        id?: T;
+      };
+  mostrarPiezas?: T;
   imagenes?: T;
   seo?:
     | T
@@ -2175,6 +2281,7 @@ export interface TiposEquipoSelect<T extends boolean = true> {
         modelo?: T;
         id?: T;
       };
+  categoriasModelo?: T;
   seo?:
     | T
     | {
@@ -2486,6 +2593,7 @@ export interface PaginasSelect<T extends boolean = true> {
         contenido?: T;
         id?: T;
       };
+  diseno?: T;
   bloques?:
     | T
     | {
@@ -2497,6 +2605,7 @@ export interface PaginasSelect<T extends boolean = true> {
         galeria?: T | BloqueGaleriaSelect<T>;
         videoYoutube?: T | BloqueVideoYoutubeSelect<T>;
         formularioContacto?: T | BloqueFormularioContactoSelect<T>;
+        procesoPasos?: T | BloqueProcesoPasosSelect<T>;
       };
   hero?:
     | T
@@ -2659,6 +2768,7 @@ export interface BloquePresentacionImagenSelect<T extends boolean = true> {
   texto?: T;
   botonTexto?: T;
   botonEnlace?: T;
+  textura?: T;
   id?: T;
   blockName?: T;
 }
@@ -2722,6 +2832,7 @@ export interface BloqueGaleriaSelect<T extends boolean = true> {
   ancla?: T;
   antetitulo?: T;
   titulo?: T;
+  texto?: T;
   imagenes?:
     | T
     | {
@@ -2742,6 +2853,8 @@ export interface BloqueVideoYoutubeSelect<T extends boolean = true> {
   texto?: T;
   youtube?: T;
   miniatura?: T;
+  videoTaller?: T;
+  videoFondo?: T;
   id?: T;
   blockName?: T;
 }
@@ -2755,6 +2868,28 @@ export interface BloqueFormularioContactoSelect<T extends boolean = true> {
   titulo?: T;
   texto?: T;
   botonTexto?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueProcesoPasos_select".
+ */
+export interface BloqueProcesoPasosSelect<T extends boolean = true> {
+  ancla?: T;
+  antetitulo?: T;
+  titulo?: T;
+  entradilla?: T;
+  pasos?:
+    | T
+    | {
+        etiqueta?: T;
+        texto?: T;
+        id?: T;
+      };
+  botonTexto?: T;
+  botonEnlace?: T;
+  textura?: T;
   id?: T;
   blockName?: T;
 }
@@ -3254,6 +3389,20 @@ export interface RepuestosMarca {
    */
   porQueCierre?: string | null;
   porQueBoton?: string | null;
+  /**
+   * Vacío: la tarjeta de WhatsApp no se pinta.
+   */
+  modeloAyudaTitulo?: string | null;
+  modeloAyudaTexto?: string | null;
+  modeloAyudaBoton?: string | null;
+  /**
+   * Opcional. Lleva un velo oscuro encima para que el texto se lea.
+   */
+  modeloAyudaFoto?: (number | null) | Media;
+  /**
+   * Ej. «Si deseas más info, contáctanos».
+   */
+  modeloContactoTitulo?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3487,6 +3636,11 @@ export interface RepuestosMarcaSelect<T extends boolean = true> {
       };
   porQueCierre?: T;
   porQueBoton?: T;
+  modeloAyudaTitulo?: T;
+  modeloAyudaTexto?: T;
+  modeloAyudaBoton?: T;
+  modeloAyudaFoto?: T;
+  modeloContactoTitulo?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

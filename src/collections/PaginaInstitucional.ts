@@ -154,6 +154,27 @@ export const PaginaInstitucional: CollectionConfig = {
      * que tiene sus propias secciones. Ver docs/diseno/decisiones-nosotros.md.
      */
     {
+      /*
+       * DISEÑO (2026-10-19): cómo se pintan los bloques. «Bloques» los pone uno
+       * tras otro, como siempre; «Servicio técnico» los compone con su plantilla
+       * propia (`PlantillaServicioTecnico`), que toma cada bloque por su ancla
+       * (taller, alistamiento, posventa, siniestros y contacto).
+       */
+      name: "diseno",
+      type: "select",
+      label: "Diseño",
+      defaultValue: "bloques",
+      options: [
+        { label: "Bloques, uno tras otro", value: "bloques" },
+        { label: "Servicio técnico", value: "servicioTecnico" },
+      ],
+      admin: {
+        condition: (data) => data?.slug !== "inicio",
+        description:
+          "«Servicio técnico» compone los bloques con su diseño propio, por su ancla: taller, alistamiento, posventa, Siniestros y contacto.",
+      },
+    },
+    {
       name: "bloques",
       type: "blocks",
       label: "Bloques de la página",

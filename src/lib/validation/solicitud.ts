@@ -78,6 +78,8 @@ export const esquemaSolicitud = z.object({
 
   empresa: textoOpcional(MAX.empresa, "El nombre de la empresa es demasiado largo."),
 
+  ciudad: textoOpcional(MAX.ciudad, "El nombre de la ciudad es demasiado largo."),
+
   mensaje: textoObligatorio("mensaje", MAX.mensaje).min(
     10,
     "Cuéntanos un poco más: al menos 10 caracteres.",
@@ -141,6 +143,7 @@ export function desdeFormData(formData: FormData): Record<string, unknown> {
     correo: leer("correo"),
     telefono: leer("telefono"),
     empresa: leer("empresa"),
+    ciudad: leer("ciudad"),
     mensaje: leer("mensaje"),
     interes: leer("interes"),
     perfil: leer("perfil"),

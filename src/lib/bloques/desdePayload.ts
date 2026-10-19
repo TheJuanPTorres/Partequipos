@@ -18,12 +18,18 @@ import type { AnimacionBloque, EnlaceBloque, VideoBloque, VistaBloque } from "./
  */
 export type BloqueDoc = NonNullable<Pagina["bloques"]>[number];
 
-/** Ids de los vídeos de las cabeceras, para pedirlos con su póster. */
+/** Ids de los vídeos de los bloques (cabeceras y vídeos del taller y de fondo), para pedirlos con su póster. */
 export function idsDeVideos(bloques: Pagina["bloques"]): number[] {
   const ids = new Set<number>();
+  const anadir = (v: number | Video | null | undefined) => {
+    if (v) ids.add(typeof v === "object" ? v.id : v);
+  };
   for (const b of bloques ?? []) {
-    if (b.blockType !== "cabeceraVideo" || !b.video) continue;
-    ids.add(typeof b.video === "object" ? b.video.id : b.video);
+    if (b.blockType === "cabeceraVideo") anadir(b.video);
+    if (b.blockType === "videoYoutube") {
+      anadir(b.videoTaller);
+      anadir(b.videoFondo);
+    }
   }
   return [...ids];
 }
@@ -94,7 +100,23 @@ function vistaSinAncla(b: BloqueDoc, videos: ReadonlyMap<number, Video>): VistaB
         titulo: b.titulo,
         texto: b.texto ? (b.texto as unknown as SerializedEditorState) : null,
         boton: boton(b.botonTexto, b.botonEnlace),
+        textura: imagenDeMedia(b.textura, ""),
       };
+    case "procesoPasos": {
+      const pasos = (b.pasos ?? [])
+        .filter((p) => p.etiqueta?.trim() && p.texto?.trim())
+        .map((p) => ({ id: p.id, etiqueta: p.etiqueta.trim(), texto: p.texto.trim() }));
+      return {
+        blockType: b.blockType,
+        id: b.id,
+        antetitulo: b.antetitulo,
+        titulo: b.titulo,
+        entradilla: b.entradilla?.trim() || null,
+        pasos,
+        boton: boton(b.botonTexto, b.botonEnlace),
+        textura: imagenDeMedia(b.textura, ""),
+      };
+    }
     case "cifras": {
       const cifras = (b.cifras ?? [])
         .filter(
@@ -144,6 +166,7 @@ function vistaSinAncla(b: BloqueDoc, videos: ReadonlyMap<number, Video>): VistaB
             id: b.id,
             antetitulo: b.antetitulo,
             titulo: b.titulo?.trim() || null,
+            texto: b.texto?.trim() || null,
             imagenes,
           }
         : null;
@@ -159,6 +182,8 @@ function vistaSinAncla(b: BloqueDoc, videos: ReadonlyMap<number, Video>): VistaB
             texto: b.texto ? (b.texto as unknown as SerializedEditorState) : null,
             video: v,
             miniatura: imagenDeMedia(b.miniatura, ""),
+            videoTaller: video(b.videoTaller, videos),
+            videoFondo: video(b.videoFondo, videos),
           }
         : null;
     }
@@ -179,4 +204,9 @@ export function vistaDeBloques(
   videos: ReadonlyMap<number, Video> = new Map(),
 ): VistaBloque[] {
   return (bloques ?? []).flatMap((b) => vistaDeBloque(b, videos) ?? []);
+}
+
+/** Un documento de «Vídeos» (con su póster poblado) en la forma que pintan los bloques. */
+export function vistaDeVideo(doc: Video | null | undefined): VideoBloque | null {
+  return doc ? video(doc, new Map()) : null;
 }

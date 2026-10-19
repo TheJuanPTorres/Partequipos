@@ -34,7 +34,14 @@ export const PERFILES = [
 ] as const;
 
 /** Longitudes máximas. Cortan el abuso antes de llegar a la base. */
-export const MAX = { nombre: 120, correo: 200, telefono: 40, empresa: 160, mensaje: 4000 } as const;
+export const MAX = {
+  nombre: 120,
+  correo: 200,
+  telefono: 40,
+  empresa: 160,
+  ciudad: 100,
+  mensaje: 4000,
+} as const;
 
 /** Errores por campo, en la forma que consume el formulario. */
 export type ErroresCampo = Partial<Record<string, string>>;

@@ -4,7 +4,11 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
-import { revalidarCategoriasDeRepuestos, revalidarMarcasDeRepuestos } from "../lib/revalidation";
+import {
+  revalidarCategoriasDeRepuestos,
+  revalidarMarcasDeRepuestos,
+  revalidarModelosDeRepuestos,
+} from "../lib/revalidation";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("categorias-tecnicas");
@@ -38,6 +42,7 @@ export const CategoriaTecnica: CollectionConfig = {
       portada.afterChange,
       ({ doc }) => {
         revalidarMarcasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""}`);
+        revalidarModelosDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""}`);
         revalidarCategoriasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""}`);
         return doc;
       },
@@ -46,6 +51,7 @@ export const CategoriaTecnica: CollectionConfig = {
       portada.afterDelete,
       ({ doc }) => {
         revalidarMarcasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""} borrada`);
+        revalidarModelosDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""} borrada`);
         revalidarCategoriasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""} borrada`);
         return doc;
       },

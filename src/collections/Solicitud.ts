@@ -91,6 +91,8 @@ export const Solicitud: CollectionConfig = {
     { name: "correo", type: "email", required: true, label: "Correo" },
     { name: "telefono", type: "text", label: "Teléfono" },
     { name: "empresa", type: "text", label: "Empresa" },
+    // Opcional. La piden los formularios que la muestran (página de modelo de repuestos, Lubricantes ENI).
+    { name: "ciudad", type: "text", label: "Ciudad" },
     /*
      * Clasificación opcional del formulario de la página de marca de repuestos
      * (ux-9). Solo estos dos campos y solo de elección cerrada: ningún dato

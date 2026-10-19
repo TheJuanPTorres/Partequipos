@@ -59,6 +59,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "ciudad": {
+          "name": "ciudad",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "interes": {
           "name": "interes",
           "type": "enum_solicitudes_interes",
@@ -303,6 +309,88 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.modelos_repuesto_piezas": {
+      "name": "modelos_repuesto_piezas",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "texto": {
+          "name": "texto",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "modelos_repuesto_piezas_order_idx": {
+          "name": "modelos_repuesto_piezas_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "modelos_repuesto_piezas_parent_id_idx": {
+          "name": "modelos_repuesto_piezas_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "modelos_repuesto_piezas_parent_id_fk": {
+          "name": "modelos_repuesto_piezas_parent_id_fk",
+          "tableFrom": "modelos_repuesto_piezas",
+          "tableTo": "modelos_repuesto",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.modelos_repuesto": {
       "name": "modelos_repuesto",
       "schema": "",
@@ -354,6 +442,31 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
+        },
+        "antetitulo": {
+          "name": "antetitulo",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "titulo_pagina": {
+          "name": "titulo_pagina",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "titulo_disponibles": {
+          "name": "titulo_disponibles",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mostrar_piezas": {
+          "name": "mostrar_piezas",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         },
         "seo_meta_title": {
           "name": "seo_meta_title",
@@ -1508,6 +1621,137 @@
             "id"
           ],
           "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tipos_equipo_rels": {
+      "name": "tipos_equipo_rels",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "path": {
+          "name": "path",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "categorias_tecnicas_id": {
+          "name": "categorias_tecnicas_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "tipos_equipo_rels_order_idx": {
+          "name": "tipos_equipo_rels_order_idx",
+          "columns": [
+            {
+              "expression": "order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "tipos_equipo_rels_parent_idx": {
+          "name": "tipos_equipo_rels_parent_idx",
+          "columns": [
+            {
+              "expression": "parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "tipos_equipo_rels_path_idx": {
+          "name": "tipos_equipo_rels_path_idx",
+          "columns": [
+            {
+              "expression": "path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "tipos_equipo_rels_categorias_tecnicas_id_idx": {
+          "name": "tipos_equipo_rels_categorias_tecnicas_id_idx",
+          "columns": [
+            {
+              "expression": "categorias_tecnicas_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "tipos_equipo_rels_parent_fk": {
+          "name": "tipos_equipo_rels_parent_fk",
+          "tableFrom": "tipos_equipo_rels",
+          "tableTo": "tipos_equipo",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "tipos_equipo_rels_categorias_tecnicas_fk": {
+          "name": "tipos_equipo_rels_categorias_tecnicas_fk",
+          "tableFrom": "tipos_equipo_rels",
+          "tableTo": "categorias_tecnicas",
+          "columnsFrom": [
+            "categorias_tecnicas_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -5669,6 +5913,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "textura_id": {
+          "name": "textura_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "block_name": {
           "name": "block_name",
           "type": "varchar",
@@ -5751,6 +6001,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "paginas_blocks_presentacion_imagen_textura_idx": {
+          "name": "paginas_blocks_presentacion_imagen_textura_idx",
+          "columns": [
+            {
+              "expression": "textura_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -5773,6 +6038,19 @@
           "tableTo": "animaciones",
           "columnsFrom": [
             "lottie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "paginas_blocks_presentacion_imagen_textura_id_media_id_fk": {
+          "name": "paginas_blocks_presentacion_imagen_textura_id_media_id_fk",
+          "tableFrom": "paginas_blocks_presentacion_imagen",
+          "tableTo": "media",
+          "columnsFrom": [
+            "textura_id"
           ],
           "columnsTo": [
             "id"
@@ -6609,6 +6887,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "texto": {
+          "name": "texto",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "block_name": {
           "name": "block_name",
           "type": "varchar",
@@ -6748,6 +7032,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "video_taller_id": {
+          "name": "video_taller_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "video_fondo_id": {
+          "name": "video_fondo_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "block_name": {
           "name": "block_name",
           "type": "varchar",
@@ -6815,6 +7111,36 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "paginas_blocks_video_youtube_video_taller_idx": {
+          "name": "paginas_blocks_video_youtube_video_taller_idx",
+          "columns": [
+            {
+              "expression": "video_taller_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "paginas_blocks_video_youtube_video_fondo_idx": {
+          "name": "paginas_blocks_video_youtube_video_fondo_idx",
+          "columns": [
+            {
+              "expression": "video_fondo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -6824,6 +7150,32 @@
           "tableTo": "media",
           "columnsFrom": [
             "miniatura_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "paginas_blocks_video_youtube_video_taller_id_videos_id_fk": {
+          "name": "paginas_blocks_video_youtube_video_taller_id_videos_id_fk",
+          "tableFrom": "paginas_blocks_video_youtube",
+          "tableTo": "videos",
+          "columnsFrom": [
+            "video_taller_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "paginas_blocks_video_youtube_video_fondo_id_videos_id_fk": {
+          "name": "paginas_blocks_video_youtube_video_fondo_id_videos_id_fk",
+          "tableFrom": "paginas_blocks_video_youtube",
+          "tableTo": "videos",
+          "columnsFrom": [
+            "video_fondo_id"
           ],
           "columnsTo": [
             "id"
@@ -6967,6 +7319,267 @@
         "paginas_blocks_formulario_contacto_parent_id_fk": {
           "name": "paginas_blocks_formulario_contacto_parent_id_fk",
           "tableFrom": "paginas_blocks_formulario_contacto",
+          "tableTo": "paginas",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.paginas_blocks_proceso_pasos_pasos": {
+      "name": "paginas_blocks_proceso_pasos_pasos",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "etiqueta": {
+          "name": "etiqueta",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "texto": {
+          "name": "texto",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "paginas_blocks_proceso_pasos_pasos_order_idx": {
+          "name": "paginas_blocks_proceso_pasos_pasos_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "paginas_blocks_proceso_pasos_pasos_parent_id_idx": {
+          "name": "paginas_blocks_proceso_pasos_pasos_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "paginas_blocks_proceso_pasos_pasos_parent_id_fk": {
+          "name": "paginas_blocks_proceso_pasos_pasos_parent_id_fk",
+          "tableFrom": "paginas_blocks_proceso_pasos_pasos",
+          "tableTo": "paginas_blocks_proceso_pasos",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.paginas_blocks_proceso_pasos": {
+      "name": "paginas_blocks_proceso_pasos",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ancla": {
+          "name": "ancla",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "antetitulo": {
+          "name": "antetitulo",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "titulo": {
+          "name": "titulo",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entradilla": {
+          "name": "entradilla",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "boton_texto": {
+          "name": "boton_texto",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "boton_enlace": {
+          "name": "boton_enlace",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "textura_id": {
+          "name": "textura_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "paginas_blocks_proceso_pasos_order_idx": {
+          "name": "paginas_blocks_proceso_pasos_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "paginas_blocks_proceso_pasos_parent_id_idx": {
+          "name": "paginas_blocks_proceso_pasos_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "paginas_blocks_proceso_pasos_path_idx": {
+          "name": "paginas_blocks_proceso_pasos_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "paginas_blocks_proceso_pasos_textura_idx": {
+          "name": "paginas_blocks_proceso_pasos_textura_idx",
+          "columns": [
+            {
+              "expression": "textura_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "paginas_blocks_proceso_pasos_textura_id_media_id_fk": {
+          "name": "paginas_blocks_proceso_pasos_textura_id_media_id_fk",
+          "tableFrom": "paginas_blocks_proceso_pasos",
+          "tableTo": "media",
+          "columnsFrom": [
+            "textura_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "paginas_blocks_proceso_pasos_parent_id_fk": {
+          "name": "paginas_blocks_proceso_pasos_parent_id_fk",
+          "tableFrom": "paginas_blocks_proceso_pasos",
           "tableTo": "paginas",
           "columnsFrom": [
             "_parent_id"
@@ -7517,6 +8130,14 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false
+        },
+        "diseno": {
+          "name": "diseno",
+          "type": "enum_paginas_diseno",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'bloques'"
         },
         "seccion_nueva_antetitulo": {
           "name": "seccion_nueva_antetitulo",
@@ -13034,6 +13655,36 @@
           "primaryKey": false,
           "notNull": false
         },
+        "modelo_ayuda_titulo": {
+          "name": "modelo_ayuda_titulo",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "modelo_ayuda_texto": {
+          "name": "modelo_ayuda_texto",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "modelo_ayuda_boton": {
+          "name": "modelo_ayuda_boton",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "modelo_ayuda_foto_id": {
+          "name": "modelo_ayuda_foto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "modelo_contacto_titulo": {
+          "name": "modelo_contacto_titulo",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp(3) with time zone",
@@ -13092,6 +13743,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "repuestos_marca_modelo_ayuda_foto_idx": {
+          "name": "repuestos_marca_modelo_ayuda_foto_idx",
+          "columns": [
+            {
+              "expression": "modelo_ayuda_foto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -13127,6 +13793,19 @@
           "tableTo": "media",
           "columnsFrom": [
             "por_que_imagen_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "repuestos_marca_modelo_ayuda_foto_id_media_id_fk": {
+          "name": "repuestos_marca_modelo_ayuda_foto_id_media_id_fk",
+          "tableFrom": "repuestos_marca",
+          "tableTo": "media",
+          "columnsFrom": [
+            "modelo_ayuda_foto_id"
           ],
           "columnsTo": [
             "id"
@@ -13813,6 +14492,14 @@
         "portada"
       ]
     },
+    "public.enum_paginas_diseno": {
+      "name": "enum_paginas_diseno",
+      "schema": "public",
+      "values": [
+        "bloques",
+        "servicioTecnico"
+      ]
+    },
     "public.enum_fuentes_formato": {
       "name": "enum_fuentes_formato",
       "schema": "public",
@@ -13890,6 +14577,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "c0d9c19d-6cb4-4a34-9b94-c7478adcf296",
+  "id": "add75352-7731-438a-8af6-3a070b595c65",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

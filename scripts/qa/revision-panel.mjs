@@ -305,6 +305,59 @@ try {
     }
 
     /*
+     * Modo `fuentes` (`… fuentes <carpeta>`): sube por el formulario del panel
+     * cada `*.woff2`, `*.woff`, `*.ttf` y `*.otf` de la carpeta con el tipo
+     * que manda Chrome en Windows (`application/octet-stream`) y lee lo que
+     * guardó Payload (tipo MIME y «Formato»). Crea fuentes «PRUEBA FUENTES —»:
+     * borrarlas después (un editor no puede).
+     */
+    if (MODO === "fuentes") {
+      const carpeta = process.argv[4];
+      if (!carpeta || !fs.existsSync(carpeta)) fallar("Uso: … fuentes <carpeta con las fuentes>");
+      if (ancho.movil) {
+        await contexto.close();
+        continue;
+      }
+      const ficheros = fs.readdirSync(carpeta).filter((f) => /\.(woff2?|ttf|otf)$/i.test(f));
+      for (const nombre of ficheros) {
+        await pagina.goto(`${base}/admin/collections/fuentes/create`, { waitUntil: "networkidle" });
+        await pagina.locator('input[type="file"]').setInputFiles({
+          name: nombre,
+          mimeType: "application/octet-stream",
+          buffer: fs.readFileSync(path.join(carpeta, nombre)),
+        });
+        await pagina.locator("#field-nombre").fill(`PRUEBA FUENTES — ${nombre} ${Date.now()}`);
+        await pagina.locator("#action-save").click();
+        const creada = await pagina
+          .waitForURL((u) => /\/fuentes\/\d+/.test(u.pathname), { timeout: 30_000 })
+          .then(() => true)
+          .catch(() => false);
+        await pagina.waitForTimeout(1500);
+        const fichero = path.join(salida, `fuente-${nombre}.png`);
+        await pagina.screenshot({ path: fichero, fullPage: true });
+        if (!creada) {
+          const aviso = await pagina
+            .locator(".toast-error, .Toastify__toast--error, [data-sonner-toast]")
+            .allTextContents();
+          hallazgos.push({ pantalla: "fuente", nombre, creada, aviso });
+          decir(`✗ ${nombre}: no se guardó — ${aviso.join(" | ").slice(0, 200)}`);
+          continue;
+        }
+        const id = new URL(pagina.url()).pathname.split("/").filter(Boolean).pop();
+        const doc = await pagina.evaluate(async (i) => {
+          const r = await fetch(`/api/fuentes/${i}?depth=0`, { credentials: "include" });
+          const d = await r.json();
+          return { mimeType: d.mimeType, formato: d.formato, filename: d.filename };
+        }, id);
+        hallazgos.push({ pantalla: "fuente", nombre, creada, id, ...doc });
+        decir(`✓ ${nombre}: id ${id} · ${doc.mimeType} · formato ${doc.formato}`);
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      await contexto.close();
+      continue;
+    }
+
+    /*
      * Modo `listas` (F3, decisiones-panel.md §24): captura las listas con
      * estados, fechas y miniaturas, y registra el resultado de ORDENAR, FILTRAR
      * y BUSCAR (las primeras filas) para comparar antes y después. Solo lee.

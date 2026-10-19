@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import {
   alternativasEnNueva,
   mensajeSinUnidades,
+  usaEstadoVacioPropio,
   nombreComparable,
   type EquipoNuevoAlternativa,
 } from "./vacia";
@@ -126,5 +127,19 @@ describe("estado vacío de usados", () => {
       mensajeSinUnidades("marca", "Maquinaria Doosan usada", "Doosan"),
       "Ahora mismo no tenemos maquinaria Doosan usada disponible",
     );
+  });
+});
+
+describe("usaEstadoVacioPropio (dirección, 2026-10-19: solo diseños de Andrés)", () => {
+  it("solo con «propio» se pinta el estado vacío diseñado", () => {
+    assert.equal(usaEstadoVacioPropio({ estadoVacio: "propio" }), true);
+  });
+
+  it("por defecto, sin valor o con otro, el aviso provisional", () => {
+    assert.equal(usaEstadoVacioPropio({ estadoVacio: "provisional" }), false);
+    assert.equal(usaEstadoVacioPropio({ estadoVacio: null }), false);
+    assert.equal(usaEstadoVacioPropio({}), false);
+    assert.equal(usaEstadoVacioPropio(undefined), false);
+    assert.equal(usaEstadoVacioPropio({ estadoVacio: "Propio" }), false);
   });
 });

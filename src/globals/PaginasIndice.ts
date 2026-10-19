@@ -143,6 +143,27 @@ export const PaginasIndice: GlobalConfig = {
           "Foto de fondo del encabezado",
           "Opcional. Foto de obra a todo el ancho; sin ella, la misma de respaldo que «Maquinaria pesada».",
         ),
+        /*
+         * Dirección, 2026-10-19: en el sitio publicado solo van diseños de
+         * Andrés. El estado vacío diseñado del #257/#258 se queda en el
+         * código, apagado. Las categorías vacías se siguen viendo (índice,
+         * pestañas y menú); su página, con un aviso sencillo.
+         */
+        {
+          name: "estadoVacio",
+          type: "select",
+          label: "Página de una categoría o marca sin unidades",
+          defaultValue: "provisional",
+          required: true,
+          options: [
+            { label: "Provisional (aviso sencillo)", value: "provisional" },
+            { label: "Diseño propio (sin plantilla de Andrés)", value: "propio" },
+          ],
+          admin: {
+            description:
+              "«Provisional»: «Por ahora no hay unidades disponibles», con enlace a Contáctanos y WhatsApp. «Diseño propio»: el nuestro, con alternativas y «Avísame», sin aprobar para el sitio publicado.",
+          },
+        },
       ],
     },
     {

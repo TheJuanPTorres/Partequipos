@@ -26,6 +26,13 @@ export default async function PaginaMarcaUsada({ params, searchParams }: Props) 
   if (pagina === null) notFound();
   const parametros = await searchParams;
   if (pagina === 1) redirigirPaginaUno("marca", marca, parametros);
-  const { ambito, listado, vacio } = await cargarListadoUsado("marca", marca, pagina, parametros);
-  return <ListadoUsados ambito={ambito} pagina={pagina} listado={listado} vacio={vacio} />;
+  const { ambito, listado, vacio, aviso } = await cargarListadoUsado(
+    "marca",
+    marca,
+    pagina,
+    parametros,
+  );
+  return (
+    <ListadoUsados ambito={ambito} pagina={pagina} listado={listado} vacio={vacio} aviso={aviso} />
+  );
 }

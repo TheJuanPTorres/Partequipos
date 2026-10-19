@@ -24,14 +24,14 @@ describe("vistaModelo", () => {
     assert.equal(v.disponibles, "repuestos disponibles para excavadora ejemplo x100");
   });
 
-  it("sin textos, el tÃ­tulo y el de las categorÃ­as tienen respaldo (nunca un h1 vacÃ­o)", () => {
+  it("sin textos, el título y el de las categorías tienen respaldo (nunca un h1 vacío)", () => {
     const v = vistaModelo(modelo({ tituloPagina: "  ", tituloDisponibles: null }));
     assert.equal(v.antetitulo, "");
     assert.equal(v.titulo, "Repuestos Excavadora EJEMPLO X100");
     assert.equal(v.disponibles, "Repuestos disponibles para Excavadora EJEMPLO X100");
   });
 
-  it("la lista de piezas solo sale con Â«Mostrar la lista de piezasÂ»", () => {
+  it("la lista de piezas solo sale con «Mostrar la lista de piezas»", () => {
     const piezas = [{ texto: "- Filtros para x100" }, { texto: "  " }, { texto: "- llantas" }];
     assert.deepEqual(vistaModelo(modelo({ piezas, mostrarPiezas: false })).piezas, []);
     assert.deepEqual(vistaModelo(modelo({ piezas, mostrarPiezas: true })).piezas, [
@@ -58,7 +58,7 @@ describe("categoriasDelTipo", () => {
     );
   });
 
-  it("sin categorÃ­as elegidas, ninguna", () => {
+  it("sin categorías elegidas, ninguna", () => {
     assert.deepEqual(categoriasDelTipo({ categoriasModelo: null }, todas), []);
   });
 });

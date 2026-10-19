@@ -8,11 +8,11 @@ import type { CategoriaMarca } from "@/lib/repuestos/marca";
 import type { VistaModelo } from "@/lib/repuestos/modelo";
 
 /*
- * La pÃ¡gina de modelo de repuestos PROVISIONAL (direcciÃ³n, 2026-10-19): en el
- * sitio publicado solo van diseÃ±os de AndrÃ©s, asÃ­ que mientras no llegue el
- * suyo la pÃ¡gina enseÃ±a el contenido de WordPress de forma sencilla, en el
- * estilo de antes del #267. Se elige en el global Â«PÃ¡ginas de marca de
- * repuestosÂ» â†’ Â«DiseÃ±o de las pÃ¡ginas de modeloÂ».
+ * La página de modelo de repuestos PROVISIONAL (dirección, 2026-10-19): en el
+ * sitio publicado solo van diseños de Andrés, así que mientras no llegue el
+ * suyo la página enseña el contenido de WordPress de forma sencilla, en el
+ * estilo de antes del #267. Se elige en el global «Páginas de marca de
+ * repuestos» → «Diseño de las páginas de modelo».
  */
 export function ModeloProvisional({
   migas,
@@ -34,7 +34,7 @@ export function ModeloProvisional({
   marca: { nombre: string; href: string };
   tipo: { nombre: string; href: string };
   codigo: string;
-  /** La tarjeta Â«Estamos aquÃ­ para ayudarloÂ» de WordPress, en sencillo. */
+  /** La tarjeta «Estamos aquí para ayudarlo» de WordPress, en sencillo. */
   ayuda: {
     titulo: string;
     texto: string;
@@ -81,7 +81,7 @@ export function ModeloProvisional({
         </div>
         {codigo ? (
           <div className="flex gap-2">
-            <dt className="font-medium text-gray-900">CÃ³digo:</dt>
+            <dt className="font-medium text-gray-900">Código:</dt>
             <dd>{codigo}</dd>
           </div>
         ) : null}
@@ -92,7 +92,7 @@ export function ModeloProvisional({
       ) : null}
 
       {imagenes.length > 0 ? (
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2" aria-label="ImÃ¡genes">
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2" aria-label="Imágenes">
           {imagenes.map((img, i) => (
             <li key={img.url} className="rounded-lg border border-gray-200 p-3">
               <Image
@@ -173,7 +173,7 @@ export function ModeloProvisional({
         </section>
       ) : null}
 
-      {/* Solicitud del repuesto con el modelo preseleccionado; con Â«CiudadÂ», sin n.Âº de documento (Ley 1581). */}
+      {/* Solicitud del repuesto con el modelo preseleccionado; con «Ciudad», sin n.º de documento (Ley 1581). */}
       <FormularioSolicitud
         tipo="repuesto"
         origen={contacto.origen}
@@ -187,15 +187,15 @@ export function ModeloProvisional({
         titulo={contacto.titulo}
         textoBoton={contacto.textoBoton}
         conCiudad
-        etiquetaMensaje="Â¿En quÃ© estÃ¡s interesado?"
+        etiquetaMensaje="¿En qué estás interesado?"
       />
 
       <nav
         className="mt-10 border-t border-gray-200 pt-6 text-sm"
-        aria-label="NavegaciÃ³n de catÃ¡logo"
+        aria-label="Navegación de catálogo"
       >
         <Link href={tipo.href} className="underline hover:text-gray-900">
-          â† Ver todos los modelos de {tipo.nombre.toLowerCase()} {marca.nombre}
+          ← Ver todos los modelos de {tipo.nombre.toLowerCase()} {marca.nombre}
         </Link>
       </nav>
     </>

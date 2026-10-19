@@ -3446,7 +3446,7 @@ export interface PaginasIndice {
      */
     fondo?: (number | null) | Media;
     /**
-     * Hasta seis, de tres en tres. Cada una lleva un título, la página a la que lleva y, si se quiere, una foto (sin foto, la tarjeta se pinta solo con el título).
+     * Hasta seis, de tres en tres (la última fila, centrada). Cada una lleva un título, la página a la que lleva y, si se quiere, una foto (sin foto, la tarjeta se pinta solo con el título).
      */
     tarjetas?:
       | {
@@ -3459,6 +3459,10 @@ export interface PaginasIndice {
            * Opcional. Horizontal, de unos 800 × 530 píxeles.
            */
           imagen?: (number | null) | Media;
+          /**
+           * Desmarcada, la tarjeta no se pinta, pero se conserva para volver a mostrarla.
+           */
+          mostrar?: boolean | null;
           id?: string | null;
         }[]
       | null;
@@ -3472,7 +3476,7 @@ export interface PaginasIndice {
      */
     fondo?: (number | null) | Media;
     /**
-     * Hasta seis, de tres en tres. Cada una lleva un título, la página a la que lleva y, si se quiere, una foto (sin foto, la tarjeta se pinta solo con el título).
+     * Hasta seis, de tres en tres (la última fila, centrada). Cada una lleva un título, la página a la que lleva y, si se quiere, una foto (sin foto, la tarjeta se pinta solo con el título).
      */
     tarjetas?:
       | {
@@ -3485,6 +3489,10 @@ export interface PaginasIndice {
            * Opcional. Horizontal, de unos 800 × 530 píxeles.
            */
           imagen?: (number | null) | Media;
+          /**
+           * Desmarcada, la tarjeta no se pinta, pero se conserva para volver a mostrarla.
+           */
+          mostrar?: boolean | null;
           id?: string | null;
         }[]
       | null;
@@ -3688,6 +3696,7 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
               titulo?: T;
               enlace?: T;
               imagen?: T;
+              mostrar?: T;
               id?: T;
             };
       };
@@ -3704,6 +3713,7 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
               titulo?: T;
               enlace?: T;
               imagen?: T;
+              mostrar?: T;
               id?: T;
             };
       };

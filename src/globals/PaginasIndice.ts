@@ -35,7 +35,7 @@ const tarjetas = (): Field => ({
   maxRows: 6,
   admin: {
     description:
-      "Hasta seis, de tres en tres. Cada una lleva un título, la página a la que lleva y, si se quiere, una foto (sin foto, la tarjeta se pinta solo con el título).",
+      "Hasta seis, de tres en tres (la última fila, centrada). Cada una lleva un título, la página a la que lleva y, si se quiere, una foto (sin foto, la tarjeta se pinta solo con el título).",
     initCollapsed: true,
   },
   fields: [
@@ -49,6 +49,20 @@ const tarjetas = (): Field => ({
       admin: { description: "Ruta del sitio (/…) o https://" },
     },
     imagen("imagen", "Foto", "Opcional. Horizontal, de unos 800 × 530 píxeles."),
+    /*
+     * Ocultar sin borrar (cliente, 2026-10-19: el índice de Repuestos solo con
+     * las dos primeras). Marcada por defecto: las que ya existían siguen igual.
+     */
+    {
+      name: "mostrar",
+      type: "checkbox",
+      label: "Mostrar en la web",
+      defaultValue: true,
+      admin: {
+        description:
+          "Desmarcada, la tarjeta no se pinta, pero se conserva para volver a mostrarla.",
+      },
+    },
   ],
 });
 

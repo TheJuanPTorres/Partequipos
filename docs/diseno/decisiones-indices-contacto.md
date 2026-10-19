@@ -186,3 +186,10 @@ rgb(140,140,140)); el velo de la cabecera de la «Plantilla 1» pasa al **60 %**
 marca y tipo de repuestos no cambian). **Medido contra el píxel más claro de su fondo real (texto oculto), 7 páginas × 390,
 1010 y 1440:** 5,78:1 como mínimo con foto; 19:1 en la cabecera oscura sin foto (Aditamentos). Captura a 1440 en
 `capturas-2026-10-18-plantilla1/antetitulo-*-1440-despues.png`.
+
+## 10. Tarjetas ocultables y última fila centrada (agente C, 2026-10-19, petición del cliente)
+
+- **Ocultar sin borrar.** Cada tarjeta de «Páginas índice y contacto» (Repuestos y Maquinaria) tiene la casilla «Mostrar en la web», marcada por defecto. Desmarcada, `tarjetasDeIndice` no la pinta; vacía (filas anteriores) cuenta como marcada. Migración `20261019_205349_indice_tarjetas_mostrar`, solo esquema (`DEFAULT true`).
+- **Índice de Repuestos:** solo «Repuestos por marca» y «Categorías técnicas». Las otras cuatro (Tren de rodaje, Filtración, Herramienta de corte (GETS) y Lubricantes) se conservan desmarcadas. En el preview, desmarcadas por SQL; en el sitio publicado, desde el panel con `runbook-indice-repuestos-dos-tarjetas.md`.
+- **Última fila centrada.** Una rejilla CSS no centra una fila a medias, así que en `.tarjetasIndice` la lista pasa a flex con salto de línea y `justify-content: center`, y cada tarjeta mide exactamente una columna de la rejilla de antes: `(100% − (n − 1) × 20 px) / n`, con n = 3, 2 o 1 según el ancho. Las filas completas quedan igual; el recuadro con scroll (#249) no cambia (solo `transform`).
+- Vale para todas las páginas con `IndiceTarjetas`: índices de Repuestos, Maquinaria pesada y usados, y las marcas de nueva.

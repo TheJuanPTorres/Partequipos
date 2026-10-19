@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { VistaPorQue } from "@/lib/repuestos/plantillaTipo";
 
 import estilos from "./plantillaTipo.module.css";
@@ -17,10 +19,13 @@ export function PorQueElegirnos({
   id,
   vista,
   anclaContacto,
+  formulario,
 }: {
   id: string;
   vista: VistaPorQue | null;
   anclaContacto: string;
+  /** El formulario de contacto de la página: el botón lo abre en una ventana. */
+  formulario: ConfigFormulario;
 }) {
   if (!vista) return null;
   const idTitulo = `${id}-titulo`;
@@ -51,9 +56,13 @@ export function PorQueElegirnos({
           ) : null}
           {vista.cierre ? <p className={estilos.porQueCierre}>{vista.cierre}</p> : null}
           {vista.boton ? (
-            <a href={`#${anclaContacto}`} className={estilos.porQueBoton}>
+            <BotonFormulario
+              href={`#${anclaContacto}`}
+              className={estilos.porQueBoton}
+              formulario={formulario}
+            >
               {vista.boton}
-            </a>
+            </BotonFormulario>
           ) : null}
         </div>
       </div>

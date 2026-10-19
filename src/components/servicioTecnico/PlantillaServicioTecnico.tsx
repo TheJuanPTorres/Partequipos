@@ -16,9 +16,11 @@ import Link from "next/link";
 import { GaleriaFicha } from "@/components/ficha/GaleriaFicha";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { DialogoYouTube } from "@/components/portada/DialogoYouTube";
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import type { EnlaceBloque } from "@/lib/bloques/vista";
 import type { VistaServicioTecnico } from "@/lib/servicioTecnico/vista";
+import { configContactoMarca, type ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { EnlaceWhatsApp } from "@/lib/whatsapp";
 
 import { CarruselVideos } from "./CarruselVideos";
@@ -77,8 +79,29 @@ function Antetitulo({ ancla }: { ancla: string }) {
   ) : null;
 }
 
-function Contactanos({ boton }: { boton: EnlaceBloque | null }) {
+/**
+ * El botón «Contáctanos» de las secciones: si lleva a la página de contacto, abre el formulario en
+ * una ventana (sin JavaScript sigue llevando al formulario del final de esta página). Un enlace
+ * a otro sitio, tal cual.
+ */
+function Contactanos({
+  boton,
+  formulario,
+  ancla,
+}: {
+  boton: EnlaceBloque | null;
+  formulario: ConfigFormulario | null;
+  ancla: string | null;
+}) {
   if (!boton) return null;
+  if (formulario && ancla && /^\/contactanos\/?(#.*)?$/.test(boton.href)) {
+    return (
+      <BotonFormulario href={`#${ancla}`} className={estilos.boton} formulario={formulario}>
+        {boton.texto}
+        <IconMail size={20} stroke={1.6} aria-hidden="true" />
+      </BotonFormulario>
+    );
+  }
   return (
     <Link href={boton.href} className={estilos.boton}>
       {boton.texto}
@@ -99,6 +122,21 @@ export function PlantillaServicioTecnico({
   origen: string;
 }) {
   const { hero, taller, alistamiento, posventa, siniestros, contacto } = vista;
+  // El formulario del final de la página, también en la ventana de los botones «Contáctanos».
+  const formularioContacto: ConfigFormulario | null = contacto
+    ? configContactoMarca({
+        origen,
+        siteKey,
+        whatsapp,
+        boton: contacto.botonTexto,
+        marca: "",
+        formulario: {
+          titulo: "Solicitud de servicio técnico",
+          conCiudad: true,
+          etiquetaMensaje: "¿Qué necesitas?",
+        },
+      })
+    : null;
   const fotoHero = hero.video?.poster ?? hero.imagen;
   // Las tarjetas: las 4 secciones que existen. Posventa vive junto al alistamiento.
   const accesos = vista.accesos.filter((a) => SECCIONES[a.ancla.toLowerCase()]);
@@ -191,7 +229,11 @@ export function PlantillaServicioTecnico({
                 </p>
               ))}
               {taller.destacado ? <p className={estilos.destacado}>{taller.destacado}</p> : null}
-              <Contactanos boton={taller.boton} />
+              <Contactanos
+                boton={taller.boton}
+                formulario={formularioContacto}
+                ancla={contacto?.ancla ?? null}
+              />
             </div>
           </div>
         </section>
@@ -269,7 +311,11 @@ export function PlantillaServicioTecnico({
                       {p}
                     </p>
                   ))}
-                  <Contactanos boton={posventa.boton} />
+                  <Contactanos
+                    boton={posventa.boton}
+                    formulario={formularioContacto}
+                    ancla={contacto?.ancla ?? null}
+                  />
                 </>
               ) : (
                 <Revelado
@@ -334,7 +380,11 @@ export function PlantillaServicioTecnico({
                   })}
                 </ol>
               ) : null}
-              <Contactanos boton={siniestros.boton} />
+              <Contactanos
+                boton={siniestros.boton}
+                formulario={formularioContacto}
+                ancla={contacto?.ancla ?? null}
+              />
               {siniestros.aseguradoras ? (
                 <Revelado
                   como="p"

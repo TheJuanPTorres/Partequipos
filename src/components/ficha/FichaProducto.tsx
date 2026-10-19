@@ -3,6 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
+
 import { BotonImprimir } from "@/components/ficha/BotonImprimir";
 import { EngranajeMarca } from "@/components/ficha/EngranajeMarca";
 import { GaleriaFicha, type FotoFicha } from "@/components/ficha/GaleriaFicha";
@@ -98,7 +102,7 @@ type Props = {
   /** Datos estructurados (Product y BreadcrumbList), ya construidos por la página. */
   jsonLd: ReactNode;
   /** El formulario de cotización, con la referencia a lo que se cotiza. */
-  formulario: ReactNode;
+  formulario: ConfigFormulario;
 };
 
 export function FichaProducto({
@@ -173,10 +177,14 @@ export function FichaProducto({
           <ListaDatos datos={datos} clase={`${estilos.datos} texto-destacado`} apilado />
 
           <div className={`${estilos.botones} ${estilos.noImprimir}`}>
-            <a href={`#${ANCLA_COTIZAR}`} className={`${estilos.boton} texto-etiqueta`}>
+            <BotonFormulario
+              href={`#${ANCLA_COTIZAR}`}
+              className={`${estilos.boton} texto-etiqueta`}
+              formulario={formulario}
+            >
               <IconCirclePlus aria-hidden="true" stroke={1.75} />
               Cotizar el equipo
-            </a>
+            </BotonFormulario>
             {experto ? (
               <a
                 href={experto.href}
@@ -322,10 +330,14 @@ export function FichaProducto({
               Contáctanos para recibir asesoría
             </h2>
             <div className={estilos.botonesContacto}>
-              <a href={`#${ANCLA_COTIZAR}`} className={`${estilos.boton} texto-etiqueta`}>
+              <BotonFormulario
+                href={`#${ANCLA_COTIZAR}`}
+                className={`${estilos.boton} texto-etiqueta`}
+                formulario={formulario}
+              >
                 <IconMail aria-hidden="true" stroke={1.75} />
                 Contáctanos
-              </a>
+              </BotonFormulario>
               {experto ? (
                 <a
                   href={experto.href}
@@ -373,7 +385,7 @@ export function FichaProducto({
            * Cotización con la referencia ya preseleccionada: quien llega hasta aquí ya
            * sabe qué quiere, y volver a escribirlo es fricción que cuesta leads.
            */}
-          {formulario}
+          <FormularioSolicitud {...formulario} />
         </div>
       </section>
     </main>

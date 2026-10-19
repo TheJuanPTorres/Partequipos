@@ -51,8 +51,10 @@ type Props = {
   /**
    * `plano`: sin tarjeta ni margen propios y con el título solo para lectores
    * de pantalla; la página que lo aloja pone el título visible y el marco.
+   * `emergente`: dentro de la ventana de contacto, que pone el título y el marco;
+   * el formulario no pinta ningún título.
    */
-  variante?: "tarjeta" | "plano";
+  variante?: "tarjeta" | "plano" | "emergente";
   /** Etiqueta del campo de mensaje: «Mensaje» por defecto; lubricantes: «¿Qué necesitas?». */
   etiquetaMensaje?: string;
   /**
@@ -86,9 +88,10 @@ export function FormularioSolicitud({
   const idBase = useId();
   const campo = (n: string) => `${idBase}-${n}`;
 
-  const claseSeccion = variante === "plano" ? "" : "mt-10 rounded-lg border border-gray-200 p-6";
+  const claseSeccion = variante !== "tarjeta" ? "" : "mt-10 rounded-lg border border-gray-200 p-6";
   const claseTitulo = variante === "plano" ? "sr-only" : "text-xl font-medium text-gray-900";
 
+  const conTitulo = variante !== "emergente";
   const resumenRef = useRef<HTMLDivElement>(null);
   const confirmacionRef = useRef<HTMLDivElement>(null);
   const idTitulo = `${idBase}-titulo`;
@@ -105,10 +108,12 @@ export function FormularioSolicitud({
 
   if (estado.estado === "ok") {
     return (
-      <section aria-labelledby={idTitulo} className={claseSeccion}>
-        <h2 id={idTitulo} className={claseTitulo}>
-          {titulo}
-        </h2>
+      <section aria-labelledby={conTitulo ? idTitulo : undefined} className={claseSeccion}>
+        {conTitulo ? (
+          <h2 id={idTitulo} className={claseTitulo}>
+            {titulo}
+          </h2>
+        ) : null}
         <div
           ref={confirmacionRef}
           tabIndex={-1}
@@ -222,10 +227,12 @@ export function FormularioSolicitud({
   );
 
   return (
-    <section aria-labelledby={idTitulo} className={claseSeccion}>
-      <h2 id={idTitulo} className={claseTitulo}>
-        {titulo}
-      </h2>
+    <section aria-labelledby={conTitulo ? idTitulo : undefined} className={claseSeccion}>
+      {conTitulo ? (
+        <h2 id={idTitulo} className={claseTitulo}>
+          {titulo}
+        </h2>
+      ) : null}
       {descripcion ? <p className="mt-2 text-sm text-gray-600">{descripcion}</p> : null}
 
       {referencia ? (

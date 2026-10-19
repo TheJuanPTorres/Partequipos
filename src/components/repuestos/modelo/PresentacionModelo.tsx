@@ -1,6 +1,8 @@
 import { IconBrandWhatsapp, IconCirclePlus } from "@tabler/icons-react";
 import Image from "next/image";
 
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import estilos from "./modelo.module.css";
@@ -25,6 +27,7 @@ export function PresentacionModelo({
   foto,
   logo,
   solicitarHref,
+  formulario,
   whatsapp,
 }: {
   texto: string;
@@ -32,6 +35,8 @@ export function PresentacionModelo({
   /** El logo de la marca, para el panel sin foto. */
   logo: ImagenLista | null;
   solicitarHref: string;
+  /** El formulario de la página de modelo: «Solicitar repuestos» lo abre en una ventana. */
+  formulario: ConfigFormulario;
   whatsapp: string | null;
 }) {
   return (
@@ -63,10 +68,10 @@ export function PresentacionModelo({
         <div className={estilos.columnaTexto}>
           {texto ? <p className={estilos.parrafo}>{texto}</p> : null}
           <div className={estilos.botones}>
-            <a href={solicitarHref} className={estilos.boton}>
+            <BotonFormulario href={solicitarHref} className={estilos.boton} formulario={formulario}>
               <IconCirclePlus aria-hidden="true" stroke={1.75} />
               Solicitar repuestos
-            </a>
+            </BotonFormulario>
             {whatsapp ? (
               <a
                 href={whatsapp}

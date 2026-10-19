@@ -11,6 +11,7 @@ import { ModeloProvisional } from "@/components/repuestos/modelo/ModeloProvision
 import { PresentacionModelo } from "@/components/repuestos/modelo/PresentacionModelo";
 import estilosModelo from "@/components/repuestos/modelo/modelo.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import { estiloDeMarca, logoBlancoSobre } from "@/lib/marca/colorMarca";
 import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
@@ -180,6 +181,14 @@ export async function PaginaModeloRepuesto({
         foto={imagenes[0] ?? null}
         logo={logo}
         solicitarHref={`#${ANCLA_CONTACTO}`}
+        formulario={configContactoMarca({
+          origen: ruta,
+          siteKey: turnstileSiteKey(),
+          whatsapp: enlaceWhatsApp(empresa.whatsapp),
+          boton: texto(global.contactoBoton) || "Enviar solicitud",
+          marca: modelo.nombre,
+          modelo: { id: modelo.id, nombre: modelo.nombre },
+        })}
         whatsapp={whatsapp ?? null}
       />
 

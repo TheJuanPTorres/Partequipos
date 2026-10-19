@@ -1,4 +1,5 @@
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
+import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
 
@@ -63,24 +64,7 @@ export function ContactoMarca({
       />
       <div className={estilos.formulario}>
         <FormularioSolicitud
-          tipo={modelo ? "repuesto" : "contacto"}
-          origen={origen}
-          siteKey={siteKey}
-          whatsapp={whatsapp}
-          referencia={
-            modelo ? { tipo: "modelos-repuesto", id: modelo.id, texto: modelo.nombre } : undefined
-          }
-          titulo={formulario?.titulo ?? `Contacto sobre repuestos ${marca}`}
-          textoBoton={boton || "Enviar"}
-          clasificacion={!modelo && !formulario}
-          conCiudad={formulario ? Boolean(formulario.conCiudad) : Boolean(modelo)}
-          etiquetaMensaje={
-            formulario
-              ? formulario.etiquetaMensaje
-              : modelo
-                ? "¿En qué estás interesado?"
-                : undefined
-          }
+          {...configContactoMarca({ origen, siteKey, whatsapp, boton, marca, modelo, formulario })}
           variante="plano"
         />
       </div>

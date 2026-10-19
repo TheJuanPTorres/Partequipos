@@ -25,6 +25,7 @@ import { categoriasDeMarca, tarjetasDeTipos, vistaEncabezado } from "@/lib/repue
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
+import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -128,6 +129,13 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
         id="por-que-elegirnos"
         vista={vistaPorQue(global, marca)}
         anclaContacto={ANCLA_CONTACTO}
+        formulario={configContactoMarca({
+          origen: rutas.marca(marca.slug),
+          siteKey: turnstileSiteKey(),
+          whatsapp: empresa ? enlaceWhatsApp(empresa.whatsapp) : undefined,
+          boton: texto(global.contactoBoton),
+          marca: marca.nombre,
+        })}
       />
 
       <SedesCompactas id="sedes-repuestos" sedes={sedesDePortada(sedes)} />

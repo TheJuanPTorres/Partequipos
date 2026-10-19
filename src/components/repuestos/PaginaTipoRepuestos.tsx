@@ -26,6 +26,7 @@ import {
   gruposDeModelos,
   vistaEncabezadoTipo,
 } from "@/lib/repuestos/tipo";
+import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
@@ -147,6 +148,13 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         id="por-que-elegirnos"
         vista={vistaPorQue(global, marca)}
         anclaContacto={ANCLA_CONTACTO}
+        formulario={configContactoMarca({
+          origen: rutas.tipo(marca.slug, seg),
+          siteKey: turnstileSiteKey(),
+          whatsapp: empresa ? enlaceWhatsApp(empresa.whatsapp) : undefined,
+          boton: texto(global.contactoBoton),
+          marca: `${nombreTipo} ${marca.nombre}`,
+        })}
       />
 
       <SedesCompactas id="sedes-repuestos" sedes={sedesDePortada(sedes)} />

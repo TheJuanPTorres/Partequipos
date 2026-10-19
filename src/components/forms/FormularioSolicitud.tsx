@@ -51,8 +51,10 @@ type Props = {
   /**
    * `plano`: sin tarjeta ni margen propios y con el título solo para lectores
    * de pantalla; la página que lo aloja pone el título visible y el marco.
+   * `emergente`: dentro de la ventana de contacto, que pone el título y el marco;
+   * el formulario no pinta ningún título.
    */
-  variante?: "tarjeta" | "plano";
+  variante?: "tarjeta" | "plano" | "emergente";
   /** Etiqueta del campo de mensaje: «Mensaje» por defecto; lubricantes: «¿Qué necesitas?». */
   etiquetaMensaje?: string;
   /**
@@ -76,19 +78,30 @@ export function FormularioSolicitud({
   titulo,
   descripcion,
   textoBoton,
-  clasificacion = false,
+  clasificacion: clasificacionPagina = false,
   variante = "tarjeta",
-  etiquetaMensaje = "Mensaje",
-  conCiudad = false,
+  etiquetaMensaje: etiquetaPagina = "Mensaje",
+  conCiudad: conCiudadPagina = false,
 }: Props) {
+  /*
+   * La VENTANA EMERGENTE lleva siempre «Ciudad» y «¿Qué necesitas?» (dirección,
+   * 2026-10-19) y no las preguntas de clasificación del diseño de repuestos:
+   * es el mismo formulario corto en cualquier página que la abra.
+   */
+  const emergente = variante === "emergente";
+  const clasificacion = emergente ? false : clasificacionPagina;
+  const conCiudad = emergente || conCiudadPagina;
+  const etiquetaMensaje =
+    emergente && etiquetaPagina === "Mensaje" ? "¿Qué necesitas?" : etiquetaPagina;
   const [estado, accion, enviando] = useActionState(enviarSolicitud, ESTADO_INICIAL);
 
   const idBase = useId();
   const campo = (n: string) => `${idBase}-${n}`;
 
-  const claseSeccion = variante === "plano" ? "" : "mt-10 rounded-lg border border-gray-200 p-6";
+  const claseSeccion = variante !== "tarjeta" ? "" : "mt-10 rounded-lg border border-gray-200 p-6";
   const claseTitulo = variante === "plano" ? "sr-only" : "text-xl font-medium text-gray-900";
 
+  const conTitulo = variante !== "emergente";
   const resumenRef = useRef<HTMLDivElement>(null);
   const confirmacionRef = useRef<HTMLDivElement>(null);
   const idTitulo = `${idBase}-titulo`;
@@ -105,10 +118,12 @@ export function FormularioSolicitud({
 
   if (estado.estado === "ok") {
     return (
-      <section aria-labelledby={idTitulo} className={claseSeccion}>
-        <h2 id={idTitulo} className={claseTitulo}>
-          {titulo}
-        </h2>
+      <section aria-labelledby={conTitulo ? idTitulo : undefined} className={claseSeccion}>
+        {conTitulo ? (
+          <h2 id={idTitulo} className={claseTitulo}>
+            {titulo}
+          </h2>
+        ) : null}
         <div
           ref={confirmacionRef}
           tabIndex={-1}
@@ -222,10 +237,12 @@ export function FormularioSolicitud({
   );
 
   return (
-    <section aria-labelledby={idTitulo} className={claseSeccion}>
-      <h2 id={idTitulo} className={claseTitulo}>
-        {titulo}
-      </h2>
+    <section aria-labelledby={conTitulo ? idTitulo : undefined} className={claseSeccion}>
+      {conTitulo ? (
+        <h2 id={idTitulo} className={claseTitulo}>
+          {titulo}
+        </h2>
+      ) : null}
       {descripcion ? <p className="mt-2 text-sm text-gray-600">{descripcion}</p> : null}
 
       {referencia ? (

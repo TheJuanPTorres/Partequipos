@@ -1,7 +1,9 @@
 import { IconBell, IconBrandWhatsapp } from "@tabler/icons-react";
 
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import type { DatosVacio } from "@/lib/usados/listado";
 
@@ -22,6 +24,18 @@ const ANCLA_AVISO = "avisame";
  * (D4); vuelve sola con la primera unidad.
  */
 export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen: string }) {
+  // El mismo formulario en la página y en la ventana de «Avísame cuando llegue una».
+  const formulario: ConfigFormulario = {
+    tipo: "cotizacion",
+    origen,
+    siteKey: turnstileSiteKey(),
+    whatsapp: datos.whatsapp,
+    referencia: { texto: `${datos.referencia} (avísame cuando llegue una)` },
+    titulo: "Avísame cuando llegue una",
+    descripcion:
+      "Déjanos tus datos y te escribimos en cuanto entre una unidad. Si buscas un modelo, un año o unas horas concretas, cuéntanoslo en el mensaje.",
+    textoBoton: "Avísame",
+  };
   return (
     <div className={estilos.vacio}>
       <section className={estilos.cabecera} aria-labelledby="vacio-titulo">
@@ -33,10 +47,14 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
           déjanos tus datos y te avisamos en cuanto llegue una.
         </p>
         <div className={estilos.acciones}>
-          <a href={`#${ANCLA_AVISO}`} className={`${estilos.boton} ${estilos.botonRojo}`}>
+          <BotonFormulario
+            href={`#${ANCLA_AVISO}`}
+            className={`${estilos.boton} ${estilos.botonRojo}`}
+            formulario={formulario}
+          >
             <IconBell size={18} stroke={1.8} aria-hidden="true" />
             Avísame cuando llegue una
-          </a>
+          </BotonFormulario>
           {datos.whatsapp ? (
             <a
               href={datos.whatsapp.href}
@@ -72,16 +90,7 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
       ) : null}
 
       <div id={ANCLA_AVISO} className={estilos.formulario}>
-        <FormularioSolicitud
-          tipo="cotizacion"
-          origen={origen}
-          siteKey={turnstileSiteKey()}
-          whatsapp={datos.whatsapp}
-          referencia={{ texto: `${datos.referencia} (avísame cuando llegue una)` }}
-          titulo="Avísame cuando llegue una"
-          descripcion="Déjanos tus datos y te escribimos en cuanto entre una unidad. Si buscas un modelo, un año o unas horas concretas, cuéntanoslo en el mensaje."
-          textoBoton="Avísame"
-        />
+        <FormularioSolicitud {...formulario} />
       </div>
     </div>
   );

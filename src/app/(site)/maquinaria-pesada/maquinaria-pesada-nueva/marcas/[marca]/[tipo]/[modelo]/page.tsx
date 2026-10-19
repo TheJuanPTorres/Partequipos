@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { FichaProducto, type OtraReferencia } from "@/components/ficha/FichaProducto";
 import type { FotoFicha } from "@/components/ficha/GaleriaFicha";
 import estilos from "@/components/ficha/ficha.module.css";
-import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { DESTACADAS_EN_TARJETA, destacadas, filasCompletas } from "@/lib/maquinaria/fichaTecnica";
@@ -197,18 +196,16 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
       imagenContacto={imagenContacto}
       contactoEsFoto={contactoEsFoto}
       jsonLd={<JsonLd data={[productJsonLd, buildBreadcrumbJsonLd(breadcrumbs)]} />}
-      formulario={
-        <FormularioSolicitud
-          tipo="cotizacion"
-          origen={ruta}
-          siteKey={turnstileSiteKey()}
-          whatsapp={enlaceWhatsApp(empresa.whatsapp, `Hola, quiero cotizar la ${equipo.nombre}.`)}
-          referencia={{ tipo: "equipos-nuevos", id: equipo.id, texto: equipo.nombre }}
-          titulo="Solicitar cotización"
-          descripcion="Te enviamos precio, disponibilidad y condiciones de entrega."
-          textoBoton="Pedir cotización"
-        />
-      }
+      formulario={{
+        tipo: "cotizacion",
+        origen: ruta,
+        siteKey: turnstileSiteKey(),
+        whatsapp: enlaceWhatsApp(empresa.whatsapp, `Hola, quiero cotizar la ${equipo.nombre}.`),
+        referencia: { tipo: "equipos-nuevos", id: equipo.id, texto: equipo.nombre },
+        titulo: "Solicitar cotización",
+        descripcion: "Te enviamos precio, disponibilidad y condiciones de entrega.",
+        textoBoton: "Pedir cotización",
+      }}
     />
   );
 }

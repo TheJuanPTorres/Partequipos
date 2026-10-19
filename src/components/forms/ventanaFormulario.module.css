@@ -1,0 +1,105 @@
+/*
+ * Ventana emergente del formulario de contacto (dirección, 2026-10-19). Es un <dialog> nativo:
+ * cerrado no pinta nada (display: none del navegador), así que no ocupa sitio ni mueve la página.
+ */
+
+.ventana {
+  width: min(680px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--color-texto, #1a1a1a);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.ventana::backdrop {
+  background: rgb(0 0 0 / 0.6);
+}
+
+/* La página de detrás no se desplaza mientras la ventana está abierta. */
+:global(html:has(dialog[data-ventana-contacto][open])) {
+  overflow: hidden;
+}
+
+.contenido {
+  padding: 28px 32px 32px;
+}
+
+.cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.cerrar {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  margin: -8px -10px 0 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.cerrar:hover {
+  background: rgb(0 0 0 / 0.08);
+}
+
+.cerrar:focus-visible {
+  outline: 3px solid currentcolor;
+  outline-offset: 2px;
+}
+
+.cargando {
+  margin: 24px 0 0;
+  min-height: 320px;
+  color: #555;
+  font-size: 14px;
+}
+
+/* Móvil: a pantalla completa. */
+@media (max-width: 767px) {
+  .ventana {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .contenido {
+    padding: 20px 16px 28px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ventana[open] {
+    animation: aparece 160ms ease-out;
+  }
+}
+
+@keyframes aparece {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

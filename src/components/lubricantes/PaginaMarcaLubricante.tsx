@@ -1,8 +1,10 @@
 import { IconArrowRight, IconBrandWhatsapp, IconFileTypePdf } from "@tabler/icons-react";
 import Image from "next/image";
 
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { RichText } from "@/components/layout/RichText";
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { SeccionLubricante } from "@/lib/lubricantes/marca";
 import { estiloDeIdentidad } from "@/lib/lubricantes/identidad";
 import { rutas } from "@/lib/routes";
@@ -40,6 +42,16 @@ export function PaginaMarcaLubricante({
   whatsapp?: EnlaceWhatsApp;
 }) {
   const titulo = `Lubricantes ${marca.nombre}`;
+  // El mismo formulario en la página y en la ventana de los botones de cotizar.
+  const formulario: ConfigFormulario = {
+    tipo: "contacto",
+    origen: `${rutas.marcaLubricante(marca.slug)}/`,
+    siteKey: turnstileSiteKey(),
+    whatsapp,
+    titulo: `Formulario de contacto sobre ${titulo}`,
+    textoBoton: "Pedir cotización",
+    etiquetaMensaje: "¿Qué necesitas?",
+  };
   const fondo = imagenDeMedia(marca.imagenCabecera, "");
   const logo = imagenDeMedia(marca.logo, `Logo de ${marca.nombre}`);
   const entradilla = marca.entradilla?.trim() ?? "";
@@ -85,12 +97,13 @@ export function PaginaMarcaLubricante({
             </h1>
             {entradilla ? <p className={estilos.lede}>{entradilla}</p> : null}
             <div className={estilos.acciones}>
-              <a
+              <BotonFormulario
                 href={`#${ANCLA_CONTACTO}`}
                 className={`${estilos.boton} ${estilos.botonPrincipal}`}
+                formulario={formulario}
               >
                 Pedir cotización
-              </a>
+              </BotonFormulario>
               {whatsapp ? (
                 <a
                   href={whatsapp.href}
@@ -176,13 +189,14 @@ export function PaginaMarcaLubricante({
                   </h2>
                   {s.entradilla ? <p className={estilos.subtitulo}>{s.entradilla}</p> : null}
                 </div>
-                <a
+                <BotonFormulario
                   href={`#${ANCLA_CONTACTO}`}
                   className={`${estilos.boton} ${estilos.botonPrincipal}`}
                   style={{ background: "var(--lub-oscuro)", color: "var(--lub-principal)" }}
+                  formulario={formulario}
                 >
                   Cotizar esta línea
-                </a>
+                </BotonFormulario>
               </div>
 
               {s.grupos.map((g) => (
@@ -262,16 +276,7 @@ export function PaginaMarcaLubricante({
             ) : null}
           </div>
           <div className={estilos.formularioCaja}>
-            <FormularioSolicitud
-              tipo="contacto"
-              origen={`${rutas.marcaLubricante(marca.slug)}/`}
-              siteKey={turnstileSiteKey()}
-              whatsapp={whatsapp}
-              titulo={`Formulario de contacto sobre ${titulo}`}
-              textoBoton="Pedir cotización"
-              variante="plano"
-              etiquetaMensaje="¿Qué necesitas?"
-            />
+            <FormularioSolicitud {...formulario} variante="plano" />
           </div>
         </div>
       </section>

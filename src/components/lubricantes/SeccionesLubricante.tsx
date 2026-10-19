@@ -1,6 +1,8 @@
 import { IconFileTypePdf } from "@tabler/icons-react";
 import Image from "next/image";
 
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { SeccionLubricante } from "@/lib/lubricantes/marca";
 
 import estilos from "./lubricantes.module.css";
@@ -19,9 +21,12 @@ import estilos from "./lubricantes.module.css";
 export function SeccionesLubricante({
   secciones,
   anclaContacto,
+  formulario,
 }: {
   secciones: SeccionLubricante[];
   anclaContacto: string;
+  /** El formulario de la página: «Cotizar» lo abre en una ventana. */
+  formulario: ConfigFormulario;
 }) {
   return (
     <>
@@ -41,9 +46,13 @@ export function SeccionesLubricante({
                 </h2>
                 {s.entradilla ? <p className={estilos.entradilla}>{s.entradilla}</p> : null}
               </div>
-              <a href={`#${anclaContacto}`} className={estilos.cotizar}>
+              <BotonFormulario
+                href={`#${anclaContacto}`}
+                className={estilos.cotizar}
+                formulario={formulario}
+              >
                 Cotizar
-              </a>
+              </BotonFormulario>
             </div>
 
             {s.grupos.map((g) => (

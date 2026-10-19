@@ -4,6 +4,7 @@ import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
 import estilosMarca from "@/components/repuestos/marca.module.css";
 import type { SeccionLubricante } from "@/lib/lubricantes/marca";
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import { rutas } from "@/lib/routes";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia } from "@/lib/utils/relations";
@@ -34,6 +35,15 @@ export function PaginaMarcaLubricanteProvisional({
   whatsapp?: EnlaceWhatsApp;
 }) {
   const titulo = `Lubricantes ${marca.nombre}`;
+  // El mismo formulario en la página y en la ventana de «Cotizar».
+  const formulario: ConfigFormulario = {
+    tipo: "contacto",
+    origen: `${rutas.marcaLubricante(marca.slug)}/`,
+    siteKey: turnstileSiteKey(),
+    whatsapp,
+    titulo: `Más información sobre ${titulo}`,
+    textoBoton: "Obtener más información",
+  };
   return (
     <main>
       <HeroMarca
@@ -66,7 +76,11 @@ export function PaginaMarcaLubricanteProvisional({
         </div>
       ) : null}
 
-      <SeccionesLubricante secciones={secciones} anclaContacto={ANCLA_CONTACTO} />
+      <SeccionesLubricante
+        secciones={secciones}
+        anclaContacto={ANCLA_CONTACTO}
+        formulario={formulario}
+      />
 
       <section
         id={ANCLA_CONTACTO}
@@ -78,15 +92,7 @@ export function PaginaMarcaLubricanteProvisional({
           Más información sobre {titulo}
         </h2>
         <div className={estilosMarca.formulario}>
-          <FormularioSolicitud
-            tipo="contacto"
-            origen={`${rutas.marcaLubricante(marca.slug)}/`}
-            siteKey={turnstileSiteKey()}
-            whatsapp={whatsapp}
-            titulo={`Más información sobre ${titulo}`}
-            textoBoton="Obtener más información"
-            variante="plano"
-          />
+          <FormularioSolicitud {...formulario} variante="plano" />
         </div>
       </section>
     </main>

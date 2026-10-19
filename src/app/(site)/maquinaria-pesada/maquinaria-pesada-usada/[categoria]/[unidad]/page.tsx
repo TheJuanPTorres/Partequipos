@@ -3,7 +3,6 @@ import { notFound, permanentRedirect } from "next/navigation";
 
 import { FichaProducto, type OtraReferencia } from "@/components/ficha/FichaProducto";
 import type { FotoFicha } from "@/components/ficha/GaleriaFicha";
-import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getFichaProducto } from "@/lib/queries/getFichaProducto";
 import { getInventarioUsados, getUnidadUsadaPorSlug } from "@/lib/queries/getMaquinaria";
@@ -157,18 +156,16 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
       imagenContacto={imagenContacto}
       contactoEsFoto={contactoEsFoto}
       jsonLd={<JsonLd data={[productJsonLd, buildBreadcrumbJsonLd(migas)]} />}
-      formulario={
-        <FormularioSolicitud
-          tipo="cotizacion"
-          origen={ruta}
-          siteKey={turnstileSiteKey()}
-          whatsapp={enlaceWhatsApp(empresa.whatsapp, `Hola, quiero cotizar la ${unidad.nombre}.`)}
-          referencia={{ texto: unidad.nombre }}
-          titulo="Solicitar cotización"
-          descripcion="Te enviamos precio, disponibilidad y condiciones de entrega."
-          textoBoton="Pedir cotización"
-        />
-      }
+      formulario={{
+        tipo: "cotizacion",
+        origen: ruta,
+        siteKey: turnstileSiteKey(),
+        whatsapp: enlaceWhatsApp(empresa.whatsapp, `Hola, quiero cotizar la ${unidad.nombre}.`),
+        referencia: { texto: unidad.nombre },
+        titulo: "Solicitar cotización",
+        descripcion: "Te enviamos precio, disponibilidad y condiciones de entrega.",
+        textoBoton: "Pedir cotización",
+      }}
     />
   );
 }

@@ -1,4 +1,7 @@
 import type { MetadataRoute } from "next";
+import { unstable_cache } from "next/cache";
+
+import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 
 import { getArticulos, getCategoriasBlog } from "@/lib/queries/getBlog";
 import { getMarcasLubricante } from "@/lib/queries/getLubricantes";
@@ -30,16 +33,21 @@ import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/pa
  * consultas**, entre ellas los 351 modelos de repuesto, y cada rastreador que
  * lo pedía las repetía contra la base (`propuestas/2026-10-15-consumo-base.md`).
  *
- * Ahora se genera en el build y se regenera:
+ * EN LA CACHÉ DE DATOS desde el 2026-10-19 (antes, ruta ISR con
+ * `revalidate`). Medido en un preview: en Vercel, `revalidatePath("/sitemap.xml")`
+ * NO regeneraba la copia ISR de esta ruta —ni desde los ganchos ni desde
+ * `POST /api/revalidar/`; la página seguía «HIT» con su edad creciendo—, así
+ * que solo se renovaba por la vigencia de 1 h. La etiqueta de la caché de
+ * datos sí se invalida (como los listados), por eso:
  *
- * - cuando un gancho del catálogo lo invalida (`revalidarIndices` en
- *   `src/lib/cacheDatos.ts`, que llaman `revalidarRutas` y los de usados y
- *   nueva), en la visita siguiente;
- * - y, como red, cada hora como mucho (`revalidate`), por si algún gancho no
- *   pasa por ahí.
+ * - las ENTRADAS van en `unstable_cache` con la etiqueta `datos:sitemap` (y
+ *   las de usados y nueva), que invalidan `revalidarIndices` (ganchos del
+ *   catálogo) y `POST /api/revalidar/`; vigencia de 1 h como red;
+ * - la RUTA es dinámica: cada petición sirve las entradas en caché, sin tocar
+ *   la base (las 15 consultas solo corren al renovar la entrada).
  *
- * Una página nueva puede tardar hasta una hora en salir aquí si su gancho no
- * lo invalida: para un sitemap, que Google lee cada varios días, sobra.
+ * Cuenta para ocultar una marca de nueva (`src/lib/nueva/visibilidad.ts`):
+ * sin esto, sus URL seguían en el sitemap hasta una hora.
  *
  * SOBRE EL LÍMITE DE 50.000 URLs: hoy son ~96 (y ~400 con los datos reales, 648
  * contando toda la migración), menos del 1,5 % del límite —y muy lejos también
@@ -48,9 +56,21 @@ import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/pa
  * Cuando se acerque a las 50.000 URLs, Next ofrece `generateSitemaps()` para
  * partirlo por sección sin cambiar el resto del diseño.
  */
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
+
+/** Vigencia de las entradas en caché, como red si algún gancho no la invalida. */
+export const VIGENCIA_SITEMAP = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  return entradasEnCache();
+}
+
+const entradasEnCache = unstable_cache(() => entradas(), ["sitemap", CLAVE_DESPLIEGUE], {
+  tags: [ETIQUETAS_DATOS.sitemap, ETIQUETAS_DATOS.nueva, ETIQUETAS_DATOS.usados],
+  revalidate: VIGENCIA_SITEMAP,
+});
+
+async function entradas(): Promise<MetadataRoute.Sitemap> {
   const [
     marcas,
     categoriasRepuestos,

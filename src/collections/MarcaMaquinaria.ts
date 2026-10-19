@@ -28,7 +28,7 @@ export const MarcaMaquinaria: CollectionConfig = {
   labels: { singular: "Marca de maquinaria nueva", plural: "Marcas de maquinaria nueva" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "slug"],
+    defaultColumns: ["nombre", "slug", "mostrarEnWeb"],
     group: "Maquinaria",
   },
   access: {
@@ -43,6 +43,30 @@ export const MarcaMaquinaria: CollectionConfig = {
   },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
+    // Ocultar sin borrar (2026-10-19, cliente: Ammann). `src/lib/nueva/visibilidad.ts`.
+    {
+      name: "mostrarEnWeb",
+      type: "checkbox",
+      defaultValue: true,
+      label: "Mostrar en la web",
+      admin: {
+        position: "sidebar",
+        description:
+          "Desmarcada, la marca, sus tipos y sus equipos desaparecen de toda la web (menú, listados, filtros, portada, buscador y sitemap) sin borrarse del panel, y sus páginas llevan con un 301 a la página de abajo.",
+      },
+    },
+    {
+      name: "destinoOculta",
+      type: "relationship",
+      relationTo: "categorias-maquinaria",
+      label: "Si está oculta, sus páginas llevan a",
+      admin: {
+        position: "sidebar",
+        condition: (datos) => datos?.mostrarEnWeb === false,
+        description:
+          "Categoría de maquinaria nueva a la que redirigen (301) la página de la marca, las de sus tipos y sus fichas. Vacío: el índice de maquinaria nueva.",
+      },
+    },
     // Nivel superior de su rama: unicidad global del slug.
     slugField({ unique: true }),
     { name: "descripcion", type: "textarea", label: "Descripción" },

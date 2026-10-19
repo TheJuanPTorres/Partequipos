@@ -2,7 +2,19 @@ import config from "@payload-config";
 import { NextResponse } from "next/server";
 import { getPayload } from "payload";
 
-import { destinosDe, mapaConClave, MAX_RUTAS_CONSULTA } from "@/lib/redirects/mapaConClave";
+import {
+  aplanarHaciaOcultas,
+  redirectsDeMarcasOcultas,
+  type HijoDeMarcaOculta,
+} from "@/lib/nueva/visibilidad";
+import {
+  destinosDe,
+  mapaConClave,
+  MAX_RUTAS_CONSULTA,
+  type RedirectGuardado,
+} from "@/lib/redirects/mapaConClave";
+import { poblado } from "@/lib/utils/relations";
+import type { CategoriasMaquinaria } from "@/payload-types";
 
 /**
  * Mapa completo de redirects, consumido por `proxy.ts` (ADR 0005).
@@ -93,5 +105,64 @@ async function leerRedirects() {
     limit: 0,
     overrideAccess: true,
   });
-  return docs.map((doc) => ({ desde: doc.desde, hacia: doc.hacia, tipo: doc.tipo }));
+  const guardados = docs.map((doc) => ({ desde: doc.desde, hacia: doc.hacia, tipo: doc.tipo }));
+  const ocultos = await redirectsDeOcultas(guardados);
+  return [...aplanarHaciaOcultas(guardados, ocultos), ...ocultos];
+}
+
+/**
+ * Los 301 de las marcas de maquinaria nueva ocultas (`src/lib/nueva/visibilidad.ts`):
+ * su página, las de sus tipos y sus fichas, al destino de la marca. Sin
+ * marcas ocultas, una sola consulta pequeña por refresco del mapa (60 s).
+ */
+async function redirectsDeOcultas(guardados: RedirectGuardado[]): Promise<RedirectGuardado[]> {
+  const payload = await getPayload({ config });
+  const { docs: marcas } = await payload.find({
+    collection: "marcas-maquinaria",
+    where: { mostrarEnWeb: { equals: false } },
+    depth: 1,
+    limit: 0,
+    pagination: false,
+    select: { slug: true, destinoOculta: true },
+    populate: { "categorias-maquinaria": { slug: true } },
+  });
+  if (marcas.length === 0) return [];
+  const ids = marcas.map((m) => m.id);
+  const slugDe = new Map(marcas.map((m) => [m.id, m.slug]));
+  const [tipos, equipos] = await Promise.all([
+    payload.find({
+      collection: "tipos-maquinaria",
+      where: { marca: { in: ids } },
+      depth: 0,
+      limit: 0,
+      pagination: false,
+      select: { slug: true, marca: true },
+    }),
+    payload.find({
+      collection: "equipos-nuevos",
+      where: { marca: { in: ids } },
+      depth: 0,
+      limit: 0,
+      pagination: false,
+      select: { slug: true, marca: true, tipo: true },
+    }),
+  ]);
+  const tipoDe = new Map(tipos.docs.map((t) => [t.id, t.slug]));
+  const id = (v: unknown) => (typeof v === "number" ? v : ((v as { id?: number })?.id ?? -1));
+  const hijos: HijoDeMarcaOculta[] = [
+    ...tipos.docs.map((t) => ({ marcaSlug: slugDe.get(id(t.marca)) ?? "", tipoSlug: t.slug })),
+    ...equipos.docs.map((e) => ({
+      marcaSlug: slugDe.get(id(e.marca)) ?? "",
+      tipoSlug: tipoDe.get(id(e.tipo)) ?? "",
+      equipoSlug: e.slug,
+    })),
+  ].filter((h) => h.marcaSlug && h.tipoSlug);
+  return redirectsDeMarcasOcultas(
+    marcas.map((m) => ({
+      slug: m.slug,
+      destino: poblado<CategoriasMaquinaria>(m.destinoOculta)?.slug ?? null,
+    })),
+    hijos,
+    guardados,
+  );
 }

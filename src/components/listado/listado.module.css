@@ -112,6 +112,8 @@
   max-width: 1150px;
 }
 .pestana {
+  /* Contiene el texto solo para lectores de la nota: sin esto se sale de la tira y desborda la página. */
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 12px;

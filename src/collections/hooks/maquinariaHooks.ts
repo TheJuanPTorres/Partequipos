@@ -80,6 +80,8 @@ export const revalidarMarcaMaquinaria: CollectionAfterChangeHook = async ({ doc,
   try {
     // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
     revalidarDatos(ETIQUETAS_DATOS.nueva, `marca maquinaria ${doc.slug}`);
+    // Las marcas de usada enlazan a su marca de nueva, y la quitan si se oculta.
+    revalidarDatos(ETIQUETAS_DATOS.usados, `marca maquinaria ${doc.slug}`);
     revalidarRutas(
       rutasDeMarcaMaquinaria(doc.slug, await hijosDeMarca(req, doc.id)),
       `marca maquinaria ${doc.slug}`,

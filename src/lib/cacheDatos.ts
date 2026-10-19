@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 /**
  * CACHÉ DE DATOS de los listados DINÁMICOS (2026-10-13).
@@ -39,6 +39,12 @@ export const ETIQUETAS_DATOS = {
    * ganchos pasan por aquí. La invalida `revalidarIndices`.
    */
   busqueda: "datos:busqueda",
+  /**
+   * Las entradas del sitemap (`src/app/(site)/sitemap.ts`, 2026-10-19). En
+   * Vercel, `revalidatePath("/sitemap.xml")` no regeneraba la copia ISR de la
+   * ruta; la etiqueta sí. La invalida `revalidarIndices`.
+   */
+  sitemap: "datos:sitemap",
 } as const;
 
 /**
@@ -85,7 +91,7 @@ export function revalidarDatos(etiqueta: string, motivo: string): void {
 export function revalidarIndices(motivo: string): void {
   try {
     revalidateTag(ETIQUETAS_DATOS.busqueda, { expire: 0 });
-    revalidatePath("/sitemap.xml");
+    revalidateTag(ETIQUETAS_DATOS.sitemap, { expire: 0 });
   } catch (error) {
     console.error(`[revalidación] fallaron el sitemap o el buscador (${motivo}):`, error);
   }

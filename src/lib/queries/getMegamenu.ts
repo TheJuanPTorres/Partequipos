@@ -6,6 +6,7 @@ import { getPayload } from "payload";
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 
 import { construirMegamenu, type PanelMenu } from "@/lib/megamenu";
+import { DE_MARCA_VISIBLE, MARCA_VISIBLE } from "@/lib/nueva/visibilidad";
 
 /**
  * Datos del megamenú (`src/lib/megamenu.ts`): ocho consultas LIGERAS —solo
@@ -44,10 +45,12 @@ const megamenuEnCache = unstable_cache(
       equiposNuevos,
       equiposUsados,
     ] = await Promise.all([
-      payload.find({ collection: "marcas-maquinaria", ...marcas }),
+      // Sin las marcas de nueva ocultas, ni sus tipos ni sus equipos (`visibilidad.ts`).
+      payload.find({ collection: "marcas-maquinaria", ...marcas, where: MARCA_VISIBLE }),
       payload.find({
         collection: "tipos-maquinaria",
         ...base,
+        where: DE_MARCA_VISIBLE,
         select: { ...conMarca, subtipos: true },
       }),
       payload.find({ collection: "categorias-maquinaria", ...base, select: sinMarca }),
@@ -59,7 +62,12 @@ const megamenuEnCache = unstable_cache(
         select: { ...conMarca, slugPadre: true },
       }),
       // Solo el tipo de cada equipo: el menú no enlaza a los tipos de maquinaria nueva sin equipos.
-      payload.find({ collection: "equipos-nuevos", ...base, select: { tipo: true } }),
+      payload.find({
+        collection: "equipos-nuevos",
+        ...base,
+        where: DE_MARCA_VISIBLE,
+        select: { tipo: true },
+      }),
       // Solo la categoría de las unidades disponibles: «Sin unidades por ahora» en las vacías.
       payload.find({
         collection: "equipos-usados",

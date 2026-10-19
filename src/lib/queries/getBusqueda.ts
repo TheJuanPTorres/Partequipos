@@ -15,6 +15,7 @@ import type {
   TiposEquipo,
   TiposMaquinaria,
 } from "@/payload-types";
+import { conMarcaVisible } from "@/lib/nueva/visibilidad";
 
 /**
  * Búsqueda del sitio (`/buscar/?q=…`, CLAUDE.md §10.33 p.9): por nombre —y por
@@ -69,7 +70,8 @@ async function buscarEnLaBase(texto: string): Promise<ResultadosBusqueda> {
   const [nuevos, usados, modelos, articulos] = await Promise.all([
     payload.find({
       collection: "equipos-nuevos",
-      where: porNombreOCodigo(texto),
+      // Sin los de marcas ocultas, tampoco en el total (`visibilidad.ts`).
+      where: conMarcaVisible(porNombreOCodigo(texto)),
       ...comun,
     }),
     payload.find({

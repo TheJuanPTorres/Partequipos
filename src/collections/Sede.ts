@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { validarLatitud, validarLongitud } from "../lib/fields/reglasPortada";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
+import { revalidarMarcasDeRepuestos } from "../lib/revalidation";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("sedes");
@@ -44,7 +45,23 @@ export const Sede: CollectionConfig = {
     update: escrituraContenido,
     delete: borradoAdmin,
   },
-  hooks: { afterChange: [portada.afterChange], afterDelete: [portada.afterDelete] },
+  hooks: {
+    // La portada y las páginas de marca y tipo de repuestos (sedes compactas) las muestran.
+    afterChange: [
+      portada.afterChange,
+      ({ doc }) => {
+        revalidarMarcasDeRepuestos(`sedes ${doc?.id ?? ""}`);
+        return doc;
+      },
+    ],
+    afterDelete: [
+      portada.afterDelete,
+      ({ doc }) => {
+        revalidarMarcasDeRepuestos(`sedes ${doc?.id ?? ""} borrada`);
+        return doc;
+      },
+    ],
+  },
   defaultSort: "orden",
   fields: [
     {

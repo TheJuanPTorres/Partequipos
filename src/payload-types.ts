@@ -3370,6 +3370,26 @@ export interface RepuestosMarca {
   testimoniosTitulo?: string | null;
   verVideoTexto?: string | null;
   /**
+   * Vacío: la sección no se pinta.
+   */
+  porQueTitulo?: string | null;
+  /**
+   * Foto de la columna izquierda. Sin ella, un fondo oscuro.
+   */
+  porQueImagen?: (number | null) | Media;
+  porQuePuntos?:
+    | {
+        titulo: string;
+        texto: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * «{marca}» se sustituye por el nombre de la marca de la página.
+   */
+  porQueCierre?: string | null;
+  porQueBoton?: string | null;
+  /**
    * «Provisional»: el contenido de WordPress en una página sencilla. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.
    */
   disenoModelo: 'provisional' | 'propio';
@@ -3609,6 +3629,17 @@ export interface RepuestosMarcaSelect<T extends boolean = true> {
   contactoBoton?: T;
   testimoniosTitulo?: T;
   verVideoTexto?: T;
+  porQueTitulo?: T;
+  porQueImagen?: T;
+  porQuePuntos?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+        id?: T;
+      };
+  porQueCierre?: T;
+  porQueBoton?: T;
   disenoModelo?: T;
   modeloAyudaTitulo?: T;
   modeloAyudaTexto?: T;

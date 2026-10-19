@@ -3399,6 +3399,10 @@ export interface RepuestosMarca {
   porQueCierre?: string | null;
   porQueBoton?: string | null;
   /**
+   * «Provisional»: el contenido de WordPress en una página sencilla. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.
+   */
+  disenoModelo: 'provisional' | 'propio';
+  /**
    * Vacío: la tarjeta de WhatsApp no se pinta.
    */
   modeloAyudaTitulo?: string | null;
@@ -3646,6 +3650,7 @@ export interface RepuestosMarcaSelect<T extends boolean = true> {
       };
   porQueCierre?: T;
   porQueBoton?: T;
+  disenoModelo?: T;
   modeloAyudaTitulo?: T;
   modeloAyudaTexto?: T;
   modeloAyudaBoton?: T;

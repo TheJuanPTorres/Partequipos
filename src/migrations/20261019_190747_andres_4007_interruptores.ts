@@ -8,12 +8,12 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
  *   (#0b4ea2): un color elegido por un editor no se toca.
  * - El subtítulo del contacto, como en el diseño: «Si deseas más información, contáctanos»
  *   (solo si seguía con el texto de WordPress).
- * SQL explícito (CLAUDE.md §3.5).
+ * SQL explícito (CLAUDE.md §3.5). IDEMPOTENTE: el preview ya aplicó la primera versión (183801), renombrada al fusionar `main`.
  */
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-   ALTER TABLE "marcas_lubricante" ADD COLUMN "diseno_propio" boolean DEFAULT false;
-  ALTER TABLE "repuestos_marca" ADD COLUMN "que_incluye_diseno_propio" boolean DEFAULT false;`)
+   ALTER TABLE "marcas_lubricante" ADD COLUMN IF NOT EXISTS "diseno_propio" boolean DEFAULT false;
+  ALTER TABLE "repuestos_marca" ADD COLUMN IF NOT EXISTS "que_incluye_diseno_propio" boolean DEFAULT false;`)
 
   await db.execute(sql`
    UPDATE "marcas" SET "color_marca" = '#04aca3' WHERE lower("nombre") = 'kobelco' AND "color_marca" = '#0b4ea2';

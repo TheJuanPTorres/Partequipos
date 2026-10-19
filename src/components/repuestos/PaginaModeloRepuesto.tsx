@@ -7,6 +7,7 @@ import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { AyudaWhatsApp } from "@/components/repuestos/modelo/AyudaWhatsApp";
+import { ModeloProvisional } from "@/components/repuestos/modelo/ModeloProvisional";
 import { PresentacionModelo } from "@/components/repuestos/modelo/PresentacionModelo";
 import estilosModelo from "@/components/repuestos/modelo/modelo.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -15,7 +16,7 @@ import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepu
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { categoriasDeMarca } from "@/lib/repuestos/marca";
-import { categoriasDelTipo, vistaModelo } from "@/lib/repuestos/modelo";
+import { categoriasDelTipo, usaDisenoPropio, vistaModelo } from "@/lib/repuestos/modelo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
@@ -30,10 +31,11 @@ import type { Marca, ModelosRepuesto, TiposEquipo } from "@/payload-types";
  * y, para los modelos de un tipo anidado (la «Excavadora» de CASE,
  * `src/lib/repuestos/anidado.ts`), un nivel más.
  *
- * Diseño propio aprobado por dirección el 2026-10-19 (Andrés no tiene
- * plantilla), con los componentes de las páginas de marca y tipo y el
- * contenido de WordPress tal cual (decisión del cliente). Detalle en
- * docs/diseno/decisiones-modelo-repuestos.md.
+ * Dos diseños, elegidos en el global «Páginas de marca de repuestos»
+ * (`disenoModelo`): la versión PROVISIONAL sencilla, por defecto, y el diseño
+ * propio del #267, APAGADO (dirección, 2026-10-19: en el sitio publicado solo
+ * van diseños de Andrés). Los dos con el contenido de WordPress tal cual
+ * (decisión del cliente). Detalle en docs/diseno/decisiones-modelo-repuestos.md.
  */
 
 /** Metadatos de la ficha de un modelo de repuestos. */
@@ -112,6 +114,41 @@ export async function PaginaModeloRepuesto({
     codigo: modelo.codigo,
     imagenes: imagenes.map((img) => img.url),
   });
+
+  if (!usaDisenoPropio(global)) {
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-10">
+        <JsonLd data={[productJsonLd, buildBreadcrumbJsonLd(breadcrumbs)]} />
+        {/* La página ya tiene su formulario: el pie no pinta la tarjeta roja. */}
+        <PieSinTarjeta />
+        <ModeloProvisional
+          migas={breadcrumbs}
+          vista={vista}
+          descripcion={texto(modelo.descripcion)}
+          imagenes={imagenes}
+          categorias={enOrden}
+          marca={{ nombre: marca.nombre, href: rutas.marca(marca.slug) }}
+          tipo={{ nombre: tipo.nombre, href: rutas.tipo(marca.slug, seg) }}
+          codigo={texto(modelo.codigo)}
+          ayuda={{
+            titulo: texto(global.modeloAyudaTitulo),
+            texto: texto(global.modeloAyudaTexto),
+            boton: texto(global.modeloAyudaBoton) || "WhatsApp",
+            href: whatsapp ?? null,
+            foto: imagenDeMedia(global.modeloAyudaFoto, ""),
+          }}
+          contacto={{
+            titulo: texto(global.modeloContactoTitulo) || "Solicitar este repuesto",
+            origen: ruta,
+            siteKey: turnstileSiteKey(),
+            whatsapp: enlaceWhatsApp(empresa.whatsapp),
+            modelo: { id: modelo.id, nombre: modelo.nombre },
+            textoBoton: texto(global.contactoBoton) || "Enviar solicitud",
+          }}
+        />
+      </main>
+    );
+  }
 
   return (
     <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>

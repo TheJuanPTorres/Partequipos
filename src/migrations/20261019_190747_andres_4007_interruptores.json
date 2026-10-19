@@ -13669,6 +13669,14 @@
           "primaryKey": false,
           "notNull": false
         },
+        "diseno_modelo": {
+          "name": "diseno_modelo",
+          "type": "enum_repuestos_marca_diseno_modelo",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'provisional'"
+        },
         "modelo_ayuda_titulo": {
           "name": "modelo_ayuda_titulo",
           "type": "varchar",
@@ -14579,6 +14587,14 @@
         "Saturday",
         "Sunday"
       ]
+    },
+    "public.enum_repuestos_marca_diseno_modelo": {
+      "name": "enum_repuestos_marca_diseno_modelo",
+      "schema": "public",
+      "values": [
+        "provisional",
+        "propio"
+      ]
     }
   },
   "schemas": {},
@@ -14591,6 +14607,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "65c4fc1d-d09a-470d-ae2f-d73a7da46482",
+  "id": "0f458bca-500b-4f9c-a7d2-809eb1d1ec63",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

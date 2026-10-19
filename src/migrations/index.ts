@@ -60,6 +60,7 @@ import * as migration_20261019_175032_por_que_elegirnos_repuestos from './202610
 import * as migration_20261019_181113_diseno_modelo_repuestos from './20261019_181113_diseno_modelo_repuestos';
 import * as migration_20261019_190747_andres_4007_interruptores from './20261019_190747_andres_4007_interruptores';
 import * as migration_20261019_202332_marca_nueva_mostrar_en_web from './20261019_202332_marca_nueva_mostrar_en_web';
+import * as migration_20261019_205349_indice_tarjetas_mostrar from './20261019_205349_indice_tarjetas_mostrar';
 
 export const migrations = [
   {
@@ -370,6 +371,11 @@ export const migrations = [
   {
     up: migration_20261019_202332_marca_nueva_mostrar_en_web.up,
     down: migration_20261019_202332_marca_nueva_mostrar_en_web.down,
-    name: '20261019_202332_marca_nueva_mostrar_en_web'
+    name: '20261019_202332_marca_nueva_mostrar_en_web',
+  },
+  {
+    up: migration_20261019_205349_indice_tarjetas_mostrar.up,
+    down: migration_20261019_205349_indice_tarjetas_mostrar.down,
+    name: '20261019_205349_indice_tarjetas_mostrar'
   },
 ];

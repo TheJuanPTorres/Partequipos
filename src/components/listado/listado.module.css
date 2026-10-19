@@ -1,6 +1,6 @@
 /*
  * «Categoría secundaria» de ux-9: el listado de maquinaria nueva (índice y
- * categorías). Medidas de la página pintada de ux-9 a 390, 1010 y 1440
+ * categorías) y, desde el 2026-10-18, los de usada (categorías y marcas). Medidas de la página pintada de ux-9 a 390, 1010 y 1440
  * (2026-10-13); decisiones y desviaciones en
  * `docs/diseno/decisiones-categoria-secundaria.md`.
  *
@@ -60,6 +60,37 @@
   margin-top: 6px;
   font-size: 18px;
   font-weight: 400;
+}
+
+/* Descripción y enlaces bajo el título (listados de usada, 2026-10-18). */
+.descripcion {
+  max-width: 720px;
+  margin: 14px auto 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 20px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+}
+.enlaces a {
+  color: #fff;
+  text-underline-offset: 3px;
+}
+
+/* Sin pestañas (marcas de usada): el borde redondeado blanco que sube sobre la cabecera. */
+.sinPestanas {
+  position: relative;
+  height: 30px;
+  margin-top: -30px;
+  border-radius: 30px 30px 0 0;
+  background: #fff;
 }
 
 /* ---- Pestañas ---------------------------------------------------------- */
@@ -532,6 +563,17 @@
 .vacio {
   padding: 40px 16px;
   text-align: center;
+}
+/* Sin el lateral de filtros (listado vacío), el resultado ocupa todo el ancho. */
+.cuerpo > .resultados:only-child {
+  grid-column: 1 / -1;
+}
+.vacio p + p {
+  margin-top: 10px;
+}
+.vacio a {
+  color: var(--rojo);
+  font-weight: 500;
 }
 
 /* Botones de cada vista (como ux-9). */

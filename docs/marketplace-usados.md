@@ -26,8 +26,14 @@ Puro: sin React, Payload ni Next. Todo tiene pruebas (`filtros.test.ts`).
 | `seo.ts`     | `metadataFiltrada` (noindex, follow y canónica sin filtros) y `metadataSinIndexar` (D4)                                        |
 | `listado.ts` | `resolverListado`: todo lo anterior junto. Devuelve `redirigir`, `no-existe` o el listado                                      |
 
-**Componentes** (`src/components/catalog/filtros/`), de servidor y sin
-JavaScript: `PanelFiltros`, `SeleccionActual`, `Ordenar` y `Paginacion`.
+**Componentes:** desde el 2026-10-18 (petición del cliente), los listados de
+usada y de nueva comparten la plantilla «Categoría secundaria» de ux-9
+(`src/components/listado/`): `PlantillaListado` (cabecera, pestañas, recuento,
+filtros elegidos, «Ordenar» y vista lista/rejilla), `PanelFiltrosListado` (el
+lateral «Filtrar», formulario GET sin JavaScript) y `TarjetaListado`. La
+paginación sigue en `src/components/catalog/filtros/Paginacion`. Los
+componentes provisionales de antes (`PanelFiltros`, `SeleccionActual` y
+`Ordenar`) se quitaron al quedarse sin uso.
 
 ### Reglas de la URL
 

@@ -15,7 +15,9 @@ import {
   type ParametrosURL,
 } from "../filtros";
 import {
+  getCategoriasUsada,
   getCategoriaUsadaPorSlug,
+  getInventarioUsados,
   getMarcaUsadaPorSlug,
   getUnidadesDeCategoriaUsada,
   getUnidadesDeMarcaUsada,
@@ -28,6 +30,7 @@ import { METADATA_404 } from "../seo/noEncontrada";
 import { descripcionPorDefecto, tituloPorDefecto } from "../seo/porDefecto";
 import { CATALOGO_USADOS, CATALOGO_USADOS_MARCA, type UnidadFiltrable } from "./filtros";
 import { POR_PAGINA } from "./paginacion";
+import { pestanasDeCategorias, type PestanaListado } from "./pestanas";
 
 /**
  * Los listados de USADA con filtros: el de una CATEGORÍA
@@ -60,6 +63,11 @@ export type Ambito = {
   indexable: boolean;
   /** Enlaces a la misma marca en otras líneas (solo en las marcas). */
   enlaces: { href: string; texto: string }[];
+  /**
+   * Pestañas de la plantilla (solo en las categorías): las categorías con
+   * unidades, por nombre, y la propia aunque esté vacía.
+   */
+  pestanas: PestanaListado[];
 };
 
 const slugPoblado = (v: unknown): string | null =>
@@ -71,7 +79,11 @@ async function ambitoDe(tipo: TipoListadoUsado, slug: string): Promise<Ambito | 
   if (tipo === "categoria") {
     const categoria = await getCategoriaUsadaPorSlug(slug);
     if (!categoria) return null;
-    const unidades = await getUnidadesDeCategoriaUsada(categoria.id);
+    const [unidades, categorias, inventario] = await Promise.all([
+      getUnidadesDeCategoriaUsada(categoria.id),
+      getCategoriasUsada(),
+      getInventarioUsados(),
+    ]);
     return {
       tipo,
       registro: categoria,
@@ -82,6 +94,11 @@ async function ambitoDe(tipo: TipoListadoUsado, slug: string): Promise<Ambito | 
       // Sin unidades, no se indexa; vuelve sola con la primera (D4).
       indexable: unidades.length > 0,
       enlaces: [],
+      pestanas: pestanasDeCategorias(
+        categorias,
+        new Set(inventario.map((u) => u.categoria)),
+        categoria.id,
+      ),
     };
   }
   const marca = await getMarcaUsadaPorSlug(slug);
@@ -114,6 +131,7 @@ async function ambitoDe(tipo: TipoListadoUsado, slug: string): Promise<Ambito | 
           ]
         : []),
     ],
+    pestanas: [],
   };
 }
 

@@ -83,12 +83,9 @@
   gap: 22px;
 }
 
-/* El logo de ENI ya es un rótulo amarillo con su borde: va solo, sin placa detrás. */
+/* El logo de ENI ya es un rótulo amarillo con su borde: va solo, sin placa ni sombra detrás. */
 .placaLogo {
   display: flex;
-  overflow: hidden;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
 }
 
 .logo {
@@ -574,9 +571,10 @@
   object-position: 70% 50%;
 }
 
+/* Abajo a la izquierda, alineado con el contenido: a la derecha lo taparía el botón de WhatsApp. */
 .pausaVideo {
   position: absolute;
-  right: 16px;
-  bottom: 16px;
+  bottom: 20px;
+  left: calc(50% - min(620px, 50% - 20px));
   z-index: 2;
 }

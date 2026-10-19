@@ -72,6 +72,11 @@ sobre una placa oscura (PR #125). Tampoco sirven como imagen al compartir
   dice Hitachi, y lo es (comprobado a la vista).
 - Nombre en `Media`: `wp-logo-<id del adjunto>-<marca>.png`; texto alternativo
   «Logo de {marca}». Una segunda ejecución no los vuelve a subir.
+- **Un logo elegido en el panel no se pisa** (2026-10-18). Si la marca ya
+  lleva un logo que no es `wp-logo-…`, la importación ni sube el de WordPress
+  ni toca el campo, y la simulación lo lista en `conLogoDeEditorSinTocar`. Así
+  estaban 12 de las 13 marcas en el sitio publicado. Antes, cada pasada
+  devolvía el de WordPress.
 
 ## 4. Lo que no se importa, y las redirecciones
 

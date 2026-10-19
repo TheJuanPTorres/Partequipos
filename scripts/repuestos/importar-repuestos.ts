@@ -645,14 +645,28 @@ const demoModelosConSlugDeWp = demoModelos.filter((m) =>
 
 // ---------- Subidas al Blob ----------
 
-// Logos (lo único que se sube): uno por marca, por id de adjunto.
+// Logos: uno por marca, por id de adjunto. LO DE UN EDITOR NO SE PISA (2026-10-18): si la
+// marca ya tiene un logo que no es de esta importación (`wp-logo-…`), se queda, y el de
+// WordPress ni se sube. En el sitio publicado, 12 de las 13 marcas llevaban ya un logo
+// elegido en el panel.
+const nombreDeMedia = new Map(enMedia.map((m) => [m.id, m.filename ?? ""]));
+const marcasConLogoDeEditor = new Set(
+  enMarcas
+    .filter((d) => {
+      const id = typeof d.logo === "number" ? d.logo : null;
+      return id !== null && !(nombreDeMedia.get(id) ?? "").startsWith("wp-logo-");
+    })
+    .map((d) => d.slug),
+);
 const logosYa = new Set(
   enMedia
     .map((m) => m.filename?.match(/^wp-logo-(\d+)-/)?.[1])
     .filter(Boolean)
     .map(Number),
 );
-const logosASubir = marcas.filter((m) => !logosYa.has(m.logo.idWp));
+const logosASubir = marcas.filter(
+  (m) => !marcasConLogoDeEditor.has(m.slug) && !logosYa.has(m.logo.idWp),
+);
 
 // Imagen de cada tipo (una por adjunto) y fondo de EJEMPLO de las marcas.
 const ficheroDeMedia = new Map(enMedia.map((m) => [m.id, m.filename ?? ""]));
@@ -869,7 +883,9 @@ const resumen = {
   retiradaDeLaDemo: { tipos: demoTipos.length, modelos: demoModelos.length },
   blob: {
     subidasDeLogos: logosASubir.length,
-    logosYaSubidos: marcas.length - logosASubir.length,
+    logosYaSubidos:
+      marcas.filter((m) => !marcasConLogoDeEditor.has(m.slug)).length - logosASubir.length,
+    conLogoDeEditorSinTocar: [...marcasConLogoDeEditor],
     subidasDeImagenesDeTipo: imagenesTipoASubir.length,
     subidasDeImagenesDeTarjeta: tarjetasASubir.length,
     imagenesDeTipoYaSubidas: imagenesTipo.size - imagenesTipoASubir.length,
@@ -1102,8 +1118,10 @@ async function imagenEnMedia(i: PlanImagen): Promise<number> {
 // 3. Marcas. El fondo de EJEMPLO de ux-9 se quita: WordPress no tiene fondo visible.
 const idMarcaFinal = new Map<string, number>();
 for (const m of marcas) {
-  const logo = await logoEnMedia(m.logo);
   const doc = enMarcas.find((x) => x.slug === m.slug);
+  // Con logo elegido en el panel, ni se sube el de WordPress ni se toca el campo.
+  const logoDeEditor = marcasConLogoDeEditor.has(m.slug);
+  const logo = logoDeEditor ? null : await logoEnMedia(m.logo);
   const quitarFondo = !!doc && fondosDeEjemplo.includes(m.slug);
   if (doc && quitarFondo) {
     recordarImagen({
@@ -1117,7 +1135,7 @@ for (const m of marcas) {
     nombre: m.nombre,
     slug: m.slug,
     descripcion: m.descripcion,
-    logo,
+    ...(logoDeEditor ? {} : { logo }),
     ...(quitarFondo ? { fondoHero: null } : {}),
   };
   if (doc) {

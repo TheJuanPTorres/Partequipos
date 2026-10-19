@@ -353,12 +353,15 @@ export function HeroPortada({ diapositivas }: Props) {
   /* La foto de la SIGUIENTE se pide `ANTICIPO_MS` antes de que le toque, con el pase en marcha. */
   useEffect(() => {
     if (!hayVarias || pausado || dentro) return;
+    // En la primera, la línea de progreso arranca al pintarse la página (CSS), antes de
+    // hidratar: se descuenta lo que ya lleva desde la navegación (medido: ~2 s en móvil).
+    const yaLleva = activo === 0 && !cambiado ? performance.now() : 0;
     const t = window.setTimeout(
       () => cargar((activo + 1) % total),
-      Math.max(PASE_MS - ANTICIPO_MS, 0),
+      Math.max(PASE_MS - ANTICIPO_MS - yaLleva, 0),
     );
     return () => window.clearTimeout(t);
-  }, [activo, cargar, dentro, hayVarias, pausado, total]);
+  }, [activo, cambiado, cargar, dentro, hayVarias, pausado, total]);
 
   /** Al acercarse a una flecha o a un punto, se pide ya la foto de su destino. */
   const anticipar = (destino: number) => cargar((destino + total) % total);

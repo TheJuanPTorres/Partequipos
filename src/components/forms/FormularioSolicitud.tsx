@@ -53,6 +53,8 @@ type Props = {
    * de pantalla; la página que lo aloja pone el título visible y el marco.
    */
   variante?: "tarjeta" | "plano";
+  /** Etiqueta del campo de mensaje: «Mensaje» por defecto; lubricantes: «¿Qué necesitas?». */
+  etiquetaMensaje?: string;
 };
 
 const OPCIONES = {
@@ -71,6 +73,7 @@ export function FormularioSolicitud({
   textoBoton,
   clasificacion = false,
   variante = "tarjeta",
+  etiquetaMensaje = "Mensaje",
 }: Props) {
   const [estado, accion, enviando] = useActionState(enviarSolicitud, ESTADO_INICIAL);
 
@@ -281,14 +284,14 @@ export function FormularioSolicitud({
           </div>
         )}
 
-        <Campo id={campo("mensaje")} etiqueta="Mensaje" obligatorio error={err.mensaje}>
+        <Campo id={campo("mensaje")} etiqueta={etiquetaMensaje} obligatorio error={err.mensaje}>
           {(p) => (
             <textarea
               {...p}
               name="mensaje"
               rows={5}
               defaultValue={previo.mensaje}
-              placeholder={variante === "plano" ? "Mensaje" : undefined}
+              placeholder={variante === "plano" ? etiquetaMensaje : undefined}
               className={claseControl}
             />
           )}

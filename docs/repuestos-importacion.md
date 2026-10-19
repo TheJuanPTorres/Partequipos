@@ -425,3 +425,46 @@ ficha de la ZX450LC-5); segunda pasada «ya estaban»; retirada probada (5 tipos
 | Caterpillar · bulldozer                         | Las páginas D6, D6G, D6K OLD y D8 no salen en la lista                                                                     |
 | Komatsu · página de marca                       | Solo enseña la tarjeta de excavadoras (tiene 4 tipos); las páginas de bulldozer, cargador y motoniveladora no tienen lista |
 | Caterpillar · tipos                             | Las direcciones dicen «buldozer» y «retrocargador»                                                                         |
+
+## 13. El contenido de las páginas de MODELO, tal cual (agente C, 2026-10-19)
+
+**Decisión del cliente (2026-10-17): se migra todo, erratas incluidas.** La página de modelo tiene diseño propio,
+aprobado por dirección el 2026-10-19 (`docs/diseno/decisiones-modelo-repuestos.md`). Lo que trae de WordPress:
+
+| Dato de WordPress                                            | Dónde se guarda                                                                     |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| Antetítulo («Repuestos para Maquinaria Pesada»)              | `antetitulo` del modelo                                                             |
+| Título («HITACHI Excavadora ZX200»), el `<h1>`               | `tituloPagina` del modelo (vacío: «Repuestos <nombre>»)                             |
+| Párrafo largo                                                | `descripcion` del modelo (ya existía)                                               |
+| «repuestos disponibles para …»                               | `tituloDisponibles` del modelo                                                      |
+| Lista de piezas («- Filtros para …»)                         | `piezas` del modelo, con `mostrarPiezas`: visible en 27 páginas, oculta en el resto |
+| Categorías (una plantilla de Elementor por tipo)             | `categoriasModelo` del **tipo**, una vez por tipo                                   |
+| Tarjeta «ESTAMOS AQUÍ PARA AYUDARLO · Escríbenos · Whatsapp» | Global «Páginas de marca de repuestos» → «Páginas de modelo» (textos y foto)        |
+| Formulario «Si deseas más info, contáctanos»                 | El mismo global (título); los campos, nuestros, con «Ciudad» (nueva en solicitudes) |
+
+**El n.º de documento del formulario de WordPress NO se pide** (dirección, 2026-10-19): es un dato personal sensible
+(Ley 1581, minimización) y lo decide el cliente.
+
+**Fuente:** `scripts/repuestos/extraer-modelos-wp.py` lee del XML las 353 páginas de modelo publicadas: la sección
+principal visible en escritorio (antetítulo, título y párrafo), el título «repuestos disponibles», la lista de piezas
+(y si se ve en algún tamaño) y las plantillas incrustadas. La salida va fuera del repositorio
+(`Desktop/partequipos-cierre/repuestos-modelos-wp.json`).
+
+**Plantillas de categorías** (`CATEGORIAS_DE_PLANTILLA` en `src/lib/repuestos/modelosWp.ts`, leídas de sus botones «VER
+TODOS»): 43095 «BULLDOZER EXCAVADORA» 10; 43283 «MINIEXCAVADORA» 4 (tren de rodaje, filtración, corte y lubricantes);
+43307 «CARGADOR MOTONIVELADORA», 43363 «RETROCARGADOR» y 43404 «MINICARGADOR» 9 (sin tren de rodaje); 45834 «Martillos
+OKADA» 1 (misceláneos). Cada tipo se queda con la plantilla más usada por sus modelos; las mezclas se avisan. 23 páginas
+«antiguas» (sobre todo Komatsu) no tienen plantilla: sus tipos quedan sin categorías salvo que otro modelo del tipo la
+tenga.
+
+**Hallazgo: la «E xcavadora» no es de WordPress.** WordPress pinta «Excavadora»; la palabra lleva una etiqueta interna
+en la primera letra, y el importador de repuestos (§1) cambiaba esa etiqueta por un espacio. El importador nuevo corrige
+la descripción **solo cuando difiere del texto de WordPress únicamente en espacios**; cualquier otra diferencia la
+avisa y no la toca.
+
+**Importador:** `scripts/repuestos/importar-modelos-wp.ts` (`simular | importar | retirar`, destino `preview` o el del
+sitio publicado). Casa cada modelo por su URL; solo rellena lo vacío (no pisa a un editor); elige las categorías de un
+tipo solo si están vacías; sube la foto propia de WordPress de la tarjeta de ayuda (fuera del repositorio,
+`Desktop/partequipos-diseno/repuestos-modelo/ayuda-whatsapp.jpg`) y la elige si el campo está vacío. Manifiesto con lo de
+antes (`Desktop/partequipos-cierre/manifiesto-modelos-wp-<destino>.json`) y retirada exacta, que borra la foto subida y
+comprueba el 404 en el Blob. No revalida: después, el paso de revalidación del runbook.

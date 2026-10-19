@@ -37,13 +37,14 @@ export function tintaSobre(fondo: string): string {
 }
 
 /**
- * ¿Se ve el logo en BLANCO sobre este color de marca? Sí si la tinta es blanca; con una tinta negra
- * (un amarillo, un turquesa claro) el blanco no se leería y el logo va en negro. Sin color de
- * marca vale el amarillo de siempre: negro.
+ * ¿Va el logo en BLANCO sobre este color de marca? Sí, como en el diseño de Andrés, salvo que el
+ * color sea tan claro (un amarillo) que el blanco apenas se distinga: con menos de 2,5:1 de
+ * contraste, negro. Un logotipo no tiene requisito de contraste (WCAG 1.4.3), pero tiene que
+ * leerse. Sin color de marca vale el amarillo de siempre: negro.
  */
 export function logoBlancoSobre(valor: string | null | undefined): boolean {
   const color = colorDeMarca(valor);
-  return color ? tintaSobre(color) === BLANCO : false;
+  return color ? contraste(luz(color), luz(BLANCO)) >= 2.5 : false;
 }
 
 /**

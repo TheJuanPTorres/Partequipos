@@ -786,7 +786,7 @@ a.pildora:hover {
   width: 100%;
   min-height: 48px;
   box-sizing: border-box;
-  padding: 6px 22px;
+  padding: 6px 12px;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -845,6 +845,12 @@ a.modelo:hover {
 /* La copia de reserva es más ancha que el texto: el texto va centrado en ella. */
 .modeloTexto {
   text-align: center;
+}
+
+/* El texto visible, centrado en su celda: la copia invisible de la reserva puede ocupar más líneas. */
+.modeloTexto > span {
+  align-self: center;
+  text-wrap: balance;
 }
 
 .modeloCodigo {

@@ -66,7 +66,7 @@ describe("logoBlancoSobre", () => {
   it("blanco sobre un color oscuro, negro sobre uno claro o sin color (el amarillo de siempre)", () => {
     assert.equal(logoBlancoSobre("#0b4ea2"), true);
     assert.equal(logoBlancoSobre("#ffd100"), false);
-    assert.equal(logoBlancoSobre("#04aca3"), false);
+    assert.equal(logoBlancoSobre("#04aca3"), true); // el turquesa de Kobelco: blanco, como el diseño
     assert.equal(logoBlancoSobre(null), false);
     assert.equal(logoBlancoSobre("no-es-un-color"), false);
   });

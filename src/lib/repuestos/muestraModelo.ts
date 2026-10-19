@@ -91,3 +91,12 @@ export const MUESTRAS_MODELO: Record<string, MuestraModelo> = {
     categorias: RETROCARGADOR,
   },
 };
+
+/**
+ * Texto alternativo exacto de la foto propia de WordPress de la tarjeta «ESTAMOS
+ * AQUÍ PARA AYUDARLO» (la misma en todas las marcas). Así la reconocen el script
+ * que la sube al preview (`scripts/repuestos/ayuda-modelo-preview.ts`) y el
+ * laboratorio; con la migración se elegirá en un campo del panel.
+ */
+export const ALT_AYUDA_MODELO =
+  "Excavadora Hitachi naranja sobre un montón de tierra, bajo un cielo con nubes";

@@ -9,8 +9,9 @@ import estilos from "@/components/repuestos/marca.module.css";
 import { AyudaWhatsApp } from "@/components/repuestos/modelo/AyudaWhatsApp";
 import { PresentacionModelo } from "@/components/repuestos/modelo/PresentacionModelo";
 import estilosModelo from "@/components/repuestos/modelo/modelo.module.css";
-import { estiloDeMarca } from "@/lib/marca/colorMarca";
+import { colorDeMarca, estiloDeMarca, tintaSobre } from "@/lib/marca/colorMarca";
 import { getModelos, getModeloPorSlug } from "@/lib/queries/getModelos";
+import { getFotoAyudaModelo } from "@/lib/queries/getMuestraModelo";
 import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
@@ -51,16 +52,21 @@ export default async function LaboratorioModeloRepuestos({
   const tipo = poblado<TiposEquipo>(modelo?.tipo);
   if (!modelo || !marca || !tipo) notFound();
 
-  const [global, categorias, empresa] = await Promise.all([
+  const [global, categorias, empresa, fotoAyuda] = await Promise.all([
     getRepuestosMarca(),
     getCategoriasParaMarca(),
     getEmpresa(),
+    getFotoAyudaModelo(),
   ]);
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const fotos = (Array.isArray(modelo.imagenes) ? modelo.imagenes : [])
     .map((img) => imagenDeMedia(img, modelo.nombre))
     .filter((img): img is NonNullable<typeof img> => img !== null);
   const fotoTipo = imagenDeMedia(tipo.imagen, "");
+  const logo = imagenDeMedia(marca.logo, `Logo de ${marca.nombre.trim()}`);
+  // Sin color de marca, la franja es el amarillo de siempre: logo en negro.
+  const color = colorDeMarca(marca.colorMarca);
+  const logoClaro = color ? tintaSobre(color) === "#ffffff" : false;
   const whatsapp = enlaceWhatsApp(
     empresa.whatsapp,
     `Hola, busco repuestos para ${modelo.nombre}.`,
@@ -82,7 +88,7 @@ export default async function LaboratorioModeloRepuestos({
           linea2: "",
           descripcion: "",
           fondo: fotoTipo ?? imagenDeMedia(marca.fondoHero, ""),
-          logo: imagenDeMedia(marca.logo, `Logo de ${marca.nombre.trim()}`),
+          logo,
           logoOscuro: Boolean(marca.logoOscuroEnMenu),
         }}
         anclaSiguiente="modelo-categorias"
@@ -92,6 +98,8 @@ export default async function LaboratorioModeloRepuestos({
       <PresentacionModelo
         texto={texto(modelo.descripcion)}
         foto={fotos[0] ?? null}
+        logo={logo}
+        logoClaro={logoClaro}
         solicitarHref={`#${ANCLA_CONTACTO}`}
         whatsapp={whatsapp ?? null}
       />
@@ -116,7 +124,7 @@ export default async function LaboratorioModeloRepuestos({
         texto="Escríbenos"
         boton="Whatsapp"
         href={whatsapp ?? null}
-        fondo={fotoTipo}
+        fondo={imagenDeMedia(fotoAyuda, "")}
       />
 
       <ContactoMarca

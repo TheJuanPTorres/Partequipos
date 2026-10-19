@@ -100,8 +100,10 @@ export function CarruselMarcas({ tarjetas, etiqueta }: Props) {
   const frente = alFrente(indice, total);
   const estiloPista = { "--indice": indice } as CSSProperties;
 
+  // Diapositiva en `div` con `role="group"` (patrón de carrusel de WAI-ARIA): un `<li>` con
+  // `role="group"` deja una lista con hijos no válidos (Lighthouse, 2026-10-19).
   const tarjeta = (t: TarjetaMarca, i: number, copia: boolean) => (
-    <li
+    <div
       key={`${copia ? "copia" : "t"}-${t.id}`}
       className={estilos.diapositiva}
       aria-hidden={copia || undefined}
@@ -143,7 +145,7 @@ export function CarruselMarcas({ tarjetas, etiqueta }: Props) {
           </span>
         ) : null}
       </Link>
-    </li>
+    </div>
   );
 
   return (
@@ -166,14 +168,14 @@ export function CarruselMarcas({ tarjetas, etiqueta }: Props) {
         onPointerUp={(e) => alSoltar(e.clientX)}
         onPointerCancel={() => (inicioGesto.current = null)}
       >
-        <ul
+        <div
           id="portada-marcas-pista"
           className={`${estilos.pista} ${animar ? "" : estilos.sinTransicion}`}
           style={estiloPista}
         >
           {tarjetas.map((t, i) => tarjeta(t, i, false))}
           {total > 1 ? tarjetas.map((t, i) => tarjeta(t, i, true)) : null}
-        </ul>
+        </div>
       </div>
       {/* Siempre en el marcado: reserva el alto de los controles y no hay salto al hidratar. */}
       <div className={estilos.controles}>

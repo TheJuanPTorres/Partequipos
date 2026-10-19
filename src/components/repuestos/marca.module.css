@@ -118,6 +118,17 @@
   line-height: 1.2;
 }
 
+.h1Largo .linea1 {
+  /* Una palabra larga («RETROCARGADORA») nunca se sale de la tarjeta. */
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  .h1Largo .linea1 {
+    font-size: var(--texto-titulo-3);
+  }
+}
+
 .linea2 {
   display: block;
   font-size: var(--texto-titulo-3);

@@ -13,8 +13,9 @@ import estilos from "./modelo.module.css";
  * funde con el blanco del texto. En móvil, la foto arriba con el mismo borde,
  * fundido hacia abajo. Los botones son los de la ficha V2.
  *
- * Sin foto del modelo, el lado de la imagen es un panel del color de la marca
- * con su logo en grande, con el mismo borde: sin una mitad vacía.
+ * Sin foto del modelo, el lado de la imagen es un panel oscuro con un brillo
+ * del color de la marca y su logo en blanco, en grande, con el mismo borde:
+ * sin una mitad vacía.
  *
  * Sin animación. El borde es una máscara CSS: no mueve nada (sin CLS) y no
  * descarga nada (el SVG va en el propio CSS).
@@ -23,7 +24,6 @@ export function PresentacionModelo({
   texto,
   foto,
   logo,
-  logoClaro,
   solicitarHref,
   whatsapp,
 }: {
@@ -31,8 +31,6 @@ export function PresentacionModelo({
   foto: ImagenLista | null;
   /** El logo de la marca, para el panel sin foto. */
   logo: ImagenLista | null;
-  /** El logo se pinta en blanco (sobre un color de marca oscuro) o en negro. */
-  logoClaro: boolean;
   solicitarHref: string;
   whatsapp: string | null;
 }) {
@@ -57,7 +55,6 @@ export function PresentacionModelo({
                 height={logo.height}
                 sizes="420px"
                 className={estilos.logoGrandeImg}
-                data-claro={logoClaro ? "" : undefined}
               />
             </span>
           ) : null}

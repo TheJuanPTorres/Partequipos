@@ -42,6 +42,7 @@ export function HeroMarca({
   bajaSinFoto = false,
   indice = false,
   bajo = false,
+  tituloLargo = false,
   etiquetaRaton,
 }: {
   vista: VistaEncabezado;
@@ -54,6 +55,8 @@ export function HeroMarca({
   indice?: boolean;
   /** La tarjeta baja (380 px; 420 en móvil), tenga o no foto. */
   bajo?: boolean;
+  /** Títulos largos de una sola línea (los de WordPress de cada modelo): más pequeños en móvil. */
+  tituloLargo?: boolean;
   /** Nombre accesible del icono del ratón. */
   etiquetaRaton?: string;
 }) {
@@ -92,7 +95,7 @@ export function HeroMarca({
 
           {vista.antetitulo ? <p className={estilos.antetituloHero}>{vista.antetitulo}</p> : null}
 
-          <h1 className={estilos.h1}>
+          <h1 className={`${estilos.h1} ${tituloLargo ? estilos.h1Largo : ""}`}>
             <Revelado
               como="span"
               alCargar

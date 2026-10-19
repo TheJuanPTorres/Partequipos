@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
@@ -72,6 +73,8 @@ export default async function LaboratorioModeloRepuestos({
 
   return (
     <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
+      {/* La página ya tiene su formulario: el pie no pinta la tarjeta roja. */}
+      <PieSinTarjeta />
       <HeroMarca
         vista={{
           antetitulo: muestra.antetitulo,

@@ -179,7 +179,15 @@ if (modo === "retirar") {
 
   if (!fs.existsSync(FUENTE)) fallar(`no está la fuente: ${FUENTE}`);
   const paginas = JSON.parse(fs.readFileSync(FUENTE, "utf8")) as PaginaModeloWp[];
-  const porRuta = new Map(paginas.map((p) => [p.ruta, p]));
+  // Las rutas de WordPress llevan la barra final; las nuestras (`rutas.modelo`), no.
+  const conBarra = (r: string) => r.replace(/\/?$/, "/");
+  const porRuta = new Map(paginas.map((p) => [conBarra(p.ruta), p]));
+  // Algunas direcciones de WordPress acaban en «_» (D6K, DX225LCA-CEBDX) y las
+  // nuestras no lo llevan: se casan sin él, si no hay ya una página sin «_».
+  for (const p of paginas) {
+    const sinGuion = conBarra(p.ruta).replace(/_\/$/, "/");
+    if (!porRuta.has(sinGuion)) porRuta.set(sinGuion, p);
+  }
 
   const { docs: modelos } = await payload.find({
     collection: "modelos-repuesto",
@@ -201,7 +209,7 @@ if (modo === "retirar") {
     const marca = typeof m.marca === "object" ? m.marca : null;
     const tipo = typeof m.tipo === "object" ? m.tipo : null;
     if (!marca || !tipo) continue;
-    const ruta = rutas.modelo(marca.slug, segmentoDeTipo(tipo), m.slug);
+    const ruta = conBarra(rutas.modelo(marca.slug, segmentoDeTipo(tipo), m.slug));
     const wp = porRuta.get(ruta);
     if (!wp) {
       sinPagina.push(ruta);
@@ -256,7 +264,9 @@ if (modo === "retirar") {
   );
   if (sinPagina.length)
     log(`sin página en WordPress (${sinPagina.length}): ${sinPagina.join(", ")}`);
-  const sueltas = paginas.filter((p) => !casadas.has(p.ruta)).map((p) => p.ruta);
+  const sueltas = paginas
+    .filter((p) => ![...casadas].some((r) => porRuta.get(r) === p))
+    .map((p) => p.ruta);
   if (sueltas.length)
     log(`páginas de WordPress sin modelo (${sueltas.length}): ${sueltas.join(", ")}`);
   if (otrasDescripciones.length) {

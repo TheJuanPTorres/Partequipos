@@ -96,7 +96,9 @@
 }
 
 .lista .entrada:hover,
-.lista .entrada:focus-visible {
+.lista .entrada:focus-visible,
+.lista:has(.entrada:hover, .entrada:focus-visible) .entrada:hover,
+.lista:has(.entrada:hover, .entrada:focus-visible) .entrada:focus-visible {
   color: var(--color-marca);
 }
 

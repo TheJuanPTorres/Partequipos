@@ -44,9 +44,7 @@
 
 .pieza {
   position: relative;
-  transition:
-    transform 0.35s ease,
-    filter 0.35s ease;
+  transition: transform 0.35s ease;
 }
 
 .pieza[data-tam="grande"] {
@@ -69,13 +67,21 @@
 .foto {
   object-fit: cover;
   transform: scale(1.08);
-  transition: transform 0.6s ease;
+  transition:
+    transform 0.6s ease,
+    filter 0.35s ease;
 }
 
+/* Velo: más denso abajo, donde va el nombre en blanco (AA con cualquier foto, medido). */
 .velo {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgb(0 0 0 / 0.05) 35%, rgb(0 0 0 / 0.72));
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0) 15%,
+    rgb(0 0 0 / 0.62) 55%,
+    rgb(0 0 0 / 0.88)
+  );
 }
 
 .placa {
@@ -128,14 +134,20 @@
   font-weight: 500;
 }
 
-/* Al pasar el ratón o enfocar: la pieza crece un poco y las demás se atenúan. */
-.mosaico:has(.enlace:hover, .enlace:focus-visible) .pieza {
-  filter: brightness(0.55) saturate(0.8);
+/*
+ * Al pasar el ratón o enfocar: la pieza crece un poco y las demás se atenúan
+ * (solo su FOTO: el nombre sigue en blanco y legible).
+ */
+.mosaico:has(.enlace:hover, .enlace:focus-visible) .foto {
+  filter: brightness(0.45) saturate(0.7);
+}
+
+.mosaico .pieza:has(.enlace:hover, .enlace:focus-visible) .foto {
+  filter: none;
 }
 
 .mosaico .pieza:has(.enlace:hover, .enlace:focus-visible) {
   z-index: 1;
-  filter: none;
   transform: scale(1.025);
 }
 
@@ -208,9 +220,11 @@
     transition: none;
   }
 
-  .mosaico:has(.enlace:hover, .enlace:focus-visible) .pieza,
-  .mosaico .pieza:has(.enlace:hover, .enlace:focus-visible) {
+  .mosaico:has(.enlace:hover, .enlace:focus-visible) .foto {
     filter: none;
+  }
+
+  .mosaico .pieza:has(.enlace:hover, .enlace:focus-visible) {
     transform: none;
   }
 

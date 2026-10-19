@@ -144,6 +144,7 @@ export function PlantillaListado<T>({
                     {p.nota ? (
                       <span className={estilos.pestanaTexto}>
                         {p.texto}
+                        <span className="sr-only">, </span>
                         <small className={estilos.pestanaNota}>{p.nota}</small>
                       </span>
                     ) : (

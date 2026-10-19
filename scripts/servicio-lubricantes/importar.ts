@@ -40,6 +40,9 @@
  * servicio-lubricantes/videos/`, con su LEEME). Van al mismo manifiesto, así
  * que la retirada también los quita.
  *
+ * `solo=servicio` (2026-10-19): lo que falta y la página de servicio técnico
+ * con su diseño, SIN tocar lubricantes (que pueden haber cambiado después).
+ *
  * DESTINO validado contra la base y el almacén ANTES de cargar Payload, más la
  * guarda del almacén (§10.37), como el importador del blog. Educado con el
  * servidor de WordPress: una petición cada 700 ms como mucho.
@@ -90,7 +93,9 @@ const CIERRE = path.join(os.homedir(), "Desktop", "partequipos-cierre");
 const MANIFIESTO =
   valorDe("manifiesto") ?? path.join(CIERRE, `manifiesto-servicio-lubricantes-${destino}.json`);
 const SOLO = valorDe("solo");
-if (SOLO && SOLO !== "faltantes") fallar(`solo=${SOLO} no existe (solo hay «solo=faltantes»)`);
+if (SOLO && SOLO !== "faltantes" && SOLO !== "servicio") {
+  fallar(`solo=${SOLO} no existe (hay «solo=faltantes» y «solo=servicio»)`);
+}
 const CARPETA_VIDEOS =
   valorDe("videos") ??
   path.join(
@@ -716,6 +721,15 @@ await actualizar("paginas", pagina!.id, {
   bloques,
 });
 log(`servicio técnico: ${bloques.length} bloques (galería: ${galeria.length} fotos)`);
+
+// `solo=servicio` (2026-10-19): solo la página de servicio técnico, sin tocar lubricantes.
+if (SOLO === "servicio") {
+  log(
+    `ficheros: subidos ${cuenta.subidos} · reutilizados ${cuenta.reutilizados} · por subir ${cuenta.simulados}`,
+  );
+  if (modo === "importar") log(`manifiesto: ${MANIFIESTO}`);
+  process.exit(0);
+}
 
 // ---------- Lubricantes ----------
 

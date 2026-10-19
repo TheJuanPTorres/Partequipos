@@ -49,17 +49,19 @@ export function vistaEncabezadoDeIndice(
  * una quitaría un enlace (en ux-9 la segunda fila era relleno repetido).
  */
 export function tarjetasDeIndice(grupo: GrupoIndice | null | undefined): TarjetaMarca[] {
-  return (grupo?.tarjetas ?? [])
-    // `mostrar` desmarcada: oculta sin borrarla (vacía en filas antiguas = se muestra).
-    .filter((t) => t.mostrar !== false && texto(t.titulo) && texto(t.enlace))
-    .slice(0, 6)
-    .map((t, i) => ({
-      clave: t.id ?? `indice-${i}`,
-      titulo: texto(t.titulo),
-      href: texto(t.enlace),
-      imagen: imagenDeMedia(t.imagen, ""),
-      soloEscritorio: false,
-    }));
+  return (
+    (grupo?.tarjetas ?? [])
+      // `mostrar` desmarcada: oculta sin borrarla (vacía en filas antiguas = se muestra).
+      .filter((t) => t.mostrar !== false && texto(t.titulo) && texto(t.enlace))
+      .slice(0, 6)
+      .map((t, i) => ({
+        clave: t.id ?? `indice-${i}`,
+        titulo: texto(t.titulo),
+        href: texto(t.enlace),
+        imagen: imagenDeMedia(t.imagen, ""),
+        soloEscritorio: false,
+      }))
+  );
 }
 
 export type CanalContacto = {

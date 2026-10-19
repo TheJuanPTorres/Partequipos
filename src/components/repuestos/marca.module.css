@@ -1257,8 +1257,7 @@ a.modelo:hover {
 }
 
 .tarjetasIndice .rejilla > .tarjeta {
-  flex: 0 0
-    calc((100% - (var(--columnas) - 1) * var(--hueco-columnas)) / var(--columnas));
+  flex: 0 0 calc((100% - (var(--columnas) - 1) * var(--hueco-columnas)) / var(--columnas));
   min-width: 0;
 }
 

@@ -59,7 +59,8 @@ const tarjetas = (): Field => ({
       label: "Mostrar en la web",
       defaultValue: true,
       admin: {
-        description: "Desmarcada, la tarjeta no se pinta, pero se conserva para volver a mostrarla.",
+        description:
+          "Desmarcada, la tarjeta no se pinta, pero se conserva para volver a mostrarla.",
       },
     },
   ],

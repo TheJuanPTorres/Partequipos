@@ -53,6 +53,7 @@ export const notificarSolicitud: CollectionAfterChangeHook = async ({ doc, opera
         `Correo:   ${doc.correo}`,
         `Teléfono: ${doc.telefono ?? "—"}`,
         `Empresa:  ${doc.empresa ?? "—"}`,
+        `Ciudad:   ${doc.ciudad ?? "—"}`,
         `Producto: ${doc.referenciaTexto ?? "—"}`,
         `Origen:   ${doc.origen ?? "—"}`,
         "",

@@ -55,6 +55,7 @@ import * as migration_20261019_042312_color_marca from './20261019_042312_color_
 import * as migration_20261019_052701_colores_marca_lubricante from './20261019_052701_colores_marca_lubricante';
 import * as migration_20261019_061302_video_cabecera_lubricante from './20261019_061302_video_cabecera_lubricante';
 import * as migration_20261019_144109_servicio_tecnico_diseno from './20261019_144109_servicio_tecnico_diseno';
+import * as migration_20261019_150937_pagina_modelo_repuestos from './20261019_150937_pagina_modelo_repuestos';
 
 export const migrations = [
   {
@@ -340,6 +341,11 @@ export const migrations = [
   {
     up: migration_20261019_144109_servicio_tecnico_diseno.up,
     down: migration_20261019_144109_servicio_tecnico_diseno.down,
-    name: '20261019_144109_servicio_tecnico_diseno'
+    name: '20261019_144109_servicio_tecnico_diseno',
+  },
+  {
+    up: migration_20261019_150937_pagina_modelo_repuestos.up,
+    down: migration_20261019_150937_pagina_modelo_repuestos.down,
+    name: '20261019_150937_pagina_modelo_repuestos'
   },
 ];

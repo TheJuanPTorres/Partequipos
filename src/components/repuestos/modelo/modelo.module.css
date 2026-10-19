@@ -1,0 +1,325 @@
+/*
+ * PÁGINA DE MODELO DE REPUESTOS — diseño propio (2026-10-19), con el lenguaje
+ * de las páginas de marca y tipo (marca.module.css) y la ficha V2 como
+ * referencia de la foto y los botones. Va dentro de `.pagina` de marca, así
+ * que usa sus variables: `--marca-amarillo` (el color de la marca) y
+ * `--marca-tinta` (negro o blanco sobre ese color).
+ */
+
+/* --- Presentación: sobre la franja de color, entre la cabecera y las categorías --- */
+
+.presentacion {
+  /* Abajo, el aire hasta el título de las categorías (que empieza pegado a su franja). */
+  padding: 0 1.5vw 40px;
+  background: var(--marca-amarillo, #f2bc2e);
+}
+
+/*
+ * PANTALLA PARTIDA: el lado de la imagen ocupa el 58 % de la tarjeta, a sangre,
+ * cortado por una DIAGONAL LIMPIA Y NÍTIDA (máscara SVG de un solo polígono, en
+ * el propio CSS: sin descargas ni desenfoque) que va del 45 % de la tarjeta
+ * arriba al 56 % abajo. El texto empieza pasado el 57 %: siempre sobre blanco.
+ * En tablet y móvil, la misma diagonal en horizontal bajo la foto.
+ */
+.partida {
+  position: relative;
+  display: grid;
+  min-height: 520px;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  border-radius: 30px;
+  background: var(--color-fondo);
+}
+
+.lado {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 58%;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 78,0 96,100 0,100'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 78,0 96,100 0,100'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/*
+ * Sin foto del modelo: un panel oscuro con un brillo del color de la marca y su
+ * logo en blanco, en grande. (Con el color de la marca a secas, el panel se
+ * confundía con la franja del mismo color y la tarjeta perdía su forma.)
+ */
+.lado[data-sin-foto] {
+  display: flex;
+  padding-right: 18%;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(
+      circle at 32% 45%,
+      color-mix(in srgb, var(--marca-amarillo, #f2bc2e) 55%, transparent),
+      transparent 65%
+    ),
+    #1f1d1b;
+}
+
+.logoGrande {
+  display: flex;
+  width: min(70%, 420px);
+  justify-content: center;
+}
+
+.logoGrandeImg {
+  width: 100%;
+  height: auto;
+  max-height: 260px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+}
+
+.columnaTexto {
+  display: flex;
+  max-width: 600px;
+  padding: 56px 5vw 56px 7vw;
+  grid-column: 2;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.parrafo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Los botones de la ficha V2: rojo de la marca y oscuro. */
+.boton {
+  display: inline-flex;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 0 22px;
+  align-items: center;
+  gap: 12px;
+  border: 2px solid var(--color-marca);
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.boton svg {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+}
+
+.boton:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.botonOscuro {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.botonOscuro:hover {
+  border-color: var(--color-marca);
+  background: var(--color-marca);
+}
+
+.boton:focus-visible,
+.ayudaBoton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.foto {
+  object-fit: cover;
+}
+
+/* --- La lista de piezas (solo donde WordPress la pinta) ---------------------------- */
+
+.piezas {
+  max-width: 1100px;
+  margin: 28px auto 0;
+  padding: 0 24px;
+  color: var(--marca-tinta, var(--color-texto));
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  list-style: none;
+  columns: 3 260px;
+  column-gap: 40px;
+}
+
+.piezas li {
+  break-inside: avoid;
+}
+
+/* --- «Estamos aquí para ayudarlo» --------------------------------------------------- */
+
+.ayuda {
+  position: relative;
+  display: flex;
+  min-height: 360px;
+  margin: 40px 1.5vw 0;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  background: #1f1d1b;
+}
+
+.ayudaFondo {
+  object-fit: cover;
+}
+
+/* El velo de WordPress (#00000094, 58 %): el título blanco se lee con cualquier foto. */
+.ayudaVelo {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.62);
+}
+
+.ayudaContenido {
+  position: relative;
+  display: flex;
+  padding: 48px 24px;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #fff;
+  text-align: center;
+}
+
+.ayudaTitulo {
+  margin: 0;
+  font-size: var(--texto-titulo-3);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ayudaTexto {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 300;
+}
+
+.ayudaBoton {
+  display: inline-flex;
+  min-height: 48px;
+  margin-top: 8px;
+  padding: 0 26px;
+  align-items: center;
+  gap: 10px;
+  border-radius: 30px;
+  background: #13733a;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 0.3s;
+}
+
+.ayudaBoton svg {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+.ayudaBoton:hover {
+  background: #0d5a2c;
+}
+
+.ayudaBoton:focus-visible {
+  outline-color: #fff;
+}
+
+/* Tablet y móvil: la imagen arriba, a sangre, cortada por la diagonal en horizontal. */
+@media (max-width: 1024px) {
+  .partida {
+    display: block;
+    min-height: 0;
+  }
+
+  .lado {
+    position: relative;
+    width: 100%;
+    height: 340px;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 100,0 100,80 0,96'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 100,0 100,80 0,96'/%3E%3C/svg%3E");
+  }
+
+  .lado[data-sin-foto] {
+    padding: 0 0 70px;
+  }
+
+  .logoGrande {
+    width: min(56%, 320px);
+  }
+
+  .columnaTexto {
+    max-width: none;
+    margin-top: 0;
+    padding: 0 5vw 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .partida {
+    border-radius: 24px;
+  }
+
+  .lado {
+    height: 260px;
+  }
+
+  .columnaTexto {
+    margin-top: 0;
+    padding: 0 20px 28px;
+    gap: 22px;
+  }
+
+  .parrafo {
+    font-size: 17px;
+  }
+
+  .boton {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .piezas {
+    padding: 0 12px;
+    font-size: 15px;
+  }
+
+  .ayuda {
+    min-height: 300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton,
+  .ayudaBoton {
+    transition: none;
+  }
+}

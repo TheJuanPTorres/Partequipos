@@ -118,6 +118,25 @@
   line-height: 1.2;
 }
 
+.h1Largo .linea1 {
+  /*
+   * Los títulos de WordPress de cada modelo son largos («CASE CONSTRUCTION
+   * EXCAVADORA CX350C»): más pequeños que el de marca, para que quepan en una
+   * línea en la cabecera baja sin tocar el icono del ratón. Una palabra larga
+   * («RETROCARGADORA») nunca se sale de la tarjeta.
+   */
+  font-size: clamp(32px, 3.3vw, 48px);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+@media (max-width: 767px) {
+  /* 26 px: «RETROCARGADORA», la palabra más larga de los títulos de WordPress, cabe entera a 390. */
+  .h1Largo .linea1 {
+    font-size: 26px;
+  }
+}
+
 .linea2 {
   display: block;
   font-size: var(--texto-titulo-3);
@@ -356,6 +375,18 @@ a.pildora:hover {
   .pildoraIcono {
     width: 30px;
     height: 30px;
+  }
+
+  /* Página de modelo: todas las categorías, dos por fila. */
+  .categoriasTodas .pildoraCaja:nth-child(1),
+  .categoriasTodas .pildoraCaja:nth-child(n + 4) {
+    display: flex;
+  }
+
+  .categoriasTodas .pildoras {
+    display: grid;
+    padding: 0 6px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

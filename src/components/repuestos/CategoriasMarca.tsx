@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { ICONOS_CATEGORIA } from "@/components/portada/iconosCategoria";
 import type { CategoriaMarca } from "@/lib/repuestos/marca";
@@ -26,6 +27,8 @@ export function CategoriasMarca({
   categorias,
   fondo = "amarillo",
   enlaceTodas,
+  todasEnMovil = false,
+  children,
 }: {
   id: string;
   titulo: string;
@@ -34,18 +37,23 @@ export function CategoriasMarca({
   fondo?: "amarillo" | "gris";
   /** El enlace al índice de categorías, debajo de las píldoras. */
   enlaceTodas?: { href: string; texto: string };
+  /** En móvil se ven TODAS (página de modelo), no solo la 2.ª y la 3.ª de ux-9. */
+  todasEnMovil?: boolean;
+  /** Contenido entre el título y las píldoras (la lista de piezas del modelo). */
+  children?: ReactNode;
 }) {
   if (!titulo || categorias.length === 0) return null;
   const idTitulo = `${id}-titulo`;
   return (
     <section
       id={id}
-      className={`${estilos.categorias} ${fondo === "gris" ? estilos.categoriasGris : ""}`}
+      className={`${estilos.categorias} ${fondo === "gris" ? estilos.categoriasGris : ""} ${todasEnMovil ? estilos.categoriasTodas : ""}`}
       aria-labelledby={idTitulo}
     >
       <h2 id={idTitulo} className={estilos.tituloSeccion}>
         {titulo}
       </h2>
+      {children}
       <ul className={estilos.pildoras}>
         {categorias.map((c) => {
           const Icono = c.icono ? ICONOS_CATEGORIA[c.icono] : null;

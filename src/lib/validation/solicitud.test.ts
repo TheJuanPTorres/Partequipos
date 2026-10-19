@@ -174,3 +174,32 @@ describe("validarSolicitud — clasificación opcional (página de marca de repu
     assert.equal(datos.perfil, "comprador");
   });
 });
+
+describe("validarSolicitud — ciudad (opcional, 2026-10-19)", () => {
+  it("la guarda recortada", () => {
+    const r = valida({ ciudad: "  Medellín  " });
+    assert.ok(r.ok);
+    assert.equal(r.datos.ciudad, "Medellín");
+  });
+
+  it("vacía o ausente, queda en undefined", () => {
+    const vacia = valida({ ciudad: "   " });
+    assert.ok(vacia.ok);
+    assert.equal(vacia.datos.ciudad, undefined);
+    const ausente = valida();
+    assert.ok(ausente.ok);
+    assert.equal(ausente.datos.ciudad, undefined);
+  });
+
+  it("rechaza una ciudad desmesurada", () => {
+    const r = valida({ ciudad: "x".repeat(101) });
+    assert.equal(r.ok, false);
+    assert.ok(!r.ok && r.errores.ciudad);
+  });
+
+  it("desdeFormData la lee del formulario", () => {
+    const fd = new FormData();
+    fd.set("ciudad", "Cali");
+    assert.equal(desdeFormData(fd).ciudad, "Cali");
+  });
+});

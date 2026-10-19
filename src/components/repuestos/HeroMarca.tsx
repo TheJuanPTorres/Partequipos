@@ -31,6 +31,9 @@ import estilos from "./marca.module.css";
  * marca de nueva. La tarjeta mide el 70 % del alto de la ventana, con el
  * contenido centrado en vertical y en horizontal, y el antetítulo en rojo. Sin
  * foto y con `bajaSinFoto`, manda la tarjeta baja.
+ *
+ * `bajo` (página de modelo de repuestos, 2026-10-19): la tarjeta baja con o sin
+ * foto; el texto largo del modelo va después, junto a su foto.
  */
 export function HeroMarca({
   vista,
@@ -38,6 +41,7 @@ export function HeroMarca({
   franja = true,
   bajaSinFoto = false,
   indice = false,
+  bajo = false,
   etiquetaRaton,
 }: {
   vista: VistaEncabezado;
@@ -48,11 +52,13 @@ export function HeroMarca({
   bajaSinFoto?: boolean;
   /** Variante de las páginas índice («Plantilla 1»): 70 % de la ventana, centrada. */
   indice?: boolean;
+  /** La tarjeta baja (380 px; 420 en móvil), tenga o no foto. */
+  bajo?: boolean;
   /** Nombre accesible del icono del ratón. */
   etiquetaRaton?: string;
 }) {
   const { fondo, logo } = vista;
-  const baja = bajaSinFoto && !fondo;
+  const baja = bajo || (bajaSinFoto && !fondo);
   const variante = baja ? estilos.heroBajo : indice ? estilos.heroIndice : "";
   return (
     <section className={`${estilos.heroSeccion} ${franja ? "" : estilos.heroSeccionPlano}`}>

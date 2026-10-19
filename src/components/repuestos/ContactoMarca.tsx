@@ -24,6 +24,8 @@ export function ContactoMarca({
   siteKey,
   whatsapp,
   marca,
+  id = "repuestos-marca-contacto",
+  modelo,
 }: {
   titulo: string;
   subtitulo: string;
@@ -32,28 +34,40 @@ export function ContactoMarca({
   siteKey: string | null;
   whatsapp?: { href: string; etiqueta: string };
   marca: string;
+  /** Id del título; la página de modelo lo usa de ancla («Solicitar repuestos» baja aquí). */
+  id?: string;
+  /**
+   * Página de modelo: solicitud de repuesto con el modelo preseleccionado y los
+   * campos de su formulario de WordPress (ciudad e interés), sin las preguntas
+   * de clasificación.
+   */
+  modelo?: { id: number; nombre: string };
 }) {
   if (!subtitulo) return null;
   return (
-    <section className={estilos.contacto} aria-labelledby="repuestos-marca-contacto">
+    <section className={estilos.contacto} aria-labelledby={id}>
       {titulo ? <p className={estilos.antetitulo}>{titulo}</p> : null}
       <Revelado
         adelanto={ADELANTOS.bajo}
         como="h2"
-        id="repuestos-marca-contacto"
+        id={id}
         texto={subtitulo}
         ritmo="titulo"
         className={estilos.tituloContacto}
       />
       <div className={estilos.formulario}>
         <FormularioSolicitud
-          tipo="contacto"
+          tipo={modelo ? "repuesto" : "contacto"}
           origen={origen}
           siteKey={siteKey}
           whatsapp={whatsapp}
+          referencia={
+            modelo ? { tipo: "modelos-repuesto", id: modelo.id, texto: modelo.nombre } : undefined
+          }
           titulo={`Contacto sobre repuestos ${marca}`}
           textoBoton={boton || "Enviar"}
-          clasificacion
+          clasificacion={!modelo}
+          camposModelo={Boolean(modelo)}
           variante="plano"
         />
       </div>

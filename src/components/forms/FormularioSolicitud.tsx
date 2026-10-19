@@ -53,6 +53,12 @@ type Props = {
    * de pantalla; la página que lo aloja pone el título visible y el marco.
    */
   variante?: "tarjeta" | "plano";
+  /**
+   * Los campos del formulario de la página de modelo de repuestos de WordPress
+   * (2026-10-19, MUESTRA del laboratorio): «Ciudad» y el mensaje como «¿En qué
+   * estás interesado?». La ciudad aún no se guarda: llega con la migración.
+   */
+  camposModelo?: boolean;
 };
 
 const OPCIONES = {
@@ -71,6 +77,7 @@ export function FormularioSolicitud({
   textoBoton,
   clasificacion = false,
   variante = "tarjeta",
+  camposModelo = false,
 }: Props) {
   const [estado, accion, enviando] = useActionState(enviarSolicitud, ESTADO_INICIAL);
 
@@ -196,6 +203,22 @@ export function FormularioSolicitud({
     </Campo>
   );
 
+  const campoCiudad = (
+    <Campo id={campo("ciudad")} etiqueta="Ciudad">
+      {(p) => (
+        <input
+          {...p}
+          name="ciudad"
+          type="text"
+          autoComplete="address-level2"
+          placeholder={variante === "plano" ? "Ciudad" : undefined}
+          className={claseControl}
+        />
+      )}
+    </Campo>
+  );
+  const etiquetaMensaje = camposModelo ? "¿En qué estás interesado?" : "Mensaje";
+
   return (
     <section aria-labelledby={idTitulo} className={claseSeccion}>
       <h2 id={idTitulo} className={claseTitulo}>
@@ -264,7 +287,14 @@ export function FormularioSolicitud({
             ))
           : null}
 
-        {clasificacion ? (
+        {camposModelo ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {campoNombre}
+            {campoTelefono}
+            {campoCorreo}
+            {campoCiudad}
+          </div>
+        ) : clasificacion ? (
           // Orden del diseño de ux-9: nombre y teléfono en una fila, el correo debajo.
           // Sin «Empresa»: ahí es una opción de «Quién soy».
           <div className="grid gap-4 sm:grid-cols-2">
@@ -281,14 +311,14 @@ export function FormularioSolicitud({
           </div>
         )}
 
-        <Campo id={campo("mensaje")} etiqueta="Mensaje" obligatorio error={err.mensaje}>
+        <Campo id={campo("mensaje")} etiqueta={etiquetaMensaje} obligatorio error={err.mensaje}>
           {(p) => (
             <textarea
               {...p}
               name="mensaje"
               rows={5}
               defaultValue={previo.mensaje}
-              placeholder={variante === "plano" ? "Mensaje" : undefined}
+              placeholder={variante === "plano" ? etiquetaMensaje : undefined}
               className={claseControl}
             />
           )}

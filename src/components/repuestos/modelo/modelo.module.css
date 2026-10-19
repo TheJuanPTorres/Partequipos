@@ -1,0 +1,272 @@
+/*
+ * PÁGINA DE MODELO DE REPUESTOS — diseño propio (2026-10-19), con el lenguaje
+ * de las páginas de marca y tipo (marca.module.css) y la ficha V2 como
+ * referencia de la foto y los botones. Va dentro de `.pagina` de marca, así
+ * que usa sus variables: `--marca-amarillo` (el color de la marca) y
+ * `--marca-tinta` (negro o blanco sobre ese color).
+ */
+
+/* --- Presentación: sobre la franja de color, entre la cabecera y las categorías --- */
+
+.presentacion {
+  padding: 0 1.5vw;
+  background: var(--marca-amarillo, #f2bc2e);
+}
+
+.tarjeta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 40px;
+  padding: 40px;
+  border-radius: 30px;
+  background: var(--color-fondo);
+}
+
+.tarjeta[data-sin-foto] {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  text-align: center;
+}
+
+.columnaTexto {
+  display: flex;
+  max-width: 640px;
+  flex-direction: column;
+  gap: 28px;
+  padding-left: 2vw;
+}
+
+.tarjeta[data-sin-foto] .columnaTexto {
+  align-items: center;
+  padding-left: 0;
+}
+
+.parrafo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Los botones de la ficha V2: rojo de la marca y oscuro. */
+.boton {
+  display: inline-flex;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 0 22px;
+  align-items: center;
+  gap: 12px;
+  border: 2px solid var(--color-marca);
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.boton svg {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+}
+
+.boton:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.botonOscuro {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.botonOscuro:hover {
+  border-color: var(--color-marca);
+  background: var(--color-marca);
+}
+
+.boton:focus-visible,
+.ayudaBoton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/* La foto en su caja: una copia desenfocada la rellena y la foto entera va encima. */
+.caja {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: 24px;
+  background: var(--color-fondo-seccion);
+}
+
+.fotoFondo {
+  object-fit: cover;
+  filter: blur(24px) saturate(1.1);
+  transform: scale(1.15);
+}
+
+.foto {
+  object-fit: contain;
+}
+
+/* --- La lista de piezas (solo donde WordPress la pinta) ---------------------------- */
+
+.piezas {
+  max-width: 1100px;
+  margin: 28px auto 0;
+  padding: 0 24px;
+  color: var(--marca-tinta, var(--color-texto));
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  list-style: none;
+  columns: 3 260px;
+  column-gap: 40px;
+}
+
+.piezas li {
+  break-inside: avoid;
+}
+
+/* --- «Estamos aquí para ayudarlo» --------------------------------------------------- */
+
+.ayuda {
+  position: relative;
+  display: flex;
+  min-height: 360px;
+  margin: 40px 1.5vw 0;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  background: #1f1d1b;
+}
+
+.ayudaFondo {
+  object-fit: cover;
+}
+
+/* El velo de WordPress (#00000094, 58 %): el título blanco se lee con cualquier foto. */
+.ayudaVelo {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.62);
+}
+
+.ayudaContenido {
+  position: relative;
+  display: flex;
+  padding: 48px 24px;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #fff;
+  text-align: center;
+}
+
+.ayudaTitulo {
+  margin: 0;
+  font-size: var(--texto-titulo-3);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ayudaTexto {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 300;
+}
+
+.ayudaBoton {
+  display: inline-flex;
+  min-height: 48px;
+  margin-top: 8px;
+  padding: 0 26px;
+  align-items: center;
+  gap: 10px;
+  border-radius: 30px;
+  background: #13733a;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 0.3s;
+}
+
+.ayudaBoton svg {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+.ayudaBoton:hover {
+  background: #0d5a2c;
+}
+
+.ayudaBoton:focus-visible {
+  outline-color: #fff;
+}
+
+@media (max-width: 1024px) {
+  .tarjeta {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 32px;
+  }
+
+  .columnaTexto {
+    max-width: none;
+    padding-left: 0;
+  }
+
+  /* En tablet y móvil la foto va primero, como en la ficha. */
+  .caja {
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 767px) {
+  .tarjeta {
+    gap: 24px;
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .parrafo {
+    font-size: 17px;
+  }
+
+  .boton {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .piezas {
+    padding: 0 12px;
+    font-size: 15px;
+  }
+
+  .ayuda {
+    min-height: 300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton,
+  .ayudaBoton {
+    transition: none;
+  }
+}

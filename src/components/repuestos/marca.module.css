@@ -357,6 +357,18 @@ a.pildora:hover {
     width: 30px;
     height: 30px;
   }
+
+  /* Página de modelo: todas las categorías, dos por fila. */
+  .categoriasTodas .pildoraCaja:nth-child(1),
+  .categoriasTodas .pildoraCaja:nth-child(n + 4) {
+    display: flex;
+  }
+
+  .categoriasTodas .pildoras {
+    display: grid;
+    padding: 0 6px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* --- Tarjetas ---------------------------------------------------------------- */

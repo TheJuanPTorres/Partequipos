@@ -1749,7 +1749,7 @@ export interface BloqueProcesoPasos {
   blockType: 'procesoPasos';
 }
 /**
- * Tipos de letra propios para el título del hero (WOFF2, o WOFF/TTF; máximo 4 MB). Después se eligen en «Tipografía del título» de cada diapositiva. Comprueba que la licencia permite usarla en una web.
+ * Tipos de letra propios para el título del hero (WOFF2, o WOFF/TTF/OTF; máximo 4 MB). Después se eligen en «Tipografía del título» de cada diapositiva. Comprueba que la licencia permite usarla en una web.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "fuentes".
@@ -1761,7 +1761,7 @@ export interface Fuente {
    */
   nombre: string;
   /**
-   * Lo lee del fichero al subirlo.
+   * Se rellena solo al subir el fichero. OTF sale como TTF.
    */
   formato?: ('woff2' | 'woff' | 'truetype') | null;
   actualizadoPor?: (number | null) | User;
@@ -3370,6 +3370,10 @@ export interface RepuestosMarca {
   testimoniosTitulo?: string | null;
   verVideoTexto?: string | null;
   /**
+   * «Provisional»: el contenido de WordPress en una página sencilla. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.
+   */
+  disenoModelo: 'provisional' | 'propio';
+  /**
    * Vacío: la tarjeta de WhatsApp no se pinta.
    */
   modeloAyudaTitulo?: string | null;
@@ -3605,6 +3609,7 @@ export interface RepuestosMarcaSelect<T extends boolean = true> {
   contactoBoton?: T;
   testimoniosTitulo?: T;
   verVideoTexto?: T;
+  disenoModelo?: T;
   modeloAyudaTitulo?: T;
   modeloAyudaTexto?: T;
   modeloAyudaBoton?: T;

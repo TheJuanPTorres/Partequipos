@@ -374,7 +374,8 @@ export function PlantillaServicioTecnico({
               origen={origen}
               siteKey={siteKey}
               whatsapp={whatsapp}
-              titulo={contacto.titulo}
+              // El título visible está en el panel: el del formulario (solo lectores) no lo repite.
+              titulo="Datos de la solicitud"
               textoBoton={contacto.botonTexto}
               variante="plano"
             />

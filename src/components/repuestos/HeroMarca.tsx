@@ -11,7 +11,7 @@ import estilos from "./marca.module.css";
  * ENCABEZADO DE LA PÁGINA DE MARCA DE REPUESTOS (ux-9, contenedor de la
  * plantilla 3373). Tarjeta de bordes redondeados sobre la franja de color de
  * la página, con la foto de obra de la marca de fondo, el logo de la marca en
- * una placa blanca, el título en dos líneas, la presentación y el icono de
+ * un cuadrado del color de la marca, el título en dos líneas, la presentación y el icono de
  * desplazamiento.
  *
  * Componente de SERVIDOR: el título usa `Revelado` (cliente) con `alCargar`,
@@ -81,13 +81,13 @@ export function HeroMarca({
 
         <div className={estilos.heroContenido}>
           {logo ? (
-            <div className={estilos.placa} data-logo-oscuro={vista.logoOscuro ? "" : undefined}>
+            <div className={estilos.placa} data-logo-blanco={vista.logoBlanco ? "" : undefined}>
               <Image
                 src={logo.url}
                 alt={logo.alt}
                 width={logo.width}
                 height={logo.height}
-                sizes="131px"
+                sizes="120px"
                 className={estilos.logo}
               />
             </div>

@@ -92,6 +92,7 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
         id="que-incluye"
         titulo={`Qué incluye ${categoria.nombre.toLowerCase()}`}
         grupos={gruposDeCategoria(categoria)}
+        propio={Boolean(global.queIncluyeDisenoPropio)}
       />
 
       <CierreRepuestos

@@ -58,6 +58,7 @@ import * as migration_20261019_144109_servicio_tecnico_diseno from './20261019_1
 import * as migration_20261019_150937_pagina_modelo_repuestos from './20261019_150937_pagina_modelo_repuestos';
 import * as migration_20261019_175032_por_que_elegirnos_repuestos from './20261019_175032_por_que_elegirnos_repuestos';
 import * as migration_20261019_181113_diseno_modelo_repuestos from './20261019_181113_diseno_modelo_repuestos';
+import * as migration_20261019_190747_andres_4007_interruptores from './20261019_190747_andres_4007_interruptores';
 
 export const migrations = [
   {
@@ -358,6 +359,11 @@ export const migrations = [
   {
     up: migration_20261019_181113_diseno_modelo_repuestos.up,
     down: migration_20261019_181113_diseno_modelo_repuestos.down,
-    name: '20261019_181113_diseno_modelo_repuestos'
+    name: '20261019_181113_diseno_modelo_repuestos',
+  },
+  {
+    up: migration_20261019_190747_andres_4007_interruptores.up,
+    down: migration_20261019_190747_andres_4007_interruptores.down,
+    name: '20261019_190747_andres_4007_interruptores'
   },
 ];

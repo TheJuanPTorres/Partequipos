@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { PaginaMarcaLubricante } from "@/components/lubricantes/PaginaMarcaLubricante";
+import { PaginaMarcaLubricanteProvisional } from "@/components/lubricantes/PaginaMarcaLubricanteProvisional";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { seccionesDeCategorias } from "@/lib/lubricantes/marca";
 import {
@@ -41,9 +42,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 }
 
 /**
- * PÁGINA DE UNA MARCA DE LUBRICANTES (`/lubricantes/lubricantes-eni/`): un «sitio dentro del
- * sitio» con la identidad de la marca (2026-10-19, cliente). El diseño, en
- * `PaginaMarcaLubricante`; los colores, desde el panel.
+ * PÁGINA DE UNA MARCA DE LUBRICANTES (`/lubricantes/lubricantes-eni/`). Por defecto, la versión
+ * PROVISIONAL sencilla; con la casilla «Diseño propio» de la marca, el «sitio dentro del sitio»
+ * con su identidad (`PaginaMarcaLubricante`, #260), con los colores desde el panel.
  *
  * Las 4 subpáginas de WordPress (auto liviano, auto pesado, engranajes, motos y
  * scooter) son SECCIONES de esta página desde el 2026-10-14, con su `slug`
@@ -68,14 +69,23 @@ export default async function MarcaLubricantePage({ params }: { params: Promise<
   return (
     <>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <PaginaMarcaLubricante
-        marca={marca}
-        secciones={seccionesDeCategorias(categorias)}
-        whatsapp={enlaceWhatsApp(
-          empresa.whatsapp,
-          `Hola, quiero cotizar lubricantes ${marca.nombre}`,
-        )}
-      />
+      {/* En producción solo van plantillas de Andrés: el diseño propio es opt-in (dirección, 2026-10-19). */}
+      {marca.disenoPropio ? (
+        <PaginaMarcaLubricante
+          marca={marca}
+          secciones={seccionesDeCategorias(categorias)}
+          whatsapp={enlaceWhatsApp(
+            empresa.whatsapp,
+            `Hola, quiero cotizar lubricantes ${marca.nombre}`,
+          )}
+        />
+      ) : (
+        <PaginaMarcaLubricanteProvisional
+          marca={marca}
+          secciones={seccionesDeCategorias(categorias)}
+          whatsapp={enlaceWhatsApp(empresa.whatsapp)}
+        />
+      )}
     </>
   );
 }

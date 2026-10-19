@@ -1,3 +1,4 @@
+import { logoBlancoSobre } from "@/lib/marca/colorMarca";
 import type { CategoriasTecnica, Marca, RepuestosMarca, TiposEquipo } from "@/payload-types";
 
 import { rutas } from "../routes";
@@ -26,10 +27,10 @@ export type VistaEncabezado = {
   /** Texto de presentación: la descripción de la marca. */
   descripcion: string;
   fondo: ImagenLista | null;
-  /** El logo de la marca va sobre el título, en una placa blanca. */
+  /** El logo de la marca va sobre el título, en un cuadrado del color de la marca. */
   logo: ImagenLista | null;
-  /** Logo blanco o muy claro (casilla «Pintar el logo en oscuro»): sobre la placa clara se pinta en tinta oscura. */
-  logoOscuro?: boolean;
+  /** El logo se pinta en una sola tinta: blanco sobre un color oscuro, negro sobre uno claro. */
+  logoBlanco?: boolean;
 };
 
 /**
@@ -46,7 +47,7 @@ export function vistaEncabezado(marca: Marca, global: RepuestosMarca): VistaEnca
     descripcion: texto(marca.descripcion),
     fondo: imagenDeMedia(marca.fondoHero, ""),
     logo: imagenDeMedia(marca.logo, `Logo de ${nombre}`),
-    logoOscuro: Boolean(marca.logoOscuroEnMenu),
+    logoBlanco: logoBlancoSobre(marca.colorMarca),
   };
 }
 

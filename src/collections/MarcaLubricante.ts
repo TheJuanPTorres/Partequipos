@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { validarColor } from "../lib/fields/tipografiaTitulo";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
@@ -60,6 +61,33 @@ export const MarcaLubricante: CollectionConfig = {
       admin: {
         description:
           "Foto de fondo de la cabecera de la página. Opcional: sin ella, un fondo oscuro.",
+      },
+    },
+    /*
+     * Identidad de la marca (2026-10-19, cliente): la página de la marca de lubricantes es un
+     * «sitio dentro del sitio» con los colores de la marca. Vacíos: amarillo y negro de ENI.
+     */
+    {
+      name: "colorPrincipal",
+      type: "text",
+      label: "Color principal de la marca",
+      validate: validarColor,
+      admin: {
+        placeholder: "#FFD100",
+        components: { Field: "/components/admin/CampoColor" },
+        description:
+          "El color de acento de la página (botones, franjas, etiquetas): en ENI, el amarillo. El texto sobre él se pone solo en negro o blanco, el que mejor se lea.",
+      },
+    },
+    {
+      name: "colorOscuro",
+      type: "text",
+      label: "Color oscuro de la marca",
+      validate: validarColor,
+      admin: {
+        placeholder: "#111111",
+        components: { Field: "/components/admin/CampoColor" },
+        description: "El fondo oscuro de la cabecera y de la zona de contacto: en ENI, el negro.",
       },
     },
     seoField(),

@@ -913,6 +913,14 @@ export interface MarcasLubricante {
    */
   imagenCabecera?: (number | null) | Media;
   /**
+   * El color de acento de la página (botones, franjas, etiquetas): en ENI, el amarillo. El texto sobre él se pone solo en negro o blanco, el que mejor se lea.
+   */
+  colorPrincipal?: string | null;
+  /**
+   * El fondo oscuro de la cabecera y de la zona de contacto: en ENI, el negro.
+   */
+  colorOscuro?: string | null;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -2409,6 +2417,8 @@ export interface MarcasLubricanteSelect<T extends boolean = true> {
   descripcion?: T;
   logo?: T;
   imagenCabecera?: T;
+  colorPrincipal?: T;
+  colorOscuro?: T;
   seo?:
     | T
     | {

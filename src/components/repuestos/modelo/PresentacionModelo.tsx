@@ -8,10 +8,11 @@ import estilos from "./modelo.module.css";
 /**
  * PRESENTACIÓN DEL MODELO (página de modelo de repuestos, diseño propio del
  * 2026-10-19), en PANTALLA PARTIDA: la foto del modelo a sangre a un lado y el
- * párrafo de WordPress (tal cual) al otro, separados por una división diagonal
- * de borde orgánico —una máscara SVG con trazos de pincel, desenfocada— que se
- * funde con el blanco del texto. En móvil, la foto arriba con el mismo borde,
- * fundido hacia abajo. Los botones son los de la ficha V2.
+ * párrafo de WordPress (tal cual) al otro, separados por una diagonal GRANULAR
+ * y nítida: la foto se deshace en rombos y cuadrados cada vez más pequeños y
+ * separados, como grumos de tierra que se desprenden hacia el texto (máscara
+ * SVG fija en el CSS). En tablet y móvil, la foto arriba con el mismo borde
+ * hacia abajo. Los botones son los de la ficha V2.
  *
  * Sin foto del modelo, el lado de la imagen es un panel oscuro con un brillo
  * del color de la marca y su logo en blanco, en grande, con el mismo borde:

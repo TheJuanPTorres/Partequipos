@@ -11,7 +11,7 @@ import { ModeloProvisional } from "@/components/repuestos/modelo/ModeloProvision
 import { PresentacionModelo } from "@/components/repuestos/modelo/PresentacionModelo";
 import estilosModelo from "@/components/repuestos/modelo/modelo.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { estiloDeMarca } from "@/lib/marca/colorMarca";
+import { estiloDeMarca, logoBlancoSobre } from "@/lib/marca/colorMarca";
 import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
@@ -168,7 +168,7 @@ export async function PaginaModeloRepuesto({
           descripcion: "",
           fondo: imagenDeMedia(tipo.imagen, "") ?? imagenDeMedia(marca.fondoHero, ""),
           logo,
-          logoOscuro: Boolean(marca.logoOscuroEnMenu),
+          logoBlanco: logoBlancoSobre(marca.colorMarca),
         }}
         anclaSiguiente={ANCLA_CATEGORIAS}
         bajo

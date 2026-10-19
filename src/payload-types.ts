@@ -958,6 +958,10 @@ export interface MarcasLubricante {
    */
   videoCabecera?: (number | null) | Video;
   /**
+   * Desmarcada (por defecto), la página es la PROVISIONAL sencilla. Marcada, el diseño propio con la identidad de la marca (colores, vídeo de cabecera…). En producción solo se publican plantillas de Andrés.
+   */
+  disenoPropio?: boolean | null;
+  /**
    * El color de acento de la página (botones, franjas, etiquetas): en ENI, el amarillo. El texto sobre él se pone solo en negro o blanco, el que mejor se lea.
    */
   colorPrincipal?: string | null;
@@ -2539,6 +2543,7 @@ export interface MarcasLubricanteSelect<T extends boolean = true> {
   logo?: T;
   imagenCabecera?: T;
   videoCabecera?: T;
+  disenoPropio?: T;
   colorPrincipal?: T;
   colorOscuro?: T;
   seo?:
@@ -3380,11 +3385,15 @@ export interface RepuestosMarca {
   testimoniosTitulo?: string | null;
   verVideoTexto?: string | null;
   /**
-   * Vacío: la sección no se pinta.
+   * Desmarcada (por defecto), «Qué incluye» de las categorías se ve de forma sencilla: el nombre del grupo y su lista. Marcada, tarjetas con foto y «Ver productos». En producción solo se publican plantillas de Andrés.
+   */
+  queIncluyeDisenoPropio?: boolean | null;
+  /**
+   * Vacío: la sección no se pinta (tampoco sin foto).
    */
   porQueTitulo?: string | null;
   /**
-   * Foto de la columna izquierda. Sin ella, un fondo oscuro.
+   * Foto de la columna izquierda. Sin foto, el bloque NO se pinta.
    */
   porQueImagen?: (number | null) | Media;
   porQuePuntos?:
@@ -3639,6 +3648,7 @@ export interface RepuestosMarcaSelect<T extends boolean = true> {
   contactoBoton?: T;
   testimoniosTitulo?: T;
   verVideoTexto?: T;
+  queIncluyeDisenoPropio?: T;
   porQueTitulo?: T;
   porQueImagen?: T;
   porQuePuntos?:

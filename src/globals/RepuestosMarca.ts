@@ -118,6 +118,16 @@ export const RepuestosMarca: GlobalConfig = {
       },
     },
     { name: "verVideoTexto", type: "text", label: "Testimonios: texto «Ver video»" },
+    {
+      name: "queIncluyeDisenoPropio",
+      type: "checkbox",
+      label: "«Qué incluye»: diseño propio de Partequipos (no es de Andrés)",
+      defaultValue: false,
+      admin: {
+        description:
+          "Desmarcada (por defecto), «Qué incluye» de las categorías se ve de forma sencilla: el nombre del grupo y su lista. Marcada, tarjetas con foto y «Ver productos». En producción solo se publican plantillas de Andrés.",
+      },
+    },
     /*
      * «¿Por qué elegirnos?» de la plantilla de Andrés para las páginas de marca y de tipo de
      * repuestos (2026-10-19): una foto a la izquierda y a la derecha el título, unos puntos, el
@@ -127,14 +137,14 @@ export const RepuestosMarca: GlobalConfig = {
       name: "porQueTitulo",
       type: "text",
       label: "¿Por qué elegirnos?: título",
-      admin: { description: "Vacío: la sección no se pinta." },
+      admin: { description: "Vacío: la sección no se pinta (tampoco sin foto)." },
     },
     {
       name: "porQueImagen",
       type: "upload",
       relationTo: "media",
       label: "¿Por qué elegirnos?: foto",
-      admin: { description: "Foto de la columna izquierda. Sin ella, un fondo oscuro." },
+      admin: { description: "Foto de la columna izquierda. Sin foto, el bloque NO se pinta." },
     },
     {
       name: "porQuePuntos",

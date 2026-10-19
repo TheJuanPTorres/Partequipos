@@ -1,3 +1,4 @@
+import { logoBlancoSobre } from "@/lib/marca/colorMarca";
 import type { Marca, ModelosRepuesto, RepuestosMarca, TiposEquipo } from "@/payload-types";
 
 import { rutas } from "../routes";
@@ -33,7 +34,7 @@ export function vistaEncabezadoTipo(
     descripcion: texto(tipo.descripcion),
     fondo: imagenDeMedia(marca.fondoHero, "") ?? imagenDeMedia(tipo.imagen, ""),
     logo: imagenDeMedia(marca.logo, `Logo de ${nombre}`),
-    logoOscuro: Boolean(marca.logoOscuroEnMenu),
+    logoBlanco: logoBlancoSobre(marca.colorMarca),
   };
 }
 

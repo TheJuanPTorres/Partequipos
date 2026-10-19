@@ -78,6 +78,16 @@ export const MarcaLubricante: CollectionConfig = {
      * «sitio dentro del sitio» con los colores de la marca. Vacíos: amarillo y negro de ENI.
      */
     {
+      name: "disenoPropio",
+      type: "checkbox",
+      label: "Diseño propio de Partequipos (no es de Andrés)",
+      defaultValue: false,
+      admin: {
+        description:
+          "Desmarcada (por defecto), la página es la PROVISIONAL sencilla. Marcada, el diseño propio con la identidad de la marca (colores, vídeo de cabecera…). En producción solo se publican plantillas de Andrés.",
+      },
+    },
+    {
       name: "colorPrincipal",
       type: "text",
       label: "Color principal de la marca",

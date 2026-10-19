@@ -77,29 +77,32 @@
 }
 
 /*
- * Placa CLARA (2026-10-18, cliente): los logos ya son en color y sobre oscuro no se
- * leían; es la placa blanca de ux-9. Un logo blanco o muy claro (casilla «Pintar el
- * logo en oscuro») se pinta en una sola tinta oscura para verse sobre ella.
+ * CUADRADO DEL LOGO (plantilla de Andrés, 4007; 2026-10-19): el logo en una sola tinta sobre un
+ * cuadrado con el color de la marca. Blanco, salvo que el color sea claro (un amarillo): ahí va
+ * en negro, porque el blanco no se leería (AA, `logoBlancoSobre`).
  */
 .placa {
   display: flex;
-  padding: 12px 20px;
+  width: 168px;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  padding: 24px;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  background: #fff;
+  border-radius: 20px;
+  background: var(--marca-amarillo);
 }
 
-.placa[data-logo-oscuro] .logo {
+.logo {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
   filter: brightness(0);
 }
 
-/* El logo mide 131 de ancho y, como mucho, 87 de alto (medido); la placa blanca le suma 20 a cada lado. */
-.logo {
-  width: 131px;
-  height: auto;
-  max-height: 87px;
-  object-fit: contain;
+.placa[data-logo-blanco] .logo {
+  filter: brightness(0) invert(1);
 }
 
 .h1 {
@@ -758,36 +761,80 @@ a.pildora:hover {
   background: var(--marca-amarillo);
 }
 
+/*
+ * BOTONES DE MODELOS (2026-10-19, dirección): en una CUADRÍCULA de columnas iguales (4 en
+ * escritorio ancho, 3, 2 en tablet y 1 en móvil), todos del mismo ancho y alineados, elevados con una
+ * sombra suave. Al pasar el ratón, el color de la marca OSCURECIDO (60 % de negro) y texto blanco:
+ * con ese negro el blanco cumple AA con cualquier color de marca.
+ */
 .modelosLista {
-  display: flex;
+  display: grid;
   max-width: 1240px;
   margin: 40px auto 0;
   padding: 0;
-  flex-wrap: wrap;
-  justify-content: center;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px 20px;
   list-style: none;
 }
 
+.modelosLista > li {
+  display: flex;
+}
+
 .modelo {
   display: inline-flex;
-  min-height: 40px;
+  width: 100%;
+  min-height: 48px;
   box-sizing: border-box;
-  padding: 0 22px;
+  padding: 6px 12px;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   border-radius: 30px;
   background: #fafafa;
+  box-shadow:
+    0 2px 6px rgb(0 0 0 / 0.12),
+    0 6px 16px rgb(0 0 0 / 0.1);
   color: var(--color-texto-suave);
   font-size: 16px;
   font-weight: 600;
   line-height: 1.2;
+  text-align: center;
   text-decoration: none;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
 }
 
 a.modelo:hover {
-  background: var(--marca-hover-fondo, var(--color-marca));
-  color: var(--marca-hover-texto, var(--color-fondo));
+  background: color-mix(in srgb, var(--marca-amarillo, var(--color-marca)) 40%, #000);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.16);
+  color: #fff;
+}
+
+@media (max-width: 1279px) {
+  .modelosLista {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .modelosLista {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .modelosLista {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modelo {
+    transition: none;
+  }
 }
 
 /* Un modelo sin ficha (WordPress lo nombra sin página): el mismo aspecto, sin efecto al pasar. */
@@ -798,6 +845,12 @@ a.modelo:hover {
 /* La copia de reserva es más ancha que el texto: el texto va centrado en ella. */
 .modeloTexto {
   text-align: center;
+}
+
+/* El texto visible, centrado en su celda: la copia invisible de la reserva puede ocupar más líneas. */
+.modeloTexto > span {
+  align-self: center;
+  text-wrap: balance;
 }
 
 .modeloCodigo {
@@ -840,7 +893,6 @@ a.modelo:hover {
 @media (max-width: 767px) {
   .modelosLista {
     margin-top: 27px;
-    gap: 10px;
   }
 }
 
@@ -1185,4 +1237,32 @@ a.modelo:hover {
   .tarjetasIndice .rejilla {
     row-gap: 30px;
   }
+}
+
+/* --- «Qué incluye» sencillo (versión PROVISIONAL, dirección 2026-10-19) ------------------- */
+
+.queIncluyeSencillo {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+
+.grupoSencillo {
+  margin-top: 32px;
+}
+
+.grupoSencilloTitulo {
+  margin: 0 0 12px;
+  color: var(--color-texto);
+  font-size: var(--texto-destacado);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.grupoSencilloLista {
+  margin: 0;
+  padding-left: 22px;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-cuerpo);
+  line-height: 1.6;
 }

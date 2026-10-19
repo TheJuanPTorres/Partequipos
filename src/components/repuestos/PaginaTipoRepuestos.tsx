@@ -121,6 +121,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         titulo={texto(global.tituloCategorias)}
         verTodo={texto(global.verTodoTexto) || "Ver todo"}
         tarjetas={tarjetasDeCategorias(categorias)}
+        indice
       />
 
       <ContactoMarca

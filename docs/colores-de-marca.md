@@ -29,7 +29,7 @@ encontraron y se marcan según su certeza:
 | LiuGong                     | `#0c4da2` | Logo (whatthelogo.com), tercero. Otra fuente da `#11316e`.                                                                                                         |
 | Doosan                      | `#062f86` | Agregador (brandcolorcode.com), con la advertencia de que no es oficial. Su maquinaria es naranja «Kairos», sin hex.                                               |
 | Link-Belt                   | `#ce1922` | **Oficial**: guía de marca de Link-Belt (guidelines.lbxco.com), «Link-Belt Red», PANTONE 1797C.                                                                    |
-| Kobelco                     | `#0b4ea2` | **ESTIMADO, sin fuente.**                                                                                                                                          |
+| Kobelco                     | `#04aca3` | **Turquesa del diseño de Andrés (4007, 2026-10-19).** Antes `#0b4ea2` estimado.                                                                                    |
 | Bobcat                      | `#e31837` | **ESTIMADO, sin fuente.**                                                                                                                                          |
 | Yanmar (repuestos y nueva)  | `#ed1c24` | Rojo corporativo de Yanmar (yanmar.com lo declara); el hex es de un agregador.                                                                                     |
 | Volvo                       | `#003057` | **ESTIMADO, sin fuente.**                                                                                                                                          |

@@ -10,7 +10,7 @@ import estilos from "./plantillaTipo.module.css";
  * frase de cierre y el botón «Solicita asesoría», que baja al formulario de contacto.
  *
  * Componente de SERVIDOR. Los textos y la foto salen del global de repuestos (editables); sin
- * título no se pinta. Sin foto, la columna izquierda es un fondo oscuro. En móvil, la foto va
+ * título ni sin foto no se pinta (dirección, 2026-10-19). En móvil, la foto va
  * arriba como una banda y el texto debajo.
  */
 export function PorQueElegirnos({
@@ -28,15 +28,13 @@ export function PorQueElegirnos({
     <section id={id} className={estilos.porQue} aria-labelledby={idTitulo}>
       <div className={estilos.porQueTarjeta}>
         <div className={estilos.porQueFoto}>
-          {vista.imagen ? (
-            <Image
-              src={vista.imagen.url}
-              alt=""
-              fill
-              sizes="(max-width: 767px) 100vw, 40vw"
-              className={estilos.porQueFotoImg}
-            />
-          ) : null}
+          <Image
+            src={vista.imagen.url}
+            alt=""
+            fill
+            sizes="(max-width: 767px) 100vw, 40vw"
+            className={estilos.porQueFotoImg}
+          />
         </div>
         <div className={estilos.porQueTexto}>
           <h2 id={idTitulo} className={estilos.porQueTitulo}>

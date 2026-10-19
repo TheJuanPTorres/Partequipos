@@ -230,10 +230,6 @@ video.medio {
   outline: 2px solid var(--color-texto);
   outline-offset: 3px;
 }
-.botonWhatsapp {
-  border-color: #128c3c;
-  background: #128c3c;
-}
 
 /* ---- Alistamiento: el carrusel de los dos vídeos ------------------------- */
 .carrusel {
@@ -414,12 +410,11 @@ video.medio {
   line-height: 1.4;
 }
 
-/* ---- Solicitud ----------------------------------------------------------- */
-.formulario {
-  min-width: 0;
-  padding: 30px;
-  border-radius: 30px;
-  background: var(--color-fondo-seccion);
+/* ---- Contacto: el bloque de repuestos, con su línea de sección -------- */
+.contacto {
+  scroll-margin-top: 100px;
+  border-top: 1px solid var(--linea);
+  background: var(--color-fondo);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -473,8 +468,5 @@ video.medio {
   }
   .galeria {
     padding: 0;
-  }
-  .formulario {
-    padding: 20px;
   }
 }

@@ -1,5 +1,4 @@
 import {
-  IconBrandWhatsapp,
   IconChecklist,
   IconDeviceDesktopCog,
   IconHeartHandshake,
@@ -15,9 +14,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { GaleriaFicha } from "@/components/ficha/GaleriaFicha";
-import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { DialogoYouTube } from "@/components/portada/DialogoYouTube";
+import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import type { EnlaceBloque } from "@/lib/bloques/vista";
 import type { VistaServicioTecnico } from "@/lib/servicioTecnico/vista";
 import type { EnlaceWhatsApp } from "@/lib/whatsapp";
@@ -42,7 +41,8 @@ import { VideoFondo } from "./VideoFondo";
  *   «Trabajamos con las principales aseguradoras» al final.
  *
  * Lo que la plantilla no trae y se conserva (decisiones-servicio-lubricantes.md §7):
- * la frase destacada del taller y el formulario de solicitud, al final.
+ * la frase destacada del taller y, al final, el bloque de contacto de las
+ * plantillas de Andrés de repuestos (`ContactoMarca`).
  *
  * Todo el contenido sale de los bloques de la página (editables en el panel).
  */
@@ -348,46 +348,30 @@ export function PlantillaServicioTecnico({
         </section>
       ) : null}
 
-      {/* ---------- Solicitud (no está en la plantilla: se conserva, con su lenguaje) ---------- */}
+      {/*
+       * ---------- Contacto: el MISMO bloque que las plantillas de Andrés de
+       * repuestos (`ContactoMarca`), con «Ciudad» y «¿Qué necesitas?»
+       * (dirección, 2026-10-19). Antetítulo = título del bloque; título
+       * revelado = su texto.
+       */}
       {contacto ? (
-        <section id={contacto.ancla} className={estilos.seccion} aria-labelledby="contacto-titulo">
-          <p className={estilos.antetitulo}>Solicitud de servicio</p>
-          <div className={estilos.fila}>
-            <div className={estilos.columnaTexto}>
-              <Revelado
-                id="contacto-titulo"
-                texto={contacto.titulo}
-                {...RITMO}
-                className={estilos.titulo}
-              />
-              {contacto.texto ? <p className={estilos.parrafo}>{contacto.texto}</p> : null}
-              {whatsapp ? (
-                <a
-                  href={whatsapp.href}
-                  className={`${estilos.boton} ${estilos.botonWhatsapp}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Escríbenos por WhatsApp
-                  <IconBrandWhatsapp size={20} stroke={1.6} aria-hidden="true" />
-                  <span className="sr-only"> (se abre en una pestaña nueva)</span>
-                </a>
-              ) : null}
-            </div>
-            <div className={estilos.formulario}>
-              <FormularioSolicitud
-                tipo="contacto"
-                origen={origen}
-                siteKey={siteKey}
-                whatsapp={whatsapp}
-                // El título visible está en el panel: el del formulario (solo lectores) no lo repite.
-                titulo="Datos de la solicitud"
-                textoBoton={contacto.botonTexto}
-                variante="plano"
-              />
-            </div>
-          </div>
-        </section>
+        <div id={contacto.ancla} className={estilos.contacto}>
+          <ContactoMarca
+            id="contacto-titulo"
+            titulo={contacto.titulo}
+            subtitulo={contacto.texto ?? contacto.titulo}
+            boton={contacto.botonTexto}
+            origen={origen}
+            siteKey={siteKey}
+            whatsapp={whatsapp}
+            marca=""
+            formulario={{
+              titulo: "Solicitud de servicio técnico",
+              conCiudad: true,
+              etiquetaMensaje: "¿Qué necesitas?",
+            }}
+          />
+        </div>
       ) : null}
     </div>
   );

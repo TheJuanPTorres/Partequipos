@@ -15,11 +15,11 @@
  *
  * Qué escribe:
  * - `/servicio-tecnico/`: «Diseño: Servicio técnico» (aprobado el 2026-10-19)
- *   y sus BLOQUES (cabecera con vídeo; #taller con la textura; #alistamiento
- *   con el corto de YouTube y su miniatura, el vídeo del taller y el de fondo;
- *   #posventa; #Siniestros como «Proceso paso a paso»; la galería con
- *   «Trabajamos con las principales aseguradoras» de titular, y el
- *   formulario), su entradilla, y vacía su «Contenido» y sus «Secciones con
+ *   y sus BLOQUES para la plantilla de Andrés (cabecera con vídeo; #taller;
+ *   #alistamiento con el corto de YouTube y su miniatura y el vídeo de las
+ *   etapas; #posventa; #Siniestros como «Proceso paso a paso»; la galería con
+ *   «Trabajamos con las principales aseguradoras» de titular, y el bloque de
+ *   contacto «Contacto Partequipos»), su entradilla, y vacía su «Contenido» y sus «Secciones con
  *   ancla» de demostración.
  * - La marca `lubricantes-eni`: entradilla, logo e imagen de cabecera.
  * - Sus 4 categorías: entradilla, imagen de la tarjeta y los productos con su
@@ -31,11 +31,11 @@
  * responsabilidad (CLAUDE.md §10.38). La marca queda en el JSON como lista.
  *
  * `solo=faltantes` (2026-10-19, inventario frente a WordPress): sube SOLO lo
- * que la primera importación no traía —la textura de fondo de #taller y
- * #Siniestros, el vídeo alojado de las etapas del alistamiento, el vídeo de
- * fondo de esa sección y la miniatura del corto de YouTube— sin tocar los bloques: dónde se pintan lo decide el
- * diseño propio de la página (pendiente de aprobación). Los dos vídeos pasan
- * del tope de 4 MB de `videos`, así que se suben RECOMPRIMIDOS desde
+ * que la primera importación no traía y pinta la plantilla de Andrés —el
+ * vídeo alojado de las etapas del alistamiento y la miniatura del corto de
+ * YouTube— sin tocar los bloques. La textura y el vídeo de fondo de WordPress
+ * ya no se suben (2026-10-19): la plantilla no los lleva. El vídeo pasa del
+ * tope de 4 MB de `videos`, así que se sube RECOMPRIMIDO desde
  * `videos=<carpeta>` (por defecto, `partequipos-diseno/wordpress/
  * servicio-lubricantes/videos/`, con su LEEME). Van al mismo manifiesto, así
  * que la retirada también los quita.
@@ -479,34 +479,6 @@ async function miniaturaYoutube(enlace: string, alt: string): Promise<number | n
   return doc.id;
 }
 
-/** El póster local (JPEG) de un vídeo recomprimido, a «Imágenes». */
-async function posterLocal(url: string, alt: string): Promise<number | null> {
-  const fichero = nombreDeFicheroWp(url).replace(/\.mp4$/, "-poster.jpg");
-  const ya = await buscarFichero("media", fichero);
-  if (ya) {
-    cuenta.reutilizados++;
-    return ya;
-  }
-  const ruta = path.join(CARPETA_VIDEOS, fichero);
-  if (!fs.existsSync(ruta)) fallar(`falta el póster ${ruta} (ver el LEEME de los vídeos)`);
-  if (modo === "simular") {
-    cuenta.simulados++;
-    return null;
-  }
-  const bytes = fs.readFileSync(ruta);
-  const doc = await payload.create({
-    collection: "media",
-    data: { alt, focalX: 50, focalY: 50 },
-    file: { data: bytes, mimetype: "image/jpeg", name: fichero, size: bytes.length },
-    overrideAccess: true,
-  });
-  yaVistos.set(`media:${fichero}`, doc.id);
-  manifiesto.creado.media.push(await guardado("media", doc.id, fichero));
-  guardarManifiesto();
-  cuenta.subidos++;
-  return doc.id;
-}
-
 // ---------- Texto enriquecido (Lexical) ----------
 
 type Trozo = string | { negrita: string };
@@ -574,13 +546,19 @@ const pagina = (
 ).docs[0];
 if (!pagina) fallar("no existe la página «servicio-tecnico» en el destino");
 
-/** Sube lo que faltaba frente a WordPress (2026-10-19) y devuelve sus ids. */
+/**
+ * Sube lo que faltaba frente a WordPress y pinta la plantilla de Andrés
+ * (2026-10-19): el vídeo de las etapas, con su póster, y la miniatura del
+ * corto de YouTube. La textura y el vídeo de fondo de WordPress ya no se
+ * suben: la plantilla no los lleva.
+ */
 async function subirFaltantes() {
   const a = s.alistamiento;
-  if (!s.fondo || !a.videoAlojado || !a.videoFondo) {
-    fallar("el contenido extraído no trae lo que faltaba: vuelve a ejecutar extraer-xml.py");
+  if (!a.videoAlojado) {
+    fallar(
+      "el contenido extraído no trae el vídeo de las etapas: vuelve a ejecutar extraer-xml.py",
+    );
   }
-  const fondo = await imagen(s.fondo!, "Textura gris clara de fondo");
   const posterEtapas = await imagen(a.miniatura, "Alistamiento de maquinaria en el taller");
   const etapas = await videoLocal(
     a.videoAlojado!,
@@ -588,24 +566,14 @@ async function subirFaltantes() {
     "Las etapas del alistamiento de maquinaria pesada en el taller de Partequipos",
     false,
   );
-  const posterFondo = await posterLocal(
-    a.videoFondo!,
-    "Bulldozers trabajando en una obra de movimiento de tierras",
-  );
-  const fondoVideo = await videoLocal(
-    a.videoFondo!,
-    posterFondo,
-    "Maquinaria amarilla trabajando en obra (vídeo de fondo)",
-    true,
-  );
   const miniatura = await miniaturaYoutube(
     a.youtube,
     "Técnico de Partequipos explicando una fase del alistamiento de una máquina",
   );
   log(
-    `faltantes: textura ${fondo ?? "(por subir)"} · vídeo de etapas ${etapas ?? "(por subir)"} · vídeo de fondo ${fondoVideo ?? "(por subir)"} · póster ${posterFondo ?? "(por subir)"} · miniatura de YouTube ${miniatura ?? "(por subir)"}`,
+    `faltantes: vídeo de etapas ${etapas ?? "(por subir)"} · miniatura de YouTube ${miniatura ?? "(por subir)"}`,
   );
-  return { fondo, etapas, fondoVideo, miniatura };
+  return { etapas, miniatura };
 }
 
 const faltantes = await subirFaltantes();
@@ -636,13 +604,6 @@ for (const f of s.siniestros.galeria) {
 }
 
 const BOTON_CONTACTO = { botonTexto: "Contáctanos", botonEnlace: "/contactanos/" };
-/**
- * La frase que presenta la galería de siniestros: texto NUESTRO (en WordPress
- * no hay), aprobado con la muestra; describe las fotos sin decir que son
- * trabajos propios. Se cambia en el panel.
- */
-const TEXTO_GALERIA_SINIESTROS =
-  "Así llegan muchas máquinas tras un siniestro. Te acompañamos desde la valoración hasta la reparación y los repuestos.";
 const bloques = [
   {
     blockType: "cabeceraVideo",
@@ -661,7 +622,6 @@ const bloques = [
       parrafo({ negrita: s.taller.destacado }),
     ),
     ...BOTON_CONTACTO,
-    textura: faltantes.fondo,
   },
   {
     blockType: "videoYoutube",
@@ -673,7 +633,6 @@ const bloques = [
     // (`imgAlistamiento`) es el del vídeo del taller, que ya lo lleva.
     miniatura: faltantes.miniatura ?? imgAlistamiento,
     videoTaller: faltantes.etapas,
-    videoFondo: faltantes.fondoVideo,
   },
   {
     blockType: "presentacionImagen",
@@ -692,7 +651,6 @@ const bloques = [
     // Las etiquetas, tal cual (en mayúsculas en WordPress; decisión del cliente, 2026-10-18).
     pasos: s.siniestros.apartados.map((a) => ({ etiqueta: a.etiqueta, texto: a.texto })),
     ...BOTON_CONTACTO,
-    textura: faltantes.fondo,
   },
   ...(galeria.length
     ? [
@@ -700,7 +658,6 @@ const bloques = [
           blockType: "galeria",
           // «Trabajamos con las principales aseguradoras» presenta la galería.
           titulo: `${s.siniestros.aseguradoras}.`,
-          texto: TEXTO_GALERIA_SINIESTROS,
           imagenes: galeria.map((id) => ({ imagen: id })),
         },
       ]
@@ -708,9 +665,10 @@ const bloques = [
   {
     blockType: "formularioContacto",
     ancla: "contacto",
-    titulo: "Solicita servicio técnico",
-    texto: "Cuéntanos qué necesita tu maquinaria y te respondemos en horario de oficina.",
-    botonTexto: "Enviar solicitud",
+    // El bloque de contacto de las plantillas de Andrés de repuestos (dirección, 2026-10-19).
+    titulo: "Contacto Partequipos",
+    texto: "Si deseas más información, contáctanos",
+    botonTexto: "Enviar",
   },
 ];
 await actualizar("paginas", pagina!.id, {

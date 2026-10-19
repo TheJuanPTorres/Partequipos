@@ -59,6 +59,22 @@ const antetitulo: Field = {
   admin: { description: "Texto corto encima del título. Opcional." },
 };
 
+/**
+ * Textura de fondo opcional (diseño «Servicio técnico», 2026-10-19): una imagen
+ * clara que se pinta una vez, al pie de la sección (la de WordPress son
+ * siluetas de maquinaria).
+ */
+const textura: Field = {
+  name: "textura",
+  type: "upload",
+  relationTo: "media",
+  label: "Textura de fondo",
+  admin: {
+    description:
+      "Opcional. Imagen clara que se pinta una vez al pie de la sección, detrás del texto. Solo la usa el diseño «Servicio técnico».",
+  },
+};
+
 export const BloqueCabeceraVideo: Block = {
   slug: "cabeceraVideo",
   interfaceName: "BloqueCabeceraVideo",
@@ -128,6 +144,45 @@ export const BloquePresentacionImagen: Block = {
     { name: "titulo", type: "text", required: true, label: "Título" },
     { name: "texto", type: "richText", label: "Texto" },
     boton("botón"),
+    textura,
+  ],
+};
+
+/**
+ * PROCESO PASO A PASO (diseño «Servicio técnico», 2026-10-19): título,
+ * entradilla y pasos numerados (01, 02, 03…), cada uno con su etiqueta y su
+ * texto. En servicio técnico, los de siniestros: valoración, reparación y
+ * repuestos.
+ */
+export const BloqueProcesoPasos: Block = {
+  slug: "procesoPasos",
+  interfaceName: "BloqueProcesoPasos",
+  labels: { singular: "Proceso paso a paso", plural: "Procesos paso a paso" },
+  fields: [
+    ancla,
+    antetitulo,
+    { name: "titulo", type: "text", required: true, label: "Título" },
+    {
+      name: "entradilla",
+      type: "textarea",
+      label: "Entradilla",
+      admin: { description: "Opcional. Una frase bajo el título." },
+    },
+    {
+      name: "pasos",
+      type: "array",
+      label: "Pasos",
+      labels: { singular: "Paso", plural: "Pasos" },
+      minRows: 1,
+      maxRows: 8,
+      admin: { description: "En este orden; se numeran solos (01, 02, 03…)." },
+      fields: [
+        { name: "etiqueta", type: "text", required: true, label: "Nombre del paso" },
+        { name: "texto", type: "textarea", required: true, label: "Texto" },
+      ],
+    },
+    boton("botón"),
+    textura,
   ],
 };
 
@@ -269,6 +324,12 @@ export const BloqueGaleria: Block = {
       },
     },
     {
+      name: "texto",
+      type: "textarea",
+      label: "Texto de presentación",
+      admin: { description: "Opcional. Una frase bajo el título que presenta las fotos." },
+    },
+    {
       name: "imagenes",
       type: "array",
       label: "Imágenes",
@@ -313,6 +374,27 @@ export const BloqueVideoYoutube: Block = {
         description: "La que se ve antes de reproducir. Sin ella, un fondo oscuro con el botón.",
       },
     },
+    {
+      // Diseño «Servicio técnico» (2026-10-19): el vídeo propio junto al de YouTube.
+      name: "videoTaller",
+      type: "upload",
+      relationTo: "videos",
+      label: "Vídeo del taller (opcional)",
+      admin: {
+        description:
+          "Un vídeo de «Vídeos» que se pinta junto al de YouTube, con sus controles y su póster. Solo lo usa el diseño «Servicio técnico».",
+      },
+    },
+    {
+      name: "videoFondo",
+      type: "upload",
+      relationTo: "videos",
+      label: "Vídeo de fondo (opcional)",
+      admin: {
+        description:
+          "Decorativo, sin sonido: detrás del texto, solo en pantallas grandes y con botón de pausa. Solo lo usa el diseño «Servicio técnico».",
+      },
+    },
   ],
 };
 
@@ -350,4 +432,5 @@ export const BLOQUES_PAGINA: Block[] = [
   BloqueGaleria,
   BloqueVideoYoutube,
   BloqueFormularioContacto,
+  BloqueProcesoPasos,
 ];

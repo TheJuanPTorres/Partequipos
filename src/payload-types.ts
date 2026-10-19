@@ -1102,6 +1102,10 @@ export interface Pagina {
       }[]
     | null;
   /**
+   * «Servicio técnico» compone los bloques con su diseño propio, por su ancla: taller, alistamiento, posventa, Siniestros y contacto.
+   */
+  diseno?: ('bloques' | 'servicioTecnico') | null;
+  /**
    * Opcional. Si añades bloques, la página se compone con ellos y dejan de mostrarse «Contenido» y «Secciones con ancla».
    */
   bloques?:
@@ -1114,6 +1118,7 @@ export interface Pagina {
         | BloqueGaleria
         | BloqueVideoYoutube
         | BloqueFormularioContacto
+        | BloqueProcesoPasos
       )[]
     | null;
   /**
@@ -1424,6 +1429,10 @@ export interface BloquePresentacionImagen {
    * Una ruta del sitio (/…/) o una dirección https://. Vacío: sin botón.
    */
   botonEnlace?: string | null;
+  /**
+   * Opcional. Imagen clara que se pinta una vez al pie de la sección, detrás del texto. Solo la usa el diseño «Servicio técnico».
+   */
+  textura?: (number | null) | Media;
   id?: string | null;
   blockName?: string | null;
   blockType: 'presentacionImagen';
@@ -1574,6 +1583,10 @@ export interface BloqueGaleria {
    */
   titulo?: string | null;
   /**
+   * Opcional. Una frase bajo el título que presenta las fotos.
+   */
+  texto?: string | null;
+  /**
    * En este orden, en una rejilla. Cuida el texto alternativo de cada una.
    */
   imagenes?:
@@ -1623,6 +1636,14 @@ export interface BloqueVideoYoutube {
    * La que se ve antes de reproducir. Sin ella, un fondo oscuro con el botón.
    */
   miniatura?: (number | null) | Media;
+  /**
+   * Un vídeo de «Vídeos» que se pinta junto al de YouTube, con sus controles y su póster. Solo lo usa el diseño «Servicio técnico».
+   */
+  videoTaller?: (number | null) | Video;
+  /**
+   * Decorativo, sin sonido: detrás del texto, solo en pantallas grandes y con botón de pausa. Solo lo usa el diseño «Servicio técnico».
+   */
+  videoFondo?: (number | null) | Video;
   id?: string | null;
   blockName?: string | null;
   blockType: 'videoYoutube';
@@ -1652,6 +1673,47 @@ export interface BloqueFormularioContacto {
   id?: string | null;
   blockName?: string | null;
   blockType: 'formularioContacto';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueProcesoPasos".
+ */
+export interface BloqueProcesoPasos {
+  /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
+  /**
+   * Texto corto encima del título. Opcional.
+   */
+  antetitulo?: string | null;
+  titulo: string;
+  /**
+   * Opcional. Una frase bajo el título.
+   */
+  entradilla?: string | null;
+  /**
+   * En este orden; se numeran solos (01, 02, 03…).
+   */
+  pasos?:
+    | {
+        etiqueta: string;
+        texto: string;
+        id?: string | null;
+      }[]
+    | null;
+  botonTexto?: string | null;
+  /**
+   * Una ruta del sitio (/…/) o una dirección https://. Vacío: sin botón.
+   */
+  botonEnlace?: string | null;
+  /**
+   * Opcional. Imagen clara que se pinta una vez al pie de la sección, detrás del texto. Solo la usa el diseño «Servicio técnico».
+   */
+  textura?: (number | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'procesoPasos';
 }
 /**
  * Tipos de letra propios para el título del hero (WOFF2, o WOFF/TTF; máximo 4 MB). Después se eligen en «Tipografía del título» de cada diapositiva. Comprueba que la licencia permite usarla en una web.
@@ -2486,6 +2548,7 @@ export interface PaginasSelect<T extends boolean = true> {
         contenido?: T;
         id?: T;
       };
+  diseno?: T;
   bloques?:
     | T
     | {
@@ -2497,6 +2560,7 @@ export interface PaginasSelect<T extends boolean = true> {
         galeria?: T | BloqueGaleriaSelect<T>;
         videoYoutube?: T | BloqueVideoYoutubeSelect<T>;
         formularioContacto?: T | BloqueFormularioContactoSelect<T>;
+        procesoPasos?: T | BloqueProcesoPasosSelect<T>;
       };
   hero?:
     | T
@@ -2659,6 +2723,7 @@ export interface BloquePresentacionImagenSelect<T extends boolean = true> {
   texto?: T;
   botonTexto?: T;
   botonEnlace?: T;
+  textura?: T;
   id?: T;
   blockName?: T;
 }
@@ -2722,6 +2787,7 @@ export interface BloqueGaleriaSelect<T extends boolean = true> {
   ancla?: T;
   antetitulo?: T;
   titulo?: T;
+  texto?: T;
   imagenes?:
     | T
     | {
@@ -2742,6 +2808,8 @@ export interface BloqueVideoYoutubeSelect<T extends boolean = true> {
   texto?: T;
   youtube?: T;
   miniatura?: T;
+  videoTaller?: T;
+  videoFondo?: T;
   id?: T;
   blockName?: T;
 }
@@ -2755,6 +2823,28 @@ export interface BloqueFormularioContactoSelect<T extends boolean = true> {
   titulo?: T;
   texto?: T;
   botonTexto?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueProcesoPasos_select".
+ */
+export interface BloqueProcesoPasosSelect<T extends boolean = true> {
+  ancla?: T;
+  antetitulo?: T;
+  titulo?: T;
+  entradilla?: T;
+  pasos?:
+    | T
+    | {
+        etiqueta?: T;
+        texto?: T;
+        id?: T;
+      };
+  botonTexto?: T;
+  botonEnlace?: T;
+  textura?: T;
   id?: T;
   blockName?: T;
 }

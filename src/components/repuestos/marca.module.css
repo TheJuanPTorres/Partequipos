@@ -119,8 +119,15 @@
 }
 
 .h1Largo .linea1 {
-  /* Una palabra larga («RETROCARGADORA») nunca se sale de la tarjeta. */
+  /*
+   * Los títulos de WordPress de cada modelo son largos («CASE CONSTRUCTION
+   * EXCAVADORA CX350C»): más pequeños que el de marca, para que quepan en una
+   * línea en la cabecera baja sin tocar el icono del ratón. Una palabra larga
+   * («RETROCARGADORA») nunca se sale de la tarjeta.
+   */
+  font-size: clamp(32px, 3.3vw, 48px);
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 @media (max-width: 767px) {

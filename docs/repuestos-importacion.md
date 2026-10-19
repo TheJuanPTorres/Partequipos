@@ -431,16 +431,16 @@ ficha de la ZX450LC-5); segunda pasada «ya estaban»; retirada probada (5 tipos
 **Decisión del cliente (2026-10-17): se migra todo, erratas incluidas.** La página de modelo tiene diseño propio,
 aprobado por dirección el 2026-10-19 (`docs/diseno/decisiones-modelo-repuestos.md`). Lo que trae de WordPress:
 
-| Dato de WordPress                                            | Dónde se guarda                                                                     |
-| ------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| Antetítulo («Repuestos para Maquinaria Pesada»)              | `antetitulo` del modelo                                                             |
-| Título («HITACHI Excavadora ZX200»), el `<h1>`               | `tituloPagina` del modelo (vacío: «Repuestos <nombre>»)                             |
-| Párrafo largo                                                | `descripcion` del modelo (ya existía)                                               |
-| «repuestos disponibles para …»                               | `tituloDisponibles` del modelo                                                      |
-| Lista de piezas («- Filtros para …»)                         | `piezas` del modelo, con `mostrarPiezas`: visible en 27 páginas, oculta en el resto |
-| Categorías (una plantilla de Elementor por tipo)             | `categoriasModelo` del **tipo**, una vez por tipo                                   |
-| Tarjeta «ESTAMOS AQUÍ PARA AYUDARLO · Escríbenos · Whatsapp» | Global «Páginas de marca de repuestos» → «Páginas de modelo» (textos y foto)        |
-| Formulario «Si deseas más info, contáctanos»                 | El mismo global (título); los campos, nuestros, con «Ciudad» (nueva en solicitudes) |
+| Dato de WordPress                                            | Dónde se guarda                                                                                                                                                    |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Antetítulo («Repuestos para Maquinaria Pesada»)              | `antetitulo` del modelo                                                                                                                                            |
+| Título («HITACHI Excavadora ZX200»), el `<h1>`               | `tituloPagina` del modelo (vacío: «Repuestos <nombre>»)                                                                                                            |
+| Párrafo largo                                                | `descripcion` del modelo (ya existía)                                                                                                                              |
+| «repuestos disponibles para …»                               | `tituloDisponibles` del modelo                                                                                                                                     |
+| Lista de piezas («- Filtros para …»)                         | `piezas` del modelo, con `mostrarPiezas`: visible en 25 modelos (27 páginas de WordPress, 2 de ellas los borradores «-copy», que no se migran), oculta en el resto |
+| Categorías (una plantilla de Elementor por tipo)             | `categoriasModelo` del **tipo**, una vez por tipo                                                                                                                  |
+| Tarjeta «ESTAMOS AQUÍ PARA AYUDARLO · Escríbenos · Whatsapp» | Global «Páginas de marca de repuestos» → «Páginas de modelo» (textos y foto)                                                                                       |
+| Formulario «Si deseas más info, contáctanos»                 | El mismo global (título); los campos, nuestros, con «Ciudad» (nueva en solicitudes)                                                                                |
 
 **El n.º de documento del formulario de WordPress NO se pide** (dirección, 2026-10-19): es un dato personal sensible
 (Ley 1581, minimización) y lo decide el cliente.

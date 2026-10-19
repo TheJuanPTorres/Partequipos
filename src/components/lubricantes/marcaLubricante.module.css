@@ -82,17 +82,17 @@
   gap: 22px;
 }
 
+/* El logo de ENI ya es un rótulo amarillo con su borde: va solo, sin placa detrás. */
 .placaLogo {
   display: flex;
-  padding: 14px 22px;
+  overflow: hidden;
   border-radius: 14px;
-  background: var(--lub-principal);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
 }
 
 .logo {
-  width: 150px;
+  width: 220px;
   height: auto;
-  max-height: 72px;
   object-fit: contain;
 }
 
@@ -557,7 +557,7 @@
   }
 
   .logo {
-    width: 120px;
+    width: 170px;
   }
 
   .acciones .boton {

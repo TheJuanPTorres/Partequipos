@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 /**
  * CACHÉ DE DATOS de los listados DINÁMICOS (2026-10-13).

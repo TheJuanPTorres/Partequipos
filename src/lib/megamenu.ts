@@ -413,7 +413,7 @@ export function construirMegamenu(d: DatosMegamenu): Record<string, PanelMenu> {
     [claveDeEnlace(rutas.repuestos())]: panelRepuestos(d),
   };
   // «Lubricantes» abre su panel apunte a la página general o a la de una marca
-  // (hoy la cabecera enlaza a la de ENI).
+  // (desde el 2026-10-20 la cabecera enlaza a la general).
   const lubricantes = panelLubricantes(d);
   if (lubricantes) {
     for (const href of [

@@ -203,8 +203,9 @@ Scooter, Auto liviano, Auto pesado y Engranajes; su plantilla llegará).
   orden de las secciones de la página de ENI). Cada categoría va a su **«Enlace en el menú»** (campo nuevo de las
   categorías de lubricante) o, vacío, a su sección (ancla) de la página de la marca: cuando cada categoría tenga
   página, se cambia ahí. El panel se abre tanto si el enlace de la cabecera apunta a `/lubricantes/` como a la página
-  de una marca (hoy apunta a ENI); para que el enlace del menú móvil lleve a la general, **runbook**
-  `runbook-cabecera-lubricantes.md`.
+  de una marca. **Desde el 2026-10-20 apunta a `/lubricantes/`** (`runbook-cabecera-lubricantes.md`, **EJECUTADO por
+  dirección** y comprobado pintado a 1440 y 390: en móvil, el texto «Lubricantes» lleva a la general y el «+»
+  despliega ENI y sus 4 categorías).
 - **Refresco:** las marcas y categorías de lubricante llevan el gancho del megamenú (también al cambiar el «Enlace en
   el menú»), y guardar una marca revalida además `/lubricantes/` (el logo).
 - Migración `20261020_064422_lubricantes_general`, **solo esquema**.

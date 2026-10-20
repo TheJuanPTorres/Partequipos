@@ -1,0 +1,330 @@
+/*
+ * PÁGINA DE MARCA DE MAQUINARIA NUEVA — plantilla de Andrés «Maquinaria Nueva
+ * Marca» (elementor 4023, 2026-10-20). Va dentro de `.pagina` de
+ * repuestos/marca.module.css (fondo y cabecera). `--acento` y `--acento-tinta` (el
+ * color de la marca y su tinta) los pone la página solo si la marca tiene color; sin
+ * él, el rojo del sitio: nunca el amarillo.
+ */
+
+/* --- «Nuestra línea de equipos <marca> incluye:» y la franja de tipos --- */
+
+.linea {
+  padding: 60px 1.5vw 20px;
+  text-align: center;
+}
+
+.intro {
+  margin: 0 0 20px;
+  color: var(--color-texto);
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.franja {
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.marquee {
+  overflow: hidden;
+  padding: 10px 0;
+}
+
+/* Seis copias; la pista recorre la mitad en 90 s, como el `ue_speed` 90 del export. */
+.pista {
+  display: flex;
+  width: max-content;
+  animation: desplazar 90s linear infinite;
+}
+
+.marquee[data-pausado] .pista {
+  animation-play-state: paused;
+}
+
+.copia {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.itemFranja {
+  display: flex;
+  padding: 10px 0;
+  align-items: center;
+  gap: 39px;
+  white-space: nowrap;
+}
+
+.itemFranja::after {
+  display: block;
+  width: 39px;
+  content: "";
+}
+
+.punto {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--acento, var(--color-marca));
+}
+
+.enlaceFranja {
+  color: var(--color-texto);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+a.enlaceFranja:hover {
+  color: var(--color-marca);
+}
+
+a.enlaceFranja:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+@keyframes desplazar {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pista {
+    animation: none;
+  }
+}
+
+.pausa {
+  margin-top: 4px;
+}
+
+.cierre {
+  max-width: 760px;
+  margin: 24px auto 0;
+  color: var(--color-texto-suave);
+  font-size: 18px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* --- Una sección por tipo --- */
+
+.seccionTipo {
+  margin: 40px 3% 0;
+  padding-top: 40px;
+  border-top: 1px solid rgb(0 0 0 / 12%);
+}
+
+.tituloTipo {
+  margin: 0 0 30px;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-seccion);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/*
+ * COLOCACIÓN DE LAS TARJETAS (regla del #281, la misma de `TarjetasMarca`): escritorio,
+ * 1 o 2 centradas, 4 en 2 + 2 centradas y el resto en 3 columnas con la última fila
+ * incompleta centrada; tablet, 2 columnas con la impar centrada; móvil, 1. Una rejilla
+ * de 6 columnas (4 en tablet) donde cada tarjeta ocupa 2: con el mismo hueco, 2 de 6
+ * miden lo mismo que 1 de 3.
+ */
+.rejilla {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 30px;
+  list-style: none;
+}
+
+@media (min-width: 1025px) {
+  .rejilla {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .rejilla > .tarjeta {
+    grid-column: span 2;
+  }
+
+  .rejilla > .tarjeta:last-child:nth-child(3n + 1) {
+    grid-column: 3 / span 2;
+  }
+
+  .rejilla > .tarjeta:nth-last-child(2):nth-child(3n + 1) {
+    grid-column: 2 / span 2;
+  }
+
+  .rejilla:has(> .tarjeta:nth-child(4):last-child) > .tarjeta:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+
+  .rejilla:has(> .tarjeta:nth-child(4):last-child) > .tarjeta:nth-child(even) {
+    grid-column: 4 / span 2;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .rejilla {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .rejilla > .tarjeta {
+    grid-column: span 2;
+  }
+
+  .rejilla > .tarjeta:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+}
+
+/* --- La tarjeta de un equipo --- */
+
+.tarjeta {
+  display: flex;
+  box-sizing: border-box;
+  padding: 20px;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 30px;
+  background: var(--color-fondo);
+  box-shadow: 5px 5px 10px rgb(0 0 0 / 23%);
+}
+
+.foto {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--color-fondo-seccion);
+}
+
+.fotoImg {
+  object-fit: cover;
+}
+
+.nombre {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.datos {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  list-style: none;
+}
+
+.dato {
+  display: flex;
+  padding: 8px 0;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgb(0 0 0 / 10%);
+  color: var(--color-texto);
+  font-size: 16px;
+}
+
+.datoIcono {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--color-marca);
+}
+
+/* Los botones, al pie de la tarjeta: las de una fila igualan su alto. */
+.acciones {
+  display: flex;
+  margin-top: auto;
+  padding-top: 8px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.botonFicha,
+.botonCotizar {
+  display: inline-flex;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 0 24px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--acento, var(--color-marca));
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.botonFicha {
+  background: var(--acento, var(--color-marca));
+  color: var(--acento-tinta, #fff);
+}
+
+.botonCotizar {
+  background: transparent;
+  color: var(--color-texto);
+}
+
+.botonFicha:hover,
+.botonCotizar:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+  color: var(--color-fondo);
+}
+
+.botonFicha:focus-visible,
+.botonCotizar:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.verTodos {
+  margin: 30px 0 0;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .seccionTipo {
+    margin-inline: 2%;
+  }
+}
+
+@media (max-width: 767px) {
+  .linea {
+    padding-top: 40px;
+  }
+
+  .enlaceFranja {
+    font-size: 6.5vw;
+  }
+
+  .seccionTipo {
+    margin: 30px 20px 0;
+    padding-top: 30px;
+  }
+
+  .tituloTipo {
+    text-align: center;
+  }
+
+  .foto {
+    height: 240px;
+  }
+}

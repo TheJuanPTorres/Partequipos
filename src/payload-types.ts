@@ -387,6 +387,19 @@ export interface MarcasMaquinaria {
     compromisoBoton?: string | null;
   };
   /**
+   * Los textos fijos de la página de la marca (no sirve para Aditamentos, que tiene los suyos). Vacío, el texto de siempre.
+   */
+  plantillaLinea?: {
+    /**
+     * «{marca}» se sustituye por el nombre de la marca.
+     */
+    intro?: string | null;
+    /**
+     * Una línea nueva es un salto de línea.
+     */
+    cierre?: string | null;
+  };
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -2488,6 +2501,12 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
         compromisoEntradilla?: T;
         compromisoTexto?: T;
         compromisoBoton?: T;
+      };
+  plantillaLinea?:
+    | T
+    | {
+        intro?: T;
+        cierre?: T;
       };
   seo?:
     | T

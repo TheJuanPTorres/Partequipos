@@ -31,4 +31,11 @@ describe("megamenú: cuándo hay que revalidar el sitio", () => {
   it("editar otra cosa (la descripción) no revalida todo el sitio", () => {
     assert.equal(cambiaElMenu("update", { ...antes, descripcion: "otra" }, antes), false);
   });
+
+  it("en las categorías técnicas, si cambia el icono o el orden; en las marcas, la tinta oscura", () => {
+    const cat = { nombre: "Filtración", slug: "filtros", icono: "filtro", ordenMarca: 1 };
+    assert.equal(cambiaElMenu("update", { ...cat, icono: "motor" }, cat), true);
+    assert.equal(cambiaElMenu("update", { ...cat, ordenMarca: 2 }, cat), true);
+    assert.equal(cambiaElMenu("update", { ...antes, logoOscuroEnMenu: true }, antes), true);
+  });
 });

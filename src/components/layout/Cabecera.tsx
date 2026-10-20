@@ -27,7 +27,7 @@ import { claveDeEnlace, type PanelMenu } from "@/lib/megamenu";
 import type { ImagenLogo } from "@/lib/seo/logo";
 
 import estilos from "./cabecera.module.css";
-import { Megamenu } from "./Megamenu";
+import { Megamenu, SubmenuMovil } from "./Megamenu";
 
 /**
  * CABECERA DEL SITIO (ux-9, export 2629 = plantilla 2162). Valores en `cabecera.module.css`.
@@ -279,15 +279,30 @@ export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, panel
 
   const actual = (href: string) => (ruta === href || ruta.startsWith(href) ? "page" : undefined);
 
+  // Móvil: las entradas con panel despliegan su contenido (el mismo del megamenú, 2026-10-20).
   const listaEnlaces = (
     <ul className={estilos.lista}>
-      {enlaces.map((e) => (
-        <li key={e.href}>
-          <Link href={e.href} className={estilos.enlace} aria-current={actual(e.href)}>
-            {e.etiqueta}
-          </Link>
-        </li>
-      ))}
+      {enlaces.map((e) => {
+        const datos = paneles[claveDeEnlace(e.href)];
+        return (
+          <li key={e.href}>
+            {datos ? (
+              <SubmenuMovil
+                etiqueta={e.etiqueta}
+                href={e.href}
+                actual={actual(e.href)}
+                panel={datos}
+                claseEnlace={estilos.enlace}
+                alElegir={() => setAbiertoEn(null)}
+              />
+            ) : (
+              <Link href={e.href} className={estilos.enlace} aria-current={actual(e.href)}>
+                {e.etiqueta}
+              </Link>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 

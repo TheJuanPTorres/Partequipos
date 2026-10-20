@@ -9,9 +9,12 @@ import {
   revalidarMarcasDeRepuestos,
   revalidarModelosDeRepuestos,
 } from "../lib/revalidation";
+import { revalidarMegamenu } from "./hooks/megamenuHooks";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("categorias-tecnicas");
+// «Repuestos por categoría técnica» del megamenú (2026-10-20).
+const megamenu = revalidarMegamenu("categorias-tecnicas");
 
 /**
  * Categorías técnicas transversales del proyecto (Tren de Rodaje, Filtración,
@@ -40,6 +43,7 @@ export const CategoriaTecnica: CollectionConfig = {
   hooks: {
     afterChange: [
       portada.afterChange,
+      megamenu.afterChange,
       ({ doc }) => {
         revalidarMarcasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""}`);
         revalidarModelosDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""}`);
@@ -49,6 +53,7 @@ export const CategoriaTecnica: CollectionConfig = {
     ],
     afterDelete: [
       portada.afterDelete,
+      megamenu.afterDelete,
       ({ doc }) => {
         revalidarMarcasDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""} borrada`);
         revalidarModelosDeRepuestos(`categorias-tecnicas ${doc?.id ?? ""} borrada`);

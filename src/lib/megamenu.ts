@@ -2,6 +2,7 @@ import { claveDeMarca, logoPropio } from "./marca/logoMarca";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
 import { rutas } from "./routes";
+import { ETIQUETA_OTROS, separarCategorias } from "./usados/otros";
 import { SIN_UNIDADES } from "./usados/vacia";
 
 /**
@@ -99,7 +100,8 @@ export type DatosMegamenu = {
   marcasMaquinaria: ItemCatalogo[];
   tiposMaquinaria: TipoCatalogo[];
   categoriasNueva: ItemCatalogo[];
-  categoriasUsada: ItemCatalogo[];
+  /** Con su casilla «Agrupar en «Otros»» y su orden (2026-10-19). */
+  categoriasUsada: (ItemCatalogo & { enOtros?: boolean | null; orden?: number | null })[];
   marcasRepuestos: ItemCatalogo[];
   tiposRepuestos: TipoCatalogo[];
   /** Los equipos nuevos (solo su tipo): el menú no enlaza a un tipo de maquinaria sin equipos. */
@@ -209,15 +211,29 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
         ),
       )
     : null;
+  // Como en WordPress (cliente, 2026-10-19): las de primer nivel (Excavadoras y
+  // Aditamentos) y «Otros», que lleva a la página de las agrupadas.
+  const { primerNivel, agrupadas } = separarCategorias(d.categoriasUsada);
+  const sinUnidades = (ids: number[]) =>
+    conUnidades && !ids.some((id) => conUnidades.has(id)) ? { nota: SIN_UNIDADES } : {};
   const usada: GrupoMenu = {
     titulo: "Maquinaria pesada usada",
     enlaces: [
       { etiqueta: "Ver toda la maquinaria usada", href: conBarra(rutas.usada()) },
-      ...[...d.categoriasUsada].sort(porNombre).map((c) => ({
+      ...primerNivel.map((c) => ({
         etiqueta: c.nombre,
         href: conBarra(rutas.categoriaUsada(c.slug)),
-        ...(conUnidades && !conUnidades.has(c.id) ? { nota: SIN_UNIDADES } : {}),
+        ...sinUnidades([c.id]),
       })),
+      ...(agrupadas.length > 0
+        ? [
+            {
+              etiqueta: ETIQUETA_OTROS,
+              href: conBarra(rutas.usadaOtros()),
+              ...sinUnidades(agrupadas.map((c) => c.id)),
+            },
+          ]
+        : []),
     ],
     grupos: [],
   };

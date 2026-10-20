@@ -194,8 +194,14 @@ oficial, no lo pongas.
   nueva o tenemos repuestos, enlazarla a esa marca (su página enlazará a la
   otra). Una marca **sin unidades disponibles** no sale en Google ni en el
   índice de usados hasta que tenga alguna.
-- Ninguna categoría de usados puede llamarse «marcas»: esa dirección web es
-  la de las páginas de marca.
+- Ninguna categoría de usados puede llamarse «marcas» ni «otros»: son las
+  direcciones de las páginas de marca y de «Otros».
+- **Maquinaria → Categorías de maquinaria usada → «Agrupar en «Otros»».** En
+  el menú y en la página «Maquinaria pesada usada» solo salen Excavadoras,
+  Aditamentos y «Otros», como en la web anterior. Marcada (lo normal), la
+  categoría sale dentro de «Otros»; desmarcada, sale sola en el primer nivel,
+  en el lugar de su **«Orden en el primer nivel»**. Los textos de la página
+  «Otros» están en **Partes del sitio → Páginas índice**.
 - **Al venderse, desmarca «Disponible»** en vez de borrarlo. Si fue un error,
   se vuelve a marcar.
 - «Pestaña en la portada»: por defecto, según su categoría; elige

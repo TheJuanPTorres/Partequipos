@@ -5,7 +5,7 @@ import { contraste, luminancia, rgbDeHex } from "../portada/contraste";
 /**
  * COLOR DE LA MARCA (2026-10-18, petición del cliente): la franja de color de las
  * páginas de marca y de tipo (de repuestos y de maquinaria nueva) deja de ser el
- * amarillo de Caterpillar y toma el de cada marca. Sin color, gris neutro (en el CSS), nunca amarillo.
+ * amarillo de Caterpillar y toma el de cada marca. Sin color, ninguno: la franja toma el fondo de la página (en el CSS).
  */
 
 const RE_COLOR = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;

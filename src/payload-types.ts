@@ -347,7 +347,7 @@ export interface MarcasMaquinaria {
   descripcion?: string | null;
   logo?: (number | null) | Media;
   /**
-   * Color de la franja de las páginas de esta marca (y de sus tipos). Vacío: amarillo. El texto de la franja se pone solo en blanco o negro, el que mejor se lea.
+   * Color de la franja de las páginas de esta marca (y de sus tipos). Vacío: sin color, igual que el fondo (si no es una marca, p. ej. Aditamentos, déjalo vacío). El texto de la franja se pone solo en blanco o negro, el que mejor se lea.
    */
   colorMarca?: string | null;
   /**
@@ -611,7 +611,7 @@ export interface Marca {
    */
   logo?: (number | null) | Media;
   /**
-   * Color de la franja de las páginas de esta marca (y de sus tipos). Vacío: amarillo. El texto de la franja se pone solo en blanco o negro, el que mejor se lea.
+   * Color de la franja de las páginas de esta marca (y de sus tipos). Vacío: sin color, igual que el fondo (si no es una marca, p. ej. Aditamentos, déjalo vacío). El texto de la franja se pone solo en blanco o negro, el que mejor se lea.
    */
   colorMarca?: string | null;
   /**
@@ -865,6 +865,14 @@ export interface CategoriasUsada {
    * Opcional. La foto de la tarjeta de esta categoría en la página «Maquinaria pesada usada». Vacía, sale la primera foto de su unidad más reciente.
    */
   imagen?: (number | null) | Media;
+  /**
+   * Marcada, la categoría sale dentro de «Otros» (menú e índice de usados). Desmarcada, sale sola en el primer nivel, como Excavadoras y Aditamentos. Su página no cambia.
+   */
+  enOtros?: boolean | null;
+  /**
+   * Solo para las que NO van en «Otros»: el número más bajo sale primero (vacío, al final, por nombre). «Otros» va siempre detrás.
+   */
+  orden?: number | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -2498,6 +2506,8 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
   slug?: T;
   descripcion?: T;
   imagen?: T;
+  enOtros?: T;
+  orden?: T;
   seo?:
     | T
     | {
@@ -3430,7 +3440,7 @@ export interface RepuestosMarca {
   createdAt?: string | null;
 }
 /**
- * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada».
+ * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada» y de su página «Otros».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "paginas-indice".
@@ -3512,6 +3522,25 @@ export interface PaginasIndice {
      * «Provisional»: «Por ahora no hay unidades disponibles», con enlace a Contáctanos y WhatsApp. «Diseño propio»: el nuestro, con alternativas y «Avísame», sin aprobar para el sitio publicado.
      */
     estadoVacio: 'provisional' | 'propio';
+  };
+  /**
+   * La entrada «Otros» del menú y del índice de usados, y su página. Las tarjetas salen solas: una por cada categoría marcada «Agrupar en «Otros»», con su número de unidades.
+   */
+  usadaOtros?: {
+    antetitulo?: string | null;
+    /**
+     * Vacío: «Otra maquinaria pesada usada».
+     */
+    titulo?: string | null;
+    texto?: string | null;
+    /**
+     * Opcional. Foto de obra a todo el ancho; sin ella, la misma de respaldo que «Maquinaria pesada».
+     */
+    fondo?: (number | null) | Media;
+    /**
+     * Opcional. La foto de la tarjeta «Otros» en la página «Maquinaria pesada usada». Vacía, sale la primera foto de la unidad más reciente de las categorías agrupadas.
+     */
+    imagenTarjeta?: (number | null) | Media;
   };
   contacto?: {
     antetitulo?: string | null;
@@ -3729,6 +3758,15 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
         texto?: T;
         fondo?: T;
         estadoVacio?: T;
+      };
+  usadaOtros?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        texto?: T;
+        fondo?: T;
+        imagenTarjeta?: T;
       };
   contacto?:
     | T

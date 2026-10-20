@@ -21,6 +21,8 @@ describe("clasificarDestino — rutas estáticas", () => {
     "/maquinaria-pesada/maquinaria-pesada-nueva/",
     M + "/",
     "/maquinaria-pesada/maquinaria-pesada-usada/",
+    // «Otros» de usados (2026-10-19), destino de /elementor-48399/.
+    "/maquinaria-pesada/maquinaria-pesada-usada/otros/",
     "/noticias/",
   ]) {
     it(`reconoce ${ruta}`, () => {

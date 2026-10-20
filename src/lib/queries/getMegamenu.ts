@@ -54,7 +54,11 @@ const megamenuEnCache = unstable_cache(
         select: { ...conMarca, subtipos: true },
       }),
       payload.find({ collection: "categorias-maquinaria", ...base, select: sinMarca }),
-      payload.find({ collection: "categorias-usada", ...base, select: sinMarca }),
+      payload.find({
+        collection: "categorias-usada",
+        ...base,
+        select: { ...sinMarca, enOtros: true, orden: true },
+      }),
       payload.find({ collection: "marcas", ...marcas }),
       payload.find({
         collection: "tipos-equipo",

@@ -111,9 +111,11 @@ el contacto y los testimonios se quedan como estaban. Las placas oscuras siguen 
 
 - **Encabezado del bloque** como el export: «Partequipos» (M BOLD, 20/20/18 px) y «Nuestras marcas» como `<h2>`
   revelado por palabras (Principal, 55/40 px y 10vw), en blanco, en una caja de radio 30, relleno 50 y 35vh de alto.
-- **Recuadro blanco** de radio 30 y relleno 50 con una **baldosa cuadrada** por marca (radio 20, relleno 20): 4 por
-  fila, 2 en tablet y en móvil, y la última fila incompleta **centrada** (flex con el ancho exacto de una columna,
-  como el #274). El logo encoge al pasar el ratón («shrink» de Elementor), salvo con «reducir movimiento».
+- **Recuadro blanco** de radio 30 y relleno 50 con una **baldosa** por marca (radio 20, relleno 20), **rectangular en
+  horizontal, 3:2** (dirección, 2026-10-20; el export la pinta cuadrada), con el logo centrado al 70 % del ancho como
+  mucho y la mitad del alto. 4 por fila, 2 en tablet y en móvil, con **la regla del #281**: la última fila incompleta
+  centrada y, con exactamente 4, 2 + 2 centradas (rejilla de 8 columnas donde cada baldosa ocupa 2; 4 en tablet y
+  móvil). El logo encoge al pasar el ratón («shrink» de Elementor), salvo con «reducir movimiento».
 - **Baldosa BLANCA con el logo de la marca** (dirección, 2026-10-20; antes, del color de la marca): el logo de todo
   el sitio (`LogoMarca`, `docs/diseno/logo-marca.md`), en sus colores o en tinta oscura con «Pintar el logo en
   oscuro». Un borde gris la separa del recuadro. Sin logo, su nombre. Mismas marcas que antes (`placasDeMarcas`: con

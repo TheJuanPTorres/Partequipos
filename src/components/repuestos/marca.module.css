@@ -1379,28 +1379,56 @@ a.modelo:hover {
 }
 
 .baldosas {
-  --columnas: 4;
-  --hueco-baldosas: 20px;
-  display: flex;
+  display: grid;
   max-width: 1240px;
   margin: 0 auto;
   padding: 0;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--hueco-baldosas);
+  /*
+   * COLOCACIÓN (la regla del #281, con 4 por fila): una rejilla de 8 columnas donde cada
+   * baldosa ocupa 2, así la última fila incompleta se centra empezando una columna más a la
+   * derecha; exactamente 4, en 2 + 2 centradas. Tablet y móvil: 2 por fila (rejilla de 4),
+   * la última impar al centro. Mismo ancho de baldosa siempre. Sin JavaScript ni CLS.
+   */
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 20px;
   list-style: none;
 }
 
 .baldosaCaja {
   display: flex;
-  flex: 0 0 calc((100% - (var(--columnas) - 1) * var(--hueco-baldosas)) / var(--columnas));
   min-width: 0;
+  grid-column: span 2;
+}
+
+@media (min-width: 1025px) {
+  /* Última fila con 1, 2 o 3 baldosas: centradas. */
+  .baldosaCaja:last-child:nth-child(4n + 1) {
+    grid-column: 4 / span 2;
+  }
+
+  .baldosaCaja:nth-last-child(2):nth-child(4n + 1) {
+    grid-column: 3 / span 2;
+  }
+
+  .baldosaCaja:nth-last-child(3):nth-child(4n + 1) {
+    grid-column: 2 / span 2;
+  }
+
+  /* Exactamente 4: 2 + 2 centradas. */
+  .baldosas:has(> .baldosaCaja:nth-child(4):last-child) > .baldosaCaja:nth-child(odd) {
+    grid-column: 3 / span 2;
+  }
+
+  .baldosas:has(> .baldosaCaja:nth-child(4):last-child) > .baldosaCaja:nth-child(even) {
+    grid-column: 5 / span 2;
+  }
 }
 
 .baldosa {
   display: flex;
   width: 100%;
-  aspect-ratio: 1;
+  /* RECTANGULAR en horizontal, 3:2 (dirección, 2026-10-20): menos alta que la cuadrada del export. */
+  aspect-ratio: 3 / 2;
   box-sizing: border-box;
   padding: 20px;
   align-items: center;
@@ -1422,9 +1450,10 @@ a.modelo:hover {
 }
 
 .baldosaLogo {
-  width: 100%;
+  /* Centrado y con aire: el 70 % del ancho como mucho, y nunca más de la mitad del alto. */
+  width: 70%;
   height: auto;
-  max-height: 100%;
+  max-height: 50%;
 }
 
 /* «shrink» de Elementor en el logo, solo si no se pide reducir el movimiento. */
@@ -1441,7 +1470,11 @@ a.modelo:hover {
 
 @media (max-width: 1024px) {
   .baldosas {
-    --columnas: 2;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .baldosas > .baldosaCaja:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
   }
 
   .mostrarMarcasTitulo {

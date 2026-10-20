@@ -51,8 +51,11 @@ export function VisorLibro({
   titulo,
   pdf,
   paginas,
+  conTitulo = true,
 }: {
   titulo: string;
+  /** Dentro del texto, el encabezado de la sección ya lo nombra: el título solo para lectores. */
+  conTitulo?: boolean;
   pdf: { url: string; tamano: string | null };
   paginas: PaginaLibro[];
 }) {
@@ -211,7 +214,7 @@ export function VisorLibro({
       data-completa={completa ? "" : undefined}
       data-miniaturas={miniaturas ? "" : undefined}
     >
-      <h3 className={estilos.titulo}>{titulo}</h3>
+      {conTitulo ? <h3 className={estilos.titulo}>{titulo}</h3> : null}
 
       <div
         ref={escenario}

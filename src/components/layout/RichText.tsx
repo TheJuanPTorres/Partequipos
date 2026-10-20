@@ -35,6 +35,7 @@ const convertidores: JSXConvertersFunction = ({ defaultConverters }) => ({
               : null
           }
           titulo={campos?.titulo}
+          conTitulo={false}
         />
       );
     },

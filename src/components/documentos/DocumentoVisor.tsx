@@ -27,9 +27,12 @@ const ANCHO_MINIATURA = 64;
 export async function DocumentoVisor({
   documento,
   titulo,
+  conTitulo = true,
 }: {
   documento: number | { id: number } | null | undefined;
   titulo?: string | null;
+  /** `false` dentro del texto: lo nombra el encabezado de su sección (y el `aria-label`). */
+  conTitulo?: boolean;
 }) {
   const id = typeof documento === "object" ? documento?.id : documento;
   if (!id) return null;
@@ -72,5 +75,7 @@ export async function DocumentoVisor({
     };
   });
 
-  return <VisorLibro titulo={vista.titulo} pdf={vista.pdf} paginas={paginas} />;
+  return (
+    <VisorLibro titulo={vista.titulo} pdf={vista.pdf} paginas={paginas} conTitulo={conTitulo} />
+  );
 }

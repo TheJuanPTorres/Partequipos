@@ -58,7 +58,7 @@ export function TarjetasMarca({
           {titulo}
         </h2>
       ) : null}
-      <ul className={estilos.rejilla}>
+      <ul className={`${estilos.rejilla} ${estilos.rejillaTarjetas}`}>
         {tarjetas.map((t) => {
           const idT = `${id}-${t.clave}`;
           return (

@@ -279,7 +279,10 @@ export function VisorLibro({
         ) : null}
       </div>
 
-      {/* El botón flotante de WhatsApp sube para no tapar los controles (`WhatsAppFlotante`). */}
+      {/*
+        En el teléfono, los controles le dejan su columna al botón flotante de
+        WhatsApp (CSS); si aun así lo pisan, el botón sube (`WhatsAppFlotante`).
+      */}
       <div className={estilos.controles} data-evita-flotante="">
         <button
           type="button"

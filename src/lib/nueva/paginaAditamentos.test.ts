@@ -40,22 +40,24 @@ describe("página de marca de aditamentos", () => {
   });
 
   it("cada producto una vez, con su foto y «Ver todo» a SU ficha", () => {
-    const [s] = seccionesAditamentos(
+    const s = seccionesAditamentos(
       marca,
       [tipo(1, "Excavadoras")],
       [equipo(10, 1, [5, foto(7)]), equipo(10, 1, [foto(7)])],
-    );
+    )[0];
+    assert.ok(s);
     assert.equal(s.tarjetas.length, 1);
-    assert.equal(s.tarjetas[0].imagen?.url, "https://ejemplo.test/7.jpg");
+    assert.equal(s.tarjetas[0]?.imagen?.url, "https://ejemplo.test/7.jpg");
     assert.equal(
-      s.tarjetas[0].href,
+      s.tarjetas[0]?.href,
       "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos/excavadoras/producto-10/",
     );
   });
 
   it("sin foto, la tarjeta va sin imagen", () => {
-    const [s] = seccionesAditamentos(marca, [tipo(1, "Excavadoras")], [equipo(10, 1)]);
-    assert.equal(s.tarjetas[0].imagen, null);
+    const s = seccionesAditamentos(marca, [tipo(1, "Excavadoras")], [equipo(10, 1)])[0];
+    assert.ok(s);
+    assert.equal(s.tarjetas[0]?.imagen, null);
   });
 
   it("la plantilla es solo para la marca de aditamentos", () => {

@@ -2,17 +2,14 @@ import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { BaldosasMarcas } from "@/components/repuestos/BaldosasMarcas";
-import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { placasDeMarcasNueva } from "@/lib/nueva/indiceMarcas";
 import { getLogosMarca } from "@/lib/queries/getLogosMarca";
 import { getEquiposNuevos, getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
-import { vistaEncabezadoIndice } from "@/lib/repuestos/categoria";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
-import { imagenDeMedia } from "@/lib/utils/relations";
 
 const TITULO = "Marcas de maquinaria pesada nueva";
 const DESCRIPCION = "Marcas que distribuimos, con sus tipos de equipo y modelos disponibles.";
@@ -31,7 +28,8 @@ const ANCLA = "marcas-maquinaria";
  * ÍNDICE DE MARCAS DE MAQUINARIA NUEVA: el «Mostrar marcas» de Andrés (plantilla
  * 4017), el mismo componente que el índice de marcas de repuestos
  * (`BaldosasMarcas`), con las marcas que tienen equipos; sin «Aditamentos» (dirección, 2026-10-20).
- * Sin franja de color: es un índice general.
+ * Sin franja de color: es un índice general. Sin el hero grande (dirección,
+ * 2026-10-20): la cabecera es la caja baja de las baldosas, con el `<h1>`.
  */
 export default async function MarcasMaquinariaPage() {
   const [marcas, equipos, logos] = await Promise.all([
@@ -47,8 +45,6 @@ export default async function MarcasMaquinariaPage() {
     { nombre: "Marcas", path: rutas.marcasMaquinaria() },
   ];
 
-  const fondo = marcas.map((m) => imagenDeMedia(m.imagenTarjeta, "")).find(Boolean) ?? null;
-
   return (
     <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
@@ -56,13 +52,11 @@ export default async function MarcasMaquinariaPage() {
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <HeroMarca
-        vista={vistaEncabezadoIndice("Maquinaria pesada nueva", "Marcas", DESCRIPCION, fondo)}
-        anclaSiguiente={ANCLA}
-        franja={false}
+      <BaldosasMarcas
+        id={ANCLA}
+        marcas={placasDeMarcasNueva(marcas, equipos, logos)}
+        h1={{ antetitulo: "Maquinaria pesada nueva", titulo: "Marcas" }}
       />
-
-      <BaldosasMarcas id={ANCLA} marcas={placasDeMarcasNueva(marcas, equipos, logos)} />
     </main>
   );
 }

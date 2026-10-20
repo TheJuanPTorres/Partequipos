@@ -107,8 +107,15 @@ visual** que marca y tipo. **Provisional**: se reemplaza cuando llegue la planti
 >
 > **CAMBIADO otra vez el mismo día (dirección):**
 >
-> - **Logo un 15 % más grande y la baldosa igual:** hasta el 80,5 % del ancho y el 57,5 % del alto (92 % y 69 % en
->   móvil). Es `baldosaLogo`, que solo usan los dos índices de marcas (este y el de maquinaria nueva).
+> - **Logo dos veces un 15 % más grande (×1,3225) y la baldosa igual:** hasta el 92,6 % del ancho y el 66,1 % del
+>   alto. En móvil no cabía con el relleno de 12 px (habría ocupado el 105,8 % del contenido), así que el relleno de
+>   la baldosa baja a 4 px y el logo queda al 94,4 % y al 66,2 %, a 9 px del borde a 390. Es `baldosaLogo`, que solo
+>   usan los dos índices de marcas (este y el de maquinaria nueva).
+> - **Sin el hero grande** en los dos índices de marcas: ni la foto, ni la descripción, ni el icono del ratón. La
+>   cabecera es la caja oscura y baja de las baldosas, pegada a la cabecera del sitio. Lleva el `<h1>` de siempre
+>   (antetítulo «Maquinaria pesada nueva» o el título del global de repuestos, y «Marcas») en lugar de
+>   «Partequipos / Nuestras marcas» (`BaldosasMarcas` con `h1`). Título, descripción y canónica de la página, sin
+>   cambios.
 > - **El índice de marcas de maquinaria nueva ya no lleva la baldosa de «Aditamentos»** (`placasDeMarcasNueva`). No
 >   es una marca. Su página sigue publicada y la enlaza el megamenú. No hay casilla en el panel solo para el índice, y
 >   «Mostrar en la web» ocultaría también la página.

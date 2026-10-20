@@ -13,21 +13,53 @@ import estilos from "./marca.module.css";
  * su logo, el de todo el sitio (`LogoMarca`; dirección, 2026-10-20: sin fondo
  * de color). Sin logo, su nombre.
  * Detalle en docs/diseno/decisiones-repuestos-marca.md §8.
+ *
+ * Con `h1`, es la CABECERA DE LA PÁGINA (dirección, 2026-10-20: los índices de
+ * marcas sin el hero grande): la misma caja oscura y baja, pegada a la cabecera
+ * del sitio, con el `<h1>` de siempre de la página (antetítulo y título) en lugar
+ * de «Partequipos / Nuestras marcas».
  */
-export function BaldosasMarcas({ id, marcas }: { id: string; marcas: PlacaMarca[] }) {
-  if (marcas.length === 0) return null;
+export function BaldosasMarcas({
+  id,
+  marcas,
+  h1,
+}: {
+  id: string;
+  marcas: PlacaMarca[];
+  h1?: { antetitulo: string; titulo: string };
+}) {
+  if (marcas.length === 0 && !h1) return null;
   const idTitulo = `${id}-titulo`;
   return (
-    <section id={id} className={estilos.mostrarMarcas} aria-labelledby={idTitulo}>
+    <section
+      id={id}
+      className={`${estilos.mostrarMarcas} ${h1 ? estilos.mostrarMarcasPagina : ""}`}
+      aria-labelledby={idTitulo}
+    >
       <div className={estilos.mostrarMarcasCabecera}>
-        <p className={estilos.mostrarMarcasAntetitulo}>Partequipos</p>
-        <Revelado
-          como="h2"
-          id={idTitulo}
-          ritmo="titulo"
-          texto="Nuestras marcas"
-          className={estilos.mostrarMarcasTitulo}
-        />
+        {h1 ? (
+          <h1 id={idTitulo} className={estilos.mostrarMarcasH1}>
+            <span className={estilos.mostrarMarcasAntetitulo}>{h1.antetitulo}</span>{" "}
+            <Revelado
+              como="span"
+              alCargar
+              ritmo="titulo"
+              texto={h1.titulo}
+              className={estilos.mostrarMarcasTitulo}
+            />
+          </h1>
+        ) : (
+          <>
+            <p className={estilos.mostrarMarcasAntetitulo}>Partequipos</p>
+            <Revelado
+              como="h2"
+              id={idTitulo}
+              ritmo="titulo"
+              texto="Nuestras marcas"
+              className={estilos.mostrarMarcasTitulo}
+            />
+          </>
+        )}
       </div>
 
       <div className={estilos.mostrarMarcasRecuadro}>

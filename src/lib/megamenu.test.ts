@@ -7,6 +7,7 @@ import {
   construirMegamenu,
   logoDeMenu,
   panelMaquinaria,
+  panelLubricantes,
   panelRepuestos,
   type DatosMegamenu,
   type GrupoMenu,
@@ -281,6 +282,48 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
       categoriasTecnicas: [{ id: 4, nombre: "X", slug: "", icono: null, ordenMarca: null }],
     });
     assert.deepEqual(titulos(p.grupos), ["Repuestos por marca"]);
+  });
+});
+
+describe("megamenú: lubricantes (2026-10-20)", () => {
+  const conLubricantes: DatosMegamenu = {
+    ...DATOS,
+    marcasLubricante: [{ id: 1, nombre: "Eni", slug: "lubricantes-eni" }],
+    categoriasLubricante: [
+      { id: 4, nombre: "Motos & Scooter", slug: "motos-scooter", marca: 1 },
+      { id: 1, nombre: "Auto liviano", slug: "auto-liviano", marca: { id: 1 } },
+      {
+        id: 3,
+        nombre: "Engranajes",
+        slug: "engranajes",
+        marca: 1,
+        enlaceMenu: "/lubricantes/lubricantes-eni/engranajes/",
+      },
+      { id: 9, nombre: "De otra marca", slug: "otra", marca: 2 },
+    ],
+  };
+
+  it("«Ver todos» a la general y, por marca, su página y sus categorías a su ancla o a su enlace", () => {
+    const p = panelLubricantes(conLubricantes)!;
+    assert.deepEqual(p.verTodo, { etiqueta: "Ver todos los lubricantes", href: "/lubricantes/" });
+    assert.deepEqual(titulos(p.grupos), ["Lubricantes Eni"]);
+    assert.deepEqual(
+      p.grupos[0]!.enlaces.map((e) => [e.etiqueta, e.href]),
+      [
+        ["Ver todo Lubricantes Eni", "/lubricantes/lubricantes-eni/"],
+        ["Auto liviano", "/lubricantes/lubricantes-eni/#auto-liviano"],
+        ["Engranajes", "/lubricantes/lubricantes-eni/engranajes/"],
+        ["Motos & Scooter", "/lubricantes/lubricantes-eni/#motos-scooter"],
+      ],
+    );
+  });
+
+  it("abre con el enlace de la cabecera a la general o a la página de la marca; sin marcas, no hay panel", () => {
+    const m = construirMegamenu(conLubricantes);
+    assert.ok(m["/lubricantes/"]);
+    assert.ok(m["/lubricantes/lubricantes-eni/"]);
+    assert.equal(panelLubricantes(DATOS), null);
+    assert.equal(construirMegamenu(DATOS)["/lubricantes/"], undefined);
   });
 });
 

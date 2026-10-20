@@ -1,12 +1,14 @@
 import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
+import { validarEnlace } from "../lib/fields/reglasPortada";
 import { slugField } from "../lib/fields/slugField";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import {
   revalidarCategoriaLubricante,
   revalidarCategoriaLubricanteBorrada,
 } from "./hooks/lubricantesHooks";
+import { revalidarMegamenu } from "./hooks/megamenuHooks";
 
 /**
  * Categoría de aplicación de una marca de lubricantes:
@@ -20,6 +22,9 @@ import {
  * dirección): su ancla es su `slug` (`/lubricantes/lubricantes-eni/#auto-liviano`)
  * y su URL antigua lleva un 301 a esa ancla. Ya no tienen página propia.
  */
+// El desplegable «Lubricantes» del megamenú lista las categorías (2026-10-20).
+const megamenu = revalidarMegamenu("categorias-lubricante");
+
 export const CategoriaLubricante: CollectionConfig = {
   slug: "categorias-lubricante",
   labels: { singular: "Categoría de lubricante", plural: "Categorías de lubricante" },
@@ -35,8 +40,8 @@ export const CategoriaLubricante: CollectionConfig = {
     delete: borradoAdmin,
   },
   hooks: {
-    afterChange: [revalidarCategoriaLubricante],
-    afterDelete: [revalidarCategoriaLubricanteBorrada],
+    afterChange: [revalidarCategoriaLubricante, megamenu.afterChange],
+    afterDelete: [revalidarCategoriaLubricanteBorrada, megamenu.afterDelete],
   },
   // Unicidad por marca: dos marcas pueden tener una categoría "auto-liviano".
   indexes: [{ fields: ["marca", "slug"], unique: true }],
@@ -49,6 +54,16 @@ export const CategoriaLubricante: CollectionConfig = {
       relationTo: "marcas-lubricante",
       required: true,
       label: "Marca",
+    },
+    {
+      name: "enlaceMenu",
+      type: "text",
+      label: "Enlace en el menú",
+      validate: validarEnlace,
+      admin: {
+        description:
+          "Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su sección de la página de la marca (#su-direccion). Cámbialo cuando la categoría tenga página propia.",
+      },
     },
     {
       name: "entradilla",

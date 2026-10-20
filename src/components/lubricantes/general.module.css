@@ -1,0 +1,135 @@
+/*
+ * PÁGINA GENERAL DE LUBRICANTES (plantilla de Andrés 809451, 2026-10-20): el
+ * bloque a dos columnas bajo el encabezado. Valores del export: relleno lateral
+ * del 3 %, recuadro blanco de radio 30 y relleno del 3 %, dos columnas al 50 %
+ * (en tablet con 20 px entre ellas) y, en móvil, una sobre otra.
+ */
+.seccion {
+  padding: 1.5vw 3% 3%;
+}
+
+.recuadro {
+  display: flex;
+  box-sizing: border-box;
+  padding: 3%;
+  gap: 0;
+  border-radius: 30px;
+  background: var(--color-fondo);
+}
+
+.columnaFormulario {
+  flex: 0 0 50%;
+  min-width: 0;
+  margin: 0;
+}
+
+.columnaTexto {
+  display: flex;
+  flex: 0 0 50%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding-left: 3%;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* «Secundario» del kit: 45 / 35 px y 9vw, peso 500, interlineado 1,2. */
+.titulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: 45px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.parrafo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Logo a la izquierda (115 px de ancho, como el export) y el botón a la derecha. */
+.pie {
+  display: flex;
+  margin-top: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.logo {
+  width: 115px;
+  height: auto;
+}
+
+.boton {
+  display: inline-flex;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 0 25px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--color-marca);
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.boton:hover,
+.boton:focus-visible {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.boton svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 1024px) {
+  .recuadro {
+    gap: 20px;
+  }
+
+  .columnaFormulario,
+  .columnaTexto {
+    flex-basis: calc(50% - 10px);
+  }
+
+  .columnaTexto {
+    padding-left: 0;
+  }
+
+  .titulo {
+    font-size: 35px;
+  }
+}
+
+@media (max-width: 767px) {
+  .recuadro {
+    padding: 24px 16px;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .columnaFormulario,
+  .columnaTexto {
+    flex-basis: auto;
+  }
+
+  .titulo {
+    font-size: 9vw;
+  }
+}

@@ -32,7 +32,9 @@ export function cambiaElMenu(operacion: string, doc: Registro, anterior: Registr
     doc.logoOscuroEnMenu !== anterior.logoOscuroEnMenu ||
     // Las categorías técnicas: su icono y su orden también se pintan (2026-10-20).
     doc.icono !== anterior.icono ||
-    doc.ordenMarca !== anterior.ordenMarca
+    doc.ordenMarca !== anterior.ordenMarca ||
+    // Las categorías de lubricante: su enlace en el menú (2026-10-20).
+    doc.enlaceMenu !== anterior.enlaceMenu
   );
 }
 

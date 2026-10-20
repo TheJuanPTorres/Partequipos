@@ -8,6 +8,7 @@ import {
   revalidarMarcaLubricante,
   revalidarMarcaLubricanteBorrada,
 } from "./hooks/lubricantesHooks";
+import { revalidarMegamenu } from "./hooks/megamenuHooks";
 
 /**
  * Marca de lubricantes. Es la raíz de la sección: `/lubricantes/{slug}/`.
@@ -19,6 +20,9 @@ import {
  * Hoy solo existe Eni en el sitio, pero su propia página menciona **Dispel**
  * como segunda marca, de ahí que sea una colección y no un valor fijo.
  */
+// El desplegable «Lubricantes» del megamenú lleva cada marca (2026-10-20).
+const megamenu = revalidarMegamenu("marcas-lubricante");
+
 export const MarcaLubricante: CollectionConfig = {
   slug: "marcas-lubricante",
   labels: { singular: "Marca de lubricante", plural: "Marcas de lubricante" },
@@ -34,8 +38,8 @@ export const MarcaLubricante: CollectionConfig = {
     delete: borradoAdmin,
   },
   hooks: {
-    afterChange: [revalidarMarcaLubricante],
-    afterDelete: [revalidarMarcaLubricanteBorrada],
+    afterChange: [revalidarMarcaLubricante, megamenu.afterChange],
+    afterDelete: [revalidarMarcaLubricanteBorrada, megamenu.afterDelete],
   },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },

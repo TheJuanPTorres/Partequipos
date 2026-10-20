@@ -106,8 +106,8 @@ describe("buildSitemapEntries", () => {
     const e = buildSitemapEntries(datos, AHORA);
     // 1 portada + 3 índices de repuestos (principal, marcas y categorías)
     // + 4 índices de maquinaria + 1 índice de blog + 1 institucional
-    // + 1 marca + 1 tipo + 1 modelo
-    assert.equal(e.length, 13);
+    // + 1 marca + 1 tipo + 1 modelo + la página general de lubricantes (2026-10-20)
+    assert.equal(e.length, 14);
   });
 
   it("no anuncia una página que redirige con REDIRECTS_FIJOS (2026-10-17)", () => {
@@ -124,7 +124,7 @@ describe("buildSitemapEntries", () => {
     );
     // Las demás institucionales siguen.
     assert.ok(e.some((x) => new URL(x.url).pathname === "/nosotros/"));
-    assert.equal(e.length, 13);
+    assert.equal(e.length, 14);
   });
 
   it("lista la página de cada unidad usada disponible, bajo su categoría", () => {
@@ -226,9 +226,9 @@ describe("buildSitemapEntries", () => {
     );
 
     // Sin documento de portada no se lista `/`: quedan los 3 índices de
-    // repuestos, los 4 de maquinaria y el del blog, que son rutas estáticas y
-    // existen aunque no haya contenido.
-    assert.equal(e.length, 8);
+    // repuestos, los 4 de maquinaria, el del blog y la general de lubricantes,
+    // que son rutas estáticas y existen aunque no haya contenido.
+    assert.equal(e.length, 9);
     assert.equal(e[0]?.lastModified.getTime(), AHORA.getTime());
     for (const entrada of e) assert.match(entrada.url, /^https:\/\//);
   });
@@ -367,9 +367,9 @@ describe("lubricantes en el sitemap", () => {
     );
   });
 
-  it("NO emite un índice en /lubricantes/, que no existe en el sitio", () => {
+  it("emite la página general /lubricantes/ (2026-10-20)", () => {
     const urls = buildSitemapEntries(datosConLubricantes, AHORA).map((x) => x.url);
-    assert.equal(urls.includes("https://partequipos.com/lubricantes/"), false);
+    assert.equal(urls.includes("https://partequipos.com/lubricantes/"), true);
   });
 
   it("toma lastModified del updatedAt real", () => {

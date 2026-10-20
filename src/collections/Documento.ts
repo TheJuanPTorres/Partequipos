@@ -60,5 +60,21 @@ export const Documento: CollectionConfig = {
       label: "Nombre del documento",
       admin: { description: "Para el panel. Ej. «Ficha técnica Hitachi ZX130-7H»." },
     },
+    /*
+     * Las páginas del PDF como imágenes (2026-10-20), para el bloque «Documento
+     * en visor». Las genera `scripts/documentos/paginas-documento.ts` al
+     * importar el PDF: así el visor no carga pdf.js en el navegador.
+     */
+    {
+      name: "paginas",
+      type: "upload",
+      relationTo: "media",
+      hasMany: true,
+      label: "Páginas como imágenes",
+      admin: {
+        description:
+          "Una imagen por página, en orden, para el «Documento en visor». Las genera el script al importar el PDF; si cambias el PDF, hay que volver a generarlas. Vacío: el visor muestra solo el enlace de descarga.",
+      },
+    },
   ],
 };

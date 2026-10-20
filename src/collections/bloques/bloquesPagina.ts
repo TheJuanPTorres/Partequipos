@@ -3,6 +3,7 @@ import type { Block, Field } from "payload";
 import { validarAncla } from "../../lib/fields/ancla";
 import { validarEnlace } from "../../lib/fields/reglasPortada";
 import { validarYouTube } from "../../lib/fields/youtube";
+import { BloqueDocumentoVisor } from "./documentoVisor";
 
 /**
  * BLOQUES DE PÁGINA — los tipos reutilizables del campo `bloques` de
@@ -443,4 +444,5 @@ export const BLOQUES_PAGINA: Block[] = [
   BloqueVideoYoutube,
   BloqueFormularioContacto,
   BloqueProcesoPasos,
+  BloqueDocumentoVisor,
 ];

@@ -1,0 +1,331 @@
+/*
+ * VISOR TIPO LIBRO (2026-10-20). La caja del libro tiene SIEMPRE la proporción
+ * de lo que se ve: dos páginas (libro abierto) si el visor mide 640 px o más,
+ * una por debajo; es la misma regla con la que page-flip pasa a una página
+ * (`minWidth` 320 × 2). Portada y libro ocupan la misma caja: sin CLS.
+ */
+
+.visor {
+  container-type: inline-size;
+  max-width: 1120px;
+  margin-block: 1.5rem;
+  color: #171717;
+}
+
+.titulo {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #171717;
+}
+
+.escenario {
+  position: relative;
+  width: 100%;
+  aspect-ratio: calc(var(--proporcion) * 2);
+  overflow: hidden;
+  border-radius: 8px;
+  background: #ececec;
+  outline-offset: 3px;
+  touch-action: pan-y;
+}
+
+.escenario:focus-visible {
+  outline: 2px solid oklch(0.577 0.215 27.325);
+}
+
+.portada {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  cursor: pointer;
+}
+
+.portada img {
+  display: block;
+  width: 50%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+.hostLibro {
+  position: absolute;
+  inset: 0;
+}
+
+.libro {
+  width: 100%;
+}
+
+.hoja {
+  background: #fff;
+}
+
+.hoja img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Con zoom, el libro sigue montado detrás (conserva la página), sin verse. */
+.escenario[data-zoom] .hostLibro {
+  visibility: hidden;
+}
+
+.ampliada {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  background: #e2e2e2;
+  overscroll-behavior: contain;
+}
+
+.ampliadaPaginas {
+  display: flex;
+  width: 200%;
+}
+
+.ampliadaPaginas img {
+  display: block;
+  flex: 1 1 0;
+  min-width: 0;
+  height: auto;
+  background: #fff;
+}
+
+.controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.boton {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #c9c9c9;
+  border-radius: 999px;
+  background: #fff;
+  color: #171717;
+  cursor: pointer;
+  transition:
+    background-color 150ms,
+    border-color 150ms;
+}
+
+.boton:hover:not(:disabled) {
+  border-color: #171717;
+}
+
+.boton:focus-visible,
+.descargar:focus-visible,
+.miniatura:focus-visible {
+  outline: 2px solid oklch(0.577 0.215 27.325);
+  outline-offset: 2px;
+}
+
+.boton:disabled {
+  color: #9a9a9a;
+  cursor: default;
+}
+
+.boton[aria-pressed="true"],
+.boton[aria-expanded="true"] {
+  border-color: #171717;
+  background: #171717;
+  color: #fff;
+}
+
+.contador {
+  min-width: 4.5rem;
+  margin: 0;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.separador {
+  flex: 1 1 auto;
+}
+
+.descargar {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: oklch(0.577 0.215 27.325);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.descargar:hover {
+  background: #171717;
+}
+
+.tamano {
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.soloLectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.siUna {
+  display: none;
+}
+
+.miniaturas {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+  padding: 0 0 0.25rem;
+  overflow-x: auto;
+  list-style: none;
+}
+
+.miniaturas[hidden] {
+  display: none;
+}
+
+/* Sin el margen de las listas del texto enriquecido (`RichText`). */
+.miniaturas > li {
+  margin: 0;
+}
+
+.miniatura {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: none;
+  color: #171717;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.miniatura[aria-current="page"] {
+  border-color: oklch(0.577 0.215 27.325);
+}
+
+.miniatura img {
+  display: block;
+  width: 64px;
+  height: auto;
+  background: #fff;
+  box-shadow: 0 0 0 1px #d4d4d4;
+}
+
+/* Sin «Páginas como imágenes»: solo el enlace. */
+.soloEnlace {
+  margin-block: 1rem;
+}
+
+/* Una página: en móvil y en visores estrechos (deslizar para pasar). */
+@container (max-width: 639px) {
+  .escenario {
+    aspect-ratio: var(--proporcion);
+  }
+
+  .portada img {
+    width: 100%;
+  }
+
+  .portada .segunda {
+    display: none;
+  }
+
+  .ampliadaPaginas img + img {
+    display: none;
+  }
+
+  .siDobles {
+    display: none;
+  }
+
+  .siUna {
+    display: inline;
+  }
+
+  /* Los botones en una fila y «Descargar PDF» debajo, a todo el ancho. */
+  .controles {
+    gap: 0.5rem 0.25rem;
+  }
+
+  .descargar {
+    flex-basis: 100%;
+    justify-content: center;
+  }
+}
+
+/*
+ * Pantalla completa: fondo oscuro y el libro tan grande como quepa a lo alto,
+ * descontando título, controles y, si están abiertas, las miniaturas
+ * (`--reserva`). Sin encogerse en la columna: si no, recortaría la página.
+ */
+.visor[data-completa] {
+  --reserva: 9rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  padding: 1rem;
+  background: #1f1f1f;
+  color: #fff;
+}
+
+.visor[data-completa][data-miniaturas] {
+  --reserva: 16rem;
+}
+
+.visor[data-completa] .titulo,
+.visor[data-completa] .miniatura {
+  color: #fff;
+}
+
+.visor[data-completa] .escenario {
+  flex: none;
+  width: min(100%, calc((100dvh - var(--reserva)) * var(--proporcion) * 2));
+  margin-inline: auto;
+}
+
+.visor[data-completa] .miniaturas {
+  justify-content: center;
+}
+
+.visor[data-completa] .controles {
+  justify-content: center;
+}
+
+@container (max-width: 639px) {
+  .visor[data-completa] .escenario {
+    width: min(100%, calc((100dvh - var(--reserva) - 3rem) * var(--proporcion)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton {
+    transition: none;
+  }
+}

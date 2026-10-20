@@ -64,6 +64,18 @@ export type VistaPresentacionImagen = {
   textura?: ImagenBloque | null;
 };
 
+/**
+ * «Documento en visor» (2026-10-20): solo el id y el título; el componente pide
+ * el documento con sus páginas (`DocumentoVisor`).
+ */
+export type VistaDocumentoVisor = {
+  blockType: "documentoVisor";
+  id?: string | null;
+  ancla?: string | null;
+  documento: number;
+  titulo: string | null;
+};
+
 /** «Proceso paso a paso» (2026-10-19): pasos numerados con etiqueta y texto. */
 export type VistaProcesoPasos = {
   blockType: "procesoPasos";
@@ -172,7 +184,8 @@ export type VistaBloque =
   | VistaGaleria
   | VistaVideoYoutube
   | VistaFormularioContacto
-  | VistaProcesoPasos;
+  | VistaProcesoPasos
+  | VistaDocumentoVisor;
 
 /**
  * Formato de las cifras como en ux-9: separador de miles «,» (el que pone el

@@ -549,6 +549,10 @@ export interface Documento {
    * Para el panel. Ej. «Ficha técnica Hitachi ZX130-7H».
    */
   titulo: string;
+  /**
+   * Una imagen por página, en orden, para el «Documento en visor». Las genera el script al importar el PDF; si cambias el PDF, hay que volver a generarlas. Vacío: el visor muestra solo el enlace de descarga.
+   */
+  paginas?: (number | Media)[] | null;
   actualizadoPor?: (number | null) | User;
   createdAt: string;
   url?: string | null;
@@ -1213,6 +1217,7 @@ export interface Pagina {
         | BloqueVideoYoutube
         | BloqueFormularioContacto
         | BloqueProcesoPasos
+        | BloqueDocumentoVisor
       )[]
     | null;
   /**
@@ -1812,6 +1817,27 @@ export interface BloqueProcesoPasos {
   id?: string | null;
   blockName?: string | null;
   blockType: 'procesoPasos';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueDocumentoVisor".
+ */
+export interface BloqueDocumentoVisor {
+  /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#». Solo en los bloques de una página.
+   */
+  ancla?: string | null;
+  /**
+   * El PDF de «Documentos». Para verlo como libro tiene que tener sus «Páginas como imágenes»; sin ellas sale solo el enlace para descargarlo.
+   */
+  documento: number | Documento;
+  /**
+   * Opcional. Vacío: el nombre del documento.
+   */
+  titulo?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'documentoVisor';
 }
 /**
  * Tipos de letra propios para el título del hero (WOFF2, o WOFF/TTF/OTF; máximo 4 MB). Después se eligen en «Tipografía del título» de cada diapositiva. Comprueba que la licencia permite usarla en una web.
@@ -2697,6 +2723,7 @@ export interface PaginasSelect<T extends boolean = true> {
         videoYoutube?: T | BloqueVideoYoutubeSelect<T>;
         formularioContacto?: T | BloqueFormularioContactoSelect<T>;
         procesoPasos?: T | BloqueProcesoPasosSelect<T>;
+        documentoVisor?: T | BloqueDocumentoVisorSelect<T>;
       };
   hero?:
     | T
@@ -2987,6 +3014,17 @@ export interface BloqueProcesoPasosSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueDocumentoVisor_select".
+ */
+export interface BloqueDocumentoVisorSelect<T extends boolean = true> {
+  ancla?: T;
+  documento?: T;
+  titulo?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articulos_select".
  */
 export interface ArticulosSelect<T extends boolean = true> {
@@ -3114,6 +3152,7 @@ export interface MediaSelect<T extends boolean = true> {
 export interface DocumentosSelect<T extends boolean = true> {
   updatedAt?: T;
   titulo?: T;
+  paginas?: T;
   actualizadoPor?: T;
   createdAt?: T;
   url?: T;

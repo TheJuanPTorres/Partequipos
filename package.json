@@ -155,6 +155,7 @@
     "@tabler/icons-react": "^3.46.0",
     "lottie-web": "5.13.0",
     "next": "16.3.5",
+    "page-flip": "2.0.7",
     "payload": "3.89.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",

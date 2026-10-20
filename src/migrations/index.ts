@@ -68,6 +68,7 @@ import * as migration_20261020_061256_cabecera_politica_repuestos from './202610
 import * as migration_20261020_062304_servicio_tecnico_descripcion_youtube from './20261020_062304_servicio_tecnico_descripcion_youtube';
 import * as migration_20261020_064422_lubricantes_general from './20261020_064422_lubricantes_general';
 import * as migration_20261020_170728_marca_nueva_textos_linea from './20261020_170728_marca_nueva_textos_linea';
+import * as migration_20261020_183648_documento_visor from './20261020_183648_documento_visor';
 
 export const migrations = [
   {
@@ -418,6 +419,11 @@ export const migrations = [
   {
     up: migration_20261020_170728_marca_nueva_textos_linea.up,
     down: migration_20261020_170728_marca_nueva_textos_linea.down,
-    name: '20261020_170728_marca_nueva_textos_linea'
+    name: '20261020_170728_marca_nueva_textos_linea',
+  },
+  {
+    up: migration_20261020_183648_documento_visor.up,
+    down: migration_20261020_183648_documento_visor.down,
+    name: '20261020_183648_documento_visor'
   },
 ];

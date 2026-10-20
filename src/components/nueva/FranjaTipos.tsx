@@ -1,10 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { useId } from "react";
 
-import { BotonPausa } from "@/components/movimiento/BotonPausa";
-import { usePausa } from "@/components/movimiento/useMovimiento";
 import type { EnlaceDeTipo } from "@/lib/nueva/paginaMarcaAndres";
 
 import estilos from "./marcaNueva.module.css";
@@ -22,12 +17,10 @@ const COPIAS = 6;
  * (WCAG 2.2.2) sigue disponible.
  */
 export function FranjaTipos({ tipos }: { tipos: EnlaceDeTipo[] }) {
-  const { pausado, alternar } = usePausa();
-  const idPista = useId();
   if (tipos.length === 0) return null;
   return (
     <div className={estilos.franja}>
-      <div id={idPista} className={estilos.marquee} data-pausado={pausado ? "" : undefined}>
+      <div className={estilos.marquee}>
         <div className={estilos.pista}>
           {Array.from({ length: COPIAS }, (_, i) => (
             <ul
@@ -52,13 +45,6 @@ export function FranjaTipos({ tipos }: { tipos: EnlaceDeTipo[] }) {
           ))}
         </div>
       </div>
-      <BotonPausa
-        pausado={pausado}
-        alPulsar={alternar}
-        que="la franja de tipos de equipo"
-        controla={idPista}
-        className={estilos.pausa}
-      />
     </div>
   );
 }

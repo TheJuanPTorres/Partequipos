@@ -70,7 +70,10 @@ export type SeccionDeTipo = {
   /** Página del tipo, para «Ver todos». */
   href: string;
   total: number;
+  /** Las primeras (como mucho 6): las que se ven en la página. */
   tarjetas: TarjetaEquipo[];
+  /** Todos los equipos del tipo, para el panel de «Ver todos». Solo si `hayMas`. */
+  todas: TarjetaEquipo[];
   hayMas: boolean;
 };
 
@@ -109,21 +112,23 @@ export function seccionesDeTipos(
   return tipos.flatMap((tipo) => {
     const suyos = equipos.filter((e) => idDe(e.tipo) === tipo.id);
     if (suyos.length === 0) return [];
-    const tarjetas = suyos.slice(0, MAX_EQUIPOS_POR_TIPO).map((e) => ({
+    const todas = suyos.map((e) => ({
       id: e.id,
       nombre: e.nombre.trim(),
       href: `${rutas.equipoNuevo(marca.slug, tipo.slug, e.slug)}/`,
       foto: (e.imagenes ?? []).map((i) => imagenDeMedia(i, "")).find(Boolean) ?? null,
       datos: datosDeTarjeta(e.fichaTecnica),
     }));
+    const hayMas = todas.length > MAX_EQUIPOS_POR_TIPO;
     return [
       {
         clave: `tipo-${tipo.id}`,
         titulo: tipo.nombre.trim(),
         href: `${rutas.tipoMaquinaria(marca.slug, tipo.slug)}/`,
         total: suyos.length,
-        tarjetas,
-        hayMas: suyos.length > MAX_EQUIPOS_POR_TIPO,
+        tarjetas: todas.slice(0, MAX_EQUIPOS_POR_TIPO),
+        todas: hayMas ? todas : [],
+        hayMas,
       },
     ];
   });

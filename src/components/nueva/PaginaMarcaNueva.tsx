@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
@@ -28,6 +27,7 @@ import type { MarcasMaquinaria } from "@/payload-types";
 import { FranjaTipos } from "./FranjaTipos";
 import estilos from "./marcaNueva.module.css";
 import { TarjetaEquipo } from "./TarjetaEquipo";
+import { VerTodosEquipos } from "./VerTodosEquipos";
 
 const ANCLA_LINEA = "linea-de-equipos";
 const ANCLA_CONTACTO = "contacto-marca-nueva";
@@ -107,34 +107,40 @@ export async function PaginaMarcaNueva({ marca }: { marca: MarcasMaquinaria }) {
         {t.cierre ? <p className={estilos.cierre}>{t.cierre}</p> : null}
       </section>
 
-      {secciones.map((s, i) => (
-        <section key={s.clave} className={estilos.seccionTipo} aria-labelledby={`${s.clave}-t`}>
-          <Revelado
-            como="h2"
-            id={`${s.clave}-t`}
-            ritmo="titulo"
-            texto={s.titulo}
-            className={estilos.tituloTipo}
-          />
-          <ul className={estilos.rejilla}>
-            {s.tarjetas.map((e, j) => (
-              <TarjetaEquipo
-                key={e.id}
-                equipo={e}
-                anclaContacto={ANCLA_CONTACTO}
-                prioridad={i === 0 && j < 3}
-              />
-            ))}
-          </ul>
-          {s.hayMas ? (
-            <p className={estilos.verTodos}>
-              <Link href={s.href} className={estilos.botonFicha}>
-                Ver todos ({s.total})
-              </Link>
-            </p>
-          ) : null}
-        </section>
-      ))}
+      <div className={estilos.tipos}>
+        {secciones.map((s, i) => (
+          <section key={s.clave} className={estilos.seccionTipo} aria-labelledby={`${s.clave}-t`}>
+            <Revelado
+              como="h2"
+              id={`${s.clave}-t`}
+              ritmo="titulo"
+              texto={s.titulo}
+              className={estilos.tituloTipo}
+            />
+            <ul className={estilos.rejilla}>
+              {s.tarjetas.map((e, j) => (
+                <TarjetaEquipo
+                  key={e.id}
+                  equipo={e}
+                  anclaContacto={ANCLA_CONTACTO}
+                  prioridad={i === 0 && j < 3}
+                />
+              ))}
+            </ul>
+            {s.hayMas ? (
+              <p className={estilos.verTodos}>
+                <VerTodosEquipos
+                  titulo={s.titulo}
+                  href={s.href}
+                  total={s.total}
+                  equipos={s.todas}
+                  className={estilos.botonFicha}
+                />
+              </p>
+            ) : null}
+          </section>
+        ))}
+      </div>
 
       <ContactoMarca
         id={ANCLA_CONTACTO}

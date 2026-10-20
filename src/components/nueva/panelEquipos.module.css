@@ -1,0 +1,224 @@
+/*
+ * PANEL «VER TODOS» de la página de marca de nueva (cliente, 2026-10-20): una hoja que
+ * sube desde la parte inferior con el listado completo de los equipos de un tipo. Es un
+ * <dialog> nativo: cerrado no pinta nada. El color de la marca (`--acento`, que pone la
+ * página; sin color, un gris oscuro neutro) solo va en la barra: NUNCA debajo de texto,
+ * así que se lee igual con cualquier color.
+ */
+
+.panel {
+  /* Pegado abajo y centrado: la hoja sube desde el borde inferior. */
+  width: min(1320px, calc(100% - 32px));
+  max-width: none;
+  height: min(88dvh, 1000px);
+  /* Altura mínima generosa: con un solo equipo no queda bajita. */
+  min-height: min(70dvh, 640px);
+  margin: auto auto 0;
+  padding: 0;
+  border: 0;
+  border-radius: 28px 28px 0 0;
+  background: var(--color-fondo, #fff);
+  color: var(--color-texto, #1a1a1a);
+  box-shadow: 0 -18px 60px rgb(0 0 0 / 0.28);
+  overflow: hidden;
+}
+
+.panel[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel::backdrop {
+  background: rgb(10 10 12 / 0.55);
+}
+
+/* La página de detrás no se desplaza mientras el panel está abierto. */
+:global(html:has(dialog[data-panel-equipos][open])) {
+  overflow: hidden;
+}
+
+.hoja {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding: 0 36px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* La barra superior con el color de la marca: sin texto encima. */
+.barra {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  display: block;
+  height: 6px;
+  margin: 0 -36px;
+  flex: none;
+  background: var(--acento, var(--color-texto, #1a1a1a));
+}
+
+/* El asa: indica que la hoja se puede cerrar hacia abajo. */
+.asa {
+  display: block;
+  width: 52px;
+  height: 5px;
+  margin: 12px auto 0;
+  flex: none;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.18);
+}
+
+.cabecera {
+  position: sticky;
+  z-index: 1;
+  top: 6px;
+  display: flex;
+  margin: 0 -36px;
+  padding: 14px 36px 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid rgb(0 0 0 / 0.1);
+  background: var(--color-fondo, #fff);
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(22px, 2.2vw, 30px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cuenta {
+  color: var(--color-texto-suave, #56545a);
+  font-weight: 500;
+}
+
+.cerrar {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.06);
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.cerrar:hover {
+  background: rgb(0 0 0 / 0.12);
+}
+
+.cerrar:focus-visible,
+.enlaceEquipo:focus-visible {
+  outline: 3px solid var(--color-texto, #1a1a1a);
+  outline-offset: 3px;
+}
+
+.lista {
+  padding: 30px 0 48px;
+}
+
+/* El equipo entero es el enlace a su ficha. */
+.enlaceEquipo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 20px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.enlaceEquipo:hover > span {
+  color: var(--color-marca, #e5242d);
+}
+
+/* Móvil: a pantalla completa. */
+@media (max-width: 767px) {
+  .panel {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    border-radius: 0;
+  }
+
+  .hoja {
+    padding: 0 16px;
+  }
+
+  .barra,
+  .cabecera {
+    margin: 0 -16px;
+  }
+
+  .cabecera {
+    padding: 12px 16px 14px;
+  }
+
+  .lista {
+    padding-top: 22px;
+  }
+}
+
+/*
+ * EL BARRIDO: sube con una curva de desaceleración larga (easeOutExpo) y baja con una de
+ * aceleración más corta; el fondo se funde. Con «reducir movimiento», sin barrido: solo
+ * un fundido.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .panel[open] {
+    animation: sube 640ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .panel[open]::backdrop {
+    animation: funde 480ms ease-out;
+  }
+
+  .panel[open][data-cerrando] {
+    animation: baja 360ms cubic-bezier(0.55, 0, 0.8, 0.3) forwards;
+  }
+
+  .panel[open][data-cerrando]::backdrop {
+    animation: desvanece 360ms ease-in forwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel[open],
+  .panel[open]::backdrop {
+    animation: funde 220ms ease-out;
+  }
+}
+
+@keyframes sube {
+  from {
+    opacity: 0.6;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes baja {
+  to {
+    opacity: 0.6;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes funde {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes desvanece {
+  to {
+    opacity: 0;
+  }
+}

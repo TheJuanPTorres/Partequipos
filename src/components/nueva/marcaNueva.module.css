@@ -37,7 +37,11 @@
   animation: desplazar 90s linear infinite;
 }
 
-.marquee[data-pausado] .pista {
+/* Sin botón de pausa (WCAG 2.2.2): se detiene al pasar el ratón, al enfocar un enlace y al
+   tocarla; con «reducir movimiento» está quieta. */
+.marquee:hover .pista,
+.marquee:focus-within .pista,
+.marquee:active .pista {
   animation-play-state: paused;
 }
 
@@ -97,10 +101,6 @@ a.enlaceFranja:focus-visible {
   .pista {
     animation: none;
   }
-}
-
-.pausa {
-  margin-top: 4px;
 }
 
 .cierre {
@@ -186,15 +186,13 @@ a.enlaceFranja:focus-visible {
 
 /* --- La tarjeta de un equipo --- */
 
+/* Sin fondo, sombra ni borde: el equipo va directamente sobre el fondo de la página. */
 .tarjeta {
   display: flex;
   box-sizing: border-box;
-  padding: 20px;
+  padding: 0;
   flex-direction: column;
   gap: 16px;
-  border-radius: 30px;
-  background: var(--color-fondo);
-  box-shadow: 5px 5px 10px rgb(0 0 0 / 23%);
 }
 
 .foto {
@@ -293,6 +291,11 @@ a.enlaceFranja:focus-visible {
 .botonCotizar:focus-visible {
   outline: 3px solid var(--color-texto);
   outline-offset: 3px;
+}
+
+/* Aire antes del formulario de contacto: no pegado a la última tarjeta. */
+.tipos {
+  padding-bottom: 100px;
 }
 
 .verTodos {

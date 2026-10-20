@@ -61,8 +61,10 @@ describe("seccionesDeTipos", () => {
     assert.equal(s!.tarjetas.length, MAX_EQUIPOS_POR_TIPO);
     assert.equal(s!.hayMas, true);
     assert.equal(s!.total, MAX_EQUIPOS_POR_TIPO + 2);
+    assert.equal(s!.todas.length, MAX_EQUIPOS_POR_TIPO + 2);
     const [t] = seccionesDeTipos(marca, [tipo(1, "A")], muchos.slice(0, MAX_EQUIPOS_POR_TIPO));
     assert.equal(t!.hayMas, false);
+    assert.equal(t!.todas.length, 0);
   });
 
   it("los datos destacados de la ficha, como mucho 4", () => {

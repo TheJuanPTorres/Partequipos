@@ -162,26 +162,37 @@ export default async function HomePage() {
       />
 
       {/* Secciones 6, 7 y 8 de ux-9 (fase F). Sin vídeo, la tarjeta va en oscuro. */}
-      <SeccionCompania
-        video={videoCompania}
-        imagen={imagenCompania}
-        youtube={videoDeYouTube(compania?.youtube)}
-        textos={{
-          titulo: tx(compania?.titulo),
-          texto: tx(compania?.texto),
-          marquesina: tx(compania?.marquesina),
-          marquesinaEnlace: tx(compania?.marquesinaEnlace),
-        }}
-      />
-      <SeccionCatalogo
-        whatsapp={enlaceWhatsApp(empresa.whatsapp)}
-        textos={{
-          titulo: tx(catalogo?.titulo),
-          catalogoTexto: tx(catalogo?.catalogoTexto),
-          catalogoEnlace: tx(catalogo?.catalogoEnlace),
-          whatsappTexto: tx(catalogo?.whatsappTexto),
-        }}
-      />
+      {/*
+       * Contenedor sin estilos, a propósito (2026-10-20): es el bloque contenedor
+       * del `sticky` de la llamada (sección 8, `catalogo.module.css`). Con el
+       * `<main>` como contenedor, la llamada podía pegarse al pie de la ventana
+       * en CUALQUIER punto de la portada, y si su estado se quedaba en «visible»
+       * (un salto de scroll hacia arriba sin cruzar «Nuestra Compañía», que el
+       * IntersectionObserver no ve) su título se pintaba encima de «Maquinaria
+       * pesada usada». Aquí dentro solo se pega mientras dura su propio recorrido.
+       */}
+      <div>
+        <SeccionCompania
+          video={videoCompania}
+          imagen={imagenCompania}
+          youtube={videoDeYouTube(compania?.youtube)}
+          textos={{
+            titulo: tx(compania?.titulo),
+            texto: tx(compania?.texto),
+            marquesina: tx(compania?.marquesina),
+            marquesinaEnlace: tx(compania?.marquesinaEnlace),
+          }}
+        />
+        <SeccionCatalogo
+          whatsapp={enlaceWhatsApp(empresa.whatsapp)}
+          textos={{
+            titulo: tx(catalogo?.titulo),
+            catalogoTexto: tx(catalogo?.catalogoTexto),
+            catalogoEnlace: tx(catalogo?.catalogoEnlace),
+            whatsappTexto: tx(catalogo?.whatsappTexto),
+          }}
+        />
+      </div>
 
       {/* Sección 9 de ux-9 (fase G). Globo solo con token de Mapbox; sin él, la lista. */}
       <SeccionSedes

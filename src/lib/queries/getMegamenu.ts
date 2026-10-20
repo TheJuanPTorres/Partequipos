@@ -14,7 +14,8 @@ import { DE_MARCA_VISIBLE, MARCA_VISIBLE } from "@/lib/nueva/visibilidad";
  * marcas y categorías de lubricante) —solo
  * nombre, slug y marca, `depth: 0`— porque la cabecera va en todas las
  * páginas y esto se ejecuta en cada una al construir el sitio (CLAUDE.md
- * §10.10). Las dos de MARCAS llevan además el logo con `depth: 1`, pero de
+ * §10.10). Las dos de MARCAS llevan además el logo con `depth: 1` (y las categorías
+ * técnicas, su foto), pero de
  * la imagen solo url, ancho y alto (`populate`).
  *
  * En la caché de datos del MARCO (`datos:marco`, `src/lib/cacheDatos.ts`): sin
@@ -85,11 +86,12 @@ const megamenuEnCache = unstable_cache(
         where: { disponible: { equals: true } },
         select: { categoria: true },
       }),
-      // «Repuestos por categoría técnica» (2026-10-20): nombre, dirección, icono y orden.
+      // «Repuestos por categoría técnica» (2026-10-20): nombre, dirección, orden y la
+      // foto de la tarjeta (de la imagen, solo url y medidas, como los logos).
       payload.find({
         collection: "categorias-tecnicas",
-        ...base,
-        select: { nombre: true, slug: true, icono: true, ordenMarca: true },
+        ...marcas,
+        select: { nombre: true, slug: true, ordenMarca: true, imagen: true },
       }),
       // «Política de garantías y repuestos», editable en el global de la cabecera.
       payload.findGlobal({ slug: "cabecera", depth: 0, select: { politicaRepuestos: true } }),

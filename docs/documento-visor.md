@@ -19,7 +19,7 @@ aprobada.
 | Convertir un PDF en imágenes                         | `scripts/documentos/rasterizar-pdf.mjs`            |
 | Subir las páginas, poner visores, retirar            | `scripts/documentos/visor.ts`                      |
 
-Migración `20261020_070957_documento_visor`, solo esquema
+Migración `20261020_183648_documento_visor`, solo esquema
 (`paginas_blocks_documento_visor` y `documentos_rels`). El bloque dentro del
 texto no necesita tablas: va en el JSON de Lexical.
 

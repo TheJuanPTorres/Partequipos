@@ -34,12 +34,16 @@ export type EnlaceMenu = {
   href: string;
   /** Marca discreta tras la etiqueta (las categorías de usados sin unidades, 2026-10-18). */
   nota?: string;
-  /** El icono de la categoría técnica, en lugar de la marca de verificación (2026-10-20). */
-  icono?: IconoMenu;
 };
 
-/** Los iconos de las categorías técnicas (`ICONOS_CATEGORIA`, los mismos de la portada). */
-export type IconoMenu = NonNullable<CategoriasTecnica["icono"]>;
+/**
+ * Una TARJETA con foto del menú (las categorías técnicas, 2026-10-20): su
+ * nombre, su página y la «Imagen de la tarjeta» de la categoría, si la tiene.
+ */
+export type TarjetaMenu = { etiqueta: string; href: string; imagen?: ImagenMenu };
+
+/** Una foto del menú: url y medidas reales (el tamaño lo pide `next/image`). */
+export type ImagenMenu = { url: string; width: number; height: number };
 
 /**
  * El logo de una marca, ya a la medida con la que se pinta (alto fijo).
@@ -59,6 +63,8 @@ export type GrupoMenu = {
   enlaces: EnlaceMenu[];
   grupos: GrupoMenu[];
   logo?: LogoMenu;
+  /** Tarjetas con foto bajo los enlaces (las categorías técnicas de Repuestos). */
+  tarjetas?: TarjetaMenu[];
 };
 
 /**
@@ -67,11 +73,19 @@ export type GrupoMenu = {
  */
 export type PanelMenu = { verTodo: EnlaceMenu; grupos: GrupoMenu[]; finales?: EnlaceMenu[] };
 
-/** Lo que el menú necesita de una categoría técnica. */
+/** ¿Lleva el panel tarjetas? Entonces el de escritorio es más ancho (5 por fila). */
+export function panelConTarjetas(panel: PanelMenu): boolean {
+  const tiene = (g: GrupoMenu): boolean => (g.tarjetas?.length ?? 0) > 0 || g.grupos.some(tiene);
+  return panel.grupos.some(tiene);
+}
+
+/** Lo que el menú necesita de una categoría técnica (la foto, `depth: 1`: url y medidas). */
 export type CategoriaTecnicaMenu = Pick<
   CategoriasTecnica,
-  "id" | "nombre" | "slug" | "icono" | "ordenMarca"
->;
+  "id" | "nombre" | "slug" | "ordenMarca"
+> & {
+  imagen?: number | LogoCatalogo | null;
+};
 
 /** La entrada editable de la política de garantías (global `cabecera`). */
 export type PoliticaMenu = {
@@ -291,29 +305,38 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
   };
 }
 
+/** La foto de una tarjeta del menú: sin url o sin medidas, ninguna (la tarjeta va sin foto). */
+export function imagenDeMenu(imagen: CategoriaTecnicaMenu["imagen"]): ImagenMenu | undefined {
+  if (!imagen || typeof imagen !== "object") return undefined;
+  const { url, width, height } = imagen;
+  return url && width && height ? { url, width, height } : undefined;
+}
+
 /**
- * «Repuestos por categoría técnica»: «Ver todas» al índice y una por categoría, en
- * el orden de las páginas de repuestos (`categoriasDeMarca`: «Orden en las
- * páginas de marca» y después por nombre), con su icono. Sin página (sin
- * dirección), no sale: el menú no lleva enlaces rotos. Sin ninguna, el apartado
- * no se pinta.
+ * «Repuestos por categoría técnica» (dirección, 2026-10-20): «Ver todas las
+ * categorías» al índice y una TARJETA CON FOTO por categoría (su «Imagen de la
+ * tarjeta», la de las tarjetas de categorías del sitio), en el orden de las
+ * páginas de repuestos (`categoriasDeMarca`: «Orden en las páginas de marca» y
+ * después por nombre). Sin página (sin dirección), no sale: el menú no lleva
+ * enlaces rotos. Sin ninguna, el apartado no se pinta.
  */
 export function grupoCategoriasTecnicas(
   categorias: ReadonlyArray<CategoriaTecnicaMenu>,
 ): GrupoMenu | null {
-  const conPagina = categoriasDeMarca([...categorias] as CategoriasTecnica[]).flatMap((c) =>
-    c.href
-      ? [{ etiqueta: c.nombre, href: conBarra(c.href), ...(c.icono ? { icono: c.icono } : {}) }]
-      : [],
-  );
-  if (conPagina.length === 0) return null;
+  const porId = new Map(categorias.map((c) => [c.id, c]));
+  const tarjetas = categoriasDeMarca([...categorias] as CategoriasTecnica[]).flatMap((c) => {
+    if (!c.href) return [];
+    const imagen = imagenDeMenu(porId.get(c.id)?.imagen);
+    return [{ etiqueta: c.nombre, href: conBarra(c.href), ...(imagen ? { imagen } : {}) }];
+  });
+  if (tarjetas.length === 0) return null;
   return {
     titulo: "Repuestos por categoría técnica",
     enlaces: [
       { etiqueta: "Ver todas las categorías", href: conBarra(rutas.categoriasRepuestos()) },
-      ...conPagina,
     ],
     grupos: [],
+    tarjetas,
   };
 }
 

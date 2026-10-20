@@ -3487,6 +3487,18 @@
           "notNull": false,
           "default": "'Solicita asesoría'"
         },
+        "plantilla_linea_intro": {
+          "name": "plantilla_linea_intro",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "plantilla_linea_cierre": {
+          "name": "plantilla_linea_cierre",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "seo_meta_title": {
           "name": "seo_meta_title",
           "type": "varchar",
@@ -15267,6 +15279,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "421da96b-1f91-46a0-bcb9-734324962103",
+  "id": "ab0d1f10-8ecd-411e-9017-fb6c323e844b",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

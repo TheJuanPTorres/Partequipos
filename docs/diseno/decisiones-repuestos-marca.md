@@ -100,6 +100,29 @@ visual** que marca y tipo. **Provisional**: se reemplaza cuando llegue la planti
 - Los textos «Marcas con las que trabajamos» y «Repuestos por marca» se componen en el código (no hay campo de panel):
   una razón más de que sea provisional.
 
+## 8. Índice de marcas con «Mostrar marcas» de Andrés (2026-10-20, dirección)
+
+Plantilla 4017 (`Desktop\partequipos-diseno\wordpress\indice-marcas-repuestos\elementor-4017-2026-10-20.json`).
+**Solo cambia la parte de las marcas** de `…/repuestos-maquinaria-pesada-marcas/` (`BaldosasMarcas`); el encabezado,
+el contacto y los testimonios se quedan como estaban. Las placas oscuras siguen en el índice de categorías y en cada categoría técnica.
+
+- **Encabezado del bloque** como el export: «Partequipos» (M BOLD, 20/20/18 px) y «Nuestras marcas» como `<h2>`
+  revelado por palabras (Principal, 55/40 px y 10vw), en blanco, en una caja de radio 30, relleno 50 y 35vh de alto.
+- **Recuadro blanco** de radio 30 y relleno 50 con una **baldosa cuadrada** por marca (radio 20, relleno 20): 4 por
+  fila, 2 en tablet y en móvil, y la última fila incompleta **centrada** (flex con el ancho exacto de una columna,
+  como el #274). El logo encoge al pasar el ratón («shrink» de Elementor), salvo con «reducir movimiento».
+- **El cuadrado del #271:** la baldosa toma el «Color de la marca» y el logo va en blanco, o en negro si el color es
+  muy claro (`logoBlancoSobre`). Sin color, el de las páginas de marca sin color (`--marca-amarillo`: el gris neutro del #279 de D, nunca amarillo) con el logo en negro; sin logo, su nombre en la
+  tinta que mejor se lea (`tintaSobre`). Mismas marcas que antes (`placasDeMarcas`: con nombre y dirección).
+- **Sin franja amarilla** (dirección): ni el `#F2BC2E` del export tras los recuadros ni la mitad inferior de la del
+  encabezado de la página. Es un índice general, no el de una marca.
+
+**Desviaciones, para Andrés:**
+
+- La caja del encabezado lleva en el export una foto del kit (`3425625-1-scaled.jpg`) con gris `#919191` en
+  «multiply». **Licencia sin confirmar (L3):** sin ella, el tono oscuro de los encabezados sin foto (`#1f1d1b`).
+- El export usa una fila sin salto con cuatro marcas; con las 13 reales, la fila salta y la última se centra.
+
 ## 5. Pendiente
 
 - ~~Imágenes reales de fondo (por marca) y de cada tipo~~ **HECHO el 2026-10-14 (agente C):** la imagen de cada tipo es la

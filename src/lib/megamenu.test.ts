@@ -29,6 +29,9 @@ const DATOS: DatosMegamenu = {
   categoriasUsada: [
     { id: 30, nombre: "Motoniveladoras", slug: "motoniveladoras" },
     { id: 31, nombre: "Bulldozers", slug: "bulldozer" },
+    // Primer nivel (casilla «Agrupar en «Otros»» desmarcada), por su orden.
+    { id: 33, nombre: "Aditamentos", slug: "aditamentos", enOtros: false, orden: 2 },
+    { id: 32, nombre: "Excavadoras", slug: "excavadoras", enOtros: false, orden: 1 },
   ],
   marcasRepuestos: [
     { id: 40, nombre: "Caterpillar", slug: "repuestos-para-maquinaria-pesada-caterpillar" },
@@ -87,27 +90,41 @@ describe("megamenú: maquinaria", () => {
     ]);
   });
 
-  it("usada: sin marcas, solo sus tipos", () => {
+  it("usada: como en WordPress, las de primer nivel por su orden y «Otros» al final", () => {
     const usada = panel.grupos[1]!;
     assert.equal(usada.grupos.length, 0);
     assert.deepEqual(
-      usada.enlaces.map((e) => e.etiqueta),
-      ["Ver toda la maquinaria usada", "Bulldozers", "Motoniveladoras"],
+      usada.enlaces.map((e) => [e.etiqueta, e.href]),
+      [
+        ["Ver toda la maquinaria usada", "/maquinaria-pesada/maquinaria-pesada-usada/"],
+        ["Excavadoras", "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/"],
+        ["Aditamentos", "/maquinaria-pesada/maquinaria-pesada-usada/aditamentos/"],
+        ["Otros", "/maquinaria-pesada/maquinaria-pesada-usada/otros/"],
+      ],
     );
   });
 
-  it("usada: todas las categorías; las que no tienen unidades, con su nota", () => {
-    const usada = panelMaquinaria({ ...DATOS, equiposUsados: [{ categoria: 31 }] }).grupos[1]!;
-    assert.deepEqual(
-      usada.enlaces.map((e) => [e.etiqueta, e.nota ?? null]),
-      [
-        ["Ver toda la maquinaria usada", null],
-        ["Bulldozers", null],
-        ["Motoniveladoras", "Sin unidades por ahora"],
-      ],
-    );
+  it("usada: sin unidades, la nota; «Otros» la lleva solo si ninguna agrupada tiene", () => {
+    const notas = (equiposUsados: { categoria: number }[]) =>
+      panelMaquinaria({ ...DATOS, equiposUsados }).grupos[1]!.enlaces.map((e) => [
+        e.etiqueta,
+        e.nota ?? null,
+      ]);
+    assert.deepEqual(notas([{ categoria: 31 }]), [
+      ["Ver toda la maquinaria usada", null],
+      ["Excavadoras", "Sin unidades por ahora"],
+      ["Aditamentos", "Sin unidades por ahora"],
+      ["Otros", null],
+    ]);
+    assert.deepEqual(notas([{ categoria: 32 }]).at(-1), ["Otros", "Sin unidades por ahora"]);
     // Sin el dato de las unidades, ninguna nota.
     assert.ok(panel.grupos[1]!.enlaces.every((e) => !e.nota));
+  });
+
+  it("usada: sin categorías agrupadas no hay «Otros»", () => {
+    const soloPrimerNivel = DATOS.categoriasUsada.filter((c) => c.enOtros === false);
+    const usada = panelMaquinaria({ ...DATOS, categoriasUsada: soloPrimerNivel }).grupos[1]!;
+    assert.ok(usada.enlaces.every((e) => e.etiqueta !== "Otros"));
   });
 
   it("aditamentos: la «marca» del sitio, con sus tipos", () => {

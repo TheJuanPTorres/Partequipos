@@ -39,6 +39,8 @@ export const SEGMENTO_MAQUINARIA = "maquinaria-pesada";
 export const SEGMENTO_NUEVA = "maquinaria-pesada-nueva";
 export const SEGMENTO_USADA = "maquinaria-pesada-usada";
 export const SEGMENTO_MARCAS_MAQUINARIA = "marcas";
+/** La página «Otros» de usados (cliente, 2026-10-19): agrupa las categorías que no van en el primer nivel. */
+export const SEGMENTO_OTROS_USADA = "otros";
 
 /**
  * Lubricantes.
@@ -81,6 +83,8 @@ export const rutas = {
   usada: () => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}`,
   categoriaNueva: (slug: string) => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${slug}`,
   categoriaUsada: (slug: string) => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${slug}`,
+  /** «Otros» de usados: las categorías agrupadas (`otros` está reservada en las categorías). */
+  usadaOtros: () => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${SEGMENTO_OTROS_USADA}`,
   /** Página n del listado de maquinaria nueva («Categoría secundaria»); la 1 es el índice. */
   nuevaPagina: (pagina: number) =>
     pagina <= 1

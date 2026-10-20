@@ -65,7 +65,7 @@ describe("vistaPorQue", () => {
       ["Calidad"],
     );
     assert.equal(v.boton, "Solicita asesoría");
-    assert.equal(v.imagen.url, "/f.jpg");
+    assert.equal(v.imagen?.url, "/f.jpg");
   });
 
   it("sin foto, la sección no se pinta (hasta que el cliente mande una)", () => {

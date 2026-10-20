@@ -363,6 +363,30 @@ export interface MarcasMaquinaria {
    */
   ordenPortada?: number | null;
   /**
+   * «Plantilla 1»: una tarjeta por tipo, como las demás marcas. «Aditamentos»: la plantilla de Andrés de la marca de aditamentos, con un bloque por tipo y sus productos, el contacto, la franja de servicios, «Nuestro compromiso» y las sedes.
+   */
+  disenoPagina?: ('plantilla1' | 'aditamentos') | null;
+  /**
+   * Solo se usan con el diseño «Aditamentos». Vacío, el texto de siempre.
+   */
+  plantillaAditamentos?: {
+    antetitulo?: string | null;
+    /**
+     * El título principal (h1) de la página.
+     */
+    titulo?: string | null;
+    franja1?: string | null;
+    franja2?: string | null;
+    franja3?: string | null;
+    compromisoTitulo?: string | null;
+    compromisoEntradilla?: string | null;
+    compromisoTexto?: string | null;
+    /**
+     * El botón abre el formulario de contacto.
+     */
+    compromisoBoton?: string | null;
+  };
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -2443,6 +2467,20 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
   logoOscuroEnMenu?: T;
   imagenTarjeta?: T;
   ordenPortada?: T;
+  disenoPagina?: T;
+  plantillaAditamentos?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        franja1?: T;
+        franja2?: T;
+        franja3?: T;
+        compromisoTitulo?: T;
+        compromisoEntradilla?: T;
+        compromisoTexto?: T;
+        compromisoBoton?: T;
+      };
   seo?:
     | T
     | {

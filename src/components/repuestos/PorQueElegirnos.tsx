@@ -12,7 +12,8 @@ import estilos from "./plantillaTipo.module.css";
  * frase de cierre y el botón «Solicita asesoría», que baja al formulario de contacto.
  *
  * Componente de SERVIDOR. Los textos y la foto salen del global de repuestos (editables); sin
- * título ni sin foto no se pinta (dirección, 2026-10-19). En móvil, la foto va
+ * título ni sin foto no se pinta (dirección, 2026-10-19). La página de aditamentos (2026-10-20)
+ * lo usa para «Nuestro compromiso…»: sin foto, solo su imagen no se pinta y el texto ocupa la tarjeta. En móvil, la foto va
  * arriba como una banda y el texto debajo.
  */
 export function PorQueElegirnos({
@@ -32,19 +33,31 @@ export function PorQueElegirnos({
   return (
     <section id={id} className={estilos.porQue} aria-labelledby={idTitulo}>
       <div className={estilos.porQueTarjeta}>
-        <div className={estilos.porQueFoto}>
-          <Image
-            src={vista.imagen.url}
-            alt=""
-            fill
-            sizes="(max-width: 767px) 100vw, 40vw"
-            className={estilos.porQueFotoImg}
-          />
-        </div>
-        <div className={estilos.porQueTexto}>
+        {vista.imagen ? (
+          <div className={estilos.porQueFoto}>
+            <Image
+              src={vista.imagen.url}
+              alt=""
+              fill
+              sizes="(max-width: 767px) 100vw, 40vw"
+              className={estilos.porQueFotoImg}
+            />
+          </div>
+        ) : null}
+        <div className={`${estilos.porQueTexto} ${vista.imagen ? "" : estilos.porQueTextoSolo}`}>
           <h2 id={idTitulo} className={estilos.porQueTitulo}>
             {vista.titulo}
           </h2>
+          {vista.entradilla || vista.texto ? (
+            <div className={estilos.porQueCierre}>
+              {vista.entradilla ? (
+                <p className={estilos.porQueEntradilla}>
+                  <strong>{vista.entradilla}</strong>
+                </p>
+              ) : null}
+              {vista.texto ? <p>{vista.texto}</p> : null}
+            </div>
+          ) : null}
           {vista.puntos.length > 0 ? (
             <ul className={estilos.porQuePuntos}>
               {vista.puntos.map((p) => (

@@ -128,7 +128,7 @@ export async function PaginaMarcaNueva({ marca }: { marca: MarcasMaquinaria }) {
               ))}
             </ul>
             {s.hayMas ? (
-              <p className={estilos.verTodos}>
+              <div className={estilos.verTodos}>
                 <VerTodosEquipos
                   titulo={s.titulo}
                   href={s.href}
@@ -136,7 +136,7 @@ export async function PaginaMarcaNueva({ marca }: { marca: MarcasMaquinaria }) {
                   equipos={s.todas}
                   className={estilos.botonFicha}
                 />
-              </p>
+              </div>
             ) : null}
           </section>
         ))}

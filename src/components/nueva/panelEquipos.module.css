@@ -21,6 +21,8 @@
   border-radius: 28px 28px 0 0;
   background: var(--color-fondo, #fff);
   color: var(--color-texto, #1a1a1a);
+  /* El panel cuelga del botón, que va centrado: el texto del listado, a la izquierda. */
+  text-align: left;
   box-shadow: 0 -18px 60px rgb(0 0 0 / 0.28);
   overflow: hidden;
 }

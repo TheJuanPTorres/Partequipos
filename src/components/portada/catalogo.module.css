@@ -122,6 +122,9 @@
  * recibe foco ni clics) hasta que el vídeo encogido deja libre el sitio del
  * título; entonces el título entra con un fundido y 12 px de desplazamiento, y
  * los botones detrás, a 0,15 y 0,3 s. Solo `opacity` y `transform`: sin CLS.
+ * El bloque contenedor del `sticky` es el `<div>` que envuelve las secciones 6–8
+ * en `page.tsx` (2026-10-20), no el `<main>`: así no se pega al pie de la ventana
+ * fuera de su recorrido, encima de las secciones de arriba.
  */
 :global([data-llamada]) + .seccion {
   position: sticky;

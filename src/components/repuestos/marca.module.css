@@ -1450,10 +1450,15 @@ a.modelo:hover {
 }
 
 .baldosaLogo {
-  /* Centrado y con aire: el 70 % del ancho como mucho, y nunca más de la mitad del alto. */
-  width: 70%;
+  /*
+   * Centrado y con aire. Un 15 % más grande que al principio (dirección,
+   * 2026-10-20), con la baldosa del mismo tamaño: el 80,5 % del ancho como mucho
+   * (antes 70) y el 57,5 % del alto (antes 50). Solo lo usan los dos índices de
+   * marcas (`BaldosasMarcas`).
+   */
+  width: 80.5%;
   height: auto;
-  max-height: 50%;
+  max-height: 57.5%;
 }
 
 /* «shrink» de Elementor en el logo, solo si no se pide reducir el movimiento. */
@@ -1500,9 +1505,10 @@ a.modelo:hover {
     padding: 12px;
   }
 
+  /* El 15 % más de dirección (2026-10-20) también aquí: antes 80 % y 60 %. */
   .baldosaLogo {
-    width: 80%;
-    max-height: 60%;
+    width: 92%;
+    max-height: 69%;
   }
 
   .mostrarMarcasTitulo {

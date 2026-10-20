@@ -30,7 +30,7 @@ const ANCLA = "marcas-maquinaria";
 /**
  * ÍNDICE DE MARCAS DE MAQUINARIA NUEVA: el «Mostrar marcas» de Andrés (plantilla
  * 4017), el mismo componente que el índice de marcas de repuestos
- * (`BaldosasMarcas`), con las marcas que tienen equipos y Aditamentos al final.
+ * (`BaldosasMarcas`), con las marcas que tienen equipos; sin «Aditamentos» (dirección, 2026-10-20).
  * Sin franja de color: es un índice general.
  */
 export default async function MarcasMaquinariaPage() {

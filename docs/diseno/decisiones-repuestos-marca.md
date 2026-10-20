@@ -104,6 +104,14 @@ visual** que marca y tipo. **Provisional**: se reemplaza cuando llegue la planti
 
 > **CAMBIADO el mismo día (dirección):** las baldosas son BLANCAS con el logo de la marca, el de todo el sitio
 > (`LogoMarca`, `docs/diseno/logo-marca.md`); ya no van del color de la marca.
+>
+> **CAMBIADO otra vez el mismo día (dirección):**
+>
+> - **Logo un 15 % más grande y la baldosa igual:** hasta el 80,5 % del ancho y el 57,5 % del alto (92 % y 69 % en
+>   móvil). Es `baldosaLogo`, que solo usan los dos índices de marcas (este y el de maquinaria nueva).
+> - **El índice de marcas de maquinaria nueva ya no lleva la baldosa de «Aditamentos»** (`placasDeMarcasNueva`). No
+>   es una marca. Su página sigue publicada y la enlaza el megamenú. No hay casilla en el panel solo para el índice, y
+>   «Mostrar en la web» ocultaría también la página.
 
 Plantilla 4017 (`Desktop\partequipos-diseno\wordpress\indice-marcas-repuestos\elementor-4017-2026-10-20.json`).
 **Solo cambia la parte de las marcas** de `…/repuestos-maquinaria-pesada-marcas/` (`BaldosasMarcas`); el encabezado,

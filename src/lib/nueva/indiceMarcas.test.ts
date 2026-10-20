@@ -18,16 +18,15 @@ describe("placasDeMarcasNueva", () => {
   ];
   const equipos = [{ marca: 1 }, { marca: marca(2, "aditamentos") }, { marca: 3 }, { marca: 5 }];
 
-  it("solo las marcas con equipos, por nombre y con Aditamentos al final", () => {
+  it("solo las marcas con equipos, por nombre", () => {
     assert.deepEqual(
       placasDeMarcasNueva(marcas, equipos, new Map()).map((p) => p.nombre),
-      ["Case", "Hitachi", "Yanmar", "Aditamentos"],
+      ["Case", "Hitachi", "Yanmar"],
     );
   });
 
-  it("Aditamentos va con su nombre (sin logo), aunque tenga uno propio", () => {
-    const a = placasDeMarcasNueva(marcas, equipos, new Map()).at(-1)!;
-    assert.equal(a.logo, null);
-    assert.match(a.href, /aditamentos\/$/);
+  it("sin «Aditamentos», aunque tenga equipos (dirección, 2026-10-20)", () => {
+    const placas = placasDeMarcasNueva(marcas, equipos, new Map());
+    assert.ok(placas.every((p) => !/aditamentos/.test(p.href)));
   });
 });

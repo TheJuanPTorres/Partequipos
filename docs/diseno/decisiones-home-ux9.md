@@ -2296,6 +2296,13 @@ CSV del cliente aparecerán solas.
   en el menú). El icono ya no se pinta, así que cambiarlo no revalida el sitio.
 - **Sin esquema.**
 
+#### 26.1.4 «Aditamentos para maquinaria pesada», enlace directo sin submenú (2026-10-20, dirección)
+
+- En el panel de Maquinaria Pesada, «Aditamentos para maquinaria pesada» deja de ser un acordeón («+», con «Ver todo Aditamentos» y sus tipos) y pasa a ser un **enlace directo** a la página de la marca (`/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos/`).
+- Usa la fila de enlace suelto de nivel 1 (`finales` de `PanelMenu`), la misma de la política de garantías de Repuestos: el recuadro de los acordeones, una flecha en lugar del «+», y el hover y el foco de los títulos.
+- Es lógica del menú (`panelMaquinaria`, `src/lib/megamenu.ts`), no un dato del panel: el menú se construye desde el catálogo y no hay elementos de menú editables. Escritorio, tablet y menú móvil pintan el mismo `ContenidoMenu`.
+- Sin la marca `aditamentos`, la fila no sale. **Sin esquema.**
+
 ## 27. Cambios de dirección en la home tras la prueba en móvil (2026-10-05)
 
 Decisiones de dirección del 2026-10-05, cada una en su PR. Las que se apartan

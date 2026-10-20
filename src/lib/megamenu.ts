@@ -174,6 +174,9 @@ export type CategoriaLubricanteMenu = {
 /** La «marca» de maquinaria nueva que en el sitio actual agrupa los aditamentos. */
 export const SLUG_ADITAMENTOS = "aditamentos";
 
+/** Su fila en el panel de Maquinaria Pesada: un enlace directo, sin submenú. */
+export const ETIQUETA_ADITAMENTOS = "Aditamentos para maquinaria pesada";
+
 const conBarra = (href: string) => (href.endsWith("/") ? href : `${href}/`);
 
 /** Clave con la que se busca el panel de un enlace de la cabecera. */
@@ -228,16 +231,8 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
   };
   const marcas = d.marcasMaquinaria.map(conLogoUnico).sort(porNombre);
   const aditamentos = marcas.find((m) => m.slug === SLUG_ADITAMENTOS);
-  const deMarca = (m: ItemCatalogo, titulo?: string) =>
-    grupoDeMarca(
-      m,
-      tiposConEquiposNuevos,
-      rutas.marcaMaquinaria,
-      rutas.tipoMaquinaria,
-      titulo,
-      // «Aditamentos» no es una marca de verdad: va sin logo.
-      m.slug !== SLUG_ADITAMENTOS,
-    );
+  const deMarca = (m: ItemCatalogo) =>
+    grupoDeMarca(m, tiposConEquiposNuevos, rutas.marcaMaquinaria, rutas.tipoMaquinaria);
 
   const porMarca: GrupoMenu = {
     titulo: "Por marca",
@@ -297,11 +292,19 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
 
   return {
     verTodo: { etiqueta: "Ver toda la maquinaria pesada", href: conBarra(rutas.maquinaria()) },
-    grupos: [
-      nueva,
-      usada,
-      ...(aditamentos ? [deMarca(aditamentos, "Aditamentos para maquinaria pesada")] : []),
-    ],
+    grupos: [nueva, usada],
+    // «Aditamentos» es un ENLACE directo a su página, sin submenú (dirección, 2026-10-20):
+    // la fila de nivel 1 con el recuadro de los acordeones, como la política de Repuestos.
+    ...(aditamentos
+      ? {
+          finales: [
+            {
+              etiqueta: ETIQUETA_ADITAMENTOS,
+              href: conBarra(rutas.marcaMaquinaria(aditamentos.slug)),
+            },
+          ],
+        }
+      : {}),
   };
 }
 

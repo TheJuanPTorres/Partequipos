@@ -103,8 +103,7 @@ visual** que marca y tipo. **Provisional**: se reemplaza cuando llegue la planti
 ## 8. Índice de marcas con «Mostrar marcas» de Andrés (2026-10-20, dirección)
 
 > **CAMBIADO el mismo día (dirección):** las baldosas son BLANCAS con el logo de la marca, el de todo el sitio
-> (`LogoMarca`, `docs/diseno/logo-marca.md`); ya no van del color de la marca. Lo de abajo sobre el color queda
-> como historia.
+> (`LogoMarca`, `docs/diseno/logo-marca.md`); ya no van del color de la marca.
 
 Plantilla 4017 (`Desktop\partequipos-diseno\wordpress\indice-marcas-repuestos\elementor-4017-2026-10-20.json`).
 **Solo cambia la parte de las marcas** de `…/repuestos-maquinaria-pesada-marcas/` (`BaldosasMarcas`); el encabezado,
@@ -115,9 +114,10 @@ el contacto y los testimonios se quedan como estaban. Las placas oscuras siguen 
 - **Recuadro blanco** de radio 30 y relleno 50 con una **baldosa cuadrada** por marca (radio 20, relleno 20): 4 por
   fila, 2 en tablet y en móvil, y la última fila incompleta **centrada** (flex con el ancho exacto de una columna,
   como el #274). El logo encoge al pasar el ratón («shrink» de Elementor), salvo con «reducir movimiento».
-- **El cuadrado del #271:** la baldosa toma el «Color de la marca» y el logo va en blanco, o en negro si el color es
-  muy claro (`logoBlancoSobre`). Sin color, el de las páginas de marca sin color (`--marca-amarillo`: el gris neutro del #279 de D, nunca amarillo) con el logo en negro; sin logo, su nombre en la
-  tinta que mejor se lea (`tintaSobre`). Mismas marcas que antes (`placasDeMarcas`: con nombre y dirección).
+- **Baldosa BLANCA con el logo de la marca** (dirección, 2026-10-20; antes, del color de la marca): el logo de todo
+  el sitio (`LogoMarca`, `docs/diseno/logo-marca.md`), en sus colores o en tinta oscura con «Pintar el logo en
+  oscuro». Un borde gris la separa del recuadro. Sin logo, su nombre. Mismas marcas que antes (`placasDeMarcas`: con
+  nombre y dirección).
 - **Sin franja amarilla** (dirección): ni el `#F2BC2E` del export tras los recuadros ni la mitad inferior de la del
   encabezado de la página. Es un índice general, no el de una marca.
 

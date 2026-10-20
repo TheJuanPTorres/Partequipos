@@ -67,7 +67,10 @@ export function tarjetasDeCategoriasUsada(
   categorias: Pick<CategoriasUsada, "id" | "nombre" | "slug" | "imagen">[],
   unidades: UnidadDelIndice[],
   ruta: (slug: string) => string,
-  { incluirVacias = false }: { incluirVacias?: boolean } = {},
+  {
+    incluirVacias = false,
+    porUnidades = false,
+  }: { incluirVacias?: boolean; porUnidades?: boolean } = {},
 ): TarjetaMarca[] {
   const porCategoria = agrupar(unidades, (u) => u.categoria);
   const filas = categorias
@@ -84,8 +87,17 @@ export function tarjetasDeCategoriasUsada(
       };
       return { tarjeta, n: suyas.length };
     });
+  /*
+   * `porUnidades` («Otros», dirección 2026-10-20): de más a menos unidades
+   * DISPONIBLES (el inventario ya excluye las vendidas) y, con las mismas, por
+   * nombre. Sale de los datos de cada petición: si cambian las unidades, cambia
+   * el orden. Las vacías, al final, también por nombre.
+   */
+  const ordenUnidades = (a: (typeof filas)[number], b: (typeof filas)[number]) =>
+    b.n - a.n || a.tarjeta.titulo.localeCompare(b.tarjeta.titulo, "es");
   const con = filas.filter((f) => f.n > 0);
   const vacias = incluirVacias ? filas.filter((f) => f.n === 0) : [];
+  if (porUnidades) return [...con, ...vacias].sort(ordenUnidades).map((f) => f.tarjeta);
   return [...con, ...vacias].map((f) => f.tarjeta);
 }
 

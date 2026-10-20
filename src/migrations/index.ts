@@ -70,6 +70,7 @@ import * as migration_20261020_064422_lubricantes_general from './20261020_06442
 import * as migration_20261020_170728_marca_nueva_textos_linea from './20261020_170728_marca_nueva_textos_linea';
 import * as migration_20261020_183648_documento_visor from './20261020_183648_documento_visor';
 import * as migration_20261020_192253_categorias_cabeceras from './20261020_192253_categorias_cabeceras';
+import * as migration_20261020_230146_categoria_usada_mostrar_en_web from './20261020_230146_categoria_usada_mostrar_en_web';
 
 export const migrations = [
   {
@@ -430,6 +431,11 @@ export const migrations = [
   {
     up: migration_20261020_192253_categorias_cabeceras.up,
     down: migration_20261020_192253_categorias_cabeceras.down,
-    name: '20261020_192253_categorias_cabeceras'
+    name: '20261020_192253_categorias_cabeceras',
+  },
+  {
+    up: migration_20261020_230146_categoria_usada_mostrar_en_web.up,
+    down: migration_20261020_230146_categoria_usada_mostrar_en_web.down,
+    name: '20261020_230146_categoria_usada_mostrar_en_web'
   },
 ];

@@ -884,6 +884,9 @@ export interface EquiposUsado {
    * Ordena la portada y los listados: primero la más reciente. Por defecto, hoy; se puede cambiar.
    */
   fechaPublicacion?: string | null;
+  /**
+   * Desde el 2026-10-20 la portada solo enseña excavadoras: una marcada como «Aditamentos» no sale en ella.
+   */
   pestanaPortada?: ('categoria' | 'aditamentos') | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
@@ -917,6 +920,10 @@ export interface CategoriasUsada {
    * Marcada, la categoría sale dentro de «Otros» (menú e índice de usados). Desmarcada, sale sola en el primer nivel, como Excavadoras y Aditamentos. Su página no cambia.
    */
   enOtros?: boolean | null;
+  /**
+   * Desmarcada, la categoría y sus unidades desaparecen de toda la web (menú, índice, «Otros», pestañas, listados y sitemap) sin borrarse del panel, y su dirección da «página no encontrada». Para llevarla a otra página, crear una redirección en «Redirecciones».
+   */
+  mostrarEnWeb?: boolean | null;
   /**
    * Solo para las que NO van en «Otros»: el número más bajo sale primero (vacío, al final, por nombre). «Otros» va siempre detrás.
    */
@@ -1355,13 +1362,19 @@ export interface Pagina {
     antetitulo?: string | null;
     titulo?: string | null;
     /**
-     * Vacío: el nombre de la categoría «excavadoras».
+     * Botón rojo sobre el carrusel; lleva a la categoría «Excavadoras» de usados. Vacío: «Excavadoras».
      */
     pestanaExcavadoras?: string | null;
+    /**
+     * Lleva a la página «Otros» de usados. Vacío: «Otros».
+     */
     pestanaOtros?: string | null;
+    /**
+     * Lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».
+     */
     pestanaAditamentos?: string | null;
     /**
-     * Lleva al listado de la categoría del equipo (las unidades usadas no tienen página propia).
+     * Sin efecto desde el 2026-10-20: cada equipo lleva «Ver producto» y «Cotizar».
      */
     verProductoTexto?: string | null;
     marcasTitulo?: string | null;
@@ -2606,6 +2619,7 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
   descripcion?: T;
   imagen?: T;
   enOtros?: T;
+  mostrarEnWeb?: T;
   orden?: T;
   seo?:
     | T

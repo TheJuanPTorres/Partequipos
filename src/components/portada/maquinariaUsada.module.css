@@ -197,7 +197,12 @@
   background: var(--color-fondo-seccion);
 }
 
-.pestanas {
+/*
+ * ENLACES A LAS CATEGORÍAS (dirección, 2026-10-20; antes, pestañas): píldoras
+ * con el relleno, la tipografía y el sitio de las pestañas de la Home V2, pero
+ * en el rojo de marca y con el paso a oscuro de los demás botones rojos.
+ */
+.enlaces {
   padding-top: var(--s3-gap);
 }
 
@@ -205,44 +210,40 @@
   display: flex;
   justify-content: center;
   gap: var(--s3-pestana-hueco);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.pestana {
+.enlace {
+  display: block;
   padding: var(--s3-pestana-relleno);
-  border: 0;
+  border: 1px solid var(--color-marca);
   border-radius: 50px;
-  background: var(--color-marca-tenue);
-  color: var(--color-texto);
-  font: inherit;
+  background: var(--color-marca);
+  color: var(--color-fondo);
   /* Medido: 16 px en los tres anchos; el interlineado, 16 en escritorio y 13 en el resto. */
   font-size: 16px;
   font-weight: 500;
   line-height: var(--s3-pestana-interlineado);
-  cursor: pointer;
-  transition: background-color 0.3s;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
 }
 
-.pestana:hover {
-  background: var(--color-marca);
-  color: var(--color-fondo);
+.enlace:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
 }
 
-.pestana[aria-selected="true"] {
-  background: var(--color-texto-fuerte);
-  color: var(--color-fondo);
+.enlace:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
 }
 
-.pestana:focus-visible {
-  outline: 3px solid var(--color-marca);
-  outline-offset: 2px;
-}
-
-/*
- * DESVIACIÓN (D10, se conserva): en móvil el diseño convierte las pestañas en
- * acordeón y deja «Otros» y «Aditamentos» DEBAJO del contenido abierto. Aquí
- * siguen siendo pestañas: las tres arriba, a todo el ancho, con el mismo
- * aspecto. El patrón ARIA de pestañas exige que la lista vaya junta.
- */
+/* DESVIACIÓN (D10, se conserva): en móvil, uno debajo de otro y a todo el ancho. */
 @media (max-width: 767px) {
   .lista {
     flex-direction: column;
@@ -251,22 +252,6 @@
 
 .panel {
   padding: 10px;
-}
-
-.panel:focus-visible {
-  outline: 3px solid var(--color-marca);
-  outline-offset: 2px;
-  border-radius: var(--s3-radio);
-}
-
-.panelEntrando {
-  animation: aparecer 0.75s both;
-}
-
-@keyframes aparecer {
-  from {
-    opacity: 0;
-  }
 }
 
 .tarjeta {
@@ -388,12 +373,21 @@
   outline-offset: 3px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .panelEntrando {
-    animation: none;
-  }
+/*
+ * «Ver todo» de la cabecera, MÁS GRANDE (dirección, 2026-10-20): el botón de
+ * siempre con la letra del texto destacado (20 px; 18 en móvil) y el
+ * relleno en proporción, ~50 px de alto frente a los ~38 de los demás.
+ */
+.botonGrande {
+  gap: 14px;
+  padding: 16px 34px 14px;
+  font-size: var(--texto-destacado);
+  font-weight: 500;
+  line-height: 1;
+}
 
-  .pestana,
+@media (prefers-reduced-motion: reduce) {
+  .enlace,
   .boton {
     transition: none;
   }

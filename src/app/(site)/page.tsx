@@ -12,7 +12,12 @@ import { SeccionSedes } from "@/components/portada/SeccionSedes";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { diapositivasDeHero } from "@/lib/portada/hero";
-import { RUTA_USADA, pestanasDeUsada, tarjetasDeMarcas } from "@/lib/portada/secciones";
+import {
+  RUTA_USADA,
+  enlacesDeUsada,
+  tarjetasDeExcavadoras,
+  tarjetasDeMarcas,
+} from "@/lib/portada/secciones";
 import { logosDeMarcas, tarjetasDeRepuestos } from "@/lib/portada/seccionesE";
 import { videoDeCompania, videoDeYouTube } from "@/lib/portada/seccionesF";
 import { preguntasDeFaq, tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
@@ -20,12 +25,13 @@ import { sedesDePortada, tokenMapbox } from "@/lib/portada/sedes";
 import { getCategoriasTecnicasDePortada } from "@/lib/queries/getCategoriasTecnicas";
 import { getPreguntasDePortada, getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getVideoPorId } from "@/lib/queries/getVideos";
-import { getEquiposUsadosDePortada, getMarcasDePortada } from "@/lib/queries/getMaquinaria";
+import { getExcavadorasUsadasDePortada, getMarcasDePortada } from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { getLogosMarca } from "@/lib/queries/getLogosMarca";
 import { metadataDe } from "@/lib/seo/metadata";
+import { turnstileSiteKey } from "@/lib/turnstile";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
@@ -73,7 +79,7 @@ export default async function HomePage() {
     logosMarca,
   ] = await Promise.all([
     getMarcasDePortada(),
-    getEquiposUsadosDePortada(),
+    getExcavadorasUsadasDePortada(),
     getCategoriasTecnicasDePortada(),
     getTestimoniosDePortada(),
     getPreguntasDePortada(),
@@ -124,11 +130,13 @@ export default async function HomePage() {
         }}
       />
       <SeccionMaquinariaUsada
-        pestanas={pestanasDeUsada(usados, {
+        enlaces={enlacesDeUsada({
           excavadoras: usada?.pestanaExcavadoras,
           otros: usada?.pestanaOtros,
           aditamentos: usada?.pestanaAditamentos,
         })}
+        excavadoras={tarjetasDeExcavadoras(usados)}
+        cotizar={{ siteKey: turnstileSiteKey(), telefono: empresa.whatsapp }}
         maquina={maquinaUsada ? { ...maquinaUsada, alt: "" } : null}
         hrefVerTodo={RUTA_USADA}
         textos={{
@@ -137,7 +145,6 @@ export default async function HomePage() {
           marcasTitulo: tx(usada?.marcasTitulo),
           marcasTexto: tx(usada?.marcasTexto),
           botonTexto: tx(usada?.botonTexto),
-          verProductoTexto: tx(usada?.verProductoTexto),
         }}
       />
 

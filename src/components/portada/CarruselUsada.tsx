@@ -23,7 +23,7 @@ import {
 import estilos from "./maquinariaUsada.module.css";
 
 /**
- * CARRUSEL DE LAS PESTAÑAS DE «MAQUINARIA PESADA USADA» (2026-10-17, dirección).
+ * CARRUSEL DE «MAQUINARIA PESADA USADA» (2026-10-17, dirección): desde el\n * 2026-10-20, uno solo, el de las excavadoras.
  *
  * Misma mecánica que el de marcas de «Máquinas nuevas» (`CarruselMarcas`,
  * lógica común en `src/lib/portada/carruselMarcas.ts`): 3 tarjetas a la vista
@@ -78,7 +78,7 @@ export function CarruselUsada({ id, etiqueta, nombres, tarjetas, copias }: Props
   const { pausado, alternar } = usePausa();
   const inicioGesto = useRef<number | null>(null);
 
-  // Fuera de la vista (o en una pestaña oculta) no avanza.
+  // Fuera de la vista no avanza.
   useEffect(() => {
     const el = region.current;
     if (!el) return;

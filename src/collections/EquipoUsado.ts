@@ -232,7 +232,11 @@ export const EquipoUsado: CollectionConfig = {
         { label: "Según su categoría (Excavadoras u Otros)", value: "categoria" },
         { label: "Aditamentos", value: "aditamentos" },
       ],
-      admin: { position: "sidebar" },
+      admin: {
+        position: "sidebar",
+        description:
+          "Desde el 2026-10-20 la portada solo enseña excavadoras: una marcada como «Aditamentos» no sale en ella.",
+      },
     },
     seoField(),
   ],

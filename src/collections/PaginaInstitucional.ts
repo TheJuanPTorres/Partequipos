@@ -454,17 +454,27 @@ export const PaginaInstitucional: CollectionConfig = {
         texto("titulo", "Título", "Maquinaria pesada usada"),
         texto(
           "pestanaExcavadoras",
-          "Pestaña de excavadoras",
+          "Enlace a las excavadoras",
           "Excavadoras",
-          "Vacío: el nombre de la categoría «excavadoras».",
+          "Botón rojo sobre el carrusel; lleva a la categoría «Excavadoras» de usados. Vacío: «Excavadoras».",
         ),
-        texto("pestanaOtros", "Pestaña del resto de categorías", "Otros"),
-        texto("pestanaAditamentos", "Pestaña de aditamentos", "Aditamentos"),
+        texto(
+          "pestanaOtros",
+          "Enlace a «Otros»",
+          "Otros",
+          "Lleva a la página «Otros» de usados. Vacío: «Otros».",
+        ),
+        texto(
+          "pestanaAditamentos",
+          "Enlace a los aditamentos",
+          "Aditamentos",
+          "Lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».",
+        ),
         texto(
           "verProductoTexto",
-          "Texto del botón de cada equipo",
+          "Texto del botón de cada equipo (ya no se usa)",
           "Ver más",
-          "Lleva al listado de la categoría del equipo (las unidades usadas no tienen página propia).",
+          "Sin efecto desde el 2026-10-20: cada equipo lleva «Ver producto» y «Cotizar».",
         ),
         texto("marcasTitulo", "Subtítulo de la cabecera", "Marcas que Respaldan Nuestro Trabajo"),
         parrafo(

@@ -57,6 +57,21 @@ describe("logoDeMarca", () => {
     );
   });
 
+  it("«CASE» es «Case Construction»: por el comienzo, solo si encaja una marca", () => {
+    const conCase = indiceDeLogos([
+      { nombre: "Case Construction", logo: media("/rep-case.png"), logoOscuroEnMenu: true },
+      { nombre: "Hitachi", logo: media("/rep-hitachi.png") },
+    ]);
+    assert.equal(
+      logoDeMarca({ nombre: "CASE", logo: media("/case.png") }, conCase)?.url,
+      "/rep-case.png",
+    );
+    // Menos de 3 letras: no se adivina.
+    assert.equal(logoDeMarca({ nombre: "CA", logo: media("/ca.png") }, conCase)?.url, "/ca.png");
+    // ENI o CF no son marcas de repuestos: su logo.
+    assert.equal(logoDeMarca({ nombre: "ENI", logo: media("/eni.jpg") }, conCase)?.url, "/eni.jpg");
+  });
+
   it("sin ninguno, null", () => {
     assert.equal(logoDeMarca({ nombre: "Ammann" }, indice), null);
   });

@@ -4,7 +4,7 @@ import { validarColor } from "./tipografiaTitulo";
 
 /**
  * Campo «Color de la marca» (selector de color de `CampoColor`), común a las marcas de
- * repuestos y a las de maquinaria nueva. Vacío: la franja es amarilla como siempre.
+ * repuestos y a las de maquinaria nueva. Vacío: franja gris neutra.
  */
 export const campoColorMarca: Field = {
   name: "colorMarca",
@@ -15,6 +15,6 @@ export const campoColorMarca: Field = {
     placeholder: "#FFCD00",
     components: { Field: "/components/admin/CampoColor" },
     description:
-      "Color de la franja de las páginas de esta marca (y de sus tipos). Vacío: amarillo. El texto de la franja se pone solo en blanco o negro, el que mejor se lea.",
+      "Color de la franja de las páginas de esta marca (y de sus tipos). Vacío: gris neutro (si no es una marca, p. ej. Aditamentos, déjalo vacío). El texto de la franja se pone solo en blanco o negro, el que mejor se lea.",
   },
 };

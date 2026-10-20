@@ -1,12 +1,18 @@
 "use client";
 
 import { IconCheck, IconChevronRight, IconMinus, IconPlus } from "@tabler/icons-react";
+import Image from "next/image";
 import Link from "next/link";
 import { forwardRef, memo, useId, useState, type CSSProperties, type KeyboardEvent } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
-import { ICONOS_CATEGORIA } from "@/components/portada/iconosCategoria";
-import type { EnlaceMenu, GrupoMenu, PanelMenu } from "@/lib/megamenu";
+import {
+  panelConTarjetas,
+  type EnlaceMenu,
+  type GrupoMenu,
+  type PanelMenu,
+  type TarjetaMenu,
+} from "@/lib/megamenu";
 
 import estilos from "./megamenu.module.css";
 
@@ -19,13 +25,6 @@ import estilos from "./megamenu.module.css";
  * enlaces están siempre en el HTML del servidor (SEO, CLAUDE.md §3.1).
  */
 
-/** El icono de la categoría técnica (los de la portada) o, si no lleva, la marca de verificación. */
-function IconoHoja({ icono }: { icono: EnlaceMenu["icono"] }) {
-  const Icono = icono ? ICONOS_CATEGORIA[icono] : null;
-  if (!Icono) return <IconCheck aria-hidden="true" focusable="false" stroke={2.5} />;
-  return <Icono aria-hidden="true" focusable="false" stroke={1.75} className={estilos.hojaIcono} />;
-}
-
 function Lista({ enlaces, alElegir }: { enlaces: EnlaceMenu[]; alElegir: () => void }) {
   if (enlaces.length === 0) return null;
   return (
@@ -33,9 +32,44 @@ function Lista({ enlaces, alElegir }: { enlaces: EnlaceMenu[]; alElegir: () => v
       {enlaces.map((e) => (
         <li key={e.href}>
           <Link href={e.href} className={estilos.hoja} onClick={alElegir}>
-            <IconoHoja icono={e.icono} />
+            <IconCheck aria-hidden="true" focusable="false" stroke={2.5} />
             {e.etiqueta}
             {e.nota ? <span className={estilos.nota}> · {e.nota}</span> : null}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/**
+ * TARJETAS CON FOTO (las categorías técnicas de Repuestos, 2026-10-20): foto y
+ * nombre, como las tarjetas de categorías del sitio, en versión compacta; 5 por
+ * fila en escritorio y 2 en el menú móvil, con la última fila centrada (regla
+ * del #281). La foto es DECORATIVA (el nombre ya nombra la tarjeta), diferida y
+ * pedida a su tamaño: va dentro de un acordeón cerrado (`hidden`), así que no se
+ * descarga hasta que se abre. La caja tiene proporción fija: sin CLS.
+ */
+function Tarjetas({ tarjetas, alElegir }: { tarjetas: TarjetaMenu[]; alElegir: () => void }) {
+  if (tarjetas.length === 0) return null;
+  return (
+    <ul className={estilos.tarjetas}>
+      {tarjetas.map((t) => (
+        <li key={t.href} className={estilos.tarjetaCaja}>
+          <Link href={t.href} className={estilos.tarjeta} onClick={alElegir}>
+            <span className={estilos.tarjetaFoto}>
+              {t.imagen ? (
+                <Image
+                  src={t.imagen.url}
+                  width={t.imagen.width}
+                  height={t.imagen.height}
+                  alt=""
+                  sizes="(max-width: 1024px) 45vw, 130px"
+                  loading="lazy"
+                />
+              ) : null}
+            </span>
+            <span className={estilos.tarjetaNombre}>{t.etiqueta}</span>
           </Link>
         </li>
       ))}
@@ -87,6 +121,7 @@ function Acordeon({
       </button>
       <div id={id} className={estilos.contenido} hidden={!abierto}>
         <Lista enlaces={grupo.enlaces} alElegir={alElegir} />
+        {grupo.tarjetas ? <Tarjetas tarjetas={grupo.tarjetas} alElegir={alElegir} /> : null}
         {grupo.grupos.map((g) => (
           <Acordeon key={g.titulo} grupo={g} nivel={nivel + 1} alElegir={alElegir} />
         ))}
@@ -235,6 +270,7 @@ export const Megamenu = memo(
         aria-label={etiqueta}
         className={estilos.panel}
         data-abierto={abierto ? "si" : "no"}
+        data-ancho={panelConTarjetas(panel) ? "amplio" : undefined}
         style={arriba === null ? undefined : ({ "--mega-arriba": `${arriba}px` } as CSSProperties)}
         onKeyDown={alTeclado}
         onMouseEnter={() => alEntrar(clave)}

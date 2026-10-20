@@ -2266,7 +2266,7 @@ CSV del cliente aparecerán solas.
   - **Orden:** el de las páginas de repuestos (`categoriasDeMarca`: «Orden en las páginas de marca» y después por
     nombre).
   - **Icono:** el de la portada (`ICONOS_CATEGORIA`) en lugar de la marca de verificación; una categoría sin icono
-    lleva la marca.
+    lleva la marca. **Sustituido el mismo día por las tarjetas con foto (§26.1.3).**
   - **Sin página** (sin dirección), la categoría no sale; si no queda ninguna, el apartado no se pinta.
 - **«Política de garantías y repuestos»**, enlace suelto al final del panel, con el recuadro de los acordeones de
   nivel 1. Es **editable** en el global «Cabecera» (grupo «Menú de Repuestos: política de garantías»: «Mostrar en el
@@ -2279,6 +2279,22 @@ CSV del cliente aparecerán solas.
   enlaces de primer nivel.
 - **El menú se refresca solo:** `categorias-tecnicas` lleva el gancho del megamenú (`revalidarMegamenu`), que salta
   también al cambiar el icono o el orden de una categoría; el global «Cabecera» ya revalidaba todo el sitio.
+
+#### 26.1.3 Las categorías técnicas del menú, en tarjetas con foto (2026-10-20, dirección)
+
+- **Qué cambia:** «Repuestos por categoría técnica» deja de ser una lista con iconos. Lleva «Ver todas las categorías»
+  y, debajo, una **tarjeta por categoría**: su «Imagen de la tarjeta» (la de las tarjetas de categorías del sitio) y su
+  nombre, cada una a su página. Mismo orden y mismo criterio de antes (sin página, no sale).
+- **Colocación:** 5 por fila en escritorio y 2 en el menú móvil, con la última fila incompleta centrada y el mismo
+  ancho de tarjeta (regla del #281, con `flex-wrap` centrado). Para que quepan 5, el panel **que lleva tarjetas**
+  (hoy solo Repuestos) pasa de 500 a **820 px** (`data-ancho="amplio"`); Maquinaria Pesada y Lubricantes siguen en 500.
+- **Foto:** decorativa (`alt=""`: el nombre ya nombra la tarjeta), en caja 4:3 fija (sin CLS), con `next/image`, carga
+  diferida y `sizes` a su ancho real (~130 px en escritorio, ~45 % de la pantalla en móvil). Va dentro del acordeón
+  cerrado (`hidden`, `display: none`), así que **no se descarga hasta que se abre el acordeón**. Sin foto, la caja gris.
+- **Datos:** la consulta del menú lee la foto con `depth: 1` y solo url y medidas, como los logos de marca. El gancho de
+  `categorias-tecnicas` revalida el menú también al cambiar su foto (solo en esa colección: la foto de un tipo no sale
+  en el menú). El icono ya no se pinta, así que cambiarlo no revalida el sitio.
+- **Sin esquema.**
 
 ## 27. Cambios de dirección en la home tras la prueba en móvil (2026-10-05)
 

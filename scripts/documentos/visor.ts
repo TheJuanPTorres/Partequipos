@@ -125,12 +125,15 @@ async function subirPaginas(): Promise<void> {
   const { paginas } = JSON.parse(fs.readFileSync(path.join(carpeta!, "paginas.json"), "utf8")) as {
     paginas: { n: number; fichero: string }[];
   };
+  // Sin el sufijo aleatorio que el Blob puso al PDF («-AbC…» de 30 caracteres).
   const base = path
     .basename(doc.filename ?? `documento-${id}`, ".pdf")
+    .replace(/-[A-Za-z0-9]{30}$/, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
-    .slice(0, 60);
+    .slice(0, 60)
+    .replace(/-$/, "");
   log(
     `documento ${id} («${doc.titulo}»): ${paginas.length} páginas${simular ? " (simulación)" : ""}`,
   );
@@ -151,7 +154,18 @@ async function subirPaginas(): Promise<void> {
       file: { data: webp, mimetype: "image/webp", name: nombre, size: webp.length },
       overrideAccess: true,
     });
-    entrada.media.push({ id: media.id, filename: media.filename ?? nombre, url: media.url ?? "" });
+    // La URL, leída después de crear: la que devuelve `create` no lleva el sufijo del Blob.
+    const guardada = await payload.findByID({
+      collection: "media",
+      id: media.id,
+      depth: 0,
+      overrideAccess: true,
+    });
+    entrada.media.push({
+      id: media.id,
+      filename: guardada.filename ?? nombre,
+      url: guardada.url ?? "",
+    });
     guardarManifiesto();
     log(`  página ${p.n}: media ${media.id} (${Math.round(webp.length / 1024)} KB)`);
   }

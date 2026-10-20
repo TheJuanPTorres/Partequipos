@@ -119,11 +119,14 @@ de producción y comprobadas.
 
 **Cambio del 2026-10-19 (§7):** `/elementor-48399/` era la página «Otros» de
 WordPress y pasa a llevar a la página «Otros» nueva
-(`/maquinaria-pesada/maquinaria-pesada-usada/otros/`). Se cambia el destino en
-el panel de producción con
-`Desktop\partequipos-cierre
-unbook-elementor-48399-otros.md`, después de
-desplegar la página.
+(`/maquinaria-pesada/maquinaria-pesada-usada/otros/`), igual que la URL vieja
+`/maquinaria-pesada/maquinaria-pesada-usada-otros/` (su 301 al índice venía de
+la migración de huérfanas del 2026-10-14). Runbook:
+`Desktop\partequipos-cierre\runbook-elementor-48399-otros.md`.
+
+**EJECUTADO por dirección el 2026-10-20:** las dos dan 301 a «Otros», que
+responde 200 en un solo salto (comprobado por el agente A en el sitio
+publicado).
 
 ## 6. Marcas de usados (paso b, D1)
 

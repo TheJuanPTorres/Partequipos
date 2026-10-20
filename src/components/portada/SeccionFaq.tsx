@@ -1,6 +1,7 @@
 import { IconHelpCircle } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import { EnlaceContacto } from "@/components/forms/EnlaceContacto";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
@@ -71,9 +72,12 @@ export function SeccionFaq({ preguntas, imagen, textos }: Props) {
           {textos.intro ? <p className={`${estilos.intro} texto-cuerpo`}>{textos.intro}</p> : null}
           {textos.botonTexto && textos.botonEnlace ? (
             <div>
-              <Link href={textos.botonEnlace} className={`${estilos.boton} texto-etiqueta`}>
+              <EnlaceContacto
+                href={textos.botonEnlace}
+                className={`${estilos.boton} texto-etiqueta`}
+              >
                 {textos.botonTexto}
-              </Link>
+              </EnlaceContacto>
             </div>
           ) : null}
         </div>

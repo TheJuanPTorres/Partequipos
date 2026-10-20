@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
+import { ProveedorContacto } from "@/components/forms/ProveedorContacto";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { WhatsApp } from "@/components/layout/WhatsApp";
@@ -69,7 +70,7 @@ export default function RootLayout({
         </a>
         <Header />
         <div id="contenido" className="flex-1">
-          {children}
+          <ProveedorContacto>{children}</ProveedorContacto>
         </div>
         <Footer />
         {/* Botón flotante de WhatsApp: en todo el sitio público, no en el panel. */}

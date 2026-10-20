@@ -1,5 +1,5 @@
 import { IconSettings } from "@tabler/icons-react";
-import Link from "next/link";
+import { EnlaceContacto } from "@/components/forms/EnlaceContacto";
 
 import type { EnlaceBloque } from "@/lib/bloques/vista";
 
@@ -11,9 +11,12 @@ import estilos from "./boton.module.css";
  */
 export function BotonBloque({ boton, className }: { boton: EnlaceBloque; className?: string }) {
   return (
-    <Link href={boton.href} className={`${estilos.boton} texto-etiqueta ${className ?? ""}`}>
+    <EnlaceContacto
+      href={boton.href}
+      className={`${estilos.boton} texto-etiqueta ${className ?? ""}`}
+    >
       <IconSettings aria-hidden="true" focusable="false" stroke={1.75} />
       {boton.texto}
-    </Link>
+    </EnlaceContacto>
   );
 }

@@ -1,5 +1,5 @@
 import { IconSettings } from "@tabler/icons-react";
-import Link from "next/link";
+import { EnlaceContacto } from "@/components/forms/EnlaceContacto";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
@@ -53,10 +53,10 @@ export function SeccionMaquinariaNueva({
       </div>
       {textos.botonTexto && textos.botonEnlace ? (
         <div className={estilos.pie}>
-          <Link href={textos.botonEnlace} className={`${estilos.boton} texto-etiqueta`}>
+          <EnlaceContacto href={textos.botonEnlace} className={`${estilos.boton} texto-etiqueta`}>
             <IconSettings aria-hidden="true" focusable="false" stroke={1.75} />
             {textos.botonTexto}
-          </Link>
+          </EnlaceContacto>
         </div>
       ) : null}
     </section>

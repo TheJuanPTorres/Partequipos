@@ -3,6 +3,8 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { tieneCabecera, type VistaBloque } from "@/lib/bloques/vista";
 import { buildBreadcrumbJsonLd, type BreadcrumbItem } from "@/lib/seo/jsonLd";
 
+import { DocumentoVisor } from "@/components/documentos/DocumentoVisor";
+
 import { BloqueCabeceraVideo } from "./BloqueCabeceraVideo";
 import { BloqueCifras } from "./BloqueCifras";
 import { BloqueFormularioContacto, type ContextoFormulario } from "./BloqueFormularioContacto";
@@ -43,6 +45,12 @@ function bloque(b: VistaBloque, clave: string, formulario: ContextoFormulario) {
       return <BloqueFormularioContacto key={clave} {...b} contexto={formulario} />;
     case "procesoPasos":
       return <BloqueProcesoPasos key={clave} {...b} />;
+    case "documentoVisor":
+      return (
+        <div key={clave} id={b.ancla ?? undefined} className={estilos.documento}>
+          <DocumentoVisor documento={b.documento} titulo={b.titulo} />
+        </div>
+      );
   }
 }
 

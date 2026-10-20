@@ -197,6 +197,12 @@ function vistaSinAncla(b: BloqueDoc, videos: ReadonlyMap<number, Video>): VistaB
         texto: b.texto?.trim() || null,
         botonTexto: b.botonTexto?.trim() || null,
       };
+    case "documentoVisor": {
+      const documento = typeof b.documento === "object" ? b.documento?.id : b.documento;
+      return documento
+        ? { blockType: b.blockType, id: b.id, documento, titulo: b.titulo?.trim() || null }
+        : null;
+    }
   }
 }
 

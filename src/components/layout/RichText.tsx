@@ -5,6 +5,7 @@ import {
 } from "@payloadcms/richtext-lexical/react";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 
+import { DocumentoVisor } from "@/components/documentos/DocumentoVisor";
 import type { Media } from "@/payload-types";
 
 /*
@@ -21,6 +22,23 @@ const SIZES_CUERPO = "(min-width: 704px) 672px, calc(100vw - 32px)";
  */
 const convertidores: JSXConvertersFunction = ({ defaultConverters }) => ({
   ...defaultConverters,
+  // «Documento en visor» dentro del texto (2026-10-20): el PDF como libro.
+  blocks: {
+    documentoVisor: ({ node }: { node: unknown }) => {
+      const campos = (node as { fields?: { documento?: unknown; titulo?: string | null } }).fields;
+      const documento = campos?.documento;
+      return (
+        <DocumentoVisor
+          documento={
+            typeof documento === "number" || (documento && typeof documento === "object")
+              ? (documento as number | { id: number })
+              : null
+          }
+          titulo={campos?.titulo}
+        />
+      );
+    },
+  },
   upload: ({ node }) => {
     const doc = (node as { value?: unknown }).value;
     if (!doc || typeof doc !== "object") return null;

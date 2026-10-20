@@ -5,9 +5,11 @@ import { default as default_c9f64be0d161498ee822e08aa62ffab9 } from '../../../co
 import { default as default_40a9883d727ab65fdd0e9c9df10e79e2 } from '../../../components/admin/celdas/CeldaMiniatura'
 import { default as default_137d3220b5ae877ef2c31422510baf68 } from '../../../components/admin/SeoGuiado'
 import { default as default_5c55248894877e0ef25c11c535b2b5bf } from '../../../components/admin/VerEnElSitio'
+import { default as default_adf6b68ce64d26f52375d6ee194bc8e3 } from '../../../components/admin/CampoColor'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
+import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { InlineToolbarFeatureClient as InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -32,7 +34,6 @@ import { default as default_ee64598c7457a4d9197213cdb580e4d5 } from '../../../co
 import { default as default_6dd5387c7f2e5f0ef6f0dcb5c3b7a99a } from '../../../components/admin/aviso/AvisoNoDisponible'
 import { default as default_9381d73c54a9c03b46798bb778a3bdc0 } from '../../../components/admin/celdas/CeldaDisponible'
 import { default as default_7afa784110d90c3c093bacc977ecd19b } from '../../../components/admin/AvisoBloques'
-import { default as default_adf6b68ce64d26f52375d6ee194bc8e3 } from '../../../components/admin/CampoColor'
 import { default as default_c109ce541d2210185cddcb9e5d98a2d1 } from '../../../components/admin/aviso/AvisoContrasteTitulo'
 import { default as default_6b3563e09f348391483892d49429a65e } from '../../../components/admin/aviso/AvisoRecorteMovil'
 import { default as default_c9d56b0835087f2ddee9688731704ee9 } from '../../../components/admin/celdas/CeldaPublicado'
@@ -60,9 +61,11 @@ export const importMap = {
   "/components/admin/celdas/CeldaMiniatura#default": default_40a9883d727ab65fdd0e9c9df10e79e2,
   "/components/admin/SeoGuiado#default": default_137d3220b5ae877ef2c31422510baf68,
   "/components/admin/VerEnElSitio#default": default_5c55248894877e0ef25c11c535b2b5bf,
+  "/components/admin/CampoColor#default": default_adf6b68ce64d26f52375d6ee194bc8e3,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
+  "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#InlineToolbarFeatureClient": InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
@@ -87,7 +90,6 @@ export const importMap = {
   "/components/admin/aviso/AvisoNoDisponible#default": default_6dd5387c7f2e5f0ef6f0dcb5c3b7a99a,
   "/components/admin/celdas/CeldaDisponible#default": default_9381d73c54a9c03b46798bb778a3bdc0,
   "/components/admin/AvisoBloques#default": default_7afa784110d90c3c093bacc977ecd19b,
-  "/components/admin/CampoColor#default": default_adf6b68ce64d26f52375d6ee194bc8e3,
   "/components/admin/aviso/AvisoContrasteTitulo#default": default_c109ce541d2210185cddcb9e5d98a2d1,
   "/components/admin/aviso/AvisoRecorteMovil#default": default_6b3563e09f348391483892d49429a65e,
   "/components/admin/celdas/CeldaPublicado#default": default_c9d56b0835087f2ddee9688731704ee9,

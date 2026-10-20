@@ -78,6 +78,8 @@ export const PATRONES_DE_PAGINA = {
   submodelosDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]/[tipo]/[modelo]/[submodelo]`,
   categoriasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]`,
   paginasUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]",
+  /** Páginas institucionales y artículos (la ruta comodín). */
+  comodin: "/(site)/[...slug]",
 } as const;
 
 /** Ejecuta `revalidatePath` sin permitir que un fallo rompa el guardado. */
@@ -227,6 +229,19 @@ export function revalidarFichasDeProducto(motivo: string): void {
     revalidatePath(PATRONES_DE_PAGINA.unidadesUsadas, "page");
   } catch (error) {
     console.error(`[revalidación] fallaron las fichas de producto (${motivo}):`, error);
+  }
+}
+
+/**
+ * Revalida las páginas institucionales y los artículos (la ruta comodín): el
+ * «Documento en visor» (2026-10-20) puede estar en cualquiera de ellas, dentro
+ * del texto o en sus bloques. Nunca relanza.
+ */
+export function revalidarPaginasDelComodin(motivo: string): void {
+  try {
+    revalidatePath(PATRONES_DE_PAGINA.comodin, "page");
+  } catch (error) {
+    console.error(`[revalidación] fallaron las páginas institucionales (${motivo}):`, error);
   }
 }
 

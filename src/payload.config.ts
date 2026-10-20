@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { BlocksFeature, lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { endurecerSubidaDirecta } from "./lib/blob/rutaSubidaDirecta";
 /*
@@ -26,6 +26,7 @@ import { pushPermitido } from "./lib/db/pushEsquema";
 import { fusionarTraducciones, traduccionesEnOracion } from "./lib/panel/oracion";
 import { RUTAS_EN_EL_SITIO, verEnElSitio } from "./lib/panel/verEnElSitio";
 
+import { BloqueDocumentoVisor } from "./collections/bloques/documentoVisor";
 import { Articulo } from "./collections/Articulo";
 import { Cabecera } from "./globals/Cabecera";
 import { Pie } from "./globals/Pie";
@@ -246,7 +247,14 @@ export default buildConfig({
   // Globales: contenido único, no listas. El pie de todas las páginas (§13 de
   // docs/diseno/decisiones-home-ux9.md).
   globals: sinPestanaApi([Cabecera, Pie, Seo, FichaProducto, RepuestosMarca, PaginasIndice]),
-  editor: lexicalEditor(),
+  // El «Documento en visor» también dentro del texto (2026-10-20): un PDF que se
+  // lee como libro entre dos párrafos de una sección (`documentoVisor.ts`).
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      BlocksFeature({ blocks: [BloqueDocumentoVisor] }),
+    ],
+  }),
   /*
    * Panel en español (CLAUDE.md §5: textos de interfaz en español).
    *

@@ -50,6 +50,19 @@ describe("placasDeMarcas", () => {
     assert.equal(p[0]?.logo, null);
   });
 
+  it("lleva el color de la marca y si el logo va en blanco (en negro sobre un color claro)", () => {
+    const [oscura, clara, sinColor] = placasDeMarcas([
+      { ...marca(1, "A", "a"), colorMarca: "#04ACA3" },
+      { ...marca(2, "B", "b"), colorMarca: "#ffe600" },
+      { ...marca(3, "C", "c"), colorMarca: "no" },
+    ]);
+    assert.equal(oscura?.color, "#04aca3");
+    assert.equal(oscura?.logoBlanco, true);
+    assert.equal(clara?.logoBlanco, false);
+    assert.equal(sinColor?.color, null);
+    assert.equal(sinColor?.logoBlanco, false);
+  });
+
   it("descarta las marcas sin nombre o sin slug", () => {
     assert.equal(placasDeMarcas([marca(1, " ", "a"), marca(2, "B", "")]).length, 0);
   });

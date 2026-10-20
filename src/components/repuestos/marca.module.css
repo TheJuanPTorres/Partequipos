@@ -1300,3 +1300,140 @@ a.modelo:hover {
   font-size: var(--texto-cuerpo);
   line-height: 1.6;
 }
+
+/*
+ * --- «Mostrar marcas» de Andrés (plantilla 4017), índice de marcas de repuestos ---------
+ * Encabezado y recuadro blanco sobre el gris de la página: sin la franja amarilla
+ * del export (es un índice general, no de una marca). La cuadrícula es flex con el
+ * ancho exacto de una columna, así la última fila incompleta queda centrada (#274).
+ */
+.mostrarMarcas {
+  display: flex;
+  padding: 0 1.5vw 1.5vw;
+  flex-direction: column;
+  gap: 1.5vw;
+}
+
+/* El export pinta una foto del kit con gris en «multiply»; sin ella (licencia L3), el tono
+   oscuro de los encabezados sin foto: el texto blanco se lee. */
+.mostrarMarcasCabecera {
+  display: flex;
+  min-height: 35vh;
+  box-sizing: border-box;
+  padding: 50px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: var(--marca-radio);
+  background: #1f1d1b;
+  color: #fff;
+  text-align: center;
+}
+
+.mostrarMarcasAntetitulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.mostrarMarcasTitulo {
+  max-width: 1000px;
+  margin: 0;
+  font-size: 55px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.mostrarMarcasRecuadro {
+  box-sizing: border-box;
+  padding: 50px;
+  border-radius: var(--marca-radio);
+  background: var(--color-fondo);
+}
+
+.baldosas {
+  --columnas: 4;
+  --hueco-baldosas: 20px;
+  display: flex;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--hueco-baldosas);
+  list-style: none;
+}
+
+.baldosaCaja {
+  display: flex;
+  flex: 0 0 calc((100% - (var(--columnas) - 1) * var(--hueco-baldosas)) / var(--columnas));
+  min-width: 0;
+}
+
+.baldosa {
+  display: flex;
+  width: 100%;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  padding: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: var(--baldosa-color);
+  color: var(--baldosa-tinta);
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.baldosa:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.baldosaLogo {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  filter: brightness(0);
+}
+
+.baldosa[data-logo-blanco] .baldosaLogo {
+  filter: brightness(0) invert(1);
+}
+
+/* «shrink» de Elementor en el logo, solo si no se pide reducir el movimiento. */
+@media (prefers-reduced-motion: no-preference) {
+  .baldosaLogo {
+    transition: transform 0.3s;
+  }
+
+  .baldosa:hover .baldosaLogo,
+  .baldosa:focus-visible .baldosaLogo {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 1024px) {
+  .baldosas {
+    --columnas: 2;
+  }
+
+  .mostrarMarcasTitulo {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .mostrarMarcasAntetitulo {
+    font-size: 18px;
+  }
+
+  .mostrarMarcasTitulo {
+    font-size: 10vw;
+  }
+}

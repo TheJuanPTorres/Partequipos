@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { BaldosasMarcas } from "@/components/repuestos/BaldosasMarcas";
 import { CierreRepuestos } from "@/components/repuestos/CierreRepuestos";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
-import { PlacasMarcas } from "@/components/repuestos/PlacasMarcas";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getMarcas } from "@/lib/queries/getMarcas";
@@ -24,10 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
 const ANCLA = "marcas-repuestos";
 
 /**
- * ÍNDICE DE MARCAS DE REPUESTOS — PROVISIONAL hasta el diseño de Andrés
- * (docs/diseno/decisiones-repuestos-marca.md §7): encabezado, una placa oscura
- * con el logo de cada marca (sus logos son blancos) con enlace a su página,
- * contacto y testimonios.
+ * ÍNDICE DE MARCAS DE REPUESTOS: encabezado, las marcas con «Mostrar marcas» de
+ * Andrés (plantilla 4017: baldosas del color de cada marca en un recuadro blanco,
+ * docs/diseno/decisiones-repuestos-marca.md §8), contacto y testimonios. Sin la
+ * franja amarilla: es un índice general, no la página de una marca.
  */
 export default async function MarcasIndexPage() {
   const [global, marcas] = await Promise.all([getRepuestosMarca(), getMarcas()]);
@@ -52,9 +52,10 @@ export default async function MarcasIndexPage() {
           fondoDeRespaldo(marcas),
         )}
         anclaSiguiente={ANCLA}
+        franja={false}
       />
 
-      <PlacasMarcas id={ANCLA} titulo="Repuestos por marca" marcas={placasDeMarcas(marcas)} />
+      <BaldosasMarcas id={ANCLA} marcas={placasDeMarcas(marcas)} />
 
       <CierreRepuestos origen={rutas.marcas()} sobre="repuestos por marca" />
     </main>

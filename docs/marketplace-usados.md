@@ -117,6 +117,14 @@ aplican (§10.22).
 **EJECUTADO por dirección el 2026-10-13:** las dos 301 creadas desde el panel
 de producción y comprobadas.
 
+**Cambio del 2026-10-19 (§7):** `/elementor-48399/` era la página «Otros» de
+WordPress y pasa a llevar a la página «Otros» nueva
+(`/maquinaria-pesada/maquinaria-pesada-usada/otros/`). Se cambia el destino en
+el panel de producción con
+`Desktop\partequipos-cierre
+unbook-elementor-48399-otros.md`, después de
+desplegar la página.
+
 ## 6. Marcas de usados (paso b, D1)
 
 **Colección «Marcas de maquinaria usada»** (`marcas-usada`, menú
@@ -155,3 +163,31 @@ y 3 casos inventados (tildes, eñe y barra).
 el panel lo dice en español al guardar.
 
 **Pendiente:** retirar el texto `marca` y `pestanaPortada` con su migración (M3 de la propuesta), cuando producción esté migrada y sin unidades sin marca.
+
+## 7. Primer nivel y «Otros», como en WordPress (2026-10-19, cliente)
+
+En el **megamenú** («Maquinaria pesada usada») y en el **índice de usados**
+solo hay tres entradas: **Excavadoras, Aditamentos y «Otros»**. «Otros» lleva
+a una página nueva, `/maquinaria-pesada/maquinaria-pesada-usada/otros/`, con la
+misma «Plantilla 1» del índice: una tarjeta por cada categoría agrupada, con su
+número de unidades, y las vacías detrás con «Sin unidades por ahora».
+
+- **Qué va en «Otros»:** la casilla **«Agrupar en «Otros»»** de cada categoría
+  de usada (marcada por defecto: una categoría nueva va a «Otros»).
+  Desmarcada, la categoría sale sola en el primer nivel, por su **«Orden en el
+  primer nivel»**; «Otros» siempre detrás. La migración
+  `20261020_040506_usados_otros` deja desmarcadas Excavadoras (1) y
+  Aditamentos (2).
+- **Textos de la página:** grupo «Página «Otros» de maquinaria usada» del
+  global «Páginas índice» (antetítulo, título —vacío, «Otra maquinaria pesada
+  usada»—, texto, foto de fondo y foto de la tarjeta «Otros» del índice; vacía,
+  la de la unidad más reciente de las agrupadas).
+- **«otros» queda reservada** como dirección de categoría, igual que «marcas».
+- **SEO:** migas y `BreadcrumbList`; sin unidades en ninguna agrupada, como D4,
+  no se indexa ni va al sitemap. Sin ninguna categoría agrupada, 404 y sin
+  entrada en el menú ni en el índice.
+- **En el menú,** «Otros» lleva «Sin unidades por ahora» solo si ninguna de sus
+  categorías tiene unidades; las de primer nivel, como antes (#257).
+- **No cambian** las páginas de cada categoría, sus fichas, sus pestañas ni el
+  bloque «Marcas» del índice de usados.
+- Lógica en `src/lib/usados/otros.ts`, con pruebas.

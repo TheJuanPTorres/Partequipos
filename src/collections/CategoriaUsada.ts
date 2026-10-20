@@ -23,7 +23,7 @@ export const CategoriaUsada: CollectionConfig = {
   labels: { singular: "Categoría de maquinaria usada", plural: "Categorías de maquinaria usada" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "slug"],
+    defaultColumns: ["nombre", "slug", "enOtros"],
     group: "Maquinaria",
   },
   access: {
@@ -38,7 +38,7 @@ export const CategoriaUsada: CollectionConfig = {
   },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
-    // «marcas» está reservada: la usan las páginas de marca (D1).
+    // «marcas» y «otros» están reservadas: las usan las páginas de marca (D1) y «Otros».
     slugField({ unique: true, validate: slugCategoriaUsadaNoReservado }),
     { name: "descripcion", type: "textarea", label: "Descripción" },
     {
@@ -49,6 +49,32 @@ export const CategoriaUsada: CollectionConfig = {
       admin: {
         description:
           "Opcional. La foto de la tarjeta de esta categoría en la página «Maquinaria pesada usada». Vacía, sale la primera foto de su unidad más reciente.",
+      },
+    },
+    /*
+     * Primer nivel u «Otros» (cliente, 2026-10-19, como en WordPress): en el
+     * menú y en el índice de usados solo salen las categorías de primer nivel y
+     * la entrada «Otros», cuya página lista las agrupadas. Una categoría nueva
+     * va a «Otros» por defecto. Su página y sus fichas no cambian.
+     */
+    {
+      name: "enOtros",
+      type: "checkbox",
+      label: "Agrupar en «Otros»",
+      defaultValue: true,
+      admin: {
+        description:
+          "Marcada, la categoría sale dentro de «Otros» (menú e índice de usados). Desmarcada, sale sola en el primer nivel, como Excavadoras y Aditamentos. Su página no cambia.",
+      },
+    },
+    {
+      name: "orden",
+      type: "number",
+      label: "Orden en el primer nivel",
+      admin: {
+        description:
+          "Solo para las que NO van en «Otros»: el número más bajo sale primero (vacío, al final, por nombre). «Otros» va siempre detrás.",
+        condition: (datos) => datos?.enOtros === false,
       },
     },
     seoField(),

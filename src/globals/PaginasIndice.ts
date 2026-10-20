@@ -72,7 +72,7 @@ export const PaginasIndice: GlobalConfig = {
   admin: {
     group: "Partes del sitio",
     description:
-      "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada».",
+      "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada» y de su página «Otros».",
   },
   access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
@@ -83,6 +83,7 @@ export const PaginasIndice: GlobalConfig = {
             "/repuestos-maquinaria-pesada-colombia",
             "/maquinaria-pesada",
             "/maquinaria-pesada/maquinaria-pesada-usada",
+            "/maquinaria-pesada/maquinaria-pesada-usada/otros",
             "/contactanos",
           ],
           "global paginas-indice",
@@ -164,6 +165,37 @@ export const PaginasIndice: GlobalConfig = {
               "«Provisional»: «Por ahora no hay unidades disponibles», con enlace a Contáctanos y WhatsApp. «Diseño propio»: el nuestro, con alternativas y «Avísame», sin aprobar para el sitio publicado.",
           },
         },
+      ],
+    },
+    {
+      // «Otros» de usados (cliente, 2026-10-19): sus tarjetas salen solas, una por
+      // categoría marcada «Agrupar en «Otros»».
+      name: "usadaOtros",
+      type: "group",
+      label: "Página «Otros» de maquinaria usada",
+      admin: {
+        description:
+          "La entrada «Otros» del menú y del índice de usados, y su página. Las tarjetas salen solas: una por cada categoría marcada «Agrupar en «Otros»», con su número de unidades.",
+      },
+      fields: [
+        { name: "antetitulo", type: "text", label: "Antetítulo" },
+        {
+          name: "titulo",
+          type: "text",
+          label: "Título",
+          admin: { description: "Vacío: «Otra maquinaria pesada usada»." },
+        },
+        { name: "texto", type: "textarea", label: "Texto de presentación" },
+        imagen(
+          "fondo",
+          "Foto de fondo del encabezado",
+          "Opcional. Foto de obra a todo el ancho; sin ella, la misma de respaldo que «Maquinaria pesada».",
+        ),
+        imagen(
+          "imagenTarjeta",
+          "Imagen de la tarjeta «Otros»",
+          "Opcional. La foto de la tarjeta «Otros» en la página «Maquinaria pesada usada». Vacía, sale la primera foto de la unidad más reciente de las categorías agrupadas.",
+        ),
       ],
     },
     {

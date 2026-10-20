@@ -6,13 +6,14 @@ import { text } from "payload/shared";
  * 2026-10-13).
  *
  * Las marcas de usada viven en `/maquinaria-pesada/maquinaria-pesada-usada/
- * marcas/<marca>/`. En Next, el segmento fijo `marcas` gana a `[categoria]`:
- * una categoría con la dirección `marcas` quedaría tapada sin ningún error.
+ * marcas/<marca>/` y la página «Otros» (2026-10-19) en `…/otros/`. En Next, un
+ * segmento fijo gana a `[categoria]`: una categoría con la dirección `marcas`
+ * u `otros` quedaría tapada sin ningún error.
  */
-export const SLUGS_RESERVADOS_CATEGORIA_USADA: ReadonlySet<string> = new Set(["marcas"]);
+export const SLUGS_RESERVADOS_CATEGORIA_USADA: ReadonlySet<string> = new Set(["marcas", "otros"]);
 
 export const MENSAJE_SLUG_RESERVADO =
-  "Esa dirección web está reservada: la usa la página de las marcas de usados. Elige otra.";
+  "Esa dirección web está reservada: la usa otra página de usados («marcas» u «otros»). Elige otra.";
 
 /**
  * Validación del campo «Dirección web» de las categorías de usada: la de

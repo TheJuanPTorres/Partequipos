@@ -294,9 +294,13 @@ export function revalidarPaginasUsadas(motivo: string): void {
   }
 }
 
-/** Rutas afectadas por un cambio en una categoría de usada. */
+/**
+ * Rutas afectadas por un cambio en una categoría de usada (o en una de sus
+ * unidades): también «Otros», que lista las agrupadas con su número de
+ * unidades (2026-10-19).
+ */
 export function rutasDeCategoriaUsada(slug: string): string[] {
-  return [rutas.maquinaria(), rutas.usada(), rutas.categoriaUsada(slug)];
+  return [rutas.maquinaria(), rutas.usada(), rutas.usadaOtros(), rutas.categoriaUsada(slug)];
 }
 
 // --- Lubricantes ------------------------------------------------------------

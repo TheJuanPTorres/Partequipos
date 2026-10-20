@@ -21,6 +21,7 @@ import { getTipos } from "@/lib/queries/getTipos";
 import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
 import { tiposConEquipos } from "@/lib/nueva/tiposConEquipos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
+import { vaEnOtros } from "@/lib/usados/otros";
 import { poblado } from "@/lib/utils/relations";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import type { Marca, MarcasMaquinaria, TiposEquipo, TiposMaquinaria } from "@/payload-types";
@@ -175,6 +176,11 @@ async function entradas(): Promise<MetadataRoute.Sitemap> {
     // actual. Vuelve en cuanto tenga una.
     categoriasUsada: categoriasUsada
       .filter((c) => inventarioUsados.some((u) => u.categoria === c.id))
+      .map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
+
+    // «Otros» de usados (2026-10-19): sus categorías agrupadas con unidades.
+    categoriasOtrosUsada: categoriasUsada
+      .filter((c) => vaEnOtros(c) && inventarioUsados.some((u) => u.categoria === c.id))
       .map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })),
 
     // Las unidades DISPONIBLES con dirección web; el inventario ya excluye las vendidas.

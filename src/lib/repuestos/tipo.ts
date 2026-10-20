@@ -1,11 +1,10 @@
-import { logoBlancoSobre } from "@/lib/marca/colorMarca";
 import type { Marca, ModelosRepuesto, RepuestosMarca, TiposEquipo } from "@/payload-types";
 
 import { rutas } from "../routes";
 import { imagenDeMedia } from "../utils/relations";
 
 import { segmentoDeTipo } from "./anidado";
-import type { VistaEncabezado } from "./marca";
+import { logoConAlt, type VistaEncabezado } from "./marca";
 import { agruparPorSerie, seriesDeTipo, type GrupoDeModelos } from "./series";
 
 /**
@@ -33,8 +32,7 @@ export function vistaEncabezadoTipo(
     linea2: [nombre.toUpperCase(), sufijo].filter(Boolean).join(" "),
     descripcion: texto(tipo.descripcion),
     fondo: imagenDeMedia(marca.fondoHero, "") ?? imagenDeMedia(tipo.imagen, ""),
-    logo: imagenDeMedia(marca.logo, `Logo de ${nombre}`),
-    logoBlanco: logoBlancoSobre(marca.colorMarca),
+    logo: logoConAlt(marca, nombre),
   };
 }
 

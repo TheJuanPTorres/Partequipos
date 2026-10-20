@@ -10,6 +10,7 @@ import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia } from "@/lib/utils/relations";
 import type { EnlaceWhatsApp } from "@/lib/whatsapp";
 import type { MarcasLubricante } from "@/payload-types";
+import { conAlt, logoPropio } from "@/lib/marca/logoMarca";
 
 import estilos from "./lubricantes.module.css";
 import { SeccionesLubricante } from "./SeccionesLubricante";
@@ -52,7 +53,8 @@ export function PaginaMarcaLubricanteProvisional({
           linea2: marca.nombre,
           descripcion: marca.entradilla?.trim() ?? "",
           fondo: imagenDeMedia(marca.imagenCabecera, ""),
-          logo: imagenDeMedia(marca.logo, marca.nombre),
+          // Una marca de lubricante no tiene casilla de tinta oscura: su logo, con sus colores.
+          logo: conAlt(logoPropio({ logo: marca.logo }), marca.nombre),
         }}
         anclaSiguiente={ANCLA_LINEAS}
       />

@@ -206,6 +206,8 @@ export function rutasDeEquipoNuevo(
   hermanoSlugs: string[] = [],
 ): string[] {
   return [
+    // El índice de marcas solo lista las que tienen equipos (2026-10-19).
+    rutas.marcasMaquinaria(),
     rutas.tipoMaquinaria(marcaSlug, tipoSlug),
     rutas.equipoNuevo(marcaSlug, tipoSlug, equipoSlug),
     ...hermanoSlugs.map((slug) => rutas.equipoNuevo(marcaSlug, tipoSlug, slug)),
@@ -294,9 +296,13 @@ export function revalidarPaginasUsadas(motivo: string): void {
   }
 }
 
-/** Rutas afectadas por un cambio en una categoría de usada. */
+/**
+ * Rutas afectadas por un cambio en una categoría de usada (o en una de sus
+ * unidades): también «Otros», que lista las agrupadas con su número de
+ * unidades (2026-10-19).
+ */
 export function rutasDeCategoriaUsada(slug: string): string[] {
-  return [rutas.maquinaria(), rutas.usada(), rutas.categoriaUsada(slug)];
+  return [rutas.maquinaria(), rutas.usada(), rutas.usadaOtros(), rutas.categoriaUsada(slug)];
 }
 
 // --- Lubricantes ------------------------------------------------------------

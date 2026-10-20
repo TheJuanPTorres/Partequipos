@@ -33,6 +33,11 @@ export type SitemapInput = {
   unidadesUsada: (ConSlug & { categoriaSlug: string })[];
   /** Marcas de usada con unidades disponibles (D4: las vacías no van). */
   marcasUsada: ConSlug[];
+  /**
+   * Las categorías de «Otros» de usados CON unidades (2026-10-19). Vacío o sin
+   * el dato, la página «Otros» no va: como D4, vuelve con la primera unidad.
+   */
+  categoriasOtrosUsada?: ConSlug[];
   /** Lubricantes: marca → categoría de aplicación. Sin índice de sección. */
   marcasLubricante: ConSlug[];
   /** Blog. Los artículos van en la raíz, sin prefijo. */
@@ -75,6 +80,7 @@ export const PATRONES_SITEMAP = [
   "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]",
   "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/[unidad]",
   "/maquinaria-pesada/maquinaria-pesada-usada/marcas/[marca]",
+  "/maquinaria-pesada/maquinaria-pesada-usada/otros",
   /*
    * Lubricantes. No hay patrón "/lubricantes" a secas: esa página NO existe en
    * el sitio actual, así que tampoco aquí. Ver SEGMENTO_LUBRICANTES.
@@ -171,6 +177,7 @@ export function buildSitemapEntries(
     categoriasUsada,
     unidadesUsada,
     marcasUsada,
+    categoriasOtrosUsada = [],
     marcasLubricante,
     articulos,
     categoriasBlog,
@@ -337,6 +344,16 @@ export function buildSitemapEntries(
       lastModified: fecha(equipo.updatedAt, ahora),
       changeFrequency: "monthly",
       priority: 0.6,
+    });
+  }
+
+  const otros = categoriasOtrosUsada;
+  if (otros.length > 0) {
+    entradas.push({
+      url: absoluteUrl(rutas.usadaOtros()),
+      lastModified: masReciente(otros, ahora),
+      changeFrequency: "daily",
+      priority: 0.7,
     });
   }
 

@@ -190,7 +190,8 @@ export function FormularioSolicitud({
       id={campo("telefono")}
       etiqueta="Teléfono"
       error={err.telefono}
-      ayuda="Con indicativo si es fijo."
+      // En la ventana emergente, sin ayuda (dirección, 2026-10-19); en las páginas, se queda.
+      ayuda={variante === "emergente" ? undefined : "Con indicativo si es fijo."}
     >
       {(p) => (
         <input
@@ -214,6 +215,7 @@ export function FormularioSolicitud({
           defaultValue={previo.empresa}
           type="text"
           autoComplete="organization"
+          placeholder={variante === "plano" ? "Empresa" : undefined}
           className={claseControl}
         />
       )}

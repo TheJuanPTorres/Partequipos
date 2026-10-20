@@ -7,7 +7,13 @@
  * de las tarjetas, y el blanco con las suyas sobre el gris del contacto.
  */
 .pagina {
-  --marca-amarillo: #f2bc2e;
+  /* Sin «Color de la marca» (Aditamentos, Okada…): NINGÚN color. La franja toma el fondo de la
+     página (como si no hubiera franja), con la tinta y el hover oscuros del kit (2026-10-19).
+     Con color, estiloDeMarca lo sustituye en línea. */
+  --marca-amarillo: var(--color-fondo-seccion);
+  --marca-tinta: var(--color-texto);
+  --marca-hover-fondo: var(--color-texto);
+  --marca-hover-texto: var(--color-fondo);
   --marca-radio: 30px;
   background: var(--color-fondo-seccion);
 }
@@ -77,9 +83,9 @@
 }
 
 /*
- * CUADRADO DEL LOGO (plantilla de Andrés, 4007; 2026-10-19): el logo en una sola tinta sobre un
- * cuadrado con el color de la marca. Blanco, salvo que el color sea claro (un amarillo): ahí va
- * en negro, porque el blanco no se leería (AA, `logoBlancoSobre`).
+ * CUADRADO DEL LOGO (plantilla de Andrés, 4007): BLANCO con el logo de la marca, el de todo el
+ * sitio (`LogoMarca`: sus colores, o tinta oscura si es un logo blanco). Dirección, 2026-10-20:
+ * ya no va del color de la marca.
  */
 .placa {
   display: flex;
@@ -90,19 +96,13 @@
   align-items: center;
   justify-content: center;
   border-radius: 20px;
-  background: var(--marca-amarillo);
+  background: #fff;
 }
 
 .logo {
   width: 100%;
   height: auto;
   max-height: 100%;
-  object-fit: contain;
-  filter: brightness(0);
-}
-
-.placa[data-logo-blanco] .logo {
-  filter: brightness(0) invert(1);
 }
 
 .h1 {
@@ -898,7 +898,7 @@ a.modelo:hover {
 
 /* --- Placas de marca y variante gris de las categorías (índices, PROVISIONAL) -------- */
 
-/* Los logos del cliente son blancos: cada marca va sobre su placa oscura (D10). */
+/* Una placa blanca por marca con su logo (`LogoMarca`). */
 .placasLista {
   display: flex;
   max-width: 1240px;
@@ -918,19 +918,21 @@ a.modelo:hover {
   padding: 14px 20px;
   align-items: center;
   justify-content: center;
+  /* Placa BLANCA con el logo de la marca, el de todo el sitio (`LogoMarca`, 2026-10-20). */
+  border: 1px solid #e2e2e2;
   border-radius: 10px;
-  background: var(--color-texto);
-  color: #fff;
+  background: #fff;
+  color: var(--color-texto);
   font-size: 16px;
   font-weight: 600;
   text-align: center;
   text-decoration: none;
-  transition: background-color 0.3s;
+  transition: border-color 0.3s;
 }
 
 .placaMarca:hover,
 .placaMarca:focus-visible {
-  background: var(--color-marca);
+  border-color: var(--color-marca);
 }
 
 .placaLogo {
@@ -938,7 +940,6 @@ a.modelo:hover {
   max-width: 131px;
   height: auto;
   max-height: 56px;
-  object-fit: contain;
 }
 
 /* Categorías sobre el gris de la página (la amarilla solo va tras el encabezado). */
@@ -1240,36 +1241,60 @@ a.modelo:hover {
 }
 
 /*
- * La ÚLTIMA FILA INCOMPLETA va CENTRADA (cliente, 2026-10-19), también con solo
- * 2 tarjetas en total. Una rejilla CSS no centra una fila a medias, así que en
- * los índices la lista pasa a flex con salto de línea y cada tarjeta mide
- * exactamente una columna de la rejilla de antes (3, 2 o 1 por fila, con los
- * mismos 20 px entre columnas): las filas completas no cambian. Las tarjetas de
- * una fila se siguen igualando en alto (`align-items: stretch` de flex).
+ * COLOCACIÓN DE LAS TARJETAS (cliente, 2026-10-19; sustituye al centrado por
+ * flex del #274), en todas las secciones de `TarjetasMarca`:
+ * - escritorio: 1 o 2 tarjetas, centradas; 4, en 2 + 2 centradas (el ÚNICO
+ *   caso de 2 columnas); cualquier otro número, 3 columnas con la última fila
+ *   incompleta centrada (5 → 3 + 2, 7 → 3 + 3 + 1);
+ * - tablet: 2 columnas, con la última impar centrada; móvil: 1 columna.
+ * La tarjeta mide siempre una columna de la rejilla de 3 (o de 2 en tablet):
+ * con 2 por fila no se estira. Una rejilla CSS no centra una fila a medias, así
+ * que se usa una de 6 columnas (4 en tablet) donde cada tarjeta ocupa 2, y las
+ * de una fila incompleta empiezan una columna más a la derecha. Con el mismo
+ * hueco entre columnas, 2 de 6 miden lo mismo que 1 de 3. Las filas siguen
+ * igualando el alto de sus tarjetas (es una rejilla). Sin JavaScript ni CLS.
  */
-.tarjetasIndice .rejilla {
-  --columnas: 3;
-  --hueco-columnas: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  column-gap: var(--hueco-columnas);
-}
+@media (min-width: 1025px) {
+  .rejillaTarjetas {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
 
-.tarjetasIndice .rejilla > .tarjeta {
-  flex: 0 0 calc((100% - (var(--columnas) - 1) * var(--hueco-columnas)) / var(--columnas));
-  min-width: 0;
-}
+  .rejillaTarjetas > .tarjeta {
+    grid-column: span 2;
+  }
 
-@media (max-width: 1024px) {
-  .tarjetasIndice .rejilla {
-    --columnas: 2;
+  /* Última fila con 1 tarjeta (también 1 en total): al centro. */
+  .rejillaTarjetas > .tarjeta:last-child:nth-child(3n + 1) {
+    grid-column: 3 / span 2;
+  }
+
+  /* Última fila con 2 (también 2 en total): la primera empieza en la columna 2; la otra la sigue. */
+  .rejillaTarjetas > .tarjeta:nth-last-child(2):nth-child(3n + 1) {
+    grid-column: 2 / span 2;
+  }
+
+  /* Exactamente 4: 2 + 2 centradas. */
+  .rejillaTarjetas:has(> .tarjeta:nth-child(4):last-child) > .tarjeta:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+
+  .rejillaTarjetas:has(> .tarjeta:nth-child(4):last-child) > .tarjeta:nth-child(even) {
+    grid-column: 4 / span 2;
   }
 }
 
-@media (max-width: 767px) {
-  .tarjetasIndice .rejilla {
-    --columnas: 1;
+@media (min-width: 768px) and (max-width: 1024px) {
+  .rejillaTarjetas {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .rejillaTarjetas > .tarjeta {
+    grid-column: span 2;
+  }
+
+  /* Última impar: al centro. */
+  .rejillaTarjetas > .tarjeta:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
   }
 }
 
@@ -1299,4 +1324,188 @@ a.modelo:hover {
   color: var(--color-texto-suave);
   font-size: var(--texto-cuerpo);
   line-height: 1.6;
+}
+
+/*
+ * --- «Mostrar marcas» de Andrés (plantilla 4017), índice de marcas de repuestos ---------
+ * Encabezado y recuadro blanco sobre el gris de la página: sin la franja amarilla
+ * del export (es un índice general, no de una marca). La cuadrícula es flex con el
+ * ancho exacto de una columna, así la última fila incompleta queda centrada (#274).
+ */
+.mostrarMarcas {
+  display: flex;
+  padding: 0 1.5vw 1.5vw;
+  flex-direction: column;
+  gap: 1.5vw;
+}
+
+/* El export pinta una foto del kit con gris en «multiply»; sin ella (licencia L3), el tono
+   oscuro de los encabezados sin foto: el texto blanco se lee. */
+.mostrarMarcasCabecera {
+  display: flex;
+  min-height: 35vh;
+  box-sizing: border-box;
+  padding: 50px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: var(--marca-radio);
+  background: #1f1d1b;
+  color: #fff;
+  text-align: center;
+}
+
+.mostrarMarcasAntetitulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.mostrarMarcasTitulo {
+  max-width: 1000px;
+  margin: 0;
+  font-size: 55px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.mostrarMarcasRecuadro {
+  box-sizing: border-box;
+  padding: 50px;
+  border-radius: var(--marca-radio);
+  background: var(--color-fondo);
+}
+
+.baldosas {
+  display: grid;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0;
+  /*
+   * COLOCACIÓN (la regla del #281, con 4 por fila): una rejilla de 8 columnas donde cada
+   * baldosa ocupa 2, así la última fila incompleta se centra empezando una columna más a la
+   * derecha; exactamente 4, en 2 + 2 centradas. Tablet y móvil: 2 por fila (rejilla de 4),
+   * la última impar al centro. Mismo ancho de baldosa siempre. Sin JavaScript ni CLS.
+   */
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 20px;
+  list-style: none;
+}
+
+.baldosaCaja {
+  display: flex;
+  min-width: 0;
+  grid-column: span 2;
+}
+
+@media (min-width: 1025px) {
+  /* Última fila con 1, 2 o 3 baldosas: centradas. */
+  .baldosaCaja:last-child:nth-child(4n + 1) {
+    grid-column: 4 / span 2;
+  }
+
+  .baldosaCaja:nth-last-child(2):nth-child(4n + 1) {
+    grid-column: 3 / span 2;
+  }
+
+  .baldosaCaja:nth-last-child(3):nth-child(4n + 1) {
+    grid-column: 2 / span 2;
+  }
+
+  /* Exactamente 4: 2 + 2 centradas. */
+  .baldosas:has(> .baldosaCaja:nth-child(4):last-child) > .baldosaCaja:nth-child(odd) {
+    grid-column: 3 / span 2;
+  }
+
+  .baldosas:has(> .baldosaCaja:nth-child(4):last-child) > .baldosaCaja:nth-child(even) {
+    grid-column: 5 / span 2;
+  }
+}
+
+.baldosa {
+  display: flex;
+  width: 100%;
+  /* RECTANGULAR en horizontal, 3:2 (dirección, 2026-10-20): menos alta que la cuadrada del export. */
+  aspect-ratio: 3 / 2;
+  box-sizing: border-box;
+  padding: 20px;
+  align-items: center;
+  justify-content: center;
+  /* BLANCA con el logo de la marca (dirección, 2026-10-20): un borde gris la separa del recuadro. */
+  border: 1px solid #e2e2e2;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--color-texto);
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.baldosa:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.baldosaLogo {
+  /* Centrado y con aire: el 70 % del ancho como mucho, y nunca más de la mitad del alto. */
+  width: 70%;
+  height: auto;
+  max-height: 50%;
+}
+
+/* «shrink» de Elementor en el logo, solo si no se pide reducir el movimiento. */
+@media (prefers-reduced-motion: no-preference) {
+  .baldosaLogo {
+    transition: transform 0.3s;
+  }
+
+  .baldosa:hover .baldosaLogo,
+  .baldosa:focus-visible .baldosaLogo {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 1024px) {
+  .baldosas {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .baldosas > .baldosaCaja:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+
+  .mostrarMarcasTitulo {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .mostrarMarcasAntetitulo {
+    font-size: 18px;
+  }
+
+  /* En móvil, menos relleno que el export (50 y 20): con él, el logo se quedaba en unos 60 px. */
+  .mostrarMarcasRecuadro {
+    padding: 24px;
+  }
+
+  .baldosas {
+    gap: 12px;
+  }
+
+  .baldosa {
+    padding: 12px;
+  }
+
+  .baldosaLogo {
+    width: 80%;
+    max-height: 60%;
+  }
+
+  .mostrarMarcasTitulo {
+    font-size: 10vw;
+  }
 }

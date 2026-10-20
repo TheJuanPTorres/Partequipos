@@ -50,6 +50,17 @@ describe("placasDeMarcas", () => {
     assert.equal(p[0]?.logo, null);
   });
 
+  it("lleva el logo de la marca con su casilla de tinta oscura (`LogoMarca`)", () => {
+    const [p] = placasDeMarcas([
+      {
+        ...marca(1, "A", "a"),
+        logo: { id: 9, url: "/a.png", width: 419, height: 100 } as Marca["logo"],
+        logoOscuroEnMenu: true,
+      },
+    ]);
+    assert.deepEqual(p?.logo, { url: "/a.png", width: 419, height: 100, oscuro: true });
+  });
+
   it("descarta las marcas sin nombre o sin slug", () => {
     assert.equal(placasDeMarcas([marca(1, " ", "a"), marca(2, "B", "")]).length, 0);
   });

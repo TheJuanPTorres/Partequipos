@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { IndiceTarjetas } from "@/components/indices/IndiceTarjetas";
+import { PaginaMarcaAditamentos } from "@/components/nueva/PaginaMarcaAditamentos";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
@@ -11,6 +12,7 @@ import {
   tarjetasDeTiposNueva,
   vistaEncabezadoMarcaNueva,
 } from "@/lib/nueva/paginaMarca";
+import { usaDisenoAditamentos } from "@/lib/nueva/paginaAditamentos";
 import {
   getEquiposDeTipos,
   getMarcaMaquinariaPorSlug,
@@ -59,6 +61,8 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
   const { marca: slug } = await params;
   const marca = await getMarcaMaquinariaPorSlug(slug);
   if (!marca) notFound();
+  // La marca de aditamentos con su plantilla de Andrés (2026-10-20).
+  if (usaDisenoAditamentos(marca)) return <PaginaMarcaAditamentos marca={marca} />;
 
   const [tipos, global, indice] = await Promise.all([
     getTiposDeMarcaMaquinaria(marca.id),

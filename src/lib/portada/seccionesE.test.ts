@@ -28,6 +28,19 @@ describe("sección 4: logos", () => {
     );
   });
 
+  it("con el nombre de una marca de repuestos, su logo (el de todo el sitio)", () => {
+    const logos = new Map([
+      ["hitachi", { url: "/rep.png", width: 419, height: 100, oscuro: true }],
+    ]);
+    const [l] = logosDeMarcas(
+      { logos: [{ id: "a", nombre: "Hitachi", logo: 1 }] } as Pagina["seccionLogos"],
+      logos,
+    );
+    assert.equal(l?.logo.url, "/rep.png");
+    assert.equal(l?.logo.oscuro, true);
+    assert.equal(l?.logo.alt, "Hitachi");
+  });
+
   it("sin imagen poblada o sin nombre, ese logo no sale", () => {
     const r = logosDeMarcas({
       logos: [

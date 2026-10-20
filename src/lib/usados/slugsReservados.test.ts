@@ -16,6 +16,11 @@ describe("slugCategoriaUsadaNoReservado", () => {
     assert.equal(slugCategoriaUsadaNoReservado(" Marcas ", args), MENSAJE_SLUG_RESERVADO);
   });
 
+  it("rechaza «otros» (la página que agrupa las categorías, 2026-10-19)", () => {
+    assert.equal(slugCategoriaUsadaNoReservado("otros", args), MENSAJE_SLUG_RESERVADO);
+    assert.equal(slugCategoriaUsadaNoReservado("OTROS", args), MENSAJE_SLUG_RESERVADO);
+  });
+
   it("deja pasar las demás y conserva el «obligatorio» de Payload", () => {
     assert.equal(slugCategoriaUsadaNoReservado("excavadoras", args), true);
     assert.notEqual(slugCategoriaUsadaNoReservado("", args), true);

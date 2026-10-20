@@ -1,5 +1,6 @@
 import type { CategoriasTecnica, Marca, RepuestosMarca } from "@/payload-types";
 
+import { logoPropio, type LogoMarca } from "../marca/logoMarca";
 import { rutas } from "../routes";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
@@ -60,8 +61,8 @@ export type PlacaMarca = {
   id: number;
   nombre: string;
   href: string;
-  /** Los logos del cliente son blancos: van sobre una placa oscura (D10). */
-  logo: ImagenLista | null;
+  /** El logo de la marca (`LogoMarca`), sobre fondo blanco. */
+  logo: LogoMarca | null;
 };
 
 /** Una placa por marca, con su enlace a la página de la marca. */
@@ -72,6 +73,6 @@ export function placasDeMarcas(marcas: Marca[]): PlacaMarca[] {
       id: m.id,
       nombre: m.nombre.trim(),
       href: rutas.marca(m.slug),
-      logo: imagenDeMedia(m.logo, m.nombre.trim()),
+      logo: logoPropio(m),
     }));
 }

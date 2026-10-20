@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { ListaEnlaces } from "@/components/catalog/ListaEnlaces";
+import { BaldosasMarcas } from "@/components/repuestos/BaldosasMarcas";
+import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
+import { placasDeMarcasNueva } from "@/lib/nueva/indiceMarcas";
+import { getLogosMarca } from "@/lib/queries/getLogosMarca";
+import { getEquiposNuevos, getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
+import { vistaEncabezadoIndice } from "@/lib/repuestos/categoria";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -20,8 +25,20 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
+const ANCLA = "marcas-maquinaria";
+
+/**
+ * ÍNDICE DE MARCAS DE MAQUINARIA NUEVA: el «Mostrar marcas» de Andrés (plantilla
+ * 4017), el mismo componente que el índice de marcas de repuestos
+ * (`BaldosasMarcas`), con las marcas que tienen equipos y Aditamentos al final.
+ * Sin franja de color: es un índice general.
+ */
 export default async function MarcasMaquinariaPage() {
-  const marcas = await getMarcasMaquinaria();
+  const [marcas, equipos, logos] = await Promise.all([
+    getMarcasMaquinaria(),
+    getEquiposNuevos(),
+    getLogosMarca(),
+  ]);
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -30,24 +47,22 @@ export default async function MarcasMaquinariaPage() {
     { nombre: "Marcas", path: rutas.marcasMaquinaria() },
   ];
 
-  const items = marcas.map((marca) => ({
-    href: `${rutas.marcaMaquinaria(marca.slug)}/`,
-    titulo: marca.nombre,
-    descripcion: marca.descripcion,
-    imagen: imagenDeMedia(marca.logo, `Logo de ${marca.nombre}`),
-  }));
+  const fondo = marcas.map((m) => imagenDeMedia(m.imagenTarjeta, "")).find(Boolean) ?? null;
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <Breadcrumbs items={breadcrumbs} />
-
-      <h1 className="text-3xl font-semibold text-gray-900">{TITULO}</h1>
-      <p className="mt-3 max-w-2xl text-gray-600">{DESCRIPCION}</p>
-
-      <div className="mt-8">
-        <ListaEnlaces items={items} vacio="Todavía no hay marcas publicadas." />
+      <div className={estilos.migas}>
+        <Breadcrumbs items={breadcrumbs} />
       </div>
+
+      <HeroMarca
+        vista={vistaEncabezadoIndice("Maquinaria pesada nueva", "Marcas", DESCRIPCION, fondo)}
+        anclaSiguiente={ANCLA}
+        franja={false}
+      />
+
+      <BaldosasMarcas id={ANCLA} marcas={placasDeMarcasNueva(marcas, equipos, logos)} />
     </main>
   );
 }

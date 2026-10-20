@@ -5,7 +5,9 @@ import { TarjetaListado } from "@/components/listado/TarjetaListado";
 import type { ResultadoListado } from "@/lib/filtros";
 import { CATALOGO_NUEVA } from "@/lib/nueva/filtros";
 import type { AmbitoNueva } from "@/lib/nueva/listado";
-import type { EquipoNuevoListado, FotoDeTarjeta } from "@/lib/queries/getMaquinaria";
+import { logoDeMarca, type LogoMarca } from "@/lib/marca/logoMarca";
+import type { EquipoNuevoListado } from "@/lib/queries/getMaquinaria";
+import { getLogosMarca } from "@/lib/queries/getLogosMarca";
 import { rutas } from "@/lib/routes";
 
 /**
@@ -15,7 +17,7 @@ import { rutas } from "@/lib/routes";
  * tarjeta son los comunes con usada (`src/components/listado/`).
  */
 
-export function ListadoNueva({
+export async function ListadoNueva({
   ambito,
   pagina,
   listado,
@@ -34,10 +36,17 @@ export function ListadoNueva({
   ];
   if (pagina > 1) migas.push({ nombre: `Página ${pagina}`, path: ambito.ruta(pagina) });
 
-  // Los logos de las marcas salen de los propios equipos (la marca los lleva).
-  const logoDeMarca = new Map<string, FotoDeTarjeta>();
+  // El logo de cada marca, el de todo el sitio (`logoMarca.ts`): el de repuestos si es la misma.
+  const indice = await getLogosMarca();
+  const logoDe = (e: EquipoNuevoListado) =>
+    logoDeMarca(
+      { nombre: e.marcaRef?.nombre, logo: e.logo, logoOscuroEnMenu: e.logoOscuro },
+      indice,
+    );
+  const logosDeMarca = new Map<string, LogoMarca>();
   for (const e of ambito.equipos) {
-    if (e.marcaRef && e.logo) logoDeMarca.set(e.marcaRef.slug, e.logo);
+    const logo = logoDe(e);
+    if (e.marcaRef && logo) logosDeMarca.set(e.marcaRef.slug, logo);
   }
 
   return (
@@ -51,7 +60,7 @@ export function ListadoNueva({
       listado={listado}
       rutaDe={(n) => `${ambito.ruta(n)}/`}
       elemento={{ singular: "equipo", plural: "equipos" }}
-      logoDeMarca={logoDeMarca}
+      logoDeMarca={logosDeMarca}
       idLista="tarjetas-nueva"
       vacio="Todavía no hay equipos publicados aquí."
     >
@@ -63,7 +72,7 @@ export function ListadoNueva({
           href={e.href}
           codigo={e.codigo}
           foto={e.foto}
-          logo={e.logo}
+          logo={logoDe(e)}
           logoAlt={e.marcaRef?.nombre ?? ""}
           filas={[
             { icono: IconWeight, texto: "Peso operativo", valor: e.datos.peso },

@@ -1,4 +1,5 @@
 import { campoColorMarca } from "@/lib/fields/colorMarca";
+import { TEXTOS_ADITAMENTOS as T } from "@/lib/nueva/paginaAditamentos";
 import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
@@ -101,6 +102,74 @@ export const MarcaMaquinaria: CollectionConfig = {
         description:
           "Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» (en ux-9: Hitachi, CASE y Yanmar). Necesita la foto de la tarjeta.",
       },
+    },
+    // Plantilla de Andrés de la marca de aditamentos (2026-10-20): `src/lib/nueva/paginaAditamentos.ts`.
+    {
+      name: "disenoPagina",
+      type: "select",
+      defaultValue: "plantilla1",
+      label: "Diseño de la página",
+      options: [
+        { label: "Plantilla 1 (tarjetas por tipo)", value: "plantilla1" },
+        { label: "Aditamentos (productos por tipo, contacto y sedes)", value: "aditamentos" },
+      ],
+      admin: {
+        position: "sidebar",
+        description:
+          "«Plantilla 1»: una tarjeta por tipo, como las demás marcas. «Aditamentos»: la plantilla de Andrés de la marca de aditamentos, con un bloque por tipo y sus productos, el contacto, la franja de servicios, «Nuestro compromiso» y las sedes.",
+      },
+    },
+    {
+      name: "plantillaAditamentos",
+      type: "group",
+      label: "Textos de la plantilla «Aditamentos»",
+      admin: {
+        condition: (datos) => datos?.disenoPagina === "aditamentos",
+        description: "Solo se usan con el diseño «Aditamentos». Vacío, el texto de siempre.",
+      },
+      fields: [
+        { name: "antetitulo", type: "text", label: "Antetítulo", defaultValue: T.antetitulo },
+        {
+          name: "titulo",
+          type: "text",
+          label: "Título de la página",
+          defaultValue: T.titulo,
+          admin: { description: "El título principal (h1) de la página." },
+        },
+        {
+          type: "row",
+          fields: [
+            { name: "franja1", type: "text", label: "Franja: texto 1", defaultValue: T.franja[0] },
+            { name: "franja2", type: "text", label: "Franja: texto 2", defaultValue: T.franja[1] },
+            { name: "franja3", type: "text", label: "Franja: texto 3", defaultValue: T.franja[2] },
+          ],
+        },
+        {
+          name: "compromisoTitulo",
+          type: "textarea",
+          label: "«Nuestro compromiso»: título",
+          defaultValue: T.compromisoTitulo,
+        },
+        {
+          name: "compromisoEntradilla",
+          type: "text",
+          label: "«Nuestro compromiso»: frase en negrita",
+          defaultValue: T.compromisoEntradilla,
+        },
+        {
+          name: "compromisoTexto",
+          type: "textarea",
+          label: "«Nuestro compromiso»: texto",
+          defaultValue: T.compromisoTexto,
+        },
+        {
+          name: "compromisoBoton",
+          type: "text",
+          label: "«Nuestro compromiso»: texto del botón",
+          defaultValue: T.compromisoBoton,
+          admin: { description: "El botón abre el formulario de contacto." },
+        },
+      ],
     },
     seoField(),
   ],

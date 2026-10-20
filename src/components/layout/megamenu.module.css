@@ -358,16 +358,6 @@
   object-fit: contain;
 }
 
-/*
- * Cada logo sale con SUS colores (2026-10-17): el submenú es blanco sólido
- * desde el #205. Solo el que la marca marca con «Pintar el logo en oscuro en el
- * menú» (los blancos o muy claros) se pinta en una sola tinta oscura.
- */
-.logo[data-oscuro] {
-  filter: brightness(0);
-  opacity: 0.85;
-}
-
 .titulo:hover,
 .acordeon[data-abierto="si"] > .titulo {
   color: var(--mega-rojo);

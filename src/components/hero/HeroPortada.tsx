@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { getImageProps } from "next/image";
-import Link from "next/link";
+import { EnlaceContacto } from "@/components/forms/EnlaceContacto";
 import {
   useCallback,
   useEffect,
@@ -716,9 +716,13 @@ export function HeroPortada({ diapositivas }: Props) {
               )}
             </div>
             {d.enlace ? (
-              <Link href={d.enlace.href} className={estilos.mas} aria-label={d.enlace.nombre}>
+              <EnlaceContacto
+                href={d.enlace.href}
+                className={estilos.mas}
+                ariaLabel={d.enlace.nombre}
+              >
                 <IconoMas />
-              </Link>
+              </EnlaceContacto>
             ) : hayEnlaces ? (
               // Hueco del «+» si otra diapositiva lo tiene: el párrafo no cambia de ancho.
               <span className={`${estilos.mas} ${estilos.masVacio}`} aria-hidden="true">

@@ -1,0 +1,46 @@
+/* Franja de servicios de la plantilla de aditamentos (elementor 4020). */
+
+.franja {
+  padding: 0 3% 3%;
+}
+
+.lista {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 16px;
+  text-align: center;
+}
+
+.item + .item {
+  border-left: 1px solid var(--color-marca);
+}
+
+.texto {
+  max-width: 237px;
+  color: var(--color-texto-suave);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@media (max-width: 767px) {
+  .lista {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .item + .item {
+    padding-top: 16px;
+    border-top: 1px solid var(--color-marca);
+    border-left: 0;
+  }
+}

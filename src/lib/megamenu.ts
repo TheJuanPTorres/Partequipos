@@ -1,6 +1,8 @@
+import { claveDeMarca, logoPropio } from "./marca/logoMarca";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
 import { rutas } from "./routes";
+import { ETIQUETA_OTROS, separarCategorias } from "./usados/otros";
 import { SIN_UNIDADES } from "./usados/vacia";
 
 /**
@@ -98,7 +100,8 @@ export type DatosMegamenu = {
   marcasMaquinaria: ItemCatalogo[];
   tiposMaquinaria: TipoCatalogo[];
   categoriasNueva: ItemCatalogo[];
-  categoriasUsada: ItemCatalogo[];
+  /** Con su casilla «Agrupar en «Otros»» y su orden (2026-10-19). */
+  categoriasUsada: (ItemCatalogo & { enOtros?: boolean | null; orden?: number | null })[];
   marcasRepuestos: ItemCatalogo[];
   tiposRepuestos: TipoCatalogo[];
   /** Los equipos nuevos (solo su tipo): el menú no enlaza a un tipo de maquinaria sin equipos. */
@@ -159,7 +162,14 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
   // que las páginas de marca, #232): vuelve solo con el primer equipo (`tiposConEquipos`).
   const conEquipos = tiposConEquipos(d.equiposNuevos, d.tiposMaquinaria);
   const tiposConEquiposNuevos = d.tiposMaquinaria.filter((t) => conEquipos.has(t.id));
-  const marcas = [...d.marcasMaquinaria].sort(porNombre);
+  // El logo de una marca de nueva que también es de repuestos (Hitachi, CASE, Yanmar…) es el de
+  // repuestos, con su casilla de tinta oscura: un solo logo por marca (`src/lib/marca/logoMarca.ts`).
+  const deRepuestos = new Map(d.marcasRepuestos.map((r) => [claveDeMarca(r.nombre), r]));
+  const conLogoUnico = (m: ItemCatalogo): ItemCatalogo => {
+    const r = deRepuestos.get(claveDeMarca(m.nombre));
+    return r && logoPropio(r) ? { ...m, logo: r.logo, logoOscuroEnMenu: r.logoOscuroEnMenu } : m;
+  };
+  const marcas = d.marcasMaquinaria.map(conLogoUnico).sort(porNombre);
   const aditamentos = marcas.find((m) => m.slug === SLUG_ADITAMENTOS);
   const deMarca = (m: ItemCatalogo, titulo?: string) =>
     grupoDeMarca(
@@ -201,15 +211,29 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
         ),
       )
     : null;
+  // Como en WordPress (cliente, 2026-10-19): las de primer nivel (Excavadoras y
+  // Aditamentos) y «Otros», que lleva a la página de las agrupadas.
+  const { primerNivel, agrupadas } = separarCategorias(d.categoriasUsada);
+  const sinUnidades = (ids: number[]) =>
+    conUnidades && !ids.some((id) => conUnidades.has(id)) ? { nota: SIN_UNIDADES } : {};
   const usada: GrupoMenu = {
     titulo: "Maquinaria pesada usada",
     enlaces: [
       { etiqueta: "Ver toda la maquinaria usada", href: conBarra(rutas.usada()) },
-      ...[...d.categoriasUsada].sort(porNombre).map((c) => ({
+      ...primerNivel.map((c) => ({
         etiqueta: c.nombre,
         href: conBarra(rutas.categoriaUsada(c.slug)),
-        ...(conUnidades && !conUnidades.has(c.id) ? { nota: SIN_UNIDADES } : {}),
+        ...sinUnidades([c.id]),
       })),
+      ...(agrupadas.length > 0
+        ? [
+            {
+              etiqueta: ETIQUETA_OTROS,
+              href: conBarra(rutas.usadaOtros()),
+              ...sinUnidades(agrupadas.map((c) => c.id)),
+            },
+          ]
+        : []),
     ],
     grupos: [],
   };

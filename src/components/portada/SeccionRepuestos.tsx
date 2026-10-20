@@ -1,6 +1,7 @@
 import { IconEngine } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import { EnlaceContacto } from "@/components/forms/EnlaceContacto";
 
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
@@ -128,10 +129,10 @@ export function SeccionRepuestos({
         </TarjetasApiladas>
         {textos.botonTexto && textos.botonEnlace ? (
           <div className={estilos.pie}>
-            <Link href={textos.botonEnlace} className={`${estilos.boton} texto-etiqueta`}>
+            <EnlaceContacto href={textos.botonEnlace} className={`${estilos.boton} texto-etiqueta`}>
               <IconEngine aria-hidden="true" focusable="false" stroke={1.75} />
               {textos.botonTexto}
-            </Link>
+            </EnlaceContacto>
           </div>
         ) : null}
       </div>

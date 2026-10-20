@@ -78,6 +78,8 @@ export type VistaServicioTecnico = {
     youtube: VistaVideoYoutube["video"];
     /** La portada del vídeo de YouTube, local (no se carga YouTube hasta pulsar). */
     miniaturaYoutube: ImagenBloque | null;
+    /** El recuadro bajo el vídeo de YouTube (editable; dirección, 2026-10-20). */
+    descripcionYoutube: string | null;
     fondo: VideoBloque | null;
   } | null;
   posventa: {
@@ -192,6 +194,7 @@ export function vistaServicioTecnico(bloques: VistaBloque[]): VistaServicioTecni
           etapas: alist.videoTaller ?? null,
           youtube: alist.video,
           miniaturaYoutube: alist.miniatura,
+          descripcionYoutube: alist.descripcionYoutube ?? null,
           fondo: alist.videoFondo ?? null,
         }
       : null,

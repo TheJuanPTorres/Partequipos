@@ -292,6 +292,11 @@ export function PlantillaServicioTecnico({
                       <IconPlayerPlayFilled focusable="false" />
                     </span>
                   </DialogoYouTube>
+                  {alistamiento.descripcionYoutube ? (
+                    <div className={estilos.recuadroVideo}>
+                      <p>{alistamiento.descripcionYoutube}</p>
+                    </div>
+                  ) : null}
                 </div>
               </CarruselVideos>
             </div>

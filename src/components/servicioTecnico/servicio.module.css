@@ -114,7 +114,8 @@ video.medio {
 }
 .accesoIcono {
   flex: none;
-  color: var(--color-texto);
+  /* El rojo de Partequipos (dirección, 2026-10-20). */
+  color: var(--color-marca);
   transition: transform 0.3s;
 }
 /* `grow-rotate` del icono al pasar el ratón, como el widget. */
@@ -398,6 +399,8 @@ video.medio {
 }
 .pasoTitulo {
   margin: 0 0 5px;
+  /* «Valoración», «Reparación», «Repuestos»: en rojo (dirección, 2026-10-20). */
+  color: var(--color-marca);
   font-size: var(--texto-destacado);
   font-weight: 700;
   line-height: 1.2;

@@ -375,6 +375,16 @@ export const BloqueVideoYoutube: Block = {
       },
     },
     {
+      // Diseño «Servicio técnico» (2026-10-20, dirección): el recuadro bajo el vídeo de YouTube.
+      name: "descripcionYoutube",
+      type: "textarea",
+      label: "Descripción del vídeo de YouTube (opcional)",
+      admin: {
+        description:
+          "Texto del recuadro bajo el vídeo de YouTube en el carrusel. Solo lo usa el diseño «Servicio técnico».",
+      },
+    },
+    {
       // Diseño «Servicio técnico» (2026-10-19): el vídeo propio junto al de YouTube.
       name: "videoTaller",
       type: "upload",

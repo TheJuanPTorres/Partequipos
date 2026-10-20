@@ -1714,6 +1714,10 @@ export interface BloqueVideoYoutube {
    */
   miniatura?: (number | null) | Media;
   /**
+   * Texto del recuadro bajo el vídeo de YouTube en el carrusel. Solo lo usa el diseño «Servicio técnico».
+   */
+  descripcionYoutube?: string | null;
+  /**
    * Un vídeo de «Vídeos» que se pinta junto al de YouTube, con sus controles y su póster. Solo lo usa el diseño «Servicio técnico».
    */
   videoTaller?: (number | null) | Video;
@@ -2916,6 +2920,7 @@ export interface BloqueVideoYoutubeSelect<T extends boolean = true> {
   texto?: T;
   youtube?: T;
   miniatura?: T;
+  descripcionYoutube?: T;
   videoTaller?: T;
   videoFondo?: T;
   id?: T;
@@ -3557,7 +3562,7 @@ export interface PaginasIndice {
      */
     fondo?: (number | null) | Media;
     /**
-     * «Provisional»: «Por ahora no hay unidades disponibles», con enlace a Contáctanos y WhatsApp. «Diseño propio»: el nuestro, con alternativas y «Avísame», sin aprobar para el sitio publicado.
+     * «Provisional»: «Por ahora no hay unidades disponibles», con enlace a Contáctanos y WhatsApp. «Diseño propio»: el nuestro, con alternativas y «Avísame»; aprobado por dirección como excepción (2026-10-19), es el elegido en el sitio publicado.
      */
     estadoVacio: 'provisional' | 'propio';
   };

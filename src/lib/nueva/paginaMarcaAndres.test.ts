@@ -6,6 +6,7 @@ import type { EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-
 import {
   MAX_EQUIPOS_POR_TIPO,
   enlacesDeTipos,
+  datosDeTarjeta,
   seccionesDeTipos,
   textosMarcaNueva,
 } from "./paginaMarcaAndres";
@@ -72,5 +73,28 @@ describe("seccionesDeTipos", () => {
     }));
     const [s] = seccionesDeTipos(marca, [tipo(1, "A")], [equipo(1, 1, { fichaTecnica: filas })]);
     assert.equal(s!.tarjetas[0]!.datos.length, 4);
+  });
+});
+
+describe("datosDeTarjeta", () => {
+  it("sin datos marcados, peso, potencia y motor de la ficha", () => {
+    const d = datosDeTarjeta([
+      { etiqueta: "Color", valor: "Naranja" },
+      { etiqueta: "Peso operativo", valor: "7,7 t" },
+      { etiqueta: "Potencia", valor: "90 hp" },
+      { etiqueta: "Motor", valor: "FPT" },
+    ]);
+    assert.deepEqual(
+      d.map((x) => x.icono),
+      ["peso", "potencia", "motor"],
+    );
+  });
+
+  it("con datos marcados, solo esos", () => {
+    const d = datosDeTarjeta([
+      { etiqueta: "Color", valor: "Naranja", destacar: true },
+      { etiqueta: "Peso operativo", valor: "7,7 t" },
+    ]);
+    assert.equal(d.length, 1);
   });
 });

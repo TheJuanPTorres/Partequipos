@@ -145,6 +145,11 @@ export async function PaginaMarcaNueva({ marca }: { marca: MarcasMaquinaria }) {
         siteKey={turnstileSiteKey()}
         whatsapp={empresa ? enlaceWhatsApp(empresa.whatsapp) : undefined}
         marca={nombre}
+        formulario={{
+          titulo: `Contacto sobre maquinaria ${nombre}`,
+          conCiudad: true,
+          etiquetaMensaje: "¿En qué estás interesado?",
+        }}
       />
 
       <SeccionTestimonios

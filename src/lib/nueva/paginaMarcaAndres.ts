@@ -1,9 +1,4 @@
-import {
-  DESTACADAS_EN_TARJETA,
-  MAX_DESTACADAS,
-  destacadas,
-  type DatoDestacado,
-} from "@/lib/maquinaria/fichaTecnica";
+import { MAX_DESTACADAS, destacadas, type DatoDestacado } from "@/lib/maquinaria/fichaTecnica";
 import type { EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
 
 import { rutas } from "../routes";
@@ -39,6 +34,25 @@ export function textosMarcaNueva(
     intro: o(p.intro, TEXTOS_MARCA_NUEVA.intro).replaceAll("{marca}", marca.nombre.trim()),
     cierre: o(p.cierre, TEXTOS_MARCA_NUEVA.cierre),
   };
+}
+
+/**
+ * Los datos de la tarjeta: los marcados «Destacar» en la ficha técnica (hasta 4); si el
+ * equipo no tiene ninguno marcado, peso, potencia y motor, como las tarjetas de los listados.
+ */
+export function datosDeTarjeta(filas: EquiposNuevo["fichaTecnica"]): DatoDestacado[] {
+  const marcados = destacadas(filas, MAX_DESTACADAS);
+  if (marcados.length > 0) return marcados;
+  const patrones: [RegExp, DatoDestacado["icono"]][] = [
+    [/^peso\s+(operativo|operacional|de\s+operaci[oó]n|en\s+funcionamiento)/i, "peso"],
+    [/potencia/i, "potencia"],
+    [/^motor\b/i, "motor"],
+  ];
+  return patrones.flatMap(([patron, icono]) => {
+    const fila = (filas ?? []).find((f) => f.etiqueta && patron.test(f.etiqueta));
+    const valor = fila?.valor?.trim();
+    return fila && valor ? [{ etiqueta: fila.etiqueta!.trim(), valor, icono }] : [];
+  });
 }
 
 export type TarjetaEquipo = {
@@ -100,7 +114,7 @@ export function seccionesDeTipos(
       nombre: e.nombre.trim(),
       href: `${rutas.equipoNuevo(marca.slug, tipo.slug, e.slug)}/`,
       foto: (e.imagenes ?? []).map((i) => imagenDeMedia(i, "")).find(Boolean) ?? null,
-      datos: destacadas(e.fichaTecnica, Math.min(MAX_DESTACADAS, DESTACADAS_EN_TARJETA + 1)),
+      datos: datosDeTarjeta(e.fichaTecnica),
     }));
     return [
       {

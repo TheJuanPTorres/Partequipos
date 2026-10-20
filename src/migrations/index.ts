@@ -69,6 +69,7 @@ import * as migration_20261020_062304_servicio_tecnico_descripcion_youtube from 
 import * as migration_20261020_064422_lubricantes_general from './20261020_064422_lubricantes_general';
 import * as migration_20261020_170728_marca_nueva_textos_linea from './20261020_170728_marca_nueva_textos_linea';
 import * as migration_20261020_183648_documento_visor from './20261020_183648_documento_visor';
+import * as migration_20261020_192253_categorias_cabeceras from './20261020_192253_categorias_cabeceras';
 
 export const migrations = [
   {
@@ -424,6 +425,11 @@ export const migrations = [
   {
     up: migration_20261020_183648_documento_visor.up,
     down: migration_20261020_183648_documento_visor.down,
-    name: '20261020_183648_documento_visor'
+    name: '20261020_183648_documento_visor',
+  },
+  {
+    up: migration_20261020_192253_categorias_cabeceras.up,
+    down: migration_20261020_192253_categorias_cabeceras.down,
+    name: '20261020_192253_categorias_cabeceras'
   },
 ];

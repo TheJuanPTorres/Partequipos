@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import type { CategoriasTecnica, Marca, RepuestosMarca } from "@/payload-types";
+import type { CategoriasTecnica, Marca, Media, RepuestosMarca } from "@/payload-types";
 
 import { fondoDeRespaldo, placasDeMarcas, vistaEncabezadoCategoria } from "./categoria";
 
@@ -34,6 +34,17 @@ describe("vistaEncabezadoCategoria", () => {
 
   it("sin imagen propia ni de respaldo, no hay fondo (sin hueco)", () => {
     assert.equal(vistaEncabezadoCategoria(categoria, global, null).fondo, null);
+  });
+
+  it("el fondo: el del encabezado, si no la imagen de la tarjeta, si no el de respaldo", () => {
+    const media = (id: number, url: string) =>
+      ({ id, url, width: 1600, height: 900, alt: "" }) as Media;
+    const respaldo = { url: "/respaldo.jpg", alt: "", width: 1, height: 1, posicion: "50% 50%" };
+    const tarjeta = { ...categoria, imagen: media(2, "/tarjeta.jpg") } as CategoriasTecnica;
+    const ambas = { ...tarjeta, fondoHero: media(3, "/fondo.jpg") } as CategoriasTecnica;
+    assert.equal(vistaEncabezadoCategoria(ambas, global, respaldo).fondo?.url, "/fondo.jpg");
+    assert.equal(vistaEncabezadoCategoria(tarjeta, global, respaldo).fondo?.url, "/tarjeta.jpg");
+    assert.equal(vistaEncabezadoCategoria(categoria, global, respaldo).fondo?.url, "/respaldo.jpg");
   });
 });
 

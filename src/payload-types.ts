@@ -764,7 +764,14 @@ export interface CategoriasTecnica {
    */
   slug: string;
   descripcion?: string | null;
+  /**
+   * La de su tarjeta en la portada, el menú, el índice de categorías técnicas y las páginas de tipo. También la cabecera de su página si no tiene «Fondo del encabezado».
+   */
   imagen?: (number | null) | Media;
+  /**
+   * Opcional. Foto horizontal de obra a todo el ancho para la cabecera de su página. Vacía, la imagen de la tarjeta (y sin ella, la de la primera marca de repuestos con foto).
+   */
+  fondoHero?: (number | null) | Media;
   /**
    * Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de marca.
    */
@@ -2393,6 +2400,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   slug?: T;
   descripcion?: T;
   imagen?: T;
+  fondoHero?: T;
   icono?: T;
   tituloPortada?: T;
   enlace?: T;
@@ -3594,6 +3602,12 @@ export interface PaginasIndice {
         }[]
       | null;
   };
+  categoriasRepuestos?: {
+    /**
+     * Opcional. Foto de obra a todo el ancho; sin ella, la del encabezado de la primera marca de repuestos que lo tenga.
+     */
+    fondo?: (number | null) | Media;
+  };
   maquinaria?: {
     antetitulo?: string | null;
     titulo?: string | null;
@@ -3877,6 +3891,11 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
               mostrar?: T;
               id?: T;
             };
+      };
+  categoriasRepuestos?:
+    | T
+    | {
+        fondo?: T;
       };
   maquinaria?:
     | T

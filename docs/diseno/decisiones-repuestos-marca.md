@@ -112,7 +112,7 @@ el contacto y los testimonios se quedan como estaban. Las placas oscuras siguen 
   fila, 2 en tablet y en móvil, y la última fila incompleta **centrada** (flex con el ancho exacto de una columna,
   como el #274). El logo encoge al pasar el ratón («shrink» de Elementor), salvo con «reducir movimiento».
 - **El cuadrado del #271:** la baldosa toma el «Color de la marca» y el logo va en blanco, o en negro si el color es
-  muy claro (`logoBlancoSobre`). Sin color, el amarillo de siempre con el logo en negro; sin logo, su nombre en la
+  muy claro (`logoBlancoSobre`). Sin color, el de las páginas de marca sin color (`--marca-amarillo`: amarillo hoy, gris neutro con el #279 de D) con el logo en negro; sin logo, su nombre en la
   tinta que mejor se lea (`tintaSobre`). Mismas marcas que antes (`placasDeMarcas`: con nombre y dirección).
 - **Sin franja amarilla** (dirección): ni el `#F2BC2E` del export tras los recuadros ni la mitad inferior de la del
   encabezado de la página. Es un índice general, no el de una marca.

@@ -1381,8 +1381,8 @@ a.modelo:hover {
   align-items: center;
   justify-content: center;
   border-radius: 20px;
-  background: var(--baldosa-color);
-  color: var(--baldosa-tinta);
+  background: var(--baldosa-color, var(--marca-amarillo));
+  color: var(--baldosa-tinta, var(--marca-tinta, #000));
   font-size: 20px;
   font-weight: 700;
   text-align: center;

@@ -1,4 +1,4 @@
-import { logoBlancoSobre } from "@/lib/marca/colorMarca";
+import { conAlt, logoPropio, type LogoConAlt, type LogoMarca } from "@/lib/marca/logoMarca";
 import type { CategoriasTecnica, Marca, RepuestosMarca, TiposEquipo } from "@/payload-types";
 
 import { rutas } from "../routes";
@@ -27,11 +27,14 @@ export type VistaEncabezado = {
   /** Texto de presentación: la descripción de la marca. */
   descripcion: string;
   fondo: ImagenLista | null;
-  /** El logo de la marca va sobre el título, en un cuadrado del color de la marca. */
-  logo: ImagenLista | null;
-  /** El logo se pinta en una sola tinta: blanco sobre un color oscuro, negro sobre uno claro. */
-  logoBlanco?: boolean;
+  /** El logo de la marca (`LogoMarca`) va sobre el título, en un cuadrado blanco. */
+  logo: LogoConAlt | null;
 };
+
+/** El logo de una marca de repuestos con «Logo de <marca>» como texto alternativo. */
+export function logoConAlt(marca: Marca, nombre = marca.nombre.trim()): LogoConAlt | null {
+  return conAlt(logoPropio(marca), `Logo de ${nombre}`);
+}
 
 /**
  * El título nunca queda vacío: sin el texto del global, el `<h1>` usa el
@@ -46,8 +49,7 @@ export function vistaEncabezado(marca: Marca, global: RepuestosMarca): VistaEnca
     linea2: [nombre.toUpperCase(), sufijo].filter(Boolean).join(" "),
     descripcion: texto(marca.descripcion),
     fondo: imagenDeMedia(marca.fondoHero, ""),
-    logo: imagenDeMedia(marca.logo, `Logo de ${nombre}`),
-    logoBlanco: logoBlancoSobre(marca.colorMarca),
+    logo: logoConAlt(marca, nombre),
   };
 }
 
@@ -94,8 +96,8 @@ export type TarjetaMarca = {
   soloEscritorio: boolean;
   /** Línea bajo el título (p. ej. «3 unidades disponibles» en el índice de usados). */
   detalle?: string;
-  /** La imagen es un logo: se pinta entero, sin recortar (índice de usados). */
-  logo?: boolean;
+  /** El logo de la marca (`LogoMarca`), entero y sin recortar, en lugar de la foto (índice de usados). */
+  logo?: LogoMarca;
 };
 
 /**

@@ -6,10 +6,10 @@ import {
   IconPlus,
   type Icon,
 } from "@tabler/icons-react";
-import Image from "next/image";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { FacetaPintada } from "@/lib/filtros";
-import type { FotoDeTarjeta } from "@/lib/queries/getMaquinaria";
+import type { LogoMarca as LogoMarcaDatos } from "@/lib/marca/logoMarca";
 
 import estilos from "./listado.module.css";
 
@@ -46,7 +46,7 @@ export function PanelFiltrosListado({
   orden: string;
   ordenPorDefecto: string;
   elemento: { singular: string; plural: string };
-  logoDeMarca?: Map<string, FotoDeTarjeta>;
+  logoDeMarca?: Map<string, LogoMarcaDatos>;
 }) {
   const conOpciones = facetas.filter((f) => f.opciones.length);
   if (!conOpciones.length) return null;
@@ -78,12 +78,11 @@ export function PanelFiltrosListado({
                     return (
                       <li key={o.valor}>
                         <label className={estilos.marca}>
-                          {logo?.url && logo.width && logo.height ? (
-                            <Image
-                              src={logo.url}
+                          {logo ? (
+                            <LogoMarca
+                              logo={logo}
                               alt=""
-                              width={112}
-                              height={Math.round((112 * logo.height) / logo.width)}
+                              sizes="56px"
                               className={estilos.marcaLogo}
                             />
                           ) : null}

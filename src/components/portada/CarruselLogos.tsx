@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useId, type CSSProperties } from "react";
 
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { usePausa } from "@/components/movimiento/useMovimiento";
-import type { LogoMarca } from "@/lib/portada/seccionesE";
+import { LogoMarca } from "@/components/marca/LogoMarca";
+import type { LogoDePortada } from "@/lib/portada/seccionesE";
 
 import estilos from "./logos.module.css";
 
@@ -32,7 +32,7 @@ const SEGUNDOS_POR_LOGO = 4.5;
 /** Ancho pintado de cada logo: 218 / 267 / 125 px en los tres cortes de ux-9. */
 const SIZES_LOGO = "(max-width: 767px) 125px, (max-width: 1024px) 267px, 218px";
 
-export function CarruselLogos({ logos }: { logos: LogoMarca[] }) {
+export function CarruselLogos({ logos }: { logos: LogoDePortada[] }) {
   const { pausado, alternar } = usePausa();
   const idPista = useId();
   if (logos.length === 0) return null;
@@ -53,11 +53,9 @@ export function CarruselLogos({ logos }: { logos: LogoMarca[] }) {
             <ul key={copia} className={estilos.lista} aria-hidden={copia > 0 ? true : undefined}>
               {logos.map((l) => (
                 <li key={l.id} className={estilos.caja}>
-                  <Image
-                    src={l.logo.url}
+                  <LogoMarca
+                    logo={l.logo}
                     alt={copia === 0 ? l.logo.alt : ""}
-                    width={l.logo.width}
-                    height={l.logo.height}
                     sizes={SIZES_LOGO}
                     className={estilos.logo}
                   />

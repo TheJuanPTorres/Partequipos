@@ -102,6 +102,10 @@ visual** que marca y tipo. **Provisional**: se reemplaza cuando llegue la planti
 
 ## 8. Índice de marcas con «Mostrar marcas» de Andrés (2026-10-20, dirección)
 
+> **CAMBIADO el mismo día (dirección):** las baldosas son BLANCAS con el logo de la marca, el de todo el sitio
+> (`LogoMarca`, `docs/diseno/logo-marca.md`); ya no van del color de la marca. Lo de abajo sobre el color queda
+> como historia.
+
 Plantilla 4017 (`Desktop\partequipos-diseno\wordpress\indice-marcas-repuestos\elementor-4017-2026-10-20.json`).
 **Solo cambia la parte de las marcas** de `…/repuestos-maquinaria-pesada-marcas/` (`BaldosasMarcas`); el encabezado,
 el contacto y los testimonios se quedan como estaban. Las placas oscuras siguen en el índice de categorías y en cada categoría técnica.

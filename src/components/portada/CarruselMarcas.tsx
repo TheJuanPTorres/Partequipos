@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { usePausa } from "@/components/movimiento/useMovimiento";
 import {
@@ -126,11 +127,9 @@ export function CarruselMarcas({ tarjetas, etiqueta }: Props) {
         />
         {t.logo ? (
           <span className={estilos.logoCol}>
-            <Image
-              src={t.logo.url}
+            <LogoMarca
+              logo={t.logo}
               alt={copia ? "" : t.logo.alt}
-              width={t.logo.width}
-              height={t.logo.height}
               sizes="120px"
               className={estilos.logo}
             />

@@ -1,5 +1,6 @@
 import type { CategoriasUsada, EquiposUsado, MarcasMaquinaria } from "@/payload-types";
 
+import { conAlt, logoDeMarca, type IndiceLogos, type LogoConAlt } from "../marca/logoMarca";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 
 /**
@@ -26,8 +27,8 @@ export type TarjetaMarca = {
   texto: string | null;
   /** Decorativa: `alt` vacío. El nombre lo da el logo. */
   fondo: ImagenLista;
-  /** `alt` = nombre de la marca: es lo único que la nombra en la tarjeta. */
-  logo: ImagenLista | null;
+  /** `alt` = nombre de la marca: es lo único que la nombra en la tarjeta. El de todo el sitio. */
+  logo: LogoConAlt | null;
 };
 
 /**
@@ -35,7 +36,10 @@ export type TarjetaMarca = {
  * texto blanco caería sobre la página), en el orden de esa posición. En ux-9:
  * Hitachi, CASE y Yanmar.
  */
-export function tarjetasDeMarcas(marcas: MarcasMaquinaria[]): TarjetaMarca[] {
+export function tarjetasDeMarcas(
+  marcas: MarcasMaquinaria[],
+  logos: IndiceLogos = new Map(),
+): TarjetaMarca[] {
   const conPosicion = marcas
     .filter((m) => typeof m.ordenPortada === "number")
     .sort((a, b) => (a.ordenPortada ?? 0) - (b.ordenPortada ?? 0));
@@ -43,7 +47,8 @@ export function tarjetasDeMarcas(marcas: MarcasMaquinaria[]): TarjetaMarca[] {
     const fondo = imagenDeMedia(m.imagenTarjeta, "");
     const nombre = m.nombre?.trim();
     if (!fondo || !nombre || !m.slug) return [];
-    const logo = imagenDeMedia(m.logo, nombre);
+    // El logo de la marca, el de todo el sitio: el de repuestos si es la misma marca.
+    const logo = conAlt(logoDeMarca(m, logos), nombre);
     return [
       {
         id: m.id,
@@ -51,7 +56,7 @@ export function tarjetasDeMarcas(marcas: MarcasMaquinaria[]): TarjetaMarca[] {
         href: `${RUTA_MARCAS_NUEVA}${m.slug}/`,
         texto: m.descripcion?.trim() || null,
         fondo: { ...fondo, alt: "" },
-        logo: logo ? { ...logo, alt: nombre } : null,
+        logo,
       },
     ];
   });

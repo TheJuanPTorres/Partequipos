@@ -82,9 +82,9 @@
 }
 
 /*
- * CUADRADO DEL LOGO (plantilla de Andrés, 4007; 2026-10-19): el logo en una sola tinta sobre un
- * cuadrado con el color de la marca. Blanco, salvo que el color sea claro (un amarillo): ahí va
- * en negro, porque el blanco no se leería (AA, `logoBlancoSobre`).
+ * CUADRADO DEL LOGO (plantilla de Andrés, 4007): BLANCO con el logo de la marca, el de todo el
+ * sitio (`LogoMarca`: sus colores, o tinta oscura si es un logo blanco). Dirección, 2026-10-20:
+ * ya no va del color de la marca.
  */
 .placa {
   display: flex;
@@ -95,19 +95,13 @@
   align-items: center;
   justify-content: center;
   border-radius: 20px;
-  background: var(--marca-amarillo);
+  background: #fff;
 }
 
 .logo {
   width: 100%;
   height: auto;
   max-height: 100%;
-  object-fit: contain;
-  filter: brightness(0);
-}
-
-.placa[data-logo-blanco] .logo {
-  filter: brightness(0) invert(1);
 }
 
 .h1 {
@@ -903,7 +897,7 @@ a.modelo:hover {
 
 /* --- Placas de marca y variante gris de las categorías (índices, PROVISIONAL) -------- */
 
-/* Los logos del cliente son blancos: cada marca va sobre su placa oscura (D10). */
+/* Una placa blanca por marca con su logo (`LogoMarca`). */
 .placasLista {
   display: flex;
   max-width: 1240px;
@@ -923,19 +917,21 @@ a.modelo:hover {
   padding: 14px 20px;
   align-items: center;
   justify-content: center;
+  /* Placa BLANCA con el logo de la marca, el de todo el sitio (`LogoMarca`, 2026-10-20). */
+  border: 1px solid #e2e2e2;
   border-radius: 10px;
-  background: var(--color-texto);
-  color: #fff;
+  background: #fff;
+  color: var(--color-texto);
   font-size: 16px;
   font-weight: 600;
   text-align: center;
   text-decoration: none;
-  transition: background-color 0.3s;
+  transition: border-color 0.3s;
 }
 
 .placaMarca:hover,
 .placaMarca:focus-visible {
-  background: var(--color-marca);
+  border-color: var(--color-marca);
 }
 
 .placaLogo {
@@ -943,7 +939,6 @@ a.modelo:hover {
   max-width: 131px;
   height: auto;
   max-height: 56px;
-  object-fit: contain;
 }
 
 /* Categorías sobre el gris de la página (la amarilla solo va tras el encabezado). */
@@ -1409,9 +1404,11 @@ a.modelo:hover {
   padding: 20px;
   align-items: center;
   justify-content: center;
+  /* BLANCA con el logo de la marca (dirección, 2026-10-20): un borde gris la separa del recuadro. */
+  border: 1px solid #e2e2e2;
   border-radius: 20px;
-  background: var(--baldosa-color, var(--marca-amarillo));
-  color: var(--baldosa-tinta, var(--marca-tinta, #000));
+  background: #fff;
+  color: var(--color-texto);
   font-size: 20px;
   font-weight: 700;
   text-align: center;
@@ -1427,12 +1424,6 @@ a.modelo:hover {
   width: 100%;
   height: auto;
   max-height: 100%;
-  object-fit: contain;
-  filter: brightness(0);
-}
-
-.baldosa[data-logo-blanco] .baldosaLogo {
-  filter: brightness(0) invert(1);
 }
 
 /* «shrink» de Elementor en el logo, solo si no se pide reducir el movimiento. */

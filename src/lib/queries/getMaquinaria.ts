@@ -472,8 +472,10 @@ export type EquipoNuevoListado = EquipoFiltrable & {
   href: string;
   tipoId: number;
   foto: FotoDeTarjeta | null;
-  /** El logo de la marca, que va sobre la foto. */
+  /** El logo de la marca, que va sobre la foto (se resuelve con `logoDeMarca` al pintar). */
   logo: FotoDeTarjeta | null;
+  /** «Pintar el logo en oscuro en el menú» de la marca. */
+  logoOscuro: boolean;
   /** Los tres datos de la tarjeta, tal como los escribe la ficha técnica. */
   datos: { peso: string | null; potencia: string | null; motor: string | null };
   /** El PDF de la ficha técnica, si lo hay. */
@@ -538,7 +540,7 @@ const listadoNuevaEnCache = unstable_cache(
         depth: 0,
         limit: 0,
         pagination: false,
-        select: { slug: true, nombre: true, logo: true },
+        select: { slug: true, nombre: true, logo: true, logoOscuroEnMenu: true },
       }),
       payload.find({
         collection: "tipos-maquinaria",
@@ -641,6 +643,7 @@ const listadoNuevaEnCache = unstable_cache(
         pesoKg: e.pesoOperativoKg ?? null,
         foto: foto(primera == null ? null : idRel(primera)),
         logo: foto(idRel(marca.logo)),
+        logoOscuro: marca.logoOscuroEnMenu === true,
         datos: {
           peso: datoDeFicha(e.fichaTecnica, PATRONES_TARJETA.peso),
           potencia: datoDeFicha(e.fichaTecnica, PATRONES_TARJETA.potencia),

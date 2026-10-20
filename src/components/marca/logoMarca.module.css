@@ -1,0 +1,10 @@
+/* Entero y sin deformarse dentro de la caja que le dé quien lo usa. */
+.logo {
+  object-fit: contain;
+}
+
+/* «Pintar el logo en oscuro en el menú»: los logos blancos, en una sola tinta oscura (megamenú, §26.1.1). */
+.logo[data-oscuro] {
+  filter: brightness(0);
+  opacity: 0.85;
+}

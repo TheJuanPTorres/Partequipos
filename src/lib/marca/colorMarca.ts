@@ -37,17 +37,6 @@ export function tintaSobre(fondo: string): string {
 }
 
 /**
- * ¿Va el logo en BLANCO sobre este color de marca? Sí, como en el diseño de Andrés, salvo que el
- * color sea tan claro (un amarillo) que el blanco apenas se distinga: con menos de 2,5:1 de
- * contraste, negro. Un logotipo no tiene requisito de contraste (WCAG 1.4.3), pero tiene que
- * leerse. Sin color de marca vale el gris neutro: negro.
- */
-export function logoBlancoSobre(valor: string | null | undefined): boolean {
-  const color = colorDeMarca(valor);
-  return color ? contraste(luz(color), luz(BLANCO)) >= 2.5 : false;
-}
-
-/**
  * Las variables CSS de la página: el color de la franja, la tinta de sus
  * títulos y del foco, y el aspecto de una píldora al pasar el ratón (la tinta
  * sobre el color de la franja: nunca del color de la franja sobre sí mismo).

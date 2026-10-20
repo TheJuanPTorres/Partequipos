@@ -1,11 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
+import type { LogoConAlt } from "@/lib/marca/logoMarca";
+
 export type EnlaceItem = {
   href: string;
   titulo: string;
   descripcion?: string | null;
   imagen?: { url: string; alt: string; width: number; height: number } | null;
+  /** El logo de una marca, el de todo el sitio (`LogoMarca`); manda sobre `imagen`. */
+  logo?: LogoConAlt | null;
 };
 
 /**
@@ -29,7 +34,14 @@ export function ListaEnlaces({ items, vacio }: { items: EnlaceItem[]; vacio: str
       {items.map((item) => (
         <li key={item.href} className="rounded-lg border border-gray-200">
           <Link href={item.href} className="flex h-full items-center gap-4 p-4 hover:bg-gray-50">
-            {item.imagen ? (
+            {item.logo ? (
+              <LogoMarca
+                logo={item.logo}
+                alt={item.logo.alt}
+                sizes="200px"
+                className="h-12 w-auto shrink-0"
+              />
+            ) : item.imagen ? (
               <Image
                 src={item.imagen.url}
                 alt={item.imagen.alt}

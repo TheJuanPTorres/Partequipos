@@ -2,7 +2,9 @@ import { IconBrandWhatsapp, IconCirclePlus } from "@tabler/icons-react";
 import Image from "next/image";
 
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
+import type { LogoMarca as LogoMarcaDatos } from "@/lib/marca/logoMarca";
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import estilos from "./modelo.module.css";
@@ -33,7 +35,7 @@ export function PresentacionModelo({
   texto: string;
   foto: ImagenLista | null;
   /** El logo de la marca, para el panel sin foto. */
-  logo: ImagenLista | null;
+  logo: LogoMarcaDatos | null;
   solicitarHref: string;
   /** El formulario de la página de modelo: «Solicitar repuestos» lo abre en una ventana. */
   formulario: ConfigFormulario;
@@ -53,14 +55,7 @@ export function PresentacionModelo({
             />
           ) : logo ? (
             <span className={estilos.logoGrande} aria-hidden="true">
-              <Image
-                src={logo.url}
-                alt=""
-                width={logo.width}
-                height={logo.height}
-                sizes="420px"
-                className={estilos.logoGrandeImg}
-              />
+              <LogoMarca logo={logo} alt="" sizes="420px" className={estilos.logoGrandeImg} />
             </span>
           ) : null}
         </div>

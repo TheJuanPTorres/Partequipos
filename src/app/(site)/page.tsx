@@ -24,6 +24,7 @@ import { getEquiposUsadosDePortada, getMarcasDePortada } from "@/lib/queries/get
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
+import { getLogosMarca } from "@/lib/queries/getLogosMarca";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
@@ -69,6 +70,7 @@ export default async function HomePage() {
     sedes,
     empresa,
     logo,
+    logosMarca,
   ] = await Promise.all([
     getMarcasDePortada(),
     getEquiposUsadosDePortada(),
@@ -79,6 +81,7 @@ export default async function HomePage() {
     getSedesDePortada(),
     getEmpresa(),
     getLogo(),
+    getLogosMarca(),
   ]);
   const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
   const maquinaUsada = imagenDeMedia(pagina.seccionUsada?.imagen, "");
@@ -112,7 +115,7 @@ export default async function HomePage() {
 
       {/* Secciones 2 y 3 de ux-9 (fase D). Sin datos, no se pintan. */}
       <SeccionMaquinariaNueva
-        tarjetas={tarjetasDeMarcas(marcas)}
+        tarjetas={tarjetasDeMarcas(marcas, logosMarca)}
         textos={{
           antetitulo: tx(nueva?.antetitulo),
           titulo: tx(nueva?.titulo),
@@ -139,7 +142,7 @@ export default async function HomePage() {
       />
 
       {/* Secciones 4 y 5 de ux-9 (fase E). Sin datos, no se pintan. */}
-      <CarruselLogos logos={logosDeMarcas(pagina.seccionLogos)} />
+      <CarruselLogos logos={logosDeMarcas(pagina.seccionLogos, logosMarca)} />
       <SeccionRepuestos
         tarjetas={tarjetasDeRepuestos(categoriasTecnicas)}
         textos={{

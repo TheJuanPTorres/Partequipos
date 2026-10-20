@@ -19,6 +19,7 @@ import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { tarjetasDeCategoriasUsada, tarjetasDeMarcasUsada } from "@/lib/usados/indice";
+import { indiceDeLogos } from "@/lib/marca/logoMarca";
 
 const TITULO = "Maquinaria pesada usada";
 const DESCRIPCION =
@@ -78,7 +79,12 @@ export default async function UsadaIndexPage() {
         titulo="Marcas"
         indice
         verTodo={verTodo}
-        tarjetas={tarjetasDeMarcasUsada(marcasUsada, inventario, rutas.marcaUsada)}
+        tarjetas={tarjetasDeMarcasUsada(
+          marcasUsada,
+          inventario,
+          rutas.marcaUsada,
+          indiceDeLogos(marcas),
+        )}
       />
     </main>
   );

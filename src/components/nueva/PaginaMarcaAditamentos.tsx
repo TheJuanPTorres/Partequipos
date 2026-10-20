@@ -25,9 +25,10 @@ import { FranjaServicios } from "./FranjaServicios";
 const ANCLA_PRODUCTOS = "aditamentos-por-tipo";
 const ANCLA_CONTACTO = "contacto-aditamentos";
 
-/** Los campos del formulario del export (sin «No Documento», Ley 1581): sin preguntas de clasificación. */
+/** Los campos del formulario del export, con «Ciudad» en lugar de «No Documento» (Ley 1581, como la página de modelo). */
 const FORMULARIO = {
   titulo: "Contacto sobre aditamentos",
+  conCiudad: true,
   etiquetaMensaje: "¿En qué estás interesado?",
 };
 

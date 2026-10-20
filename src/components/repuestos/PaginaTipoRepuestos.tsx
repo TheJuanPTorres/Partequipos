@@ -29,7 +29,7 @@ import {
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
-import { tituloPorDefecto } from "@/lib/seo/porDefecto";
+import { tipoEnTitulo, tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { poblado } from "@/lib/utils/relations";
@@ -111,7 +111,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
 
       <ModelosTipo
         id={ANCLA_MODELOS}
-        titulo={`Modelos de ${nombreTipo} ${marca.nombre}`}
+        titulo={`Modelos de ${tipoEnTitulo(tipo.nombre)} ${marca.nombre}`}
         modelos={enlaces}
         grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}

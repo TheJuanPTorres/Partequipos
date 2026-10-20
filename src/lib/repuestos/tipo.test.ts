@@ -19,7 +19,7 @@ const modelo = (id: number, nombre: string, slug: string, codigo?: string) =>
 describe("vistaEncabezadoTipo", () => {
   it("compone el título con el tipo y la marca, y toma la descripción del tipo", () => {
     const v = vistaEncabezadoTipo(marca, tipo, global);
-    assert.equal(v.linea1, "Repuestos para excavadora");
+    assert.equal(v.linea1, "Repuestos para Excavadora");
     assert.equal(v.linea2, "CATERPILLAR En Colombia");
     assert.equal(v.descripcion, "Piezas de desgaste.");
   });

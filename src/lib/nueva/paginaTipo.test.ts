@@ -84,17 +84,17 @@ describe("fotoDeCabecera", () => {
 describe("títulos", () => {
   it("encabezado y franja con la marca, sin repetirla si el tipo ya la lleva", () => {
     assert.equal(vistaEncabezadoTipoNueva(marca, tipo(), []).linea1, "Excavadoras Hitachi");
-    assert.equal(tituloFranja(marca, tipo()), "Modelos de excavadoras Hitachi");
+    assert.equal(tituloFranja(marca, tipo()), "Modelos de Excavadoras Hitachi");
     assert.equal(
       tituloFranja(marca, tipo({ nombre: "Excavadoras Hitachi" })),
-      "Modelos de excavadoras Hitachi",
+      "Modelos de Excavadoras Hitachi",
     );
     const adit = { ...marca, nombre: "Aditamentos", slug: "aditamentos" } as MarcasMaquinaria;
     assert.equal(
       tituloFranja(adit, tipo({ nombre: "Aditamentos para minicargadores" })),
-      "Modelos de aditamentos para minicargadores",
+      "Modelos de Aditamentos para minicargadores",
     );
     const case_ = { ...marca, nombre: "Case Construction" } as MarcasMaquinaria;
-    assert.equal(tituloFranja(case_, tipo()), "Modelos de excavadoras Case Construction");
+    assert.equal(tituloFranja(case_, tipo()), "Modelos de Excavadoras Case Construction");
   });
 });

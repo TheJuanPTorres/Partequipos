@@ -40,6 +40,16 @@ export function tipoConMarca(tipo: string, marca: string): string {
   return yaLaLleva || !m ? t : `${t} ${m}`;
 }
 
+/**
+ * El tipo de máquina en un banner o título principal (petición del cliente, 2026-10-20):
+ * empieza por mayúscula y el resto va en minúscula («Cargador frontal»). Solo para
+ * encabezados: el cuerpo, el SEO y las URL siguen con el tipo en minúscula.
+ */
+export function tipoEnTitulo(tipo: string): string {
+  const t = tipo.trim().toLowerCase();
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
 /** Título por defecto de cada página del catálogo, a partir de sus nombres. */
 export const tituloPorDefecto = {
   tipoRepuesto: (tipo: string, marca: string) => `Repuestos para ${tipo.toLowerCase()} ${marca}`,

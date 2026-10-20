@@ -136,6 +136,11 @@
   line-height: 1.2;
 }
 
+/* Recibe el foco al abrir (tabindex -1): no es un control, sin aro. */
+.titulo:focus {
+  outline: none;
+}
+
 .cuenta {
   color: var(--color-texto-suave, #56545a);
   font-weight: 500;

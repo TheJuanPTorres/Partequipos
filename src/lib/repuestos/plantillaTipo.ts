@@ -38,7 +38,12 @@ export function tarjetasDeCategorias(categorias: CategoriasTecnica[]): TarjetaMa
 
 export type VistaPorQue = {
   titulo: string;
-  imagen: ImagenLista;
+  /** Sin foto (la página de aditamentos, 2026-10-20): el texto ocupa toda la tarjeta. */
+  imagen: ImagenLista | null;
+  /** Frase en negrita antes de los puntos (el «Nuestro compromiso…» de aditamentos). */
+  entradilla?: string;
+  /** Párrafo tras la entradilla. */
+  texto?: string;
   puntos: { clave: string; titulo: string; texto: string }[];
   cierre: string;
   boton: string;

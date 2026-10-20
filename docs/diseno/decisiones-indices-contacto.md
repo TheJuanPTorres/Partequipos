@@ -193,3 +193,19 @@ marca y tipo de repuestos no cambian). **Medido contra el píxel más claro de s
 - **Índice de Repuestos:** solo «Repuestos por marca» y «Categorías técnicas». Las otras cuatro (Tren de rodaje, Filtración, Herramienta de corte (GETS) y Lubricantes) se conservan desmarcadas. En el preview, desmarcadas por SQL; en el sitio publicado, desde el panel con `runbook-indice-repuestos-dos-tarjetas.md`.
 - **Última fila centrada.** Una rejilla CSS no centra una fila a medias, así que en `.tarjetasIndice` la lista pasa a flex con salto de línea y `justify-content: center`, y cada tarjeta mide exactamente una columna de la rejilla de antes: `(100% − (n − 1) × 20 px) / n`, con n = 3, 2 o 1 según el ancho. Las filas completas quedan igual; el recuadro con scroll (#249) no cambia (solo `transform`).
 - Vale para todas las páginas con `IndiceTarjetas`: índices de Repuestos, Maquinaria pesada y usados, y las marcas de nueva.
+- **Sustituido por §11** (el mismo día): el centrado pasa a una rejilla de 6 columnas y la regla cambia con 4 tarjetas.
+
+## 11. Regla de colocación de las tarjetas (agente A, 2026-10-19, petición del cliente)
+
+Para **todas** las secciones de `TarjetasMarca`: tipos de la marca de repuestos, categorías del tipo de repuestos, «Plantilla 1» de los índices (Repuestos, Maquinaria pesada, usados) y marcas de nueva.
+
+| Tarjetas                           | Escritorio (≥ 1025 px)                                                                   |
+| ---------------------------------- | ---------------------------------------------------------------------------------------- |
+| 1 o 2                              | Centradas                                                                                |
+| 4                                  | 2 + 2, centradas. **El único caso de 2 columnas**                                        |
+| Cualquier otro (3, 5, 6, 7, 8, 9…) | 3 columnas, la última fila incompleta centrada (5 → 3 + 2; 7 → 3 + 3 + 1; 8 → 3 + 3 + 2) |
+
+- **Tablet** (768–1024): 2 columnas, la última impar centrada. **Móvil:** 1 columna.
+- **La tarjeta no cambia de ancho:** mide una columna de la rejilla de 3 (de 2 en tablet), también cuando van 2 por fila.
+- **Cómo:** rejilla de 6 columnas (4 en tablet) con cada tarjeta ocupando 2; las de una fila incompleta empiezan una columna más a la derecha (`nth-child` / `nth-last-child`, y `:has()` para «exactamente 4»). Con el mismo hueco entre columnas, 2 de 6 miden lo mismo que 1 de 3. Solo CSS, sin JavaScript; las filas siguen igualando el alto de sus tarjetas y el recuadro con scroll (#249) no cambia.
+- Sustituye al flex del §10, que solo cubría los índices.

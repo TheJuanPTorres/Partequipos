@@ -11,7 +11,10 @@ import { imagenDeMedia } from "../utils/relations";
  * «Nuestro compromiso…» y las sedes. Las demás marcas siguen con la «Plantilla 1».
  */
 
-/** Textos de la plantilla (los de Andrés, sin la errata «Aditamientos» del export). */
+/**
+ * Textos por defecto de la plantilla (los de Andrés, sin la errata «Aditamientos» del
+ * export). Se editan en la marca (grupo «Textos de la plantilla «Aditamentos»»).
+ */
 export const TEXTOS_ADITAMENTOS = {
   antetitulo: "Partequipos",
   titulo: "Aditamentos para maquinaria pesada",
@@ -24,9 +27,38 @@ export const TEXTOS_ADITAMENTOS = {
   compromisoBoton: "Solicita asesoría",
 } as const;
 
-/** TEMPORAL (muestra): se sustituye por el campo «Diseño de la página» de la marca. */
-export function usaDisenoAditamentos(marca: Pick<MarcasMaquinaria, "slug">): boolean {
-  return marca.slug === "aditamentos";
+/** La marca usa la plantilla de aditamentos: su campo «Diseño de la página». */
+export function usaDisenoAditamentos(marca: Pick<MarcasMaquinaria, "disenoPagina">): boolean {
+  return marca.disenoPagina === "aditamentos";
+}
+
+export type TextosAditamentos = {
+  antetitulo: string;
+  titulo: string;
+  franja: string[];
+  compromisoTitulo: string;
+  compromisoEntradilla: string;
+  compromisoTexto: string;
+  compromisoBoton: string;
+};
+
+/** Los textos de la plantilla desde el panel; uno vacío, el de siempre. */
+export function textosAditamentos(
+  marca: Pick<MarcasMaquinaria, "plantillaAditamentos">,
+): TextosAditamentos {
+  const p = marca.plantillaAditamentos ?? {};
+  const o = (v: string | null | undefined, por: string) => v?.trim() || por;
+  return {
+    antetitulo: o(p.antetitulo, TEXTOS_ADITAMENTOS.antetitulo),
+    titulo: o(p.titulo, TEXTOS_ADITAMENTOS.titulo),
+    franja: [p.franja1, p.franja2, p.franja3].map((v, i) =>
+      o(v, TEXTOS_ADITAMENTOS.franja[i] ?? ""),
+    ),
+    compromisoTitulo: o(p.compromisoTitulo, TEXTOS_ADITAMENTOS.compromisoTitulo),
+    compromisoEntradilla: o(p.compromisoEntradilla, TEXTOS_ADITAMENTOS.compromisoEntradilla),
+    compromisoTexto: o(p.compromisoTexto, TEXTOS_ADITAMENTOS.compromisoTexto),
+    compromisoBoton: o(p.compromisoBoton, TEXTOS_ADITAMENTOS.compromisoBoton),
+  };
 }
 
 export type SeccionAditamentos = {

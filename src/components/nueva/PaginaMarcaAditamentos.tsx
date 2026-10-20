@@ -7,7 +7,7 @@ import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
-import { seccionesAditamentos, TEXTOS_ADITAMENTOS } from "@/lib/nueva/paginaAditamentos";
+import { seccionesAditamentos, textosAditamentos } from "@/lib/nueva/paginaAditamentos";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getEquiposDeTipos, getTiposDeMarcaMaquinaria } from "@/lib/queries/getMaquinaria";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
@@ -52,6 +52,7 @@ export async function PaginaMarcaAditamentos({ marca }: { marca: MarcasMaquinari
   ]);
   const equipos = await getEquiposDeTipos(tipos.map((t) => t.id));
   const secciones = seccionesAditamentos(marca, tipos, equipos);
+  const t = textosAditamentos(marca);
 
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const origen = rutas.marcaMaquinaria(marca.slug);
@@ -74,8 +75,8 @@ export async function PaginaMarcaAditamentos({ marca }: { marca: MarcasMaquinari
 
       <HeroMarca
         vista={{
-          antetitulo: TEXTOS_ADITAMENTOS.antetitulo,
-          linea1: TEXTOS_ADITAMENTOS.titulo,
+          antetitulo: t.antetitulo,
+          linea1: t.titulo,
           linea2: "",
           descripcion: "",
           fondo: imagenDeMedia(marca.imagenTarjeta, ""),
@@ -112,18 +113,18 @@ export async function PaginaMarcaAditamentos({ marca }: { marca: MarcasMaquinari
         formulario={FORMULARIO}
       />
 
-      <FranjaServicios textos={TEXTOS_ADITAMENTOS.franja} />
+      <FranjaServicios textos={t.franja} />
 
       <PorQueElegirnos
         id="nuestro-compromiso"
         vista={{
-          titulo: TEXTOS_ADITAMENTOS.compromisoTitulo,
+          titulo: t.compromisoTitulo,
           imagen: null,
-          entradilla: TEXTOS_ADITAMENTOS.compromisoEntradilla,
-          texto: TEXTOS_ADITAMENTOS.compromisoTexto,
+          entradilla: t.compromisoEntradilla,
+          texto: t.compromisoTexto,
           puntos: [],
           cierre: "",
-          boton: TEXTOS_ADITAMENTOS.compromisoBoton,
+          boton: t.compromisoBoton,
         }}
         anclaContacto={ANCLA_CONTACTO}
         formulario={configContactoMarca({

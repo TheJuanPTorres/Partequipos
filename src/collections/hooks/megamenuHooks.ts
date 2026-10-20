@@ -10,7 +10,7 @@ import { revalidarTodoElSitio } from "../../lib/revalidation";
  *
  * Revalidar el sitio entero es caro, así que SOLO cuando cambia lo que el menú
  * pinta (nombre, slug, marca; en las marcas, el logo y su tinta; en las categorías
- * técnicas, el icono y el orden): editar una
+ * técnicas, la foto y el orden): editar una
  * descripción no lo dispara. Se AÑADE
  * a los ganchos de cada colección; nunca relanza.
  */
@@ -21,7 +21,12 @@ const idDe = (v: unknown) =>
   v && typeof v === "object" && "id" in v ? (v as { id: unknown }).id : v;
 
 /** ¿Cambia lo que pinta el menú? Pura, para probarla sin Payload. */
-export function cambiaElMenu(operacion: string, doc: Registro, anterior: Registro): boolean {
+export function cambiaElMenu(
+  operacion: string,
+  doc: Registro,
+  anterior: Registro,
+  coleccion?: string,
+): boolean {
   if (operacion === "create") return true;
   if (!doc || !anterior) return true;
   return (
@@ -30,8 +35,9 @@ export function cambiaElMenu(operacion: string, doc: Registro, anterior: Registr
     idDe(doc.marca) !== idDe(anterior.marca) ||
     idDe(doc.logo) !== idDe(anterior.logo) ||
     doc.logoOscuroEnMenu !== anterior.logoOscuroEnMenu ||
-    // Las categorías técnicas: su icono y su orden también se pintan (2026-10-20).
-    doc.icono !== anterior.icono ||
+    // Las categorías técnicas: su foto y su orden también se pintan (2026-10-20). La
+    // foto, solo en ellas: la de un tipo o una categoría de usados no sale en el menú.
+    (coleccion === "categorias-tecnicas" && idDe(doc.imagen) !== idDe(anterior.imagen)) ||
     doc.ordenMarca !== anterior.ordenMarca ||
     // Las categorías de lubricante: su enlace en el menú (2026-10-20).
     doc.enlaceMenu !== anterior.enlaceMenu
@@ -44,7 +50,7 @@ export function revalidarMegamenu(coleccion: string): {
 } {
   return {
     afterChange: ({ doc, previousDoc, operation }) => {
-      if (cambiaElMenu(operation, doc, previousDoc)) {
+      if (cambiaElMenu(operation, doc, previousDoc, coleccion)) {
         revalidarTodoElSitio(`${coleccion} ${doc?.id ?? ""} (megamenú)`);
       }
       return doc;

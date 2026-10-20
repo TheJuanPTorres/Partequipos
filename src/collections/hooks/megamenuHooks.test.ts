@@ -32,10 +32,21 @@ describe("megamenú: cuándo hay que revalidar el sitio", () => {
     assert.equal(cambiaElMenu("update", { ...antes, descripcion: "otra" }, antes), false);
   });
 
-  it("en las categorías técnicas, si cambia el icono o el orden; en las marcas, la tinta oscura", () => {
-    const cat = { nombre: "Filtración", slug: "filtros", icono: "filtro", ordenMarca: 1 };
-    assert.equal(cambiaElMenu("update", { ...cat, icono: "motor" }, cat), true);
-    assert.equal(cambiaElMenu("update", { ...cat, ordenMarca: 2 }, cat), true);
+  it("en las categorías técnicas, si cambia la foto o el orden (no el icono); en las marcas, la tinta oscura", () => {
+    const cat = {
+      nombre: "Filtración",
+      slug: "filtros",
+      icono: "filtro",
+      ordenMarca: 1,
+      imagen: 5,
+    };
+    const ct = "categorias-tecnicas";
+    assert.equal(cambiaElMenu("update", { ...cat, imagen: 6 }, cat, ct), true);
+    assert.equal(cambiaElMenu("update", { ...cat, imagen: null }, cat, ct), true);
+    assert.equal(cambiaElMenu("update", { ...cat, icono: "motor" }, cat, ct), false);
+    assert.equal(cambiaElMenu("update", { ...cat, ordenMarca: 2 }, cat, ct), true);
+    // La foto de un tipo no sale en el menú: no revalida todo el sitio.
+    assert.equal(cambiaElMenu("update", { ...cat, imagen: 6 }, cat, "tipos-equipo"), false);
     assert.equal(cambiaElMenu("update", { ...antes, logoOscuroEnMenu: true }, antes), true);
   });
 });

@@ -430,10 +430,91 @@
   border-radius: 4px;
 }
 
-/* Icono de la categoría técnica en «Repuestos por categoría técnica» (2026-10-20). */
-.hoja svg.hojaIcono {
-  width: 18px;
-  height: 18px;
+/*
+ * TARJETAS CON FOTO de «Repuestos por categoría técnica» (dirección, 2026-10-20):
+ * foto y nombre, como las tarjetas de categorías del sitio, en versión compacta.
+ * 5 por fila en escritorio (el panel con tarjetas pasa a 820 px) y en tablet, y 2
+ * en el teléfono; la última fila incompleta, CENTRADA (regla del #281: mismo ancho de
+ * tarjeta, `flex-wrap` centrado). Foto en caja 4:3 fija: sin CLS al llegar.
+ */
+.panel[data-ancho="amplio"] {
+  width: 820px;
+}
+
+.tarjetas {
+  --tarjetas-columnas: 5;
+  --tarjetas-hueco: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--tarjetas-hueco);
+  margin: 0;
+  padding: 0 0 10px;
+  list-style: none;
+}
+
+.tarjetaCaja {
+  flex: 0 0
+    calc((100% - (var(--tarjetas-columnas) - 1) * var(--tarjetas-hueco)) / var(--tarjetas-columnas));
+  min-width: 0;
+}
+
+.tarjeta {
+  display: flex;
+  height: 100%;
+  box-sizing: border-box;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+
+.tarjetaFoto {
+  display: block;
+  /* Sin `overflow: hidden`, la foto estiraba la caja y salía cuadrada (medido). */
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--color-fondo);
+}
+
+/* Las fotos son recortes de producto: ENTERAS (`contain`), sin cortar la pieza. */
+.tarjetaFoto img {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  object-fit: contain;
+}
+
+.tarjetaNombre {
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.tarjeta:hover {
+  border-color: var(--mega-rojo);
+  color: var(--mega-rojo);
+}
+
+.tarjeta:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+}
+
+/* Menú móvil: 2 por fila en el teléfono; en tablet (hasta 1024 px), 5 como en escritorio. */
+@media (max-width: 767px) {
+  .movil .tarjetas {
+    --tarjetas-columnas: 2;
+  }
 }
 
 /* Un enlace suelto de nivel 1 (la política de garantías) con el recuadro de los acordeones. */

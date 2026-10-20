@@ -7,6 +7,7 @@ import {
   construirMegamenu,
   logoDeMenu,
   panelMaquinaria,
+  panelConTarjetas,
   panelLubricantes,
   panelRepuestos,
   type DatosMegamenu,
@@ -219,18 +220,19 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
         id: 1,
         nombre: "Tren de rodaje",
         slug: "tren-de-rodaje-para-maquinaria-pesada",
-        icono: "rodaje",
         ordenMarca: 2,
+        imagen: { url: "/api/media/file/rodaje.jpg", width: 800, height: 600 },
       },
       {
         id: 2,
         nombre: "Filtración",
         slug: "filtros-para-maquinaria-pesada",
-        icono: "filtro",
         ordenMarca: 1,
+        // Sin medidas: la tarjeta va sin foto.
+        imagen: { url: "/api/media/file/filtro.jpg", width: null, height: null },
       },
-      { id: 3, nombre: "Accesorios", slug: "accesorios", icono: null, ordenMarca: null },
-      { id: 4, nombre: "Sin página", slug: "", icono: "motor", ordenMarca: null },
+      { id: 3, nombre: "Accesorios", slug: "accesorios", ordenMarca: null, imagen: 9 },
+      { id: 4, nombre: "Sin página", slug: "", ordenMarca: null, imagen: null },
     ],
     politicaRepuestos: {
       mostrar: true,
@@ -239,27 +241,36 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
     },
   };
 
-  it("el apartado de categorías: «Ver todas» y una por categoría, en su orden, con su icono", () => {
+  it("el apartado de categorías: «Ver todas» y una TARJETA con foto por categoría, en su orden", () => {
     const p = panelRepuestos(conTodo);
     assert.deepEqual(titulos(p.grupos), ["Repuestos por marca", "Repuestos por categoría técnica"]);
     const g = p.grupos[1]!;
     assert.deepEqual(
-      g.enlaces.map((e) => [e.etiqueta, e.icono ?? null]),
+      g.enlaces.map((e) => [e.etiqueta, e.href]),
       [
-        ["Ver todas las categorías", null],
-        ["Filtración", "filtro"],
-        ["Tren de rodaje", "rodaje"],
-        ["Accesorios", null],
+        [
+          "Ver todas las categorías",
+          "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/",
+        ],
       ],
     );
-    assert.equal(
-      g.enlaces[0]!.href,
-      "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/",
-    );
-    assert.equal(
-      g.enlaces[1]!.href,
-      "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/filtros-para-maquinaria-pesada/",
-    );
+    assert.deepEqual(g.tarjetas, [
+      {
+        etiqueta: "Filtración",
+        href: "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/filtros-para-maquinaria-pesada/",
+      },
+      {
+        etiqueta: "Tren de rodaje",
+        href: "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/tren-de-rodaje-para-maquinaria-pesada/",
+        imagen: { url: "/api/media/file/rodaje.jpg", width: 800, height: 600 },
+      },
+      {
+        etiqueta: "Accesorios",
+        href: "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/accesorios/",
+      },
+    ]);
+    assert.equal(panelConTarjetas(p), true);
+    assert.equal(panelConTarjetas({ ...p, grupos: [p.grupos[0]!] }), false);
   });
 
   it("la política, al final, como enlace suelto; desmarcada o sin texto o enlace, no sale", () => {
@@ -279,7 +290,7 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
   it("sin ninguna categoría con página, el apartado no sale", () => {
     const p = panelRepuestos({
       ...conTodo,
-      categoriasTecnicas: [{ id: 4, nombre: "X", slug: "", icono: null, ordenMarca: null }],
+      categoriasTecnicas: [{ id: 4, nombre: "X", slug: "", ordenMarca: null }],
     });
     assert.deepEqual(titulos(p.grupos), ["Repuestos por marca"]);
   });

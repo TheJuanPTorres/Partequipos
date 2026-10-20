@@ -262,14 +262,24 @@
     display: inline;
   }
 
-  .separador {
+  /* Los botones en una fila y «Descargar PDF» debajo, a todo el ancho. */
+  .controles {
+    gap: 0.5rem 0.25rem;
+  }
+
+  .descargar {
     flex-basis: 100%;
-    height: 0;
+    justify-content: center;
   }
 }
 
-/* Pantalla completa: fondo oscuro y el libro tan grande como quepa. */
+/*
+ * Pantalla completa: fondo oscuro y el libro tan grande como quepa a lo alto,
+ * descontando título, controles y, si están abiertas, las miniaturas
+ * (`--reserva`). Sin encogerse en la columna: si no, recortaría la página.
+ */
 .visor[data-completa] {
+  --reserva: 9rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -279,13 +289,23 @@
   color: #fff;
 }
 
-.visor[data-completa] .titulo {
+.visor[data-completa][data-miniaturas] {
+  --reserva: 16rem;
+}
+
+.visor[data-completa] .titulo,
+.visor[data-completa] .miniatura {
   color: #fff;
 }
 
 .visor[data-completa] .escenario {
-  width: min(100%, calc((100dvh - 9rem) * var(--proporcion) * 2));
+  flex: none;
+  width: min(100%, calc((100dvh - var(--reserva)) * var(--proporcion) * 2));
   margin-inline: auto;
+}
+
+.visor[data-completa] .miniaturas {
+  justify-content: center;
 }
 
 .visor[data-completa] .controles {
@@ -294,7 +314,7 @@
 
 @container (max-width: 639px) {
   .visor[data-completa] .escenario {
-    width: min(100%, calc((100dvh - 11rem) * var(--proporcion)));
+    width: min(100%, calc((100dvh - var(--reserva) - 3rem) * var(--proporcion)));
   }
 }
 

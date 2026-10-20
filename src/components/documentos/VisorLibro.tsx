@@ -148,6 +148,11 @@ export function VisorLibro({
     return () => document.removeEventListener("fullscreenchange", cambio);
   }, []);
 
+  // Abrir o cerrar las miniaturas en pantalla completa cambia el tamaño del libro.
+  useEffect(() => {
+    requestAnimationFrame(() => libro.current?.update());
+  }, [miniaturas, completa]);
+
   const ir = useCallback(
     async (accion: "anterior" | "siguiente" | "inicio" | "fin" | number) => {
       const pf = await asegurar();
@@ -204,6 +209,7 @@ export function VisorLibro({
       onKeyDown={alTeclado}
       style={{ ["--proporcion" as string]: String(proporcion) }}
       data-completa={completa ? "" : undefined}
+      data-miniaturas={miniaturas ? "" : undefined}
     >
       <h3 className={estilos.titulo}>{titulo}</h3>
 

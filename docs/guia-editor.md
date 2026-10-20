@@ -288,6 +288,20 @@ oficial, no lo pongas.
   quien tiene el movimiento reducido activado.
 - **Qué muestra el vídeo:** descríbelo siempre, aunque sea decorativo.
 
+### 5.6 bis Un PDF para leer como libro («Documento en visor»)
+
+- En una página, el bloque **«Documento en visor»** muestra un PDF de
+  **Archivos → Documentos** como un libro: se pasan las páginas, hay
+  miniaturas, zoom, pantalla completa y el botón **«Descargar PDF»**. Se puede
+  añadir en **«Bloques»** de la página o **dentro de un texto**: en el editor
+  de texto, con el botón «+» o escribiendo «/», elige «Documento en visor».
+- Para verse como libro, el documento necesita sus **«Páginas como
+  imágenes»**. Las genera un script al importar el PDF; pídelo al equipo
+  técnico cuando subas uno nuevo. Mientras no las tenga, el bloque muestra
+  solo el enlace para descargarlo.
+- **Si cambias el PDF** de un documento, hay que volver a generar sus páginas:
+  si no, el visor seguiría mostrando las del PDF anterior.
+
 ### 5.7 Testimonios, preguntas frecuentes y sedes
 
 - **Testimonios:** son de personas reales. **No se pueden publicar sin marcar

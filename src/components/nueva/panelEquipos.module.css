@@ -10,6 +10,8 @@
   /* Pegado abajo y centrado: la hoja sube desde el borde inferior. */
   width: min(1320px, calc(100% - 32px));
   max-width: none;
+  /* El estilo del navegador limita el alto del <dialog>: aquí lo manda la altura de abajo. */
+  max-height: none;
   height: min(88dvh, 1000px);
   /* Altura mínima generosa: con un solo equipo no queda bajita. */
   min-height: min(70dvh, 640px);

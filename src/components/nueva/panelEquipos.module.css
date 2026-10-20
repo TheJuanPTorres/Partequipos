@@ -19,7 +19,8 @@
    */
   --fila: 69px;
   --cromo: 103px;
-  height: auto;
+  /* `fit-content`, no `auto`: un <dialog> está anclado arriba y abajo y con `auto` se estiraría. */
+  height: fit-content;
   max-height: min(85dvh, 1000px);
   min-height: calc(var(--cromo) + 18px + 3 * var(--fila) + 48px);
   margin: auto auto 0;

@@ -81,6 +81,7 @@
     "preview:aditamentos:simular": "tsx scripts/preview/con-entorno.ts payload run scripts/aditamentos/importar.ts simular preview",
     "preview:aditamentos:importar": "tsx scripts/preview/con-entorno.ts payload run scripts/aditamentos/importar.ts importar preview",
     "preview:aditamentos:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/aditamentos/importar.ts retirar preview",
+    "preview:aditamentos:cabecera": "tsx scripts/preview/con-entorno.ts payload run scripts/aditamentos/cabecera.ts preview",
     "preview:catalogo-wp:simular": "tsx scripts/preview/con-entorno.ts payload run scripts/catalogo-wp/importar.ts simular preview",
     "preview:catalogo-wp:importar": "tsx scripts/preview/con-entorno.ts payload run scripts/catalogo-wp/importar.ts importar preview",
     "preview:catalogo-wp:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/catalogo-wp/importar.ts retirar preview",

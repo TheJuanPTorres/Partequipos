@@ -150,8 +150,8 @@ describe("clasificarDestino — lubricantes y blog", () => {
     assert.deepEqual(d.padres, ["lubricantes-eni"]);
   });
 
-  it("`/lubricantes/` a secas NO es ruta: esa página no existe", () => {
-    assert.equal(clasificarDestino("/lubricantes/").clase, "sin-ruta");
+  it("`/lubricantes/` es la página general (2026-10-20)", () => {
+    assert.deepEqual(clasificarDestino("/lubricantes/"), { clase: "estatica", ruta: "/lubricantes" });
   });
 
   it("archivo de categoría del blog", () => {

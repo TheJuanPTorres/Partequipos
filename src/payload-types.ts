@@ -1057,6 +1057,10 @@ export interface CategoriasLubricante {
   slug: string;
   marca: number | MarcasLubricante;
   /**
+   * Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su sección de la página de la marca (#su-direccion). Cámbialo cuando la categoría tenga página propia.
+   */
+  enlaceMenu?: string | null;
+  /**
    * Resumen de una o dos líneas, bajo el título.
    */
   entradilla?: string | null;
@@ -2613,6 +2617,7 @@ export interface CategoriasLubricanteSelect<T extends boolean = true> {
   nombre?: T;
   slug?: T;
   marca?: T;
+  enlaceMenu?: T;
   entradilla?: T;
   descripcion?: T;
   imagen?: T;
@@ -3489,7 +3494,7 @@ export interface RepuestosMarca {
   createdAt?: string | null;
 }
 /**
- * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada» y de su página «Otros».
+ * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada», de su página «Otros» y de «Lubricantes».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "paginas-indice".
@@ -3590,6 +3595,27 @@ export interface PaginasIndice {
      * Opcional. La foto de la tarjeta «Otros» en la página «Maquinaria pesada usada». Vacía, sale la primera foto de la unidad más reciente de las categorías agrupadas.
      */
     imagenTarjeta?: (number | null) | Media;
+  };
+  /**
+   * La página /lubricantes/ (plantilla de Andrés). Un campo vacío usa el texto del diseño.
+   */
+  lubricantes?: {
+    antetitulo?: string | null;
+    titulo?: string | null;
+    /**
+     * Opcional. Sin ella, el encabezado queda en un tono oscuro.
+     */
+    fondo?: (number | null) | Media;
+    tituloBloque?: string | null;
+    /**
+     * Un párrafo por línea en blanco. Vacío, el texto del diseño.
+     */
+    textoBloque?: string | null;
+    /**
+     * Su logo (el de la marca en el panel) y el botón llevan a su página. Vacía, la primera marca de lubricantes.
+     */
+    marca?: (number | null) | MarcasLubricante;
+    textoBoton?: string | null;
   };
   contacto?: {
     antetitulo?: string | null;
@@ -3823,6 +3849,17 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
         texto?: T;
         fondo?: T;
         imagenTarjeta?: T;
+      };
+  lubricantes?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        fondo?: T;
+        tituloBloque?: T;
+        textoBloque?: T;
+        marca?: T;
+        textoBoton?: T;
       };
   contacto?:
     | T

@@ -313,7 +313,8 @@ export function rutasDeCategoriaUsada(slug: string): string[] {
  * son secciones de esa página y ya no tienen ruta propia.
  */
 export function rutasDeMarcaLubricante(marcaSlug: string): string[] {
-  return [rutas.marcaLubricante(marcaSlug)];
+  // La página general (2026-10-20) pinta el logo y el enlace de la marca destacada.
+  return [rutas.marcaLubricante(marcaSlug), rutas.lubricantes()];
 }
 
 // --- Blog -------------------------------------------------------------------

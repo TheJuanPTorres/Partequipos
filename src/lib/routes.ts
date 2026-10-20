@@ -45,10 +45,10 @@ export const SEGMENTO_OTROS_USADA = "otros";
 /**
  * Lubricantes.
  *
- * OJO: `/lubricantes/` **no es una página**. El rastreo no la encuentra entre
- * las 648 URLs vivas: solo existen `/lubricantes/{marca}/` y sus categorías. Es
- * un segmento de ruta sin índice, y se replica así — inventar el índice sería
- * crear una URL que nadie ha indexado.
+ * `/lubricantes/` es la página GENERAL de lubricantes desde el 2026-10-20
+ * (plantilla de Andrés 809451, dirección). Antes no existía: el rastreo no la
+ * encuentra entre las 648 URLs vivas, que solo tienen `/lubricantes/{marca}/` y
+ * sus categorías. Es una URL NUEVA (no sustituye a ninguna indexada).
  */
 export const SEGMENTO_LUBRICANTES = "lubricantes";
 
@@ -124,6 +124,8 @@ export const rutas = {
     `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${SEGMENTO_MARCAS_MAQUINARIA}/${marcaSlug}/${tipoSlug}/${equipoSlug}`,
 
   // --- Lubricantes --------------------------------------------------------
+  /** La página general (2026-10-20): presentación, formulario y la marca. */
+  lubricantes: () => `/${SEGMENTO_LUBRICANTES}`,
   marcaLubricante: (marcaSlug: string) => `/${SEGMENTO_LUBRICANTES}/${marcaSlug}`,
   /**
    * Las categorías de lubricante son SECCIONES de la página de su marca

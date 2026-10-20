@@ -72,7 +72,7 @@ export const PaginasIndice: GlobalConfig = {
   admin: {
     group: "Partes del sitio",
     description:
-      "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada» y de su página «Otros».",
+      "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada», de su página «Otros» y de «Lubricantes».",
   },
   access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
@@ -85,6 +85,7 @@ export const PaginasIndice: GlobalConfig = {
             "/maquinaria-pesada/maquinaria-pesada-usada",
             "/maquinaria-pesada/maquinaria-pesada-usada/otros",
             "/contactanos",
+            "/lubricantes",
           ],
           "global paginas-indice",
         );
@@ -196,6 +197,57 @@ export const PaginasIndice: GlobalConfig = {
           "Imagen de la tarjeta «Otros»",
           "Opcional. La foto de la tarjeta «Otros» en la página «Maquinaria pesada usada». Vacía, sale la primera foto de la unidad más reciente de las categorías agrupadas.",
         ),
+      ],
+    },
+    {
+      name: "lubricantes",
+      type: "group",
+      label: "Página «Lubricantes» (la general)",
+      admin: {
+        description:
+          "La página /lubricantes/ (plantilla de Andrés). Un campo vacío usa el texto del diseño.",
+      },
+      fields: [
+        { name: "antetitulo", type: "text", label: "Antetítulo", admin: { placeholder: "Partequipos" } },
+        {
+          name: "titulo",
+          type: "text",
+          label: "Título",
+          admin: { placeholder: "Nuestros Lubricantes" },
+        },
+        imagen(
+          "fondo",
+          "Foto de fondo del encabezado",
+          "Opcional. Sin ella, el encabezado queda en un tono oscuro.",
+        ),
+        {
+          name: "tituloBloque",
+          type: "text",
+          label: "Título junto al formulario",
+          admin: { placeholder: "Máxima protección y eficiencia para tu maquinaria." },
+        },
+        {
+          name: "textoBloque",
+          type: "textarea",
+          label: "Texto junto al formulario",
+          admin: { description: "Un párrafo por línea en blanco. Vacío, el texto del diseño." },
+        },
+        {
+          name: "marca",
+          type: "relationship",
+          relationTo: "marcas-lubricante",
+          label: "Marca destacada",
+          admin: {
+            description:
+              "Su logo (el de la marca en el panel) y el botón llevan a su página. Vacía, la primera marca de lubricantes.",
+          },
+        },
+        {
+          name: "textoBoton",
+          type: "text",
+          label: "Texto del botón",
+          admin: { placeholder: "Ver catálogo" },
+        },
       ],
     },
     {

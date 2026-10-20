@@ -142,6 +142,19 @@ export type DatosMegamenu = {
   categoriasTecnicas?: ReadonlyArray<CategoriaTecnicaMenu>;
   /** «Política de garantías y repuestos», del global `cabecera`. */
   politicaRepuestos?: PoliticaMenu;
+  /** Las marcas de lubricante y sus categorías (desplegable «Lubricantes», 2026-10-20). */
+  marcasLubricante?: ReadonlyArray<ItemCatalogo>;
+  categoriasLubricante?: ReadonlyArray<CategoriaLubricanteMenu>;
+};
+
+/** Lo que el menú necesita de una categoría de lubricante. */
+export type CategoriaLubricanteMenu = {
+  id: number;
+  nombre: string;
+  slug: string;
+  marca: number | { id: number } | null | undefined;
+  /** «Enlace en el menú»: vacío, su sección (ancla) de la página de la marca. */
+  enlaceMenu?: string | null;
 };
 
 /** La «marca» de maquinaria nueva que en el sitio actual agrupa los aditamentos. */
@@ -331,13 +344,58 @@ export function panelRepuestos(d: DatosMegamenu): PanelMenu {
 }
 
 /**
+ * «LUBRICANTES» (2026-10-20, dirección): «Ver todos los lubricantes» a la página
+ * general y, por marca, un acordeón «Lubricantes <marca>» con «Ver todo» a su
+ * página y sus categorías por nombre (el orden de las secciones de esa página).
+ * Cada categoría va a su «Enlace en el menú» o, vacío, a su ancla en la página
+ * de la marca (sus páginas propias llegarán con la plantilla de Andrés). Sin
+ * ninguna marca, no hay panel: «Lubricantes» sigue siendo un enlace.
+ */
+export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
+  const marcas = [...(d.marcasLubricante ?? [])].filter((m) => m.nombre && m.slug).sort(porNombre);
+  if (marcas.length === 0) return null;
+  const categorias = [...(d.categoriasLubricante ?? [])].sort(porNombre);
+  return {
+    verTodo: { etiqueta: "Ver todos los lubricantes", href: conBarra(rutas.lubricantes()) },
+    grupos: marcas.map((m) => ({
+      titulo: `Lubricantes ${m.nombre}`,
+      enlaces: [
+        { etiqueta: `Ver todo Lubricantes ${m.nombre}`, href: conBarra(rutas.marcaLubricante(m.slug)) },
+        ...categorias
+          .filter((c) => c.nombre && c.slug && idDeMarcaLubricante(c) === m.id)
+          .map((c) => ({
+            etiqueta: c.nombre,
+            href: c.enlaceMenu?.trim() || rutas.categoriaLubricante(m.slug, c.slug),
+          })),
+      ],
+      grupos: [],
+    })),
+  };
+}
+
+const idDeMarcaLubricante = (c: CategoriaLubricanteMenu) =>
+  typeof c.marca === "object" ? c.marca?.id : c.marca;
+
+/**
  * Paneles por clave de enlace de la cabecera: el enlace del global `cabecera`
  * que apunte a la portada de maquinaria o de repuestos abre su panel. Los
  * demás («Lubricantes», «Servicio Técnico») siguen siendo enlaces.
  */
 export function construirMegamenu(d: DatosMegamenu): Record<string, PanelMenu> {
-  return {
+  const paneles: Record<string, PanelMenu> = {
     [claveDeEnlace(rutas.maquinaria())]: panelMaquinaria(d),
     [claveDeEnlace(rutas.repuestos())]: panelRepuestos(d),
   };
+  // «Lubricantes» abre su panel apunte a la página general o a la de una marca
+  // (hoy la cabecera enlaza a la de ENI).
+  const lubricantes = panelLubricantes(d);
+  if (lubricantes) {
+    for (const href of [
+      rutas.lubricantes(),
+      ...(d.marcasLubricante ?? []).map((m) => rutas.marcaLubricante(m.slug)),
+    ]) {
+      paneles[claveDeEnlace(href)] = lubricantes;
+    }
+  }
+  return paneles;
 }

@@ -75,6 +75,8 @@ const ESTATICAS = new Set([
   // «Otros» de usados (2026-10-19): destino de la antigua /elementor-48399/.
   `${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${SEGMENTO_OTROS_USADA}`,
   SEGMENTO_BLOG_INDICE,
+  // La página general de lubricantes (2026-10-20; antes no existía).
+  SEGMENTO_LUBRICANTES,
 ]);
 
 export function clasificarDestino(destino: string): Destino {

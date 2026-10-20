@@ -9,8 +9,9 @@ import { construirMegamenu, type PanelMenu } from "@/lib/megamenu";
 import { DE_MARCA_VISIBLE, MARCA_VISIBLE } from "@/lib/nueva/visibilidad";
 
 /**
- * Datos del megamenú (`src/lib/megamenu.ts`): diez consultas LIGERAS (con las
- * categorías técnicas y la política de garantías del global `cabecera`) —solo
+ * Datos del megamenú (`src/lib/megamenu.ts`): doce consultas LIGERAS (con las
+ * categorías técnicas, la política de garantías del global `cabecera` y las
+ * marcas y categorías de lubricante) —solo
  * nombre, slug y marca, `depth: 0`— porque la cabecera va en todas las
  * páginas y esto se ejecuta en cada una al construir el sitio (CLAUDE.md
  * §10.10). Las dos de MARCAS llevan además el logo con `depth: 1`, pero de
@@ -47,6 +48,8 @@ const megamenuEnCache = unstable_cache(
       equiposUsados,
       categoriasTecnicas,
       cabecera,
+      marcasLubricante,
+      categoriasLubricante,
     ] = await Promise.all([
       // Sin las marcas de nueva ocultas, ni sus tipos ni sus equipos (`visibilidad.ts`).
       payload.find({ collection: "marcas-maquinaria", ...marcas, where: MARCA_VISIBLE }),
@@ -90,6 +93,13 @@ const megamenuEnCache = unstable_cache(
       }),
       // «Política de garantías y repuestos», editable en el global de la cabecera.
       payload.findGlobal({ slug: "cabecera", depth: 0, select: { politicaRepuestos: true } }),
+      // «Lubricantes» (2026-10-20): las marcas y sus categorías con su enlace del menú.
+      payload.find({ collection: "marcas-lubricante", ...base, select: sinMarca }),
+      payload.find({
+        collection: "categorias-lubricante",
+        ...base,
+        select: { ...conMarca, enlaceMenu: true },
+      }),
     ]);
 
     return construirMegamenu({
@@ -103,6 +113,8 @@ const megamenuEnCache = unstable_cache(
       equiposUsados: equiposUsados.docs,
       categoriasTecnicas: categoriasTecnicas.docs,
       politicaRepuestos: cabecera.politicaRepuestos ?? null,
+      marcasLubricante: marcasLubricante.docs,
+      categoriasLubricante: categoriasLubricante.docs,
     });
   },
   ["megamenu", CLAVE_DESPLIEGUE],

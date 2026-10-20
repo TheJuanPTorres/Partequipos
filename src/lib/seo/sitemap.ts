@@ -81,10 +81,8 @@ export const PATRONES_SITEMAP = [
   "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/[unidad]",
   "/maquinaria-pesada/maquinaria-pesada-usada/marcas/[marca]",
   "/maquinaria-pesada/maquinaria-pesada-usada/otros",
-  /*
-   * Lubricantes. No hay patrón "/lubricantes" a secas: esa página NO existe en
-   * el sitio actual, así que tampoco aquí. Ver SEGMENTO_LUBRICANTES.
-   */
+  // Lubricantes: la página general (2026-10-20) y una por marca. Ver SEGMENTO_LUBRICANTES.
+  "/lubricantes",
   "/lubricantes/[marca]",
   /*
    * Blog. Los ARTÍCULOS no aparecen aquí: se sirven desde `[...slug]`, que ya
@@ -387,12 +385,15 @@ export function buildSitemapEntries(
   }
 
   /*
-   * LUBRICANTES.
-   *
-   * Sin entrada de índice: `/lubricantes/` no es una página en el sitio actual
-   * y no se inventa. La raíz de la sección es cada marca. Cambian poco, de ahí
-   * `monthly`.
+   * LUBRICANTES: la página general (2026-10-20) y una por marca. Cambian poco,
+   * de ahí `monthly`.
    */
+  entradas.push({
+    url: absoluteUrl(rutas.lubricantes()),
+    lastModified: masReciente(marcasLubricante, ahora),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  });
   for (const marca of marcasLubricante) {
     entradas.push({
       url: absoluteUrl(rutas.marcaLubricante(marca.slug)),

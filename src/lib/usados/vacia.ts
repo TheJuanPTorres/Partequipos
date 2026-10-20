@@ -18,7 +18,9 @@ export const SIN_UNIDADES = "Sin unidades por ahora";
 /**
  * ¿Se pinta el estado vacío diseñado? Solo si el global lo elige expresamente:
  * sin valor, o con cualquier otro, el aviso provisional (dirección,
- * 2026-10-19: en el sitio publicado solo van diseños de Andrés).
+ * 2026-10-19: en el sitio publicado solo van diseños de Andrés). EXCEPCIÓN de
+ * dirección el mismo día: el diseño propio del estado vacío sí se publica, y es
+ * el que dirección elige en el panel; no se cambia sin su orden.
  */
 export function usaEstadoVacioPropio(usada: { estadoVacio?: string | null } | null | undefined) {
   return usada?.estadoVacio === "propio";

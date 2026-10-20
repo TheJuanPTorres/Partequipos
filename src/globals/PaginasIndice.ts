@@ -157,11 +157,11 @@ export const PaginasIndice: GlobalConfig = {
           required: true,
           options: [
             { label: "Provisional (aviso sencillo)", value: "provisional" },
-            { label: "Diseño propio (sin plantilla de Andrés)", value: "propio" },
+            { label: "Diseño propio (excepción aprobada por dirección)", value: "propio" },
           ],
           admin: {
             description:
-              "«Provisional»: «Por ahora no hay unidades disponibles», con enlace a Contáctanos y WhatsApp. «Diseño propio»: el nuestro, con alternativas y «Avísame», sin aprobar para el sitio publicado.",
+              "«Provisional»: «Por ahora no hay unidades disponibles», con enlace a Contáctanos y WhatsApp. «Diseño propio»: el nuestro, con alternativas y «Avísame»; aprobado por dirección como excepción (2026-10-19), es el elegido en el sitio publicado.",
           },
         },
       ],

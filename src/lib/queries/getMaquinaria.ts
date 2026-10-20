@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import config from "@payload-config";
-import { getPayload, type Where } from "payload";
+import { getPayload } from "payload";
 
 /*
  * Las consultas de este módulo van envueltas en `cache()` de React.
@@ -709,29 +709,28 @@ export const getMarcasDePortada = cache(async (): Promise<MarcasMaquinaria[]> =>
 });
 
 /**
- * Equipos usados DISPONIBLES para las pestañas de la sección 3: los de
- * excavadoras y los del resto, por separado y con su tope, para que un
- * inventario con muchas unidades de una categoría no deje vacía la otra
- * pestaña. `depth: 1` puebla la categoría (para enlazarla) y las imágenes.
+ * Excavadoras usadas DISPONIBLES para el carrusel de la sección 3, con su tope
+ * (dirección, 2026-10-20: solo excavadoras; «Otros» y «Aditamentos» ya no
+ * tienen carrusel ni consulta). `depth: 1` puebla la categoría (para la
+ * dirección de la unidad) y las imágenes.
  */
-export const getEquiposUsadosDePortada = cache(async (): Promise<EquiposUsado[]> => {
+export const getExcavadorasUsadasDePortada = cache(async (): Promise<EquiposUsado[]> => {
   const payload = await getPayload({ config });
-  const consulta = (categoria: Where) =>
-    payload.find({
-      collection: "equipos-usados",
-      where: { and: [{ disponible: { equals: true } }, categoria] },
-      depth: 1,
-      limit: TARJETAS_POR_PESTANA,
-      // Primero las más recientes por su fecha de publicación (la de WordPress en las importadas).
-      sort: ["-fechaPublicacion", "-createdAt"],
-    });
-  const noAditamento: Where = { pestanaPortada: { not_equals: "aditamentos" } };
-  const [excavadoras, otros, aditamentos] = await Promise.all([
-    consulta({ and: [{ "categoria.slug": { equals: SLUG_EXCAVADORAS } }, noAditamento] }),
-    consulta({ and: [{ "categoria.slug": { not_equals: SLUG_EXCAVADORAS } }, noAditamento] }),
-    consulta({ pestanaPortada: { equals: "aditamentos" } }),
-  ]);
-  return [...excavadoras.docs, ...otros.docs, ...aditamentos.docs];
+  const { docs } = await payload.find({
+    collection: "equipos-usados",
+    where: {
+      and: [
+        { disponible: { equals: true } },
+        { "categoria.slug": { equals: SLUG_EXCAVADORAS } },
+        { pestanaPortada: { not_equals: "aditamentos" } },
+      ],
+    },
+    depth: 1,
+    limit: TARJETAS_POR_PESTANA,
+    // Primero las más recientes por su fecha de publicación (la de WordPress en las importadas).
+    sort: ["-fechaPublicacion", "-createdAt"],
+  });
+  return docs;
 });
 
 /**

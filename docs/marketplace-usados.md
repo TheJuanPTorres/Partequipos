@@ -188,6 +188,8 @@ número de unidades, y las vacías detrás con «Sin unidades por ahora».
   entrada en el menú ni en el índice.
 - **En el menú,** «Otros» lleva «Sin unidades por ahora» solo si ninguna de sus
   categorías tiene unidades; las de primer nivel, como antes (#257).
-- **No cambian** las páginas de cada categoría, sus fichas, sus pestañas ni el
-  bloque «Marcas» del índice de usados.
+- **No cambian** las páginas de cada categoría, sus fichas ni sus pestañas.
+- **Sin el bloque «Marcas» en el índice desde el 2026-10-20** (dirección: en
+  usados interesa la categoría, no la marca). Las páginas de cada marca de
+  usados siguen existiendo, con su sitemap.
 - Lógica en `src/lib/usados/otros.ts`, con pruebas.

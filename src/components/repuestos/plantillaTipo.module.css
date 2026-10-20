@@ -217,3 +217,20 @@
     transition: none;
   }
 }
+
+/* Sin foto (aditamentos, 2026-10-20): el texto ocupa la tarjeta. */
+.porQueTextoSolo {
+  width: 100%;
+}
+
+.porQueCierre p {
+  margin: 0;
+}
+
+.porQueCierre p + p {
+  margin-top: 1em;
+}
+
+.porQueEntradilla strong {
+  color: var(--color-texto);
+}

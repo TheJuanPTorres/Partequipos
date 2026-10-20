@@ -186,16 +186,14 @@ video.medio {
   line-height: 1.2;
 }
 .parrafo,
+/* La frase del taller, en párrafo aparte y en NEGRITA antes de «Contáctanos» (dirección, 2026-10-20). */
 .destacado {
   max-width: 537px;
   margin: 0;
   color: var(--color-texto);
   font-size: var(--texto-cuerpo);
-  font-weight: 300;
+  font-weight: 700;
   line-height: 1.4;
-}
-.destacado {
-  font-weight: 600;
 }
 .entradilla {
   max-width: 685px;

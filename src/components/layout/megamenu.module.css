@@ -433,8 +433,8 @@
 /*
  * TARJETAS CON FOTO de «Repuestos por categoría técnica» (dirección, 2026-10-20):
  * foto y nombre, como las tarjetas de categorías del sitio, en versión compacta.
- * 5 por fila en escritorio (el panel con tarjetas pasa a 820 px) y 2 en el menú
- * móvil; la última fila incompleta, CENTRADA (regla del #281: mismo ancho de
+ * 5 por fila en escritorio (el panel con tarjetas pasa a 820 px) y en tablet, y 2
+ * en el teléfono; la última fila incompleta, CENTRADA (regla del #281: mismo ancho de
  * tarjeta, `flex-wrap` centrado). Foto en caja 4:3 fija: sin CLS al llegar.
  */
 .panel[data-ancho="amplio"] {
@@ -475,6 +475,8 @@
 
 .tarjetaFoto {
   display: block;
+  /* Sin `overflow: hidden`, la foto estiraba la caja y salía cuadrada (medido). */
+  overflow: hidden;
   aspect-ratio: 4 / 3;
   background: var(--color-fondo-seccion);
 }
@@ -505,8 +507,11 @@
   outline-offset: 2px;
 }
 
-.movil .tarjetas {
-  --tarjetas-columnas: 2;
+/* Menú móvil: 2 por fila en el teléfono; en tablet (hasta 1024 px), 5 como en escritorio. */
+@media (max-width: 767px) {
+  .movil .tarjetas {
+    --tarjetas-columnas: 2;
+  }
 }
 
 /* Un enlace suelto de nivel 1 (la política de garantías) con el recuadro de los acordeones. */

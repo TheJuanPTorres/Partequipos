@@ -2285,11 +2285,11 @@ CSV del cliente aparecerán solas.
 - **Qué cambia:** «Repuestos por categoría técnica» deja de ser una lista con iconos. Lleva «Ver todas las categorías»
   y, debajo, una **tarjeta por categoría**: su «Imagen de la tarjeta» (la de las tarjetas de categorías del sitio) y su
   nombre, cada una a su página. Mismo orden y mismo criterio de antes (sin página, no sale).
-- **Colocación:** 5 por fila en escritorio y 2 en el menú móvil, con la última fila incompleta centrada y el mismo
+- **Colocación:** 5 por fila en escritorio y en tablet (menú móvil hasta 1024 px) y 2 en el teléfono (≤ 767 px), con la última fila incompleta centrada y el mismo
   ancho de tarjeta (regla del #281, con `flex-wrap` centrado). Para que quepan 5, el panel **que lleva tarjetas**
   (hoy solo Repuestos) pasa de 500 a **820 px** (`data-ancho="amplio"`); Maquinaria Pesada y Lubricantes siguen en 500.
 - **Foto:** decorativa (`alt=""`: el nombre ya nombra la tarjeta), en caja 4:3 fija (sin CLS), con `next/image`, carga
-  diferida y `sizes` a su ancho real (~130 px en escritorio, ~45 % de la pantalla en móvil). Va dentro del acordeón
+  diferida y `sizes` a su ancho real (~130 px en escritorio, ~19 % de la pantalla en tablet y ~45 % en el teléfono). Va dentro del acordeón
   cerrado (`hidden`, `display: none`), así que **no se descarga hasta que se abre el acordeón**. Sin foto, la caja gris.
 - **Datos:** la consulta del menú lee la foto con `depth: 1` y solo url y medidas, como los logos de marca. El gancho de
   `categorias-tecnicas` revalida el menú también al cambiar su foto (solo en esa colección: la foto de un tipo no sale

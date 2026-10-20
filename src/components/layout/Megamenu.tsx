@@ -45,7 +45,7 @@ function Lista({ enlaces, alElegir }: { enlaces: EnlaceMenu[]; alElegir: () => v
 /**
  * TARJETAS CON FOTO (las categorías técnicas de Repuestos, 2026-10-20): foto y
  * nombre, como las tarjetas de categorías del sitio, en versión compacta; 5 por
- * fila en escritorio y 2 en el menú móvil, con la última fila centrada (regla
+ * fila en escritorio y tablet y 2 en el teléfono, con la última fila centrada (regla
  * del #281). La foto es DECORATIVA (el nombre ya nombra la tarjeta), diferida y
  * pedida a su tamaño: va dentro de un acordeón cerrado (`hidden`), así que no se
  * descarga hasta que se abre. La caja tiene proporción fija: sin CLS.
@@ -64,7 +64,7 @@ function Tarjetas({ tarjetas, alElegir }: { tarjetas: TarjetaMenu[]; alElegir: (
                   width={t.imagen.width}
                   height={t.imagen.height}
                   alt=""
-                  sizes="(max-width: 1024px) 45vw, 130px"
+                  sizes="(max-width: 767px) 45vw, (max-width: 1024px) 19vw, 130px"
                   loading="lazy"
                 />
               ) : null}

@@ -18,7 +18,7 @@ import panel from "./panelEquipos.module.css";
  *
  * El panel es un `<dialog>` nativo con `showModal()`: foco atrapado, Esc, título
  * anunciado y la página de detrás inerte. Se añade la X y el clic fuera. El foco vuelve
- * al enlace al cerrar. El contenido se monta en el primer clic; cerrado no ocupa sitio.
+ * al enlace «Ver todos» al cerrar; al abrir, el foco va al título del panel. El contenido se monta en el primer clic; cerrado no ocupa sitio.
  * Con «reducir movimiento» no hay barrido: un fundido.
  */
 export function VerTodosEquipos({
@@ -39,13 +39,19 @@ export function VerTodosEquipos({
   const [cerrando, setCerrando] = useState(false);
   const enlace = useRef<HTMLAnchorElement>(null);
   const dialogo = useRef<HTMLDialogElement>(null);
+  const tituloRef = useRef<HTMLHeadingElement>(null);
   const empezoFuera = useRef(false);
   const idTitulo = useId();
 
   useEffect(() => {
     const d = dialogo.current;
     if (!d) return;
-    if (abierto && !d.open) d.showModal();
+    if (abierto && !d.open) {
+      d.showModal();
+      // El foco inicial va al título (decisión de dirección, 2026-10-20): se anuncia el panel y
+      // el Tab siguiente llega al botón de cerrar y al listado.
+      tituloRef.current?.focus();
+    }
   }, [abierto, montado]);
 
   function alPulsar(e: MouseEvent<HTMLAnchorElement>) {
@@ -111,7 +117,7 @@ export function VerTodosEquipos({
             <span className={panel.barra} aria-hidden="true" />
             <span className={panel.asa} aria-hidden="true" />
             <div className={panel.cabecera}>
-              <h2 id={idTitulo} className={panel.titulo}>
+              <h2 id={idTitulo} ref={tituloRef} tabIndex={-1} className={panel.titulo}>
                 {titulo} <span className={panel.cuenta}>({total})</span>
               </h2>
               <button type="button" className={panel.cerrar} onClick={cerrar}>

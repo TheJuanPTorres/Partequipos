@@ -98,8 +98,8 @@ export function vistaEncabezadoTipoNueva(
 }
 
 /**
- * Título de la franja: «Modelos de excavadoras Hitachi». Como el `<h1>`, no repite la marca
- * si el nombre del tipo ya la lleva; el tipo va en minúscula y la marca conserva la suya.
+ * Título de la franja: «Modelos de Excavadoras Hitachi». Como el `<h1>`, no repite la marca
+ * si el nombre del tipo ya la lleva; el tipo empieza por mayúscula (petición del cliente, 2026-10-20) y la marca conserva la suya.
  */
 export function tituloFranja(marca: MarcasMaquinaria, tipo: TiposMaquinaria): string {
   const nombre = marca.nombre.trim();
@@ -110,5 +110,5 @@ export function tituloFranja(marca: MarcasMaquinaria, tipo: TiposMaquinaria): st
   const titulo = minuscula.endsWith(nombre.toLowerCase())
     ? minuscula.slice(0, i) + nombre
     : minuscula;
-  return `Modelos de ${titulo}`;
+  return `Modelos de ${titulo.charAt(0).toUpperCase()}${titulo.slice(1)}`;
 }

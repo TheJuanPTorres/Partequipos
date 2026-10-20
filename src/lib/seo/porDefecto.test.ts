@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  tipoEnTitulo,
   concuerda,
   descripcionPorDefecto,
   recortarDescripcion,
@@ -137,5 +138,13 @@ describe("descripcionPorDefecto de usados", () => {
       SEO_POR_COLECCION["marcas-usada"]?.descripcion?.("Hitachi"),
       descripcionPorDefecto.marcaUsada("Hitachi"),
     );
+  });
+});
+
+describe("tipoEnTitulo", () => {
+  it("pone en mayúscula solo la primera letra del tipo", () => {
+    assert.equal(tipoEnTitulo("excavadora"), "Excavadora");
+    assert.equal(tipoEnTitulo("  Cargador Frontal "), "Cargador frontal");
+    assert.equal(tipoEnTitulo(""), "");
   });
 });

@@ -280,28 +280,30 @@
 }
 
 /*
- * En el teléfono, el visor ocupa todo el ancho y el botón flotante de WhatsApp
- * (56 px a 16 px del borde derecho, `whatsappFlotante.module.css`) cae sobre el
- * final de la fila de controles. Se le RESERVA esa columna (dirección,
- * 2026-10-20): los controles y las miniaturas acaban 72 px antes del borde. Así
- * el botón no tapa nada ni tiene que subir (`data-evita-flotante` ya no los
- * pisa) y no salta encima de la página. El contador se estrecha para que la
- * fila quepa a 390; a 360 las herramientas bajan a una segunda fila.
+ * Por debajo de 1024 px, la fila de controles acaba bajo el botón flotante de
+ * WhatsApp (56 px a 16 px del borde derecho, `whatsappFlotante.module.css`;
+ * medido: a 1010, 1 px de aire; a 1024, los 8 que pide). Se le RESERVA esa
+ * columna (dirección, 2026-10-20): los controles y las miniaturas acaban 72 px
+ * antes. Así el botón no tapa nada ni tiene que subir (`data-evita-flotante`
+ * ya no los pisa), y no salta encima de la página.
  */
-@media (max-width: 639px) {
+@media (max-width: 1023px) {
   .controles,
   .miniaturas {
     margin-inline-end: 4.5rem;
-  }
-
-  .contador {
-    min-width: 3.5rem;
   }
 
   /* En pantalla completa el botón no se ve (queda fuera de la capa superior). */
   .visor[data-completa] .controles,
   .visor[data-completa] .miniaturas {
     margin-inline-end: 0;
+  }
+}
+
+/* En el teléfono, el contador se estrecha para que la fila quepa a 390; a 360 las herramientas bajan a otra fila. */
+@media (max-width: 639px) {
+  .contador {
+    min-width: 3.5rem;
   }
 }
 

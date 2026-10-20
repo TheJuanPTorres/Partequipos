@@ -54,7 +54,7 @@ texto no necesita tablas: va en el JSON de Lexical.
   - sin título visible: lo nombra el encabezado de su sección, y el visor lleva
     `aria-label`.
 - **Sin «Páginas como imágenes»:** solo el enlace de descarga, nunca un hueco.
-- El botón flotante de WhatsApp no tapa sus controles. En el teléfono (< 640 px) la fila de controles y las miniaturas le reservan su columna (72 px a la derecha, dirección, 2026-10-20): el botón se queda quieto, sin saltar encima de la página. A 360, las herramientas bajan a una segunda fila. En anchos mayores, si los pisa, sube (`data-evita-flotante`). En pantalla completa no se ve.
+- El botón flotante de WhatsApp no tapa sus controles. Por debajo de 1024 px (teléfono y tablet), la fila de controles y las miniaturas le reservan su columna (72 px a la derecha, dirección, 2026-10-20): el botón se queda quieto, sin saltar encima de la página. A 360, las herramientas bajan a una segunda fila. Desde 1024 px ya hay aire (medido) y, si alguna vez los pisa, sube (`data-evita-flotante`). En pantalla completa no se ve.
 - **Revalidación:** guardar o borrar un documento revalida las páginas de la
   ruta comodín (`revalidarPaginasDelComodin`). Las páginas que genera el script
   no revalidan: el runbook termina vaciando la caché.

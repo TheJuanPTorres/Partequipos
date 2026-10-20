@@ -213,6 +213,8 @@ export function VisorLibro({
       style={{ ["--proporcion" as string]: String(proporcion) }}
       data-completa={completa ? "" : undefined}
       data-miniaturas={miniaturas ? "" : undefined}
+      // Dentro del texto, sale de la columna de lectura al ancho de la página (`RichText`).
+      data-ancho-pagina=""
     >
       {conTitulo ? <h3 className={estilos.titulo}>{titulo}</h3> : null}
 

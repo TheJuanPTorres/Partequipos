@@ -25,6 +25,8 @@ export function BotonFormulario({
   style,
   formulario,
   titulo,
+  ariaLabel,
+  origenDePagina = false,
   children,
 }: {
   /** Destino sin JavaScript: el formulario de la página. */
@@ -34,10 +36,14 @@ export function BotonFormulario({
   formulario: ConfigFormulario;
   /** Título de la ventana; por defecto, el del formulario. */
   titulo?: string;
+  ariaLabel?: string;
+  /** El `origen` de la solicitud es la página donde se pulsa (botones editables del panel). */
+  origenDePagina?: boolean;
   children: ReactNode;
 }) {
   const [abierta, setAbierta] = useState(false);
   const [montada, setMontada] = useState(false);
+  const [origen, setOrigen] = useState<string | null>(null);
   const enlace = useRef<HTMLAnchorElement>(null);
 
   function alPulsar(e: MouseEvent<HTMLAnchorElement>) {
@@ -45,6 +51,7 @@ export function BotonFormulario({
       return;
     }
     e.preventDefault();
+    if (origenDePagina) setOrigen(window.location.pathname);
     setMontada(true);
     setAbierta(true);
   }
@@ -58,6 +65,7 @@ export function BotonFormulario({
         style={style}
         onClick={alPulsar}
         aria-haspopup="dialog"
+        aria-label={ariaLabel}
       >
         {children}
       </a>
@@ -65,7 +73,7 @@ export function BotonFormulario({
         <VentanaFormulario
           abierta={abierta}
           titulo={titulo ?? formulario.titulo}
-          formulario={formulario}
+          formulario={origen ? { ...formulario, origen } : formulario}
           alCerrar={() => {
             setAbierta(false);
             // Foco de vuelta al botón que la abrió.

@@ -1,6 +1,9 @@
+import type { CategoriasTecnica } from "@/payload-types";
+
 import { claveDeMarca, logoPropio } from "./marca/logoMarca";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
+import { categoriasDeMarca } from "./repuestos/marca";
 import { rutas } from "./routes";
 import { ETIQUETA_OTROS, separarCategorias } from "./usados/otros";
 import { SIN_UNIDADES } from "./usados/vacia";
@@ -21,8 +24,9 @@ import { SIN_UNIDADES } from "./usados/vacia";
  *   maquinaria nueva): no se repite dentro de «Por marca».
  * - El segundo «Maquinaria pesada nueva» del diseño es «Por tipo de máquina».
  * - «Usada» va sin nivel de marcas: la usada solo se organiza por tipo.
- * - «Repuestos» solo lleva «Repuestos por marca»: «por categoría» queda fuera
- *   hasta que existan páginas de categoría técnica.
+ * - «Repuestos» lleva «Repuestos por marca», «Repuestos por categoría técnica»
+ *   (desde el 2026-10-20, con las páginas de categoría ya publicadas) y, al final,
+ *   el enlace editable a la política de garantías (global `cabecera`).
  */
 
 export type EnlaceMenu = {
@@ -30,7 +34,12 @@ export type EnlaceMenu = {
   href: string;
   /** Marca discreta tras la etiqueta (las categorías de usados sin unidades, 2026-10-18). */
   nota?: string;
+  /** El icono de la categoría técnica, en lugar de la marca de verificación (2026-10-20). */
+  icono?: IconoMenu;
 };
+
+/** Los iconos de las categorías técnicas (`ICONOS_CATEGORIA`, los mismos de la portada). */
+export type IconoMenu = NonNullable<CategoriasTecnica["icono"]>;
 
 /**
  * El logo de una marca, ya a la medida con la que se pinta (alto fijo).
@@ -52,7 +61,24 @@ export type GrupoMenu = {
   logo?: LogoMenu;
 };
 
-export type PanelMenu = { verTodo: EnlaceMenu; grupos: GrupoMenu[] };
+/**
+ * `finales`: enlaces sueltos de nivel 1 tras los acordeones, con el mismo
+ * recuadro (la política de garantías en Repuestos).
+ */
+export type PanelMenu = { verTodo: EnlaceMenu; grupos: GrupoMenu[]; finales?: EnlaceMenu[] };
+
+/** Lo que el menú necesita de una categoría técnica. */
+export type CategoriaTecnicaMenu = Pick<
+  CategoriasTecnica,
+  "id" | "nombre" | "slug" | "icono" | "ordenMarca"
+>;
+
+/** La entrada editable de la política de garantías (global `cabecera`). */
+export type PoliticaMenu = {
+  mostrar?: boolean | null;
+  texto?: string | null;
+  enlace?: string | null;
+} | null;
 
 /** El logo tal como llega de Payload (`depth: 1`, solo url y medidas). */
 type LogoCatalogo = { url?: string | null; width?: number | null; height?: number | null };
@@ -112,6 +138,10 @@ export type DatosMegamenu = {
    * por ahora» (petición del cliente, 2026-10-18). Sin el dato, ninguna nota.
    */
   equiposUsados?: ReadonlyArray<{ categoria: number | { id: number } | null | undefined }>;
+  /** Las categorías técnicas de repuestos («Repuestos por categoría técnica», 2026-10-20). */
+  categoriasTecnicas?: ReadonlyArray<CategoriaTecnicaMenu>;
+  /** «Política de garantías y repuestos», del global `cabecera`. */
+  politicaRepuestos?: PoliticaMenu;
 };
 
 /** La «marca» de maquinaria nueva que en el sitio actual agrupa los aditamentos. */
@@ -248,8 +278,44 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
   };
 }
 
+/**
+ * «Repuestos por categoría técnica»: «Ver todas» al índice y una por categoría, en
+ * el orden de las páginas de repuestos (`categoriasDeMarca`: «Orden en las
+ * páginas de marca» y después por nombre), con su icono. Sin página (sin
+ * dirección), no sale: el menú no lleva enlaces rotos. Sin ninguna, el apartado
+ * no se pinta.
+ */
+export function grupoCategoriasTecnicas(
+  categorias: ReadonlyArray<CategoriaTecnicaMenu>,
+): GrupoMenu | null {
+  const conPagina = categoriasDeMarca([...categorias] as CategoriasTecnica[]).flatMap((c) =>
+    c.href
+      ? [{ etiqueta: c.nombre, href: conBarra(c.href), ...(c.icono ? { icono: c.icono } : {}) }]
+      : [],
+  );
+  if (conPagina.length === 0) return null;
+  return {
+    titulo: "Repuestos por categoría técnica",
+    enlaces: [
+      { etiqueta: "Ver todas las categorías", href: conBarra(rutas.categoriasRepuestos()) },
+      ...conPagina,
+    ],
+    grupos: [],
+  };
+}
+
+/** La política de garantías: solo con «Mostrar» marcada, texto y enlace. */
+export function enlacePolitica(p: PoliticaMenu | undefined): EnlaceMenu | null {
+  const texto = p?.texto?.trim();
+  const enlace = p?.enlace?.trim();
+  if (!p || p.mostrar === false || !texto || !enlace) return null;
+  return { etiqueta: texto, href: enlace };
+}
+
 export function panelRepuestos(d: DatosMegamenu): PanelMenu {
   const marcas = [...d.marcasRepuestos].sort(porNombre);
+  const categorias = grupoCategoriasTecnicas(d.categoriasTecnicas ?? []);
+  const politica = enlacePolitica(d.politicaRepuestos);
   return {
     verTodo: { etiqueta: "Ver todos los repuestos", href: conBarra(rutas.repuestos()) },
     grupos: [
@@ -258,7 +324,9 @@ export function panelRepuestos(d: DatosMegamenu): PanelMenu {
         enlaces: [{ etiqueta: "Ver todas las marcas", href: conBarra(rutas.marcas()) }],
         grupos: marcas.map((m) => grupoDeMarca(m, d.tiposRepuestos, rutas.marca, rutas.tipo)),
       },
+      ...(categorias ? [categorias] : []),
     ],
+    ...(politica ? { finales: [politica] } : {}),
   };
 }
 

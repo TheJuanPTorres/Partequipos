@@ -5,6 +5,7 @@ import Link from "next/link";
 import { forwardRef, memo, useId, useState, type CSSProperties, type KeyboardEvent } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
+import { ICONOS_CATEGORIA } from "@/components/portada/iconosCategoria";
 import type { EnlaceMenu, GrupoMenu, PanelMenu } from "@/lib/megamenu";
 
 import estilos from "./megamenu.module.css";
@@ -18,6 +19,13 @@ import estilos from "./megamenu.module.css";
  * enlaces están siempre en el HTML del servidor (SEO, CLAUDE.md §3.1).
  */
 
+/** El icono de la categoría técnica (los de la portada) o, si no lleva, la marca de verificación. */
+function IconoHoja({ icono }: { icono: EnlaceMenu["icono"] }) {
+  const Icono = icono ? ICONOS_CATEGORIA[icono] : null;
+  if (!Icono) return <IconCheck aria-hidden="true" focusable="false" stroke={2.5} />;
+  return <Icono aria-hidden="true" focusable="false" stroke={1.75} className={estilos.hojaIcono} />;
+}
+
 function Lista({ enlaces, alElegir }: { enlaces: EnlaceMenu[]; alElegir: () => void }) {
   if (enlaces.length === 0) return null;
   return (
@@ -25,7 +33,7 @@ function Lista({ enlaces, alElegir }: { enlaces: EnlaceMenu[]; alElegir: () => v
       {enlaces.map((e) => (
         <li key={e.href}>
           <Link href={e.href} className={estilos.hoja} onClick={alElegir}>
-            <IconCheck aria-hidden="true" focusable="false" stroke={2.5} />
+            <IconoHoja icono={e.icono} />
             {e.etiqueta}
             {e.nota ? <span className={estilos.nota}> · {e.nota}</span> : null}
           </Link>
@@ -84,6 +92,89 @@ function Acordeon({
         ))}
       </div>
     </div>
+  );
+}
+
+/**
+ * El CONTENIDO de un panel —«Ver todo», los acordeones y los enlaces finales
+ * (la política de garantías)—, común al megamenú de escritorio y al menú móvil
+ * (2026-10-20): los dos pintan lo mismo.
+ */
+export function ContenidoMenu({ panel, alElegir }: { panel: PanelMenu; alElegir: () => void }) {
+  return (
+    <>
+      <Link href={panel.verTodo.href} className={estilos.verTodo} onClick={alElegir}>
+        {panel.verTodo.etiqueta}
+        <IconChevronRight aria-hidden="true" focusable="false" stroke={2} />
+      </Link>
+      {panel.grupos.map((g) => (
+        <Acordeon key={g.titulo} grupo={g} nivel={1} alElegir={alElegir} />
+      ))}
+      {(panel.finales ?? []).map((e) => (
+        // Un enlace suelto con el recuadro de los acordeones de nivel 1.
+        <div key={e.href} className={estilos.acordeon} data-nivel={1}>
+          <Link
+            href={e.href}
+            className={`${estilos.titulo} ${estilos.tituloEnlace}`}
+            onClick={alElegir}
+          >
+            <IconChevronRight aria-hidden="true" focusable="false" stroke={2.5} />
+            {e.etiqueta}
+          </Link>
+        </div>
+      ))}
+    </>
+  );
+}
+
+/**
+ * MENÚ MÓVIL (2026-10-20): una entrada con panel es su enlace y, al lado, un
+ * botón que despliega el MISMO contenido que el megamenú de escritorio
+ * (`ContenidoMenu`). Divulgación con `aria-expanded`; los enlaces están en el
+ * HTML del servidor aunque estén plegados.
+ */
+export function SubmenuMovil({
+  etiqueta,
+  href,
+  actual,
+  panel,
+  claseEnlace,
+  alElegir,
+}: {
+  etiqueta: string;
+  href: string;
+  actual: "page" | undefined;
+  panel: PanelMenu;
+  claseEnlace?: string;
+  alElegir: () => void;
+}) {
+  const [abierto, setAbierto] = useState(false);
+  const id = useId();
+  return (
+    <>
+      <div className={estilos.filaMovil}>
+        <Link href={href} className={claseEnlace} aria-current={actual}>
+          {etiqueta}
+        </Link>
+        <button
+          type="button"
+          className={estilos.abrirMovil}
+          aria-expanded={abierto}
+          aria-controls={id}
+          aria-label={`${abierto ? "Cerrar" : "Abrir"} el menú de ${etiqueta}`}
+          onClick={() => setAbierto(!abierto)}
+        >
+          {abierto ? (
+            <IconMinus aria-hidden="true" focusable="false" stroke={2.5} />
+          ) : (
+            <IconPlus aria-hidden="true" focusable="false" stroke={2.5} />
+          )}
+        </button>
+      </div>
+      <div id={id} className={estilos.movil} hidden={!abierto}>
+        <ContenidoMenu panel={panel} alElegir={alElegir} />
+      </div>
+    </>
   );
 }
 
@@ -150,17 +241,7 @@ export const Megamenu = memo(
         onMouseLeave={alSalir}
       >
         <div className={estilos.caja}>
-          <Link
-            href={panel.verTodo.href}
-            className={estilos.verTodo}
-            onClick={() => alCerrar(clave, null)}
-          >
-            {panel.verTodo.etiqueta}
-            <IconChevronRight aria-hidden="true" focusable="false" stroke={2} />
-          </Link>
-          {panel.grupos.map((g) => (
-            <Acordeon key={g.titulo} grupo={g} nivel={1} alElegir={() => alCerrar(clave, null)} />
-          ))}
+          <ContenidoMenu panel={panel} alElegir={() => alCerrar(clave, null)} />
         </div>
       </nav>
     );

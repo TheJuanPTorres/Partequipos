@@ -52,9 +52,10 @@ describe("y todo lo que pinta el marco la invalida", () => {
     }
   });
 
-  it("las 7 colecciones del megamenú llevan sus ganchos", () => {
+  it("las 8 colecciones del megamenú llevan sus ganchos", () => {
     const colecciones: Record<string, string> = {
       "categorias-maquinaria": "CategoriaMaquinaria",
+      "categorias-tecnicas": "CategoriaTecnica",
       "categorias-usada": "CategoriaUsada",
       marcas: "Marca",
       "marcas-maquinaria": "MarcaMaquinaria",

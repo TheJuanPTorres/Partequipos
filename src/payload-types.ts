@@ -3251,6 +3251,17 @@ export interface Cabecera {
     | null;
   botonTexto?: string | null;
   botonEnlace?: string | null;
+  /**
+   * Última entrada del menú desplegable de Repuestos (escritorio y móvil). Desmarca «Mostrar» para quitarla sin borrarla.
+   */
+  politicaRepuestos?: {
+    mostrar?: boolean | null;
+    texto?: string | null;
+    /**
+     * Una ruta del sitio (/…/) o https://. Hoy, la política de garantía publicada.
+     */
+    enlace?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3557,7 +3568,7 @@ export interface PaginasIndice {
      */
     fondo?: (number | null) | Media;
     /**
-     * «Provisional»: «Por ahora no hay unidades disponibles», con enlace a Contáctanos y WhatsApp. «Diseño propio»: el nuestro, con alternativas y «Avísame», sin aprobar para el sitio publicado.
+     * «Provisional»: «Por ahora no hay unidades disponibles», con enlace a Contáctanos y WhatsApp. «Diseño propio»: el nuestro, con alternativas y «Avísame»; aprobado por dirección como excepción (2026-10-19), es el elegido en el sitio publicado.
      */
     estadoVacio: 'provisional' | 'propio';
   };
@@ -3614,6 +3625,13 @@ export interface CabeceraSelect<T extends boolean = true> {
       };
   botonTexto?: T;
   botonEnlace?: T;
+  politicaRepuestos?:
+    | T
+    | {
+        mostrar?: T;
+        texto?: T;
+        enlace?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

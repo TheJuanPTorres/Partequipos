@@ -55,6 +55,40 @@ describe("índice de usados", () => {
     );
   });
 
+  it("con porUnidades: de más a menos disponibles, empates y vacías por nombre", () => {
+    const cats = [
+      { id: 1, nombre: "Zorras", slug: "zorras", imagen: null },
+      { id: 2, nombre: "Bulldozers", slug: "bulldozers", imagen: null },
+      { id: 3, nombre: "Cargadores Frontales", slug: "cargadores", imagen: null },
+      { id: 4, nombre: "Aplanadoras", slug: "aplanadoras", imagen: null },
+      { id: 5, nombre: "Miniexcavadoras", slug: "miniexcavadoras", imagen: null },
+    ];
+    const u = [
+      unidad(5, null, "2026-01-01", null),
+      unidad(5, null, "2026-01-02", null),
+      unidad(5, null, "2026-01-03", null),
+      unidad(2, null, "2026-01-01", null),
+      unidad(1, null, "2026-01-01", null),
+    ];
+    const orden = (unidades: UnidadDelIndice[]) =>
+      tarjetasDeCategoriasUsada(cats, unidades, ruta, {
+        incluirVacias: true,
+        porUnidades: true,
+      }).map((x) => x.titulo);
+    assert.deepEqual(orden(u), [
+      "Miniexcavadoras",
+      "Bulldozers",
+      "Zorras",
+      "Aplanadoras",
+      "Cargadores Frontales",
+    ]);
+    // Es automático: una unidad más en «Cargadores Frontales» y cambia el orden.
+    assert.deepEqual(
+      orden([...u, unidad(3, null, "2026-02-01", null), unidad(3, null, "2026-02-02", null)]),
+      ["Miniexcavadoras", "Cargadores Frontales", "Bulldozers", "Zorras", "Aplanadoras"],
+    );
+  });
+
   it("en el índice, también las vacías: después y con «Sin unidades por ahora»", () => {
     const t = tarjetasDeCategoriasUsada(
       [

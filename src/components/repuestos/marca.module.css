@@ -7,12 +7,13 @@
  * de las tarjetas, y el blanco con las suyas sobre el gris del contacto.
  */
 .pagina {
-  /* Sin «Color de la marca» (Aditamentos, Okada…): gris claro neutro con tinta oscura, nunca el
-     amarillo de Caterpillar (2026-10-19). Con color, estiloDeMarca lo sustituye en línea. */
-  --marca-amarillo: #e2e2e2;
-  --marca-tinta: #000;
-  --marca-hover-fondo: #000;
-  --marca-hover-texto: #fff;
+  /* Sin «Color de la marca» (Aditamentos, Okada…): NINGÚN color. La franja toma el fondo de la
+     página (como si no hubiera franja), con la tinta y el hover oscuros del kit (2026-10-19).
+     Con color, estiloDeMarca lo sustituye en línea. */
+  --marca-amarillo: var(--color-fondo-seccion);
+  --marca-tinta: var(--color-texto);
+  --marca-hover-fondo: var(--color-texto);
+  --marca-hover-texto: var(--color-fondo);
   --marca-radio: 30px;
   background: var(--color-fondo-seccion);
 }

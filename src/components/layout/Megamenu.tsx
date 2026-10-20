@@ -132,7 +132,7 @@ function Acordeon({
 
 /**
  * El CONTENIDO de un panel —«Ver todo», los acordeones y los enlaces finales
- * (la política de garantías)—, común al megamenú de escritorio y al menú móvil
+ * (la política de garantías y Aditamentos)—, común al megamenú de escritorio y al menú móvil
  * (2026-10-20): los dos pintan lo mismo.
  */
 export function ContenidoMenu({ panel, alElegir }: { panel: PanelMenu; alElegir: () => void }) {

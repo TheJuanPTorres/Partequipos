@@ -60,11 +60,11 @@ describe("megamenú: maquinaria", () => {
       etiqueta: "Ver toda la maquinaria pesada",
       href: "/maquinaria-pesada/",
     });
-    assert.deepEqual(titulos(panel.grupos), [
-      "Maquinaria pesada nueva",
-      "Maquinaria pesada usada",
-      "Aditamentos para maquinaria pesada",
-    ]);
+    assert.deepEqual(titulos(panel.grupos), ["Maquinaria pesada nueva", "Maquinaria pesada usada"]);
+    assert.deepEqual(
+      panel.finales?.map((e) => e.etiqueta),
+      ["Aditamentos para maquinaria pesada"],
+    );
   });
 
   it("nueva: por marca (sin aditamentos, en orden alfabético) y por tipo", () => {
@@ -129,18 +129,14 @@ describe("megamenú: maquinaria", () => {
     assert.ok(usada.enlaces.every((e) => e.etiqueta !== "Otros"));
   });
 
-  it("aditamentos: la «marca» del sitio, con sus tipos", () => {
-    const aditamentos = panel.grupos[2]!;
-    assert.deepEqual(aditamentos.enlaces, [
+  it("aditamentos: un enlace directo a su página, sin submenú ni sus tipos (2026-10-20)", () => {
+    assert.deepEqual(panel.finales, [
       {
-        etiqueta: "Ver todo Aditamentos",
+        etiqueta: "Aditamentos para maquinaria pesada",
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos/",
       },
-      {
-        etiqueta: "Aditamentos para excavadoras",
-        href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos/excavadoras/",
-      },
     ]);
+    assert.ok(!JSON.stringify(panel).includes("/marcas/aditamentos/excavadoras/"));
   });
 
   it("un tipo paraguas se enlaza si algún subtipo tiene equipos (#238)", () => {
@@ -173,7 +169,7 @@ describe("megamenú: maquinaria", () => {
     assert.ok(!sinNada.includes("Miniexcavadoras"));
   });
 
-  it("sin la marca de aditamentos, el acordeón no sale; sin categorías, tampoco «Por tipo»", () => {
+  it("sin la marca de aditamentos, su enlace no sale; sin categorías, tampoco «Por tipo»", () => {
     const p = panelMaquinaria({
       ...DATOS,
       marcasMaquinaria: DATOS.marcasMaquinaria.filter((m) => m.slug !== SLUG_ADITAMENTOS),
@@ -181,6 +177,7 @@ describe("megamenú: maquinaria", () => {
     });
     assert.deepEqual(titulos(p.grupos), ["Maquinaria pesada nueva", "Maquinaria pesada usada"]);
     assert.deepEqual(titulos(p.grupos[0]!.grupos), ["Por marca"]);
+    assert.equal(p.finales, undefined);
   });
 });
 
@@ -364,7 +361,7 @@ describe("megamenú: logos de marca (petición del cliente, 2026-10-06)", () => 
     assert.equal(logoDeMenu({ url: null, width: 400, height: 100 }), undefined);
   });
 
-  it("las marcas con logo lo llevan; las que no, solo el nombre; Aditamentos, nunca", () => {
+  it("las marcas con logo lo llevan; las que no, solo el nombre; Aditamentos, nunca (es un enlace)", () => {
     const datos: DatosMegamenu = {
       ...DATOS,
       marcasMaquinaria: [
@@ -380,8 +377,7 @@ describe("megamenú: logos de marca (petición del cliente, 2026-10-06)", () => 
     const caseC = porMarca.grupos.find((g) => g.titulo === "Case Construction")!;
     assert.equal(yanmar.logo?.height, 24);
     assert.equal("logo" in caseC, false);
-    const aditamentos = maquinaria.grupos.find((g) => g.titulo.startsWith("Aditamentos"))!;
-    assert.equal(aditamentos.logo, undefined);
+    assert.ok(!maquinaria.grupos.some((g) => g.titulo.startsWith("Aditamentos")));
     const caterpillar = panelRepuestos(datos).grupos[0]!.grupos[0]!;
     assert.equal(caterpillar.logo?.url, LOGO.url);
   });

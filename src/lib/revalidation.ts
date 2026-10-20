@@ -206,6 +206,8 @@ export function rutasDeEquipoNuevo(
   hermanoSlugs: string[] = [],
 ): string[] {
   return [
+    // El índice de marcas solo lista las que tienen equipos (2026-10-19).
+    rutas.marcasMaquinaria(),
     rutas.tipoMaquinaria(marcaSlug, tipoSlug),
     rutas.equipoNuevo(marcaSlug, tipoSlug, equipoSlug),
     ...hermanoSlugs.map((slug) => rutas.equipoNuevo(marcaSlug, tipoSlug, slug)),

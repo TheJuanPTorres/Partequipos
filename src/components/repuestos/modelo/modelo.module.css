@@ -11,7 +11,7 @@
 .presentacion {
   /* Abajo, el aire hasta el título de las categorías (que empieza pegado a su franja). */
   padding: 0 1.5vw 40px;
-  background: var(--marca-amarillo, #f2bc2e);
+  background: var(--marca-amarillo, #e2e2e2);
 }
 
 /*
@@ -59,7 +59,7 @@
   background:
     radial-gradient(
       circle at 32% 45%,
-      color-mix(in srgb, var(--marca-amarillo, #f2bc2e) 55%, transparent),
+      color-mix(in srgb, var(--marca-amarillo, #e2e2e2) 55%, transparent),
       transparent 65%
     ),
     #1f1d1b;

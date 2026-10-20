@@ -146,6 +146,8 @@ export type VistaVideoYoutube = {
   /** Id de 11 caracteres y segundo de inicio, ya validados. */
   video: { id: string; inicio: number | null };
   miniatura: ImagenBloque | null;
+  /** Solo el diseño «Servicio técnico»: el recuadro bajo el vídeo de YouTube. */
+  descripcionYoutube?: string | null;
   /** Solo el diseño «Servicio técnico»: el vídeo propio del taller y el de fondo. */
   videoTaller?: VideoBloque | null;
   videoFondo?: VideoBloque | null;

@@ -104,7 +104,7 @@ visual** que marca y tipo. **Provisional**: se reemplaza cuando llegue la planti
 
 Plantilla 4017 (`Desktop\partequipos-diseno\wordpress\indice-marcas-repuestos\elementor-4017-2026-10-20.json`).
 **Solo cambia la parte de las marcas** de `…/repuestos-maquinaria-pesada-marcas/` (`BaldosasMarcas`); el encabezado,
-el contacto y los testimonios se quedan como estaban. Las placas oscuras siguen en la principal y en las categorías.
+el contacto y los testimonios se quedan como estaban. Las placas oscuras siguen en el índice de categorías y en cada categoría técnica.
 
 - **Encabezado del bloque** como el export: «Partequipos» (M BOLD, 20/20/18 px) y «Nuestras marcas» como `<h2>`
   revelado por palabras (Principal, 55/40 px y 10vw), en blanco, en una caja de radio 30, relleno 50 y 35vh de alto.

@@ -39,6 +39,15 @@ describe("página de marca de aditamentos", () => {
     );
   });
 
+  it("el tipo que ya se llama «Aditamentos para…» no lo repite", () => {
+    const [s] = seccionesAditamentos(
+      marca,
+      [tipo(1, "Aditamentos para excavadoras")],
+      [equipo(10, 1)],
+    );
+    assert.equal(s?.titulo, "Aditamentos para excavadoras");
+  });
+
   it("cada producto una vez, con su foto y «Ver todo» a SU ficha", () => {
     const s = seccionesAditamentos(
       marca,

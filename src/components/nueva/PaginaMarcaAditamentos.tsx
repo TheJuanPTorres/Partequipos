@@ -25,6 +25,12 @@ import { FranjaServicios } from "./FranjaServicios";
 const ANCLA_PRODUCTOS = "aditamentos-por-tipo";
 const ANCLA_CONTACTO = "contacto-aditamentos";
 
+/** Los campos del formulario del export (sin «No Documento», Ley 1581): sin preguntas de clasificación. */
+const FORMULARIO = {
+  titulo: "Contacto sobre aditamentos",
+  etiquetaMensaje: "¿En qué estás interesado?",
+};
+
 /**
  * PÁGINA DE MARCA «ADITAMENTOS» con la plantilla de Andrés (elementor 4020,
  * 2026-10-20). Solo para esta marca; las demás siguen con la «Plantilla 1».
@@ -102,6 +108,7 @@ export async function PaginaMarcaAditamentos({ marca }: { marca: MarcasMaquinari
         siteKey={turnstileSiteKey()}
         whatsapp={whatsapp}
         marca={marca.nombre}
+        formulario={FORMULARIO}
       />
 
       <FranjaServicios textos={TEXTOS_ADITAMENTOS.franja} />
@@ -124,6 +131,7 @@ export async function PaginaMarcaAditamentos({ marca }: { marca: MarcasMaquinari
           whatsapp,
           boton: texto(global.contactoBoton),
           marca: marca.nombre,
+          formulario: FORMULARIO,
         })}
       />
 

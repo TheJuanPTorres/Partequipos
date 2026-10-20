@@ -31,7 +31,7 @@ export function usaDisenoAditamentos(marca: Pick<MarcasMaquinaria, "slug">): boo
 
 export type SeccionAditamentos = {
   clave: string;
-  /** «Aditamentos para Excavadoras». */
+  /** «Aditamentos para excavadoras»: el nombre del tipo (con «Aditamentos para» si no lo lleva). */
   titulo: string;
   tarjetas: TarjetaMarca[];
 };
@@ -64,8 +64,9 @@ export function seccionesAditamentos(
       });
     }
     if (tarjetas.length === 0) return [];
-    return [
-      { clave: `tipo-${tipo.id}`, titulo: `Aditamentos para ${tipo.nombre.trim()}`, tarjetas },
-    ];
+    // En la base los tipos ya se llaman «Aditamentos para excavadoras»: no se repite.
+    const nombre = tipo.nombre.trim();
+    const titulo = /^aditamentos\b/i.test(nombre) ? nombre : `Aditamentos para ${nombre}`;
+    return [{ clave: `tipo-${tipo.id}`, titulo, tarjetas }];
   });
 }

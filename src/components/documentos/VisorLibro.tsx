@@ -274,7 +274,8 @@ export function VisorLibro({
         ) : null}
       </div>
 
-      <div className={estilos.controles}>
+      {/* El botón flotante de WhatsApp sube para no tapar los controles (`WhatsAppFlotante`). */}
+      <div className={estilos.controles} data-evita-flotante="">
         <button
           type="button"
           className={estilos.boton}

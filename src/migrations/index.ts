@@ -65,6 +65,7 @@ import * as migration_20261019_213426_estado_vacio_usados from './20261019_21342
 import * as migration_20261020_040506_usados_otros from './20261020_040506_usados_otros';
 import * as migration_20261020_050127_marca_nueva_diseno_aditamentos from './20261020_050127_marca_nueva_diseno_aditamentos';
 import * as migration_20261020_061256_cabecera_politica_repuestos from './20261020_061256_cabecera_politica_repuestos';
+import * as migration_20261020_062304_servicio_tecnico_descripcion_youtube from './20261020_062304_servicio_tecnico_descripcion_youtube';
 
 export const migrations = [
   {
@@ -400,6 +401,11 @@ export const migrations = [
   {
     up: migration_20261020_061256_cabecera_politica_repuestos.up,
     down: migration_20261020_061256_cabecera_politica_repuestos.down,
-    name: '20261020_061256_cabecera_politica_repuestos'
+    name: '20261020_061256_cabecera_politica_repuestos',
+  },
+  {
+    up: migration_20261020_062304_servicio_tecnico_descripcion_youtube.up,
+    down: migration_20261020_062304_servicio_tecnico_descripcion_youtube.down,
+    name: '20261020_062304_servicio_tecnico_descripcion_youtube'
   },
 ];

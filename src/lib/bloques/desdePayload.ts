@@ -182,6 +182,7 @@ function vistaSinAncla(b: BloqueDoc, videos: ReadonlyMap<number, Video>): VistaB
             texto: b.texto ? (b.texto as unknown as SerializedEditorState) : null,
             video: v,
             miniatura: imagenDeMedia(b.miniatura, ""),
+            descripcionYoutube: b.descripcionYoutube?.trim() || null,
             videoTaller: video(b.videoTaller, videos),
             videoFondo: video(b.videoFondo, videos),
           }

@@ -300,10 +300,25 @@
   }
 }
 
-/* En el teléfono, el contador se estrecha para que la fila quepa a 390; a 360 las herramientas bajan a otra fila. */
+/*
+ * En el teléfono, el contador se estrecha para que la fila quepa a 390; por
+ * debajo de 380 (360), también los botones, a 36 px (≥ 24 px de WCAG 2.5.8),
+ * para que ninguna herramienta baje sola a otra fila.
+ */
 @media (max-width: 639px) {
   .contador {
     min-width: 3.5rem;
+  }
+}
+
+@media (max-width: 379px) {
+  .boton {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .contador {
+    min-width: 2.75rem;
   }
 }
 

@@ -151,7 +151,10 @@ describe("clasificarDestino — lubricantes y blog", () => {
   });
 
   it("`/lubricantes/` es la página general (2026-10-20)", () => {
-    assert.deepEqual(clasificarDestino("/lubricantes/"), { clase: "estatica", ruta: "/lubricantes" });
+    assert.deepEqual(clasificarDestino("/lubricantes/"), {
+      clase: "estatica",
+      ruta: "/lubricantes",
+    });
   });
 
   it("archivo de categoría del blog", () => {

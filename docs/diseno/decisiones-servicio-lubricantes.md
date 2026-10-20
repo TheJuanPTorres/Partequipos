@@ -176,3 +176,44 @@ Andrés mandó su plantilla (`elementor-4010-2026-10-19.json`) y sustituye al di
 | El vídeo de cabecera, solo en escritorio                           | Como en todo el sitio                             |
 | Las tarjetas, en el gris del kit `#F0F0F0`                         | El global `a3f07e1` no está en el kit que tenemos |
 | La galería lleva de fondo la foto desenfocada                      | Es la de la ficha                                 |
+
+## 8. Página general de lubricantes con la plantilla de Andrés (2026-10-20, dirección)
+
+Plantilla 809451 (`Desktop\partequipos-diseno\wordpress\lubricantes\elementor-809451-2026-10-20.json`). Estructura que se
+queda: **Lubricantes** (general, esta) → **Lubricantes ENI** (su plantilla llegará) → cada categoría de ENI (Motos &
+Scooter, Auto liviano, Auto pesado y Engranajes; su plantilla llegará).
+
+- **`/lubricantes/` es una URL NUEVA.** Antes daba 404 (no estaba en el rastreo ni en el url-map, y no redirigía; la
+  que redirige es `/lubricantes-eni/` → ENI, y sigue igual). Entra en el sitemap y en los destinos válidos de
+  redirección (`destino.ts`). Migas visuales ocultas, `BreadcrumbList` (Inicio › Lubricantes), título, descripción y
+  canónica propios, un solo `<h1>`.
+- **Encabezado:** el de las páginas índice («Plantilla 1»: 70 % de la ventana, antetítulo «Partequipos», «Nuestros
+  Lubricantes» revelado por palabras e icono del ratón que baja al bloque). El export pinta un **vídeo del kit** con
+  gris en «multiply»: no se usa (licencia L3). En su lugar, una foto opcional del panel; sin ella, el tono oscuro de
+  los encabezados sin foto.
+- **Bloque a dos columnas** (recuadro blanco de radio 30 y relleno del 3 %): a la izquierda el **formulario de
+  solicitud** (el nuestro: «Ciudad» y «¿Qué necesitas?»; sin n.º de documento, Ley 1581); a la derecha «Máxima
+  protección y eficiencia para tu maquinaria.», el texto, el **logo de la marca destacada** (`LogoMarca`, el de la
+  marca en el panel) y **«Ver catálogo»** a su página. En móvil, una columna sobre otra.
+- **Textos editables** en «Páginas índice y contacto» → «Página «Lubricantes» (la general)»: antetítulo, título, foto
+  de fondo, título y texto del bloque, marca destacada (vacía, la primera marca) y texto del botón. Vacíos, los del
+  diseño (`TEXTOS_LUBRICANTES`, `src/lib/lubricantes/general.ts`).
+- **Megamenú y menú móvil:** «Lubricantes» pasa a desplegable (`panelLubricantes`): «Ver todos los lubricantes» (→
+  `/lubricantes/`) y, por marca, «Lubricantes <marca>» con «Ver todo» a su página y sus categorías **por nombre** (el
+  orden de las secciones de la página de ENI). Cada categoría va a su **«Enlace en el menú»** (campo nuevo de las
+  categorías de lubricante) o, vacío, a su sección (ancla) de la página de la marca: cuando cada categoría tenga
+  página, se cambia ahí. El panel se abre tanto si el enlace de la cabecera apunta a `/lubricantes/` como a la página
+  de una marca (hoy apunta a ENI); para que el enlace del menú móvil lleve a la general, **runbook**
+  `runbook-cabecera-lubricantes.md`.
+- **Refresco:** las marcas y categorías de lubricante llevan el gancho del megamenú (también al cambiar el «Enlace en
+  el menú»), y guardar una marca revalida además `/lubricantes/` (el logo).
+- Migración `20261020_064422_lubricantes_general`, **solo esquema**.
+
+**Desviaciones, para Andrés:**
+
+- El vídeo de fondo del encabezado no se usa (licencia); foto opcional del panel en su lugar.
+- El antetítulo va en blanco, como en el resto de páginas índice (decisión de dirección del 2026-10-18: el rojo no se
+  leía sobre la foto).
+- El botón del export lleva un sobre (`envelope-dot`); aquí, una flecha, porque lleva al catálogo y no al contacto.
+- El título del grupo del menú es «Lubricantes <nombre de la marca en el panel>» («Lubricantes Eni» hoy); para que
+  diga «ENI», se cambia el nombre de la marca en el panel.

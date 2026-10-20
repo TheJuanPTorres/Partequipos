@@ -66,6 +66,7 @@ import * as migration_20261020_040506_usados_otros from './20261020_040506_usado
 import * as migration_20261020_050127_marca_nueva_diseno_aditamentos from './20261020_050127_marca_nueva_diseno_aditamentos';
 import * as migration_20261020_061256_cabecera_politica_repuestos from './20261020_061256_cabecera_politica_repuestos';
 import * as migration_20261020_062304_servicio_tecnico_descripcion_youtube from './20261020_062304_servicio_tecnico_descripcion_youtube';
+import * as migration_20261020_064422_lubricantes_general from './20261020_064422_lubricantes_general';
 
 export const migrations = [
   {
@@ -406,6 +407,11 @@ export const migrations = [
   {
     up: migration_20261020_062304_servicio_tecnico_descripcion_youtube.up,
     down: migration_20261020_062304_servicio_tecnico_descripcion_youtube.down,
-    name: '20261020_062304_servicio_tecnico_descripcion_youtube'
+    name: '20261020_062304_servicio_tecnico_descripcion_youtube',
+  },
+  {
+    up: migration_20261020_064422_lubricantes_general.up,
+    down: migration_20261020_064422_lubricantes_general.down,
+    name: '20261020_064422_lubricantes_general'
   },
 ];

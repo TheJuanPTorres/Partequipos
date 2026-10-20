@@ -360,7 +360,10 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
     grupos: marcas.map((m) => ({
       titulo: `Lubricantes ${m.nombre}`,
       enlaces: [
-        { etiqueta: `Ver todo Lubricantes ${m.nombre}`, href: conBarra(rutas.marcaLubricante(m.slug)) },
+        {
+          etiqueta: `Ver todo Lubricantes ${m.nombre}`,
+          href: conBarra(rutas.marcaLubricante(m.slug)),
+        },
         ...categorias
           .filter((c) => c.nombre && c.slug && idDeMarcaLubricante(c) === m.id)
           .map((c) => ({

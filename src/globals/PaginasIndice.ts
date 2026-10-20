@@ -208,7 +208,12 @@ export const PaginasIndice: GlobalConfig = {
           "La página /lubricantes/ (plantilla de Andrés). Un campo vacío usa el texto del diseño.",
       },
       fields: [
-        { name: "antetitulo", type: "text", label: "Antetítulo", admin: { placeholder: "Partequipos" } },
+        {
+          name: "antetitulo",
+          type: "text",
+          label: "Antetítulo",
+          admin: { placeholder: "Partequipos" },
+        },
         {
           name: "titulo",
           type: "text",

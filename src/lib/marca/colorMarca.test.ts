@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import { contraste, luminancia, rgbDeHex } from "../portada/contraste";
 
-import { colorDeMarca, estiloDeMarca, logoBlancoSobre, tintaSobre } from "./colorMarca";
+import { colorDeMarca, estiloDeMarca, tintaSobre } from "./colorMarca";
 
 const luz = (hex: string) => {
   const [r, g, b] = rgbDeHex(hex)!;
@@ -59,15 +59,5 @@ describe("estiloDeMarca", () => {
     const oscuro = estiloDeMarca("#283d99") as Record<string, string>;
     assert.equal(oscuro["--marca-hover-fondo"], "#ffffff");
     assert.equal(oscuro["--marca-hover-texto"], "#000000");
-  });
-});
-
-describe("logoBlancoSobre", () => {
-  it("blanco sobre un color oscuro, negro sobre uno claro o sin color (el amarillo de siempre)", () => {
-    assert.equal(logoBlancoSobre("#0b4ea2"), true);
-    assert.equal(logoBlancoSobre("#ffd100"), false);
-    assert.equal(logoBlancoSobre("#04aca3"), true); // el turquesa de Kobelco: blanco, como el diseño
-    assert.equal(logoBlancoSobre(null), false);
-    assert.equal(logoBlancoSobre("no-es-un-color"), false);
   });
 });

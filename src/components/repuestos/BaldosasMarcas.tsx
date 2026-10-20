@@ -1,9 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
-import type { CSSProperties } from "react";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import { Revelado } from "@/components/movimiento/Revelado";
-import { tintaSobre } from "@/lib/marca/colorMarca";
 import type { PlacaMarca } from "@/lib/repuestos/categoria";
 
 import estilos from "./marca.module.css";
@@ -11,10 +9,9 @@ import estilos from "./marca.module.css";
 /**
  * «MOSTRAR MARCAS» de Andrés (plantilla 4017) en el índice de marcas de
  * repuestos: un encabezado («Partequipos» y «Nuestras marcas», revelado por
- * palabras) y un recuadro blanco con una baldosa cuadrada por marca, de su
- * color y con el logo en blanco (en negro si el color es muy claro, la regla
- * del #271). Sin color, el gris neutro de las páginas de marca sin color
- * (`--marca-amarillo` de `.pagina`, #279) con el logo en negro; sin logo, su nombre.
+ * palabras) y un recuadro blanco con una baldosa cuadrada BLANCA por marca con
+ * su logo, el de todo el sitio (`LogoMarca`; dirección, 2026-10-20: sin fondo
+ * de color). Sin logo, su nombre.
  * Detalle en docs/diseno/decisiones-repuestos-marca.md §8.
  */
 export function BaldosasMarcas({ id, marcas }: { id: string; marcas: PlacaMarca[] }) {
@@ -35,37 +32,22 @@ export function BaldosasMarcas({ id, marcas }: { id: string; marcas: PlacaMarca[
 
       <div className={estilos.mostrarMarcasRecuadro}>
         <ul className={estilos.baldosas}>
-          {marcas.map((m) => {
-            const color = m.color
-              ? ({
-                  "--baldosa-color": m.color,
-                  "--baldosa-tinta": tintaSobre(m.color),
-                } as CSSProperties)
-              : undefined;
-            return (
-              <li key={m.id} className={estilos.baldosaCaja}>
-                <Link
-                  href={m.href}
-                  className={estilos.baldosa}
-                  style={color}
-                  data-logo-blanco={m.logoBlanco ? "" : undefined}
-                >
-                  {m.logo ? (
-                    <Image
-                      src={m.logo.url}
-                      alt={m.logo.alt}
-                      width={m.logo.width}
-                      height={m.logo.height}
-                      sizes="(max-width: 1024px) 40vw, 240px"
-                      className={estilos.baldosaLogo}
-                    />
-                  ) : (
-                    m.nombre
-                  )}
-                </Link>
-              </li>
-            );
-          })}
+          {marcas.map((m) => (
+            <li key={m.id} className={estilos.baldosaCaja}>
+              <Link href={m.href} className={estilos.baldosa}>
+                {m.logo ? (
+                  <LogoMarca
+                    logo={m.logo}
+                    alt={m.nombre}
+                    sizes="(max-width: 1024px) 40vw, 240px"
+                    className={estilos.baldosaLogo}
+                  />
+                ) : (
+                  m.nombre
+                )}
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </section>

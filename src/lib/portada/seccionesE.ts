@@ -1,6 +1,7 @@
 import type { CategoriasTecnica, Pagina } from "@/payload-types";
 
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
+import { conAlt, logoDeMarca, type IndiceLogos, type LogoConAlt } from "../marca/logoMarca";
 
 /**
  * SECCIONES 4 Y 5 DE LA PORTADA (fase E, docs/diseno/decisiones-home-ux9.md §18).
@@ -10,15 +11,22 @@ import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
 // --- Sección 4: logos -----------------------------------------------------------
 
-export type LogoMarca = { id: string; nombre: string; logo: ImagenLista };
+export type LogoDePortada = { id: string; nombre: string; logo: LogoConAlt };
 
-/** Los logos de la portada, en su orden. Uno sin imagen o sin nombre no sale. */
-export function logosDeMarcas(seccion: Pagina["seccionLogos"]): LogoMarca[] {
+/**
+ * Los logos de la portada, en su orden. Si el nombre es el de una marca de
+ * repuestos, su logo, el de todo el sitio (`logoMarca.ts`); si no, el elegido
+ * aquí. Uno sin imagen o sin nombre no sale.
+ */
+export function logosDeMarcas(
+  seccion: Pagina["seccionLogos"],
+  logos: IndiceLogos = new Map(),
+): LogoDePortada[] {
   return (seccion?.logos ?? []).flatMap((l, i) => {
     const nombre = l.nombre?.trim();
-    const logo = nombre ? imagenDeMedia(l.logo, nombre) : null;
+    const logo = nombre ? conAlt(logoDeMarca({ nombre, logo: l.logo }, logos), nombre) : null;
     if (!nombre || !logo) return [];
-    return [{ id: l.id ?? String(i), nombre, logo: { ...logo, alt: nombre } }];
+    return [{ id: l.id ?? String(i), nombre, logo }];
   });
 }
 

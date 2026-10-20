@@ -215,6 +215,7 @@ export function FormularioSolicitud({
           defaultValue={previo.empresa}
           type="text"
           autoComplete="organization"
+          placeholder={variante === "plano" ? "Empresa" : undefined}
           className={claseControl}
         />
       )}

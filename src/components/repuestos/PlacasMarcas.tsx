@@ -1,14 +1,14 @@
-import Image from "next/image";
 import Link from "next/link";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { PlacaMarca } from "@/lib/repuestos/categoria";
 
 import estilos from "./marca.module.css";
 
 /**
  * «MARCAS» de los índices y de las páginas de categoría (PROVISIONAL hasta el
- * diseño de Andrés): la franja amarilla del encabezado, con una placa oscura
- * por marca —sus logos son blancos— que enlaza a su página de repuestos. Una
+ * diseño de Andrés): la franja del encabezado, con una placa blanca por marca
+ * con su logo (`LogoMarca`) que enlaza a su página de repuestos. Una
  * marca sin logo se pinta con su nombre, sin hueco.
  *
  * `enlaceTodas`: el enlace a la página de todas las marcas, debajo de las placas.
@@ -43,11 +43,9 @@ export function PlacasMarcas({
           <li key={m.id}>
             <Link href={m.href} className={estilos.placaMarca}>
               {m.logo ? (
-                <Image
-                  src={m.logo.url}
-                  alt={m.logo.alt}
-                  width={m.logo.width}
-                  height={m.logo.height}
+                <LogoMarca
+                  logo={m.logo}
+                  alt={m.nombre}
                   sizes="131px"
                   className={estilos.placaLogo}
                 />

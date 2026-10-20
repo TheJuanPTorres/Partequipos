@@ -1,5 +1,6 @@
 import type { CategoriasUsada, MarcasUsada, Media } from "@/payload-types";
 
+import { logoDeMarca, type IndiceLogos } from "../marca/logoMarca";
 import type { TarjetaMarca } from "../repuestos/marca";
 import { imagenDeMedia, posicionFocal, type ImagenLista } from "../utils/relations";
 import { SIN_UNIDADES } from "./vacia";
@@ -90,26 +91,28 @@ export function tarjetasDeCategoriasUsada(
 
 /**
  * Una tarjeta por marca CON unidades, en el orden recibido (por nombre), con
- * su número de unidades. Con logo, el logo entero (`logo: true`); sin él, la
- * foto de su unidad más reciente.
+ * su número de unidades. Con logo —el de todo el sitio (`logoDeMarca`): el de la
+ * marca de repuestos con su nombre o, si no, el suyo—, el logo entero; sin él,
+ * la foto de su unidad más reciente.
  */
 export function tarjetasDeMarcasUsada(
   marcas: Pick<MarcasUsada, "id" | "nombre" | "slug" | "logo">[],
   unidades: UnidadDelIndice[],
   ruta: (slug: string) => string,
+  logos: IndiceLogos = new Map(),
 ): TarjetaMarca[] {
   const porMarca = agrupar(unidades, (u) => u.marcaUsada);
   return marcas
     .filter((m) => m.nombre && m.slug && porMarca.get(m.id)?.length)
     .map((m) => {
       const suyas = porMarca.get(m.id) ?? [];
-      const logo = imagenDeMedia(m.logo, "");
+      const logo = logoDeMarca(m, logos);
       return {
         clave: `marca-${m.id}`,
         titulo: m.nombre,
         href: `${ruta(m.slug)}/`,
-        imagen: logo ?? fotoMasReciente(suyas),
-        logo: Boolean(logo),
+        imagen: logo ? null : fotoMasReciente(suyas),
+        ...(logo ? { logo } : {}),
         soloEscritorio: false,
         detalle: textoUnidades(suyas.length),
       };

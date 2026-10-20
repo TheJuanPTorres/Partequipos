@@ -2,6 +2,7 @@ import { IconArrowRight } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { TarjetaMarca } from "@/lib/repuestos/marca";
 
 import estilos from "./marca.module.css";
@@ -66,23 +67,33 @@ export function TarjetasMarca({
               key={t.clave}
               className={`${estilos.tarjeta} ${t.soloEscritorio ? estilos.soloEscritorio : ""}`}
             >
-              {t.imagen ? (
+              {t.logo ? (
+                <div className={estilos.foto}>
+                  <LogoMarca
+                    logo={t.logo}
+                    alt=""
+                    fill
+                    sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
+                    className={`${estilos.fotoImg} ${estilos.fotoLogo}`}
+                  />
+                </div>
+              ) : t.imagen ? (
                 <div className={estilos.foto}>
                   <Image
                     src={t.imagen.url}
                     alt=""
                     fill
                     sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
-                    className={`${estilos.fotoImg} ${t.logo ? estilos.fotoLogo : ""}`}
+                    className={estilos.fotoImg}
                     style={{ objectPosition: t.imagen.posicion }}
                   />
                 </div>
               ) : null}
               <div
                 className={estilos.panel}
-                data-con-foto={t.imagen ? "" : undefined}
+                data-con-foto={t.imagen || t.logo ? "" : undefined}
                 // En los índices, el recuadro se desplaza con el scroll (`RecuadrosConScroll`).
-                data-recuadro-scroll={indice && t.imagen ? "" : undefined}
+                data-recuadro-scroll={indice && (t.imagen || t.logo) ? "" : undefined}
               >
                 <Nivel id={idT} className={estilos.tituloTarjeta}>
                   {t.titulo}

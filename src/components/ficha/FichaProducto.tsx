@@ -15,6 +15,8 @@ import estilos from "@/components/ficha/ficha.module.css";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import type { DatoDestacado } from "@/lib/maquinaria/fichaTecnica";
 import type { ImagenLista } from "@/lib/utils/relations";
+import { LogoMarca } from "@/components/marca/LogoMarca";
+import type { LogoConAlt } from "@/lib/marca/logoMarca";
 
 /*
  * FICHA DE PRODUCTO V2 de ux-9 (export 3166, docs/diseno/decisiones-ficha.md).
@@ -81,7 +83,8 @@ type Props = {
   /** Enlace de WhatsApp de «Habla con un experto»; `null` si la empresa no tiene número. */
   experto?: { href: string } | null;
   /** Logo de la marca, sobre el texto; sin logo no se pinta. */
-  logo: { url: string; alt: string; width: number; height: number } | null;
+  /** El logo de la marca, el de todo el sitio (`LogoMarca`). */
+  logo: LogoConAlt | null;
   /** Entradilla, descripción y puntos: lo que cambia entre nueva y usada. */
   cuerpo: ReactNode;
   especificaciones: FilaEspecificacion[];
@@ -209,14 +212,7 @@ export function FichaProducto({
       >
         <div className={estilos.columnaTexto}>
           {logo ? (
-            <Image
-              src={logo.url}
-              alt={logo.alt}
-              width={logo.width}
-              height={logo.height}
-              sizes="95px"
-              className={estilos.logoMarca}
-            />
+            <LogoMarca logo={logo} alt={logo.alt} sizes="95px" className={estilos.logoMarca} />
           ) : null}
           <div className={`${estilos.texto} texto-cuerpo`}>{cuerpo}</div>
         </div>

@@ -2,6 +2,8 @@ import { IconEye, IconFileDescription, type Icon } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
+import type { LogoMarca as LogoMarcaDatos } from "@/lib/marca/logoMarca";
 import type { FotoDeTarjeta } from "@/lib/queries/getMaquinaria";
 import { posicionFocal } from "@/lib/utils/relations";
 
@@ -51,7 +53,8 @@ export function TarjetaListado({
   /** Línea roja bajo el título (el modelo, en nueva). */
   codigo?: string | null;
   foto: FotoDeTarjeta | null;
-  logo?: FotoDeTarjeta | null;
+  /** El logo de la marca, el de todo el sitio (`LogoMarca`). */
+  logo?: LogoMarcaDatos | null;
   logoAlt?: string;
   filas: FilaTarjeta[];
   pdf?: string | null;
@@ -71,14 +74,9 @@ export function TarjetaListado({
             style={{ objectPosition: posicionFocal(foto.focalX, foto.focalY) }}
           />
         ) : null}
-        {logo?.url && logo.width && logo.height ? (
+        {logo ? (
           <span className={estilos.logo}>
-            <Image
-              src={logo.url}
-              alt={logoAlt}
-              width={96}
-              height={Math.round((96 * logo.height) / logo.width)}
-            />
+            <LogoMarca logo={logo} alt={logoAlt} sizes="96px" />
           </span>
         ) : null}
       </div>

@@ -85,12 +85,26 @@ describe("índice de usados", () => {
       ruta,
     );
     assert.deepEqual(
-      t.map((x) => [x.titulo, x.imagen?.url, x.logo, x.detalle]),
+      t.map((x) => [x.titulo, x.imagen?.url ?? null, x.logo?.url ?? null, x.detalle]),
       [
-        ["Hitachi", "/nueva.jpg", false, "2 unidades disponibles"],
-        ["Komatsu", "/logo.png", true, "1 unidad disponible"],
+        ["Hitachi", "/nueva.jpg", null, "2 unidades disponibles"],
+        ["Komatsu", null, "/logo.png", "1 unidad disponible"],
       ],
     );
+  });
+
+  it("el logo de la marca de repuestos con su nombre manda (un solo logo por marca)", () => {
+    const logos = new Map([
+      ["hitachi", { url: "/rep.png", width: 419, height: 100, oscuro: true }],
+    ]);
+    const [t] = tarjetasDeMarcasUsada(
+      [{ id: 10, nombre: "Hitachi", slug: "hitachi", logo: null }],
+      unidades,
+      ruta,
+      logos,
+    );
+    assert.deepEqual(t?.logo, { url: "/rep.png", width: 419, height: 100, oscuro: true });
+    assert.equal(t?.imagen, null);
   });
 
   it("singular y plural", () => {

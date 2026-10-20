@@ -2,30 +2,34 @@ import { IconCalendar, IconClock, IconSettings, IconWeight } from "@tabler/icons
 import Image from "next/image";
 import Link from "next/link";
 
+import { ANCLA_COTIZAR } from "@/components/ficha/FichaProducto";
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
-import type { DatoFicha, Pestana, TarjetaEquipo } from "@/lib/portada/secciones";
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
+import type { DatoFicha, EnlaceUsada, TarjetaEquipo } from "@/lib/portada/secciones";
 import type { ImagenLista } from "@/lib/utils/relations";
+import { enlaceWhatsApp } from "@/lib/whatsapp";
 
 import estilos from "./maquinariaUsada.module.css";
-import { CarruselUsada, PestanasUsada } from "./diferidos";
+import { CarruselUsada } from "./diferidos";
 
 /**
  * «MAQUINARIA PESADA USADA» DE LA PORTADA — Home V2 de Andrés (2026-10-15),
  * secciones 3 (cabecera) y 4 (pestañas) de `elementor-3519`.
  *
- * Componente de SERVIDOR: las tarjetas se pintan aquí y llegan ya hechas a las
- * pestañas (cliente). Los textos son del panel (página «inicio»); las
+ * Componente de SERVIDOR: las tarjetas se pintan aquí y llegan ya hechas al
+ * carrusel (cliente). Los textos son del panel (página «inicio»); las
  * tarjetas, de `equipos-usados`; la máquina decorativa, de la portada.
  *
  * Lo que se aparta del diseño (docs/diseno/decisiones-home-ux9.md §33):
  * - El título en `<h2>` y el subtítulo y la frase en `<p>` (en el diseño,
  *   `<div>` y `<h3>`); el nombre de cada tarjeta en `<h3>`.
- * - D10: en móvil siguen siendo pestañas, no acordeón.
- * - Las tres pestañas con tarjetas verticales (el diseño solo rediseña la
- *   primera; «Otros» y «Aditamentos» conservan las de ux-9), por petición de
- *   dirección.
- * - «Ficha técnica» lleva a la página de la unidad (antes, a su PDF).
+ * - DIRECCIÓN (2026-10-20): las tres «pestañas» son ENLACES a su categoría de
+ *   usados, en el rojo de marca, y solo hay un carrusel, el de excavadoras.
+ * - DIRECCIÓN (2026-10-20): en cada tarjeta, «Ver producto» (la página de la
+ *   unidad) y «Cotizar» (la ventana emergente del formulario, con la unidad
+ *   como referencia); «Ver todo», más grande.
  * - Iconos de Tabler en vez de los de Flaticon (L2).
  * - La ficha lleva peso operativo, año y horómetro (cliente, 2026-10-16), no
  *   el peso, la potencia y el motor de la Home V2.
@@ -41,15 +45,36 @@ const ICONOS: Record<DatoFicha["clave"], typeof IconWeight> = {
 const SIZES_TARJETA =
   "(max-width: 767px) calc(100vw - 93px), (max-width: 1024px) calc(47vw - 76px), calc(32vw - 76px)";
 
+/** Lo que la ventana de «Cotizar» necesita del servidor. */
+export type DatosCotizar = { siteKey: string | null; telefono: string };
+
+/**
+ * El formulario de la ventana: el MISMO que el de la página de la unidad
+ * (`[categoria]/[unidad]/page.tsx`), con la unidad como referencia. La
+ * solicitud guarda de dónde viene: la portada.
+ */
+function formularioDeCotizar(nombre: string, datos: DatosCotizar): ConfigFormulario {
+  return {
+    tipo: "cotizacion",
+    origen: "/",
+    siteKey: datos.siteKey,
+    whatsapp: enlaceWhatsApp(datos.telefono, `Hola, quiero cotizar la ${nombre}.`),
+    referencia: { texto: nombre },
+    titulo: "Solicitar cotización",
+    descripcion: "Te enviamos precio, disponibilidad y condiciones de entrega.",
+    textoBoton: "Pedir cotización",
+  };
+}
+
 /** `idNombre` sale de la posición, no del id de la base: no se exponen ids (CLAUDE.md §8). */
 function Tarjeta({
   equipo,
   idNombre,
-  verTexto,
+  cotizar,
 }: {
   equipo: TarjetaEquipo;
   idNombre: string;
-  verTexto: string;
+  cotizar: DatosCotizar;
 }) {
   return (
     <article className={estilos.tarjeta} aria-labelledby={idNombre}>
@@ -90,23 +115,19 @@ function Tarjeta({
         </ul>
       ) : null}
       <div className={estilos.botones}>
-        {verTexto ? (
-          <Link
-            href={equipo.href}
-            aria-describedby={idNombre}
-            className={`${estilos.boton} texto-etiqueta`}
-          >
-            {verTexto}
+        {equipo.href ? (
+          <Link href={equipo.href} className={`${estilos.boton} texto-etiqueta`}>
+            Ver producto<span className="sr-only">: {equipo.nombre}</span>
           </Link>
         ) : null}
-        {equipo.hrefFicha ? (
-          <Link
-            href={equipo.hrefFicha}
-            className={`${estilos.boton} ${estilos.botonOscuro} texto-etiqueta`}
-          >
-            Ficha técnica<span className="sr-only"> de {equipo.nombre}</span>
-          </Link>
-        ) : null}
+        {/* Sin JavaScript, baja al formulario de la página de la unidad. */}
+        <BotonFormulario
+          href={equipo.href ? `${equipo.href}#${ANCLA_COTIZAR}` : "/contactanos/"}
+          className={`${estilos.boton} ${estilos.botonOscuro} texto-etiqueta`}
+          formulario={formularioDeCotizar(equipo.nombre, cotizar)}
+        >
+          Cotizar<span className="sr-only">: {equipo.nombre}</span>
+        </BotonFormulario>
       </div>
     </article>
   );
@@ -118,18 +139,35 @@ export type TextosUsada = {
   marcasTitulo: string;
   marcasTexto: string;
   botonTexto: string;
-  verProductoTexto: string;
 };
 
 type Props = {
-  pestanas: Pestana[];
+  enlaces: EnlaceUsada[];
+  excavadoras: TarjetaEquipo[];
   maquina: ImagenLista | null;
   hrefVerTodo: string;
   textos: TextosUsada;
+  cotizar: DatosCotizar;
 };
 
-export function SeccionMaquinariaUsada({ pestanas, maquina, hrefVerTodo, textos }: Props) {
-  if (pestanas.length === 0) return null;
+export function SeccionMaquinariaUsada({
+  enlaces,
+  excavadoras,
+  maquina,
+  hrefVerTodo,
+  textos,
+  cotizar,
+}: Props) {
+  if (excavadoras.length === 0) return null;
+  const hechas = (sufijo: string) =>
+    excavadoras.map((e, i) => (
+      <Tarjeta
+        key={e.id}
+        equipo={e}
+        idNombre={`portada-usada${sufijo}-${i + 1}`}
+        cotizar={cotizar}
+      />
+    ));
   return (
     <section className={estilos.seccion} aria-labelledby="portada-usada-titulo">
       <div className={maquina ? `${estilos.cabecera} ${estilos.conMaquina}` : estilos.cabecera}>
@@ -183,7 +221,7 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefVerTodo, textos 
           ) : null}
           {textos.botonTexto ? (
             <div className={estilos.verTodo}>
-              <Link href={hrefVerTodo} className={`${estilos.boton} texto-etiqueta`}>
+              <Link href={hrefVerTodo} className={`${estilos.boton} ${estilos.botonGrande}`}>
                 <IconSettings aria-hidden="true" focusable="false" stroke={1.75} />
                 {textos.botonTexto}
               </Link>
@@ -193,31 +231,27 @@ export function SeccionMaquinariaUsada({ pestanas, maquina, hrefVerTodo, textos 
       </div>
 
       <div className={estilos.catalogo}>
-        <PestanasUsada
-          etiquetadoPor="portada-usada-titulo"
-          pestanas={pestanas.map(({ clave, etiqueta }) => ({ clave, etiqueta }))}
-          paneles={pestanas.map((p) => {
-            const hechas = (sufijo: string) =>
-              p.equipos.map((e, i) => (
-                <Tarjeta
-                  key={e.id}
-                  equipo={e}
-                  idNombre={`portada-usada-${p.clave}${sufijo}-${i + 1}`}
-                  verTexto={textos.verProductoTexto}
-                />
-              ));
-            return (
-              <CarruselUsada
-                key={p.clave}
-                id={`portada-usada-${p.clave}`}
-                etiqueta={`Unidades usadas: ${p.etiqueta}`}
-                nombres={p.equipos.map((e) => e.nombre)}
-                tarjetas={hechas("")}
-                copias={hechas("-copia")}
-              />
-            );
-          })}
-        />
+        {/* Enlaces a las categorías de usados (antes, pestañas). */}
+        <nav aria-label="Categorías de maquinaria usada" className={estilos.enlaces}>
+          <ul className={estilos.lista}>
+            {enlaces.map((e) => (
+              <li key={e.clave}>
+                <Link href={e.href} className={estilos.enlace}>
+                  {e.etiqueta}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className={estilos.panel}>
+          <CarruselUsada
+            id="portada-usada-excavadoras"
+            etiqueta={`Unidades usadas: ${enlaces[0]?.etiqueta ?? "Excavadoras"}`}
+            nombres={excavadoras.map((e) => e.nombre)}
+            tarjetas={hechas("")}
+            copias={hechas("-copia")}
+          />
+        </div>
       </div>
     </section>
   );

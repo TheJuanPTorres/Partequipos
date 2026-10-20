@@ -2715,6 +2715,30 @@ de WordPress, que es una foto normal.
   calendario, reloj) y sin línea si falta el dato. La Home V2 pinta peso,
   potencia y motor, que casi ninguna unidad importada trae.
 
+### 33.3 Enlaces, un solo carrusel y «Cotizar» (dirección, 2026-10-20)
+
+- **Las pestañas pasan a ser ENLACES** a su categoría de usados:
+  `…/maquinaria-pesada-usada/excavadoras/`, `…/otros/` y `…/aditamentos/`
+  (las tres en 200 en el sitio publicado). Van en el rojo de marca, con el
+  paso a oscuro de los demás botones rojos al pasar el ratón y un contorno
+  visible con teclado. Ya no llevan la semántica de pestañas: son una `<nav>`
+  con una lista de enlaces. Los textos siguen saliendo de los campos que
+  tenían las pestañas («Enlace a…» en el panel).
+- **Un solo carrusel, el de excavadoras.** Se quitan los de «Otros» y
+  «Aditamentos» y su consulta (`getExcavadorasUsadasDePortada`, una sola).
+  Se conservan las reglas del #208/#213: hasta 6 unidades, las más recientes
+  por fecha de publicación, avance automático con pausa, quieto con «reducir
+  movimiento» y sin CLS.
+- **Botones de cada tarjeta:** «Ver producto» (la página de la unidad) y
+  «Cotizar», que abre la ventana emergente del formulario (#273) con la unidad
+  como referencia, igual que la página de la unidad. Sin JavaScript, «Cotizar»
+  baja al formulario de esa página. El campo «Texto del botón de cada equipo»
+  (`verProductoTexto`) se queda sin uso; quitarlo exigiría una migración.
+- **«Ver todo», más grande:** la letra del texto destacado (20 px; 18 en
+  móvil) con relleno de 16 · 34 · 14 px, unos 50 px de alto frente a los ~38
+  de los demás botones.
+- Sin esquema y sin datos que cambiar en producción.
+
 ## 34. Auditoría de D (2026-10-14): pines de las sedes y título de la portada
 
 ### 34.1 Pines de las sedes a 390 (axe `target-size` ×6)

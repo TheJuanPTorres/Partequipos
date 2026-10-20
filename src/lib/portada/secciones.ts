@@ -1,6 +1,8 @@
 import type { CategoriasUsada, EquiposUsado, MarcasMaquinaria } from "@/payload-types";
 
+import { SLUG_CATEGORIA_USADA_ADITAMENTOS } from "../aditamentos/wordpress";
 import { conAlt, logoDeMarca, type IndiceLogos, type LogoConAlt } from "../marca/logoMarca";
+import { SEGMENTO_OTROS_USADA } from "../routes";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 
 /**
@@ -62,7 +64,7 @@ export function tarjetasDeMarcas(
   });
 }
 
-// --- Sección 3: pestañas de equipo usado --------------------------------------
+// --- Sección 3: carrusel de excavadoras usadas -------------------------------
 
 export type DatoFicha = { clave: "peso" | "anio" | "horometro"; etiqueta: string; valor: string };
 
@@ -72,17 +74,16 @@ export type TarjetaEquipo = {
   nombre: string;
   imagen: ImagenLista | null;
   ficha: DatoFicha[];
-  /** «Ver más» lleva al listado de su categoría. */
-  href: string;
   /**
-   * «Ficha técnica» lleva a la PÁGINA de la unidad (2026-10-16, antes era su PDF,
-   * que ahora se descarga desde esa página). Una unidad aún sin dirección web no
-   * pinta el botón.
+   * La PÁGINA de la unidad: «Ver producto» lleva a ella y, sin JavaScript,
+   * «Cotizar» baja a su formulario. Una unidad aún sin dirección web no pinta
+   * «Ver producto», y su «Cotizar» va a /contactanos/.
    */
-  hrefFicha: string | null;
+  href: string | null;
 };
 
-export type Pestana = { clave: string; etiqueta: string; equipos: TarjetaEquipo[] };
+/** Enlace de la cabecera del carrusel a una categoría de usados (dirección, 2026-10-20). */
+export type EnlaceUsada = { clave: string; etiqueta: string; href: string };
 
 const numero = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 1 });
 /** Horas con separador de miles SIEMPRE («4.500 h»), también con cuatro cifras. */
@@ -123,67 +124,59 @@ export function hrefDeCategoriaUsada(slug: string): string {
   return `${RUTA_USADA}${slug}/`;
 }
 
-/** Etiquetas de las pestañas, desde el panel (página «inicio»). */
-export type EtiquetasPestanas = {
+/** Textos de los enlaces de la cabecera, desde el panel (página «inicio»; antes, las pestañas). */
+export type EtiquetasEnlaces = {
   excavadoras?: string | null;
   otros?: string | null;
   aditamentos?: string | null;
 };
 
 /**
- * PESTAÑAS de la sección 3, las tres de ux-9: «Excavadoras» (la categoría
- * `excavadoras`), «Otros» (el resto de categorías) y «Aditamentos» (los
- * equipos marcados con «Pestaña en la portada: Aditamentos», porque en la
- * línea usada no hay categoría de aditamentos). Las etiquetas salen del panel.
- *
- * Solo equipos DISPONIBLES y con categoría poblada (sin ella no hay adónde
- * enlazar). Una pestaña sin equipos no se pinta.
+ * ENLACES de la cabecera del carrusel (dirección, 2026-10-20): ya no son
+ * pestañas, llevan a su categoría de usados (`excavadoras`, la página
+ * «Otros» y `aditamentos`). Los textos salen de los campos que tenían las
+ * pestañas; vacíos, los de siempre. Se pintan siempre: las tres páginas existen
+ * aunque no tengan unidades.
  */
-export function pestanasDeUsada(
-  equipos: EquiposUsado[],
-  etiquetas: EtiquetasPestanas = {},
-  por: number = TARJETAS_POR_PESTANA,
-): Pestana[] {
-  const excavadoras: TarjetaEquipo[] = [];
-  const otros: TarjetaEquipo[] = [];
-  const aditamentos: TarjetaEquipo[] = [];
-  let etiquetaExcavadoras = etiquetas.excavadoras?.trim() || "";
+export function enlacesDeUsada(etiquetas: EtiquetasEnlaces = {}): EnlaceUsada[] {
+  return [
+    { clave: SLUG_EXCAVADORAS, texto: etiquetas.excavadoras, defecto: "Excavadoras" },
+    { clave: SEGMENTO_OTROS_USADA, texto: etiquetas.otros, defecto: "Otros" },
+    {
+      clave: SLUG_CATEGORIA_USADA_ADITAMENTOS,
+      texto: etiquetas.aditamentos,
+      defecto: "Aditamentos",
+    },
+  ].map(({ clave, texto, defecto }) => ({
+    clave,
+    etiqueta: texto?.trim() || defecto,
+    href: hrefDeCategoriaUsada(clave),
+  }));
+}
 
+/**
+ * TARJETAS del carrusel: solo las EXCAVADORAS (dirección, 2026-10-20; antes
+ * había un carrusel por pestaña). Las más recientes primero, en el orden que
+ * trae la consulta, y hasta `por`. Solo equipos DISPONIBLES de la categoría
+ * `excavadoras` y que no estén marcados como aditamento.
+ */
+export function tarjetasDeExcavadoras(
+  equipos: EquiposUsado[],
+  por: number = TARJETAS_POR_PESTANA,
+): TarjetaEquipo[] {
+  const tarjetas: TarjetaEquipo[] = [];
   for (const e of equipos) {
-    if (!e.disponible) continue;
+    if (!e.disponible || e.pestanaPortada === "aditamentos") continue;
     const categoria = poblado<CategoriasUsada>(e.categoria);
     const nombre = e.nombre?.trim();
-    if (!categoria?.slug || !nombre) continue;
-    const tarjeta: TarjetaEquipo = {
+    if (categoria?.slug !== SLUG_EXCAVADORAS || !nombre) continue;
+    tarjetas.push({
       id: e.id,
       nombre,
       imagen: imagenDeMedia(Array.isArray(e.imagenes) ? e.imagenes[0] : null, nombre),
       ficha: fichaDeEquipo(e),
-      href: hrefDeCategoriaUsada(categoria.slug),
-      hrefFicha: e.slug ? `${hrefDeCategoriaUsada(categoria.slug)}${e.slug}/` : null,
-    };
-    if (e.pestanaPortada === "aditamentos") {
-      aditamentos.push(tarjeta);
-    } else if (categoria.slug === SLUG_EXCAVADORAS) {
-      etiquetaExcavadoras ||= categoria.nombre?.trim() || "Excavadoras";
-      excavadoras.push(tarjeta);
-    } else {
-      otros.push(tarjeta);
-    }
+      href: e.slug ? `${hrefDeCategoriaUsada(categoria.slug)}${e.slug}/` : null,
+    });
   }
-
-  const pestanas: Pestana[] = [
-    {
-      clave: SLUG_EXCAVADORAS,
-      etiqueta: etiquetaExcavadoras || "Excavadoras",
-      equipos: excavadoras.slice(0, por),
-    },
-    { clave: "otros", etiqueta: etiquetas.otros?.trim() || "Otros", equipos: otros.slice(0, por) },
-    {
-      clave: "aditamentos",
-      etiqueta: etiquetas.aditamentos?.trim() || "Aditamentos",
-      equipos: aditamentos.slice(0, por),
-    },
-  ];
-  return pestanas.filter((p) => p.equipos.length > 0);
+  return tarjetas.slice(0, por);
 }

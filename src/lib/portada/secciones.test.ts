@@ -3,7 +3,12 @@ import { describe, it } from "node:test";
 
 import type { CategoriasUsada, EquiposUsado, MarcasMaquinaria, Media } from "@/payload-types";
 
-import { fichaDeEquipo, pestanasDeUsada, tarjetasDeMarcas } from "./secciones";
+import {
+  enlacesDeUsada,
+  fichaDeEquipo,
+  tarjetasDeExcavadoras,
+  tarjetasDeMarcas,
+} from "./secciones";
 
 const media = (id: number, alt = ""): Media =>
   ({ id, url: `/m/${id}.jpg`, alt, width: 800, height: 600 }) as Media;
@@ -94,77 +99,65 @@ describe("sección 3: ficha", () => {
   });
 });
 
-describe("sección 3: pestañas", () => {
-  const exc = cat("excavadoras", "Excavadoras");
-  const mini = cat("minicargadores", "Minicargadores");
-
-  it("Excavadoras y Otros, seis tarjetas como máximo en cada una (carrusel)", () => {
-    const r = pestanasDeUsada([
-      ...[1, 2, 3, 4, 5, 6, 7, 8].map((id) => equipo(id, exc)),
-      ...[9, 10].map((id) => equipo(id, mini)),
-    ]);
+describe("sección 3: enlaces a las categorías", () => {
+  it("Excavadoras, Otros y Aditamentos, a su categoría de usados; textos desde el panel", () => {
     assert.deepEqual(
-      r.map((p) => [p.etiqueta, p.equipos.map((e) => e.id)]),
+      enlacesDeUsada({ otros: "Otros equipos", aditamentos: "  " }).map((e) => [
+        e.etiqueta,
+        e.href,
+      ]),
       [
-        ["Excavadoras", [1, 2, 3, 4, 5, 6]],
-        ["Otros", [9, 10]],
+        ["Excavadoras", "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/"],
+        ["Otros equipos", "/maquinaria-pesada/maquinaria-pesada-usada/otros/"],
+        ["Aditamentos", "/maquinaria-pesada/maquinaria-pesada-usada/aditamentos/"],
       ],
     );
   });
+});
 
-  it("nombre entero; «Ficha técnica» lleva a la página de la unidad, «Ver más» a su categoría", () => {
-    const [p] = pestanasDeUsada([
+describe("sección 3: carrusel de excavadoras", () => {
+  const exc = cat("excavadoras", "Excavadoras");
+  const mini = cat("minicargadores", "Minicargadores");
+
+  it("solo excavadoras, en el orden de la consulta y seis como máximo", () => {
+    const r = tarjetasDeExcavadoras([
+      ...[1, 2, 3, 4, 5, 6, 7, 8].map((id) => equipo(id, exc)),
+      equipo(9, mini),
+    ]);
+    assert.deepEqual(
+      r.map((e) => e.id),
+      [1, 2, 3, 4, 5, 6],
+    );
+  });
+
+  it("nombre entero; «Ver producto» a la página de la unidad (sin dirección, nada)", () => {
+    const r = tarjetasDeExcavadoras([
       equipo(1, exc, { nombre: "Excavadora Hitachi ZX350H-5B 2016", slug: "excavadora-hitachi-1" }),
       equipo(2, exc),
     ]);
     assert.deepEqual(
-      p!.equipos.map((e) => [e.nombre, e.href, e.hrefFicha]),
+      r.map((e) => [e.nombre, e.href]),
       [
         [
           "Excavadora Hitachi ZX350H-5B 2016",
-          "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/",
           "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/excavadora-hitachi-1/",
         ],
-        ["Equipo 2", "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/", null],
+        ["Equipo 2", null],
       ],
     );
   });
 
-  it("descarta los no disponibles y los que no traen la categoría poblada", () => {
-    const r = pestanasDeUsada([
+  it("descarta los no disponibles, los aditamentos y los que no traen la categoría poblada", () => {
+    const r = tarjetasDeExcavadoras([
       equipo(1, exc, { disponible: false }),
       equipo(2, 4),
-      equipo(3, mini),
+      equipo(3, exc, { pestanaPortada: "aditamentos" }),
+      equipo(4, exc),
     ]);
     assert.deepEqual(
-      r.map((p) => p.clave),
-      ["otros"],
+      r.map((e) => e.id),
+      [4],
     );
-  });
-
-  it("tercera pestaña: los marcados como aditamentos; etiquetas desde el panel", () => {
-    const r = pestanasDeUsada(
-      [
-        equipo(1, exc),
-        equipo(2, mini),
-        equipo(3, exc, { pestanaPortada: "aditamentos" }),
-        equipo(4, mini, { pestanaPortada: "aditamentos" }),
-      ],
-      { excavadoras: "Excavadoras", otros: "Otros equipos", aditamentos: "Aditamentos" },
-    );
-    assert.deepEqual(
-      r.map((p) => [p.clave, p.etiqueta, p.equipos.map((e) => e.id)]),
-      [
-        ["excavadoras", "Excavadoras", [1]],
-        ["otros", "Otros equipos", [2]],
-        ["aditamentos", "Aditamentos", [3, 4]],
-      ],
-    );
-  });
-
-  it("sin equipos, ninguna pestaña; el enlace va a la categoría del equipo", () => {
-    assert.deepEqual(pestanasDeUsada([]), []);
-    const [p] = pestanasDeUsada([equipo(1, mini)]);
-    assert.equal(p!.equipos[0]!.href, "/maquinaria-pesada/maquinaria-pesada-usada/minicargadores/");
+    assert.deepEqual(tarjetasDeExcavadoras([]), []);
   });
 });

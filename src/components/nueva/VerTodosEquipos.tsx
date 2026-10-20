@@ -1,7 +1,6 @@
 "use client";
 
 import { IconArrowRight, IconCircleCheck, IconX } from "@tabler/icons-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 
@@ -38,9 +37,6 @@ export function VerTodosEquipos({
   const [montado, setMontado] = useState(false);
   const [abierto, setAbierto] = useState(false);
   const [cerrando, setCerrando] = useState(false);
-  // Dos versiones del listado para que dirección elija: `?variante=a` (solo el nombre con un
-  // icono) o `?variante=b` (con la foto en miniatura). Se lee al abrir; por defecto, la A.
-  const [variante, setVariante] = useState<"a" | "b">("a");
   const enlace = useRef<HTMLAnchorElement>(null);
   const dialogo = useRef<HTMLDialogElement>(null);
   const empezoFuera = useRef(false);
@@ -57,7 +53,6 @@ export function VerTodosEquipos({
       return;
     }
     e.preventDefault();
-    setVariante(new URLSearchParams(window.location.search).get("variante") === "b" ? "b" : "a");
     setMontado(true);
     setAbierto(true);
   }
@@ -124,36 +119,23 @@ export function VerTodosEquipos({
                 <span className="sr-only">Cerrar el listado</span>
               </button>
             </div>
-            <ul className={panel.lista} data-variante={variante}>
-              {equipos.map((e) => (
-                <li key={e.id}>
-                  <Link href={e.href} className={panel.item}>
-                    {variante === "b" ? (
-                      <span className={panel.mini} aria-hidden="true">
-                        {e.foto?.url ? (
-                          <Image
-                            src={e.foto.url}
-                            alt=""
-                            fill
-                            sizes="48px"
-                            className={panel.miniImg}
-                            style={{ objectPosition: e.foto.posicion }}
-                          />
-                        ) : null}
-                      </span>
-                    ) : (
+            <div className={panel.cuerpo}>
+              <ul className={panel.lista}>
+                {equipos.map((e) => (
+                  <li key={e.id}>
+                    <Link href={e.href} className={panel.item}>
                       <span className={panel.marca} aria-hidden="true">
                         <IconCircleCheck focusable="false" stroke={1.9} size={26} />
                       </span>
-                    )}
-                    <span className={panel.nombreItem}>{e.nombre}</span>
-                    <span className={panel.flecha} aria-hidden="true">
-                      <IconArrowRight focusable="false" stroke={2.2} size={22} />
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+                      <span className={panel.nombreItem}>{e.nombre}</span>
+                      <span className={panel.flecha} aria-hidden="true">
+                        <IconArrowRight focusable="false" stroke={2.2} size={22} />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </dialog>
       ) : null}

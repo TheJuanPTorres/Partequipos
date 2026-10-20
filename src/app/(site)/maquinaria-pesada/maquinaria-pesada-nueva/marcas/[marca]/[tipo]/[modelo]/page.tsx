@@ -31,6 +31,8 @@ import type {
   TiposMaquinaria,
 } from "@/payload-types";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
+import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
+import { getLogosMarca } from "@/lib/queries/getLogosMarca";
 
 /*
  * FICHA DE EQUIPO NUEVO — ficha de producto V2 de ux-9 (export 3166,
@@ -112,7 +114,8 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
   const especificaciones = filasCompletas(equipo.fichaTecnica);
   const puntos = (equipo.destacados ?? []).filter((d) => d.texto?.trim());
   const pdf = urlPdf(equipo);
-  const logo = imagenDeMedia(marca.logo, marca.nombre);
+  // El logo de la marca, el de todo el sitio (`logoMarca.ts`): el de repuestos si es la misma marca.
+  const logo = conAlt(logoDeMarca(marca, await getLogosMarca()), `Logo de ${marca.nombre}`);
   const imagenContacto = imagenDeMedia(ficha.imagenContacto, "");
   // Un PNG es el recorte de ux-9 (sobresale del recuadro); otra cosa, una foto que lo llena.
   const contactoEsFoto = poblado<Media>(ficha.imagenContacto)?.mimeType !== "image/png";
@@ -173,16 +176,7 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
       fotos={fotos}
       datos={datos}
       experto={experto}
-      logo={
-        logo
-          ? {
-              url: logo.url,
-              alt: `Logo de ${marca.nombre}`,
-              width: logo.width,
-              height: logo.height,
-            }
-          : null
-      }
+      logo={logo}
       cuerpo={cuerpo}
       especificaciones={especificaciones.map((e) => ({
         id: e.id,

@@ -270,4 +270,30 @@ describe("megamenú: logos de marca (petición del cliente, 2026-10-06)", () => 
     };
     assert.equal(panelRepuestos(datos).grupos[0]!.grupos[0]!.logo?.oscuro, true);
   });
+
+  it("una marca de nueva que también es de repuestos lleva el logo de repuestos (2026-10-20)", () => {
+    const REP = {
+      url: "https://x.public.blob.vercel-storage.com/rep.png",
+      width: 419,
+      height: 100,
+    };
+    const datos: DatosMegamenu = {
+      ...DATOS,
+      marcasMaquinaria: [
+        { id: 1, nombre: "Hitachi", slug: "hitachi", logo: LOGO },
+        { id: 2, nombre: "Dynapac", slug: "dynapac", logo: LOGO },
+      ],
+      marcasRepuestos: [
+        { id: 9, nombre: "Hitachi", slug: "rep-hitachi", logo: REP, logoOscuroEnMenu: true },
+      ],
+    };
+    const porMarca = panelMaquinaria(datos).grupos[0]!.grupos.find(
+      (g) => g.titulo === "Por marca",
+    )!;
+    const hitachi = porMarca.grupos.find((g) => g.titulo === "Hitachi")!;
+    const dynapac = porMarca.grupos.find((g) => g.titulo === "Dynapac")!;
+    assert.equal(hitachi.logo?.url, REP.url);
+    assert.equal(hitachi.logo?.oscuro, true);
+    assert.equal(dynapac.logo?.url, LOGO.url);
+  });
 });

@@ -12,11 +12,11 @@ import { PresentacionModelo } from "@/components/repuestos/modelo/PresentacionMo
 import estilosModelo from "@/components/repuestos/modelo/modelo.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
-import { estiloDeMarca, logoBlancoSobre } from "@/lib/marca/colorMarca";
+import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
-import { categoriasDeMarca } from "@/lib/repuestos/marca";
+import { categoriasDeMarca, logoConAlt } from "@/lib/repuestos/marca";
 import { categoriasDelTipo, usaDisenoPropio, vistaModelo } from "@/lib/repuestos/modelo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
@@ -85,7 +85,7 @@ export async function PaginaModeloRepuesto({
   const imagenes = (Array.isArray(modelo.imagenes) ? modelo.imagenes : [])
     .map((img) => imagenDeMedia(img, modelo.nombre))
     .filter((img): img is NonNullable<typeof img> => img !== null);
-  const logo = imagenDeMedia(marca.logo, `Logo de ${marca.nombre.trim()}`);
+  const logo = logoConAlt(marca);
   const whatsapp = enlaceWhatsApp(
     empresa.whatsapp,
     `Hola, busco repuestos para ${modelo.nombre}.`,
@@ -169,7 +169,6 @@ export async function PaginaModeloRepuesto({
           descripcion: "",
           fondo: imagenDeMedia(tipo.imagen, "") ?? imagenDeMedia(marca.fondoHero, ""),
           logo,
-          logoBlanco: logoBlancoSobre(marca.colorMarca),
         }}
         anclaSiguiente={ANCLA_CATEGORIAS}
         bajo

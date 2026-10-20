@@ -25,6 +25,7 @@ describe("el marco va en la caché de datos con su etiqueta", () => {
     "src/lib/queries/getPie.ts",
     "src/lib/queries/getSeo.ts",
     "src/lib/queries/getMegamenu.ts",
+    "src/lib/queries/getLogosMarca.ts",
   ]) {
     it(fichero, () => {
       const s = leer(fichero);

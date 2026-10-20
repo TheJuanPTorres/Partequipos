@@ -1,3 +1,4 @@
+import { claveDeMarca, logoPropio } from "./marca/logoMarca";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
 import { rutas } from "./routes";
@@ -161,7 +162,14 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
   // que las páginas de marca, #232): vuelve solo con el primer equipo (`tiposConEquipos`).
   const conEquipos = tiposConEquipos(d.equiposNuevos, d.tiposMaquinaria);
   const tiposConEquiposNuevos = d.tiposMaquinaria.filter((t) => conEquipos.has(t.id));
-  const marcas = [...d.marcasMaquinaria].sort(porNombre);
+  // El logo de una marca de nueva que también es de repuestos (Hitachi, CASE, Yanmar…) es el de
+  // repuestos, con su casilla de tinta oscura: un solo logo por marca (`src/lib/marca/logoMarca.ts`).
+  const deRepuestos = new Map(d.marcasRepuestos.map((r) => [claveDeMarca(r.nombre), r]));
+  const conLogoUnico = (m: ItemCatalogo): ItemCatalogo => {
+    const r = deRepuestos.get(claveDeMarca(m.nombre));
+    return r && logoPropio(r) ? { ...m, logo: r.logo, logoOscuroEnMenu: r.logoOscuroEnMenu } : m;
+  };
+  const marcas = d.marcasMaquinaria.map(conLogoUnico).sort(porNombre);
   const aditamentos = marcas.find((m) => m.slug === SLUG_ADITAMENTOS);
   const deMarca = (m: ItemCatalogo, titulo?: string) =>
     grupoDeMarca(

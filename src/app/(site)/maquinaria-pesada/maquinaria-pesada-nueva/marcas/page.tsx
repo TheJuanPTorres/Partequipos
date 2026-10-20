@@ -7,7 +7,8 @@ import { getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
-import { imagenDeMedia } from "@/lib/utils/relations";
+import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
+import { getLogosMarca } from "@/lib/queries/getLogosMarca";
 
 const TITULO = "Marcas de maquinaria pesada nueva";
 const DESCRIPCION = "Marcas que distribuimos, con sus tipos de equipo y modelos disponibles.";
@@ -21,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MarcasMaquinariaPage() {
-  const marcas = await getMarcasMaquinaria();
+  const [marcas, logos] = await Promise.all([getMarcasMaquinaria(), getLogosMarca()]);
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -34,7 +35,8 @@ export default async function MarcasMaquinariaPage() {
     href: `${rutas.marcaMaquinaria(marca.slug)}/`,
     titulo: marca.nombre,
     descripcion: marca.descripcion,
-    imagen: imagenDeMedia(marca.logo, `Logo de ${marca.nombre}`),
+    // El logo de la marca, el de todo el sitio: el de repuestos si es la misma marca.
+    logo: conAlt(logoDeMarca(marca, logos), `Logo de ${marca.nombre}`),
   }));
 
   return (

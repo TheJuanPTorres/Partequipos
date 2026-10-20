@@ -1,10 +1,10 @@
 "use client";
 
 import { IconCheck, IconChevronRight, IconMinus, IconPlus } from "@tabler/icons-react";
-import Image from "next/image";
 import Link from "next/link";
 import { forwardRef, memo, useId, useState, type CSSProperties, type KeyboardEvent } from "react";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { EnlaceMenu, GrupoMenu, PanelMenu } from "@/lib/megamenu";
 
 import estilos from "./megamenu.module.css";
@@ -67,14 +67,12 @@ function Acordeon({
          * explícitas: sin CLS.
          */}
         {grupo.logo ? (
-          <Image
-            src={grupo.logo.url}
+          <LogoMarca
+            logo={{ ...grupo.logo, oscuro: grupo.logo.oscuro === true }}
             alt=""
-            width={grupo.logo.width}
-            height={grupo.logo.height}
+            sizes="96px"
             loading="lazy"
             className={estilos.logo}
-            data-oscuro={grupo.logo.oscuro ? "" : undefined}
           />
         ) : null}
         {grupo.titulo}

@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import reserva from "@/components/blog/cabeceraArticulo.module.css";
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import { Revelado } from "@/components/movimiento/Revelado";
 import type { VistaEncabezado } from "@/lib/repuestos/marca";
 
@@ -10,8 +11,8 @@ import estilos from "./marca.module.css";
 /**
  * ENCABEZADO DE LA PÁGINA DE MARCA DE REPUESTOS (ux-9, contenedor de la
  * plantilla 3373). Tarjeta de bordes redondeados sobre la franja de color de
- * la página, con la foto de obra de la marca de fondo, el logo de la marca en
- * un cuadrado del color de la marca, el título en dos líneas, la presentación y el icono de
+ * la página, con la foto de obra de la marca de fondo, el logo de la marca
+ * (`LogoMarca`, el de todo el sitio) en un cuadrado blanco, el título en dos líneas, la presentación y el icono de
  * desplazamiento.
  *
  * Componente de SERVIDOR: el título usa `Revelado` (cliente) con `alCargar`,
@@ -81,15 +82,8 @@ export function HeroMarca({
 
         <div className={estilos.heroContenido}>
           {logo ? (
-            <div className={estilos.placa} data-logo-blanco={vista.logoBlanco ? "" : undefined}>
-              <Image
-                src={logo.url}
-                alt={logo.alt}
-                width={logo.width}
-                height={logo.height}
-                sizes="120px"
-                className={estilos.logo}
-              />
+            <div className={estilos.placa}>
+              <LogoMarca logo={logo} alt={logo.alt} sizes="120px" className={estilos.logo} />
             </div>
           ) : null}
 

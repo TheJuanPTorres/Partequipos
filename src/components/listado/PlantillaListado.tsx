@@ -12,7 +12,7 @@ import {
   type Catalogo,
   type ResultadoListado,
 } from "@/lib/filtros";
-import type { FotoDeTarjeta } from "@/lib/queries/getMaquinaria";
+import type { LogoMarca } from "@/lib/marca/logoMarca";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 
 import { CambioDeVista } from "./CambioDeVista";
@@ -74,7 +74,7 @@ export function PlantillaListado<T>({
   /** «equipo» / «unidad», para el recuento («12 equipos disponibles»). */
   elemento: { singular: string; plural: string };
   /** Logos de las opciones de la faceta «marca», por su valor. */
-  logoDeMarca?: Map<string, FotoDeTarjeta>;
+  logoDeMarca?: Map<string, LogoMarca>;
   idLista: string;
   /** Lo que se pinta si el listado no tiene nada (sin contar los filtros). */
   vacio: ReactNode;

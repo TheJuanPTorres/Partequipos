@@ -171,6 +171,37 @@ export const MarcaMaquinaria: CollectionConfig = {
         },
       ],
     },
+    // Textos de la plantilla de Andrés de las marcas de nueva (2026-10-20): `src/lib/nueva/paginaMarcaAndres.ts`.
+    {
+      name: "plantillaLinea",
+      type: "group",
+      label: "Textos de la página de la marca",
+      admin: {
+        description:
+          "Los textos fijos de la página de la marca (no sirve para Aditamentos, que tiene los suyos). Vacío, el texto de siempre.",
+      },
+      fields: [
+        {
+          name: "intro",
+          type: "text",
+          label: "Frase sobre la franja de tipos",
+          admin: {
+            placeholder: "Nuestra línea de equipos {marca} incluye:",
+            description: "«{marca}» se sustituye por el nombre de la marca.",
+          },
+        },
+        {
+          name: "cierre",
+          type: "textarea",
+          label: "Frase de cierre bajo la franja",
+          admin: {
+            placeholder:
+              "Tecnología de punta, bajo consumo, máxima productividad y respaldo oficial.",
+            description: "Una línea nueva es un salto de línea.",
+          },
+        },
+      ],
+    },
     seoField(),
   ],
 };

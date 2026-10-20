@@ -1,0 +1,393 @@
+/*
+ * PANEL «VER TODOS» de la página de marca de nueva (cliente, 2026-10-20): una hoja que
+ * sube desde la parte inferior con el listado completo de los equipos de un tipo. Es un
+ * <dialog> nativo: cerrado no pinta nada. El color de la marca (`--acento`, que pone la
+ * página; sin color, un gris oscuro neutro) solo va en la barra: NUNCA debajo de texto,
+ * así que se lee igual con cualquier color.
+ */
+
+.panel {
+  /* Pegado abajo y centrado: la hoja sube desde el borde inferior. */
+  width: min(1320px, calc(100% - 32px));
+  max-width: none;
+  /* El estilo del navegador limita el alto del <dialog>: aquí lo manda la altura de abajo. */
+  /*
+   * ALTURA: la mínima es la de TRES filas del listado (aunque haya 6 o menos); con más
+   * equipos crece con el contenido; la máxima, el 85 % de la pantalla, y de ahí el
+   * desplazamiento es interno (`.cuerpo`). Sin altura fija: el estilo del navegador
+   * limita el alto del <dialog>, así que se anula.
+   */
+  --fila: 69px;
+  --cromo: 103px;
+  /* `fit-content`, no `auto`: un <dialog> está anclado arriba y abajo y con `auto` se estiraría. */
+  height: fit-content;
+  max-height: min(85dvh, 1000px);
+  min-height: calc(var(--cromo) + 18px + 3 * var(--fila) + 48px);
+  margin: auto auto 0;
+  padding: 0;
+  border: 0;
+  border-radius: 28px 28px 0 0;
+  background: var(--color-fondo, #fff);
+  color: var(--color-texto, #1a1a1a);
+  /* El panel cuelga del botón, que va centrado: el texto del listado, a la izquierda. */
+  text-align: left;
+  box-shadow: 0 -18px 60px rgb(0 0 0 / 0.28);
+  overflow: hidden;
+}
+
+.panel[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel::backdrop {
+  background: rgb(10 10 12 / 0.55);
+}
+
+/* La página de detrás no se desplaza mientras el panel está abierto. */
+:global(html:has(dialog[data-panel-equipos][open])) {
+  overflow: hidden;
+}
+
+.hoja {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  /* Mide lo que mide su contenido (no `flex: 1`, que lo estiraría al máximo) y encoge si no cabe. */
+  flex: 0 1 auto;
+  flex-direction: column;
+  padding: 0 36px;
+}
+
+/* La barra superior con el color de la marca: sin texto encima. */
+.barra {
+  display: block;
+  height: 6px;
+  margin: 0 -36px;
+  flex: none;
+  background: var(--acento, var(--color-texto, #1a1a1a));
+}
+
+/* El asa: indica que la hoja se puede cerrar hacia abajo. */
+.asa {
+  display: block;
+  width: 52px;
+  height: 5px;
+  margin: 12px auto 0;
+  flex: none;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.18);
+}
+
+/*
+ * El listado es lo único que se desplaza (la barra y la cabecera quedan quietas), así que
+ * la barra de desplazamiento nunca llega a las esquinas redondeadas de arriba. Con la
+ * MISMA barra minimalista del megamenú (#205/#207): fina, redondeada y discreta.
+ */
+.cuerpo {
+  --barra: rgb(16 15 15 / 18%);
+  --barra-activa: rgb(16 15 15 / 45%);
+  min-height: 0;
+  margin: 0 -36px;
+  padding: 0 36px;
+  flex: 0 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--barra) transparent;
+}
+
+.cuerpo:hover {
+  scrollbar-color: var(--barra-activa) transparent;
+}
+
+.cuerpo::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cuerpo::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cuerpo::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--barra);
+}
+
+.cuerpo:hover::-webkit-scrollbar-thumb {
+  background: var(--barra-activa);
+}
+
+.cabecera {
+  display: flex;
+  margin: 0 -36px;
+  padding: 14px 36px 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid rgb(0 0 0 / 0.1);
+  background: var(--color-fondo, #fff);
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(22px, 2.2vw, 30px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cuenta {
+  color: var(--color-texto-suave, #56545a);
+  font-weight: 500;
+}
+
+.cerrar {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.06);
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.cerrar:hover {
+  background: rgb(0 0 0 / 0.12);
+}
+
+.cerrar:focus-visible,
+.item:focus-visible {
+  outline: 3px solid var(--color-texto, #1a1a1a);
+  outline-offset: -3px;
+}
+
+/*
+ * EL LISTADO, ligero (petición de dirección, 2026-10-20): una fila por equipo, con una
+ * línea divisoria entre cada una, hasta 3 columnas con la regla del #281 (1 o 2 filas
+ * centradas, 4 en 2 + 2, el resto en 3 con la última fila centrada; tablet 2; móvil 1).
+ * Solo el nombre, con un icono delante (la «versión A» elegida por dirección).
+ */
+.lista {
+  display: grid;
+  margin: 0;
+  padding: 18px 0 48px;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 40px;
+  list-style: none;
+}
+
+@media (min-width: 1025px) {
+  .lista {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .lista > li {
+    grid-column: span 2;
+  }
+
+  .lista > li:last-child:nth-child(3n + 1) {
+    grid-column: 3 / span 2;
+  }
+
+  .lista > li:nth-last-child(2):nth-child(3n + 1) {
+    grid-column: 2 / span 2;
+  }
+
+  .lista:has(> li:nth-child(4):last-child) > li:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+
+  .lista:has(> li:nth-child(4):last-child) > li:nth-child(even) {
+    grid-column: 4 / span 2;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .lista {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .lista > li {
+    grid-column: span 2;
+  }
+
+  .lista > li:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+}
+
+/* Cada fila es el enlace a la ficha; la línea divisoria va en el `li`. */
+.lista > li {
+  border-bottom: 1px solid rgb(0 0 0 / 0.12);
+}
+
+.item {
+  position: relative;
+  display: flex;
+  min-height: 64px;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  align-items: center;
+  gap: 16px;
+  border-radius: 12px;
+  color: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background-color 180ms ease,
+    padding-left 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 180ms ease;
+}
+
+/* El icono de la versión A, en el acento de la marca o neutro. */
+.marca {
+  display: inline-flex;
+  flex: none;
+  color: var(--acento, var(--color-texto, #1a1a1a));
+}
+
+.nombreItem {
+  min-width: 0;
+  flex: 1;
+}
+
+/* La flecha, que aparece al pasar el ratón o enfocar. */
+.flecha {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-marca, #e5242d);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity 180ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.item:hover,
+.item:focus-visible {
+  background: rgb(0 0 0 / 0.06);
+  color: var(--color-marca, #e5242d);
+  padding-left: 22px;
+}
+
+.item:hover .flecha,
+.item:focus-visible .flecha {
+  opacity: 1;
+  transform: none;
+}
+
+@media (hover: none) {
+  .flecha {
+    opacity: 0.55;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .flecha {
+    transition: none;
+  }
+
+  .item:hover,
+  .item:focus-visible {
+    padding-left: 14px;
+  }
+}
+
+/* Móvil: a pantalla completa. */
+@media (max-width: 767px) {
+  .panel {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    min-height: 0;
+    border-radius: 0;
+  }
+
+  .hoja {
+    padding: 0 16px;
+  }
+
+  .barra,
+  .cabecera,
+  .cuerpo {
+    margin: 0 -16px;
+  }
+
+  .cuerpo {
+    padding: 0 16px;
+  }
+
+  .cabecera {
+    padding: 12px 16px 14px;
+  }
+
+  .lista {
+    padding-top: 10px;
+  }
+}
+
+/*
+ * EL BARRIDO: sube con una curva de desaceleración larga (easeOutExpo) y baja con una de
+ * aceleración más corta; el fondo se funde. Con «reducir movimiento», sin barrido: solo
+ * un fundido.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .panel[open] {
+    animation: sube 640ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .panel[open]::backdrop {
+    animation: funde 480ms ease-out;
+  }
+
+  .panel[open][data-cerrando] {
+    animation: baja 360ms cubic-bezier(0.55, 0, 0.8, 0.3) forwards;
+  }
+
+  .panel[open][data-cerrando]::backdrop {
+    animation: desvanece 360ms ease-in forwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel[open],
+  .panel[open]::backdrop {
+    animation: funde 220ms ease-out;
+  }
+}
+
+@keyframes sube {
+  from {
+    opacity: 0.6;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes baja {
+  to {
+    opacity: 0.6;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes funde {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes desvanece {
+  to {
+    opacity: 0;
+  }
+}

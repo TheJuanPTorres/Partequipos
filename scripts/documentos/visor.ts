@@ -7,6 +7,9 @@
  *
  *      npm run preview:ejecutar -- payload run scripts/documentos/visor.ts paginas preview documento=<id> carpeta=<carpeta del rasterizado>
  *
+ *    En vez de `documento=<id>`, `fichero=<parte del nombre del PDF>` (p. ej.
+ *    `fichero=da-mvl-09`): tiene que coincidir con UN solo documento.
+ *
  * 2. `pagina` — en una página institucional, cambia cada párrafo que solo
  *    enlaza a un PDF de «Documentos» por el bloque «Documento en visor» de ese
  *    documento (dentro de su sección, en el mismo sitio):
@@ -99,10 +102,24 @@ const idDe = (v: unknown): number | null =>
 
 // ---------- 1. Páginas de un documento ----------
 
+/** El id del ÚNICO documento cuyo nombre de fichero contiene `parte` (sin distinguir mayúsculas). */
+async function idPorFichero(parte: string | undefined): Promise<number> {
+  if (!parte) return fallar("falta documento=<id> o fichero=<parte del nombre del PDF>");
+  const buscado = parte.toLowerCase();
+  const docs = (
+    await payload.find({ collection: "documentos", depth: 0, limit: 0, overrideAccess: true })
+  ).docs.filter((d) => (d.filename ?? "").toLowerCase().includes(buscado));
+  if (docs.length !== 1) {
+    fallar(
+      `fichero=${parte}: ${docs.length} documentos coinciden (${docs.map((d) => `${d.id} ${d.filename}`).join(", ") || "ninguno"}); tiene que ser uno`,
+    );
+  }
+  return docs[0]!.id;
+}
+
 async function subirPaginas(): Promise<void> {
-  const id = Number(valorDe("documento"));
   const carpeta = valorDe("carpeta");
-  if (!id) fallar("falta documento=<id>");
+  const id = Number(valorDe("documento")) || (await idPorFichero(valorDe("fichero")));
   if (!carpeta || !fs.existsSync(path.join(carpeta, "paginas.json"))) {
     fallar(`falta carpeta=<carpeta> con el paginas.json del rasterizado (${carpeta ?? "—"})`);
   }

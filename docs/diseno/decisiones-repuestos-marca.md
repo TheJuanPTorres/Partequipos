@@ -81,7 +81,7 @@ visual** que marca y tipo. **Provisional**: se reemplaza cuando llegue la planti
 | ---------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Principal de repuestos | `/repuestos-maquinaria-pesada-colombia/`                    | Encabezado, **cada marca** (placa oscura con su logo y enlace) con «Ver todas las marcas», **cada categoría** (píldora con enlace) con «Ver todas las categorías», contacto y testimonios |
 | Índice de marcas       | `…/repuestos-maquinaria-pesada-marcas/`                     | Encabezado, las 13 marcas en placa oscura con enlace a su página, contacto y testimonios                                                                                                  |
-| Índice de categorías   | `…/categoria-repuestos-para-maquinaria-pesada/`             | Encabezado, las categorías técnicas (píldoras con enlace), las marcas con las que trabajamos, contacto y testimonios                                                                      |
+| Índice de categorías   | `…/categoria-repuestos-para-maquinaria-pesada/`             | Encabezado, las categorías técnicas (tarjetas con foto desde el 2026-10-20, §9), las marcas con las que trabajamos, contacto y testimonios                                                |
 | Categoría técnica      | `…/categoria-repuestos-para-maquinaria-pesada/<categoría>/` | Encabezado con nombre, descripción e imagen de `CategoriaTecnica`, las marcas con las que trabajamos, contacto y testimonios                                                              |
 
 - Las 10 categorías y sus URL salen de `docs/url-map.csv`. **Sin esquema**: una migración de DATOS
@@ -129,6 +129,29 @@ el contacto y los testimonios se quedan como estaban. Las placas oscuras siguen 
 - La caja del encabezado lleva en el export una foto del kit (`3425625-1-scaled.jpg`) con gris `#919191` en
   «multiply». **Licencia sin confirmar (L3):** sin ella, el tono oscuro de los encabezados sin foto (`#1f1d1b`).
 - El export usa una fila sin salto con cuatro marcas; con las 13 reales, la fila salta y la última se centra.
+
+## 9. Índice de categorías técnicas con tarjetas, y cabeceras propias (2026-10-20, dirección)
+
+En `…/categoria-repuestos-para-maquinaria-pesada/` las 10 píldoras con icono dejan paso a **las tarjetas de las
+páginas índice** (`TarjetasMarca`, variante `indice`: foto arriba, recuadro blanco que sube sobre ella con el título y
+«Ver todo»), las mismas de «Repuestos por marca» y «Categorías técnicas» del índice de repuestos. Es el componente de
+siempre, sin uno nuevo, y las tarjetas salen de `tarjetasDeCategorias` (el de las páginas de tipo): el mismo orden
+(`ordenMarca`, luego el nombre) y cada una a su categoría. Con 10, la colocación de §11 de
+`decisiones-indices-contacto.md`: 3 + 3 + 3 + 1, con la última centrada; 2 en tablet y 1 en móvil. El título «Nuestras
+categorías de repuestos» del global se conserva como `<h2>` y las tarjetas cuelgan de él (`<h3>`). El encabezado,
+las marcas, el contacto y los testimonios no cambian.
+
+- **Foto de cada tarjeta:** la «Imagen de la tarjeta» de la categoría (antes «Imagen de la tarjeta en la portada»; solo
+  cambia la etiqueta). **Ya tenía las fotos de la página de categorías de WordPress:** comparadas con las de la
+  referencia, 9 son idénticas byte a byte y la de motor diésel es la misma foto, a las mismas medidas, recomprimida al
+  importarla. Están en el sitio publicado desde el contenido real de la portada, así que no hay que subir ninguna.
+- **Cabeceras propias** (migración `20261020_192253_categorias_cabeceras`, solo esquema, campos vacíos):
+  - «Fondo del encabezado» en cada categoría técnica (`fondoHero`). Vacío, como hasta ahora: la imagen de la tarjeta
+    y, sin ella, la de respaldo (`fondoDeRespaldo`, la primera marca de repuestos con foto).
+  - «Foto de fondo del encabezado» del índice, en el grupo nuevo «Página «Categorías técnicas» de repuestos» de
+    «Páginas índice y contacto» (`categoriasRepuestos.fondo`). Vacía, la de respaldo de siempre. Guardar el global
+    revalida también esta página.
+  - El índice de marcas de repuestos y el de marcas de nueva siguen sin campo propio (dirección: más adelante).
 
 ## 5. Pendiente
 

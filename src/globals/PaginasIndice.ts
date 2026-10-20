@@ -81,6 +81,7 @@ export const PaginasIndice: GlobalConfig = {
         revalidarRutas(
           [
             "/repuestos-maquinaria-pesada-colombia",
+            "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada",
             "/maquinaria-pesada",
             "/maquinaria-pesada/maquinaria-pesada-usada",
             "/maquinaria-pesada/maquinaria-pesada-usada/otros",
@@ -108,6 +109,20 @@ export const PaginasIndice: GlobalConfig = {
           "Opcional. Foto de obra a todo el ancho; sin ella, el encabezado queda en un tono oscuro.",
         ),
         tarjetas(),
+      ],
+    },
+    {
+      // Solo la foto (2026-10-20, dirección): los textos y las tarjetas de este índice salen
+      // de «Páginas de marca de repuestos» y de las categorías técnicas.
+      name: "categoriasRepuestos",
+      type: "group",
+      label: "Página «Categorías técnicas» de repuestos",
+      fields: [
+        imagen(
+          "fondo",
+          "Foto de fondo del encabezado",
+          "Opcional. Foto de obra a todo el ancho; sin ella, la del encabezado de la primera marca de repuestos que lo tenga.",
+        ),
       ],
     },
     {

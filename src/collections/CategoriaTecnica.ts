@@ -88,7 +88,21 @@ export const CategoriaTecnica: CollectionConfig = {
       name: "imagen",
       type: "upload",
       relationTo: "media",
-      label: "Imagen de la tarjeta en la portada",
+      label: "Imagen de la tarjeta",
+      admin: {
+        description:
+          "La de su tarjeta en la portada, el menú, el índice de categorías técnicas y las páginas de tipo. También la cabecera de su página si no tiene «Fondo del encabezado».",
+      },
+    },
+    {
+      name: "fondoHero",
+      type: "upload",
+      relationTo: "media",
+      label: "Fondo del encabezado",
+      admin: {
+        description:
+          "Opcional. Foto horizontal de obra a todo el ancho para la cabecera de su página. Vacía, la imagen de la tarjeta (y sin ella, la de la primera marca de repuestos con foto).",
+      },
     },
     {
       name: "icono",

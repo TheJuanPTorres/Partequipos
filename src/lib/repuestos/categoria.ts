@@ -30,7 +30,8 @@ export function fondoDeRespaldo(marcas: Marca[]): ImagenLista | null {
 /**
  * Encabezado de una categoría: «Repuestos para maquinaria pesada» y
  * «<CATEGORÍA> En Colombia» (como el de la marca), con su descripción. El fondo
- * es la imagen de la categoría o, si no la tiene, el de respaldo; sin logo.
+ * es su «Fondo del encabezado»; vacío, la imagen de su tarjeta, y sin ella, el de
+ * respaldo (2026-10-20); sin logo.
  */
 export function vistaEncabezadoCategoria(
   categoria: CategoriasTecnica,
@@ -42,7 +43,8 @@ export function vistaEncabezadoCategoria(
     linea1: texto(global.tituloHero) || "Repuestos para maquinaria pesada",
     linea2: [categoria.nombre.trim().toUpperCase(), sufijo].filter(Boolean).join(" "),
     descripcion: texto(categoria.descripcion),
-    fondo: imagenDeMedia(categoria.imagen, "") ?? respaldo,
+    fondo:
+      imagenDeMedia(categoria.fondoHero, "") ?? imagenDeMedia(categoria.imagen, "") ?? respaldo,
     logo: null,
   };
 }

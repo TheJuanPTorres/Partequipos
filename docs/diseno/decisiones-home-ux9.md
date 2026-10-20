@@ -2257,6 +2257,29 @@ CSV del cliente aparecerán solas.
 - **Sin cambios** en la caja común (96 × 24, `object-fit: contain`) ni en la
   proporción del #189.
 
+#### 26.1.2 Repuestos por categoría técnica y política de garantías; el mismo contenido en móvil (2026-10-20, dirección)
+
+- **«Repuestos por categoría técnica»**, nuevo acordeón de nivel 1 en el panel de Repuestos, después de «Repuestos por
+  marca» y con su mismo estilo. Lleva «Ver todas las categorías» (al índice
+  `/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/`) y una entrada por categoría
+  técnica de la colección. Detalles:
+  - **Orden:** el de las páginas de repuestos (`categoriasDeMarca`: «Orden en las páginas de marca» y después por
+    nombre).
+  - **Icono:** el de la portada (`ICONOS_CATEGORIA`) en lugar de la marca de verificación; una categoría sin icono
+    lleva la marca.
+  - **Sin página** (sin dirección), la categoría no sale; si no queda ninguna, el apartado no se pinta.
+- **«Política de garantías y repuestos»**, enlace suelto al final del panel, con el recuadro de los acordeones de
+  nivel 1. Es **editable** en el global «Cabecera» (grupo «Menú de Repuestos: política de garantías»: «Mostrar en el
+  menú», texto y enlace; migración `…_cabecera_politica_repuestos`, solo esquema, con los valores de hoy como
+  `DEFAULT`). Por ahora enlaza a `/politica-de-garantia-de-repuestos/`, la página publicada que enlazan las preguntas
+  frecuentes; cuando exista la nueva, se cambia el enlace en el panel.
+- **Menú móvil:** la entrada con panel (Maquinaria Pesada y Repuestos) lleva su enlace y un botón «+» que despliega
+  **el mismo contenido** que el megamenú de escritorio (`ContenidoMenu`, compartido), así que Repuestos lleva las dos
+  entradas nuevas en móvil, y Maquinaria Pesada recibe su panel también. Hasta ahora el menú móvil solo tenía los
+  enlaces de primer nivel.
+- **El menú se refresca solo:** `categorias-tecnicas` lleva el gancho del megamenú (`revalidarMegamenu`), que salta
+  también al cambiar el icono o el orden de una categoría; el global «Cabecera» ya revalidaba todo el sitio.
+
 ## 27. Cambios de dirección en la home tras la prueba en móvil (2026-10-05)
 
 Decisiones de dirección del 2026-10-05, cada una en su PR. Las que se apartan

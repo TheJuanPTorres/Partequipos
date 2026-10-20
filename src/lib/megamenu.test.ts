@@ -183,7 +183,7 @@ describe("megamenú: maquinaria", () => {
 });
 
 describe("megamenú: repuestos", () => {
-  it("solo «Repuestos por marca»: las marcas del catálogo con sus tipos", () => {
+  it("sin categorías ni política, solo «Repuestos por marca»: las marcas con sus tipos", () => {
     const p = panelRepuestos(DATOS);
     assert.equal(p.verTodo.href, "/repuestos-maquinaria-pesada-colombia/");
     assert.deepEqual(titulos(p.grupos), ["Repuestos por marca"]);
@@ -207,6 +207,80 @@ describe("megamenú: repuestos", () => {
       ],
     });
     assert.deepEqual(titulos(p.grupos[0]!.grupos), ["Bobcat", "Caterpillar"]);
+  });
+});
+
+describe("megamenú: repuestos por categoría técnica y política de garantías (2026-10-20)", () => {
+  const conTodo: DatosMegamenu = {
+    ...DATOS,
+    categoriasTecnicas: [
+      {
+        id: 1,
+        nombre: "Tren de rodaje",
+        slug: "tren-de-rodaje-para-maquinaria-pesada",
+        icono: "rodaje",
+        ordenMarca: 2,
+      },
+      {
+        id: 2,
+        nombre: "Filtración",
+        slug: "filtros-para-maquinaria-pesada",
+        icono: "filtro",
+        ordenMarca: 1,
+      },
+      { id: 3, nombre: "Accesorios", slug: "accesorios", icono: null, ordenMarca: null },
+      { id: 4, nombre: "Sin página", slug: "", icono: "motor", ordenMarca: null },
+    ],
+    politicaRepuestos: {
+      mostrar: true,
+      texto: "Política de garantías y repuestos",
+      enlace: "/politica-de-garantia-de-repuestos/",
+    },
+  };
+
+  it("el apartado de categorías: «Ver todas» y una por categoría, en su orden, con su icono", () => {
+    const p = panelRepuestos(conTodo);
+    assert.deepEqual(titulos(p.grupos), ["Repuestos por marca", "Repuestos por categoría técnica"]);
+    const g = p.grupos[1]!;
+    assert.deepEqual(
+      g.enlaces.map((e) => [e.etiqueta, e.icono ?? null]),
+      [
+        ["Ver todas las categorías", null],
+        ["Filtración", "filtro"],
+        ["Tren de rodaje", "rodaje"],
+        ["Accesorios", null],
+      ],
+    );
+    assert.equal(
+      g.enlaces[0]!.href,
+      "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/",
+    );
+    assert.equal(
+      g.enlaces[1]!.href,
+      "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/filtros-para-maquinaria-pesada/",
+    );
+  });
+
+  it("la política, al final, como enlace suelto; desmarcada o sin texto o enlace, no sale", () => {
+    assert.deepEqual(panelRepuestos(conTodo).finales, [
+      {
+        etiqueta: "Política de garantías y repuestos",
+        href: "/politica-de-garantia-de-repuestos/",
+      },
+    ]);
+    const sin = (politicaRepuestos: DatosMegamenu["politicaRepuestos"]) =>
+      panelRepuestos({ ...conTodo, politicaRepuestos }).finales;
+    assert.equal(sin({ ...conTodo.politicaRepuestos, mostrar: false }), undefined);
+    assert.equal(sin({ ...conTodo.politicaRepuestos, texto: " " }), undefined);
+    assert.equal(sin(null), undefined);
+  });
+
+  it("sin ninguna categoría con página, el apartado no sale", () => {
+    const p = panelRepuestos({
+      ...conTodo,
+      categoriasTecnicas: [{ id: 4, nombre: "X", slug: "", icono: null, ordenMarca: null }],
+    });
+    assert.deepEqual(titulos(p.grupos), ["Repuestos por marca"]);
   });
 });
 

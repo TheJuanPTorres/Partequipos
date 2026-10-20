@@ -429,3 +429,61 @@
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* Icono de la categoría técnica en «Repuestos por categoría técnica» (2026-10-20). */
+.hoja svg.hojaIcono {
+  width: 18px;
+  height: 18px;
+}
+
+/* Un enlace suelto de nivel 1 (la política de garantías) con el recuadro de los acordeones. */
+.tituloEnlace {
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+/*
+ * MENÚ MÓVIL (2026-10-20): una entrada con panel es su enlace y un botón «+» que
+ * despliega el mismo contenido que el megamenú de escritorio.
+ */
+.filaMovil {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--color-fondo-seccion);
+}
+
+/* El filete lo pone la fila: el enlace no lleva el suyo. */
+.filaMovil.filaMovil > a {
+  flex: 1;
+  border-bottom: 0;
+}
+
+.abrirMovil {
+  display: grid;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 0;
+  background: none;
+  color: var(--color-texto);
+  cursor: pointer;
+}
+
+.abrirMovil svg {
+  width: 16px;
+  height: 16px;
+}
+
+.movil {
+  --mega-rojo: #be1620;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 0 16px;
+  border-bottom: 1px solid var(--color-fondo-seccion);
+}
+
+.movil[hidden] {
+  display: none;
+}

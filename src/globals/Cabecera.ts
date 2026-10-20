@@ -78,5 +78,46 @@ export const Cabecera: GlobalConfig = {
         },
       ],
     },
+    {
+      name: "politicaRepuestos",
+      type: "group",
+      label: "Menú de Repuestos: política de garantías",
+      admin: {
+        description:
+          "Última entrada del menú desplegable de Repuestos (escritorio y móvil). Desmarca «Mostrar» para quitarla sin borrarla.",
+      },
+      fields: [
+        {
+          name: "mostrar",
+          type: "checkbox",
+          label: "Mostrar en el menú",
+          defaultValue: true,
+        },
+        {
+          type: "row",
+          fields: [
+            {
+              name: "texto",
+              type: "text",
+              label: "Texto",
+              defaultValue: "Política de garantías y repuestos",
+              admin: { width: "40%" },
+            },
+            {
+              name: "enlace",
+              type: "text",
+              label: "Enlace",
+              defaultValue: "/politica-de-garantia-de-repuestos/",
+              validate: validarEnlace,
+              admin: {
+                width: "60%",
+                description:
+                  "Una ruta del sitio (/…/) o https://. Hoy, la política de garantía publicada.",
+              },
+            },
+          ],
+        },
+      ],
+    },
   ],
 };

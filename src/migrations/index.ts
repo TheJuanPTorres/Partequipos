@@ -64,6 +64,7 @@ import * as migration_20261019_205349_indice_tarjetas_mostrar from './20261019_2
 import * as migration_20261019_213426_estado_vacio_usados from './20261019_213426_estado_vacio_usados';
 import * as migration_20261020_040506_usados_otros from './20261020_040506_usados_otros';
 import * as migration_20261020_050127_marca_nueva_diseno_aditamentos from './20261020_050127_marca_nueva_diseno_aditamentos';
+import * as migration_20261020_061256_cabecera_politica_repuestos from './20261020_061256_cabecera_politica_repuestos';
 
 export const migrations = [
   {
@@ -394,6 +395,11 @@ export const migrations = [
   {
     up: migration_20261020_050127_marca_nueva_diseno_aditamentos.up,
     down: migration_20261020_050127_marca_nueva_diseno_aditamentos.down,
-    name: '20261020_050127_marca_nueva_diseno_aditamentos'
+    name: '20261020_050127_marca_nueva_diseno_aditamentos',
+  },
+  {
+    up: migration_20261020_061256_cabecera_politica_repuestos.up,
+    down: migration_20261020_061256_cabecera_politica_repuestos.down,
+    name: '20261020_061256_cabecera_politica_repuestos'
   },
 ];

@@ -1,14 +1,12 @@
 "use client";
 
-import { IconX } from "@tabler/icons-react";
+import { IconArrowRight, IconCircleCheck, IconX } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 
-import { IconoDato } from "@/components/ficha/IconoDato";
 import type { TarjetaEquipo } from "@/lib/nueva/paginaMarcaAndres";
 
-import estilos from "./marcaNueva.module.css";
 import panel from "./panelEquipos.module.css";
 
 /**
@@ -40,6 +38,9 @@ export function VerTodosEquipos({
   const [montado, setMontado] = useState(false);
   const [abierto, setAbierto] = useState(false);
   const [cerrando, setCerrando] = useState(false);
+  // Dos versiones del listado para que dirección elija: `?variante=a` (solo el nombre con un
+  // icono) o `?variante=b` (con la foto en miniatura). Se lee al abrir; por defecto, la A.
+  const [variante, setVariante] = useState<"a" | "b">("a");
   const enlace = useRef<HTMLAnchorElement>(null);
   const dialogo = useRef<HTMLDialogElement>(null);
   const empezoFuera = useRef(false);
@@ -56,6 +57,7 @@ export function VerTodosEquipos({
       return;
     }
     e.preventDefault();
+    setVariante(new URLSearchParams(window.location.search).get("variante") === "b" ? "b" : "a");
     setMontado(true);
     setAbierto(true);
   }
@@ -122,35 +124,32 @@ export function VerTodosEquipos({
                 <span className="sr-only">Cerrar el listado</span>
               </button>
             </div>
-            <ul className={`${estilos.rejilla} ${panel.lista}`}>
+            <ul className={panel.lista} data-variante={variante}>
               {equipos.map((e) => (
-                <li key={e.id} className={estilos.tarjeta}>
-                  <Link href={e.href} className={panel.enlaceEquipo}>
-                    <div className={estilos.foto}>
-                      {e.foto?.url ? (
-                        <Image
-                          src={e.foto.url}
-                          alt=""
-                          fill
-                          sizes="(max-width: 767px) 90vw, (max-width: 1024px) 45vw, 400px"
-                          className={estilos.fotoImg}
-                          style={{ objectPosition: e.foto.posicion }}
-                        />
-                      ) : null}
-                    </div>
-                    <span className={estilos.nombre}>{e.nombre}</span>
-                    {e.datos.length > 0 ? (
-                      <ul className={estilos.datos}>
-                        {e.datos.map((d) => (
-                          <li key={d.etiqueta} className={estilos.dato}>
-                            <IconoDato icono={d.icono} className={estilos.datoIcono} />
-                            <span>
-                              <strong>{d.etiqueta}:</strong> {d.valor}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
+                <li key={e.id}>
+                  <Link href={e.href} className={panel.item}>
+                    {variante === "b" ? (
+                      <span className={panel.mini} aria-hidden="true">
+                        {e.foto?.url ? (
+                          <Image
+                            src={e.foto.url}
+                            alt=""
+                            fill
+                            sizes="48px"
+                            className={panel.miniImg}
+                            style={{ objectPosition: e.foto.posicion }}
+                          />
+                        ) : null}
+                      </span>
+                    ) : (
+                      <span className={panel.marca} aria-hidden="true">
+                        <IconCircleCheck focusable="false" stroke={1.9} size={26} />
+                      </span>
+                    )}
+                    <span className={panel.nombreItem}>{e.nombre}</span>
+                    <span className={panel.flecha} aria-hidden="true">
+                      <IconArrowRight focusable="false" stroke={2.2} size={22} />
+                    </span>
                   </Link>
                 </li>
               ))}

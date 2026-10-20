@@ -140,7 +140,9 @@ a.enlaceFranja:focus-visible {
   margin: 0;
   padding: 0;
   grid-template-columns: minmax(0, 1fr);
-  gap: 30px;
+  /* Mucho aire entre equipos (sin borde, se amontonaban): 80 px entre filas y 56 entre columnas.
+     El hueco entre columnas es el mismo en toda la rejilla (la regla del #281 lo necesita). */
+  gap: 80px 56px;
   list-style: none;
 }
 
@@ -190,7 +192,7 @@ a.enlaceFranja:focus-visible {
 .tarjeta {
   display: flex;
   box-sizing: border-box;
-  padding: 0;
+  padding: 12px 0;
   flex-direction: column;
   gap: 16px;
 }

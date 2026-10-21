@@ -29,7 +29,7 @@ describe("tarjetasDeCategorias", () => {
       categoria(1, { nombre: "A", imagen: media as never }),
       categoria(2, { nombre: "B" }),
     ]);
-    assert.match(con!.href, /categoria-1\/$|categoria-1$/);
+    assert.match(con!.href ?? "", /categoria-1\/$|categoria-1$/);
     assert.equal(con!.imagen?.url, "/f.jpg");
     assert.equal(sin!.imagen, null);
   });

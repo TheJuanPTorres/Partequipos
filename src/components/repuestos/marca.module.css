@@ -1544,3 +1544,68 @@ a.modelo:hover {
     font-size: 10vw;
   }
 }
+
+/*
+ * --- Modelos de la página de tipo en TARJETAS (dirección, 2026-10-21) --------------------
+ * La sección de las páginas índice (`tarjetasIndice`) con el título «Modelos de…» y, en un
+ * tipo con series, un subtítulo por serie con su rejilla debajo.
+ */
+.modelosTarjetas .modelosSerie {
+  margin-top: 0;
+}
+
+.modelosTarjetas .modelosGrupo + .modelosGrupo {
+  margin-top: 56px;
+}
+
+.modelosTarjetas .modelosSerie + .rejilla {
+  margin-top: 24px;
+}
+
+@media (max-width: 767px) {
+  .modelosTarjetas .modelosGrupo + .modelosGrupo {
+    margin-top: 40px;
+  }
+}
+
+/*
+ * Página de tipo: de cada serie, solo las 2 PRIMERAS FILAS (dirección, 2026-10-21) y
+ * «Ver todos (N)» al panel con la serie completa. Solo con JavaScript (`scripting`): sin él,
+ * o en un navegador que no conoce la consulta, se ven todas y el botón no sale. Con 6, 4 o 2
+ * a la vista las filas quedan completas, así que la regla de colocación no cambia.
+ */
+.verTodosModelos {
+  display: none;
+  margin-top: 30px;
+  text-align: center;
+}
+
+@media (scripting: enabled) and (max-width: 767px) {
+  .recorteModelos .rejillaTarjetas > .tarjeta:nth-child(n + 3) {
+    display: none;
+  }
+
+  .recorteMovil > .verTodosModelos {
+    display: block;
+  }
+}
+
+@media (scripting: enabled) and (min-width: 768px) and (max-width: 1024px) {
+  .recorteModelos .rejillaTarjetas > .tarjeta:nth-child(n + 5) {
+    display: none;
+  }
+
+  .recorteTablet > .verTodosModelos {
+    display: block;
+  }
+}
+
+@media (scripting: enabled) and (min-width: 1025px) {
+  .recorteModelos .rejillaTarjetas > .tarjeta:nth-child(n + 7) {
+    display: none;
+  }
+
+  .recorteEscritorio > .verTodosModelos {
+    display: block;
+  }
+}

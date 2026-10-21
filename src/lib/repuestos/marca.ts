@@ -1,10 +1,13 @@
 import { conAlt, logoPropio, type LogoConAlt, type LogoMarca } from "@/lib/marca/logoMarca";
 import type { CategoriasTecnica, Marca, RepuestosMarca, TiposEquipo } from "@/payload-types";
 
+import { colorDeMarca } from "../marca/colorMarca";
 import { rutas } from "../routes";
+import { tipoEnTitulo } from "../seo/porDefecto";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 import { segmentoDeTipo } from "./anidado";
-import { claveSerie, seriesDeTipo } from "./series";
+import { agruparPorSerie, claveSerie, seriesDeTipo } from "./series";
+import type { ModeloEnlace } from "./tipo";
 
 /**
  * Lógica pura de la página de marca de repuestos (ux-9,
@@ -86,10 +89,22 @@ export function categoriasDeMarca(categorias: CategoriasTecnica[]): CategoriaMar
 
 // --- Tarjetas ------------------------------------------------------------------
 
+/** El panel «Ver todo» de una tarjeta (`VerTodosEquipos`): sus modelos, cada uno a su ficha. */
+export type PanelTarjeta = {
+  titulo: string;
+  total: number;
+  elementos: { id: number | string; nombre: string; href: string | null }[];
+  /** Texto del enlace discreto a la página completa (el `href` de la tarjeta). */
+  enlacePagina: string;
+  /** El color de la marca, para la barra del panel. */
+  acento: string | null;
+};
+
 export type TarjetaMarca = {
   clave: string;
   titulo: string;
-  href: string;
+  /** `null`: una tarjeta sin página (un modelo que WordPress nombra sin ficha): sin botón. */
+  href: string | null;
   /** Decorativa: el título ya nombra la tarjeta. */
   imagen: ImagenLista | null;
   /** Las del marketplace se ocultan en móvil, como en ux-9. */
@@ -98,6 +113,8 @@ export type TarjetaMarca = {
   detalle?: string;
   /** El logo de la marca (`LogoMarca`), entero y sin recortar, en lugar de la foto (índice de usados). */
   logo?: LogoMarca;
+  /** Con él, «Ver todo» abre el panel con la lista; sin JavaScript sigue llevando a `href`. */
+  panel?: PanelTarjeta;
 };
 
 /**
@@ -108,9 +125,31 @@ export type TarjetaMarca = {
  * Un tipo con SERIES (Hitachi: EX y ZAXIS) pinta una tarjeta por serie, en su
  * orden, con el título de WordPress («… excavadora HITACHI EX»), su foto (o la
  * del tipo) y el enlace al ancla de la serie en la página del tipo.
+ *
+ * Con `modelosDe` (la lista completa de cada tipo, `listaDeModelos`), «Ver todo» abre el
+ * PANEL con los modelos de la tarjeta (dirección, 2026-10-21): los de la serie, o todos los
+ * del tipo. Sin modelos, el enlace de siempre.
  */
-export function tarjetasDeTipos(marca: Marca, tipos: TiposEquipo[]): TarjetaMarca[] {
-  const nombreMarca = marca.nombre.trim().toUpperCase();
+export function tarjetasDeTipos(
+  marca: Marca,
+  tipos: TiposEquipo[],
+  modelosDe?: (tipo: TiposEquipo) => ModeloEnlace[],
+): TarjetaMarca[] {
+  const nombre = marca.nombre.trim();
+  const nombreMarca = nombre.toUpperCase();
+  const acento = colorDeMarca(marca.colorMarca);
+  const panel = (titulo: string, modelos: ModeloEnlace[], pagina: string) =>
+    modelos.length === 0
+      ? {}
+      : {
+          panel: {
+            titulo,
+            total: modelos.length,
+            elementos: modelos.map(({ id, nombre: n, href }) => ({ id, nombre: n, href })),
+            enlacePagina: `Ver la página de ${pagina}`,
+            acento,
+          },
+        };
   return tipos
     .filter((t) => t.nombre?.trim() && t.slug?.trim())
     .flatMap((t) => {
@@ -118,11 +157,25 @@ export function tarjetasDeTipos(marca: Marca, tipos: TiposEquipo[]): TarjetaMarc
       const href = rutas.tipo(marca.slug, segmentoDeTipo(t));
       const imagenTipo = imagenDeMedia(t.imagen, "");
       const series = seriesDeTipo(t);
+      const modelos = modelosDe?.(t) ?? [];
+      const tituloPanel = `${tipoEnTitulo(t.nombre)} ${nombreMarca}`;
+      const pagina = `${t.nombre.trim().toLowerCase()} ${nombre}`;
       if (series.length === 0) {
-        return [{ clave: `tipo-${t.id}`, titulo, href, imagen: imagenTipo, soloEscritorio: false }];
+        return [
+          {
+            clave: `tipo-${t.id}`,
+            titulo,
+            href,
+            imagen: imagenTipo,
+            soloEscritorio: false,
+            ...panel(tituloPanel, modelos, pagina),
+          },
+        ];
       }
+      const grupos = agruparPorSerie(series, modelos, (m) => m.serie) ?? [];
       return series.map((s) => {
         const fila = t.series?.find((f) => claveSerie(f.nombre) === claveSerie(s.nombre));
+        const deSerie = grupos.find((g) => g.ancla === s.ancla)?.modelos ?? [];
         return {
           clave: `tipo-${t.id}-${s.ancla}`,
           titulo: `${titulo} ${s.nombre.toUpperCase()}`,
@@ -130,6 +183,7 @@ export function tarjetasDeTipos(marca: Marca, tipos: TiposEquipo[]): TarjetaMarc
           href: `${href}/#${s.ancla}`,
           imagen: imagenDeMedia(fila?.imagen, "") ?? imagenTipo,
           soloEscritorio: false,
+          ...panel(`${tituloPanel} ${s.nombre.toUpperCase()}`, deSerie, pagina),
         };
       });
     });

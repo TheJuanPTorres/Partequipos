@@ -21,9 +21,9 @@ import { tarjetasDeCategorias, vistaPorQue } from "@/lib/repuestos/plantillaTipo
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
 import {
-  conOtrasEntradas,
-  enlacesDeModelos,
   gruposDeModelos,
+  idsDeOtrasEntradas,
+  listaDeModelos,
   vistaEncabezadoTipo,
 } from "@/lib/repuestos/tipo";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
@@ -75,18 +75,8 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
   ]);
 
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
-  // Las fichas a las que enlazan las «otras entradas» de la lista (pueden ser de otro tipo).
-  const enlazados = await getModelosPorIds(
-    (tipo.otrasEntradas ?? []).flatMap((e) =>
-      typeof e.modelo === "number" ? [e.modelo] : e.modelo ? [e.modelo.id] : [],
-    ),
-  );
-  const enlaces = conOtrasEntradas(tipo, enlacesDeModelos(marca, tipo, modelos), (id) => {
-    const m = enlazados.find((x) => x.id === id);
-    const mMarca = poblado<Marca>(m?.marca);
-    const mTipo = poblado<TiposEquipo>(m?.tipo);
-    return m && mMarca && mTipo ? rutas.modelo(mMarca.slug, segmentoDeTipo(mTipo), m.slug) : null;
-  });
+  const enlazados = await getModelosPorIds(idsDeOtrasEntradas([tipo]));
+  const enlaces = listaDeModelos(marca, tipo, modelos, enlazados);
   const nombreTipo = tipo.nombre.toLowerCase();
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -112,7 +102,10 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
       <ModelosTipo
         id={ANCLA_MODELOS}
         titulo={`Modelos de ${tipoEnTitulo(tipo.nombre)} ${marca.nombre}`}
+        tipo={tipo}
         modelos={enlaces}
+        verTodo="Ver repuestos"
+        tituloPanel={`${tipoEnTitulo(tipo.nombre)} ${marca.nombre.trim().toUpperCase()}`}
         grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
       />

@@ -34,6 +34,25 @@ export const getModelos = cache(async (): Promise<ModelosRepuesto[]> => {
   return docs;
 });
 
+/**
+ * Los modelos de una marca, para los paneles «Ver todo» de su página: una sola consulta
+ * para todos sus tipos, sin poblar nada y solo con lo que pinta la lista.
+ */
+export const getModelosDeMarca = cache(async (marcaId: number): Promise<ModelosRepuesto[]> => {
+  const payload = await getPayload({ config });
+
+  const { docs } = await payload.find({
+    collection: "modelos-repuesto",
+    where: { marca: { equals: marcaId } },
+    depth: 0,
+    limit: 0,
+    sort: "nombre",
+    select: { nombre: true, slug: true, codigo: true, serie: true, tipo: true },
+  });
+
+  return docs as ModelosRepuesto[];
+});
+
 /** Modelos de un tipo concreto. */
 export const getModelosDeTipo = cache(async (tipoId: number): Promise<ModelosRepuesto[]> => {
   const payload = await getPayload({ config });

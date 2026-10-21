@@ -1,0 +1,315 @@
+/*
+ * FICHA DE MAQUINARIA NUEVA — plantilla de Andrés 4036 (2026-10-21).
+ *
+ * Va ENCIMA de las clases de la V2 (`ficha.module.css`, que no se toca: la usa
+ * la ficha usada). Cada regla que corrige una de la V2 lleva las clases
+ * propias de este módulo suficientes para ganarle por especificidad, no por el
+ * orden en que se carguen las hojas. Cortes del kit: escritorio ≥ 1025,
+ * tablet 768–1024, móvil ≤ 767. Detalle: docs/diseno/decisiones-ficha-nueva.md.
+ */
+
+/* ====================== 1. CABECERA DEL PRODUCTO ====================== */
+
+/*
+ * FONDO NEUTRO (dirección: sin el degradado rojo #CE2A2C → blanco de la
+ * plantilla): la tarjeta blanca de radio 30 sobre el gris de la página, como
+ * el resto de tarjetas del sitio. La galería va sin el fondo desenfocado de la
+ * V2 (`sinFondo`), así que toda la tarjeta es blanca.
+ */
+.principal {
+  background: var(--color-fondo);
+}
+
+/* La columna de la galería: «Ver en vista 360» encima de la foto, alineado a la izquierda. */
+.columnaGaleria {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.columnaGaleria > :last-child {
+  align-self: stretch;
+}
+
+/*
+ * «Ver en vista 360»: píldora blanca con texto y borde del negro del kit y, al
+ * pasar, rojo. DESVIACIÓN: en la plantilla el borde es naranja (#E58624), un
+ * color que no está en la paleta del kit; se toma por errata.
+ */
+.boton360 {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--boton-relleno);
+  border: var(--boton-borde) solid var(--color-texto);
+  border-radius: 30px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    color 0.3s;
+}
+
+.boton360 svg {
+  width: 1.3em;
+  height: 1.3em;
+  flex: none;
+}
+
+.boton360:hover {
+  border-color: var(--color-marca);
+  background: var(--color-marca);
+  color: var(--color-fondo);
+}
+
+.boton360:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/* La columna de datos sobre blanco: sin el degradado de la V2 (no hace falta). */
+.principal .columnaDatos {
+  background: none;
+}
+
+/* Título: en escritorio y tablet, la marca y la referencia en dos líneas; en móvil, el nombre. */
+.tituloEscritorio {
+  display: block;
+}
+
+.lineaMarca {
+  display: block;
+  text-transform: uppercase;
+}
+
+.tituloEscritorio > :last-child {
+  display: block;
+}
+
+.tituloMovil {
+  display: none;
+}
+
+/* La descripción comercial, bajo el título (en la plantilla, un párrafo). */
+.descripcion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+  max-width: 650px;
+  color: var(--color-texto);
+}
+
+.descripcion :is(p, ul, ol, h2, h3, h4) {
+  margin: 0;
+}
+
+/* Un título dentro de la descripción no compite con el `<h1>`: como el texto, en negrita. */
+.descripcion :is(h2, h3, h4) {
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
+}
+
+.descripcion :is(ul, ol) {
+  padding-left: 1.2em;
+}
+
+/*
+ * Datos con icono: las pastillas de vidrio de la plantilla son casi invisibles
+ * sobre blanco (fondo blanco al 12 %). Sobre el fondo neutro van en el gris
+ * del kit (#F0F0F0), sin borde ni sombra. Mismas columnas fijas que la V2 (CLS).
+ */
+.principal .datos li {
+  border-color: transparent;
+  background: var(--color-fondo-seccion);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* ====================== 2. MÁS ESPECIFICACIONES ====================== */
+
+.especificaciones {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 0 var(--ficha-margen) var(--ficha-margen);
+  padding: 2.82cqi;
+  border-radius: var(--ficha-radio);
+  background: var(--color-fondo);
+}
+
+/* En escritorio, en dos columnas (la lista de la V2, con su punto rojo y separador). */
+@media (min-width: 1025px) {
+  .listaEspecificaciones {
+    column-count: 2;
+    column-gap: 60px;
+  }
+
+  .listaEspecificaciones > div {
+    break-inside: avoid;
+  }
+}
+
+/* ====================== 3. «OTRAS <TIPO>» ====================== */
+
+.otras {
+  padding: 0 var(--ficha-margen) 5cqi;
+}
+
+/* La franja: tarjeta blanca de radio 30, la foto del tipo a la izquierda y el título a la derecha. */
+.franja {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: max(1cqi, 12px);
+  border-radius: var(--ficha-radio);
+  background: var(--color-fondo);
+}
+
+.fotoFranja {
+  width: 100px;
+  height: 75px;
+  flex: none;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.tituloFranja {
+  margin: 0 0 0 auto;
+  padding-right: 10px;
+  color: var(--color-texto);
+  text-align: right;
+}
+
+/*
+ * Las tarjetas con la regla del sitio (#281, la de `TarjetasMarca`): 1 o 2
+ * centradas y 3 en fila en escritorio; en tablet, 2 con la impar centrada; en
+ * móvil, una debajo de otra. La plantilla OCULTA la 3.ª en tablet y la 2.ª y
+ * 3.ª en móvil; aquí se ven todas.
+ */
+.rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 1025px) {
+  .rejilla {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .rejilla > .tarjeta {
+    grid-column: span 2;
+  }
+
+  .rejilla > .tarjeta:last-child:nth-child(3n + 1) {
+    grid-column: 3 / span 2;
+  }
+
+  .rejilla > .tarjeta:nth-last-child(2):nth-child(3n + 1) {
+    grid-column: 2 / span 2;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .rejilla {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .rejilla > .tarjeta {
+    grid-column: span 2;
+  }
+
+  .rejilla > .tarjeta:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+}
+
+/* La V2 oculta tarjetas en tablet y móvil (`.tarjeta:nth-child(…)`); aquí no. */
+.otras .rejilla > .tarjeta {
+  display: flex;
+}
+
+/* ====================== 4–6. ASESORÍA, CONTACTO Y TESTIMONIOS ====================== */
+
+/* La llamada sola (en la V2 el formulario iba debajo, dentro de la misma sección). */
+.asesoria {
+  padding-bottom: 0;
+}
+
+/* El contacto y los testimonios siguen sobre el blanco de la llamada. */
+.cierre {
+  padding-top: 5cqi;
+  background: var(--color-fondo);
+}
+
+/* ====================== TABLET (768–1024) ====================== */
+
+@media (max-width: 1024px) {
+  .columnaGaleria {
+    align-items: stretch;
+  }
+
+  .boton360 {
+    align-self: flex-start;
+  }
+
+  /* La píldora de las migas de la V2 en tablet y móvil es para ir sobre la foto desenfocada. */
+  .principal .columnaDatos .cabecera .migas ol {
+    border-color: var(--color-texto-suave);
+    background: transparent;
+    color: var(--color-texto-suave);
+  }
+}
+
+/* ====================== MÓVIL (≤ 767) ====================== */
+
+@media (max-width: 767px) {
+  .tituloEscritorio {
+    display: none;
+  }
+
+  .tituloMovil {
+    display: inline;
+  }
+
+  /*
+   * Sin el fondo desenfocado no hace falta el velo oscuro de la V2: el título y
+   * las migas van en el negro del kit sobre blanco. (En la plantilla el título
+   * de móvil es blanco porque va sobre el degradado rojo, que aquí no está.)
+   */
+  .principal .cabecera::before {
+    content: none;
+  }
+
+  .principal .columnaDatos .cabecera .titulo {
+    color: var(--color-texto);
+    text-shadow: none;
+  }
+
+  .franja {
+    gap: 12px;
+  }
+
+  .fotoFranja {
+    width: 90px;
+    height: 68px;
+  }
+
+  .tituloFranja {
+    padding-right: 4px;
+  }
+}

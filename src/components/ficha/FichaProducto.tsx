@@ -8,11 +8,11 @@ import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 
 import { BotonImprimir } from "@/components/ficha/BotonImprimir";
-import { EngranajeMarca } from "@/components/ficha/EngranajeMarca";
 import { GaleriaFicha, type FotoFicha } from "@/components/ficha/GaleriaFicha";
 import { IconoDato } from "@/components/ficha/IconoDato";
 import estilos from "@/components/ficha/ficha.module.css";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
+import { RecuadroAsesoria } from "@/components/ficha/RecuadroAsesoria";
 import type { DatoDestacado } from "@/lib/maquinaria/fichaTecnica";
 import type { ImagenLista } from "@/lib/utils/relations";
 import { LogoMarca } from "@/components/marca/LogoMarca";
@@ -320,61 +320,13 @@ export function FichaProducto({
 
       {/* 4. LLAMADA A CONTACTAR y, debajo, el formulario de cotización. */}
       <section className={`${estilos.contacto} ${estilos.noImprimir}`} aria-labelledby="asesoria">
-        <div className={estilos.recuadroContacto}>
-          <div className={estilos.textoContacto}>
-            <h2 id="asesoria" className={`${estilos.tituloContacto} texto-titulo-seccion`}>
-              Contáctanos para recibir asesoría
-            </h2>
-            <div className={estilos.botonesContacto}>
-              <BotonFormulario
-                href={`#${ANCLA_COTIZAR}`}
-                className={`${estilos.boton} texto-etiqueta`}
-                formulario={formulario}
-              >
-                <IconMail aria-hidden="true" stroke={1.75} />
-                Contáctanos
-              </BotonFormulario>
-              {experto ? (
-                <a
-                  href={experto.href}
-                  className={`${estilos.boton} texto-etiqueta`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <IconBrandWhatsapp aria-hidden="true" stroke={1.75} />
-                  WhatsApp<span className="sr-only"> (abre WhatsApp)</span>
-                </a>
-              ) : null}
-            </div>
-          </div>
-          {imagenContacto && contactoEsFoto ? (
-            <div className={`${estilos.imagenContacto} ${estilos.imagenContactoFoto}`}>
-              <Image
-                src={imagenContacto.url}
-                alt=""
-                width={imagenContacto.width}
-                height={imagenContacto.height}
-                sizes="(min-width: 768px) 46vw, 90vw"
-                className={estilos.fotoContactoLlena}
-                style={{ objectPosition: imagenContacto.posicion }}
-              />
-            </div>
-          ) : (
-            <div className={estilos.imagenContacto}>
-              <EngranajeMarca className={estilos.engranaje} />
-              {imagenContacto ? (
-                <Image
-                  src={imagenContacto.url}
-                  alt=""
-                  width={imagenContacto.width}
-                  height={imagenContacto.height}
-                  sizes="(min-width: 1025px) 430px, (min-width: 768px) 305px, 210px"
-                  className={estilos.fotoContacto}
-                />
-              ) : null}
-            </div>
-          )}
-        </div>
+        <RecuadroAsesoria
+          formulario={formulario}
+          hrefFormulario={`#${ANCLA_COTIZAR}`}
+          experto={experto}
+          imagenContacto={imagenContacto}
+          contactoEsFoto={contactoEsFoto}
+        />
 
         <div id={ANCLA_COTIZAR} className={estilos.formulario}>
           {/*

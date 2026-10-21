@@ -18,3 +18,22 @@ export const getDocumentoParaVisor = cache(async (id: number): Promise<Documento
     return null;
   }
 });
+
+/**
+ * Varios documentos de una vez, con sus «Páginas como imágenes» pobladas: la
+ * ficha de maquinaria nueva abre en el visor su PDF y el de cada tarjeta de
+ * «Otras …» (2026-10-21). Una sola consulta en vez de una por documento.
+ */
+export const getDocumentosParaVisor = cache(async (ids: number[]): Promise<Documento[]> => {
+  const unicos = [...new Set(ids)].filter((id) => Number.isInteger(id) && id > 0);
+  if (unicos.length === 0) return [];
+  const payload = await getPayload({ config });
+  const { docs } = await payload.find({
+    collection: "documentos",
+    where: { id: { in: unicos } },
+    depth: 1,
+    limit: unicos.length,
+    pagination: false,
+  });
+  return docs;
+});

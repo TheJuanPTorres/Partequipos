@@ -1,43 +1,53 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { FichaProducto, type OtraReferencia } from "@/components/ficha/FichaProducto";
+import { FichaNueva, type PdfVisor, type TarjetaOtra } from "@/components/ficha/FichaNueva";
 import type { FotoFicha } from "@/components/ficha/GaleriaFicha";
-import estilos from "@/components/ficha/ficha.module.css";
 import { RichText } from "@/components/layout/RichText";
+import { SeccionTestimonios } from "@/components/portada/diferidos";
+import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { DESTACADAS_EN_TARJETA, destacadas, filasCompletas } from "@/lib/maquinaria/fichaTecnica";
+import { vistaDeDocumento } from "@/lib/documentos/visor";
+import { configContactoMarca } from "@/lib/formularios/configFormulario";
+import {
+  datosDeCabecera,
+  enlaceVista360,
+  filasRestantes,
+  tituloEscritorio,
+  tituloOtras,
+} from "@/lib/maquinaria/fichaNueva";
+import { DESTACADAS_EN_TARJETA, filasCompletas } from "@/lib/maquinaria/fichaTecnica";
+import { primeraFotoPorTipo } from "@/lib/nueva/paginaMarca";
+import { datosDeTarjeta } from "@/lib/nueva/paginaMarcaAndres";
+import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
+import { getDocumentosParaVisor } from "@/lib/queries/getDocumentos";
 import { getFichaProducto } from "@/lib/queries/getFichaProducto";
 import {
   getEquipoNuevoPorSlug,
+  getEquiposDeTipos,
   getEquiposNuevos,
   getMarcaMaquinariaPorSlug,
   getOtrasReferencias,
   getTipoMaquinariaPorSlug,
 } from "@/lib/queries/getMaquinaria";
+import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
+import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { rutas } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/seo/config";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
+import { METADATA_404 } from "@/lib/seo/noEncontrada";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
-import type {
-  Documento,
-  EquiposNuevo,
-  MarcasMaquinaria,
-  Media,
-  TiposMaquinaria,
-} from "@/payload-types";
-import { METADATA_404 } from "@/lib/seo/noEncontrada";
-import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
-import { getLogosMarca } from "@/lib/queries/getLogosMarca";
+import type { EquiposNuevo, MarcasMaquinaria, Media, TiposMaquinaria } from "@/payload-types";
 
 /*
- * FICHA DE EQUIPO NUEVO — ficha de producto V2 de ux-9 (export 3166,
- * docs/diseno/decisiones-ficha.md). Las 80 URL de `url-map.csv`, sin cambiar
- * slugs. Server Component salvo la galería y el botón de imprimir.
+ * FICHA DE EQUIPO NUEVO — plantilla de Andrés «Ficha maquinaria nueva»
+ * (elementor 4036, 2026-10-21; docs/diseno/decisiones-ficha-nueva.md). La usan
+ * los equipos nuevos y los aditamentos nuevos; la usada sigue con la V2. Las
+ * URL, el SEO (metadatos y JSON-LD) y los datos no cambian.
  */
 
 type Params = { marca: string; tipo: string; modelo: string };
@@ -86,21 +96,39 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
-/** URL del PDF de la ficha técnica, si el equipo lo tiene. */
-function urlPdf(equipo: EquiposNuevo): string | null {
-  return poblado<Documento>(equipo.fichaTecnicaPdf)?.url ?? null;
+/** Id del documento de la ficha técnica en PDF, si el equipo lo tiene. */
+function idPdf(equipo: EquiposNuevo): number | null {
+  const v = equipo.fichaTecnicaPdf;
+  return typeof v === "number" ? v : (v?.id ?? null);
 }
+
+/** Ancla del contacto: «Contáctanos» baja aquí sin JavaScript. */
+const ANCLA_CONTACTO = "contacto-equipo";
+
+const texto = (v: string | null | undefined) => v?.trim() ?? "";
 
 export default async function EquipoNuevoPage({ params }: { params: Promise<Params> }) {
   const data = await resolver(await params);
   if (!data) notFound();
   const { marca, tipo, equipo } = data;
 
-  const [empresa, ficha, otras] = await Promise.all([
+  const [empresa, ficha, otras, delTipo, global, testimonios] = await Promise.all([
     getEmpresa(),
     getFichaProducto(),
     getOtrasReferencias(tipo.id, equipo.id),
+    getEquiposDeTipos([tipo.id]),
+    getRepuestosMarca(),
+    getTestimoniosDePortada(),
   ]);
+  // El PDF del equipo y el de cada tarjeta, con sus páginas, en una sola consulta.
+  const documentos = await getDocumentosParaVisor(
+    [equipo, ...otras].flatMap((e) => idPdf(e) ?? []),
+  );
+  const pdfDe = (e: EquiposNuevo): PdfVisor | null => {
+    const id = idPdf(e);
+    const vista = vistaDeDocumento(documentos.find((d) => d.id === id));
+    return vista ? { url: vista.pdf.url, tamano: vista.pdf.tamano, paginas: vista.paginas } : null;
+  };
 
   const ruta = rutas.equipoNuevo(marca.slug, tipo.slug, equipo.slug);
   const urlFicha = absoluteUrl(ruta);
@@ -110,12 +138,10 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     .filter((img): img is NonNullable<typeof img> => img !== null)
     .map(({ url, alt, width, height }) => ({ url, alt, width, height }));
 
-  const datos = destacadas(equipo.fichaTecnica);
+  // Los cinco datos de la plantilla salen de la ficha técnica; el resto, debajo.
+  const datos = datosDeCabecera(equipo.fichaTecnica);
+  const restantes = filasRestantes(equipo.fichaTecnica, datos);
   const especificaciones = filasCompletas(equipo.fichaTecnica);
-  const puntos = (equipo.destacados ?? []).filter((d) => d.texto?.trim());
-  const pdf = urlPdf(equipo);
-  // El logo de la marca, el de todo el sitio (`logoMarca.ts`): el de repuestos si es la misma marca.
-  const logo = conAlt(logoDeMarca(marca, await getLogosMarca()), `Logo de ${marca.nombre}`);
   const imagenContacto = imagenDeMedia(ficha.imagenContacto, "");
   // Un PNG es el recorte de ux-9 (sobresale del recuadro); otra cosa, una foto que lo llena.
   const contactoEsFoto = poblado<Media>(ficha.imagenContacto)?.mimeType !== "image/png";
@@ -124,6 +150,7 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     empresa.whatsapp,
     `Hola, quiero hablar con un experto sobre la ${equipo.nombre}: ${urlFicha}`,
   );
+  const whatsapp = enlaceWhatsApp(empresa.whatsapp, `Hola, quiero cotizar la ${equipo.nombre}.`);
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -135,6 +162,7 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     { nombre: equipo.nombre, path: ruta },
   ];
 
+  // El JSON-LD no cambia: todas las filas de la ficha técnica, como antes.
   const productJsonLd = buildProductJsonLd({
     nombre: equipo.nombre,
     path: ruta,
@@ -145,61 +173,83 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     propiedades: especificaciones.map((e) => ({ nombre: e.etiqueta, valor: e.valor })),
   });
 
-  const cuerpo = (
-    <>
-      {equipo.entradilla ? <p>{equipo.entradilla}</p> : null}
-      {equipo.descripcion ? <RichText data={equipo.descripcion} /> : null}
-      {puntos.length > 0 ? (
-        <ul className={estilos.puntos}>
-          {puntos.map((p) => (
-            <li key={p.id ?? p.texto}>{p.texto}</li>
-          ))}
-        </ul>
-      ) : null}
-    </>
-  );
+  const entradilla = texto(equipo.entradilla);
+  const descripcion =
+    entradilla || equipo.descripcion ? (
+      <>
+        {entradilla ? <p>{entradilla}</p> : null}
+        {equipo.descripcion ? <RichText data={equipo.descripcion} /> : null}
+      </>
+    ) : null;
 
-  const otrasReferencias: OtraReferencia[] = otras.map((o) => ({
+  // Nuestro formulario (Ciudad y «¿Qué necesitas?», sin n.º de documento), con el equipo.
+  const contacto = {
+    origen: ruta,
+    siteKey: turnstileSiteKey(),
+    whatsapp,
+    boton: texto(global.contactoBoton),
+    marca: marca.nombre,
+    equipo: { id: equipo.id, nombre: equipo.nombre },
+    formulario: {
+      titulo: `Cotización: ${equipo.nombre}`,
+      conCiudad: true,
+      etiquetaMensaje: "¿Qué necesitas?",
+    },
+  };
+
+  const tarjetas: TarjetaOtra[] = otras.map((o) => ({
     id: o.id,
     nombre: o.nombre,
     href: `${rutas.equipoNuevo(marca.slug, tipo.slug, o.slug)}/`,
     foto: imagenDeMedia(Array.isArray(o.imagenes) ? o.imagenes[0] : null, o.nombre),
-    datos: destacadas(o.fichaTecnica, DESTACADAS_EN_TARJETA),
-    pdf: urlPdf(o),
+    datos: datosDeTarjeta(o.fichaTecnica).slice(0, DESTACADAS_EN_TARJETA),
+    pdf: pdfDe(o),
   }));
 
   return (
-    <FichaProducto
+    <FichaNueva
       nombre={equipo.nombre}
-      urlFicha={urlFicha}
+      tituloEscritorio={tituloEscritorio(marca.nombre, equipo.codigo)}
       migas={breadcrumbs}
       fotos={fotos}
+      descripcion={descripcion}
       datos={datos}
-      experto={experto}
-      logo={logo}
-      cuerpo={cuerpo}
-      especificaciones={especificaciones.map((e) => ({
+      especificaciones={restantes.map((e) => ({
         id: e.id,
         etiqueta: e.etiqueta ?? "",
         valor: e.valor ?? "",
       }))}
-      pdf={pdf}
-      tituloOtras="Otras referencias de esta categoría"
-      textoVerMas="Ver más"
-      otras={otrasReferencias}
+      pdf={pdfDe(equipo)}
+      vista360={enlaceVista360(equipo.vista360)}
+      experto={experto ?? null}
+      otras={{
+        titulo: tituloOtras(tipo.nombre),
+        // La «Imagen de la tarjeta» del tipo; sin ella, la primera foto de su primer equipo.
+        foto: imagenDeMedia(tipo.imagen, "") ?? primeraFotoPorTipo(delTipo).get(tipo.id) ?? null,
+        tarjetas,
+      }}
       imagenContacto={imagenContacto}
       contactoEsFoto={contactoEsFoto}
+      formulario={configContactoMarca(contacto)}
+      anclaContacto={ANCLA_CONTACTO}
       jsonLd={<JsonLd data={[productJsonLd, buildBreadcrumbJsonLd(breadcrumbs)]} />}
-      formulario={{
-        tipo: "cotizacion",
-        origen: ruta,
-        siteKey: turnstileSiteKey(),
-        whatsapp: enlaceWhatsApp(empresa.whatsapp, `Hola, quiero cotizar la ${equipo.nombre}.`),
-        referencia: { tipo: "equipos-nuevos", id: equipo.id, texto: equipo.nombre },
-        titulo: "Solicitar cotización",
-        descripcion: "Te enviamos precio, disponibilidad y condiciones de entrega.",
-        textoBoton: "Pedir cotización",
-      }}
+      cierre={
+        <>
+          <ContactoMarca
+            id={ANCLA_CONTACTO}
+            titulo={texto(global.contactoTitulo)}
+            subtitulo={texto(global.contactoSubtitulo)}
+            {...contacto}
+          />
+          <SeccionTestimonios
+            tarjetas={tarjetasDeTestimonios(testimonios)}
+            textos={{
+              titulo: texto(global.testimoniosTitulo),
+              verVideoTexto: texto(global.verVideoTexto),
+            }}
+          />
+        </>
+      }
     />
   );
 }

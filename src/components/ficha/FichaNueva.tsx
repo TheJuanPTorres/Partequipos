@@ -7,6 +7,7 @@ import { BotonVisorPdf } from "@/components/ficha/BotonVisorPdf";
 import { BotonVista360 } from "@/components/ficha/BotonVista360";
 import { GaleriaFicha, type FotoFicha } from "@/components/ficha/GaleriaFicha";
 import { IconoDato } from "@/components/ficha/IconoDato";
+import { PastillaDato } from "@/components/ficha/PastillaDato";
 import { RecuadroAsesoria } from "@/components/ficha/RecuadroAsesoria";
 import estilos from "@/components/ficha/ficha.module.css";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
@@ -49,15 +50,6 @@ export type TarjetaOtra = {
   pdf: PdfVisor | null;
 };
 
-/**
- * A partir de estos caracteres (en el nombre o en el valor), la línea PUEDE
- * partirse si no cabe ni a todo el ancho: nunca se recorta un dato. Solo
- * llega a partirse en unos pocos casos (p. ej. el «Motor» de 200 caracteres de
- * la CX130C, o valores de 40+ a 390); la propuesta para ellos está pendiente
- * de dirección (docs/diseno/decisiones-ficha-nueva.md).
- */
-const TEXTO_LARGO = 38;
-
 function ListaDatos({
   datos,
   clase,
@@ -70,35 +62,24 @@ function ListaDatos({
   if (datos.length === 0) return null;
   return (
     <ul className={clase}>
-      {datos.map((d) => (
-        <li
-          key={`${d.etiqueta}-${d.valor}`}
-          data-largo={
-            apilado && Math.max(d.etiqueta.length + 1, d.valor.length) > TEXTO_LARGO
-              ? ""
-              : undefined
-          }
-        >
-          <IconoDato icono={d.icono} className={estilos.iconoDato} />
-          {apilado ? (
-            // La copia invisible fija el alto: al llegar Inter, la pastilla no cambia de alto (CLS).
-            <span
-              className={nueva.reserva}
-              data-reserva={`${d.etiqueta}:
-${d.valor}`}
-            >
-              {/* Dos líneas exactas: el nombre y el valor, cada uno sin partir. */}
-              <span className={`${estilos.datoApilado} ${nueva.dosLineas}`}>
-                <b>{d.etiqueta}:</b> <span>{d.valor}</span>
-              </span>
-            </span>
-          ) : (
+      {datos.map((d) =>
+        apilado ? (
+          // Dos líneas exactas, el nombre y el valor, con «…» si no caben.
+          <PastillaDato
+            key={`${d.etiqueta}-${d.valor}`}
+            etiqueta={d.etiqueta}
+            valor={d.valor}
+            icono={<IconoDato icono={d.icono} className={estilos.iconoDato} />}
+          />
+        ) : (
+          <li key={`${d.etiqueta}-${d.valor}`}>
+            <IconoDato icono={d.icono} className={estilos.iconoDato} />
             <span>
               <b>{d.etiqueta}:</b> {d.valor}
             </span>
-          )}
-        </li>
-      ))}
+          </li>
+        ),
+      )}
     </ul>
   );
 }

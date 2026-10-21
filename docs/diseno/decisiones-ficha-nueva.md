@@ -53,17 +53,19 @@ galería y dejaba un hueco bajo la foto. Ahora:
   descripción (el texto largo, al final).
 
 **Las tarjetas de características (dirección, 2026-10-21)** van en **dos líneas
-exactas**: el nombre en la primera y el valor en la segunda, sin partir ninguna.
-Todas tienen el mismo alto y el contenido centrado en vertical.
+exactas**: el nombre en la primera y el valor en la segunda. Todas tienen el
+mismo alto y el contenido centrado en vertical.
 
-- **Sin recortar:** cada tarjeta mide lo que su texto, y las filas se llenan
-  solas (flex con crecimiento, sin huecos).
-- **Sin CLS:** la copia de la reserva fija también el ancho.
-- **Medido:** 1+1 líneas y 13/13 px de aire en las fichas de prueba, a 390,
-  1010 y 1440.
-- **Excepción, pendiente de dirección:** un texto de más de 38 caracteres
-  **puede** partirse si no cabe ni a todo el ancho, para no recortar nunca un
-  dato. Lista y propuesta en el informe del PR.
+- **Reparto:** 3 por fila, y la última fila se reparte el ancho entero: con 5,
+  3 + 2 (mitad y mitad); con 4, 3 + 1 (a todo el ancho); con 3, una fila. En
+  móvil, 2 por fila y la impar del final a todo el ancho (5 = 2 + 2 + 1).
+  Rejilla de 6 columnas, solo CSS.
+- **Lo que no cabe en su línea** (dirección): «…», con el texto entero para
+  lectores de pantalla (está en el HTML), al pasar el ratón (`title`) y al
+  tocar la tarjeta o pulsar Intro, que la despliega (`PastillaDato`, de
+  cliente solo para medir si se corta).
+- **Sin CLS:** el ancho de cada tarjeta lo fija la rejilla, no el texto, y las
+  dos líneas no se parten: al llegar Inter nada se mueve.
 
 **Quedó fuera de la plantilla**, y por qué:
 

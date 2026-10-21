@@ -115,16 +115,17 @@ section.principal[data-con-izquierda] {
 
 /*
  * LAS CARACTERÍSTICAS (dirección, 2026-10-21): cada tarjeta en DOS líneas
- * exactas, el nombre y el valor, sin partir ninguna; todas con el mismo alto y
- * el contenido centrado en vertical. Se consigue con la colocación, sin recortar:
- * cada tarjeta mide lo que su texto (`flex: 1 0 auto`) y las filas se llenan
- * solas (crecen hasta ocupar el ancho, sin huecos). El ancho lo fija la copia
- * de la reserva (fuente de respaldo, ensanchada y en negrita), así que al llegar
- * Inter ni el ancho ni el alto cambian (CLS).
+ * exactas, el nombre y el valor, todas con el mismo alto y el contenido
+ * centrado en vertical. Reparto: 3 por fila y la última fila se reparte el
+ * ancho entero (con 5, 3 + 2 a mitad y mitad; con 4, 3 + 1 a todo el ancho;
+ * con 3, una fila). En móvil, 2 por fila y la impar del final a todo el ancho.
+ * Rejilla de 6 columnas: cada tarjeta ocupa 2, las dos últimas de una fila de
+ * dos ocupan 3 y la sola, 6. El ancho no depende del texto, así que al llegar
+ * Inter nada se mueve (CLS); lo que no cabe se corta con «…» (`PastillaDato`).
  */
 .principal .datos {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   width: auto;
   margin: 0;
@@ -132,8 +133,8 @@ section.principal[data-con-izquierda] {
 }
 
 .principal .datos li {
-  flex: 1 0 auto;
-  max-width: 100%;
+  grid-column: span 2;
+  min-width: 0;
   min-height: 0;
   align-items: center;
   gap: 10px;
@@ -142,23 +143,31 @@ section.principal[data-con-izquierda] {
   line-height: 1.35;
 }
 
+/* Última fila de dos: mitad y mitad. */
+.principal .datos li:nth-child(3n + 1):nth-last-child(2),
+.principal .datos li:nth-child(3n + 2):last-child {
+  grid-column: span 3;
+}
+
+/* Última fila de una: todo el ancho. */
+.principal .datos li:nth-child(3n + 1):last-child {
+  grid-column: 1 / -1;
+}
+
 /* El icono, centrado con las dos líneas. */
 .principal .datos li > svg {
   height: 1.35em;
   align-self: center;
 }
 
-.principal .datos .reserva {
-  align-content: center;
+.dosLineas {
+  min-width: 0;
 }
 
-/* La copia, en dos líneas sin partir y menos ensanchada (si no, sobraba sitio). */
-.principal .datos .reserva::after {
-  white-space: pre;
-  letter-spacing: 0.02em;
-}
-
+/* Cada línea, entera si cabe y con «…» si no. */
 .dosLineas > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -166,21 +175,20 @@ section.principal[data-con-izquierda] {
   font-weight: 600;
 }
 
-/*
- * PENDIENTE DE DIRECCIÓN: un texto muy largo (más de 38 caracteres) puede
- * partirse si no cabe ni a todo el ancho, para no recortar nunca un dato. Solo
- * se parte cuando hace falta (la tarjeta mide su texto en una línea si cabe).
- */
-.principal .datos li[data-largo] {
-  min-width: 0;
+/* Cortada: el texto entero al pasar el ratón (`title`) y al tocarla, desplegada. */
+.principal .datos li[data-cortado] {
+  cursor: pointer;
 }
 
-.principal .datos li[data-largo] .dosLineas > * {
+.principal .datos li[data-abierto] .dosLineas > * {
+  overflow: visible;
   white-space: normal;
+  overflow-wrap: anywhere;
 }
 
-.principal .datos li[data-largo] .reserva::after {
-  white-space: pre-line;
+.principal .datos li[data-cortado]:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
 }
 
 /* Sin galería, solo «Ver en vista 360» (si lo hay) antes de los botones. */
@@ -482,8 +490,25 @@ section.principal[data-con-izquierda] {
     text-shadow: none;
   }
 
+  /* 2 por fila; la impar del final, a todo el ancho. */
   .principal .datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+  }
+
+  .principal .datos li,
+  .principal .datos li:nth-child(3n + 1):nth-last-child(2),
+  .principal .datos li:nth-child(3n + 2):last-child,
+  .principal .datos li:nth-child(3n + 1):last-child {
+    grid-column: auto;
+  }
+
+  .principal .datos li:nth-child(odd):last-child {
+    grid-column: 1 / -1;
+  }
+
+  .principal .datos li {
+    padding: 12px;
   }
 
   .franja {

@@ -140,9 +140,10 @@ a.enlaceFranja:focus-visible {
   margin: 0;
   padding: 0;
   grid-template-columns: minmax(0, 1fr);
-  /* Mucho aire entre equipos (sin borde, se amontonaban): 110 px entre filas y 96 entre columnas.
-     El hueco entre columnas es el mismo en toda la rejilla (la regla del #281 lo necesita). */
-  gap: 110px 96px;
+  /* Aire entre equipos (sin borde, se amontonaban): 55 px entre filas (la mitad de los 110 de
+     antes; dirección, 2026-10-21) y 96 entre columnas, en todos los anchos. El hueco entre
+     columnas es el mismo en toda la rejilla (la regla del #281 lo necesita). */
+  gap: 55px 96px;
   list-style: none;
 }
 

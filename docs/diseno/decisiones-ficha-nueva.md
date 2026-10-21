@@ -33,7 +33,7 @@ tarjetas comparten medidas con la V2, así que se reutilizan sus clases
 | 5 datos con icono                                          | **Como mucho 5 características** (regla del cliente, §4): potencia neta, peso operativo, motor, fuerza de tracción máxima y ancho de la zapata; si falta alguna, otras filas reales de la ficha técnica, en su orden | Pastillas en el gris del kit: las de vidrio de la plantilla no se ven sobre blanco. Iconos de Tabler (los de la plantilla son de Flaticon, L2)       |
 | «Ficha técnica» (abre una ventana emergente)               | `BotonVisorPdf`: el PDF del equipo en el **visor tipo libro** (#295) dentro de una ventana emergente. Sin PDF, no sale                                                                                               | Sin «Páginas como imágenes», abre el PDF en otra pestaña (§5). Tamaño grande del #306                                                                |
 | «Habla con un experto»                                     | Igual que antes: WhatsApp con el nombre y la URL del equipo                                                                                                                                                          | Tamaño grande del #306. **No hay «Cotizar»** (dirección)                                                                                             |
-| «Otras Excavadoras»: franja con foto y título              | `tituloOtras`: «Otras»/«Otros» según la primera palabra del tipo. Foto: la «Imagen de la tarjeta» del tipo; vacía, la primera foto de su primer equipo (`primeraFotoPorTipo`)                                        | —                                                                                                                                                    |
+| «Otras Excavadoras»: franja con foto y título              | `tituloOtras`: «Otras»/«Otros» según la primera palabra del tipo. Imagen: el **logo de la marca** (`LogoMarca`, el único del sitio, dirección 2026-10-21); sin logo (Aditamentos), la franja va sin imagen           | —                                                                                                                                                    |
 | Tarjetas: foto, nombre, datos, «Ver más» y «Ficha técnica» | Hasta **3 equipos del mismo tipo** (el tipo ya es de la marca), sin el de la página; las 3 primeras de sus 5 características; «Ficha técnica» en el visor, solo con PDF                                              | **Regla de tarjetas del sitio (#281):** la plantilla oculta la 3.ª en tablet y la 2.ª y 3.ª en móvil; aquí se ven todas. Foto 3:2 entera, como la V2 |
 | CTA del operario con casco                                 | **La nuestra**: «Contáctanos para recibir asesoría» con la foto del mecánico, «Contáctanos» (formulario en ventana) y «WhatsApp» (`RecuadroAsesoria`, el mismo de la V2)                                             | Dirección                                                                                                                                            |
 | Formulario de Elementor (con n.º de documento)             | **El nuestro** (`ContactoMarca`): «Contacto Partequipos», «Si deseas más información, contáctanos», **Ciudad** y **«¿Qué necesitas?»**, sin n.º de documento                                                         | La solicitud es una cotización con el equipo como referencia (`configContactoMarca` con `equipo`), como el formulario de la V2                       |
@@ -51,6 +51,19 @@ galería y dejaba un hueco bajo la foto. Ahora:
 - **Tablet y móvil:** las columnas se deshacen (`display: contents`) y los
   bloques se ordenan así: galería, migas y título, características, botones y
   descripción (el texto largo, al final).
+
+**Las tarjetas de características (dirección, 2026-10-21)** van en **dos líneas
+exactas**: el nombre en la primera y el valor en la segunda, sin partir ninguna.
+Todas tienen el mismo alto y el contenido centrado en vertical.
+
+- **Sin recortar:** cada tarjeta mide lo que su texto, y las filas se llenan
+  solas (flex con crecimiento, sin huecos).
+- **Sin CLS:** la copia de la reserva fija también el ancho.
+- **Medido:** 1+1 líneas y 13/13 px de aire en las fichas de prueba, a 390,
+  1010 y 1440.
+- **Excepción, pendiente de dirección:** un texto de más de 38 caracteres
+  **puede** partirse si no cabe ni a todo el ancho, para no recortar nunca un
+  dato. Lista y propuesta en el informe del PR.
 
 **Quedó fuera de la plantilla**, y por qué:
 

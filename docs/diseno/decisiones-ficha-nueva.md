@@ -57,7 +57,7 @@ exactas**: el nombre en la primera y el valor en la segunda. Todas tienen el
 mismo alto y el contenido centrado en vertical.
 
 - **Reparto:** 3 por fila, y la última fila se reparte el ancho entero: con 5,
-  3 + 2 (mitad y mitad); con 4, 3 + 1 (a todo el ancho); con 3, una fila. En
+  3 + 2 (mitad y mitad); con 4, 2 + 2 (dirección); con 3, una fila. En
   móvil, 2 por fila y la impar del final a todo el ancho (5 = 2 + 2 + 1).
   Rejilla de 6 columnas, solo CSS.
 - **Lo que no cabe en su línea** (dirección): «…», con el texto entero para

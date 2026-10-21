@@ -117,8 +117,8 @@ section.principal[data-con-izquierda] {
  * LAS CARACTERÍSTICAS (dirección, 2026-10-21): cada tarjeta en DOS líneas
  * exactas, el nombre y el valor, todas con el mismo alto y el contenido
  * centrado en vertical. Reparto: 3 por fila y la última fila se reparte el
- * ancho entero (con 5, 3 + 2 a mitad y mitad; con 4, 3 + 1 a todo el ancho;
- * con 3, una fila). En móvil, 2 por fila y la impar del final a todo el ancho.
+ * ancho entero (con 5, 3 + 2 a mitad y mitad; con 3, una fila); con 4, 2 + 2
+ * (dirección). En móvil, 2 por fila y la impar del final a todo el ancho.
  * Rejilla de 6 columnas: cada tarjeta ocupa 2, las dos últimas de una fila de
  * dos ocupan 3 y la sola, 6. El ancho no depende del texto, así que al llegar
  * Inter nada se mueve (CLS); lo que no cabe se corta con «…» (`PastillaDato`).
@@ -152,6 +152,14 @@ section.principal[data-con-izquierda] {
 /* Última fila de una: todo el ancho. */
 .principal .datos li:nth-child(3n + 1):last-child {
   grid-column: 1 / -1;
+}
+
+/* Con 4, 2 + 2 (dirección): no 3 + 1. En móvil ya van de 2 en 2. */
+@media (min-width: 768px) {
+  .principal .datos li:first-child:nth-last-child(4),
+  .principal .datos li:first-child:nth-last-child(4) ~ li {
+    grid-column: span 3;
+  }
 }
 
 /* El icono, centrado con las dos líneas. */

@@ -671,6 +671,109 @@
   padding-top: 22px;
 }
 
+/*
+ * ---- Botones de categoría en la columna izquierda (usados, 2026-10-21) ----
+ * Encima de «Filtrar»: en escritorio, lista vertical; en móvil y tablet, una
+ * fila deslizable sobre «Filtrar». Las categorías con unidades llevan su
+ * número; las vacías, apagadas (borde y sin fondo), pero legibles y clicables.
+ */
+.categoriasTitulo {
+  margin: 0 0 12px;
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 500;
+  color: var(--gris-texto);
+}
+.categorias ul {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 0 -16px;
+  padding: 0 16px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-padding-inline: 16px;
+}
+.categorias li {
+  flex: none;
+}
+.categoria {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 16px;
+  border-radius: 30px;
+  border: 1px solid transparent;
+  background: var(--gris-claro);
+  color: var(--gris-texto);
+  font-size: 15px;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.categoria svg {
+  color: var(--rojo);
+  flex: none;
+}
+.categoriaTexto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.categoriaCuenta {
+  margin-left: auto;
+  min-width: 26px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--negro);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+}
+/* Vacía: apagada pero legible (#6b6970 sobre blanco, 5,3:1). */
+.categoria[data-vacia] {
+  background: #fff;
+  border-color: #e6e6e6;
+  color: #6b6970;
+}
+.categoria[data-vacia] svg {
+  color: #a3a1a6;
+}
+.categoria:hover,
+.categoria[aria-current="page"] {
+  background: var(--rosado);
+  border-color: transparent;
+  color: var(--negro);
+}
+.categoria[aria-current="page"] {
+  font-weight: 500;
+}
+.categoria[aria-current="page"] .categoriaCuenta {
+  background: var(--rojo);
+  color: #fff;
+}
+.categorias + aside {
+  margin-top: 16px;
+}
+/* La barra va sobre el listado, en su columna. */
+.columnaResultados > .barra {
+  margin: 0 0 16px;
+  padding: 0;
+  max-width: none;
+}
+.columnaResultados > .resultados {
+  margin-top: 0;
+}
+.cuerpo[data-lateral] {
+  margin-top: 28px;
+}
+.cuerpo[data-lateral] .columnaResultados {
+  margin-top: 24px;
+}
+
 @media (min-width: 640px) {
   .tarjetas[data-vista="lista"] .tarjeta {
     grid-template-columns: 40% 1fr;
@@ -742,6 +845,40 @@
     .filtros > summary {
       pointer-events: none;
     }
+  }
+  /* Botones de categoría: lista vertical a lo ancho de la columna. */
+  .categorias ul {
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  .categoria {
+    white-space: normal;
+  }
+  .categoriasTitulo {
+    font-size: 24px;
+  }
+  .categorias + aside {
+    margin-top: 32px;
+  }
+  .cuerpo[data-lateral] .columnaResultados {
+    margin-top: 0;
+    min-width: 0;
+  }
+  .columnaResultados > .barra .resumen {
+    justify-content: flex-start;
+  }
+  .columnaResultados > .barra {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+  }
+  .columnaResultados > .barra .acciones {
+    margin-top: 0;
+    flex: 1 1 auto;
   }
   .resultados {
     margin-top: 0;

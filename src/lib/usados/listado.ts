@@ -32,7 +32,7 @@ import { METADATA_404 } from "../seo/noEncontrada";
 import { descripcionPorDefecto, tituloPorDefecto } from "../seo/porDefecto";
 import { CATALOGO_USADOS, CATALOGO_USADOS_MARCA, type UnidadFiltrable } from "./filtros";
 import { POR_PAGINA } from "./paginacion";
-import { pestanasDeCategorias, type PestanaListado } from "./pestanas";
+import { pestanasDeCategorias, unidadesPorCategoria, type PestanaListado } from "./pestanas";
 import type { TarjetaMarca } from "../repuestos/marca";
 import { getEmpresa } from "../queries/getSeo";
 import { enlaceWhatsApp, type EnlaceWhatsApp } from "../whatsapp";
@@ -121,8 +121,8 @@ export type Ambito = {
   /** Enlaces a la misma marca en otras líneas (solo en las marcas). */
   enlaces: { href: string; texto: string }[];
   /**
-   * Pestañas de la plantilla (solo en las categorías): las categorías con
-   * unidades, por nombre, y la propia aunque esté vacía.
+   * Botones de categoría (solo en las categorías), en la columna izquierda:
+   * todas, las que tienen unidades primero y con su número (`pestanas.ts`).
    */
   pestanas: PestanaListado[];
 };
@@ -151,11 +151,7 @@ async function ambitoDe(tipo: TipoListadoUsado, slug: string): Promise<Ambito | 
       // Sin unidades, no se indexa; vuelve sola con la primera (D4).
       indexable: unidades.length > 0,
       enlaces: [],
-      pestanas: pestanasDeCategorias(
-        categorias,
-        new Set(inventario.map((u) => u.categoria)),
-        categoria.id,
-      ),
+      pestanas: pestanasDeCategorias(categorias, unidadesPorCategoria(inventario), categoria.id),
     };
   }
   const marca = await getMarcaUsadaPorSlug(slug);

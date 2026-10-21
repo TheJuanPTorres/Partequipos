@@ -50,11 +50,13 @@ export type TarjetaOtra = {
 };
 
 /**
- * Caracteres a partir de los que un valor puede no caber en una línea a 390 px
- * ni a todo el ancho (p. ej. «22/26/30 in (según requerimiento cliente)»): solo
- * en el teléfono, ese valor puede pasar a una segunda línea (pendiente de dirección).
+ * A partir de estos caracteres (en el nombre o en el valor), la línea PUEDE
+ * partirse si no cabe ni a todo el ancho: nunca se recorta un dato. Solo
+ * llega a partirse en unos pocos casos (p. ej. el «Motor» de 200 caracteres de
+ * la CX130C, o valores de 40+ a 390); la propuesta para ellos está pendiente
+ * de dirección (docs/diseno/decisiones-ficha-nueva.md).
  */
-const VALOR_LARGO = 32;
+const TEXTO_LARGO = 38;
 
 function ListaDatos({
   datos,
@@ -71,7 +73,11 @@ function ListaDatos({
       {datos.map((d) => (
         <li
           key={`${d.etiqueta}-${d.valor}`}
-          data-largo={apilado && d.valor.length > VALOR_LARGO ? "" : undefined}
+          data-largo={
+            apilado && Math.max(d.etiqueta.length + 1, d.valor.length) > TEXTO_LARGO
+              ? ""
+              : undefined
+          }
         >
           <IconoDato icono={d.icono} className={estilos.iconoDato} />
           {apilado ? (

@@ -166,6 +166,23 @@ section.principal[data-con-izquierda] {
   font-weight: 600;
 }
 
+/*
+ * PENDIENTE DE DIRECCIÓN: un texto muy largo (más de 38 caracteres) puede
+ * partirse si no cabe ni a todo el ancho, para no recortar nunca un dato. Solo
+ * se parte cuando hace falta (la tarjeta mide su texto en una línea si cabe).
+ */
+.principal .datos li[data-largo] {
+  min-width: 0;
+}
+
+.principal .datos li[data-largo] .dosLineas > * {
+  white-space: normal;
+}
+
+.principal .datos li[data-largo] .reserva::after {
+  white-space: pre-line;
+}
+
 /* Sin galería, solo «Ver en vista 360» (si lo hay) antes de los botones. */
 .solo360 {
   display: contents;
@@ -467,19 +484,6 @@ section.principal[data-con-izquierda] {
 
   .principal .datos {
     gap: 10px;
-  }
-
-  /*
-   * PENDIENTE DE DIRECCIÓN: un valor muy largo (más de 32 caracteres, p. ej.
-   * «22/26/30 in (según requerimiento cliente)») no cabe en una línea a 390 ni
-   * a todo el ancho; mientras se decide, solo ese valor pasa a otra línea.
-   */
-  .principal .datos li[data-largo] .dosLineas > :last-child {
-    white-space: normal;
-  }
-
-  .principal .datos li[data-largo] .reserva::after {
-    white-space: pre-line;
   }
 
   .franja {

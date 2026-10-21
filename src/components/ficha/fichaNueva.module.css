@@ -99,26 +99,64 @@
 
 /* La descripción comercial, bajo el título (en la plantilla, un párrafo). */
 .descripcion {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75em;
   max-width: 650px;
   color: var(--color-texto);
+  line-height: 1.5;
 }
 
-.descripcion :is(p, ul, ol, h2, h3, h4) {
+/*
+ * Párrafos separados EXACTAMENTE una línea, con el mismo interlineado en todo:
+ * así la copia de la reserva (párrafos separados por una línea en blanco)
+ * ocupa las mismas líneas que el texto. Se anulan los márgenes y el
+ * interlineado de `RichText`.
+ */
+.cuerpoDescripcion,
+.cuerpoDescripcion * {
   margin: 0;
-}
-
-/* Un título dentro de la descripción no compite con el `<h1>`: como el texto, en negrita. */
-.descripcion :is(h2, h3, h4) {
-  font-size: inherit;
-  font-weight: 600;
   line-height: inherit;
 }
 
-.descripcion :is(ul, ol) {
+.cuerpoDescripcion > * + *,
+.cuerpoDescripcion > div > * + * {
+  margin-top: 1lh;
+}
+
+/* Un título dentro de la descripción no compite con el `<h1>`: como el texto, en negrita. */
+.cuerpoDescripcion :is(h2, h3, h4) {
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.cuerpoDescripcion :is(ul, ol) {
   padding-left: 1.2em;
+}
+
+/*
+ * RESERVA: la caja no cambia de alto al llegar Inter (sin precarga, §10.36).
+ * Misma idea que la cabecera del artículo (`cabeceraArticulo.module.css`): una
+ * COPIA INVISIBLE del texto (`data-reserva`) en la fuente de respaldo
+ * ensanchada 0,04 em y en negrita, en la misma celda de la rejilla, así que
+ * el alto es siempre el de la copia, que no depende de Inter. Medido antes:
+ * CLS 0,12 a 1010 en el 1150M (la descripción perdía una línea).
+ */
+.reserva {
+  display: grid;
+}
+
+.reserva > *,
+.reserva::after {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.reserva::after {
+  content: attr(data-reserva);
+  visibility: hidden;
+  pointer-events: none;
+  white-space: pre-line;
+  font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 /*

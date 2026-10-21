@@ -62,9 +62,22 @@ function ListaDatos({
       {datos.map((d) => (
         <li key={`${d.etiqueta}-${d.valor}`}>
           <IconoDato icono={d.icono} className={estilos.iconoDato} />
-          <span className={apilado ? estilos.datoApilado : undefined}>
-            <b>{d.etiqueta}:</b> {d.valor}
-          </span>
+          {apilado ? (
+            // La copia invisible fija el alto: al llegar Inter, la pastilla no cambia de alto (CLS).
+            <span
+              className={nueva.reserva}
+              data-reserva={`${d.etiqueta}:
+${d.valor}`}
+            >
+              <span className={estilos.datoApilado}>
+                <b>{d.etiqueta}:</b> {d.valor}
+              </span>
+            </span>
+          ) : (
+            <span>
+              <b>{d.etiqueta}:</b> {d.valor}
+            </span>
+          )}
         </li>
       ))}
     </ul>
@@ -79,6 +92,8 @@ type Props = {
   fotos: FotoFicha[];
   /** La descripción comercial, ya pintada (texto enriquecido). */
   descripcion: ReactNode | null;
+  /** Su texto plano (`reservaDescripcion`): la copia invisible que fija su alto (CLS). */
+  reservaDescripcion: string;
   datos: DatoDestacado[];
   pdf: PdfVisor | null;
   vista360: string | null;
@@ -103,6 +118,7 @@ export function FichaNueva({
   migas,
   fotos,
   descripcion,
+  reservaDescripcion,
   datos,
   pdf,
   vista360,
@@ -186,7 +202,12 @@ export function FichaNueva({
           </div>
 
           {descripcion ? (
-            <div className={`${nueva.descripcion} texto-cuerpo`}>{descripcion}</div>
+            <div
+              className={`${nueva.descripcion} ${nueva.reserva} texto-cuerpo`}
+              data-reserva={reservaDescripcion}
+            >
+              <div className={nueva.cuerpoDescripcion}>{descripcion}</div>
+            </div>
           ) : null}
 
           <ListaDatos

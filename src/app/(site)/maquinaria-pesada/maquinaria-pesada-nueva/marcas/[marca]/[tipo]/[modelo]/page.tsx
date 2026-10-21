@@ -16,6 +16,7 @@ import {
   tituloOtras,
 } from "@/lib/maquinaria/fichaNueva";
 import { DESTACADAS_EN_TARJETA, filasCompletas } from "@/lib/maquinaria/fichaTecnica";
+import { reservaDescripcion } from "@/lib/maquinaria/reservaTexto";
 import { primeraFotoPorTipo } from "@/lib/nueva/paginaMarca";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getDocumentosParaVisor } from "@/lib/queries/getDocumentos";
@@ -210,6 +211,7 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
       migas={breadcrumbs}
       fotos={fotos}
       descripcion={descripcion}
+      reservaDescripcion={reservaDescripcion(entradilla, equipo.descripcion)}
       datos={datos}
       pdf={pdfDe(equipo)}
       vista360={enlaceVista360(equipo.vista360)}

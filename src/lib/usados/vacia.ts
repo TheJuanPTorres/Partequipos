@@ -83,6 +83,11 @@ const primeraFoto = (equipos: EquipoNuevoAlternativa[]) =>
  * Las alternativas en maquinaria nueva de una categoría de usados: la
  * categoría de nueva con el mismo nombre (si tiene equipos) o, si no hay, cada
  * tipo de nueva con equipos que se llame igual. Hasta `tope` tarjetas.
+ *
+ * Se empareja por la DIRECCIÓN WEB de la categoría de usados (`slug`, que no
+ * cambia al renombrarla: «cargadores» sigue casando con el tipo «Cargadores»
+ * aunque la categoría pase a llamarse «Cargadores Frontales») y, si con ella no
+ * sale nada, por el nombre visible (2026-10-21, dirección).
  */
 export function alternativasEnNueva(
   nombreCategoria: string,
@@ -92,11 +97,33 @@ export function alternativasEnNueva(
     categoriaNueva: (slug: string) => string;
     tipoMaquinaria: (marca: string, tipo: string) => string;
   },
-  tope = 3,
+  { tope = 3, slug }: { tope?: number; slug?: string } = {},
 ): TarjetaMarca[] {
-  const buscado = nombreComparable(nombreCategoria);
-  if (!buscado) return [];
+  const candidatos = [
+    ...new Set(
+      [
+        slug ? nombreComparable(slug.replace(/-/g, " ")) : "",
+        nombreComparable(nombreCategoria),
+      ].filter(Boolean),
+    ),
+  ];
+  for (const buscado of candidatos) {
+    const tarjetas = alternativasPorNombre(buscado, categorias, equipos, rutas, tope);
+    if (tarjetas.length) return tarjetas;
+  }
+  return [];
+}
 
+function alternativasPorNombre(
+  buscado: string,
+  categorias: CategoriaNuevaAlternativa[],
+  equipos: EquipoNuevoAlternativa[],
+  rutas: {
+    categoriaNueva: (slug: string) => string;
+    tipoMaquinaria: (marca: string, tipo: string) => string;
+  },
+  tope: number,
+): TarjetaMarca[] {
   const categoria = categorias.find((c) => nombreComparable(c.nombre) === buscado);
   if (categoria) {
     const tipos = new Set(categoria.tipos);

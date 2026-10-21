@@ -104,6 +104,21 @@ describe("estado vacío de usados", () => {
     );
   });
 
+  it("renombrar la categoría no rompe el emparejamiento: casa por su dirección web", () => {
+    const equipos = [
+      equipo(1, "Cargadores", "cargadores", "Case Construction", "case-construction"),
+    ];
+    // Sin la dirección web, «Cargadores Frontales» ya no se parece a «Cargadores».
+    assert.deepEqual(alternativasEnNueva("Cargadores Frontales", [], equipos, rutas), []);
+    const t = alternativasEnNueva("Cargadores Frontales", [], equipos, rutas, {
+      slug: "cargadores",
+    });
+    assert.deepEqual(
+      t.map((x) => [x.titulo, x.href]),
+      [["Cargadores Case Construction", "/nueva/marcas/case-construction/cargadores/"]],
+    );
+  });
+
   it("sin nada parecido en nueva, ninguna alternativa", () => {
     assert.deepEqual(alternativasEnNueva("Grúas", [], [], rutas), []);
     // Una categoría de nueva sin equipos tampoco cuenta.

@@ -38,7 +38,12 @@ import { getEmpresa } from "../queries/getSeo";
 import { enlaceWhatsApp, type EnlaceWhatsApp } from "../whatsapp";
 import { tarjetasDeCategoriasUsada } from "./indice";
 import { getPaginasIndice } from "../queries/getPaginasIndice";
-import { alternativasEnNueva, mensajeSinUnidades, usaEstadoVacioPropio } from "./vacia";
+import {
+  alternativasEnNueva,
+  mensajeSinUnidades,
+  nombreEnTexto,
+  usaEstadoVacioPropio,
+} from "./vacia";
 
 /**
  * Lo que pinta el ESTADO VACÍO de un listado sin unidades (petición del
@@ -58,7 +63,11 @@ export type DatosVacio = {
 export type AvisoVacio = { whatsapp?: EnlaceWhatsApp };
 
 const mensajeWhatsApp = (ambito: Ambito) =>
-  `Hola, busco ${ambito.titulo.charAt(0).toLowerCase()}${ambito.titulo.slice(1)}. Avísenme cuando llegue una.`;
+  `Hola, busco ${
+    ambito.tipo === "categoria"
+      ? nombreEnTexto(ambito.titulo)
+      : ambito.titulo.charAt(0).toLowerCase() + ambito.titulo.slice(1)
+  }. Avísenme cuando llegue una.`;
 
 async function datosVacio(ambito: Ambito): Promise<DatosVacio> {
   const [listadoNueva, categorias, inventario, empresa] = await Promise.all([

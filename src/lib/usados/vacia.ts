@@ -144,8 +144,17 @@ export function alternativasEnNueva(
 }
 
 /**
- * El titular del estado vacío: «Ahora mismo no tenemos cargadores usados
- * disponibles» (el título de la página, en minúscula salvo las marcas).
+ * Un nombre de categoría dentro de una frase: TODO en minúscula («Cargadores
+ * Frontales usados» → «cargadores frontales usados»; dirección, 2026-10-21).
+ * Los títulos, el <h1>, las migas y las tarjetas conservan el nombre tal cual.
+ */
+export function nombreEnTexto(titulo: string): string {
+  return titulo.toLowerCase();
+}
+
+/**
+ * El titular del estado vacío: «Ahora mismo no tenemos cargadores frontales usados
+ * disponibles» (el nombre de la categoría, todo en minúscula).
  */
 export function mensajeSinUnidades(
   tipo: "categoria" | "marca",
@@ -153,5 +162,5 @@ export function mensajeSinUnidades(
   nombre: string,
 ): string {
   if (tipo === "marca") return `Ahora mismo no tenemos maquinaria ${nombre} usada disponible`;
-  return `Ahora mismo no tenemos ${titulo.charAt(0).toLowerCase()}${titulo.slice(1)} disponibles`;
+  return `Ahora mismo no tenemos ${nombreEnTexto(titulo)} disponibles`;
 }

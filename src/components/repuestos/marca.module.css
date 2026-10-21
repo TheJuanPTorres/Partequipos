@@ -1273,13 +1273,59 @@ a.modelo:hover {
     grid-column: 2 / span 2;
   }
 
-  /* Exactamente 4: 2 + 2 centradas. */
-  .rejillaTarjetas:has(> .tarjeta:nth-child(4):last-child) > .tarjeta:nth-child(odd) {
+  /* Exactamente 4: 2 + 2 centradas (salvo `.rejillaCuatroEnUnaFila`, abajo). */
+  .rejillaTarjetas:not(.rejillaCuatroEnUnaFila):has(> .tarjeta:nth-child(4):last-child)
+    > .tarjeta:nth-child(odd) {
     grid-column: 2 / span 2;
   }
 
-  .rejillaTarjetas:has(> .tarjeta:nth-child(4):last-child) > .tarjeta:nth-child(even) {
+  .rejillaTarjetas:not(.rejillaCuatroEnUnaFila):has(> .tarjeta:nth-child(4):last-child)
+    > .tarjeta:nth-child(even) {
     grid-column: 4 / span 2;
+  }
+
+  /*
+   * LAS 4 LÍNEAS DE LUBRICANTES ENI (plantilla de Andrés 3946, dirección 2026-10-21): en
+   * escritorio, las 4 en una fila, como la plantilla (289 px y 40 px entre ellas a 1440).
+   */
+  .rejillaCuatroEnUnaFila:has(> .tarjeta:nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 40px;
+  }
+
+  .rejillaCuatroEnUnaFila:has(> .tarjeta:nth-child(4):last-child) > .tarjeta {
+    grid-column: auto;
+  }
+}
+
+/*
+ * Y en tablet y móvil, 2 + 2 (la plantilla oculta 2 en tablet y pone 1 por fila en móvil:
+ * son variantes de la maqueta; aquí se ven las 4 en todos los anchos). En móvil la tarjeta
+ * es estrecha (~165 px): foto más alta que ancha, recuadro y botón más compactos.
+ */
+@media (max-width: 767px) {
+  .rejillaCuatroEnUnaFila:has(> .tarjeta:nth-child(4):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 12px;
+  }
+
+  .rejillaCuatroEnUnaFila .foto {
+    aspect-ratio: 4 / 5;
+  }
+
+  .tarjetasIndice .rejillaCuatroEnUnaFila .panel[data-con-foto] {
+    margin-inline: 4%;
+    padding: 28px 8px 10px;
+  }
+
+  .rejillaCuatroEnUnaFila .tituloTarjeta {
+    font-size: 16px;
+  }
+
+  .rejillaCuatroEnUnaFila .botonTarjeta {
+    min-width: 0;
+    padding: 0 14px;
+    gap: 8px;
   }
 }
 

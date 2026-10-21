@@ -32,6 +32,7 @@ export function TarjetasMarca({
   verTodo,
   tarjetas,
   indice = false,
+  cuatroEnUnaFila = false,
   etiqueta = "Páginas de la sección",
 }: {
   id: string;
@@ -41,6 +42,11 @@ export function TarjetasMarca({
   tarjetas: TarjetaMarca[];
   /** Variante de las páginas índice: sección blanca de esquinas redondeadas, sin título. */
   indice?: boolean;
+  /**
+   * Con exactamente 4 tarjetas: en una fila en escritorio y 2 + 2 en tablet y móvil (las líneas
+   * de Lubricantes ENI, plantilla de Andrés 3946). Con otro número, la colocación de siempre.
+   */
+  cuatroEnUnaFila?: boolean;
   etiqueta?: string;
 }) {
   if ((!titulo && !indice) || tarjetas.length === 0) return null;
@@ -59,7 +65,9 @@ export function TarjetasMarca({
           {titulo}
         </h2>
       ) : null}
-      <ul className={`${estilos.rejilla} ${estilos.rejillaTarjetas}`}>
+      <ul
+        className={`${estilos.rejilla} ${estilos.rejillaTarjetas} ${cuatroEnUnaFila ? estilos.rejillaCuatroEnUnaFila : ""}`}
+      >
         {tarjetas.map((t) => {
           const idT = `${id}-${t.clave}`;
           return (

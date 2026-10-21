@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { PaginaMarcaLubricante } from "@/components/lubricantes/PaginaMarcaLubricante";
-import { PaginaMarcaLubricanteProvisional } from "@/components/lubricantes/PaginaMarcaLubricanteProvisional";
+import { PaginaMarcaLubricantePlantilla } from "@/components/lubricantes/PaginaMarcaLubricantePlantilla";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { vistaLubricantes } from "@/lib/lubricantes/general";
 import { seccionesDeCategorias } from "@/lib/lubricantes/marca";
 import {
   getCategoriasDeMarcaLubricante,
   getMarcaLubricantePorSlug,
   getMarcasLubricante,
 } from "@/lib/queries/getLubricantes";
+import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { rutas } from "@/lib/routes";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -42,8 +44,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 }
 
 /**
- * PÁGINA DE UNA MARCA DE LUBRICANTES (`/lubricantes/lubricantes-eni/`). Por defecto, la versión
- * PROVISIONAL sencilla; con la casilla «Diseño propio» de la marca, el «sitio dentro del sitio»
+ * PÁGINA DE UNA MARCA DE LUBRICANTES (`/lubricantes/lubricantes-eni/`). Por defecto, la
+ * plantilla de Andrés «Categoría Lubricantes» (3946, dirección 2026-10-21; antes, una versión
+ * provisional sencilla); con la casilla «Diseño propio» de la marca, el «sitio dentro del sitio»
  * con su identidad (`PaginaMarcaLubricante`, #260), con los colores desde el panel.
  *
  * Las 4 subpáginas de WordPress (auto liviano, auto pesado, engranajes, motos y
@@ -56,9 +59,11 @@ export default async function MarcaLubricantePage({ params }: { params: Promise<
   const marca = await getMarcaLubricantePorSlug(slug);
   if (!marca) notFound();
 
-  const [categorias, empresa] = await Promise.all([
+  const [categorias, empresa, indice, marcas] = await Promise.all([
     getCategoriasDeMarcaLubricante(marca.id),
     getEmpresa(),
+    getPaginasIndice(),
+    getMarcasLubricante(),
   ]);
 
   const breadcrumbs = [
@@ -80,9 +85,11 @@ export default async function MarcaLubricantePage({ params }: { params: Promise<
           )}
         />
       ) : (
-        <PaginaMarcaLubricanteProvisional
+        <PaginaMarcaLubricantePlantilla
           marca={marca}
           secciones={seccionesDeCategorias(categorias)}
+          // Los textos del bloque final son los de la página general (`/lubricantes/`), del panel.
+          bloque={vistaLubricantes(indice.lubricantes, marcas).bloque}
           whatsapp={enlaceWhatsApp(empresa.whatsapp)}
         />
       )}

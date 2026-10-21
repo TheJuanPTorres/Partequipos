@@ -78,6 +78,7 @@ export const PATRONES_DE_PAGINA = {
   submodelosDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]/[tipo]/[modelo]/[submodelo]`,
   categoriasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]`,
   paginasUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]",
+  marcasDeLubricante: "/(site)/lubricantes/[marca]",
   /** Páginas institucionales y artículos (la ruta comodín). */
   comodin: "/(site)/[...slug]",
 } as const;
@@ -229,6 +230,18 @@ export function revalidarFichasDeProducto(motivo: string): void {
     revalidatePath(PATRONES_DE_PAGINA.unidadesUsadas, "page");
   } catch (error) {
     console.error(`[revalidación] fallaron las fichas de producto (${motivo}):`, error);
+  }
+}
+
+/**
+ * Revalida las páginas de las marcas de lubricantes: su bloque final lleva los textos de la
+ * página general (grupo «Lubricantes» de «Páginas índice y contacto», 2026-10-21). Nunca relanza.
+ */
+export function revalidarMarcasDeLubricante(motivo: string): void {
+  try {
+    revalidatePath(PATRONES_DE_PAGINA.marcasDeLubricante, "page");
+  } catch (error) {
+    console.error(`[revalidación] fallaron las marcas de lubricantes (${motivo}):`, error);
   }
 }
 

@@ -82,6 +82,23 @@ texto no necesita tablas: va en el JSON de Lexical.
 Todo admite `simular`. La retirada es exacta, por el manifiesto (fuera del
 repositorio). En el sitio publicado, por runbook de dirección.
 
+## Las fichas técnicas de maquinaria nueva (2026-10-21)
+
+En la ficha nueva (plantilla 4036, `docs/diseno/decisiones-ficha-nueva.md`),
+«Ficha técnica» abre el PDF del equipo en este visor, en una ventana
+emergente (`BotonVisorPdf`). Sus páginas se generan de una vez con el modo
+**`fichas`**: descarga cada PDF de «Ficha técnica completa (PDF)» que aún no
+tenga páginas, lo rasteriza y las sube (mismo manifiesto y misma retirada):
+
+```
+npm run preview:ejecutar -- payload run scripts/documentos/visor.ts fichas preview
+```
+
+`limite=<n>` o `documento=<id>` para hacer menos. Sin páginas, el botón abre
+el PDF en otra pestaña. En la ventana, los `srcset` se calculan al abrirla
+(`paginasDelLibro`, compartida con `DocumentoVisor`), para no llevarlos en el
+HTML de cada ficha.
+
 ## Inventario de la Política de garantía (2026-10-20)
 
 Los dos PDF de la página de WordPress están en su **versión más reciente** en

@@ -144,11 +144,13 @@ async function subirPaginasDe(id: number, carpeta: string): Promise<void> {
     overrideAccess: true,
   });
   const antes = (doc.paginas ?? []).flatMap((p) => idDe(p) ?? []);
-  if (manifiesto.documentos.some((d) => d.id === id)) {
+  // Una ejecución cortada a medias deja el documento en el manifiesto y sin páginas: se reanuda.
+  const previa = manifiesto.documentos.find((d) => d.id === id);
+  if (previa && antes.length) {
     log(`el documento ${id} («${doc.titulo}») ya tiene sus páginas de este script: nada que hacer`);
     return;
   }
-  if (antes.length) {
+  if (!previa && antes.length) {
     fallar(
       `el documento ${id} ya tiene ${antes.length} «Páginas como imágenes» que no puso este script: no se pisan`,
     );
@@ -165,14 +167,16 @@ async function subirPaginasDe(id: number, carpeta: string): Promise<void> {
     .replace(/^-|-$/g, "")
     .slice(0, 60)
     .replace(/-$/, "");
+  const hechas = previa?.media.length ?? 0;
   log(
-    `documento ${id} («${doc.titulo}»): ${paginas.length} páginas${simular ? " (simulación)" : ""}`,
+    `documento ${id} («${doc.titulo}»): ${paginas.length} páginas${hechas ? `, se reanuda tras la ${hechas}` : ""}${simular ? " (simulación)" : ""}`,
   );
   if (simular) return;
 
-  const entrada = { id, antes, media: [] as Fichero[] };
-  manifiesto.documentos.push(entrada);
-  for (const p of paginas) {
+  const entrada = previa ?? { id, antes, media: [] as Fichero[] };
+  if (!previa) manifiesto.documentos.push(entrada);
+  // Las páginas se suben en orden: las `hechas` primeras ya están en el manifiesto.
+  for (const p of paginas.slice(hechas)) {
     const webp = await sharp(path.join(carpeta, p.fichero)).webp({ quality: 82 }).toBuffer();
     const nombre = `${base}-pagina-${String(p.n).padStart(2, "0")}.webp`;
     const media = await payload.create({
@@ -218,7 +222,9 @@ async function subirPaginasDe(id: number, carpeta: string): Promise<void> {
  * las tenga: lo descarga, lo rasteriza con `rasterizar-pdf.mjs` (pdf.js por
  * `npx`, fuera del proyecto) y sube sus páginas como `paginas`. Lo que sube
  * queda en el manifiesto: `retirar` lo deshace igual que lo demás.
- * `limite=<n>` hace solo los n primeros; `documento=<id>`, solo ese.
+ * `limite=<n>` hace solo los n primeros; `documento=<id>`, solo ese. Si se
+ * corta (la conexión a la base cayó en el preview con el equipo en reposo),
+ * volver a lanzarlo salta los hechos y reanuda el que quedó a medias.
  */
 async function paginasDeFichas(): Promise<void> {
   const limite = Number(valorDe("limite")) || Infinity;
@@ -243,7 +249,8 @@ async function paginasDeFichas(): Promise<void> {
       depth: 0,
       overrideAccess: true,
     });
-    if ((doc.paginas ?? []).length > 0 || manifiesto.documentos.some((d) => d.id === id)) continue;
+    // Con páginas, hecho. En el manifiesto y sin páginas: una ejecución cortada, se reanuda.
+    if ((doc.paginas ?? []).length > 0) continue;
     if (!doc.url) {
       log(`documento ${id} («${doc.titulo}») sin URL: se salta`);
       continue;

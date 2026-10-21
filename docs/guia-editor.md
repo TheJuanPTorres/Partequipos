@@ -160,17 +160,28 @@ tipo. Además llevan puntos destacados y ficha técnica: copia los datos tal
 como los publica el fabricante, con su unidad («20.500 kg»). Si no hay dato
 oficial, no lo pongas.
 
-- **«Destacar» en la ficha técnica:** marca **hasta 4 filas**. Salen con su
-  icono junto al título de la ficha, y las 3 primeras, en las tarjetas de
-  «otras referencias». Al marcarla aparece **«Icono»**: elige el que mejor
-  encaje («Peso», «Potencia», «Motor»…); si no eliges, sale «Otro dato». Bajo
-  la ficha técnica, un contador dice cuántas llevas («Filas destacadas: 3 de
-  4»). Con una quinta marcada se pone en rojo y te dice cuántas quitar; si
-  guardas así, el panel no lo deja y el aviso de arriba nombra las casillas.
+- **Los datos junto al título de la ficha** salen solos de la ficha técnica,
+  si están: **potencia neta, peso operativo, alcance máximo en el suelo,
+  profundidad máxima de excavación y motor** (se reconocen por la etiqueta de
+  la fila, con su icono). El resto de filas sale debajo, en «Más
+  especificaciones». Para enseñar otros datos, usa «Destacar».
+- **«Destacar» en la ficha técnica:** marca **hasta 4 filas**. Entonces salen
+  esas, y no las cinco de arriba, con su icono junto al título de la ficha.
+  Al marcarla aparece **«Icono»**: elige el que mejor encaje («Peso»,
+  «Potencia», «Motor»…); si no eliges, sale «Otro dato». Bajo la ficha
+  técnica, un contador dice cuántas llevas («Filas destacadas: 3 de 4»). Con
+  una quinta marcada se pone en rojo y te dice cuántas quitar; si guardas así,
+  el panel no lo deja y el aviso de arriba nombra las casillas.
 - **«Ficha técnica completa (PDF)»:** súbelo ahí mismo con **«Crear»**, o
-  elige uno ya subido. Solo PDF, **máximo 30 MB**. Sale en la ficha como
-  «Descargar ficha técnica completa»; sin PDF, el botón no aparece. Los PDF
-  quedan en **Archivos → Documentos**.
+  elige uno ya subido. Solo PDF, **máximo 30 MB**. Sale en la ficha como el
+  botón **«Ficha técnica»**, que abre el PDF como un libro (el visor) en una
+  ventana sobre la ficha; sin PDF, el botón no aparece. Para el visor, el PDF
+  necesita sus **«Páginas como imágenes»** (en **Archivos → Documentos**); las
+  genera un script al importarlo. Sin ellas, el botón abre el PDF en otra
+  pestaña.
+- **«Vista 360 (enlace)»** (opcional): el enlace de la vista 360 del equipo,
+  empezando por `https://`. Sale el botón **«Ver en vista 360»** sobre la
+  galería, que la abre en una ventana sobre la ficha. Vacío, no hay botón.
 - **La imagen del recuadro «Contáctanos para recibir asesoría»**, al final de
   todas las fichas, es la misma para todas: está en **Partes del sitio → Ficha de
   producto**.

@@ -39,6 +39,19 @@ tarjetas comparten medidas con la V2, así que se reutilizan sus clases
 | Formulario de Elementor (con n.º de documento)             | **El nuestro** (`ContactoMarca`): «Contacto Partequipos», «Si deseas más información, contáctanos», **Ciudad** y **«¿Qué necesitas?»**, sin n.º de documento                                                         | La solicitud es una cotización con el equipo como referencia (`configContactoMarca` con `equipo`), como el formulario de la V2                       |
 | Testimonios (acordeón de vídeos)                           | `SeccionTestimonios` de la portada                                                                                                                                                                                   | —                                                                                                                                                    |
 
+**Reparto de la cabecera (dirección, 2026-10-21).** En la plantilla los datos
+iban bajo la descripción, en la derecha, que quedaba mucho más alta que la
+galería y dejaba un hueco bajo la foto. Ahora:
+
+- **Escritorio:** dos columnas centradas en vertical. A la izquierda, la
+  galería y debajo las características (más compactas: 3 columnas, letra del
+  cuerpo y menos relleno). A la derecha, migas, título, descripción y botones,
+  con más ancho para que «CASE CONSTRUCTION» quepa en una línea. En el HTML va
+  primero la derecha: el `<h1>` antes que la galería.
+- **Tablet y móvil:** las columnas se deshacen (`display: contents`) y los
+  bloques se ordenan así: galería, migas y título, características, botones y
+  descripción (el texto largo, al final).
+
 **Quedó fuera de la plantilla**, y por qué:
 
 - **Logo de la marca, «Compartir» e «Imprimir»** de la V2: no están en la 4036.

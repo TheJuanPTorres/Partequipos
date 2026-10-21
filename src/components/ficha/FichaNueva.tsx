@@ -131,6 +131,7 @@ export function FichaNueva({
   jsonLd,
   cierre,
 }: Props) {
+  const hayIzquierda = fotos.length > 0 || datos.length > 0;
   const boton360 = vista360 ? (
     <BotonVista360 url={vista360} nombre={nombre} className={nueva.boton360}>
       <IconView360 aria-hidden="true" stroke={1.75} />
@@ -144,20 +145,22 @@ export function FichaNueva({
       {/* La ficha ya tiene su llamada a la acción: el pie no pinta la tarjeta roja. */}
       <PieSinTarjeta />
 
-      {/* 1. CABECERA DEL PRODUCTO: galería, migas, título, descripción, datos y botones. */}
+      {/*
+        1. CABECERA DEL PRODUCTO (dirección, 2026-10-21). En escritorio, dos
+        columnas equilibradas: a la izquierda la galería y, debajo, las
+        características; a la derecha las migas, el título, la descripción y los
+        botones. En el HTML va primero la derecha (el <h1> antes que la galería).
+        En tablet y móvil las dos columnas se deshacen (`display: contents`) y
+        los bloques se ordenan: galería, migas y título, características,
+        botones y descripción.
+      */}
       <section
         className={`${estilos.principal} ${nueva.principal}`}
         data-sin-fotos={fotos.length === 0 ? "" : undefined}
+        data-con-izquierda={hayIzquierda ? "" : undefined}
         aria-labelledby="ficha-titulo"
       >
-        {fotos.length > 0 ? (
-          <div className={`${estilos.columnaGaleria} ${nueva.columnaGaleria}`}>
-            {boton360}
-            <GaleriaFicha fotos={fotos} nombre={nombre} sinFondo />
-          </div>
-        ) : null}
-
-        <div className={`${estilos.columnaDatos} ${nueva.columnaDatos}`}>
+        <div className={nueva.columnaTexto}>
           <div className={`${estilos.cabeceraDatos} ${nueva.cabecera}`}>
             {/* Migas: la ruta COMPLETA en la píldora, como en la V2. */}
             <nav aria-label="Ruta de navegación" className={`${estilos.migas} ${nueva.migas}`}>
@@ -217,13 +220,7 @@ ${tituloEscritorio.modelo}`}
             </div>
           ) : null}
 
-          <ListaDatos
-            datos={datos}
-            clase={`${estilos.datos} ${nueva.datos} texto-destacado`}
-            apilado
-          />
-
-          {fotos.length === 0 ? boton360 : null}
+          {fotos.length === 0 ? <div className={nueva.solo360}>{boton360}</div> : null}
 
           {pdf || experto ? (
             <div className={`${estilos.botones} ${nueva.botones}`}>
@@ -253,6 +250,22 @@ ${tituloEscritorio.modelo}`}
             </div>
           ) : null}
         </div>
+
+        {hayIzquierda ? (
+          <div className={nueva.columnaIzquierda}>
+            {fotos.length > 0 ? (
+              <div className={`${estilos.columnaGaleria} ${nueva.columnaGaleria}`}>
+                {boton360}
+                <GaleriaFicha fotos={fotos} nombre={nombre} sinFondo />
+              </div>
+            ) : null}
+            <ListaDatos
+              datos={datos}
+              clase={`${estilos.datos} ${nueva.datos} texto-cuerpo`}
+              apilado
+            />
+          </div>
+        ) : null}
       </section>
 
       {/* 2. «OTRAS <TIPO>»: la franja con la foto del tipo y las tarjetas. Sin otras, no sale. */}

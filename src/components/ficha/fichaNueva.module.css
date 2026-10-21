@@ -71,9 +71,68 @@
   outline-offset: 3px;
 }
 
-/* La columna de datos sobre blanco: sin el degradado de la V2 (no hace falta). */
-.principal .columnaDatos {
-  background: none;
+/*
+ * REPARTO EN ESCRITORIO (dirección, 2026-10-21): la derecha (migas, título,
+ * descripción y botones) era mucho más alta que la galería y dejaba un hueco
+ * bajo la foto. Ahora la izquierda lleva la galería y, debajo, las
+ * características; las dos columnas se centran en vertical. En el HTML la
+ * derecha va primero (el <h1> antes que la galería): la rejilla la coloca.
+ */
+section.principal[data-con-izquierda] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.principal[data-con-izquierda] .columnaIzquierda {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.principal[data-con-izquierda] .columnaTexto {
+  grid-column: 2;
+  grid-row: 1;
+  /* Más ancho para el título que en la V2: «CASE CONSTRUCTION» cabe en una línea. */
+  padding: 4.7cqi 3.5cqi 4.7cqi 1cqi;
+}
+
+.columnaTexto {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 4.7cqi;
+}
+
+.columnaIzquierda {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding-bottom: 2.82cqi;
+}
+
+/* Las características bajo la galería: más compactas que en la V2, en 3 columnas. */
+.principal .datos {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: auto;
+  margin: 0;
+  padding: 0 2.82cqi;
+}
+
+.principal .datos li {
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: var(--texto-cuerpo);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+/* Sin galería, solo «Ver en vista 360» (si lo hay) antes de los botones. */
+.solo360 {
+  display: contents;
 }
 
 /* Título: en escritorio y tablet, la marca y la referencia en dos líneas; en móvil, el nombre. */
@@ -275,8 +334,60 @@
 /* ====================== TABLET (768–1024) ====================== */
 
 @media (max-width: 1024px) {
+  /*
+   * Una sola columna: las dos columnas se deshacen y los bloques se ordenan
+   * galería, migas y título, características, botones y descripción (el
+   * producto, qué es, sus datos y qué hacer; el texto largo, al final).
+   */
+  section.principal {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .columnaTexto,
+  .columnaIzquierda {
+    display: contents;
+  }
+
+  .columnaGaleria {
+    order: 1;
+  }
+
+  .principal .cabecera {
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0 4.7cqi;
+  }
+
+  .principal .datos {
+    order: 3;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    padding: 0 4.7cqi;
+  }
+
+  .solo360 {
+    order: 4;
+    display: block;
+    padding: 0 4.7cqi;
+  }
+
+  .principal .botones {
+    order: 4;
+    margin: 0;
+    padding: 0 4.7cqi;
+  }
+
+  .descripcion {
+    order: 5;
+    padding: 0 4.7cqi 4.7cqi;
+  }
+
   /* La píldora de las migas de la V2 en tablet y móvil es para ir sobre la foto desenfocada. */
-  .principal .columnaDatos .cabecera .migas ol {
+  .principal .columnaTexto .cabecera .migas ol {
     border-color: var(--color-texto-suave);
     background: transparent;
     color: var(--color-texto-suave);
@@ -303,9 +414,14 @@
     content: none;
   }
 
-  .principal .columnaDatos .cabecera .titulo {
+  .principal .columnaTexto .cabecera .titulo {
     color: var(--color-texto);
     text-shadow: none;
+  }
+
+  .principal .datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .franja {

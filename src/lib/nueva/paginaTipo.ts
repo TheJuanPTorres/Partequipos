@@ -7,6 +7,7 @@ import { rutas } from "../routes";
 import { tituloPorDefecto } from "../seo/porDefecto";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
+import { datosDeTarjeta, type TarjetaEquipo } from "./paginaMarcaAndres";
 import type { GrupoDeSubtipo } from "./subtipos";
 
 /**
@@ -46,6 +47,24 @@ export function enlacesDeEquipos(
   equipos: EquiposNuevo[],
 ): ModeloEnlace[] {
   return equipos.filter(publicable).map((e) => enlaceDeEquipo(marca, tipoSlug, e));
+}
+
+/**
+ * Los equipos del tipo como TARJETAS, las mismas de la página de marca (foto, nombre, datos
+ * «Destacar», «Ver ficha» y «Cotizar»). Los sin nombre o sin slug no salen.
+ */
+export function tarjetasDeEquipos(
+  marca: Pick<MarcasMaquinaria, "slug">,
+  tipoSlug: string,
+  equipos: EquiposNuevo[],
+): TarjetaEquipo[] {
+  return equipos.filter(publicable).map((e) => ({
+    id: e.id,
+    nombre: texto(e.nombre),
+    href: `${rutas.equipoNuevo(marca.slug, tipoSlug, e.slug)}/`,
+    foto: (e.imagenes ?? []).map((i) => imagenDeMedia(i, "")).find(Boolean) ?? null,
+    datos: datosDeTarjeta(e.fichaTecnica),
+  }));
 }
 
 /**

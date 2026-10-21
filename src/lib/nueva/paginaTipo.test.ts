@@ -7,6 +7,7 @@ import {
   enlacesDeEquipos,
   fotoDeCabecera,
   gruposDeEnlaces,
+  tarjetasDeEquipos,
   tituloFranja,
   vistaEncabezadoTipoNueva,
 } from "./paginaTipo";
@@ -17,6 +18,31 @@ const tipo = (extra: Partial<TiposMaquinaria> = {}) =>
 const media = (id: number) => ({ id, url: `/f${id}.jpg`, width: 800, height: 600, alt: "x" });
 const equipo = (id: number, extra: Partial<EquiposNuevo> = {}) =>
   ({ id, nombre: `Equipo ${id}`, slug: `equipo-${id}`, ...extra }) as EquiposNuevo;
+
+describe("tarjetasDeEquipos", () => {
+  it("una tarjeta por equipo publicable, con su ficha, su foto y sus datos destacados", () => {
+    const r = tarjetasDeEquipos(marca, "excavadoras", [
+      equipo(1, {
+        imagenes: [media(9)] as EquiposNuevo["imagenes"],
+        fichaTecnica: [
+          { etiqueta: "Motor", valor: "Isuzu", destacar: true },
+        ] as EquiposNuevo["fichaTecnica"],
+      }),
+      equipo(2, { nombre: " " }),
+      equipo(3, { slug: "" }),
+    ]);
+    assert.equal(r.length, 1);
+    assert.equal(
+      r[0]!.href,
+      "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/hitachi/excavadoras/equipo-1/",
+    );
+    assert.equal(r[0]!.foto?.url, "/f9.jpg");
+    assert.deepEqual(
+      r[0]!.datos.map((d) => d.etiqueta),
+      ["Motor"],
+    );
+  });
+});
 
 describe("enlacesDeEquipos", () => {
   it("un enlace por equipo, a su ficha, y sin los que no tienen nombre o slug", () => {

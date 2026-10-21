@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
-import { ModelosTipo } from "@/components/repuestos/ModelosTipo";
+import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
+import { Revelado } from "@/components/movimiento/Revelado";
+import { TarjetaEquipo } from "@/components/nueva/TarjetaEquipo";
+import estilosTarjetas from "@/components/nueva/marcaNueva.module.css";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { estiloDeMarca } from "@/lib/marca/colorMarca";
-import {
-  enlacesDeEquipos,
-  gruposDeEnlaces,
-  tituloFranja,
-  vistaEncabezadoTipoNueva,
-} from "@/lib/nueva/paginaTipo";
+import { colorDeMarca, estiloDeMarca, tintaSobre } from "@/lib/marca/colorMarca";
+import { tarjetasDeEquipos, tituloFranja, vistaEncabezadoTipoNueva } from "@/lib/nueva/paginaTipo";
+import type { TarjetaEquipo as DatosTarjeta } from "@/lib/nueva/paginaMarcaAndres";
 import { gruposDeSubtipos, subtiposDe } from "@/lib/nueva/subtipos";
 import {
   getEquiposDeTipo,
@@ -21,6 +21,10 @@ import {
   getTipoMaquinariaPorSlug,
   getTiposMaquinaria,
 } from "@/lib/queries/getMaquinaria";
+import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
+import { getEmpresa } from "@/lib/queries/getSeo";
+import { turnstileSiteKey } from "@/lib/turnstile";
+import { enlaceWhatsApp } from "@/lib/whatsapp";
 import { metadataSinIndexar } from "@/lib/filtros/seo";
 import { rutas } from "@/lib/routes";
 import { indexacionPermitida } from "@/lib/seo/config";
@@ -35,6 +39,7 @@ type Params = { marca: string; tipo: string };
 
 /** Ancla de la franja de equipos: a ella baja el icono de ratón del encabezado. */
 const ANCLA_MODELOS = "modelos-nueva";
+const ANCLA_CONTACTO = "contacto-tipo-nueva";
 
 export async function generateStaticParams(): Promise<Params[]> {
   const tipos = await getTiposMaquinaria();
@@ -100,13 +105,26 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
     { nombre: tipo.nombre, path: rutas.tipoMaquinaria(marca.slug, tipo.slug) },
   ];
 
-  // La ficha cuelga del tipo del equipo (en un paraguas, su subtipo).
-  const modelos = grupos
-    ? grupos.flatMap((g) => enlacesDeEquipos(marca, g.tipo.slug, g.equipos))
-    : enlacesDeEquipos(marca, tipo.slug, equipos);
+  const [global, empresa] = await Promise.all([getRepuestosMarca(), getEmpresa()]);
+  const nombre = marca.nombre.trim();
+  const origen = `${rutas.tipoMaquinaria(marca.slug, tipo.slug)}/`;
+  const texto = (v: string | null | undefined) => v?.trim() ?? "";
+  // La ficha cuelga del tipo del equipo (en un paraguas, su subtipo). Las tarjetas son las de la marca.
+  const bloques: { clave: string; titulo: string | null; tarjetas: DatosTarjeta[] }[] = grupos
+    ? grupos.map((g) => ({
+        clave: g.tipo.slug,
+        titulo: g.tipo.nombre,
+        tarjetas: tarjetasDeEquipos(marca, g.tipo.slug, g.equipos),
+      }))
+    : [{ clave: tipo.slug, titulo: null, tarjetas: tarjetasDeEquipos(marca, tipo.slug, equipos) }];
+  const hayTarjetas = bloques.some((b) => b.tarjetas.length > 0);
+  const color = colorDeMarca(marca.colorMarca);
+  const acento = color
+    ? ({ "--acento": color, "--acento-tinta": tintaSobre(color) } as CSSProperties)
+    : undefined;
 
   return (
-    <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
+    <main className={estilos.pagina} style={{ ...estiloDeMarca(marca.colorMarca), ...acento }}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
         <Breadcrumbs items={breadcrumbs} />
@@ -118,12 +136,53 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
         bajaSinFoto
       />
 
-      <ModelosTipo
+      <section
         id={ANCLA_MODELOS}
-        titulo={tituloFranja(marca, tipo)}
-        modelos={modelos}
-        grupos={grupos ? gruposDeEnlaces(marca, grupos) : null}
-        vacio={`Todavía no hay equipos publicados para ${tituloPorDefecto.tipoMaquinaria(tipo.nombre, marca.nombre)}.`}
+        className={estilosTarjetas.seccionTipo}
+        aria-labelledby="modelos-nueva-t"
+      >
+        <Revelado
+          como="h2"
+          id="modelos-nueva-t"
+          ritmo="titulo"
+          texto={tituloFranja(marca, tipo)}
+          className={estilosTarjetas.tituloTipo}
+        />
+        {hayTarjetas ? (
+          bloques.map((b, i) => (
+            <div key={b.clave} id={b.titulo ? `subtipo-${b.clave}` : undefined}>
+              {b.titulo ? <h3 className={estilosTarjetas.tituloTipo}>{b.titulo}</h3> : null}
+              <ul className={estilosTarjetas.rejilla}>
+                {b.tarjetas.map((e, j) => (
+                  <TarjetaEquipo
+                    key={e.id}
+                    equipo={e}
+                    anclaContacto={ANCLA_CONTACTO}
+                    prioridad={i === 0 && j < 3}
+                  />
+                ))}
+              </ul>
+            </div>
+          ))
+        ) : (
+          <p>{`Todavía no hay equipos publicados para ${tituloPorDefecto.tipoMaquinaria(tipo.nombre, marca.nombre)}.`}</p>
+        )}
+      </section>
+
+      <ContactoMarca
+        id={ANCLA_CONTACTO}
+        titulo={texto(global.contactoTitulo)}
+        subtitulo={texto(global.contactoSubtitulo)}
+        boton={texto(global.contactoBoton)}
+        origen={origen}
+        siteKey={turnstileSiteKey()}
+        whatsapp={empresa ? enlaceWhatsApp(empresa.whatsapp) : undefined}
+        marca={nombre}
+        formulario={{
+          titulo: `Contacto sobre maquinaria ${nombre}`,
+          conCiudad: true,
+          etiquetaMensaje: "¿En qué estás interesado?",
+        }}
       />
     </main>
   );

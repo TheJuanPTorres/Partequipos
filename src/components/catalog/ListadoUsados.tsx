@@ -17,8 +17,8 @@ const numero = (n: number) => n.toLocaleString("es-CO");
  * El listado de maquinaria USADA de una categoría o de una marca, una página
  * cada vez (`src/lib/usados/listado.ts`), con la MISMA plantilla que el de
  * nueva («Categoría secundaria» de ux-9; 2026-10-18, petición del cliente):
- * cabecera, pestañas de categorías (solo en las categorías), filtros a la
- * izquierda, ordenar, vista lista/rejilla y tarjetas con peso, año y horas.
+ * cabecera, filtros a la izquierda (en las categorías, con los botones de
+ * categoría encima, `pestanasEnLateral`), ordenar, vista lista/rejilla y tarjetas con peso, año y horas.
  * Las piezas son las comunes (`src/components/listado/`).
  *
  * Solo se listan las disponibles; las vendidas se marcan, no se borran. Sin
@@ -59,7 +59,8 @@ export function ListadoUsados({
       descripcion={registro.descripcion}
       enlaces={ambito.enlaces}
       pestanas={ambito.pestanas}
-      etiquetaPestanas="Categorías de maquinaria usada"
+      etiquetaPestanas="Categorías"
+      pestanasEnLateral
       catalogo={catalogo}
       listado={listado}
       rutaDe={(n) => `${ambito.ruta(n)}/`}

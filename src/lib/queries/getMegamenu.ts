@@ -64,6 +64,8 @@ const megamenuEnCache = unstable_cache(
       payload.find({
         collection: "categorias-usada",
         ...base,
+        // Sin las ocultas (`mostrarEnWeb`, 2026-10-20).
+        where: { mostrarEnWeb: { not_equals: false } },
         select: { ...sinMarca, enOtros: true, orden: true },
       }),
       payload.find({ collection: "marcas", ...marcas }),

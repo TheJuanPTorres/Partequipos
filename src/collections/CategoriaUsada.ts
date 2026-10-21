@@ -23,7 +23,7 @@ export const CategoriaUsada: CollectionConfig = {
   labels: { singular: "Categoría de maquinaria usada", plural: "Categorías de maquinaria usada" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "slug", "enOtros"],
+    defaultColumns: ["nombre", "slug", "enOtros", "mostrarEnWeb"],
     group: "Maquinaria",
   },
   access: {
@@ -65,6 +65,18 @@ export const CategoriaUsada: CollectionConfig = {
       admin: {
         description:
           "Marcada, la categoría sale dentro de «Otros» (menú e índice de usados). Desmarcada, sale sola en el primer nivel, como Excavadoras y Aditamentos. Su página no cambia.",
+      },
+    },
+    // Ocultar sin borrar (2026-10-20, dirección: Compactadores). Ver `getCategoriasUsada`.
+    {
+      name: "mostrarEnWeb",
+      type: "checkbox",
+      defaultValue: true,
+      label: "Mostrar en la web",
+      admin: {
+        position: "sidebar",
+        description:
+          "Desmarcada, la categoría y sus unidades desaparecen de toda la web (menú, índice, «Otros», pestañas, listados y sitemap) sin borrarse del panel, y su dirección da «página no encontrada». Para llevarla a otra página, crear una redirección en «Redirecciones».",
       },
     },
     {

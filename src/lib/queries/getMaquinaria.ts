@@ -267,7 +267,19 @@ const categoriasUsadaEnCache = unstable_cache(
   { tags: [ETIQUETAS_DATOS.usados] },
 );
 
-export const getCategoriasUsada = cache(() => categoriasUsadaEnCache());
+/** «Mostrar en la web» desmarcada: la categoría no existe para el público (se queda en el panel). */
+export const categoriaUsadaVisible = (c: { mostrarEnWeb?: boolean | null }) =>
+  c.mostrarEnWeb !== false;
+
+/**
+ * Las categorías de usada VISIBLES. Las ocultas (`mostrarEnWeb`, 2026-10-20) no
+ * salen en ninguna parte ni dan página: `getCategoriaUsadaPorSlug` las trata
+ * como inexistentes. El inventario las lee SIN filtrar para resolver sus
+ * referencias y después descarta las unidades de una oculta.
+ */
+export const getCategoriasUsada = cache(async () =>
+  (await categoriasUsadaEnCache()).filter(categoriaUsadaVisible),
+);
 
 export const getCategoriaUsadaPorSlug = cache(
   async (slug: string): Promise<CategoriasUsada | null> =>
@@ -402,42 +414,47 @@ const inventarioUsadosEnCache = unstable_cache(
         : v && typeof v === "object" && "id" in v
           ? (v as { id: number }).id
           : null;
-    return docs.map((u) => {
-      const categoriaId = idRel(u.categoria)!;
-      const marcaId = idRel(u.marcaUsada);
-      const primera = Array.isArray(u.imagenes) ? u.imagenes[0] : null;
-      const idFoto = primera == null ? null : typeof primera === "object" ? primera.id : primera;
-      const foto = idFoto == null ? undefined : porId.get(idFoto);
-      return {
-        id: u.id,
-        nombre: u.nombre,
-        slug: u.slug ?? null,
-        updatedAt: u.updatedAt,
-        fechaPublicacion: u.fechaPublicacion ?? u.createdAt,
-        categoria: categoriaId,
-        categoriaRef: ref(categoriaPorId.get(categoriaId)),
-        marcaUsada: marcaId,
-        marcaRef: marcaId === null ? null : ref(marcaPorId.get(marcaId)),
-        marca: u.marca,
-        modelo: u.modelo,
-        anio: u.anio,
-        horometro: u.horometro,
-        pesoOperativo: u.pesoOperativo,
-        ubicacion: u.ubicacion,
-        descripcion: u.descripcion,
-        foto: foto
-          ? {
-              id: foto.id,
-              url: foto.url,
-              alt: foto.alt,
-              width: foto.width,
-              height: foto.height,
-              focalX: foto.focalX,
-              focalY: foto.focalY,
-            }
-          : null,
-      };
-    });
+    return docs
+      .filter((u) => {
+        const c = categoriaPorId.get(idRel(u.categoria)!);
+        return !c || categoriaUsadaVisible(c);
+      })
+      .map((u) => {
+        const categoriaId = idRel(u.categoria)!;
+        const marcaId = idRel(u.marcaUsada);
+        const primera = Array.isArray(u.imagenes) ? u.imagenes[0] : null;
+        const idFoto = primera == null ? null : typeof primera === "object" ? primera.id : primera;
+        const foto = idFoto == null ? undefined : porId.get(idFoto);
+        return {
+          id: u.id,
+          nombre: u.nombre,
+          slug: u.slug ?? null,
+          updatedAt: u.updatedAt,
+          fechaPublicacion: u.fechaPublicacion ?? u.createdAt,
+          categoria: categoriaId,
+          categoriaRef: ref(categoriaPorId.get(categoriaId)),
+          marcaUsada: marcaId,
+          marcaRef: marcaId === null ? null : ref(marcaPorId.get(marcaId)),
+          marca: u.marca,
+          modelo: u.modelo,
+          anio: u.anio,
+          horometro: u.horometro,
+          pesoOperativo: u.pesoOperativo,
+          ubicacion: u.ubicacion,
+          descripcion: u.descripcion,
+          foto: foto
+            ? {
+                id: foto.id,
+                url: foto.url,
+                alt: foto.alt,
+                width: foto.width,
+                height: foto.height,
+                focalX: foto.focalX,
+                focalY: foto.focalY,
+              }
+            : null,
+        };
+      });
   },
   ["inventario-usados", CLAVE_DESPLIEGUE],
   { tags: [ETIQUETAS_DATOS.usados] },

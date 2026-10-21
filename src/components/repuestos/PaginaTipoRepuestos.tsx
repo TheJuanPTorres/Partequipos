@@ -105,6 +105,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         tipo={tipo}
         modelos={enlaces}
         verTodo="Ver repuestos"
+        tituloPanel={`${tipoEnTitulo(tipo.nombre)} ${marca.nombre.trim().toUpperCase()}`}
         grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
       />

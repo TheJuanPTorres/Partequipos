@@ -188,6 +188,12 @@ las marcas, el contacto y los testimonios no cambian.
   (328 de 349 la tienen); sin ella, la de su serie y, si no, la del tipo. La sección es
   blanca y se une con la de categorías que la sigue: la franja del color de la marca bajo
   el encabezado ya no lleva los botones.
+- **Largo de la página de tipo (decisión de dirección, el mismo día):** de cada serie (o de
+  la lista entera, en un tipo sin series) solo se ven las 2 PRIMERAS FILAS (6 tarjetas en
+  escritorio, 4 en tablet, 2 en móvil) y debajo «Ver todos (N)», que abre el mismo panel con
+  la serie completa. Si cabe en 2 filas, no hay botón. Es solo CSS con
+  `@media (scripting: enabled)`: sin JavaScript se ven todas y el botón no sale. Las anclas
+  (`#serie-ex`) no cambian.
 
 ## 5. Pendiente
 

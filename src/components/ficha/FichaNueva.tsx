@@ -47,6 +47,9 @@ export type TarjetaOtra = {
   pdf: PdfVisor | null;
 };
 
+/** Caracteres a partir de los que un valor ocupa dos columnas en la cabecera. */
+const VALOR_LARGO = 18;
+
 function ListaDatos({
   datos,
   clase,
@@ -60,7 +63,11 @@ function ListaDatos({
   return (
     <ul className={clase}>
       {datos.map((d) => (
-        <li key={`${d.etiqueta}-${d.valor}`}>
+        <li
+          key={`${d.etiqueta}-${d.valor}`}
+          // Un valor largo («22/26/30 in (según requerimiento cliente)») ocupa dos columnas.
+          data-largo={apilado && d.valor.length > VALOR_LARGO ? "" : undefined}
+        >
           <IconoDato icono={d.icono} className={estilos.iconoDato} />
           {apilado ? (
             // La copia invisible fija el alto: al llegar Inter, la pastilla no cambia de alto (CLS).

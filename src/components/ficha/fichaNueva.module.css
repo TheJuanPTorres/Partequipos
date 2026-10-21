@@ -116,13 +116,25 @@ section.principal[data-con-izquierda] {
 /* Las características bajo la galería: más compactas que en la V2, en 3 columnas. */
 .principal .datos {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Las de valor largo ocupan dos columnas; `dense` rellena los huecos que dejan. */
+  grid-auto-flow: dense;
   gap: 12px;
   width: auto;
   margin: 0;
   padding: 0 2.82cqi;
 }
 
+.principal .datos li[data-largo] {
+  grid-column: span 2;
+}
+
+/* En la pastilla, la copia de la reserva se ensancha menos: si no, dejaba una línea en blanco. */
+.principal .datos .reserva::after {
+  letter-spacing: 0.02em;
+}
+
 .principal .datos li {
+  min-height: 0;
   gap: 8px;
   padding: 10px 14px;
   font-size: var(--texto-cuerpo);

@@ -38,7 +38,7 @@ const ANCLA_CONTACTO = "contacto-marca-nueva";
  * Hitachi, CASE, Dynapac y Yanmar; Aditamentos sigue con la suya.
  *
  * 1. Cabecera con el logo de la marca, `Maquinaria <marca>`, su texto de
- *    presentación y el icono del ratón.
+ *    presentación y el icono del ratón, sobre la franja del color de la marca.
  * 2. «Nuestra línea de equipos <marca> incluye:», la franja en movimiento con
  *    sus tipos (enlazados) y la frase de cierre (editable en la marca).
  * 3. Una sección por tipo con las tarjetas de sus equipos (6 como mucho;
@@ -74,10 +74,16 @@ export async function PaginaMarcaNueva({ marca }: { marca: MarcasMaquinaria }) {
     { nombre: "Marcas", path: rutas.marcasMaquinaria() },
     { nombre, path: origen },
   ];
-  // El color de la marca solo da el acento de los botones; sin él, el rojo del sitio.
+  // El color de la marca da el acento de los botones (sin él, el rojo del sitio) y la
+  // franja tras el banner, desde su mitad hasta un poco por debajo, como en las marcas de
+  // repuestos (dirección, 2026-10-21). Sin color, sin franja.
   const color = colorDeMarca(marca.colorMarca);
   const acento = color
-    ? ({ "--acento": color, "--acento-tinta": tintaSobre(color) } as CSSProperties)
+    ? ({
+        "--acento": color,
+        "--acento-tinta": tintaSobre(color),
+        "--marca-amarillo": color,
+      } as CSSProperties)
     : undefined;
 
   return (
@@ -96,7 +102,7 @@ export async function PaginaMarcaNueva({ marca }: { marca: MarcasMaquinaria }) {
           logo: conAlt(logoDeMarca(marca, logos), nombre),
         }}
         anclaSiguiente={ANCLA_LINEA}
-        franja={false}
+        franja={Boolean(color)}
         indice
         etiquetaRaton="Ir a la línea de equipos"
       />

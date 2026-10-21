@@ -70,6 +70,8 @@ export function PaginaMarcaLubricanteProvisional({
           imagen: s.imagen,
           soloEscritorio: false,
         }))}
+        // El estilo «difuminado» de las tarjetas del sitio (dirección, 2026-10-21).
+        indice
       />
 
       {marca.descripcion ? (

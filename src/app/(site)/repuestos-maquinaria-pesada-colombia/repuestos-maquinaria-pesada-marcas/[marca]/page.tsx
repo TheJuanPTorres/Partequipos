@@ -104,6 +104,8 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
         titulo={texto(global.tituloTipos)}
         verTodo={texto(global.verTodoTexto)}
         tarjetas={tarjetasDeTipos(marca, tipos)}
+        // El estilo «difuminado» de las tarjetas del sitio (dirección, 2026-10-21).
+        indice
       />
 
       <ContactoMarca

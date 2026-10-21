@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { validarVista360 } from "../lib/maquinaria/fichaNueva";
 import { ICONOS_FICHA, validarDestacarFila, type FilaFicha } from "../lib/maquinaria/fichaTecnica";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
@@ -145,7 +146,7 @@ export const EquipoNuevo: CollectionConfig = {
       labels: { singular: "Especificación", plural: "Especificaciones" },
       admin: {
         description:
-          "Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. Marca «Destacar» en hasta 4 filas: salen con su icono junto al título de la ficha (y las 3 primeras, en las tarjetas de otras referencias).",
+          "Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. En la ficha salen como mucho 5, junto al título: potencia neta, peso operativo, motor, fuerza de tracción máxima y ancho de la zapata (se reconocen por la etiqueta); si falta alguna, se completa con las siguientes filas, en el orden de aquí. «Destacar» elige los datos de la tarjeta del equipo en la página de su marca.",
       },
       fields: [
         {
@@ -208,6 +209,21 @@ export const EquipoNuevo: CollectionConfig = {
       admin: {
         description:
           "Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 30 MB) o elige uno ya subido en «Documentos».",
+      },
+    },
+    /*
+     * VISTA 360 (2026-10-21, ficha nueva de Andrés): un ENLACE, no un fichero.
+     * La vista 360 la aloja su proveedor (Matterport, Kuula, un visor propio…) y
+     * la ficha la abre en una ventana emergente; sin enlace, no hay botón.
+     */
+    {
+      name: "vista360",
+      type: "text",
+      label: "Vista 360 (enlace)",
+      validate: validarVista360,
+      admin: {
+        description:
+          "Opcional. El enlace de la vista 360 del equipo (empieza por https://). Sale el botón «Ver en vista 360», que la abre en una ventana sobre la ficha. Vacío, no hay botón.",
       },
     },
     /*

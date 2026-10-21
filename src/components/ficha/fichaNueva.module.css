@@ -1,0 +1,534 @@
+/*
+ * FICHA DE MAQUINARIA NUEVA — plantilla de Andrés 4036 (2026-10-21).
+ *
+ * Va ENCIMA de las clases de la V2 (`ficha.module.css`, que no se toca: la usa
+ * la ficha usada). Cada regla que corrige una de la V2 lleva las clases
+ * propias de este módulo suficientes para ganarle por especificidad, no por el
+ * orden en que se carguen las hojas. Cortes del kit: escritorio ≥ 1025,
+ * tablet 768–1024, móvil ≤ 767. Detalle: docs/diseno/decisiones-ficha-nueva.md.
+ */
+
+/* ====================== 1. CABECERA DEL PRODUCTO ====================== */
+
+/*
+ * FONDO NEUTRO (dirección: sin el degradado rojo #CE2A2C → blanco de la
+ * plantilla): la tarjeta blanca de radio 30 sobre el gris de la página, como
+ * el resto de tarjetas del sitio. La galería va sin el fondo desenfocado de la
+ * V2 (`sinFondo`), así que toda la tarjeta es blanca.
+ */
+.principal {
+  background: var(--color-fondo);
+}
+
+/* La columna de la galería: «Ver en vista 360» encima de la foto, alineado a la izquierda. */
+.columnaGaleria {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/*
+ * «Ver en vista 360»: píldora blanca con texto y borde del negro del kit y, al
+ * pasar, rojo. DESVIACIÓN: en la plantilla el borde es naranja (#E58624), un
+ * color que no está en la paleta del kit; se toma por errata.
+ */
+.boton360 {
+  /* La galería ocupa todo el ancho de la columna; el botón, solo lo suyo. */
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--boton-relleno);
+  border: var(--boton-borde) solid var(--color-texto);
+  border-radius: 30px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    color 0.3s;
+}
+
+.boton360 svg {
+  width: 1.3em;
+  height: 1.3em;
+  flex: none;
+}
+
+.boton360:hover {
+  border-color: var(--color-marca);
+  background: var(--color-marca);
+  color: var(--color-fondo);
+}
+
+.boton360:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/*
+ * REPARTO EN ESCRITORIO (dirección, 2026-10-21): la derecha (migas, título,
+ * descripción y botones) era mucho más alta que la galería y dejaba un hueco
+ * bajo la foto. Ahora la izquierda lleva la galería y, debajo, las
+ * características; las dos columnas se centran en vertical. En el HTML la
+ * derecha va primero (el <h1> antes que la galería): la rejilla la coloca.
+ */
+section.principal[data-con-izquierda] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.principal[data-con-izquierda] .columnaIzquierda {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.principal[data-con-izquierda] .columnaTexto {
+  grid-column: 2;
+  grid-row: 1;
+  /* Más ancho para el título que en la V2: «CASE CONSTRUCTION» cabe en una línea. */
+  padding: 4.7cqi 3.5cqi 4.7cqi 1cqi;
+}
+
+.columnaTexto {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 4.7cqi;
+}
+
+.columnaIzquierda {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding-bottom: 2.82cqi;
+}
+
+/*
+ * LAS CARACTERÍSTICAS (dirección, 2026-10-21): cada tarjeta en DOS líneas
+ * exactas, el nombre y el valor, todas con el mismo alto y el contenido
+ * centrado en vertical. Reparto: 3 por fila y la última fila se reparte el
+ * ancho entero (con 5, 3 + 2 a mitad y mitad; con 3, una fila); con 4, 2 + 2
+ * (dirección). En móvil, 2 por fila y la impar del final a todo el ancho.
+ * Rejilla de 6 columnas: cada tarjeta ocupa 2, las dos últimas de una fila de
+ * dos ocupan 3 y la sola, 6. El ancho no depende del texto, así que al llegar
+ * Inter nada se mueve (CLS); lo que no cabe se corta con «…» (`PastillaDato`).
+ */
+.principal .datos {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  width: auto;
+  margin: 0;
+  padding: 0 2.82cqi;
+}
+
+.principal .datos li {
+  grid-column: span 2;
+  min-width: 0;
+  min-height: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  font-size: var(--texto-cuerpo);
+  line-height: 1.35;
+}
+
+/* Última fila de dos: mitad y mitad. */
+.principal .datos li:nth-child(3n + 1):nth-last-child(2),
+.principal .datos li:nth-child(3n + 2):last-child {
+  grid-column: span 3;
+}
+
+/* Última fila de una: todo el ancho. */
+.principal .datos li:nth-child(3n + 1):last-child {
+  grid-column: 1 / -1;
+}
+
+/* Con 4, 2 + 2 (dirección): no 3 + 1. En móvil ya van de 2 en 2. */
+@media (min-width: 768px) {
+  .principal .datos li:first-child:nth-last-child(4),
+  .principal .datos li:first-child:nth-last-child(4) ~ li {
+    grid-column: span 3;
+  }
+}
+
+/* El icono, centrado con las dos líneas. */
+.principal .datos li > svg {
+  height: 1.35em;
+  align-self: center;
+}
+
+.dosLineas {
+  min-width: 0;
+}
+
+/* Cada línea, entera si cabe y con «…» si no. */
+.dosLineas > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dosLineas b {
+  font-weight: 600;
+}
+
+/* Cortada: el texto entero al pasar el ratón (`title`) y al tocarla, desplegada. */
+.principal .datos li[data-cortado] {
+  cursor: pointer;
+}
+
+.principal .datos li[data-abierto] .dosLineas > * {
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.principal .datos li[data-cortado]:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+}
+
+/* Sin galería, solo «Ver en vista 360» (si lo hay) antes de los botones. */
+.solo360 {
+  display: contents;
+}
+
+/* Título: en escritorio y tablet, la marca y la referencia en dos líneas; en móvil, el nombre. */
+.tituloEscritorio {
+  display: block;
+}
+
+.lineaMarca {
+  display: block;
+  text-transform: uppercase;
+}
+
+.lineasTitulo > :last-child {
+  display: block;
+}
+
+.tituloMovil {
+  display: none;
+}
+
+/* La descripción comercial, bajo el título (en la plantilla, un párrafo). */
+.descripcion {
+  max-width: 650px;
+  color: var(--color-texto);
+  line-height: 1.5;
+}
+
+/*
+ * Párrafos separados EXACTAMENTE una línea, con el mismo interlineado en todo:
+ * así la copia de la reserva (párrafos separados por una línea en blanco)
+ * ocupa las mismas líneas que el texto. Se anulan los márgenes y el
+ * interlineado de `RichText`.
+ */
+.cuerpoDescripcion,
+.cuerpoDescripcion * {
+  margin: 0;
+  line-height: inherit;
+}
+
+.cuerpoDescripcion > * + *,
+.cuerpoDescripcion > div > * + * {
+  margin-top: 1lh;
+}
+
+/* Un título dentro de la descripción no compite con el `<h1>`: como el texto, en negrita. */
+.cuerpoDescripcion :is(h2, h3, h4) {
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.cuerpoDescripcion :is(ul, ol) {
+  padding-left: 1.2em;
+}
+
+/*
+ * RESERVA: la caja no cambia de alto al llegar Inter (sin precarga, §10.36).
+ * Misma idea que la cabecera del artículo (`cabeceraArticulo.module.css`): una
+ * COPIA INVISIBLE del texto (`data-reserva`) en la fuente de respaldo
+ * ensanchada 0,04 em y en negrita, en la misma celda de la rejilla, así que
+ * el alto es siempre el de la copia, que no depende de Inter. Medido antes:
+ * CLS 0,12 a 1010 en el 1150M (la descripción perdía una línea).
+ */
+.reserva {
+  display: grid;
+}
+
+.reserva > *,
+.reserva::after {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+/* En el título, la copia va en mayúsculas como su primera línea (así mide al menos lo mismo). */
+.reservaTitulo::after {
+  text-transform: uppercase;
+}
+
+.reserva::after {
+  content: attr(data-reserva);
+  visibility: hidden;
+  pointer-events: none;
+  white-space: pre-line;
+  font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/*
+ * Datos con icono: las pastillas de vidrio de la plantilla son casi invisibles
+ * sobre blanco (fondo blanco al 12 %). Sobre el fondo neutro van en el gris
+ * del kit (#F0F0F0), sin borde ni sombra. Mismas columnas fijas que la V2 (CLS).
+ */
+.principal .datos li {
+  border-color: transparent;
+  background: var(--color-fondo-seccion);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* ====================== 2. «OTRAS <TIPO>» ====================== */
+
+.otras {
+  padding: 0 var(--ficha-margen) 5cqi;
+}
+
+/* La franja: tarjeta blanca de radio 30, la foto del tipo a la izquierda y el título a la derecha. */
+.franja {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: max(1cqi, 12px);
+  border-radius: var(--ficha-radio);
+  background: var(--color-fondo);
+}
+
+/* El logo de la marca (`LogoMarca`), entero, en una caja de 140 × 64 sobre blanco. */
+.cajaLogoFranja {
+  display: flex;
+  width: 140px;
+  height: 64px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding-left: 10px;
+}
+
+.logoFranja {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.tituloFranja {
+  margin: 0 0 0 auto;
+  padding-right: 10px;
+  color: var(--color-texto);
+  text-align: right;
+}
+
+/*
+ * Las tarjetas con la regla del sitio (#281, la de `TarjetasMarca`): 1 o 2
+ * centradas y 3 en fila en escritorio; en tablet, 2 con la impar centrada; en
+ * móvil, una debajo de otra. La plantilla OCULTA la 3.ª en tablet y la 2.ª y
+ * 3.ª en móvil; aquí se ven todas.
+ */
+.rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 1025px) {
+  .rejilla {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .rejilla > .tarjeta {
+    grid-column: span 2;
+  }
+
+  .rejilla > .tarjeta:last-child:nth-child(3n + 1) {
+    grid-column: 3 / span 2;
+  }
+
+  .rejilla > .tarjeta:nth-last-child(2):nth-child(3n + 1) {
+    grid-column: 2 / span 2;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .rejilla {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .rejilla > .tarjeta {
+    grid-column: span 2;
+  }
+
+  .rejilla > .tarjeta:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+}
+
+/* La V2 oculta tarjetas en tablet y móvil (`.tarjeta:nth-child(…)`); aquí no. */
+.otras .rejilla > .tarjeta {
+  display: flex;
+}
+
+/* ====================== 3–5. ASESORÍA, CONTACTO Y TESTIMONIOS ====================== */
+
+/* La llamada sola (en la V2 el formulario iba debajo, dentro de la misma sección). */
+.asesoria {
+  padding-bottom: 0;
+}
+
+/* El contacto y los testimonios siguen sobre el blanco de la llamada. */
+.cierre {
+  padding-top: 5cqi;
+  background: var(--color-fondo);
+}
+
+/* ====================== TABLET (768–1024) ====================== */
+
+@media (max-width: 1024px) {
+  /*
+   * Una sola columna: las dos columnas se deshacen y los bloques se ordenan
+   * galería, migas y título, características, botones y descripción (el
+   * producto, qué es, sus datos y qué hacer; el texto largo, al final).
+   */
+  section.principal {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .columnaTexto,
+  .columnaIzquierda {
+    display: contents;
+  }
+
+  .columnaGaleria {
+    order: 1;
+  }
+
+  .principal .cabecera {
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0 4.7cqi;
+  }
+
+  .principal .datos {
+    order: 3;
+    padding: 0 4.7cqi;
+  }
+
+  .solo360 {
+    order: 4;
+    display: block;
+    padding: 0 4.7cqi;
+  }
+
+  .principal .botones {
+    order: 4;
+    margin: 0;
+    padding: 0 4.7cqi;
+  }
+
+  .descripcion {
+    order: 5;
+    padding: 0 4.7cqi 4.7cqi;
+  }
+
+  /* La píldora de las migas de la V2 en tablet y móvil es para ir sobre la foto desenfocada. */
+  .principal .columnaTexto .cabecera .migas ol {
+    border-color: var(--color-texto-suave);
+    background: transparent;
+    color: var(--color-texto-suave);
+  }
+}
+
+/* ====================== MÓVIL (≤ 767) ====================== */
+
+@media (max-width: 767px) {
+  .tituloEscritorio {
+    display: none;
+  }
+
+  .tituloMovil {
+    display: inline;
+  }
+
+  /*
+   * Sin el fondo desenfocado no hace falta el velo oscuro de la V2: el título y
+   * las migas van en el negro del kit sobre blanco. (En la plantilla el título
+   * de móvil es blanco porque va sobre el degradado rojo, que aquí no está.)
+   */
+  .principal .cabecera::before {
+    content: none;
+  }
+
+  .principal .columnaTexto .cabecera .titulo {
+    color: var(--color-texto);
+    text-shadow: none;
+  }
+
+  /* 2 por fila; la impar del final, a todo el ancho. */
+  .principal .datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .principal .datos li,
+  .principal .datos li:nth-child(3n + 1):nth-last-child(2),
+  .principal .datos li:nth-child(3n + 2):last-child,
+  .principal .datos li:nth-child(3n + 1):last-child {
+    grid-column: auto;
+  }
+
+  .principal .datos li:nth-child(odd):last-child {
+    grid-column: 1 / -1;
+  }
+
+  .principal .datos li {
+    padding: 12px;
+  }
+
+  .franja {
+    gap: 12px;
+  }
+
+  .cajaLogoFranja {
+    width: 100px;
+    height: 48px;
+  }
+
+  .tituloFranja {
+    padding-right: 4px;
+  }
+}

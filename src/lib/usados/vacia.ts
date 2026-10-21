@@ -79,12 +79,16 @@ const imagenDe = (foto: Foto): ImagenLista | null =>
 const primeraFoto = (equipos: EquipoNuevoAlternativa[]) =>
   imagenDe(equipos.find((e) => imagenDe(e.foto))?.foto ?? null);
 
-const equiposTexto = (n: number) => `${n} ${n === 1 ? "equipo nuevo" : "equipos nuevos"}`;
-
 /**
- * Las alternativas en maquinaria nueva de una categoría de usados: la
- * categoría de nueva con el mismo nombre (si tiene equipos) o, si no hay, cada
- * tipo de nueva con equipos que se llame igual. Hasta `tope` tarjetas.
+ * Las alternativas en maquinaria nueva de una categoría de usados: cada tipo
+ * de nueva con equipos que se llame igual («Cargadores Case Construction»;
+ * dirección, 2026-10-21) o, si no hay, la categoría de nueva con el mismo
+ * nombre (si tiene equipos). Hasta `tope` tarjetas.
+ *
+ * Se empareja por la DIRECCIÓN WEB de la categoría de usados (`slug`, que no
+ * cambia al renombrarla: «cargadores» sigue casando con el tipo «Cargadores»
+ * aunque la categoría pase a llamarse «Cargadores Frontales») y, si con ella no
+ * sale nada, por el nombre visible (2026-10-21, dirección).
  */
 export function alternativasEnNueva(
   nombreCategoria: string,
@@ -94,10 +98,52 @@ export function alternativasEnNueva(
     categoriaNueva: (slug: string) => string;
     tipoMaquinaria: (marca: string, tipo: string) => string;
   },
-  tope = 3,
+  { tope = 3, slug }: { tope?: number; slug?: string } = {},
 ): TarjetaMarca[] {
-  const buscado = nombreComparable(nombreCategoria);
-  if (!buscado) return [];
+  const candidatos = [
+    ...new Set(
+      [
+        slug ? nombreComparable(slug.replace(/-/g, " ")) : "",
+        nombreComparable(nombreCategoria),
+      ].filter(Boolean),
+    ),
+  ];
+  for (const buscado of candidatos) {
+    const tarjetas = alternativasPorNombre(buscado, categorias, equipos, rutas, tope);
+    if (tarjetas.length) return tarjetas;
+  }
+  return [];
+}
+
+function alternativasPorNombre(
+  buscado: string,
+  categorias: CategoriaNuevaAlternativa[],
+  equipos: EquipoNuevoAlternativa[],
+  rutas: {
+    categoriaNueva: (slug: string) => string;
+    tipoMaquinaria: (marca: string, tipo: string) => string;
+  },
+  tope: number,
+): TarjetaMarca[] {
+  const porTipo = new Map<number, EquipoNuevoAlternativa[]>();
+  for (const e of equipos) {
+    if (!e.tipoRef || !e.marcaRef || nombreComparable(e.tipoRef.nombre) !== buscado) continue;
+    porTipo.set(e.tipoId, [...(porTipo.get(e.tipoId) ?? []), e]);
+  }
+  const deTipo = [...porTipo.values()]
+    .map((suyos) => {
+      const { tipoRef, marcaRef } = suyos[0]!;
+      return {
+        clave: `nueva-tipo-${marcaRef!.slug}-${tipoRef!.slug}`,
+        titulo: tipoConMarca(tipoRef!.nombre, marcaRef!.nombre),
+        href: `${rutas.tipoMaquinaria(marcaRef!.slug, tipoRef!.slug)}/`,
+        imagen: primeraFoto(suyos),
+        soloEscritorio: false,
+      };
+    })
+    .sort((a, b) => a.titulo.localeCompare(b.titulo, "es"))
+    .slice(0, tope);
+  if (deTipo.length) return deTipo;
 
   const categoria = categorias.find((c) => nombreComparable(c.nombre) === buscado);
   if (categoria) {
@@ -116,31 +162,11 @@ export function alternativasEnNueva(
           href: `${rutas.categoriaNueva(categoria.slug)}/`,
           imagen: primeraFoto(mismoNombre) ?? primeraFoto(suyos),
           soloEscritorio: false,
-          detalle: equiposTexto(suyos.length),
         },
       ];
     }
   }
-
-  const porTipo = new Map<number, EquipoNuevoAlternativa[]>();
-  for (const e of equipos) {
-    if (!e.tipoRef || !e.marcaRef || nombreComparable(e.tipoRef.nombre) !== buscado) continue;
-    porTipo.set(e.tipoId, [...(porTipo.get(e.tipoId) ?? []), e]);
-  }
-  return [...porTipo.values()]
-    .map((suyos) => {
-      const { tipoRef, marcaRef } = suyos[0]!;
-      return {
-        clave: `nueva-tipo-${marcaRef!.slug}-${tipoRef!.slug}`,
-        titulo: tipoConMarca(tipoRef!.nombre, marcaRef!.nombre),
-        href: `${rutas.tipoMaquinaria(marcaRef!.slug, tipoRef!.slug)}/`,
-        imagen: primeraFoto(suyos),
-        soloEscritorio: false,
-        detalle: equiposTexto(suyos.length),
-      };
-    })
-    .sort((a, b) => a.titulo.localeCompare(b.titulo, "es"))
-    .slice(0, tope);
+  return [];
 }
 
 /**

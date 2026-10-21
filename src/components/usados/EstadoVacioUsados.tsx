@@ -70,7 +70,7 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
         </div>
       </section>
 
-      {datos.nueva.length || datos.otras.length ? (
+      {datos.nueva.length ? (
         <div className={estilos.alternativas}>
           <TarjetasMarca
             id="vacio-nueva"
@@ -78,13 +78,6 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
             indice
             verTodo="Ver equipos"
             tarjetas={datos.nueva}
-          />
-          <TarjetasMarca
-            id="vacio-otras"
-            titulo="Otras categorías de usados con unidades"
-            indice
-            verTodo="Ver unidades"
-            tarjetas={datos.otras}
           />
         </div>
       ) : null}

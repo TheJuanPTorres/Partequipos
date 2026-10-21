@@ -16,6 +16,7 @@ import type { LogoMarca } from "@/lib/marca/logoMarca";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 
 import { CambioDeVista } from "./CambioDeVista";
+import { CategoriasListado } from "./CategoriasListado";
 import { iconoDePestana } from "./iconos";
 import estilos from "./listado.module.css";
 import { PanelFiltrosListado } from "./PanelFiltrosListado";
@@ -39,6 +40,8 @@ export type Pestana = {
   activa: boolean;
   /** Marca discreta bajo el texto («Sin unidades por ahora» en las categorías de usados vacías). */
   nota?: string;
+  /** Número de elementos de la pestaña (las categorías de usados con unidades). */
+  cuenta?: number;
 };
 
 export function PlantillaListado<T>({
@@ -49,6 +52,7 @@ export function PlantillaListado<T>({
   enlaces = [],
   pestanas = [],
   etiquetaPestanas,
+  pestanasEnLateral = false,
   catalogo,
   listado,
   rutaDe,
@@ -67,6 +71,12 @@ export function PlantillaListado<T>({
   enlaces?: { href: string; texto: string }[];
   pestanas?: Pestana[];
   etiquetaPestanas?: string;
+  /**
+   * Las pestañas, como lista vertical en la columna izquierda encima de
+   * «Filtrar» (en móvil y tablet, una fila deslizable sobre «Filtrar»), y la
+   * barra del recuento sobre el listado. Listados de usados (cliente, 2026-10-21).
+   */
+  pestanasEnLateral?: boolean;
   catalogo: Catalogo<T>;
   listado: Extract<ResultadoListado<T>, { tipo: "listado" }>;
   /** Ruta de la página n, CON su barra final. */
@@ -92,6 +102,114 @@ export function PlantillaListado<T>({
     listado.filtrado && total !== totalSinFiltros
       ? `${total} de ${totalSinFiltros} ${disponibles(totalSinFiltros)}`
       : `${total} ${disponibles(total)}`;
+
+  // Sin nada que listar, ni recuento ni orden: lo dice el estado vacío.
+  const barra =
+    totalSinFiltros > 0 ? (
+      <div className={estilos.barra}>
+        <p className={estilos.resumen} aria-live="polite">
+          {chips.length ? <strong>Selección actual:</strong> : null}
+          <span>
+            {recuento}
+            {paginas > 1 ? ` · página ${pagina} de ${paginas}` : ""}
+          </span>
+        </p>
+        <div className={estilos.acciones}>
+          {chips.length ? (
+            <>
+              <ul className={estilos.chips} aria-label="Filtros elegidos">
+                {chips.map((c) => (
+                  <li key={c.clave}>
+                    <Link
+                      href={c.href}
+                      prefetch={false}
+                      rel="nofollow"
+                      className={estilos.chip}
+                      aria-label={`Quitar el filtro ${c.etiqueta}`}
+                    >
+                      <IconX size={14} stroke={2.4} aria-hidden="true" />
+                      {c.etiqueta}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href={enlaceCon(rutaBase, catalogo, seleccion, { limpiar: true })}
+                prefetch={false}
+                rel="nofollow"
+                className={estilos.limpiar}
+              >
+                <IconAdjustmentsHorizontal size={18} stroke={1.8} aria-hidden="true" />
+                Limpiar filtro
+              </Link>
+            </>
+          ) : null}
+          {total > 1 && ordenActual ? (
+            <details className={estilos.ordenar}>
+              <summary>
+                Ordenar
+                <span className="sr-only">: {ordenActual.etiqueta}</span>
+                <IconChevronDown size={18} stroke={2} aria-hidden="true" />
+              </summary>
+              <ul>
+                {ordenes.map((o) => (
+                  <li key={o.valor}>
+                    <Link
+                      href={o.href}
+                      prefetch={false}
+                      rel="nofollow"
+                      aria-current={o.activa ? "true" : undefined}
+                    >
+                      {o.etiqueta}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : null}
+          {elementos.length > 1 ? <CambioDeVista idLista={idLista} /> : null}
+        </div>
+      </div>
+    ) : null;
+
+  const resultados = (
+    <section aria-labelledby="listado-titulo" className={estilos.resultados}>
+      <h2 id="listado-titulo" className="sr-only">
+        {elemento.plural.charAt(0).toUpperCase() + elemento.plural.slice(1)}
+      </h2>
+      {totalSinFiltros === 0 ? (
+        // Un texto, en el recuadro de siempre; un estado vacío diseñado (usados) trae su marco.
+        typeof vacio === "string" ? (
+          <p className={estilos.vacio}>{vacio}</p>
+        ) : (
+          vacio
+        )
+      ) : elementos.length === 0 ? (
+        <p className={estilos.vacio}>
+          Ningún{elemento.singular === "unidad" ? "a" : ""} {elemento.singular} cumple estos
+          filtros. Quita alguno para ver más.
+        </p>
+      ) : (
+        <ul id={idLista} className={estilos.tarjetas} data-vista="lista">
+          {children}
+        </ul>
+      )}
+      <Paginacion
+        actual={pagina}
+        total={paginas}
+        hrefDe={(n) => conConsulta(rutaDe(n), consulta)}
+      />
+    </section>
+  );
+
+  const listaLateral =
+    pestanasEnLateral && pestanas.length ? (
+      <CategoriasListado
+        pestanas={pestanas}
+        titulo={etiquetaPestanas ?? "Categorías"}
+        elemento={elemento}
+      />
+    ) : null;
 
   return (
     <main className={estilos.pagina}>
@@ -128,7 +246,7 @@ export function PlantillaListado<T>({
         </div>
       </header>
 
-      {pestanas.length ? (
+      {pestanas.length && !pestanasEnLateral ? (
         <nav aria-label={etiquetaPestanas} className={estilos.pestanas}>
           <ul>
             {pestanas.map((p) => {
@@ -160,76 +278,26 @@ export function PlantillaListado<T>({
         <div className={estilos.sinPestanas} />
       )}
 
-      {/* Sin nada que listar, ni recuento ni orden: lo dice el estado vacío. */}
-      {totalSinFiltros > 0 ? (
-        <div className={estilos.barra}>
-          <p className={estilos.resumen} aria-live="polite">
-            {chips.length ? <strong>Selección actual:</strong> : null}
-            <span>
-              {recuento}
-              {paginas > 1 ? ` · página ${pagina} de ${paginas}` : ""}
-            </span>
-          </p>
-          <div className={estilos.acciones}>
-            {chips.length ? (
-              <>
-                <ul className={estilos.chips} aria-label="Filtros elegidos">
-                  {chips.map((c) => (
-                    <li key={c.clave}>
-                      <Link
-                        href={c.href}
-                        prefetch={false}
-                        rel="nofollow"
-                        className={estilos.chip}
-                        aria-label={`Quitar el filtro ${c.etiqueta}`}
-                      >
-                        <IconX size={14} stroke={2.4} aria-hidden="true" />
-                        {c.etiqueta}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={enlaceCon(rutaBase, catalogo, seleccion, { limpiar: true })}
-                  prefetch={false}
-                  rel="nofollow"
-                  className={estilos.limpiar}
-                >
-                  <IconAdjustmentsHorizontal size={18} stroke={1.8} aria-hidden="true" />
-                  Limpiar filtro
-                </Link>
-              </>
-            ) : null}
-            {total > 1 && ordenActual ? (
-              <details className={estilos.ordenar}>
-                <summary>
-                  Ordenar
-                  <span className="sr-only">: {ordenActual.etiqueta}</span>
-                  <IconChevronDown size={18} stroke={2} aria-hidden="true" />
-                </summary>
-                <ul>
-                  {ordenes.map((o) => (
-                    <li key={o.valor}>
-                      <Link
-                        href={o.href}
-                        prefetch={false}
-                        rel="nofollow"
-                        aria-current={o.activa ? "true" : undefined}
-                      >
-                        {o.etiqueta}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            ) : null}
-            {elementos.length > 1 ? <CambioDeVista idLista={idLista} /> : null}
-          </div>
-        </div>
-      ) : null}
+      {pestanasEnLateral ? null : barra}
 
-      <div className={estilos.cuerpo}>
-        {totalSinFiltros > 0 ? (
+      <div className={estilos.cuerpo} data-lateral={pestanasEnLateral ? "" : undefined}>
+        {listaLateral ? (
+          <div className={estilos.lateral}>
+            {listaLateral}
+            {totalSinFiltros > 0 ? (
+              <aside aria-label="Filtros">
+                <PanelFiltrosListado
+                  accion={rutaBase}
+                  facetas={facetas}
+                  orden={seleccion.orden}
+                  ordenPorDefecto={catalogo.ordenes[0].valor}
+                  elemento={elemento}
+                  logoDeMarca={logoDeMarca}
+                />
+              </aside>
+            ) : null}
+          </div>
+        ) : totalSinFiltros > 0 ? (
           <aside aria-label="Filtros">
             <PanelFiltrosListado
               accion={rutaBase}
@@ -242,33 +310,14 @@ export function PlantillaListado<T>({
           </aside>
         ) : null}
 
-        <section aria-labelledby="listado-titulo" className={estilos.resultados}>
-          <h2 id="listado-titulo" className="sr-only">
-            {elemento.plural.charAt(0).toUpperCase() + elemento.plural.slice(1)}
-          </h2>
-          {totalSinFiltros === 0 ? (
-            // Un texto, en el recuadro de siempre; un estado vacío diseñado (usados) trae su marco.
-            typeof vacio === "string" ? (
-              <p className={estilos.vacio}>{vacio}</p>
-            ) : (
-              vacio
-            )
-          ) : elementos.length === 0 ? (
-            <p className={estilos.vacio}>
-              Ningún{elemento.singular === "unidad" ? "a" : ""} {elemento.singular} cumple estos
-              filtros. Quita alguno para ver más.
-            </p>
-          ) : (
-            <ul id={idLista} className={estilos.tarjetas} data-vista="lista">
-              {children}
-            </ul>
-          )}
-          <Paginacion
-            actual={pagina}
-            total={paginas}
-            hrefDe={(n) => conConsulta(rutaDe(n), consulta)}
-          />
-        </section>
+        {pestanasEnLateral ? (
+          <div className={estilos.columnaResultados}>
+            {barra}
+            {resultados}
+          </div>
+        ) : (
+          resultados
+        )}
       </div>
     </main>
   );

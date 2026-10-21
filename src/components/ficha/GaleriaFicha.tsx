@@ -37,7 +37,16 @@ export type FotoFicha = { url: string; alt: string; width: number; height: numbe
 const INTERVALO_MS = 5000;
 const MINIATURAS_VISIBLES = 3;
 
-export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: string }) {
+export function GaleriaFicha({
+  fotos,
+  nombre,
+  sinFondo = false,
+}: {
+  fotos: FotoFicha[];
+  nombre: string;
+  /** Sin el fondo desenfocado de la tarjeta (ficha de maquinaria nueva, fondo neutro). */
+  sinFondo?: boolean;
+}) {
   const [actual, setActual] = useState(0);
   // Arranca en reproducción (dirección, 2026-10-17); con una sola foto, nada.
   const [reproduciendo, setReproduciendo] = useState(fotos.length > 1);
@@ -140,16 +149,18 @@ export function GaleriaFicha({ fotos, nombre }: { fotos: FotoFicha[]; nombre: st
   return (
     <>
       {/* Fondo de toda la tarjeta: la foto actual, desenfocada. */}
-      <div className={estilos.fondoDesenfocado} aria-hidden="true">
-        <Image
-          key={foto.url}
-          src={foto.url}
-          alt=""
-          fill
-          sizes="64px"
-          className={estilos.fondoFoto}
-        />
-      </div>
+      {sinFondo ? null : (
+        <div className={estilos.fondoDesenfocado} aria-hidden="true">
+          <Image
+            key={foto.url}
+            src={foto.url}
+            alt=""
+            fill
+            sizes="64px"
+            className={estilos.fondoFoto}
+          />
+        </div>
+      )}
 
       <div
         ref={raiz}

@@ -33,4 +33,18 @@ describe("configContactoMarca", () => {
     assert.equal(c.clasificacion, false);
     assert.equal(c.etiquetaMensaje, "¿Qué necesitas?");
   });
+
+  it("ficha de maquinaria nueva: cotización con el equipo, Ciudad y «¿Qué necesitas?»", () => {
+    const c = configContactoMarca({ ...base, equipo: { id: 12, nombre: "Excavadora ZX130-5B" } });
+    assert.equal(c.tipo, "cotizacion");
+    assert.deepEqual(c.referencia, {
+      tipo: "equipos-nuevos",
+      id: 12,
+      texto: "Excavadora ZX130-5B",
+    });
+    assert.equal(c.clasificacion, false);
+    assert.equal(c.conCiudad, true);
+    assert.equal(c.etiquetaMensaje, "¿Qué necesitas?");
+    assert.equal(c.titulo, "Cotización: Excavadora ZX130-5B");
+  });
 });

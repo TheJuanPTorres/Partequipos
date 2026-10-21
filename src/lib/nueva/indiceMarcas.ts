@@ -8,8 +8,10 @@ import { SLUG_ADITAMENTOS } from "../megamenu";
 /**
  * Las baldosas del ÍNDICE DE MARCAS de maquinaria nueva (2026-10-19, «Mostrar
  * marcas» de Andrés, el mismo componente que el índice de marcas de repuestos).
- * Solo las marcas visibles CON equipos; «Aditamentos» (no es una marca, pero es la
- * entrada a los aditamentos) va al final, con su nombre en lugar de logo (sin logo ni color).
+ * Solo las marcas visibles CON equipos, por nombre. «Aditamentos» NO va
+ * (dirección, 2026-10-20): no es una marca; su página sigue publicada y la
+ * enlaza el megamenú. Se quita solo de aquí, no con «Mostrar en la web», que
+ * ocultaría también la página.
  */
 export function placasDeMarcasNueva(
   marcas: MarcasMaquinaria[],
@@ -19,22 +21,18 @@ export function placasDeMarcasNueva(
   const conEquipos = new Set(
     equipos.map((e) => (typeof e.marca === "number" ? e.marca : e.marca?.id)),
   );
-  const validas = marcas.filter((m) => m.nombre?.trim() && m.slug?.trim() && conEquipos.has(m.id));
   const nombre = (m: MarcasMaquinaria) => m.nombre.trim();
-  const porNombre = (a: MarcasMaquinaria, b: MarcasMaquinaria) =>
-    nombre(a).localeCompare(nombre(b), "es");
-  const ordenadas = [
-    ...validas.filter((m) => m.slug !== SLUG_ADITAMENTOS).sort(porNombre),
-    ...validas.filter((m) => m.slug === SLUG_ADITAMENTOS),
-  ];
-  return ordenadas.map((m) => {
-    const aditamentos = m.slug === SLUG_ADITAMENTOS;
-    return {
+  return marcas
+    .filter(
+      (m) =>
+        m.nombre?.trim() && m.slug?.trim() && m.slug !== SLUG_ADITAMENTOS && conEquipos.has(m.id),
+    )
+    .sort((a, b) => nombre(a).localeCompare(nombre(b), "es"))
+    .map((m) => ({
       id: m.id,
       nombre: nombre(m),
       href: `${rutas.marcaMaquinaria(m.slug)}/`,
-      // El logo de todo el sitio (`LogoMarca`); Aditamentos, con su nombre.
-      logo: aditamentos ? null : logoDeMarca(m, logos),
-    };
-  });
+      // El logo de todo el sitio (`LogoMarca`).
+      logo: logoDeMarca(m, logos),
+    }));
 }

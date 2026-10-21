@@ -1371,6 +1371,25 @@ a.modelo:hover {
   line-height: 1.2;
 }
 
+/* Como cabecera de la página (sin hero encima): el aire bajo la cabecera fija del hero. */
+.mostrarMarcasPagina {
+  padding-top: 24px;
+}
+
+/* El `<h1>` de la cabecera baja: antetítulo y título en dos líneas, como el `<h2>` de siempre. */
+.mostrarMarcasH1 {
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font: inherit;
+}
+
+.mostrarMarcasH1 > .mostrarMarcasTitulo {
+  display: block;
+}
+
 .mostrarMarcasRecuadro {
   box-sizing: border-box;
   padding: 50px;
@@ -1450,10 +1469,15 @@ a.modelo:hover {
 }
 
 .baldosaLogo {
-  /* Centrado y con aire: el 70 % del ancho como mucho, y nunca más de la mitad del alto. */
-  width: 70%;
+  /*
+   * Centrado y con aire. Dos veces un 15 % más grande que al principio
+   * (dirección, 2026-10-20; ×1,3225), con la baldosa del mismo tamaño: el
+   * 92,6 % del ancho como mucho (al principio 70) y el 66,1 % del alto (50).
+   * Solo lo usan los dos índices de marcas (`BaldosasMarcas`).
+   */
+  width: 92.6%;
   height: auto;
-  max-height: 50%;
+  max-height: 66.1%;
 }
 
 /* «shrink» de Elementor en el logo, solo si no se pide reducir el movimiento. */
@@ -1496,13 +1520,19 @@ a.modelo:hover {
     gap: 12px;
   }
 
+  /*
+   * ×1,3225 de dirección (2026-10-20) también aquí. Con el relleno de 12 px no
+   * cabía (el 105,8 % del contenido), así que baja a 4: la baldosa mide lo mismo
+   * (la fija el ancho con su 3:2) y el logo queda en el mismo tamaño que pide, a
+   * 9 px del borde a 390. Al principio: relleno 12, 80 % y 60 %.
+   */
   .baldosa {
-    padding: 12px;
+    padding: 4px;
   }
 
   .baldosaLogo {
-    width: 80%;
-    max-height: 60%;
+    width: 94.4%;
+    max-height: 66.2%;
   }
 
   .mostrarMarcasTitulo {

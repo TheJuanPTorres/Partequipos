@@ -47,8 +47,8 @@ describe("estado vacío de usados", () => {
       rutas,
     );
     assert.deepEqual(
-      t.map((x) => [x.titulo, x.href, x.detalle, x.imagen?.url]),
-      [["Cargadores nuevos", "/nueva/cargadores/", "1 equipo nuevo", "/f.jpg"]],
+      t.map((x) => [x.titulo, x.href, x.detalle ?? null, x.imagen?.url]),
+      [["Cargadores nuevos", "/nueva/cargadores/", null, "/f.jpg"]],
     );
   });
 
@@ -68,7 +68,7 @@ describe("estado vacío de usados", () => {
       rutas,
     );
     assert.equal(t[0]?.imagen?.url, "/w20f.jpg");
-    assert.equal(t[0]?.detalle, "2 equipos nuevos");
+    assert.equal(t[0]?.detalle, undefined);
   });
 
   it("sin categoría de nueva, los tipos con equipos que se llaman igual (las motoniveladoras de Case)", () => {
@@ -92,12 +92,12 @@ describe("estado vacío de usados", () => {
     ];
     const t = alternativasEnNueva("Motoniveladoras", [], equipos, rutas);
     assert.deepEqual(
-      t.map((x) => [x.titulo, x.href, x.detalle, x.imagen?.url]),
+      t.map((x) => [x.titulo, x.href, x.detalle ?? null, x.imagen?.url]),
       [
         [
           "Motoniveladoras Case Construction",
           "/nueva/marcas/case-construction/motoniveladoras-case/",
-          "2 equipos nuevos",
+          null,
           "/f.jpg",
         ],
       ],

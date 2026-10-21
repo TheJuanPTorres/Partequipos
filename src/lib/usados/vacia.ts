@@ -79,8 +79,6 @@ const imagenDe = (foto: Foto): ImagenLista | null =>
 const primeraFoto = (equipos: EquipoNuevoAlternativa[]) =>
   imagenDe(equipos.find((e) => imagenDe(e.foto))?.foto ?? null);
 
-const equiposTexto = (n: number) => `${n} ${n === 1 ? "equipo nuevo" : "equipos nuevos"}`;
-
 /**
  * Las alternativas en maquinaria nueva de una categoría de usados: la
  * categoría de nueva con el mismo nombre (si tiene equipos) o, si no hay, cada
@@ -116,7 +114,6 @@ export function alternativasEnNueva(
           href: `${rutas.categoriaNueva(categoria.slug)}/`,
           imagen: primeraFoto(mismoNombre) ?? primeraFoto(suyos),
           soloEscritorio: false,
-          detalle: equiposTexto(suyos.length),
         },
       ];
     }
@@ -136,7 +133,6 @@ export function alternativasEnNueva(
         href: `${rutas.tipoMaquinaria(marcaRef!.slug, tipoRef!.slug)}/`,
         imagen: primeraFoto(suyos),
         soloEscritorio: false,
-        detalle: equiposTexto(suyos.length),
       };
     })
     .sort((a, b) => a.titulo.localeCompare(b.titulo, "es"))

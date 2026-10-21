@@ -76,20 +76,23 @@ y no cambia ningún dato guardado.
    máxima y Ancho de la zapata, las que tenga.
 2. **Si falta alguna,** se completa hasta 5 con otras filas reales de su
    ficha técnica, **en el orden en que están guardadas**.
-3. **Con menos de 5 filas,** las que tenga. Nunca se inventa nada: la etiqueta
-   y el valor salen tal cual.
+3. **Con menos de 5 filas,** las que tenga. Nunca se inventa nada.
+4. **Etiquetas (dirección):** las 5 de prioridad salen con su nombre uniforme
+   («Potencia neta», «Peso operativo», «Motor», «Fuerza de tracción máxima»,
+   «Ancho de la zapata»), venga como venga de WordPress; las de relleno, con su
+   etiqueta tal cual. **Los valores no se tocan nunca.**
 
 **Emparejado de etiquetas.** Se comparan normalizadas (`normalizar`: sin
 tildes, en minúsculas, sin «:» final y con un solo espacio) contra unos
 patrones por prioridad, en orden de preferencia:
 
-| Prioridad                 | Patrones (normalizados)                                                                      | Variantes encontradas en las 103 fichas                                                                                                                                                                               |
-| ------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Potencia neta             | empieza por «potencia neta» o «potencia nominal del volante neta»; si no, «potencia» a secas | POTENCIA NETA (36), Potencia Neta (5), Potencia Neta (SAE J1349) (5), Potencia neta (SAE J1349) (3), Potência neta (SAE J1349) (1), Potencia neta del motor (2), … a 2500 rpm (1), del volante Neta (2), Potencia (9) |
-| Peso operativo            | «peso operativo / operacional / de operación / en funcionamiento»                            | PESO OPERATIVO (56), Peso operativo (17), Peso de operación (6), Peso operacional (3), Peso operacional sin cabina (1), Peso en funcionamiento (1)                                                                    |
-| Motor                     | «motor» a secas; «(marca y) modelo del motor»                                                | MOTOR (45), Motor (12), Marca y modelo del motor (11)                                                                                                                                                                 |
-| Fuerza de tracción máxima | «fuerza de tracción máxima»; si no, «fuerza de tracción»                                     | Fuerza de tracción máxima (3), FUERZA DE TRACCIÓN MÁXIMA (3), Fuerza de tracción (1)                                                                                                                                  |
-| Ancho de la zapata        | «ancho de (la) zapata»                                                                       | Ancho de la zapata (5), ANCHO DE LA ZAPATA (3)                                                                                                                                                                        |
+| Prioridad                 | Patrones (normalizados)                                                                                            | Variantes encontradas en las 103 fichas                                                                                                                                                                               |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Potencia neta             | empieza por «potencia neta» o «potencia nominal del volante neta»; si no, «potencia» a secas                       | POTENCIA NETA (36), Potencia Neta (5), Potencia Neta (SAE J1349) (5), Potencia neta (SAE J1349) (3), Potência neta (SAE J1349) (1), Potencia neta del motor (2), … a 2500 rpm (1), del volante Neta (2), Potencia (9) |
+| Peso operativo            | «peso operativo / operacional / de operación / en funcionamiento»                                                  | PESO OPERATIVO (56), Peso operativo (17), Peso de operación (6), Peso operacional (3), Peso operacional sin cabina (1), Peso en funcionamiento (1)                                                                    |
+| Motor                     | «motor» a secas; «(marca y) modelo del motor»                                                                      | MOTOR (45), Motor (12), Marca y modelo del motor (11)                                                                                                                                                                 |
+| Fuerza de tracción máxima | «fuerza de tracción máxima»; si no, «fuerza de tracción» o «barra de tracción parada» (la misma medida, dirección) | Fuerza de tracción máxima (3), FUERZA DE TRACCIÓN MÁXIMA (3), Fuerza de tracción (1)                                                                                                                                  |
+| Ancho de la zapata        | «ancho de (la) zapata»                                                                                             | Ancho de la zapata (5), ANCHO DE LA ZAPATA (3)                                                                                                                                                                        |
 
 **Lo que NO se empareja, a propósito:**
 
@@ -97,8 +100,6 @@ patrones por prioridad, en orden de preferencia:
   sitio de la neta: si hace falta, entra de relleno con su propia etiqueta.
 - **«Motor de arranque», «Aceite del motor…», «Fabricante del Motor» y «Tipo
   del Motor»** no son «Motor».
-- **«Barra de tracción parada»** (el 1150M) no se toma por la fuerza de
-  tracción máxima sin confirmarlo.
 - **Las fuerzas de excavación** y **«Número de zapatas»** tampoco.
 
 **«Destacar»** ya no cambia la ficha: elige los datos de la tarjeta del equipo

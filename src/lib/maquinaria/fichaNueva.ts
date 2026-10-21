@@ -17,7 +17,13 @@ import { filasCompletas, type DatoDestacado, type FilaFicha } from "./fichaTecni
  *
  * Si falta alguna, se completa hasta 5 con OTRAS filas reales de su ficha
  * técnica, en el orden en que están guardadas; con menos de 5 filas, las que
- * tenga. Nunca se inventa nada: se pinta la etiqueta y el valor tal cual.
+ * tenga. Nunca se inventa nada.
+ *
+ * ETIQUETAS (dirección, 2026-10-21): los 5 de prioridad se enseñan con su
+ * nombre uniforme («Potencia neta», «Peso operativo», «Motor», «Fuerza de
+ * tracción máxima», «Ancho de la zapata»), venga como venga de WordPress; los
+ * de relleno, con su etiqueta tal cual. Los VALORES no se tocan nunca, y lo
+ * guardado no cambia: solo lo que se enseña.
  *
  * Las etiquetas llegan de WordPress escritas de muchas formas (mayúsculas,
  * tildes, «Potencia» frente a «Potencia neta», «(SAE J1349)»…): se comparan
@@ -48,7 +54,12 @@ export const PRIORIDADES: {
   {
     nombre: "Fuerza de tracción máxima",
     icono: "otro",
-    patrones: [/^fuerza de traccion maxima/, /^fuerza (maxima )?de traccion/],
+    // «Barra de tracción parada» es la misma medida (dirección, 2026-10-21).
+    patrones: [
+      /^fuerza de traccion maxima/,
+      /^fuerza (maxima )?de traccion/,
+      /^barra de traccion parada/,
+    ],
   },
   {
     nombre: "Ancho de la zapata",
@@ -96,8 +107,8 @@ export function datosDeCabecera(
   const completas = filasCompletas(filas);
   const normal = completas.map((f) => normalizar(f.etiqueta!));
   const usadas = new Set<number>();
-  const elegidas: { i: number; icono: DatoDestacado["icono"] }[] = [];
-  for (const { icono, patrones } of PRIORIDADES) {
+  const elegidas: { i: number; icono: DatoDestacado["icono"]; nombre?: string }[] = [];
+  for (const { nombre, icono, patrones } of PRIORIDADES) {
     let encontrada = -1;
     for (const patron of patrones) {
       encontrada = normal.findIndex((e, i) => !usadas.has(i) && patron.test(e));
@@ -105,7 +116,7 @@ export function datosDeCabecera(
     }
     if (encontrada >= 0) {
       usadas.add(encontrada);
-      elegidas.push({ i: encontrada, icono });
+      elegidas.push({ i: encontrada, icono, nombre });
     }
   }
   for (let i = 0; i < completas.length && elegidas.length < max; i++) {
@@ -113,8 +124,9 @@ export function datosDeCabecera(
     usadas.add(i);
     elegidas.push({ i, icono: iconoPorEtiqueta(completas[i]!.etiqueta!) });
   }
-  return elegidas.slice(0, max).map(({ i, icono }) => ({
-    etiqueta: completas[i]!.etiqueta!.trim(),
+  return elegidas.slice(0, max).map(({ i, icono, nombre }) => ({
+    // Prioridad: el nombre uniforme. Relleno: la etiqueta tal cual.
+    etiqueta: nombre ?? completas[i]!.etiqueta!.trim(),
     valor: completas[i]!.valor!.trim(),
     icono,
   }));

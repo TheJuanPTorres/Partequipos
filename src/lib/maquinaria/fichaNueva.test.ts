@@ -23,7 +23,7 @@ describe("datosDeCabecera (regla del cliente: máximo 5, por prioridad)", () => 
   const ver = (filas: FilaFicha[], max?: number) =>
     datosDeCabecera(filas, max).map((d) => `${d.etiqueta}: ${d.valor}`);
 
-  it("1150M Tier4: los cinco de prioridad, en su orden y tal cual están guardados", () => {
+  it("1150M Tier4: los cinco de prioridad, en su orden, con el nombre uniforme y el valor tal cual", () => {
     assert.deepEqual(
       ver([
         fila("POTENCIA NETA", "138 hp"),
@@ -33,16 +33,16 @@ describe("datosDeCabecera (regla del cliente: máximo 5, por prioridad)", () => 
         fila("MOTOR", "FPT F4HFE613F"),
       ]),
       [
-        "POTENCIA NETA: 138 hp",
-        "PESO OPERATIVO: 14,3 t",
-        "MOTOR: FPT F4HFE613F",
-        "FUERZA DE TRACCIÓN MÁXIMA: 213,5 kN",
-        "ANCHO DE LA ZAPATA: 22/26/30 in (según requerimiento cliente)",
+        "Potencia neta: 138 hp",
+        "Peso operativo: 14,3 t",
+        "Motor: FPT F4HFE613F",
+        "Fuerza de tracción máxima: 213,5 kN",
+        "Ancho de la zapata: 22/26/30 in (según requerimiento cliente)",
       ],
     );
   });
 
-  it("si falta alguna, completa con otras filas reales en el orden guardado", () => {
+  it("si falta alguna, completa con otras filas reales en el orden guardado (relleno: su etiqueta tal cual)", () => {
     assert.deepEqual(
       ver([
         fila("POTENCIA NETA", "98 hp"),
@@ -53,19 +53,43 @@ describe("datosDeCabecera (regla del cliente: máximo 5, por prioridad)", () => 
         fila("Cilindros", "4"),
       ]),
       [
-        "POTENCIA NETA: 98 hp",
-        "PESO OPERATIVO: 13 t",
-        "MOTOR: Isuzu AM-4JJ1X",
+        "Potencia neta: 98 hp",
+        "Peso operativo: 13 t",
+        "Motor: Isuzu AM-4JJ1X",
         "ALANCE MAXIMO EN EL SUELO: 8,65m",
         "PROFUNDIDAD MÁXIMA DE EXCAVACIÓN: 6,0m",
       ],
     );
   });
 
+  it("1150M: «Barra de tracción parada» es la fuerza de tracción máxima; «Barra de tracción - versión XLT», no", () => {
+    assert.deepEqual(
+      ver([
+        fila("Ancho de la pala", '120" I 3.048mm'),
+        fila("Potencia bruta del motor a RPM", "138 hp (103 kW)"),
+        fila("Marca y modelo del motor", "F4HFA613L"),
+        fila("Peso operacional", "31.134 lb (14.122 kg)"),
+        fila("Barra de tracción parada", "48.000 lb-ft I 213,5 kN"),
+        fila("Ancho de la zapata", '22" I 559 mm'),
+        fila("Potencia neta del motor", "127,4 hp (95 kW)"),
+      ]),
+      [
+        "Potencia neta: 127,4 hp (95 kW)",
+        "Peso operativo: 31.134 lb (14.122 kg)",
+        "Motor: F4HFA613L",
+        "Fuerza de tracción máxima: 48.000 lb-ft I 213,5 kN",
+        'Ancho de la zapata: 22" I 559 mm',
+      ],
+    );
+    assert.deepEqual(ver([fila("Barra de tracción - versión XLT", "66 kg")]), [
+      "Barra de tracción - versión XLT: 66 kg",
+    ]);
+  });
+
   it("con menos de 5 filas, las que haya: nunca se inventa", () => {
     assert.deepEqual(ver([fila("MOTOR", "Kubota – 25 hp"), fila("PESO OPERATIVO", "2,6 Ton")]), [
-      "PESO OPERATIVO: 2,6 Ton",
-      "MOTOR: Kubota – 25 hp",
+      "Peso operativo: 2,6 Ton",
+      "Motor: Kubota – 25 hp",
     ]);
     assert.deepEqual(ver([]), []);
     assert.deepEqual(ver(null as unknown as FilaFicha[]), []);
@@ -83,7 +107,7 @@ describe("datosDeCabecera (regla del cliente: máximo 5, por prioridad)", () => 
       d.map((x) => x.icono),
       ["potencia", "peso", "motor", "otro", "alcance"],
     );
-    assert.equal(ver([fila("Potencia", "64 hp")])[0], "Potencia: 64 hp");
+    assert.equal(ver([fila("Potencia", "64 hp")])[0], "Potencia neta: 64 hp");
   });
 
   it("la potencia BRUTA no ocupa el sitio de la neta: va de relleno, con su etiqueta", () => {
@@ -93,11 +117,7 @@ describe("datosDeCabecera (regla del cliente: máximo 5, por prioridad)", () => 
         fila("Peso operativo", "13 t"),
         fila("Potencia neta (SAE J1349)", "118 hp"),
       ]),
-      [
-        "Potencia neta (SAE J1349): 118 hp",
-        "Peso operativo: 13 t",
-        "Potencia bruta (SAE J1349): 130 hp",
-      ],
+      ["Potencia neta: 118 hp", "Peso operativo: 13 t", "Potencia bruta (SAE J1349): 130 hp"],
     );
   });
 

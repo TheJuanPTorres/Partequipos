@@ -13,8 +13,9 @@ import type { Pestana } from "./PlantillaListado";
  * (cliente, 2026-10-21). Es de cliente por dos cosas que necesitan estado o el
  * navegador:
  *  - las categorías SIN unidades van plegadas tras «Ver más (n)», un botón con
- *    `aria-expanded` que las despliega y las vuelve a plegar; la actual se ve
- *    siempre, aunque esté vacía;
+ *    `aria-expanded` que las despliega y las vuelve a plegar con una animación
+ *    suave (solo CSS, `listado.module.css`); la actual se ve siempre, aunque
+ *    esté vacía;
  *  - en móvil y tablet (fila deslizable), al cargar, la fila se desplaza hasta
  *    dejar visible la categoría actual, sin cambiar el orden.
  * Sin JavaScript, el `<noscript>` enseña todas y quita el botón, que no haría nada.
@@ -55,7 +56,7 @@ export function CategoriasListado({
         <noscript
           dangerouslySetInnerHTML={{
             __html:
-              "<style>[data-categoria-oculta]{display:list-item!important}[data-ver-mas]{display:none!important}</style>",
+              "<style>[data-categoria-oculta]{grid-template-rows:1fr!important;grid-template-columns:1fr!important;opacity:1!important;visibility:visible!important;margin:0!important}[data-ver-mas]{display:none!important}</style>",
           }}
         />
       ) : null}
@@ -66,35 +67,38 @@ export function CategoriasListado({
           return (
             <li
               key={p.href}
-              hidden={oculta && !abiertas}
               data-categoria-oculta={oculta ? "" : undefined}
+              data-plegada={oculta && !abiertas ? "" : undefined}
             >
-              <Link
-                href={p.href}
-                className={estilos.categoria}
-                aria-current={p.activa ? "page" : undefined}
-              >
-                <IconoPestana size={22} stroke={1.5} aria-hidden="true" />
-                <span className={estilos.categoriaTexto}>
-                  {p.texto}
-                  {p.nota ? (
-                    <>
-                      <span className="sr-only">, </span>
-                      <small className={estilos.pestanaNota}>{p.nota}</small>
-                    </>
-                  ) : null}
-                </span>
-                {typeof p.cuenta === "number" ? (
-                  <span className={estilos.categoriaCuenta}>
-                    <span className="sr-only">, </span>
-                    {p.cuenta}
-                    <span className="sr-only">
-                      {" "}
-                      {p.cuenta === 1 ? elemento.singular : elemento.plural}
-                    </span>
+              {/* La caja que se anima (altura en la lista, ancho en la fila). */}
+              <div className={estilos.categoriaPlegable}>
+                <Link
+                  href={p.href}
+                  className={estilos.categoria}
+                  aria-current={p.activa ? "page" : undefined}
+                >
+                  <IconoPestana size={22} stroke={1.5} aria-hidden="true" />
+                  <span className={estilos.categoriaTexto}>
+                    {p.texto}
+                    {p.nota ? (
+                      <>
+                        <span className="sr-only">, </span>
+                        <small className={estilos.pestanaNota}>{p.nota}</small>
+                      </>
+                    ) : null}
                   </span>
-                ) : null}
-              </Link>
+                  {typeof p.cuenta === "number" ? (
+                    <span className={estilos.categoriaCuenta}>
+                      <span className="sr-only">, </span>
+                      {p.cuenta}
+                      <span className="sr-only">
+                        {" "}
+                        {p.cuenta === 1 ? elemento.singular : elemento.plural}
+                      </span>
+                    </span>
+                  ) : null}
+                </Link>
+              </div>
             </li>
           );
         })}

@@ -750,7 +750,7 @@
 }
 .verMas svg {
   color: var(--rojo);
-  transition: transform 150ms ease;
+  transition: transform 280ms cubic-bezier(0.33, 0, 0.2, 1);
 }
 .verMas[aria-expanded="true"] svg {
   transform: rotate(180deg);
@@ -771,6 +771,57 @@
 .categoria[aria-current="page"] .categoriaCuenta {
   background: var(--rojo);
   color: #fff;
+}
+/*
+ * Plegado de las categorías sin unidades (dirección, 2026-10-21): la pista de
+ * rejilla pasa de 1fr a 0fr, así la caja crece y decrece sin medir alturas,
+ * con fundido. En la fila (móvil y tablet) se anima el ANCHO, que no cambia
+ * el alto de la fila; en la lista vertical, la altura. El margen negativo
+ * cancela el hueco de 8 px de la plegada. `visibility` cambia al final del
+ * cierre: plegadas, no se enfocan ni las leen los lectores de pantalla.
+ */
+.categorias li[data-categoria-oculta] {
+  --curva-plegado: cubic-bezier(0.33, 0, 0.2, 1);
+  display: grid;
+  grid-template-columns: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    grid-template-columns 280ms var(--curva-plegado),
+    grid-template-rows 280ms var(--curva-plegado),
+    margin 280ms var(--curva-plegado),
+    opacity 220ms ease 60ms,
+    visibility 0s;
+}
+.categorias li[data-plegada] {
+  grid-template-columns: 0fr;
+  margin-left: -8px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-columns 280ms var(--curva-plegado),
+    grid-template-rows 280ms var(--curva-plegado),
+    margin 280ms var(--curva-plegado),
+    opacity 160ms ease,
+    visibility 0s linear 280ms;
+}
+.categoriaPlegable {
+  min-width: 0;
+  min-height: 0;
+}
+.categorias li[data-categoria-oculta] > .categoriaPlegable {
+  overflow: hidden;
+}
+/* Dentro de la caja recortada, el foco va por dentro para que no se corte. */
+.categorias li[data-categoria-oculta] .categoria:focus-visible {
+  outline-offset: -3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .categorias li[data-categoria-oculta],
+  .categorias li[data-plegada],
+  .verMas svg {
+    transition: none;
+  }
 }
 .categorias + aside {
   margin-top: 16px;
@@ -872,6 +923,16 @@
   }
   .categoria {
     white-space: normal;
+  }
+  /* Lista vertical: se anima la altura, no el ancho. */
+  .categorias li[data-categoria-oculta] {
+    grid-template-rows: 1fr;
+  }
+  .categorias li[data-plegada] {
+    grid-template-columns: 1fr;
+    grid-template-rows: 0fr;
+    margin-left: 0;
+    margin-top: -8px;
   }
   .categoriasTitulo {
     font-size: 24px;

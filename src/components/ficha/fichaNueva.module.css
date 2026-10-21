@@ -113,33 +113,57 @@ section.principal[data-con-izquierda] {
   padding-bottom: 2.82cqi;
 }
 
-/* Las características bajo la galería: más compactas que en la V2, en 3 columnas. */
+/*
+ * LAS CARACTERÍSTICAS (dirección, 2026-10-21): cada tarjeta en DOS líneas
+ * exactas, el nombre y el valor, sin partir ninguna; todas con el mismo alto y
+ * el contenido centrado en vertical. Se consigue con la colocación, sin recortar:
+ * cada tarjeta mide lo que su texto (`flex: 1 0 auto`) y las filas se llenan
+ * solas (crecen hasta ocupar el ancho, sin huecos). El ancho lo fija la copia
+ * de la reserva (fuente de respaldo, ensanchada y en negrita), así que al llegar
+ * Inter ni el ancho ni el alto cambian (CLS).
+ */
 .principal .datos {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  /* Las de valor largo ocupan dos columnas; `dense` rellena los huecos que dejan. */
-  grid-auto-flow: dense;
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   width: auto;
   margin: 0;
   padding: 0 2.82cqi;
 }
 
-.principal .datos li[data-largo] {
-  grid-column: span 2;
+.principal .datos li {
+  flex: 1 0 auto;
+  max-width: 100%;
+  min-height: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  font-size: var(--texto-cuerpo);
+  line-height: 1.35;
 }
 
-/* En la pastilla, la copia de la reserva se ensancha menos: si no, dejaba una línea en blanco. */
+/* El icono, centrado con las dos líneas. */
+.principal .datos li > svg {
+  height: 1.35em;
+  align-self: center;
+}
+
+.principal .datos .reserva {
+  align-content: center;
+}
+
+/* La copia, en dos líneas sin partir y menos ensanchada (si no, sobraba sitio). */
 .principal .datos .reserva::after {
+  white-space: pre;
   letter-spacing: 0.02em;
 }
 
-.principal .datos li {
-  min-height: 0;
-  gap: 8px;
-  padding: 10px 14px;
-  font-size: var(--texto-cuerpo);
-  line-height: 1.35;
-  overflow-wrap: anywhere;
+.dosLineas > * {
+  white-space: nowrap;
+}
+
+.dosLineas b {
+  font-weight: 600;
 }
 
 /* Sin galería, solo «Ver en vista 360» (si lo hay) antes de los botones. */
@@ -263,12 +287,23 @@ section.principal[data-con-izquierda] {
   background: var(--color-fondo);
 }
 
-.fotoFranja {
-  width: 100px;
-  height: 75px;
+/* El logo de la marca (`LogoMarca`), entero, en una caja de 140 × 64 sobre blanco. */
+.cajaLogoFranja {
+  display: flex;
+  width: 140px;
+  height: 64px;
   flex: none;
-  border-radius: 10px;
-  object-fit: cover;
+  align-items: center;
+  justify-content: center;
+  padding-left: 10px;
+}
+
+.logoFranja {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 .tituloFranja {
@@ -377,7 +412,6 @@ section.principal[data-con-izquierda] {
 
   .principal .datos {
     order: 3;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
     padding: 0 4.7cqi;
   }
 
@@ -432,17 +466,29 @@ section.principal[data-con-izquierda] {
   }
 
   .principal .datos {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+  }
+
+  /*
+   * PENDIENTE DE DIRECCIÓN: un valor muy largo (más de 32 caracteres, p. ej.
+   * «22/26/30 in (según requerimiento cliente)») no cabe en una línea a 390 ni
+   * a todo el ancho; mientras se decide, solo ese valor pasa a otra línea.
+   */
+  .principal .datos li[data-largo] .dosLineas > :last-child {
+    white-space: normal;
+  }
+
+  .principal .datos li[data-largo] .reserva::after {
+    white-space: pre-line;
   }
 
   .franja {
     gap: 12px;
   }
 
-  .fotoFranja {
-    width: 90px;
-    height: 68px;
+  .cajaLogoFranja {
+    width: 100px;
+    height: 48px;
   }
 
   .tituloFranja {

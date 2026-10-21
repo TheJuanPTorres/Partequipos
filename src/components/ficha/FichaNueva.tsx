@@ -10,8 +10,10 @@ import { IconoDato } from "@/components/ficha/IconoDato";
 import { RecuadroAsesoria } from "@/components/ficha/RecuadroAsesoria";
 import estilos from "@/components/ficha/ficha.module.css";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { PaginaVisor } from "@/lib/documentos/visor";
+import type { LogoConAlt } from "@/lib/marca/logoMarca";
 import type { DatoDestacado } from "@/lib/maquinaria/fichaTecnica";
 import type { ImagenLista } from "@/lib/utils/relations";
 
@@ -47,8 +49,12 @@ export type TarjetaOtra = {
   pdf: PdfVisor | null;
 };
 
-/** Caracteres a partir de los que un valor ocupa dos columnas en la cabecera. */
-const VALOR_LARGO = 18;
+/**
+ * Caracteres a partir de los que un valor puede no caber en una línea a 390 px
+ * ni a todo el ancho (p. ej. «22/26/30 in (según requerimiento cliente)»): solo
+ * en el teléfono, ese valor puede pasar a una segunda línea (pendiente de dirección).
+ */
+const VALOR_LARGO = 32;
 
 function ListaDatos({
   datos,
@@ -65,7 +71,6 @@ function ListaDatos({
       {datos.map((d) => (
         <li
           key={`${d.etiqueta}-${d.valor}`}
-          // Un valor largo («22/26/30 in (según requerimiento cliente)») ocupa dos columnas.
           data-largo={apilado && d.valor.length > VALOR_LARGO ? "" : undefined}
         >
           <IconoDato icono={d.icono} className={estilos.iconoDato} />
@@ -76,8 +81,9 @@ function ListaDatos({
               data-reserva={`${d.etiqueta}:
 ${d.valor}`}
             >
-              <span className={estilos.datoApilado}>
-                <b>{d.etiqueta}:</b> {d.valor}
+              {/* Dos líneas exactas: el nombre y el valor, cada uno sin partir. */}
+              <span className={`${estilos.datoApilado} ${nueva.dosLineas}`}>
+                <b>{d.etiqueta}:</b> <span>{d.valor}</span>
               </span>
             </span>
           ) : (
@@ -106,7 +112,8 @@ type Props = {
   vista360: string | null;
   /** Enlace de WhatsApp de «Habla con un experto»; `null` si la empresa no tiene número. */
   experto: { href: string } | null;
-  otras: { titulo: string; foto: ImagenLista | null; tarjetas: TarjetaOtra[] };
+  /** «Otras <tipo>»: el título, el logo de la marca (o nada) y las tarjetas. */
+  otras: { titulo: string; logo: LogoConAlt | null; tarjetas: TarjetaOtra[] };
   imagenContacto: ImagenLista | null;
   contactoEsFoto: boolean;
   /** El formulario de la ventana de «Contáctanos» (el mismo que el del contacto). */
@@ -279,16 +286,15 @@ ${tituloEscritorio.modelo}`}
       {otras.tarjetas.length > 0 ? (
         <section className={nueva.otras} aria-labelledby="otras-del-tipo">
           <div className={nueva.franja}>
-            {otras.foto ? (
-              <Image
-                src={otras.foto.url}
-                alt=""
-                width={otras.foto.width}
-                height={otras.foto.height}
-                sizes="100px"
-                className={nueva.fotoFranja}
-                style={{ objectPosition: otras.foto.posicion }}
-              />
+            {otras.logo ? (
+              <span className={nueva.cajaLogoFranja}>
+                <LogoMarca
+                  logo={otras.logo}
+                  alt={otras.logo.alt}
+                  sizes="140px"
+                  className={nueva.logoFranja}
+                />
+              </span>
             ) : null}
             <h2 id="otras-del-tipo" className={`${nueva.tituloFranja} texto-titulo-bloque`}>
               {otras.titulo}

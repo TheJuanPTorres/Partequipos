@@ -17,13 +17,13 @@ import {
 } from "@/lib/maquinaria/fichaNueva";
 import { DESTACADAS_EN_TARJETA, filasCompletas } from "@/lib/maquinaria/fichaTecnica";
 import { reservaDescripcion } from "@/lib/maquinaria/reservaTexto";
-import { primeraFotoPorTipo } from "@/lib/nueva/paginaMarca";
+import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getDocumentosParaVisor } from "@/lib/queries/getDocumentos";
 import { getFichaProducto } from "@/lib/queries/getFichaProducto";
+import { getLogosMarca } from "@/lib/queries/getLogosMarca";
 import {
   getEquipoNuevoPorSlug,
-  getEquiposDeTipos,
   getEquiposNuevos,
   getMarcaMaquinariaPorSlug,
   getOtrasReferencias,
@@ -111,11 +111,11 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
   if (!data) notFound();
   const { marca, tipo, equipo } = data;
 
-  const [empresa, ficha, otras, delTipo, global, testimonios] = await Promise.all([
+  const [empresa, ficha, otras, logos, global, testimonios] = await Promise.all([
     getEmpresa(),
     getFichaProducto(),
     getOtrasReferencias(tipo.id, equipo.id),
-    getEquiposDeTipos([tipo.id]),
+    getLogosMarca(),
     getRepuestosMarca(),
     getTestimoniosDePortada(),
   ]);
@@ -218,8 +218,8 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
       experto={experto ?? null}
       otras={{
         titulo: tituloOtras(tipo.nombre),
-        // La «Imagen de la tarjeta» del tipo; sin ella, la primera foto de su primer equipo.
-        foto: imagenDeMedia(tipo.imagen, "") ?? primeraFotoPorTipo(delTipo).get(tipo.id) ?? null,
+        // El logo de la marca, el único del sitio (`LogoMarca`); sin logo, la franja va sin imagen.
+        logo: conAlt(logoDeMarca(marca, logos), `Logo de ${marca.nombre}`),
         tarjetas,
       }}
       imagenContacto={imagenContacto}

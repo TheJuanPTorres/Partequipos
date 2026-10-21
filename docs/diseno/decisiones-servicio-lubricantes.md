@@ -256,7 +256,8 @@ adonde llevan el megamenú y los 301 de las URL viejas.
 - **«Ver catálogo» baja a la primera línea.** La página no puede enlazarse a sí misma y no existe un PDF de catálogo
   de ENI en el WordPress (solo las fichas de cada producto).
 - **Nombres y orden de las líneas, los de los datos** («Motos & Scooter», «Engranajes»; en la plantilla, «Motos y
-  Scooters» y «Engranaje»).
+  Scooters» y «Engranaje»). El orden es alfabético por nombre (la plantilla pone Motos primero); cambiarlo exigiría un
+  campo de orden en las categorías.
 
 **Interruptor:** la casilla «Diseño propio» de la marca sigue, desmarcada.
 

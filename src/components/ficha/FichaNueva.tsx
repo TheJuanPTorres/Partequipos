@@ -189,9 +189,16 @@ export function FichaNueva({
             >
               {tituloEscritorio ? (
                 <>
-                  <span className={nueva.tituloEscritorio}>
-                    <span className={nueva.lineaMarca}>{tituloEscritorio.marca}</span>{" "}
-                    <span>{tituloEscritorio.modelo}</span>
+                  {/* Con reserva de alto: «Case Construction» ocupa 2 líneas o 1 según la fuente. */}
+                  <span
+                    className={`${nueva.tituloEscritorio} ${nueva.reserva} ${nueva.reservaTitulo}`}
+                    data-reserva={`${tituloEscritorio.marca}
+${tituloEscritorio.modelo}`}
+                  >
+                    <span className={nueva.lineasTitulo}>
+                      <span className={nueva.lineaMarca}>{tituloEscritorio.marca}</span>{" "}
+                      <span>{tituloEscritorio.modelo}</span>
+                    </span>
                   </span>
                   <span className={nueva.tituloMovil}>{nombre}</span>
                 </>

@@ -89,7 +89,7 @@
   text-transform: uppercase;
 }
 
-.tituloEscritorio > :last-child {
+.lineasTitulo > :last-child {
   display: block;
 }
 
@@ -147,6 +147,11 @@
 .reserva::after {
   grid-area: 1 / 1;
   min-width: 0;
+}
+
+/* En el título, la copia va en mayúsculas como su primera línea (así mide al menos lo mismo). */
+.reservaTitulo::after {
+  text-transform: uppercase;
 }
 
 .reserva::after {

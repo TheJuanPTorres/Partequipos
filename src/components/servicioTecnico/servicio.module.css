@@ -144,9 +144,10 @@ video.medio {
 }
 .antetitulo {
   margin: 0 0 20px;
-  color: var(--color-texto-suave);
+  color: var(--color-texto);
   font-size: var(--texto-etiqueta);
-  font-weight: 500;
+  /* En negrita y en el negro de los textos por petición del cliente (2026-10-21); mismo tamaño y sitio. */
+  font-weight: 700;
   line-height: 1;
 }
 .fila {

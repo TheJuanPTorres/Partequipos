@@ -55,8 +55,8 @@ if (/^https:\/\//i.test(origen)) {
   datos = new Uint8Array(fs.readFileSync(origen));
 }
 
-// Las fuentes estándar y los mapas de caracteres van con pdf.js: sin ellos, un
-// PDF que no incrusta sus fuentes sale con otra letra.
+// Las fuentes estándar, los mapas de caracteres y los decodificadores van con pdf.js:
+// sin ellos, un PDF que no incrusta sus fuentes sale con otra letra.
 const raizPdfjs = path.dirname(resolverDeNpx("pdfjs-dist/package.json"));
 // En Node, pdf.js lee estas carpetas con `fs`: ruta del disco (no `file://`) con barra final.
 const conBarra = (p) => p.replace(/[\\/]?$/, "/");
@@ -66,6 +66,9 @@ const doc = await pdfjs.getDocument({
   standardFontDataUrl: conBarra(path.join(raizPdfjs, "standard_fonts")),
   cMapUrl: conBarra(path.join(raizPdfjs, "cmaps")),
   cMapPacked: true,
+  // Los decodificadores de JPEG 2000 y JBIG2 (WebAssembly). Sin esto, las imágenes en
+  // JPEG 2000 de un PDF salen en blanco («JpxError: OpenJPEG failed to initialize»).
+  wasmUrl: conBarra(path.join(raizPdfjs, "wasm")),
 }).promise;
 fs.mkdirSync(carpeta, { recursive: true });
 const paginas = [];

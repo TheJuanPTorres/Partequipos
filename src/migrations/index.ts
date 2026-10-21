@@ -71,6 +71,7 @@ import * as migration_20261020_170728_marca_nueva_textos_linea from './20261020_
 import * as migration_20261020_183648_documento_visor from './20261020_183648_documento_visor';
 import * as migration_20261020_192253_categorias_cabeceras from './20261020_192253_categorias_cabeceras';
 import * as migration_20261020_230146_categoria_usada_mostrar_en_web from './20261020_230146_categoria_usada_mostrar_en_web';
+import * as migration_20261021_052023_equipo_nuevo_vista360 from './20261021_052023_equipo_nuevo_vista360';
 
 export const migrations = [
   {
@@ -436,6 +437,11 @@ export const migrations = [
   {
     up: migration_20261020_230146_categoria_usada_mostrar_en_web.up,
     down: migration_20261020_230146_categoria_usada_mostrar_en_web.down,
-    name: '20261020_230146_categoria_usada_mostrar_en_web'
+    name: '20261020_230146_categoria_usada_mostrar_en_web',
+  },
+  {
+    up: migration_20261021_052023_equipo_nuevo_vista360.up,
+    down: migration_20261021_052023_equipo_nuevo_vista360.down,
+    name: '20261021_052023_equipo_nuevo_vista360'
   },
 ];

@@ -21,11 +21,30 @@ type Entrada = {
   modelo?: { id: number; nombre: string };
   /** Otra página con el bloque de contacto (servicio técnico, lubricantes…). */
   formulario?: { titulo: string; conCiudad?: boolean; etiquetaMensaje?: string };
+  /**
+   * Ficha de maquinaria nueva (2026-10-21): cotización con el equipo como
+   * referencia, como el formulario de la ficha V2. Va con `formulario`.
+   */
+  equipo?: { id: number; nombre: string };
 };
 
 /** Las propiedades del formulario de `ContactoMarca`, compartidas con su ventana emergente. */
 export function configContactoMarca(e: Entrada): ConfigFormulario {
-  const { modelo, formulario } = e;
+  const { modelo, formulario, equipo } = e;
+  if (equipo) {
+    return {
+      tipo: "cotizacion",
+      origen: e.origen,
+      siteKey: e.siteKey,
+      whatsapp: e.whatsapp,
+      referencia: { tipo: "equipos-nuevos", id: equipo.id, texto: equipo.nombre },
+      titulo: formulario?.titulo ?? `Cotización: ${equipo.nombre}`,
+      textoBoton: e.boton || "Enviar",
+      clasificacion: false,
+      conCiudad: formulario?.conCiudad ?? true,
+      etiquetaMensaje: formulario?.etiquetaMensaje ?? "¿Qué necesitas?",
+    };
+  }
   return {
     tipo: modelo ? "repuesto" : "contacto",
     origen: e.origen,

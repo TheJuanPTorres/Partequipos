@@ -1,0 +1,132 @@
+/*
+ * Ventana emergente de la ficha de maquinaria nueva (2026-10-21): el PDF en el
+ * visor y la vista 360. Como la del formulario (`ventanaFormulario.module.css`),
+ * pero ancha. Cerrada, el <dialog> no pinta nada (display: none): sin CLS.
+ *
+ * El ancho del documento: el libro abierto mide dos páginas, así que para que
+ * quepa en el alto de la pantalla su ancho no pasa de (alto disponible) ×
+ * proporción × 2. `--proporcion` la pone el botón (ancho / alto de la página).
+ */
+
+.ventana {
+  width: min(1200px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--color-texto, #1a1a1a);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.ventana::backdrop {
+  background: rgb(0 0 0 / 0.7);
+}
+
+/* La página de detrás no se desplaza mientras la ventana está abierta. */
+:global(html:has(dialog[data-ventana-ficha][open])) {
+  overflow: hidden;
+}
+
+.contenido {
+  /* Alto que queda para el documento: la pantalla menos la cabecera, los controles y el aire. */
+  --alto-libre: calc(100dvh - 32px - 210px);
+
+  width: min(100%, calc(var(--alto-libre) * var(--proporcion, 1.414) * 2 + 64px));
+  margin-inline: auto;
+  padding: 20px 32px 28px;
+}
+
+.cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.cerrar {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  margin: -8px -10px 0 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.cerrar:hover {
+  background: rgb(0 0 0 / 0.08);
+}
+
+.cerrar:focus-visible {
+  outline: 3px solid currentcolor;
+  outline-offset: 2px;
+}
+
+/* Vista 360: un marco 16:9 que cabe en el alto de la pantalla. */
+.marco360 {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: calc(100dvh - 32px - 120px);
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 12px;
+  background: #111;
+}
+
+.ventana360 .contenido {
+  width: 100%;
+}
+
+/* Móvil: a pantalla completa. */
+@media (max-width: 767px) {
+  .ventana {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .contenido {
+    width: 100%;
+    padding: 16px 16px 24px;
+  }
+
+  .marco360 {
+    max-height: none;
+    height: calc(100dvh - 110px);
+    aspect-ratio: auto;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ventana[open] {
+    animation: aparece 160ms ease-out;
+  }
+}
+
+@keyframes aparece {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

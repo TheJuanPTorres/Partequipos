@@ -27,6 +27,7 @@ export function ContactoMarca({
   marca,
   id = "repuestos-marca-contacto",
   modelo,
+  equipo,
   formulario,
 }: {
   titulo: string;
@@ -44,6 +45,8 @@ export function ContactoMarca({
    * de clasificación.
    */
   modelo?: { id: number; nombre: string };
+  /** Ficha de maquinaria nueva: cotización con el equipo como referencia. */
+  equipo?: { id: number; nombre: string };
   /**
    * Otra página con el mismo bloque (servicio técnico, 2026-10-19): el título
    * del formulario para lectores y sus campos. Sin esto, el de repuestos.
@@ -64,7 +67,16 @@ export function ContactoMarca({
       />
       <div className={estilos.formulario}>
         <FormularioSolicitud
-          {...configContactoMarca({ origen, siteKey, whatsapp, boton, marca, modelo, formulario })}
+          {...configContactoMarca({
+            origen,
+            siteKey,
+            whatsapp,
+            boton,
+            marca,
+            modelo,
+            equipo,
+            formulario,
+          })}
           variante="plano"
         />
       </div>

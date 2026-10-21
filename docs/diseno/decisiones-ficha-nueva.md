@@ -130,7 +130,25 @@ lo deshace igual que lo demás.
 - el vibrocompactador Case SV208;
 - el bulldozer Case 1150M.
 
-## 6. Cortes
+## 6. Sin desplazamiento al llegar Inter
+
+Inter llega sin precarga (CLAUDE.md §10.36). Con la descripción en la cabecera,
+al cambiar de fuente la descripción, el título de escritorio y las pastillas
+ganaban o perdían una línea, y la cabecera se movía. Medido en el 1150M: CLS
+0,1237 a 1010 y 0,0219 a 1440.
+
+**Arreglo (`.reserva` de `fichaNueva.module.css`):** la misma idea que la
+cabecera del artículo, una copia invisible del texto (`data-reserva`) en la
+fuente de respaldo, ensanchada y en negrita, que fija el alto.
+
+- **Descripción:** su texto plano (`reservaDescripcion`), con los párrafos
+  separados exactamente una línea.
+- **Título de escritorio y cada pastilla:** también llevan su copia.
+
+**Comprobado:** con Inter bloqueado y sin bloquear, los altos son los mismos
+en la descripción y en las pastillas.
+
+## 7. Cortes
 
 Escritorio ≥ 1025, tablet 768–1024 y móvil ≤ 767, como la V2. Las medidas en
 el preview, en el informe del PR.

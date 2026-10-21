@@ -439,6 +439,28 @@
   padding: 10px;
 }
 
+/*
+ * Las dos llamadas a la acción de la tarjeta principal, más grandes (dirección,
+ * 2026-10-20): la letra de «Ver todo» de la portada (20 px; 18 en móvil, por
+ * `--texto-destacado`) y el icono a escala. Mismo estilo y colores. Crecen
+ * para llenar su fila: si no caben uno al lado del otro, cada uno va a todo
+ * el ancho, en cualquier pantalla.
+ */
+.botonGrande {
+  flex: 1 1 auto;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px 34px 14px;
+  font-size: var(--texto-destacado);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.botonGrande svg {
+  width: 1.2em;
+  height: 1.2em;
+}
+
 /* ====================== 2. DESCRIPCIÓN Y FICHA TÉCNICA ====================== */
 
 .descripcion {
@@ -889,10 +911,12 @@
     padding: 10px 12px;
   }
 
+  /* En móvil no caben uno al lado del otro: uno debajo del otro y a todo el ancho. */
   .botones {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    align-self: stretch;
+    align-items: stretch;
+    gap: 12px;
     padding: 0;
   }
 

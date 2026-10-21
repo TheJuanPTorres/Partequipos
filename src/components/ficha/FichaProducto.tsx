@@ -182,7 +182,7 @@ export function FichaProducto({
           <div className={`${estilos.botones} ${estilos.noImprimir}`}>
             <BotonFormulario
               href={`#${ANCLA_COTIZAR}`}
-              className={`${estilos.boton} texto-etiqueta`}
+              className={`${estilos.boton} ${estilos.botonGrande}`}
               formulario={formulario}
             >
               <IconCirclePlus aria-hidden="true" stroke={1.75} />
@@ -191,7 +191,7 @@ export function FichaProducto({
             {experto ? (
               <a
                 href={experto.href}
-                className={`${estilos.boton} ${estilos.botonOscuro} texto-etiqueta`}
+                className={`${estilos.boton} ${estilos.botonOscuro} ${estilos.botonGrande}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

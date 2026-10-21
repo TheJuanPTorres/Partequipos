@@ -160,18 +160,18 @@ tipo. Además llevan puntos destacados y ficha técnica: copia los datos tal
 como los publica el fabricante, con su unidad («20.500 kg»). Si no hay dato
 oficial, no lo pongas.
 
-- **Los datos junto al título de la ficha** salen solos de la ficha técnica,
-  si están: **potencia neta, peso operativo, alcance máximo en el suelo,
-  profundidad máxima de excavación y motor** (se reconocen por la etiqueta de
-  la fila, con su icono). El resto de filas sale debajo, en «Más
-  especificaciones». Para enseñar otros datos, usa «Destacar».
-- **«Destacar» en la ficha técnica:** marca **hasta 4 filas**. Entonces salen
-  esas, y no las cinco de arriba, con su icono junto al título de la ficha.
-  Al marcarla aparece **«Icono»**: elige el que mejor encaje («Peso»,
-  «Potencia», «Motor»…); si no eliges, sale «Otro dato». Bajo la ficha
-  técnica, un contador dice cuántas llevas («Filas destacadas: 3 de 4»). Con
-  una quinta marcada se pone en rojo y te dice cuántas quitar; si guardas así,
-  el panel no lo deja y el aviso de arriba nombra las casillas.
+- **Los datos junto al título de la ficha: como mucho 5** (regla del
+  cliente). Salen solos de la ficha técnica, en este orden de prioridad:
+  **potencia neta, peso operativo, motor, fuerza de tracción máxima y ancho
+  de la zapata** (se reconocen por la etiqueta, con o sin tildes ni
+  mayúsculas). Si falta alguna, se completa hasta 5 con las **siguientes filas
+  de la ficha técnica, en el orden en que están**; con menos filas, las que
+  haya. El orden de las filas importa: lo que quieras ver antes, más arriba.
+- **«Destacar» en la ficha técnica:** elige los datos de la tarjeta del equipo
+  en la **página de su marca** (hasta 4). No cambia la ficha del equipo. Al
+  marcarla aparece **«Icono»** («Peso», «Potencia», «Motor»…; sin elegir,
+  «Otro dato»). Bajo la ficha técnica, un contador dice cuántas llevas; con
+  una quinta marcada se pone en rojo y el panel no deja guardar.
 - **«Ficha técnica completa (PDF)»:** súbelo ahí mismo con **«Crear»**, o
   elige uno ya subido. Solo PDF, **máximo 30 MB**. Sale en la ficha como el
   botón **«Ficha técnica»**, que abre el PDF como un libro (el visor) en una

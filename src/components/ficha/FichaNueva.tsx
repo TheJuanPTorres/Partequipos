@@ -23,8 +23,8 @@ import nueva from "./fichaNueva.module.css";
  * aditamentos nuevos; la unidad USADA sigue con la ficha V2 (`FichaProducto`).
  *
  * Es la V2 (export 3166) con lo que cambia la 4036: cabecera sobre fondo
- * neutro (sin el degradado rojo, dirección), descripción y los cinco datos de
- * la plantilla bajo el título, «Ficha técnica» (el PDF en el visor tipo libro)
+ * neutro (sin el degradado rojo, dirección), descripción y como mucho 5
+ * características bajo el título (regla del cliente: sin tabla aparte), «Ficha técnica» (el PDF en el visor tipo libro)
  * y «Habla con un experto», «Ver en vista 360» si hay enlace, «Otras <tipo>»
  * con su franja, la llamada «Contáctanos para recibir asesoría», el contacto
  * con nuestro formulario y los testimonios. Reutiliza las clases de la V2
@@ -80,8 +80,6 @@ type Props = {
   /** La descripción comercial, ya pintada (texto enriquecido). */
   descripcion: ReactNode | null;
   datos: DatoDestacado[];
-  /** Las filas de la ficha técnica que no salen en la cabecera. */
-  especificaciones: { id?: string | null; etiqueta: string; valor: string }[];
   pdf: PdfVisor | null;
   vista360: string | null;
   /** Enlace de WhatsApp de «Habla con un experto»; `null` si la empresa no tiene número. */
@@ -106,7 +104,6 @@ export function FichaNueva({
   fotos,
   descripcion,
   datos,
-  especificaciones,
   pdf,
   vista360,
   experto,
@@ -230,27 +227,7 @@ export function FichaNueva({
         </div>
       </section>
 
-      {/*
-        2. MÁS ESPECIFICACIONES (no está en la plantilla): las filas de la ficha
-        técnica que la cabecera no enseña. Se conservan para no quitar contenido
-        de la página (NO TOCAR SEO). Sin filas de más, no sale.
-      */}
-      {especificaciones.length > 0 ? (
-        <section className={nueva.especificaciones} aria-labelledby="mas-especificaciones">
-          <h2 id="mas-especificaciones" className={`${estilos.subtitulo} texto-titulo-3`}>
-            Más especificaciones
-          </h2>
-          <dl className={`${estilos.especificaciones} ${nueva.listaEspecificaciones} texto-cuerpo`}>
-            {especificaciones.map((e) => (
-              <div key={e.id ?? e.etiqueta}>
-                <dt>{e.etiqueta}:</dt> <dd>{e.valor}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      ) : null}
-
-      {/* 3. «OTRAS <TIPO>»: la franja con la foto del tipo y las tarjetas. Sin otras, no sale. */}
+      {/* 2. «OTRAS <TIPO>»: la franja con la foto del tipo y las tarjetas. Sin otras, no sale. */}
       {otras.tarjetas.length > 0 ? (
         <section className={nueva.otras} aria-labelledby="otras-del-tipo">
           <div className={nueva.franja}>
@@ -305,7 +282,7 @@ export function FichaNueva({
         </section>
       ) : null}
 
-      {/* 4. LLAMADA A CONTACTAR: la que ya tenemos (no la del operario de la plantilla). */}
+      {/* 3. LLAMADA A CONTACTAR: la que ya tenemos (no la del operario de la plantilla). */}
       <section className={`${estilos.contacto} ${nueva.asesoria}`} aria-labelledby="asesoria">
         <RecuadroAsesoria
           formulario={formulario}
@@ -316,7 +293,7 @@ export function FichaNueva({
         />
       </section>
 
-      {/* 5 y 6. CONTACTO (nuestro formulario) y TESTIMONIOS. */}
+      {/* 4 y 5. CONTACTO (nuestro formulario) y TESTIMONIOS. */}
       <div className={nueva.cierre}>{cierre}</div>
     </main>
   );

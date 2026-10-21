@@ -22,23 +22,22 @@ tarjetas comparten medidas con la V2, así que se reutilizan sus clases
 
 ## 2. Bloque a bloque
 
-| Bloque de la plantilla                                     | En el sitio                                                                                                                                                                                         | Ajuste                                                                                                                                               |
-| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tarjeta de cabecera con degradado rojo `#CE2A2C` → blanco  | Tarjeta **blanca** de radio 30 sobre el gris de la página, como las demás tarjetas del sitio                                                                                                        | Dirección: sin el degradado. Sin el fondo desenfocado de la V2 (`GaleriaFicha sinFondo`)                                                             |
-| Galería con miniaturas (`uc_slider_image` + `remote_tabs`) | `GaleriaFicha` de la V2, sin cambios                                                                                                                                                                | Con una sola foto (la mayoría hoy) no hay miniaturas                                                                                                 |
-| «Ver en vista 360» (abre una ventana emergente)            | `BotonVista360`: solo si el equipo tiene **«Vista 360 (enlace)»**; abre el enlace en un marco dentro de una ventana emergente                                                                       | Campo nuevo (§3). Borde del negro del kit: el naranja `#E58624` de la plantilla no está en la paleta (errata)                                        |
-| Migas «Inicio / Maquinaria pesada nueva/»                  | Las migas completas en la píldora, como la V2                                                                                                                                                       | En tablet y móvil, píldora gris sobre blanco (la de la V2 era para la foto desenfocada)                                                              |
-| Título: «YANMAR / ViO50-6a» (escritorio) y nombre (móvil)  | **Un solo `<h1>`** con las dos variantes: marca y referencia (`codigo`) en dos líneas en escritorio y tablet; el nombre completo en móvil                                                           | Sin referencia (los aditamentos), el nombre en todas. En móvil, título negro: el blanco de la plantilla iba sobre el degradado rojo                  |
-| Descripción (un párrafo)                                   | La `entradilla` y la «Descripción comercial» (texto enriquecido), bajo el título                                                                                                                    | Un título dentro de la descripción se pinta como texto en negrita, para no competir con el `<h1>`                                                    |
-| 5 datos con icono                                          | Potencia neta, Peso operativo, Alcance máximo en el suelo, Profundidad máxima de excavación y Motor, **solo los que tenga** (§4)                                                                    | Pastillas en el gris del kit: las de vidrio de la plantilla no se ven sobre blanco. Iconos de Tabler (los de la plantilla son de Flaticon, L2)       |
-| «Ficha técnica» (abre una ventana emergente)               | `BotonVisorPdf`: el PDF del equipo en el **visor tipo libro** (#295) dentro de una ventana emergente. Sin PDF, no sale                                                                              | Sin «Páginas como imágenes», abre el PDF en otra pestaña (§5). Tamaño grande del #306                                                                |
-| «Habla con un experto»                                     | Igual que antes: WhatsApp con el nombre y la URL del equipo                                                                                                                                         | Tamaño grande del #306. **No hay «Cotizar»** (dirección)                                                                                             |
-| _(no está en la plantilla)_                                | **«Más especificaciones»**: las filas de la ficha técnica que la cabecera no enseña, en dos columnas en escritorio. Sin filas de más, no sale                                                       | Se conserva para no quitar contenido de la página (no tocar el SEO). 59 de 103 equipos la tienen                                                     |
-| «Otras Excavadoras»: franja con foto y título              | `tituloOtras`: «Otras»/«Otros» según la primera palabra del tipo. Foto: la «Imagen de la tarjeta» del tipo; vacía, la primera foto de su primer equipo (`primeraFotoPorTipo`)                       | —                                                                                                                                                    |
-| Tarjetas: foto, nombre, datos, «Ver más» y «Ficha técnica» | Hasta **3 equipos del mismo tipo** (el tipo ya es de la marca), sin el de la página; datos como las tarjetas de la página de marca (`datosDeTarjeta`, 3); «Ficha técnica» en el visor, solo con PDF | **Regla de tarjetas del sitio (#281):** la plantilla oculta la 3.ª en tablet y la 2.ª y 3.ª en móvil; aquí se ven todas. Foto 3:2 entera, como la V2 |
-| CTA del operario con casco                                 | **La nuestra**: «Contáctanos para recibir asesoría» con la foto del mecánico, «Contáctanos» (formulario en ventana) y «WhatsApp» (`RecuadroAsesoria`, el mismo de la V2)                            | Dirección                                                                                                                                            |
-| Formulario de Elementor (con n.º de documento)             | **El nuestro** (`ContactoMarca`): «Contacto Partequipos», «Si deseas más información, contáctanos», **Ciudad** y **«¿Qué necesitas?»**, sin n.º de documento                                        | La solicitud es una cotización con el equipo como referencia (`configContactoMarca` con `equipo`), como el formulario de la V2                       |
-| Testimonios (acordeón de vídeos)                           | `SeccionTestimonios` de la portada                                                                                                                                                                  | —                                                                                                                                                    |
+| Bloque de la plantilla                                     | En el sitio                                                                                                                                                                                                          | Ajuste                                                                                                                                               |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tarjeta de cabecera con degradado rojo `#CE2A2C` → blanco  | Tarjeta **blanca** de radio 30 sobre el gris de la página, como las demás tarjetas del sitio                                                                                                                         | Dirección: sin el degradado. Sin el fondo desenfocado de la V2 (`GaleriaFicha sinFondo`)                                                             |
+| Galería con miniaturas (`uc_slider_image` + `remote_tabs`) | `GaleriaFicha` de la V2, sin cambios                                                                                                                                                                                 | Con una sola foto (la mayoría hoy) no hay miniaturas                                                                                                 |
+| «Ver en vista 360» (abre una ventana emergente)            | `BotonVista360`: solo si el equipo tiene **«Vista 360 (enlace)»**; abre el enlace en un marco dentro de una ventana emergente                                                                                        | Campo nuevo (§3). Borde del negro del kit: el naranja `#E58624` de la plantilla no está en la paleta (errata)                                        |
+| Migas «Inicio / Maquinaria pesada nueva/»                  | Las migas completas en la píldora, como la V2                                                                                                                                                                        | En tablet y móvil, píldora gris sobre blanco (la de la V2 era para la foto desenfocada)                                                              |
+| Título: «YANMAR / ViO50-6a» (escritorio) y nombre (móvil)  | **Un solo `<h1>`** con las dos variantes: marca y referencia (`codigo`) en dos líneas en escritorio y tablet; el nombre completo en móvil                                                                            | Sin referencia (los aditamentos), el nombre en todas. En móvil, título negro: el blanco de la plantilla iba sobre el degradado rojo                  |
+| Descripción (un párrafo)                                   | La `entradilla` y la «Descripción comercial» (texto enriquecido), bajo el título                                                                                                                                     | Un título dentro de la descripción se pinta como texto en negrita, para no competir con el `<h1>`                                                    |
+| 5 datos con icono                                          | **Como mucho 5 características** (regla del cliente, §4): potencia neta, peso operativo, motor, fuerza de tracción máxima y ancho de la zapata; si falta alguna, otras filas reales de la ficha técnica, en su orden | Pastillas en el gris del kit: las de vidrio de la plantilla no se ven sobre blanco. Iconos de Tabler (los de la plantilla son de Flaticon, L2)       |
+| «Ficha técnica» (abre una ventana emergente)               | `BotonVisorPdf`: el PDF del equipo en el **visor tipo libro** (#295) dentro de una ventana emergente. Sin PDF, no sale                                                                                               | Sin «Páginas como imágenes», abre el PDF en otra pestaña (§5). Tamaño grande del #306                                                                |
+| «Habla con un experto»                                     | Igual que antes: WhatsApp con el nombre y la URL del equipo                                                                                                                                                          | Tamaño grande del #306. **No hay «Cotizar»** (dirección)                                                                                             |
+| «Otras Excavadoras»: franja con foto y título              | `tituloOtras`: «Otras»/«Otros» según la primera palabra del tipo. Foto: la «Imagen de la tarjeta» del tipo; vacía, la primera foto de su primer equipo (`primeraFotoPorTipo`)                                        | —                                                                                                                                                    |
+| Tarjetas: foto, nombre, datos, «Ver más» y «Ficha técnica» | Hasta **3 equipos del mismo tipo** (el tipo ya es de la marca), sin el de la página; las 3 primeras de sus 5 características; «Ficha técnica» en el visor, solo con PDF                                              | **Regla de tarjetas del sitio (#281):** la plantilla oculta la 3.ª en tablet y la 2.ª y 3.ª en móvil; aquí se ven todas. Foto 3:2 entera, como la V2 |
+| CTA del operario con casco                                 | **La nuestra**: «Contáctanos para recibir asesoría» con la foto del mecánico, «Contáctanos» (formulario en ventana) y «WhatsApp» (`RecuadroAsesoria`, el mismo de la V2)                                             | Dirección                                                                                                                                            |
+| Formulario de Elementor (con n.º de documento)             | **El nuestro** (`ContactoMarca`): «Contacto Partequipos», «Si deseas más información, contáctanos», **Ciudad** y **«¿Qué necesitas?»**, sin n.º de documento                                                         | La solicitud es una cotización con el equipo como referencia (`configContactoMarca` con `equipo`), como el formulario de la V2                       |
+| Testimonios (acordeón de vídeos)                           | `SeccionTestimonios` de la portada                                                                                                                                                                                   | —                                                                                                                                                    |
 
 **Quedó fuera de la plantilla**, y por qué:
 
@@ -46,6 +45,8 @@ tarjetas comparten medidas con la V2, así que se reutilizan sus clases
 - **El texto de la V2 en su propia sección:** la descripción pasa a la cabecera.
 - **El movimiento de las pastillas de datos con el scroll** (`motion_fx`): no
   aporta nada y movería el contenido (CLS).
+- **La tabla de especificaciones de la V2:** regla del cliente, máximo 5
+  características (§4). Las filas siguen guardadas y en el JSON-LD.
 
 **No cambia:** las URL, los metadatos (título, descripción, canónica, `noindex`
 mientras el sitio esté cerrado), el JSON-LD (`Product` con **todas** las filas
@@ -64,32 +65,50 @@ emergente. Solo `https` y sin usuario ni contraseña (`validarVista360`).
 - El marco solo existe con la ventana abierta, así que la página no carga nada del proveedor hasta que se pulsa.
 - **CSP:** hoy está en `Report-Only` y el marco funciona. Al pasar a la fase 2 (§10.16), el dominio del proveedor tendrá que entrar en `frame-src`.
 
-## 4. Los cinco datos de la cabecera
+## 4. Máximo 5 características (regla del cliente, 2026-10-21)
 
-**No hay campos nuevos:** los cinco existen ya en el panel como filas de
-«Ficha técnica» de cada equipo, con etiquetas variadas y erratas de WordPress
-(«ALANCE MAXIMO EN EL SUELO», «Máx. profundidad de excavación», «Potencia neta
-(SAE J1349)»…). `datosDeCabecera` las reconoce por la etiqueta y pinta la
-etiqueta y el valor **tal cual** están en la fila; si el equipo no tiene el
-dato, no sale. Para la potencia prefiere la neta; si el fabricante solo da
-otra, sale esa con su propia etiqueta. «Motor de arranque» no cuenta como motor.
+La ficha enseña **como mucho 5 características**, las de la cabecera de la
+plantilla, y **no hay tabla de especificaciones aparte**. **No hay campos
+nuevos:** salen de las filas de «Ficha técnica» del equipo (`datosDeCabecera`),
+y no cambia ningún dato guardado.
 
-Si el editor marca **«Destacar»** en alguna fila (hasta 4), salen esas en su
-lugar, como antes. Las filas que no salen en la cabecera van a «Más
-especificaciones».
+1. **Por prioridad:** Potencia neta, Peso operativo, Motor, Fuerza de tracción
+   máxima y Ancho de la zapata, las que tenga.
+2. **Si falta alguna,** se completa hasta 5 con otras filas reales de su
+   ficha técnica, **en el orden en que están guardadas**.
+3. **Con menos de 5 filas,** las que tenga. Nunca se inventa nada: la etiqueta
+   y el valor salen tal cual.
 
-Cobertura en el preview (103 equipos nuevos, 2026-10-21):
+**Emparejado de etiquetas.** Se comparan normalizadas (`normalizar`: sin
+tildes, en minúsculas, sin «:» final y con un solo espacio) contra unos
+patrones por prioridad, en orden de preferencia:
 
-| Dato        | Equipos que lo tienen |
-| ----------- | --------------------- |
-| Peso        | 84                    |
-| Motor       | 68                    |
-| Potencia    | 66                    |
-| Profundidad | 32                    |
-| Alcance     | 26                    |
+| Prioridad                 | Patrones (normalizados)                                                                      | Variantes encontradas en las 103 fichas                                                                                                                                                                               |
+| ------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Potencia neta             | empieza por «potencia neta» o «potencia nominal del volante neta»; si no, «potencia» a secas | POTENCIA NETA (36), Potencia Neta (5), Potencia Neta (SAE J1349) (5), Potencia neta (SAE J1349) (3), Potência neta (SAE J1349) (1), Potencia neta del motor (2), … a 2500 rpm (1), del volante Neta (2), Potencia (9) |
+| Peso operativo            | «peso operativo / operacional / de operación / en funcionamiento»                            | PESO OPERATIVO (56), Peso operativo (17), Peso de operación (6), Peso operacional (3), Peso operacional sin cabina (1), Peso en funcionamiento (1)                                                                    |
+| Motor                     | «motor» a secas; «(marca y) modelo del motor»                                                | MOTOR (45), Motor (12), Marca y modelo del motor (11)                                                                                                                                                                 |
+| Fuerza de tracción máxima | «fuerza de tracción máxima»; si no, «fuerza de tracción»                                     | Fuerza de tracción máxima (3), FUERZA DE TRACCIÓN MÁXIMA (3), Fuerza de tracción (1)                                                                                                                                  |
+| Ancho de la zapata        | «ancho de (la) zapata»                                                                       | Ancho de la zapata (5), ANCHO DE LA ZAPATA (3)                                                                                                                                                                        |
 
-- **Los cinco datos:** 15 equipos.
-- **Ninguno:** 16 equipos, los aditamentos (que no tienen ficha técnica) y 3 más.
+**Lo que NO se empareja, a propósito:**
+
+- **La potencia BRUTA** (14 filas, «Potencia Bruta (ISO 14396)»…) no ocupa el
+  sitio de la neta: si hace falta, entra de relleno con su propia etiqueta.
+- **«Motor de arranque», «Aceite del motor…», «Fabricante del Motor» y «Tipo
+  del Motor»** no son «Motor».
+- **«Barra de tracción parada»** (el 1150M) no se toma por la fuerza de
+  tracción máxima sin confirmarlo.
+- **Las fuerzas de excavación** y **«Número de zapatas»** tampoco.
+
+**«Destacar»** ya no cambia la ficha: elige los datos de la tarjeta del equipo
+en la página de su marca. Las tarjetas de «Otras …» llevan las 3 primeras de
+sus 5 características.
+
+**Lo que se enseña, en el preview** (103 equipos nuevos):
+
+- 46 equipos con 5 características, 19 con 4 y 25 con 3;
+- 13 sin ninguna: los aditamentos sin ficha técnica.
 
 ## 5. «Ficha técnica» en el visor
 

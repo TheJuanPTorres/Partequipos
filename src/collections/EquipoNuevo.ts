@@ -146,7 +146,7 @@ export const EquipoNuevo: CollectionConfig = {
       labels: { singular: "Especificación", plural: "Especificaciones" },
       admin: {
         description:
-          "Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. Junto al título de la ficha salen solas, con su icono, la potencia neta, el peso operativo, el alcance máximo en el suelo, la profundidad máxima de excavación y el motor, si están aquí (por su etiqueta). Para elegir otras, marca «Destacar» en hasta 4 filas: entonces salen esas. El resto de filas sale debajo, en «Más especificaciones».",
+          "Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. En la ficha salen como mucho 5, junto al título: potencia neta, peso operativo, motor, fuerza de tracción máxima y ancho de la zapata (se reconocen por la etiqueta); si falta alguna, se completa con las siguientes filas, en el orden de aquí. «Destacar» elige los datos de la tarjeta del equipo en la página de su marca.",
       },
       fields: [
         {

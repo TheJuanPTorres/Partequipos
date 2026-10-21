@@ -134,31 +134,7 @@
   backdrop-filter: none;
 }
 
-/* ====================== 2. MÁS ESPECIFICACIONES ====================== */
-
-.especificaciones {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin: 0 var(--ficha-margen) var(--ficha-margen);
-  padding: 2.82cqi;
-  border-radius: var(--ficha-radio);
-  background: var(--color-fondo);
-}
-
-/* En escritorio, en dos columnas (la lista de la V2, con su punto rojo y separador). */
-@media (min-width: 1025px) {
-  .listaEspecificaciones {
-    column-count: 2;
-    column-gap: 60px;
-  }
-
-  .listaEspecificaciones > div {
-    break-inside: avoid;
-  }
-}
-
-/* ====================== 3. «OTRAS <TIPO>» ====================== */
+/* ====================== 2. «OTRAS <TIPO>» ====================== */
 
 .otras {
   padding: 0 var(--ficha-margen) 5cqi;
@@ -243,7 +219,7 @@
   display: flex;
 }
 
-/* ====================== 4–6. ASESORÍA, CONTACTO Y TESTIMONIOS ====================== */
+/* ====================== 3–5. ASESORÍA, CONTACTO Y TESTIMONIOS ====================== */
 
 /* La llamada sola (en la V2 el formulario iba debajo, dentro de la misma sección). */
 .asesoria {

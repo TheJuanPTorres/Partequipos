@@ -12,13 +12,11 @@ import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import {
   datosDeCabecera,
   enlaceVista360,
-  filasRestantes,
   tituloEscritorio,
   tituloOtras,
 } from "@/lib/maquinaria/fichaNueva";
 import { DESTACADAS_EN_TARJETA, filasCompletas } from "@/lib/maquinaria/fichaTecnica";
 import { primeraFotoPorTipo } from "@/lib/nueva/paginaMarca";
-import { datosDeTarjeta } from "@/lib/nueva/paginaMarcaAndres";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getDocumentosParaVisor } from "@/lib/queries/getDocumentos";
 import { getFichaProducto } from "@/lib/queries/getFichaProducto";
@@ -138,9 +136,8 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     .filter((img): img is NonNullable<typeof img> => img !== null)
     .map(({ url, alt, width, height }) => ({ url, alt, width, height }));
 
-  // Los cinco datos de la plantilla salen de la ficha técnica; el resto, debajo.
+  // Máximo 5 características (regla del cliente): las de prioridad y, si faltan, otras reales.
   const datos = datosDeCabecera(equipo.fichaTecnica);
-  const restantes = filasRestantes(equipo.fichaTecnica, datos);
   const especificaciones = filasCompletas(equipo.fichaTecnica);
   const imagenContacto = imagenDeMedia(ficha.imagenContacto, "");
   // Un PNG es el recorte de ux-9 (sobresale del recuadro); otra cosa, una foto que lo llena.
@@ -162,7 +159,7 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     { nombre: equipo.nombre, path: ruta },
   ];
 
-  // El JSON-LD no cambia: todas las filas de la ficha técnica, como antes.
+  // El JSON-LD no cambia: todas las filas de la ficha técnica, como antes (no se toca el SEO).
   const productJsonLd = buildProductJsonLd({
     nombre: equipo.nombre,
     path: ruta,
@@ -202,7 +199,7 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     nombre: o.nombre,
     href: `${rutas.equipoNuevo(marca.slug, tipo.slug, o.slug)}/`,
     foto: imagenDeMedia(Array.isArray(o.imagenes) ? o.imagenes[0] : null, o.nombre),
-    datos: datosDeTarjeta(o.fichaTecnica).slice(0, DESTACADAS_EN_TARJETA),
+    datos: datosDeCabecera(o.fichaTecnica, DESTACADAS_EN_TARJETA),
     pdf: pdfDe(o),
   }));
 
@@ -214,11 +211,6 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
       fotos={fotos}
       descripcion={descripcion}
       datos={datos}
-      especificaciones={restantes.map((e) => ({
-        id: e.id,
-        etiqueta: e.etiqueta ?? "",
-        valor: e.valor ?? "",
-      }))}
       pdf={pdfDe(equipo)}
       vista360={enlaceVista360(equipo.vista360)}
       experto={experto ?? null}

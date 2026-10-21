@@ -1,10 +1,4 @@
-import {
-  destacadas,
-  filasCompletas,
-  MAX_DESTACADAS,
-  type DatoDestacado,
-  type FilaFicha,
-} from "./fichaTecnica";
+import { filasCompletas, type DatoDestacado, type FilaFicha } from "./fichaTecnica";
 
 /**
  * Lógica pura de la FICHA DE MAQUINARIA NUEVA con la plantilla de Andrés
@@ -14,70 +8,116 @@ import {
  */
 
 /**
- * Los cinco datos de la cabecera de la plantilla, en su orden. NO son campos
- * nuevos: salen de las filas de «Ficha técnica» del equipo, reconocidas por su
- * etiqueta (con las variantes y erratas que trae WordPress, p. ej. «ALANCE
- * MAXIMO EN EL SUELO»). Se pinta la etiqueta y el valor tal cual estén en la
- * fila: si el equipo no tiene el dato, no sale (nunca se inventa).
+ * REGLA DEL CLIENTE (2026-10-21): MÁXIMO 5 CARACTERÍSTICAS POR PRODUCTO, las de
+ * la cabecera de la plantilla. No hay tabla de especificaciones aparte. Por
+ * prioridad:
+ *
+ *   1. Potencia neta · 2. Peso operativo · 3. Motor ·
+ *   4. Fuerza de tracción máxima · 5. Ancho de la zapata
+ *
+ * Si falta alguna, se completa hasta 5 con OTRAS filas reales de su ficha
+ * técnica, en el orden en que están guardadas; con menos de 5 filas, las que
+ * tenga. Nunca se inventa nada: se pinta la etiqueta y el valor tal cual.
+ *
+ * Las etiquetas llegan de WordPress escritas de muchas formas (mayúsculas,
+ * tildes, «Potencia» frente a «Potencia neta», «(SAE J1349)»…): se comparan
+ * normalizadas (`normalizar`) contra los patrones de cada prioridad, en orden
+ * de preferencia. La potencia BRUTA no cuenta como neta: si es lo único que
+ * hay, entra como dato de relleno, con su propia etiqueta.
  */
-const DATOS_PLANTILLA: { icono: DatoDestacado["icono"]; patrones: RegExp[] }[] = [
+export const PRIORIDADES: {
+  nombre: string;
+  icono: DatoDestacado["icono"];
+  patrones: RegExp[];
+}[] = [
   {
+    nombre: "Potencia neta",
     icono: "potencia",
-    // Primero la neta; si el fabricante solo da otra, esa, con su propia etiqueta.
-    patrones: [/potencia\s+neta|potência\s+neta|volante\s+neta/i, /^potencia\b/i],
+    patrones: [/^potencia neta/, /^potencia nominal del volante neta/, /^potencia$/],
   },
   {
+    nombre: "Peso operativo",
     icono: "peso",
-    patrones: [/^peso\s+(operativo|operacional|de\s+operaci[oó]n|en\s+funcionamiento)/i],
+    patrones: [/^peso (operativo|operacional|de operacion|en funcionamiento)/],
   },
-  { icono: "alcance", patrones: [/^alc?ance\s+m[aá]ximo/i] },
-  { icono: "profundidad", patrones: [/profundidad.*excavaci|excavaci.*profundidad/i] },
-  { icono: "motor", patrones: [/^motor$/i, /^(marca\s+y\s+)?modelo\s+del\s+motor$/i] },
+  {
+    nombre: "Motor",
+    icono: "motor",
+    patrones: [/^motor$/, /^(marca y )?modelo del motor$/],
+  },
+  {
+    nombre: "Fuerza de tracción máxima",
+    icono: "otro",
+    patrones: [/^fuerza de traccion maxima/, /^fuerza (maxima )?de traccion/],
+  },
+  {
+    nombre: "Ancho de la zapata",
+    icono: "alcance",
+    patrones: [/^ancho de (la )?zapata/],
+  },
 ];
 
-/** La primera fila completa cuya etiqueta casa con un patrón, por orden de preferencia. */
-function filaPorPatrones<T extends FilaFicha>(filas: T[], patrones: RegExp[]): T | undefined {
-  for (const patron of patrones) {
-    const fila = filas.find((f) => patron.test(f.etiqueta!.trim()));
-    if (fila) return fila;
-  }
-  return undefined;
+/** Cuántas características se enseñan como mucho. */
+export const MAX_CARACTERISTICAS = 5;
+
+/** Minúsculas, sin tildes, sin «:» final y con un solo espacio: para comparar etiquetas. */
+export function normalizar(etiqueta: string): string {
+  return etiqueta
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/:\s*$/, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-export type DatoConFila = DatoDestacado & { fila: number };
+/** El icono de un dato de relleno, por su etiqueta; sin parecido, «otro». */
+export function iconoPorEtiqueta(etiqueta: string): DatoDestacado["icono"] {
+  const e = normalizar(etiqueta);
+  if (/^potencia|torque/.test(e)) return "potencia";
+  if (/^peso/.test(e)) return "peso";
+  if (/motor|cilindr|desplazamiento/.test(e)) return "motor";
+  if (/profundidad|altura|alt\./.test(e)) return "profundidad";
+  if (/capacidad|caudal|flujo|tanque/.test(e)) return "capacidad";
+  if (/velocidad/.test(e)) return "velocidad";
+  if (/alcance|ancho|largo|largura|longitud|radio/.test(e)) return "alcance";
+  return "otro";
+}
 
 /**
- * Los datos de la cabecera: si el editor marcó «Destacar» en alguna fila, esas
- * (hasta 4, con su icono); si no, los cinco de la plantilla que el equipo tenga.
- * `fila` es la posición en la ficha, para no repetirla en «Más especificaciones».
+ * Las características de la ficha (cabecera y, las 3 primeras, sus tarjetas):
+ * las de prioridad que tenga, en su orden, y después otras filas reales en el
+ * orden guardado, hasta `max`.
  */
-export function datosDeCabecera(filas: FilaFicha[] | null | undefined): DatoConFila[] {
+export function datosDeCabecera(
+  filas: FilaFicha[] | null | undefined,
+  max: number = MAX_CARACTERISTICAS,
+): DatoDestacado[] {
   const completas = filasCompletas(filas);
-  if (completas.some((f) => f.destacar)) {
-    const marcadas = destacadas(completas, MAX_DESTACADAS);
-    return marcadas.map((d) => ({
-      ...d,
-      fila: completas.findIndex((f) => f.destacar && f.etiqueta!.trim() === d.etiqueta),
-    }));
-  }
+  const normal = completas.map((f) => normalizar(f.etiqueta!));
   const usadas = new Set<number>();
-  return DATOS_PLANTILLA.flatMap(({ icono, patrones }) => {
-    const libres = completas.filter((_, i) => !usadas.has(i));
-    const fila = filaPorPatrones(libres, patrones);
-    if (!fila) return [];
-    const i = completas.indexOf(fila);
+  const elegidas: { i: number; icono: DatoDestacado["icono"] }[] = [];
+  for (const { icono, patrones } of PRIORIDADES) {
+    let encontrada = -1;
+    for (const patron of patrones) {
+      encontrada = normal.findIndex((e, i) => !usadas.has(i) && patron.test(e));
+      if (encontrada >= 0) break;
+    }
+    if (encontrada >= 0) {
+      usadas.add(encontrada);
+      elegidas.push({ i: encontrada, icono });
+    }
+  }
+  for (let i = 0; i < completas.length && elegidas.length < max; i++) {
+    if (usadas.has(i)) continue;
     usadas.add(i);
-    return [{ etiqueta: fila.etiqueta!.trim(), valor: fila.valor!.trim(), icono, fila: i }];
-  });
-}
-
-/** Las filas de la ficha técnica que la cabecera no enseña ya («Más especificaciones»). */
-export function filasRestantes<T extends FilaFicha>(
-  filas: T[] | null | undefined,
-  enCabecera: readonly { fila: number }[],
-): T[] {
-  const ya = new Set(enCabecera.map((d) => d.fila));
-  return filasCompletas(filas).filter((_, i) => !ya.has(i));
+    elegidas.push({ i, icono: iconoPorEtiqueta(completas[i]!.etiqueta!) });
+  }
+  return elegidas.slice(0, max).map(({ i, icono }) => ({
+    etiqueta: completas[i]!.etiqueta!.trim(),
+    valor: completas[i]!.valor!.trim(),
+    icono,
+  }));
 }
 
 /**

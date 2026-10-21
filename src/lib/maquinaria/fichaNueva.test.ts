@@ -4,7 +4,8 @@ import { describe, it } from "node:test";
 import {
   datosDeCabecera,
   enlaceVista360,
-  filasRestantes,
+  iconoPorEtiqueta,
+  normalizar,
   tituloEscritorio,
   tituloOtras,
   validarVista360,
@@ -18,97 +19,124 @@ const fila = (etiqueta: string, valor: string, destacar = false, icono?: string)
   icono: icono ?? null,
 });
 
-describe("datosDeCabecera", () => {
-  it("reconoce los cinco de la plantilla, en su orden, con la etiqueta tal cual (también erratas)", () => {
-    const filas = [
-      fila("PESO OPERATIVO", "13 t"),
-      fila("MOTOR", "Isuzu AM-4JJ1X"),
-      fila("ALANCE MAXIMO EN EL SUELO", "8,65m"),
-      fila("POTENCIA NETA", "98 hp"),
-      fila("PROFUNDIDAD MÁXIMA DE EXCAVACIÓN", "6,0m"),
-    ];
-    const d = datosDeCabecera(filas);
+describe("datosDeCabecera (regla del cliente: máximo 5, por prioridad)", () => {
+  const ver = (filas: FilaFicha[], max?: number) =>
+    datosDeCabecera(filas, max).map((d) => `${d.etiqueta}: ${d.valor}`);
+
+  it("1150M Tier4: los cinco de prioridad, en su orden y tal cual están guardados", () => {
     assert.deepEqual(
-      d.map((x) => [x.etiqueta, x.valor, x.icono]),
+      ver([
+        fila("POTENCIA NETA", "138 hp"),
+        fila("FUERZA DE TRACCIÓN MÁXIMA", "213,5 kN"),
+        fila("PESO OPERATIVO", "14,3 t"),
+        fila("ANCHO DE LA ZAPATA", "22/26/30 in (según requerimiento cliente)"),
+        fila("MOTOR", "FPT F4HFE613F"),
+      ]),
       [
-        ["POTENCIA NETA", "98 hp", "potencia"],
-        ["PESO OPERATIVO", "13 t", "peso"],
-        ["ALANCE MAXIMO EN EL SUELO", "8,65m", "alcance"],
-        ["PROFUNDIDAD MÁXIMA DE EXCAVACIÓN", "6,0m", "profundidad"],
-        ["MOTOR", "Isuzu AM-4JJ1X", "motor"],
+        "POTENCIA NETA: 138 hp",
+        "PESO OPERATIVO: 14,3 t",
+        "MOTOR: FPT F4HFE613F",
+        "FUERZA DE TRACCIÓN MÁXIMA: 213,5 kN",
+        "ANCHO DE LA ZAPATA: 22/26/30 in (según requerimiento cliente)",
       ],
     );
-    assert.deepEqual(filasRestantes(filas, d), []);
   });
 
-  it("sin el dato, no sale: nunca se inventa", () => {
-    const d = datosDeCabecera([fila("Peso operativo", "8.400 kg"), fila("Cilindros", "4")]);
+  it("si falta alguna, completa con otras filas reales en el orden guardado", () => {
+    assert.deepEqual(
+      ver([
+        fila("POTENCIA NETA", "98 hp"),
+        fila("ALANCE MAXIMO EN EL SUELO", "8,65m"),
+        fila("PESO OPERATIVO", "13 t"),
+        fila("PROFUNDIDAD MÁXIMA DE EXCAVACIÓN", "6,0m"),
+        fila("MOTOR", "Isuzu AM-4JJ1X"),
+        fila("Cilindros", "4"),
+      ]),
+      [
+        "POTENCIA NETA: 98 hp",
+        "PESO OPERATIVO: 13 t",
+        "MOTOR: Isuzu AM-4JJ1X",
+        "ALANCE MAXIMO EN EL SUELO: 8,65m",
+        "PROFUNDIDAD MÁXIMA DE EXCAVACIÓN: 6,0m",
+      ],
+    );
+  });
+
+  it("con menos de 5 filas, las que haya: nunca se inventa", () => {
+    assert.deepEqual(ver([fila("MOTOR", "Kubota – 25 hp"), fila("PESO OPERATIVO", "2,6 Ton")]), [
+      "PESO OPERATIVO: 2,6 Ton",
+      "MOTOR: Kubota – 25 hp",
+    ]);
+    assert.deepEqual(ver([]), []);
+    assert.deepEqual(ver(null as unknown as FilaFicha[]), []);
+  });
+
+  it("empareja las variantes de WordPress: mayúsculas, tildes, «(SAE J1349)», «Potencia» a secas", () => {
+    const d = datosDeCabecera([
+      fila("Potência neta (SAE J1349)", "92 hp"),
+      fila("Peso de Operación", "5,25 t"),
+      fila("Marca y modelo del motor", "FPT 445TA"),
+      fila("Fuerza de tracción", "100 kN"),
+      fila("Ancho de la zapata:", "500 mm"),
+    ]);
     assert.deepEqual(
       d.map((x) => x.icono),
-      ["peso"],
+      ["potencia", "peso", "motor", "otro", "alcance"],
     );
+    assert.equal(ver([fila("Potencia", "64 hp")])[0], "Potencia: 64 hp");
   });
 
-  it("prefiere la potencia neta y, si no hay, toma otra potencia con su propia etiqueta", () => {
-    const conNeta = datosDeCabecera([
-      fila("Potencia bruta (ISO 14396)", "110 hp"),
-      fila("Potencia neta (SAE J1349)", "98 hp"),
-    ]);
-    assert.equal(conNeta[0]?.etiqueta, "Potencia neta (SAE J1349)");
-    const sinNeta = datosDeCabecera([fila("Potencia bruta (ISO 14396)", "110 hp")]);
-    assert.equal(sinNeta[0]?.etiqueta, "Potencia bruta (ISO 14396)");
-  });
-
-  it("reconoce las variantes de profundidad y de motor, pero no «motor de arranque»", () => {
-    const d = datosDeCabecera([
-      fila("Máx. profundidad de excavación", "4,1 m"),
-      fila("Motor de arranque", "12 V"),
-      fila("Marca y modelo del motor", "Yanmar 4TNV88C"),
-    ]);
+  it("la potencia BRUTA no ocupa el sitio de la neta: va de relleno, con su etiqueta", () => {
     assert.deepEqual(
-      d.map((x) => [x.icono, x.valor]),
+      ver([
+        fila("Potencia bruta (SAE J1349)", "130 hp"),
+        fila("Peso operativo", "13 t"),
+        fila("Potencia neta (SAE J1349)", "118 hp"),
+      ]),
       [
-        ["profundidad", "4,1 m"],
-        ["motor", "Yanmar 4TNV88C"],
+        "Potencia neta (SAE J1349): 118 hp",
+        "Peso operativo: 13 t",
+        "Potencia bruta (SAE J1349): 130 hp",
       ],
     );
   });
 
-  it("si el editor marcó «Destacar», mandan esas filas (con su icono)", () => {
-    const filas = [
-      fila("Potencia neta", "98 hp"),
-      fila("Ancho de rodadura", "2,5 m", true, "alcance"),
-      fila("Peso operativo", "13 t"),
-    ];
-    const d = datosDeCabecera(filas);
+  it("«Motor de arranque» no es el motor; «Destacar» no cambia la ficha", () => {
+    const d = datosDeCabecera([
+      fila("Motor de arranque", "12 V", true, "otro"),
+      fila("Motor", "Yanmar 4TNV88C"),
+    ]);
     assert.deepEqual(
-      d.map((x) => [x.etiqueta, x.icono, x.fila]),
-      [["Ancho de rodadura", "alcance", 1]],
-    );
-    assert.deepEqual(
-      filasRestantes(filas, d).map((f) => f.etiqueta),
-      ["Potencia neta", "Peso operativo"],
+      d.map((x) => x.etiqueta),
+      ["Motor", "Motor de arranque"],
     );
   });
 
-  it("sin ficha técnica, ningún dato", () => {
-    assert.deepEqual(datosDeCabecera(null), []);
-    assert.deepEqual(datosDeCabecera([]), []);
+  it("las tarjetas piden 3: los 3 primeros de los mismos 5", () => {
+    assert.deepEqual(
+      ver(
+        [
+          fila("Motor", "M"),
+          fila("Peso operativo", "P"),
+          fila("Potencia neta", "N"),
+          fila("Ancho de la zapata", "Z"),
+        ],
+        3,
+      ),
+      ["Potencia neta: N", "Peso operativo: P", "Motor: M"],
+    );
   });
 });
 
-describe("filasRestantes", () => {
-  it("devuelve lo que la cabecera no enseña, en el orden de la ficha y sin filas incompletas", () => {
-    const filas = [
-      fila("Peso operativo", "13 t"),
-      fila("Cilindros", "4"),
-      fila("Vacía", ""),
-      fila("Ancho de la zapata", "500 mm"),
-    ];
-    assert.deepEqual(
-      filasRestantes(filas, datosDeCabecera(filas)).map((f) => f.etiqueta),
-      ["Cilindros", "Ancho de la zapata"],
-    );
+describe("normalizar e iconoPorEtiqueta", () => {
+  it("compara sin tildes, mayúsculas ni «:» final", () => {
+    assert.equal(normalizar("  FUERZA DE TRACCIÓN  MÁXIMA: "), "fuerza de traccion maxima");
+  });
+
+  it("los datos de relleno llevan el icono que se les parece", () => {
+    assert.equal(iconoPorEtiqueta("Profundidad de dragado"), "profundidad");
+    assert.equal(iconoPorEtiqueta("Capacidad del cucharón"), "capacidad");
+    assert.equal(iconoPorEtiqueta("Certificación"), "otro");
   });
 });
 

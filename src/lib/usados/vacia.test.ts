@@ -36,10 +36,8 @@ describe("estado vacío de usados", () => {
     assert.equal(nombreComparable("Vibrocompactadores"), "vibrocompactador");
   });
 
-  it("la categoría de nueva con el mismo nombre, si tiene equipos", () => {
-    const equipos = [
-      equipo(1, "Cargadores", "cargadores", "Case Construction", "case-construction"),
-    ];
+  it("sin tipo del mismo nombre, la categoría de nueva con el mismo nombre, si tiene equipos", () => {
+    const equipos = [equipo(1, "Frontales", "frontales", "Case Construction", "case-construction")];
     const t = alternativasEnNueva(
       "Cargadores",
       [{ slug: "cargadores", nombre: "Cargadores", tipos: [1] }],
@@ -52,7 +50,7 @@ describe("estado vacío de usados", () => {
     );
   });
 
-  it("la foto de la categoría, mejor de un equipo de su mismo tipo (no del aditamento)", () => {
+  it("el tipo del mismo nombre va antes que la categoría: Cargadores Case Construction", () => {
     const aditamento = {
       ...equipo(5, "Minicargadores", "minicargadores", "Aditamentos", "aditamentos"),
       foto: { ...foto, url: "/ahoyador.jpg" },
@@ -67,8 +65,16 @@ describe("estado vacío de usados", () => {
       [aditamento, cargador],
       rutas,
     );
-    assert.equal(t[0]?.imagen?.url, "/w20f.jpg");
-    assert.equal(t[0]?.detalle, undefined);
+    assert.deepEqual(
+      t.map((x) => [x.titulo, x.href, x.imagen?.url]),
+      [
+        [
+          "Cargadores Case Construction",
+          "/nueva/marcas/case-construction/cargadores/",
+          "/w20f.jpg",
+        ],
+      ],
+    );
   });
 
   it("sin categoría de nueva, los tipos con equipos que se llaman igual (las motoniveladoras de Case)", () => {

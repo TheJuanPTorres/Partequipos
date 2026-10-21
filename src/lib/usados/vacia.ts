@@ -80,9 +80,10 @@ const primeraFoto = (equipos: EquipoNuevoAlternativa[]) =>
   imagenDe(equipos.find((e) => imagenDe(e.foto))?.foto ?? null);
 
 /**
- * Las alternativas en maquinaria nueva de una categoría de usados: la
- * categoría de nueva con el mismo nombre (si tiene equipos) o, si no hay, cada
- * tipo de nueva con equipos que se llame igual. Hasta `tope` tarjetas.
+ * Las alternativas en maquinaria nueva de una categoría de usados: cada tipo
+ * de nueva con equipos que se llame igual («Cargadores Case Construction»;
+ * dirección, 2026-10-21) o, si no hay, la categoría de nueva con el mismo
+ * nombre (si tiene equipos). Hasta `tope` tarjetas.
  *
  * Se empareja por la DIRECCIÓN WEB de la categoría de usados (`slug`, que no
  * cambia al renombrarla: «cargadores» sigue casando con el tipo «Cargadores»
@@ -124,6 +125,26 @@ function alternativasPorNombre(
   },
   tope: number,
 ): TarjetaMarca[] {
+  const porTipo = new Map<number, EquipoNuevoAlternativa[]>();
+  for (const e of equipos) {
+    if (!e.tipoRef || !e.marcaRef || nombreComparable(e.tipoRef.nombre) !== buscado) continue;
+    porTipo.set(e.tipoId, [...(porTipo.get(e.tipoId) ?? []), e]);
+  }
+  const deTipo = [...porTipo.values()]
+    .map((suyos) => {
+      const { tipoRef, marcaRef } = suyos[0]!;
+      return {
+        clave: `nueva-tipo-${marcaRef!.slug}-${tipoRef!.slug}`,
+        titulo: tipoConMarca(tipoRef!.nombre, marcaRef!.nombre),
+        href: `${rutas.tipoMaquinaria(marcaRef!.slug, tipoRef!.slug)}/`,
+        imagen: primeraFoto(suyos),
+        soloEscritorio: false,
+      };
+    })
+    .sort((a, b) => a.titulo.localeCompare(b.titulo, "es"))
+    .slice(0, tope);
+  if (deTipo.length) return deTipo;
+
   const categoria = categorias.find((c) => nombreComparable(c.nombre) === buscado);
   if (categoria) {
     const tipos = new Set(categoria.tipos);
@@ -145,25 +166,7 @@ function alternativasPorNombre(
       ];
     }
   }
-
-  const porTipo = new Map<number, EquipoNuevoAlternativa[]>();
-  for (const e of equipos) {
-    if (!e.tipoRef || !e.marcaRef || nombreComparable(e.tipoRef.nombre) !== buscado) continue;
-    porTipo.set(e.tipoId, [...(porTipo.get(e.tipoId) ?? []), e]);
-  }
-  return [...porTipo.values()]
-    .map((suyos) => {
-      const { tipoRef, marcaRef } = suyos[0]!;
-      return {
-        clave: `nueva-tipo-${marcaRef!.slug}-${tipoRef!.slug}`,
-        titulo: tipoConMarca(tipoRef!.nombre, marcaRef!.nombre),
-        href: `${rutas.tipoMaquinaria(marcaRef!.slug, tipoRef!.slug)}/`,
-        imagen: primeraFoto(suyos),
-        soloEscritorio: false,
-      };
-    })
-    .sort((a, b) => a.titulo.localeCompare(b.titulo, "es"))
-    .slice(0, tope);
+  return [];
 }
 
 /**

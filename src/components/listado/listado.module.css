@@ -844,6 +844,48 @@
   margin-top: 24px;
 }
 
+/* Mientras llega el catálogo nuevo (`ZonaCatalogo`): se atenúa, tras un
+   instante para que una respuesta rápida no parpadee, y una línea se mueve
+   encima. Fuera del flujo: no desplaza nada. */
+.columnaResultados {
+  position: relative;
+  transition: opacity 0.2s ease;
+}
+.cuerpo[data-cargando] .columnaResultados {
+  opacity: 0.5;
+  transition-delay: 0.12s;
+  cursor: progress;
+}
+.cuerpo[data-cargando] .columnaResultados::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 0;
+  width: 30%;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--rojo);
+  animation: cargandoCatalogo 1s ease-in-out infinite;
+}
+@keyframes cargandoCatalogo {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(233%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .columnaResultados,
+  .cuerpo[data-cargando] .columnaResultados {
+    transition: none;
+  }
+  .cuerpo[data-cargando] .columnaResultados::before {
+    width: 100%;
+    animation: none;
+  }
+}
+
 @media (min-width: 640px) {
   .tarjetas[data-vista="lista"] .tarjeta {
     grid-template-columns: 40% 1fr;

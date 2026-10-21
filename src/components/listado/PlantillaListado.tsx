@@ -20,6 +20,7 @@ import { CategoriasListado } from "./CategoriasListado";
 import { iconoDePestana } from "./iconos";
 import estilos from "./listado.module.css";
 import { PanelFiltrosListado } from "./PanelFiltrosListado";
+import { ZonaCatalogo } from "./ZonaCatalogo";
 
 /**
  * La plantilla «Categoría secundaria» de ux-9, COMÚN a los listados de
@@ -53,6 +54,7 @@ export function PlantillaListado<T>({
   pestanas = [],
   etiquetaPestanas,
   pestanasEnLateral = false,
+  navegacionCliente = false,
   catalogo,
   listado,
   rutaDe,
@@ -77,6 +79,11 @@ export function PlantillaListado<T>({
    * barra del recuento sobre el listado. Listados de usados (cliente, 2026-10-21).
    */
   pestanasEnLateral?: boolean;
+  /**
+   * Categorías, filtros, orden y paginación cambian solo el catálogo, sin
+   * recargar ni volver arriba (`ZonaCatalogo`). Listados de usados (cliente, 2026-10-21).
+   */
+  navegacionCliente?: boolean;
   catalogo: Catalogo<T>;
   listado: Extract<ResultadoListado<T>, { tipo: "listado" }>;
   /** Ruta de la página n, CON su barra final. */
@@ -106,7 +113,7 @@ export function PlantillaListado<T>({
   // Sin nada que listar, ni recuento ni orden: lo dice el estado vacío.
   const barra =
     totalSinFiltros > 0 ? (
-      <div className={estilos.barra}>
+      <div className={estilos.barra} data-catalogo-nav="">
         <p className={estilos.resumen} aria-live="polite">
           {chips.length ? <strong>Selección actual:</strong> : null}
           <span>
@@ -174,7 +181,7 @@ export function PlantillaListado<T>({
 
   const resultados = (
     <section aria-labelledby="listado-titulo" className={estilos.resultados}>
-      <h2 id="listado-titulo" className="sr-only">
+      <h2 id="listado-titulo" className="sr-only" tabIndex={-1}>
         {elemento.plural.charAt(0).toUpperCase() + elemento.plural.slice(1)}
       </h2>
       {totalSinFiltros === 0 ? (
@@ -194,11 +201,13 @@ export function PlantillaListado<T>({
           {children}
         </ul>
       )}
-      <Paginacion
-        actual={pagina}
-        total={paginas}
-        hrefDe={(n) => conConsulta(rutaDe(n), consulta)}
-      />
+      <div data-catalogo-nav="">
+        <Paginacion
+          actual={pagina}
+          total={paginas}
+          hrefDe={(n) => conConsulta(rutaDe(n), consulta)}
+        />
+      </div>
     </section>
   );
 
@@ -210,6 +219,48 @@ export function PlantillaListado<T>({
         elemento={elemento}
       />
     ) : null;
+
+  const cuerpo = (
+    <>
+      {listaLateral ? (
+        <div className={estilos.lateral}>
+          {listaLateral}
+          {totalSinFiltros > 0 ? (
+            <aside aria-label="Filtros">
+              <PanelFiltrosListado
+                accion={rutaBase}
+                facetas={facetas}
+                orden={seleccion.orden}
+                ordenPorDefecto={catalogo.ordenes[0].valor}
+                elemento={elemento}
+                logoDeMarca={logoDeMarca}
+              />
+            </aside>
+          ) : null}
+        </div>
+      ) : totalSinFiltros > 0 ? (
+        <aside aria-label="Filtros">
+          <PanelFiltrosListado
+            accion={rutaBase}
+            facetas={facetas}
+            orden={seleccion.orden}
+            ordenPorDefecto={catalogo.ordenes[0].valor}
+            elemento={elemento}
+            logoDeMarca={logoDeMarca}
+          />
+        </aside>
+      ) : null}
+
+      {pestanasEnLateral ? (
+        <div className={estilos.columnaResultados}>
+          {barra}
+          {resultados}
+        </div>
+      ) : (
+        resultados
+      )}
+    </>
+  );
 
   return (
     <main className={estilos.pagina}>
@@ -280,45 +331,19 @@ export function PlantillaListado<T>({
 
       {pestanasEnLateral ? null : barra}
 
-      <div className={estilos.cuerpo} data-lateral={pestanasEnLateral ? "" : undefined}>
-        {listaLateral ? (
-          <div className={estilos.lateral}>
-            {listaLateral}
-            {totalSinFiltros > 0 ? (
-              <aside aria-label="Filtros">
-                <PanelFiltrosListado
-                  accion={rutaBase}
-                  facetas={facetas}
-                  orden={seleccion.orden}
-                  ordenPorDefecto={catalogo.ordenes[0].valor}
-                  elemento={elemento}
-                  logoDeMarca={logoDeMarca}
-                />
-              </aside>
-            ) : null}
-          </div>
-        ) : totalSinFiltros > 0 ? (
-          <aside aria-label="Filtros">
-            <PanelFiltrosListado
-              accion={rutaBase}
-              facetas={facetas}
-              orden={seleccion.orden}
-              ordenPorDefecto={catalogo.ordenes[0].valor}
-              elemento={elemento}
-              logoDeMarca={logoDeMarca}
-            />
-          </aside>
-        ) : null}
-
-        {pestanasEnLateral ? (
-          <div className={estilos.columnaResultados}>
-            {barra}
-            {resultados}
-          </div>
-        ) : (
-          resultados
-        )}
-      </div>
+      {navegacionCliente ? (
+        <ZonaCatalogo
+          clave={conConsulta(rutaDe(pagina), consulta)}
+          className={estilos.cuerpo}
+          lateral={pestanasEnLateral}
+        >
+          {cuerpo}
+        </ZonaCatalogo>
+      ) : (
+        <div className={estilos.cuerpo} data-lateral={pestanasEnLateral ? "" : undefined}>
+          {cuerpo}
+        </div>
+      )}
     </main>
   );
 }

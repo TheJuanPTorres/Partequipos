@@ -914,6 +914,7 @@
   /* En móvil no caben uno al lado del otro: uno debajo del otro y a todo el ancho. */
   .botones {
     flex-direction: column;
+    align-self: stretch;
     align-items: stretch;
     gap: 12px;
     padding: 0;

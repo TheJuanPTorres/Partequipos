@@ -124,6 +124,10 @@ describe("estado vacío de usados", () => {
       "Ahora mismo no tenemos cargadores usados disponibles",
     );
     assert.equal(
+      mensajeSinUnidades("categoria", "Cargadores Frontales usados", "Cargadores Frontales"),
+      "Ahora mismo no tenemos cargadores frontales usados disponibles",
+    );
+    assert.equal(
       mensajeSinUnidades("marca", "Maquinaria Doosan usada", "Doosan"),
       "Ahora mismo no tenemos maquinaria Doosan usada disponible",
     );

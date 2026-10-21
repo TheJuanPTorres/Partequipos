@@ -18,15 +18,21 @@ import estilos from "./marca.module.css";
  * marcas sin el hero grande): la misma caja oscura y baja, pegada a la cabecera
  * del sitio, con el `<h1>` de siempre de la página (antetítulo y título) en lugar
  * de «Partequipos / Nuestras marcas».
+ *
+ * Con `cuatroEnUnaFila`, exactamente 4 marcas van en escritorio en UNA fila y no
+ * en 2 + 2 (dirección, 2026-10-21: solo el índice de marcas de nueva). Con otro
+ * número, la colocación de siempre.
  */
 export function BaldosasMarcas({
   id,
   marcas,
   h1,
+  cuatroEnUnaFila = false,
 }: {
   id: string;
   marcas: PlacaMarca[];
   h1?: { antetitulo: string; titulo: string };
+  cuatroEnUnaFila?: boolean;
 }) {
   if (marcas.length === 0 && !h1) return null;
   const idTitulo = `${id}-titulo`;
@@ -63,7 +69,9 @@ export function BaldosasMarcas({
       </div>
 
       <div className={estilos.mostrarMarcasRecuadro}>
-        <ul className={estilos.baldosas}>
+        <ul
+          className={`${estilos.baldosas} ${cuatroEnUnaFila ? estilos.baldosasCuatroEnUnaFila : ""}`}
+        >
           {marcas.map((m) => (
             <li key={m.id} className={estilos.baldosaCaja}>
               <Link href={m.href} className={estilos.baldosa}>

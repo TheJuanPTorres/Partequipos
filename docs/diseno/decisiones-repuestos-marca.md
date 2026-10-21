@@ -172,6 +172,23 @@ las marcas, el contacto y los testimonios no cambian.
     revalida también esta página.
   - El índice de marcas de repuestos y el de marcas de nueva siguen sin campo propio (dirección: más adelante).
 
+## 10. «Ver todo» abre el panel, y los modelos del tipo en tarjetas (2026-10-21, dirección)
+
+- **Marca de repuestos, las 13:** el «Ver todo» de cada tarjeta de tipo o serie abre el
+  panel que sube desde abajo de la marca de nueva (`VerTodosEquipos`, de D, #290), con los
+  modelos de la tarjeta (los de su serie, o todos los del tipo, con las «otras entradas» de
+  WordPress) y, al pie, un enlace discreto a la página del tipo. Sin JavaScript, o con
+  Ctrl/⌘/Mayús, lleva a la página del tipo, como antes. Misma animación, foco al título,
+  Escape y vuelta del foco; la barra, en el color de la marca. Un tipo sin modelos sigue
+  con el enlace. Los modelos salen de una sola consulta por marca (`getModelosDeMarca`).
+- **Página de tipo:** los botones de modelo pasan a TARJETAS con el estilo «difuminado»
+  (`RejillaTarjetas`, la de `TarjetasMarca` con `indice`), agrupadas por serie con su
+  título y su ancla (`#serie-ex`). Mismo nombre, mismo código (debajo del título) y mismo
+  destino; botón «Ver repuestos»; una entrada sin ficha va sin botón. Foto: la del modelo
+  (328 de 349 la tienen); sin ella, la de su serie y, si no, la del tipo. La sección es
+  blanca y se une con la de categorías que la sigue: la franja del color de la marca bajo
+  el encabezado ya no lleva los botones.
+
 ## 5. Pendiente
 
 - ~~Imágenes reales de fondo (por marca) y de cada tipo~~ **HECHO el 2026-10-14 (agente C):** la imagen de cada tipo es la

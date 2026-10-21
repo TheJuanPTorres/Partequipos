@@ -308,6 +308,42 @@
   }
 }
 
+/* Una entrada sin página (repuestos: WordPress la nombra sin ficha): el texto, sin efecto. */
+.itemSinEnlace {
+  color: var(--color-texto-suave, #56545a);
+}
+
+/*
+ * El enlace DISCRETO a la página completa (marca de repuestos, 2026-10-21): al pie del
+ * listado, centrado, pequeño y subrayado; para quien quiera la página y para Google.
+ */
+.lista:has(+ .pie) {
+  padding-bottom: 12px;
+}
+
+.pie {
+  margin: 0;
+  padding: 8px 0 32px;
+  text-align: center;
+}
+
+.enlacePagina {
+  color: var(--color-texto-suave, #56545a);
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.enlacePagina:hover {
+  color: var(--color-texto, #1a1a1a);
+}
+
+.enlacePagina:focus-visible {
+  outline: 3px solid var(--color-texto, #1a1a1a);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 /* Móvil: a pantalla completa. */
 @media (max-width: 767px) {
   .panel {

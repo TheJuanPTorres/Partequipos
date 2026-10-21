@@ -1,43 +1,48 @@
-import Link from "next/link";
-
-import reserva from "@/components/blog/cabeceraArticulo.module.css";
 import type { GrupoDeModelos } from "@/lib/repuestos/series";
-import type { ModeloEnlace } from "@/lib/repuestos/tipo";
+import { tarjetasDeModelos, type ModeloEnlace } from "@/lib/repuestos/tipo";
+import type { TiposEquipo } from "@/payload-types";
 
 import estilos from "./marca.module.css";
+import { RecuadrosConScroll } from "./RecuadrosConScroll";
+import { RejillaTarjetas } from "./TarjetasMarca";
 
 /**
- * «MODELOS DE <TIPO> <MARCA>» de la página de tipo (PROVISIONAL hasta el
- * diseño de Andrés): la franja amarilla que sigue al encabezado, con un enlace
- * en píldora por modelo, a su ficha de repuestos. Mismo lenguaje que las
- * categorías de la página de marca.
+ * «MODELOS DE <TIPO> <MARCA>» de la página de tipo: una TARJETA por modelo, con el estilo
+ * «difuminado» de las páginas índice (dirección, 2026-10-21; antes, un botón por modelo en
+ * la franja del color de la marca). Mismo contenido y mismos destinos: el nombre de la
+ * lista, el código si lo hay y el botón a su ficha; una entrada que WordPress nombra sin
+ * página va sin botón. Colocación, la regla de las tarjetas (`rejillaTarjetas`).
  *
- * Sin desplazamiento al llegar Inter (CLS 0,073 a 1440 en la medición de C): cada
- * texto de la píldora reserva su ancho con una copia invisible en la fuente de
- * respaldo (la técnica de la cabecera del artículo), así las filas de la lista
- * no se reparten distinto con una fuente y con otra.
+ * Sin modelos publicados, un aviso en vez de una sección vacía.
  *
- * Sin modelos publicados, un aviso en vez de una franja vacía.
- *
- * Con `grupos` (un tipo con SERIES, como Hitachi), un subtítulo por serie con
- * su ancla, a la que baja la tarjeta de la serie en la página de la marca.
+ * Con `grupos` (un tipo con SERIES, como Hitachi), un subtítulo por serie con su ancla,
+ * a la que baja la tarjeta de la serie en la página de la marca, y su rejilla debajo.
  */
 export function ModelosTipo({
   id,
   titulo,
+  tipo,
   modelos,
   vacio,
   grupos,
+  verTodo,
 }: {
   id: string;
   titulo: string;
+  tipo: TiposEquipo;
   modelos: ModeloEnlace[];
   vacio: string;
   grupos?: GrupoDeModelos<ModeloEnlace>[] | null;
+  /** Texto del botón de cada tarjeta. */
+  verTodo: string;
 }) {
   const idTitulo = `${id}-titulo`;
   return (
-    <section id={id} className={estilos.modelos} aria-labelledby={idTitulo}>
+    <section
+      id={id}
+      className={`${estilos.tarjetas} ${estilos.tarjetasIndice} ${estilos.modelosTarjetas}`}
+      aria-labelledby={idTitulo}
+    >
       <h2 id={idTitulo} className={estilos.tituloSeccion}>
         {titulo}
       </h2>
@@ -47,51 +52,25 @@ export function ModelosTipo({
         grupos.map((g) => (
           <div key={g.ancla ?? "otros"} id={g.ancla ?? undefined} className={estilos.modelosGrupo}>
             <h3 className={estilos.modelosSerie}>{g.titulo}</h3>
-            <ListaModelos modelos={g.modelos} />
+            <RejillaTarjetas
+              id={`${id}-${g.ancla ?? "otros"}`}
+              tarjetas={tarjetasDeModelos(tipo, g.modelos)}
+              verTodo={verTodo}
+              indice
+              nivel="h4"
+            />
           </div>
         ))
       ) : (
-        <ListaModelos modelos={modelos} />
+        <RejillaTarjetas
+          id={id}
+          tarjetas={tarjetasDeModelos(tipo, modelos)}
+          verTodo={verTodo}
+          indice
+          nivel="h3"
+        />
       )}
+      {modelos.length > 0 ? <RecuadrosConScroll /> : null}
     </section>
-  );
-}
-
-function ListaModelos({ modelos }: { modelos: ModeloEnlace[] }) {
-  return (
-    <ul className={estilos.modelosLista}>
-      {modelos.map((m) => (
-        <li key={m.id}>
-          {m.href ? (
-            <Link href={m.href} className={estilos.modelo}>
-              <TextoModelo modelo={m} />
-            </Link>
-          ) : (
-            // Un modelo que WordPress nombra sin página propia: el texto, sin enlace.
-            <span className={`${estilos.modelo} ${estilos.modeloSinFicha}`}>
-              <TextoModelo modelo={m} />
-            </span>
-          )}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function TextoModelo({ modelo: m }: { modelo: ModeloEnlace }) {
-  return (
-    <>
-      <span className={`${reserva.reserva} ${estilos.modeloTexto}`} data-reserva={m.nombre}>
-        <span>{m.nombre}</span>
-      </span>
-      {m.codigo ? (
-        <span
-          className={`${reserva.reserva} ${estilos.modeloTexto} ${estilos.modeloCodigo}`}
-          data-reserva={m.codigo}
-        >
-          <span>{m.codigo}</span>
-        </span>
-      ) : null}
-    </>
   );
 }

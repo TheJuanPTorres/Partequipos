@@ -1544,3 +1544,26 @@ a.modelo:hover {
     font-size: 10vw;
   }
 }
+
+/*
+ * --- Modelos de la página de tipo en TARJETAS (dirección, 2026-10-21) --------------------
+ * La sección de las páginas índice (`tarjetasIndice`) con el título «Modelos de…» y, en un
+ * tipo con series, un subtítulo por serie con su rejilla debajo.
+ */
+.modelosTarjetas .modelosSerie {
+  margin-top: 0;
+}
+
+.modelosTarjetas .modelosGrupo + .modelosGrupo {
+  margin-top: 56px;
+}
+
+.modelosTarjetas .modelosSerie + .rejilla {
+  margin-top: 24px;
+}
+
+@media (max-width: 767px) {
+  .modelosTarjetas .modelosGrupo + .modelosGrupo {
+    margin-top: 40px;
+  }
+}

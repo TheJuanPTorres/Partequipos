@@ -16,6 +16,7 @@ import type { LogoMarca } from "@/lib/marca/logoMarca";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 
 import { CambioDeVista } from "./CambioDeVista";
+import { CategoriasListado } from "./CategoriasListado";
 import { iconoDePestana } from "./iconos";
 import estilos from "./listado.module.css";
 import { PanelFiltrosListado } from "./PanelFiltrosListado";
@@ -203,47 +204,11 @@ export function PlantillaListado<T>({
 
   const listaLateral =
     pestanasEnLateral && pestanas.length ? (
-      <nav aria-labelledby="categorias-titulo" className={estilos.categorias}>
-        <h2 id="categorias-titulo" className={estilos.categoriasTitulo}>
-          {etiquetaPestanas ?? "Categorías"}
-        </h2>
-        <ul>
-          {pestanas.map((p) => {
-            const IconoPestana = iconoDePestana(p.texto);
-            return (
-              <li key={p.href}>
-                <Link
-                  href={p.href}
-                  className={estilos.categoria}
-                  aria-current={p.activa ? "page" : undefined}
-                  data-vacia={p.nota ? "" : undefined}
-                >
-                  <IconoPestana size={22} stroke={1.5} aria-hidden="true" />
-                  <span className={estilos.categoriaTexto}>
-                    {p.texto}
-                    {p.nota ? (
-                      <>
-                        <span className="sr-only">, </span>
-                        <small className={estilos.pestanaNota}>{p.nota}</small>
-                      </>
-                    ) : null}
-                  </span>
-                  {typeof p.cuenta === "number" ? (
-                    <span className={estilos.categoriaCuenta}>
-                      <span className="sr-only">, </span>
-                      {p.cuenta}
-                      <span className="sr-only">
-                        {" "}
-                        {p.cuenta === 1 ? elemento.singular : elemento.plural}
-                      </span>
-                    </span>
-                  ) : null}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      <CategoriasListado
+        pestanas={pestanas}
+        titulo={etiquetaPestanas ?? "Categorías"}
+        elemento={elemento}
+      />
     ) : null;
 
   return (

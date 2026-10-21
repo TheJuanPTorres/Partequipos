@@ -675,7 +675,7 @@
  * ---- Botones de categoría en la columna izquierda (usados, 2026-10-21) ----
  * Encima de «Filtrar»: en escritorio, lista vertical; en móvil y tablet, una
  * fila deslizable sobre «Filtrar». Las categorías con unidades llevan su
- * número; las vacías, apagadas (borde y sin fondo), pero legibles y clicables.
+ * número; las vacías, el mismo estilo, plegadas tras «Ver más (n)».
  */
 .categoriasTitulo {
   margin: 0 0 12px;
@@ -733,14 +733,31 @@
   font-weight: 500;
   text-align: center;
 }
-/* Vacía: apagada pero legible (#6b6970 sobre blanco, 5,3:1). */
-.categoria[data-vacia] {
-  background: #fff;
-  border-color: #e6e6e6;
-  color: #6b6970;
+/* «Ver más (n)» / «Ver menos»: despliega las categorías sin unidades. */
+.verMas {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--gris-texto);
+  font: inherit;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
 }
-.categoria[data-vacia] svg {
-  color: #a3a1a6;
+.verMas svg {
+  color: var(--rojo);
+  transition: transform 150ms ease;
+}
+.verMas[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.verMas:hover {
+  color: var(--negro);
+  text-decoration: underline;
 }
 .categoria:hover,
 .categoria[aria-current="page"] {

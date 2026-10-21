@@ -218,3 +218,47 @@ Scooter, Auto liviano, Auto pesado y Engranajes; su plantilla llegará).
 - El botón del export lleva un sobre (`envelope-dot`); aquí, una flecha, porque lleva al catálogo y no al contacto.
 - El título del grupo del menú es «Lubricantes <nombre de la marca en el panel>» («Lubricantes Eni» hoy); para que
   diga «ENI», se cambia el nombre de la marca en el panel.
+
+## 9. Lubricantes ENI con la plantilla de Andrés «Categoría Lubricantes» (2026-10-21, dirección; PR #318)
+
+**Fuente:** la página pintada «Categoría Lubricantes» (3946) del sitio de diseño. El export `elementor-811423` que
+nombraba el encargo no estaba en disco. **Cambia el diseño, no el contenido:** las líneas siguen siendo secciones de
+`/lubricantes/lubricantes-eni/` con su ancla (`#motos-scooter`, `#auto-liviano`, `#auto-pesado`, `#engranajes`), que es
+adonde llevan el megamenú y los 301 de las URL viejas.
+
+**Orden** (`PaginaMarcaLubricantePlantilla`):
+
+1. **Cabecera** de las páginas índice (`HeroMarca` con `indice`):
+   - la «Imagen de cabecera» de la marca o, vacía, el fondo oscuro;
+   - el logo (`LogoMarca`);
+   - «Lubricantes {nombre}» revelado por palabras, en el único `<h1>`;
+   - la entradilla y el icono del ratón.
+
+   Detrás, la franja del **«Color principal» de la marca en el panel** (`estiloDeMarca`). Vacío, ninguna franja: no
+   se inventan colores.
+
+2. **Una tarjeta por línea** (`TarjetasMarca` con `indice` y `cuatroEnUnaFila`):
+   - la foto de la línea de siempre, su nombre y «Ver todo» al ancla;
+   - con 4, en una fila en escritorio (como la plantilla) y 2 + 2 en tablet y móvil;
+   - las 4 visibles en todos los anchos (la plantilla oculta 2 en tablet y pone 1 por fila en móvil: son variantes
+     de la maqueta).
+3. **Los productos de cada línea**, como estaban (`SeccionesLubricante`).
+4. **El bloque final** (`BloqueLubricantes`):
+   - nuestro formulario («Ciudad» y «¿Qué necesitas?», sin documento), el mismo que abren los botones «Cotizar»;
+   - título y texto de la página general (grupo «Lubricantes» de «Páginas índice y contacto»), que al guardarse
+     revalida también esta página;
+   - el logo de la marca y «Ver catálogo».
+
+**Desviaciones:**
+
+- **`Lubricantes.jpg` de la plantilla no se usa.** Es un fotograma de banco (1920 × 1080) subido al sitio de diseño
+  en 2026-10, no una foto del WordPress del cliente. Manda el campo «Imagen de cabecera» de la marca.
+- **«Ver catálogo» baja a la primera línea.** La página no puede enlazarse a sí misma y no existe un PDF de catálogo
+  de ENI en el WordPress (solo las fichas de cada producto).
+- **Nombres y orden de las líneas, los de los datos** («Motos & Scooter», «Engranajes»; en la plantilla, «Motos y
+  Scooters» y «Engranaje»).
+
+**Interruptor:** la casilla «Diseño propio» de la marca sigue, desmarcada.
+
+- **Desmarcada**, la plantilla de Andrés. Sustituye a la provisional, que se quitó.
+- **Marcada**, el diseño propio del #260 (`PaginaMarcaLubricante`), que se queda en el código.

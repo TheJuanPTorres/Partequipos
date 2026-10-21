@@ -1306,7 +1306,7 @@ a.modelo:hover {
 @media (max-width: 767px) {
   .rejillaCuatroEnUnaFila:has(> .tarjeta:nth-child(4):last-child) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px 12px;
+    gap: 30px 12px;
   }
 
   .rejillaCuatroEnUnaFila .foto {

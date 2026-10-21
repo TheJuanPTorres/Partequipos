@@ -82,7 +82,9 @@ async function datosVacio(ambito: Ambito): Promise<DatosVacio> {
     referencia: ambito.titulo,
     nueva:
       ambito.tipo === "categoria"
-        ? alternativasEnNueva(nombre, listadoNueva.categorias, listadoNueva.equipos, rutas)
+        ? alternativasEnNueva(nombre, listadoNueva.categorias, listadoNueva.equipos, rutas, {
+            slug: ambito.registro.slug,
+          })
         : [],
     otras: tarjetasDeCategoriasUsada(categorias, inventario, rutas.categoriaUsada).slice(0, 6),
     whatsapp: enlaceWhatsApp(empresa.whatsapp, mensajeWhatsApp(ambito)),

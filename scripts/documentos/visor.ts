@@ -10,6 +10,12 @@
  *    En vez de `documento=<id>`, `fichero=<parte del nombre del PDF>` (p. ej.
  *    `fichero=da-mvl-09`): tiene que coincidir con UN solo documento.
  *
+ * 1b. `fichas` — lo mismo, de una vez, para los PDF de «Ficha técnica completa
+ *    (PDF)» de los equipos nuevos que aún no tienen páginas (los descarga y los
+ *    rasteriza él mismo; `limite=<n>` o `documento=<id>` para hacer menos):
+ *
+ *      npm run preview:ejecutar -- payload run scripts/documentos/visor.ts fichas preview
+ *
  * 2. `pagina` — en una página institucional, cambia cada párrafo que solo
  *    enlaza a un PDF de «Documentos» por el bloque «Documento en visor» de ese
  *    documento (dentro de su sección, en el mismo sitio):
@@ -30,6 +36,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { randomBytes } from "node:crypto";
+import { spawnSync } from "node:child_process";
 
 import { getPayload } from "payload";
 import sharp from "sharp";
@@ -42,7 +49,9 @@ import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 // ---------- Argumentos y destino (antes de cargar Payload) ----------
 
 const args = process.argv.slice(2);
-const modo = args.find((a) => a === "paginas" || a === "pagina" || a === "retirar");
+const modo = args.find(
+  (a) => a === "paginas" || a === "fichas" || a === "pagina" || a === "retirar",
+);
 const destino = args.find((a) => a === "preview" || a === "produccion");
 const simular = args.includes("simular");
 const valorDe = (k: string) => args.find((a) => a.startsWith(`${k}=`))?.slice(k.length + 1);
@@ -52,7 +61,7 @@ const fallar = (m: string): never => {
   e.stack = e.message;
   throw e;
 };
-if (!modo) fallar("indica el modo: paginas, pagina o retirar");
+if (!modo) fallar("indica el modo: paginas, fichas, pagina o retirar");
 if (!destino) fallar("indica el destino: preview o produccion");
 if (destino === "preview") {
   const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
@@ -123,6 +132,11 @@ async function subirPaginas(): Promise<void> {
   if (!carpeta || !fs.existsSync(path.join(carpeta, "paginas.json"))) {
     fallar(`falta carpeta=<carpeta> con el paginas.json del rasterizado (${carpeta ?? "—"})`);
   }
+  await subirPaginasDe(id, carpeta!);
+}
+
+/** Sube las páginas ya rasterizadas en `carpeta` y las pone en el documento `id`. */
+async function subirPaginasDe(id: number, carpeta: string): Promise<void> {
   const doc = await payload.findByID({
     collection: "documentos",
     id,
@@ -139,7 +153,7 @@ async function subirPaginas(): Promise<void> {
       `el documento ${id} ya tiene ${antes.length} «Páginas como imágenes» que no puso este script: no se pisan`,
     );
   }
-  const { paginas } = JSON.parse(fs.readFileSync(path.join(carpeta!, "paginas.json"), "utf8")) as {
+  const { paginas } = JSON.parse(fs.readFileSync(path.join(carpeta, "paginas.json"), "utf8")) as {
     paginas: { n: number; fichero: string }[];
   };
   // Sin el sufijo aleatorio que el Blob puso al PDF («-AbC…» de 30 caracteres).
@@ -159,7 +173,7 @@ async function subirPaginas(): Promise<void> {
   const entrada = { id, antes, media: [] as Fichero[] };
   manifiesto.documentos.push(entrada);
   for (const p of paginas) {
-    const webp = await sharp(path.join(carpeta!, p.fichero)).webp({ quality: 82 }).toBuffer();
+    const webp = await sharp(path.join(carpeta, p.fichero)).webp({ quality: 82 }).toBuffer();
     const nombre = `${base}-pagina-${String(p.n).padStart(2, "0")}.webp`;
     const media = await payload.create({
       collection: "media",
@@ -193,6 +207,82 @@ async function subirPaginas(): Promise<void> {
     overrideAccess: true,
   });
   log(`✓ «Páginas como imágenes» del documento ${id}: ${entrada.media.length}`);
+}
+
+// ---------- 1b. Páginas de las fichas técnicas de maquinaria nueva ----------
+
+/*
+ * `fichas` (2026-10-21, ficha nueva de Andrés): «Ficha técnica» abre el PDF del
+ * equipo en el visor, así que cada PDF de «Ficha técnica completa (PDF)» de los
+ * equipos nuevos necesita sus «Páginas como imágenes». Para cada uno que aún no
+ * las tenga: lo descarga, lo rasteriza con `rasterizar-pdf.mjs` (pdf.js por
+ * `npx`, fuera del proyecto) y sube sus páginas como `paginas`. Lo que sube
+ * queda en el manifiesto: `retirar` lo deshace igual que lo demás.
+ * `limite=<n>` hace solo los n primeros; `documento=<id>`, solo ese.
+ */
+async function paginasDeFichas(): Promise<void> {
+  const limite = Number(valorDe("limite")) || Infinity;
+  const solo = Number(valorDe("documento")) || null;
+  const equipos = (
+    await payload.find({
+      collection: "equipos-nuevos",
+      depth: 0,
+      limit: 0,
+      pagination: false,
+      overrideAccess: true,
+    })
+  ).docs;
+  const ids = [...new Set(equipos.flatMap((e) => idDe(e.fichaTecnicaPdf) ?? []))]
+    .filter((id) => !solo || id === solo)
+    .sort((a, b) => a - b);
+  const pendientes: { id: number; url: string; titulo: string }[] = [];
+  for (const id of ids) {
+    const doc = await payload.findByID({
+      collection: "documentos",
+      id,
+      depth: 0,
+      overrideAccess: true,
+    });
+    if ((doc.paginas ?? []).length > 0 || manifiesto.documentos.some((d) => d.id === id)) continue;
+    if (!doc.url) {
+      log(`documento ${id} («${doc.titulo}») sin URL: se salta`);
+      continue;
+    }
+    pendientes.push({ id, url: doc.url, titulo: doc.titulo });
+  }
+  const tanda = pendientes.slice(0, limite);
+  log(
+    `${ids.length} PDF de fichas; ${pendientes.length} sin páginas; ahora ${tanda.length}${simular ? " (simulación)" : ""}`,
+  );
+  if (simular) {
+    for (const d of tanda) log(`  documento ${d.id}: «${d.titulo}»`);
+    return;
+  }
+  const raiz = fs.mkdtempSync(path.join(os.tmpdir(), "visor-fichas-"));
+  const rasterizador = path.resolve("scripts", "documentos", "rasterizar-pdf.mjs");
+  for (const [i, d] of tanda.entries()) {
+    log(`(${i + 1}/${tanda.length}) documento ${d.id}: «${d.titulo}»`);
+    const r = await fetch(d.url);
+    if (!r.ok) fallar(`no se pudo descargar el PDF del documento ${d.id}: HTTP ${r.status}`);
+    const carpeta = path.join(raiz, String(d.id));
+    fs.mkdirSync(carpeta, { recursive: true });
+    const pdf = path.join(carpeta, "documento.pdf");
+    fs.writeFileSync(pdf, Buffer.from(await r.arrayBuffer()));
+    const comando = [
+      "npx -y -p pdfjs-dist@6.4.299 -p @napi-rs/canvas@1.0.10 node",
+      `"${rasterizador}"`,
+      `"${pdf}"`,
+      `"${carpeta}"`,
+    ].join(" ");
+    const salida = spawnSync(comando, { shell: true, stdio: ["ignore", "ignore", "inherit"] });
+    if (salida.status !== 0 || !fs.existsSync(path.join(carpeta, "paginas.json"))) {
+      fallar(`no se pudo rasterizar el documento ${d.id} (código ${salida.status})`);
+    }
+    await subirPaginasDe(d.id, carpeta);
+    fs.rmSync(carpeta, { recursive: true, force: true });
+  }
+  fs.rmSync(raiz, { recursive: true, force: true });
+  log(`✓ ${tanda.length} documentos con sus páginas`);
 }
 
 // ---------- 2. Visores en una página ----------
@@ -312,5 +402,6 @@ async function retirar(): Promise<void> {
 }
 
 if (modo === "paginas") await subirPaginas();
+else if (modo === "fichas") await paginasDeFichas();
 else if (modo === "pagina") await ponerEnPagina();
 else await retirar();

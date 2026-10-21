@@ -282,7 +282,7 @@ export interface EquiposNuevo {
    */
   imagenes?: (number | Media)[] | null;
   /**
-   * Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. Marca «Destacar» en hasta 4 filas: salen con su icono junto al título de la ficha (y las 3 primeras, en las tarjetas de otras referencias).
+   * Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. Junto al título de la ficha salen solas, con su icono, la potencia neta, el peso operativo, el alcance máximo en el suelo, la profundidad máxima de excavación y el motor, si están aquí (por su etiqueta). Para elegir otras, marca «Destacar» en hasta 4 filas: entonces salen esas. El resto de filas sale debajo, en «Más especificaciones».
    */
   fichaTecnica?:
     | {
@@ -309,6 +309,10 @@ export interface EquiposNuevo {
    * Opcional. Sale como «Descargar ficha técnica completa». Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 30 MB) o elige uno ya subido en «Documentos».
    */
   fichaTecnicaPdf?: (number | null) | Documento;
+  /**
+   * Opcional. El enlace de la vista 360 del equipo (empieza por https://). Sale el botón «Ver en vista 360», que la abre en una ventana sobre la ficha. Vacío, no hay botón.
+   */
+  vista360?: string | null;
   /**
    * Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). No se muestran en el sitio. El PDF de la ficha técnica va en «Ficha técnica completa (PDF)».
    */
@@ -2474,6 +2478,7 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
         id?: T;
       };
   fichaTecnicaPdf?: T;
+  vista360?: T;
   documentos?: T;
   seo?:
     | T

@@ -735,6 +735,8 @@
 }
 /* «Ver más (n)» / «Ver menos»: despliega las categorías sin unidades. */
 .verMas {
+  /* Contiene el texto solo para lectores: sin esto, escapa del recorte de la fila deslizable y ensancha la página. */
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;

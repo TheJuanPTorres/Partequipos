@@ -119,6 +119,10 @@ visual** que marca y tipo. **Provisional**: se reemplaza cuando llegue la planti
 > - **El índice de marcas de maquinaria nueva ya no lleva la baldosa de «Aditamentos»** (`placasDeMarcasNueva`). No
 >   es una marca. Su página sigue publicada y la enlaza el megamenú. No hay casilla en el panel solo para el índice, y
 >   «Mostrar en la web» ocultaría también la página.
+> - **Índice de marcas de nueva: con exactamente 4 marcas, una sola fila en escritorio** (dirección, 2026-10-21;
+>   `cuatroEnUnaFila` de `BaldosasMarcas`), en lugar del 2 + 2. Excepción solo de ese índice: la baldosa mide lo
+>   mismo (2 de 8 columnas), así que los logos siguen en ×1,3225. Con 5 o más, la colocación de siempre de las
+>   baldosas (4 por fila, la última centrada); tablet y móvil, 2 por fila, como siempre. Repuestos, sin cambios.
 
 Plantilla 4017 (`Desktop\partequipos-diseno\wordpress\indice-marcas-repuestos\elementor-4017-2026-10-20.json`).
 **Solo cambia la parte de las marcas** de `…/repuestos-maquinaria-pesada-marcas/` (`BaldosasMarcas`); el encabezado,

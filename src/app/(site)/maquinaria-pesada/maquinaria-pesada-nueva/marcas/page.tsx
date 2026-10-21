@@ -56,6 +56,7 @@ export default async function MarcasMaquinariaPage() {
         id={ANCLA}
         marcas={placasDeMarcasNueva(marcas, equipos, logos)}
         h1={{ antetitulo: "Maquinaria pesada nueva", titulo: "Marcas" }}
+        cuatroEnUnaFila
       />
     </main>
   );

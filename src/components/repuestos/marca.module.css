@@ -1433,12 +1433,17 @@ a.modelo:hover {
     grid-column: 2 / span 2;
   }
 
-  /* Exactamente 4: 2 + 2 centradas. */
-  .baldosas:has(> .baldosaCaja:nth-child(4):last-child) > .baldosaCaja:nth-child(odd) {
+  /*
+   * Exactamente 4: 2 + 2 centradas; con `.baldosasCuatroEnUnaFila` (índice de marcas de
+   * nueva, dirección 2026-10-21), en una fila de 4, con el mismo ancho de baldosa.
+   */
+  .baldosas:not(.baldosasCuatroEnUnaFila):has(> .baldosaCaja:nth-child(4):last-child)
+    > .baldosaCaja:nth-child(odd) {
     grid-column: 3 / span 2;
   }
 
-  .baldosas:has(> .baldosaCaja:nth-child(4):last-child) > .baldosaCaja:nth-child(even) {
+  .baldosas:not(.baldosasCuatroEnUnaFila):has(> .baldosaCaja:nth-child(4):last-child)
+    > .baldosaCaja:nth-child(even) {
     grid-column: 5 / span 2;
   }
 }

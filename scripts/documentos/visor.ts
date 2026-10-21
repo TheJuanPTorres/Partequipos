@@ -225,10 +225,36 @@ async function subirPaginasDe(id: number, carpeta: string): Promise<void> {
  * `limite=<n>` hace solo los n primeros; `documento=<id>`, solo ese. Si se
  * corta (la conexión a la base cayó en el preview con el equipo en reposo),
  * volver a lanzarlo salta los hechos y reanuda el que quedó a medias.
+ * `rehacer=<id>` borra las páginas que ESTE script subió a ese documento (las
+ * del manifiesto) y las vuelve a generar: así se rehízo la ZX690LC-6, que se
+ * rasterizó sin el decodificador de JPEG 2000 (imágenes en blanco).
  */
 async function paginasDeFichas(): Promise<void> {
   const limite = Number(valorDe("limite")) || Infinity;
-  const solo = Number(valorDe("documento")) || null;
+  const rehacer = Number(valorDe("rehacer")) || null;
+  const solo = Number(valorDe("documento")) || rehacer;
+  if (rehacer) {
+    const entrada = manifiesto.documentos.find((d) => d.id === rehacer);
+    if (!entrada) fallar(`rehacer=${rehacer}: ese documento no está en el manifiesto`);
+    log(
+      `rehacer el documento ${rehacer}: ${entrada!.media.length} páginas a borrar${simular ? " (simulación)" : ""}`,
+    );
+    if (simular) return;
+    await payload.update({
+      collection: "documentos",
+      id: rehacer,
+      data: { paginas: entrada!.antes },
+      overrideAccess: true,
+    });
+    for (const m of entrada!.media) {
+      await payload
+        .delete({ collection: "media", id: m.id, overrideAccess: true })
+        .catch(() => null);
+    }
+    manifiesto.documentos = manifiesto.documentos.filter((d) => d.id !== rehacer);
+    guardarManifiesto();
+    log(`  páginas del documento ${rehacer} borradas; se vuelven a generar`);
+  }
   const equipos = (
     await payload.find({
       collection: "equipos-nuevos",

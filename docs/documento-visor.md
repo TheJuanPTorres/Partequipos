@@ -94,7 +94,16 @@ tenga páginas, lo rasteriza y las sube (mismo manifiesto y misma retirada):
 npm run preview:ejecutar -- payload run scripts/documentos/visor.ts fichas preview
 ```
 
-`limite=<n>` o `documento=<id>` para hacer menos. Sin páginas, el botón abre
+`limite=<n>` o `documento=<id>` para hacer menos; si se corta, volver a
+lanzarlo reanuda; `rehacer=<id>` borra las páginas de ese documento (las de su
+manifiesto) y las vuelve a generar.
+
+**JPEG 2000:** pdf.js decodifica esas imágenes con WebAssembly, y en Node hay
+que darle la carpeta (`wasmUrl` en `rasterizar-pdf.mjs`). Sin ella salían en
+blanco con el aviso `JpxError: OpenJPEG failed to initialize` (pasó con la
+ZX690LC-6, rehecha). Si vuelve a salir ese aviso, la página no está bien.
+
+Sin páginas, el botón abre
 el PDF en otra pestaña. En la ventana, los `srcset` se calculan al abrirla
 (`paginasDelLibro`, compartida con `DocumentoVisor`), para no llevarlos en el
 HTML de cada ficha.

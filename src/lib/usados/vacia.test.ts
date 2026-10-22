@@ -182,3 +182,25 @@ describe("tituloEnNueva", () => {
     );
   });
 });
+
+describe("alternativasEnNueva sin «Aditamentos»", () => {
+  it("nunca da una tarjeta de la marca Aditamentos; quedan los tipos de marcas reales", () => {
+    const equipos = [
+      equipo(1, "Minicargadores", "minicargadores", "Aditamentos", "aditamentos"),
+      equipo(2, "Minicargadores", "minicargadores", "CASE", "case"),
+    ];
+    const tarjetas = alternativasEnNueva("Minicargadores", [], equipos, rutas);
+    assert.deepEqual(
+      tarjetas.map((t) => t.href),
+      ["/nueva/marcas/case/minicargadores/"],
+    );
+  });
+
+  it("si solo había de Aditamentos, no queda ninguna (la sección no sale)", () => {
+    const equipos = [equipo(1, "Minicargadores", "minicargadores", "Aditamentos", "aditamentos")];
+    assert.deepEqual(alternativasEnNueva("Minicargadores", [], equipos, rutas), []);
+    // Tampoco la tarjeta de la categoría de nueva si sus únicos equipos son aditamentos.
+    const categorias = [{ slug: "minicargadores", nombre: "Minicargadores", tipos: [1] }];
+    assert.deepEqual(alternativasEnNueva("Minicargadores", categorias, equipos, rutas), []);
+  });
+});

@@ -26,7 +26,8 @@ export function BarraSeries({
     let pendiente = 0;
     const medir = () => {
       pendiente = 0;
-      const limite = (barra.current?.getBoundingClientRect().bottom ?? 0) + 24;
+      // La serie llega unos 30 px bajo la barra (`scroll-margin-top`): margen de sobra.
+      const limite = (barra.current?.getBoundingClientRect().bottom ?? 0) + 64;
       let elegida: string | null = null;
       for (const s of series) {
         const g = document.getElementById(s.ancla);

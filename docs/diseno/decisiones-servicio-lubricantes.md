@@ -294,7 +294,8 @@ página, haría un bucle.
      tipo «cotización», con Ciudad y «¿Qué necesitas?»). Sin JavaScript, baja al formulario.
    - **«Ficha técnica»** abre el PDF en nuestro visor si el documento tiene «Páginas como imágenes»; si no, en otra
      pestaña. Sin PDF, sin botón (hoy 3 productos: I-RIDE RACING 10W-60, I-SINT 10W-40 y MULTITECH CT PLUS 10W). Las
-     páginas se generan con `visor.ts fichas … de=lubricantes`.
+     páginas se generan con `visor.ts fichas … de=lubricantes` (en el preview, los 67 PDF; en el sitio publicado,
+     `runbook-lubricantes-lineas-visor.md`, en `Desktop\partequipos-cierre\`).
 3. **Nuestro formulario** al final, como en la página de la marca (`BloqueLubricantes`), sin «Ver catálogo».
 
 SEO: título por defecto «{línea} | Lubricantes {marca}» (`tituloPorDefecto.categoriaLubricante`, editable en

@@ -28,11 +28,30 @@ type Entrada = {
   equipo?: { id: number; nombre: string };
   /** Texto con el que empieza «¿Qué necesitas?» (R4 de repuestos, 2026-10-21). */
   mensajeInicial?: string;
+  /**
+   * Producto de una línea de lubricantes (2026-10-22): cotización con el producto como
+   * referencia de texto (no es un documento propio: vive dentro de su línea).
+   */
+  producto?: string;
 };
 
 /** Las propiedades del formulario de `ContactoMarca`, compartidas con su ventana emergente. */
 export function configContactoMarca(e: Entrada): ConfigFormulario {
-  const { modelo, formulario, equipo } = e;
+  const { modelo, formulario, equipo, producto } = e;
+  if (producto) {
+    return {
+      tipo: "cotizacion",
+      origen: e.origen,
+      siteKey: e.siteKey,
+      whatsapp: e.whatsapp,
+      referencia: { texto: producto },
+      titulo: formulario?.titulo ?? `Cotización: ${producto}`,
+      textoBoton: e.boton || "Enviar",
+      clasificacion: false,
+      conCiudad: formulario?.conCiudad ?? true,
+      etiquetaMensaje: formulario?.etiquetaMensaje ?? "¿Qué necesitas?",
+    };
+  }
   if (equipo) {
     return {
       tipo: "cotizacion",

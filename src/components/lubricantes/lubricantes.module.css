@@ -1,7 +1,8 @@
 /*
- * LÍNEAS DE PRODUCTO DE LUBRICANTES — PROVISIONAL hasta el diseño de Andrés,
- * con el lenguaje de la página de marca de repuestos: fondo gris claro de la
- * página, tarjetas blancas de 8 px, rojo de marca en los botones.
+ * PÁGINA DE UNA LÍNEA DE LUBRICANTES — plantilla de Andrés «Ficha producto lubricante»
+ * (4039; pintada en 3969, medida a 390, 1010 y 1440 el 2026-10-21). Sobre el gris de la
+ * página (`.pagina` de marca.module.css): una barra blanca por grupo y tarjetas blancas de
+ * 30 px de radio con la foto, el nombre y «Cotizar» / «Ficha técnica».
  */
 .descripcion {
   max-width: 1100px;
@@ -14,51 +15,142 @@
   margin: 0 0 0.9rem;
 }
 
-.seccion {
-  max-width: 1280px;
+.lineas {
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 40px 3vw;
-  scroll-margin-top: 110px;
+  padding: 20px 3vw 72px;
 }
 
-.cabeceraSeccion {
+.grupo + .grupo {
+  margin-top: 72px;
+}
+
+/* La barra blanca del grupo: el título a la izquierda (centrado en móvil). */
+.cabeceraGrupo {
   display: flex;
-  margin-bottom: 24px;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+  min-height: 54px;
+  margin-bottom: 40px;
+  border-radius: 30px;
+  padding: 24px;
+  background: #fff;
+  align-items: center;
 }
 
-.tituloSeccion {
+.tituloGrupo {
   margin: 0;
   color: var(--color-texto);
-  font-size: var(--texto-titulo-seccion);
+  font-size: 45px;
   font-weight: 500;
+  line-height: 1.2;
+  /*
+   * Los grupos vienen de WordPress tal cual («mOTO & SCOOTER», «REFRIGERACIÓN»: el sitio
+   * actual los pinta en mayúsculas). La plantilla los escribe en tipo frase («Moto y
+   * Scooter», «Refrigeración»): se pintan en minúscula con la inicial en mayúscula, sin
+   * tocar el dato (decisión de réplica, docs/diseno/decisiones-servicio-lubricantes.md §10).
+   */
+  text-transform: lowercase;
+}
+
+.tituloGrupo::first-letter {
+  text-transform: uppercase;
+}
+
+/*
+ * REGLA DE LAS TARJETAS: 4 por fila en escritorio, 2 en tablet y 1 en móvil, todas del
+ * mismo ancho, y la última fila CENTRADA (la plantilla la deja a la izquierda).
+ */
+.productos {
+  --columnas: 4;
+  --hueco: 20px;
+
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--hueco);
+  list-style: none;
+}
+
+.producto {
+  display: flex;
+  width: calc((100% - (var(--columnas) - 1) * var(--hueco)) / var(--columnas));
+  box-sizing: border-box;
+  border-radius: 30px;
+  padding: 25px;
+  background: #fff;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fotoCaja {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+}
+
+.foto {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.nombre {
+  margin: 0;
+  color: #56545a;
+  font-size: 20px;
+  font-weight: 700;
   line-height: 1.2;
 }
 
-.entradilla {
-  max-width: 720px;
-  margin: 8px 0 0;
-  color: var(--color-texto-suave);
+/* Los botones, abajo: las tarjetas de una fila miden lo mismo. */
+.botones {
+  display: flex;
+  margin-top: auto;
+  flex-wrap: wrap;
+  /* Los dos en una fila en las tarjetas de escritorio (273 px de ancho útil a 1440). */
+  gap: 10px;
 }
 
-.cotizar {
+.cotizar,
+.ficha {
   display: inline-flex;
-  min-height: 44px;
-  border-radius: 8px;
-  padding: 10px 24px;
-  background: var(--color-marca);
-  color: #fff;
-  font-weight: 600;
+  min-height: 40px;
+  box-sizing: border-box;
+  border: 1px solid;
+  border-radius: 30px;
+  padding: 10px 22px 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
   align-items: center;
+  justify-content: center;
   text-decoration: none;
+  white-space: nowrap;
   transition: filter 150ms ease;
 }
 
+.cotizar {
+  border-color: var(--color-marca);
+  background: var(--color-marca);
+  color: #fff;
+}
+
+.ficha {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+  color: #fff;
+}
+
 .cotizar:hover {
-  filter: brightness(0.9);
+  filter: brightness(0.88);
+}
+
+.ficha:hover {
+  background: #3a3838;
 }
 
 .cotizar:focus-visible,
@@ -67,100 +159,62 @@
   outline-offset: 3px;
 }
 
-.grupo + .grupo {
-  margin-top: 32px;
-}
-
-.tituloGrupo {
-  margin: 0 0 16px;
-  color: var(--color-texto);
-  font-size: 1.125rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.productos {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.producto {
-  display: flex;
-  border-radius: 8px;
-  padding: 16px;
-  background: #fff;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.fotoCaja {
-  display: flex;
-  width: 100%;
-  margin-bottom: 12px;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1 / 1;
-}
-
-.foto {
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.nombre {
-  margin: 0;
-  color: var(--color-texto);
-  font-weight: 700;
-}
-
-.grado {
-  margin: 2px 0 0;
-  color: var(--color-marca);
-  font-weight: 600;
-}
-
-.ficha {
-  display: inline-flex;
-  min-height: 44px;
-  margin-top: auto;
-  padding-top: 12px;
-  color: var(--color-texto);
-  font-size: 0.875rem;
-  font-weight: 600;
-  align-items: center;
-  gap: 6px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.ficha svg {
-  width: 20px;
-  height: 20px;
-  color: var(--color-marca);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .cotizar {
+  .cotizar,
+  .ficha {
     transition: none;
   }
 }
 
-@media (max-width: 767px) {
-  .productos {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+@media (max-width: 1024px) {
+  .lineas {
+    padding-bottom: 50px;
   }
 
-  .producto {
-    padding: 12px 8px;
+  .grupo + .grupo {
+    margin-top: 50px;
+  }
+
+  .cabeceraGrupo {
+    margin-bottom: 30px;
+    padding: 20px;
+  }
+
+  .tituloGrupo {
+    font-size: 35px;
+  }
+
+  .productos {
+    --columnas: 2;
+  }
+
+  .cotizar,
+  .ficha {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 767px) {
+  .lineas {
+    padding-top: 12px;
+    padding-bottom: 32px;
+  }
+
+  .grupo + .grupo {
+    margin-top: 20px;
+  }
+
+  .cabeceraGrupo {
+    margin-bottom: 12px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .productos {
+    --columnas: 1;
+  }
+
+  .nombre {
+    font-size: 18px;
   }
 }

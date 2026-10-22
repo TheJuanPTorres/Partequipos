@@ -356,14 +356,27 @@ describe("lubricantes en el sitemap", () => {
     marcasLubricante: [{ slug: "lubricantes-eni", updatedAt: "2026-07-17T10:00:00.000Z" }],
   };
 
-  it("emite la marca, que lleva sus categorías como secciones", () => {
-    const urls = buildSitemapEntries(datosConLubricantes, AHORA).map((x) => x.url);
+  it("emite la marca y la página de cada línea (2026-10-22)", () => {
+    const urls = buildSitemapEntries(
+      {
+        ...datosConLubricantes,
+        categoriasLubricante: [
+          {
+            slug: "auto-liviano",
+            marcaSlug: "lubricantes-eni",
+            updatedAt: "2026-10-22T10:00:00.000Z",
+          },
+        ],
+      },
+      AHORA,
+    ).map((x) => x.url);
 
     assert.ok(urls.includes("https://partequipos.com/lubricantes/lubricantes-eni/"));
+    assert.ok(urls.includes("https://partequipos.com/lubricantes/lubricantes-eni/auto-liviano/"));
     assert.equal(
-      urls.some((u) => u.includes("/lubricantes-eni/auto-liviano")),
+      urls.some((u) => u.includes("#")),
       false,
-      "las categorías ya no tienen URL propia (301 a su ancla)",
+      "ninguna URL del sitemap lleva ancla",
     );
   });
 

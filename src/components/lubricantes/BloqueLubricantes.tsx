@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import estilosMarca from "@/components/repuestos/marca.module.css";
-import { configContactoMarca } from "@/lib/formularios/configFormulario";
+import { configContactoMarca, type ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { VistaLubricantes } from "@/lib/lubricantes/general";
 
 import estilos from "./general.module.css";
@@ -15,6 +15,10 @@ import estilos from "./general.module.css";
  * «¿Qué necesitas?»; sin n.º de documento, Ley 1581) y, al lado, el título, el
  * texto, el logo de la marca destacada (`LogoMarca`) y «Ver catálogo» a su
  * página. Los textos salen del panel.
+ *
+ * También cierra la página de cada marca (Lubricantes ENI, plantilla 3946) y la de
+ * cada una de sus líneas (plantilla 4039), con su propio formulario (`formulario`:
+ * el mismo de los botones «Cotizar») y SIN «Ver catálogo» (dirección, 2026-10-22).
  */
 export function BloqueLubricantes({
   id,
@@ -22,12 +26,15 @@ export function BloqueLubricantes({
   origen,
   siteKey,
   whatsapp,
+  formulario,
 }: {
   id: string;
   bloque: VistaLubricantes["bloque"];
   origen: string;
   siteKey: string | null;
   whatsapp?: { href: string; etiqueta: string };
+  /** El formulario de la página, si no es el de la página general. */
+  formulario?: ConfigFormulario;
 }) {
   const idTitulo = `${id}-titulo`;
   return (
@@ -35,18 +42,19 @@ export function BloqueLubricantes({
       <div className={estilos.recuadro}>
         <div className={`${estilos.columnaFormulario} ${estilosMarca.formulario}`}>
           <FormularioSolicitud
-            {...configContactoMarca({
-              origen,
-              siteKey,
-              whatsapp,
-              boton: "Enviar",
-              marca: "lubricantes",
-              formulario: {
-                titulo: "Solicitud de información sobre lubricantes",
-                conCiudad: true,
-                etiquetaMensaje: "¿Qué necesitas?",
-              },
-            })}
+            {...(formulario ??
+              configContactoMarca({
+                origen,
+                siteKey,
+                whatsapp,
+                boton: "Enviar",
+                marca: "lubricantes",
+                formulario: {
+                  titulo: "Solicitud de información sobre lubricantes",
+                  conCiudad: true,
+                  etiquetaMensaje: "¿Qué necesitas?",
+                },
+              }))}
             variante="plano"
           />
         </div>
@@ -71,10 +79,12 @@ export function BloqueLubricantes({
               ) : (
                 <span />
               )}
-              <Link href={bloque.marca.href} className={estilos.boton}>
-                {bloque.textoBoton}
-                <IconArrowRight aria-hidden="true" focusable="false" stroke={2} />
-              </Link>
+              {bloque.marca.href ? (
+                <Link href={bloque.marca.href} className={estilos.boton}>
+                  {bloque.textoBoton}
+                  <IconArrowRight aria-hidden="true" focusable="false" stroke={2} />
+                </Link>
+              ) : null}
             </div>
           ) : null}
         </div>

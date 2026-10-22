@@ -282,7 +282,7 @@ export interface EquiposNuevo {
    */
   imagenes?: (number | Media)[] | null;
   /**
-   * Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. Junto al título de la ficha salen solas, con su icono, la potencia neta, el peso operativo, el alcance máximo en el suelo, la profundidad máxima de excavación y el motor, si están aquí (por su etiqueta). Para elegir otras, marca «Destacar» en hasta 4 filas: entonces salen esas. El resto de filas sale debajo, en «Más especificaciones».
+   * Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. En la ficha salen como mucho 5, junto al título: potencia neta, peso operativo, motor, fuerza de tracción máxima y ancho de la zapata (se reconocen por la etiqueta); si falta alguna, se completa con las siguientes filas, en el orden de aquí. «Destacar» elige los datos de la tarjeta del equipo en la página de su marca.
    */
   fichaTecnica?:
     | {
@@ -1025,7 +1025,7 @@ export interface MarcasLubricante {
    */
   videoCabecera?: (number | null) | Video;
   /**
-   * Desmarcada (por defecto), la página es la PROVISIONAL sencilla. Marcada, el diseño propio con la identidad de la marca (colores, vídeo de cabecera…). En producción solo se publican plantillas de Andrés.
+   * Desmarcada (por defecto), la página usa la plantilla de Andrés («Categoría Lubricantes»). Marcada, el diseño propio con la identidad de la marca (colores, vídeo de cabecera…). En producción solo se publican plantillas de Andrés.
    */
   disenoPropio?: boolean | null;
   /**
@@ -1092,11 +1092,15 @@ export interface CategoriasLubricante {
   slug: string;
   marca: number | MarcasLubricante;
   /**
-   * Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su sección de la página de la marca (#su-direccion). Cámbialo cuando la categoría tenga página propia.
+   * Posición de la línea en la página de la marca y en el menú «Lubricantes» (1, 2, 3…). Vacío, después de las que tienen orden, por nombre.
+   */
+  orden?: number | null;
+  /**
+   * Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su página.
    */
   enlaceMenu?: string | null;
   /**
-   * Resumen de una o dos líneas, bajo el título.
+   * Texto de la cabecera de su página, bajo el título. Vacío, la entradilla de la marca.
    */
   entradilla?: string | null;
   descripcion?: {
@@ -1115,9 +1119,13 @@ export interface CategoriasLubricante {
     [k: string]: unknown;
   } | null;
   /**
-   * Fondo de su tarjeta en la página de la marca.
+   * Foto de su tarjeta en la página de la marca. También la de la cabecera de su página si «Imagen de cabecera» está vacía.
    */
   imagen?: (number | null) | Media;
+  /**
+   * Opcional. Fondo de la cabecera de su página. Vacía, la «Imagen» de la línea; sin ninguna, fondo oscuro.
+   */
+  imagenCabecera?: (number | null) | Media;
   /**
    * En este orden en la página. Nombre y grado tal como los publica el fabricante; no inventes especificaciones.
    */
@@ -1145,7 +1153,7 @@ export interface CategoriasLubricante {
       }[]
     | null;
   /**
-   * Hoy estas fichas no tienen página propia en el sitio, así que esto no sale en Google. Se guarda para cuando la tengan.
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
     metaTitle?: string | null;
@@ -2693,10 +2701,12 @@ export interface CategoriasLubricanteSelect<T extends boolean = true> {
   nombre?: T;
   slug?: T;
   marca?: T;
+  orden?: T;
   enlaceMenu?: T;
   entradilla?: T;
   descripcion?: T;
   imagen?: T;
+  imagenCabecera?: T;
   productos?:
     | T
     | {

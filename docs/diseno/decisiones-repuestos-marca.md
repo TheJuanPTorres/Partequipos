@@ -217,6 +217,8 @@ píldoras.
 - R2: el salto a ZAXIS deja la serie unos 30 px bajo la barra, marcada como actual; el resaltado viaja en 380 ms con frenada y las tarjetas entran escalonadas (6 / 4 / 2 a 1440 / 1010 / 390); con «reducir movimiento», ninguna animación.
 - R4: una franja por página (1000 × 104 px a 1440), y la ventana sale con el mensaje escrito.
 
+**Panel inferior (2026-10-22, dirección; los tres usos: «Ver todo» de las marcas, «Ver todos» de las series y «Ver productos» de las categorías técnicas):** al pasar el ratón o enfocar, un elemento con enlace solo cambia de color y de fondo; el relleno ya no crece (antes, 8 px más, y un nombre largo saltaba de línea). Una entrada sin enlace es solo informativa: sin fondo, sin rojo y sin mano. Medido a 1440 / 1010 / 390 con elementos de 2 y 3 líneas: mismas medidas antes y durante el hover.
+
 ## 12. Categorías técnicas con la plantilla 4007 de la marca (2026-10-22, dirección)
 
 Las 10 páginas de categoría técnica (`…/categoria-repuestos-para-maquinaria-pesada/<categoria>/`)

@@ -73,7 +73,7 @@ describe("tarjetas", () => {
   it("una por tipo, con el título de ux-9 y el enlace a la página del tipo", () => {
     const t = tarjetasDeTipos(marca, [tipo(1, "Bulldozer", "bulldozer")]);
     assert.equal(t.length, 1);
-    assert.equal(t[0]?.titulo, "Repuestos para maquinaria pesada bulldozer CATERPILLAR");
+    assert.equal(t[0]?.titulo, "Repuestos para maquinaria pesada Bulldozer CATERPILLAR");
     assert.match(t[0]?.href ?? "", /caterpillar\/bulldozer\/?$/);
     assert.equal(t[0]?.soloEscritorio, false);
   });

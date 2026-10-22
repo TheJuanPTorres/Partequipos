@@ -153,13 +153,13 @@ export function tarjetasDeTipos(
   return tipos
     .filter((t) => t.nombre?.trim() && t.slug?.trim())
     .flatMap((t) => {
-      const titulo = `Repuestos para maquinaria pesada ${t.nombre.trim().toLowerCase()} ${nombreMarca}`;
+      const titulo = `Repuestos para maquinaria pesada ${t.nombre.trim()} ${nombreMarca}`;
       const href = rutas.tipo(marca.slug, segmentoDeTipo(t));
       const imagenTipo = imagenDeMedia(t.imagen, "");
       const series = seriesDeTipo(t);
       const modelos = modelosDe?.(t) ?? [];
       const tituloPanel = `${tipoEnTitulo(t.nombre)} ${nombreMarca}`;
-      const pagina = `${t.nombre.trim().toLowerCase()} ${nombre}`;
+      const pagina = `${t.nombre.trim()} ${nombre}`;
       if (series.length === 0) {
         return [
           {

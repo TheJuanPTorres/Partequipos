@@ -69,8 +69,8 @@ export function categoriaRelacionada(
 /** El texto del enlace de la llamada final. */
 export function textoEnlaceRelacionada(c: CandidataRelacion): string {
   if (c.tipo === "repuestos") return `Ver repuestos de ${c.nombre}`;
-  if (c.tipo === "nueva") return `Ver ${c.nombre.toLowerCase()} nuevas`;
-  return `Ver ${c.nombre.toLowerCase()} usadas`;
+  if (c.tipo === "nueva") return `Ver ${c.nombre.trim()} nuevas`;
+  return `Ver ${c.nombre.trim()} usadas`;
 }
 
 /**

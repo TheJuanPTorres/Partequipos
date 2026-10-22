@@ -143,11 +143,11 @@ describe("estado vacío de usados", () => {
   it("el titular", () => {
     assert.equal(
       mensajeSinUnidades("categoria", "Cargadores usados", "Cargadores"),
-      "Ahora mismo no tenemos cargadores usados disponibles",
+      "Ahora mismo no tenemos Cargadores usados disponibles",
     );
     assert.equal(
       mensajeSinUnidades("categoria", "Cargadores Frontales usados", "Cargadores Frontales"),
-      "Ahora mismo no tenemos cargadores frontales usados disponibles",
+      "Ahora mismo no tenemos Cargadores Frontales usados disponibles",
     );
     assert.equal(
       mensajeSinUnidades("marca", "Maquinaria Doosan usada", "Doosan"),
@@ -171,14 +171,14 @@ describe("usaEstadoVacioPropio (dirección, 2026-10-19: solo diseños de Andrés
 });
 
 describe("tituloEnNueva", () => {
-  it("lleva la categoría que se buscó, en minúscula dentro de la frase", () => {
+  it("lleva la categoría que se buscó tal como está guardada", () => {
     assert.equal(
       tituloEnNueva("Cargadores Frontales"),
-      "Te invitamos a conocer nuestra disponibilidad de cargadores frontales",
+      "Te invitamos a conocer nuestra disponibilidad de Cargadores Frontales",
     );
     assert.equal(
       tituloEnNueva("Motoniveladoras"),
-      "Te invitamos a conocer nuestra disponibilidad de motoniveladoras",
+      "Te invitamos a conocer nuestra disponibilidad de Motoniveladoras",
     );
   });
 });

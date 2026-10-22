@@ -79,7 +79,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const enlazados = await getModelosPorIds(idsDeOtrasEntradas([tipo]));
   const enlaces = listaDeModelos(marca, tipo, modelos, enlazados);
-  const nombreTipo = tipo.nombre.toLowerCase();
+  const nombreTipo = tipo.nombre.trim();
   const formularioContacto = (mensajeInicial?: string) =>
     configContactoMarca({
       origen: rutas.tipo(marca.slug, seg),

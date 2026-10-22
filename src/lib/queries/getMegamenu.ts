@@ -58,9 +58,14 @@ const megamenuEnCache = unstable_cache(
         collection: "tipos-maquinaria",
         ...base,
         where: DE_MARCA_VISIBLE,
-        select: { ...conMarca, subtipos: true },
+        // La casilla «Tarjeta en el índice de tipos»: «Por tipo de máquina» del menú (2026-10-22).
+        select: { ...conMarca, subtipos: true, pestanaIndiceNueva: true },
       }),
-      payload.find({ collection: "categorias-maquinaria", ...base, select: sinMarca }),
+      payload.find({
+        collection: "categorias-maquinaria",
+        ...base,
+        select: { ...sinMarca, tiposIncluidos: true },
+      }),
       payload.find({
         collection: "categorias-usada",
         ...base,

@@ -1,6 +1,7 @@
 import type { CategoriasTecnica } from "@/payload-types";
 
 import { claveDeMarca, logoPropio } from "./marca/logoMarca";
+import { unaEntradaPorTipo } from "./nueva/ordenTipos";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
 import { categoriasDeMarca } from "./repuestos/marca";
@@ -134,12 +135,17 @@ export type TipoCatalogo = ItemCatalogo & {
   slugPadre?: string | null;
   /** Solo los tipos «paraguas» de maquinaria nueva («Tipos que agrupa»). */
   subtipos?: ReadonlyArray<number | { id: number } | null | undefined> | null;
+  /** Solo maquinaria nueva: «Tarjeta en el índice de tipos» (va en «Por tipo de máquina»). */
+  pestanaIndiceNueva?: boolean | null;
 };
 
 export type DatosMegamenu = {
   marcasMaquinaria: ItemCatalogo[];
   tiposMaquinaria: TipoCatalogo[];
-  categoriasNueva: ItemCatalogo[];
+  /** Con los tipos que incluye: solo salen en el menú si alguno tiene equipos (2026-10-22). */
+  categoriasNueva: (ItemCatalogo & {
+    tiposIncluidos?: ReadonlyArray<number | { id: number } | null | undefined> | null;
+  })[];
   /** Con su casilla «Agrupar en «Otros»» y su orden (2026-10-19). */
   categoriasUsada: (ItemCatalogo & { enOtros?: boolean | null; orden?: number | null })[];
   marcasRepuestos: ItemCatalogo[];
@@ -239,12 +245,49 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
     enlaces: [{ etiqueta: "Ver todas las marcas", href: conBarra(rutas.marcasMaquinaria()) }],
     grupos: marcas.filter((m) => m.slug !== SLUG_ADITAMENTOS).map((m) => deMarca(m)),
   };
+  // «Por tipo de máquina» (2026-10-22, dirección): TODOS los tipos, en el orden de la web antigua
+  // (`ordenTipos.ts`), como el índice de tipos. Los de varias marcas van a su categoría que las
+  // mezcla; los de una sola, a la página de su tipo (casilla «Tarjeta en el índice de tipos»).
+  // Sin equipos, no salen. «Aditamentos» sigue con su entrada propia.
+  const idRel = (v: number | { id: number } | null | undefined) =>
+    typeof v === "number" ? v : (v?.id ?? null);
+  const slugDeMarca = new Map(d.marcasMaquinaria.map((m) => [m.id, m.slug]));
+  const marcaDeTipo = new Map(tiposConEquiposNuevos.map((t) => [t.id, idRel(t.marca)]));
+  // Una categoría sale si alguno de sus tipos tiene equipos; cuenta de cuántas marcas son.
+  const deCategorias = d.categoriasNueva.flatMap((c) => {
+    const marcas = new Set(
+      (c.tiposIncluidos ?? [])
+        .map((t) => idRel(t))
+        .filter((t): t is number => t !== null && marcaDeTipo.has(t))
+        .map((t) => marcaDeTipo.get(t)),
+    );
+    return marcas.size > 0
+      ? [
+          {
+            nombre: c.nombre,
+            marcas: marcas.size,
+            dato: { etiqueta: c.nombre, href: conBarra(rutas.categoriaNueva(c.slug)) },
+          },
+        ]
+      : [];
+  });
+  const deTipos = tiposConEquiposNuevos
+    .filter((t) => t.pestanaIndiceNueva)
+    .flatMap((t) => {
+      const marca = slugDeMarca.get(idRel(t.marca) ?? -1);
+      return marca
+        ? [
+            {
+              nombre: t.nombre,
+              dato: { etiqueta: t.nombre, href: conBarra(rutas.tipoMaquinaria(marca, t.slug)) },
+            },
+          ]
+        : [];
+    });
   const porTipo: GrupoMenu = {
     titulo: "Por tipo de máquina",
-    enlaces: [...d.categoriasNueva].sort(porNombre).map((c) => ({
-      etiqueta: c.nombre,
-      href: conBarra(rutas.categoriaNueva(c.slug)),
-    })),
+    // Una entrada por tipo, en el orden de la web antigua (`ordenTipos.ts`).
+    enlaces: unaEntradaPorTipo(deCategorias, deTipos),
     grupos: [],
   };
   const nueva: GrupoMenu = {

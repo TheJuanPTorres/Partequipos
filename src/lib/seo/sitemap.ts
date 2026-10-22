@@ -124,14 +124,6 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
   "/maquinaria-pesada/maquinaria-pesada-usada/marcas/[marca]/pagina/[pagina]":
     "paginación: se llega desde la página 1 de la marca",
   /*
-   * Lo mismo en las categorías de maquinaria NUEVA («Categoría secundaria»,
-   * src/lib/nueva/listado.ts): cada categoría está en el sitemap; sus páginas
-   * siguientes se descubren desde la 1. (Las del antiguo listado del índice,
-   * `…/nueva/pagina/<n>/`, dan 301 al índice desde el 2026-10-22: no son página.)
-   */
-  "/maquinaria-pesada/maquinaria-pesada-nueva/[categoria]/pagina/[pagina]":
-    "paginación: se llega desde la página 1 de la categoría",
-  /*
    * Lo mismo en el blog (2026-10-21, plantilla «Blog» de Andrés): el índice y cada
    * categoría están en el sitemap; sus páginas siguientes se descubren desde la 1.
    */

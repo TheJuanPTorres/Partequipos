@@ -6,11 +6,12 @@ import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { vistaEncabezadoDeIndice } from "@/lib/indices/paginasIndice";
 import {
+  DESCRIPCION_NUEVA,
   SLUG_ADITAMENTOS,
+  TITULO_NUEVA,
   tarjetasDeTiposNueva,
   tarjetasIndiceNueva,
 } from "@/lib/nueva/indiceTipos";
-import { DESCRIPCION_NUEVA, TITULO_NUEVA } from "@/lib/nueva/listado";
 import { getListadoNueva, getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
 import { getMarcas } from "@/lib/queries/getMarcas";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";

@@ -71,6 +71,8 @@ import {
  */
 export const PATRONES_DE_PAGINA = {
   fichasNuevas: "/(site)/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
+  /** Las categorías de nueva que mezclan marcas, estáticas desde el 2026-10-22 (sin listado). */
+  categoriasNueva: "/(site)/maquinaria-pesada/maquinaria-pesada-nueva/[categoria]",
   unidadesUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/[unidad]",
   marcasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]`,
   tiposDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]/[tipo]`,
@@ -228,6 +230,19 @@ export function rutasDeEquipoNuevo(
     ...hermanoSlugs.map((slug) => rutas.equipoNuevo(marcaSlug, tipoSlug, slug)),
     ...categoriaSlugs.map((slug) => rutas.categoriaNueva(slug)),
   ];
+}
+
+/**
+ * Todas las categorías de nueva que mezclan marcas, por el patrón de la ruta. Pintan los equipos
+ * agrupados por marca y tipo, con su nombre: un cambio de marca o de tipo las afecta, y la
+ * relación va al revés (la categoría declara los tipos). Son 3. Nunca relanza.
+ */
+export function revalidarCategoriasNueva(motivo: string): void {
+  try {
+    revalidatePath(PATRONES_DE_PAGINA.categoriasNueva, "page");
+  } catch (error) {
+    console.error(`[revalidación] fallaron las categorías de nueva (${motivo}):`, error);
+  }
 }
 
 /**

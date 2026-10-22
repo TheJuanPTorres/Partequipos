@@ -9,6 +9,7 @@ import {
   revalidarPaginasDelComodin,
   revalidarMarcasDeLubricante,
   rutasDeEquipoNuevo,
+  revalidarCategoriasNueva,
   rutasDeMarcaMaquinaria,
   rutasDeTipoMaquinaria,
 } from "@/lib/revalidation";
@@ -82,6 +83,7 @@ export const revalidarMarcaMaquinaria: CollectionAfterChangeHook = async ({ doc,
   try {
     // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
     revalidarDatos(ETIQUETAS_DATOS.nueva, `marca maquinaria ${doc.slug}`);
+    revalidarCategoriasNueva(`marca maquinaria ${doc.slug}`);
     // Las marcas de usada enlazan a su marca de nueva, y la quitan si se oculta.
     revalidarDatos(ETIQUETAS_DATOS.usados, `marca maquinaria ${doc.slug}`);
     revalidarRutas(
@@ -98,6 +100,7 @@ export const revalidarMarcaMaquinariaBorrada: CollectionAfterDeleteHook = async 
   try {
     // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
     revalidarDatos(ETIQUETAS_DATOS.nueva, `marca maquinaria borrada ${doc.slug}`);
+    revalidarCategoriasNueva(`marca maquinaria borrada ${doc.slug}`);
     const hijos = await hijosDeMarca(req, doc.id).catch(() => []);
     revalidarRutas(rutasDeMarcaMaquinaria(doc.slug, hijos), `marca maquinaria borrada ${doc.slug}`);
   } catch (error) {
@@ -110,6 +113,7 @@ export const revalidarTipoMaquinaria: CollectionAfterChangeHook = async ({ doc, 
   try {
     // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
     revalidarDatos(ETIQUETAS_DATOS.nueva, `tipo maquinaria ${doc.slug}`);
+    revalidarCategoriasNueva(`tipo maquinaria ${doc.slug}`);
     const marcaSlug = await slugPorId(req, "marcas-maquinaria", doc.marca);
     if (!marcaSlug) return doc;
 
@@ -127,6 +131,7 @@ export const revalidarTipoMaquinariaBorrado: CollectionAfterDeleteHook = async (
   try {
     // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
     revalidarDatos(ETIQUETAS_DATOS.nueva, `tipo maquinaria borrado ${doc.slug}`);
+    revalidarCategoriasNueva(`tipo maquinaria borrado ${doc.slug}`);
     const marcaSlug = await slugPorId(req, "marcas-maquinaria", doc.marca);
     if (!marcaSlug) return doc;
 

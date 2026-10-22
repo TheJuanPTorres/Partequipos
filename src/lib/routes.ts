@@ -91,19 +91,6 @@ export const rutas = {
   /** «Otros» de usados: las categorías agrupadas (`otros` está reservada en las categorías). */
   usadaOtros: () => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${SEGMENTO_OTROS_USADA}`,
   /**
-   * Página n del ANTIGUO listado de maquinaria nueva. Desde el 2026-10-22 el índice ya no es un
-   * listado (dirección: el marketplace es solo para usados) y estas URL dan 301 al índice.
-   */
-  nuevaPagina: (pagina: number) =>
-    pagina <= 1
-      ? `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}`
-      : `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/pagina/${pagina}`,
-  /** Página n del listado de una categoría de nueva; la 1 es la propia categoría. */
-  categoriaNuevaPagina: (slug: string, pagina: number) =>
-    pagina <= 1
-      ? `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${slug}`
-      : `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${slug}/pagina/${pagina}`,
-  /**
    * Página de UNA unidad usada (2026-10-16, decisión de dirección): cuelga de su
    * categoría. `pagina` y `marcas` no pueden ser el slug de una unidad
    * (`src/lib/usados/urls.ts`).

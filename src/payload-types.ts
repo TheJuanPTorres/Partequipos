@@ -1916,6 +1916,22 @@ export interface Articulo {
    */
   categoria?: (number | null) | CategoriasBlog;
   /**
+   * Opcional. Una categoría de repuestos, de maquinaria usada o de maquinaria nueva: el final del artículo enlaza a ella. Vacío: se intenta deducir del título.
+   */
+  categoriaRelacionada?:
+    | ({
+        relationTo: 'categorias-tecnicas';
+        value: number | CategoriasTecnica;
+      } | null)
+    | ({
+        relationTo: 'categorias-usada';
+        value: number | CategoriasUsada;
+      } | null)
+    | ({
+        relationTo: 'categorias-maquinaria';
+        value: number | CategoriasMaquinaria;
+      } | null);
+  /**
    * Ordena el blog (lo más reciente primero) y es la fecha que ven los buscadores.
    */
   fechaPublicacion: string;
@@ -3068,6 +3084,7 @@ export interface ArticulosSelect<T extends boolean = true> {
   titulo?: T;
   slug?: T;
   categoria?: T;
+  categoriaRelacionada?: T;
   fechaPublicacion?: T;
   autor?: T;
   entradilla?: T;

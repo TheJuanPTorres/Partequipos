@@ -21,7 +21,7 @@ export type CandidataRelacion = {
   nombre: string;
   href: string;
   /** De dónde sale: cambia el texto del enlace («Repuestos de…», «… usadas»). */
-  tipo: "repuestos" | "usada";
+  tipo: "repuestos" | "usada" | "nueva";
 };
 
 const GENERICAS = new Set([
@@ -68,9 +68,27 @@ export function categoriaRelacionada(
 
 /** El texto del enlace de la llamada final. */
 export function textoEnlaceRelacionada(c: CandidataRelacion): string {
-  return c.tipo === "repuestos"
-    ? `Ver repuestos de ${c.nombre}`
-    : `Ver ${c.nombre.toLowerCase()} usadas`;
+  if (c.tipo === "repuestos") return `Ver repuestos de ${c.nombre}`;
+  if (c.tipo === "nueva") return `Ver ${c.nombre.toLowerCase()} nuevas`;
+  return `Ver ${c.nombre.toLowerCase()} usadas`;
+}
+
+/**
+ * ¿La entradilla repite el comienzo del cuerpo? (los artículos importados
+ * llevan como entradilla el primer párrafo). Compara sin tildes, mayúsculas ni
+ * signos: si el primer párrafo contiene la entradilla o la entradilla lo
+ * contiene, no se pinta dos veces.
+ */
+export function entradillaRepiteCuerpo(entradilla: string, primerParrafo: string): boolean {
+  const limpiar = (t: string) =>
+    normalizar(t)
+      .replace(/[^a-z0-9 ]+/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  const e = limpiar(entradilla);
+  const p = limpiar(primerParrafo);
+  if (!e || !p) return false;
+  return p.includes(e) || e.includes(p);
 }
 
 /** Palabras de un título que cuentan para parecerse a otro (cinco letras o más, en singular aproximado). */

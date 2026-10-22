@@ -12,7 +12,12 @@ import {
   POR_PAGINA_BLOG,
   type ArticuloLista,
 } from "./indice";
-import { articulosRelacionados, categoriaRelacionada, textoEnlaceRelacionada } from "./relacionada";
+import {
+  articulosRelacionados,
+  categoriaRelacionada,
+  entradillaRepiteCuerpo,
+  textoEnlaceRelacionada,
+} from "./relacionada";
 import { idsUnicos, slugDeTitulo, titulosDeLexical } from "./titulos";
 
 /** Aserciones con la forma de siempre, sobre `node:assert`. */
@@ -268,5 +273,29 @@ describe("artículos relacionados", () => {
       (a) => a.id,
     );
     expect(r).toEqual([3, 4]);
+  });
+});
+
+describe("entradillaRepiteCuerpo", () => {
+  it("detecta la entradilla igual al primer párrafo o contenida en él", () => {
+    assert.equal(entradillaRepiteCuerpo("Una llanta, con bulto.", "Una llanta con bulto"), true);
+    assert.equal(
+      entradillaRepiteCuerpo("Una llanta con bulto", "Una llanta con bulto y otras cosas más."),
+      true,
+    );
+    assert.equal(
+      entradillaRepiteCuerpo("Una llanta con bulto y algo más largo", "Una llanta con bulto"),
+      true,
+    );
+  });
+  it("no la oculta si es distinta o está vacía", () => {
+    assert.equal(entradillaRepiteCuerpo("Resumen propio", "Otro texto del cuerpo"), false);
+    assert.equal(entradillaRepiteCuerpo("", "Texto"), false);
+  });
+  it("el enlace de nueva dice «nuevas»", () => {
+    assert.equal(
+      textoEnlaceRelacionada({ nombre: "Excavadoras", href: "/x/", tipo: "nueva" }),
+      "Ver excavadoras nuevas",
+    );
   });
 });

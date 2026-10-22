@@ -9,6 +9,7 @@ import { minutosDeLectura } from "@/lib/blog/indice";
 import {
   articulosRelacionados,
   categoriaRelacionada,
+  entradillaRepiteCuerpo,
   textoEnlaceRelacionada,
   type CandidataRelacion,
 } from "@/lib/blog/relacionada";
@@ -25,7 +26,13 @@ import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
-import type { Articulo, CategoriasBlog } from "@/payload-types";
+import type {
+  Articulo,
+  CategoriasBlog,
+  CategoriasMaquinaria,
+  CategoriasTecnica,
+  CategoriasUsada,
+} from "@/payload-types";
 
 import { CompartirArticulo } from "./CompartirArticulo";
 import { CuerpoArticulo } from "./CuerpoArticulo";
@@ -93,7 +100,31 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
       tipo: "usada" as const,
     })),
   ];
-  const relacionada = categoriaRelacionada(articulo.titulo, candidatas);
+  // Primero la categoría elegida en el panel; sin ella, la deducción por el título.
+  const elegida = articulo.categoriaRelacionada;
+  const valorElegido = elegida && typeof elegida.value === "object" ? elegida.value : null;
+  let relacionada: CandidataRelacion | null = null;
+  if (elegida && valorElegido && valorElegido.slug) {
+    if (elegida.relationTo === "categorias-tecnicas") {
+      const c = valorElegido as CategoriasTecnica;
+      relacionada = {
+        nombre: c.nombre,
+        href: `${rutas.categoriaRepuestos(c.slug)}/`,
+        tipo: "repuestos",
+      };
+    } else if (elegida.relationTo === "categorias-usada") {
+      const c = valorElegido as CategoriasUsada;
+      relacionada = { nombre: c.nombre, href: `${rutas.categoriaUsada(c.slug)}/`, tipo: "usada" };
+    } else {
+      const c = valorElegido as CategoriasMaquinaria;
+      relacionada = { nombre: c.nombre, href: `${rutas.categoriaNueva(c.slug)}/`, tipo: "nueva" };
+    }
+  }
+  relacionada ??= categoriaRelacionada(articulo.titulo, candidatas);
+  const primerosBloques = cuerpoTexto.split("\n\n").slice(0, 2);
+  const mostrarEntradilla =
+    !!articulo.entradilla &&
+    !primerosBloques.some((p) => entradillaRepiteCuerpo(articulo.entradilla ?? "", p));
 
   const whatsapp = enlaceWhatsApp(
     empresa.whatsapp,
@@ -191,7 +222,7 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
           </aside>
 
           <div className={estilos.columna}>
-            {articulo.entradilla ? (
+            {mostrarEntradilla && articulo.entradilla ? (
               <p
                 className={`${reserva.reserva} ${estilos.entradilla}`}
                 data-reserva={articulo.entradilla}

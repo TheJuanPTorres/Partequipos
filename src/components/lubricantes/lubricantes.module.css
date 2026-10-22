@@ -111,7 +111,8 @@
   display: flex;
   margin-top: auto;
   flex-wrap: wrap;
-  gap: 12px 16px;
+  /* Los dos en una fila en las tarjetas de escritorio (273 px de ancho útil a 1440). */
+  gap: 10px;
 }
 
 .cotizar,
@@ -121,7 +122,7 @@
   box-sizing: border-box;
   border: 1px solid;
   border-radius: 30px;
-  padding: 10px 25px 8px;
+  padding: 10px 22px 8px;
   font-size: 16px;
   font-weight: 500;
   line-height: 1.2;

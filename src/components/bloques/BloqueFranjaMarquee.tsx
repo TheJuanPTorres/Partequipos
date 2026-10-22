@@ -24,6 +24,8 @@ const COPIAS = 8;
  *
  * Lo que se aparta de ux-9 (docs/diseno/decisiones-nosotros.md §4):
  * - D2: botón de pausa, y quieto con movimiento reducido.
+ * - El `fa-circle` de ux-9 pasa a «|» DESPUÉS de cada texto, con el mismo margen a los dos
+ *   lados (también en la unión de las copias y del bucle).
  * - En ux-9 cada copia es un enlace a «#»; aquí es texto. El lector lee el
  *   texto UNA vez: las copias van con `aria-hidden`.
  * - La foto de fondo es decorativa (`alt` vacío); la máquina también: repite
@@ -52,8 +54,8 @@ export function BloqueFranjaMarquee({ texto, imagenFondo, imagenFrontal }: Datos
           <div className={estilos.pista} aria-hidden="true">
             {Array.from({ length: COPIAS }, (_, i) => (
               <span key={i} className={estilos.item}>
-                <span className={estilos.punto} />
                 <span className={estilos.texto}>{texto}</span>
+                <span className={estilos.separador}>|</span>
               </span>
             ))}
           </div>

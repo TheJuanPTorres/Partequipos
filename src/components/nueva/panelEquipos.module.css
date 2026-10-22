@@ -248,7 +248,6 @@
   text-transform: uppercase;
   transition:
     background-color 180ms ease,
-    padding-left 220ms cubic-bezier(0.22, 1, 0.36, 1),
     color 180ms ease;
 }
 
@@ -276,15 +275,20 @@
     transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.item:hover,
-.item:focus-visible {
+/*
+ * Al pasar el ratón o enfocar, SOLO cambian el color y el fondo (dirección, 2026-10-22): el
+ * relleno y el borde son siempre los mismos, así el texto se corta en las mismas líneas antes y
+ * durante el hover (antes ganaba 8 px de relleno y un nombre largo saltaba de línea). Solo los
+ * enlaces: una entrada sin página es texto informativo.
+ */
+a.item:hover,
+a.item:focus-visible {
   background: rgb(0 0 0 / 0.06);
   color: var(--color-marca, #e5242d);
-  padding-left: 22px;
 }
 
-.item:hover .flecha,
-.item:focus-visible .flecha {
+a.item:hover .flecha,
+a.item:focus-visible .flecha {
   opacity: 1;
   transform: none;
 }
@@ -301,16 +305,15 @@
   .flecha {
     transition: none;
   }
-
-  .item:hover,
-  .item:focus-visible {
-    padding-left: 14px;
-  }
 }
 
-/* Una entrada sin página (repuestos: WordPress la nombra sin ficha): el texto, sin efecto. */
+/*
+ * Una entrada sin página (repuestos: WordPress la nombra sin ficha; los productos de una
+ * categoría técnica): SOLO INFORMATIVA, no reacciona al ratón (sin fondo, sin rojo, sin mano).
+ */
 .itemSinEnlace {
   color: var(--color-texto-suave, #56545a);
+  cursor: default;
 }
 
 /*
@@ -430,5 +433,53 @@
 @keyframes desvanece {
   to {
     opacity: 0;
+  }
+}
+
+/*
+ * R5 de repuestos (2026-10-21): el buscador del panel, entre la cabecera y el listado; no se
+ * desplaza con la lista.
+ */
+.buscar {
+  display: flex;
+  margin: 0 -36px;
+  padding: 14px 36px 4px;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  color: var(--color-texto-suave, #56545a);
+}
+
+.buscarCampo {
+  min-width: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+  flex: 1 1 220px;
+  padding: 0 16px;
+  border: 1px solid rgb(0 0 0 / 0.35);
+  border-radius: 999px;
+  background: var(--color-fondo, #fff);
+  color: var(--color-texto, #1a1a1a);
+  font: inherit;
+  font-size: 16px;
+}
+
+.buscarCampo:focus-visible {
+  outline: 3px solid var(--color-texto, #1a1a1a);
+  outline-offset: 1px;
+}
+
+.buscarCuenta {
+  min-height: 1.5em;
+  margin: 0;
+  flex-basis: 100%;
+  font-size: 14px;
+}
+
+@media (max-width: 767px) {
+  .buscar {
+    margin: 0 -16px;
+    padding: 12px 16px 2px;
   }
 }

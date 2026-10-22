@@ -35,6 +35,7 @@ export function TarjetasMarca({
   indice = false,
   cuatroEnUnaFila = false,
   etiqueta = "Páginas de la sección",
+  panelR5 = false,
 }: {
   id: string;
   /** Sin título (las páginas índice no lo llevan) la sección se nombra con `etiqueta`. */
@@ -49,6 +50,8 @@ export function TarjetasMarca({
    */
   cuatroEnUnaFila?: boolean;
   etiqueta?: string;
+  /** R5 de repuestos: el panel «Ver todo» con buscador y orden natural. */
+  panelR5?: boolean;
 }) {
   if ((!titulo && !indice) || tarjetas.length === 0) return null;
   const idTitulo = `${id}-titulo`;
@@ -70,6 +73,7 @@ export function TarjetasMarca({
         verTodo={verTodo}
         indice={indice}
         nivel={titulo ? "h3" : "h2"}
+        panelR5={panelR5}
         cuatroEnUnaFila={cuatroEnUnaFila}
       />
       {indice ? <RecuadrosConScroll /> : null}
@@ -92,6 +96,7 @@ export function RejillaTarjetas({
   verTodo,
   indice = false,
   nivel: Nivel,
+  panelR5 = false,
   cuatroEnUnaFila = false,
 }: {
   id: string;
@@ -99,6 +104,7 @@ export function RejillaTarjetas({
   verTodo: string;
   indice?: boolean;
   nivel: "h2" | "h3" | "h4";
+  panelR5?: boolean;
   /** Ver `TarjetasMarca`. */
   cuatroEnUnaFila?: boolean;
 }) {
@@ -170,6 +176,7 @@ export function RejillaTarjetas({
                   describedBy={idT}
                   enlacePagina={t.panel.enlacePagina}
                   acento={t.panel.acento}
+                  buscador={panelR5}
                 />
               ) : verTodo && t.href ? (
                 <Link href={t.href} aria-describedby={idT} className={estilos.botonTarjeta}>

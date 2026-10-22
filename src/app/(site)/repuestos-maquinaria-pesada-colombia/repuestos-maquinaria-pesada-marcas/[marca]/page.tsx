@@ -6,6 +6,7 @@ import { SeccionTestimonios } from "@/components/portada/diferidos";
 import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { InterruptorMejoras } from "@/components/repuestos/InterruptorMejoras";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
 import { SedesCompactas } from "@/components/repuestos/SedesCompactas";
 import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
@@ -24,6 +25,7 @@ import { getEmpresa } from "@/lib/queries/getSeo";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { categoriasDeMarca, tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
 import { idsDeOtrasEntradas, listaDeModelos } from "@/lib/repuestos/tipo";
+import { MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
@@ -99,6 +101,7 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
 
   return (
     <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
+      <InterruptorMejoras />
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
         <Breadcrumbs items={breadcrumbs} />
@@ -119,6 +122,7 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
         tarjetas={tarjetasDeTipos(marca, tipos, modelosDe)}
         // El estilo «difuminado» de las tarjetas del sitio (dirección, 2026-10-21).
         indice
+        panelR5={MEJORAS_ACTIVAS.R5}
       />
 
       <ContactoMarca

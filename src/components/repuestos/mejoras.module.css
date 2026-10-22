@@ -1,0 +1,206 @@
+/*
+ * MEJORAS DE LAS PÁGINAS DE REPUESTOS (dirección, 2026-10-21; `src/lib/repuestos/mejoras.ts`).
+ * Lo apagado por la URL del preview (`<html data-mejoras-apagadas="…">`) no se pinta. En
+ * producción ese atributo no existe: manda el interruptor del código.
+ */
+:global(html[data-mejoras-apagadas~="R2"]) .barraSeries,
+:global(html[data-mejoras-apagadas~="R4"]) .ayuda {
+  display: none;
+}
+
+/* --- R2: barra de series ------------------------------------------------------------------ */
+
+.barraSeries {
+  position: sticky;
+  z-index: 20;
+  /* 8 px bajo la cabecera fija: 67 px en móvil, 71 en tablet y 70 (encogida) en escritorio. */
+  top: 78px;
+  margin: 28px auto 0;
+  padding: 6px;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--color-fondo);
+  box-shadow:
+    0 0 0 1px rgb(16 15 15 / 0.08),
+    0 6px 20px rgb(16 15 15 / 0.12);
+}
+
+.barraLista {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.barraLista::-webkit-scrollbar {
+  display: none;
+}
+
+.barraEnlace {
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 0 18px;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.barraEnlace:hover {
+  background: var(--color-fondo-seccion);
+}
+
+/*
+ * El fondo de la serie actual es su `::before` (no el del enlace): así puede VIAJAR desde la
+ * serie de antes (`BarraSeries`, como A4 del listado de usados), por debajo del texto.
+ */
+.barraEnlace[aria-current] {
+  color: var(--marca-tinta, var(--color-fondo));
+}
+
+.barraEnlace[aria-current]::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--marca-amarillo, var(--color-texto));
+  content: "";
+  transform-origin: left center;
+}
+
+/* La actual no cambia de fondo al pasar el ratón: ya lo tiene. */
+.barraEnlace[aria-current]:hover {
+  background: transparent;
+}
+
+.barraEnlace:focus-visible {
+  outline: 2px solid var(--color-texto);
+  outline-offset: -2px;
+}
+
+.barraCuenta {
+  opacity: 0.75;
+  font-weight: 400;
+}
+
+@media (max-width: 1024px) {
+  .barraSeries {
+    top: 79px;
+  }
+}
+
+@media (max-width: 767px) {
+  .barraSeries {
+    top: 75px;
+    width: auto;
+    margin-top: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barraEnlace {
+    transition: none;
+  }
+}
+
+/* --- R4: ¿No encuentras tu modelo? (franja propia, 2026-10-22) -------------------------------- */
+
+.ayuda {
+  display: flex;
+  max-width: 1000px;
+  margin: 48px auto 0;
+  padding: 24px 28px;
+  align-items: center;
+  gap: 20px;
+  border-radius: 20px;
+  background: var(--color-marca-tenue);
+  text-align: left;
+}
+
+.ayudaIcono {
+  display: flex;
+  width: 56px;
+  height: 56px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-fondo);
+  color: var(--color-marca);
+}
+
+.ayudaTexto {
+  flex: 1;
+}
+
+.ayudaTitulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.ayudaFrase {
+  margin: 4px 0 0;
+  color: var(--color-texto);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+/* El botón rojo del sitio (el de «Contáctanos» y las tarjetas). */
+.ayudaBoton {
+  display: inline-flex;
+  min-height: 44px;
+  flex: none;
+  padding: 0 26px;
+  align-items: center;
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.ayudaBoton:hover {
+  background: var(--color-texto);
+}
+
+.ayudaBoton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  .ayuda {
+    margin-top: 36px;
+    padding: 24px 20px;
+    flex-direction: column;
+    gap: 14px;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ayudaBoton {
+    transition: none;
+  }
+}

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Fragment } from "react";
 
 import { ArticuloCuerpo } from "@/components/blog/ArticuloCuerpo";
+import { ArticuloPropio } from "@/components/blog/ArticuloPropio";
 import { PaginaConBloques } from "@/components/bloques/PaginaConBloques";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { ContactoPagina } from "@/components/indices/ContactoPagina";
@@ -135,7 +136,15 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
   const resuelto = await resolver(clave);
   if (!resuelto) notFound();
 
-  if (resuelto.tipo === "articulo") return <ArticuloCuerpo articulo={resuelto.articulo} />;
+  if (resuelto.tipo === "articulo") {
+    // Interruptor «Diseño del artículo» (2026-10-21): apagado, el artículo de siempre.
+    const indice = await getPaginasIndice();
+    return indice.blog?.disenoArticulo === "propio" ? (
+      <ArticuloPropio articulo={resuelto.articulo} />
+    ) : (
+      <ArticuloCuerpo articulo={resuelto.articulo} />
+    );
+  }
 
   const { pagina } = resuelto;
   const secciones = pagina.secciones ?? [];

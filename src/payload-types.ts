@@ -3723,6 +3723,15 @@ export interface PaginasIndice {
     marca?: (number | null) | MarcasLubricante;
     textoBoton?: string | null;
   };
+  /**
+   * El índice del blog usa la plantilla «Blog» de Andrés. El artículo, que Andrés no diseñó, tiene un diseño nuestro que se enciende aquí cuando se apruebe.
+   */
+  blog: {
+    /**
+     * «Provisional»: el artículo sencillo de siempre. «Diseño propio»: cabecera baja con migas, imagen destacada, columna de lectura con índice fijo, barra de progreso, compartir, llamada a contactar y artículos relacionados. Cambiarlo actualiza todos los artículos.
+     */
+    disenoArticulo: 'provisional' | 'propio';
+  };
   contacto?: {
     antetitulo?: string | null;
     titulo?: string | null;
@@ -3971,6 +3980,11 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
         textoBloque?: T;
         marca?: T;
         textoBoton?: T;
+      };
+  blog?:
+    | T
+    | {
+        disenoArticulo?: T;
       };
   contacto?:
     | T

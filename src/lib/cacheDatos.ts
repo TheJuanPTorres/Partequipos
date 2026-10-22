@@ -45,6 +45,13 @@ export const ETIQUETAS_DATOS = {
    * ruta; la etiqueta sí. La invalida `revalidarIndices`.
    */
   sitemap: "datos:sitemap",
+  /**
+   * Los artículos del blog como los pinta el índice (`getIndiceBlog`): sin el
+   * cuerpo, con foto, categoría y extracto. El índice lee la query de la URL
+   * (filtros y búsqueda) y se pinta en cada petición. La invalida el gancho
+   * del artículo y el de la categoría.
+   */
+  blog: "datos:blog",
 } as const;
 
 /**

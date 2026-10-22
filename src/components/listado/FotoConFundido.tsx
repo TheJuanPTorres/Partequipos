@@ -1,12 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import estilos from "./listado.module.css";
 
 /** Ancho de la miniatura borrosa que hace de fondo mientras llega la foto. */
 const ANCHO_MINIATURA = 32;
+
+/** Nada que escuchar: solo distingue el servidor (y la hidratación) del navegador. */
+const sinSuscripcion = () => () => {};
 
 /**
  * La foto de una tarjeta con fundido al cargar (animación A6 del listado de
@@ -16,10 +19,11 @@ const ANCHO_MINIATURA = 32;
  * un fundido. Las dos son diferidas: fuera de la vista no se piden.
  *
  * Es de cliente porque necesita saber cuándo ha cargado la foto. Sin
- * JavaScript la foto se ve como siempre: la ocultación inicial y la miniatura
- * solo se aplican con `scripting: enabled` (`listado.module.css`); sin ellas,
- * la miniatura no se pinta y, al ser diferida, no se pide. Con «reducir
- * movimiento», tampoco hay miniatura.
+ * JavaScript la foto se ve como siempre: la ocultación inicial solo se aplica
+ * con `scripting: enabled` (`listado.module.css`), y la miniatura solo se pinta
+ * en el navegador, tras hidratar. No va en el HTML del servidor porque, sin
+ * JavaScript, el navegador no difiere las imágenes y la pediría aunque no se
+ * pinte (medido: 23 peticiones). Con «reducir movimiento», no hay miniatura.
  */
 export function FotoConFundido({
   src,
@@ -37,6 +41,12 @@ export function FotoConFundido({
   posicion: string;
 }) {
   const [cargada, setCargada] = useState(false);
+  // `false` en el servidor y al hidratar; `true` después, ya en el navegador.
+  const enNavegador = useSyncExternalStore(
+    sinSuscripcion,
+    () => true,
+    () => false,
+  );
   const foto = useRef<HTMLImageElement>(null);
   // La foto pudo terminar antes de hidratar (caché): entonces no habrá `load`.
   useEffect(() => {
@@ -44,16 +54,18 @@ export function FotoConFundido({
   }, []);
   return (
     <span className={estilos.marcoFoto} data-cargada={cargada ? "" : undefined}>
-      <Image
-        src={src}
-        alt=""
-        aria-hidden="true"
-        width={ANCHO_MINIATURA}
-        height={Math.max(1, Math.round((ANCHO_MINIATURA * height) / width))}
-        sizes={`${ANCHO_MINIATURA}px`}
-        className={estilos.miniatura}
-        style={{ objectPosition: posicion }}
-      />
+      {enNavegador ? (
+        <Image
+          src={src}
+          alt=""
+          aria-hidden="true"
+          width={ANCHO_MINIATURA}
+          height={Math.max(1, Math.round((ANCHO_MINIATURA * height) / width))}
+          sizes={`${ANCHO_MINIATURA}px`}
+          className={estilos.miniatura}
+          style={{ objectPosition: posicion }}
+        />
+      ) : null}
       <Image
         ref={foto}
         src={src}

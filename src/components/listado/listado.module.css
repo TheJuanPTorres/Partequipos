@@ -1321,7 +1321,7 @@
   height: 100%;
   object-fit: contain;
 }
-/* Sin JavaScript no hay fundido: la miniatura ni se pinta (ni se descarga, `FotoConFundido`). */
+/* Sin JavaScript no hay fundido ni miniatura (que además solo se monta en el navegador, `FotoConFundido`). */
 .miniatura {
   display: none;
 }

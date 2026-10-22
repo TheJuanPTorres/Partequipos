@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { slugCategoriaNuevaNoReservado } from "../lib/nueva/slugsReservados";
 import { revalidarCategoriaNueva, revalidarCategoriaNuevaBorrada } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMegamenu } from "./hooks/megamenuHooks";
@@ -40,7 +41,8 @@ export const CategoriaMaquinaria: CollectionConfig = {
   },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
-    slugField({ unique: true }),
+    // «marcas», «tipos» y «pagina» están reservadas: son páginas fijas al mismo nivel.
+    slugField({ unique: true, validate: slugCategoriaNuevaNoReservado }),
     { name: "descripcion", type: "textarea", label: "Descripción" },
     {
       name: "tiposIncluidos",

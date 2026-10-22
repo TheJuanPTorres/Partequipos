@@ -70,3 +70,42 @@ Análisis previo: `Desktop\partequipos-cierre\propuestas\2026-10-14-categoria-se
 - **Filtros:** con el de Hitachi, «18 de 80» y la canónica a la página sin filtros. Una query mal escrita (`?marca=HITACHI&orden=recomendados`) redirige (308) a `?marca=hitachi`.
 - **Pintado a 390, 1010 y 1440:** composición de ux-9 en escritorio y en móvil; a 1010, la de móvil.
 - **Fallo encontrado al medir:** las tarjetas salían sin foto. Con `select`, Payload devuelve `url: null` si no se pide `filename`. Arreglado aquí, y en el listado de usados con su propio PR (#141, con un guardarraíl).
+
+## Índice de nueva sin marketplace (2026-10-22, dirección)
+
+**El marketplace es solo para usados.** El índice `/maquinaria-pesada/maquinaria-pesada-nueva/` deja la plantilla «Categoría
+secundaria» (listado con filtros y paginación) y pasa a la plantilla de índices de Andrés, como `/maquinaria-pesada/`
+(`IndiceTarjetas`): la cabecera y **dos tarjetas** centradas (regla de tarjetas: 1–2 centradas):
+
+- **«Por marca»** → `…/nueva/marcas/`. Foto: la «Imagen de la tarjeta» de la primera marca que la tenga, por nombre
+  y sin «Aditamentos».
+- **«Por tipo de máquina»** → `…/nueva/tipos/` (**URL NUEVA, fijada por dirección**). Foto: la de la primera tarjeta
+  del índice de tipos que tenga foto.
+
+Sin campos nuevos ni migración: las fotos son las que ya había. El título y la descripción del índice son los de
+siempre (el SEO no cambia). La plantilla de `/maquinaria-pesada/` no lleva formulario, así que este tampoco.
+
+**Índice de tipos** (`…/nueva/tipos/`): no existía ni aquí ni en WordPress. Allí el propio índice de nueva hacía de
+índice de tipos, con «conocer más» a cada tipo. Lleva una tarjeta por tipo (`src/lib/nueva/indiceTipos.ts`):
+
+- los de **varias marcas**, a su **categoría transversal** (Excavadoras, Cargadores, Compactadores → `…/nueva/<categoria>/`,
+  que **siguen siendo listados con filtros**: no se tocan en este cambio);
+- los de **una sola marca**, a la página de su tipo en esa marca. Son los que tienen marcada la casilla del tipo,
+  rebautizada «Tarjeta en el índice de tipos de maquinaria nueva» (antes «Pestaña en el índice…»; mismo campo, sin
+  esquema). Un «paraguas» (Pavimentadoras de Dynapac) cuenta los equipos de los tipos que agrupa;
+- **«Aditamentos»**, al final, a su página de marca.
+
+Foto de cada tarjeta: la «Imagen de la tarjeta» del tipo o, vacía, la del primer equipo con foto (por nombre).
+
+**Datos:** como en el índice de WordPress, Minicargadores (CASE) y Pavimentadoras (Dynapac) llevan la casilla
+marcada. En el preview ya lo están; en el sitio publicado se marcan desde el panel (`runbook-nueva-tipos-casillas.md`).
+
+**Las URL del antiguo listado no dan 404:**
+
+- `…/nueva/pagina/<n>/` → **301** al índice, con o sin filtros en la query (manejador de ruta, no página: sale del
+  sitemap);
+- el índice con filtros (`?marca=…`) → la misma página, con la canónica sin query.
+
+`marcas`, `tipos` y `pagina` quedan **reservadas** como dirección de una categoría de nueva
+(`src/lib/nueva/slugsReservados.ts`). Los dos índices son estáticos: los revalidan los cambios de marca, tipo, equipo
+y categoría. Las fichas y sus URL no cambian.

@@ -1,13 +1,11 @@
 import { VerTodosEquipos } from "@/components/nueva/VerTodosEquipos";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
-import { ejemploDeModelo } from "@/lib/repuestos/buscarModelo";
 import type { GrupoDeModelos } from "@/lib/repuestos/series";
 import { tarjetasDeModelos, type ModeloEnlace } from "@/lib/repuestos/tipo";
 import type { TiposEquipo } from "@/payload-types";
 
 import { AyudaModelo } from "./AyudaModelo";
 import { BarraSeries } from "./BarraSeries";
-import { BuscadorModelos } from "./BuscadorModelos";
 import estilos from "./marca.module.css";
 import { RecuadrosConScroll } from "./RecuadrosConScroll";
 import { RejillaTarjetas } from "./TarjetasMarca";
@@ -31,9 +29,8 @@ import { RejillaTarjetas } from "./TarjetasMarca";
  * conoce esa consulta) se ven todas y el botón no sale. Las tarjetas ocultas siguen en el HTML.
  *
  * MEJORAS (dirección, 2026-10-21; interruptores en `src/lib/repuestos/mejoras.ts`), cada una
- * solo si la página la pide: el buscador de modelo (R1, `buscador`, con más de 2 modelos), la
- * barra de series fija (R2, `barraSeries`, con 2 o más series), «¿No encuentras tu modelo?» al
- * final de cada serie (R4, `ayuda`) y el panel con buscador y orden natural (R5, `panelR5`).
+ * solo si la página la pide: la barra de series fija (R2, `barraSeries`, con 2 o más series), «¿No encuentras tu modelo?» como
+ * franja al final de los modelos (R4, `ayuda`) y el panel con buscador y orden natural (R5, `panelR5`).
  */
 export function ModelosTipo({
   id,
@@ -44,11 +41,9 @@ export function ModelosTipo({
   grupos,
   verTodo,
   tituloPanel,
-  buscador = false,
   barraSeries = false,
   ayuda = null,
   panelR5 = false,
-  quitarDelEjemplo = [],
 }: {
   id: string;
   titulo: string;
@@ -60,16 +55,12 @@ export function ModelosTipo({
   grupos?: GrupoDeModelos<ModeloEnlace>[] | null;
   /** Texto del botón de cada tarjeta. */
   verTodo: string;
-  /** R1. */
-  buscador?: boolean;
   /** R2. */
   barraSeries?: boolean;
   /** R4: el formulario que abre «¿No encuentras tu modelo?». */
   ayuda?: { formulario: ConfigFormulario; anclaContacto: string } | null;
   /** R5. */
   panelR5?: boolean;
-  /** Palabras que no van en el ejemplo del buscador: el tipo y la marca. */
-  quitarDelEjemplo?: string[];
 }) {
   const idTitulo = `${id}-titulo`;
   const series = (grupos ?? []).flatMap((g) =>
@@ -85,13 +76,6 @@ export function ModelosTipo({
       <h2 id={idTitulo} className={estilos.tituloSeccion}>
         {titulo}
       </h2>
-      {buscador && modelos.length > 2 ? (
-        <BuscadorModelos
-          seccion={id}
-          ejemplo={modelos[0] ? ejemploDeModelo(modelos[0].nombre, quitarDelEjemplo) : null}
-          ayuda={ayuda}
-        />
-      ) : null}
       {conBarra ? <BarraSeries series={series} /> : null}
       {modelos.length === 0 ? (
         <p className={estilos.modelosVacio}>{vacio}</p>
@@ -112,7 +96,6 @@ export function ModelosTipo({
               tituloPanel={`${tituloPanel}: ${g.titulo}`}
               destino={g.ancla ?? id}
               nivel="h4"
-              ayuda={ayuda}
               panelR5={panelR5}
             />
           </div>
@@ -126,10 +109,12 @@ export function ModelosTipo({
           tituloPanel={tituloPanel}
           destino={id}
           nivel="h3"
-          ayuda={ayuda}
           panelR5={panelR5}
         />
       )}
+      {ayuda && modelos.length > 0 ? (
+        <AyudaModelo formulario={ayuda.formulario} anclaContacto={ayuda.anclaContacto} />
+      ) : null}
       {modelos.length > 0 ? <RecuadrosConScroll /> : null}
     </section>
   );
@@ -144,7 +129,6 @@ function RejillaRecortada({
   tituloPanel,
   destino,
   nivel,
-  ayuda,
   panelR5,
 }: {
   id: string;
@@ -155,7 +139,6 @@ function RejillaRecortada({
   /** El ancla de la serie (o de la sección): el `href` del botón. */
   destino: string;
   nivel: "h3" | "h4";
-  ayuda: { formulario: ConfigFormulario; anclaContacto: string } | null;
   panelR5: boolean;
 }) {
   const n = modelos.length;
@@ -187,9 +170,6 @@ function RejillaRecortada({
             buscador={panelR5}
           />
         </div>
-      ) : null}
-      {ayuda ? (
-        <AyudaModelo formulario={ayuda.formulario} anclaContacto={ayuda.anclaContacto} />
       ) : null}
     </div>
   );

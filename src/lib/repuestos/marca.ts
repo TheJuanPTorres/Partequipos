@@ -115,8 +115,6 @@ export type TarjetaMarca = {
   logo?: LogoMarca;
   /** Con él, «Ver todo» abre el panel con la lista; sin JavaScript sigue llevando a `href`. */
   panel?: PanelTarjeta;
-  /** Clave del buscador de modelos (R1, `normalizarBusqueda`): nombre y código. */
-  buscar?: string;
 };
 
 /**

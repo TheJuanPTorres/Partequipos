@@ -25,8 +25,8 @@ import { getEmpresa } from "@/lib/queries/getSeo";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { categoriasDeMarca, tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
 import { idsDeOtrasEntradas, listaDeModelos } from "@/lib/repuestos/tipo";
-import { interruptoresPorUrl, MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
-import { tarjetasDeCategorias, vistaPorQue } from "@/lib/repuestos/plantillaTipo";
+import { MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
+import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
@@ -98,10 +98,6 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
     { nombre: "Marcas", path: rutas.marcas() },
     { nombre: marca.nombre, path: rutas.marca(marca.slug) },
   ];
-  // R3: las categorías en tarjetas con foto; en el preview se pintan también las píldoras de
-  // antes (delante, ocultas), para poder apagarla con la URL (`src/lib/repuestos/mejoras.ts`).
-  // Las tarjetas y las de los tipos, seguidas, forman un solo bloque blanco.
-  const conPruebas = interruptoresPorUrl();
 
   return (
     <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
@@ -113,25 +109,11 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
 
       <HeroMarca vista={vistaEncabezado(marca, global)} anclaSiguiente={ANCLA_CATEGORIAS} />
 
-      {!MEJORAS_ACTIVAS.R3 || conPruebas ? (
-        <div className={MEJORAS_ACTIVAS.R3 ? estilos.categoriasSinR3 : undefined}>
-          <CategoriasMarca
-            id={MEJORAS_ACTIVAS.R3 ? `${ANCLA_CATEGORIAS}-sin-r3` : ANCLA_CATEGORIAS}
-            titulo={texto(global.tituloCategorias)}
-            categorias={categoriasDeMarca(categorias)}
-          />
-        </div>
-      ) : null}
-      {MEJORAS_ACTIVAS.R3 ? (
-        <TarjetasMarca
-          id={ANCLA_CATEGORIAS}
-          titulo={texto(global.tituloCategorias)}
-          verTodo={texto(global.verTodoTexto) || "Ver todo"}
-          tarjetas={tarjetasDeCategorias(categorias)}
-          indice
-          className={conPruebas ? estilos.categoriasR3 : undefined}
-        />
-      ) : null}
+      <CategoriasMarca
+        id={ANCLA_CATEGORIAS}
+        titulo={texto(global.tituloCategorias)}
+        categorias={categoriasDeMarca(categorias)}
+      />
 
       <TarjetasMarca
         id="repuestos-marca-tipos"

@@ -36,7 +36,6 @@ export function TarjetasMarca({
   cuatroEnUnaFila = false,
   etiqueta = "Páginas de la sección",
   panelR5 = false,
-  className,
 }: {
   id: string;
   /** Sin título (las páginas índice no lo llevan) la sección se nombra con `etiqueta`. */
@@ -53,14 +52,13 @@ export function TarjetasMarca({
   etiqueta?: string;
   /** R5 de repuestos: el panel «Ver todo» con buscador y orden natural. */
   panelR5?: boolean;
-  className?: string;
 }) {
   if ((!titulo && !indice) || tarjetas.length === 0) return null;
   const idTitulo = `${id}-titulo`;
   return (
     <section
       id={id}
-      className={`${estilos.tarjetas} ${indice ? estilos.tarjetasIndice : ""} ${className ?? ""}`}
+      className={`${estilos.tarjetas} ${indice ? estilos.tarjetasIndice : ""}`}
       aria-labelledby={titulo ? idTitulo : undefined}
       aria-label={titulo ? undefined : etiqueta}
     >
@@ -129,7 +127,6 @@ export function RejillaTarjetas({
           <li
             key={t.clave}
             className={`${estilos.tarjeta} ${t.soloEscritorio ? estilos.soloEscritorio : ""}`}
-            data-buscar={t.buscar}
           >
             {t.logo ? (
               <div className={estilos.foto}>

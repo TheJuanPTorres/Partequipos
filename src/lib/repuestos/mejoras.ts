@@ -1,29 +1,26 @@
 /**
  * MEJORAS DE LAS PÁGINAS DE REPUESTOS (dirección, 2026-10-21), cada una con su INTERRUPTOR:
  *
- * - R1: buscador de modelo en la página de tipo.
  * - R2: barra de series fija en la página de tipo.
- * - R3: «Nuestras categorías de repuestos» de la marca en tarjetas con foto (antes, píldoras).
- * - R4: «¿No encuentras tu modelo?» al final de cada serie, con la ventana del formulario.
+ * - R4: «¿No encuentras tu modelo?», una franja al final de los modelos, con la ventana del
+ *   formulario.
  * - R5: buscador y orden natural (EX100, EX120, EX200…) en el panel «Ver todos».
  *
  * `MEJORAS_ACTIVAS` es el interruptor de verdad: una mejora en `false` no se pinta en ningún
- * entorno, y quitarla no toca las demás.
+ * entorno, y quitarla no toca las demás. Juan Pablo dejó R2, R4 y R5 (2026-10-22): R1 (buscador
+ * de modelo en la página) y R3 (categorías de la marca en tarjetas) se quitaron, con su código.
  *
  * PARA PROBARLAS EN EL PREVIEW (nunca en producción), la URL apaga las que no se nombren:
- * `?mejoras=R1,R3` deja solo esas dos; `?mejoras=no`, ninguna; sin parámetro, todas. Un
+ * `?mejoras=R2,R4` deja solo esas dos; `?mejoras=no`, ninguna; sin parámetro, todas. Un
  * script en línea (`codigoInterruptorMejoras`) lo lee antes de pintar y pone en `<html>` el
  * atributo `data-mejoras-apagadas="R2 R4 R5"`; el CSS oculta lo apagado y los componentes con
- * JavaScript lo consultan (`mejoraApagadaEnLaPagina`). Por eso, en el preview, lo que tiene
- * dos versiones (R3) pinta las dos y el CSS elige.
+ * JavaScript lo consultan (`mejoraApagadaEnLaPagina`).
  */
-export const MEJORAS = ["R1", "R2", "R3", "R4", "R5"] as const;
+export const MEJORAS = ["R2", "R4", "R5"] as const;
 export type Mejora = (typeof MEJORAS)[number];
 
 export const MEJORAS_ACTIVAS: Record<Mejora, boolean> = {
-  R1: true,
   R2: true,
-  R3: true,
   R4: true,
   R5: true,
 };

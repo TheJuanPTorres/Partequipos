@@ -5,7 +5,6 @@ import { tipoEnTitulo } from "../seo/porDefecto";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 
 import { segmentoDeTipo } from "./anidado";
-import { normalizarBusqueda } from "./buscarModelo";
 import { logoConAlt, type TarjetaMarca, type VistaEncabezado } from "./marca";
 import { agruparPorSerie, claveSerie, seriesDeTipo, type GrupoDeModelos } from "./series";
 
@@ -171,6 +170,5 @@ export function tarjetasDeModelos(tipo: TiposEquipo, modelos: ModeloEnlace[]): T
     imagen: m.imagen ?? fotoSerie(m.serie) ?? fotoTipo,
     soloEscritorio: false,
     ...(m.codigo ? { detalle: m.codigo } : {}),
-    buscar: normalizarBusqueda(`${m.nombre} ${m.codigo ?? ""}`),
   }));
 }

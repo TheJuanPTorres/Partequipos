@@ -120,7 +120,6 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         tituloPanel={`${tipoEnTitulo(tipo.nombre)} ${marca.nombre.trim().toUpperCase()}`}
         grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
-        buscador={MEJORAS_ACTIVAS.R1}
         barraSeries={MEJORAS_ACTIVAS.R2}
         ayuda={
           MEJORAS_ACTIVAS.R4
@@ -133,7 +132,6 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
             : null
         }
         panelR5={MEJORAS_ACTIVAS.R5}
-        quitarDelEjemplo={[tipo.nombre, marca.nombre]}
       />
 
       <TarjetasMarca

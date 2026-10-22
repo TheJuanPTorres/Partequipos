@@ -1,8 +1,7 @@
 /**
- * BUSCAR UN MODELO por su nombre (mejoras R1 y R5 de repuestos, 2026-10-21): sin distinguir
+ * BUSCAR UN MODELO por su nombre (R5 de repuestos, el buscador del panel «Ver todo»; 2026-10-21): sin distinguir
  * mayúsculas, tildes, guiones ni espacios. «zx 200», «ZX-200» y «zx200» encuentran la
- * «ZX200-3»; se busca dentro del nombre y del código. Puro: lo usan el servidor (la clave de
- * cada tarjeta) y el navegador (lo que se escribe).
+ * «ZX200-3»; se busca dentro del nombre. Puro.
  */
 export function normalizarBusqueda(texto: string): string {
   return texto
@@ -26,34 +25,4 @@ const ORDEN = new Intl.Collator("es", { numeric: true, sensitivity: "base" });
  */
 export function enOrdenNatural<T extends { nombre: string }>(lista: readonly T[]): T[] {
   return [...lista].sort((a, b) => ORDEN.compare(a.nombre, b.nombre));
-}
-
-/**
- * Columna de inicio de la tarjeta `i` de `n` en ESCRITORIO (rejilla de 6, cada tarjeta ocupa
- * 2), igual que la regla de las tarjetas: 4, en 2 + 2; la última fila incompleta, centrada.
- * `null`: la colocación automática.
- */
-export function columnaEscritorio(i: number, n: number): string | null {
-  if (n === 4) return i % 2 === 0 ? "2 / span 2" : "4 / span 2";
-  if (n % 3 === 1 && i === n - 1) return "3 / span 2";
-  if (n % 3 === 2 && i === n - 2) return "2 / span 2";
-  return null;
-}
-
-/** En TABLET (rejilla de 4): la última de un número impar, al centro. */
-export function columnaTablet(i: number, n: number): string | null {
-  return n % 2 === 1 && i === n - 1 ? "2 / span 2" : null;
-}
-
-/**
- * El ejemplo del buscador: el nombre del modelo sin las palabras del tipo ni de la marca
- * («Excavadora HITACHI EX100» → «EX100»). Si no queda nada, el nombre entero.
- */
-export function ejemploDeModelo(nombre: string, quitar: string[]): string {
-  const fuera = new Set(quitar.flatMap((q) => q.split(/\s+/)).map(normalizarBusqueda));
-  const resto = nombre
-    .split(/\s+/)
-    .filter((p) => p && !fuera.has(normalizarBusqueda(p)))
-    .join(" ");
-  return resto || nombre.trim();
 }

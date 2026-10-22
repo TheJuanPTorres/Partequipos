@@ -1,17 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import {
-  coincideModelo,
-  columnaEscritorio,
-  columnaTablet,
-  ejemploDeModelo,
-  enOrdenNatural,
-  normalizarBusqueda,
-} from "./buscarModelo";
+import { coincideModelo, enOrdenNatural, normalizarBusqueda } from "./buscarModelo";
 import { codigoInterruptorMejoras, MEJORAS, mejorasApagadasPorUrl } from "./mejoras";
 
-describe("normalizarBusqueda y coincideModelo (R1)", () => {
+describe("normalizarBusqueda y coincideModelo (R5)", () => {
   it("ignora mayúsculas, tildes, guiones y espacios", () => {
     assert.equal(normalizarBusqueda(" ZX-200 lc é"), "zx200lce");
     const clave = normalizarBusqueda("ZX200-3 Excavadora");
@@ -47,12 +40,12 @@ describe("interruptores por URL", () => {
   it("sin parámetro, ninguna apagada; «no», todas; una lista, el resto", () => {
     assert.deepEqual(mejorasApagadasPorUrl(null), []);
     assert.deepEqual(mejorasApagadasPorUrl("no"), [...MEJORAS]);
-    assert.deepEqual(mejorasApagadasPorUrl("r1, R3"), ["R2", "R4", "R5"]);
+    assert.deepEqual(mejorasApagadasPorUrl("r2, R5"), ["R4"]);
     assert.deepEqual(mejorasApagadasPorUrl(""), [...MEJORAS]);
   });
 
   it("el script en línea hace lo mismo que la función", () => {
-    for (const busqueda of ["", "?mejoras=R1,R3", "?mejoras=no", "?x=1&mejoras=r5", "?mejoras="]) {
+    for (const busqueda of ["", "?mejoras=R2,R4", "?mejoras=no", "?x=1&mejoras=r5", "?mejoras="]) {
       const atributos: Record<string, string> = {};
       const documento = {
         documentElement: { setAttribute: (k: string, v: string) => (atributos[k] = v) },
@@ -64,35 +57,5 @@ describe("interruptores por URL", () => {
       const esperado = valor === null ? undefined : mejorasApagadasPorUrl(valor).join(" ");
       assert.equal(atributos["data-mejoras-apagadas"], esperado, busqueda);
     }
-  });
-});
-
-describe("colocación de los resultados (regla de las tarjetas, #281)", () => {
-  const fila = (n: number, f: (i: number, n: number) => string | null) =>
-    Array.from({ length: n }, (_, i) => f(i, n));
-  it("escritorio: 1 y 2 al centro, 4 en 2 + 2, la última fila incompleta centrada", () => {
-    assert.deepEqual(fila(1, columnaEscritorio), ["3 / span 2"]);
-    assert.deepEqual(fila(2, columnaEscritorio), ["2 / span 2", null]);
-    assert.deepEqual(fila(3, columnaEscritorio), [null, null, null]);
-    assert.deepEqual(fila(4, columnaEscritorio), [
-      "2 / span 2",
-      "4 / span 2",
-      "2 / span 2",
-      "4 / span 2",
-    ]);
-    assert.deepEqual(fila(5, columnaEscritorio), [null, null, null, "2 / span 2", null]);
-    assert.deepEqual(fila(7, columnaEscritorio).at(-1), "3 / span 2");
-  });
-  it("tablet: la última de un número impar, al centro", () => {
-    assert.deepEqual(fila(3, columnaTablet), [null, null, "2 / span 2"]);
-    assert.deepEqual(fila(4, columnaTablet), [null, null, null, null]);
-  });
-});
-
-describe("ejemploDeModelo", () => {
-  it("quita el tipo y la marca del nombre", () => {
-    assert.equal(ejemploDeModelo("Excavadora HITACHI EX100", ["Excavadora", "Hitachi"]), "EX100");
-    assert.equal(ejemploDeModelo("Bulldozer Caterpillar D6D", ["Bulldozer", "Caterpillar"]), "D6D");
-    assert.equal(ejemploDeModelo("Hitachi", ["Hitachi"]), "Hitachi");
   });
 });

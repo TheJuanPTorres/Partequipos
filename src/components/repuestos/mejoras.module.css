@@ -3,79 +3,9 @@
  * Lo apagado por la URL del preview (`<html data-mejoras-apagadas="…">`) no se pinta. En
  * producción ese atributo no existe: manda el interruptor del código.
  */
-:global(html[data-mejoras-apagadas~="R1"]) .buscador,
 :global(html[data-mejoras-apagadas~="R2"]) .barraSeries,
 :global(html[data-mejoras-apagadas~="R4"]) .ayuda {
   display: none;
-}
-
-/* --- R1: buscador de modelo --------------------------------------------------------------- */
-
-.buscador {
-  display: flex;
-  max-width: 560px;
-  margin: 32px auto 0;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  text-align: center;
-}
-
-/* Sin JavaScript no puede filtrar: no se enseña. */
-@media (scripting: none) {
-  .buscador {
-    display: none;
-  }
-}
-
-.buscadorEtiqueta {
-  color: var(--color-texto);
-  font-size: var(--texto-etiqueta);
-  font-weight: 600;
-}
-
-.buscadorCaja {
-  position: relative;
-  display: flex;
-  align-items: center;
-  color: var(--color-texto-suave, #56545a);
-}
-
-.buscadorCaja > svg {
-  position: absolute;
-  left: 18px;
-  pointer-events: none;
-}
-
-.buscadorCampo {
-  width: 100%;
-  min-height: 48px;
-  box-sizing: border-box;
-  padding: 0 20px 0 48px;
-  border: 1px solid rgb(16 15 15 / 0.35);
-  border-radius: 999px;
-  background: var(--color-fondo);
-  color: var(--color-texto);
-  font: inherit;
-  font-size: 16px;
-}
-
-.buscadorCampo:focus-visible {
-  border-color: var(--color-texto);
-  outline: 2px solid var(--color-texto);
-  outline-offset: 2px;
-}
-
-/* El aviso reserva su línea: escribir no mueve lo de debajo. */
-.buscadorCuenta {
-  min-height: 1.5em;
-  margin: 0;
-  color: var(--color-texto-suave, #56545a);
-  font-size: 15px;
-}
-
-.ayudaSinResultados {
-  margin-top: 4px;
 }
 
 /* --- R2: barra de series ------------------------------------------------------------------ */
@@ -169,27 +99,88 @@
   }
 }
 
-/* --- R4: ¿No encuentras tu modelo? ------------------------------------------------------------ */
+/* --- R4: ¿No encuentras tu modelo? (franja propia, 2026-10-22) -------------------------------- */
 
 .ayuda {
-  margin: 24px 0 0;
-  color: var(--color-texto-suave, #56545a);
-  font-size: 16px;
-  text-align: center;
+  display: flex;
+  max-width: 1000px;
+  margin: 48px auto 0;
+  padding: 24px 28px;
+  align-items: center;
+  gap: 20px;
+  border-radius: 20px;
+  background: var(--color-marca-tenue);
+  text-align: left;
 }
 
-.ayudaEnlace {
+.ayudaIcono {
+  display: flex;
+  width: 56px;
+  height: 56px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-fondo);
+  color: var(--color-marca);
+}
+
+.ayudaTexto {
+  flex: 1;
+}
+
+.ayudaTitulo {
+  margin: 0;
   color: var(--color-texto);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.ayudaFrase {
+  margin: 4px 0 0;
+  color: var(--color-texto);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+/* El botón rojo del sitio (el de «Contáctanos» y las tarjetas). */
+.ayudaBoton {
+  display: inline-flex;
+  min-height: 44px;
+  flex: none;
+  padding: 0 26px;
+  align-items: center;
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: #fff;
+  font-size: 16px;
   font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration: none;
+  transition: background-color 0.3s;
 }
 
-.ayudaEnlace:hover {
-  text-decoration-thickness: 2px;
+.ayudaBoton:hover {
+  background: var(--color-texto);
 }
 
-/* Buscando (R1), la ayuda de cada serie se va: queda la del «sin resultados». */
-[data-buscando] .ayuda:not(.ayudaSinResultados) {
-  display: none;
+.ayudaBoton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  .ayuda {
+    margin-top: 36px;
+    padding: 24px 20px;
+    flex-direction: column;
+    gap: 14px;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ayudaBoton {
+    transition: none;
+  }
 }

@@ -1672,10 +1672,7 @@ a.modelo:hover {
 }
 
 @media (scripting: enabled) and (max-width: 767px) {
-  .modelosTarjetas:not([data-buscando])
-    .recorteModelos
-    .rejillaTarjetas
-    > .tarjeta:nth-child(n + 3) {
+  .recorteModelos .rejillaTarjetas > .tarjeta:nth-child(n + 3) {
     display: none;
   }
 
@@ -1685,10 +1682,7 @@ a.modelo:hover {
 }
 
 @media (scripting: enabled) and (min-width: 768px) and (max-width: 1024px) {
-  .modelosTarjetas:not([data-buscando])
-    .recorteModelos
-    .rejillaTarjetas
-    > .tarjeta:nth-child(n + 5) {
+  .recorteModelos .rejillaTarjetas > .tarjeta:nth-child(n + 5) {
     display: none;
   }
 
@@ -1698,40 +1692,12 @@ a.modelo:hover {
 }
 
 @media (scripting: enabled) and (min-width: 1025px) {
-  .modelosTarjetas:not([data-buscando])
-    .recorteModelos
-    .rejillaTarjetas
-    > .tarjeta:nth-child(n + 7) {
+  .recorteModelos .rejillaTarjetas > .tarjeta:nth-child(n + 7) {
     display: none;
   }
 
   .recorteEscritorio > .verTodosModelos {
     display: block;
-  }
-}
-
-/*
- * R1, BUSCANDO un modelo (`BuscadorModelos`): sin el recorte a 2 filas, solo las tarjetas que
- * coinciden, sin las series que no tienen ninguna y sin «Ver todos». La última fila de los
- * resultados se centra como la regla de las tarjetas, con la columna que calcula el buscador
- * (`--col-e`, `--col-t`); `!important` porque las reglas de colocación cuentan las tarjetas
- * ocultas (`:nth-child`) y son más específicas.
- */
-.modelosTarjetas[data-buscando] .rejillaTarjetas > .tarjeta:not([data-coincide]),
-.modelosTarjetas[data-buscando] .modelosGrupo[data-sin-coincidencias],
-.modelosTarjetas[data-buscando] .verTodosModelos {
-  display: none;
-}
-
-@media (min-width: 1025px) {
-  .modelosTarjetas[data-buscando] .rejillaTarjetas > .tarjeta[data-coincide] {
-    grid-column: var(--col-e, span 2) !important;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1024px) {
-  .modelosTarjetas[data-buscando] .rejillaTarjetas > .tarjeta[data-coincide] {
-    grid-column: var(--col-t, span 2) !important;
   }
 }
 
@@ -1743,20 +1709,4 @@ a.modelo:hover {
 /* Con la barra de series fija (R2), el ancla de una serie deja sitio también a la barra. */
 :global(html:not([data-mejoras-apagadas~="R2"])) .conBarraSeries .modelosGrupo {
   scroll-margin-top: 88px;
-}
-
-/*
- * R3 en el PREVIEW (`?mejoras=`): la marca pinta las píldoras y las tarjetas de categorías, y
- * se ve la que toca. En producción solo se pinta una.
- */
-:global(html[data-mejoras-apagadas~="R3"]) .categoriasR3,
-:global(html:not([data-mejoras-apagadas~="R3"])) .categoriasSinR3 {
-  display: none;
-}
-
-/* Apagada en el preview: la sección de los tipos vuelve a ser la de siempre bajo la franja. */
-:global(html[data-mejoras-apagadas~="R3"]) .categoriasR3 + .tarjetasIndice {
-  padding-top: 5%;
-  border-top-left-radius: var(--marca-radio);
-  border-top-right-radius: var(--marca-radio);
 }

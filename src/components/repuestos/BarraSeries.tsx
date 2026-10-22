@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
+
+import { CURVA, CURVA_FRENADA, DURACION_DESLIZAR_MS, DURACION_MS } from "@/lib/listado/animaciones";
 
 import mejoras from "./mejoras.module.css";
 
@@ -8,8 +10,18 @@ import mejoras from "./mejoras.module.css";
  * R2 (dirección, 2026-10-21): la BARRA DE SERIES de la página de tipo de repuestos. Va dentro de
  * la sección de modelos y, al bajar, se queda fija bajo la cabecera del sitio (`sticky`, sin
  * JavaScript ni CLS) con «Serie EX (11) · Serie ZAXIS (15)…». Marca la serie que se está
- * viendo (`aria-current`) y lleva a cada una con desplazamiento suave (salvo con «reducir
- * movimiento»). En móvil, una fila que se desliza de lado. Solo con 2 o más series.
+ * viendo (`aria-current`) y lleva a cada una con desplazamiento suave. En móvil, una fila que se
+ * desliza de lado. Solo con 2 o más series.
+ *
+ * ANIMACIÓN DEL CAMBIO DE SERIE (dirección, 2026-10-22), con las utilidades del listado de usados
+ * (#320, `src/lib/listado/animaciones.ts`), sin duplicarlas:
+ * - el RESALTADO se desliza de una serie a otra, como su A4: el fondo de la serie actual (su
+ *   `::before`) viaja desde el botón de antes, con `DURACION_DESLIZAR_MS` y `CURVA_FRENADA`;
+ * - al elegir una serie, el desplazamiento es suave y, mientras dura, el resaltado va directo a
+ *   la elegida (no pasa por las de en medio);
+ * - las tarjetas de la serie elegida que se ven ENTRAN ESCALONADAS al llegar, como su A1
+ *   (`DURACION_MS`, `CURVA`, 40 ms entre una y otra, hasta 8).
+ * Solo `transform` y `opacity`. Con «reducir movimiento», nada: el salto es directo.
  *
  * Sin JavaScript son anclas normales: la barra se queda fija y lleva a cada serie igual.
  */
@@ -21,11 +33,16 @@ export function BarraSeries({
   const [actual, setActual] = useState<string | null>(null);
   const barra = useRef<HTMLElement>(null);
   const lista = useRef<HTMLUListElement>(null);
+  /** La serie elegida mientras dura el desplazamiento: manda sobre lo que se ve. */
+  const destino = useRef<string | null>(null);
+  /** Dónde estaba el resaltado antes del cambio, respecto a la lista. */
+  const anterior = useRef<{ izquierda: number; ancho: number } | null>(null);
 
   useEffect(() => {
     let pendiente = 0;
     const medir = () => {
       pendiente = 0;
+      if (destino.current) return;
       // La serie llega unos 30 px bajo la barra (`scroll-margin-top`): margen de sobra.
       const limite = (barra.current?.getBoundingClientRect().bottom ?? 0) + 64;
       let elegida: string | null = null;
@@ -33,7 +50,7 @@ export function BarraSeries({
         const g = document.getElementById(s.ancla);
         if (g && g.getBoundingClientRect().top <= limite) elegida = s.ancla;
       }
-      setActual(elegida);
+      cambiar(elegida);
     };
     const alMover = () => {
       if (!pendiente) pendiente = requestAnimationFrame(medir);
@@ -48,6 +65,34 @@ export function BarraSeries({
     };
   }, [series]);
 
+  /** Cambia la serie actual guardando antes dónde estaba el resaltado (para deslizarlo). */
+  function cambiar(ancla: string | null) {
+    setActual((previa) => {
+      if (previa === ancla) return previa;
+      const ul = lista.current;
+      const a = previa ? ul?.querySelector<HTMLElement>(`a[href="#${previa}"]`) : null;
+      anterior.current = a ? { izquierda: a.offsetLeft, ancho: a.offsetWidth } : null;
+      return ancla;
+    });
+  }
+
+  // El resaltado viaja desde el botón de antes (como A4 del listado de usados).
+  useLayoutEffect(() => {
+    const antes = anterior.current;
+    anterior.current = null;
+    const a = actual ? lista.current?.querySelector<HTMLElement>(`a[href="#${actual}"]`) : null;
+    if (!antes || !a || !suave() || !a.offsetWidth) return;
+    const dx = antes.izquierda - a.offsetLeft;
+    if (Math.abs(dx) < 1) return;
+    a.animate(
+      [
+        { transform: `translateX(${dx}px) scaleX(${antes.ancho / a.offsetWidth})` },
+        { transform: "none" },
+      ],
+      { duration: DURACION_DESLIZAR_MS, easing: CURVA_FRENADA, pseudoElement: "::before" },
+    );
+  }, [actual]);
+
   // En móvil, la serie marcada a la vista dentro de la fila (solo de lado: la página no se mueve).
   useEffect(() => {
     const ul = lista.current;
@@ -59,14 +104,34 @@ export function BarraSeries({
 
   function irA(e: MouseEvent<HTMLAnchorElement>, ancla: string) {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    const destino = document.getElementById(ancla);
-    if (!destino) return;
+    const grupo = document.getElementById(ancla);
+    if (!grupo) return;
     e.preventDefault();
-    destino.scrollIntoView({ behavior: suave() ? "smooth" : "auto", block: "start" });
+    const animar = suave();
+    cambiar(ancla);
     history.replaceState(history.state, "", `#${ancla}`);
     // El foco va a la serie (sin mover la página otra vez): el teclado sigue desde ahí.
-    if (!destino.hasAttribute("tabindex")) destino.setAttribute("tabindex", "-1");
-    destino.focus({ preventScroll: true });
+    if (!grupo.hasAttribute("tabindex")) grupo.setAttribute("tabindex", "-1");
+    if (!animar) {
+      grupo.scrollIntoView({ behavior: "auto", block: "start" });
+      grupo.focus({ preventScroll: true });
+      return;
+    }
+    destino.current = ancla;
+    const entradas = entradaEscalonada(grupo);
+    grupo.scrollIntoView({ behavior: "smooth", block: "start" });
+    grupo.focus({ preventScroll: true });
+    let hecho = false;
+    const llegar = () => {
+      if (hecho) return;
+      hecho = true;
+      window.removeEventListener("scrollend", llegar);
+      destino.current = null;
+      for (const animacion of entradas) animacion.play();
+    };
+    // `scrollend` donde exista; si no (o si la página ya estaba ahí), a los 900 ms.
+    window.addEventListener("scrollend", llegar, { once: true });
+    window.setTimeout(llegar, 900);
   }
 
   return (
@@ -87,6 +152,27 @@ export function BarraSeries({
       </ul>
     </nav>
   );
+}
+
+/**
+ * La entrada escalonada de las tarjetas de una serie (como A1 del listado de usados): las que se
+ * ven (hasta 8), preparadas y en pausa —quedan transparentes— hasta llegar a la serie.
+ */
+function entradaEscalonada(grupo: HTMLElement): Animation[] {
+  const tarjetas = [...grupo.querySelectorAll<HTMLElement>("ul > li")]
+    .filter((li) => li.offsetParent !== null)
+    .slice(0, 8);
+  return tarjetas.map((li, i) => {
+    const animacion = li.animate(
+      [
+        { opacity: 0, transform: "translateY(10px)" },
+        { opacity: 1, transform: "none" },
+      ],
+      { duration: DURACION_MS, easing: CURVA, delay: i * 40, fill: "backwards" },
+    );
+    animacion.pause();
+    return animacion;
+  });
 }
 
 function suave() {

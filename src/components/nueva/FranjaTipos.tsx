@@ -13,7 +13,8 @@ const COPIAS = 6;
  *
  * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): el botón de pausa tiene estado;
  * el movimiento es CSS puro. Solo la PRIMERA copia lleva enlaces; las demás son
- * `aria-hidden` y sin foco. Con movimiento reducido no se mueve y el botón de pausa
+ * `aria-hidden` y sin foco. El separador «|» va DESPUÉS de cada texto, con el mismo margen a los
+ * dos lados (también donde una copia enlaza con la siguiente) y `aria-hidden`. Con movimiento reducido no se mueve y el botón de pausa
  * (WCAG 2.2.2) sigue disponible.
  */
 export function FranjaTipos({ tipos }: { tipos: EnlaceDeTipo[] }) {
@@ -31,7 +32,6 @@ export function FranjaTipos({ tipos }: { tipos: EnlaceDeTipo[] }) {
             >
               {tipos.map((t) => (
                 <li key={t.clave} className={estilos.itemFranja}>
-                  <span className={estilos.punto} aria-hidden="true" />
                   {i === 0 ? (
                     <Link href={t.href} className={estilos.enlaceFranja}>
                       {t.nombre}
@@ -39,6 +39,9 @@ export function FranjaTipos({ tipos }: { tipos: EnlaceDeTipo[] }) {
                   ) : (
                     <span className={estilos.enlaceFranja}>{t.nombre}</span>
                   )}
+                  <span className={estilos.separador} aria-hidden="true">
+                    |
+                  </span>
                 </li>
               ))}
             </ul>

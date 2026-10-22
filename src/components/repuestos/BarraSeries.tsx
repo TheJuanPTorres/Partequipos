@@ -143,6 +143,8 @@ export function BarraSeries({
     };
     window.addEventListener("scrollend", llegar, { once: true });
     window.setTimeout(llegar, 900);
+    // Si la serie ya estaba en su sitio, no habrá desplazamiento: entran ya.
+    requestAnimationFrame(() => comprobarLlegada.current?.());
   }
 
   return (

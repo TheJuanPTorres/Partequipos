@@ -1272,7 +1272,8 @@
   inset: -1px;
   z-index: -1;
   border-radius: inherit;
-  background: var(--rosado);
+  /* Opaco (el rosado translúcido sobre blanco): así tapa el gris del botón y queda del color de siempre. */
+  background: linear-gradient(var(--rosado), var(--rosado)), #fff;
   transform-origin: 0 0;
 }
 

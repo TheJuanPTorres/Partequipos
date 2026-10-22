@@ -4,7 +4,7 @@ import { unstable_cache } from "next/cache";
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 
 import { getArticulos, getCategoriasBlog } from "@/lib/queries/getBlog";
-import { getMarcasLubricante } from "@/lib/queries/getLubricantes";
+import { getCategoriasLubricante, getMarcasLubricante } from "@/lib/queries/getLubricantes";
 import {
   getCategoriasMaquinaria,
   getCategoriasUsada,
@@ -88,6 +88,7 @@ async function entradas(): Promise<MetadataRoute.Sitemap> {
     categoriasBlog,
     inventarioUsados,
     marcasUsada,
+    categoriasLubricante,
   ] = await Promise.all([
     getMarcas(),
     getCategoriasRepuestos(),
@@ -104,6 +105,7 @@ async function entradas(): Promise<MetadataRoute.Sitemap> {
     getCategoriasBlog(),
     getInventarioUsados(),
     getMarcasUsada(),
+    getCategoriasLubricante(),
   ]);
 
   const conEquipos = tiposConEquipos(equiposNuevos, tiposMaquinaria);
@@ -197,6 +199,7 @@ async function entradas(): Promise<MetadataRoute.Sitemap> {
 
     // --- Lubricantes --------------------------------------------------------
     marcasLubricante: marcasLubricante.map((m) => ({ slug: m.slug, updatedAt: m.updatedAt })),
+    categoriasLubricante,
 
     // --- Blog ---------------------------------------------------------------
     articulos: articulos.map((a) => ({ slug: a.slug, updatedAt: a.updatedAt })),

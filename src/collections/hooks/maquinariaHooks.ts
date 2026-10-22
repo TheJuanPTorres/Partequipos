@@ -7,6 +7,7 @@ import {
   rutasDeCategoriaUsada,
   revalidarPaginasUsadas,
   revalidarPaginasDelComodin,
+  revalidarMarcasDeLubricante,
   rutasDeEquipoNuevo,
   rutasDeMarcaMaquinaria,
   rutasDeTipoMaquinaria,
@@ -261,6 +262,8 @@ export const revalidarDocumento: CollectionAfterChangeHook = async ({ doc, req }
     revalidarDatos(ETIQUETAS_DATOS.nueva, `documento ${doc.id}`);
     // Sus páginas en el «Documento en visor» (2026-10-20), en cualquier página institucional.
     revalidarPaginasDelComodin(`documento ${doc.id}`);
+    // La «Ficha técnica» de los productos de lubricante (2026-10-22) abre el PDF en el visor.
+    revalidarMarcasDeLubricante(`documento ${doc.id}`);
     const { docs } = await req.payload.find({
       collection: "equipos-nuevos",
       where: { fichaTecnicaPdf: { equals: doc.id } },
@@ -289,6 +292,7 @@ export const revalidarDocumento: CollectionAfterChangeHook = async ({ doc, req }
 export const revalidarDocumentoBorrado: CollectionAfterDeleteHook = ({ doc }) => {
   revalidarDatos(ETIQUETAS_DATOS.nueva, `documento borrado ${doc.id}`);
   revalidarPaginasDelComodin(`documento borrado ${doc.id}`);
+  revalidarMarcasDeLubricante(`documento borrado ${doc.id}`);
   return doc;
 };
 

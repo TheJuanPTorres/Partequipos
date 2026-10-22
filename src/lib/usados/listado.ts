@@ -24,6 +24,7 @@ import {
   getUnidadesDeMarcaUsada,
   type UnidadUsada,
 } from "../queries/getMaquinaria";
+import { animacionesActivas, PARAMETRO_ANIMACIONES } from "../listado/animaciones";
 import { marcaVisible } from "../nueva/visibilidad";
 import { rutas } from "../routes";
 import { absoluteUrl, indexacionPermitida } from "../seo/config";
@@ -230,7 +231,12 @@ export async function cargarListadoUsado(
       aviso = { whatsapp: enlaceWhatsApp(empresa.whatsapp, mensajeWhatsApp(ambito)) };
     }
   }
-  return { ambito, listado, vacio, aviso };
+  // Las animaciones del listado; en un preview se prueban con `?anim=` (nunca en el sitio publicado).
+  const animaciones = animacionesActivas(
+    parametros[PARAMETRO_ANIMACIONES],
+    process.env.VERCEL_ENV !== "production",
+  );
+  return { ambito, listado, vacio, aviso, animaciones };
 }
 
 /**

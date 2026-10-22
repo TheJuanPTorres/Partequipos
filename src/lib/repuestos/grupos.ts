@@ -32,3 +32,21 @@ export function gruposDeCategoria(categoria: CategoriasTecnica): GrupoVista[] {
   });
   return grupos;
 }
+
+/**
+ * «Cotizar» de una tarjeta de grupo (plantilla 4007 en las categorías, 2026-10-22): los productos
+ * no tienen página propia, así que la tarjeta abre la ventana del formulario con el grupo ya
+ * escrito en «¿Qué necesitas?». El nombre, que en WordPress va en mayúsculas, pasa a tipo frase
+ * en el mensaje (solo ahí: la tarjeta lo pinta tal cual).
+ */
+export function mensajeCotizar(grupo: string, categoria: string): string {
+  return `Quiero cotizar: ${enFrase(grupo)} (${categoria.trim().toLowerCase()}). Marca y modelo de la máquina: `;
+}
+
+/** «CADENA PARA MAQUINARIA PESADA» → «Cadena para maquinaria pesada»; lo que no va todo en mayúsculas, igual. */
+export function enFrase(t: string): string {
+  const limpio = t.trim().replace(/\s+/g, " ");
+  if (limpio !== limpio.toUpperCase()) return limpio;
+  const bajo = limpio.toLowerCase();
+  return bajo.charAt(0).toUpperCase() + bajo.slice(1);
+}

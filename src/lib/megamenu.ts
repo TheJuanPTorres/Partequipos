@@ -167,7 +167,7 @@ export type CategoriaLubricanteMenu = {
   nombre: string;
   slug: string;
   marca: number | { id: number } | null | undefined;
-  /** «Enlace en el menú»: vacío, su sección (ancla) de la página de la marca. */
+  /** «Enlace en el menú»: vacío, su página (desde el 2026-10-22; antes, su ancla). */
   enlaceMenu?: string | null;
 };
 
@@ -394,7 +394,7 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
           .filter((c) => c.nombre && c.slug && idDeMarcaLubricante(c) === m.id)
           .map((c) => ({
             etiqueta: c.nombre,
-            href: c.enlaceMenu?.trim() || rutas.categoriaLubricante(m.slug, c.slug),
+            href: c.enlaceMenu?.trim() || conBarra(rutas.categoriaLubricante(m.slug, c.slug)),
           })),
       ],
       grupos: [],

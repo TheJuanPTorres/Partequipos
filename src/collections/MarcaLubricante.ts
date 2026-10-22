@@ -88,7 +88,7 @@ export const MarcaLubricante: CollectionConfig = {
       defaultValue: false,
       admin: {
         description:
-          "Desmarcada (por defecto), la página es la PROVISIONAL sencilla. Marcada, el diseño propio con la identidad de la marca (colores, vídeo de cabecera…). En producción solo se publican plantillas de Andrés.",
+          "Desmarcada (por defecto), la página usa la plantilla de Andrés («Categoría Lubricantes»). Marcada, el diseño propio con la identidad de la marca (colores, vídeo de cabecera…). En producción solo se publican plantillas de Andrés.",
       },
     },
     {

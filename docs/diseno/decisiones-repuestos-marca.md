@@ -211,6 +211,52 @@ Fase 1 de las mejoras de las plantillas de repuestos (PR #319). **Juan Pablo dec
 
 **Medido en el preview** (Hitachi marca y excavadora, Caterpillar bulldozer, a 1440, 1010 y 390): CLS ≤ 0,0009, sin desbordamiento ni errores; con `?mejoras=no`, la página de tipo mide lo mismo que tras el #315.
 
+## 12. Categorías técnicas con la plantilla 4007 de la marca (2026-10-22, dirección)
+
+Las 10 páginas de categoría técnica (`…/categoria-repuestos-para-maquinaria-pesada/<categoria>/`)
+dejan la página provisional del §7 y usan la **misma plantilla que la marca de repuestos** (4007,
+la de Bobcat), adaptada. URL, SEO, JSON-LD y migas no cambian.
+
+| Sección                                             | Qué lleva                                                                                                                                                                                        |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Cabecera                                            | `HeroMarca` sin logo y **con el contenido centrado en vertical** (`centrado`: título, subtítulo, texto y ratón), sin la franja de color detrás (`franja={false}`). El ratón baja a «Qué incluye» |
+| «Qué incluye …»                                     | **Tarjetas difuminadas** (las de los índices) una por grupo, con su foto de WordPress, el nombre tal cual y, **en la misma fila**, «Cotizar» y «Ver productos» (`TarjetasGrupos`)                |
+| Contacto, testimonios, «¿Por qué elegirnos?», sedes | Como la marca. «¿Por qué elegirnos?» no sale sin foto; sin marca, un cierre con `{marca}` tampoco                                                                                                |
+
+**Sin «Nuestras categorías de repuestos»** (las píldoras; dirección, 2026-10-22: en las marcas se
+queda), **sin franja de color** y **sin «Marcas con las que trabajamos»**.
+
+**«Cotizar»:** los productos no tienen página propia (en WordPress, «VER MÁS» solo despliega la
+lista), así que abre la ventana del formulario con el grupo escrito en «¿Qué necesitas?»:
+«Quiero cotizar: Cadena para maquinaria pesada (tren de rodaje). Marca y modelo de la máquina: »
+(`mensajeCotizar`; el nombre pasa a tipo frase solo en el mensaje). Sin JavaScript baja al
+formulario de la página.
+
+**«Ver productos»:** abre el **mismo panel que sube desde abajo** del «Ver todo» de las marcas
+(`VerTodosEquipos`): el grupo y su número de productos de título (el botón, sin número: dirección, 2026-10-22), y los productos como **texto, sin enlaces**.
+Misma animación, foco al título, Escape y el foco vuelve al botón. La lista está además en el HTML
+de la tarjeta (Google); con JavaScript no se pinta (`productosSinJs`) y sin JavaScript se ve, y
+«Ver productos» lleva a ella.
+
+**Los dos botones en una fila:** en el teléfono, con menos relleno (a 390 faltaba 1 px); por
+debajo de unos 360 px, uno bajo el otro.
+
+**Interruptor «Qué incluye: diseño propio»** (global `repuestos-marca`): sin uso y **oculto en el
+panel** (`admin.hidden`, sin migración). La columna se quita con una migración cuando haya
+VENTANA. `QueIncluye.tsx` (las dos versiones, sencilla y propia) se borra.
+
+**Fotos:** las 70 de los grupos ya están en el preview y en el sitio publicado (importación del
+2026-10-18, `docs/repuestos-importacion.md` §9). No hay que subir nada.
+
+**Medido en el preview** (2026-10-22, 1440 / 1010 / 390):
+
+- **Las 10:** cabecera con el mismo aire arriba y abajo (181 / 196 / 95–122 px), con textos de 1 a 5 líneas.
+- **Componentes hidráulicos y Misceláneos:**
+  - tarjetas 3 / 2 / 1 por fila, con la última fila centrada (regla #281);
+  - los dos botones en una fila;
+  - el panel con los productos sin enlaces;
+  - CLS ≤ 0,0013, sin desbordamiento ni errores.
+
 ## 5. Pendiente
 
 - ~~Imágenes reales de fondo (por marca) y de cada tipo~~ **HECHO el 2026-10-14 (agente C):** la imagen de cada tipo es la

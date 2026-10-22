@@ -216,6 +216,11 @@
   flex: 1;
 }
 
+/* Categoría técnica (2026-10-22): la tarjeta de siempre, con el contenido centrado en vertical. */
+.heroCentrado .heroContenido {
+  flex: 1;
+}
+
 /* El icono del ratón, al pie de la tarjeta: así lo centrado es el título con su texto. */
 .heroBajo .raton {
   position: absolute;
@@ -532,40 +537,64 @@ a.pildora:hover {
   }
 }
 
-/* --- Qué incluye (página de categoría técnica) --------------------------------- */
+/* --- Qué incluye (página de categoría técnica, plantilla 4007) ------------------- */
 
-/* Las tarjetas no se estiran: al desplegar una, las demás de su fila no cambian. */
-.rejillaGrupos {
-  align-items: start;
-  row-gap: 30px;
+/*
+ * «Cotizar» y «Ver productos (N)» en la misma fila (dirección, 2026-10-22); si aun así no caben
+ * (pantallas de menos de 360 px), uno bajo el otro, centrados. «Ver productos» es el botón secundario: contorno, sin relleno.
+ */
+.accionesGrupo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
 }
 
-.desplegable {
-  width: 100%;
-  text-align: center;
+.accionesGrupo .botonTarjeta {
+  min-width: 0;
+  padding-inline: 20px;
 }
 
-.desplegable > summary {
-  margin-inline: auto;
-  cursor: pointer;
-  list-style: none;
+/* En el teléfono caben en una fila con menos relleno (medido a 390: faltaba 1 px; a 360, sobran 2). */
+@media (max-width: 767px) {
+  .accionesGrupo {
+    gap: 8px;
+  }
+
+  .accionesGrupo .botonTarjeta {
+    padding-inline: 14px;
+  }
 }
 
-.desplegable > summary::-webkit-details-marker {
-  display: none;
+.botonSecundario,
+.tarjetasIndice .botonSecundario {
+  border: 1px solid var(--color-texto);
+  background: transparent;
+  color: var(--color-texto);
 }
 
-.desplegable > summary svg {
-  transition: transform 0.2s;
+.botonSecundario:hover,
+.tarjetasIndice .botonSecundario:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+  color: var(--color-fondo);
 }
 
-.desplegable[open] > summary svg {
-  transform: rotate(180deg);
-}
-
-.desplegable > summary:focus-visible {
+.botonSecundario:focus-visible {
   outline: 3px solid var(--color-texto);
   outline-offset: 3px;
+}
+
+/* La lista de productos de la tarjeta: en el HTML siempre; a la vista, solo sin JavaScript. */
+.productosSinJs {
+  display: none;
+  width: 100%;
+}
+
+@media (scripting: none) {
+  .productosSinJs {
+    display: block;
+  }
 }
 
 .listaProductos {
@@ -591,12 +620,6 @@ a.pildora:hover {
   color: var(--color-marca);
   content: "›";
   font-weight: 700;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .desplegable > summary svg {
-    transition: none;
-  }
 }
 
 /* --- Contacto ------------------------------------------------------------------ */
@@ -1017,6 +1040,56 @@ a.modelo:hover {
 }
 
 /*
+ * Migas visibles sobre el logo (plantilla de Andrés de las líneas de lubricante, 4039,
+ * 2026-10-22): blancas y en negrita, como su «Lubricantes ENI»; subrayadas al pasar.
+ */
+.migasHero ol {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 8px;
+  list-style: none;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.migasHero li + li::before {
+  margin-right: 8px;
+  content: "/";
+  opacity: 0.7;
+}
+
+.migasHero a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.migasHero a:hover {
+  text-decoration: underline;
+}
+
+.migasHero a:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/*
+ * En móvil, las migas largas («Inicio / Lubricantes Eni / Auto pesado») caben en una línea con
+ * la fuente de respaldo y pasan a dos al llegar Inter, que es más ancha: la cabecera bajaba
+ * 22 px (CLS 0,0435 a 390). Se reservan siempre dos líneas y su hueco, con las migas abajo.
+ */
+@media (max-width: 767px) {
+  .migasHero ol {
+    min-height: calc(2.6em + 4px);
+    align-content: flex-end;
+  }
+}
+
+/*
  * CABECERA DE LA «PLANTILLA 1» (2026-10-18): el 70 % del alto de la ventana en
  * los tres tamaños, con el contenido centrado en vertical y en horizontal. La
  * cabecera baja sin foto (`heroBajo`) no lleva esta clase.
@@ -1273,13 +1346,59 @@ a.modelo:hover {
     grid-column: 2 / span 2;
   }
 
-  /* Exactamente 4: 2 + 2 centradas. */
-  .rejillaTarjetas:has(> .tarjeta:nth-child(4):last-child) > .tarjeta:nth-child(odd) {
+  /* Exactamente 4: 2 + 2 centradas (salvo `.rejillaCuatroEnUnaFila`, abajo). */
+  .rejillaTarjetas:not(.rejillaCuatroEnUnaFila):has(> .tarjeta:nth-child(4):last-child)
+    > .tarjeta:nth-child(odd) {
     grid-column: 2 / span 2;
   }
 
-  .rejillaTarjetas:has(> .tarjeta:nth-child(4):last-child) > .tarjeta:nth-child(even) {
+  .rejillaTarjetas:not(.rejillaCuatroEnUnaFila):has(> .tarjeta:nth-child(4):last-child)
+    > .tarjeta:nth-child(even) {
     grid-column: 4 / span 2;
+  }
+
+  /*
+   * LAS 4 LÍNEAS DE LUBRICANTES ENI (plantilla de Andrés 3946, dirección 2026-10-21): en
+   * escritorio, las 4 en una fila, como la plantilla (289 px y 40 px entre ellas a 1440).
+   */
+  .rejillaCuatroEnUnaFila:has(> .tarjeta:nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 40px;
+  }
+
+  .rejillaCuatroEnUnaFila:has(> .tarjeta:nth-child(4):last-child) > .tarjeta {
+    grid-column: auto;
+  }
+}
+
+/*
+ * Y en tablet y móvil, 2 + 2 (la plantilla oculta 2 en tablet y pone 1 por fila en móvil:
+ * son variantes de la maqueta; aquí se ven las 4 en todos los anchos). En móvil la tarjeta
+ * es estrecha (~165 px): foto más alta que ancha, recuadro y botón más compactos.
+ */
+@media (max-width: 767px) {
+  .rejillaCuatroEnUnaFila:has(> .tarjeta:nth-child(4):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 12px;
+  }
+
+  .rejillaCuatroEnUnaFila .foto {
+    aspect-ratio: 4 / 5;
+  }
+
+  .tarjetasIndice .rejillaCuatroEnUnaFila .panel[data-con-foto] {
+    margin-inline: 4%;
+    padding: 28px 8px 10px;
+  }
+
+  .rejillaCuatroEnUnaFila .tituloTarjeta {
+    font-size: 16px;
+  }
+
+  .rejillaCuatroEnUnaFila .botonTarjeta {
+    min-width: 0;
+    padding: 0 14px;
+    gap: 8px;
   }
 }
 
@@ -1296,34 +1415,6 @@ a.modelo:hover {
   .rejillaTarjetas > .tarjeta:last-child:nth-child(odd) {
     grid-column: 2 / span 2;
   }
-}
-
-/* --- «Qué incluye» sencillo (versión PROVISIONAL, dirección 2026-10-19) ------------------- */
-
-.queIncluyeSencillo {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 60px 24px 80px;
-}
-
-.grupoSencillo {
-  margin-top: 32px;
-}
-
-.grupoSencilloTitulo {
-  margin: 0 0 12px;
-  color: var(--color-texto);
-  font-size: var(--texto-destacado);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.grupoSencilloLista {
-  margin: 0;
-  padding-left: 22px;
-  color: var(--color-texto-suave);
-  font-size: var(--texto-cuerpo);
-  line-height: 1.6;
 }
 
 /*

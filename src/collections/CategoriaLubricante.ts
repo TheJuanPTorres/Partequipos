@@ -16,11 +16,13 @@ import { revalidarMegamenu } from "./hooks/megamenuHooks";
  *
  * Son las 4 del rastreo (auto liviano, auto pesado, engranajes, motos &
  * scooter): agrupan por **uso**, no por producto. En el sitio actual no hay ni
- * una ficha de producto individual, así que no se modela ninguna.
+ * una ficha de producto individual, así que no se modela ninguna: los productos
+ * van dentro de su línea.
  *
- * DESDE EL 2026-10-14 SON SECCIONES DE LA PÁGINA DE LA MARCA (decisión de
- * dirección): su ancla es su `slug` (`/lubricantes/lubricantes-eni/#auto-liviano`)
- * y su URL antigua lleva un 301 a esa ancla. Ya no tienen página propia.
+ * Del 2026-10-14 al 2026-10-21 fueron secciones de la página de la marca, con un
+ * 301 de su URL a su ancla. DESDE EL 2026-10-22 VUELVEN A TENER PÁGINA PROPIA, en
+ * su URL de WordPress, con la plantilla de Andrés «Ficha producto lubricante»
+ * (4039; dirección). Las anclas viejas (`#auto-liviano`) llevan a su página.
  */
 // El desplegable «Lubricantes» del megamenú lista las categorías (2026-10-20).
 const megamenu = revalidarMegamenu("categorias-lubricante");
@@ -30,7 +32,7 @@ export const CategoriaLubricante: CollectionConfig = {
   labels: { singular: "Categoría de lubricante", plural: "Categorías de lubricante" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "marca", "slug"],
+    defaultColumns: ["nombre", "marca", "orden", "slug"],
     group: "Lubricantes",
   },
   access: {
@@ -56,20 +58,33 @@ export const CategoriaLubricante: CollectionConfig = {
       label: "Marca",
     },
     {
+      name: "orden",
+      type: "number",
+      label: "Orden",
+      admin: {
+        position: "sidebar",
+        description:
+          "Posición de la línea en la página de la marca y en el menú «Lubricantes» (1, 2, 3…). Vacío, después de las que tienen orden, por nombre.",
+      },
+    },
+    {
       name: "enlaceMenu",
       type: "text",
       label: "Enlace en el menú",
       validate: validarEnlace,
       admin: {
         description:
-          "Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su sección de la página de la marca (#su-direccion). Cámbialo cuando la categoría tenga página propia.",
+          "Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su página.",
       },
     },
     {
       name: "entradilla",
       type: "textarea",
       label: "Entradilla",
-      admin: { description: "Resumen de una o dos líneas, bajo el título." },
+      admin: {
+        description:
+          "Texto de la cabecera de su página, bajo el título. Vacío, la entradilla de la marca.",
+      },
     },
     { name: "descripcion", type: "richText", label: "Descripción" },
     {
@@ -77,7 +92,20 @@ export const CategoriaLubricante: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       label: "Imagen",
-      admin: { description: "Fondo de su tarjeta en la página de la marca." },
+      admin: {
+        description:
+          "Foto de su tarjeta en la página de la marca. También la de la cabecera de su página si «Imagen de cabecera» está vacía.",
+      },
+    },
+    {
+      name: "imagenCabecera",
+      type: "upload",
+      relationTo: "media",
+      label: "Imagen de cabecera",
+      admin: {
+        description:
+          "Opcional. Fondo de la cabecera de su página. Vacía, la «Imagen» de la línea; sin ninguna, fondo oscuro.",
+      },
     },
     /*
      * Productos de la línea, como en el sitio actual: nombre comercial, grado
@@ -133,6 +161,6 @@ export const CategoriaLubricante: CollectionConfig = {
         { name: "descripcion", type: "textarea", label: "Descripción" },
       ],
     },
-    seoField({ sinPagina: true }),
+    seoField(),
   ],
 };

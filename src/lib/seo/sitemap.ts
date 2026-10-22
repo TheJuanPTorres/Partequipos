@@ -38,8 +38,9 @@ export type SitemapInput = {
    * el dato, la página «Otros» no va: como D4, vuelve con la primera unidad.
    */
   categoriasOtrosUsada?: ConSlug[];
-  /** Lubricantes: marca → categoría de aplicación. Sin índice de sección. */
+  /** Lubricantes: la página de cada marca y la de cada línea (desde el 2026-10-22). */
   marcasLubricante: ConSlug[];
+  categoriasLubricante?: TipoLike[];
   /** Blog. Los artículos van en la raíz, sin prefijo. */
   articulos: ConSlug[];
   categoriasBlog: ConSlug[];
@@ -81,9 +82,10 @@ export const PATRONES_SITEMAP = [
   "/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/[unidad]",
   "/maquinaria-pesada/maquinaria-pesada-usada/marcas/[marca]",
   "/maquinaria-pesada/maquinaria-pesada-usada/otros",
-  // Lubricantes: la página general (2026-10-20) y una por marca. Ver SEGMENTO_LUBRICANTES.
+  // Lubricantes: la página general (2026-10-20), una por marca y una por línea (2026-10-22).
   "/lubricantes",
   "/lubricantes/[marca]",
+  "/lubricantes/[marca]/[categoria]",
   /*
    * Blog. Los ARTÍCULOS no aparecen aquí: se sirven desde `[...slug]`, que ya
    * está declarado arriba, porque viven en la raíz igual que las páginas
@@ -177,6 +179,7 @@ export function buildSitemapEntries(
     marcasUsada,
     categoriasOtrosUsada = [],
     marcasLubricante,
+    categoriasLubricante = [],
     articulos,
     categoriasBlog,
   }: SitemapInput,
@@ -400,6 +403,15 @@ export function buildSitemapEntries(
       lastModified: fecha(marca.updatedAt, ahora),
       changeFrequency: "monthly",
       priority: 0.8,
+    });
+  }
+  // Las líneas vuelven a tener página, en su URL de WordPress (2026-10-22).
+  for (const linea of categoriasLubricante) {
+    entradas.push({
+      url: absoluteUrl(rutas.categoriaLubricante(linea.marcaSlug, linea.slug)),
+      lastModified: fecha(linea.updatedAt, ahora),
+      changeFrequency: "monthly",
+      priority: 0.7,
     });
   }
 

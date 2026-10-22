@@ -1,4 +1,4 @@
-import { IconEye, IconFileDescription, type Icon } from "@tabler/icons-react";
+import { IconArrowRight, IconEye, IconFileDescription, type Icon } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -7,6 +7,7 @@ import type { LogoMarca as LogoMarcaDatos } from "@/lib/marca/logoMarca";
 import type { FotoDeTarjeta } from "@/lib/queries/getMaquinaria";
 import { posicionFocal } from "@/lib/utils/relations";
 
+import { FotoConFundido } from "./FotoConFundido";
 import estilos from "./listado.module.css";
 
 /**
@@ -45,6 +46,8 @@ export function TarjetaListado({
   filas,
   pdf,
   prioridad,
+  flecha = false,
+  fundido = false,
 }: {
   /** El nombre completo, para la foto sin `alt` y los textos solo para lectores. */
   nombre: string;
@@ -59,11 +62,28 @@ export function TarjetaListado({
   filas: FilaTarjeta[];
   pdf?: string | null;
   prioridad: boolean;
+  /** Una flecha en el botón principal, que se desplaza al pasar el ratón (animación A3 de usados). */
+  flecha?: boolean;
+  /** La foto entra con un fundido sobre su miniatura (animación A6 de usados); nunca la prioritaria. */
+  fundido?: boolean;
 }) {
+  const flechaBoton = flecha ? (
+    <IconArrowRight size={16} stroke={2} aria-hidden="true" className={estilos.flecha} />
+  ) : null;
+  const posicion = foto ? posicionFocal(foto.focalX, foto.focalY) : undefined;
   return (
     <li className={estilos.tarjeta}>
       <div className={estilos.foto}>
-        {foto?.url && foto.width && foto.height ? (
+        {foto?.url && foto.width && foto.height && fundido && !prioridad ? (
+          <FotoConFundido
+            src={foto.url}
+            alt={foto.alt || nombre}
+            width={ANCHO_FOTO}
+            height={Math.round((ANCHO_FOTO * foto.height) / foto.width)}
+            sizes={SIZES_FOTO}
+            posicion={posicion ?? "50% 50%"}
+          />
+        ) : foto?.url && foto.width && foto.height ? (
           <Image
             src={foto.url}
             alt={foto.alt || nombre}
@@ -71,7 +91,7 @@ export function TarjetaListado({
             height={Math.round((ANCHO_FOTO * foto.height) / foto.width)}
             sizes={SIZES_FOTO}
             priority={prioridad}
-            style={{ objectPosition: posicionFocal(foto.focalX, foto.focalY) }}
+            style={{ objectPosition: posicion }}
           />
         ) : null}
         {logo ? (
@@ -106,6 +126,7 @@ export function TarjetaListado({
             >
               <IconEye size={18} stroke={1.8} aria-hidden="true" />
               Ver producto<span className="sr-only">: {nombre}</span>
+              {flechaBoton}
             </Link>
             <Link
               href={`${href}#cotizar`}
@@ -118,6 +139,7 @@ export function TarjetaListado({
               className={`${estilos.boton} ${estilos.botonRojo} ${estilos.soloRejilla}`}
             >
               Ver más<span className="sr-only">: {nombre}</span>
+              {flechaBoton}
             </Link>
             {pdf ? (
               <a

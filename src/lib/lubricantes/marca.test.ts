@@ -3,7 +3,13 @@ import { describe, it } from "node:test";
 
 import type { CategoriasLubricante } from "@/payload-types";
 
-import { agruparProductos, seccionesDeCategorias } from "./marca";
+import {
+  agruparProductos,
+  encabezadoDeLinea,
+  nombreCompleto,
+  scriptAnclasALineas,
+  seccionesDeCategorias,
+} from "./marca";
 
 type Producto = NonNullable<CategoriasLubricante["productos"]>[number];
 
@@ -74,5 +80,66 @@ describe("seccionesDeCategorias", () => {
     ]);
     assert.equal(s?.ancla, "auto-liviano");
     assert.equal(s?.grupos[0]?.productos[0]?.grado, "0W-20");
+  });
+});
+
+describe("páginas de línea (2026-10-22)", () => {
+  it("nombreCompleto: el nombre con su grado", () => {
+    assert.equal(
+      nombreCompleto({ nombre: "I-RIDE RACING", grado: "5W-40" }),
+      "I-RIDE RACING 5W-40",
+    );
+    assert.equal(nombreCompleto({ nombre: "OSO", grado: null }), "OSO");
+  });
+
+  it("encabezado: «Lubricantes <línea>» y, sin entradilla, la de la marca", () => {
+    const e = encabezadoDeLinea(
+      { nombre: "Motos & Scooter", entradilla: "  ", imagen: null, imagenCabecera: null },
+      { entradilla: "Lubricantes ENI son productos…" },
+      null,
+    );
+    assert.equal(e.linea1, "Lubricantes Motos & Scooter");
+    assert.equal(e.descripcion, "Lubricantes ENI son productos…");
+    assert.equal(e.fondo, null);
+  });
+
+  it("encabezado: la entradilla propia de la línea manda", () => {
+    const e = encabezadoDeLinea(
+      { nombre: "Auto liviano", entradilla: "Propia", imagen: null, imagenCabecera: null },
+      { entradilla: "De la marca" },
+      null,
+    );
+    assert.equal(e.descripcion, "Propia");
+  });
+
+  it("producto: sin ficha, sin PDF; con ficha sin páginas, el PDF sin visor", () => {
+    const [g] = agruparProductos([
+      p("A"),
+      p("B", {
+        grado: "10W",
+        ficha: {
+          id: 1,
+          titulo: "B",
+          url: "https://x/b.pdf",
+          filesize: 2048,
+          updatedAt: "",
+          createdAt: "",
+        },
+      }),
+    ]);
+    assert.equal(g?.productos[0]?.pdf, null);
+    assert.equal(g?.productos[1]?.pdf?.pdf.url, "https://x/b.pdf");
+    assert.equal(g?.productos[1]?.pdf?.titulo, "Ficha técnica: B 10W");
+    assert.deepEqual(g?.productos[1]?.pdf?.paginas, []);
+  });
+
+  it("anclas viejas: el script solo lleva a las líneas que conoce y no puede cerrar el <script>", () => {
+    const s = scriptAnclasALineas({
+      "auto-liviano": "/lubricantes/lubricantes-eni/auto-liviano/",
+      "x</script>": "/y/",
+    });
+    assert.ok(s.includes('"auto-liviano":"/lubricantes/lubricantes-eni/auto-liviano/"'));
+    assert.ok(!s.includes("</script>"));
+    assert.ok(s.includes("location.replace"));
   });
 });

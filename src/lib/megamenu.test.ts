@@ -319,9 +319,9 @@ describe("megamenú: lubricantes (2026-10-20)", () => {
       p.grupos[0]!.enlaces.map((e) => [e.etiqueta, e.href]),
       [
         ["Ver todo Lubricantes Eni", "/lubricantes/lubricantes-eni/"],
-        ["Auto liviano", "/lubricantes/lubricantes-eni/#auto-liviano"],
+        ["Auto liviano", "/lubricantes/lubricantes-eni/auto-liviano/"],
         ["Engranajes", "/lubricantes/lubricantes-eni/engranajes/"],
-        ["Motos & Scooter", "/lubricantes/lubricantes-eni/#motos-scooter"],
+        ["Motos & Scooter", "/lubricantes/lubricantes-eni/motos-scooter/"],
       ],
     );
   });

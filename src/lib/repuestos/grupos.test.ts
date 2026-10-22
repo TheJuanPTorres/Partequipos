@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import type { CategoriasTecnica } from "@/payload-types";
 
-import { gruposDeCategoria } from "./grupos";
+import { enFrase, gruposDeCategoria, mensajeCotizar } from "./grupos";
 
 const categoria = (grupos: CategoriasTecnica["grupos"]) =>
   ({ id: 1, nombre: "Filtración", slug: "filtracion", grupos }) as CategoriasTecnica;
@@ -74,5 +74,19 @@ describe("gruposDeCategoria", () => {
       ]),
     );
     assert.equal(r[0]?.imagen?.alt, "Cadena para maquinaria pesada");
+  });
+});
+
+describe("mensajeCotizar", () => {
+  it("escribe el grupo en tipo frase y la categoría en minúsculas", () => {
+    assert.equal(
+      mensajeCotizar("CADENA PARA  MAQUINARIA PESADA", "Tren de Rodaje"),
+      "Quiero cotizar: Cadena para maquinaria pesada (tren de rodaje). Marca y modelo de la máquina: ",
+    );
+  });
+
+  it("un nombre que no va todo en mayúsculas se deja como está", () => {
+    assert.equal(enFrase("Filtros GET"), "Filtros GET");
+    assert.equal(enFrase(" BOMBAS "), "Bombas");
   });
 });

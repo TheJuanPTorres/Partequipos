@@ -83,16 +83,20 @@
   gap: 20px;
 }
 
+/*
+ * Recuadro cuadrado e igual en todas las tarjetas. La foto va POSICIONADA dentro: en el flujo,
+ * una foto vertical (las I-RIDE MOTO S&T, 1087 × 1973) empujaba el `aspect-ratio`, que solo es
+ * un mínimo, y el recuadro crecía a 273 × 496 a 1440. Así, la botella entera y centrada.
+ */
 .fotoCaja {
   position: relative;
-  display: flex;
   width: 100%;
-  align-items: center;
-  justify-content: center;
   aspect-ratio: 1 / 1;
 }
 
 .foto {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;

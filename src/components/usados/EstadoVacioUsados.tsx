@@ -74,7 +74,7 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
         <div className={estilos.alternativas}>
           <TarjetasMarca
             id="vacio-nueva"
-            titulo="En maquinaria nueva"
+            titulo={datos.tituloNueva}
             indice
             verTodo="Ver equipos"
             tarjetas={datos.nueva}

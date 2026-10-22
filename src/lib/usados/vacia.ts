@@ -179,6 +179,15 @@ export function nombreEnTexto(titulo: string): string {
 }
 
 /**
+ * El título de la sección de maquinaria nueva del estado vacío (dirección,
+ * 2026-10-22): «Te invitamos a conocer nuestra disponibilidad de cargadores
+ * frontales», con la categoría que se buscó en minúscula, como el titular.
+ */
+export function tituloEnNueva(nombre: string): string {
+  return `Te invitamos a conocer nuestra disponibilidad de ${nombreEnTexto(nombre)}`;
+}
+
+/**
  * El titular del estado vacío: «Ahora mismo no tenemos cargadores frontales usados
  * disponibles» (el nombre de la categoría, todo en minúscula).
  */

@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import {
   alternativasEnNueva,
   mensajeSinUnidades,
+  tituloEnNueva,
   usaEstadoVacioPropio,
   nombreComparable,
   type EquipoNuevoAlternativa,
@@ -166,5 +167,18 @@ describe("usaEstadoVacioPropio (dirección, 2026-10-19: solo diseños de Andrés
     assert.equal(usaEstadoVacioPropio({}), false);
     assert.equal(usaEstadoVacioPropio(undefined), false);
     assert.equal(usaEstadoVacioPropio({ estadoVacio: "Propio" }), false);
+  });
+});
+
+describe("tituloEnNueva", () => {
+  it("lleva la categoría que se buscó, en minúscula dentro de la frase", () => {
+    assert.equal(
+      tituloEnNueva("Cargadores Frontales"),
+      "Te invitamos a conocer nuestra disponibilidad de cargadores frontales",
+    );
+    assert.equal(
+      tituloEnNueva("Motoniveladoras"),
+      "Te invitamos a conocer nuestra disponibilidad de motoniveladoras",
+    );
   });
 });

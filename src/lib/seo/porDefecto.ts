@@ -42,11 +42,13 @@ export function tipoConMarca(tipo: string, marca: string): string {
 
 /**
  * El tipo de máquina en un banner o título principal (petición del cliente, 2026-10-20):
- * empieza por mayúscula y el resto va en minúscula («Cargador frontal»). Solo para
- * encabezados: el cuerpo, el SEO y las URL siguen con el tipo en minúscula.
+ * empieza por mayúscula. Solo la PRIMERA letra: el resto, tal como está guardado
+ * («Cargador Frontal» sigue así; «excavadora» → «Excavadora»). Hasta el 2026-10-22 pasaba el
+ * resto a minúscula y salía «Cargador frontal» (dirección). Solo para encabezados: el cuerpo,
+ * el SEO y las URL siguen como estaban.
  */
 export function tipoEnTitulo(tipo: string): string {
-  const t = tipo.trim().toLowerCase();
+  const t = tipo.trim();
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 

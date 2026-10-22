@@ -142,9 +142,11 @@ describe("descripcionPorDefecto de usados", () => {
 });
 
 describe("tipoEnTitulo", () => {
-  it("pone en mayúscula solo la primera letra del tipo", () => {
+  it("pone en mayúscula solo la primera letra y deja el resto como está guardado", () => {
     assert.equal(tipoEnTitulo("excavadora"), "Excavadora");
-    assert.equal(tipoEnTitulo("  Cargador Frontal "), "Cargador frontal");
+    assert.equal(tipoEnTitulo("  Cargador Frontal "), "Cargador Frontal");
+    assert.equal(tipoEnTitulo("cargador frontal"), "Cargador frontal");
+    assert.equal(tipoEnTitulo("Minicargador CASE"), "Minicargador CASE");
     assert.equal(tipoEnTitulo(""), "");
   });
 });

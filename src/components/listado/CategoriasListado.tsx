@@ -19,6 +19,10 @@ import type { Pestana } from "./PlantillaListado";
  *  - en móvil y tablet (fila deslizable), al cargar, la fila se desplaza hasta
  *    dejar visible la categoría actual, sin cambiar el orden.
  * Sin JavaScript, el `<noscript>` enseña todas y quita el botón, que no haría nada.
+ *
+ * Los enlaces solo cambian el catálogo (`data-catalogo-nav`, `ZonaCatalogo`) y
+ * se precargan al pasar el ratón o enfocarlos, no al entrar en pantalla: así
+ * cargar la página no dispara una petición por categoría.
  */
 export function CategoriasListado({
   pestanas,
@@ -30,6 +34,7 @@ export function CategoriasListado({
   elemento: { singular: string; plural: string };
 }) {
   const [abiertas, setAbiertas] = useState(false);
+  const [precargar, setPrecargar] = useState<string | null>(null);
   const lista = useRef<HTMLUListElement>(null);
   const idLista = useId();
   const ocultables = pestanas.filter((p) => p.nota && !p.activa).length;
@@ -48,7 +53,7 @@ export function CategoriasListado({
   }, []);
 
   return (
-    <nav aria-labelledby="categorias-titulo" className={estilos.categorias}>
+    <nav aria-labelledby="categorias-titulo" className={estilos.categorias} data-catalogo-nav="">
       <h2 id="categorias-titulo" className={estilos.categoriasTitulo}>
         {titulo}
       </h2>
@@ -74,6 +79,10 @@ export function CategoriasListado({
               <div className={estilos.categoriaPlegable}>
                 <Link
                   href={p.href}
+                  prefetch={precargar === p.href && !p.activa ? null : false}
+                  onMouseEnter={() => setPrecargar(p.href)}
+                  onFocus={() => setPrecargar(p.href)}
+                  onTouchStart={() => setPrecargar(p.href)}
                   className={estilos.categoria}
                   aria-current={p.activa ? "page" : undefined}
                 >

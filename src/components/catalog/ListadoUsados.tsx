@@ -19,6 +19,8 @@ const numero = (n: number) => n.toLocaleString("es-CO");
  * nueva («Categoría secundaria» de ux-9; 2026-10-18, petición del cliente):
  * cabecera, filtros a la izquierda (en las categorías, con los botones de
  * categoría encima, `pestanasEnLateral`), ordenar, vista lista/rejilla y tarjetas con peso, año y horas.
+ * Categorías, filtros, orden y paginación cambian solo el catálogo, sin recargar
+ * (`navegacionCliente`, 2026-10-21); sin JavaScript, como siempre.
  * Las piezas son las comunes (`src/components/listado/`).
  *
  * Solo se listan las disponibles; las vendidas se marcan, no se borran. Sin
@@ -61,6 +63,7 @@ export function ListadoUsados({
       pestanas={ambito.pestanas}
       etiquetaPestanas="Categorías"
       pestanasEnLateral
+      navegacionCliente
       catalogo={catalogo}
       listado={listado}
       rutaDe={(n) => `${ambito.ruta(n)}/`}

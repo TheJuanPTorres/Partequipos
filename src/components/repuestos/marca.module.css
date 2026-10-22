@@ -540,8 +540,8 @@ a.pildora:hover {
 /* --- Qué incluye (página de categoría técnica, plantilla 4007) ------------------- */
 
 /*
- * «Cotizar» y «Ver productos (N)» en la misma fila (dirección, 2026-10-22); si no caben, uno bajo
- * el otro, centrados. «Ver productos» es el botón secundario: contorno, sin relleno.
+ * «Cotizar» y «Ver productos (N)» en la misma fila (dirección, 2026-10-22); si aun así no caben
+ * (pantallas de menos de 360 px), uno bajo el otro, centrados. «Ver productos» es el botón secundario: contorno, sin relleno.
  */
 .accionesGrupo {
   display: flex;
@@ -553,6 +553,17 @@ a.pildora:hover {
 .accionesGrupo .botonTarjeta {
   min-width: 0;
   padding-inline: 20px;
+}
+
+/* En el teléfono caben en una fila con menos relleno (medido a 390: faltaba 1 px; a 360, sobran 2). */
+@media (max-width: 767px) {
+  .accionesGrupo {
+    gap: 8px;
+  }
+
+  .accionesGrupo .botonTarjeta {
+    padding-inline: 14px;
+  }
 }
 
 .botonSecundario,

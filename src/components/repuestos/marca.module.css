@@ -1057,11 +1057,11 @@ a.modelo:hover {
 /*
  * En móvil, las migas largas («Inicio / Lubricantes Eni / Auto pesado») caben en una línea con
  * la fuente de respaldo y pasan a dos al llegar Inter, que es más ancha: la cabecera bajaba
- * 22 px (CLS 0,0435 a 390). Se reservan siempre dos líneas, con las migas abajo.
+ * 22 px (CLS 0,0435 a 390). Se reservan siempre dos líneas y su hueco, con las migas abajo.
  */
 @media (max-width: 767px) {
   .migasHero ol {
-    min-height: 2.6em;
+    min-height: calc(2.6em + 4px);
     align-content: flex-end;
   }
 }

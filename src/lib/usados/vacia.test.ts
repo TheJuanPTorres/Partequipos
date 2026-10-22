@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import {
   alternativasEnNueva,
   mensajeSinUnidades,
+  tituloEnNueva,
   usaEstadoVacioPropio,
   nombreComparable,
   type EquipoNuevoAlternativa,
@@ -166,5 +167,40 @@ describe("usaEstadoVacioPropio (dirección, 2026-10-19: solo diseños de Andrés
     assert.equal(usaEstadoVacioPropio({}), false);
     assert.equal(usaEstadoVacioPropio(undefined), false);
     assert.equal(usaEstadoVacioPropio({ estadoVacio: "Propio" }), false);
+  });
+});
+
+describe("tituloEnNueva", () => {
+  it("lleva la categoría que se buscó, en minúscula dentro de la frase", () => {
+    assert.equal(
+      tituloEnNueva("Cargadores Frontales"),
+      "Te invitamos a conocer nuestra disponibilidad de cargadores frontales",
+    );
+    assert.equal(
+      tituloEnNueva("Motoniveladoras"),
+      "Te invitamos a conocer nuestra disponibilidad de motoniveladoras",
+    );
+  });
+});
+
+describe("alternativasEnNueva sin «Aditamentos»", () => {
+  it("nunca da una tarjeta de la marca Aditamentos; quedan los tipos de marcas reales", () => {
+    const equipos = [
+      equipo(1, "Minicargadores", "minicargadores", "Aditamentos", "aditamentos"),
+      equipo(2, "Minicargadores", "minicargadores", "CASE", "case"),
+    ];
+    const tarjetas = alternativasEnNueva("Minicargadores", [], equipos, rutas);
+    assert.deepEqual(
+      tarjetas.map((t) => t.href),
+      ["/nueva/marcas/case/minicargadores/"],
+    );
+  });
+
+  it("si solo había de Aditamentos, no queda ninguna (la sección no sale)", () => {
+    const equipos = [equipo(1, "Minicargadores", "minicargadores", "Aditamentos", "aditamentos")];
+    assert.deepEqual(alternativasEnNueva("Minicargadores", [], equipos, rutas), []);
+    // Tampoco la tarjeta de la categoría de nueva si sus únicos equipos son aditamentos.
+    const categorias = [{ slug: "minicargadores", nombre: "Minicargadores", tipos: [1] }];
+    assert.deepEqual(alternativasEnNueva("Minicargadores", categorias, equipos, rutas), []);
   });
 });

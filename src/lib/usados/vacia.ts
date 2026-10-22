@@ -1,3 +1,4 @@
+import { SLUG_MARCA_ADITAMENTOS } from "../aditamentos/wordpress";
 import type { TarjetaMarca } from "../repuestos/marca";
 import { tipoConMarca, tituloPorDefecto } from "../seo/porDefecto";
 import { posicionFocal, type ImagenLista } from "../utils/relations";
@@ -108,8 +109,10 @@ export function alternativasEnNueva(
       ].filter(Boolean),
     ),
   ];
+  // Solo tipos de marcas reales: nunca una tarjeta de «Aditamentos» (dirección, 2026-10-22).
+  const deMarcasReales = equipos.filter((e) => e.marcaRef?.slug !== SLUG_MARCA_ADITAMENTOS);
   for (const buscado of candidatos) {
-    const tarjetas = alternativasPorNombre(buscado, categorias, equipos, rutas, tope);
+    const tarjetas = alternativasPorNombre(buscado, categorias, deMarcasReales, rutas, tope);
     if (tarjetas.length) return tarjetas;
   }
   return [];
@@ -176,6 +179,15 @@ function alternativasPorNombre(
  */
 export function nombreEnTexto(titulo: string): string {
   return titulo.toLowerCase();
+}
+
+/**
+ * El título de la sección de maquinaria nueva del estado vacío (dirección,
+ * 2026-10-22): «Te invitamos a conocer nuestra disponibilidad de cargadores
+ * frontales», con la categoría que se buscó en minúscula, como el titular.
+ */
+export function tituloEnNueva(nombre: string): string {
+  return `Te invitamos a conocer nuestra disponibilidad de ${nombreEnTexto(nombre)}`;
 }
 
 /**

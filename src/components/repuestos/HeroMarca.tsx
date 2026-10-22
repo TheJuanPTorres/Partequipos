@@ -37,6 +37,9 @@ import estilos from "./marca.module.css";
  *
  * `bajo` (página de modelo de repuestos, 2026-10-19): la tarjeta baja con o sin
  * foto; el texto largo del modelo va después, junto a su foto.
+ *
+ * `centrado` (páginas de categoría técnica, 2026-10-22): la tarjeta de siempre (630 px) con el
+ * contenido centrado en vertical; sin logo, quedaba arriba con un hueco debajo.
  */
 export function HeroMarca({
   vista,
@@ -46,6 +49,7 @@ export function HeroMarca({
   indice = false,
   bajo = false,
   tituloLargo = false,
+  centrado = false,
   etiquetaRaton,
   migas,
 }: {
@@ -61,6 +65,8 @@ export function HeroMarca({
   bajo?: boolean;
   /** Títulos largos de una sola línea (los de WordPress de cada modelo): más pequeños en móvil. */
   tituloLargo?: boolean;
+  /** El contenido centrado en vertical en la tarjeta de siempre. */
+  centrado?: boolean;
   /** Nombre accesible del icono del ratón. */
   etiquetaRaton?: string;
   /**
@@ -71,7 +77,13 @@ export function HeroMarca({
 }) {
   const { fondo, logo } = vista;
   const baja = bajo || (bajaSinFoto && !fondo);
-  const variante = baja ? estilos.heroBajo : indice ? estilos.heroIndice : "";
+  const variante = baja
+    ? estilos.heroBajo
+    : indice
+      ? estilos.heroIndice
+      : centrado
+        ? estilos.heroCentrado
+        : "";
   return (
     <section className={`${estilos.heroSeccion} ${franja ? "" : estilos.heroSeccionPlano}`}>
       <div className={`${estilos.hero} ${variante}`}>

@@ -123,10 +123,12 @@ export const RepuestosMarca: GlobalConfig = {
       type: "checkbox",
       label: "«Qué incluye»: diseño propio de Partequipos (no es de Andrés)",
       defaultValue: false,
-      admin: {
-        description:
-          "Desmarcada (por defecto), «Qué incluye» de las categorías se ve de forma sencilla: el nombre del grupo y su lista. Marcada, tarjetas con foto y «Ver productos». En producción solo se publican plantillas de Andrés.",
-      },
+      /*
+       * YA NO SE USA (2026-10-22): las páginas de categoría técnica pasan a la plantilla 4007 de
+       * Andrés y «Qué incluye» son sus tarjetas, sin elección. Oculto en el panel; la columna
+       * se queda hasta una migración que la quite (cambio de esquema, con su VENTANA).
+       */
+      admin: { hidden: true },
     },
     /*
      * «¿Por qué elegirnos?» de la plantilla de Andrés para las páginas de marca y de tipo de

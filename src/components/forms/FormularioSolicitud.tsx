@@ -62,6 +62,11 @@ type Props = {
    * página de modelo de repuestos y Lubricantes ENI.
    */
   conCiudad?: boolean;
+  /**
+   * Texto con el que empieza el mensaje (editable): «¿No encuentras tu modelo?» de las páginas
+   * de tipo de repuestos lo abre con la marca y el tipo ya escritos (R4, 2026-10-21).
+   */
+  mensajeInicial?: string;
 };
 
 const OPCIONES = {
@@ -82,6 +87,7 @@ export function FormularioSolicitud({
   variante = "tarjeta",
   etiquetaMensaje: etiquetaPagina = "Mensaje",
   conCiudad: conCiudadPagina = false,
+  mensajeInicial,
 }: Props) {
   /*
    * La VENTANA EMERGENTE lleva siempre «Ciudad» y «¿Qué necesitas?» (dirección,
@@ -338,7 +344,7 @@ export function FormularioSolicitud({
               {...p}
               name="mensaje"
               rows={5}
-              defaultValue={previo.mensaje}
+              defaultValue={previo.mensaje ?? mensajeInicial}
               placeholder={variante === "plano" ? etiquetaMensaje : undefined}
               className={claseControl}
             />

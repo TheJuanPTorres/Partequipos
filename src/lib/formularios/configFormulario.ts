@@ -26,6 +26,8 @@ type Entrada = {
    * referencia, como el formulario de la ficha V2. Va con `formulario`.
    */
   equipo?: { id: number; nombre: string };
+  /** Texto con el que empieza «¿Qué necesitas?» (R4 de repuestos, 2026-10-21). */
+  mensajeInicial?: string;
   /**
    * Producto de una línea de lubricantes (2026-10-22): cotización con el producto como
    * referencia de texto (no es un documento propio: vive dentro de su línea).
@@ -81,5 +83,6 @@ export function configContactoMarca(e: Entrada): ConfigFormulario {
       : modelo
         ? "¿En qué estás interesado?"
         : undefined,
+    ...(e.mensajeInicial ? { mensajeInicial: e.mensajeInicial } : {}),
   };
 }

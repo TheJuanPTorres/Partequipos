@@ -1,5 +1,6 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadRequest } from "payload";
 
+import { ETIQUETAS_DATOS, revalidarDatos } from "@/lib/cacheDatos";
 import { revalidarRutas, rutasDeArticulo, rutasDeCategoriaBlog } from "@/lib/revalidation";
 import { poblado } from "@/lib/utils/relations";
 
@@ -36,6 +37,7 @@ async function revalidarArticuloCore(
   try {
     const categoriaSlug = await slugDeCategoria(req, doc.categoria);
     revalidarRutas(rutasDeArticulo(doc.slug, categoriaSlug), `artículo ${doc.slug}`);
+    revalidarDatos(ETIQUETAS_DATOS.blog, `artículo ${doc.slug}`);
   } catch (error) {
     console.error("[revalidación] hook de Articulo falló:", error);
   }
@@ -63,6 +65,7 @@ async function revalidarCategoriaBlogCore(doc: { id: number; slug: string }, req
       ),
       `categoría de blog ${doc.slug}`,
     );
+    revalidarDatos(ETIQUETAS_DATOS.blog, `categoría de blog ${doc.slug}`);
   } catch (error) {
     console.error("[revalidación] hook de CategoriaBlog falló:", error);
   }

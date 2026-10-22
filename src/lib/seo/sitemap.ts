@@ -130,6 +130,13 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
     "paginación: se llega desde la página 1 del índice de nueva",
   "/maquinaria-pesada/maquinaria-pesada-nueva/[categoria]/pagina/[pagina]":
     "paginación: se llega desde la página 1 de la categoría",
+  /*
+   * Lo mismo en el blog (2026-10-21, plantilla «Blog» de Andrés): el índice y cada
+   * categoría están en el sitemap; sus páginas siguientes se descubren desde la 1.
+   */
+  "/noticias/pagina/[pagina]": "paginación: se llega desde la página 1 del índice del blog",
+  "/category/[categoria]/pagina/[pagina]":
+    "paginación: se llega desde la página 1 del archivo de la categoría",
 } as const;
 
 /** Slug reservado de la portada dentro de la colección de páginas. */

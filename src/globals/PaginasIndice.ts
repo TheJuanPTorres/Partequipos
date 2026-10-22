@@ -2,7 +2,11 @@ import type { Field, GlobalConfig } from "payload";
 
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
-import { revalidarMarcasDeLubricante, revalidarRutas } from "../lib/revalidation";
+import {
+  revalidarMarcasDeLubricante,
+  revalidarRutas,
+  revalidarTodoElSitio,
+} from "../lib/revalidation";
 
 /**
  * Las páginas ÍNDICE de repuestos, de maquinaria y de usados y la de CONTÁCTANOS (plantillas
@@ -77,7 +81,11 @@ export const PaginasIndice: GlobalConfig = {
   access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
     afterChange: [
-      ({ doc }) => {
+      ({ doc, previousDoc }) => {
+        // Cambiar el diseño del artículo cambia las 53 páginas de artículo (estáticas).
+        if (doc?.blog?.disenoArticulo !== previousDoc?.blog?.disenoArticulo) {
+          revalidarTodoElSitio("global paginas-indice: diseño del artículo");
+        }
         revalidarRutas(
           [
             "/repuestos-maquinaria-pesada-colombia",
@@ -87,6 +95,7 @@ export const PaginasIndice: GlobalConfig = {
             "/maquinaria-pesada/maquinaria-pesada-usada/otros",
             "/contactanos",
             "/lubricantes",
+            "/noticias",
           ],
           "global paginas-indice",
         );
@@ -268,6 +277,34 @@ export const PaginasIndice: GlobalConfig = {
           type: "text",
           label: "Texto del botón",
           admin: { placeholder: "Ver catálogo" },
+        },
+      ],
+    },
+    {
+      // Interruptor del artículo del blog (dirección, 2026-10-21): Andrés no tiene plantilla de
+      // artículo; la propia espera la aprobación de Juan Pablo. Apagada, el artículo es como era.
+      name: "blog",
+      type: "group",
+      label: "Blog",
+      admin: {
+        description:
+          "El índice del blog usa la plantilla «Blog» de Andrés. El artículo, que Andrés no diseñó, tiene un diseño nuestro que se enciende aquí cuando se apruebe.",
+      },
+      fields: [
+        {
+          name: "disenoArticulo",
+          type: "select",
+          label: "Diseño del artículo",
+          defaultValue: "provisional",
+          required: true,
+          options: [
+            { label: "Provisional (el de siempre)", value: "provisional" },
+            { label: "Diseño propio (pendiente de aprobación)", value: "propio" },
+          ],
+          admin: {
+            description:
+              "«Provisional»: el artículo sencillo de siempre. «Diseño propio»: cabecera baja con migas, imagen destacada, columna de lectura con índice fijo, barra de progreso, compartir, llamada a contactar y artículos relacionados. Cambiarlo actualiza todos los artículos.",
+          },
         },
       ],
     },

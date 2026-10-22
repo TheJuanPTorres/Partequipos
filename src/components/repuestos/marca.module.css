@@ -216,6 +216,11 @@
   flex: 1;
 }
 
+/* Categoría técnica (2026-10-22): la tarjeta de siempre, con el contenido centrado en vertical. */
+.heroCentrado .heroContenido {
+  flex: 1;
+}
+
 /* El icono del ratón, al pie de la tarjeta: así lo centrado es el título con su texto. */
 .heroBajo .raton {
   position: absolute;
@@ -534,55 +539,51 @@ a.pildora:hover {
 
 /* --- Qué incluye (página de categoría técnica, plantilla 4007) ------------------- */
 
-/* Las tarjetas no se estiran: al desplegar una, las demás de su fila no cambian. */
-.rejillaGrupos {
-  align-items: start;
-  row-gap: 30px;
+/*
+ * «Cotizar» y «Ver productos (N)» en la misma fila (dirección, 2026-10-22); si no caben, uno bajo
+ * el otro, centrados. «Ver productos» es el botón secundario: contorno, sin relleno.
+ */
+.accionesGrupo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
 }
 
-.desplegable {
-  width: 100%;
-  text-align: center;
+.accionesGrupo .botonTarjeta {
+  min-width: 0;
+  padding-inline: 20px;
 }
 
-.desplegable > summary {
-  margin-inline: auto;
-  cursor: pointer;
-  list-style: none;
-}
-
-.desplegable > summary::-webkit-details-marker {
-  display: none;
-}
-
-.desplegable > summary svg {
-  transition: transform 0.2s;
-}
-
-.desplegable[open] > summary svg {
-  transform: rotate(180deg);
-}
-
-/* «Ver productos (N)» de las tarjetas de grupo: un enlace de texto bajo «Cotizar», con su flecha. */
-.verProductos {
-  display: inline-flex;
-  min-height: 32px;
-  align-items: center;
-  gap: 6px;
+.botonSecundario,
+.tarjetasIndice .botonSecundario {
+  border: 1px solid var(--color-texto);
+  background: transparent;
   color: var(--color-texto);
-  font-size: var(--texto-etiqueta);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
-.verProductos:hover {
-  text-decoration-thickness: 2px;
+.botonSecundario:hover,
+.tarjetasIndice .botonSecundario:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+  color: var(--color-fondo);
 }
 
-.desplegable > summary:focus-visible {
+.botonSecundario:focus-visible {
   outline: 3px solid var(--color-texto);
   outline-offset: 3px;
+}
+
+/* La lista de productos de la tarjeta: en el HTML siempre; a la vista, solo sin JavaScript. */
+.productosSinJs {
+  display: none;
+  width: 100%;
+}
+
+@media (scripting: none) {
+  .productosSinJs {
+    display: block;
+  }
 }
 
 .listaProductos {
@@ -608,12 +609,6 @@ a.pildora:hover {
   color: var(--color-marca);
   content: "›";
   font-weight: 700;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .desplegable > summary svg {
-    transition: none;
-  }
 }
 
 /* --- Contacto ------------------------------------------------------------------ */

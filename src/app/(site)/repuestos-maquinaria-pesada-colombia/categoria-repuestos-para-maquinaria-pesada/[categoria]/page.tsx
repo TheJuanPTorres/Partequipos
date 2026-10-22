@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { SeccionTestimonios } from "@/components/portada/diferidos";
-import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
@@ -20,12 +19,11 @@ import {
 } from "@/lib/queries/getCategoriasRepuestos";
 import { getMarcas } from "@/lib/queries/getMarcas";
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
-import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
+import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { fondoDeRespaldo, vistaEncabezadoCategoria } from "@/lib/repuestos/categoria";
 import { gruposDeCategoria } from "@/lib/repuestos/grupos";
-import { categoriasDeMarca } from "@/lib/repuestos/marca";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
@@ -57,17 +55,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
-/** Ancla de «Nuestras categorías de repuestos»: a ella baja el icono de ratón del encabezado. */
-const ANCLA_CATEGORIAS = "categorias-repuestos";
+/** Ancla de «Qué incluye»: a ella baja el icono de ratón del encabezado. */
+const ANCLA_GRUPOS = "que-incluye";
 const ANCLA_CONTACTO = "contacto-repuestos";
 
 /**
  * PÁGINA DE CATEGORÍA TÉCNICA DE REPUESTOS con la PLANTILLA 4007 de Andrés, la de la marca de
  * repuestos (dirección, 2026-10-22; docs/diseno/decisiones-repuestos-marca.md §12), adaptada:
  *
- * - sin el color de una marca: «Nuestras categorías de repuestos» va sobre el gris (no en la
- *   franja de color) y sin la categoría de la propia página;
- * - sin «Marcas con las que trabajamos»;
+ * - sin la franja de color de una marca, sin «Nuestras categorías de repuestos» (dirección,
+ *   2026-10-22) y sin «Marcas con las que trabajamos»;
+ * - la cabecera con el contenido centrado en vertical (`centrado`);
  * - en lugar de los tipos de máquina, lo que INCLUYE la categoría: una tarjeta difuminada por
  *   grupo, con su foto de WordPress, «Cotizar» (ventana con el grupo escrito) y «Ver productos»
  *   (`TarjetasGrupos`);
@@ -79,10 +77,9 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
   const categoria = await getCategoriaRepuestosPorSlug(slug);
   if (!categoria) notFound();
 
-  const [global, marcas, categorias, testimonios, empresa, sedes] = await Promise.all([
+  const [global, marcas, testimonios, empresa, sedes] = await Promise.all([
     getRepuestosMarca(),
     getMarcas(),
-    getCategoriasParaMarca(),
     getTestimoniosDePortada(),
     getEmpresa(),
     getSedesDePortada(),
@@ -113,18 +110,13 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
 
       <HeroMarca
         vista={vistaEncabezadoCategoria(categoria, global, fondoDeRespaldo(marcas))}
-        anclaSiguiente={ANCLA_CATEGORIAS}
-      />
-
-      <CategoriasMarca
-        id={ANCLA_CATEGORIAS}
-        titulo={texto(global.tituloCategorias)}
-        categorias={categoriasDeMarca(categorias.filter((c) => c.id !== categoria.id))}
-        fondo="gris"
+        anclaSiguiente={ANCLA_GRUPOS}
+        franja={false}
+        centrado
       />
 
       <TarjetasGrupos
-        id="que-incluye"
+        id={ANCLA_GRUPOS}
         titulo={`Qué incluye ${nombre.toLowerCase()}`}
         categoria={nombre}
         grupos={gruposDeCategoria(categoria)}

@@ -1,7 +1,8 @@
-import { IconChevronDown, IconMessageCircle } from "@tabler/icons-react";
+import { IconMessageCircle } from "@tabler/icons-react";
 import Image from "next/image";
 
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import { VerTodosEquipos } from "@/components/nueva/VerTodosEquipos";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import { mensajeCotizar, type GrupoVista } from "@/lib/repuestos/grupos";
 
@@ -16,11 +17,13 @@ import { RecuadrosConScroll } from "./RecuadrosConScroll";
  * - «Cotizar»: los productos no tienen página propia, así que abre la VENTANA del formulario con
  *   el grupo ya escrito en «¿Qué necesitas?» (`mensajeCotizar`). Sin JavaScript baja al
  *   formulario de la página (`anclaContacto`).
- * - «Ver productos (N)»: la lista de lo que incluye, en un `<details>` nativo (como el «VER MÁS»
- *   de WordPress). La lista está en el HTML aunque esté plegada: es lo que lee Google.
+ * - «Ver productos (N)», en la misma fila (dirección, 2026-10-22): abre el MISMO panel que sube
+ *   desde abajo del «Ver todo» de las marcas (`VerTodosEquipos`), con el grupo y su número, y los
+ *   productos como texto, sin enlaces (en WordPress no tienen página). La lista está además en el
+ *   HTML de la página para Google; solo se ve sin JavaScript (`productosSinJs`), y el botón lleva a
+ *   ella.
  *
- * Misma rejilla y colocación que las tarjetas de la marca (`rejillaTarjetas`, regla #281), salvo
- * que las tarjetas no se estiran: al desplegar una, las demás de su fila no cambian.
+ * Misma rejilla y colocación que las tarjetas de la marca (`rejillaTarjetas`, regla #281).
  */
 export function TarjetasGrupos({
   id,
@@ -50,9 +53,10 @@ export function TarjetasGrupos({
       <h2 id={idTitulo} className={estilos.tituloSeccion}>
         {titulo}
       </h2>
-      <ul className={`${estilos.rejilla} ${estilos.rejillaTarjetas} ${estilos.rejillaGrupos}`}>
+      <ul className={`${estilos.rejilla} ${estilos.rejillaTarjetas}`}>
         {grupos.map((g) => {
           const idT = `${id}-${g.id}`;
+          const idLista = `${idT}-productos`;
           return (
             <li key={g.id} className={estilos.tarjeta}>
               {g.imagen ? (
@@ -75,30 +79,39 @@ export function TarjetasGrupos({
                 <h3 id={idT} className={estilos.tituloTarjeta}>
                   {g.nombre}
                 </h3>
-                <BotonFormulario
-                  href={`#${anclaContacto}`}
-                  className={estilos.botonTarjeta}
-                  formulario={{
-                    ...formulario,
-                    mensajeInicial: mensajeCotizar(g.nombre, categoria),
-                  }}
-                  titulo={`Cotizar: ${g.nombre}`}
-                  ariaLabel={`Cotizar ${g.nombre}`}
-                >
-                  <IconMessageCircle aria-hidden="true" focusable="false" stroke={2} size={16} />
-                  Cotizar
-                </BotonFormulario>
-                <details className={estilos.desplegable}>
-                  <summary className={estilos.verProductos} aria-describedby={idT}>
-                    <span>Ver productos ({g.productos.length})</span>
-                    <IconChevronDown aria-hidden="true" stroke={2} width={18} height={18} />
-                  </summary>
-                  <ul className={estilos.listaProductos}>
-                    {g.productos.map((p, i) => (
-                      <li key={`${i}-${p}`}>{p}</li>
-                    ))}
-                  </ul>
-                </details>
+                <div className={estilos.accionesGrupo}>
+                  <BotonFormulario
+                    href={`#${anclaContacto}`}
+                    className={estilos.botonTarjeta}
+                    formulario={{
+                      ...formulario,
+                      mensajeInicial: mensajeCotizar(g.nombre, categoria),
+                    }}
+                    titulo={`Cotizar: ${g.nombre}`}
+                    ariaLabel={`Cotizar ${g.nombre}`}
+                  >
+                    <IconMessageCircle aria-hidden="true" focusable="false" stroke={2} size={16} />
+                    Cotizar
+                  </BotonFormulario>
+                  <VerTodosEquipos
+                    titulo={g.nombre}
+                    href={`#${idLista}`}
+                    total={g.productos.length}
+                    equipos={g.productos.map((p, i) => ({ id: i, nombre: p, href: null }))}
+                    className={`${estilos.botonTarjeta} ${estilos.botonSecundario}`}
+                    etiqueta={`Ver productos (${g.productos.length})`}
+                    describedBy={idT}
+                  />
+                </div>
+                {/*
+                 * La lista en el HTML de la página (Google) y para quien no tiene JavaScript, que
+                 * llega aquí con «Ver productos». Con JavaScript no se pinta: la enseña el panel.
+                 */}
+                <ul id={idLista} className={`${estilos.listaProductos} ${estilos.productosSinJs}`}>
+                  {g.productos.map((p, i) => (
+                    <li key={`${i}-${p}`}>{p}</li>
+                  ))}
+                </ul>
               </div>
             </li>
           );

@@ -195,6 +195,43 @@ las marcas, el contacto y los testimonios no cambian.
   `@media (scripting: enabled)`: sin JavaScript se ven todas y el botón no sale. Las anclas
   (`#serie-ex`) no cambian.
 
+## 12. Categorías técnicas con la plantilla 4007 de la marca (2026-10-22, dirección)
+
+Las 10 páginas de categoría técnica (`…/categoria-repuestos-para-maquinaria-pesada/<categoria>/`)
+dejan la página provisional del §7 y usan la **misma plantilla que la marca de repuestos** (4007,
+la de Bobcat), adaptada. URL, SEO, JSON-LD y migas no cambian.
+
+| Sección                                             | Qué lleva                                                                                                                                                             |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cabecera                                            | `HeroMarca` como antes (sin logo), con el ratón que baja a las categorías                                                                                             |
+| «Nuestras categorías de repuestos»                  | Las píldoras de la marca **sobre el gris** (`fondo="gris"`): sin franja de color, porque no es una marca. **Sin la categoría de la propia página** (9 píldoras)       |
+| «Qué incluye …»                                     | **Tarjetas difuminadas** (las de los índices) una por grupo, con su foto de WordPress, el nombre tal cual, **«Cotizar»** y **«Ver productos (N)»** (`TarjetasGrupos`) |
+| Contacto, testimonios, «¿Por qué elegirnos?», sedes | Como la marca. «¿Por qué elegirnos?» no sale sin foto; sin marca, un cierre con `{marca}` tampoco                                                                     |
+
+**Sin «Marcas con las que trabajamos»** (`PlacasMarcas`, sigue en los índices).
+
+**«Cotizar»:** los productos no tienen página propia (en WordPress, «VER MÁS» solo despliega la
+lista), así que abre la ventana del formulario con el grupo escrito en «¿Qué necesitas?»:
+«Quiero cotizar: Cadena para maquinaria pesada (tren de rodaje). Marca y modelo de la máquina: »
+(`mensajeCotizar`; el nombre pasa a tipo frase solo en el mensaje). Sin JavaScript baja al
+formulario de la página.
+
+**«Ver productos (N)»:** `<details>` nativo, como el «VER MÁS» de WordPress. La lista está en el
+HTML aunque esté plegada (lo lee Google). Las tarjetas no se estiran: al desplegar una, las de su
+fila no cambian.
+
+**Interruptor «Qué incluye: diseño propio»** (global `repuestos-marca`): sin uso y **oculto en el
+panel** (`admin.hidden`, sin migración). La columna se quita con una migración cuando haya
+VENTANA. `QueIncluye.tsx` (las dos versiones, sencilla y propia) se borra.
+
+**Fotos:** las 70 de los grupos ya están en el preview y en el sitio publicado (importación del
+2026-10-18, `docs/repuestos-importacion.md` §9). No hay que subir nada.
+
+**Medido en el preview** (2026-10-22, 1440 / 1010 / 390) en Componentes hidráulicos, Tren de
+rodaje y Misceláneos (la de más productos, 61): 3 / 2 / 1 por fila con la última centrada
+(regla #281), CLS ≤ 0,0013, sin desbordamiento ni errores; las 10 responden 200 con todas sus
+fotos.
+
 ## 5. Pendiente
 
 - ~~Imágenes reales de fondo (por marca) y de cada tipo~~ **HECHO el 2026-10-14 (agente C):** la imagen de cada tipo es la

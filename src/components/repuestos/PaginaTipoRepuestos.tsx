@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { SeccionTestimonios } from "@/components/portada/diferidos";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { InterruptorMejoras } from "@/components/repuestos/InterruptorMejoras";
 import { ModelosTipo } from "@/components/repuestos/ModelosTipo";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
 import { SedesCompactas } from "@/components/repuestos/SedesCompactas";
@@ -16,6 +17,7 @@ import { getModelosDeTipo, getModelosPorIds } from "@/lib/queries/getModelos";
 import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
+import { MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { tarjetasDeCategorias, vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
@@ -78,6 +80,15 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
   const enlazados = await getModelosPorIds(idsDeOtrasEntradas([tipo]));
   const enlaces = listaDeModelos(marca, tipo, modelos, enlazados);
   const nombreTipo = tipo.nombre.toLowerCase();
+  const formularioContacto = (mensajeInicial?: string) =>
+    configContactoMarca({
+      origen: rutas.tipo(marca.slug, seg),
+      siteKey: turnstileSiteKey(),
+      whatsapp: empresa ? enlaceWhatsApp(empresa.whatsapp) : undefined,
+      boton: texto(global.contactoBoton),
+      marca: `${nombreTipo} ${marca.nombre}`,
+      mensajeInicial,
+    });
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
     { nombre: "Repuestos", path: rutas.repuestos() },
@@ -92,6 +103,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
 
   return (
     <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
+      <InterruptorMejoras />
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
         <Breadcrumbs items={breadcrumbs} />
@@ -108,6 +120,19 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         tituloPanel={`${tipoEnTitulo(tipo.nombre)} ${marca.nombre.trim().toUpperCase()}`}
         grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
+        buscador={MEJORAS_ACTIVAS.R1}
+        barraSeries={MEJORAS_ACTIVAS.R2}
+        ayuda={
+          MEJORAS_ACTIVAS.R4
+            ? {
+                formulario: formularioContacto(
+                  `Busco repuestos para ${nombreTipo} ${marca.nombre}. Modelo y número de serie: `,
+                ),
+                anclaContacto: ANCLA_CONTACTO,
+              }
+            : null
+        }
+        panelR5={MEJORAS_ACTIVAS.R5}
       />
 
       <TarjetasMarca
@@ -141,13 +166,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         id="por-que-elegirnos"
         vista={vistaPorQue(global, marca)}
         anclaContacto={ANCLA_CONTACTO}
-        formulario={configContactoMarca({
-          origen: rutas.tipo(marca.slug, seg),
-          siteKey: turnstileSiteKey(),
-          whatsapp: empresa ? enlaceWhatsApp(empresa.whatsapp) : undefined,
-          boton: texto(global.contactoBoton),
-          marca: `${nombreTipo} ${marca.nombre}`,
-        })}
+        formulario={formularioContacto()}
       />
 
       <SedesCompactas id="sedes-repuestos" sedes={sedesDePortada(sedes)} />

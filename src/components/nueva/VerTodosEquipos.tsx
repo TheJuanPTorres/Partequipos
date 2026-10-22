@@ -1,6 +1,6 @@
 "use client";
 
-import { IconArrowRight, IconCircleCheck, IconX } from "@tabler/icons-react";
+import { IconArrowRight, IconCircleCheck, IconSearch, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import {
   useEffect,
@@ -11,6 +11,9 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
+
+import { coincideModelo, enOrdenNatural, normalizarBusqueda } from "@/lib/repuestos/buscarModelo";
+import { mejoraApagadaEnLaPagina } from "@/lib/repuestos/mejoras";
 
 import panel from "./panelEquipos.module.css";
 
@@ -34,6 +37,11 @@ export type ElementoPanel = { id: number | string; nombre: string; href: string 
  * cada tarjeta de tipo o serie abre el panel con sus modelos (`etiqueta`, `describedBy`), con
  * un enlace discreto a la página completa del tipo (`enlacePagina`) y la barra en el color de
  * la marca (`acento`).
+ *
+ * R5 de repuestos (dirección, 2026-10-21), con `buscador`: un campo «Busca tu modelo» arriba del
+ * listado que lo filtra al escribir (sin distinguir mayúsculas, guiones ni espacios), y los
+ * modelos en ORDEN NATURAL (EX100, EX120, EX200…). El alto del panel se fija al empezar a
+ * escribir, para que no salte al filtrar.
  */
 export function VerTodosEquipos({
   titulo,
@@ -45,6 +53,7 @@ export function VerTodosEquipos({
   describedBy,
   enlacePagina,
   acento,
+  buscador = false,
 }: {
   titulo: string;
   href: string;
@@ -59,6 +68,8 @@ export function VerTodosEquipos({
   enlacePagina?: string;
   /** Color de la barra del panel; sin él, el `--acento` de la página o un gris oscuro. */
   acento?: string | null;
+  /** R5: buscador y orden natural (panel de modelos de repuestos). */
+  buscador?: boolean;
 }) {
   const [montado, setMontado] = useState(false);
   const [abierto, setAbierto] = useState(false);
@@ -68,6 +79,9 @@ export function VerTodosEquipos({
   const tituloRef = useRef<HTMLHeadingElement>(null);
   const empezoFuera = useRef(false);
   const idTitulo = useId();
+  const idBuscar = useId();
+  const [consulta, setConsulta] = useState("");
+  const [altoFijo, setAltoFijo] = useState<number | null>(null);
 
   useEffect(() => {
     const d = dialogo.current;
@@ -101,6 +115,15 @@ export function VerTodosEquipos({
     window.setTimeout(() => dialogo.current?.open && dialogo.current.close(), 700);
   }
 
+  // R5: solo con el panel montado (en el navegador), así que se puede leer la URL del preview.
+  const conR5 = buscador && montado && !mejoraApagadaEnLaPagina("R5");
+  const ordenados = conR5 ? enOrdenNatural(equipos) : equipos;
+  const q = normalizarBusqueda(consulta);
+  const visibles =
+    conR5 && q
+      ? ordenados.filter((e) => coincideModelo(normalizarBusqueda(e.nombre), q))
+      : ordenados;
+
   return (
     <>
       <Link
@@ -118,7 +141,12 @@ export function VerTodosEquipos({
           ref={dialogo}
           className={panel.panel}
           aria-labelledby={idTitulo}
-          style={acento ? ({ "--acento": acento } as CSSProperties) : undefined}
+          style={
+            {
+              ...(acento ? { "--acento": acento } : {}),
+              ...(altoFijo ? { minHeight: `${altoFijo}px` } : {}),
+            } as CSSProperties
+          }
           data-panel-equipos=""
           data-cerrando={cerrando ? "" : undefined}
           // Esc: el cierre pasa por la animación de bajada.
@@ -129,6 +157,8 @@ export function VerTodosEquipos({
           onClose={() => {
             setAbierto(false);
             setCerrando(false);
+            setConsulta("");
+            setAltoFijo(null);
             enlace.current?.focus();
           }}
           onAnimationEnd={(e) => {
@@ -153,9 +183,41 @@ export function VerTodosEquipos({
                 <span className="sr-only">Cerrar el listado</span>
               </button>
             </div>
+            {conR5 ? (
+              <div className={panel.buscar} role="search">
+                <label htmlFor={idBuscar} className="sr-only">
+                  Busca tu modelo
+                </label>
+                <IconSearch aria-hidden="true" focusable="false" stroke={2} size={20} />
+                <input
+                  id={idBuscar}
+                  type="search"
+                  value={consulta}
+                  onChange={(e) => {
+                    if (altoFijo === null && dialogo.current) {
+                      setAltoFijo(dialogo.current.getBoundingClientRect().height);
+                    }
+                    setConsulta(e.target.value);
+                  }}
+                  placeholder="Busca tu modelo"
+                  autoComplete="off"
+                  spellCheck={false}
+                  className={panel.buscarCampo}
+                />
+                <p className={panel.buscarCuenta} aria-live="polite" aria-atomic="true">
+                  {consulta.trim()
+                    ? visibles.length === 0
+                      ? "Ningún modelo coincide."
+                      : visibles.length === 1
+                        ? "1 modelo"
+                        : `${visibles.length} modelos`
+                    : ""}
+                </p>
+              </div>
+            ) : null}
             <div className={panel.cuerpo}>
               <ul className={panel.lista}>
-                {equipos.map((e) => (
+                {visibles.map((e) => (
                   <li key={e.id}>
                     {e.href ? (
                       <Link href={e.href} className={panel.item}>

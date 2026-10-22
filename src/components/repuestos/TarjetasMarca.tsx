@@ -34,6 +34,8 @@ export function TarjetasMarca({
   tarjetas,
   indice = false,
   etiqueta = "Páginas de la sección",
+  panelR5 = false,
+  className,
 }: {
   id: string;
   /** Sin título (las páginas índice no lo llevan) la sección se nombra con `etiqueta`. */
@@ -43,13 +45,16 @@ export function TarjetasMarca({
   /** Variante de las páginas índice: sección blanca de esquinas redondeadas, sin título. */
   indice?: boolean;
   etiqueta?: string;
+  /** R5 de repuestos: el panel «Ver todo» con buscador y orden natural. */
+  panelR5?: boolean;
+  className?: string;
 }) {
   if ((!titulo && !indice) || tarjetas.length === 0) return null;
   const idTitulo = `${id}-titulo`;
   return (
     <section
       id={id}
-      className={`${estilos.tarjetas} ${indice ? estilos.tarjetasIndice : ""}`}
+      className={`${estilos.tarjetas} ${indice ? estilos.tarjetasIndice : ""} ${className ?? ""}`}
       aria-labelledby={titulo ? idTitulo : undefined}
       aria-label={titulo ? undefined : etiqueta}
     >
@@ -64,6 +69,7 @@ export function TarjetasMarca({
         verTodo={verTodo}
         indice={indice}
         nivel={titulo ? "h3" : "h2"}
+        panelR5={panelR5}
       />
       {indice ? <RecuadrosConScroll /> : null}
     </section>
@@ -85,12 +91,14 @@ export function RejillaTarjetas({
   verTodo,
   indice = false,
   nivel: Nivel,
+  panelR5 = false,
 }: {
   id: string;
   tarjetas: TarjetaMarca[];
   verTodo: string;
   indice?: boolean;
   nivel: "h2" | "h3" | "h4";
+  panelR5?: boolean;
 }) {
   return (
     <ul className={`${estilos.rejilla} ${estilos.rejillaTarjetas}`}>
@@ -109,6 +117,7 @@ export function RejillaTarjetas({
           <li
             key={t.clave}
             className={`${estilos.tarjeta} ${t.soloEscritorio ? estilos.soloEscritorio : ""}`}
+            data-buscar={t.buscar}
           >
             {t.logo ? (
               <div className={estilos.foto}>
@@ -158,6 +167,7 @@ export function RejillaTarjetas({
                   describedBy={idT}
                   enlacePagina={t.panel.enlacePagina}
                   acento={t.panel.acento}
+                  buscador={panelR5}
                 />
               ) : verTodo && t.href ? (
                 <Link href={t.href} aria-describedby={idT} className={estilos.botonTarjeta}>

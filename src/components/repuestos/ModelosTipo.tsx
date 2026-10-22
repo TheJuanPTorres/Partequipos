@@ -1,8 +1,12 @@
 import { VerTodosEquipos } from "@/components/nueva/VerTodosEquipos";
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { GrupoDeModelos } from "@/lib/repuestos/series";
 import { tarjetasDeModelos, type ModeloEnlace } from "@/lib/repuestos/tipo";
 import type { TiposEquipo } from "@/payload-types";
 
+import { AyudaModelo } from "./AyudaModelo";
+import { BarraSeries } from "./BarraSeries";
+import { BuscadorModelos } from "./BuscadorModelos";
 import estilos from "./marca.module.css";
 import { RecuadrosConScroll } from "./RecuadrosConScroll";
 import { RejillaTarjetas } from "./TarjetasMarca";
@@ -24,6 +28,11 @@ import { RejillaTarjetas } from "./TarjetasMarca";
  * (N)», que abre el mismo panel de la marca con la serie completa. Si cabe en 2 filas, no hay
  * botón. Solo CSS, con `@media (scripting: enabled)`: sin JavaScript (o en un navegador que no
  * conoce esa consulta) se ven todas y el botón no sale. Las tarjetas ocultas siguen en el HTML.
+ *
+ * MEJORAS (dirección, 2026-10-21; interruptores en `src/lib/repuestos/mejoras.ts`), cada una
+ * solo si la página la pide: el buscador de modelo (R1, `buscador`, con más de 2 modelos), la
+ * barra de series fija (R2, `barraSeries`, con 2 o más series), «¿No encuentras tu modelo?» al
+ * final de cada serie (R4, `ayuda`) y el panel con buscador y orden natural (R5, `panelR5`).
  */
 export function ModelosTipo({
   id,
@@ -34,6 +43,10 @@ export function ModelosTipo({
   grupos,
   verTodo,
   tituloPanel,
+  buscador = false,
+  barraSeries = false,
+  ayuda = null,
+  panelR5 = false,
 }: {
   id: string;
   titulo: string;
@@ -45,22 +58,43 @@ export function ModelosTipo({
   grupos?: GrupoDeModelos<ModeloEnlace>[] | null;
   /** Texto del botón de cada tarjeta. */
   verTodo: string;
+  /** R1. */
+  buscador?: boolean;
+  /** R2. */
+  barraSeries?: boolean;
+  /** R4: el formulario que abre «¿No encuentras tu modelo?». */
+  ayuda?: { formulario: ConfigFormulario; anclaContacto: string } | null;
+  /** R5. */
+  panelR5?: boolean;
 }) {
   const idTitulo = `${id}-titulo`;
+  const series = (grupos ?? []).flatMap((g) =>
+    g.ancla ? [{ ancla: g.ancla, titulo: g.titulo, total: g.modelos.length }] : [],
+  );
+  const conBarra = barraSeries && series.length >= 2;
   return (
     <section
       id={id}
-      className={`${estilos.tarjetas} ${estilos.tarjetasIndice} ${estilos.modelosTarjetas}`}
+      className={`${estilos.tarjetas} ${estilos.tarjetasIndice} ${estilos.modelosTarjetas} ${conBarra ? estilos.conBarraSeries : ""}`}
       aria-labelledby={idTitulo}
     >
       <h2 id={idTitulo} className={estilos.tituloSeccion}>
         {titulo}
       </h2>
+      {buscador && modelos.length > 2 ? (
+        <BuscadorModelos seccion={id} ejemplo={modelos[0]?.nombre ?? null} ayuda={ayuda} />
+      ) : null}
+      {conBarra ? <BarraSeries series={series} /> : null}
       {modelos.length === 0 ? (
         <p className={estilos.modelosVacio}>{vacio}</p>
       ) : grupos ? (
         grupos.map((g) => (
-          <div key={g.ancla ?? "otros"} id={g.ancla ?? undefined} className={estilos.modelosGrupo}>
+          <div
+            key={g.ancla ?? "otros"}
+            id={g.ancla ?? undefined}
+            className={estilos.modelosGrupo}
+            data-grupo-modelos=""
+          >
             <h3 className={estilos.modelosSerie}>{g.titulo}</h3>
             <RejillaRecortada
               id={`${id}-${g.ancla ?? "otros"}`}
@@ -70,6 +104,8 @@ export function ModelosTipo({
               tituloPanel={`${tituloPanel}: ${g.titulo}`}
               destino={g.ancla ?? id}
               nivel="h4"
+              ayuda={ayuda}
+              panelR5={panelR5}
             />
           </div>
         ))
@@ -82,6 +118,8 @@ export function ModelosTipo({
           tituloPanel={tituloPanel}
           destino={id}
           nivel="h3"
+          ayuda={ayuda}
+          panelR5={panelR5}
         />
       )}
       {modelos.length > 0 ? <RecuadrosConScroll /> : null}
@@ -98,6 +136,8 @@ function RejillaRecortada({
   tituloPanel,
   destino,
   nivel,
+  ayuda,
+  panelR5,
 }: {
   id: string;
   tipo: TiposEquipo;
@@ -107,6 +147,8 @@ function RejillaRecortada({
   /** El ancla de la serie (o de la sección): el `href` del botón. */
   destino: string;
   nivel: "h3" | "h4";
+  ayuda: { formulario: ConfigFormulario; anclaContacto: string } | null;
+  panelR5: boolean;
 }) {
   const n = modelos.length;
   // En qué tamaños no cabe en 2 filas (móvil 2, tablet 4, escritorio 6): ahí sale el botón.
@@ -134,8 +176,12 @@ function RejillaRecortada({
             total={n}
             equipos={modelos.map(({ id: clave, nombre, href }) => ({ id: clave, nombre, href }))}
             className={estilos.botonTarjeta}
+            buscador={panelR5}
           />
         </div>
+      ) : null}
+      {ayuda ? (
+        <AyudaModelo formulario={ayuda.formulario} anclaContacto={ayuda.anclaContacto} />
       ) : null}
     </div>
   );

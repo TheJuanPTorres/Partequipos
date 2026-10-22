@@ -1,0 +1,195 @@
+/*
+ * MEJORAS DE LAS PÁGINAS DE REPUESTOS (dirección, 2026-10-21; `src/lib/repuestos/mejoras.ts`).
+ * Lo apagado por la URL del preview (`<html data-mejoras-apagadas="…">`) no se pinta. En
+ * producción ese atributo no existe: manda el interruptor del código.
+ */
+:global(html[data-mejoras-apagadas~="R1"]) .buscador,
+:global(html[data-mejoras-apagadas~="R2"]) .barraSeries,
+:global(html[data-mejoras-apagadas~="R4"]) .ayuda {
+  display: none;
+}
+
+/* --- R1: buscador de modelo --------------------------------------------------------------- */
+
+.buscador {
+  display: flex;
+  max-width: 560px;
+  margin: 32px auto 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  text-align: center;
+}
+
+/* Sin JavaScript no puede filtrar: no se enseña. */
+@media (scripting: none) {
+  .buscador {
+    display: none;
+  }
+}
+
+.buscadorEtiqueta {
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  font-weight: 600;
+}
+
+.buscadorCaja {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: var(--color-texto-suave, #56545a);
+}
+
+.buscadorCaja > svg {
+  position: absolute;
+  left: 18px;
+  pointer-events: none;
+}
+
+.buscadorCampo {
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 0 20px 0 48px;
+  border: 1px solid rgb(16 15 15 / 0.35);
+  border-radius: 999px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 16px;
+}
+
+.buscadorCampo:focus-visible {
+  border-color: var(--color-texto);
+  outline: 2px solid var(--color-texto);
+  outline-offset: 2px;
+}
+
+/* El aviso reserva su línea: escribir no mueve lo de debajo. */
+.buscadorCuenta {
+  min-height: 1.5em;
+  margin: 0;
+  color: var(--color-texto-suave, #56545a);
+  font-size: 15px;
+}
+
+.ayudaSinResultados {
+  margin-top: 4px;
+}
+
+/* --- R2: barra de series ------------------------------------------------------------------ */
+
+.barraSeries {
+  position: sticky;
+  z-index: 20;
+  /* 8 px bajo la cabecera fija: 67 px en móvil, 71 en tablet y 70 (encogida) en escritorio. */
+  top: 78px;
+  margin: 28px auto 0;
+  padding: 6px;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--color-fondo);
+  box-shadow:
+    0 0 0 1px rgb(16 15 15 / 0.08),
+    0 6px 20px rgb(16 15 15 / 0.12);
+}
+
+.barraLista {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.barraLista::-webkit-scrollbar {
+  display: none;
+}
+
+.barraEnlace {
+  display: inline-flex;
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 0 18px;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.barraEnlace:hover {
+  background: var(--color-fondo-seccion);
+}
+
+.barraEnlace[aria-current] {
+  background: var(--marca-amarillo, var(--color-texto));
+  color: var(--marca-tinta, var(--color-fondo));
+}
+
+.barraEnlace:focus-visible {
+  outline: 2px solid var(--color-texto);
+  outline-offset: -2px;
+}
+
+.barraCuenta {
+  opacity: 0.75;
+  font-weight: 400;
+}
+
+@media (max-width: 1024px) {
+  .barraSeries {
+    top: 79px;
+  }
+}
+
+@media (max-width: 767px) {
+  .barraSeries {
+    top: 75px;
+    width: auto;
+    margin-top: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barraEnlace {
+    transition: none;
+  }
+}
+
+/* --- R4: ¿No encuentras tu modelo? ------------------------------------------------------------ */
+
+.ayuda {
+  margin: 24px 0 0;
+  color: var(--color-texto-suave, #56545a);
+  font-size: 16px;
+  text-align: center;
+}
+
+.ayudaEnlace {
+  color: var(--color-texto);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ayudaEnlace:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* Buscando (R1), la ayuda de cada serie se va: queda la del «sin resultados». */
+[data-buscando] .ayuda:not(.ayudaSinResultados) {
+  display: none;
+}

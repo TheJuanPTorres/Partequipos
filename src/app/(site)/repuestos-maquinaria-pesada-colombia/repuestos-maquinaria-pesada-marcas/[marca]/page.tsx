@@ -6,6 +6,7 @@ import { SeccionTestimonios } from "@/components/portada/diferidos";
 import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { InterruptorMejoras } from "@/components/repuestos/InterruptorMejoras";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
 import { SedesCompactas } from "@/components/repuestos/SedesCompactas";
 import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
@@ -24,7 +25,8 @@ import { getEmpresa } from "@/lib/queries/getSeo";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { categoriasDeMarca, tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
 import { idsDeOtrasEntradas, listaDeModelos } from "@/lib/repuestos/tipo";
-import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
+import { interruptoresPorUrl, MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
+import { tarjetasDeCategorias, vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
@@ -96,9 +98,14 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
     { nombre: "Marcas", path: rutas.marcas() },
     { nombre: marca.nombre, path: rutas.marca(marca.slug) },
   ];
+  // R3: las categorías en tarjetas con foto; en el preview se pintan también las píldoras de
+  // antes (delante, ocultas), para poder apagarla con la URL (`src/lib/repuestos/mejoras.ts`).
+  // Las tarjetas y las de los tipos, seguidas, forman un solo bloque blanco.
+  const conPruebas = interruptoresPorUrl();
 
   return (
     <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
+      <InterruptorMejoras />
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
         <Breadcrumbs items={breadcrumbs} />
@@ -106,11 +113,25 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
 
       <HeroMarca vista={vistaEncabezado(marca, global)} anclaSiguiente={ANCLA_CATEGORIAS} />
 
-      <CategoriasMarca
-        id={ANCLA_CATEGORIAS}
-        titulo={texto(global.tituloCategorias)}
-        categorias={categoriasDeMarca(categorias)}
-      />
+      {!MEJORAS_ACTIVAS.R3 || conPruebas ? (
+        <div className={MEJORAS_ACTIVAS.R3 ? estilos.categoriasSinR3 : undefined}>
+          <CategoriasMarca
+            id={MEJORAS_ACTIVAS.R3 ? `${ANCLA_CATEGORIAS}-sin-r3` : ANCLA_CATEGORIAS}
+            titulo={texto(global.tituloCategorias)}
+            categorias={categoriasDeMarca(categorias)}
+          />
+        </div>
+      ) : null}
+      {MEJORAS_ACTIVAS.R3 ? (
+        <TarjetasMarca
+          id={ANCLA_CATEGORIAS}
+          titulo={texto(global.tituloCategorias)}
+          verTodo={texto(global.verTodoTexto) || "Ver todo"}
+          tarjetas={tarjetasDeCategorias(categorias)}
+          indice
+          className={conPruebas ? estilos.categoriasR3 : undefined}
+        />
+      ) : null}
 
       <TarjetasMarca
         id="repuestos-marca-tipos"
@@ -119,6 +140,7 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
         tarjetas={tarjetasDeTipos(marca, tipos, modelosDe)}
         // El estilo «difuminado» de las tarjetas del sitio (dirección, 2026-10-21).
         indice
+        panelR5={MEJORAS_ACTIVAS.R5}
       />
 
       <ContactoMarca

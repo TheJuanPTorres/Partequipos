@@ -110,7 +110,8 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
         {grupos.length > 0 ? (
           grupos.map((g, i) => (
             <div key={g.clave} id={`grupo-${g.clave}`}>
-              <h3 className={estilosTarjetas.tituloTipo}>{g.titulo}</h3>
+              {/* `h2`: los nombres de las tarjetas (`TarjetaEquipo`) son `h3`. */}
+              <h2 className={estilosTarjetas.tituloTipo}>{g.titulo}</h2>
               <ul className={estilosTarjetas.rejilla}>
                 {g.tarjetas.map((e, j) => (
                   <TarjetaEquipo

@@ -331,3 +331,22 @@ dato.
 
 **Interruptor:** con «Diseño propio» marcado, la marca sigue pintando el #260 con las líneas como secciones; las
 páginas de línea existen igual.
+
+### 10.1 Fotos de producto con el mismo formato (2026-10-22, dirección)
+
+Dirección vio fotos mucho más grandes que otras en las tarjetas (las I-RIDE MOTO S&T frente a la RACING 5W-40) y
+tarjetas desiguales. Dos causas, medidas en el sitio publicado:
+
+1. **El recuadro crecía con las fotos verticales.** `aspect-ratio: 1 / 1` es solo un mínimo: una foto en el flujo de
+   1087 × 1973 lo estiraba a 273 × 496 a 1440 (y la de 389 × 584, a 273 × 410), y su fila pasaba de 451 a 650 px. A
+   390 no se notaba. **Arreglo (CSS):** la foto va posicionada dentro del recuadro (`position: absolute; inset: 0`),
+   con `object-fit: contain`: recuadro cuadrado e igual en todas, botella entera y centrada.
+2. **Las propias imágenes traen márgenes distintos:** la botella ocupa del 74 % al 100 % del alto de su imagen, así
+   que con el mismo recuadro unas se ven más grandes. **Arreglo (datos):** `scripts/lubricantes/fotos-uniformes.ts`
+   recorta el fondo (transparente o casi blanco) y centra la botella en un lienzo blanco de 800 px, ocupando el
+   86 % del lado en su dimensión mayor (`src/lib/lubricantes/fotoUniforme.ts`, con pruebas). Sube fotos NUEVAS
+   (`lub-uniforme-…webp`) y las pone en los productos; las originales se quedan y la retirada vuelve a ellas
+   (manifiesto). En el preview: 56 fotos y 70 productos. Sitio publicado: `runbook-lubricantes-fotos-uniformes.md`.
+
+**Límite:** la foto de I-SIGMA UNIVERSAL 20W-50 es de 225 × 225 en WordPress y se amplía ×3,1: se ve más blanda.
+Mejor sustituirla por una foto mayor del cliente.

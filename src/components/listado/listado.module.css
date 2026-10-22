@@ -1191,24 +1191,26 @@
 }
 
 /*
- * A3 — Al pasar el ratón (solo puntero fino): las DOS cajas de la tarjeta (la
- * de la foto y la de los datos) suben 3 px y ganan sombra, cada una con su
- * forma; la foto, al 103 % dentro de su caja, y la flecha del botón se
- * desplaza. El contenedor de fuera no se mueve (dirección, 2026-10-22). Igual
- * en rejilla.
+ * A3 — Al pasar el ratón (solo puntero fino), con la foto al 103 % dentro de
+ * su caja y la flecha del botón desplazada (dirección, 2026-10-22):
+ *  - en LISTA, suben 3 px y ganan sombra las DOS cajas (foto y datos), cada
+ *    una con su forma; el contenedor de fuera queda quieto;
+ *  - en REJILLA, sube y gana sombra la tarjeta entera, como una sola pieza.
  */
 .flecha {
   flex: none;
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  [data-anim~="A3"] .foto,
-  [data-anim~="A3"] .datos {
+  [data-anim~="A3"] .tarjetas[data-vista="lista"] .foto,
+  [data-anim~="A3"] .tarjetas[data-vista="lista"] .datos,
+  [data-anim~="A3"] .tarjetas[data-vista="rejilla"] .tarjeta {
     position: relative;
     transition: transform 280ms var(--curva-anim);
   }
   /* La sombra mayor ya está pintada: solo cambia su opacidad. */
-  [data-anim~="A3"] .foto::after,
-  [data-anim~="A3"] .datos::after {
+  [data-anim~="A3"] .tarjetas[data-vista="lista"] .foto::after,
+  [data-anim~="A3"] .tarjetas[data-vista="lista"] .datos::after,
+  [data-anim~="A3"] .tarjetas[data-vista="rejilla"] .tarjeta::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -1218,12 +1220,14 @@
     pointer-events: none;
     transition: opacity 280ms var(--curva-anim);
   }
-  [data-anim~="A3"] .tarjeta:hover .foto,
-  [data-anim~="A3"] .tarjeta:hover .datos {
+  [data-anim~="A3"] .tarjetas[data-vista="lista"] .tarjeta:hover .foto,
+  [data-anim~="A3"] .tarjetas[data-vista="lista"] .tarjeta:hover .datos,
+  [data-anim~="A3"] .tarjetas[data-vista="rejilla"] .tarjeta:hover {
     transform: translateY(-3px);
   }
-  [data-anim~="A3"] .tarjeta:hover .foto::after,
-  [data-anim~="A3"] .tarjeta:hover .datos::after {
+  [data-anim~="A3"] .tarjetas[data-vista="lista"] .tarjeta:hover .foto::after,
+  [data-anim~="A3"] .tarjetas[data-vista="lista"] .tarjeta:hover .datos::after,
+  [data-anim~="A3"] .tarjetas[data-vista="rejilla"] .tarjeta:hover::after {
     opacity: 1;
   }
   [data-anim~="A3"] .foto img {

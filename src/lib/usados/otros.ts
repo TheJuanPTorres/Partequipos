@@ -21,7 +21,7 @@ export const ETIQUETA_OTROS = "Otros";
 export const TITULO_OTROS = "Otra maquinaria pesada usada";
 
 export const DESCRIPCION_OTROS =
-  "Miniexcavadoras, bulldozers, motoniveladoras, cargadores y el resto de maquinaria pesada usada disponible, por categoría.";
+  "Bulldozers, motoniveladoras, cargadores y el resto de maquinaria pesada usada disponible, por categoría.";
 
 type ConAgrupacion = Pick<CategoriasUsada, "nombre"> & {
   enOtros?: boolean | null;

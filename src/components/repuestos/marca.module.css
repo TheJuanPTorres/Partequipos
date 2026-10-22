@@ -1055,6 +1055,18 @@ a.modelo:hover {
 }
 
 /*
+ * En móvil, las migas largas («Inicio / Lubricantes Eni / Auto pesado») caben en una línea con
+ * la fuente de respaldo y pasan a dos al llegar Inter, que es más ancha: la cabecera bajaba
+ * 22 px (CLS 0,0435 a 390). Se reservan siempre dos líneas, con las migas abajo.
+ */
+@media (max-width: 767px) {
+  .migasHero ol {
+    min-height: 2.6em;
+    align-content: flex-end;
+  }
+}
+
+/*
  * CABECERA DE LA «PLANTILLA 1» (2026-10-18): el 70 % del alto de la ventana en
  * los tres tamaños, con el contenido centrado en vertical y en horizontal. La
  * cabecera baja sin foto (`heroBajo`) no lleva esta clase.

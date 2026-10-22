@@ -221,6 +221,9 @@ Scooter, Auto liviano, Auto pesado y Engranajes; su plantilla llegará).
 
 ## 9. Lubricantes ENI con la plantilla de Andrés «Categoría Lubricantes» (2026-10-21, dirección; PR #318)
 
+> **Superado en parte por el §10 (2026-10-22):** cada línea tiene su página, la de la marca ya no lista los productos
+> ni lleva «Ver catálogo», y el orden de las líneas sale del campo «Orden».
+
 **Fuente:** la página pintada «Categoría Lubricantes» (3946) del sitio de diseño. El export `elementor-811423` que
 nombraba el encargo no estaba en disco. **Cambia el diseño, no el contenido:** las líneas siguen siendo secciones de
 `/lubricantes/lubricantes-eni/` con su ancla (`#motos-scooter`, `#auto-liviano`, `#auto-pesado`, `#engranajes`), que es
@@ -263,3 +266,67 @@ adonde llevan el megamenú y los 301 de las URL viejas.
 
 - **Desmarcada**, la plantilla de Andrés. Sustituye a la provisional, que se quitó.
 - **Marcada**, el diseño propio del #260 (`PaginaMarcaLubricante`), que se queda en el código.
+
+## 10. Una página por línea con la plantilla de Andrés «Ficha producto lubricante» (2026-10-22, dirección; PR #318)
+
+**Fuente:** el export `elementor-4039-2026-10-22.json` y su página pintada (3969, `ficha-producto-lubricantes/`),
+medida a 390, 1010 y 1440. Sustituye a lo que el §9 decía de los listados y de «Ver catálogo».
+
+**URL: las de WordPress, tal cual.** Las 4 líneas tenían dirección propia (`docs/url-map.csv`):
+`/lubricantes/lubricantes-eni/{motos-scooter,auto-liviano,auto-pesado,engranajes}/`. Del 2026-10-14 al 21 llevaban un
+301 a su ancla de la página de la marca; la migración `20261022_014813_lubricantes_lineas_paginas` **borra esos 4
+301** (solo si siguen apuntando a su ancla). Si se quedaran, taparían la página y el ancla, que ahora lleva a la
+página, haría un bucle.
+
+**Página de la línea** (`[marca]/[categoria]/page.tsx`, `PaginaLineaLubricante`):
+
+1. **Cabecera** de las páginas índice (`HeroMarca` con `indice`, sin franja, como la plantilla):
+   - fondo: la «Imagen de cabecera» de la línea (campo nuevo) o, vacía, su «Imagen» (la foto de su tarjeta, del
+     WordPress del cliente); sin ninguna, el fondo oscuro;
+   - **migas visibles** encima del logo («Inicio / Lubricantes Eni / Motos & Scooter», los items del `BreadcrumbList`;
+     la plantilla pinta «Lubricantes ENI» en ese sitio);
+   - el logo (`LogoMarca`), «Lubricantes {línea}» revelado por palabras en el único `<h1>`, el texto (la entradilla de
+     la línea o, vacía, la de la marca) y el icono del ratón.
+2. **Productos por grupos** (`ProductosLinea`): una barra blanca de 30 px de radio por grupo con su título y las
+   tarjetas debajo (foto, «NOMBRE GRADO», «Cotizar» y «Ficha técnica»). **Regla de tarjetas:** 4 por fila en
+   escritorio, 2 en tablet, 1 en móvil, mismo ancho y la última fila centrada.
+   - **«Cotizar»** abre la ventana emergente con el producto como referencia («Lubricante Eni I-RIDE RACING 5W-40»;
+     tipo «cotización», con Ciudad y «¿Qué necesitas?»). Sin JavaScript, baja al formulario.
+   - **«Ficha técnica»** abre el PDF en nuestro visor si el documento tiene «Páginas como imágenes»; si no, en otra
+     pestaña. Sin PDF, sin botón (hoy 3 productos: I-RIDE RACING 10W-60, I-SINT 10W-40 y MULTITECH CT PLUS 10W). Las
+     páginas se generan con `visor.ts fichas … de=lubricantes`.
+3. **Nuestro formulario** al final, como en la página de la marca (`BloqueLubricantes`), sin «Ver catálogo».
+
+SEO: título por defecto «{línea} | Lubricantes {marca}» (`tituloPorDefecto.categoriaLubricante`, editable en
+«Buscadores y redes sociales» de la línea, que ya no dice «sin página»), descripción = la del texto de la cabecera,
+canónica, `BreadcrumbList` (Inicio › Lubricantes Eni › línea) y entrada en el sitemap. Revalida al guardar la línea, su
+marca, «Páginas índice y contacto» o un documento.
+
+**Grupos: los de los datos.** Motos & Scooter («mOTO & SCOOTER», «REFRIGERACIÓN») y Engranajes (9 grupos, p. ej.
+«TRANSMISIONES», «HIDRÁULICOS · OSO») los tienen. **Auto liviano y Auto pesado no tienen grupos**: sus productos van en
+una sola rejilla, sin barra (el `<h1>` ya nombra la línea), en el orden del panel. Para darles grupos basta con
+rellenar «Grupo» en sus productos. Los títulos se pintan en tipo frase («Moto & scooter», «Refrigeración»), como la
+plantilla, sin tocar el dato de WordPress (que va en mayúsculas, con la errata «mOTO»).
+
+**Página de la marca** (`/lubricantes/lubricantes-eni/`): sin los listados; quedan la cabecera, las 4 tarjetas
+(«Ver todo» a cada página) y el bloque final, **sin «Ver catálogo»** (en `/lubricantes/` se queda). **Las anclas
+viejas** (`#auto-liviano`…) que haya enlazadas desde fuera llevan a su página con un script en línea al principio de la
+página (`scriptAnclasALineas`, `location.replace`; el ancla no llega al servidor).
+
+**Orden de las líneas:** campo «Orden» nuevo (en la página de la marca y en el megamenú; sin orden, por nombre). La
+migración lo pone como la plantilla: Motos & Scooter, Auto liviano, Auto pesado, Engranajes.
+
+**Megamenú:** «Enlace en el menú» vacío lleva ahora a la página de la línea (antes, a su ancla). No hay que tocar el
+dato.
+
+**Desviaciones:**
+
+- **`Moto.jpg` y el logo «iRide» (`Recurso-21`) de la plantilla no se usan:** no están en el WordPress del cliente
+  (son del sitio de diseño, 2026-10). La cabecera usa la foto de la línea, y la barra del grupo va sin imagen: los datos
+  no tienen logo de sublínea (habría que añadir un campo).
+- **La última fila, centrada** (la plantilla la deja a la izquierda y con otro ancho), por la regla de tarjetas.
+- **«Ficha técnica» en una línea** (a 1440 la plantilla la parte en dos).
+- La plantilla cierra con una caja roja con «WhatsApp»; aquí va nuestro formulario (dirección).
+
+**Interruptor:** con «Diseño propio» marcado, la marca sigue pintando el #260 con las líneas como secciones; las
+páginas de línea existen igual.

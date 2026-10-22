@@ -14,6 +14,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getMarcaPorSlug, getMarcas } from "@/lib/queries/getMarcas";
+import { getModelosDeMarca, getModelosPorIds } from "@/lib/queries/getModelos";
 import {
   getCategoriasParaMarca,
   getRepuestosMarca,
@@ -22,6 +23,7 @@ import {
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { categoriasDeMarca, tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
+import { idsDeOtrasEntradas, listaDeModelos } from "@/lib/repuestos/tipo";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
@@ -67,14 +69,25 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
   const marca = await getMarcaPorSlug(marcaSlug);
   if (!marca) notFound();
 
-  const [global, tipos, categorias, testimonios, empresa, sedes] = await Promise.all([
+  const [global, tipos, categorias, testimonios, empresa, sedes, modelos] = await Promise.all([
     getRepuestosMarca(),
     getTiposDeMarcaConImagen(marca.id),
     getCategoriasParaMarca(),
     getTestimoniosDePortada(),
     getEmpresa(),
     getSedesDePortada(),
+    getModelosDeMarca(marca.id),
   ]);
+  // El panel «Ver todo» de cada tarjeta lista lo mismo que la página del tipo, con las
+  // «otras entradas» de WordPress (dirección, 2026-10-21).
+  const enlazados = await getModelosPorIds(idsDeOtrasEntradas(tipos));
+  const modelosDe = (tipo: (typeof tipos)[number]) =>
+    listaDeModelos(
+      marca,
+      tipo,
+      modelos.filter((m) => (typeof m.tipo === "number" ? m.tipo : m.tipo?.id) === tipo.id),
+      enlazados,
+    );
 
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const breadcrumbs = [
@@ -103,7 +116,7 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
         id="repuestos-marca-tipos"
         titulo={texto(global.tituloTipos)}
         verTodo={texto(global.verTodoTexto)}
-        tarjetas={tarjetasDeTipos(marca, tipos)}
+        tarjetas={tarjetasDeTipos(marca, tipos, modelosDe)}
         // El estilo «difuminado» de las tarjetas del sitio (dirección, 2026-10-21).
         indice
       />

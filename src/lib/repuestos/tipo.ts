@@ -2,11 +2,11 @@ import type { Marca, ModelosRepuesto, RepuestosMarca, TiposEquipo } from "@/payl
 
 import { rutas } from "../routes";
 import { tipoEnTitulo } from "../seo/porDefecto";
-import { imagenDeMedia } from "../utils/relations";
+import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 
 import { segmentoDeTipo } from "./anidado";
-import { logoConAlt, type VistaEncabezado } from "./marca";
-import { agruparPorSerie, seriesDeTipo, type GrupoDeModelos } from "./series";
+import { logoConAlt, type TarjetaMarca, type VistaEncabezado } from "./marca";
+import { agruparPorSerie, claveSerie, seriesDeTipo, type GrupoDeModelos } from "./series";
 
 /**
  * Lógica pura de la página de TIPO de repuestos (PROVISIONAL hasta el diseño
@@ -47,6 +47,8 @@ export type ModeloEnlace = {
   href: string | null;
   /** La serie que eligió el editor (solo cuenta si el tipo tiene series). */
   serie: string | null;
+  /** La primera de sus «Imágenes» (decorativa en la tarjeta); sin ella o sin poblar, `null`. */
+  imagen?: ImagenLista | null;
 };
 
 /** Un enlace por modelo, a su ficha. Uno sin nombre o sin slug no sale. */
@@ -67,6 +69,7 @@ export function enlacesDeModelos(
         codigo: codigo && !nombre.toLowerCase().includes(codigo.toLowerCase()) ? codigo : null,
         href: rutas.modelo(marca.slug, segmentoDeTipo(tipo), m.slug),
         serie: texto(m.serie) || null,
+        imagen: imagenDeMedia(m.imagenes?.[0], ""),
       };
     });
 }
@@ -95,6 +98,7 @@ export function conOtrasEntradas(
         codigo: null,
         href: id === null ? null : hrefDeModelo(id),
         serie: texto(e.serie) || null,
+        imagen: null,
       },
     ];
   });
@@ -102,6 +106,34 @@ export function conOtrasEntradas(
   return [...modelos, ...otras].sort((a, b) =>
     a.nombre.localeCompare(b.nombre, "es", { numeric: true, sensitivity: "base" }),
   );
+}
+
+/** Los ids de las fichas a las que enlazan las «otras entradas» de unos tipos (pueden ser de otro tipo). */
+export function idsDeOtrasEntradas(tipos: TiposEquipo[]): number[] {
+  return tipos.flatMap((t) =>
+    (t.otrasEntradas ?? []).flatMap((e) =>
+      typeof e.modelo === "number" ? [e.modelo] : e.modelo ? [e.modelo.id] : [],
+    ),
+  );
+}
+
+/**
+ * La lista COMPLETA de un tipo, la misma en su página y en el panel «Ver todo» de la
+ * marca: sus modelos y sus «otras entradas». `enlazados` son las fichas de esas entradas,
+ * con su marca y su tipo poblados (`getModelosPorIds`).
+ */
+export function listaDeModelos(
+  marca: Marca,
+  tipo: TiposEquipo,
+  modelos: ModelosRepuesto[],
+  enlazados: ModelosRepuesto[],
+): ModeloEnlace[] {
+  return conOtrasEntradas(tipo, enlacesDeModelos(marca, tipo, modelos), (id) => {
+    const m = enlazados.find((x) => x.id === id);
+    const mMarca = poblado<Marca>(m?.marca);
+    const mTipo = poblado<TiposEquipo>(m?.tipo);
+    return m && mMarca && mTipo ? rutas.modelo(mMarca.slug, segmentoDeTipo(mTipo), m.slug) : null;
+  });
 }
 
 /**
@@ -113,4 +145,30 @@ export function gruposDeModelos(
   modelos: ModeloEnlace[],
 ): GrupoDeModelos<ModeloEnlace>[] | null {
   return agruparPorSerie(seriesDeTipo(tipo), modelos, (m) => m.serie);
+}
+
+/**
+ * Los modelos como TARJETAS de la página de tipo (dirección, 2026-10-21): el estilo
+ * «difuminado» de las páginas índice, con el nombre de la lista como título, el código
+ * debajo (si lo hay) y el botón a su ficha. Mismo contenido y mismos destinos que la
+ * lista de botones de antes; una entrada sin ficha, sin botón.
+ *
+ * Foto: la del modelo (la primera de sus «Imágenes»); sin ella, la de su serie y, si no,
+ * la del tipo, las mismas que llevan sus tarjetas en la página de la marca.
+ */
+export function tarjetasDeModelos(tipo: TiposEquipo, modelos: ModeloEnlace[]): TarjetaMarca[] {
+  const fotoTipo = imagenDeMedia(tipo.imagen, "");
+  const fotoSerie = (serie: string | null) => {
+    if (!serie) return null;
+    const fila = tipo.series?.find((f) => claveSerie(f.nombre) === claveSerie(serie));
+    return imagenDeMedia(fila?.imagen, "");
+  };
+  return modelos.map((m) => ({
+    clave: `modelo-${m.id}`,
+    titulo: m.nombre,
+    href: m.href,
+    imagen: m.imagen ?? fotoSerie(m.serie) ?? fotoTipo,
+    soloEscritorio: false,
+    ...(m.codigo ? { detalle: m.codigo } : {}),
+  }));
 }

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
+import { VerTodosEquipos } from "@/components/nueva/VerTodosEquipos";
 import type { TarjetaMarca } from "@/lib/repuestos/marca";
 
 import estilos from "./marca.module.css";
@@ -51,8 +52,6 @@ export function TarjetasMarca({
 }) {
   if ((!titulo && !indice) || tarjetas.length === 0) return null;
   const idTitulo = `${id}-titulo`;
-  // Sin título de sección (páginas índice) las tarjetas cuelgan del h1: h2, no h3.
-  const Nivel = titulo ? "h3" : "h2";
   return (
     <section
       id={id}
@@ -65,66 +64,123 @@ export function TarjetasMarca({
           {titulo}
         </h2>
       ) : null}
-      <ul
-        className={`${estilos.rejilla} ${estilos.rejillaTarjetas} ${cuatroEnUnaFila ? estilos.rejillaCuatroEnUnaFila : ""}`}
-      >
-        {tarjetas.map((t) => {
-          const idT = `${id}-${t.clave}`;
-          return (
-            <li
-              key={t.clave}
-              className={`${estilos.tarjeta} ${t.soloEscritorio ? estilos.soloEscritorio : ""}`}
-            >
-              {t.logo ? (
-                <div className={estilos.foto}>
-                  <LogoMarca
-                    logo={t.logo}
-                    alt=""
-                    fill
-                    sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
-                    className={`${estilos.fotoImg} ${estilos.fotoLogo}`}
-                  />
-                </div>
-              ) : t.imagen ? (
-                <div className={estilos.foto}>
-                  <Image
-                    src={t.imagen.url}
-                    alt=""
-                    fill
-                    sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
-                    className={estilos.fotoImg}
-                    style={{ objectPosition: t.imagen.posicion }}
-                  />
-                </div>
-              ) : null}
-              <div
-                className={estilos.panel}
-                data-con-foto={t.imagen || t.logo ? "" : undefined}
-                // En los índices, el recuadro se desplaza con el scroll (`RecuadrosConScroll`).
-                data-recuadro-scroll={indice && (t.imagen || t.logo) ? "" : undefined}
-              >
-                <Nivel id={idT} className={estilos.tituloTarjeta}>
-                  {t.titulo}
-                </Nivel>
-                {t.detalle ? <p className={estilos.detalleTarjeta}>{t.detalle}</p> : null}
-                {verTodo ? (
-                  <Link href={t.href} aria-describedby={idT} className={estilos.botonTarjeta}>
-                    {/* En los índices, la flecha maciza del export (fa-arrow-right) a su tamaño. */}
-                    <IconArrowRight
-                      aria-hidden="true"
-                      focusable="false"
-                      stroke={indice ? 3 : 2}
-                      size={indice ? 16 : 14}
-                    />
-                    {verTodo}
-                  </Link>
-                ) : null}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      <RejillaTarjetas
+        id={id}
+        tarjetas={tarjetas}
+        verTodo={verTodo}
+        indice={indice}
+        nivel={titulo ? "h3" : "h2"}
+        cuatroEnUnaFila={cuatroEnUnaFila}
+      />
       {indice ? <RecuadrosConScroll /> : null}
     </section>
+  );
+}
+
+/**
+ * La REJILLA de tarjetas (la lista), también suelta: la página de tipo pinta una por serie
+ * (`ModelosTipo`). `nivel` es el de los títulos de las tarjetas: sin título de sección (páginas
+ * índice) cuelgan del h1 (h2); bajo un título de sección, h3; bajo el de una serie, h4.
+ *
+ * El botón: con `panel` (marca de repuestos), «Ver todo» abre el panel con los modelos de la
+ * tarjeta (`VerTodosEquipos`) y, sin JavaScript, lleva a `href`; sin `href` (un modelo sin
+ * ficha), la tarjeta no lleva botón.
+ */
+export function RejillaTarjetas({
+  id,
+  tarjetas,
+  verTodo,
+  indice = false,
+  nivel: Nivel,
+  cuatroEnUnaFila = false,
+}: {
+  id: string;
+  tarjetas: TarjetaMarca[];
+  verTodo: string;
+  indice?: boolean;
+  nivel: "h2" | "h3" | "h4";
+  /** Ver `TarjetasMarca`. */
+  cuatroEnUnaFila?: boolean;
+}) {
+  return (
+    <ul
+      className={`${estilos.rejilla} ${estilos.rejillaTarjetas} ${cuatroEnUnaFila ? estilos.rejillaCuatroEnUnaFila : ""}`}
+    >
+      {tarjetas.map((t) => {
+        const idT = `${id}-${t.clave}`;
+        // En los índices, la flecha maciza del export (fa-arrow-right) a su tamaño.
+        const flecha = (
+          <IconArrowRight
+            aria-hidden="true"
+            focusable="false"
+            stroke={indice ? 3 : 2}
+            size={indice ? 16 : 14}
+          />
+        );
+        return (
+          <li
+            key={t.clave}
+            className={`${estilos.tarjeta} ${t.soloEscritorio ? estilos.soloEscritorio : ""}`}
+          >
+            {t.logo ? (
+              <div className={estilos.foto}>
+                <LogoMarca
+                  logo={t.logo}
+                  alt=""
+                  fill
+                  sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
+                  className={`${estilos.fotoImg} ${estilos.fotoLogo}`}
+                />
+              </div>
+            ) : t.imagen ? (
+              <div className={estilos.foto}>
+                <Image
+                  src={t.imagen.url}
+                  alt=""
+                  fill
+                  sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
+                  className={estilos.fotoImg}
+                  style={{ objectPosition: t.imagen.posicion }}
+                />
+              </div>
+            ) : null}
+            <div
+              className={estilos.panel}
+              data-con-foto={t.imagen || t.logo ? "" : undefined}
+              // En los índices, el recuadro se desplaza con el scroll (`RecuadrosConScroll`).
+              data-recuadro-scroll={indice && (t.imagen || t.logo) ? "" : undefined}
+            >
+              <Nivel id={idT} className={estilos.tituloTarjeta}>
+                {t.titulo}
+              </Nivel>
+              {t.detalle ? <p className={estilos.detalleTarjeta}>{t.detalle}</p> : null}
+              {verTodo && t.href && t.panel ? (
+                <VerTodosEquipos
+                  titulo={t.panel.titulo}
+                  href={t.href}
+                  total={t.panel.total}
+                  equipos={t.panel.elementos}
+                  className={estilos.botonTarjeta}
+                  etiqueta={
+                    <>
+                      {flecha}
+                      {verTodo}
+                    </>
+                  }
+                  describedBy={idT}
+                  enlacePagina={t.panel.enlacePagina}
+                  acento={t.panel.acento}
+                />
+              ) : verTodo && t.href ? (
+                <Link href={t.href} aria-describedby={idT} className={estilos.botonTarjeta}>
+                  {flecha}
+                  {verTodo}
+                </Link>
+              ) : null}
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

@@ -2,11 +2,20 @@
 
 import { IconArrowRight, IconCircleCheck, IconX } from "@tabler/icons-react";
 import Link from "next/link";
-import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
-
-import type { TarjetaEquipo } from "@/lib/nueva/paginaMarcaAndres";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 
 import panel from "./panelEquipos.module.css";
+
+/** Una fila del panel. Sin `href`, el nombre como texto (un modelo que WordPress nombra sin página). */
+export type ElementoPanel = { id: number | string; nombre: string; href: string | null };
 
 /**
  * «VER TODOS (N)»: abre un PANEL que sube desde la parte inferior de la pantalla con el
@@ -20,6 +29,11 @@ import panel from "./panelEquipos.module.css";
  * anunciado y la página de detrás inerte. Se añade la X y el clic fuera. El foco vuelve
  * al enlace «Ver todos» al cerrar; al abrir, el foco va al título del panel. El contenido se monta en el primer clic; cerrado no ocupa sitio.
  * Con «reducir movimiento» no hay barrido: un fundido.
+ *
+ * También lo usa la página de MARCA DE REPUESTOS (dirección, 2026-10-21): el «Ver todo» de
+ * cada tarjeta de tipo o serie abre el panel con sus modelos (`etiqueta`, `describedBy`), con
+ * un enlace discreto a la página completa del tipo (`enlacePagina`) y la barra en el color de
+ * la marca (`acento`).
  */
 export function VerTodosEquipos({
   titulo,
@@ -27,12 +41,24 @@ export function VerTodosEquipos({
   total,
   equipos,
   className,
+  etiqueta,
+  describedBy,
+  enlacePagina,
+  acento,
 }: {
   titulo: string;
   href: string;
   total: number;
-  equipos: TarjetaEquipo[];
+  equipos: ElementoPanel[];
   className?: string;
+  /** El contenido del enlace; por defecto «Ver todos (N)». */
+  etiqueta?: ReactNode;
+  /** `aria-describedby` del enlace (la tarjeta a la que pertenece). */
+  describedBy?: string;
+  /** Texto de un enlace discreto, al pie del panel, a la página completa (`href`). */
+  enlacePagina?: string;
+  /** Color de la barra del panel; sin él, el `--acento` de la página o un gris oscuro. */
+  acento?: string | null;
 }) {
   const [montado, setMontado] = useState(false);
   const [abierto, setAbierto] = useState(false);
@@ -83,14 +109,16 @@ export function VerTodosEquipos({
         className={className}
         onClick={alPulsar}
         aria-haspopup="dialog"
+        aria-describedby={describedBy}
       >
-        Ver todos ({total})
+        {etiqueta ?? `Ver todos (${total})`}
       </Link>
       {montado ? (
         <dialog
           ref={dialogo}
           className={panel.panel}
           aria-labelledby={idTitulo}
+          style={acento ? ({ "--acento": acento } as CSSProperties) : undefined}
           data-panel-equipos=""
           data-cerrando={cerrando ? "" : undefined}
           // Esc: el cierre pasa por la animación de bajada.
@@ -129,18 +157,34 @@ export function VerTodosEquipos({
               <ul className={panel.lista}>
                 {equipos.map((e) => (
                   <li key={e.id}>
-                    <Link href={e.href} className={panel.item}>
-                      <span className={panel.marca} aria-hidden="true">
-                        <IconCircleCheck focusable="false" stroke={1.9} size={26} />
+                    {e.href ? (
+                      <Link href={e.href} className={panel.item}>
+                        <span className={panel.marca} aria-hidden="true">
+                          <IconCircleCheck focusable="false" stroke={1.9} size={26} />
+                        </span>
+                        <span className={panel.nombreItem}>{e.nombre}</span>
+                        <span className={panel.flecha} aria-hidden="true">
+                          <IconArrowRight focusable="false" stroke={2.2} size={22} />
+                        </span>
+                      </Link>
+                    ) : (
+                      <span className={`${panel.item} ${panel.itemSinEnlace}`}>
+                        <span className={panel.marca} aria-hidden="true">
+                          <IconCircleCheck focusable="false" stroke={1.9} size={26} />
+                        </span>
+                        <span className={panel.nombreItem}>{e.nombre}</span>
                       </span>
-                      <span className={panel.nombreItem}>{e.nombre}</span>
-                      <span className={panel.flecha} aria-hidden="true">
-                        <IconArrowRight focusable="false" stroke={2.2} size={22} />
-                      </span>
-                    </Link>
+                    )}
                   </li>
                 ))}
               </ul>
+              {enlacePagina ? (
+                <p className={panel.pie}>
+                  <Link href={href} className={panel.enlacePagina}>
+                    {enlacePagina}
+                  </Link>
+                </p>
+              ) : null}
             </div>
           </div>
         </dialog>

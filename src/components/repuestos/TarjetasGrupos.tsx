@@ -17,7 +17,7 @@ import { RecuadrosConScroll } from "./RecuadrosConScroll";
  * - «Cotizar»: los productos no tienen página propia, así que abre la VENTANA del formulario con
  *   el grupo ya escrito en «¿Qué necesitas?» (`mensajeCotizar`). Sin JavaScript baja al
  *   formulario de la página (`anclaContacto`).
- * - «Ver productos (N)», en la misma fila (dirección, 2026-10-22): abre el MISMO panel que sube
+ * - «Ver productos», en la misma fila (dirección, 2026-10-22): abre el MISMO panel que sube
  *   desde abajo del «Ver todo» de las marcas (`VerTodosEquipos`), con el grupo y su número, y los
  *   productos como texto, sin enlaces (en WordPress no tienen página). La lista está además en el
  *   HTML de la página para Google; solo se ve sin JavaScript (`productosSinJs`), y el botón lleva a
@@ -99,7 +99,7 @@ export function TarjetasGrupos({
                     total={g.productos.length}
                     equipos={g.productos.map((p, i) => ({ id: i, nombre: p, href: null }))}
                     className={`${estilos.botonTarjeta} ${estilos.botonSecundario}`}
-                    etiqueta={`Ver productos (${g.productos.length})`}
+                    etiqueta="Ver productos"
                     describedBy={idT}
                   />
                 </div>

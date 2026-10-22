@@ -204,7 +204,7 @@ la de Bobcat), adaptada. URL, SEO, JSON-LD y migas no cambian.
 | Sección                                             | Qué lleva                                                                                                                                                                                        |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Cabecera                                            | `HeroMarca` sin logo y **con el contenido centrado en vertical** (`centrado`: título, subtítulo, texto y ratón), sin la franja de color detrás (`franja={false}`). El ratón baja a «Qué incluye» |
-| «Qué incluye …»                                     | **Tarjetas difuminadas** (las de los índices) una por grupo, con su foto de WordPress, el nombre tal cual y, **en la misma fila**, «Cotizar» y «Ver productos (N)» (`TarjetasGrupos`)            |
+| «Qué incluye …»                                     | **Tarjetas difuminadas** (las de los índices) una por grupo, con su foto de WordPress, el nombre tal cual y, **en la misma fila**, «Cotizar» y «Ver productos» (`TarjetasGrupos`)                |
 | Contacto, testimonios, «¿Por qué elegirnos?», sedes | Como la marca. «¿Por qué elegirnos?» no sale sin foto; sin marca, un cierre con `{marca}` tampoco                                                                                                |
 
 **Sin «Nuestras categorías de repuestos»** (las píldoras; dirección, 2026-10-22: en las marcas se
@@ -216,8 +216,8 @@ lista), así que abre la ventana del formulario con el grupo escrito en «¿Qué
 (`mensajeCotizar`; el nombre pasa a tipo frase solo en el mensaje). Sin JavaScript baja al
 formulario de la página.
 
-**«Ver productos (N)»:** abre el **mismo panel que sube desde abajo** del «Ver todo» de las marcas
-(`VerTodosEquipos`): el grupo y su número de título, y los productos como **texto, sin enlaces**.
+**«Ver productos»:** abre el **mismo panel que sube desde abajo** del «Ver todo» de las marcas
+(`VerTodosEquipos`): el grupo y su número de productos de título (el botón, sin número: dirección, 2026-10-22), y los productos como **texto, sin enlaces**.
 Misma animación, foco al título, Escape y el foco vuelve al botón. La lista está además en el HTML
 de la tarjeta (Google); con JavaScript no se pinta (`productosSinJs`) y sin JavaScript se ve, y
 «Ver productos» lleva a ella.

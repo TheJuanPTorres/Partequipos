@@ -252,7 +252,7 @@ export function PlantillaListado<T>({
       ) : null}
 
       {pestanasEnLateral ? (
-        <div className={estilos.columnaResultados}>
+        <div className={estilos.columnaResultados} data-inicio-listado="">
           {barra}
           {resultados}
         </div>

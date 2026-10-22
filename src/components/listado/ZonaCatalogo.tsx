@@ -13,6 +13,23 @@ const ATRIBUTO_NAVEGACION = "data-catalogo-nav";
  */
 let focoPendiente: { titulo: boolean; origen: Element | null } | null = null;
 
+/** Espacio que deja la cabecera fija al subir hasta el listado. */
+const MARGEN_CABECERA = 110;
+
+/**
+ * Si el inicio del listado ha quedado por encima de la vista (al cambiar de
+ * categoría desde abajo), la página sube hasta él; suave, salvo con
+ * «reducir movimiento».
+ */
+function subirAlListado(zona: HTMLElement | null) {
+  const listado = zona?.querySelector("[data-inicio-listado]") ?? zona;
+  if (!listado) return;
+  const arriba = listado.getBoundingClientRect().top;
+  if (arriba >= MARGEN_CABECERA) return;
+  const reducir = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  scrollTo({ top: scrollY + arriba - MARGEN_CABECERA, behavior: reducir ? "auto" : "smooth" });
+}
+
 /**
  * La zona del catálogo de los listados de usados (cliente, 2026-10-21): al
  * cambiar de categoría, de filtro, de orden o de página solo se actualiza el
@@ -51,6 +68,7 @@ export function ZonaCatalogo({
     focoPendiente = null;
     if (!pendiente) return;
     const origen = pendiente.origen;
+    if (pendiente.titulo) subirAlListado(zona.current);
     if (pendiente.titulo || !origen?.isConnected) {
       document.getElementById("listado-titulo")?.focus({ preventScroll: true });
     } else if (origen instanceof HTMLElement && document.activeElement !== origen) {
@@ -78,9 +96,12 @@ export function ZonaCatalogo({
         const url = new URL(a.href, location.href);
         if (url.origin !== location.origin) return;
         e.preventDefault();
+        // Un desplegable («Ordenar») se cierra al elegir; el foco vuelve a su botón.
+        const desplegable = a.closest("details");
+        desplegable?.removeAttribute("open");
         // Otra categoría u otra página: el foco, al título del listado.
         const titulo = url.pathname !== location.pathname;
-        navegar(url.pathname + url.search, titulo, a);
+        navegar(url.pathname + url.search, titulo, desplegable?.querySelector("summary") ?? a);
       }}
       onSubmitCapture={(e) => {
         const form = e.target as HTMLFormElement;

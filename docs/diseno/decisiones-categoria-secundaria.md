@@ -70,3 +70,57 @@ Análisis previo: `Desktop\partequipos-cierre\propuestas\2026-10-14-categoria-se
 - **Filtros:** con el de Hitachi, «18 de 80» y la canónica a la página sin filtros. Una query mal escrita (`?marca=HITACHI&orden=recomendados`) redirige (308) a `?marca=hitachi`.
 - **Pintado a 390, 1010 y 1440:** composición de ux-9 en escritorio y en móvil; a 1010, la de móvil.
 - **Fallo encontrado al medir:** las tarjetas salían sin foto. Con `select`, Payload devuelve `url: null` si no se pide `filename`. Arreglado aquí, y en el listado de usados con su propio PR (#141, con un guardarraíl).
+
+## Maquinaria nueva sin marketplace (2026-10-22, dirección)
+
+**En maquinaria nueva no hay marketplace ni catálogo con filtros en NINGUNA página** (el marketplace es solo para
+usados). Lo de arriba (la «Categoría secundaria» en nueva) queda sustituido:
+
+- **Índice** `/maquinaria-pesada/maquinaria-pesada-nueva/`: la plantilla de índices de Andrés, como `/maquinaria-pesada/`
+  (`IndiceTarjetas`). Lleva la cabecera y **dos tarjetas** centradas, «Por marca» → `…/nueva/marcas/` y «Por tipo de
+  máquina» → `…/nueva/tipos/`.
+  - **Fotos, de las que ya había** (sin campo nuevo):
+    - «Por marca»: la «Imagen de la tarjeta» de la primera marca que la tenga, por nombre y sin «Aditamentos»;
+    - «Por tipo»: la de la primera tarjeta de tipos con foto.
+  - Mismo título y descripción que antes: el SEO no cambia. La plantilla no lleva formulario.
+- **Índice de tipos** `…/nueva/tipos/` (**URL NUEVA, fijada por dirección**; no existía ni aquí ni en WordPress, donde el
+  índice de nueva hacía de índice de tipos): una tarjeta por tipo (`src/lib/nueva/indiceTipos.ts`).
+  - Un tipo de **varias marcas** va a su **categoría** (Excavadoras, Cargadores, Compactadores).
+  - Uno de **una sola marca** va a su página de tipo, si el tipo tiene marcada la casilla «Tarjeta en el índice de
+    tipos de maquinaria nueva» (antes «Pestaña en el índice…»; mismo campo, sin esquema). Un «paraguas» (Pavimentadoras
+    de Dynapac) cuenta los equipos de los tipos que agrupa.
+  - **«Aditamentos»** va al final.
+  - Foto: la «Imagen de la tarjeta» del tipo o, vacía, la del primer equipo con foto.
+- **Categorías que mezclan marcas** `…/nueva/<categoria>/`: como la página de tipo de nueva (#310). Llevan la cabecera,
+  las tarjetas de equipo (`TarjetaEquipo`, sin tocarlo) **agrupadas por marca y tipo** con su subtítulo («Excavadoras
+  Hitachi», `src/lib/nueva/paginaCategoria.ts`), la regla de tarjetas y el formulario al final. Mismo `<h1>`, título,
+  descripción y canónica que antes.
+- **Megamenú «Maquinaria pesada nueva → Por tipo de máquina»**: TODOS los tipos, cada uno a su página (de tipo o de
+  categoría). «Aditamentos» sigue con su entrada propia.
+  - **Orden de la web antigua** (`src/lib/nueva/ordenTipos.ts`): Bulldozer, Excavadoras, Motoniveladoras,
+    Miniexcavadoras, Minicargadores, Retrocargadoras, Compactadores, Pavimentadoras y Cargadores. Un tipo nuevo que no
+    esté en la lista va detrás, por nombre. El mismo orden en el índice de tipos.
+  - **Una entrada por tipo** (`unaEntradaPorTipo`): si una categoría y un tipo se llaman igual, gana la categoría solo
+    si mezcla marcas.
+
+**Las URL de antes no dan 404:**
+
+- `…/nueva/pagina/<n>/` y `…/nueva/<categoria>/pagina/<n>/` → **301** al índice o a la categoría, con o sin filtros
+  (manejadores de ruta, fuera del sitemap);
+- con filtros en la query (`?marca=…`, `?orden=…`), la misma página, con la canónica sin query.
+
+`marcas`, `tipos` y `pagina` quedan **reservadas** como dirección de una categoría de nueva
+(`src/lib/nueva/slugsReservados.ts`). Las páginas son estáticas: las revalidan los cambios de marca, tipo, equipo y
+categoría (las categorías, por el patrón de su ruta). Desaparecen `ListadoNueva` y `src/lib/nueva/listado.ts`. Las
+fichas y sus URL no cambian.
+
+**Datos del sitio publicado (hallazgo, 2026-10-22):** alguien montó el «Por tipo» del menú creando categorías a mano.
+
+- **Excavadoras** tiene por dirección una URL pegada, y por eso **`/…/nueva/excavadoras/` (de WordPress) da 404**.
+- Hay más direcciones pegadas (Bulldozer, Motoniveladoras, Pavimentadoras) y categorías vacías o con erratas
+  (`compactadoras`, `minicargasoras`, `miniexcavadoras`, `retrocargadores`).
+- «Cargadores» incluye los minicargadores.
+
+Se limpia desde el panel con `runbook-nueva-tipos-y-categorias.md`, que deja las tres de WordPress, borra el resto con
+sus 301, y marca las casillas de Minicargadores (CASE) y Pavimentadoras (Dynapac), que el índice de WordPress tenía.
+En el preview ya están marcadas.

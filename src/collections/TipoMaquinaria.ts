@@ -88,10 +88,11 @@ export const TipoMaquinaria: CollectionConfig = {
       name: "pestanaIndiceNueva",
       type: "checkbox",
       defaultValue: false,
-      label: "Pestaña en el índice de maquinaria nueva",
+      // Solo la etiqueta y la ayuda cambian (2026-10-22): el campo y su columna son los de siempre.
+      label: "Tarjeta en el índice de tipos de maquinaria nueva",
       admin: {
         description:
-          "Marcada, el índice de maquinaria nueva enseña una pestaña con el nombre de este tipo que lleva a su página. Solo sale si el tipo tiene equipos.",
+          "Marcada, el índice de tipos de maquinaria nueva (y las pestañas de las categorías de nueva) enseña una tarjeta con el nombre de este tipo que lleva a su página. Para un tipo de UNA sola marca; los de varias marcas van por su categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.",
       },
     },
     seoField(),

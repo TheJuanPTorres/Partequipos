@@ -105,9 +105,9 @@ describe("buildSitemapEntries", () => {
   it("incluye portada, índices y una entrada por entidad", () => {
     const e = buildSitemapEntries(datos, AHORA);
     // 1 portada + 3 índices de repuestos (principal, marcas y categorías)
-    // + 4 índices de maquinaria + 1 índice de blog + 1 institucional
-    // + 1 marca + 1 tipo + 1 modelo + la página general de lubricantes (2026-10-20)
-    assert.equal(e.length, 14);
+    // + 5 índices de maquinaria (con el de tipos de nueva, 2026-10-22) + 1 índice de blog
+    // + 1 institucional + 1 marca + 1 tipo + 1 modelo + la página general de lubricantes (2026-10-20)
+    assert.equal(e.length, 15);
   });
 
   it("no anuncia una página que redirige con REDIRECTS_FIJOS (2026-10-17)", () => {
@@ -124,7 +124,7 @@ describe("buildSitemapEntries", () => {
     );
     // Las demás institucionales siguen.
     assert.ok(e.some((x) => new URL(x.url).pathname === "/nosotros/"));
-    assert.equal(e.length, 14);
+    assert.equal(e.length, 15);
   });
 
   it("lista la página de cada unidad usada disponible, bajo su categoría", () => {
@@ -226,9 +226,9 @@ describe("buildSitemapEntries", () => {
     );
 
     // Sin documento de portada no se lista `/`: quedan los 3 índices de
-    // repuestos, los 4 de maquinaria, el del blog y la general de lubricantes,
+    // repuestos, los 5 de maquinaria, el del blog y la general de lubricantes,
     // que son rutas estáticas y existen aunque no haya contenido.
-    assert.equal(e.length, 9);
+    assert.equal(e.length, 10);
     assert.equal(e[0]?.lastModified.getTime(), AHORA.getTime());
     for (const entrada of e) assert.match(entrada.url, /^https:\/\//);
   });

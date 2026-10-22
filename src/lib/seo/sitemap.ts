@@ -74,6 +74,8 @@ export const PATRONES_SITEMAP = [
   "/maquinaria-pesada/maquinaria-pesada-nueva",
   "/maquinaria-pesada/maquinaria-pesada-nueva/[categoria]",
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas",
+  // El índice de tipos de nueva (2026-10-22, URL nueva).
+  "/maquinaria-pesada/maquinaria-pesada-nueva/tipos",
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]",
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]",
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
@@ -121,15 +123,6 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
     "paginación: se llega desde la página 1 de la categoría",
   "/maquinaria-pesada/maquinaria-pesada-usada/marcas/[marca]/pagina/[pagina]":
     "paginación: se llega desde la página 1 de la marca",
-  /*
-   * Lo mismo en los listados de maquinaria NUEVA («Categoría secundaria»,
-   * src/lib/nueva/listado.ts): el índice y cada categoría están en el
-   * sitemap; sus páginas siguientes se descubren desde la 1.
-   */
-  "/maquinaria-pesada/maquinaria-pesada-nueva/pagina/[pagina]":
-    "paginación: se llega desde la página 1 del índice de nueva",
-  "/maquinaria-pesada/maquinaria-pesada-nueva/[categoria]/pagina/[pagina]":
-    "paginación: se llega desde la página 1 de la categoría",
   /*
    * Lo mismo en el blog (2026-10-21, plantilla «Blog» de Andrés): el índice y cada
    * categoría están en el sitemap; sus páginas siguientes se descubren desde la 1.
@@ -307,6 +300,12 @@ export function buildSitemapEntries(
     {
       url: absoluteUrl(rutas.marcasMaquinaria()),
       lastModified: masReciente(marcasMaquinaria, ahora),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: absoluteUrl(rutas.nuevaTipos()),
+      lastModified: masReciente(maquinariaTodo, ahora),
       changeFrequency: "weekly",
       priority: 0.8,
     },

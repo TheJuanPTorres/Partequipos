@@ -71,6 +71,8 @@ import {
  */
 export const PATRONES_DE_PAGINA = {
   fichasNuevas: "/(site)/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]/[modelo]",
+  /** Las categorías de nueva que mezclan marcas, estáticas desde el 2026-10-22 (sin listado). */
+  categoriasNueva: "/(site)/maquinaria-pesada/maquinaria-pesada-nueva/[categoria]",
   unidadesUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/[unidad]",
   marcasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]`,
   tiposDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]/[tipo]`,
@@ -170,6 +172,7 @@ export function rutasDeMarcaMaquinaria(
   const paths = [
     rutas.maquinaria(),
     rutas.nueva(),
+    rutas.nuevaTipos(),
     rutas.marcasMaquinaria(),
     rutas.marcaMaquinaria(marcaSlug),
   ];
@@ -190,7 +193,14 @@ export function rutasDeTipoMaquinaria(
   tipoSlug: string,
   equipoSlugs: string[],
 ): string[] {
-  const paths = [rutas.marcaMaquinaria(marcaSlug), rutas.tipoMaquinaria(marcaSlug, tipoSlug)];
+  const paths = [
+    // Los índices de nueva (2026-10-22): el de tipos pinta el tipo y su foto, y el de nueva la
+    // foto de la primera tarjeta de tipos.
+    rutas.nueva(),
+    rutas.nuevaTipos(),
+    rutas.marcaMaquinaria(marcaSlug),
+    rutas.tipoMaquinaria(marcaSlug, tipoSlug),
+  ];
   for (const equipoSlug of equipoSlugs) {
     paths.push(rutas.equipoNuevo(marcaSlug, tipoSlug, equipoSlug));
   }
@@ -212,11 +222,27 @@ export function rutasDeEquipoNuevo(
   return [
     // El índice de marcas solo lista las que tienen equipos (2026-10-19).
     rutas.marcasMaquinaria(),
+    // Los índices de nueva (2026-10-22): las fotos de las tarjetas de tipo salen de los equipos.
+    rutas.nueva(),
+    rutas.nuevaTipos(),
     rutas.tipoMaquinaria(marcaSlug, tipoSlug),
     rutas.equipoNuevo(marcaSlug, tipoSlug, equipoSlug),
     ...hermanoSlugs.map((slug) => rutas.equipoNuevo(marcaSlug, tipoSlug, slug)),
     ...categoriaSlugs.map((slug) => rutas.categoriaNueva(slug)),
   ];
+}
+
+/**
+ * Todas las categorías de nueva que mezclan marcas, por el patrón de la ruta. Pintan los equipos
+ * agrupados por marca y tipo, con su nombre: un cambio de marca o de tipo las afecta, y la
+ * relación va al revés (la categoría declara los tipos). Son 3. Nunca relanza.
+ */
+export function revalidarCategoriasNueva(motivo: string): void {
+  try {
+    revalidatePath(PATRONES_DE_PAGINA.categoriasNueva, "page");
+  } catch (error) {
+    console.error(`[revalidación] fallaron las categorías de nueva (${motivo}):`, error);
+  }
 }
 
 /**
@@ -312,7 +338,7 @@ export function revalidarCategoriasDeRepuestos(motivo: string): void {
 
 /** Rutas afectadas por un cambio en una categoría de la línea nueva. */
 export function rutasDeCategoriaNueva(slug: string): string[] {
-  return [rutas.nueva(), rutas.categoriaNueva(slug)];
+  return [rutas.nueva(), rutas.nuevaTipos(), rutas.categoriaNueva(slug)];
 }
 
 /**

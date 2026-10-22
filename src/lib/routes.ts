@@ -33,12 +33,15 @@ export const SEGMENTO_CATEGORIAS_REPUESTOS = "categoria-repuestos-para-maquinari
  *
  * `marcas` es un segmento estático al mismo nivel que `{categoria}`. Next
  * resuelve lo estático antes que lo dinámico, así que no chocan — pero ninguna
- * categoría puede llamarse "marcas".
+ * categoría puede llamarse "marcas". Lo mismo `tipos` (el índice de tipos de
+ * nueva, 2026-10-22) y `pagina` (`src/lib/nueva/slugsReservados.ts`).
  */
 export const SEGMENTO_MAQUINARIA = "maquinaria-pesada";
 export const SEGMENTO_NUEVA = "maquinaria-pesada-nueva";
 export const SEGMENTO_USADA = "maquinaria-pesada-usada";
 export const SEGMENTO_MARCAS_MAQUINARIA = "marcas";
+/** El índice de tipos de maquinaria nueva (2026-10-22, dirección): `…/maquinaria-pesada-nueva/tipos/`. */
+export const SEGMENTO_TIPOS_NUEVA = "tipos";
 /** La página «Otros» de usados (cliente, 2026-10-19): agrupa las categorías que no van en el primer nivel. */
 export const SEGMENTO_OTROS_USADA = "otros";
 
@@ -81,20 +84,12 @@ export const rutas = {
   maquinaria: () => `/${SEGMENTO_MAQUINARIA}`,
   nueva: () => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}`,
   usada: () => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}`,
+  /** Índice de tipos de maquinaria nueva, de todas las marcas (2026-10-22). */
+  nuevaTipos: () => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${SEGMENTO_TIPOS_NUEVA}`,
   categoriaNueva: (slug: string) => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${slug}`,
   categoriaUsada: (slug: string) => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${slug}`,
   /** «Otros» de usados: las categorías agrupadas (`otros` está reservada en las categorías). */
   usadaOtros: () => `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}/${SEGMENTO_OTROS_USADA}`,
-  /** Página n del listado de maquinaria nueva («Categoría secundaria»); la 1 es el índice. */
-  nuevaPagina: (pagina: number) =>
-    pagina <= 1
-      ? `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}`
-      : `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/pagina/${pagina}`,
-  /** Página n del listado de una categoría de nueva; la 1 es la propia categoría. */
-  categoriaNuevaPagina: (slug: string, pagina: number) =>
-    pagina <= 1
-      ? `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${slug}`
-      : `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${slug}/pagina/${pagina}`,
   /**
    * Página de UNA unidad usada (2026-10-16, decisión de dirección): cuelga de su
    * categoría. `pagina` y `marcas` no pueden ser el slug de una unidad

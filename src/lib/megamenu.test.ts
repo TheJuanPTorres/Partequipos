@@ -21,13 +21,32 @@ const DATOS: DatosMegamenu = {
     { id: 3, nombre: "Case Construction", slug: "case-construction" },
   ],
   tiposMaquinaria: [
-    { id: 10, nombre: "Miniexcavadoras", slug: "miniexcavadoras", marca: 1 },
-    { id: 11, nombre: "Retrocargadoras", slug: "retrocargadoras", marca: { id: 3 } },
-    { id: 12, nombre: "Bulldozers", slug: "bulldozer", marca: 3 },
+    // «Tarjeta en el índice de tipos»: van en «Por tipo de máquina» (2026-10-22).
+    {
+      id: 10,
+      nombre: "Miniexcavadoras",
+      slug: "miniexcavadoras",
+      marca: 1,
+      pestanaIndiceNueva: true,
+    },
+    {
+      id: 11,
+      nombre: "Retrocargadoras",
+      slug: "retrocargadoras",
+      marca: { id: 3 },
+      pestanaIndiceNueva: true,
+    },
+    { id: 12, nombre: "Bulldozers", slug: "bulldozer", marca: 3, pestanaIndiceNueva: true },
+    // Sin la casilla: solo por su categoría «Excavadoras», que mezcla marcas.
+    { id: 15, nombre: "Excavadoras", slug: "excavadoras-case", marca: 3 },
     { id: 13, nombre: "Aditamentos para excavadoras", slug: "excavadoras", marca: 2 },
     { id: 14, nombre: "Huérfano", slug: "huerfano", marca: null },
   ],
-  categoriasNueva: [{ id: 20, nombre: "Excavadoras", slug: "excavadoras" }],
+  categoriasNueva: [
+    { id: 20, nombre: "Excavadoras", slug: "excavadoras", tiposIncluidos: [15] },
+    // Sin equipos en sus tipos: no sale.
+    { id: 21, nombre: "Cargadores", slug: "cargadores", tiposIncluidos: [99] },
+  ],
   categoriasUsada: [
     { id: 30, nombre: "Motoniveladoras", slug: "motoniveladoras" },
     { id: 31, nombre: "Bulldozers", slug: "bulldozer" },
@@ -47,7 +66,14 @@ const DATOS: DatosMegamenu = {
     },
   ],
   // Todos los tipos de maquinaria nueva tienen equipos salvo el 14 (sin marca).
-  equiposNuevos: [{ tipo: 10 }, { tipo: 10 }, { tipo: { id: 11 } }, { tipo: 12 }, { tipo: 13 }],
+  equiposNuevos: [
+    { tipo: 10 },
+    { tipo: 10 },
+    { tipo: { id: 11 } },
+    { tipo: 12 },
+    { tipo: 13 },
+    { tipo: 15 },
+  ],
 };
 
 const titulos = (g: GrupoMenu[]) => g.map((x) => x.titulo);
@@ -83,12 +109,30 @@ describe("megamenú: maquinaria", () => {
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/bulldozer/",
       },
       {
+        etiqueta: "Excavadoras",
+        href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/excavadoras-case/",
+      },
+      {
         etiqueta: "Retrocargadoras",
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/",
       },
     ]);
+    // TODOS los tipos, en el orden de la web antigua: la categoría que mezcla marcas a su página,
+    // los de una sola marca a la de su tipo; nunca a un listado.
     assert.deepEqual(nueva.grupos[1]!.enlaces, [
+      {
+        etiqueta: "Bulldozers",
+        href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/bulldozer/",
+      },
       { etiqueta: "Excavadoras", href: "/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/" },
+      {
+        etiqueta: "Miniexcavadoras",
+        href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/yanmar/miniexcavadoras/",
+      },
+      {
+        etiqueta: "Retrocargadoras",
+        href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/",
+      },
     ]);
   });
 
@@ -169,11 +213,12 @@ describe("megamenú: maquinaria", () => {
     assert.ok(!sinNada.includes("Miniexcavadoras"));
   });
 
-  it("sin la marca de aditamentos, su enlace no sale; sin categorías, tampoco «Por tipo»", () => {
+  it("sin la marca de aditamentos, su enlace no sale; sin categorías ni tipos marcados, tampoco «Por tipo»", () => {
     const p = panelMaquinaria({
       ...DATOS,
       marcasMaquinaria: DATOS.marcasMaquinaria.filter((m) => m.slug !== SLUG_ADITAMENTOS),
       categoriasNueva: [],
+      tiposMaquinaria: DATOS.tiposMaquinaria.map((t) => ({ ...t, pestanaIndiceNueva: false })),
     });
     assert.deepEqual(titulos(p.grupos), ["Maquinaria pesada nueva", "Maquinaria pesada usada"]);
     assert.deepEqual(titulos(p.grupos[0]!.grupos), ["Por marca"]);

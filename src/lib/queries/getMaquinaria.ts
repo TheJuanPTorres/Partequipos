@@ -521,8 +521,18 @@ type CategoriaNueva = Pick<
   tipos: number[];
 };
 
-/** Un tipo con «Pestaña en el índice de maquinaria nueva» y con equipos (2026-10-17). */
-export type PestanaDeTipoNueva = { nombre: string; href: string };
+/**
+ * Un tipo con «Pestaña en el índice de maquinaria nueva» y con equipos (2026-10-17). Desde el
+ * 2026-10-22, una tarjeta del índice de tipos: con su id y la «Imagen de la tarjeta» del tipo.
+ */
+export type PestanaDeTipoNueva = {
+  id: number;
+  nombre: string;
+  href: string;
+  foto: FotoDeTarjeta | null;
+  /** Él y, si es un «paraguas» (Pavimentadoras de Dynapac), los tipos que agrupa. */
+  tipos: number[];
+};
 
 const listadoNuevaEnCache = unstable_cache(
   async (): Promise<{
@@ -565,7 +575,14 @@ const listadoNuevaEnCache = unstable_cache(
         depth: 0,
         limit: 0,
         pagination: false,
-        select: { slug: true, nombre: true, marca: true, pestanaIndiceNueva: true },
+        select: {
+          slug: true,
+          nombre: true,
+          marca: true,
+          pestanaIndiceNueva: true,
+          imagen: true,
+          subtipos: true,
+        },
       }),
       payload.find({
         collection: "categorias-maquinaria",
@@ -583,10 +600,15 @@ const listadoNuevaEnCache = unstable_cache(
           ? (v as { id: number }).id
           : null;
 
-    // Solo las fotos que se pintan: la primera de cada equipo y los logos.
+    // Solo las fotos que se pintan: la primera de cada equipo, los logos y las de los tipos.
     const idsFotos = new Set<number>(idsDePrimeraImagen(equipos.docs));
     for (const m of marcas.docs) {
       const id = idRel(m.logo);
+      if (id !== null) idsFotos.add(id);
+    }
+    // Y la «Imagen de la tarjeta» de los tipos con pestaña (índice de tipos, 2026-10-22).
+    for (const t of tipos.docs) {
+      const id = t.pestanaIndiceNueva ? idRel(t.imagen) : null;
       if (id !== null) idsFotos.add(id);
     }
     const idsPdf = [
@@ -682,14 +704,23 @@ const listadoNuevaEnCache = unstable_cache(
           .map(idRel)
           .filter((x): x is number => x !== null && tipoPorId.has(x)),
       })),
-      // Pestañas de tipo del índice: los marcados en el panel que tienen equipos.
+      // Pestañas de tipo del índice: los marcados en el panel que tienen equipos (un «paraguas»,
+      // los de los tipos que agrupa: índice de tipos, 2026-10-22).
       pestanasTipos: tipos.docs
-        .filter((t) => t.pestanaIndiceNueva && lista.some((e) => e.tipoId === t.id))
+        .filter((t) => t.pestanaIndiceNueva)
         .flatMap((t) => {
           const marca = marcaPorId.get(idRel(t.marca) ?? -1);
-          return marca
-            ? [{ nombre: t.nombre, href: `${rutas.tipoMaquinaria(marca.slug, t.slug)}/` }]
-            : [];
+          const ids = [t.id, ...(t.subtipos ?? []).map(idRel).filter((x) => x !== null)];
+          if (!marca || !lista.some((e) => ids.includes(e.tipoId))) return [];
+          return [
+            {
+              id: t.id,
+              nombre: t.nombre,
+              href: `${rutas.tipoMaquinaria(marca.slug, t.slug)}/`,
+              foto: foto(idRel(t.imagen)),
+              tipos: ids,
+            },
+          ];
         })
         .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
     };

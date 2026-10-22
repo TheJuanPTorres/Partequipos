@@ -48,7 +48,7 @@ export function BarraSeries({
         comprobarLlegada.current?.();
         return;
       }
-      // La serie llega unos 30 px bajo la barra (`scroll-margin-top`): margen de sobra.
+      // La serie llega 40 px bajo la barra (32 en móvil, `scroll-margin-top`): margen de sobra.
       const limite = (barra.current?.getBoundingClientRect().bottom ?? 0) + 64;
       let elegida: string | null = null;
       for (const s of series) {
@@ -137,7 +137,9 @@ export function BarraSeries({
     };
     // Llega cuando la serie está en su sitio (bajo la barra, `scroll-margin-top`), con
     // `scrollend` donde exista o, como red, a los 900 ms.
-    const margen = parseFloat(getComputedStyle(grupo).scrollMarginTop) || 0;
+    const margen =
+      (parseFloat(getComputedStyle(grupo).scrollMarginTop) || 0) +
+      (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0);
     comprobarLlegada.current = () => {
       if (Math.abs(grupo.getBoundingClientRect().top - margen) < 4) llegar();
     };

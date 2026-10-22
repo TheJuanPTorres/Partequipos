@@ -1706,7 +1706,33 @@ a.modelo:hover {
   outline: none;
 }
 
-/* Con la barra de series fija (R2), el ancla de una serie deja sitio también a la barra. */
+/*
+ * BARRA DE SERIES (R2) y su aire (dirección, 2026-10-22): la primera serie va 40 px bajo la
+ * barra (32 en móvil), como entre el título de una sección y su contenido, y al saltar a una
+ * serie, con la barra fija arriba, su título queda a la misma distancia de ella. Medido: la
+ * cabecera reserva 76 / 72 / 72 px (`scroll-padding-top`) y la barra acaba a 130 / 131 / 127 px
+ * (1440 / 1010 / 390); de ahí 94, 99 y 87 px.
+ */
+:global(html:not([data-mejoras-apagadas~="R2"])) .conBarraSeries > nav + .modelosGrupo {
+  margin-top: 40px;
+}
+
 :global(html:not([data-mejoras-apagadas~="R2"])) .conBarraSeries .modelosGrupo {
-  scroll-margin-top: 88px;
+  scroll-margin-top: 94px;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  :global(html:not([data-mejoras-apagadas~="R2"])) .conBarraSeries .modelosGrupo {
+    scroll-margin-top: 99px;
+  }
+}
+
+@media (max-width: 767px) {
+  :global(html:not([data-mejoras-apagadas~="R2"])) .conBarraSeries > nav + .modelosGrupo {
+    margin-top: 32px;
+  }
+
+  :global(html:not([data-mejoras-apagadas~="R2"])) .conBarraSeries .modelosGrupo {
+    scroll-margin-top: 87px;
+  }
 }

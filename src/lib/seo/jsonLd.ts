@@ -156,6 +156,12 @@ export type ArticleJsonLdInput = {
   imagenUrl?: string | null;
   /** Logo del editor: el del panel o el de siempre (`getLogo().buscadores`). */
   logoUrl?: string | null;
+  /** `Article` (por defecto) o `BlogPosting` (el diseño propio del artículo, 2026-10-21). */
+  tipo?: "Article" | "BlogPosting";
+  /** La categoría del blog (`articleSection`). */
+  seccion?: string | null;
+  /** Palabras del cuerpo (`wordCount`). */
+  palabras?: number | null;
 };
 
 /**
@@ -187,7 +193,7 @@ export function buildArticleJsonLd(input: ArticleJsonLdInput): JsonLdObject {
 
   const jsonLd: JsonLdObject = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": input.tipo ?? "Article",
     headline: titulo,
     url: absoluteUrl(path),
     mainEntityOfPage: absoluteUrl(path),
@@ -203,6 +209,8 @@ export function buildArticleJsonLd(input: ArticleJsonLdInput): JsonLdObject {
   if (fechaModificacion?.trim()) jsonLd.dateModified = fechaModificacion.trim();
   jsonLd.author = autorJsonLd(autor);
   if (imagenUrl?.trim()) jsonLd.image = [absoluteUrl(imagenUrl.trim())];
+  if (input.seccion?.trim()) jsonLd.articleSection = input.seccion.trim();
+  if (input.palabras && input.palabras > 0) jsonLd.wordCount = input.palabras;
 
   return jsonLd;
 }

@@ -1916,6 +1916,22 @@ export interface Articulo {
    */
   categoria?: (number | null) | CategoriasBlog;
   /**
+   * Opcional. Una categoría de repuestos, de maquinaria usada o de maquinaria nueva: el final del artículo enlaza a ella. Vacío: se intenta deducir del título.
+   */
+  categoriaRelacionada?:
+    | ({
+        relationTo: 'categorias-tecnicas';
+        value: number | CategoriasTecnica;
+      } | null)
+    | ({
+        relationTo: 'categorias-usada';
+        value: number | CategoriasUsada;
+      } | null)
+    | ({
+        relationTo: 'categorias-maquinaria';
+        value: number | CategoriasMaquinaria;
+      } | null);
+  /**
    * Ordena el blog (lo más reciente primero) y es la fecha que ven los buscadores.
    */
   fechaPublicacion: string;
@@ -3068,6 +3084,7 @@ export interface ArticulosSelect<T extends boolean = true> {
   titulo?: T;
   slug?: T;
   categoria?: T;
+  categoriaRelacionada?: T;
   fechaPublicacion?: T;
   autor?: T;
   entradilla?: T;
@@ -3723,6 +3740,15 @@ export interface PaginasIndice {
     marca?: (number | null) | MarcasLubricante;
     textoBoton?: string | null;
   };
+  /**
+   * El índice del blog usa la plantilla «Blog» de Andrés. El artículo, que Andrés no diseñó, tiene un diseño nuestro que se enciende aquí cuando se apruebe.
+   */
+  blog: {
+    /**
+     * «Provisional»: el artículo sencillo de siempre. «Diseño propio»: cabecera baja con migas, imagen destacada, columna de lectura con índice fijo, barra de progreso, compartir, llamada a contactar y artículos relacionados. Cambiarlo actualiza todos los artículos.
+     */
+    disenoArticulo: 'provisional' | 'propio';
+  };
   contacto?: {
     antetitulo?: string | null;
     titulo?: string | null;
@@ -3971,6 +3997,11 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
         textoBloque?: T;
         marca?: T;
         textoBoton?: T;
+      };
+  blog?:
+    | T
+    | {
+        disenoArticulo?: T;
       };
   contacto?:
     | T

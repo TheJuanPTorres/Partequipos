@@ -54,6 +54,16 @@ export const Articulo: CollectionConfig = {
       admin: { description: "En qué listado del blog aparece el artículo." },
     },
     {
+      name: "categoriaRelacionada",
+      type: "relationship",
+      relationTo: ["categorias-tecnicas", "categorias-usada", "categorias-maquinaria"],
+      label: "Categoría relacionada",
+      admin: {
+        description:
+          "Opcional. Una categoría de repuestos, de maquinaria usada o de maquinaria nueva: el final del artículo enlaza a ella. Vacío: se intenta deducir del título.",
+      },
+    },
+    {
       name: "fechaPublicacion",
       type: "date",
       required: true,

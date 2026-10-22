@@ -20,7 +20,7 @@ const SIZES_CUERPO = "(min-width: 704px) 672px, calc(100vw - 32px)";
  * reservan la caja, así que no hay CLS; `max-w-full h-auto` las encoge sin
  * deformarlas y no estira las que son más estrechas que el texto.
  */
-const convertidores: JSXConvertersFunction = ({ defaultConverters }) => ({
+export const convertidores: JSXConvertersFunction = ({ defaultConverters }) => ({
   ...defaultConverters,
   // «Documento en visor» dentro del texto (2026-10-20): el PDF como libro.
   blocks: {

@@ -1,7 +1,12 @@
 import config from "@payload-config";
 import { getPayload } from "payload";
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
 
+import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
+import { extracto, minutosDeLectura, normalizar, type ArticuloLista } from "@/lib/blog/indice";
+import { textoPlanoLexical } from "@/lib/maquinaria/reservaTexto";
+import { imagenDeMedia, poblado } from "@/lib/utils/relations";
 import type { Articulo, CategoriasBlog } from "@/payload-types";
 
 /*
@@ -78,4 +83,45 @@ export const getArticulosDeCategoria = cache(async (categoriaId: number): Promis
     sort: "-fechaPublicacion",
   });
   return docs;
+});
+
+/** Un artículo como lo pinta una tarjeta del índice (y del bloque «relacionados»). */
+export function aArticuloLista(a: Articulo): ArticuloLista {
+  const categoria = poblado<CategoriasBlog>(a.categoria);
+  const cuerpo = textoPlanoLexical(a.contenido);
+  const entradilla = a.entradilla?.trim() ?? "";
+  return {
+    id: a.id,
+    slug: a.slug,
+    titulo: a.titulo,
+    fecha: a.fechaPublicacion,
+    extracto: extracto(entradilla || cuerpo, 100),
+    imagen: imagenDeMedia(a.imagenDestacada, a.titulo),
+    categoria: categoria ? { slug: categoria.slug, nombre: categoria.nombre } : null,
+    // Título, entradilla, categoría y el principio del cuerpo: lo que busca el campo «Buscar…».
+    indice: normalizar(
+      [a.titulo, entradilla, categoria?.nombre ?? "", cuerpo.slice(0, 3000)].join(" "),
+    ),
+    minutos: minutosDeLectura(cuerpo),
+  };
+}
+
+async function leerIndiceBlog(): Promise<{
+  articulos: ArticuloLista[];
+  categorias: { slug: string; nombre: string }[];
+}> {
+  const [articulos, categorias] = await Promise.all([getArticulos(), getCategoriasBlog()]);
+  return {
+    articulos: articulos.map(aArticuloLista),
+    categorias: categorias.map((c) => ({ slug: c.slug, nombre: c.nombre })),
+  };
+}
+
+/**
+ * Los artículos del índice y las categorías, en la caché de datos con la
+ * etiqueta `datos:blog`: el índice se pinta en cada petición (lee la query de
+ * la URL) y no debe consultar la base cada vez.
+ */
+export const getIndiceBlog = unstable_cache(leerIndiceBlog, ["blog-indice", CLAVE_DESPLIEGUE], {
+  tags: [ETIQUETAS_DATOS.blog],
 });

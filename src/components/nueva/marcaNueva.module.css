@@ -63,7 +63,9 @@
    una copia con la siguiente (y la del bucle) queda igual que entre dos textos cualesquiera. */
 .separador {
   flex: none;
-  margin: 0 39px;
+  /* 0,0085 em: compensa que el hueco del glifo «|» de Inter es algo mayor a su derecha, para que
+     la TINTA quede a la misma distancia de los dos textos. */
+  margin: 0 calc(39px - 0.0085em) 0 calc(39px + 0.0085em);
   color: var(--acento, var(--color-marca));
   font-size: 30px;
   font-weight: 400;

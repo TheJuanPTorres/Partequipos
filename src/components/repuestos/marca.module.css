@@ -1651,7 +1651,7 @@ a.modelo:hover {
 
 /* Con la barra de series fija (R2), el ancla de una serie deja sitio también a la barra. */
 :global(html:not([data-mejoras-apagadas~="R2"])) .conBarraSeries .modelosGrupo {
-  scroll-margin-top: 64px;
+  scroll-margin-top: 88px;
 }
 
 /*

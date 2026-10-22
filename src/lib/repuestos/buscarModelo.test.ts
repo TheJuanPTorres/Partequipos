@@ -5,6 +5,7 @@ import {
   coincideModelo,
   columnaEscritorio,
   columnaTablet,
+  ejemploDeModelo,
   enOrdenNatural,
   normalizarBusqueda,
 } from "./buscarModelo";
@@ -85,5 +86,13 @@ describe("colocación de los resultados (regla de las tarjetas, #281)", () => {
   it("tablet: la última de un número impar, al centro", () => {
     assert.deepEqual(fila(3, columnaTablet), [null, null, "2 / span 2"]);
     assert.deepEqual(fila(4, columnaTablet), [null, null, null, null]);
+  });
+});
+
+describe("ejemploDeModelo", () => {
+  it("quita el tipo y la marca del nombre", () => {
+    assert.equal(ejemploDeModelo("Excavadora HITACHI EX100", ["Excavadora", "Hitachi"]), "EX100");
+    assert.equal(ejemploDeModelo("Bulldozer Caterpillar D6D", ["Bulldozer", "Caterpillar"]), "D6D");
+    assert.equal(ejemploDeModelo("Hitachi", ["Hitachi"]), "Hitachi");
   });
 });

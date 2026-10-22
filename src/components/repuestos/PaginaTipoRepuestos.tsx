@@ -133,6 +133,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
             : null
         }
         panelR5={MEJORAS_ACTIVAS.R5}
+        quitarDelEjemplo={[tipo.nombre, marca.nombre]}
       />
 
       <TarjetasMarca

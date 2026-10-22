@@ -1,5 +1,6 @@
 import { VerTodosEquipos } from "@/components/nueva/VerTodosEquipos";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
+import { ejemploDeModelo } from "@/lib/repuestos/buscarModelo";
 import type { GrupoDeModelos } from "@/lib/repuestos/series";
 import { tarjetasDeModelos, type ModeloEnlace } from "@/lib/repuestos/tipo";
 import type { TiposEquipo } from "@/payload-types";
@@ -47,6 +48,7 @@ export function ModelosTipo({
   barraSeries = false,
   ayuda = null,
   panelR5 = false,
+  quitarDelEjemplo = [],
 }: {
   id: string;
   titulo: string;
@@ -66,6 +68,8 @@ export function ModelosTipo({
   ayuda?: { formulario: ConfigFormulario; anclaContacto: string } | null;
   /** R5. */
   panelR5?: boolean;
+  /** Palabras que no van en el ejemplo del buscador: el tipo y la marca. */
+  quitarDelEjemplo?: string[];
 }) {
   const idTitulo = `${id}-titulo`;
   const series = (grupos ?? []).flatMap((g) =>
@@ -82,7 +86,11 @@ export function ModelosTipo({
         {titulo}
       </h2>
       {buscador && modelos.length > 2 ? (
-        <BuscadorModelos seccion={id} ejemplo={modelos[0]?.nombre ?? null} ayuda={ayuda} />
+        <BuscadorModelos
+          seccion={id}
+          ejemplo={modelos[0] ? ejemploDeModelo(modelos[0].nombre, quitarDelEjemplo) : null}
+          ayuda={ayuda}
+        />
       ) : null}
       {conBarra ? <BarraSeries series={series} /> : null}
       {modelos.length === 0 ? (

@@ -44,3 +44,16 @@ export function columnaEscritorio(i: number, n: number): string | null {
 export function columnaTablet(i: number, n: number): string | null {
   return n % 2 === 1 && i === n - 1 ? "2 / span 2" : null;
 }
+
+/**
+ * El ejemplo del buscador: el nombre del modelo sin las palabras del tipo ni de la marca
+ * («Excavadora HITACHI EX100» → «EX100»). Si no queda nada, el nombre entero.
+ */
+export function ejemploDeModelo(nombre: string, quitar: string[]): string {
+  const fuera = new Set(quitar.flatMap((q) => q.split(/\s+/)).map(normalizarBusqueda));
+  const resto = nombre
+    .split(/\s+/)
+    .filter((p) => p && !fuera.has(normalizarBusqueda(p)))
+    .join(" ");
+  return resto || nombre.trim();
+}

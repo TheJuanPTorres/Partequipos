@@ -68,6 +68,13 @@ describe("vistaPorQue", () => {
     assert.equal(v.imagen?.url, "/f.jpg");
   });
 
+  it("sin marca (página de categoría), un cierre con {marca} no sale; uno sin él, sí", () => {
+    const con = (porQueCierre: string) =>
+      vistaPorQue(global({ porQueTitulo: "¿Por qué elegirnos?", porQueCierre }), null)!.cierre;
+    assert.equal(con("Su maquinaria {marca} lo merece."), "");
+    assert.equal(con("Confíe en nosotros."), "Confíe en nosotros.");
+  });
+
   it("sin foto, la sección no se pinta (hasta que el cliente mande una)", () => {
     assert.equal(
       vistaPorQue(global({ porQueTitulo: "¿Por qué elegirnos?", porQueImagen: null }), marca),

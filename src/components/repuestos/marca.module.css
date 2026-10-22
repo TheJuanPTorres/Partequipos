@@ -532,7 +532,7 @@ a.pildora:hover {
   }
 }
 
-/* --- Qué incluye (página de categoría técnica) --------------------------------- */
+/* --- Qué incluye (página de categoría técnica, plantilla 4007) ------------------- */
 
 /* Las tarjetas no se estiran: al desplegar una, las demás de su fila no cambian. */
 .rejillaGrupos {
@@ -561,6 +561,23 @@ a.pildora:hover {
 
 .desplegable[open] > summary svg {
   transform: rotate(180deg);
+}
+
+/* «Ver productos (N)» de las tarjetas de grupo: un enlace de texto bajo «Cotizar», con su flecha. */
+.verProductos {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.verProductos:hover {
+  text-decoration-thickness: 2px;
 }
 
 .desplegable > summary:focus-visible {
@@ -1296,34 +1313,6 @@ a.modelo:hover {
   .rejillaTarjetas > .tarjeta:last-child:nth-child(odd) {
     grid-column: 2 / span 2;
   }
-}
-
-/* --- «Qué incluye» sencillo (versión PROVISIONAL, dirección 2026-10-19) ------------------- */
-
-.queIncluyeSencillo {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 60px 24px 80px;
-}
-
-.grupoSencillo {
-  margin-top: 32px;
-}
-
-.grupoSencilloTitulo {
-  margin: 0 0 12px;
-  color: var(--color-texto);
-  font-size: var(--texto-destacado);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.grupoSencilloLista {
-  margin: 0;
-  padding-left: 22px;
-  color: var(--color-texto-suave);
-  font-size: var(--texto-cuerpo);
-  line-height: 1.6;
 }
 
 /*

@@ -53,8 +53,14 @@ export type VistaPorQue = {
  * «¿Por qué elegirnos?»: sin título NO se pinta, y sin foto tampoco (dirección, 2026-10-19: hasta
  * que el cliente mande una propia no se publica el bloque con un fondo vacío). La frase de cierre lleva «{marca}», que se
  * sustituye por el nombre de la marca de la página. Un punto sin título o sin texto no sale.
+ *
+ * Sin marca (`null`: las páginas de categoría técnica, 2026-10-22), una frase de cierre con
+ * «{marca}» no sale: quedaría coja.
  */
-export function vistaPorQue(global: RepuestosMarca, marca: Marca): VistaPorQue | null {
+export function vistaPorQue(
+  global: RepuestosMarca,
+  marca: Pick<Marca, "nombre"> | null,
+): VistaPorQue | null {
   const titulo = texto(global.porQueTitulo);
   const imagen = imagenDeMedia(global.porQueImagen, "");
   if (!titulo || !imagen) return null;
@@ -66,7 +72,12 @@ export function vistaPorQue(global: RepuestosMarca, marca: Marca): VistaPorQue |
         ? [{ clave: p.id ?? `p${i}`, titulo: texto(p.titulo), texto: texto(p.texto) }]
         : [],
     ),
-    cierre: texto(global.porQueCierre).replaceAll("{marca}", texto(marca.nombre)),
+    cierre: cierreDe(texto(global.porQueCierre), marca),
     boton: texto(global.porQueBoton),
   };
+}
+
+function cierreDe(cierre: string, marca: Pick<Marca, "nombre"> | null): string {
+  if (!cierre.includes("{marca}")) return cierre;
+  return marca ? cierre.replaceAll("{marca}", texto(marca.nombre)) : "";
 }

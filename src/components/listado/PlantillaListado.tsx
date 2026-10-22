@@ -12,6 +12,7 @@ import {
   type Catalogo,
   type ResultadoListado,
 } from "@/lib/filtros";
+import type { Animacion } from "@/lib/listado/animaciones";
 import type { LogoMarca } from "@/lib/marca/logoMarca";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 
@@ -19,7 +20,9 @@ import { CambioDeVista } from "./CambioDeVista";
 import { CategoriasListado } from "./CategoriasListado";
 import { iconoDePestana } from "./iconos";
 import estilos from "./listado.module.css";
+import { NumeroAnimado } from "./NumeroAnimado";
 import { PanelFiltrosListado } from "./PanelFiltrosListado";
+import { TransicionCatalogo } from "./TransicionCatalogo";
 import { ZonaCatalogo } from "./ZonaCatalogo";
 
 /**
@@ -55,6 +58,7 @@ export function PlantillaListado<T>({
   etiquetaPestanas,
   pestanasEnLateral = false,
   navegacionCliente = false,
+  animaciones = [],
   catalogo,
   listado,
   rutaDe,
@@ -84,6 +88,11 @@ export function PlantillaListado<T>({
    * recargar ni volver arriba (`ZonaCatalogo`). Listados de usados (cliente, 2026-10-21).
    */
   navegacionCliente?: boolean;
+  /**
+   * Las animaciones del listado (`src/lib/listado/animaciones.ts`), solo con
+   * `navegacionCliente`. Usados (dirección, 2026-10-21); nueva, ninguna.
+   */
+  animaciones?: Animacion[];
   catalogo: Catalogo<T>;
   listado: Extract<ResultadoListado<T>, { tipo: "listado" }>;
   /** Ruta de la página n, CON su barra final. */
@@ -105,10 +114,12 @@ export function PlantillaListado<T>({
   const ordenActual = ordenes.find((o) => o.activa) ?? ordenes[0];
   const disponibles = (n: number) =>
     `${n === 1 ? elemento.singular : elemento.plural} ${n === 1 ? "disponible" : "disponibles"}`;
-  const recuento =
+  const anim = new Set(navegacionCliente ? animaciones : []);
+  // El total va aparte: con la animación A5, cuenta hasta el valor nuevo.
+  const restoRecuento =
     listado.filtrado && total !== totalSinFiltros
-      ? `${total} de ${totalSinFiltros} ${disponibles(totalSinFiltros)}`
-      : `${total} ${disponibles(total)}`;
+      ? ` de ${totalSinFiltros} ${disponibles(totalSinFiltros)}`
+      : ` ${disponibles(total)}`;
 
   // Sin nada que listar, ni recuento ni orden: lo dice el estado vacío.
   const barra =
@@ -117,7 +128,8 @@ export function PlantillaListado<T>({
         <p className={estilos.resumen} aria-live="polite">
           {chips.length ? <strong>Selección actual:</strong> : null}
           <span>
-            {recuento}
+            {anim.has("A5") ? <NumeroAnimado valor={total} /> : total}
+            {restoRecuento}
             {paginas > 1 ? ` · página ${pagina} de ${paginas}` : ""}
           </span>
         </p>
@@ -126,7 +138,7 @@ export function PlantillaListado<T>({
             <>
               <ul className={estilos.chips} aria-label="Filtros elegidos">
                 {chips.map((c) => (
-                  <li key={c.clave}>
+                  <li key={c.clave} data-etiqueta-filtro={c.clave}>
                     <Link
                       href={c.href}
                       prefetch={false}
@@ -174,32 +186,44 @@ export function PlantillaListado<T>({
               </ul>
             </details>
           ) : null}
-          {elementos.length > 1 ? <CambioDeVista idLista={idLista} /> : null}
+          {elementos.length > 1 ? (
+            <CambioDeVista idLista={idLista} recolocar={anim.has("A8")} />
+          ) : null}
         </div>
       </div>
     ) : null;
+
+  const catalogoPintado =
+    totalSinFiltros === 0 ? (
+      // Un texto, en el recuadro de siempre; un estado vacío diseñado (usados) trae su marco.
+      typeof vacio === "string" ? (
+        <p className={estilos.vacio}>{vacio}</p>
+      ) : (
+        vacio
+      )
+    ) : elementos.length === 0 ? (
+      <p className={estilos.vacio}>
+        Ningún{elemento.singular === "unidad" ? "a" : ""} {elemento.singular} cumple estos filtros.
+        Quita alguno para ver más.
+      </p>
+    ) : (
+      <ul id={idLista} className={estilos.tarjetas} data-vista="lista">
+        {children}
+      </ul>
+    );
 
   const resultados = (
     <section aria-labelledby="listado-titulo" className={estilos.resultados}>
       <h2 id="listado-titulo" className="sr-only" tabIndex={-1}>
         {elemento.plural.charAt(0).toUpperCase() + elemento.plural.slice(1)}
       </h2>
-      {totalSinFiltros === 0 ? (
-        // Un texto, en el recuadro de siempre; un estado vacío diseñado (usados) trae su marco.
-        typeof vacio === "string" ? (
-          <p className={estilos.vacio}>{vacio}</p>
-        ) : (
-          vacio
-        )
-      ) : elementos.length === 0 ? (
-        <p className={estilos.vacio}>
-          Ningún{elemento.singular === "unidad" ? "a" : ""} {elemento.singular} cumple estos
-          filtros. Quita alguno para ver más.
-        </p>
+      {anim.has("A2") ? (
+        <>
+          <TransicionCatalogo>{catalogoPintado}</TransicionCatalogo>
+          {elementos.length ? <EsqueletoCatalogo /> : null}
+        </>
       ) : (
-        <ul id={idLista} className={estilos.tarjetas} data-vista="lista">
-          {children}
-        </ul>
+        catalogoPintado
       )}
       <div data-catalogo-nav="">
         <Paginacion
@@ -217,6 +241,7 @@ export function PlantillaListado<T>({
         pestanas={pestanas}
         titulo={etiquetaPestanas ?? "Categorías"}
         elemento={elemento}
+        deslizar={anim.has("A4")}
       />
     ) : null;
 
@@ -336,6 +361,7 @@ export function PlantillaListado<T>({
           clave={conConsulta(rutaDe(pagina), consulta)}
           className={estilos.cuerpo}
           lateral={pestanasEnLateral}
+          animaciones={[...anim]}
         >
           {cuerpo}
         </ZonaCatalogo>
@@ -345,5 +371,29 @@ export function PlantillaListado<T>({
         </div>
       )}
     </main>
+  );
+}
+
+/**
+ * Tarjetas «esqueleto» con la forma de las reales (en lista o en rejilla,
+ * según la vista), encima del catálogo mientras llega uno nuevo que tarda
+ * (animación A2; `ZonaCatalogo` las enseña pasados ~300 ms). Fuera del flujo:
+ * no desplazan nada. Ocultas para los lectores de pantalla.
+ */
+function EsqueletoCatalogo() {
+  return (
+    <div className={estilos.esqueleto} aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className={estilos.esqueletoTarjeta}>
+          <span className={estilos.esqueletoFoto} />
+          <span className={estilos.esqueletoDatos}>
+            <i />
+            <i />
+            <i />
+            <i />
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }

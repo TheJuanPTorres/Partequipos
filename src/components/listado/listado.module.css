@@ -1027,3 +1027,322 @@
     font-size: 16px;
   }
 }
+
+/*
+ * ---- Animaciones del listado de usados (dirección, 2026-10-21) ------------
+ * Cada una cuelga de `data-anim` de la zona del catálogo (`ZonaCatalogo`) y se
+ * enciende o apaga en `src/lib/listado/animaciones.ts`, sin tocar las demás.
+ * Todas: la curva y los 280 ms de «Ver más», solo `opacity` y `transform`,
+ * nada con «reducir movimiento» y, sin JavaScript, la página como siempre
+ * (`scripting: enabled`).
+ */
+.cuerpo[data-anim] {
+  --curva-anim: cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+/* A1 — Primera carga: las tarjetas 2 a 9 entran escalonadas; la primera, no (LCP). */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-anim~="A1"][data-primera-carga] ul[data-vista] > li:nth-child(n + 2):nth-child(-n + 9) {
+    animation: entradaTarjeta 280ms var(--curva-anim) backwards;
+  }
+  [data-anim~="A1"][data-primera-carga] ul[data-vista] > li:nth-child(3) {
+    animation-delay: 40ms;
+  }
+  [data-anim~="A1"][data-primera-carga] ul[data-vista] > li:nth-child(4) {
+    animation-delay: 80ms;
+  }
+  [data-anim~="A1"][data-primera-carga] ul[data-vista] > li:nth-child(5) {
+    animation-delay: 120ms;
+  }
+  [data-anim~="A1"][data-primera-carga] ul[data-vista] > li:nth-child(6) {
+    animation-delay: 160ms;
+  }
+  [data-anim~="A1"][data-primera-carga] ul[data-vista] > li:nth-child(7) {
+    animation-delay: 200ms;
+  }
+  [data-anim~="A1"][data-primera-carga] ul[data-vista] > li:nth-child(8) {
+    animation-delay: 240ms;
+  }
+  [data-anim~="A1"][data-primera-carga] ul[data-vista] > li:nth-child(9) {
+    animation-delay: 280ms;
+  }
+}
+@keyframes entradaTarjeta {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* A2 — Tarjetas «esqueleto» con la forma real, encima del catálogo si tarda. */
+.esqueleto {
+  display: none;
+}
+[data-anim~="A2"] .resultados {
+  position: relative;
+}
+[data-anim~="A2"] .esqueleto {
+  position: absolute;
+  inset: 10px;
+  z-index: 2;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--gris-claro);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 280ms var(--curva-anim),
+    visibility 0s linear 280ms;
+}
+[data-anim~="A2"][data-esqueleto] .esqueleto {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 280ms var(--curva-anim);
+}
+/* Con el esqueleto delante, el catálogo viejo ya no se atenúa. */
+[data-anim~="A2"][data-esqueleto] .columnaResultados {
+  opacity: 1;
+}
+.esqueletoTarjeta {
+  display: grid;
+  gap: 10px;
+}
+.esqueletoFoto,
+.esqueletoDatos {
+  display: block;
+  border-radius: 30px;
+  background: #fff;
+}
+.esqueletoFoto {
+  min-height: 220px;
+}
+.esqueletoDatos {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 24px 20px;
+  background: #ededed;
+}
+.esqueletoDatos i {
+  display: block;
+  height: 14px;
+  width: 70%;
+  border-radius: 7px;
+  background: #dcdbdd;
+}
+.esqueletoDatos i:first-child {
+  height: 18px;
+  width: 85%;
+}
+.esqueletoDatos i:nth-child(3) {
+  width: 55%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-esqueleto] .esqueletoFoto,
+  [data-esqueleto] .esqueletoDatos i {
+    animation: pulsoEsqueleto 0.9s ease-in-out infinite alternate;
+  }
+}
+@keyframes pulsoEsqueleto {
+  to {
+    opacity: 0.55;
+  }
+}
+@media (min-width: 640px) {
+  .esqueletoTarjeta {
+    grid-template-columns: 40% 1fr;
+  }
+}
+/* En rejilla, el esqueleto también: 1 / 2 / 3 por fila. */
+.tarjetas[data-vista="rejilla"] + .esqueleto {
+  grid-template-columns: minmax(0, 1fr);
+}
+.tarjetas[data-vista="rejilla"] + .esqueleto .esqueletoTarjeta {
+  grid-template-columns: minmax(0, 1fr);
+  border-radius: 30px;
+  background: #fff;
+}
+.tarjetas[data-vista="rejilla"] + .esqueleto .esqueletoFoto {
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+}
+.tarjetas[data-vista="rejilla"] + .esqueleto .esqueletoDatos {
+  background: transparent;
+}
+@media (min-width: 768px) {
+  .tarjetas[data-vista="rejilla"] + .esqueleto {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1025px) {
+  .esqueletoTarjeta {
+    grid-template-columns: 391px 1fr;
+  }
+  .esqueletoFoto {
+    min-height: 372px;
+  }
+  .tarjetas[data-vista="rejilla"] + .esqueleto {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* A3 — Al pasar el ratón (solo puntero fino): sube 3 px con más sombra, foto al 103 % y la flecha. */
+.flecha {
+  flex: none;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  [data-anim~="A3"] .tarjeta {
+    position: relative;
+    transition: transform 280ms var(--curva-anim);
+  }
+  /* La sombra mayor ya está pintada: solo cambia su opacidad. */
+  [data-anim~="A3"] .tarjeta::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 30px;
+    box-shadow: 0 16px 36px rgba(16, 15, 15, 0.14);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 280ms var(--curva-anim);
+  }
+  [data-anim~="A3"] .tarjeta:hover {
+    transform: translateY(-3px);
+  }
+  [data-anim~="A3"] .tarjeta:hover::after {
+    opacity: 1;
+  }
+  [data-anim~="A3"] .foto {
+    overflow: hidden;
+  }
+  [data-anim~="A3"] .foto img {
+    transition: transform 280ms var(--curva-anim);
+  }
+  [data-anim~="A3"] .tarjeta:hover .foto img {
+    transform: scale(1.03);
+  }
+  [data-anim~="A3"] .flecha {
+    transition: transform 280ms var(--curva-anim);
+  }
+  [data-anim~="A3"] .tarjeta:hover .flecha {
+    transform: translateX(4px);
+  }
+}
+
+/* A4 — El resaltado de la categoría actual va en su `::before`, que se desliza. */
+[data-anim~="A4"] .categoria[aria-current="page"] {
+  z-index: 1;
+  isolation: isolate;
+  background: transparent;
+}
+[data-anim~="A4"] .categoria[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--rosado);
+  transform-origin: 0 0;
+}
+
+/* A5 — El número del recuento: cifras de ancho fijo y la caja del valor final. */
+.numeroAnimado {
+  position: relative;
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* A6 — La foto entra con un fundido sobre su miniatura borrosa, en la misma caja. */
+.foto > .marcoFoto {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+.marcoFoto > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.miniatura {
+  filter: blur(10px);
+  transition: opacity 280ms var(--curva-anim) 280ms;
+}
+.marcoFoto[data-cargada] .miniatura {
+  opacity: 0;
+}
+@media (scripting: enabled) {
+  .fotoFundida {
+    opacity: 0;
+    transition: opacity 280ms var(--curva-anim);
+  }
+  .marcoFoto[data-cargada] .fotoFundida {
+    opacity: 1;
+  }
+}
+.tarjetas[data-vista="rejilla"] .foto > .marcoFoto {
+  position: absolute;
+  inset: 24px;
+  width: auto;
+  height: auto;
+}
+@media (min-width: 1025px) {
+  .foto > .marcoFoto {
+    height: 260px;
+  }
+}
+
+/* A7 — La casilla dibuja su check: la tapa del color de la casilla se retira de izquierda a derecha. */
+@media (scripting: enabled) {
+  [data-anim~="A7"] .marca input,
+  [data-anim~="A7"] .tramo input,
+  [data-anim~="A7"] .acordeon input {
+    appearance: none;
+    position: relative;
+    margin: 0;
+    border: 2px solid #8a8890;
+    border-radius: 5px;
+    background: #fff no-repeat center / 14px 14px;
+    cursor: pointer;
+  }
+  [data-anim~="A7"] .marca input:checked,
+  [data-anim~="A7"] .tramo input:checked,
+  [data-anim~="A7"] .acordeon input:checked {
+    border-color: var(--rojo);
+    background-color: var(--rojo);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  [data-anim~="A7"] .marca input::after,
+  [data-anim~="A7"] .tramo input::after,
+  [data-anim~="A7"] .acordeon input::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--rojo);
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-anim~="A7"] .marca input:checked::after,
+  [data-anim~="A7"] .tramo input:checked::after,
+  [data-anim~="A7"] .acordeon input:checked::after {
+    animation: dibujarCheck 280ms var(--curva-anim);
+  }
+}
+@keyframes dibujarCheck {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}

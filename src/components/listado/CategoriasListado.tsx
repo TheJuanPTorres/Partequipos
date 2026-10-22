@@ -2,7 +2,9 @@
 
 import { IconChevronDown } from "@tabler/icons-react";
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
+
+import { CURVA, DURACION_MS } from "@/lib/listado/animaciones";
 
 import { iconoDePestana } from "./iconos";
 import estilos from "./listado.module.css";
@@ -23,15 +25,30 @@ import type { Pestana } from "./PlantillaListado";
  * Los enlaces solo cambian el catálogo (`data-catalogo-nav`, `ZonaCatalogo`) y
  * se precargan al pasar el ratón o enfocarlos, no al entrar en pantalla: así
  * cargar la página no dispara una petición por categoría.
+ *
+ * Con `deslizar` (animación A4, `src/lib/listado/animaciones.ts`), el
+ * resaltado de la categoría actual se desliza desde el botón de antes hasta el
+ * nuevo (solo `transform`, sobre su `::before`).
  */
+
+/**
+ * Dónde estaba el resaltado al elegir otra categoría. Fuera del componente
+ * porque, al cambiar de categoría, Next monta la página de nuevo.
+ */
+let resaltadoAnterior: { caja: DOMRect; cuando: number } | null = null;
+
+/** Pasado este tiempo, el resaltado ya no se desliza (la navegación tardó demasiado). */
+const VIGENCIA_DESLIZAR_MS = 5000;
 export function CategoriasListado({
   pestanas,
   titulo,
   elemento,
+  deslizar = false,
 }: {
   pestanas: Pestana[];
   titulo: string;
   elemento: { singular: string; plural: string };
+  deslizar?: boolean;
 }) {
   const [abiertas, setAbiertas] = useState(false);
   const [precargar, setPrecargar] = useState<string | null>(null);
@@ -39,18 +56,52 @@ export function CategoriasListado({
   const idLista = useId();
   const ocultables = pestanas.filter((p) => p.nota && !p.activa).length;
 
-  useEffect(() => {
+  // Antes de pintar: la fila se desplaza hasta la actual y, después, el resaltado se desliza.
+  useLayoutEffect(() => {
     const ul = lista.current;
     const actual = ul?.querySelector<HTMLElement>("[aria-current='page']");
+    if (!ul || !actual) return;
     // Solo si es la fila deslizable (móvil y tablet) y la actual no se ve entera.
-    if (!ul || !actual || ul.scrollWidth <= ul.clientWidth) return;
-    const margen = 16;
-    const izquierda = actual.offsetLeft - ul.offsetLeft;
-    const derecha = izquierda + actual.offsetWidth;
-    if (izquierda < ul.scrollLeft + margen || derecha > ul.scrollLeft + ul.clientWidth - margen) {
-      ul.scrollLeft = izquierda - margen;
+    if (ul.scrollWidth > ul.clientWidth) {
+      const margen = 16;
+      const izquierda = actual.offsetLeft - ul.offsetLeft;
+      const derecha = izquierda + actual.offsetWidth;
+      if (izquierda < ul.scrollLeft + margen || derecha > ul.scrollLeft + ul.clientWidth - margen) {
+        ul.scrollLeft = izquierda - margen;
+      }
     }
-  }, []);
+    const antes = resaltadoAnterior;
+    resaltadoAnterior = null;
+    if (
+      !deslizar ||
+      !antes ||
+      Date.now() - antes.cuando > VIGENCIA_DESLIZAR_MS ||
+      matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    const ahora = actual.getBoundingClientRect();
+    if (!ahora.width || !ahora.height) return;
+    const dx = antes.caja.left - ahora.left;
+    const dy = antes.caja.top - ahora.top;
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+    actual.animate(
+      [
+        {
+          transform: `translate(${dx}px, ${dy}px) scale(${antes.caja.width / ahora.width}, ${antes.caja.height / ahora.height})`,
+        },
+        { transform: "none" },
+      ],
+      { duration: DURACION_MS, easing: CURVA, pseudoElement: "::before" },
+    );
+  }, [deslizar]);
+
+  /** Al elegir otra categoría, se guarda dónde estaba el resaltado. */
+  const recordarResaltado = () => {
+    const actual = lista.current?.querySelector("[aria-current='page']");
+    resaltadoAnterior = actual
+      ? { caja: actual.getBoundingClientRect(), cuando: Date.now() }
+      : null;
+  };
 
   return (
     <nav aria-labelledby="categorias-titulo" className={estilos.categorias} data-catalogo-nav="">
@@ -83,6 +134,7 @@ export function CategoriasListado({
                   onMouseEnter={() => setPrecargar(p.href)}
                   onFocus={() => setPrecargar(p.href)}
                   onTouchStart={() => setPrecargar(p.href)}
+                  onClick={deslizar && !p.activa ? recordarResaltado : undefined}
                   className={estilos.categoria}
                   aria-current={p.activa ? "page" : undefined}
                 >

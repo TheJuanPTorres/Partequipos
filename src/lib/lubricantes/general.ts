@@ -25,7 +25,12 @@ export const TEXTOS_LUBRICANTES = {
 
 type GrupoLubricantes = PaginasIndice["lubricantes"];
 
-export type MarcaDestacada = { nombre: string; href: string; logo: LogoConAlt | null };
+export type MarcaDestacada = {
+  nombre: string;
+  /** Destino de «Ver catálogo»; `null`, sin el botón (las páginas de la marca y de sus líneas). */
+  href: string | null;
+  logo: LogoConAlt | null;
+};
 
 export type VistaLubricantes = {
   encabezado: VistaEncabezado;

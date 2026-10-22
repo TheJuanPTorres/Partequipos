@@ -39,7 +39,7 @@ describe("rutaEnElSitio", () => {
     );
     assert.equal(
       await rutaEnElSitio("categorias-lubricante", { slug: "auto-liviano", marca: 5 }, buscar),
-      "/lubricantes/lubricantes-eni/#auto-liviano",
+      "/lubricantes/lubricantes-eni/auto-liviano/",
     );
   });
 

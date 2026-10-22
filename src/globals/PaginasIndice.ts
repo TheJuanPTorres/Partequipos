@@ -2,7 +2,7 @@ import type { Field, GlobalConfig } from "payload";
 
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
-import { revalidarRutas } from "../lib/revalidation";
+import { revalidarMarcasDeLubricante, revalidarRutas } from "../lib/revalidation";
 
 /**
  * Las páginas ÍNDICE de repuestos, de maquinaria y de usados y la de CONTÁCTANOS (plantillas
@@ -90,6 +90,7 @@ export const PaginasIndice: GlobalConfig = {
           ],
           "global paginas-indice",
         );
+        revalidarMarcasDeLubricante("global paginas-indice");
         return doc;
       },
     ],

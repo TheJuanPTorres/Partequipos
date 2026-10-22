@@ -102,6 +102,8 @@ const megamenuEnCache = unstable_cache(
       payload.find({
         collection: "categorias-lubricante",
         ...base,
+        // En el orden del panel («Orden», 2026-10-22), y sin orden, por nombre.
+        sort: ["orden", "nombre"],
         select: { ...conMarca, enlaceMenu: true },
       }),
     ]);

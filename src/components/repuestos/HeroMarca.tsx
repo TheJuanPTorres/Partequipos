@@ -1,9 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import reserva from "@/components/blog/cabeceraArticulo.module.css";
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import { Revelado } from "@/components/movimiento/Revelado";
 import type { VistaEncabezado } from "@/lib/repuestos/marca";
+import type { BreadcrumbItem } from "@/lib/seo/jsonLd";
 
 import { IconoRaton } from "./IconoRaton";
 import estilos from "./marca.module.css";
@@ -45,6 +47,7 @@ export function HeroMarca({
   bajo = false,
   tituloLargo = false,
   etiquetaRaton,
+  migas,
 }: {
   vista: VistaEncabezado;
   anclaSiguiente: string;
@@ -60,6 +63,11 @@ export function HeroMarca({
   tituloLargo?: boolean;
   /** Nombre accesible del icono del ratón. */
   etiquetaRaton?: string;
+  /**
+   * Migas VISIBLES sobre el logo (la plantilla de Andrés de las líneas de lubricante, 4039),
+   * con los mismos items del `BreadcrumbList`. Sin ellas, la página pone las suyas.
+   */
+  migas?: BreadcrumbItem[];
 }) {
   const { fondo, logo } = vista;
   const baja = bajo || (bajaSinFoto && !fondo);
@@ -81,6 +89,24 @@ export function HeroMarca({
         <div className={estilos.velo} aria-hidden="true" />
 
         <div className={estilos.heroContenido}>
+          {migas && migas.length > 0 ? (
+            <nav aria-label="Ruta de navegación" className={estilos.migasHero}>
+              <ol>
+                {migas.map((m, i) =>
+                  i === migas.length - 1 ? (
+                    <li key={m.path} aria-current="page">
+                      {m.nombre}
+                    </li>
+                  ) : (
+                    <li key={m.path}>
+                      <Link href={`${m.path.replace(/\/$/, "")}/`}>{m.nombre}</Link>
+                    </li>
+                  ),
+                )}
+              </ol>
+            </nav>
+          ) : null}
+
           {logo ? (
             <div className={estilos.placa}>
               <LogoMarca logo={logo} alt={logo.alt} sizes="120px" className={estilos.logo} />

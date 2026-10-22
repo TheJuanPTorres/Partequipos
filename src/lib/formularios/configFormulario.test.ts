@@ -47,4 +47,13 @@ describe("configContactoMarca", () => {
     assert.equal(c.etiquetaMensaje, "¿Qué necesitas?");
     assert.equal(c.titulo, "Cotización: Excavadora ZX130-5B");
   });
+
+  it("producto de lubricante: cotización con el producto como referencia de texto", () => {
+    const c = configContactoMarca({ ...base, producto: "Lubricante Eni I-RIDE RACING 5W-40" });
+    assert.equal(c.tipo, "cotizacion");
+    assert.deepEqual(c.referencia, { texto: "Lubricante Eni I-RIDE RACING 5W-40" });
+    assert.equal(c.conCiudad, true);
+    assert.equal(c.etiquetaMensaje, "¿Qué necesitas?");
+    assert.equal(c.titulo, "Cotización: Lubricante Eni I-RIDE RACING 5W-40");
+  });
 });

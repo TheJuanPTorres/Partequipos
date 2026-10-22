@@ -16,6 +16,11 @@
  *
  *      npm run preview:ejecutar -- payload run scripts/documentos/visor.ts fichas preview
  *
+ *    Con `de=lubricantes` (2026-10-22), los PDF de «Ficha técnica» de los productos de las
+ *    líneas de lubricante, que se abren en el visor desde la página de cada línea:
+ *
+ *      npm run preview:ejecutar -- payload run scripts/documentos/visor.ts fichas preview de=lubricantes
+ *
  * 2. `pagina` — en una página institucional, cambia cada párrafo que solo
  *    enlaza a un PDF de «Documentos» por el bloque «Documento en visor» de ese
  *    documento (dentro de su sección, en el mismo sitio):
@@ -255,18 +260,29 @@ async function paginasDeFichas(): Promise<void> {
     guardarManifiesto();
     log(`  páginas del documento ${rehacer} borradas; se vuelven a generar`);
   }
-  const equipos = (
-    await payload.find({
-      collection: "equipos-nuevos",
-      depth: 0,
-      limit: 0,
-      pagination: false,
-      overrideAccess: true,
-    })
-  ).docs;
-  const ids = [...new Set(equipos.flatMap((e) => idDe(e.fichaTecnicaPdf) ?? []))]
-    .filter((id) => !solo || id === solo)
-    .sort((a, b) => a - b);
+  const de = valorDe("de") ?? "equipos";
+  if (de !== "equipos" && de !== "lubricantes") fallar("de=equipos o de=lubricantes");
+  const idsDeOrigen =
+    de === "lubricantes"
+      ? (
+          await payload.find({
+            collection: "categorias-lubricante",
+            depth: 0,
+            limit: 0,
+            pagination: false,
+            overrideAccess: true,
+          })
+        ).docs.flatMap((c) => (c.productos ?? []).flatMap((p) => idDe(p.ficha) ?? []))
+      : (
+          await payload.find({
+            collection: "equipos-nuevos",
+            depth: 0,
+            limit: 0,
+            pagination: false,
+            overrideAccess: true,
+          })
+        ).docs.flatMap((e) => idDe(e.fichaTecnicaPdf) ?? []);
+  const ids = [...new Set(idsDeOrigen)].filter((id) => !solo || id === solo).sort((a, b) => a - b);
   const pendientes: { id: number; url: string; titulo: string }[] = [];
   for (const id of ids) {
     const doc = await payload.findByID({

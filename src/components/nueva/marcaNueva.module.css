@@ -56,22 +56,18 @@
   display: flex;
   padding: 10px 0;
   align-items: center;
-  gap: 39px;
   white-space: nowrap;
 }
 
-.itemFranja::after {
-  display: block;
-  width: 39px;
-  content: "";
-}
-
-.punto {
+/* El separador «|» va después de cada texto con el MISMO margen a los dos lados: la unión de
+   una copia con la siguiente (y la del bucle) queda igual que entre dos textos cualesquiera. */
+.separador {
   flex: none;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--acento, var(--color-marca));
+  margin: 0 39px;
+  color: var(--acento, var(--color-marca));
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.2;
 }
 
 .enlaceFranja {
@@ -317,7 +313,8 @@ a.enlaceFranja:focus-visible {
     padding-top: 40px;
   }
 
-  .enlaceFranja {
+  .enlaceFranja,
+  .separador {
     font-size: 6.5vw;
   }
 

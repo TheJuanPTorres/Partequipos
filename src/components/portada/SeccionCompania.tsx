@@ -306,7 +306,7 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
           tabIndex={-1}
         >
           {textos.marquesina}
-          <span className={estilos.separador}>•</span>
+          <span className={estilos.separador}>|</span>
         </a>
       ))}
     </div>

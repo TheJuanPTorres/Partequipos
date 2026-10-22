@@ -43,6 +43,7 @@ import {
   alternativasEnNueva,
   mensajeSinUnidades,
   nombreEnTexto,
+  tituloEnNueva,
   usaEstadoVacioPropio,
 } from "./vacia";
 
@@ -53,6 +54,8 @@ import {
  */
 export type DatosVacio = {
   mensaje: string;
+  /** El título de la sección de maquinaria nueva (`tituloEnNueva`). */
+  tituloNueva: string;
   /** Lo que se pide en el formulario («Cargadores usados»). */
   referencia: string;
   nueva: TarjetaMarca[];
@@ -80,6 +83,7 @@ async function datosVacio(ambito: Ambito): Promise<DatosVacio> {
   const { nombre } = ambito.registro;
   return {
     mensaje: mensajeSinUnidades(ambito.tipo, ambito.titulo, nombre),
+    tituloNueva: tituloEnNueva(nombre),
     referencia: ambito.titulo,
     nueva:
       ambito.tipo === "categoria"

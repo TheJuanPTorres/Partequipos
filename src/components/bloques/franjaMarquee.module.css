@@ -57,19 +57,20 @@
 
 .item {
   display: flex;
-  padding: 10px;
+  padding: 10px 0;
   align-items: center;
-  gap: 34px;
   white-space: nowrap;
 }
 
-/* El `fa-circle` de 20 px de ux-9, dibujado sin la fuente de iconos. */
-.punto {
+/* El `fa-circle` de ux-9 pasa a «|», después de cada texto y con el MISMO margen a los dos lados
+   (la unión de las copias y la del bucle quedan como entre dos textos cualesquiera). */
+.separador {
   flex: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--color-fondo);
+  margin: 0 0.3em;
+  color: var(--color-fondo);
+  font-size: var(--franja-texto);
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 .texto {

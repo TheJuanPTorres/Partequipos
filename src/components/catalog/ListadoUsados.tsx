@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PlantillaListado } from "@/components/listado/PlantillaListado";
 import { TarjetaListado } from "@/components/listado/TarjetaListado";
 import type { ResultadoListado } from "@/lib/filtros";
+import type { Animacion } from "@/lib/listado/animaciones";
 import type { UnidadUsada } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
 import estilosListado from "@/components/listado/listado.module.css";
@@ -20,7 +21,8 @@ const numero = (n: number) => n.toLocaleString("es-CO");
  * cabecera, filtros a la izquierda (en las categorías, con los botones de
  * categoría encima, `pestanasEnLateral`), ordenar, vista lista/rejilla y tarjetas con peso, año y horas.
  * Categorías, filtros, orden y paginación cambian solo el catálogo, sin recargar
- * (`navegacionCliente`, 2026-10-21); sin JavaScript, como siempre.
+ * (`navegacionCliente`, 2026-10-21); sin JavaScript, como siempre. Con las
+ * animaciones encendidas en `src/lib/listado/animaciones.ts` (2026-10-21).
  * Las piezas son las comunes (`src/components/listado/`).
  *
  * Solo se listan las disponibles; las vendidas se marcan, no se borran. Sin
@@ -35,6 +37,7 @@ export function ListadoUsados({
   listado,
   vacio,
   aviso,
+  animaciones = [],
 }: {
   ambito: Ambito;
   pagina: number;
@@ -43,6 +46,8 @@ export function ListadoUsados({
   vacio: DatosVacio | null;
   /** Sin ninguna unidad y con el interruptor en «Provisional»: el aviso sencillo. */
   aviso?: AvisoVacio | null;
+  /** Las animaciones que se pintan (`animacionesActivas`). */
+  animaciones?: Animacion[];
 }) {
   const { registro, catalogo } = ambito;
   const migas = [
@@ -64,6 +69,7 @@ export function ListadoUsados({
       etiquetaPestanas="Categorías"
       pestanasEnLateral
       navegacionCliente
+      animaciones={animaciones}
       catalogo={catalogo}
       listado={listado}
       rutaDe={(n) => `${ambito.ruta(n)}/`}
@@ -118,6 +124,8 @@ export function ListadoUsados({
             },
           ]}
           prioridad={i === 0}
+          flecha={animaciones.includes("A3")}
+          fundido={animaciones.includes("A6")}
         />
       ))}
     </PlantillaListado>

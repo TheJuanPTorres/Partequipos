@@ -158,38 +158,9 @@ async function redirectsHacia(ruta: string) {
 }
 
 // ---------- Retirada ----------
+// Primero vuelven las unidades (y la categoría, si se ocultó aquí), para que las
+// URL viejas tengan página en cuanto se borran los 301; luego los 301.
 if (modo === "retirar") {
-  let borrados = 0;
-  for (const id of [...manifiesto.redirects].reverse()) {
-    const r = await payload
-      .delete({ collection: "redirects", id, overrideAccess: true })
-      .catch(() => null);
-    if (r) borrados++;
-  }
-  log(`redirecciones creadas y borradas: ${borrados} de ${manifiesto.redirects.length}`);
-  for (const a of manifiesto.aplanados) {
-    await payload.update({
-      collection: "redirects",
-      id: a.id,
-      data: {
-        hacia: a.hacia,
-        estadoDestino: a.estadoDestino,
-        destinoVerificadoEn: a.destinoVerificadoEn,
-      },
-      overrideAccess: true,
-      context: { saltarAplanado: true },
-    });
-  }
-  log(`301 aplanados devueltos a su destino de antes: ${manifiesto.aplanados.length}`);
-  for (const u of manifiesto.unidades) {
-    await payload.update({
-      collection: "equipos-usados",
-      id: u.id,
-      data: { categoria: u.categoria },
-      overrideAccess: true,
-    });
-  }
-  log(`unidades devueltas a su categoría: ${manifiesto.unidades.length}`);
   if (manifiesto.mostrarEnWebAntes !== null) {
     await payload.update({
       collection: "categorias-usada",
@@ -199,6 +170,40 @@ if (modo === "retirar") {
     });
     log(`«Mostrar en la web» de Miniexcavadoras devuelto a ${manifiesto.mostrarEnWebAntes}`);
   }
+  for (const u of manifiesto.unidades) {
+    await payload.update({
+      collection: "equipos-usados",
+      id: u.id,
+      data: { categoria: u.categoria },
+      overrideAccess: true,
+    });
+  }
+  log(`unidades devueltas a su categoría: ${manifiesto.unidades.length}`);
+  let borrados = 0;
+  for (const id of [...manifiesto.redirects].reverse()) {
+    const r = await payload
+      .delete({ collection: "redirects", id, overrideAccess: true })
+      .catch(() => null);
+    if (r) borrados++;
+  }
+  log(`redirecciones creadas y borradas: ${borrados} de ${manifiesto.redirects.length}`);
+  for (const a of manifiesto.aplanados) {
+    // Dos pasos: al cambiar `hacia`, el gancho `marcarDestinoSinVerificar` pone
+    // el estado en «sin verificar»; con `hacia` ya igual, se devuelve el de antes.
+    await payload.update({
+      collection: "redirects",
+      id: a.id,
+      data: { hacia: a.hacia },
+      overrideAccess: true,
+    });
+    await payload.update({
+      collection: "redirects",
+      id: a.id,
+      data: { estadoDestino: a.estadoDestino, destinoVerificadoEn: a.destinoVerificadoEn },
+      overrideAccess: true,
+    });
+  }
+  log(`301 aplanados devueltos a su destino y su estado de antes: ${manifiesto.aplanados.length}`);
   const quedan = (await unidadesDe(origen.id)).length;
   manifiesto.unidades = [];
   manifiesto.redirects = [];

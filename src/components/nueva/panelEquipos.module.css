@@ -248,7 +248,6 @@
   text-transform: uppercase;
   transition:
     background-color 180ms ease,
-    padding-left 220ms cubic-bezier(0.22, 1, 0.36, 1),
     color 180ms ease;
 }
 
@@ -276,15 +275,20 @@
     transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.item:hover,
-.item:focus-visible {
+/*
+ * Al pasar el ratón o enfocar, SOLO cambian el color y el fondo (dirección, 2026-10-22): el
+ * relleno y el borde son siempre los mismos, así el texto se corta en las mismas líneas antes y
+ * durante el hover (antes ganaba 8 px de relleno y un nombre largo saltaba de línea). Solo los
+ * enlaces: una entrada sin página es texto informativo.
+ */
+a.item:hover,
+a.item:focus-visible {
   background: rgb(0 0 0 / 0.06);
   color: var(--color-marca, #e5242d);
-  padding-left: 22px;
 }
 
-.item:hover .flecha,
-.item:focus-visible .flecha {
+a.item:hover .flecha,
+a.item:focus-visible .flecha {
   opacity: 1;
   transform: none;
 }
@@ -301,16 +305,15 @@
   .flecha {
     transition: none;
   }
-
-  .item:hover,
-  .item:focus-visible {
-    padding-left: 14px;
-  }
 }
 
-/* Una entrada sin página (repuestos: WordPress la nombra sin ficha): el texto, sin efecto. */
+/*
+ * Una entrada sin página (repuestos: WordPress la nombra sin ficha; los productos de una
+ * categoría técnica): SOLO INFORMATIVA, no reacciona al ratón (sin fondo, sin rojo, sin mano).
+ */
 .itemSinEnlace {
   color: var(--color-texto-suave, #56545a);
+  cursor: default;
 }
 
 /*

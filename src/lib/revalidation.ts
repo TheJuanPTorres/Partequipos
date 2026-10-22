@@ -79,6 +79,7 @@ export const PATRONES_DE_PAGINA = {
   categoriasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]`,
   paginasUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]",
   marcasDeLubricante: "/(site)/lubricantes/[marca]",
+  lineasDeLubricante: "/(site)/lubricantes/[marca]/[categoria]",
   /** Páginas institucionales y artículos (la ruta comodín). */
   comodin: "/(site)/[...slug]",
 } as const;
@@ -234,12 +235,14 @@ export function revalidarFichasDeProducto(motivo: string): void {
 }
 
 /**
- * Revalida las páginas de las marcas de lubricantes: su bloque final lleva los textos de la
- * página general (grupo «Lubricantes» de «Páginas índice y contacto», 2026-10-21). Nunca relanza.
+ * Revalida las páginas de las marcas de lubricantes y las de sus líneas: su bloque final lleva
+ * los textos de la página general (grupo «Lubricantes» de «Páginas índice y contacto»,
+ * 2026-10-21), y las líneas pintan además el logo y el nombre de su marca. Nunca relanza.
  */
 export function revalidarMarcasDeLubricante(motivo: string): void {
   try {
     revalidatePath(PATRONES_DE_PAGINA.marcasDeLubricante, "page");
+    revalidatePath(PATRONES_DE_PAGINA.lineasDeLubricante, "page");
   } catch (error) {
     console.error(`[revalidación] fallaron las marcas de lubricantes (${motivo}):`, error);
   }
@@ -340,9 +343,14 @@ export function rutasDeCategoriaUsada(slug: string): string[] {
  * categorías: solo la página de la marca. Desde el 2026-10-14 las categorías
  * son secciones de esa página y ya no tienen ruta propia.
  */
-export function rutasDeMarcaLubricante(marcaSlug: string): string[] {
-  // La página general (2026-10-20) pinta el logo y el enlace de la marca destacada.
-  return [rutas.marcaLubricante(marcaSlug), rutas.lubricantes()];
+export function rutasDeMarcaLubricante(marcaSlug: string, lineaSlugs: string[] = []): string[] {
+  // La página general (2026-10-20) pinta el logo y el enlace de la marca destacada; la de
+  // cada línea (2026-10-22), su tarjeta en la de la marca.
+  return [
+    rutas.marcaLubricante(marcaSlug),
+    rutas.lubricantes(),
+    ...lineaSlugs.map((l) => rutas.categoriaLubricante(marcaSlug, l)),
+  ];
 }
 
 // --- Blog -------------------------------------------------------------------

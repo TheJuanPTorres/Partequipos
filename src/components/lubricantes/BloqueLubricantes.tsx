@@ -16,8 +16,9 @@ import estilos from "./general.module.css";
  * texto, el logo de la marca destacada (`LogoMarca`) y «Ver catálogo» a su
  * página. Los textos salen del panel.
  *
- * También cierra la página de cada marca (Lubricantes ENI, plantilla 3946), con
- * su propio formulario (`formulario`: el mismo de los botones «Cotizar»).
+ * También cierra la página de cada marca (Lubricantes ENI, plantilla 3946) y la de
+ * cada una de sus líneas (plantilla 4039), con su propio formulario (`formulario`:
+ * el mismo de los botones «Cotizar») y SIN «Ver catálogo» (dirección, 2026-10-22).
  */
 export function BloqueLubricantes({
   id,
@@ -78,10 +79,12 @@ export function BloqueLubricantes({
               ) : (
                 <span />
               )}
-              <Link href={bloque.marca.href} className={estilos.boton}>
-                {bloque.textoBoton}
-                <IconArrowRight aria-hidden="true" focusable="false" stroke={2} />
-              </Link>
+              {bloque.marca.href ? (
+                <Link href={bloque.marca.href} className={estilos.boton}>
+                  {bloque.textoBoton}
+                  <IconArrowRight aria-hidden="true" focusable="false" stroke={2} />
+                </Link>
+              ) : null}
             </div>
           ) : null}
         </div>

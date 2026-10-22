@@ -4,7 +4,7 @@ import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
 import estilosMarca from "@/components/repuestos/marca.module.css";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import type { VistaLubricantes } from "@/lib/lubricantes/general";
-import type { SeccionLubricante } from "@/lib/lubricantes/marca";
+import { scriptAnclasALineas, type SeccionLubricante } from "@/lib/lubricantes/marca";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { conAlt, logoPropio } from "@/lib/marca/logoMarca";
 import { rutas } from "@/lib/routes";
@@ -15,7 +15,6 @@ import type { MarcasLubricante } from "@/payload-types";
 
 import { BloqueLubricantes } from "./BloqueLubricantes";
 import estilos from "./lubricantes.module.css";
-import { SeccionesLubricante } from "./SeccionesLubricante";
 
 /** Ancla de las tarjetas de línea (el icono del ratón baja a ellas) y del formulario. */
 const ANCLA_LINEAS = "lineas";
@@ -26,18 +25,20 @@ const ANCLA_CONTACTO = "contacto";
  * (3946; dirección, 2026-10-21). Sustituye a la provisional sencilla; el diseño propio de
  * ENI (`PaginaMarcaLubricante`) sigue opt-in con la casilla «Diseño propio» de la marca.
  *
- * CAMBIA EL DISEÑO, NO EL CONTENIDO: las líneas siguen siendo secciones de esta página, con
- * su ancla (`#auto-liviano`…), que es adonde llevan el megamenú y los 301 de las URL viejas.
+ * DESDE EL 2026-10-22 (dirección) cada línea tiene su página (plantilla 4039), así que esta
+ * ya no lista los productos:
  *
  * 1. Cabecera de la plantilla (la de las páginas índice): foto de la marca o, sin ella, el
  *    fondo oscuro; logo (`LogoMarca`), «Lubricantes {marca}» revelado por palabras, la
  *    entradilla y el icono del ratón; tras ella, la franja del color de la marca del panel.
- * 2. Una tarjeta por línea con su foto y «Ver todo», que baja a su sección (4 en una fila en
- *    escritorio y 2 + 2 en tablet y móvil).
- * 3. Los productos de cada línea, como estaban.
- * 4. El bloque final de la plantilla: nuestro formulario («Ciudad» y «¿Qué necesitas?») y
- *    «Máxima protección y eficiencia…» con los textos del panel, el logo y «Ver catálogo»,
- *    que aquí baja a la primera línea (la página no se enlaza a sí misma).
+ * 2. Una tarjeta por línea con su foto y «Ver todo» a su página, en el «Orden» del panel (4 en
+ *    una fila en escritorio y 2 + 2 en tablet y móvil).
+ * 3. El bloque final de la plantilla: nuestro formulario («Ciudad» y «¿Qué necesitas?») y
+ *    «Máxima protección y eficiencia…» con los textos del panel y el logo, sin «Ver catálogo»
+ *    (dirección, 2026-10-22; en `/lubricantes/` se queda).
+ *
+ * Las anclas viejas de las líneas (`#auto-liviano`), que pueden estar enlazadas desde fuera,
+ * llevan a su página con un script en línea (`scriptAnclasALineas`).
  */
 export function PaginaMarcaLubricantePlantilla({
   marca,
@@ -53,7 +54,7 @@ export function PaginaMarcaLubricantePlantilla({
 }) {
   const titulo = `Lubricantes ${marca.nombre}`;
   const logo = conAlt(logoPropio({ logo: marca.logo }), `Logo de ${marca.nombre}`);
-  // El mismo formulario al final de la página y en la ventana de los botones «Cotizar».
+  // El formulario del final de la página (los «Cotizar» de cada producto están en su línea).
   const formulario = configContactoMarca({
     origen: `${rutas.marcaLubricante(marca.slug)}/`,
     siteKey: turnstileSiteKey(),
@@ -66,10 +67,14 @@ export function PaginaMarcaLubricantePlantilla({
       etiquetaMensaje: "¿Qué necesitas?",
     },
   });
-  const primera = secciones[0];
+  const destinos = Object.fromEntries(
+    secciones.map((s) => [s.ancla, `${rutas.categoriaLubricante(marca.slug, s.ancla)}/`]),
+  );
 
   return (
     <main className={estilosMarca.pagina} style={estiloDeMarca(marca.colorPrincipal)}>
+      {/* Antes de pintar nada más: un `#auto-liviano` viejo lleva a su página sin esperar. */}
+      <script dangerouslySetInnerHTML={{ __html: scriptAnclasALineas(destinos) }} />
       <HeroMarca
         vista={{
           linea1: titulo,
@@ -90,7 +95,7 @@ export function PaginaMarcaLubricantePlantilla({
         tarjetas={secciones.map((s) => ({
           clave: s.ancla,
           titulo: s.nombre,
-          href: `#${s.ancla}`,
+          href: destinos[s.ancla] ?? `#${s.ancla}`,
           imagen: s.imagen,
           soloEscritorio: false,
         }))}
@@ -104,21 +109,11 @@ export function PaginaMarcaLubricantePlantilla({
         </div>
       ) : null}
 
-      <SeccionesLubricante
-        secciones={secciones}
-        anclaContacto={ANCLA_CONTACTO}
-        formulario={formulario}
-      />
-
       <BloqueLubricantes
         id={ANCLA_CONTACTO}
         bloque={{
           ...bloque,
-          marca: {
-            nombre: marca.nombre,
-            href: primera ? `#${primera.ancla}` : `${rutas.lubricantes()}/`,
-            logo,
-          },
+          marca: { nombre: marca.nombre, href: null, logo },
         }}
         origen={formulario.origen}
         siteKey={formulario.siteKey}

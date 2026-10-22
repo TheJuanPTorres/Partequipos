@@ -72,6 +72,7 @@ import * as migration_20261020_183648_documento_visor from './20261020_183648_do
 import * as migration_20261020_192253_categorias_cabeceras from './20261020_192253_categorias_cabeceras';
 import * as migration_20261020_230146_categoria_usada_mostrar_en_web from './20261020_230146_categoria_usada_mostrar_en_web';
 import * as migration_20261021_052023_equipo_nuevo_vista360 from './20261021_052023_equipo_nuevo_vista360';
+import * as migration_20261022_014813_lubricantes_lineas_paginas from './20261022_014813_lubricantes_lineas_paginas';
 
 export const migrations = [
   {
@@ -442,6 +443,11 @@ export const migrations = [
   {
     up: migration_20261021_052023_equipo_nuevo_vista360.up,
     down: migration_20261021_052023_equipo_nuevo_vista360.down,
-    name: '20261021_052023_equipo_nuevo_vista360'
+    name: '20261021_052023_equipo_nuevo_vista360',
+  },
+  {
+    up: migration_20261022_014813_lubricantes_lineas_paginas.up,
+    down: migration_20261022_014813_lubricantes_lineas_paginas.down,
+    name: '20261022_014813_lubricantes_lineas_paginas'
   },
 ];

@@ -128,11 +128,12 @@ export const rutas = {
   lubricantes: () => `/${SEGMENTO_LUBRICANTES}`,
   marcaLubricante: (marcaSlug: string) => `/${SEGMENTO_LUBRICANTES}/${marcaSlug}`,
   /**
-   * Las categorías de lubricante son SECCIONES de la página de su marca
-   * (2026-10-14): su dirección es el ancla. La URL antigua lleva un 301 aquí.
+   * La página de una línea de lubricantes, en su URL de WordPress (desde el
+   * 2026-10-22, plantilla de Andrés 4039; del 2026-10-14 al 21 fue un ancla de
+   * la página de su marca).
    */
   categoriaLubricante: (marcaSlug: string, categoriaSlug: string) =>
-    `/${SEGMENTO_LUBRICANTES}/${marcaSlug}/#${categoriaSlug}`,
+    `/${SEGMENTO_LUBRICANTES}/${marcaSlug}/${categoriaSlug}`,
 
   // --- Blog ---------------------------------------------------------------
   blog: () => `/${SEGMENTO_BLOG_INDICE}`,

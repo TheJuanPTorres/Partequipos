@@ -49,10 +49,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  * provisional sencilla); con la casilla «Diseño propio» de la marca, el «sitio dentro del sitio»
  * con su identidad (`PaginaMarcaLubricante`, #260), con los colores desde el panel.
  *
- * Las 4 subpáginas de WordPress (auto liviano, auto pesado, engranajes, motos y
- * scooter) son SECCIONES de esta página desde el 2026-10-14, con su `slug`
- * como ancla y un 301 desde la URL antigua (decisión de dirección; detalle en
- * docs/diseno/decisiones-servicio-lubricantes.md).
+ * Las 4 líneas (auto liviano, auto pesado, engranajes, motos y scooter) tienen su página
+ * desde el 2026-10-22 (`[categoria]`, plantilla 4039), en su URL de WordPress; la plantilla
+ * de esta solo pinta sus tarjetas, y el diseño propio las sigue pintando como secciones
+ * (detalle en docs/diseno/decisiones-servicio-lubricantes.md §10).
  */
 export default async function MarcaLubricantePage({ params }: { params: Promise<Params> }) {
   const { marca: slug } = await params;

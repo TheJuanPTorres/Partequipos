@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { ANIMACIONES, animacionesActivas, inicioDelContador } from "./animaciones";
+import { ANIMACIONES, animacionesActivas, frenar, inicioDelContador } from "./animaciones";
 
 const encendidas = Object.entries(ANIMACIONES)
   .filter(([, v]) => v)
@@ -43,5 +43,17 @@ describe("inicioDelContador", () => {
   it("nunca empieza con más dígitos que el final", () => {
     assert.equal(inicioDelContador(104, 9), 9);
     assert.equal(inicioDelContador(1500, 230), 999);
+  });
+});
+
+describe("frenar (contador A5)", () => {
+  it("va de 0 a 1", () => {
+    assert.equal(frenar(0), 0);
+    assert.equal(frenar(1), 1);
+  });
+
+  it("frena al acercarse al final: avanza más al principio que al final", () => {
+    assert.ok(frenar(0.5) > 0.9);
+    assert.ok(frenar(0.25) - frenar(0) > frenar(1) - frenar(0.75));
   });
 });

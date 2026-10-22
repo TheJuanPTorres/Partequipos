@@ -13,7 +13,8 @@
  * - A7: la casilla dibuja su check y las etiquetas de los filtros entran suaves.
  * - A8: lista ↔ rejilla con transición de recolocación.
  *
- * Todas: misma curva y duración que «Ver más» de las categorías, solo
+ * Todas: misma curva y duración que «Ver más» de las categorías (salvo A4 y
+ * A5, abajo), solo
  * `opacity` y `transform`, apagadas con «reducir movimiento» y, sin
  * JavaScript, la página como siempre.
  */
@@ -33,6 +34,18 @@ export type Animacion = keyof typeof ANIMACIONES;
 /** Duración y curva comunes (las de «Ver más», `listado.module.css`). */
 export const DURACION_MS = 280;
 export const CURVA = "cubic-bezier(0.33, 0, 0.2, 1)";
+
+/**
+ * Excepciones pedidas por dirección (2026-10-22) para que se noten: el
+ * resaltado de la categoría (A4) viaja más despacio y frena al llegar, y el
+ * contador (A5) frena al acercarse al número final.
+ */
+export const DURACION_DESLIZAR_MS = 380;
+export const CURVA_FRENADA = "cubic-bezier(0.22, 1, 0.36, 1)";
+export const DURACION_CONTADOR_MS = 700;
+
+/** La curva de frenado como función (el contador no es CSS): `1 - (1 - t)^4`. */
+export const frenar = (t: number) => 1 - (1 - t) ** 4;
 
 /** Parámetro de la URL con el que se prueban en un preview (`?anim=A1,A3`; `?anim=no`, ninguna). */
 export const PARAMETRO_ANIMACIONES = "anim";

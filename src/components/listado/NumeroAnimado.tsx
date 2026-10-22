@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef } from "react";
 
-import { DURACION_MS, inicioDelContador } from "@/lib/listado/animaciones";
+import { DURACION_CONTADOR_MS, frenar, inicioDelContador } from "@/lib/listado/animaciones";
 
 import estilos from "./listado.module.css";
 
@@ -12,16 +12,13 @@ import estilos from "./listado.module.css";
  */
 let ultimoValor: number | null = null;
 
-/** Aproximación de la curva común (`CURVA`, que es de CSS) para el contador. */
-const facilitar = (t: number) => 1 - (1 - t) ** 3;
-
 const escribir = (span: HTMLSpanElement, n: number) => {
   if (span.firstChild) span.firstChild.nodeValue = String(n);
 };
 
 /**
  * El número de unidades del recuento, que cuenta hasta el valor nuevo en unos
- * 300 ms (animación A5 del listado de usados, `src/lib/listado/animaciones.ts`).
+ * 700 ms, frenando al acercarse al final (animación A5 del listado de usados, `src/lib/listado/animaciones.ts`).
  * El lector de pantalla solo oye el valor final: los números intermedios van
  * ocultos para él. La caja tiene desde el principio el ancho del valor final
  * (cifras de ancho fijo) y nunca cuenta con más cifras, así que no empuja el
@@ -42,8 +39,8 @@ export function NumeroAnimado({ valor }: { valor: number }) {
     let marco = 0;
     const inicio = performance.now();
     const paso = (ahora: number) => {
-      const t = Math.min(1, (ahora - inicio) / DURACION_MS);
-      escribir(span, Math.round(desde + (valor - desde) * facilitar(t)));
+      const t = Math.min(1, (ahora - inicio) / DURACION_CONTADOR_MS);
+      escribir(span, Math.round(desde + (valor - desde) * frenar(t)));
       if (t < 1) marco = requestAnimationFrame(paso);
     };
     escribir(span, desde);

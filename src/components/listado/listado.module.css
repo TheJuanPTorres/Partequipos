@@ -1144,7 +1144,7 @@
 @media (prefers-reduced-motion: no-preference) {
   [data-esqueleto] .esqueletoFoto,
   [data-esqueleto] .esqueletoDatos i {
-    animation: pulsoEsqueleto 0.9s ease-in-out infinite alternate;
+    animation: pulsoEsqueleto 280ms var(--curva-anim) infinite alternate;
   }
 }
 @keyframes pulsoEsqueleto {
@@ -1190,34 +1190,41 @@
   }
 }
 
-/* A3 — Al pasar el ratón (solo puntero fino): sube 3 px con más sombra, foto al 103 % y la flecha. */
+/*
+ * A3 — Al pasar el ratón (solo puntero fino): las DOS cajas de la tarjeta (la
+ * de la foto y la de los datos) suben 3 px y ganan sombra, cada una con su
+ * forma; la foto, al 103 % dentro de su caja, y la flecha del botón se
+ * desplaza. El contenedor de fuera no se mueve (dirección, 2026-10-22). Igual
+ * en rejilla.
+ */
 .flecha {
   flex: none;
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  [data-anim~="A3"] .tarjeta {
+  [data-anim~="A3"] .foto,
+  [data-anim~="A3"] .datos {
     position: relative;
     transition: transform 280ms var(--curva-anim);
   }
   /* La sombra mayor ya está pintada: solo cambia su opacidad. */
-  [data-anim~="A3"] .tarjeta::after {
+  [data-anim~="A3"] .foto::after,
+  [data-anim~="A3"] .datos::after {
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: 30px;
-    box-shadow: 0 16px 36px rgba(16, 15, 15, 0.14);
+    border-radius: inherit;
+    box-shadow: 0 14px 30px rgba(16, 15, 15, 0.14);
     opacity: 0;
     pointer-events: none;
     transition: opacity 280ms var(--curva-anim);
   }
-  [data-anim~="A3"] .tarjeta:hover {
+  [data-anim~="A3"] .tarjeta:hover .foto,
+  [data-anim~="A3"] .tarjeta:hover .datos {
     transform: translateY(-3px);
   }
-  [data-anim~="A3"] .tarjeta:hover::after {
+  [data-anim~="A3"] .tarjeta:hover .foto::after,
+  [data-anim~="A3"] .tarjeta:hover .datos::after {
     opacity: 1;
-  }
-  [data-anim~="A3"] .foto {
-    overflow: hidden;
   }
   [data-anim~="A3"] .foto img {
     transition: transform 280ms var(--curva-anim);
@@ -1233,11 +1240,31 @@
   }
 }
 
-/* A4 — El resaltado de la categoría actual va en su `::before`, que se desliza. */
-[data-anim~="A4"] .categoria[aria-current="page"] {
-  z-index: 1;
+/*
+ * A4 — El fondo rosado de la categoría actual (su `::before`) viaja de un
+ * botón al otro (`CategoriasListado`). Para que se vea viajar, el gris de cada
+ * botón pasa a su `::after`, por debajo; y el rosado, por encima del gris de
+ * todos y por debajo de su texto (la lista es su contexto de apilamiento). La
+ * elegida mientras llega (`data-destino`) no se pinta rosada al pasar el ratón.
+ */
+[data-anim~="A4"] .categorias ul {
   isolation: isolate;
+}
+[data-anim~="A4"] .categoria,
+[data-anim~="A4"] .categoria:hover,
+[data-anim~="A4"] .categoria[aria-current="page"] {
   background: transparent;
+}
+[data-anim~="A4"] .categoria::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -2;
+  border-radius: inherit;
+  background: var(--gris-claro);
+}
+[data-anim~="A4"] .categoria:not([aria-current]):not([data-destino]):hover::after {
+  background: var(--rosado);
 }
 [data-anim~="A4"] .categoria[aria-current="page"]::before {
   content: "";
@@ -1250,6 +1277,28 @@
 }
 
 /* A5 — El número del recuento: cifras de ancho fijo y la caja del valor final. */
+/* Mientras carga, el recuento sigue «vivo»: solo se atenúan las tarjetas (dirección, 2026-10-22). */
+[data-anim~="A5"] .resultados {
+  transition: opacity 0.2s ease;
+}
+.cuerpo[data-anim~="A5"][data-cargando] .columnaResultados {
+  opacity: 1;
+  transition-delay: 0s;
+}
+.cuerpo[data-anim~="A5"][data-cargando] .resultados {
+  opacity: 0.5;
+  transition-delay: 0.12s;
+}
+/* Con el esqueleto (A2) delante, las tarjetas tampoco se atenúan. */
+.cuerpo[data-anim~="A5"][data-anim~="A2"][data-esqueleto] .resultados {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-anim~="A5"] .resultados,
+  .cuerpo[data-anim~="A5"][data-cargando] .resultados {
+    transition: none;
+  }
+}
 .numeroAnimado {
   position: relative;
   display: inline-block;
@@ -1272,20 +1321,31 @@
   height: 100%;
   object-fit: contain;
 }
+/* Sin JavaScript no hay fundido: la miniatura ni se pinta (ni se descarga, `FotoConFundido`). */
 .miniatura {
-  filter: blur(10px);
-  transition: opacity 280ms var(--curva-anim) 280ms;
-}
-.marcoFoto[data-cargada] .miniatura {
-  opacity: 0;
+  display: none;
 }
 @media (scripting: enabled) {
+  .miniatura {
+    display: block;
+    filter: blur(10px);
+    transition: opacity 280ms var(--curva-anim) 280ms;
+  }
+  .marcoFoto[data-cargada] .miniatura {
+    opacity: 0;
+  }
   .fotoFundida {
     opacity: 0;
     transition: opacity 280ms var(--curva-anim);
   }
   .marcoFoto[data-cargada] .fotoFundida {
     opacity: 1;
+  }
+}
+/* Con «reducir movimiento», sin miniatura: la foto aparece al llegar, sin nada que desaparezca de golpe. */
+@media (prefers-reduced-motion: reduce) {
+  .miniatura {
+    display: none;
   }
 }
 .tarjetas[data-vista="rejilla"] .foto > .marcoFoto {

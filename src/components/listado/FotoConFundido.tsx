@@ -16,8 +16,10 @@ const ANCHO_MINIATURA = 32;
  * un fundido. Las dos son diferidas: fuera de la vista no se piden.
  *
  * Es de cliente porque necesita saber cuándo ha cargado la foto. Sin
- * JavaScript la foto se ve como siempre: la ocultación inicial solo se aplica
- * con `scripting: enabled` (`listado.module.css`).
+ * JavaScript la foto se ve como siempre: la ocultación inicial y la miniatura
+ * solo se aplican con `scripting: enabled` (`listado.module.css`); sin ellas,
+ * la miniatura no se pinta y, al ser diferida, no se pide. Con «reducir
+ * movimiento», tampoco hay miniatura.
  */
 export function FotoConFundido({
   src,

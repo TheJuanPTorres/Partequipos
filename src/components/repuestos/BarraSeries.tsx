@@ -37,12 +37,17 @@ export function BarraSeries({
   const destino = useRef<string | null>(null);
   /** Dónde estaba el resaltado antes del cambio, respecto a la lista. */
   const anterior = useRef<{ izquierda: number; ancho: number } | null>(null);
+  /** Al elegir una serie: comprueba si ya llegó (en cada fotograma de desplazamiento). */
+  const comprobarLlegada = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     let pendiente = 0;
     const medir = () => {
       pendiente = 0;
-      if (destino.current) return;
+      if (destino.current) {
+        comprobarLlegada.current?.();
+        return;
+      }
       // La serie llega unos 30 px bajo la barra (`scroll-margin-top`): margen de sobra.
       const limite = (barra.current?.getBoundingClientRect().bottom ?? 0) + 64;
       let elegida: string | null = null;
@@ -126,10 +131,16 @@ export function BarraSeries({
       if (hecho) return;
       hecho = true;
       window.removeEventListener("scrollend", llegar);
+      comprobarLlegada.current = null;
       destino.current = null;
       for (const animacion of entradas) animacion.play();
     };
-    // `scrollend` donde exista; si no (o si la página ya estaba ahí), a los 900 ms.
+    // Llega cuando la serie está en su sitio (bajo la barra, `scroll-margin-top`), con
+    // `scrollend` donde exista o, como red, a los 900 ms.
+    const margen = parseFloat(getComputedStyle(grupo).scrollMarginTop) || 0;
+    comprobarLlegada.current = () => {
+      if (Math.abs(grupo.getBoundingClientRect().top - margen) < 4) llegar();
+    };
     window.addEventListener("scrollend", llegar, { once: true });
     window.setTimeout(llegar, 900);
   }

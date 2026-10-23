@@ -16,19 +16,10 @@ export const REDIRECTS_FIJOS: { destination: string; source: string }[] = [
    */
   { source: "/maquinaria/", destination: "/maquinaria-pesada/" },
   /*
-   * `/nosotros/trabaja-con-nosotros/` → el portal de empleo del cliente
-   * (decisión de dirección, 2026-10-14). El mapa de alcance lo redirige con 301
-   * a https://partequipos.buk.co/trabaja-con-nosotros en vez de ser una página
-   * propia, así que NO se construye la plantilla «Trabaja con nosotros» de
-   * Andrés: es una desviación del diseño anotada en
-   * docs/diseno/decisiones-indices-contacto.md. Es una URL del sitio actual
-   * (200 en el rastreo); el destino es externo y fijo. Si algún día es una
-   * página, se quita esto.
+   * `/nosotros/trabaja-con-nosotros/` ya NO redirige (2026-10-23, Juan Pablo):
+   * del 2026-10-14 al 22 iba con 301 al portal de empleo de Buk; hoy es una
+   * página propia con las vacantes leídas de ese portal (`src/lib/vacantes/`).
    */
-  {
-    source: "/nosotros/trabaja-con-nosotros/",
-    destination: "https://partequipos.buk.co/trabaja-con-nosotros",
-  },
   /*
    * El índice de maquinaria nueva → el índice de tipos (decisión del cliente,
    * 2026-10-23). La página intermedia con las dos tarjetas «Por marca» / «Por

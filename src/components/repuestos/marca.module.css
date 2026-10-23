@@ -1110,7 +1110,8 @@ a.modelo:hover {
  * en rgb(140,140,140) sobre las fotos claras (3,4:1, sin AA). Al 60 %, el
  * antetítulo cumple AA en las 7 páginas (medido, decisiones-indices-contacto.md §9).
  */
-.heroIndice .velo {
+.heroIndice .velo,
+.heroBajoIndice .velo {
   opacity: 0.6;
 }
 

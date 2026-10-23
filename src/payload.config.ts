@@ -60,6 +60,7 @@ import { Documento } from "./collections/Documento";
 import { FichaProducto } from "./globals/FichaProducto";
 import { PaginasIndice } from "./globals/PaginasIndice";
 import { RepuestosMarca } from "./globals/RepuestosMarca";
+import { VacantesBuk } from "./globals/VacantesBuk";
 import { modoCorreo, opcionesTransporte } from "./lib/correo/smtp";
 import { LOGO_SITIO_RESPALDO } from "./lib/seo/logo";
 
@@ -246,7 +247,15 @@ export default buildConfig({
   ),
   // Globales: contenido único, no listas. El pie de todas las páginas (§13 de
   // docs/diseno/decisiones-home-ux9.md).
-  globals: sinPestanaApi([Cabecera, Pie, Seo, FichaProducto, RepuestosMarca, PaginasIndice]),
+  globals: sinPestanaApi([
+    Cabecera,
+    Pie,
+    Seo,
+    FichaProducto,
+    RepuestosMarca,
+    PaginasIndice,
+    VacantesBuk,
+  ]),
   // El «Documento en visor» también dentro del texto (2026-10-20): un PDF que se
   // lee como libro entre dos párrafos de una sección (`documentoVisor.ts`).
   editor: lexicalEditor({

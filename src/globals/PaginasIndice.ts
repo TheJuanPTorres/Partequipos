@@ -76,7 +76,7 @@ export const PaginasIndice: GlobalConfig = {
   admin: {
     group: "Partes del sitio",
     description:
-      "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada», de su página «Otros» y de «Lubricantes».",
+      "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada», de su página «Otros», de «Lubricantes» y de «Trabaja con nosotros».",
   },
   access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
@@ -96,6 +96,7 @@ export const PaginasIndice: GlobalConfig = {
             "/contactanos",
             "/lubricantes",
             "/noticias",
+            "/nosotros/trabaja-con-nosotros",
           ],
           "global paginas-indice",
         );
@@ -278,6 +279,77 @@ export const PaginasIndice: GlobalConfig = {
           label: "Texto del botón",
           admin: { placeholder: "Ver catálogo" },
         },
+      ],
+    },
+    {
+      // «Trabaja con nosotros» (plantilla de Andrés, 2026-10-23). Las vacantes salen de Buk
+      // (global «Vacantes de Buk»); aquí, solo los textos y las dos imágenes.
+      name: "trabaja",
+      type: "group",
+      label: "Página «Trabaja con nosotros»",
+      admin: {
+        description:
+          "La página /nosotros/trabaja-con-nosotros/ (plantilla de Andrés). Un campo vacío usa el texto del diseño. Las vacantes se leen de Buk: su interruptor está en «Vacantes de Buk».",
+      },
+      fields: [
+        {
+          name: "antetitulo",
+          type: "text",
+          label: "Antetítulo",
+          admin: { placeholder: "Partequipos" },
+        },
+        {
+          name: "titulo",
+          type: "text",
+          label: "Título",
+          admin: { placeholder: "Trabaja con nosotros" },
+        },
+        imagen(
+          "fondo",
+          "Foto de fondo del encabezado",
+          "Opcional. Sin ella, el encabezado queda en un tono oscuro.",
+        ),
+        {
+          name: "tituloEquipo",
+          type: "text",
+          label: "Título sobre las vacantes",
+          admin: { placeholder: "Únete a nuestro equipo" },
+        },
+        {
+          name: "textoEquipo",
+          type: "textarea",
+          label: "Texto sobre las vacantes",
+          admin: { description: "Vacío, el texto del diseño («Buscamos profesionales que…»)." },
+        },
+        {
+          name: "tituloHojaDeVida",
+          type: "text",
+          label: "Título del bloque final",
+          admin: { placeholder: "¿No ves una oferta para tu perfil?" },
+        },
+        {
+          name: "textoHojaDeVida",
+          type: "textarea",
+          label: "Texto del bloque final",
+          admin: {
+            description:
+              "Un párrafo por línea en blanco; el último va en negrita. Vacío, el texto del diseño.",
+          },
+        },
+        {
+          name: "botonHojaDeVida",
+          type: "text",
+          label: "Texto del botón del bloque final",
+          admin: {
+            placeholder: "Envíanos tu hoja de vida",
+            description: "El botón lleva al portal de empleo de Buk: aquí no se guardan datos.",
+          },
+        },
+        imagen(
+          "imagenHojaDeVida",
+          "Imagen del bloque final",
+          "Opcional. Una persona recortada (PNG o WebP con transparencia), junto al texto. Sin ella, el texto ocupa el bloque.",
+        ),
       ],
     },
     {

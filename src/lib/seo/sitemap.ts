@@ -1,5 +1,5 @@
 import { REDIRECTS_FIJOS } from "../redirects/fijos";
-import { rutas } from "../routes";
+import { rutas, SLUGS_CON_RUTA_PROPIA } from "../routes";
 import { absoluteUrl } from "./config";
 
 /** Entrada de sitemap con los campos que usa Next (`MetadataRoute.Sitemap`). */
@@ -88,6 +88,8 @@ export const PATRONES_SITEMAP = [
   "/lubricantes",
   "/lubricantes/[marca]",
   "/lubricantes/[marca]/[categoria]",
+  // «Trabaja con nosotros» (2026-10-23): ruta propia, en su URL de WordPress.
+  "/nosotros/trabaja-con-nosotros",
   /*
    * Blog. Los ARTÍCULOS no aparecen aquí: se sirven desde `[...slug]`, que ya
    * está declarado arriba, porque viven en la raíz igual que las páginas
@@ -186,7 +188,10 @@ export function buildSitemapEntries(
   ahora: Date = new Date(),
 ): SitemapEntry[] {
   const portada = paginas.find((p) => p.slug === SLUG_PORTADA_SITEMAP);
-  const institucionales = paginas.filter((p) => p.slug !== SLUG_PORTADA_SITEMAP);
+  // Las que tienen ruta propia se anuncian aparte, una sola vez.
+  const institucionales = paginas.filter(
+    (p) => p.slug !== SLUG_PORTADA_SITEMAP && !SLUGS_CON_RUTA_PROPIA.includes(p.slug),
+  );
 
   const entradas: SitemapEntry[] = [];
 
@@ -241,6 +246,21 @@ export function buildSitemapEntries(
       priority: 0.5,
     });
   }
+
+  /*
+   * «Trabaja con nosotros» (2026-10-23): siempre, con vacantes o sin ellas (sin
+   * vacantes la página sigue sirviendo: lleva al portal de Buk). Las vacantes
+   * cambian a menudo, de ahí `daily`.
+   */
+  entradas.push({
+    url: absoluteUrl(rutas.trabajaConNosotros()),
+    lastModified: fecha(
+      paginas.find((p) => p.slug === "nosotros/trabaja-con-nosotros")?.updatedAt,
+      ahora,
+    ),
+    changeFrequency: "daily",
+    priority: 0.5,
+  });
 
   for (const marca of marcas) {
     entradas.push({
@@ -451,9 +471,9 @@ export function buildSitemapEntries(
     });
   }
 
-  // Una URL que redirige no se anuncia (2026-10-17, dirección): la página
-  // institucional `nosotros/trabaja-con-nosotros` sigue en la base, pero
-  // `REDIRECTS_FIJOS` la manda al portal de empleo del cliente.
+  // Una URL que redirige no se anuncia (2026-10-17, dirección). Hasta el
+  // 2026-10-23 era `nosotros/trabaja-con-nosotros`, que iba al portal de Buk;
+  // hoy tiene página propia y la lista solo lleva `/maquinaria/`.
   const conBarra = (ruta: string) => (ruta.endsWith("/") ? ruta : `${ruta}/`);
   const redirigidas = new Set(REDIRECTS_FIJOS.map((r) => conBarra(r.source)));
   return entradas.filter((e) => !redirigidas.has(conBarra(new URL(e.url).pathname)));

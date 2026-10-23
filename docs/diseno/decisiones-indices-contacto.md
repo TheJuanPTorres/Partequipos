@@ -7,7 +7,7 @@ Agente D, 2026-10-14. Plantillas de Andrés en `partequipos-diseno\wordpress\`:
 | «Repuestos para maquinaria pesada» | `repuesto-principal\Repuesto para maquinaria pesada.json` | `partequipos.uxdesign.website/ux-9/repuestos-para-maquinaria-pesada/` |
 | «Categoría principal»              | `categoria-principal\Categoria Principal.json`            | `…/ux-9/ux-categoria-principal/`                                      |
 | «Contáctanos»                      | `contacto\Contactanos.json`                               | `…/ux-9/contacto/`                                                    |
-| «Trabaja con nosotros»             | `trabaja-con-nosotros\Trabaja con Nosotros.json`          | **No se construye** (ver §4)                                          |
+| «Trabaja con nosotros»             | `trabaja-con-nosotros\Trabaja con Nosotros.json`          | `…/ux-9/trabaja-con-nosotros/` (se construye desde el 2026-10-23, §4) |
 
 Medidas tomadas de las referencias pintadas a 390, 1010 y 1440 (las dos primeras miden igual en alto: 2893, 2777 y 2871).
 
@@ -79,13 +79,46 @@ Sin cambiar la URL (`/contactanos/`, hoy una página institucional que lleva el 
 - El diseño de Andrés no lleva el horario de atención que hoy muestra `/contactanos/`: se conserva debajo de las
   tarjetas (desviación, y es dato que va en el JSON-LD).
 
-## 4. Trabaja con nosotros: NO se construye (decisión de dirección, 2026-10-14)
+## 4. Trabaja con nosotros: SE CONSTRUYE (Juan Pablo, 2026-10-23)
 
-Según el mapa de alcance, `/nosotros/trabaja-con-nosotros/` redirige con **301** a
-`https://partequipos.buk.co/trabaja-con-nosotros` (portal de empleo del cliente). **Hecho en `next.config.ts`**, junto
-al de `/maquinaria/`, sin tocar ninguna base. **Desviación del diseño de Andrés** (su plantilla `trabaja-con-nosotros`
-no se usa). El enlace «Trabaja con nosotros» del pie sigue siendo el que ponga el panel (hoy `/contactanos/`): cuando
-dirección quiera, se apunta al portal.
+Del 2026-10-14 al 22, `/nosotros/trabaja-con-nosotros/` redirigía con 301 a `https://partequipos.buk.co/trabaja-con-nosotros`
+(decisión de dirección del 2026-10-14). Desde el 2026-10-23 es una página propia, en esa misma URL de WordPress, con la
+plantilla de Andrés y las vacantes leídas del portal público de Buk. El 301 era código (`src/lib/redirects/fijos.ts`) y
+se quitó con la página.
+
+**Plantilla:** `trabaja-con-nosotros\Trabaja con Nosotros.json`, pintada en `…/ux-9/trabaja-con-nosotros/` (medida a
+390, 1010 y 1440 el 2026-10-23):
+
+- encabezado de la «Plantilla 1» (`HeroMarca` con `indice`);
+- «Únete a nuestro equipo» (55 px) y la frase (510 px, `secondary`) en una fila sobre una línea;
+- tarjetas en filas de cuatro, también a 1010, cada fila con su línea y 18 px. Tarjeta #FAFAFA con 30 px de relleno; cargo
+  `cd1706f`; ciudad con icono rojo de 14 px; «Ver oferta» rojo con ojo y radio 30. En móvil, una por fila;
+- «¿No ves una oferta para tu perfil?»: caja gris con radio 30 y la imagen recortada que sube 120 px (508 · 228 · 59 %).
+
+**Desviaciones:**
+
+| Diseño                                                                      | Aquí                                                                                                               | Por qué                                             |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| Formulario con nombre, correo y hoja de vida                                | Botón «Envíanos tu hoja de vida» al portal de Buk                                                                  | Juan Pablo: no guardamos datos personales           |
+| Foto de fondo del encabezado y persona del bloque final (kit de Andrés, L3) | Campos opcionales en «Páginas índice y contacto» → «Trabaja con nosotros»; vacíos, tono oscuro y bloque sin imagen | Assets nunca al repositorio; licencia sin confirmar |
+| Engranaje decorativo tras la persona (`image-3.png`)                        | No se pinta                                                                                                        | Asset del kit sin licencia                          |
+| —                                                                           | Filtro por ciudad (enlaces `?ciudad=`), solo con 8 o más vacantes                                                  | Juan Pablo; `noindex` y canónica sin filtro         |
+| —                                                                           | Estado sin vacantes: aviso y «Ver el portal de empleo»                                                             | El diseño no lo tiene                               |
+
+**Vacantes:** `src/lib/vacantes/`, módulo aislado. La página solo usa `obtenerVacantes()`; el día de la API oficial de Buk
+(`GET /recruiting/selection_processes`, con clave del cliente: `informes/2026-10-23-buk-vacantes.md`) se cambia el lector y
+la página no se toca.
+
+- Se lee el listado desde el servidor, como mucho cada 6 h (también tras un fallo), con un User-Agent propio y sin seguir
+  redirecciones.
+- La última copia buena se guarda en el global «Vacantes de Buk» y se pinta si la lectura falla o el marcado cambia
+  (`MarcadoCambiado`). Sin copia, estado vacío. Una lista vacía en Buk es «no hay vacantes».
+- El interruptor «Leer vacantes de Buk» está en ese global. Al guardarlo se invalida `datos:vacantes`.
+- Cargo como frase, con las siglas (`SIGLAS` de `cargo.ts`) y sin el lugar del final (la ubicación de Buk o un lugar de
+  `LUGARES`, con guion o sin él); ciudad aparte. Las erratas se quedan.
+- SEO: el de la página institucional `nosotros/trabaja-con-nosotros` del panel, si existe. La ruta comodín y el sitemap la
+  excluyen (`SLUGS_CON_RUTA_PROPIA`) y el sitemap la anuncia una vez.
+- El enlace «Trabaja con nosotros» del pie es dato del panel (global «Pie de página»).
 
 ## 5. Esquema (APROBADO por dirección el 2026-10-14, una sola migración)
 
@@ -109,7 +142,7 @@ los textos y las seis tarjetas de cada página** (título y enlace), sin imágen
 | D5  | La principal de repuestos ya no enlaza directamente a cada marca y cada categoría (lo hacía la versión provisional anterior): enlaza a los dos índices y a tres categorías; el resto, a un clic de distancia.                                                                |
 | D6  | Contáctanos: el título es el `<h1>` (en ux-9, `<h2>`); errata «con nosotro» corregida; el horario de atención se conserva bajo las tarjetas de canales; el teléfono y el correo son enlaces; la foto se oculta en móvil, como en ux-9.                                       |
 | D7  | Contáctanos **pinta la tarjeta roja del pie**, como la plantilla (antes se ocultaba, decisión del 2026-10-06 para la ficha de producto).                                                                                                                                     |
-| D8  | «Trabaja con nosotros» **NO se construye**: `/nosotros/trabaja-con-nosotros/` redirige con 301 a `https://partequipos.buk.co/trabaja-con-nosotros` (mapa de alcance), en `next.config.ts`. La plantilla de Andrés no se usa.                                                 |
+| D8  | «Trabaja con nosotros» **NO se construye** (2026-10-14): 301 a Buk. **SUSTITUIDA el 2026-10-23**: página propia con las vacantes de Buk (§4).                                                                                                                                |
 
 ## 7. Imágenes
 

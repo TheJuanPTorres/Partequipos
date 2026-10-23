@@ -107,25 +107,46 @@ describe("buildSitemapEntries", () => {
     // 1 portada + 3 índices de repuestos (principal, marcas y categorías)
     // + 4 índices de maquinaria (el de tipos de nueva, 2026-10-22; sin el de nueva, que da 301
     // al de tipos desde el 2026-10-23) + 1 índice de blog + 1 institucional + 1 marca + 1 tipo
-    // + 1 modelo + la página general de lubricantes (2026-10-20)
-    assert.equal(e.length, 14);
+    // + 1 modelo + la página general de lubricantes (2026-10-20) + «Trabaja con nosotros» (2026-10-23)
+    assert.equal(e.length, 15);
+  });
+
+  it("anuncia «Trabaja con nosotros» UNA vez, por su ruta propia (2026-10-23)", () => {
+    const conPagina = buildSitemapEntries(
+      {
+        ...datos,
+        paginas: [
+          ...datos.paginas,
+          { slug: "nosotros/trabaja-con-nosotros", updatedAt: "2026-09-01T00:00:00.000Z" },
+        ],
+      },
+      AHORA,
+    );
+    const suyas = conPagina.filter(
+      (x) => new URL(x.url).pathname === "/nosotros/trabaja-con-nosotros/",
+    );
+    assert.equal(suyas.length, 1);
+    // La fecha, la de la página institucional que sigue en la base.
+    assert.equal(suyas[0]?.lastModified.toISOString(), "2026-09-01T00:00:00.000Z");
+    // Sin la página institucional en la base, también sale.
+    const sin = buildSitemapEntries(datos, AHORA);
+    assert.equal(
+      sin.filter((x) => new URL(x.url).pathname === "/nosotros/trabaja-con-nosotros/").length,
+      1,
+    );
+    // Las demás institucionales siguen.
+    assert.ok(conPagina.some((x) => new URL(x.url).pathname === "/nosotros/"));
   });
 
   it("no anuncia una página que redirige con REDIRECTS_FIJOS (2026-10-17)", () => {
     const e = buildSitemapEntries(
-      {
-        ...datos,
-        paginas: [...datos.paginas, { slug: "nosotros/trabaja-con-nosotros", updatedAt: null }],
-      },
+      { ...datos, paginas: [...datos.paginas, { slug: "maquinaria", updatedAt: null }] },
       AHORA,
     );
     assert.equal(
-      e.some((x) => new URL(x.url).pathname === "/nosotros/trabaja-con-nosotros/"),
+      e.some((x) => new URL(x.url).pathname === "/maquinaria/"),
       false,
     );
-    // Las demás institucionales siguen.
-    assert.ok(e.some((x) => new URL(x.url).pathname === "/nosotros/"));
-    assert.equal(e.length, 14);
   });
 
   it("no anuncia el índice de nueva (301 al de tipos, 2026-10-23) y sí el de tipos", () => {
@@ -234,9 +255,9 @@ describe("buildSitemapEntries", () => {
 
     // Sin documento de portada no se lista `/`: quedan los 3 índices de
     // repuestos, los 4 de maquinaria (sin el índice de nueva, que da 301 al de
-    // tipos desde el 2026-10-23), el del blog y la general de lubricantes,
-    // que son rutas estáticas y existen aunque no haya contenido.
-    assert.equal(e.length, 9);
+    // tipos desde el 2026-10-23), el del blog, la general de lubricantes y
+    // «Trabaja con nosotros», que son rutas estáticas y existen aunque no haya contenido.
+    assert.equal(e.length, 10);
     assert.equal(e[0]?.lastModified.getTime(), AHORA.getTime());
     for (const entrada of e) assert.match(entrada.url, /^https:\/\//);
   });

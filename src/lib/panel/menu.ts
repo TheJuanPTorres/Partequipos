@@ -68,6 +68,7 @@ export const ORDEN_DE_ENTRADAS = [
   "ficha-producto",
   "repuestos-marca",
   "paginas-indice",
+  "vacantes-buk",
   // Configuración
   "seo",
   "redirects",

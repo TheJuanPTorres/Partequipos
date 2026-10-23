@@ -1,7 +1,7 @@
 import type { EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
 
 import type { VistaEncabezado } from "../repuestos/marca";
-import { tituloPorDefecto } from "../seo/porDefecto";
+import { adjetivoConcordado, tituloPorDefecto } from "../seo/porDefecto";
 import { imagenDeMedia, poblado } from "../utils/relations";
 
 import type { TarjetaEquipo } from "./paginaMarcaAndres";
@@ -65,12 +65,14 @@ const mayusculaEnCadaPalabra = (texto: string) =>
     .join(" ");
 
 /**
- * El `<h1>` del banner de una página general de tipo (dirección, 2026-10-23): «Maquinaria Tipo
- * Bulldozers Nueva», con el nombre del tipo con mayúscula en cada palabra. El título SEO sigue
- * siendo el de siempre («Bulldozers nuevos», `tituloPorDefecto.categoriaNueva`).
+ * El `<h1>` del banner de una página general de tipo (dirección, 2026-10-23): «Maquinaria Pesada
+ * Bulldozer Nuevo», «Maquinaria Pesada Excavadora Nueva», con el nombre del tipo con mayúscula en
+ * cada palabra y el adjetivo concordado con la máquina (con un nombre aún en plural, «Nuevas» o
+ * «Nuevos»). Antes, «Maquinaria Tipo {Nombre} Nueva». El título SEO es el de
+ * `tituloPorDefecto.categoriaNueva` («Bulldozer Nuevo»).
  */
 export function tituloBannerTipoNueva(nombre: string): string {
-  return `Maquinaria Tipo ${mayusculaEnCadaPalabra(nombre)} Nueva`;
+  return `Maquinaria Pesada ${mayusculaEnCadaPalabra(nombre)} ${adjetivoConcordado(nombre, "Nuev")}`;
 }
 
 /**

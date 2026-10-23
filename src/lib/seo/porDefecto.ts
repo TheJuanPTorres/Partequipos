@@ -7,16 +7,44 @@
  * Solo funciones puras: lo importa también un componente de cliente.
  */
 
+/** La primera palabra del nombre (el sustantivo), en minúscula y sin tildes. */
+const primeraPalabra = (nombre: string) =>
+  (nombre.trim().split(/\s+/)[0] ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
 /**
- * «nuevas» o «nuevos», «usadas» o «usados», según el nombre de la categoría.
- * Las categorías son plurales («Excavadoras», «Cargadores», «Bulldozers»): el
- * femenino plural acaba en «-as», y todo lo demás va en masculino. Antes el
- * sitio decía «Vibrocompactadores usadas» y «Cargadores nuevas».
+ * Femenino si el SUSTANTIVO (la primera palabra) acaba en «-a» o «-as»: «Excavadora»,
+ * «Motoniveladoras», «Regla Vibratoria», «Pavimentadoras Dynapac». Lo demás, masculino:
+ * «Bulldozer», «Cargador Frontal», «Compactadores de Suelo», «Aditamentos».
+ *
+ * Los nombres de máquina pasan a SINGULAR (cliente, por SEO, 2026-10-23), y mientras se
+ * renombran en el panel conviven los dos números: por eso mira el sustantivo, que
+ * funciona con «Excavadora» y con «Excavadoras». Hasta entonces miraba la ÚLTIMA palabra
+ * y solo «-as»: con «Excavadora» habría dicho «Excavadora usados».
  */
-export function concuerda(nombre: string, femenino: string, masculino: string): string {
-  const ultima = nombre.trim().split(/\s+/).pop()?.toLowerCase() ?? "";
-  return ultima.endsWith("as") ? femenino : masculino;
+export function esFemenino(nombre: string): boolean {
+  return /as?$/.test(primeraPalabra(nombre));
 }
+
+/** Plural si el sustantivo acaba en «-s»: «Excavadoras», «Compactadores de Suelo». */
+export function esPlural(nombre: string): boolean {
+  return primeraPalabra(nombre).endsWith("s");
+}
+
+/** `femenino` o `masculino` según el género del nombre (`esFemenino`). */
+export function concuerda(nombre: string, femenino: string, masculino: string): string {
+  return esFemenino(nombre) ? femenino : masculino;
+}
+
+/**
+ * El adjetivo concordado en género y número, con mayúscula (dirección, 2026-10-23:
+ * «Excavadora Usada», «Bulldozer Nuevo»). `raiz` sin la terminación: «Nuev», «Usad».
+ */
+export function adjetivoConcordado(nombre: string, raiz: string): string {
+  return `${raiz}${esFemenino(nombre) ? "a" : "o"}${esPlural(nombre) ? "s" : ""}`;
+}
+
+/** «un» o «una» para un nombre en singular. */
+export const articuloIndeterminado = (nombre: string) => (esFemenino(nombre) ? "una" : "un");
 
 /**
  * «<tipo> <marca>», sin repetir la marca si el nombre del tipo ya la lleva
@@ -60,8 +88,10 @@ export const tituloPorDefecto = {
   categoriaRepuestos: (categoria: string) => `${categoria} para maquinaria pesada`,
   marcaMaquinaria: (marca: string) => `Maquinaria pesada ${marca}`,
   tipoMaquinaria: (tipo: string, marca: string) => tipoConMarca(tipo, marca),
-  categoriaNueva: (categoria: string) => `${categoria} ${concuerda(categoria, "nuevas", "nuevos")}`,
-  categoriaUsada: (categoria: string) => `${categoria} ${concuerda(categoria, "usadas", "usados")}`,
+  categoriaNueva: (categoria: string) =>
+    `${categoria.trim()} ${adjetivoConcordado(categoria, "Nuev")}`,
+  categoriaUsada: (categoria: string) =>
+    `${categoria.trim()} ${adjetivoConcordado(categoria, "Usad")}`,
   marcaUsada: (marca: string) => `Maquinaria ${marca} usada`,
   marcaLubricante: (marca: string) => `Lubricantes ${marca}`,
   categoriaLubricante: (categoria: string, marca: string) => `${categoria} | Lubricantes ${marca}`,

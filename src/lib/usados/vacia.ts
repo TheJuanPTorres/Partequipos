@@ -1,7 +1,14 @@
 import { SLUG_MARCA_ADITAMENTOS } from "../aditamentos/wordpress";
 import type { TarjetaMarca } from "../repuestos/marca";
-import { tipoConMarca, tituloPorDefecto } from "../seo/porDefecto";
+import {
+  articuloIndeterminado,
+  esFemenino,
+  esPlural,
+  tipoConMarca,
+  tituloPorDefecto,
+} from "../seo/porDefecto";
 import { posicionFocal, type ImagenLista } from "../utils/relations";
+import { singularAproximado } from "../utils/singular";
 
 /**
  * Lógica pura del ESTADO VACÍO de una categoría de usados (petición del
@@ -36,15 +43,7 @@ export const AVISO_SIN_UNIDADES = "Por ahora no hay unidades disponibles.";
  * «Bulldozers» → «bulldozer»).
  */
 export function nombreComparable(nombre: string): string {
-  const base = nombre
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, " ");
-  if (/(or|dor)es$/.test(base)) return base.slice(0, -2);
-  if (base.endsWith("s")) return base.slice(0, -1);
-  return base;
+  return singularAproximado(nombre);
 }
 
 type Foto = {
@@ -182,15 +181,19 @@ function alternativasPorNombre(
 /**
  * El título de la sección de maquinaria nueva del estado vacío (dirección,
  * 2026-10-22): «Te invitamos a conocer nuestra disponibilidad de Cargadores
- * Frontales», con la categoría que se buscó tal como está guardada.
+ * Frontales», con la categoría que se buscó tal como está guardada. Con el nombre
+ * en SINGULAR (2026-10-23), «…nuestra disponibilidad en Cargador Frontal Nuevo».
  */
 export function tituloEnNueva(nombre: string): string {
-  return `Te invitamos a conocer nuestra disponibilidad de ${nombre.trim()}`;
+  if (esPlural(nombre)) return `Te invitamos a conocer nuestra disponibilidad de ${nombre.trim()}`;
+  return `Te invitamos a conocer nuestra disponibilidad en ${tituloPorDefecto.categoriaNueva(nombre)}`;
 }
 
 /**
- * El titular del estado vacío: «Ahora mismo no tenemos Cargadores Frontales usados
- * disponibles» (el título de la categoría, con el nombre tal como está guardado).
+ * El titular del estado vacío: «Ahora mismo no tenemos Cargadores Frontales Usados
+ * disponibles» (el título de la categoría, con el nombre tal como está guardado). Con el
+ * nombre en SINGULAR, con género (2026-10-23): «Ahora mismo no tenemos ningún Cargador
+ * Frontal Usado disponible», «…ninguna Excavadora Usada disponible».
  */
 export function mensajeSinUnidades(
   tipo: "categoria" | "marca",
@@ -198,5 +201,37 @@ export function mensajeSinUnidades(
   nombre: string,
 ): string {
   if (tipo === "marca") return `Ahora mismo no tenemos maquinaria ${nombre} usada disponible`;
-  return `Ahora mismo no tenemos ${titulo.trim()} disponibles`;
+  if (esPlural(nombre)) return `Ahora mismo no tenemos ${titulo.trim()} disponibles`;
+  const ninguno = esFemenino(nombre) ? "ninguna" : "ningún";
+  return `Ahora mismo no tenemos ${ninguno} ${titulo.trim()} disponible`;
+}
+
+/**
+ * «una» (unidad) o, con el nombre de una categoría en singular, el pronombre de su género:
+ * «avísenme cuando llegue uno» (Bulldozer), «…llegue una» (Excavadora).
+ */
+export function cuandoLlegue(tipo: "categoria" | "marca", nombre: string): "uno" | "una" {
+  if (tipo === "marca" || esPlural(nombre)) return "una";
+  return esFemenino(nombre) ? "una" : "uno";
+}
+
+/**
+ * El mensaje de WhatsApp del listado sin unidades: «Hola, busco Excavadoras Usadas.
+ * Avísenme cuando llegue una.»; con el nombre en singular, con artículo y género: «Hola,
+ * busco un Bulldozer Usado. Avísenme cuando llegue uno.»; de una marca, «Hola, busco
+ * maquinaria Doosan usada. …».
+ */
+export function mensajeWhatsAppSinUnidades(
+  tipo: "categoria" | "marca",
+  titulo: string,
+  nombre: string,
+): string {
+  const t = titulo.trim();
+  const buscado =
+    tipo === "marca"
+      ? t.charAt(0).toLowerCase() + t.slice(1)
+      : esPlural(nombre)
+        ? t
+        : `${articuloIndeterminado(nombre)} ${t}`;
+  return `Hola, busco ${buscado}. Avísenme cuando llegue ${cuandoLlegue(tipo, nombre)}.`;
 }

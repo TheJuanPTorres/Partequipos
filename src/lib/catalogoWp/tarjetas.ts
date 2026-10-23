@@ -19,15 +19,16 @@ export const MARCAS_NUEVA: Readonly<Record<string, { slug: string; nombre: strin
 /**
  * El tipo (dentro de su marca) de las tarjetas de cada página de categoría de
  * nueva, con el nombre del modelo en singular. Los dos tipos son nuevos: en
- * WordPress no tenían página.
+ * WordPress no tenían página. El nombre del tipo, en singular como todos los nombres de
+ * máquina (cliente, 2026-10-23): solo se usa si el importador tiene que CREAR el tipo.
  */
 export const TIPOS_DE_CATEGORIA: Readonly<
   Record<string, { slug: string; nombre: string; singular: string }>
 > = {
-  cargadores: { slug: "cargadores", nombre: "Cargadores", singular: "Cargador" },
+  cargadores: { slug: "cargadores", nombre: "Cargador Frontal", singular: "Cargador" },
   compactadores: {
     slug: "vibrocompactadores",
-    nombre: "Vibrocompactadores",
+    nombre: "Vibrocompactador",
     singular: "Vibrocompactador",
   },
 };

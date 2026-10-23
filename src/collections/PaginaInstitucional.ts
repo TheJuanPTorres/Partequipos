@@ -454,9 +454,11 @@ export const PaginaInstitucional: CollectionConfig = {
         texto("titulo", "Título", "Maquinaria pesada usada"),
         texto(
           "pestanaExcavadoras",
-          "Enlace a las excavadoras",
+          "Enlace a Excavadora",
+          // El valor por defecto sigue en plural: cambiarlo cambia el DEFAULT de la columna y pide
+          // migración. El texto se pone en el panel (runbook del singular, 2026-10-23).
           "Excavadoras",
-          "Botón rojo sobre el carrusel; lleva a la categoría «Excavadoras» de usados. Vacío: «Excavadoras».",
+          "Botón rojo sobre el carrusel; lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».",
         ),
         texto(
           "pestanaOtros",

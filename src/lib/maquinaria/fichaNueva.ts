@@ -144,14 +144,12 @@ export function datosDeCabecera(
 }
 
 /**
- * «Otras Excavadoras», «Otros Minicargadores»: el adjetivo concuerda con la
- * PRIMERA palabra del tipo (el sustantivo), no con la última como `concuerda`
- * («Pavimentadoras Dynapac» es femenino).
+ * El título de las otras referencias del mismo tipo (dirección, 2026-10-23): «Otros modelos de
+ * Excavadora», sin género, así vale con el nombre en singular y en plural. Antes, «Otras
+ * Excavadoras» / «Otros Bulldozers», que con un nombre en singular decía «Otros Excavadora».
  */
 export function tituloOtras(tipo: string): string {
-  const t = tipo.trim();
-  const primera = t.split(/\s+/)[0]?.toLowerCase() ?? "";
-  return `${primera.endsWith("as") ? "Otras" : "Otros"} ${t}`;
+  return `Otros modelos de ${tipo.trim()}`;
 }
 
 /**

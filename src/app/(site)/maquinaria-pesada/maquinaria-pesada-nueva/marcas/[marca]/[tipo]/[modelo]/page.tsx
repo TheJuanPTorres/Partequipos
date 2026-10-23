@@ -32,9 +32,11 @@ import {
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
+import { fotoDeCabecera } from "@/lib/nueva/paginaTipo";
 import { productoVisible } from "@/lib/nueva/visibilidad";
 import { rutas } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/seo/config";
+import { articuloDefinido } from "@/lib/seo/porDefecto";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
@@ -148,11 +150,16 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
   // Un PNG es el recorte de ux-9 (sobresale del recuadro); otra cosa, una foto que lo llena.
   const contactoEsFoto = poblado<Media>(ficha.imagenContacto)?.mimeType !== "image/png";
 
+  // «el»/«la» con el género del tipo (antes siempre «la»: «cotizar la Compactador…»).
+  const articulo = articuloDefinido(tipo.nombre);
   const experto = enlaceWhatsApp(
     empresa.whatsapp,
-    `Hola, quiero hablar con un experto sobre la ${equipo.nombre}: ${urlFicha}`,
+    `Hola, quiero hablar con un experto sobre ${articulo} ${equipo.nombre}: ${urlFicha}`,
   );
-  const whatsapp = enlaceWhatsApp(empresa.whatsapp, `Hola, quiero cotizar la ${equipo.nombre}.`);
+  const whatsapp = enlaceWhatsApp(
+    empresa.whatsapp,
+    `Hola, quiero cotizar ${articulo} ${equipo.nombre}.`,
+  );
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -225,6 +232,9 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
         // El logo de la marca, el único del sitio (`LogoMarca`); sin logo, la franja va sin imagen.
         logo: conAlt(logoDeMarca(marca, logos), `Logo de ${marca.nombre}`),
         tarjetas,
+        color: marca.colorMarca,
+        foto: fotoDeCabecera(tipo, [equipo]),
+        marca: { nombre: marca.nombre, href: `${rutas.marcaMaquinaria(marca.slug)}/` },
       }}
       imagenContacto={imagenContacto}
       contactoEsFoto={contactoEsFoto}

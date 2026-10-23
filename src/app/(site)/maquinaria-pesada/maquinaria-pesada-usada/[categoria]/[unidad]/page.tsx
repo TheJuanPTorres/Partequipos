@@ -10,6 +10,7 @@ import { getEmpresa } from "@/lib/queries/getSeo";
 import { productoVisible } from "@/lib/nueva/visibilidad";
 import { rutas } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/seo/config";
+import { articuloDefinido } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { metadataDe } from "@/lib/seo/metadata";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
@@ -108,9 +109,11 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
   const imagenContacto = imagenDeMedia(ficha.imagenContacto, "");
   const contactoEsFoto = poblado<Media>(ficha.imagenContacto)?.mimeType !== "image/png";
 
+  // «el»/«la» con el género de la categoría (antes siempre «la»).
+  const articulo = articuloDefinido(categoria.nombre);
   const experto = enlaceWhatsApp(
     empresa.whatsapp,
-    `Hola, quiero hablar con un experto sobre la ${unidad.nombre}: ${urlFicha}`,
+    `Hola, quiero hablar con un experto sobre ${articulo} ${unidad.nombre}: ${urlFicha}`,
   );
 
   const migas = [
@@ -168,7 +171,10 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
         tipo: "cotizacion",
         origen: ruta,
         siteKey: turnstileSiteKey(),
-        whatsapp: enlaceWhatsApp(empresa.whatsapp, `Hola, quiero cotizar la ${unidad.nombre}.`),
+        whatsapp: enlaceWhatsApp(
+          empresa.whatsapp,
+          `Hola, quiero cotizar ${articulo} ${unidad.nombre}.`,
+        ),
         referencia: { texto: unidad.nombre },
         titulo: "Solicitar cotización",
         descripcion: "Te enviamos precio, disponibilidad y condiciones de entrega.",

@@ -72,10 +72,10 @@ const datos = {
 describe("tarjetasDeTiposNueva", () => {
   const tarjetas = tarjetasDeTiposNueva(datos);
 
-  it("una por categoría con equipos y por tipo con pestaña, por orden alfabético, y «Aditamentos» al final", () => {
+  it("una por categoría con equipos y por tipo con pestaña, por orden alfabético", () => {
     assert.deepEqual(
       tarjetas.map((t) => t.titulo),
-      ["Bulldozers", "Excavadoras", "Retrocargadoras", "Aditamentos"],
+      ["Bulldozers", "Excavadoras", "Retrocargadoras"],
     );
   });
 
@@ -89,10 +89,6 @@ describe("tarjetasDeTiposNueva", () => {
       porTitulo.get("Retrocargadoras"),
       "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/",
     );
-    assert.equal(
-      porTitulo.get("Aditamentos"),
-      "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos/",
-    );
   });
 
   it("foto: la del tipo; si no, la del primer equipo CON foto por nombre", () => {
@@ -102,8 +98,30 @@ describe("tarjetasDeTiposNueva", () => {
     assert.equal(porTitulo.get("Retrocargadoras"), "https://ejemplo.test/foto-4.jpg"); // «Retro Y»
   });
 
-  it("sin equipos de aditamentos, no hay tarjeta «Aditamentos»", () => {
-    const sin = tarjetasDeTiposNueva({ ...datos, equipos: equipos.filter((e) => e.id !== 5) });
-    assert.equal(sin.at(-1)?.titulo, "Retrocargadoras");
+  it("la «Imagen de la tarjeta» de la categoría gana a la de sus equipos (2026-10-23)", () => {
+    const con = tarjetasDeTiposNueva({
+      ...datos,
+      categorias: datos.categorias.map((c) =>
+        c.slug === "excavadoras" ? { ...c, foto: foto(77) } : c,
+      ),
+    });
+    const excavadoras = con.find((t) => t.titulo === "Excavadoras");
+    assert.equal(excavadoras?.imagen?.url, "https://ejemplo.test/foto-77.jpg");
+  });
+
+  it("los equipos de aditamentos no dan foto ni tarjeta a una categoría (2026-10-23)", () => {
+    const ahoyador = equipo(6, "Ahoyador para minicargadores", 50, "aditamentos", foto(6));
+    const con = tarjetasDeTiposNueva({
+      ...datos,
+      equipos: [...equipos, ahoyador],
+      categorias: [...datos.categorias, { slug: "minis", nombre: "Minis", tipos: [50] }],
+    });
+    assert.ok(!con.some((t) => t.titulo === "Minis"));
+    assert.ok(!con.some((t) => t.imagen?.url === "https://ejemplo.test/foto-6.jpg"));
+  });
+
+  it("solo maquinaria: con equipos de aditamentos, ninguna tarjeta lleva a ellos (2026-10-23)", () => {
+    assert.ok(equipos.some((e) => e.marcaRef?.slug === "aditamentos"));
+    assert.ok(!tarjetas.some((t) => /aditamento/i.test(`${t.titulo} ${t.href}`)));
   });
 });

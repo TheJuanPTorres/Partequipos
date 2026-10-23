@@ -29,8 +29,8 @@ const ANCLA = "nueva-tipos";
  * ÍNDICE DE TIPOS DE MAQUINARIA NUEVA (2026-10-22, dirección; URL NUEVA, `…/nueva/tipos/`): no
  * existía ni aquí ni en WordPress, donde el propio índice de nueva hacía de índice de tipos. La
  * plantilla de índices de Andrés con una tarjeta por tipo: los de varias marcas, a su categoría
- * transversal; los de una sola marca, a la página de su tipo en esa marca; y «Aditamentos»
- * (`src/lib/nueva/indiceTipos.ts`).
+ * transversal; los de una sola marca, a la página de su tipo en esa marca. Solo maquinaria: sin
+ * «Aditamentos» desde el 2026-10-23 (`src/lib/nueva/indiceTipos.ts`).
  *
  * Desde el 2026-10-23 (cliente) es la PÁGINA PRINCIPAL de maquinaria nueva: la de «Por marca» /
  * «Por tipo de máquina» (`…/maquinaria-pesada-nueva/`) ya no se navega y da 301 aquí. Lleva su

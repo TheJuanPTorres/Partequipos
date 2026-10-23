@@ -1,3 +1,5 @@
+import { tituloPorDefecto } from "../seo/porDefecto";
+
 import { normalizar } from "./indice";
 
 /**
@@ -66,11 +68,15 @@ export function categoriaRelacionada(
   return mejor?.candidata ?? null;
 }
 
-/** El texto del enlace de la llamada final. */
+/**
+ * El texto del enlace de la llamada final: «Ver Excavadora Nueva», «Ver Bulldozer Usado»
+ * (el título de la categoría, concordado). Antes el adjetivo iba fijo en femenino plural y
+ * salía «Ver Bulldozers usadas».
+ */
 export function textoEnlaceRelacionada(c: CandidataRelacion): string {
   if (c.tipo === "repuestos") return `Ver repuestos de ${c.nombre}`;
-  if (c.tipo === "nueva") return `Ver ${c.nombre.trim()} nuevas`;
-  return `Ver ${c.nombre.trim()} usadas`;
+  if (c.tipo === "nueva") return `Ver ${tituloPorDefecto.categoriaNueva(c.nombre)}`;
+  return `Ver ${tituloPorDefecto.categoriaUsada(c.nombre)}`;
 }
 
 /**

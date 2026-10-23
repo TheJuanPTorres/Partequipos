@@ -213,7 +213,7 @@ describe("categoría del sitio relacionada", () => {
 
   it("el texto del enlace dice qué es", () => {
     expect(textoEnlaceRelacionada(candidatas[0]!)).toBe("Ver repuestos de Llantas y Rines");
-    expect(textoEnlaceRelacionada(candidatas[3]!)).toBe("Ver Excavadoras usadas");
+    expect(textoEnlaceRelacionada(candidatas[3]!)).toBe("Ver Excavadoras Usadas");
   });
 });
 
@@ -292,10 +292,14 @@ describe("entradillaRepiteCuerpo", () => {
     assert.equal(entradillaRepiteCuerpo("Resumen propio", "Otro texto del cuerpo"), false);
     assert.equal(entradillaRepiteCuerpo("", "Texto"), false);
   });
-  it("el enlace de nueva dice «nuevas»", () => {
+  it("el enlace concuerda con la máquina, en plural y en singular", () => {
     assert.equal(
       textoEnlaceRelacionada({ nombre: "Excavadoras", href: "/x/", tipo: "nueva" }),
-      "Ver Excavadoras nuevas",
+      "Ver Excavadoras Nuevas",
+    );
+    assert.equal(
+      textoEnlaceRelacionada({ nombre: "Bulldozer", href: "/x/", tipo: "usada" }),
+      "Ver Bulldozer Usado",
     );
   });
 });

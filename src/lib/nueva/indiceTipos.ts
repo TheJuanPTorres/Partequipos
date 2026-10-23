@@ -18,8 +18,9 @@ import { unaEntradaPorTipo } from "./ordenTipos";
  *   tarjeta por tipo, los mismos que las pestañas del antiguo listado y que el índice de nueva de
  *   WordPress. Cada tipo va a su página GENERAL, la categoría de nueva (`…/nueva/excavadoras/`),
  *   aunque solo tenga equipos de una marca (2026-10-23, tarea 9). Solo un tipo SIN categoría va a
- *   la página de su tipo en su marca (casilla «Pestaña en el índice de maquinaria nueva»); y
- *   «Aditamentos» al final, a su página de marca.
+ *   la página de su tipo en su marca (casilla «Pestaña en el índice de maquinaria nueva»).
+ *   Solo maquinaria: «Aditamentos» ya no lleva tarjeta (2026-10-23, dirección); tiene su entrada
+ *   propia en el menú.
  */
 
 /** Título y descripción de la página principal de nueva (el índice de tipos desde el 2026-10-23): los
@@ -28,10 +29,15 @@ export const TITULO_NUEVA = "Maquinaria pesada nueva";
 export const DESCRIPCION_NUEVA =
   "Equipos nuevos organizados por marca y tipo, con ficha técnica y solicitud de cotización.";
 
-/** La marca de nueva que hace de «Aditamentos». */
+/** La marca de nueva que hace de «Aditamentos» (fuera de las páginas de tipo, `paginaCategoria.ts`). */
 export const SLUG_ADITAMENTOS = "aditamentos";
 
-type CategoriaDelListado = { slug: string; nombre: string; tipos: number[] };
+type CategoriaDelListado = {
+  slug: string;
+  nombre: string;
+  tipos: number[];
+  foto?: EquipoNuevoListado["foto"];
+};
 
 const imagen = (f: EquipoNuevoListado["foto"]): ImagenLista | null =>
   imagenDeMedia(f as Media | null, "");
@@ -50,16 +56,18 @@ function primeraFoto(
 }
 
 /**
- * Las tarjetas del índice de tipos, en el orden de la web antigua y «Aditamentos» al final. Una
+ * Las tarjetas del índice de tipos, en el orden de la web antigua; solo maquinaria. Una
  * categoría o un tipo sin equipos no sale (no hay nada a lo que llevar). Foto: la «Imagen de la
- * tarjeta» del tipo o, vacía, la del primer equipo con foto (por nombre).
+ * tarjeta» de la categoría o del tipo o, vacía, la del primer equipo con foto (por nombre).
  */
 export function tarjetasDeTiposNueva(datos: {
   equipos: EquipoNuevoListado[];
   categorias: CategoriaDelListado[];
   pestanasTipos: PestanaDeTipoNueva[];
 }): TarjetaMarca[] {
-  const { equipos } = datos;
+  // Solo maquinaria: los equipos de «Aditamentos» no cuentan ni para que salga una tarjeta ni
+  // para su foto de respaldo (p. ej. un ahoyador en «Cargadores»), como en las páginas de tipo.
+  const equipos = datos.equipos.filter((e) => e.marcaRef?.slug !== SLUG_ADITAMENTOS);
   const deCategorias = datos.categorias.flatMap((c) => {
     const tipos = new Set(c.tipos);
     const suyos = equipos.filter((e) => tipos.has(e.tipoId));
@@ -74,7 +82,7 @@ export function tarjetasDeTiposNueva(datos: {
           clave: `categoria-${c.slug}`,
           titulo: c.nombre,
           href: `${rutas.categoriaNueva(c.slug)}/`,
-          imagen: primeraFoto(equipos, (e) => tipos.has(e.tipoId)),
+          imagen: imagen(c.foto ?? null) ?? primeraFoto(equipos, (e) => tipos.has(e.tipoId)),
           soloEscritorio: false,
         } satisfies TarjetaMarca,
       },
@@ -91,16 +99,5 @@ export function tarjetasDeTiposNueva(datos: {
     } satisfies TarjetaMarca,
   }));
   // Una por tipo y en el orden de la web antigua (el mismo del megamenú, `ordenTipos.ts`).
-  const tarjetas = unaEntradaPorTipo(deCategorias, deTipos);
-  const deAditamentos = (e: EquipoNuevoListado) => e.marcaRef?.slug === SLUG_ADITAMENTOS;
-  if (equipos.some(deAditamentos)) {
-    tarjetas.push({
-      clave: "aditamentos",
-      titulo: "Aditamentos",
-      href: `${rutas.marcaMaquinaria(SLUG_ADITAMENTOS)}/`,
-      imagen: primeraFoto(equipos, deAditamentos),
-      soloEscritorio: false,
-    });
-  }
-  return tarjetas;
+  return unaEntradaPorTipo(deCategorias, deTipos);
 }

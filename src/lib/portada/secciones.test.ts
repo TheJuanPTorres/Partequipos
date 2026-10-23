@@ -100,14 +100,14 @@ describe("sección 3: ficha", () => {
 });
 
 describe("sección 3: enlaces a las categorías", () => {
-  it("Excavadoras, Otros y Aditamentos, a su categoría de usados; textos desde el panel", () => {
+  it("Excavadora, Otros y Aditamentos, a su categoría de usados; textos desde el panel", () => {
     assert.deepEqual(
       enlacesDeUsada({ otros: "Otros equipos", aditamentos: "  " }).map((e) => [
         e.etiqueta,
         e.href,
       ]),
       [
-        ["Excavadoras", "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/"],
+        ["Excavadora", "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/"],
         ["Otros equipos", "/maquinaria-pesada/maquinaria-pesada-usada/otros/"],
         ["Aditamentos", "/maquinaria-pesada/maquinaria-pesada-usada/aditamentos/"],
       ],

@@ -41,7 +41,9 @@ import { tarjetasDeCategoriasUsada } from "./indice";
 import { getPaginasIndice } from "../queries/getPaginasIndice";
 import {
   alternativasEnNueva,
+  cuandoLlegue,
   mensajeSinUnidades,
+  mensajeWhatsAppSinUnidades,
   tituloEnNueva,
   usaEstadoVacioPropio,
 } from "./vacia";
@@ -55,8 +57,10 @@ export type DatosVacio = {
   mensaje: string;
   /** El título de la sección de maquinaria nueva (`tituloEnNueva`). */
   tituloNueva: string;
-  /** Lo que se pide en el formulario («Cargadores usados»). */
+  /** Lo que se pide en el formulario («Cargadores Usados»). */
   referencia: string;
+  /** «uno» o «una»: «(avísame cuando llegue uno)» con un nombre en singular masculino. */
+  llegue: "uno" | "una";
   nueva: TarjetaMarca[];
   otras: TarjetaMarca[];
   whatsapp?: EnlaceWhatsApp;
@@ -66,11 +70,7 @@ export type DatosVacio = {
 export type AvisoVacio = { whatsapp?: EnlaceWhatsApp };
 
 const mensajeWhatsApp = (ambito: Ambito) =>
-  `Hola, busco ${
-    ambito.tipo === "categoria"
-      ? ambito.titulo
-      : ambito.titulo.charAt(0).toLowerCase() + ambito.titulo.slice(1)
-  }. Avísenme cuando llegue una.`;
+  mensajeWhatsAppSinUnidades(ambito.tipo, ambito.titulo, ambito.registro.nombre);
 
 async function datosVacio(ambito: Ambito): Promise<DatosVacio> {
   const [listadoNueva, categorias, inventario, empresa] = await Promise.all([
@@ -84,6 +84,7 @@ async function datosVacio(ambito: Ambito): Promise<DatosVacio> {
     mensaje: mensajeSinUnidades(ambito.tipo, ambito.titulo, nombre),
     tituloNueva: tituloEnNueva(nombre),
     referencia: ambito.titulo,
+    llegue: cuandoLlegue(ambito.tipo, nombre),
     nueva:
       ambito.tipo === "categoria"
         ? alternativasEnNueva(nombre, listadoNueva.categorias, listadoNueva.equipos, rutas, {

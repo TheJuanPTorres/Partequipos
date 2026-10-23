@@ -3,7 +3,9 @@ import { describe, it } from "node:test";
 
 import {
   alternativasEnNueva,
+  cuandoLlegue,
   mensajeSinUnidades,
+  mensajeWhatsAppSinUnidades,
   tituloEnNueva,
   usaEstadoVacioPropio,
   nombreComparable,
@@ -47,7 +49,7 @@ describe("estado vacío de usados", () => {
     );
     assert.deepEqual(
       t.map((x) => [x.titulo, x.href, x.detalle ?? null, x.imagen?.url]),
-      [["Cargadores nuevos", "/nueva/cargadores/", null, "/f.jpg"]],
+      [["Cargadores Nuevos", "/nueva/cargadores/", null, "/f.jpg"]],
     );
   });
 
@@ -140,19 +142,58 @@ describe("estado vacío de usados", () => {
     );
   });
 
-  it("el titular", () => {
+  it("el titular, con el nombre en plural", () => {
     assert.equal(
-      mensajeSinUnidades("categoria", "Cargadores usados", "Cargadores"),
-      "Ahora mismo no tenemos Cargadores usados disponibles",
+      mensajeSinUnidades("categoria", "Cargadores Usados", "Cargadores"),
+      "Ahora mismo no tenemos Cargadores Usados disponibles",
     );
     assert.equal(
-      mensajeSinUnidades("categoria", "Cargadores Frontales usados", "Cargadores Frontales"),
-      "Ahora mismo no tenemos Cargadores Frontales usados disponibles",
+      mensajeSinUnidades("categoria", "Cargadores Frontales Usados", "Cargadores Frontales"),
+      "Ahora mismo no tenemos Cargadores Frontales Usados disponibles",
     );
     assert.equal(
       mensajeSinUnidades("marca", "Maquinaria Doosan usada", "Doosan"),
       "Ahora mismo no tenemos maquinaria Doosan usada disponible",
     );
+  });
+
+  it("el titular, con el nombre en singular: ningún / ninguna", () => {
+    assert.equal(
+      mensajeSinUnidades("categoria", "Cargador Frontal Usado", "Cargador Frontal"),
+      "Ahora mismo no tenemos ningún Cargador Frontal Usado disponible",
+    );
+    assert.equal(
+      mensajeSinUnidades("categoria", "Motoniveladora Usada", "Motoniveladora"),
+      "Ahora mismo no tenemos ninguna Motoniveladora Usada disponible",
+    );
+  });
+});
+
+describe("WhatsApp y formulario del listado sin unidades", () => {
+  it("en plural, como siempre", () => {
+    assert.equal(
+      mensajeWhatsAppSinUnidades("categoria", "Excavadoras Usadas", "Excavadoras"),
+      "Hola, busco Excavadoras Usadas. Avísenme cuando llegue una.",
+    );
+    assert.equal(
+      mensajeWhatsAppSinUnidades("marca", "Maquinaria Doosan usada", "Doosan"),
+      "Hola, busco maquinaria Doosan usada. Avísenme cuando llegue una.",
+    );
+    assert.equal(cuandoLlegue("categoria", "Bulldozers"), "una");
+  });
+
+  it("en singular, con artículo y género", () => {
+    assert.equal(
+      mensajeWhatsAppSinUnidades("categoria", "Bulldozer Usado", "Bulldozer"),
+      "Hola, busco un Bulldozer Usado. Avísenme cuando llegue uno.",
+    );
+    assert.equal(
+      mensajeWhatsAppSinUnidades("categoria", "Excavadora Usada", "Excavadora"),
+      "Hola, busco una Excavadora Usada. Avísenme cuando llegue una.",
+    );
+    assert.equal(cuandoLlegue("categoria", "Cargador Frontal"), "uno");
+    assert.equal(cuandoLlegue("categoria", "Retrocargadora"), "una");
+    assert.equal(cuandoLlegue("marca", "Case"), "una");
   });
 });
 
@@ -171,14 +212,21 @@ describe("usaEstadoVacioPropio (dirección, 2026-10-19: solo diseños de Andrés
 });
 
 describe("tituloEnNueva", () => {
-  it("lleva la categoría que se buscó tal como está guardada", () => {
+  it("con el nombre en plural, la categoría tal como está guardada", () => {
     assert.equal(
       tituloEnNueva("Cargadores Frontales"),
       "Te invitamos a conocer nuestra disponibilidad de Cargadores Frontales",
     );
+  });
+
+  it("con el nombre en singular, «…disponibilidad en {Nombre} Nuevo/Nueva»", () => {
     assert.equal(
-      tituloEnNueva("Motoniveladoras"),
-      "Te invitamos a conocer nuestra disponibilidad de Motoniveladoras",
+      tituloEnNueva("Cargador Frontal"),
+      "Te invitamos a conocer nuestra disponibilidad en Cargador Frontal Nuevo",
+    );
+    assert.equal(
+      tituloEnNueva("Motoniveladora"),
+      "Te invitamos a conocer nuestra disponibilidad en Motoniveladora Nueva",
     );
   });
 });

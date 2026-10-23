@@ -4239,6 +4239,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "imagen_id": {
+          "name": "imagen_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "seo_meta_title": {
           "name": "seo_meta_title",
           "type": "varchar",
@@ -4290,6 +4296,21 @@
             }
           ],
           "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "categorias_maquinaria_imagen_idx": {
+          "name": "categorias_maquinaria_imagen_idx",
+          "columns": [
+            {
+              "expression": "imagen_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -4356,6 +4377,19 @@
         }
       },
       "foreignKeys": {
+        "categorias_maquinaria_imagen_id_media_id_fk": {
+          "name": "categorias_maquinaria_imagen_id_media_id_fk",
+          "tableFrom": "categorias_maquinaria",
+          "tableTo": "media",
+          "columnsFrom": [
+            "imagen_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
         "categorias_maquinaria_seo_og_image_id_media_id_fk": {
           "name": "categorias_maquinaria_seo_og_image_id_media_id_fk",
           "tableFrom": "categorias_maquinaria",
@@ -15142,12 +15176,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "trabaja_correo_hojas_de_vida": {
-          "name": "trabaja_correo_hojas_de_vida",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
         "trabaja_titulo_hoja_de_vida": {
           "name": "trabaja_titulo_hoja_de_vida",
           "type": "varchar",
@@ -15908,6 +15936,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "ba655deb-d1aa-4a8c-b11e-755380c629ca",
+  "id": "32f60cc1-85fe-4136-b55b-07241ff127d5",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

@@ -161,16 +161,11 @@ describe("normalizar e iconoPorEtiqueta", () => {
 });
 
 describe("tituloOtras", () => {
-  it("concuerda con la primera palabra del tipo", () => {
-    assert.equal(tituloOtras("Excavadoras"), "Otras Excavadoras");
-    assert.equal(tituloOtras("Pavimentadoras Dynapac"), "Otras Pavimentadoras Dynapac");
-    assert.equal(tituloOtras("Reglas vibratorias"), "Otras Reglas vibratorias");
-    assert.equal(tituloOtras("Minicargadores"), "Otros Minicargadores");
-    assert.equal(tituloOtras("Bulldozers"), "Otros Bulldozers");
-    assert.equal(
-      tituloOtras("Aditamentos para minicargadores"),
-      "Otros Aditamentos para minicargadores",
-    );
+  it("«Otros modelos de {tipo}», sin género: vale en singular y en plural", () => {
+    assert.equal(tituloOtras("Excavadora"), "Otros modelos de Excavadora");
+    assert.equal(tituloOtras(" Bulldozer "), "Otros modelos de Bulldozer");
+    assert.equal(tituloOtras("Pavimentadora Dynapac"), "Otros modelos de Pavimentadora Dynapac");
+    assert.equal(tituloOtras("Excavadoras"), "Otros modelos de Excavadoras");
   });
 });
 

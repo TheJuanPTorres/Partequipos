@@ -11,6 +11,7 @@ import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { RichText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { PaginaPolitica } from "@/components/politica/PaginaPolitica";
 import { PlantillaServicioTecnico } from "@/components/servicioTecnico/PlantillaServicioTecnico";
 import { idsDeVideos, vistaDeBloques } from "@/lib/bloques/desdePayload";
 import { getArticuloPorSlug, getArticulos } from "@/lib/queries/getBlog";
@@ -30,6 +31,7 @@ import { textoDias, textoHora } from "@/lib/seo/horario";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { vistaServicioTecnico } from "@/lib/servicioTecnico/vista";
 import { turnstileSiteKey } from "@/lib/turnstile";
+import { SLUG_POLITICA_GARANTIA } from "@/lib/politica/animaciones";
 import { imagenDeMedia } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
@@ -237,6 +239,22 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
           }}
         />
       </main>
+    );
+  }
+
+  /*
+   * La página de garantías (dirección, 2026-10-23): cabecera baja, títulos de sección y el
+   * selector «Garantía · Devolución», con los mismos visores. Las demás, como siempre.
+   */
+  if (clave === SLUG_POLITICA_GARANTIA) {
+    return (
+      <PaginaPolitica
+        titulo={pagina.titulo}
+        entradilla={pagina.entradilla}
+        contenido={pagina.contenido}
+        secciones={secciones}
+        migas={breadcrumbs}
+      />
     );
   }
 

@@ -51,6 +51,7 @@ export function HeroMarca({
   tituloLargo = false,
   etiquetaRaton,
   migas,
+  reservarTitulo = false,
 }: {
   vista: VistaEncabezado;
   anclaSiguiente: string;
@@ -71,6 +72,12 @@ export function HeroMarca({
    * con los mismos items del `BreadcrumbList`. Sin ellas, la página pone las suyas.
    */
   migas?: BreadcrumbItem[];
+  /**
+   * Fija el alto del `<h1>` con una copia invisible en la fuente de respaldo (la técnica de la
+   * cabecera del artículo): un título de varias líneas no mueve el contenido centrado al llegar
+   * Inter. Solo con `linea1` (la página de garantías, 2026-10-23).
+   */
+  reservarTitulo?: boolean;
 }) {
   const { fondo, logo } = vista;
   const baja = bajo || (bajaSinFoto && !fondo);
@@ -125,24 +132,39 @@ export function HeroMarca({
 
           {vista.antetitulo ? <p className={estilos.antetituloHero}>{vista.antetitulo}</p> : null}
 
-          <h1 className={`${estilos.h1} ${tituloLargo ? estilos.h1Largo : ""}`}>
-            <Revelado
-              como="span"
-              alCargar
-              ritmo="titulo"
-              texto={vista.linea1}
-              className={estilos.linea1}
-            />
-            {vista.linea2 ? (
+          {reservarTitulo && !vista.linea2 ? (
+            <h1
+              className={`${estilos.h1} ${tituloLargo ? estilos.h1Largo : ""} ${estilos.h1Reservado}`}
+              data-reserva={vista.linea1}
+            >
               <Revelado
                 como="span"
                 alCargar
                 ritmo="titulo"
-                texto={vista.linea2}
-                className={estilos.linea2}
+                texto={vista.linea1}
+                className={estilos.linea1}
               />
-            ) : null}
-          </h1>
+            </h1>
+          ) : (
+            <h1 className={`${estilos.h1} ${tituloLargo ? estilos.h1Largo : ""}`}>
+              <Revelado
+                como="span"
+                alCargar
+                ritmo="titulo"
+                texto={vista.linea1}
+                className={estilos.linea1}
+              />
+              {vista.linea2 ? (
+                <Revelado
+                  como="span"
+                  alCargar
+                  ritmo="titulo"
+                  texto={vista.linea2}
+                  className={estilos.linea2}
+                />
+              ) : null}
+            </h1>
+          )}
 
           {/*
            * Sin desplazamiento al llegar Inter (medido: CLS 0,073 a 1440 en el tipo

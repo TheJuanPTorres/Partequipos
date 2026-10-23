@@ -68,6 +68,13 @@ export const SEGMENTO_LUBRICANTES = "lubricantes";
 export const SEGMENTO_BLOG_INDICE = "noticias";
 export const SEGMENTO_BLOG_CATEGORIA = "category";
 
+/**
+ * Slugs de páginas institucionales que tienen RUTA PROPIA: la ruta comodín no
+ * los genera y el sitemap no los anuncia dos veces. La página sigue en la base
+ * (con su SEO de WordPress), pero la sirve su ruta.
+ */
+export const SLUGS_CON_RUTA_PROPIA: readonly string[] = ["nosotros/trabaja-con-nosotros"];
+
 export const rutas = {
   repuestos: () => `/${SEGMENTO_REPUESTOS}`,
   marcas: () => `/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}`,
@@ -117,6 +124,14 @@ export const rutas = {
     `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${SEGMENTO_MARCAS_MAQUINARIA}/${marcaSlug}/${tipoSlug}`,
   equipoNuevo: (marcaSlug: string, tipoSlug: string, equipoSlug: string) =>
     `/${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${SEGMENTO_MARCAS_MAQUINARIA}/${marcaSlug}/${tipoSlug}/${equipoSlug}`,
+
+  // --- Trabaja con nosotros ------------------------------------------------
+  /**
+   * La página de vacantes (2026-10-23), en su URL de WordPress. Tiene ruta
+   * propia aunque la página institucional con ese slug siga en la base: la
+   * ruta comodín la excluye (`SLUGS_CON_RUTA_PROPIA`).
+   */
+  trabajaConNosotros: () => "/nosotros/trabaja-con-nosotros",
 
   // --- Lubricantes --------------------------------------------------------
   /** La página general (2026-10-20): presentación, formulario y la marca. */

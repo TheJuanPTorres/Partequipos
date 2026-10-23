@@ -144,6 +144,7 @@ export interface Config {
     'ficha-producto': FichaProducto;
     'repuestos-marca': RepuestosMarca;
     'paginas-indice': PaginasIndice;
+    'vacantes-buk': VacantesBuk;
   };
   globalsSelect: {
     cabecera: CabeceraSelect<false> | CabeceraSelect<true>;
@@ -152,6 +153,7 @@ export interface Config {
     'ficha-producto': FichaProductoSelect<false> | FichaProductoSelect<true>;
     'repuestos-marca': RepuestosMarcaSelect<false> | RepuestosMarcaSelect<true>;
     'paginas-indice': PaginasIndiceSelect<false> | PaginasIndiceSelect<true>;
+    'vacantes-buk': VacantesBukSelect<false> | VacantesBukSelect<true>;
   };
   locale: null;
   widgets: {
@@ -3612,7 +3614,7 @@ export interface RepuestosMarca {
   createdAt?: string | null;
 }
 /**
- * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada», de su página «Otros» y de «Lubricantes».
+ * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada», de su página «Otros», de «Lubricantes» y de «Trabaja con nosotros».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "paginas-indice".
@@ -3742,6 +3744,35 @@ export interface PaginasIndice {
     textoBoton?: string | null;
   };
   /**
+   * La página /nosotros/trabaja-con-nosotros/ (plantilla de Andrés). Un campo vacío usa el texto del diseño. Las vacantes se leen de Buk: su interruptor está en «Vacantes de Buk».
+   */
+  trabaja?: {
+    antetitulo?: string | null;
+    titulo?: string | null;
+    /**
+     * Opcional. Sin ella, el encabezado queda en un tono oscuro.
+     */
+    fondo?: (number | null) | Media;
+    tituloEquipo?: string | null;
+    /**
+     * Vacío, el texto del diseño («Buscamos profesionales que…»).
+     */
+    textoEquipo?: string | null;
+    tituloHojaDeVida?: string | null;
+    /**
+     * Un párrafo por línea en blanco; el último va en negrita. Vacío, el texto del diseño.
+     */
+    textoHojaDeVida?: string | null;
+    /**
+     * El botón lleva al portal de empleo de Buk: aquí no se guardan datos.
+     */
+    botonHojaDeVida?: string | null;
+    /**
+     * Opcional. Una persona recortada (PNG o WebP con transparencia), junto al texto. Sin ella, el texto ocupa el bloque.
+     */
+    imagenHojaDeVida?: (number | null) | Media;
+  };
+  /**
    * El índice del blog usa la plantilla «Blog» de Andrés. El artículo, que Andrés no diseñó, tiene un diseño nuestro que se enciende aquí cuando se apruebe.
    */
   blog: {
@@ -3767,6 +3798,40 @@ export interface PaginasIndice {
      */
     imagenDecorativa?: (number | null) | Media;
   };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Las vacantes de la página «Trabaja con nosotros» se leen del portal de empleo de Buk, como mucho cada 6 horas. Aquí se puede cortar esa lectura y ver cómo fue la última.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vacantes-buk".
+ */
+export interface VacantesBuk {
+  id: number;
+  /**
+   * Desmarcada, la página no lee Buk y muestra solo el aviso de que no hay vacantes con el enlace al portal de empleo de Buk. El cambio se ve en la siguiente visita.
+   */
+  leer?: boolean | null;
+  /**
+   * Las vacantes que se ven en la página son las de esta lectura.
+   */
+  copiaEl?: string | null;
+  numeroVacantes?: number | null;
+  ultimoIntento?: string | null;
+  /**
+   * Vacío: salió bien. Con texto: la lectura falló y la página sigue con la última lectura correcta.
+   */
+  ultimoError?: string | null;
+  vacantes?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -4000,6 +4065,19 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
         marca?: T;
         textoBoton?: T;
       };
+  trabaja?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        fondo?: T;
+        tituloEquipo?: T;
+        textoEquipo?: T;
+        tituloHojaDeVida?: T;
+        textoHojaDeVida?: T;
+        botonHojaDeVida?: T;
+        imagenHojaDeVida?: T;
+      };
   blog?:
     | T
     | {
@@ -4018,6 +4096,21 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
         foto?: T;
         imagenDecorativa?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vacantes-buk_select".
+ */
+export interface VacantesBukSelect<T extends boolean = true> {
+  leer?: T;
+  copiaEl?: T;
+  numeroVacantes?: T;
+  ultimoIntento?: T;
+  ultimoError?: T;
+  vacantes?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

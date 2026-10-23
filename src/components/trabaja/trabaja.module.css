@@ -1,0 +1,358 @@
+/*
+ * «TRABAJA CON NOSOTROS» (plantilla de Andrés `Trabaja con Nosotros.json`,
+ * pintada en partequipos.uxdesign.website/ux-9/trabaja-con-nosotros/; CSS
+ * `post-3019.css` y el kit `post-7.css`). Valores del kit con nuestros tokens:
+ * `099f28a` = --color-fondo, `a372504` = --color-fondo-seccion, `a3f07e1` =
+ * #FAFAFA (fondo de la tarjeta), `primary` = --color-marca.
+ */
+
+/* --- «Únete a nuestro equipo» y las vacantes (contenedor a178fc5) --------- */
+.equipo {
+  margin-top: 20px;
+  padding: 5% 3%;
+  border-radius: 30px;
+  background: var(--color-fondo);
+  scroll-margin-top: 100px;
+}
+
+/* Título y frase en una fila sobre una línea (742f42a: borde superior y 18 px arriba). */
+.equipoCabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--color-fondo-seccion);
+}
+
+.equipoTitulo {
+  max-width: 737px;
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-seccion);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.equipoTexto {
+  max-width: 510px;
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-cuerpo);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+/* --- Filtro por ciudad (no está en el diseño: solo con 8 o más vacantes) -- */
+.filtro {
+  margin-top: 30px;
+}
+
+.filtroLista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.filtroOpcion {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--color-texto);
+  border-radius: 30px;
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.filtroOpcion:hover,
+.filtroOpcion[aria-current="page"] {
+  background: var(--color-texto);
+  color: var(--color-fondo);
+}
+
+.filtroOpcion:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.filtroCuantas {
+  margin-left: 4px;
+  font-weight: 300;
+}
+
+/* --- Tarjetas (filas 675274a: línea arriba, 18 px, 20 px entre filas y tarjetas) */
+.tarjetas {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--color-fondo-seccion);
+  list-style: none;
+}
+
+/* Tarjeta d70251d: fondo #FAFAFA y 30 px de relleno. */
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 30px;
+  background: #fafafa;
+}
+
+/* Cargo: tipografía `cd1706f` (20 · 20 · 18, 400, 1,3) en `secondary`. */
+.cargo {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-destacado);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+/* Ciudad: lista con icono de 14 px y la tipografía `text` del kit. */
+.ciudad {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-cuerpo);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.ciudad svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--color-marca);
+}
+
+/* «Ver oferta» (40af2da): rojo, borde de 1 px, radio 30 y oscuro al pasar. */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding: var(--boton-relleno);
+  border: 1px solid var(--color-marca);
+  border-radius: 30px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.boton svg {
+  flex: none;
+  width: 1em;
+  height: 1em;
+}
+
+.boton:hover {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/* --- Sin vacantes (no está en el diseño) --------------------------------- */
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  margin-top: 20px;
+  padding: 40px 30px;
+  border-top: 1px solid var(--color-fondo-seccion);
+  background: #fafafa;
+}
+
+.vacioTitulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-destacado);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.vacioTexto {
+  margin: 0 0 6px;
+  color: var(--color-texto);
+  font-size: var(--texto-cuerpo);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.vacio .boton {
+  margin-top: 0;
+}
+
+/* --- «¿No ves una oferta para tu perfil?» (fbd0e68 · ced1675) ------------- */
+.hojaDeVida {
+  margin-top: 20px;
+  padding: 5%;
+  border-radius: 30px 30px 0 0;
+  background: var(--color-fondo);
+}
+
+.hojaDeVidaCaja {
+  display: flex;
+  align-items: center;
+  padding-left: 5%;
+  border-radius: 30px;
+  background: var(--color-fondo-seccion);
+}
+
+.hojaDeVidaTexto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  width: 50%;
+  padding: 30px 0;
+  color: var(--color-texto);
+  font-size: var(--texto-cuerpo);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.hojaDeVidaSinImagen .hojaDeVidaTexto {
+  width: auto;
+  max-width: 640px;
+}
+
+.hojaDeVidaTexto p {
+  margin: 0;
+}
+
+.hojaDeVidaTexto .boton {
+  margin-top: 8px;
+}
+
+.destacado {
+  font-weight: 600;
+}
+
+/* Título `secondary` del kit (45 · 35 · 9vw, 500, 1,2), 501 px. */
+.hojaDeVidaTitulo {
+  max-width: 501px;
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-bloque);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* La imagen (7ec040a): a la derecha, 508 px, sube 120 px sobre la caja. */
+.hojaDeVidaImagen {
+  display: flex;
+  justify-content: flex-end;
+  width: 50%;
+  margin-top: -120px;
+}
+
+.hojaDeVidaImagen img {
+  width: 508px;
+  max-width: 100%;
+  height: auto;
+}
+
+.soloLectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- Tablet (≤ 1024 px) --------------------------------------------------- */
+@media (max-width: 1024px) {
+  .equipoTitulo,
+  .equipoTexto {
+    flex: 1 1 0;
+  }
+
+  .hojaDeVidaImagen img {
+    width: 228px;
+  }
+}
+
+/* --- Móvil (≤ 767 px) ----------------------------------------------------- */
+@media (max-width: 767px) {
+  .equipoCabecera {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .equipoTitulo {
+    max-width: none;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .equipoTexto {
+    max-width: none;
+  }
+
+  .fila {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hojaDeVidaCaja {
+    flex-direction: column;
+    padding-left: 0;
+  }
+
+  .hojaDeVidaTexto,
+  .hojaDeVidaSinImagen .hojaDeVidaTexto {
+    align-items: center;
+    width: 100%;
+    max-width: none;
+    padding: 30px 10px 10px;
+    text-align: center;
+  }
+
+  .hojaDeVidaImagen {
+    justify-content: center;
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .hojaDeVidaImagen img {
+    width: 59%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton,
+  .filtroOpcion {
+    transition: none;
+  }
+}

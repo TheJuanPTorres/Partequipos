@@ -74,10 +74,11 @@ export function HeroMarca({
 }) {
   const { fondo, logo } = vista;
   const baja = bajo || (bajaSinFoto && !fondo);
-  // Baja y de índice («Trabaja con nosotros», 2026-10-23): la altura de la baja con el velo
-  // del índice, que deja el antetítulo en AA sobre la foto.
+  // `bajo` e `indice` a la vez («Trabaja con nosotros», 2026-10-23): la altura de la baja con
+  // el velo del índice, que deja el antetítulo en AA sobre la foto. Solo con `bajo` explícito:
+  // la baja por `bajaSinFoto` (el índice del blog) se queda como estaba.
   const variante = baja
-    ? `${estilos.heroBajo} ${indice ? estilos.heroBajoIndice : ""}`
+    ? `${estilos.heroBajo} ${bajo && indice ? estilos.heroBajoIndice : ""}`
     : indice
       ? estilos.heroIndice
       : "";

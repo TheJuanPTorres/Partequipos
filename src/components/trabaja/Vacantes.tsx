@@ -1,6 +1,7 @@
 import { IconEye, IconMapPin } from "@tabler/icons-react";
 import Link from "next/link";
 
+import { ZonaCatalogo } from "@/components/listado/ZonaCatalogo";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { URL_PORTAL_BUK } from "@/lib/vacantes/portalBuk";
 import type { Vacante } from "@/lib/vacantes/tipos";
@@ -15,7 +16,10 @@ import estilos from "./trabaja.module.css";
  * que abre la vacante en Buk en otra pestaña. Sin vacantes (o con la lectura
  * apagada o sin copia), el aviso con el enlace al portal de Buk.
  *
- * Componente de servidor: el filtro son enlaces (`?ciudad=…`), sin JavaScript.
+ * El filtro son enlaces (`?ciudad=…`) que funcionan sin JavaScript. Con él,
+ * cambiar de ciudad solo actualiza las tarjetas, sin recargar ni subir (Juan
+ * Pablo, 2026-10-23): `ZonaCatalogo`, el mismo de los listados de usados
+ * (#317), navega con `scroll: false` a la misma URL, con atrás y adelante.
  */
 const POR_FILA = 4;
 
@@ -33,6 +37,7 @@ export function Vacantes({
   ciudades,
   filtro,
   ruta,
+  clave,
 }: {
   id: string;
   titulo: string;
@@ -43,6 +48,8 @@ export function Vacantes({
   filtro: Filtro;
   /** La ruta de la página, con barra final, para los enlaces del filtro. */
   ruta: string;
+  /** Ruta y consulta de la URL pintada: `ZonaCatalogo` sabe así que cambió. */
+  clave: string;
 }) {
   const idTitulo = `${id}-titulo`;
   const ciudadActual = filtro.tipo === "ciudad" ? filtro.ciudad.slug : null;
@@ -59,73 +66,88 @@ export function Vacantes({
         <Revelado como="p" texto={texto} ritmo="titulo" className={estilos.equipoTexto} />
       </div>
 
-      {ciudades.length > 0 && (
-        <nav className={estilos.filtro} aria-label="Filtrar las vacantes por ciudad">
-          <ul className={estilos.filtroLista}>
-            <li>
-              <Link
-                href={ruta}
-                className={estilos.filtroOpcion}
-                aria-current={ciudadActual === null ? "page" : undefined}
-                prefetch={false}
-              >
-                Todas
-              </Link>
-            </li>
-            {ciudades.map((c) => (
-              <li key={c.slug}>
+      <ZonaCatalogo clave={clave} lateral={false} className={estilos.zona}>
+        {ciudades.length > 0 && (
+          <nav
+            className={estilos.filtro}
+            aria-label="Filtrar las vacantes por ciudad"
+            data-catalogo-nav=""
+          >
+            <ul className={estilos.filtroLista}>
+              <li>
                 <Link
-                  href={`${ruta}?ciudad=${c.slug}`}
+                  href={ruta}
                   className={estilos.filtroOpcion}
-                  aria-current={ciudadActual === c.slug ? "page" : undefined}
+                  aria-current={ciudadActual === null ? "page" : undefined}
                   prefetch={false}
                 >
-                  {c.nombre} <span className={estilos.filtroCuantas}>({c.cuantas})</span>
+                  Todas
                 </Link>
               </li>
-            ))}
-          </ul>
-        </nav>
-      )}
-
-      {vacantes.length > 0 ? (
-        /* Filas de cuatro, cada una con su línea encima, como el diseño (también a 1010 px). */
-        <div className={estilos.tarjetas}>
-          {filas(vacantes).map((fila, i) => (
-            <ul key={i} className={estilos.fila}>
-              {fila.map((v) => (
-                <li key={v.enlace} className={estilos.tarjeta}>
-                  <h3 className={estilos.cargo}>{v.cargo}</h3>
-                  <p className={estilos.ciudad}>
-                    <IconMapPin aria-hidden="true" size={14} stroke={2} />
-                    {v.ciudad}
-                  </p>
-                  <a
-                    href={v.enlace}
-                    className={estilos.boton}
-                    target="_blank"
-                    rel="noopener"
-                    aria-label={`Ver oferta: ${v.cargo}, ${v.ciudad} (se abre en otra pestaña, en Buk)`}
+              {ciudades.map((c) => (
+                <li key={c.slug}>
+                  <Link
+                    href={`${ruta}?ciudad=${c.slug}`}
+                    className={estilos.filtroOpcion}
+                    aria-current={ciudadActual === c.slug ? "page" : undefined}
+                    prefetch={false}
                   >
-                    <IconEye aria-hidden="true" size={16} stroke={2} />
-                    Ver oferta
-                  </a>
+                    {c.nombre} <span className={estilos.filtroCuantas}>({c.cuantas})</span>
+                  </Link>
                 </li>
               ))}
             </ul>
-          ))}
-        </div>
-      ) : (
-        <div className={estilos.vacio}>
-          <p className={estilos.vacioTitulo}>Ahora no tenemos vacantes abiertas</p>
-          <p className={estilos.vacioTexto}>
-            Consulta nuestro portal de empleo: allí publicamos cada oferta en cuanto se abre.
+          </nav>
+        )}
+
+        {ciudades.length > 0 && (
+          <p className={estilos.soloLectores} aria-live="polite">
+            {vacantes.length === 1 ? "1 vacante" : `${vacantes.length} vacantes`}
+            {filtro.tipo === "ciudad" ? ` en ${filtro.ciudad.nombre}` : ""}
           </p>
-          <a href={URL_PORTAL_BUK} className={estilos.boton} target="_blank" rel="noopener">
-            Ver el portal de empleo
-          </a>
+        )}
+
+        <div className={estilos.resultados}>
+          {vacantes.length > 0 ? (
+            /* Filas de cuatro, cada una con su línea encima, como el diseño (también a 1010 px). */
+            <div className={estilos.tarjetas}>
+              {filas(vacantes).map((fila, i) => (
+                <ul key={i} className={estilos.fila}>
+                  {fila.map((v) => (
+                    <li key={v.enlace} className={estilos.tarjeta}>
+                      <h3 className={estilos.cargo}>{v.cargo}</h3>
+                      <p className={estilos.ciudad}>
+                        <IconMapPin aria-hidden="true" size={14} stroke={2} />
+                        {v.ciudad}
+                      </p>
+                      <a
+                        href={v.enlace}
+                        className={estilos.boton}
+                        target="_blank"
+                        rel="noopener"
+                        aria-label={`Ver oferta: ${v.cargo}, ${v.ciudad} (se abre en otra pestaña, en Buk)`}
+                      >
+                        <IconEye aria-hidden="true" size={16} stroke={2} />
+                        Ver oferta
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ))}
+            </div>
+          ) : (
+            <div className={estilos.vacio}>
+              <p className={estilos.vacioTitulo}>Ahora no tenemos vacantes abiertas</p>
+              <p className={estilos.vacioTexto}>
+                Consulta nuestro portal de empleo: allí publicamos cada oferta en cuanto se abre.
+              </p>
+              <a href={URL_PORTAL_BUK} className={estilos.boton} target="_blank" rel="noopener">
+                Ver el portal de empleo
+              </a>
+            </div>
+          )}
         </div>
-      )}
+      </ZonaCatalogo>
     </section>
   );
 }

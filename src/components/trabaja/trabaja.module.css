@@ -89,6 +89,43 @@
   font-weight: 300;
 }
 
+/*
+ * Mientras llegan las tarjetas de otra ciudad (`ZonaCatalogo`, como en los
+ * listados de usados): se atenúan tras un instante y una línea roja se mueve
+ * encima. Fuera del flujo: no desplaza nada.
+ */
+.resultados {
+  position: relative;
+  transition: opacity 0.2s ease;
+}
+
+.zona[data-cargando] .resultados {
+  opacity: 0.5;
+  transition-delay: 0.12s;
+  cursor: progress;
+}
+
+.zona[data-cargando] .resultados::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 0;
+  width: 30%;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--color-marca);
+  animation: cargandoVacantes 1s ease-in-out infinite;
+}
+
+@keyframes cargandoVacantes {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(233%);
+  }
+}
+
 /* --- Tarjetas (filas 675274a: línea arriba, 18 px, 20 px entre filas y tarjetas) */
 .tarjetas {
   display: flex;
@@ -352,7 +389,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .boton,
-  .filtroOpcion {
+  .filtroOpcion,
+  .resultados,
+  .zona[data-cargando] .resultados {
     transition: none;
+  }
+
+  .zona[data-cargando] .resultados::before {
+    width: 100%;
+    animation: none;
   }
 }

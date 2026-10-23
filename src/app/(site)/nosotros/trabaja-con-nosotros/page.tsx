@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -28,7 +29,7 @@ import {
  * WordPress; plantilla de Andrés, 2026-10-23). Del 2026-10-14 al 22 esta URL
  * redirigía al portal de Buk.
  *
- * - Encabezado de las páginas índice («Plantilla 1»), «Únete a nuestro equipo»
+ * - Encabezado BAJO de las páginas índice («Plantilla 1»), «Únete a nuestro equipo»
  *   con las vacantes y «¿No ves una oferta para tu perfil?» con el botón al
  *   portal de Buk (no guardamos datos personales).
  * - Las vacantes salen SOLO de `obtenerVacantes()` (`src/lib/vacantes/`): hoy
@@ -89,7 +90,8 @@ export default async function TrabajaConNosotrosPage({ searchParams }: Props) {
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <HeroMarca vista={vista.encabezado} anclaSiguiente={ANCLA} franja={false} indice />
+      {/* Cabecera BAJA (Juan Pablo, 2026-10-23): 380 px (420 en móvil), centrada en vertical. */}
+      <HeroMarca vista={vista.encabezado} anclaSiguiente={ANCLA} franja={false} indice bajo />
 
       <Vacantes
         id={ANCLA}
@@ -99,9 +101,14 @@ export default async function TrabajaConNosotrosPage({ searchParams }: Props) {
         ciudades={ciudades}
         filtro={filtro}
         ruta={ruta}
+        clave={filtro.tipo === "ciudad" ? `${ruta}?ciudad=${filtro.ciudad.slug}` : ruta}
       />
 
       <HojaDeVida bloque={vista.hojaDeVida} />
+
+      {/* Sin la tarjeta roja del pie («Ofrecemos Soluciones…», para compradores): la página es
+          para trabajadores y ya cierra con «¿No ves una oferta para tu perfil?» (Juan Pablo). */}
+      <PieSinTarjeta />
     </main>
   );
 }

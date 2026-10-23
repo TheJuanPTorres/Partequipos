@@ -74,7 +74,13 @@ export function HeroMarca({
 }) {
   const { fondo, logo } = vista;
   const baja = bajo || (bajaSinFoto && !fondo);
-  const variante = baja ? estilos.heroBajo : indice ? estilos.heroIndice : "";
+  // Baja y de índice («Trabaja con nosotros», 2026-10-23): la altura de la baja con el velo
+  // del índice, que deja el antetítulo en AA sobre la foto.
+  const variante = baja
+    ? `${estilos.heroBajo} ${indice ? estilos.heroBajoIndice : ""}`
+    : indice
+      ? estilos.heroIndice
+      : "";
   return (
     <section className={`${estilos.heroSeccion} ${franja ? "" : estilos.heroSeccionPlano}`}>
       <div className={`${estilos.hero} ${variante}`}>

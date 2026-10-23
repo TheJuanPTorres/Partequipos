@@ -43,6 +43,13 @@ export function adjetivoConcordado(nombre: string, raiz: string): string {
   return `${raiz}${esFemenino(nombre) ? "a" : "o"}${esPlural(nombre) ? "s" : ""}`;
 }
 
+/**
+ * «el» o «la» delante del nombre de un equipo, con el género de su TIPO o su categoría
+ * («la Excavadora Hitachi ZX130-5B», «el Compactador de suelo …», «el OKADA TOP 100» en
+ * Aditamentos): el nombre del equipo puede empezar por la marca. Antes iba siempre «la».
+ */
+export const articuloDefinido = (tipo: string) => (esFemenino(tipo) ? "la" : "el");
+
 /** «un» o «una» para un nombre en singular. */
 export const articuloIndeterminado = (nombre: string) => (esFemenino(nombre) ? "una" : "un");
 

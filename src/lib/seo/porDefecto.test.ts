@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import {
   tipoEnTitulo,
   adjetivoConcordado,
+  articuloDefinido,
   articuloIndeterminado,
   concuerda,
   descripcionPorDefecto,
@@ -141,6 +142,9 @@ describe("concordancia de Nuevo/Nueva y Usado/Usada", () => {
     assert.equal(adjetivoConcordado("Compactadores de Suelo", "Nuev"), "Nuevos");
     assert.equal(articuloIndeterminado("Retrocargadora"), "una");
     assert.equal(articuloIndeterminado("Minicargador"), "un");
+    assert.equal(articuloDefinido("Compactadores de suelo"), "el");
+    assert.equal(articuloDefinido("Excavadora"), "la");
+    assert.equal(articuloDefinido("Aditamentos"), "el");
   });
 });
 

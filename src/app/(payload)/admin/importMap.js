@@ -2,6 +2,7 @@ import { default as default_7d4eccb57b337121abb97170a6625d97 } from '../../../co
 import { default as default_4fdf05aabfcf02e659803b82d700369d } from '../../../components/admin/celdas/CeldaSolicitud'
 import { default as default_0c32825fe60d0fe4ee2f9fbf6df19841 } from '../../../components/admin/aviso/AvisoSolicitudes'
 import { default as default_c9f64be0d161498ee822e08aa62ffab9 } from '../../../components/admin/aviso/AvisoSinFotos'
+import { default as default_f4712ba04226872691305c226599165d } from '../../../components/admin/celdas/CeldaVisible'
 import { default as default_40a9883d727ab65fdd0e9c9df10e79e2 } from '../../../components/admin/celdas/CeldaMiniatura'
 import { default as default_137d3220b5ae877ef2c31422510baf68 } from '../../../components/admin/SeoGuiado'
 import { default as default_5c55248894877e0ef25c11c535b2b5bf } from '../../../components/admin/VerEnElSitio'
@@ -58,6 +59,7 @@ export const importMap = {
   "/components/admin/celdas/CeldaSolicitud#default": default_4fdf05aabfcf02e659803b82d700369d,
   "/components/admin/aviso/AvisoSolicitudes#default": default_0c32825fe60d0fe4ee2f9fbf6df19841,
   "/components/admin/aviso/AvisoSinFotos#default": default_c9f64be0d161498ee822e08aa62ffab9,
+  "/components/admin/celdas/CeldaVisible#default": default_f4712ba04226872691305c226599165d,
   "/components/admin/celdas/CeldaMiniatura#default": default_40a9883d727ab65fdd0e9c9df10e79e2,
   "/components/admin/SeoGuiado#default": default_137d3220b5ae877ef2c31422510baf68,
   "/components/admin/VerEnElSitio#default": default_5c55248894877e0ef25c11c535b2b5bf,

@@ -33,7 +33,14 @@ import type { EquipoFiltrable } from "../nueva/filtros";
 import { rutas } from "../routes";
 import type { UnidadFiltrable } from "../usados/filtros";
 import { idsDePrimeraImagen } from "../usados/primeraImagen";
-import { conMarcaVisible, DE_MARCA_VISIBLE, MARCA_VISIBLE } from "../nueva/visibilidad";
+import {
+  conEquipoVisible,
+  conMarcaVisible,
+  conProductoVisible,
+  DE_MARCA_VISIBLE,
+  MARCA_VISIBLE,
+  PRODUCTO_VISIBLE,
+} from "../nueva/visibilidad";
 
 /**
  * Acceso a datos de la sección maquinaria (API local de Payload, CLAUDE.md §3.2).
@@ -117,7 +124,7 @@ export const getEquiposNuevos = cache(async (): Promise<EquiposNuevo[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "equipos-nuevos",
-    where: DE_MARCA_VISIBLE,
+    where: conEquipoVisible(),
     depth: 1,
     limit: 0,
     sort: "nombre",
@@ -129,7 +136,7 @@ export const getEquiposDeTipo = cache(async (tipoId: number): Promise<EquiposNue
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "equipos-nuevos",
-    where: conMarcaVisible({ tipo: { equals: tipoId } }),
+    where: conEquipoVisible({ tipo: { equals: tipoId } }),
     depth: 1,
     limit: 0,
     sort: "nombre",
@@ -143,6 +150,7 @@ export const getEquipoNuevoPorSlug = cache(
     const payload = await getPayload({ config });
     const { docs } = await payload.find({
       collection: "equipos-nuevos",
+      // Trae también el oculto (producto-oculto-ok): la ficha lo redirige a su tipo.
       where: conMarcaVisible({ and: [{ tipo: { equals: tipoId } }, { slug: { equals: slug } }] }),
       depth: 2,
       limit: 1,
@@ -160,7 +168,7 @@ export const getOtrasReferencias = cache(
     const payload = await getPayload({ config });
     const { docs } = await payload.find({
       collection: "equipos-nuevos",
-      where: conMarcaVisible({
+      where: conEquipoVisible({
         and: [{ tipo: { equals: tipoId } }, { id: { not_equals: excluirId } }],
       }),
       sort: "nombre",
@@ -177,7 +185,7 @@ export const getEquiposDeTipos = cache(async (tipoIds: number[]): Promise<Equipo
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "equipos-nuevos",
-    where: conMarcaVisible({ tipo: { in: tipoIds } }),
+    where: conEquipoVisible({ tipo: { in: tipoIds } }),
     depth: 1,
     limit: 0,
     sort: "nombre",
@@ -354,7 +362,7 @@ const inventarioUsadosEnCache = unstable_cache(
     const payload = await getPayload({ config });
     const { docs } = await payload.find({
       collection: "equipos-usados",
-      where: { disponible: { equals: true } },
+      where: conProductoVisible({ disponible: { equals: true } }),
       depth: 0,
       limit: 0,
       pagination: false,
@@ -545,7 +553,7 @@ const listadoNuevaEnCache = unstable_cache(
       payload.find({
         collection: "equipos-nuevos",
         // Los de marcas ocultas tampoco: ni en tarjetas ni en filtros ni en contadores.
-        where: DE_MARCA_VISIBLE,
+        where: conEquipoVisible(),
         depth: 0,
         limit: 0,
         pagination: false,
@@ -769,6 +777,7 @@ export const getExcavadorasUsadasDePortada = cache(async (): Promise<EquiposUsad
     where: {
       and: [
         { disponible: { equals: true } },
+        PRODUCTO_VISIBLE,
         { "categoria.slug": { equals: SLUG_EXCAVADORAS } },
         { pestanaPortada: { not_equals: "aditamentos" } },
       ],
@@ -797,6 +806,7 @@ export const getUnidadUsadaPorSlug = cache(
     const payload = await getPayload({ config });
     const { docs } = await payload.find({
       collection: "equipos-usados",
+      // Trae también la oculta y la vendida (producto-oculto-ok): la página las redirige.
       where: { and: [{ categoria: { equals: categoria.id } }, { slug: { equals: slug } }] },
       depth: 1,
       limit: 1,

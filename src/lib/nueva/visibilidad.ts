@@ -29,6 +29,30 @@ export const DE_MARCA_VISIBLE: Where = { "marca.mostrarEnWeb": { not_equals: fal
 export const conMarcaVisible = (where?: Where): Where =>
   where ? { and: [where, DE_MARCA_VISIBLE] } : DE_MARCA_VISIBLE;
 
+/**
+ * PRODUCTOS OCULTOS (2026-10-23, dirección): la casilla «Mostrar en la web» de cada
+ * PRODUCTO (equipos nuevos y usados, modelos de repuestos; los productos de
+ * lubricantes la llevan en su fila, `agruparProductos`). Mismo criterio que la de
+ * las marcas: solo se oculta lo desmarcado (`not_equals: false` deja pasar los
+ * que no tienen valor). Una consulta pública NUEVA de esas colecciones tiene
+ * que llevarlo (`visibilidadProductos.test.ts`).
+ */
+export const PRODUCTO_VISIBLE: Where = { mostrarEnWeb: { not_equals: false } };
+
+/** `where` + que el equipo nuevo se muestre y su marca también. */
+export const conEquipoVisible = (where?: Where): Where =>
+  where
+    ? { and: [where, DE_MARCA_VISIBLE, PRODUCTO_VISIBLE] }
+    : { and: [DE_MARCA_VISIBLE, PRODUCTO_VISIBLE] };
+
+/** `where` + que el producto se muestre (usados y modelos de repuestos). */
+export const conProductoVisible = (where?: Where): Where =>
+  where ? { and: [where, PRODUCTO_VISIBLE] } : PRODUCTO_VISIBLE;
+
+/** Un producto ya leído se muestra salvo que tenga la casilla desmarcada. */
+export const productoVisible = (p: { mostrarEnWeb?: boolean | null } | null | undefined) =>
+  p?.mostrarEnWeb !== false;
+
 /** Una marca ya leída (poblada) se muestra salvo que tenga la casilla desmarcada. */
 export function marcaVisible(marca: unknown): boolean {
   return !(

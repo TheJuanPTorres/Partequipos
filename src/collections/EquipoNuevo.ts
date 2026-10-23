@@ -4,6 +4,7 @@ import { validarVista360 } from "../lib/maquinaria/fichaNueva";
 import { ICONOS_FICHA, validarDestacarFila, type FilaFicha } from "../lib/maquinaria/fichaTecnica";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { mostrarEnWebField } from "../lib/fields/mostrarEnWeb";
 import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
 import { revalidarEquipoNuevo, revalidarEquipoNuevoBorrado } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
@@ -21,7 +22,7 @@ export const EquipoNuevo: CollectionConfig = {
   labels: { singular: "Equipo nuevo", plural: "Equipos nuevos" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "imagenes", "marca", "tipo", "slug"],
+    defaultColumns: ["nombre", "imagenes", "marca", "tipo", "slug", "mostrarEnWeb"],
     group: "Maquinaria",
     listSearchableFields: ["nombre", "codigo"],
   },
@@ -43,6 +44,10 @@ export const EquipoNuevo: CollectionConfig = {
     // Aviso en vivo si la galería está vacía (F4).
     avisoField("avisoSinFotos", "AvisoSinFotos"),
     { name: "nombre", type: "text", required: true, label: "Nombre" },
+    mostrarEnWebField({
+      descripcion:
+        "Desmarcada, el equipo desaparece de toda la web (listados, «Otras referencias», menú, buscador, portada y sitemap) sin borrarse del panel, y su ficha lleva a la página de su tipo. Vuelve al marcarla.",
+    }),
     slugField(),
     {
       name: "marca",

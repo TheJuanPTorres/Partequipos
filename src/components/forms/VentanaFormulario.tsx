@@ -1,7 +1,7 @@
 "use client";
 
 import { IconX } from "@tabler/icons-react";
-import { lazy, Suspense, useEffect, useId, useMemo, useRef, useSyncExternalStore } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 
 import { useDatosContacto } from "@/components/forms/ContextoContacto";
 
@@ -31,17 +31,19 @@ const FormularioSolicitud = lazy(() =>
 export function VentanaFormulario({
   abierta,
   titulo,
+  nombreAccesible,
   formulario,
   alCerrar,
 }: {
   abierta: boolean;
   titulo: string;
+  /** Para lectores de pantalla; por defecto, el título visible. */
+  nombreAccesible?: string;
   formulario: ConfigFormulario;
   alCerrar: () => void;
 }) {
   const dialogo = useRef<HTMLDialogElement>(null);
   const empezoFuera = useRef(false);
-  const idTitulo = useId();
 
   // Las mejoras F1–F4 (`animacionesVentana.ts`): las encendidas en el código y, solo fuera del sitio
   // publicado, recortadas por `?anim=`. En el servidor y al hidratar, todas las encendidas.
@@ -67,7 +69,7 @@ export function VentanaFormulario({
     <dialog
       ref={dialogo}
       className={estilos.ventana}
-      aria-labelledby={idTitulo}
+      aria-label={nombreAccesible ?? titulo}
       data-ventana-contacto=""
       data-anim={activas.join(" ")}
       // Esc o `close()`: el estado se entera y el foco vuelve al botón.
@@ -82,9 +84,7 @@ export function VentanaFormulario({
     >
       <div className={estilos.contenido}>
         <div className={estilos.cabecera}>
-          <h2 id={idTitulo} className={estilos.titulo}>
-            {titulo}
-          </h2>
+          <h2 className={estilos.titulo}>{titulo}</h2>
           <button type="button" className={estilos.cerrar} onClick={alCerrar}>
             <IconX aria-hidden="true" focusable="false" stroke={1.9} size={22} />
             <span className="sr-only">Cerrar la ventana</span>

@@ -74,6 +74,7 @@ import * as migration_20261020_230146_categoria_usada_mostrar_en_web from './202
 import * as migration_20261021_052023_equipo_nuevo_vista360 from './20261021_052023_equipo_nuevo_vista360';
 import * as migration_20261022_014813_lubricantes_lineas_paginas from './20261022_014813_lubricantes_lineas_paginas';
 import * as migration_20261022_164312_blog_diseno_articulo from './20261022_164312_blog_diseno_articulo';
+import * as migration_20261023_045614_pie_enlace_documento from './20261023_045614_pie_enlace_documento';
 
 export const migrations = [
   {
@@ -454,6 +455,11 @@ export const migrations = [
   {
     up: migration_20261022_164312_blog_diseno_articulo.up,
     down: migration_20261022_164312_blog_diseno_articulo.down,
-    name: '20261022_164312_blog_diseno_articulo'
+    name: '20261022_164312_blog_diseno_articulo',
+  },
+  {
+    up: migration_20261023_045614_pie_enlace_documento.up,
+    down: migration_20261023_045614_pie_enlace_documento.down,
+    name: '20261023_045614_pie_enlace_documento'
   },
 ];

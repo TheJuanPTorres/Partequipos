@@ -465,7 +465,7 @@ export interface TiposMaquinaria {
    */
   subtipos?: (number | TiposMaquinaria)[] | null;
   /**
-   * Marcada, el índice de maquinaria nueva enseña una pestaña con el nombre de este tipo que lleva a su página. Solo sale si el tipo tiene equipos.
+   * Marcada, el índice de tipos de maquinaria nueva (y las pestañas de las categorías de nueva) enseña una tarjeta con el nombre de este tipo que lleva a su página. Para un tipo de UNA sola marca; los de varias marcas van por su categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.
    */
   pestanaIndiceNueva?: boolean | null;
   /**
@@ -3412,11 +3412,15 @@ export interface Pie {
         enlaces?:
           | {
               etiqueta: string;
-              tipo: 'pagina' | 'telefono';
+              tipo: 'pagina' | 'telefono' | 'documento';
               /**
-               * Ruta del sitio (/…) o https://
+               * Ruta del sitio (/…) o https://. Una dirección https:// de otro sitio se abre en una pestaña nueva.
                */
               destino?: string | null;
+              /**
+               * El PDF de «Documentos». Se abre en el visor si tiene sus páginas como imágenes.
+               */
+              documento?: (number | null) | Documento;
               id?: string | null;
             }[]
           | null;
@@ -3565,9 +3569,6 @@ export interface RepuestosMarca {
    */
   testimoniosTitulo?: string | null;
   verVideoTexto?: string | null;
-  /**
-   * Desmarcada (por defecto), «Qué incluye» de las categorías se ve de forma sencilla: el nombre del grupo y su lista. Marcada, tarjetas con foto y «Ver productos». En producción solo se publican plantillas de Andrés.
-   */
   queIncluyeDisenoPropio?: boolean | null;
   /**
    * Vacío: la sección no se pinta (tampoco sin foto).
@@ -3814,6 +3815,7 @@ export interface PieSelect<T extends boolean = true> {
               etiqueta?: T;
               tipo?: T;
               destino?: T;
+              documento?: T;
               id?: T;
             };
         id?: T;

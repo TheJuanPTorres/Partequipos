@@ -5,13 +5,17 @@ import {
   IconBrandTiktokFilled,
   IconBrandWhatsapp,
   IconBrandXFilled,
+  IconBrandWhatsappFilled,
   IconBrandYoutubeFilled,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { BotonVisorPdf } from "@/components/ficha/BotonVisorPdf";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
+import { ANIMACIONES_PIE, COLOR_RED } from "@/lib/animacionesPie";
+import { activasDe } from "@/lib/listado/animaciones";
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { columnasDelPie, hrefTelefono, redesDelPie, type ColumnaPie, type RedPie } from "@/lib/pie";
 import { getPie } from "@/lib/queries/getPie";
@@ -19,6 +23,7 @@ import { getEmpresa, getLogo } from "@/lib/queries/getSeo";
 import { imagenDeMedia } from "@/lib/utils/relations";
 import { seoConfig } from "@/lib/seo/config";
 
+import { AnimacionesPie } from "./AnimacionesPie";
 import { BuscadorPie } from "./BuscadorPie";
 import estilos from "./pie.module.css";
 
@@ -59,6 +64,7 @@ const ICONOS: Record<RedPie, typeof IconBrandFacebookFilled> = {
   Instagram: IconBrandInstagramFilled,
   TikTok: IconBrandTiktokFilled,
   YouTube: IconBrandYoutubeFilled,
+  WhatsApp: IconBrandWhatsappFilled,
 };
 
 function Columna({
@@ -78,10 +84,24 @@ function Columna({
       <ul className={`${estilos.lista} texto-cuerpo`}>
         {columna.enlaces.map((e) => (
           <li key={`${e.etiqueta}-${e.href}`}>
-            {e.interno ? (
+            {e.documento ? (
+              <BotonVisorPdf
+                titulo={e.documento.titulo}
+                pdf={e.documento.pdf}
+                paginas={e.documento.paginas}
+                className={estilos.enlace}
+              >
+                {e.etiqueta}
+              </BotonVisorPdf>
+            ) : e.interno ? (
               <Link href={e.href} className={estilos.enlace}>
                 {e.etiqueta}
               </Link>
+            ) : e.externo ? (
+              <a href={e.href} className={estilos.enlace} target="_blank" rel="noopener noreferrer">
+                {e.etiqueta}
+                <span className="sr-only"> (se abre en otra pestaña)</span>
+              </a>
             ) : (
               <a href={e.href} className={estilos.enlace}>
                 {e.etiqueta}
@@ -109,10 +129,20 @@ export async function Footer() {
       : [],
   );
   // En el orden de ux-9, escriba el panel el que escriba (`ORDEN_REDES`).
-  const redes = redesDelPie(empresa.redes).map((r) => ({ ...r, Icono: ICONOS[r.nombre] }));
+  // WhatsApp, con el número de la empresa, al final (2026-10-22).
+  const redes = redesDelPie(empresa.redes, empresa.whatsapp).map((r) => ({
+    ...r,
+    Icono: ICONOS[r.nombre],
+  }));
+  // Las animaciones encendidas en el código; en un preview, `AnimacionesPie` las recorta con `?anim=`.
+  const animaciones = activasDe(ANIMACIONES_PIE, null, false);
 
   return (
-    <footer className={estilos.pie} data-con-imagen={decorativa ? "" : undefined}>
+    <footer
+      className={estilos.pie}
+      data-con-imagen={decorativa ? "" : undefined}
+      data-anim={animaciones.join(" ")}
+    >
       {/* Sin lema o sin texto del botón (global aún vacío), la tarjeta no se pinta. */}
       {pie.lema && pie.textoBoton ? (
         <div className={estilos.marco}>
@@ -180,6 +210,7 @@ export async function Footer() {
                       <a
                         href={url}
                         className={estilos.red}
+                        style={{ ["--color-red" as string]: COLOR_RED[nombre] }}
                         aria-label={`${nombre} de Partequipos`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -210,6 +241,7 @@ export async function Footer() {
           <a href={`mailto:${empresa.correo}`}>{empresa.correo}</a> · © {new Date().getFullYear()}{" "}
           {seoConfig.siteName}
         </address>
+        <AnimacionesPie permitirUrl={process.env.VERCEL_ENV !== "production"} />
       </div>
     </footer>
   );

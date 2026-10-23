@@ -1,6 +1,9 @@
-import type { Pie } from "@/payload-types";
+import type { Documento, Pie } from "@/payload-types";
 
+import { vistaDeDocumento, type VistaDocumentoVisor } from "./documentos/visor";
 import { validarEnlace } from "./fields/reglasPortada";
+import { enlaceWhatsApp } from "./navegacion";
+import { poblado } from "./utils/relations";
 
 /**
  * PIE DEL SITIO — lógica pura del global `pie` (docs/diseno/decisiones-home-ux9.md
@@ -9,11 +12,23 @@ import { validarEnlace } from "./fields/reglasPortada";
  * dirección (`redDelPie`).
  */
 
-export type EnlacePie = { etiqueta: string; href: string; interno: boolean };
+/**
+ * Un enlace del pie. `externo`: una dirección https:// de otro sitio, que se abre en una pestaña
+ * nueva (2026-10-22, «Zona de clientes» y la PQRSF). `documento`: el PDF que se abre en el
+ * visor (`href` es el PDF, para abrirlo sin JavaScript).
+ */
+export type EnlacePie = {
+  etiqueta: string;
+  href: string;
+  interno: boolean;
+  externo?: boolean;
+  documento?: VistaDocumentoVisor;
+};
 export type ColumnaPie = { titulo: string; enlaces: EnlacePie[] };
 
-/** Redes que el pie sabe pintar: las cinco de ux-9 y Instagram. */
-export type RedPie = "LinkedIn" | "X" | "Facebook" | "Instagram" | "TikTok" | "YouTube";
+/** Redes que el pie sabe pintar: las cinco de ux-9, Instagram y WhatsApp. */
+export type RedPie =
+  "LinkedIn" | "X" | "Facebook" | "Instagram" | "TikTok" | "YouTube" | "WhatsApp";
 
 const PATRONES_RED: ReadonlyArray<readonly [RegExp, RedPie]> = [
   [/^https:\/\/([a-z]+\.)?linkedin\.com\//i, "LinkedIn"],
@@ -46,15 +61,21 @@ export const ORDEN_REDES: readonly RedPie[] = [
   "TikTok",
   "YouTube",
   "Instagram",
+  "WhatsApp",
 ];
 
 /**
  * Las redes del panel que el pie pinta, en el orden de ux-9. Si una red se
  * repite, sale la primera; las que el pie no sabe pintar se quedan solo en el
- * JSON-LD `sameAs`.
+ * JSON-LD `sameAs`. WhatsApp (2026-10-22) no es una red del panel: sale del
+ * número de la empresa, al final, y no entra en el `sameAs`.
  */
-export function redesDelPie(urls: readonly string[]): { nombre: RedPie; url: string }[] {
+export function redesDelPie(
+  urls: readonly string[],
+  whatsapp?: string | null,
+): { nombre: RedPie; url: string }[] {
   const porRed = new Map<RedPie, string>();
+  if (whatsapp?.trim()) porRed.set("WhatsApp", enlaceWhatsApp(whatsapp));
   for (const url of urls) {
     const nombre = redDelPie(url);
     if (nombre && !porRed.has(nombre)) porRed.set(nombre, url.trim());
@@ -63,6 +84,20 @@ export function redesDelPie(urls: readonly string[]): { nombre: RedPie; url: str
     const url = porRed.get(nombre);
     return url ? [{ nombre, url }] : [];
   });
+}
+
+/** Una dirección https:// del propio sitio (partequipos.com o el dominio publicado): no es externa. */
+function esDelSitio(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return (
+      host === "partequipos.com" ||
+      host === "www.partequipos.com" ||
+      host === "partequipos.vercel.app"
+    );
+  } catch {
+    return false;
+  }
 }
 
 /** `href` de un teléfono publicado: `tel:+573176707071`. */
@@ -78,11 +113,20 @@ export function validarDestinoPie(
   valor: unknown,
   { siblingData }: { siblingData?: { tipo?: string | null } },
 ): true | string {
-  if (siblingData?.tipo === "telefono") return true;
+  if (siblingData?.tipo === "telefono" || siblingData?.tipo === "documento") return true;
   if (typeof valor !== "string" || !valor.trim()) {
     return "Indica adónde lleva el enlace: una ruta del sitio (/…) o una dirección https://.";
   }
   return validarEnlace(valor);
+}
+
+/** Validación del documento de un enlace del pie: obligatorio con el tipo «Documento en el visor». */
+export function validarDocumentoPie(
+  valor: unknown,
+  { siblingData }: { siblingData?: { tipo?: string | null } },
+): true | string {
+  if (siblingData?.tipo !== "documento") return true;
+  return valor ? true : "Elige el documento de «Documentos» que abre este enlace.";
 }
 
 /**
@@ -99,9 +143,15 @@ export function columnasDelPie(columnas: Pie["columnas"], telefono: string): Col
       if (!etiqueta) return [];
       if (e.tipo === "telefono")
         return [{ etiqueta, href: hrefTelefono(telefono), interno: false }];
+      if (e.tipo === "documento") {
+        const documento = vistaDeDocumento(poblado<Documento>(e.documento), etiqueta);
+        return documento ? [{ etiqueta, href: documento.pdf.url, interno: false, documento }] : [];
+      }
       const destino = e.destino?.trim();
       if (!destino || validarEnlace(destino) !== true) return [];
-      return [{ etiqueta, href: destino, interno: destino.startsWith("/") }];
+      const interno = destino.startsWith("/");
+      const externo = !interno && !esDelSitio(destino);
+      return [{ etiqueta, href: destino, interno, ...(externo ? { externo } : {}) }];
     });
     return enlaces.length ? [{ titulo, enlaces }] : [];
   });

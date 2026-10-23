@@ -50,27 +50,36 @@ export const frenar = (t: number) => 1 - (1 - t) ** 4;
 /** Parámetro de la URL con el que se prueban en un preview (`?anim=A1,A3`; `?anim=no`, ninguna). */
 export const PARAMETRO_ANIMACIONES = "anim";
 
-const TODAS = (Object.keys(ANIMACIONES) as Animacion[]).filter((a) => ANIMACIONES[a]);
-
 /**
- * Las animaciones que se pintan: las encendidas en `ANIMACIONES` y, si se
- * permite (nunca en el sitio publicado), recortadas por `?anim=`. Sin
+ * Las animaciones que se pintan de un juego de interruptores (el del listado
+ * o, desde el 2026-10-22, el del pie, `lib/animacionesPie.ts`): las encendidas
+ * y, si se permite (nunca en el sitio publicado), recortadas por `?anim=`. Sin
  * parámetro, todas las encendidas; con `no`, ninguna. Una apagada en el código
  * no se enciende desde la URL.
  */
-export function animacionesActivas(
-  parametro: string | string[] | undefined,
+export function activasDe<K extends string>(
+  interruptores: Readonly<Record<K, boolean>>,
+  parametro: string | string[] | null | undefined,
   permitirUrl: boolean,
-): Animacion[] {
+): K[] {
+  const todas = (Object.keys(interruptores) as K[]).filter((a) => interruptores[a]);
   const valor = Array.isArray(parametro) ? parametro[0] : parametro;
-  if (!permitirUrl || valor === undefined) return TODAS;
+  if (!permitirUrl || valor === undefined || valor === null) return todas;
   const pedidas = new Set(
     valor
       .split(/[\s,]+/)
       .map((p) => p.trim().toUpperCase())
       .filter(Boolean),
   );
-  return TODAS.filter((a) => pedidas.has(a));
+  return todas.filter((a) => pedidas.has(a));
+}
+
+/** Las del listado (`ANIMACIONES`). */
+export function animacionesActivas(
+  parametro: string | string[] | undefined,
+  permitirUrl: boolean,
+): Animacion[] {
+  return activasDe(ANIMACIONES, parametro, permitirUrl);
 }
 
 /**

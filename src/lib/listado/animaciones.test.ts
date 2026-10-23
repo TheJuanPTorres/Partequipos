@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { ANIMACIONES, animacionesActivas, frenar, inicioDelContador } from "./animaciones";
+import {
+  ANIMACIONES,
+  activasDe,
+  animacionesActivas,
+  frenar,
+  inicioDelContador,
+} from "./animaciones";
 
 const encendidas = Object.entries(ANIMACIONES)
   .filter(([, v]) => v)
@@ -55,5 +61,14 @@ describe("frenar (contador A5)", () => {
   it("frena al acercarse al final: avanza más al principio que al final", () => {
     assert.ok(frenar(0.5) > 0.9);
     assert.ok(frenar(0.25) - frenar(0) > frenar(1) - frenar(0.75));
+  });
+});
+
+describe("activasDe (el pie, 2026-10-22)", () => {
+  it("vale para otro juego de interruptores: los apagados no se encienden por la URL", () => {
+    const pie = { P1: true, P2: false, P3: true } as const;
+    assert.deepEqual(activasDe(pie, null, true), ["P1", "P3"]);
+    assert.deepEqual(activasDe(pie, "p2,P3", true), ["P3"]);
+    assert.deepEqual(activasDe(pie, "no", false), ["P1", "P3"]);
   });
 });

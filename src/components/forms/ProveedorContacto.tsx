@@ -13,6 +13,7 @@ export async function ProveedorContacto({ children }: { children: ReactNode }) {
       datos={{
         siteKey: turnstileSiteKey(),
         whatsapp: empresa ? enlaceWhatsApp(empresa.whatsapp) : undefined,
+        permitirUrl: process.env.VERCEL_ENV !== "production",
       }}
     >
       {children}

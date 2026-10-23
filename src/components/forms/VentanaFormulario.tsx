@@ -1,11 +1,18 @@
 "use client";
 
 import { IconX } from "@tabler/icons-react";
-import { lazy, Suspense, useEffect, useId, useRef } from "react";
+import { lazy, Suspense, useEffect, useId, useMemo, useRef, useSyncExternalStore } from "react";
 
+import { useDatosContacto } from "@/components/forms/ContextoContacto";
+
+import { ANIMACIONES_VENTANA } from "@/lib/formularios/animacionesVentana";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
+import { activasDe, PARAMETRO_ANIMACIONES } from "@/lib/listado/animaciones";
 
+import piel from "./pielFormulario.module.css";
 import estilos from "./ventanaFormulario.module.css";
+
+const sinSuscripcion = () => () => {};
 
 /** El formulario (campos, Turnstile, acción) no viaja hasta que la ventana se abre. */
 const FormularioSolicitud = lazy(() =>
@@ -36,6 +43,19 @@ export function VentanaFormulario({
   const empezoFuera = useRef(false);
   const idTitulo = useId();
 
+  // Las mejoras F1–F4 (`animacionesVentana.ts`): las encendidas en el código y, solo fuera del sitio
+  // publicado, recortadas por `?anim=`. En el servidor y al hidratar, todas las encendidas.
+  const permitirUrl = useDatosContacto()?.permitirUrl ?? false;
+  const parametro = useSyncExternalStore(
+    sinSuscripcion,
+    () => (permitirUrl ? new URL(location.href).searchParams.get(PARAMETRO_ANIMACIONES) : null),
+    () => null,
+  );
+  const activas = useMemo(
+    () => activasDe(ANIMACIONES_VENTANA, parametro, permitirUrl),
+    [parametro, permitirUrl],
+  );
+
   useEffect(() => {
     const d = dialogo.current;
     if (!d) return;
@@ -49,6 +69,7 @@ export function VentanaFormulario({
       className={estilos.ventana}
       aria-labelledby={idTitulo}
       data-ventana-contacto=""
+      data-anim={activas.join(" ")}
       // Esc o `close()`: el estado se entera y el foco vuelve al botón.
       onClose={alCerrar}
       // Cierra al tocar el fondo, pero no si la pulsación empezó dentro (arrastrar texto).
@@ -71,7 +92,14 @@ export function VentanaFormulario({
         </div>
         {abierta ? (
           <Suspense fallback={<p className={estilos.cargando}>Cargando el formulario…</p>}>
-            <FormularioSolicitud {...formulario} variante="emergente" />
+            <div className={piel.formulario}>
+              <FormularioSolicitud
+                {...formulario}
+                variante="emergente"
+                animar={activas}
+                alCerrar={alCerrar}
+              />
+            </div>
           </Suspense>
         ) : null}
       </div>

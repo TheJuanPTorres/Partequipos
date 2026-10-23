@@ -33,7 +33,7 @@ export function Campo({ id, etiqueta, error, obligatorio, ayuda, children }: Pro
   const describedBy = [ayuda ? idAyuda : null, error ? idError : null].filter(Boolean).join(" ");
 
   return (
-    <div>
+    <div data-campo="">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">
         {etiqueta}
         {obligatorio ? (
@@ -66,7 +66,7 @@ export function Campo({ id, etiqueta, error, obligatorio, ayuda, children }: Pro
        * el usuario tenga que ir a buscarlo.
        */}
       {error ? (
-        <p id={idError} role="alert" className="mt-1 text-sm text-red-700">
+        <p id={idError} role="alert" data-error="" className="mt-1 text-sm text-red-700">
           {error}
         </p>
       ) : null}

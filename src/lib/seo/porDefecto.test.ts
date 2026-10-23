@@ -3,6 +3,9 @@ import { describe, it } from "node:test";
 
 import {
   tipoEnTitulo,
+  adjetivoConcordado,
+  articuloDefinido,
+  articuloIndeterminado,
   concuerda,
   descripcionPorDefecto,
   recortarDescripcion,
@@ -33,8 +36,10 @@ describe("tituloPorDefecto", () => {
       tituloPorDefecto.tipoMaquinaria("Vibrocompactador SV208", "Case Construction"),
       "Vibrocompactador SV208 Case Construction",
     );
-    assert.equal(tituloPorDefecto.categoriaNueva("Excavadoras"), "Excavadoras nuevas");
-    assert.equal(tituloPorDefecto.categoriaUsada("Excavadoras"), "Excavadoras usadas");
+    assert.equal(tituloPorDefecto.categoriaNueva("Excavadoras"), "Excavadoras Nuevas");
+    assert.equal(tituloPorDefecto.categoriaUsada("Excavadoras"), "Excavadoras Usadas");
+    assert.equal(tituloPorDefecto.categoriaNueva("Excavadora"), "Excavadora Nueva");
+    assert.equal(tituloPorDefecto.categoriaUsada("Bulldozer"), "Bulldozer Usado");
     assert.equal(tituloPorDefecto.marcaLubricante("Eni"), "Lubricantes Eni");
     assert.equal(tituloPorDefecto.categoriaLubricante("Motos", "Eni"), "Motos | Lubricantes Eni");
   });
@@ -88,30 +93,58 @@ describe("estadoLongitud", () => {
   });
 });
 
-describe("concordancia de nuevas/usadas", () => {
-  it("las 11 categorías que hay hoy (8 de usada y 3 de nueva)", () => {
-    const usada = {
-      Vibrocompactadores: "Vibrocompactadores usados",
-      Retrocargadoras: "Retrocargadoras usadas",
-      Motoniveladoras: "Motoniveladoras usadas",
-      Minicargadores: "Minicargadores usados",
-      Excavadoras: "Excavadoras usadas",
-      Compactadores: "Compactadores usados",
-      Cargadores: "Cargadores usados",
-      Bulldozers: "Bulldozers usados",
+describe("concordancia de Nuevo/Nueva y Usado/Usada", () => {
+  it("en plural, como hasta ahora pero con mayúscula", () => {
+    const usada: Record<string, string> = {
+      Vibrocompactadores: "Vibrocompactadores Usados",
+      Retrocargadoras: "Retrocargadoras Usadas",
+      Motoniveladoras: "Motoniveladoras Usadas",
+      Minicargadores: "Minicargadores Usados",
+      Excavadoras: "Excavadoras Usadas",
+      Compactadores: "Compactadores Usados",
+      "Cargadores Frontales": "Cargadores Frontales Usados",
+      Bulldozers: "Bulldozers Usados",
+      Aditamentos: "Aditamentos Usados",
     };
     for (const [nombre, titulo] of Object.entries(usada)) {
       assert.equal(tituloPorDefecto.categoriaUsada(nombre), titulo);
     }
-    assert.equal(tituloPorDefecto.categoriaNueva("Excavadoras"), "Excavadoras nuevas");
-    assert.equal(tituloPorDefecto.categoriaNueva("Compactadores"), "Compactadores nuevos");
-    assert.equal(tituloPorDefecto.categoriaNueva("Cargadores"), "Cargadores nuevos");
+    assert.equal(tituloPorDefecto.categoriaNueva("Excavadoras"), "Excavadoras Nuevas");
+    assert.equal(tituloPorDefecto.categoriaNueva("Compactadores"), "Compactadores Nuevos");
   });
 
-  it("mira la última palabra, sin importar mayúsculas", () => {
+  it("en singular (cliente, 2026-10-23), concordado con cada máquina", () => {
+    const nueva: Record<string, string> = {
+      Bulldozer: "Bulldozer Nuevo",
+      Excavadora: "Excavadora Nueva",
+      Motoniveladora: "Motoniveladora Nueva",
+      Miniexcavadora: "Miniexcavadora Nueva",
+      Minicargador: "Minicargador Nuevo",
+      Retrocargadora: "Retrocargadora Nueva",
+      Compactador: "Compactador Nuevo",
+      Pavimentadora: "Pavimentadora Nueva",
+    };
+    for (const [nombre, titulo] of Object.entries(nueva)) {
+      assert.equal(tituloPorDefecto.categoriaNueva(nombre), titulo);
+    }
+    assert.equal(tituloPorDefecto.categoriaUsada("Cargador Frontal"), "Cargador Frontal Usado");
+    assert.equal(tituloPorDefecto.categoriaUsada("Vibrocompactador"), "Vibrocompactador Usado");
+    assert.equal(tituloPorDefecto.categoriaUsada("Regla Vibratoria"), "Regla Vibratoria Usada");
+  });
+
+  it("el género sale del sustantivo (la primera palabra), sin importar mayúsculas ni tildes", () => {
     assert.equal(concuerda("Grúas TELESCÓPICAS", "f", "m"), "f");
     assert.equal(concuerda("Equipos de compactación", "f", "m"), "m");
     assert.equal(concuerda("bulldozer", "f", "m"), "m");
+    assert.equal(concuerda("Pavimentadora Dynapac", "f", "m"), "f");
+    assert.equal(concuerda("Compactador de Llantas", "f", "m"), "m");
+    assert.equal(adjetivoConcordado("Excavadora", "Usad"), "Usada");
+    assert.equal(adjetivoConcordado("Compactadores de Suelo", "Nuev"), "Nuevos");
+    assert.equal(articuloIndeterminado("Retrocargadora"), "una");
+    assert.equal(articuloIndeterminado("Minicargador"), "un");
+    assert.equal(articuloDefinido("Compactadores de suelo"), "el");
+    assert.equal(articuloDefinido("Excavadora"), "la");
+    assert.equal(articuloDefinido("Aditamentos"), "el");
   });
 });
 

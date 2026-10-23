@@ -30,7 +30,7 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
     origen,
     siteKey: turnstileSiteKey(),
     whatsapp: datos.whatsapp,
-    referencia: { texto: `${datos.referencia} (avísame cuando llegue una)` },
+    referencia: { texto: `${datos.referencia} (avísame cuando llegue ${datos.llegue})` },
     titulo: "Avísame cuando llegue una",
     descripcion:
       "Déjanos tus datos y te escribimos en cuanto entre una unidad. Si buscas un modelo, un año o unas horas concretas, cuéntanoslo en el mensaje.",

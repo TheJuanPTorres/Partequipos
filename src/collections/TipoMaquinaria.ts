@@ -81,7 +81,7 @@ export const TipoMaquinaria: CollectionConfig = {
       },
       admin: {
         description:
-          "Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Compactadores» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.",
+          "Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Compactador» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.",
       },
     },
     {

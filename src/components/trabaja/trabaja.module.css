@@ -51,11 +51,15 @@
 /*
  * RESERVA DE ALTO frente a la llegada de Inter (CLS), como la cabecera del
  * artículo (`cabeceraArticulo.module.css`): una copia invisible del texto
- * (`::after`, con `data-reserva`) en la fuente de respaldo, ensanchada
- * 0,04 em, en la misma celda de rejilla que el texto visible. La caja mide
- * siempre lo de la copia, con Inter o sin ella. Tipografía en el contenedor;
- * el texto visible la hereda (`.heredado`). Medido: CLS de 0,12 a 1010 y
- * 0,05 a 1440 sin esto.
+ * (`::after`, con `data-reserva`) en la fuente de respaldo, en la misma celda
+ * de rejilla que el texto visible: la caja es la mayor de las dos y no cambia
+ * al llegar Inter. Tipografía en el contenedor; el texto visible la hereda
+ * (`.heredado`). Medido sin esto: CLS de 0,12 a 1010 y 0,05 a 1440.
+ *
+ * SIN ensanchar la copia (la cabecera del artículo la ensancha 0,04 em): aquí
+ * eso daba una línea más al título y a la frase a 1010 y 390 (hueco de ~20 px)
+ * y píldoras más anchas (el filtro pasaba a dos filas a 1440). «Inter
+ * Fallback» ya está ajustada al ancho de Inter.
  */
 .reserva {
   display: grid;
@@ -73,18 +77,6 @@
   pointer-events: none;
   white-space: pre-line;
   font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: 0.04em;
-}
-
-/*
- * El título, la frase y las píldoras, SIN ensanchar: con 0,04 em la copia
- * del título y la de la frase ocupaban una línea más a 1010 y 390 (hueco de
- * ~20 px) y las píldoras salían más anchas (el filtro pasaba a dos filas a
- * 1440). «Inter Fallback» ya está
- * ajustada al ancho de Inter; la caja es el mayor de los dos.
- */
-.reservaJusta::after {
-  letter-spacing: normal;
 }
 
 /* Las píldoras del filtro, en una línea y con el texto centrado en su caja. */

@@ -62,10 +62,7 @@ export function Vacantes({
        * a 1010). La copia invisible en la fuente de respaldo fija su caja.
        */}
       <div className={estilos.equipoCabecera}>
-        <div
-          className={`${estilos.equipoTitulo} ${estilos.reserva} ${estilos.reservaJusta}`}
-          data-reserva={titulo}
-        >
+        <div className={`${estilos.equipoTitulo} ${estilos.reserva}`} data-reserva={titulo}>
           <Revelado
             como="h2"
             id={idTitulo}
@@ -74,10 +71,7 @@ export function Vacantes({
             className={estilos.heredado}
           />
         </div>
-        <div
-          className={`${estilos.equipoTexto} ${estilos.reserva} ${estilos.reservaJusta}`}
-          data-reserva={texto}
-        >
+        <div className={`${estilos.equipoTexto} ${estilos.reserva}`} data-reserva={texto}>
           <Revelado como="p" texto={texto} ritmo="titulo" className={estilos.heredado} />
         </div>
       </div>
@@ -98,7 +92,7 @@ export function Vacantes({
                   prefetch={false}
                 >
                   <span
-                    className={`${estilos.reserva} ${estilos.reservaJusta} ${estilos.reservaLinea}`}
+                    className={`${estilos.reserva} ${estilos.reservaLinea}`}
                     data-reserva="Todas"
                   >
                     <span>Todas</span>
@@ -114,7 +108,7 @@ export function Vacantes({
                     prefetch={false}
                   >
                     <span
-                      className={`${estilos.reserva} ${estilos.reservaJusta} ${estilos.reservaLinea}`}
+                      className={`${estilos.reserva} ${estilos.reservaLinea}`}
                       data-reserva={`${c.nombre} (${c.cuantas})`}
                     >
                       <span>

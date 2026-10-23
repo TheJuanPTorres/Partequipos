@@ -4,8 +4,7 @@ import { getPayload } from "payload";
 
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "../cacheDatos";
 import { calcularVacantes } from "./calcular";
-import { CONTEXTO_ESCRITURA_VACANTES, SLUG_VACANTES_BUK } from "./constantes";
-import { vacantesGuardadas, type Guardado } from "./estado";
+import { guardar, leerGuardado } from "./guardado";
 import { leerPortalBuk } from "./portalBuk";
 
 /**
@@ -27,34 +26,17 @@ import { leerPortalBuk } from "./portalBuk";
  */
 const VIGENCIA_CACHE_S = 60 * 60;
 
-async function leerGuardado(): Promise<Guardado> {
-  const payload = await getPayload({ config });
-  const g = await payload.findGlobal({ slug: SLUG_VACANTES_BUK, depth: 0 });
-  return {
-    leer: g.leer !== false,
-    vacantes: vacantesGuardadas(g.vacantes),
-    copiaEl: g.copiaEl ?? null,
-    ultimoIntento: g.ultimoIntento ?? null,
-    ultimoError: g.ultimoError ?? null,
-  };
-}
-
-async function guardar(datos: Partial<Omit<Guardado, "leer">>): Promise<void> {
-  const payload = await getPayload({ config });
-  await payload.updateGlobal({
-    slug: SLUG_VACANTES_BUK,
-    data: {
-      ...datos,
-      ...(datos.vacantes ? { numeroVacantes: datos.vacantes.length } : {}),
-    },
-    overrideAccess: true,
-    context: { [CONTEXTO_ESCRITURA_VACANTES]: true },
-  });
-}
-
 /** Las vacantes que pinta «Trabaja con nosotros». */
 export const obtenerVacantes = unstable_cache(
-  () => calcularVacantes({ ahora: Date.now, leerGuardado, guardar, leer: () => leerPortalBuk() }),
+  // `getPayload` va dentro de cada dependencia: si falla, `calcularVacantes`
+  // lo recoge y la página sigue (estado vacío), en vez de caerse.
+  () =>
+    calcularVacantes({
+      ahora: Date.now,
+      leerGuardado: async () => leerGuardado(await getPayload({ config })),
+      guardar: async (datos) => guardar(await getPayload({ config }), datos),
+      leer: () => leerPortalBuk(),
+    }),
   ["vacantes-buk", CLAVE_DESPLIEGUE],
   { tags: [ETIQUETAS_DATOS.vacantes], revalidate: VIGENCIA_CACHE_S },
 );

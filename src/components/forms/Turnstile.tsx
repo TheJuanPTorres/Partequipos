@@ -3,6 +3,8 @@
 import Script from "next/script";
 import { useEffect, useId, useRef } from "react";
 
+import { alCargarTurnstile, montarPendientes } from "@/lib/formularios/colaTurnstile";
+
 /**
  * Widget de Cloudflare Turnstile.
  *
@@ -55,11 +57,17 @@ export function Turnstile({ siteKey, reinicio }: { siteKey: string; reinicio?: u
       });
     };
 
-    // El script puede haber cargado antes de que monte este componente.
+    // El script puede haber cargado antes de que monte este componente. Si no, a la cola: con
+    // dos formularios en la página, la función global los monta a los dos (`colaTurnstile`).
+    let quitarDeLaCola = () => {};
     if (window.turnstile) montar();
-    else window.alListoTurnstile = montar;
+    else {
+      quitarDeLaCola = alCargarTurnstile(montar);
+      window.alListoTurnstile = montarPendientes;
+    }
 
     return () => {
+      quitarDeLaCola();
       if (widgetId.current && window.turnstile) {
         window.turnstile.remove(widgetId.current);
         widgetId.current = null;

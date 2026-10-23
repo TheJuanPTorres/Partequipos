@@ -534,6 +534,8 @@ type CategoriaNueva = Pick<
   "id" | "slug" | "nombre" | "descripcion" | "seo"
 > & {
   tipos: number[];
+  /** «Imagen de la tarjeta» de la categoría (índice de tipos), o null. */
+  foto: FotoDeTarjeta | null;
 };
 
 /**
@@ -605,7 +607,14 @@ const listadoNuevaEnCache = unstable_cache(
         limit: 0,
         pagination: false,
         sort: "nombre",
-        select: { slug: true, nombre: true, descripcion: true, seo: true, tiposIncluidos: true },
+        select: {
+          slug: true,
+          nombre: true,
+          descripcion: true,
+          seo: true,
+          tiposIncluidos: true,
+          imagen: true,
+        },
       }),
     ]);
     const idRel = (v: unknown): number | null =>
@@ -624,6 +633,11 @@ const listadoNuevaEnCache = unstable_cache(
     // Y la «Imagen de la tarjeta» de los tipos con pestaña (índice de tipos, 2026-10-22).
     for (const t of tipos.docs) {
       const id = t.pestanaIndiceNueva ? idRel(t.imagen) : null;
+      if (id !== null) idsFotos.add(id);
+    }
+    // Y la de las categorías (índice de tipos, 2026-10-23).
+    for (const c of categorias.docs) {
+      const id = idRel(c.imagen);
       if (id !== null) idsFotos.add(id);
     }
     const idsPdf = [
@@ -714,6 +728,7 @@ const listadoNuevaEnCache = unstable_cache(
         nombre: c.nombre,
         descripcion: c.descripcion,
         seo: c.seo,
+        foto: foto(idRel(c.imagen)),
         // Sin los tipos de marcas ocultas (`tipoPorId` ya no los tiene).
         tipos: (c.tiposIncluidos ?? [])
           .map(idRel)

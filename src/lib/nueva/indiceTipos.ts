@@ -32,7 +32,12 @@ export const DESCRIPCION_NUEVA =
 /** La marca de nueva que hace de «Aditamentos» (fuera de las páginas de tipo, `paginaCategoria.ts`). */
 export const SLUG_ADITAMENTOS = "aditamentos";
 
-type CategoriaDelListado = { slug: string; nombre: string; tipos: number[] };
+type CategoriaDelListado = {
+  slug: string;
+  nombre: string;
+  tipos: number[];
+  foto?: EquipoNuevoListado["foto"];
+};
 
 const imagen = (f: EquipoNuevoListado["foto"]): ImagenLista | null =>
   imagenDeMedia(f as Media | null, "");
@@ -53,7 +58,7 @@ function primeraFoto(
 /**
  * Las tarjetas del índice de tipos, en el orden de la web antigua; solo maquinaria. Una
  * categoría o un tipo sin equipos no sale (no hay nada a lo que llevar). Foto: la «Imagen de la
- * tarjeta» del tipo o, vacía, la del primer equipo con foto (por nombre).
+ * tarjeta» de la categoría o del tipo o, vacía, la del primer equipo con foto (por nombre).
  */
 export function tarjetasDeTiposNueva(datos: {
   equipos: EquipoNuevoListado[];
@@ -75,7 +80,7 @@ export function tarjetasDeTiposNueva(datos: {
           clave: `categoria-${c.slug}`,
           titulo: c.nombre,
           href: `${rutas.categoriaNueva(c.slug)}/`,
-          imagen: primeraFoto(equipos, (e) => tipos.has(e.tipoId)),
+          imagen: imagen(c.foto ?? null) ?? primeraFoto(equipos, (e) => tipos.has(e.tipoId)),
           soloEscritorio: false,
         } satisfies TarjetaMarca,
       },

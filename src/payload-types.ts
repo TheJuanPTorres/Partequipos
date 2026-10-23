@@ -434,46 +434,13 @@ export interface CategoriasMaquinaria {
   slug: string;
   descripcion?: string | null;
   /**
-   * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
-   */
-  tiposIncluidos?: (number | TiposMaquinaria)[] | null;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  actualizadoPor?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tipos-maquinaria".
- */
-export interface TiposMaquinaria {
-  id: number;
-  nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  marca: number | MarcasMaquinaria;
-  descripcion?: string | null;
-  /**
-   * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.
+   * Opcional. Foto de la categoría para su tarjeta en el índice de tipos de maquinaria nueva. Si la dejas vacía, se usa la primera foto del primer equipo de la categoría.
    */
   imagen?: (number | null) | Media;
   /**
-   * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Compactadores» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
+   * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
    */
-  subtipos?: (number | TiposMaquinaria)[] | null;
-  /**
-   * Solo para un tipo que todavía NO tiene su página general (una «Categoría de maquinaria nueva» con su nombre): marcada, el índice de tipos y el menú enseñan este tipo y llevan a su página en la marca. Con categoría, el índice y el menú llevan siempre a la categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.
-   */
-  pestanaIndiceNueva?: boolean | null;
+  tiposIncluidos?: (number | TiposMaquinaria)[] | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -545,6 +512,43 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tipos-maquinaria".
+ */
+export interface TiposMaquinaria {
+  id: number;
+  nombre: string;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  marca: number | MarcasMaquinaria;
+  descripcion?: string | null;
+  /**
+   * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.
+   */
+  imagen?: (number | null) | Media;
+  /**
+   * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Compactadores» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
+   */
+  subtipos?: (number | TiposMaquinaria)[] | null;
+  /**
+   * Solo para un tipo que todavía NO tiene su página general (una «Categoría de maquinaria nueva» con su nombre): marcada, el índice de tipos y el menú enseñan este tipo y llevan a su página en la marca. Con categoría, el índice y el menú llevan siempre a la categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.
+   */
+  pestanaIndiceNueva?: boolean | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 30 MB. Las imágenes van en «Imágenes».
@@ -2661,6 +2665,7 @@ export interface CategoriasMaquinariaSelect<T extends boolean = true> {
   nombre?: T;
   slug?: T;
   descripcion?: T;
+  imagen?: T;
   tiposIncluidos?: T;
   seo?:
     | T

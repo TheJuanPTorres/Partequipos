@@ -98,6 +98,17 @@ describe("tarjetasDeTiposNueva", () => {
     assert.equal(porTitulo.get("Retrocargadoras"), "https://ejemplo.test/foto-4.jpg"); // «Retro Y»
   });
 
+  it("la «Imagen de la tarjeta» de la categoría gana a la de sus equipos (2026-10-23)", () => {
+    const con = tarjetasDeTiposNueva({
+      ...datos,
+      categorias: datos.categorias.map((c) =>
+        c.slug === "excavadoras" ? { ...c, foto: foto(77) } : c,
+      ),
+    });
+    const excavadoras = con.find((t) => t.titulo === "Excavadoras");
+    assert.equal(excavadoras?.imagen?.url, "https://ejemplo.test/foto-77.jpg");
+  });
+
   it("solo maquinaria: con equipos de aditamentos, ninguna tarjeta lleva a ellos (2026-10-23)", () => {
     assert.ok(equipos.some((e) => e.marcaRef?.slug === "aditamentos"));
     assert.ok(!tarjetas.some((t) => /aditamento/i.test(`${t.titulo} ${t.href}`)));

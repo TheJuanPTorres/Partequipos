@@ -309,6 +309,18 @@
   margin-top: 0;
 }
 
+/* Con cuatro tarjetas por fila a 1440 px, los dos botones caben juntos solo si son algo más compactos. */
+@media (min-width: 1280px) {
+  .acciones {
+    gap: 8px;
+  }
+
+  .acciones .boton {
+    gap: 8px;
+    padding: 11px 16px;
+  }
+}
+
 /* «Enviar HV»: el mismo botón, con el contorno rojo (la acción principal sigue siendo «Ver oferta»). */
 .botonSecundario {
   background: transparent;

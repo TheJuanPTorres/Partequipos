@@ -201,6 +201,8 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
           </div>
         </header>
 
+        <IndiceArticulo titulos={titulos} variante="movil" />
+
         {imagen ? (
           <div className={estilos.destacada}>
             <Image
@@ -218,7 +220,7 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
 
         <div className={estilos.lectura}>
           <aside className={estilos.lateral}>
-            <IndiceArticulo titulos={titulos} />
+            <IndiceArticulo titulos={titulos} variante="escritorio" />
           </aside>
 
           <div className={estilos.columna}>

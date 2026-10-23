@@ -131,6 +131,10 @@
   padding: 32px 20px 24px;
 }
 
+.lateral {
+  display: none;
+}
+
 .columna {
   min-width: 0;
   width: 100%;
@@ -149,6 +153,7 @@
   }
 
   .lateral {
+    display: block;
     position: sticky;
     top: 110px;
     max-height: calc(100vh - 140px);
@@ -161,6 +166,13 @@
 }
 
 /* ---- Índice «En este artículo» --------------------------------------------- */
+/* Por debajo de 1025 px: desplegable bajo la cabecera, antes de la foto. */
+.indiceCabecera {
+  max-width: 1200px;
+  margin: 16px auto 0;
+  padding: 0 16px;
+}
+
 .indiceMovil {
   border-radius: 20px;
   background: var(--gris-fondo);
@@ -191,7 +203,7 @@
 }
 
 @media (min-width: 1025px) {
-  .indiceMovil {
+  .indiceCabecera {
     display: none;
   }
 

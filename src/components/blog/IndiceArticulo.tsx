@@ -1,7 +1,7 @@
 "use client";
 
 import { IconListDetails } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { TituloArticulo } from "@/lib/blog/titulos";
 
@@ -10,12 +10,21 @@ import estilos from "./articuloPropio.module.css";
 /**
  * «En este artículo»: el índice de los h2 y h3. Todos son enlaces normales a
  * sus anclas (funciona sin JavaScript); con JavaScript, el del título que se
- * está leyendo se marca (`aria-current="location"`). Desde 1025 px queda fijo
- * al lado del texto; en pantallas más estrechas es un desplegable sobre el
- * texto (`<details>`, cerrado).
+ * está leyendo se marca (`aria-current="location"`). Dos variantes, cada una
+ * en su sitio de la página: `escritorio` (desde 1025 px) fijo al lado del
+ * texto, y `movil` (por debajo) un desplegable discreto justo bajo la
+ * cabecera (`<details>`, cerrado), que se cierra al elegir una sección.
  */
-export function IndiceArticulo({ titulos }: { titulos: TituloArticulo[] }) {
+export function IndiceArticulo({
+  titulos,
+  variante,
+}: {
+  titulos: TituloArticulo[];
+  variante: "movil" | "escritorio";
+}) {
   const [activo, setActivo] = useState<string | null>(null);
+  const [abierto, setAbierto] = useState(false);
+  const desplegable = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
     const elementos = titulos
@@ -50,19 +59,34 @@ export function IndiceArticulo({ titulos }: { titulos: TituloArticulo[] }) {
     </ol>
   );
 
+  if (variante === "escritorio") {
+    return (
+      <nav className={estilos.indiceEscritorio} aria-label="En este artículo">
+        <p className={estilos.tituloIndice}>En este artículo</p>
+        {lista}
+      </nav>
+    );
+  }
+
   return (
-    <nav className={estilos.indice} aria-label="En este artículo">
-      <details className={estilos.indiceMovil}>
-        <summary>
+    <nav className={estilos.indiceCabecera} aria-label="En este artículo">
+      <details
+        ref={desplegable}
+        className={estilos.indiceMovil}
+        onToggle={(e) => setAbierto(e.currentTarget.open)}
+        onClick={(e) => {
+          // Al elegir una sección el desplegable se cierra; el ancla sigue su curso.
+          if ((e.target as HTMLElement).closest("a") && desplegable.current) {
+            desplegable.current.open = false;
+          }
+        }}
+      >
+        <summary aria-expanded={abierto}>
           <IconListDetails aria-hidden="true" size={20} stroke={1.8} />
           En este artículo
         </summary>
         {lista}
       </details>
-      <div className={estilos.indiceEscritorio}>
-        <p className={estilos.tituloIndice}>En este artículo</p>
-        {lista}
-      </div>
     </nav>
   );
 }

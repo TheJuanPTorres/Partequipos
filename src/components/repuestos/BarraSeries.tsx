@@ -24,11 +24,24 @@ import mejoras from "./mejoras.module.css";
  * Solo `transform` y `opacity`. Con «reducir movimiento», nada: el salto es directo.
  *
  * Sin JavaScript son anclas normales: la barra se queda fija y lleva a cada serie igual.
+ *
+ * También es el selector «Garantía · Devolución» de la página de garantías (V3, 2026-10-23):
+ * sin cuenta, con su nombre accesible y sin la entrada escalonada (`entrada={false}`).
  */
 export function BarraSeries({
   series,
+  etiqueta = "Series",
+  entrada = true,
+  className,
 }: {
-  series: { ancla: string; titulo: string; total: number }[];
+  /** `total` es opcional: sin él, la pastilla lleva solo el título (la página de garantías). */
+  series: { ancla: string; titulo: string; total?: number }[];
+  /** Nombre accesible de la barra. */
+  etiqueta?: string;
+  /** `false`: al llegar a una sección, sus tarjetas no entran escalonadas (no hay tarjetas). */
+  entrada?: boolean;
+  /** Clase extra del `<nav>` (la página de garantías la usa para su interruptor V3). */
+  className?: string;
 }) {
   const [actual, setActual] = useState<string | null>(null);
   const barra = useRef<HTMLElement>(null);
@@ -123,7 +136,7 @@ export function BarraSeries({
       return;
     }
     destino.current = ancla;
-    const entradas = entradaEscalonada(grupo);
+    const entradas = entrada ? entradaEscalonada(grupo) : [];
     grupo.scrollIntoView({ behavior: "smooth", block: "start" });
     grupo.focus({ preventScroll: true });
     let hecho = false;
@@ -150,7 +163,12 @@ export function BarraSeries({
   }
 
   return (
-    <nav ref={barra} className={mejoras.barraSeries} aria-label="Series" data-mejora="R2">
+    <nav
+      ref={barra}
+      className={`${mejoras.barraSeries} ${className ?? ""}`}
+      aria-label={etiqueta}
+      data-mejora="R2"
+    >
       <ul ref={lista} className={mejoras.barraLista}>
         {series.map((s) => (
           <li key={s.ancla}>
@@ -160,7 +178,13 @@ export function BarraSeries({
               aria-current={actual === s.ancla ? "true" : undefined}
               onClick={(e) => irA(e, s.ancla)}
             >
-              {s.titulo} <span className={mejoras.barraCuenta}>({s.total})</span>
+              {s.titulo}
+              {s.total === undefined ? null : (
+                <>
+                  {" "}
+                  <span className={mejoras.barraCuenta}>({s.total})</span>
+                </>
+              )}
             </a>
           </li>
         ))}

@@ -354,7 +354,7 @@ export function VisorLibro({
           )}
         </button>
 
-        <a href={pdf.url} className={estilos.descargar} rel="noopener noreferrer">
+        <a href={pdf.url} className={estilos.descargar} rel="noopener noreferrer" data-descargar="">
           <IconDownload aria-hidden="true" size={18} />
           Descargar PDF
           {pdf.tamano ? <span className={estilos.tamano}> ({pdf.tamano})</span> : null}

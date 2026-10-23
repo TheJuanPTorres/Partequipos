@@ -1,0 +1,187 @@
+/*
+ * LA PÁGINA DE GARANTÍAS (dirección, 2026-10-23; `PaginaPolitica.tsx`). Cabecera baja de
+ * «Trabaja con nosotros» y, debajo, una tarjeta blanca con el selector y una sección por
+ * política, cada una con su título de sección y su visor de PDF (los de siempre).
+ *
+ * Las mejoras cuelgan de `[data-anim~="V…"]` (`ZonaAnimada`, `ANIMACIONES_POLITICA`).
+ */
+.pagina {
+  padding-bottom: 20px;
+}
+
+.cuerpo {
+  margin: 20px 1.5vw 0;
+  padding: 56px 3% 80px;
+  border-radius: 30px;
+  background: var(--color-fondo);
+}
+
+.entradilla,
+.contenido {
+  max-width: 760px;
+  margin: 0 auto 24px;
+  color: var(--color-texto-suave);
+}
+
+/* --- V3: el selector «Garantía · Devolución» (la barra de series de repuestos) -------------- */
+
+/* El resaltado, en la tinta del sitio (en repuestos es el color de la marca). */
+.selector {
+  --marca-amarillo: var(--color-texto);
+  --marca-tinta: var(--color-fondo);
+  margin-top: 0;
+}
+
+/* Sin V3, el índice de siempre. */
+.indice {
+  display: none;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  border: 1px solid var(--color-fondo-seccion);
+  border-radius: 20px;
+}
+
+[data-anim]:not([data-anim~="V3"]) .selector {
+  display: none;
+}
+
+[data-anim]:not([data-anim~="V3"]) .indice {
+  display: block;
+}
+
+.indiceTitulo {
+  margin: 0;
+  font-size: var(--texto-etiqueta);
+  font-weight: 600;
+}
+
+.indice ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.indice a {
+  color: var(--color-texto);
+  text-decoration: underline;
+}
+
+/* --- Las secciones ------------------------------------------------------------------------- */
+
+/*
+ * Con el selector fijo arriba, la sección llega bajo él (los valores de la barra de series:
+ * cabecera de 76 / 72 / 72 px y barra que acaba a 130 / 131 / 127 px).
+ */
+.seccion {
+  max-width: 1100px;
+  margin: 72px auto 0;
+  scroll-margin-top: 94px;
+}
+
+.selector + .indice + .seccion {
+  margin-top: 48px;
+}
+
+.seccion:focus {
+  outline: none;
+}
+
+/*
+ * El título de sección (55 / 40 / 10vw), con su alto reservado frente a la llegada de Inter:
+ * una copia invisible en la fuente de respaldo en la misma celda (la técnica de «Trabaja con
+ * nosotros», #336, sin ensanchar). El texto visible hereda la tipografía (`.heredado`).
+ */
+.titulo {
+  display: grid;
+  margin: 0 0 32px;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-seccion);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.titulo > *,
+.titulo::after {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.titulo::after {
+  content: attr(data-reserva);
+  visibility: hidden;
+  pointer-events: none;
+  white-space: pre-line;
+  font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+}
+
+.heredado {
+  margin: 0;
+  color: inherit;
+  font: inherit;
+}
+
+/* V1 apagada: el título, quieto y visible desde el principio. */
+[data-anim]:not([data-anim~="V1"]) .titulo [data-revelado] span {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* --- V4: el marco y el icono de «Descargar PDF» -------------------------------------------- */
+
+[data-anim~="V4"] .marco {
+  padding: 32px;
+  border-radius: 30px;
+  background: var(--color-fondo-seccion);
+}
+
+[data-anim~="V4"] .marco [data-descargar] svg {
+  transition: transform 0.28s cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+[data-anim~="V4"] .marco [data-descargar]:hover svg,
+[data-anim~="V4"] .marco [data-descargar]:focus-visible svg {
+  transform: translateY(3px);
+}
+
+@media (max-width: 1024px) {
+  .seccion {
+    scroll-margin-top: 99px;
+  }
+}
+
+@media (max-width: 767px) {
+  .cuerpo {
+    padding: 40px 20px 56px;
+  }
+
+  .seccion {
+    margin-top: 56px;
+    scroll-margin-top: 87px;
+  }
+
+  .selector + .indice + .seccion {
+    margin-top: 32px;
+  }
+
+  .titulo {
+    margin-bottom: 24px;
+  }
+
+  [data-anim~="V4"] .marco {
+    padding: 16px;
+    border-radius: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-anim~="V4"] .marco [data-descargar] svg {
+    transition: none;
+  }
+
+  [data-anim~="V4"] .marco [data-descargar]:hover svg,
+  [data-anim~="V4"] .marco [data-descargar]:focus-visible svg {
+    transform: none;
+  }
+}

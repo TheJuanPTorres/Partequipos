@@ -111,6 +111,11 @@
  * `opacity` y colores; el movimiento, solo si no se pidió «reducir movimiento».
  */
 
+/* Aire entre la referencia («Consulta sobre») y el primer campo. */
+.ventana .contenido form {
+  margin-top: 16px;
+}
+
 /* F1 · apertura: fundido y subida suave; fondo oscurecido con leve desenfoque. */
 .ventana[data-anim~="F1"]::backdrop {
   background: rgb(10 10 10 / 0.55);

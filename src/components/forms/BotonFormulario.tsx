@@ -4,6 +4,7 @@ import { useRef, useState, type CSSProperties, type MouseEvent, type ReactNode }
 
 import { VentanaFormulario } from "@/components/forms/VentanaFormulario";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
+import { tituloDeVentana } from "@/lib/formularios/tituloVentana";
 
 /**
  * BOTÓN QUE ABRE EL FORMULARIO DE CONTACTO EN UNA VENTANA EMERGENTE
@@ -25,6 +26,7 @@ export function BotonFormulario({
   style,
   formulario,
   titulo,
+  nombreAccesible,
   ariaLabel,
   origenDePagina = false,
   children,
@@ -34,8 +36,10 @@ export function BotonFormulario({
   className?: string;
   style?: CSSProperties;
   formulario: ConfigFormulario;
-  /** Título de la ventana; por defecto, el del formulario. */
+  /** Título de la ventana; por defecto, el del formulario sin el producto (`tituloDeVentana`). */
   titulo?: string;
+  /** Nombre accesible del diálogo (puede llevar el producto); por defecto, el calculado. */
+  nombreAccesible?: string;
   ariaLabel?: string;
   /** El `origen` de la solicitud es la página donde se pulsa (botones editables del panel). */
   origenDePagina?: boolean;
@@ -45,6 +49,7 @@ export function BotonFormulario({
   const [montada, setMontada] = useState(false);
   const [origen, setOrigen] = useState<string | null>(null);
   const enlace = useRef<HTMLAnchorElement>(null);
+  const vistos = tituloDeVentana(formulario, titulo);
 
   function alPulsar(e: MouseEvent<HTMLAnchorElement>) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
@@ -72,7 +77,8 @@ export function BotonFormulario({
       {montada ? (
         <VentanaFormulario
           abierta={abierta}
-          titulo={titulo ?? formulario.titulo}
+          titulo={vistos.visible}
+          nombreAccesible={nombreAccesible ?? vistos.accesible}
           formulario={origen ? { ...formulario, origen } : formulario}
           alCerrar={() => {
             setAbierta(false);

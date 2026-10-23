@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { avisoField } from "../lib/fields/avisoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { seoField } from "../lib/fields/seoField";
+import { SLUG_POLITICA_GARANTIA } from "../lib/politica/animaciones";
 import { tipografiaTituloField } from "../lib/fields/tipografiaTitulo";
 import { BLOQUES_PAGINA } from "./bloques/bloquesPagina";
 import { validarYouTube } from "../lib/fields/youtube";
@@ -98,6 +99,23 @@ export const PaginaInstitucional: CollectionConfig = {
       type: "textarea",
       label: "Entradilla",
       admin: { description: "Párrafo introductorio bajo el título." },
+    },
+    /*
+     * FOTO DE LA CABECERA de la página de garantías (dirección, 2026-10-23): Juan Pablo cambia el
+     * fondo del encabezado él mismo. Con foto, el velo de las páginas índice para que el título
+     * se lea; sin ella, la tarjeta oscura de siempre. Solo se ve en esa página: es la única
+     * plantilla que la pinta (`PaginaPolitica`).
+     */
+    {
+      name: "fotoCabecera",
+      type: "upload",
+      relationTo: "media",
+      label: "Foto de fondo del encabezado",
+      admin: {
+        condition: (data) => data?.slug === SLUG_POLITICA_GARANTIA,
+        description:
+          "Opcional. Foto a todo el ancho detrás del título, con un velo oscuro para que se lea. Sin ella, el encabezado queda en un tono oscuro.",
+      },
     },
     {
       name: "contenido",

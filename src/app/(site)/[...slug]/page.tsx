@@ -254,6 +254,7 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
         contenido={pagina.contenido}
         secciones={secciones}
         migas={breadcrumbs}
+        fondo={imagenDeMedia(pagina.fotoCabecera, "")}
       />
     );
   }

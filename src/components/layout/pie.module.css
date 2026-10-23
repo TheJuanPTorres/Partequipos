@@ -584,3 +584,94 @@
     height: 56px;
   }
 }
+
+/*
+ * ANIMACIONES DEL PIE (dirección, 2026-10-22; interruptores en
+ * `lib/animacionesPie.ts`). Cada una cuelga de su marca en `data-anim` del
+ * `<footer>` y solo con movimiento permitido. Duración y curva, las del
+ * listado (#320, `DURACION_MS` y `CURVA`): 280 ms, cubic-bezier(0.33, 0, 0.2, 1).
+ */
+
+/* P4: «Volver arriba», en la franja legal (también sin movimiento: sube sin desplazamiento suave). */
+.arriba {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.arriba svg {
+  width: 14px;
+  height: 14px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* P1: subrayado que crece desde la izquierda, en el color del enlace. */
+  .pie[data-anim~="P1"] .enlace,
+  .pie[data-anim~="P1"] .legal a {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    background-position: 0 100%;
+    background-size: 0 1px;
+    transition:
+      background-size 280ms cubic-bezier(0.33, 0, 0.2, 1),
+      color 280ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  .pie[data-anim~="P1"] .enlace:hover,
+  .pie[data-anim~="P1"] .enlace:focus-visible,
+  .pie[data-anim~="P1"] .legal a:hover,
+  .pie[data-anim~="P1"] .legal a:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* P2: la caja sube 3 px y se rellena con el color de su red (`--color-red`, icono en blanco). */
+  .pie[data-anim~="P2"] .red::before {
+    background: var(--color-red, var(--color-marca));
+  }
+
+  .pie[data-anim~="P2"] .red:hover,
+  .pie[data-anim~="P2"] .red:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px 0 rgb(0 0 0 / 0.12);
+  }
+
+  /*
+   * P3: las columnas entran escalonadas la primera vez que se ve el pie.
+   * «pendiente» lo pone el script solo si el pie aún no se ve: sin JavaScript,
+   * o con el pie ya en pantalla, nada se oculta.
+   */
+  .pie[data-anim~="P3"][data-p3="pendiente"] .columna {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  .pie[data-anim~="P3"][data-p3="visto"] .columna {
+    transition:
+      opacity 450ms cubic-bezier(0.33, 0, 0.2, 1),
+      transform 450ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  .pie[data-anim~="P3"][data-p3="visto"] .columna:nth-child(2) {
+    transition-delay: 90ms;
+  }
+
+  .pie[data-anim~="P3"][data-p3="visto"] .columna:nth-child(3) {
+    transition-delay: 180ms;
+  }
+
+  .pie[data-anim~="P3"][data-p3="visto"] .columna:nth-child(4) {
+    transition-delay: 270ms;
+  }
+
+  /* P4: la flecha sube un poco al pasar. */
+  .arriba svg {
+    transition: transform 280ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  .arriba:hover svg,
+  .arriba:focus-visible svg {
+    transform: translateY(-2px);
+  }
+}

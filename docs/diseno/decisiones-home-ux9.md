@@ -2845,3 +2845,38 @@ En todo el sitio público (layout de `(site)`; no en el panel), fijo abajo a la
     mueve así no cuenta como CLS.
   - **El pie:** la franja legal reserva 88 px abajo (16 + 56 + 16) más la
     zona segura. Al final de la página queda por encima del botón.
+
+## 37. Enlaces nuevos del pie y sus animaciones (2026-10-22, dirección)
+
+**Enlaces** (datos del panel, salvo lo que exigía código):
+
+- «Zona de clientes» lleva al portal SAP del cliente. Un destino https:// de
+  **otro sitio** se abre en pestaña nueva (`noopener noreferrer`), con
+  «(se abre en otra pestaña)» para lectores; las rutas y el propio dominio, no.
+- Fuera «Call center» y «Financiación»; en «Contacto», la PQRSF (formulario de
+  Microsoft, pestaña nueva) y la «Línea Ética».
+- **Tipo de enlace «Documento en el visor»** (migración
+  `20261023_045614_pie_enlace_documento`): un PDF de «Documentos» que se abre
+  en la ventana emergente con el visor tipo libro (`BotonVisorPdf`, el de la
+  ficha). Sin JavaScript, o sin «Páginas como imágenes», el enlace abre el PDF.
+- **Redes:** LinkedIn es una dirección del panel (el pie ya la pintaba);
+  **WhatsApp** sale del número de la empresa, al final, y no entra en el
+  `sameAs` del JSON-LD. **X y TikTok no van en el pie** (dirección,
+  2026-10-23): no se cargan en el panel; el código los sigue sabiendo pintar.
+
+**Animaciones** (`src/lib/animacionesPie.ts`, una por interruptor; en un
+preview, `?anim=P1,P3` o `?anim=no`):
+
+| Id  | Qué hace                                                                |
+| --- | ----------------------------------------------------------------------- |
+| P1  | Subrayado que crece desde la izquierda al pasar o con el foco           |
+| P2  | La caja de la red sube 3 px y se rellena con el color de su red         |
+| P3  | Las columnas entran escalonadas (90 ms) la primera vez que se ve el pie |
+| P4  | «Volver arriba» en la franja legal (sin JavaScript, enlace a `#`)       |
+
+- Solo `opacity`, `transform` y el fondo del subrayado: CLS 0.
+- Con «reducir movimiento», ninguna se mueve; P4 sube sin desplazamiento suave.
+- P3 solo oculta las columnas si el pie aún no se ve al cargar.
+- **Colores de P2 con contraste del icono blanco ≥ 3:1** (WCAG 1.4.11):
+  WhatsApp en su verde oscuro `#128C7E` (el claro `#25D366` daba 2:1) e
+  Instagram en `#C13584`.

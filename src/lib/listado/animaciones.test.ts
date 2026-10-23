@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { ANIMACIONES, animacionesActivas, frenar, inicioDelContador } from "./animaciones";
+import {
+  activasDe,
+  ANIMACIONES,
+  animacionesActivas,
+  frenar,
+  inicioDelContador,
+} from "./animaciones";
 
 const encendidas = Object.entries(ANIMACIONES)
   .filter(([, v]) => v)
@@ -55,5 +61,15 @@ describe("frenar (contador A5)", () => {
   it("frena al acercarse al final: avanza más al principio que al final", () => {
     assert.ok(frenar(0.5) > 0.9);
     assert.ok(frenar(0.25) - frenar(0) > frenar(1) - frenar(0.75));
+  });
+});
+
+describe("activasDe", () => {
+  const interruptores = { C1: true, C2: false, C3: true };
+  it("sin parámetro o sin permiso, las encendidas; una apagada no se enciende desde la URL", () => {
+    assert.deepEqual(activasDe(interruptores, null, true), ["C1", "C3"]);
+    assert.deepEqual(activasDe(interruptores, "c2", false), ["C1", "C3"]);
+    assert.deepEqual(activasDe(interruptores, "c2,C3", true), ["C3"]);
+    assert.deepEqual(activasDe(interruptores, "no", true), []);
   });
 });

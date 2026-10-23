@@ -1,5 +1,7 @@
 import type { EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
 
+import { colorDeMarca, tintaSobre } from "../marca/colorMarca";
+import type { LogoConAlt } from "../marca/logoMarca";
 import type { VistaEncabezado } from "../repuestos/marca";
 import { tituloPorDefecto } from "../seo/porDefecto";
 import { imagenDeMedia, poblado } from "../utils/relations";
@@ -54,6 +56,47 @@ export function gruposPorMarcaYTipo(equipos: EquiposNuevo[]): GrupoDeCategoria[]
       tarjetas: tarjetasDeEquipos(g.marca, g.tipo.slug, g.equipos),
     }))
     .filter((g) => g.tarjetas.length > 0);
+}
+
+/**
+ * El naranja de la barra de series de repuestos (el color de Hitachi): el de la pastilla activa
+ * de una marca sin color (dirección, 2026-10-23).
+ */
+export const COLOR_BARRA_SIN_MARCA = "#fc661c";
+
+/** Una pastilla de la barra de marcas: lleva al primer grupo de la marca. */
+export type PastillaMarca = {
+  ancla: string;
+  /** El nombre de la marca: el texto sin logo y el nombre accesible con él. */
+  titulo: string;
+  logo: LogoConAlt | null;
+  /** El fondo de la pastilla activa (el color de la marca o el naranja) y la tinta del logo encima. */
+  color: { fondo: string; tinta: string };
+};
+
+/**
+ * LA BARRA DE MARCAS de la página general de tipo (dirección, 2026-10-23): una pastilla por
+ * marca, en el orden de los grupos, que lleva a la franja de su primer grupo (`grupo-<clave>`).
+ * Solo con 2 o más marcas; con una, ninguna.
+ */
+export function barraDeMarcas(
+  grupos: GrupoDeCategoria[],
+  logoDe: (marca: MarcasMaquinaria) => LogoConAlt | null,
+): PastillaMarca[] {
+  const vistas = new Set<string>();
+  const pastillas: PastillaMarca[] = [];
+  for (const g of grupos) {
+    if (vistas.has(g.marca.slug)) continue;
+    vistas.add(g.marca.slug);
+    const fondo = colorDeMarca(g.marca.colorMarca) ?? COLOR_BARRA_SIN_MARCA;
+    pastillas.push({
+      ancla: `grupo-${g.clave}`,
+      titulo: g.marca.nombre.trim(),
+      logo: logoDe(g.marca),
+      color: { fondo, tinta: tintaSobre(fondo) },
+    });
+  }
+  return pastillas.length >= 2 ? pastillas : [];
 }
 
 /** Cada palabra con su inicial en mayúscula; el resto, tal cual (regla del sitio, 2026-10-22). */

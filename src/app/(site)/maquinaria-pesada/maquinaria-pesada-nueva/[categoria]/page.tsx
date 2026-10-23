@@ -5,12 +5,14 @@ import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { FranjaMarca } from "@/components/marca/FranjaMarca";
 import { TarjetaEquipo } from "@/components/nueva/TarjetaEquipo";
 import estilosTarjetas from "@/components/nueva/marcaNueva.module.css";
+import { BarraSeries } from "@/components/repuestos/BarraSeries";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { metadataSinIndexar } from "@/lib/filtros/seo";
 import {
+  barraDeMarcas,
   gruposPorMarcaYTipo,
   sinAditamentos,
   tituloBannerTipoNueva,
@@ -107,6 +109,8 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
   const marcaConLogo = new Map(marcas.map((m) => [m.slug, m]));
   const logoDe = (m: (typeof grupos)[number]["marca"]) =>
     conAlt(logoDeMarca(marcaConLogo.get(m.slug) ?? m, logos), `Logo de ${m.nombre}`);
+  // Con 2 o más marcas, la barra de marcas fija arriba (la de series de repuestos, R2).
+  const pastillas = barraDeMarcas(grupos, logoDe);
 
   return (
     <main className={estilos.pagina}>
@@ -132,6 +136,13 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
         className={estilosTarjetas.seccionTipo}
         aria-label={`Modelos de ${titulo}`}
       >
+        {pastillas.length > 0 ? (
+          <BarraSeries
+            series={pastillas}
+            etiqueta="Marcas"
+            className={estilosTarjetas.barraMarcas}
+          />
+        ) : null}
         {grupos.length > 0 ? (
           grupos.map((g, i) => (
             <div key={g.clave} id={`grupo-${g.clave}`} className={estilosTarjetas.grupoMarca}>

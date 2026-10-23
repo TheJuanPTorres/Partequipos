@@ -471,7 +471,7 @@ export interface TiposMaquinaria {
    */
   subtipos?: (number | TiposMaquinaria)[] | null;
   /**
-   * Marcada, el índice de tipos de maquinaria nueva (y las pestañas de las categorías de nueva) enseña una tarjeta con el nombre de este tipo que lleva a su página. Para un tipo de UNA sola marca; los de varias marcas van por su categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.
+   * Solo para un tipo que todavía NO tiene su página general (una «Categoría de maquinaria nueva» con su nombre): marcada, el índice de tipos y el menú enseñan este tipo y llevan a su página en la marca. Con categoría, el índice y el menú llevan siempre a la categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.
    */
   pestanaIndiceNueva?: boolean | null;
   /**

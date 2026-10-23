@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import { contraste, luminancia, rgbDeHex } from "../portada/contraste";
 
-import { colorDeMarca, estiloDeMarca, tintaSobre } from "./colorMarca";
+import { colorDeMarca, estiloDeMarca, tintaDeLogoSobre, tintaSobre } from "./colorMarca";
 
 const luz = (hex: string) => {
   const [r, g, b] = rgbDeHex(hex)!;
@@ -59,5 +59,16 @@ describe("estiloDeMarca", () => {
     const oscuro = estiloDeMarca("#283d99") as Record<string, string>;
     assert.equal(oscuro["--marca-hover-fondo"], "#ffffff");
     assert.equal(oscuro["--marca-hover-texto"], "#000000");
+  });
+});
+
+describe("tintaDeLogoSobre", () => {
+  it("blanco con contraste de al menos 3:1; negro solo en colores claros", () => {
+    assert.equal(tintaDeLogoSobre("#ed1c24"), "#ffffff"); // rojo de Yanmar
+    assert.equal(tintaDeLogoSobre("#bf2e1a"), "#ffffff"); // Dynapac
+    assert.equal(tintaDeLogoSobre("#f2a900"), "#000000"); // amarillo de Case
+    assert.equal(tintaDeLogoSobre("#ffffff"), "#000000");
+    for (const c of ["#ed1c24", "#bf2e1a", "#333333", "#0055aa"])
+      assert.ok(contraste(luz(c), luz("#ffffff")) >= 3);
   });
 });

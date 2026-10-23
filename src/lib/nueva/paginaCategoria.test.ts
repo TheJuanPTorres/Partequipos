@@ -49,8 +49,8 @@ describe("barraDeMarcas", () => {
   it("una pastilla por marca, al primer grupo de cada una, con su color y la tinta por contraste", () => {
     const r = barraDeMarcas(
       [
-        grupo("dynapac-pavimentadoras", "dynapac", "Dynapac", "#1a1a1a"),
-        grupo("dynapac-reglas", "dynapac", "Dynapac", "#1a1a1a"),
+        grupo("dynapac-pavimentadoras", "dynapac", "Dynapac", "#bf2e1a"),
+        grupo("dynapac-reglas", "dynapac", "Dynapac", "#bf2e1a"),
         grupo("case-compactadores", "case", "Case", "#ffcd00"),
       ],
       (m) => (m.slug === "case" ? logo : null),
@@ -58,7 +58,7 @@ describe("barraDeMarcas", () => {
     assert.deepEqual(
       r.map((p) => [p.ancla, p.titulo, p.color.fondo, p.color.tinta, Boolean(p.logo)]),
       [
-        ["grupo-dynapac-pavimentadoras", "Dynapac", "#1a1a1a", "#ffffff", false],
+        ["grupo-dynapac-pavimentadoras", "Dynapac", "#bf2e1a", "#ffffff", false],
         ["grupo-case-compactadores", "Case", "#ffcd00", "#000000", true],
       ],
     );

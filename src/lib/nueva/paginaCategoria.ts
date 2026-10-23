@@ -1,6 +1,6 @@
 import type { EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
 
-import { colorDeMarca, tintaSobre } from "../marca/colorMarca";
+import { colorDeMarca, tintaDeLogoSobre } from "../marca/colorMarca";
 import type { LogoConAlt } from "../marca/logoMarca";
 import type { VistaEncabezado } from "../repuestos/marca";
 import { tituloPorDefecto } from "../seo/porDefecto";
@@ -70,7 +70,8 @@ export type PastillaMarca = {
   /** El nombre de la marca: el texto sin logo y el nombre accesible con él. */
   titulo: string;
   logo: LogoConAlt | null;
-  /** El fondo de la pastilla activa (el color de la marca o el naranja) y la tinta del logo encima. */
+  /** El fondo de la pastilla activa (el color de la marca o el naranja) y la tinta del logo encima
+   * (`tintaDeLogoSobre`: blanco con 3:1 o más, negro solo en los claros). */
   color: { fondo: string; tinta: string };
 };
 
@@ -93,7 +94,7 @@ export function barraDeMarcas(
       ancla: `grupo-${g.clave}`,
       titulo: g.marca.nombre.trim(),
       logo: logoDe(g.marca),
-      color: { fondo, tinta: tintaSobre(fondo) },
+      color: { fondo, tinta: tintaDeLogoSobre(fondo) },
     });
   }
   return pastillas.length >= 2 ? pastillas : [];

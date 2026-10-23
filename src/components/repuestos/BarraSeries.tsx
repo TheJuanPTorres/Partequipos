@@ -39,7 +39,7 @@ import mejoras from "./mejoras.module.css";
  *
  * Y la BARRA DE MARCAS de las páginas generales de tipo de nueva (2026-10-23): cada pastilla con
  * el logo de su marca (`LogoMarca`) y su nombre como `aria-label`; la activa, del color de la
- * marca, con el logo en blanco u oscuro según el contraste (`tintaSobre`).
+ * marca, con el logo en blanco si se lee (3:1) y negro solo en los claros (`tintaDeLogoSobre`).
  */
 export function BarraSeries({
   series,

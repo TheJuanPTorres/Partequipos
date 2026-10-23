@@ -106,7 +106,7 @@ export function TarjetaListado({
       <div className={estilos.datos}>
         <h3 className={estilos.nombre}>{href ? <Link href={href}>{titulo}</Link> : titulo}</h3>
         {codigo ? <p className={estilos.modelo}>{codigo}</p> : null}
-        {resumen ? <p className={estilos.resumen}>{resumen}</p> : null}
+        {resumen ? <p className={estilos.descripcionCorta}>{resumen}</p> : null}
         <hr className={estilos.linea} />
         <ul className={estilos.lista}>
           {filas

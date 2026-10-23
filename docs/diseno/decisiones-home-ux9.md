@@ -2861,7 +2861,8 @@ En todo el sitio público (layout de `(site)`; no en el panel), fijo abajo a la
   ficha). Sin JavaScript, o sin «Páginas como imágenes», el enlace abre el PDF.
 - **Redes:** LinkedIn es una dirección del panel (el pie ya la pintaba);
   **WhatsApp** sale del número de la empresa, al final, y no entra en el
-  `sameAs` del JSON-LD.
+  `sameAs` del JSON-LD. **X y TikTok no van en el pie** (dirección,
+  2026-10-23): no se cargan en el panel; el código los sigue sabiendo pintar.
 
 **Animaciones** (`src/lib/animacionesPie.ts`, una por interruptor; en un
 preview, `?anim=P1,P3` o `?anim=no`):

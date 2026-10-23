@@ -72,10 +72,10 @@ const datos = {
 describe("tarjetasDeTiposNueva", () => {
   const tarjetas = tarjetasDeTiposNueva(datos);
 
-  it("una por categoría con equipos y por tipo con pestaña, por orden alfabético, y «Aditamentos» al final", () => {
+  it("una por categoría con equipos y por tipo con pestaña, por orden alfabético", () => {
     assert.deepEqual(
       tarjetas.map((t) => t.titulo),
-      ["Bulldozers", "Excavadoras", "Retrocargadoras", "Aditamentos"],
+      ["Bulldozers", "Excavadoras", "Retrocargadoras"],
     );
   });
 
@@ -89,10 +89,6 @@ describe("tarjetasDeTiposNueva", () => {
       porTitulo.get("Retrocargadoras"),
       "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/",
     );
-    assert.equal(
-      porTitulo.get("Aditamentos"),
-      "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos/",
-    );
   });
 
   it("foto: la del tipo; si no, la del primer equipo CON foto por nombre", () => {
@@ -102,8 +98,8 @@ describe("tarjetasDeTiposNueva", () => {
     assert.equal(porTitulo.get("Retrocargadoras"), "https://ejemplo.test/foto-4.jpg"); // «Retro Y»
   });
 
-  it("sin equipos de aditamentos, no hay tarjeta «Aditamentos»", () => {
-    const sin = tarjetasDeTiposNueva({ ...datos, equipos: equipos.filter((e) => e.id !== 5) });
-    assert.equal(sin.at(-1)?.titulo, "Retrocargadoras");
+  it("solo maquinaria: con equipos de aditamentos, ninguna tarjeta lleva a ellos (2026-10-23)", () => {
+    assert.ok(equipos.some((e) => e.marcaRef?.slug === "aditamentos"));
+    assert.ok(!tarjetas.some((t) => /aditamento/i.test(`${t.titulo} ${t.href}`)));
   });
 });

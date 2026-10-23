@@ -53,7 +53,11 @@ export function AnimacionesPie({ permitirUrl }: { permitirUrl: boolean }) {
       { threshold: 0.1 },
     );
     observador.observe(pie);
-    return () => observador.disconnect();
+    return () => {
+      observador.disconnect();
+      // Si P3 deja de estar activa antes de verse el pie (`?anim=`), nada queda a medias.
+      if (pie.dataset.p3 === "pendiente") delete pie.dataset.p3;
+    };
   }, [clave]);
 
   if (!activas.includes("P4")) return null;

@@ -75,7 +75,7 @@ export async function restoDeLaCopia(payload: unknown): Promise<string[]> {
 
 /** Enlace de cada tarjeta de Nosotros: el índice de su sección del sitio. */
 export const ENLACES_TARJETAS = {
-  nueva: `${rutas.nueva()}/`,
+  nueva: `${rutas.nuevaTipos()}/`,
   usada: `${rutas.usada()}/`,
   repuestos: `${rutas.repuestos()}/`,
 } as const;

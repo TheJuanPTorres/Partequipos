@@ -68,7 +68,8 @@ export type HijoDeMarcaOculta = { marcaSlug: string; tipoSlug: string; equipoSlu
 /**
  * Los 301 de las páginas de las marcas ocultas: la marca, cada tipo y cada
  * ficha llevan al destino de su marca (`destino`, el slug de una categoría de
- * nueva) o, sin él, al índice de maquinaria nueva. Con barra final, como las
+ * nueva) o, sin él, al índice de tipos de maquinaria nueva
+ * (la página principal de nueva desde el 2026-10-23). Con barra final, como las
  * URL del sitio. Los de la colección `redirects` mandan: si una de estas rutas
  * ya tiene uno, no se duplica.
  */
@@ -78,7 +79,10 @@ export function redirectsDeMarcasOcultas(
   existentes: RedirectGuardado[] = [],
 ): RedirectGuardado[] {
   const destinoDe = new Map(
-    marcas.map((m) => [m.slug, `${m.destino ? rutas.categoriaNueva(m.destino) : rutas.nueva()}/`]),
+    marcas.map((m) => [
+      m.slug,
+      `${m.destino ? rutas.categoriaNueva(m.destino) : rutas.nuevaTipos()}/`,
+    ]),
   );
   const sinBarra = (r: string) => r.replace(/\/+$/, "");
   const ocupadas = new Set(existentes.map((r) => sinBarra(r.desde)));

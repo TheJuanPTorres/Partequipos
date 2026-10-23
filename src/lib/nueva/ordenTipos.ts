@@ -47,10 +47,14 @@ function claveDeTipo(nombre: string): string {
 }
 
 /**
- * UNA entrada por tipo (2026-10-22), para el megamenú y el índice de tipos: si una categoría y
- * un tipo con casilla se llaman igual («Bulldozer» y «Bulldozers»), gana la CATEGORÍA solo si
- * mezcla marcas (2 o más); si no, el TIPO de esa marca. Dos categorías iguales: la de más marcas.
- * El resultado, en el orden de la web antigua.
+ * UNA entrada por tipo, para el megamenú y el índice de tipos, en el orden de la web antigua.
+ *
+ * Desde el 2026-10-23 (dirección, tarea 9) la CATEGORÍA del tipo gana SIEMPRE al tipo de una
+ * marca: «Por tipo de máquina» lleva a la página GENERAL del tipo (la de las categorías que
+ * mezclan marcas, #326), aunque hoy solo tenga equipos de una marca. El tipo de una marca (casilla
+ * «Tarjeta en el índice de tipos») solo sale si su tipo NO tiene categoría, para no perder la
+ * entrada mientras se crea. Dos categorías del mismo tipo: la de más marcas. (Antes, la del 2026-10-22:
+ * la categoría solo ganaba si mezclaba 2 o más marcas.)
  */
 export function unaEntradaPorTipo<T>(
   categorias: readonly { nombre: string; marcas: number; dato: T }[],
@@ -64,9 +68,7 @@ export function unaEntradaPorTipo<T>(
   }
   for (const t of tipos) {
     const clave = claveDeTipo(t.nombre);
-    const previa = porClave.get(clave);
-    if (!previa || previa.marcas < 2)
-      porClave.set(clave, { nombre: t.nombre, marcas: 1, dato: t.dato });
+    if (!porClave.has(clave)) porClave.set(clave, { nombre: t.nombre, marcas: 1, dato: t.dato });
   }
   return ordenarTiposNueva([...porClave.values()], (e) => e.nombre).map((e) => e.dato);
 }

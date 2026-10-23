@@ -70,9 +70,10 @@ const ESTATICAS = new Set([
   `${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}`,
   `${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}`,
   SEGMENTO_MAQUINARIA,
-  `${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}`,
+  // El índice de nueva NO: desde el 2026-10-23 da 301 al de tipos (`REDIRECTS_FIJOS`); un
+  // redirect hacia él serían dos saltos.
   `${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${SEGMENTO_MARCAS_MAQUINARIA}`,
-  // El índice de tipos de nueva (2026-10-22).
+  // El índice de tipos de nueva (2026-10-22), la página principal de nueva.
   `${SEGMENTO_MAQUINARIA}/${SEGMENTO_NUEVA}/${SEGMENTO_TIPOS_NUEVA}`,
   `${SEGMENTO_MAQUINARIA}/${SEGMENTO_USADA}`,
   // «Otros» de usados (2026-10-19): destino de la antigua /elementor-48399/.

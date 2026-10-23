@@ -1,0 +1,57 @@
+/* La franja: tarjeta blanca de radio 30, el logo de la marca a la izquierda y el título a la derecha. */
+.franja {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: max(1cqi, 12px);
+  border-radius: 30px;
+  background: var(--color-fondo);
+}
+
+/* El logo de la marca (`LogoMarca`), entero, en una caja de 140 × 64 sobre blanco. */
+.cajaLogo {
+  display: flex;
+  width: 140px;
+  height: 64px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding-left: 10px;
+}
+
+.logo {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Un título largo («Miniexcavadoras Yanmar») parte la palabra con guion en vez de salirse de la
+   pantalla junto al logo (a 390 px desbordaba 42 px). */
+.titulo {
+  min-width: 0;
+  margin: 0 0 0 auto;
+  padding-right: 10px;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  color: var(--color-texto);
+  text-align: right;
+}
+
+@media (max-width: 767px) {
+  .franja {
+    gap: 12px;
+  }
+
+  .cajaLogo {
+    width: 100px;
+    height: 48px;
+  }
+
+  .titulo {
+    padding-right: 4px;
+  }
+}

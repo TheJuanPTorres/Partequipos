@@ -99,4 +99,27 @@ describe("datosDeTarjeta", () => {
     ]);
     assert.equal(d.length, 1);
   });
+
+  it("las prioritarias con el nombre uniforme de la ficha nueva; las demás y los valores, tal cual", () => {
+    const d = datosDeTarjeta([
+      { etiqueta: "POTENCIA NETA (SAE J1349):", valor: "74 hp @ 2.200 rpm", destacar: true },
+      { etiqueta: "Peso operacional", valor: "13.000 kg", destacar: true },
+      { etiqueta: "Marca y modelo del motor", valor: "Isuzu AR-4JJ1X", destacar: true },
+      { etiqueta: "Capacidad del cucharón", valor: "0,5 m³", destacar: true },
+    ]);
+    assert.deepEqual(
+      d.map((x) => [x.etiqueta, x.valor]),
+      [
+        ["Potencia neta", "74 hp @ 2.200 rpm"],
+        ["Peso operativo", "13.000 kg"],
+        ["Motor", "Isuzu AR-4JJ1X"],
+        ["Capacidad del cucharón", "0,5 m³"],
+      ],
+    );
+  });
+
+  it("la potencia bruta no se llama «Potencia neta»", () => {
+    const [d] = datosDeTarjeta([{ etiqueta: "Potencia bruta", valor: "80 hp", destacar: true }]);
+    assert.equal(d?.etiqueta, "Potencia bruta");
+  });
 });

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import type { EquipoNuevoListado, FotoDeTarjeta } from "../queries/getMaquinaria";
-import { tarjetasDeTiposNueva, tarjetasIndiceNueva } from "./indiceTipos";
+import { tarjetasDeTiposNueva } from "./indiceTipos";
 
 const foto = (id: number): FotoDeTarjeta => ({
   id,
@@ -105,16 +105,5 @@ describe("tarjetasDeTiposNueva", () => {
   it("sin equipos de aditamentos, no hay tarjeta «Aditamentos»", () => {
     const sin = tarjetasDeTiposNueva({ ...datos, equipos: equipos.filter((e) => e.id !== 5) });
     assert.equal(sin.at(-1)?.titulo, "Retrocargadoras");
-  });
-});
-
-describe("tarjetasIndiceNueva", () => {
-  it("dos tarjetas: «Por marca» al índice de marcas y «Por tipo de máquina» al de tipos", () => {
-    const [marca, tipo] = tarjetasIndiceNueva(null, tarjetasDeTiposNueva(datos));
-    assert.equal(marca?.href, "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/");
-    assert.equal(marca?.imagen, null);
-    assert.equal(tipo?.href, "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/");
-    // La foto de la primera tarjeta de tipos que la tenga (Bulldozers).
-    assert.equal(tipo?.imagen?.url, "https://ejemplo.test/foto-40.jpg");
   });
 });

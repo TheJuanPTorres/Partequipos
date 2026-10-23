@@ -171,7 +171,6 @@ export function rutasDeMarcaMaquinaria(
 ): string[] {
   const paths = [
     rutas.maquinaria(),
-    rutas.nueva(),
     rutas.nuevaTipos(),
     rutas.marcasMaquinaria(),
     rutas.marcaMaquinaria(marcaSlug),
@@ -194,9 +193,7 @@ export function rutasDeTipoMaquinaria(
   equipoSlugs: string[],
 ): string[] {
   const paths = [
-    // Los índices de nueva (2026-10-22): el de tipos pinta el tipo y su foto, y el de nueva la
-    // foto de la primera tarjeta de tipos.
-    rutas.nueva(),
+    // El índice de tipos (la página principal de nueva) pinta el tipo y su foto.
     rutas.nuevaTipos(),
     rutas.marcaMaquinaria(marcaSlug),
     rutas.tipoMaquinaria(marcaSlug, tipoSlug),
@@ -222,8 +219,7 @@ export function rutasDeEquipoNuevo(
   return [
     // El índice de marcas solo lista las que tienen equipos (2026-10-19).
     rutas.marcasMaquinaria(),
-    // Los índices de nueva (2026-10-22): las fotos de las tarjetas de tipo salen de los equipos.
-    rutas.nueva(),
+    // El índice de tipos: las fotos de sus tarjetas salen de los equipos.
     rutas.nuevaTipos(),
     rutas.tipoMaquinaria(marcaSlug, tipoSlug),
     rutas.equipoNuevo(marcaSlug, tipoSlug, equipoSlug),
@@ -338,7 +334,7 @@ export function revalidarCategoriasDeRepuestos(motivo: string): void {
 
 /** Rutas afectadas por un cambio en una categoría de la línea nueva. */
 export function rutasDeCategoriaNueva(slug: string): string[] {
-  return [rutas.nueva(), rutas.nuevaTipos(), rutas.categoriaNueva(slug)];
+  return [rutas.nuevaTipos(), rutas.categoriaNueva(slug)];
 }
 
 /**

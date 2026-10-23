@@ -59,7 +59,7 @@ const PLANTILLAS = [
   "/lubricantes/lubricantes-eni/",
   "/lubricantes/lubricantes-eni/auto-liviano/",
   "/maquinaria-pesada/",
-  "/maquinaria-pesada/maquinaria-pesada-nueva/",
+  "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/",
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/",
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos/",
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/aditamentos/aditamentos/",

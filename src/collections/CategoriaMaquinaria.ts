@@ -2,7 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
-import { slugCategoriaNuevaNoReservado } from "../lib/nueva/slugsReservados";
+import { slugCategoriaNuevaValido } from "../lib/nueva/slugsReservados";
 import { revalidarCategoriaNueva, revalidarCategoriaNuevaBorrada } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMegamenu } from "./hooks/megamenuHooks";
@@ -11,7 +11,9 @@ const menu = revalidarMegamenu("categorias-maquinaria");
 
 /**
  * Categorías transversales de la línea NUEVA
- * (`/…/maquinaria-pesada-nueva/excavadoras/`, `cargadores`, `compactadores`).
+ * (`/…/maquinaria-pesada-nueva/excavadoras/`, `cargadores`, `compactadores`). Desde el
+ * 2026-10-23 (tarea 9) son también la PÁGINA GENERAL de cada tipo, aunque solo tenga una marca
+ * (bulldozers, motoniveladoras…): el menú y el índice de tipos llevan siempre aquí.
  *
  * Son vistas por tipo que **cruzan marcas**: la de excavadoras reúne las de Case,
  * Hitachi y Yanmar. Están indexadas, así que se preservan como rutas (ADR 0007).
@@ -41,8 +43,9 @@ export const CategoriaMaquinaria: CollectionConfig = {
   },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
-    // «marcas», «tipos» y «pagina» están reservadas: son páginas fijas al mismo nivel.
-    slugField({ unique: true, validate: slugCategoriaNuevaNoReservado }),
+    // «marcas», «tipos» y «pagina» están reservadas: son páginas fijas al mismo nivel. Y ninguna
+    // redirección puede salir de su URL: la taparía (2026-10-23).
+    slugField({ unique: true, validate: slugCategoriaNuevaValido }),
     { name: "descripcion", type: "textarea", label: "Descripción" },
     {
       name: "tiposIncluidos",

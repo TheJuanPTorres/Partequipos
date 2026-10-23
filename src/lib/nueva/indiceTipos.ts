@@ -12,16 +12,18 @@ import { unaEntradaPorTipo } from "./ordenTipos";
  * para usados). Lógica pura de las dos páginas, con la plantilla de índices de Andrés
  * (`IndiceTarjetas`):
  *
- * - `/maquinaria-pesada/maquinaria-pesada-nueva/`: dos tarjetas, «Por marca» (al índice de
- *   marcas) y «Por tipo de máquina» (al índice de tipos).
+ * - `/maquinaria-pesada/maquinaria-pesada-nueva/`: tenía dos tarjetas, «Por marca» y «Por tipo
+ *   de máquina»; desde el 2026-10-23 (cliente) da 301 al índice de tipos.
  * - `/maquinaria-pesada/maquinaria-pesada-nueva/tipos/` (URL NUEVA, fijada por dirección): una
  *   tarjeta por tipo, los mismos que las pestañas del antiguo listado y que el índice de nueva de
- *   WordPress. Un tipo de VARIAS marcas va a su categoría transversal (`…/nueva/excavadoras/`);
- *   uno de UNA sola marca, a la página de su tipo en esa marca (casilla «Pestaña en el índice de
- *   maquinaria nueva» del tipo); y «Aditamentos» al final, a su página de marca.
+ *   WordPress. Cada tipo va a su página GENERAL, la categoría de nueva (`…/nueva/excavadoras/`),
+ *   aunque solo tenga equipos de una marca (2026-10-23, tarea 9). Solo un tipo SIN categoría va a
+ *   la página de su tipo en su marca (casilla «Pestaña en el índice de maquinaria nueva»); y
+ *   «Aditamentos» al final, a su página de marca.
  */
 
-/** Título y descripción del índice de nueva: los del antiguo listado (el SEO no cambia). */
+/** Título y descripción de la página principal de nueva (el índice de tipos desde el 2026-10-23): los
+ * del antiguo listado, así el SEO no cambia. */
 export const TITULO_NUEVA = "Maquinaria pesada nueva";
 export const DESCRIPCION_NUEVA =
   "Equipos nuevos organizados por marca y tipo, con ficha técnica y solicitud de cotización.";
@@ -65,7 +67,8 @@ export function tarjetasDeTiposNueva(datos: {
     return [
       {
         nombre: c.nombre,
-        // De cuántas marcas son sus equipos: una que las mezcla gana al tipo del mismo nombre.
+        // De cuántas marcas son sus equipos: entre dos categorías del mismo tipo, gana la de más.
+        // Al tipo de una marca le gana siempre (página general, 2026-10-23).
         marcas: new Set(suyos.map((e) => e.marcaRef?.slug)).size,
         dato: {
           clave: `categoria-${c.slug}`,
@@ -100,32 +103,4 @@ export function tarjetasDeTiposNueva(datos: {
     });
   }
   return tarjetas;
-}
-
-/**
- * Las dos tarjetas del índice de nueva. Fotos, de lo que ya hay (sin campo nuevo):
- * - «Por marca»: la «Imagen de la tarjeta» de la primera marca que la tenga (en el orden en que
- *   llegan las marcas);
- * - «Por tipo de máquina»: la de la primera tarjeta del índice de tipos que tenga foto.
- */
-export function tarjetasIndiceNueva(
-  fotoMarcas: ImagenLista | null,
-  tiposConFoto: TarjetaMarca[],
-): TarjetaMarca[] {
-  return [
-    {
-      clave: "por-marca",
-      titulo: "Por marca",
-      href: `${rutas.marcasMaquinaria()}/`,
-      imagen: fotoMarcas,
-      soloEscritorio: false,
-    },
-    {
-      clave: "por-tipo",
-      titulo: "Por tipo de máquina",
-      href: `${rutas.nuevaTipos()}/`,
-      imagen: tiposConFoto.find((t) => t.imagen)?.imagen ?? null,
-      soloEscritorio: false,
-    },
-  ];
 }

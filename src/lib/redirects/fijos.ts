@@ -20,4 +20,16 @@ export const REDIRECTS_FIJOS: { destination: string; source: string }[] = [
    * del 2026-10-14 al 22 iba con 301 al portal de empleo de Buk; hoy es una
    * página propia con las vacantes leídas de ese portal (`src/lib/vacantes/`).
    */
+  /*
+   * El índice de maquinaria nueva → el índice de tipos (decisión del cliente,
+   * 2026-10-23). La página intermedia con las dos tarjetas «Por marca» / «Por
+   * tipo de máquina» ya no se navega: `/tipos/` es la página principal de
+   * nueva. Es una URL del sitio actual (200 en el rastreo), así que 301 y no
+   * 404. Su paginación antigua (`pagina/<n>/`) va directa a `/tipos/` desde su
+   * propio manejador, en un salto.
+   */
+  {
+    source: "/maquinaria-pesada/maquinaria-pesada-nueva/",
+    destination: "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/",
+  },
 ];

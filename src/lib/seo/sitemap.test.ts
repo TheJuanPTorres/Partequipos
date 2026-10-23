@@ -105,10 +105,10 @@ describe("buildSitemapEntries", () => {
   it("incluye portada, índices y una entrada por entidad", () => {
     const e = buildSitemapEntries(datos, AHORA);
     // 1 portada + 3 índices de repuestos (principal, marcas y categorías)
-    // + 5 índices de maquinaria (con el de tipos de nueva, 2026-10-22) + 1 índice de blog
-    // + 1 institucional + 1 marca + 1 tipo + 1 modelo + la página general de lubricantes (2026-10-20)
-    // + «Trabaja con nosotros» (2026-10-23)
-    assert.equal(e.length, 16);
+    // + 4 índices de maquinaria (el de tipos de nueva, 2026-10-22; sin el de nueva, que da 301
+    // al de tipos desde el 2026-10-23) + 1 índice de blog + 1 institucional + 1 marca + 1 tipo
+    // + 1 modelo + la página general de lubricantes (2026-10-20) + «Trabaja con nosotros» (2026-10-23)
+    assert.equal(e.length, 15);
   });
 
   it("anuncia «Trabaja con nosotros» UNA vez, por su ruta propia (2026-10-23)", () => {
@@ -147,6 +147,12 @@ describe("buildSitemapEntries", () => {
       e.some((x) => new URL(x.url).pathname === "/maquinaria/"),
       false,
     );
+  });
+
+  it("no anuncia el índice de nueva (301 al de tipos, 2026-10-23) y sí el de tipos", () => {
+    const rutas = buildSitemapEntries(datos, AHORA).map((x) => new URL(x.url).pathname);
+    assert.equal(rutas.includes("/maquinaria-pesada/maquinaria-pesada-nueva/"), false);
+    assert.ok(rutas.includes("/maquinaria-pesada/maquinaria-pesada-nueva/tipos/"));
   });
 
   it("lista la página de cada unidad usada disponible, bajo su categoría", () => {
@@ -248,9 +254,10 @@ describe("buildSitemapEntries", () => {
     );
 
     // Sin documento de portada no se lista `/`: quedan los 3 índices de
-    // repuestos, los 5 de maquinaria, el del blog, la general de lubricantes y
+    // repuestos, los 4 de maquinaria (sin el índice de nueva, que da 301 al de
+    // tipos desde el 2026-10-23), el del blog, la general de lubricantes y
     // «Trabaja con nosotros», que son rutas estáticas y existen aunque no haya contenido.
-    assert.equal(e.length, 11);
+    assert.equal(e.length, 10);
     assert.equal(e[0]?.lastModified.getTime(), AHORA.getTime());
     for (const entrada of e) assert.match(entrada.url, /^https:\/\//);
   });
@@ -346,7 +353,6 @@ describe("maquinaria en el sitemap", () => {
 
     for (const esperada of [
       `${base}/`,
-      `${base}/maquinaria-pesada-nueva/`,
       `${base}/maquinaria-pesada-nueva/marcas/`,
       `${base}/maquinaria-pesada-nueva/categoria-n/`,
       `${base}/maquinaria-pesada-nueva/marcas/marca-m/`,

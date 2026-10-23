@@ -80,6 +80,7 @@ import * as migration_20261023_150157_productos_mostrar_en_web from './20261023_
 import * as migration_20261023_155220_aditamentos_usados_serial from './20261023_155220_aditamentos_usados_serial';
 import * as migration_20261023_202727_politica_foto_cabecera from './20261023_202727_politica_foto_cabecera';
 import * as migration_20261023_213120_categorias_nueva_imagen from './20261023_213120_categorias_nueva_imagen';
+import * as migration_20261023_222308_correo_hojas_de_vida from './20261023_222308_correo_hojas_de_vida';
 
 export const migrations = [
   {
@@ -490,6 +491,11 @@ export const migrations = [
   {
     up: migration_20261023_213120_categorias_nueva_imagen.up,
     down: migration_20261023_213120_categorias_nueva_imagen.down,
-    name: '20261023_213120_categorias_nueva_imagen'
+    name: '20261023_213120_categorias_nueva_imagen',
+  },
+  {
+    up: migration_20261023_222308_correo_hojas_de_vida.up,
+    down: migration_20261023_222308_correo_hojas_de_vida.down,
+    name: '20261023_222308_correo_hojas_de_vida'
   },
 ];

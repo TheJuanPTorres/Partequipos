@@ -87,7 +87,8 @@ export function TarjetasGrupos({
                       ...formulario,
                       mensajeInicial: mensajeCotizar(g.nombre, categoria),
                     }}
-                    titulo={`Cotizar: ${g.nombre}`}
+                    titulo="Cotización"
+                    nombreAccesible={`Cotizar: ${g.nombre}`}
                     ariaLabel={`Cotizar ${g.nombre}`}
                   >
                     <IconMessageCircle aria-hidden="true" focusable="false" stroke={2} size={16} />

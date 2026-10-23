@@ -9,7 +9,7 @@ import estilos from "./marca.module.css";
 /**
  * Las CATEGORÍAS TÉCNICAS del índice en BALDOSAS (dirección, 2026-10-22), las de «Mostrar
  * marcas» del índice de marcas (`BaldosasMarcas`: blancas, compactas, con borde gris): la foto
- * de la tarjeta de la categoría, centrada y entera en su marco, su nombre y «Ver productos →».
+ * de la tarjeta de la categoría, centrada y entera en su marco, su nombre y «Ver productos →» (botón rojo de marca, el de los botones rojos del sitio).
  * Toda la baldosa es el enlace.
  *
  * Colocación (excepción a la regla de tarjetas, como las marcas): 5 por fila en escritorio

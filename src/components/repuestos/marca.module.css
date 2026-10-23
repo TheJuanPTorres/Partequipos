@@ -1836,21 +1836,42 @@ a.modelo:hover {
   line-height: 1.25;
 }
 
+/*
+ * «Ver productos →» como BOTÓN ROJO de marca con texto claro, el de los botones rojos del sitio
+ * (`bloques/boton.module.css`), y su hover (oscuro) al pasar por la baldosa (dirección,
+ * 2026-10-22). Es un `span`: el enlace sigue siendo la baldosa entera.
+ */
 .baldosaVer {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
-  border: 1px solid #d4d4d4;
+  padding: 7px 16px;
+  border: 1px solid var(--color-marca);
   border-radius: 999px;
+  background: var(--color-marca);
+  color: var(--color-fondo);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.baldosaCategoria:hover .baldosaVer,
+.baldosaCategoria:focus-visible .baldosaVer {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
 }
 
 .baldosaFlecha {
   display: inline-block;
-  color: var(--color-marca);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .baldosaVer {
+    transition: none;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -1900,7 +1921,7 @@ a.modelo:hover {
   }
 
   .baldosaVer {
-    padding: 5px 10px;
+    padding: 6px 10px;
     font-size: 13px;
   }
 }

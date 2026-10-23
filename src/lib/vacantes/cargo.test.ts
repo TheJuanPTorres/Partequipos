@@ -15,37 +15,34 @@ describe("cargo legible", () => {
 
   it("quita también el departamento y el guion pegado", () => {
     assert.equal(
-      cargoLegible("ASESOR COMERCIAL DE MAQUINARIA AMARILLA- CÓRDOBA", "Montería, Córdoba"),
-      "Asesor comercial de maquinaria amarilla",
+      cargoLegible("SUPERVISOR DE BODEGA PRINCIPAL- CÓRDOBA", "Montería, Córdoba"),
+      "Supervisor de bodega principal",
     );
   });
 
   it("quita el lugar del final aunque no lleve guion, también de varias palabras", () => {
     assert.equal(
-      cargoLegible("ASESOR COMERCIAL DE MAQUINARIA CORDOBA", "Montería, Córdoba"),
-      "Asesor comercial de maquinaria",
+      cargoLegible("COORDINADOR DE COMPRAS CORDOBA", "Montería, Córdoba"),
+      "Coordinador de compras",
     );
     assert.equal(
-      cargoLegible(
-        "ASESOR COMERCIAL DE MAQUINARIA NORTE DE SANTANDER",
-        "Cúcuta, Norte de Santander",
-      ),
-      "Asesor comercial de maquinaria",
+      cargoLegible("COORDINADOR DE COMPRAS NORTE DE SANTANDER", "Cúcuta, Norte de Santander"),
+      "Coordinador de compras",
     );
     assert.equal(
-      cargoLegible("DIRECTOR CONTABLE Y FINANCIERO ENVIGADO ", "Envigado, Antioquia"),
-      "Director contable y financiero",
+      cargoLegible("ANALISTA DE CARTERA Y COBRO ENVIGADO ", "Envigado, Antioquia"),
+      "Analista de cartera y cobro",
     );
   });
 
-  it("quita un lugar conocido aunque no sea la ubicación en Buk (y una región)", () => {
+  it("quita un lugar conocido aunque no sea la ubicación en Buk (y una región); la errata se queda", () => {
     assert.equal(
-      cargoLegible("JEFE DE NÓMINA - ENVIGADO", "Medellín, Antioquia"),
-      "Jefe de nómina",
+      cargoLegible("AUXILIAR DE ARCHIVO - ENVIGADO", "Medellín, Antioquia"),
+      "Auxiliar de archivo",
     );
     assert.equal(
-      cargoLegible("ASESOR COMERICAL DE MAQUINARIA EJE CAFETERO", "Pereira, Risaralda"),
-      "Asesor comerical de maquinaria",
+      cargoLegible("VENDEDOR DE MOSTRADR EJE CAFETERO", "Pereira, Risaralda"),
+      "Vendedor de mostradr",
     );
   });
 

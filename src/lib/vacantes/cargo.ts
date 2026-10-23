@@ -2,11 +2,11 @@
  * El cargo de una vacante en escritura normal (Juan Pablo, 2026-10-23).
  *
  * En Buk los títulos van en MAYÚSCULAS y casi siempre con el lugar dentro, con
- * guion o sin él: «ANALISTA TIC - BOGOTÁ», «… MAQUINARIA AMARILLA- CÓRDOBA»,
- * «… MAQUINARIA NORTE DE SANTANDER». En la página va el cargo como frase, con
+ * guion o sin él (ejemplos inventados): «ANALISTA TIC - BOGOTÁ», «… DE BODEGA- CÓRDOBA»,
+ * «… DE COMPRAS NORTE DE SANTANDER». En la página va el cargo como frase, con
  * las siglas en mayúscula, y la ciudad aparte: «Analista TIC» y «Bogotá».
  *
- * Las erratas se quedan como vienen («COMERICAL»): el texto es del cliente.
+ * Las erratas se quedan como vienen: el texto es del cliente.
  * Un título que ya viene con minúsculas se respeta (solo se le quita el lugar).
  */
 
@@ -216,8 +216,8 @@ function palabra(original: string): string {
 
 /**
  * «ANALISTA TIC - BOGOTÁ» con ubicación «Bogotá, Bogotá, D.C.» → «Analista TIC».
- * «ASESOR COMERCIAL DE MAQUINARIA NORTE DE SANTANDER» con «Cúcuta, Norte de
- * Santander» → «Asesor comercial de maquinaria».
+ * «COORDINADOR DE COMPRAS NORTE DE SANTANDER» con «Cúcuta, Norte de
+ * Santander» → «Coordinador de compras».
  */
 export function cargoLegible(titulo: string, ubicacion: string): string {
   const ubic = new Set(ubicacion.split(",").map(normalizar).filter(Boolean));

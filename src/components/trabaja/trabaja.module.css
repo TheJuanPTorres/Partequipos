@@ -77,9 +77,10 @@
 }
 
 /*
- * La frase y las píldoras, SIN ensanchar: con 0,04 em la copia de la frase
- * ocupaba una línea más a 1010 y 390 (hueco de ~20 px) y las píldoras salían
- * más anchas (el filtro pasaba a dos filas a 1440). «Inter Fallback» ya está
+ * El título, la frase y las píldoras, SIN ensanchar: con 0,04 em la copia
+ * del título y la de la frase ocupaban una línea más a 1010 y 390 (hueco de
+ * ~20 px) y las píldoras salían más anchas (el filtro pasaba a dos filas a
+ * 1440). «Inter Fallback» ya está
  * ajustada al ancho de Inter; la caja es el mayor de los dos.
  */
 .reservaJusta::after {

@@ -62,7 +62,10 @@ export function Vacantes({
        * a 1010). La copia invisible en la fuente de respaldo fija su caja.
        */}
       <div className={estilos.equipoCabecera}>
-        <div className={`${estilos.equipoTitulo} ${estilos.reserva}`} data-reserva={titulo}>
+        <div
+          className={`${estilos.equipoTitulo} ${estilos.reserva} ${estilos.reservaJusta}`}
+          data-reserva={titulo}
+        >
           <Revelado
             como="h2"
             id={idTitulo}

@@ -1211,6 +1211,10 @@ export interface Pagina {
    * Párrafo introductorio bajo el título.
    */
   entradilla?: string | null;
+  /**
+   * Opcional. Foto a todo el ancho detrás del título, con un velo oscuro para que se lea. Sin ella, el encabezado queda en un tono oscuro.
+   */
+  fotoCabecera?: (number | null) | Media;
   contenido?: {
     root: {
       type: string;
@@ -2786,6 +2790,7 @@ export interface PaginasSelect<T extends boolean = true> {
   slug?: T;
   tipoPagina?: T;
   entradilla?: T;
+  fotoCabecera?: T;
   contenido?: T;
   secciones?:
     | T

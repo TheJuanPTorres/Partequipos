@@ -40,6 +40,7 @@ export function TarjetaListado({
   titulo,
   href,
   codigo,
+  resumen,
   foto,
   logo,
   logoAlt = "",
@@ -55,6 +56,8 @@ export function TarjetaListado({
   href: string | null;
   /** Línea roja bajo el título (el modelo, en nueva). */
   codigo?: string | null;
+  /** Texto breve bajo el título, cortado a 3 líneas con «…» (la descripción corta de un aditamento usado). */
+  resumen?: string | null;
   foto: FotoDeTarjeta | null;
   /** El logo de la marca, el de todo el sitio (`LogoMarca`). */
   logo?: LogoMarcaDatos | null;
@@ -103,6 +106,7 @@ export function TarjetaListado({
       <div className={estilos.datos}>
         <h3 className={estilos.nombre}>{href ? <Link href={href}>{titulo}</Link> : titulo}</h3>
         {codigo ? <p className={estilos.modelo}>{codigo}</p> : null}
+        {resumen ? <p className={estilos.resumen}>{resumen}</p> : null}
         <hr className={estilos.linea} />
         <ul className={estilos.lista}>
           {filas

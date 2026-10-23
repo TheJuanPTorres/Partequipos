@@ -11,6 +11,8 @@ import { createContext, useContext, type ReactNode } from "react";
 export type DatosContacto = {
   siteKey: string | null;
   whatsapp?: { href: string; etiqueta: string };
+  /** Solo fuera del sitio publicado: deja probar las mejoras de la ventana con `?anim=`. */
+  permitirUrl?: boolean;
 };
 
 const Contexto = createContext<DatosContacto | null>(null);

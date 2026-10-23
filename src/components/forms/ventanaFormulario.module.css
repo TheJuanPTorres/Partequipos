@@ -103,3 +103,224 @@
     transform: translateY(8px);
   }
 }
+
+/*
+ * MEJORAS DE LA VENTANA (dirección, 2026-10-23; `lib/formularios/animacionesVentana.ts`). Cada una
+ * cuelga de `data-anim` del <dialog>: una apagada en el código (o con `?anim=` en un preview)
+ * no pinta nada. La curva y la duración son las del listado de usados (#320). Solo `transform`,
+ * `opacity` y colores; el movimiento, solo si no se pidió «reducir movimiento».
+ */
+
+/* F1 · apertura: fundido y subida suave; fondo oscurecido con leve desenfoque. */
+.ventana[data-anim~="F1"]::backdrop {
+  background: rgb(10 10 10 / 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ventana[data-anim~="F1"][open] {
+    animation: f1Aparece 280ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  .ventana[data-anim~="F1"][open]::backdrop {
+    animation: f1Fondo 280ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+}
+
+@keyframes f1Aparece {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+@keyframes f1Fondo {
+  from {
+    opacity: 0;
+  }
+}
+
+/* En móvil sube desde abajo, como los paneles del sitio. */
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  .ventana[data-anim~="F1"][open] {
+    animation: f1Sube 340ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@keyframes f1Sube {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+/* F2 · campos vivos: borde rojo al enfocar; las píldoras se marcan con transición suave. */
+.ventana[data-anim~="F2"] input[type="text"]:focus,
+.ventana[data-anim~="F2"] input[type="email"]:focus,
+.ventana[data-anim~="F2"] input[type="tel"]:focus,
+.ventana[data-anim~="F2"] textarea:focus {
+  border-color: var(--color-marca);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-marca-tenue);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ventana[data-anim~="F2"] input[type="text"],
+  .ventana[data-anim~="F2"] input[type="email"],
+  .ventana[data-anim~="F2"] input[type="tel"],
+  .ventana[data-anim~="F2"] textarea {
+    transition:
+      border-color 200ms cubic-bezier(0.33, 0, 0.2, 1),
+      box-shadow 200ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  .ventana[data-anim~="F2"] fieldset label {
+    transition:
+      border-color 200ms cubic-bezier(0.33, 0, 0.2, 1),
+      background-color 200ms cubic-bezier(0.33, 0, 0.2, 1),
+      transform 200ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  .ventana[data-anim~="F2"] fieldset label:has(input:checked) {
+    transform: scale(1.04);
+  }
+}
+
+/* F3 · envío: indicador en el botón y confirmación con check que se dibuja. */
+.ventana[data-anim~="F3"] button[data-enviando] {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ventana[data-anim~="F3"] button[data-enviando]::before {
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 2px solid rgb(255 255 255 / 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  content: "";
+}
+
+[data-confirmacion="animada"] {
+  padding: 24px 0 8px;
+  color: #1b6e34;
+  text-align: center;
+}
+
+[data-confirmacion="animada"] p {
+  color: var(--color-texto, #1a1a1a);
+}
+
+[data-confirmacion="animada"] button[data-cerrar] {
+  min-height: 40px;
+  margin-top: 20px;
+  padding: 0 28px;
+  border: 1px solid var(--color-marca);
+  border-radius: 30px;
+  background: transparent;
+  color: var(--color-marca);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+[data-confirmacion="animada"] button[data-cerrar]:hover {
+  background: var(--color-marca);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ventana[data-anim~="F3"] button[data-enviando]::before {
+    animation: f3Gira 700ms linear infinite;
+  }
+
+  [data-confirmacion="animada"] {
+    animation: f3Entra 320ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  [data-confirmacion="animada"] [data-check] circle {
+    stroke-dasharray: 151;
+    stroke-dashoffset: 151;
+    animation: f3Trazo 520ms cubic-bezier(0.22, 1, 0.36, 1) 120ms forwards;
+  }
+
+  [data-confirmacion="animada"] [data-check] path {
+    stroke-dasharray: 36;
+    stroke-dashoffset: 36;
+    animation: f3Trazo 360ms cubic-bezier(0.22, 1, 0.36, 1) 520ms forwards;
+  }
+}
+
+@keyframes f3Gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes f3Entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes f3Trazo {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/*
+ * F4 · errores: cada campo reserva sitio para su mensaje (sin saltos al aparecer) y el que falta se
+ * marca en rojo y se mueve un poco. El mensaje sigue enlazado con `aria-describedby` y se anuncia.
+ */
+.ventana[data-anim~="F4"] form [data-campo] {
+  position: relative;
+  padding-bottom: 22px;
+}
+
+.ventana[data-anim~="F4"] form [data-error] {
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.ventana[data-anim~="F4"] [aria-invalid="true"] {
+  border-color: #c4161c;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ventana[data-anim~="F4"] form[data-vuelta="1"] [aria-invalid="true"] {
+    animation: f4Sacude1 360ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+
+  .ventana[data-anim~="F4"] form[data-vuelta="0"] [aria-invalid="true"] {
+    animation: f4Sacude0 360ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+}
+
+@keyframes f4Sacude1 {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes f4Sacude0 {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}

@@ -67,6 +67,13 @@ type Props = {
    * de tipo de repuestos lo abre con la marca y el tipo ya escritos (R4, 2026-10-21).
    */
   mensajeInicial?: string;
+  /**
+   * Las mejoras de la ventana emergente que están encendidas (`F3`, `F4`; `animacionesVentana.ts`).
+   * Solo las lee la variante `emergente`.
+   */
+  animar?: readonly string[];
+  /** Cierra la ventana: lo usa el botón de la confirmación animada (F3). */
+  alCerrar?: () => void;
 };
 
 const OPCIONES = {
@@ -88,6 +95,8 @@ export function FormularioSolicitud({
   etiquetaMensaje: etiquetaPagina = "Mensaje",
   conCiudad: conCiudadPagina = false,
   mensajeInicial,
+  animar = [],
+  alCerrar,
 }: Props) {
   /*
    * La VENTANA EMERGENTE lleva siempre «Ciudad» y «¿Qué necesitas?» (dirección,
@@ -95,6 +104,11 @@ export function FormularioSolicitud({
    * es el mismo formulario corto en cualquier página que la abra.
    */
   const emergente = variante === "emergente";
+  const f3 = emergente && animar.includes("F3");
+  const f4 = emergente && animar.includes("F4");
+  // La piel de Contáctanos (campos en píldora) pinta las etiquetas solo para lectores: lo visible
+  // es el placeholder, y la ventana la lleva también.
+  const conMarcador = variante === "plano" || emergente;
   const clasificacion = emergente ? false : clasificacionPagina;
   const conCiudad = emergente || conCiudadPagina;
   const etiquetaMensaje =
@@ -117,6 +131,16 @@ export function FormularioSolicitud({
    * queda en el botón y no se entera de si el envío salió bien: el cambio ocurre
    * en otra parte de la página.
    */
+  // F4: cada error nuevo reinicia el movimiento de los campos señalados (par/impar: al cambiar el
+  // nombre de la animación vuelve a empezar aunque el campo siga marcado).
+  const formulario = useRef<HTMLFormElement>(null);
+  const vuelta = useRef(0);
+  useEffect(() => {
+    if (!f4 || estado.estado !== "error" || !formulario.current) return;
+    vuelta.current += 1;
+    formulario.current.dataset.vuelta = String(vuelta.current % 2);
+  }, [estado, f4]);
+
   useEffect(() => {
     if (estado.estado === "ok") confirmacionRef.current?.focus();
     else if (estado.estado === "error") resumenRef.current?.focus();
@@ -134,8 +158,32 @@ export function FormularioSolicitud({
           ref={confirmacionRef}
           tabIndex={-1}
           role="status"
-          className="mt-4 rounded border border-green-700 bg-green-50 p-4 text-green-900 focus:outline-none focus:ring-2 focus:ring-green-700"
+          data-confirmacion={f3 ? "animada" : undefined}
+          className={
+            f3
+              ? "mt-4 focus:outline-none"
+              : "mt-4 rounded border border-green-700 bg-green-50 p-4 text-green-900 focus:outline-none focus:ring-2 focus:ring-green-700"
+          }
         >
+          {f3 ? (
+            <svg
+              viewBox="0 0 52 52"
+              aria-hidden="true"
+              focusable="false"
+              data-check=""
+              className="mx-auto mb-3 h-16 w-16"
+            >
+              <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" strokeWidth="3" />
+              <path
+                d="M15 27l8 8 15-17"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : null}
           <p className="font-medium">Solicitud enviada</p>
           <p className="mt-1 text-sm">{estado.mensaje}</p>
           {whatsapp ? (
@@ -150,6 +198,11 @@ export function FormularioSolicitud({
                 Escríbenos por WhatsApp al {whatsapp.etiqueta}
               </a>
             </p>
+          ) : null}
+          {f3 && alCerrar ? (
+            <button type="button" onClick={alCerrar} data-cerrar="">
+              Cerrar
+            </button>
           ) : null}
         </div>
       </section>
@@ -170,7 +223,7 @@ export function FormularioSolicitud({
           defaultValue={previo.nombre}
           type="text"
           autoComplete="name"
-          placeholder={variante === "plano" ? "Nombre" : undefined}
+          placeholder={conMarcador ? "Nombre" : undefined}
           className={claseControl}
         />
       )}
@@ -185,7 +238,7 @@ export function FormularioSolicitud({
           defaultValue={previo.correo}
           type="email"
           autoComplete="email"
-          placeholder={variante === "plano" ? "Correo electrónico" : undefined}
+          placeholder={conMarcador ? "Correo electrónico" : undefined}
           className={claseControl}
         />
       )}
@@ -206,7 +259,7 @@ export function FormularioSolicitud({
           defaultValue={previo.telefono}
           type="tel"
           autoComplete="tel"
-          placeholder={variante === "plano" ? "Teléfono" : undefined}
+          placeholder={conMarcador ? "Teléfono" : undefined}
           className={claseControl}
         />
       )}
@@ -221,7 +274,7 @@ export function FormularioSolicitud({
           defaultValue={previo.empresa}
           type="text"
           autoComplete="organization"
-          placeholder={variante === "plano" ? "Empresa" : undefined}
+          placeholder={conMarcador ? "Empresa" : undefined}
           className={claseControl}
         />
       )}
@@ -237,7 +290,7 @@ export function FormularioSolicitud({
           defaultValue={previo.ciudad}
           type="text"
           autoComplete="address-level2"
-          placeholder={variante === "plano" ? "Ciudad" : undefined}
+          placeholder={conMarcador ? "Ciudad" : undefined}
           className={claseControl}
         />
       )}
@@ -268,13 +321,19 @@ export function FormularioSolicitud({
           ref={resumenRef}
           tabIndex={-1}
           role="alert"
-          className="mt-4 rounded border border-red-700 bg-red-50 p-4 text-sm text-red-900 focus:outline-none focus:ring-2 focus:ring-red-700"
+          // F4: con errores en los campos, el resumen solo se anuncia (cada mensaje ya está bajo su
+          // campo); si fue otro fallo (reto, servidor), se ve como siempre.
+          className={
+            f4 && Object.keys(err).length > 0
+              ? "sr-only"
+              : "mt-4 rounded border border-red-700 bg-red-50 p-4 text-sm text-red-900 focus:outline-none focus:ring-2 focus:ring-red-700"
+          }
         >
           {estado.mensaje}
         </div>
       ) : null}
 
-      <form action={accion} className="mt-6 space-y-4" noValidate>
+      <form ref={formulario} action={accion} className="mt-6 space-y-4" noValidate>
         {/* Campos que no toca el usuario. El servidor los valida igual. */}
         <input type="hidden" name="tipo" value={tipo} />
         <input type="hidden" name="origen" value={origen} />
@@ -345,7 +404,7 @@ export function FormularioSolicitud({
               name="mensaje"
               rows={5}
               defaultValue={previo.mensaje ?? mensajeInicial}
-              placeholder={variante === "plano" ? etiquetaMensaje : undefined}
+              placeholder={conMarcador ? etiquetaMensaje : undefined}
               className={claseControl}
             />
           )}
@@ -367,6 +426,7 @@ export function FormularioSolicitud({
           <button
             type="submit"
             disabled={enviando}
+            data-enviando={f3 && enviando ? "" : undefined}
             className="rounded bg-gray-900 px-5 py-2.5 font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
           >
             {enviando ? "Enviando…" : textoBoton}

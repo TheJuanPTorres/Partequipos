@@ -75,6 +75,7 @@ import * as migration_20261021_052023_equipo_nuevo_vista360 from './20261021_052
 import * as migration_20261022_014813_lubricantes_lineas_paginas from './20261022_014813_lubricantes_lineas_paginas';
 import * as migration_20261022_164312_blog_diseno_articulo from './20261022_164312_blog_diseno_articulo';
 import * as migration_20261023_045614_pie_enlace_documento from './20261023_045614_pie_enlace_documento';
+import * as migration_20261023_062354_trabaja_con_nosotros from './20261023_062354_trabaja_con_nosotros';
 
 export const migrations = [
   {
@@ -460,6 +461,11 @@ export const migrations = [
   {
     up: migration_20261023_045614_pie_enlace_documento.up,
     down: migration_20261023_045614_pie_enlace_documento.down,
-    name: '20261023_045614_pie_enlace_documento'
+    name: '20261023_045614_pie_enlace_documento',
+  },
+  {
+    up: migration_20261023_062354_trabaja_con_nosotros.up,
+    down: migration_20261023_062354_trabaja_con_nosotros.down,
+    name: '20261023_062354_trabaja_con_nosotros'
   },
 ];

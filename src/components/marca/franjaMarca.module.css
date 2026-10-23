@@ -29,9 +29,14 @@
   object-fit: contain;
 }
 
+/* Un título largo («Miniexcavadoras Yanmar») parte la palabra con guion en vez de salirse de la
+   pantalla junto al logo (a 390 px desbordaba 42 px). */
 .titulo {
+  min-width: 0;
   margin: 0 0 0 auto;
   padding-right: 10px;
+  overflow-wrap: break-word;
+  hyphens: auto;
   color: var(--color-texto);
   text-align: right;
 }

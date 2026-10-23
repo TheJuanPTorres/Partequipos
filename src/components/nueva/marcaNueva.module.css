@@ -116,6 +116,12 @@ a.enlaceFranja:focus-visible {
   border-top: 1px solid rgb(0 0 0 / 12%);
 }
 
+/* Página general de tipo: más aire antes de la franja de la marca siguiente (dirección,
+   2026-10-23). Con los 20 + 55 px de debajo de la última fila de tarjetas, unos 100 px. */
+.grupoMarca + .grupoMarca {
+  margin-top: 25px;
+}
+
 .tituloTipo {
   margin: 0 0 30px;
   color: var(--color-texto);
@@ -138,8 +144,10 @@ a.enlaceFranja:focus-visible {
   grid-template-columns: minmax(0, 1fr);
   /* Aire entre equipos (sin borde, se amontonaban): 55 px entre filas (la mitad de los 110 de
      antes; dirección, 2026-10-21) y 96 entre columnas, en todos los anchos. El hueco entre
-     columnas es el mismo en toda la rejilla (la regla del #281 lo necesita). */
-  gap: 55px 96px;
+     columnas es el mismo en toda la rejilla (la regla del #281 lo necesita). Los 55 entre filas
+     los pone cada tarjeta debajo (`margin-bottom`): la rejilla no lleva hueco entre filas porque
+     las tarjetas reparten sus filas con ella (`subgrid`, abajo). */
+  gap: 0 96px;
   list-style: none;
 }
 
@@ -194,6 +202,41 @@ a.enlaceFranja:focus-visible {
   gap: 10px;
 }
 
+/*
+ * UNA FILA DE TARJETAS, ALINEADA (dirección, 2026-10-23): cada tarjeta ocupa 4 filas de la
+ * rejilla (foto, nombre, datos y botones) y las comparte con las de su fila (`subgrid`). Así
+ * todas miden lo mismo, los nombres de 1, 2 o 3 líneas y los datos de 3 o 4 filas no dejan
+ * huecos distintos, y los botones quedan a la misma altura. El aire entre piezas va en sus
+ * márgenes (la rejilla no tiene hueco entre filas).
+ */
+.rejilla > .tarjeta {
+  display: grid;
+  margin-bottom: 55px;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+}
+
+.rejilla > .tarjeta > .foto {
+  grid-row: 1;
+}
+
+.rejilla > .tarjeta > .nombre {
+  grid-row: 2;
+  margin-top: 10px;
+}
+
+.rejilla > .tarjeta > .datos {
+  grid-row: 3;
+  margin-top: 10px;
+}
+
+.rejilla > .tarjeta > .acciones {
+  grid-row: 4;
+  margin-top: 10px;
+  align-self: start;
+}
+
 .foto {
   position: relative;
   height: 240px;
@@ -231,6 +274,17 @@ a.enlaceFranja:focus-visible {
   border-bottom: 1px solid rgb(0 0 0 / 10%);
   color: var(--color-texto);
   font-size: 15px;
+}
+
+/* El texto del dato, como mucho 2 líneas con «…»; entero en el `title` del dato y para los
+   lectores de pantalla (dirección, 2026-10-23). */
+.datoTexto {
+  display: -webkit-box;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .datoIcono {

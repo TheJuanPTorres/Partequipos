@@ -12,7 +12,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { metadataSinIndexar } from "@/lib/filtros/seo";
 import {
   gruposPorMarcaYTipo,
-  mezclaMarcas,
+  sinAditamentos,
   tituloBannerTipoNueva,
   vistaEncabezadoCategoriaNueva,
 } from "@/lib/nueva/paginaCategoria";
@@ -49,7 +49,8 @@ async function resolver(slug: string) {
   const { categorias } = await getListadoNueva();
   const categoria = categorias.find((c) => c.slug === slug);
   if (!categoria) return null;
-  return { categoria, equipos: await getEquiposDeTipos(categoria.tipos) };
+  // Solo marcas: sin los aditamentos, que tienen su página (dirección, 2026-10-23).
+  return { categoria, equipos: sinAditamentos(await getEquiposDeTipos(categoria.tipos)) };
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -75,8 +76,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  * (`TarjetaEquipo`) agrupadas por marca y tipo con su subtítulo («Excavadoras Hitachi»), con la
  * regla de tarjetas, y el formulario al final. Desde el 2026-10-23 es también la PÁGINA GENERAL
  * de cada tipo (tarea 9): banner «Maquinaria Tipo {Nombre} Nueva», sin el título «Modelos de …»,
- * y con más de una marca cada grupo empieza con la franja de su marca (`FranjaMarca`, la de la
- * ficha nueva). Las URL de su antigua paginación (`pagina/<n>/`)
+ * cada grupo (marca y tipo) empieza con la franja de su marca (`FranjaMarca`, la de la ficha
+ * nueva), y solo marcas: sin los aditamentos. Las URL de su antigua paginación (`pagina/<n>/`)
  * dan 301 aquí; con filtros en la query, la canónica es la de siempre, sin query.
  */
 export default async function CategoriaNuevaPage({ params }: { params: Promise<Params> }) {
@@ -100,10 +101,9 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
   ]);
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const grupos = gruposPorMarcaYTipo(equipos);
-  // Con más de una marca, cada grupo empieza con la franja de su marca (la de «Otros {tipo}» de la
-  // ficha nueva); con una sola, el título del grupo a secas (dirección, 2026-10-23). El logo, el
-  // único del sitio: la marca con su logo poblado (`getMarcasMaquinaria`); sin logo, solo el título.
-  const conFranja = mezclaMarcas(grupos);
+  // Cada grupo empieza con la franja de su marca (la de «Otros {tipo}» de la ficha nueva), también
+  // con una sola marca (dirección, 2026-10-23). El logo, el único del sitio: la marca con su logo
+  // poblado (`getMarcasMaquinaria`); sin logo, solo el título.
   const marcaConLogo = new Map(marcas.map((m) => [m.slug, m]));
   const logoDe = (m: (typeof grupos)[number]["marca"]) =>
     conAlt(logoDeMarca(marcaConLogo.get(m.slug) ?? m, logos), `Logo de ${m.nombre}`);
@@ -134,13 +134,9 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
       >
         {grupos.length > 0 ? (
           grupos.map((g, i) => (
-            <div key={g.clave} id={`grupo-${g.clave}`}>
-              {/* `h2`: los nombres de las tarjetas (`TarjetaEquipo`) son `h3`. */}
-              {conFranja ? (
-                <FranjaMarca id={`grupo-${g.clave}-t`} titulo={g.titulo} logo={logoDe(g.marca)} />
-              ) : (
-                <h2 className={estilosTarjetas.tituloTipo}>{g.titulo}</h2>
-              )}
+            <div key={g.clave} id={`grupo-${g.clave}`} className={estilosTarjetas.grupoMarca}>
+              {/* `h2` en la franja: los nombres de las tarjetas (`TarjetaEquipo`) son `h3`. */}
+              <FranjaMarca id={`grupo-${g.clave}-t`} titulo={g.titulo} logo={logoDe(g.marca)} />
               <ul className={estilosTarjetas.rejilla}>
                 {g.tarjetas.map((e, j) => (
                   <TarjetaEquipo

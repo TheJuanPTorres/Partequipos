@@ -82,6 +82,17 @@ export function normalizar(etiqueta: string): string {
     .trim();
 }
 
+/**
+ * El nombre corto y uniforme de una característica prioritaria («Potencia neta», «Peso
+ * operativo», «Motor»…) si su etiqueta empareja con uno de los patrones de `PRIORIDADES`; si no,
+ * `null` (la etiqueta va tal cual). La misma regla que la cabecera de la ficha nueva (#309), para
+ * las tarjetas de equipo (dirección, 2026-10-23).
+ */
+export function nombreUniforme(etiqueta: string): string | null {
+  const e = normalizar(etiqueta);
+  return PRIORIDADES.find((p) => p.patrones.some((r) => r.test(e)))?.nombre ?? null;
+}
+
 /** El icono de un dato de relleno, por su etiqueta; sin parecido, «otro». */
 export function iconoPorEtiqueta(etiqueta: string): DatoDestacado["icono"] {
   const e = normalizar(etiqueta);

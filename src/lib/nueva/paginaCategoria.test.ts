@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import type { MarcasMaquinaria } from "@/payload-types";
+import type { EquiposNuevo } from "@/payload-types";
 
-import { mezclaMarcas, tituloBannerTipoNueva, type GrupoDeCategoria } from "./paginaCategoria";
+import { sinAditamentos, tituloBannerTipoNueva } from "./paginaCategoria";
 
 describe("tituloBannerTipoNueva", () => {
   it("«Maquinaria Tipo {Nombre} Nueva», con mayúscula en cada palabra del tipo", () => {
@@ -17,20 +17,15 @@ describe("tituloBannerTipoNueva", () => {
   });
 });
 
-describe("mezclaMarcas", () => {
-  const grupo = (marca: string, clave: string): GrupoDeCategoria => ({
-    clave,
-    titulo: clave,
-    marca: { id: 1, nombre: marca, slug: marca } as MarcasMaquinaria,
-    tarjetas: [],
-  });
+describe("sinAditamentos", () => {
+  const equipo = (id: number, marca: string) =>
+    ({ id, marca: { id, nombre: marca, slug: marca } }) as unknown as EquiposNuevo;
 
-  it("con una sola marca (aunque tenga varios tipos), sin franjas", () => {
-    assert.equal(mezclaMarcas([grupo("case", "a"), grupo("case", "b")]), false);
-    assert.equal(mezclaMarcas([]), false);
-  });
-
-  it("con dos o más marcas, cada grupo con su franja", () => {
-    assert.equal(mezclaMarcas([grupo("case", "a"), grupo("hitachi", "b")]), true);
+  it("las páginas generales, solo marcas: fuera los equipos de «Aditamentos»", () => {
+    const r = sinAditamentos([equipo(1, "hitachi"), equipo(2, "aditamentos"), equipo(3, "case")]);
+    assert.deepEqual(
+      r.map((e) => e.id),
+      [1, 3],
+    );
   });
 });

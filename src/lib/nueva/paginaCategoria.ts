@@ -5,6 +5,7 @@ import { tituloPorDefecto } from "../seo/porDefecto";
 import { imagenDeMedia, poblado } from "../utils/relations";
 
 import type { TarjetaEquipo } from "./paginaMarcaAndres";
+import { SLUG_ADITAMENTOS } from "./indiceTipos";
 import { tarjetasDeEquipos } from "./paginaTipo";
 
 /**
@@ -72,9 +73,13 @@ export function tituloBannerTipoNueva(nombre: string): string {
   return `Maquinaria Tipo ${mayusculaEnCadaPalabra(nombre)} Nueva`;
 }
 
-/** Más de una marca entre los grupos: entonces cada grupo empieza con la franja de su marca. */
-export function mezclaMarcas(grupos: readonly GrupoDeCategoria[]): boolean {
-  return new Set(grupos.map((g) => g.marca.slug)).size > 1;
+/**
+ * Las páginas generales de tipo muestran SOLO MARCAS (dirección, 2026-10-23): fuera los equipos
+ * de la marca «Aditamentos» (p. ej. «Aditamentos para excavadoras» en Excavadoras), que tienen
+ * su propia página. Sin ellos tampoco cuentan para la foto del banner ni para indexar.
+ */
+export function sinAditamentos(equipos: EquiposNuevo[]): EquiposNuevo[] {
+  return equipos.filter((e) => poblado<MarcasMaquinaria>(e.marca)?.slug !== SLUG_ADITAMENTOS);
 }
 
 /** Cabecera: el `<h1>` del banner, la descripción y la foto del primer equipo. */

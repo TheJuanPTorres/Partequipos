@@ -166,9 +166,17 @@ En el preview ya están marcadas.
 - `<h1>` del banner: «Maquinaria Tipo {Nombre} Nueva», con el nombre del tipo con mayúscula en cada palabra
   (`tituloBannerTipoNueva`). El título SEO no cambia («Bulldozers nuevos»).
 - Sin el título de sección «Modelos de {tipo} nuevos». La sección se nombra solo para lectores de pantalla.
-- **Franja de marca:**
-  - Con más de una marca, cada grupo empieza con la franja de «Otros {tipo}» de la ficha nueva: barra blanca, logo
-    de la marca a la izquierda y título del grupo («Excavadoras Hitachi») a la derecha.
+- **Franja de marca, SIEMPRE** (Juan Pablo, 2026-10-23; antes, solo con más de una marca):
+  - Cada grupo empieza con la franja de «Otros {tipo}» de la ficha nueva: barra blanca, logo de la marca a la
+    izquierda y título del grupo («Excavadoras Hitachi») a la derecha.
   - Es un componente compartido, `FranjaMarca` (`src/components/marca/`), que también usa la ficha.
   - Marca sin logo: solo el título.
-  - Con una sola marca no hay franja: el título del grupo a secas.
+  - Unos 100 px de aire entre la última fila de una marca y la franja de la siguiente.
+- **Solo marcas:** fuera los equipos de la marca «Aditamentos» (`sinAditamentos`), que tienen su propia página.
+- **Tarjetas de equipo (`TarjetaEquipo`, en todas sus páginas):**
+  - Las características prioritarias llevan el nombre corto y uniforme de la ficha nueva («Potencia neta», «Peso
+    operativo», «Motor»…), con el mismo emparejamiento de etiquetas (`nombreUniforme`).
+  - Cada dato ocupa como mucho 2 líneas con «…». El texto entero está en el `title` y lo leen los lectores de
+    pantalla.
+  - Las tarjetas de una fila reparten sus filas con la rejilla (`subgrid`): mismo alto, y foto, nombre, datos y
+    botones alineados.

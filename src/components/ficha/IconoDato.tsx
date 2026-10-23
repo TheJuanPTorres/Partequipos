@@ -1,5 +1,6 @@
 import {
   IconArrowBarToDown,
+  IconBarcode,
   IconBolt,
   IconBucket,
   IconCalendar,
@@ -31,6 +32,7 @@ const ICONOS: Record<IconoDatoFicha, Icon> = {
   anio: IconCalendar,
   horas: IconClockHour4,
   ubicacion: IconMapPin,
+  serial: IconBarcode,
 };
 
 export function IconoDato({ icono, className }: { icono: IconoDatoFicha; className?: string }) {

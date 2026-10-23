@@ -77,6 +77,7 @@ import * as migration_20261022_164312_blog_diseno_articulo from './20261022_1643
 import * as migration_20261023_045614_pie_enlace_documento from './20261023_045614_pie_enlace_documento';
 import * as migration_20261023_062354_trabaja_con_nosotros from './20261023_062354_trabaja_con_nosotros';
 import * as migration_20261023_150157_productos_mostrar_en_web from './20261023_150157_productos_mostrar_en_web';
+import * as migration_20261023_155220_aditamentos_usados_serial from './20261023_155220_aditamentos_usados_serial';
 
 export const migrations = [
   {
@@ -472,6 +473,11 @@ export const migrations = [
   {
     up: migration_20261023_150157_productos_mostrar_en_web.up,
     down: migration_20261023_150157_productos_mostrar_en_web.down,
-    name: '20261023_150157_productos_mostrar_en_web'
+    name: '20261023_150157_productos_mostrar_en_web',
+  },
+  {
+    up: migration_20261023_155220_aditamentos_usados_serial.up,
+    down: migration_20261023_155220_aditamentos_usados_serial.down,
+    name: '20261023_155220_aditamentos_usados_serial'
   },
 ];

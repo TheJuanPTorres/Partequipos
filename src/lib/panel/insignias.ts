@@ -6,7 +6,8 @@
 export type TonoInsignia = "exito" | "aviso" | "error" | "info" | "neutro";
 export type Insignia = { texto: string; tono: TonoInsignia };
 
-export type TipoInsignia = "disponible" | "publicado" | "autorizacion" | "solicitud" | "destino";
+export type TipoInsignia =
+  "disponible" | "publicado" | "autorizacion" | "solicitud" | "destino" | "visible";
 
 const SI_NO: Record<"disponible" | "publicado" | "autorizacion", [si: Insignia, no: Insignia]> = {
   disponible: [
@@ -39,6 +40,12 @@ const OPCIONES: Record<"solicitud" | "destino", Record<string, Insignia>> = {
 
 /** La insignia de un valor, o `null` si no hay valor que mostrar. */
 export function insigniaDe(tipo: TipoInsignia, valor: unknown): Insignia | null {
+  // «Mostrar en la web»: sin valor cuenta como visible (solo se oculta lo desmarcado).
+  if (tipo === "visible") {
+    return valor === false
+      ? { texto: "Oculto", tono: "aviso" }
+      : { texto: "Visible", tono: "exito" };
+  }
   if (tipo === "solicitud" || tipo === "destino") {
     return typeof valor === "string"
       ? (OPCIONES[tipo][valor] ?? { texto: valor, tono: "neutro" })

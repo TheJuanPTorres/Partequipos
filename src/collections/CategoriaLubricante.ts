@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { seoField } from "../lib/fields/seoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { slugField } from "../lib/fields/slugField";
+import { mostrarEnWebField } from "../lib/fields/mostrarEnWeb";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import {
   revalidarCategoriaLubricante,
@@ -159,6 +160,11 @@ export const CategoriaLubricante: CollectionConfig = {
           admin: { description: "El PDF del fabricante. Sale como «Ficha técnica»." },
         },
         { name: "descripcion", type: "textarea", label: "Descripción" },
+        mostrarEnWebField({
+          sidebar: false,
+          descripcion:
+            "Desmarcado, el producto desaparece de la página de su línea (y de sus grupos y fichas) sin borrarse del panel. Vuelve al marcarlo.",
+        }),
       ],
     },
     seoField(),

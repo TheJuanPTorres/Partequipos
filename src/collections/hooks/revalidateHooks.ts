@@ -1,5 +1,6 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadRequest } from "payload";
 
+import { revalidarSiCambiaLaVisibilidad } from "./visibilidadProducto";
 import { revalidarRutas, rutasDeMarca, rutasDeModelo, rutasDeTipo } from "@/lib/revalidation";
 import { rutas } from "@/lib/routes";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
@@ -206,6 +207,7 @@ async function contextoDeModelo(
 
 export const revalidarModelo: CollectionAfterChangeHook = async ({ doc, previousDoc, req }) => {
   try {
+    revalidarSiCambiaLaVisibilidad(doc, previousDoc, "modelo");
     const actual = await contextoDeModelo(req, doc);
     if (!actual) return doc;
 

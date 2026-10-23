@@ -15,7 +15,9 @@ import {
 } from "@/lib/revalidation";
 import { ETIQUETAS_DATOS, revalidarDatos } from "@/lib/cacheDatos";
 import { cambiaElMenuPorEquipo } from "@/lib/nueva/tiposConEquipos";
+import { PRODUCTO_VISIBLE, productoVisible } from "@/lib/nueva/visibilidad";
 import { rutas } from "@/lib/routes";
+import { revalidarSiCambiaLaVisibilidad } from "./visibilidadProducto";
 import { poblado } from "@/lib/utils/relations";
 
 /**
@@ -190,8 +192,8 @@ async function hermanosDe(req: PayloadRequest, doc: { slug: string; tipo: unknow
 async function refrescarMenuSiCambia(
   req: PayloadRequest,
   operacion: "create" | "update" | "delete",
-  doc: { id?: unknown; slug?: string; tipo?: unknown },
-  anterior?: { tipo?: unknown } | null,
+  doc: { id?: unknown; slug?: string; tipo?: unknown; mostrarEnWeb?: boolean | null },
+  anterior?: { tipo?: unknown; mostrarEnWeb?: boolean | null } | null,
 ): Promise<void> {
   const idTipo = (t: unknown) => {
     const p = poblado<{ id: number }>(t as number | { id: number } | null | undefined);
@@ -203,12 +205,17 @@ async function refrescarMenuSiCambia(
       ? { totalDocs: 0 }
       : await req.payload.count({
           collection: "equipos-nuevos",
-          where: { tipo: { equals: tipo } },
+          // Solo cuentan los equipos que se muestran (`PRODUCTO_VISIBLE`).
+          where: { and: [{ tipo: { equals: tipo } }, PRODUCTO_VISIBLE] },
           req,
         });
+  // Mostrar u ocultar un equipo cuenta como crearlo o borrarlo para el menú: el tipo
+  // puede aparecer o desaparecer. (Ocultar el único equipo: 0 visibles → «borrar».)
+  const visibilidadCambia =
+    operacion === "update" && anterior && productoVisible(doc) !== productoVisible(anterior);
   if (
     cambiaElMenuPorEquipo({
-      operacion,
+      operacion: visibilidadCambia ? (productoVisible(doc) ? "create" : "delete") : operacion,
       tipo,
       tipoAnterior: anterior ? idTipo(anterior.tipo) : null,
       equiposDelTipo: totalDocs,
@@ -225,6 +232,7 @@ export const revalidarEquipoNuevo: CollectionAfterChangeHook = async ({
   req,
 }) => {
   try {
+    revalidarSiCambiaLaVisibilidad(doc, previousDoc, "equipo nuevo");
     // El listado de nueva es dinámico: se invalidan sus DATOS (`src/lib/cacheDatos.ts`).
     revalidarDatos(ETIQUETAS_DATOS.nueva, `equipo nuevo ${doc.slug}`);
     await refrescarMenuSiCambia(
@@ -408,7 +416,13 @@ async function refrescarMenuSiCambiaUsado(
   for (const categoria of categorias) {
     const { totalDocs } = await req.payload.count({
       collection: "equipos-usados",
-      where: { and: [{ categoria: { equals: categoria } }, { disponible: { equals: true } }] },
+      where: {
+        and: [
+          { categoria: { equals: categoria } },
+          { disponible: { equals: true } },
+          PRODUCTO_VISIBLE,
+        ],
+      },
       req,
     });
     if (totalDocs <= 1) {
@@ -419,11 +433,12 @@ async function refrescarMenuSiCambiaUsado(
 }
 
 async function revalidarEquipoUsadoCore(
-  doc: { id: number; categoria: unknown; slug?: string | null },
+  doc: { id: number; categoria: unknown; slug?: string | null; mostrarEnWeb?: boolean | null },
   req: PayloadRequest,
-  anterior?: { categoria?: unknown } | null,
+  anterior?: { categoria?: unknown; mostrarEnWeb?: boolean | null } | null,
 ) {
   try {
+    revalidarSiCambiaLaVisibilidad(doc, anterior, "equipo usado");
     // Antes que nada: los datos de los listados (dinámicos) de TODAS las
     // categorías, también la anterior si la unidad cambió de categoría.
     revalidarDatos(ETIQUETAS_DATOS.usados, `equipo usado ${doc.id}`);

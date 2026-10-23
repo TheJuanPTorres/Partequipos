@@ -232,6 +232,10 @@ export interface EquiposNuevo {
   id: number;
   nombre: string;
   /**
+   * Desmarcada, el equipo desaparece de toda la web (listados, «Otras referencias», menú, buscador, portada y sitemap) sin borrarse del panel, y su ficha lleva a la página de su tipo. Vuelve al marcarla.
+   */
+  mostrarEnWeb?: boolean | null;
+  /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
@@ -577,6 +581,10 @@ export interface ModelosRepuesto {
   id: number;
   nombre: string;
   /**
+   * Desmarcado, el modelo desaparece de toda la web (listados del tipo y de la marca, buscador y sitemap) sin borrarse del panel, y su página lleva a la de su tipo. Vuelve al marcarlo.
+   */
+  mostrarEnWeb?: boolean | null;
+  /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
@@ -883,6 +891,10 @@ export interface EquiposUsado {
    */
   fichaTecnicaPdf?: (number | null) | Documento;
   /**
+   * Desmarcada, la unidad desaparece de toda la web (listados, portada, menú, buscador y sitemap) sin borrarse del panel, y su página lleva a su categoría de forma temporal. Para una unidad VENDIDA usa «Disponible».
+   */
+  mostrarEnWeb?: boolean | null;
+  /**
    * Al venderse, desmarcar en vez de borrar: conserva el historial y permite deshacer.
    */
   disponible?: boolean | null;
@@ -1151,6 +1163,10 @@ export interface CategoriasLubricante {
          */
         ficha?: (number | null) | Documento;
         descripcion?: string | null;
+        /**
+         * Desmarcado, el producto desaparece de la página de su línea (y de sus grupos y fichas) sin borrarse del panel. Vuelve al marcarlo.
+         */
+        mostrarEnWeb?: boolean | null;
         id?: string | null;
       }[]
     | null;
@@ -2344,6 +2360,7 @@ export interface SolicitudesSelect<T extends boolean = true> {
  */
 export interface ModelosRepuestoSelect<T extends boolean = true> {
   nombre?: T;
+  mostrarEnWeb?: T;
   slug?: T;
   marca?: T;
   tipo?: T;
@@ -2480,6 +2497,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
  */
 export interface EquiposNuevosSelect<T extends boolean = true> {
   nombre?: T;
+  mostrarEnWeb?: T;
   slug?: T;
   marca?: T;
   tipo?: T;
@@ -2537,6 +2555,7 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
   descripcion?: T;
   imagenes?: T;
   fichaTecnicaPdf?: T;
+  mostrarEnWeb?: T;
   disponible?: T;
   fechaPublicacion?: T;
   pestanaPortada?: T;
@@ -2734,6 +2753,7 @@ export interface CategoriasLubricanteSelect<T extends boolean = true> {
         imagen?: T;
         ficha?: T;
         descripcion?: T;
+        mostrarEnWeb?: T;
         id?: T;
       };
   seo?:

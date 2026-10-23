@@ -7,7 +7,12 @@ import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 
 import { construirMegamenu, type PanelMenu } from "@/lib/megamenu";
 import { selectDelMenu } from "@/lib/megamenuCampos";
-import { DE_MARCA_VISIBLE, MARCA_VISIBLE } from "@/lib/nueva/visibilidad";
+import {
+  conEquipoVisible,
+  conProductoVisible,
+  DE_MARCA_VISIBLE,
+  MARCA_VISIBLE,
+} from "@/lib/nueva/visibilidad";
 
 /**
  * Datos del megamenú (`src/lib/megamenu.ts`): doce consultas LIGERAS (con las
@@ -88,14 +93,14 @@ const megamenuEnCache = unstable_cache(
       payload.find({
         collection: "equipos-nuevos",
         ...base,
-        where: DE_MARCA_VISIBLE,
+        where: conEquipoVisible(),
         select: { tipo: true },
       }),
       // Solo la categoría de las unidades disponibles: «Sin unidades por ahora» en las vacías.
       payload.find({
         collection: "equipos-usados",
         ...base,
-        where: { disponible: { equals: true } },
+        where: conProductoVisible({ disponible: { equals: true } }),
         select: { categoria: true },
       }),
       // «Repuestos por categoría técnica» (2026-10-20): nombre, dirección, orden y la

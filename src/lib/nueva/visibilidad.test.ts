@@ -72,7 +72,7 @@ describe("marcas de nueva ocultas: los 301", () => {
  */
 const RAIZ = path.resolve(process.cwd(), "src");
 const COLECCIONES = ["marcas-maquinaria", "tipos-maquinaria", "equipos-nuevos"];
-const FILTRO = /\b(MARCA_VISIBLE|DE_MARCA_VISIBLE|conMarcaVisible)\b/;
+const FILTRO = /\b(MARCA_VISIBLE|DE_MARCA_VISIBLE|conMarcaVisible|conEquipoVisible)\b/;
 const EXCLUIDOS = [
   path.join("src", "collections"),
   path.join("src", "app", "(payload)"),

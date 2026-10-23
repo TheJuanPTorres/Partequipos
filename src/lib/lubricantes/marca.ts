@@ -53,6 +53,8 @@ export function nombreCompleto(p: { nombre: string; grado: string | null }): str
 }
 
 function producto(p: Producto, i: number): ProductoLubricante | null {
+  // «Mostrar en la web» desmarcada: el producto no sale (sigue en el panel).
+  if (p.mostrarEnWeb === false) return null;
   const nombre = p.nombre?.trim();
   if (!nombre) return null;
   const grado = p.grado?.trim() || null;

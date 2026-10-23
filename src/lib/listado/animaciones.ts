@@ -51,14 +51,24 @@ export const frenar = (t: number) => 1 - (1 - t) ** 4;
 export const PARAMETRO_ANIMACIONES = "anim";
 
 /**
- * Las animaciones que se pintan de un juego de interruptores (el del listado
- * o, desde el 2026-10-22, el del pie, `lib/animacionesPie.ts`): las encendidas
- * y, si se permite (nunca en el sitio publicado), recortadas por `?anim=`. Sin
+ * Las animaciones que se pintan: las encendidas en `ANIMACIONES` y, si se
+ * permite (nunca en el sitio publicado), recortadas por `?anim=`. Sin
  * parámetro, todas las encendidas; con `no`, ninguna. Una apagada en el código
  * no se enciende desde la URL.
  */
+export function animacionesActivas(
+  parametro: string | string[] | undefined,
+  permitirUrl: boolean,
+): Animacion[] {
+  return activasDe(ANIMACIONES, parametro, permitirUrl);
+}
+
+/**
+ * La misma regla para cualquier juego de interruptores (`ANIMACIONES` del listado, las del
+ * índice de categorías técnicas…): las encendidas y, si se permite, recortadas por `?anim=`.
+ */
 export function activasDe<K extends string>(
-  interruptores: Readonly<Record<K, boolean>>,
+  interruptores: Record<K, boolean>,
   parametro: string | string[] | null | undefined,
   permitirUrl: boolean,
 ): K[] {
@@ -72,14 +82,6 @@ export function activasDe<K extends string>(
       .filter(Boolean),
   );
   return todas.filter((a) => pedidas.has(a));
-}
-
-/** Las del listado (`ANIMACIONES`). */
-export function animacionesActivas(
-  parametro: string | string[] | undefined,
-  permitirUrl: boolean,
-): Animacion[] {
-  return activasDe(ANIMACIONES, parametro, permitirUrl);
 }
 
 /**

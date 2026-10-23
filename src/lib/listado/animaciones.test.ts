@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
-  ANIMACIONES,
   activasDe,
+  ANIMACIONES,
   animacionesActivas,
   frenar,
   inicioDelContador,
@@ -64,11 +64,12 @@ describe("frenar (contador A5)", () => {
   });
 });
 
-describe("activasDe (el pie, 2026-10-22)", () => {
-  it("vale para otro juego de interruptores: los apagados no se encienden por la URL", () => {
-    const pie = { P1: true, P2: false, P3: true } as const;
-    assert.deepEqual(activasDe(pie, null, true), ["P1", "P3"]);
-    assert.deepEqual(activasDe(pie, "p2,P3", true), ["P3"]);
-    assert.deepEqual(activasDe(pie, "no", false), ["P1", "P3"]);
+describe("activasDe", () => {
+  const interruptores = { C1: true, C2: false, C3: true };
+  it("sin parámetro o sin permiso, las encendidas; una apagada no se enciende desde la URL", () => {
+    assert.deepEqual(activasDe(interruptores, null, true), ["C1", "C3"]);
+    assert.deepEqual(activasDe(interruptores, "c2", false), ["C1", "C3"]);
+    assert.deepEqual(activasDe(interruptores, "c2,C3", true), ["C3"]);
+    assert.deepEqual(activasDe(interruptores, "no", true), []);
   });
 });

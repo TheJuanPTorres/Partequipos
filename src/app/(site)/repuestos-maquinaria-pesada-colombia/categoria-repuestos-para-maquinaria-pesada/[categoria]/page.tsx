@@ -112,7 +112,6 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
         vista={vistaEncabezadoCategoria(categoria, global, fondoDeRespaldo(marcas))}
         anclaSiguiente={ANCLA_GRUPOS}
         franja={false}
-        centrado
       />
 
       <TarjetasGrupos

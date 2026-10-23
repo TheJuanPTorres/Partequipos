@@ -48,6 +48,46 @@
   margin-top: 30px;
 }
 
+/*
+ * RESERVA DE ALTO frente a la llegada de Inter (CLS), como la cabecera del
+ * artículo (`cabeceraArticulo.module.css`): una copia invisible del texto
+ * (`::after`, con `data-reserva`) en la fuente de respaldo, ensanchada
+ * 0,04 em, en la misma celda de rejilla que el texto visible. La caja mide
+ * siempre lo de la copia, con Inter o sin ella. Tipografía en el contenedor;
+ * el texto visible la hereda (`.heredado`). Medido: CLS de 0,12 a 1010 y
+ * 0,05 a 1440 sin esto.
+ */
+.reserva {
+  display: grid;
+}
+
+.reserva > *,
+.reserva::after {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.reserva::after {
+  content: attr(data-reserva);
+  visibility: hidden;
+  pointer-events: none;
+  white-space: pre-line;
+  font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+/* Las píldoras del filtro, en una línea: su ancho es el de la copia. */
+.reservaLinea,
+.reservaLinea::after {
+  white-space: nowrap;
+}
+
+.heredado {
+  margin: 0;
+  color: inherit;
+  font: inherit;
+}
+
 .filtroLista {
   display: flex;
   flex-wrap: wrap;

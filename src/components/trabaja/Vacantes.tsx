@@ -55,15 +55,25 @@ export function Vacantes({
   const ciudadActual = filtro.tipo === "ciudad" ? filtro.ciudad.slug : null;
   return (
     <section id={id} className={estilos.equipo} aria-labelledby={idTitulo}>
+      {/*
+       * Con reserva de alto (CLS): con la cabecera baja, este bloque entra en
+       * la primera pantalla, y al llegar Inter el título, la frase y las
+       * píldoras del filtro cambiaban de ancho y de líneas (CLS medido de 0,12
+       * a 1010). La copia invisible en la fuente de respaldo fija su caja.
+       */}
       <div className={estilos.equipoCabecera}>
-        <Revelado
-          como="h2"
-          id={idTitulo}
-          texto={titulo}
-          ritmo="titulo"
-          className={estilos.equipoTitulo}
-        />
-        <Revelado como="p" texto={texto} ritmo="titulo" className={estilos.equipoTexto} />
+        <div className={`${estilos.equipoTitulo} ${estilos.reserva}`} data-reserva={titulo}>
+          <Revelado
+            como="h2"
+            id={idTitulo}
+            texto={titulo}
+            ritmo="titulo"
+            className={estilos.heredado}
+          />
+        </div>
+        <div className={`${estilos.equipoTexto} ${estilos.reserva}`} data-reserva={texto}>
+          <Revelado como="p" texto={texto} ritmo="titulo" className={estilos.heredado} />
+        </div>
       </div>
 
       <ZonaCatalogo clave={clave} lateral={false} className={estilos.zona}>
@@ -81,7 +91,12 @@ export function Vacantes({
                   aria-current={ciudadActual === null ? "page" : undefined}
                   prefetch={false}
                 >
-                  Todas
+                  <span
+                    className={`${estilos.reserva} ${estilos.reservaLinea}`}
+                    data-reserva="Todas"
+                  >
+                    <span>Todas</span>
+                  </span>
                 </Link>
               </li>
               {ciudades.map((c) => (
@@ -92,7 +107,14 @@ export function Vacantes({
                     aria-current={ciudadActual === c.slug ? "page" : undefined}
                     prefetch={false}
                   >
-                    {c.nombre} <span className={estilos.filtroCuantas}>({c.cuantas})</span>
+                    <span
+                      className={`${estilos.reserva} ${estilos.reservaLinea}`}
+                      data-reserva={`${c.nombre} (${c.cuantas})`}
+                    >
+                      <span>
+                        {c.nombre} <span className={estilos.filtroCuantas}>({c.cuantas})</span>
+                      </span>
+                    </span>
                   </Link>
                 </li>
               ))}

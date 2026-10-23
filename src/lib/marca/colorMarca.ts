@@ -37,6 +37,15 @@ export function tintaSobre(fondo: string): string {
 }
 
 /**
+ * La tinta de un LOGO sobre el color de la marca (pastilla activa de la barra de marcas,
+ * dirección 2026-10-23): BLANCO siempre que se lea bien (contraste ≥ 3:1, el de los
+ * elementos gráficos de WCAG, que basta para un logo); NEGRO solo en colores claros.
+ */
+export function tintaDeLogoSobre(fondo: string): string {
+  return contraste(luz(fondo), luz(BLANCO)) >= 3 ? BLANCO : NEGRO;
+}
+
+/**
  * Las variables CSS de la página: el color de la franja, la tinta de sus
  * títulos y del foco, y el aspecto de una píldora al pasar el ratón (la tinta
  * sobre el color de la franja: nunca del color de la franja sobre sí mismo).

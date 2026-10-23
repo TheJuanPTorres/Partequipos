@@ -1,50 +1,44 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from "payload";
 
+import { CAMPOS_MENU, type ColeccionDelMenu } from "../../lib/megamenuCampos";
 import { revalidarTodoElSitio } from "../../lib/revalidation";
 
 /**
  * MEGAMENÚ (decisiones-home-ux9.md §26): va en la cabecera de TODAS las
- * páginas y se lee del catálogo. Si una marca, un tipo o una categoría cambia
- * de nombre o de slug, se crea o se borra, el menú de todo el sitio tiene que
- * refrescarse, no solo las páginas de ese registro.
+ * páginas y se lee del catálogo. Si un registro cambia algo que el menú pinta,
+ * se crea o se borra, el menú de todo el sitio tiene que refrescarse, no solo
+ * las páginas de ese registro.
  *
- * Revalidar el sitio entero es caro, así que SOLO cuando cambia lo que el menú
- * pinta (nombre, slug, marca; en las marcas, el logo y su tinta; en las categorías
- * técnicas, la foto y el orden): editar una
- * descripción no lo dispara. Se AÑADE
- * a los ganchos de cada colección; nunca relanza.
+ * Revalidar el sitio entero es caro, así que SOLO cuando cambia un campo que
+ * lee el menú: los de `CAMPOS_MENU` (`src/lib/megamenuCampos.ts`), la misma
+ * lista que pide su consulta. Editar una descripción no lo dispara. Se AÑADE a
+ * los ganchos de cada colección; nunca relanza.
  */
 
 type Registro = Readonly<Record<string, unknown>> | null | undefined;
 
-const idDe = (v: unknown) =>
-  v && typeof v === "object" && "id" in v ? (v as { id: unknown }).id : v;
+/** Un valor comparable: una relación poblada cuenta como su id, también dentro de una lista. */
+function valorComparable(v: unknown): unknown {
+  if (Array.isArray(v)) return JSON.stringify(v.map(valorComparable));
+  if (v && typeof v === "object" && "id" in v) return (v as { id: unknown }).id;
+  return v ?? null;
+}
 
 /** ¿Cambia lo que pinta el menú? Pura, para probarla sin Payload. */
 export function cambiaElMenu(
   operacion: string,
   doc: Registro,
   anterior: Registro,
-  coleccion?: string,
+  coleccion: ColeccionDelMenu,
 ): boolean {
   if (operacion === "create") return true;
   if (!doc || !anterior) return true;
-  return (
-    doc.nombre !== anterior.nombre ||
-    doc.slug !== anterior.slug ||
-    idDe(doc.marca) !== idDe(anterior.marca) ||
-    idDe(doc.logo) !== idDe(anterior.logo) ||
-    doc.logoOscuroEnMenu !== anterior.logoOscuroEnMenu ||
-    // Las categorías técnicas: su foto y su orden también se pintan (2026-10-20). La
-    // foto, solo en ellas: la de un tipo o una categoría de usados no sale en el menú.
-    (coleccion === "categorias-tecnicas" && idDe(doc.imagen) !== idDe(anterior.imagen)) ||
-    doc.ordenMarca !== anterior.ordenMarca ||
-    // Las categorías de lubricante: su enlace en el menú (2026-10-20).
-    doc.enlaceMenu !== anterior.enlaceMenu
+  return CAMPOS_MENU[coleccion].some(
+    (campo) => valorComparable(doc[campo]) !== valorComparable(anterior[campo]),
   );
 }
 
-export function revalidarMegamenu(coleccion: string): {
+export function revalidarMegamenu(coleccion: ColeccionDelMenu): {
   afterChange: CollectionAfterChangeHook;
   afterDelete: CollectionAfterDeleteHook;
 } {

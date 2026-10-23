@@ -18,6 +18,12 @@ export function colorDeMarca(valor: string | null | undefined): string | null {
   return seis.toLowerCase();
 }
 
+/**
+ * El naranja de la barra de series de repuestos (el de Hitachi): el de una marca SIN color en
+ * la barra de marcas y en la franja de marca de nueva (dirección, 2026-10-23).
+ */
+export const COLOR_SIN_MARCA = "#fc661c";
+
 const NEGRO = "#000000";
 const BLANCO = "#ffffff";
 

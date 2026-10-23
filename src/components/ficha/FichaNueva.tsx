@@ -100,7 +100,15 @@ type Props = {
   /** Enlace de WhatsApp de «Habla con un experto»; `null` si la empresa no tiene número. */
   experto: { href: string } | null;
   /** «Otras <tipo>»: el título, el logo de la marca (o nada) y las tarjetas. */
-  otras: { titulo: string; logo: LogoConAlt | null; tarjetas: TarjetaOtra[] };
+  otras: {
+    titulo: string;
+    logo: LogoConAlt | null;
+    tarjetas: TarjetaOtra[];
+    /** Para la franja con más fuerza (`MEJORAS_FRANJA`): color, máquina y página de la marca. */
+    color?: string | null;
+    foto?: ImagenLista | null;
+    marca?: { nombre: string; href: string };
+  };
   imagenContacto: ImagenLista | null;
   contactoEsFoto: boolean;
   /** El formulario de la ventana de «Contáctanos» (el mismo que el del contacto). */
@@ -272,7 +280,15 @@ ${tituloEscritorio.modelo}`}
       {/* 2. «OTRAS <TIPO>»: la franja con la foto del tipo y las tarjetas. Sin otras, no sale. */}
       {otras.tarjetas.length > 0 ? (
         <section className={nueva.otras} aria-labelledby="otras-del-tipo">
-          <FranjaMarca id="otras-del-tipo" titulo={otras.titulo} logo={otras.logo} />
+          <FranjaMarca
+            id="otras-del-tipo"
+            titulo={otras.titulo}
+            logo={otras.logo}
+            color={otras.color}
+            foto={otras.foto}
+            modelos={otras.tarjetas.length}
+            marca={otras.marca}
+          />
           <ul className={nueva.rejilla}>
             {otras.tarjetas.map((o) => (
               <li key={o.id} className={`${estilos.tarjeta} ${nueva.tarjeta}`}>

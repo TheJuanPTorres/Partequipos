@@ -147,7 +147,15 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
           grupos.map((g, i) => (
             <div key={g.clave} id={`grupo-${g.clave}`} className={estilosTarjetas.grupoMarca}>
               {/* `h2` en la franja: los nombres de las tarjetas (`TarjetaEquipo`) son `h3`. */}
-              <FranjaMarca id={`grupo-${g.clave}-t`} titulo={g.titulo} logo={logoDe(g.marca)} />
+              <FranjaMarca
+                id={`grupo-${g.clave}-t`}
+                titulo={g.titulo}
+                logo={logoDe(g.marca)}
+                color={g.marca.colorMarca}
+                foto={g.foto}
+                modelos={g.tarjetas.length}
+                marca={{ nombre: g.marca.nombre, href: `${rutas.marcaMaquinaria(g.marca.slug)}/` }}
+              />
               <ul className={estilosTarjetas.rejilla}>
                 {g.tarjetas.map((e, j) => (
                   <TarjetaEquipo

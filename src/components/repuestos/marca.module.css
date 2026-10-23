@@ -69,10 +69,17 @@
   mix-blend-mode: multiply;
 }
 
+/*
+ * El contenido del encabezado va SIEMPRE centrado en vertical en la tarjeta (dirección,
+ * 2026-10-22, para TODA la web): `flex: 1` lo estira al alto de la tarjeta y `justify-content`
+ * lo centra. Antes solo lo hacían las variantes (`heroBajo`, `heroIndice`, `heroCentrado`) y la
+ * tarjeta de siempre lo dejaba arriba con un hueco debajo.
+ */
 .heroContenido {
   position: relative;
   display: flex;
   width: 100%;
+  flex: 1;
   padding: 50px 2.9vw;
   flex-direction: column;
   align-items: center;
@@ -213,11 +220,6 @@
 }
 
 .heroBajo .heroContenido {
-  flex: 1;
-}
-
-/* Categoría técnica (2026-10-22): la tarjeta de siempre, con el contenido centrado en vertical. */
-.heroCentrado .heroContenido {
   flex: 1;
 }
 
@@ -1734,5 +1736,237 @@ a.modelo:hover {
 
   :global(html:not([data-mejoras-apagadas~="R2"])) .conBarraSeries .modelosGrupo {
     scroll-margin-top: 87px;
+  }
+}
+
+/*
+ * --- Categorías técnicas del índice en BALDOSAS (dirección, 2026-10-22) -------------------
+ * Las de «Mostrar marcas» (blancas, compactas, borde gris), con la foto de la categoría
+ * centrada y entera en su marco, el nombre y «Ver productos →». 5 por fila en escritorio
+ * (rejilla de 10 columnas, cada una ocupa 2), 3 en tablet (6) y 2 en móvil (4); la última
+ * fila incompleta, centrada. Sus `li` llevan su propia clase para no heredar la colocación de
+ * 4 por fila de las marcas.
+ */
+.categoriasRecuadro {
+  padding-top: 60px;
+}
+
+.categoriasTitulo {
+  margin: 0 0 48px;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-seccion);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.baldosas.baldosasCategorias {
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+}
+
+.categoriaCaja {
+  display: flex;
+  min-width: 0;
+  grid-column: span 2;
+}
+
+@media (min-width: 1025px) {
+  .categoriaCaja:last-child:nth-child(5n + 1) {
+    grid-column: 5 / span 2;
+  }
+
+  .categoriaCaja:nth-last-child(2):nth-child(5n + 1) {
+    grid-column: 4 / span 2;
+  }
+
+  .categoriaCaja:nth-last-child(3):nth-child(5n + 1) {
+    grid-column: 3 / span 2;
+  }
+
+  .categoriaCaja:nth-last-child(4):nth-child(5n + 1) {
+    grid-column: 2 / span 2;
+  }
+}
+
+.baldosaCategoria {
+  position: relative;
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 14px 18px;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e2e2e2;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--color-texto);
+  text-align: center;
+  text-decoration: none;
+}
+
+.baldosaCategoria:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.baldosaFoto {
+  display: flex;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.baldosaFotoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.baldosaNombre {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.baldosaVer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid #d4d4d4;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.baldosaFlecha {
+  display: inline-block;
+  color: var(--color-marca);
+}
+
+@media (max-width: 1024px) {
+  .baldosas.baldosasCategorias {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .categoriaCaja:last-child:nth-child(3n + 1) {
+    grid-column: 3 / span 2;
+  }
+
+  .categoriaCaja:nth-last-child(2):nth-child(3n + 1) {
+    grid-column: 2 / span 2;
+  }
+}
+
+@media (max-width: 767px) {
+  .categoriasRecuadro {
+    padding-top: 40px;
+  }
+
+  .categoriasTitulo {
+    margin-bottom: 28px;
+  }
+
+  .baldosas.baldosasCategorias {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  /* Las de tablet no valen aquí: se vuelven a la columna que les toca. */
+  .categoriaCaja:last-child:nth-child(3n + 1),
+  .categoriaCaja:nth-last-child(2):nth-child(3n + 1) {
+    grid-column: span 2;
+  }
+
+  .categoriaCaja:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+
+  .baldosaCategoria {
+    padding: 10px 10px 14px;
+    gap: 10px;
+  }
+
+  .baldosaNombre {
+    font-size: 15px;
+  }
+
+  .baldosaVer {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
+}
+
+/*
+ * ANIMACIONES del índice de categorías (`ANIMACIONES_CATEGORIAS`, interruptor por animación;
+ * cuelgan de `data-anim` de `ZonaAnimada`). Curva y duración del listado de usados (#320).
+ * C1 (entrada escalonada) va en `ZonaAnimada`.
+ */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  /* C2: sube con más sombra (la sombra ya pintada, solo cambia su opacidad), zoom leve de la
+     foto dentro de su marco, borde en el rojo de marca y la flecha se desplaza. */
+  [data-anim~="C2"] .baldosaCategoria {
+    transition:
+      transform 280ms cubic-bezier(0.33, 0, 0.2, 1),
+      border-color 280ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  [data-anim~="C2"] .baldosaCategoria::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 14px 30px rgba(16, 15, 15, 0.14);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 280ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  [data-anim~="C2"] .baldosaFotoImg,
+  [data-anim~="C2"] .baldosaFlecha {
+    transition: transform 280ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  [data-anim~="C2"] .baldosaCategoria:hover {
+    border-color: var(--color-marca);
+    transform: translateY(-4px);
+  }
+
+  [data-anim~="C2"] .baldosaCategoria:hover::after {
+    opacity: 1;
+  }
+
+  [data-anim~="C2"] .baldosaCategoria:hover .baldosaFotoImg {
+    transform: scale(1.06);
+  }
+
+  [data-anim~="C2"] .baldosaCategoria:hover .baldosaFlecha {
+    transform: translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* C3: la foto de la cabecera se acerca muy despacio, solo `transform` (no toca el LCP: la
+     imagen se pinta igual desde el primer fotograma). */
+  [data-anim~="C3"] .fondo {
+    animation: zoomLento 12s cubic-bezier(0.33, 0, 0.2, 1) forwards;
+  }
+}
+
+@keyframes zoomLento {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.05);
   }
 }

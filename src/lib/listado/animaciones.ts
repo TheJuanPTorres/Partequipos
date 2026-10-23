@@ -50,8 +50,6 @@ export const frenar = (t: number) => 1 - (1 - t) ** 4;
 /** Parámetro de la URL con el que se prueban en un preview (`?anim=A1,A3`; `?anim=no`, ninguna). */
 export const PARAMETRO_ANIMACIONES = "anim";
 
-const TODAS = (Object.keys(ANIMACIONES) as Animacion[]).filter((a) => ANIMACIONES[a]);
-
 /**
  * Las animaciones que se pintan: las encendidas en `ANIMACIONES` y, si se
  * permite (nunca en el sitio publicado), recortadas por `?anim=`. Sin
@@ -62,15 +60,28 @@ export function animacionesActivas(
   parametro: string | string[] | undefined,
   permitirUrl: boolean,
 ): Animacion[] {
+  return activasDe(ANIMACIONES, parametro, permitirUrl);
+}
+
+/**
+ * La misma regla para cualquier juego de interruptores (`ANIMACIONES` del listado, las del
+ * índice de categorías técnicas…): las encendidas y, si se permite, recortadas por `?anim=`.
+ */
+export function activasDe<K extends string>(
+  interruptores: Record<K, boolean>,
+  parametro: string | string[] | null | undefined,
+  permitirUrl: boolean,
+): K[] {
+  const todas = (Object.keys(interruptores) as K[]).filter((a) => interruptores[a]);
   const valor = Array.isArray(parametro) ? parametro[0] : parametro;
-  if (!permitirUrl || valor === undefined) return TODAS;
+  if (!permitirUrl || valor === undefined || valor === null) return todas;
   const pedidas = new Set(
     valor
       .split(/[\s,]+/)
       .map((p) => p.trim().toUpperCase())
       .filter(Boolean),
   );
-  return TODAS.filter((a) => pedidas.has(a));
+  return todas.filter((a) => pedidas.has(a));
 }
 
 /**

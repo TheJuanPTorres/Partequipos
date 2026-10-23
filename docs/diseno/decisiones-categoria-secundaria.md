@@ -160,3 +160,15 @@ En el preview ya están marcadas.
 - **Guarda:** una categoría de nueva no se guarda si una redirección sale de su URL (`slugCategoriaNuevaValido`). El
   proxy aplica las redirecciones antes que las páginas, así que la categoría quedaría tapada sin ningún error (pasaba
   con `/…/nueva/miniexcavadoras/`, el 301 a Yanmar de la limpieza del panel).
+
+**La plantilla de las 9 páginas generales (dirección, 2026-10-23):**
+
+- `<h1>` del banner: «Maquinaria Tipo {Nombre} Nueva», con el nombre del tipo con mayúscula en cada palabra
+  (`tituloBannerTipoNueva`). El título SEO no cambia («Bulldozers nuevos»).
+- Sin el título de sección «Modelos de {tipo} nuevos». La sección se nombra solo para lectores de pantalla.
+- **Franja de marca:**
+  - Con más de una marca, cada grupo empieza con la franja de «Otros {tipo}» de la ficha nueva: barra blanca, logo
+    de la marca a la izquierda y título del grupo («Excavadoras Hitachi») a la derecha.
+  - Es un componente compartido, `FranjaMarca` (`src/components/marca/`), que también usa la ficha.
+  - Marca sin logo: solo el título.
+  - Con una sola marca no hay franja: el título del grupo a secas.

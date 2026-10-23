@@ -308,43 +308,7 @@ section.principal[data-con-izquierda] {
   padding: 0 var(--ficha-margen) 5cqi;
 }
 
-/* La franja: tarjeta blanca de radio 30, la foto del tipo a la izquierda y el título a la derecha. */
-.franja {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 30px;
-  padding: max(1cqi, 12px);
-  border-radius: var(--ficha-radio);
-  background: var(--color-fondo);
-}
-
-/* El logo de la marca (`LogoMarca`), entero, en una caja de 140 × 64 sobre blanco. */
-.cajaLogoFranja {
-  display: flex;
-  width: 140px;
-  height: 64px;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  padding-left: 10px;
-}
-
-.logoFranja {
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.tituloFranja {
-  margin: 0 0 0 auto;
-  padding-right: 10px;
-  color: var(--color-texto);
-  text-align: right;
-}
+/* La franja (logo de la marca y título) es `FranjaMarca` (src/components/marca/). */
 
 /*
  * Las tarjetas con la regla del sitio (#281, la de `TarjetasMarca`): 1 o 2
@@ -517,18 +481,5 @@ section.principal[data-con-izquierda] {
 
   .principal .datos li {
     padding: 12px;
-  }
-
-  .franja {
-    gap: 12px;
-  }
-
-  .cajaLogoFranja {
-    width: 100px;
-    height: 48px;
-  }
-
-  .tituloFranja {
-    padding-right: 4px;
   }
 }

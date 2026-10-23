@@ -16,6 +16,8 @@ export type GrupoDeCategoria = {
   clave: string;
   /** El subtítulo del grupo: «Excavadoras Hitachi» (el `<h1>` de la página de ese tipo). */
   titulo: string;
+  /** La marca del grupo, para su logo en la franja (`FranjaMarca`) cuando la página mezcla marcas. */
+  marca: MarcasMaquinaria;
   tarjetas: TarjetaEquipo[];
 };
 
@@ -47,12 +49,35 @@ export function gruposPorMarcaYTipo(equipos: EquiposNuevo[]): GrupoDeCategoria[]
     .map(([clave, g]) => ({
       clave,
       titulo: tituloPorDefecto.tipoMaquinaria(g.tipo.nombre, g.marca.nombre),
+      marca: g.marca,
       tarjetas: tarjetasDeEquipos(g.marca, g.tipo.slug, g.equipos),
     }))
     .filter((g) => g.tarjetas.length > 0);
 }
 
-/** Cabecera: el `<h1>` de siempre («Excavadoras nuevas»), la descripción y la foto del primer equipo. */
+/** Cada palabra con su inicial en mayúscula; el resto, tal cual (regla del sitio, 2026-10-22). */
+const mayusculaEnCadaPalabra = (texto: string) =>
+  texto
+    .trim()
+    .split(/\s+/)
+    .map((p) => p.charAt(0).toLocaleUpperCase("es") + p.slice(1))
+    .join(" ");
+
+/**
+ * El `<h1>` del banner de una página general de tipo (dirección, 2026-10-23): «Maquinaria Tipo
+ * Bulldozers Nueva», con el nombre del tipo con mayúscula en cada palabra. El título SEO sigue
+ * siendo el de siempre («Bulldozers nuevos», `tituloPorDefecto.categoriaNueva`).
+ */
+export function tituloBannerTipoNueva(nombre: string): string {
+  return `Maquinaria Tipo ${mayusculaEnCadaPalabra(nombre)} Nueva`;
+}
+
+/** Más de una marca entre los grupos: entonces cada grupo empieza con la franja de su marca. */
+export function mezclaMarcas(grupos: readonly GrupoDeCategoria[]): boolean {
+  return new Set(grupos.map((g) => g.marca.slug)).size > 1;
+}
+
+/** Cabecera: el `<h1>` del banner, la descripción y la foto del primer equipo. */
 export function vistaEncabezadoCategoriaNueva(
   titulo: string,
   descripcion: string | null | undefined,

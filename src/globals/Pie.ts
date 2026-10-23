@@ -2,7 +2,7 @@ import type { GlobalConfig } from "payload";
 
 import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { validarEnlace } from "../lib/fields/reglasPortada";
-import { validarDestinoPie } from "../lib/pie";
+import { validarDestinoPie, validarDocumentoPie } from "../lib/pie";
 import { revalidarTodoElSitio } from "../lib/revalidation";
 
 /**
@@ -86,6 +86,7 @@ export const Pie: GlobalConfig = {
                   options: [
                     { label: "Página o dirección", value: "pagina" },
                     { label: "Teléfono de la empresa", value: "telefono" },
+                    { label: "Documento en el visor", value: "documento" },
                   ],
                   admin: { width: "25%" },
                 },
@@ -96,8 +97,27 @@ export const Pie: GlobalConfig = {
                   validate: validarDestinoPie,
                   admin: {
                     width: "40%",
-                    condition: (_, siblingData) => siblingData?.tipo !== "telefono",
-                    description: "Ruta del sitio (/…) o https://",
+                    condition: (_, siblingData) => (siblingData?.tipo ?? "pagina") === "pagina",
+                    description:
+                      "Ruta del sitio (/…) o https://. Una dirección https:// de otro sitio se abre en una pestaña nueva.",
+                  },
+                },
+                {
+                  /*
+                   * «Documento en el visor» (2026-10-22, «Línea Ética»): el PDF se abre en la
+                   * ventana emergente con el visor tipo libro, si tiene sus «Páginas como
+                   * imágenes»; sin ellas o sin JavaScript, el enlace abre el PDF.
+                   */
+                  name: "documento",
+                  type: "upload",
+                  relationTo: "documentos",
+                  label: "Documento",
+                  validate: validarDocumentoPie,
+                  admin: {
+                    width: "40%",
+                    condition: (_, siblingData) => siblingData?.tipo === "documento",
+                    description:
+                      "El PDF de «Documentos». Se abre en el visor si tiene sus páginas como imágenes.",
                   },
                 },
               ],

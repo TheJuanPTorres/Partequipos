@@ -64,7 +64,7 @@ export const CategoriaUsada: CollectionConfig = {
       defaultValue: true,
       admin: {
         description:
-          "Marcada, la categoría sale dentro de «Otros» (menú e índice de usados). Desmarcada, sale sola en el primer nivel, como Excavadoras y Aditamentos. Su página no cambia.",
+          "Marcada, la categoría sale dentro de «Otros» (menú e índice de usados). Desmarcada, sale sola en el primer nivel, como Excavadora y Aditamentos. Su página no cambia.",
       },
     },
     // Ocultar sin borrar (2026-10-20, dirección: Compactadores). Ver `getCategoriasUsada`.

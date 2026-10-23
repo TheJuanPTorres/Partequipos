@@ -77,7 +77,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  * en ninguna página). Como la página de tipo de nueva (#310): cabecera, las tarjetas de equipo
  * (`TarjetaEquipo`) agrupadas por marca y tipo con su subtítulo («Excavadoras Hitachi»), con la
  * regla de tarjetas, y el formulario al final. Desde el 2026-10-23 es también la PÁGINA GENERAL
- * de cada tipo (tarea 9): banner «Maquinaria Tipo {Nombre} Nueva», sin el título «Modelos de …»,
+ * de cada tipo (tarea 9): banner «Maquinaria Pesada {Nombre} Nuevo/Nueva», sin el título «Modelos de …»,
  * cada grupo (marca y tipo) empieza con la franja de su marca (`FranjaMarca`, la de la ficha
  * nueva), y solo marcas: sin los aditamentos. Las URL de su antigua paginación (`pagina/<n>/`)
  * dan 301 aquí; con filtros en la query, la canónica es la de siempre, sin query.
@@ -169,7 +169,7 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
             </div>
           ))
         ) : (
-          <p>{`Todavía no hay equipos publicados de ${titulo.toLowerCase()}.`}</p>
+          <p>{`Todavía no hay equipos publicados de ${titulo}.`}</p>
         )}
       </section>
 

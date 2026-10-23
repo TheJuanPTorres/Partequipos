@@ -140,7 +140,7 @@ export type EtiquetasEnlaces = {
  */
 export function enlacesDeUsada(etiquetas: EtiquetasEnlaces = {}): EnlaceUsada[] {
   return [
-    { clave: SLUG_EXCAVADORAS, texto: etiquetas.excavadoras, defecto: "Excavadoras" },
+    { clave: SLUG_EXCAVADORAS, texto: etiquetas.excavadoras, defecto: "Excavadora" },
     { clave: SEGMENTO_OTROS_USADA, texto: etiquetas.otros, defecto: "Otros" },
     {
       clave: SLUG_CATEGORIA_USADA_ADITAMENTOS,

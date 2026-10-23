@@ -246,7 +246,7 @@ export function SeccionMaquinariaUsada({
         <div className={estilos.panel}>
           <CarruselUsada
             id="portada-usada-excavadoras"
-            etiqueta={`Unidades usadas: ${enlaces[0]?.etiqueta ?? "Excavadoras"}`}
+            etiqueta={`Unidades usadas: ${enlaces[0]?.etiqueta ?? "Excavadora"}`}
             nombres={excavadoras.map((e) => e.nombre)}
             tarjetas={hechas("")}
             copias={hechas("-copia")}

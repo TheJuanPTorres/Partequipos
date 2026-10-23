@@ -272,7 +272,7 @@ export const EquipoUsado: CollectionConfig = {
       defaultValue: "categoria",
       label: "Pestaña en la portada",
       options: [
-        { label: "Según su categoría (Excavadoras u Otros)", value: "categoria" },
+        { label: "Según su categoría (Excavadora u Otros)", value: "categoria" },
         { label: "Aditamentos", value: "aditamentos" },
       ],
       admin: {

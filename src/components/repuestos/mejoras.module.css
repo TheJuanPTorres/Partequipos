@@ -99,6 +99,35 @@
   font-weight: 400;
 }
 
+/*
+ * Barra de MARCAS de nueva (2026-10-23): el logo en lugar del texto, entero en una caja de
+ * 22 px de alto (la pastilla sigue en 40). Activa, sobre el color de la marca, el logo en una
+ * sola tinta: blanco sobre colores oscuros y negro sobre claros (`data-tinta`, por contraste).
+ */
+.barraConLogo {
+  padding: 0 16px;
+}
+
+.barraLogo {
+  display: block;
+  width: auto;
+  max-width: 96px;
+  height: 22px;
+  transition:
+    filter 0.2s,
+    opacity 0.2s;
+}
+
+.barraEnlace[aria-current][data-tinta="clara"] .barraLogo {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
+.barraEnlace[aria-current][data-tinta="oscura"] .barraLogo {
+  filter: brightness(0);
+  opacity: 1;
+}
+
 @media (max-width: 1024px) {
   .barraSeries {
     top: 79px;
@@ -114,7 +143,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .barraEnlace {
+  .barraEnlace,
+  .barraLogo {
     transition: none;
   }
 }

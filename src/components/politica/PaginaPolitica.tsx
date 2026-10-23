@@ -7,6 +7,7 @@ import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ANIMACIONES_POLITICA, etiquetaCorta } from "@/lib/politica/animaciones";
 import type { Pagina } from "@/payload-types";
+import type { ImagenLista } from "@/lib/utils/relations";
 import { buildBreadcrumbJsonLd, type BreadcrumbItem } from "@/lib/seo/jsonLd";
 
 import marca from "@/components/repuestos/marca.module.css";
@@ -34,12 +35,15 @@ export function PaginaPolitica({
   contenido,
   secciones,
   migas,
+  fondo,
 }: {
   titulo: string;
   entradilla?: string | null;
   contenido?: unknown;
   secciones: Seccion[];
   migas: BreadcrumbItem[];
+  /** «Foto de fondo del encabezado» de la página: con ella, el velo; sin ella, la tarjeta oscura. */
+  fondo: ImagenLista | null;
 }) {
   const conSelector = secciones.length > 1;
   return (
@@ -60,7 +64,7 @@ export function PaginaPolitica({
             linea1: titulo,
             linea2: "",
             descripcion: "",
-            fondo: null,
+            fondo,
             logo: null,
           }}
           anclaSiguiente={ANCLA_INICIO}

@@ -1,8 +1,17 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+} from "react";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import { CURVA, CURVA_FRENADA, DURACION_DESLIZAR_MS, DURACION_MS } from "@/lib/listado/animaciones";
+import type { LogoConAlt } from "@/lib/marca/logoMarca";
 
 import mejoras from "./mejoras.module.css";
 
@@ -27,6 +36,10 @@ import mejoras from "./mejoras.module.css";
  *
  * También es el selector «Garantía · Devolución» de la página de garantías (V3, 2026-10-23):
  * sin cuenta, con su nombre accesible y sin la entrada escalonada (`entrada={false}`).
+ *
+ * Y la BARRA DE MARCAS de las páginas generales de tipo de nueva (2026-10-23): cada pastilla con
+ * el logo de su marca (`LogoMarca`) y su nombre como `aria-label`; la activa, del color de la
+ * marca, con el logo en blanco si se lee (3:1) y negro solo en los claros (`tintaDeLogoSobre`).
  */
 export function BarraSeries({
   series,
@@ -34,8 +47,18 @@ export function BarraSeries({
   entrada = true,
   className,
 }: {
-  /** `total` es opcional: sin él, la pastilla lleva solo el título (la página de garantías). */
-  series: { ancla: string; titulo: string; total?: number }[];
+  /**
+   * `total` es opcional: sin él, la pastilla lleva solo el título (la página de garantías). Con
+   * `logo`, el logo en lugar del título, que queda como nombre accesible (la barra de marcas de
+   * nueva); con `color`, la pastilla activa toma ese fondo y el logo, su tinta.
+   */
+  series: {
+    ancla: string;
+    titulo: string;
+    total?: number;
+    logo?: LogoConAlt | null;
+    color?: { fondo: string; tinta: string };
+  }[];
   /** Nombre accesible de la barra. */
   etiqueta?: string;
   /** `false`: al llegar a una sección, sus tarjetas no entran escalonadas (no hay tarjetas). */
@@ -174,11 +197,25 @@ export function BarraSeries({
           <li key={s.ancla}>
             <a
               href={`#${s.ancla}`}
-              className={mejoras.barraEnlace}
+              className={`${mejoras.barraEnlace} ${s.logo ? mejoras.barraConLogo : ""}`}
               aria-current={actual === s.ancla ? "true" : undefined}
+              aria-label={s.logo ? s.titulo : undefined}
+              style={
+                s.color
+                  ? ({
+                      "--marca-amarillo": s.color.fondo,
+                      "--marca-tinta": s.color.tinta,
+                    } as CSSProperties)
+                  : undefined
+              }
+              data-tinta={s.color ? (s.color.tinta === "#ffffff" ? "clara" : "oscura") : undefined}
               onClick={(e) => irA(e, s.ancla)}
             >
-              {s.titulo}
+              {s.logo ? (
+                <LogoMarca logo={s.logo} alt="" sizes="96px" className={mejoras.barraLogo} />
+              ) : (
+                s.titulo
+              )}
               {s.total === undefined ? null : (
                 <>
                   {" "}

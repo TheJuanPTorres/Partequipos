@@ -31,18 +31,33 @@ export function IndiceArticulo({
       .map((t) => document.getElementById(t.id))
       .filter((e): e is HTMLElement => e !== null);
     if (!elementos.length) return;
-    const observador = new IntersectionObserver(
-      (entradas) => {
-        const visibles = entradas
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visibles[0]) setActivo(visibles[0].target.id);
-      },
-      // La banda de lectura: del 10 % al 35 % de la altura de la ventana.
-      { rootMargin: "-10% 0px -65% 0px" },
-    );
-    elementos.forEach((e) => observador.observe(e));
-    return () => observador.disconnect();
+    // La sección actual es la última cuyo título ya pasó la línea de lectura
+    // (35 % de la ventana). Se recalcula al hacer scroll, al cambiar el ancla
+    // y al cambiar el tamaño: no depende de que un título cruce una banda.
+    let pendiente = 0;
+    const calcular = () => {
+      pendiente = 0;
+      const linea = window.innerHeight * 0.35;
+      let actual: string | null = null;
+      for (const e of elementos) {
+        if (e.getBoundingClientRect().top <= linea) actual = e.id;
+        else break;
+      }
+      setActivo(actual);
+    };
+    const programar = () => {
+      if (!pendiente) pendiente = requestAnimationFrame(calcular);
+    };
+    calcular();
+    window.addEventListener("scroll", programar, { passive: true });
+    window.addEventListener("resize", programar);
+    window.addEventListener("hashchange", programar);
+    return () => {
+      cancelAnimationFrame(pendiente);
+      window.removeEventListener("scroll", programar);
+      window.removeEventListener("resize", programar);
+      window.removeEventListener("hashchange", programar);
+    };
   }, [titulos]);
 
   if (titulos.length < 2) return null;
@@ -51,7 +66,11 @@ export function IndiceArticulo({
     <ol className={estilos.listaIndice}>
       {titulos.map((t) => (
         <li key={t.id} data-nivel={t.nivel}>
-          <a href={`#${t.id}`} aria-current={activo === t.id ? "location" : undefined}>
+          <a
+            href={`#${t.id}`}
+            aria-current={activo === t.id ? "location" : undefined}
+            onClick={() => setActivo(t.id)}
+          >
             {t.texto}
           </a>
         </li>

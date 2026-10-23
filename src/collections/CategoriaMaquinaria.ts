@@ -47,6 +47,20 @@ export const CategoriaMaquinaria: CollectionConfig = {
     // redirección puede salir de su URL: la taparía (2026-10-23).
     slugField({ unique: true, validate: slugCategoriaNuevaValido }),
     { name: "descripcion", type: "textarea", label: "Descripción" },
+    /*
+     * Foto de la tarjeta de la categoría en el índice de tipos de maquinaria nueva (2026-10-23,
+     * dirección: la misma de su tarjeta en WordPress). Vacía, la del primer equipo con foto.
+     */
+    {
+      name: "imagen",
+      type: "upload",
+      relationTo: "media",
+      label: "Imagen de la tarjeta",
+      admin: {
+        description:
+          "Opcional. Foto de la categoría para su tarjeta en el índice de tipos de maquinaria nueva. Si la dejas vacía, se usa la primera foto del primer equipo de la categoría.",
+      },
+    },
     {
       name: "tiposIncluidos",
       type: "relationship",

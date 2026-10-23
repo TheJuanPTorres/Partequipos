@@ -8,7 +8,10 @@
  *   npm run preview:ejecutar -- payload run scripts/nueva/tipos-generales.ts listar
  *   npm run preview:ejecutar -- payload run scripts/nueva/tipos-generales.ts aplicar
  *   npm run preview:ejecutar -- payload run scripts/nueva/tipos-generales.ts retirar
+ *   npm run preview:ejecutar -- payload run scripts/nueva/tipos-generales.ts probar-guarda
  *
+ * `probar-guarda` comprueba por su efecto que el panel no deja crear una categoría tapada por una
+ * redirección: crea un 301 de prueba, intenta la categoría (debe fallar con el mensaje) y lo borra.
  * `listar` solo lee (tipos con su marca y sus equipos, categorías y redirecciones de nueva).
  * `aplicar` guarda en un manifiesto lo que crea; `retirar` borra exactamente eso. Solo el preview
  * (guarda del hero de prueba).
@@ -28,8 +31,8 @@ const fallar = (m: string): never => {
 };
 const modo = process.argv
   .slice(2)
-  .find((a) => a === "listar" || a === "aplicar" || a === "retirar");
-if (!modo) fallar("indica el modo: listar, aplicar o retirar");
+  .find((a) => ["listar", "aplicar", "retirar", "probar-guarda"].includes(a));
+if (!modo) fallar("indica el modo: listar, aplicar, retirar o probar-guarda");
 const guarda = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
 if (!guarda.permitido) fallar(`NO se hace nada: ${guarda.motivo}`);
 
@@ -83,7 +86,39 @@ const idTipo = new Map(
   tipos.docs.map((t) => [`${slugMarca.get(idDe(t.marca) ?? -1)}/${t.slug}`, t.id]),
 );
 
-if (modo === "listar") {
+if (modo === "probar-guarda") {
+  const SLUG = "prueba-guarda-redireccion";
+  const red = await payload.create({
+    collection: "redirects",
+    data: {
+      desde: `/maquinaria-pesada/maquinaria-pesada-nueva/${SLUG}/`,
+      hacia: "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/",
+      tipo: "301",
+      origen: "manual",
+    },
+  });
+  let mensaje = "";
+  try {
+    const c = await payload.create({
+      collection: "categorias-maquinaria",
+      data: { nombre: "PRUEBA guarda", slug: SLUG },
+    });
+    await payload.delete({ collection: "categorias-maquinaria", id: c.id });
+  } catch (e) {
+    mensaje =
+      e instanceof Error ? JSON.stringify((e as { data?: unknown }).data ?? e.message) : String(e);
+  } finally {
+    await payload.delete({ collection: "redirects", id: red.id });
+  }
+  const sinRed = await payload.create({
+    collection: "categorias-maquinaria",
+    data: { nombre: "PRUEBA guarda", slug: SLUG },
+  });
+  await payload.delete({ collection: "categorias-maquinaria", id: sinRed.id });
+  if (!mensaje.includes("taparía")) fallar(`la categoría se creó con el 301 delante: ${mensaje}`);
+  log(`✓ con el 301, rechazada: ${mensaje}`);
+  log("✓ sin el 301, se crea (y se borra); el 301 de prueba, borrado");
+} else if (modo === "listar") {
   const equipos = await payload.find({
     collection: "equipos-nuevos",
     limit: 0,

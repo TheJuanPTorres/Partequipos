@@ -38,8 +38,8 @@ import estilos from "./marca.module.css";
  * `bajo` (página de modelo de repuestos, 2026-10-19): la tarjeta baja con o sin
  * foto; el texto largo del modelo va después, junto a su foto.
  *
- * `centrado` (páginas de categoría técnica, 2026-10-22): la tarjeta de siempre (630 px) con el
- * contenido centrado en vertical; sin logo, quedaba arriba con un hueco debajo.
+ * EL CONTENIDO VA SIEMPRE CENTRADO EN VERTICAL (dirección, 2026-10-22, en toda la web): en
+ * todas las variantes, también en la tarjeta de siempre (630 px), que lo dejaba arriba.
  */
 export function HeroMarca({
   vista,
@@ -49,7 +49,6 @@ export function HeroMarca({
   indice = false,
   bajo = false,
   tituloLargo = false,
-  centrado = false,
   etiquetaRaton,
   migas,
 }: {
@@ -65,8 +64,6 @@ export function HeroMarca({
   bajo?: boolean;
   /** Títulos largos de una sola línea (los de WordPress de cada modelo): más pequeños en móvil. */
   tituloLargo?: boolean;
-  /** El contenido centrado en vertical en la tarjeta de siempre. */
-  centrado?: boolean;
   /** Nombre accesible del icono del ratón. */
   etiquetaRaton?: string;
   /**
@@ -77,13 +74,14 @@ export function HeroMarca({
 }) {
   const { fondo, logo } = vista;
   const baja = bajo || (bajaSinFoto && !fondo);
+  // `bajo` e `indice` a la vez («Trabaja con nosotros», 2026-10-23): la altura de la baja con
+  // el velo del índice, que deja el antetítulo en AA sobre la foto. Solo con `bajo` explícito:
+  // la baja por `bajaSinFoto` (el índice del blog) se queda como estaba.
   const variante = baja
-    ? estilos.heroBajo
+    ? `${estilos.heroBajo} ${bajo && indice ? estilos.heroBajoIndice : ""}`
     : indice
       ? estilos.heroIndice
-      : centrado
-        ? estilos.heroCentrado
-        : "";
+      : "";
   return (
     <section className={`${estilos.heroSeccion} ${franja ? "" : estilos.heroSeccionPlano}`}>
       <div className={`${estilos.hero} ${variante}`}>

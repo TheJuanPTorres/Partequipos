@@ -52,6 +52,13 @@ export const ETIQUETAS_DATOS = {
    * del artículo y el de la categoría.
    */
   blog: "datos:blog",
+  /**
+   * Las vacantes de «Trabaja con nosotros» (`src/lib/vacantes/fuente.ts`,
+   * 2026-10-23): lo guardado en el global «Vacantes de Buk» y, cada 6 horas,
+   * la lectura del portal de Buk. La invalida el gancho de ese global (el
+   * interruptor) y `POST /api/revalidar/`.
+   */
+  vacantes: "datos:vacantes",
 } as const;
 
 /**

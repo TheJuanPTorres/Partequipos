@@ -24,7 +24,7 @@ import { canalesDeContacto } from "@/lib/indices/paginasIndice";
 import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
 import { getEmpresa, getHorario } from "@/lib/queries/getSeo";
 import { getVideoPorId } from "@/lib/queries/getVideos";
-import { rutas } from "@/lib/routes";
+import { rutas, SLUGS_CON_RUTA_PROPIA } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { textoDias, textoHora } from "@/lib/seo/horario";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -70,6 +70,8 @@ export async function generateStaticParams(): Promise<Params[]> {
   return [
     ...paginas
       .filter((p) => p.slug !== SLUG_PORTADA) // la portada la sirve `/`
+      // «Trabaja con nosotros» y las demás con ruta propia las sirve su ruta.
+      .filter((p) => !SLUGS_CON_RUTA_PROPIA.includes(p.slug))
       .map((p) => ({ slug: p.slug.split("/").filter(Boolean) })),
     // Los artículos son siempre de un solo segmento.
     ...articulos.map((a) => ({ slug: [a.slug] })),

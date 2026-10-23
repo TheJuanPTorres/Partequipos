@@ -9,6 +9,7 @@ import {
   redDelPie,
   redesDelPie,
   validarDestinoPie,
+  validarDocumentoPie,
 } from "./pie";
 
 describe("pie: columnas", () => {
@@ -110,5 +111,68 @@ describe("pie: orden de las redes (ux-9)", () => {
       "https://www.pinterest.com/partequipos/",
     ]);
     assert.deepEqual(r, [{ nombre: "Facebook", url: "https://www.facebook.com/primera" }]);
+  });
+});
+
+describe("pie: enlaces externos, documento en el visor y WhatsApp (2026-10-22)", () => {
+  const columna = (enlaces: unknown[]) =>
+    columnasDelPie([{ titulo: "Navegación", enlaces }] as never, "+57 300 000 0000")[0]?.enlaces;
+
+  it("una dirección https:// de otro sitio es externa (pestaña nueva); una ruta o el propio sitio, no", () => {
+    const e = columna([
+      {
+        etiqueta: "Zona de clientes",
+        tipo: "pagina",
+        destino: "https://portal.ejemplo.com/#/sap/x",
+      },
+      { etiqueta: "Nosotros", tipo: "pagina", destino: "/nosotros/" },
+      { etiqueta: "Propio", tipo: "pagina", destino: "https://partequipos.com/nosotros/" },
+    ]);
+    assert.deepEqual(
+      e?.map((x) => [x.etiqueta, x.externo ?? false]),
+      [
+        ["Zona de clientes", true],
+        ["Nosotros", false],
+        ["Propio", false],
+      ],
+    );
+  });
+
+  it("«Documento en el visor»: el enlace es el PDF y lleva sus páginas; sin documento poblado, no sale", () => {
+    const documento = {
+      id: 9,
+      titulo: "Línea ética",
+      url: "https://blob.ejemplo.com/linea-etica.pdf",
+      filesize: 92_192,
+      paginas: [{ id: 3, url: "https://blob.ejemplo.com/p1.webp", width: 1600, height: 2071 }],
+    };
+    const e = columna([
+      { etiqueta: "Línea Ética", tipo: "documento", documento },
+      { etiqueta: "Sin poblar", tipo: "documento", documento: 9 },
+    ]);
+    assert.equal(e?.length, 1);
+    assert.equal(e?.[0]?.href, documento.url);
+    assert.equal(e?.[0]?.documento?.titulo, "Línea Ética");
+    assert.equal(e?.[0]?.documento?.paginas.length, 1);
+  });
+
+  it("el documento es obligatorio solo con ese tipo; el destino no se pide con él", () => {
+    assert.equal(validarDocumentoPie(null, { siblingData: { tipo: "pagina" } }), true);
+    assert.notEqual(validarDocumentoPie(null, { siblingData: { tipo: "documento" } }), true);
+    assert.equal(validarDocumentoPie(9, { siblingData: { tipo: "documento" } }), true);
+    assert.equal(validarDestinoPie("", { siblingData: { tipo: "documento" } }), true);
+  });
+
+  it("WhatsApp sale del número de la empresa, al final de las redes", () => {
+    const r = redesDelPie(
+      ["https://www.youtube.com/@x", "https://www.linkedin.com/company/x/"],
+      "+57 317 000 0000",
+    );
+    assert.deepEqual(
+      r.map((x) => x.nombre),
+      ["LinkedIn", "YouTube", "WhatsApp"],
+    );
+    assert.equal(r.at(-1)?.url, "https://wa.me/573170000000");
+    assert.equal(redesDelPie(["https://www.youtube.com/@x"], "").length, 1);
   });
 });

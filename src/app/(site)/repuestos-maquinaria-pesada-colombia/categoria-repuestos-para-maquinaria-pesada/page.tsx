@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { BaldosasCategorias } from "@/components/repuestos/BaldosasCategorias";
 import { CierreRepuestos } from "@/components/repuestos/CierreRepuestos";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { PlacasMarcas } from "@/components/repuestos/PlacasMarcas";
-import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
+import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
 import { getMarcas } from "@/lib/queries/getMarcas";
 import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
+import { ANIMACIONES_CATEGORIAS } from "@/lib/repuestos/animacionesCategorias";
 import { fondoDeRespaldo, placasDeMarcas, vistaEncabezadoIndice } from "@/lib/repuestos/categoria";
 import { tarjetasDeCategorias } from "@/lib/repuestos/plantillaTipo";
 import { rutas } from "@/lib/routes";
@@ -42,6 +44,11 @@ const ANCLA = "categorias-repuestos";
  * «Ver todo»), con la «Imagen de la tarjeta» de cada una, en lugar de las píldoras
  * con icono. El encabezado lleva su propia foto («Páginas índice y contacto»);
  * vacía, la de respaldo de siempre.
+ *
+ * Desde el 2026-10-22 (dirección), las categorías van en BALDOSAS como las del índice de
+ * marcas (`BaldosasCategorias`: 5 por fila, 3 en tablet, 2 en móvil) y la página lleva tres
+ * animaciones con su interruptor (`ANIMACIONES_CATEGORIAS`, C1–C3), probables en un preview con
+ * `?anim=`.
  */
 export default async function CategoriasRepuestosIndexPage() {
   const [global, categorias, marcas, indice] = await Promise.all([
@@ -63,23 +70,27 @@ export default async function CategoriasRepuestosIndexPage() {
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <HeroMarca
-        vista={vistaEncabezadoIndice(
-          global.tituloHero?.trim() || "Repuestos para maquinaria pesada",
-          "Categorías técnicas",
-          DESCRIPCION,
-          imagenDeMedia(indice.categoriasRepuestos?.fondo, "") ?? fondoDeRespaldo(marcas),
-        )}
-        anclaSiguiente={ANCLA}
-      />
+      <ZonaAnimada
+        interruptores={ANIMACIONES_CATEGORIAS}
+        permitirUrl={process.env.VERCEL_ENV !== "production"}
+        entrada="C1"
+      >
+        <HeroMarca
+          vista={vistaEncabezadoIndice(
+            global.tituloHero?.trim() || "Repuestos para maquinaria pesada",
+            "Categorías técnicas",
+            DESCRIPCION,
+            imagenDeMedia(indice.categoriasRepuestos?.fondo, "") ?? fondoDeRespaldo(marcas),
+          )}
+          anclaSiguiente={ANCLA}
+        />
 
-      <TarjetasMarca
-        id={ANCLA}
-        titulo={global.tituloCategorias?.trim() || "Nuestras categorías de repuestos"}
-        verTodo="Ver todo"
-        tarjetas={tarjetasDeCategorias(categorias)}
-        indice
-      />
+        <BaldosasCategorias
+          id={ANCLA}
+          titulo={global.tituloCategorias?.trim() || "Nuestras categorías de repuestos"}
+          categorias={tarjetasDeCategorias(categorias)}
+        />
+      </ZonaAnimada>
 
       <PlacasMarcas
         id="marcas-repuestos"

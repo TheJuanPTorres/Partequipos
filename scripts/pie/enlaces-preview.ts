@@ -7,7 +7,8 @@
  *   «Call center» y «Financiación», y en «Contacto» la PQRSF y la «Línea Ética»
  *   (tipo «Documento en el visor»);
  * - en «SEO y datos de la empresa», la dirección de LinkedIn real en lugar de
- *   la de ejemplo (o añadida, si no hay ninguna).
+ *   la de ejemplo (o añadida, si no hay ninguna), y fuera X y TikTok (dirección,
+ *   2026-10-23: en el pie no van).
  *
  * Las páginas del PDF para el visor, después, con `scripts/documentos/visor.ts
  * paginas preview documento=<id> carpeta=… manifiesto=…` (su propio manifiesto).
@@ -119,7 +120,9 @@ if (modo === "aplicar") {
   });
   await payload.updateGlobal({ slug: "pie", data: { columnas } });
 
-  const redes = (seo.empresa?.redes ?? []).filter((r) => !/linkedin\.com\//i.test(r.url));
+  const redes = (seo.empresa?.redes ?? []).filter(
+    (r) => !/linkedin\.com\/|^https:\/\/(www\.)?(x|twitter|tiktok)\.com\//i.test(r.url),
+  );
   redes.unshift({ url: LINKEDIN } as (typeof redes)[number]);
   await payload.updateGlobal({ slug: "seo", data: { empresa: { ...seo.empresa, redes } } });
   log("pie y redes actualizados");

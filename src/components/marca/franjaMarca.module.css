@@ -140,7 +140,13 @@
   object-fit: cover;
 }
 
-/* Con D1, la foto se tiñe un poco del color para fundirse con él. */
+/* Con D1, la foto se funde con el color: su blanco (las fotos de producto sobre fondo blanco)
+   toma el del degradado (`multiply`), y un velo del color la tiñe por la izquierda. */
+[data-anim~="D1"][data-anim~="D3"] .foto {
+  mix-blend-mode: multiply;
+}
+
+/* El velo. */
 [data-anim~="D1"][data-anim~="D3"] .foto::after {
   position: absolute;
   inset: 0;
@@ -249,8 +255,9 @@
     padding-right: 4px;
   }
 
+  /* En el teléfono, el tamaño de siempre (más grande partía «Vibrocompactador»): solo más peso. */
   [data-anim~="D1"] .titulo {
-    font-size: calc(var(--texto-titulo-bloque) * 1.05);
+    font-size: var(--texto-titulo-bloque);
   }
 
   /*

@@ -76,6 +76,7 @@ import * as migration_20261022_014813_lubricantes_lineas_paginas from './2026102
 import * as migration_20261022_164312_blog_diseno_articulo from './20261022_164312_blog_diseno_articulo';
 import * as migration_20261023_045614_pie_enlace_documento from './20261023_045614_pie_enlace_documento';
 import * as migration_20261023_062354_trabaja_con_nosotros from './20261023_062354_trabaja_con_nosotros';
+import * as migration_20261023_150157_productos_mostrar_en_web from './20261023_150157_productos_mostrar_en_web';
 
 export const migrations = [
   {
@@ -466,6 +467,11 @@ export const migrations = [
   {
     up: migration_20261023_062354_trabaja_con_nosotros.up,
     down: migration_20261023_062354_trabaja_con_nosotros.down,
-    name: '20261023_062354_trabaja_con_nosotros'
+    name: '20261023_062354_trabaja_con_nosotros',
+  },
+  {
+    up: migration_20261023_150157_productos_mostrar_en_web.up,
+    down: migration_20261023_150157_productos_mostrar_en_web.down,
+    name: '20261023_150157_productos_mostrar_en_web'
   },
 ];

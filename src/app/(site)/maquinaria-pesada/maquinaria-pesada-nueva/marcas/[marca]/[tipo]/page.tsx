@@ -99,7 +99,7 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
     { nombre: "Maquinaria pesada", path: rutas.maquinaria() },
-    { nombre: "Nueva", path: rutas.nueva() },
+    { nombre: "Nueva", path: rutas.nuevaTipos() },
     { nombre: "Marcas", path: rutas.marcasMaquinaria() },
     { nombre: marca.nombre, path: rutas.marcaMaquinaria(marca.slug) },
     { nombre: tipo.nombre, path: rutas.tipoMaquinaria(marca.slug, tipo.slug) },

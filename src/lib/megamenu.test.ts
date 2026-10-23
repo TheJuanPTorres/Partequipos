@@ -95,7 +95,8 @@ describe("megamenú: maquinaria", () => {
 
   it("nueva: por marca (sin aditamentos, en orden alfabético) y por tipo", () => {
     const nueva = panel.grupos[0]!;
-    assert.equal(nueva.enlaces[0]?.href, "/maquinaria-pesada/maquinaria-pesada-nueva/");
+    // «Ver toda la maquinaria nueva» lleva al índice de tipos (2026-10-23).
+    assert.equal(nueva.enlaces[0]?.href, "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/");
     assert.deepEqual(titulos(nueva.grupos), ["Por marca", "Por tipo de máquina"]);
     const porMarca = nueva.grupos[0]!;
     assert.deepEqual(titulos(porMarca.grupos), ["Case Construction", "Yanmar"]);
@@ -117,9 +118,14 @@ describe("megamenú: maquinaria", () => {
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/",
       },
     ]);
-    // TODOS los tipos, en el orden de la web antigua: la categoría que mezcla marcas a su página,
-    // los de una sola marca a la de su tipo; nunca a un listado.
+    // «Ver todos los tipos de máquina» primero, al índice de tipos (2026-10-23); después TODOS los
+    // tipos, en el orden de la web antigua: el que tiene categoría a su página general, los que
+    // aún no la tienen a la de su tipo en la marca; nunca a un listado.
     assert.deepEqual(nueva.grupos[1]!.enlaces, [
+      {
+        etiqueta: "Ver todos los tipos de máquina",
+        href: "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/",
+      },
       {
         etiqueta: "Bulldozers",
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/bulldozer/",
@@ -134,6 +140,25 @@ describe("megamenú: maquinaria", () => {
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/",
       },
     ]);
+  });
+
+  it("un tipo con su página general (categoría) va a ella, aunque sea de una sola marca", () => {
+    const conGeneral = panelMaquinaria({
+      ...DATOS,
+      categoriasNueva: [
+        ...DATOS.categoriasNueva,
+        { id: 22, nombre: "Bulldozers", slug: "bulldozers", tiposIncluidos: [12] },
+      ],
+    });
+    const porTipo = conGeneral.grupos[0]!.grupos[1]!.enlaces;
+    assert.deepEqual(porTipo[1], {
+      etiqueta: "Bulldozers",
+      href: "/maquinaria-pesada/maquinaria-pesada-nueva/bulldozers/",
+    });
+    assert.equal(
+      porTipo.some((e) => e.href.endsWith("/case-construction/bulldozer/")),
+      false,
+    );
   });
 
   it("usada: como en WordPress, las de primer nivel por su orden y «Otros» al final", () => {

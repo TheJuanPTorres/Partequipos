@@ -47,7 +47,7 @@ describe("ordenarTiposNueva", () => {
 });
 
 describe("unaEntradaPorTipo", () => {
-  it("categoría de varias marcas gana al tipo; la de una sola marca, no; las vacías no llegan", () => {
+  it("la categoría gana SIEMPRE al tipo, aunque sea de una sola marca (página general, 2026-10-23)", () => {
     const r = unaEntradaPorTipo(
       [
         { nombre: "EXCAVADORAS", marcas: 2, dato: "cat-excavadoras" },
@@ -59,7 +59,18 @@ describe("unaEntradaPorTipo", () => {
         { nombre: "Excavadoras", dato: "tipo-excavadoras" },
       ],
     );
-    assert.deepEqual(r, ["tipo-bulldozer", "cat-excavadoras", "cat-compactadoras"]);
+    assert.deepEqual(r, ["cat-bulldozer", "cat-excavadoras", "cat-compactadoras"]);
+  });
+
+  it("un tipo sin categoría sale con su página de marca (mientras se crea la general)", () => {
+    const r = unaEntradaPorTipo(
+      [{ nombre: "Excavadoras", marcas: 2, dato: "cat-excavadoras" }],
+      [
+        { nombre: "Retrocargadoras", dato: "tipo-retro" },
+        { nombre: "Bulldozers", dato: "tipo-bulldozer" },
+      ],
+    );
+    assert.deepEqual(r, ["tipo-bulldozer", "cat-excavadoras", "tipo-retro"]);
   });
 
   it("dos categorías con el mismo tipo: la de más marcas", () => {

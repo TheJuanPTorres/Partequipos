@@ -74,7 +74,7 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
     { nombre: "Maquinaria pesada", path: rutas.maquinaria() },
-    { nombre: "Nueva", path: rutas.nueva() },
+    { nombre: "Nueva", path: rutas.nuevaTipos() },
     { nombre: categoria.nombre, path: rutas.categoriaNueva(categoria.slug) },
   ];
 

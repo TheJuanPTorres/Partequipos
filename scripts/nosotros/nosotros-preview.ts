@@ -225,7 +225,7 @@ function bloques(ids: Record<ClaveImagen, number>, video: number, animacion: num
           titulo: "Maquinaria pesada nueva",
           texto: DYNAPAC,
           imagen: ids.tarjetaNueva,
-          enlace: "/maquinaria-pesada/maquinaria-pesada-nueva/",
+          enlace: "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/",
         },
         {
           titulo: "Maquinaria pesada usada",

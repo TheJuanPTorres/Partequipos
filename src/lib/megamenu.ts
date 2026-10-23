@@ -246,9 +246,10 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
     grupos: marcas.filter((m) => m.slug !== SLUG_ADITAMENTOS).map((m) => deMarca(m)),
   };
   // «Por tipo de máquina» (2026-10-22, dirección): TODOS los tipos, en el orden de la web antigua
-  // (`ordenTipos.ts`), como el índice de tipos. Los de varias marcas van a su categoría que las
-  // mezcla; los de una sola, a la página de su tipo (casilla «Tarjeta en el índice de tipos»).
-  // Sin equipos, no salen. «Aditamentos» sigue con su entrada propia.
+  // (`ordenTipos.ts`), como el índice de tipos. Cada uno va a su página GENERAL, la categoría de
+  // nueva, aunque solo tenga una marca (2026-10-23, tarea 9); solo un tipo SIN categoría va a la
+  // página de su tipo en su marca (casilla «Tarjeta en el índice de tipos»). Sin equipos, no
+  // salen. «Aditamentos» sigue con su entrada propia.
   const idRel = (v: number | { id: number } | null | undefined) =>
     typeof v === "number" ? v : (v?.id ?? null);
   const slugDeMarca = new Map(d.marcasMaquinaria.map((m) => [m.id, m.slug]));
@@ -284,15 +285,24 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
           ]
         : [];
     });
+  const tiposDelMenu = unaEntradaPorTipo(deCategorias, deTipos);
+  const verTodosLosTipos = {
+    etiqueta: "Ver todos los tipos de máquina",
+    href: conBarra(rutas.nuevaTipos()),
+  };
   const porTipo: GrupoMenu = {
     titulo: "Por tipo de máquina",
-    // Una entrada por tipo, en el orden de la web antigua (`ordenTipos.ts`).
-    enlaces: unaEntradaPorTipo(deCategorias, deTipos),
+    // «Ver todos los tipos de máquina» al índice de tipos (dirección, 2026-10-23), como «Ver todas
+    // las categorías» de repuestos; después, una entrada por tipo, en el orden de la web antigua
+    // (`ordenTipos.ts`). Sin tipos con equipos, el grupo no sale (ni este enlace).
+    enlaces: tiposDelMenu.length > 0 ? [verTodosLosTipos, ...tiposDelMenu] : [],
     grupos: [],
   };
   const nueva: GrupoMenu = {
     titulo: "Maquinaria pesada nueva",
-    enlaces: [{ etiqueta: "Ver toda la maquinaria nueva", href: conBarra(rutas.nueva()) }],
+    // El índice de tipos es la página principal de nueva (dirección, 2026-10-23): la de «Por
+    // marca» / «Por tipo» da 301 allí.
+    enlaces: [{ etiqueta: "Ver toda la maquinaria nueva", href: conBarra(rutas.nuevaTipos()) }],
     // Sin marcas no hay «Por marca»; sin categorías, no hay «Por tipo».
     grupos: [
       ...(porMarca.grupos.length > 0 ? [porMarca] : []),

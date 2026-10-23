@@ -26,7 +26,7 @@ describe("marcas de nueva ocultas: los 301", () => {
 
   it("sin destino, al índice de maquinaria nueva", () => {
     const [r] = redirectsDeMarcasOcultas([{ slug: "marca-x", destino: null }], []);
-    assert.equal(r?.hacia, `${NUEVA}/`);
+    assert.equal(r?.hacia, `${NUEVA}/tipos/`);
   });
 
   it("no duplica una ruta que ya tiene redirect en la colección, ni hijos de otra marca", () => {

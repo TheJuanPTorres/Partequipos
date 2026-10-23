@@ -18,8 +18,9 @@ describe("clasificarDestino — rutas estáticas", () => {
     "/repuestos-maquinaria-pesada-colombia/",
     R + "/",
     "/maquinaria-pesada/",
-    "/maquinaria-pesada/maquinaria-pesada-nueva/",
     M + "/",
+    // El índice de tipos, la página principal de nueva (2026-10-23).
+    "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/",
     "/maquinaria-pesada/maquinaria-pesada-usada/",
     // «Otros» de usados (2026-10-19), destino de /elementor-48399/.
     "/maquinaria-pesada/maquinaria-pesada-usada/otros/",
@@ -29,6 +30,13 @@ describe("clasificarDestino — rutas estáticas", () => {
       assert.equal(clasificarDestino(ruta).clase, "estatica");
     });
   }
+
+  it("el índice de nueva ya no es destino: da 301 al de tipos (dos saltos)", () => {
+    assert.equal(
+      clasificarDestino("/maquinaria-pesada/maquinaria-pesada-nueva/").clase,
+      "sin-ruta",
+    );
+  });
 
   it("es indiferente a la barra final", () => {
     assert.deepEqual(clasificarDestino("/noticias"), clasificarDestino("/noticias/"));

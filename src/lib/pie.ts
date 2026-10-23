@@ -178,7 +178,7 @@ export const PIE_INICIAL: Pick<
         {
           etiqueta: "Nueva",
           tipo: "pagina",
-          destino: "/maquinaria-pesada/maquinaria-pesada-nueva/",
+          destino: "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/",
         },
         {
           etiqueta: "Usada",

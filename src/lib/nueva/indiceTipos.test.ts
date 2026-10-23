@@ -109,6 +109,17 @@ describe("tarjetasDeTiposNueva", () => {
     assert.equal(excavadoras?.imagen?.url, "https://ejemplo.test/foto-77.jpg");
   });
 
+  it("los equipos de aditamentos no dan foto ni tarjeta a una categoría (2026-10-23)", () => {
+    const ahoyador = equipo(6, "Ahoyador para minicargadores", 50, "aditamentos", foto(6));
+    const con = tarjetasDeTiposNueva({
+      ...datos,
+      equipos: [...equipos, ahoyador],
+      categorias: [...datos.categorias, { slug: "minis", nombre: "Minis", tipos: [50] }],
+    });
+    assert.ok(!con.some((t) => t.titulo === "Minis"));
+    assert.ok(!con.some((t) => t.imagen?.url === "https://ejemplo.test/foto-6.jpg"));
+  });
+
   it("solo maquinaria: con equipos de aditamentos, ninguna tarjeta lleva a ellos (2026-10-23)", () => {
     assert.ok(equipos.some((e) => e.marcaRef?.slug === "aditamentos"));
     assert.ok(!tarjetas.some((t) => /aditamento/i.test(`${t.titulo} ${t.href}`)));

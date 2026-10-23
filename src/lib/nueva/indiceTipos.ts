@@ -65,7 +65,9 @@ export function tarjetasDeTiposNueva(datos: {
   categorias: CategoriaDelListado[];
   pestanasTipos: PestanaDeTipoNueva[];
 }): TarjetaMarca[] {
-  const { equipos } = datos;
+  // Solo maquinaria: los equipos de «Aditamentos» no cuentan ni para que salga una tarjeta ni
+  // para su foto de respaldo (p. ej. un ahoyador en «Cargadores»), como en las páginas de tipo.
+  const equipos = datos.equipos.filter((e) => e.marcaRef?.slug !== SLUG_ADITAMENTOS);
   const deCategorias = datos.categorias.flatMap((c) => {
     const tipos = new Set(c.tipos);
     const suyos = equipos.filter((e) => tipos.has(e.tipoId));

@@ -172,27 +172,25 @@ function alternativasPorNombre(
   return [];
 }
 
-/**
- * Un nombre de categoría dentro de una frase: TODO en minúscula («Cargadores
- * Frontales usados» → «cargadores frontales usados»; dirección, 2026-10-21).
- * Los títulos, el <h1>, las migas y las tarjetas conservan el nombre tal cual.
+/*
+ * REGLA DE TODA LA WEB (Juan Pablo, 2026-10-22): el nombre de una máquina (tipo o
+ * categoría) va SIEMPRE tal como está guardado en Payload, con cada palabra en
+ * mayúscula («Cargadores Frontales»), también dentro de una frase. Sustituye a la
+ * de pasarlo a minúscula en el texto corrido (#307 y #327).
  */
-export function nombreEnTexto(titulo: string): string {
-  return titulo.toLowerCase();
-}
 
 /**
  * El título de la sección de maquinaria nueva del estado vacío (dirección,
- * 2026-10-22): «Te invitamos a conocer nuestra disponibilidad de cargadores
- * frontales», con la categoría que se buscó en minúscula, como el titular.
+ * 2026-10-22): «Te invitamos a conocer nuestra disponibilidad de Cargadores
+ * Frontales», con la categoría que se buscó tal como está guardada.
  */
 export function tituloEnNueva(nombre: string): string {
-  return `Te invitamos a conocer nuestra disponibilidad de ${nombreEnTexto(nombre)}`;
+  return `Te invitamos a conocer nuestra disponibilidad de ${nombre.trim()}`;
 }
 
 /**
- * El titular del estado vacío: «Ahora mismo no tenemos cargadores frontales usados
- * disponibles» (el nombre de la categoría, todo en minúscula).
+ * El titular del estado vacío: «Ahora mismo no tenemos Cargadores Frontales usados
+ * disponibles» (el título de la categoría, con el nombre tal como está guardado).
  */
 export function mensajeSinUnidades(
   tipo: "categoria" | "marca",
@@ -200,5 +198,5 @@ export function mensajeSinUnidades(
   nombre: string,
 ): string {
   if (tipo === "marca") return `Ahora mismo no tenemos maquinaria ${nombre} usada disponible`;
-  return `Ahora mismo no tenemos ${nombreEnTexto(titulo)} disponibles`;
+  return `Ahora mismo no tenemos ${titulo.trim()} disponibles`;
 }

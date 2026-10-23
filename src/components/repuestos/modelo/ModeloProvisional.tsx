@@ -195,7 +195,7 @@ export function ModeloProvisional({
         aria-label="Navegación de catálogo"
       >
         <Link href={tipo.href} className="underline hover:text-gray-900">
-          ← Ver todos los modelos de {tipo.nombre.toLowerCase()} {marca.nombre}
+          ← Ver todos los modelos de {tipo.nombre.trim()} {marca.nombre}
         </Link>
       </nav>
     </>

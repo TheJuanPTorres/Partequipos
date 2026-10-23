@@ -213,7 +213,7 @@ describe("categoría del sitio relacionada", () => {
 
   it("el texto del enlace dice qué es", () => {
     expect(textoEnlaceRelacionada(candidatas[0]!)).toBe("Ver repuestos de Llantas y Rines");
-    expect(textoEnlaceRelacionada(candidatas[3]!)).toBe("Ver excavadoras usadas");
+    expect(textoEnlaceRelacionada(candidatas[3]!)).toBe("Ver Excavadoras usadas");
   });
 });
 
@@ -295,7 +295,7 @@ describe("entradillaRepiteCuerpo", () => {
   it("el enlace de nueva dice «nuevas»", () => {
     assert.equal(
       textoEnlaceRelacionada({ nombre: "Excavadoras", href: "/x/", tipo: "nueva" }),
-      "Ver excavadoras nuevas",
+      "Ver Excavadoras nuevas",
     );
   });
 });

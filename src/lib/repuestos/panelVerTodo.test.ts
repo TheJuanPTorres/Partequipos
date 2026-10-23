@@ -45,7 +45,7 @@ describe("«Ver todo» de la marca de repuestos abre el panel", () => {
       ],
     );
     // El enlace a la página completa y el color de la barra.
-    assert.equal(t[0]?.panel?.enlacePagina, "Ver la página de excavadora Hitachi");
+    assert.equal(t[0]?.panel?.enlacePagina, "Ver la página de Excavadora Hitachi");
     assert.equal(t[0]?.panel?.acento, "#fc661c");
     // Una entrada sin ficha sigue en la lista, sin enlace.
     assert.equal(t[0]?.panel?.elementos[1]?.href, null);

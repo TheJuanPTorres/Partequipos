@@ -42,7 +42,6 @@ import { getPaginasIndice } from "../queries/getPaginasIndice";
 import {
   alternativasEnNueva,
   mensajeSinUnidades,
-  nombreEnTexto,
   tituloEnNueva,
   usaEstadoVacioPropio,
 } from "./vacia";
@@ -69,7 +68,7 @@ export type AvisoVacio = { whatsapp?: EnlaceWhatsApp };
 const mensajeWhatsApp = (ambito: Ambito) =>
   `Hola, busco ${
     ambito.tipo === "categoria"
-      ? nombreEnTexto(ambito.titulo)
+      ? ambito.titulo
       : ambito.titulo.charAt(0).toLowerCase() + ambito.titulo.slice(1)
   }. Avísenme cuando llegue una.`;
 

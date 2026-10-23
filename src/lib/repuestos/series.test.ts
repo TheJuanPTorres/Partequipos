@@ -80,11 +80,11 @@ describe("tarjetas de la marca con series", () => {
       t.map((x) => [x.titulo, x.href]),
       [
         [
-          "Repuestos para maquinaria pesada excavadora HITACHI EX",
+          "Repuestos para maquinaria pesada Excavadora HITACHI EX",
           "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/hitachi/excavadora-hitachi/#serie-ex",
         ],
         [
-          "Repuestos para maquinaria pesada excavadora HITACHI ZAXIS",
+          "Repuestos para maquinaria pesada Excavadora HITACHI ZAXIS",
           "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/hitachi/excavadora-hitachi/#serie-zaxis",
         ],
       ],
@@ -94,7 +94,7 @@ describe("tarjetas de la marca con series", () => {
   it("sin series, una sola tarjeta del tipo, como siempre", () => {
     const t = tarjetasDeTipos(marca, [tipo([])]);
     assert.equal(t.length, 1);
-    assert.equal(t[0]?.titulo, "Repuestos para maquinaria pesada excavadora HITACHI");
+    assert.equal(t[0]?.titulo, "Repuestos para maquinaria pesada Excavadora HITACHI");
   });
 });
 

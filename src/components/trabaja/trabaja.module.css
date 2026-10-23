@@ -138,8 +138,8 @@
   outline-offset: 3px;
 }
 
+/* Sin margen: con la reserva, el espacio entre el nombre y la cifra ya se pinta (antes lo comía el flex). */
 .filtroCuantas {
-  margin-left: 4px;
   font-weight: 300;
 }
 

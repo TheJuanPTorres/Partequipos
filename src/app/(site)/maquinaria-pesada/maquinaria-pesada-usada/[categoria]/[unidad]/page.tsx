@@ -14,6 +14,7 @@ import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { metadataDe } from "@/lib/seo/metadata";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
 import { turnstileSiteKey } from "@/lib/turnstile";
+import { camposDeAditamento } from "@/lib/usados/aditamentos";
 import { datosDeUnidad, parrafos } from "@/lib/usados/ficha";
 import { imagenDeMedia, poblado, posicionFocal, type ImagenLista } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
@@ -25,7 +26,8 @@ import type { Documento, Media } from "@/payload-types";
  * La MISMA ficha de producto V2 que la maquinaria nueva (`FichaProducto`):
  * cambian los datos. Datos destacados: peso, año, horómetro y ubicación; sin
  * ficha técnica en filas y sin PDF salvo que la unidad lo tenga; JSON-LD
- * `Product` sin precio. EL NÚMERO DE SERIE NO SALE EN NINGÚN SITIO.
+ * `Product` sin precio. EL NÚMERO DE SERIE NO SALE, salvo el campo «Serial»
+ * de un ADITAMENTO (2026-10-23, dirección), como un dato más.
  *
  * Una unidad no disponible (vendida) redirige con permanentRedirect a su
  * categoría; solo una dirección que no existe da 404. Las disponibles se
@@ -97,7 +99,10 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
     .filter((img): img is NonNullable<typeof img> => img !== null)
     .map(({ url, alt, width, height }) => ({ url, alt, width, height }));
 
-  const datos = datosDeUnidad(unidad);
+  const datos = datosDeUnidad({
+    ...unidad,
+    serial: camposDeAditamento(categoria.slug, unidad).serial,
+  });
   const pdf = poblado<Documento>(unidad.fichaTecnicaPdf)?.url ?? null;
   const marca = poblado<{ id: number; nombre: string }>(unidad.marcaUsada)?.nombre ?? unidad.marca;
   const imagenContacto = imagenDeMedia(ficha.imagenContacto, "");
@@ -134,7 +139,7 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
       nombre: u.nombre,
       href: `${rutas.unidadUsada(categoria.slug, u.slug!)}/`,
       foto: fotoDeTarjeta(u.foto, u.nombre),
-      datos: datosDeUnidad(u, 3),
+      datos: datosDeUnidad({ ...u, serial: camposDeAditamento(categoria.slug, u).serial }, 3),
       pdf: null,
     }));
 

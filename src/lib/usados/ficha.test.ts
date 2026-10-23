@@ -33,6 +33,22 @@ describe("datosDeUnidad", () => {
   it("un horómetro de 0 se muestra", () => {
     assert.equal(datosDeUnidad({ horometro: 0 })[0]?.valor, "0 h");
   });
+  it("el serial de un aditamento va el último y siempre cabe", () => {
+    const d = datosDeUnidad(
+      { pesoOperativo: 1, anio: 2000, horometro: 1, ubicacion: "x", serial: " AB-123 " },
+      3,
+    );
+    assert.deepEqual(
+      d.map((x) => [x.etiqueta, x.valor]),
+      [
+        ["Peso operativo", "1 t"],
+        ["Año", "2000"],
+        ["Serial", "AB-123"],
+      ],
+    );
+    assert.equal(d[2]?.icono, "serial");
+    assert.deepEqual(datosDeUnidad({ serial: "  " }), []);
+  });
   it("respeta el máximo", () => {
     const d = datosDeUnidad({ pesoOperativo: 1, anio: 2000, horometro: 1, ubicacion: "x" }, 3);
     assert.equal(d.length, 3);

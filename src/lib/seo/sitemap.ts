@@ -71,10 +71,10 @@ export const PATRONES_SITEMAP = [
   // Fichas de un tipo ANIDADO (las excavadoras de CASE, src/lib/repuestos/anidado.ts).
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]/[modelo]/[submodelo]",
   "/maquinaria-pesada",
-  "/maquinaria-pesada/maquinaria-pesada-nueva",
   "/maquinaria-pesada/maquinaria-pesada-nueva/[categoria]",
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas",
-  // El índice de tipos de nueva (2026-10-22, URL nueva).
+  // El índice de tipos de nueva (2026-10-22, URL nueva): la página principal de nueva desde el
+  // 2026-10-23 (la de «Por marca» / «Por tipo» da 301 aquí, `REDIRECTS_FIJOS`).
   "/maquinaria-pesada/maquinaria-pesada-nueva/tipos",
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]",
   "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/[marca]/[tipo]",
@@ -312,7 +312,8 @@ export function buildSitemapEntries(
       priority: 0.9,
     },
     {
-      url: absoluteUrl(rutas.nueva()),
+      // La página principal de maquinaria nueva (2026-10-23): el índice de tipos.
+      url: absoluteUrl(rutas.nuevaTipos()),
       lastModified: masReciente(maquinariaTodo, ahora),
       changeFrequency: "weekly",
       priority: 0.9,
@@ -320,12 +321,6 @@ export function buildSitemapEntries(
     {
       url: absoluteUrl(rutas.marcasMaquinaria()),
       lastModified: masReciente(marcasMaquinaria, ahora),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: absoluteUrl(rutas.nuevaTipos()),
-      lastModified: masReciente(maquinariaTodo, ahora),
       changeFrequency: "weekly",
       priority: 0.8,
     },

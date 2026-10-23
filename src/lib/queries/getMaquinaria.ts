@@ -344,6 +344,9 @@ export type UnidadUsada = UnidadFiltrable & {
   modelo?: string | null;
   ubicacion?: string | null;
   descripcion?: string | null;
+  /** Solo aditamentos (2026-10-23): se pintan con `camposDeAditamento`. */
+  serial?: string | null;
+  descripcionCorta?: string | null;
   foto: FotoDeTarjeta | null;
 };
 
@@ -381,6 +384,8 @@ const inventarioUsadosEnCache = unstable_cache(
         pesoOperativo: true,
         ubicacion: true,
         descripcion: true,
+        serial: true,
+        descripcionCorta: true,
         imagenes: true,
       },
     });
@@ -450,6 +455,8 @@ const inventarioUsadosEnCache = unstable_cache(
           pesoOperativo: u.pesoOperativo,
           ubicacion: u.ubicacion,
           descripcion: u.descripcion,
+          serial: u.serial,
+          descripcionCorta: u.descripcionCorta,
           foto: foto
             ? {
                 id: foto.id,

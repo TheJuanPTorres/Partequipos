@@ -41,7 +41,7 @@ export default async function MarcasMaquinariaPage() {
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
     { nombre: "Maquinaria pesada", path: rutas.maquinaria() },
-    { nombre: "Nueva", path: rutas.nueva() },
+    { nombre: "Nueva", path: rutas.nuevaTipos() },
     { nombre: "Marcas", path: rutas.marcasMaquinaria() },
   ];
 

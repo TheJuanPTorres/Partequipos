@@ -11,7 +11,7 @@ import { PastillaDato } from "@/components/ficha/PastillaDato";
 import { RecuadroAsesoria } from "@/components/ficha/RecuadroAsesoria";
 import estilos from "@/components/ficha/ficha.module.css";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
-import { LogoMarca } from "@/components/marca/LogoMarca";
+import { FranjaMarca } from "@/components/marca/FranjaMarca";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { PaginaVisor } from "@/lib/documentos/visor";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
@@ -272,21 +272,7 @@ ${tituloEscritorio.modelo}`}
       {/* 2. «OTRAS <TIPO>»: la franja con la foto del tipo y las tarjetas. Sin otras, no sale. */}
       {otras.tarjetas.length > 0 ? (
         <section className={nueva.otras} aria-labelledby="otras-del-tipo">
-          <div className={nueva.franja}>
-            {otras.logo ? (
-              <span className={nueva.cajaLogoFranja}>
-                <LogoMarca
-                  logo={otras.logo}
-                  alt={otras.logo.alt}
-                  sizes="140px"
-                  className={nueva.logoFranja}
-                />
-              </span>
-            ) : null}
-            <h2 id="otras-del-tipo" className={`${nueva.tituloFranja} texto-titulo-bloque`}>
-              {otras.titulo}
-            </h2>
-          </div>
+          <FranjaMarca id="otras-del-tipo" titulo={otras.titulo} logo={otras.logo} />
           <ul className={nueva.rejilla}>
             {otras.tarjetas.map((o) => (
               <li key={o.id} className={`${estilos.tarjeta} ${nueva.tarjeta}`}>

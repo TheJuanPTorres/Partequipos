@@ -9,7 +9,7 @@ import estilos from "./marcaNueva.module.css";
 
 /**
  * TARJETA DE UN EQUIPO de la plantilla de Andrés (4023): foto, nombre, 3–4 datos
- * «Destacar» de su ficha técnica, «Ver ficha» y «Cotizar» (el formulario de contacto
+ * «Destacar» de su ficha técnica (con el nombre uniforme de la ficha nueva y como mucho 2 líneas), «Ver ficha» y «Cotizar» (el formulario de contacto
  * en ventana emergente; sin JavaScript, baja al formulario de la página).
  */
 export function TarjetaEquipo({
@@ -44,9 +44,11 @@ export function TarjetaEquipo({
       {equipo.datos.length > 0 ? (
         <ul className={estilos.datos}>
           {equipo.datos.map((d) => (
-            <li key={d.etiqueta} className={estilos.dato}>
+            // El texto, como mucho 2 líneas con «…» (CSS); entero al pasar el ratón (`title`) y
+            // para los lectores de pantalla (el recorte es solo visual).
+            <li key={d.etiqueta} className={estilos.dato} title={`${d.etiqueta}: ${d.valor}`}>
               <IconoDato icono={d.icono} className={estilos.datoIcono} />
-              <span>
+              <span className={estilos.datoTexto}>
                 <strong>{d.etiqueta}:</strong> {d.valor}
               </span>
             </li>

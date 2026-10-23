@@ -33,6 +33,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_ee64598c7457a4d9197213cdb580e4d5 } from '../../../components/admin/ContadorDestacadas'
 import { default as default_6dd5387c7f2e5f0ef6f0dcb5c3b7a99a } from '../../../components/admin/aviso/AvisoNoDisponible'
+import { default as default_62f5c571abea184f2a2009cb72fbc5c0 } from '../../../components/admin/CampoSoloAditamentos'
 import { default as default_9381d73c54a9c03b46798bb778a3bdc0 } from '../../../components/admin/celdas/CeldaDisponible'
 import { default as default_7afa784110d90c3c093bacc977ecd19b } from '../../../components/admin/AvisoBloques'
 import { default as default_c109ce541d2210185cddcb9e5d98a2d1 } from '../../../components/admin/aviso/AvisoContrasteTitulo'
@@ -90,6 +91,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/ContadorDestacadas#default": default_ee64598c7457a4d9197213cdb580e4d5,
   "/components/admin/aviso/AvisoNoDisponible#default": default_6dd5387c7f2e5f0ef6f0dcb5c3b7a99a,
+  "/components/admin/CampoSoloAditamentos#default": default_62f5c571abea184f2a2009cb72fbc5c0,
   "/components/admin/celdas/CeldaDisponible#default": default_9381d73c54a9c03b46798bb778a3bdc0,
   "/components/admin/AvisoBloques#default": default_7afa784110d90c3c093bacc977ecd19b,
   "/components/admin/aviso/AvisoContrasteTitulo#default": default_c109ce541d2210185cddcb9e5d98a2d1,

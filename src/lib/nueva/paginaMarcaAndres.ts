@@ -1,3 +1,4 @@
+import { nombreUniforme } from "@/lib/maquinaria/fichaNueva";
 import { MAX_DESTACADAS, destacadas, type DatoDestacado } from "@/lib/maquinaria/fichaTecnica";
 import type { EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
 
@@ -39,10 +40,17 @@ export function textosMarcaNueva(
 /**
  * Los datos de la tarjeta: los marcados «Destacar» en la ficha técnica (hasta 4); si el
  * equipo no tiene ninguno marcado, peso, potencia y motor, como las tarjetas de los listados.
+ * Las características prioritarias llevan el nombre corto y uniforme de la ficha nueva
+ * («Potencia neta», «Peso operativo», «Motor»…; `nombreUniforme`, dirección 2026-10-23); las
+ * demás, su etiqueta tal cual. Los valores no se tocan.
  */
 export function datosDeTarjeta(filas: EquiposNuevo["fichaTecnica"]): DatoDestacado[] {
+  const uniforme = (d: DatoDestacado): DatoDestacado => ({
+    ...d,
+    etiqueta: nombreUniforme(d.etiqueta) ?? d.etiqueta,
+  });
   const marcados = destacadas(filas, MAX_DESTACADAS);
-  if (marcados.length > 0) return marcados;
+  if (marcados.length > 0) return marcados.map(uniforme);
   const patrones: [RegExp, DatoDestacado["icono"]][] = [
     [/^peso\s+(operativo|operacional|de\s+operaci[oó]n|en\s+funcionamiento)/i, "peso"],
     [/potencia/i, "potencia"],
@@ -51,7 +59,7 @@ export function datosDeTarjeta(filas: EquiposNuevo["fichaTecnica"]): DatoDestaca
   return patrones.flatMap(([patron, icono]) => {
     const fila = (filas ?? []).find((f) => f.etiqueta && patron.test(f.etiqueta));
     const valor = fila?.valor?.trim();
-    return fila && valor ? [{ etiqueta: fila.etiqueta!.trim(), valor, icono }] : [];
+    return fila && valor ? [uniforme({ etiqueta: fila.etiqueta!.trim(), valor, icono })] : [];
   });
 }
 

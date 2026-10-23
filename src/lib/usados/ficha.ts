@@ -5,8 +5,10 @@
  * ficha técnica; la usada no tiene ficha en filas, así que salen de sus campos:
  * peso, año, horómetro y ubicación, en ese orden y omitiendo lo que falte.
  *
- * EL NÚMERO DE SERIE NO ESTÁ EN NINGÚN LADO: ni la colección lo guarda ni estas
- * funciones lo reciben (decisión de dirección, 2026-10-07).
+ * EL NÚMERO DE SERIE de la maquinaria usada no sale (decisión de dirección,
+ * 2026-10-07). La única excepción son los ADITAMENTOS (2026-10-23): su campo
+ * «Serial» llega aquí solo si la unidad es de esa categoría
+ * (`camposDeAditamento`, `src/lib/usados/aditamentos.ts`).
  */
 import type { DatoDestacado } from "../maquinaria/fichaTecnica";
 
@@ -19,9 +21,14 @@ export type DatosUnidad = {
   anio?: number | null;
   horometro?: number | null;
   ubicacion?: string | null;
+  /** Solo de un aditamento (`camposDeAditamento`); en el resto, nunca se pasa. */
+  serial?: string | null;
 };
 
-/** Cuántos datos caben en la tarjeta de «Otras unidades» (3) y en la principal (4). */
+/**
+ * Cuántos datos caben en la tarjeta de «Otras unidades» (3) y en la principal (4).
+ * El serial de un aditamento va el último y siempre cabe: es lo que lo distingue.
+ */
 export function datosDeUnidad(u: DatosUnidad, max = 4): DatoDestacado[] {
   const datos: DatoDestacado[] = [];
   if (positivo(u.pesoOperativo)) {
@@ -44,7 +51,9 @@ export function datosDeUnidad(u: DatosUnidad, max = 4): DatoDestacado[] {
   }
   const ubicacion = u.ubicacion?.trim();
   if (ubicacion) datos.push({ etiqueta: "Ubicación", valor: ubicacion, icono: "ubicacion" });
-  return datos.slice(0, max);
+  const serial = u.serial?.trim();
+  if (!serial) return datos.slice(0, max);
+  return [...datos.slice(0, max - 1), { etiqueta: "Serial", valor: serial, icono: "serial" }];
 }
 
 /** La descripción en párrafos (una línea en blanco o un salto separan párrafos). */

@@ -124,3 +124,59 @@ fichas y sus URL no cambian.
 Se limpia desde el panel con `runbook-nueva-tipos-y-categorias.md`, que deja las tres de WordPress, borra el resto con
 sus 301, y marca las casillas de Minicargadores (CASE) y Pavimentadoras (Dynapac), que el índice de WordPress tenía.
 En el preview ya están marcadas.
+
+## Sin página intermedia y una página general por tipo (2026-10-23, cliente y dirección)
+
+**`/tipos/` es la página principal de maquinaria nueva.**
+
+- `/maquinaria-pesada/maquinaria-pesada-nueva/` (las dos tarjetas «Por marca» / «Por tipo de máquina») da **301** a
+  `/maquinaria-pesada/maquinaria-pesada-nueva/tipos/`:
+  - el 301 está en `REDIRECTS_FIJOS` (`src/lib/redirects/fijos.ts`);
+  - la paginación antigua (`pagina/<n>/`) va directa a `/tipos/`, en un salto;
+  - sale del sitemap y deja de ser un destino válido de una redirección (serían dos saltos).
+- `/tipos/` lleva el título y la descripción del antiguo índice («Maquinaria pesada nueva»), con canónica propia. En
+  las migas de todas las páginas de nueva, «Nueva» lleva aquí.
+- Megamenú:
+  - «Ver toda la maquinaria nueva» lleva a `/tipos/`;
+  - «Por tipo de máquina» empieza con «Ver todos los tipos de máquina», igual que «Ver todas las categorías» de
+    repuestos.
+- Los enlaces que son datos del panel (pie, tarjeta «Maquinaria nueva» de `/maquinaria-pesada/` y Nosotros) se
+  cambian con `runbook-nueva-paginas-generales.md`.
+
+**«Por tipo de máquina» y el índice de tipos llevan SIEMPRE a la página general del tipo.**
+
+- La página general es una **categoría de nueva**, con la plantilla de las que mezclan marcas (tarjetas agrupadas por
+  marca y formulario al final), aunque hoy solo tenga equipos de una marca.
+- `unaEntradaPorTipo` (`ordenTipos.ts`):
+  - la categoría gana siempre al tipo de una marca;
+  - un tipo SIN categoría sigue yendo a su página en la marca (casilla «Tarjeta en el índice de tipos»), para no
+    perder la entrada mientras se crea la categoría.
+- Las páginas de marca + tipo se quedan: se llega a ellas desde la marca.
+- **Las 9 páginas generales:**
+  - ya existían (WordPress) Excavadoras, Cargadores y Compactadores;
+  - nuevas: Bulldozers, Motoniveladoras, Miniexcavadoras, Minicargadores, Retrocargadoras y Pavimentadoras, en
+    `/maquinaria-pesada/maquinaria-pesada-nueva/<tipo>/`, porque WordPress no tenía ninguna de ellas.
+- En el preview, con `scripts/nueva/tipos-generales.ts aplicar`, con manifiesto y retirada exacta.
+- **Guarda:** una categoría de nueva no se guarda si una redirección sale de su URL (`slugCategoriaNuevaValido`). El
+  proxy aplica las redirecciones antes que las páginas, así que la categoría quedaría tapada sin ningún error (pasaba
+  con `/…/nueva/miniexcavadoras/`, el 301 a Yanmar de la limpieza del panel).
+
+**La plantilla de las 9 páginas generales (dirección, 2026-10-23):**
+
+- `<h1>` del banner: «Maquinaria Tipo {Nombre} Nueva», con el nombre del tipo con mayúscula en cada palabra
+  (`tituloBannerTipoNueva`). El título SEO no cambia («Bulldozers nuevos»).
+- Sin el título de sección «Modelos de {tipo} nuevos». La sección se nombra solo para lectores de pantalla.
+- **Franja de marca, SIEMPRE** (Juan Pablo, 2026-10-23; antes, solo con más de una marca):
+  - Cada grupo empieza con la franja de «Otros {tipo}» de la ficha nueva: barra blanca, logo de la marca a la
+    izquierda y título del grupo («Excavadoras Hitachi») a la derecha.
+  - Es un componente compartido, `FranjaMarca` (`src/components/marca/`), que también usa la ficha.
+  - Marca sin logo: solo el título.
+  - Unos 100 px de aire entre la última fila de una marca y la franja de la siguiente.
+- **Solo marcas:** fuera los equipos de la marca «Aditamentos» (`sinAditamentos`), que tienen su propia página.
+- **Tarjetas de equipo (`TarjetaEquipo`, en todas sus páginas):**
+  - Las características prioritarias llevan el nombre corto y uniforme de la ficha nueva («Potencia neta», «Peso
+    operativo», «Motor»…), con el mismo emparejamiento de etiquetas (`nombreUniforme`).
+  - Cada dato ocupa como mucho 2 líneas con «…». El texto entero está en el `title` y lo leen los lectores de
+    pantalla.
+  - Las tarjetas de una fila reparten sus filas con la rejilla (`subgrid`): mismo alto, y foto, nombre, datos y
+    botones alineados.

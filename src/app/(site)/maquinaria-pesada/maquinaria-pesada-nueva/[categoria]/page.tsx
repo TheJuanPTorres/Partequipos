@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { Revelado } from "@/components/movimiento/Revelado";
+import { FranjaMarca } from "@/components/marca/FranjaMarca";
 import { TarjetaEquipo } from "@/components/nueva/TarjetaEquipo";
 import estilosTarjetas from "@/components/nueva/marcaNueva.module.css";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
@@ -10,8 +10,19 @@ import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { metadataSinIndexar } from "@/lib/filtros/seo";
-import { gruposPorMarcaYTipo, vistaEncabezadoCategoriaNueva } from "@/lib/nueva/paginaCategoria";
-import { getEquiposDeTipos, getListadoNueva } from "@/lib/queries/getMaquinaria";
+import {
+  gruposPorMarcaYTipo,
+  sinAditamentos,
+  tituloBannerTipoNueva,
+  vistaEncabezadoCategoriaNueva,
+} from "@/lib/nueva/paginaCategoria";
+import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
+import { getLogosMarca } from "@/lib/queries/getLogosMarca";
+import {
+  getEquiposDeTipos,
+  getListadoNueva,
+  getMarcasMaquinaria,
+} from "@/lib/queries/getMaquinaria";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { rutas } from "@/lib/routes";
@@ -38,7 +49,8 @@ async function resolver(slug: string) {
   const { categorias } = await getListadoNueva();
   const categoria = categorias.find((c) => c.slug === slug);
   if (!categoria) return null;
-  return { categoria, equipos: await getEquiposDeTipos(categoria.tipos) };
+  // Solo marcas: sin los aditamentos, que tienen su página (dirección, 2026-10-23).
+  return { categoria, equipos: sinAditamentos(await getEquiposDeTipos(categoria.tipos)) };
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -62,7 +74,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  * compactadores), SIN MARKETPLACE (2026-10-22, dirección: en nueva no hay catálogo con filtros
  * en ninguna página). Como la página de tipo de nueva (#310): cabecera, las tarjetas de equipo
  * (`TarjetaEquipo`) agrupadas por marca y tipo con su subtítulo («Excavadoras Hitachi»), con la
- * regla de tarjetas, y el formulario al final. Las URL de su antigua paginación (`pagina/<n>/`)
+ * regla de tarjetas, y el formulario al final. Desde el 2026-10-23 es también la PÁGINA GENERAL
+ * de cada tipo (tarea 9): banner «Maquinaria Tipo {Nombre} Nueva», sin el título «Modelos de …»,
+ * cada grupo (marca y tipo) empieza con la franja de su marca (`FranjaMarca`, la de la ficha
+ * nueva), y solo marcas: sin los aditamentos. Las URL de su antigua paginación (`pagina/<n>/`)
  * dan 301 aquí; con filtros en la query, la canónica es la de siempre, sin query.
  */
 export default async function CategoriaNuevaPage({ params }: { params: Promise<Params> }) {
@@ -74,13 +89,24 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
     { nombre: "Maquinaria pesada", path: rutas.maquinaria() },
-    { nombre: "Nueva", path: rutas.nueva() },
+    { nombre: "Nueva", path: rutas.nuevaTipos() },
     { nombre: categoria.nombre, path: rutas.categoriaNueva(categoria.slug) },
   ];
 
-  const [global, empresa] = await Promise.all([getRepuestosMarca(), getEmpresa()]);
+  const [global, empresa, logos, marcas] = await Promise.all([
+    getRepuestosMarca(),
+    getEmpresa(),
+    getLogosMarca(),
+    getMarcasMaquinaria(),
+  ]);
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const grupos = gruposPorMarcaYTipo(equipos);
+  // Cada grupo empieza con la franja de su marca (la de «Otros {tipo}» de la ficha nueva), también
+  // con una sola marca (dirección, 2026-10-23). El logo, el único del sitio: la marca con su logo
+  // poblado (`getMarcasMaquinaria`); sin logo, solo el título.
+  const marcaConLogo = new Map(marcas.map((m) => [m.slug, m]));
+  const logoDe = (m: (typeof grupos)[number]["marca"]) =>
+    conAlt(logoDeMarca(marcaConLogo.get(m.slug) ?? m, logos), `Logo de ${m.nombre}`);
 
   return (
     <main className={estilos.pagina}>
@@ -90,28 +116,27 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
       </div>
 
       <HeroMarca
-        vista={vistaEncabezadoCategoriaNueva(titulo, categoria.descripcion, equipos)}
+        vista={vistaEncabezadoCategoriaNueva(
+          tituloBannerTipoNueva(categoria.nombre),
+          categoria.descripcion,
+          equipos,
+        )}
         anclaSiguiente={ANCLA_MODELOS}
         bajaSinFoto
       />
 
+      {/* Sin el título «Modelos de …» (dirección, 2026-10-23): la sección se nombra para los
+          lectores de pantalla. */}
       <section
         id={ANCLA_MODELOS}
         className={estilosTarjetas.seccionTipo}
-        aria-labelledby="modelos-categoria-nueva-t"
+        aria-label={`Modelos de ${titulo}`}
       >
-        <Revelado
-          como="h2"
-          id="modelos-categoria-nueva-t"
-          ritmo="titulo"
-          texto={`Modelos de ${titulo.charAt(0).toLowerCase()}${titulo.slice(1)}`}
-          className={estilosTarjetas.tituloTipo}
-        />
         {grupos.length > 0 ? (
           grupos.map((g, i) => (
-            <div key={g.clave} id={`grupo-${g.clave}`}>
-              {/* `h2`: los nombres de las tarjetas (`TarjetaEquipo`) son `h3`. */}
-              <h2 className={estilosTarjetas.tituloTipo}>{g.titulo}</h2>
+            <div key={g.clave} id={`grupo-${g.clave}`} className={estilosTarjetas.grupoMarca}>
+              {/* `h2` en la franja: los nombres de las tarjetas (`TarjetaEquipo`) son `h3`. */}
+              <FranjaMarca id={`grupo-${g.clave}-t`} titulo={g.titulo} logo={logoDe(g.marca)} />
               <ul className={estilosTarjetas.rejilla}>
                 {g.tarjetas.map((e, j) => (
                   <TarjetaEquipo

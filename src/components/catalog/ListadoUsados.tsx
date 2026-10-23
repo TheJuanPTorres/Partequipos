@@ -1,4 +1,4 @@
-import { IconCalendar, IconClockHour4, IconWeight } from "@tabler/icons-react";
+import { IconBarcode, IconCalendar, IconClockHour4, IconWeight } from "@tabler/icons-react";
 import Link from "next/link";
 
 import { PlantillaListado } from "@/components/listado/PlantillaListado";
@@ -10,6 +10,7 @@ import { rutas } from "@/lib/routes";
 import estilosListado from "@/components/listado/listado.module.css";
 import { EstadoVacioUsados } from "@/components/usados/EstadoVacioUsados";
 import type { Ambito, AvisoVacio, DatosVacio } from "@/lib/usados/listado";
+import { camposDeAditamento } from "@/lib/usados/aditamentos";
 import { AVISO_SIN_UNIDADES } from "@/lib/usados/vacia";
 
 const numero = (n: number) => n.toLocaleString("es-CO");
@@ -100,34 +101,40 @@ export function ListadoUsados({
         )
       }
     >
-      {listado.elementos.map((u, i) => (
-        <TarjetaListado
-          key={u.id}
-          nombre={u.nombre}
-          titulo={u.nombre}
-          // La página de la unidad (2026-10-16); sin dirección web aún, sin enlace.
-          href={
-            u.slug && u.categoriaRef ? `${rutas.unidadUsada(u.categoriaRef.slug, u.slug)}/` : null
-          }
-          foto={u.foto}
-          filas={[
-            {
-              icono: IconWeight,
-              texto: "Peso operativo",
-              valor: typeof u.pesoOperativo === "number" ? `${numero(u.pesoOperativo)} t` : null,
-            },
-            { icono: IconCalendar, texto: "Año", valor: u.anio ? String(u.anio) : null },
-            {
-              icono: IconClockHour4,
-              texto: "Horas",
-              valor: typeof u.horometro === "number" ? `${numero(u.horometro)} h` : null,
-            },
-          ]}
-          prioridad={i === 0}
-          flecha={animaciones.includes("A3")}
-          fundido={animaciones.includes("A6")}
-        />
-      ))}
+      {listado.elementos.map((u, i) => {
+        // Aditamentos (2026-10-23): la descripción corta bajo el título y el serial como un dato más.
+        const { serial, descripcionCorta } = camposDeAditamento(u.categoriaRef?.slug, u);
+        return (
+          <TarjetaListado
+            key={u.id}
+            nombre={u.nombre}
+            titulo={u.nombre}
+            // La página de la unidad (2026-10-16); sin dirección web aún, sin enlace.
+            href={
+              u.slug && u.categoriaRef ? `${rutas.unidadUsada(u.categoriaRef.slug, u.slug)}/` : null
+            }
+            foto={u.foto}
+            resumen={descripcionCorta}
+            filas={[
+              {
+                icono: IconWeight,
+                texto: "Peso operativo",
+                valor: typeof u.pesoOperativo === "number" ? `${numero(u.pesoOperativo)} t` : null,
+              },
+              { icono: IconCalendar, texto: "Año", valor: u.anio ? String(u.anio) : null },
+              {
+                icono: IconClockHour4,
+                texto: "Horas",
+                valor: typeof u.horometro === "number" ? `${numero(u.horometro)} h` : null,
+              },
+              { icono: IconBarcode, texto: "Serial", valor: serial },
+            ]}
+            prioridad={i === 0}
+            flecha={animaciones.includes("A3")}
+            fundido={animaciones.includes("A6")}
+          />
+        );
+      })}
     </PlantillaListado>
   );
 }

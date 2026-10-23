@@ -884,6 +884,14 @@ export interface EquiposUsado {
    * Ej. YANMAR 4TNV98CT
    */
   motor?: string | null;
+  /**
+   * Solo aditamentos. Opcional. Sale en la ficha, con sus datos, y en la tarjeta del listado.
+   */
+  serial?: string | null;
+  /**
+   * Solo aditamentos. Opcional, hasta 140 caracteres. Sale en la tarjeta del listado (como mucho 3 líneas). Vacía, la tarjeta queda como siempre.
+   */
+  descripcionCorta?: string | null;
   descripcion?: string | null;
   imagenes?: (number | Media)[] | null;
   /**
@@ -2552,6 +2560,8 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
   pesoOperativo?: T;
   potencia?: T;
   motor?: T;
+  serial?: T;
+  descripcionCorta?: T;
   descripcion?: T;
   imagenes?: T;
   fichaTecnicaPdf?: T;

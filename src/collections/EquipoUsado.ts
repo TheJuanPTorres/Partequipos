@@ -9,6 +9,7 @@ import { marcaUsadaSincronizada } from "./hooks/marcaUsada";
 import { slugUnidadUsada, validarSlugUnidadUsada } from "./hooks/slugUnidadUsada";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
+import { MAX_DESCRIPCION_CORTA, MAX_SERIAL } from "../lib/usados/aditamentos";
 
 const portada = revalidarPortada("equipos-usados");
 
@@ -161,6 +162,34 @@ export const EquipoUsado: CollectionConfig = {
           admin: { width: "34%", description: "Ej. YANMAR 4TNV98CT" },
         },
       ],
+    },
+    /*
+     * ADITAMENTOS (2026-10-23, dirección): «Serial» y «Descripción corta»,
+     * visibles en el panel SOLO si la categoría es Aditamentos
+     * (`CampoSoloAditamentos`), y pintados solo en esa categoría
+     * (`camposDeAditamento`, `src/lib/usados/aditamentos.ts`). El serial es la
+     * excepción, solo de aditamentos, a «el número de serie no sale».
+     */
+    {
+      name: "serial",
+      type: "text",
+      label: "Serial",
+      maxLength: MAX_SERIAL,
+      admin: {
+        components: { Field: "/components/admin/CampoSoloAditamentos" },
+        description:
+          "Solo aditamentos. Opcional. Sale en la ficha, con sus datos, y en la tarjeta del listado.",
+      },
+    },
+    {
+      name: "descripcionCorta",
+      type: "textarea",
+      label: "Descripción corta",
+      maxLength: MAX_DESCRIPCION_CORTA,
+      admin: {
+        components: { Field: "/components/admin/CampoSoloAditamentos" },
+        description: `Solo aditamentos. Opcional, hasta ${MAX_DESCRIPCION_CORTA} caracteres. Sale en la tarjeta del listado (como mucho 3 líneas). Vacía, la tarjeta queda como siempre.`,
+      },
     },
     {
       name: "descripcion",

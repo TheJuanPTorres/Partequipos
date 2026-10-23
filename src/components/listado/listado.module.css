@@ -517,6 +517,17 @@
   font-weight: 500;
   color: var(--rojo);
 }
+.descripcionCorta {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--gris-texto);
+}
 .linea {
   margin: 20px 0;
   border: 0;

@@ -4,6 +4,7 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
 import { revalidarModelo, revalidarModeloBorrado } from "./hooks/revalidateHooks";
+import { mostrarEnWebField } from "../lib/fields/mostrarEnWeb";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { avisoField } from "../lib/fields/avisoField";
 import { validarSerieDelModelo } from "../lib/repuestos/series";
@@ -20,7 +21,7 @@ export const ModeloRepuesto: CollectionConfig = {
   },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "imagenes", "marca", "tipo", "slug"],
+    defaultColumns: ["nombre", "imagenes", "marca", "tipo", "slug", "mostrarEnWeb"],
     group: "Repuestos",
     // El código («320D») es como busca un comercial; el nombre solo no basta.
     listSearchableFields: ["nombre", "codigo"],
@@ -49,6 +50,10 @@ export const ModeloRepuesto: CollectionConfig = {
       required: true,
       label: "Nombre",
     },
+    mostrarEnWebField({
+      descripcion:
+        "Desmarcado, el modelo desaparece de toda la web (listados del tipo y de la marca, buscador y sitemap) sin borrarse del panel, y su página lleva a la de su tipo. Vuelve al marcarlo.",
+    }),
     slugField(),
     // `marca` va antes que `tipo` para poder filtrar los tipos por la marca
     // elegida. Desnormalizada a propósito (consultas y breadcrumbs).

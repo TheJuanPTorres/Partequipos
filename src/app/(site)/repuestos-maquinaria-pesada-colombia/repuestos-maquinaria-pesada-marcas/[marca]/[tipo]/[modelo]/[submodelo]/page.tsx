@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import {
   metadataModeloRepuesto,
@@ -8,6 +8,9 @@ import {
 import { getMarcaPorSlug } from "@/lib/queries/getMarcas";
 import { getModeloPorSlug, getModelos } from "@/lib/queries/getModelos";
 import { getTipoPorSlug } from "@/lib/queries/getTipos";
+import { productoVisible } from "@/lib/nueva/visibilidad";
+import { segmentoDeTipo } from "@/lib/repuestos/anidado";
+import { rutas } from "@/lib/routes";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
 import { poblado } from "@/lib/utils/relations";
 import type { Marca, TiposEquipo } from "@/payload-types";
@@ -47,11 +50,17 @@ async function resolver(params: Params) {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const data = await resolver(await params);
-  return data ? metadataModeloRepuesto(data.marca, data.tipo, data.modelo) : METADATA_404;
+  return data && productoVisible(data.modelo)
+    ? metadataModeloRepuesto(data.marca, data.tipo, data.modelo)
+    : METADATA_404;
 }
 
 export default async function ModeloAnidadoPage({ params }: { params: Promise<Params> }) {
   const data = await resolver(await params);
   if (!data) notFound();
+  // Modelo oculto: redirección TEMPORAL (307) a la página de su tipo anidado.
+  if (!productoVisible(data.modelo)) {
+    redirect(`${rutas.tipo(data.marca.slug, segmentoDeTipo(data.tipo))}/`);
+  }
   return <PaginaModeloRepuesto marca={data.marca} tipo={data.tipo} modelo={data.modelo} />;
 }

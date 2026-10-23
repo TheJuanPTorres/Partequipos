@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound, permanentRedirect, redirect } from "next/navigation";
 
 import { FichaProducto, type OtraReferencia } from "@/components/ficha/FichaProducto";
 import type { FotoFicha } from "@/components/ficha/GaleriaFicha";
@@ -7,6 +7,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { getFichaProducto } from "@/lib/queries/getFichaProducto";
 import { getInventarioUsados, getUnidadUsadaPorSlug } from "@/lib/queries/getMaquinaria";
 import { getEmpresa } from "@/lib/queries/getSeo";
+import { productoVisible } from "@/lib/nueva/visibilidad";
 import { rutas } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/seo/config";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
@@ -59,7 +60,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { categoria, unidad: slug } = await params;
   const data = await getUnidadUsadaPorSlug(categoria, slug);
   // Si la unidad está vendida la página redirige: no hacen falta metadatos propios.
-  if (!data) return METADATA_404;
+  if (!data || !productoVisible(data.unidad)) return METADATA_404;
   const { unidad } = data;
   const fotos = Array.isArray(unidad.imagenes) ? unidad.imagenes : [];
 
@@ -79,6 +80,8 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
   const { unidad, categoria } = data;
   // Vendida: su categoría es el sitio más parecido a lo que buscaba quien llega aquí.
   if (!unidad.disponible) permanentRedirect(`${rutas.categoriaUsada(categoria.slug)}/`);
+  // Oculta («Mostrar en la web» desmarcada): a la misma categoría, pero de forma TEMPORAL (307).
+  if (!productoVisible(unidad)) redirect(`${rutas.categoriaUsada(categoria.slug)}/`);
 
   const [empresa, ficha, inventario] = await Promise.all([
     getEmpresa(),

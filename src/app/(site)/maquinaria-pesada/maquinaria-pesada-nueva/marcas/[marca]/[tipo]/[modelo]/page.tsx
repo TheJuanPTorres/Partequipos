@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { FichaNueva, type PdfVisor, type TarjetaOtra } from "@/components/ficha/FichaNueva";
 import type { FotoFicha } from "@/components/ficha/GaleriaFicha";
@@ -32,6 +32,7 @@ import {
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
+import { productoVisible } from "@/lib/nueva/visibilidad";
 import { rutas } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/seo/config";
 import { metadataDe } from "@/lib/seo/metadata";
@@ -81,7 +82,8 @@ async function resolver(params: Params) {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const data = await resolver(await params);
-  if (!data) return METADATA_404;
+  // Un equipo oculto redirige a su tipo: no se indexa (`conProductoVisible`, visibilidad.ts).
+  if (!data || !productoVisible(data.equipo)) return METADATA_404;
 
   const { marca, tipo, equipo } = data;
   const imagenes = Array.isArray(equipo.imagenes) ? equipo.imagenes : [];
@@ -110,6 +112,8 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
   const data = await resolver(await params);
   if (!data) notFound();
   const { marca, tipo, equipo } = data;
+  // «Mostrar en la web» desmarcada: redirección TEMPORAL (307) a la página de su tipo.
+  if (!productoVisible(equipo)) redirect(`${rutas.tipoMaquinaria(marca.slug, tipo.slug)}/`);
 
   const [empresa, ficha, otras, logos, global, testimonios] = await Promise.all([
     getEmpresa(),

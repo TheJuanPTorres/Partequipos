@@ -4,6 +4,8 @@ import { getPayload } from "payload";
 
 import type { ModelosRepuesto } from "@/payload-types";
 
+import { conProductoVisible } from "../nueva/visibilidad";
+
 /*
  * Las consultas de este módulo van envueltas en `cache()` de React.
  *
@@ -26,6 +28,7 @@ export const getModelos = cache(async (): Promise<ModelosRepuesto[]> => {
 
   const { docs } = await payload.find({
     collection: "modelos-repuesto",
+    where: conProductoVisible(),
     depth: 1,
     limit: 0,
     sort: "nombre",
@@ -43,7 +46,7 @@ export const getModelosDeMarca = cache(async (marcaId: number): Promise<ModelosR
 
   const { docs } = await payload.find({
     collection: "modelos-repuesto",
-    where: { marca: { equals: marcaId } },
+    where: conProductoVisible({ marca: { equals: marcaId } }),
     depth: 0,
     limit: 0,
     sort: "nombre",
@@ -59,7 +62,7 @@ export const getModelosDeTipo = cache(async (tipoId: number): Promise<ModelosRep
 
   const { docs } = await payload.find({
     collection: "modelos-repuesto",
-    where: { tipo: { equals: tipoId } },
+    where: conProductoVisible({ tipo: { equals: tipoId } }),
     depth: 1,
     limit: 0,
     sort: "nombre",
@@ -78,6 +81,7 @@ export const getModeloPorSlug = cache(
 
     const { docs } = await payload.find({
       collection: "modelos-repuesto",
+      // Trae también el oculto (producto-oculto-ok): la ficha lo redirige a su tipo.
       where: {
         and: [{ tipo: { equals: tipoId } }, { slug: { equals: modeloSlug } }],
       },
@@ -99,7 +103,7 @@ export async function getModelosPorIds(ids: number[]): Promise<ModelosRepuesto[]
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "modelos-repuesto",
-    where: { id: { in: ids } },
+    where: conProductoVisible({ id: { in: ids } }),
     depth: 1,
     limit: 0,
   });

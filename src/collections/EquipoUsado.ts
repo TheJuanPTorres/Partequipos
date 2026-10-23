@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { revalidarEquipoUsado, revalidarEquipoUsadoBorrado } from "./hooks/maquinariaHooks";
+import { mostrarEnWebField } from "../lib/fields/mostrarEnWeb";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarPortada } from "./hooks/portadaHooks";
 import { avisoField } from "../lib/fields/avisoField";
@@ -30,7 +31,15 @@ export const EquipoUsado: CollectionConfig = {
   labels: { singular: "Equipo usado", plural: "Equipos usados" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "imagenes", "categoria", "marcaUsada", "anio", "disponible"],
+    defaultColumns: [
+      "nombre",
+      "imagenes",
+      "categoria",
+      "marcaUsada",
+      "anio",
+      "disponible",
+      "mostrarEnWeb",
+    ],
     group: "Maquinaria",
     listSearchableFields: ["nombre", "marca", "modelo"],
     description:
@@ -186,6 +195,11 @@ export const EquipoUsado: CollectionConfig = {
      * publicar una cifra desactualizada es peor que no publicarla. Si el negocio
      * decide mostrarlo, se añade entonces con su moneda y su vigencia.
      */
+    // Distinto de «Disponible» (vendida: su página lleva a la categoría con 308). Oculta: 307.
+    mostrarEnWebField({
+      descripcion:
+        "Desmarcada, la unidad desaparece de toda la web (listados, portada, menú, buscador y sitemap) sin borrarse del panel, y su página lleva a su categoría de forma temporal. Para una unidad VENDIDA usa «Disponible».",
+    }),
     {
       name: "disponible",
       type: "checkbox",

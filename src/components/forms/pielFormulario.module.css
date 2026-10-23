@@ -120,36 +120,81 @@
  * su etiqueta SE VE (un archivo no tiene marcador de posición): por eso son `<section>` y no `<div>`
  * (la regla de arriba oculta las etiquetas de los `div`).
  */
-.formulario section[data-archivo] > label {
-  display: block;
-  margin-bottom: 8px;
+.formulario section[data-archivo] [data-titulo-archivo] {
+  margin: 0 0 8px;
   color: var(--color-texto);
   font-size: 14px;
   font-weight: 500;
 }
 
-.formulario input[type="file"] {
-  width: 100%;
-  min-height: 47px;
-  box-sizing: border-box;
-  padding: 8px 14px;
-  border: 1px solid rgb(16 15 15 / 0.45);
-  border-radius: 30px;
-  color: var(--color-texto);
-  font-size: 14px;
+.formulario [data-adjuntar-fila] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
 }
 
-.formulario input[type="file"]::file-selector-button {
-  min-height: 31px;
-  margin-right: 12px;
-  padding: 0 16px;
-  border: 0;
+/* «Adjuntar PDF»: el botón propio; el input nativo queda oculto y su foco se ve aquí. */
+.formulario [data-adjuntar] {
+  display: inline-flex;
+  min-height: 40px;
+  box-sizing: border-box;
+  gap: 8px;
+  align-items: center;
+  padding: 0 22px;
   border-radius: 30px;
   background: var(--color-texto);
   color: var(--color-fondo);
-  font: inherit;
+  font-size: var(--texto-etiqueta);
   font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.formulario [data-adjuntar]:hover {
+  background: var(--color-marca);
+}
+
+.formulario input[type="file"]:focus-visible + [data-adjuntar] {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 3px;
+}
+
+.formulario [data-sin-archivo] {
+  color: #5a5857;
+  font-size: 14px;
+}
+
+/* El nombre se parte en varias líneas si hace falta: nunca se corta el texto. */
+.formulario [data-archivo-elegido] {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 180px;
+  gap: 10px;
+  align-items: center;
+}
+
+.formulario [data-nombre-archivo] {
+  min-width: 0;
+  color: var(--color-texto);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.formulario [data-quitar] {
+  flex: none;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--color-marca);
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.formulario [data-quitar]:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 2px;
 }
 
 .formulario section[data-autorizacion] > label {
@@ -175,7 +220,7 @@
   text-decoration: underline;
 }
 
-.formulario section[data-archivo] [aria-invalid="true"],
+.formulario section[data-archivo] input[aria-invalid="true"] + [data-adjuntar],
 .formulario section[data-autorizacion] [aria-invalid="true"] {
   outline: 2px solid #c4161c;
   outline-offset: 2px;

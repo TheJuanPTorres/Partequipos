@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { IconPaperclip } from "@tabler/icons-react";
+import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 
 import { Campo, claseControl } from "@/components/forms/Campo";
 import { Turnstile } from "@/components/forms/Turnstile";
@@ -47,6 +48,8 @@ export function FormularioHojaDeVida({
   const confirmacion = useRef<HTMLDivElement>(null);
   const vuelta = useRef(0);
 
+  const [archivo, setArchivo] = useState<File | null>(null);
+  const entradaArchivo = useRef<HTMLInputElement>(null);
   const [enviando, setEnviando] = useState(false);
   const [errores, setErrores] = useState<ErroresHv>({});
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -75,6 +78,26 @@ export function FormularioHojaDeVida({
       return `El PDF pesa demasiado: el máximo es ${MAX_PDF_MB} MB.`;
     }
     return undefined;
+  }
+
+  function alElegirArchivo(e: ChangeEvent<HTMLInputElement>) {
+    const elegido = e.currentTarget.files?.[0] ?? null;
+    const aviso = avisoDelArchivo(elegido ?? undefined);
+    if (aviso) {
+      // No se queda un archivo que no vale: se avisa y se vacía la elección.
+      e.currentTarget.value = "";
+      setArchivo(null);
+      setErrores((previos) => ({ ...previos, hojaDeVida: aviso }));
+      return;
+    }
+    setArchivo(elegido);
+    setErrores((previos) => ({ ...previos, hojaDeVida: undefined }));
+  }
+
+  function quitarArchivo() {
+    if (entradaArchivo.current) entradaArchivo.current.value = "";
+    setArchivo(null);
+    entradaArchivo.current?.focus();
   }
 
   async function alEnviar(e: FormEvent<HTMLFormElement>) {
@@ -242,24 +265,50 @@ export function FormularioHojaDeVida({
           )}
         </Campo>
 
-        {/* El PDF: fuera de `Campo` porque aquí la etiqueta SÍ se ve (no hay placeholder en un archivo). */}
+        {/*
+         * El PDF: botón propio «Adjuntar PDF». El `<input type="file">` nativo queda oculto pero
+         * accesible (sigue en el orden de tabulación y anuncia su nombre; su foco se pinta en el
+         * botón). Al elegir, se ve el nombre del archivo, con «Quitar».
+         */}
         <section data-campo="" data-archivo="">
-          <label htmlFor={campo("hojaDeVida")}>
+          <p id={campo("hojaDeVida-titulo")} data-titulo-archivo="">
             Hoja de vida (PDF, máximo {MAX_PDF_MB} MB)
             <span className="text-red-700">
               {" *"}
               <span className="sr-only">(obligatorio)</span>
             </span>
-          </label>
-          <input
-            id={campo("hojaDeVida")}
-            name="hojaDeVida"
-            type="file"
-            accept="application/pdf,.pdf"
-            required
-            aria-invalid={errores.hojaDeVida ? true : undefined}
-            aria-describedby={errores.hojaDeVida ? campo("hojaDeVida-error") : undefined}
-          />
+          </p>
+          <div data-adjuntar-fila="">
+            <input
+              ref={entradaArchivo}
+              id={campo("hojaDeVida")}
+              name="hojaDeVida"
+              type="file"
+              accept="application/pdf,.pdf"
+              className="sr-only"
+              aria-labelledby={campo("hojaDeVida-titulo")}
+              aria-invalid={errores.hojaDeVida ? true : undefined}
+              aria-describedby={errores.hojaDeVida ? campo("hojaDeVida-error") : undefined}
+              onChange={alElegirArchivo}
+            />
+            <label htmlFor={campo("hojaDeVida")} data-adjuntar="">
+              <IconPaperclip aria-hidden="true" size={18} stroke={2} />
+              {archivo ? "Cambiar PDF" : "Adjuntar PDF"}
+            </label>
+            {archivo ? (
+              <span data-archivo-elegido="">
+                <span data-nombre-archivo="">{archivo.name}</span>
+                <button type="button" data-quitar="" onClick={quitarArchivo}>
+                  Quitar<span className="sr-only"> el archivo {archivo.name}</span>
+                </button>
+              </span>
+            ) : (
+              <span data-sin-archivo="">Ningún archivo seleccionado</span>
+            )}
+          </div>
+          <span aria-live="polite" className="sr-only">
+            {archivo ? `Archivo elegido: ${archivo.name}` : ""}
+          </span>
           {errores.hojaDeVida ? (
             <p id={campo("hojaDeVida-error")} role="alert" data-error="">
               {errores.hojaDeVida}

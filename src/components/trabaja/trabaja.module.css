@@ -309,15 +309,40 @@
   margin-top: 0;
 }
 
-/* Con cuatro tarjetas por fila a 1440 px, los dos botones caben juntos solo si son algo más compactos. */
-@media (min-width: 1280px) {
+/*
+ * MISMA FILA en escritorio y tablet (≥ 768 px, donde hay cuatro tarjetas por fila): los dos botones
+ * se reparten el ancho de la tarjeta sin partirse. Desde 768 hasta 1279 px la tarjeta es más
+ * estrecha (menos relleno, letra de 14 px y sin icono); en móvil, una tarjeta por fila, caben o bajan
+ * uno bajo el otro.
+ */
+@media (min-width: 768px) {
   .acciones {
+    flex-wrap: nowrap;
     gap: 8px;
+    width: 100%;
   }
 
   .acciones .boton {
-    gap: 8px;
-    padding: 11px 16px;
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    gap: 6px;
+    padding: 11px 8px;
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .tarjeta {
+    padding: 24px 16px;
+  }
+
+  .acciones .boton {
+    font-size: 14px;
+  }
+
+  .acciones .boton svg {
+    display: none;
   }
 }
 

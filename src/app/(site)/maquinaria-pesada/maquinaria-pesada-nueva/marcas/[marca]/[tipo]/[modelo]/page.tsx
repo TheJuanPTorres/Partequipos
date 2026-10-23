@@ -32,6 +32,7 @@ import {
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
+import { fotoDeCabecera } from "@/lib/nueva/paginaTipo";
 import { productoVisible } from "@/lib/nueva/visibilidad";
 import { rutas } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/seo/config";
@@ -225,6 +226,9 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
         // El logo de la marca, el único del sitio (`LogoMarca`); sin logo, la franja va sin imagen.
         logo: conAlt(logoDeMarca(marca, logos), `Logo de ${marca.nombre}`),
         tarjetas,
+        color: marca.colorMarca,
+        foto: fotoDeCabecera(tipo, [equipo]),
+        marca: { nombre: marca.nombre, href: `${rutas.marcaMaquinaria(marca.slug)}/` },
       }}
       imagenContacto={imagenContacto}
       contactoEsFoto={contactoEsFoto}

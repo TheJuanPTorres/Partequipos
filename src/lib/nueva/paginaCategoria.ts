@@ -1,14 +1,14 @@
 import type { EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
 
-import { colorDeMarca, tintaDeLogoSobre } from "../marca/colorMarca";
+import { COLOR_SIN_MARCA, colorDeMarca, tintaDeLogoSobre } from "../marca/colorMarca";
 import type { LogoConAlt } from "../marca/logoMarca";
 import type { VistaEncabezado } from "../repuestos/marca";
 import { tituloPorDefecto } from "../seo/porDefecto";
-import { imagenDeMedia, poblado } from "../utils/relations";
+import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 
 import type { TarjetaEquipo } from "./paginaMarcaAndres";
 import { SLUG_ADITAMENTOS } from "./indiceTipos";
-import { tarjetasDeEquipos } from "./paginaTipo";
+import { fotoDeCabecera, tarjetasDeEquipos } from "./paginaTipo";
 
 /**
  * Lógica pura de la CATEGORÍA QUE MEZCLA MARCAS de maquinaria nueva sin marketplace
@@ -22,6 +22,11 @@ export type GrupoDeCategoria = {
   /** La marca del grupo, para su logo en la franja (`FranjaMarca`) cuando la página mezcla marcas. */
   marca: MarcasMaquinaria;
   tarjetas: TarjetaEquipo[];
+  /**
+   * La máquina que asoma en la franja (D3, `MEJORAS_FRANJA`): la «Imagen de la tarjeta» del tipo
+   * o, sin ella, la primera foto de sus equipos (la de la cabecera de su página de tipo).
+   */
+  foto: ImagenLista | null;
 };
 
 /**
@@ -54,6 +59,7 @@ export function gruposPorMarcaYTipo(equipos: EquiposNuevo[]): GrupoDeCategoria[]
       titulo: tituloPorDefecto.tipoMaquinaria(g.tipo.nombre, g.marca.nombre),
       marca: g.marca,
       tarjetas: tarjetasDeEquipos(g.marca, g.tipo.slug, g.equipos),
+      foto: fotoDeCabecera(g.tipo, g.equipos),
     }))
     .filter((g) => g.tarjetas.length > 0);
 }
@@ -62,7 +68,7 @@ export function gruposPorMarcaYTipo(equipos: EquiposNuevo[]): GrupoDeCategoria[]
  * El naranja de la barra de series de repuestos (el color de Hitachi): el de la pastilla activa
  * de una marca sin color (dirección, 2026-10-23).
  */
-export const COLOR_BARRA_SIN_MARCA = "#fc661c";
+export const COLOR_BARRA_SIN_MARCA = COLOR_SIN_MARCA;
 
 /** Una pastilla de la barra de marcas: lleva al primer grupo de la marca. */
 export type PastillaMarca = {

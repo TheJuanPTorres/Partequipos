@@ -1897,7 +1897,9 @@ a.modelo:hover {
   /* C3: la foto de la cabecera se acerca muy despacio, solo `transform` (no toca el LCP: la
      imagen se pinta igual desde el primer fotograma). Lineal: con la curva del listado, que
      frena al final, a los 5 s ya iba por 1,043 y no se sentía como un zoom de 12 s. */
-  [data-anim~="C3"] .fondo {
+  [data-anim~="C3"] .fondo,
+  /* T5 de «Trabaja con nosotros»: la misma foto que se acerca (2026-10-23). */
+  [data-anim~="T5"] .fondo {
     animation: zoomLento 12s linear forwards;
   }
 }

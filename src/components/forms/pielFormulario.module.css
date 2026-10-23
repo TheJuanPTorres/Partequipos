@@ -114,3 +114,76 @@
 .formulario button[type="submit"]:hover:not(:disabled) {
   background: var(--color-texto);
 }
+
+/*
+ * «Enviar HV» (2026-10-23): el PDF y la casilla de autorización. A diferencia de los demás campos,
+ * su etiqueta SE VE (un archivo no tiene marcador de posición): por eso son `<section>` y no `<div>`
+ * (la regla de arriba oculta las etiquetas de los `div`).
+ */
+.formulario section[data-archivo] > label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-texto);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.formulario input[type="file"] {
+  width: 100%;
+  min-height: 47px;
+  box-sizing: border-box;
+  padding: 8px 14px;
+  border: 1px solid rgb(16 15 15 / 0.45);
+  border-radius: 30px;
+  color: var(--color-texto);
+  font-size: 14px;
+}
+
+.formulario input[type="file"]::file-selector-button {
+  min-height: 31px;
+  margin-right: 12px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 30px;
+  background: var(--color-texto);
+  color: var(--color-fondo);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.formulario section[data-autorizacion] > label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--color-texto);
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.formulario section[data-autorizacion] input[type="checkbox"] {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  accent-color: var(--color-marca);
+}
+
+.formulario section[data-autorizacion] a {
+  color: var(--color-marca);
+  text-decoration: underline;
+}
+
+.formulario section[data-archivo] [aria-invalid="true"],
+.formulario section[data-autorizacion] [aria-invalid="true"] {
+  outline: 2px solid #c4161c;
+  outline-offset: 2px;
+}
+
+.formulario section[data-campo] [data-error] {
+  margin: 6px 0 0 4px;
+  color: #c4161c;
+  font-size: 13px;
+  line-height: 18px;
+}

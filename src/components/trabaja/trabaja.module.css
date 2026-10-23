@@ -297,74 +297,105 @@
   margin-top: 0;
 }
 
-/* --- «¿No ves una oferta para tu perfil?» (fbd0e68 · ced1675) ------------- */
-.hojaDeVida {
-  margin-top: 20px;
-  padding: 5%;
-  border-radius: 30px 30px 0 0;
-  background: var(--color-fondo);
-}
-
-.hojaDeVidaCaja {
+/* --- Acciones de la tarjeta: «Enviar HV» y «Ver oferta» (2026-10-23) ----- */
+.acciones {
   display: flex;
-  align-items: center;
-  padding-left: 5%;
-  border-radius: 30px;
-  background: var(--color-fondo-seccion);
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
 }
 
-.hojaDeVidaTexto {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
-  width: 50%;
-  padding: 30px 0;
+.acciones .boton {
+  margin-top: 0;
+}
+
+/* «Enviar HV»: el mismo botón, con el contorno rojo (la acción principal sigue siendo «Ver oferta»). */
+.botonSecundario {
+  background: transparent;
+  color: var(--color-marca);
+}
+
+.botonSecundario:hover {
+  color: var(--color-fondo);
+}
+
+/* --- Contador «N vacantes abiertas» (T4) ---------------------------------- */
+.contador {
+  margin: 24px 0 0;
   color: var(--color-texto);
-  font-size: var(--texto-cuerpo);
-  font-weight: 300;
-  line-height: 1.4;
-}
-
-.hojaDeVidaSinImagen .hojaDeVidaTexto {
-  width: auto;
-  max-width: 640px;
-}
-
-.hojaDeVidaTexto p {
-  margin: 0;
-}
-
-.hojaDeVidaTexto .boton {
-  margin-top: 8px;
-}
-
-.destacado {
-  font-weight: 600;
-}
-
-/* Título `secondary` del kit (45 · 35 · 9vw, 500, 1,2), 501 px. */
-.hojaDeVidaTitulo {
-  max-width: 501px;
-  margin: 0;
-  color: var(--color-texto);
-  font-size: var(--texto-titulo-bloque);
+  font-size: var(--texto-destacado);
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
-/* La imagen (7ec040a): a la derecha, 508 px, sube 120 px sobre la caja. */
-.hojaDeVidaImagen {
-  display: flex;
-  justify-content: flex-end;
-  width: 50%;
-  margin-top: -120px;
+.cifra {
+  display: inline-grid;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-marca);
 }
 
-.hojaDeVidaImagen img {
-  width: 508px;
-  max-width: 100%;
-  height: auto;
+/* La cifra final, invisible, fija el ancho: al subir, el texto no se mueve (CLS 0). */
+.cifra > * {
+  grid-area: 1 / 1;
+  text-align: right;
+}
+
+.cifraFija {
+  visibility: hidden;
+}
+
+/*
+ * T1 · las tarjetas entran escalonadas (opacity y transform: sin CLS). Una tarjeta nueva —al
+ * cambiar de ciudad— se monta y entra igual. `--i` es su posición (hasta 8 escalonan).
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-anim~="T1"] .tarjeta {
+    animation: entraTarjeta 0.5s cubic-bezier(0.33, 0, 0.2, 1) backwards;
+    animation-delay: calc(min(var(--i, 0), 8) * 60ms);
+  }
+
+  /* T2 · sube con sombra al pasar el ratón o al enfocar algo de la tarjeta. */
+  [data-anim~="T2"] .tarjeta {
+    transition:
+      transform 0.28s cubic-bezier(0.33, 0, 0.2, 1),
+      box-shadow 0.28s cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  [data-anim~="T2"] .tarjeta:hover,
+  [data-anim~="T2"] .tarjeta:focus-within {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 28px rgb(16 15 15 / 0.12);
+  }
+}
+
+@keyframes entraTarjeta {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/*
+ * T3 · el resaltado de la ciudad elegida es un fondo propio (`::before`) que viaja de una
+ * píldora a otra (`FiltroCiudades`). Sin T3, la píldora actual se rellena como siempre.
+ */
+[data-anim~="T3"] .filtroOpcion {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+[data-anim~="T3"] .filtroOpcion[aria-current="page"] {
+  background: transparent;
+}
+
+[data-anim~="T3"] .filtroOpcion[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--color-texto);
 }
 
 .soloLectores {
@@ -381,10 +412,6 @@
   .equipoTitulo,
   .equipoTexto {
     flex: 1 1 0;
-  }
-
-  .hojaDeVidaImagen img {
-    width: 228px;
   }
 }
 
@@ -408,34 +435,12 @@
   .fila {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  .hojaDeVidaCaja {
-    flex-direction: column;
-    padding-left: 0;
-  }
-
-  .hojaDeVidaTexto,
-  .hojaDeVidaSinImagen .hojaDeVidaTexto {
-    align-items: center;
-    width: 100%;
-    max-width: none;
-    padding: 30px 10px 10px;
-    text-align: center;
-  }
-
-  .hojaDeVidaImagen {
-    justify-content: center;
-    width: 100%;
-    margin-top: 0;
-  }
-
-  .hojaDeVidaImagen img {
-    width: 59%;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .boton,
+  .botonSecundario,
+  .tarjeta,
   .filtroOpcion,
   .resultados,
   .zona[data-cargando] .resultados {

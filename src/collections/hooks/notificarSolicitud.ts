@@ -15,8 +15,15 @@ import { datosEmpresa } from "@/lib/seo/empresa";
  *
  * Solo avisa al crear: marcar una solicitud como atendida no vuelve a notificar.
  */
-export const notificarSolicitud: CollectionAfterChangeHook = async ({ doc, operation, req }) => {
+export const notificarSolicitud: CollectionAfterChangeHook = async ({
+  doc,
+  operation,
+  req,
+  context,
+}) => {
   if (operation !== "create") return doc;
+  // La hoja de vida («Enviar HV») avisa ella misma, con el PDF adjunto: aquí no se repite.
+  if (context.sinAviso) return doc;
 
   // Sin destino propio, en producción, el correo de contacto de la empresa
   // (global `seo`, con respaldo en `seoConfig`). Fuera de producción, solo el

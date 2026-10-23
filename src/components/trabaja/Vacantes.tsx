@@ -1,8 +1,11 @@
 import { IconEye, IconMapPin } from "@tabler/icons-react";
-import Link from "next/link";
+import type { CSSProperties } from "react";
 
 import { ZonaCatalogo } from "@/components/listado/ZonaCatalogo";
 import { Revelado } from "@/components/movimiento/Revelado";
+import { BotonHojaDeVida } from "@/components/trabaja/BotonHojaDeVida";
+import { ContadorVacantes } from "@/components/trabaja/ContadorVacantes";
+import { FiltroCiudades } from "@/components/trabaja/FiltroCiudades";
 import { URL_PORTAL_BUK } from "@/lib/vacantes/portalBuk";
 import type { Vacante } from "@/lib/vacantes/tipos";
 import type { Filtro, OpcionCiudad } from "@/lib/vacantes/vista";
@@ -83,49 +86,16 @@ export function Vacantes({
             aria-label="Filtrar las vacantes por ciudad"
             data-catalogo-nav=""
           >
-            <ul className={estilos.filtroLista}>
-              <li>
-                <Link
-                  href={ruta}
-                  className={estilos.filtroOpcion}
-                  aria-current={ciudadActual === null ? "page" : undefined}
-                  prefetch={false}
-                >
-                  <span
-                    className={`${estilos.reserva} ${estilos.reservaLinea}`}
-                    data-reserva="Todas"
-                  >
-                    <span>Todas</span>
-                  </span>
-                </Link>
-              </li>
-              {ciudades.map((c) => (
-                <li key={c.slug}>
-                  <Link
-                    href={`${ruta}?ciudad=${c.slug}`}
-                    className={estilos.filtroOpcion}
-                    aria-current={ciudadActual === c.slug ? "page" : undefined}
-                    prefetch={false}
-                  >
-                    <span
-                      className={`${estilos.reserva} ${estilos.reservaLinea}`}
-                      data-reserva={`${c.nombre} (${c.cuantas})`}
-                    >
-                      <span>
-                        {c.nombre} <span className={estilos.filtroCuantas}>({c.cuantas})</span>
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <FiltroCiudades ciudades={ciudades} ciudadActual={ciudadActual} ruta={ruta} />
           </nav>
         )}
 
-        {ciudades.length > 0 && (
+        {/* «N vacantes abiertas» (T4): también anuncia el cambio al filtrar (lectores de pantalla). */}
+        {vacantes.length > 0 && <ContadorVacantes total={vacantes.length} />}
+        {ciudades.length > 0 && filtro.tipo === "ciudad" && (
           <p className={estilos.soloLectores} aria-live="polite">
-            {vacantes.length === 1 ? "1 vacante" : `${vacantes.length} vacantes`}
-            {filtro.tipo === "ciudad" ? ` en ${filtro.ciudad.nombre}` : ""}
+            {vacantes.length === 1 ? "1 vacante" : `${vacantes.length} vacantes`} en{" "}
+            {filtro.ciudad.nombre}
           </p>
         )}
 
@@ -135,23 +105,35 @@ export function Vacantes({
             <div className={estilos.tarjetas}>
               {filas(vacantes).map((fila, i) => (
                 <ul key={i} className={estilos.fila}>
-                  {fila.map((v) => (
-                    <li key={v.enlace} className={estilos.tarjeta}>
+                  {fila.map((v, j) => (
+                    <li
+                      key={v.enlace}
+                      className={estilos.tarjeta}
+                      style={{ "--i": i * POR_FILA + j } as CSSProperties}
+                    >
                       <h3 className={estilos.cargo}>{v.cargo}</h3>
                       <p className={estilos.ciudad}>
                         <IconMapPin aria-hidden="true" size={14} stroke={2} />
                         {v.ciudad}
                       </p>
-                      <a
-                        href={v.enlace}
-                        className={estilos.boton}
-                        target="_blank"
-                        rel="noopener"
-                        aria-label={`Ver oferta: ${v.cargo}, ${v.ciudad} (se abre en otra pestaña, en Buk)`}
-                      >
-                        <IconEye aria-hidden="true" size={16} stroke={2} />
-                        Ver oferta
-                      </a>
+                      <div className={estilos.acciones}>
+                        <BotonHojaDeVida
+                          vacante={v.cargo}
+                          ciudad={v.ciudad}
+                          hrefSinJs={v.enlace}
+                          className={`${estilos.boton} ${estilos.botonSecundario}`}
+                        />
+                        <a
+                          href={v.enlace}
+                          className={estilos.boton}
+                          target="_blank"
+                          rel="noopener"
+                          aria-label={`Ver oferta: ${v.cargo}, ${v.ciudad} (se abre en otra pestaña, en Buk)`}
+                        >
+                          <IconEye aria-hidden="true" size={16} stroke={2} />
+                          Ver oferta
+                        </a>
+                      </div>
                     </li>
                   ))}
                 </ul>

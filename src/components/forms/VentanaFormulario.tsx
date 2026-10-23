@@ -21,6 +21,16 @@ const FormularioSolicitud = lazy(() =>
   })),
 );
 
+/** La hoja de vida («Enviar HV», 2026-10-23): su formulario tampoco viaja hasta abrir la ventana. */
+const FormularioHojaDeVida = lazy(() =>
+  import("@/components/forms/FormularioHojaDeVida").then((m) => ({
+    default: m.FormularioHojaDeVida,
+  })),
+);
+
+/** El formulario de la hoja de vida de una vacante, en lugar del de solicitud. */
+export type ConfigHojaDeVida = { vacante: string; origen: string };
+
 /**
  * LA VENTANA: un `<dialog>` nativo abierto con `showModal()`, que ya da el foco
  * atrapado (el resto de la página queda inerte), el cierre con Esc y el
@@ -33,13 +43,16 @@ export function VentanaFormulario({
   titulo,
   nombreAccesible,
   formulario,
+  hojaDeVida,
   alCerrar,
 }: {
   abierta: boolean;
   titulo: string;
   /** Para lectores de pantalla; por defecto, el título visible. */
   nombreAccesible?: string;
-  formulario: ConfigFormulario;
+  /** El formulario de solicitud; si se da `hojaDeVida`, no se usa. */
+  formulario?: ConfigFormulario;
+  hojaDeVida?: ConfigHojaDeVida;
   alCerrar: () => void;
 }) {
   const dialogo = useRef<HTMLDialogElement>(null);
@@ -47,7 +60,8 @@ export function VentanaFormulario({
 
   // Las mejoras F1–F4 (`animacionesVentana.ts`): las encendidas en el código y, solo fuera del sitio
   // publicado, recortadas por `?anim=`. En el servidor y al hidratar, todas las encendidas.
-  const permitirUrl = useDatosContacto()?.permitirUrl ?? false;
+  const contacto = useDatosContacto();
+  const permitirUrl = contacto?.permitirUrl ?? false;
   const parametro = useSyncExternalStore(
     sinSuscripcion,
     () => (permitirUrl ? new URL(location.href).searchParams.get(PARAMETRO_ANIMACIONES) : null),
@@ -93,12 +107,22 @@ export function VentanaFormulario({
         {abierta ? (
           <Suspense fallback={<p className={estilos.cargando}>Cargando el formulario…</p>}>
             <div className={piel.formulario}>
-              <FormularioSolicitud
-                {...formulario}
-                variante="emergente"
-                animar={activas}
-                alCerrar={alCerrar}
-              />
+              {hojaDeVida ? (
+                <FormularioHojaDeVida
+                  vacante={hojaDeVida.vacante}
+                  origen={hojaDeVida.origen}
+                  siteKey={contacto?.siteKey ?? null}
+                  animar={activas}
+                  alCerrar={alCerrar}
+                />
+              ) : formulario ? (
+                <FormularioSolicitud
+                  {...formulario}
+                  variante="emergente"
+                  animar={activas}
+                  alCerrar={alCerrar}
+                />
+              ) : null}
             </div>
           </Suspense>
         ) : null}

@@ -3798,18 +3798,13 @@ export interface PaginasIndice {
      * Vacío, el texto del diseño («Buscamos profesionales que…»).
      */
     textoEquipo?: string | null;
+    /**
+     * A este correo llegan las hojas de vida que se envían con «Enviar HV», con el PDF adjunto (no se guarda en el sitio). Vacío, el correo general de la empresa. Fuera del sitio publicado (previews) este campo se ignora.
+     */
+    correoHojasDeVida?: string | null;
     tituloHojaDeVida?: string | null;
-    /**
-     * Un párrafo por línea en blanco; el último va en negrita. Vacío, el texto del diseño.
-     */
     textoHojaDeVida?: string | null;
-    /**
-     * El botón lleva al portal de empleo de Buk: aquí no se guardan datos.
-     */
     botonHojaDeVida?: string | null;
-    /**
-     * Opcional. Una persona recortada (PNG o WebP con transparencia), junto al texto. Sin ella, el texto ocupa el bloque.
-     */
     imagenHojaDeVida?: (number | null) | Media;
   };
   /**
@@ -4113,6 +4108,7 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
         fondo?: T;
         tituloEquipo?: T;
         textoEquipo?: T;
+        correoHojasDeVida?: T;
         tituloHojaDeVida?: T;
         textoHojaDeVida?: T;
         botonHojaDeVida?: T;

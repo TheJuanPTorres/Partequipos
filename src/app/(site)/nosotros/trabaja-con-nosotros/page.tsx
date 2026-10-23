@@ -5,8 +5,8 @@ import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
+import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { HojaDeVida } from "@/components/trabaja/HojaDeVida";
 import { Vacantes } from "@/components/trabaja/Vacantes";
 import { metadataFiltrada } from "@/lib/filtros/seo";
 import { getPaginaPorSlug } from "@/lib/queries/getPaginas";
@@ -15,6 +15,7 @@ import { rutas } from "@/lib/routes";
 import { absoluteUrl, indexacionPermitida } from "@/lib/seo/config";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { metadataDe } from "@/lib/seo/metadata";
+import { ANIMACIONES_TRABAJA } from "@/lib/trabaja/animaciones";
 import { obtenerVacantes } from "@/lib/vacantes/fuente";
 import {
   aplicarFiltro,
@@ -29,9 +30,11 @@ import {
  * WordPress; plantilla de Andrés, 2026-10-23). Del 2026-10-14 al 22 esta URL
  * redirigía al portal de Buk.
  *
- * - Encabezado BAJO de las páginas índice («Plantilla 1»), «Únete a nuestro equipo»
- *   con las vacantes y «¿No ves una oferta para tu perfil?» con el botón al
- *   portal de Buk (no guardamos datos personales).
+ * - Encabezado BAJO de las páginas índice («Plantilla 1») y «Únete a nuestro equipo»
+ *   con las vacantes: cada tarjeta lleva «Ver oferta» (a Buk) y «Enviar HV», que abre la
+ *   ventana del formulario con la hoja de vida en PDF (`/api/hoja-de-vida/`; el PDF va de
+ *   adjunto por correo y NO se guarda). El bloque «¿No ves una oferta para tu perfil?» se
+ *   quitó el 2026-10-23.
  * - Las vacantes salen SOLO de `obtenerVacantes()` (`src/lib/vacantes/`): hoy
  *   leen el portal público de Buk cada 6 horas como mucho, con la última copia
  *   buena si falla; mañana, la API oficial, sin tocar esta página.
@@ -90,21 +93,26 @@ export default async function TrabajaConNosotrosPage({ searchParams }: Props) {
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      {/* Cabecera BAJA (Juan Pablo, 2026-10-23): 380 px (420 en móvil), centrada en vertical. */}
-      <HeroMarca vista={vista.encabezado} anclaSiguiente={ANCLA} franja={false} indice bajo />
+      {/* Las mejoras T1–T5 (`animaciones.ts`): en un preview, `?anim=T1,T3`; en el publicado, el
+          parámetro no hace nada. */}
+      <ZonaAnimada
+        interruptores={ANIMACIONES_TRABAJA}
+        permitirUrl={process.env.VERCEL_ENV !== "production"}
+      >
+        {/* Cabecera BAJA (Juan Pablo, 2026-10-23): 380 px (420 en móvil), centrada en vertical. */}
+        <HeroMarca vista={vista.encabezado} anclaSiguiente={ANCLA} franja={false} indice bajo />
 
-      <Vacantes
-        id={ANCLA}
-        titulo={vista.equipo.titulo}
-        texto={vista.equipo.texto}
-        vacantes={aplicarFiltro(resultado.vacantes, filtro)}
-        ciudades={ciudades}
-        filtro={filtro}
-        ruta={ruta}
-        clave={filtro.tipo === "ciudad" ? `${ruta}?ciudad=${filtro.ciudad.slug}` : ruta}
-      />
-
-      <HojaDeVida bloque={vista.hojaDeVida} />
+        <Vacantes
+          id={ANCLA}
+          titulo={vista.equipo.titulo}
+          texto={vista.equipo.texto}
+          vacantes={aplicarFiltro(resultado.vacantes, filtro)}
+          ciudades={ciudades}
+          filtro={filtro}
+          ruta={ruta}
+          clave={filtro.tipo === "ciudad" ? `${ruta}?ciudad=${filtro.ciudad.slug}` : ruta}
+        />
+      </ZonaAnimada>
 
       {/* Sin la tarjeta roja del pie («Ofrecemos Soluciones…», para compradores): la página es
           para trabajadores y ya cierra con «¿No ves una oferta para tu perfil?» (Juan Pablo). */}

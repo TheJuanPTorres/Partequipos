@@ -322,34 +322,44 @@ export const PaginasIndice: GlobalConfig = {
           admin: { description: "Vacío, el texto del diseño («Buscamos profesionales que…»)." },
         },
         {
+          // Cada vacante lleva «Enviar HV» (ventana con el formulario y el PDF). El PDF NO se guarda:
+          // va de adjunto en este correo.
+          name: "correoHojasDeVida",
+          type: "email",
+          label: "Correo para hojas de vida",
+          admin: {
+            placeholder: "seleccion@…",
+            description:
+              "A este correo llegan las hojas de vida que se envían con «Enviar HV», con el PDF adjunto (no se guarda en el sitio). Vacío, el correo general de la empresa. Fuera del sitio publicado (previews) este campo se ignora.",
+          },
+        },
+        // El bloque «¿No ves una oferta para tu perfil?» se quitó (2026-10-23): estos campos ya no
+        // se pintan. Siguen en la base; ocultos para no confundir.
+        {
           name: "tituloHojaDeVida",
           type: "text",
           label: "Título del bloque final",
-          admin: { placeholder: "¿No ves una oferta para tu perfil?" },
+          admin: { hidden: true },
         },
         {
           name: "textoHojaDeVida",
           type: "textarea",
           label: "Texto del bloque final",
-          admin: {
-            description:
-              "Un párrafo por línea en blanco; el último va en negrita. Vacío, el texto del diseño.",
-          },
+          admin: { hidden: true },
         },
         {
           name: "botonHojaDeVida",
           type: "text",
           label: "Texto del botón del bloque final",
-          admin: {
-            placeholder: "Envíanos tu hoja de vida",
-            description: "El botón lleva al portal de empleo de Buk: aquí no se guardan datos.",
-          },
+          admin: { hidden: true },
         },
-        imagen(
-          "imagenHojaDeVida",
-          "Imagen del bloque final",
-          "Opcional. Una persona recortada (PNG o WebP con transparencia), junto al texto. Sin ella, el texto ocupa el bloque.",
-        ),
+        {
+          name: "imagenHojaDeVida",
+          type: "upload",
+          relationTo: "media",
+          label: "Imagen del bloque final",
+          admin: { hidden: true },
+        },
       ],
     },
     {

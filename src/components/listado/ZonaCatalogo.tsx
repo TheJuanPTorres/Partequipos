@@ -9,6 +9,7 @@ import {
   PARAMETRO_ANIMACIONES,
   type Animacion,
 } from "@/lib/listado/animaciones";
+import { esEnvioDelCatalogo } from "@/lib/listado/envioCatalogo";
 
 /** Los enlaces que solo cambian el catálogo van dentro de un elemento con este atributo. */
 const ATRIBUTO_NAVEGACION = "data-catalogo-nav";
@@ -197,7 +198,8 @@ export function ZonaCatalogo({
       }}
       onSubmitCapture={(e) => {
         const form = e.target as HTMLFormElement;
-        if (form.method.toLowerCase() !== "get") return;
+        // Solo el de filtros: un formulario de solicitud (acción de servidor) sigue su camino.
+        if (!esEnvioDelCatalogo(form)) return;
         e.preventDefault();
         const datos = new URLSearchParams();
         new FormData(form).forEach((v, k) => {

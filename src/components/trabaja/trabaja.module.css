@@ -76,7 +76,21 @@
   letter-spacing: 0.04em;
 }
 
-/* Las píldoras del filtro, en una línea: su ancho es el de la copia. */
+/*
+ * La frase y las píldoras, SIN ensanchar: con 0,04 em la copia de la frase
+ * ocupaba una línea más a 1010 y 390 (hueco de ~20 px) y las píldoras salían
+ * más anchas (el filtro pasaba a dos filas a 1440). «Inter Fallback» ya está
+ * ajustada al ancho de Inter; la caja es el mayor de los dos.
+ */
+.reservaJusta::after {
+  letter-spacing: normal;
+}
+
+/* Las píldoras del filtro, en una línea y con el texto centrado en su caja. */
+.reservaLinea {
+  justify-items: center;
+}
+
 .reservaLinea,
 .reservaLinea::after {
   white-space: nowrap;

@@ -531,7 +531,7 @@ export interface TiposMaquinaria {
    */
   imagen?: (number | null) | Media;
   /**
-   * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Compactadores» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
+   * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Vibrocompactador» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
    */
   subtipos?: (number | TiposMaquinaria)[] | null;
   /**
@@ -947,7 +947,7 @@ export interface CategoriasUsada {
    */
   imagen?: (number | null) | Media;
   /**
-   * Marcada, la categoría sale dentro de «Otros» (menú e índice de usados). Desmarcada, sale sola en el primer nivel, como Excavadoras y Aditamentos. Su página no cambia.
+   * Marcada, la categoría sale dentro de «Otros» (menú e índice de usados). Desmarcada, sale sola en el primer nivel, como Excavadora y Aditamentos. Su página no cambia.
    */
   enOtros?: boolean | null;
   /**
@@ -1408,7 +1408,7 @@ export interface Pagina {
     antetitulo?: string | null;
     titulo?: string | null;
     /**
-     * Botón rojo sobre el carrusel; lleva a la categoría «Excavadoras» de usados. Vacío: «Excavadoras».
+     * Botón rojo sobre el carrusel; lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».
      */
     pestanaExcavadoras?: string | null;
     /**

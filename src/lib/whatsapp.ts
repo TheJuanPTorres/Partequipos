@@ -19,3 +19,10 @@ export function enlaceWhatsApp(numero: string, mensaje?: string): EnlaceWhatsApp
 
   return { href: url.toString(), etiqueta: numero };
 }
+
+/** El mismo enlace con un mensaje ya escrito (`?text=`), p. ej. el producto que se cotiza. */
+export function conMensaje(enlace: EnlaceWhatsApp, mensaje: string): EnlaceWhatsApp {
+  const url = new URL(enlace.href);
+  url.searchParams.set("text", mensaje);
+  return { ...enlace, href: url.toString() };
+}

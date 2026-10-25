@@ -4,6 +4,7 @@ import { BotonFormulario } from "@/components/forms/BotonFormulario";
 import { BotonVisorPdf } from "@/components/ficha/BotonVisorPdf";
 import { configContactoMarca, type ConfigFormulario } from "@/lib/formularios/configFormulario";
 import { nombreCompleto, type GrupoProductos } from "@/lib/lubricantes/marca";
+import { conMensaje } from "@/lib/whatsapp";
 
 import estilos from "./lubricantes.module.css";
 
@@ -58,7 +59,13 @@ export function ProductosLinea({
                 const cotizacion = configContactoMarca({
                   origen: formulario.origen,
                   siteKey: formulario.siteKey,
-                  whatsapp: formulario.whatsapp,
+                  // El WhatsApp de la ventana lleva el producto en el mensaje, como las fichas.
+                  whatsapp: formulario.whatsapp
+                    ? conMensaje(
+                        formulario.whatsapp,
+                        `Hola, quiero cotizar el lubricante ${marca} ${nombre}.`,
+                      )
+                    : undefined,
                   boton: formulario.textoBoton,
                   marca,
                   producto: `Lubricante ${marca} ${nombre}`,

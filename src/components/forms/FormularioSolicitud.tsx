@@ -1,5 +1,6 @@
 "use client";
 
+import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { useActionState, useEffect, useId, useRef } from "react";
 
 import { Campo, claseControl } from "@/components/forms/Campo";
@@ -437,7 +438,20 @@ export function FormularioSolicitud({
             {enviando ? "Enviando la solicitud" : ""}
           </span>
 
-          {whatsapp ? (
+          {whatsapp && emergente ? (
+            // La VENTANA lleva un botón verde con el icono (2026-10-25); el enlace de texto de las
+            // páginas no cambia. Mismo destino y mensaje, en pestaña nueva.
+            <a
+              href={whatsapp.href}
+              data-whatsapp-boton=""
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={2} size={20} />
+              Escríbenos por WhatsApp
+              <span className="sr-only"> (se abre en otra pestaña)</span>
+            </a>
+          ) : whatsapp ? (
             <a
               href={whatsapp.href}
               className="text-sm text-gray-700 underline hover:text-gray-900"

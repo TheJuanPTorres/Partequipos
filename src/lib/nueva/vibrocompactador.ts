@@ -96,3 +96,11 @@ export function avisoNoVibratorio(texto: string): string | null {
   if (/para\s+minicargador/i.test(texto)) return "aditamento: confirmar si vibra";
   return null;
 }
+
+/**
+ * Para PINTAR un título grande: un guion suave (U+00AD) entre «Vibro» y «compactador», así en el
+ * móvil la palabra se divide como «Vibro-compactador» en cualquier navegador (sin diccionario de
+ * guiones, Chrome la partía por donde caía). Invisible si cabe; no va en datos ni en metadatos.
+ */
+export const conCorteSuave = (texto: string): string =>
+  texto.replace(/(vibro)(compactador)/giu, "$1\u00AD$2");

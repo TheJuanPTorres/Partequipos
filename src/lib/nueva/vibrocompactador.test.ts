@@ -6,6 +6,7 @@ import {
   aVibrocompactadorRico,
   aVibrocompactadorTexto,
   avisoNoVibratorio,
+  conCorteSuave,
   nombraCompactador,
 } from "./vibrocompactador";
 
@@ -99,5 +100,13 @@ describe("avisos", () => {
     assert.ok(nombraCompactador("Compactador"));
     assert.ok(nombraCompactador("Compactador"));
     assert.ok(!nombraCompactador("Excavadora"));
+  });
+});
+
+describe("conCorteSuave", () => {
+  it("un guion suave entre «Vibro» y «compactador», con cualquier caja; el resto igual", () => {
+    assert.equal(conCorteSuave("Vibrocompactador de Suelo"), "Vibro­compactador de Suelo");
+    assert.equal(conCorteSuave("VIBROCOMPACTADOR"), "VIBRO­COMPACTADOR");
+    assert.equal(conCorteSuave("Excavadora"), "Excavadora");
   });
 });

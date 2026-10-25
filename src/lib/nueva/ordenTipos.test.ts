@@ -44,6 +44,16 @@ describe("ordenarTiposNueva", () => {
     assert.equal(posicionDeTipo("Miniexcavadoras"), 3);
     assert.equal(posicionDeTipo("Minicargadores"), 4);
   });
+
+  it("«Vibrocompactador» va donde «Compactadores», con el nombre viejo o el nuevo (2026-10-25)", () => {
+    assert.equal(posicionDeTipo("Vibrocompactador"), posicionDeTipo("Compactadores"));
+    assert.equal(posicionDeTipo("Vibrocompactador de Llantas"), 6);
+    assert.equal(posicionDeTipo("Compactador"), 6);
+    assert.deepEqual(
+      ordenarTiposNueva(["Pavimentadora", "Vibrocompactador", "Retrocargadora"], (n) => n),
+      ["Retrocargadora", "Vibrocompactador", "Pavimentadora"],
+    );
+  });
 });
 
 describe("unaEntradaPorTipo", () => {

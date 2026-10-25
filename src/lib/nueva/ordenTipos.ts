@@ -25,7 +25,9 @@ const normal = (s: string) =>
 
 /** Posición en el orden de la web antigua; los que no están, al final. */
 export function posicionDeTipo(nombre: string): number {
-  const n = normal(nombre);
+  // Sin «vibro» delante: «Vibrocompactador» va donde «Compactadores» (cliente, 2026-10-25), con
+  // los nombres viejos y los nuevos.
+  const n = normal(nombre).replace(/^vibro(?=compactador)/, "");
   // Por la raíz, sin la terminación («compactador»): «Compactadoras» y «Compactadores» son el mismo.
   const i = ORDEN_TIPOS_NUEVA.findIndex((clave) => n.startsWith(clave.replace(/(es|s)$/, "")));
   return i === -1 ? ORDEN_TIPOS_NUEVA.length : i;

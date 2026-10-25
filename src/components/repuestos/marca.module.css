@@ -128,6 +128,27 @@
   line-height: 1.2;
 }
 
+@media (max-width: 767px) {
+  /*
+   * Una palabra más ancha que la tarjeta («Vibrocompactador» a 390, 2026-10-25) se partía por
+   * fuera: cada palabra del revelado va en su máscara (`span` en línea) y no se dividía. Ahora
+   * la máscara no pasa del ancho y la palabra se divide con guion si tiene 16 letras o más
+   * (`hyphenate-limit-chars`: «Retrocargadora» o «Excavadora» no cambian); sin ese soporte, solo
+   * se parte la palabra que no cabe.
+   */
+  .linea1 span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  @supports (hyphenate-limit-chars: 16 6 6) {
+    .linea1 span {
+      hyphens: auto;
+      hyphenate-limit-chars: 16 6 6;
+    }
+  }
+}
+
 /*
  * `reservarTitulo` (la página de garantías, 2026-10-23): el alto del `<h1>` lo fija una copia
  * invisible del título en la fuente de respaldo, con el tamaño de `.linea1`, en la misma celda

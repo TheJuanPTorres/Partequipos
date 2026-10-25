@@ -4,6 +4,7 @@ import Link from "next/link";
 import reserva from "@/components/blog/cabeceraArticulo.module.css";
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import { Revelado } from "@/components/movimiento/Revelado";
+import { conCorteSuave } from "@/lib/nueva/vibrocompactador";
 import type { VistaEncabezado } from "@/lib/repuestos/marca";
 import type { BreadcrumbItem } from "@/lib/seo/jsonLd";
 
@@ -141,7 +142,7 @@ export function HeroMarca({
                 como="span"
                 alCargar
                 ritmo="titulo"
-                texto={vista.linea1}
+                texto={conCorteSuave(vista.linea1)}
                 className={estilos.linea1}
               />
             </h1>
@@ -151,7 +152,7 @@ export function HeroMarca({
                 como="span"
                 alCargar
                 ritmo="titulo"
-                texto={vista.linea1}
+                texto={conCorteSuave(vista.linea1)}
                 className={estilos.linea1}
               />
               {vista.linea2 ? (
@@ -159,7 +160,7 @@ export function HeroMarca({
                   como="span"
                   alCargar
                   ritmo="titulo"
-                  texto={vista.linea2}
+                  texto={conCorteSuave(vista.linea2)}
                   className={estilos.linea2}
                 />
               ) : null}

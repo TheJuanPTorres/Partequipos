@@ -126,7 +126,8 @@ a.enlaceFranja:focus-visible {
  * La BARRA DE MARCAS (2026-10-23, `BarraSeries` de repuestos): arriba de la sección, la primera
  * franja 40 px bajo ella (32 en móvil) y, al saltar a una marca, su franja a la misma distancia
  * de la barra fija. Las cifras, las de la barra de series (`marca.module.css`, R2): la cabecera
- * reserva 76 / 72 / 72 px y la barra acaba a 130 / 131 / 127 px.
+ * reserva 76 / 72 / 72 px y la barra GRANDE (pastillas de 54 px, 2026-10-25) acaba a 144 / 145 /
+ * 141 px: 14 px más abajo que la de series (130 / 131 / 127).
  */
 /* `nav.`: gana al margen de `.barraSeries`, que viene de otro módulo. */
 nav.barraMarcas {
@@ -134,7 +135,7 @@ nav.barraMarcas {
 }
 
 .barraMarcas ~ .grupoMarca {
-  scroll-margin-top: 94px;
+  scroll-margin-top: 108px;
 }
 
 .barraMarcas + .grupoMarca {
@@ -147,13 +148,13 @@ nav.barraMarcas {
 
 @media (min-width: 768px) and (max-width: 1024px) {
   .barraMarcas ~ .grupoMarca {
-    scroll-margin-top: 99px;
+    scroll-margin-top: 113px;
   }
 }
 
 @media (max-width: 767px) {
   .barraMarcas ~ .grupoMarca {
-    scroll-margin-top: 87px;
+    scroll-margin-top: 101px;
   }
 
   .barraMarcas + .grupoMarca {

@@ -141,6 +141,7 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
             series={pastillas}
             etiqueta="Marcas"
             className={estilosTarjetas.barraMarcas}
+            grande
           />
         ) : null}
         {grupos.length > 0 ? (

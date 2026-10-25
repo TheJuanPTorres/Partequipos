@@ -40,12 +40,14 @@ import mejoras from "./mejoras.module.css";
  * Y la BARRA DE MARCAS de las páginas generales de tipo de nueva (2026-10-23): cada pastilla con
  * el logo de su marca (`LogoMarca`) y su nombre como `aria-label`; la activa, del color de la
  * marca, con el logo en blanco si se lee (3:1) y negro solo en los claros (`tintaDeLogoSobre`).
+ * Desde el 2026-10-25, en la variante `grande`: pastillas y logos un ~35 % mayores.
  */
 export function BarraSeries({
   series,
   etiqueta = "Series",
   entrada = true,
   className,
+  grande = false,
 }: {
   /**
    * `total` es opcional: sin él, la pastilla lleva solo el título (la página de garantías). Con
@@ -65,6 +67,8 @@ export function BarraSeries({
   entrada?: boolean;
   /** Clase extra del `<nav>` (la página de garantías la usa para su interruptor V3). */
   className?: string;
+  /** Pastillas y logos más grandes (la barra de marcas de nueva, 2026-10-25). */
+  grande?: boolean;
 }) {
   const [actual, setActual] = useState<string | null>(null);
   const barra = useRef<HTMLElement>(null);
@@ -188,7 +192,7 @@ export function BarraSeries({
   return (
     <nav
       ref={barra}
-      className={`${mejoras.barraSeries} ${className ?? ""}`}
+      className={`${mejoras.barraSeries} ${grande ? mejoras.barraGrande : ""} ${className ?? ""}`}
       aria-label={etiqueta}
       data-mejora="R2"
     >

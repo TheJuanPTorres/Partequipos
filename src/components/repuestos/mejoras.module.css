@@ -118,6 +118,24 @@
     opacity 0.2s;
 }
 
+/*
+ * Variante GRANDE de la barra de marcas (dirección, 2026-10-25): pastillas de 54 px de alto en
+ * lugar de 40 (+35 %), más relleno a los lados (22 en lugar de 16) y el logo a 30 px de alto y
+ * hasta 130 de ancho en lugar de 22 y 96 (+36 %). La barra de series no la usa.
+ */
+.barraGrande .barraEnlace {
+  min-height: 54px;
+}
+
+.barraGrande .barraConLogo {
+  padding: 0 22px;
+}
+
+.barraGrande .barraLogo {
+  max-width: 130px;
+  height: 30px;
+}
+
 .barraEnlace[aria-current][data-tinta="clara"] .barraLogo {
   filter: brightness(0) invert(1);
   opacity: 1;

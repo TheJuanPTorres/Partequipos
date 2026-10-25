@@ -332,3 +332,44 @@
     transform: translateX(6px);
   }
 }
+
+/*
+ * «Escríbenos por WhatsApp» (2026-10-25): botón verde con el icono, junto a «Enviar», del mismo
+ * alto y radio. #0F7B45 con texto blanco da 5,3:1 (AA; el #25D366 de la marca de WhatsApp da
+ * 1,9:1), y #0A6E37 al pasar el ratón, 6,4:1. Si no cabe en la fila, baja (el contenedor envuelve).
+ */
+.ventana a[data-whatsapp-boton] {
+  display: inline-flex;
+  min-height: 40px;
+  box-sizing: border-box;
+  gap: 8px;
+  align-items: center;
+  padding: 0 22px;
+  border-radius: 30px;
+  background: #0f7b45;
+  color: #fff;
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.ventana a[data-whatsapp-boton] svg {
+  flex: none;
+}
+
+.ventana a[data-whatsapp-boton]:hover {
+  background: #0a6e37;
+}
+
+.ventana a[data-whatsapp-boton]:focus-visible {
+  outline: 3px solid #0a6e37;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ventana a[data-whatsapp-boton] {
+    transition: none;
+  }
+}

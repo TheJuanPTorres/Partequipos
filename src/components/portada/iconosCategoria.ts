@@ -10,7 +10,9 @@ import {
   IconWheel,
 } from "@tabler/icons-react";
 
-import type { IconoCategoria } from "@/lib/portada/seccionesE";
+import type { CategoriasTecnica } from "@/payload-types";
+
+type IconoCategoria = NonNullable<CategoriasTecnica["icono"]>;
 
 /**
  * Icono de Tabler de cada categoría técnica. Lo comparten la portada (sección

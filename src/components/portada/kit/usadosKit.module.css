@@ -1,0 +1,664 @@
+/*
+ * «MAQUINARIA PESADA USADA» CON EL DISEÑO DEL CLIENTE (2026-10-26), portado del prototipo
+ * (Tailwind) a CSS modules con los tokens del sitio. Cortes del prototipo: 640 (filtro en tres
+ * columnas), 768 (dos tarjetas), 1025 (cabecera en dos columnas) y 1280 (tres tarjetas).
+ */
+
+.seccion {
+  --kit-gris: #f1f0ee;
+  --kit-linea: #e4e1de;
+  /* El rojo de marca no llega a AA en texto pequeño sobre el gris: el antetítulo va más oscuro. */
+  --kit-rojo-texto: color-mix(in srgb, var(--color-marca) 78%, #000);
+  --kit-sombra: 0 1px 2px rgb(20 17 15 / 0.05);
+  padding: 12px;
+  background: var(--color-fondo);
+}
+
+@media (min-width: 640px) {
+  .seccion {
+    padding: 20px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .seccion {
+    padding: 24px;
+  }
+}
+
+.panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--kit-gris);
+}
+
+@media (min-width: 1025px) {
+  .panel {
+    border-radius: 32px;
+  }
+}
+
+/* --- Cabecera --------------------------------------------------------------------------------- */
+
+.cabecera {
+  position: relative;
+  isolation: isolate;
+}
+
+.fondo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mask-image: linear-gradient(
+    180deg,
+    #000 70%,
+    rgb(0 0 0 / 0.6) 82%,
+    rgb(0 0 0 / 0.25) 92%,
+    transparent
+  );
+}
+
+/*
+ * En el móvil y la tablet el texto va DEBAJO de la máquina, y la franja roja del fondo lo cruzaba
+ * (bajaba el contraste del párrafo): las losas y la franja se apagan antes de llegar al texto.
+ */
+@media (max-width: 767px) {
+  .fondo {
+    mask-image: linear-gradient(180deg, #000 28%, transparent 46%);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .fondo {
+    mask-image: linear-gradient(180deg, #000 50%, transparent 68%);
+  }
+}
+
+.cabeceraRejilla {
+  display: grid;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px 40px;
+  align-items: center;
+  gap: 24px 40px;
+}
+
+@media (min-width: 1025px) {
+  .cabeceraRejilla {
+    min-height: calc(100svh - 20rem);
+    padding: 40px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+}
+
+/* El render trae ~11 % de margen transparente a cada lado: el margen negativo y la escala se lo
+   comen para que la máquina crezca sin empujar el texto. */
+.maquinaCaja {
+  position: relative;
+  margin: 0 -16px;
+}
+
+@media (min-width: 640px) {
+  .maquinaCaja {
+    margin: 0;
+  }
+}
+
+@media (min-width: 1025px) {
+  .maquinaCaja {
+    margin-left: -56px;
+    transform: scale(1.1);
+    transform-origin: 50% 85%;
+  }
+}
+
+.maquina {
+  position: relative;
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+/* El piso de estudio: arranca en el horizonte de las orugas y se asienta hasta el gris del panel. */
+.piso {
+  position: absolute;
+  top: 75%;
+  right: -6%;
+  left: -100vw;
+  height: 90%;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgb(20 17 15 / 0) 0%,
+    rgb(20 17 15 / 0.035) 1.2%,
+    rgb(248 247 245 / 0.35) 2.4%,
+    rgb(248 247 245 / 0.75) 4.5%,
+    rgb(248 247 245 / 0.95) 6.5%,
+    #f8f7f5 8%,
+    #f6f5f3 30%,
+    #f3f2f0 60%,
+    var(--kit-gris) 100%
+  );
+  mask-image: linear-gradient(
+    to left,
+    transparent 0,
+    rgb(0 0 0 / 0.12) 40px,
+    rgb(0 0 0 / 0.35) 90px,
+    rgb(0 0 0 / 0.65) 150px,
+    rgb(0 0 0 / 0.88) 210px,
+    #000 260px
+  );
+}
+
+/* Reflejo: la imagen volteada sobre la línea de apoyo (el 92 %), solo la franja del tren de
+   rodaje y apagándose pronto: un piso satinado, no un espejo. */
+.reflejo {
+  object-fit: contain;
+  opacity: 0.13;
+  filter: blur(1.5px);
+  transform: scaleY(-1);
+  transform-origin: 50% 92%;
+  pointer-events: none;
+  mask-image: linear-gradient(
+    180deg,
+    transparent 78%,
+    rgb(0 0 0 / 0.4) 86%,
+    #000 92%,
+    transparent 92.5%
+  );
+}
+
+.sombras {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.maquinaImg {
+  object-fit: contain;
+}
+
+.texto {
+  position: relative;
+  z-index: 1;
+  max-width: 40rem;
+}
+
+.antetitulo {
+  margin: 0;
+  color: var(--kit-rojo-texto);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.titulo {
+  margin: 16px 0 0;
+  color: var(--color-texto);
+  font-size: clamp(2.25rem, 4.4vw, 3.9rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+}
+
+.descripcion {
+  margin: 20px 0 0;
+  color: var(--color-texto-suave);
+  font-size: 16px;
+  line-height: 1.625;
+}
+
+@media (min-width: 1025px) {
+  .descripcion {
+    font-size: 1.05rem;
+  }
+}
+
+.verTodo {
+  display: inline-flex;
+  margin-top: 32px;
+  padding: 14px 24px 14px 20px;
+  align-items: center;
+  gap: 12px;
+  border-radius: 999px;
+  background: var(--color-marca);
+  box-shadow: 0 2px 6px -2px rgb(185 28 28 / 0.45);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 180ms ease;
+}
+
+.verTodo:hover {
+  background: color-mix(in srgb, var(--color-marca) 85%, #fff);
+}
+
+.verTodo:focus-visible,
+.boton:focus-visible,
+.filtro:focus-visible,
+.punto:focus-visible,
+.nombreEnlace:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 3px;
+}
+
+.flecha {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+/* --- Filtro y carrusel ------------------------------------------------------------------------ */
+
+.cuerpo {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+
+@media (min-width: 1025px) {
+  .cuerpo {
+    padding: 0 40px 56px;
+  }
+}
+
+.filtros {
+  display: grid;
+  margin: 0;
+  padding: 4px 0;
+  gap: 12px;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .filtros {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1025px) {
+  .filtros {
+    gap: 20px;
+  }
+}
+
+.filtro {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 12px 16px 12px 12px;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--kit-linea);
+  border-radius: 24px;
+  background: var(--color-fondo);
+  box-shadow: var(--kit-sombra);
+  color: var(--color-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 180ms ease;
+}
+
+@media (min-width: 1025px) {
+  .filtro {
+    padding: 16px 20px 16px 16px;
+  }
+}
+
+.filtro:hover {
+  border-color: color-mix(in srgb, var(--color-marca) 60%, transparent);
+}
+
+.filtro[data-activo] {
+  border-color: var(--color-marca);
+  background: linear-gradient(90deg, #fdeeee 0%, var(--color-fondo) 75%);
+}
+
+.filtroImagen {
+  position: relative;
+  display: block;
+  width: 96px;
+  height: 56px;
+  flex: none;
+}
+
+@media (min-width: 1025px) {
+  .filtroImagen {
+    width: 116px;
+    height: 72px;
+  }
+}
+
+.filtroImg {
+  object-fit: contain;
+}
+
+.filtroNombre {
+  min-width: 0;
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+@media (min-width: 1025px) {
+  .filtroNombre {
+    font-size: 1.05rem;
+  }
+}
+
+.filtroFlecha {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgb(240 237 232 / 0.7);
+  color: var(--color-texto);
+  transition:
+    background-color 300ms ease,
+    color 300ms ease,
+    rotate 300ms ease;
+}
+
+.filtroFlecha svg {
+  width: 16px;
+  height: 16px;
+}
+
+.filtro:hover .filtroFlecha,
+.filtro[data-activo] .filtroFlecha {
+  background: var(--color-marca);
+  color: #fff;
+}
+
+.filtro[data-activo] .filtroFlecha {
+  rotate: 90deg;
+}
+
+.listado {
+  padding-top: 20px;
+  scroll-margin-top: 128px;
+}
+
+@media (min-width: 1025px) {
+  .listado {
+    padding-top: 24px;
+  }
+}
+
+/* El margen negativo con relleno deja aire para el contorno de foco, que el carrusel recortaría. */
+.pista {
+  display: flex;
+  margin: -4px;
+  padding: 4px;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-padding: 4px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  list-style: none;
+}
+
+.pista::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .pista {
+    gap: 20px;
+  }
+}
+
+.item {
+  width: 100%;
+  flex: none;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .item {
+    width: calc((100% - 12px) / 2);
+  }
+}
+
+@media (min-width: 1025px) {
+  .item {
+    width: calc((100% - 20px) / 2);
+  }
+}
+
+@media (min-width: 1280px) {
+  .item {
+    width: calc((100% - 40px) / 3);
+  }
+}
+
+/* Al elegir una categoría, sus tarjetas suben un poco (solo se desplazan: nunca arrancan invisibles). */
+@media (prefers-reduced-motion: no-preference) {
+  .panelFiltro:not([hidden]) .item {
+    animation: kitEntraTarjeta 420ms cubic-bezier(0.33, 0, 0.2, 1) backwards;
+  }
+}
+
+@keyframes kitEntraTarjeta {
+  from {
+    transform: translateY(12px);
+  }
+}
+
+/* La tarjeta: los botones al pie (`margin-top: auto`), a la misma altura en toda la fila. */
+.tarjeta {
+  display: flex;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  flex-direction: column;
+  border: 1px solid var(--kit-linea);
+  border-radius: 24px;
+  background: var(--color-fondo);
+  box-shadow: var(--kit-sombra);
+}
+
+@media (min-width: 640px) {
+  .tarjeta {
+    padding: 20px;
+  }
+}
+
+.foto {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 3 / 2;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #e6e4e1 0%, #f3f2f0 70%, #eceae7 100%);
+}
+
+.fotoImg {
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fotoImg {
+    transition: transform 500ms cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  .tarjeta:hover .fotoImg {
+    transform: scale(1.04);
+  }
+}
+
+.nombre {
+  margin: 20px 0 0;
+  color: var(--color-texto);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.375;
+}
+
+.nombreEnlace {
+  color: inherit;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.nombreEnlace:hover {
+  color: var(--kit-rojo-texto);
+}
+
+.ficha {
+  margin: 12px 0 0;
+}
+
+.dato {
+  display: flex;
+  padding: 10px 0;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+.dato + .dato {
+  border-top: 1px solid var(--kit-linea);
+}
+
+.dato dt {
+  color: var(--color-texto);
+}
+
+.dato dd {
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+.icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--color-marca);
+}
+
+.botones {
+  display: flex;
+  margin-top: auto;
+  padding-top: 20px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.boton {
+  display: inline-flex;
+  padding: 10px 24px;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--color-marca);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 180ms ease;
+}
+
+.boton:hover {
+  background: color-mix(in srgb, var(--color-marca) 85%, #fff);
+}
+
+.botonOscuro {
+  background: var(--color-texto);
+}
+
+.botonOscuro:hover {
+  background: rgb(16 15 15 / 0.85);
+}
+
+.controles {
+  display: flex;
+  margin-top: 20px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.punto {
+  display: flex;
+  height: 32px;
+  padding: 0 6px;
+  align-items: center;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.punto span {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(16 15 15 / 0.25);
+  transition:
+    width 300ms ease,
+    background-color 300ms ease;
+}
+
+.punto:hover span {
+  background: rgb(16 15 15 / 0.5);
+}
+
+.punto[aria-current] span {
+  width: 24px;
+  background: var(--color-texto);
+}
+
+.pausa {
+  margin-left: 8px;
+}
+
+.vacio {
+  padding: 48px 24px;
+  border: 1px dashed rgb(16 15 15 / 0.15);
+  border-radius: 24px;
+  background: var(--color-fondo);
+  text-align: center;
+}
+
+.vacioTitulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-weight: 600;
+}
+
+.vacioTexto {
+  margin: 4px 0 0;
+  color: var(--color-texto-suave);
+}
+
+.vacio .verTodo {
+  margin-top: 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verTodo,
+  .boton,
+  .filtro,
+  .filtroFlecha,
+  .punto span {
+    transition: none;
+  }
+}

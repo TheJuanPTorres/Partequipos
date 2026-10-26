@@ -6,7 +6,7 @@ import type { CategoriasTecnica } from "@/payload-types";
 
 /**
  * Categorías técnicas de la sección 5 de la portada (fase E): las que tienen
- * posición en la portada. El orden fino lo hace `tarjetasDeRepuestos`.
+ * posición en la portada. El orden fino lo hace `categoriasDePortada` (`kitCliente.ts`).
  * `depth: 1` puebla la imagen de la tarjeta.
  */
 export const getCategoriasTecnicasDePortada = cache(async (): Promise<CategoriasTecnica[]> => {

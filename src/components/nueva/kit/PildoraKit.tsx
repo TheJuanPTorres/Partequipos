@@ -1,15 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import { CURVA_FRENADA, DURACION_DESLIZAR_MS } from "@/lib/listado/animaciones";
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import estilos from "./kit.module.css";
 
 /** Lo que se necesita de una imagen para pintarla (el logo no lleva punto focal). */
-type Imagen = Pick<ImagenLista, "url" | "alt" | "width" | "height">;
+type Imagen = Pick<ImagenLista, "url" | "alt" | "width" | "height"> & { oscuro?: boolean };
 
 /**
  * PÍLDORA DE NAVEGACIÓN del «Kit de marca» (2026-10-25), al estilo de la isla de Apple: aparece
@@ -147,7 +147,8 @@ export function PildoraKit({
         className={estilos.pildoraLogo}
       >
         {logo ? (
-          <Image src={logo.url} alt="" width={logo.width} height={logo.height} sizes="96px" />
+          // Sobre la cápsula clara: el logo con su regla común (en tinta oscura si es blanco).
+          <LogoMarca logo={{ ...logo, oscuro: logo.oscuro ?? false }} alt="" sizes="96px" />
         ) : (
           <span>{nombre}</span>
         )}

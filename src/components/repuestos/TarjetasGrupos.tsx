@@ -80,6 +80,8 @@ export function TarjetasGrupos({
                 <h3 id={idT} className={estilos.tituloTarjeta}>
                   {g.nombre}
                 </h3>
+                {/* Opcional (2026-10-26, Filtros Donaldson): para qué sirve ese tipo de producto. */}
+                {g.descripcion ? <p className={estilos.descripcionGrupo}>{g.descripcion}</p> : null}
                 <div className={estilos.accionesGrupo}>
                   <BotonFormulario
                     href={`#${anclaContacto}`}
@@ -95,27 +97,35 @@ export function TarjetasGrupos({
                     <IconMessageCircle aria-hidden="true" focusable="false" stroke={2} size={16} />
                     Cotizar
                   </BotonFormulario>
-                  <VerTodosEquipos
-                    titulo={g.nombre}
-                    href={`#${idLista}`}
-                    total={g.productos.length}
-                    equipos={g.productos.map((p, i) => ({ id: i, nombre: p, href: null }))}
-                    buscador
-                    cotizar={{ formulario, categoria }}
-                    className={`${estilos.botonTarjeta} ${estilos.botonSecundario}`}
-                    etiqueta="Ver productos"
-                    describedBy={idT}
-                  />
+                  {/* Sin productos (un grupo con solo descripción), sin «Ver productos». */}
+                  {g.productos.length > 0 ? (
+                    <VerTodosEquipos
+                      titulo={g.nombre}
+                      href={`#${idLista}`}
+                      total={g.productos.length}
+                      equipos={g.productos.map((p, i) => ({ id: i, nombre: p, href: null }))}
+                      buscador
+                      cotizar={{ formulario, categoria }}
+                      className={`${estilos.botonTarjeta} ${estilos.botonSecundario}`}
+                      etiqueta="Ver productos"
+                      describedBy={idT}
+                    />
+                  ) : null}
                 </div>
                 {/*
                  * La lista en el HTML de la página (Google) y para quien no tiene JavaScript, que
                  * llega aquí con «Ver productos». Con JavaScript no se pinta: la enseña el panel.
                  */}
-                <ul id={idLista} className={`${estilos.listaProductos} ${estilos.productosSinJs}`}>
-                  {g.productos.map((p, i) => (
-                    <li key={`${i}-${p}`}>{p}</li>
-                  ))}
-                </ul>
+                {g.productos.length > 0 ? (
+                  <ul
+                    id={idLista}
+                    className={`${estilos.listaProductos} ${estilos.productosSinJs}`}
+                  >
+                    {g.productos.map((p, i) => (
+                      <li key={`${i}-${p}`}>{p}</li>
+                    ))}
+                  </ul>
+                ) : null}
               </div>
             </li>
           );

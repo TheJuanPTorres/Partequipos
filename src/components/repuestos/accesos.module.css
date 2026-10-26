@@ -1,0 +1,128 @@
+/*
+ * ACCESO a las páginas que cuelgan de una categoría técnica (Filtros Donaldson en Filtración,
+ * 2026-10-26): la franja de marca del #349 (`franjaMarca.module.css`, D1–D5) hecha enlace. Aquí
+ * solo lo propio: el aire de la sección, la placa blanca del logo, «Ver productos →» y el hover y
+ * el foco del enlace. Sin desplazamientos: la placa tiene medidas fijas (CLS 0).
+ */
+.seccion {
+  width: 100%;
+  max-width: 1100px;
+  margin: 72px auto 96px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.titulo {
+  margin: 0 0 24px;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-3);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.lista {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* La franja, más alta que la de las fichas: es un acceso, no un separador. */
+.enlace {
+  min-height: 132px;
+  margin-bottom: 0;
+  padding: 20px 28px;
+  text-decoration: none;
+  transition: box-shadow 0.25s ease;
+}
+
+.enlace:hover {
+  box-shadow: 0 10px 28px rgb(0 0 0 / 0.16);
+}
+
+/* El fondo se aclara un poco al pasar el ratón (el blanco sigue con AA: el inicio ya da 4,5:1 y
+   el resto del degradado es más oscuro). */
+.enlace:hover > span:first-child {
+  filter: brightness(1.06);
+}
+
+.enlace:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 4px;
+}
+
+/* El logo de la marca en su placa blanca, entero y en sus colores. */
+.placa {
+  width: 190px;
+  height: 84px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.ver svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease;
+}
+
+.enlace:hover .ver,
+.enlace:focus-visible .ver {
+  text-decoration-color: currentColor;
+}
+
+.enlace:hover .ver svg,
+.enlace:focus-visible .ver svg {
+  transform: translateX(4px);
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    margin: 48px auto 64px;
+  }
+
+  .enlace {
+    min-height: 0;
+    padding: 16px;
+  }
+
+  .placa {
+    width: 140px;
+    height: 60px;
+    padding: 8px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enlace,
+  .ver,
+  .ver svg {
+    transition: none;
+  }
+
+  .enlace:hover .ver svg,
+  .enlace:focus-visible .ver svg {
+    transform: none;
+  }
+}

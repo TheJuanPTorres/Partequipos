@@ -64,38 +64,10 @@
   height: auto;
 }
 
-.boton {
-  display: inline-flex;
-  min-height: 44px;
-  box-sizing: border-box;
-  padding: 0 25px;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--color-marca);
-  border-radius: 30px;
-  background: var(--color-marca);
-  color: var(--color-fondo);
-  font-weight: 500;
-  text-decoration: none;
-  transition:
-    background-color 0.3s,
-    border-color 0.3s;
-}
-
-.boton:hover,
-.boton:focus-visible {
-  border-color: var(--color-texto);
-  background: var(--color-texto);
-}
-
-.boton:focus-visible {
-  outline: 3px solid var(--color-texto);
-  outline-offset: 3px;
-}
-
-.boton svg {
-  width: 18px;
-  height: 18px;
+/* «Ver catálogo» bajo el título (`BotonCatalogo`, 2026-10-26). */
+.botonCatalogo {
+  align-self: flex-start;
+  margin: 4px 0 8px;
 }
 
 @media (max-width: 1024px) {

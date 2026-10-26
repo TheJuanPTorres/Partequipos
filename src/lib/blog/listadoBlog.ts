@@ -13,6 +13,8 @@ import {
   type ParametrosURL,
 } from "@/lib/filtros";
 import { metadataFiltrada } from "@/lib/filtros";
+import { ANIMACIONES_BLOG } from "@/lib/animacionesBlog";
+import { activasDe, PARAMETRO_ANIMACIONES } from "@/lib/listado/animaciones";
 import { getIndiceBlog } from "@/lib/queries/getBlog";
 import { rutas } from "@/lib/routes";
 import { absoluteUrl, indexacionPermitida } from "@/lib/seo/config";
@@ -24,6 +26,7 @@ import {
   CLAVE_BUSQUEDA,
   leerBusqueda,
   POR_PAGINA_BLOG,
+  PRIMERA_PAGINA_BLOG_CON_DESTACADO,
   type ArticuloLista,
 } from "./indice";
 
@@ -82,12 +85,23 @@ export async function cargarIndiceBlog(
 
   const busqueda = leerBusqueda(parametros[CLAVE_BUSQUEDA]);
   const catalogo = catalogoDe(ambito);
+  // Las mejoras N1–N4; en un preview se prueban con `?anim=` (nunca en el sitio publicado).
+  const activas = activasDe(
+    ANIMACIONES_BLOG,
+    parametros[PARAMETRO_ANIMACIONES],
+    process.env.VERCEL_ENV !== "production",
+  );
   const listado = resolverListado({
     items: buscarEnArticulos(articulos, busqueda),
     parametros: { ...parametros, [CLAVE_BUSQUEDA]: undefined },
     catalogo,
     pagina,
     porPagina: POR_PAGINA_BLOG,
+    // Con el destacado (N1), solo sin búsqueda ni filtros: 10 en la página 1; si no, 9.
+    primeraPagina: (filtrado) =>
+      activas.includes("N1") && busqueda === "" && !filtrado
+        ? PRIMERA_PAGINA_BLOG_CON_DESTACADO
+        : POR_PAGINA_BLOG,
     ruta: `${rutaDeBlog(ambito, pagina)}/`,
   });
   // `buscar` es texto libre y no una faceta: se reescribe aparte en la redirección.
@@ -107,7 +121,15 @@ export async function cargarIndiceBlog(
     permanentRedirect(conConsulta(ruta, resto, consultaDeBusqueda(busqueda)));
   }
   if (listado.tipo === "no-existe") notFound();
-  return { listado, catalogo, categorias, categoria, busqueda, totalArticulos: articulos.length };
+  return {
+    listado,
+    catalogo,
+    categorias,
+    categoria,
+    busqueda,
+    activas,
+    totalArticulos: articulos.length,
+  };
 }
 
 /** Los parámetros desconocidos (`utm_…`) sin `buscar`, que es nuestro. */

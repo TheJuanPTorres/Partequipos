@@ -79,6 +79,8 @@ export const PATRONES_DE_PAGINA = {
   modelosDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]/[tipo]/[modelo]`,
   submodelosDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/[marca]/[tipo]/[modelo]/[submodelo]`,
   categoriasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]`,
+  /** Las páginas dentro de una categoría técnica (Filtros Donaldson, 2026-10-26). */
+  subcategoriasDeRepuestos: `/(site)/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/[categoria]/[subcategoria]`,
   paginasUsadas: "/(site)/maquinaria-pesada/maquinaria-pesada-usada/[categoria]/pagina/[pagina]",
   marcasDeLubricante: "/(site)/lubricantes/[marca]",
   lineasDeLubricante: "/(site)/lubricantes/[marca]/[categoria]",
@@ -322,6 +324,7 @@ export function revalidarCategoriasDeRepuestos(motivo: string): void {
   try {
     revalidatePath(rutas.categoriasRepuestos());
     revalidatePath(PATRONES_DE_PAGINA.categoriasDeRepuestos, "page");
+    revalidatePath(PATRONES_DE_PAGINA.subcategoriasDeRepuestos, "page");
     revalidatePath(rutas.repuestos());
     revalidarIndices(motivo);
   } catch (error) {

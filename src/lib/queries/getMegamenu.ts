@@ -40,7 +40,11 @@ const megamenuEnCache = unstable_cache(
       depth: 1,
       // `filename` hace falta aunque no se pinte: la `url` la calcula un gancho
       // de lectura a partir de él, y sin él sale `null` (medido en el preview).
-      populate: { media: { url: true, filename: true, width: true, height: true } },
+      populate: {
+        media: { url: true, filename: true, width: true, height: true },
+        // La categoría de la que cuelga una página (Filtros Donaldson): solo su dirección.
+        "categorias-tecnicas": { slug: true },
+      },
     } as const;
 
     const [

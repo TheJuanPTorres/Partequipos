@@ -11,6 +11,12 @@ import type { ImagenLista } from "../utils/relations";
 /** Artículos por página del índice (3 columnas × 3 filas). */
 export const POR_PAGINA_BLOG = 9;
 
+/**
+ * La página 1 con el artículo destacado (N1) lleva 10: el destacado y tres filas de tres debajo.
+ * Sin destacado (búsqueda, categoría o N1 apagada), 9 como las demás.
+ */
+export const PRIMERA_PAGINA_BLOG_CON_DESTACADO = POR_PAGINA_BLOG + 1;
+
 /** Parámetro de la búsqueda por texto. No es una faceta: es texto libre. */
 export const CLAVE_BUSQUEDA = "buscar";
 

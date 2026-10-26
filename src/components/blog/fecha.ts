@@ -17,3 +17,24 @@ export function fechaLarga(iso: string): string {
     timeZone: "UTC",
   });
 }
+
+const MESES_BREVES = [
+  "ene",
+  "feb",
+  "mar",
+  "abr",
+  "may",
+  "jun",
+  "jul",
+  "ago",
+  "sept",
+  "oct",
+  "nov",
+  "dic",
+];
+
+/** «25 sept 2026», en una línea y en UTC. */
+export function fechaBreve(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getUTCDate()} ${MESES_BREVES[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}

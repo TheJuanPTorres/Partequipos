@@ -179,6 +179,17 @@
   pointer-events: none;
 }
 
+/*
+ * En el móvil la máquina va bajo el texto y la franja roja, que sube por encima de su caja, pasaba
+ * por detrás del final de las líneas del título y del «Texto bajo el título» (contraste bajo AA).
+ * Ahí la pared se queda dentro de la caja de la máquina.
+ */
+@media (max-width: 767px) {
+  .capa {
+    overflow: hidden;
+  }
+}
+
 .piso {
   position: absolute;
   top: 24%;

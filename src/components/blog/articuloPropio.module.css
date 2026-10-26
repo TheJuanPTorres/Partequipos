@@ -26,8 +26,16 @@
 }
 
 /* ---- Cabecera baja -------------------------------------------------------- */
+/*
+ * El bloque (migas, etiqueta, título y datos) va CENTRADO EN VERTICAL y alineado a
+ * la izquierda (Juan Pablo, 2026-10-26): alto mínimo fijo (reserva el sitio: CLS),
+ * relleno simétrico y 20 px entre elementos. Un título largo hace crecer la caja.
+ */
 .cabecera {
   position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 380px;
   margin: 8px 8px 0;
   overflow: hidden;
   border-radius: 30px;
@@ -38,14 +46,19 @@
 }
 
 .cabeceraInterior {
-  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 88px 20px 48px;
+  padding: 56px 16px;
 }
 
 /* Las migas, sobre fondo oscuro. */
 .migas :global(nav) {
-  margin-bottom: 20px;
+  margin: 0;
 }
 
 .migas :global(ol),
@@ -79,8 +92,8 @@
 }
 
 .titulo {
-  margin: 16px 0 0;
-  max-width: 900px;
+  margin: 0;
+  max-width: 860px;
   color: #fff;
   font-size: 30px;
   font-weight: 600;
@@ -89,15 +102,19 @@
 }
 
 .meta {
-  margin: 16px 0 0;
+  margin: 0;
   color: rgba(255, 255, 255, 0.85);
   font-size: 15px;
   line-height: 1.5;
 }
 
 @media (min-width: 1025px) {
+  .cabecera {
+    min-height: 460px;
+  }
+
   .cabeceraInterior {
-    padding: 112px 20px 64px;
+    padding: 72px 16px;
   }
 
   .titulo {
@@ -128,7 +145,7 @@
   gap: 48px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px 20px 24px;
+  padding: 24px 16px 24px;
 }
 
 .columna {
@@ -146,13 +163,13 @@
 }
 
 @media (min-width: 1025px) {
+  /* Artículo a la izquierda y «Post recientes» a la derecha, con sus bordes en los de la foto. */
   .lectura {
     display: grid;
-    grid-template-columns: minmax(0, 720px) 320px;
-    justify-content: center;
+    grid-template-columns: minmax(0, 1fr) clamp(340px, 30vw, 400px);
     align-items: start;
-    gap: 64px;
-    padding: 32px 20px 40px;
+    gap: 56px;
+    padding: 32px 16px 40px;
   }
 
   .columna,
@@ -259,6 +276,40 @@
   margin: 6px 0 0;
   font-size: 14px;
   line-height: 1.45;
+}
+
+@media (min-width: 1025px) {
+  .recientes {
+    padding: 32px 28px;
+  }
+
+  .tituloRecientes {
+    margin-bottom: 24px;
+    font-size: 26px;
+  }
+
+  .recientes ul {
+    gap: 24px;
+  }
+
+  .reciente {
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .miniatura {
+    width: 128px;
+    border-radius: 20px;
+  }
+
+  .reciente h3 {
+    font-size: 18px;
+    line-height: 1.35;
+  }
+
+  .reciente p {
+    font-size: 15px;
+  }
 }
 
 /* A2: zoom leve de la miniatura al pasar el ratón (solo sin «reducir movimiento»). */

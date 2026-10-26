@@ -34,7 +34,7 @@ import {
 } from "@/lib/cabecera/fluidez";
 import { inicioDelPanel, modoCabecera } from "@/lib/cabecera/modo";
 import { activasDe, PARAMETRO_ANIMACIONES } from "@/lib/listado/animaciones";
-import { claveDeEnlace, panelConTarjetas, type PanelMenu } from "@/lib/megamenu";
+import { claveDeEnlace, type PanelMenu } from "@/lib/megamenu";
 import type { ImagenLogo } from "@/lib/seo/logo";
 
 import estilos from "./cabecera.module.css";
@@ -282,7 +282,9 @@ export function Cabecera({
 
   /** M2: ¿el puntero va hacia el panel abierto? */
   const vaAlPanel = () => {
-    const caja = marcoRef.current?.firstElementChild?.getBoundingClientRect();
+    const caja = marcoRef.current
+      ?.querySelector("nav[data-estado='activo']")
+      ?.getBoundingClientRect();
     const puntos = rastro.current;
     if (!caja || puntos.length < 2) return false;
     return dentroDelPasillo(puntos[0] as Punto, puntos[puntos.length - 1] as Punto, caja);
@@ -473,7 +475,6 @@ export function Cabecera({
 
   const conPanel = enlaces.filter((e) => paneles[claveDeEnlace(e.href)]);
   const visible = megaAbierto ?? ultimo;
-  const panelVisible = visible ? paneles[visible] : undefined;
 
   return (
     <MejorasMenu.Provider value={mejoras}>
@@ -592,9 +593,8 @@ export function Cabecera({
             activo={visible}
             abierto={megaAbierto !== null}
             arriba={inicioDelPanel(alto, !arriba)}
-            amplio={panelVisible ? panelConTarjetas(panelVisible) : false}
           >
-            {(estado, anchoSaliente) =>
+            {(estado) =>
               conPanel.map((e) => {
                 const clave = claveDeEnlace(e.href);
                 return (
@@ -606,7 +606,6 @@ export function Cabecera({
                     etiqueta={e.etiqueta}
                     panel={paneles[clave] as PanelMenu}
                     estado={estado(clave)}
-                    anchoSaliente={anchoSaliente}
                     alCerrar={cerrarMega}
                     alEntrar={abrirMega}
                     alSalir={cerrarMegaLuego}

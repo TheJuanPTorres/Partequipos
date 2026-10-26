@@ -34,29 +34,27 @@
 /*
  * EL MARCO (2026-10-25): una caja para todos los paneles (`MarcoMegamenu`).
  *
- *   ┌── cabecera ──────────────────────┐
- *   ╯ ╭──────────────────────────╮ ╰    ← dos piezas cóncavas, encima del marco
- *     │  lienzo: fondo y filete   │      ← `border` NATIVO a los lados y abajo
- *     ╰──────────────────────────╯      ← `border-radius` NATIVO de 30 px
- *
- * Antes la forma era una MÁSCARA de 6 piezas de degradado. Abajo, la franja
- * central y las dos esquinas se unían en una costura vertical a cada lado; con
- * un escalado no entero (125 %) cada pieza redondea el medio píxel por su lado
- * y la costura deja ver el filete: las «dos líneas finas» al pie del panel al
- * terminar la animación (durante ella la capa se pinta de otra forma). Un borde
- * nativo no tiene piezas ni costuras.
+ * El CONTORNO son piezas (`lib/cabecera/marco.ts`): fondo, base, dos lados, pie,
+ * dos esquinas y las dos curvas cóncavas de arriba, colocadas y estiradas SOLO
+ * con `transform`. Antes la forma era una MÁSCARA de 6 piezas de degradado: abajo,
+ * la franja central y las dos esquinas se unían en una costura vertical a cada
+ * lado; con un escalado no entero (125 %) cada pieza redondeaba el medio píxel
+ * por su lado y la costura dejaba ver el filete: las «dos líneas finas» al pie
+ * del panel al terminar la animación. Ahora cada línea es una pieza de 1 px en
+ * una posición entera, y al cambiar de tamaño (M3) nada cambia de sitio en la
+ * maqueta (CLS 0).
  */
 .marco {
   /* Dónde acaba la cabecera (px): la fija `Cabecera` con su alto MEDIDO. */
   --mega-arriba: 100px;
-  /* Radio de la curva cóncava de arriba y de las esquinas convexas de abajo. */
+  /* Radio de la curva cóncava de arriba y de las esquinas convexas de abajo (los lee el marco). */
   --mega-curva: 20px;
   --mega-radio: 30px;
   /* Fondo SÓLIDO (dirección, 2026-10-17); antes, vidrio blanco al 86 %. */
   --mega-fondo: var(--color-fondo);
   /*
    * El filete, OPACO: el gris que daba rgb(16 15 15 / 18 %) sobre el fondo blanco.
-   * Opaco, el de los lados (sobre el lienzo) y el de las curvas (sobre la página)
+   * Opaco, el de los lados (sobre el panel) y el de las curvas (sobre la página)
    * son idénticos.
    */
   --mega-filete: #d4d4d4;
@@ -84,21 +82,89 @@
     top 0.4s ease-in-out;
 }
 
-/* Las dos curvas cóncavas que unen el marco a la barra (como las pestañas de Chrome). */
-.marco::before,
-.marco::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  /* Un píxel más hacia dentro: tapan el filete del lienzo donde la curva lo sustituye. */
-  width: calc(var(--mega-curva) + 1px);
-  height: var(--mega-curva);
+/*
+ * El lienzo tiene un ancho FIJO (el del panel más ancho): los paneles van
+ * centrados dentro. Así el marco no cambia de sitio al cambiar de panel. Lo que
+ * queda fuera del panel no es clicable.
+ */
+.lienzo {
+  position: relative;
+  width: min(820px, 100vw - 2 * var(--mega-curva) - 20px);
   pointer-events: none;
 }
 
-.marco::before {
-  left: calc(-1 * var(--mega-curva));
+.contorno {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.pieza {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  /* Hasta el primer pintado del marco, nada. */
+  transform: scale(0);
+}
+
+.pieza[data-pieza="fondo"],
+.pieza[data-pieza="base"] {
+  width: 1px;
+  height: 1px;
+  background: var(--mega-fondo);
+}
+
+.pieza[data-pieza="ladoI"],
+.pieza[data-pieza="ladoD"],
+.pieza[data-pieza="pie"] {
+  z-index: 1;
+  width: 1px;
+  height: 1px;
+  background: var(--mega-filete);
+}
+
+/* Esquinas de abajo: fondo, el filete de 1 px por fuera y transparente fuera del arco. */
+.pieza[data-pieza="esquinaI"],
+.pieza[data-pieza="esquinaD"] {
+  z-index: 1;
+  width: var(--mega-radio);
+  height: var(--mega-radio);
+}
+
+.pieza[data-pieza="esquinaI"] {
+  background: radial-gradient(
+    circle at 100% 0,
+    var(--mega-fondo) calc(var(--mega-radio) - 1.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    #0000 calc(var(--mega-radio) + 0.5px)
+  );
+}
+
+.pieza[data-pieza="esquinaD"] {
+  background: radial-gradient(
+    circle at 0 0,
+    var(--mega-fondo) calc(var(--mega-radio) - 1.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    #0000 calc(var(--mega-radio) + 0.5px)
+  );
+}
+
+/*
+ * Las dos curvas cóncavas que unen el marco a la barra (como las pestañas de
+ * Chrome). Entran 1 px en el panel: tapan el principio del lado, que la curva
+ * sustituye.
+ */
+.pieza[data-pieza="curvaI"],
+.pieza[data-pieza="curvaD"] {
+  z-index: 2;
+  width: calc(var(--mega-curva) + 1px);
+  height: var(--mega-curva);
+}
+
+.pieza[data-pieza="curvaI"] {
   background: radial-gradient(
     circle at 0 100%,
     #0000 calc(var(--mega-curva) - 0.5px),
@@ -108,8 +174,7 @@
   );
 }
 
-.marco::after {
-  right: calc(-1 * var(--mega-curva));
+.pieza[data-pieza="curvaD"] {
   background: radial-gradient(
     circle at 100% 100%,
     #0000 calc(var(--mega-curva) - 0.5px),
@@ -119,25 +184,24 @@
   );
 }
 
-.lienzo {
+/* El contenido, encima del contorno; recortado con su forma (`clip-path` del marco). */
+.contenidoMarco {
   position: relative;
-  z-index: 1;
-  box-sizing: border-box;
-  width: 500px;
-  max-width: calc(100vw - 2 * var(--mega-curva) - 20px);
-  overflow: hidden;
-  border: 1px solid var(--mega-filete);
-  border-top: 0;
-  border-radius: 0 0 var(--mega-radio) var(--mega-radio);
-  background: var(--mega-fondo);
+  z-index: 3;
+}
+
+/* Un panel dentro del marco: el que se ve, en el flujo y centrado; el que sale (M3), encima y quieto. */
+.vista {
+  width: min(500px, 100%);
+  margin-inline: auto;
+  pointer-events: auto;
 }
 
 /* TARJETAS CON FOTO de «Repuestos por categoría técnica»: el panel pasa a 820 px (5 por fila). */
-.lienzo[data-ancho="amplio"] {
-  width: 820px;
+.vista[data-ancho="amplio"] {
+  width: 100%;
 }
 
-/* Un panel dentro del marco: el que se ve, en el flujo; el que sale (M3), encima y quieto. */
 .vista[hidden] {
   display: none;
 }
@@ -152,11 +216,11 @@
 
 /* M3: el contenido se cruza en un fundido mientras el marco cambia de tamaño. */
 .marco[data-m3="si"] .vista[data-estado="activo"] {
-  animation: entra-mega 260ms cubic-bezier(0.33, 0, 0.2, 1) both;
+  animation: entra-mega 260ms cubic-bezier(0.33, 0, 0.2, 1) backwards;
 }
 
 .marco[data-m3="si"] .vista[data-estado="saliendo"] {
-  animation: sale-mega 260ms cubic-bezier(0.33, 0, 0.2, 1) both;
+  animation: sale-mega 260ms cubic-bezier(0.33, 0, 0.2, 1) forwards;
 }
 
 @keyframes entra-mega {
@@ -222,13 +286,13 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   /*
-   * 39 px de relleno (38 + el filete de 1 px del lienzo), de ellos 30 (el radio
+   * 39 px de relleno, de ellos 30 (el radio
    * de las esquinas) como borde TRANSPARENTE arriba y abajo: la barra de
    * desplazamiento vive en la caja de relleno, así que no llega a las esquinas
    * redondeadas en ningún navegador (Chrome ≥ 121 y Firefox ignoran el `margin`
    * de `::-webkit-scrollbar-track`).
    */
-  padding: calc(39px - var(--mega-radio)) 38px;
+  padding: calc(39px - var(--mega-radio)) 39px;
   border-block: var(--mega-radio) solid transparent;
 }
 

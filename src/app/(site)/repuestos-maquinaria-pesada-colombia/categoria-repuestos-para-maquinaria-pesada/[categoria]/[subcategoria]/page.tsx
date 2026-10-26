@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { EmblemaKit } from "@/components/nueva/kit/EmblemaKit";
 import { SeccionTestimonios } from "@/components/portada/diferidos";
+import { BienvenidaMarca } from "@/components/repuestos/BienvenidaMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
@@ -11,6 +14,8 @@ import { TarjetasGrupos } from "@/components/repuestos/TarjetasGrupos";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
+import { colorDeMarca, estiloDeMarca } from "@/lib/marca/colorMarca";
+import { colorConBlanco } from "@/lib/marca/franjaMarca";
 import { conAlt, logoPropio } from "@/lib/marca/logoMarca";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
@@ -25,6 +30,7 @@ import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { fondoDeRespaldo, vistaEncabezadoCategoria } from "@/lib/repuestos/categoria";
 import { gruposDeCategoria } from "@/lib/repuestos/grupos";
+import { vistaBienvenida, vistaPorQuePropia } from "@/lib/repuestos/paginaMarca";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { esCategoriaPrincipal, rutaDeCategoriaTecnica } from "@/lib/repuestos/subcategorias";
 import { rutas } from "@/lib/routes";
@@ -71,8 +77,8 @@ const ANCLA_CONTACTO = "contacto-repuestos";
  * PÁGINA DENTRO DE UNA CATEGORÍA TÉCNICA (2026-10-26, dirección: «Filtros Donaldson» dentro de
  * «Filtración», en su URL de WordPress), con la MISMA plantilla 4007 que las categorías: la
  * cabecera (con el logo de la marca sobre el título), una tarjeta por tipo de producto con su
- * foto, su descripción y «Cotizar», el contacto, los testimonios, «¿Por qué elegirnos?» y las
- * sedes. Las migas pasan por su categoría. Solo responde bajo la categoría de la que cuelga.
+ * foto, su descripción y «Cotizar», la presentación con su carrusel (2026-10-26), el contacto,
+ * los testimonios, «¿Por qué elegirnos?» (el propio si lo tiene) y las sedes. Las migas pasan por su categoría. Solo responde bajo la categoría de la que cuelga.
  */
 export default async function SubcategoriaRepuestosPage({ params }: { params: Promise<Params> }) {
   const { categoria: padreSlug, subcategoria: slug } = await params;
@@ -104,29 +110,76 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
     boton: texto(global.contactoBoton),
     marca: nombre.toLowerCase(),
   });
+  const bienvenida = vistaBienvenida(sub);
+  const porQuePropio = vistaPorQuePropia(sub, global);
+  const encabezado = vistaEncabezadoCategoria(sub, global, fondoDeRespaldo(marcas));
   const vista = {
-    ...vistaEncabezadoCategoria(sub, global, fondoDeRespaldo(marcas)),
+    ...encabezado,
+    // Con texto de bienvenida propio, la cabecera no lo repite (la «Descripción» sigue en buscadores).
+    descripcion: bienvenida?.texto ? "" : encabezado.descripcion,
     // El logo de la marca sobre el título, en su cuadrado blanco (como las marcas de repuestos).
     logo: conAlt(logoPropio({ nombre, logo: sub.logo ?? null }), `Logo de ${nombre}`),
   };
 
+  // COLOR Y EMBLEMA DE LA MARCA (2026-10-26, dirección), como las páginas de marca de nueva: el
+  // «Color de la marca» tiñe la franja de la cabecera y los botones, y el «Icono de la marca» es
+  // el emblema de fondo, grande y gris, que gira despacio con el scroll (`EmblemaKit`). Sin color
+  // ni icono, la página de siempre.
+  const color = colorDeMarca(sub.colorMarca);
+  const emblema = imagenDeMedia(sub.iconoMarca, "") ?? null;
+
   return (
-    <main className={estilos.pagina}>
+    <main
+      className={`${estilos.pagina} ${color ? estilos.paginaConColor : ""}`}
+      style={
+        color
+          ? ({
+              ...estiloDeMarca(color),
+              // Botones y texto sobre el color: oscurecido lo justo para el blanco (AA), como el
+              // botón del menú. La franja de la cabecera sigue con el color tal cual.
+              "--boton-acento": colorConBlanco(color),
+              "--boton-acento-tinta": "#fff",
+            } as CSSProperties)
+          : undefined
+      }
+    >
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <HeroMarca vista={vista} anclaSiguiente={ANCLA_GRUPOS} franja={false} />
+      <HeroMarca vista={vista} anclaSiguiente={ANCLA_GRUPOS} franja={Boolean(color)} />
 
-      <TarjetasGrupos
-        id={ANCLA_GRUPOS}
-        titulo={`Nuestra línea de ${nombre}`}
-        categoria={nombre}
-        grupos={gruposDeCategoria(sub)}
-        formulario={formulario}
-        anclaContacto={ANCLA_CONTACTO}
-      />
+      <EmblemaKit
+        emblema={emblema}
+        className={estilos.zonaEmblema}
+        // El icono es más alto que ancho: más estrecho que el águila de Case, para que quepa.
+        ancho="min(520px, 70vw)"
+      >
+        <TarjetasGrupos
+          id={ANCLA_GRUPOS}
+          titulo={`Nuestra línea de ${nombre}`}
+          categoria={nombre}
+          grupos={gruposDeCategoria(sub)}
+          formulario={formulario}
+          anclaContacto={ANCLA_CONTACTO}
+        />
+        <BienvenidaMarca id="presentacion-marca" vista={bienvenida} />
+      </EmblemaKit>
+
+      {/*
+       * El «¿Por qué elegirnos?» PROPIO va donde en WordPress: justo tras la presentación, con el
+       * texto sobre el color de la marca (su franja azul). El general, en su sitio de siempre.
+       */}
+      {porQuePropio ? (
+        <PorQueElegirnos
+          id="por-que-elegirnos"
+          vista={porQuePropio}
+          anclaContacto={ANCLA_CONTACTO}
+          formulario={formulario}
+          acento={Boolean(color)}
+        />
+      ) : null}
 
       <ContactoMarca
         id={ANCLA_CONTACTO}
@@ -147,12 +200,14 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
         }}
       />
 
-      <PorQueElegirnos
-        id="por-que-elegirnos"
-        vista={vistaPorQue(global, null)}
-        anclaContacto={ANCLA_CONTACTO}
-        formulario={formulario}
-      />
+      {porQuePropio ? null : (
+        <PorQueElegirnos
+          id="por-que-elegirnos"
+          vista={vistaPorQue(global, null)}
+          anclaContacto={ANCLA_CONTACTO}
+          formulario={formulario}
+        />
+      )}
 
       <SedesCompactas id="sedes-repuestos" sedes={sedesDePortada(sedes)} />
     </main>

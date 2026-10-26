@@ -331,6 +331,79 @@ export const CategoriaTecnica: CollectionConfig = {
         },
       ],
     },
+    /*
+     * SECCIONES PROPIAS DE UNA PÁGINA DE MARCA dentro de una categoría (Filtros Donaldson,
+     * 2026-10-26, dirección): la presentación con su carrusel de fotos y un «¿Por qué
+     * elegirnos?» propio, con el contenido de su página de WordPress. Todo opcional: vacío, la
+     * página no pinta la presentación y usa el «¿Por qué elegirnos?» general.
+     */
+    {
+      name: "paginaMarca",
+      type: "group",
+      label: "Secciones propias de la página de marca",
+      admin: {
+        condition: (datos) => Boolean(datos?.padre),
+        description:
+          "Solo para una página de marca dentro de otra categoría (p. ej. Filtros Donaldson). Todo opcional.",
+      },
+      fields: [
+        {
+          name: "bienvenidaAntetitulo",
+          type: "text",
+          label: "Presentación: antetítulo",
+          admin: { description: "La línea pequeña sobre el título." },
+        },
+        { name: "bienvenidaTitulo", type: "text", label: "Presentación: título" },
+        {
+          name: "bienvenidaTexto",
+          type: "textarea",
+          label: "Presentación: texto",
+          admin: {
+            description:
+              "El texto de bienvenida. Si lo hay, la cabecera de la página ya no repite la «Descripción» (que sigue sirviendo para buscadores).",
+          },
+        },
+        {
+          name: "bienvenidaFotos",
+          type: "upload",
+          relationTo: "media",
+          hasMany: true,
+          maxRows: 8,
+          label: "Presentación: fotos del carrusel",
+          admin: {
+            description:
+              "Se ven enteras, una a una, con flechas y puntos; pasan solas cada 5 segundos, con botón de pausa.",
+          },
+        },
+        {
+          name: "porQueTitulo",
+          type: "text",
+          label: "¿Por qué elegirnos?: título",
+          admin: {
+            description:
+              "Con título y foto, la página lleva su propio «¿Por qué elegirnos?» en lugar del general del sitio.",
+          },
+        },
+        { name: "porQueTexto", type: "textarea", label: "¿Por qué elegirnos?: texto" },
+        {
+          name: "porQueImagen",
+          type: "upload",
+          relationTo: "media",
+          label: "¿Por qué elegirnos?: foto",
+        },
+        {
+          name: "compromisoTitulo",
+          type: "text",
+          label: "¿Por qué elegirnos?: frase destacada",
+          admin: { description: "En negrita bajo el texto (p. ej. «Nuestro compromiso es…»)." },
+        },
+        {
+          name: "compromisoTexto",
+          type: "text",
+          label: "¿Por qué elegirnos?: complemento de la frase",
+        },
+      ],
+    },
     // Tiene página propia desde el 2026-10-13 (provisional hasta el diseño de Andrés). Las URL
     // heredadas de segundo nivel y las duplicadas siguen sin decidir (docs/redirects-map.csv).
     seoField(),

@@ -18,9 +18,15 @@ import estilos from "./kit.module.css";
  */
 export function EmblemaKit({
   emblema,
+  className,
+  ancho,
   children,
 }: {
   emblema: ImagenLista | null;
+  /** Clase extra de la capa (Filtros Donaldson: la zona blanca que lleva el emblema). */
+  className?: string;
+  /** Ancho del grabado, si no es el del kit (un emblema más alto que ancho, como el de Donaldson). */
+  ancho?: string;
   children: ReactNode;
 }) {
   const capa = useRef<HTMLDivElement>(null);
@@ -54,10 +60,10 @@ export function EmblemaKit({
     };
   }, [emblema]);
 
-  if (!emblema) return <>{children}</>;
+  if (!emblema) return className ? <div className={className}>{children}</div> : <>{children}</>;
   const url = `url("${emblema.url}")`;
   return (
-    <div ref={capa} className={estilos.emblemaCapa}>
+    <div ref={capa} className={`${estilos.emblemaCapa} ${className ?? ""}`}>
       <div aria-hidden="true" className={estilos.emblemaFondo}>
         <div className={estilos.emblemaPegado}>
           <span
@@ -65,6 +71,7 @@ export function EmblemaKit({
             className={estilos.emblema}
             style={{
               aspectRatio: `${emblema.width} / ${emblema.height}`,
+              width: ancho,
               maskImage: url,
               WebkitMaskImage: url,
             }}

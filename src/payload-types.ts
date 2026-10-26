@@ -880,6 +880,35 @@ export interface CategoriasTecnica {
       }[]
     | null;
   /**
+   * Solo para una página de marca dentro de otra categoría (p. ej. Filtros Donaldson). Todo opcional.
+   */
+  paginaMarca?: {
+    /**
+     * La línea pequeña sobre el título.
+     */
+    bienvenidaAntetitulo?: string | null;
+    bienvenidaTitulo?: string | null;
+    /**
+     * El texto de bienvenida. Si lo hay, la cabecera de la página ya no repite la «Descripción» (que sigue sirviendo para buscadores).
+     */
+    bienvenidaTexto?: string | null;
+    /**
+     * Se ven enteras, una a una, con flechas y puntos; pasan solas cada 5 segundos, con botón de pausa.
+     */
+    bienvenidaFotos?: (number | Media)[] | null;
+    /**
+     * Con título y foto, la página lleva su propio «¿Por qué elegirnos?» en lugar del general del sitio.
+     */
+    porQueTitulo?: string | null;
+    porQueTexto?: string | null;
+    porQueImagen?: (number | null) | Media;
+    /**
+     * En negrita bajo el texto (p. ej. «Nuestro compromiso es…»).
+     */
+    compromisoTitulo?: string | null;
+    compromisoTexto?: string | null;
+  };
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -2589,6 +2618,19 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
               id?: T;
             };
         id?: T;
+      };
+  paginaMarca?:
+    | T
+    | {
+        bienvenidaAntetitulo?: T;
+        bienvenidaTitulo?: T;
+        bienvenidaTexto?: T;
+        bienvenidaFotos?: T;
+        porQueTitulo?: T;
+        porQueTexto?: T;
+        porQueImagen?: T;
+        compromisoTitulo?: T;
+        compromisoTexto?: T;
       };
   seo?:
     | T

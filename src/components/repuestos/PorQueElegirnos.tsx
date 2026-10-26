@@ -21,9 +21,12 @@ export function PorQueElegirnos({
   vista,
   anclaContacto,
   formulario,
+  acento = false,
 }: {
   id: string;
   vista: VistaPorQue | null;
+  /** El propio de una página de marca: el texto sobre el color de la marca (Filtros Donaldson). */
+  acento?: boolean;
   anclaContacto: string;
   /** El formulario de contacto de la página: el botón lo abre en una ventana. */
   formulario: ConfigFormulario;
@@ -31,7 +34,11 @@ export function PorQueElegirnos({
   if (!vista) return null;
   const idTitulo = `${id}-titulo`;
   return (
-    <section id={id} className={estilos.porQue} aria-labelledby={idTitulo}>
+    <section
+      id={id}
+      className={`${estilos.porQue} ${acento ? estilos.porQueAcento : ""}`}
+      aria-labelledby={idTitulo}
+    >
       <div className={estilos.porQueTarjeta}>
         {vista.imagen ? (
           <div className={estilos.porQueFoto}>
@@ -57,6 +64,17 @@ export function PorQueElegirnos({
               ) : null}
               {vista.texto ? <p>{vista.texto}</p> : null}
             </div>
+          ) : null}
+          {vista.compromiso ? (
+            <p className={estilos.porQueCompromiso}>
+              <strong>{vista.compromiso.titulo}</strong>
+              {vista.compromiso.texto ? (
+                <>
+                  <br />
+                  {vista.compromiso.texto}
+                </>
+              ) : null}
+            </p>
           ) : null}
           {vista.puntos.length > 0 ? (
             <ul className={estilos.porQuePuntos}>

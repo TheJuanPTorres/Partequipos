@@ -55,3 +55,12 @@ anidado). Lógica pura con pruebas: `src/lib/repuestos/modelo.ts`.
 Un solo `<h1>`; párrafo a 19:1 como mínimo sobre lo que tiene detrás; CLS ≤ 0,0054 a 1440 y 0 a 390; sin desbordamiento
 ni errores de consola. Rondas del diseño: caja de foto → borde orgánico difuminado → borde granular → diagonal limpia
 (informe `2026-10-19-modelo-repuestos-muestra.md`).
+
+## «Ver todos» en la plantilla 4086 (2026-10-26, dirección)
+
+Tras las baldosas de categorías, un recuadro con «Otros modelos de {Tipo} {MARCA}» (y la serie, si el
+tipo las tiene) y «Ver todos (N)», que abre el PANEL INFERIOR de la marca (`VerTodosEquipos`, la rejilla
+del #355) con los modelos de la serie del modelo o, sin series, de todo el tipo: la misma lista que la
+página del tipo, con las mismas fotos. El modelo de la página sale MARCADO (borde y fondo suave del color
+de la marca, check y «(página actual)» para lectores de pantalla). Sin JavaScript, el botón lleva a la
+página del tipo, al ancla de la serie. Con un solo modelo no se pinta (`OtrosModelos`).

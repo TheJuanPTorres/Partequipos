@@ -3923,6 +3923,10 @@ export interface PaginasIndice {
    */
   blog: {
     /**
+     * Opcional. Foto a todo el ancho detrás de «Partequipos · Nuestro Blog» en /noticias/ y en las categorías del blog; sin ella, el encabezado oscuro de siempre.
+     */
+    fondo?: (number | null) | Media;
+    /**
      * «Provisional»: el artículo sencillo de siempre. «Diseño propio»: cabecera baja con migas, imagen destacada, columna de lectura con índice fijo, barra de progreso, compartir, llamada a contactar y artículos relacionados. Cambiarlo actualiza todos los artículos.
      */
     disenoArticulo: 'provisional' | 'propio';
@@ -4228,6 +4232,7 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
   blog?:
     | T
     | {
+        fondo?: T;
         disenoArticulo?: T;
       };
   contacto?:

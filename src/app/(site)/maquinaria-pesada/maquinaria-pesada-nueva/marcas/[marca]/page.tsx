@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 
 import { PaginaMarcaNueva } from "@/components/nueva/PaginaMarcaNueva";
 import { PaginaMarcaAditamentos } from "@/components/nueva/PaginaMarcaAditamentos";
-import { usaDisenoAditamentos } from "@/lib/nueva/paginaAditamentos";
+import { PaginaMarcaKit } from "@/components/nueva/kit/PaginaMarcaKit";
+import { usaDisenoAditamentos, usaDisenoKit } from "@/lib/nueva/paginaAditamentos";
 import { getMarcaMaquinariaPorSlug, getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
@@ -42,5 +43,7 @@ export default async function MarcaMaquinariaPage({ params }: { params: Promise<
   const marca = await getMarcaMaquinariaPorSlug(slug);
   if (!marca) notFound();
   if (usaDisenoAditamentos(marca)) return <PaginaMarcaAditamentos marca={marca} />;
+  // «Kit de marca» (2026-10-25, diseño del cliente): se elige por marca en el panel.
+  if (usaDisenoKit(marca)) return <PaginaMarcaKit marca={marca} />;
   return <PaginaMarcaNueva marca={marca} />;
 }

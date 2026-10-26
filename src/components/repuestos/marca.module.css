@@ -1218,10 +1218,15 @@ a.modelo:hover {
  * foto por encima del recuadro del nombre: los 34 px que sube sobre la caja y
  * los 25 px que puede subir con el scroll (`RecuadrosConScroll`).
  */
+/* Más alta que la de escena (4:3, no 3:2): las fotos de producto son casi cuadradas. */
+.tarjetasGrupos .foto {
+  aspect-ratio: 4 / 3;
+}
+
 .tarjetasGrupos .foto .fotoImg.fotoProducto,
 .tarjetasGrupos .tarjeta:hover .fotoImg.fotoProducto {
   box-sizing: border-box;
-  padding: 6% 8% calc(59px + 3%);
+  padding: 4% 5% 59px;
   object-fit: contain;
   object-position: center;
   transform: none;

@@ -3,29 +3,30 @@ import { notFound } from "next/navigation";
 
 import { HeroPortada } from "@/components/hero/HeroPortada";
 import { SeccionMaquinariaNueva } from "@/components/portada/SeccionMaquinariaNueva";
-import { SeccionMaquinariaUsada } from "@/components/portada/SeccionMaquinariaUsada";
-import { SeccionRepuestos } from "@/components/portada/SeccionRepuestos";
+import { SeccionMarcasKit } from "@/components/portada/kit/SeccionMarcasKit";
+import { SeccionRepuestosKit } from "@/components/portada/kit/SeccionRepuestosKit";
+import { SeccionUsadosKit } from "@/components/portada/kit/SeccionUsadosKit";
 import { SeccionCatalogo } from "@/components/portada/SeccionCatalogo";
-import { CarruselLogos, SeccionCompania, SeccionTestimonios } from "@/components/portada/diferidos";
+import { SeccionCompania, SeccionTestimonios } from "@/components/portada/diferidos";
 import { SeccionFaq } from "@/components/portada/SeccionFaq";
 import { SeccionSedes } from "@/components/portada/SeccionSedes";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { diapositivasDeHero } from "@/lib/portada/hero";
 import {
-  RUTA_USADA,
-  enlacesDeUsada,
-  tarjetasDeExcavadoras,
-  tarjetasDeMarcas,
-} from "@/lib/portada/secciones";
-import { logosDeMarcas, tarjetasDeRepuestos } from "@/lib/portada/seccionesE";
+  categoriasDePortada,
+  filtrosDeUsados,
+  imagenDecorativa,
+  logosDeLaBanda,
+} from "@/lib/portada/kitCliente";
+import { RUTA_USADA, tarjetasDeMarcas } from "@/lib/portada/secciones";
 import { videoDeCompania, videoDeYouTube } from "@/lib/portada/seccionesF";
 import { preguntasDeFaq, tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { sedesDePortada, tokenMapbox } from "@/lib/portada/sedes";
 import { getCategoriasTecnicasDePortada } from "@/lib/queries/getCategoriasTecnicas";
 import { getPreguntasDePortada, getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getVideoPorId } from "@/lib/queries/getVideos";
-import { getExcavadorasUsadasDePortada, getMarcasDePortada } from "@/lib/queries/getMaquinaria";
+import { getMarcasDePortada, getUsadosDePortada } from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
@@ -79,7 +80,7 @@ export default async function HomePage() {
     logosMarca,
   ] = await Promise.all([
     getMarcasDePortada(),
-    getExcavadorasUsadasDePortada(),
+    getUsadosDePortada(),
     getCategoriasTecnicasDePortada(),
     getTestimoniosDePortada(),
     getPreguntasDePortada(),
@@ -90,7 +91,6 @@ export default async function HomePage() {
     getLogosMarca(),
   ]);
   const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
-  const maquinaUsada = imagenDeMedia(pagina.seccionUsada?.imagen, "");
   const relVideo = pagina.seccionCompania?.video;
   const idVideo = typeof relVideo === "object" && relVideo ? relVideo.id : relVideo;
   const videoCompania = videoDeCompania({
@@ -129,35 +129,38 @@ export default async function HomePage() {
           botonEnlace: tx(nueva?.botonEnlace),
         }}
       />
-      <SeccionMaquinariaUsada
-        enlaces={enlacesDeUsada({
-          excavadoras: usada?.pestanaExcavadoras,
-          otros: usada?.pestanaOtros,
-          aditamentos: usada?.pestanaAditamentos,
-        })}
-        excavadoras={tarjetasDeExcavadoras(usados)}
-        cotizar={{ siteKey: turnstileSiteKey(), telefono: empresa.whatsapp }}
-        maquina={maquinaUsada ? { ...maquinaUsada, alt: "" } : null}
+      {/*
+       * Las tres secciones con el DISEÑO DEL CLIENTE (2026-10-26, `components/portada/kit/`):
+       * «Maquinaria pesada usada», marcas (sustituye al carrusel de logos de ux-9) y «Venta de
+       * repuestos». Datos e imágenes, del panel.
+       */}
+      <SeccionUsadosKit
+        filtros={filtrosDeUsados(usados, usada)}
+        maquina={imagenDecorativa(usada?.imagen)}
         hrefVerTodo={RUTA_USADA}
+        cotizar={{ siteKey: turnstileSiteKey(), telefono: empresa.whatsapp }}
         textos={{
           antetitulo: tx(usada?.antetitulo),
           titulo: tx(usada?.titulo),
-          marcasTitulo: tx(usada?.marcasTitulo),
-          marcasTexto: tx(usada?.marcasTexto),
+          descripcion: tx(usada?.descripcion),
           botonTexto: tx(usada?.botonTexto),
         }}
       />
-
-      {/* Secciones 4 y 5 de ux-9 (fase E). Sin datos, no se pintan. */}
-      <CarruselLogos logos={logosDeMarcas(pagina.seccionLogos, logosMarca)} />
-      <SeccionRepuestos
-        tarjetas={tarjetasDeRepuestos(categoriasTecnicas)}
+      <SeccionMarcasKit
+        logos={logosDeLaBanda(pagina.seccionLogos, logosMarca)}
+        titulo={tx(pagina.seccionLogos?.titulo)}
+        resaltado={tx(pagina.seccionLogos?.tituloResaltado)}
+        maquina={imagenDecorativa(pagina.seccionLogos?.maquina)}
+        reflejo={imagenDecorativa(pagina.seccionLogos?.maquinaReflejo)}
+      />
+      <SeccionRepuestosKit
+        categorias={categoriasDePortada(categoriasTecnicas)}
+        maquina={imagenDecorativa(repuestos?.maquina)}
+        reflejo={imagenDecorativa(repuestos?.maquinaReflejo)}
         textos={{
           antetitulo: tx(repuestos?.antetitulo),
           titulo: tx(repuestos?.titulo),
-          verMasTexto: tx(repuestos?.verMasTexto),
-          botonTexto: tx(repuestos?.botonTexto),
-          botonEnlace: tx(repuestos?.botonEnlace),
+          verTodos: tx(repuestos?.verMasTexto),
         }}
       />
 

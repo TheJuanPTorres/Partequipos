@@ -23,6 +23,19 @@ import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/segur
  * de URLs es intocable (CLAUDE.md §3.3).
  */
 /** Descripción con aviso si la página tiene bloques (`src/components/admin/AvisoBloques`). */
+/**
+ * Una imagen del KIT DE LA PORTADA del cliente (2026-10-26): render recortado, su reflejo o la foto
+ * de una tarjeta. Decorativa (`alt` vacío al pintarla) y opcional: sin ella, la sección se pinta sin
+ * ese adorno, sin hueco. En Payload y no en el repositorio (assets nunca en `public/`).
+ */
+const imagenKit = (name: string, label: string, description: string) => ({
+  name,
+  type: "upload" as const,
+  relationTo: "media" as const,
+  label,
+  admin: { description },
+});
+
 const AVISO_BLOQUES = (texto?: string) => ({
   path: "/components/admin/AvisoBloques",
   clientProps: texto ? { texto } : {},
@@ -463,32 +476,53 @@ export const PaginaInstitucional: CollectionConfig = {
           name: "imagen",
           type: "upload",
           relationTo: "media",
-          label: "Máquina recortada (PNG transparente)",
+          label: "Máquina de la cabecera (PNG o WebP transparente)",
           admin: {
-            description: "Decorativa: asoma sobre la sección anterior. Opcional.",
+            description:
+              "Decorativa: la máquina sobre el piso, con su reflejo (la misma imagen volteada). Opcional.",
           },
         },
         texto("antetitulo", "Antetítulo", "Venta de maquinaria"),
         texto("titulo", "Título", "Maquinaria pesada usada"),
+        parrafo(
+          "descripcion",
+          "Texto de la cabecera",
+          "Encuentra excavadoras, retrocargadoras, cargadores, minicargadores, motoniveladoras y más para construcción, infraestructura y movimiento de tierra en Colombia.",
+        ),
+        imagenKit(
+          "imagenExcavadoras",
+          "Imagen del filtro «Excavadora»",
+          "La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.",
+        ),
+        imagenKit(
+          "imagenOtros",
+          "Imagen del filtro «Otros»",
+          "La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.",
+        ),
+        imagenKit(
+          "imagenAditamentos",
+          "Imagen del filtro de los aditamentos",
+          "El aditamento recortado (PNG o WebP transparente) de la tarjeta del filtro. Opcional.",
+        ),
         texto(
           "pestanaExcavadoras",
-          "Enlace a Excavadora",
+          "Filtro «Excavadora»",
           // El valor por defecto sigue en plural: cambiarlo cambia el DEFAULT de la columna y pide
           // migración. El texto se pone en el panel (runbook del singular, 2026-10-23).
           "Excavadoras",
-          "Botón rojo sobre el carrusel; lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».",
+          "Tarjeta del filtro sobre el carrusel; «Ver todo» lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».",
         ),
         texto(
           "pestanaOtros",
-          "Enlace a «Otros»",
+          "Filtro «Otros»",
           "Otros",
-          "Lleva a la página «Otros» de usados. Vacío: «Otros».",
+          "Tarjeta del filtro; «Ver todo» lleva a la página «Otros» de usados. Vacío: «Otros».",
         ),
         texto(
           "pestanaAditamentos",
-          "Enlace a los aditamentos",
+          "Filtro de los aditamentos",
           "Aditamentos",
-          "Lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».",
+          "Tarjeta del filtro; «Ver todo» lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».",
         ),
         texto(
           "verProductoTexto",
@@ -496,17 +530,22 @@ export const PaginaInstitucional: CollectionConfig = {
           "Ver más",
           "Sin efecto desde el 2026-10-20: cada equipo lleva «Ver producto» y «Cotizar».",
         ),
-        texto("marcasTitulo", "Subtítulo de la cabecera", "Marcas que Respaldan Nuestro Trabajo"),
+        texto(
+          "marcasTitulo",
+          "Subtítulo de la cabecera (ya no se usa)",
+          "Marcas que Respaldan Nuestro Trabajo",
+          "Sin efecto desde el 2026-10-26 (diseño del cliente): la cabecera lleva el «Texto de la cabecera».",
+        ),
         parrafo(
           "marcasTexto",
-          "Frase de la cabecera",
+          "Frase de la cabecera (ya no se usa)",
           "Trabajamos con fabricantes líderes a nivel internacional para ofrecerle calidad, rendimiento y respaldo",
         ),
         texto(
           "botonTexto",
           "Texto del botón de la cabecera",
           "Ver todo",
-          "El botón lleva al índice de maquinaria usada.",
+          "El botón baja al carrusel de la categoría elegida.",
         ),
       ],
     },
@@ -522,6 +561,18 @@ export const PaginaInstitucional: CollectionConfig = {
       label: "Sección «Logos de marcas» de la portada",
       admin: { condition: (data) => data?.slug === "inicio" },
       fields: [
+        texto("titulo", "Título", "Marcas que mueven"),
+        texto("tituloResaltado", "Final del título, en rojo", "tu operación"),
+        imagenKit(
+          "maquina",
+          "Máquina (PNG o WebP transparente)",
+          "Decorativa: la máquina sobre el piso, por delante de la banda de logos. Opcional.",
+        ),
+        imagenKit(
+          "maquinaReflejo",
+          "Reflejo de la máquina",
+          "La imagen del reflejo, del kit del cliente (más alta que la máquina). Opcional.",
+        ),
         {
           name: "logos",
           type: "array",
@@ -529,7 +580,7 @@ export const PaginaInstitucional: CollectionConfig = {
           labels: { singular: "Logo", plural: "Logos" },
           admin: {
             description:
-              "En este orden en el carrusel. PNG transparente, con el logo centrado en su lienzo.",
+              "En este orden en el carrusel. PNG transparente, con el logo centrado en su lienzo. Desde el 2026-10-26 este logo manda en la portada, también para una marca del sitio (los del kit del cliente).",
           },
           fields: [
             {
@@ -562,9 +613,28 @@ export const PaginaInstitucional: CollectionConfig = {
       fields: [
         texto("antetitulo", "Antetítulo", "Venta de repuestos"),
         texto("titulo", "Título", "Encuentra Maquinaria y Repuestos Rápido y Fácil"),
-        texto("verMasTexto", "Texto del enlace de cada tarjeta", "Ver más"),
-        texto("botonTexto", "Texto del botón", "Ver todos los repuestos"),
-        enlace("botonEnlace", "Enlace del botón", "/repuestos-maquinaria-pesada-colombia/"),
+        texto("verMasTexto", "Texto del botón de cada tarjeta", "Ver más"),
+        texto(
+          "botonTexto",
+          "Texto del botón (ya no se usa)",
+          "Ver todos los repuestos",
+          "Sin efecto desde el 2026-10-26 (diseño del cliente): cada tarjeta lleva su botón.",
+        ),
+        enlace(
+          "botonEnlace",
+          "Enlace del botón (ya no se usa)",
+          "/repuestos-maquinaria-pesada-colombia/",
+        ),
+        imagenKit(
+          "maquina",
+          "Máquina (PNG o WebP transparente)",
+          "Decorativa: la máquina sobre el piso, junto a las categorías. Opcional.",
+        ),
+        imagenKit(
+          "maquinaReflejo",
+          "Reflejo de la máquina",
+          "La imagen del reflejo, del kit del cliente (más alta que la máquina). Opcional.",
+        ),
       ],
     },
     /*

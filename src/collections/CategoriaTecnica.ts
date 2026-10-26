@@ -220,6 +220,21 @@ export const CategoriaTecnica: CollectionConfig = {
         description: "Opcional. Vacío: la tarjeta de la portada usa el nombre de la categoría.",
       },
     },
+    /*
+     * FOTO DE LA PORTADA (diseño del cliente, 2026-10-26): la pieza recortada de la tarjeta de
+     * «Venta de repuestos». Aparte de la «Imagen de la tarjeta», que usan el índice de categorías,
+     * las páginas de marca y el megamenú. Vacía, la tarjeta de la portada usa esa.
+     */
+    {
+      name: "imagenPortada",
+      type: "upload",
+      relationTo: "media",
+      label: "Foto en la portada",
+      admin: {
+        description:
+          "Opcional: la pieza recortada (PNG o WebP transparente) de la tarjeta de la portada. Vacía: la «Imagen de la tarjeta».",
+      },
+    },
     {
       name: "enlace",
       type: "text",

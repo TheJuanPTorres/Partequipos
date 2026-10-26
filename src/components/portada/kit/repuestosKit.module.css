@@ -1,0 +1,400 @@
+/*
+ * «VENTA DE REPUESTOS» CON EL DISEÑO DEL CLIENTE (2026-10-26), portado del prototipo (Tailwind).
+ * Cortes del prototipo: 640, 768 (cinco tarjetas por fila), 1025 (título y máquina en una fila) y
+ * 1536 (tarjetas a la izquierda, máquina a la derecha).
+ */
+
+.seccion {
+  --kit-gris: #f1f0ee;
+  --kit-rojo-texto: color-mix(in srgb, var(--color-marca) 78%, #000);
+  padding: 0 12px 12px;
+  background: var(--color-fondo);
+}
+
+@media (min-width: 640px) {
+  .seccion {
+    padding: 0 20px 20px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .seccion {
+    padding: 0 24px 24px;
+  }
+}
+
+.panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--kit-gris);
+}
+
+@media (min-width: 1025px) {
+  .panel {
+    border-radius: 32px;
+  }
+}
+
+.rejilla {
+  display: grid;
+  padding: 32px 20px;
+  gap: 32px;
+}
+
+@media (min-width: 640px) {
+  .rejilla {
+    padding: 40px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .rejilla {
+    padding: 48px 40px;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 16px 32px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .rejilla {
+    padding: 48px 24px 48px 5%;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    gap: 36px 16px;
+  }
+}
+
+.cabecera {
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 1025px) {
+  .cabecera {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+  }
+}
+
+@media (min-width: 1536px) {
+  .cabecera {
+    align-self: start;
+  }
+}
+
+.antetitulo {
+  margin: 0;
+  color: var(--kit-rojo-texto);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.titulo {
+  margin: 12px 0 0;
+  color: var(--color-texto);
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 1025px) {
+  .titulo {
+    max-width: 24ch;
+    font-size: clamp(2rem, 2.8vw, 2.6rem);
+    line-height: 1.1;
+  }
+}
+
+@media (min-width: 1536px) {
+  .titulo {
+    max-width: none;
+    font-size: clamp(1.6rem, 1.9vw, 2.4rem);
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+}
+
+/* --- La máquina ------------------------------------------------------------------------------- */
+
+.maquinaCaja {
+  position: relative;
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 1025px) {
+  .maquinaCaja {
+    max-width: 30rem;
+    margin: 0;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    justify-self: end;
+  }
+}
+
+@media (min-width: 1536px) {
+  .maquinaCaja {
+    width: 124%;
+    max-width: none;
+    margin: 0 -12%;
+    grid-row: 1 / span 2;
+    align-self: end;
+    justify-self: auto;
+  }
+}
+
+.maquina {
+  position: relative;
+}
+
+.capa {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.piso {
+  position: absolute;
+  top: 24%;
+  right: -200%;
+  bottom: -400%;
+  left: -200%;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgb(241 240 238 / 0) 0%,
+    rgb(20 17 15 / 0.035) 1.5%,
+    rgb(246 245 243 / 0.85) 4%,
+    #f6f5f3 7%,
+    #f8f7f5 30%,
+    #f9f9f8 60%,
+    #f6f5f3 100%
+  );
+}
+
+@media (min-width: 1025px) {
+  .piso {
+    right: -40%;
+    left: -70%;
+    mask-image: linear-gradient(to right, transparent, #000 30%);
+  }
+}
+
+.reflejo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.contener {
+  object-fit: contain;
+}
+
+/* --- Las tarjetas ----------------------------------------------------------------------------- */
+
+.tarjetas {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .tarjetas {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1025px) {
+  .tarjetas {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .tarjetas {
+    grid-column: 1;
+  }
+}
+
+/* Toda la tarjeta lleva a la página de la categoría; «Ver todos» va al pie, alineado en la fila. */
+.tarjeta {
+  display: flex;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 16px 8px;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 20px;
+  background: var(--color-fondo);
+  box-shadow: 0 1px 2px rgb(20 17 15 / 0.05);
+  color: var(--color-texto);
+  text-align: center;
+  text-decoration: none;
+}
+
+@media (min-width: 640px) {
+  .tarjeta {
+    padding: 16px 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .tarjeta {
+    padding: 16px 8px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .tarjeta {
+    padding: 20px 12px;
+  }
+}
+
+.tarjeta:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+}
+
+.foto {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 12rem;
+  height: 80px;
+}
+
+@media (min-width: 768px) {
+  .foto {
+    height: 64px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .foto {
+    height: 112px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .foto {
+    height: 128px;
+  }
+}
+
+.fotoImg {
+  object-fit: contain;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fotoImg {
+    transition: transform 300ms cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  .tarjeta:hover .fotoImg {
+    transform: scale(1.06);
+  }
+}
+
+/* El nombre ocupa siempre dos líneas de alto: los botones quedan alineados en la fila. */
+.nombre {
+  display: flex;
+  min-height: 2lh;
+  margin: 12px 0;
+  align-items: center;
+  font-size: 0.825rem;
+  font-weight: 700;
+  line-height: 1.375;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .nombre {
+    font-size: 0.765rem;
+    letter-spacing: normal;
+  }
+}
+
+@media (min-width: 1025px) {
+  .nombre {
+    font-size: 0.925rem;
+    letter-spacing: 0.025em;
+  }
+}
+
+.ver {
+  display: inline-flex;
+  margin-top: auto;
+  padding: 8px 16px;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1.5px var(--color-marca);
+  color: var(--color-marca);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+@media (min-width: 768px) {
+  .ver {
+    padding: 6px 10px;
+    gap: 4px;
+    font-size: 0.66rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .ver {
+    padding: 8px 16px;
+    gap: 6px;
+    font-size: 0.78rem;
+  }
+}
+
+.tarjeta:hover .ver {
+  background: var(--color-marca);
+  color: #fff;
+}
+
+.flecha {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .flecha {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ver {
+    transition: none;
+  }
+}

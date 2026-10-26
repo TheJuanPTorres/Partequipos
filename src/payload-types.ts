@@ -838,6 +838,10 @@ export interface CategoriasTecnica {
    */
   tituloPortada?: string | null;
   /**
+   * Opcional: la pieza recortada (PNG o WebP transparente) de la tarjeta de la portada. Vacía: la «Imagen de la tarjeta».
+   */
+  imagenPortada?: (number | null) | Media;
+  /**
    * A dónde llevan la tarjeta de la portada y la categoría en las páginas de marca. Ruta del sitio (/…) o https://.
    */
   enlace?: string | null;
@@ -1443,37 +1447,63 @@ export interface Pagina {
   };
   seccionUsada?: {
     /**
-     * Decorativa: asoma sobre la sección anterior. Opcional.
+     * Decorativa: la máquina sobre el piso, con su reflejo (la misma imagen volteada). Opcional.
      */
     imagen?: (number | null) | Media;
     antetitulo?: string | null;
     titulo?: string | null;
+    descripcion?: string | null;
     /**
-     * Botón rojo sobre el carrusel; lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».
+     * La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.
+     */
+    imagenExcavadoras?: (number | null) | Media;
+    /**
+     * La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.
+     */
+    imagenOtros?: (number | null) | Media;
+    /**
+     * El aditamento recortado (PNG o WebP transparente) de la tarjeta del filtro. Opcional.
+     */
+    imagenAditamentos?: (number | null) | Media;
+    /**
+     * Tarjeta del filtro sobre el carrusel; «Ver todo» lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».
      */
     pestanaExcavadoras?: string | null;
     /**
-     * Lleva a la página «Otros» de usados. Vacío: «Otros».
+     * Tarjeta del filtro; «Ver todo» lleva a la página «Otros» de usados. Vacío: «Otros».
      */
     pestanaOtros?: string | null;
     /**
-     * Lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».
+     * Tarjeta del filtro; «Ver todo» lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».
      */
     pestanaAditamentos?: string | null;
     /**
      * Sin efecto desde el 2026-10-20: cada equipo lleva «Ver producto» y «Cotizar».
      */
     verProductoTexto?: string | null;
+    /**
+     * Sin efecto desde el 2026-10-26 (diseño del cliente): la cabecera lleva el «Texto de la cabecera».
+     */
     marcasTitulo?: string | null;
     marcasTexto?: string | null;
     /**
-     * El botón lleva al índice de maquinaria usada.
+     * El botón baja al carrusel de la categoría elegida.
      */
     botonTexto?: string | null;
   };
   seccionLogos?: {
+    titulo?: string | null;
+    tituloResaltado?: string | null;
     /**
-     * En este orden en el carrusel. PNG transparente, con el logo centrado en su lienzo.
+     * Decorativa: la máquina sobre el piso, por delante de la banda de logos. Opcional.
+     */
+    maquina?: (number | null) | Media;
+    /**
+     * La imagen del reflejo, del kit del cliente (más alta que la máquina). Opcional.
+     */
+    maquinaReflejo?: (number | null) | Media;
+    /**
+     * En este orden en el carrusel. PNG transparente, con el logo centrado en su lienzo. Desde el 2026-10-26 este logo manda en la portada, también para una marca del sitio (los del kit del cliente).
      */
     logos?:
       | {
@@ -1490,11 +1520,22 @@ export interface Pagina {
     antetitulo?: string | null;
     titulo?: string | null;
     verMasTexto?: string | null;
+    /**
+     * Sin efecto desde el 2026-10-26 (diseño del cliente): cada tarjeta lleva su botón.
+     */
     botonTexto?: string | null;
     /**
      * Una ruta del sitio (/…/) o una dirección https://.
      */
     botonEnlace?: string | null;
+    /**
+     * Decorativa: la máquina sobre el piso, junto a las categorías. Opcional.
+     */
+    maquina?: (number | null) | Media;
+    /**
+     * La imagen del reflejo, del kit del cliente (más alta que la máquina). Opcional.
+     */
+    maquinaReflejo?: (number | null) | Media;
   };
   seccionCompania?: {
     /**
@@ -2524,6 +2565,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   fondoHero?: T;
   icono?: T;
   tituloPortada?: T;
+  imagenPortada?: T;
   enlace?: T;
   ordenPortada?: T;
   ordenMarca?: T;
@@ -2931,6 +2973,10 @@ export interface PaginasSelect<T extends boolean = true> {
         imagen?: T;
         antetitulo?: T;
         titulo?: T;
+        descripcion?: T;
+        imagenExcavadoras?: T;
+        imagenOtros?: T;
+        imagenAditamentos?: T;
         pestanaExcavadoras?: T;
         pestanaOtros?: T;
         pestanaAditamentos?: T;
@@ -2942,6 +2988,10 @@ export interface PaginasSelect<T extends boolean = true> {
   seccionLogos?:
     | T
     | {
+        titulo?: T;
+        tituloResaltado?: T;
+        maquina?: T;
+        maquinaReflejo?: T;
         logos?:
           | T
           | {
@@ -2958,6 +3008,8 @@ export interface PaginasSelect<T extends boolean = true> {
         verMasTexto?: T;
         botonTexto?: T;
         botonEnlace?: T;
+        maquina?: T;
+        maquinaReflejo?: T;
       };
   seccionCompania?:
     | T
@@ -3687,7 +3739,7 @@ export interface RepuestosMarca {
   porQueCierre?: string | null;
   porQueBoton?: string | null;
   /**
-   * «Provisional»: el contenido de WordPress en una página sencilla. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.
+   * «Plantilla de Andrés»: la ficha 4086 (cabecera partida y las categorías del tipo en baldosas), la del sitio publicado. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.
    */
   disenoModelo: 'provisional' | 'propio';
   /**

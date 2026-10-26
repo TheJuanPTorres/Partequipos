@@ -494,8 +494,6 @@
   --tarjetas-hueco: 10px;
   display: flex;
   flex-wrap: wrap;
-  /* Sin estirar: el botón de una subpágina (Donaldson) alarga solo su columna (2026-10-26). */
-  align-items: flex-start;
   justify-content: center;
   gap: var(--tarjetas-hueco);
   margin: 0;
@@ -511,6 +509,7 @@
 
 .tarjeta {
   display: flex;
+  height: 100%;
   box-sizing: border-box;
   flex-direction: column;
   overflow: hidden;
@@ -541,8 +540,6 @@
 }
 
 .tarjetaNombre {
-  /* Dos líneas reservadas: todas las baldosas miden lo mismo aunque el nombre ocupe una. */
-  min-height: calc(2 * 1.25em);
   padding: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -574,6 +571,7 @@
 .tarjetaMarco {
   container-type: inline-size;
   display: flex;
+  height: 100%;
   box-sizing: border-box;
   flex-direction: column;
   overflow: hidden;
@@ -583,7 +581,10 @@
   transition: border-color 0.2s;
 }
 
+/* La baldosa crece con la fila (un nombre largo en otra columna); el botón queda abajo. */
 .tarjetaMarco .tarjeta {
+  height: auto;
+  flex: 1;
   border: 0;
   border-radius: 0;
 }
@@ -607,7 +608,7 @@
   margin: 0 8px 8px;
   padding: 0 8px;
   overflow: hidden;
-  border: 1.5px solid var(--acceso-color);
+  border: 2px solid var(--acceso-color);
   border-radius: 8px;
   background: var(--color-fondo);
   color: var(--acceso-color);

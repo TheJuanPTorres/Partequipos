@@ -67,4 +67,14 @@ describe("destino de los avisos: el preview nunca escribe al cliente (§10.21)",
     assert.equal(destinoAvisos("cliente@x.co", { VERCEL_ENV: "preview" }), null);
     assert.equal(destinoAvisos("cliente@x.co", {}), null);
   });
+  it("producción: el correo del panel gana a SOLICITUDES_EMAIL_TO y al de la empresa", () => {
+    const env = { VERCEL_ENV: "production", SOLICITUDES_EMAIL_TO: "env@x.co" };
+    assert.equal(destinoAvisos("cliente@x.co", env, "panel@x.co"), "panel@x.co");
+    assert.equal(destinoAvisos("cliente@x.co", env, "  "), "env@x.co");
+  });
+  it("fuera de producción el correo del panel se ignora (la base es un clon)", () => {
+    assert.equal(destinoAvisos("cliente@x.co", { VERCEL_ENV: "preview" }, "panel@x.co"), null);
+    const env = { VERCEL_ENV: "preview", SOLICITUDES_EMAIL_TO: "p@x.co" };
+    assert.equal(destinoAvisos("cliente@x.co", env, "panel@x.co"), "p@x.co");
+  });
 });

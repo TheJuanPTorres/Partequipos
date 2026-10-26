@@ -112,7 +112,11 @@ export type VistaFranjaMarquee = {
   ancla?: string | null;
   /** El texto que se repite en movimiento, p. ej. «Marcas aliadas». */
   texto: string;
-  imagenFondo: ImagenBloque | null;
+  /**
+   * Las fotos de fondo, que se alternan con el efecto Ken Burns (plantilla 4089 de Andrés,
+   * 2026-10-26: «slideshow» de Elementor). Hoy, la «Imagen de fondo» del bloque.
+   */
+  fondos: ImagenBloque[];
   /** La máquina recortada (PNG transparente) que va delante del texto. */
   imagenFrontal: ImagenBloque | null;
 };

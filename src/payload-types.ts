@@ -1756,13 +1756,17 @@ export interface BloqueFranjaMarquee {
    */
   ancla?: string | null;
   /**
-   * Se repite de lado a lado, en mayúsculas. Ej. «Marcas aliadas».
+   * Se repite de lado a lado, tal como se escribe. Ej. «Marcas Aliadas».
    */
   texto: string;
   /**
-   * Decorativa.
+   * Decorativa. Es la primera del pase de fotos.
    */
   imagenFondo?: (number | null) | Media;
+  /**
+   * Opcional. Con alguna, la franja pasa de una foto a otra cada 5 s, empezando por la «Imagen de fondo». Decorativas.
+   */
+  fondosExtra?: (number | Media)[] | null;
   /**
    * Va delante del texto. Decorativa. Opcional.
    */
@@ -3117,6 +3121,7 @@ export interface BloqueFranjaMarqueeSelect<T extends boolean = true> {
   ancla?: T;
   texto?: T;
   imagenFondo?: T;
+  fondosExtra?: T;
   imagenFrontal?: T;
   id?: T;
   blockName?: T;

@@ -15,11 +15,14 @@ type Props = {
   proporcion: number;
   /** Qué se pausa, para el nombre accesible del botón: «la animación del mapa». */
   que?: string;
-  /** La imagen fija (de servidor): se ve hasta que la animación está lista y siempre que no se anime. */
+  /** El nombre accesible de lo que se ve (el texto alternativo de la imagen del bloque). */
+  etiqueta?: string;
+  /** La imagen fija (de servidor): SOLO si la animación no carga. */
   children?: ReactNode;
 };
 
-type Estado = "esperando" | "lista" | "reproduciendo" | "pausada" | "terminada" | "fallo";
+type Estado =
+  "esperando" | "lista" | "reproduciendo" | "pausada" | "terminada" | "quieta" | "fallo";
 
 /**
  * ANIMACIÓN LOTTIE con imagen fija de respaldo (el mapa de sedes de Nosotros).
@@ -34,15 +37,24 @@ type Estado = "esperando" | "lista" | "reproduciendo" | "pausada" | "terminada" 
  * - **Carga perezosa:** lottie-web (versión ligera) y el JSON se piden por
  *   import dinámico y `fetch` SOLO cuando la caja está a menos de una pantalla.
  *   Ninguna otra página los descarga.
- * - **Sin CLS:** la caja tiene el tamaño de la imagen fija en todos los casos;
- *   la animación se pinta encima, en una capa absoluta.
- * - **Movimiento reducido o fallo de carga:** no se anima; queda la imagen.
- *   La imagen no se quita nunca del árbol de accesibilidad (solo se vuelve
- *   transparente): su texto alternativo es el nombre de lo que se ve.
+ * - **Sin CLS:** la caja reserva el hueco (la proporción de la animación) desde el
+ *   principio; la animación se pinta dentro cuando llega.
+ * - **Sin la foto delante (Juan Pablo, 2026-10-26):** la foto del mapa no tiene
+ *   transparencia y se veía un fondo blanco antes de la animación. Ahora el hueco
+ *   queda vacío hasta que carga el Lottie, y la foto SOLO sale si la carga falla.
+ * - **Movimiento reducido:** se carga igual y se queda QUIETA en su último
+ *   fotograma (el mapa completo), sin reproducirse ni botón de pausa.
+ * - El nombre de lo que se ve va en la caja (`role="img"` y `aria-label`).
  * - **Pausa (WCAG 2.2.2, desviación N4):** dura más de 5 s, así que mientras
  *   se mueve lleva botón de pausa. ux-9 no lo tiene.
  */
-export function AnimacionLottie({ src, proporcion, que = "la animación", children }: Props) {
+export function AnimacionLottie({
+  src,
+  proporcion,
+  que = "la animación",
+  etiqueta,
+  children,
+}: Props) {
   const caja = useRef<HTMLDivElement>(null);
   const capa = useRef<HTMLDivElement>(null);
   const anim = useRef<AnimationItem | null>(null);
@@ -55,7 +67,7 @@ export function AnimacionLottie({ src, proporcion, que = "la animación", childr
   useEffect(() => {
     const el = caja.current;
     const destino = capa.current;
-    if (!el || !destino || reducido) return;
+    if (!el || !destino) return;
     let cancelado = false;
     const obs = new IntersectionObserver(
       (entradas) => {
@@ -81,7 +93,11 @@ export function AnimacionLottie({ src, proporcion, que = "la animación", childr
             anim.current = a;
             a.addEventListener("DOMLoaded", () => {
               if (cancelado) return;
-              if (visible.current) {
+              if (reducido) {
+                // Con «reducir movimiento», quieta en el último fotograma: el mapa completo.
+                a.goToAndStop(Math.max(0, a.totalFrames - 1), true);
+                setEstado("quieta");
+              } else if (visible.current) {
                 a.play();
                 setEstado("reproduciendo");
               } else {
@@ -115,7 +131,7 @@ export function AnimacionLottie({ src, proporcion, que = "la animación", childr
     const obs = new IntersectionObserver(
       (entradas) => {
         visible.current = entradas.some((e) => e.isIntersecting);
-        if (visible.current && anim.current && estado === "lista") {
+        if (visible.current && anim.current && estado === "lista" && !reducido) {
           anim.current.play();
           setEstado("reproduciendo");
         }
@@ -124,7 +140,7 @@ export function AnimacionLottie({ src, proporcion, que = "la animación", childr
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [estado]);
+  }, [estado, reducido]);
 
   useEffect(() => {
     if (estado === "fallo") {
@@ -149,7 +165,6 @@ export function AnimacionLottie({ src, proporcion, que = "la animación", childr
     }
   };
 
-  const animada = !reducido && estado !== "esperando" && estado !== "fallo";
   const conBoton =
     !reducido &&
     (estado === "reproduciendo" || estado === "pausada" || (estado === "terminada" && conFoco));
@@ -159,11 +174,12 @@ export function AnimacionLottie({ src, proporcion, que = "la animación", childr
       ref={caja}
       className={estilos.caja}
       style={{ aspectRatio: proporcion }}
-      data-animada={animada ? "" : undefined}
+      role={estado === "fallo" ? undefined : "img"}
+      aria-label={estado === "fallo" ? undefined : etiqueta}
       onFocus={() => setConFoco(true)}
       onBlur={() => setConFoco(false)}
     >
-      {children}
+      {estado === "fallo" ? children : null}
       <div ref={capa} className={estilos.capaAnimacion} aria-hidden="true" />
       {conBoton ? (
         <BotonPausa

@@ -2176,3 +2176,70 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
     text-align: center;
   }
 }
+
+/* =========================================================================
+ * CORREO Y FORMULARIOS (`components/admin/correo/`, 2026-10-26): el estado del
+ * SMTP y «Enviar correo de prueba». Campos `ui`: sin columna ni esquema.
+ * ========================================================================= */
+.pq-correo-estado {
+  margin-bottom: var(--base);
+}
+
+.pq-correo-estado__datos {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 16px;
+  margin: 8px 0;
+
+  dt {
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.pq-correo-prueba {
+  display: grid;
+  gap: 8px;
+  margin-top: var(--base);
+
+  .field-label {
+    margin-bottom: 0;
+  }
+}
+
+.pq-correo-prueba__ayuda {
+  margin: 0;
+  color: var(--pq-muted-foreground);
+}
+
+.pq-correo-prueba__fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+
+  input {
+    flex: 1 1 260px;
+    min-width: 0;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--theme-elevation-400);
+    border-radius: var(--style-radius-s);
+    background: var(--theme-input-bg);
+    color: var(--theme-elevation-1000);
+    font: inherit;
+  }
+
+  input:focus-visible {
+    outline: 2px solid var(--pq-primary);
+    outline-offset: 1px;
+  }
+
+  .btn {
+    margin: 0;
+  }
+}

@@ -145,6 +145,7 @@ export interface Config {
     'repuestos-marca': RepuestosMarca;
     'paginas-indice': PaginasIndice;
     'vacantes-buk': VacantesBuk;
+    'correo-formularios': CorreoFormulario;
   };
   globalsSelect: {
     cabecera: CabeceraSelect<false> | CabeceraSelect<true>;
@@ -154,6 +155,7 @@ export interface Config {
     'repuestos-marca': RepuestosMarcaSelect<false> | RepuestosMarcaSelect<true>;
     'paginas-indice': PaginasIndiceSelect<false> | PaginasIndiceSelect<true>;
     'vacantes-buk': VacantesBukSelect<false> | VacantesBukSelect<true>;
+    'correo-formularios': CorreoFormulariosSelect<false> | CorreoFormulariosSelect<true>;
   };
   locale: null;
   widgets: {
@@ -3909,10 +3911,6 @@ export interface PaginasIndice {
      * Vacío, el texto del diseño («Buscamos profesionales que…»).
      */
     textoEquipo?: string | null;
-    /**
-     * A este correo llegan las hojas de vida que se envían con «Enviar HV», con el PDF adjunto (no se guarda en el sitio). Vacío, el correo general de la empresa. Fuera del sitio publicado (previews) este campo se ignora.
-     */
-    correoHojasDeVida?: string | null;
     tituloHojaDeVida?: string | null;
     textoHojaDeVida?: string | null;
     botonHojaDeVida?: string | null;
@@ -3982,6 +3980,25 @@ export interface VacantesBuk {
     | number
     | boolean
     | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Adónde llegan los formularios del sitio, si el correo de salida (SMTP) está configurado y un botón para enviar un correo de prueba.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "correo-formularios".
+ */
+export interface CorreoFormulario {
+  id: number;
+  /**
+   * A este correo llega el aviso de cada formulario de contacto, cotización y «Avísame cuando llegue una». Vacío, el correo de contacto de «SEO y datos de la empresa». Solo cuenta en el sitio publicado.
+   */
+  correoSolicitudes?: string | null;
+  /**
+   * A este correo llegan las hojas de vida de «Trabaja con nosotros» («Enviar HV»), con el PDF adjunto (no se guarda en el sitio). Vacío, el correo para solicitudes. Solo cuenta en el sitio publicado.
+   */
+  correoHojasDeVida?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -4223,7 +4240,6 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
         fondo?: T;
         tituloEquipo?: T;
         textoEquipo?: T;
-        correoHojasDeVida?: T;
         tituloHojaDeVida?: T;
         textoHojaDeVida?: T;
         botonHojaDeVida?: T;
@@ -4263,6 +4279,17 @@ export interface VacantesBukSelect<T extends boolean = true> {
   ultimoIntento?: T;
   ultimoError?: T;
   vacantes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "correo-formularios_select".
+ */
+export interface CorreoFormulariosSelect<T extends boolean = true> {
+  correoSolicitudes?: T;
+  correoHojasDeVida?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

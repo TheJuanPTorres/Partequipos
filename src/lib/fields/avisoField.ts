@@ -14,7 +14,8 @@ export function avisoField(
     | "AvisoBuscadores"
     | "AvisoRedirecciones"
     | "AvisoRecorteMovil"
-    | "AvisoContrasteTitulo",
+    | "AvisoContrasteTitulo"
+    | "AvisoCorreoHojasDeVida",
   { sidebar = false }: { sidebar?: boolean } = {},
 ): Field {
   return {

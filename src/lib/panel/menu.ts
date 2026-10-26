@@ -71,6 +71,7 @@ export const ORDEN_DE_ENTRADAS = [
   "vacantes-buk",
   // Configuración
   "seo",
+  "correo-formularios",
   "redirects",
   "users",
 ] as const;

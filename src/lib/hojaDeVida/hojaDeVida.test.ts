@@ -56,6 +56,13 @@ describe("destinoHojasDeVida", () => {
       null,
     );
   });
+  it("en producción, sin correo propio: el de solicitudes del panel antes que el de la empresa", () => {
+    const env = { VERCEL_ENV: "production" };
+    assert.equal(
+      destinoHojasDeVida("", "info@ejemplo.test", env, "ventas@ejemplo.test"),
+      "ventas@ejemplo.test",
+    );
+  });
 });
 
 function formulario(extra: Record<string, string | File> = {}): FormData {

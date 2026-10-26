@@ -25,6 +25,10 @@ import { RecuadrosConScroll } from "./RecuadrosConScroll";
  *   ella.
  *
  * Misma rejilla y colocación que las tarjetas de la marca (`rejillaTarjetas`, regla #281).
+ *
+ * La foto, SIEMPRE ENTERA (dirección, 2026-10-26): son fotos de producto (motores, cilindros,
+ * cabinas…) que con `cover` salían recortadas. Va con `contain`, centrada, con margen interior y
+ * por encima del recuadro del nombre (`fotoProducto`).
  */
 export function TarjetasGrupos({
   id,
@@ -48,7 +52,7 @@ export function TarjetasGrupos({
   return (
     <section
       id={id}
-      className={`${estilos.tarjetas} ${estilos.tarjetasIndice}`}
+      className={`${estilos.tarjetas} ${estilos.tarjetasIndice} ${estilos.tarjetasGrupos}`}
       aria-labelledby={idTitulo}
     >
       <h2 id={idTitulo} className={estilos.tituloSeccion}>
@@ -67,8 +71,7 @@ export function TarjetasGrupos({
                     alt=""
                     fill
                     sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
-                    className={estilos.fotoImg}
-                    style={{ objectPosition: g.imagen.posicion }}
+                    className={`${estilos.fotoImg} ${estilos.fotoProducto}`}
                   />
                 </div>
               ) : null}

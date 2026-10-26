@@ -31,11 +31,15 @@ export const getTiposDeMarcaConImagen = cache(async (marcaId: number): Promise<T
   return docs;
 });
 
-/** Todas las categorías técnicas: son COMUNES a las marcas. El orden lo decide `ordenMarca`. */
+/**
+ * Todas las categorías técnicas NORMALES: son COMUNES a las marcas. El orden lo decide
+ * `ordenMarca`. Las que cuelgan de otra (Filtros Donaldson) no: salen en su categoría.
+ */
 export const getCategoriasParaMarca = cache(async (): Promise<CategoriasTecnica[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "categorias-tecnicas",
+    where: { padre: { exists: false } },
     // depth 1: la FOTO de la categoría (las tarjetas de la página de tipo) llega poblada.
     depth: 1,
     limit: 0,

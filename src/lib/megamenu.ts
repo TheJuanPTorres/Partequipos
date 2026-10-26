@@ -5,6 +5,7 @@ import { unaEntradaPorTipo } from "./nueva/ordenTipos";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
 import { categoriasDeMarca } from "./repuestos/marca";
+import { accesosDe, esCategoriaPrincipal } from "./repuestos/subcategorias";
 import { rutas } from "./routes";
 import { ETIQUETA_OTROS, separarCategorias } from "./usados/otros";
 import { SIN_UNIDADES } from "./usados/vacia";
@@ -41,7 +42,25 @@ export type EnlaceMenu = {
  * Una TARJETA con foto del menú (las categorías técnicas, 2026-10-20): su
  * nombre, su página y la «Imagen de la tarjeta» de la categoría, si la tiene.
  */
-export type TarjetaMenu = { etiqueta: string; href: string; imagen?: ImagenMenu };
+export type TarjetaMenu = {
+  etiqueta: string;
+  href: string;
+  imagen?: ImagenMenu;
+  /**
+   * Las páginas que cuelgan de la categoría (Filtros Donaldson bajo Filtración, 2026-10-26): un
+   * botón con su logo, su nombre y el color de la marca, justo debajo de la baldosa.
+   */
+  accesos?: AccesoMenu[];
+};
+
+/** El botón de una página que cuelga de una categoría: el color de la marca y la tinta que mejor se lee. */
+export type AccesoMenu = {
+  etiqueta: string;
+  href: string;
+  logo?: LogoMenu;
+  color: string;
+  tinta: string;
+};
 
 /** Una foto del menú: url y medidas reales (el tamaño lo pide `next/image`). */
 export type ImagenMenu = { url: string; width: number; height: number };
@@ -83,9 +102,12 @@ export function panelConTarjetas(panel: PanelMenu): boolean {
 /** Lo que el menú necesita de una categoría técnica (la foto, `depth: 1`: url y medidas). */
 export type CategoriaTecnicaMenu = Pick<
   CategoriasTecnica,
-  "id" | "nombre" | "slug" | "ordenMarca"
+  "id" | "nombre" | "slug" | "ordenMarca" | "colorMarca"
 > & {
   imagen?: number | LogoCatalogo | null;
+  /** La categoría de la que cuelga (solo su dirección). */
+  padre?: number | { id: number; slug?: string | null } | null;
+  logo?: number | LogoCatalogo | null;
 };
 
 /** La entrada editable de la política de garantías (global `cabecera`). */
@@ -380,10 +402,29 @@ export function grupoCategoriasTecnicas(
   categorias: ReadonlyArray<CategoriaTecnicaMenu>,
 ): GrupoMenu | null {
   const porId = new Map(categorias.map((c) => [c.id, c]));
-  const tarjetas = categoriasDeMarca([...categorias] as CategoriasTecnica[]).flatMap((c) => {
+  // Las que cuelgan de otra (Filtros Donaldson) no son baldosas: van como botón bajo la suya.
+  const principales = categorias.filter(esCategoriaPrincipal);
+  const tarjetas = categoriasDeMarca([...principales] as CategoriasTecnica[]).flatMap((c) => {
     if (!c.href) return [];
     const imagen = imagenDeMenu(porId.get(c.id)?.imagen);
-    return [{ etiqueta: c.nombre, href: conBarra(c.href), ...(imagen ? { imagen } : {}) }];
+    const accesos = accesosDe(c.id, categorias).map((a) => {
+      const logo = imagenDeMenu(porId.get(a.id)?.logo);
+      return {
+        etiqueta: a.nombre,
+        href: conBarra(a.href),
+        color: a.color,
+        tinta: a.tinta,
+        ...(logo ? { logo } : {}),
+      };
+    });
+    return [
+      {
+        etiqueta: c.nombre,
+        href: conBarra(c.href),
+        ...(imagen ? { imagen } : {}),
+        ...(accesos.length > 0 ? { accesos } : {}),
+      },
+    ];
   });
   if (tarjetas.length === 0) return null;
   return {

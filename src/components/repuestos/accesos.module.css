@@ -1,0 +1,136 @@
+/*
+ * ACCESO a las páginas que cuelgan de una categoría técnica (Filtros Donaldson en Filtración,
+ * 2026-10-26): una franja con el color de la marca. Sin desplazamientos: la placa del logo tiene
+ * medidas fijas (CLS 0).
+ */
+.seccion {
+  width: 100%;
+  max-width: 1000px;
+  margin: 60px auto 0;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.titulo {
+  margin: 0 0 20px;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-3);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.lista {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.franja {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 18px 28px;
+  border-radius: 16px;
+  background: var(--acceso-color);
+  color: var(--acceso-tinta);
+  text-decoration: none;
+  transition: filter 0.2s ease;
+}
+
+.franja:hover {
+  filter: brightness(0.94);
+}
+
+.franja:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/* El logo, sobre blanco: los logos de marca se leen así con cualquier color de franja. */
+.placa {
+  display: grid;
+  flex: none;
+  width: 180px;
+  height: 72px;
+  place-items: center;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.texto {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 20px;
+}
+
+.nombre {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.ver svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.franja:hover .ver svg {
+  transform: translateX(3px);
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    margin-top: 40px;
+  }
+
+  .franja {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 20px;
+  }
+
+  .placa {
+    width: 150px;
+    height: 60px;
+  }
+
+  .texto {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .franja,
+  .ver svg {
+    transition: none;
+  }
+
+  .franja:hover .ver svg {
+    transform: none;
+  }
+}

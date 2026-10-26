@@ -15,7 +15,9 @@ export const CAMPOS_MENU = {
   "categorias-usada": ["nombre", "slug", "enOtros", "orden", "mostrarEnWeb"],
   marcas: ["nombre", "slug", "logo", "logoOscuroEnMenu"],
   "tipos-equipo": ["nombre", "slug", "marca", "slugPadre"],
-  "categorias-tecnicas": ["nombre", "slug", "ordenMarca", "imagen"],
+  // `padre`, `logo` y `colorMarca`: el botón de una página que cuelga de una categoría bajo su
+  // baldosa (Filtros Donaldson bajo Filtración, 2026-10-26).
+  "categorias-tecnicas": ["nombre", "slug", "ordenMarca", "imagen", "padre", "logo", "colorMarca"],
   "marcas-lubricante": ["nombre", "slug"],
   "categorias-lubricante": ["nombre", "slug", "marca", "enlaceMenu", "orden"],
 } as const;

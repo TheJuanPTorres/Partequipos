@@ -95,8 +95,21 @@ describe("clasificarDestino — categorías técnicas de repuestos", () => {
     assert.deepEqual(d.padres, []);
   });
 
-  it("un nivel de más no es una ruta (los subniveles heredados ya no existen)", () => {
-    assert.equal(clasificarDestino(`${C}/tren-de-rodaje/tren-de-rodaje-itr/`).clase, "sin-ruta");
+  it("una página dentro de una categoría (Filtros Donaldson, 2026-10-26) es una ruta", () => {
+    const d = clasificarDestino(
+      `${C}/filtracion-para-maquinaria-pesada/filtros-donaldson-maquinaria-pesada/`,
+    );
+    assert.ok(d.clase === "dinamica");
+    assert.deepEqual(d.colecciones, ["categorias-tecnicas"]);
+    assert.equal(d.slug, "filtros-donaldson-maquinaria-pesada");
+    assert.deepEqual(d.padres, ["filtracion-para-maquinaria-pesada"]);
+  });
+
+  it("dos niveles de más no son una ruta", () => {
+    assert.equal(
+      clasificarDestino(`${C}/tren-de-rodaje/tren-de-rodaje-itr/otro/`).clase,
+      "sin-ruta",
+    );
   });
 });
 

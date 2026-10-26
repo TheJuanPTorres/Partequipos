@@ -176,6 +176,35 @@ function Tarjetas({ tarjetas, alElegir }: { tarjetas: TarjetaMenu[]; alElegir: (
             </span>
             <span className={estilos.tarjetaNombre}>{t.etiqueta}</span>
           </Link>
+          {/*
+           * Las páginas que cuelgan de esta categoría (Filtros Donaldson bajo Filtración,
+           * 2026-10-26): un botón con el color de la marca, su logo en una placa blanca y su
+           * nombre. Es un enlace normal: teclado y lectores, como el resto del menú.
+           */}
+          {(t.accesos ?? []).map((a) => (
+            <Link
+              key={a.href}
+              href={a.href}
+              className={estilos.acceso}
+              style={{ "--acceso-color": a.color, "--acceso-tinta": a.tinta } as CSSProperties}
+              onClick={alElegir}
+            >
+              {a.logo ? (
+                <span className={estilos.accesoPlaca}>
+                  {/* Decorativo: el nombre va al lado. */}
+                  <Image
+                    src={a.logo.url}
+                    width={a.logo.width}
+                    height={a.logo.height}
+                    alt=""
+                    sizes="64px"
+                    loading="lazy"
+                  />
+                </span>
+              ) : null}
+              <span className={estilos.accesoNombre}>{a.etiqueta}</span>
+            </Link>
+          ))}
         </li>
       ))}
     </ul>

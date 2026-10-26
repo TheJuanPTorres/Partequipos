@@ -7,6 +7,7 @@ import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
 import { SedesCompactas } from "@/components/repuestos/SedesCompactas";
+import { AccesosSubcategorias } from "@/components/repuestos/AccesosSubcategorias";
 import { TarjetasGrupos } from "@/components/repuestos/TarjetasGrupos";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -24,6 +25,7 @@ import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { fondoDeRespaldo, vistaEncabezadoCategoria } from "@/lib/repuestos/categoria";
 import { gruposDeCategoria } from "@/lib/repuestos/grupos";
+import { accesosDe, esCategoriaPrincipal } from "@/lib/repuestos/subcategorias";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
@@ -38,7 +40,7 @@ type Params = { categoria: string };
 
 export async function generateStaticParams(): Promise<Params[]> {
   const categorias = await getCategoriasRepuestos();
-  return categorias.map((c) => ({ categoria: c.slug }));
+  return categorias.filter(esCategoriaPrincipal).map((c) => ({ categoria: c.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -77,13 +79,16 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
   const categoria = await getCategoriaRepuestosPorSlug(slug);
   if (!categoria) notFound();
 
-  const [global, marcas, testimonios, empresa, sedes] = await Promise.all([
+  const [global, marcas, testimonios, empresa, sedes, todas] = await Promise.all([
     getRepuestosMarca(),
     getMarcas(),
     getTestimoniosDePortada(),
     getEmpresa(),
     getSedesDePortada(),
+    getCategoriasRepuestos(),
   ]);
+  // Las páginas que cuelgan de esta categoría (Filtros Donaldson en Filtración, 2026-10-26).
+  const accesos = accesosDe(categoria.id, todas);
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const nombre = categoria.nombre.trim();
   const origen = rutas.categoriaRepuestos(categoria.slug);
@@ -113,6 +118,8 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
         anclaSiguiente={ANCLA_GRUPOS}
         franja={false}
       />
+
+      {accesos.length > 0 ? <AccesosSubcategorias accesos={accesos} categoria={nombre} /> : null}
 
       <TarjetasGrupos
         id={ANCLA_GRUPOS}

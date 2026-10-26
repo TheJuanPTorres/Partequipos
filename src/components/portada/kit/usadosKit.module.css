@@ -63,6 +63,22 @@
   );
 }
 
+/*
+ * En el móvil y la tablet el texto va DEBAJO de la máquina, y la franja roja del fondo lo cruzaba
+ * (bajaba el contraste del párrafo): las losas y la franja se apagan antes de llegar al texto.
+ */
+@media (max-width: 767px) {
+  .fondo {
+    mask-image: linear-gradient(180deg, #000 28%, transparent 46%);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .fondo {
+    mask-image: linear-gradient(180deg, #000 50%, transparent 68%);
+  }
+}
+
 .cabeceraRejilla {
   display: grid;
   max-width: 1400px;

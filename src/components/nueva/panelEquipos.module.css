@@ -262,7 +262,8 @@ a.item:hover {
  * marca, y un check en la esquina de la foto (sin foto, en la esquina de la tarjeta). El texto
  * sigue en el color de siempre.
  */
-.item[data-actual] {
+.item[data-actual],
+a.item[data-actual]:hover {
   border-color: var(--acento, var(--color-texto, #1a1a1a));
   background: color-mix(in srgb, var(--acento, #1a1a1a) 10%, var(--color-fondo, #fff));
 }

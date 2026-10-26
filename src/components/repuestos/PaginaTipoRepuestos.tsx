@@ -18,7 +18,7 @@ import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepu
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
-import { estiloDeMarca } from "@/lib/marca/colorMarca";
+import { colorDeMarca, estiloDeMarca } from "@/lib/marca/colorMarca";
 import { tarjetasDeCategorias, vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
@@ -132,6 +132,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
             : null
         }
         panelR5={MEJORAS_ACTIVAS.R5}
+        acento={colorDeMarca(marca.colorMarca)}
       />
 
       <TarjetasMarca

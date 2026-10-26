@@ -44,6 +44,7 @@ export function ModelosTipo({
   barraSeries = false,
   ayuda = null,
   panelR5 = false,
+  acento = null,
 }: {
   id: string;
   titulo: string;
@@ -61,6 +62,8 @@ export function ModelosTipo({
   ayuda?: { formulario: ConfigFormulario; anclaContacto: string } | null;
   /** R5. */
   panelR5?: boolean;
+  /** El color de la marca: el borde superior del panel «Ver todos». */
+  acento?: string | null;
 }) {
   const idTitulo = `${id}-titulo`;
   const series = (grupos ?? []).flatMap((g) =>
@@ -97,6 +100,7 @@ export function ModelosTipo({
               destino={g.ancla ?? id}
               nivel="h4"
               panelR5={panelR5}
+              acento={acento}
             />
           </div>
         ))
@@ -110,6 +114,7 @@ export function ModelosTipo({
           destino={id}
           nivel="h3"
           panelR5={panelR5}
+          acento={acento}
         />
       )}
       {ayuda && modelos.length > 0 ? (
@@ -130,6 +135,7 @@ function RejillaRecortada({
   destino,
   nivel,
   panelR5,
+  acento,
 }: {
   id: string;
   tipo: TiposEquipo;
@@ -140,6 +146,7 @@ function RejillaRecortada({
   destino: string;
   nivel: "h3" | "h4";
   panelR5: boolean;
+  acento: string | null;
 }) {
   const n = modelos.length;
   // En qué tamaños no cabe en 2 filas (móvil 2, tablet 4, escritorio 6): ahí sale el botón.
@@ -169,6 +176,7 @@ function RejillaRecortada({
             }))}
             className={estilos.botonTarjeta}
             buscador={panelR5}
+            acento={acento}
           />
         </div>
       ) : null}

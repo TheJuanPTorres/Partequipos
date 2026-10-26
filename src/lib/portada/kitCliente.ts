@@ -1,13 +1,7 @@
 import type { CategoriasTecnica, CategoriasUsada, EquiposUsado, Pagina } from "@/payload-types";
 
 import { SLUG_CATEGORIA_USADA_ADITAMENTOS } from "../aditamentos/wordpress";
-import {
-  conAlt,
-  logoDeMarca,
-  logoPropio,
-  type IndiceLogos,
-  type LogoConAlt,
-} from "../marca/logoMarca";
+import { conAlt, logoDeMarca, type IndiceLogos, type LogoConAlt } from "../marca/logoMarca";
 import { rutas, SEGMENTO_OTROS_USADA } from "../routes";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 import {
@@ -177,9 +171,10 @@ export function categoriasDePortada(categorias: CategoriasTecnica[]): CategoriaD
 export type LogoDePortada = { id: string; nombre: string; logo: LogoConAlt };
 
 /**
- * Los logos de la banda, en su orden. Aquí MANDA el logo elegido en la lista (dirección,
- * 2026-10-26: los SVG del kit del cliente, pasados a PNG); si no se puede pintar, el de la marca
- * del sitio con ese nombre (`logoMarca.ts`). Uno sin logo ni nombre no sale.
+ * Los logos de la banda, en su orden, con la REGLA COMÚN de «un solo logo por marca»
+ * (`logoMarca.ts`): si el nombre es el de una marca de repuestos, su logo, el de todo el sitio; si
+ * no, el elegido en la lista. Uno sin logo ni nombre no sale. (Del 2026-10-26 por la mañana mandaba
+ * el de la lista, para los logos del kit del cliente; Juan Pablo se queda con los de antes.)
  */
 export function logosDeLaBanda(
   seccion: Pagina["seccionLogos"],
@@ -188,7 +183,7 @@ export function logosDeLaBanda(
   return (seccion?.logos ?? []).flatMap((l, i) => {
     const nombre = l.nombre?.trim();
     if (!nombre) return [];
-    const logo = conAlt(logoPropio({ logo: l.logo }) ?? logoDeMarca({ nombre }, indice), nombre);
+    const logo = conAlt(logoDeMarca({ nombre, logo: l.logo }, indice), nombre);
     return logo ? [{ id: l.id ?? String(i), nombre, logo }] : [];
   });
 }

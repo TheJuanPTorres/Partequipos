@@ -58,6 +58,17 @@ export function PorQueElegirnos({
               {vista.texto ? <p>{vista.texto}</p> : null}
             </div>
           ) : null}
+          {vista.compromiso ? (
+            <p className={estilos.porQueCompromiso}>
+              <strong>{vista.compromiso.titulo}</strong>
+              {vista.compromiso.texto ? (
+                <>
+                  <br />
+                  {vista.compromiso.texto}
+                </>
+              ) : null}
+            </p>
+          ) : null}
           {vista.puntos.length > 0 ? (
             <ul className={estilos.porQuePuntos}>
               {vista.puntos.map((p) => (

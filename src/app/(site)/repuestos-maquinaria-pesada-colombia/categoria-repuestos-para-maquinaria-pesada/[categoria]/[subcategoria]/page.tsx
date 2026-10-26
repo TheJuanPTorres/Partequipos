@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { EmblemaKit } from "@/components/nueva/kit/EmblemaKit";
 import { SeccionTestimonios } from "@/components/portada/diferidos";
+import { BienvenidaMarca } from "@/components/repuestos/BienvenidaMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
@@ -27,6 +28,7 @@ import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { fondoDeRespaldo, vistaEncabezadoCategoria } from "@/lib/repuestos/categoria";
 import { gruposDeCategoria } from "@/lib/repuestos/grupos";
+import { vistaBienvenida, vistaPorQuePropia } from "@/lib/repuestos/paginaMarca";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { esCategoriaPrincipal, rutaDeCategoriaTecnica } from "@/lib/repuestos/subcategorias";
 import { rutas } from "@/lib/routes";
@@ -73,8 +75,8 @@ const ANCLA_CONTACTO = "contacto-repuestos";
  * PÁGINA DENTRO DE UNA CATEGORÍA TÉCNICA (2026-10-26, dirección: «Filtros Donaldson» dentro de
  * «Filtración», en su URL de WordPress), con la MISMA plantilla 4007 que las categorías: la
  * cabecera (con el logo de la marca sobre el título), una tarjeta por tipo de producto con su
- * foto, su descripción y «Cotizar», el contacto, los testimonios, «¿Por qué elegirnos?» y las
- * sedes. Las migas pasan por su categoría. Solo responde bajo la categoría de la que cuelga.
+ * foto, su descripción y «Cotizar», la presentación con su carrusel (2026-10-26), el contacto,
+ * los testimonios, «¿Por qué elegirnos?» (el propio si lo tiene) y las sedes. Las migas pasan por su categoría. Solo responde bajo la categoría de la que cuelga.
  */
 export default async function SubcategoriaRepuestosPage({ params }: { params: Promise<Params> }) {
   const { categoria: padreSlug, subcategoria: slug } = await params;
@@ -106,8 +108,12 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
     boton: texto(global.contactoBoton),
     marca: nombre.toLowerCase(),
   });
+  const bienvenida = vistaBienvenida(sub);
+  const encabezado = vistaEncabezadoCategoria(sub, global, fondoDeRespaldo(marcas));
   const vista = {
-    ...vistaEncabezadoCategoria(sub, global, fondoDeRespaldo(marcas)),
+    ...encabezado,
+    // Con texto de bienvenida propio, la cabecera no lo repite (la «Descripción» sigue en buscadores).
+    descripcion: bienvenida?.texto ? "" : encabezado.descripcion,
     // El logo de la marca sobre el título, en su cuadrado blanco (como las marcas de repuestos).
     logo: conAlt(logoPropio({ nombre, logo: sub.logo ?? null }), `Logo de ${nombre}`),
   };
@@ -131,7 +137,12 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
 
       <HeroMarca vista={vista} anclaSiguiente={ANCLA_GRUPOS} franja={Boolean(color)} />
 
-      <EmblemaKit emblema={emblema} className={estilos.zonaEmblema}>
+      <EmblemaKit
+        emblema={emblema}
+        className={estilos.zonaEmblema}
+        // El icono es más alto que ancho: más estrecho que el águila de Case, para que quepa.
+        ancho="min(520px, 70vw)"
+      >
         <TarjetasGrupos
           id={ANCLA_GRUPOS}
           titulo={`Nuestra línea de ${nombre}`}
@@ -140,6 +151,7 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
           formulario={formulario}
           anclaContacto={ANCLA_CONTACTO}
         />
+        <BienvenidaMarca id="presentacion-marca" vista={bienvenida} />
       </EmblemaKit>
 
       <ContactoMarca
@@ -163,7 +175,7 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
 
       <PorQueElegirnos
         id="por-que-elegirnos"
-        vista={vistaPorQue(global, null)}
+        vista={vistaPorQuePropia(sub, global) ?? vistaPorQue(global, null)}
         anclaContacto={ANCLA_CONTACTO}
         formulario={formulario}
       />

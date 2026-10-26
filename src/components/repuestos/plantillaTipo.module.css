@@ -233,6 +233,18 @@
   margin-top: 1em;
 }
 
+/* La frase destacada (Filtros Donaldson): en negrita y oscura, el complemento debajo. */
+.porQueCompromiso {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-cuerpo);
+  line-height: 1.5;
+}
+
+.porQueCompromiso strong {
+  color: var(--color-texto);
+}
+
 .porQueEntradilla strong {
   color: var(--color-texto);
 }

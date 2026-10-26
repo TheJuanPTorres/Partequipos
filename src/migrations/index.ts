@@ -88,6 +88,7 @@ import * as migration_20261026_143331_kit_portada from './20261026_143331_kit_po
 import * as migration_20261026_154428_nosotros_franja_fotos from './20261026_154428_nosotros_franja_fotos';
 import * as migration_20261026_191224_blog_fondo_cabecera from './20261026_191224_blog_fondo_cabecera';
 import * as migration_20261026_195305_correo_formularios from './20261026_195305_correo_formularios';
+import * as migration_20261026_203555_donaldson_secciones from './20261026_203555_donaldson_secciones';
 
 export const migrations = [
   {
@@ -538,6 +539,11 @@ export const migrations = [
   {
     up: migration_20261026_195305_correo_formularios.up,
     down: migration_20261026_195305_correo_formularios.down,
-    name: '20261026_195305_correo_formularios'
+    name: '20261026_195305_correo_formularios',
+  },
+  {
+    up: migration_20261026_203555_donaldson_secciones.up,
+    down: migration_20261026_203555_donaldson_secciones.down,
+    name: '20261026_203555_donaldson_secciones'
   },
 ];

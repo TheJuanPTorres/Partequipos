@@ -1,0 +1,182 @@
+/*
+ * PRESENTACIÓN DE UNA PÁGINA DE MARCA (Filtros Donaldson, 2026-10-26): texto a la izquierda y el
+ * carrusel de fotos a la derecha; en tablet y teléfono, uno bajo el otro. Va dentro de la zona
+ * blanca del emblema: sin fondo propio, para que el emblema asome.
+ */
+.bienvenida {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 48px;
+  align-items: center;
+  padding: 24px 5% 96px;
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* El antetítulo, pequeño y en mayúsculas, sobre el título. */
+.antetitulo {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-etiqueta);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-3);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+/* La raya del color de la marca bajo el título (el detalle de las secciones del kit). */
+.titulo::after {
+  display: block;
+  width: 64px;
+  height: 4px;
+  margin-top: 16px;
+  border-radius: 2px;
+  background: var(--marca-amarillo, var(--color-marca));
+  content: "";
+}
+
+.parrafo {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-cuerpo);
+  line-height: 1.6;
+}
+
+/* --- Carrusel --------------------------------------------------------------------------- */
+
+.carrusel {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ventana {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--color-fondo-seccion);
+}
+
+.pista {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: transform 0.5s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pista {
+    transition: none;
+  }
+}
+
+.diapositiva {
+  position: relative;
+  flex: 0 0 100%;
+  aspect-ratio: 3 / 2;
+}
+
+/* La foto ENTERA, nunca recortada, sobre el gris claro de la caja. */
+.foto {
+  object-fit: contain;
+}
+
+.flecha {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.92);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.15);
+  color: var(--color-texto);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.flecha:hover {
+  background: var(--color-texto);
+  color: var(--color-fondo);
+}
+
+.flecha:focus-visible,
+.punto:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 2px;
+}
+
+.flechaAnterior {
+  left: 12px;
+}
+
+.flechaSiguiente {
+  right: 12px;
+}
+
+.controles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.pausa {
+  flex: none;
+}
+
+.puntos {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
+  list-style: none;
+}
+
+/* El punto se ve de 10 px, pero el botón mide 24 (área de toque WCAG 2.5.8). */
+.punto {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.punto::before {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--color-texto);
+  border-radius: 50%;
+  content: "";
+}
+
+.punto[aria-current="true"]::before {
+  background: var(--color-texto);
+}
+
+@media (max-width: 1024px) {
+  .bienvenida {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    padding: 16px 5% 72px;
+  }
+}

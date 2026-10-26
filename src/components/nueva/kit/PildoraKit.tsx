@@ -34,6 +34,7 @@ export function PildoraKit({
   const [visible, setVisible] = useState(false);
   const [activa, setActiva] = useState<string | null>(tipos[0]?.clave ?? null);
   const lista = useRef<HTMLUListElement>(null);
+  const barra = useRef<HTMLElement>(null);
   const anterior = useRef<{ izquierda: number; ancho: number } | null>(null);
   const reducido = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -46,6 +47,29 @@ export function PildoraKit({
       return clave;
     });
   }
+
+  // Va SIEMPRE justo debajo de la cabecera del sitio, que es fija y cambia de alto al bajar (se
+  // encoge): se sigue su borde inferior real, y el CSS suaviza el cambio con una transición.
+  useEffect(() => {
+    const sitio = document.querySelector("header");
+    const el = barra.current;
+    if (!sitio || !el) return;
+    const colocar = () =>
+      el.style.setProperty(
+        "--pildora-arriba",
+        `${Math.max(0, Math.round(sitio.getBoundingClientRect().bottom))}px`,
+      );
+    colocar();
+    const ro = new ResizeObserver(colocar);
+    ro.observe(sitio);
+    addEventListener("scroll", colocar, { passive: true });
+    addEventListener("resize", colocar);
+    return () => {
+      ro.disconnect();
+      removeEventListener("scroll", colocar);
+      removeEventListener("resize", colocar);
+    };
+  }, []);
 
   // Visible desde que la cabecera deja de verse.
   useEffect(() => {
@@ -106,6 +130,7 @@ export function PildoraKit({
 
   return (
     <nav
+      ref={barra}
       aria-label={`Tipos de máquina ${nombre}`}
       className={estilos.pildora}
       data-visible={visible ? "" : undefined}

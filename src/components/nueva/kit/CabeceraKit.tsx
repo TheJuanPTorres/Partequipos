@@ -1,12 +1,13 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import estilos from "./kit.module.css";
 
 /** Lo que se necesita de una imagen para pintarla (el logo no lleva punto focal). */
-type Imagen = Pick<ImagenLista, "url" | "alt" | "width" | "height">;
+type Imagen = Pick<ImagenLista, "url" | "alt" | "width" | "height"> & { oscuro?: boolean };
 
 /**
  * CABECERA del «Kit de marca» (2026-10-25): banda partida (gris arriba, el color de la marca
@@ -48,11 +49,10 @@ export function CabeceraKit({
         <div className={estilos.heroContenido}>
           {logo ? (
             <div className={estilos.placa}>
-              <Image
-                src={logo.url}
+              {/* Sobre la placa blanca: el logo con su regla común (oscuro si es blanco). */}
+              <LogoMarca
+                logo={{ ...logo, oscuro: logo.oscuro ?? false }}
                 alt={logo.alt}
-                width={logo.width}
-                height={logo.height}
                 sizes="120px"
                 priority
               />

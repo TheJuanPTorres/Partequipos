@@ -243,11 +243,9 @@ export async function Footer() {
           </nav>
           <address className={estilos.legalDireccion}>
             <IconMapPin aria-hidden="true" focusable="false" stroke={1.75} />
-            <span>
-              {empresa.direccion}, {empresa.ciudad} · <a href={telefono}>{empresa.telefono}</a> ·{" "}
-              <a href={`mailto:${empresa.correo}`}>{empresa.correo}</a> · ©{" "}
-              {new Date().getFullYear()} {seoConfig.siteName}
-            </span>
+            {empresa.direccion}, {empresa.ciudad} · <a href={telefono}>{empresa.telefono}</a> ·{" "}
+            <a href={`mailto:${empresa.correo}`}>{empresa.correo}</a> · © {new Date().getFullYear()}{" "}
+            {seoConfig.siteName}
           </address>
           <AnimacionesPie permitirUrl={process.env.VERCEL_ENV !== "production"} />
         </div>

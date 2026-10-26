@@ -575,22 +575,22 @@
   color: var(--color-marca);
 }
 
+/* El icono va EN LÍNEA con el texto: en móvil, con la dirección en varias líneas centradas,
+   queda pegado a la primera palabra y no suelto a la izquierda. */
 .legalDireccion {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 6px;
   max-width: 760px;
+  margin: 0;
   font-size: 14px;
   font-style: normal;
 }
 
 .legalDireccion svg {
-  flex: none;
+  display: inline-block;
   width: 18px;
   height: 18px;
-  margin-top: 1px;
+  margin-right: 6px;
   color: var(--color-marca);
+  vertical-align: -4px;
 }
 
 .legalDireccion a {

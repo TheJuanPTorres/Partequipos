@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { EmblemaKit } from "@/components/nueva/kit/EmblemaKit";
 import { SeccionTestimonios } from "@/components/portada/diferidos";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
@@ -11,6 +12,7 @@ import { TarjetasGrupos } from "@/components/repuestos/TarjetasGrupos";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
+import { colorDeMarca, estiloDeMarca } from "@/lib/marca/colorMarca";
 import { conAlt, logoPropio } from "@/lib/marca/logoMarca";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
@@ -110,23 +112,35 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
     logo: conAlt(logoPropio({ nombre, logo: sub.logo ?? null }), `Logo de ${nombre}`),
   };
 
+  // COLOR Y EMBLEMA DE LA MARCA (2026-10-26, dirección), como las páginas de marca de nueva: el
+  // «Color de la marca» tiñe la franja de la cabecera y los botones, y el «Icono de la marca» es
+  // el emblema de fondo, grande y gris, que gira despacio con el scroll (`EmblemaKit`). Sin color
+  // ni icono, la página de siempre.
+  const color = colorDeMarca(sub.colorMarca);
+  const emblema = imagenDeMedia(sub.iconoMarca, "") ?? null;
+
   return (
-    <main className={estilos.pagina}>
+    <main
+      className={`${estilos.pagina} ${color ? estilos.paginaConColor : ""}`}
+      style={estiloDeMarca(sub.colorMarca)}
+    >
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <HeroMarca vista={vista} anclaSiguiente={ANCLA_GRUPOS} franja={false} />
+      <HeroMarca vista={vista} anclaSiguiente={ANCLA_GRUPOS} franja={Boolean(color)} />
 
-      <TarjetasGrupos
-        id={ANCLA_GRUPOS}
-        titulo={`Nuestra línea de ${nombre}`}
-        categoria={nombre}
-        grupos={gruposDeCategoria(sub)}
-        formulario={formulario}
-        anclaContacto={ANCLA_CONTACTO}
-      />
+      <EmblemaKit emblema={emblema} className={estilos.zonaEmblema}>
+        <TarjetasGrupos
+          id={ANCLA_GRUPOS}
+          titulo={`Nuestra línea de ${nombre}`}
+          categoria={nombre}
+          grupos={gruposDeCategoria(sub)}
+          formulario={formulario}
+          anclaContacto={ANCLA_CONTACTO}
+        />
+      </EmblemaKit>
 
       <ContactoMarca
         id={ANCLA_CONTACTO}

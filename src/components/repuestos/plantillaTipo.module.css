@@ -87,8 +87,9 @@
   padding: 0 28px;
   align-items: center;
   border-radius: 8px;
-  background: var(--color-marca);
-  color: #fff;
+  /* Una página con «Color de la marca» (Filtros Donaldson) lo pone con su tinta. */
+  background: var(--boton-acento, var(--color-marca));
+  color: var(--boton-acento-tinta, #fff);
   font-size: 16px;
   font-weight: 600;
   text-decoration: none;
@@ -99,6 +100,7 @@
 
 .porQueBoton:hover {
   background: var(--color-texto);
+  color: #fff;
 }
 
 .porQueBoton:focus-visible {

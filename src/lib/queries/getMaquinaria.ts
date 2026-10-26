@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import config from "@payload-config";
-import { getPayload } from "payload";
+import { getPayload, type Where } from "payload";
 
 /*
  * Las consultas de este módulo van envueltas en `cache()` de React.
@@ -27,12 +27,14 @@ import type {
   TiposMaquinaria,
 } from "@/payload-types";
 
-import { SLUG_EXCAVADORAS, TARJETAS_POR_PESTANA } from "../portada/secciones";
+import { SLUG_EXCAVADORAS } from "../portada/secciones";
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "../cacheDatos";
 import type { EquipoFiltrable } from "../nueva/filtros";
 import { rutas } from "../routes";
 import type { UnidadFiltrable } from "../usados/filtros";
-import { idsDePrimeraImagen } from "../usados/primeraImagen";
+import { conPrimeraImagen, idsDePrimeraImagen } from "../usados/primeraImagen";
+import { USADOS_POR_FILTRO } from "../portada/kitCliente";
+import { SLUG_CATEGORIA_USADA_ADITAMENTOS } from "../aditamentos/wordpress";
 import {
   conEquipoVisible,
   conMarcaVisible,
@@ -787,30 +789,109 @@ export const getMarcasDePortada = cache(async (): Promise<MarcasMaquinaria[]> =>
 });
 
 /**
- * Excavadoras usadas DISPONIBLES para el carrusel de la sección 3, con su tope
- * (dirección, 2026-10-20: solo excavadoras; «Otros» y «Aditamentos» ya no
- * tienen carrusel ni consulta). `depth: 1` puebla la categoría (para la
- * dirección de la unidad) y las imágenes.
+ * LAS UNIDADES DEL FILTRO DE LA PORTADA (diseño del cliente, 2026-10-26): las disponibles y
+ * visibles de Excavadoras, de «Otros» (las categorías con «Agrupar en «Otros»», como el menú y su
+ * página) y de Aditamentos (su categoría o las marcadas con la pestaña «Aditamentos»), las más
+ * recientes primero y hasta `USADOS_POR_FILTRO` de cada una.
+ *
+ * Sin poblar nada (`depth: 0`): la categoría se cose con una consulta de las categorías y solo
+ * se pide la PRIMERA foto de cada unidad (`conPrimeraImagen`), no todas.
  */
-export const getExcavadorasUsadasDePortada = cache(async (): Promise<EquiposUsado[]> => {
-  const payload = await getPayload({ config });
-  const { docs } = await payload.find({
-    collection: "equipos-usados",
-    where: {
-      and: [
-        { disponible: { equals: true } },
-        PRODUCTO_VISIBLE,
-        { "categoria.slug": { equals: SLUG_EXCAVADORAS } },
-        { pestanaPortada: { not_equals: "aditamentos" } },
-      ],
-    },
-    depth: 1,
-    limit: TARJETAS_POR_PESTANA,
-    // Primero las más recientes por su fecha de publicación (la de WordPress en las importadas).
-    sort: ["-fechaPublicacion", "-createdAt"],
-  });
-  return docs;
-});
+export const getUsadosDePortada = cache(
+  async (): Promise<{
+    excavadoras: EquiposUsado[];
+    otros: EquiposUsado[];
+    aditamentos: EquiposUsado[];
+  }> => {
+    const payload = await getPayload({ config });
+    const comun: Where[] = [
+      { disponible: { equals: true } },
+      PRODUCTO_VISIBLE,
+      { "categoria.mostrarEnWeb": { not_equals: false } },
+    ];
+    const SIN_ADITAMENTO: Where = { pestanaPortada: { not_equals: "aditamentos" } };
+    const consulta = (where: Where) =>
+      payload.find({
+        collection: "equipos-usados",
+        where: { and: [...comun, where] },
+        depth: 0,
+        limit: USADOS_POR_FILTRO,
+        sort: ["-fechaPublicacion", "-createdAt"],
+        select: {
+          nombre: true,
+          slug: true,
+          categoria: true,
+          disponible: true,
+          pesoOperativo: true,
+          anio: true,
+          horometro: true,
+          imagenes: true,
+        },
+      });
+    const [excavadoras, otros, aditamentos, categorias] = await Promise.all([
+      consulta({ and: [{ "categoria.slug": { equals: SLUG_EXCAVADORAS } }, SIN_ADITAMENTO] }),
+      consulta({
+        and: [
+          {
+            "categoria.slug": {
+              not_in: [SLUG_EXCAVADORAS, SLUG_CATEGORIA_USADA_ADITAMENTOS],
+            },
+          },
+          { "categoria.enOtros": { not_equals: false } },
+          SIN_ADITAMENTO,
+        ],
+      }),
+      consulta({
+        or: [
+          { "categoria.slug": { equals: SLUG_CATEGORIA_USADA_ADITAMENTOS } },
+          { pestanaPortada: { equals: "aditamentos" } },
+        ],
+      }),
+      payload.find({
+        collection: "categorias-usada",
+        depth: 0,
+        limit: 0,
+        pagination: false,
+        select: { slug: true, nombre: true },
+      }),
+    ]);
+    const todas = [...excavadoras.docs, ...otros.docs, ...aditamentos.docs] as EquiposUsado[];
+    const ids = idsDePrimeraImagen(todas);
+    const fotos = ids.length
+      ? (
+          await payload.find({
+            collection: "media",
+            where: { id: { in: ids } },
+            depth: 0,
+            limit: 0,
+            pagination: false,
+            // Con `select`, la URL sale null si no se pide `filename` (Payload la calcula con él).
+            select: {
+              url: true,
+              filename: true,
+              alt: true,
+              width: true,
+              height: true,
+              focalX: true,
+              focalY: true,
+            },
+          })
+        ).docs
+      : [];
+    const porId = new Map(categorias.docs.map((c) => [c.id, c as CategoriasUsada]));
+    const coser = (docs: unknown[]) =>
+      conPrimeraImagen(docs as EquiposUsado[], fotos as Media[]).map((u) => {
+        const id = typeof u.categoria === "object" ? u.categoria?.id : u.categoria;
+        const categoria = id == null ? undefined : porId.get(id);
+        return categoria ? { ...u, categoria } : u;
+      });
+    return {
+      excavadoras: coser(excavadoras.docs),
+      otros: coser(otros.docs),
+      aditamentos: coser(aditamentos.docs),
+    };
+  },
+);
 
 /**
  * Una unidad usada por su dirección web DENTRO de su categoría, con lo que

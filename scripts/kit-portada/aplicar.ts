@@ -183,7 +183,9 @@ async function subir(fichero: string, alt: string): Promise<number | null> {
     pagination: false,
     overrideAccess: true,
   });
-  const hallada = ya.docs.find((d) => d.filename?.startsWith(base));
+  // El nombre exacto, con o sin el sufijo aleatorio del Blob («-d1MBTC…»): «…-yanmar» no es «…-yanmar-reflejo».
+  const exacto = new RegExp(`^${base}(-[A-Za-z0-9]+)?[.](webp|png)$`);
+  const hallada = ya.docs.find((d) => exacto.test(d.filename ?? ""));
   if (hallada) return hallada.id;
   const ruta = path.join(KIT, fichero);
   if (!fs.existsSync(ruta)) fallar(`no está la imagen del kit: ${ruta}`);

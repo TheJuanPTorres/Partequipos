@@ -1,8 +1,19 @@
 "use client";
 
-import { IconArrowRight, IconCircleCheck, IconSearch, IconX } from "@tabler/icons-react";
-import Link from "next/link";
 import {
+  IconCheck,
+  IconCircleCheck,
+  IconMessageCircle,
+  IconPhoto,
+  IconSearch,
+  IconX,
+} from "@tabler/icons-react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  lazy,
+  Suspense,
   useEffect,
   useId,
   useRef,
@@ -12,13 +23,33 @@ import {
   type ReactNode,
 } from "react";
 
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
+import { tituloDeVentana } from "@/lib/formularios/tituloVentana";
 import { coincideModelo, enOrdenNatural, normalizarBusqueda } from "@/lib/repuestos/buscarModelo";
+import { cotizacionDeProducto } from "@/lib/repuestos/cotizarProducto";
 import { mejoraApagadaEnLaPagina } from "@/lib/repuestos/mejoras";
+import type { ImagenLista } from "@/lib/utils/relations";
 
 import panel from "./panelEquipos.module.css";
 
-/** Una fila del panel. Sin `href`, el nombre como texto (un modelo que WordPress nombra sin página). */
-export type ElementoPanel = { id: number | string; nombre: string; href: string | null };
+/** La ventana de cotización (con su formulario) no viaja hasta pulsar un producto. */
+const VentanaFormulario = lazy(() =>
+  import("@/components/forms/VentanaFormulario").then((m) => ({ default: m.VentanaFormulario })),
+);
+
+/**
+ * Una tarjeta del panel. Sin `href`, el nombre como texto (un modelo que WordPress nombra sin
+ * página). `imagen`: su foto; `null` o sin el campo, el respaldo neutro.
+ */
+export type ElementoPanel = {
+  id: number | string;
+  nombre: string;
+  href: string | null;
+  imagen?: ImagenLista | null;
+};
+
+/** Sin la barra final ni el ancla, para comparar una ruta con la página en la que se está. */
+const sinBarra = (ruta: string) => ruta.split("#")[0]!.replace(/\/+$/, "") || "/";
 
 /**
  * «VER TODOS (N)»: abre un PANEL que sube desde la parte inferior de la pantalla con el
@@ -42,6 +73,18 @@ export type ElementoPanel = { id: number | string; nombre: string; href: string 
  * listado que lo filtra al escribir (sin distinguir mayúsculas, guiones ni espacios), y los
  * modelos en ORDEN NATURAL (EX100, EX120, EX200…). El alto del panel se fija al empezar a
  * escribir, para que no salte al filtrar.
+ *
+ * REJILLA DE TARJETAS (diseño del cliente, 2026-10-25): foto arriba (la del modelo o el equipo;
+ * sin ella, un respaldo neutro) y nombre debajo; 4 por fila en escritorio, 3 en tablet y 2 en
+ * el móvil. La de la página en la que se está, marcada (borde y fondo suave del color de la marca
+ * y un check). Las fotos, diferidas y con su caja reservada.
+ *
+ * PRODUCTOS DE UNA CATEGORÍA TÉCNICA, con `cotizar` (Juan Pablo, 2026-10-26): el LISTADO de antes
+ * (filas sin foto, hasta 3 columnas con la regla del #281), con el buscador R5 en el orden de
+ * WordPress, y cada producto PULSABLE: abre la ventana de cotización con el producto y la categoría
+ * ya indicados y en el mensaje de WhatsApp (`cotizacionDeProducto`). No lleva a ninguna página. La
+ * ventana se monta junto al panel, no dentro (así su Esc y su cierre no cierran el panel), y al
+ * cerrarla el foco vuelve al producto.
  */
 export function VerTodosEquipos({
   titulo,
@@ -54,6 +97,7 @@ export function VerTodosEquipos({
   enlacePagina,
   acento,
   buscador = false,
+  cotizar,
 }: {
   titulo: string;
   href: string;
@@ -70,6 +114,8 @@ export function VerTodosEquipos({
   acento?: string | null;
   /** R5: buscador y orden natural (panel de modelos de repuestos). */
   buscador?: boolean;
+  /** Productos de una categoría técnica: listado y cada producto abre la ventana de cotización. */
+  cotizar?: { formulario: ConfigFormulario; categoria: string };
 }) {
   const [montado, setMontado] = useState(false);
   const [abierto, setAbierto] = useState(false);
@@ -82,6 +128,11 @@ export function VerTodosEquipos({
   const idBuscar = useId();
   const [consulta, setConsulta] = useState("");
   const [altoFijo, setAltoFijo] = useState<number | null>(null);
+  const ruta = usePathname();
+  // El producto que se está cotizando (su ventana queda montada tras cerrarla, como `BotonFormulario`).
+  const [cotizando, setCotizando] = useState<ElementoPanel | null>(null);
+  const [ventanaAbierta, setVentanaAbierta] = useState(false);
+  const botonCotizado = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     const d = dialogo.current;
@@ -117,12 +168,20 @@ export function VerTodosEquipos({
 
   // R5: solo con el panel montado (en el navegador), así que se puede leer la URL del preview.
   const conR5 = buscador && montado && !mejoraApagadaEnLaPagina("R5");
-  const ordenados = conR5 ? enOrdenNatural(equipos) : equipos;
+  // Los productos, en el orden de WordPress; los modelos, en orden natural.
+  const ordenados = conR5 && !cotizar ? enOrdenNatural(equipos) : equipos;
   const q = normalizarBusqueda(consulta);
   const visibles =
     conR5 && q
       ? ordenados.filter((e) => coincideModelo(normalizarBusqueda(e.nombre), q))
       : ordenados;
+  const palabra = cotizar ? "producto" : "modelo";
+  const configVentana =
+    cotizar && cotizando
+      ? cotizacionDeProducto(cotizar.formulario, cotizando.nombre, cotizar.categoria)
+      : null;
+  const vistosVentana = configVentana ? tituloDeVentana(configVentana) : null;
+  const esActual = (e: ElementoPanel) => !!e.href && !!ruta && sinBarra(e.href) === sinBarra(ruta);
 
   return (
     <>
@@ -172,7 +231,6 @@ export function VerTodosEquipos({
           }}
         >
           <div className={panel.hoja}>
-            <span className={panel.barra} aria-hidden="true" />
             <span className={panel.asa} aria-hidden="true" />
             <div className={panel.cabecera}>
               <h2 id={idTitulo} ref={tituloRef} tabIndex={-1} className={panel.titulo}>
@@ -186,7 +244,7 @@ export function VerTodosEquipos({
             {conR5 ? (
               <div className={panel.buscar} role="search">
                 <label htmlFor={idBuscar} className="sr-only">
-                  Busca tu modelo
+                  {cotizar ? "Busca un producto" : "Busca tu modelo"}
                 </label>
                 <IconSearch aria-hidden="true" focusable="false" stroke={2} size={20} />
                 <input
@@ -199,7 +257,7 @@ export function VerTodosEquipos({
                     }
                     setConsulta(e.target.value);
                   }}
-                  placeholder="Busca tu modelo"
+                  placeholder={cotizar ? "Busca un producto" : "Busca tu modelo"}
                   autoComplete="off"
                   spellCheck={false}
                   className={panel.buscarCampo}
@@ -207,39 +265,102 @@ export function VerTodosEquipos({
                 <p className={panel.buscarCuenta} aria-live="polite" aria-atomic="true">
                   {consulta.trim()
                     ? visibles.length === 0
-                      ? "Ningún modelo coincide."
+                      ? `Ningún ${palabra} coincide.`
                       : visibles.length === 1
-                        ? "1 modelo"
-                        : `${visibles.length} modelos`
+                        ? `1 ${palabra}`
+                        : `${visibles.length} ${palabra}s`
                     : ""}
                 </p>
               </div>
             ) : null}
             <div className={panel.cuerpo}>
-              <ul className={panel.lista}>
-                {visibles.map((e) => (
-                  <li key={e.id}>
-                    {e.href ? (
-                      <Link href={e.href} className={panel.item}>
+              {cotizar ? (
+                <ul className={`${panel.lista} ${panel.listaFilas}`}>
+                  {visibles.map((e, i) => (
+                    <li key={e.id} style={{ "--i": Math.min(i, 12) } as CSSProperties}>
+                      <button
+                        type="button"
+                        className={panel.fila}
+                        aria-haspopup="dialog"
+                        onClick={(ev) => {
+                          botonCotizado.current = ev.currentTarget;
+                          setCotizando(e);
+                          setVentanaAbierta(true);
+                        }}
+                      >
                         <span className={panel.marca} aria-hidden="true">
                           <IconCircleCheck focusable="false" stroke={1.9} size={26} />
                         </span>
-                        <span className={panel.nombreItem}>{e.nombre}</span>
+                        <span className={panel.nombreFila}>
+                          {e.nombre}
+                          <span className="sr-only">: cotizar</span>
+                        </span>
                         <span className={panel.flecha} aria-hidden="true">
-                          <IconArrowRight focusable="false" stroke={2.2} size={22} />
+                          <IconMessageCircle focusable="false" stroke={2} size={22} />
                         </span>
-                      </Link>
-                    ) : (
-                      <span className={`${panel.item} ${panel.itemSinEnlace}`}>
-                        <span className={panel.marca} aria-hidden="true">
-                          <IconCircleCheck focusable="false" stroke={1.9} size={26} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ul className={panel.lista}>
+                  {visibles.map((e, i) => {
+                    const actual = esActual(e);
+                    const contenido = (
+                      <>
+                        <span className={panel.foto}>
+                          {e.imagen ? (
+                            <Image
+                              src={e.imagen.url}
+                              alt=""
+                              fill
+                              sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, 320px"
+                              className={panel.fotoImg}
+                              style={{ objectPosition: e.imagen.posicion }}
+                            />
+                          ) : (
+                            <IconPhoto
+                              className={panel.fotoVacia}
+                              aria-hidden="true"
+                              focusable="false"
+                              stroke={1.4}
+                              size={40}
+                            />
+                          )}
                         </span>
-                        <span className={panel.nombreItem}>{e.nombre}</span>
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
+                        {actual ? (
+                          <span className={panel.check} aria-hidden="true">
+                            <IconCheck focusable="false" stroke={3} size={18} />
+                          </span>
+                        ) : null}
+                        <span className={panel.nombreItem}>
+                          {e.nombre}
+                          {actual ? <span className="sr-only"> (página actual)</span> : null}
+                        </span>
+                      </>
+                    );
+                    return (
+                      // `--i`: el escalón de la entrada al abrir (como mucho 12 escalones).
+                      <li key={e.id} style={{ "--i": Math.min(i, 12) } as CSSProperties}>
+                        {e.href ? (
+                          <Link
+                            href={e.href}
+                            className={panel.item}
+                            data-actual={actual ? "" : undefined}
+                            aria-current={actual ? "page" : undefined}
+                          >
+                            {contenido}
+                          </Link>
+                        ) : (
+                          <span className={`${panel.item} ${panel.itemSinEnlace}`}>
+                            {contenido}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
               {enlacePagina ? (
                 <p className={panel.pie}>
                   <Link href={href} className={panel.enlacePagina}>
@@ -250,6 +371,21 @@ export function VerTodosEquipos({
             </div>
           </div>
         </dialog>
+      ) : null}
+      {configVentana && vistosVentana ? (
+        <Suspense fallback={null}>
+          <VentanaFormulario
+            abierta={ventanaAbierta}
+            titulo={vistosVentana.visible}
+            nombreAccesible={vistosVentana.accesible}
+            formulario={configVentana}
+            alCerrar={() => {
+              setVentanaAbierta(false);
+              // Foco de vuelta al producto, dentro del panel, que sigue abierto.
+              botonCotizado.current?.focus();
+            }}
+          />
+        </Suspense>
       ) : null}
     </>
   );

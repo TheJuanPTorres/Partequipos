@@ -23,8 +23,14 @@ export function idsDePrimeraImagen(unidades: Pick<EquiposUsado, "imagenes">[]): 
   return [...ids];
 }
 
-/** Cada unidad con `imagenes` reducido a su primera foto, ya poblada. */
-export function conPrimeraImagen(unidades: EquiposUsado[], fotos: Media[]): EquiposUsado[] {
+/**
+ * Cada unidad con `imagenes` reducido a su primera foto, ya poblada. Vale para cualquier colección
+ * con `imagenes` (también los modelos de repuestos del panel «Ver todo», 2026-10-25).
+ */
+export function conPrimeraImagen<T extends Pick<EquiposUsado, "imagenes">>(
+  unidades: T[],
+  fotos: Media[],
+): T[] {
   const porId = new Map(fotos.map((f) => [f.id, f]));
   return unidades.map((u) => {
     const primera = Array.isArray(u.imagenes) ? u.imagenes[0] : null;

@@ -2,9 +2,10 @@ import { cache } from "react";
 import config from "@payload-config";
 import { getPayload } from "payload";
 
-import type { ModelosRepuesto } from "@/payload-types";
+import type { Media, ModelosRepuesto } from "@/payload-types";
 
 import { conProductoVisible } from "../nueva/visibilidad";
+import { conPrimeraImagen, idsDePrimeraImagen } from "../usados/primeraImagen";
 
 /*
  * Las consultas de este módulo van envueltas en `cache()` de React.
@@ -39,7 +40,9 @@ export const getModelos = cache(async (): Promise<ModelosRepuesto[]> => {
 
 /**
  * Los modelos de una marca, para los paneles «Ver todo» de su página: una sola consulta
- * para todos sus tipos, sin poblar nada y solo con lo que pinta la lista.
+ * para todos sus tipos, sin poblar nada y solo con lo que pinta la lista. Desde el 2026-10-25
+ * el panel pinta la foto de cada modelo: se pide aparte SOLO la primera de cada uno (no todas,
+ * como haría `depth: 1`), en una consulta más.
  */
 export const getModelosDeMarca = cache(async (marcaId: number): Promise<ModelosRepuesto[]> => {
   const payload = await getPayload({ config });
@@ -50,10 +53,30 @@ export const getModelosDeMarca = cache(async (marcaId: number): Promise<ModelosR
     depth: 0,
     limit: 0,
     sort: "nombre",
-    select: { nombre: true, slug: true, codigo: true, serie: true, tipo: true },
+    select: { nombre: true, slug: true, codigo: true, serie: true, tipo: true, imagenes: true },
+  });
+  const modelos = docs as ModelosRepuesto[];
+  const ids = idsDePrimeraImagen(modelos);
+  if (ids.length === 0) return modelos;
+  const { docs: fotos } = await payload.find({
+    collection: "media",
+    where: { id: { in: ids } },
+    depth: 0,
+    limit: 0,
+    pagination: false,
+    // Con `select`, la URL sale null si no se pide `filename` (Payload la calcula con él).
+    select: {
+      url: true,
+      filename: true,
+      alt: true,
+      width: true,
+      height: true,
+      focalX: true,
+      focalY: true,
+    },
   });
 
-  return docs as ModelosRepuesto[];
+  return conPrimeraImagen(modelos, fotos as Media[]);
 });
 
 /** Modelos de un tipo concreto. */

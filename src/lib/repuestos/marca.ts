@@ -93,7 +93,13 @@ export function categoriasDeMarca(categorias: CategoriasTecnica[]): CategoriaMar
 export type PanelTarjeta = {
   titulo: string;
   total: number;
-  elementos: { id: number | string; nombre: string; href: string | null }[];
+  /** Cada modelo con su foto: la suya o, sin ella, la de su serie o la del tipo (rejilla del panel). */
+  elementos: {
+    id: number | string;
+    nombre: string;
+    href: string | null;
+    imagen: ImagenLista | null;
+  }[];
   /** Texto del enlace discreto a la página completa (el `href` de la tarjeta). */
   enlacePagina: string;
   /** El color de la marca, para la barra del panel. */
@@ -138,14 +144,24 @@ export function tarjetasDeTipos(
   const nombre = marca.nombre.trim();
   const nombreMarca = nombre.toUpperCase();
   const acento = colorDeMarca(marca.colorMarca);
-  const panel = (titulo: string, modelos: ModeloEnlace[], pagina: string) =>
+  const panel = (
+    titulo: string,
+    modelos: ModeloEnlace[],
+    pagina: string,
+    respaldo: ImagenLista | null,
+  ) =>
     modelos.length === 0
       ? {}
       : {
           panel: {
             titulo,
             total: modelos.length,
-            elementos: modelos.map(({ id, nombre: n, href }) => ({ id, nombre: n, href })),
+            elementos: modelos.map(({ id, nombre: n, href, imagen }) => ({
+              id,
+              nombre: n,
+              href,
+              imagen: imagen ?? respaldo,
+            })),
             enlacePagina: `Ver la página de ${pagina}`,
             acento,
           },
@@ -168,7 +184,7 @@ export function tarjetasDeTipos(
             href,
             imagen: imagenTipo,
             soloEscritorio: false,
-            ...panel(tituloPanel, modelos, pagina),
+            ...panel(tituloPanel, modelos, pagina, imagenTipo),
           },
         ];
       }
@@ -176,14 +192,15 @@ export function tarjetasDeTipos(
       return series.map((s) => {
         const fila = t.series?.find((f) => claveSerie(f.nombre) === claveSerie(s.nombre));
         const deSerie = grupos.find((g) => g.ancla === s.ancla)?.modelos ?? [];
+        const imagenSerie = imagenDeMedia(fila?.imagen, "") ?? imagenTipo;
         return {
           clave: `tipo-${t.id}-${s.ancla}`,
           titulo: `${titulo} ${s.nombre.toUpperCase()}`,
           // Con la barra final: así el ancla no pasa por la redirección de `trailingSlash`.
           href: `${href}/#${s.ancla}`,
-          imagen: imagenDeMedia(fila?.imagen, "") ?? imagenTipo,
+          imagen: imagenSerie,
           soloEscritorio: false,
-          ...panel(`${tituloPanel} ${s.nombre.toUpperCase()}`, deSerie, pagina),
+          ...panel(`${tituloPanel} ${s.nombre.toUpperCase()}`, deSerie, pagina, imagenSerie),
         };
       });
     });

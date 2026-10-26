@@ -149,15 +149,10 @@ function RejillaRecortada({
     n > 4 ? estilos.recorteTablet : "",
     n > 6 ? estilos.recorteEscritorio : "",
   ].join(" ");
+  const tarjetas = tarjetasDeModelos(tipo, modelos);
   return (
     <div className={clases}>
-      <RejillaTarjetas
-        id={id}
-        tarjetas={tarjetasDeModelos(tipo, modelos)}
-        verTodo={verTodo}
-        indice
-        nivel={nivel}
-      />
+      <RejillaTarjetas id={id} tarjetas={tarjetas} verTodo={verTodo} indice nivel={nivel} />
       {n > 2 ? (
         <div className={estilos.verTodosModelos}>
           <VerTodosEquipos
@@ -165,7 +160,13 @@ function RejillaRecortada({
             // Sin JavaScript el botón no se ve; si llegara a usarse, se queda en la lista.
             href={`#${destino}`}
             total={n}
-            equipos={modelos.map(({ id: clave, nombre, href }) => ({ id: clave, nombre, href }))}
+            // Con la foto de su tarjeta: la del modelo, la de su serie o la del tipo.
+            equipos={modelos.map(({ id: clave, nombre, href }, i) => ({
+              id: clave,
+              nombre,
+              href,
+              imagen: tarjetas[i]?.imagen ?? null,
+            }))}
             className={estilos.botonTarjeta}
             buscador={panelR5}
           />

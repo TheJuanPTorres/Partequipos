@@ -139,7 +139,12 @@ export async function PaginaMarcaNueva({ marca }: { marca: MarcasMaquinaria }) {
                   titulo={s.titulo}
                   href={s.href}
                   total={s.total}
-                  equipos={s.todas}
+                  equipos={s.todas.map(({ id, nombre, href, foto }) => ({
+                    id,
+                    nombre,
+                    href,
+                    imagen: foto,
+                  }))}
                   className={estilos.botonFicha}
                 />
               </div>

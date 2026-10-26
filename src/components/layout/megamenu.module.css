@@ -144,8 +144,14 @@
   );
 }
 
+/*
+ * La de la derecha va con `translate` hasta el borde derecho (`--mega-ancho`, el ancho que
+ * pone el marco), no con `right`: así, al cambiar de ancho, no cambia de sitio en la maqueta
+ * y no cuenta como desplazamiento (CLS 0).
+ */
 .forma::after {
-  right: calc(-1px - var(--mega-curva));
+  left: 0;
+  translate: calc(var(--mega-ancho, 0px) - 2px) 0;
   background: radial-gradient(
     circle at 100% 100%,
     #0000 calc(var(--mega-curva) - 0.5px),

@@ -460,7 +460,10 @@ export function MarcoMegamenu({
     if (!m || !l || !c || !f) return;
     const traslado = `${caja.x}px 0px`;
     if (f.style.translate !== traslado) f.style.translate = traslado;
-    if (f.style.width !== `${caja.ancho}px`) f.style.width = `${caja.ancho}px`;
+    if (f.style.width !== `${caja.ancho}px`) {
+      f.style.width = `${caja.ancho}px`;
+      f.style.setProperty("--mega-ancho", `${caja.ancho}px`);
+    }
     if (f.style.height !== `${caja.alto}px`) f.style.height = `${caja.alto}px`;
     f.dataset.medida = "si";
     const recorte = recorteMarco(caja, l.clientWidth, c.offsetHeight, radioDe(m));

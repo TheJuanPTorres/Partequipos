@@ -122,7 +122,8 @@
   font-size: var(--franja-texto);
   font-weight: 500;
   line-height: 1.2;
-  text-transform: uppercase;
+  /* Sin `text-transform` (Juan Pablo, 2026-10-26): el texto sale como está en el panel
+     («Marcas Aliadas»; los nombres de marca, como estén registrados). */
 }
 
 @keyframes desplazar {

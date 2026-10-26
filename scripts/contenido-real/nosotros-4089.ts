@@ -7,7 +7,9 @@
  * - en «Presentación con imagen», la animación del mapa de sedes (colección «Animaciones»), que
  *   se pinta en lugar de la foto (la foto queda de respaldo con «reducir movimiento»);
  * - en «Tarjetas expandibles», el botón «Ver todo» → /maquinaria-pesada/ si no tiene botón;
- * - el botón de la presentación lleva a /contactanos/ (su texto, el del panel).
+ * - el botón de la presentación lleva a /contactanos/;
+ * - MAYÚSCULAS (Juan Pablo, 2026-10-26): los textos que WordPress guardaba en mayúsculas pasan a
+ *   frase o a mayúscula inicial en cada palabra (`CAMBIOS_DE_TEXTO`); solo si están tal cual.
  *
  *   npm run preview:ejecutar -- payload run scripts/contenido-real/nosotros-4089.ts listar
  *   npm run preview:ejecutar -- payload run scripts/contenido-real/nosotros-4089.ts aplicar
@@ -49,6 +51,18 @@ process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 const { default: config } = await import("../../src/payload.config");
 const payload = await getPayload({ config });
 const log = (m: string) => process.stdout.write(`[nosotros-4089] ${m}\n`);
+
+/** Texto guardado (exacto) → texto nuevo. Uno que ya no coincide, no se toca. */
+const CAMBIOS_DE_TEXTO: Record<string, string> = {
+  "OFRECEMOS SOLUCIONES PARA TUS PROYECTOS": "Ofrecemos soluciones para tus proyectos",
+  CONTÁCTANOS: "Contáctanos",
+  "MARCAS ALIADAS": "Marcas Aliadas",
+  "MAQUINARIA PESADA NUEVA": "Maquinaria Pesada Nueva",
+  "MAQUINARIA PESADA USADA": "Maquinaria Pesada Usada",
+  "REPUESTOS PARA MAQUINARIA PESADA": "Repuestos para Maquinaria Pesada",
+};
+const nuevoTexto = (v: unknown): unknown =>
+  typeof v === "string" && CAMBIOS_DE_TEXTO[v.trim()] ? CAMBIOS_DE_TEXTO[v.trim()] : v;
 
 const { docs } = await payload.find({
   collection: "paginas",
@@ -113,10 +127,26 @@ if (modo === "listar") {
       return { ...b, cifras: [...cifras, ...extra] };
     }
     if (b.blockType === "presentacionImagen") {
-      return { ...b, ...(mapa ? { lottie: mapa.id } : {}), botonEnlace: "/contactanos/" };
+      return {
+        ...b,
+        ...(mapa ? { lottie: mapa.id } : {}),
+        titulo: nuevoTexto(b.titulo),
+        botonTexto: nuevoTexto(b.botonTexto),
+        botonEnlace: "/contactanos/",
+      };
     }
-    if (b.blockType === "tarjetasExpandibles" && !(b.botonTexto as string | undefined)?.trim()) {
-      return { ...b, botonTexto: "Ver todo", botonEnlace: "/maquinaria-pesada/" };
+    if (b.blockType === "franjaMarquee") return { ...b, texto: nuevoTexto(b.texto) };
+    if (b.blockType === "tarjetasExpandibles") {
+      const tarjetas = ((b.tarjetas ?? []) as Record<string, unknown>[]).map((t) => ({
+        ...t,
+        titulo: nuevoTexto(t.titulo),
+      }));
+      const sinBoton = !(b.botonTexto as string | undefined)?.trim();
+      return {
+        ...b,
+        tarjetas,
+        ...(sinBoton ? { botonTexto: "Ver todo", botonEnlace: "/maquinaria-pesada/" } : {}),
+      };
     }
     return b;
   });

@@ -12,7 +12,7 @@ import { esAdministrador, soloAdmin, soloPersonal } from "../lib/seguridad/acces
  * - los DESTINATARIOS de los formularios: el correo de las solicitudes (contacto, cotización,
  *   «Avísame») y el de las hojas de vida, que antes estaba en «Páginas índice y contacto» →
  *   «Trabaja con nosotros» (la migración lo mueve con su valor);
- * - «ENVIAR CORREO DE PRUEBA» (campo `ui` de cliente → `POST /api/globals/correo-formularios/prueba`).
+ * - «ENVIAR CORREO DE PRUEBA» (campo `ui` de cliente → `POST /api/globals/correo-formularios/prueba/`).
  *
  * Privado: lo lee el personal del panel y lo cambia un administrador (decide adónde van los
  * leads). Los destinatarios solo cuentan en el sitio publicado: un preview avisa siempre al buzón

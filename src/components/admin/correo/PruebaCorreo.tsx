@@ -27,7 +27,7 @@ export default function PruebaCorreo() {
     setEnviando(true);
     setResultado(null);
     try {
-      const r = await fetch("/api/globals/correo-formularios/prueba", {
+      const r = await fetch("/api/globals/correo-formularios/prueba/", {
         method: "POST",
         credentials: "include",
         headers: { "content-type": "application/json" },

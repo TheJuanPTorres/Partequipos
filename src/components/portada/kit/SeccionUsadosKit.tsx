@@ -10,7 +10,7 @@ import type { DatoFicha, TarjetaEquipo } from "@/lib/portada/secciones";
 import type { ImagenLista } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 
-import { FiltroUsadosCliente, SliderUsados } from "./diferidosKit";
+import { SliderUsados } from "./diferidosKit";
 import { Flecha } from "./Flecha";
 import estilos from "./usadosKit.module.css";
 
@@ -18,15 +18,18 @@ import estilos from "./usadosKit.module.css";
  * «MAQUINARIA PESADA USADA» CON EL DISEÑO DEL CLIENTE (2026-10-26; prototipos `CatalogoUsados` y
  * `UsedHero` de `partequipos-diseno\portada\maquinaria-usada`), PORTADO a CSS modules y sin
  * `motion`. Un solo panel redondeado con la cabecera (la máquina sobre su piso, con reflejo y
- * sombras, y el texto), el FILTRO de tres categorías y el carrusel de la elegida.
+ * sombras, y el texto), tres ENLACES a las categorías de usados y el carrusel de las EXCAVADORAS.
  *
- * Componente de SERVIDOR: las tarjetas de las tres categorías se pintan aquí (están en el HTML,
- * para buscadores y sin JavaScript) y el cliente solo decide cuál se ve y mueve el carrusel.
+ * Los tres botones (Excavadora, «Otros», Aditamentos) eran un filtro del carrusel; desde el
+ * 2026-10-26 (dirección) son enlaces a la página de su categoría, sin estado «seleccionado», y el
+ * carrusel enseña siempre las excavadoras disponibles. Componente de SERVIDOR: el único JavaScript
+ * es el del carrusel.
  *
  * Se aparta del prototipo:
  * - Datos del panel: las unidades disponibles y visibles de cada categoría, sus textos e imágenes.
- * - «Cotizar ahora» abre NUESTRA ventana de cotización (no la ficha), y el aviso sin unidades,
- *   la misma ventana (no WhatsApp directo). «Ver todo» lleva al índice de usados.
+ * - «Cotizar ahora» abre NUESTRA ventana de cotización (no la ficha). Sin excavadoras
+ *   disponibles, en lugar del carrusel, el aviso con «Avísame cuando llegue» (la misma ventana).
+ *   «Ver todo» lleva al índice de usados.
  * - El título en `<h2>` (el `<h1>` de la portada es otro) y el carrusel con el botón de pausa del
  *   sitio (D2), parado con «reducir movimiento».
  */
@@ -168,6 +171,8 @@ export function SeccionUsadosKit({
   cotizar: DatosCotizar;
 }) {
   const idTitulo = "usados-kit-titulo";
+  // El carrusel es siempre el de las excavadoras (la primera categoría de `filtrosDeUsados`).
+  const excavadoras = filtros[0];
   return (
     <section id="maquinaria-usada" className={estilos.seccion} aria-labelledby={idTitulo}>
       <div className={estilos.panel}>
@@ -220,44 +225,65 @@ export function SeccionUsadosKit({
         </div>
 
         <div className={estilos.cuerpo}>
-          <FiltroUsadosCliente
-            filtros={filtros.map((f) => ({ clave: f.clave, nombre: f.nombre, imagen: f.imagen }))}
-            paneles={filtros.map((f) =>
-              f.tarjetas.length > 0 ? (
-                <SliderUsados key={f.clave} etiqueta={f.nombre}>
-                  {f.tarjetas.map((t, i) => (
-                    <li key={t.id} className={estilos.item}>
-                      <Tarjeta
-                        equipo={t}
-                        idNombre={`usados-kit-${f.clave}-${i}`}
-                        cotizar={cotizar}
-                      />
-                    </li>
-                  ))}
-                </SliderUsados>
-              ) : (
-                <div key={f.clave} className={estilos.vacio}>
-                  <p className={estilos.vacioTitulo}>
-                    Por ahora no hay {f.nombre.toLowerCase()} usada en el inventario.
-                  </p>
-                  <p className={estilos.vacioTexto}>
-                    Cuéntanos qué buscas y te avisamos cuando llegue.
-                  </p>
-                  <BotonFormulario
-                    href={f.href}
-                    className={estilos.verTodo}
-                    formulario={formularioDeAviso(f.nombre, cotizar)}
-                  >
-                    Avísame cuando llegue
-                    <Flecha className={estilos.flecha} />
-                  </BotonFormulario>
-                </div>
-              ),
-            )}
-          />
+          <EnlacesCategorias filtros={filtros} />
+          <div className={estilos.listado}>
+            {excavadoras && excavadoras.tarjetas.length > 0 ? (
+              <SliderUsados etiqueta={excavadoras.nombre}>
+                {excavadoras.tarjetas.map((t, i) => (
+                  <li key={t.id} className={estilos.item}>
+                    <Tarjeta equipo={t} idNombre={`usados-kit-${i}`} cotizar={cotizar} />
+                  </li>
+                ))}
+              </SliderUsados>
+            ) : excavadoras ? (
+              <div className={estilos.vacio}>
+                <p className={estilos.vacioTitulo}>
+                  Por ahora no hay {excavadoras.nombre.toLowerCase()} usada en el inventario.
+                </p>
+                <p className={estilos.vacioTexto}>
+                  Cuéntanos qué buscas y te avisamos cuando llegue.
+                </p>
+                <BotonFormulario
+                  href={excavadoras.href}
+                  className={estilos.verTodo}
+                  formulario={formularioDeAviso(excavadoras.nombre, cotizar)}
+                >
+                  Avísame cuando llegue
+                  <Flecha className={estilos.flecha} />
+                </BotonFormulario>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Los tres botones de categoría: ENLACES a su página de usados. Al pasar el ratón o enfocar, la
+ * flecha pasa a rojo y el lado izquierdo se tiñe de un rojo suave (solo color y opacidad: nada se
+ * mueve ni cambia de medida).
+ */
+function EnlacesCategorias({ filtros }: { filtros: FiltroUsados[] }) {
+  return (
+    <ul className={estilos.filtros} aria-label="Maquinaria usada por categoría">
+      {filtros.map((f) => (
+        <li key={f.clave}>
+          <Link href={f.href} className={estilos.filtro}>
+            <span className={estilos.filtroImagen}>
+              {f.imagen ? (
+                <Image src={f.imagen.url} alt="" fill sizes="120px" className={estilos.filtroImg} />
+              ) : null}
+            </span>
+            <span className={estilos.filtroNombre}>{f.nombre}</span>
+            <span className={estilos.filtroFlecha} aria-hidden="true">
+              <Flecha />
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 

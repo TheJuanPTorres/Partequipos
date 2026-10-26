@@ -1,6 +1,6 @@
 /*
  * «MAQUINARIA PESADA USADA» CON EL DISEÑO DEL CLIENTE (2026-10-26), portado del prototipo
- * (Tailwind) a CSS modules con los tokens del sitio. Cortes del prototipo: 640 (filtro en tres
+ * (Tailwind) a CSS modules con los tokens del sitio. Cortes del prototipo: 640 (enlaces de categoría en tres
  * columnas), 768 (dos tarjetas), 1025 (cabecera en dos columnas) y 1280 (tres tarjetas).
  */
 
@@ -293,10 +293,18 @@
   }
 }
 
+/*
+ * Los tres botones de categoría son ENLACES (2026-10-26). Hover y foco: la flecha a rojo y el lado
+ * izquierdo teñido de rojo suave (`::before`, solo opacidad), sin mover nada ni cambiar medidas.
+ */
 .filtro {
+  position: relative;
+  isolation: isolate;
   display: flex;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
   padding: 12px 16px 12px 12px;
   align-items: center;
   gap: 16px;
@@ -307,8 +315,23 @@
   color: var(--color-texto);
   font: inherit;
   text-align: left;
-  cursor: pointer;
+  text-decoration: none;
   transition: border-color 180ms ease;
+}
+
+.filtro::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-marca) 14%, transparent) 0%,
+    color-mix(in srgb, var(--color-marca) 6%, transparent) 40%,
+    transparent 70%
+  );
+  content: "";
+  opacity: 0;
+  transition: opacity 180ms ease;
 }
 
 @media (min-width: 1025px) {
@@ -317,13 +340,14 @@
   }
 }
 
-.filtro:hover {
+.filtro:hover,
+.filtro:focus-visible {
   border-color: color-mix(in srgb, var(--color-marca) 60%, transparent);
 }
 
-.filtro[data-activo] {
-  border-color: var(--color-marca);
-  background: linear-gradient(90deg, #fdeeee 0%, var(--color-fondo) 75%);
+.filtro:hover::before,
+.filtro:focus-visible::before {
+  opacity: 1;
 }
 
 .filtroImagen {
@@ -370,9 +394,8 @@
   background: rgb(240 237 232 / 0.7);
   color: var(--color-texto);
   transition:
-    background-color 300ms ease,
-    color 300ms ease,
-    rotate 300ms ease;
+    background-color 180ms ease,
+    color 180ms ease;
 }
 
 .filtroFlecha svg {
@@ -381,18 +404,13 @@
 }
 
 .filtro:hover .filtroFlecha,
-.filtro[data-activo] .filtroFlecha {
+.filtro:focus-visible .filtroFlecha {
   background: var(--color-marca);
   color: #fff;
 }
 
-.filtro[data-activo] .filtroFlecha {
-  rotate: 90deg;
-}
-
 .listado {
   padding-top: 20px;
-  scroll-margin-top: 128px;
 }
 
 @media (min-width: 1025px) {
@@ -445,19 +463,6 @@
 @media (min-width: 1280px) {
   .item {
     width: calc((100% - 40px) / 3);
-  }
-}
-
-/* Al elegir una categoría, sus tarjetas suben un poco (solo se desplazan: nunca arrancan invisibles). */
-@media (prefers-reduced-motion: no-preference) {
-  .panelFiltro:not([hidden]) .item {
-    animation: kitEntraTarjeta 420ms cubic-bezier(0.33, 0, 0.2, 1) backwards;
-  }
-}
-
-@keyframes kitEntraTarjeta {
-  from {
-    transform: translateY(12px);
   }
 }
 
@@ -657,6 +662,7 @@
   .verTodo,
   .boton,
   .filtro,
+  .filtro::before,
   .filtroFlecha,
   .punto span {
     transition: none;

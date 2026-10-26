@@ -619,6 +619,17 @@ export const PaginaInstitucional: CollectionConfig = {
       fields: [
         texto("antetitulo", "Antetítulo", "Venta de repuestos"),
         texto("titulo", "Título", "Encuentra Maquinaria y Repuestos Rápido y Fácil"),
+        {
+          // Campo nuevo (2026-10-26): los «ya no se usa» de esta sección son de una línea y con un
+          // valor por defecto que saldría en la web, así que no sirven para un párrafo.
+          name: "descripcion",
+          type: "textarea",
+          label: "Texto bajo el título",
+          admin: {
+            description:
+              "Un párrafo corto bajo el título. Respeta los saltos de línea. Vacío, no se pinta.",
+          },
+        },
         texto("verMasTexto", "Texto del botón de cada tarjeta", "Ver más"),
         texto(
           "botonTexto",

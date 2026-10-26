@@ -161,6 +161,7 @@ export default async function HomePage() {
         textos={{
           antetitulo: tx(repuestos?.antetitulo),
           titulo: tx(repuestos?.titulo),
+          descripcion: tx(repuestos?.descripcion),
           verTodos: tx(repuestos?.verMasTexto),
         }}
       />

@@ -1561,6 +1561,10 @@ export interface Pagina {
   seccionRepuestos?: {
     antetitulo?: string | null;
     titulo?: string | null;
+    /**
+     * Un párrafo corto bajo el título. Respeta los saltos de línea. Vacío, no se pinta.
+     */
+    descripcion?: string | null;
     verMasTexto?: string | null;
     /**
      * Sin efecto desde el 2026-10-26 (diseño del cliente): cada tarjeta lleva su botón.
@@ -3066,6 +3070,7 @@ export interface PaginasSelect<T extends boolean = true> {
     | {
         antetitulo?: T;
         titulo?: T;
+        descripcion?: T;
         verMasTexto?: T;
         botonTexto?: T;
         botonEnlace?: T;

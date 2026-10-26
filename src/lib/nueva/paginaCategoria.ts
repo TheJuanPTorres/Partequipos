@@ -8,6 +8,7 @@ import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 
 import type { TarjetaEquipo } from "./paginaMarcaAndres";
 import { SLUG_ADITAMENTOS } from "./indiceTipos";
+import { porOrden } from "./orden";
 import { fotoDeCabecera, tarjetasDeEquipos } from "./paginaTipo";
 
 /**
@@ -30,8 +31,8 @@ export type GrupoDeCategoria = {
 };
 
 /**
- * Un grupo por marca y tipo, por nombre de marca y luego de tipo; dentro, los equipos en el orden
- * en que llegan (por nombre). La ficha cuelga del tipo del equipo. Un equipo sin marca o sin
+ * Un grupo por marca y tipo, por nombre de marca y luego por el «Orden» del tipo (vacío, al final,
+ * por nombre); dentro, los equipos en el orden en que llegan (su «Orden» y su nombre, la consulta). La ficha cuelga del tipo del equipo. Un equipo sin marca o sin
  * tipo poblados no sale (no habría ficha a la que ir), y un grupo vacío tampoco.
  */
 export function gruposPorMarcaYTipo(equipos: EquiposNuevo[]): GrupoDeCategoria[] {
@@ -51,8 +52,7 @@ export function gruposPorMarcaYTipo(equipos: EquiposNuevo[]): GrupoDeCategoria[]
   return [...grupos.entries()]
     .sort(
       ([, a], [, b]) =>
-        a.marca.nombre.localeCompare(b.marca.nombre, "es") ||
-        a.tipo.nombre.localeCompare(b.tipo.nombre, "es"),
+        a.marca.nombre.localeCompare(b.marca.nombre, "es") || porOrden(a.tipo, b.tipo),
     )
     .map(([clave, g]) => ({
       clave,

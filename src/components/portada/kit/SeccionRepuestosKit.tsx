@@ -89,12 +89,7 @@ function Maquina({ maquina, reflejo }: { maquina: ImagenLista; reflejo: ImagenLi
     <div className={estilos.maquinaCaja}>
       <div className={estilos.maquina} style={{ aspectRatio: `${W} / ${H}` }}>
         {/* La pared: losas grises y la franja roja, ancladas a la máquina, apagadas hacia el texto. */}
-        <svg
-          aria-hidden="true"
-          focusable="false"
-          viewBox="0 0 1920 1344"
-          className={estilos.capa}
-        >
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 1920 1344" className={estilos.capa}>
           <defs>
             <linearGradient
               id="kit-repuestos-izq"
@@ -133,12 +128,28 @@ function Maquina({ maquina, reflejo }: { maquina: ImagenLista; reflejo: ImagenLi
             </mask>
           </defs>
           <g mask="url(#kit-repuestos-mascara)">
-            <polygon points="887,-2400 1117,-2400 -655,640 -885,640" fill="#d3d1ce" opacity="0.45" />
-            <polygon points="1117,-2400 1417,-2400 -355,640 -655,640" fill="#fbfbfa" opacity="0.8" />
+            <polygon
+              points="887,-2400 1117,-2400 -655,640 -885,640"
+              fill="#d3d1ce"
+              opacity="0.45"
+            />
+            <polygon
+              points="1117,-2400 1417,-2400 -355,640 -655,640"
+              fill="#fbfbfa"
+              opacity="0.8"
+            />
             <polygon points="2207,-2400 2437,-2400 665,640 435,640" fill="#d3d1ce" opacity="0.45" />
             <polygon points="2437,-2400 2767,-2400 995,640 665,640" fill="#fbfbfa" opacity="0.85" />
-            <polygon points="3407,-2400 3627,-2400 1855,640 1635,640" fill="#d3d1ce" opacity="0.45" />
-            <polygon points="3627,-2400 3927,-2400 2155,640 1855,640" fill="#fbfbfa" opacity="0.8" />
+            <polygon
+              points="3407,-2400 3627,-2400 1855,640 1635,640"
+              fill="#d3d1ce"
+              opacity="0.45"
+            />
+            <polygon
+              points="3627,-2400 3927,-2400 2155,640 1855,640"
+              fill="#fbfbfa"
+              opacity="0.8"
+            />
           </g>
           <polygon
             points="2987,-2400 3177,-2400 1405,640 1215,640"
@@ -151,12 +162,7 @@ function Maquina({ maquina, reflejo }: { maquina: ImagenLista; reflejo: ImagenLi
         <div className={estilos.piso} aria-hidden="true" />
 
         {/* Sombras medidas por el cliente sobre el render de la Yanmar (1920 × 1344). */}
-        <svg
-          aria-hidden="true"
-          focusable="false"
-          viewBox="0 0 1920 1344"
-          className={estilos.capa}
-        >
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 1920 1344" className={estilos.capa}>
           <defs>
             <filter id="kit-repuestos-oruga" x="-20%" y="-200%" width="140%" height="500%">
               <feGaussianBlur stdDeviation="14" />
@@ -200,7 +206,13 @@ function Maquina({ maquina, reflejo }: { maquina: ImagenLista; reflejo: ImagenLi
             className={estilos.reflejo}
             style={{ aspectRatio: `${reflejo.width} / ${reflejo.height}` }}
           >
-            <Image src={reflejo.url} alt="" fill sizes={SIZES_MAQUINA} className={estilos.contener} />
+            <Image
+              src={reflejo.url}
+              alt=""
+              fill
+              sizes={SIZES_MAQUINA}
+              className={estilos.contener}
+            />
           </div>
         ) : null}
         <Image src={maquina.url} alt="" fill sizes={SIZES_MAQUINA} className={estilos.contener} />

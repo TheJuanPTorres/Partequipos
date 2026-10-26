@@ -620,7 +620,11 @@ export const PaginaInstitucional: CollectionConfig = {
           "Ver todos los repuestos",
           "Sin efecto desde el 2026-10-26 (diseño del cliente): cada tarjeta lleva su botón.",
         ),
-        enlace("botonEnlace", "Enlace del botón (ya no se usa)", "/repuestos-maquinaria-pesada-colombia/"),
+        enlace(
+          "botonEnlace",
+          "Enlace del botón (ya no se usa)",
+          "/repuestos-maquinaria-pesada-colombia/",
+        ),
         imagenKit(
           "maquina",
           "Máquina (PNG o WebP transparente)",

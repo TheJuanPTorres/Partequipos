@@ -74,7 +74,13 @@ export function SeccionMarcasKit({
               </div>
             ) : null}
             <Sombras />
-            <Image src={maquina.url} alt="" fill sizes={SIZES_MAQUINA} className={estilos.contener} />
+            <Image
+              src={maquina.url}
+              alt=""
+              fill
+              sizes={SIZES_MAQUINA}
+              className={estilos.contener}
+            />
           </div>
         ) : null}
 
@@ -99,14 +105,35 @@ function Fondo() {
       className={estilos.fondo}
     >
       <defs>
-        <linearGradient id="kit-marcas-izq" gradientUnits="userSpaceOnUse" x1="380" y1="0" x2="640" y2="0">
+        <linearGradient
+          id="kit-marcas-izq"
+          gradientUnits="userSpaceOnUse"
+          x1="380"
+          y1="0"
+          x2="640"
+          y2="0"
+        >
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
           <stop offset="1" stopColor="#fff" />
         </linearGradient>
-        <mask id="kit-marcas-mascara" maskUnits="userSpaceOnUse" x="0" y="-100" width="1000" height="500">
+        <mask
+          id="kit-marcas-mascara"
+          maskUnits="userSpaceOnUse"
+          x="0"
+          y="-100"
+          width="1000"
+          height="500"
+        >
           <rect x="0" y="-100" width="1000" height="500" fill="url(#kit-marcas-izq)" />
         </mask>
-        <linearGradient id="kit-marcas-roja" gradientUnits="userSpaceOnUse" x1="0" y1="-20" x2="0" y2="250">
+        <linearGradient
+          id="kit-marcas-roja"
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          y1="-20"
+          x2="0"
+          y2="250"
+        >
           <stop offset="0" stopColor="var(--color-marca)" />
           <stop offset="0.45" stopColor="var(--color-marca)" stopOpacity="0.92" />
           <stop offset="0.75" stopColor="var(--color-marca)" stopOpacity="0.45" />
@@ -123,7 +150,11 @@ function Fondo() {
         <polygon points="642,-20 772,-20 549,340 419,340" fill="#d8d6d3" opacity="0.45" />
         <polygon points="772,-20 862,-20 639,340 549,340" fill="#ebe9e6" opacity="0.5" />
         <polygon points="1020,-20 1120,-20 897,340 797,340" fill="#d8d6d3" opacity="0.4" />
-        <polygon points="862,-20 920,-20 763,233 705,233" fill="url(#kit-marcas-roja)" opacity="0.85" />
+        <polygon
+          points="862,-20 920,-20 763,233 705,233"
+          fill="url(#kit-marcas-roja)"
+          opacity="0.85"
+        />
       </g>
       <rect x="-1000" y="225" width="3000" height="120" fill="url(#kit-marcas-piso)" />
     </svg>
@@ -133,12 +164,7 @@ function Fondo() {
 /** Sombras de contacto medidas por el cliente sobre el render de la Case 580N (1920 × 1344). */
 function Sombras() {
   return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      viewBox="0 0 1920 1344"
-      className={estilos.sombras}
-    >
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 1920 1344" className={estilos.sombras}>
       <defs>
         <filter id="kit-marcas-amplia" x="-30%" y="-200%" width="160%" height="500%">
           <feGaussianBlur stdDeviation="40" />
@@ -147,11 +173,48 @@ function Sombras() {
           <feGaussianBlur stdDeviation="12" />
         </filter>
       </defs>
-      <ellipse cx="1050" cy="1110" rx="820" ry="55" fill="#14110f" opacity="0.14" filter="url(#kit-marcas-amplia)" />
-      <ellipse cx="345" cy="1032" rx="90" ry="12" fill="#14110f" opacity="0.4" filter="url(#kit-marcas-sombra)" />
-      <ellipse cx="650" cy="1044" rx="115" ry="14" fill="#14110f" opacity="0.45" filter="url(#kit-marcas-sombra)" />
-      <ellipse cx="955" cy="1095" rx="85" ry="13" fill="#14110f" opacity="0.45" filter="url(#kit-marcas-sombra)" />
-      <polygon points="1170,1112 1800,1100 1800,1116 1170,1134" fill="#14110f" opacity="0.32" filter="url(#kit-marcas-sombra)" />
+      <ellipse
+        cx="1050"
+        cy="1110"
+        rx="820"
+        ry="55"
+        fill="#14110f"
+        opacity="0.14"
+        filter="url(#kit-marcas-amplia)"
+      />
+      <ellipse
+        cx="345"
+        cy="1032"
+        rx="90"
+        ry="12"
+        fill="#14110f"
+        opacity="0.4"
+        filter="url(#kit-marcas-sombra)"
+      />
+      <ellipse
+        cx="650"
+        cy="1044"
+        rx="115"
+        ry="14"
+        fill="#14110f"
+        opacity="0.45"
+        filter="url(#kit-marcas-sombra)"
+      />
+      <ellipse
+        cx="955"
+        cy="1095"
+        rx="85"
+        ry="13"
+        fill="#14110f"
+        opacity="0.45"
+        filter="url(#kit-marcas-sombra)"
+      />
+      <polygon
+        points="1170,1112 1800,1100 1800,1116 1170,1134"
+        fill="#14110f"
+        opacity="0.32"
+        filter="url(#kit-marcas-sombra)"
+      />
     </svg>
   );
 }

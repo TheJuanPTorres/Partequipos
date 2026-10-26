@@ -1,7 +1,13 @@
 import type { CategoriasTecnica, CategoriasUsada, EquiposUsado, Pagina } from "@/payload-types";
 
 import { SLUG_CATEGORIA_USADA_ADITAMENTOS } from "../aditamentos/wordpress";
-import { conAlt, logoDeMarca, logoPropio, type IndiceLogos, type LogoConAlt } from "../marca/logoMarca";
+import {
+  conAlt,
+  logoDeMarca,
+  logoPropio,
+  type IndiceLogos,
+  type LogoConAlt,
+} from "../marca/logoMarca";
 import { rutas, SEGMENTO_OTROS_USADA } from "../routes";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 import {

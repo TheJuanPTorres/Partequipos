@@ -806,14 +806,13 @@ export const getUsadosDePortada = cache(
     const payload = await getPayload({ config });
     const comun: Where[] = [
       { disponible: { equals: true } },
-      PRODUCTO_VISIBLE,
       { "categoria.mostrarEnWeb": { not_equals: false } },
     ];
     const SIN_ADITAMENTO: Where = { pestanaPortada: { not_equals: "aditamentos" } };
     const consulta = (where: Where) =>
       payload.find({
         collection: "equipos-usados",
-        where: { and: [...comun, where] },
+        where: { and: [PRODUCTO_VISIBLE, ...comun, where] },
         depth: 0,
         limit: USADOS_POR_FILTRO,
         sort: ["-fechaPublicacion", "-createdAt"],

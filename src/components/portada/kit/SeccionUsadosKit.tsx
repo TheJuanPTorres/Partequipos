@@ -313,7 +313,11 @@ function Fondo() {
         <polygon points="760,100 905,100 1326,640 1181,640" fill="#dedcd9" opacity="0.28" />
         <polygon points="600,250 835,250 1139,640 904,640" fill="#d3d1ce" opacity="0.35" />
       </g>
-      <polygon points="45,215 200,215 470,560 315,560" fill="url(#kit-usados-roja)" opacity="0.78" />
+      <polygon
+        points="45,215 200,215 470,560 315,560"
+        fill="url(#kit-usados-roja)"
+        opacity="0.78"
+      />
     </svg>
   );
 }
@@ -325,12 +329,7 @@ function Fondo() {
  */
 function SombraMaquina() {
   return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      viewBox="0 0 1920 1344"
-      className={estilos.sombras}
-    >
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 1920 1344" className={estilos.sombras}>
       <defs>
         <filter id="kit-usados-amplia" x="-50%" y="-300%" width="200%" height="700%">
           <feGaussianBlur stdDeviation="30" />
@@ -342,11 +341,51 @@ function SombraMaquina() {
           <feGaussianBlur stdDeviation="5" />
         </filter>
       </defs>
-      <ellipse cx="1250" cy="1252" rx="600" ry="52" fill="#14110f" opacity="0.34" filter="url(#kit-usados-amplia)" />
-      <ellipse cx="470" cy="1286" rx="200" ry="28" fill="#14110f" opacity="0.26" filter="url(#kit-usados-amplia)" />
-      <ellipse cx="1210" cy="1240" rx="455" ry="24" fill="#14110f" opacity="0.42" filter="url(#kit-usados-media)" />
-      <ellipse cx="450" cy="1281" rx="130" ry="14" fill="#14110f" opacity="0.38" filter="url(#kit-usados-media)" />
-      <ellipse cx="935" cy="1231" rx="178" ry="11" fill="#14110f" opacity="0.78" filter="url(#kit-usados-contacto)" />
+      <ellipse
+        cx="1250"
+        cy="1252"
+        rx="600"
+        ry="52"
+        fill="#14110f"
+        opacity="0.34"
+        filter="url(#kit-usados-amplia)"
+      />
+      <ellipse
+        cx="470"
+        cy="1286"
+        rx="200"
+        ry="28"
+        fill="#14110f"
+        opacity="0.26"
+        filter="url(#kit-usados-amplia)"
+      />
+      <ellipse
+        cx="1210"
+        cy="1240"
+        rx="455"
+        ry="24"
+        fill="#14110f"
+        opacity="0.42"
+        filter="url(#kit-usados-media)"
+      />
+      <ellipse
+        cx="450"
+        cy="1281"
+        rx="130"
+        ry="14"
+        fill="#14110f"
+        opacity="0.38"
+        filter="url(#kit-usados-media)"
+      />
+      <ellipse
+        cx="935"
+        cy="1231"
+        rx="178"
+        ry="11"
+        fill="#14110f"
+        opacity="0.78"
+        filter="url(#kit-usados-contacto)"
+      />
       <ellipse
         cx="1380"
         cy="1244"
@@ -357,7 +396,15 @@ function SombraMaquina() {
         opacity="0.8"
         filter="url(#kit-usados-contacto)"
       />
-      <ellipse cx="500" cy="1279" rx="72" ry="8" fill="#14110f" opacity="0.62" filter="url(#kit-usados-contacto)" />
+      <ellipse
+        cx="500"
+        cy="1279"
+        rx="72"
+        ry="8"
+        fill="#14110f"
+        opacity="0.62"
+        filter="url(#kit-usados-contacto)"
+      />
     </svg>
   );
 }

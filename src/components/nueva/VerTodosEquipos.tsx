@@ -1,7 +1,9 @@
 "use client";
 
-import { IconArrowRight, IconCircleCheck, IconSearch, IconX } from "@tabler/icons-react";
+import { IconCheck, IconPhoto, IconSearch, IconX } from "@tabler/icons-react";
+import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   useEffect,
   useId,
@@ -14,11 +16,24 @@ import {
 
 import { coincideModelo, enOrdenNatural, normalizarBusqueda } from "@/lib/repuestos/buscarModelo";
 import { mejoraApagadaEnLaPagina } from "@/lib/repuestos/mejoras";
+import type { ImagenLista } from "@/lib/utils/relations";
 
 import panel from "./panelEquipos.module.css";
 
-/** Una fila del panel. Sin `href`, el nombre como texto (un modelo que WordPress nombra sin página). */
-export type ElementoPanel = { id: number | string; nombre: string; href: string | null };
+/**
+ * Una tarjeta del panel. Sin `href`, el nombre como texto (un modelo que WordPress nombra sin
+ * página). `imagen`: su foto; `null`, el respaldo neutro; sin el campo (los productos de una
+ * categoría técnica), tarjetas solo de texto.
+ */
+export type ElementoPanel = {
+  id: number | string;
+  nombre: string;
+  href: string | null;
+  imagen?: ImagenLista | null;
+};
+
+/** Sin la barra final ni el ancla, para comparar una ruta con la página en la que se está. */
+const sinBarra = (ruta: string) => ruta.split("#")[0]!.replace(/\/+$/, "") || "/";
 
 /**
  * «VER TODOS (N)»: abre un PANEL que sube desde la parte inferior de la pantalla con el
@@ -42,6 +57,12 @@ export type ElementoPanel = { id: number | string; nombre: string; href: string 
  * listado que lo filtra al escribir (sin distinguir mayúsculas, guiones ni espacios), y los
  * modelos en ORDEN NATURAL (EX100, EX120, EX200…). El alto del panel se fija al empezar a
  * escribir, para que no salte al filtrar.
+ *
+ * REJILLA DE TARJETAS (diseño del cliente, 2026-10-25): foto arriba (la del modelo o el equipo;
+ * sin ella, un respaldo neutro) y nombre debajo; 4 por fila en escritorio, 3 en tablet y 2 en
+ * el móvil. Sin fotos (productos de una categoría técnica), las mismas tarjetas solo de texto.
+ * La de la página en la que se está, marcada (borde y fondo suave del color de la marca y un
+ * check). Las fotos, diferidas y con su caja reservada.
  */
 export function VerTodosEquipos({
   titulo,
@@ -82,6 +103,7 @@ export function VerTodosEquipos({
   const idBuscar = useId();
   const [consulta, setConsulta] = useState("");
   const [altoFijo, setAltoFijo] = useState<number | null>(null);
+  const ruta = usePathname();
 
   useEffect(() => {
     const d = dialogo.current;
@@ -123,6 +145,9 @@ export function VerTodosEquipos({
     conR5 && q
       ? ordenados.filter((e) => coincideModelo(normalizarBusqueda(e.nombre), q))
       : ordenados;
+  // Con foto si algún elemento trae el campo; los productos de una categoría técnica, no.
+  const conFotos = equipos.some((e) => e.imagen !== undefined);
+  const esActual = (e: ElementoPanel) => !!e.href && !!ruta && sinBarra(e.href) === sinBarra(ruta);
 
   return (
     <>
@@ -172,7 +197,6 @@ export function VerTodosEquipos({
           }}
         >
           <div className={panel.hoja}>
-            <span className={panel.barra} aria-hidden="true" />
             <span className={panel.asa} aria-hidden="true" />
             <div className={panel.cabecera}>
               <h2 id={idTitulo} ref={tituloRef} tabIndex={-1} className={panel.titulo}>
@@ -216,29 +240,62 @@ export function VerTodosEquipos({
               </div>
             ) : null}
             <div className={panel.cuerpo}>
-              <ul className={panel.lista}>
-                {visibles.map((e) => (
-                  <li key={e.id}>
-                    {e.href ? (
-                      <Link href={e.href} className={panel.item}>
-                        <span className={panel.marca} aria-hidden="true">
-                          <IconCircleCheck focusable="false" stroke={1.9} size={26} />
+              <ul className={`${panel.lista} ${conFotos ? "" : panel.listaTexto}`}>
+                {visibles.map((e, i) => {
+                  const actual = esActual(e);
+                  const contenido = (
+                    <>
+                      {conFotos ? (
+                        <span className={panel.foto}>
+                          {e.imagen ? (
+                            <Image
+                              src={e.imagen.url}
+                              alt=""
+                              fill
+                              sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, 320px"
+                              className={panel.fotoImg}
+                              style={{ objectPosition: e.imagen.posicion }}
+                            />
+                          ) : (
+                            <IconPhoto
+                              className={panel.fotoVacia}
+                              aria-hidden="true"
+                              focusable="false"
+                              stroke={1.4}
+                              size={40}
+                            />
+                          )}
                         </span>
-                        <span className={panel.nombreItem}>{e.nombre}</span>
-                        <span className={panel.flecha} aria-hidden="true">
-                          <IconArrowRight focusable="false" stroke={2.2} size={22} />
+                      ) : null}
+                      {actual ? (
+                        <span className={panel.check} aria-hidden="true">
+                          <IconCheck focusable="false" stroke={3} size={18} />
                         </span>
-                      </Link>
-                    ) : (
-                      <span className={`${panel.item} ${panel.itemSinEnlace}`}>
-                        <span className={panel.marca} aria-hidden="true">
-                          <IconCircleCheck focusable="false" stroke={1.9} size={26} />
-                        </span>
-                        <span className={panel.nombreItem}>{e.nombre}</span>
+                      ) : null}
+                      <span className={panel.nombreItem}>
+                        {e.nombre}
+                        {actual ? <span className="sr-only"> (página actual)</span> : null}
                       </span>
-                    )}
-                  </li>
-                ))}
+                    </>
+                  );
+                  return (
+                    // `--i`: el escalón de la entrada al abrir (como mucho 12 escalones).
+                    <li key={e.id} style={{ "--i": Math.min(i, 12) } as CSSProperties}>
+                      {e.href ? (
+                        <Link
+                          href={e.href}
+                          className={panel.item}
+                          data-actual={actual ? "" : undefined}
+                          aria-current={actual ? "page" : undefined}
+                        >
+                          {contenido}
+                        </Link>
+                      ) : (
+                        <span className={`${panel.item} ${panel.itemSinEnlace}`}>{contenido}</span>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
               {enlacePagina ? (
                 <p className={panel.pie}>

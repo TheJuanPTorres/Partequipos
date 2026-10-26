@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { BloqueLubricantes } from "@/components/lubricantes/BloqueLubricantes";
+import { BotonCatalogo } from "@/components/lubricantes/BotonCatalogo";
+import catalogo from "@/components/lubricantes/botonCatalogo.module.css";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -52,7 +54,22 @@ export default async function LubricantesPage() {
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <HeroMarca vista={vista.encabezado} anclaSiguiente={ANCLA} franja={false} indice />
+      <HeroMarca
+        vista={vista.encabezado}
+        anclaSiguiente={ANCLA}
+        franja={false}
+        indice
+        accion={
+          // «Ver catálogo» visible al entrar (petición del cliente, 2026-10-26).
+          vista.bloque.marca?.href ? (
+            <BotonCatalogo
+              href={vista.bloque.marca.href}
+              texto={vista.bloque.textoBoton}
+              className={catalogo.sobreFoto}
+            />
+          ) : null
+        }
+      />
 
       <BloqueLubricantes
         id={ANCLA}

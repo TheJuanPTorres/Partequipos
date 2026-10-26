@@ -1,5 +1,6 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, RelationshipFieldSingleValidation, Where } from "payload";
 
+import { validarColor } from "../lib/fields/tipografiaTitulo";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
@@ -13,6 +14,32 @@ import { revalidarMegamenu } from "./hooks/megamenuHooks";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("categorias-tecnicas");
+
+/**
+ * «Cuelga de» (2026-10-26): un solo nivel. La que cuelga no puede colgar de sí misma ni de
+ * otra que ya cuelga; y una que ya tiene páginas dentro no puede pasar a colgar de otra.
+ */
+const validarPadreCategoria: RelationshipFieldSingleValidation = async (valor, { req, id }) => {
+  const padre = typeof valor === "object" && valor !== null ? (valor as { id?: number }).id : valor;
+  if (padre === null || padre === undefined || padre === "") return true;
+  if (id !== undefined && String(padre) === String(id))
+    return "Una categoría no puede colgar de sí misma.";
+  const elegido = await req.payload.findByID({
+    collection: "categorias-tecnicas",
+    id: padre as number,
+    depth: 0,
+    select: { padre: true },
+  });
+  if (elegido?.padre) return "Esa categoría ya cuelga de otra: elige una categoría normal.";
+  if (id !== undefined) {
+    const { totalDocs } = await req.payload.count({
+      collection: "categorias-tecnicas",
+      where: { padre: { equals: id } },
+    });
+    if (totalDocs > 0) return "Esta categoría tiene páginas dentro: no puede colgar de otra.";
+  }
+  return true;
+};
 // «Repuestos por categoría técnica» del megamenú (2026-10-20).
 const megamenu = revalidarMegamenu("categorias-tecnicas");
 
@@ -71,6 +98,62 @@ export const CategoriaTecnica: CollectionConfig = {
     },
     // Colección de nivel superior e independiente: unicidad global del slug.
     slugField({ unique: true }),
+    /*
+     * PÁGINA DENTRO DE OTRA CATEGORÍA (2026-10-26, dirección: Filtros Donaldson dentro de
+     * Filtración, en su URL de WordPress). Su dirección es la de la categoría seguida de la
+     * suya, y sale bajo esa categoría en el menú y en su página, no en el índice de categorías.
+     * Un solo nivel: una categoría que cuelga de otra no puede tener las suyas.
+     */
+    {
+      name: "padre",
+      type: "relationship",
+      relationTo: "categorias-tecnicas",
+      label: "Cuelga de",
+      filterOptions: ({ id }) => {
+        const condiciones: Where[] = [{ padre: { exists: false } }];
+        if (id) condiciones.push({ id: { not_equals: id } });
+        return { and: condiciones };
+      },
+      validate: validarPadreCategoria,
+      admin: {
+        position: "sidebar",
+        description:
+          "Solo para una página dentro de otra categoría (p. ej. «Filtros Donaldson» dentro de «Filtración»). Su dirección web es la de esa categoría seguida de la suya, y sale bajo ella en el menú y en su página, no en el índice. Vacío: una categoría normal.",
+      },
+    },
+    {
+      name: "logo",
+      type: "upload",
+      relationTo: "media",
+      label: "Logo de la marca",
+      admin: {
+        description:
+          "Opcional, para una página de MARCA dentro de una categoría (p. ej. Donaldson): va en la cabecera de su página y en su acceso desde la categoría.",
+      },
+    },
+    {
+      name: "iconoMarca",
+      type: "upload",
+      relationTo: "media",
+      label: "Icono de la marca (menú)",
+      admin: {
+        description:
+          "Opcional: el símbolo de la marca SIN su nombre, para el botón del menú (ahí el nombre va escrito al lado). Vacío, el botón lleva solo el nombre.",
+      },
+    },
+    // El mismo selector de color que las marcas (`campoColorMarca`), con su propia ayuda.
+    {
+      name: "colorMarca",
+      type: "text",
+      label: "Color de la marca",
+      validate: validarColor,
+      admin: {
+        placeholder: "#007CC4",
+        components: { Field: "/components/admin/CampoColor" },
+        description:
+          "Opcional, con el logo: el color del botón de esta página en el menú y de su acceso desde la categoría. El texto se pone solo en blanco o negro, el que mejor se lea.",
+      },
+    },
     {
       name: "descripcion",
       type: "textarea",
@@ -135,6 +218,21 @@ export const CategoriaTecnica: CollectionConfig = {
       label: "Título en portada",
       admin: {
         description: "Opcional. Vacío: la tarjeta de la portada usa el nombre de la categoría.",
+      },
+    },
+    /*
+     * FOTO DE LA PORTADA (diseño del cliente, 2026-10-26): la pieza recortada de la tarjeta de
+     * «Venta de repuestos». Aparte de la «Imagen de la tarjeta», que usan el índice de categorías,
+     * las páginas de marca y el megamenú. Vacía, la tarjeta de la portada usa esa.
+     */
+    {
+      name: "imagenPortada",
+      type: "upload",
+      relationTo: "media",
+      label: "Foto en la portada",
+      admin: {
+        description:
+          "Opcional: la pieza recortada (PNG o WebP transparente) de la tarjeta de la portada. Vacía: la «Imagen de la tarjeta».",
       },
     },
     {
@@ -212,6 +310,15 @@ export const CategoriaTecnica: CollectionConfig = {
           type: "upload",
           relationTo: "media",
           label: "Foto del grupo",
+        },
+        {
+          name: "descripcion",
+          type: "textarea",
+          label: "Descripción del grupo",
+          admin: {
+            description:
+              "Opcional. Una o dos frases bajo el nombre, en su tarjeta (p. ej. para qué sirve ese tipo de filtro). Un grupo con descripción sale aunque no tenga productos.",
+          },
         },
         {
           name: "productos",

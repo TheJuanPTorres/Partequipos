@@ -244,14 +244,27 @@ export const BloqueFranjaMarquee: Block = {
       type: "text",
       required: true,
       label: "Texto en movimiento",
-      admin: { description: "Se repite de lado a lado, en mayúsculas. Ej. «Marcas aliadas»." },
+      admin: {
+        description: "Se repite de lado a lado, tal como se escribe. Ej. «Marcas Aliadas».",
+      },
     },
     {
       name: "imagenFondo",
       type: "upload",
       relationTo: "media",
       label: "Imagen de fondo",
-      admin: { description: "Decorativa." },
+      admin: { description: "Decorativa. Es la primera del pase de fotos." },
+    },
+    {
+      name: "fondosExtra",
+      type: "upload",
+      relationTo: "media",
+      hasMany: true,
+      label: "Más fotos de fondo",
+      admin: {
+        description:
+          "Opcional. Con alguna, la franja pasa de una foto a otra cada 5 s, empezando por la «Imagen de fondo». Decorativas.",
+      },
     },
     {
       name: "imagenFrontal",

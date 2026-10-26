@@ -115,9 +115,12 @@ async function entradas(): Promise<MetadataRoute.Sitemap> {
 
     marcas: marcas.map((marca) => ({ slug: marca.slug, updatedAt: marca.updatedAt })),
 
+    // Con la categoría de la que cuelga (Filtros Donaldson): sin ella, saldría como de primer nivel.
     categoriasRepuestos: categoriasRepuestos.map((c) => ({
       slug: c.slug,
       updatedAt: c.updatedAt,
+      padre:
+        typeof c.padre === "object" && c.padre ? { id: c.padre.id, slug: c.padre.slug } : c.padre,
     })),
 
     tipos: tipos.flatMap((tipo) => {

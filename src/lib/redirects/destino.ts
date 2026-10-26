@@ -108,6 +108,8 @@ export function clasificarDestino(destino: string): Destino {
   // --- Categorías técnicas de repuestos ---------------------------------------
   if (seg(0) === SEGMENTO_REPUESTOS && seg(1) === SEGMENTO_CATEGORIAS_REPUESTOS) {
     if (partes.length === 3) return din(["categorias-tecnicas"], seg(2));
+    // Una página dentro de una categoría (Filtros Donaldson en Filtración, 2026-10-26).
+    if (partes.length === 4) return din(["categorias-tecnicas"], seg(3), [seg(2)]);
     return { clase: "sin-ruta" };
   }
 

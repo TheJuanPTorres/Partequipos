@@ -519,6 +519,15 @@ a.pildora:hover {
   text-align: center;
 }
 
+/* La descripción opcional del grupo (Filtros Donaldson, 2026-10-26), bajo su nombre. */
+.descripcionGrupo {
+  margin: 8px 0 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-cuerpo, 16px);
+  line-height: 1.45;
+  text-align: center;
+}
+
 .botonTarjeta {
   display: inline-flex;
   min-width: 145px;
@@ -1933,4 +1942,11 @@ a.modelo:hover {
   to {
     transform: scale(1.05);
   }
+}
+
+/* Un botón en la cabecera (`accion` de `HeroMarca`): «Ver catálogo» de lubricantes. */
+.accionHero {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
 }

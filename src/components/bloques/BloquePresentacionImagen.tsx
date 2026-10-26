@@ -52,8 +52,10 @@ export function BloquePresentacionImagen({
           {animacion ? (
             <AnimacionLottie
               src={animacion.url}
-              proporcion={imagen ? imagen.width / imagen.height : animacion.ancho / animacion.alto}
+              // El hueco, con la proporción de la ANIMACIÓN: la foto ya no se ve antes de ella.
+              proporcion={animacion.ancho / animacion.alto}
               que="la animación del mapa"
+              etiqueta={imagen?.alt || undefined}
             >
               {imagen ? (
                 <Image

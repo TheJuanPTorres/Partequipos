@@ -344,6 +344,33 @@ describe("categorías técnicas de repuestos en el sitemap", () => {
     const e = buildSitemapEntries(conCategorias, AHORA);
     assert.equal(new Set(e.map((x) => x.url)).size, e.length);
   });
+
+  it("una página dentro de una categoría va en su dirección completa; sin la categoría poblada, no sale", () => {
+    const urls = buildSitemapEntries(
+      {
+        ...conCategorias,
+        categoriasRepuestos: [
+          ...conCategorias.categoriasRepuestos,
+          {
+            slug: "filtros-donaldson-maquinaria-pesada",
+            updatedAt: "2026-07-17T10:00:00.000Z",
+            padre: { id: 4, slug: "filtracion-para-maquinaria-pesada" },
+          },
+          { slug: "huerfana", updatedAt: "2026-07-17T10:00:00.000Z", padre: 99 },
+        ],
+      },
+      AHORA,
+    ).map((x) => x.url);
+    const base =
+      "https://partequipos.com/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/";
+    assert.ok(
+      urls.includes(
+        base + "filtracion-para-maquinaria-pesada/filtros-donaldson-maquinaria-pesada/",
+      ),
+    );
+    assert.ok(!urls.some((u) => u.includes("filtros-donaldson") && !u.includes("filtracion")));
+    assert.ok(!urls.some((u) => u.includes("huerfana")));
+  });
 });
 
 describe("maquinaria en el sitemap", () => {

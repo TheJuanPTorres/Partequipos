@@ -199,6 +199,8 @@ export const TipoEquipo: CollectionConfig = {
       relationTo: "categorias-tecnicas",
       hasMany: true,
       label: "Categorías en las páginas de sus modelos",
+      // Solo las de primer nivel: las que cuelgan de otra (Filtros Donaldson) tienen otra dirección.
+      filterOptions: { padre: { exists: false } },
       admin: {
         description:
           "Las categorías de repuestos que se muestran en la página de cada modelo de este tipo, en este orden. Vacío: no se muestra ninguna.",

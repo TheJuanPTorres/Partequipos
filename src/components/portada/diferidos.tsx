@@ -17,11 +17,6 @@ import dynamic from "next/dynamic";
 export const CarruselMarcas = dynamic(() =>
   import("./CarruselMarcas").then((m) => m.CarruselMarcas),
 );
-export const TarjetasApiladas = dynamic(() =>
-  import("./TarjetasApiladas").then((m) => m.TarjetasApiladas),
-);
-export const CarruselUsada = dynamic(() => import("./CarruselUsada").then((m) => m.CarruselUsada));
-export const CarruselLogos = dynamic(() => import("./CarruselLogos").then((m) => m.CarruselLogos));
 export const SeccionCompania = dynamic(() =>
   import("./SeccionCompania").then((m) => m.SeccionCompania),
 );

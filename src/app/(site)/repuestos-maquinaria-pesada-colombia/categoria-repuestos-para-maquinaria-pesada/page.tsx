@@ -9,6 +9,7 @@ import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
+import { esCategoriaPrincipal } from "@/lib/repuestos/subcategorias";
 import { getMarcas } from "@/lib/queries/getMarcas";
 import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
@@ -88,7 +89,7 @@ export default async function CategoriasRepuestosIndexPage() {
         <BaldosasCategorias
           id={ANCLA}
           titulo={global.tituloCategorias?.trim() || "Nuestras categorías de repuestos"}
-          categorias={tarjetasDeCategorias(categorias)}
+          categorias={tarjetasDeCategorias(categorias.filter(esCategoriaPrincipal))}
         />
       </ZonaAnimada>
 

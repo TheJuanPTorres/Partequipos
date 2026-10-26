@@ -47,11 +47,10 @@
 }
 
 /*
- * Con animación: la caja mide lo mismo que la imagen sola (455 px, sin pasar
- * del ancho disponible, y la proporción de la imagen por `aspect-ratio`), así
- * que cargar, animar o fallar no mueve nada (CLS 0). La animación se pinta en
- * una capa encima; mientras se anima, la imagen se vuelve transparente pero
- * sigue en el árbol de accesibilidad.
+ * Con animación: la caja reserva el hueco (455 px, sin pasar del ancho
+ * disponible, con la proporción de la animación por `aspect-ratio`), así que
+ * cargar o animar no mueve nada (CLS 0). La animación se pinta en una capa; la
+ * imagen fija solo aparece si la animación no carga (2026-10-26).
  */
 .caja {
   position: relative;
@@ -63,10 +62,6 @@
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.caja[data-animada] .imagenEnCaja {
-  opacity: 0;
 }
 
 .capaAnimacion {

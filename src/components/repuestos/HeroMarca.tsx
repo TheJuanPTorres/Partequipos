@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import reserva from "@/components/blog/cabeceraArticulo.module.css";
 import { LogoMarca } from "@/components/marca/LogoMarca";
@@ -53,6 +54,7 @@ export function HeroMarca({
   etiquetaRaton,
   migas,
   reservarTitulo = false,
+  accion,
 }: {
   vista: VistaEncabezado;
   anclaSiguiente: string;
@@ -79,6 +81,11 @@ export function HeroMarca({
    * Inter. Solo con `linea1` (la página de garantías, 2026-10-23).
    */
   reservarTitulo?: boolean;
+  /**
+   * Un botón bajo la presentación, visible al entrar («Ver catálogo» de la página general de
+   * lubricantes, petición del cliente, 2026-10-26).
+   */
+  accion?: ReactNode;
 }) {
   const { fondo, logo } = vista;
   const baja = bajo || (bajaSinFoto && !fondo);
@@ -180,6 +187,8 @@ export function HeroMarca({
               <span>{vista.descripcion}</span>
             </p>
           ) : null}
+
+          {accion ? <div className={estilos.accionHero}>{accion}</div> : null}
 
           <IconoRaton href={`#${anclaSiguiente}`} etiqueta={etiquetaRaton} />
         </div>

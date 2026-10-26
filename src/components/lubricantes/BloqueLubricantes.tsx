@@ -1,12 +1,10 @@
-import { IconArrowRight } from "@tabler/icons-react";
-import Link from "next/link";
-
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import estilosMarca from "@/components/repuestos/marca.module.css";
 import { configContactoMarca, type ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { VistaLubricantes } from "@/lib/lubricantes/general";
 
+import { BotonCatalogo } from "./BotonCatalogo";
 import estilos from "./general.module.css";
 
 /**
@@ -14,7 +12,7 @@ import estilos from "./general.module.css";
  * Andrés 809451): el FORMULARIO de solicitud (el nuestro, con «Ciudad» y
  * «¿Qué necesitas?»; sin n.º de documento, Ley 1581) y, al lado, el título, el
  * texto, el logo de la marca destacada (`LogoMarca`) y «Ver catálogo» a su
- * página. Los textos salen del panel.
+ * página (desde el 2026-10-26, botón principal bajo el título). Los textos salen del panel.
  *
  * También cierra la página de cada marca (Lubricantes ENI, plantilla 3946) y la de
  * cada una de sus líneas (plantilla 4039), con su propio formulario (`formulario`:
@@ -62,6 +60,17 @@ export function BloqueLubricantes({
           <h2 id={idTitulo} className={estilos.titulo}>
             {bloque.titulo}
           </h2>
+          {/*
+           * «Ver catálogo» justo bajo el título (petición del cliente, 2026-10-26: más
+           * protagonismo), como botón principal; antes, pequeño al final junto al logo.
+           */}
+          {bloque.marca?.href ? (
+            <BotonCatalogo
+              href={bloque.marca.href}
+              texto={bloque.textoBoton}
+              className={estilos.botonCatalogo}
+            />
+          ) : null}
           {bloque.parrafos.map((p, i) => (
             <p key={i} className={estilos.parrafo}>
               {p}
@@ -76,14 +85,6 @@ export function BloqueLubricantes({
                   sizes="115px"
                   className={estilos.logo}
                 />
-              ) : (
-                <span />
-              )}
-              {bloque.marca.href ? (
-                <Link href={bloque.marca.href} className={estilos.boton}>
-                  {bloque.textoBoton}
-                  <IconArrowRight aria-hidden="true" focusable="false" stroke={2} />
-                </Link>
               ) : null}
             </div>
           ) : null}

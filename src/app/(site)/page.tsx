@@ -142,6 +142,7 @@ export default async function HomePage() {
         textos={{
           antetitulo: tx(usada?.antetitulo),
           titulo: tx(usada?.titulo),
+          frase: tx(usada?.marcasTexto),
           descripcion: tx(usada?.descripcion),
           botonTexto: tx(usada?.botonTexto),
         }}

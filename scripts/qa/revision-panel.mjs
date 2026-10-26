@@ -26,7 +26,8 @@
  * - Modos (tercer argumento): `ficha` (aviso de más de 4 «Destacar»), `acceso`
  *   (la pantalla de acceso, §17–§19 de decisiones-panel.md), `avisos` (los
  *   avisos del panel, §22), `listas` (estados, fechas, miniaturas y ordenar,
- *   filtrar y buscar, §24) y `oscuro`, solo o detrás de otro modo
+ *   filtrar y buscar, §24), `orden` (las listas de tipos y equipos nuevos de Case por su
+ *   «Orden», #379) y `oscuro`, solo o detrás de otro modo
  *   («avisos oscuro»). Sin modo, la pasada normal en claro.
  * - No escribe nada en el panel: solo navega y lee. En modo `ficha` pulsa
  *   «Guardar» con 5 «Destacar» marcados, que la validación rechaza, y comprueba
@@ -437,6 +438,50 @@ try {
         };
       }
       hallazgos.push({ pantalla: "ordenar-filtrar-buscar", ancho: ancho.nombre, resultados });
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `orden` (2026-10-26, #379): las listas de tipos y de equipos nuevos de Case,
+     * ordenadas por la columna «Orden» (vacíos al final), con la columna a la vista. Solo lee.
+     */
+    if (MODO === "orden") {
+      const LISTAS = [
+        [
+          "orden-tipos-case",
+          "/admin/collections/tipos-maquinaria?sort=orden&where[marca.slug][equals]=case-construction",
+        ],
+        [
+          "orden-equipos-case",
+          "/admin/collections/equipos-nuevos?sort=orden&where[marca.slug][equals]=case-construction",
+        ],
+      ];
+      for (const [nombre, ruta] of LISTAS) {
+        await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(1500);
+        await pagina.screenshot({
+          path: path.join(salida, `${nombre}-${ancho.nombre}.png`),
+          fullPage: true,
+        });
+        const lista = await pagina.evaluate(() => {
+          const columnas = [...document.querySelectorAll("table thead th")].map((th) =>
+            th.textContent.trim(),
+          );
+          const iOrden = columnas.findIndex((c) => /^orden/i.test(c));
+          return {
+            columnas,
+            filas: [...document.querySelectorAll("table tbody tr")].slice(0, 8).map((tr) => ({
+              nombre: tr.querySelector("td:nth-child(2)")?.textContent?.trim().slice(0, 50),
+              orden: iOrden >= 0 ? tr.children[iOrden]?.textContent?.trim() : null,
+            })),
+          };
+        });
+        hallazgos.push({ pantalla: nombre, ancho: ancho.nombre, ...lista });
+        decir(`✓ ${nombre} (${ancho.nombre})`);
+      }
       hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
       hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
       await contexto.close();

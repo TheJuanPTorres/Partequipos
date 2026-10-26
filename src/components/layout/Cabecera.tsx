@@ -12,33 +12,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 import {
+  Fragment,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
   type FormEvent,
   type KeyboardEvent,
   type MouseEvent,
 } from "react";
 
-import {
-  dentroDelPasillo,
-  ESPERA_PASILLO_MS,
-  FLUIDEZ_MEGAMENU,
-  RETRASO_ABRIR_MS,
-  RETRASO_CERRAR_MS,
-  RETRASO_CERRAR_SIN_M1_MS,
-  type Punto,
-} from "@/lib/cabecera/fluidez";
 import { inicioDelPanel, modoCabecera } from "@/lib/cabecera/modo";
-import { activasDe, PARAMETRO_ANIMACIONES } from "@/lib/listado/animaciones";
 import { claveDeEnlace, type PanelMenu } from "@/lib/megamenu";
 import type { ImagenLogo } from "@/lib/seo/logo";
 
 import estilos from "./cabecera.module.css";
-import { GrupoHermanos, MarcoMegamenu, Megamenu, MejorasMenu, SubmenuMovil } from "./Megamenu";
+import { Megamenu, SubmenuMovil } from "./Megamenu";
 
 /**
  * CABECERA DEL SITIO (ux-9, export 2629 = plantilla 2162). Valores en `cabecera.module.css`.
@@ -83,12 +72,10 @@ type Props = {
   nombreSitio: string;
   /** Paneles del megamenú por clave de enlace (`getMegamenu`). */
   paneles: Readonly<Record<string, PanelMenu>>;
-  /** En un preview, las mejoras de fluidez (M1–M4) se recortan con `?anim=`; en el sitio publicado, no. */
-  permitirUrl: boolean;
 };
 
-const sinSuscripcion = () => () => {};
-const parametroDeLaUrl = () => new URL(location.href).searchParams.get(PARAMETRO_ANIMACIONES);
+/** Margen para cruzar del botón al panel con el ratón sin que se cierre. */
+const RETARDO_CIERRE = 200;
 
 /** Id del panel de una clave de enlace: `/maquinaria-pesada/` → `mega-maquinariapesada`. */
 const idPanel = (clave: string) => `mega-${clave.replace(/[^a-z0-9]+/gi, "")}`;
@@ -127,15 +114,7 @@ function Logo({
   );
 }
 
-export function Cabecera({
-  enlaces,
-  contacto,
-  whatsapp,
-  logo,
-  nombreSitio,
-  paneles,
-  permitirUrl,
-}: Props) {
+export function Cabecera({ enlaces, contacto, whatsapp, logo, nombreSitio, paneles }: Props) {
   const esPortada = useSelectedLayoutSegment() === null;
   const ruta = usePathname();
   const [arriba, setArriba] = useState(true);
@@ -162,29 +141,6 @@ export function Cabecera({
   const disparadores = useRef<Record<string, HTMLButtonElement | null>>({});
   const paneMega = useRef<Record<string, HTMLElement | null>>({});
   const temporizador = useRef<number | undefined>(undefined);
-  // El último panel abierto: se sigue viendo mientras el marco se cierra.
-  const [ultimo, setUltimo] = useState<string | null>(null);
-  // Fluidez (`lib/cabecera/fluidez.ts`): las mejoras encendidas, recortadas con `?anim=` en un preview.
-  const parametro = useSyncExternalStore(sinSuscripcion, parametroDeLaUrl, () => null);
-  const claveMejoras = activasDe(FLUIDEZ_MEGAMENU, parametro, permitirUrl).join(" ");
-  const mejoras = useMemo(
-    () =>
-      new Set(claveMejoras.split(" ").filter(Boolean)) as ReadonlySet<
-        keyof typeof FLUIDEZ_MEGAMENU
-      >,
-    [claveMejoras],
-  );
-  const mejorasRef = useRef(mejoras);
-  useEffect(() => {
-    mejorasRef.current = mejoras;
-  }, [mejoras]);
-  // M2: el botón bajo el puntero, las últimas posiciones del puntero y el marco (su caja).
-  const encima = useRef<string | null>(null);
-  const rastro = useRef<Punto[]>([]);
-  const marcoRef = useRef<HTMLDivElement | null>(null);
-  const abiertaRef = useRef<string | null>(null);
-  // El panel abierto con el teclado: su primer enlace recibe el foco en cuanto se ve.
-  const enfocarAlAbrir = useRef<string | null>(null);
 
   useEffect(() => {
     const alDesplazar = () => setArriba(window.scrollY < UMBRAL_VELO);
@@ -256,75 +212,19 @@ export function Cabecera({
 
   useEffect(() => () => window.clearTimeout(temporizador.current), []);
 
-  useEffect(() => {
-    abiertaRef.current = megaAbierto;
-  }, [megaAbierto]);
-
-  /** Abre un panel y lo recuerda: se sigue viendo mientras el marco se cierra. */
-  const mostrarMega = useCallback(
-    (clave: string) => {
-      setMega({ clave, ruta });
-      setUltimo(clave);
-    },
-    [ruta],
-  );
-
-  // M2: el rastro del puntero mientras hay un panel abierto (las 4 últimas posiciones).
-  useEffect(() => {
-    if (!megaAbierto || !mejoras.has("M2")) return;
-    const mover = (e: PointerEvent) => {
-      rastro.current = [...rastro.current.slice(-3), { x: e.clientX, y: e.clientY }];
-    };
-    document.addEventListener("pointermove", mover, { passive: true });
-    return () => {
-      document.removeEventListener("pointermove", mover);
-      rastro.current = [];
-    };
-  }, [megaAbierto, mejoras]);
-
-  /** M2: ¿el puntero va hacia el panel abierto? */
-  const vaAlPanel = () => {
-    const caja = marcoRef.current
-      ?.querySelector("nav[data-estado='activo']")
-      ?.getBoundingClientRect();
-    const puntos = rastro.current;
-    if (!caja || puntos.length < 2) return false;
-    return dentroDelPasillo(puntos[0] as Punto, puntos[puntos.length - 1] as Punto, caja);
-  };
-
   // Estables (no cambian al abrir el buscador ni al hacer scroll): así los paneles del
   // megamenú, que son memoizados, no se vuelven a pintar con cada cambio de la cabecera.
   const abrirMega = useCallback(
     (clave: string) => {
       window.clearTimeout(temporizador.current);
-      const m = mejorasRef.current;
-      const abierta = abiertaRef.current;
-      // El que ya está abierto (el puntero vuelve a su botón o entra en el panel): se queda.
-      if (abierta === clave) return;
-      const abrir = () => mostrarMega(clave);
-      // M2: hay otro abierto y el puntero baja hacia él: se espera; si sigue en este botón, cambia.
-      if (abierta && m.has("M2") && vaAlPanel()) {
-        temporizador.current = window.setTimeout(() => {
-          if (encima.current === clave) abrir();
-        }, ESPERA_PASILLO_MS);
-        return;
-      }
-      // M1: se espera un poco, por si solo pasaba por encima.
-      if (m.has("M1")) {
-        temporizador.current = window.setTimeout(abrir, RETRASO_ABRIR_MS);
-        return;
-      }
-      abrir();
+      setMega({ clave, ruta });
     },
-    [mostrarMega],
+    [ruta],
   );
 
   const cerrarMegaLuego = useCallback(() => {
     window.clearTimeout(temporizador.current);
-    // Sin panel abierto no hay nada que cerrar (y el que iba a abrirse por M1 ya no se abre).
-    if (!abiertaRef.current) return;
-    const espera = mejorasRef.current.has("M1") ? RETRASO_CERRAR_MS : RETRASO_CERRAR_SIN_M1_MS;
-    temporizador.current = window.setTimeout(() => setMega(null), espera);
+    temporizador.current = window.setTimeout(() => setMega(null), RETARDO_CIERRE);
   }, []);
 
   const cerrarMega = useCallback((clave: string | null, foco: "boton" | "siguiente" | null) => {
@@ -357,36 +257,11 @@ export function Cabecera({
       setMega(null);
       return;
     }
-    // Un clic o una tecla abren AL INSTANTE: los retrasos (M1, M2) son solo para el ratón que pasa.
-    window.clearTimeout(temporizador.current);
-    mostrarMega(clave);
-    // Con el teclado, el foco entra en el panel cuando ya se ve (efecto de abajo).
-    if (conTeclado) enfocarAlAbrir.current = clave;
+    abrirMega(clave);
+    if (conTeclado) {
+      window.setTimeout(() => paneMega.current[clave]?.querySelector<HTMLElement>("a")?.focus(), 0);
+    }
   };
-
-  /*
-   * El foco entra en el panel abierto con el teclado EN CUANTO SE VE. Antes, con un
-   * `setTimeout(0)`, el panel aún estaba oculto y el foco se quedaba en el botón
-   * (medido con «reducir movimiento», 2026-10-26; ya pasaba en el sitio publicado):
-   * con esa preferencia, una regla global da a todo una transición de 0,01 ms y los
-   * hijos del marco heredan `visibility: hidden` un fotograma más. Se reintenta en
-   * cada fotograma, como mucho 10, hasta que el enlace acepta el foco.
-   */
-  useEffect(() => {
-    if (!megaAbierto || enfocarAlAbrir.current !== megaAbierto) return;
-    enfocarAlAbrir.current = null;
-    let intentos = 0;
-    let id = 0;
-    const intentar = () => {
-      const enlace = paneMega.current[megaAbierto]?.querySelector<HTMLElement>("a");
-      if (!enlace) return;
-      enlace.focus();
-      if (document.activeElement !== enlace && intentos++ < 10)
-        id = requestAnimationFrame(intentar);
-    };
-    id = requestAnimationFrame(intentar);
-    return () => cancelAnimationFrame(id);
-  }, [megaAbierto]);
 
   const alTeclado = (e: KeyboardEvent<HTMLElement>) => {
     if (e.key !== "Escape") return;
@@ -446,17 +321,7 @@ export function Cabecera({
           );
         }
         return (
-          <li
-            key={e.href}
-            onMouseEnter={() => {
-              encima.current = clave;
-              abrirMega(clave);
-            }}
-            onMouseLeave={() => {
-              if (encima.current === clave) encima.current = null;
-              cerrarMegaLuego();
-            }}
-          >
+          <li key={e.href} onMouseEnter={() => abrirMega(clave)} onMouseLeave={cerrarMegaLuego}>
             <button
               ref={(el) => {
                 disparadores.current[clave] = el;
@@ -498,11 +363,8 @@ export function Cabecera({
     </form>
   );
 
-  const conPanel = enlaces.filter((e) => paneles[claveDeEnlace(e.href)]);
-  const visible = megaAbierto ?? ultimo;
-
   return (
-    <MejorasMenu.Provider value={mejoras}>
+    <Fragment>
       <header
         ref={cabecera}
         className={estilos.cabecera}
@@ -601,46 +463,32 @@ export function Cabecera({
         </div>
 
         <div ref={panel} id="menu-movil" className={estilos.panel} hidden={!abierto}>
-          <nav aria-label="Menú">
-            <GrupoHermanos>{listaEnlaces}</GrupoHermanos>
-          </nav>
+          <nav aria-label="Menú">{listaEnlaces}</nav>
           {botonContacto}
         </div>
       </header>
 
-      {/*
-       * Fuera de la cabecera: su `clip-path` recortaría el panel (§26). UN marco para
-       * todos los paneles (2026-10-25): nunca hay dos a la vez.
-       */}
-      {conPanel.length > 0 ? (
-        <div ref={marcoRef}>
-          <MarcoMegamenu
-            activo={visible}
-            abierto={megaAbierto !== null}
+      {/* Fuera de la cabecera: su `clip-path` recortaría el panel (§26). */}
+      {enlaces.flatMap((e) => {
+        const clave = claveDeEnlace(e.href);
+        const datos = paneles[clave];
+        if (!datos) return [];
+        return [
+          <Megamenu
+            key={clave}
+            ref={refDelPanel(clave)}
+            clave={clave}
+            id={idPanel(clave)}
+            etiqueta={e.etiqueta}
+            panel={datos}
+            abierto={megaAbierto === clave}
             arriba={inicioDelPanel(alto, !arriba)}
-          >
-            {(estado) =>
-              conPanel.map((e) => {
-                const clave = claveDeEnlace(e.href);
-                return (
-                  <Megamenu
-                    key={clave}
-                    ref={refDelPanel(clave)}
-                    clave={clave}
-                    id={idPanel(clave)}
-                    etiqueta={e.etiqueta}
-                    panel={paneles[clave] as PanelMenu}
-                    estado={estado(clave)}
-                    alCerrar={cerrarMega}
-                    alEntrar={abrirMega}
-                    alSalir={cerrarMegaLuego}
-                  />
-                );
-              })
-            }
-          </MarcoMegamenu>
-        </div>
-      ) : null}
-    </MejorasMenu.Provider>
+            alCerrar={cerrarMega}
+            alEntrar={abrirMega}
+            alSalir={cerrarMegaLuego}
+          />,
+        ];
+      })}
+    </Fragment>
   );
 }

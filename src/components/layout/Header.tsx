@@ -28,8 +28,6 @@ export async function Header() {
       logo={logo.sitio}
       nombreSitio={seoConfig.siteName}
       paneles={paneles}
-      // Las mejoras del megamenú (M1–M4) se prueban con `?anim=` solo fuera del sitio publicado.
-      permitirUrl={process.env.VERCEL_ENV !== "production"}
     />
   );
 }

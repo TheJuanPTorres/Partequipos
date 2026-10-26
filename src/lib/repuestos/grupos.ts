@@ -7,12 +7,15 @@ import { imagenDeMedia, type ImagenLista } from "../utils/relations";
  * productos que el editor carga en la categoría, como en WordPress. Lógica pura
  * de la página de categoría.
  *
- * Un grupo con «Mostrar en la web» desmarcado, sin nombre o sin ningún producto no se pinta (no deja una tarjeta
- * vacía), y una foto sin dimensiones tampoco: la tarjeta sale sin foto, sin hueco.
+ * Un grupo con «Mostrar en la web» desmarcado, sin nombre o sin productos NI descripción no se
+ * pinta (no deja una tarjeta vacía), y una foto sin dimensiones tampoco: la tarjeta sale sin
+ * foto, sin hueco. La descripción (2026-10-26, Filtros Donaldson) basta para que salga.
  */
 export type GrupoVista = {
   id: string;
   nombre: string;
+  /** Para qué sirve el grupo (opcional), bajo su nombre. */
+  descripcion: string | null;
   imagen: ImagenLista | null;
   productos: string[];
 };
@@ -22,10 +25,12 @@ export function gruposDeCategoria(categoria: CategoriasTecnica): GrupoVista[] {
   (categoria.grupos ?? []).forEach((g, i) => {
     const nombre = g.nombre?.trim() ?? "";
     const productos = (g.productos ?? []).map((p) => p.texto?.trim() ?? "").filter(Boolean);
-    if (g.mostrar === false || !nombre || productos.length === 0) return;
+    const descripcion = g.descripcion?.trim() || null;
+    if (g.mostrar === false || !nombre || (productos.length === 0 && !descripcion)) return;
     grupos.push({
       id: g.id ?? `grupo-${i}`,
       nombre,
+      descripcion,
       imagen: imagenDeMedia(g.imagen, `${nombre} para maquinaria pesada`),
       productos,
     });

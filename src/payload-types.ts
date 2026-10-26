@@ -802,6 +802,22 @@ export interface CategoriasTecnica {
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
+  /**
+   * Solo para una página dentro de otra categoría (p. ej. «Filtros Donaldson» dentro de «Filtración»). Su dirección web es la de esa categoría seguida de la suya, y sale bajo ella en el menú y en su página, no en el índice. Vacío: una categoría normal.
+   */
+  padre?: (number | null) | CategoriasTecnica;
+  /**
+   * Opcional, para una página de MARCA dentro de una categoría (p. ej. Donaldson): va en la cabecera de su página y en su acceso desde la categoría.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Opcional: el símbolo de la marca SIN su nombre, para el botón del menú (ahí el nombre va escrito al lado). Vacío, el botón lleva solo el nombre.
+   */
+  iconoMarca?: (number | null) | Media;
+  /**
+   * Opcional, con el logo: el color del botón de esta página en el menú y de su acceso desde la categoría. El texto se pone solo en blanco o negro, el que mejor se lea.
+   */
+  colorMarca?: string | null;
   descripcion?: string | null;
   /**
    * La de su tarjeta en la portada, el menú, el índice de categorías técnicas y las páginas de tipo. También la cabecera de su página si no tiene «Fondo del encabezado».
@@ -844,6 +860,10 @@ export interface CategoriasTecnica {
          */
         mostrar?: boolean | null;
         imagen?: (number | null) | Media;
+        /**
+         * Opcional. Una o dos frases bajo el nombre, en su tarjeta (p. ej. para qué sirve ese tipo de filtro). Un grupo con descripción sale aunque no tenga productos.
+         */
+        descripcion?: string | null;
         productos?:
           | {
               texto: string;
@@ -2495,6 +2515,10 @@ export interface TiposEquipoSelect<T extends boolean = true> {
 export interface CategoriasTecnicasSelect<T extends boolean = true> {
   nombre?: T;
   slug?: T;
+  padre?: T;
+  logo?: T;
+  iconoMarca?: T;
+  colorMarca?: T;
   descripcion?: T;
   imagen?: T;
   fondoHero?: T;
@@ -2509,6 +2533,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
         nombre?: T;
         mostrar?: T;
         imagen?: T;
+        descripcion?: T;
         productos?:
           | T
           | {

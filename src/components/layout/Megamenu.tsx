@@ -159,8 +159,9 @@ function Tarjetas({ tarjetas, alElegir }: { tarjetas: TarjetaMenu[]; alElegir: (
   if (tarjetas.length === 0) return null;
   return (
     <ul className={estilos.tarjetas}>
-      {tarjetas.map((t) => (
-        <li key={t.href} className={estilos.tarjetaCaja}>
+      {tarjetas.map((t) => {
+        const accesos = t.accesos ?? [];
+        const baldosa = (
           <Link href={t.href} className={estilos.tarjeta} onClick={alElegir}>
             <span className={estilos.tarjetaFoto}>
               {t.imagen ? (
@@ -176,8 +177,48 @@ function Tarjetas({ tarjetas, alElegir }: { tarjetas: TarjetaMenu[]; alElegir: (
             </span>
             <span className={estilos.tarjetaNombre}>{t.etiqueta}</span>
           </Link>
-        </li>
-      ))}
+        );
+        return (
+          <li key={t.href} className={estilos.tarjetaCaja}>
+            {accesos.length === 0 ? (
+              baldosa
+            ) : (
+              /*
+               * Las páginas que cuelgan de esta categoría (Filtros Donaldson bajo Filtración,
+               * 2026-10-26): un botón DENTRO de la baldosa, bajo su nombre, con el icono y el
+               * nombre de la marca. La foto cede su alto, así la baldosa mide lo mismo que las
+               * demás. Dos enlaces hermanos (no uno dentro de otro): teclado y lectores, como el
+               * resto del menú.
+               */
+              <div className={estilos.tarjetaMarco}>
+                {baldosa}
+                {accesos.map((a) => (
+                  <Link
+                    key={a.href}
+                    href={a.href}
+                    className={estilos.acceso}
+                    style={{ "--acceso-color": a.color } as CSSProperties}
+                    onClick={alElegir}
+                  >
+                    {a.icono ? (
+                      <Image
+                        src={a.icono.url}
+                        width={a.icono.width}
+                        height={a.icono.height}
+                        alt=""
+                        sizes="24px"
+                        loading="lazy"
+                        className={estilos.accesoIcono}
+                      />
+                    ) : null}
+                    <span className={estilos.accesoNombre}>{a.etiqueta}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }

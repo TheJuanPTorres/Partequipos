@@ -1,6 +1,7 @@
 import { REDIRECTS_FIJOS } from "../redirects/fijos";
 import { rutas, SLUGS_CON_RUTA_PROPIA } from "../routes";
 import { absoluteUrl } from "./config";
+import { rutaDeCategoriaTecnica } from "../repuestos/subcategorias";
 
 /** Entrada de sitemap con los campos que usa Next (`MetadataRoute.Sitemap`). */
 export type SitemapEntry = {
@@ -18,7 +19,10 @@ type ModeloLike = ConSlug & { marcaSlug: string; tipoSlug: string };
 export type SitemapInput = {
   marcas: ConSlug[];
   /** Categorías técnicas de repuestos: índice y una página por categoría. */
-  categoriasRepuestos: ConSlug[];
+  /** Con `padre` las que cuelgan de otra categoría (Filtros Donaldson): su dirección completa. */
+  categoriasRepuestos: (ConSlug & {
+    padre?: number | { id: number; slug?: string | null } | null;
+  })[];
   tipos: TipoLike[];
   modelos: ModeloLike[];
   /** Páginas institucionales. El slug `inicio` corresponde a la portada `/`. */
@@ -65,6 +69,8 @@ export const PATRONES_SITEMAP = [
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas",
   "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada",
   "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/[categoria]",
+  // Páginas dentro de una categoría técnica (Filtros Donaldson, 2026-10-26).
+  "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/[categoria]/[subcategoria]",
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]",
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]",
   "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/[marca]/[tipo]/[modelo]",
@@ -228,9 +234,13 @@ export function buildSitemapEntries(
     },
   );
 
+  // También las páginas que cuelgan de una categoría (Filtros Donaldson, 2026-10-26), en su
+  // dirección completa; sin la categoría de la que cuelgan, no salen (sin enlace roto).
   for (const categoria of categoriasRepuestos) {
+    const ruta = rutaDeCategoriaTecnica(categoria);
+    if (!ruta) continue;
     entradas.push({
-      url: absoluteUrl(rutas.categoriaRepuestos(categoria.slug)),
+      url: absoluteUrl(ruta),
       lastModified: fecha(categoria.updatedAt, ahora),
       changeFrequency: "weekly",
       priority: 0.8,

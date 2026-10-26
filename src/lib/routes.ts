@@ -81,6 +81,9 @@ export const rutas = {
   categoriasRepuestos: () => `/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}`,
   categoriaRepuestos: (slug: string) =>
     `/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/${slug}`,
+  /** Una página DENTRO de una categoría técnica (Filtros Donaldson en Filtración, 2026-10-26). */
+  subcategoriaRepuestos: (categoriaSlug: string, slug: string) =>
+    `/${SEGMENTO_REPUESTOS}/${SEGMENTO_CATEGORIAS_REPUESTOS}/${categoriaSlug}/${slug}`,
   marca: (marcaSlug: string) => `/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/${marcaSlug}`,
   tipo: (marcaSlug: string, tipoSlug: string) =>
     `/${SEGMENTO_REPUESTOS}/${SEGMENTO_MARCAS}/${marcaSlug}/${tipoSlug}`,

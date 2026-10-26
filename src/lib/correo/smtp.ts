@@ -69,11 +69,19 @@ export function modoCorreo(env: Entorno = process.env): ModoCorreo {
 }
 
 /**
- * A quién avisar. En producción, sin destino propio, el correo de contacto de
- * la empresa. Fuera de producción, SOLO el destino explícito: `null` = no
- * enviar.
+ * A quién avisar. En producción: el «Correo para solicitudes» del panel (global
+ * «Correo y formularios»), si no `SOLICITUDES_EMAIL_TO` y, si tampoco, el correo
+ * de contacto de la empresa. Fuera de producción, SOLO `SOLICITUDES_EMAIL_TO`
+ * (el buzón de pruebas): la base del preview es un clon de la de producción y
+ * el correo del panel sería el real. `null` = no enviar.
  */
-export function destinoAvisos(correoEmpresa: string, env: Entorno = process.env): string | null {
+export function destinoAvisos(
+  correoEmpresa: string,
+  env: Entorno = process.env,
+  correoDelPanel?: string | null,
+): string | null {
+  const delPanel = correoDelPanel?.trim() ?? "";
+  if (env.VERCEL_ENV === "production" && delPanel) return delPanel;
   const propio = leer(env, "SOLICITUDES_EMAIL_TO");
   if (propio) return propio;
   return env.VERCEL_ENV === "production" ? correoEmpresa || null : null;

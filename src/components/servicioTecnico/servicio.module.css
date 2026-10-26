@@ -32,10 +32,9 @@ video.medio {
   position: absolute;
   inset: 0;
 }
-/* Abajo a la izquierda: a la derecha lo taparía el botón de WhatsApp. */
 .pausa {
   position: absolute;
-  left: 20px;
+  right: 20px;
   bottom: 20px;
   z-index: 3;
 }

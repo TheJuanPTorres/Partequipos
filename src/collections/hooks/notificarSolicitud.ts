@@ -25,11 +25,18 @@ export const notificarSolicitud: CollectionAfterChangeHook = async ({
   // La hoja de vida («Enviar HV») avisa ella misma, con el PDF adjunto: aquí no se repite.
   if (context.sinAviso) return doc;
 
-  // Sin destino propio, en producción, el correo de contacto de la empresa
-  // (global `seo`, con respaldo en `seoConfig`). Fuera de producción, solo el
-  // destino explícito: un preview no escribe al cliente (§10.21).
-  const seo = await req.payload.findGlobal({ slug: "seo", depth: 0, req });
-  const destino = destinoAvisos(datosEmpresa(seo.empresa).correo);
+  // En producción, el «Correo para solicitudes» del panel («Correo y formularios») y, vacío,
+  // el correo de contacto de la empresa (global `seo`, con respaldo en `seoConfig`). Fuera de
+  // producción, solo el destino explícito: un preview no escribe al cliente (§10.21).
+  const [seo, correoFormularios] = await Promise.all([
+    req.payload.findGlobal({ slug: "seo", depth: 0, req }),
+    req.payload.findGlobal({ slug: "correo-formularios", depth: 0, req }),
+  ]);
+  const destino = destinoAvisos(
+    datosEmpresa(seo.empresa).correo,
+    process.env,
+    correoFormularios.correoSolicitudes,
+  );
 
   /*
    * Sin SMTP o sin destino no hay envío. Se comprueba de forma explícita en vez

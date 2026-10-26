@@ -45,6 +45,9 @@ import { default as default_0fd5939e7377923b57680e833dbb83a0 } from '../../../co
 import { default as default_5e454bdf69bfb354952f5c8e3b0d94e6 } from '../../../components/admin/aviso/AvisoRedirecciones'
 import { default as default_26ab6d6832a1a0f01610473a5c49ccf3 } from '../../../components/admin/celdas/CeldaDestino'
 import { default as default_2f5078d45d23f67b4dc8ace54c1bd9c9 } from '../../../components/admin/aviso/AvisoBuscadores'
+import { default as default_3ca9d3a75dd33d68037bdb3d2a6d2387 } from '../../../components/admin/aviso/AvisoCorreoHojasDeVida'
+import { default as default_1ab4a54a9fa0b36805f90f61950f69d3 } from '../../../components/admin/correo/EstadoSmtp'
+import { default as default_2f74b216bdaff3354c93592e0c5fa496 } from '../../../components/admin/correo/PruebaCorreo'
 import { default as default_965175d01b56876a09418037afb35340 } from '../../../components/admin/Nav'
 import { default as default_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { default as default_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
@@ -103,6 +106,9 @@ export const importMap = {
   "/components/admin/aviso/AvisoRedirecciones#default": default_5e454bdf69bfb354952f5c8e3b0d94e6,
   "/components/admin/celdas/CeldaDestino#default": default_26ab6d6832a1a0f01610473a5c49ccf3,
   "/components/admin/aviso/AvisoBuscadores#default": default_2f5078d45d23f67b4dc8ace54c1bd9c9,
+  "/components/admin/aviso/AvisoCorreoHojasDeVida#default": default_3ca9d3a75dd33d68037bdb3d2a6d2387,
+  "/components/admin/correo/EstadoSmtp#default": default_1ab4a54a9fa0b36805f90f61950f69d3,
+  "/components/admin/correo/PruebaCorreo#default": default_2f74b216bdaff3354c93592e0c5fa496,
   "/components/admin/Nav#default": default_965175d01b56876a09418037afb35340,
   "/components/admin/Icon#default": default_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#default": default_91a09b539d3c86b0aebf520e7564ce08,

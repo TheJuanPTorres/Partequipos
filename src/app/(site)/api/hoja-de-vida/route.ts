@@ -5,7 +5,6 @@ import { getPayload } from "payload";
 import { modoCorreo } from "@/lib/correo/smtp";
 import { destinoHojasDeVida } from "@/lib/hojaDeVida/destino";
 import { procesarHojaDeVida } from "@/lib/hojaDeVida/procesar";
-import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
 import { datosEmpresa } from "@/lib/seo/empresa";
 import { verificarTurnstile } from "@/lib/turnstile";
 
@@ -42,11 +41,16 @@ export async function POST(peticion: Request) {
     ip,
     verificar: verificarTurnstile,
     destino: async () => {
-      const [indice, payload] = await Promise.all([getPaginasIndice(), getPayload({ config })]);
-      const seo = await payload.findGlobal({ slug: "seo", depth: 0 });
+      const payload = await getPayload({ config });
+      const [seo, correo] = await Promise.all([
+        payload.findGlobal({ slug: "seo", depth: 0 }),
+        payload.findGlobal({ slug: "correo-formularios", depth: 0 }),
+      ]);
       return destinoHojasDeVida(
-        indice.trabaja?.correoHojasDeVida,
+        correo.correoHojasDeVida,
         datosEmpresa(seo.empresa).correo,
+        process.env,
+        correo.correoSolicitudes,
       );
     },
     enviarCorreo: async (correo) => {

@@ -99,15 +99,21 @@ export function ordenar<T>(items: readonly T[], catalogo: Catalogo<T>, seleccion
   return [...items].sort(orden.comparar);
 }
 
-/** Una página de una lista ya filtrada y ordenada. */
+/**
+ * Una página de una lista ya filtrada y ordenada. `primeraPagina` (por defecto, `porPagina`) es lo
+ * que cabe en la página 1 cuando es distinto (el índice del blog: el destacado y tres filas de tres
+ * son 10); la página 2 empieza justo donde acaba la 1, sin repetir ni saltarse ninguno.
+ */
 export function paginar<T>(
   items: readonly T[],
   pagina: number,
   porPagina: number,
+  primeraPagina: number = porPagina,
 ): { elementos: T[]; total: number; paginas: number } {
   const total = items.length;
-  const paginas = Math.max(1, Math.ceil(total / porPagina));
-  const inicio = (pagina - 1) * porPagina;
+  const paginas = total <= primeraPagina ? 1 : 1 + Math.ceil((total - primeraPagina) / porPagina);
+  if (pagina <= 1) return { elementos: items.slice(0, primeraPagina), total, paginas };
+  const inicio = primeraPagina + (pagina - 2) * porPagina;
   return { elementos: items.slice(inicio, inicio + porPagina), total, paginas };
 }
 

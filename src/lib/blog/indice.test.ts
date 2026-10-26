@@ -10,6 +10,7 @@ import {
   minutosDeLectura,
   normalizar,
   POR_PAGINA_BLOG,
+  PRIMERA_PAGINA_BLOG_CON_DESTACADO,
   type ArticuloLista,
 } from "./indice";
 import {
@@ -144,6 +145,69 @@ describe("listado del blog con el módulo común de filtros", () => {
       expect(r.elementos).toHaveLength(9);
       expect(r.paginas).toBe(3);
       expect(r.filtrado).toBe(false);
+    }
+  });
+
+  it("con el destacado, la página 1 lleva 10 y las demás 9, sin repetir ni saltar (53 artículos)", () => {
+    const cincuentaYTres = Array.from({ length: 53 }, (_, i) => articulo(i + 1));
+    const pagina = (n: number) =>
+      resolverListado({
+        items: cincuentaYTres,
+        parametros: {},
+        catalogo: CATALOGO_BLOG,
+        pagina: n,
+        porPagina: POR_PAGINA_BLOG,
+        primeraPagina: PRIMERA_PAGINA_BLOG_CON_DESTACADO,
+        ruta: "/noticias/",
+      });
+    const vistos: number[] = [];
+    const tamanos: number[] = [];
+    for (let n = 1; n <= 6; n++) {
+      const r = pagina(n);
+      assert.equal(r.tipo, "listado");
+      if (r.tipo !== "listado") return;
+      assert.equal(r.paginas, 6);
+      tamanos.push(r.elementos.length);
+      vistos.push(...r.elementos.map((a) => a.id));
+    }
+    expect(tamanos).toEqual([10, 9, 9, 9, 9, 7]);
+    // El orden del listado (lo más reciente primero), de una sola vez: las páginas lo siguen tal cual.
+    const entero = resolverListado({
+      items: cincuentaYTres,
+      parametros: {},
+      catalogo: CATALOGO_BLOG,
+      pagina: 1,
+      porPagina: 100,
+      ruta: "/noticias/",
+    });
+    assert.equal(entero.tipo, "listado");
+    if (entero.tipo === "listado") expect(vistos).toEqual(entero.elementos.map((a) => a.id));
+    expect(new Set(vistos).size).toBe(53);
+    expect(pagina(7).tipo).toBe("no-existe");
+  });
+
+  it("sin destacado (búsqueda, categoría o N1 apagada) son 9 en todas", () => {
+    const cincuentaYTres = Array.from({ length: 53 }, (_, i) => articulo(i + 1));
+    const pagina = (n: number) =>
+      resolverListado({
+        items: cincuentaYTres,
+        parametros: {},
+        catalogo: CATALOGO_BLOG,
+        pagina: n,
+        porPagina: POR_PAGINA_BLOG,
+        primeraPagina: () => POR_PAGINA_BLOG,
+        ruta: "/noticias/",
+      });
+    const uno = pagina(1);
+    const dos = pagina(2);
+    assert.equal(uno.tipo, "listado");
+    assert.equal(dos.tipo, "listado");
+    if (uno.tipo === "listado" && dos.tipo === "listado") {
+      expect(uno.elementos).toHaveLength(9);
+      expect(dos.paginas).toBe(6);
+      expect(dos.elementos).toHaveLength(9);
+      // La 2 empieza justo después de la 1.
+      expect(new Set([...uno.elementos, ...dos.elementos].map((a) => a.id)).size).toBe(18);
     }
   });
 

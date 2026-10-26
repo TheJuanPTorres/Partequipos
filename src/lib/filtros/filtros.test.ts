@@ -238,6 +238,15 @@ describe("ordenar y paginar", () => {
   it("pagina y nunca da menos de 1 página", () => {
     assert.deepEqual(paginar([1, 2, 3, 4, 5], 2, 2), { elementos: [3, 4], total: 5, paginas: 3 });
     assert.deepEqual(paginar([], 1, 24), { elementos: [], total: 0, paginas: 1 });
+    // Con la primera página distinta: la 2 sigue donde acaba la 1, sin repetir ni saltar.
+    assert.deepEqual(paginar([1, 2, 3, 4, 5, 6, 7], 1, 2, 3), {
+      elementos: [1, 2, 3],
+      total: 7,
+      paginas: 3,
+    });
+    assert.deepEqual(paginar([1, 2, 3, 4, 5, 6, 7], 2, 2, 3).elementos, [4, 5]);
+    assert.deepEqual(paginar([1, 2, 3, 4, 5, 6, 7], 3, 2, 3).elementos, [6, 7]);
+    assert.equal(paginar([1, 2, 3], 1, 2, 3).paginas, 1);
   });
 });
 

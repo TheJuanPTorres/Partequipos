@@ -316,6 +316,34 @@
   animation-play-state: paused;
 }
 
+/*
+ * Fuera del bucle (`modoDeCinta`): QUIETA y centrada, sin animación ni máscara de bordes, o A
+ * MANO, que se desliza con el dedo o la rueda. El espacio se reparte a ambos lados de cada tarjeta
+ * para que el conjunto quede centrado de verdad.
+ */
+.cintaQuieta {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.cintaQuieta .pista {
+  width: 100%;
+  justify-content: center;
+  animation: none;
+}
+
+.cintaQuieta .cintaItem {
+  padding: 0 6px;
+}
+
+.cintaManual {
+  overflow-x: auto;
+}
+
+.cintaManual .pista {
+  animation: none;
+}
+
 @keyframes cintaBucle {
   to {
     transform: translateX(-50%);

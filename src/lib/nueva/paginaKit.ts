@@ -69,6 +69,33 @@ export type SeccionKit = SeccionDeTipo & {
 /** Cuántos tipos hacen falta como mínimo para que la cinta llene el ancho (la lista se repite). */
 export const MIN_TARJETAS_CINTA = 7;
 
+/** Ancho de una tarjeta de la cinta, con su separación (17 rem; `.cintaItem` del CSS). */
+export const REM_TARJETA_CINTA = 17;
+
+/** Con menos tipos que estos no hay bucle que valga: la cinta se desplaza a mano. */
+export const MIN_TIPOS_BUCLE = 3;
+
+export type ModoCinta = "quieta" | "manual" | "bucle";
+
+/**
+ * Cómo va la cinta de tipos según el ancho (Juan Pablo, 2026-10-26; regla automática, no por
+ * marca): si los tipos NO llenan el ancho disponible, QUIETA y centrada (sin copias ni
+ * animación); si lo llenan con pocos tipos (menos de {@link MIN_TIPOS_BUCLE}), un bucle repetiría
+ * las mismas tarjetas, así que se desliza A MANO; si lo llenan con varios, BUCLE como siempre.
+ */
+export function modoDeCinta({
+  tipos,
+  anchoDisponible,
+  anchoTarjeta,
+}: {
+  tipos: number;
+  anchoDisponible: number;
+  anchoTarjeta: number;
+}): ModoCinta {
+  if (tipos * anchoTarjeta <= anchoDisponible) return "quieta";
+  return tipos < MIN_TIPOS_BUCLE ? "manual" : "bucle";
+}
+
 /** Cuántas veces se repite la lista de tipos en una vuelta de la cinta para llenar el ancho. */
 export function repeticionesDeCinta(tipos: number): number {
   return tipos <= 0 ? 0 : Math.ceil(MIN_TARJETAS_CINTA / tipos);

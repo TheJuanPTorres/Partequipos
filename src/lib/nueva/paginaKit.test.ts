@@ -7,6 +7,7 @@ import {
   enFilaDe,
   franjaDesde,
   mediosDeKit,
+  modoDeCinta,
   repeticionesDeCinta,
 } from "./paginaKit";
 
@@ -43,6 +44,30 @@ describe("la cinta", () => {
     assert.equal(repeticionesDeCinta(5), 2);
     assert.equal(repeticionesDeCinta(7), 1);
     assert.equal(repeticionesDeCinta(9), 1);
+  });
+});
+
+describe("el modo de la cinta según el ancho", () => {
+  const caso = (tipos: number, anchoDisponible: number) =>
+    modoDeCinta({ tipos, anchoDisponible, anchoTarjeta: 272 });
+
+  it("si los tipos no llenan el ancho, quieta y centrada", () => {
+    assert.equal(caso(1, 390), "quieta");
+    assert.equal(caso(1, 1440), "quieta");
+    assert.equal(caso(2, 1010), "quieta");
+    assert.equal(caso(5, 1440), "quieta");
+  });
+
+  it("si los llenan con pocos tipos, a mano; con varios, en bucle", () => {
+    assert.equal(caso(2, 390), "manual");
+    assert.equal(caso(3, 390), "bucle");
+    assert.equal(caso(6, 1010), "bucle");
+    assert.equal(caso(6, 1440), "bucle");
+  });
+
+  it("justo al llenar el ancho ya no se repite: queda quieta", () => {
+    assert.equal(caso(5, 1360), "quieta");
+    assert.equal(caso(5, 1359), "bucle");
   });
 });
 

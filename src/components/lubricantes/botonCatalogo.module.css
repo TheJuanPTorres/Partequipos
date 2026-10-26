@@ -1,0 +1,81 @@
+/*
+ * «Ver catálogo» como botón PRINCIPAL del sitio (2026-10-26): rojo de marca (blanco encima,
+ * 4,55:1), radio del kit, 56 px de alto y texto de 18 px. Alto fijo: sin CLS.
+ */
+.boton {
+  display: inline-flex;
+  height: 56px;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 10px;
+  padding: 0 30px 0 26px;
+  border: 1px solid var(--color-marca);
+  border-radius: var(--boton-radio);
+  background: var(--color-marca);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 8px 22px rgb(229 36 45 / 0.28);
+  transition:
+    background-color 0.25s,
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+
+.boton:hover,
+.boton:focus-visible {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+  box-shadow: 0 8px 22px rgb(0 0 0 / 0.22);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/* Sobre la foto oscura de la cabecera, el foco en blanco para que se vea. */
+.sobreFoto:focus-visible {
+  outline-color: #fff;
+}
+
+.icono {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+.flecha {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  transition: transform 0.25s ease;
+}
+
+.boton:hover .flecha,
+.boton:focus-visible .flecha {
+  transform: translateX(5px);
+}
+
+@media (max-width: 767px) {
+  .boton {
+    height: 52px;
+    padding: 0 24px 0 20px;
+    font-size: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton,
+  .flecha {
+    transition: none;
+  }
+
+  .boton:hover .flecha,
+  .boton:focus-visible .flecha {
+    transform: none;
+  }
+}

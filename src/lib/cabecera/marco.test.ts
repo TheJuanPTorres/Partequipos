@@ -37,6 +37,12 @@ describe("geometría del marco del megamenú", () => {
     assert.match(g.piezas.base, /translate\(189px, 254px\) scale\(442, 30\)/);
   });
 
+  it("con la posición medida del panel, el contorno va ahí (no al centro calculado)", () => {
+    const g = geometriaMarco(820, 284, 500, 284, 30, 20, 161.4);
+    assert.equal(g.piezas.fondo, "translate(161px, 0px) scale(500, 255)");
+    assert.equal(g.recorte, "inset(0px 159px 0px 161px round 0px 0px 30px 30px)");
+  });
+
   it("nunca escalas negativas, aunque el panel sea más bajo que el radio", () => {
     const g = geometriaMarco(820, 10, 10, 10);
     for (const p of PIEZAS_MARCO) assert.doesNotMatch(g.piezas[p], /scale\([^)]*-/, p);

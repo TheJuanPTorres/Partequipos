@@ -51,10 +51,16 @@ export function geometriaMarco(
   alto: number,
   radio = 30,
   curva = 20,
+  /**
+   * Dónde empieza el panel dentro del lienzo, MEDIDO en pantalla. Sin él, centrado. El
+   * marco pasa siempre la medida real: así el contorno cae donde está el panel, sin
+   * depender de cálculos de centrado.
+   */
+  izquierda?: number,
 ): Geometria {
   const w = Math.max(2 * radio, Math.round(ancho));
   const h = Math.max(radio, Math.round(alto));
-  const x = Math.round((anchoLienzo - w) / 2);
+  const x = Math.round(izquierda ?? (anchoLienzo - w) / 2);
   const recto = h - radio;
   const t = (dx: number, dy: number, sx?: number, sy?: number) =>
     `translate(${dx}px, ${dy}px)${sx === undefined ? "" : ` scale(${sx}, ${sy})`}`;

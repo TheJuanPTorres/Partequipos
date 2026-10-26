@@ -184,6 +184,19 @@
   );
 }
 
+/*
+ * M3: durante el cambio de panel (`data-cambiando`, 260 ms), las piezas y el recorte van del
+ * tamaño de antes al nuevo con una transición; fuera de él, al instante (así el contorno sigue a
+ * un acordeón fotograma a fotograma).
+ */
+.marco[data-cambiando="si"] .pieza {
+  transition: transform 260ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+.marco[data-cambiando="si"] .contenidoMarco {
+  transition: clip-path 260ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
 /* El contenido, encima del contorno; recortado con su forma (`clip-path` del marco). */
 .contenidoMarco {
   position: relative;
@@ -274,6 +287,11 @@
 
   .vista[data-estado="saliendo"] {
     display: none;
+  }
+
+  .marco[data-cambiando="si"] .pieza,
+  .marco[data-cambiando="si"] .contenidoMarco {
+    transition: none;
   }
 }
 

@@ -373,6 +373,11 @@ export const PaginasIndice: GlobalConfig = {
           "El índice del blog usa la plantilla «Blog» de Andrés. El artículo, que Andrés no diseñó, tiene un diseño nuestro que se enciende aquí cuando se apruebe.",
       },
       fields: [
+        imagen(
+          "fondo",
+          "Foto de fondo del encabezado del índice",
+          "Opcional. Foto a todo el ancho detrás de «Partequipos · Nuestro Blog» en /noticias/ y en las categorías del blog; sin ella, el encabezado oscuro de siempre.",
+        ),
         {
           name: "disenoArticulo",
           type: "select",

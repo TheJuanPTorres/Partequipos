@@ -3662,7 +3662,7 @@ export interface RepuestosMarca {
   porQueCierre?: string | null;
   porQueBoton?: string | null;
   /**
-   * «Provisional»: el contenido de WordPress en una página sencilla. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.
+   * «Plantilla de Andrés»: la ficha 4086 (cabecera partida y las categorías del tipo en baldosas), la del sitio publicado. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.
    */
   disenoModelo: 'provisional' | 'propio';
   /**
@@ -3840,6 +3840,10 @@ export interface PaginasIndice {
    * El índice del blog usa la plantilla «Blog» de Andrés. El artículo, que Andrés no diseñó, tiene un diseño nuestro que se enciende aquí cuando se apruebe.
    */
   blog: {
+    /**
+     * Opcional. Foto a todo el ancho detrás de «Partequipos · Nuestro Blog» en /noticias/ y en las categorías del blog; sin ella, el encabezado oscuro de siempre.
+     */
+    fondo?: (number | null) | Media;
     /**
      * «Provisional»: el artículo sencillo de siempre. «Diseño propio»: cabecera baja con migas, imagen destacada, columna de lectura con índice fijo, barra de progreso, compartir, llamada a contactar y artículos relacionados. Cambiarlo actualiza todos los artículos.
      */
@@ -4146,6 +4150,7 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
   blog?:
     | T
     | {
+        fondo?: T;
         disenoArticulo?: T;
       };
   contacto?:

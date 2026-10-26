@@ -17,7 +17,9 @@ import {
   type ResultadoListado,
 } from "@/lib/filtros";
 import type { AnimacionBlog } from "@/lib/animacionesBlog";
+import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
 import { rutas } from "@/lib/routes";
+import { imagenDeMedia } from "@/lib/utils/relations";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { paginasVisibles } from "@/lib/usados/paginacion";
 
@@ -38,7 +40,7 @@ import { ZonaBlog } from "./ZonaBlog";
  * filtro, chip y página es un enlace normal. Las vistas filtradas no se
  * indexan (`metadataIndiceBlog`).
  */
-export function IndiceBlog({
+export async function IndiceBlog({
   ambito,
   pagina,
   listado,
@@ -87,6 +89,11 @@ export function IndiceBlog({
       : []),
   ];
 
+  // «Foto de fondo del encabezado del índice» (Páginas índice y contacto → Blog); vacía, el
+  // encabezado oscuro de siempre.
+  const indice = await getPaginasIndice();
+  const fondo = imagenDeMedia(indice.blog?.fondo, "");
+
   return (
     <main className={marca.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(migas)} />
@@ -99,7 +106,7 @@ export function IndiceBlog({
           linea1: "Partequipos",
           linea2: nombreCategoria ?? "Nuestro Blog",
           descripcion: "",
-          fondo: null,
+          fondo,
           logo: null,
         }}
         anclaSiguiente="blog-articulos"

@@ -18,6 +18,7 @@ import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import { textoPlanoLexical } from "@/lib/maquinaria/reservaTexto";
 import { getIndiceBlog } from "@/lib/queries/getBlog";
 import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
+import { rutaDeCategoriaTecnica } from "@/lib/repuestos/subcategorias";
 import { getCategoriasUsada } from "@/lib/queries/getMaquinaria";
 import { getEmpresa, getLogo } from "@/lib/queries/getSeo";
 import { rutas } from "@/lib/routes";
@@ -87,13 +88,11 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
   const relacionados = yo ? articulosRelacionados(yo, indice.articulos, 3) : [];
 
   const candidatas: CandidataRelacion[] = [
-    ...repuestos
-      .filter((c) => c.slug)
-      .map((c) => ({
-        nombre: c.nombre,
-        href: `${rutas.categoriaRepuestos(c.slug)}/`,
-        tipo: "repuestos" as const,
-      })),
+    // Con su dirección real: una categoría que cuelga de otra (Filtros Donaldson) va bajo ella.
+    ...repuestos.flatMap((c) => {
+      const ruta = rutaDeCategoriaTecnica(c);
+      return ruta ? [{ nombre: c.nombre, href: `${ruta}/`, tipo: "repuestos" as const }] : [];
+    }),
     ...usadas.map((c) => ({
       nombre: c.nombre,
       href: `${rutas.categoriaUsada(c.slug)}/`,
@@ -107,11 +106,9 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
   if (elegida && valorElegido && valorElegido.slug) {
     if (elegida.relationTo === "categorias-tecnicas") {
       const c = valorElegido as CategoriasTecnica;
-      relacionada = {
-        nombre: c.nombre,
-        href: `${rutas.categoriaRepuestos(c.slug)}/`,
-        tipo: "repuestos",
-      };
+      // La de la lista trae poblada la categoría de la que cuelga.
+      const ruta = rutaDeCategoriaTecnica(repuestos.find((r) => r.id === c.id) ?? c);
+      relacionada = ruta ? { nombre: c.nombre, href: `${ruta}/`, tipo: "repuestos" } : null;
     } else if (elegida.relationTo === "categorias-usada") {
       const c = valorElegido as CategoriasUsada;
       relacionada = { nombre: c.nombre, href: `${rutas.categoriaUsada(c.slug)}/`, tipo: "usada" };

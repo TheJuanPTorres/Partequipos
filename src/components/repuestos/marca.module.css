@@ -1738,6 +1738,9 @@ a.modelo:hover {
   font-weight: 500;
   line-height: 1.2;
   text-align: center;
+  /* Sin palabras sueltas en la última línea (el título del modelo va en dos líneas). */
+  text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 .baldosas.baldosasCategorias {

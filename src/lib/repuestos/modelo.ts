@@ -75,8 +75,20 @@ export function tituloModelo4086({ marca, tipo, modelo }: Nombres): string {
     .join(" ");
 }
 
-/** «Repuestos disponibles para {tipo} {marca} {modelo}» (con el revelado por palabras). */
-export function tituloDisponibles4086({ marca, tipo, modelo }: Nombres): string {
-  const partes = [texto(tipo.nombre), texto(marca.nombre), modeloCorto(modelo)].filter(Boolean);
-  return `Repuestos disponibles para ${partes.join(" ")}`;
+/** «{tipo} {marca} {modelo}», tal como están guardados: «Excavadora Hitachi EX120-2». */
+export function equipoModelo4086({ marca, tipo, modelo }: Nombres): string {
+  return [texto(tipo.nombre), texto(marca.nombre), modeloCorto(modelo)].filter(Boolean).join(" ");
+}
+
+/**
+ * El título de las categorías, en DOS líneas (Juan Pablo, 2026-10-26; el salto lo respeta el
+ * revelado por palabras): «Repuestos disponibles para» y «{tipo} {marca} {modelo}».
+ */
+export function tituloDisponibles4086(nombres: Nombres): string {
+  return `Repuestos disponibles para\n${equipoModelo4086(nombres)}`;
+}
+
+/** La referencia de «Cotizar» y del mensaje de WhatsApp: «Repuestos para Excavadora Hitachi EX120-2». */
+export function referenciaModelo4086(nombres: Nombres): string {
+  return `Repuestos para ${equipoModelo4086(nombres)}`;
 }

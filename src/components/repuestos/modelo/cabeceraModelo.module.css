@@ -90,6 +90,61 @@
   white-space: pre-line;
 }
 
+/* Los dos botones bajo la descripción: «Cotizar» (el rojo de marca) y el verde de las ventanas. */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.cotizar,
+.whatsapp {
+  display: inline-flex;
+  min-height: 44px;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  border-radius: 30px;
+  color: #fff;
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.cotizar {
+  background: var(--color-marca);
+}
+
+.cotizar:hover {
+  background: var(--color-texto);
+}
+
+/* #0F7B45 con texto blanco da 5,3:1 (AA); el verde de la marca de WhatsApp, 1,9:1. */
+.whatsapp {
+  background: #0f7b45;
+}
+
+.whatsapp:hover {
+  background: #0a6e37;
+}
+
+.cotizar:focus-visible,
+.whatsapp:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cotizar,
+  .whatsapp {
+    transition: none;
+  }
+}
+
 /* En el teléfono, la foto arriba (240 px) y el texto debajo, a todo el ancho. */
 @media (max-width: 767px) {
   .cabecera {
@@ -109,6 +164,11 @@
 
   .datos {
     gap: 10px;
+  }
+
+  .acciones > * {
+    flex: 1 1 100%;
+    justify-content: center;
   }
 }
 

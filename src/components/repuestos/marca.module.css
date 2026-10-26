@@ -1943,3 +1943,10 @@ a.modelo:hover {
     transform: scale(1.05);
   }
 }
+
+/* Un botón en la cabecera (`accion` de `HeroMarca`): «Ver catálogo» de lubricantes. */
+.accionHero {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+}

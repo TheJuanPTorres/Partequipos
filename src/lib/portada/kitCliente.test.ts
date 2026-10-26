@@ -150,21 +150,21 @@ describe("kit de la portada: logos de la banda", () => {
     ["hitachi", { url: "/sitio-hitachi.png", width: 10, height: 5, oscuro: true }],
   ]);
 
-  it("manda el logo de la lista (el del kit); sin él, el de la marca del sitio; sin ninguno, no sale", () => {
+  it("regla común: el logo de la marca del sitio con ese nombre; si no la hay, el de la lista; sin ninguno, no sale", () => {
     const seccion = {
       logos: [
         { id: "a", nombre: "Hitachi", logo: media(5) },
-        { id: "b", nombre: "Hitachi", logo: null },
+        { id: "b", nombre: "Eni", logo: media(6) },
         { id: "c", nombre: "Sin logo", logo: null },
-        { id: "d", nombre: "  ", logo: media(6) },
+        { id: "d", nombre: "  ", logo: media(7) },
       ],
     } as unknown as Pagina["seccionLogos"];
     const r = logosDeLaBanda(seccion, sitio);
     assert.deepEqual(
       r.map((l) => [l.id, l.logo.url, l.logo.alt, l.logo.oscuro]),
       [
-        ["a", "/m/5.webp", "Hitachi", false],
-        ["b", "/sitio-hitachi.png", "Hitachi", true],
+        ["a", "/sitio-hitachi.png", "Hitachi", true],
+        ["b", "/m/6.webp", "Eni", false],
       ],
     );
   });

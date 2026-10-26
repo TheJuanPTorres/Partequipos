@@ -580,7 +580,7 @@ export const PaginaInstitucional: CollectionConfig = {
           labels: { singular: "Logo", plural: "Logos" },
           admin: {
             description:
-              "En este orden en el carrusel. PNG transparente, con el logo centrado en su lienzo. Desde el 2026-10-26 este logo manda en la portada, también para una marca del sitio (los del kit del cliente).",
+              "En este orden en el carrusel. PNG transparente, con el logo centrado en su lienzo. Si el nombre es el de una marca de repuestos, la portada usa el logo de esa marca (uno solo en todo el sitio).",
           },
           fields: [
             {

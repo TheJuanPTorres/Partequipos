@@ -10,8 +10,15 @@
  *
  *   npm run preview:ejecutar -- npx payload run scripts/kit-portada/aplicar.ts <modo> <destino>
  *
- *   modo:     simular | aplicar | retirar
+ *   modo:     simular | aplicar | retirar | simular-logos | retirar-logos
  *   destino:  preview | produccion (solo dirección, con runbook)
+ *
+ * SOLO LOS LOGOS (Juan Pablo, 2026-10-26: en la banda se quedan los logos de antes, con el diseño
+ * nuevo): `retirar-logos` devuelve la lista «Logos de marcas» a la de antes del kit (la del
+ * manifiesto) y borra del Blob los 6 logos del kit si nada más los usa; no toca máquinas, reflejos
+ * ni fotos. Se niega si la lista ya no es la que dejó el kit (un editor la cambió después).
+ * `simular-logos` enseña qué haría, sin escribir. Después, un `aplicar` ya no vuelve a poner los
+ * logos del kit (`logosRetirados` en el manifiesto).
  *
  * - Las imágenes están FUERA del repositorio: `Desktop/partequipos-diseno/portada/_optimizadas/`.
  * - Idempotente: una imagen ya subida (mismo nombre) no se vuelve a subir.
@@ -31,14 +38,19 @@ import { claveDeMarca } from "../../src/lib/marca/logoMarca";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 
 const args = process.argv.slice(2);
-const modo = args.find((a) => a === "simular" || a === "aplicar" || a === "retirar");
+const MODOS = ["simular", "aplicar", "retirar", "simular-logos", "retirar-logos"] as const;
+const modo = args.find((a): a is (typeof MODOS)[number] =>
+  (MODOS as readonly string[]).includes(a),
+);
+/** Las simulaciones no escriben nada (ni base ni Blob). */
+const simula = modo === "simular" || modo === "simular-logos";
 const destino = args.find((a) => a === "preview" || a === "produccion");
 const fallar = (m: string): never => {
   const e = new Error(`[kit-portada] ✗ ${m}`);
   e.stack = e.message;
   throw e;
 };
-if (!modo) fallar("indica el modo: simular, aplicar o retirar");
+if (!modo) fallar(`indica el modo: ${MODOS.join(", ")}`);
 if (!destino) fallar("indica el destino: preview o produccion");
 if (destino === "preview") {
   const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
@@ -48,7 +60,7 @@ if (destino === "preview") {
   if (!v.valido) fallar(`destino no válido, no se hace nada: ${v.motivo}`);
   if (v.valido) process.env.ALMACEN_BLOB_ESPERADO = v.almacen;
 }
-if (modo === "simular") process.env.BLOB_READ_WRITE_TOKEN = "";
+if (simula) process.env.BLOB_READ_WRITE_TOKEN = "";
 else exigirAlmacen("[kit-portada]");
 
 const ESCRITORIO = path.join(os.homedir(), "Desktop");
@@ -64,7 +76,7 @@ process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 const { default: config } = await import("../../src/payload.config");
 const payload = await getPayload({ config });
-if (modo === "simular") {
+if (simula) {
   for (const op of ["create", "update", "delete"] as const) {
     (payload as unknown as Record<string, unknown>)[op] = () =>
       fallar(`simulación: «${op}» no está permitido`);
@@ -150,13 +162,15 @@ type Manifiesto = {
   inicio: Record<string, Record<string, unknown>> | null;
   categorias: { id: number; slug: string; antes: number | null }[];
   media: { id: number; filename: string; url: string }[];
+  /** Los logos del kit se retiraron (`retirar-logos`): `aplicar` ya no los vuelve a poner. */
+  logosRetirados?: boolean;
 };
 const manifiesto: Manifiesto = fs.existsSync(MANIFIESTO)
   ? (JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto)
   : { destino: destino!, inicio: null, categorias: [], media: [] };
 if (manifiesto.destino !== destino) fallar(`el manifiesto es del destino «${manifiesto.destino}»`);
 const guardar = () => {
-  if (modo !== "simular") fs.writeFileSync(MANIFIESTO, JSON.stringify(manifiesto, null, 2));
+  if (!simula) fs.writeFileSync(MANIFIESTO, JSON.stringify(manifiesto, null, 2));
 };
 const idDe = (v: unknown): number | null =>
   typeof v === "number" ? v : v && typeof v === "object" && "id" in v ? idDe(v.id) : null;
@@ -192,7 +206,7 @@ async function subir(fichero: string, alt: string): Promise<number | null> {
   const datos = fs.readFileSync(ruta);
   const mimetype = fichero.endsWith(".png") ? "image/png" : "image/webp";
   log(`sube ${nombre} (${Math.round(datos.length / 1024)} kB)`);
-  if (modo === "simular") return null;
+  if (simula) return null;
   const doc = await payload.create({
     collection: "media",
     data: { alt, focalX: 50, focalY: 50 },
@@ -260,29 +274,17 @@ async function aplicar(): Promise<void> {
     verMasTexto: "Ver todos",
   };
 
-  // Los logos del kit primero, en el orden del diseño; los demás detrás, como estaban.
-  const actuales =
-    (manifiesto.inicio.seccionLogos!.logos as { nombre: string; logo: number | null }[]) ?? [];
-  const kit = new Set(LOGOS.map(([n]) => claveDeMarca(n)));
-  // En simulación las imágenes no se suben (`null`), pero tampoco se escribe nada.
-  const delKit: { nombre: string; logo: number }[] = [];
-  for (const [nombre, fichero] of LOGOS) {
-    const previo = actuales.find((l) => claveDeMarca(l.nombre) === claveDeMarca(nombre));
-    delKit.push({
-      nombre: previo?.nombre ?? nombre,
-      logo: (await subir(fichero, `Logo de ${nombre}`)) as number,
-    });
-  }
-  const resto = actuales
-    .filter((l) => !kit.has(claveDeMarca(l.nombre)))
-    .map((l) => ({ nombre: l.nombre, logo: l.logo as number }));
+  // Retirados los del kit, la lista se queda como esté.
+  const lista = manifiesto.logosRetirados
+    ? ((logos.logos as { nombre: string; logo: number }[] | undefined) ?? [])
+    : await listaConElKit();
   const nuevaLogos = {
     ...logos,
     maquina: await id("case580"),
     maquinaReflejo: await id("case580Reflejo"),
-    logos: [...delKit, ...resto],
+    logos: lista,
   };
-  log(`logos de la banda: ${[...delKit, ...resto].map((l) => l.nombre).join(", ")}`);
+  log(`logos de la banda: ${lista.map((l) => l.nombre).join(", ")}`);
 
   if (modo === "aplicar") {
     await payload.update({
@@ -296,7 +298,7 @@ async function aplicar(): Promise<void> {
       overrideAccess: true,
     });
   }
-  log(`${modo === "simular" ? "pondría" : "pone"} las imágenes de la página «inicio»`);
+  log(`${simula ? "pondría" : "pone"} las imágenes de la página «inicio»`);
 
   const { docs: todas } = await payload.find({
     collection: "categorias-tecnicas",
@@ -315,7 +317,7 @@ async function aplicar(): Promise<void> {
     }
     conPieza.add(cat.id);
     const foto = await subir(fichero, alt);
-    log(`${modo === "simular" ? "pondría" : "pone"} ${cat.slug}: ${fichero}`);
+    log(`${simula ? "pondría" : "pone"} ${cat.slug}: ${fichero}`);
     if (!manifiesto.categorias.some((c) => c.id === cat.id)) {
       manifiesto.categorias.push({ id: cat.id, slug: cat.slug, antes: idDe(cat.imagenPortada) });
       guardar();
@@ -334,11 +336,131 @@ async function aplicar(): Promise<void> {
       log(`⚠ ${c.slug} sale en la portada y se queda sin pieza (usa su «Imagen de la tarjeta»)`);
     }
   }
-  log(
-    modo === "simular"
-      ? "SIMULACIÓN: no se ha escrito nada."
-      : "APLICADO. Después, POST /api/revalidar/.",
+  log(simula ? "SIMULACIÓN: no se ha escrito nada." : "APLICADO. Después, POST /api/revalidar/.");
+}
+
+/**
+ * La lista «Logos de marcas» con el kit: sus logos primero, en el orden del diseño (con el nombre
+ * que ya tenía la marca en la lista), y los demás detrás, como estaban. En simulación las imágenes
+ * no se suben (`null`), pero tampoco se escribe nada.
+ */
+async function listaConElKit(): Promise<{ nombre: string; logo: number }[]> {
+  const antes =
+    (manifiesto.inicio!.seccionLogos!.logos as { nombre: string; logo: number | null }[]) ?? [];
+  const kit = new Set(LOGOS.map(([n]) => claveDeMarca(n)));
+  const delKit: { nombre: string; logo: number }[] = [];
+  for (const [nombre, fichero] of LOGOS) {
+    const previo = antes.find((l) => claveDeMarca(l.nombre) === claveDeMarca(nombre));
+    delKit.push({
+      nombre: previo?.nombre ?? nombre,
+      logo: (await subir(fichero, `Logo de ${nombre}`)) as number,
+    });
+  }
+  const resto = antes
+    .filter((l) => !kit.has(claveDeMarca(l.nombre)))
+    .map((l) => ({ nombre: l.nombre, logo: l.logo as number }));
+  return [...delKit, ...resto];
+}
+
+/**
+ * SOLO LOS LOGOS: la lista «Logos de marcas» vuelve a la de antes del kit y los 6 logos del kit se
+ * borran del Blob si nada más los usa. Lo demás que puso el kit (máquinas, reflejos, fotos) se queda.
+ */
+async function retirarLogos(): Promise<void> {
+  if (!fs.existsSync(MANIFIESTO) || !manifiesto.inicio) {
+    fallar(`no hay manifiesto con la lista de antes (${MANIFIESTO})`);
+  }
+  if (manifiesto.logosRetirados) {
+    log("los logos del kit ya se retiraron: nada que hacer");
+    return;
+  }
+  const antes = (
+    manifiesto.inicio!.seccionLogos!.logos as { nombre: string; logo: number | null }[]
+  ).map((l) => ({ nombre: l.nombre, logo: l.logo as number }));
+  const inicio = await paginaInicio();
+  const ahora = ((inicio.seccionLogos?.logos ?? []) as { nombre: string; logo: unknown }[]).map(
+    (l) => ({ nombre: l.nombre, logo: idDe(l.logo) }),
   );
+  // Los 6 logos que subió el kit, por su fichero.
+  const delKit = LOGOS.map(([nombre, fichero]) => ({
+    nombre,
+    media: manifiesto.media.find((f) =>
+      f.filename.startsWith(`${PREFIJO}${fichero.replace(/[.]png$/, "")}-`),
+    ),
+  }));
+  const conKit = new Set(LOGOS.map(([n]) => claveDeMarca(n)));
+
+  // La lista tiene que ser la que dejó el kit: los 6 del kit primero y los demás como estaban. Si
+  // un editor la cambió después, no se pisa su cambio.
+  const esperada = [
+    ...delKit.map(({ nombre, media }) => {
+      const previo = antes.find((l) => claveDeMarca(l.nombre) === claveDeMarca(nombre));
+      return { nombre: previo?.nombre ?? nombre, logo: media?.id ?? null };
+    }),
+    ...antes.filter((l) => !conKit.has(claveDeMarca(l.nombre))),
+  ];
+  const texto = (l: { nombre: string; logo: unknown }[]) =>
+    l.map((x) => `${x.nombre} (${String(x.logo)})`).join(", ");
+  log(`ahora:     ${texto(ahora)}`);
+  log(`vuelve a:  ${texto(antes)}`);
+  if (JSON.stringify(ahora) !== JSON.stringify(esperada)) {
+    fallar(
+      `la lista ya no es la que dejó el kit (${texto(esperada)}): no se toca; hazlo en el panel`,
+    );
+  }
+
+  // Los logos del kit se borran solo si nada más los usa (marcas de repuestos, de nueva o de usados).
+  const subidos = delKit.flatMap(({ media }) => (media ? [media] : []));
+  const usados = new Set<number>();
+  for (const collection of ["marcas", "marcas-maquinaria", "marcas-usada"] as const) {
+    const r = await payload.find({
+      collection,
+      where: { logo: { in: subidos.map((f) => f.id) } },
+      depth: 0,
+      pagination: false,
+      overrideAccess: true,
+    });
+    for (const d of r.docs) {
+      const id = idDe((d as { logo?: unknown }).logo);
+      if (id !== null) usados.add(id);
+    }
+  }
+  const borrar = subidos.filter((f) => !usados.has(f.id));
+  for (const f of subidos.filter((f) => usados.has(f.id))) {
+    log(`⚠ ${f.filename} lo usa una marca: se queda`);
+  }
+  log(
+    `${simula ? "borraría" : "borra"} ${borrar.length} logos del kit: ${borrar.map((f) => f.filename).join(", ")}`,
+  );
+  if (simula) {
+    log("SIMULACIÓN: no se ha escrito nada.");
+    return;
+  }
+
+  await payload.update({
+    collection: "paginas",
+    id: inicio.id,
+    data: { seccionLogos: { ...(inicio.seccionLogos ?? {}), logos: antes } },
+    overrideAccess: true,
+  });
+  log("lista «Logos de marcas» devuelta a la de antes del kit");
+  manifiesto.logosRetirados = true;
+  guardar();
+  for (const f of borrar) {
+    await payload.delete({ collection: "media", id: f.id, overrideAccess: true });
+  }
+  manifiesto.media = manifiesto.media.filter((f) => !borrar.some((b) => b.id === f.id));
+  guardar();
+  const urls = borrar.map((f) => f.url).filter(Boolean);
+  if (urls.length > 0) {
+    log(`logos borrados: ${urls.length}; espero 70 s (propagación del Blob)`);
+    await new Promise((r) => setTimeout(r, 70_000));
+    const vivas: string[] = [];
+    for (const u of urls) if ((await fetch(u, { method: "HEAD" })).status !== 404) vivas.push(u);
+    if (vivas.length > 0) fallar(`siguen respondiendo en el Blob: ${vivas.join(", ")}`);
+    log("los logos del kit responden 404 en el Blob");
+  }
+  log("LOGOS DEVUELTOS. Después, POST /api/revalidar/.");
 }
 
 async function retirar(): Promise<void> {
@@ -384,5 +506,6 @@ async function retirar(): Promise<void> {
 }
 
 if (modo === "retirar") await retirar();
+else if (modo === "simular-logos" || modo === "retirar-logos") await retirarLogos();
 else await aplicar();
 process.exit(0);

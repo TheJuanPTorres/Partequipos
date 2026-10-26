@@ -32,6 +32,11 @@ export function usaDisenoAditamentos(marca: Pick<MarcasMaquinaria, "disenoPagina
   return marca.disenoPagina === "aditamentos";
 }
 
+/** La marca con el diseño «Kit de marca» (2026-10-25, diseño del cliente). */
+export function usaDisenoKit(marca: Pick<MarcasMaquinaria, "disenoPagina">): boolean {
+  return marca.disenoPagina === "kit";
+}
+
 export type TextosAditamentos = {
   antetitulo: string;
   titulo: string;

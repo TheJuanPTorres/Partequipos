@@ -81,6 +81,7 @@ import * as migration_20261023_155220_aditamentos_usados_serial from './20261023
 import * as migration_20261023_202727_politica_foto_cabecera from './20261023_202727_politica_foto_cabecera';
 import * as migration_20261023_213120_categorias_nueva_imagen from './20261023_213120_categorias_nueva_imagen';
 import * as migration_20261023_222308_correo_hojas_de_vida from './20261023_222308_correo_hojas_de_vida';
+import * as migration_20261026_001346_kit_de_marca from './20261026_001346_kit_de_marca';
 
 export const migrations = [
   {
@@ -496,6 +497,11 @@ export const migrations = [
   {
     up: migration_20261023_222308_correo_hojas_de_vida.up,
     down: migration_20261023_222308_correo_hojas_de_vida.down,
-    name: '20261023_222308_correo_hojas_de_vida'
+    name: '20261023_222308_correo_hojas_de_vida',
+  },
+  {
+    up: migration_20261026_001346_kit_de_marca.up,
+    down: migration_20261026_001346_kit_de_marca.down,
+    name: '20261026_001346_kit_de_marca'
   },
 ];

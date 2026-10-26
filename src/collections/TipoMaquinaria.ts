@@ -62,6 +62,21 @@ export const TipoMaquinaria: CollectionConfig = {
       },
     },
     /*
+     * Render recortado del tipo (2026-10-25, diseño «Kit de marca»): la máquina sola, con fondo
+     * transparente, para la cinta de tipos y la franja de cada sección. Vacío, se usa la
+     * imagen de la tarjeta o la primera foto de sus equipos.
+     */
+    {
+      name: "render",
+      type: "upload",
+      relationTo: "media",
+      label: "Render recortado",
+      admin: {
+        description:
+          "Opcional. La máquina recortada, PNG o WebP con fondo transparente, para la cinta de tipos de la página de la marca (diseño «Kit de marca»). Si la dejas vacía, se usa la imagen de la tarjeta o la primera foto de sus equipos.",
+      },
+    },
+    /*
      * TIPOS QUE AGRUPA (auditoría de estructura, 2026-10-17): un tipo «paraguas»
      * (Compactadores y Pavimentadoras de Dynapac) lista en su página los equipos
      * de estos tipos, por grupos. No lleva equipos propios, así que no sale como

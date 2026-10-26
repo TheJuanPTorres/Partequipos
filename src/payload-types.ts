@@ -373,9 +373,9 @@ export interface MarcasMaquinaria {
    */
   ordenPortada?: number | null;
   /**
-   * «Plantilla 1»: una tarjeta por tipo, como las demás marcas. «Aditamentos»: la plantilla de Andrés de la marca de aditamentos, con un bloque por tipo y sus productos, el contacto, la franja de servicios, «Nuestro compromiso» y las sedes.
+   * «Plantilla 1»: una tarjeta por tipo, como las demás marcas. «Aditamentos»: la plantilla de Andrés de la marca de aditamentos, con un bloque por tipo y sus productos, el contacto, la franja de servicios, «Nuestro compromiso» y las sedes. «Kit de marca»: el diseño nuevo del cliente (2026-10-25) con la cabecera partida en el color de la marca, la píldora de navegación, la cinta de tipos y una sección por tipo; usa el «Color de la marca», la foto de fondo y el emblema de abajo.
    */
-  disenoPagina?: ('plantilla1' | 'aditamentos') | null;
+  disenoPagina?: ('plantilla1' | 'aditamentos' | 'kit') | null;
   /**
    * Solo se usan con el diseño «Aditamentos». Vacío, el texto de siempre.
    */
@@ -408,6 +408,23 @@ export interface MarcasMaquinaria {
      * Una línea nueva es un salto de línea.
      */
     cierre?: string | null;
+  };
+  /**
+   * Solo para el diseño «Kit de marca». El logo, el color de la marca y la descripción son los de arriba.
+   */
+  kit?: {
+    /**
+     * La foto propia de la marca, horizontal y grande (1920 px o más de ancho). Se oscurece un poco para que el texto se lea. Vacía, la cabecera queda oscura lisa.
+     */
+    fotoCabecera?: (number | null) | Media;
+    /**
+     * El emblema o mascota de la marca: un grabado en tinta oscura sobre fondo claro o transparente (WebP o PNG). Se pinta enorme y casi transparente detrás de las secciones y gira despacio al bajar.
+     */
+    emblema?: (number | null) | Media;
+    /**
+     * Desmarcada, el emblema no se pinta aunque esté subido (por ejemplo, mientras el cliente no confirme el permiso de uso de la mascota).
+     */
+    mostrarEmblema?: boolean | null;
   };
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
@@ -530,6 +547,10 @@ export interface TiposMaquinaria {
    * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.
    */
   imagen?: (number | null) | Media;
+  /**
+   * Opcional. La máquina recortada, PNG o WebP con fondo transparente, para la cinta de tipos de la página de la marca (diseño «Kit de marca»). Si la dejas vacía, se usa la imagen de la tarjeta o la primera foto de sus equipos.
+   */
+  render?: (number | null) | Media;
   /**
    * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Vibrocompactador» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
    */
@@ -2623,6 +2644,13 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
         intro?: T;
         cierre?: T;
       };
+  kit?:
+    | T
+    | {
+        fotoCabecera?: T;
+        emblema?: T;
+        mostrarEmblema?: T;
+      };
   seo?:
     | T
     | {
@@ -2644,6 +2672,7 @@ export interface TiposMaquinariaSelect<T extends boolean = true> {
   marca?: T;
   descripcion?: T;
   imagen?: T;
+  render?: T;
   subtipos?: T;
   pestanaIndiceNueva?: T;
   seo?:

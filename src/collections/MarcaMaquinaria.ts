@@ -112,11 +112,15 @@ export const MarcaMaquinaria: CollectionConfig = {
       options: [
         { label: "Plantilla 1 (tarjetas por tipo)", value: "plantilla1" },
         { label: "Aditamentos (productos por tipo, contacto y sedes)", value: "aditamentos" },
+        {
+          label: "Kit de marca (cabecera partida, píldora, cinta de tipos y secciones)",
+          value: "kit",
+        },
       ],
       admin: {
         position: "sidebar",
         description:
-          "«Plantilla 1»: una tarjeta por tipo, como las demás marcas. «Aditamentos»: la plantilla de Andrés de la marca de aditamentos, con un bloque por tipo y sus productos, el contacto, la franja de servicios, «Nuestro compromiso» y las sedes.",
+          "«Plantilla 1»: una tarjeta por tipo, como las demás marcas. «Aditamentos»: la plantilla de Andrés de la marca de aditamentos, con un bloque por tipo y sus productos, el contacto, la franja de servicios, «Nuestro compromiso» y las sedes. «Kit de marca»: el diseño nuevo del cliente (2026-10-25) con la cabecera partida en el color de la marca, la píldora de navegación, la cinta de tipos y una sección por tipo; usa el «Color de la marca», la foto de fondo y el emblema de abajo.",
       },
     },
     {
@@ -198,6 +202,52 @@ export const MarcaMaquinaria: CollectionConfig = {
             placeholder:
               "Tecnología de punta, bajo consumo, máxima productividad y respaldo oficial.",
             description: "Una línea nueva es un salto de línea.",
+          },
+        },
+      ],
+    },
+    /*
+     * «KIT DE MARCA» (2026-10-25, diseño del cliente): foto propia de la cabecera y emblema
+     * de fondo. Solo los lee el diseño «Kit de marca»; el logo, el color y el texto salen de
+     * los campos de arriba.
+     */
+    {
+      name: "kit",
+      type: "group",
+      label: "Diseño «Kit de marca»",
+      admin: {
+        description:
+          "Solo para el diseño «Kit de marca». El logo, el color de la marca y la descripción son los de arriba.",
+      },
+      fields: [
+        {
+          name: "fotoCabecera",
+          type: "upload",
+          relationTo: "media",
+          label: "Foto de fondo de la cabecera",
+          admin: {
+            description:
+              "La foto propia de la marca, horizontal y grande (1920 px o más de ancho). Se oscurece un poco para que el texto se lea. Vacía, la cabecera queda oscura lisa.",
+          },
+        },
+        {
+          name: "emblema",
+          type: "upload",
+          relationTo: "media",
+          label: "Emblema de fondo",
+          admin: {
+            description:
+              "El emblema o mascota de la marca: un grabado en tinta oscura sobre fondo claro o transparente (WebP o PNG). Se pinta enorme y casi transparente detrás de las secciones y gira despacio al bajar.",
+          },
+        },
+        {
+          name: "mostrarEmblema",
+          type: "checkbox",
+          defaultValue: false,
+          label: "Mostrar el emblema de fondo",
+          admin: {
+            description:
+              "Desmarcada, el emblema no se pinta aunque esté subido (por ejemplo, mientras el cliente no confirme el permiso de uso de la mascota).",
           },
         },
       ],

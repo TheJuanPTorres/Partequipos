@@ -1,0 +1,970 @@
+/*
+ * PÁGINA DE MARCA · «KIT DE MARCA» (2026-10-25): el prototipo del cliente (React + Tailwind +
+ * motion) portado a nuestros estilos. Sin Tailwind y sin `motion`: el movimiento es CSS y unas
+ * líneas de JavaScript, y todo se apaga con «reducir movimiento». Las medidas son las del kit.
+ *
+ * `--acento` es el «Color de la marca» y `--tinta` el texto legible sobre él (los pone la página).
+ */
+
+.pagina {
+  --acento: #fc661c;
+  --tinta: #100f0f;
+  --gris: #f0f0f0;
+  --tinta-suave: #56545a;
+  flex: 1;
+  background: var(--gris);
+  color: #100f0f;
+  font-family: inherit;
+}
+
+.migas {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.soloLectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ 1 · Cabecera */
+
+/* Banda partida: gris arriba y el color de la marca abajo, con el panel de foto encima. */
+.hero {
+  padding: 24px 1.5vw 1.5vw;
+  background: linear-gradient(var(--gris) 50%, var(--acento) 50%);
+}
+
+/* Alto reservado (70vh como mínimo): el texto no mueve nada al llegar Inter. */
+.heroPanel {
+  position: relative;
+  display: flex;
+  min-height: 70vh;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #1f1d1b;
+}
+
+.heroVelo {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0.6;
+  mix-blend-mode: multiply;
+}
+
+.heroContenido {
+  position: relative;
+  display: flex;
+  width: 100%;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 50px 2.9vw;
+  color: #fff;
+  text-align: center;
+}
+
+.placa {
+  display: flex;
+  width: 168px;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.placa img {
+  width: 100%;
+  max-height: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.heroTitulo {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0;
+  font-size: 55px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.heroTexto {
+  width: 100%;
+  max-width: 650px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.raton {
+  display: inline-block;
+  margin-top: 15px;
+  line-height: 1;
+}
+
+.ratonCaja {
+  display: inline-block;
+  width: 25px;
+  height: 40px;
+  box-sizing: border-box;
+  padding-top: 8px;
+  border: 2px solid #fff;
+  border-radius: 50px;
+  text-align: center;
+}
+
+.ratonRueda {
+  display: inline-block;
+  width: 3px;
+  height: 10px;
+  border-radius: 50px;
+  background: #e5242d;
+}
+
+.raton:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
+/* ------------------------------------------------------------------ 2 · Píldora */
+
+/* Vidrio oscuro: tinta cálida al 55 % sobre un fondo que el propio filtro oscurece y desenfoca. */
+.pildora {
+  position: fixed;
+  /* Justo debajo de la cabecera del sitio (alto real, lo pone PildoraKit). */
+  top: calc(var(--pildora-arriba, 0px) + 12px);
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  max-width: calc(100% - 2rem);
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 9999px;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.16) 0%,
+      rgb(255 255 255 / 0.05) 48%,
+      transparent 52%
+    ),
+    rgb(18 16 16 / 0.55);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 -1px 0 rgb(255 255 255 / 0.06),
+    inset 0 0 0 1px rgb(255 255 255 / 0.1),
+    0 4px 14px -6px rgb(16 15 15 / 0.55);
+  -webkit-backdrop-filter: blur(40px) brightness(0.55) saturate(1.8);
+  backdrop-filter: blur(40px) brightness(0.55) saturate(1.8);
+  /* Escondida: sin ocupar sitio ni foco. */
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -24px) scale(0.9);
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    top 0.3s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0.4s;
+}
+
+.pildora[data-visible] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0) scale(1);
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.pildoraLogo {
+  display: flex;
+  height: 40px;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9);
+}
+
+.pildoraLogo img {
+  width: auto;
+  max-width: 96px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.pildoraLogo:focus-visible,
+.pildoraEnlace:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+
+/* Se extiende desde el logo: el ancho de la lista crece de 0 a su tamaño. */
+.pildoraLista {
+  display: flex;
+  min-width: 0;
+  max-width: 0;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+  transition: max-width 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
+}
+
+.pildora[data-visible] .pildoraLista {
+  max-width: 1400px;
+}
+
+.pildoraLista::-webkit-scrollbar {
+  display: none;
+}
+
+.pildoraLista li {
+  flex-shrink: 0;
+}
+
+.pildoraEnlace {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  color: rgb(255 255 255 / 0.85);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.43;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.pildoraEnlace:hover {
+  color: #fff;
+}
+
+/* El tipo activo: su fondo (`::before`) viaja del anterior al nuevo (FLIP, `PildoraKit`). */
+.pildoraEnlace[aria-current="location"] {
+  color: var(--tinta);
+}
+
+.pildoraEnlace[aria-current="location"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 9999px;
+  background: var(--acento);
+}
+
+/* ------------------------------------------------------------------ 3 · Línea de equipos */
+
+.linea {
+  padding: 60px 0 20px;
+}
+
+.lineaTitulo {
+  margin: 0 0 20px;
+  padding: 0 1.5vw;
+  color: #100f0f;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.cinta {
+  overflow: hidden;
+  padding: 4px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+
+/* La lista va dos veces y la pista se desplaza la mitad: el bucle no tiene salto. */
+.pista {
+  display: flex;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: cintaBucle 45s linear infinite;
+}
+
+.cinta:hover .pista,
+.cinta:focus-within .pista {
+  animation-play-state: paused;
+}
+
+@keyframes cintaBucle {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* El espacio va dentro de cada <li> para que la mitad de la pista sea exactamente una vuelta. */
+.cintaItem {
+  width: 17rem;
+  flex-shrink: 0;
+  padding-right: 12px;
+}
+
+.tarjetaTipo {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e4e1de;
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(20 17 15 / 0.05);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+
+.tarjetaTipo:hover {
+  border-color: color-mix(in srgb, var(--acento) 60%, transparent);
+}
+
+.tarjetaTipo:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: -2px;
+}
+
+.renderCaja {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: linear-gradient(180deg, #e6e4e1 0%, #f3f2f0 70%, #eceae7 100%);
+}
+
+/* El render recortado se apoya en el suelo de la tarjeta; una foto de respaldo llena la caja. */
+.renderImg {
+  object-fit: contain;
+  object-position: bottom;
+  padding: 9% 8% 6%;
+  transform-origin: bottom;
+  transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.renderFoto {
+  object-fit: cover;
+  padding: 0;
+}
+
+.tarjetaTipo:hover .renderImg {
+  transform: scale(1.05);
+}
+
+.tipoPie {
+  display: flex;
+  min-height: 4.25rem;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+}
+
+.tipoNombre {
+  display: -webkit-box;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  color: #14110f;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: left;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.tipoFlecha {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgb(240 237 232 / 0.7);
+  color: #14110f;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.tipoFlecha svg {
+  transform: rotate(-45deg);
+  transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.tarjetaTipo:hover .tipoFlecha,
+.tarjetaTipo:focus-visible .tipoFlecha {
+  background: var(--acento);
+  color: var(--tinta);
+}
+
+.tarjetaTipo:hover .tipoFlecha svg,
+.tarjetaTipo:focus-visible .tipoFlecha svg {
+  transform: none;
+}
+
+.cierre {
+  margin: 24px auto 0;
+  max-width: 760px;
+  padding: 0 1.5vw;
+  color: var(--tinta-suave);
+  font-size: 18px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.cierre span {
+  display: block;
+}
+
+/* ------------------------------------------------------------------ 4 · Secciones por tipo */
+
+.tipos {
+  padding-bottom: 100px;
+}
+
+.seccion {
+  position: relative;
+  isolation: isolate;
+  margin: 40px 5% 0;
+  padding-top: 40px;
+  border-top: 1px solid rgb(0 0 0 / 0.12);
+  scroll-margin-top: 112px;
+}
+
+.cabeceraSeccion {
+  position: relative;
+}
+
+.tituloTipo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  margin: 0 0 30px;
+  color: #100f0f;
+  font-size: 55px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.numero {
+  color: #d6d4d1;
+  font-size: 1.4em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.barra {
+  width: 2px;
+  height: 1.3em;
+  border-radius: 9999px;
+  background: var(--acento);
+}
+
+/* La franja diagonal del color de la marca, con la máquina en gris, a la derecha del título. */
+.detalle {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  bottom: -60px;
+  z-index: -1;
+  display: none;
+  width: 300px;
+  pointer-events: none;
+}
+
+.franja {
+  position: absolute;
+  top: 0;
+  right: 160px;
+  bottom: 0;
+  width: 44px;
+  background: var(--acento);
+  opacity: 0.8;
+  transform: skewX(-30deg);
+}
+
+.detalleRender {
+  position: absolute;
+  right: 0;
+  bottom: 22px;
+  width: 210px;
+  height: 150px;
+}
+
+.detalleRender img {
+  object-fit: contain;
+  object-position: bottom;
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.verCategoria {
+  position: absolute;
+  right: 0;
+  bottom: -25px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #100f0f;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.verCategoria:hover {
+  color: var(--tinta-suave);
+}
+
+.verCategoria svg {
+  width: 14px;
+  height: 14px;
+  color: var(--acento);
+  transition: transform 0.3s;
+}
+
+.verCategoria:hover svg {
+  transform: translateX(4px);
+}
+
+.verCategoria:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 4px;
+}
+
+/* Rejilla de 6 columnas (4 en tablet): cada tarjeta ocupa 2. Subgrid de 4 filas por tarjeta. */
+.rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.modelo {
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  margin-bottom: 32px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(16 15 15 / 0.06),
+    0 6px 16px -10px rgb(16 15 15 / 0.18);
+  scroll-margin-top: 112px;
+}
+
+.modeloFoto {
+  position: relative;
+  display: block;
+  height: 240px;
+  background: var(--gris);
+}
+
+.modeloFoto img {
+  object-fit: cover;
+}
+
+.modeloNombre {
+  margin: 0;
+  padding: 24px 24px 0;
+  color: #100f0f;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.datos {
+  display: flex;
+  flex-direction: column;
+  margin: 12px 0 0;
+  padding: 0 24px;
+  list-style: none;
+}
+
+.dato {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgb(0 0 0 / 0.1);
+  color: #100f0f;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.datoIcono {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: #e5242d;
+}
+
+.datoTexto {
+  display: -webkit-box;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: start;
+  gap: 12px;
+  padding: 20px 24px 24px;
+}
+
+.boton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 24px;
+  border: 1px solid var(--acento);
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    color 0.3s;
+}
+
+.boton svg {
+  flex: none;
+  transition:
+    transform 0.3s,
+    color 0.3s;
+}
+
+.botonFicha {
+  background: var(--acento);
+  color: var(--tinta);
+}
+
+.botonCotizar {
+  background: #fff;
+  color: #100f0f;
+}
+
+.botonCotizar svg {
+  color: var(--acento);
+}
+
+.boton:hover {
+  border-color: #100f0f;
+  background: #100f0f;
+  color: #fff;
+}
+
+.boton:hover svg {
+  transform: translateX(4px);
+}
+
+.botonCotizar:hover svg {
+  color: #fff;
+}
+
+.boton:focus-visible {
+  outline: 3px solid #100f0f;
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------ 5 · Emblema de fondo */
+
+.emblemaCapa {
+  position: relative;
+  isolation: isolate;
+}
+
+.emblemaFondo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow-x: clip;
+  pointer-events: none;
+}
+
+.emblemaPegado {
+  position: sticky;
+  top: 12vh;
+  display: flex;
+  justify-content: center;
+  padding-top: 40px;
+}
+
+/* El grabado es una máscara rellena de tinta: una sola imagen, casi transparente. */
+.emblema {
+  display: block;
+  width: min(1150px, 94vw);
+  background: rgb(16 15 15 / 0.07);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  transform: rotate(var(--giro, 0deg));
+}
+
+/* ------------------------------------------------------------------ Tablet (≤ 1024 px) */
+
+@media (max-width: 1024px) {
+  .heroContenido {
+    padding-right: 6.4vw;
+    padding-left: 6.4vw;
+  }
+
+  .heroTitulo {
+    font-size: 40px;
+  }
+
+  .heroTexto {
+    font-size: 14px;
+  }
+
+  .linea {
+    padding-top: 40px;
+  }
+
+  .seccion {
+    margin-right: 2%;
+    margin-left: 2%;
+  }
+
+  .tituloTipo {
+    gap: 24px;
+    font-size: 40px;
+  }
+
+  .rejilla {
+    column-gap: 20px;
+  }
+}
+
+/* ------------------------------------------------------------------ Móvil (≤ 767 px) */
+
+@media (max-width: 767px) {
+  .heroContenido {
+    padding-right: 14.4vw;
+    padding-left: 14.4vw;
+  }
+
+  .heroTitulo {
+    font-size: 10vw;
+  }
+
+  .heroTexto {
+    font-size: 13px;
+  }
+
+  .tipos {
+    padding-bottom: 144px;
+  }
+
+  .seccion {
+    margin: 30px 20px 0;
+    padding-top: 30px;
+  }
+
+  .tituloTipo {
+    flex-direction: column;
+    gap: 12px;
+    font-size: 8vw;
+  }
+
+  .barra {
+    width: 32px;
+    height: 2px;
+  }
+
+  .verCategoria {
+    bottom: -25px;
+  }
+
+  .modeloFoto {
+    height: 210px;
+  }
+
+  .cierre {
+    padding: 0 24px;
+  }
+}
+
+/* ------------------------------------------------------------------ Rejilla y franja por ancho */
+
+@media (min-width: 768px) {
+  .rejilla {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .modelo {
+    grid-column: span 2;
+  }
+
+  /* Tablet: la última impar se centra. */
+  .modelo[data-col-tablet="2"] {
+    grid-column: 2 / span 2;
+  }
+
+  .verCategoria {
+    right: 0;
+  }
+
+  /* Con una sola tarjeta (tablet), el enlace queda sobre ella, centrada. */
+  .verCategoria[data-una] {
+    right: calc((100% - 60px) / 4 + 20px);
+  }
+}
+
+@media (min-width: 1025px) {
+  .rejilla {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .modelo[data-col-tablet="2"] {
+    grid-column: span 2;
+  }
+
+  .modelo[data-col="2"] {
+    grid-column: 2 / span 2;
+  }
+
+  .modelo[data-col="3"] {
+    grid-column: 3 / span 2;
+  }
+
+  .modelo[data-col="4"] {
+    grid-column: 4 / span 2;
+  }
+
+  /* El enlace queda sobre el borde derecho de la última tarjeta de la primera fila. */
+  .verCategoria[data-fila="1"] {
+    right: calc((100% - 160px) / 3 + 64px);
+  }
+
+  .verCategoria[data-fila="2"] {
+    right: calc((100% - 160px) / 6 + 32px);
+  }
+
+  .verCategoria[data-fila="3"],
+  .verCategoria[data-una] {
+    right: 0;
+  }
+}
+
+@media (min-width: 1280px) {
+  .detalle[data-desde="1280"] {
+    display: block;
+  }
+}
+
+@media (min-width: 1440px) {
+  .detalle[data-desde="1440"] {
+    display: block;
+  }
+}
+
+@media (min-width: 1600px) {
+  .detalle[data-desde="1600"] {
+    display: block;
+  }
+}
+
+@media (min-width: 1920px) {
+  .detalle[data-desde="1920"] {
+    display: block;
+  }
+}
+
+/* ------------------------------------------------------------------ Reducir movimiento */
+
+@media (prefers-reduced-motion: no-preference) {
+  .ratonRueda {
+    animation: ratonRueda 2.2s cubic-bezier(0.15, 0.41, 0.69, 0.94) 2;
+  }
+}
+
+@keyframes ratonRueda {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* La cinta queda quieta y se desplaza a mano; la píldora aparece sin viajar; sin giro. */
+  .pista {
+    animation: none;
+  }
+
+  .cinta {
+    overflow-x: auto;
+  }
+
+  .pildora,
+  .pildoraLista,
+  .pildoraEnlace,
+  .renderImg,
+  .boton,
+  .boton svg,
+  .tipoFlecha,
+  .tipoFlecha svg,
+  .verCategoria svg {
+    transition: none;
+  }
+
+  .emblema {
+    transform: none;
+  }
+}

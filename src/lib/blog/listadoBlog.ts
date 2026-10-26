@@ -13,6 +13,8 @@ import {
   type ParametrosURL,
 } from "@/lib/filtros";
 import { metadataFiltrada } from "@/lib/filtros";
+import { ANIMACIONES_BLOG } from "@/lib/animacionesBlog";
+import { activasDe, PARAMETRO_ANIMACIONES } from "@/lib/listado/animaciones";
 import { getIndiceBlog } from "@/lib/queries/getBlog";
 import { rutas } from "@/lib/routes";
 import { absoluteUrl, indexacionPermitida } from "@/lib/seo/config";
@@ -107,7 +109,21 @@ export async function cargarIndiceBlog(
     permanentRedirect(conConsulta(ruta, resto, consultaDeBusqueda(busqueda)));
   }
   if (listado.tipo === "no-existe") notFound();
-  return { listado, catalogo, categorias, categoria, busqueda, totalArticulos: articulos.length };
+  // Las mejoras N1–N4; en un preview se prueban con `?anim=` (nunca en el sitio publicado).
+  const activas = activasDe(
+    ANIMACIONES_BLOG,
+    parametros[PARAMETRO_ANIMACIONES],
+    process.env.VERCEL_ENV !== "production",
+  );
+  return {
+    listado,
+    catalogo,
+    categorias,
+    categoria,
+    busqueda,
+    activas,
+    totalArticulos: articulos.length,
+  };
 }
 
 /** Los parámetros desconocidos (`utm_…`) sin `buscar`, que es nuestro. */

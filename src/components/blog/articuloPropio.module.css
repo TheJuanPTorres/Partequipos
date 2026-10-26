@@ -26,8 +26,16 @@
 }
 
 /* ---- Cabecera baja -------------------------------------------------------- */
+/*
+ * El bloque (migas, etiqueta, título y datos) va CENTRADO EN VERTICAL y alineado a
+ * la izquierda (Juan Pablo, 2026-10-26): alto mínimo fijo (reserva el sitio: CLS),
+ * relleno simétrico y 20 px entre elementos. Un título largo hace crecer la caja.
+ */
 .cabecera {
   position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 380px;
   margin: 8px 8px 0;
   overflow: hidden;
   border-radius: 30px;
@@ -38,14 +46,19 @@
 }
 
 .cabeceraInterior {
-  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 88px 20px 48px;
+  padding: 56px 16px;
 }
 
 /* Las migas, sobre fondo oscuro. */
 .migas :global(nav) {
-  margin-bottom: 20px;
+  margin: 0;
 }
 
 .migas :global(ol),
@@ -79,8 +92,8 @@
 }
 
 .titulo {
-  margin: 16px 0 0;
-  max-width: 900px;
+  margin: 0;
+  max-width: 860px;
   color: #fff;
   font-size: 30px;
   font-weight: 600;
@@ -89,15 +102,19 @@
 }
 
 .meta {
-  margin: 16px 0 0;
+  margin: 0;
   color: rgba(255, 255, 255, 0.85);
   font-size: 15px;
   line-height: 1.5;
 }
 
 @media (min-width: 1025px) {
+  .cabecera {
+    min-height: 460px;
+  }
+
   .cabeceraInterior {
-    padding: 112px 20px 64px;
+    padding: 72px 16px;
   }
 
   .titulo {
@@ -121,18 +138,14 @@
   object-fit: cover;
 }
 
-/* ---- Zona de lectura ------------------------------------------------------ */
+/* ---- Zona de lectura: la columna del artículo y «Post recientes» --------- */
 .lectura {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 48px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 20px 24px;
-}
-
-.lateral {
-  display: none;
+  padding: 24px 16px 24px;
 }
 
 .columna {
@@ -142,118 +155,172 @@
   margin: 0 auto;
 }
 
+/* Móvil y tablet: «Post recientes» debajo del artículo, a su ancho. */
+.lateral {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
 @media (min-width: 1025px) {
+  /* Artículo a la izquierda y «Post recientes» a la derecha, con sus bordes en los de la foto. */
   .lectura {
     display: grid;
-    grid-template-columns: 250px minmax(0, 720px);
-    justify-content: center;
+    grid-template-columns: minmax(0, 1fr) clamp(340px, 30vw, 400px);
     align-items: start;
-    gap: 64px;
-    padding: 56px 20px 40px;
+    gap: 56px;
+    padding: 32px 16px 40px;
   }
 
+  .columna,
   .lateral {
-    display: block;
-    position: sticky;
-    top: 110px;
-    max-height: calc(100vh - 140px);
-    overflow-y: auto;
-  }
-
-  .columna {
     margin: 0;
   }
+
+  /* A2: fijo al bajar, solo en escritorio. */
+  .pagina[data-anim~="A2"] .lateral {
+    position: sticky;
+    top: 110px;
+  }
 }
 
-/* ---- Índice «En este artículo» --------------------------------------------- */
-/* Por debajo de 1025 px: desplegable bajo la cabecera, antes de la foto. */
-.indiceCabecera {
-  max-width: 1200px;
-  margin: 16px auto 0;
-  padding: 0 16px;
+/* ---- Datos: autor, fecha y lectura ------------------------------------------ */
+.datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0 0 32px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e3e3e3;
+  list-style: none;
+  color: var(--negro);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-.indiceMovil {
-  border-radius: 20px;
+.datoEtiqueta {
+  color: var(--gris-texto);
+  font-weight: 600;
+}
+
+.datoEtiqueta::after {
+  content: ":";
+}
+
+/* ---- Post recientes ----------------------------------------------------------- */
+.recientes {
+  padding: 24px;
+  border-radius: 30px;
   background: var(--gris-fondo);
 }
 
-.indiceMovil summary {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 0 18px;
+.tituloRecientes {
+  margin: 0 0 16px;
   color: var(--negro);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.indiceMovil summary:focus-visible {
-  outline: 3px solid var(--rojo);
-  outline-offset: 2px;
-}
-
-.indiceMovil .listaIndice {
-  padding: 0 18px 16px;
-}
-
-.indiceEscritorio {
-  display: none;
-}
-
-@media (min-width: 1025px) {
-  .indiceCabecera {
-    display: none;
-  }
-
-  .indiceEscritorio {
-    display: block;
-  }
-}
-
-.tituloIndice {
-  margin: 0 0 12px;
-  color: var(--negro);
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
 }
 
-.listaIndice {
+.recientes ul {
   display: grid;
-  gap: 4px;
+  gap: 18px;
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 14px;
-  line-height: 1.4;
 }
 
-.listaIndice a {
+.reciente {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.miniatura {
+  position: relative;
   display: block;
-  padding: 7px 0 7px 12px;
-  border-left: 2px solid #d9d9d9;
-  color: var(--gris-texto);
+  width: 96px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #e8e8e8;
+}
+
+.miniatura img {
+  object-fit: cover;
+}
+
+.reciente h3 {
+  margin: 0;
+  color: var(--negro);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.reciente h3 a {
+  color: inherit;
   text-decoration: none;
 }
 
-.listaIndice li[data-nivel="3"] a {
-  padding-left: 26px;
+.reciente h3 a:hover {
+  color: var(--rojo);
 }
 
-.listaIndice a:hover {
-  color: var(--negro);
-}
-
-.listaIndice a[aria-current="location"] {
-  border-left-color: var(--rojo);
-  color: var(--negro);
-  font-weight: 600;
-}
-
-.listaIndice a:focus-visible {
+.reciente h3 a:focus-visible {
   outline: 3px solid var(--rojo);
   outline-offset: 2px;
+}
+
+.reciente p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+@media (min-width: 1025px) {
+  .recientes {
+    padding: 32px 28px;
+  }
+
+  .tituloRecientes {
+    margin-bottom: 24px;
+    font-size: 26px;
+  }
+
+  .recientes ul {
+    gap: 24px;
+  }
+
+  .reciente {
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .miniatura {
+    width: 128px;
+    border-radius: 20px;
+  }
+
+  .reciente h3 {
+    font-size: 18px;
+    line-height: 1.35;
+  }
+
+  .reciente p {
+    font-size: 15px;
+  }
+}
+
+/* A2: zoom leve de la miniatura al pasar el ratón (solo sin «reducir movimiento»). */
+@media (prefers-reduced-motion: no-preference) {
+  .pagina[data-anim~="A2"] .miniatura img {
+    transition: transform 0.4s ease;
+  }
+
+  .pagina[data-anim~="A2"] .reciente:hover .miniatura img {
+    transform: scale(1.06);
+  }
 }
 
 /* ---- Entradilla y cuerpo --------------------------------------------------- */
@@ -414,15 +481,16 @@
   text-align: center;
 }
 
-/* ---- Compartir ------------------------------------------------------------- */
+/* ---- Compartir (bajo la imagen principal) ----------------------------------- */
 .compartir {
-  margin-top: 48px;
-  padding-top: 24px;
-  border-top: 1px solid #e3e3e3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
 }
 
 .tituloCompartir {
-  margin: 0 0 12px;
+  margin: 0;
   color: var(--negro);
   font-weight: 600;
 }
@@ -436,37 +504,69 @@
   list-style: none;
 }
 
-.compartir a,
-.compartir button {
+.compartir a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  border: 0;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--negro);
   color: #fff;
-  cursor: pointer;
 }
 
-.compartir a:hover,
-.compartir button:hover {
+.compartir a:hover {
   background: var(--rojo);
 }
 
-.compartir a:focus-visible,
-.compartir button:focus-visible {
+.compartir a:focus-visible {
   outline: 3px solid var(--rojo);
   outline-offset: 3px;
 }
 
-.copiado {
-  min-height: 1.5em;
-  margin: 8px 0 0;
-  color: var(--negro);
-  font-size: 14px;
+/* A1: toman el color de su red (blanco encima: AA) y, sin «reducir movimiento», suben un poco. */
+.pagina[data-anim~="A1"] .compartir a[data-red="facebook"]:hover {
+  background: #1877f2;
+}
+
+.pagina[data-anim~="A1"] .compartir a[data-red="x"]:hover {
+  background: #000;
+}
+
+.pagina[data-anim~="A1"] .compartir a[data-red="linkedin"]:hover {
+  background: #0a66c2;
+}
+
+.pagina[data-anim~="A1"] .compartir a[data-red="correo"]:hover {
+  background: #56545a;
+}
+
+.pagina[data-anim~="A1"] .compartir a[data-red="whatsapp"]:hover {
+  background: #128c4b;
+}
+
+/* A3: el contenido entra con un fundido (solo opacidad: CLS 0). */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pagina[data-anim~="A1"] .compartir a {
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .pagina[data-anim~="A1"] .compartir a:hover,
+  .pagina[data-anim~="A1"] .compartir a:focus-visible {
+    transform: translateY(-3px);
+  }
+
+  .pagina[data-anim~="A3"] .contenidoArticulo {
+    animation: aparecer 0.6s ease-out both;
+  }
 }
 
 /* ---- Llamada final ---------------------------------------------------------- */

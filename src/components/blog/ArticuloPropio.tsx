@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { ANIMACIONES_ARTICULO } from "@/lib/blog/animacionesArticulo";
+import { autorVisible, postRecientes, sinImagenPrincipal } from "@/lib/blog/articulo";
 import { minutosDeLectura } from "@/lib/blog/indice";
 import {
   articulosRelacionados,
@@ -13,7 +15,6 @@ import {
   textoEnlaceRelacionada,
   type CandidataRelacion,
 } from "@/lib/blog/relacionada";
-import { titulosDeLexical } from "@/lib/blog/titulos";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import { textoPlanoLexical } from "@/lib/maquinaria/reservaTexto";
 import { getIndiceBlog } from "@/lib/queries/getBlog";
@@ -26,6 +27,7 @@ import { absoluteUrl, seoConfig } from "@/lib/seo/config";
 import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
+import { activasDe } from "@/lib/listado/animaciones";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 import type {
   Articulo,
@@ -35,16 +37,18 @@ import type {
   CategoriasUsada,
 } from "@/payload-types";
 
-import { CompartirArticulo } from "./CompartirArticulo";
+import { AnimacionesArticulo } from "./AnimacionesArticulo";
+import { BarraCompartir } from "./BarraCompartir";
 import { CuerpoArticulo } from "./CuerpoArticulo";
 import { fechaLarga } from "./fecha";
-import { IndiceArticulo } from "./IndiceArticulo";
 import { TarjetaArticulo } from "./IndiceBlog";
 import estilos from "./articuloPropio.module.css";
 import reserva from "./cabeceraArticulo.module.css";
+import { PostRecientes } from "./PostRecientes";
 import { ProgresoLectura } from "./ProgresoLectura";
 
 const ID_CUERPO = "articulo-cuerpo";
+const ID_PAGINA = "articulo-pagina";
 
 /**
  * El artículo del blog con el DISEÑO PROPIO (2026-10-21, dirección): Andrés no
@@ -54,11 +58,16 @@ const ID_CUERPO = "articulo-cuerpo";
  * el artículo es `ArticuloCuerpo`, como siempre.
  *
  * - cabecera baja con migas, categoría, `<h1>`, fecha, autor y tiempo de lectura;
- * - imagen destacada grande con esquinas redondeadas;
+ * - imagen destacada grande con esquinas redondeadas y, debajo (como WordPress,
+ *   2026-10-26), «Comparte esta nota de interés» y los datos: autor, fecha y
+ *   minutos de lectura. La imagen principal no se repite en el contenido
+ *   (`sinImagenPrincipal`) y un autor que parece usuario interno firma
+ *   «Partequipos» (`autorVisible`);
  * - columna de lectura de 720 px con estilo para títulos, listas, citas, tablas
- *   (con desplazamiento propio) e imágenes con pie;
- * - índice «En este artículo» fijo al lado desde 1025 px y barra de progreso;
- * - compartir (WhatsApp, LinkedIn, Facebook, copiar enlace);
+ *   (con desplazamiento propio) e imágenes con pie, y barra de progreso;
+ * - «Post recientes» a la derecha desde 1025 px (debajo en móvil). Sin el índice
+ *   «En este artículo» (2026-10-26);
+ * - mejoras A1–A3 con su interruptor (`ANIMACIONES_ARTICULO`);
  * - llamada final que abre la ventana emergente del formulario y, si el título
  *   habla de una categoría del sitio, un enlace a ella (`categoriaRelacionada`);
  * - tres artículos relacionados con las tarjetas del índice.
@@ -77,15 +86,19 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
 
   const categoria = poblado<CategoriasBlog>(articulo.categoria);
   const imagen = imagenDeMedia(articulo.imagenDestacada, articulo.titulo);
-  const autor = articulo.autor?.trim() || seoConfig.siteName;
+  const autor = autorVisible(articulo.autor, seoConfig.siteName);
   const cuerpoTexto = textoPlanoLexical(articulo.contenido);
   const minutos = minutosDeLectura(cuerpoTexto);
-  const titulos = titulosDeLexical(articulo.contenido);
+  const contenido = sinImagenPrincipal(articulo.contenido, articulo.imagenDestacada);
   const path = rutas.articulo(articulo.slug);
   const url = absoluteUrl(`${path}/`);
 
   const yo = indice.articulos.find((a) => a.id === articulo.id);
   const relacionados = yo ? articulosRelacionados(yo, indice.articulos, 3) : [];
+  const recientes = postRecientes(indice.articulos, articulo.id, 3);
+  // A1–A3 encendidas en el código; en un preview, `?anim=` las recorta en el navegador.
+  const permitirUrl = process.env.VERCEL_ENV !== "production";
+  const animaciones = activasDe(ANIMACIONES_ARTICULO, null, false).join(" ");
 
   const candidatas: CandidataRelacion[] = [
     // Con su dirección real: una categoría que cuelga de otra (Filtros Donaldson) va bajo ella.
@@ -152,7 +165,7 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
   const meta = [fecha, lectura, `Por ${autor}`].join(" · ");
 
   return (
-    <main className={estilos.pagina}>
+    <main id={ID_PAGINA} className={estilos.pagina} data-anim={animaciones}>
       <JsonLd
         data={[
           buildArticleJsonLd({
@@ -172,6 +185,7 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
         ]}
       />
       <ProgresoLectura idCuerpo={ID_CUERPO} />
+      <AnimacionesArticulo permitirUrl={permitirUrl} idRaiz={ID_PAGINA} />
 
       <article>
         <header className={estilos.cabecera}>
@@ -198,8 +212,6 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
           </div>
         </header>
 
-        <IndiceArticulo titulos={titulos} variante="movil" />
-
         {imagen ? (
           <div className={estilos.destacada}>
             <Image
@@ -216,26 +228,40 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
         ) : null}
 
         <div className={estilos.lectura}>
-          <aside className={estilos.lateral}>
-            <IndiceArticulo titulos={titulos} variante="escritorio" />
-          </aside>
-
           <div className={estilos.columna}>
-            {mostrarEntradilla && articulo.entradilla ? (
-              <p
-                className={`${reserva.reserva} ${estilos.entradilla}`}
-                data-reserva={articulo.entradilla}
-              >
-                <span>{articulo.entradilla}</span>
-              </p>
-            ) : null}
+            <BarraCompartir url={url} titulo={articulo.titulo} />
+            <ul className={estilos.datos} aria-label="Datos del artículo">
+              <li>
+                <span className={estilos.datoEtiqueta}>Autor</span> {autor}
+              </li>
+              <li>
+                <span className={estilos.datoEtiqueta}>Fecha</span>{" "}
+                <time dateTime={articulo.fechaPublicacion}>{fecha}</time>
+              </li>
+              <li>
+                <span className={estilos.datoEtiqueta}>Lectura</span> {lectura}
+              </li>
+            </ul>
 
-            <div id={ID_CUERPO}>
-              <CuerpoArticulo data={articulo.contenido} />
+            <div className={estilos.contenidoArticulo}>
+              {mostrarEntradilla && articulo.entradilla ? (
+                <p
+                  className={`${reserva.reserva} ${estilos.entradilla}`}
+                  data-reserva={articulo.entradilla}
+                >
+                  <span>{articulo.entradilla}</span>
+                </p>
+              ) : null}
+
+              <div id={ID_CUERPO}>
+                <CuerpoArticulo data={contenido} />
+              </div>
             </div>
-
-            <CompartirArticulo url={url} titulo={articulo.titulo} />
           </div>
+
+          <aside className={estilos.lateral}>
+            <PostRecientes articulos={recientes} />
+          </aside>
         </div>
       </article>
 

@@ -20,6 +20,7 @@ import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { categoriasDeMarca, logoConAlt } from "@/lib/repuestos/marca";
 import { ANIMACIONES_CATEGORIAS } from "@/lib/repuestos/animacionesCategorias";
+import { ANIMACIONES_MODELO } from "@/lib/repuestos/animacionesModelo";
 import {
   categoriasDelTipo,
   tituloDisponibles4086,
@@ -135,7 +136,7 @@ export async function PaginaModeloRepuesto({
         {/* La página ya tiene su formulario: el pie no pinta la tarjeta roja. */}
         <PieSinTarjeta />
         <ZonaAnimada
-          interruptores={ANIMACIONES_CATEGORIAS}
+          interruptores={{ ...ANIMACIONES_CATEGORIAS, ...ANIMACIONES_MODELO }}
           permitirUrl={process.env.VERCEL_ENV !== "production"}
           entrada="C1"
         >
@@ -147,8 +148,11 @@ export async function PaginaModeloRepuesto({
               tipo: texto(tipo.nombre),
               marca: texto(marca.nombre),
             }}
-            fondo={imagenDeMedia(tipo.imagen, "") ?? imagenDeMedia(marca.fondoHero, "")}
-            foto={imagenes[0] ?? null}
+            // UNA sola foto (Juan Pablo, 2026-10-26): la del modelo y, sin ella, la del tipo o la
+            // de la marca (estas dos, decorativas).
+            fondo={
+              imagenes[0] ?? imagenDeMedia(tipo.imagen, "") ?? imagenDeMedia(marca.fondoHero, "")
+            }
             texto={texto(modelo.descripcion)}
           />
           <BaldosasCategorias

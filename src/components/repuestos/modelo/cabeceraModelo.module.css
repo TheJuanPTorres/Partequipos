@@ -3,10 +3,14 @@
  * Export: contenedor con 3 % de relleno; la tarjeta blanca de radio 30 en fila, con la foto
  * al 45 % (51vh de alto mínimo, esquinas izquierdas redondeadas) y el texto al 55 % (3 % de
  * relleno, centrado en vertical). Datos con icono en pastillas del gris de sección, a 20 px.
+ *
+ * Aire (Juan Pablo, 2026-10-26: iba pegada): 24 px bajo la cabecera del sitio y 1,5vw a los
+ * lados, como el banner de las demás páginas de repuestos (`heroSeccion`), y 48 px antes de
+ * «Repuestos disponibles…» (32 en móvil).
  */
 .cabecera {
   display: flex;
-  margin: 3% 3% 0;
+  margin: 24px 1.5vw 48px;
   overflow: hidden;
   border-radius: 30px;
   background: var(--color-fondo);
@@ -77,43 +81,20 @@
   color: var(--color-marca);
 }
 
-.presentacion {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-  margin-top: 16px;
-}
-
-.fotoModelo {
-  flex: none;
-  width: 375px;
-  max-width: 45%;
-  height: auto;
-  border-radius: 20px;
-  object-fit: contain;
-}
-
+/* El texto del modelo en el sitio de la foto que se quitó: una medida de lectura cómoda. */
 .texto {
-  margin: 0;
+  max-width: 64ch;
+  margin: 12px 0 0;
   color: var(--color-texto);
+  line-height: 1.6;
   white-space: pre-line;
-}
-
-@media (max-width: 1024px) {
-  .presentacion {
-    flex-direction: column;
-  }
-
-  .fotoModelo {
-    max-width: 100%;
-  }
 }
 
 /* En el teléfono, la foto arriba (240 px) y el texto debajo, a todo el ancho. */
 @media (max-width: 767px) {
   .cabecera {
     flex-direction: column;
-    margin: 20px 20px 0;
+    margin-bottom: 32px;
   }
 
   .lado {
@@ -128,5 +109,60 @@
 
   .datos {
     gap: 10px;
+  }
+}
+
+/* --- Animaciones H1–H3 (`ANIMACIONES_MODELO`) -------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* H1: el texto entra escalonado desde el primer pintado (CSS, sin JavaScript ni parpadeo). */
+  [data-anim~="H1"] .cuerpo > * {
+    animation: entrar 520ms cubic-bezier(0.33, 0, 0.2, 1) backwards;
+  }
+
+  [data-anim~="H1"] .cuerpo > :nth-child(2) {
+    animation-delay: 80ms;
+  }
+
+  [data-anim~="H1"] .cuerpo > :nth-child(3) {
+    animation-delay: 160ms;
+  }
+
+  [data-anim~="H1"] .cuerpo > :nth-child(4) {
+    animation-delay: 240ms;
+  }
+
+  [data-anim~="H1"] .cuerpo > :nth-child(5) {
+    animation-delay: 320ms;
+  }
+
+  /* H2: la pastilla sube 3 px al pasar el ratón; solo `transform`, el resto no se mueve. */
+  [data-anim~="H2"] .dato {
+    transition:
+      transform 280ms cubic-bezier(0.33, 0, 0.2, 1),
+      box-shadow 280ms cubic-bezier(0.33, 0, 0.2, 1);
+  }
+
+  [data-anim~="H2"] .dato:hover {
+    box-shadow: 0 6px 14px rgb(16 15 15 / 0.12);
+    transform: translateY(-3px);
+  }
+
+  /* H3: la foto aparece con un fundido (en la caja: la imagen ya lleva el zoom C3). */
+  [data-anim~="H3"] .lado {
+    animation: aparecer 700ms cubic-bezier(0.33, 0, 0.2, 1) backwards;
+  }
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
   }
 }

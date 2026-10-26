@@ -13,25 +13,27 @@ import estilos from "./cabeceraModelo.module.css";
  * repuestos», 2026-10-26): una tarjeta blanca de radio 30 partida en dos. A la izquierda (45 %),
  * la foto de fondo; a la derecha (55 %), las migas, el antetítulo rojo «Repuestos para
  * Maquinaria Pesada», el título «{MARCA} {Tipo} {Modelo}» (el `<h1>`), tres datos con icono
- * (código, tipo y marca, en pastillas grises) y, debajo, la foto del modelo y su texto.
+ * (código, tipo y marca, en pastillas grises) y, debajo, el texto del modelo. La foto va SOLO a
+ * la izquierda (Juan Pablo, 2026-10-26: salía dos veces).
  *
- * La foto de fondo lleva la clase `fondo` de las cabeceras de repuestos: con C3
+ * La foto es la del modelo (con su texto alternativo) o, sin ella, la del tipo o la de la marca
+ * (decorativas, `alt` vacío). Lleva la clase `fondo` de las cabeceras de repuestos: con C3
  * (`ANIMACIONES_CATEGORIAS`) se acerca muy despacio, como la del índice de categorías.
  * Sin foto, la mitad izquierda no se pinta y el texto ocupa la tarjeta.
+ *
+ * Animaciones H1–H3 (`ANIMACIONES_MODELO`): solo CSS, colgadas de `[data-anim~="H…"]`.
  */
 export function CabeceraModelo({
   migas,
   titulo,
   datos,
   fondo,
-  foto,
   texto,
 }: {
   migas: BreadcrumbItem[];
   titulo: string;
   datos: { codigo: string; tipo: string; marca: string };
   fondo: ImagenLista | null;
-  foto: ImagenLista | null;
   texto: string;
 }) {
   const filas = [
@@ -46,7 +48,7 @@ export function CabeceraModelo({
         <div className={estilos.lado}>
           <Image
             src={fondo.url}
-            alt=""
+            alt={fondo.alt}
             fill
             priority
             sizes="(max-width: 767px) 100vw, 45vw"
@@ -75,21 +77,7 @@ export function CabeceraModelo({
             ))}
           </ul>
         ) : null}
-        {foto || texto ? (
-          <div className={estilos.presentacion}>
-            {foto ? (
-              <Image
-                src={foto.url}
-                alt={foto.alt}
-                width={foto.width}
-                height={foto.height}
-                sizes="(max-width: 767px) 90vw, 375px"
-                className={estilos.fotoModelo}
-              />
-            ) : null}
-            {texto ? <p className={`${estilos.texto} texto-cuerpo`}>{texto}</p> : null}
-          </div>
-        ) : null}
+        {texto ? <p className={`${estilos.texto} texto-cuerpo`}>{texto}</p> : null}
       </div>
     </section>
   );

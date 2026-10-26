@@ -24,7 +24,13 @@ import estilos from "./repuestosKit.module.css";
 
 const SIZES_MAQUINA = "(min-width: 1536px) 54vw, (min-width: 1025px) 50vw, 90vw";
 
-export type TextosRepuestosKit = { antetitulo: string; titulo: string; verTodos: string };
+export type TextosRepuestosKit = {
+  antetitulo: string;
+  titulo: string;
+  /** «Texto bajo el título», con sus saltos de línea. Vacío, no se pinta. */
+  descripcion: string;
+  verTodos: string;
+};
 
 export function SeccionRepuestosKit({
   categorias,
@@ -48,6 +54,9 @@ export function SeccionRepuestosKit({
             <h2 id={idTitulo} className={estilos.titulo}>
               {textos.titulo || "Encuentra Maquinaria y Repuestos Rápido y Fácil"}
             </h2>
+            {textos.descripcion ? (
+              <p className={estilos.descripcion}>{textos.descripcion}</p>
+            ) : null}
           </div>
 
           {maquina ? <Maquina maquina={maquina} reflejo={reflejo} /> : null}

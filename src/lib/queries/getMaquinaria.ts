@@ -30,6 +30,7 @@ import type {
 import { SLUG_EXCAVADORAS } from "../portada/secciones";
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "../cacheDatos";
 import type { EquipoFiltrable } from "../nueva/filtros";
+import { SORT_POR_ORDEN } from "../nueva/orden";
 import { rutas } from "../routes";
 import type { UnidadFiltrable } from "../usados/filtros";
 import { conPrimeraImagen, idsDePrimeraImagen } from "../usados/primeraImagen";
@@ -84,7 +85,7 @@ export const getTiposMaquinaria = cache(async (): Promise<TiposMaquinaria[]> => 
     where: DE_MARCA_VISIBLE,
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    sort: SORT_POR_ORDEN,
   });
   return docs;
 });
@@ -98,7 +99,7 @@ export const getTiposDeMarcaMaquinaria = cache(
       // `depth: 1` puebla la imagen de la tarjeta del tipo.
       depth: 1,
       limit: 0,
-      sort: "nombre",
+      sort: SORT_POR_ORDEN,
     });
     return docs;
   },
@@ -129,7 +130,7 @@ export const getEquiposNuevos = cache(async (): Promise<EquiposNuevo[]> => {
     where: conEquipoVisible(),
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    sort: SORT_POR_ORDEN,
   });
   return docs;
 });
@@ -141,7 +142,7 @@ export const getEquiposDeTipo = cache(async (tipoId: number): Promise<EquiposNue
     where: conEquipoVisible({ tipo: { equals: tipoId } }),
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    sort: SORT_POR_ORDEN,
   });
   return docs;
 });
@@ -173,7 +174,7 @@ export const getOtrasReferencias = cache(
       where: conEquipoVisible({
         and: [{ tipo: { equals: tipoId } }, { id: { not_equals: excluirId } }],
       }),
-      sort: "nombre",
+      sort: SORT_POR_ORDEN,
       depth: 1,
       limit: 3,
     });
@@ -190,7 +191,7 @@ export const getEquiposDeTipos = cache(async (tipoIds: number[]): Promise<Equipo
     where: conEquipoVisible({ tipo: { in: tipoIds } }),
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    sort: SORT_POR_ORDEN,
   });
   return docs;
 });

@@ -250,6 +250,10 @@ export interface EquiposNuevo {
    */
   tipo: number | TiposMaquinaria;
   /**
+   * Posición del equipo dentro de su tipo (1, 2, 3…), en la página de la marca y en las del tipo. Vacío: después de los que tienen orden, por nombre.
+   */
+  orden?: number | null;
+  /**
    * Referencia del fabricante, ej. 1150M o ZX350LC-6.
    */
   codigo?: string | null;
@@ -544,6 +548,10 @@ export interface TiposMaquinaria {
    */
   slug: string;
   marca: number | MarcasMaquinaria;
+  /**
+   * Posición del tipo en la página de su marca, en la barra de tipos y en el menú (1, 2, 3…). Vacío: después de los que tienen orden, por nombre.
+   */
+  orden?: number | null;
   descripcion?: string | null;
   /**
    * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.
@@ -2653,6 +2661,7 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
   slug?: T;
   marca?: T;
   tipo?: T;
+  orden?: T;
   codigo?: T;
   pesoOperativoKg?: T;
   entradilla?: T;
@@ -2785,6 +2794,7 @@ export interface TiposMaquinariaSelect<T extends boolean = true> {
   nombre?: T;
   slug?: T;
   marca?: T;
+  orden?: T;
   descripcion?: T;
   imagen?: T;
   render?: T;

@@ -17,7 +17,7 @@ export const TipoMaquinaria: CollectionConfig = {
   labels: { singular: "Tipo de maquinaria nueva", plural: "Tipos de maquinaria nueva" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "marca", "slug"],
+    defaultColumns: ["nombre", "marca", "orden", "slug"],
     group: "Maquinaria",
   },
   access: {
@@ -45,6 +45,21 @@ export const TipoMaquinaria: CollectionConfig = {
       relationTo: "marcas-maquinaria",
       required: true,
       label: "Marca",
+    },
+    /*
+     * ORDEN (2026-10-26, cliente): el de las secciones de la página de su marca (y de la píldora,
+     * la cinta y el menú). Vacío, al final, por nombre.
+     */
+    {
+      name: "orden",
+      type: "number",
+      label: "Orden",
+      admin: {
+        position: "sidebar",
+        step: 1,
+        description:
+          "Posición del tipo en la página de su marca, en la barra de tipos y en el menú (1, 2, 3…). Vacío: después de los que tienen orden, por nombre.",
+      },
     },
     { name: "descripcion", type: "textarea", label: "Descripción" },
     /*

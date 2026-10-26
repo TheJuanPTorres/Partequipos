@@ -22,7 +22,7 @@ export const EquipoNuevo: CollectionConfig = {
   labels: { singular: "Equipo nuevo", plural: "Equipos nuevos" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "imagenes", "marca", "tipo", "slug", "mostrarEnWeb"],
+    defaultColumns: ["nombre", "imagenes", "marca", "tipo", "orden", "slug", "mostrarEnWeb"],
     group: "Maquinaria",
     listSearchableFields: ["nombre", "codigo"],
   },
@@ -70,6 +70,21 @@ export const EquipoNuevo: CollectionConfig = {
       filterOptions: ({ siblingData }) => {
         const marca = (siblingData as { marca?: number | string | null }).marca;
         return marca ? { marca: { equals: marca } } : true;
+      },
+    },
+    /*
+     * ORDEN (2026-10-26, cliente): el de los equipos dentro de su tipo, en la página de la marca,
+     * en la de marca y tipo y en la página general del tipo. Vacío, al final, por nombre.
+     */
+    {
+      name: "orden",
+      type: "number",
+      label: "Orden",
+      admin: {
+        position: "sidebar",
+        step: 1,
+        description:
+          "Posición del equipo dentro de su tipo (1, 2, 3…), en la página de la marca y en las del tipo. Vacío: después de los que tienen orden, por nombre.",
       },
     },
     {

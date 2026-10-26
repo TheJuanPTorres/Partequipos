@@ -10,7 +10,7 @@
  */
 export const CAMPOS_MENU = {
   "marcas-maquinaria": ["nombre", "slug", "logo", "logoOscuroEnMenu", "mostrarEnWeb"],
-  "tipos-maquinaria": ["nombre", "slug", "marca", "subtipos", "pestanaIndiceNueva"],
+  "tipos-maquinaria": ["nombre", "slug", "marca", "subtipos", "pestanaIndiceNueva", "orden"],
   "categorias-maquinaria": ["nombre", "slug", "tiposIncluidos"],
   "categorias-usada": ["nombre", "slug", "enOtros", "orden", "mostrarEnWeb"],
   marcas: ["nombre", "slug", "logo", "logoOscuroEnMenu"],

@@ -89,6 +89,7 @@ import * as migration_20261026_154428_nosotros_franja_fotos from './20261026_154
 import * as migration_20261026_191224_blog_fondo_cabecera from './20261026_191224_blog_fondo_cabecera';
 import * as migration_20261026_195305_correo_formularios from './20261026_195305_correo_formularios';
 import * as migration_20261026_203555_donaldson_secciones from './20261026_203555_donaldson_secciones';
+import * as migration_20261026_212026_orden_maquinaria_nueva from './20261026_212026_orden_maquinaria_nueva';
 
 export const migrations = [
   {
@@ -544,6 +545,11 @@ export const migrations = [
   {
     up: migration_20261026_203555_donaldson_secciones.up,
     down: migration_20261026_203555_donaldson_secciones.down,
-    name: '20261026_203555_donaldson_secciones'
+    name: '20261026_203555_donaldson_secciones',
+  },
+  {
+    up: migration_20261026_212026_orden_maquinaria_nueva.up,
+    down: migration_20261026_212026_orden_maquinaria_nueva.down,
+    name: '20261026_212026_orden_maquinaria_nueva'
   },
 ];

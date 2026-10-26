@@ -2,6 +2,7 @@ import type { CategoriasTecnica } from "@/payload-types";
 
 import { claveDeMarca, logoPropio } from "./marca/logoMarca";
 import { colorConBlanco } from "./marca/franjaMarca";
+import { porOrden } from "./nueva/orden";
 import { unaEntradaPorTipo } from "./nueva/ordenTipos";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
@@ -159,6 +160,8 @@ export type TipoCatalogo = ItemCatalogo & {
   marca: number | { id: number } | null | undefined;
   /** Solo los tipos de repuestos anidados (src/lib/repuestos/anidado.ts). */
   slugPadre?: string | null;
+  /** Solo maquinaria nueva: su «Orden» en la marca (vacío, al final). */
+  orden?: number | null;
   /** Solo los tipos «paraguas» de maquinaria nueva («Tipos que agrupa»). */
   subtipos?: ReadonlyArray<number | { id: number } | null | undefined> | null;
   /** Solo maquinaria nueva: «Tarjeta en el índice de tipos» (va en «Por tipo de máquina»). */
@@ -221,8 +224,9 @@ const idDeMarca = (t: TipoCatalogo) => (typeof t.marca === "object" ? t.marca?.i
 const porNombre = <T extends { nombre: string }>(a: T, b: T) =>
   a.nombre.localeCompare(b.nombre, "es");
 
+/** Los tipos de una marca, por su «Orden» (vacío, al final, por nombre), como en su página. */
 function tiposDe(marca: ItemCatalogo, tipos: TipoCatalogo[]) {
-  return tipos.filter((t) => idDeMarca(t) === marca.id).sort(porNombre);
+  return tipos.filter((t) => idDeMarca(t) === marca.id).sort(porOrden);
 }
 
 /** Acordeón de una marca: «Ver todo» y sus tipos. */

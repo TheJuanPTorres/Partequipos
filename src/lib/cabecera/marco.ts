@@ -60,11 +60,15 @@ export function geometriaMarco(
     `translate(${dx}px, ${dy}px)${sx === undefined ? "" : ` scale(${sx}, ${sy})`}`;
   return {
     piezas: {
-      fondo: t(x, 0, w, recto),
-      base: t(x + radio, recto, w - 2 * radio, radio),
-      ladoI: t(x, 0, 1, recto),
-      ladoD: t(x + w - 1, 0, 1, recto),
-      pie: t(x + radio, h - 1, w - 2 * radio, 1),
+      // Las piezas estiradas SE SOLAPAN 1 px con sus vecinas (`+ 1`, `- 1`): dos piezas que
+      // solo se tocaran dejarían, con un escalado no entero (125 %), una costura de medio
+      // píxel, como la de la máscara de antes. Lo solapado queda debajo de las esquinas y
+      // las líneas, del mismo color.
+      fondo: t(x, 0, w, recto + 1),
+      base: t(x + radio - 1, recto, w - 2 * radio + 2, radio),
+      ladoI: t(x, 0, 1, recto + 1),
+      ladoD: t(x + w - 1, 0, 1, recto + 1),
+      pie: t(x + radio - 1, h - 1, w - 2 * radio + 2, 1),
       esquinaI: t(x, recto),
       esquinaD: t(x + w - radio, recto),
       curvaI: t(x - curva, 0),

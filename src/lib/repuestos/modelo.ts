@@ -1,4 +1,4 @@
-import type { CategoriasTecnica, ModelosRepuesto, TiposEquipo } from "@/payload-types";
+import type { CategoriasTecnica, Marca, ModelosRepuesto, TiposEquipo } from "@/payload-types";
 
 /**
  * Lógica pura de la PÁGINA DE MODELO de repuestos (diseño propio aprobado el
@@ -53,4 +53,30 @@ export function categoriasDelTipo(
 ): CategoriasTecnica[] {
   const ids = (tipo.categoriasModelo ?? []).map((c) => (typeof c === "number" ? c : c.id));
   return ids.flatMap((id) => todas.filter((c) => c.id === id && texto(c.nombre)));
+}
+
+type Nombres = {
+  marca: Pick<Marca, "nombre">;
+  tipo: Pick<TiposEquipo, "nombre">;
+  modelo: Pick<ModelosRepuesto, "nombre" | "codigo">;
+};
+
+/** El modelo en la plantilla 4086: su código («EX120-2») o, sin él, su nombre. */
+const modeloCorto = (m: Nombres["modelo"]) => texto(m.codigo) || texto(m.nombre);
+
+/**
+ * El `<h1>` de la página de modelo con la plantilla 4086 de Andrés (2026-10-26): «{MARCA}
+ * {Tipo} {Modelo}», p. ej. «HITACHI Excavadora EX120-2». La marca en mayúsculas, como el
+ * diseño; el tipo, tal como está guardado (regla del sitio). El título SEO no cambia.
+ */
+export function tituloModelo4086({ marca, tipo, modelo }: Nombres): string {
+  return [texto(marca.nombre).toLocaleUpperCase("es"), texto(tipo.nombre), modeloCorto(modelo)]
+    .filter(Boolean)
+    .join(" ");
+}
+
+/** «Repuestos disponibles para {tipo} {marca} {modelo}» (con el revelado por palabras). */
+export function tituloDisponibles4086({ marca, tipo, modelo }: Nombres): string {
+  const partes = [texto(tipo.nombre), texto(marca.nombre), modeloCorto(modelo)].filter(Boolean);
+  return `Repuestos disponibles para ${partes.join(" ")}`;
 }

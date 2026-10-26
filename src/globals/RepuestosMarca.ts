@@ -178,8 +178,9 @@ export const RepuestosMarca: GlobalConfig = {
       fields: [
         /*
          * Dirección, 2026-10-19: en el sitio publicado solo van diseños de
-         * Andrés. El diseño propio del #267 se queda en el código, apagado,
-         * hasta que llegue el suyo.
+         * Andrés. Desde el 2026-10-26 el valor `provisional` pinta su plantilla
+         * 4086 (el valor no cambia: sin migración); el diseño propio del #267
+         * sigue en el código, apagado.
          */
         {
           name: "disenoModelo",
@@ -188,12 +189,12 @@ export const RepuestosMarca: GlobalConfig = {
           defaultValue: "provisional",
           required: true,
           options: [
-            { label: "Provisional (sencillo)", value: "provisional" },
+            { label: "Plantilla de Andrés (4086)", value: "provisional" },
             { label: "Diseño propio (sin plantilla de Andrés)", value: "propio" },
           ],
           admin: {
             description:
-              "«Provisional»: el contenido de WordPress en una página sencilla. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.",
+              "«Plantilla de Andrés»: la ficha 4086 (cabecera partida y las categorías del tipo en baldosas), la del sitio publicado. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.",
           },
         },
         {

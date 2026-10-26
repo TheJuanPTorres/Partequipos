@@ -1,29 +1,65 @@
 /*
- * BLOQUE «FRANJA CON MARQUEE» — Nosotros de ux-9, contenedores `71d4927` y
- * `67ccc064`, widget «List Marquee» `2aa6a439` e imagen `3ce5ff58`. Valores
- * MEDIDOS pintados a 1440, 1010 y 390 (docs/diseno/decisiones-nosotros.md §5).
+ * BLOQUE «FRANJA CON MARQUEE» — Nosotros de ux-9. Desde la plantilla 4089 de Andrés
+ * («Nosotros final», 2026-10-26), contenedores `3` y `3/0` del export:
+ * - sección con 1,5 % a los lados y 5 % abajo (antes 1,5 %); sin alto mínimo propio;
+ * - tarjeta de radio 30 y 64vh de alto mínimo (85vh en móvil; antes 774 px), con el fondo en
+ *   «slideshow» con Ken Burns hacia fuera y el velo #CACACA al 74 % en `multiply`;
+ * - el texto en el centro de la tarjeta: su caja con −250 px de margen inferior y el marquee con
+ *   12vw de margen inferior (en móvil, la tarjeta reparte el espacio y el texto va arriba);
+ * - sin la máquina recortada.
  */
 .seccion {
-  /* Posición del texto en movimiento: borde superior de su caja, medido. */
-  --franja-marquee-arriba: 375px;
   --franja-texto: 110px;
 
-  /* El contenedor de ux-9 mide al menos 792 px: en móvil deja 27 px bajo la tarjeta. */
   box-sizing: border-box;
-  min-height: 792px;
-  padding: 0 1.5vw 1.5vw;
+  padding: 0 1.5vw 5vw;
 }
 
 .tarjeta {
   position: relative;
-  min-height: 774px;
+  display: flex;
+  min-height: 64vh;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   border-radius: 30px;
   background: #8a7d70;
 }
 
+/* Una foto por diapositiva: la actual se ve y se aleja (Ken Burns hacia fuera, 1,3 → 1). */
+.diapositiva {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s linear;
+}
+
+.diapositiva[data-actual] {
+  opacity: 1;
+}
+
 .fondo {
   object-fit: cover;
+}
+
+.diapositiva[data-actual] .fondo {
+  animation: kenBurns 5.5s linear forwards;
+}
+
+.tarjeta[data-pausado] .fondo {
+  animation-play-state: paused;
+}
+
+@keyframes kenBurns {
+  from {
+    transform: scale(1.3);
+  }
+
+  to {
+    transform: scale(1);
+  }
 }
 
 /* El velo de ux-9: #CACACA al 74 % en `multiply`, que apaga y calienta la foto. */
@@ -35,11 +71,19 @@
   mix-blend-mode: multiply;
 }
 
+/* La caja del texto (export: −250 px de margen inferior), por encima de las fotos. */
+.centro {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: -250px;
+}
+
 .marquee {
-  position: absolute;
-  top: var(--franja-marquee-arriba);
-  right: 0;
-  left: 0;
+  width: 100%;
+  margin-bottom: 12vw;
   padding: 10px;
   overflow: hidden;
 }
@@ -51,7 +95,7 @@
   animation: desplazar 80s linear 0.25s infinite;
 }
 
-.marquee[data-pausado] .pista {
+.tarjeta[data-pausado] .pista {
   animation-play-state: paused;
 }
 
@@ -88,14 +132,20 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pista {
+  .pista,
+  .diapositiva[data-actual] .fondo {
     animation: none;
+  }
+
+  .diapositiva {
+    transition: none;
   }
 }
 
-/* La máquina, delante del texto y apoyada a 3vh del borde inferior. */
+/* La máquina (si el panel tiene una; la 4089 ya no la trae), delante del texto. */
 .maquina {
   position: absolute;
+  z-index: 1;
   right: calc(17vw + 48px);
   bottom: 3vh;
   width: 704px;
@@ -106,14 +156,19 @@
 /* Botón de pausa (D2): ux-9 no lo tiene. */
 .pausa {
   position: absolute;
+  z-index: 2;
   right: 16px;
   bottom: 16px;
 }
 
 @media (max-width: 1024px) {
   .seccion {
-    --franja-marquee-arriba: 443px;
     --franja-texto: var(--texto-titulo-seccion);
+  }
+
+  /* Export, tablet: 50 · 30 · 30 · 30 px de relleno. */
+  .tarjeta {
+    padding: 50px 30px 30px;
   }
 
   .maquina {
@@ -123,12 +178,9 @@
 }
 
 @media (max-width: 767px) {
-  .seccion {
-    --franja-marquee-arriba: 60px;
-  }
-
   .tarjeta {
-    min-height: 765px;
+    min-height: 85vh;
+    justify-content: space-between;
   }
 
   .maquina {

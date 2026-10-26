@@ -136,7 +136,7 @@ function vistaSinAncla(b: BloqueDoc, videos: ReadonlyMap<number, Video>): VistaB
         blockType: b.blockType,
         id: b.id,
         texto: b.texto,
-        imagenFondo: imagenDeMedia(b.imagenFondo, ""),
+        fondos: [imagenDeMedia(b.imagenFondo, "")].filter((i) => i !== null),
         imagenFrontal: imagenDeMedia(b.imagenFrontal, ""),
       };
     case "tarjetasExpandibles": {

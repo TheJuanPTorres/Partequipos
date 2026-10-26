@@ -130,7 +130,7 @@ describe("vistaDeBloques", () => {
         imagenFondo: media(5, { width: null }),
       },
     ]);
-    assert.equal(v?.blockType === "franjaMarquee" && v.imagenFondo, null);
+    assert.deepEqual(v?.blockType === "franjaMarquee" && v.fondos, []);
   });
 
   it("tarjetas: enlace vacío es null; sin tarjetas no hay bloque", () => {

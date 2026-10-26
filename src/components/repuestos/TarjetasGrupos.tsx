@@ -19,7 +19,8 @@ import { RecuadrosConScroll } from "./RecuadrosConScroll";
  *   formulario de la página (`anclaContacto`).
  * - «Ver productos», en la misma fila (dirección, 2026-10-22): abre el MISMO panel que sube
  *   desde abajo del «Ver todo» de las marcas (`VerTodosEquipos`), con el grupo y su número, y los
- *   productos como texto, sin enlaces (en WordPress no tienen página). La lista está además en el
+ *   productos en una lista con buscador; sin enlaces (en WordPress no tienen página): cada uno abre
+ *   la ventana de cotización con el producto y la categoría (Juan Pablo, 2026-10-26). La lista está además en el
  *   HTML de la página para Google; solo se ve sin JavaScript (`productosSinJs`), y el botón lleva a
  *   ella.
  *
@@ -99,6 +100,8 @@ export function TarjetasGrupos({
                     href={`#${idLista}`}
                     total={g.productos.length}
                     equipos={g.productos.map((p, i) => ({ id: i, nombre: p, href: null }))}
+                    buscador
+                    cotizar={{ formulario, categoria }}
                     className={`${estilos.botonTarjeta} ${estilos.botonSecundario}`}
                     etiqueta="Ver productos"
                     describedBy={idT}

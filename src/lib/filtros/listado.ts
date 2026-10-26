@@ -46,6 +46,7 @@ export function resolverListado<T>({
   catalogo,
   pagina,
   porPagina,
+  primeraPagina,
   ruta,
 }: {
   items: readonly T[];
@@ -53,6 +54,11 @@ export function resolverListado<T>({
   catalogo: Catalogo<T>;
   pagina: number;
   porPagina: number;
+  /**
+   * Lo que cabe en la página 1 si es distinto de `porPagina` (puede depender de si hay filtros).
+   * Por defecto, `porPagina`.
+   */
+  primeraPagina?: number | ((filtrado: boolean) => number);
   ruta: string;
 }): ResultadoListado<T> {
   const seleccion = depurar(leerSeleccion(parametros, catalogo), catalogo, items);
@@ -64,13 +70,16 @@ export function resolverListado<T>({
     };
   }
   const filtrados = ordenar(filtrar(items, catalogo, seleccion), catalogo, seleccion);
-  const { elementos, total, paginas } = paginar(filtrados, pagina, porPagina);
+  const filtrado = hayFiltros(seleccion, catalogo);
+  const primera =
+    typeof primeraPagina === "function" ? primeraPagina(filtrado) : (primeraPagina ?? porPagina);
+  const { elementos, total, paginas } = paginar(filtrados, pagina, porPagina, primera);
   if (pagina > paginas) return { tipo: "no-existe" };
   return {
     tipo: "listado",
     seleccion,
     consulta,
-    filtrado: hayFiltros(seleccion, catalogo),
+    filtrado,
     facetas: facetasConCuenta(items, catalogo, seleccion),
     elementos,
     total,

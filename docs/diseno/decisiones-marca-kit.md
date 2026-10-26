@@ -14,11 +14,13 @@ Siembra: `scripts/marca-kit/marca-kit.ts` (`runbook-marca-kit-case.md`).
 
 ## Fase 2: Dynapac, Hitachi y Yanmar
 
-Mismos componentes con **sus datos** y los **respaldos** del diseño: sin foto de fondo (panel
-oscuro liso), sin emblema y, en cada tipo, el render si lo hay; si no, la «Imagen de la tarjeta» del
-tipo y, si tampoco, la primera foto de sus equipos. El color de la marca sale del campo «Color de
-la marca» (`--acento`) y el texto se pone en negro o blanco según el contraste (`--tinta`).
-Interruptor: `scripts/marca-kit/marcas-kit-fase2.ts` (`aplicar` / `retirar`, con manifiesto).
+Mismos componentes con **sus datos**. Desde el 2026-10-26 el cliente entregó los kits de las tres
+marcas (foto de fondo, emblema, logo y renders) y dio permiso para los tres emblemas, que van
+ACTIVADOS. El mismo script de Case los siembra: `marca-kit.ts <modo> <destino> <marca>` con
+`hitachi`, `yanmar` o `dynapac` (`runbook-marca-kit-fase2.md`). Respaldos del diseño donde no hay
+render (la miniexcavadora de Hitachi, y los tipos sin kit): la «Imagen de la tarjeta» del tipo y, si
+tampoco, la primera foto de sus equipos. El color de la marca sale del campo «Color de la marca»
+(`--acento`) y el texto se pone en negro o blanco según el contraste (`--tinta`).
 
 ### Tipos «paraguas» de Dynapac
 
@@ -28,13 +30,13 @@ la cinta ni en la píldora: sus equipos salen en las secciones de sus subtipos (
 Compactador de suelo, de llantas y de doble rodillo). Sus páginas de tipo siguen listándolos por
 grupos como hasta ahora.
 
-### Qué falta pedir al cliente (no está en su kit)
+### Qué trae cada kit
 
-| Marca   | Render de cada tipo                         | Foto de fondo | Emblema          | Logo del kit  |
-| ------- | ------------------------------------------- | ------------- | ---------------- | ------------- |
-| Dynapac | 5 (pavimentadora, reglas y 3 compactadores) | sí            | sí (rinoceronte) | sí            |
-| Hitachi | 2 (excavadora y miniexcavadora)             | sí            | sí (Ojo Hitachi) | no hace falta |
-| Yanmar  | 1 (miniexcavadora)                          | sí            | sí (libélula)    | no hace falta |
+| Marca   | Renders                                                 | Foto de fondo | Emblema     |
+| ------- | ------------------------------------------------------- | ------------- | ----------- |
+| Dynapac | 5 (doble rodillo, llantas, suelo, pavimentadora, regla) | 834 × 862     | rinoceronte |
+| Hitachi | 1 (excavadora; la miniexcavadora usa el respaldo)       | sí            | Ojo Hitachi |
+| Yanmar  | 1 (miniexcavadora)                                      | sí            | libélula    |
 
-Hitachi y Yanmar ya tienen logo e imagen de tarjeta en el panel; Dynapac tiene tarjeta y logo.
-Cada emblema necesita además el permiso de uso del cliente, como el de Case.
+Los renders se emparejan con su tipo por dirección (los 7 casaron en el preview). Los logos del
+kit son transparentes; no se usan: el sitio conserva los suyos.

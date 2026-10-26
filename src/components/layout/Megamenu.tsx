@@ -7,6 +7,7 @@ import {
   createContext,
   forwardRef,
   memo,
+  useCallback,
   useContext,
   useEffect,
   useId,
@@ -27,7 +28,13 @@ import {
   DURACION_MARCO_MS,
   type MejoraMegamenu,
 } from "@/lib/cabecera/fluidez";
-import { geometriaMarco, PIEZAS_MARCO, type PiezaMarco } from "@/lib/cabecera/marco";
+import {
+  cajaMarco,
+  type CajaMarco,
+  interpolarCaja,
+  recorteMarco,
+  suavizadoMarco,
+} from "@/lib/cabecera/marco";
 import {
   panelConTarjetas,
   type EnlaceMenu,
@@ -384,6 +391,10 @@ export function SubmenuMovil({
   );
 }
 
+/** El radio de las esquinas de abajo del marco (`--mega-radio`). */
+const radioDe = (m: HTMLElement) =>
+  parseFloat(getComputedStyle(m).getPropertyValue("--mega-radio")) || 30;
+
 /** Cómo está cada panel dentro del marco. */
 export type EstadoPanel = "activo" | "saliendo" | "oculto";
 
@@ -391,25 +402,23 @@ export type EstadoPanel = "activo" | "saliendo" | "oculto";
  * EL MARCO del megamenú (2026-10-25): UNA caja con el contorno para todos los
  * paneles, que van dentro: nunca hay dos a la vez.
  *
- * EL CONTORNO son piezas (`lib/cabecera/marco.ts`) que solo se mueven y se
- * estiran con `transform`, solapadas 1 px entre ellas. Antes era una MÁSCARA de 6
- * piezas de degradado que solo se tocaban: con un escalado de pantalla no entero
- * (125 %) la unión caía en medio píxel y se veía una línea fina.
+ * EL CONTORNO es UN SOLO elemento real (`.forma`, `lib/cabecera/marco.ts`):
+ * fondo, filete y esquinas con `border` y `border-radius` nativos, que cambia de
+ * `width` y `height` de verdad. Antes (#357) eran piezas de 1 × 1 px estiradas con
+ * `scale()` y con transición CSS: con GPU, tras cambiar de menú, el fondo se
+ * quedaba en pantalla con el tamaño de otro panel (en «Repuestos», sin cubrirlo).
  *
- * EL CONTORNO SIGUE SIEMPRE AL PANEL (2026-10-26, fallo visto por Juan Pablo: en
- * «Repuestos» el fondo se quedaba con el tamaño de otro menú). Cada cambio de
- * tamaño o de posición del panel lo repinta en el mismo fotograma, con la caja
- * MEDIDA del panel en pantalla, también a mitad de un cambio de panel. Antes,
- * durante el cambio, dejaba de seguirlo hasta que la animación avisaba de que
- * había terminado; si el aviso no llegaba, el contorno se quedaba corto.
+ * EL CONTORNO SIGUE SIEMPRE AL PANEL: cada cambio de tamaño o de posición del
+ * panel lo repinta, con la caja MEDIDA del panel en pantalla, también a mitad de
+ * un cambio de panel.
  *
  * M3: al cambiar de panel con el marco abierto, no se cierra y reabre: durante
- * `DURACION_MARCO_MS` el marco lleva `data-cambiando` y las piezas y el recorte
- * del contenido pasan del tamaño de antes al nuevo con una TRANSICIÓN CSS (se
- * reencamina sola si algo cambia a medias); el saliente se funde mientras entra el
- * nuevo. Nada cambia de sitio en la maqueta: CLS 0. Sin M3, el cambio vuelve a
- * hacer la entrada de siempre (bajada y fundido). Con «reducir movimiento», al
- * instante.
+ * `DURACION_MARCO_MS` el contorno y el recorte del contenido pasan del tamaño de
+ * antes al nuevo, INTERPOLADOS AQUÍ fotograma a fotograma (sin transiciones CSS,
+ * que con GPU podían quedarse a medias; si el panel cambia a mitad, va hacia la
+ * medida nueva); el saliente se funde mientras entra el nuevo. Nada cambia de
+ * sitio en la maqueta: CLS 0. Sin M3, el cambio vuelve a hacer la entrada de
+ * siempre (bajada y fundido). Con «reducir movimiento», al instante.
  */
 export function MarcoMegamenu({
   activo,
@@ -428,40 +437,79 @@ export function MarcoMegamenu({
   const marco = useRef<HTMLDivElement>(null);
   const lienzo = useRef<HTMLDivElement>(null);
   const contenido = useRef<HTMLDivElement>(null);
-  const piezas = useRef<Partial<Record<PiezaMarco, HTMLSpanElement | null>>>({});
+  const forma = useRef<HTMLSpanElement>(null);
   const previo = useRef<{ activo: string | null; abierto: boolean }>({ activo, abierto });
   const ultimoAlto = useRef<number | null>(null);
   const finCambio = useRef<number | undefined>(undefined);
+  /** La caja que se ve ahora y, durante un cambio (M3), de dónde viene, adónde va y desde cuándo. */
+  const pintada = useRef<CajaMarco | null>(null);
+  const cambio = useRef<{
+    desde: CajaMarco;
+    hacia: CajaMarco;
+    inicio: number;
+    fotograma: number;
+  } | null>(null);
   const [saliente, setSaliente] = useState<string | null>(null);
 
-  /** Pinta el contorno y el recorte sobre el panel que se ve, con su caja MEDIDA en pantalla. */
-  const pintar = () => {
+  /** Pone la caja en el contorno y en el recorte del contenido: valores fijos, sin transiciones. */
+  const aplicar = useCallback((caja: CajaMarco) => {
     const m = marco.current;
     const l = lienzo.current;
     const c = contenido.current;
-    const v = c?.querySelector<HTMLElement>("nav[data-estado='activo']");
-    if (!m || !l || !c || !v) return;
-    const css = getComputedStyle(m);
-    const radio = parseFloat(css.getPropertyValue("--mega-radio")) || 30;
-    const curva = parseFloat(css.getPropertyValue("--mega-curva")) || 20;
+    const f = forma.current;
+    if (!m || !l || !c || !f) return;
+    const traslado = `${caja.x}px 0px`;
+    if (f.style.translate !== traslado) f.style.translate = traslado;
+    if (f.style.width !== `${caja.ancho}px`) f.style.width = `${caja.ancho}px`;
+    if (f.style.height !== `${caja.alto}px`) f.style.height = `${caja.alto}px`;
+    f.dataset.medida = "si";
+    const recorte = recorteMarco(caja, l.clientWidth, c.offsetHeight, radioDe(m));
+    if (c.style.clipPath !== recorte) c.style.clipPath = recorte;
+    pintada.current = caja;
+  }, []);
+
+  /** La caja del panel que se ve, MEDIDA en pantalla. */
+  const medir = useCallback((): CajaMarco | null => {
+    const m = marco.current;
+    const l = lienzo.current;
+    const v = contenido.current?.querySelector<HTMLElement>("nav[data-estado='activo']");
+    if (!m || !l || !v) return null;
     const rl = l.getBoundingClientRect();
     const rv = v.getBoundingClientRect();
-    const g = geometriaMarco(
-      l.clientWidth,
-      c.offsetHeight,
-      rv.width,
-      rv.height,
-      radio,
-      curva,
-      rv.left - rl.left,
-    );
-    for (const p of PIEZAS_MARCO) {
-      const el = piezas.current[p];
-      if (el && el.style.transform !== g.piezas[p]) el.style.transform = g.piezas[p];
-    }
-    if (c.style.clipPath !== g.recorte) c.style.clipPath = g.recorte;
     ultimoAlto.current = rv.height;
-  };
+    return cajaMarco(l.clientWidth, rv.width, rv.height, radioDe(m), rv.left - rl.left);
+  }, []);
+
+  /** Pinta el contorno sobre el panel que se ve; durante un cambio, solo le da el destino nuevo. */
+  const pintar = useCallback(() => {
+    const caja = medir();
+    if (!caja) return;
+    if (cambio.current) cambio.current.hacia = caja;
+    else aplicar(caja);
+  }, [aplicar, medir]);
+
+  const pararCambio = useCallback(() => {
+    if (cambio.current) window.cancelAnimationFrame(cambio.current.fotograma);
+    cambio.current = null;
+  }, []);
+
+  /** M3: del tamaño que se ve al del panel nuevo, un fotograma tras otro. */
+  const empezarCambio = useCallback(() => {
+    const hacia = medir();
+    if (!hacia) return;
+    const desde = pintada.current ?? hacia;
+    pararCambio();
+    const paso = (ahora: number) => {
+      const actual = cambio.current;
+      if (!actual) return;
+      const t = Math.min(1, (ahora - actual.inicio) / DURACION_MARCO_MS);
+      aplicar(interpolarCaja(actual.desde, actual.hacia, suavizadoMarco(t)));
+      if (t < 1) actual.fotograma = window.requestAnimationFrame(paso);
+      else cambio.current = null;
+    };
+    cambio.current = { desde, hacia, inicio: performance.now(), fotograma: 0 };
+    cambio.current.fotograma = window.requestAnimationFrame(paso);
+  }, [aplicar, medir, pararCambio]);
 
   // Cualquier cambio de tamaño (un acordeón, una foto que llega, otro ancho de ventana): se repinta.
   useEffect(() => {
@@ -473,9 +521,15 @@ export function MarcoMegamenu({
     observador.observe(l);
     for (const v of c.querySelectorAll("nav")) observador.observe(v);
     return () => observador.disconnect();
-  }, []);
+  }, [pintar]);
 
-  useEffect(() => () => window.clearTimeout(finCambio.current), []);
+  useEffect(
+    () => () => {
+      window.clearTimeout(finCambio.current);
+      pararCambio();
+    },
+    [pararCambio],
+  );
 
   useLayoutEffect(() => {
     const antes = previo.current;
@@ -483,27 +537,26 @@ export function MarcoMegamenu({
     const m = marco.current;
     const c = contenido.current;
     if (!m || !c) return;
-    const cambio = abierto && antes.abierto && antes.activo !== null && antes.activo !== activo;
-    const animar = cambio && !reducirMovimiento();
+    const otroPanel = abierto && antes.abierto && antes.activo !== null && antes.activo !== activo;
+    const animar = otroPanel && !reducirMovimiento();
     if (animar && mejoras.has("M3")) {
       // Mientras dura el cambio, el contenido mide lo del más alto de los dos paneles: el
       // recorte puede ir del tamaño de antes al nuevo sin que nada se salga.
       const nuevo = c.querySelector<HTMLElement>("nav[data-estado='activo']")?.offsetHeight ?? 0;
       c.style.minHeight = `${Math.max(ultimoAlto.current ?? 0, nuevo)}px`;
-      m.dataset.cambiando = "si";
-      pintar();
+      empezarCambio();
       window.clearTimeout(finCambio.current);
       finCambio.current = window.setTimeout(() => {
-        delete m.dataset.cambiando;
+        pararCambio();
         c.style.minHeight = "";
         pintar();
-      }, DURACION_MARCO_MS);
+      }, DURACION_MARCO_MS + 20);
       setSaliente(antes.activo);
       return;
     }
     // Sin cambio animado: al instante.
     window.clearTimeout(finCambio.current);
-    delete m.dataset.cambiando;
+    pararCambio();
     c.style.minHeight = "";
     pintar();
     if (animar && typeof m.animate === "function") {
@@ -514,7 +567,7 @@ export function MarcoMegamenu({
       });
       c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 550, easing: "ease" });
     }
-  }, [activo, abierto, mejoras]);
+  }, [activo, abierto, mejoras, empezarCambio, pararCambio, pintar]);
 
   // El saliente se funde durante el cambio de tamaño y después desaparece.
   useEffect(() => {
@@ -536,16 +589,7 @@ export function MarcoMegamenu({
     >
       <div ref={lienzo} className={estilos.lienzo}>
         <div className={estilos.contorno} aria-hidden="true">
-          {PIEZAS_MARCO.map((p) => (
-            <span
-              key={p}
-              ref={(el) => {
-                piezas.current[p] = el;
-              }}
-              className={estilos.pieza}
-              data-pieza={p}
-            />
-          ))}
+          <span ref={forma} className={estilos.forma} />
         </div>
         {/*
          * Cerrado (también durante el fundido de salida), el contenido no se puede

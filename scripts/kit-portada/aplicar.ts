@@ -111,22 +111,37 @@ const LOGOS: [string, string][] = [
   ["LiuGong", "logo-liugong.png"],
 ];
 
-/** La pieza de cada categoría técnica, por una palabra de su dirección web. */
+/**
+ * La pieza de cada categoría técnica, por el PRINCIPIO de su dirección web y solo entre las de
+ * primer nivel («Filtros Donaldson», que cuelga de «Filtración», no cuenta).
+ */
 const CATEGORIAS: [RegExp, string, string][] = [
-  [/tren/, "repuestos-categoria-tren.webp", "Cadena y rodillos de tren de rodaje"],
-  [/filtr/, "repuestos-categoria-filtracion.webp", "Filtros para maquinaria pesada"],
+  [/^tren/, "repuestos-categoria-tren.webp", "Cadena y rodillos de tren de rodaje"],
+  [/^filtracion/, "repuestos-categoria-filtracion.webp", "Filtros para maquinaria pesada"],
   [
-    /corte|balde|gets/,
+    /^(herramienta|balde)/,
     "repuestos-categoria-baldes.webp",
     "Balde y dientes de herramienta de corte",
   ],
-  [/lubric/, "repuestos-categoria-lubricantes.webp", "Envases de lubricantes para maquinaria"],
-  [/llanta/, "repuestos-categoria-llantas.webp", "Llanta y rin para maquinaria pesada"],
-  [/miscel/, "repuestos-categoria-miscelaneos.webp", "Repuestos misceláneos para maquinaria"],
-  [/component/, "repuestos-categoria-componentes.webp", "Componentes mayores de maquinaria pesada"],
-  [/motor|diesel/, "repuestos-categoria-motor.webp", "Repuestos para motor diésel"],
-  [/transmis/, "repuestos-categoria-transmision.webp", "Piezas de transmisión para maquinaria"],
-  [/hidraul/, "repuestos-categoria-hidraulicos.webp", "Componentes hidráulicos para maquinaria"],
+  [/^lubric/, "repuestos-categoria-lubricantes.webp", "Envases de lubricantes para maquinaria"],
+  [/^llanta/, "repuestos-categoria-llantas.webp", "Llanta y rin para maquinaria pesada"],
+  [/^miscel/, "repuestos-categoria-miscelaneos.webp", "Repuestos misceláneos para maquinaria"],
+  [
+    /^componentes-mayores/,
+    "repuestos-categoria-componentes.webp",
+    "Componentes mayores de maquinaria pesada",
+  ],
+  [
+    /^(motor|repuestos-para-motor)/,
+    "repuestos-categoria-motor.webp",
+    "Repuestos para motor diésel",
+  ],
+  [/^transmis/, "repuestos-categoria-transmision.webp", "Piezas de transmisión para maquinaria"],
+  [
+    /^(componentes-hidraul|hidraul)/,
+    "repuestos-categoria-hidraulicos.webp",
+    "Componentes hidráulicos para maquinaria",
+  ],
 ];
 
 type Manifiesto = {
@@ -281,19 +296,22 @@ async function aplicar(): Promise<void> {
   }
   log(`${modo === "simular" ? "pondría" : "pone"} las imágenes de la página «inicio»`);
 
-  const { docs: cats } = await payload.find({
+  const { docs: todas } = await payload.find({
     collection: "categorias-tecnicas",
     depth: 0,
     limit: 0,
     pagination: false,
     overrideAccess: true,
   });
+  const cats = todas.filter((c) => !c.padre);
+  const conPieza = new Set<number>();
   for (const [patron, fichero, alt] of CATEGORIAS) {
     const cat = cats.find((c) => patron.test(c.slug));
     if (!cat) {
       log(`⚠ ninguna categoría técnica casa con ${patron}: su pieza no se pone`);
       continue;
     }
+    conPieza.add(cat.id);
     const foto = await subir(fichero, alt);
     log(`${modo === "simular" ? "pondría" : "pone"} ${cat.slug}: ${fichero}`);
     if (!manifiesto.categorias.some((c) => c.id === cat.id)) {
@@ -307,6 +325,11 @@ async function aplicar(): Promise<void> {
         data: { imagenPortada: foto },
         overrideAccess: true,
       });
+    }
+  }
+  for (const c of cats) {
+    if (typeof c.ordenPortada === "number" && !conPieza.has(c.id)) {
+      log(`⚠ ${c.slug} sale en la portada y se queda sin pieza (usa su «Imagen de la tarjeta»)`);
     }
   }
   log(

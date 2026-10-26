@@ -10,7 +10,7 @@ import estilos from "./accesos.module.css";
 /**
  * ACCESO a las páginas que cuelgan de una categoría técnica (2026-10-26, dirección: Filtros
  * Donaldson desde Filtración), para que no dependan solo del menú: una franja por página, con
- * el COLOR de la marca, su logo en una placa blanca, su nombre y «Ver …». Toda la franja es el
+ * el COLOR de la marca, su logo en una placa blanca, su nombre y «Ver productos». Toda la franja es el
  * enlace; el texto va en negro o blanco, el que mejor se lee sobre el color (AA).
  */
 export function AccesosSubcategorias({
@@ -44,7 +44,7 @@ export function AccesosSubcategorias({
               <span className={estilos.texto}>
                 <span className={estilos.nombre}>{a.nombre}</span>
                 <span className={estilos.ver}>
-                  Ver {a.nombre.toLowerCase()}
+                  Ver productos
                   <IconArrowRight aria-hidden="true" focusable="false" stroke={2} />
                 </span>
               </span>

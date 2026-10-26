@@ -1,5 +1,6 @@
 import type { Field, GlobalConfig } from "payload";
 
+import { avisoField } from "../lib/fields/avisoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import {
@@ -321,18 +322,9 @@ export const PaginasIndice: GlobalConfig = {
           label: "Texto sobre las vacantes",
           admin: { description: "Vacío, el texto del diseño («Buscamos profesionales que…»)." },
         },
-        {
-          // Cada vacante lleva «Enviar HV» (ventana con el formulario y el PDF). El PDF NO se guarda:
-          // va de adjunto en este correo.
-          name: "correoHojasDeVida",
-          type: "email",
-          label: "Correo para hojas de vida",
-          admin: {
-            placeholder: "seleccion@…",
-            description:
-              "A este correo llegan las hojas de vida que se envían con «Enviar HV», con el PDF adjunto (no se guarda en el sitio). Vacío, el correo general de la empresa. Fuera del sitio publicado (previews) este campo se ignora.",
-          },
-        },
+        // El «Correo para hojas de vida» pasó a Configuración → «Correo y formularios»
+        // (2026-10-26): aquí solo queda la nota que lleva a él.
+        avisoField("avisoCorreoHojasDeVida", "AvisoCorreoHojasDeVida"),
         // El bloque «¿No ves una oferta para tu perfil?» se quitó (2026-10-23): estos campos ya no
         // se pintan. Siguen en la base; ocultos para no confundir.
         {

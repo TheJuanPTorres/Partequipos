@@ -59,10 +59,10 @@
   color: var(--color-fondo);
 }
 
-/* Botón de pausa (D2): ux-9 no lo tiene. Abajo a la izquierda, dentro de la tarjeta: a la derecha lo taparía el botón de WhatsApp. */
+/* Botón de pausa (D2): ux-9 no lo tiene. Abajo a la derecha, dentro de la tarjeta. */
 .pausa {
   position: absolute;
-  left: 16px;
+  right: 16px;
   bottom: 16px;
 }
 

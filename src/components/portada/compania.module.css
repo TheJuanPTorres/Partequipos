@@ -163,10 +163,10 @@
   outline-offset: 4px;
 }
 
-/* Pausa (D2): abajo a la izquierda de la tarjeta, sobre el vídeo: a la derecha lo taparía el botón de WhatsApp. */
+/* Pausa (D2): abajo a la derecha de la tarjeta, sobre el vídeo. */
 .pausa {
   position: absolute;
-  left: 24px;
+  right: 24px;
   bottom: 24px;
   z-index: 3;
   border-color: var(--color-fondo);

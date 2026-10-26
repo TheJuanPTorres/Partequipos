@@ -14,6 +14,11 @@
  *   npm run preview:ejecutar -- payload run scripts/contenido-real/nosotros-4089.ts listar
  *   npm run preview:ejecutar -- payload run scripts/contenido-real/nosotros-4089.ts aplicar
  *   npm run preview:ejecutar -- payload run scripts/contenido-real/nosotros-4089.ts retirar
+ *   npm run preview:ejecutar -- payload run scripts/contenido-real/nosotros-4089.ts fotos
+ *
+ * `fotos` (después de `aplicar` y con la migración del pase): pone en «Más fotos de fondo» de la
+ * franja las de CASE y Yanmar de WordPress (`FOTOS_PASE`), detrás de la «Imagen de fondo». No
+ * lleva manifiesto propio: `retirar` devuelve los bloques de antes de `aplicar`, sin ellas.
  *
  * `listar` solo lee (bloques de Nosotros, animaciones y fotos `wp-real-`). `aplicar` guarda en
  * un manifiesto los bloques tal como estaban; `retirar` los devuelve. Solo el preview. En el
@@ -34,8 +39,8 @@ const fallar = (m: string): never => {
 };
 const modo = process.argv
   .slice(2)
-  .find((a) => a === "listar" || a === "aplicar" || a === "retirar");
-if (!modo) fallar("indica el modo: listar, aplicar o retirar");
+  .find((a) => a === "listar" || a === "aplicar" || a === "retirar" || a === "fotos");
+if (!modo) fallar("indica el modo: listar, aplicar, retirar o fotos");
 const guarda = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
 if (!guarda.permitido) fallar(`NO se hace nada: ${guarda.motivo}`);
 
@@ -61,6 +66,9 @@ const CAMBIOS_DE_TEXTO: Record<string, string> = {
   "MAQUINARIA PESADA USADA": "Maquinaria Pesada Usada",
   "REPUESTOS PARA MAQUINARIA PESADA": "Repuestos para Maquinaria Pesada",
 };
+/** Fotos de WordPress (ya en «Imágenes») que siguen a la «Imagen de fondo» en el pase. */
+const FOTOS_PASE = ["wp-real-marca-case", "wp-real-marca-yanmar"];
+
 const nuevoTexto = (v: unknown): unknown =>
   typeof v === "string" && CAMBIOS_DE_TEXTO[v.trim()] ? CAMBIOS_DE_TEXTO[v.trim()] : v;
 
@@ -90,6 +98,31 @@ if (modo === "listar") {
   for (const f of fotos.docs)
     if (f.filename?.startsWith("wp-real"))
       log(`foto ${f.id}: ${f.filename} ${f.width}×${f.height} «${f.alt}»`);
+} else if (modo === "fotos") {
+  if (!fs.existsSync(MANIFIESTO)) fallar("primero `aplicar`: `retirar` devuelve las fotos con él");
+  const ids: number[] = [];
+  for (const prefijo of FOTOS_PASE) {
+    const { docs: encontradas } = await payload.find({
+      collection: "media",
+      where: { filename: { like: prefijo } },
+      limit: 10,
+      depth: 0,
+    });
+    const foto =
+      encontradas.find((f) => f.filename?.startsWith(prefijo)) ?? fallar(`no hay foto ${prefijo}…`);
+    ids.push(foto.id);
+    log(`foto del pase: ${foto.id} ${foto.filename}`);
+  }
+  const nuevos = bloques.map((b) =>
+    b.blockType === "franjaMarquee" ? { ...b, fondosExtra: ids } : b,
+  );
+  if (!nuevos.some((b) => b.blockType === "franjaMarquee")) fallar("Nosotros no tiene franja");
+  await payload.update({
+    collection: "paginas",
+    id: pagina.id,
+    data: { bloques: nuevos } as never,
+  });
+  log(`✓ pase con la imagen de fondo y ${ids.length} fotos más`);
 } else if (modo === "retirar") {
   if (!fs.existsSync(MANIFIESTO)) fallar(`no existe ${MANIFIESTO}: nada que retirar`);
   const antes = JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as { bloques: Bloque[] };

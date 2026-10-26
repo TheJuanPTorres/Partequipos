@@ -73,10 +73,10 @@
   display: block;
 }
 
-/* Botón de pausa (N4): ux-9 no lo tiene. Abajo a la derecha, dentro de la caja. */
+/* Botón de pausa (N4): ux-9 no lo tiene. Abajo a la izquierda, dentro de la caja: a la derecha lo taparía el botón de WhatsApp. */
 .pausa {
   position: absolute;
-  right: 0;
+  left: 0;
   bottom: 0;
 }
 

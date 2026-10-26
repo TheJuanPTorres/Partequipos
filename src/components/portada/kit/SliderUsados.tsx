@@ -89,6 +89,14 @@ export function SliderUsados({ etiqueta, children }: { etiqueta: string; childre
       </ul>
       {posiciones > 1 ? (
         <div className={estilos.controles}>
+          {/* La pausa va delante de los puntos: al final de la fila, con muchos puntos, la tapaba el WhatsApp. */}
+          <BotonPausa
+            pausado={pausado}
+            alPulsar={alternar}
+            que={`el carrusel de ${etiqueta.toLowerCase()}`}
+            controla={idPista}
+            className={estilos.pausa}
+          />
           {Array.from({ length: posiciones }, (_, i) => (
             <button
               key={i}
@@ -101,13 +109,6 @@ export function SliderUsados({ etiqueta, children }: { etiqueta: string; childre
               <span />
             </button>
           ))}
-          <BotonPausa
-            pausado={pausado}
-            alPulsar={alternar}
-            que={`el carrusel de ${etiqueta.toLowerCase()}`}
-            controla={idPista}
-            className={estilos.pausa}
-          />
         </div>
       ) : null}
     </div>

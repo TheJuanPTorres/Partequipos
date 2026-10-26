@@ -154,11 +154,11 @@
   height: auto;
 }
 
-/* Botón de pausa (D2): ux-9 no lo tiene. */
+/* Botón de pausa (D2): ux-9 no lo tiene. Abajo a la izquierda: a la derecha lo taparía el botón de WhatsApp. */
 .pausa {
   position: absolute;
   z-index: 2;
-  right: 16px;
+  left: 16px;
   bottom: 16px;
 }
 

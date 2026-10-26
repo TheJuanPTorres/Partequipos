@@ -183,6 +183,8 @@ export function Cabecera({
   const rastro = useRef<Punto[]>([]);
   const marcoRef = useRef<HTMLDivElement | null>(null);
   const abiertaRef = useRef<string | null>(null);
+  // El panel abierto con el teclado: su primer enlace recibe el foco en cuanto se ve.
+  const enfocarAlAbrir = useRef<string | null>(null);
 
   useEffect(() => {
     const alDesplazar = () => setArriba(window.scrollY < UMBRAL_VELO);
@@ -358,10 +360,24 @@ export function Cabecera({
     // Un clic o una tecla abren AL INSTANTE: los retrasos (M1, M2) son solo para el ratón que pasa.
     window.clearTimeout(temporizador.current);
     mostrarMega(clave);
-    if (conTeclado) {
-      window.setTimeout(() => paneMega.current[clave]?.querySelector<HTMLElement>("a")?.focus(), 0);
-    }
+    // Con el teclado, el foco entra en el panel cuando ya se ve (efecto de abajo).
+    if (conTeclado) enfocarAlAbrir.current = clave;
   };
+
+  /*
+   * El foco entra en el panel abierto con el teclado en el fotograma SIGUIENTE a
+   * abrirlo: antes, con un `setTimeout(0)`, a veces el panel aún estaba oculto
+   * (`visibility: hidden`) y el foco se quedaba en el botón (medido con «reducir
+   * movimiento», 2026-10-26; ya pasaba en el sitio publicado).
+   */
+  useEffect(() => {
+    if (!megaAbierto || enfocarAlAbrir.current !== megaAbierto) return;
+    enfocarAlAbrir.current = null;
+    const id = requestAnimationFrame(() =>
+      paneMega.current[megaAbierto]?.querySelector<HTMLElement>("a")?.focus(),
+    );
+    return () => cancelAnimationFrame(id);
+  }, [megaAbierto]);
 
   const alTeclado = (e: KeyboardEvent<HTMLElement>) => {
     if (e.key !== "Escape") return;

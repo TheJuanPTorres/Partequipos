@@ -538,7 +538,11 @@ export function MarcoMegamenu({
             />
           ))}
         </div>
-        <div ref={contenido} className={estilos.contenidoMarco}>
+        {/*
+         * Cerrado (también durante el fundido de salida), el contenido no se puede
+         * enfocar: antes el Tab entraba en el panel que se estaba cerrando.
+         */}
+        <div ref={contenido} className={estilos.contenidoMarco} inert={!abierto}>
           {children(estado)}
         </div>
       </div>

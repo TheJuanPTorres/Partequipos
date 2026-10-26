@@ -392,7 +392,20 @@ a.item:hover {
     color 180ms ease;
 }
 
-.fila:hover,
+/* El hover, solo con ratón: en una pantalla táctil se quedaba pegado a la fila que caía bajo el
+ * toque que abre el panel. */
+@media (hover: hover) {
+  .fila:hover {
+    background: rgb(0 0 0 / 0.06);
+    color: var(--color-marca, #e5242d);
+  }
+
+  .fila:hover .flecha {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .fila:focus-visible {
   background: rgb(0 0 0 / 0.06);
   color: var(--color-marca, #e5242d);
@@ -429,7 +442,6 @@ a.item:hover {
     transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.fila:hover .flecha,
 .fila:focus-visible .flecha {
   opacity: 1;
   transform: none;

@@ -6,6 +6,7 @@ import {
   IconBrandWhatsapp,
   IconBrandXFilled,
   IconBrandWhatsappFilled,
+  IconMapPin,
   IconBrandYoutubeFilled,
 } from "@tabler/icons-react";
 import Image from "next/image";
@@ -226,22 +227,30 @@ export async function Footer() {
         </div>
       </div>
 
+      {/* La franja legal es la BARRA INFERIOR del pie (2026-10-25): mismo fondo, una línea fina
+          arriba y todo centrado (los enlaces en una fila con «·», la dirección con su icono y
+          «Volver arriba»). Textos y enlaces, los del panel. */}
       <div className={estilos.legal}>
-        <nav aria-label="Legal">
-          <ul>
-            {legalesEnOrden.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href}>{item.etiqueta}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <address>
-          {empresa.direccion}, {empresa.ciudad} · <a href={telefono}>{empresa.telefono}</a> ·{" "}
-          <a href={`mailto:${empresa.correo}`}>{empresa.correo}</a> · © {new Date().getFullYear()}{" "}
-          {seoConfig.siteName}
-        </address>
-        <AnimacionesPie permitirUrl={process.env.VERCEL_ENV !== "production"} />
+        <div className={estilos.legalBarra}>
+          <nav aria-label="Legal">
+            <ul className={estilos.legalEnlaces}>
+              {legalesEnOrden.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href}>{item.etiqueta}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <address className={estilos.legalDireccion}>
+            <IconMapPin aria-hidden="true" focusable="false" stroke={1.75} />
+            <span>
+              {empresa.direccion}, {empresa.ciudad} · <a href={telefono}>{empresa.telefono}</a> ·{" "}
+              <a href={`mailto:${empresa.correo}`}>{empresa.correo}</a> · ©{" "}
+              {new Date().getFullYear()} {seoConfig.siteName}
+            </span>
+          </address>
+          <AnimacionesPie permitirUrl={process.env.VERCEL_ENV !== "production"} />
+        </div>
       </div>
     </footer>
   );

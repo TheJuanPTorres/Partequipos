@@ -5,6 +5,7 @@ import type { CategoriasTecnica, ModelosRepuesto } from "@/payload-types";
 
 import {
   categoriasDelTipo,
+  referenciaModelo4086,
   tituloDisponibles4086,
   tituloModelo4086,
   usaDisenoPropio,
@@ -96,10 +97,14 @@ describe("títulos de la plantilla 4086", () => {
     );
   });
 
-  it("«Repuestos disponibles para {tipo} {marca} {modelo}», tal como están guardados", () => {
+  it("«Repuestos disponibles para» y, en otra línea, «{tipo} {marca} {modelo}»", () => {
     assert.equal(
       tituloDisponibles4086(nombres),
-      "Repuestos disponibles para Excavadora Hitachi EX120-2",
+      "Repuestos disponibles para\nExcavadora Hitachi EX120-2",
     );
+  });
+
+  it("la referencia de «Cotizar» y de WhatsApp", () => {
+    assert.equal(referenciaModelo4086(nombres), "Repuestos para Excavadora Hitachi EX120-2");
   });
 });

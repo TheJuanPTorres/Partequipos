@@ -9,42 +9,34 @@ import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { AyudaWhatsApp } from "@/components/repuestos/modelo/AyudaWhatsApp";
 import { CabeceraModelo } from "@/components/repuestos/modelo/CabeceraModelo";
-import { OtrosModelos } from "@/components/repuestos/modelo/OtrosModelos";
 import { PresentacionModelo } from "@/components/repuestos/modelo/PresentacionModelo";
 import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
 import estilosModelo from "@/components/repuestos/modelo/modelo.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
-import { colorDeMarca, estiloDeMarca } from "@/lib/marca/colorMarca";
-import { getModelosDeTipo, getModelosPorIds } from "@/lib/queries/getModelos";
+import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { categoriasDeMarca, logoConAlt } from "@/lib/repuestos/marca";
 import { ANIMACIONES_CATEGORIAS } from "@/lib/repuestos/animacionesCategorias";
 import { ANIMACIONES_MODELO } from "@/lib/repuestos/animacionesModelo";
-import { MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
 import {
   categoriasDelTipo,
+  referenciaModelo4086,
   tituloDisponibles4086,
   tituloModelo4086,
   usaDisenoPropio,
   vistaModelo,
 } from "@/lib/repuestos/modelo";
 import { tarjetasDeCategorias } from "@/lib/repuestos/plantillaTipo";
-import {
-  gruposDeModelos,
-  idsDeOtrasEntradas,
-  listaDeModelos,
-  tarjetasDeModelos,
-} from "@/lib/repuestos/tipo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
-import { tipoEnTitulo, tituloPorDefecto } from "@/lib/seo/porDefecto";
+import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
-import { enlaceWhatsApp } from "@/lib/whatsapp";
+import { conMensaje, enlaceWhatsApp } from "@/lib/whatsapp";
 import type { Marca, ModelosRepuesto, TiposEquipo } from "@/payload-types";
 
 /*
@@ -81,8 +73,6 @@ export async function metadataModeloRepuesto(
 const ANCLA_CONTACTO = "modelo-contacto";
 /** Ancla de las categorías: a ellas baja el icono del ratón de la cabecera. */
 const ANCLA_CATEGORIAS = "modelo-categorias";
-/** Ancla del «Ver todos» de los modelos del tipo. */
-const ANCLA_OTROS = "modelo-otros-modelos";
 
 export async function PaginaModeloRepuesto({
   marca,
@@ -93,12 +83,10 @@ export async function PaginaModeloRepuesto({
   tipo: TiposEquipo;
   modelo: ModelosRepuesto;
 }) {
-  const [global, categorias, empresa, delMismoTipo, enlazados] = await Promise.all([
+  const [global, categorias, empresa] = await Promise.all([
     getRepuestosMarca(),
     getCategoriasParaMarca(),
     getEmpresa(),
-    getModelosDeTipo(tipo.id),
-    getModelosPorIds(idsDeOtrasEntradas([tipo])),
   ]);
   const seg = segmentoDeTipo(tipo);
   const padre = poblado<TiposEquipo>(tipo.tipoPadre);
@@ -118,16 +106,6 @@ export async function PaginaModeloRepuesto({
   const delTipo = categoriasDelTipo(tipo, categorias);
   const conEnlace = categoriasDeMarca(delTipo);
   const enOrden = delTipo.flatMap((c) => conEnlace.filter((d) => d.id === c.id));
-
-  // «Ver todos»: la lista del tipo (la misma de su página y del panel de la marca) y, si el tipo
-  // tiene series, solo la serie del modelo. Las fotos, las de sus tarjetas.
-  const lista = listaDeModelos(marca, tipo, delMismoTipo, enlazados);
-  const grupo = gruposDeModelos(tipo, lista)?.find((g) =>
-    g.modelos.some((m) => m.id === modelo.id),
-  );
-  const delPanel = grupo?.modelos ?? lista;
-  const fotos = tarjetasDeModelos(tipo, delPanel);
-  const nombrePanel = `${tipoEnTitulo(tipo.nombre)} ${marca.nombre.trim().toUpperCase()}`;
 
   const breadcrumbs = [
     { nombre: "Inicio", path: "/" },
@@ -151,6 +129,8 @@ export async function PaginaModeloRepuesto({
   });
 
   if (!usaDisenoPropio(global)) {
+    const referencia = referenciaModelo4086({ marca, tipo, modelo });
+    const whatsappModelo = enlaceWhatsApp(empresa.whatsapp);
     // La plantilla 4086 de Andrés (2026-10-26): cabecera partida, las categorías del tipo en las
     // BALDOSAS del índice de categorías técnicas (con C1–C3) y el formulario.
     return (
@@ -177,25 +157,29 @@ export async function PaginaModeloRepuesto({
               imagenes[0] ?? imagenDeMedia(tipo.imagen, "") ?? imagenDeMedia(marca.fondoHero, "")
             }
             texto={texto(modelo.descripcion)}
+            cotizarHref={`#${ANCLA_CONTACTO}`}
+            formulario={configContactoMarca({
+              origen: ruta,
+              siteKey: turnstileSiteKey(),
+              whatsapp: enlaceWhatsApp(empresa.whatsapp),
+              boton: "Enviar",
+              marca: modelo.nombre,
+              modelo: { id: modelo.id, nombre: modelo.nombre },
+              formulario: {
+                titulo: "Cotizar repuestos",
+                conCiudad: true,
+                etiquetaMensaje: "¿En qué estás interesado?",
+              },
+              mensajeInicial: `Consulta sobre: ${referencia}`,
+            })}
+            whatsapp={
+              whatsappModelo ? conMensaje(whatsappModelo, `Hola, busco ${referencia}.`).href : null
+            }
           />
           <BaldosasCategorias
             id={ANCLA_CATEGORIAS}
             titulo={tituloDisponibles4086({ marca, tipo, modelo })}
             categorias={tarjetasDeCategorias(delTipo)}
-          />
-          <OtrosModelos
-            id={ANCLA_OTROS}
-            titulo={`Otros modelos de ${nombrePanel}${grupo?.ancla ? `: ${grupo.titulo}` : ""}`}
-            tituloPanel={grupo ? `${nombrePanel}: ${grupo.titulo}` : nombrePanel}
-            href={`${rutas.tipo(marca.slug, seg)}${grupo?.ancla ? `#${grupo.ancla}` : ""}`}
-            modelos={delPanel.map(({ id, nombre, href }, i) => ({
-              id,
-              nombre,
-              href,
-              imagen: fotos[i]?.imagen ?? null,
-            }))}
-            acento={colorDeMarca(marca.colorMarca)}
-            buscador={MEJORAS_ACTIVAS.R5}
           />
         </ZonaAnimada>
         {vista.piezas.length > 0 ? (

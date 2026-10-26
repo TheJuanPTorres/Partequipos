@@ -4,13 +4,14 @@
  * al 45 % (51vh de alto mínimo, esquinas izquierdas redondeadas) y el texto al 55 % (3 % de
  * relleno, centrado en vertical). Datos con icono en pastillas del gris de sección, a 20 px.
  *
- * Aire (Juan Pablo, 2026-10-26: iba pegada): 24 px bajo la cabecera del sitio y 1,5vw a los
- * lados, como el banner de las demás páginas de repuestos (`heroSeccion`), y 48 px antes de
- * «Repuestos disponibles…» (32 en móvil).
+ * Aire (Juan Pablo, 2026-10-26: iba pegada). Medido: con 24 px bajo la cabecera y 1,5vw a los
+ * lados (6 px a 390), como el banner de las demás páginas, se veía apretada. Ahora 48 px bajo
+ * la cabecera (32 en móvil), al menos 12 px a los lados y 48 px antes de «Repuestos
+ * disponibles…» (32 en móvil).
  */
 .cabecera {
   display: flex;
-  margin: 24px 1.5vw 48px;
+  margin: 48px max(1.5vw, 12px) 48px;
   overflow: hidden;
   border-radius: 30px;
   background: var(--color-fondo);
@@ -90,10 +91,66 @@
   white-space: pre-line;
 }
 
+/* Los dos botones bajo la descripción: «Cotizar» (el rojo de marca) y el verde de las ventanas. */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.cotizar,
+.whatsapp {
+  display: inline-flex;
+  min-height: 44px;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  border-radius: 30px;
+  color: #fff;
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.cotizar {
+  background: var(--color-marca);
+}
+
+.cotizar:hover {
+  background: var(--color-texto);
+}
+
+/* #0F7B45 con texto blanco da 5,3:1 (AA); el verde de la marca de WhatsApp, 1,9:1. */
+.whatsapp {
+  background: #0f7b45;
+}
+
+.whatsapp:hover {
+  background: #0a6e37;
+}
+
+.cotizar:focus-visible,
+.whatsapp:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cotizar,
+  .whatsapp {
+    transition: none;
+  }
+}
+
 /* En el teléfono, la foto arriba (240 px) y el texto debajo, a todo el ancho. */
 @media (max-width: 767px) {
   .cabecera {
     flex-direction: column;
+    margin-top: 32px;
     margin-bottom: 32px;
   }
 
@@ -109,6 +166,11 @@
 
   .datos {
     gap: 10px;
+  }
+
+  .acciones > * {
+    flex: 1 1 100%;
+    justify-content: center;
   }
 }
 
@@ -165,4 +227,9 @@
   from {
     opacity: 0;
   }
+}
+
+/* El código del modelo («EX120-2») no se parte por el guion en el teléfono. */
+.sinCorte {
+  white-space: nowrap;
 }

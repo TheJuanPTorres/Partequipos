@@ -1,8 +1,16 @@
-import { IconBarcode, IconBuildingFactory2, IconEngine } from "@tabler/icons-react";
+import {
+  IconArrowRight,
+  IconBarcode,
+  IconBrandWhatsapp,
+  IconBuildingFactory2,
+  IconEngine,
+} from "@tabler/icons-react";
 import Image from "next/image";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
 import marca from "@/components/repuestos/marca.module.css";
+import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { BreadcrumbItem } from "@/lib/seo/jsonLd";
 import type { ImagenLista } from "@/lib/utils/relations";
 
@@ -21,6 +29,11 @@ import estilos from "./cabeceraModelo.module.css";
  * (`ANIMACIONES_CATEGORIAS`) se acerca muy despacio, como la del índice de categorías.
  * Sin foto, la mitad izquierda no se pinta y el texto ocupa la tarjeta.
  *
+ * Bajo el texto, dos botones (Juan Pablo, 2026-10-26): «Cotizar», que abre nuestra ventana del
+ * formulario con el modelo como referencia (sin JavaScript, baja al formulario de la página), y
+ * «Escríbenos por WhatsApp», el verde de las ventanas, con el modelo en el mensaje y en pestaña
+ * nueva (sin número de WhatsApp no se pinta).
+ *
  * Animaciones H1–H3 (`ANIMACIONES_MODELO`): solo CSS, colgadas de `[data-anim~="H…"]`.
  */
 export function CabeceraModelo({
@@ -29,12 +42,21 @@ export function CabeceraModelo({
   datos,
   fondo,
   texto,
+  cotizarHref,
+  formulario,
+  whatsapp,
 }: {
   migas: BreadcrumbItem[];
   titulo: string;
   datos: { codigo: string; tipo: string; marca: string };
   fondo: ImagenLista | null;
   texto: string;
+  /** Sin JavaScript, «Cotizar» baja al formulario de la página. */
+  cotizarHref: string;
+  /** El formulario de la ventana de «Cotizar», con el modelo como referencia. */
+  formulario: ConfigFormulario;
+  /** Enlace de WhatsApp con el modelo en el mensaje; sin número, no hay botón. */
+  whatsapp: string | null;
 }) {
   const filas = [
     { etiqueta: "Código", valor: datos.codigo, Icono: IconBarcode },
@@ -63,7 +85,16 @@ export function CabeceraModelo({
         </div>
         <p className={`${estilos.antetitulo} texto-destacado`}>Repuestos para Maquinaria Pesada</p>
         <h1 id="modelo-titulo" className={`${estilos.titulo} texto-titulo-bloque`}>
-          {titulo}
+          {titulo.split(" ").map((palabra, i) => (
+            <span key={`${i}-${palabra}`}>
+              {i > 0 ? " " : null}
+              {palabra.includes("-") ? (
+                <span className={estilos.sinCorte}>{palabra}</span>
+              ) : (
+                palabra
+              )}
+            </span>
+          ))}
         </h1>
         {filas.length > 0 ? (
           <ul className={`${estilos.datos} texto-etiqueta`}>
@@ -78,6 +109,24 @@ export function CabeceraModelo({
           </ul>
         ) : null}
         {texto ? <p className={`${estilos.texto} texto-cuerpo`}>{texto}</p> : null}
+        <div className={estilos.acciones}>
+          <BotonFormulario href={cotizarHref} className={estilos.cotizar} formulario={formulario}>
+            Cotizar
+            <IconArrowRight aria-hidden="true" size={18} stroke={2} />
+          </BotonFormulario>
+          {whatsapp ? (
+            <a
+              href={whatsapp}
+              className={estilos.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={2} size={20} />
+              Escríbenos por WhatsApp
+              <span className="sr-only"> (se abre en otra pestaña)</span>
+            </a>
+          ) : null}
+        </div>
       </div>
     </section>
   );

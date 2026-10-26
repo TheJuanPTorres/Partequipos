@@ -22,26 +22,42 @@
  *    texto, 5,4:1 el gris y 4,56:1 el rojo; sobre blanco, 6,3:1 el rojo.
  * 2. ESQUINAS SUPERIORES INVERTIDAS: donde el panel se une a la cabecera, en
  *    vez de un ángulo de 90°, una curva CÓNCAVA que se abre hacia fuera, como
- *    las pestañas de Chrome al unirse a su barra. El vidrio y el filete siguen
- *    exactamente esa forma con una MÁSCARA de gradientes (sin JavaScript ni
- *    medidas: vale con cualquier alto y ancho). La construcción está explicada
- *    en `.panel` y se genera con la fórmula de decisiones-cabecera.md.
+ *    las pestañas de Chrome al unirse a su barra. Hasta el 2026-10-25 era una
+ *    MÁSCARA de gradientes; ahora, un borde nativo y dos piezas cóncavas (ver
+ *    `.marco`).
  *
  * ORDEN: las variantes `-webkit-` van SIEMPRE antes que las estándar (si no,
  * lightningcss se queda con la última y se pierde la prefijada, CLAUDE.md
  * §10.35).
  */
 
-.panel {
+/*
+ * EL MARCO (2026-10-25): una caja para todos los paneles (`MarcoMegamenu`).
+ *
+ * El CONTORNO son piezas (`lib/cabecera/marco.ts`): fondo, base, dos lados, pie,
+ * dos esquinas y las dos curvas cóncavas de arriba, colocadas y estiradas SOLO
+ * con `transform`. Antes la forma era una MÁSCARA de 6 piezas de degradado: abajo,
+ * la franja central y las dos esquinas se unían en una costura vertical a cada
+ * lado; con un escalado no entero (125 %) cada pieza redondeaba el medio píxel
+ * por su lado y la costura dejaba ver el filete: las «dos líneas finas» al pie
+ * del panel al terminar la animación. Ahora cada línea es una pieza de 1 px en
+ * una posición entera, y al cambiar de tamaño (M3) nada cambia de sitio en la
+ * maqueta (CLS 0).
+ */
+.marco {
   /* Dónde acaba la cabecera (px): la fija `Cabecera` con su alto MEDIDO. */
   --mega-arriba: 100px;
-  /* Radio de la curva cóncava de arriba y de las esquinas convexas de abajo. */
+  /* Radio de la curva cóncava de arriba y de las esquinas convexas de abajo (los lee el marco). */
   --mega-curva: 20px;
   --mega-radio: 30px;
-  --mega-filete-ancho: 1px;
   /* Fondo SÓLIDO (dirección, 2026-10-17); antes, vidrio blanco al 86 %. */
   --mega-fondo: var(--color-fondo);
-  --mega-filete: rgb(16 15 15 / 18%);
+  /*
+   * El filete, OPACO: el gris que daba rgb(16 15 15 / 18 %) sobre el fondo blanco.
+   * Opaco, el de los lados (sobre el panel) y el de las curvas (sobre la página)
+   * son idénticos.
+   */
+  --mega-filete: #d4d4d4;
   --mega-rojo: #be1620;
 
   position: fixed;
@@ -49,8 +65,6 @@
   /* Un píxel por debajo de la cabecera: sin costura entre las dos. */
   top: calc(var(--mega-arriba) - 1px);
   left: 50%;
-  width: 500px;
-  max-width: calc(100vw - 40px);
   visibility: hidden;
   transform: translate(-50%, -12px);
   transition:
@@ -59,7 +73,7 @@
     top 0.4s ease-in-out;
 }
 
-.panel[data-abierto="si"] {
+.marco[data-abierto="si"] {
   visibility: visible;
   transform: translate(-50%, 0);
   transition:
@@ -69,40 +83,218 @@
 }
 
 /*
- * EL FUNDIDO va SOLO en el contenido. El fondo (`::after`) y el filete (`::before`)
- * no se funden: el panel es blanco SÓLIDO desde el primer fotograma, al abrirse y
- * en reposo (dirección, 2026-10-17; con el fundido se veía translúcido al abrir).
- * Cerrado, lo oculta `visibility` del panel.
+ * El lienzo tiene un ancho FIJO (el del panel más ancho): los paneles van
+ * centrados dentro. Así el marco no cambia de sitio al cambiar de panel. Lo que
+ * queda fuera del panel no es clicable.
+ */
+.lienzo {
+  position: relative;
+  width: min(820px, 100vw - 2 * var(--mega-curva) - 20px);
+  pointer-events: none;
+}
+
+.contorno {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.pieza {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  /* Hasta el primer pintado del marco, nada. */
+  transform: scale(0);
+}
+
+.pieza[data-pieza="fondo"],
+.pieza[data-pieza="base"] {
+  width: 1px;
+  height: 1px;
+  background: var(--mega-fondo);
+}
+
+.pieza[data-pieza="ladoI"],
+.pieza[data-pieza="ladoD"],
+.pieza[data-pieza="pie"] {
+  z-index: 1;
+  width: 1px;
+  height: 1px;
+  background: var(--mega-filete);
+}
+
+/* Esquinas de abajo: fondo, el filete de 1 px por fuera y transparente fuera del arco. */
+.pieza[data-pieza="esquinaI"],
+.pieza[data-pieza="esquinaD"] {
+  z-index: 1;
+  width: var(--mega-radio);
+  height: var(--mega-radio);
+}
+
+.pieza[data-pieza="esquinaI"] {
+  background: radial-gradient(
+    circle at 100% 0,
+    var(--mega-fondo) calc(var(--mega-radio) - 1.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    #0000 calc(var(--mega-radio) + 0.5px)
+  );
+}
+
+.pieza[data-pieza="esquinaD"] {
+  background: radial-gradient(
+    circle at 0 0,
+    var(--mega-fondo) calc(var(--mega-radio) - 1.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    #0000 calc(var(--mega-radio) + 0.5px)
+  );
+}
+
+/*
+ * Las dos curvas cóncavas que unen el marco a la barra (como las pestañas de
+ * Chrome). Entran 1 px en el panel: tapan el principio del lado, que la curva
+ * sustituye.
+ */
+.pieza[data-pieza="curvaI"],
+.pieza[data-pieza="curvaD"] {
+  z-index: 2;
+  width: calc(var(--mega-curva) + 1px);
+  height: var(--mega-curva);
+}
+
+.pieza[data-pieza="curvaI"] {
+  background: radial-gradient(
+    circle at 0 100%,
+    #0000 calc(var(--mega-curva) - 0.5px),
+    var(--mega-filete) calc(var(--mega-curva) + 0.5px),
+    var(--mega-filete) calc(var(--mega-curva) + 0.5px),
+    var(--mega-fondo) calc(var(--mega-curva) + 1.5px)
+  );
+}
+
+.pieza[data-pieza="curvaD"] {
+  background: radial-gradient(
+    circle at 100% 100%,
+    #0000 calc(var(--mega-curva) - 0.5px),
+    var(--mega-filete) calc(var(--mega-curva) + 0.5px),
+    var(--mega-filete) calc(var(--mega-curva) + 0.5px),
+    var(--mega-fondo) calc(var(--mega-curva) + 1.5px)
+  );
+}
+
+/*
+ * M3: durante el cambio de panel (`data-cambiando`, 260 ms), las piezas y el recorte van del
+ * tamaño de antes al nuevo con una transición; fuera de él, al instante (así el contorno sigue a
+ * un acordeón fotograma a fotograma).
+ */
+.marco[data-cambiando="si"] .pieza {
+  transition: transform 260ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+.marco[data-cambiando="si"] .contenidoMarco {
+  transition: clip-path 260ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+/* El contenido, encima del contorno; recortado con su forma (`clip-path` del marco). */
+.contenidoMarco {
+  position: relative;
+  z-index: 3;
+}
+
+/* Un panel dentro del marco: el que se ve, en el flujo y centrado; el que sale (M3), encima y quieto. */
+.vista {
+  width: min(500px, 100%);
+  margin-inline: auto;
+  pointer-events: auto;
+}
+
+/* TARJETAS CON FOTO de «Repuestos por categoría técnica»: el panel pasa a 820 px (5 por fila). */
+.vista[data-ancho="amplio"] {
+  width: 100%;
+}
+
+.vista[hidden] {
+  display: none;
+}
+
+.vista[data-estado="saliendo"] {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+/* M3: el contenido se cruza en un fundido mientras el marco cambia de tamaño. */
+.marco[data-m3="si"] .vista[data-estado="activo"] {
+  animation: entra-mega 260ms cubic-bezier(0.33, 0, 0.2, 1) backwards;
+}
+
+.marco[data-m3="si"] .vista[data-estado="saliendo"] {
+  animation: sale-mega 260ms cubic-bezier(0.33, 0, 0.2, 1) forwards;
+}
+
+@keyframes entra-mega {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes sale-mega {
+  to {
+    opacity: 0;
+  }
+}
+
+/*
+ * EL FUNDIDO al abrir va SOLO en el contenido. El fondo y el filete no se funden:
+ * el panel es blanco SÓLIDO desde el primer fotograma (dirección, 2026-10-17).
+ * Cerrado, lo oculta `visibility` del marco.
  */
 .caja {
   opacity: 0;
   transition: opacity 0.55s ease;
 }
 
-.panel[data-abierto="si"] .caja {
+.marco[data-abierto="si"] .caja {
   opacity: 1;
 }
 
 @media (max-width: 1024px) {
-  .panel {
+  .marco {
     display: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .panel,
-  .panel[data-abierto="si"] {
+  .marco,
+  .marco[data-abierto="si"] {
     transform: translate(-50%, 0);
     transition: none;
   }
 
-  /* El contenido no se desplaza: solo aparece, sin fundido. */
+  /* El contenido no se desplaza ni se funde: solo aparece. */
   .caja {
+    transition: none;
+  }
+
+  .marco[data-m3="si"] .vista[data-estado="activo"],
+  .marco[data-m3="si"] .vista[data-estado="saliendo"] {
+    animation: none;
+  }
+
+  .vista[data-estado="saliendo"] {
+    display: none;
+  }
+
+  .marco[data-cambiando="si"] .pieza,
+  .marco[data-cambiando="si"] .contenidoMarco {
     transition: none;
   }
 }
 
-/* Sin máscaras ni desenfoque: la caja blanca de siempre, con sus esquinas de abajo de 30 px. */
 .caja {
   display: flex;
   flex-direction: column;
@@ -112,16 +304,14 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   /*
-   * 39 px de relleno, de ellos 30 (el radio de las esquinas) como borde
-   * TRANSPARENTE arriba y abajo: la barra de desplazamiento vive en la caja de
-   * relleno, así que no llega a las esquinas redondeadas en ningún navegador
-   * (Chrome ≥ 121 y Firefox ignoran el `margin` de `::-webkit-scrollbar-track`).
-   * El fondo sigue pintándose debajo del borde.
+   * 39 px de relleno, de ellos 30 (el radio
+   * de las esquinas) como borde TRANSPARENTE arriba y abajo: la barra de
+   * desplazamiento vive en la caja de relleno, así que no llega a las esquinas
+   * redondeadas en ningún navegador (Chrome ≥ 121 y Firefox ignoran el `margin`
+   * de `::-webkit-scrollbar-track`).
    */
   padding: calc(39px - var(--mega-radio)) 39px;
   border-block: var(--mega-radio) solid transparent;
-  border-radius: 0 0 var(--mega-radio) var(--mega-radio);
-  background: var(--color-fondo);
 }
 
 /*
@@ -156,145 +346,6 @@
 
 .caja:hover::-webkit-scrollbar-thumb {
   background: var(--barra-activa);
-}
-
-/*
- * CON máscaras (todos los navegadores actuales): el panel mide 500 + 2 × curva
- * y la caja de contenido va en el centro, entre las dos pestañas invertidas.
- *
- *   ┌── cabecera ──────────────────────┐
- *   ╯ ╭──────────────────────────╮ ╰    ← la curva cóncava une el panel a la barra
- *     │          contenido       │
- *     ╰──────────────────────────╯      ← esquinas de abajo convexas de 30 px
- *
- * Tres capas, todas con la MISMA forma salvo el grosor del filete:
- * - `::before` FILETE: forma exterior MENOS forma interior (anillo de 1 px),
- *   con `mask-composite`: las capas interiores restan (`subtract`) y las
- *   exteriores suman (`add`). Arriba no hay filete: ahí se une a la cabecera.
- * - `::after` FONDO: forma interior, sólida.
- * - `.caja`: el contenido, encima, sin fondo.
- * La forma son 6 capas de gradiente (columna central, franja de abajo, dos
- * cuartos de círculo convexos y las dos curvas cóncavas); con el filete en 0
- * es la exterior y con 1 px la interior, desplazada hacia dentro.
- */
-@supports (
-  (mask-image: linear-gradient(#000, #000)) or (-webkit-mask-image: linear-gradient(#000, #000))
-) {
-  .panel {
-    --ci: calc(var(--mega-curva) + var(--mega-filete-ancho));
-    --rbi: calc(var(--mega-radio) - var(--mega-filete-ancho));
-
-    /* Forma EXTERIOR (sin filete). */
-    --ext-img:
-      linear-gradient(#000, #000), linear-gradient(#000, #000),
-      radial-gradient(
-        circle at 100% 0,
-        #000 calc(var(--mega-radio) - 0.5px),
-        #0000 calc(var(--mega-radio) + 0.5px)
-      ),
-      radial-gradient(
-        circle at 0 0,
-        #000 calc(var(--mega-radio) - 0.5px),
-        #0000 calc(var(--mega-radio) + 0.5px)
-      ),
-      radial-gradient(
-        circle at 0 100%,
-        #0000 calc(var(--mega-curva) - 0.5px),
-        #000 calc(var(--mega-curva) + 0.5px)
-      ),
-      radial-gradient(
-        circle at 100% 100%,
-        #0000 calc(var(--mega-curva) - 0.5px),
-        #000 calc(var(--mega-curva) + 0.5px)
-      );
-    --ext-tam:
-      calc(100% - 2 * var(--mega-curva)) calc(100% - var(--mega-radio)),
-      calc(100% - 2 * (var(--mega-curva) + var(--mega-radio))) var(--mega-radio),
-      var(--mega-radio) var(--mega-radio), var(--mega-radio) var(--mega-radio),
-      var(--mega-curva) var(--mega-curva), var(--mega-curva) var(--mega-curva);
-    --ext-pos:
-      left var(--mega-curva) top 0, left calc(var(--mega-curva) + var(--mega-radio)) bottom 0,
-      left var(--mega-curva) bottom 0, right var(--mega-curva) bottom 0, left 0 top 0, right 0 top 0;
-
-    /* Forma INTERIOR: la exterior desplazada hacia dentro el grosor del filete. */
-    --int-img:
-      linear-gradient(#000, #000), linear-gradient(#000, #000),
-      radial-gradient(
-        circle at 100% 0,
-        #000 calc(var(--rbi) - 0.5px),
-        #0000 calc(var(--rbi) + 0.5px)
-      ),
-      radial-gradient(circle at 0 0, #000 calc(var(--rbi) - 0.5px), #0000 calc(var(--rbi) + 0.5px)),
-      radial-gradient(
-        circle at 0 100%,
-        #0000 calc(var(--ci) - 0.5px),
-        #000 calc(var(--ci) + 0.5px)
-      ),
-      radial-gradient(
-        circle at 100% 100%,
-        #0000 calc(var(--ci) - 0.5px),
-        #000 calc(var(--ci) + 0.5px)
-      );
-    --int-tam:
-      calc(100% - 2 * var(--ci)) calc(100% - var(--mega-radio)),
-      calc(100% - 2 * (var(--mega-curva) + var(--mega-radio))) var(--rbi), var(--rbi) var(--rbi),
-      var(--rbi) var(--rbi), var(--ci) var(--mega-curva), var(--ci) var(--mega-curva);
-    --int-pos:
-      left var(--ci) top 0,
-      left calc(var(--mega-curva) + var(--mega-radio)) bottom var(--mega-filete-ancho),
-      left var(--ci) bottom var(--mega-filete-ancho),
-      right var(--ci) bottom var(--mega-filete-ancho), left 0 top 0, right 0 top 0;
-
-    width: calc(500px + 2 * var(--mega-curva));
-    max-width: calc(100vw - 20px);
-  }
-
-  .panel::before,
-  .panel::after {
-    content: "";
-    position: absolute;
-    z-index: 0;
-    inset: 0;
-    pointer-events: none;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-  }
-
-  /* FILETE: exterior menos interior. Las seis capas de arriba restan; las seis de abajo suman. */
-  .panel::before {
-    background: var(--mega-filete);
-    -webkit-mask-image: var(--int-img), var(--ext-img);
-    -webkit-mask-size: var(--int-tam), var(--ext-tam);
-    -webkit-mask-position: var(--int-pos), var(--ext-pos);
-    -webkit-mask-composite:
-      source-out, source-out, source-out, source-out, source-out, source-out, source-over,
-      source-over, source-over, source-over, source-over, source-over;
-    mask-image: var(--int-img), var(--ext-img);
-    mask-size: var(--int-tam), var(--ext-tam);
-    mask-position: var(--int-pos), var(--ext-pos);
-    mask-composite:
-      subtract, subtract, subtract, subtract, subtract, subtract, add, add, add, add, add, add;
-  }
-
-  /* FONDO: la forma interior, sólida como la barra abierta. */
-  .panel::after {
-    background: var(--mega-fondo);
-    -webkit-mask-image: var(--int-img);
-    -webkit-mask-size: var(--int-tam);
-    -webkit-mask-position: var(--int-pos);
-    mask-image: var(--int-img);
-    mask-size: var(--int-tam);
-    mask-position: var(--int-pos);
-  }
-
-  .caja {
-    position: relative;
-    z-index: 1;
-    /* Entre las dos pestañas invertidas. */
-    margin-inline: var(--mega-curva);
-    border-radius: 0;
-    background: none;
-  }
 }
 
 .verTodo {
@@ -372,16 +423,17 @@
   line-height: 1; /* 48 px de alto, como ux-9 */
 }
 
+/* M4: la región que se pliega no lleva relleno (su altura va a 0); el relleno, dentro. */
+.plegable[hidden] {
+  display: none;
+}
+
 .contenido {
   padding: 10px 0 0 10px;
 }
 
-.acordeon[data-nivel="1"] > .contenido {
+.acordeon[data-nivel="1"] > .plegable > .contenido {
   padding: 10px 10px 0;
-}
-
-.contenido[hidden] {
-  display: none;
 }
 
 .lista {
@@ -437,10 +489,6 @@
  * en el teléfono; la última fila incompleta, CENTRADA (regla del #281: mismo ancho de
  * tarjeta, `flex-wrap` centrado). Foto en caja 4:3 fija: sin CLS al llegar.
  */
-.panel[data-ancho="amplio"] {
-  width: 820px;
-}
-
 .tarjetas {
   --tarjetas-columnas: 5;
   --tarjetas-hueco: 10px;
@@ -563,8 +611,4 @@
   gap: 10px;
   padding: 12px 0 16px;
   border-bottom: 1px solid var(--color-fondo-seccion);
-}
-
-.movil[hidden] {
-  display: none;
 }

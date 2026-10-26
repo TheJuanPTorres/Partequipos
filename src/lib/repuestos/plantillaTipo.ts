@@ -44,6 +44,8 @@ export type VistaPorQue = {
   entradilla?: string;
   /** Párrafo tras la entradilla. */
   texto?: string;
+  /** Frase destacada tras el texto, con su complemento (el «Nuestro compromiso…» de Filtros Donaldson). */
+  compromiso?: { titulo: string; texto: string };
   puntos: { clave: string; titulo: string; texto: string }[];
   cierre: string;
   boton: string;

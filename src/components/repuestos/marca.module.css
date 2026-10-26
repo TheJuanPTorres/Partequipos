@@ -1984,3 +1984,36 @@ a.modelo:hover {
   justify-content: center;
   margin-top: 28px;
 }
+
+/*
+ * PÁGINA DE MARCA DENTRO DE UNA CATEGORÍA (Filtros Donaldson, 2026-10-26, dirección): como las
+ * páginas de marca de nueva, la página toma el «Color de la marca» (franja de la cabecera; los
+ * botones, con el color oscurecido para el texto blanco) y lleva el emblema de fondo
+ * (`EmblemaKit`) detrás de la zona blanca de los productos: la zona pone el blanco y sus
+ * secciones quedan transparentes, para que el emblema asome entre las tarjetas.
+ */
+.zonaEmblema {
+  border-radius: var(--marca-radio);
+  background: var(--color-fondo);
+}
+
+.zonaEmblema .tarjetas {
+  background: transparent;
+}
+
+.paginaConColor .botonTarjeta:not(.botonSecundario) {
+  /*
+   * El color de los botones es el de la marca oscurecido lo justo para el BLANCO con AA
+   * (`colorConBlanco`, el mismo del botón del menú; dirección, 2026-10-26): lo pone la página
+   * en `--boton-acento`. La franja de la cabecera sigue con el color tal cual.
+   */
+  border-color: var(--boton-acento);
+  background: var(--boton-acento);
+  color: var(--boton-acento-tinta);
+}
+
+.paginaConColor .botonTarjeta:not(.botonSecundario):hover {
+  border-color: var(--marca-hover-fondo);
+  background: var(--marca-hover-fondo);
+  color: var(--marca-hover-texto);
+}

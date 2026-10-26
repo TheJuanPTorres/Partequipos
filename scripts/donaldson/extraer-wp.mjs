@@ -7,6 +7,8 @@
  * - el logo de Donaldson;
  * - los tipos de filtro: nombre, frase y foto (las tarjetas de WordPress);
  * - el texto de presentación y dos fotos de obra (cabecera y tarjeta);
+ * - las secciones propias (2026-10-26): la presentación con las 4 fotos de su carrusel y su
+ *   «¿Por qué elegirnos?» (texto, compromiso y foto), que monta `secciones.ts`;
  *
  * El contenido va TAL CUAL (decisión del cliente, 2026-10-17: se migra todo aunque tenga
  * erratas). Las fotos se piden a su tamaño original (sin el «-768x543» de WordPress).
@@ -31,6 +33,8 @@ const limpio = (t) =>
     .replace(/&amp;/g, "&")
     .replace(/&#8211;/g, "–")
     .replace(/\s+/g, " ")
+    // Lo que deja quitar las etiquetas: «PARTEQUIPOS</b>,» → «PARTEQUIPOS ,».
+    .replace(/\s+([,.;:])/g, "$1")
     .trim();
 /** La URL del original: sin el sufijo de tamaño que pone WordPress («-768x543»). */
 const original = (u) => u.replace(/-\d+x\d+(\.[a-z]+)$/i, "$1");
@@ -73,6 +77,32 @@ const presentacion = limpio(
 const fotosObra = [...bloque.matchAll(/<img[^>]*?src="([^"]+)"/g)].map((m) => original(m[1]));
 if (!presentacion || fotosObra.length < 2) fallar("no encuentro la presentación o sus fotos");
 
+// «¿Por qué elegirnos?» propio (2026-10-26): su texto, la frase del compromiso y la foto de los
+// filtros. Los títulos van en tipo frase, como los escribió dirección (WordPress los pinta en
+// mayúsculas con CSS y su texto trae las mayúsculas cambiadas: «cONSTRUCCIÓN mINERIA»).
+const finPorQue = html.indexOf("TESTIMONIOS", fin);
+const bloquePorQue = html.slice(html.indexOf("elegirnos", fin), finPorQue);
+const parrafos = [...bloquePorQue.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)]
+  .map((m) => limpio(m[1].replace(/<[^>]+>/g, " ")))
+  .filter(Boolean);
+const fotoPorQue = bloquePorQue.match(/<img[^>]*?src="([^"]+)"/)?.[1];
+if (parrafos.length < 2 || !fotoPorQue)
+  fallar("no encuentro el «¿Por qué elegirnos?» de Donaldson");
+const secciones = {
+  antetitulo: "Protegiendo su maquinaria pesada en la",
+  titulo: "Construcción, minería y agricultura",
+  texto: presentacion,
+  // Las CUATRO fotos del carrusel de WordPress, en su orden.
+  fotos: fotosObra,
+  porQue: {
+    titulo: "¿Por qué elegirnos?",
+    texto: parrafos[0],
+    foto: original(fotoPorQue),
+    compromisoTitulo: "Nuestro compromiso es ofrecerle soluciones",
+    compromisoTexto: parrafos[1],
+  },
+};
+
 const logo = original(
   html.match(/<img[^>]*?src="([^"]*donaldson_logo[^"]*)"/)?.[1] ?? fallar("no encuentro el logo"),
 );
@@ -87,6 +117,7 @@ const datos = {
   fondo: fotosObra[0],
   tarjeta: fotosObra[1],
   tipos,
+  secciones,
 };
 fs.writeFileSync(SALIDA, JSON.stringify(datos, null, 2));
 process.stdout.write(

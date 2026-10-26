@@ -87,8 +87,9 @@
   padding: 0 28px;
   align-items: center;
   border-radius: 8px;
-  background: var(--color-marca);
-  color: #fff;
+  /* Una página con «Color de la marca» (Filtros Donaldson) lo pone con su tinta. */
+  background: var(--boton-acento, var(--color-marca));
+  color: var(--boton-acento-tinta, #fff);
   font-size: 16px;
   font-weight: 600;
   text-decoration: none;
@@ -99,11 +100,49 @@
 
 .porQueBoton:hover {
   background: var(--color-texto);
+  color: #fff;
 }
 
 .porQueBoton:focus-visible {
   outline: 3px solid var(--color-texto);
   outline-offset: 3px;
+}
+
+/*
+ * «¿POR QUÉ ELEGIRNOS?» PROPIO de una página de marca (Filtros Donaldson, 2026-10-26): como la
+ * franja azul de WordPress, el panel del texto va sobre el color de la marca oscurecido para el
+ * blanco (`--boton-acento`, AA), con título y textos en blanco y el botón al revés; la foto, sin
+ * el velo de la plantilla.
+ */
+.porQueAcento .porQueTexto {
+  background: var(--boton-acento, var(--color-marca));
+  color: #fff;
+}
+
+.porQueAcento .porQueTitulo,
+.porQueAcento .porQueCierre,
+.porQueAcento .porQueCompromiso,
+.porQueAcento .porQueCompromiso strong,
+.porQueAcento .porQueEntradilla strong {
+  color: #fff;
+}
+
+.porQueAcento .porQueFoto::after {
+  display: none;
+}
+
+.porQueAcento .porQueBoton {
+  background: #fff;
+  color: var(--boton-acento, var(--color-marca));
+}
+
+.porQueAcento .porQueBoton:hover {
+  background: var(--color-texto);
+  color: #fff;
+}
+
+.porQueAcento .porQueBoton:focus-visible {
+  outline-color: #fff;
 }
 
 /* --- Sedes ------------------------------------------------------------------------- */
@@ -229,6 +268,18 @@
 
 .porQueCierre p + p {
   margin-top: 1em;
+}
+
+/* La frase destacada (Filtros Donaldson): en negrita y oscura, el complemento debajo. */
+.porQueCompromiso {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-cuerpo);
+  line-height: 1.5;
+}
+
+.porQueCompromiso strong {
+  color: var(--color-texto);
 }
 
 .porQueEntradilla strong {

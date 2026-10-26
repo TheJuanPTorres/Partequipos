@@ -257,7 +257,7 @@ if (fs.existsSync(MANIFIESTO)) {
 }
 const previo: Manifiesto = fs.existsSync(MANIFIESTO)
   ? (JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto)
-  : { destino, marca: marca.id, media: [] };
+  : { destino: String(destino), marca: marca.id, media: [] };
 const subidas = [...previo.media];
 
 const mime = (f: string) =>

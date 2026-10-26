@@ -261,13 +261,15 @@
   line-height: 1.45;
 }
 
-/* A2: zoom leve de la miniatura al pasar el ratón por el artículo reciente. */
-.pagina[data-anim~="A2"] .miniatura img {
-  transition: transform 0.4s ease;
-}
+/* A2: zoom leve de la miniatura al pasar el ratón (solo sin «reducir movimiento»). */
+@media (prefers-reduced-motion: no-preference) {
+  .pagina[data-anim~="A2"] .miniatura img {
+    transition: transform 0.4s ease;
+  }
 
-.pagina[data-anim~="A2"] .reciente:hover .miniatura img {
-  transform: scale(1.06);
+  .pagina[data-anim~="A2"] .reciente:hover .miniatura img {
+    transform: scale(1.06);
+  }
 }
 
 /* ---- Entradilla y cuerpo --------------------------------------------------- */
@@ -471,18 +473,7 @@
   outline-offset: 3px;
 }
 
-/* A1: suben un poco y toman el color de su red (blanco sobre todos: AA). */
-.pagina[data-anim~="A1"] .compartir a {
-  transition:
-    transform 0.2s ease,
-    background-color 0.2s ease;
-}
-
-.pagina[data-anim~="A1"] .compartir a:hover,
-.pagina[data-anim~="A1"] .compartir a:focus-visible {
-  transform: translateY(-3px);
-}
-
+/* A1: toman el color de su red (blanco encima: AA) y, sin «reducir movimiento», suben un poco. */
 .pagina[data-anim~="A1"] .compartir a[data-red="facebook"]:hover {
   background: #1877f2;
 }
@@ -510,8 +501,21 @@
   }
 }
 
-.pagina[data-anim~="A3"] .contenidoArticulo {
-  animation: aparecer 0.6s ease-out both;
+@media (prefers-reduced-motion: no-preference) {
+  .pagina[data-anim~="A1"] .compartir a {
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .pagina[data-anim~="A1"] .compartir a:hover,
+  .pagina[data-anim~="A1"] .compartir a:focus-visible {
+    transform: translateY(-3px);
+  }
+
+  .pagina[data-anim~="A3"] .contenidoArticulo {
+    animation: aparecer 0.6s ease-out both;
+  }
 }
 
 /* ---- Llamada final ---------------------------------------------------------- */
@@ -663,15 +667,5 @@
 @media (prefers-reduced-motion: reduce) {
   .progreso {
     transition: none;
-  }
-
-  .pagina .compartir a,
-  .pagina .miniatura img {
-    transition: none;
-    transform: none !important;
-  }
-
-  .pagina .contenidoArticulo {
-    animation: none;
   }
 }

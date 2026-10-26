@@ -1,97 +1,85 @@
 /**
- * GEOMETRÍA DEL MARCO del megamenú (2026-10-26). El contorno es UN SOLO
- * elemento real (`.forma`): fondo, filete de 1 px y esquinas de abajo con
- * `border` y `border-radius` nativos, y las dos curvas cóncavas de arriba como
- * pseudoelementos de tamaño fijo, que van pegados a sus lados. Cambia de ancho y
- * de alto DE VERDAD (`width`/`height`), siguiendo la caja MEDIDA del panel.
+ * GEOMETRÍA DEL MARCO del megamenú (2026-10-25). El contorno se dibuja con PIEZAS
+ * que solo se mueven y se estiran con `transform`: así el marco cambia de tamaño
+ * (M3) sin que nada cambie de sitio en la maqueta (CLS 0) y el contorno es el
+ * mismo en cada fotograma (las esquinas y las curvas no se deforman, las líneas
+ * siguen midiendo 1 px).
  *
- *   ╯ ╭───────────────────────────────────╮ ╰    ← ::before y ::after (tamaño fijo)
- *     │                                   │
- *     │              .forma               │      ← width × height reales
- *     ╰───────────────────────────────────╯      ← border-radius nativo
+ *        curvaI                                curvaD
+ *   ╯ ╭──┬────────────────────────────────┬──╮ ╰
+ *     │  │                                │  │
+ *   ladoI           fondo               ladoD      ← fondo: 1 × 1 escalado
+ *     │  │                                │  │
+ *     ╰──┴───────────── base ─────────────┴──╯     ← base y pie: 1 × 1 escalados
+ *   esquinaI             pie             esquinaD  ← esquinas: tamaño fijo, solo se mueven
  *
- * POR QUÉ (fallo del #357, reproducido el 2026-10-26 en Chrome con ventana y
- * GPU, Intel D3D11): las piezas de 1 × 1 px estiradas con `scale()` y con
- * transición CSS se quedaban, tras cambiar de menú, con el tamaño de OTRO panel
- * en pantalla, aunque su `transform` ya era el bueno: el fondo no cubría el
- * panel. Sin pantalla (las capturas de siempre) no pasaba nunca.
- *
- * Por eso tampoco hay transiciones CSS: el cambio de tamaño (M3) lo interpola el
- * marco fotograma a fotograma (`interpolarCaja`), con valores fijos en cada uno.
- * La posición va en `translate` (no cuenta como desplazamiento: CLS 0); el
- * tamaño, en `width` y `height`, que no mueven el punto de inicio.
+ * Todo va en coordenadas del LIENZO, que tiene un ancho FIJO (`anchoLienzo`): el
+ * panel de `ancho` × `alto` va centrado en él.
  */
-export type CajaMarco = {
-  /** Dónde empieza el panel dentro del lienzo (px). */
-  x: number;
-  ancho: number;
-  alto: number;
+export type PiezaMarco =
+  "fondo" | "base" | "ladoI" | "ladoD" | "pie" | "esquinaI" | "esquinaD" | "curvaI" | "curvaD";
+
+export const PIEZAS_MARCO: readonly PiezaMarco[] = [
+  "fondo",
+  "base",
+  "ladoI",
+  "ladoD",
+  "pie",
+  "esquinaI",
+  "esquinaD",
+  "curvaI",
+  "curvaD",
+];
+
+export type Geometria = {
+  /** El `transform` de cada pieza (con `transform-origin: 0 0`). */
+  piezas: Record<PiezaMarco, string>;
+  /** El recorte del contenido: `inset()` relativo al lienzo, con las esquinas de abajo redondeadas. */
+  recorte: string;
 };
 
 /**
- * La caja del contorno para un panel de `ancho` × `alto` que empieza en
- * `izquierda` (MEDIDO en pantalla; sin él, centrado en `anchoLienzo`). Todo en
- * píxeles enteros: sin medios píxeles, sin líneas borrosas. Nunca más estrecha
- * que las dos esquinas ni más baja que una.
+ * Las piezas para un panel de `ancho` × `alto` centrado en un lienzo de
+ * `anchoLienzo` y `altoLienzo`. `radio`: esquinas de abajo; `curva`: las curvas
+ * cóncavas de arriba (que salen del panel por los lados). Todo en píxeles
+ * enteros: sin medios píxeles, sin líneas borrosas.
  */
-export function cajaMarco(
+export function geometriaMarco(
   anchoLienzo: number,
+  altoLienzo: number,
   ancho: number,
   alto: number,
   radio = 30,
+  curva = 20,
+  /**
+   * Dónde empieza el panel dentro del lienzo, MEDIDO en pantalla. Sin él, centrado. El
+   * marco pasa siempre la medida real: así el contorno cae donde está el panel, sin
+   * depender de cálculos de centrado.
+   */
   izquierda?: number,
-): CajaMarco {
+): Geometria {
   const w = Math.max(2 * radio, Math.round(ancho));
+  const h = Math.max(radio, Math.round(alto));
+  const x = Math.round(izquierda ?? (anchoLienzo - w) / 2);
+  const recto = h - radio;
+  const t = (dx: number, dy: number, sx?: number, sy?: number) =>
+    `translate(${dx}px, ${dy}px)${sx === undefined ? "" : ` scale(${sx}, ${sy})`}`;
   return {
-    x: Math.round(izquierda ?? (anchoLienzo - w) / 2),
-    ancho: w,
-    alto: Math.max(radio, Math.round(alto)),
+    piezas: {
+      // Las piezas estiradas SE SOLAPAN 1 px con sus vecinas (`+ 1`, `- 1`): dos piezas que
+      // solo se tocaran dejarían, con un escalado no entero (125 %), una costura de medio
+      // píxel, como la de la máscara de antes. Lo solapado queda debajo de las esquinas y
+      // las líneas, del mismo color.
+      fondo: t(x, 0, w, recto + 1),
+      base: t(x + radio - 1, recto, w - 2 * radio + 2, radio),
+      ladoI: t(x, 0, 1, recto + 1),
+      ladoD: t(x + w - 1, 0, 1, recto + 1),
+      pie: t(x + radio - 1, h - 1, w - 2 * radio + 2, 1),
+      esquinaI: t(x, recto),
+      esquinaD: t(x + w - radio, recto),
+      curvaI: t(x - curva, 0),
+      curvaD: t(x + w - 1, 0),
+    },
+    recorte: `inset(0px ${anchoLienzo - x - w}px ${Math.round(altoLienzo) - h}px ${x}px round 0px 0px ${radio}px ${radio}px)`,
   };
-}
-
-/** El recorte del contenido: la misma caja, con las esquinas de abajo redondeadas. */
-export function recorteMarco(
-  caja: CajaMarco,
-  anchoLienzo: number,
-  altoLienzo: number,
-  radio = 30,
-): string {
-  const der = Math.max(0, Math.round(anchoLienzo) - caja.x - caja.ancho);
-  const abajo = Math.max(0, Math.round(altoLienzo) - caja.alto);
-  return `inset(0px ${der}px ${abajo}px ${caja.x}px round 0px 0px ${radio}px ${radio}px)`;
-}
-
-/** De `desde` a `hacia` en el punto `t` (0–1, ya suavizado), en píxeles enteros. */
-export function interpolarCaja(desde: CajaMarco, hacia: CajaMarco, t: number): CajaMarco {
-  const k = Math.min(1, Math.max(0, t));
-  const m = (a: number, b: number) => Math.round(a + (b - a) * k);
-  return {
-    x: m(desde.x, hacia.x),
-    ancho: m(desde.ancho, hacia.ancho),
-    alto: m(desde.alto, hacia.alto),
-  };
-}
-
-/**
- * La curva de M3, `cubic-bezier(0.33, 0, 0.2, 1)` (la del fundido de los
- * paneles), para `t` de 0 a 1.
- */
-export function suavizadoMarco(t: number): number {
-  const x1 = 0.33;
-  const x2 = 0.2;
-  const y1 = 0;
-  const y2 = 1;
-  if (t <= 0) return 0;
-  if (t >= 1) return 1;
-  const bx = (s: number) => 3 * x1 * s * (1 - s) ** 2 + 3 * x2 * s ** 2 * (1 - s) + s ** 3;
-  const by = (s: number) => 3 * y1 * s * (1 - s) ** 2 + 3 * y2 * s ** 2 * (1 - s) + s ** 3;
-  // Bisección: x(s) es monótona en [0, 1].
-  let a = 0;
-  let b = 1;
-  for (let i = 0; i < 30; i++) {
-    const s = (a + b) / 2;
-    if (bx(s) < t) a = s;
-    else b = s;
-  }
-  return by((a + b) / 2);
 }

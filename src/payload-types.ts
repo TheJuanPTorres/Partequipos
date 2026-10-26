@@ -1516,6 +1516,9 @@ export interface Pagina {
      * Sin efecto desde el 2026-10-26 (diseño del cliente): la cabecera lleva el «Texto de la cabecera».
      */
     marcasTitulo?: string | null;
+    /**
+     * Bajo el título, antes del «Texto de la cabecera». Respeta los saltos de línea. Vacía, no se pinta.
+     */
     marcasTexto?: string | null;
     /**
      * El botón baja al carrusel de la categoría elegida.

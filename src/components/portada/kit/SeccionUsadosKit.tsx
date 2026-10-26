@@ -153,6 +153,8 @@ function Tarjeta({
 export type TextosUsadosKit = {
   antetitulo: string;
   titulo: string;
+  /** «Frase de la cabecera»: bajo el título, con sus saltos de línea. */
+  frase: string;
   descripcion: string;
   botonTexto: string;
 };
@@ -211,6 +213,7 @@ export function SeccionUsadosKit({
               <h2 id={idTitulo} className={estilos.titulo}>
                 {textos.titulo || "Maquinaria pesada usada"}
               </h2>
+              {textos.frase ? <p className={estilos.frase}>{textos.frase}</p> : null}
               {textos.descripcion ? (
                 <p className={estilos.descripcion}>{textos.descripcion}</p>
               ) : null}

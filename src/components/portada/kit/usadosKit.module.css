@@ -209,6 +209,23 @@
   letter-spacing: -0.025em;
 }
 
+/* «Frase de la cabecera»: entradilla bajo el título, con sus saltos de línea y ancho de lectura. */
+.frase {
+  max-width: 36rem;
+  margin: 20px 0 0;
+  color: var(--color-texto);
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+@media (min-width: 1025px) {
+  .frase {
+    font-size: 1.2rem;
+  }
+}
+
 .descripcion {
   margin: 20px 0 0;
   color: var(--color-texto-suave);

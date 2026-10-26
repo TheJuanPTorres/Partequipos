@@ -536,11 +536,17 @@ export const PaginaInstitucional: CollectionConfig = {
           "Marcas que Respaldan Nuestro Trabajo",
           "Sin efecto desde el 2026-10-26 (diseño del cliente): la cabecera lleva el «Texto de la cabecera».",
         ),
-        parrafo(
-          "marcasTexto",
-          "Frase de la cabecera (ya no se usa)",
-          "Trabajamos con fabricantes líderes a nivel internacional para ofrecerle calidad, rendimiento y respaldo",
-        ),
+        {
+          name: "marcasTexto",
+          type: "textarea",
+          label: "Frase de la cabecera",
+          defaultValue:
+            "Trabajamos con fabricantes líderes a nivel internacional para ofrecerle calidad, rendimiento y respaldo",
+          admin: {
+            description:
+              "Bajo el título, antes del «Texto de la cabecera». Respeta los saltos de línea. Vacía, no se pinta.",
+          },
+        },
         texto(
           "botonTexto",
           "Texto del botón de la cabecera",

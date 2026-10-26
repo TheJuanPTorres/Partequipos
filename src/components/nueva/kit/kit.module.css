@@ -149,7 +149,8 @@
 /* Vidrio oscuro: tinta cálida al 55 % sobre un fondo que el propio filtro oscurece y desenfoca. */
 .pildora {
   position: fixed;
-  top: 20px;
+  /* Justo debajo de la cabecera del sitio (alto real, lo pone PildoraKit). */
+  top: calc(var(--pildora-arriba, 0px) + 12px);
   left: 50%;
   z-index: 60;
   display: flex;
@@ -180,6 +181,7 @@
   visibility: hidden;
   transition:
     opacity 0.3s ease,
+    top 0.3s ease,
     transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
     visibility 0s linear 0.4s;
 }
@@ -797,10 +799,6 @@
 
   .heroTexto {
     font-size: 13px;
-  }
-
-  .pildora {
-    top: 12px;
   }
 
   .tipos {

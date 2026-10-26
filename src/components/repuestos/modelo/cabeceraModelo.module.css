@@ -4,13 +4,14 @@
  * al 45 % (51vh de alto mínimo, esquinas izquierdas redondeadas) y el texto al 55 % (3 % de
  * relleno, centrado en vertical). Datos con icono en pastillas del gris de sección, a 20 px.
  *
- * Aire (Juan Pablo, 2026-10-26: iba pegada): 24 px bajo la cabecera del sitio y 1,5vw a los
- * lados, como el banner de las demás páginas de repuestos (`heroSeccion`), y 48 px antes de
- * «Repuestos disponibles…» (32 en móvil).
+ * Aire (Juan Pablo, 2026-10-26: iba pegada). Medido: con 24 px bajo la cabecera y 1,5vw a los
+ * lados (6 px a 390), como el banner de las demás páginas, se veía apretada. Ahora 48 px bajo
+ * la cabecera (32 en móvil), al menos 12 px a los lados y 48 px antes de «Repuestos
+ * disponibles…» (32 en móvil).
  */
 .cabecera {
   display: flex;
-  margin: 24px 1.5vw 48px;
+  margin: 48px max(1.5vw, 12px) 48px;
   overflow: hidden;
   border-radius: 30px;
   background: var(--color-fondo);
@@ -149,6 +150,7 @@
 @media (max-width: 767px) {
   .cabecera {
     flex-direction: column;
+    margin-top: 32px;
     margin-bottom: 32px;
   }
 
@@ -225,4 +227,9 @@
   from {
     opacity: 0;
   }
+}
+
+/* El código del modelo («EX120-2») no se parte por el guion en el teléfono. */
+.sinCorte {
+  white-space: nowrap;
 }

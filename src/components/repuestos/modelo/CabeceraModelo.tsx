@@ -85,7 +85,16 @@ export function CabeceraModelo({
         </div>
         <p className={`${estilos.antetitulo} texto-destacado`}>Repuestos para Maquinaria Pesada</p>
         <h1 id="modelo-titulo" className={`${estilos.titulo} texto-titulo-bloque`}>
-          {titulo}
+          {titulo.split(" ").map((palabra, i) => (
+            <span key={`${i}-${palabra}`}>
+              {i > 0 ? " " : null}
+              {palabra.includes("-") ? (
+                <span className={estilos.sinCorte}>{palabra}</span>
+              ) : (
+                palabra
+              )}
+            </span>
+          ))}
         </h1>
         {filas.length > 0 ? (
           <ul className={`${estilos.datos} texto-etiqueta`}>

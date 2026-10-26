@@ -108,6 +108,43 @@
   outline-offset: 3px;
 }
 
+/*
+ * «¿POR QUÉ ELEGIRNOS?» PROPIO de una página de marca (Filtros Donaldson, 2026-10-26): como la
+ * franja azul de WordPress, el panel del texto va sobre el color de la marca oscurecido para el
+ * blanco (`--boton-acento`, AA), con título y textos en blanco y el botón al revés; la foto, sin
+ * el velo de la plantilla.
+ */
+.porQueAcento .porQueTexto {
+  background: var(--boton-acento, var(--color-marca));
+  color: #fff;
+}
+
+.porQueAcento .porQueTitulo,
+.porQueAcento .porQueCierre,
+.porQueAcento .porQueCompromiso,
+.porQueAcento .porQueCompromiso strong,
+.porQueAcento .porQueEntradilla strong {
+  color: #fff;
+}
+
+.porQueAcento .porQueFoto::after {
+  display: none;
+}
+
+.porQueAcento .porQueBoton {
+  background: #fff;
+  color: var(--boton-acento, var(--color-marca));
+}
+
+.porQueAcento .porQueBoton:hover {
+  background: var(--color-texto);
+  color: #fff;
+}
+
+.porQueAcento .porQueBoton:focus-visible {
+  outline-color: #fff;
+}
+
 /* --- Sedes ------------------------------------------------------------------------- */
 
 .sedes {

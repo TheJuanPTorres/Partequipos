@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
@@ -14,6 +15,7 @@ import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import { colorDeMarca, estiloDeMarca } from "@/lib/marca/colorMarca";
+import { colorConBlanco } from "@/lib/marca/franjaMarca";
 import { conAlt, logoPropio } from "@/lib/marca/logoMarca";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
@@ -109,6 +111,7 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
     marca: nombre.toLowerCase(),
   });
   const bienvenida = vistaBienvenida(sub);
+  const porQuePropio = vistaPorQuePropia(sub, global);
   const encabezado = vistaEncabezadoCategoria(sub, global, fondoDeRespaldo(marcas));
   const vista = {
     ...encabezado,
@@ -128,7 +131,17 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
   return (
     <main
       className={`${estilos.pagina} ${color ? estilos.paginaConColor : ""}`}
-      style={estiloDeMarca(sub.colorMarca)}
+      style={
+        color
+          ? ({
+              ...estiloDeMarca(color),
+              // Botones y texto sobre el color: oscurecido lo justo para el blanco (AA), como el
+              // botón del menú. La franja de la cabecera sigue con el color tal cual.
+              "--boton-acento": colorConBlanco(color),
+              "--boton-acento-tinta": "#fff",
+            } as CSSProperties)
+          : undefined
+      }
     >
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
@@ -154,6 +167,20 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
         <BienvenidaMarca id="presentacion-marca" vista={bienvenida} />
       </EmblemaKit>
 
+      {/*
+       * El «¿Por qué elegirnos?» PROPIO va donde en WordPress: justo tras la presentación, con el
+       * texto sobre el color de la marca (su franja azul). El general, en su sitio de siempre.
+       */}
+      {porQuePropio ? (
+        <PorQueElegirnos
+          id="por-que-elegirnos"
+          vista={porQuePropio}
+          anclaContacto={ANCLA_CONTACTO}
+          formulario={formulario}
+          acento={Boolean(color)}
+        />
+      ) : null}
+
       <ContactoMarca
         id={ANCLA_CONTACTO}
         titulo={texto(global.contactoTitulo)}
@@ -173,12 +200,14 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
         }}
       />
 
-      <PorQueElegirnos
-        id="por-que-elegirnos"
-        vista={vistaPorQuePropia(sub, global) ?? vistaPorQue(global, null)}
-        anclaContacto={ANCLA_CONTACTO}
-        formulario={formulario}
-      />
+      {porQuePropio ? null : (
+        <PorQueElegirnos
+          id="por-que-elegirnos"
+          vista={vistaPorQue(global, null)}
+          anclaContacto={ANCLA_CONTACTO}
+          formulario={formulario}
+        />
+      )}
 
       <SedesCompactas id="sedes-repuestos" sedes={sedesDePortada(sedes)} />
     </main>

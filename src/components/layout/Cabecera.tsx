@@ -365,17 +365,26 @@ export function Cabecera({
   };
 
   /*
-   * El foco entra en el panel abierto con el teclado en el fotograma SIGUIENTE a
-   * abrirlo: antes, con un `setTimeout(0)`, a veces el panel aún estaba oculto
-   * (`visibility: hidden`) y el foco se quedaba en el botón (medido con «reducir
-   * movimiento», 2026-10-26; ya pasaba en el sitio publicado).
+   * El foco entra en el panel abierto con el teclado EN CUANTO SE VE. Antes, con un
+   * `setTimeout(0)`, el panel aún estaba oculto y el foco se quedaba en el botón
+   * (medido con «reducir movimiento», 2026-10-26; ya pasaba en el sitio publicado):
+   * con esa preferencia, una regla global da a todo una transición de 0,01 ms y los
+   * hijos del marco heredan `visibility: hidden` un fotograma más. Se reintenta en
+   * cada fotograma, como mucho 10, hasta que el enlace acepta el foco.
    */
   useEffect(() => {
     if (!megaAbierto || enfocarAlAbrir.current !== megaAbierto) return;
     enfocarAlAbrir.current = null;
-    const id = requestAnimationFrame(() =>
-      paneMega.current[megaAbierto]?.querySelector<HTMLElement>("a")?.focus(),
-    );
+    let intentos = 0;
+    let id = 0;
+    const intentar = () => {
+      const enlace = paneMega.current[megaAbierto]?.querySelector<HTMLElement>("a");
+      if (!enlace) return;
+      enlace.focus();
+      if (document.activeElement !== enlace && intentos++ < 10)
+        id = requestAnimationFrame(intentar);
+    };
+    id = requestAnimationFrame(intentar);
     return () => cancelAnimationFrame(id);
   }, [megaAbierto]);
 

@@ -1210,6 +1210,32 @@ a.modelo:hover {
   transform: none;
 }
 
+/*
+ * «QUÉ INCLUYE» DE LAS CATEGORÍAS TÉCNICAS (dirección, 2026-10-26): las fotos de
+ * producto, SIEMPRE ENTERAS. `contain`, centradas y con margen interior, sin el
+ * zoom de las fotos de escena, sobre el mismo gris claro en todas las tarjetas
+ * (el blanco de la foto se funde con él, `multiply`). El margen de abajo deja la
+ * foto por encima del recuadro del nombre: los 34 px que sube sobre la caja y
+ * los 25 px que puede subir con el scroll (`RecuadrosConScroll`).
+ */
+.tarjetasGrupos .foto .fotoImg.fotoProducto,
+.tarjetasGrupos .tarjeta:hover .fotoImg.fotoProducto {
+  box-sizing: border-box;
+  padding: 6% 8% calc(59px + 3%);
+  object-fit: contain;
+  object-position: center;
+  transform: none;
+}
+
+/* Los botones, abajo y a la misma altura en toda la fila, haya o no descripción. */
+.tarjetasGrupos .panel {
+  justify-content: flex-start;
+}
+
+.tarjetasGrupos .accionesGrupo {
+  margin-top: auto;
+}
+
 /* El título del bloque de marcas, sin el margen negativo de la página de marca. */
 .tarjetasIndice > .tituloSeccion {
   margin-inline: 0;

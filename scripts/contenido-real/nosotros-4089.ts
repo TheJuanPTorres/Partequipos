@@ -2,7 +2,7 @@
  * NOSOTROS CON LA PLANTILLA 4089 DE ANDRÉS (2026-10-26, decisiones de Juan Pablo): el contenido
  * REAL de WordPress se queda (textos y cifras) y solo se AÑADE lo que falta de la plantilla:
  *
- * - en «Cifras», «100 %» «Cobertura nacional*» y «10.000+» «Repuestos disponibles», detrás de
+ * - en «Cifras», «100 %» «Cobertura nacional» (sin asterisco: no hay nota) y «10.000+» «Repuestos disponibles», detrás de
  *   las que ya haya (la de «+26 Años de experiencia»);
  * - en «Presentación con imagen», la animación del mapa de sedes (colección «Animaciones»), que
  *   se pinta en lugar de la foto (la foto queda de respaldo con «reducir movimiento»);
@@ -119,7 +119,7 @@ if (modo === "listar") {
       const extra = [
         ...(tiene("cobertura")
           ? []
-          : [{ prefijo: "", numero: 100, sufijo: "%", etiqueta: "Cobertura nacional*" }]),
+          : [{ prefijo: "", numero: 100, sufijo: "%", etiqueta: "Cobertura nacional" }]),
         ...(tiene("repuestos")
           ? []
           : [{ prefijo: "", numero: 10000, sufijo: "+", etiqueta: "Repuestos disponibles" }]),

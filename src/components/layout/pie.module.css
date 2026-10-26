@@ -507,51 +507,94 @@
  * DESVIACIÓN (decisión 3, no estética): franja legal. ux-9 no la trae, pero el
  * sitio tiene que enlazar la política de tratamiento de datos (Ley 1581 de
  * 2012) y las demás páginas legales, y conservar la dirección y el teléfono.
+ *
+ * BARRA INFERIOR DEL PIE (dirección, 2026-10-25): antes se veía fuera del pie (una
+ * franja aparte, a 13 px y con el texto repartido a los lados). Ahora sigue al
+ * panel con su mismo fondo, separada por una línea fina a la anchura del
+ * contenido, y todo centrado: los enlaces en una fila con «·» (varias filas
+ * centradas en móvil), debajo la dirección con su icono y, al final, «Volver
+ * arriba» (P4). Letra de 15 px (14 en móvil). Contraste: enlaces en
+ * `--color-texto` (19:1) y la dirección en `--color-texto-suave` (7,5:1).
  */
 .legal {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 12px 24px;
   /*
    * Abajo, el sitio del botón flotante de WhatsApp (2026-10-17): 16 + 56 + 16 px
-   * y la zona segura. Al final de la página la franja queda por encima de él y
-   * no la tapa.
+   * y la zona segura. Al final de la página la barra queda por encima de él y
+   * no la tapa; «Volver arriba» va centrado, lejos de su esquina.
    */
-  padding: 20px 5% calc(88px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--color-fondo-seccion);
+  padding: 0 5% calc(88px + env(safe-area-inset-bottom, 0px));
   background: var(--color-fondo);
   color: var(--color-texto-suave);
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.5;
 }
 
-.legal ul {
+.legalBarra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 28px;
+  border-top: 1px solid rgb(16 15 15 / 0.14);
+  text-align: center;
+}
+
+.legalEnlaces {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 18px;
+  justify-content: center;
+  gap: 6px 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.legal a {
+/* El «·» entre enlaces, con buen espacio; los lectores de pantalla no lo leen. */
+.legalEnlaces li + li::before {
+  margin-inline: 16px;
   color: var(--color-texto-suave);
+  content: "·" / "";
+}
+
+.legalEnlaces a {
+  color: var(--color-texto);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.legal a {
   /*
-   * ZONA PULSABLE de 24 px (auditoría de C, I6; WCAG 2.5.8) sin cambio
+   * ZONA PULSABLE de 24 px o más (auditoría de C, I6; WCAG 2.5.8) sin cambio
    * visual: en un elemento en línea el relleno vertical agranda la caja y no
-   * mueve las líneas. 13 px de letra dan una caja de 16; con 4 + 4, 24. Entre
-   * filas hay 25,5 px, así que no se pisan.
+   * mueve las líneas.
    */
   padding-block: 4px;
 }
 
-.legal a:hover {
+.legal a:not(.arriba):hover {
   color: var(--color-marca);
 }
 
-.legal address {
+/* El icono va EN LÍNEA con el texto: en móvil, con la dirección en varias líneas centradas,
+   queda pegado a la primera palabra y no suelto a la izquierda. */
+.legalDireccion {
+  max-width: 760px;
+  margin: 0;
+  font-size: 14px;
   font-style: normal;
+}
+
+.legalDireccion svg {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  color: var(--color-marca);
+  vertical-align: -4px;
+}
+
+.legalDireccion a {
+  color: inherit;
 }
 
 /* Teléfono y correo no se parten: a 390 el teléfono se cortaba en dos líneas. */
@@ -559,7 +602,31 @@
   white-space: nowrap;
 }
 
+@media (max-width: 767px) {
+  .legal {
+    font-size: 14px;
+  }
+
+  .legalBarra {
+    padding-top: 24px;
+  }
+
+  /* En el teléfono, los enlaces en varias filas centradas, sin «·» al empezar una fila. */
+  .legalEnlaces {
+    gap: 4px 20px;
+  }
+
+  .legalEnlaces li + li::before {
+    content: none;
+  }
+
+  .legalDireccion {
+    font-size: 13px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .arriba,
   .red,
   .red::before,
   .red svg {
@@ -592,23 +659,50 @@
  * listado (#320, `DURACION_MS` y `CURVA`): 280 ms, cubic-bezier(0.33, 0, 0.2, 1).
  */
 
-/* P4: «Volver arriba», en la franja legal (también sin movimiento: sube sin desplazamiento suave). */
+/*
+ * P4: «Volver arriba», al final de la barra legal, centrado y en una pastilla de contorno
+ * (también sin movimiento: sube sin desplazamiento suave). Centrado queda lejos de la
+ * esquina del botón flotante de WhatsApp.
+ */
 .arriba {
   display: inline-flex;
+  min-height: 36px;
+  margin-top: 4px;
+  padding-inline: 16px;
   align-items: center;
   gap: 6px;
+  border: 1px solid rgb(16 15 15 / 0.2);
+  border-radius: 999px;
+  color: var(--color-texto);
+  font-size: 14px;
+  font-weight: 500;
   white-space: nowrap;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.arriba:hover {
+  border-color: var(--color-marca);
+  color: var(--color-marca);
+}
+
+/* El `:focus-visible` global pone `border-radius: 2px`: se conserva la pastilla. */
+.arriba:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+  border-radius: 999px;
 }
 
 .arriba svg {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   /* P1: subrayado que crece desde la izquierda, en el color del enlace. */
   .pie[data-anim~="P1"] .enlace,
-  .pie[data-anim~="P1"] .legal a {
+  .pie[data-anim~="P1"] .legal a:not(.arriba) {
     background-image: linear-gradient(currentColor, currentColor);
     background-repeat: no-repeat;
     background-origin: content-box;
@@ -621,8 +715,8 @@
 
   .pie[data-anim~="P1"] .enlace:hover,
   .pie[data-anim~="P1"] .enlace:focus-visible,
-  .pie[data-anim~="P1"] .legal a:hover,
-  .pie[data-anim~="P1"] .legal a:focus-visible {
+  .pie[data-anim~="P1"] .legal a:not(.arriba):hover,
+  .pie[data-anim~="P1"] .legal a:not(.arriba):focus-visible {
     background-size: 100% 1px;
   }
 

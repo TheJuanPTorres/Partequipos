@@ -3,18 +3,19 @@
  * cliente (foto de fondo de la cabecera, emblema —el águila Old Abe— y el render de cada tipo) a
  * «Imágenes», las asigna a la marca y a sus tipos y deja la marca en el diseño «Kit de marca».
  *
- *   payload run scripts/marca-kit/marca-kit.ts <modo> <destino> [emblema=on|off]
+ *   payload run scripts/marca-kit/marca-kit.ts <modo> <destino> [marca] [emblema=on|off]
  *
  *   modo:    simular (no escribe) · sembrar · retirar
  *   destino: preview · produccion
+ *   marca:   case (por defecto) · hitachi · yanmar · dynapac. Fase 2 (2026-10-26): mismas piezas
+ *            con las imágenes de cada kit (`Desktop/partequipos-diseno/kit-marca-<marca>`).
  *
  * DESTINO validado ANTES de cargar Payload: `preview` solo con la base y el Blob del preview;
  * `produccion` solo con la base y el almacén de producción (`veredictoDestino`), y el almacén se
  * declara para la guarda de las colecciones. Cualquier otra combinación, se niega.
  *
- * EL EMBLEMA: en el preview se activa (`mostrarEmblema`); en PRODUCCIÓN se sube pero queda
- * DESACTIVADO hasta que el cliente confirme el permiso de uso del águila Old Abe (se activa
- * desde el panel, casilla «Mostrar el emblema de fondo»). `emblema=on|off` lo fuerza.
+ * EL EMBLEMA: se sube y se ACTIVA (`mostrarEmblema`); el cliente dio permiso para los cuatro
+ * (2026-10-26). `emblema=off` lo deja desactivado (casilla «Mostrar el emblema de fondo»).
  *
  * IDEMPOTENTE: una segunda pasada no duplica nada (reutiliza las imágenes `kit-case-…` ya subidas)
  * y NO pisa lo que alguien eligió en el panel (un campo con otra imagen se deja como está).
@@ -37,6 +38,8 @@ import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 
 const args = process.argv.slice(2);
 const modo = args.find((a) => a === "simular" || a === "sembrar" || a === "retirar");
+const MARCAS = ["case", "hitachi", "yanmar", "dynapac"] as const;
+const clave = MARCAS.find((m) => args.includes(m)) ?? "case";
 const destino = args.find((a) => a === "preview" || a === "produccion");
 const fallar = (m: string): never => {
   const e = new Error(`[marca-kit] ✗ ${m}`);
@@ -66,62 +69,157 @@ process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 
 const ESCRITORIO = path.join(os.homedir(), "Desktop");
-const CARPETA =
-  process.env.KIT_MARCA_DIR ??
-  path.join(
-    ESCRITORIO,
-    "partequipos-diseno",
-    "kit-marca",
-    "public",
-    "partequipos",
-    "marcas",
-    "case",
-  );
+
+/** El render del kit de un tipo: su slug y, por si el slug cambiara, parte de su nombre. */
+type Render = {
+  /** Ruta dentro de la carpeta de la marca. */
+  fichero: string;
+  slug: string;
+  /** Principio del nombre del tipo (sin tildes), o parte de él con `incluye`. */
+  clave: string;
+  nombre: string;
+  incluye?: boolean;
+};
+type Config = {
+  nombre: string;
+  slug: string;
+  carpeta: string;
+  emblemaAlt: string;
+  renders: readonly Render[];
+};
+
+const kitDe = (dir: string, marca: string) =>
+  path.join(ESCRITORIO, "partequipos-diseno", dir, "public", "partequipos", "marcas", marca);
+
+const CONFIGS: Record<(typeof MARCAS)[number], Config> = {
+  case: {
+    nombre: "Case Construction",
+    slug: "case-construction",
+    carpeta: process.env.KIT_MARCA_DIR ?? kitDe("kit-marca", "case"),
+    emblemaAlt: "Emblema de Case Construction, el águila Old Abe",
+    renders: [
+      {
+        fichero: "tipos/bulldozer.png",
+        slug: "bulldozer",
+        clave: "bulldozer",
+        nombre: "Bulldozer",
+      },
+      { fichero: "tipos/cargador.png", slug: "cargadores", clave: "cargador", nombre: "Cargador" },
+      {
+        fichero: "tipos/excavadora.png",
+        slug: "excavadoras",
+        clave: "excavadora",
+        nombre: "Excavadora",
+      },
+      {
+        fichero: "tipos/minicargador.png",
+        slug: "minicargadores-case",
+        clave: "minicargador",
+        nombre: "Minicargador",
+      },
+      {
+        fichero: "tipos/motoniveladora.png",
+        slug: "motoniveladoras-case",
+        clave: "motoniveladora",
+        nombre: "Motoniveladora",
+      },
+      {
+        fichero: "tipos/retrocargadora.png",
+        slug: "retrocargadoras",
+        clave: "retrocargadora",
+        nombre: "Retrocargadora",
+      },
+      {
+        fichero: "tipos/vibrocompactador.png",
+        slug: "vibrocompactador-case-sv208",
+        clave: "vibrocompactador",
+        nombre: "Vibrocompactador",
+      },
+    ],
+  },
+  hitachi: {
+    nombre: "Hitachi",
+    slug: "hitachi",
+    carpeta: kitDe("kit-marca-hitachi", "hitachi"),
+    emblemaAlt: "Emblema de Hitachi, el Ojo Hitachi",
+    renders: [
+      {
+        fichero: "../../maq-hitachi-zx210.png",
+        slug: "excavadoras-hitachi",
+        clave: "excavadora",
+        nombre: "Excavadora",
+      },
+    ],
+  },
+  yanmar: {
+    nombre: "Yanmar",
+    slug: "yanmar",
+    carpeta: kitDe("kit-marca-yanmar", "yanmar"),
+    emblemaAlt: "Emblema de Yanmar, la libélula",
+    renders: [
+      {
+        fichero: "../../maq-yanmar.png",
+        slug: "miniexcavadoras",
+        clave: "miniexcavadora",
+        nombre: "Miniexcavadora",
+      },
+    ],
+  },
+  dynapac: {
+    nombre: "Dynapac",
+    slug: "dynapac",
+    carpeta: kitDe("kit-marca-dynapac", "dynapac"),
+    emblemaAlt: "Emblema de Dynapac, el rinoceronte",
+    renders: [
+      {
+        fichero: "tipos/doble-rodillo.png",
+        slug: "compactador-doble-rodillo-dynapac",
+        clave: "doble rodillo",
+        nombre: "doble rodillo",
+        incluye: true,
+      },
+      {
+        fichero: "tipos/llantas.png",
+        slug: "compactador-de-llantas-dynapac",
+        clave: "llantas",
+        nombre: "llantas",
+        incluye: true,
+      },
+      {
+        fichero: "tipos/suelo.png",
+        slug: "compactador-de-suelo-dynapac",
+        clave: "de suelo",
+        nombre: "suelo",
+        incluye: true,
+      },
+      {
+        fichero: "tipos/pavimentadora.png",
+        slug: "pavimentadoras-dynapac",
+        clave: "pavimentadoras dynapac",
+        nombre: "pavimentadora",
+        incluye: true,
+      },
+      {
+        fichero: "tipos/regla.png",
+        slug: "reglas-dynapac",
+        clave: "regla",
+        nombre: "regla",
+        incluye: true,
+      },
+    ],
+  },
+};
+const CFG = CONFIGS[clave];
+const CARPETA = CFG.carpeta;
+const RENDERS = CFG.renders;
 const MANIFIESTO = path.join(
   ESCRITORIO,
   "partequipos-cierre",
-  `manifiesto-marca-kit-case-${destino}.json`,
+  `manifiesto-marca-kit-${clave}-${destino}.json`,
 );
-const SLUG_MARCA = "case-construction";
-const PREFIJO = "kit-case-";
+const PREFIJO = `kit-${clave}-`;
 const emblemaPedido = args.find((a) => a.startsWith("emblema="))?.slice("emblema=".length);
-const mostrarEmblema = emblemaPedido ? emblemaPedido === "on" : destino === "preview";
-
-/** El render del kit de cada tipo: su slug y, por si el slug cambiara, el principio de su nombre. */
-const RENDERS = [
-  { fichero: "tipos/bulldozer.png", slug: "bulldozer", clave: "bulldozer", nombre: "Bulldozer" },
-  { fichero: "tipos/cargador.png", slug: "cargadores", clave: "cargador", nombre: "Cargador" },
-  {
-    fichero: "tipos/excavadora.png",
-    slug: "excavadoras",
-    clave: "excavadora",
-    nombre: "Excavadora",
-  },
-  {
-    fichero: "tipos/minicargador.png",
-    slug: "minicargadores-case",
-    clave: "minicargador",
-    nombre: "Minicargador",
-  },
-  {
-    fichero: "tipos/motoniveladora.png",
-    slug: "motoniveladoras-case",
-    clave: "motoniveladora",
-    nombre: "Motoniveladora",
-  },
-  {
-    fichero: "tipos/retrocargadora.png",
-    slug: "retrocargadoras",
-    clave: "retrocargadora",
-    nombre: "Retrocargadora",
-  },
-  {
-    fichero: "tipos/vibrocompactador.png",
-    slug: "vibrocompactador-case-sv208",
-    clave: "vibrocompactador",
-    nombre: "Vibrocompactador",
-  },
-] as const;
+const mostrarEmblema = emblemaPedido ? emblemaPedido === "on" : true;
 
 type Subida = { id: number; para: string; url: string; creada: boolean };
 type Manifiesto = { destino: string; marca: number; media: Subida[] };
@@ -133,14 +231,16 @@ const idDe = (x: unknown) =>
 const { default: config } = await import("../../src/payload.config");
 const payload = await getPayload({ config });
 
-const { docs: marcas } = await payload.find({
+const { docs: todasMarcas } = await payload.find({
   collection: "marcas-maquinaria",
-  where: { slug: { equals: SLUG_MARCA } },
   depth: 0,
-  limit: 1,
+  limit: 100,
   overrideAccess: true,
 });
-const marca = marcas[0] ?? fallar(`no existe la marca «${SLUG_MARCA}»`);
+const marca =
+  todasMarcas.find((m) => m.slug === CFG.slug) ??
+  todasMarcas.find((m) => sinTildes(m.nombre).startsWith(clave) || m.slug.startsWith(clave)) ??
+  fallar(`no existe la marca «${CFG.slug}»`);
 const { docs: tipos } = await payload.find({
   collection: "tipos-maquinaria",
   where: { marca: { equals: marca.id } },
@@ -150,10 +250,12 @@ const { docs: tipos } = await payload.find({
 });
 
 /** El tipo de CASE de cada render: por su dirección y, si no, por el principio de su nombre. */
-function tipoDe(r: (typeof RENDERS)[number]) {
+function tipoDe(r: Render) {
   const porSlug = tipos.find((t) => t.slug === r.slug);
   if (porSlug) return porSlug;
-  const porNombre = tipos.filter((t) => sinTildes(t.nombre).startsWith(r.clave));
+  const porNombre = tipos.filter((t) =>
+    r.incluye ? sinTildes(t.nombre).includes(r.clave) : sinTildes(t.nombre).startsWith(r.clave),
+  );
   return porNombre.length === 1 ? porNombre[0] : undefined;
 }
 
@@ -295,16 +397,12 @@ try {
   if (propia(kit.fotoCabecera)) {
     kit.fotoCabecera = await subir(
       "fondo.jpg",
-      "Foto de fondo de la cabecera de Case Construction",
+      `Foto de fondo de la cabecera de ${CFG.nombre}`,
       "fondo",
     );
   } else log("  la marca ya tiene otra foto de cabecera: no se pisa");
   if (propia(kit.emblema)) {
-    kit.emblema = await subir(
-      "mascota-tinta.webp",
-      "Emblema de Case Construction, el águila Old Abe",
-      "emblema",
-    );
+    kit.emblema = await subir("mascota-tinta.webp", CFG.emblemaAlt, "emblema");
     if (idDe(marca.kit?.emblema) === null) kit.mostrarEmblema = mostrarEmblema;
   } else log("  la marca ya tiene otro emblema: no se pisa");
   await payload.update({
@@ -320,7 +418,11 @@ try {
       log(`  «${t.nombre}» ya tiene otro render: no se pisa`);
       continue;
     }
-    const id = await subir(r.fichero, `Render recortado de ${r.nombre} Case`, `tipo:${r.slug}`);
+    const id = await subir(
+      r.fichero,
+      `Render recortado de ${r.nombre} ${CFG.nombre}`,
+      `tipo:${r.slug}`,
+    );
     await payload.update({
       collection: "tipos-maquinaria",
       id: t.id,

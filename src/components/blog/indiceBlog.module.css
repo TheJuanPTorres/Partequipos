@@ -17,9 +17,9 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 48px 20px 80px;
+  padding: 48px 22px 80px;
   color: var(--gris-texto);
 }
 
@@ -145,6 +145,13 @@
 
 .limpiar:hover {
   background: var(--negro);
+}
+
+.resumen {
+  margin: 0;
+  color: var(--negro);
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .vacio {
@@ -351,9 +358,10 @@
   text-decoration: none;
 }
 
-.extracto + .leer,
-.titulo + .leer {
-  margin-top: 18px;
+/* «Leer» siempre abajo, a la misma altura en todas las tarjetas de una fila. */
+.extracto,
+.titulo:has(+ .leer) {
+  margin-bottom: 18px;
 }
 
 .leer:hover {

@@ -5,6 +5,7 @@ import { contraste, luminancia, rgbDeHex } from "../portada/contraste";
 
 import { COLOR_SIN_MARCA } from "./colorMarca";
 import {
+  colorConBlanco,
   coloresFranja,
   CONTRASTE_TEXTO,
   MEJORAS_FRANJA,
@@ -76,5 +77,22 @@ describe("textoModelos", () => {
   it("singular y plural", () => {
     assert.equal(textoModelos(1), "1 modelo");
     assert.equal(textoModelos(3), "3 modelos");
+  });
+});
+
+describe("colorConBlanco (botón del menú de Filtros Donaldson)", () => {
+  it("oscurece lo justo para que el blanco pase AA", () => {
+    // #007CC4 da 4,47:1 con el blanco: se oscurece.
+    assert.ok(con("#007CC4", "#ffffff") < CONTRASTE_TEXTO);
+    const c = colorConBlanco("#007CC4");
+    assert.ok(con(c, "#ffffff") >= CONTRASTE_TEXTO);
+    // Lo justo: un paso menos ya no llegaría.
+    assert.notEqual(c, "#007cc4");
+  });
+
+  it("no toca un color que ya pasa, y sin color usa el de las marcas sin color", () => {
+    assert.equal(colorConBlanco("#1a1a1a"), "#1a1a1a");
+    assert.ok(con(colorConBlanco(null), "#ffffff") >= CONTRASTE_TEXTO);
+    assert.ok(con(colorConBlanco("#ffe600"), "#ffffff") >= CONTRASTE_TEXTO);
   });
 });

@@ -88,7 +88,11 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
     getCategoriasRepuestos(),
   ]);
   // Las páginas que cuelgan de esta categoría (Filtros Donaldson en Filtración, 2026-10-26).
-  const accesos = accesosDe(categoria.id, todas);
+  // Con la foto de su tarjeta, que asoma por la derecha de la franja (D3).
+  const accesos = accesosDe(categoria.id, todas).map((a) => ({
+    ...a,
+    foto: imagenDeMedia(todas.find((c) => c.id === a.id)?.imagen, a.nombre),
+  }));
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const nombre = categoria.nombre.trim();
   const origen = rutas.categoriaRepuestos(categoria.slug);

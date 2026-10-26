@@ -90,6 +90,20 @@ export function coloresFranja(valor: string | null | undefined): ColoresFranja {
   return { inicio: color, fin: oscurecer(color, k), tinta };
 }
 
+/**
+ * El color de la marca oscurecido lo justo para que el BLANCO se lea encima con AA (4,5:1); como
+ * el contraste es simétrico, también se lee él sobre blanco. Lo usa el botón del menú de las
+ * páginas que cuelgan de una categoría (Filtros Donaldson: `#007CC4`, 4,47:1, pasa a 4,5).
+ */
+export function colorConBlanco(valor: string | null | undefined): string {
+  const color = colorDeMarca(valor) ?? COLOR_SIN_MARCA;
+  const lb = luz(BLANCO);
+  let k = 0;
+  while (contraste(lb, luz(oscurecer(color, k))) < CONTRASTE_TEXTO && k < 1)
+    k = Math.round((k + 0.02) * 100) / 100;
+  return oscurecer(color, k);
+}
+
 /** Las variables CSS de la franja (las usan D1, D2 y D3). */
 export function estiloFranja(valor: string | null | undefined): CSSProperties {
   const { inicio, fin, tinta } = coloresFranja(valor);

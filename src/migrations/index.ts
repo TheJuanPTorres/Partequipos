@@ -83,6 +83,7 @@ import * as migration_20261023_213120_categorias_nueva_imagen from './20261023_2
 import * as migration_20261023_222308_correo_hojas_de_vida from './20261023_222308_correo_hojas_de_vida';
 import * as migration_20261026_001346_kit_de_marca from './20261026_001346_kit_de_marca';
 import * as migration_20261026_125856_filtros_donaldson from './20261026_125856_filtros_donaldson';
+import * as migration_20261026_135151_filtros_donaldson_icono from './20261026_135151_filtros_donaldson_icono';
 
 export const migrations = [
   {
@@ -508,6 +509,11 @@ export const migrations = [
   {
     up: migration_20261026_125856_filtros_donaldson.up,
     down: migration_20261026_125856_filtros_donaldson.down,
-    name: '20261026_125856_filtros_donaldson'
+    name: '20261026_125856_filtros_donaldson',
+  },
+  {
+    up: migration_20261026_135151_filtros_donaldson_icono.up,
+    down: migration_20261026_135151_filtros_donaldson_icono.down,
+    name: '20261026_135151_filtros_donaldson_icono'
   },
 ];

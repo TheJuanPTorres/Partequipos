@@ -807,9 +807,13 @@ export interface CategoriasTecnica {
    */
   padre?: (number | null) | CategoriasTecnica;
   /**
-   * Opcional, para una página de MARCA dentro de una categoría (p. ej. Donaldson): va en la cabecera de su página, en su botón del menú y en su acceso desde la categoría.
+   * Opcional, para una página de MARCA dentro de una categoría (p. ej. Donaldson): va en la cabecera de su página y en su acceso desde la categoría.
    */
   logo?: (number | null) | Media;
+  /**
+   * Opcional: el símbolo de la marca SIN su nombre, para el botón del menú (ahí el nombre va escrito al lado). Vacío, el botón lleva solo el nombre.
+   */
+  iconoMarca?: (number | null) | Media;
   /**
    * Opcional, con el logo: el color del botón de esta página en el menú y de su acceso desde la categoría. El texto se pone solo en blanco o negro, el que mejor se lea.
    */
@@ -2513,6 +2517,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   slug?: T;
   padre?: T;
   logo?: T;
+  iconoMarca?: T;
   colorMarca?: T;
   descripcion?: T;
   imagen?: T;

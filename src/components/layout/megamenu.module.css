@@ -562,29 +562,68 @@
 }
 
 /*
- * El BOTÓN de una página que cuelga de la categoría, justo debajo de su baldosa (Filtros
- * Donaldson bajo Filtración, 2026-10-26): el color de la marca, su logo en una placa blanca y
- * su nombre en la tinta que mejor se lee (AA). Ancho de la baldosa; alto fijo, sin CLS.
+ * El BOTÓN de una página que cuelga de la categoría (Filtros Donaldson bajo Filtración,
+ * 2026-10-26, dirección): DENTRO de la baldosa, bajo su nombre. La baldosa pasa a ser un marco
+ * (`tarjetaMarco`) con dos enlaces hermanos, y su foto cede justo el alto del botón (40 px:
+ * 32 + 8 de margen), así mide lo mismo que las demás baldosas de la fila.
+ *
+ * Sin relleno: borde y texto en el color de la marca oscurecido hasta AA con el blanco
+ * (`colorConBlanco`, el mismo contraste sobre blanco). Al pasar el ratón o con foco, relleno de
+ * ese color, texto e icono en blanco.
  */
-.acceso {
+.tarjetaMarco {
+  container-type: inline-size;
   display: flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 34px;
-  margin-top: 6px;
-  padding: 4px 8px 4px 4px;
-  border-radius: 8px;
-  background: var(--acceso-color);
-  color: var(--acceso-tinta);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.15;
-  text-decoration: none;
   box-sizing: border-box;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  background: var(--color-fondo);
+  transition: border-color 0.2s;
 }
 
-.acceso:hover {
-  filter: brightness(0.94);
+.tarjetaMarco .tarjeta {
+  border: 0;
+  border-radius: 0;
+}
+
+.tarjetaMarco:has(> .tarjeta:hover) {
+  border-color: var(--mega-rojo);
+}
+
+.tarjetaMarco .tarjetaFoto {
+  height: calc(75cqi - 40px);
+  aspect-ratio: auto;
+}
+
+.acceso {
+  display: flex;
+  height: 32px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 8px 8px;
+  padding: 0 8px;
+  overflow: hidden;
+  border: 1.5px solid var(--acceso-color);
+  border-radius: 8px;
+  background: var(--color-fondo);
+  color: var(--acceso-color);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.1;
+  text-decoration: none;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.acceso:hover,
+.acceso:focus-visible {
+  background: var(--acceso-color);
+  color: #fff;
 }
 
 .acceso:focus-visible {
@@ -592,27 +631,31 @@
   outline-offset: 2px;
 }
 
-.accesoPlaca {
-  display: grid;
+.accesoIcono {
+  width: auto;
+  height: 18px;
   flex: none;
-  width: 48px;
-  height: 26px;
-  place-items: center;
-  padding: 3px 4px;
-  border-radius: 5px;
-  background: #fff;
-  box-sizing: border-box;
+  transition: filter 0.2s;
 }
 
-.accesoPlaca img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+/* El icono en blanco sobre el relleno. */
+.acceso:hover .accesoIcono,
+.acceso:focus-visible .accesoIcono {
+  filter: brightness(0) invert(1);
 }
 
 .accesoNombre {
   min-width: 0;
+  text-align: center;
   overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acceso,
+  .accesoIcono,
+  .tarjetaMarco {
+    transition: none;
+  }
 }
 
 /* Menú móvil: 2 por fila en el teléfono; en tablet (hasta 1024 px), 5 como en escritorio. */

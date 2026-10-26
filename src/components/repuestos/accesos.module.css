@@ -1,18 +1,19 @@
 /*
  * ACCESO a las páginas que cuelgan de una categoría técnica (Filtros Donaldson en Filtración,
- * 2026-10-26): una franja con el color de la marca. Sin desplazamientos: la placa del logo tiene
- * medidas fijas (CLS 0).
+ * 2026-10-26): la franja de marca del #349 (`franjaMarca.module.css`, D1–D5) hecha enlace. Aquí
+ * solo lo propio: el aire de la sección, la placa blanca del logo, «Ver productos →» y el hover y
+ * el foco del enlace. Sin desplazamientos: la placa tiene medidas fijas (CLS 0).
  */
 .seccion {
   width: 100%;
-  max-width: 1000px;
-  margin: 60px auto 0;
+  max-width: 1100px;
+  margin: 72px auto 96px;
   padding: 0 20px;
   box-sizing: border-box;
 }
 
 .titulo {
-  margin: 0 0 20px;
+  margin: 0 0 24px;
   color: var(--color-texto);
   font-size: var(--texto-titulo-3);
   font-weight: 500;
@@ -22,42 +23,42 @@
 
 .lista {
   display: grid;
-  gap: 12px;
+  gap: 16px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.franja {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 18px 28px;
-  border-radius: 16px;
-  background: var(--acceso-color);
-  color: var(--acceso-tinta);
+/* La franja, más alta que la de las fichas: es un acceso, no un separador. */
+.enlace {
+  min-height: 132px;
+  margin-bottom: 0;
+  padding: 20px 28px;
   text-decoration: none;
-  transition: filter 0.2s ease;
+  transition: box-shadow 0.25s ease;
 }
 
-.franja:hover {
-  filter: brightness(0.94);
+.enlace:hover {
+  box-shadow: 0 10px 28px rgb(0 0 0 / 0.16);
 }
 
-.franja:focus-visible {
+/* El fondo se aclara un poco al pasar el ratón (el blanco sigue con AA: el inicio ya da 4,5:1 y
+   el resto del degradado es más oscuro). */
+.enlace:hover > span:first-child {
+  filter: brightness(1.06);
+}
+
+.enlace:focus-visible {
   outline: 3px solid var(--color-texto);
-  outline-offset: 3px;
+  outline-offset: 4px;
 }
 
-/* El logo, sobre blanco: los logos de marca se leen así con cualquier color de franja. */
+/* El logo de la marca en su placa blanca, entero y en sus colores. */
 .placa {
-  display: grid;
-  flex: none;
-  width: 180px;
-  height: 72px;
-  place-items: center;
-  padding: 10px 16px;
-  border-radius: 10px;
+  width: 190px;
+  height: 84px;
+  padding: 12px 18px;
+  border-radius: 14px;
   background: #fff;
   box-sizing: border-box;
 }
@@ -68,69 +69,60 @@
   object-fit: contain;
 }
 
-.texto {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 20px;
-}
-
-.nombre {
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
 .ver {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
-  font-weight: 500;
+  margin-top: 10px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.2s ease;
 }
 
 .ver svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   transition: transform 0.2s ease;
 }
 
-.franja:hover .ver svg {
-  transform: translateX(3px);
+.enlace:hover .ver,
+.enlace:focus-visible .ver {
+  text-decoration-color: currentColor;
+}
+
+.enlace:hover .ver svg,
+.enlace:focus-visible .ver svg {
+  transform: translateX(4px);
 }
 
 @media (max-width: 767px) {
   .seccion {
-    margin-top: 40px;
+    margin: 48px auto 64px;
   }
 
-  .franja {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 18px 20px;
+  .enlace {
+    min-height: 0;
+    padding: 16px;
   }
 
   .placa {
-    width: 150px;
+    width: 140px;
     height: 60px;
-  }
-
-  .texto {
-    flex-direction: column;
-    align-items: flex-start;
+    padding: 8px 12px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .franja,
+  .enlace,
+  .ver,
   .ver svg {
     transition: none;
   }
 
-  .franja:hover .ver svg {
+  .enlace:hover .ver svg,
+  .enlace:focus-visible .ver svg {
     transform: none;
   }
 }

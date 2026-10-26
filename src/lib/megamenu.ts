@@ -1,6 +1,7 @@
 import type { CategoriasTecnica } from "@/payload-types";
 
 import { claveDeMarca, logoPropio } from "./marca/logoMarca";
+import { colorConBlanco } from "./marca/franjaMarca";
 import { unaEntradaPorTipo } from "./nueva/ordenTipos";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
@@ -48,18 +49,21 @@ export type TarjetaMenu = {
   imagen?: ImagenMenu;
   /**
    * Las páginas que cuelgan de la categoría (Filtros Donaldson bajo Filtración, 2026-10-26): un
-   * botón con su logo, su nombre y el color de la marca, justo debajo de la baldosa.
+   * botón con el icono y el nombre de la marca, DENTRO de la baldosa, bajo su nombre.
    */
   accesos?: AccesoMenu[];
 };
 
-/** El botón de una página que cuelga de una categoría: el color de la marca y la tinta que mejor se lee. */
+/**
+ * El botón de una página que cuelga de una categoría: el icono de la marca y el color de la marca
+ * oscurecido hasta que el blanco se lea con AA (`colorConBlanco`): borde y texto sobre blanco y,
+ * al pasar el ratón o con foco, relleno con el texto en blanco.
+ */
 export type AccesoMenu = {
   etiqueta: string;
   href: string;
-  logo?: LogoMenu;
+  icono?: LogoMenu;
   color: string;
-  tinta: string;
 };
 
 /** Una foto del menú: url y medidas reales (el tamaño lo pide `next/image`). */
@@ -107,7 +111,7 @@ export type CategoriaTecnicaMenu = Pick<
   imagen?: number | LogoCatalogo | null;
   /** La categoría de la que cuelga (solo su dirección). */
   padre?: number | { id: number; slug?: string | null } | null;
-  logo?: number | LogoCatalogo | null;
+  iconoMarca?: number | LogoCatalogo | null;
 };
 
 /** La entrada editable de la política de garantías (global `cabecera`). */
@@ -408,13 +412,12 @@ export function grupoCategoriasTecnicas(
     if (!c.href) return [];
     const imagen = imagenDeMenu(porId.get(c.id)?.imagen);
     const accesos = accesosDe(c.id, categorias).map((a) => {
-      const logo = imagenDeMenu(porId.get(a.id)?.logo);
+      const icono = imagenDeMenu(porId.get(a.id)?.iconoMarca);
       return {
         etiqueta: a.nombre,
         href: conBarra(a.href),
-        color: a.color,
-        tinta: a.tinta,
-        ...(logo ? { logo } : {}),
+        color: colorConBlanco(porId.get(a.id)?.colorMarca),
+        ...(icono ? { icono } : {}),
       };
     });
     return [

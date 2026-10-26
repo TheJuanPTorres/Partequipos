@@ -15,8 +15,9 @@
  *   1. guarda en el manifiesto y BORRA la redirección 301 que hoy lleva esa URL a Filtración
  *      (la sembró la migración `20261014_045109_redirects_categorias_heredadas`): una URL viva
  *      no puede ser origen de un redirect;
- *   2. sube a «Imágenes» (`wp-donaldson-…`) el logo, la foto de cada tipo de filtro y dos fotos
- *      de obra (cabecera y tarjeta), las grandes reducidas a 2560 px;
+ *   2. sube a «Imágenes» (`wp-donaldson-…`) el logo, el icono del menú (de
+ *      `partequipos-diseno/donaldson`), la foto de cada tipo de filtro y dos fotos de obra
+ *      (cabecera y tarjeta), las grandes reducidas a 2560 px;
  *   3. crea la categoría «Filtros Donaldson» que cuelga de Filtración: logo, color de la marca
  *      (#007CC4, el del logo), presentación, una tarjeta por tipo de filtro (nombre, foto y su
  *      frase) y el título y la descripción para buscadores de WordPress, TAL CUAL.
@@ -72,6 +73,14 @@ const SLUG = "filtros-donaldson-maquinaria-pesada";
 const NOMBRE = "Filtros Donaldson";
 const COLOR = "#007CC4";
 const PREFIJO = "wp-donaldson";
+/** El icono de Donaldson sin su nombre, para el botón del menú (lo entregó dirección). */
+const ICONO = path.join(
+  os.homedir(),
+  "Desktop",
+  "partequipos-diseno",
+  "donaldson",
+  "donaldson_icono.png",
+);
 const ANCHO_MAXIMO = 2560;
 
 process.env.PAYLOAD_DISABLE_PUSH = "true";
@@ -224,10 +233,16 @@ if (modo === "retirar") {
       log(`foto ya subida: ${existente.filename}`);
       return existente.id;
     }
-    const r = await fetch(url, { headers: { "User-Agent": AGENTE } });
-    if (!r.ok) fallar(`no se puede descargar ${url}: HTTP ${r.status}`);
+    let datos: Buffer;
+    if (/^https?:\/\//.test(url)) {
+      const r = await fetch(url, { headers: { "User-Agent": AGENTE } });
+      if (!r.ok) fallar(`no se puede descargar ${url}: HTTP ${r.status}`);
+      datos = Buffer.from(await r.arrayBuffer());
+    } else {
+      if (!fs.existsSync(url)) fallar(`no está el fichero ${url}`);
+      datos = fs.readFileSync(url);
+    }
     const { default: sharp } = await import("sharp");
-    let datos = Buffer.from(await r.arrayBuffer());
     const meta = await sharp(datos).metadata();
     const f = formatoDeImagen(meta.format) ?? fallar(`${url}: formato que Media no admite`);
     if ((meta.width ?? 0) > ANCHO_MAXIMO) {
@@ -265,6 +280,7 @@ if (modo === "retirar") {
   };
 
   const logo = await subir(fuente.logo, "logo", "Logo de Donaldson");
+  const icono = await subir(ICONO, "icono", "Icono de Donaldson");
   const fondo = await subir(fuente.fondo, "cabecera", "Filtros Donaldson para maquinaria pesada");
   const tarjeta = await subir(fuente.tarjeta, "tarjeta", "Familia de filtros Donaldson");
   const grupos = [];
@@ -285,6 +301,19 @@ if (modo === "retirar") {
   ).docs[0];
   if (existente) {
     log(`la categoría «${existente.nombre}» ya existe (${existente.id}): no se toca`);
+    // El icono del menú (campo añadido después, 2026-10-26): solo si está vacío.
+    if (!existente.iconoMarca) {
+      log("icono del menú a poner en la categoría");
+      if (modo === "aplicar" && icono !== null) {
+        await payload.update({
+          collection: "categorias-tecnicas",
+          id: existente.id,
+          data: { iconoMarca: icono },
+          overrideAccess: true,
+        });
+        log("icono del menú puesto");
+      }
+    }
     manifiesto.creado.categoria ??= existente.id;
     guardar();
   } else {
@@ -297,6 +326,7 @@ if (modo === "retirar") {
           slug: SLUG,
           padre: padre!.id,
           logo,
+          iconoMarca: icono,
           colorMarca: COLOR,
           descripcion: fuente.presentacion,
           imagen: tarjeta,

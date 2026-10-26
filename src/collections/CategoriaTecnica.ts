@@ -128,7 +128,17 @@ export const CategoriaTecnica: CollectionConfig = {
       label: "Logo de la marca",
       admin: {
         description:
-          "Opcional, para una página de MARCA dentro de una categoría (p. ej. Donaldson): va en la cabecera de su página, en su botón del menú y en su acceso desde la categoría.",
+          "Opcional, para una página de MARCA dentro de una categoría (p. ej. Donaldson): va en la cabecera de su página y en su acceso desde la categoría.",
+      },
+    },
+    {
+      name: "iconoMarca",
+      type: "upload",
+      relationTo: "media",
+      label: "Icono de la marca (menú)",
+      admin: {
+        description:
+          "Opcional: el símbolo de la marca SIN su nombre, para el botón del menú (ahí el nombre va escrito al lado). Vacío, el botón lleva solo el nombre.",
       },
     },
     // El mismo selector de color que las marcas (`campoColorMarca`), con su propia ayuda.

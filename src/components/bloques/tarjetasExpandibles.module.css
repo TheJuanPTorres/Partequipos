@@ -201,12 +201,12 @@
 
 /* -------------------------------------------------------------- resto */
 
-/* Botón de pausa (D2): ux-9 no lo tiene. A la derecha de la fila de «Ver todo», fuera de las tarjetas. */
+/* Botón de pausa (D2): ux-9 no lo tiene. A la izquierda de la fila de «Ver todo», fuera de las tarjetas: a la derecha lo taparía el botón de WhatsApp. */
 .pausa {
   position: absolute;
   /* Centrado con el botón: la fila lleva 30 px arriba y 10 abajo. */
   top: calc(50% + 10px);
-  right: 10px;
+  left: 10px;
   transform: translateY(-50%);
 }
 

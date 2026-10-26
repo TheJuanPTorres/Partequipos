@@ -85,6 +85,7 @@ import * as migration_20261026_001346_kit_de_marca from './20261026_001346_kit_d
 import * as migration_20261026_125856_filtros_donaldson from './20261026_125856_filtros_donaldson';
 import * as migration_20261026_135151_filtros_donaldson_icono from './20261026_135151_filtros_donaldson_icono';
 import * as migration_20261026_143331_kit_portada from './20261026_143331_kit_portada';
+import * as migration_20261026_154428_nosotros_franja_fotos from './20261026_154428_nosotros_franja_fotos';
 
 export const migrations = [
   {
@@ -520,6 +521,11 @@ export const migrations = [
   {
     up: migration_20261026_143331_kit_portada.up,
     down: migration_20261026_143331_kit_portada.down,
-    name: '20261026_143331_kit_portada'
+    name: '20261026_143331_kit_portada',
+  },
+  {
+    up: migration_20261026_154428_nosotros_franja_fotos.up,
+    down: migration_20261026_154428_nosotros_franja_fotos.down,
+    name: '20261026_154428_nosotros_franja_fotos'
   },
 ];

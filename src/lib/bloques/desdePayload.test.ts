@@ -133,6 +133,22 @@ describe("vistaDeBloques", () => {
     assert.deepEqual(v?.blockType === "franjaMarquee" && v.fondos, []);
   });
 
+  it("franja: el pase es la imagen de fondo y después las demás, sin las que no sirven", () => {
+    const [v] = vistaDeBloques([
+      {
+        blockType: "franjaMarquee",
+        texto: "Marcas Aliadas",
+        imagenFondo: media(1),
+        fondosExtra: [media(2), 7, media(3, { width: null }), media(4)],
+      },
+    ]);
+    assert.deepEqual(v?.blockType === "franjaMarquee" && v.fondos.map((f) => f.alt), [
+      "alt 1",
+      "alt 2",
+      "alt 4",
+    ]);
+  });
+
   it("tarjetas: enlace vacío es null; sin tarjetas no hay bloque", () => {
     const vistas = vistaDeBloques([
       { blockType: "tarjetasExpandibles", titulo: "T", tarjetas: [{ titulo: "A", enlace: "" }] },

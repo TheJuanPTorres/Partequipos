@@ -23,7 +23,7 @@
  * 2. ESQUINAS SUPERIORES INVERTIDAS: donde el panel se une a la cabecera, en
  *    vez de un ángulo de 90°, una curva CÓNCAVA que se abre hacia fuera, como
  *    las pestañas de Chrome al unirse a su barra. Hasta el 2026-10-25 era una
- *    MÁSCARA de gradientes; ahora, un elemento con borde nativo y dos curvas (ver
+ *    MÁSCARA de gradientes; ahora, un borde nativo y dos piezas cóncavas (ver
  *    `.marco`).
  *
  * ORDEN: las variantes `-webkit-` van SIEMPRE antes que las estándar (si no,
@@ -34,17 +34,15 @@
 /*
  * EL MARCO (2026-10-25): una caja para todos los paneles (`MarcoMegamenu`).
  *
- * EL CONTORNO (2026-10-26) es UN SOLO elemento real, `.forma`: fondo, filete de
- * 1 px y esquinas de abajo con `border` y `border-radius` nativos, y las dos
- * curvas cóncavas de arriba como `::before` y `::after` de tamaño fijo. Cambia de
- * `width` y `height` de verdad con la caja MEDIDA del panel (`lib/cabecera/marco.ts`).
- *
- * Antes (#357) eran 9 piezas de 1 × 1 px estiradas con `scale()` y con transición
- * CSS: con GPU (Chrome con ventana, Intel D3D11), tras cambiar de menú el fondo se
- * quedaba en pantalla con el tamaño de OTRO panel. Y antes, una máscara de 6 piezas
- * de degradado, con costuras a 125 %. Ahora no hay piezas, ni costuras, ni nada
- * estirado, ni transiciones CSS: el cambio de tamaño (M3) lo interpola el marco
- * fotograma a fotograma. La posición va en `translate` (CLS 0).
+ * El CONTORNO son piezas (`lib/cabecera/marco.ts`): fondo, base, dos lados, pie,
+ * dos esquinas y las dos curvas cóncavas de arriba, colocadas y estiradas SOLO
+ * con `transform`. Antes la forma era una MÁSCARA de 6 piezas de degradado: abajo,
+ * la franja central y las dos esquinas se unían en una costura vertical a cada
+ * lado; con un escalado no entero (125 %) cada pieza redondeaba el medio píxel
+ * por su lado y la costura dejaba ver el filete: las «dos líneas finas» al pie
+ * del panel al terminar la animación. Ahora cada línea es una pieza de 1 px en
+ * una posición entera, y al cambiar de tamaño (M3) nada cambia de sitio en la
+ * maqueta (CLS 0).
  */
 .marco {
   /* Dónde acaba la cabecera (px): la fija `Cabecera` con su alto MEDIDO. */
@@ -101,40 +99,72 @@
   overflow: visible;
 }
 
-.forma {
+.pieza {
   position: absolute;
   top: 0;
   left: 0;
-  box-sizing: border-box;
-  width: 0;
-  height: 0;
-  background: var(--mega-fondo);
-  border: 1px solid var(--mega-filete);
-  border-top: 0;
-  border-radius: 0 0 var(--mega-radio) var(--mega-radio);
+  transform-origin: 0 0;
+  /* Hasta el primer pintado del marco, nada. */
+  transform: scale(0);
 }
 
-/* Hasta la primera medida del panel, nada. */
-.forma:not([data-medida]) {
-  visibility: hidden;
+.pieza[data-pieza="fondo"],
+.pieza[data-pieza="base"] {
+  width: 1px;
+  height: 1px;
+  background: var(--mega-fondo);
+}
+
+.pieza[data-pieza="ladoI"],
+.pieza[data-pieza="ladoD"],
+.pieza[data-pieza="pie"] {
+  z-index: 1;
+  width: 1px;
+  height: 1px;
+  background: var(--mega-filete);
+}
+
+/* Esquinas de abajo: fondo, el filete de 1 px por fuera y transparente fuera del arco. */
+.pieza[data-pieza="esquinaI"],
+.pieza[data-pieza="esquinaD"] {
+  z-index: 1;
+  width: var(--mega-radio);
+  height: var(--mega-radio);
+}
+
+.pieza[data-pieza="esquinaI"] {
+  background: radial-gradient(
+    circle at 100% 0,
+    var(--mega-fondo) calc(var(--mega-radio) - 1.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    #0000 calc(var(--mega-radio) + 0.5px)
+  );
+}
+
+.pieza[data-pieza="esquinaD"] {
+  background: radial-gradient(
+    circle at 0 0,
+    var(--mega-fondo) calc(var(--mega-radio) - 1.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    var(--mega-filete) calc(var(--mega-radio) - 0.5px),
+    #0000 calc(var(--mega-radio) + 0.5px)
+  );
 }
 
 /*
  * Las dos curvas cóncavas que unen el marco a la barra (como las pestañas de
- * Chrome). De tamaño fijo, pegadas por fuera a cada lado; entran 1 px en el
- * panel y tapan el principio del filete del lado, que la curva sustituye.
+ * Chrome). Entran 1 px en el panel: tapan el principio del lado, que la curva
+ * sustituye.
  */
-.forma::before,
-.forma::after {
-  content: "";
-  position: absolute;
-  top: 0;
+.pieza[data-pieza="curvaI"],
+.pieza[data-pieza="curvaD"] {
+  z-index: 2;
   width: calc(var(--mega-curva) + 1px);
   height: var(--mega-curva);
 }
 
-.forma::before {
-  left: calc(-1px - var(--mega-curva));
+.pieza[data-pieza="curvaI"] {
   background: radial-gradient(
     circle at 0 100%,
     #0000 calc(var(--mega-curva) - 0.5px),
@@ -144,14 +174,7 @@
   );
 }
 
-/*
- * La de la derecha va con `translate` hasta el borde derecho (`--mega-ancho`, el ancho que
- * pone el marco), no con `right`: así, al cambiar de ancho, no cambia de sitio en la maqueta
- * y no cuenta como desplazamiento (CLS 0).
- */
-.forma::after {
-  left: 0;
-  translate: calc(var(--mega-ancho, 0px) - 2px) 0;
+.pieza[data-pieza="curvaD"] {
   background: radial-gradient(
     circle at 100% 100%,
     #0000 calc(var(--mega-curva) - 0.5px),
@@ -159,6 +182,19 @@
     var(--mega-filete) calc(var(--mega-curva) + 0.5px),
     var(--mega-fondo) calc(var(--mega-curva) + 1.5px)
   );
+}
+
+/*
+ * M3: durante el cambio de panel (`data-cambiando`, 260 ms), las piezas y el recorte van del
+ * tamaño de antes al nuevo con una transición; fuera de él, al instante (así el contorno sigue a
+ * un acordeón fotograma a fotograma).
+ */
+.marco[data-cambiando="si"] .pieza {
+  transition: transform 260ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+.marco[data-cambiando="si"] .contenidoMarco {
+  transition: clip-path 260ms cubic-bezier(0.33, 0, 0.2, 1);
 }
 
 /* El contenido, encima del contorno; recortado con su forma (`clip-path` del marco). */
@@ -251,6 +287,11 @@
 
   .vista[data-estado="saliendo"] {
     display: none;
+  }
+
+  .marco[data-cambiando="si"] .pieza,
+  .marco[data-cambiando="si"] .contenidoMarco {
+    transition: none;
   }
 }
 

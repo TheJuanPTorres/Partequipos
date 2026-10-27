@@ -371,11 +371,11 @@ export interface MarcasMaquinaria {
    */
   logoOscuroEnMenu?: boolean | null;
   /**
-   * Fondo de la tarjeta de esta marca en el inicio.
+   * Fondo de la tarjeta de esta marca en el inicio si no tiene «Foto de fondo de la cabecera» del «Kit de marca» (esa manda).
    */
   imagenTarjeta?: (number | null) | Media;
   /**
-   * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» (en ux-9: Hitachi, CASE y Yanmar). Necesita la foto de la tarjeta.
+   * 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» de la portada. Todas las marcas visibles salen; las que no tienen número, al final por nombre.
    */
   ordenPortada?: number | null;
   /**
@@ -1502,6 +1502,10 @@ export interface Pagina {
     titulo?: string | null;
     descripcion?: string | null;
     /**
+     * Cómo se alinea este texto en la web. Por defecto, a la izquierda.
+     */
+    descripcionAlineacion?: ('left' | 'center' | 'right' | 'justify') | null;
+    /**
      * La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.
      */
     imagenExcavadoras?: (number | null) | Media;
@@ -1537,6 +1541,10 @@ export interface Pagina {
      * Bajo el título, antes del «Texto de la cabecera». Respeta los saltos de línea. Vacía, no se pinta.
      */
     marcasTexto?: string | null;
+    /**
+     * Cómo se alinea este texto en la web. Por defecto, a la izquierda.
+     */
+    marcasTextoAlineacion?: ('left' | 'center' | 'right' | 'justify') | null;
     /**
      * El botón baja al carrusel de la categoría elegida.
      */
@@ -1574,6 +1582,10 @@ export interface Pagina {
      * Un párrafo corto bajo el título. Respeta los saltos de línea. Vacío, no se pinta.
      */
     descripcion?: string | null;
+    /**
+     * Cómo se alinea este texto en la web. Por defecto, a la izquierda.
+     */
+    descripcionAlineacion?: ('left' | 'center' | 'right' | 'justify') | null;
     verMasTexto?: string | null;
     /**
      * Sin efecto desde el 2026-10-26 (diseño del cliente): cada tarjeta lleva su botón.
@@ -3102,6 +3114,7 @@ export interface PaginasSelect<T extends boolean = true> {
         antetitulo?: T;
         titulo?: T;
         descripcion?: T;
+        descripcionAlineacion?: T;
         imagenExcavadoras?: T;
         imagenOtros?: T;
         imagenAditamentos?: T;
@@ -3111,6 +3124,7 @@ export interface PaginasSelect<T extends boolean = true> {
         verProductoTexto?: T;
         marcasTitulo?: T;
         marcasTexto?: T;
+        marcasTextoAlineacion?: T;
         botonTexto?: T;
       };
   seccionLogos?:
@@ -3134,6 +3148,7 @@ export interface PaginasSelect<T extends boolean = true> {
         antetitulo?: T;
         titulo?: T;
         descripcion?: T;
+        descripcionAlineacion?: T;
         verMasTexto?: T;
         botonTexto?: T;
         botonEnlace?: T;

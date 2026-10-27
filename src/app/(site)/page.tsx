@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { HeroPortada } from "@/components/hero/HeroPortada";
+import { alineacionDeTexto } from "@/lib/fields/alineacionTexto";
 import { SeccionMarcasKit } from "@/components/portada/kit/SeccionMarcasKit";
 import { SeccionNuevaKit } from "@/components/portada/kit/SeccionNuevaKit";
 import { SeccionRepuestosKit } from "@/components/portada/kit/SeccionRepuestosKit";
@@ -148,7 +149,9 @@ export default async function HomePage() {
           antetitulo: tx(usada?.antetitulo),
           titulo: tx(usada?.titulo),
           frase: tx(usada?.marcasTexto),
+          fraseAlineacion: alineacionDeTexto(usada?.marcasTextoAlineacion),
           descripcion: tx(usada?.descripcion),
+          descripcionAlineacion: alineacionDeTexto(usada?.descripcionAlineacion),
           botonTexto: tx(usada?.botonTexto),
         }}
       />
@@ -167,6 +170,7 @@ export default async function HomePage() {
           antetitulo: tx(repuestos?.antetitulo),
           titulo: tx(repuestos?.titulo),
           descripcion: tx(repuestos?.descripcion),
+          descripcionAlineacion: alineacionDeTexto(repuestos?.descripcionAlineacion),
           verTodos: tx(repuestos?.verMasTexto),
         }}
       />

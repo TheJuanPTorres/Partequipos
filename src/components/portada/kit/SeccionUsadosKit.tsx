@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { ANCLA_COTIZAR } from "@/components/ficha/FichaProducto";
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import type { AlineacionTexto } from "@/lib/fields/alineacionTexto";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { FiltroUsados } from "@/lib/portada/kitCliente";
 import type { DatoFicha, TarjetaEquipo } from "@/lib/portada/secciones";
@@ -12,6 +13,7 @@ import { enlaceWhatsApp } from "@/lib/whatsapp";
 
 import { SliderUsados } from "./diferidosKit";
 import { Flecha } from "./Flecha";
+import { TextoEditable } from "./TextoEditable";
 import estilos from "./usadosKit.module.css";
 
 /**
@@ -155,7 +157,9 @@ export type TextosUsadosKit = {
   titulo: string;
   /** «Frase de la cabecera»: bajo el título, con sus saltos de línea. */
   frase: string;
+  fraseAlineacion: AlineacionTexto;
   descripcion: string;
+  descripcionAlineacion: AlineacionTexto;
   botonTexto: string;
 };
 
@@ -213,10 +217,16 @@ export function SeccionUsadosKit({
               <h2 id={idTitulo} className={estilos.titulo}>
                 {textos.titulo || "Maquinaria pesada usada"}
               </h2>
-              {textos.frase ? <p className={estilos.frase}>{textos.frase}</p> : null}
-              {textos.descripcion ? (
-                <p className={estilos.descripcion}>{textos.descripcion}</p>
-              ) : null}
+              <TextoEditable
+                texto={textos.frase}
+                alineacion={textos.fraseAlineacion}
+                className={estilos.frase}
+              />
+              <TextoEditable
+                texto={textos.descripcion}
+                alineacion={textos.descripcionAlineacion}
+                className={estilos.descripcion}
+              />
               {textos.botonTexto ? (
                 <Link href={hrefVerTodo} className={estilos.verTodo}>
                   {textos.botonTexto}

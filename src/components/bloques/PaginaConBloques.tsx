@@ -10,6 +10,7 @@ import { BloqueCifras } from "./BloqueCifras";
 import { BloqueFormularioContacto, type ContextoFormulario } from "./BloqueFormularioContacto";
 import { BloqueFranjaMarquee } from "./BloqueFranjaMarquee";
 import { BloqueGaleria } from "./BloqueGaleria";
+import { BloqueMarcasAliadas } from "./BloqueMarcasAliadas";
 import { BloquePresentacionImagen } from "./BloquePresentacionImagen";
 import { BloqueProcesoPasos } from "./BloqueProcesoPasos";
 import { BloqueTarjetasExpandibles } from "./BloqueTarjetasExpandibles";
@@ -35,6 +36,8 @@ function bloque(b: VistaBloque, clave: string, formulario: ContextoFormulario) {
       return <BloqueCifras key={clave} {...b} />;
     case "franjaMarquee":
       return <BloqueFranjaMarquee key={clave} {...b} />;
+    case "marcasAliadas":
+      return <BloqueMarcasAliadas key={clave} {...b} />;
     case "tarjetasExpandibles":
       return <BloqueTarjetasExpandibles key={clave} {...b} />;
     case "galeria":

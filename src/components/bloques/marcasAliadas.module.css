@@ -1,0 +1,334 @@
+/*
+ * BLOQUE «MARCAS ALIADAS» — diseño del cliente (prototipo MarcasAliadas.tsx, 2026-10-26), portado
+ * sin Tailwind. Un contenedor redondeado con las fotos de la franja de fondo, tenues y en relevo
+ * lento, un velo oscuro que sostiene el título en blanco, y una tarjeta por empresa: logo sobre
+ * blanco y, debajo, su foto teñida con su color (dos capas) y cortada en diagonal.
+ */
+.seccion {
+  box-sizing: border-box;
+  padding: 0 1.5vw 5vw;
+}
+
+.contenedor {
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 28px;
+  background: #141210;
+  padding: 40px 20px;
+}
+
+/* ------------------------------------------------------------ fondo */
+
+.fondo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.fotos {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+}
+
+/* Una foto por capa: la de turno se ve y se acerca muy despacio; las demás, transparentes. */
+.foto {
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease-out;
+}
+
+.foto[data-actual] {
+  opacity: 1;
+  animation: acercar 7s linear forwards;
+}
+
+.contenedor[data-pausado] .foto[data-actual] {
+  animation-play-state: paused;
+}
+
+@keyframes acercar {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.06);
+  }
+}
+
+/* Velo: más denso arriba, donde va el título. */
+.velo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(16 14 13 / 60%) 0%,
+    rgb(16 14 13 / 35%) 35%,
+    rgb(16 14 13 / 30%) 75%,
+    rgb(16 14 13 / 50%) 100%
+  );
+}
+
+.pausa {
+  position: absolute;
+  z-index: 2;
+  top: 16px;
+  right: 16px;
+}
+
+/* ------------------------------------------------------------ título */
+
+.titulo {
+  margin: 0;
+  text-align: center;
+  color: #fff;
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 35%);
+}
+
+/* ------------------------------------------------------------ lista */
+
+/* Filas centradas: con 5 tarjetas en 2 o 3 columnas, la última fila corta queda al centro. */
+.lista {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* ------------------------------------------------------------ tarjeta */
+
+.tarjeta {
+  --aliada: #3a3a3a;
+
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(16 15 15 / 6%),
+    0 6px 16px -10px rgb(16 15 15 / 20%);
+  color: inherit;
+  text-decoration: none;
+}
+
+.tarjeta:focus-visible {
+  outline: 3px solid var(--aliada);
+  outline-offset: 3px;
+}
+
+.logo {
+  display: flex;
+  height: 96px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 28px;
+  color: #100f0f;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.logoImagen {
+  width: auto;
+  height: auto;
+  max-width: 82%;
+  max-height: 44px;
+  object-fit: contain;
+}
+
+/* El borde de arriba de la foto es un arco: una elipse muy ancha, con el centro abajo a la
+   derecha, recorta la foto con una curva que sube de izquierda a derecha. Solo toca la foto. */
+.visual {
+  position: relative;
+  display: block;
+  margin-top: -12px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--aliada);
+  clip-path: ellipse(150% 100% at 100% 100%);
+}
+
+.fotoTarjeta {
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.tarjeta:hover .fotoTarjeta {
+  transform: scale(1.05);
+}
+
+/* Capa 1: el color de la empresa, multiplicado desde la esquina de abajo a la izquierda. */
+.tinte {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(20deg, var(--aliada) 0%, var(--aliada) 25%, transparent 75%);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
+
+/* Capa 2: el oscurecido al pie, que sostiene el texto blanco sobre cualquier color (AA). */
+.sombra {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgb(12 10 9 / 88%) 0%,
+    rgb(12 10 9 / 70%) 30%,
+    rgb(12 10 9 / 25%) 55%,
+    transparent 75%
+  );
+}
+
+.pie {
+  position: absolute;
+  inset: auto 16px 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.textos {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 35%);
+}
+
+.nombre {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.frase {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.flecha {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #100f0f;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.flecha svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s;
+}
+
+.tarjeta:hover .flecha {
+  background: var(--aliada);
+  color: #fff;
+}
+
+.tarjeta:hover .flecha svg {
+  transform: translateX(2px);
+}
+
+/* ------------------------------------------------------------ anchos */
+
+@media (min-width: 560px) {
+  .item {
+    width: calc((100% - 16px) / 2);
+  }
+}
+
+@media (min-width: 640px) {
+  .contenedor {
+    padding: 40px 40px;
+  }
+}
+
+@media (min-width: 768px) {
+  .item {
+    width: calc((100% - 32px) / 3);
+  }
+}
+
+@media (min-width: 1024px) {
+  .contenedor {
+    border-radius: 32px;
+    padding: 56px 5%;
+  }
+
+  .titulo {
+    font-size: clamp(2rem, 2.4vw, 2.6rem);
+  }
+
+  .lista {
+    gap: 20px;
+  }
+
+  .item {
+    width: calc((100% - 40px) / 3);
+  }
+
+  .pausa {
+    top: 20px;
+    right: 20px;
+  }
+}
+
+/* Cinco en una fila cuando caben. */
+@media (min-width: 1280px) {
+  .item {
+    width: calc((100% - 80px) / 5);
+  }
+
+  .frase {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foto,
+  .fotoTarjeta,
+  .flecha,
+  .flecha svg {
+    transition: none;
+  }
+
+  .foto[data-actual] {
+    animation: none;
+  }
+
+  .tarjeta:hover .fotoTarjeta,
+  .tarjeta:hover .flecha svg {
+    transform: none;
+  }
+}

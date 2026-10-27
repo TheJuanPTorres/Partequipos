@@ -149,6 +149,46 @@ describe("vistaDeBloques", () => {
     ]);
   });
 
+  it("marcas aliadas: tarjetas en su orden, color solo si es válido, sin nombre no hay tarjeta", () => {
+    const [v] = vistaDeBloques([
+      {
+        blockType: "marcasAliadas",
+        titulo: " ",
+        imagenFondo: media(1),
+        fondosExtra: [media(2), 9],
+        tarjetas: [
+          {
+            nombre: " Uno ",
+            texto: " frase ",
+            logo: media(3),
+            color: "#0a5bb0",
+            enlace: " https://uno.test/ ",
+          },
+          { nombre: "Dos", color: "azul", enlace: "", logo: 5 },
+          { nombre: "  ", color: "#fff" },
+        ],
+      },
+    ]);
+    assert.equal(v?.blockType, "marcasAliadas");
+    if (v?.blockType !== "marcasAliadas") return;
+    assert.equal(v.titulo, "Marcas aliadas");
+    assert.equal(v.fondos.length, 2);
+    assert.deepEqual(
+      v.tarjetas.map((t) => [t.nombre, t.texto, t.color, t.href, t.logo?.alt ?? null]),
+      [
+        ["Uno", "frase", "#0a5bb0", "https://uno.test/", "alt 3"],
+        ["Dos", "", null, null, null],
+      ],
+    );
+  });
+
+  it("marcas aliadas: sin tarjetas no hay bloque", () => {
+    assert.deepEqual(
+      vistaDeBloques([{ blockType: "marcasAliadas", titulo: "X", tarjetas: [] }]),
+      [],
+    );
+  });
+
   it("tarjetas: enlace vacío es null; sin tarjetas no hay bloque", () => {
     const vistas = vistaDeBloques([
       { blockType: "tarjetasExpandibles", titulo: "T", tarjetas: [{ titulo: "A", enlace: "" }] },

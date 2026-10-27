@@ -3,6 +3,7 @@ import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical
 import type { Animacion, Media, Pagina, Video } from "@/payload-types";
 
 import { anclaValida } from "../fields/ancla";
+import { RE_COLOR } from "../fields/tipografiaTitulo";
 import { videoDeYouTube } from "../fields/youtube";
 import { imagenDeMedia, poblado } from "../utils/relations";
 import type { AnimacionBloque, EnlaceBloque, VideoBloque, VistaBloque } from "./vista";
@@ -141,6 +142,31 @@ function vistaSinAncla(b: BloqueDoc, videos: ReadonlyMap<number, Video>): VistaB
           .filter((i) => i !== null),
         imagenFrontal: imagenDeMedia(b.imagenFrontal, ""),
       };
+    case "marcasAliadas": {
+      const tarjetas = (b.tarjetas ?? [])
+        .filter((t) => t.nombre?.trim())
+        .map((t) => ({
+          id: t.id,
+          nombre: t.nombre.trim(),
+          texto: t.texto?.trim() ?? "",
+          logo: imagenDeMedia(t.logo, ""),
+          foto: imagenDeMedia(t.foto, ""),
+          color: t.color && RE_COLOR.test(t.color.trim()) ? t.color.trim() : null,
+          href: t.enlace?.trim() || null,
+        }));
+      return tarjetas.length
+        ? {
+            blockType: b.blockType,
+            id: b.id,
+            ancla: ancla(b.ancla),
+            titulo: b.titulo?.trim() || "Marcas aliadas",
+            fondos: [b.imagenFondo, ...(b.fondosExtra ?? [])]
+              .map((m) => imagenDeMedia(m, ""))
+              .filter((i) => i !== null),
+            tarjetas,
+          }
+        : null;
+    }
     case "tarjetasExpandibles": {
       const tarjetas = (b.tarjetas ?? []).map((t) => ({
         id: t.id,

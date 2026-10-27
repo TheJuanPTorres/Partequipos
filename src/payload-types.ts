@@ -1356,6 +1356,7 @@ export interface Pagina {
         | BloquePresentacionImagen
         | BloqueCifras
         | BloqueFranjaMarquee
+        | BloqueMarcasAliadas
         | BloqueTarjetasExpandibles
         | BloqueGaleria
         | BloqueVideoYoutube
@@ -1820,6 +1821,57 @@ export interface BloqueFranjaMarquee {
   id?: string | null;
   blockName?: string | null;
   blockType: 'franjaMarquee';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueMarcasAliadas".
+ */
+export interface BloqueMarcasAliadas {
+  /**
+   * Opcional. Identificador para enlazar a este bloque, sin «#» (p. ej. «taller» para /servicio-tecnico/#taller). Cópialo exacto del sitio actual: distingue mayúsculas.
+   */
+  ancla?: string | null;
+  titulo: string;
+  /**
+   * Decorativa, tenue. Es la primera del pase de fotos.
+   */
+  imagenFondo?: (number | null) | Media;
+  /**
+   * Opcional. Con alguna, el fondo pasa de una foto a otra con un fundido lento, empezando por la «Imagen de fondo». Decorativas.
+   */
+  fondosExtra?: (number | Media)[] | null;
+  /**
+   * Una por empresa, en este orden (arrástralas para reordenar). Cinco caben en una fila en pantalla ancha.
+   */
+  tarjetas?:
+    | {
+        nombre: string;
+        /**
+         * Una línea corta sobre la foto. Opcional.
+         */
+        texto?: string | null;
+        /**
+         * Va sobre blanco. Sin logo, se escribe el nombre.
+         */
+        logo?: (number | null) | Media;
+        /**
+         * Se tiñe con el color de la empresa. Decorativa.
+         */
+        foto?: (number | null) | Media;
+        /**
+         * Tiñe la foto y marca el foco y el botón al pasar el ratón. Vacío: gris oscuro.
+         */
+        color?: string | null;
+        /**
+         * Se abre en una pestaña nueva. Una dirección https://.
+         */
+        enlace?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'marcasAliadas';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2974,6 +3026,7 @@ export interface PaginasSelect<T extends boolean = true> {
         presentacionImagen?: T | BloquePresentacionImagenSelect<T>;
         cifras?: T | BloqueCifrasSelect<T>;
         franjaMarquee?: T | BloqueFranjaMarqueeSelect<T>;
+        marcasAliadas?: T | BloqueMarcasAliadasSelect<T>;
         tarjetasExpandibles?: T | BloqueTarjetasExpandiblesSelect<T>;
         galeria?: T | BloqueGaleriaSelect<T>;
         videoYoutube?: T | BloqueVideoYoutubeSelect<T>;
@@ -3185,6 +3238,29 @@ export interface BloqueFranjaMarqueeSelect<T extends boolean = true> {
   imagenFondo?: T;
   fondosExtra?: T;
   imagenFrontal?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BloqueMarcasAliadas_select".
+ */
+export interface BloqueMarcasAliadasSelect<T extends boolean = true> {
+  ancla?: T;
+  titulo?: T;
+  imagenFondo?: T;
+  fondosExtra?: T;
+  tarjetas?:
+    | T
+    | {
+        nombre?: T;
+        texto?: T;
+        logo?: T;
+        foto?: T;
+        color?: T;
+        enlace?: T;
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }

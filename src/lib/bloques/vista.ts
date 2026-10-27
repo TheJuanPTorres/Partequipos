@@ -121,6 +121,30 @@ export type VistaFranjaMarquee = {
   imagenFrontal: ImagenBloque | null;
 };
 
+export type TarjetaAliada = {
+  id?: string | null;
+  nombre: string;
+  /** Frase corta sobre la foto; vacía, no se pinta. */
+  texto: string;
+  logo: ImagenBloque | null;
+  foto: ImagenBloque | null;
+  /** Color de la empresa, `#RGB` o `#RRGGBB`; vacío o inválido, `null` (gris oscuro). */
+  color: string | null;
+  /** Su web, siempre en pestaña nueva. */
+  href: string | null;
+};
+
+export type VistaMarcasAliadas = {
+  blockType: "marcasAliadas";
+  id?: string | null;
+  /** Ancla del bloque, sin «#»: `/pagina/#ancla` lleva a él. */
+  ancla?: string | null;
+  titulo: string;
+  /** Las fotos del fondo, en su orden de relevo. */
+  fondos: ImagenBloque[];
+  tarjetas: TarjetaAliada[];
+};
+
 export type TarjetaExpandible = {
   id?: string | null;
   titulo: string;
@@ -184,6 +208,7 @@ export type VistaBloque =
   | VistaPresentacionImagen
   | VistaCifras
   | VistaFranjaMarquee
+  | VistaMarcasAliadas
   | VistaTarjetasExpandibles
   | VistaGaleria
   | VistaVideoYoutube

@@ -149,12 +149,14 @@
 /* Vidrio oscuro: tinta cálida al 55 % sobre un fondo que el propio filtro oscurece y desenfoca. */
 .pildora {
   position: fixed;
-  /* Justo debajo de la cabecera del sitio (alto real, lo pone PildoraKit). */
-  top: calc(var(--pildora-arriba, 0px) + 12px);
+  /* Abajo y centrada, con la zona segura del móvil. */
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   left: 50%;
-  z-index: 60;
+  z-index: 39;
   display: flex;
-  max-width: calc(100% - 2rem);
+  /* Nunca pisa el botón de WhatsApp (56 px a 16 px de la esquina derecha): deja 88 px a cada
+     lado, así sigue centrada, y si no cabe la lista se desliza. */
+  max-width: min(calc(100% - 184px), 1100px);
   align-items: center;
   gap: 4px;
   padding: 6px;
@@ -177,11 +179,10 @@
   /* Escondida: sin ocupar sitio ni foco. */
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, -24px) scale(0.9);
+  transform: translate(-50%, 24px) scale(0.9);
   visibility: hidden;
   transition:
     opacity 0.3s ease,
-    top 0.3s ease,
     transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
     visibility 0s linear 0.4s;
 }
@@ -486,7 +487,7 @@
   margin: 40px 5% 0;
   padding-top: 40px;
   border-top: 1px solid rgb(0 0 0 / 0.12);
-  scroll-margin-top: 112px;
+  scroll-margin-top: 96px;
 }
 
 .cabeceraSeccion {
@@ -615,7 +616,7 @@
   box-shadow:
     0 1px 2px rgb(16 15 15 / 0.06),
     0 6px 16px -10px rgb(16 15 15 / 0.18);
-  scroll-margin-top: 112px;
+  scroll-margin-top: 96px;
 }
 
 .modeloFoto {

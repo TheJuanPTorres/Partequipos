@@ -359,7 +359,7 @@ export const IMAGENES_TARJETAS = {
     idWp: 47286,
     archivo: "2025/11/002.jpg",
     nombre: "maquinaria-pesada-usada",
-    alt: "Excavadora Hitachi usada en el patio",
+    alt: "Excavadora Hitachi LANDCROS usada en el patio",
   },
   aditamentos: {
     idWp: 1437,

@@ -28,7 +28,7 @@ export const PLAN_HITACHI: PlanSeriesTipo[] = [
           url: `${SUBIDAS}/1.jpg`,
           fichero: "wp-serie-excavadora-hitachi-zaxis",
           // En WordPress decía «Hitachi CX 200»: errata.
-          alt: "Excavadora Hitachi Zaxis",
+          alt: "Excavadora Hitachi LANDCROS Zaxis",
         },
       },
     ],
@@ -42,7 +42,7 @@ export const PLAN_HITACHI: PlanSeriesTipo[] = [
         foto: {
           url: `${SUBIDAS}/mini-hitachi-zx.webp`,
           fichero: "wp-serie-miniexcavadora-hitachi-zaxis",
-          alt: "Miniexcavadora Hitachi Zaxis",
+          alt: "Miniexcavadora Hitachi LANDCROS Zaxis",
         },
       },
     ],

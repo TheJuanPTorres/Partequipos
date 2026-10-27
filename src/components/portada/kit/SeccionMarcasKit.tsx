@@ -20,7 +20,7 @@ import estilos from "./marcasKit.module.css";
  * título y la máquina con su reflejo. Sin logos, la sección no se pinta.
  */
 
-const SIZES_MAQUINA = "(min-width: 1025px) 55vw, 90vw";
+const SIZES_MAQUINA = "(min-width: 1025px) 46vw, 85vw";
 
 export function SeccionMarcasKit({
   logos,
@@ -73,7 +73,6 @@ export function SeccionMarcasKit({
                 />
               </div>
             ) : null}
-            <Sombras />
             <Image
               src={maquina.url}
               alt=""
@@ -157,64 +156,6 @@ function Fondo() {
         />
       </g>
       <rect x="-1000" y="225" width="3000" height="120" fill="url(#kit-marcas-piso)" />
-    </svg>
-  );
-}
-
-/** Sombras de contacto medidas por el cliente sobre el render de la Case 580N (1920 × 1344). */
-function Sombras() {
-  return (
-    <svg aria-hidden="true" focusable="false" viewBox="0 0 1920 1344" className={estilos.sombras}>
-      <defs>
-        <filter id="kit-marcas-amplia" x="-30%" y="-200%" width="160%" height="500%">
-          <feGaussianBlur stdDeviation="40" />
-        </filter>
-        <filter id="kit-marcas-sombra" x="-30%" y="-200%" width="160%" height="500%">
-          <feGaussianBlur stdDeviation="12" />
-        </filter>
-      </defs>
-      <ellipse
-        cx="1050"
-        cy="1110"
-        rx="820"
-        ry="55"
-        fill="#14110f"
-        opacity="0.14"
-        filter="url(#kit-marcas-amplia)"
-      />
-      <ellipse
-        cx="345"
-        cy="1032"
-        rx="90"
-        ry="12"
-        fill="#14110f"
-        opacity="0.4"
-        filter="url(#kit-marcas-sombra)"
-      />
-      <ellipse
-        cx="650"
-        cy="1044"
-        rx="115"
-        ry="14"
-        fill="#14110f"
-        opacity="0.45"
-        filter="url(#kit-marcas-sombra)"
-      />
-      <ellipse
-        cx="955"
-        cy="1095"
-        rx="85"
-        ry="13"
-        fill="#14110f"
-        opacity="0.45"
-        filter="url(#kit-marcas-sombra)"
-      />
-      <polygon
-        points="1170,1112 1800,1100 1800,1116 1170,1134"
-        fill="#14110f"
-        opacity="0.32"
-        filter="url(#kit-marcas-sombra)"
-      />
     </svg>
   );
 }

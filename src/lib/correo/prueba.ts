@@ -1,5 +1,5 @@
+import type { SmtpEnVigor } from "./enVigor";
 import { errorSinSecretos } from "./estado";
-import { modoCorreo } from "./smtp";
 
 type Entorno = Record<string, string | undefined>;
 
@@ -18,17 +18,19 @@ const ENTORNO: Record<string, string> = { production: "sitio publicado", preview
  *
  * - solo un administrador (403);
  * - a UNA dirección válida (400);
- * - sin SMTP completo no intenta nada y dice qué variables faltan, solo sus NOMBRES (409);
+ * - usa el SMTP EN VIGOR (`smtpEnVigor`: el del panel si está completo, si no el de Vercel);
+ * - sin ninguno no intenta nada y dice qué falta, solo NOMBRES (409);
  * - si el servidor SMTP falla o rechaza, el motivo sin usuario ni contraseña (502).
  *
- * Las variables SMTP solo cambian con un despliegue nuevo: el resultado es el del despliegue
- * que responde.
+ * Los datos del panel cuentan en cuanto se guardan; las variables de Vercel, solo tras un
+ * despliegue nuevo.
  */
 export async function enviarCorreoDePrueba(
   destino: unknown,
   deps: {
     esAdministrador: boolean;
     enviar: (correo: CorreoDePrueba) => Promise<unknown>;
+    enVigor: SmtpEnVigor;
     env?: Entorno;
     ahora?: Date;
   },
@@ -47,13 +49,13 @@ export async function enviarCorreoDePrueba(
       cuerpo: { ok: false, mensaje: "Escribe una sola dirección de correo válida." },
     };
   }
-  const modo = modoCorreo(env);
-  if (modo.modo !== "smtp") {
+  const enVigor = deps.enVigor;
+  if (enVigor.origen === "ninguno") {
     return {
       status: 409,
       cuerpo: {
         ok: false,
-        mensaje: `No se envió: el SMTP no está configurado (${modo.motivo}). Hay que ponerlas en Vercel y volver a desplegar.`,
+        mensaje: `No se envió: no hay correo de salida configurado (${enVigor.motivo}).${enVigor.aviso ? ` ${enVigor.aviso}` : ""} Rellena los datos del SMTP aquí, en el panel, o ponlos en Vercel y vuelve a desplegar.`,
       },
     };
   }
@@ -68,6 +70,7 @@ export async function enviarCorreoDePrueba(
         "(Configuración → «Correo y formularios»).",
         "",
         `Entorno: ${entorno}`,
+        `SMTP: ${enVigor.origen === "panel" ? "el del panel" : "el de las variables de Vercel"}`,
         `Hora (UTC): ${hora}`,
         "",
         "Si te ha llegado, los avisos de los formularios pueden salir por este servidor.",
@@ -78,7 +81,7 @@ export async function enviarCorreoDePrueba(
       status: 200,
       cuerpo: {
         ok: true,
-        mensaje: `Enviado a ${to}${id}. Si no llega en unos minutos, revisa la carpeta de spam.`,
+        mensaje: `Enviado a ${to}${id}, con el SMTP ${enVigor.origen === "panel" ? "del panel" : "de Vercel"}. Si no llega en unos minutos, revisa la carpeta de spam.`,
       },
     };
   } catch (error) {
@@ -86,7 +89,7 @@ export async function enviarCorreoDePrueba(
       status: 502,
       cuerpo: {
         ok: false,
-        mensaje: `El servidor de correo no lo aceptó: ${errorSinSecretos(error, env)}`,
+        mensaje: `El servidor de correo no lo aceptó: ${errorSinSecretos(error, env, enVigor.config)}`,
       },
     };
   }

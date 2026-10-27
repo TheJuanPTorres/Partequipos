@@ -1,8 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { smtpEnVigor } from "./enVigor";
 import { errorSinSecretos, estadoCorreo } from "./estado";
 import { enviarCorreoDePrueba } from "./prueba";
+
+const SIN_CLAVE = { clave: null, motivo: "falta SMTP_CLAVE_CIFRADO" } as const;
+const enVigor = (env: Record<string, string>) => smtpEnVigor(null, SIN_CLAVE, env);
 
 const COMPLETO = {
   SMTP_HOST: "smtp.ejemplo.test",
@@ -13,15 +17,16 @@ const COMPLETO = {
 
 describe("estado del correo en el panel", () => {
   it("sin SMTP: no configurado y QUÉ falta (solo nombres)", () => {
-    const e = estadoCorreo({ SMTP_HOST: "smtp.ejemplo.test" });
+    const e = estadoCorreo(enVigor({ SMTP_HOST: "smtp.ejemplo.test" }));
     assert.equal(e.configurado, false);
     if (e.configurado) return;
     assert.match(e.motivo, /SMTP_USER/);
   });
   it("con SMTP: servidor, puerto, cifrado y remitente, NUNCA usuario ni contraseña", () => {
-    const e = estadoCorreo({ ...COMPLETO, SMTP_FROM_NAME: "Avisos" });
+    const e = estadoCorreo(enVigor({ ...COMPLETO, SMTP_FROM_NAME: "Avisos" }));
     assert.deepEqual(e, {
       configurado: true,
+      origen: "vercel",
       servidor: "smtp.ejemplo.test",
       puerto: 587,
       cifrado: "STARTTLS obligatorio",
@@ -29,7 +34,16 @@ describe("estado del correo en el panel", () => {
     });
     assert.doesNotMatch(JSON.stringify(e), /usuario-smtp|clave-secreta/);
   });
-  it("el error de envío sale sin usuario ni contraseña", () => {
+  it("el error de envío sale sin usuario ni contraseña, tampoco los del panel", () => {
+    const panel = errorSinSecretos(
+      new Error("535 ventas@x.co / del-panel"),
+      {},
+      {
+        user: "ventas@x.co",
+        pass: "del-panel",
+      },
+    );
+    assert.doesNotMatch(panel, /ventas@x\.co|del-panel/);
     const t = errorSinSecretos(
       new Error("Invalid login: 535 usuario-smtp / clave-secreta rejected"),
       COMPLETO,
@@ -50,13 +64,17 @@ describe("correo de prueba", () => {
     const r = await enviarCorreoDePrueba("a@ejemplo.test", {
       esAdministrador: false,
       enviar,
-      env: COMPLETO,
+      enVigor: enVigor(COMPLETO),
     });
     assert.equal(r.status, 403);
   });
   it("una sola dirección válida", async () => {
     for (const d of ["", "no-es-correo", "a@x.co, b@x.co", "Nombre <a@x.co>", 42]) {
-      const r = await enviarCorreoDePrueba(d, { esAdministrador: true, enviar, env: COMPLETO });
+      const r = await enviarCorreoDePrueba(d, {
+        esAdministrador: true,
+        enviar,
+        enVigor: enVigor(COMPLETO),
+      });
       assert.equal(r.status, 400, String(d));
     }
   });
@@ -65,7 +83,7 @@ describe("correo de prueba", () => {
     const r = await enviarCorreoDePrueba("a@ejemplo.test", {
       esAdministrador: true,
       enviar,
-      env: {},
+      enVigor: enVigor({}),
     });
     assert.equal(r.status, 409);
     assert.match(r.cuerpo.mensaje, /SMTP_HOST/);
@@ -75,7 +93,8 @@ describe("correo de prueba", () => {
     const r = await enviarCorreoDePrueba(" a@ejemplo.test ", {
       esAdministrador: true,
       enviar,
-      env: { ...COMPLETO, VERCEL_ENV: "preview" },
+      enVigor: enVigor(COMPLETO),
+      env: { VERCEL_ENV: "preview" },
     });
     assert.equal(r.status, 200);
     assert.equal(r.cuerpo.ok, true);
@@ -90,7 +109,7 @@ describe("correo de prueba", () => {
       enviar: async () => {
         throw new Error("Invalid login for usuario-smtp");
       },
-      env: COMPLETO,
+      enVigor: enVigor(COMPLETO),
     });
     assert.equal(r.status, 502);
     assert.equal(r.cuerpo.ok, false);

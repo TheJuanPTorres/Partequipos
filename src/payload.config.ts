@@ -2,7 +2,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { BlocksFeature, lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { endurecerSubidaDirecta } from "./lib/blob/rutaSubidaDirecta";
@@ -62,35 +61,23 @@ import { PaginasIndice } from "./globals/PaginasIndice";
 import { RepuestosMarca } from "./globals/RepuestosMarca";
 import { VacantesBuk } from "./globals/VacantesBuk";
 import { CorreoFormularios } from "./globals/CorreoFormularios";
-import { modoCorreo, opcionesTransporte } from "./lib/correo/smtp";
+import { adaptadorCorreo } from "./lib/correo/adaptador";
 import { LOGO_SITIO_RESPALDO } from "./lib/seo/logo";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 /*
- * Adaptador de correo (SMTP con nodemailer), OPCIONAL a propósito.
- *
- * Sin SMTP completo (`modoCorreo`, `src/lib/correo/smtp.ts`) no se configura
- * ningún adaptador. OJO: el de nodemailer SIN `transportOptions` crearía una
- * cuenta de prueba de ethereal.email e imprimiría sus credenciales; por eso
- * solo se monta con la configuración completa. `skipVerify`: no se abre una
- * conexión SMTP en cada arranque en frío del lambda; el envío ya informa si
- * falla.
+ * Adaptador de correo (SMTP con nodemailer), SIEMPRE montado desde el 2026-10-27: decide en cada
+ * envío entre el SMTP del panel («Correo y formularios», si está completo) y el de las variables
+ * de Vercel (`src/lib/correo/adaptador.ts`). Sin ninguno, no envía y lo registra sin el contenido
+ * (antes, sin adaptador, Payload escribía el correo entero en la consola). Nunca crea la cuenta
+ * de prueba de ethereal.email: el adaptador oficial solo se llama con opciones completas.
  *
  * DEGRADACIÓN: el aviso nunca cuesta un lead. Si el correo falla, la solicitud
  * ya está guardada y el gancho solo lo registra (`notificarSolicitud.ts`).
  */
-const correo = modoCorreo();
-const email =
-  correo.modo === "smtp"
-    ? nodemailerAdapter({
-        defaultFromAddress: correo.config.fromAddress,
-        defaultFromName: correo.config.fromName,
-        skipVerify: true,
-        transportOptions: opcionesTransporte(correo.config),
-      })
-    : undefined;
+const email = adaptadorCorreo;
 
 /*
  * «Ver en el sitio»: en las colecciones con página pública, el formulario

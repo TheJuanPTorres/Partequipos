@@ -24,10 +24,17 @@
  * (§10.21).
  */
 
+/**
+ * Cifrado de la conexión: `starttls` (587, obligatorio), `ssl` (TLS desde el principio, 465) o
+ * `ninguno`. Las variables de Vercel solo dan los dos primeros (`SMTP_SECURE`); «ninguno» solo se
+ * elige en el panel, con su aviso (la contraseña podría viajar sin cifrar).
+ */
+export type CifradoSmtp = "starttls" | "ssl" | "ninguno";
+
 export type ConfigSmtp = {
   host: string;
   port: number;
-  secure: boolean;
+  cifrado: CifradoSmtp;
   user: string;
   pass: string;
   fromAddress: string;
@@ -59,7 +66,7 @@ export function modoCorreo(env: Entorno = process.env): ModoCorreo {
     config: {
       host: leer(env, "SMTP_HOST"),
       port,
-      secure: leer(env, "SMTP_SECURE").toLowerCase() === "true",
+      cifrado: leer(env, "SMTP_SECURE").toLowerCase() === "true" ? "ssl" : "starttls",
       user: leer(env, "SMTP_USER"),
       pass: leer(env, "SMTP_PASS"),
       fromAddress: leer(env, "SMTP_FROM_ADDRESS"),
@@ -88,16 +95,17 @@ export function destinoAvisos(
 }
 
 /**
- * Opciones de transporte de nodemailer. Sin cifrar NUNCA: o TLS desde el
- * principio (`secure`) o STARTTLS obligatorio (`requireTLS`). Tiempos cortos:
- * el aviso va dentro de la petición del formulario.
+ * Opciones de transporte de nodemailer. Con `ssl`, TLS desde el principio (`secure`); con
+ * `starttls`, STARTTLS obligatorio (`requireTLS`); con `ninguno` (solo desde el panel), sin
+ * exigirlo: nodemailer sigue subiendo a TLS si el servidor lo ofrece. Tiempos cortos: el aviso va
+ * dentro de la petición del formulario.
  */
 export function opcionesTransporte(c: ConfigSmtp) {
   return {
     host: c.host,
     port: c.port,
-    secure: c.secure,
-    requireTLS: !c.secure,
+    secure: c.cifrado === "ssl",
+    requireTLS: c.cifrado === "starttls",
     auth: { user: c.user, pass: c.pass },
     connectionTimeout: 10_000,
     greetingTimeout: 10_000,

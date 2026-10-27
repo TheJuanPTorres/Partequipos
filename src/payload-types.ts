@@ -4145,7 +4145,7 @@ export interface VacantesBuk {
   createdAt?: string | null;
 }
 /**
- * Adónde llegan los formularios del sitio, si el correo de salida (SMTP) está configurado y un botón para enviar un correo de prueba.
+ * Adónde llegan los formularios del sitio, el correo de salida (SMTP: el del panel o el de Vercel) y un botón para enviar un correo de prueba.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "correo-formularios".
@@ -4160,6 +4160,36 @@ export interface CorreoFormulario {
    * A este correo llegan las hojas de vida de «Trabaja con nosotros» («Enviar HV»), con el PDF adjunto (no se guarda en el sitio). Vacío, el correo para solicitudes. Solo cuenta en el sitio publicado.
    */
   correoHojasDeVida?: string | null;
+  smtpPanel?: {
+    /**
+     * El servidor de correo saliente (SMTP) de la cuenta.
+     */
+    servidor?: string | null;
+    /**
+     * «Ninguno» solo si el proveedor no admite otro: la contraseña podría viajar sin cifrar.
+     */
+    cifrado?: ('starttls' | 'ssl' | 'ninguno') | null;
+    /**
+     * Vacío: 587 con STARTTLS, 465 con SSL/TLS y 25 sin cifrado.
+     */
+    puerto?: number | null;
+    /**
+     * Normalmente, el correo completo de la cuenta que envía.
+     */
+    usuario?: string | null;
+    contrasenaNueva?: string | null;
+    borrarContrasena?: boolean | null;
+    contrasenaGuardada?: boolean | null;
+    contrasenaCifrada?: string | null;
+    /**
+     * Desde qué dirección salen los avisos (la cuenta tiene que poder enviar como ella).
+     */
+    remitenteCorreo?: string | null;
+    /**
+     * Vacío: «Partequipos».
+     */
+    remitenteNombre?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -4451,6 +4481,20 @@ export interface VacantesBukSelect<T extends boolean = true> {
 export interface CorreoFormulariosSelect<T extends boolean = true> {
   correoSolicitudes?: T;
   correoHojasDeVida?: T;
+  smtpPanel?:
+    | T
+    | {
+        servidor?: T;
+        cifrado?: T;
+        puerto?: T;
+        usuario?: T;
+        contrasenaNueva?: T;
+        borrarContrasena?: T;
+        contrasenaGuardada?: T;
+        contrasenaCifrada?: T;
+        remitenteCorreo?: T;
+        remitenteNombre?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

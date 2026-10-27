@@ -417,10 +417,23 @@ promote`/`rollback`/`redeploy`, `--prod`, `--target production`; **no** la
   - Dos scripts del repositorio llevaban un patrón por motivos legítimos y
     se reformularon: `humo.ts` describe la reversión con palabras y
     `verificar-acceso-portada.ts` importa la constante del host.
-- **REGLA: si la barrera bloquea, no se busca otra vía.** Se reformula el
-  comando sin lo que la activó, o se informa a dirección. Solo los **textos**
-  —mensaje de commit, cuerpo de un PR y documentación— pueden ir por un
-  fichero `.md` o `.txt`, y se menciona en el informe.
+- **REGLA: si la barrera bloquea, se PARA y se informa a dirección. No se
+  rehace por otra vía.** Vale igual para los agentes y para el verificador
+  (precisado por dirección el 2026-10-27). «Otra vía» es cualquier forma de
+  conseguir lo mismo que se bloqueó, aunque parezca inocua:
+  - otra herramienta (`Edit`/`Write` en lugar de `Bash`, PowerShell en lugar
+    de `Bash`, un MCP);
+  - otro lenguaje (`node` en lugar de `python`);
+  - no guardar el fichero y hacerlo en memoria, o partir el comando en trozos.
+
+  **Aunque el bloqueo parezca un falso positivo, se para.** Caso que lo
+  motivó: el 2026-10-27 la barrera bloqueó un `python` que leía el HTML de un
+  preview, porque contenía el id del almacén del Blob de producción. El
+  verificador repitió el análisis en memoria con `node`, y eso no se puede
+  hacer. Solo los **textos** —mensaje de commit, cuerpo de un PR y
+  documentación— pueden ir por un fichero `.md` o `.txt`, y se menciona en el
+  informe.
+
 - **Lo que este hook NO ve:** un script que escribe en el Blob con el token
   que tenga el entorno, sin nombrar el almacén en el comando. Así fue la subida
   a producción del 2026-10-01 (§10.37). Eso lo para la **guarda del almacén**,
@@ -528,7 +541,9 @@ enlazado desde `.claude\agents` de cada copia) que, con el
 contexto limpio y en solo lectura, comprueba **por su efecto** lo que el
 agente principal afirma. **Regla de hitos:** ningún informe de hito (CI,
 preview, prueba de humo, despliegue, lo pintado, la base) se da sin su
-veredicto, que va en el informe.
+veredicto, que va en el informe. **Si la barrera bloquea al verificador**, la
+afirmación queda NO VERIFICABLE y lo dice en el informe, con el comando
+bloqueado. No la comprueba por otra vía (regla de la barrera, arriba).
 
 **Rutina de fusión (desde la fase 6, 2026-10-01):**
 

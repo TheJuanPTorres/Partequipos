@@ -2,7 +2,7 @@ import config from "@payload-config";
 import { NextResponse } from "next/server";
 import { getPayload } from "payload";
 
-import { modoCorreo } from "@/lib/correo/smtp";
+import { leerSmtpEnVigor } from "@/lib/correo/servidor";
 import { destinoHojasDeVida } from "@/lib/hojaDeVida/destino";
 import { procesarHojaDeVida } from "@/lib/hojaDeVida/procesar";
 import { datosEmpresa } from "@/lib/seo/empresa";
@@ -54,8 +54,11 @@ export async function POST(peticion: Request) {
       );
     },
     enviarCorreo: async (correo) => {
-      if (modoCorreo().modo !== "smtp") throw new Error("sin SMTP configurado");
       const payload = await getPayload({ config });
+      // El SMTP en vigor (panel o Vercel): sin ninguno, «ok: false» (la hoja de vida no se pierde en silencio).
+      if ((await leerSmtpEnVigor(payload)).origen === "ninguno") {
+        throw new Error("sin SMTP configurado");
+      }
       await payload.sendEmail({
         to: correo.to,
         replyTo: correo.replyTo,

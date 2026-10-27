@@ -1,6 +1,7 @@
 import type { CollectionAfterChangeHook } from "payload";
 
-import { destinoAvisos, modoCorreo } from "@/lib/correo/smtp";
+import { leerSmtpEnVigor } from "@/lib/correo/servidor";
+import { destinoAvisos } from "@/lib/correo/smtp";
 import { datosEmpresa } from "@/lib/seo/empresa";
 
 /**
@@ -42,12 +43,13 @@ export const notificarSolicitud: CollectionAfterChangeHook = async ({
    * Sin SMTP o sin destino no hay envío. Se comprueba de forma explícita en vez
    * de dejar que `sendEmail` lo registre por su cuenta: así el mensaje dice qué
    * solicitud quedó sin avisar y qué falta para arreglarlo. Solo NOMBRES de
-   * variables, nunca valores.
+   * campos y variables, nunca valores.
    */
-  const correo = modoCorreo();
-  if (correo.modo !== "smtp" || !destino) {
+  // El SMTP en vigor: el del panel si está completo, si no el de las variables de Vercel.
+  const correo = await leerSmtpEnVigor(req.payload);
+  if (correo.origen === "ninguno" || !destino) {
     const falta =
-      correo.modo !== "smtp"
+      correo.origen === "ninguno"
         ? correo.motivo
         : "falta SOLICITUDES_EMAIL_TO (fuera de producción no se avisa al cliente)";
     req.payload.logger.warn(

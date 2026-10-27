@@ -31,7 +31,7 @@ describe("correo de avisos por SMTP (§10.11)", () => {
     assert.equal(m.modo, "smtp");
     if (m.modo !== "smtp") return;
     assert.equal(m.config.port, 587);
-    assert.equal(m.config.secure, false);
+    assert.equal(m.config.cifrado, "starttls");
     assert.equal(m.config.fromName, "Partequipos");
     const t = opcionesTransporte(m.config);
     assert.equal(t.requireTLS, true);

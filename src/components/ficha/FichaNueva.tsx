@@ -1,7 +1,7 @@
 import { IconBrandWhatsapp, IconFileTypePdf, IconView360 } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { BotonVisorPdf } from "@/components/ficha/BotonVisorPdf";
 import { BotonVista360 } from "@/components/ficha/BotonVista360";
@@ -13,6 +13,8 @@ import { RecuadroAsesoria } from "@/components/ficha/RecuadroAsesoria";
 import estilos from "@/components/ficha/ficha.module.css";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { FranjaMarca } from "@/components/marca/FranjaMarca";
+import { CabeceraKit } from "@/components/nueva/kit/CabeceraKit";
+import { EmblemaKit } from "@/components/nueva/kit/EmblemaKit";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { PaginaVisor } from "@/lib/documentos/visor";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
@@ -37,6 +39,9 @@ import nueva from "./fichaNueva.module.css";
  */
 
 export type Miga = { nombre: string; path: string };
+
+/** Destino del indicador de la cabecera del kit: la tarjeta del equipo. */
+const ANCLA_PRODUCTO = "ficha-equipo";
 
 /** Un PDF que se abre en el visor: la URL, el tamaño y sus páginas como imágenes. */
 export type PdfVisor = { url: string; tamano: string | null; paginas: PaginaVisor[] };
@@ -120,6 +125,17 @@ type Props = {
   jsonLd: ReactNode;
   /** El contacto (nuestro formulario) y los testimonios, ya montados por la página. */
   cierre: ReactNode;
+  /**
+   * La marca tiene «Kit de marca» (2026-10-27): la cabecera del kit (banda con su color, placa con
+   * el logo, su foto y el emblema) con las migas y el `<h1>`. `null`: la cabecera de siempre.
+   */
+  kit?: {
+    acento: string;
+    tinta: string;
+    fondo: ImagenLista | null;
+    logo: LogoConAlt | null;
+    emblema: ImagenLista | null;
+  } | null;
 };
 
 export function FichaNueva({
@@ -140,6 +156,7 @@ export function FichaNueva({
   anclaContacto,
   jsonLd,
   cierre,
+  kit = null,
 }: Props) {
   const hayIzquierda = fotos.length > 0 || datos.length > 0;
   const boton360 = vista360 ? (
@@ -148,6 +165,68 @@ export function FichaNueva({
       Ver en vista 360
     </BotonVista360>
   ) : null;
+
+  /**
+   * Las migas: la ruta COMPLETA en la píldora, como en la V2, en la tarjeta o en la cabecera del
+   * kit. Reservan su alto (#390): una copia oculta de la lista, con las líneas que saldrían en
+   * «Inter Fallback» ensanchada, en la misma celda; sin ella, una miga larga ocupaba una línea más
+   * antes de llegar Inter y el título saltaba 18 px a 390 (CLS 0,059).
+   */
+  const migasFicha = (clase: string) => (
+    <nav aria-label="Ruta de navegación" className={`${clase} ${nueva.migasReserva}`}>
+      <ol>
+        {migas.map((m, i) =>
+          i === migas.length - 1 ? (
+            <li key={m.path}>
+              <span aria-current="page">{sinCortarCodigos(m.nombre, nueva.sinCorte)}</span>
+            </li>
+          ) : (
+            <li key={m.path}>
+              <Link href={`${m.path}${m.path.endsWith("/") ? "" : "/"}`}>{m.nombre}</Link>
+              <span aria-hidden="true"> / </span>
+            </li>
+          ),
+        )}
+      </ol>
+      <ol aria-hidden="true" className={nueva.copiaMigas}>
+        {migas.map((m, i) => (
+          <li key={m.path}>
+            {i === migas.length - 1 ? sinCortarCodigos(m.nombre, nueva.sinCorte) : m.nombre}
+            {i < migas.length - 1 ? " / " : null}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+
+  /*
+   * UN SOLO <h1> con las dos variantes de la plantilla: en escritorio y tablet, la marca y la
+   * referencia en dos líneas; en móvil, el nombre completo. La que no se ve está oculta con
+   * `display: none`, así que el nombre accesible es siempre el de la variante visible. Con el
+   * kit, el <h1> va en su cabecera (el nombre completo).
+   */
+  const tituloFicha = (
+    <h1 id="ficha-titulo" className={`${estilos.titulo} ${nueva.titulo} texto-titulo-bloque`}>
+      {tituloEscritorio ? (
+        <>
+          {/* Con reserva de alto: «Case Construction» ocupa 2 líneas o 1 según la fuente. */}
+          <span
+            className={`${nueva.tituloEscritorio} ${nueva.reserva} ${nueva.reservaTitulo}`}
+            data-reserva={`${tituloEscritorio.marca}
+${tituloEscritorio.modelo}`}
+          >
+            <span className={nueva.lineasTitulo}>
+              <span className={nueva.lineaMarca}>{tituloEscritorio.marca}</span>{" "}
+              <span>{sinCortarCodigos(tituloEscritorio.modelo, nueva.sinCorte)}</span>
+            </span>
+          </span>
+          <span className={nueva.tituloMovil}>{sinCortarCodigos(nombre, nueva.sinCorte)}</span>
+        </>
+      ) : (
+        nombre
+      )}
+    </h1>
+  );
 
   return (
     <main className={estilos.pagina}>
@@ -164,138 +243,106 @@ export function FichaNueva({
         los bloques se ordenan: galería, migas y título, características,
         botones y descripción.
       */}
-      <section
-        className={`${estilos.principal} ${nueva.principal}`}
-        data-sin-fotos={fotos.length === 0 ? "" : undefined}
-        data-con-izquierda={hayIzquierda ? "" : undefined}
-        aria-labelledby="ficha-titulo"
-      >
-        <div className={nueva.columnaTexto}>
-          <div className={`${estilos.cabeceraDatos} ${nueva.cabecera}`}>
-            {/* Migas: la ruta COMPLETA en la píldora, como en la V2. */}
-            {/*
-              Las migas reservan su alto: una copia oculta de la lista, con las mismas
-              líneas que saldrían en «Inter Fallback» ensanchada, en la misma celda.
-              Sin ella, una miga larga ocupaba una línea más antes de llegar Inter y
-              el título saltaba 18 px a 390 (CLS 0,059).
-            */}
-            <nav
-              aria-label="Ruta de navegación"
-              className={`${estilos.migas} ${nueva.migas} ${nueva.migasReserva}`}
-            >
-              <ol>
-                {migas.map((m, i) =>
-                  i === migas.length - 1 ? (
-                    <li key={m.path}>
-                      <span aria-current="page">{sinCortarCodigos(m.nombre, nueva.sinCorte)}</span>
-                    </li>
-                  ) : (
-                    <li key={m.path}>
-                      <Link href={`${m.path}${m.path.endsWith("/") ? "" : "/"}`}>{m.nombre}</Link>
-                      <span aria-hidden="true"> / </span>
-                    </li>
-                  ),
-                )}
-              </ol>
-              <ol aria-hidden="true" className={nueva.copiaMigas}>
-                {migas.map((m, i) => (
-                  <li key={m.path}>
-                    {i === migas.length - 1 ? sinCortarCodigos(m.nombre, nueva.sinCorte) : m.nombre}
-                    {i < migas.length - 1 ? " / " : null}
-                  </li>
-                ))}
-              </ol>
-            </nav>
-
-            {/*
-              UN SOLO <h1> con las dos variantes de la plantilla: en escritorio y
-              tablet, la marca y la referencia en dos líneas; en móvil, el nombre
-              completo. La que no se ve está oculta con `display: none`, así que
-              el nombre accesible es siempre el de la variante visible.
-            */}
-            <h1
-              id="ficha-titulo"
-              className={`${estilos.titulo} ${nueva.titulo} texto-titulo-bloque`}
-            >
-              {tituloEscritorio ? (
-                <>
-                  {/* Con reserva de alto: «Case Construction» ocupa 2 líneas o 1 según la fuente. */}
-                  <span
-                    className={`${nueva.tituloEscritorio} ${nueva.reserva} ${nueva.reservaTitulo}`}
-                    data-reserva={`${tituloEscritorio.marca}
-${tituloEscritorio.modelo}`}
-                  >
-                    <span className={nueva.lineasTitulo}>
-                      <span className={nueva.lineaMarca}>{tituloEscritorio.marca}</span>{" "}
-                      <span>{sinCortarCodigos(tituloEscritorio.modelo, nueva.sinCorte)}</span>
-                    </span>
-                  </span>
-                  <span className={nueva.tituloMovil}>
-                    {sinCortarCodigos(nombre, nueva.sinCorte)}
-                  </span>
-                </>
-              ) : (
-                nombre
-              )}
-            </h1>
-          </div>
-
-          {descripcion ? (
-            <div
-              className={`${nueva.descripcion} ${nueva.reserva} texto-cuerpo`}
-              data-reserva={reservaDescripcion}
-            >
-              <div className={nueva.cuerpoDescripcion}>{descripcion}</div>
-            </div>
-          ) : null}
-
-          {fotos.length === 0 ? <div className={nueva.solo360}>{boton360}</div> : null}
-
-          {pdf || experto ? (
-            <div className={`${estilos.botones} ${nueva.botones}`}>
-              {pdf ? (
-                <BotonVisorPdf
-                  titulo={`Ficha técnica: ${nombre}`}
-                  pdf={{ url: pdf.url, tamano: pdf.tamano }}
-                  paginas={pdf.paginas}
-                  className={`${estilos.boton} ${estilos.botonGrande}`}
-                >
-                  <IconFileTypePdf aria-hidden="true" stroke={1.75} />
-                  Ficha técnica
-                </BotonVisorPdf>
-              ) : null}
-              {experto ? (
-                <a
-                  href={experto.href}
-                  className={`${estilos.boton} ${estilos.botonOscuro} ${estilos.botonGrande}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <IconBrandWhatsapp aria-hidden="true" stroke={1.75} />
-                  Habla con un experto
-                  <span className="sr-only"> (abre WhatsApp)</span>
-                </a>
-              ) : null}
-            </div>
-          ) : null}
+      {kit ? (
+        <div
+          className={nueva.cabeceraKit}
+          style={{ "--acento": kit.acento, "--tinta": kit.tinta } as CSSProperties}
+        >
+          <CabeceraKit
+            id="ficha-titulo"
+            titulo={nombre}
+            texto=""
+            fondo={kit.fondo}
+            logo={kit.logo}
+            destino={`#${ANCLA_PRODUCTO}`}
+            etiquetaRaton="Ir al equipo"
+            migas={migasFicha(`${estilos.migas} ${nueva.migas} ${nueva.migasKit}`)}
+            contenidoTitulo={
+              // Con reserva de alto: el contenido va centrado en el panel y no se mueve.
+              <span className={`${nueva.reserva} ${nueva.reservaKit}`} data-reserva={nombre}>
+                <span>{sinCortarCodigos(nombre, nueva.sinCorte)}</span>
+              </span>
+            }
+          />
         </div>
+      ) : null}
 
-        {hayIzquierda ? (
-          <div className={nueva.columnaIzquierda}>
-            {fotos.length > 0 ? (
-              <div className={`${estilos.columnaGaleria} ${nueva.columnaGaleria}`}>
-                {boton360}
-                <GaleriaFicha fotos={fotos} nombre={nombre} sinFondo />
+      <EmblemaKit emblema={kit?.emblema ?? null}>
+        <section
+          id={ANCLA_PRODUCTO}
+          tabIndex={-1}
+          className={`${estilos.principal} ${nueva.principal}`}
+          data-sin-fotos={fotos.length === 0 ? "" : undefined}
+          data-con-izquierda={hayIzquierda ? "" : undefined}
+          data-con-kit={kit ? "" : undefined}
+          aria-labelledby="ficha-titulo"
+        >
+          <div className={nueva.columnaTexto}>
+            {kit ? null : (
+              <div className={`${estilos.cabeceraDatos} ${nueva.cabecera}`}>
+                {migasFicha(`${estilos.migas} ${nueva.migas}`)}
+
+                {tituloFicha}
+              </div>
+            )}
+
+            {descripcion ? (
+              <div
+                className={`${nueva.descripcion} ${nueva.reserva} texto-cuerpo`}
+                data-reserva={reservaDescripcion}
+              >
+                <div className={nueva.cuerpoDescripcion}>{descripcion}</div>
               </div>
             ) : null}
-            <ListaDatos
-              datos={datos}
-              clase={`${estilos.datos} ${nueva.datos} texto-cuerpo`}
-              apilado
-            />
+
+            {fotos.length === 0 ? <div className={nueva.solo360}>{boton360}</div> : null}
+
+            {pdf || experto ? (
+              <div className={`${estilos.botones} ${nueva.botones}`}>
+                {pdf ? (
+                  <BotonVisorPdf
+                    titulo={`Ficha técnica: ${nombre}`}
+                    pdf={{ url: pdf.url, tamano: pdf.tamano }}
+                    paginas={pdf.paginas}
+                    className={`${estilos.boton} ${estilos.botonGrande}`}
+                  >
+                    <IconFileTypePdf aria-hidden="true" stroke={1.75} />
+                    Ficha técnica
+                  </BotonVisorPdf>
+                ) : null}
+                {experto ? (
+                  <a
+                    href={experto.href}
+                    className={`${estilos.boton} ${estilos.botonOscuro} ${estilos.botonGrande}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconBrandWhatsapp aria-hidden="true" stroke={1.75} />
+                    Habla con un experto
+                    <span className="sr-only"> (abre WhatsApp)</span>
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
           </div>
-        ) : null}
-      </section>
+
+          {hayIzquierda ? (
+            <div className={nueva.columnaIzquierda}>
+              {fotos.length > 0 ? (
+                <div className={`${estilos.columnaGaleria} ${nueva.columnaGaleria}`}>
+                  {boton360}
+                  <GaleriaFicha fotos={fotos} nombre={nombre} sinFondo />
+                </div>
+              ) : null}
+              <ListaDatos
+                datos={datos}
+                clase={`${estilos.datos} ${nueva.datos} texto-cuerpo`}
+                apilado
+              />
+            </div>
+          ) : null}
+        </section>
+      </EmblemaKit>
 
       {/* 2. «OTRAS <TIPO>»: la franja con la foto del tipo y las tarjetas. Sin otras, no sale. */}
       {otras.tarjetas.length > 0 ? (

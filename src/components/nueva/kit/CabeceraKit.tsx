@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { ImagenLista } from "@/lib/utils/relations";
@@ -14,6 +14,9 @@ type Imagen = Pick<ImagenLista, "url" | "alt" | "width" | "height"> & { oscuro?:
  * abajo) con el panel de foto encima, la placa blanca con el logo, el `<h1>`, el texto y el
  * indicador de scroll. La foto es la propia de cada marca (panel); sin ella, el panel queda
  * oscuro liso. Alto mínimo de 70vh: el texto no mueve nada al llegar la fuente.
+ *
+ * La ficha de un equipo nuevo la usa también (2026-10-27): con `migas` sobre el título,
+ * `contenidoTitulo` (el nombre con su reserva de alto) y su propia etiqueta del indicador.
  */
 export function CabeceraKit({
   id,
@@ -22,6 +25,9 @@ export function CabeceraKit({
   fondo,
   logo,
   destino,
+  migas,
+  contenidoTitulo,
+  etiquetaRaton = "Ir a la línea de equipos",
 }: {
   /** `id` del `<h1>`: la píldora lo usa para saber cuándo sale la cabecera de la pantalla. */
   id: string;
@@ -30,6 +36,11 @@ export function CabeceraKit({
   fondo: ImagenLista | null;
   logo: Imagen | null;
   destino: string;
+  /** Migas visibles entre la placa y el título (la ficha); la página de marca las lleva ocultas. */
+  migas?: ReactNode;
+  /** Lo que va dentro del `<h1>`, si no es `titulo` tal cual (p. ej. con reserva de alto). */
+  contenidoTitulo?: ReactNode;
+  etiquetaRaton?: string;
 }) {
   return (
     <section aria-labelledby={id} className={estilos.hero} data-cabecera-kit="">
@@ -58,11 +69,12 @@ export function CabeceraKit({
               />
             </div>
           ) : null}
+          {migas}
           <h1 id={id} className={estilos.heroTitulo}>
-            {titulo}
+            {contenidoTitulo ?? titulo}
           </h1>
           {texto ? <p className={estilos.heroTexto}>{texto}</p> : null}
-          <a href={destino} aria-label="Ir a la línea de equipos" className={estilos.raton}>
+          <a href={destino} aria-label={etiquetaRaton} className={estilos.raton}>
             <span aria-hidden="true" className={estilos.ratonCaja}>
               <span className={estilos.ratonRueda} />
             </span>

@@ -117,7 +117,12 @@ export async function PaginaMarcaKit({ marca }: { marca: MarcasMaquinaria }) {
       <PildoraKit
         nombre={nombre}
         logo={logo}
-        tipos={secciones.map((s) => ({ clave: s.clave, nombre: s.titulo }))}
+        tipos={secciones.map((s) => ({
+          clave: s.clave,
+          nombre: s.titulo,
+          imagen: s.render?.imagen ?? null,
+          recortado: s.render?.recortado ?? false,
+        }))}
         idCabecera={ID_TITULO}
       />
       <CabeceraKit

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { ANCLA_COTIZAR } from "@/components/ficha/FichaProducto";
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
-import type { AlineacionTexto } from "@/lib/fields/alineacionTexto";
+import type { AlineacionTexto, AnchoTexto } from "@/lib/fields/alineacionTexto";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { FiltroUsados } from "@/lib/portada/kitCliente";
 import type { DatoFicha, TarjetaEquipo } from "@/lib/portada/secciones";
@@ -158,8 +158,10 @@ export type TextosUsadosKit = {
   /** «Frase de la cabecera»: bajo el título, con sus saltos de línea. */
   frase: string;
   fraseAlineacion: AlineacionTexto;
+  fraseAncho: AnchoTexto;
   descripcion: string;
   descripcionAlineacion: AlineacionTexto;
+  descripcionAncho: AnchoTexto;
   botonTexto: string;
 };
 
@@ -220,11 +222,13 @@ export function SeccionUsadosKit({
               <TextoEditable
                 texto={textos.frase}
                 alineacion={textos.fraseAlineacion}
+                ancho={textos.fraseAncho}
                 className={estilos.frase}
               />
               <TextoEditable
                 texto={textos.descripcion}
                 alineacion={textos.descripcionAlineacion}
+                ancho={textos.descripcionAncho}
                 className={estilos.descripcion}
               />
               {textos.botonTexto ? (

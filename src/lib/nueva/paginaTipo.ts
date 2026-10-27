@@ -7,6 +7,7 @@ import { rutas } from "../routes";
 import { tituloPorDefecto } from "../seo/porDefecto";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
+import { franjaDesde, type SeccionKit } from "./paginaKit";
 import { datosDeTarjeta, type TarjetaEquipo } from "./paginaMarcaAndres";
 import type { GrupoDeSubtipo } from "./subtipos";
 
@@ -123,4 +124,51 @@ export function vistaEncabezadoTipoNueva(
  */
 export function tituloFranja(marca: MarcasMaquinaria, tipo: TiposMaquinaria): string {
   return `Modelos de ${tituloPorDefecto.tipoMaquinaria(tipo.nombre, marca.nombre)}`;
+}
+
+/**
+ * La página de MARCA + TIPO con el «Kit de marca» del padre (ronda 8, 2026-10-26): las secciones
+ * del kit, como en la página de la marca pero con TODOS los modelos (sin el tope de 6) en el orden
+ * del campo «Orden». Un tipo normal da UNA sección; un «paraguas» (#238), una por subtipo con
+ * equipos. «Ver toda la categoría» lleva a la página general del tipo (la categoría de nueva que
+ * lo incluye); sin ella, `href` vacío y el enlace no se pinta (enlazaría a la propia página).
+ */
+export function seccionesKitDeTipo({
+  marca,
+  bloques,
+  renders,
+  hrefCategoria,
+}: {
+  marca: Pick<MarcasMaquinaria, "slug">;
+  bloques: GrupoDeSubtipo[];
+  renders: Map<number, { imagen: ImagenLista; recortado: boolean }>;
+  hrefCategoria: string | null;
+}): SeccionKit[] {
+  return bloques
+    .map(({ tipo, equipos }) => ({ tipo, tarjetas: tarjetasDeEquipos(marca, tipo.slug, equipos) }))
+    .filter((b) => b.tarjetas.length > 0)
+    .map(({ tipo, tarjetas }, n) => {
+      const titulo = texto(tipo.nombre);
+      return {
+        clave: `tipo-${tipo.id}`,
+        titulo,
+        href: hrefCategoria ?? "",
+        total: tarjetas.length,
+        tarjetas,
+        todas: [],
+        hayMas: false,
+        numero: String(n + 1).padStart(2, "0"),
+        render: renders.get(tipo.id) ?? null,
+        franjaDesde: franjaDesde(titulo, tarjetas.length),
+      };
+    });
+}
+
+/** La página general del tipo: la primera categoría de nueva que lo incluye. */
+export function categoriaDeTipo(
+  tipoId: number,
+  categorias: { slug: string; tipos: number[] }[],
+): string | null {
+  const categoria = categorias.find((c) => c.tipos.includes(tipoId));
+  return categoria ? `${rutas.categoriaNueva(categoria.slug)}/` : null;
 }

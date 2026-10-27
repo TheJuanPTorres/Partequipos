@@ -7,10 +7,12 @@ import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { TarjetaEquipo } from "@/components/nueva/TarjetaEquipo";
+import { PaginaTipoKit } from "@/components/nueva/kit/PaginaTipoKit";
 import estilosTarjetas from "@/components/nueva/marcaNueva.module.css";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { colorDeMarca, estiloDeMarca, tintaSobre } from "@/lib/marca/colorMarca";
+import { usaDisenoKit } from "@/lib/nueva/paginaAditamentos";
 import { tarjetasDeEquipos, tituloFranja, vistaEncabezadoTipoNueva } from "@/lib/nueva/paginaTipo";
 import type { TarjetaEquipo as DatosTarjeta } from "@/lib/nueva/paginaMarcaAndres";
 import { gruposDeSubtipos, subtiposDe } from "@/lib/nueva/subtipos";
@@ -104,6 +106,19 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
     { nombre: marca.nombre, path: rutas.marcaMaquinaria(marca.slug) },
     { nombre: tipo.nombre, path: rutas.tipoMaquinaria(marca.slug, tipo.slug) },
   ];
+
+  // «Kit de marca» (ronda 8, 2026-10-26): la página del tipo toma el diseño de su marca padre
+  // cuando la marca lo tiene elegido en el panel; si no, la plantilla de siempre.
+  if (usaDisenoKit(marca)) {
+    return (
+      <PaginaTipoKit
+        marca={marca}
+        tipo={tipo}
+        bloques={grupos ?? [{ tipo, equipos }]}
+        breadcrumbs={breadcrumbs}
+      />
+    );
+  }
 
   const [global, empresa] = await Promise.all([getRepuestosMarca(), getEmpresa()]);
   const nombre = marca.nombre.trim();

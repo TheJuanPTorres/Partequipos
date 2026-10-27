@@ -56,16 +56,19 @@ export function SeccionTipoKit({
             ) : null}
           </span>
         ) : null}
-        <Link
-          href={seccion.href}
-          className={estilos.verCategoria}
-          data-fila={fila}
-          data-una={n === 1 ? "" : undefined}
-        >
-          Ver toda la categoría
-          <span className="sr-only"> de {seccion.titulo}</span>
-          <IconArrowRight aria-hidden="true" size={14} stroke={2.2} />
-        </Link>
+        {/* Sin destino (la página de marca + tipo sin categoría general), sin enlace. */}
+        {seccion.href ? (
+          <Link
+            href={seccion.href}
+            className={estilos.verCategoria}
+            data-fila={fila}
+            data-una={n === 1 ? "" : undefined}
+          >
+            Ver toda la categoría
+            <span className="sr-only"> de {seccion.titulo}</span>
+            <IconArrowRight aria-hidden="true" size={14} stroke={2.2} />
+          </Link>
+        ) : null}
         <h2 id={idTitulo} className={estilos.tituloTipo}>
           <span aria-hidden="true" className={estilos.numero}>
             {seccion.numero}

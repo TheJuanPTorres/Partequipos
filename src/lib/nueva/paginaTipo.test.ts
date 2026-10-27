@@ -4,7 +4,9 @@ import { describe, it } from "node:test";
 import type { EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
 
 import {
+  categoriaDeTipo,
   enlacesDeEquipos,
+  seccionesKitDeTipo,
   fotoDeCabecera,
   gruposDeEnlaces,
   tarjetasDeEquipos,
@@ -122,5 +124,80 @@ describe("títulos", () => {
     );
     const case_ = { ...marca, nombre: "Case Construction" } as MarcasMaquinaria;
     assert.equal(tituloFranja(case_, tipo()), "Modelos de Excavadoras Case Construction");
+  });
+});
+
+describe("seccionesKitDeTipo", () => {
+  const render = { imagen: { ...media(7), posicion: "50% 50%" }, recortado: true };
+  const muchos = Array.from({ length: 8 }, (_, i) => equipo(i + 1));
+
+  it("un tipo: UNA sección con TODOS sus modelos (sin el tope de 6), en el orden recibido", () => {
+    const r = seccionesKitDeTipo({
+      marca,
+      bloques: [{ tipo: tipo({ nombre: " Retrocargadora " }), equipos: muchos }],
+      renders: new Map([[5, render]]),
+      hrefCategoria: "/maquinaria-pesada/maquinaria-pesada-nueva/retrocargadoras/",
+    });
+    assert.equal(r.length, 1);
+    assert.equal(r[0]!.titulo, "Retrocargadora");
+    assert.equal(r[0]!.numero, "01");
+    assert.equal(r[0]!.tarjetas.length, 8);
+    assert.deepEqual(
+      r[0]!.tarjetas.map((t) => t.id),
+      [1, 2, 3, 4, 5, 6, 7, 8],
+    );
+    assert.equal(r[0]!.hayMas, false);
+    assert.equal(r[0]!.render, render);
+    assert.equal(r[0]!.href, "/maquinaria-pesada/maquinaria-pesada-nueva/retrocargadoras/");
+  });
+
+  it("sin categoría general, sin destino (no enlaza a la propia página)", () => {
+    const r = seccionesKitDeTipo({
+      marca,
+      bloques: [{ tipo: tipo(), equipos: muchos.slice(0, 2) }],
+      renders: new Map(),
+      hrefCategoria: null,
+    });
+    assert.equal(r[0]!.href, "");
+    assert.equal(r[0]!.render, null);
+    assert.equal(r[0]!.franjaDesde, 0); // fila de 2: la franja no cae sobre una tarjeta
+  });
+
+  it("un paraguas: una sección por subtipo con equipos, numeradas; los vacíos no cuentan", () => {
+    const r = seccionesKitDeTipo({
+      marca,
+      bloques: [
+        { tipo: tipo({ id: 6, nombre: "Rodillos", slug: "rodillos" }), equipos: [equipo(1)] },
+        {
+          tipo: tipo({ id: 7, nombre: "Vacío", slug: "vacio" }),
+          equipos: [equipo(2, { slug: "" })],
+        },
+        { tipo: tipo({ id: 8, nombre: "Placas", slug: "placas" }), equipos: [equipo(3)] },
+      ],
+      renders: new Map(),
+      hrefCategoria: null,
+    });
+    assert.deepEqual(
+      r.map((s) => [s.clave, s.numero]),
+      [
+        ["tipo-6", "01"],
+        ["tipo-8", "02"],
+      ],
+    );
+    assert.match(r[1]!.tarjetas[0]!.href, /\/hitachi\/placas\/equipo-3\/$/);
+  });
+});
+
+describe("categoriaDeTipo", () => {
+  it("la primera categoría de nueva que incluye el tipo; ninguna, null", () => {
+    const categorias = [
+      { slug: "excavadoras", tipos: [1, 2] },
+      { slug: "retrocargadoras", tipos: [5] },
+    ];
+    assert.equal(
+      categoriaDeTipo(5, categorias),
+      "/maquinaria-pesada/maquinaria-pesada-nueva/retrocargadoras/",
+    );
+    assert.equal(categoriaDeTipo(9, categorias), null);
   });
 });

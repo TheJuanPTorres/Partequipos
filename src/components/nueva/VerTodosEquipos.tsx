@@ -23,7 +23,6 @@ import {
   type ReactNode,
 } from "react";
 
-import { conFormaDeMarca } from "@/components/marca/FormaMarca";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import { tituloDeVentana } from "@/lib/formularios/tituloVentana";
 import { coincideModelo, enOrdenNatural, normalizarBusqueda } from "@/lib/repuestos/buscarModelo";
@@ -335,7 +334,7 @@ export function VerTodosEquipos({
                           </span>
                         ) : null}
                         <span className={panel.nombreItem}>
-                          {conFormaDeMarca(e.nombre)}
+                          {e.nombre}
                           {actual ? <span className="sr-only"> (página actual)</span> : null}
                         </span>
                       </>

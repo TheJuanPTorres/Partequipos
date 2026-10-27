@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { IconoDato } from "@/components/ficha/IconoDato";
-import { conFormaDeMarca } from "@/components/marca/FormaMarca";
 import { columnaDeTarjeta, enFilaDe, type SeccionKit } from "@/lib/nueva/paginaKit";
 import type { TarjetaEquipo } from "@/lib/nueva/paginaMarcaAndres";
 
@@ -130,7 +129,7 @@ function TarjetaKit({
       </Link>
 
       <h3 id={idTitulo} className={estilos.modeloNombre}>
-        {conFormaDeMarca(equipo.nombre)}
+        {equipo.nombre}
       </h3>
 
       <ul className={estilos.datos}>

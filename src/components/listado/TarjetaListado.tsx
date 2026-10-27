@@ -2,7 +2,6 @@ import { IconArrowRight, IconEye, IconFileDescription, type Icon } from "@tabler
 import Image from "next/image";
 import Link from "next/link";
 
-import { conFormaDeMarca } from "@/components/marca/FormaMarca";
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { LogoMarca as LogoMarcaDatos } from "@/lib/marca/logoMarca";
 import type { FotoDeTarjeta } from "@/lib/queries/getMaquinaria";
@@ -105,9 +104,7 @@ export function TarjetaListado({
         ) : null}
       </div>
       <div className={estilos.datos}>
-        <h3 className={estilos.nombre}>
-          {href ? <Link href={href}>{conFormaDeMarca(titulo)}</Link> : conFormaDeMarca(titulo)}
-        </h3>
+        <h3 className={estilos.nombre}>{href ? <Link href={href}>{titulo}</Link> : titulo}</h3>
         {codigo ? <p className={estilos.modelo}>{codigo}</p> : null}
         {resumen ? <p className={estilos.descripcionCorta}>{resumen}</p> : null}
         <hr className={estilos.linea} />

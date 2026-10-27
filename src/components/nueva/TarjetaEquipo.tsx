@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import { IconoDato } from "@/components/ficha/IconoDato";
 import { EnlaceContacto } from "@/components/forms/EnlaceContacto";
-import { conFormaDeMarca } from "@/components/marca/FormaMarca";
 import type { TarjetaEquipo as Datos } from "@/lib/nueva/paginaMarcaAndres";
 
 import estilos from "./marcaNueva.module.css";
@@ -40,7 +39,7 @@ export function TarjetaEquipo({
         ) : null}
       </div>
       <h3 id={idTitulo} className={estilos.nombre}>
-        {conFormaDeMarca(equipo.nombre)}
+        {equipo.nombre}
       </h3>
       {equipo.datos.length > 0 ? (
         <ul className={estilos.datos}>

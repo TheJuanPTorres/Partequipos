@@ -289,6 +289,38 @@ export function HeroPortada({ diapositivas }: Props) {
     });
   }
 
+  /*
+   * LA MÁQUINA ESPERA A LAS FUENTES DEL TÍTULO (2026-10-27): con una fuente de
+   * respaldo de otro ancho (Inter mientras llega la propia del panel, o el
+   * respaldo ajustado mientras llega Inter) una línea del panel puede ocupar
+   * otro número de filas, y al llegar la fuente el título cambia de alto y la
+   * caja de la máquina, que ocupa lo que queda debajo, se mueve (CLS 0,022 a
+   * 390 y 0,048 a 1010 y 1440 con zoom 125 %). El número de filas final no se
+   * sabe antes de que llegue la fuente, así que no se reserva: la máquina no se
+   * pinta hasta entonces (`data-fuente-cargando`), y lo que no se ha pintado no
+   * cuenta como salto. Con un fallo o si tarda más de 5 s, se pinta igual.
+   */
+  const [fuenteLista, setFuenteLista] = useState(false);
+  useEffect(() => {
+    let vivo = true;
+    const soltar = () => {
+      if (vivo) setFuenteLista(true);
+    };
+    const espera = window.setTimeout(soltar, 5000);
+    const h2 = document.getElementById(idTitulo);
+    if (h2) {
+      // `load` con la lista de familias del título carga las de todas (la propia e Inter).
+      const cs = getComputedStyle(h2);
+      document.fonts
+        .load(`${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, h2.innerText)
+        .then(soltar, soltar);
+    } else soltar();
+    return () => {
+      vivo = false;
+      window.clearTimeout(espera);
+    };
+  }, [idTitulo]);
+
   const cargar = useCallback((...indices: number[]) => {
     setCargadas((antes) => {
       if (indices.every((i) => antes.has(i))) return antes;
@@ -571,6 +603,7 @@ export function HeroPortada({ diapositivas }: Props) {
           className={estilos.capaTexto}
           data-maquina={d.posicionMaquina}
           data-partido={d.tituloPartido ? "" : undefined}
+          data-fuente-cargando={fuenteLista ? undefined : ""}
         >
           {/*
            * POSICIÓN DEL PANEL (2026-10-17): en las pantallas que la tienen, la

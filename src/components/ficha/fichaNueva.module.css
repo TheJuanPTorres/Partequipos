@@ -506,3 +506,42 @@ section.principal[data-con-izquierda] {
 .sinCorte {
   white-space: nowrap;
 }
+
+/*
+ * CABECERA DEL «KIT DE MARCA» (2026-10-27): solo si la marca lo tiene. Las variables del kit
+ * (`--acento` y `--tinta` las pone la ficha con el color de la marca) y el gris de la página.
+ */
+.cabeceraKit {
+  --gris: var(--color-fondo-seccion);
+}
+
+/* Las migas, sobre la foto oscurecida: en blanco, centradas y a lo ancho del título. */
+.migas.migasKit {
+  width: 100%;
+  max-width: 900px;
+}
+
+.migas.migasKit ol {
+  justify-content: center;
+  border-color: rgb(255 255 255 / 0.7);
+  background: rgb(255 255 255 / 0.1);
+  color: #fff;
+}
+
+.migas.migasKit a:focus-visible {
+  outline-color: #fff;
+}
+
+/* La copia que reserva el alto del título: el mismo tamaño y grosor que el título del kit. */
+.reservaKit {
+  width: 100%;
+}
+
+.reservaKit::after {
+  font-weight: 500;
+}
+
+/* Con la cabecera del kit, la tarjeta (galería, datos, descripción y botones) es el destino del indicador. */
+section.principal[data-con-kit] {
+  scroll-margin-top: 110px;
+}

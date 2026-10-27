@@ -17,6 +17,7 @@ import {
 } from "@/lib/maquinaria/fichaNueva";
 import { DESTACADAS_EN_TARJETA, filasCompletas } from "@/lib/maquinaria/fichaTecnica";
 import { reservaDescripcion } from "@/lib/maquinaria/reservaTexto";
+import { COLOR_SIN_MARCA } from "@/lib/marca/colorMarca";
 import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getDocumentosParaVisor } from "@/lib/queries/getDocumentos";
@@ -32,6 +33,8 @@ import {
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
+import { usaDisenoKit } from "@/lib/nueva/paginaAditamentos";
+import { acentoDeMarca, mediosDeKit } from "@/lib/nueva/paginaKit";
 import { fotoDeCabecera } from "@/lib/nueva/paginaTipo";
 import { productoVisible } from "@/lib/nueva/visibilidad";
 import { rutas } from "@/lib/routes";
@@ -215,8 +218,15 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     pdf: pdfDe(o),
   }));
 
+  // La marca con «Kit de marca»: la cabecera del kit (su color, su logo, su foto y su emblema).
+  const logo = conAlt(logoDeMarca(marca, logos), `Logo de ${marca.nombre}`);
+  const kit = usaDisenoKit(marca)
+    ? { ...acentoDeMarca(marca, COLOR_SIN_MARCA), ...mediosDeKit(marca), logo }
+    : null;
+
   return (
     <FichaNueva
+      kit={kit}
       nombre={equipo.nombre}
       tituloEscritorio={tituloEscritorio(marca.nombre, equipo.codigo)}
       migas={breadcrumbs}
@@ -230,7 +240,7 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
       otras={{
         titulo: tituloOtras(tipo.nombre),
         // El logo de la marca, el único del sitio (`LogoMarca`); sin logo, la franja va sin imagen.
-        logo: conAlt(logoDeMarca(marca, logos), `Logo de ${marca.nombre}`),
+        logo,
         tarjetas,
         color: marca.colorMarca,
         foto: fotoDeCabecera(tipo, [equipo]),

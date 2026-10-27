@@ -104,9 +104,9 @@
   letter-spacing: 0.025em;
 }
 
-/* «Texto bajo el título»: como el texto de la cabecera de usados, con sus saltos de línea. */
+/* «Texto bajo el título»: un párrafo por línea. Llega hasta el borde derecho de su columna, con un tope de ancho de lectura en pantallas muy anchas. */
 .descripcion {
-  max-width: 36rem;
+  max-width: 60rem;
   margin: 16px 0 0;
   color: var(--color-texto-suave);
   font-size: 16px;

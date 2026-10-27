@@ -372,6 +372,18 @@
   object-fit: contain;
 }
 
+/* En tablet sobra ancho: el logo, más legible (los anchos, como Hitachi, se ven enteros). */
+@media (min-width: 768px) {
+  .botonTiposLogo {
+    padding: 0 12px;
+  }
+
+  .botonTiposLogo img {
+    max-width: 64px;
+    height: 20px;
+  }
+}
+
 /* «Excavadoras · 3 de 7»: si no cabe, se corta el tipo, nunca la posición. */
 .botonTiposTexto {
   display: flex;

@@ -838,7 +838,7 @@ export interface CategoriasTecnica {
    */
   fondoHero?: (number | null) | Media;
   /**
-   * Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de marca.
+   * Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo.
    */
   icono?:
     | ('corte' | 'llanta' | 'lubricante' | 'filtro' | 'motor' | 'rodaje' | 'miscelaneos' | 'componentes' | 'diesel')
@@ -860,7 +860,7 @@ export interface CategoriasTecnica {
    */
   ordenPortada?: number | null;
   /**
-   * Orden en «Nuestras categorías de repuestos» de cada página de marca. Vacío: al final, por nombre.
+   * Orden en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo, y en el menú. Vacío: al final, por nombre.
    */
   ordenMarca?: number | null;
   /**

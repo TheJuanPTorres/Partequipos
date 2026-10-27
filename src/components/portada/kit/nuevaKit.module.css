@@ -358,19 +358,23 @@
   box-shadow: 0 2px 6px -2px rgb(0 0 0 / 0.35);
 }
 
+/*
+ * Desde 1024 px, la placa crece con la pantalla de 96 a 112 px (108 px a 1440; Juan Pablo,
+ * 2026-10-27): en los 80 px del prototipo los logos anchos, como el de Hitachi LANDCROS, no se leían.
+ */
 @media (min-width: 1024px) {
   .placa {
-    width: 80px;
+    width: clamp(96px, 7.5vw, 112px);
     min-width: 0;
-    padding: 8px;
-    border-radius: 12px;
+    max-width: none;
+    padding: 9px;
+    border-radius: 13px;
   }
 }
 
 @media (min-width: 1536px) {
   .placa {
-    width: 40%;
-    min-width: 72px;
+    width: clamp(96px, 40%, 112px);
     padding: 10px;
     border-radius: 14px;
   }

@@ -50,7 +50,7 @@ export default function LaboratorioMovimiento() {
 
       <Hueco texto="Ritmo «portada»: escalón 0,3 s · 2 s · 50 % · disparo 85 %" />
       <Revelado
-        texto="Potencia Hitachi"
+        texto="Potencia Hitachi LANDCROS"
         ritmo="portada"
         className="texto-titulo-seccion uppercase text-texto"
         id="revelado-portada"
@@ -67,7 +67,7 @@ export default function LaboratorioMovimiento() {
       <Hueco texto="Ritmo «titulo» en un párrafo (sin aria-label): el vidrio del hero" />
       <Revelado
         como="p"
-        texto="En Partequipos encuentras maquinaria Hitachi, diseñada para ofrecer rendimiento, precisión y confiabilidad en cada operación."
+        texto="En Partequipos encuentras maquinaria Hitachi LANDCROS, diseñada para ofrecer rendimiento, precisión y confiabilidad en cada operación."
         className="texto-cuerpo max-w-md text-texto"
         id="revelado-parrafo"
       />

@@ -275,7 +275,8 @@ ${tituloEscritorio.modelo}`}
           data-sin-fotos={fotos.length === 0 ? "" : undefined}
           data-con-izquierda={hayIzquierda ? "" : undefined}
           data-con-kit={kit ? "" : undefined}
-          aria-labelledby="ficha-titulo"
+          // Con el kit, el <h1> ya da nombre a su cabecera: la tarjeta no repite la región.
+          aria-labelledby={kit ? undefined : "ficha-titulo"}
         >
           <div className={nueva.columnaTexto}>
             {kit ? null : (

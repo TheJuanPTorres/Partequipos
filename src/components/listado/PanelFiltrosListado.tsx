@@ -40,7 +40,10 @@ export function PanelFiltrosListado({
   ordenPorDefecto,
   elemento,
   logoDeMarca,
+  enVivo = false,
 }: {
+  /** Los filtros se aplican al cambiar, sin botón (listados con `ZonaCatalogo`). */
+  enVivo?: boolean;
   accion: string;
   facetas: FacetaPintada[];
   orden: string;
@@ -167,9 +170,18 @@ export function PanelFiltrosListado({
         })}
 
         {orden !== ordenPorDefecto ? <input type="hidden" name="orden" value={orden} /> : null}
-        <button type="submit" className={estilos.aplicar}>
-          Aplicar filtros
-        </button>
+        {enVivo ? (
+          // Con JavaScript cada cambio se aplica al momento (`ZonaCatalogo`); sin él, el botón de siempre.
+          <noscript>
+            <button type="submit" className={estilos.aplicar}>
+              Aplicar filtros
+            </button>
+          </noscript>
+        ) : (
+          <button type="submit" className={estilos.aplicar}>
+            Aplicar filtros
+          </button>
+        )}
       </form>
     </details>
   );

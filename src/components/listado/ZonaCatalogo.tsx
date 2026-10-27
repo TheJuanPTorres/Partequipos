@@ -29,6 +29,12 @@ let focoPendiente: { titulo: boolean; origen: Element | null } | null = null;
 let ultimaClave: string | null = null;
 let etiquetasAnteriores = new Set<string>();
 
+/** La URL a la que va el último cambio de filtros pedido y que aún no ha llegado. */
+let destinoPendiente: string | null = null;
+
+/** Pausa antes de aplicar un rango o un texto, para no pedir un catálogo por cada tecla. */
+const PAUSA_FILTROS_MS = 350;
+
 /** Espacio que deja la cabecera fija al subir hasta el listado. */
 const MARGEN_CABECERA = 110;
 
@@ -110,9 +116,14 @@ export function ZonaCatalogo({
   const conA7 = animaciones.includes("A7");
 
   useEffect(() => {
-    // Las casillas pueden haberse tocado: vuelven a lo que dice la URL (sus
-    // `defaultChecked` ya son los de la URL nueva).
-    zona.current?.querySelectorAll<HTMLFormElement>("form[method=get]").forEach((f) => f.reset());
+    // Atrás y adelante: las casillas vuelven a lo que dice la URL (sus `defaultChecked` ya son
+    // los de la URL nueva). Si el visitante ya pidió otro cambio que está en camino, no se
+    // tocan: el siguiente catálogo traerá su estado.
+    const llego = location.pathname + location.search;
+    if (destinoPendiente === null || destinoPendiente === llego) {
+      destinoPendiente = null;
+      zona.current?.querySelectorAll<HTMLFormElement>("form[method=get]").forEach((f) => f.reset());
+    }
     const pendiente = focoPendiente;
     focoPendiente = null;
     if (!pendiente) return;
@@ -162,13 +173,28 @@ export function ZonaCatalogo({
     };
   }, [conA2, cargando]);
 
+  const pausa = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => void (pausa.current && clearTimeout(pausa.current)), []);
+
   const navegar = (destino: URL, titulo: boolean, origen: Element | null) => {
     // Para probar las animaciones en un preview: `?anim=` sigue al navegar
     // (en el sitio publicado no tiene efecto).
     const anim = new URL(location.href).searchParams.get(PARAMETRO_ANIMACIONES);
     if (anim !== null) destino.searchParams.set(PARAMETRO_ANIMACIONES, anim);
     focoPendiente = { titulo, origen };
+    destinoPendiente = destino.pathname + destino.search;
     iniciar(() => router.push(destino.pathname + destino.search, { scroll: false }));
+  };
+
+  /** Lo que tiene el formulario de filtros ahora mismo, a la URL canónica que ya envía el formulario. */
+  const enviarFiltros = (form: HTMLFormElement, origen: Element | null, titulo = false) => {
+    const datos = new URLSearchParams();
+    new FormData(form).forEach((v, k) => {
+      if (typeof v === "string") datos.append(k, v);
+    });
+    const destino = new URL(form.action, location.href);
+    destino.search = datos.toString();
+    navegar(destino, titulo, origen);
   };
 
   return (
@@ -201,14 +227,22 @@ export function ZonaCatalogo({
         // Solo el de filtros: un formulario de solicitud (acción de servidor) sigue su camino.
         if (!esEnvioDelCatalogo(form)) return;
         e.preventDefault();
-        const datos = new URLSearchParams();
-        new FormData(form).forEach((v, k) => {
-          if (typeof v === "string") datos.append(k, v);
-        });
-        const destino = new URL(form.action, location.href);
-        destino.search = datos.toString();
+        if (pausa.current) clearTimeout(pausa.current);
         const boton = (e.nativeEvent as SubmitEvent).submitter;
-        navegar(destino, false, boton ?? form);
+        enviarFiltros(form, boton ?? form);
+      }}
+      onChangeCapture={(e) => {
+        // Filtros EN VIVO (2026-10-27): cada cambio del formulario de filtros se aplica al momento;
+        // casillas y desplegables, enseguida; rangos y textos, tras una pausa corta.
+        const campo = e.target as HTMLInputElement | HTMLSelectElement;
+        const form = campo.form;
+        if (!form || !esEnvioDelCatalogo(form)) return;
+        if (pausa.current) clearTimeout(pausa.current);
+        const tipo = (campo as HTMLInputElement).type;
+        const inmediato =
+          campo instanceof HTMLSelectElement || tipo === "checkbox" || tipo === "radio";
+        if (inmediato) enviarFiltros(form, campo);
+        else pausa.current = setTimeout(() => enviarFiltros(form, campo), PAUSA_FILTROS_MS);
       }}
     >
       {children}

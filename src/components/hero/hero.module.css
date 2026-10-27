@@ -356,6 +356,17 @@
   justify-content: var(--titulo-alinear, center);
 }
 
+/*
+ * MIENTRAS LLEGA LA FUENTE PROPIA DEL TÍTULO (`data-fuente-cargando`): cada
+ * línea ocupa una fila aunque la de respaldo la parta, así el título no cambia
+ * de alto al llegar la fuente y la máquina de debajo no salta (CLS). Lo que
+ * pase de la fila se ve por encima un momento.
+ */
+.capaTexto[data-fuente-cargando] .tituloLinea,
+.capaTexto[data-fuente-cargando] .tituloArriba {
+  height: 1lh;
+}
+
 /* La parte de arriba del título partido: solo en escritorio (ver abajo). */
 .titulo .tituloArriba {
   display: none;

@@ -289,6 +289,33 @@ export function HeroPortada({ diapositivas }: Props) {
     });
   }
 
+  /*
+   * RESERVA DEL TÍTULO MIENTRAS LLEGA SU FUENTE (2026-10-27): con la fuente de
+   * respaldo (Inter, más ancha) una línea del panel puede partirse en dos, y al
+   * llegar la fuente propia vuelve a una: el título encogía y la máquina, que
+   * ocupa lo que queda debajo, saltaba (CLS 0,022 a 390 y 0,048 a 1440 con
+   * zoom 125 %, medido en el sitio publicado). Mientras no llega, cada línea
+   * ocupa UNA fila (`data-fuente-cargando`) y la máquina queda en su sitio; al
+   * llegar se suelta, así lo pintado al final es lo de siempre (también si la
+   * línea se parte de verdad con la fuente propia). Con un fallo o si tarda más
+   * de 5 s, se suelta igual.
+   */
+  const [fuenteLista, setFuenteLista] = useState(!primeraFuente);
+  const familiaPrimera = primeraFuente?.familia;
+  useEffect(() => {
+    if (!familiaPrimera) return;
+    let vivo = true;
+    const soltar = () => {
+      if (vivo) setFuenteLista(true);
+    };
+    const espera = window.setTimeout(soltar, 5000);
+    document.fonts.load(`1em "${familiaPrimera}"`).then(soltar, soltar);
+    return () => {
+      vivo = false;
+      window.clearTimeout(espera);
+    };
+  }, [familiaPrimera]);
+
   const cargar = useCallback((...indices: number[]) => {
     setCargadas((antes) => {
       if (indices.every((i) => antes.has(i))) return antes;
@@ -571,6 +598,7 @@ export function HeroPortada({ diapositivas }: Props) {
           className={estilos.capaTexto}
           data-maquina={d.posicionMaquina}
           data-partido={d.tituloPartido ? "" : undefined}
+          data-fuente-cargando={fuenteLista ? undefined : ""}
         >
           {/*
            * POSICIÓN DEL PANEL (2026-10-17): en las pantallas que la tienen, la

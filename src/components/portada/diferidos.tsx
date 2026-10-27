@@ -14,9 +14,6 @@ import dynamic from "next/dynamic";
  * Tiene que ser un fichero de CLIENTE: desde un componente de servidor,
  * `next/dynamic` no parte el JS (lo dice la guía de lazy loading de Next 16).
  */
-export const CarruselMarcas = dynamic(() =>
-  import("./CarruselMarcas").then((m) => m.CarruselMarcas),
-);
 export const SeccionCompania = dynamic(() =>
   import("./SeccionCompania").then((m) => m.SeccionCompania),
 );

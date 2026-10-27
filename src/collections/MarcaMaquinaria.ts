@@ -90,7 +90,10 @@ export const MarcaMaquinaria: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       label: "Foto de la tarjeta en la portada",
-      admin: { description: "Fondo de la tarjeta de esta marca en el inicio." },
+      admin: {
+        description:
+          "Fondo de la tarjeta de esta marca en el inicio si no tiene «Foto de fondo de la cabecera» del «Kit de marca» (esa manda).",
+      },
     },
     {
       name: "ordenPortada",
@@ -100,7 +103,7 @@ export const MarcaMaquinaria: CollectionConfig = {
       admin: {
         position: "sidebar",
         description:
-          "Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» (en ux-9: Hitachi, CASE y Yanmar). Necesita la foto de la tarjeta.",
+          "1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» de la portada. Todas las marcas visibles salen; las que no tienen número, al final por nombre.",
       },
     },
     // Plantilla de Andrés de la marca de aditamentos (2026-10-20): `src/lib/nueva/paginaAditamentos.ts`.

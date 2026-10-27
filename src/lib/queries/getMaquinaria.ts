@@ -774,17 +774,20 @@ export const getCategoriaNuevaConEquipos = cache(async (slug: string) => {
 });
 
 // --- Portada (fase D: secciones 2 y 3 de ux-9) --------------------------------
-/** Marcas con foto de tarjeta, para el carrusel de la sección 2. */
+/**
+ * Las marcas de nueva VISIBLES para «Maquinaria pesada nueva» de la portada (diseño del cliente,
+ * 2026-10-27): todas menos la de aditamentos (no es una marca de máquinas), por «Posición en la
+ * portada» y, sin ella, al final por nombre. `depth: 1` trae la foto de la cabecera del kit, la
+ * de la tarjeta y el logo.
+ */
 export const getMarcasDePortada = cache(async (): Promise<MarcasMaquinaria[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "marcas-maquinaria",
-    where: {
-      and: [{ imagenTarjeta: { exists: true } }, { ordenPortada: { exists: true } }, MARCA_VISIBLE],
-    },
+    where: { and: [{ disenoPagina: { not_equals: "aditamentos" } }, MARCA_VISIBLE] },
     depth: 1,
     limit: 0,
-    sort: "ordenPortada",
+    sort: ["ordenPortada", "nombre"],
   });
   return docs;
 });

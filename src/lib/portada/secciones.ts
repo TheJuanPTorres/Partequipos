@@ -15,48 +15,51 @@ export const RUTA_USADA = "/maquinaria-pesada/maquinaria-pesada-usada/";
 /** La categoría que lleva pestaña propia y el botón «Ver todas las excavadoras». */
 export const SLUG_EXCAVADORAS = "excavadoras";
 
-// --- Sección 2: tarjetas de marca -------------------------------------------
+// --- «Maquinaria pesada nueva»: una tarjeta por marca (diseño del cliente, 2026-10-27) -------
 
 export type TarjetaMarca = {
   id: number;
   nombre: string;
   href: string;
+  /** La presentación de la marca (su «Descripción» del panel). */
   texto: string | null;
-  /** Decorativa: `alt` vacío. El nombre lo da el logo. */
-  fondo: ImagenLista;
+  /** Decorativa: `alt` vacío. Sin foto, la tarjeta queda oscura lisa. */
+  fondo: ImagenLista | null;
   /** `alt` = nombre de la marca: es lo único que la nombra en la tarjeta. El de todo el sitio. */
   logo: LogoConAlt | null;
 };
 
 /**
- * Solo las marcas con POSICIÓN EN LA PORTADA y FOTO DE TARJETA (sin foto, el
- * texto blanco caería sobre la página), en el orden de esa posición. En ux-9:
- * Hitachi, CASE y Yanmar.
+ * Una tarjeta por marca VISIBLE de nueva (la consulta ya quita las ocultas y la de aditamentos),
+ * en el orden del panel: «Posición en la portada» y, sin ella, al final por nombre. La foto es la
+ * de la cabecera del «Kit de marca» y, si no hay, la «Foto de la tarjeta en la portada»; el logo,
+ * el de todo el sitio (el de repuestos si es la misma marca). Sin nombre o sin dirección no hay
+ * tarjeta (no habría a dónde llevar).
  */
 export function tarjetasDeMarcas(
   marcas: MarcasMaquinaria[],
   logos: IndiceLogos = new Map(),
 ): TarjetaMarca[] {
-  const conPosicion = marcas
-    .filter((m) => typeof m.ordenPortada === "number")
-    .sort((a, b) => (a.ordenPortada ?? 0) - (b.ordenPortada ?? 0));
-  return conPosicion.flatMap((m) => {
-    const fondo = imagenDeMedia(m.imagenTarjeta, "");
-    const nombre = m.nombre?.trim();
-    if (!fondo || !nombre || !m.slug) return [];
-    // El logo de la marca, el de todo el sitio: el de repuestos si es la misma marca.
-    const logo = conAlt(logoDeMarca(m, logos), nombre);
-    return [
-      {
-        id: m.id,
-        nombre,
-        href: `${RUTA_MARCAS_NUEVA}${m.slug}/`,
-        texto: m.descripcion?.trim() || null,
-        fondo: { ...fondo, alt: "" },
-        logo,
-      },
-    ];
-  });
+  const posicion = (m: MarcasMaquinaria) =>
+    typeof m.ordenPortada === "number" ? m.ordenPortada : Number.POSITIVE_INFINITY;
+  return [...marcas]
+    .sort((a, b) => posicion(a) - posicion(b) || a.nombre.localeCompare(b.nombre, "es"))
+    .flatMap((m) => {
+      const nombre = m.nombre?.trim();
+      if (!nombre || !m.slug) return [];
+      const fondo =
+        imagenDeMedia(m.kit?.fotoCabecera, "") ?? imagenDeMedia(m.imagenTarjeta, "") ?? null;
+      return [
+        {
+          id: m.id,
+          nombre,
+          href: `${RUTA_MARCAS_NUEVA}${m.slug}/`,
+          texto: m.descripcion?.trim() || null,
+          fondo: fondo ? { ...fondo, alt: "" } : null,
+          logo: conAlt(logoDeMarca(m, logos), nombre),
+        },
+      ];
+    });
 }
 
 // --- Sección de usados: la tarjeta de una unidad (kit del cliente, `kitCliente.ts`) ----

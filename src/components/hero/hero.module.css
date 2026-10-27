@@ -356,17 +356,6 @@
   justify-content: var(--titulo-alinear, center);
 }
 
-/*
- * MIENTRAS LLEGAN LAS FUENTES DEL TÍTULO (`data-fuente-cargando`): cada línea
- * ocupa una fila aunque la de respaldo la parta, así el título no cambia de
- * alto al llegar la fuente y la máquina de debajo no salta (CLS). Lo que pase
- * de la fila se ve por encima un momento.
- */
-.capaTexto[data-fuente-cargando] .tituloLinea,
-.capaTexto[data-fuente-cargando] .tituloArriba {
-  height: 1lh;
-}
-
 /* La parte de arriba del título partido: solo en escritorio (ver abajo). */
 .titulo .tituloArriba {
   display: none;
@@ -501,6 +490,16 @@
 .frontal {
   object-fit: contain;
   object-position: center top;
+}
+
+/*
+ * MIENTRAS LLEGAN LAS FUENTES DEL TÍTULO (`data-fuente-cargando`): la caja de la
+ * máquina está en su sitio, pero la máquina no se pinta. Con la fuente de
+ * respaldo el título puede ocupar otro número de filas y, al llegar la buena,
+ * la caja se mueve: algo que aún no se ha pintado no cuenta como salto (CLS).
+ */
+.capaTexto[data-fuente-cargando] .capaMaquina {
+  visibility: hidden;
 }
 
 /* ----------------------------------------------------------- texto circular */

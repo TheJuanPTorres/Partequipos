@@ -290,16 +290,15 @@ export function HeroPortada({ diapositivas }: Props) {
   }
 
   /*
-   * RESERVA DEL TÍTULO MIENTRAS LLEGAN SUS FUENTES (2026-10-27): con una fuente
-   * de respaldo más ancha (Inter mientras llega la propia del panel, o el
-   * respaldo ajustado mientras llega Inter) una línea del panel puede partirse
-   * en dos, y al llegar la fuente vuelve a una: el título encogía y la máquina,
-   * que ocupa lo que queda debajo, saltaba (CLS 0,022 a 390 y 0,048 a 1010 y
-   * 1440 con zoom 125 %). Mientras no han llegado TODAS las del título, cada
-   * línea ocupa UNA fila (`data-fuente-cargando`) y la máquina queda en su
-   * sitio; después se suelta, así lo pintado al final es lo de siempre (también
-   * si la línea se parte de verdad con la fuente final). Con un fallo o si
-   * tarda más de 5 s, se suelta igual.
+   * LA MÁQUINA ESPERA A LAS FUENTES DEL TÍTULO (2026-10-27): con una fuente de
+   * respaldo de otro ancho (Inter mientras llega la propia del panel, o el
+   * respaldo ajustado mientras llega Inter) una línea del panel puede ocupar
+   * otro número de filas, y al llegar la fuente el título cambia de alto y la
+   * caja de la máquina, que ocupa lo que queda debajo, se mueve (CLS 0,022 a
+   * 390 y 0,048 a 1010 y 1440 con zoom 125 %). El número de filas final no se
+   * sabe antes de que llegue la fuente, así que no se reserva: la máquina no se
+   * pinta hasta entonces (`data-fuente-cargando`), y lo que no se ha pintado no
+   * cuenta como salto. Con un fallo o si tarda más de 5 s, se pinta igual.
    */
   const [fuenteLista, setFuenteLista] = useState(false);
   useEffect(() => {

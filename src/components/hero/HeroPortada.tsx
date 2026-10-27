@@ -290,31 +290,37 @@ export function HeroPortada({ diapositivas }: Props) {
   }
 
   /*
-   * RESERVA DEL TÍTULO MIENTRAS LLEGA SU FUENTE (2026-10-27): con la fuente de
-   * respaldo (Inter, más ancha) una línea del panel puede partirse en dos, y al
-   * llegar la fuente propia vuelve a una: el título encogía y la máquina, que
-   * ocupa lo que queda debajo, saltaba (CLS 0,022 a 390 y 0,048 a 1440 con
-   * zoom 125 %, medido en el sitio publicado). Mientras no llega, cada línea
-   * ocupa UNA fila (`data-fuente-cargando`) y la máquina queda en su sitio; al
-   * llegar se suelta, así lo pintado al final es lo de siempre (también si la
-   * línea se parte de verdad con la fuente propia). Con un fallo o si tarda más
-   * de 5 s, se suelta igual.
+   * RESERVA DEL TÍTULO MIENTRAS LLEGAN SUS FUENTES (2026-10-27): con una fuente
+   * de respaldo más ancha (Inter mientras llega la propia del panel, o el
+   * respaldo ajustado mientras llega Inter) una línea del panel puede partirse
+   * en dos, y al llegar la fuente vuelve a una: el título encogía y la máquina,
+   * que ocupa lo que queda debajo, saltaba (CLS 0,022 a 390 y 0,048 a 1010 y
+   * 1440 con zoom 125 %). Mientras no han llegado TODAS las del título, cada
+   * línea ocupa UNA fila (`data-fuente-cargando`) y la máquina queda en su
+   * sitio; después se suelta, así lo pintado al final es lo de siempre (también
+   * si la línea se parte de verdad con la fuente final). Con un fallo o si
+   * tarda más de 5 s, se suelta igual.
    */
-  const [fuenteLista, setFuenteLista] = useState(!primeraFuente);
-  const familiaPrimera = primeraFuente?.familia;
+  const [fuenteLista, setFuenteLista] = useState(false);
   useEffect(() => {
-    if (!familiaPrimera) return;
     let vivo = true;
     const soltar = () => {
       if (vivo) setFuenteLista(true);
     };
     const espera = window.setTimeout(soltar, 5000);
-    document.fonts.load(`1em "${familiaPrimera}"`).then(soltar, soltar);
+    const h2 = document.getElementById(idTitulo);
+    if (h2) {
+      // `load` con la lista de familias del título carga las de todas (la propia e Inter).
+      const cs = getComputedStyle(h2);
+      document.fonts
+        .load(`${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, h2.innerText)
+        .then(soltar, soltar);
+    } else soltar();
     return () => {
       vivo = false;
       window.clearTimeout(espera);
     };
-  }, [familiaPrimera]);
+  }, [idTitulo]);
 
   const cargar = useCallback((...indices: number[]) => {
     setCargadas((antes) => {

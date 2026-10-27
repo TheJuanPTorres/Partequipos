@@ -8,6 +8,7 @@ import { BotonVista360 } from "@/components/ficha/BotonVista360";
 import { GaleriaFicha, type FotoFicha } from "@/components/ficha/GaleriaFicha";
 import { IconoDato } from "@/components/ficha/IconoDato";
 import { PastillaDato } from "@/components/ficha/PastillaDato";
+import { sinCortarCodigos } from "@/components/ficha/SinCorte";
 import { RecuadroAsesoria } from "@/components/ficha/RecuadroAsesoria";
 import estilos from "@/components/ficha/ficha.module.css";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
@@ -172,12 +173,21 @@ export function FichaNueva({
         <div className={nueva.columnaTexto}>
           <div className={`${estilos.cabeceraDatos} ${nueva.cabecera}`}>
             {/* Migas: la ruta COMPLETA en la píldora, como en la V2. */}
-            <nav aria-label="Ruta de navegación" className={`${estilos.migas} ${nueva.migas}`}>
+            {/*
+              Las migas reservan su alto: una copia oculta de la lista, con las mismas
+              líneas que saldrían en «Inter Fallback» ensanchada, en la misma celda.
+              Sin ella, una miga larga ocupaba una línea más antes de llegar Inter y
+              el título saltaba 18 px a 390 (CLS 0,059).
+            */}
+            <nav
+              aria-label="Ruta de navegación"
+              className={`${estilos.migas} ${nueva.migas} ${nueva.migasReserva}`}
+            >
               <ol>
                 {migas.map((m, i) =>
                   i === migas.length - 1 ? (
                     <li key={m.path}>
-                      <span aria-current="page">{m.nombre}</span>
+                      <span aria-current="page">{sinCortarCodigos(m.nombre, nueva.sinCorte)}</span>
                     </li>
                   ) : (
                     <li key={m.path}>
@@ -186,6 +196,14 @@ export function FichaNueva({
                     </li>
                   ),
                 )}
+              </ol>
+              <ol aria-hidden="true" className={nueva.copiaMigas}>
+                {migas.map((m, i) => (
+                  <li key={m.path}>
+                    {i === migas.length - 1 ? sinCortarCodigos(m.nombre, nueva.sinCorte) : m.nombre}
+                    {i < migas.length - 1 ? " / " : null}
+                  </li>
+                ))}
               </ol>
             </nav>
 
@@ -209,10 +227,12 @@ ${tituloEscritorio.modelo}`}
                   >
                     <span className={nueva.lineasTitulo}>
                       <span className={nueva.lineaMarca}>{tituloEscritorio.marca}</span>{" "}
-                      <span>{tituloEscritorio.modelo}</span>
+                      <span>{sinCortarCodigos(tituloEscritorio.modelo, nueva.sinCorte)}</span>
                     </span>
                   </span>
-                  <span className={nueva.tituloMovil}>{nombre}</span>
+                  <span className={nueva.tituloMovil}>
+                    {sinCortarCodigos(nombre, nueva.sinCorte)}
+                  </span>
                 </>
               ) : (
                 nombre

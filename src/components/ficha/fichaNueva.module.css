@@ -483,3 +483,26 @@ section.principal[data-con-izquierda] {
     padding: 12px;
   }
 }
+
+/* Las migas reservan su alto (ver FichaNueva): la lista y su copia en la misma celda. */
+.migasReserva {
+  display: grid;
+}
+
+.migasReserva > ol {
+  grid-area: 1 / 1;
+  align-self: start;
+}
+
+/* La copia: las mismas líneas que en la fuente de respaldo ensanchada, que ocupa más que Inter. */
+.migasReserva > .copiaMigas {
+  visibility: hidden;
+  pointer-events: none;
+  font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+/* Un código de modelo («ZX130-5B») no se parte por el guion. */
+.sinCorte {
+  white-space: nowrap;
+}

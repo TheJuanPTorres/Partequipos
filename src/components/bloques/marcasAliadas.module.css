@@ -66,8 +66,8 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgb(16 14 13 / 60%) 0%,
-    rgb(16 14 13 / 35%) 35%,
+    rgb(16 14 13 / 74%) 0%,
+    rgb(16 14 13 / 48%) 35%,
     rgb(16 14 13 / 30%) 75%,
     rgb(16 14 13 / 50%) 100%
   );
@@ -184,16 +184,17 @@
   opacity: 0.85;
 }
 
-/* Capa 2: el oscurecido al pie, que sostiene el texto blanco sobre cualquier color (AA). */
+/* Capa 2: el oscurecido al pie, que sostiene el texto blanco sobre cualquier color (AA). Más
+   alto y denso que el del prototipo: medido a 1440 el texto pequeño no llegaba a 4,5:1. */
 .sombra {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgb(12 10 9 / 88%) 0%,
-    rgb(12 10 9 / 70%) 30%,
-    rgb(12 10 9 / 25%) 55%,
-    transparent 75%
+    rgb(12 10 9 / 92%) 0%,
+    rgb(12 10 9 / 80%) 35%,
+    rgb(12 10 9 / 48%) 60%,
+    transparent 85%
   );
 }
 

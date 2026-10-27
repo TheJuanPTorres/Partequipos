@@ -9,3 +9,6 @@ import dynamic from "next/dynamic";
  */
 export const SliderUsados = dynamic(() => import("./SliderUsados").then((m) => m.SliderUsados));
 export const BandaLogos = dynamic(() => import("./BandaLogos").then((m) => m.BandaLogos));
+export const CarruselNuevaKit = dynamic(() =>
+  import("./CarruselNuevaKit").then((m) => m.CarruselNuevaKit),
+);

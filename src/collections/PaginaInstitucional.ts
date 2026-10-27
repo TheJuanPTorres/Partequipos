@@ -458,6 +458,17 @@ export const PaginaInstitucional: CollectionConfig = {
           "Enlace del botón",
           "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/",
         ),
+        // Diseño del cliente (2026-10-27): la máquina y la foto de obra, decorativas y opcionales.
+        imagenKit(
+          "maquina",
+          "Máquina de la sección (PNG o WebP transparente)",
+          "La retroexcavadora de perfil que va junto a las tarjetas (en el kit del cliente, la Case Utility Plus). Decorativa. Vacía, la sección sale sin máquina.",
+        ),
+        imagenKit(
+          "fondo",
+          "Foto de obra del fondo",
+          "Foto horizontal grande (1920 px o más), con el lado izquierdo ya fundido en blanco: título y tarjetas van encima. Decorativa. Vacía, fondo blanco.",
+        ),
       ],
     },
     /*

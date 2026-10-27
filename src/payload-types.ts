@@ -1484,6 +1484,14 @@ export interface Pagina {
      * Una ruta del sitio (/…/) o una dirección https://.
      */
     botonEnlace?: string | null;
+    /**
+     * La retroexcavadora de perfil que va junto a las tarjetas (en el kit del cliente, la Case Utility Plus). Decorativa. Vacía, la sección sale sin máquina.
+     */
+    maquina?: (number | null) | Media;
+    /**
+     * Foto horizontal grande (1920 px o más), con el lado izquierdo ya fundido en blanco: título y tarjetas van encima. Decorativa. Vacía, fondo blanco.
+     */
+    fondo?: (number | null) | Media;
   };
   seccionUsada?: {
     /**
@@ -3084,6 +3092,8 @@ export interface PaginasSelect<T extends boolean = true> {
         titulo?: T;
         botonTexto?: T;
         botonEnlace?: T;
+        maquina?: T;
+        fondo?: T;
       };
   seccionUsada?:
     | T

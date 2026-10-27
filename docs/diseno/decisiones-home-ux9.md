@@ -2880,3 +2880,41 @@ preview, `?anim=P1,P3` o `?anim=no`):
 - **Colores de P2 con contraste del icono blanco ≥ 3:1** (WCAG 1.4.11):
   WhatsApp en su verde oscuro `#128C7E` (el claro `#25D366` daba 2:1) e
   Instagram en `#C13584`.
+
+## 38. «Maquinaria pesada nueva» con el diseño del cliente (2026-10-27, dirección)
+
+El prototipo `MaquinariaNueva` del cliente (`Desktop\partequipos-diseno\portada-nueva\`) está portado a CSS modules en `src/components/portada/kit/SeccionNuevaKit.tsx` y `nuevaKit.module.css`. Sustituye a la sección 2 de ux-9 (§11). Los datos de ejemplo del prototipo no se usan: todo sale del panel.
+
+| Pieza                       | Del panel                                                                                             |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Rótulo, título y «Ver todo» | Página «inicio» → «Maquinaria pesada nueva» (los campos de siempre)                                   |
+| Tarjetas                    | Una por marca de nueva **visible**, salvo la de aditamentos (`getMarcasDePortada`)                    |
+| Orden                       | «Posición en la portada»; sin número, al final y por nombre (antes no salían)                         |
+| Foto de la tarjeta          | La cabecera del «Kit de marca»; si no hay, la «Foto de la tarjeta»; si tampoco, oscura                |
+| Logo                        | En una placa blanca, con la regla común (`LogoMarca`)                                                 |
+| Presentación                | La «Descripción» de la marca                                                                          |
+| Máquina y foto de obra      | Campos nuevos `seccionNueva.maquina` y `seccionNueva.fondo` (migración `20261027_162258`), opcionales |
+
+**Desviaciones del prototipo:**
+
+- El título va en `<h2>`, porque el `<h1>` de la portada es otro.
+- «Ver todo» lleva al enlace del panel.
+- El carrusel lleva el botón de pausa del sitio (D2) y está parado de partida con «reducir movimiento».
+
+**Cortes:**
+
+- Carrusel hasta 1023 px: 78 % de ancho por tarjeta, 2 tarjetas a la vista desde 480 px y 3 desde 768 px.
+- Rejilla de 2 × 2 desde 1024 px y fila de 4 desde 1536 px.
+- Desde 1024 px, la máquina va pegada a la última tarjeta y la foto de obra cubre la sección.
+- Por debajo de 1024 px, la máquina va junto al título.
+
+**Animaciones** (`ANIMACIONES_NUEVA`, con la `ZonaAnimada` del #320):
+
+- **N1:** las tarjetas entran escalonadas y la máquina con un fundido.
+- **N2:** la foto hace zoom lento al pasar el ratón.
+- Solo `opacity` y `transform`; nada con «reducir movimiento».
+
+**Imágenes:**
+
+- `scripts/kit-portada/nueva.ts` (simular, aplicar y retirar, con manifiesto) sube los dos WebP optimizados (`_optimizadas\`, fuera del repositorio) y los elige en la sección.
+- Al sitio publicado irán con un runbook de dirección.

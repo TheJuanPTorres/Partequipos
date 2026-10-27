@@ -11,54 +11,50 @@ const media = (id: number, alt = ""): Media =>
 const marca = (over: Partial<MarcasMaquinaria>): MarcasMaquinaria =>
   ({ id: 1, nombre: "Hitachi", slug: "hitachi", ordenPortada: 1, ...over }) as MarcasMaquinaria;
 
-describe("sección 2: tarjetas de marca", () => {
-  it("en el orden de su posición en la portada; sin posición no salen (Dynapac, LiuGong)", () => {
+describe("«Maquinaria pesada nueva»: tarjetas de marca", () => {
+  it("todas las que llegan, por su posición en la portada; sin posición, al final por nombre", () => {
     const r = tarjetasDeMarcas([
-      marca({ id: 3, nombre: "Yanmar", slug: "yanmar", ordenPortada: 3, imagenTarjeta: media(12) }),
-      marca({ id: 1, imagenTarjeta: media(10) }),
-      marca({
-        id: 2,
-        nombre: "CASE",
-        slug: "case-construction",
-        ordenPortada: 2,
-        imagenTarjeta: media(11),
-      }),
-      marca({
-        id: 4,
-        nombre: "Dynapac",
-        slug: "dynapac",
-        ordenPortada: null,
-        imagenTarjeta: media(13),
-      }),
+      marca({ id: 3, nombre: "Yanmar", slug: "yanmar", ordenPortada: 3 }),
+      marca({ id: 5, nombre: "Volvo", slug: "volvo", ordenPortada: null }),
+      marca({ id: 1, nombre: "Hitachi LANDCROS" }),
+      marca({ id: 4, nombre: "Dynapac", slug: "dynapac", ordenPortada: null }),
+      marca({ id: 2, nombre: "Case Construction", slug: "case-construction", ordenPortada: 2 }),
     ]);
     assert.deepEqual(
       r.map((t) => t.nombre),
-      ["Hitachi", "CASE", "Yanmar"],
+      ["Hitachi LANDCROS", "Case Construction", "Yanmar", "Dynapac", "Volvo"],
     );
   });
 
-  it("solo las marcas con foto de tarjeta; el resto no sale", () => {
+  it("foto: la de la cabecera del kit; si no, la de la tarjeta; si no, ninguna", () => {
     const r = tarjetasDeMarcas([
-      marca({ id: 1, imagenTarjeta: media(10) }),
-      marca({ id: 2, nombre: "Aditamentos", slug: "aditamentos" }),
+      marca({
+        id: 1,
+        imagenTarjeta: media(10),
+        kit: { fotoCabecera: media(20, "algo") } as MarcasMaquinaria["kit"],
+      }),
+      marca({ id: 2, nombre: "Yanmar", slug: "yanmar", ordenPortada: 2, imagenTarjeta: media(11) }),
+      marca({ id: 3, nombre: "Dynapac", slug: "dynapac", ordenPortada: 3 }),
     ]);
     assert.deepEqual(
-      r.map((t) => t.id),
-      [1],
+      r.map((t) => t.fondo?.url ?? null),
+      ["/m/20.jpg", "/m/11.jpg", null],
     );
+    assert.equal(r[0]!.fondo!.alt, "");
   });
 
-  it("fondo decorativo (alt vacío) y logo con el nombre de la marca como alt", () => {
+  it("presentación = la descripción; enlace a la marca; logo con el nombre como alt", () => {
     const [t] = tarjetasDeMarcas([
-      marca({ imagenTarjeta: media(10, "algo"), logo: media(11, "logo viejo") }),
+      marca({ descripcion: "  Excavadoras.  ", logo: media(11, "logo viejo") }),
     ]);
-    assert.equal(t!.fondo.alt, "");
+    assert.equal(t!.texto, "Excavadoras.");
     assert.equal(t!.logo!.alt, "Hitachi");
     assert.equal(t!.href, "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/hitachi/");
   });
 
-  it("sin logo poblado la tarjeta sale igual, sin logo", () => {
-    const [t] = tarjetasDeMarcas([marca({ imagenTarjeta: media(10), logo: 11 })]);
-    assert.equal(t!.logo, null);
+  it("sin logo poblado la tarjeta sale igual, sin logo; sin slug no sale", () => {
+    const r = tarjetasDeMarcas([marca({ logo: 11 }), marca({ id: 2, slug: "" })]);
+    assert.equal(r.length, 1);
+    assert.equal(r[0]!.logo, null);
   });
 });

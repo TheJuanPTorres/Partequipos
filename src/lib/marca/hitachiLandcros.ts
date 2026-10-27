@@ -41,16 +41,6 @@ export function aHitachiLandcros(texto: string): string {
     .replace(REPETIDA, HITACHI_LANDCROS);
 }
 
-/**
- * La marca «en mayúsculas» de las plantillas de repuestos («HITACHI Excavadora EX120-2», «REPUESTOS …
- * HITACHI»): en mayúsculas, salvo Hitachi, que tiene una sola forma en toda la web, «Hitachi LANDCROS»
- * (decisión del cliente).
- */
-export function marcaEnMayusculas(nombre: string): string {
-  const n = nombre.trim();
-  return nombraHitachi(n) ? aHitachiLandcros(n) : n.toLocaleUpperCase("es");
-}
-
 /** ¿Nombra a la EMPRESA («Hitachi Construction Machinery», «Hitachi, Ltd.»)? Se queda y se avisa. */
 export const nombraEmpresaHitachi = (texto: string): boolean =>
   new RegExp(String.raw`hitachi(?:${EMPRESA})`, "iu").test(texto);

@@ -5,7 +5,6 @@ import {
   aHitachiLandcros,
   aHitachiLandcrosProfundo,
   esModeloAntiguoHitachi,
-  marcaEnMayusculas,
   nombraEmpresaHitachi,
   nombraHitachi,
 } from "./hitachiLandcros";
@@ -131,13 +130,5 @@ describe("esModeloAntiguoHitachi", () => {
     assert.equal(esModeloAntiguoHitachi("ZX200"), false);
     assert.equal(esModeloAntiguoHitachi(""), false);
     assert.equal(esModeloAntiguoHitachi(null), false);
-  });
-});
-
-describe("marcaEnMayusculas", () => {
-  it("en mayúsculas, salvo Hitachi, que va con su forma única", () => {
-    assert.equal(marcaEnMayusculas(" Kobelco "), "KOBELCO");
-    assert.equal(marcaEnMayusculas("Hitachi"), "Hitachi LANDCROS");
-    assert.equal(marcaEnMayusculas("Hitachi LANDCROS"), "Hitachi LANDCROS");
   });
 });

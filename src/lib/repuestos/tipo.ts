@@ -1,6 +1,5 @@
 import type { Marca, ModelosRepuesto, RepuestosMarca, TiposEquipo } from "@/payload-types";
 
-import { marcaEnMayusculas } from "../marca/hitachiLandcros";
 import { rutas } from "../routes";
 import { tipoEnTitulo } from "../seo/porDefecto";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
@@ -31,7 +30,7 @@ export function vistaEncabezadoTipo(
   const sufijo = texto(global.subtituloHero);
   return {
     linea1: `Repuestos para ${tipoEnTitulo(tipo.nombre)}`,
-    linea2: [marcaEnMayusculas(nombre), sufijo].filter(Boolean).join(" "),
+    linea2: [nombre.toUpperCase(), sufijo].filter(Boolean).join(" "),
     descripcion: texto(tipo.descripcion),
     fondo: imagenDeMedia(marca.fondoHero, "") ?? imagenDeMedia(tipo.imagen, ""),
     logo: logoConAlt(marca, nombre),

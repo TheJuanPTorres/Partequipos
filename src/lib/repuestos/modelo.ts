@@ -1,7 +1,5 @@
 import type { CategoriasTecnica, Marca, ModelosRepuesto, TiposEquipo } from "@/payload-types";
 
-import { marcaEnMayusculas } from "../marca/hitachiLandcros";
-
 /**
  * Lógica pura de la PÁGINA DE MODELO de repuestos (diseño propio aprobado el
  * 2026-10-19, docs/diseno/decisiones-modelo-repuestos.md): los textos de
@@ -72,7 +70,7 @@ const modeloCorto = (m: Nombres["modelo"]) => texto(m.codigo) || texto(m.nombre)
  * diseño; el tipo, tal como está guardado (regla del sitio). El título SEO no cambia.
  */
 export function tituloModelo4086({ marca, tipo, modelo }: Nombres): string {
-  return [marcaEnMayusculas(texto(marca.nombre)), texto(tipo.nombre), modeloCorto(modelo)]
+  return [texto(marca.nombre).toLocaleUpperCase("es"), texto(tipo.nombre), modeloCorto(modelo)]
     .filter(Boolean)
     .join(" ");
 }

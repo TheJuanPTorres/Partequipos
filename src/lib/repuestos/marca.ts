@@ -2,7 +2,6 @@ import { conAlt, logoPropio, type LogoConAlt, type LogoMarca } from "@/lib/marca
 import type { CategoriasTecnica, Marca, RepuestosMarca, TiposEquipo } from "@/payload-types";
 
 import { colorDeMarca } from "../marca/colorMarca";
-import { marcaEnMayusculas } from "../marca/hitachiLandcros";
 import { rutas } from "../routes";
 import { tipoEnTitulo } from "../seo/porDefecto";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
@@ -50,7 +49,7 @@ export function vistaEncabezado(marca: Marca, global: RepuestosMarca): VistaEnca
   const sufijo = texto(global.subtituloHero);
   return {
     linea1,
-    linea2: [marcaEnMayusculas(nombre), sufijo].filter(Boolean).join(" "),
+    linea2: [nombre.toUpperCase(), sufijo].filter(Boolean).join(" "),
     descripcion: texto(marca.descripcion),
     fondo: imagenDeMedia(marca.fondoHero, ""),
     logo: logoConAlt(marca, nombre),
@@ -143,7 +142,7 @@ export function tarjetasDeTipos(
   modelosDe?: (tipo: TiposEquipo) => ModeloEnlace[],
 ): TarjetaMarca[] {
   const nombre = marca.nombre.trim();
-  const nombreMarca = marcaEnMayusculas(nombre);
+  const nombreMarca = nombre.toUpperCase();
   const acento = colorDeMarca(marca.colorMarca);
   const panel = (
     titulo: string,

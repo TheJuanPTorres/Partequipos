@@ -13,7 +13,7 @@ type Imagen = Pick<ImagenLista, "url" | "alt" | "width" | "height"> & { oscuro?:
 
 /**
  * PÍLDORA DE NAVEGACIÓN del «Kit de marca» (2026-10-25), al estilo de la isla de Apple: aparece
- * arriba al centro cuando la cabecera sale de la pantalla, primero como la píldora del logo y
+ * ABAJO al centro, flotando, cuando la cabecera sale de la pantalla (y se aparta al llegar al pie), primero como la píldora del logo y
  * enseguida se extiende con los tipos de la marca. El tipo que está a media pantalla se marca con
  * el color de la marca, y ese resaltado se DESLIZA de uno a otro (`::before` animado con
  * `transform`, como la barra de series, sin librerías). Es un atajo: las secciones siguen ahí
@@ -31,10 +31,11 @@ export function PildoraKit({
   /** `id` del `<h1>` de la cabecera. */
   idCabecera: string;
 }) {
-  const [visible, setVisible] = useState(false);
+  const [fueraDeCabecera, setFueraDeCabecera] = useState(false);
+  const [sobrePie, setSobrePie] = useState(false);
+  const visible = fueraDeCabecera && !sobrePie;
   const [activa, setActiva] = useState<string | null>(tipos[0]?.clave ?? null);
   const lista = useRef<HTMLUListElement>(null);
-  const barra = useRef<HTMLElement>(null);
   const anterior = useRef<{ izquierda: number; ancho: number } | null>(null);
   const reducido = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -48,29 +49,6 @@ export function PildoraKit({
     });
   }
 
-  // Va SIEMPRE justo debajo de la cabecera del sitio, que es fija y cambia de alto al bajar (se
-  // encoge): se sigue su borde inferior real, y el CSS suaviza el cambio con una transición.
-  useEffect(() => {
-    const sitio = document.querySelector("header");
-    const el = barra.current;
-    if (!sitio || !el) return;
-    const colocar = () =>
-      el.style.setProperty(
-        "--pildora-arriba",
-        `${Math.max(0, Math.round(sitio.getBoundingClientRect().bottom))}px`,
-      );
-    colocar();
-    const ro = new ResizeObserver(colocar);
-    ro.observe(sitio);
-    addEventListener("scroll", colocar, { passive: true });
-    addEventListener("resize", colocar);
-    return () => {
-      ro.disconnect();
-      removeEventListener("scroll", colocar);
-      removeEventListener("resize", colocar);
-    };
-  }, []);
-
   // Visible desde que la cabecera deja de verse.
   useEffect(() => {
     const cabecera = document.getElementById(idCabecera)?.closest("section");
@@ -78,13 +56,28 @@ export function PildoraKit({
     const io = new IntersectionObserver(
       (entradas) => {
         const e = entradas[0];
-        if (e) setVisible(!e.isIntersecting);
+        if (e) setFueraDeCabecera(!e.isIntersecting);
       },
       { threshold: 0 },
     );
     io.observe(cabecera);
     return () => io.disconnect();
   }, [idCabecera]);
+
+  // Al llegar al pie se aparta: no tapa el final del contenido.
+  useEffect(() => {
+    const pie = document.querySelector("footer");
+    if (!pie) return;
+    const io = new IntersectionObserver(
+      (entradas) => {
+        const e = entradas[0];
+        if (e) setSobrePie(e.isIntersecting);
+      },
+      { threshold: 0 },
+    );
+    io.observe(pie);
+    return () => io.disconnect();
+  }, []);
 
   // El tipo activo es el que cruza la mitad de la pantalla.
   useEffect(() => {
@@ -130,7 +123,6 @@ export function PildoraKit({
 
   return (
     <nav
-      ref={barra}
       aria-label={`Tipos de máquina ${nombre}`}
       className={estilos.pildora}
       data-visible={visible ? "" : undefined}

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import type { AlineacionTexto } from "@/lib/fields/alineacionTexto";
+import type { AlineacionTexto, AnchoTexto } from "@/lib/fields/alineacionTexto";
 import type { CategoriaDePortada } from "@/lib/portada/kitCliente";
 import type { ImagenLista } from "@/lib/utils/relations";
 
@@ -25,13 +25,6 @@ import estilos from "./repuestosKit.module.css";
  * franja) en espejo. El render de la máquina trae su propia sombra: no se dibuja ninguna ni reflejo.
  */
 
-/**
- * Tamaño de la máquina desde portátil (2026-10-27, Juan Pablo la veía grande): la fracción del
- * tamaño que tenía en el diseño del cliente. Solo la máquina se encoge, apoyada en el piso; la pared,
- * el piso y las columnas de texto y tarjetas no cambian.
- */
-const ESCALA_MAQUINA = 0.78;
-
 const SIZES_MAQUINA = "(min-width: 1536px) 54vw, (min-width: 1025px) 40vw, 90vw";
 
 export type TextosRepuestosKit = {
@@ -40,6 +33,9 @@ export type TextosRepuestosKit = {
   /** «Texto bajo el título», con sus saltos de línea. Vacío, no se pinta. */
   descripcion: string;
   descripcionAlineacion: AlineacionTexto;
+  descripcionAncho: AnchoTexto;
+  /** Tamaño de la máquina desde portátil, de 0,6 a 1 (el del diseño). */
+  escalaMaquina: number;
   verTodos: string;
 };
 
@@ -68,11 +64,14 @@ export function SeccionRepuestosKit({
             <TextoEditable
               texto={textos.descripcion}
               alineacion={textos.descripcionAlineacion}
+              ancho={textos.descripcionAncho}
               className={estilos.descripcion}
             />
           </div>
 
-          {maquina ? <Maquina maquina={maquina} reflejo={reflejo} /> : null}
+          {maquina ? (
+            <Maquina maquina={maquina} reflejo={reflejo} escala={textos.escalaMaquina} />
+          ) : null}
 
           <ul className={estilos.tarjetas}>
             {categorias.map((c) => (
@@ -104,14 +103,27 @@ export function SeccionRepuestosKit({
   );
 }
 
-function Maquina({ maquina, reflejo }: { maquina: ImagenLista; reflejo: ImagenLista | null }) {
+/**
+ * La máquina, a la escala elegida en el panel («Tamaño de la máquina», 60–100 %, por defecto 78 %)
+ * desde portátil: solo se encoge el render, apoyado en el piso; la pared, el piso y las columnas
+ * no cambian y el alto reservado de la caja es el mismo.
+ */
+function Maquina({
+  maquina,
+  reflejo,
+  escala,
+}: {
+  maquina: ImagenLista;
+  reflejo: ImagenLista | null;
+  escala: number;
+}) {
   const W = maquina.width;
   const H = maquina.height;
   return (
     <div className={estilos.maquinaCaja}>
       <div
         className={estilos.maquina}
-        style={{ aspectRatio: `${W} / ${H}`, ["--escala-maquina" as string]: ESCALA_MAQUINA }}
+        style={{ aspectRatio: `${W} / ${H}`, ["--escala-maquina" as string]: escala }}
       >
         {/* La pared: losas grises y la franja roja, ancladas a la máquina (en espejo desde 1025 px, con la máquina a la izquierda) y apagadas hacia el texto. */}
         <svg

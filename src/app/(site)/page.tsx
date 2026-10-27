@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { HeroPortada } from "@/components/hero/HeroPortada";
-import { alineacionDeTexto } from "@/lib/fields/alineacionTexto";
+import { alineacionDeTexto, anchoDeTexto, escalaDeMaquina } from "@/lib/fields/alineacionTexto";
 import { SeccionMarcasKit } from "@/components/portada/kit/SeccionMarcasKit";
 import { SeccionNuevaKit } from "@/components/portada/kit/SeccionNuevaKit";
 import { SeccionRepuestosKit } from "@/components/portada/kit/SeccionRepuestosKit";
@@ -150,8 +150,10 @@ export default async function HomePage() {
           titulo: tx(usada?.titulo),
           frase: tx(usada?.marcasTexto),
           fraseAlineacion: alineacionDeTexto(usada?.marcasTextoAlineacion),
+          fraseAncho: anchoDeTexto(usada?.marcasTextoAncho, "estrecho"),
           descripcion: tx(usada?.descripcion),
           descripcionAlineacion: alineacionDeTexto(usada?.descripcionAlineacion),
+          descripcionAncho: anchoDeTexto(usada?.descripcionAncho, "columna"),
           botonTexto: tx(usada?.botonTexto),
         }}
       />
@@ -171,6 +173,8 @@ export default async function HomePage() {
           titulo: tx(repuestos?.titulo),
           descripcion: tx(repuestos?.descripcion),
           descripcionAlineacion: alineacionDeTexto(repuestos?.descripcionAlineacion),
+          descripcionAncho: anchoDeTexto(repuestos?.descripcionAncho, "ancho"),
+          escalaMaquina: escalaDeMaquina(repuestos?.tamanoMaquina),
           verTodos: tx(repuestos?.verMasTexto),
         }}
       />

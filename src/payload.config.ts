@@ -62,7 +62,6 @@ import { RepuestosMarca } from "./globals/RepuestosMarca";
 import { VacantesBuk } from "./globals/VacantesBuk";
 import { CorreoFormularios } from "./globals/CorreoFormularios";
 import { adaptadorCorreo } from "./lib/correo/adaptador";
-import { LOGO_SITIO_RESPALDO } from "./lib/seo/logo";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -138,12 +137,17 @@ export default buildConfig({
       titleSuffix: "· Partequipos",
       description: "Gestión de contenido de partequipos.com",
       /*
-       * Icono de la pestaña: el logo de `public/`, del MISMO origen que el
-       * panel (2026-10-15). Antes era la URL fija del Blob de producción
-       * (§10.8): en cada pantalla del panel, también en los previews, el
-       * navegador la bloqueaba por ORB en las pantallas con sesión.
+       * Icono de la pestaña: el favicon del cliente (2026-10-27), el mismo del
+       * sitio (`src/app/favicon.ico` e `icon0.png`), del MISMO origen que el
+       * panel. Antes, el logo apaisado de `public/` (2026-10-15), y antes aún
+       * la URL fija del Blob de producción, que el navegador bloqueaba por
+       * ORB en las pantallas con sesión (§10.8).
        */
-      icons: [{ rel: "icon", type: "image/png", url: LOGO_SITIO_RESPALDO.src }],
+      icons: [
+        { rel: "icon", url: "/favicon.ico", sizes: "48x48" },
+        { rel: "icon", type: "image/png", url: "/icon0.png", sizes: "32x32" },
+        { rel: "apple-touch-icon", type: "image/png", url: "/apple-icon.png", sizes: "180x180" },
+      ],
       // El panel nunca debe indexarse, esté abierto el sitio o no.
       robots: "noindex, nofollow",
     },

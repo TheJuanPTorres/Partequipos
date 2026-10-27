@@ -92,6 +92,7 @@ import * as migration_20261026_203555_donaldson_secciones from './20261026_20355
 import * as migration_20261026_212026_orden_maquinaria_nueva from './20261026_212026_orden_maquinaria_nueva';
 import * as migration_20261026_220102_portada_texto_repuestos from './20261026_220102_portada_texto_repuestos';
 import * as migration_20261027_043129_marcas_aliadas_nosotros from './20261027_043129_marcas_aliadas_nosotros';
+import * as migration_20261027_162258_portada_nueva_maquina_fondo from './20261027_162258_portada_nueva_maquina_fondo';
 
 export const migrations = [
   {
@@ -562,6 +563,11 @@ export const migrations = [
   {
     up: migration_20261027_043129_marcas_aliadas_nosotros.up,
     down: migration_20261027_043129_marcas_aliadas_nosotros.down,
-    name: '20261027_043129_marcas_aliadas_nosotros'
+    name: '20261027_043129_marcas_aliadas_nosotros',
+  },
+  {
+    up: migration_20261027_162258_portada_nueva_maquina_fondo.up,
+    down: migration_20261027_162258_portada_nueva_maquina_fondo.down,
+    name: '20261027_162258_portada_nueva_maquina_fondo'
   },
 ];

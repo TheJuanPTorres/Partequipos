@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { HeroPortada } from "@/components/hero/HeroPortada";
-import { SeccionMaquinariaNueva } from "@/components/portada/SeccionMaquinariaNueva";
 import { SeccionMarcasKit } from "@/components/portada/kit/SeccionMarcasKit";
+import { SeccionNuevaKit } from "@/components/portada/kit/SeccionNuevaKit";
 import { SeccionRepuestosKit } from "@/components/portada/kit/SeccionRepuestosKit";
 import { SeccionUsadosKit } from "@/components/portada/kit/SeccionUsadosKit";
 import { SeccionCatalogo } from "@/components/portada/SeccionCatalogo";
@@ -119,9 +119,14 @@ export default async function HomePage() {
       {/* Sección 1 de ux-9. Sin diapositivas en Payload, no se pinta. */}
       {diapositivas.length > 0 ? <HeroPortada diapositivas={diapositivas} /> : null}
 
-      {/* Secciones 2 y 3 de ux-9 (fase D). Sin datos, no se pintan. */}
-      <SeccionMaquinariaNueva
+      {/*
+       * «Maquinaria pesada nueva» con el DISEÑO DEL CLIENTE (2026-10-27): una tarjeta por marca
+       * visible de nueva, la máquina y la foto de obra del panel. Sin marcas, no se pinta.
+       */}
+      <SeccionNuevaKit
         tarjetas={tarjetasDeMarcas(marcas, logosMarca)}
+        maquina={imagenDecorativa(nueva?.maquina)}
+        fondo={imagenDecorativa(nueva?.fondo)}
         textos={{
           antetitulo: tx(nueva?.antetitulo),
           titulo: tx(nueva?.titulo),

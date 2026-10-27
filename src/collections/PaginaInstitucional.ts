@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { alineacionTextoField } from "../lib/fields/alineacionTexto";
 import { avisoField } from "../lib/fields/avisoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { seoField } from "../lib/fields/seoField";
@@ -500,6 +501,7 @@ export const PaginaInstitucional: CollectionConfig = {
           "Texto de la cabecera",
           "Encuentra excavadoras, retrocargadoras, cargadores, minicargadores, motoniveladoras y más para construcción, infraestructura y movimiento de tierra en Colombia.",
         ),
+        alineacionTextoField("descripcionAlineacion", "Alineación del texto de la cabecera"),
         imagenKit(
           "imagenExcavadoras",
           "Imagen del filtro «Excavadora»",
@@ -558,6 +560,7 @@ export const PaginaInstitucional: CollectionConfig = {
               "Bajo el título, antes del «Texto de la cabecera». Respeta los saltos de línea. Vacía, no se pinta.",
           },
         },
+        alineacionTextoField("marcasTextoAlineacion", "Alineación de la frase de la cabecera"),
         texto(
           "botonTexto",
           "Texto del botón de la cabecera",
@@ -641,6 +644,7 @@ export const PaginaInstitucional: CollectionConfig = {
               "Un párrafo corto bajo el título. Respeta los saltos de línea. Vacío, no se pinta.",
           },
         },
+        alineacionTextoField("descripcionAlineacion", "Alineación del texto bajo el título"),
         texto("verMasTexto", "Texto del botón de cada tarjeta", "Ver más"),
         texto(
           "botonTexto",

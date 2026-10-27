@@ -1,0 +1,31 @@
+/*
+ * Un texto del panel: un párrafo por línea y alineación elegida. El texto alineado al centro o a la
+ * derecha mueve también su caja (que tiene un ancho máximo), para que no quede pegada a la izquierda.
+ */
+.texto p {
+  margin: 0;
+}
+
+.texto p + p {
+  margin-top: 0.75em;
+}
+
+.texto[data-alineacion="left"] {
+  text-align: left;
+}
+
+.texto[data-alineacion="center"] {
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
+
+.texto[data-alineacion="right"] {
+  margin-left: auto;
+  text-align: right;
+}
+
+.texto[data-alineacion="justify"] {
+  text-align: justify;
+  hyphens: auto;
+}

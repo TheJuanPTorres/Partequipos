@@ -164,11 +164,20 @@ export function seccionesKitDeTipo({
     });
 }
 
-/** La página general del tipo: la primera categoría de nueva que lo incluye. */
+/**
+ * La página general del tipo: la categoría de nueva MÁS CONCRETA que lo incluye (la de menos
+ * tipos; a igualdad, la primera). Un tipo puede estar en dos: las miniexcavadoras de Yanmar van
+ * en «Excavadoras» y en «Miniexcavadoras», y su página general es la segunda.
+ */
 export function categoriaDeTipo(
   tipoId: number,
   categorias: { slug: string; tipos: number[] }[],
 ): string | null {
-  const categoria = categorias.find((c) => c.tipos.includes(tipoId));
+  const categoria = categorias
+    .filter((c) => c.tipos.includes(tipoId))
+    .reduce<{ slug: string; tipos: number[] } | null>(
+      (mejor, c) => (!mejor || c.tipos.length < mejor.tipos.length ? c : mejor),
+      null,
+    );
   return categoria ? `${rutas.categoriaNueva(categoria.slug)}/` : null;
 }

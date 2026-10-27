@@ -189,7 +189,7 @@ describe("seccionesKitDeTipo", () => {
 });
 
 describe("categoriaDeTipo", () => {
-  it("la primera categoría de nueva que incluye el tipo; ninguna, null", () => {
+  it("la categoría de nueva que incluye el tipo; ninguna, null", () => {
     const categorias = [
       { slug: "excavadoras", tipos: [1, 2] },
       { slug: "retrocargadoras", tipos: [5] },
@@ -199,5 +199,20 @@ describe("categoriaDeTipo", () => {
       "/maquinaria-pesada/maquinaria-pesada-nueva/retrocargadoras/",
     );
     assert.equal(categoriaDeTipo(9, categorias), null);
+  });
+
+  it("en dos categorías, la más concreta (la de menos tipos)", () => {
+    const categorias = [
+      { slug: "excavadoras", tipos: [5, 17, 18, 22] },
+      { slug: "miniexcavadoras", tipos: [18, 22] },
+    ];
+    assert.equal(
+      categoriaDeTipo(18, categorias),
+      "/maquinaria-pesada/maquinaria-pesada-nueva/miniexcavadoras/",
+    );
+    assert.equal(
+      categoriaDeTipo(5, categorias),
+      "/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/",
+    );
   });
 });

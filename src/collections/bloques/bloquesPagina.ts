@@ -1,6 +1,7 @@
 import type { Block, Field } from "payload";
 
 import { validarAncla } from "../../lib/fields/ancla";
+import { validarColor } from "../../lib/fields/tipografiaTitulo";
 import { validarEnlace } from "../../lib/fields/reglasPortada";
 import { validarYouTube } from "../../lib/fields/youtube";
 import { BloqueDocumentoVisor } from "./documentoVisor";
@@ -276,6 +277,97 @@ export const BloqueFranjaMarquee: Block = {
   ],
 };
 
+/**
+ * «Marcas aliadas» (diseño del cliente, 2026-10-26; Nosotros): sustituye a la franja con texto en
+ * movimiento de esa página. Fotos de fondo en pase lento y una tarjeta por empresa del grupo.
+ */
+export const BloqueMarcasAliadas: Block = {
+  slug: "marcasAliadas",
+  interfaceName: "BloqueMarcasAliadas",
+  labels: { singular: "Marcas aliadas", plural: "Marcas aliadas" },
+  fields: [
+    ancla,
+    {
+      name: "titulo",
+      type: "text",
+      required: true,
+      defaultValue: "Marcas aliadas",
+      label: "Título",
+    },
+    {
+      name: "imagenFondo",
+      type: "upload",
+      relationTo: "media",
+      label: "Imagen de fondo",
+      admin: { description: "Decorativa, tenue. Es la primera del pase de fotos." },
+    },
+    {
+      name: "fondosExtra",
+      type: "upload",
+      relationTo: "media",
+      hasMany: true,
+      label: "Más fotos de fondo",
+      admin: {
+        description:
+          "Opcional. Con alguna, el fondo pasa de una foto a otra con un fundido lento, empezando por la «Imagen de fondo». Decorativas.",
+      },
+    },
+    {
+      name: "tarjetas",
+      type: "array",
+      label: "Tarjetas",
+      labels: { singular: "Tarjeta", plural: "Tarjetas" },
+      minRows: 1,
+      admin: {
+        description:
+          "Una por empresa, en este orden (arrástralas para reordenar). Cinco caben en una fila en pantalla ancha.",
+      },
+      fields: [
+        { name: "nombre", type: "text", required: true, label: "Nombre" },
+        {
+          name: "texto",
+          type: "text",
+          label: "Frase",
+          admin: { description: "Una línea corta sobre la foto. Opcional." },
+        },
+        {
+          name: "logo",
+          type: "upload",
+          relationTo: "media",
+          label: "Logo",
+          admin: { description: "Va sobre blanco. Sin logo, se escribe el nombre." },
+        },
+        {
+          name: "foto",
+          type: "upload",
+          relationTo: "media",
+          label: "Foto",
+          admin: { description: "Se tiñe con el color de la empresa. Decorativa." },
+        },
+        {
+          name: "color",
+          type: "text",
+          label: "Color de la empresa",
+          validate: validarColor,
+          admin: {
+            placeholder: "#0A5BB0",
+            components: { Field: "/components/admin/CampoColor" },
+            description:
+              "Tiñe la foto y marca el foco y el botón al pasar el ratón. Vacío: gris oscuro.",
+          },
+        },
+        {
+          name: "enlace",
+          type: "text",
+          label: "Enlace a su web",
+          validate: validarEnlace,
+          admin: { description: "Se abre en una pestaña nueva. Una dirección https://." },
+        },
+      ],
+    },
+  ],
+};
+
 export const BloqueTarjetasExpandibles: Block = {
   slug: "tarjetasExpandibles",
   /*
@@ -452,6 +544,7 @@ export const BLOQUES_PAGINA: Block[] = [
   BloquePresentacionImagen,
   BloqueCifras,
   BloqueFranjaMarquee,
+  BloqueMarcasAliadas,
   BloqueTarjetasExpandibles,
   BloqueGaleria,
   BloqueVideoYoutube,

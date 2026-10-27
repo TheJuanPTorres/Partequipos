@@ -54,3 +54,11 @@ export function vistaBanner(
     foto: imagenDeMedia(marca.kit?.fotoCabecera, "") ?? imagenDeMedia(marca.imagenTarjeta, ""),
   };
 }
+
+/**
+ * Un logo JPEG no tiene transparencia: teñido en una sola tinta sería un rectángulo (el de
+ * Dynapac). Ese va con sus colores sobre una placa blanca, como la placa de la cabecera del kit.
+ */
+export function logoOpaco(url: string): boolean {
+  return /\.jpe?g(?:$|[?#])/i.test(url);
+}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
-import type { VistaBanner } from "@/lib/nueva/bannerMarca";
+import { logoOpaco, type VistaBanner } from "@/lib/nueva/bannerMarca";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
 
 import estilos from "./bannerMarca.module.css";
@@ -16,7 +16,8 @@ import estilos from "./bannerMarca.module.css";
  * redondeadas (con otra más oscura detrás), el título en `<h2>` sobre un tono claro de la marca y,
  * a la derecha, la foto de la marca teñida con su color que se oscurece hacia «Ver marca».
  * Móvil (≤ 767 px): tarjeta blanca con el bloque de color del logo, el título y una flecha.
- * Sin logo, el nombre de la marca en el bloque; sin foto, el banner en su color.
+ * Sin logo, el nombre de la marca en el bloque; un logo JPEG (opaco), con sus colores sobre una
+ * placa blanca; sin foto, el banner en su color.
  */
 export function BannerMarcaTipo({
   id,
@@ -56,7 +57,10 @@ export function BannerMarcaTipo({
       <span aria-hidden="true" className={estilos.formaAtras} />
       <span aria-hidden="true" className={estilos.forma} />
 
-      <div className={estilos.logoCaja} data-tinta={vista.tintaLogo}>
+      <div
+        className={estilos.logoCaja}
+        data-tinta={logo && logoOpaco(logo.url) ? "placa" : vista.tintaLogo}
+      >
         {logo ? (
           <LogoMarca logo={logo} alt={logo.alt} sizes="180px" className={estilos.logo} />
         ) : (

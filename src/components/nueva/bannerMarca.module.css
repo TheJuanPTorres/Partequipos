@@ -107,6 +107,14 @@
   opacity: 1;
 }
 
+/* Un logo JPEG (opaco): con sus colores sobre una placa blanca, como la cabecera del kit. */
+.logoCaja[data-tinta="placa"] .logo {
+  box-sizing: content-box;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+
 .logoTexto {
   font-size: 15px;
   font-weight: 700;
@@ -114,11 +122,27 @@
   text-align: center;
 }
 
-.logoCaja[data-tinta="clara"] .logoTexto {
+.logoCaja[data-tinta="clara"] /* Un logo JPEG (opaco): con sus colores sobre una placa blanca, como la cabecera del kit. */
+.logoCaja[data-tinta="placa"] .logo {
+  box-sizing: content-box;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.logoTexto {
   color: #fff;
 }
 
-.logoCaja[data-tinta="oscura"] .logoTexto {
+.logoCaja[data-tinta="oscura"] /* Un logo JPEG (opaco): con sus colores sobre una placa blanca, como la cabecera del kit. */
+.logoCaja[data-tinta="placa"] .logo {
+  box-sizing: content-box;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.logoTexto {
   color: #000;
 }
 
@@ -225,7 +249,10 @@
     padding: 0 0 0 calc(1.5% + 28px);
   }
 
+  /* Un título largo se parte antes de llegar a la zona oscura de la foto. */
   .titulo {
+    max-width: 24ch;
+    text-wrap: balance;
     color: var(--banner-tinta);
     font-size: clamp(1.5rem, 2.2vw, 2.1rem);
     line-height: 1.15;

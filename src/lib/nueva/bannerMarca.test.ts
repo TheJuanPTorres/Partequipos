@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import type { Media } from "@/payload-types";
 
-import { mezclar, vistaBanner } from "./bannerMarca";
+import { logoOpaco, mezclar, vistaBanner } from "./bannerMarca";
 
 const media = (url: string) => ({ id: 1, url, alt: "x", width: 800, height: 400 }) as Media;
 
@@ -41,5 +41,13 @@ describe("banner de marca de la página general de tipo", () => {
       imagenTarjeta: media("/tarjeta.jpg"),
     });
     assert.equal(tarjeta.foto?.url, "/tarjeta.jpg");
+  });
+
+  it("un logo JPEG es opaco (placa blanca); PNG, WebP y SVG se tiñen", () => {
+    assert.equal(logoOpaco("https://x/logo-dynapac.jpg"), true);
+    assert.equal(logoOpaco("/api/media/file/logo.JPEG?v=1"), true);
+    assert.equal(logoOpaco("https://x/logo-case.png"), false);
+    assert.equal(logoOpaco("https://x/logo.webp"), false);
+    assert.equal(logoOpaco("https://x/jpg-logo.svg"), false);
   });
 });

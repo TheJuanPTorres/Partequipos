@@ -140,7 +140,7 @@ describe("seccionesKitDeTipo", () => {
     });
     assert.equal(r.length, 1);
     assert.equal(r[0]!.titulo, "Retrocargadora");
-    assert.equal(r[0]!.numero, "01");
+    assert.equal(r[0]!.numero, ""); // una sola sección: sin «01 |»
     assert.equal(r[0]!.tarjetas.length, 8);
     assert.deepEqual(
       r[0]!.tarjetas.map((t) => t.id),

@@ -70,10 +70,15 @@ export function SeccionTipoKit({
           </Link>
         ) : null}
         <h2 id={idTitulo} className={estilos.tituloTipo}>
-          <span aria-hidden="true" className={estilos.numero}>
-            {seccion.numero}
-          </span>
-          <span aria-hidden="true" className={estilos.barra} />
+          {/* Sin número (marca + tipo con una sola sección), solo el nombre del tipo. */}
+          {seccion.numero ? (
+            <>
+              <span aria-hidden="true" className={estilos.numero}>
+                {seccion.numero}
+              </span>
+              <span aria-hidden="true" className={estilos.barra} />
+            </>
+          ) : null}
           <span>{seccion.titulo}</span>
         </h2>
       </div>

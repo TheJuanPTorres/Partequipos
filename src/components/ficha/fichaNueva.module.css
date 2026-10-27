@@ -445,7 +445,7 @@ section.principal[data-con-izquierda] {
   }
 
   .tituloMovil {
-    display: inline;
+    display: block;
   }
 
   /*

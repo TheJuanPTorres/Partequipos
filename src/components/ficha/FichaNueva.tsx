@@ -212,7 +212,12 @@ ${tituloEscritorio.modelo}`}
                       <span>{tituloEscritorio.modelo}</span>
                     </span>
                   </span>
-                  <span className={nueva.tituloMovil}>{nombre}</span>
+                  {/* También con reserva: un nombre largo cambia de líneas al llegar Inter. */}
+                  <span className={nueva.tituloMovil}>
+                    <span className={nueva.reserva} data-reserva={nombre}>
+                      <span>{nombre}</span>
+                    </span>
+                  </span>
                 </>
               ) : (
                 nombre

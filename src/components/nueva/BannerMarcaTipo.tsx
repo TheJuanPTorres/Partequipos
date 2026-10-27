@@ -25,14 +25,18 @@ export function BannerMarcaTipo({
   marca,
   logo,
   vista,
+  nivel = "h2",
 }: {
-  /** `id` del `<h2>`. */
+  /** `id` del título. */
   id: string;
   titulo: string;
   marca: { nombre: string; href: string };
   logo: LogoConAlt | null;
   vista: VistaBanner;
+  /** El nivel del título: `h3` si el banner va bajo el `<h2>` de su sección. */
+  nivel?: "h2" | "h3";
 }) {
+  const Titulo = nivel;
   const variables = {
     "--acento": vista.acento,
     "--acento-oscuro": vista.acentoOscuro,
@@ -69,9 +73,9 @@ export function BannerMarcaTipo({
       </div>
 
       <div className={estilos.texto}>
-        <h2 id={id} className={estilos.titulo}>
+        <Titulo id={id} className={estilos.titulo}>
           {titulo}
-        </h2>
+        </Titulo>
       </div>
 
       <div className={estilos.accion}>

@@ -122,27 +122,11 @@
   text-align: center;
 }
 
-.logoCaja[data-tinta="clara"] /* Un logo JPEG (opaco): con sus colores sobre una placa blanca, como la cabecera del kit. */
-.logoCaja[data-tinta="placa"] .logo {
-  box-sizing: content-box;
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.logoTexto {
+.logoCaja[data-tinta="clara"] .logoTexto {
   color: #fff;
 }
 
-.logoCaja[data-tinta="oscura"] /* Un logo JPEG (opaco): con sus colores sobre una placa blanca, como la cabecera del kit. */
-.logoCaja[data-tinta="placa"] .logo {
-  box-sizing: content-box;
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.logoTexto {
+.logoCaja[data-tinta="oscura"] .logoTexto {
   color: #000;
 }
 

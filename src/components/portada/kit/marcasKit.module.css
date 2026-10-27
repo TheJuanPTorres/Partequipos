@@ -94,38 +94,37 @@
   color: var(--color-marca);
 }
 
-/* La máquina, por delante de la banda: al 55 % del panel y subida un 12 % de su alto. */
+/*
+ * La máquina (el compactador Dynapac CA3500D, 2026-10-27), por delante de la banda. El render trae
+ * su propia sombra de contacto: no se dibuja ninguna ni reflejo. Medida sobre el render
+ * (1920 × 1344): el compactador ocupa x ≈ 10–91 % e y ≈ 12–93 %, su centro visible cae al 52,5 % de
+ * la caja. Desde 1025 px va centrada en vertical (top 50 % y subida 49 %, un poco menos para que la
+ * cabina alta se vea centrada en perspectiva), al 46 % del panel y a la derecha.
+ */
 .maquina {
   position: relative;
   z-index: 2;
-  width: min(100%, 40rem);
+  width: min(85%, 34rem);
   margin: 16px auto 0;
 }
 
 @media (min-width: 1025px) {
   .maquina {
     position: absolute;
-    top: -12%;
-    right: 0;
-    width: 55%;
+    top: 50%;
+    right: 3%;
+    width: 46%;
     margin: 0;
+    transform: translateY(-49%);
   }
 }
 
+/* Solo si el editor elige un reflejo (el diseño actual no lleva). */
 .reflejo {
   position: absolute;
   top: 0;
   right: 0;
   left: 0;
-  pointer-events: none;
-}
-
-.sombras {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
   pointer-events: none;
 }
 

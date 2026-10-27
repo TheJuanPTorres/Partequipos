@@ -49,19 +49,23 @@
   }
 }
 
+/*
+ * Desde portátil la disposición se INVIERTE (diseño del 2026-10-27): la máquina a la izquierda, a
+ * toda la altura, y título, texto y tarjetas a la derecha.
+ */
 @media (min-width: 1025px) {
   .rejilla {
-    padding: 48px 40px;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    gap: 16px 32px;
+    padding: 48px 4% 48px 16px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
+    grid-template-rows: auto 1fr;
+    gap: 28px 16px;
   }
 }
 
 @media (min-width: 1536px) {
   .rejilla {
-    padding: 48px 24px 48px 5%;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    grid-template-rows: auto 1fr;
+    padding: 48px 5% 48px 24px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
     gap: 36px 16px;
   }
 }
@@ -73,15 +77,22 @@
 
 @media (min-width: 1025px) {
   .cabecera {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 1;
-    align-self: center;
+    align-self: start;
   }
 }
 
-@media (min-width: 1536px) {
-  .cabecera {
-    align-self: start;
+/* Sin máquina elegida en el panel, título y tarjetas ocupan todo el ancho. */
+@media (min-width: 1025px) {
+  .sinMaquina {
+    padding: 48px 40px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sinMaquina .cabecera,
+  .sinMaquina .tarjetas {
+    grid-column: 1;
   }
 }
 
@@ -93,9 +104,9 @@
   letter-spacing: 0.025em;
 }
 
-/* «Texto bajo el título»: como el texto de la cabecera de usados, con sus saltos de línea. */
+/* «Texto bajo el título»: un párrafo por línea. Llega hasta el borde derecho de su columna, con un tope de ancho de lectura en pantallas muy anchas. */
 .descripcion {
-  max-width: 36rem;
+  max-width: 60rem;
   margin: 16px 0 0;
   color: var(--color-texto-suave);
   font-size: 16px;
@@ -120,17 +131,13 @@
 
 @media (min-width: 1025px) {
   .titulo {
-    max-width: 24ch;
-    font-size: clamp(2rem, 2.8vw, 2.6rem);
-    line-height: 1.1;
+    font-size: clamp(1.6rem, 2.3vw, 2.4rem);
   }
 }
 
 @media (min-width: 1536px) {
   .titulo {
-    max-width: none;
     font-size: clamp(1.6rem, 1.9vw, 2.4rem);
-    line-height: 1.25;
     white-space: nowrap;
   }
 }
@@ -144,30 +151,52 @@
   margin: 0 auto;
 }
 
+/*
+ * Portátil: la máquina toma todo el alto de la sección (sus dos filas), el ancho sale de la
+ * proporción, y va centrada en su columna: el aire transparente del render sobresale a los lados.
+ * Escritorio ancho: por ancho, apoyada abajo y desbordando un 12 % a cada lado.
+ */
 @media (min-width: 1025px) {
   .maquinaCaja {
-    max-width: 30rem;
+    left: 50%;
+    width: auto;
+    max-width: none;
+    height: 100%;
     margin: 0;
-    grid-column: 2;
-    grid-row: 1;
-    align-self: center;
-    justify-self: end;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+    justify-self: start;
+    transform: translateX(-50%);
   }
 }
 
 @media (min-width: 1536px) {
   .maquinaCaja {
+    left: 0;
     width: 124%;
-    max-width: none;
+    height: auto;
     margin: 0 -12%;
-    grid-row: 1 / span 2;
     align-self: end;
     justify-self: auto;
+    transform: none;
   }
 }
 
 .maquina {
   position: relative;
+}
+
+@media (min-width: 1025px) {
+  .maquina {
+    height: 100%;
+  }
+}
+
+@media (min-width: 1536px) {
+  .maquina {
+    height: auto;
+  }
 }
 
 .capa {
@@ -187,6 +216,13 @@
 @media (max-width: 767px) {
   .capa {
     overflow: hidden;
+  }
+}
+
+/* En espejo desde portátil: las losas y la franja bajan del lado de la máquina y se apagan hacia el texto. */
+@media (min-width: 1025px) {
+  .pared {
+    transform: scaleX(-1);
   }
 }
 
@@ -211,9 +247,9 @@
 
 @media (min-width: 1025px) {
   .piso {
-    right: -40%;
-    left: -70%;
-    mask-image: linear-gradient(to right, transparent, #000 30%);
+    right: -70%;
+    left: -40%;
+    mask-image: linear-gradient(to left, transparent, #000 30%);
   }
 }
 
@@ -223,6 +259,17 @@
   right: 0;
   left: 0;
   pointer-events: none;
+}
+
+/*
+ * El render de la máquina, a escala desde portátil: se encoge hacia su apoyo en el piso (centro y
+ * 91 % de su alto) y la pared, el piso y las columnas siguen igual. En el teléfono, a su tamaño.
+ */
+@media (min-width: 1025px) {
+  .render {
+    transform: scale(var(--escala-maquina, 1));
+    transform-origin: 50% 91%;
+  }
 }
 
 .contener {
@@ -250,19 +297,22 @@
 
 @media (min-width: 1025px) {
   .tarjetas {
-    grid-column: 1 / span 2;
+    grid-column: 2;
     grid-row: 2;
+  }
+}
+
+@media (min-width: 1280px) {
+  .tarjetas {
     gap: 16px;
   }
 }
 
-@media (min-width: 1536px) {
-  .tarjetas {
-    grid-column: 1;
-  }
-}
-
-/* Toda la tarjeta lleva a la página de la categoría; «Ver todos» va al pie, alineado en la fila. */
+/*
+ * Toda la tarjeta lleva a la página de la categoría; «Ver todos» va al pie, alineado en la fila.
+ * Tamaños del diseño del 2026-10-27: de 768 a 1535 px las tarjetas son estrechas (cinco por fila
+ * en la columna derecha) y todo baja de tamaño; desde 1536 px vuelven al tamaño pleno.
+ */
 .tarjeta {
   display: flex;
   height: 100%;
@@ -290,7 +340,7 @@
   }
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 1536px) {
   .tarjeta {
     padding: 20px 12px;
   }
@@ -315,9 +365,9 @@
   }
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 1280px) {
   .foto {
-    height: 112px;
+    height: 80px;
   }
 }
 
@@ -364,6 +414,18 @@
 
 @media (min-width: 1025px) {
   .nombre {
+    font-size: 0.66rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .nombre {
+    font-size: 0.765rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .nombre {
     font-size: 0.925rem;
     letter-spacing: 0.025em;
   }
@@ -394,7 +456,7 @@
   }
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 1536px) {
   .ver {
     padding: 8px 16px;
     gap: 6px;
@@ -413,7 +475,7 @@
   flex: none;
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1535px) {
   .flecha {
     width: 12px;
     height: 12px;

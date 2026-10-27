@@ -557,6 +557,20 @@ bloqueado. No la comprueba por otra vía (regla de la barrera, arriba).
    (`git commit --allow-empty`) y push. Volver al punto 3 con el nuevo sha.
    Anotarlo en el informe: es el fallo silencioso de §10.30.
 5. Con el estado en verde, la prueba de humo de ese despliegue también.
+6. **Comprobar que el dominio publicado sirve el commit fusionado, o uno
+   posterior que lo incluya** (2026-10-27).
+   `npx vercel inspect partequipos.vercel.app` da la URL del despliegue
+   que sirve el dominio, y
+   `gh api "repos/<repo>/deployments?environment=Production"` dice de qué
+   commit es; con `git merge-base --is-ancestor <fusionado> <servido>` se
+   comprueba que lo incluye. **Si no lo incluye:** un commit vacío encima de
+   `main` y volver al punto 3 con el nuevo sha. Anotarlo en el informe.
+   Motivo: el 2026-10-27 se fusionaron el #391 y el #392 con 7 s de
+   diferencia; el despliegue del #391 terminó después y se quedó con el
+   dominio, así que el sitio publicado servía código **sin** el #392 aunque
+   su commit tenía «Vercel» y humo en verde. Se arregló con un commit vacío
+   (`f8e6280`). Promocionar un despliegue a mano es de dirección, nunca del
+   agente.
 
 ---
 

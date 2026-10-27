@@ -1,34 +1,45 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import type { AlineacionTexto } from "@/lib/fields/alineacionTexto";
 import type { CategoriaDePortada } from "@/lib/portada/kitCliente";
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import { Flecha } from "./Flecha";
+import { TextoEditable } from "./TextoEditable";
 import estilos from "./repuestosKit.module.css";
 
 /**
  * «VENTA DE REPUESTOS» CON EL DISEÑO DEL CLIENTE (2026-10-26; prototipo `CatalogoRepuestos` de
  * `partequipos-diseno\portada\repuestos`), PORTADO a CSS modules. Título y tarjetas de categoría a
- * la izquierda y la máquina sobre el piso, con su reflejo, a la derecha.
+ * la derecha y la máquina sobre el piso, a la izquierda (desde portátil).
  *
  * Componente de SERVIDOR, sin JavaScript. Las categorías son las técnicas con posición en la
  * portada (orden, nombre o «Título en portada», y la «Foto en la portada» o la de la tarjeta), y
  * cada tarjeta lleva a SU PÁGINA («Ver todos»), no a WhatsApp como el prototipo. Máquina y reflejo,
  * del panel; sin ellos, la columna no se pinta.
  *
- * Distribución por tamaño (la del prototipo): en teléfono y tablet, título, máquina y tarjetas
- * apiladas; en portátil, título y máquina en una fila y las tarjetas debajo a todo el ancho; desde
- * 1536 px, tarjetas a la izquierda y la máquina a la derecha.
+ * Distribución por tamaño (diseño nuevo del cliente, 2026-10-27): en teléfono y tablet, título,
+ * máquina y tarjetas apiladas; desde portátil (1025 px) la disposición se INVIERTE: la máquina a la
+ * izquierda, a toda la altura, y título, texto y tarjetas a la derecha, con la pared (losas y
+ * franja) en espejo. El render de la máquina trae su propia sombra: no se dibuja ninguna ni reflejo.
  */
 
-const SIZES_MAQUINA = "(min-width: 1536px) 54vw, (min-width: 1025px) 50vw, 90vw";
+/**
+ * Tamaño de la máquina desde portátil (2026-10-27, Juan Pablo la veía grande): la fracción del
+ * tamaño que tenía en el diseño del cliente. Solo la máquina se encoge, apoyada en el piso; la pared,
+ * el piso y las columnas de texto y tarjetas no cambian.
+ */
+const ESCALA_MAQUINA = 0.78;
+
+const SIZES_MAQUINA = "(min-width: 1536px) 54vw, (min-width: 1025px) 40vw, 90vw";
 
 export type TextosRepuestosKit = {
   antetitulo: string;
   titulo: string;
   /** «Texto bajo el título», con sus saltos de línea. Vacío, no se pinta. */
   descripcion: string;
+  descripcionAlineacion: AlineacionTexto;
   verTodos: string;
 };
 
@@ -48,15 +59,17 @@ export function SeccionRepuestosKit({
   return (
     <section id="repuestos" className={estilos.seccion} aria-labelledby={idTitulo}>
       <div className={estilos.panel}>
-        <div className={estilos.rejilla}>
+        <div className={`${estilos.rejilla} ${maquina ? "" : estilos.sinMaquina}`}>
           <div className={estilos.cabecera}>
             {textos.antetitulo ? <p className={estilos.antetitulo}>{textos.antetitulo}</p> : null}
             <h2 id={idTitulo} className={estilos.titulo}>
               {textos.titulo || "Encuentra Maquinaria y Repuestos Rápido y Fácil"}
             </h2>
-            {textos.descripcion ? (
-              <p className={estilos.descripcion}>{textos.descripcion}</p>
-            ) : null}
+            <TextoEditable
+              texto={textos.descripcion}
+              alineacion={textos.descripcionAlineacion}
+              className={estilos.descripcion}
+            />
           </div>
 
           {maquina ? <Maquina maquina={maquina} reflejo={reflejo} /> : null}
@@ -96,9 +109,17 @@ function Maquina({ maquina, reflejo }: { maquina: ImagenLista; reflejo: ImagenLi
   const H = maquina.height;
   return (
     <div className={estilos.maquinaCaja}>
-      <div className={estilos.maquina} style={{ aspectRatio: `${W} / ${H}` }}>
-        {/* La pared: losas grises y la franja roja, ancladas a la máquina, apagadas hacia el texto. */}
-        <svg aria-hidden="true" focusable="false" viewBox="0 0 1920 1344" className={estilos.capa}>
+      <div
+        className={estilos.maquina}
+        style={{ aspectRatio: `${W} / ${H}`, ["--escala-maquina" as string]: ESCALA_MAQUINA }}
+      >
+        {/* La pared: losas grises y la franja roja, ancladas a la máquina (en espejo desde 1025 px, con la máquina a la izquierda) y apagadas hacia el texto. */}
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          viewBox="0 0 1920 1344"
+          className={`${estilos.capa} ${estilos.pared}`}
+        >
           <defs>
             <linearGradient
               id="kit-repuestos-izq"
@@ -170,45 +191,6 @@ function Maquina({ maquina, reflejo }: { maquina: ImagenLista; reflejo: ImagenLi
         {/* El piso: un plano grande desde un horizonte alto (la cámara mira desde arriba). */}
         <div className={estilos.piso} aria-hidden="true" />
 
-        {/* Sombras medidas por el cliente sobre el render de la Yanmar (1920 × 1344). */}
-        <svg aria-hidden="true" focusable="false" viewBox="0 0 1920 1344" className={estilos.capa}>
-          <defs>
-            <filter id="kit-repuestos-oruga" x="-20%" y="-200%" width="140%" height="500%">
-              <feGaussianBlur stdDeviation="14" />
-            </filter>
-            <filter id="kit-repuestos-amplia" x="-30%" y="-100%" width="160%" height="300%">
-              <feGaussianBlur stdDeviation="45" />
-            </filter>
-          </defs>
-          <polygon
-            points="700,900 1420,1180 1700,1000 1640,880 1000,720"
-            fill="#14110f"
-            opacity="0.14"
-            filter="url(#kit-repuestos-amplia)"
-          />
-          <polygon
-            points="760,905 1400,1255 1415,1225 790,880"
-            fill="#14110f"
-            opacity="0.32"
-            filter="url(#kit-repuestos-oruga)"
-          />
-          <polygon
-            points="1470,958 1660,962 1660,940 1480,936"
-            fill="#14110f"
-            opacity="0.28"
-            filter="url(#kit-repuestos-oruga)"
-          />
-          <ellipse
-            cx="690"
-            cy="960"
-            rx="40"
-            ry="10"
-            fill="#14110f"
-            opacity="0.25"
-            filter="url(#kit-repuestos-oruga)"
-          />
-        </svg>
-
         {/* El reflejo, del kit (más alto que el render): su caja empieza arriba, con su proporción. */}
         {reflejo ? (
           <div
@@ -224,7 +206,13 @@ function Maquina({ maquina, reflejo }: { maquina: ImagenLista; reflejo: ImagenLi
             />
           </div>
         ) : null}
-        <Image src={maquina.url} alt="" fill sizes={SIZES_MAQUINA} className={estilos.contener} />
+        <Image
+          src={maquina.url}
+          alt=""
+          fill
+          sizes={SIZES_MAQUINA}
+          className={`${estilos.contener} ${estilos.render}`}
+        />
       </div>
     </div>
   );

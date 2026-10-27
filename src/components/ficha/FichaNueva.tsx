@@ -11,6 +11,7 @@ import { PastillaDato } from "@/components/ficha/PastillaDato";
 import { RecuadroAsesoria } from "@/components/ficha/RecuadroAsesoria";
 import estilos from "@/components/ficha/ficha.module.css";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
+import { conFormaDeMarca } from "@/components/marca/FormaMarca";
 import { FranjaMarca } from "@/components/marca/FranjaMarca";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { PaginaVisor } from "@/lib/documentos/visor";
@@ -208,7 +209,9 @@ export function FichaNueva({
 ${tituloEscritorio.modelo}`}
                   >
                     <span className={nueva.lineasTitulo}>
-                      <span className={nueva.lineaMarca}>{tituloEscritorio.marca}</span>{" "}
+                      <span className={nueva.lineaMarca}>
+                        {conFormaDeMarca(tituloEscritorio.marca)}
+                      </span>{" "}
                       <span>{tituloEscritorio.modelo}</span>
                     </span>
                   </span>

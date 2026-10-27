@@ -25,6 +25,13 @@ import estilos from "./repuestosKit.module.css";
  * franja) en espejo. El render de la máquina trae su propia sombra: no se dibuja ninguna ni reflejo.
  */
 
+/**
+ * Tamaño de la máquina desde portátil (2026-10-27, Juan Pablo la veía grande): la fracción del
+ * tamaño que tenía en el diseño del cliente. Solo la máquina se encoge, apoyada en el piso; la pared,
+ * el piso y las columnas de texto y tarjetas no cambian.
+ */
+const ESCALA_MAQUINA = 0.78;
+
 const SIZES_MAQUINA = "(min-width: 1536px) 54vw, (min-width: 1025px) 40vw, 90vw";
 
 export type TextosRepuestosKit = {
@@ -102,7 +109,10 @@ function Maquina({ maquina, reflejo }: { maquina: ImagenLista; reflejo: ImagenLi
   const H = maquina.height;
   return (
     <div className={estilos.maquinaCaja}>
-      <div className={estilos.maquina} style={{ aspectRatio: `${W} / ${H}` }}>
+      <div
+        className={estilos.maquina}
+        style={{ aspectRatio: `${W} / ${H}`, ["--escala-maquina" as string]: ESCALA_MAQUINA }}
+      >
         {/* La pared: losas grises y la franja roja, ancladas a la máquina (en espejo desde 1025 px, con la máquina a la izquierda) y apagadas hacia el texto. */}
         <svg
           aria-hidden="true"
@@ -196,7 +206,13 @@ function Maquina({ maquina, reflejo }: { maquina: ImagenLista; reflejo: ImagenLi
             />
           </div>
         ) : null}
-        <Image src={maquina.url} alt="" fill sizes={SIZES_MAQUINA} className={estilos.contener} />
+        <Image
+          src={maquina.url}
+          alt=""
+          fill
+          sizes={SIZES_MAQUINA}
+          className={`${estilos.contener} ${estilos.render}`}
+        />
       </div>
     </div>
   );

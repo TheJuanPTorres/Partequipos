@@ -28,6 +28,7 @@ import { gruposDeCategoria } from "@/lib/repuestos/grupos";
 import { accesosDe, esCategoriaPrincipal } from "@/lib/repuestos/subcategorias";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { rutas } from "@/lib/routes";
+import { vistaBannerDe } from "@/lib/nueva/bannerMarca";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -87,12 +88,19 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
     getSedesDePortada(),
     getCategoriasRepuestos(),
   ]);
-  // Las páginas que cuelgan de esta categoría (Filtros Donaldson en Filtración, 2026-10-26).
-  // Con la foto de su tarjeta, que asoma por la derecha de la franja (D3).
-  const accesos = accesosDe(categoria.id, todas).map((a) => ({
-    ...a,
-    foto: imagenDeMedia(todas.find((c) => c.id === a.id)?.imagen, a.nombre),
-  }));
+  // Las páginas que cuelgan de esta categoría (Filtros Donaldson en Filtración, 2026-10-26),
+  // con el banner de marca del #385: su color y, a la derecha, su «Fondo del encabezado» o, sin
+  // él, la imagen de su tarjeta.
+  const accesos = accesosDe(categoria.id, todas).map((a) => {
+    const c = todas.find((t) => t.id === a.id);
+    return {
+      ...a,
+      vista: vistaBannerDe(
+        c?.colorMarca,
+        imagenDeMedia(c?.fondoHero, "") ?? imagenDeMedia(c?.imagen, ""),
+      ),
+    };
+  });
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const nombre = categoria.nombre.trim();
   const origen = rutas.categoriaRepuestos(categoria.slug);

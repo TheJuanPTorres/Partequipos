@@ -43,7 +43,21 @@ export type VistaBanner = {
 export function vistaBanner(
   marca: Pick<MarcasMaquinaria, "colorMarca" | "kit" | "imagenTarjeta">,
 ): VistaBanner {
-  const acento = colorDeMarca(marca.colorMarca) ?? COLOR_SIN_MARCA;
+  return vistaBannerDe(
+    marca.colorMarca,
+    imagenDeMedia(marca.kit?.fotoCabecera, "") ?? imagenDeMedia(marca.imagenTarjeta, ""),
+  );
+}
+
+/**
+ * El mismo banner con el color y la foto ya elegidos: lo usa también la página de una categoría
+ * técnica de repuestos para las páginas que cuelgan de ella (Filtros Donaldson en Filtración).
+ */
+export function vistaBannerDe(
+  colorMarca: string | null | undefined,
+  foto: ImagenLista | null,
+): VistaBanner {
+  const acento = colorDeMarca(colorMarca) ?? COLOR_SIN_MARCA;
   const fondo = mezclar(acento, "#ffffff", 0.58);
   return {
     acento,
@@ -51,7 +65,7 @@ export function vistaBanner(
     fondo,
     tintaTitulo: tintaSobre(fondo),
     tintaLogo: tintaDeLogoSobre(acento) === "#ffffff" ? "clara" : "oscura",
-    foto: imagenDeMedia(marca.kit?.fotoCabecera, "") ?? imagenDeMedia(marca.imagenTarjeta, ""),
+    foto,
   };
 }
 

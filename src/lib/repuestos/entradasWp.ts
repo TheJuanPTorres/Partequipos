@@ -51,7 +51,7 @@ export const ENTRADAS_WP: EntradaWp[] = [
   {
     marca: `${M}hitachi`,
     tipo: `${M}miniexcavadora-hitachi`,
-    texto: "Miniexcavadora Hitachi EX450LC-5",
+    texto: "Miniexcavadora Hitachi LANDCROS EX450LC-5",
     serie: "EX",
     enlace: { tipo: `${M}excavadora-hitachi`, modelo: "repuestos-excavadora-hitachi-zx450lc-5" },
   },

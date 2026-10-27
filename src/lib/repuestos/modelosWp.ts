@@ -20,7 +20,7 @@ export type PaginaModeloWp = {
 
 /** Texto alternativo de la foto propia de WordPress de la tarjeta «Estamos aquí para ayudarlo». */
 export const ALT_FOTO_AYUDA =
-  "Excavadora Hitachi naranja sobre un montón de tierra, bajo un cielo con nubes";
+  "Excavadora Hitachi LANDCROS naranja sobre un montón de tierra, bajo un cielo con nubes";
 
 const CATEGORIAS = {
   rodaje: "tren-de-rodaje-para-maquinaria-pesada",

@@ -40,8 +40,8 @@ describe("«Ver todo» de la marca de repuestos abre el panel", () => {
     assert.deepEqual(
       t.map((x) => [x.panel?.titulo, x.panel?.total, x.panel?.elementos.map((e) => e.id)]),
       [
-        ["Excavadora HITACHI EX", 2, [2, 3]],
-        ["Excavadora HITACHI ZAXIS", 1, [1]],
+        ["Excavadora Hitachi LANDCROS EX", 2, [2, 3]],
+        ["Excavadora Hitachi LANDCROS ZAXIS", 1, [1]],
       ],
     );
     // El enlace a la página completa y el color de la barra.
@@ -55,7 +55,7 @@ describe("«Ver todo» de la marca de repuestos abre el panel", () => {
 
   it("sin series, todos los modelos del tipo", () => {
     const t = tarjetasDeTipos(marca, [tipo([])], () => [modelo(1, null), modelo(2, null)]);
-    assert.equal(t[0]?.panel?.titulo, "Excavadora HITACHI");
+    assert.equal(t[0]?.panel?.titulo, "Excavadora Hitachi LANDCROS");
     assert.equal(t[0]?.panel?.total, 2);
   });
 

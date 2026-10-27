@@ -87,13 +87,13 @@ describe("títulos de la plantilla 4086", () => {
   };
 
   it("el h1: «{MARCA} {Tipo} {Modelo}» con el código", () => {
-    assert.equal(tituloModelo4086(nombres), "HITACHI Excavadora EX120-2");
+    assert.equal(tituloModelo4086(nombres), "Hitachi LANDCROS Excavadora EX120-2");
   });
 
   it("sin código, el nombre del modelo", () => {
     assert.equal(
       tituloModelo4086({ ...nombres, modelo: { nombre: "ZX200", codigo: null } }),
-      "HITACHI Excavadora ZX200",
+      "Hitachi LANDCROS Excavadora ZX200",
     );
   });
 

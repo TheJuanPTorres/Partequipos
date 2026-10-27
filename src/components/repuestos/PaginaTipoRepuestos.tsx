@@ -19,6 +19,7 @@ import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
 import { colorDeMarca, estiloDeMarca } from "@/lib/marca/colorMarca";
+import { marcaEnMayusculas } from "@/lib/marca/hitachiLandcros";
 import { tarjetasDeCategorias, vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
@@ -117,7 +118,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         tipo={tipo}
         modelos={enlaces}
         verTodo="Ver repuestos"
-        tituloPanel={`${tipoEnTitulo(tipo.nombre)} ${marca.nombre.trim().toUpperCase()}`}
+        tituloPanel={`${tipoEnTitulo(tipo.nombre)} ${marcaEnMayusculas(marca.nombre)}`}
         grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
         barraSeries={MEJORAS_ACTIVAS.R2}

@@ -46,6 +46,9 @@ const AVISO_BLOQUES = (texto?: string) => ({
   clientProps: texto ? { texto } : {},
 });
 
+const AYUDA_ANCHO_USADOS =
+  "En esta sección la columna ya es estrecha: solo «Estrecho» cambia el aspecto.";
+
 export const PaginaInstitucional: CollectionConfig = {
   slug: "paginas",
   labels: {
@@ -506,7 +509,12 @@ export const PaginaInstitucional: CollectionConfig = {
           "Encuentra excavadoras, retrocargadoras, cargadores, minicargadores, motoniveladoras y más para construcción, infraestructura y movimiento de tierra en Colombia.",
         ),
         alineacionTextoField("descripcionAlineacion", "Alineación del texto de la cabecera"),
-        anchoTextoField("descripcionAncho", "Ancho del texto de la cabecera", "columna"),
+        anchoTextoField(
+          "descripcionAncho",
+          "Ancho del texto de la cabecera",
+          "columna",
+          AYUDA_ANCHO_USADOS,
+        ),
         imagenKit(
           "imagenExcavadoras",
           "Imagen del filtro «Excavadora»",
@@ -566,7 +574,12 @@ export const PaginaInstitucional: CollectionConfig = {
           },
         },
         alineacionTextoField("marcasTextoAlineacion", "Alineación de la frase de la cabecera"),
-        anchoTextoField("marcasTextoAncho", "Ancho de la frase de la cabecera", "estrecho"),
+        anchoTextoField(
+          "marcasTextoAncho",
+          "Ancho de la frase de la cabecera",
+          "estrecho",
+          AYUDA_ANCHO_USADOS,
+        ),
         texto(
           "botonTexto",
           "Texto del botón de la cabecera",

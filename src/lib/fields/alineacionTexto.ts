@@ -44,7 +44,12 @@ export function lineasDeTexto(texto: string | null | undefined): string[] {
 export const ANCHOS_TEXTO = ["estrecho", "medio", "ancho", "columna"] as const;
 export type AnchoTexto = (typeof ANCHOS_TEXTO)[number];
 
-export function anchoTextoField(name: string, label: string, defaultValue: AnchoTexto): Field {
+export function anchoTextoField(
+  name: string,
+  label: string,
+  defaultValue: AnchoTexto,
+  ayudaExtra?: string,
+): Field {
   return {
     name,
     type: "select",
@@ -57,8 +62,7 @@ export function anchoTextoField(name: string, label: string, defaultValue: Ancho
       { label: "Toda la columna", value: "columna" },
     ],
     admin: {
-      description:
-        "Hasta dónde se estira el texto hacia la derecha. Nunca pasa del borde de su columna; en el teléfono no cambia nada.",
+      description: `Hasta dónde se estira el texto hacia la derecha. Nunca pasa del borde de su columna; en el teléfono no cambia nada.${ayudaExtra ? ` ${ayudaExtra}` : ""}`,
     },
   };
 }

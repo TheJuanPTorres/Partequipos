@@ -288,6 +288,12 @@ async function retirar(): Promise<void> {
       log(`${c.sitio} ${c.id}: ya no existe, se salta`);
       continue;
     }
+    // Ya con su valor de antes: el texto de marca de una unidad usada vuelve solo al devolver su
+    // nombre (el gancho lo iguala al de su marca, devuelta primero).
+    if (igual(doc[c.campo], c.antes)) {
+      devueltos += 1;
+      continue;
+    }
     if (!igual(doc[c.campo], c.despues)) {
       log(`${c.sitio} ${c.id ?? ""} ${c.campo}: lo cambió alguien después; NO se toca`);
       continue;

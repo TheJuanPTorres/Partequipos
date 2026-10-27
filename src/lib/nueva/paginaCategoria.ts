@@ -1,4 +1,4 @@
-import type { EquiposNuevo, MarcasMaquinaria, TiposMaquinaria } from "@/payload-types";
+import type { EquiposNuevo, MarcasMaquinaria, Media, TiposMaquinaria } from "@/payload-types";
 
 import { COLOR_SIN_MARCA, colorDeMarca, tintaDeLogoSobre } from "../marca/colorMarca";
 import type { LogoConAlt } from "../marca/logoMarca";
@@ -134,14 +134,18 @@ export function sinAditamentos(equipos: EquiposNuevo[]): EquiposNuevo[] {
   return equipos.filter((e) => poblado<MarcasMaquinaria>(e.marca)?.slug !== SLUG_ADITAMENTOS);
 }
 
-/** Cabecera: el `<h1>` del banner, la descripción y la foto del primer equipo. */
+/**
+ * Cabecera: el `<h1>` del banner, la descripción y la foto: la «Imagen de la tarjeta» de la
+ * categoría en el panel (2026-10-26, cliente: la del tipo) y, sin ella, la del primer equipo.
+ */
 export function vistaEncabezadoCategoriaNueva(
   titulo: string,
   descripcion: string | null | undefined,
   equipos: EquiposNuevo[],
+  foto: Media | null = null,
 ): VistaEncabezado {
-  let fondo = null;
-  for (const e of equipos) {
+  let fondo = imagenDeMedia(foto, "");
+  for (const e of fondo ? [] : equipos) {
     fondo = (e.imagenes ?? []).map((i) => imagenDeMedia(i, "")).find(Boolean) ?? null;
     if (fondo) break;
   }

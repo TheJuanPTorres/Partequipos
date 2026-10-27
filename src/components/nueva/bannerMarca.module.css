@@ -1,0 +1,294 @@
+/*
+ * BANNER DE MARCA de la página general de tipo de nueva (2026-10-26, prototipo del cliente
+ * portado; `BannerMarcaTipo.tsx`). Las medidas son las del prototipo. Variables (las pone el
+ * componente): `--acento` (color de la marca), `--acento-oscuro` (la forma de atrás),
+ * `--banner-fondo` (el tono claro de escritorio) y `--banner-tinta` (el título sobre él).
+ */
+
+/* Móvil primero: tarjeta blanca con el bloque de color del logo, el título y la flecha. */
+.banner {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-height: 88px;
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(16 15 15 / 0.06),
+    0 6px 16px -10px rgb(16 15 15 / 0.18);
+}
+
+/* La foto de la marca: entra desde la mitad, teñida con su color y oscura al borde derecho. */
+.foto {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: -1;
+  display: none;
+  width: 62%;
+  height: 100%;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgb(0 0 0 / 0.55) 30%, #000 55%);
+  mask-image: linear-gradient(to right, transparent 0%, rgb(0 0 0 / 0.55) 30%, #000 55%);
+}
+
+.fotoTinte {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--acento) 0%, var(--acento) 25%, transparent 70%);
+  opacity: 0.8;
+  mix-blend-mode: multiply;
+}
+
+.fotoSombra {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to left,
+    rgb(20 14 12 / 0.75) 0%,
+    rgb(20 14 12 / 0.35) 28%,
+    transparent 55%
+  );
+}
+
+/* Las formas del logo (escritorio): sesgadas desde abajo, así el borde diagonal sube hacia la
+   derecha; la de atrás, 22 px más ancha y más oscura, asoma por la diagonal. */
+.forma,
+.formaAtras {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -100px;
+  display: none;
+  border-radius: 0 16px 16px 0;
+  transform: skewX(-30deg);
+  transform-origin: bottom;
+}
+
+.formaAtras {
+  width: calc(22% + 100px - 2.2rem + 22px);
+  background: var(--acento-oscuro);
+}
+
+.forma {
+  width: calc(22% + 100px - 2.2rem);
+  background: var(--acento);
+}
+
+/* En móvil, el bloque del logo con su esquina en diagonal. */
+.logoCaja {
+  position: relative;
+  display: flex;
+  width: 36%;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6% 0 12px;
+  background: var(--acento);
+  clip-path: polygon(0 0, 100% 0, 84% 100%, 0 100%);
+}
+
+.logo {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 36px;
+}
+
+/* El logo en una sola tinta sobre el color de la marca (como la barra de marcas). */
+.logoCaja[data-tinta="clara"] .logo {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
+.logoCaja[data-tinta="oscura"] .logo {
+  filter: brightness(0);
+  opacity: 1;
+}
+
+/* Un logo JPEG (opaco): con sus colores sobre una placa blanca, como la cabecera del kit. */
+.logoCaja[data-tinta="placa"] .logo {
+  box-sizing: content-box;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.logoTexto {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.logoCaja[data-tinta="clara"] /* Un logo JPEG (opaco): con sus colores sobre una placa blanca, como la cabecera del kit. */
+.logoCaja[data-tinta="placa"] .logo {
+  box-sizing: content-box;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.logoTexto {
+  color: #fff;
+}
+
+.logoCaja[data-tinta="oscura"] /* Un logo JPEG (opaco): con sus colores sobre una placa blanca, como la cabecera del kit. */
+.logoCaja[data-tinta="placa"] .logo {
+  box-sizing: content-box;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.logoTexto {
+  color: #000;
+}
+
+.texto {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 0 12px 12px;
+}
+
+.titulo {
+  margin: 0;
+  color: #100f0f;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.accion {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0 16px 0 8px;
+}
+
+.ver {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: #100f0f;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.3s;
+}
+
+.ver svg {
+  flex: none;
+  color: var(--acento);
+  transition: transform 0.3s;
+}
+
+.ver:hover svg {
+  transform: translateX(4px);
+}
+
+.ver:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px #100f0f;
+}
+
+/* En móvil, «Ver marca» solo para lectores (la flecha es el botón). */
+.verTexto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Desde tablet: el banner de color completo. */
+@media (min-width: 768px) {
+  .banner {
+    display: grid;
+    min-height: 108px;
+    grid-template-columns: 22% minmax(0, 1fr) auto;
+    align-items: center;
+    background: var(--banner-fondo);
+    box-shadow: none;
+  }
+
+  .foto,
+  .forma,
+  .formaAtras {
+    display: block;
+  }
+
+  .logoCaja {
+    width: auto;
+    align-self: stretch;
+    padding: 0 3.5rem 0 0;
+    background: transparent;
+    clip-path: none;
+  }
+
+  .logo {
+    max-width: 170px;
+    max-height: 48px;
+  }
+
+  .texto {
+    display: block;
+    padding: 0 0 0 calc(1.5% + 28px);
+  }
+
+  /* Un título largo se parte antes de llegar a la zona oscura de la foto. */
+  .titulo {
+    max-width: 24ch;
+    text-wrap: balance;
+    color: var(--banner-tinta);
+    font-size: clamp(1.5rem, 2.2vw, 2.1rem);
+    line-height: 1.15;
+  }
+
+  .accion {
+    display: block;
+    padding: 0 32px 0 16px;
+  }
+
+  .ver {
+    width: auto;
+    height: auto;
+    min-height: 44px;
+    gap: 24px;
+    padding: 0 24px;
+    border: 1.5px solid var(--acento);
+    background: rgb(16 15 15 / 0.85);
+  }
+
+  .verTexto {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ver,
+  .ver svg {
+    transition: none;
+  }
+
+  .ver:hover svg {
+    transform: none;
+  }
+}

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { FranjaMarca } from "@/components/marca/FranjaMarca";
-import { TarjetaEquipo } from "@/components/nueva/TarjetaEquipo";
+import { BannerMarcaTipo } from "@/components/nueva/BannerMarcaTipo";
+import estilosKit from "@/components/nueva/kit/kit.module.css";
+import { TarjetaKit } from "@/components/nueva/kit/TarjetaKit";
 import estilosTarjetas from "@/components/nueva/marcaNueva.module.css";
 import { BarraSeries } from "@/components/repuestos/BarraSeries";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
@@ -18,7 +20,10 @@ import {
   tituloBannerTipoNueva,
   vistaEncabezadoCategoriaNueva,
 } from "@/lib/nueva/paginaCategoria";
+import { tintaSobre } from "@/lib/marca/colorMarca";
 import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
+import { vistaBanner } from "@/lib/nueva/bannerMarca";
+import { columnaDeTarjeta } from "@/lib/nueva/paginaKit";
 import { getLogosMarca } from "@/lib/queries/getLogosMarca";
 import {
   getEquiposDeTipos,
@@ -35,6 +40,7 @@ import { METADATA_404 } from "@/lib/seo/noEncontrada";
 import { descripcionPorDefecto, tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
+import type { Media } from "@/payload-types";
 
 type Params = { categoria: string };
 
@@ -78,8 +84,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  * (`TarjetaEquipo`) agrupadas por marca y tipo con su subtítulo («Excavadoras Hitachi»), con la
  * regla de tarjetas, y el formulario al final. Desde el 2026-10-23 es también la PÁGINA GENERAL
  * de cada tipo (tarea 9): banner «Maquinaria Pesada {Nombre} Nuevo/Nueva», sin el título «Modelos de …»,
- * cada grupo (marca y tipo) empieza con la franja de su marca (`FranjaMarca`, la de la ficha
- * nueva), y solo marcas: sin los aditamentos. Las URL de su antigua paginación (`pagina/<n>/`)
+ * y solo marcas: sin los aditamentos. Desde el 2026-10-26 (prototipo del cliente «Excavadoras
+ * nuevas», portado): la cabecera con la foto de la categoría del panel, y cada grupo (marca y
+ * tipo) empieza con el BANNER de su marca (`BannerMarcaTipo`, en lugar de la franja del #349 y
+ * sin el conteo de modelos) seguido de las tarjetas del «Kit de marca» (`TarjetaKit`), en el
+ * orden del campo «Orden», 3 por fila y la última fila centrada. Las URL de su antigua paginación (`pagina/<n>/`)
  * dan 301 aquí; con filtros en la query, la canónica es la de siempre, sin query.
  */
 export default async function CategoriaNuevaPage({ params }: { params: Promise<Params> }) {
@@ -103,9 +112,8 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
   ]);
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const grupos = gruposPorMarcaYTipo(equipos);
-  // Cada grupo empieza con la franja de su marca (la de «Otros {tipo}» de la ficha nueva), también
-  // con una sola marca (dirección, 2026-10-23). El logo, el único del sitio: la marca con su logo
-  // poblado (`getMarcasMaquinaria`); sin logo, solo el título.
+  // Cada grupo empieza con el banner de su marca, también con una sola marca. La marca, con sus
+  // imágenes pobladas (`getMarcasMaquinaria`): el logo (el único del sitio), el color y la foto.
   const marcaConLogo = new Map(marcas.map((m) => [m.slug, m]));
   const logoDe = (m: (typeof grupos)[number]["marca"]) =>
     conAlt(logoDeMarca(marcaConLogo.get(m.slug) ?? m, logos), `Logo de ${m.nombre}`);
@@ -124,6 +132,7 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
           tituloBannerTipoNueva(categoria.nombre),
           categoria.descripcion,
           equipos,
+          categoria.foto as Media | null,
         )}
         anclaSiguiente={ANCLA_MODELOS}
         bajaSinFoto
@@ -145,30 +154,43 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
           />
         ) : null}
         {grupos.length > 0 ? (
-          grupos.map((g, i) => (
-            <div key={g.clave} id={`grupo-${g.clave}`} className={estilosTarjetas.grupoMarca}>
-              {/* `h2` en la franja: los nombres de las tarjetas (`TarjetaEquipo`) son `h3`. */}
-              <FranjaMarca
-                id={`grupo-${g.clave}-t`}
-                titulo={g.titulo}
-                logo={logoDe(g.marca)}
-                color={g.marca.colorMarca}
-                foto={g.foto}
-                modelos={g.tarjetas.length}
-                marca={{ nombre: g.marca.nombre, href: `${rutas.marcaMaquinaria(g.marca.slug)}/` }}
-              />
-              <ul className={estilosTarjetas.rejilla}>
-                {g.tarjetas.map((e, j) => (
-                  <TarjetaEquipo
-                    key={e.id}
-                    equipo={e}
-                    anclaContacto={ANCLA_CONTACTO}
-                    prioridad={i === 0 && j < 3}
-                  />
-                ))}
-              </ul>
-            </div>
-          ))
+          grupos.map((g, i) => {
+            const marca = marcaConLogo.get(g.marca.slug) ?? g.marca;
+            const vista = vistaBanner(marca);
+            const nombre = g.marca.nombre.trim();
+            return (
+              <div
+                key={g.clave}
+                id={`grupo-${g.clave}`}
+                className={`${estilosTarjetas.grupoMarca} ${estilosTarjetas.grupoKit}`}
+                style={
+                  { "--acento": vista.acento, "--tinta": tintaSobre(vista.acento) } as CSSProperties
+                }
+              >
+                {/* `h2` en el banner: los nombres de las tarjetas (`TarjetaKit`) son `h3`. */}
+                <BannerMarcaTipo
+                  id={`grupo-${g.clave}-t`}
+                  titulo={g.titulo}
+                  marca={{ nombre, href: `${rutas.marcaMaquinaria(g.marca.slug)}/` }}
+                  logo={logoDe(g.marca)}
+                  vista={vista}
+                />
+                <ul className={`${estilosKit.rejilla} ${estilosTarjetas.rejillaKit}`}>
+                  {g.tarjetas.map((e, j) => (
+                    <TarjetaKit
+                      key={e.id}
+                      equipo={e}
+                      columna={columnaDeTarjeta(j, g.tarjetas.length)}
+                      marca={nombre}
+                      origen={`${rutas.categoriaNueva(categoria.slug)}/`}
+                      anclaContacto={ANCLA_CONTACTO}
+                      prioridad={i === 0 && j < 3}
+                    />
+                  ))}
+                </ul>
+              </div>
+            );
+          })
         ) : (
           <p>{`Todavía no hay equipos publicados de ${titulo}.`}</p>
         )}

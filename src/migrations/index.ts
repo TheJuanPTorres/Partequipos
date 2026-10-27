@@ -94,6 +94,7 @@ import * as migration_20261026_220102_portada_texto_repuestos from './20261026_2
 import * as migration_20261027_043129_marcas_aliadas_nosotros from './20261027_043129_marcas_aliadas_nosotros';
 import * as migration_20261027_162258_portada_nueva_maquina_fondo from './20261027_162258_portada_nueva_maquina_fondo';
 import * as migration_20261027_191652_portada_alineacion_textos from './20261027_191652_portada_alineacion_textos';
+import * as migration_20261027_195936_correo_smtp_panel from './20261027_195936_correo_smtp_panel';
 
 export const migrations = [
   {
@@ -574,6 +575,11 @@ export const migrations = [
   {
     up: migration_20261027_191652_portada_alineacion_textos.up,
     down: migration_20261027_191652_portada_alineacion_textos.down,
-    name: '20261027_191652_portada_alineacion_textos'
+    name: '20261027_191652_portada_alineacion_textos',
+  },
+  {
+    up: migration_20261027_195936_correo_smtp_panel.up,
+    down: migration_20261027_195936_correo_smtp_panel.down,
+    name: '20261027_195936_correo_smtp_panel'
   },
 ];

@@ -76,11 +76,6 @@ type Props = {
   animar?: readonly string[];
   /** Cierra la ventana: lo usa el botón de la confirmación animada (F3). */
   alCerrar?: () => void;
-  /**
-   * WhatsApp como el enlace de texto de antes y no como el botón verde. Solo lo usa el estado vacío
-   * de los listados de usados, que queda fuera del cambio del 2026-10-27.
-   */
-  whatsappComoEnlace?: boolean;
 };
 
 const OPCIONES = {
@@ -104,7 +99,6 @@ export function FormularioSolicitud({
   mensajeInicial,
   animar = [],
   alCerrar,
-  whatsappComoEnlace = false,
 }: Props) {
   // El mensaje de WhatsApp lleva el contexto de la página, salvo que quien llama ya haya puesto uno
   // (el producto que se cotiza, el modelo…).
@@ -459,7 +453,7 @@ export function FormularioSolicitud({
             {enviando ? "Enviando la solicitud" : ""}
           </span>
 
-          {whatsappContexto && !whatsappComoEnlace ? (
+          {whatsappContexto ? (
             // Botón verde con el icono: en la VENTANA desde el 2026-10-25 (#351) y en los formularios
             // de página desde el 2026-10-27. Pestaña nueva, con el contexto de la página en el
             // mensaje. Fuera de la ventana el aspecto lo dan estas clases (y la piel de Contáctanos
@@ -478,15 +472,6 @@ export function FormularioSolicitud({
               <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={2} size={20} />
               Escríbenos por WhatsApp
               <span className="sr-only"> (se abre en otra pestaña)</span>
-            </a>
-          ) : whatsappContexto ? (
-            <a
-              href={whatsappContexto.href}
-              className="text-sm text-gray-700 underline hover:text-gray-900"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              O escríbenos por WhatsApp
             </a>
           ) : null}
         </div>

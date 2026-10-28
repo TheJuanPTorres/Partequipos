@@ -1,6 +1,8 @@
 import { IconBarcode, IconCalendar, IconClockHour4, IconWeight } from "@tabler/icons-react";
 import Link from "next/link";
 
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import { turnstileSiteKey } from "@/lib/turnstile";
 import { PlantillaListado } from "@/components/listado/PlantillaListado";
 import { TarjetaListado } from "@/components/listado/TarjetaListado";
 import type { ResultadoListado } from "@/lib/filtros";
@@ -39,7 +41,10 @@ export function ListadoUsados({
   vacio,
   aviso,
   animaciones = [],
+  avisoFiltros,
 }: {
+  /** WhatsApp para «Avísame» cuando los filtros no dejan ninguna unidad. */
+  avisoFiltros?: AvisoVacio | null;
   ambito: Ambito;
   pagina: number;
   listado: Extract<ResultadoListado<UnidadUsada>, { tipo: "listado" }>;
@@ -76,6 +81,27 @@ export function ListadoUsados({
       rutaDe={(n) => `${ambito.ruta(n)}/`}
       elemento={{ singular: "unidad", plural: "unidades" }}
       idLista="tarjetas-usada"
+      avisame={(filtros) => (
+        <BotonFormulario
+          href="/contactanos/"
+          className={estilosListado.avisame}
+          formulario={{
+            tipo: "cotizacion",
+            origen: `${ambito.ruta(pagina)}/`,
+            siteKey: turnstileSiteKey(),
+            whatsapp: avisoFiltros?.whatsapp,
+            referencia: {
+              texto: `${ambito.titulo}${filtros.length ? ` · ${filtros.join(", ")}` : ""} (avísame cuando llegue una)`,
+            },
+            titulo: "Avísame cuando llegue una",
+            descripcion:
+              "Déjanos tus datos y te escribimos en cuanto entre una unidad como la que buscas. Ya indicamos los filtros que elegiste; si quieres algo más concreto, cuéntanoslo en el mensaje.",
+            textoBoton: "Avísame",
+          }}
+        >
+          avísame cuando llegue una
+        </BotonFormulario>
+      )}
       vacio={
         vacio ? (
           <EstadoVacioUsados datos={vacio} origen={`${ambito.ruta(pagina)}/`} />

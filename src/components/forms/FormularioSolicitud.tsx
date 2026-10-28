@@ -8,6 +8,7 @@ import { Turnstile } from "@/components/forms/Turnstile";
 import { ESTADO_INICIAL } from "@/lib/actions/estadoFormulario";
 import { enviarSolicitud } from "@/lib/actions/solicitudes";
 import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/opcionesSolicitud";
+import { conMensaje, mensajeWhatsApp } from "@/lib/whatsapp";
 
 /**
  * Formulario de solicitud. Sirve a los tres casos (contacto, cotización de
@@ -75,6 +76,11 @@ type Props = {
   animar?: readonly string[];
   /** Cierra la ventana: lo usa el botón de la confirmación animada (F3). */
   alCerrar?: () => void;
+  /**
+   * WhatsApp como el enlace de texto de antes y no como el botón verde. Solo lo usa el estado vacío
+   * de los listados de usados, que queda fuera del cambio del 2026-10-27.
+   */
+  whatsappComoEnlace?: boolean;
 };
 
 const OPCIONES = {
@@ -98,7 +104,15 @@ export function FormularioSolicitud({
   mensajeInicial,
   animar = [],
   alCerrar,
+  whatsappComoEnlace = false,
 }: Props) {
+  // El mensaje de WhatsApp lleva el contexto de la página, salvo que quien llama ya haya puesto uno
+  // (el producto que se cotiza, el modelo…).
+  const whatsappContexto = whatsapp
+    ? new URL(whatsapp.href).searchParams.has("text")
+      ? whatsapp
+      : conMensaje(whatsapp, mensajeWhatsApp(referencia?.texto, titulo))
+    : undefined;
   /*
    * La VENTANA EMERGENTE lleva siempre «Ciudad» y «¿Qué necesitas?» (dirección,
    * 2026-10-19) y no las preguntas de clasificación del diseño de repuestos:
@@ -418,7 +432,14 @@ export function FormularioSolicitud({
          */}
         {siteKey ? <Turnstile siteKey={siteKey} reinicio={estado} /> : null}
 
-        <div className="flex flex-wrap items-center gap-4 pt-2">
+        <div
+          className={
+            // En las páginas, en móvil, «Enviar» y WhatsApp a todo el ancho, uno debajo del otro.
+            emergente
+              ? "flex flex-wrap items-center gap-4 pt-2"
+              : "flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
+          }
+        >
           {/*
            * DOBLE ENVÍO: el botón se deshabilita mientras la acción está en
            * vuelo. `useActionState` además encola las llamadas, así que un
@@ -428,7 +449,7 @@ export function FormularioSolicitud({
             type="submit"
             disabled={enviando}
             data-enviando={f3 && enviando ? "" : undefined}
-            className="rounded bg-gray-900 px-5 py-2.5 font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
+            className={`${emergente ? "" : "w-full sm:w-auto "}rounded bg-gray-900 px-5 py-2.5 font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400`}
           >
             {enviando ? "Enviando…" : textoBoton}
           </button>
@@ -438,22 +459,29 @@ export function FormularioSolicitud({
             {enviando ? "Enviando la solicitud" : ""}
           </span>
 
-          {whatsapp && emergente ? (
-            // La VENTANA lleva un botón verde con el icono (2026-10-25); el enlace de texto de las
-            // páginas no cambia. Mismo destino y mensaje, en pestaña nueva.
+          {whatsappContexto && !whatsappComoEnlace ? (
+            // Botón verde con el icono: en la VENTANA desde el 2026-10-25 (#351) y en los formularios
+            // de página desde el 2026-10-27. Pestaña nueva, con el contexto de la página en el
+            // mensaje. Fuera de la ventana el aspecto lo dan estas clases (y la piel de Contáctanos
+            // el radio); en la ventana manda `ventanaFormulario.module.css`.
             <a
-              href={whatsapp.href}
+              href={whatsappContexto.href}
               data-whatsapp-boton=""
               rel="noopener noreferrer"
               target="_blank"
+              className={
+                emergente
+                  ? undefined
+                  : "inline-flex w-full items-center justify-center gap-2 rounded bg-[#0f7b45] px-5 py-2.5 font-medium text-white no-underline transition-colors duration-300 hover:bg-[#0a6e37] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#0a6e37] motion-reduce:transition-none sm:w-auto"
+              }
             >
               <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={2} size={20} />
               Escríbenos por WhatsApp
               <span className="sr-only"> (se abre en otra pestaña)</span>
             </a>
-          ) : whatsapp ? (
+          ) : whatsappContexto ? (
             <a
-              href={whatsapp.href}
+              href={whatsappContexto.href}
               className="text-sm text-gray-700 underline hover:text-gray-900"
               rel="noopener noreferrer"
               target="_blank"

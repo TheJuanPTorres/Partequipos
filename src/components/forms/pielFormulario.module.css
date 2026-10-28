@@ -115,6 +115,20 @@
   background: var(--color-texto);
 }
 
+/* El botón verde de WhatsApp (2026-10-27), del mismo alto, radio y letra que «Enviar». */
+.formulario a[data-whatsapp-boton] {
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 0 22px;
+  border-radius: 30px;
+  font-size: var(--texto-etiqueta);
+  line-height: 1.2;
+}
+
+.formulario a[data-whatsapp-boton] svg {
+  flex: none;
+}
+
 /*
  * «Enviar HV» (2026-10-23): el PDF y la casilla de autorización. A diferencia de los demás campos,
  * su etiqueta SE VE (un archivo no tiene marcador de posición): por eso son `<section>` y no `<div>`

@@ -20,6 +20,20 @@ export function enlaceWhatsApp(numero: string, mensaje?: string): EnlaceWhatsApp
   return { href: url.toString(), etiqueta: numero };
 }
 
+/**
+ * Mensaje de WhatsApp de un formulario con el contexto de su página (2026-10-27): lo que se consulta
+ * si hay referencia (el equipo, el modelo) y, si no, el título del formulario («Contacto sobre
+ * repuestos Hitachi», «Contáctanos»…).
+ */
+export function mensajeWhatsApp(referencia: string | undefined, titulo: string): string {
+  const ref = referencia?.trim();
+  if (ref) return `Hola, quiero información sobre ${ref}.`;
+  const t = titulo.trim();
+  return t
+    ? `Hola, les escribo desde la página «${t}» de Partequipos.`
+    : "Hola, quiero información.";
+}
+
 /** El mismo enlace con un mensaje ya escrito (`?text=`), p. ej. el producto que se cotiza. */
 export function conMensaje(enlace: EnlaceWhatsApp, mensaje: string): EnlaceWhatsApp {
   const url = new URL(enlace.href);

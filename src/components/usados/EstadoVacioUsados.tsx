@@ -83,7 +83,7 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
       ) : null}
 
       <div id={ANCLA_AVISO} className={estilos.formulario}>
-        <FormularioSolicitud {...formulario} />
+        <FormularioSolicitud {...formulario} whatsappComoEnlace />
       </div>
     </div>
   );

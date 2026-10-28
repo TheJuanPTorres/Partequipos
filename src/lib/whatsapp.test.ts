@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { conMensaje, enlaceWhatsApp } from "./whatsapp";
+import { conMensaje, enlaceWhatsApp, mensajeWhatsApp } from "./whatsapp";
 
 describe("conMensaje", () => {
   it("añade el mensaje al enlace sin cambiar el número ni la etiqueta", () => {
@@ -17,5 +17,25 @@ describe("conMensaje", () => {
     const base = enlaceWhatsApp("+57 317 000 0000", "antes");
     assert.ok(base);
     assert.equal(new URL(conMensaje(base, "después").href).searchParams.get("text"), "después");
+  });
+});
+
+describe("mensajeWhatsApp", () => {
+  it("con referencia, nombra lo que se consulta", () => {
+    assert.equal(
+      mensajeWhatsApp(" Excavadora Hitachi ZX350 ", "Cotización"),
+      "Hola, quiero información sobre Excavadora Hitachi ZX350.",
+    );
+  });
+
+  it("sin referencia, nombra el formulario de la página", () => {
+    assert.equal(
+      mensajeWhatsApp(undefined, "Contacto sobre repuestos Hitachi"),
+      "Hola, les escribo desde la página «Contacto sobre repuestos Hitachi» de Partequipos.",
+    );
+  });
+
+  it("sin referencia ni título, un saludo genérico", () => {
+    assert.equal(mensajeWhatsApp("  ", " "), "Hola, quiero información.");
   });
 });

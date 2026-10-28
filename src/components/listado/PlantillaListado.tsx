@@ -67,6 +67,7 @@ export function PlantillaListado<T>({
   idLista,
   vacio,
   avisame,
+  escribenos,
   children,
 }: {
   migas: Miga[];
@@ -111,6 +112,8 @@ export function PlantillaListado<T>({
    * enlace a /contactanos/.
    */
   avisame?: (filtros: string[]) => ReactNode;
+  /** El botón verde «Escríbenos por WhatsApp» del mismo estado, con los filtros activos en el mensaje. */
+  escribenos?: (filtros: string[]) => ReactNode;
   /** Las tarjetas (`<TarjetaListado>`), ya en su orden. */
   children: ReactNode;
 }) {
@@ -222,18 +225,14 @@ export function PlantillaListado<T>({
           >
             Limpiar filtros
           </Link>
-          {elemento.singular === "unidad" ? (
-            <>
-              {" o "}
-              {avisame ? (
-                avisame(chips.map((c) => c.etiqueta))
-              ) : (
-                <Link href="/contactanos/">avísame cuando llegue una</Link>
-              )}
-            </>
-          ) : null}
           .
         </p>
+        {avisame || escribenos ? (
+          <div className={estilos.acciones2}>
+            {avisame?.(chips.map((c) => c.etiqueta))}
+            {escribenos?.(chips.map((c) => c.etiqueta))}
+          </div>
+        ) : null}
       </div>
     ) : (
       <ul id={idLista} className={estilos.tarjetas} data-vista="lista">

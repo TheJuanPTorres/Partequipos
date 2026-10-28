@@ -244,12 +244,41 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
 
 .externo svg {
   flex: none;
   width: 14px;
   height: 14px;
+}
+
+/*
+ * Barra de escritorio estrecha (1025–1299 px): con seis enlaces (la tienda,
+ * 2026-10-27) logo, menú y acciones no caben a la vez, y la columna de la lupa
+ * y «Contáctanos», que encoge por debajo de su contenido, se metía sobre el
+ * último enlace (ya pasaba con «Blog» a 1025). Aquí no encoge por debajo de su
+ * contenido, el logo se queda en al menos 110 px y los enlaces juntan su aire
+ * (12 px entre textos en lugar de 26); los largos parten en dos líneas, como ya
+ * hacían. Medido en el preview del #406 de 1025 a 1440: sin solapes ni
+ * desbordamiento, y desde 1300 la barra queda igual que antes.
+ */
+@media (min-width: 1025px) and (max-width: 1299px) {
+  .accionCol {
+    min-width: max-content;
+  }
+
+  .logoCol {
+    min-width: 130px;
+  }
+
+  .lista {
+    gap: 0;
+  }
+
+  .enlace {
+    padding-inline: 6px;
+  }
 }
 
 .enlace:focus-visible,

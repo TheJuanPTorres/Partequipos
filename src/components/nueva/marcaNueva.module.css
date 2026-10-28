@@ -429,12 +429,20 @@ nav.barraMarcas {
 /*
  * Página general de tipo con el BANNER de marca y las tarjetas del «Kit de marca» (2026-10-26):
  * las variables de la tarjeta del kit (el grupo pone `--acento` y `--tinta`) y las tarjetas
- * 20 px bajo el banner.
+ * 32 px bajo el banner, 24 en móvil (Juan Pablo, 2026-10-27; igual que «Otros modelos» de la
+ * ficha nueva). Con `.grupoKit` delante: `.rejilla { margin: 0 }` del kit no depende así del
+ * orden en que se cargan los dos CSS.
  */
 .grupoKit {
   --gris: #f0f0f0;
 }
 
-.rejillaKit {
-  margin-top: 20px;
+.grupoKit .rejillaKit {
+  margin-top: 32px;
+}
+
+@media (max-width: 767px) {
+  .grupoKit .rejillaKit {
+    margin-top: 24px;
+  }
 }

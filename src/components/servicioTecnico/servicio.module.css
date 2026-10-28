@@ -201,11 +201,73 @@ video.medio {
   display: flex;
   flex-direction: column;
 }
-/* El texto arriba, bajo su `<h2>` (centrado en el alto dejaba un hueco a 1440). */
-.columnaPosventa > .columnaTexto {
+/*
+ * El cuerpo de la tarjeta de posventa (Juan Pablo, 2026-10-27): texto, cuatro puntos y botones.
+ * Sin foto, ocupa el alto de la tarjeta (la iguala la del alistamiento) y reparte el sobrante
+ * entre los tres grupos; con foto, la foto se queda con lo que sobra.
+ */
+.posventaCuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.posventaCuerpo:not([data-con-foto]) {
   flex: 1;
-  justify-content: flex-start;
+  justify-content: space-between;
+}
+.posventaTexto {
+  display: grid;
+  gap: 16px;
+}
+.puntos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
   padding: 0;
+  list-style: none;
+}
+.punto {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.puntoIcono {
+  flex: none;
+  /* El rojo de marca sobre blanco: 4,54:1. */
+  color: var(--color-marca);
+}
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+/* El verde de WhatsApp de los formularios (#405): blanco sobre #0f7b45, 5,3:1. */
+.boton.botonWhatsapp {
+  border-color: #0f7b45;
+  background: #0f7b45;
+}
+.boton.botonWhatsapp:hover {
+  border-color: #0a6e37;
+  background: #0a6e37;
+}
+.fotoPosventa {
+  position: relative;
+  flex: 1;
+  min-height: 200px;
+  margin-top: 24px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--color-fondo);
 }
 .tituloServicio {
   display: flex;
@@ -522,6 +584,19 @@ video.medio {
   }
   .columnaSeccion {
     padding: 24px 16px;
+  }
+  /* En móvil, apilado: los puntos en una columna, los botones a todo el ancho, foto 16:9. */
+  .puntos {
+    grid-template-columns: 1fr;
+  }
+  .botones > * {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+  .fotoPosventa {
+    flex: none;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
   }
   .tituloServicio {
     justify-content: center;

@@ -1,5 +1,8 @@
 import {
+  IconBrandWhatsapp,
+  IconCalendarCog,
   IconChecklist,
+  IconClipboardCheck,
   IconDeviceDesktopCog,
   IconHeartHandshake,
   IconLinkOff,
@@ -7,6 +10,8 @@ import {
   IconPlayerPlayFilled,
   IconSettings,
   IconSettingsCog,
+  IconTool,
+  IconTools,
   IconWheel,
   type Icon,
 } from "@tabler/icons-react";
@@ -21,7 +26,7 @@ import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import type { EnlaceBloque } from "@/lib/bloques/vista";
 import type { VistaServicioTecnico } from "@/lib/servicioTecnico/vista";
 import { configContactoMarca, type ConfigFormulario } from "@/lib/formularios/configFormulario";
-import type { EnlaceWhatsApp } from "@/lib/whatsapp";
+import { conMensaje, type EnlaceWhatsApp } from "@/lib/whatsapp";
 
 import { CarruselVideos } from "./CarruselVideos";
 import estilos from "./servicio.module.css";
@@ -57,6 +62,20 @@ const SECCIONES: Record<string, { etiqueta: string; icono: Icon }> = {
   posventa: { etiqueta: "Servicio postventa", icono: IconHeartHandshake },
   siniestros: { etiqueta: "Siniestros de maquinaria", icono: IconLinkOff },
 };
+
+/**
+ * Los cuatro puntos de la tarjeta de posventa (Juan Pablo, 2026-10-27), sacados de su propio
+ * texto («reparaciones, alistamiento y/o mantenimientos…», «herramienta especializada»).
+ */
+const PUNTOS_POSVENTA: { texto: string; icono: Icon }[] = [
+  { texto: "Reparaciones", icono: IconTool },
+  { texto: "Alistamiento", icono: IconClipboardCheck },
+  { texto: "Mantenimiento", icono: IconCalendarCog },
+  { texto: "Herramienta especializada", icono: IconTools },
+];
+
+/** El mensaje del WhatsApp de la tarjeta de posventa. */
+const MENSAJE_POSVENTA = "Hola, quiero información sobre el servicio postventa.";
 
 /** Los iconos de los pasos de siniestros, por orden (los de Andrés). */
 const ICONOS_PASOS: Icon[] = [IconChecklist, IconDeviceDesktopCog, IconSettingsCog];
@@ -333,25 +352,74 @@ export function PlantillaServicioTecnico({
                 aria-labelledby={`${posventa.ancla}-antetitulo`}
               >
                 <TituloServicio ancla={posventa.ancla} texto={posventa.antetitulo} />
-                <div className={estilos.columnaTexto}>
-                  <Revelado
-                    id="posventa-titulo"
-                    como="h3"
-                    texto={posventa.titulo}
-                    {...RITMO}
-                    className={`${estilos.titulo} ${estilos.tituloEnTarjeta}`}
-                  />
-                  {posventa.parrafos.map((p) => (
-                    <p key={p} className={estilos.parrafo}>
-                      {p}
-                    </p>
-                  ))}
-                  <Contactanos
-                    boton={posventa.boton}
-                    formulario={formularioContacto}
-                    ancla={contacto?.ancla ?? null}
-                  />
+                {/*
+                 * La tarjeta reparte su alto (Juan Pablo, 2026-10-27): el texto, los cuatro
+                 * puntos, los botones juntos y, si el bloque tiene «Imagen» en el panel, la foto
+                 * abajo ocupando lo que queda; sin foto, los grupos se reparten el alto.
+                 */}
+                <div
+                  className={estilos.posventaCuerpo}
+                  data-con-foto={posventa.imagen ? "" : undefined}
+                >
+                  <div className={estilos.posventaTexto}>
+                    <Revelado
+                      id="posventa-titulo"
+                      como="h3"
+                      texto={posventa.titulo}
+                      {...RITMO}
+                      className={`${estilos.titulo} ${estilos.tituloEnTarjeta}`}
+                    />
+                    {posventa.parrafos.map((p) => (
+                      <p key={p} className={estilos.parrafo}>
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                  <ul className={estilos.puntos} aria-label="Qué incluye el servicio postventa">
+                    {PUNTOS_POSVENTA.map(({ texto, icono: Icono }) => (
+                      <li key={texto} className={estilos.punto}>
+                        <Icono
+                          size={26}
+                          stroke={1.6}
+                          aria-hidden="true"
+                          className={estilos.puntoIcono}
+                        />
+                        <span>{texto}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className={estilos.botones}>
+                    <Contactanos
+                      boton={posventa.boton}
+                      formulario={formularioContacto}
+                      ancla={contacto?.ancla ?? null}
+                    />
+                    {whatsapp ? (
+                      <a
+                        href={conMensaje(whatsapp, MENSAJE_POSVENTA).href}
+                        className={`${estilos.boton} ${estilos.botonWhatsapp}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <IconBrandWhatsapp size={20} stroke={1.6} aria-hidden="true" />
+                        WhatsApp
+                        <span className="sr-only"> (abre WhatsApp en una pestaña nueva)</span>
+                      </a>
+                    ) : null}
+                  </div>
                 </div>
+                {posventa.imagen ? (
+                  <div className={estilos.fotoPosventa}>
+                    <Image
+                      src={posventa.imagen.url}
+                      alt={posventa.imagen.alt}
+                      fill
+                      sizes="(max-width: 767px) 90vw, 44vw"
+                      className={estilos.medio}
+                      style={{ objectPosition: posventa.imagen.posicion }}
+                    />
+                  </div>
+                ) : null}
               </section>
             ) : (
               <div className={estilos.columnaTexto}>

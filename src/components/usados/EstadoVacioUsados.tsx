@@ -55,7 +55,7 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
           {datos.whatsapp ? (
             <a
               href={datos.whatsapp.href}
-              className={`${estilos.boton} ${estilos.botonNegro}`}
+              className={`${estilos.boton} ${estilos.botonVerde}`}
               target="_blank"
               rel="noopener noreferrer"
             >

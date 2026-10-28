@@ -2,7 +2,9 @@ import { IconBarcode, IconCalendar, IconClockHour4, IconWeight } from "@tabler/i
 import Link from "next/link";
 
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { turnstileSiteKey } from "@/lib/turnstile";
+import { conMensaje } from "@/lib/whatsapp";
 import { PlantillaListado } from "@/components/listado/PlantillaListado";
 import { TarjetaListado } from "@/components/listado/TarjetaListado";
 import type { ResultadoListado } from "@/lib/filtros";
@@ -64,6 +66,15 @@ export function ListadoUsados({
   ];
   if (pagina > 1) migas.push({ nombre: `Página ${pagina}`, path: ambito.ruta(pagina) });
 
+  // El mensaje de WhatsApp del estado «los filtros no dejan ninguna»: lo que se busca y con qué filtros.
+  const whatsappConFiltros = (filtros: string[]) =>
+    avisoFiltros?.whatsapp
+      ? conMensaje(
+          avisoFiltros.whatsapp,
+          `Hola, quiero información sobre ${ambito.titulo}${filtros.length ? ` (${filtros.join(", ")})` : ""}.`,
+        )
+      : undefined;
+
   return (
     <PlantillaListado
       migas={migas}
@@ -89,7 +100,7 @@ export function ListadoUsados({
             tipo: "cotizacion",
             origen: `${ambito.ruta(pagina)}/`,
             siteKey: turnstileSiteKey(),
-            whatsapp: avisoFiltros?.whatsapp,
+            whatsapp: whatsappConFiltros(filtros),
             referencia: {
               texto: `${ambito.titulo}${filtros.length ? ` · ${filtros.join(", ")}` : ""} (avísame cuando llegue una)`,
             },
@@ -102,6 +113,10 @@ export function ListadoUsados({
           avísame cuando llegue una
         </BotonFormulario>
       )}
+      escribenos={(filtros) => {
+        const wa = whatsappConFiltros(filtros);
+        return wa ? <BotonWhatsApp href={wa.href} /> : null;
+      }}
       vacio={
         vacio ? (
           <EstadoVacioUsados datos={vacio} origen={`${ambito.ruta(pagina)}/`} />
@@ -109,18 +124,13 @@ export function ListadoUsados({
           <div className={estilosListado.vacio}>
             <p>{AVISO_SIN_UNIDADES}</p>
             <p>
-              <Link href="/contactanos/">Contáctanos</Link>
-              {aviso.whatsapp ? (
-                <>
-                  {" o "}
-                  <a href={aviso.whatsapp.href} target="_blank" rel="noopener noreferrer">
-                    escríbenos por WhatsApp
-                    <span className="sr-only"> (se abre en una pestaña nueva)</span>
-                  </a>
-                </>
-              ) : null}{" "}
-              y te avisamos cuando llegue una.
+              <Link href="/contactanos/">Contáctanos</Link> y te avisamos cuando llegue una.
             </p>
+            {aviso.whatsapp ? (
+              <div className={estilosListado.acciones2}>
+                <BotonWhatsApp href={aviso.whatsapp.href} />
+              </div>
+            ) : null}
           </div>
         ) : (
           AVISO_SIN_UNIDADES
@@ -162,5 +172,21 @@ export function ListadoUsados({
         );
       })}
     </PlantillaListado>
+  );
+}
+
+/** El botón verde de WhatsApp de los avisos de usados sin unidades (pestaña nueva). */
+function BotonWhatsApp({ href }: { href: string }) {
+  return (
+    <a
+      href={href}
+      className={estilosListado.whatsappVerde}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <IconBrandWhatsapp size={20} stroke={2} aria-hidden="true" />
+      Escríbenos por WhatsApp
+      <span className="sr-only"> (se abre en una pestaña nueva)</span>
+    </a>
   );
 }

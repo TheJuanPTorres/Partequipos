@@ -66,6 +66,18 @@
   background: #100f0f;
 }
 
+.botonVerde {
+  background: #0f7b45;
+}
+
+.botonVerde:hover {
+  background: #0a6e37;
+}
+
+.botonVerde:focus-visible {
+  outline-color: #0a6e37;
+}
+
 .botonRojo:hover,
 .botonNegro:hover {
   opacity: 0.9;

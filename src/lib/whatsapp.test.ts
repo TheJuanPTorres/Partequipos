@@ -23,19 +23,20 @@ describe("conMensaje", () => {
 describe("mensajeWhatsApp", () => {
   it("con referencia, nombra lo que se consulta", () => {
     assert.equal(
-      mensajeWhatsApp(" Excavadora Hitachi ZX350 ", "Cotización"),
+      mensajeWhatsApp(" Excavadora Hitachi ZX350 ", "Contacto sobre maquinaria Hitachi"),
       "Hola, quiero información sobre Excavadora Hitachi ZX350.",
     );
   });
 
-  it("sin referencia, nombra el formulario de la página", () => {
+  it("sin referencia, toma el tema de un título «Contacto sobre …»", () => {
     assert.equal(
       mensajeWhatsApp(undefined, "Contacto sobre repuestos Hitachi"),
-      "Hola, les escribo desde la página «Contacto sobre repuestos Hitachi» de Partequipos.",
+      "Hola, quiero información sobre repuestos Hitachi.",
     );
   });
 
-  it("sin referencia ni título, un saludo genérico", () => {
+  it("con otro título (Contáctanos), un saludo neutro", () => {
+    assert.equal(mensajeWhatsApp(undefined, "Escríbenos"), "Hola, quiero información.");
     assert.equal(mensajeWhatsApp("  ", " "), "Hola, quiero información.");
   });
 });

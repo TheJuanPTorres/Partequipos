@@ -39,6 +39,14 @@
   margin-top: 24px;
 }
 
+/* Móvil: un botón debajo del otro. */
+@media (max-width: 639px) {
+  .acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 .boton {
   display: inline-flex;
   align-items: center;

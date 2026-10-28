@@ -1,8 +1,7 @@
 import { IconBarcode, IconCalendar, IconClockHour4, IconWeight } from "@tabler/icons-react";
-import Link from "next/link";
 
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
-import { IconBrandWhatsapp } from "@tabler/icons-react";
+import { IconBell, IconBrandWhatsapp } from "@tabler/icons-react";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { conMensaje } from "@/lib/whatsapp";
 import { PlantillaListado } from "@/components/listado/PlantillaListado";
@@ -93,25 +92,12 @@ export function ListadoUsados({
       elemento={{ singular: "unidad", plural: "unidades" }}
       idLista="tarjetas-usada"
       avisame={(filtros) => (
-        <BotonFormulario
-          href="/contactanos/"
-          className={estilosListado.avisame}
-          formulario={{
-            tipo: "cotizacion",
-            origen: `${ambito.ruta(pagina)}/`,
-            siteKey: turnstileSiteKey(),
-            whatsapp: whatsappConFiltros(filtros),
-            referencia: {
-              texto: `${ambito.titulo}${filtros.length ? ` · ${filtros.join(", ")}` : ""} (avísame cuando llegue una)`,
-            },
-            titulo: "Avísame cuando llegue una",
-            descripcion:
-              "Déjanos tus datos y te escribimos en cuanto entre una unidad como la que buscas. Ya indicamos los filtros que elegiste; si quieres algo más concreto, cuéntanoslo en el mensaje.",
-            textoBoton: "Avísame",
-          }}
-        >
-          avísame cuando llegue una
-        </BotonFormulario>
+        <BotonAvisame
+          origen={`${ambito.ruta(pagina)}/`}
+          referencia={`${ambito.titulo}${filtros.length ? ` · ${filtros.join(", ")}` : ""}`}
+          whatsapp={whatsappConFiltros(filtros)}
+          descripcion="Déjanos tus datos y te escribimos en cuanto entre una unidad como la que buscas. Ya indicamos los filtros que elegiste; si quieres algo más concreto, cuéntanoslo en el mensaje."
+        />
       )}
       escribenos={(filtros) => {
         const wa = whatsappConFiltros(filtros);
@@ -123,14 +109,15 @@ export function ListadoUsados({
         ) : aviso ? (
           <div className={estilosListado.vacio}>
             <p>{AVISO_SIN_UNIDADES}</p>
-            <p>
-              <Link href="/contactanos/">Contáctanos</Link> y te avisamos cuando llegue una.
-            </p>
-            {aviso.whatsapp ? (
-              <div className={estilosListado.acciones2}>
-                <BotonWhatsApp href={aviso.whatsapp.href} />
-              </div>
-            ) : null}
+            <div className={estilosListado.acciones2}>
+              <BotonAvisame
+                origen={`${ambito.ruta(pagina)}/`}
+                referencia={ambito.titulo}
+                whatsapp={aviso.whatsapp}
+                descripcion="Déjanos tus datos y te escribimos en cuanto entre una unidad. Si buscas un modelo, un año o unas horas concretas, cuéntanoslo en el mensaje."
+              />
+              {aviso.whatsapp ? <BotonWhatsApp href={aviso.whatsapp.href} /> : null}
+            </div>
           </div>
         ) : (
           AVISO_SIN_UNIDADES
@@ -188,5 +175,38 @@ function BotonWhatsApp({ href }: { href: string }) {
       Escríbenos por WhatsApp
       <span className="sr-only"> (se abre en una pestaña nueva)</span>
     </a>
+  );
+}
+
+/** «Avísame cuando llegue una»: el botón rojo que abre la ventana del formulario con el contexto del listado. */
+function BotonAvisame({
+  origen,
+  referencia,
+  whatsapp,
+  descripcion,
+}: {
+  origen: string;
+  referencia: string;
+  whatsapp?: { href: string; etiqueta: string };
+  descripcion: string;
+}) {
+  return (
+    <BotonFormulario
+      href="/contactanos/"
+      className={estilosListado.avisame}
+      formulario={{
+        tipo: "cotizacion",
+        origen,
+        siteKey: turnstileSiteKey(),
+        whatsapp,
+        referencia: { texto: `${referencia} (avísame cuando llegue una)` },
+        titulo: "Avísame cuando llegue una",
+        descripcion,
+        textoBoton: "Avísame",
+      }}
+    >
+      <IconBell size={20} stroke={2} aria-hidden="true" />
+      Avísame cuando llegue una
+    </BotonFormulario>
   );
 }

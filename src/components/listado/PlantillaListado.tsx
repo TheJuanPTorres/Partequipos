@@ -225,20 +225,13 @@ export function PlantillaListado<T>({
           >
             Limpiar filtros
           </Link>
-          {elemento.singular === "unidad" ? (
-            <>
-              {" o "}
-              {avisame ? (
-                avisame(chips.map((c) => c.etiqueta))
-              ) : (
-                <Link href="/contactanos/">avísame cuando llegue una</Link>
-              )}
-            </>
-          ) : null}
           .
         </p>
-        {escribenos ? (
-          <div className={estilos.acciones2}>{escribenos(chips.map((c) => c.etiqueta))}</div>
+        {avisame || escribenos ? (
+          <div className={estilos.acciones2}>
+            {avisame?.(chips.map((c) => c.etiqueta))}
+            {escribenos?.(chips.map((c) => c.etiqueta))}
+          </div>
         ) : null}
       </div>
     ) : (

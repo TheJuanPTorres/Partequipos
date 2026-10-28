@@ -1425,7 +1425,28 @@
 
 /* «Avísame cuando llegue una» del estado sin resultados: un enlace que abre la ventana del formulario. */
 .avisame {
-  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 22px;
+  border-radius: 30px;
+  background: #e5242d;
+  color: #fff !important;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.avisame:hover {
+  opacity: 0.9;
+}
+
+.avisame:focus-visible {
+  outline: 3px solid #e5242d;
+  outline-offset: 3px;
 }
 
 /* Filtros en vivo: una opción sin resultados con los demás filtros sigue en el panel, en gris. */
@@ -1479,4 +1500,12 @@
   justify-content: center;
   gap: 12px;
   margin-top: 16px;
+}
+
+/* Móvil: un botón debajo del otro, a todo el ancho. */
+@media (max-width: 639px) {
+  .acciones2 {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }

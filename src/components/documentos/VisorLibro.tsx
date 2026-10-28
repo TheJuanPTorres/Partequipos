@@ -13,6 +13,13 @@ import {
 import type { PageFlip } from "page-flip";
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 
+import {
+  ANCHO_MIN_PAGINA,
+  dosPaginasCaben,
+  hayAnterior,
+  haySiguiente,
+  paginasVisibles,
+} from "@/lib/documentos/paginasVisor";
 import { textoContador } from "@/lib/documentos/visor";
 
 import estilos from "./visorLibro.module.css";
@@ -28,9 +35,6 @@ export type PaginaLibro = {
   zoomSizes: string;
   miniatura: string;
 };
-
-/** Por debajo de este ancho del visor, una sola página (y deslizar). */
-const ANCHO_MIN_PAGINA = 320;
 
 /**
  * VISOR TIPO LIBRO de un PDF (2026-10-20, petición del cliente). Cliente
@@ -124,6 +128,11 @@ export function VisorLibro({
       pf.on("changeOrientation", (e) => setDobles(e.data === "landscape"));
       pf.loadFromHTML(hojas);
       await new Promise<void>((listo) => pf.on("init", () => listo()));
+      // Recién montado, page-flip todavía no ha pintado sus hojas: un paso de página ahora se
+      // perdía (las flechas «no funcionaban» hasta mover la página a mano). Dos fotogramas.
+      await new Promise<void>((listo) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => listo())),
+      );
       setDobles(pf.getOrientation() === "landscape");
       setIndice(pf.getCurrentPageIndex());
       libro.current = pf;
@@ -140,6 +149,30 @@ export function VisorLibro({
     },
     [],
   );
+
+  /*
+   * Una o dos páginas a la vez, DESDE LA CARGA y en cada cambio de ancho del visor. Antes del
+   * libro, por el ancho (el mismo umbral que el CSS); con el libro, lo que diga page-flip, que se
+   * recoloca con `update()` (solo escucha el `resize` de la ventana, no el de su caja).
+   */
+  useEffect(() => {
+    const visor = raiz.current;
+    if (!visor) return;
+    const medir = () => {
+      const pf = libro.current;
+      if (pf) {
+        pf.update();
+        setDobles(pf.getOrientation() === "landscape");
+        setIndice(pf.getCurrentPageIndex());
+      } else {
+        setDobles(dosPaginasCaben(visor.clientWidth));
+      }
+    };
+    medir();
+    const observador = new ResizeObserver(() => medir());
+    observador.observe(visor);
+    return () => observador.disconnect();
+  }, []);
 
   useEffect(() => {
     const cambio = () => {
@@ -181,6 +214,9 @@ export function VisorLibro({
     // Con zoom, las flechas mueven la página ampliada (desplazamiento normal).
     if (accion === undefined || zoom) return;
     e.preventDefault();
+    // El mismo estado que los botones: en la primera o la última, la flecha no hace nada.
+    if (accion === "anterior" && !hayAnterior(indice)) return;
+    if (accion === "siguiente" && !haySiguiente(indice, total, dobles)) return;
     void ir(accion);
   };
 
@@ -201,7 +237,7 @@ export function VisorLibro({
   };
 
   // Lo que se ve: la página actual y, con el libro abierto, la siguiente.
-  const visibles = (dobles ? [indice, indice + 1] : [indice]).filter((i) => i < total);
+  const visibles = paginasVisibles(indice, total, dobles);
   const idMiniaturas = `${id}-miniaturas`;
 
   return (
@@ -288,7 +324,7 @@ export function VisorLibro({
           type="button"
           className={estilos.boton}
           onClick={() => void ir("anterior")}
-          disabled={indice === 0}
+          disabled={!hayAnterior(indice)}
           aria-label="Página anterior"
         >
           <IconChevronLeft aria-hidden="true" size={20} />
@@ -309,7 +345,7 @@ export function VisorLibro({
           type="button"
           className={estilos.boton}
           onClick={() => void ir("siguiente")}
-          disabled={visibles.at(-1) === total - 1}
+          disabled={!haySiguiente(indice, total, dobles)}
           aria-label="Página siguiente"
         >
           <IconChevronRight aria-hidden="true" size={20} />

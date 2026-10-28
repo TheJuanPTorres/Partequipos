@@ -87,7 +87,7 @@ export function redesDelPie(
 }
 
 /** Una dirección https:// del propio sitio (partequipos.com o el dominio publicado): no es externa. */
-function esDelSitio(url: string): boolean {
+export function esDelSitio(url: string): boolean {
   try {
     const host = new URL(url).hostname.toLowerCase();
     return (

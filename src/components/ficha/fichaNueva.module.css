@@ -308,6 +308,13 @@ section.principal[data-con-izquierda] {
   padding: 0 var(--ficha-margen) 5cqi;
 }
 
+/* En móvil el banner quedaba a 12 px de la tarjeta del equipo (medido en el #404): 32. */
+@media (max-width: 767px) {
+  .otras {
+    padding-top: 20px;
+  }
+}
+
 /*
  * El banner (logo, título y «Ver marca») es `BannerMarcaTipo` (src/components/nueva/). Aire
  * entre el banner y las tarjetas (Juan Pablo, 2026-10-27): 32 px; 24 en móvil. Con `.otras`

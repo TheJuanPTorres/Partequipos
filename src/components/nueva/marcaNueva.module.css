@@ -116,10 +116,18 @@ a.enlaceFranja:focus-visible {
   border-top: 1px solid rgb(0 0 0 / 12%);
 }
 
-/* Página general de tipo: más aire antes de la franja de la marca siguiente (dirección,
-   2026-10-23). Con los 20 + 55 px de debajo de la última fila de tarjetas, unos 100 px. */
+/* Página general de tipo: más aire antes del banner de la marca siguiente (dirección,
+   2026-10-23: unos 100 px). Las tarjetas del kit (#385) ya no traen los 55 px de debajo que
+   contaba la franja, así que el margen lo pone entero: 100 px; 64 en móvil (medido en el #404,
+   2026-10-27: quedaban 25, menos que los 32 / 24 entre el banner y sus propias tarjetas). */
 .grupoMarca + .grupoMarca {
-  margin-top: 25px;
+  margin-top: 100px;
+}
+
+@media (max-width: 767px) {
+  .grupoMarca + .grupoMarca {
+    margin-top: 64px;
+  }
 }
 
 /*

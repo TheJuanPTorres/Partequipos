@@ -12,13 +12,14 @@ import { sinCortarCodigos } from "@/components/ficha/SinCorte";
 import { RecuadroAsesoria } from "@/components/ficha/RecuadroAsesoria";
 import estilos from "@/components/ficha/ficha.module.css";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
-import { FranjaMarca } from "@/components/marca/FranjaMarca";
+import { BannerMarcaTipo } from "@/components/nueva/BannerMarcaTipo";
 import { CabeceraKit } from "@/components/nueva/kit/CabeceraKit";
 import { EmblemaKit } from "@/components/nueva/kit/EmblemaKit";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { PaginaVisor } from "@/lib/documentos/visor";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
 import type { DatoDestacado } from "@/lib/maquinaria/fichaTecnica";
+import type { VistaBanner } from "@/lib/nueva/bannerMarca";
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import nueva from "./fichaNueva.module.css";
@@ -105,15 +106,16 @@ type Props = {
   vista360: string | null;
   /** Enlace de WhatsApp de «Habla con un experto»; `null` si la empresa no tiene número. */
   experto: { href: string } | null;
-  /** «Otras <tipo>»: el título, el logo de la marca (o nada) y las tarjetas. */
+  /**
+   * «Otros modelos de <tipo>»: el banner de marca del #385 (`BannerMarcaTipo`: logo, color y
+   * foto de la marca; «Ver marca» a la página de la marca y el tipo), sin conteo, y las tarjetas.
+   */
   otras: {
     titulo: string;
     logo: LogoConAlt | null;
     tarjetas: TarjetaOtra[];
-    /** Para la franja con más fuerza (`MEJORAS_FRANJA`): color, máquina y página de la marca. */
-    color?: string | null;
-    foto?: ImagenLista | null;
-    marca?: { nombre: string; href: string };
+    vista: VistaBanner;
+    marca: { nombre: string; href: string };
   };
   imagenContacto: ImagenLista | null;
   contactoEsFoto: boolean;
@@ -345,19 +347,17 @@ ${tituloEscritorio.modelo}`}
         </section>
       </EmblemaKit>
 
-      {/* 2. «OTRAS <TIPO>»: la franja con la foto del tipo y las tarjetas. Sin otras, no sale. */}
+      {/* 2. «OTROS MODELOS DE <TIPO>»: el banner de marca y las tarjetas. Sin otras, no sale. */}
       {otras.tarjetas.length > 0 ? (
         <section className={nueva.otras} aria-labelledby="otras-del-tipo">
-          <FranjaMarca
+          <BannerMarcaTipo
             id="otras-del-tipo"
             titulo={otras.titulo}
-            logo={otras.logo}
-            color={otras.color}
-            foto={otras.foto}
-            modelos={otras.tarjetas.length}
             marca={otras.marca}
+            logo={otras.logo}
+            vista={otras.vista}
           />
-          <ul className={nueva.rejilla}>
+          <ul className={`${nueva.rejilla} ${nueva.rejillaOtras}`}>
             {otras.tarjetas.map((o) => (
               <li key={o.id} className={`${estilos.tarjeta} ${nueva.tarjeta}`}>
                 {o.foto ? (

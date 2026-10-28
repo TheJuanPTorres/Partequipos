@@ -29,3 +29,20 @@
   text-align: justify;
   hyphens: auto;
 }
+
+/* Ancho elegido en el panel. La caja de la sección manda: nunca pasa de su columna. */
+.texto[data-ancho="estrecho"] {
+  max-width: 36rem;
+}
+
+.texto[data-ancho="medio"] {
+  max-width: 48rem;
+}
+
+.texto[data-ancho="ancho"] {
+  max-width: 60rem;
+}
+
+.texto[data-ancho="columna"] {
+  max-width: none;
+}

@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { SeccionTestimonios } from "@/components/portada/diferidos";
-import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { InterruptorMejoras } from "@/components/repuestos/InterruptorMejoras";
@@ -16,14 +15,10 @@ import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getMarcaPorSlug, getMarcas } from "@/lib/queries/getMarcas";
 import { getModelosDeMarca, getModelosPorIds } from "@/lib/queries/getModelos";
-import {
-  getCategoriasParaMarca,
-  getRepuestosMarca,
-  getTiposDeMarcaConImagen,
-} from "@/lib/queries/getRepuestosMarca";
+import { getRepuestosMarca, getTiposDeMarcaConImagen } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
-import { categoriasDeMarca, tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
+import { tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
 import { idsDeOtrasEntradas, listaDeModelos } from "@/lib/repuestos/tipo";
 import { MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
@@ -62,8 +57,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
-/** Ancla de la franja de categorías: a ella baja el icono de ratón del encabezado. */
-const ANCLA_CATEGORIAS = "categorias-repuestos";
+/**
+ * Ancla de las tarjetas de tipos: a ella baja el icono de ratón del encabezado. «Nuestras
+ * categorías de repuestos» ya no va en las páginas de marca (dirección, 2026-10-27): las
+ * categorías técnicas siguen en su índice y en el menú.
+ */
+const ANCLA_TIPOS = "repuestos-marca-tipos";
 const ANCLA_CONTACTO = "contacto-repuestos";
 
 export default async function MarcaPage({ params }: { params: Promise<Params> }) {
@@ -71,10 +70,9 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
   const marca = await getMarcaPorSlug(marcaSlug);
   if (!marca) notFound();
 
-  const [global, tipos, categorias, testimonios, empresa, sedes, modelos] = await Promise.all([
+  const [global, tipos, testimonios, empresa, sedes, modelos] = await Promise.all([
     getRepuestosMarca(),
     getTiposDeMarcaConImagen(marca.id),
-    getCategoriasParaMarca(),
     getTestimoniosDePortada(),
     getEmpresa(),
     getSedesDePortada(),
@@ -107,16 +105,10 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <HeroMarca vista={vistaEncabezado(marca, global)} anclaSiguiente={ANCLA_CATEGORIAS} />
-
-      <CategoriasMarca
-        id={ANCLA_CATEGORIAS}
-        titulo={texto(global.tituloCategorias)}
-        categorias={categoriasDeMarca(categorias)}
-      />
+      <HeroMarca vista={vistaEncabezado(marca, global)} anclaSiguiente={ANCLA_TIPOS} />
 
       <TarjetasMarca
-        id="repuestos-marca-tipos"
+        id={ANCLA_TIPOS}
         titulo={texto(global.tituloTipos)}
         verTodo={texto(global.verTodoTexto)}
         tarjetas={tarjetasDeTipos(marca, tipos, modelosDe)}

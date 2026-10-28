@@ -193,7 +193,7 @@ export const CategoriaTecnica: CollectionConfig = {
       label: "Icono",
       admin: {
         description:
-          "Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de marca.",
+          "Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo.",
       },
       options: [
         { label: "Corte (cuchillas, puntas)", value: "corte" },
@@ -270,11 +270,11 @@ export const CategoriaTecnica: CollectionConfig = {
       name: "ordenMarca",
       type: "number",
       min: 1,
-      label: "Posición en las páginas de marca",
+      label: "Posición en las páginas de repuestos",
       admin: {
         position: "sidebar",
         description:
-          "Orden en «Nuestras categorías de repuestos» de cada página de marca. Vacío: al final, por nombre.",
+          "Orden en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo, y en el menú. Vacío: al final, por nombre.",
       },
     },
     /*

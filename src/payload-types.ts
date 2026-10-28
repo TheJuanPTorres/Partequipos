@@ -838,7 +838,7 @@ export interface CategoriasTecnica {
    */
   fondoHero?: (number | null) | Media;
   /**
-   * Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de marca.
+   * Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo.
    */
   icono?:
     | ('corte' | 'llanta' | 'lubricante' | 'filtro' | 'motor' | 'rodaje' | 'miscelaneos' | 'componentes' | 'diesel')
@@ -860,7 +860,7 @@ export interface CategoriasTecnica {
    */
   ordenPortada?: number | null;
   /**
-   * Orden en «Nuestras categorías de repuestos» de cada página de marca. Vacío: al final, por nombre.
+   * Orden en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo, y en el menú. Vacío: al final, por nombre.
    */
   ordenMarca?: number | null;
   /**
@@ -1506,6 +1506,10 @@ export interface Pagina {
      */
     descripcionAlineacion?: ('left' | 'center' | 'right' | 'justify') | null;
     /**
+     * Hasta dónde se estira el texto hacia la derecha. Nunca pasa del borde de su columna; en el teléfono no cambia nada.
+     */
+    descripcionAncho?: ('estrecho' | 'medio' | 'ancho' | 'columna') | null;
+    /**
      * La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.
      */
     imagenExcavadoras?: (number | null) | Media;
@@ -1545,6 +1549,10 @@ export interface Pagina {
      * Cómo se alinea este texto en la web. Por defecto, a la izquierda.
      */
     marcasTextoAlineacion?: ('left' | 'center' | 'right' | 'justify') | null;
+    /**
+     * Hasta dónde se estira el texto hacia la derecha. Nunca pasa del borde de su columna; en el teléfono no cambia nada.
+     */
+    marcasTextoAncho?: ('estrecho' | 'medio' | 'ancho' | 'columna') | null;
     /**
      * El botón baja al carrusel de la categoría elegida.
      */
@@ -1586,6 +1594,14 @@ export interface Pagina {
      * Cómo se alinea este texto en la web. Por defecto, a la izquierda.
      */
     descripcionAlineacion?: ('left' | 'center' | 'right' | 'justify') | null;
+    /**
+     * Hasta dónde se estira el texto hacia la derecha. Nunca pasa del borde de su columna; en el teléfono no cambia nada.
+     */
+    descripcionAncho?: ('estrecho' | 'medio' | 'ancho' | 'columna') | null;
+    /**
+     * Entre 60 y 100. 100 es el tamaño del diseño original; por defecto, 78. Solo desde portátil: en el teléfono no cambia. Se encoge apoyada en el piso.
+     */
+    tamanoMaquina?: number | null;
     verMasTexto?: string | null;
     /**
      * Sin efecto desde el 2026-10-26 (diseño del cliente): cada tarjeta lleva su botón.
@@ -3115,6 +3131,7 @@ export interface PaginasSelect<T extends boolean = true> {
         titulo?: T;
         descripcion?: T;
         descripcionAlineacion?: T;
+        descripcionAncho?: T;
         imagenExcavadoras?: T;
         imagenOtros?: T;
         imagenAditamentos?: T;
@@ -3125,6 +3142,7 @@ export interface PaginasSelect<T extends boolean = true> {
         marcasTitulo?: T;
         marcasTexto?: T;
         marcasTextoAlineacion?: T;
+        marcasTextoAncho?: T;
         botonTexto?: T;
       };
   seccionLogos?:
@@ -3149,6 +3167,8 @@ export interface PaginasSelect<T extends boolean = true> {
         titulo?: T;
         descripcion?: T;
         descripcionAlineacion?: T;
+        descripcionAncho?: T;
+        tamanoMaquina?: T;
         verMasTexto?: T;
         botonTexto?: T;
         botonEnlace?: T;

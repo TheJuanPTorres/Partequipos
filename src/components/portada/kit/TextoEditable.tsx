@@ -1,4 +1,4 @@
-import { lineasDeTexto, type AlineacionTexto } from "@/lib/fields/alineacionTexto";
+import { lineasDeTexto, type AlineacionTexto, type AnchoTexto } from "@/lib/fields/alineacionTexto";
 
 import estilos from "./textoEditable.module.css";
 
@@ -10,16 +10,22 @@ import estilos from "./textoEditable.module.css";
 export function TextoEditable({
   texto,
   alineacion,
+  ancho,
   className,
 }: {
   texto: string;
   alineacion: AlineacionTexto;
+  ancho: AnchoTexto;
   className?: string;
 }) {
   const lineas = lineasDeTexto(texto);
   if (lineas.length === 0) return null;
   return (
-    <div className={`${estilos.texto} ${className ?? ""}`} data-alineacion={alineacion}>
+    <div
+      className={`${estilos.texto} ${className ?? ""}`}
+      data-alineacion={alineacion}
+      data-ancho={ancho}
+    >
       {lineas.map((l, i) => (
         <p key={i}>{l}</p>
       ))}

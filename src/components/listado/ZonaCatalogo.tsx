@@ -212,6 +212,8 @@ export function ZonaCatalogo({
         const a = (e.target as Element).closest("a");
         if (!a || !a.closest(`[${ATRIBUTO_NAVEGACION}]`) || a.target || a.hasAttribute("download"))
           return;
+        // Un enlace que abre una ventana («Avísame cuando llegue una») tiene su propio manejador.
+        if (a.hasAttribute("aria-haspopup")) return;
         const url = new URL(a.href, location.href);
         if (url.origin !== location.origin) return;
         e.preventDefault();

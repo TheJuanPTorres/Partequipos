@@ -211,7 +211,7 @@ export function PlantillaListado<T>({
     ) : elementos.length === 0 ? (
       <div className={estilos.vacio} data-catalogo-nav="">
         <p>
-          Ningún{elemento.singular === "unidad" ? "a" : ""} {elemento.singular} cumple estos
+          {elemento.singular === "unidad" ? "Ninguna" : "Ningún"} {elemento.singular} cumple estos
           filtros. Quita alguno para ver más.
         </p>
         <p>
@@ -280,7 +280,7 @@ export function PlantillaListado<T>({
         // Anuncio de los resultados tras cada cambio en vivo; el nodo es el mismo entre cambios.
         <p className="sr-only" role="status">
           {total === 0
-            ? `Ningún ${elemento.singular} cumple los filtros`
+            ? `${elemento.singular === "unidad" ? "Ninguna" : "Ningún"} ${elemento.singular} cumple los filtros`
             : `${total} ${total === 1 ? elemento.singular : elemento.plural} ${total === 1 ? "disponible" : "disponibles"}`}
           {paginas > 1 ? `, página ${pagina} de ${paginas}` : ""}
         </p>

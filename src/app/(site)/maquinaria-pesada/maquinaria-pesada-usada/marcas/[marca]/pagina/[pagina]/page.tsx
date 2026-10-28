@@ -26,7 +26,7 @@ export default async function PaginaMarcaUsada({ params, searchParams }: Props) 
   if (pagina === null) notFound();
   const parametros = await searchParams;
   if (pagina === 1) redirigirPaginaUno("marca", marca, parametros);
-  const { ambito, listado, vacio, aviso, animaciones } = await cargarListadoUsado(
+  const { ambito, listado, vacio, aviso, avisoFiltros, animaciones } = await cargarListadoUsado(
     "marca",
     marca,
     pagina,
@@ -39,6 +39,7 @@ export default async function PaginaMarcaUsada({ params, searchParams }: Props) 
       listado={listado}
       vacio={vacio}
       aviso={aviso}
+      avisoFiltros={avisoFiltros}
       animaciones={animaciones}
     />
   );

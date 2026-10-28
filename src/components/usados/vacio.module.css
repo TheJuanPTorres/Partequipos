@@ -39,6 +39,14 @@
   margin-top: 24px;
 }
 
+/* Móvil: un botón debajo del otro. */
+@media (max-width: 639px) {
+  .acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 .boton {
   display: inline-flex;
   align-items: center;
@@ -66,6 +74,18 @@
   background: #100f0f;
 }
 
+.botonVerde {
+  background: #0f7b45;
+}
+
+.botonVerde:hover {
+  background: #0a6e37;
+}
+
+.botonVerde:focus-visible {
+  outline-color: #0a6e37;
+}
+
 .botonRojo:hover,
 .botonNegro:hover {
   opacity: 0.9;
@@ -77,13 +97,6 @@
   border-radius: 30px;
   /* El 10 % de relleno de abajo de la «Plantilla 1» dejaba un hueco grande bajo la tarjeta. */
   padding-bottom: 40px;
-}
-
-.formulario {
-  padding: 10px 20px 30px;
-  border-radius: 30px;
-  background: #fff;
-  scroll-margin-top: 120px;
 }
 
 @media (min-width: 1025px) {

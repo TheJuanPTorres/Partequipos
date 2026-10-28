@@ -208,6 +208,25 @@ describe("facetasConCuenta", () => {
     assert.deepEqual([caseOp.cuenta, caseOp.activa, caseOp.etiqueta], [0, true, "Case"]);
   });
 
+  it("con `mantener`, las opciones que los demás filtros dejan en 0 siguen con cuenta 0", () => {
+    const s = { valores: { marca: ["hitachi"], anio: ["2019"] }, orden: "recientes" };
+    const normal = facetasConCuenta(ITEMS, CAT, s);
+    const fija = facetasConCuenta(ITEMS, CAT, s, true);
+    // Mismas opciones que sin filtrar nada (el panel no cambia de alto)...
+    const todas = facetasConCuenta(ITEMS, CAT, { valores: {}, orden: "recientes" }, true);
+    assert.deepEqual(
+      fija.map((f) => f.opciones.map((o) => o.valor)),
+      todas.map((f) => f.opciones.map((o) => o.valor)),
+    );
+    // ...y las que no aplican se quedan en 0 y sin marcar.
+    const peso = fija.find((f) => f.clave === "peso")!;
+    assert.ok(peso.opciones.some((o) => o.cuenta === 0 && !o.activa));
+    // Sin `mantener`, esas opciones no salen.
+    assert.ok(
+      normal.find((f) => f.clave === "peso")!.opciones.every((o) => o.cuenta > 0 || o.activa),
+    );
+  });
+
   it("no pinta una faceta sin opciones", () => {
     const sinAnio = ITEMS.map((i) => ({ ...i, anio: null }));
     const claves = facetasConCuenta(sinAnio, CAT, { valores: {}, orden: "recientes" }).map(

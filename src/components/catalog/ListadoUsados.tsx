@@ -1,6 +1,9 @@
 import { IconBarcode, IconCalendar, IconClockHour4, IconWeight } from "@tabler/icons-react";
-import Link from "next/link";
 
+import { BotonFormulario } from "@/components/forms/BotonFormulario";
+import { IconBell, IconBrandWhatsapp } from "@tabler/icons-react";
+import { turnstileSiteKey } from "@/lib/turnstile";
+import { conMensaje } from "@/lib/whatsapp";
 import { PlantillaListado } from "@/components/listado/PlantillaListado";
 import { TarjetaListado } from "@/components/listado/TarjetaListado";
 import type { ResultadoListado } from "@/lib/filtros";
@@ -39,7 +42,10 @@ export function ListadoUsados({
   vacio,
   aviso,
   animaciones = [],
+  avisoFiltros,
 }: {
+  /** WhatsApp para «Avísame» cuando los filtros no dejan ninguna unidad. */
+  avisoFiltros?: AvisoVacio | null;
   ambito: Ambito;
   pagina: number;
   listado: Extract<ResultadoListado<UnidadUsada>, { tipo: "listado" }>;
@@ -59,6 +65,15 @@ export function ListadoUsados({
   ];
   if (pagina > 1) migas.push({ nombre: `Página ${pagina}`, path: ambito.ruta(pagina) });
 
+  // El mensaje de WhatsApp del estado «los filtros no dejan ninguna»: lo que se busca y con qué filtros.
+  const whatsappConFiltros = (filtros: string[]) =>
+    avisoFiltros?.whatsapp
+      ? conMensaje(
+          avisoFiltros.whatsapp,
+          `Hola, quiero información sobre ${ambito.titulo}${filtros.length ? ` (${filtros.join(", ")})` : ""}.`,
+        )
+      : undefined;
+
   return (
     <PlantillaListado
       migas={migas}
@@ -76,25 +91,33 @@ export function ListadoUsados({
       rutaDe={(n) => `${ambito.ruta(n)}/`}
       elemento={{ singular: "unidad", plural: "unidades" }}
       idLista="tarjetas-usada"
+      avisame={(filtros) => (
+        <BotonAvisame
+          origen={`${ambito.ruta(pagina)}/`}
+          referencia={`${ambito.titulo}${filtros.length ? ` · ${filtros.join(", ")}` : ""}`}
+          whatsapp={whatsappConFiltros(filtros)}
+          descripcion="Déjanos tus datos y te escribimos en cuanto entre una unidad como la que buscas. Ya indicamos los filtros que elegiste; si quieres algo más concreto, cuéntanoslo en el mensaje."
+        />
+      )}
+      escribenos={(filtros) => {
+        const wa = whatsappConFiltros(filtros);
+        return wa ? <BotonWhatsApp href={wa.href} /> : null;
+      }}
       vacio={
         vacio ? (
           <EstadoVacioUsados datos={vacio} origen={`${ambito.ruta(pagina)}/`} />
         ) : aviso ? (
           <div className={estilosListado.vacio}>
             <p>{AVISO_SIN_UNIDADES}</p>
-            <p>
-              <Link href="/contactanos/">Contáctanos</Link>
-              {aviso.whatsapp ? (
-                <>
-                  {" o "}
-                  <a href={aviso.whatsapp.href} target="_blank" rel="noopener noreferrer">
-                    escríbenos por WhatsApp
-                    <span className="sr-only"> (se abre en una pestaña nueva)</span>
-                  </a>
-                </>
-              ) : null}{" "}
-              y te avisamos cuando llegue una.
-            </p>
+            <div className={estilosListado.acciones2}>
+              <BotonAvisame
+                origen={`${ambito.ruta(pagina)}/`}
+                referencia={ambito.titulo}
+                whatsapp={aviso.whatsapp}
+                descripcion="Déjanos tus datos y te escribimos en cuanto entre una unidad. Si buscas un modelo, un año o unas horas concretas, cuéntanoslo en el mensaje."
+              />
+              {aviso.whatsapp ? <BotonWhatsApp href={aviso.whatsapp.href} /> : null}
+            </div>
           </div>
         ) : (
           AVISO_SIN_UNIDADES
@@ -136,5 +159,54 @@ export function ListadoUsados({
         );
       })}
     </PlantillaListado>
+  );
+}
+
+/** El botón verde de WhatsApp de los avisos de usados sin unidades (pestaña nueva). */
+function BotonWhatsApp({ href }: { href: string }) {
+  return (
+    <a
+      href={href}
+      className={estilosListado.whatsappVerde}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <IconBrandWhatsapp size={20} stroke={2} aria-hidden="true" />
+      Escríbenos por WhatsApp
+      <span className="sr-only"> (se abre en una pestaña nueva)</span>
+    </a>
+  );
+}
+
+/** «Avísame cuando llegue una»: el botón rojo que abre la ventana del formulario con el contexto del listado. */
+function BotonAvisame({
+  origen,
+  referencia,
+  whatsapp,
+  descripcion,
+}: {
+  origen: string;
+  referencia: string;
+  whatsapp?: { href: string; etiqueta: string };
+  descripcion: string;
+}) {
+  return (
+    <BotonFormulario
+      href="/contactanos/"
+      className={estilosListado.avisame}
+      formulario={{
+        tipo: "cotizacion",
+        origen,
+        siteKey: turnstileSiteKey(),
+        whatsapp,
+        referencia: { texto: `${referencia} (avísame cuando llegue una)` },
+        titulo: "Avísame cuando llegue una",
+        descripcion,
+        textoBoton: "Avísame",
+      }}
+    >
+      <IconBell size={20} stroke={2} aria-hidden="true" />
+      Avísame cuando llegue una
+    </BotonFormulario>
   );
 }

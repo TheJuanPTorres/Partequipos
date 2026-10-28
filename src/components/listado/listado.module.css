@@ -1422,3 +1422,90 @@
     transform: scaleX(0);
   }
 }
+
+/* «Avísame cuando llegue una» del estado sin resultados: un enlace que abre la ventana del formulario. */
+.avisame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 22px;
+  border-radius: 30px;
+  background: #e5242d;
+  color: #fff !important;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.avisame:hover {
+  opacity: 0.9;
+}
+
+.avisame:focus-visible {
+  outline: 3px solid #e5242d;
+  outline-offset: 3px;
+}
+
+/* Filtros en vivo: una opción sin resultados con los demás filtros sigue en el panel, en gris. */
+.filtros label:has(input:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Filtros en vivo: una opción sin resultados con los demás filtros sigue en el panel, en gris. */
+.filtros label:has(input:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* «Escríbenos por WhatsApp» de los avisos de usados sin unidades: el botón verde de los formularios. */
+.whatsappVerde {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 22px;
+  border-radius: 30px;
+  background: #0f7b45;
+  color: #fff !important;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.whatsappVerde:hover {
+  background: #0a6e37;
+}
+
+.whatsappVerde:focus-visible {
+  outline: 3px solid #0a6e37;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whatsappVerde {
+    transition: none;
+  }
+}
+
+.acciones2 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Móvil: un botón debajo del otro, a todo el ancho. */
+@media (max-width: 639px) {
+  .acciones2 {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

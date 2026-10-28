@@ -81,6 +81,23 @@ function Antetitulo({ ancla }: { ancla: string }) {
 }
 
 /**
+ * El título de las columnas de alistamiento y posventa (Juan Pablo, 2026-10-27): un `<h2>` al
+ * tamaño de título de sección con el icono de su tarjeta de acceso en rojo, para que los dos
+ * servicios se vean equivalentes y separados. `texto` sustituye a la etiqueta de Andrés.
+ */
+function TituloServicio({ ancla, texto }: { ancla: string; texto?: string | null }) {
+  const s = SECCIONES[ancla.toLowerCase()];
+  if (!s) return null;
+  const Icono = s.icono;
+  return (
+    <h2 id={`${ancla}-antetitulo`} className={estilos.tituloServicio}>
+      <Icono size={40} stroke={1.5} aria-hidden="true" className={estilos.tituloServicioIcono} />
+      <span>{texto || s.etiqueta}</span>
+    </h2>
+  );
+}
+
+/**
  * El botón «Contáctanos» de las secciones: si lleva a la página de contacto, abre el formulario en
  * una ventana (sin JavaScript sigue llevando al formulario del final de esta página). Un enlace
  * a otro sitio, tal cual.
@@ -242,9 +259,10 @@ export function PlantillaServicioTecnico({
 
       {/*
        * ---------- Alistamiento y posventa: DOBLE COLUMNA (dirección, 2026-10-27) ----------
-       * Cada columna es una sección propia, con su antetítulo y su ancla: a la izquierda el
-       * alistamiento (vídeos y texto), a la derecha «Servicio postventa» (el «Antetítulo» del
-       * bloque de posventa en el panel; vacío, el de Andrés) sobre su título, texto y botón. Las
+       * Cada columna es una sección propia, como TARJETA, con su `<h2>` e icono y su ancla: a la
+       * izquierda el alistamiento (vídeos y texto), a la derecha «Servicio postventa» (el
+       * «Antetítulo» del bloque de posventa en el panel; vacío, el de Andrés) sobre su título, texto
+       * y botón. Las
        * tarjetas de acceso llevan a cada una, con un resaltado breve al llegar (`:target`). En
        * móvil, una debajo de la otra.
        */}
@@ -256,7 +274,7 @@ export function PlantillaServicioTecnico({
               className={`${estilos.columnaMedio} ${estilos.columnaSeccion}`}
               aria-labelledby={`${alistamiento.ancla}-antetitulo`}
             >
-              <Antetitulo ancla={alistamiento.ancla} />
+              <TituloServicio ancla={alistamiento.ancla} />
               <CarruselVideos etiqueta="Vídeos del alistamiento de maquinaria">
                 {alistamiento.etapas ? (
                   <div className={estilos.diapositivaVideo}>
@@ -314,15 +332,14 @@ export function PlantillaServicioTecnico({
                 className={`${estilos.columnaSeccion} ${estilos.columnaPosventa}`}
                 aria-labelledby={`${posventa.ancla}-antetitulo`}
               >
-                <p id={`${posventa.ancla}-antetitulo`} className={estilos.antetitulo}>
-                  {posventa.antetitulo || SECCIONES.posventa!.etiqueta}
-                </p>
+                <TituloServicio ancla={posventa.ancla} texto={posventa.antetitulo} />
                 <div className={estilos.columnaTexto}>
                   <Revelado
                     id="posventa-titulo"
+                    como="h3"
                     texto={posventa.titulo}
                     {...RITMO}
-                    className={estilos.titulo}
+                    className={`${estilos.titulo} ${estilos.tituloEnTarjeta}`}
                   />
                   {posventa.parrafos.map((p) => (
                     <p key={p} className={estilos.parrafo}>
@@ -340,6 +357,7 @@ export function PlantillaServicioTecnico({
               <div className={estilos.columnaTexto}>
                 <Revelado
                   id="alistamiento-titulo"
+                  como="h3"
                   texto={alistamiento.titulo}
                   {...RITMO}
                   className={estilos.titulo}

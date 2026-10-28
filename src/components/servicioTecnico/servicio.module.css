@@ -181,15 +181,20 @@ video.medio {
 }
 /*
  * ALISTAMIENTO Y POSVENTA EN DOBLE COLUMNA (dirección, 2026-10-27): cada columna es una sección
- * con su antetítulo arriba, a la misma altura. La de posventa centra su texto en el alto que
- * queda. Al llegar por su ancla, un resaltado breve (sin él con «reducir movimiento»).
+ * propia, como TARJETA (el gris de las secciones, esquinas de 30 px y relleno), con su `<h2>` e
+ * icono rojo arriba, a la misma altura (Juan Pablo: más notorias, equivalentes y separadas). La
+ * de posventa centra su texto en el alto que queda. Al llegar por su ancla, un anillo rojo breve
+ * (sin él con «reducir movimiento»).
  */
 .filaDoble {
   align-items: stretch;
+  gap: 30px;
 }
 .columnaSeccion {
   min-width: 0;
+  padding: 30px;
   border-radius: 30px;
+  background: var(--color-fondo-seccion);
   scroll-margin-top: 100px;
 }
 .columnaPosventa {
@@ -198,6 +203,25 @@ video.medio {
 }
 .columnaPosventa > .columnaTexto {
   flex: 1;
+  padding: 10px 0 0;
+}
+.tituloServicio {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 24px;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-3);
+  font-weight: 700;
+  line-height: 1.1;
+}
+.tituloServicioIcono {
+  flex: none;
+  /* El rojo de las tarjetas de acceso: 4,0:1 sobre el gris (icono, AA pide 3:1). */
+  color: var(--color-marca);
+}
+.tituloEnTarjeta {
+  font-size: var(--texto-titulo-4);
 }
 .columnaSeccion:target {
   animation: resaltarSeccion 1.8s ease-out;
@@ -205,12 +229,10 @@ video.medio {
 @keyframes resaltarSeccion {
   0%,
   35% {
-    background: color-mix(in srgb, var(--color-marca) 8%, transparent);
-    box-shadow: 0 0 0 10px color-mix(in srgb, var(--color-marca) 8%, transparent);
+    box-shadow: 0 0 0 4px var(--color-marca);
   }
   100% {
-    background: transparent;
-    box-shadow: 0 0 0 10px transparent;
+    box-shadow: 0 0 0 4px transparent;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -490,9 +512,16 @@ video.medio {
   .fila {
     grid-template-columns: 1fr;
   }
-  /* En móvil, una debajo de otra, cada una con su antetítulo. */
+  /* En móvil, una debajo de otra, cada una con su título. */
   .filaDoble {
-    gap: 40px;
+    gap: 24px;
+  }
+  .columnaSeccion {
+    padding: 24px 16px;
+  }
+  .tituloServicio {
+    justify-content: center;
+    text-align: left;
   }
   /* En móvil la plantilla centra los títulos y les da 20 px a los lados. */
   .columnaTexto {

@@ -308,7 +308,10 @@ section.principal[data-con-izquierda] {
   padding: 0 var(--ficha-margen) 5cqi;
 }
 
-/* La franja (logo de la marca y título) es `FranjaMarca` (src/components/marca/). */
+/* El banner (logo, título y «Ver marca») es `BannerMarcaTipo` (src/components/nueva/). */
+.rejillaOtras {
+  margin-top: 20px;
+}
 
 /*
  * Las tarjetas con la regla del sitio (#281, la de `TarjetasMarca`): 1 o 2

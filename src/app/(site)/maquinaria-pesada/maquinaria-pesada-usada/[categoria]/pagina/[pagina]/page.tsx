@@ -30,7 +30,7 @@ export default async function PaginaCategoriaUsada({ params, searchParams }: Pro
   if (pagina === null) notFound();
   const parametros = await searchParams;
   if (pagina === 1) redirigirPaginaUno("categoria", categoria, parametros);
-  const { ambito, listado, vacio, aviso, animaciones } = await cargarListadoUsado(
+  const { ambito, listado, vacio, aviso, avisoFiltros, animaciones } = await cargarListadoUsado(
     "categoria",
     categoria,
     pagina,
@@ -43,6 +43,7 @@ export default async function PaginaCategoriaUsada({ params, searchParams }: Pro
       listado={listado}
       vacio={vacio}
       aviso={aviso}
+      avisoFiltros={avisoFiltros}
       animaciones={animaciones}
     />
   );

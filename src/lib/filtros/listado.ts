@@ -48,6 +48,7 @@ export function resolverListado<T>({
   porPagina,
   primeraPagina,
   ruta,
+  mantenerOpciones = false,
 }: {
   items: readonly T[];
   parametros: ParametrosURL;
@@ -60,6 +61,8 @@ export function resolverListado<T>({
    */
   primeraPagina?: number | ((filtrado: boolean) => number);
   ruta: string;
+  /** Las opciones que los demás filtros dejan en 0 siguen en el panel (`facetasConCuenta`). */
+  mantenerOpciones?: boolean;
 }): ResultadoListado<T> {
   const seleccion = depurar(leerSeleccion(parametros, catalogo), catalogo, items);
   const consulta = consultaCanonica(seleccion, catalogo);
@@ -80,7 +83,7 @@ export function resolverListado<T>({
     seleccion,
     consulta,
     filtrado,
-    facetas: facetasConCuenta(items, catalogo, seleccion),
+    facetas: facetasConCuenta(items, catalogo, seleccion, mantenerOpciones),
     elementos,
     total,
     totalSinFiltros: items.length,

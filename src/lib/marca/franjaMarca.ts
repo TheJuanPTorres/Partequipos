@@ -5,8 +5,10 @@ import { contraste, luminancia, rgbDeHex } from "../portada/contraste";
 import { colorDeMarca, COLOR_SIN_MARCA, tintaDeLogoSobre } from "./colorMarca";
 
 /**
- * LA FRANJA DE MARCA CON MÁS FUERZA (dirección, 2026-10-23; `FranjaMarca`): las páginas
- * generales de tipo de nueva y «Otros {tipo}» de la ficha nueva. Cada mejora es
+ * LA FRANJA DE MARCA CON MÁS FUERZA (dirección, 2026-10-23). YA NO SE PINTA EN NINGÚN SITIO: las
+ * páginas generales de tipo (#385) y «Otros modelos de {tipo}» de la ficha nueva (2026-10-27)
+ * usan el banner de marca (`BannerMarcaTipo`) y el componente `FranjaMarca` se quitó; de aquí
+ * solo se usa `colorConBlanco`. Lo demás queda como registro. Cada mejora es
  * INDEPENDIENTE y este objeto es su interruptor: una en `false` desaparece del todo. En un
  * preview se prueban con `?anim=D1,D3` (`?anim=no`, ninguna), con las utilidades del listado de
  * usados (#320, `activasDe` y `ZonaAnimada`); en el sitio publicado el parámetro no hace nada.

@@ -21,7 +21,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
 export default async function CategoriaUsadaPage({ params, searchParams }: Props) {
   const { categoria } = await params;
-  const { ambito, listado, vacio, aviso, animaciones } = await cargarListadoUsado(
+  const { ambito, listado, vacio, aviso, avisoFiltros, animaciones } = await cargarListadoUsado(
     "categoria",
     categoria,
     1,
@@ -34,6 +34,7 @@ export default async function CategoriaUsadaPage({ params, searchParams }: Props
       listado={listado}
       vacio={vacio}
       aviso={aviso}
+      avisoFiltros={avisoFiltros}
       animaciones={animaciones}
     />
   );

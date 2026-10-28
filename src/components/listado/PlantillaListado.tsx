@@ -66,6 +66,7 @@ export function PlantillaListado<T>({
   logoDeMarca,
   idLista,
   vacio,
+  avisame,
   children,
 }: {
   migas: Miga[];
@@ -104,6 +105,12 @@ export function PlantillaListado<T>({
   idLista: string;
   /** Lo que se pinta si el listado no tiene nada (sin contar los filtros). */
   vacio: ReactNode;
+  /**
+   * «Avísame cuando llegue una» cuando los FILTROS no dejan ninguna unidad: recibe las etiquetas
+   * de los filtros activos y devuelve el botón que abre la ventana del formulario. Sin él, un
+   * enlace a /contactanos/.
+   */
+  avisame?: (filtros: string[]) => ReactNode;
   /** Las tarjetas (`<TarjetaListado>`), ya en su orden. */
   children: ReactNode;
 }) {
@@ -125,7 +132,7 @@ export function PlantillaListado<T>({
   const barra =
     totalSinFiltros > 0 ? (
       <div className={estilos.barra} data-catalogo-nav="">
-        <p className={estilos.resumen} aria-live="polite">
+        <p className={estilos.resumen} aria-live={navegacionCliente ? undefined : "polite"}>
           {chips.length ? <strong>Selección actual:</strong> : null}
           <span>
             {anim.has("A5") ? <NumeroAnimado valor={total} /> : total}
@@ -159,7 +166,7 @@ export function PlantillaListado<T>({
                 className={estilos.limpiar}
               >
                 <IconAdjustmentsHorizontal size={18} stroke={1.8} aria-hidden="true" />
-                Limpiar filtro
+                Limpiar filtros
               </Link>
             </>
           ) : null}
@@ -202,10 +209,32 @@ export function PlantillaListado<T>({
         vacio
       )
     ) : elementos.length === 0 ? (
-      <p className={estilos.vacio}>
-        Ningún{elemento.singular === "unidad" ? "a" : ""} {elemento.singular} cumple estos filtros.
-        Quita alguno para ver más.
-      </p>
+      <div className={estilos.vacio} data-catalogo-nav="">
+        <p>
+          {elemento.singular === "unidad" ? "Ninguna" : "Ningún"} {elemento.singular} cumple estos
+          filtros. Quita alguno para ver más.
+        </p>
+        <p>
+          <Link
+            href={enlaceCon(rutaBase, catalogo, seleccion, { limpiar: true })}
+            prefetch={false}
+            rel="nofollow"
+          >
+            Limpiar filtros
+          </Link>
+          {elemento.singular === "unidad" ? (
+            <>
+              {" o "}
+              {avisame ? (
+                avisame(chips.map((c) => c.etiqueta))
+              ) : (
+                <Link href="/contactanos/">avísame cuando llegue una</Link>
+              )}
+            </>
+          ) : null}
+          .
+        </p>
+      </div>
     ) : (
       <ul id={idLista} className={estilos.tarjetas} data-vista="lista">
         {children}
@@ -247,6 +276,15 @@ export function PlantillaListado<T>({
 
   const cuerpo = (
     <>
+      {navegacionCliente && totalSinFiltros > 0 ? (
+        // Anuncio de los resultados tras cada cambio en vivo; el nodo es el mismo entre cambios.
+        <p className="sr-only" role="status">
+          {total === 0
+            ? `${elemento.singular === "unidad" ? "Ninguna" : "Ningún"} ${elemento.singular} cumple los filtros`
+            : `${total} ${total === 1 ? elemento.singular : elemento.plural} ${total === 1 ? "disponible" : "disponibles"}`}
+          {paginas > 1 ? `, página ${pagina} de ${paginas}` : ""}
+        </p>
+      ) : null}
       {listaLateral ? (
         <div className={estilos.lateral}>
           {listaLateral}
@@ -259,6 +297,7 @@ export function PlantillaListado<T>({
                 ordenPorDefecto={catalogo.ordenes[0].valor}
                 elemento={elemento}
                 logoDeMarca={logoDeMarca}
+                enVivo={navegacionCliente}
               />
             </aside>
           ) : null}
@@ -272,6 +311,7 @@ export function PlantillaListado<T>({
             ordenPorDefecto={catalogo.ordenes[0].valor}
             elemento={elemento}
             logoDeMarca={logoDeMarca}
+            enVivo={navegacionCliente}
           />
         </aside>
       ) : null}

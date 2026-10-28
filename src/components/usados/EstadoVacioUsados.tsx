@@ -1,15 +1,12 @@
 import { IconBell, IconBrandWhatsapp } from "@tabler/icons-react";
 
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
-import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import type { DatosVacio } from "@/lib/usados/listado";
 
 import estilos from "./vacio.module.css";
-
-const ANCLA_AVISO = "avisame";
 
 /**
  * ESTADO VACÍO de un listado de usados sin unidades (petición del cliente,
@@ -24,7 +21,7 @@ const ANCLA_AVISO = "avisame";
  * (D4); vuelve sola con la primera unidad.
  */
 export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen: string }) {
-  // El mismo formulario en la página y en la ventana de «Avísame cuando llegue una».
+  // El formulario de la ventana de «Avísame cuando llegue una» (sin JavaScript, el botón lleva a /contactanos/).
   const formulario: ConfigFormulario = {
     tipo: "cotizacion",
     origen,
@@ -48,7 +45,7 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
         </p>
         <div className={estilos.acciones}>
           <BotonFormulario
-            href={`#${ANCLA_AVISO}`}
+            href="/contactanos/"
             className={`${estilos.boton} ${estilos.botonRojo}`}
             formulario={formulario}
           >
@@ -81,10 +78,6 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
           />
         </div>
       ) : null}
-
-      <div id={ANCLA_AVISO} className={estilos.formulario}>
-        <FormularioSolicitud {...formulario} />
-      </div>
     </div>
   );
 }

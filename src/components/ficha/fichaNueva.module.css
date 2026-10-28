@@ -308,9 +308,19 @@ section.principal[data-con-izquierda] {
   padding: 0 var(--ficha-margen) 5cqi;
 }
 
-/* El banner (logo, título y «Ver marca») es `BannerMarcaTipo` (src/components/nueva/). */
-.rejillaOtras {
-  margin-top: 20px;
+/*
+ * El banner (logo, título y «Ver marca») es `BannerMarcaTipo` (src/components/nueva/). Aire
+ * entre el banner y las tarjetas (Juan Pablo, 2026-10-27): 32 px; 24 en móvil. Con `.otras`
+ * delante, porque `.rejilla { margin: 0 }` va después y lo pisaba (quedaba pegado).
+ */
+.otras .rejillaOtras {
+  margin-top: 32px;
+}
+
+@media (max-width: 767px) {
+  .otras .rejillaOtras {
+    margin-top: 24px;
+  }
 }
 
 /*

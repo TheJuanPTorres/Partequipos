@@ -81,6 +81,26 @@ describe("servicio técnico con diseño propio", () => {
     assert.equal(v.contacto?.botonTexto, "Enviar solicitud");
   });
 
+  it("posventa: el antetítulo del bloque, recortado; vacío, null (la plantilla pone el de Andrés)", () => {
+    const posventa = (antetitulo: string | null) =>
+      ({
+        blockType: "presentacionImagen",
+        ancla: "posventa",
+        antetitulo,
+        titulo: "Contamos con técnicos altamente especializados",
+        texto: lexical([t("Texto de posventa.")]),
+        imagen: null,
+        animacion: null,
+        boton: null,
+      }) as unknown as VistaBloque;
+    assert.equal(
+      vistaServicioTecnico([posventa("  Servicio posventa ")]).posventa?.antetitulo,
+      "Servicio posventa",
+    );
+    assert.equal(vistaServicioTecnico([posventa("  ")]).posventa?.antetitulo, null);
+    assert.equal(vistaServicioTecnico([posventa(null)]).posventa?.antetitulo, null);
+  });
+
   it("con el bloque «Proceso paso a paso» y el título y el texto de la galería", () => {
     const bloques = [
       ...BLOQUES.filter((b) => b.ancla !== "Siniestros" && b.blockType !== "galeria"),

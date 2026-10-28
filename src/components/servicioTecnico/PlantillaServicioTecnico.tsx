@@ -1,5 +1,8 @@
 import {
+  IconBrandWhatsapp,
+  IconCalendarCog,
   IconChecklist,
+  IconClipboardCheck,
   IconDeviceDesktopCog,
   IconHeartHandshake,
   IconLinkOff,
@@ -7,6 +10,8 @@ import {
   IconPlayerPlayFilled,
   IconSettings,
   IconSettingsCog,
+  IconTool,
+  IconTools,
   IconWheel,
   type Icon,
 } from "@tabler/icons-react";
@@ -21,7 +26,7 @@ import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import type { EnlaceBloque } from "@/lib/bloques/vista";
 import type { VistaServicioTecnico } from "@/lib/servicioTecnico/vista";
 import { configContactoMarca, type ConfigFormulario } from "@/lib/formularios/configFormulario";
-import type { EnlaceWhatsApp } from "@/lib/whatsapp";
+import { conMensaje, type EnlaceWhatsApp } from "@/lib/whatsapp";
 
 import { CarruselVideos } from "./CarruselVideos";
 import estilos from "./servicio.module.css";
@@ -38,7 +43,8 @@ import { VideoFondo } from "./VideoFondo";
  * - cada sección con su línea, su antetítulo y dos columnas: el medio (foto,
  *   carrusel de vídeos o galería) y el texto con «Contáctanos»;
  * - el alistamiento con los dos vídeos en un carrusel y, al lado, el texto de
- *   POSVENTA (así lo compone Andrés: no hay sección aparte de posventa);
+ *   POSVENTA; desde el 2026-10-27 (dirección), cada columna es una sección propia con
+ *   su antetítulo («Servicio postventa» el nuevo) y su ancla;
  * - los siniestros con la galería, los 3 pasos en tarjetas con icono y
  *   «Trabajamos con las principales aseguradoras» al final.
  *
@@ -56,6 +62,20 @@ const SECCIONES: Record<string, { etiqueta: string; icono: Icon }> = {
   posventa: { etiqueta: "Servicio postventa", icono: IconHeartHandshake },
   siniestros: { etiqueta: "Siniestros de maquinaria", icono: IconLinkOff },
 };
+
+/**
+ * Los cuatro puntos de la tarjeta de posventa (Juan Pablo, 2026-10-27), sacados de su propio
+ * texto («reparaciones, alistamiento y/o mantenimientos…», «herramienta especializada»).
+ */
+const PUNTOS_POSVENTA: { texto: string; icono: Icon }[] = [
+  { texto: "Reparaciones", icono: IconTool },
+  { texto: "Alistamiento", icono: IconClipboardCheck },
+  { texto: "Mantenimiento", icono: IconCalendarCog },
+  { texto: "Herramienta especializada", icono: IconTools },
+];
+
+/** El mensaje del WhatsApp de la tarjeta de posventa. */
+const MENSAJE_POSVENTA = "Hola, quiero información sobre el servicio postventa.";
 
 /** Los iconos de los pasos de siniestros, por orden (los de Andrés). */
 const ICONOS_PASOS: Icon[] = [IconChecklist, IconDeviceDesktopCog, IconSettingsCog];
@@ -77,6 +97,23 @@ function Antetitulo({ ancla }: { ancla: string }) {
       {s.etiqueta}
     </p>
   ) : null;
+}
+
+/**
+ * El título de las columnas de alistamiento y posventa (Juan Pablo, 2026-10-27): un `<h2>` al
+ * tamaño de título de sección con el icono de su tarjeta de acceso en rojo, para que los dos
+ * servicios se vean equivalentes y separados. `texto` sustituye a la etiqueta de Andrés.
+ */
+function TituloServicio({ ancla, texto }: { ancla: string; texto?: string | null }) {
+  const s = SECCIONES[ancla.toLowerCase()];
+  if (!s) return null;
+  const Icono = s.icono;
+  return (
+    <h2 id={`${ancla}-antetitulo`} className={estilos.tituloServicio}>
+      <Icono size={40} stroke={1.5} aria-hidden="true" className={estilos.tituloServicioIcono} />
+      <span>{texto || s.etiqueta}</span>
+    </h2>
+  );
 }
 
 /**
@@ -138,7 +175,7 @@ export function PlantillaServicioTecnico({
       })
     : null;
   const fotoHero = hero.video?.poster ?? hero.imagen;
-  // Las tarjetas: las 4 secciones que existen. Posventa vive junto al alistamiento.
+  // Las tarjetas: las 4 secciones que existen. Posventa es la columna derecha del alistamiento.
   const accesos = vista.accesos.filter((a) => SECCIONES[a.ancla.toLowerCase()]);
 
   return (
@@ -239,16 +276,24 @@ export function PlantillaServicioTecnico({
         </section>
       ) : null}
 
-      {/* ---------- Alistamiento (y, a su lado, posventa) ---------- */}
+      {/*
+       * ---------- Alistamiento y posventa: DOBLE COLUMNA (dirección, 2026-10-27) ----------
+       * Cada columna es una sección propia, como TARJETA, con su `<h2>` e icono y su ancla: a la
+       * izquierda el alistamiento (vídeos y texto), a la derecha «Servicio postventa» (el
+       * «Antetítulo» del bloque de posventa en el panel; vacío, el de Andrés) sobre su título, texto
+       * y botón. Las
+       * tarjetas de acceso llevan a cada una, con un resaltado breve al llegar (`:target`). En
+       * móvil, una debajo de la otra.
+       */}
       {alistamiento ? (
-        <section
-          id={alistamiento.ancla}
-          className={estilos.seccion}
-          aria-labelledby={`${alistamiento.ancla}-antetitulo`}
-        >
-          <Antetitulo ancla={alistamiento.ancla} />
-          <div className={estilos.fila}>
-            <div className={estilos.columnaMedio}>
+        <div className={estilos.seccion}>
+          <div className={`${estilos.fila} ${estilos.filaDoble}`}>
+            <section
+              id={alistamiento.ancla}
+              className={`${estilos.columnaMedio} ${estilos.columnaSeccion}`}
+              aria-labelledby={`${alistamiento.ancla}-antetitulo`}
+            >
+              <TituloServicio ancla={alistamiento.ancla} />
               <CarruselVideos etiqueta="Vídeos del alistamiento de maquinaria">
                 {alistamiento.etapas ? (
                   <div className={estilos.diapositivaVideo}>
@@ -299,40 +344,98 @@ export function PlantillaServicioTecnico({
                   ) : null}
                 </div>
               </CarruselVideos>
-            </div>
-            <div className={estilos.columnaTexto} id={posventa?.ancla}>
-              {posventa ? (
-                <>
-                  {/* Sin sección propia en la plantilla: su antetítulo, solo para lectores. */}
-                  <p className="sr-only">{SECCIONES.posventa!.etiqueta}</p>
-                  <Revelado
-                    id="posventa-titulo"
-                    texto={posventa.titulo}
-                    {...RITMO}
-                    className={estilos.titulo}
-                  />
-                  {posventa.parrafos.map((p) => (
-                    <p key={p} className={estilos.parrafo}>
-                      {p}
-                    </p>
-                  ))}
-                  <Contactanos
-                    boton={posventa.boton}
-                    formulario={formularioContacto}
-                    ancla={contacto?.ancla ?? null}
-                  />
-                </>
-              ) : (
+            </section>
+            {posventa ? (
+              <section
+                id={posventa.ancla}
+                className={`${estilos.columnaSeccion} ${estilos.columnaPosventa}`}
+                aria-labelledby={`${posventa.ancla}-antetitulo`}
+              >
+                <TituloServicio ancla={posventa.ancla} texto={posventa.antetitulo} />
+                {/*
+                 * La tarjeta reparte su alto (Juan Pablo, 2026-10-27): el texto, los cuatro
+                 * puntos (con la «Imagen» del bloque en el panel al lado, si la tiene) y los
+                 * botones juntos; los grupos se reparten el alto que iguala la del alistamiento.
+                 */}
+                <div className={estilos.posventaCuerpo}>
+                  <div className={estilos.posventaTexto}>
+                    <Revelado
+                      id="posventa-titulo"
+                      como="h3"
+                      texto={posventa.titulo}
+                      {...RITMO}
+                      className={`${estilos.titulo} ${estilos.tituloEnTarjeta}`}
+                    />
+                    {posventa.parrafos.map((p) => (
+                      <p key={p} className={estilos.parrafo}>
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                  <div
+                    className={estilos.puntosYFoto}
+                    data-con-foto={posventa.imagen ? "" : undefined}
+                  >
+                    <ul className={estilos.puntos} aria-label="Qué incluye el servicio postventa">
+                      {PUNTOS_POSVENTA.map(({ texto, icono: Icono }) => (
+                        <li key={texto} className={estilos.punto}>
+                          <Icono
+                            size={26}
+                            stroke={1.6}
+                            aria-hidden="true"
+                            className={estilos.puntoIcono}
+                          />
+                          <span>{texto}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    {posventa.imagen ? (
+                      <div className={estilos.fotoPosventa}>
+                        <Image
+                          src={posventa.imagen.url}
+                          alt={posventa.imagen.alt}
+                          fill
+                          sizes="(max-width: 767px) 90vw, 22vw"
+                          className={estilos.medio}
+                          style={{ objectPosition: posventa.imagen.posicion }}
+                        />
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className={estilos.botones}>
+                    <Contactanos
+                      boton={posventa.boton}
+                      formulario={formularioContacto}
+                      ancla={contacto?.ancla ?? null}
+                    />
+                    {whatsapp ? (
+                      <a
+                        href={conMensaje(whatsapp, MENSAJE_POSVENTA).href}
+                        className={`${estilos.boton} ${estilos.botonWhatsapp}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <IconBrandWhatsapp size={20} stroke={1.6} aria-hidden="true" />
+                        WhatsApp
+                        <span className="sr-only"> (abre WhatsApp en una pestaña nueva)</span>
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
+              </section>
+            ) : (
+              <div className={estilos.columnaTexto}>
                 <Revelado
                   id="alistamiento-titulo"
+                  como="h3"
                   texto={alistamiento.titulo}
                   {...RITMO}
                   className={estilos.titulo}
                 />
-              )}
-            </div>
+              </div>
+            )}
           </div>
-        </section>
+        </div>
       ) : null}
 
       {/* ---------- Siniestros ---------- */}

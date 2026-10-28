@@ -179,6 +179,139 @@ video.medio {
   padding: 10px 30px 30px;
   scroll-margin-top: 100px;
 }
+/*
+ * ALISTAMIENTO Y POSVENTA EN DOBLE COLUMNA (dirección, 2026-10-27): cada columna es una sección
+ * propia, como TARJETA (el gris de las secciones, esquinas de 30 px y relleno), con su `<h2>` e
+ * icono rojo arriba, a la misma altura (Juan Pablo: más notorias, equivalentes y separadas). La
+ * de posventa centra su texto en el alto que queda. Al llegar por su ancla, un anillo rojo breve
+ * (sin él con «reducir movimiento»).
+ */
+.filaDoble {
+  align-items: stretch;
+  gap: 30px;
+}
+.columnaSeccion {
+  min-width: 0;
+  padding: 30px;
+  border-radius: 30px;
+  background: var(--color-fondo-seccion);
+  scroll-margin-top: 100px;
+}
+.columnaPosventa {
+  display: flex;
+  flex-direction: column;
+}
+/*
+ * El cuerpo de la tarjeta de posventa (Juan Pablo, 2026-10-27): texto, cuatro puntos y botones.
+ * Ocupa el alto de la tarjeta (la iguala la del alistamiento) y reparte el sobrante entre los
+ * tres grupos. La foto va AL LADO de los puntos (en una columna), así no alarga la tarjeta.
+ */
+.posventaCuerpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+.posventaTexto {
+  display: grid;
+  gap: 16px;
+}
+.puntosYFoto {
+  display: grid;
+  gap: 12px;
+}
+.puntosYFoto[data-con-foto] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.puntos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.puntosYFoto[data-con-foto] .puntos {
+  grid-template-columns: 1fr;
+}
+.punto {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.puntoIcono {
+  flex: none;
+  /* El rojo de marca sobre blanco: 4,54:1. */
+  color: var(--color-marca);
+}
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+/* El verde de WhatsApp de los formularios (#405): blanco sobre #0f7b45, 5,3:1. */
+.boton.botonWhatsapp {
+  border-color: #0f7b45;
+  background: #0f7b45;
+}
+.boton.botonWhatsapp:hover {
+  border-color: #0a6e37;
+  background: #0a6e37;
+}
+.fotoPosventa {
+  position: relative;
+  min-height: 160px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--color-fondo);
+}
+.tituloServicio {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 24px;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-3);
+  font-weight: 700;
+  line-height: 1.1;
+}
+.tituloServicioIcono {
+  flex: none;
+  /* El rojo de las tarjetas de acceso: 4,0:1 sobre el gris (icono, AA pide 3:1). */
+  color: var(--color-marca);
+}
+/* El título del bloque, por debajo del `<h2>` de la tarjeta: más pequeño que él. */
+.titulo.tituloEnTarjeta {
+  font-size: clamp(22px, 1.8vw, 26px);
+  line-height: 1.25;
+}
+.columnaSeccion:target {
+  animation: resaltarSeccion 1.8s ease-out;
+}
+@keyframes resaltarSeccion {
+  0%,
+  35% {
+    box-shadow: 0 0 0 4px var(--color-marca);
+  }
+  100% {
+    box-shadow: 0 0 0 4px transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .columnaSeccion:target {
+    animation: none;
+  }
+}
 .titulo {
   max-width: 685px;
   margin: 0;
@@ -450,6 +583,30 @@ video.medio {
   }
   .fila {
     grid-template-columns: 1fr;
+  }
+  /* En móvil, una debajo de otra, cada una con su título. */
+  .filaDoble {
+    gap: 24px;
+  }
+  .columnaSeccion {
+    padding: 24px 16px;
+  }
+  /* En móvil, apilado: los puntos en una columna, los botones a todo el ancho, foto 16:9. */
+  .puntos,
+  .puntosYFoto[data-con-foto] {
+    grid-template-columns: 1fr;
+  }
+  .botones > * {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+  .fotoPosventa {
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+  .tituloServicio {
+    justify-content: center;
+    text-align: left;
   }
   /* En móvil la plantilla centra los títulos y les da 20 px a los lados. */
   .columnaTexto {

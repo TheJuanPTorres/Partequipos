@@ -66,6 +66,7 @@ export function PlantillaListado<T>({
   logoDeMarca,
   idLista,
   vacio,
+  avisame,
   children,
 }: {
   migas: Miga[];
@@ -104,6 +105,12 @@ export function PlantillaListado<T>({
   idLista: string;
   /** Lo que se pinta si el listado no tiene nada (sin contar los filtros). */
   vacio: ReactNode;
+  /**
+   * «Avísame cuando llegue una» cuando los FILTROS no dejan ninguna unidad: recibe las etiquetas
+   * de los filtros activos y devuelve el botón que abre la ventana del formulario. Sin él, un
+   * enlace a /contactanos/.
+   */
+  avisame?: (filtros: string[]) => ReactNode;
   /** Las tarjetas (`<TarjetaListado>`), ya en su orden. */
   children: ReactNode;
 }) {
@@ -218,7 +225,11 @@ export function PlantillaListado<T>({
           {elemento.singular === "unidad" ? (
             <>
               {" o "}
-              <Link href="/contactanos/">avísame cuando llegue una</Link>
+              {avisame ? (
+                avisame(chips.map((c) => c.etiqueta))
+              ) : (
+                <Link href="/contactanos/">avísame cuando llegue una</Link>
+              )}
             </>
           ) : null}
           .

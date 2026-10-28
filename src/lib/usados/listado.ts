@@ -235,12 +235,18 @@ export async function cargarListadoUsado(
       aviso = { whatsapp: enlaceWhatsApp(empresa.whatsapp, mensajeWhatsApp(ambito)) };
     }
   }
+  // Los filtros no dejan ninguna: «Avísame cuando llegue una» necesita el WhatsApp.
+  let avisoFiltros: AvisoVacio | null = null;
+  if (ambito.unidades.length > 0 && listado.elementos.length === 0) {
+    const empresa = await getEmpresa();
+    avisoFiltros = { whatsapp: enlaceWhatsApp(empresa.whatsapp, mensajeWhatsApp(ambito)) };
+  }
   // Las animaciones del listado; en un preview se prueban con `?anim=` (nunca en el sitio publicado).
   const animaciones = animacionesActivas(
     parametros[PARAMETRO_ANIMACIONES],
     process.env.VERCEL_ENV !== "production",
   );
-  return { ambito, listado, vacio, aviso, animaciones };
+  return { ambito, listado, vacio, aviso, avisoFiltros, animaciones };
 }
 
 /**

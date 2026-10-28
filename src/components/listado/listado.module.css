@@ -1422,3 +1422,8 @@
     transform: scaleX(0);
   }
 }
+
+/* «Avísame cuando llegue una» del estado sin resultados: un enlace que abre la ventana del formulario. */
+.avisame {
+  text-decoration: underline;
+}

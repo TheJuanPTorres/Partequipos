@@ -179,6 +179,45 @@ video.medio {
   padding: 10px 30px 30px;
   scroll-margin-top: 100px;
 }
+/*
+ * ALISTAMIENTO Y POSVENTA EN DOBLE COLUMNA (dirección, 2026-10-27): cada columna es una sección
+ * con su antetítulo arriba, a la misma altura. La de posventa centra su texto en el alto que
+ * queda. Al llegar por su ancla, un resaltado breve (sin él con «reducir movimiento»).
+ */
+.filaDoble {
+  align-items: stretch;
+}
+.columnaSeccion {
+  min-width: 0;
+  border-radius: 30px;
+  scroll-margin-top: 100px;
+}
+.columnaPosventa {
+  display: flex;
+  flex-direction: column;
+}
+.columnaPosventa > .columnaTexto {
+  flex: 1;
+}
+.columnaSeccion:target {
+  animation: resaltarSeccion 1.8s ease-out;
+}
+@keyframes resaltarSeccion {
+  0%,
+  35% {
+    background: color-mix(in srgb, var(--color-marca) 8%, transparent);
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--color-marca) 8%, transparent);
+  }
+  100% {
+    background: transparent;
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .columnaSeccion:target {
+    animation: none;
+  }
+}
 .titulo {
   max-width: 685px;
   margin: 0;
@@ -450,6 +489,10 @@ video.medio {
   }
   .fila {
     grid-template-columns: 1fr;
+  }
+  /* En móvil, una debajo de otra, cada una con su antetítulo. */
+  .filaDoble {
+    gap: 40px;
   }
   /* En móvil la plantilla centra los títulos y les da 20 px a los lados. */
   .columnaTexto {

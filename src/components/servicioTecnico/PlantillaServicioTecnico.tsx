@@ -38,7 +38,8 @@ import { VideoFondo } from "./VideoFondo";
  * - cada sección con su línea, su antetítulo y dos columnas: el medio (foto,
  *   carrusel de vídeos o galería) y el texto con «Contáctanos»;
  * - el alistamiento con los dos vídeos en un carrusel y, al lado, el texto de
- *   POSVENTA (así lo compone Andrés: no hay sección aparte de posventa);
+ *   POSVENTA; desde el 2026-10-27 (dirección), cada columna es una sección propia con
+ *   su antetítulo («Servicio postventa» el nuevo) y su ancla;
  * - los siniestros con la galería, los 3 pasos en tarjetas con icono y
  *   «Trabajamos con las principales aseguradoras» al final.
  *
@@ -138,7 +139,7 @@ export function PlantillaServicioTecnico({
       })
     : null;
   const fotoHero = hero.video?.poster ?? hero.imagen;
-  // Las tarjetas: las 4 secciones que existen. Posventa vive junto al alistamiento.
+  // Las tarjetas: las 4 secciones que existen. Posventa es la columna derecha del alistamiento.
   const accesos = vista.accesos.filter((a) => SECCIONES[a.ancla.toLowerCase()]);
 
   return (
@@ -239,16 +240,23 @@ export function PlantillaServicioTecnico({
         </section>
       ) : null}
 
-      {/* ---------- Alistamiento (y, a su lado, posventa) ---------- */}
+      {/*
+       * ---------- Alistamiento y posventa: DOBLE COLUMNA (dirección, 2026-10-27) ----------
+       * Cada columna es una sección propia, con su antetítulo y su ancla: a la izquierda el
+       * alistamiento (vídeos y texto), a la derecha «Servicio postventa» (el «Antetítulo» del
+       * bloque de posventa en el panel; vacío, el de Andrés) sobre su título, texto y botón. Las
+       * tarjetas de acceso llevan a cada una, con un resaltado breve al llegar (`:target`). En
+       * móvil, una debajo de la otra.
+       */}
       {alistamiento ? (
-        <section
-          id={alistamiento.ancla}
-          className={estilos.seccion}
-          aria-labelledby={`${alistamiento.ancla}-antetitulo`}
-        >
-          <Antetitulo ancla={alistamiento.ancla} />
-          <div className={estilos.fila}>
-            <div className={estilos.columnaMedio}>
+        <div className={estilos.seccion}>
+          <div className={`${estilos.fila} ${estilos.filaDoble}`}>
+            <section
+              id={alistamiento.ancla}
+              className={`${estilos.columnaMedio} ${estilos.columnaSeccion}`}
+              aria-labelledby={`${alistamiento.ancla}-antetitulo`}
+            >
+              <Antetitulo ancla={alistamiento.ancla} />
               <CarruselVideos etiqueta="Vídeos del alistamiento de maquinaria">
                 {alistamiento.etapas ? (
                   <div className={estilos.diapositivaVideo}>
@@ -299,12 +307,17 @@ export function PlantillaServicioTecnico({
                   ) : null}
                 </div>
               </CarruselVideos>
-            </div>
-            <div className={estilos.columnaTexto} id={posventa?.ancla}>
-              {posventa ? (
-                <>
-                  {/* Sin sección propia en la plantilla: su antetítulo, solo para lectores. */}
-                  <p className="sr-only">{SECCIONES.posventa!.etiqueta}</p>
+            </section>
+            {posventa ? (
+              <section
+                id={posventa.ancla}
+                className={`${estilos.columnaSeccion} ${estilos.columnaPosventa}`}
+                aria-labelledby={`${posventa.ancla}-antetitulo`}
+              >
+                <p id={`${posventa.ancla}-antetitulo`} className={estilos.antetitulo}>
+                  {posventa.antetitulo || SECCIONES.posventa!.etiqueta}
+                </p>
+                <div className={estilos.columnaTexto}>
                   <Revelado
                     id="posventa-titulo"
                     texto={posventa.titulo}
@@ -321,18 +334,20 @@ export function PlantillaServicioTecnico({
                     formulario={formularioContacto}
                     ancla={contacto?.ancla ?? null}
                   />
-                </>
-              ) : (
+                </div>
+              </section>
+            ) : (
+              <div className={estilos.columnaTexto}>
                 <Revelado
                   id="alistamiento-titulo"
                   texto={alistamiento.titulo}
                   {...RITMO}
                   className={estilos.titulo}
                 />
-              )}
-            </div>
+              </div>
+            )}
           </div>
-        </section>
+        </div>
       ) : null}
 
       {/* ---------- Siniestros ---------- */}

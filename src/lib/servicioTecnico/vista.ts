@@ -84,6 +84,8 @@ export type VistaServicioTecnico = {
   } | null;
   posventa: {
     ancla: string;
+    /** El antetítulo de su columna (el del bloque en el panel; vacío, «Servicio postventa»). */
+    antetitulo: string | null;
     titulo: string;
     parrafos: string[];
     imagen: ImagenBloque | null;
@@ -201,6 +203,7 @@ export function vistaServicioTecnico(bloques: VistaBloque[]): VistaServicioTecni
     posventa: posventa
       ? {
           ancla: posventa.ancla!,
+          antetitulo: posventa.antetitulo?.trim() || null,
           titulo: posventa.titulo,
           parrafos: parrafosDe(posventa.texto).map(texto),
           imagen: posventa.imagen,

@@ -1427,3 +1427,15 @@
 .avisame {
   text-decoration: underline;
 }
+
+/* Filtros en vivo: una opción sin resultados con los demás filtros sigue en el panel, en gris. */
+.filtros label:has(input:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Filtros en vivo: una opción sin resultados con los demás filtros sigue en el panel, en gris. */
+.filtros label:has(input:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

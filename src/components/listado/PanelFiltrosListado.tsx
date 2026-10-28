@@ -51,6 +51,10 @@ export function PanelFiltrosListado({
   elemento: { singular: string; plural: string };
   logoDeMarca?: Map<string, LogoMarcaDatos>;
 }) {
+  // Con los filtros en vivo, las opciones que los demás filtros dejan en 0 siguen en el panel
+  // (el panel no cambia de alto) pero no se pueden elegir.
+  const sinResultados = (o: { cuenta: number; activa: boolean }) =>
+    enVivo && o.cuenta === 0 && !o.activa;
   const conOpciones = facetas.filter((f) => f.opciones.length);
   if (!conOpciones.length) return null;
   const cuentaSr = (n: number) => `, ${n} ${n === 1 ? elemento.singular : elemento.plural}`;
@@ -97,6 +101,7 @@ export function PanelFiltrosListado({
                             name={f.clave}
                             value={o.valor}
                             defaultChecked={o.activa}
+                            disabled={sinResultados(o)}
                           />
                         </label>
                       </li>
@@ -122,6 +127,7 @@ export function PanelFiltrosListado({
                           name={f.clave}
                           value={o.valor}
                           defaultChecked={o.activa}
+                          disabled={sinResultados(o)}
                         />
                         {o.etiqueta}
                         {cuenta(o.cuenta)}
@@ -157,6 +163,7 @@ export function PanelFiltrosListado({
                           name={f.clave}
                           value={o.valor}
                           defaultChecked={o.activa}
+                          disabled={sinResultados(o)}
                         />
                         {o.etiqueta}
                         {cuenta(o.cuenta)}

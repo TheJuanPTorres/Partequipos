@@ -220,6 +220,8 @@ export async function cargarListadoUsado(
     pagina,
     porPagina: POR_PAGINA,
     ruta: `${ambito.ruta(pagina)}/`,
+    // Filtros en vivo: el panel mantiene su alto al filtrar (opciones a 0 en gris).
+    mantenerOpciones: true,
   });
   if (listado.tipo === "redirigir") permanentRedirect(listado.destino);
   if (listado.tipo === "no-existe") notFound();

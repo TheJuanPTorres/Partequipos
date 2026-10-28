@@ -41,11 +41,16 @@ export function filtrar<T>(
  * cuántas habría al añadir Hitachi a lo elegido. Se pintan las opciones con
  * algo que contar y las elegidas (aunque se queden en 0, para poder quitarlas).
  * Una faceta sin ninguna opción no se pinta.
+ *
+ * `mantener` (listados con filtros en vivo): las opciones que el resto de filtros
+ * deja en 0 también se devuelven (con `cuenta` 0), para que el panel no cambie de
+ * alto al filtrar; solo se omiten las que NINGÚN elemento del listado tiene.
  */
 export function facetasConCuenta<T>(
   items: readonly T[],
   catalogo: Catalogo<T>,
   seleccion: Seleccion,
+  mantener = false,
 ): FacetaPintada[] {
   const salida: FacetaPintada[] = [];
   for (const faceta of catalogo.facetas) {
@@ -72,7 +77,7 @@ export function facetasConCuenta<T>(
           cuenta: cuentas.get(valor) ?? 0,
           activa: elegidos.includes(valor),
         }))
-        .filter((o) => o.cuenta > 0 || o.activa);
+        .filter((o) => mantener || o.cuenta > 0 || o.activa);
       opciones.sort(
         faceta.ordenOpciones === "valor-desc"
           ? (a, b) => b.valor.localeCompare(a.valor, "es", { numeric: true })
@@ -86,7 +91,12 @@ export function facetasConCuenta<T>(
           cuenta: base.filter((item) => cumple(item, faceta, [t.valor])).length,
           activa: elegidos.includes(t.valor),
         }))
-        .filter((o) => o.cuenta > 0 || o.activa);
+        .filter(
+          (o) =>
+            o.cuenta > 0 ||
+            o.activa ||
+            (mantener && items.some((item) => cumple(item, faceta, [o.valor]))),
+        );
     }
     if (opciones.length) salida.push({ clave: faceta.clave, etiqueta: faceta.etiqueta, opciones });
   }

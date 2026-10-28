@@ -2,6 +2,7 @@
 
 import {
   IconChevronDown,
+  IconExternalLink,
   IconHeadset,
   IconMail,
   IconMenu2,
@@ -74,7 +75,8 @@ import { GrupoHermanos, MarcoMegamenu, Megamenu, MejorasMenu, SubmenuMovil } fro
 type Enlace = { etiqueta: string; href: string };
 
 type Props = {
-  enlaces: readonly Enlace[];
+  /** `externo`: otro sitio (la tienda), en pestaña nueva con su icono (`enlacesDeCabecera`). */
+  enlaces: readonly (Enlace & { externo?: boolean })[];
   /** Botón de la cabecera (global `cabecera`). Sin él, no se pinta. */
   contacto: Enlace | null;
   whatsapp: string;
@@ -86,6 +88,26 @@ type Props = {
   /** En un preview, las mejoras de fluidez (M1–M4) se recortan con `?anim=`; en el sitio publicado, no. */
   permitirUrl: boolean;
 };
+
+/**
+ * Enlace de la barra a otro sitio (la tienda del cliente, 2026-10-27): pestaña
+ * nueva, `noopener`, icono de enlace externo y el aviso en el nombre accesible.
+ * Mismo estilo que el resto de enlaces, en escritorio y en móvil.
+ */
+function EnlaceExterno({ enlace }: { enlace: Enlace }) {
+  return (
+    <a
+      href={enlace.href}
+      className={`${estilos.enlace} ${estilos.externo}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${enlace.etiqueta} (se abre en otra pestaña)`}
+    >
+      {enlace.etiqueta}
+      <IconExternalLink aria-hidden="true" focusable="false" stroke={1.75} />
+    </a>
+  );
+}
 
 const sinSuscripcion = () => () => {};
 const parametroDeLaUrl = () => new URL(location.href).searchParams.get(PARAMETRO_ANIMACIONES);
@@ -411,7 +433,9 @@ export function Cabecera({
         const datos = paneles[claveDeEnlace(e.href)];
         return (
           <li key={e.href}>
-            {datos ? (
+            {e.externo ? (
+              <EnlaceExterno enlace={e} />
+            ) : datos ? (
               <SubmenuMovil
                 etiqueta={e.etiqueta}
                 href={e.href}
@@ -436,6 +460,13 @@ export function Cabecera({
     <ul className={estilos.lista}>
       {enlaces.map((e) => {
         const clave = claveDeEnlace(e.href);
+        if (e.externo) {
+          return (
+            <li key={e.href}>
+              <EnlaceExterno enlace={e} />
+            </li>
+          );
+        }
         if (!paneles[clave]) {
           return (
             <li key={e.href}>

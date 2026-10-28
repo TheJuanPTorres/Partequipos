@@ -35,7 +35,17 @@ export const Cabecera: GlobalConfig = {
       label: "Enlaces del menú",
       labels: { singular: "Enlace", plural: "Enlaces" },
       maxRows: 6,
+      admin: {
+        description:
+          "En el orden de la barra (escritorio y móvil). Un enlace a otro sitio (https://), como la tienda, se abre en una pestaña nueva con el icono de enlace externo. Desmarca «Mostrar» para quitarlo sin borrarlo.",
+      },
       fields: [
+        {
+          name: "mostrar",
+          type: "checkbox",
+          label: "Mostrar en el menú",
+          defaultValue: true,
+        },
         {
           type: "row",
           fields: [
@@ -52,7 +62,10 @@ export const Cabecera: GlobalConfig = {
               required: true,
               label: "Enlace",
               validate: validarEnlace,
-              admin: { width: "60%", description: "Una ruta del sitio (/…/) o https://." },
+              admin: {
+                width: "60%",
+                description: "Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva).",
+              },
             },
           ],
         },

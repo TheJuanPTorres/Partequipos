@@ -223,7 +223,7 @@ video.medio {
   color: var(--color-marca);
 }
 /* El título del bloque, por debajo del `<h2>` de la tarjeta: más pequeño que él. */
-.tituloEnTarjeta {
+.titulo.tituloEnTarjeta {
   font-size: clamp(22px, 1.8vw, 26px);
   line-height: 1.25;
 }

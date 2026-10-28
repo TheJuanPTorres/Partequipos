@@ -239,6 +239,19 @@
   transform: rotate(180deg);
 }
 
+/* Enlace a otro sitio (la tienda): el texto y un icono pequeño de enlace externo. */
+.externo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.externo svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
 .enlace:focus-visible,
 .disparador:focus-visible,
 .icono:focus-visible,

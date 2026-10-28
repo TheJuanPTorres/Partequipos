@@ -1506,7 +1506,7 @@ export interface Pagina {
      */
     descripcionAlineacion?: ('left' | 'center' | 'right' | 'justify') | null;
     /**
-     * Hasta dónde se estira el texto hacia la derecha. Nunca pasa del borde de su columna; en el teléfono no cambia nada.
+     * Hasta dónde se estira el texto hacia la derecha. Nunca pasa del borde de su columna; en el teléfono no cambia nada. En esta sección la columna ya es estrecha: solo «Estrecho» cambia el aspecto.
      */
     descripcionAncho?: ('estrecho' | 'medio' | 'ancho' | 'columna') | null;
     /**
@@ -1550,7 +1550,7 @@ export interface Pagina {
      */
     marcasTextoAlineacion?: ('left' | 'center' | 'right' | 'justify') | null;
     /**
-     * Hasta dónde se estira el texto hacia la derecha. Nunca pasa del borde de su columna; en el teléfono no cambia nada.
+     * Hasta dónde se estira el texto hacia la derecha. Nunca pasa del borde de su columna; en el teléfono no cambia nada. En esta sección la columna ya es estrecha: solo «Estrecho» cambia el aspecto.
      */
     marcasTextoAncho?: ('estrecho' | 'medio' | 'ancho' | 'columna') | null;
     /**
@@ -3697,11 +3697,15 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Cabecera {
   id: number;
+  /**
+   * En el orden de la barra (escritorio y móvil). Un enlace a otro sitio (https://), como la tienda, se abre en una pestaña nueva con el icono de enlace externo. Desmarca «Mostrar» para quitarlo sin borrarlo.
+   */
   enlaces?:
     | {
+        mostrar?: boolean | null;
         etiqueta: string;
         /**
-         * Una ruta del sitio (/…/) o https://.
+         * Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva).
          */
         enlace: string;
         id?: string | null;
@@ -4221,6 +4225,7 @@ export interface CabeceraSelect<T extends boolean = true> {
   enlaces?:
     | T
     | {
+        mostrar?: T;
         etiqueta?: T;
         enlace?: T;
         id?: T;

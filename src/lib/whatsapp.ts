@@ -20,6 +20,17 @@ export function enlaceWhatsApp(numero: string, mensaje?: string): EnlaceWhatsApp
   return { href: url.toString(), etiqueta: numero };
 }
 
+/**
+ * Mensaje de WhatsApp de un formulario con el contexto de su página (2026-10-27): lo que se consulta
+ * si hay referencia (el equipo, el modelo) o, si no, el tema de un título «Contacto sobre …»
+ * («Contacto sobre repuestos Hitachi»). Con otro título («Escríbenos» en Contáctanos, editable en
+ * el panel), un saludo neutro: el título no siempre dice de qué se trata.
+ */
+export function mensajeWhatsApp(referencia: string | undefined, titulo: string): string {
+  const tema = referencia?.trim() || /^contacto sobre\s+(.+)$/i.exec(titulo.trim())?.[1]?.trim();
+  return tema ? `Hola, quiero información sobre ${tema}.` : "Hola, quiero información.";
+}
+
 /** El mismo enlace con un mensaje ya escrito (`?text=`), p. ej. el producto que se cotiza. */
 export function conMensaje(enlace: EnlaceWhatsApp, mensaje: string): EnlaceWhatsApp {
   const url = new URL(enlace.href);

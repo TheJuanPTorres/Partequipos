@@ -203,21 +203,26 @@ video.medio {
 }
 /*
  * El cuerpo de la tarjeta de posventa (Juan Pablo, 2026-10-27): texto, cuatro puntos y botones.
- * Sin foto, ocupa el alto de la tarjeta (la iguala la del alistamiento) y reparte el sobrante
- * entre los tres grupos; con foto, la foto se queda con lo que sobra.
+ * Ocupa el alto de la tarjeta (la iguala la del alistamiento) y reparte el sobrante entre los
+ * tres grupos. La foto va AL LADO de los puntos (en una columna), así no alarga la tarjeta.
  */
 .posventaCuerpo {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-.posventaCuerpo:not([data-con-foto]) {
   flex: 1;
+  flex-direction: column;
   justify-content: space-between;
+  gap: 24px;
 }
 .posventaTexto {
   display: grid;
   gap: 16px;
+}
+.puntosYFoto {
+  display: grid;
+  gap: 12px;
+}
+.puntosYFoto[data-con-foto] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .puntos {
   display: grid;
@@ -226,6 +231,9 @@ video.medio {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+.puntosYFoto[data-con-foto] .puntos {
+  grid-template-columns: 1fr;
 }
 .punto {
   display: flex;
@@ -262,11 +270,9 @@ video.medio {
 }
 .fotoPosventa {
   position: relative;
-  flex: 1;
-  min-height: 200px;
-  margin-top: 24px;
+  min-height: 160px;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 14px;
   background: var(--color-fondo);
 }
 .tituloServicio {
@@ -586,7 +592,8 @@ video.medio {
     padding: 24px 16px;
   }
   /* En móvil, apilado: los puntos en una columna, los botones a todo el ancho, foto 16:9. */
-  .puntos {
+  .puntos,
+  .puntosYFoto[data-con-foto] {
     grid-template-columns: 1fr;
   }
   .botones > * {
@@ -594,7 +601,6 @@ video.medio {
     justify-content: center;
   }
   .fotoPosventa {
-    flex: none;
     min-height: 0;
     aspect-ratio: 16 / 9;
   }

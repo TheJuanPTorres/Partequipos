@@ -354,13 +354,10 @@ export function PlantillaServicioTecnico({
                 <TituloServicio ancla={posventa.ancla} texto={posventa.antetitulo} />
                 {/*
                  * La tarjeta reparte su alto (Juan Pablo, 2026-10-27): el texto, los cuatro
-                 * puntos, los botones juntos y, si el bloque tiene «Imagen» en el panel, la foto
-                 * abajo ocupando lo que queda; sin foto, los grupos se reparten el alto.
+                 * puntos (con la «Imagen» del bloque en el panel al lado, si la tiene) y los
+                 * botones juntos; los grupos se reparten el alto que iguala la del alistamiento.
                  */}
-                <div
-                  className={estilos.posventaCuerpo}
-                  data-con-foto={posventa.imagen ? "" : undefined}
-                >
+                <div className={estilos.posventaCuerpo}>
                   <div className={estilos.posventaTexto}>
                     <Revelado
                       id="posventa-titulo"
@@ -375,19 +372,36 @@ export function PlantillaServicioTecnico({
                       </p>
                     ))}
                   </div>
-                  <ul className={estilos.puntos} aria-label="Qué incluye el servicio postventa">
-                    {PUNTOS_POSVENTA.map(({ texto, icono: Icono }) => (
-                      <li key={texto} className={estilos.punto}>
-                        <Icono
-                          size={26}
-                          stroke={1.6}
-                          aria-hidden="true"
-                          className={estilos.puntoIcono}
+                  <div
+                    className={estilos.puntosYFoto}
+                    data-con-foto={posventa.imagen ? "" : undefined}
+                  >
+                    <ul className={estilos.puntos} aria-label="Qué incluye el servicio postventa">
+                      {PUNTOS_POSVENTA.map(({ texto, icono: Icono }) => (
+                        <li key={texto} className={estilos.punto}>
+                          <Icono
+                            size={26}
+                            stroke={1.6}
+                            aria-hidden="true"
+                            className={estilos.puntoIcono}
+                          />
+                          <span>{texto}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    {posventa.imagen ? (
+                      <div className={estilos.fotoPosventa}>
+                        <Image
+                          src={posventa.imagen.url}
+                          alt={posventa.imagen.alt}
+                          fill
+                          sizes="(max-width: 767px) 90vw, 22vw"
+                          className={estilos.medio}
+                          style={{ objectPosition: posventa.imagen.posicion }}
                         />
-                        <span>{texto}</span>
-                      </li>
-                    ))}
-                  </ul>
+                      </div>
+                    ) : null}
+                  </div>
                   <div className={estilos.botones}>
                     <Contactanos
                       boton={posventa.boton}
@@ -408,18 +422,6 @@ export function PlantillaServicioTecnico({
                     ) : null}
                   </div>
                 </div>
-                {posventa.imagen ? (
-                  <div className={estilos.fotoPosventa}>
-                    <Image
-                      src={posventa.imagen.url}
-                      alt={posventa.imagen.alt}
-                      fill
-                      sizes="(max-width: 767px) 90vw, 44vw"
-                      className={estilos.medio}
-                      style={{ objectPosition: posventa.imagen.posicion }}
-                    />
-                  </div>
-                ) : null}
               </section>
             ) : (
               <div className={estilos.columnaTexto}>

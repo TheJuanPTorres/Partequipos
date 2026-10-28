@@ -201,9 +201,11 @@ video.medio {
   display: flex;
   flex-direction: column;
 }
+/* El texto arriba, bajo su `<h2>` (centrado en el alto dejaba un hueco a 1440). */
 .columnaPosventa > .columnaTexto {
   flex: 1;
-  padding: 10px 0 0;
+  justify-content: flex-start;
+  padding: 0;
 }
 .tituloServicio {
   display: flex;
@@ -220,8 +222,10 @@ video.medio {
   /* El rojo de las tarjetas de acceso: 4,0:1 sobre el gris (icono, AA pide 3:1). */
   color: var(--color-marca);
 }
+/* El título del bloque, por debajo del `<h2>` de la tarjeta: más pequeño que él. */
 .tituloEnTarjeta {
-  font-size: var(--texto-titulo-4);
+  font-size: clamp(22px, 1.8vw, 26px);
+  line-height: 1.25;
 }
 .columnaSeccion:target {
   animation: resaltarSeccion 1.8s ease-out;

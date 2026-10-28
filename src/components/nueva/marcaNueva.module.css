@@ -116,10 +116,18 @@ a.enlaceFranja:focus-visible {
   border-top: 1px solid rgb(0 0 0 / 12%);
 }
 
-/* Página general de tipo: más aire antes de la franja de la marca siguiente (dirección,
-   2026-10-23). Con los 20 + 55 px de debajo de la última fila de tarjetas, unos 100 px. */
+/* Página general de tipo: más aire antes del banner de la marca siguiente (dirección,
+   2026-10-23: unos 100 px). Las tarjetas del kit (#385) ya no traen los 55 px de debajo que
+   contaba la franja, así que el margen lo pone entero: 100 px; 64 en móvil (medido en el #404,
+   2026-10-27: quedaban 25, menos que los 32 / 24 entre el banner y sus propias tarjetas). */
 .grupoMarca + .grupoMarca {
-  margin-top: 25px;
+  margin-top: 100px;
+}
+
+@media (max-width: 767px) {
+  .grupoMarca + .grupoMarca {
+    margin-top: 64px;
+  }
 }
 
 /*
@@ -429,12 +437,20 @@ nav.barraMarcas {
 /*
  * Página general de tipo con el BANNER de marca y las tarjetas del «Kit de marca» (2026-10-26):
  * las variables de la tarjeta del kit (el grupo pone `--acento` y `--tinta`) y las tarjetas
- * 20 px bajo el banner.
+ * 32 px bajo el banner, 24 en móvil (Juan Pablo, 2026-10-27; igual que «Otros modelos» de la
+ * ficha nueva). Con `.grupoKit` delante: `.rejilla { margin: 0 }` del kit no depende así del
+ * orden en que se cargan los dos CSS.
  */
 .grupoKit {
   --gris: #f0f0f0;
 }
 
-.rejillaKit {
-  margin-top: 20px;
+.grupoKit .rejillaKit {
+  margin-top: 32px;
+}
+
+@media (max-width: 767px) {
+  .grupoKit .rejillaKit {
+    margin-top: 24px;
+  }
 }

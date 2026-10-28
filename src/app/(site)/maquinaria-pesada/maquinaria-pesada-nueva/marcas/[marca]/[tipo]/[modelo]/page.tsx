@@ -33,9 +33,9 @@ import {
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
+import { vistaBanner } from "@/lib/nueva/bannerMarca";
 import { usaDisenoKit } from "@/lib/nueva/paginaAditamentos";
 import { acentoDeMarca, mediosDeKit } from "@/lib/nueva/paginaKit";
-import { fotoDeCabecera } from "@/lib/nueva/paginaTipo";
 import { productoVisible } from "@/lib/nueva/visibilidad";
 import { rutas } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/seo/config";
@@ -239,12 +239,11 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
       experto={experto ?? null}
       otras={{
         titulo: tituloOtras(tipo.nombre),
-        // El logo de la marca, el único del sitio (`LogoMarca`); sin logo, la franja va sin imagen.
+        // El banner de marca del #385: logo (el único del sitio), color y foto de la marca.
         logo,
         tarjetas,
-        color: marca.colorMarca,
-        foto: fotoDeCabecera(tipo, [equipo]),
-        marca: { nombre: marca.nombre, href: `${rutas.marcaMaquinaria(marca.slug)}/` },
+        vista: vistaBanner(marca),
+        marca: { nombre: marca.nombre, href: `${rutas.tipoMaquinaria(marca.slug, tipo.slug)}/` },
       }}
       imagenContacto={imagenContacto}
       contactoEsFoto={contactoEsFoto}

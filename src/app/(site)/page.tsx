@@ -28,7 +28,11 @@ import { sedesDePortada, tokenMapbox } from "@/lib/portada/sedes";
 import { getCategoriasTecnicasDePortada } from "@/lib/queries/getCategoriasTecnicas";
 import { getPreguntasDePortada, getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getVideoPorId } from "@/lib/queries/getVideos";
-import { getMarcasDePortada, getUsadosDePortada } from "@/lib/queries/getMaquinaria";
+import {
+  getMarcasConEnlaceExterno,
+  getMarcasDePortada,
+  getUsadosDePortada,
+} from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
@@ -82,6 +86,7 @@ export default async function HomePage() {
     logo,
     logosMarca,
     marcasRepuestos,
+    marcasExternas,
   ] = await Promise.all([
     getMarcasDePortada(),
     getUsadosDePortada(),
@@ -94,6 +99,7 @@ export default async function HomePage() {
     getLogo(),
     getLogosMarca(),
     getMarcasRepuestosDePortada(),
+    getMarcasConEnlaceExterno(),
   ]);
   const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
   const relVideo = pagina.seccionCompania?.video;
@@ -162,7 +168,7 @@ export default async function HomePage() {
         }}
       />
       <SeccionMarcasKit
-        logos={logosDeLaBanda(pagina.seccionLogos, logosMarca)}
+        logos={logosDeLaBanda(pagina.seccionLogos, logosMarca, marcasExternas)}
         titulo={tx(pagina.seccionLogos?.titulo)}
         resaltado={tx(pagina.seccionLogos?.tituloResaltado)}
         maquina={imagenDecorativa(pagina.seccionLogos?.maquina)}

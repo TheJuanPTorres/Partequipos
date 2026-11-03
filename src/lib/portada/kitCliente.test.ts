@@ -169,6 +169,26 @@ describe("kit de la portada: logos de la banda", () => {
       ],
     );
   });
+
+  it("solo el logo de una marca sin página propia lleva enlace, el suyo (por el nombre)", () => {
+    const seccion = {
+      logos: [
+        { id: "a", nombre: "Hitachi", logo: media(5) },
+        { id: "b", nombre: "LiuGong", logo: media(6) },
+      ],
+    } as unknown as Pagina["seccionLogos"];
+    const r = logosDeLaBanda(seccion, sitio, [
+      { nombre: "Liugong", enlaceExterno: "https://maquitecno.co/" },
+      { nombre: "Otra", enlaceExterno: "javascript:alert(1)" },
+    ]);
+    assert.deepEqual(
+      r.map((l) => [l.id, l.enlace]),
+      [
+        ["a", undefined],
+        ["b", "https://maquitecno.co/"],
+      ],
+    );
+  });
 });
 
 describe("logosDeMarcasRepuestos", () => {

@@ -1574,6 +1574,20 @@ a.modelo:hover {
   text-decoration: none;
 }
 
+/* Marca sin página propia (LiuGong, 2026-11-03): a otro sitio; el icono, discreto en su esquina. */
+.baldosaExterna {
+  position: relative;
+}
+
+.baldosaExternaIcono {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  color: #595959;
+}
+
 .baldosa:focus-visible {
   outline: 3px solid var(--color-texto);
   outline-offset: 3px;

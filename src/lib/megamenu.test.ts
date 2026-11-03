@@ -93,6 +93,31 @@ describe("megamenú: maquinaria", () => {
     );
   });
 
+  it("nueva: una marca sin página propia (LiuGong) es un enlace a su distribuidor, sin tipos", () => {
+    const conLiugong = panelMaquinaria({
+      ...DATOS,
+      marcasMaquinaria: [
+        ...DATOS.marcasMaquinaria,
+        {
+          id: 4,
+          nombre: "LiuGong",
+          slug: "liugong",
+          enlaceExterno: "https://maquitecno.co/",
+          logo: { url: "/m/liugong.png", width: 571, height: 105 },
+        },
+      ],
+    });
+    const porMarca = conLiugong.grupos[0]!.grupos[0]!;
+    assert.deepEqual(titulos(porMarca.grupos), ["Case Construction", "LiuGong", "Yanmar"]);
+    const liugong = porMarca.grupos[1]!;
+    assert.equal(liugong.externo, "https://maquitecno.co/");
+    assert.deepEqual(liugong.enlaces, []);
+    assert.deepEqual(liugong.grupos, []);
+    assert.ok(liugong.logo, "lleva su logo");
+    // Las demás, como siempre: sin enlace externo.
+    assert.equal(porMarca.grupos[0]!.externo, undefined);
+  });
+
   it("nueva: por marca (sin aditamentos, en orden alfabético) y por tipo", () => {
     const nueva = panel.grupos[0]!;
     // «Ver toda la maquinaria nueva» lleva al índice de tipos (2026-10-23).

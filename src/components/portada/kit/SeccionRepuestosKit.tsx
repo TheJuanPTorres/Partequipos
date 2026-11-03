@@ -1,231 +1,135 @@
+import { IconBrandWhatsapp } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import type { AlineacionTexto, AnchoTexto } from "@/lib/fields/alineacionTexto";
-import type { CategoriaDePortada } from "@/lib/portada/kitCliente";
-import type { ImagenLista } from "@/lib/utils/relations";
+import { partirTitulo, type CategoriaDePortada } from "@/lib/portada/kitCliente";
+import type { EnlaceWhatsApp } from "@/lib/whatsapp";
 
 import { Flecha } from "./Flecha";
 import { TextoEditable } from "./TextoEditable";
 import estilos from "./repuestosKit.module.css";
 
 /**
- * «VENTA DE REPUESTOS» CON EL DISEÑO DEL CLIENTE (2026-10-26; prototipo `CatalogoRepuestos` de
- * `partequipos-diseno\portada\repuestos`), PORTADO a CSS modules. Título y tarjetas de categoría a
- * la derecha y la máquina sobre el piso, a la izquierda (desde portátil).
+ * «VENTA DE REPUESTOS», DISEÑO V3 DEL CLIENTE (2026-11-03; prototipo `CatalogoRepuestos` de
+ * `partequipos-diseno\portada-repuestos-v3`), PORTADO a CSS modules. Sustituye al de la máquina
+ * (2026-10-26/27): la sección ya NO lleva máquina (la Yanmar pasa a la banda «Marcas de repuestos»,
+ * justo debajo). Título con una palabra en rojo, el texto del panel (un párrafo por línea), el botón
+ * verde de WhatsApp (el de los formularios, #405) y las categorías en tarjetas blancas con esquina
+ * roja, 5 por fila desde portátil. Detrás, franjas diagonales grises y una roja, a la derecha del
+ * texto (nunca lo cruzan).
  *
  * Componente de SERVIDOR, sin JavaScript. Las categorías son las técnicas con posición en la
  * portada (orden, nombre o «Título en portada», y la «Foto en la portada» o la de la tarjeta), y
- * cada tarjeta lleva a SU PÁGINA («Ver todos»), no a WhatsApp como el prototipo. Máquina y reflejo,
- * del panel; sin ellos, la columna no se pinta.
- *
- * Distribución por tamaño (diseño nuevo del cliente, 2026-10-27): en teléfono y tablet, título,
- * máquina y tarjetas apiladas; desde portátil (1025 px) la disposición se INVIERTE: la máquina a la
- * izquierda, a toda la altura, y título, texto y tarjetas a la derecha, con la pared (losas y
- * franja) en espejo. El render de la máquina trae su propia sombra: no se dibuja ninguna ni reflejo.
+ * cada tarjeta lleva a SU PÁGINA, no a WhatsApp como el prototipo.
  */
-
-const SIZES_MAQUINA = "(min-width: 1536px) 54vw, (min-width: 1025px) 40vw, 90vw";
 
 export type TextosRepuestosKit = {
   antetitulo: string;
   titulo: string;
-  /** «Texto bajo el título», con sus saltos de línea. Vacío, no se pinta. */
+  /** «Palabra del título en rojo». */
+  tituloResaltado: string;
+  /** «Texto bajo el título»: un párrafo por línea. Vacío, no se pinta. */
   descripcion: string;
   descripcionAlineacion: AlineacionTexto;
   descripcionAncho: AnchoTexto;
-  /** Tamaño de la máquina desde portátil, de 0,6 a 1 (el del diseño). */
-  escalaMaquina: number;
-  verTodos: string;
+  /** Texto del botón de WhatsApp. Vacío (o sin número de la empresa), no se pinta. */
+  whatsappTexto: string;
 };
+
+const TITULO_POR_DEFECTO = "Encuentra Maquinaria y Repuestos Rápido y Fácil";
 
 export function SeccionRepuestosKit({
   categorias,
-  maquina,
-  reflejo,
+  whatsapp,
   textos,
 }: {
   categorias: CategoriaDePortada[];
-  maquina: ImagenLista | null;
-  reflejo: ImagenLista | null;
+  /** El enlace de WhatsApp de la empresa, ya con el mensaje del panel. */
+  whatsapp: EnlaceWhatsApp | undefined;
   textos: TextosRepuestosKit;
 }) {
   if (categorias.length === 0) return null;
   const idTitulo = "repuestos-kit-titulo";
+  const titulo = partirTitulo(textos.titulo || TITULO_POR_DEFECTO, textos.tituloResaltado);
   return (
     <section id="repuestos" className={estilos.seccion} aria-labelledby={idTitulo}>
       <div className={estilos.panel}>
-        <div className={`${estilos.rejilla} ${maquina ? "" : estilos.sinMaquina}`}>
-          <div className={estilos.cabecera}>
-            {textos.antetitulo ? <p className={estilos.antetitulo}>{textos.antetitulo}</p> : null}
-            <h2 id={idTitulo} className={estilos.titulo}>
-              {textos.titulo || "Encuentra Maquinaria y Repuestos Rápido y Fácil"}
-            </h2>
-            <TextoEditable
-              texto={textos.descripcion}
-              alineacion={textos.descripcionAlineacion}
-              ancho={textos.descripcionAncho}
-              className={estilos.descripcion}
-            />
-          </div>
+        <Franjas />
 
-          {maquina ? (
-            <Maquina maquina={maquina} reflejo={reflejo} escala={textos.escalaMaquina} />
+        <div className={estilos.cabecera}>
+          {textos.antetitulo ? <p className={estilos.antetitulo}>{textos.antetitulo}</p> : null}
+          <h2 id={idTitulo} className={estilos.titulo}>
+            {titulo.antes}
+            {titulo.resaltado ? (
+              <span className={estilos.resaltado}>{titulo.resaltado}</span>
+            ) : null}
+            {titulo.despues}
+          </h2>
+          <TextoEditable
+            texto={textos.descripcion}
+            alineacion={textos.descripcionAlineacion}
+            ancho={textos.descripcionAncho}
+            className={estilos.descripcion}
+          />
+          {whatsapp && textos.whatsappTexto ? (
+            <a
+              href={whatsapp.href}
+              className={estilos.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={2} size={20} />
+              {textos.whatsappTexto}
+              <span className="sr-only"> (abre WhatsApp en otra pestaña)</span>
+            </a>
           ) : null}
+        </div>
 
-          <ul className={estilos.tarjetas}>
-            {categorias.map((c) => (
-              <li key={c.id}>
-                <Link href={c.href} className={estilos.tarjeta}>
-                  <span className={estilos.foto}>
-                    {c.imagen ? (
-                      <Image
-                        src={c.imagen.url}
-                        alt=""
-                        fill
-                        sizes="(min-width: 1536px) 200px, (min-width: 1025px) 180px, 40vw"
-                        className={estilos.fotoImg}
-                      />
-                    ) : null}
-                  </span>
+        <ul className={estilos.tarjetas}>
+          {categorias.map((c) => (
+            <li key={c.id}>
+              <Link href={c.href} className={estilos.tarjeta}>
+                <span className={estilos.esquina} aria-hidden="true" />
+                <span className={estilos.foto}>
+                  {c.imagen ? (
+                    <Image
+                      src={c.imagen.url}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1025px) 18vw, (min-width: 768px) 30vw, 45vw"
+                      className={estilos.fotoImg}
+                    />
+                  ) : null}
+                </span>
+                <span className={estilos.pie}>
                   <span className={estilos.nombre}>{c.nombre}</span>
-                  <span className={estilos.ver} aria-hidden="true">
-                    {textos.verTodos || "Ver todos"}
+                  <span className={estilos.boton} aria-hidden="true">
                     <Flecha className={estilos.flecha} />
                   </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
 }
 
 /**
- * La máquina, a la escala elegida en el panel («Tamaño de la máquina», 60–100 %, por defecto 78 %)
- * desde portátil: solo se encoge el render, apoyado en el piso; la pared, el piso y las columnas
- * no cambian y el alto reservado de la caja es el mismo.
+ * Las franjas del fondo: tres losas grises y una roja que baja desde arriba y se apaga. Van en una
+ * capa que empieza A LA DERECHA de la columna del texto, así que nunca cruzan el título ni los
+ * párrafos; por debajo del texto solo quedan detrás de las tarjetas, que son opacas. Solo desde
+ * 1280 px: más estrecho no queda sitio a la derecha del texto.
  */
-function Maquina({
-  maquina,
-  reflejo,
-  escala,
-}: {
-  maquina: ImagenLista;
-  reflejo: ImagenLista | null;
-  escala: number;
-}) {
-  const W = maquina.width;
-  const H = maquina.height;
+function Franjas() {
   return (
-    <div className={estilos.maquinaCaja}>
-      <div
-        className={estilos.maquina}
-        style={{ aspectRatio: `${W} / ${H}`, ["--escala-maquina" as string]: escala }}
-      >
-        {/* La pared: losas grises y la franja roja, ancladas a la máquina (en espejo desde 1025 px, con la máquina a la izquierda) y apagadas hacia el texto. */}
-        <svg
-          aria-hidden="true"
-          focusable="false"
-          viewBox="0 0 1920 1344"
-          className={`${estilos.capa} ${estilos.pared}`}
-        >
-          <defs>
-            <linearGradient
-              id="kit-repuestos-izq"
-              gradientUnits="userSpaceOnUse"
-              x1="-900"
-              y1="0"
-              x2="250"
-              y2="0"
-            >
-              <stop offset="0" stopColor="#fff" stopOpacity="0" />
-              <stop offset="0.6" stopColor="#fff" stopOpacity="0.6" />
-              <stop offset="1" stopColor="#fff" />
-            </linearGradient>
-            <linearGradient
-              id="kit-repuestos-roja"
-              gradientUnits="userSpaceOnUse"
-              x1="0"
-              y1="-420"
-              x2="0"
-              y2="560"
-            >
-              <stop offset="0" stopColor="var(--color-marca)" />
-              <stop offset="0.5" stopColor="var(--color-marca)" stopOpacity="0.92" />
-              <stop offset="0.78" stopColor="var(--color-marca)" stopOpacity="0.45" />
-              <stop offset="1" stopColor="var(--color-marca)" stopOpacity="0" />
-            </linearGradient>
-            <mask
-              id="kit-repuestos-mascara"
-              maskUnits="userSpaceOnUse"
-              x="-3000"
-              y="-3000"
-              width="7000"
-              height="5000"
-            >
-              <rect x="-3000" y="-3000" width="7000" height="5000" fill="url(#kit-repuestos-izq)" />
-            </mask>
-          </defs>
-          <g mask="url(#kit-repuestos-mascara)">
-            <polygon
-              points="887,-2400 1117,-2400 -655,640 -885,640"
-              fill="#d3d1ce"
-              opacity="0.45"
-            />
-            <polygon
-              points="1117,-2400 1417,-2400 -355,640 -655,640"
-              fill="#fbfbfa"
-              opacity="0.8"
-            />
-            <polygon points="2207,-2400 2437,-2400 665,640 435,640" fill="#d3d1ce" opacity="0.45" />
-            <polygon points="2437,-2400 2767,-2400 995,640 665,640" fill="#fbfbfa" opacity="0.85" />
-            <polygon
-              points="3407,-2400 3627,-2400 1855,640 1635,640"
-              fill="#d3d1ce"
-              opacity="0.45"
-            />
-            <polygon
-              points="3627,-2400 3927,-2400 2155,640 1855,640"
-              fill="#fbfbfa"
-              opacity="0.8"
-            />
-          </g>
-          <polygon
-            points="2987,-2400 3177,-2400 1405,640 1215,640"
-            fill="url(#kit-repuestos-roja)"
-            opacity="0.78"
-          />
-        </svg>
-
-        {/* El piso: un plano grande desde un horizonte alto (la cámara mira desde arriba). */}
-        <div className={estilos.piso} aria-hidden="true" />
-
-        {/* El reflejo, del kit (más alto que el render): su caja empieza arriba, con su proporción. */}
-        {reflejo ? (
-          <div
-            className={estilos.reflejo}
-            style={{ aspectRatio: `${reflejo.width} / ${reflejo.height}` }}
-          >
-            <Image
-              src={reflejo.url}
-              alt=""
-              fill
-              sizes={SIZES_MAQUINA}
-              className={estilos.contener}
-            />
-          </div>
-        ) : null}
-        <Image
-          src={maquina.url}
-          alt=""
-          fill
-          sizes={SIZES_MAQUINA}
-          className={`${estilos.contener} ${estilos.render}`}
-        />
-      </div>
+    <div className={estilos.franjas} aria-hidden="true">
+      <span className={`${estilos.losa} ${estilos.losa1}`} />
+      <span className={`${estilos.losa} ${estilos.losa2}`} />
+      <span className={`${estilos.losa} ${estilos.roja}`} />
+      <span className={`${estilos.losa} ${estilos.losa3}`} />
     </div>
   );
 }

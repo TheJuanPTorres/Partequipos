@@ -35,6 +35,7 @@ import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { getLogosMarca, getMarcasRepuestosDePortada } from "@/lib/queries/getLogosMarca";
 import { metadataDe } from "@/lib/seo/metadata";
 import { turnstileSiteKey } from "@/lib/turnstile";
+import { enlaceWhatsApp as whatsappConMensaje } from "@/lib/whatsapp";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
@@ -170,16 +171,15 @@ export default async function HomePage() {
       />
       <SeccionRepuestosKit
         categorias={categoriasDePortada(categoriasTecnicas)}
-        maquina={imagenDecorativa(repuestos?.maquina)}
-        reflejo={imagenDecorativa(repuestos?.maquinaReflejo)}
+        whatsapp={whatsappConMensaje(empresa.whatsapp, tx(repuestos?.whatsappMensaje) || undefined)}
         textos={{
           antetitulo: tx(repuestos?.antetitulo),
           titulo: tx(repuestos?.titulo),
+          tituloResaltado: tx(repuestos?.tituloResaltado),
           descripcion: tx(repuestos?.descripcion),
           descripcionAlineacion: alineacionDeTexto(repuestos?.descripcionAlineacion),
           descripcionAncho: anchoDeTexto(repuestos?.descripcionAncho, "ancho"),
-          escalaMaquina: escalaDeMaquina(repuestos?.tamanoMaquina),
-          verTodos: tx(repuestos?.verMasTexto),
+          whatsappTexto: tx(repuestos?.whatsappTexto),
         }}
       />
 

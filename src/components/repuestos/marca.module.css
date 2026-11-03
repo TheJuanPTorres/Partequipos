@@ -174,6 +174,28 @@
   line-height: 1.2;
 }
 
+/*
+ * `reservarTitulo` con DOS líneas (las categorías técnicas, 2026-11-03): la misma copia
+ * invisible, por línea, con el tamaño de su línea (lo hereda de `.linea1` / `.linea2`). Medido
+ * antes: a 390 el título bajaba de 315 a 280 px de alto al llegar Inter (CLS 0,056 y 0,063).
+ */
+.lineaReservada {
+  display: grid;
+}
+
+.lineaReservada > *,
+.lineaReservada::after {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.lineaReservada::after {
+  content: attr(data-reserva);
+  visibility: hidden;
+  pointer-events: none;
+  font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+}
+
 .h1Largo .linea1 {
   /*
    * Los títulos de WordPress de cada modelo son largos («CASE CONSTRUCTION

@@ -148,7 +148,12 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <HeroMarca vista={vista} anclaSiguiente={ANCLA_GRUPOS} franja={Boolean(color)} />
+      <HeroMarca
+        vista={vista}
+        anclaSiguiente={ANCLA_GRUPOS}
+        franja={Boolean(color)}
+        reservarTitulo
+      />
 
       <EmblemaKit
         emblema={emblema}

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useId, type CSSProperties } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
@@ -24,7 +25,17 @@ const COPIAS = 4;
 const SEGUNDOS_POR_LOGO = 2.7;
 const SIZES_LOGO = "(min-width: 1025px) 15vw, 180px";
 
-export function BandaLogos({ logos }: { logos: LogoDePortada[] }) {
+export function BandaLogos({
+  logos,
+  etiqueta = "Marcas con las que trabajamos",
+  espejo = false,
+}: {
+  logos: LogoDePortada[];
+  /** El nombre de la lista para lectores de pantalla. */
+  etiqueta?: string;
+  /** La banda de «Marcas de repuestos»: los logos corren de izquierda a derecha. */
+  espejo?: boolean;
+}) {
   const { pausado, alternar } = usePausa();
   const idPista = useId();
   const duracion = { "--banda-duracion": `${logos.length * 2 * SEGUNDOS_POR_LOGO}s` };
@@ -35,6 +46,7 @@ export function BandaLogos({ logos }: { logos: LogoDePortada[] }) {
           id={idPista}
           className={estilos.carrusel}
           data-pausado={pausado ? "" : undefined}
+          data-espejo={espejo ? "" : undefined}
           style={duracion as CSSProperties}
         >
           <div className={estilos.pista}>
@@ -42,19 +54,31 @@ export function BandaLogos({ logos }: { logos: LogoDePortada[] }) {
               <ul
                 key={copia}
                 className={estilos.lista}
-                aria-label={copia === 0 ? "Marcas con las que trabajamos" : undefined}
+                aria-label={copia === 0 ? etiqueta : undefined}
                 aria-hidden={copia > 0 ? true : undefined}
               >
                 {logos.map((l) => (
                   <li key={l.id} className={estilos.item}>
-                    <span className={estilos.caja}>
-                      <LogoMarca
-                        logo={l.logo}
-                        alt={copia === 0 ? l.logo.alt : ""}
-                        sizes={SIZES_LOGO}
-                        className={estilos.logo}
-                      />
-                    </span>
+                    {l.href && copia === 0 ? (
+                      // Solo la primera copia es enlace: las demás son decorativas y no se enfocan.
+                      <Link href={l.href} className={estilos.caja} prefetch={false}>
+                        <LogoMarca
+                          logo={l.logo}
+                          alt={l.logo.alt}
+                          sizes={SIZES_LOGO}
+                          className={estilos.logo}
+                        />
+                      </Link>
+                    ) : (
+                      <span className={estilos.caja}>
+                        <LogoMarca
+                          logo={l.logo}
+                          alt={copia === 0 ? l.logo.alt : ""}
+                          sizes={SIZES_LOGO}
+                          className={estilos.logo}
+                        />
+                      </span>
+                    )}
                     <span className={estilos.separador} aria-hidden="true" />
                   </li>
                 ))}

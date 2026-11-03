@@ -691,6 +691,32 @@ export const PaginaInstitucional: CollectionConfig = {
       ],
     },
     /*
+     * «Marcas de repuestos» (2026-11-03, diseño del cliente): justo debajo de «Venta de repuestos»,
+     * la sección de marcas en espejo. Los LOGOS no se eligen aquí: salen de las marcas de repuestos
+     * (el «Logo» de cada una, uno solo en todo el sitio) y cada uno enlaza a su página de marca.
+     */
+    {
+      name: "seccionMarcasRepuestos",
+      type: "group",
+      label: "Sección «Marcas de repuestos» de la portada",
+      admin: {
+        condition: (data) => data?.slug === "inicio",
+        description:
+          "Los logos son los de las marcas de repuestos, por orden alfabético; se cambian en cada marca.",
+      },
+      fields: [
+        texto("antetitulo", "Antetítulo", "Repuestos"),
+        texto("titulo", "Título", "Repuestos para"),
+        texto("tituloResaltado", "Final del título, en rojo", "las marcas que trabajas"),
+        imagenKit(
+          "maquina",
+          "Máquina (PNG o WebP transparente)",
+          "Decorativa: la máquina a la izquierda, por delante de la banda de logos (hoy, la Yanmar ViO80). Opcional.",
+        ),
+        tamanoMaquinaField(100),
+      ],
+    },
+    /*
      * SECCIÓN 7 DE LA PORTADA (fase F): «Nuestra Compañía». El vídeo de fondo
      * y el de YouTube del botón de reproducir. Los dos opcionales: sin vídeo,
      * la tarjeta se pinta en oscuro con su texto; sin YouTube, sin botón.

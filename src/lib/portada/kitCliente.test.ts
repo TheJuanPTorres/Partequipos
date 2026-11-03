@@ -14,6 +14,7 @@ import {
   fichaCompleta,
   filtrosDeUsados,
   logosDeLaBanda,
+  logosDeMarcasRepuestos,
   tarjetasDeUnidades,
   USADOS_POR_FILTRO,
 } from "./kitCliente";
@@ -166,6 +167,42 @@ describe("kit de la portada: logos de la banda", () => {
         ["a", "/sitio-hitachi.png", "Hitachi", true],
         ["b", "/m/6.webp", "Eni", false],
       ],
+    );
+  });
+});
+
+describe("logosDeMarcasRepuestos", () => {
+  const logo = { url: "/m/1.webp", width: 400, height: 100, oscuro: false };
+
+  it("cada marca con su logo, su alt y el enlace a su página, en el orden recibido", () => {
+    const logos = logosDeMarcasRepuestos([
+      { id: 1, nombre: "Caterpillar", slug: "caterpillar", logo },
+      { id: 2, nombre: "Case Construction", slug: "case-construction", logo },
+    ]);
+    assert.deepEqual(
+      logos.map((l) => [l.nombre, l.logo.alt, l.href]),
+      [
+        [
+          "Caterpillar",
+          "Caterpillar",
+          "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/caterpillar/",
+        ],
+        [
+          "Case Construction",
+          "Case Construction",
+          "/repuestos-maquinaria-pesada-colombia/repuestos-maquinaria-pesada-marcas/case-construction/",
+        ],
+      ],
+    );
+  });
+
+  it("una marca sin nombre o sin dirección no sale", () => {
+    assert.deepEqual(
+      logosDeMarcasRepuestos([
+        { id: 1, nombre: "  ", slug: "x", logo },
+        { id: 2, nombre: "Doosan", slug: "", logo },
+      ]),
+      [],
     );
   });
 });

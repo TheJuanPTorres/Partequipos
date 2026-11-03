@@ -19,6 +19,7 @@ import {
   filtrosDeUsados,
   imagenDecorativa,
   logosDeLaBanda,
+  logosDeMarcasRepuestos,
 } from "@/lib/portada/kitCliente";
 import { RUTA_USADA, tarjetasDeMarcas } from "@/lib/portada/secciones";
 import { videoDeCompania, videoDeYouTube } from "@/lib/portada/seccionesF";
@@ -31,7 +32,7 @@ import { getMarcasDePortada, getUsadosDePortada } from "@/lib/queries/getMaquina
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
-import { getLogosMarca } from "@/lib/queries/getLogosMarca";
+import { getLogosMarca, getMarcasRepuestosDePortada } from "@/lib/queries/getLogosMarca";
 import { metadataDe } from "@/lib/seo/metadata";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
@@ -63,6 +64,7 @@ export default async function HomePage() {
   const nueva = pagina.seccionNueva;
   const usada = pagina.seccionUsada;
   const repuestos = pagina.seccionRepuestos;
+  const marcasRep = pagina.seccionMarcasRepuestos;
   const compania = pagina.seccionCompania;
   const catalogo = pagina.seccionCatalogo;
   const testimoniosT = pagina.seccionTestimonios;
@@ -79,6 +81,7 @@ export default async function HomePage() {
     empresa,
     logo,
     logosMarca,
+    marcasRepuestos,
   ] = await Promise.all([
     getMarcasDePortada(),
     getUsadosDePortada(),
@@ -90,6 +93,7 @@ export default async function HomePage() {
     getEmpresa(),
     getLogo(),
     getLogosMarca(),
+    getMarcasRepuestosDePortada(),
   ]);
   const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
   const relVideo = pagina.seccionCompania?.video;
@@ -177,6 +181,24 @@ export default async function HomePage() {
           escalaMaquina: escalaDeMaquina(repuestos?.tamanoMaquina),
           verTodos: tx(repuestos?.verMasTexto),
         }}
+      />
+
+      {/*
+       * «Marcas de repuestos» (2026-11-03, diseño del cliente): justo debajo de «Venta de repuestos»,
+       * las marcas en espejo. Los logos son los de las marcas de repuestos y enlazan a su página.
+       */}
+      <SeccionMarcasKit
+        espejo
+        logos={logosDeMarcasRepuestos(marcasRepuestos)}
+        antetitulo={tx(marcasRep?.antetitulo)}
+        titulo={tx(marcasRep?.titulo)}
+        resaltado={tx(marcasRep?.tituloResaltado)}
+        maquina={imagenDecorativa(marcasRep?.maquina)}
+        reflejo={null}
+        escalaMaquina={escalaDeMaquina(marcasRep?.tamanoMaquina, 100)}
+        altMaquina={tx(
+          marcasRep?.maquina && typeof marcasRep.maquina === "object" ? marcasRep.maquina.alt : "",
+        )}
       />
 
       {/* Secciones 6, 7 y 8 de ux-9 (fase F). Sin vídeo, la tarjeta va en oscuro. */}

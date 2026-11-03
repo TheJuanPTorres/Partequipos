@@ -4,6 +4,7 @@ import config from "@payload-config";
 import { getPayload } from "payload";
 
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
+import type { MarcaDeRepuestos } from "@/lib/portada/kitCliente";
 import { claveDeMarca, logoPropio, type IndiceLogos, type LogoMarca } from "@/lib/marca/logoMarca";
 
 /**
@@ -38,3 +39,33 @@ const logosEnCache = unstable_cache(
 
 /** El índice de logos por el nombre normalizado de la marca. */
 export const getLogosMarca = cache(async (): Promise<IndiceLogos> => new Map(await logosEnCache()));
+
+/**
+ * Las marcas de repuestos con logo para la sección «Marcas de repuestos» de la portada: nombre,
+ * dirección y el logo con la regla común. Misma caché del marco que los logos de arriba (la
+ * invalidan los ganchos de `marcas`). En orden alfabético: la colección no tiene otro orden.
+ */
+const marcasEnCache = unstable_cache(
+  async (): Promise<MarcaDeRepuestos[]> => {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "marcas",
+      depth: 1,
+      limit: 0,
+      pagination: false,
+      sort: "nombre",
+      select: { nombre: true, slug: true, logo: true, logoOscuroEnMenu: true },
+      populate: { media: { url: true, filename: true, width: true, height: true } },
+    });
+    return docs.flatMap((m) => {
+      const logo = logoPropio(m);
+      return logo && m.slug ? [{ id: m.id, nombre: m.nombre, slug: m.slug, logo }] : [];
+    });
+  },
+  ["marcas-repuestos-portada", CLAVE_DESPLIEGUE],
+  { tags: [ETIQUETAS_DATOS.marco] },
+);
+
+export const getMarcasRepuestosDePortada = cache(async (): Promise<MarcaDeRepuestos[]> =>
+  marcasEnCache(),
+);

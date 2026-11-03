@@ -75,7 +75,7 @@ const buscarPagina = async () => {
 const buscarExistente = async () => {
   const { docs } = await payload.find({
     collection: "media",
-    where: { filename: { like: "portada-v2-repuestos-miniexcavadora-yanmar-vio80" } },
+    where: { filename: { contains: "portada-v2-repuestos-miniexcavadora-yanmar-vio80" } },
     depth: 0,
     limit: 1,
   });
@@ -85,7 +85,7 @@ const buscarExistente = async () => {
 const buscarImagen = async () => {
   const { docs } = await payload.find({
     collection: "media",
-    where: { filename: { like: "marcas-repuestos-yanmar-vio80" } },
+    where: { filename: { contains: "marcas-repuestos-yanmar-vio80" } },
     depth: 0,
     limit: 5,
   });
@@ -101,7 +101,7 @@ if (!pagina) {
 if (modo === "ver") {
   const { docs } = await payload.find({
     collection: "media",
-    where: { filename: { like: "vio80" } },
+    where: { filename: { contains: "vio80" } },
     depth: 0,
     limit: 20,
   });

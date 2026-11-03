@@ -194,6 +194,9 @@
   visibility: hidden;
   pointer-events: none;
   font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  /* Ensanchada, como la del blog: sin esto la copia medía menos que el texto con las máscaras
+     del revelado y el título seguía encogiendo (Llantas a 390: 419 → 384 px). */
+  letter-spacing: 0.04em;
 }
 
 .h1Largo .linea1 {

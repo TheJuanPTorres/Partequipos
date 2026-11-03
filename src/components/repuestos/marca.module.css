@@ -179,7 +179,9 @@
  * invisible, por línea, con el tamaño de su línea (lo hereda de `.linea1` / `.linea2`). Medido
  * antes: a 390 el título bajaba de 315 a 280 px de alto al llegar Inter (CLS 0,056 y 0,063).
  */
-.lineaReservada {
+/* Con `.h1` delante: `.linea2 { display: block }` va después y la dejaba sin rejilla (la copia
+   caía debajo del texto). */
+.h1 .lineaReservada {
   display: grid;
 }
 

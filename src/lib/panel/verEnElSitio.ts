@@ -1,5 +1,6 @@
 import type { CollectionSlug, GeneratePreviewURL, PayloadRequest } from "payload";
 
+import { tienePaginaPropia } from "../nueva/enlaceExterno";
 import { segmentoDeTipo } from "../repuestos/anidado";
 import { rutas } from "../routes";
 
@@ -78,6 +79,8 @@ export const RUTAS_EN_EL_SITIO: Partial<Record<CollectionSlug, Generador>> = {
   },
   "marcas-maquinaria": async (doc) => {
     const s = slugPropio(doc);
+    // Sin página propia («Enlace externo», LiuGong, 2026-11-03): no hay nada que ver aquí.
+    if (!tienePaginaPropia(doc as { enlaceExterno?: string | null })) return null;
     return s ? rutas.marcaMaquinaria(s) : null;
   },
   "tipos-maquinaria": async (doc, buscar) => {

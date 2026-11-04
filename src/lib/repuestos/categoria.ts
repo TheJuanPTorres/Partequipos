@@ -65,6 +65,8 @@ export type PlacaMarca = {
   href: string;
   /** El logo de la marca (`LogoMarca`), sobre fondo blanco. */
   logo: LogoMarca | null;
+  /** `href` es OTRO sitio (marca de nueva sin página propia, LiuGong): pestaña nueva. */
+  externo?: true;
 };
 
 /** Una placa por marca, con su enlace a la página de la marca. */

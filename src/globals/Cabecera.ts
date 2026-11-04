@@ -37,7 +37,7 @@ export const Cabecera: GlobalConfig = {
       maxRows: 6,
       admin: {
         description:
-          "En el orden de la barra (escritorio y móvil). Un enlace a otro sitio (https://), como la tienda, se abre en una pestaña nueva con el icono de enlace externo. Desmarca «Mostrar» para quitarlo sin borrarlo.",
+          "En el orden de la barra (escritorio y móvil). Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro junto a «Contáctanos» y se abre en una pestaña nueva. Desmarca «Mostrar» para quitarlo sin borrarlo.",
       },
       fields: [
         {

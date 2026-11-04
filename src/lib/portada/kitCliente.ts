@@ -172,6 +172,26 @@ export function categoriasDePortada(categorias: CategoriasTecnica[]): CategoriaD
     }));
 }
 
+/**
+ * El título de «Venta de repuestos» partido en tres trozos para pintar en rojo la «Palabra del
+ * título en rojo» (diseño v3, 2026-11-03): antes, la palabra tal como está escrita en el título y
+ * después. Se busca sin distinguir mayúsculas, la primera vez. Sin palabra, o si el título no la
+ * lleva, todo va en `antes`.
+ */
+export function partirTitulo(
+  titulo: string,
+  resaltado: string,
+): { antes: string; resaltado: string; despues: string } {
+  const palabra = resaltado.trim();
+  const i = palabra ? titulo.toLocaleLowerCase("es").indexOf(palabra.toLocaleLowerCase("es")) : -1;
+  if (i < 0) return { antes: titulo, resaltado: "", despues: "" };
+  return {
+    antes: titulo.slice(0, i),
+    resaltado: titulo.slice(i, i + palabra.length),
+    despues: titulo.slice(i + palabra.length),
+  };
+}
+
 // --- Marcas -----------------------------------------------------------------------------------
 
 export type LogoDePortada = {

@@ -170,16 +170,13 @@ export default async function HomePage() {
       />
       <SeccionRepuestosKit
         categorias={categoriasDePortada(categoriasTecnicas)}
-        maquina={imagenDecorativa(repuestos?.maquina)}
-        reflejo={imagenDecorativa(repuestos?.maquinaReflejo)}
         textos={{
           antetitulo: tx(repuestos?.antetitulo),
           titulo: tx(repuestos?.titulo),
+          tituloResaltado: tx(repuestos?.tituloResaltado),
           descripcion: tx(repuestos?.descripcion),
           descripcionAlineacion: alineacionDeTexto(repuestos?.descripcionAlineacion),
           descripcionAncho: anchoDeTexto(repuestos?.descripcionAncho, "ancho"),
-          escalaMaquina: escalaDeMaquina(repuestos?.tamanoMaquina),
-          verTodos: tx(repuestos?.verMasTexto),
         }}
       />
 

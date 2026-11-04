@@ -661,10 +661,6 @@
  * fichero: `.accionCol { min-width: 0 }` está más abajo y, si no, ganaría.
  */
 @media (min-width: 1025px) and (max-width: 1299px) {
-  .accionCol {
-    min-width: max-content;
-  }
-
   .logoCol {
     min-width: 130px;
   }
@@ -675,5 +671,33 @@
 
   .enlace {
     padding-inline: 6px;
+  }
+}
+
+/*
+ * Con los dos botones (2026-11-03) la columna de acciones tampoco encoge por debajo
+ * de su contenido de 1300 px en adelante: si no, la lupa se metía sobre «Blog»
+ * (medido en el preview del #414: 82 px de solape a 1300 y 15 a 1440). La fila de
+ * enlaces es la que cede.
+ */
+@media (min-width: 1025px) {
+  .accionCol {
+    min-width: max-content;
+  }
+}
+
+/*
+ * Y entre 1025 y 1299 px, los dos botones más compactos (menos relleno y menos aire
+ * con el icono): con el tamaño de siempre la barra se salía 43 px por la derecha a
+ * 1025.
+ */
+@media (min-width: 1025px) and (max-width: 1299px) {
+  .acciones .boton {
+    gap: 8px;
+    padding-inline: 14px;
+  }
+
+  .acciones {
+    gap: 6px;
   }
 }

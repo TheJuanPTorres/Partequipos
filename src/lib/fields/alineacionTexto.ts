@@ -74,22 +74,24 @@ export function anchoDeTexto(valor: unknown, porDefecto: AnchoTexto): AnchoTexto
 /** Tamaño de la máquina de «Venta de repuestos»: porcentaje de su tamaño de diseño, entre 60 y 100. */
 export const TAMANO_MAQUINA = { min: 60, max: 100, porDefecto: 78 } as const;
 
-export function escalaDeMaquina(valor: unknown): number {
-  const n = typeof valor === "number" && Number.isFinite(valor) ? valor : TAMANO_MAQUINA.porDefecto;
+export function escalaDeMaquina(
+  valor: unknown,
+  porDefecto: number = TAMANO_MAQUINA.porDefecto,
+): number {
+  const n = typeof valor === "number" && Number.isFinite(valor) ? valor : porDefecto;
   return Math.min(TAMANO_MAQUINA.max, Math.max(TAMANO_MAQUINA.min, n)) / 100;
 }
 
-export function tamanoMaquinaField(): Field {
+export function tamanoMaquinaField(porDefecto: number = TAMANO_MAQUINA.porDefecto): Field {
   return {
     name: "tamanoMaquina",
     type: "number",
     label: "Tamaño de la máquina (%)",
     min: TAMANO_MAQUINA.min,
     max: TAMANO_MAQUINA.max,
-    defaultValue: TAMANO_MAQUINA.porDefecto,
+    defaultValue: porDefecto,
     admin: {
-      description:
-        "Entre 60 y 100. 100 es el tamaño del diseño original; por defecto, 78. Solo desde portátil: en el teléfono no cambia. Se encoge apoyada en el piso.",
+      description: `Entre 60 y 100. 100 es el tamaño del diseño original; por defecto, ${porDefecto}. Solo desde portátil: en el teléfono no cambia.`,
     },
   };
 }

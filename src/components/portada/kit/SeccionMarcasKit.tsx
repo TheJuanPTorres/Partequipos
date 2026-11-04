@@ -18,6 +18,10 @@ import estilos from "./marcasKit.module.css";
  *
  * Datos del panel: los logos de la lista de la sección (manda el elegido ahí, los del kit), el
  * título y la máquina con su reflejo. Sin logos, la sección no se pinta.
+ *
+ * `espejo` (2026-11-03): la sección «Marcas de repuestos», el mismo diseño volteado: la máquina a la
+ * izquierda delante de la banda, que llega desde el borde derecho; el título arriba a la derecha,
+ * con su antetítulo. Los logos son los de las marcas de repuestos y cada uno enlaza a su página.
  */
 
 const SIZES_MAQUINA = "(min-width: 1025px) 46vw, 85vw";
@@ -28,21 +32,36 @@ export function SeccionMarcasKit({
   resaltado,
   maquina,
   reflejo,
+  espejo = false,
+  antetitulo = "",
+  escalaMaquina = 1,
+  altMaquina = "",
 }: {
   logos: LogoDePortada[];
   titulo: string;
   resaltado: string;
   maquina: ImagenLista | null;
   reflejo: ImagenLista | null;
+  espejo?: boolean;
+  antetitulo?: string;
+  /** Tamaño de la máquina desde portátil, de 0,6 a 1 (el del diseño). */
+  escalaMaquina?: number;
+  altMaquina?: string;
 }) {
   if (logos.length === 0) return null;
-  const idTitulo = "marcas-kit-titulo";
+  const idTitulo = espejo ? "marcas-repuestos-titulo" : "marcas-kit-titulo";
   return (
-    <section id="marcas" className={estilos.seccion} aria-labelledby={idTitulo}>
+    <section
+      id={espejo ? "marcas-repuestos" : "marcas"}
+      className={estilos.seccion}
+      aria-labelledby={idTitulo}
+      data-espejo={espejo ? "" : undefined}
+    >
       <div className={estilos.panel}>
-        <Fondo />
+        <Fondo espejo={espejo} />
 
         <div className={estilos.cabecera}>
+          {antetitulo ? <p className={estilos.antetitulo}>{antetitulo}</p> : null}
           <h2 id={idTitulo} className={estilos.titulo}>
             {titulo || "Marcas que mueven"}
             {resaltado ? (
@@ -57,7 +76,10 @@ export function SeccionMarcasKit({
         {maquina ? (
           <div
             className={estilos.maquina}
-            style={{ aspectRatio: `${maquina.width} / ${maquina.height}` }}
+            style={{
+              aspectRatio: `${maquina.width} / ${maquina.height}`,
+              ["--escala-maquina" as string]: escalaMaquina,
+            }}
           >
             {reflejo ? (
               <div
@@ -75,7 +97,7 @@ export function SeccionMarcasKit({
             ) : null}
             <Image
               src={maquina.url}
-              alt=""
+              alt={altMaquina}
               fill
               sizes={SIZES_MAQUINA}
               className={estilos.contener}
@@ -83,7 +105,11 @@ export function SeccionMarcasKit({
           </div>
         ) : null}
 
-        <BandaLogos logos={logos} />
+        <BandaLogos
+          logos={logos}
+          etiqueta={espejo ? "Marcas de repuestos" : undefined}
+          espejo={espejo}
+        />
       </div>
     </section>
   );
@@ -94,18 +120,20 @@ export function SeccionMarcasKit({
  * más un piso claro bajo la máquina. Solo desde 1025 px: en el teléfono el panel es alto y el
  * `slice` agrandaría la franja hasta taparlo todo.
  */
-function Fondo() {
+function Fondo({ espejo }: { espejo: boolean }) {
+  // Ids únicos por variante: hay dos de estos fondos en la portada.
+  const id = espejo ? "kit-marcas-rep" : "kit-marcas";
   return (
     <svg
       aria-hidden="true"
       focusable="false"
       viewBox="0 0 1000 333"
       preserveAspectRatio="xMaxYMid slice"
-      className={estilos.fondo}
+      className={espejo ? `${estilos.fondo} ${estilos.fondoEspejo}` : estilos.fondo}
     >
       <defs>
         <linearGradient
-          id="kit-marcas-izq"
+          id={`${id}-izq`}
           gradientUnits="userSpaceOnUse"
           x1="380"
           y1="0"
@@ -116,17 +144,17 @@ function Fondo() {
           <stop offset="1" stopColor="#fff" />
         </linearGradient>
         <mask
-          id="kit-marcas-mascara"
+          id={`${id}-mascara`}
           maskUnits="userSpaceOnUse"
           x="0"
           y="-100"
           width="1000"
           height="500"
         >
-          <rect x="0" y="-100" width="1000" height="500" fill="url(#kit-marcas-izq)" />
+          <rect x="0" y="-100" width="1000" height="500" fill={`url(#${id}-izq)`} />
         </mask>
         <linearGradient
-          id="kit-marcas-roja"
+          id={`${id}-roja`}
           gradientUnits="userSpaceOnUse"
           x1="0"
           y1="-20"
@@ -138,24 +166,24 @@ function Fondo() {
           <stop offset="0.75" stopColor="var(--color-marca)" stopOpacity="0.45" />
           <stop offset="1" stopColor="var(--color-marca)" stopOpacity="0" />
         </linearGradient>
-        <linearGradient id="kit-marcas-piso" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${id}-piso`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
           <stop offset="0.3" stopColor="#ffffff" stopOpacity="0.85" />
           <stop offset="0.55" stopColor="#ffffff" />
           <stop offset="1" stopColor="#ffffff" />
         </linearGradient>
       </defs>
-      <g mask="url(#kit-marcas-mascara)">
+      <g mask={`url(#${id}-mascara)`}>
         <polygon points="642,-20 772,-20 549,340 419,340" fill="#d8d6d3" opacity="0.45" />
         <polygon points="772,-20 862,-20 639,340 549,340" fill="#ebe9e6" opacity="0.5" />
         <polygon points="1020,-20 1120,-20 897,340 797,340" fill="#d8d6d3" opacity="0.4" />
         <polygon
           points="862,-20 920,-20 763,233 705,233"
-          fill="url(#kit-marcas-roja)"
+          fill={`url(#${id}-roja)`}
           opacity="0.85"
         />
       </g>
-      <rect x="-1000" y="225" width="3000" height="120" fill="url(#kit-marcas-piso)" />
+      <rect x="-1000" y="225" width="3000" height="120" fill={`url(#${id}-piso)`} />
     </svg>
   );
 }

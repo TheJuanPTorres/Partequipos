@@ -270,3 +270,83 @@
     margin: 0;
   }
 }
+
+/*
+ * «MARCAS DE REPUESTOS» (2026-11-03, diseño del cliente): la sección de marcas EN ESPEJO. Lo de
+ * arriba vale para las dos; aquí solo lo que cambia: el título arriba a la derecha (con su
+ * antetítulo), la máquina a la izquierda y la banda llegando desde el borde derecho, que se funde
+ * a la izquierda para que los logos entren y salgan por detrás de la máquina. Medidas del diseño.
+ */
+.antetitulo {
+  margin: 0;
+  color: var(--kit-rojo-texto, #b91c1c);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.fondoEspejo {
+  transform: scaleX(-1);
+}
+
+.seccion[data-espejo] .caja {
+  width: 12rem;
+}
+
+.seccion[data-espejo] .logo {
+  max-height: 44px;
+}
+
+@media (min-width: 1025px) {
+  .seccion[data-espejo] .cabecera {
+    top: 14%;
+    right: 5%;
+    left: auto;
+    text-align: right;
+  }
+
+  .seccion[data-espejo] .maquina {
+    top: 50%;
+    right: auto;
+    left: 2%;
+    width: 46%;
+    margin: 0;
+    transform: translateY(-50%) scale(var(--escala-maquina, 1));
+    transform-origin: 50% 50%;
+  }
+
+  .seccion[data-espejo] .banda {
+    top: 52%;
+    right: 0;
+    left: auto;
+    width: 86%;
+    padding: max(1.3rem, 1.8cqw) 0;
+    mask-image: linear-gradient(270deg, #000 70%, transparent 92%);
+  }
+
+  .seccion[data-espejo] .carrusel {
+    padding-right: 5%;
+    padding-left: 0;
+    mask-image: none;
+  }
+
+  .seccion[data-espejo] .caja {
+    width: max(12.5rem, 15cqw);
+    height: max(4rem, 5.2cqw);
+    padding: 0 max(1.5rem, 2cqw);
+  }
+
+  .seccion[data-espejo] .logo {
+    max-height: max(2.75rem, 3.4cqw);
+  }
+
+  .seccion[data-espejo] .separador {
+    height: max(3.5rem, 4.4cqw);
+  }
+
+  /* El botón de pausa, abajo a la derecha del panel: a la izquierda quedaría bajo la máquina. */
+  .seccion[data-espejo] .panel .pausa {
+    right: 5%;
+    left: auto;
+  }
+}

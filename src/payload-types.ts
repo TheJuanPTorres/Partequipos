@@ -1599,7 +1599,7 @@ export interface Pagina {
      */
     descripcionAncho?: ('estrecho' | 'medio' | 'ancho' | 'columna') | null;
     /**
-     * Entre 60 y 100. 100 es el tamaño del diseño original; por defecto, 78. Solo desde portátil: en el teléfono no cambia. Se encoge apoyada en el piso.
+     * Entre 60 y 100. 100 es el tamaño del diseño original; por defecto, 78. Solo desde portátil: en el teléfono no cambia.
      */
     tamanoMaquina?: number | null;
     verMasTexto?: string | null;
@@ -1619,6 +1619,22 @@ export interface Pagina {
      * La imagen del reflejo, del kit del cliente (más alta que la máquina). Opcional.
      */
     maquinaReflejo?: (number | null) | Media;
+  };
+  /**
+   * Los logos son los de las marcas de repuestos, por orden alfabético; se cambian en cada marca.
+   */
+  seccionMarcasRepuestos?: {
+    antetitulo?: string | null;
+    titulo?: string | null;
+    tituloResaltado?: string | null;
+    /**
+     * Decorativa: la máquina a la izquierda, por delante de la banda de logos (hoy, la Yanmar ViO80). Opcional.
+     */
+    maquina?: (number | null) | Media;
+    /**
+     * Entre 60 y 100. 100 es el tamaño del diseño original; por defecto, 100. Solo desde portátil: en el teléfono no cambia.
+     */
+    tamanoMaquina?: number | null;
   };
   seccionCompania?: {
     /**
@@ -3174,6 +3190,15 @@ export interface PaginasSelect<T extends boolean = true> {
         botonEnlace?: T;
         maquina?: T;
         maquinaReflejo?: T;
+      };
+  seccionMarcasRepuestos?:
+    | T
+    | {
+        antetitulo?: T;
+        titulo?: T;
+        tituloResaltado?: T;
+        maquina?: T;
+        tamanoMaquina?: T;
       };
   seccionCompania?:
     | T

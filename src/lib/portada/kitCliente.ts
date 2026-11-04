@@ -1,7 +1,13 @@
 import type { CategoriasTecnica, CategoriasUsada, EquiposUsado, Pagina } from "@/payload-types";
 
 import { SLUG_CATEGORIA_USADA_ADITAMENTOS } from "../aditamentos/wordpress";
-import { conAlt, logoDeMarca, type IndiceLogos, type LogoConAlt } from "../marca/logoMarca";
+import {
+  conAlt,
+  logoDeMarca,
+  type IndiceLogos,
+  type LogoConAlt,
+  type LogoMarca,
+} from "../marca/logoMarca";
 import { rutas, SEGMENTO_OTROS_USADA } from "../routes";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 import {
@@ -168,7 +174,35 @@ export function categoriasDePortada(categorias: CategoriasTecnica[]): CategoriaD
 
 // --- Marcas -----------------------------------------------------------------------------------
 
-export type LogoDePortada = { id: string; nombre: string; logo: LogoConAlt };
+export type LogoDePortada = {
+  id: string;
+  nombre: string;
+  logo: LogoConAlt;
+  /** A dónde lleva el logo (la página de la marca de repuestos); sin él, no es un enlace. */
+  href?: string;
+};
+
+/** Una marca de repuestos tal como la lee la consulta ligera de la portada. */
+export type MarcaDeRepuestos = { id: number; nombre: string; slug: string; logo: LogoMarca };
+
+/**
+ * Los logos de la sección «Marcas de repuestos»: los de las marcas de repuestos del panel, en el
+ * orden que traen, cada uno con su alt y el enlace a su página de marca. La marca sin logo no sale.
+ */
+export function logosDeMarcasRepuestos(marcas: MarcaDeRepuestos[]): LogoDePortada[] {
+  return marcas.flatMap((m) => {
+    const nombre = m.nombre.trim();
+    if (!nombre || !m.slug) return [];
+    return [
+      {
+        id: String(m.id),
+        nombre,
+        logo: { ...m.logo, alt: nombre },
+        href: `${rutas.marca(m.slug)}/`,
+      },
+    ];
+  });
+}
 
 /**
  * Los logos de la banda, en su orden, con la REGLA COMÚN de «un solo logo por marca»

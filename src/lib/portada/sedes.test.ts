@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import type { Sede } from "@/payload-types";
 
-import { sedesDePortada, tokenMapbox, urlGoogleMaps } from "./sedes";
+import { ETIQUETA_TIPO, sedesDePortada, tipoDeSede, tokenMapbox, urlGoogleMaps } from "./sedes";
 
 const sede = (over: Partial<Sede>) =>
   ({
@@ -68,5 +68,31 @@ describe("urlGoogleMaps", () => {
     assert.equal(url.origin + url.pathname, "https://www.google.com/maps/search/");
     assert.equal(url.searchParams.get("api"), "1");
     assert.equal(url.searchParams.get("query"), "Calle 1 # 2-3 & Bodega, Bogotá");
+  });
+});
+
+describe("tipo de sede (principal / secundaria)", () => {
+  it("lleva el tipo de la sede", () => {
+    const [p, s] = sedesDePortada([
+      sede({ id: 1, tipo: "principal" }),
+      sede({ id: 2, tipo: "secundaria" }),
+    ]);
+    assert.equal(p?.tipo, "principal");
+    assert.equal(s?.tipo, "secundaria");
+  });
+  it("sin valor o con uno desconocido es secundaria", () => {
+    assert.equal(tipoDeSede(undefined), "secundaria");
+    assert.equal(tipoDeSede(null), "secundaria");
+    assert.equal(tipoDeSede("otra"), "secundaria");
+    const [s] = sedesDePortada([sede({})]);
+    assert.equal(s?.tipo, "secundaria");
+  });
+  it("las etiquetas dicen de qué tipo es", () => {
+    assert.equal(ETIQUETA_TIPO.principal, "Sede principal");
+    assert.equal(ETIQUETA_TIPO.secundaria, "Sede secundaria");
+  });
+  it("una sede sin líneas sigue saliendo (nombre y punto)", () => {
+    const [s] = sedesDePortada([sede({ lineas: [] })]);
+    assert.equal(s?.lineas.length, 0);
   });
 });

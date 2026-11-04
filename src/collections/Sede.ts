@@ -121,9 +121,9 @@ export const Sede: CollectionConfig = {
       type: "array",
       label: "Líneas de negocio",
       labels: { singular: "Línea", plural: "Líneas" },
-      minRows: 1,
       admin: {
-        description: "Cada línea con su dirección. Ej. Maquinaria · Diagonal 16 # 96 G – 85.",
+        description:
+          "Cada línea con su dirección. Ej. Maquinaria · Diagonal 16 # 96 G – 85. Puede quedar vacía mientras se consiguen los datos de la sede: entonces solo sale su nombre y su punto en el mapa.",
       },
       fields: [
         { name: "linea", type: "text", required: true, label: "Línea" },
@@ -146,6 +146,21 @@ export const Sede: CollectionConfig = {
       ],
     },
     { name: "foto", type: "upload", relationTo: "media", label: "Foto" },
+    {
+      name: "tipo",
+      type: "select",
+      label: "Tipo de sede",
+      defaultValue: "secundaria",
+      options: [
+        { label: "Principal", value: "principal" },
+        { label: "Secundaria", value: "secundaria" },
+      ],
+      admin: {
+        position: "sidebar",
+        description:
+          "En el mapa, la principal lleva un punto más grande con doble círculo y la secundaria uno más pequeño con un solo círculo. La lista dice de cuál se trata.",
+      },
+    },
     {
       name: "orden",
       type: "number",

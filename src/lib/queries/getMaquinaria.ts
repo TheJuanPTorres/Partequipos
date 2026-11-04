@@ -36,6 +36,7 @@ import type { UnidadFiltrable } from "../usados/filtros";
 import { conPrimeraImagen, idsDePrimeraImagen } from "../usados/primeraImagen";
 import { USADOS_POR_FILTRO } from "../portada/kitCliente";
 import { SLUG_CATEGORIA_USADA_ADITAMENTOS } from "../aditamentos/wordpress";
+import { MARCA_CON_PAGINA } from "../nueva/enlaceExterno";
 import {
   conEquipoVisible,
   conMarcaVisible,
@@ -69,7 +70,7 @@ export const getMarcaMaquinariaPorSlug = cache(
     const payload = await getPayload({ config });
     const { docs } = await payload.find({
       collection: "marcas-maquinaria",
-      where: { and: [{ slug: { equals: slug } }, MARCA_VISIBLE] },
+      where: { and: [{ slug: { equals: slug } }, MARCA_VISIBLE, MARCA_CON_PAGINA] },
       depth: 1,
       limit: 1,
     });
@@ -309,8 +310,9 @@ const marcasUsadaEnCache = unstable_cache(
       limit: 0,
       sort: "nombre",
       populate: {
-        // `mostrarEnWeb`: una marca de nueva oculta no se enlaza (`marcaVisible`).
-        "marcas-maquinaria": { slug: true, nombre: true, mostrarEnWeb: true },
+        // `mostrarEnWeb`: una marca de nueva oculta no se enlaza (`marcaVisible`); con
+        // `enlaceExterno`, tampoco: no tiene página (`tienePaginaPropia`).
+        "marcas-maquinaria": { slug: true, nombre: true, mostrarEnWeb: true, enlaceExterno: true },
         marcas: { slug: true, nombre: true },
         // `filename` hace falta: sin él, la URL del logo sale null (Payload la calcula con él).
         media: { url: true, filename: true, alt: true, width: true, height: true },
@@ -777,14 +779,17 @@ export const getCategoriaNuevaConEquipos = cache(async (slug: string) => {
 /**
  * Las marcas de nueva VISIBLES para «Maquinaria pesada nueva» de la portada (diseño del cliente,
  * 2026-10-27): todas menos la de aditamentos (no es una marca de máquinas), por «Posición en la
- * portada» y, sin ella, al final por nombre. `depth: 1` trae la foto de la cabecera del kit, la
+ * portada» y, sin ella, al final por nombre. Sin las que no tienen página propia («Enlace externo»,
+ * LiuGong, 2026-11-03). `depth: 1` trae la foto de la cabecera del kit, la
  * de la tarjeta y el logo.
  */
 export const getMarcasDePortada = cache(async (): Promise<MarcasMaquinaria[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "marcas-maquinaria",
-    where: { and: [{ disenoPagina: { not_equals: "aditamentos" } }, MARCA_VISIBLE] },
+    where: {
+      and: [{ disenoPagina: { not_equals: "aditamentos" } }, MARCA_VISIBLE, MARCA_CON_PAGINA],
+    },
     depth: 1,
     limit: 0,
     sort: ["ordenPortada", "nombre"],

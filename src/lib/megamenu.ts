@@ -1,6 +1,7 @@
 import type { CategoriasTecnica } from "@/payload-types";
 
 import { claveDeMarca, logoPropio } from "./marca/logoMarca";
+import { enlaceExternoDe } from "./nueva/enlaceExterno";
 import { colorConBlanco } from "./marca/franjaMarca";
 import { porOrden } from "./nueva/orden";
 import { unaEntradaPorTipo } from "./nueva/ordenTipos";
@@ -88,6 +89,11 @@ export type GrupoMenu = {
   enlaces: EnlaceMenu[];
   grupos: GrupoMenu[];
   logo?: LogoMenu;
+  /**
+   * Marca SIN página propia (2026-11-03, LiuGong): la entrada no despliega nada, es un enlace a
+   * otro sitio (su distribuidor), en pestaña nueva y con el icono de enlace externo.
+   */
+  externo?: string;
   /** Tarjetas con foto bajo los enlaces (las categorías técnicas de Repuestos). */
   tarjetas?: TarjetaMenu[];
 };
@@ -132,6 +138,8 @@ export type ItemCatalogo = {
   slug: string;
   logo?: number | LogoCatalogo | null;
   logoOscuroEnMenu?: boolean | null;
+  /** Solo las marcas de maquinaria nueva: «Enlace externo» (`src/lib/nueva/enlaceExterno.ts`). */
+  enlaceExterno?: string | null;
 };
 
 /** Alto con el que se pinta el logo de una marca en el menú (px). */
@@ -267,8 +275,15 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
   };
   const marcas = d.marcasMaquinaria.map(conLogoUnico).sort(porNombre);
   const aditamentos = marcas.find((m) => m.slug === SLUG_ADITAMENTOS);
-  const deMarca = (m: ItemCatalogo) =>
-    grupoDeMarca(m, tiposConEquiposNuevos, rutas.marcaMaquinaria, rutas.tipoMaquinaria);
+  const deMarca = (m: ItemCatalogo): GrupoMenu => {
+    // Sin página propia (LiuGong → su distribuidor, 2026-11-03): un enlace fuera, sin tipos.
+    const externo = enlaceExternoDe(m);
+    if (externo) {
+      const logo = logoDeMenu(m.logo, m.logoOscuroEnMenu);
+      return { titulo: m.nombre, ...(logo ? { logo } : {}), externo, enlaces: [], grupos: [] };
+    }
+    return grupoDeMarca(m, tiposConEquiposNuevos, rutas.marcaMaquinaria, rutas.tipoMaquinaria);
+  };
 
   const porMarca: GrupoMenu = {
     titulo: "Por marca",

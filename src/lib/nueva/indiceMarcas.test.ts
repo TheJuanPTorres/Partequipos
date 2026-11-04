@@ -29,4 +29,21 @@ describe("placasDeMarcasNueva", () => {
     const placas = placasDeMarcasNueva(marcas, equipos, new Map());
     assert.ok(placas.every((p) => !/aditamentos/.test(p.href)));
   });
+
+  it("una marca sin página propia sale sin equipos, con su enlace externo", () => {
+    const conLiugong = [
+      ...marcas,
+      marca(6, "liugong", { enlaceExterno: "https://maquitecno.co/" }),
+    ];
+    const placas = placasDeMarcasNueva(conLiugong, equipos, new Map());
+    assert.deepEqual(
+      placas.map((p) => [p.nombre, p.href, p.externo]),
+      [
+        ["Case", "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case/", undefined],
+        ["Hitachi", "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/hitachi/", undefined],
+        ["Liugong", "https://maquitecno.co/", true],
+        ["Yanmar", "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/yanmar/", undefined],
+      ],
+    );
+  });
 });

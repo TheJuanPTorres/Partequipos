@@ -25,6 +25,7 @@ import {
   type UnidadUsada,
 } from "../queries/getMaquinaria";
 import { animacionesActivas, PARAMETRO_ANIMACIONES } from "../listado/animaciones";
+import { tienePaginaPropia, type ConEnlaceExterno } from "../nueva/enlaceExterno";
 import { marcaVisible } from "../nueva/visibilidad";
 import { rutas } from "../routes";
 import { absoluteUrl, indexacionPermitida } from "../seo/config";
@@ -174,7 +175,10 @@ async function ambitoDe(tipo: TipoListadoUsado, slug: string): Promise<Ambito | 
     // Sin unidades, no se indexa (D4).
     indexable: unidades.length > 0,
     enlaces: [
-      ...(slugPoblado(marca.marcaNueva) && marcaVisible(marca.marcaNueva)
+      // Una marca de nueva sin página propia (LiuGong) no lleva enlace: su página daría 404.
+      ...(slugPoblado(marca.marcaNueva) &&
+      marcaVisible(marca.marcaNueva) &&
+      tienePaginaPropia(marca.marcaNueva as ConEnlaceExterno)
         ? [
             {
               href: `${rutas.marcaMaquinaria(slugPoblado(marca.marcaNueva)!)}/`,

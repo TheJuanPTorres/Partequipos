@@ -1,7 +1,9 @@
+import { IconExternalLink } from "@tabler/icons-react";
 import Link from "next/link";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import { Revelado } from "@/components/movimiento/Revelado";
+import { AVISO_OTRA_PESTANA } from "@/lib/nueva/enlaceExterno";
 import type { PlacaMarca } from "@/lib/repuestos/categoria";
 
 import estilos from "./marca.module.css";
@@ -72,22 +74,44 @@ export function BaldosasMarcas({
         <ul
           className={`${estilos.baldosas} ${cuatroEnUnaFila ? estilos.baldosasCuatroEnUnaFila : ""}`}
         >
-          {marcas.map((m) => (
-            <li key={m.id} className={estilos.baldosaCaja}>
-              <Link href={m.href} className={estilos.baldosa}>
-                {m.logo ? (
-                  <LogoMarca
-                    logo={m.logo}
-                    alt={m.nombre}
-                    sizes="(max-width: 1024px) 40vw, 240px"
-                    className={estilos.baldosaLogo}
-                  />
+          {marcas.map((m) => {
+            const contenido = m.logo ? (
+              <LogoMarca
+                logo={m.logo}
+                alt={m.externo ? "" : m.nombre}
+                sizes="(max-width: 1024px) 40vw, 240px"
+                className={estilos.baldosaLogo}
+              />
+            ) : (
+              m.nombre
+            );
+            return (
+              <li key={m.id} className={estilos.baldosaCaja}>
+                {m.externo ? (
+                  // Marca sin página propia (LiuGong, 2026-11-03): a su distribuidor, en otra pestaña.
+                  <a
+                    href={m.href}
+                    className={`${estilos.baldosa} ${estilos.baldosaExterna}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${m.nombre} (${AVISO_OTRA_PESTANA})`}
+                  >
+                    {contenido}
+                    <IconExternalLink
+                      aria-hidden="true"
+                      focusable="false"
+                      stroke={1.75}
+                      className={estilos.baldosaExternaIcono}
+                    />
+                  </a>
                 ) : (
-                  m.nombre
+                  <Link href={m.href} className={estilos.baldosa}>
+                    {contenido}
+                  </Link>
                 )}
-              </Link>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>

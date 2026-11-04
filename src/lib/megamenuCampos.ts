@@ -9,7 +9,15 @@
  * fila sale, y los del orden (`orden`, `ordenMarca`). El `id` no: no cambia.
  */
 export const CAMPOS_MENU = {
-  "marcas-maquinaria": ["nombre", "slug", "logo", "logoOscuroEnMenu", "mostrarEnWeb"],
+  "marcas-maquinaria": [
+    "nombre",
+    "slug",
+    "logo",
+    "logoOscuroEnMenu",
+    "mostrarEnWeb",
+    // Marca sin página propia: su entrada lleva fuera (LiuGong, 2026-11-03).
+    "enlaceExterno",
+  ],
   "tipos-maquinaria": ["nombre", "slug", "marca", "subtipos", "pestanaIndiceNueva", "orden"],
   "categorias-maquinaria": ["nombre", "slug", "tiposIncluidos"],
   "categorias-usada": ["nombre", "slug", "enOtros", "orden", "mostrarEnWeb"],

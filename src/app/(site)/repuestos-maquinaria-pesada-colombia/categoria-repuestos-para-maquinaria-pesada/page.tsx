@@ -4,7 +4,6 @@ import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { BaldosasCategorias } from "@/components/repuestos/BaldosasCategorias";
 import { CierreRepuestos } from "@/components/repuestos/CierreRepuestos";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
-import { PlacasMarcas } from "@/components/repuestos/PlacasMarcas";
 import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -14,7 +13,7 @@ import { getMarcas } from "@/lib/queries/getMarcas";
 import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { ANIMACIONES_CATEGORIAS } from "@/lib/repuestos/animacionesCategorias";
-import { fondoDeRespaldo, placasDeMarcas, vistaEncabezadoIndice } from "@/lib/repuestos/categoria";
+import { fondoDeRespaldo, vistaEncabezadoIndice } from "@/lib/repuestos/categoria";
 import { tarjetasDeCategorias } from "@/lib/repuestos/plantillaTipo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
@@ -38,7 +37,8 @@ const ANCLA = "categorias-repuestos";
 /**
  * ÍNDICE DE CATEGORÍAS TÉCNICAS DE REPUESTOS — PROVISIONAL hasta el diseño de
  * Andrés (docs/diseno/decisiones-repuestos-marca.md §7): encabezado, las
- * categorías, las marcas con las que trabajamos, contacto y testimonios.
+ * categorías, contacto y testimonios. Sin «Marcas con las que trabajamos» desde el
+ * 2026-11-03 (Juan Pablo): quedan solo las categorías.
  *
  * Desde el 2026-10-20 (dirección), las categorías son las TARJETAS de las páginas
  * índice (`TarjetasMarca`, variante `indice`: foto, recuadro blanco con el título y
@@ -92,13 +92,6 @@ export default async function CategoriasRepuestosIndexPage() {
           categorias={tarjetasDeCategorias(categorias.filter(esCategoriaPrincipal))}
         />
       </ZonaAnimada>
-
-      <PlacasMarcas
-        id="marcas-repuestos"
-        titulo="Marcas con las que trabajamos"
-        marcas={placasDeMarcas(marcas)}
-        franja="blanca"
-      />
 
       <CierreRepuestos origen={rutas.categoriasRepuestos()} sobre="repuestos por categoría" />
     </main>

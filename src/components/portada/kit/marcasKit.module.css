@@ -172,7 +172,10 @@
   animation: kitBandaBucle var(--banda-duracion, 32s) linear infinite;
 }
 
+/* Con el foco en un logo que es enlace («Marcas de repuestos»), también: si no, el enlace
+   enfocado se iría de la pantalla mientras se lee. */
 .carrusel:hover .pista,
+.carrusel:focus-within .pista,
 .carrusel[data-pausado] .pista {
   animation-play-state: paused;
 }

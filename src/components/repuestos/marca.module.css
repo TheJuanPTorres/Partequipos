@@ -896,44 +896,7 @@ a.modelo:hover {
   }
 }
 
-/* --- Placas de marca y variante gris de las categorías (índices, PROVISIONAL) -------- */
-
-/* Una placa blanca por marca con su logo (`LogoMarca`). */
-.placasLista {
-  display: flex;
-  max-width: 1240px;
-  margin: 40px auto 0;
-  padding: 0;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-  list-style: none;
-}
-
-.placaMarca {
-  display: flex;
-  width: 190px;
-  min-height: 84px;
-  box-sizing: border-box;
-  padding: 14px 20px;
-  align-items: center;
-  justify-content: center;
-  /* Placa BLANCA con el logo de la marca, el de todo el sitio (`LogoMarca`, 2026-10-20). */
-  border: 1px solid #e2e2e2;
-  border-radius: 10px;
-  background: #fff;
-  color: var(--color-texto);
-  font-size: 16px;
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-  transition: border-color 0.3s;
-}
-
-.placaMarca:hover,
-.placaMarca:focus-visible {
-  border-color: var(--color-marca);
-}
+/* --- Variante gris de las categorías (índices, PROVISIONAL) -------- */
 
 .placaLogo {
   width: 100%;
@@ -956,14 +919,6 @@ a.modelo:hover {
   outline-color: #000;
 }
 
-/* Franja blanca de las placas (cuando la amarilla ya la pone la sección de arriba). */
-.modelosBlanca {
-  z-index: 0;
-  margin-top: -50px;
-  padding-top: 80px;
-  background: var(--color-fondo);
-}
-
 /* La gris de las categorías, tras una franja amarilla de esquinas redondeadas. */
 .categoriasGris {
   z-index: 0;
@@ -977,23 +932,6 @@ a.modelo:hover {
   display: flex;
   margin: 30px 0 0;
   justify-content: center;
-}
-
-@media (max-width: 767px) {
-  .placasLista {
-    margin-top: 27px;
-    gap: 12px;
-  }
-
-  /* Dos por fila: el ancho es del <li>, la placa lo llena. */
-  .placasLista > li {
-    display: flex;
-    flex: 0 0 calc(50% - 6px);
-  }
-
-  .placaMarca {
-    width: 100%;
-  }
 }
 
 /* --- Páginas índice con tarjetas (repuestos y maquinaria, plantilla de Andrés) ---------- */
@@ -1572,6 +1510,20 @@ a.modelo:hover {
   font-weight: 700;
   text-align: center;
   text-decoration: none;
+}
+
+/* Marca sin página propia (LiuGong, 2026-11-03): a otro sitio; el icono, discreto en su esquina. */
+.baldosaExterna {
+  position: relative;
+}
+
+.baldosaExternaIcono {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  color: #595959;
 }
 
 .baldosa:focus-visible {

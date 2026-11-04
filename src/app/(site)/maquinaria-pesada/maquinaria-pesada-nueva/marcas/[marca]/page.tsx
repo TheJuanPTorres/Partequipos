@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PaginaMarcaNueva } from "@/components/nueva/PaginaMarcaNueva";
 import { PaginaMarcaAditamentos } from "@/components/nueva/PaginaMarcaAditamentos";
 import { PaginaMarcaKit } from "@/components/nueva/kit/PaginaMarcaKit";
+import { tienePaginaPropia } from "@/lib/nueva/enlaceExterno";
 import { usaDisenoAditamentos, usaDisenoKit } from "@/lib/nueva/paginaAditamentos";
 import { getMarcaMaquinariaPorSlug, getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
@@ -16,7 +17,8 @@ type Params = { marca: string };
 
 export async function generateStaticParams(): Promise<Params[]> {
   const marcas = await getMarcasMaquinaria();
-  return marcas.map((m) => ({ marca: m.slug }));
+  // Una marca con «Enlace externo» no tiene página aquí (LiuGong, 2026-11-03): 404.
+  return marcas.filter(tienePaginaPropia).map((m) => ({ marca: m.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

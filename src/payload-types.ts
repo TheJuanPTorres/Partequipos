@@ -357,6 +357,10 @@ export interface MarcasMaquinaria {
    */
   destinoOculta?: (number | null) | CategoriasMaquinaria;
   /**
+   * Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap ni como tarjeta de la portada. Vacío, la marca tiene su página como siempre.
+   */
+  enlaceExterno?: string | null;
+  /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
@@ -2852,6 +2856,7 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
   nombre?: T;
   mostrarEnWeb?: T;
   destinoOculta?: T;
+  enlaceExterno?: T;
   slug?: T;
   descripcion?: T;
   logo?: T;

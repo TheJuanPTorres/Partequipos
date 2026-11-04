@@ -19,6 +19,7 @@ import { getModelos } from "@/lib/queries/getModelos";
 import { getPaginas } from "@/lib/queries/getPaginas";
 import { getTipos } from "@/lib/queries/getTipos";
 import { getCategoriasRepuestos } from "@/lib/queries/getCategoriasRepuestos";
+import { tienePaginaPropia } from "@/lib/nueva/enlaceExterno";
 import { tiposConEquipos } from "@/lib/nueva/tiposConEquipos";
 import { buildSitemapEntries } from "@/lib/seo/sitemap";
 import { vaEnOtros } from "@/lib/usados/otros";
@@ -147,7 +148,8 @@ async function entradas(): Promise<MetadataRoute.Sitemap> {
     }),
 
     // --- Maquinaria ---------------------------------------------------------
-    marcasMaquinaria: marcasMaquinaria.map((marca) => ({
+    // Una marca con «Enlace externo» no tiene página aquí (LiuGong, 2026-11-03).
+    marcasMaquinaria: marcasMaquinaria.filter(tienePaginaPropia).map((marca) => ({
       slug: marca.slug,
       updatedAt: marca.updatedAt,
     })),

@@ -1,6 +1,12 @@
 "use client";
 
-import { IconCheck, IconChevronRight, IconMinus, IconPlus } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconChevronRight,
+  IconExternalLink,
+  IconMinus,
+  IconPlus,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -42,6 +48,7 @@ import {
   type PanelMenu,
   type TarjetaMenu,
 } from "@/lib/megamenu";
+import { AVISO_OTRA_PESTANA } from "@/lib/nueva/enlaceExterno";
 
 import estilos from "./megamenu.module.css";
 
@@ -230,7 +237,57 @@ function Tarjetas({ tarjetas, alElegir }: { tarjetas: TarjetaMenu[]; alElegir: (
   );
 }
 
+/** El logo de una marca en su fila del menú: DECORATIVO, el nombre ya dice la marca. */
+function LogoDeFila({ logo }: { logo: NonNullable<GrupoMenu["logo"]> }) {
+  return (
+    <LogoMarca
+      logo={{ ...logo, oscuro: logo.oscuro === true }}
+      alt=""
+      sizes="96px"
+      loading="lazy"
+      className={estilos.logo}
+    />
+  );
+}
+
+/**
+ * Una marca SIN página propia (2026-11-03, LiuGong → su distribuidor oficial): la misma fila que
+ * un acordeón, pero es un enlace a otro sitio, en pestaña nueva con `noopener`, el icono de enlace
+ * externo y el aviso en el nombre accesible. No despliega nada.
+ */
+function FilaExterna({ grupo, nivel }: { grupo: GrupoMenu & { externo: string }; nivel: number }) {
+  return (
+    <div className={estilos.acordeon} data-nivel={nivel}>
+      <a
+        href={grupo.externo}
+        className={`${estilos.titulo} ${estilos.tituloEnlace}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${grupo.titulo} (${AVISO_OTRA_PESTANA})`}
+      >
+        <IconExternalLink aria-hidden="true" focusable="false" stroke={2} />
+        {grupo.logo ? <LogoDeFila logo={grupo.logo} /> : null}
+        {grupo.titulo}
+      </a>
+    </div>
+  );
+}
+
 function Acordeon({
+  grupo,
+  nivel,
+  alElegir,
+}: {
+  grupo: GrupoMenu;
+  nivel: number;
+  alElegir: () => void;
+}) {
+  if (grupo.externo)
+    return <FilaExterna grupo={{ ...grupo, externo: grupo.externo }} nivel={nivel} />;
+  return <AcordeonDesplegable grupo={grupo} nivel={nivel} alElegir={alElegir} />;
+}
+
+function AcordeonDesplegable({
   grupo,
   nivel,
   alElegir,
@@ -263,15 +320,7 @@ function Acordeon({
          * que la carga diferida no lo descarga hasta que se abre. Medidas
          * explícitas: sin CLS.
          */}
-        {grupo.logo ? (
-          <LogoMarca
-            logo={{ ...grupo.logo, oscuro: grupo.logo.oscuro === true }}
-            alt=""
-            sizes="96px"
-            loading="lazy"
-            className={estilos.logo}
-          />
-        ) : null}
+        {grupo.logo ? <LogoDeFila logo={grupo.logo} /> : null}
         {grupo.titulo}
       </button>
       <div

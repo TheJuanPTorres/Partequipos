@@ -1,4 +1,5 @@
 import { campoColorMarca } from "@/lib/fields/colorMarca";
+import { normalizarEnlaceExterno, validarEnlaceExterno } from "@/lib/nueva/enlaceExterno";
 import { TEXTOS_ADITAMENTOS as T } from "@/lib/nueva/paginaAditamentos";
 import type { CollectionConfig } from "payload";
 
@@ -66,6 +67,20 @@ export const MarcaMaquinaria: CollectionConfig = {
         condition: (datos) => datos?.mostrarEnWeb === false,
         description:
           "Categoría de maquinaria nueva a la que redirigen (301) la página de la marca, las de sus tipos y sus fichas. Vacío: el índice de maquinaria nueva.",
+      },
+    },
+    // Marca sin página propia (2026-11-03, dirección: LiuGong). `src/lib/nueva/enlaceExterno.ts`.
+    {
+      name: "enlaceExterno",
+      type: "text",
+      label: "Enlace externo (marca sin página propia)",
+      validate: validarEnlaceExterno,
+      hooks: { beforeChange: [({ value }) => normalizarEnlaceExterno(value as string)] },
+      admin: {
+        position: "sidebar",
+        placeholder: "https://…",
+        description:
+          "Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap ni como tarjeta de la portada. Vacío, la marca tiene su página como siempre.",
       },
     },
     // Nivel superior de su rama: unicidad global del slug.

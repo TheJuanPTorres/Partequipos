@@ -625,7 +625,8 @@
   }
 }
 
-/* Un enlace suelto de nivel 1 (la política de garantías, Aditamentos) con el recuadro de los acordeones. */
+/* Un enlace suelto con el recuadro de los acordeones: la política de garantías y Aditamentos (nivel 1)
+   y una marca sin página propia, LiuGong, que lleva a otro sitio (nivel 2, 2026-11-03). */
 .tituloEnlace {
   box-sizing: border-box;
   text-decoration: none;

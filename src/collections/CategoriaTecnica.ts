@@ -224,6 +224,9 @@ export const CategoriaTecnica: CollectionConfig = {
      * FOTO DE LA PORTADA (diseño del cliente, 2026-10-26): la pieza recortada de la tarjeta de
      * «Venta de repuestos». Aparte de la «Imagen de la tarjeta», que usan el índice de categorías,
      * las páginas de marca y el megamenú. Vacía, la tarjeta de la portada usa esa.
+     * 2026-11-04: las piezas del kit (130–198 px) se veían pixeladas con las tarjetas del diseño v3
+     * (hasta 246 px CSS, ~490 px de pantalla en alta densidad); se vaciaron y la portada usa la
+     * «Imagen de la tarjeta» (600–1000 px). La ayuda pide un mínimo de 500 px.
      */
     {
       name: "imagenPortada",
@@ -232,7 +235,7 @@ export const CategoriaTecnica: CollectionConfig = {
       label: "Foto en la portada",
       admin: {
         description:
-          "Opcional: la pieza recortada (PNG o WebP transparente) de la tarjeta de la portada. Vacía: la «Imagen de la tarjeta».",
+          "Opcional: si se rellena, manda en la tarjeta de la portada. Vacía: la «Imagen de la tarjeta». Mínimo 500 px de ancho: la tarjeta se pinta hasta 250 px, y el doble en pantallas de alta densidad; más pequeña, se ve pixelada.",
       },
     },
     {

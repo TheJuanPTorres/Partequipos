@@ -852,7 +852,7 @@ export interface CategoriasTecnica {
    */
   tituloPortada?: string | null;
   /**
-   * Opcional: la pieza recortada (PNG o WebP transparente) de la tarjeta de la portada. Vacía: la «Imagen de la tarjeta».
+   * Opcional: si se rellena, manda en la tarjeta de la portada. Vacía: la «Imagen de la tarjeta». Mínimo 500 px de ancho: la tarjeta se pinta hasta 250 px, y el doble en pantallas de alta densidad; más pequeña, se ve pixelada.
    */
   imagenPortada?: (number | null) | Media;
   /**
@@ -3746,7 +3746,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface Cabecera {
   id: number;
   /**
-   * En el orden de la barra (escritorio y móvil). Un enlace a otro sitio (https://), como la tienda, se abre en una pestaña nueva con el icono de enlace externo. Desmarca «Mostrar» para quitarlo sin borrarlo.
+   * En el orden de la barra (escritorio y móvil). Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro en su sitio de la barra y se abre en una pestaña nueva. Desmarca «Mostrar» para quitarlo sin borrarlo.
    */
   enlaces?:
     | {

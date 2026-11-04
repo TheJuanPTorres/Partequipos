@@ -22,8 +22,8 @@ import estilosMarca from "./marca.module.css";
  * Orden y enlaces, los de siempre.
  *
  * `cabecera="oscura"`: la cabecera de siempre de los índices (la caja oscura y baja de
- * `marca.module.css`, con el `<h1>`), en lugar de la roja del diseño. La usa el índice de marcas de
- * maquinaria nueva (2026-11-04, Juan Pablo: solo cambian las tarjetas, la cabecera se queda).
+ * `marca.module.css`, con el `<h1>`), en lugar de la roja del diseño. Hoy no la usa ninguna página:
+ * el cliente (2026-11-04) quiere la roja en los dos índices de marcas.
  *
  * También el índice de marcas de maquinaria nueva (2026-11-04, `sobre="maquinaria"`): una marca
  * sin página propia (`externo`, LiuGong) lleva a su distribuidor en pestaña nueva, con su icono.

@@ -641,12 +641,13 @@
   border-bottom: 1px solid var(--color-fondo-seccion);
 }
 
-/* Móvil: la tienda y «Contáctanos», uno junto al otro (o uno bajo otro si no caben). */
-.botonesMovil {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+.panel .boton {
   margin-top: 16px;
+}
+
+/* En el menú del móvil, la tienda es un botón en su sitio de la lista. */
+.panel .botonExterno {
+  margin-block: 12px 4px;
 }
 
 /*
@@ -675,29 +676,31 @@
 }
 
 /*
- * Con los dos botones (2026-11-03) la columna de acciones tampoco encoge por debajo
- * de su contenido de 1300 px en adelante: si no, la lupa se metía sobre «Blog»
- * (medido en el preview del #414: 82 px de solape a 1300 y 15 a 1440). La fila de
- * enlaces es la que cede.
+ * La tienda, botón dentro de la fila (2026-11-03): centrada en vertical con los
+ * enlaces y con aire a su izquierda. La columna de acciones no encoge por debajo de
+ * su contenido en ningún ancho de escritorio, para que la lupa no se meta sobre el
+ * botón: la fila de enlaces es la que cede.
  */
+.conBoton {
+  display: flex;
+  align-items: center;
+  margin-inline-start: 8px;
+}
+
 @media (min-width: 1025px) {
   .accionCol {
     min-width: max-content;
   }
 }
 
-/*
- * Y entre 1025 y 1299 px, los dos botones más compactos (menos relleno y menos aire
- * con el icono): con el tamaño de siempre la barra se salía 43 px por la derecha a
- * 1025.
- */
+/* Entre 1025 y 1299 px, la tienda más compacta: si no, la barra no cabe. */
 @media (min-width: 1025px) and (max-width: 1299px) {
-  .acciones .boton {
-    gap: 8px;
-    padding-inline: 14px;
+  .conBoton {
+    margin-inline-start: 4px;
   }
 
-  .acciones {
-    gap: 6px;
+  .conBoton .boton {
+    gap: 8px;
+    padding-inline: 14px;
   }
 }

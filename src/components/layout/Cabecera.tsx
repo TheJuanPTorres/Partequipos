@@ -75,7 +75,7 @@ import { GrupoHermanos, MarcoMegamenu, Megamenu, MejorasMenu, SubmenuMovil } fro
 type Enlace = { etiqueta: string; href: string };
 
 type Props = {
-  /** `externo`: otro sitio (la tienda): botón oscuro junto a «Contáctanos» (`enlacesDeCabecera`). */
+  /** `externo`: otro sitio (la tienda): botón oscuro en su sitio de la fila (`enlacesDeCabecera`). */
   enlaces: readonly (Enlace & { externo?: boolean })[];
   /** Botón de la cabecera (global `cabecera`). Sin él, no se pinta. */
   contacto: Enlace | null;
@@ -91,11 +91,11 @@ type Props = {
 
 /**
  * Enlace de la cabecera a otro sitio (la tienda del cliente, #406). Desde el
- * 2026-11-03 (dirección) es un BOTÓN con la forma y el tamaño de «Contáctanos»,
- * pero oscuro (la tinta del sitio), con la bolsa en rojo y el texto claro, justo
- * antes de «Contáctanos» (también en el menú del móvil) y fuera de la fila de
- * enlaces. Todos los externos de la lista van así. Pestaña nueva, `noopener` y
- * el aviso en el nombre accesible.
+ * 2026-11-03 (dirección y Juan Pablo) es un BOTÓN con la forma y el tamaño de
+ * «Contáctanos», pero oscuro (la tinta del sitio), con la bolsa en rojo y el texto
+ * claro, en SU SITIO de la fila de enlaces (el orden del panel: hoy, tras «Blog»),
+ * también en el menú del móvil. Todos los externos de la lista van así. Pestaña
+ * nueva, `noopener` y el aviso en el nombre accesible.
  */
 function BotonExterno({ enlace }: { enlace: Enlace }) {
   return (
@@ -427,20 +427,21 @@ export function Cabecera({
     }
   };
 
-  // Los externos (la tienda) son botones junto a «Contáctanos»; en la fila, solo los del sitio.
+  // Los externos (la tienda) son botones en su sitio de la fila; sin megamenú.
   const internos = enlaces.filter((e) => !e.externo);
-  const externos = enlaces.filter((e) => e.externo);
 
   const actual = (href: string) => (ruta === href || ruta.startsWith(href) ? "page" : undefined);
 
   // Móvil: las entradas con panel despliegan su contenido (el mismo del megamenú, 2026-10-20).
   const listaEnlaces = (
     <ul className={estilos.lista}>
-      {internos.map((e) => {
+      {enlaces.map((e) => {
         const datos = paneles[claveDeEnlace(e.href)];
         return (
           <li key={e.href}>
-            {datos ? (
+            {e.externo ? (
+              <BotonExterno enlace={e} />
+            ) : datos ? (
               <SubmenuMovil
                 etiqueta={e.etiqueta}
                 href={e.href}
@@ -463,8 +464,15 @@ export function Cabecera({
   // Escritorio: las entradas con panel son botones; el resto, enlaces.
   const listaEscritorio = (
     <ul className={estilos.lista}>
-      {internos.map((e) => {
+      {enlaces.map((e) => {
         const clave = claveDeEnlace(e.href);
+        if (e.externo) {
+          return (
+            <li key={e.href} className={estilos.conBoton}>
+              <BotonExterno enlace={e} />
+            </li>
+          );
+        }
         if (!paneles[clave]) {
           return (
             <li key={e.href}>
@@ -512,8 +520,6 @@ export function Cabecera({
       {contacto.etiqueta}
     </Link>
   ) : null;
-
-  const botonesExternos = externos.map((e) => <BotonExterno key={e.href} enlace={e} />);
 
   const lupa = (
     <form action="/buscar/" method="get" className={estilos.lupaForm} onSubmit={abrirBusqueda}>
@@ -573,7 +579,6 @@ export function Cabecera({
           <div className={estilos.accionCol}>
             <div className={estilos.acciones}>
               {lupa}
-              {botonesExternos}
               {botonContacto}
             </div>
           </div>
@@ -636,12 +641,7 @@ export function Cabecera({
           <nav aria-label="Menú">
             <GrupoHermanos>{listaEnlaces}</GrupoHermanos>
           </nav>
-          {externos.length > 0 || botonContacto ? (
-            <div className={estilos.botonesMovil}>
-              {botonesExternos}
-              {botonContacto}
-            </div>
-          ) : null}
+          {botonContacto}
         </div>
       </header>
 

@@ -138,5 +138,12 @@ if (REVALIDAR) {
       (faltan.length ? `; FALTAN: ${faltan.map((f) => f.etiqueta).join(", ")}` : ""),
   );
   if (faltan.length) fallar("la cabecera del preview no lleva todos los enlaces");
+  const ocultas = ahora.filter((f) => !visibles.includes(f));
+  const salen = ocultas.filter((f) => cabecera.includes(`>${f.etiqueta}<`));
+  log(
+    `filas ocultas o sin enlace: ${ocultas.length}` +
+      (ocultas.length ? `, ${salen.length} salen en la cabecera` : ""),
+  );
+  if (salen.length) fallar(`salen filas ocultas: ${salen.map((f) => f.etiqueta).join(", ")}`);
 }
 process.exit(0);

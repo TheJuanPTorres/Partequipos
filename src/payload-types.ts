@@ -860,7 +860,7 @@ export interface CategoriasTecnica {
    */
   tituloPortada?: string | null;
   /**
-   * Opcional: la pieza recortada (PNG o WebP transparente) de la tarjeta de la portada. Vacía: la «Imagen de la tarjeta».
+   * Opcional: si se rellena, manda en la tarjeta de la portada. Vacía: la «Imagen de la tarjeta». Mínimo 500 px de ancho: la tarjeta se pinta hasta 250 px, y el doble en pantallas de alta densidad; más pequeña, se ve pixelada.
    */
   imagenPortada?: (number | null) | Media;
   /**

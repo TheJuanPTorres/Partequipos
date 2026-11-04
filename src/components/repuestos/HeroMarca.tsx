@@ -78,7 +78,8 @@ export function HeroMarca({
   /**
    * Fija el alto del `<h1>` con una copia invisible en la fuente de respaldo (la técnica de la
    * cabecera del artículo): un título de varias líneas no mueve el contenido centrado al llegar
-   * Inter. Solo con `linea1` (la página de garantías, 2026-10-23).
+   * Inter. Con `linea1` sola (la página de garantías, 2026-10-23), en el `<h1>`; con dos líneas
+   * (las categorías técnicas, 2026-11-03), en cada una.
    */
   reservarTitulo?: boolean;
   /**
@@ -155,22 +156,36 @@ export function HeroMarca({
             </h1>
           ) : (
             <h1 className={`${estilos.h1} ${tituloLargo ? estilos.h1Largo : ""}`}>
-              <Revelado
-                como="span"
-                alCargar
-                ritmo="titulo"
-                texto={conCorteSuave(vista.linea1)}
-                className={estilos.linea1}
-              />
-              {vista.linea2 ? (
-                <Revelado
-                  como="span"
-                  alCargar
-                  ritmo="titulo"
-                  texto={conCorteSuave(vista.linea2)}
-                  className={estilos.linea2}
-                />
-              ) : null}
+              {[
+                { texto: vista.linea1, clase: estilos.linea1 },
+                { texto: vista.linea2, clase: estilos.linea2 },
+              ]
+                .filter((l) => l.texto)
+                .map((l, i) => {
+                  const linea = (
+                    <Revelado
+                      key={i}
+                      como="span"
+                      alCargar
+                      ritmo="titulo"
+                      texto={conCorteSuave(l.texto)}
+                      className={l.clase}
+                    />
+                  );
+                  // Con dos líneas, la reserva va por línea: cada una con su tamaño
+                  // (categorías técnicas, 2026-11-03: CLS 0,056 a 390 al llegar Inter).
+                  return reservarTitulo ? (
+                    <span
+                      key={i}
+                      className={`${l.clase} ${estilos.lineaReservada}`}
+                      data-reserva={l.texto}
+                    >
+                      {linea}
+                    </span>
+                  ) : (
+                    linea
+                  );
+                })}
             </h1>
           )}
 

@@ -18,21 +18,43 @@
   list-style: none;
 }
 
+/*
+ * `--s`: cuánto se ensancha (> 1) o se recoge (< 1) el lienzo del panel; `--z`: cuánto se acerca
+ * la foto. Se animan con `transform`, nunca con la maquetación: el hueco de cada panel no cambia,
+ * así un hover no mueve nada (sin CLS).
+ */
 .panel {
-  position: relative;
-  isolation: isolate;
+  --s: 1;
+  --z: 1;
+
   display: flex;
   min-width: 0;
   min-height: 420px;
+  flex-direction: column;
+  color: var(--panel-tinta);
+}
+
+.lienzo {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: flex-end;
   overflow: hidden;
   border-radius: 20px;
   background: var(--panel-color);
-  color: var(--panel-tinta);
   box-shadow:
     0 1px 2px rgb(16 15 15 / 0.06),
     0 18px 40px -24px rgb(16 15 15 / 0.45);
+  transform: scaleX(var(--s));
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* El último crece y se recoge hacia la izquierda: los dos lienzos nunca se tocan. */
+.panel:last-child:not(:first-child) .lienzo {
+  transform-origin: right center;
 }
 
 /* La foto, arriba, teñida con el color de la marca y fundida con él hacia el texto. */
@@ -43,11 +65,13 @@
   height: 62%;
   -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  /* Contraescalada: el lienzo la estira en horizontal; así solo se acerca (`--z`), sin deformarse. */
+  transform: scale(calc(var(--z) / var(--s)), var(--z));
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .fotoImagen {
   filter: grayscale(1) contrast(1.05);
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .tinte {
@@ -66,6 +90,10 @@
   gap: 12px;
   padding: 48px 24px 28px;
   background: linear-gradient(to top, var(--panel-color) calc(100% - 40px), transparent);
+  /* Contraescalado: el texto no se deforma; al recogerse el lienzo, lo que sobra cae en el relleno. */
+  transform: scaleX(calc(1 / var(--s)));
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* El logo en placa blanca (con sus colores: va siempre sobre claro). */
@@ -165,7 +193,7 @@
   opacity: 0.9;
 }
 
-/* Escritorio y tablet: lado a lado; el elegido se ensancha y el otro se recoge. */
+/* Escritorio y tablet: lado a lado; el elegido se ensancha un 4 % y el otro se recoge otro tanto. */
 @media (min-width: 768px) {
   .paneles {
     display: flex;
@@ -175,7 +203,6 @@
   .panel {
     min-height: 520px;
     flex: 1 1 0;
-    transition: flex-grow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .contenido {
@@ -188,36 +215,35 @@
 
   .paneles:has(.panel:hover) .panel,
   .paneles:has(.panel:focus-within) .panel {
-    flex-grow: 0.85;
+    --s: 0.96;
   }
 
   .paneles:has(.panel:hover) .panel:hover,
   .paneles:has(.panel:focus-within) .panel:focus-within {
-    flex-grow: 1.15;
+    --s: 1.04;
   }
 }
 
-.panel:hover .fotoImagen,
-.panel:focus-within .fotoImagen {
-  transform: scale(1.06);
+.panel:hover,
+.panel:focus-within {
+  --z: 1.06;
 }
 
-/* Con «reducir movimiento», todo quieto: sin ensanchar ni acercar. */
+/* Con «reducir movimiento», todo quieto: sin ensanchar, recoger ni acercar. */
 @media (prefers-reduced-motion: reduce) {
-  .panel,
-  .fotoImagen,
+  .panel {
+    --s: 1 !important;
+    --z: 1 !important;
+  }
+
+  .lienzo,
+  .foto,
+  .contenido,
   .boton,
   .boton svg {
     transition: none;
   }
 
-  .paneles:has(.panel:hover) .panel,
-  .paneles:has(.panel:focus-within) .panel {
-    flex-grow: 1;
-  }
-
-  .panel:hover .fotoImagen,
-  .panel:focus-within .fotoImagen,
   .boton:hover svg {
     transform: none;
   }

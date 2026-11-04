@@ -1591,7 +1591,11 @@ export interface Pagina {
     antetitulo?: string | null;
     titulo?: string | null;
     /**
-     * Un párrafo corto bajo el título. Respeta los saltos de línea. Vacío, no se pinta.
+     * Se pinta en rojo donde aparezca en el título (la primera vez). Vacía, o si el título no la lleva, todo el título va en negro.
+     */
+    tituloResaltado?: string | null;
+    /**
+     * Bajo el título. Cada línea es un párrafo (el diseño lleva dos: qué repuestos y para qué marcas). Vacío, no se pinta.
      */
     descripcion?: string | null;
     /**
@@ -1603,9 +1607,20 @@ export interface Pagina {
      */
     descripcionAncho?: ('estrecho' | 'medio' | 'ancho' | 'columna') | null;
     /**
-     * Entre 60 y 100. 100 es el tamaño del diseño original; por defecto, 78. Solo desde portátil: en el teléfono no cambia.
+     * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.
      */
     tamanoMaquina?: number | null;
+    /**
+     * Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp (decisión de Juan Pablo). El texto va en «Texto bajo el título».
+     */
+    whatsappTexto?: string | null;
+    /**
+     * Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp.
+     */
+    whatsappMensaje?: string | null;
+    /**
+     * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): el botón de cada tarjeta es una flecha redonda, sin texto.
+     */
     verMasTexto?: string | null;
     /**
      * Sin efecto desde el 2026-10-26 (diseño del cliente): cada tarjeta lleva su botón.
@@ -1616,11 +1631,11 @@ export interface Pagina {
      */
     botonEnlace?: string | null;
     /**
-     * Decorativa: la máquina sobre el piso, junto a las categorías. Opcional.
+     * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina; la de la portada va en la banda «Marcas de repuestos».
      */
     maquina?: (number | null) | Media;
     /**
-     * La imagen del reflejo, del kit del cliente (más alta que la máquina). Opcional.
+     * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.
      */
     maquinaReflejo?: (number | null) | Media;
   };
@@ -3186,10 +3201,13 @@ export interface PaginasSelect<T extends boolean = true> {
     | {
         antetitulo?: T;
         titulo?: T;
+        tituloResaltado?: T;
         descripcion?: T;
         descripcionAlineacion?: T;
         descripcionAncho?: T;
         tamanoMaquina?: T;
+        whatsappTexto?: T;
+        whatsappMensaje?: T;
         verMasTexto?: T;
         botonTexto?: T;
         botonEnlace?: T;

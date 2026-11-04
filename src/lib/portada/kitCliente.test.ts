@@ -10,6 +10,7 @@ import type {
 } from "@/payload-types";
 
 import {
+  partirTitulo,
   categoriasDePortada,
   fichaCompleta,
   filtrosDeUsados,
@@ -204,5 +205,30 @@ describe("logosDeMarcasRepuestos", () => {
       ]),
       [],
     );
+  });
+});
+
+describe("partirTitulo (Venta de repuestos v3)", () => {
+  it("pinta en rojo la palabra donde aparece, sin distinguir mayúsculas, con su grafía del título", () => {
+    assert.deepEqual(partirTitulo("Encuentra Maquinaria y Repuestos Rápido y Fácil", "repuestos"), {
+      antes: "Encuentra Maquinaria y ",
+      resaltado: "Repuestos",
+      despues: " Rápido y Fácil",
+    });
+  });
+
+  it("sin palabra, o si el título no la lleva, todo el título en negro", () => {
+    const todo = { antes: "Repuestos al día", resaltado: "", despues: "" };
+    assert.deepEqual(partirTitulo("Repuestos al día", ""), todo);
+    assert.deepEqual(partirTitulo("Repuestos al día", "  "), todo);
+    assert.deepEqual(partirTitulo("Repuestos al día", "filtros"), todo);
+  });
+
+  it("solo la primera vez", () => {
+    assert.deepEqual(partirTitulo("Repuestos y más repuestos", "Repuestos"), {
+      antes: "",
+      resaltado: "Repuestos",
+      despues: " y más repuestos",
+    });
   });
 });

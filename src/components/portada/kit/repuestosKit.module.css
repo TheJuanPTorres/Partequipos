@@ -1,7 +1,7 @@
 /*
- * «VENTA DE REPUESTOS» CON EL DISEÑO DEL CLIENTE (2026-10-26), portado del prototipo (Tailwind).
- * Cortes del prototipo: 640, 768 (cinco tarjetas por fila), 1025 (título y máquina en una fila) y
- * 1536 (tarjetas a la izquierda, máquina a la derecha).
+ * «VENTA DE REPUESTOS», DISEÑO V3 DEL CLIENTE (2026-11-03), portado del prototipo (Tailwind).
+ * Cortes del prototipo: 640 (sm), 768 (3 tarjetas por fila), 1025 (5 por fila; el «lg» del sitio),
+ * 1280 (franjas del fondo) y 1536.
  */
 
 .seccion {
@@ -29,76 +29,96 @@
 }
 
 .panel {
+  --panel-x: 20px;
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  padding: 36px var(--panel-x);
   border-radius: 28px;
   background: var(--kit-gris);
 }
 
+@media (min-width: 640px) {
+  .panel {
+    --panel-x: 40px;
+    padding-block: 44px;
+  }
+}
+
 @media (min-width: 1025px) {
   .panel {
+    --panel-x: 4%;
+    padding-block: 56px;
     border-radius: 32px;
   }
 }
 
-.rejilla {
-  display: grid;
-  padding: 32px 20px;
-  gap: 32px;
-}
-
-@media (min-width: 640px) {
-  .rejilla {
-    padding: 40px;
-  }
-}
+/* --- Franjas del fondo ------------------------------------------------------------------------- */
 
 /*
- * Desde portátil la disposición se INVIERTE (diseño del 2026-10-27): la máquina a la izquierda, a
- * toda la altura, y título, texto y tarjetas a la derecha.
+ * La capa empieza a la derecha de la columna del texto (`.cabecera`, 52rem como mucho) y las losas
+ * se inclinan hacia la derecha al bajar, así que ninguna pasa por el texto.
  */
-@media (min-width: 1025px) {
-  .rejilla {
-    padding: 48px 4% 48px 16px;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
-    grid-template-rows: auto 1fr;
-    gap: 28px 16px;
+.franjas {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .franjas {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: calc(var(--panel-x) + 52rem + 24px);
+    display: block;
+    pointer-events: none;
   }
 }
 
-@media (min-width: 1536px) {
-  .rejilla {
-    padding: 48px 5% 48px 24px;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
-    gap: 36px 16px;
-  }
+.losa {
+  position: absolute;
+  top: 0;
+  height: 78%;
+  transform: skewX(-30deg);
+  transform-origin: top;
 }
+
+.losa1 {
+  left: 0;
+  width: 16%;
+  background: rgb(255 255 255 / 0.7);
+}
+
+.losa2 {
+  left: 24%;
+  width: 11%;
+  background: rgb(217 214 210 / 0.45);
+}
+
+.roja {
+  left: 44%;
+  width: 16%;
+  background: linear-gradient(
+    180deg,
+    var(--color-marca) 0%,
+    color-mix(in srgb, var(--color-marca) 85%, transparent) 35%,
+    color-mix(in srgb, var(--color-marca) 25%, transparent) 70%,
+    transparent 100%
+  );
+}
+
+.losa3 {
+  left: 70%;
+  width: 14%;
+  background: rgb(255 255 255 / 0.7);
+}
+
+/* --- Título y texto -------------------------------------------------------------------------- */
 
 .cabecera {
   position: relative;
-  z-index: 1;
-}
-
-@media (min-width: 1025px) {
-  .cabecera {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: start;
-  }
-}
-
-/* Sin máquina elegida en el panel, título y tarjetas ocupan todo el ancho. */
-@media (min-width: 1025px) {
-  .sinMaquina {
-    padding: 48px 40px;
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .sinMaquina .cabecera,
-  .sinMaquina .tarjetas {
-    grid-column: 1;
-  }
+  max-width: 52rem;
 }
 
 .antetitulo {
@@ -109,245 +129,97 @@
   letter-spacing: 0.025em;
 }
 
-/* «Texto bajo el título»: un párrafo por línea. Llega hasta el borde derecho de su columna, con un tope de ancho de lectura en pantallas muy anchas. */
-.descripcion {
-  max-width: 60rem;
-  margin: 16px 0 0;
-  color: var(--color-texto-suave);
-  font-size: 16px;
-  line-height: 1.625;
-  white-space: pre-line;
-}
-
-@media (min-width: 1025px) {
-  .descripcion {
-    font-size: 1.05rem;
-  }
-}
-
 .titulo {
   margin: 12px 0 0;
   color: var(--color-texto);
-  font-size: clamp(1.6rem, 6vw, 2.2rem);
-  font-weight: 600;
-  line-height: 1.25;
+  font-size: clamp(1.7rem, 6vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.1;
   letter-spacing: -0.025em;
 }
 
 @media (min-width: 1025px) {
   .titulo {
-    font-size: clamp(1.6rem, 2.3vw, 2.4rem);
+    font-size: clamp(2.2rem, 3vw, 3.1rem);
   }
 }
 
-@media (min-width: 1536px) {
-  .titulo {
-    font-size: clamp(1.6rem, 1.9vw, 2.4rem);
-    white-space: nowrap;
-  }
+.resaltado {
+  color: var(--color-marca);
 }
 
-/* --- La máquina ------------------------------------------------------------------------------- */
-
-.maquinaCaja {
-  position: relative;
-  width: 100%;
-  max-width: 34rem;
-  margin: 0 auto;
-}
-
-/*
- * Portátil: la máquina toma todo el alto de la sección (sus dos filas), el ancho sale de la
- * proporción, y va centrada en su columna: el aire transparente del render sobresale a los lados.
- * Escritorio ancho: por ancho, apoyada abajo y desbordando un 12 % a cada lado.
- */
-@media (min-width: 1025px) {
-  .maquinaCaja {
-    left: 50%;
-    width: auto;
-    max-width: none;
-    height: 100%;
-    margin: 0;
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    align-self: stretch;
-    justify-self: start;
-    transform: translateX(-50%);
-  }
-}
-
-@media (min-width: 1536px) {
-  .maquinaCaja {
-    left: 0;
-    width: 124%;
-    height: auto;
-    margin: 0 -12%;
-    align-self: end;
-    justify-self: auto;
-    transform: none;
-  }
-}
-
-.maquina {
-  position: relative;
+/* «Texto bajo el título»: un párrafo por línea; ancho y alineación, del panel. */
+.descripcion {
+  margin: 16px 0 0;
+  color: var(--color-texto-suave);
+  font-size: 0.95rem;
+  line-height: 1.625;
 }
 
 @media (min-width: 1025px) {
-  .maquina {
-    height: 100%;
+  .descripcion {
+    font-size: 1rem;
   }
-}
-
-@media (min-width: 1536px) {
-  .maquina {
-    height: auto;
-  }
-}
-
-.capa {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-/*
- * En el móvil la máquina va bajo el texto y la franja roja, que sube por encima de su caja, pasaba
- * por detrás del final de las líneas del título y del «Texto bajo el título» (contraste bajo AA).
- * Ahí la pared se queda dentro de la caja de la máquina.
- */
-@media (max-width: 767px) {
-  .capa {
-    overflow: hidden;
-  }
-}
-
-/* En espejo desde portátil: las losas y la franja bajan del lado de la máquina y se apagan hacia el texto. */
-@media (min-width: 1025px) {
-  .pared {
-    transform: scaleX(-1);
-  }
-}
-
-.piso {
-  position: absolute;
-  top: 24%;
-  right: -200%;
-  bottom: -400%;
-  left: -200%;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgb(241 240 238 / 0) 0%,
-    rgb(20 17 15 / 0.035) 1.5%,
-    rgb(246 245 243 / 0.85) 4%,
-    #f6f5f3 7%,
-    #f8f7f5 30%,
-    #f9f9f8 60%,
-    #f6f5f3 100%
-  );
-}
-
-@media (min-width: 1025px) {
-  .piso {
-    right: -70%;
-    left: -40%;
-    mask-image: linear-gradient(to left, transparent, #000 30%);
-  }
-}
-
-.reflejo {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  pointer-events: none;
-}
-
-/*
- * El render de la máquina, a escala desde portátil: se encoge hacia su apoyo en el piso (centro y
- * 91 % de su alto) y la pared, el piso y las columnas siguen igual. En el teléfono, a su tamaño.
- */
-@media (min-width: 1025px) {
-  .render {
-    transform: scale(var(--escala-maquina, 1));
-    transform-origin: 50% 91%;
-  }
-}
-
-.contener {
-  object-fit: contain;
 }
 
 /* --- Las tarjetas ----------------------------------------------------------------------------- */
 
 .tarjetas {
   position: relative;
-  z-index: 1;
   display: grid;
-  margin: 0;
+  margin: 36px 0 0;
   padding: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   list-style: none;
 }
 
-@media (min-width: 768px) {
-  .tarjetas {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1025px) {
-  .tarjetas {
-    grid-column: 2;
-    grid-row: 2;
-  }
-}
-
-@media (min-width: 1280px) {
+@media (min-width: 640px) {
   .tarjetas {
     gap: 16px;
   }
 }
 
-/*
- * Toda la tarjeta lleva a la página de la categoría; «Ver todos» va al pie, alineado en la fila.
- * Tamaños del diseño del 2026-10-27: de 768 a 1535 px las tarjetas son estrechas (cinco por fila
- * en la columna derecha) y todo baja de tamaño; desde 1536 px vuelven al tamaño pleno.
- */
+@media (min-width: 768px) {
+  .tarjetas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1025px) {
+  .tarjetas {
+    margin-top: 44px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1536px) {
+  .tarjetas {
+    gap: 20px;
+  }
+}
+
+/* Toda la tarjeta es un enlace a la página de la categoría. */
 .tarjeta {
+  position: relative;
   display: flex;
   height: 100%;
   box-sizing: border-box;
-  padding: 16px 8px;
+  padding: 14px;
   flex-direction: column;
-  align-items: center;
+  overflow: hidden;
   border-radius: 20px;
-  background: var(--color-fondo);
-  box-shadow: 0 1px 2px rgb(20 17 15 / 0.05);
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(20 17 15 / 0.05),
+    0 6px 16px -10px rgb(20 17 15 / 0.18);
   color: var(--color-texto);
-  text-align: center;
   text-decoration: none;
 }
 
 @media (min-width: 640px) {
   .tarjeta {
-    padding: 16px 12px;
-  }
-}
-
-@media (min-width: 768px) {
-  .tarjeta {
-    padding: 16px 8px;
-  }
-}
-
-@media (min-width: 1536px) {
-  .tarjeta {
-    padding: 20px 12px;
+    padding: 20px;
   }
 }
 
@@ -356,36 +228,124 @@
   outline-offset: 2px;
 }
 
+/* La esquina roja recortada, arriba a la izquierda. */
+.esquina {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  background: var(--color-marca);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+@media (min-width: 640px) {
+  .esquina {
+    width: 48px;
+    height: 48px;
+  }
+}
+
 .foto {
   position: relative;
   display: block;
   width: 100%;
-  max-width: 12rem;
-  height: 80px;
-}
-
-@media (min-width: 768px) {
-  .foto {
-    height: 64px;
-  }
-}
-
-@media (min-width: 1280px) {
-  .foto {
-    height: 80px;
-  }
-}
-
-@media (min-width: 1536px) {
-  .foto {
-    height: 128px;
-  }
+  aspect-ratio: 4 / 3;
 }
 
 .fotoImg {
   object-fit: contain;
 }
 
+/*
+ * Nombre y botón en una fila pegada al pie: en una fila de tarjetas los botones quedan a la misma
+ * altura aunque un nombre ocupe más líneas. Donde la tarjeta es estrecha (teléfono, y de 1025 a
+ * 1279 px con cinco columnas) el botón sube a la esquina de arriba a la derecha y el nombre usa todo
+ * el ancho.
+ */
+.pie {
+  display: flex;
+  min-height: 2lh;
+  margin-top: auto;
+  padding-top: 12px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+@media (max-width: 359px) {
+  .pie {
+    font-size: 0.85rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .pie {
+    gap: 8px;
+    font-size: 1.05rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .pie {
+    font-size: 1.15rem;
+  }
+}
+
+.nombre {
+  min-width: 0;
+  font-weight: 700;
+}
+
+.boton {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #fdeeee;
+  color: var(--color-marca);
+}
+
+@media (min-width: 640px) {
+  .boton {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 639px) {
+  .boton {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1279px) {
+  .boton {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+  }
+}
+
+.flecha {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.tarjeta:hover .boton {
+  background: var(--color-marca);
+  color: #fff;
+}
+
+/* El movimiento (zoom de la foto, flecha y rellenos), solo sin «reducir movimiento». */
 @media (prefers-reduced-motion: no-preference) {
   .fotoImg {
     transition: transform 300ms cubic-bezier(0.33, 1, 0.68, 1);
@@ -394,101 +354,18 @@
   .tarjeta:hover .fotoImg {
     transform: scale(1.06);
   }
-}
 
-/* El nombre ocupa siempre dos líneas de alto: los botones quedan alineados en la fila. */
-.nombre {
-  display: flex;
-  min-height: 2lh;
-  margin: 12px 0;
-  align-items: center;
-  font-size: 0.825rem;
-  font-weight: 700;
-  line-height: 1.375;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
-  overflow-wrap: anywhere;
-}
-
-@media (min-width: 768px) {
-  .nombre {
-    font-size: 0.765rem;
-    letter-spacing: normal;
+  .boton {
+    transition:
+      background-color 180ms ease,
+      color 180ms ease;
   }
-}
 
-@media (min-width: 1025px) {
-  .nombre {
-    font-size: 0.66rem;
-  }
-}
-
-@media (min-width: 1280px) {
-  .nombre {
-    font-size: 0.765rem;
-  }
-}
-
-@media (min-width: 1536px) {
-  .nombre {
-    font-size: 0.925rem;
-    letter-spacing: 0.025em;
-  }
-}
-
-.ver {
-  display: inline-flex;
-  margin-top: auto;
-  padding: 8px 16px;
-  align-items: center;
-  gap: 6px;
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 1.5px var(--color-marca);
-  color: var(--color-marca);
-  font-size: 0.78rem;
-  font-weight: 600;
-  white-space: nowrap;
-  transition:
-    background-color 180ms ease,
-    color 180ms ease;
-}
-
-@media (min-width: 768px) {
-  .ver {
-    padding: 6px 10px;
-    gap: 4px;
-    font-size: 0.66rem;
-  }
-}
-
-@media (min-width: 1536px) {
-  .ver {
-    padding: 8px 16px;
-    gap: 6px;
-    font-size: 0.78rem;
-  }
-}
-
-.tarjeta:hover .ver {
-  background: var(--color-marca);
-  color: #fff;
-}
-
-.flecha {
-  width: 14px;
-  height: 14px;
-  flex: none;
-}
-
-@media (min-width: 768px) and (max-width: 1535px) {
   .flecha {
-    width: 12px;
-    height: 12px;
+    transition: transform 300ms ease;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .ver {
-    transition: none;
+  .tarjeta:hover .flecha {
+    transform: translateX(2px);
   }
 }

@@ -99,6 +99,7 @@ import * as migration_20261027_204347_portada_ancho_texto_tamano_maquina from '.
 import * as migration_20261028_023032_cabecera_enlaces_mostrar from './20261028_023032_cabecera_enlaces_mostrar';
 import * as migration_20261103_224936_portada_marcas_repuestos from './20261103_224936_portada_marcas_repuestos';
 import * as migration_20261104_010016_marca_nueva_enlace_externo from './20261104_010016_marca_nueva_enlace_externo';
+import * as migration_20261104_023639_portada_repuestos_v3 from './20261104_023639_portada_repuestos_v3';
 
 export const migrations = [
   {
@@ -604,6 +605,11 @@ export const migrations = [
   {
     up: migration_20261104_010016_marca_nueva_enlace_externo.up,
     down: migration_20261104_010016_marca_nueva_enlace_externo.down,
-    name: '20261104_010016_marca_nueva_enlace_externo'
+    name: '20261104_010016_marca_nueva_enlace_externo',
+  },
+  {
+    up: migration_20261104_023639_portada_repuestos_v3.up,
+    down: migration_20261104_023639_portada_repuestos_v3.down,
+    name: '20261104_023639_portada_repuestos_v3'
   },
 ];

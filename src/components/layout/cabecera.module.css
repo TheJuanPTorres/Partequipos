@@ -691,6 +691,11 @@
   .accionCol {
     min-width: max-content;
   }
+
+  /* Los enlaces, centrados en vertical con el botón (antes, pegados arriba de la fila). */
+  .nav .lista {
+    align-items: center;
+  }
 }
 
 /* Entre 1025 y 1299 px, la tienda más compacta: si no, la barra no cabe. */
@@ -702,5 +707,13 @@
   .conBoton .boton {
     gap: 8px;
     padding-inline: 14px;
+  }
+}
+
+/* Y hasta 1099 px, también «Contáctanos» más compacto: a 1025 la barra se salía 13 px. */
+@media (min-width: 1025px) and (max-width: 1099px) {
+  .acciones .boton {
+    gap: 8px;
+    padding-inline: 16px;
   }
 }

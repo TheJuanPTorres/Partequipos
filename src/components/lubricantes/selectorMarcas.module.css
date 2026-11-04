@@ -88,12 +88,24 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 12px;
+  position: relative;
   padding: 48px 24px 28px;
-  background: linear-gradient(to top, var(--panel-color) calc(100% - 40px), transparent);
   /* Contraescalado: el texto no se deforma; al recogerse el lienzo, lo que sobra cae en el relleno. */
   transform: scaleX(calc(1 / var(--s)));
   transform-origin: left center;
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * El color liso tras el texto: una capa que sobresale 80 px por los lados (el lienzo la recorta), así
+ * cubre también lo que el lienzo crece al ensancharse, sin dejar asomar la foto por el borde.
+ */
+.contenido::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 -80px;
+  background: linear-gradient(to top, var(--panel-color) calc(100% - 40px), transparent);
+  content: "";
 }
 
 /* El logo en placa blanca (con sus colores: va siempre sobre claro). */

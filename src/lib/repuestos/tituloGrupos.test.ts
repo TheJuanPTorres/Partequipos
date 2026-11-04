@@ -10,6 +10,21 @@ test("categoría técnica: el nombre en minúsculas, como en «Qué incluye»", 
   );
 });
 
+test("las siglas se respetan en mayúsculas; una sola letra no es sigla", () => {
+  assert.equal(
+    tituloEligeRepuesto("Herramienta de Corte (GETS)", true),
+    "Elige el repuesto de herramienta de corte (GETS) que necesitas",
+  );
+  assert.equal(
+    tituloEligeRepuesto("Llantas Y Rines", true),
+    "Elige el repuesto de llantas y rines que necesitas",
+  );
+  assert.equal(
+    tituloEligeRepuesto("Filtros CAT y GETS-2", true),
+    "Elige el repuesto de filtros CAT y GETS-2 que necesitas",
+  );
+});
+
 test("Filtros Donaldson: el nombre tal cual", () => {
   assert.equal(
     tituloEligeRepuesto("Filtros Donaldson", false),

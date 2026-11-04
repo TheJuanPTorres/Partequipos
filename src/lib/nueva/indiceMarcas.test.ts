@@ -68,6 +68,11 @@ describe("baldosas de color de nueva", () => {
       blanco: false,
     });
     assert.equal(logoEnBlanco(null), null);
+    assert.equal(
+      logoEnBlanco({ ...logo, url: "https://x.blob.vercel-storage.com/logo.JPG?v=1" }),
+      null,
+      "un JPG no tiene transparencia: respaldo gris",
+    );
   });
 
   it("con color y logo, baldosa de color; sin alguno, el respaldo gris", () => {

@@ -36,9 +36,14 @@ export function colorDeBaldosaNueva(color: string | null | undefined): string | 
     : null;
 }
 
-/** El logo en blanco: el blanco tal cual si ya lo es; el de colores, en una sola tinta blanca. */
+/**
+ * El logo en blanco: el blanco tal cual si ya lo es; el de colores, en una sola tinta blanca.
+ * Un logo SIN transparencia (JPG: lleva su fondo blanco) no sirve: en tinta blanca saldría un
+ * rectángulo blanco entero. Ese va sobre el gris de respaldo (`null`).
+ */
 export function logoEnBlanco(logo: LogoMarca | null): LogoMarca | null {
-  return logo ? { ...logo, oscuro: false, blanco: !logo.oscuro } : null;
+  if (!logo || /\.jpe?g$/i.test(logo.url.split(/[?#]/)[0] ?? "")) return null;
+  return { ...logo, oscuro: false, blanco: !logo.oscuro };
 }
 
 export function placasDeMarcasNueva(

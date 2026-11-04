@@ -19,17 +19,18 @@ export type BotonSeccion = {
  * hero con los tres botones principales, cada uno con su máquina recortada y un enlace a su
  * ancla. El fondo rojo descansa en el primero y se desliza al que está bajo el ratón o con el
  * foco (`:has`, solo CSS); al pasar, la máquina avanza un poco. El desplazamiento es suave y
- * deja la sección bajo la cabecera fija (`scroll-margin-top` de cada sección); con «reducir
+ * deja el título de la sección bajo la cabecera fija (`scroll-margin-top` del destino); con «reducir
  * movimiento», salto directo y nada se anima. En móvil caben los tres, con los nombres en hasta
  * tres líneas.
  *
  * Va justo DESPUÉS del hero (fuera de su `<section>`: el teclado y el ratón no tocan el
- * carrusel); `HeroPortada` con `conNav` sube sus controles lo que la barra tapa.
+ * carrusel); `HeroPortada` con `conNav` sube sus controles lo que la barra tapa. Con
+ * `data-evita-flotante`, el botón flotante de WhatsApp sube mientras la barra pase por su sitio.
  */
 export function NavSecciones({ botones }: { botones: BotonSeccion[] }) {
   if (botones.length === 0) return null;
   return (
-    <nav aria-label="Secciones de Partequipos" className={estilos.nav}>
+    <nav aria-label="Secciones de Partequipos" className={estilos.nav} data-evita-flotante="">
       <ul className={estilos.lista} style={{ "--botones": botones.length } as CSSProperties}>
         {botones.map((b) => (
           <li key={b.ancla} className={estilos.item}>

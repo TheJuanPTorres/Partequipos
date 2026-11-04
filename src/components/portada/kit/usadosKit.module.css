@@ -5,8 +5,6 @@
  */
 
 .seccion {
-  /* Al llegar por la barra de secciones (`NavSecciones`), bajo la cabecera fija. */
-  scroll-margin-top: 96px;
   --kit-gris: #f1f0ee;
   --kit-linea: #e4e1de;
   /* El rojo de marca no llega a AA en texto pequeño sobre el gris: el antetítulo va más oscuro. */
@@ -192,6 +190,18 @@
   position: relative;
   z-index: 1;
   max-width: 40rem;
+  /*
+   * Es el ancla `#maquinaria-usada` de la barra de secciones (`NavSecciones`): se llega con el
+   * título bajo la cabecera fija (que ya reserva `scroll-padding-top` de globals.css). Desde
+   * 1025 px el texto va al lado de la máquina y el margen deja ver también el arranque del panel.
+   */
+  scroll-margin-top: 24px;
+}
+
+@media (min-width: 1025px) {
+  .texto {
+    scroll-margin-top: 120px;
+  }
 }
 
 .antetitulo {

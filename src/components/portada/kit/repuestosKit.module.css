@@ -5,8 +5,11 @@
  */
 
 .seccion {
-  /* Al llegar por la barra de secciones (`NavSecciones`), bajo la cabecera fija. */
-  scroll-margin-top: 96px;
+  /*
+   * Al llegar por la barra de secciones (`NavSecciones`): bajo la cabecera fija, que ya reserva
+   * `scroll-padding-top` (globals.css); esto es el aire de más.
+   */
+  scroll-margin-top: 24px;
   --kit-gris: #f1f0ee;
   --kit-rojo-texto: color-mix(in srgb, var(--color-marca) 78%, #000);
   padding: 0 12px 12px;

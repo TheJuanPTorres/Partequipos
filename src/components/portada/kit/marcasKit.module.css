@@ -172,8 +172,8 @@
   animation: kitBandaBucle var(--banda-duracion, 32s) linear infinite;
 }
 
-/* Con el foco en un logo que es enlace (LiuGong, «Marcas de repuestos»), también: si no, el
-   enlace enfocado se iría de la pantalla mientras se lee. */
+/* Con el foco en un logo que es enlace («Marcas de repuestos»), también: si no, el enlace
+   enfocado se iría de la pantalla mientras se lee. */
 .carrusel:hover .pista,
 .carrusel:focus-within .pista,
 .carrusel[data-pausado] .pista {
@@ -228,35 +228,6 @@
     height: max(4rem, 5.2cqw);
     padding: 0 max(1.5rem, 2cqw);
   }
-}
-
-/*
- * El logo de una marca SIN página propia (LiuGong, 2026-11-03) es un enlace a su distribuidor: la
- * misma caja, con el icono de enlace externo discreto en la esquina y el foco visible. La banda se
- * para con el ratón encima, así que se puede pulsar.
- */
-.cajaEnlace {
-  position: relative;
-  color: #595959;
-  text-decoration: none;
-}
-
-.cajaEnlace:hover {
-  color: var(--color-texto);
-}
-
-.cajaEnlace:focus-visible {
-  outline: 2px solid var(--color-texto);
-  outline-offset: -2px;
-  border-radius: 8px;
-}
-
-.cajaEnlaceIcono {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  width: 14px;
-  height: 14px;
 }
 
 .logo {

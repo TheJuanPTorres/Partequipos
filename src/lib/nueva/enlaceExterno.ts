@@ -3,9 +3,10 @@ import type { Where } from "payload";
 /**
  * MARCA DE MAQUINARIA NUEVA SIN PÁGINA PROPIA (2026-11-03, dirección: LiuGong → su distribuidor
  * oficial, maquitecno.co). El campo «Enlace externo» de `marcas-maquinaria`: si está relleno, la
- * marca NO tiene página en este sitio y todos sus enlaces (megamenú, índice de marcas y banda de
- * logos de la portada) van a esa dirección, en pestaña nueva. Su URL de aquí da 404 y no sale en
- * el sitemap; tampoco va como tarjeta de «Maquinaria pesada nueva» en la portada.
+ * marca NO tiene página en este sitio y sus enlaces (megamenú e índice de marcas) van a esa
+ * dirección, en pestaña nueva. En la banda de logos de la portada su logo NO es enlace, como los
+ * demás (dirección, 2026-11-03). Su URL de aquí da 404 y no sale en el sitemap; tampoco va como
+ * tarjeta de «Maquinaria pesada nueva» en la portada.
  *
  * Solo https y a OTRO sitio: una dirección de este sitio se pone como redirección, no aquí.
  */

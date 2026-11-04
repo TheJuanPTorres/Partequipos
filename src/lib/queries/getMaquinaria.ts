@@ -798,26 +798,6 @@ export const getMarcasDePortada = cache(async (): Promise<MarcasMaquinaria[]> =>
 });
 
 /**
- * Las marcas de nueva visibles SIN página propia («Enlace externo», LiuGong, 2026-11-03), solo su
- * nombre y su enlace: su logo en la banda de la portada lleva a su distribuidor.
- */
-export const getMarcasConEnlaceExterno = cache(
-  async (): Promise<{ nombre: string; enlaceExterno: string }[]> => {
-    const payload = await getPayload({ config });
-    const { docs } = await payload.find({
-      collection: "marcas-maquinaria",
-      where: { and: [{ enlaceExterno: { exists: true } }, MARCA_VISIBLE] },
-      depth: 0,
-      limit: 0,
-      select: { nombre: true, enlaceExterno: true },
-    });
-    return docs.flatMap((m) =>
-      m.enlaceExterno ? [{ nombre: m.nombre, enlaceExterno: m.enlaceExterno }] : [],
-    );
-  },
-);
-
-/**
  * LAS UNIDADES DEL FILTRO DE LA PORTADA (diseño del cliente, 2026-10-26): las disponibles y
  * visibles de Excavadoras, de «Otros» (las categorías con «Agrupar en «Otros»», como el menú y su
  * página) y de Aditamentos (su categoría o las marcadas con la pestaña «Aditamentos»), las más

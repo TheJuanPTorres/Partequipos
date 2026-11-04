@@ -2,14 +2,12 @@ import type { CategoriasTecnica, CategoriasUsada, EquiposUsado, Pagina } from "@
 
 import { SLUG_CATEGORIA_USADA_ADITAMENTOS } from "../aditamentos/wordpress";
 import {
-  claveDeMarca,
   conAlt,
   logoDeMarca,
   type IndiceLogos,
   type LogoConAlt,
   type LogoMarca,
 } from "../marca/logoMarca";
-import { normalizarEnlaceExterno } from "../nueva/enlaceExterno";
 import { rutas, SEGMENTO_OTROS_USADA } from "../routes";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 import {
@@ -182,8 +180,6 @@ export type LogoDePortada = {
   logo: LogoConAlt;
   /** A dónde lleva el logo (la página de la marca de repuestos); sin él, no es un enlace. */
   href?: string;
-  /** La marca no tiene página propia y su logo lleva a otro sitio, en otra pestaña (LiuGong, 2026-11-03). */
-  enlace?: string;
 };
 
 /** Una marca de repuestos tal como la lee la consulta ligera de la portada. */
@@ -213,26 +209,15 @@ export function logosDeMarcasRepuestos(marcas: MarcaDeRepuestos[]): LogoDePortad
  * (`logoMarca.ts`): si el nombre es el de una marca de repuestos, su logo, el de todo el sitio; si
  * no, el elegido en la lista. Uno sin logo ni nombre no sale. (Del 2026-10-26 por la mañana mandaba
  * el de la lista, para los logos del kit del cliente; Juan Pablo se queda con los de antes.)
- *
- * Los logos de la banda no son enlaces, salvo el de una marca de nueva SIN página propia (su
- * «Enlace externo», por el mismo nombre: LiuGong, 2026-11-03), que lleva a su distribuidor.
  */
 export function logosDeLaBanda(
   seccion: Pagina["seccionLogos"],
   indice: IndiceLogos = new Map(),
-  externas: ReadonlyArray<{ nombre: string; enlaceExterno: string }> = [],
 ): LogoDePortada[] {
-  const enlaces = new Map(
-    externas.flatMap((m) => {
-      const url = normalizarEnlaceExterno(m.enlaceExterno);
-      return url ? [[claveDeMarca(m.nombre), url] as const] : [];
-    }),
-  );
   return (seccion?.logos ?? []).flatMap((l, i) => {
     const nombre = l.nombre?.trim();
     if (!nombre) return [];
     const logo = conAlt(logoDeMarca({ nombre, logo: l.logo }, indice), nombre);
-    const enlace = enlaces.get(claveDeMarca(nombre));
-    return logo ? [{ id: l.id ?? String(i), nombre, logo, ...(enlace ? { enlace } : {}) }] : [];
+    return logo ? [{ id: l.id ?? String(i), nombre, logo }] : [];
   });
 }

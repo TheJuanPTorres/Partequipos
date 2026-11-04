@@ -80,7 +80,7 @@ export const MarcaMaquinaria: CollectionConfig = {
         position: "sidebar",
         placeholder: "https://…",
         description:
-          "Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, todos sus enlaces (menú, índice de marcas y banda de logos de la portada) llevan a esta dirección en otra pestaña, su página de aquí deja de existir, no sale en el sitemap ni como tarjeta de la portada. Vacío, la marca tiene su página como siempre.",
+          "Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap ni como tarjeta de la portada. Vacío, la marca tiene su página como siempre.",
       },
     },
     // Nivel superior de su rama: unicidad global del slug.

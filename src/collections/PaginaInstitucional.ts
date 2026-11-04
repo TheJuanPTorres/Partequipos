@@ -449,6 +449,58 @@ export const PaginaInstitucional: CollectionConfig = {
       ],
     },
     /*
+     * BARRA DE SECCIONES (diseño del cliente, 2026-11-03; `NavSecciones`): el panel blanco sobre
+     * el borde de abajo del hero, con un enlace a cada sección principal de la portada. Vacía,
+     * los tres botones de siempre (`botonesNav`). El destino es una lista cerrada con las anclas
+     * que existen en la portada, para que ningún botón lleve a un ancla rota.
+     */
+    {
+      name: "barraSecciones",
+      type: "group",
+      label: "Barra de secciones (bajo el hero)",
+      admin: {
+        condition: (data) => data?.slug === "inicio",
+        description:
+          "Los botones del panel blanco que monta sobre el borde de abajo del hero. Sin ninguno, salen los tres de siempre: «Maquinaria pesada nueva», «Maquinaria pesada usada» y «Repuestos para maquinaria pesada».",
+      },
+      fields: [
+        {
+          name: "botones",
+          type: "array",
+          label: "Botones",
+          labels: { singular: "Botón", plural: "Botones" },
+          maxRows: 3,
+          admin: { initCollapsed: true },
+          fields: [
+            {
+              name: "texto",
+              type: "text",
+              label: "Texto",
+              required: true,
+              admin: { width: "50%" },
+            },
+            {
+              name: "ancla",
+              type: "select",
+              label: "Lleva a la sección",
+              required: true,
+              options: [
+                { label: "Maquinaria pesada nueva", value: "nueva" },
+                { label: "Maquinaria pesada usada", value: "maquinaria-usada" },
+                { label: "Venta de repuestos", value: "repuestos" },
+              ],
+              admin: { width: "50%" },
+            },
+            imagenKit(
+              "imagen",
+              "Máquina del botón (PNG o WebP transparente)",
+              "Decorativa: la máquina recortada encima del texto. Vacía, la máquina de la sección a la que lleva.",
+            ),
+          ],
+        },
+      ],
+    },
+    /*
      * SECCIÓN 2 DE LA PORTADA: textos. Las tarjetas salen de
      * `marcas-maquinaria` (las que tienen posición en la portada y foto).
      */

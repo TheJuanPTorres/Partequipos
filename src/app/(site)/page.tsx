@@ -15,7 +15,7 @@ import { SeccionSedes } from "@/components/portada/SeccionSedes";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { diapositivasDeHero } from "@/lib/portada/hero";
-import { botonesNavDeRespaldo } from "@/lib/portada/navSecciones";
+import { botonesNav } from "@/lib/portada/navSecciones";
 import {
   categoriasDePortada,
   filtrosDeUsados,
@@ -129,15 +129,22 @@ export default async function HomePage() {
           <HeroPortada diapositivas={diapositivas} conNav />
           {/*
            * BARRA DE SECCIONES del cliente (2026-11-03), montada sobre el borde de abajo del
-           * hero: un enlace a cada una de las tres secciones principales. Hasta que estén sus
-           * campos en el panel, los textos de siempre y la máquina de cada sección.
+           * hero: un enlace a cada una de las secciones principales. Los botones, del grupo
+           * «Barra de secciones» del panel; vacío, los de siempre con la máquina de cada sección.
            */}
           <NavSecciones
-            botones={botonesNavDeRespaldo([
-              imagenDecorativa(nueva?.maquina),
-              imagenDecorativa(usada?.imagen),
-              imagenDecorativa(repuestos?.maquina),
-            ])}
+            botones={botonesNav(
+              pagina.barraSecciones?.botones?.map((b) => ({
+                texto: b.texto,
+                ancla: b.ancla,
+                imagen: imagenDecorativa(b.imagen),
+              })),
+              [
+                imagenDecorativa(nueva?.maquina),
+                imagenDecorativa(usada?.imagen),
+                imagenDecorativa(repuestos?.maquina),
+              ],
+            )}
           />
         </>
       ) : null}

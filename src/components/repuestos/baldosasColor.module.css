@@ -1,7 +1,8 @@
 /*
  * «REPUESTOS POR MARCA» del cliente (2026-11-03, `BaldosasColorMarcas.tsx`): el diseño
  * `RepuestosMarcas.tsx` portado sin Tailwind, con sus medidas (sus `sm` y `lg` son 640 y
- * 1024 px). La cabecera roja y el recuadro blanco van sobre el gris de la página.
+ * 1024 px). El recuadro blanco va sobre el gris de la página; la cabecera es la oscura de
+ * siempre del índice (`marca.module.css`, Juan Pablo 2026-11-04: solo cambian las baldosas).
  */
 
 .seccion {
@@ -9,45 +10,6 @@
   padding: 24px 12px 12px;
   flex-direction: column;
   gap: 12px;
-}
-
-/* Cabecera roja, baja, con el `<h1>` centrado (blanco sobre #a20f14: 7,9:1). */
-.cabecera {
-  display: flex;
-  min-height: 35vh;
-  box-sizing: border-box;
-  padding: 48px 24px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 28px;
-  background: #a20f14;
-  color: #fff;
-  text-align: center;
-}
-
-.h1 {
-  display: flex;
-  margin: 0;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  font: inherit;
-}
-
-.antetitulo {
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.25;
-  text-wrap: balance;
-}
-
-.titulo {
-  display: block;
-  font-size: clamp(40px, 10vw, 44px);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.2;
 }
 
 /* El recuadro blanco: más aire abajo, por los «Ver más» que sobresalen de la última fila. */
@@ -182,15 +144,6 @@
     gap: 16px;
   }
 
-  .cabecera {
-    padding: 48px;
-    border-radius: 30px;
-  }
-
-  .antetitulo {
-    font-size: 20px;
-  }
-
   .recuadro {
     padding: 40px 40px 56px;
     border-radius: 30px;
@@ -210,20 +163,10 @@
   }
 }
 
-@media (min-width: 768px) {
-  .titulo {
-    font-size: 40px;
-  }
-}
-
 @media (min-width: 1024px) {
   .seccion {
     padding: 24px 1.5vw 1.5vw;
     gap: 1.5vw;
-  }
-
-  .titulo {
-    font-size: 55px;
   }
 
   .recuadro {

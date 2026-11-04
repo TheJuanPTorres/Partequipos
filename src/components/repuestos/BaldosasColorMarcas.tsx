@@ -7,10 +7,11 @@ import { vistaBaldosa } from "@/lib/repuestos/baldosasColor";
 import type { PlacaMarca } from "@/lib/repuestos/categoria";
 
 import estilos from "./baldosasColor.module.css";
+import marca from "./marca.module.css";
 
 /**
  * «REPUESTOS POR MARCA» del cliente (2026-11-03, `RepuestosMarcas.tsx` portado sin Tailwind) en
- * el índice de marcas de repuestos: una cabecera roja con el `<h1>` centrado y, debajo, un
+ * el índice de marcas de repuestos: la cabecera oscura de siempre con el `<h1>` centrado y, debajo, un
  * recuadro blanco con una BALDOSA 3:2 por marca, del color de la marca y con su logo en blanco
  * al centro (`vistaBaldosa`; sin los dos datos del panel, el logo de siempre sobre gris).
  * «Ver más», rojo y con un anillo blanco, va montado sobre el borde de abajo: mitad dentro,
@@ -30,15 +31,19 @@ export function BaldosasColorMarcas({
   const idTitulo = `${id}-titulo`;
   return (
     <section id={id} className={estilos.seccion} aria-labelledby={idTitulo}>
-      <header className={estilos.cabecera}>
-        <h1 id={idTitulo} className={estilos.h1}>
-          <span className={estilos.antetitulo}>{h1.antetitulo}</span>{" "}
+      {/*
+       * La cabecera de siempre del índice (la de «Mostrar marcas», `marca.module.css`), no la roja
+       * del diseño del cliente: Juan Pablo (2026-11-04) quiere que solo cambien las baldosas.
+       */}
+      <header className={marca.mostrarMarcasCabecera}>
+        <h1 id={idTitulo} className={marca.mostrarMarcasH1}>
+          <span className={marca.mostrarMarcasAntetitulo}>{h1.antetitulo}</span>{" "}
           <Revelado
             como="span"
             alCargar
             ritmo="titulo"
             texto={h1.titulo}
-            className={estilos.titulo}
+            className={marca.mostrarMarcasTitulo}
           />
         </h1>
       </header>

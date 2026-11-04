@@ -717,3 +717,102 @@
     padding-inline: 16px;
   }
 }
+
+/*
+ * «MÁS» (2026-11-04, dirección; hasta 8 enlaces). La fila de enlaces ya no empuja a
+ * las acciones: encoge hasta 0 (`min-width: 0`) y lo que no cabe pasa a «Más»
+ * (`Cabecera.tsx`, `cuantosCaben`). Los enlaces no parten línea: un texto largo no
+ * cambia de ancho según el sitio, y así la medida es estable.
+ * - Centrada como antes (`margin-inline: auto`), pero si la fila no cabe se alinea
+ *   a la izquierda en vez de salirse por los dos lados.
+ * - Antes de medir (sin JavaScript o durante la carga), lo que sobra se RECORTA
+ *   dentro de la barra: nunca queda bajo la lupa ni «Contáctanos». Ya medida, sin
+ *   recorte (el contorno del foco se ve entero).
+ */
+.nav {
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+.nav .lista {
+  margin-inline: auto;
+}
+
+.nav:not([data-medido]) {
+  overflow: hidden;
+}
+
+.nav .enlace {
+  white-space: nowrap;
+}
+
+/* Gana a `.conBoton { display: flex }`. */
+.nav .lista > li[hidden] {
+  display: none;
+}
+
+.masItem {
+  display: flex;
+  align-items: center;
+}
+
+/* Sin enlaces de sobra no se ve ni ocupa sitio, pero se puede medir. */
+.masItem[data-oculto] {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* La lista de «Más»: en la capa superior (popover), bajo su botón. */
+.masLista {
+  position: fixed;
+  inset: auto;
+  min-width: 220px;
+  max-width: min(320px, calc(100vw - 16px));
+  margin: 0;
+  padding: 8px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--color-fondo);
+  box-shadow:
+    0 0 0 1px var(--color-fondo-seccion),
+    0 12px 32px rgb(16 15 15 / 14%);
+  color: var(--color-texto);
+  list-style: none;
+}
+
+.masEnlace {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: var(--color-texto);
+  font-size: var(--cab-enlace-tam);
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.masEnlace:hover,
+.masEnlace[aria-current="page"] {
+  color: var(--color-marca);
+}
+
+.masEnlace:hover {
+  background: var(--color-fondo-seccion);
+}
+
+.masEnlace svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--color-marca);
+}
+
+.masEnlace:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: -2px;
+}

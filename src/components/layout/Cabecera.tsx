@@ -15,6 +15,7 @@ import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -24,6 +25,7 @@ import {
   type MouseEvent,
 } from "react";
 
+import { cuantosCaben } from "@/lib/cabecera/desborde";
 import {
   dentroDelPasillo,
   ESPERA_PASILLO_MS,
@@ -70,6 +72,15 @@ import { GrupoHermanos, MarcoMegamenu, Megamenu, MejorasMenu, SubmenuMovil } fro
  *   (maquinaria y repuestos) son BOTONES que lo abren —con el ratón al pasar,
  *   con clic o con Intro/Espacio—; Escape lo cierra y devuelve el foco. El
  *   menú móvil no cambia: ahí siguen siendo enlaces.
+ * - «MÁS» (2026-11-04, dirección; hasta 8 enlaces): en escritorio se mide cuántos
+ *   enlaces caben entre el logo y las acciones (`cuantosCaben`), al cargar, al
+ *   cambiar el ancho y al llegar la fuente; los que sobran pasan, en su orden, a
+ *   un desplegable «Más» al final de la fila. Es un `popover` nativo: va en la
+ *   capa superior (el `clip-path` de la barra encogida no lo recorta), se cierra
+ *   con Escape o al pulsar fuera y devuelve el foco al botón. Una entrada con
+ *   megamenú va ahí como enlace a su página. Antes de medir (sin JavaScript), lo
+ *   que no cabe se recorta dentro de la barra: nunca se mete bajo la lupa. En el
+ *   móvil salen todos en la lista, en su orden.
  */
 
 type Enlace = { etiqueta: string; href: string };
@@ -210,6 +221,102 @@ export function Cabecera({
   const abiertaRef = useRef<string | null>(null);
   // El panel abierto con el teclado: su primer enlace recibe el foco en cuanto se ve.
   const enfocarAlAbrir = useRef<string | null>(null);
+  // «Más»: cuántos enlaces caben en la fila (null: sin medir, se pintan todos y la
+  // barra recorta) y si toca volver a medir (se pintan todos para medirlos).
+  const nav = useRef<HTMLElement>(null);
+  const masLista = useRef<HTMLUListElement>(null);
+  const masBoton = useRef<HTMLButtonElement>(null);
+  const [caben, setCaben] = useState<number | null>(null);
+  const [midiendo, setMidiendo] = useState(true);
+  const [masAbierto, setMasAbierto] = useState(false);
+  const total = enlaces.length;
+  const hayMas = !midiendo && caben !== null && caben < total;
+
+  // Se mide sin pintar (antes del fotograma): todos los enlaces en la fila y «Más» aparte.
+  useLayoutEffect(() => {
+    if (!midiendo) return;
+    const el = nav.current;
+    const lista = el?.querySelector("ul");
+    if (!el || !lista || el.clientWidth === 0) {
+      // La barra no se ve (móvil o buscador abierto): se mide cuando vuelva.
+      setMidiendo(false);
+      return;
+    }
+    const estiloNav = getComputedStyle(el);
+    const disponible =
+      el.clientWidth - parseFloat(estiloNav.paddingLeft) - parseFloat(estiloNav.paddingRight);
+    const conMargen = (li: Element) => {
+      const s = getComputedStyle(li);
+      return (
+        li.getBoundingClientRect().width + parseFloat(s.marginLeft) + parseFloat(s.marginRight)
+      );
+    };
+    const filas = [...lista.children];
+    const mas = filas.find((li) => li.hasAttribute("data-mas"));
+    const anchos = filas.filter((li) => li !== mas).map(conMargen);
+    const hueco = parseFloat(getComputedStyle(lista).columnGap) || 0;
+    setCaben(cuantosCaben(anchos, hueco, disponible, mas ? conMargen(mas) : 0));
+    setMidiendo(false);
+  }, [midiendo]);
+
+  // Otra medida al cambiar el ancho de la fila, al llegar la fuente, al cerrar el
+  // buscador y si cambian los enlaces.
+  const claveEnlaces = enlaces.map((e) => `${e.etiqueta}|${e.href}`).join("\n");
+  useEffect(() => {
+    const el = fila.current;
+    if (!el) return;
+    let ancho = el.offsetWidth;
+    const observador = new ResizeObserver(() => {
+      if (el.offsetWidth === ancho) return;
+      ancho = el.offsetWidth;
+      setMidiendo(true);
+    });
+    observador.observe(el);
+    let vivo = true;
+    void document.fonts?.ready.then(() => {
+      if (vivo) setMidiendo(true);
+    });
+    return () => {
+      vivo = false;
+      observador.disconnect();
+    };
+  }, []);
+
+  // (Durante el pintado, no en un efecto: así no hay un pintado de más.)
+  const claveMedida = `${claveEnlaces}\n${buscando}`;
+  const [medidaDe, setMedidaDe] = useState(claveMedida);
+  if (medidaDe !== claveMedida) {
+    setMedidaDe(claveMedida);
+    setMidiendo(true);
+  }
+
+  // Sin enlaces de sobra, «Más» no puede quedarse abierto.
+  useEffect(() => {
+    if (!hayMas && masLista.current?.matches(":popover-open")) masLista.current.hidePopover();
+  }, [hayMas]);
+
+  /** Coloca la lista de «Más» bajo su botón, alineada a su derecha. */
+  const colocarMas = useCallback(() => {
+    const b = masBoton.current?.getBoundingClientRect();
+    const l = masLista.current;
+    if (!b || !l) return;
+    l.style.top = `${Math.round(b.bottom + 8)}px`;
+    l.style.right = `${Math.max(8, Math.round(document.documentElement.clientWidth - b.right))}px`;
+  }, []);
+
+  useEffect(() => {
+    if (!masAbierto) return;
+    window.addEventListener("scroll", colocarMas, { passive: true });
+    window.addEventListener("resize", colocarMas);
+    return () => {
+      window.removeEventListener("scroll", colocarMas);
+      window.removeEventListener("resize", colocarMas);
+    };
+  }, [masAbierto, colocarMas]);
+
+  const cerrarMas = () => {
+    if (masLista.current?.matches(":popover-open")) masLista.current.hidePopover();
+  };
 
   useEffect(() => {
     const alDesplazar = () => setArriba(window.scrollY < UMBRAL_VELO);
@@ -288,6 +395,8 @@ export function Cabecera({
   /** Abre un panel y lo recuerda: se sigue viendo mientras el marco se cierra. */
   const mostrarMega = useCallback(
     (clave: string) => {
+      // Un panel y «Más» nunca a la vez.
+      if (masLista.current?.matches(":popover-open")) masLista.current.hidePopover();
       setMega({ clave, ruta });
       setUltimo(clave);
     },
@@ -461,21 +570,92 @@ export function Cabecera({
     </ul>
   );
 
-  // Escritorio: las entradas con panel son botones; el resto, enlaces.
+  // «Más»: los que no caben en la fila, en su orden (vacío mientras se mide o si caben todos).
+  const enMas = hayMas ? enlaces.slice(caben ?? total) : [];
+  const fuera = (i: number) => hayMas && i >= (caben ?? total);
+
+  const masDesplegable = (
+    <li
+      data-mas=""
+      className={estilos.masItem}
+      data-oculto={hayMas ? undefined : ""}
+      aria-hidden={hayMas ? undefined : true}
+    >
+      <button
+        ref={masBoton}
+        type="button"
+        className={`${estilos.enlace} ${estilos.disparador}`}
+        popoverTarget="cab-mas"
+        aria-expanded={masAbierto}
+        aria-controls="cab-mas"
+        data-actual={enMas.some((e) => !e.externo && actual(e.href)) ? "si" : undefined}
+        tabIndex={hayMas ? undefined : -1}
+      >
+        Más
+        <IconChevronDown aria-hidden="true" focusable="false" stroke={2} />
+      </button>
+      <ul
+        ref={masLista}
+        id="cab-mas"
+        popover="auto"
+        aria-label="Más enlaces"
+        className={estilos.masLista}
+        onBeforeToggle={(ev) => {
+          if (ev.newState !== "open") return;
+          window.clearTimeout(temporizador.current);
+          setMega(null);
+          colocarMas();
+        }}
+        onToggle={(ev) => setMasAbierto(ev.newState === "open")}
+      >
+        {enMas.map((e) =>
+          e.externo ? (
+            <li key={e.href}>
+              <a
+                href={e.href}
+                className={estilos.masEnlace}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${e.etiqueta} (se abre en otra pestaña)`}
+                onClick={cerrarMas}
+              >
+                <IconShoppingBag aria-hidden="true" focusable="false" stroke={1.75} />
+                {e.etiqueta}
+              </a>
+            </li>
+          ) : (
+            <li key={e.href}>
+              <Link
+                href={e.href}
+                className={estilos.masEnlace}
+                aria-current={actual(e.href)}
+                onClick={cerrarMas}
+              >
+                {e.etiqueta}
+              </Link>
+            </li>
+          ),
+        )}
+      </ul>
+    </li>
+  );
+
+  // Escritorio: las entradas con panel son botones; el resto, enlaces. Los que no
+  // caben se ocultan (`hidden`) y salen en «Más».
   const listaEscritorio = (
     <ul className={estilos.lista}>
-      {enlaces.map((e) => {
+      {enlaces.map((e, i) => {
         const clave = claveDeEnlace(e.href);
         if (e.externo) {
           return (
-            <li key={e.href} className={estilos.conBoton}>
+            <li key={e.href} className={estilos.conBoton} hidden={fuera(i)}>
               <BotonExterno enlace={e} />
             </li>
           );
         }
         if (!paneles[clave]) {
           return (
-            <li key={e.href}>
+            <li key={e.href} hidden={fuera(i)}>
               <Link href={e.href} className={estilos.enlace} aria-current={actual(e.href)}>
                 {e.etiqueta}
               </Link>
@@ -485,6 +665,7 @@ export function Cabecera({
         return (
           <li
             key={e.href}
+            hidden={fuera(i)}
             onMouseEnter={() => {
               encima.current = clave;
               abrirMega(clave);
@@ -511,6 +692,7 @@ export function Cabecera({
           </li>
         );
       })}
+      {masDesplegable}
     </ul>
   );
 
@@ -573,7 +755,12 @@ export function Cabecera({
           <div className={estilos.logoCol}>
             <Logo logo={logo} esPortada={esPortada} nombreSitio={nombreSitio} />
           </div>
-          <nav className={estilos.nav} aria-label="Navegación principal">
+          <nav
+            ref={nav}
+            className={estilos.nav}
+            aria-label="Navegación principal"
+            data-medido={caben === null || midiendo ? undefined : ""}
+          >
             {listaEscritorio}
           </nav>
           <div className={estilos.accionCol}>

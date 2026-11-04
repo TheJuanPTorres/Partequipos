@@ -1,5 +1,6 @@
 import type { GlobalConfig } from "payload";
 
+import { enlaceDeFilaObligatorio, MAX_ENLACES_CABECERA } from "../lib/cabecera/enlaces";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { revalidarTodoElSitio } from "../lib/revalidation";
 import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
@@ -34,10 +35,9 @@ export const Cabecera: GlobalConfig = {
       type: "array",
       label: "Enlaces del menú",
       labels: { singular: "Enlace", plural: "Enlaces" },
-      maxRows: 6,
+      maxRows: MAX_ENLACES_CABECERA,
       admin: {
-        description:
-          "En el orden de la barra (escritorio y móvil). Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro en su sitio de la barra y se abre en una pestaña nueva. Desmarca «Mostrar» para quitarlo sin borrarlo.",
+        description: `Hasta ${MAX_ENLACES_CABECERA}, en el orden de la barra (escritorio y móvil). Si en escritorio no caben todos, los últimos pasan a un desplegable «Más» al final de la barra; en el móvil salen todos en lista. Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro en su sitio de la barra y se abre en una pestaña nueva. Desmarca «Mostrar» para quitarlo sin borrarlo, o para crearlo antes de tener su enlace: oculto, no ocupa sitio.`,
       },
       fields: [
         {
@@ -57,14 +57,20 @@ export const Cabecera: GlobalConfig = {
               admin: { width: "40%" },
             },
             {
+              // Obligatorio solo si la fila se muestra (2026-11-04): por eso no es
+              // `required` (la columna admite NULL desde `…_cabecera_enlace_opcional`).
               name: "enlace",
               type: "text",
-              required: true,
               label: "Enlace",
-              validate: validarEnlace,
+              validate: (valor: unknown, { siblingData }: { siblingData?: unknown }) => {
+                const fila = (siblingData ?? {}) as { mostrar?: boolean | null };
+                const presente = enlaceDeFilaObligatorio(valor, fila.mostrar);
+                return presente === true ? validarEnlace(valor) : presente;
+              },
               admin: {
                 width: "60%",
-                description: "Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva).",
+                description:
+                  "Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva). Puede quedar vacío si la fila está oculta.",
               },
             },
           ],

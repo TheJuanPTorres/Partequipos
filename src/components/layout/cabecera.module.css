@@ -763,9 +763,14 @@
   pointer-events: none;
 }
 
-/* La lista de «Más»: en la capa superior (popover), bajo su botón. */
+/*
+ * La lista de «Más»: en la capa superior (popover), bajo su botón. Sin popover va
+ * en un portal a <body>: de ahí el z-index (en la capa superior no cuenta) y los
+ * valores de respaldo de las variables de la cabecera.
+ */
 .masLista {
   position: fixed;
+  z-index: 1000;
   inset: auto;
   min-width: 220px;
   max-width: min(320px, calc(100vw - 16px));
@@ -788,7 +793,7 @@
   padding: 12px 14px;
   border-radius: 10px;
   color: var(--color-texto);
-  font-size: var(--cab-enlace-tam);
+  font-size: var(--cab-enlace-tam, 16px);
   line-height: 1.2;
   text-decoration: none;
   transition:

@@ -12,6 +12,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSelectedLayoutSegment } from "next/navigation";
+import { createPortal } from "react-dom";
 import {
   useCallback,
   useEffect,
@@ -78,7 +79,10 @@ import { GrupoHermanos, MarcoMegamenu, Megamenu, MejorasMenu, SubmenuMovil } fro
  *   un desplegable «Más» al final de la fila. Es un `popover` nativo: va en la
  *   capa superior (el `clip-path` de la barra encogida no lo recorta), se cierra
  *   con Escape o al pulsar fuera y devuelve el foco al botón. Una entrada con
- *   megamenú va ahí como enlace a su página. Antes de medir (sin JavaScript), lo
+ *   megamenú va ahí como enlace a su página. Sin `popover` en el navegador
+ *   (Chrome < 114, Safari < 17, Firefox < 125), la lista se abre con un estado
+ *   propio y un portal a `<body>` (fuera del recorte), con Escape, clic fuera y
+ *   el foco de vuelta igual: esos enlaces nunca quedan inaccesibles. Antes de medir (sin JavaScript), lo
  *   que no cabe se recorta dentro de la barra: nunca se mete bajo la lupa. En el
  *   móvil salen todos en la lista, en su orden.
  */
@@ -135,6 +139,9 @@ const idPanel = (clave: string) => `mega-${clave.replace(/[^a-z0-9]+/gi, "")}`;
  * quitado el 2026-10-14.)
  */
 const UMBRAL_VELO = 60;
+
+/** El soporte de `popover` no cambia mientras la página está abierta (`sinSuscripcion`). */
+const navegadorSinPopover = () => !("popover" in HTMLElement.prototype);
 
 function Logo({
   logo,
@@ -229,8 +236,14 @@ export function Cabecera({
   const [caben, setCaben] = useState<number | null>(null);
   const [midiendo, setMidiendo] = useState(true);
   const [masAbierto, setMasAbierto] = useState(false);
+  // Sin `popover` nativo: «Más» se abre con `masAbierto` y un portal (en el servidor
+  // se supone que sí lo hay; el cliente corrige al hidratar).
+  const sinPopover = useSyncExternalStore(sinSuscripcion, navegadorSinPopover, () => false);
   const total = enlaces.length;
   const hayMas = !midiendo && caben !== null && caben < total;
+  const masVisible = masAbierto && hayMas;
+  // Si dejan de sobrar enlaces, «Más» se cierra (no se reabre solo al volver a sobrar).
+  if (masAbierto && !hayMas && !midiendo) setMasAbierto(false);
 
   // Se mide sin pintar (antes del fotograma): todos los enlaces en la fila y «Más» aparte.
   useLayoutEffect(() => {
@@ -305,17 +318,48 @@ export function Cabecera({
   }, []);
 
   useEffect(() => {
-    if (!masAbierto) return;
+    if (!masVisible) return;
     window.addEventListener("scroll", colocarMas, { passive: true });
     window.addEventListener("resize", colocarMas);
     return () => {
       window.removeEventListener("scroll", colocarMas);
       window.removeEventListener("resize", colocarMas);
     };
-  }, [masAbierto, colocarMas]);
+  }, [masVisible, colocarMas]);
+
+  // Sin popover: se coloca al abrir (antes de pintar) y se cierra con Escape (el
+  // foco vuelve al botón) o al pulsar fuera, como hace el navegador con el popover.
+  // El portal va al final de <body>: el foco salta a su primer enlace al abrir, si
+  // no el Tab no llegaría desde el botón.
+  useLayoutEffect(() => {
+    if (!sinPopover || !masVisible) return;
+    colocarMas();
+    masLista.current?.querySelector<HTMLElement>("a")?.focus();
+  }, [sinPopover, masVisible, colocarMas]);
+
+  useEffect(() => {
+    if (!sinPopover || !masVisible) return;
+    const tecla = (ev: globalThis.KeyboardEvent) => {
+      if (ev.key !== "Escape") return;
+      setMasAbierto(false);
+      masBoton.current?.focus();
+    };
+    const fuera = (ev: PointerEvent) => {
+      const t = ev.target as Node;
+      if (masLista.current?.contains(t) || masBoton.current?.contains(t)) return;
+      setMasAbierto(false);
+    };
+    document.addEventListener("keydown", tecla);
+    document.addEventListener("pointerdown", fuera);
+    return () => {
+      document.removeEventListener("keydown", tecla);
+      document.removeEventListener("pointerdown", fuera);
+    };
+  }, [sinPopover, masVisible]);
 
   const cerrarMas = () => {
-    if (masLista.current?.matches(":popover-open")) masLista.current.hidePopover();
+    if (sinPopover) setMasAbierto(false);
+    else if (masLista.current?.matches(":popover-open")) masLista.current.hidePopover();
   };
 
   useEffect(() => {
@@ -397,6 +441,7 @@ export function Cabecera({
     (clave: string) => {
       // Un panel y «Más» nunca a la vez.
       if (masLista.current?.matches(":popover-open")) masLista.current.hidePopover();
+      setMasAbierto(false);
       setMega({ clave, ruta });
       setUltimo(clave);
     },
@@ -574,6 +619,35 @@ export function Cabecera({
   const enMas = hayMas ? enlaces.slice(caben ?? total) : [];
   const fuera = (i: number) => hayMas && i >= (caben ?? total);
 
+  const filasMas = enMas.map((e) =>
+    e.externo ? (
+      <li key={e.href}>
+        <a
+          href={e.href}
+          className={estilos.masEnlace}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${e.etiqueta} (se abre en otra pestaña)`}
+          onClick={cerrarMas}
+        >
+          <IconShoppingBag aria-hidden="true" focusable="false" stroke={1.75} />
+          {e.etiqueta}
+        </a>
+      </li>
+    ) : (
+      <li key={e.href}>
+        <Link
+          href={e.href}
+          className={estilos.masEnlace}
+          aria-current={actual(e.href)}
+          onClick={cerrarMas}
+        >
+          {e.etiqueta}
+        </Link>
+      </li>
+    ),
+  );
+
   const masDesplegable = (
     <li
       data-mas=""
@@ -585,8 +659,19 @@ export function Cabecera({
         ref={masBoton}
         type="button"
         className={`${estilos.enlace} ${estilos.disparador}`}
-        popoverTarget="cab-mas"
-        aria-expanded={masAbierto}
+        popoverTarget={sinPopover ? undefined : "cab-mas"}
+        onClick={
+          sinPopover
+            ? () => {
+                if (!masAbierto) {
+                  window.clearTimeout(temporizador.current);
+                  setMega(null);
+                }
+                setMasAbierto(!masAbierto);
+              }
+            : undefined
+        }
+        aria-expanded={masVisible}
         aria-controls="cab-mas"
         data-actual={enMas.some((e) => !e.externo && actual(e.href)) ? "si" : undefined}
         tabIndex={hayMas ? undefined : -1}
@@ -594,49 +679,33 @@ export function Cabecera({
         Más
         <IconChevronDown aria-hidden="true" focusable="false" stroke={2} />
       </button>
-      <ul
-        ref={masLista}
-        id="cab-mas"
-        popover="auto"
-        aria-label="Más enlaces"
-        className={estilos.masLista}
-        onBeforeToggle={(ev) => {
-          if (ev.newState !== "open") return;
-          window.clearTimeout(temporizador.current);
-          setMega(null);
-          colocarMas();
-        }}
-        onToggle={(ev) => setMasAbierto(ev.newState === "open")}
-      >
-        {enMas.map((e) =>
-          e.externo ? (
-            <li key={e.href}>
-              <a
-                href={e.href}
-                className={estilos.masEnlace}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${e.etiqueta} (se abre en otra pestaña)`}
-                onClick={cerrarMas}
-              >
-                <IconShoppingBag aria-hidden="true" focusable="false" stroke={1.75} />
-                {e.etiqueta}
-              </a>
-            </li>
-          ) : (
-            <li key={e.href}>
-              <Link
-                href={e.href}
-                className={estilos.masEnlace}
-                aria-current={actual(e.href)}
-                onClick={cerrarMas}
-              >
-                {e.etiqueta}
-              </Link>
-            </li>
-          ),
-        )}
-      </ul>
+      {sinPopover ? (
+        // Sin popover: lista propia en `<body>`, fuera del `clip-path` de la barra.
+        masVisible &&
+        createPortal(
+          <ul ref={masLista} id="cab-mas" aria-label="Más enlaces" className={estilos.masLista}>
+            {filasMas}
+          </ul>,
+          document.body,
+        )
+      ) : (
+        <ul
+          ref={masLista}
+          id="cab-mas"
+          popover="auto"
+          aria-label="Más enlaces"
+          className={estilos.masLista}
+          onBeforeToggle={(ev) => {
+            if (ev.newState !== "open") return;
+            window.clearTimeout(temporizador.current);
+            setMega(null);
+            colocarMas();
+          }}
+          onToggle={(ev) => setMasAbierto(ev.newState === "open")}
+        >
+          {filasMas}
+        </ul>
+      )}
     </li>
   );
 

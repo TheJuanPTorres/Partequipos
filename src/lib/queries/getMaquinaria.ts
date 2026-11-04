@@ -310,8 +310,9 @@ const marcasUsadaEnCache = unstable_cache(
       limit: 0,
       sort: "nombre",
       populate: {
-        // `mostrarEnWeb`: una marca de nueva oculta no se enlaza (`marcaVisible`).
-        "marcas-maquinaria": { slug: true, nombre: true, mostrarEnWeb: true },
+        // `mostrarEnWeb`: una marca de nueva oculta no se enlaza (`marcaVisible`); con
+        // `enlaceExterno`, tampoco: no tiene página (`tienePaginaPropia`).
+        "marcas-maquinaria": { slug: true, nombre: true, mostrarEnWeb: true, enlaceExterno: true },
         marcas: { slug: true, nombre: true },
         // `filename` hace falta: sin él, la URL del logo sale null (Payload la calcula con él).
         media: { url: true, filename: true, alt: true, width: true, height: true },

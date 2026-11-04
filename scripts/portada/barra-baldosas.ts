@@ -96,15 +96,20 @@ const LOGOS = path.join(
   "repuestos",
   "marcas",
 );
-/** [slug del kit, nombre, fichero del logo, color]: los de `RepuestosMarcas.tsx`, tal cual. */
+/**
+ * [slug del kit, nombre, fichero del logo, color]: los de `RepuestosMarcas.tsx`, tal cual,
+ * salvo dos (dirección, 2026-11-04): Hitachi (`#f37021`, 2,94:1) y Kobelco (`#17b0bc`,
+ * 2,63:1) se oscurecen lo justo, con el mismo tono y saturación, para que el logo blanco
+ * llegue a 3:1 (3,01 y 3,02).
+ */
 const MARCAS: [string, string, string, string][] = [
   ["bobcat", "Bobcat", "bobcat-blanco", "#ff3600"],
   ["case-construction", "Case Construction", "case", "#f3e7cc"],
   ["caterpillar", "Caterpillar", "caterpillar", "#ffcd11"],
   ["doosan", "Doosan", "doosan-blanco", "#005eb7"],
-  ["hitachi", "Hitachi LANDCROS", "hitachi-landcros-blanco", "#f37021"],
+  ["hitachi", "Hitachi LANDCROS", "hitachi-landcros-blanco", "#f36c1b"],
   ["hyundai", "Hyundai", "hyundai-blanco", "#2c4b97"],
-  ["kobelco", "Kobelco", "kobelco-blanco", "#17b0bc"],
+  ["kobelco", "Kobelco", "kobelco-blanco", "#15a4af"],
   ["komatsu", "Komatsu", "komatsu-blanco", "#000099"],
   ["link-belt", "Link-Belt", "link-belt-blanco", "#e51b24"],
   ["liugong", "LiuGong", "liugong-blanco", "#002568"],

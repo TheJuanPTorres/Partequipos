@@ -21,6 +21,19 @@ export function urlGoogleMaps(direccion: string, ciudad: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(consulta)}`;
 }
 
+export type TipoDeSede = "principal" | "secundaria";
+
+/** «Sede principal» / «Sede secundaria»: lo que dice la lista y el nombre accesible del pin. */
+export const ETIQUETA_TIPO: Record<TipoDeSede, string> = {
+  principal: "Sede principal",
+  secundaria: "Sede secundaria",
+};
+
+/** Sin valor (una sede anterior al campo) o con uno desconocido: secundaria, el valor por defecto. */
+export function tipoDeSede(valor: string | null | undefined): TipoDeSede {
+  return valor === "principal" ? "principal" : "secundaria";
+}
+
 export type SedeLista = {
   id: number;
   /** «Sede Bogotá». */
@@ -33,6 +46,7 @@ export type SedeLista = {
   lng: number;
   foto: ImagenLista | null;
   lineas: LineaSede[];
+  tipo: TipoDeSede;
 };
 
 /** Las sedes de la portada, en su orden. Sin nombre, ciudad o coordenadas válidas, no salen. */
@@ -71,6 +85,7 @@ export function sedesDePortada(sedes: Sede[]): SedeLista[] {
         lng,
         foto,
         lineas,
+        tipo: tipoDeSede(s.tipo),
       },
     ];
   });

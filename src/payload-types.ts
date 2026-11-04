@@ -2355,7 +2355,7 @@ export interface Sede {
   latitud: number;
   longitud: number;
   /**
-   * Cada línea con su dirección. Ej. Maquinaria · Diagonal 16 # 96 G – 85.
+   * Cada línea con su dirección. Ej. Maquinaria · Diagonal 16 # 96 G – 85. Puede quedar vacía mientras se consiguen los datos de la sede: entonces solo sale su nombre y su punto en el mapa.
    */
   lineas?:
     | {
@@ -2373,6 +2373,10 @@ export interface Sede {
       }[]
     | null;
   foto?: (number | null) | Media;
+  /**
+   * En el mapa, la principal lleva un punto más grande con doble círculo y la secundaria uno más pequeño con un solo círculo. La lista dice de cuál se trata.
+   */
+  tipo?: ('principal' | 'secundaria') | null;
   /**
    * Menor primero.
    */
@@ -3541,6 +3545,7 @@ export interface SedesSelect<T extends boolean = true> {
         id?: T;
       };
   foto?: T;
+  tipo?: T;
   orden?: T;
   actualizadoPor?: T;
   updatedAt?: T;

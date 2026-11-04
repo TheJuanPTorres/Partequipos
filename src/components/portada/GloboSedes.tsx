@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { pinesAmontonados } from "@/lib/portada/pinesSedes";
+import { ETIQUETA_TIPO, type TipoDeSede } from "@/lib/portada/sedes";
 
 import estilos from "./sedes.module.css";
 
@@ -57,7 +58,13 @@ const CFG = {
   colores: { mar: "#FFFFFF", tierra: "#F4F4F4", fronteras: "#000000", iso: "CO" },
 };
 
-export type PuntoSede = { lat: number; lng: number; ciudad: string; titulo: string };
+export type PuntoSede = {
+  lat: number;
+  lng: number;
+  ciudad: string;
+  titulo: string;
+  tipo: TipoDeSede;
+};
 
 /* Lo poco de Mapbox GL que se usa, tipado a mano (no hay dependencia). */
 type Padding = { top: number; bottom: number; left: number; right: number };
@@ -301,7 +308,11 @@ export function GloboSedes({ token, sedes, children }: Props) {
                 const pin = document.createElement("button");
                 pin.type = "button";
                 pin.className = "sedes-pin";
-                pin.setAttribute("aria-label", `Ver ${s.titulo} en el mapa`);
+                pin.setAttribute(
+                  "aria-label",
+                  `Ver ${s.titulo} en el mapa (${ETIQUETA_TIPO[s.tipo].toLowerCase()})`,
+                );
+                pin.setAttribute("data-tipo", s.tipo);
                 const punto = document.createElement("span");
                 punto.className = "sedes-pin__punto";
                 const etiqueta = document.createElement("span");
@@ -376,6 +387,16 @@ export function GloboSedes({ token, sedes, children }: Props) {
         role="region"
         aria-label="Mapa de las sedes de Partequipos"
       />
+
+      {/* Qué significa cada marcador. Texto visible: el tipo no depende solo del tamaño. */}
+      <ul className={estilos.leyenda} aria-label="Leyenda del mapa">
+        {(["principal", "secundaria"] as const).map((t) => (
+          <li key={t} className={estilos.leyendaItem}>
+            <span className={estilos.leyendaPunto} data-tipo={t} aria-hidden="true" />
+            {ETIQUETA_TIPO[t]}
+          </li>
+        ))}
+      </ul>
 
       <div ref={panel} className={estilos.panel} inert={plegado || undefined}>
         <ul

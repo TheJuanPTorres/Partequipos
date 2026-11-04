@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { urlGoogleMaps, type SedeLista } from "@/lib/portada/sedes";
+import { ETIQUETA_TIPO, urlGoogleMaps, type SedeLista } from "@/lib/portada/sedes";
 
 import { GloboSedes } from "./diferidos";
 import estilos from "./sedes.module.css";
@@ -39,7 +39,9 @@ function Ficha({ sede, i }: { sede: SedeLista; i: number }) {
         </div>
       ) : null}
       <div className={estilos.cabecera}>
-        <p className={estilos.etiqueta}>{sede.etiqueta}</p>
+        <p className={estilos.etiqueta}>
+          {sede.etiqueta} · {ETIQUETA_TIPO[sede.tipo]}
+        </p>
         <h3 id={idTitulo} className={estilos.nombre}>
           {sede.titulo}
         </h3>
@@ -100,7 +102,13 @@ export function SeccionSedes({
       {token ? (
         <GloboSedes
           token={token}
-          sedes={sedes.map(({ lat, lng, ciudad, titulo }) => ({ lat, lng, ciudad, titulo }))}
+          sedes={sedes.map(({ lat, lng, ciudad, titulo, tipo }) => ({
+            lat,
+            lng,
+            ciudad,
+            titulo,
+            tipo,
+          }))}
         >
           {fichas}
         </GloboSedes>

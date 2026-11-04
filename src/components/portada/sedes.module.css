@@ -432,8 +432,8 @@
 
 .leyenda {
   position: absolute;
-  /* Por encima del logo de Mapbox (abajo a la izquierda), que tiene que verse entero. */
-  bottom: 48px;
+  /* Arriba a la izquierda: abajo taparía el logo de Mapbox (que tiene que verse entero) o un pin. */
+  top: 1.5em;
   left: 1.5em;
   z-index: 2;
   display: flex;

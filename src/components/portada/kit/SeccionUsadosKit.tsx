@@ -182,7 +182,7 @@ export function SeccionUsadosKit({
   // El carrusel es siempre el de las excavadoras (la primera categoría de `filtrosDeUsados`).
   const excavadoras = filtros[0];
   return (
-    <section id="maquinaria-usada" className={estilos.seccion} aria-labelledby={idTitulo}>
+    <section className={estilos.seccion} aria-labelledby={idTitulo}>
       <div className={estilos.panel}>
         <div className={estilos.cabecera}>
           <Fondo />
@@ -214,7 +214,9 @@ export function SeccionUsadosKit({
                 </div>
               </div>
             ) : null}
-            <div className={estilos.texto}>
+            {/* El ancla va en el bloque del título y no en la sección: por debajo de 1025 px la máquina
+                va encima y, llegando a la sección, el título quedaba fuera de la ventana (#417). */}
+            <div id="maquinaria-usada" className={estilos.texto}>
               {textos.antetitulo ? <p className={estilos.antetitulo}>{textos.antetitulo}</p> : null}
               <h2 id={idTitulo} className={estilos.titulo}>
                 {textos.titulo || "Maquinaria pesada usada"}

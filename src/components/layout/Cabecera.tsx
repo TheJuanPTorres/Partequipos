@@ -2,11 +2,11 @@
 
 import {
   IconChevronDown,
-  IconExternalLink,
   IconHeadset,
   IconMail,
   IconMenu2,
   IconSearch,
+  IconShoppingBag,
   IconX,
 } from "@tabler/icons-react";
 import Image from "next/image";
@@ -75,7 +75,7 @@ import { GrupoHermanos, MarcoMegamenu, Megamenu, MejorasMenu, SubmenuMovil } fro
 type Enlace = { etiqueta: string; href: string };
 
 type Props = {
-  /** `externo`: otro sitio (la tienda), en pestaña nueva con su icono (`enlacesDeCabecera`). */
+  /** `externo`: otro sitio (la tienda): botón oscuro en su sitio de la fila (`enlacesDeCabecera`). */
   enlaces: readonly (Enlace & { externo?: boolean })[];
   /** Botón de la cabecera (global `cabecera`). Sin él, no se pinta. */
   contacto: Enlace | null;
@@ -90,21 +90,24 @@ type Props = {
 };
 
 /**
- * Enlace de la barra a otro sitio (la tienda del cliente, 2026-10-27): pestaña
- * nueva, `noopener`, icono de enlace externo y el aviso en el nombre accesible.
- * Mismo estilo que el resto de enlaces, en escritorio y en móvil.
+ * Enlace de la cabecera a otro sitio (la tienda del cliente, #406). Desde el
+ * 2026-11-03 (dirección y Juan Pablo) es un BOTÓN con la forma y el tamaño de
+ * «Contáctanos», pero oscuro (la tinta del sitio), con la bolsa en rojo y el texto
+ * claro, en SU SITIO de la fila de enlaces (el orden del panel: hoy, tras «Blog»),
+ * también en el menú del móvil. Todos los externos de la lista van así. Pestaña
+ * nueva, `noopener` y el aviso en el nombre accesible.
  */
-function EnlaceExterno({ enlace }: { enlace: Enlace }) {
+function BotonExterno({ enlace }: { enlace: Enlace }) {
   return (
     <a
       href={enlace.href}
-      className={`${estilos.enlace} ${estilos.externo}`}
+      className={`${estilos.boton} ${estilos.botonExterno} texto-etiqueta`}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${enlace.etiqueta} (se abre en otra pestaña)`}
     >
+      <IconShoppingBag aria-hidden="true" focusable="false" stroke={1.75} />
       {enlace.etiqueta}
-      <IconExternalLink aria-hidden="true" focusable="false" stroke={1.75} />
     </a>
   );
 }
@@ -424,6 +427,9 @@ export function Cabecera({
     }
   };
 
+  // Los externos (la tienda) son botones en su sitio de la fila; sin megamenú.
+  const internos = enlaces.filter((e) => !e.externo);
+
   const actual = (href: string) => (ruta === href || ruta.startsWith(href) ? "page" : undefined);
 
   // Móvil: las entradas con panel despliegan su contenido (el mismo del megamenú, 2026-10-20).
@@ -434,7 +440,7 @@ export function Cabecera({
         return (
           <li key={e.href}>
             {e.externo ? (
-              <EnlaceExterno enlace={e} />
+              <BotonExterno enlace={e} />
             ) : datos ? (
               <SubmenuMovil
                 etiqueta={e.etiqueta}
@@ -462,8 +468,8 @@ export function Cabecera({
         const clave = claveDeEnlace(e.href);
         if (e.externo) {
           return (
-            <li key={e.href}>
-              <EnlaceExterno enlace={e} />
+            <li key={e.href} className={estilos.conBoton}>
+              <BotonExterno enlace={e} />
             </li>
           );
         }
@@ -529,7 +535,7 @@ export function Cabecera({
     </form>
   );
 
-  const conPanel = enlaces.filter((e) => paneles[claveDeEnlace(e.href)]);
+  const conPanel = internos.filter((e) => paneles[claveDeEnlace(e.href)]);
   const visible = megaAbierto ?? ultimo;
 
   return (

@@ -15,7 +15,14 @@
  */
 
 /** Lo que `next/image` necesita y si va en tinta oscura. */
-export type LogoMarca = { url: string; width: number; height: number; oscuro: boolean };
+export type LogoMarca = {
+  url: string;
+  width: number;
+  height: number;
+  oscuro: boolean;
+  /** Se pinta en una sola tinta BLANCA (baldosas de color de maquinaria nueva). */
+  blanco?: boolean;
+};
 
 type MediaLogo = { url?: string | null; width?: number | null; height?: number | null };
 

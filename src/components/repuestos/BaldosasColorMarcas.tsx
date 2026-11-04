@@ -1,8 +1,10 @@
+import { IconExternalLink } from "@tabler/icons-react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import { Revelado } from "@/components/movimiento/Revelado";
+import { AVISO_OTRA_PESTANA } from "@/lib/nueva/enlaceExterno";
 import { vistaBaldosa } from "@/lib/repuestos/baldosasColor";
 import type { PlacaMarca } from "@/lib/repuestos/categoria";
 
@@ -17,15 +19,21 @@ import estilos from "./baldosasColor.module.css";
  * mitad fuera. Al pasar el ratón o con el foco, el logo se recoge y el botón pasa a tinta.
  * 4 por fila en escritorio y 2 en tablet y móvil, con la última fila centrada (solo CSS).
  * Orden y enlaces, los de siempre.
+ *
+ * También el índice de marcas de maquinaria nueva (2026-11-04, `sobre="maquinaria"`): una marca
+ * sin página propia (`externo`, LiuGong) lleva a su distribuidor en pestaña nueva, con su icono.
  */
 export function BaldosasColorMarcas({
   id,
   marcas,
   h1,
+  sobre = "repuestos",
 }: {
   id: string;
   marcas: PlacaMarca[];
   h1: { antetitulo: string; titulo: string };
+  /** Qué se ve en cada marca, para el nombre accesible de «Ver más». */
+  sobre?: string;
 }) {
   const idTitulo = `${id}-titulo`;
   return (
@@ -48,29 +56,55 @@ export function BaldosasColorMarcas({
           <ul className={estilos.rejilla}>
             {marcas.map((m) => {
               const v = vistaBaldosa(m);
+              const propiedades = {
+                className: estilos.baldosa,
+                "data-tipo": v.tipo,
+                style: { "--baldosa-fondo": v.fondo } as CSSProperties,
+              };
+              const contenido = (
+                <>
+                  {v.logo ? (
+                    <LogoMarca
+                      logo={v.logo}
+                      alt=""
+                      sizes="(max-width: 1023px) 30vw, 180px"
+                      className={`${estilos.logo} ${v.alto ? estilos.logoAlto : ""}`}
+                    />
+                  ) : (
+                    <span className={estilos.nombre}>{m.nombre}</span>
+                  )}
+                  <span aria-hidden="true" className={estilos.verMas}>
+                    Ver más
+                  </span>
+                </>
+              );
               return (
                 <li key={m.id} className={estilos.caja}>
-                  <Link
-                    href={m.href}
-                    aria-label={`Ver más repuestos ${m.nombre}`}
-                    className={estilos.baldosa}
-                    data-tipo={v.tipo}
-                    style={{ "--baldosa-fondo": v.fondo } as CSSProperties}
-                  >
-                    {v.logo ? (
-                      <LogoMarca
-                        logo={v.logo}
-                        alt=""
-                        sizes="(max-width: 1023px) 30vw, 180px"
-                        className={`${estilos.logo} ${v.alto ? estilos.logoAlto : ""}`}
+                  {m.externo ? (
+                    <a
+                      href={m.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${m.nombre} (${AVISO_OTRA_PESTANA})`}
+                      {...propiedades}
+                    >
+                      {contenido}
+                      <IconExternalLink
+                        aria-hidden="true"
+                        focusable="false"
+                        stroke={1.75}
+                        className={estilos.externo}
                       />
-                    ) : (
-                      <span className={estilos.nombre}>{m.nombre}</span>
-                    )}
-                    <span aria-hidden="true" className={estilos.verMas}>
-                      Ver más
-                    </span>
-                  </Link>
+                    </a>
+                  ) : (
+                    <Link
+                      href={m.href}
+                      aria-label={`Ver más ${sobre} ${m.nombre}`}
+                      {...propiedades}
+                    >
+                      {contenido}
+                    </Link>
+                  )}
                 </li>
               );
             })}

@@ -3,7 +3,8 @@ import { describe, it } from "node:test";
 
 import type { MarcasMaquinaria } from "@/payload-types";
 
-import { placasDeMarcasNueva } from "./indiceMarcas";
+import { vistaBaldosa } from "../repuestos/baldosasColor";
+import { colorDeBaldosaNueva, logoEnBlanco, placasDeMarcasNueva } from "./indiceMarcas";
 
 const marca = (id: number, slug: string, extra: Partial<MarcasMaquinaria> = {}) =>
   ({ id, slug, nombre: slug[0]!.toUpperCase() + slug.slice(1), ...extra }) as MarcasMaquinaria;
@@ -45,5 +46,49 @@ describe("placasDeMarcasNueva", () => {
         ["Yanmar", "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/yanmar/", undefined],
       ],
     );
+  });
+});
+
+describe("baldosas de color de nueva", () => {
+  const logo = { url: "/l.png", width: 400, height: 100, oscuro: false };
+
+  it("el color solo si el logo blanco llega a 3:1", () => {
+    assert.equal(colorDeBaldosaNueva("#A20F14"), "#a20f14");
+    assert.equal(colorDeBaldosaNueva("#FFCD00"), null, "el amarillo no sostiene un logo blanco");
+    assert.equal(colorDeBaldosaNueva("rojo"), null);
+    assert.equal(colorDeBaldosaNueva("#fff"), null);
+    assert.equal(colorDeBaldosaNueva(null), null);
+  });
+
+  it("el logo de colores se pinta en blanco; el que ya es blanco, tal cual", () => {
+    assert.deepEqual(logoEnBlanco(logo), { ...logo, oscuro: false, blanco: true });
+    assert.deepEqual(logoEnBlanco({ ...logo, oscuro: true }), {
+      ...logo,
+      oscuro: false,
+      blanco: false,
+    });
+    assert.equal(logoEnBlanco(null), null);
+  });
+
+  it("con color y logo, baldosa de color; sin alguno, el respaldo gris", () => {
+    const logos = new Map([["yanmar", logo]]);
+    const [b, a] = placasDeMarcasNueva(
+      [marca(1, "yanmar", { colorMarca: "#ed1c24" }), marca(2, "case", { colorMarca: "#ed1c24" })],
+      [{ marca: 1 }, { marca: 2 }],
+      logos,
+    ).map(vistaBaldosa);
+    assert.equal(a!.tipo, "color");
+    assert.equal(a!.logo?.blanco, true);
+    assert.equal(b!.tipo, "respaldo", "sin logo, nombre sobre gris");
+  });
+
+  it("la marca externa conserva su enlace y su color", () => {
+    const [p] = placasDeMarcasNueva(
+      [marca(6, "liugong", { enlaceExterno: "https://maquitecno.co/", colorMarca: "#ed1c24" })],
+      [],
+      new Map(),
+    );
+    assert.equal(p!.externo, true);
+    assert.equal(p!.color, "#ed1c24");
   });
 });

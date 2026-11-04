@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { SelectorMarcas } from "@/components/lubricantes/SelectorMarcas";
 import { SeccionTestimonios } from "@/components/portada/diferidos";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
@@ -12,12 +13,14 @@ import { TarjetasGrupos } from "@/components/repuestos/TarjetasGrupos";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
+import { vistaSelector } from "@/lib/lubricantes/selector";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import {
   getCategoriaRepuestosPorSlug,
   getCategoriasRepuestos,
 } from "@/lib/queries/getCategoriasRepuestos";
+import { getMarcasLubricanteSelector } from "@/lib/queries/getLubricantes";
 import { getMarcas } from "@/lib/queries/getMarcas";
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
@@ -80,13 +83,17 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
   const categoria = await getCategoriaRepuestosPorSlug(slug);
   if (!categoria) notFound();
 
-  const [global, marcas, testimonios, empresa, sedes, todas] = await Promise.all([
+  const [global, marcas, testimonios, empresa, sedes, todas, selector] = await Promise.all([
     getRepuestosMarca(),
     getMarcas(),
     getTestimoniosDePortada(),
     getEmpresa(),
     getSedesDePortada(),
     getCategoriasRepuestos(),
+    // El selector de marcas de lubricantes (2026-11-04): solo si la categoría lo enciende.
+    categoria.selectorMarcas?.activo
+      ? getMarcasLubricanteSelector().then((m) => vistaSelector(categoria, m))
+      : Promise.resolve(null),
   ]);
   // Las páginas que cuelgan de esta categoría (Filtros Donaldson en Filtración, 2026-10-26),
   // con el banner de marca del #385: su color y, a la derecha, su «Fondo del encabezado» o, sin
@@ -132,16 +139,28 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
         reservarTitulo
       />
 
-      {accesos.length > 0 ? <AccesosSubcategorias accesos={accesos} categoria={nombre} /> : null}
+      {/*
+       * Con el selector de marcas encendido (la categoría «Lubricantes», 2026-11-04), un panel por
+       * marca en lugar de la lista de productos; el resto de la página, igual.
+       */}
+      {selector ? (
+        <SelectorMarcas id={ANCLA_GRUPOS} vista={selector} />
+      ) : (
+        <>
+          {accesos.length > 0 ? (
+            <AccesosSubcategorias accesos={accesos} categoria={nombre} />
+          ) : null}
 
-      <TarjetasGrupos
-        id={ANCLA_GRUPOS}
-        titulo={`Qué incluye ${nombre.toLowerCase()}`}
-        categoria={nombre}
-        grupos={gruposDeCategoria(categoria)}
-        formulario={formulario}
-        anclaContacto={ANCLA_CONTACTO}
-      />
+          <TarjetasGrupos
+            id={ANCLA_GRUPOS}
+            titulo={`Qué incluye ${nombre.toLowerCase()}`}
+            categoria={nombre}
+            grupos={gruposDeCategoria(categoria)}
+            formulario={formulario}
+            anclaContacto={ANCLA_CONTACTO}
+          />
+        </>
+      )}
 
       <ContactoMarca
         id={ANCLA_CONTACTO}

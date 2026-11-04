@@ -929,6 +929,20 @@ export interface CategoriasTecnica {
     compromisoTexto?: string | null;
   };
   /**
+   * Solo para la categoría «Lubricantes»: la página muestra un panel por marca de lubricantes en lugar de la lista «Qué incluye».
+   */
+  selectorMarcas?: {
+    activo?: boolean | null;
+    /**
+     * Vacío, «Elige tu marca de lubricantes».
+     */
+    titulo?: string | null;
+    /**
+     * Vacío, todas las marcas de lubricantes: primero las que tienen página aquí. Una marca de «Otra web» sin enlace sale con «Muy pronto».
+     */
+    marcas?: (number | MarcasLubricante)[] | null;
+  };
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -939,6 +953,120 @@ export interface CategoriasTecnica {
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcas-lubricante".
+ */
+export interface MarcasLubricante {
+  id: number;
+  nombre: string;
+  /**
+   * «Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, la marca no sale en el menú.
+   */
+  destino?: ('pagina' | 'externo') | null;
+  /**
+   * La web de la marca, completa y con https://. Vacío, la marca no sale en el menú.
+   */
+  enlaceExterno?: string | null;
+  /**
+   * Pinta su bandera junto al nombre en el menú de Lubricantes. Vacío, sin bandera.
+   */
+  paisOrigen?: ('it' | 'co' | 'de' | 'us' | 'gb' | 'nl' | 'fr' | 'es' | 'jp' | 'kr' | 'cn' | 'br') | null;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * Resumen de una o dos líneas, bajo el título.
+   */
+  entradilla?: string | null;
+  descripcion?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  logo?: (number | null) | Media;
+  /**
+   * La foto del panel de esta marca en la página de la categoría técnica «Lubricantes», teñida con el color principal de la marca. Vacía, la imagen de cabecera; sin ninguna, el panel en su color.
+   */
+  fotoSelector?: (number | null) | Media;
+  /**
+   * Una o dos líneas bajo el nombre, en el panel de esta marca del selector. Vacío, la primera frase de la entradilla.
+   */
+  textoSelector?: string | null;
+  /**
+   * Foto de fondo de la cabecera de la página. Opcional: sin ella, un fondo oscuro.
+   */
+  imagenCabecera?: (number | null) | Media;
+  /**
+   * Vídeo de fondo de la cabecera (sin sonido, de hasta 4 MB: se carga primero en «Vídeos», con su póster). Se ve solo en pantallas grandes: en móvil, con ahorro de datos o con «reducir movimiento», queda solo la imagen de cabecera.
+   */
+  videoCabecera?: (number | null) | Video;
+  /**
+   * Desmarcada (por defecto), la página usa la plantilla de Andrés («Categoría Lubricantes»). Marcada, el diseño propio con la identidad de la marca (colores, vídeo de cabecera…). En producción solo se publican plantillas de Andrés.
+   */
+  disenoPropio?: boolean | null;
+  /**
+   * El color de acento de la página (botones, franjas, etiquetas): en ENI, el amarillo. El texto sobre él se pone solo en negro o blanco, el que mejor se lea.
+   */
+  colorPrincipal?: string | null;
+  /**
+   * El fondo oscuro de la cabecera y de la zona de contacto: en ENI, el negro.
+   */
+  colorOscuro?: string | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Vídeos del sitio: MP4 o WebM, máximo 10 MB, con imagen de póster obligatoria.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  /**
+   * Para quien no lo ve. Aunque sea decorativo, dilo aquí: es lo que queda en el panel.
+   */
+  descripcion: string;
+  /**
+   * Lo que se ve antes de cargar, con «reducir movimiento» activado, al pausar y si el vídeo no se puede reproducir.
+   */
+  poster: number | Media;
+  /**
+   * Un vídeo de fondo sin información se oculta a los lectores de pantalla.
+   */
+  decorativo?: boolean | null;
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
 }
 /**
  * Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros, y tiene su propia página.
@@ -1106,100 +1234,6 @@ export interface MarcasUsada {
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "marcas-lubricante".
- */
-export interface MarcasLubricante {
-  id: number;
-  nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  /**
-   * Resumen de una o dos líneas, bajo el título.
-   */
-  entradilla?: string | null;
-  descripcion?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  logo?: (number | null) | Media;
-  /**
-   * Foto de fondo de la cabecera de la página. Opcional: sin ella, un fondo oscuro.
-   */
-  imagenCabecera?: (number | null) | Media;
-  /**
-   * Vídeo de fondo de la cabecera (sin sonido, de hasta 4 MB: se carga primero en «Vídeos», con su póster). Se ve solo en pantallas grandes: en móvil, con ahorro de datos o con «reducir movimiento», queda solo la imagen de cabecera.
-   */
-  videoCabecera?: (number | null) | Video;
-  /**
-   * Desmarcada (por defecto), la página usa la plantilla de Andrés («Categoría Lubricantes»). Marcada, el diseño propio con la identidad de la marca (colores, vídeo de cabecera…). En producción solo se publican plantillas de Andrés.
-   */
-  disenoPropio?: boolean | null;
-  /**
-   * El color de acento de la página (botones, franjas, etiquetas): en ENI, el amarillo. El texto sobre él se pone solo en negro o blanco, el que mejor se lea.
-   */
-  colorPrincipal?: string | null;
-  /**
-   * El fondo oscuro de la cabecera y de la zona de contacto: en ENI, el negro.
-   */
-  colorOscuro?: string | null;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  actualizadoPor?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Vídeos del sitio: MP4 o WebM, máximo 10 MB, con imagen de póster obligatoria.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "videos".
- */
-export interface Video {
-  id: number;
-  /**
-   * Para quien no lo ve. Aunque sea decorativo, dilo aquí: es lo que queda en el panel.
-   */
-  descripcion: string;
-  /**
-   * Lo que se ve antes de cargar, con «reducir movimiento» activado, al pausar y si el vídeo no se puede reproducir.
-   */
-  poster: number | Media;
-  /**
-   * Un vídeo de fondo sin información se oculta a los lectores de pantalla.
-   */
-  decorativo?: boolean | null;
-  actualizadoPor?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2796,6 +2830,13 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
         compromisoTitulo?: T;
         compromisoTexto?: T;
       };
+  selectorMarcas?:
+    | T
+    | {
+        activo?: T;
+        titulo?: T;
+        marcas?: T;
+      };
   seo?:
     | T
     | {
@@ -3040,10 +3081,15 @@ export interface MarcasUsadaSelect<T extends boolean = true> {
  */
 export interface MarcasLubricanteSelect<T extends boolean = true> {
   nombre?: T;
+  destino?: T;
+  enlaceExterno?: T;
+  paisOrigen?: T;
   slug?: T;
   entradilla?: T;
   descripcion?: T;
   logo?: T;
+  fotoSelector?: T;
+  textoSelector?: T;
   imagenCabecera?: T;
   videoCabecera?: T;
   disenoPropio?: T;

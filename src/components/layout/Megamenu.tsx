@@ -27,6 +27,7 @@ import {
   type RefObject,
 } from "react";
 
+import { Bandera } from "@/components/marca/Bandera";
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import {
   CURVA_MENU,
@@ -251,6 +252,26 @@ function LogoDeFila({ logo }: { logo: NonNullable<GrupoMenu["logo"]> }) {
 }
 
 /**
+ * La bandera del país de origen tras el nombre (las marcas de lubricantes, 2026-11-04): el dibujo
+ * es DECORATIVO y el país va en texto solo para lectores, una vez (`conTexto={false}` cuando ya va
+ * en el `aria-label` del enlace).
+ */
+function BanderaDeFila({
+  pais,
+  conTexto = true,
+}: {
+  pais: NonNullable<GrupoMenu["pais"]>;
+  conTexto?: boolean;
+}) {
+  return (
+    <>
+      <Bandera codigo={pais.codigo} className={estilos.bandera} />
+      {conTexto ? <span className="sr-only"> ({pais.nombre})</span> : null}
+    </>
+  );
+}
+
+/**
  * Una marca SIN página propia (2026-11-03, LiuGong → su distribuidor oficial): la misma fila que
  * un acordeón, pero es un enlace a otro sitio, en pestaña nueva con `noopener`, el icono de enlace
  * externo y el aviso en el nombre accesible. No despliega nada.
@@ -263,11 +284,12 @@ function FilaExterna({ grupo, nivel }: { grupo: GrupoMenu & { externo: string };
         className={`${estilos.titulo} ${estilos.tituloEnlace}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`${grupo.titulo} (${AVISO_OTRA_PESTANA})`}
+        aria-label={`${grupo.titulo} (${grupo.pais ? `${grupo.pais.nombre}, ` : ""}${AVISO_OTRA_PESTANA})`}
       >
         <IconExternalLink aria-hidden="true" focusable="false" stroke={2} />
         {grupo.logo ? <LogoDeFila logo={grupo.logo} /> : null}
         {grupo.titulo}
+        {grupo.pais ? <BanderaDeFila pais={grupo.pais} conTexto={false} /> : null}
       </a>
     </div>
   );
@@ -322,6 +344,7 @@ function AcordeonDesplegable({
          */}
         {grupo.logo ? <LogoDeFila logo={grupo.logo} /> : null}
         {grupo.titulo}
+        {grupo.pais ? <BanderaDeFila pais={grupo.pais} /> : null}
       </button>
       <div
         ref={region}

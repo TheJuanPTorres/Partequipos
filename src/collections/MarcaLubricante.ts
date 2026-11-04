@@ -1,6 +1,9 @@
 import type { CollectionConfig } from "payload";
 
 import { validarColor } from "../lib/fields/tipografiaTitulo";
+import { DESTINO_EXTERNO, DESTINO_PAGINA } from "../lib/lubricantes/destino";
+import { OPCIONES_PAIS } from "../lib/lubricantes/pais";
+import { normalizarEnlaceExterno, validarEnlaceExterno } from "../lib/nueva/enlaceExterno";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
@@ -17,8 +20,7 @@ import { revalidarMegamenu } from "./hooks/megamenuHooks";
  * nada por debajo, así que no se copia la jerarquía de repuestos
  * (marca → tipo → modelo): forzarla dejaría un nivel vacío en todas las ramas.
  *
- * Hoy solo existe Eni en el sitio, pero su propia página menciona **Dispel**
- * como segunda marca, de ahí que sea una colección y no un valor fijo.
+ * Eni tiene su página aquí; Dispel (2026-11-04) no: lleva a otra web («Destino»).
  */
 // El desplegable «Lubricantes» del megamenú lleva cada marca (2026-10-20).
 const megamenu = revalidarMegamenu("marcas-lubricante");
@@ -43,6 +45,50 @@ export const MarcaLubricante: CollectionConfig = {
   },
   fields: [
     { name: "nombre", type: "text", required: true, label: "Nombre" },
+    /*
+     * Marca sin página propia (2026-11-04, dirección: Dispel lleva a otra web) y su país, con la
+     * bandera del menú. `src/lib/lubricantes/destino.ts` y `pais.ts`.
+     */
+    {
+      name: "destino",
+      type: "radio",
+      label: "Destino",
+      defaultValue: DESTINO_PAGINA,
+      options: [
+        { label: "Su página en este sitio", value: DESTINO_PAGINA },
+        { label: "Otra web (sin página en este sitio)", value: DESTINO_EXTERNO },
+      ],
+      admin: {
+        position: "sidebar",
+        description:
+          "«Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, la marca no sale en el menú.",
+      },
+    },
+    {
+      name: "enlaceExterno",
+      type: "text",
+      label: "Enlace externo",
+      validate: validarEnlaceExterno,
+      hooks: { beforeChange: [({ value }) => normalizarEnlaceExterno(value as string)] },
+      admin: {
+        position: "sidebar",
+        placeholder: "https://…",
+        condition: (_, hermanos) => hermanos?.destino === DESTINO_EXTERNO,
+        description:
+          "La web de la marca, completa y con https://. Vacío, la marca no sale en el menú.",
+      },
+    },
+    {
+      name: "paisOrigen",
+      type: "select",
+      label: "País de origen",
+      options: OPCIONES_PAIS,
+      admin: {
+        position: "sidebar",
+        description:
+          "Pinta su bandera junto al nombre en el menú de Lubricantes. Vacío, sin bandera.",
+      },
+    },
     slugField({ unique: true }),
     {
       name: "entradilla",
@@ -56,6 +102,29 @@ export const MarcaLubricante: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       label: "Logo",
+    },
+    /*
+     * Selector de marcas de la categoría técnica «Lubricantes» (2026-11-04, dirección): el panel
+     * de esta marca. `src/lib/lubricantes/selector.ts`.
+     */
+    {
+      name: "fotoSelector",
+      type: "upload",
+      relationTo: "media",
+      label: "Foto del selector de marcas",
+      admin: {
+        description:
+          "La foto del panel de esta marca en la página de la categoría técnica «Lubricantes», teñida con el color principal de la marca. Vacía, la imagen de cabecera; sin ninguna, el panel en su color.",
+      },
+    },
+    {
+      name: "textoSelector",
+      type: "textarea",
+      label: "Texto del selector de marcas",
+      admin: {
+        description:
+          "Una o dos líneas bajo el nombre, en el panel de esta marca del selector. Vacío, la primera frase de la entradilla.",
+      },
     },
     {
       name: "imagenCabecera",

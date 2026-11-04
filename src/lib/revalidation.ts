@@ -267,6 +267,9 @@ export function revalidarMarcasDeLubricante(motivo: string): void {
   try {
     revalidatePath(PATRONES_DE_PAGINA.marcasDeLubricante, "page");
     revalidatePath(PATRONES_DE_PAGINA.lineasDeLubricante, "page");
+    // El selector de marcas de la categoría técnica «Lubricantes» (2026-11-04) pinta el
+    // color, el logo, la foto, el texto, el destino y la bandera de cada marca.
+    revalidatePath(PATRONES_DE_PAGINA.categoriasDeRepuestos, "page");
   } catch (error) {
     console.error(`[revalidación] fallaron las marcas de lubricantes (${motivo}):`, error);
   }

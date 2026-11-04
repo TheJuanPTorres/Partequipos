@@ -5,6 +5,8 @@
  */
 
 .seccion {
+  /* Al llegar por la barra de secciones (`NavSecciones`), bajo la cabecera fija. */
+  scroll-margin-top: 96px;
   --kit-gris: #f1f0ee;
   --kit-linea: #e4e1de;
   /* El rojo de marca no llega a AA en texto pequeño sobre el gris: el antetítulo va más oscuro. */

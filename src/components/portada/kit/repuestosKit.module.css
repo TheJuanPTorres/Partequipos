@@ -5,6 +5,8 @@
  */
 
 .seccion {
+  /* Al llegar por la barra de secciones (`NavSecciones`), bajo la cabecera fija. */
+  scroll-margin-top: 96px;
   --kit-gris: #f1f0ee;
   --kit-rojo-texto: color-mix(in srgb, var(--color-marca) 78%, #000);
   padding: 0 12px 12px;

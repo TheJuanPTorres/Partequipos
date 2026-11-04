@@ -67,7 +67,14 @@ import estilos from "./hero.module.css";
  * (hasta `ESPERA_MAX_MS`): nunca se ve la tarjeta en blanco.
  */
 
-type Props = { diapositivas: DiapositivaHero[] };
+type Props = {
+  diapositivas: DiapositivaHero[];
+  /**
+   * Hay barra de secciones (`NavSecciones`) montada sobre el borde de abajo de la tarjeta: los
+   * controles, el vidrio y el texto circular suben lo que ella tapa (`--hero-nav-cruce`).
+   */
+  conNav?: boolean;
+};
 
 /** Desplazamiento mínimo del dedo para contar como gesto, en px. */
 const GESTO_PX = 50;
@@ -244,7 +251,7 @@ function FondoHero({
   );
 }
 
-export function HeroPortada({ diapositivas }: Props) {
+export function HeroPortada({ diapositivas, conNav = false }: Props) {
   const [activo, setActivo] = useState(0);
   /** La que se va: sigue opaca DEBAJO mientras la nueva aparece encima. */
   const [saliente, setSaliente] = useState<number | null>(null);
@@ -548,6 +555,7 @@ export function HeroPortada({ diapositivas }: Props) {
     <section
       ref={raiz}
       className={estilos.hero}
+      data-con-nav={conNav ? "" : undefined}
       aria-roledescription={hayVarias ? "carrusel" : undefined}
       aria-labelledby={idTitulo}
       // Todo lo que se mueve solo se detiene aquí: línea, Ken Burns, pase y texto circular.

@@ -29,9 +29,8 @@ const ANCLA = "marcas-maquinaria";
  * ÍNDICE DE MARCAS DE MAQUINARIA NUEVA: las baldosas de color del diseño del cliente (2026-11-04),
  * el mismo componente que el índice de marcas de repuestos (`BaldosasColorMarcas`, #417), con el
  * «Color de la marca» y el logo en blanco, para las marcas que tienen equipos; sin «Aditamentos»
- * (dirección, 2026-10-20).
- * Sin franja de color: es un índice general. Sin el hero grande (dirección,
- * 2026-10-20): la cabecera es la caja baja de las baldosas, con el `<h1>`.
+ * (dirección, 2026-10-20). Sin franja de color: es un índice general. La cabecera es la roja del
+ * diseño, como la del índice de marcas de repuestos (cliente, 2026-11-04: los dos índices iguales).
  */
 export default async function MarcasMaquinariaPage() {
   const [marcas, equipos, logos, baldosas] = await Promise.all([
@@ -60,7 +59,6 @@ export default async function MarcasMaquinariaPage() {
         marcas={placasDeMarcasNueva(marcas, equipos, logos, baldosas)}
         h1={{ antetitulo: "Maquinaria pesada nueva", titulo: "Marcas" }}
         sobre="maquinaria"
-        cabecera="oscura"
       />
     </main>
   );

@@ -60,6 +60,7 @@ export default async function MarcasMaquinariaPage() {
         marcas={placasDeMarcasNueva(marcas, equipos, logos, baldosas)}
         h1={{ antetitulo: "Maquinaria pesada nueva", titulo: "Marcas" }}
         sobre="maquinaria"
+        cabecera="oscura"
       />
     </main>
   );

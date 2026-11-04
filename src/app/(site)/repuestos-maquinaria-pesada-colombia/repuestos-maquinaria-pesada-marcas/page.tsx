@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { BaldosasMarcas } from "@/components/repuestos/BaldosasMarcas";
+import { BaldosasColorMarcas } from "@/components/repuestos/BaldosasColorMarcas";
 import { CierreRepuestos } from "@/components/repuestos/CierreRepuestos";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -23,9 +23,9 @@ export async function generateMetadata(): Promise<Metadata> {
 const ANCLA = "marcas-repuestos";
 
 /**
- * ÍNDICE DE MARCAS DE REPUESTOS: encabezado, las marcas con «Mostrar marcas» de
- * Andrés (plantilla 4017: baldosas del color de cada marca en un recuadro blanco,
- * docs/diseno/decisiones-repuestos-marca.md §8), contacto y testimonios. Sin la
+ * ÍNDICE DE MARCAS DE REPUESTOS: encabezado, las marcas en las baldosas de color del diseño
+ * del cliente «Repuestos por marca» (`BaldosasColorMarcas`, 2026-11-03; antes «Mostrar marcas»
+ * de Andrés, docs/diseno/decisiones-repuestos-marca.md §8), contacto y testimonios. Sin la
  * franja amarilla: es un índice general, no la página de una marca. Sin el hero
  * grande (dirección, 2026-10-20): la cabecera es la caja baja de las baldosas,
  * con el `<h1>` de siempre.
@@ -45,7 +45,7 @@ export default async function MarcasIndexPage() {
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <BaldosasMarcas
+      <BaldosasColorMarcas
         id={ANCLA}
         marcas={placasDeMarcas(marcas)}
         h1={{

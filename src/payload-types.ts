@@ -713,6 +713,14 @@ export interface Marca {
    */
   logoOscuroEnMenu?: boolean | null;
   /**
+   * Fondo de la baldosa de esta marca en el índice de marcas de repuestos. Solo se usa junto con el «Logo para la baldosa»: con los dos, la baldosa va en este color; si falta uno, el logo de siempre sobre gris.
+   */
+  colorBaldosa?: string | null;
+  /**
+   * El logo que va sobre el «Color de la baldosa» (en el diseño, en blanco; Case y Caterpillar, con sus colores). PNG o WebP transparente. Comprueba que se lee bien sobre ese color.
+   */
+  logoBaldosa?: (number | null) | Media;
+  /**
    * Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.
    */
   fondoHero?: (number | null) | Media;
@@ -852,7 +860,7 @@ export interface CategoriasTecnica {
    */
   tituloPortada?: string | null;
   /**
-   * Opcional: la pieza recortada (PNG o WebP transparente) de la tarjeta de la portada. Vacía: la «Imagen de la tarjeta».
+   * Opcional: si se rellena, manda en la tarjeta de la portada. Vacía: la «Imagen de la tarjeta». Mínimo 500 px de ancho: la tarjeta se pinta hasta 250 px, y el doble en pantallas de alta densidad; más pequeña, se ve pixelada.
    */
   imagenPortada?: (number | null) | Media;
   /**
@@ -868,7 +876,7 @@ export interface CategoriasTecnica {
    */
   ordenMarca?: number | null;
   /**
-   * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Qué incluye».
+   * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Elige el repuesto de … que necesitas».
    */
   grupos?:
     | {
@@ -1480,6 +1488,22 @@ export interface Pagina {
         }[]
       | null;
   };
+  /**
+   * Los botones del panel blanco que monta sobre el borde de abajo del hero. Sin ninguno, salen los tres de siempre: «Maquinaria pesada nueva», «Maquinaria pesada usada» y «Repuestos para maquinaria pesada».
+   */
+  barraSecciones?: {
+    botones?:
+      | {
+          texto: string;
+          ancla: 'nueva' | 'maquinaria-usada' | 'repuestos';
+          /**
+           * Decorativa: la máquina recortada encima del texto. Vacía, la máquina de la sección a la que lleva.
+           */
+          imagen?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
   seccionNueva?: {
     antetitulo?: string | null;
     titulo?: string | null;
@@ -1591,7 +1615,11 @@ export interface Pagina {
     antetitulo?: string | null;
     titulo?: string | null;
     /**
-     * Un párrafo corto bajo el título. Respeta los saltos de línea. Vacío, no se pinta.
+     * Se pinta en rojo donde aparezca en el título (la primera vez). Vacía, o si el título no la lleva, todo el título va en negro.
+     */
+    tituloResaltado?: string | null;
+    /**
+     * Bajo el título. Cada línea es un párrafo (el diseño lleva dos: qué repuestos y para qué marcas). Vacío, no se pinta.
      */
     descripcion?: string | null;
     /**
@@ -1603,9 +1631,20 @@ export interface Pagina {
      */
     descripcionAncho?: ('estrecho' | 'medio' | 'ancho' | 'columna') | null;
     /**
-     * Entre 60 y 100. 100 es el tamaño del diseño original; por defecto, 78. Solo desde portátil: en el teléfono no cambia.
+     * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.
      */
     tamanoMaquina?: number | null;
+    /**
+     * Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp (decisión de Juan Pablo). El texto va en «Texto bajo el título».
+     */
+    whatsappTexto?: string | null;
+    /**
+     * Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp.
+     */
+    whatsappMensaje?: string | null;
+    /**
+     * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): el botón de cada tarjeta es una flecha redonda, sin texto.
+     */
     verMasTexto?: string | null;
     /**
      * Sin efecto desde el 2026-10-26 (diseño del cliente): cada tarjeta lleva su botón.
@@ -1616,11 +1655,11 @@ export interface Pagina {
      */
     botonEnlace?: string | null;
     /**
-     * Decorativa: la máquina sobre el piso, junto a las categorías. Opcional.
+     * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina; la de la portada va en la banda «Marcas de repuestos».
      */
     maquina?: (number | null) | Media;
     /**
-     * La imagen del reflejo, del kit del cliente (más alta que la máquina). Opcional.
+     * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.
      */
     maquinaReflejo?: (number | null) | Media;
   };
@@ -2660,6 +2699,8 @@ export interface MarcasSelect<T extends boolean = true> {
   logo?: T;
   colorMarca?: T;
   logoOscuroEnMenu?: T;
+  colorBaldosa?: T;
+  logoBaldosa?: T;
   fondoHero?: T;
   seo?:
     | T
@@ -3138,6 +3179,18 @@ export interface PaginasSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  barraSecciones?:
+    | T
+    | {
+        botones?:
+          | T
+          | {
+              texto?: T;
+              ancla?: T;
+              imagen?: T;
+              id?: T;
+            };
+      };
   seccionNueva?:
     | T
     | {
@@ -3190,10 +3243,13 @@ export interface PaginasSelect<T extends boolean = true> {
     | {
         antetitulo?: T;
         titulo?: T;
+        tituloResaltado?: T;
         descripcion?: T;
         descripcionAlineacion?: T;
         descripcionAncho?: T;
         tamanoMaquina?: T;
+        whatsappTexto?: T;
+        whatsappMensaje?: T;
         verMasTexto?: T;
         botonTexto?: T;
         botonEnlace?: T;
@@ -3733,16 +3789,16 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface Cabecera {
   id: number;
   /**
-   * En el orden de la barra (escritorio y móvil). Un enlace a otro sitio (https://), como la tienda, se abre en una pestaña nueva con el icono de enlace externo. Desmarca «Mostrar» para quitarlo sin borrarlo.
+   * Hasta 8, en el orden de la barra (escritorio y móvil). Si en escritorio no caben todos, los últimos pasan a un desplegable «Más» al final de la barra; en el móvil salen todos en lista. Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro en su sitio de la barra y se abre en una pestaña nueva. Desmarca «Mostrar» para quitarlo sin borrarlo, o para crearlo antes de tener su enlace: oculto, no ocupa sitio.
    */
   enlaces?:
     | {
         mostrar?: boolean | null;
         etiqueta: string;
         /**
-         * Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva).
+         * Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva). Puede quedar vacío si la fila está oculta.
          */
-        enlace: string;
+        enlace?: string | null;
         id?: string | null;
       }[]
     | null;

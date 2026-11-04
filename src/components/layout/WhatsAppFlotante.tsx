@@ -16,7 +16,7 @@ import estilos from "./whatsappFlotante.module.css";
  * pinta al 57 % del círculo (dirección: más aire dentro). Ninguna petición a otro dominio.
  *
  * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): para NO TAPAR el
- * recuadro de descripción con su «+» y los controles del hero. Cualquier
+ * recuadro de descripción con su «+», los controles del hero ni la barra de secciones. Cualquier
  * elemento con `data-evita-flotante` que caiga donde está el botón lo hace
  * subir lo justo (con `transform`: un elemento fijo que se desplaza así no
  * cuenta como CLS). El pie no lo necesita: la franja legal reserva su sitio
@@ -41,16 +41,24 @@ export function WhatsAppFlotante({ href }: { href: string }) {
       const caja = a.getBoundingClientRect();
       const arriba = caja.top + subido;
       const abajo = caja.bottom + subido;
+      // Al subir por encima de uno puede caer sobre otro (a 1010 px, la barra de secciones y
+      // el vidrio del hero): se repite hasta que el sitio quede libre.
+      const cajas = [...document.querySelectorAll<HTMLElement>("[data-evita-flotante]")]
+        .map((el) => el.getBoundingClientRect())
+        .filter((r) => r.width > 0 && r.height > 0);
       let subir = 0;
-      for (const el of document.querySelectorAll<HTMLElement>("[data-evita-flotante]")) {
-        const r = el.getBoundingClientRect();
-        if (r.width === 0 || r.height === 0) continue;
-        const pisa =
-          r.left < caja.right + AIRE &&
-          r.right > caja.left - AIRE &&
-          r.top < abajo + AIRE &&
-          r.bottom > arriba - AIRE;
-        if (pisa) subir = Math.max(subir, abajo - r.top + AIRE);
+      for (let vuelta = 0; vuelta < cajas.length; vuelta++) {
+        let mas = subir;
+        for (const r of cajas) {
+          const pisa =
+            r.left < caja.right + AIRE &&
+            r.right > caja.left - AIRE &&
+            r.top < abajo - subir + AIRE &&
+            r.bottom > arriba - subir - AIRE;
+          if (pisa) mas = Math.max(mas, abajo - r.top + AIRE);
+        }
+        if (mas === subir) break;
+        subir = mas;
       }
       a.dataset.subido = String(Math.round(subir));
       a.style.setProperty("--flotante-subida", `${-Math.round(subir)}px`);

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { HeroPortada } from "@/components/hero/HeroPortada";
+import { NavSecciones } from "@/components/portada/NavSecciones";
 import { alineacionDeTexto, anchoDeTexto, escalaDeMaquina } from "@/lib/fields/alineacionTexto";
 import { SeccionMarcasKit } from "@/components/portada/kit/SeccionMarcasKit";
 import { SeccionNuevaKit } from "@/components/portada/kit/SeccionNuevaKit";
@@ -14,6 +15,7 @@ import { SeccionSedes } from "@/components/portada/SeccionSedes";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { enlaceWhatsApp } from "@/lib/navegacion";
 import { diapositivasDeHero } from "@/lib/portada/hero";
+import { botonesNav } from "@/lib/portada/navSecciones";
 import {
   categoriasDePortada,
   filtrosDeUsados,
@@ -122,7 +124,30 @@ export default async function HomePage() {
       <JsonLd data={buildOrganizationJsonLd(horario, empresa, logo.buscadores)} />
 
       {/* Sección 1 de ux-9. Sin diapositivas en Payload, no se pinta. */}
-      {diapositivas.length > 0 ? <HeroPortada diapositivas={diapositivas} /> : null}
+      {diapositivas.length > 0 ? (
+        <>
+          <HeroPortada diapositivas={diapositivas} conNav />
+          {/*
+           * BARRA DE SECCIONES del cliente (2026-11-03), montada sobre el borde de abajo del
+           * hero: un enlace a cada una de las secciones principales. Los botones, del grupo
+           * «Barra de secciones» del panel; vacío, los de siempre con la máquina de cada sección.
+           */}
+          <NavSecciones
+            botones={botonesNav(
+              pagina.barraSecciones?.botones?.map((b) => ({
+                texto: b.texto,
+                ancla: b.ancla,
+                imagen: imagenDecorativa(b.imagen),
+              })),
+              [
+                imagenDecorativa(nueva?.maquina),
+                imagenDecorativa(usada?.imagen),
+                imagenDecorativa(repuestos?.maquina),
+              ],
+            )}
+          />
+        </>
+      ) : null}
 
       {/*
        * «Maquinaria pesada nueva» con el DISEÑO DEL CLIENTE (2026-10-27): una tarjeta por marca
@@ -170,16 +195,13 @@ export default async function HomePage() {
       />
       <SeccionRepuestosKit
         categorias={categoriasDePortada(categoriasTecnicas)}
-        maquina={imagenDecorativa(repuestos?.maquina)}
-        reflejo={imagenDecorativa(repuestos?.maquinaReflejo)}
         textos={{
           antetitulo: tx(repuestos?.antetitulo),
           titulo: tx(repuestos?.titulo),
+          tituloResaltado: tx(repuestos?.tituloResaltado),
           descripcion: tx(repuestos?.descripcion),
           descripcionAlineacion: alineacionDeTexto(repuestos?.descripcionAlineacion),
           descripcionAncho: anchoDeTexto(repuestos?.descripcionAncho, "ancho"),
-          escalaMaquina: escalaDeMaquina(repuestos?.tamanoMaquina),
-          verTodos: tx(repuestos?.verMasTexto),
         }}
       />
 

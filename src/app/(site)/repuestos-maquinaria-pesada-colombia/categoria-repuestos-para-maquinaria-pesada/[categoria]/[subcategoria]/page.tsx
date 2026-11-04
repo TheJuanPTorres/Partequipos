@@ -35,6 +35,7 @@ import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { esCategoriaPrincipal, rutaDeCategoriaTecnica } from "@/lib/repuestos/subcategorias";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
+import { tituloEligeRepuesto } from "@/lib/repuestos/tituloGrupos";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
@@ -163,7 +164,7 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
       >
         <TarjetasGrupos
           id={ANCLA_GRUPOS}
-          titulo={`Nuestra línea de ${nombre}`}
+          titulo={tituloEligeRepuesto(nombre, false)}
           categoria={nombre}
           grupos={gruposDeCategoria(sub)}
           formulario={formulario}

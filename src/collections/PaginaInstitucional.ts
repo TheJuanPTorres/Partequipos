@@ -1,4 +1,4 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, Field } from "payload";
 
 import {
   alineacionTextoField,
@@ -449,6 +449,58 @@ export const PaginaInstitucional: CollectionConfig = {
       ],
     },
     /*
+     * BARRA DE SECCIONES (diseño del cliente, 2026-11-03; `NavSecciones`): el panel blanco sobre
+     * el borde de abajo del hero, con un enlace a cada sección principal de la portada. Vacía,
+     * los tres botones de siempre (`botonesNav`). El destino es una lista cerrada con las anclas
+     * que existen en la portada, para que ningún botón lleve a un ancla rota.
+     */
+    {
+      name: "barraSecciones",
+      type: "group",
+      label: "Barra de secciones (bajo el hero)",
+      admin: {
+        condition: (data) => data?.slug === "inicio",
+        description:
+          "Los botones del panel blanco que monta sobre el borde de abajo del hero. Sin ninguno, salen los tres de siempre: «Maquinaria pesada nueva», «Maquinaria pesada usada» y «Repuestos para maquinaria pesada».",
+      },
+      fields: [
+        {
+          name: "botones",
+          type: "array",
+          label: "Botones",
+          labels: { singular: "Botón", plural: "Botones" },
+          maxRows: 3,
+          admin: { initCollapsed: true },
+          fields: [
+            {
+              name: "texto",
+              type: "text",
+              label: "Texto",
+              required: true,
+              admin: { width: "50%" },
+            },
+            {
+              name: "ancla",
+              type: "select",
+              label: "Lleva a la sección",
+              required: true,
+              options: [
+                { label: "Maquinaria pesada nueva", value: "nueva" },
+                { label: "Maquinaria pesada usada", value: "maquinaria-usada" },
+                { label: "Venta de repuestos", value: "repuestos" },
+              ],
+              admin: { width: "50%" },
+            },
+            imagenKit(
+              "imagen",
+              "Máquina del botón (PNG o WebP transparente)",
+              "Decorativa: la máquina recortada encima del texto. Vacía, la máquina de la sección a la que lleva.",
+            ),
+          ],
+        },
+      ],
+    },
+    /*
      * SECCIÓN 2 DE LA PORTADA: textos. Las tarjetas salen de
      * `marcas-maquinaria` (las que tienen posición en la portada y foto).
      */
@@ -652,6 +704,12 @@ export const PaginaInstitucional: CollectionConfig = {
       fields: [
         texto("antetitulo", "Antetítulo", "Venta de repuestos"),
         texto("titulo", "Título", "Encuentra Maquinaria y Repuestos Rápido y Fácil"),
+        texto(
+          "tituloResaltado",
+          "Palabra del título en rojo",
+          "Repuestos",
+          "Se pinta en rojo donde aparezca en el título (la primera vez). Vacía, o si el título no la lleva, todo el título va en negro.",
+        ),
         {
           // Campo nuevo (2026-10-26): los «ya no se usa» de esta sección son de una línea y con un
           // valor por defecto que saldría en la web, así que no sirven para un párrafo.
@@ -660,13 +718,37 @@ export const PaginaInstitucional: CollectionConfig = {
           label: "Texto bajo el título",
           admin: {
             description:
-              "Un párrafo corto bajo el título. Respeta los saltos de línea. Vacío, no se pinta.",
+              "Bajo el título. Cada línea es un párrafo (el diseño lleva dos: qué repuestos y para qué marcas). Vacío, no se pinta.",
           },
         },
         alineacionTextoField("descripcionAlineacion", "Alineación del texto bajo el título"),
         anchoTextoField("descripcionAncho", "Ancho del texto bajo el título", "ancho"),
-        tamanoMaquinaField(),
-        texto("verMasTexto", "Texto del botón de cada tarjeta", "Ver más"),
+        {
+          ...tamanoMaquinaField(),
+          label: "Tamaño de la máquina (%) (ya no se usa)",
+          admin: {
+            description:
+              "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.",
+          },
+        } as Field,
+        texto(
+          "whatsappTexto",
+          "Texto del botón de WhatsApp (ya no se usa)",
+          "Encuentra la referencia que tu máquina necesita",
+          "Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp (decisión de Juan Pablo). El texto va en «Texto bajo el título».",
+        ),
+        texto(
+          "whatsappMensaje",
+          "Mensaje ya escrito en WhatsApp (ya no se usa)",
+          "Hola, busco la referencia de un repuesto para mi máquina.",
+          "Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp.",
+        ),
+        texto(
+          "verMasTexto",
+          "Texto del botón de cada tarjeta (ya no se usa)",
+          "Ver más",
+          "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): el botón de cada tarjeta es una flecha redonda, sin texto.",
+        ),
         texto(
           "botonTexto",
           "Texto del botón (ya no se usa)",
@@ -680,13 +762,13 @@ export const PaginaInstitucional: CollectionConfig = {
         ),
         imagenKit(
           "maquina",
-          "Máquina (PNG o WebP transparente)",
-          "Decorativa: la máquina sobre el piso, junto a las categorías. Opcional.",
+          "Máquina (ya no se usa)",
+          "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina; la de la portada va en la banda «Marcas de repuestos».",
         ),
         imagenKit(
           "maquinaReflejo",
-          "Reflejo de la máquina",
-          "La imagen del reflejo, del kit del cliente (más alta que la máquina). Opcional.",
+          "Reflejo de la máquina (ya no se usa)",
+          "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.",
         ),
       ],
     },

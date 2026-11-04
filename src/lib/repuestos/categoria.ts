@@ -67,6 +67,9 @@ export type PlacaMarca = {
   logo: LogoMarca | null;
   /** `href` es OTRO sitio (marca de nueva sin página propia, LiuGong): pestaña nueva. */
   externo?: true;
+  /** «Color de la baldosa» y «Logo para la baldosa» (`BaldosasColorMarcas`, solo repuestos). */
+  color?: string | null;
+  logoSobreColor?: LogoMarca | null;
 };
 
 /** Una placa por marca, con su enlace a la página de la marca. */
@@ -78,5 +81,8 @@ export function placasDeMarcas(marcas: Marca[]): PlacaMarca[] {
       nombre: m.nombre.trim(),
       href: rutas.marca(m.slug),
       logo: logoPropio(m),
+      color: m.colorBaldosa ?? null,
+      // Su logo tal cual: el de la baldosa no se pinta en oscuro (`logoOscuroEnMenu` es del menú).
+      logoSobreColor: logoPropio({ logo: m.logoBaldosa }),
     }));
 }

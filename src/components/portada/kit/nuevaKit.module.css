@@ -6,6 +6,11 @@
  */
 
 .seccion {
+  /*
+   * Al llegar por la barra de secciones (`NavSecciones`): bajo la cabecera fija, que ya reserva
+   * `scroll-padding-top` (globals.css); esto es el aire de más.
+   */
+  scroll-margin-top: 24px;
   /* El rojo de marca no llega a AA en texto pequeño sobre blanco: el rótulo va más oscuro. */
   --nueva-rojo-texto: color-mix(in srgb, var(--color-marca) 78%, #000);
   position: relative;

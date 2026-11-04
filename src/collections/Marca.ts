@@ -1,4 +1,5 @@
 import { campoColorMarca } from "@/lib/fields/colorMarca";
+import { validarColor } from "@/lib/fields/tipografiaTitulo";
 import type { CollectionConfig } from "payload";
 
 import { seoField } from "../lib/fields/seoField";
@@ -73,6 +74,33 @@ export const Marca: CollectionConfig = {
       admin: {
         description:
           "Márcala si el logo es blanco o muy claro: en el menú de la cabecera y en la placa clara de la página de la marca se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.",
+      },
+    },
+    /*
+     * Baldosas de color del índice de marcas de repuestos (diseño del cliente, 2026-11-03;
+     * `BaldosasColorMarcas`). Van en pareja: la baldosa solo se pinta en color con los dos;
+     * si falta uno, el logo de siempre sobre gris (`vistaBaldosa`).
+     */
+    {
+      name: "colorBaldosa",
+      type: "text",
+      label: "Color de la baldosa",
+      validate: validarColor,
+      admin: {
+        placeholder: "#E30613",
+        components: { Field: "/components/admin/CampoColor" },
+        description:
+          "Fondo de la baldosa de esta marca en el índice de marcas de repuestos. Solo se usa junto con el «Logo para la baldosa»: con los dos, la baldosa va en este color; si falta uno, el logo de siempre sobre gris.",
+      },
+    },
+    {
+      name: "logoBaldosa",
+      type: "upload",
+      relationTo: "media",
+      label: "Logo para la baldosa",
+      admin: {
+        description:
+          "El logo que va sobre el «Color de la baldosa» (en el diseño, en blanco; Case y Caterpillar, con sus colores). PNG o WebP transparente. Comprueba que se lee bien sobre ese color.",
       },
     },
     /*

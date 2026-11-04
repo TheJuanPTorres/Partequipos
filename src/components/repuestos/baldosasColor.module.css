@@ -231,6 +231,20 @@
   }
 }
 
+/* Marca con enlace a otro sitio (LiuGong): su icono en la esquina, blanco sobre el color. */
+.externo {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  color: #fff;
+}
+
+.baldosa[data-tipo="respaldo"] .externo {
+  color: var(--color-texto);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .logo,
   .verMas {

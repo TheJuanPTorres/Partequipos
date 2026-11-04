@@ -860,7 +860,7 @@ export interface CategoriasTecnica {
    */
   tituloPortada?: string | null;
   /**
-   * Opcional: la pieza recortada (PNG o WebP transparente) de la tarjeta de la portada. Vacía: la «Imagen de la tarjeta».
+   * Opcional: si se rellena, manda en la tarjeta de la portada. Vacía: la «Imagen de la tarjeta». Mínimo 500 px de ancho: la tarjeta se pinta hasta 250 px, y el doble en pantallas de alta densidad; más pequeña, se ve pixelada.
    */
   imagenPortada?: (number | null) | Media;
   /**
@@ -876,7 +876,7 @@ export interface CategoriasTecnica {
    */
   ordenMarca?: number | null;
   /**
-   * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Qué incluye».
+   * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Elige el repuesto de … que necesitas».
    */
   grupos?:
     | {

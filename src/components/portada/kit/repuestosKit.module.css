@@ -109,7 +109,7 @@
   background: rgb(255 255 255 / 0.7);
 }
 
-/* --- Título, texto y WhatsApp ---------------------------------------------------------------- */
+/* --- Título y texto -------------------------------------------------------------------------- */
 
 .cabecera {
   position: relative;
@@ -155,39 +155,6 @@
   .descripcion {
     font-size: 1rem;
   }
-}
-
-/* El botón verde de WhatsApp: el de los formularios de página (#405). */
-.whatsapp {
-  display: inline-flex;
-  min-height: 44px;
-  box-sizing: border-box;
-  margin-top: 20px;
-  padding: 10px 22px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: 30px;
-  background: #0f7b45;
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.2;
-  text-decoration: none;
-  transition: background-color 300ms ease;
-}
-
-.whatsapp svg {
-  flex: none;
-}
-
-.whatsapp:hover {
-  background: #0a6e37;
-}
-
-.whatsapp:focus-visible {
-  outline: 3px solid #0a6e37;
-  outline-offset: 3px;
 }
 
 /* --- Las tarjetas ----------------------------------------------------------------------------- */
@@ -395,11 +362,5 @@
 
   .tarjeta:hover .flecha {
     transform: translateX(2px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .whatsapp {
-    transition: none;
   }
 }

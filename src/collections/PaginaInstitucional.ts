@@ -681,15 +681,15 @@ export const PaginaInstitucional: CollectionConfig = {
         } as Field,
         texto(
           "whatsappTexto",
-          "Texto del botón de WhatsApp",
+          "Texto del botón de WhatsApp (ya no se usa)",
           "Encuentra la referencia que tu máquina necesita",
-          "Botón verde bajo el texto; abre WhatsApp con el número de la empresa en otra pestaña. Vacío, no se pinta.",
+          "Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp (decisión de Juan Pablo). El texto va en «Texto bajo el título».",
         ),
         texto(
           "whatsappMensaje",
-          "Mensaje ya escrito en WhatsApp",
+          "Mensaje ya escrito en WhatsApp (ya no se usa)",
           "Hola, busco la referencia de un repuesto para mi máquina.",
-          "Lo que aparece escrito en el chat al abrirlo. Vacío, el chat se abre en blanco.",
+          "Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp.",
         ),
         texto(
           "verMasTexto",

@@ -1,10 +1,8 @@
-import { IconBrandWhatsapp } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import type { AlineacionTexto, AnchoTexto } from "@/lib/fields/alineacionTexto";
 import { partirTitulo, type CategoriaDePortada } from "@/lib/portada/kitCliente";
-import type { EnlaceWhatsApp } from "@/lib/whatsapp";
 
 import { Flecha } from "./Flecha";
 import { TextoEditable } from "./TextoEditable";
@@ -14,8 +12,8 @@ import estilos from "./repuestosKit.module.css";
  * «VENTA DE REPUESTOS», DISEÑO V3 DEL CLIENTE (2026-11-03; prototipo `CatalogoRepuestos` de
  * `partequipos-diseno\portada-repuestos-v3`), PORTADO a CSS modules. Sustituye al de la máquina
  * (2026-10-26/27): la sección ya NO lleva máquina (la Yanmar pasa a la banda «Marcas de repuestos»,
- * justo debajo). Título con una palabra en rojo, el texto del panel (un párrafo por línea), el botón
- * verde de WhatsApp (el de los formularios, #405) y las categorías en tarjetas blancas con esquina
+ * justo debajo). Título con una palabra en rojo, el texto del panel (un párrafo por línea, con su
+ * alineación y ancho; SIN el botón de WhatsApp del prototipo, por decisión de Juan Pablo) y las categorías en tarjetas blancas con esquina
  * roja, 5 por fila desde portátil. Detrás, franjas diagonales grises y una roja, a la derecha del
  * texto (nunca lo cruzan).
  *
@@ -33,20 +31,15 @@ export type TextosRepuestosKit = {
   descripcion: string;
   descripcionAlineacion: AlineacionTexto;
   descripcionAncho: AnchoTexto;
-  /** Texto del botón de WhatsApp. Vacío (o sin número de la empresa), no se pinta. */
-  whatsappTexto: string;
 };
 
 const TITULO_POR_DEFECTO = "Encuentra Maquinaria y Repuestos Rápido y Fácil";
 
 export function SeccionRepuestosKit({
   categorias,
-  whatsapp,
   textos,
 }: {
   categorias: CategoriaDePortada[];
-  /** El enlace de WhatsApp de la empresa, ya con el mensaje del panel. */
-  whatsapp: EnlaceWhatsApp | undefined;
   textos: TextosRepuestosKit;
 }) {
   if (categorias.length === 0) return null;
@@ -72,18 +65,6 @@ export function SeccionRepuestosKit({
             ancho={textos.descripcionAncho}
             className={estilos.descripcion}
           />
-          {whatsapp && textos.whatsappTexto ? (
-            <a
-              href={whatsapp.href}
-              className={estilos.whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={2} size={20} />
-              {textos.whatsappTexto}
-              <span className="sr-only"> (abre WhatsApp en otra pestaña)</span>
-            </a>
-          ) : null}
         </div>
 
         <ul className={estilos.tarjetas}>

@@ -1611,11 +1611,11 @@ export interface Pagina {
      */
     tamanoMaquina?: number | null;
     /**
-     * Botón verde bajo el texto; abre WhatsApp con el número de la empresa en otra pestaña. Vacío, no se pinta.
+     * Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp (decisión de Juan Pablo). El texto va en «Texto bajo el título».
      */
     whatsappTexto?: string | null;
     /**
-     * Lo que aparece escrito en el chat al abrirlo. Vacío, el chat se abre en blanco.
+     * Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp.
      */
     whatsappMensaje?: string | null;
     /**

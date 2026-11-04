@@ -876,7 +876,7 @@ export interface CategoriasTecnica {
    */
   ordenMarca?: number | null;
   /**
-   * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Qué incluye».
+   * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Elige el repuesto de … que necesitas».
    */
   grupos?:
     | {

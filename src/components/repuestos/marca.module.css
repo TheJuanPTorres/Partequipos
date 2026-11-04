@@ -489,6 +489,17 @@ a.pildora:hover {
   margin-inline: calc(-1 * (var(--rejilla-relleno) - 10px));
 }
 
+/*
+ * «Elige el repuesto de {categoría} que necesitas» (2026-11-04): con nombres largos («Baldes y
+ * Herramienta de Corte», «Filtros Donaldson») las líneas se reparten parejas, sin dejar una
+ * palabra sola en la última ni partir palabras.
+ */
+.tarjetasGrupos > .tituloSeccion {
+  text-wrap: balance;
+  overflow-wrap: normal;
+  hyphens: manual;
+}
+
 .rejilla {
   display: grid;
   margin: 40px 0 0;

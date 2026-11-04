@@ -1,7 +1,24 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { enlacesDeCabecera } from "./enlaces";
+import { enlaceDeFilaObligatorio, enlacesDeCabecera } from "./enlaces";
+
+describe("enlaceDeFilaObligatorio", () => {
+  it("una fila oculta se guarda sin enlace", () => {
+    assert.equal(enlaceDeFilaObligatorio("", false), true);
+    assert.equal(enlaceDeFilaObligatorio(null, false), true);
+    assert.equal(enlaceDeFilaObligatorio(undefined, false), true);
+  });
+
+  it("una fila que se muestra (o de antes de la casilla) necesita su enlace", () => {
+    for (const mostrar of [true, null, undefined]) {
+      assert.equal(typeof enlaceDeFilaObligatorio("", mostrar), "string");
+      assert.equal(typeof enlaceDeFilaObligatorio("   ", mostrar), "string");
+      assert.equal(typeof enlaceDeFilaObligatorio(null, mostrar), "string");
+      assert.equal(enlaceDeFilaObligatorio("/transporte/", mostrar), true);
+    }
+  });
+});
 
 describe("enlacesDeCabecera", () => {
   it("la tienda (https de otro sitio) es externa; las rutas y el propio dominio, no", () => {

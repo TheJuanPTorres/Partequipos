@@ -41,6 +41,7 @@ export function LogoMarca({
       loading={loading}
       className={`${estilos.logo} ${className ?? ""}`}
       data-oscuro={logo.oscuro ? "" : undefined}
+      data-blanco={logo.blanco ? "" : undefined}
     />
   );
 }

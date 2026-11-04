@@ -390,22 +390,84 @@
   cursor: pointer;
 }
 
-.globo :global(.sedes-pin__punto) {
+/*
+ * El MARCADOR dice el tipo de sede (2026-11-04): la PRINCIPAL, un punto más grande con DOBLE
+ * círculo exterior; la SECUNDARIA, uno algo más pequeño con UN solo círculo. Mismo rojo de marca.
+ * Los círculos son anillos de `box-shadow` con un hueco blanco, no `outline`, para poder ponerlos
+ * a dos radios. El tipo también va en el nombre accesible del pin y en la leyenda (no depende
+ * solo del tamaño ni del color).
+ */
+.globo :global(.sedes-pin__punto),
+.leyendaPunto {
   display: block;
-  width: 0.75em;
-  height: 0.75em;
+  width: 0.65em;
+  height: 0.65em;
   border-radius: 100em;
   background-color: var(--sedes-cta);
-  transition: all 0.35s var(--sedes-curva);
+  box-shadow:
+    0 0 0 0.2em #fff,
+    0 0 0 0.27em var(--sedes-cta);
+  transition: transform 0.35s var(--sedes-curva);
+}
+
+.globo :global(.sedes-pin[data-tipo="principal"] .sedes-pin__punto),
+.leyendaPunto[data-tipo="principal"] {
+  width: 0.95em;
+  height: 0.95em;
+  box-shadow:
+    0 0 0 0.2em #fff,
+    0 0 0 0.27em var(--sedes-cta),
+    0 0 0 0.47em #fff,
+    0 0 0 0.54em var(--sedes-cta);
 }
 
 .globo :global(.sedes-pin:hover .sedes-pin__punto) {
+  transform: scale(1.25);
+}
+
+/* Sede activa: el punto crece y la etiqueta se ve; los círculos siguen contando el tipo. */
+.globo :global(.sedes-pin[data-activo] .sedes-pin__punto) {
   transform: scale(1.35);
 }
 
-.globo :global(.sedes-pin[data-activo] .sedes-pin__punto) {
-  outline: 1px solid var(--sedes-cta);
-  outline-offset: 0.375em;
+.leyenda {
+  position: absolute;
+  /* Arriba a la izquierda: abajo taparía el logo de Mapbox (que tiene que verse entero) o un pin. */
+  top: 1.5em;
+  left: 1.5em;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 1.5em;
+  margin: 0;
+  padding: 0.625em 1em;
+  border: 1px solid var(--sedes-linea-2);
+  border-radius: 0.5em;
+  background: var(--sedes-panel);
+  color: var(--sedes-tinta);
+  font-size: 0.8125em;
+  list-style: none;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.875em;
+}
+
+.leyendaPunto {
+  flex: none;
+  margin: 0.55em;
+}
+
+@media (width <= 991px) {
+  /* En móvil el mapa va encima del panel: la leyenda, en una fila entre los dos. */
+  .leyenda {
+    position: static;
+    border-width: 1px 0 0;
+    border-radius: 0;
+    padding: 0.75em 1.5em;
+  }
 }
 
 /* Pin solapado con otro: inactivo (`inert`), lo cubren las flechas
@@ -561,6 +623,7 @@
   .verMapa,
   .cerrar,
   .globo :global(.sedes-pin__punto),
+  .leyendaPunto,
   .globo :global(.sedes-pin__etiqueta) {
     transition: none;
   }

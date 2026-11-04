@@ -876,7 +876,7 @@ export interface CategoriasTecnica {
    */
   ordenMarca?: number | null;
   /**
-   * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Qué incluye».
+   * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Elige el repuesto de … que necesitas».
    */
   grupos?:
     | {
@@ -2428,7 +2428,7 @@ export interface Sede {
   latitud: number;
   longitud: number;
   /**
-   * Cada línea con su dirección. Ej. Maquinaria · Diagonal 16 # 96 G – 85.
+   * Cada línea con su dirección. Ej. Maquinaria · Diagonal 16 # 96 G – 85. Puede quedar vacía mientras se consiguen los datos de la sede: entonces solo sale su nombre y su punto en el mapa.
    */
   lineas?:
     | {
@@ -2446,6 +2446,10 @@ export interface Sede {
       }[]
     | null;
   foto?: (number | null) | Media;
+  /**
+   * En el mapa, la principal lleva un punto más grande con doble círculo y la secundaria uno más pequeño con un solo círculo. La lista dice de cuál se trata.
+   */
+  tipo?: ('principal' | 'secundaria') | null;
   /**
    * Menor primero.
    */
@@ -3643,6 +3647,7 @@ export interface SedesSelect<T extends boolean = true> {
         id?: T;
       };
   foto?: T;
+  tipo?: T;
   orden?: T;
   actualizadoPor?: T;
   updatedAt?: T;
@@ -3830,16 +3835,16 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface Cabecera {
   id: number;
   /**
-   * En el orden de la barra (escritorio y móvil). Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro en su sitio de la barra y se abre en una pestaña nueva. Desmarca «Mostrar» para quitarlo sin borrarlo.
+   * Hasta 8, en el orden de la barra (escritorio y móvil). Si en escritorio no caben todos, los últimos pasan a un desplegable «Más» al final de la barra; en el móvil salen todos en lista. Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro en su sitio de la barra y se abre en una pestaña nueva. Desmarca «Mostrar» para quitarlo sin borrarlo, o para crearlo antes de tener su enlace: oculto, no ocupa sitio.
    */
   enlaces?:
     | {
         mostrar?: boolean | null;
         etiqueta: string;
         /**
-         * Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva).
+         * Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva). Puede quedar vacío si la fila está oculta.
          */
-        enlace: string;
+        enlace?: string | null;
         id?: string | null;
       }[]
     | null;

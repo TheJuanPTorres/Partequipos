@@ -8,3 +8,8 @@
   filter: brightness(0);
   opacity: 0.85;
 }
+
+/* En una baldosa de color (índice de marcas de nueva): el logo en una sola tinta blanca. */
+.logo[data-blanco] {
+  filter: brightness(0) invert(1);
+}

@@ -33,6 +33,7 @@ import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { rutas } from "@/lib/routes";
 import { vistaBannerDe } from "@/lib/nueva/bannerMarca";
 import { metadataDe } from "@/lib/seo/metadata";
+import { tituloEligeRepuesto } from "@/lib/repuestos/tituloGrupos";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
@@ -153,7 +154,7 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
 
           <TarjetasGrupos
             id={ANCLA_GRUPOS}
-            titulo={`Qué incluye ${nombre.toLowerCase()}`}
+            titulo={tituloEligeRepuesto(nombre, true)}
             categoria={nombre}
             grupos={gruposDeCategoria(categoria)}
             formulario={formulario}

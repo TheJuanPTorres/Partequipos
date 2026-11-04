@@ -89,10 +89,14 @@ export function logoDeMarca(fuente: FuenteLogo, indice: IndiceLogos): LogoMarca 
  * encaja: «CASE» del carrusel de la portada es «Case Construction». Con menos de 3
  * letras, o si encajan varias, ninguna (mejor su logo propio que el de otra marca).
  */
-function logoDeRepuestos(clave: string, indice: IndiceLogos): LogoMarca | undefined {
+export function buscarPorNombre<T>(clave: string, indice: ReadonlyMap<string, T>): T | undefined {
   if (!clave) return undefined;
   const exacto = indice.get(clave);
   if (exacto || clave.length < 3) return exacto;
   const encajan = [...indice].filter(([k]) => k.startsWith(clave) || clave.startsWith(k));
   return encajan.length === 1 ? encajan[0]![1] : undefined;
+}
+
+function logoDeRepuestos(clave: string, indice: IndiceLogos): LogoMarca | undefined {
+  return buscarPorNombre(clave, indice);
 }

@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 
 import type { MarcasMaquinaria } from "@/payload-types";
 
+import { contraste, luminancia, rgbDeHex } from "../portada/contraste";
 import { vistaBaldosa } from "../repuestos/baldosasColor";
 import { colorDeBaldosaNueva, logoEnBlanco, placasDeMarcasNueva } from "./indiceMarcas";
 
@@ -52,9 +53,11 @@ describe("placasDeMarcasNueva", () => {
 describe("baldosas de color de nueva", () => {
   const logo = { url: "/l.png", width: 400, height: 100, oscuro: false };
 
-  it("el color solo si el logo blanco llega a 3:1", () => {
-    assert.equal(colorDeBaldosaNueva("#A20F14"), "#a20f14");
-    assert.equal(colorDeBaldosaNueva("#FFCD00"), null, "el amarillo no sostiene un logo blanco");
+  it("el color se oscurece lo justo hasta que el blanco llega a 3:1", () => {
+    assert.equal(colorDeBaldosaNueva("#A20F14"), "#a20f14", "ya llega: sin cambios");
+    const amarillo = colorDeBaldosaNueva("#FFCD00")!;
+    assert.notEqual(amarillo, "#ffcd00");
+    assert.ok(contraste(1, luminancia(...rgbDeHex(amarillo)!)) >= 3);
     assert.equal(colorDeBaldosaNueva("rojo"), null);
     assert.equal(colorDeBaldosaNueva("#fff"), null);
     assert.equal(colorDeBaldosaNueva(null), null);
@@ -91,9 +94,34 @@ describe("baldosas de color de nueva", () => {
     const [p] = placasDeMarcasNueva(
       [marca(6, "liugong", { enlaceExterno: "https://maquitecno.co/", colorMarca: "#ed1c24" })],
       [],
-      new Map(),
+      new Map([["liugong", logo]]),
     );
     assert.equal(p!.externo, true);
     assert.equal(p!.color, "#ed1c24");
+  });
+
+  it("la baldosa de la marca de repuestos con su nombre manda sobre lo propio", () => {
+    const logoBaldosa = { url: "/b.png", width: 300, height: 90, oscuro: false };
+    const baldosas = new Map([["case", { color: "#f3e7cc", logo: logoBaldosa }]]);
+    const [p] = placasDeMarcasNueva(
+      [marca(3, "case", { nombre: "Case Construction", colorMarca: "#123456" })],
+      [{ marca: 3 }],
+      new Map([["case", logo]]),
+      baldosas,
+    );
+    assert.equal(p!.color, "#f3e7cc");
+    assert.deepEqual(p!.logoSobreColor, logoBaldosa, "su logo tal cual, sin pintarlo de blanco");
+  });
+
+  it("sin marca de repuestos, el color propio (oscurecido) y su logo en blanco; un JPG, gris", () => {
+    const dyn = (url: string) =>
+      placasDeMarcasNueva(
+        [marca(7, "dynapac", { colorMarca: "#bf2e1a" })],
+        [{ marca: 7 }],
+        new Map([["dynapac", { ...logo, url }]]),
+      )[0]!;
+    assert.equal(dyn("/d.png").color, "#bf2e1a");
+    assert.equal(dyn("/d.png").logoSobreColor?.blanco, true);
+    assert.equal(dyn("/d.jpg").color, null);
   });
 });

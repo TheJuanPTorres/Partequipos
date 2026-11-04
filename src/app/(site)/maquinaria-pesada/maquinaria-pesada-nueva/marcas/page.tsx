@@ -5,6 +5,7 @@ import { BaldosasColorMarcas } from "@/components/repuestos/BaldosasColorMarcas"
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { placasDeMarcasNueva } from "@/lib/nueva/indiceMarcas";
+import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { getLogosMarca } from "@/lib/queries/getLogosMarca";
 import { getEquiposNuevos, getMarcasMaquinaria } from "@/lib/queries/getMaquinaria";
 import { rutas } from "@/lib/routes";
@@ -33,10 +34,11 @@ const ANCLA = "marcas-maquinaria";
  * 2026-10-20): la cabecera es la caja baja de las baldosas, con el `<h1>`.
  */
 export default async function MarcasMaquinariaPage() {
-  const [marcas, equipos, logos] = await Promise.all([
+  const [marcas, equipos, logos, baldosas] = await Promise.all([
     getMarcasMaquinaria(),
     getEquiposNuevos(),
     getLogosMarca(),
+    getBaldosasMarca(),
   ]);
 
   const breadcrumbs = [
@@ -55,7 +57,7 @@ export default async function MarcasMaquinariaPage() {
 
       <BaldosasColorMarcas
         id={ANCLA}
-        marcas={placasDeMarcasNueva(marcas, equipos, logos)}
+        marcas={placasDeMarcasNueva(marcas, equipos, logos, baldosas)}
         h1={{ antetitulo: "Maquinaria pesada nueva", titulo: "Marcas" }}
         sobre="maquinaria"
       />

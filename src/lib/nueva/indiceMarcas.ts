@@ -1,7 +1,14 @@
 import type { EquiposNuevo, MarcasMaquinaria } from "@/payload-types";
 
 import { contraste, luminancia, rgbDeHex } from "../portada/contraste";
-import { logoDeMarca, type IndiceLogos, type LogoMarca } from "../marca/logoMarca";
+import { oscurecer } from "../marca/franjaMarca";
+import {
+  buscarPorNombre,
+  claveDeMarca,
+  logoDeMarca,
+  type IndiceLogos,
+  type LogoMarca,
+} from "../marca/logoMarca";
 import type { PlacaMarca } from "../repuestos/categoria";
 import { rutas } from "../routes";
 import { SLUG_ADITAMENTOS } from "../megamenu";
@@ -27,13 +34,24 @@ import { enlaceExternoDe } from "./enlaceExterno";
 /** Contraste mínimo del logo blanco sobre el color (WCAG 1.4.11, elementos gráficos). */
 export const CONTRASTE_LOGO_BLANCO = 3;
 
-/** El color de la baldosa si el logo blanco se lee sobre él (≥ 3:1); si no, `null` (respaldo gris). */
+/** La baldosa de una marca de repuestos: su color y su logo para ese color. */
+export type BaldosaDeRepuestos = { color: string; logo: LogoMarca };
+
+/**
+ * El color de la baldosa para un logo blanco: el propio si llega a 3:1; si no, OSCURECIDO lo
+ * justo (mismo tono, mezclado con negro, como hizo #417 con Hitachi y Kobelco). `null` si no es
+ * un `#rrggbb`.
+ */
 export function colorDeBaldosaNueva(color: string | null | undefined): string | null {
-  const rgb = color ? rgbDeHex(color) : null;
-  if (!rgb || !/^#[0-9a-f]{6}$/i.test(color!.trim())) return null;
-  return contraste(1, luminancia(...rgb)) >= CONTRASTE_LOGO_BLANCO
-    ? color!.trim().toLowerCase()
-    : null;
+  const t = color?.trim().toLowerCase() ?? "";
+  if (!/^#[0-9a-f]{6}$/.test(t)) return null;
+  let k = 0;
+  let c = t;
+  while (contraste(1, luminancia(...rgbDeHex(c)!)) < CONTRASTE_LOGO_BLANCO && k < 1) {
+    k = Math.round((k + 0.01) * 100) / 100;
+    c = oscurecer(t, k);
+  }
+  return c;
 }
 
 /**
@@ -50,6 +68,7 @@ export function placasDeMarcasNueva(
   marcas: MarcasMaquinaria[],
   equipos: ReadonlyArray<Pick<EquiposNuevo, "marca">>,
   logos: IndiceLogos,
+  baldosas: ReadonlyMap<string, BaldosaDeRepuestos> = new Map(),
 ): PlacaMarca[] {
   const conEquipos = new Set(
     equipos.map((e) => (typeof e.marca === "number" ? e.marca : e.marca?.id)),
@@ -67,6 +86,11 @@ export function placasDeMarcasNueva(
     .map((m) => {
       const externo = enlaceExternoDe(m);
       const logo = logoDeMarca(m, logos);
+      // «Una marca, un solo logo»: la baldosa de la marca de repuestos con su nombre (Case, Hitachi,
+      // Yanmar, LiuGong…); si no hay, su color de marca y su logo en blanco (Dynapac).
+      const deRepuestos = buscarPorNombre(claveDeMarca(m.nombre), baldosas);
+      const propia = logoEnBlanco(logo);
+      const colorPropio = propia ? colorDeBaldosaNueva(m.colorMarca) : null;
       return {
         id: m.id,
         nombre: nombre(m),
@@ -74,8 +98,8 @@ export function placasDeMarcasNueva(
         ...(externo ? { externo: true as const } : {}),
         // El logo de todo el sitio (`LogoMarca`).
         logo,
-        color: colorDeBaldosaNueva(m.colorMarca),
-        logoSobreColor: logoEnBlanco(logo),
+        color: deRepuestos ? deRepuestos.color : colorPropio,
+        logoSobreColor: deRepuestos ? deRepuestos.logo : colorPropio ? propia : null,
       };
     });
 }

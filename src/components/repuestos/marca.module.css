@@ -1218,15 +1218,21 @@ a.modelo:hover {
  * foto por encima del recuadro del nombre: los 34 px que sube sobre la caja y
  * los 25 px que puede subir con el scroll (`RecuadrosConScroll`).
  */
-/* Más alta que la de escena (4:3, no 3:2): las fotos de producto son casi cuadradas. */
+/*
+ * CUADRADA (dirección, 2026-11-03; antes 4:3): las 71 fotos son ficheros 1:1 con la pieza
+ * dentro y su propio blanco (mediana: 45 % arriba + abajo, 24 % a los lados). En 4:3 el
+ * fichero se ajustaba por el alto y la pieza ocupaba ~55 % del espacio útil; en 1:1, con
+ * 2 % de margen, ~69 %, el máximo SIN recortar (medido el 2026-11-03). Más solo recortando el
+ * blanco de los ficheros.
+ */
 .tarjetasGrupos .foto {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
 }
 
 .tarjetasGrupos .foto .fotoImg.fotoProducto,
 .tarjetasGrupos .tarjeta:hover .fotoImg.fotoProducto {
   box-sizing: border-box;
-  padding: 4% 5% 59px;
+  padding: 2% 2% 59px;
   object-fit: contain;
   object-position: center;
   transform: none;

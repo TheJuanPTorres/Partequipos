@@ -5,6 +5,13 @@
  *   npm run preview:ejecutar -- payload run scripts/cabecera/enlaces-prueba.ts sembrar <manifiesto.json>
  *   … ocultar <manifiesto.json>    # «Industrial»: «Mostrar» desmarcado y SIN enlace
  *   … retirar <manifiesto.json>    # deja los enlaces EXACTAMENTE como estaban
+ *   … ver                          # solo lee: los enlaces de la base
+ *   (cualquiera) revalidar=<origen del preview>
+ *       vacía la caché de ese preview (`POST /api/revalidar/`) y comprueba en el
+ *       HTML de su portada que salen los enlaces visibles de la base.
+ *
+ * El script corre fuera de Next: guardar el global NO refresca el preview (su
+ * cabecera va en la caché `datos:marco`). De ahí `revalidar=`.
  *
  * «sembrar» guarda en el manifiesto las filas de antes (con su id, «Mostrar» y
  * enlace) y añade «Transporte» e «Industrial» (los que añadirá Juan Pablo) y, si
@@ -18,6 +25,8 @@ import { getPayload } from "payload";
 
 import { MAX_ENLACES_CABECERA } from "../../src/lib/cabecera/enlaces";
 import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
+import { fetchAlPreview, origenDePreview } from "../../src/lib/preview/derivacion.mjs";
+import { CABECERA_REVALIDACION } from "../../src/lib/seguridad/tokenRevalidacion";
 
 const fallar = (m: string): never => {
   const e = new Error(`[enlaces-prueba] ✗ ${m}`);
@@ -25,9 +34,12 @@ const fallar = (m: string): never => {
   throw e;
 };
 const args = process.argv.slice(2);
-const modo = args.find((a) => a === "sembrar" || a === "ocultar" || a === "retirar");
+const modo = args.find((a) => a === "sembrar" || a === "ocultar" || a === "retirar" || a === "ver");
 const manifiesto = args.find((a) => a.endsWith(".json"));
-if (!modo || !manifiesto) fallar("uso: sembrar|ocultar|retirar <manifiesto.json>");
+if (!modo || (modo !== "ver" && !manifiesto))
+  fallar("uso: sembrar|ocultar|retirar <manifiesto.json> | ver  [revalidar=<preview>]");
+const REVALIDAR = args.find((a) => a.startsWith("revalidar="))?.slice("revalidar=".length);
+if (REVALIDAR && !origenDePreview(REVALIDAR)) fallar("`revalidar=` solo con la URL de un preview");
 const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
 if (!v.permitido) fallar(`NO se hace nada: ${v.motivo}`);
 
@@ -62,7 +74,9 @@ const CANDIDATAS: Fila[] = [
 ];
 
 const actuales = await leer();
-if (modo === "sembrar") {
+if (modo === "ver") {
+  // Solo lectura: lo de abajo imprime los enlaces.
+} else if (modo === "sembrar") {
   if (existsSync(manifiesto!)) fallar("el manifiesto ya existe: retira antes de volver a sembrar");
   const visibles = actuales.filter((f) => f.mostrar !== false && f.enlace).length;
   const faltan = MAX_ENLACES_CABECERA - visibles;
@@ -100,4 +114,29 @@ const ahora = await leer();
 log(
   `enlaces ahora: ${ahora.map((f) => `${f.etiqueta} → ${f.enlace ?? "(sin enlace)"}${f.mostrar === false ? " [oculta]" : ""}`).join(" | ")}`,
 );
+
+if (REVALIDAR) {
+  const origen = REVALIDAR.replace(/\/$/, "");
+  const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET ?? "";
+  const token = process.env.REVALIDACION_TOKEN ?? "";
+  if (!token) fallar("sin REVALIDACION_TOKEN del preview: no se revalida");
+  const r = await fetchAlPreview(`${origen}/api/revalidar/`, origen, bypass, {
+    method: "POST",
+    headers: { [CABECERA_REVALIDACION]: token },
+  });
+  log(`POST /api/revalidar/: HTTP ${r.status}`);
+  if (r.status !== 200) fallar("la revalidación del preview no respondió 200");
+  // La cabecera del HTML de la portada: cada enlace visible, una vez como mínimo
+  // (en la fila de escritorio; los que no caben se reparten al medir, en el navegador).
+  const pagina = await fetchAlPreview(`${origen}/`, origen, bypass);
+  const html = await pagina.text();
+  const cabecera = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+  const visibles = ahora.filter((f) => f.mostrar !== false && f.enlace);
+  const faltan = visibles.filter((f) => !cabecera.includes(`>${f.etiqueta}<`));
+  log(
+    `HTML de / (HTTP ${pagina.status}): ${visibles.length - faltan.length} de ${visibles.length} enlaces en la cabecera` +
+      (faltan.length ? `; FALTAN: ${faltan.map((f) => f.etiqueta).join(", ")}` : ""),
+  );
+  if (faltan.length) fallar("la cabecera del preview no lleva todos los enlaces");
+}
 process.exit(0);

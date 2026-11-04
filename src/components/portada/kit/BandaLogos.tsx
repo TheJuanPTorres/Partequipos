@@ -7,6 +7,7 @@ import { LogoMarca } from "@/components/marca/LogoMarca";
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { usePausa } from "@/components/movimiento/useMovimiento";
 import type { LogoDePortada } from "@/lib/portada/kitCliente";
+import { sizesDeLogo } from "@/lib/portada/sizesLogo";
 
 import estilos from "./marcasKit.module.css";
 
@@ -23,7 +24,6 @@ import estilos from "./marcasKit.module.css";
 const COPIAS = 4;
 /** El prototipo: 32 s por vuelta con 6 marcas (dos copias). */
 const SEGUNDOS_POR_LOGO = 2.7;
-const SIZES_LOGO = "(min-width: 1025px) 15vw, 180px";
 
 export function BandaLogos({
   logos,
@@ -65,7 +65,7 @@ export function BandaLogos({
                         <LogoMarca
                           logo={l.logo}
                           alt={l.logo.alt}
-                          sizes={SIZES_LOGO}
+                          sizes={sizesDeLogo(l.logo, espejo)}
                           className={estilos.logo}
                         />
                       </Link>
@@ -74,7 +74,7 @@ export function BandaLogos({
                         <LogoMarca
                           logo={l.logo}
                           alt={copia === 0 ? l.logo.alt : ""}
-                          sizes={SIZES_LOGO}
+                          sizes={sizesDeLogo(l.logo, espejo)}
                           className={estilos.logo}
                         />
                       </span>

@@ -239,20 +239,6 @@
   transform: rotate(180deg);
 }
 
-/* Enlace a otro sitio (la tienda): el texto y un icono pequeño de enlace externo. */
-.externo {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-
-.externo svg {
-  flex: none;
-  width: 14px;
-  height: 14px;
-}
-
 .enlace:focus-visible,
 .disparador:focus-visible,
 .icono:focus-visible,
@@ -307,8 +293,46 @@
 }
 
 .boton svg {
+  flex: none;
   width: 16px;
   height: 16px;
+}
+
+/*
+ * Enlace a otro sitio (la tienda, dirección 2026-11-03): la forma y el tamaño de
+ * «Contáctanos», pero en la tinta del sitio, con el texto claro y el icono rojo
+ * (#100f0f: 19,3:1 con el blanco; el rojo #e5242d, 4,3:1 sobre la tinta). Al pasar
+ * el ratón, al revés que «Contáctanos»: se rellena de rojo y el icono pasa a blanco.
+ */
+.botonExterno {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+}
+
+.botonExterno svg {
+  color: var(--color-marca);
+  transition: color 0.3s ease;
+}
+
+.botonExterno:hover {
+  border-color: var(--color-marca);
+  background: var(--color-marca);
+}
+
+.botonExterno:hover svg {
+  color: var(--color-fondo);
+}
+
+.botonExterno:focus-visible {
+  outline-color: var(--color-marca);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .boton {
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease;
+  }
 }
 
 /* --- Buscador (petición del cliente, 2026-10-14) --- */
@@ -621,9 +645,14 @@
   margin-top: 16px;
 }
 
+/* En el menú del móvil, la tienda es un botón en su sitio de la lista. */
+.panel .botonExterno {
+  margin-block: 12px 4px;
+}
+
 /*
- * Barra de escritorio estrecha (1025–1299 px): con seis enlaces (la tienda,
- * 2026-10-27) logo, menú y acciones no caben a la vez, y la columna de la lupa
+ * Barra de escritorio estrecha (1025–1299 px): con los enlaces, la lupa y los dos
+ * botones (la tienda, 2026-10-27; botón desde el 2026-11-03) logo, menú y acciones no caben a la vez, y la columna de la lupa
  * y «Contáctanos», que encoge por debajo de su contenido, se metía sobre el
  * último enlace (ya pasaba con «Blog» a 1025). Aquí no encoge por debajo de su
  * contenido, el logo se queda en al menos 110 px y los enlaces juntan su aire
@@ -633,10 +662,6 @@
  * fichero: `.accionCol { min-width: 0 }` está más abajo y, si no, ganaría.
  */
 @media (min-width: 1025px) and (max-width: 1299px) {
-  .accionCol {
-    min-width: max-content;
-  }
-
   .logoCol {
     min-width: 130px;
   }
@@ -647,5 +672,48 @@
 
   .enlace {
     padding-inline: 6px;
+  }
+}
+
+/*
+ * La tienda, botón dentro de la fila (2026-11-03): centrada en vertical con los
+ * enlaces y con aire a su izquierda. La columna de acciones no encoge por debajo de
+ * su contenido en ningún ancho de escritorio, para que la lupa no se meta sobre el
+ * botón: la fila de enlaces es la que cede.
+ */
+.conBoton {
+  display: flex;
+  align-items: center;
+  margin-inline-start: 8px;
+}
+
+@media (min-width: 1025px) {
+  .accionCol {
+    min-width: max-content;
+  }
+
+  /* Los enlaces, centrados en vertical con el botón (antes, pegados arriba de la fila). */
+  .nav .lista {
+    align-items: center;
+  }
+}
+
+/* Entre 1025 y 1299 px, la tienda más compacta: si no, la barra no cabe. */
+@media (min-width: 1025px) and (max-width: 1299px) {
+  .conBoton {
+    margin-inline-start: 4px;
+  }
+
+  .conBoton .boton {
+    gap: 8px;
+    padding-inline: 14px;
+  }
+}
+
+/* Y hasta 1099 px, también «Contáctanos» más compacto: a 1025 la barra se salía 13 px. */
+@media (min-width: 1025px) and (max-width: 1099px) {
+  .acciones .boton {
+    gap: 8px;
+    padding-inline: 16px;
   }
 }

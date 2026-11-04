@@ -2,8 +2,8 @@ import { esDelSitio } from "../pie";
 
 /**
  * Un enlace de la barra de la cabecera. `externo`: una dirección https:// de
- * otro sitio (la tienda del cliente, 2026-10-27), que se abre en una pestaña
- * nueva con el icono de enlace externo, en escritorio y en móvil.
+ * otro sitio (la tienda del cliente, 2026-10-27), que se pinta como botón oscuro
+ * en su sitio de la fila (2026-11-03) y se abre en una pestaña nueva.
  */
 export type EnlaceCabecera = { etiqueta: string; href: string; externo?: boolean };
 

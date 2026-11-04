@@ -65,7 +65,7 @@ export function BandaLogos({
                         <LogoMarca
                           logo={l.logo}
                           alt={l.logo.alt}
-                          sizes={sizesDeLogo(l.logo)}
+                          sizes={sizesDeLogo(l.logo, espejo)}
                           className={estilos.logo}
                         />
                       </Link>
@@ -74,7 +74,7 @@ export function BandaLogos({
                         <LogoMarca
                           logo={l.logo}
                           alt={copia === 0 ? l.logo.alt : ""}
-                          sizes={sizesDeLogo(l.logo)}
+                          sizes={sizesDeLogo(l.logo, espejo)}
                           className={estilos.logo}
                         />
                       </span>

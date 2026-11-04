@@ -1,0 +1,193 @@
+/*
+ * BARRA DE SECCIONES de la portada (`NavSecciones.tsx`): el diseño del cliente portado sin
+ * Tailwind ni «motion» (sus `sm` y `lg` son 640 y 1024 px). El fondo rojo es el `::before` de
+ * la lista: descansa en el primer botón y se desliza al que tiene el ratón o el foco. Va justo
+ * después del hero, montado sobre el borde de abajo de su tarjeta.
+ */
+
+/*
+ * Lo que monta sobre la tarjeta del hero: el mismo `--hero-nav-cruce` que hero.module.css (30 px
+ * en móvil, 44 desde 768), más el 1,5 % de relleno de abajo de la sección del hero.
+ */
+.nav {
+  --nav-cruce: 30px;
+  position: relative;
+  z-index: 1;
+  width: min(100% - 24px, 896px);
+  box-sizing: border-box;
+  margin: calc(-1 * (var(--nav-cruce) + 1.5vw)) auto 0;
+  padding: 6px;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(20 17 15 / 8%),
+    0 10px 20px -12px rgb(20 17 15 / 30%);
+}
+
+.lista {
+  --activo: 0;
+  position: relative;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* El fondo rojo: un botón de ancho, desplazado al botón activo. */
+.lista::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(100% / var(--botones, 3));
+  border-radius: 20px;
+  background: var(--color-marca);
+  transform: translateX(calc(var(--activo) * 100%));
+  transition: transform 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.lista:has(> .item:nth-child(2) > .boton:is(:hover, :focus-visible)) {
+  --activo: 1;
+}
+
+.lista:has(> .item:nth-child(3) > .boton:is(:hover, :focus-visible)) {
+  --activo: 2;
+}
+
+.item {
+  position: relative;
+  min-width: 0;
+  flex: 1;
+}
+
+/* Separador: una raya corta y redonda entre botones; se apaga junto al botón en rojo. */
+.item + .item::before {
+  content: "";
+  position: absolute;
+  top: 27%;
+  left: 0;
+  width: 1px;
+  height: 46%;
+  border-radius: 1px;
+  background: rgb(20 17 15 / 12%);
+  transition: opacity 0.2s;
+}
+
+.lista:not(:has(.boton:is(:hover, :focus-visible))) > .item:nth-child(2)::before,
+.item:has(> .boton:is(:hover, :focus-visible))::before,
+.item:has(> .boton:is(:hover, :focus-visible)) + .item::before {
+  opacity: 0;
+}
+
+.boton {
+  position: relative;
+  display: flex;
+  padding: 10px 6px 12px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border-radius: 20px;
+  color: #14110f;
+  text-decoration: none;
+}
+
+.boton:focus-visible {
+  outline: 3px solid #14110f;
+  outline-offset: 2px;
+}
+
+/* La máquina recortada: entera, y avanza un poco al pasar. */
+.imagen {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 40px;
+}
+
+.maquina {
+  object-fit: contain;
+  transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.boton:is(:hover, :focus-visible) .maquina {
+  transform: translateX(4px);
+}
+
+/* El nombre: el mismo alto en todos (tres líneas en móvil, dos desde 640 px), alineados. */
+.etiqueta {
+  position: relative;
+  display: flex;
+  min-height: calc(3 * 1.25em);
+  align-items: center;
+  font-size: 12.8px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+  transition: color 0.2s;
+}
+
+/* En rojo, el texto en blanco (4,54:1): el primero en reposo, el del ratón o el foco al pasar. */
+.lista:not(:has(.boton:is(:hover, :focus-visible))) > .item:first-child .etiqueta,
+.boton:is(:hover, :focus-visible) .etiqueta {
+  color: #fff;
+}
+
+@media (max-width: 380px) {
+  .etiqueta {
+    font-size: 11.8px;
+  }
+}
+
+@media (min-width: 640px) {
+  .nav {
+    width: min(92%, 896px);
+    padding: 8px;
+  }
+
+  .boton {
+    padding: 14px 12px 16px;
+  }
+
+  .imagen {
+    height: 56px;
+  }
+
+  .etiqueta {
+    min-height: calc(2 * 1.25em);
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 768px) {
+  .nav {
+    --nav-cruce: 44px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .imagen {
+    height: 60px;
+  }
+
+  .etiqueta {
+    font-size: 16.8px;
+  }
+}
+
+/* Desplazamiento suave a la sección, solo si no se pide reducir el movimiento. */
+@media (prefers-reduced-motion: no-preference) {
+  :global(html):has(.nav) {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lista::before,
+  .item + .item::before,
+  .maquina,
+  .etiqueta {
+    transition: none;
+  }
+}

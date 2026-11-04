@@ -713,6 +713,14 @@ export interface Marca {
    */
   logoOscuroEnMenu?: boolean | null;
   /**
+   * Fondo de la baldosa de esta marca en el índice de marcas de repuestos. Solo se usa junto con el «Logo para la baldosa»: con los dos, la baldosa va en este color; si falta uno, el logo de siempre sobre gris.
+   */
+  colorBaldosa?: string | null;
+  /**
+   * El logo que va sobre el «Color de la baldosa» (en el diseño, en blanco; Case y Caterpillar, con sus colores). PNG o WebP transparente. Comprueba que se lee bien sobre ese color.
+   */
+  logoBaldosa?: (number | null) | Media;
+  /**
    * Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.
    */
   fondoHero?: (number | null) | Media;
@@ -1476,6 +1484,22 @@ export interface Pagina {
            */
           enlace?: string | null;
           enlaceNombre?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Los botones del panel blanco que monta sobre el borde de abajo del hero. Sin ninguno, salen los tres de siempre: «Maquinaria pesada nueva», «Maquinaria pesada usada» y «Repuestos para maquinaria pesada».
+   */
+  barraSecciones?: {
+    botones?:
+      | {
+          texto: string;
+          ancla: 'nueva' | 'maquinaria-usada' | 'repuestos';
+          /**
+           * Decorativa: la máquina recortada encima del texto. Vacía, la máquina de la sección a la que lleva.
+           */
+          imagen?: (number | null) | Media;
           id?: string | null;
         }[]
       | null;
@@ -2671,6 +2695,8 @@ export interface MarcasSelect<T extends boolean = true> {
   logo?: T;
   colorMarca?: T;
   logoOscuroEnMenu?: T;
+  colorBaldosa?: T;
+  logoBaldosa?: T;
   fondoHero?: T;
   seo?:
     | T
@@ -3146,6 +3172,18 @@ export interface PaginasSelect<T extends boolean = true> {
               textoCircular?: T;
               enlace?: T;
               enlaceNombre?: T;
+              id?: T;
+            };
+      };
+  barraSecciones?:
+    | T
+    | {
+        botones?:
+          | T
+          | {
+              texto?: T;
+              ancla?: T;
+              imagen?: T;
               id?: T;
             };
       };

@@ -1,0 +1,239 @@
+/*
+ * «REPUESTOS POR MARCA» del cliente (2026-11-03, `BaldosasColorMarcas.tsx`): el diseño
+ * `RepuestosMarcas.tsx` portado sin Tailwind, con sus medidas (sus `sm` y `lg` son 640 y
+ * 1024 px). La cabecera roja y el recuadro blanco van sobre el gris de la página.
+ */
+
+.seccion {
+  display: flex;
+  padding: 24px 12px 12px;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Cabecera roja, baja, con el `<h1>` centrado (blanco sobre #a20f14: 7,9:1). */
+.cabecera {
+  display: flex;
+  min-height: 35vh;
+  box-sizing: border-box;
+  padding: 48px 24px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 28px;
+  background: #a20f14;
+  color: #fff;
+  text-align: center;
+}
+
+.h1 {
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font: inherit;
+}
+
+.antetitulo {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.titulo {
+  display: block;
+  font-size: clamp(40px, 10vw, 44px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+/* El recuadro blanco: más aire abajo, por los «Ver más» que sobresalen de la última fila. */
+.recuadro {
+  box-sizing: border-box;
+  padding: 24px 24px 44px;
+  border-radius: 28px;
+  background: #fff;
+}
+
+/*
+ * COLOCACIÓN (la del diseño): rejilla de 4 columnas en móvil y tablet (cada baldosa ocupa 2:
+ * 2 por fila) y de 8 desde 1024 px (4 por fila). La última fila incompleta empieza más a la
+ * derecha para quedar centrada. Las filas llevan más aire vertical que horizontal: el botón
+ * sobresale por debajo de cada baldosa.
+ */
+.rejilla {
+  display: grid;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px 12px;
+  list-style: none;
+}
+
+.caja {
+  display: flex;
+  min-width: 0;
+  grid-column: span 2;
+}
+
+@media (max-width: 1023px) {
+  .caja:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rejilla {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+
+  .caja:last-child:nth-child(4n + 1) {
+    grid-column: 4 / span 2;
+  }
+
+  .caja:nth-last-child(2):nth-child(4n + 1) {
+    grid-column: 3 / span 2;
+  }
+
+  .caja:nth-last-child(3):nth-child(4n + 1) {
+    grid-column: 2 / span 2;
+  }
+}
+
+/* La baldosa 3:2 del color de la marca (o el gris del respaldo), con el logo al centro. */
+.baldosa {
+  position: relative;
+  display: flex;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  box-sizing: border-box;
+  padding: 12px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: var(--baldosa-fondo, #f0f0f0);
+  color: var(--color-texto);
+  text-decoration: none;
+}
+
+.baldosa:focus-visible {
+  outline: 3px solid #14110f;
+  outline-offset: 3px;
+}
+
+.logo {
+  width: 68%;
+  height: 34%;
+  transform: translateY(-6%);
+  transition: transform 0.3s;
+}
+
+/* Un logo en dos pisos (Hitachi LANDCROS): más alto, para que pese como los demás. */
+.logoAlto {
+  height: 50%;
+}
+
+.baldosa:hover .logo,
+.baldosa:focus-visible .logo {
+  transform: translateY(-6%) scale(0.9);
+}
+
+/* Sin logo, el nombre de la marca. */
+.nombre {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/*
+ * «Ver más», montado sobre el borde de abajo: centrado y a caballo, mitad dentro y mitad
+ * fuera. El anillo blanco lo despega de las baldosas rojas (Bobcat, Link-Belt, Yanmar).
+ * Blanco sobre el rojo de marca: 4,54:1; sobre la tinta del hover, 18:1.
+ */
+.verMas {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: var(--color-marca);
+  box-shadow: 0 0 0 4px #fff;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translate(-50%, 50%);
+  transition: background-color 0.3s;
+}
+
+.baldosa:hover .verMas,
+.baldosa:focus-visible .verMas {
+  background: #14110f;
+}
+
+@media (min-width: 640px) {
+  .seccion {
+    padding: 24px 20px 20px;
+    gap: 16px;
+  }
+
+  .cabecera {
+    padding: 48px;
+    border-radius: 30px;
+  }
+
+  .antetitulo {
+    font-size: 20px;
+  }
+
+  .recuadro {
+    padding: 40px 40px 56px;
+    border-radius: 30px;
+  }
+
+  .rejilla {
+    gap: 40px 20px;
+  }
+
+  .baldosa {
+    padding: 20px;
+  }
+
+  .verMas {
+    padding: 12px 28px;
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  .titulo {
+    font-size: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .seccion {
+    padding: 24px 1.5vw 1.5vw;
+    gap: 1.5vw;
+  }
+
+  .titulo {
+    font-size: 55px;
+  }
+
+  .recuadro {
+    padding: 50px 50px 68px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo,
+  .verMas {
+    transition: none;
+  }
+}

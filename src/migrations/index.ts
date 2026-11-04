@@ -100,6 +100,7 @@ import * as migration_20261028_023032_cabecera_enlaces_mostrar from './20261028_
 import * as migration_20261103_224936_portada_marcas_repuestos from './20261103_224936_portada_marcas_repuestos';
 import * as migration_20261104_010016_marca_nueva_enlace_externo from './20261104_010016_marca_nueva_enlace_externo';
 import * as migration_20261104_023639_portada_repuestos_v3 from './20261104_023639_portada_repuestos_v3';
+import * as migration_20261104_155843_portada_barra_baldosas from './20261104_155843_portada_barra_baldosas';
 
 export const migrations = [
   {
@@ -610,6 +611,11 @@ export const migrations = [
   {
     up: migration_20261104_023639_portada_repuestos_v3.up,
     down: migration_20261104_023639_portada_repuestos_v3.down,
-    name: '20261104_023639_portada_repuestos_v3'
+    name: '20261104_023639_portada_repuestos_v3',
+  },
+  {
+    up: migration_20261104_155843_portada_barra_baldosas.up,
+    down: migration_20261104_155843_portada_barra_baldosas.down,
+    name: '20261104_155843_portada_barra_baldosas'
   },
 ];

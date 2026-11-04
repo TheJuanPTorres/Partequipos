@@ -1077,3 +1077,43 @@
     display: block;
   }
 }
+
+/* ------------------------------------------------ barra de secciones debajo */
+
+/*
+ * BARRA DE SECCIONES (`NavSecciones`, 2026-11-03): va justo después del hero, montada sobre el
+ * borde de abajo de la tarjeta lo que dice `--hero-nav-cruce` (el mismo valor en
+ * navSecciones.module.css). Los controles, el vidrio y el texto circular suben eso, así la
+ * barra no tapa nada del hero. Van al final para ganar a las reglas de cada pantalla.
+ */
+.hero {
+  --hero-nav-cruce: 0px;
+}
+
+.hero[data-con-nav] {
+  --hero-nav-cruce: 44px;
+}
+
+.flechas {
+  margin-bottom: calc(var(--hero-flechas-margen-abajo) + var(--hero-nav-cruce));
+}
+
+.circular {
+  bottom: calc(var(--hero-circular-abajo) + var(--hero-nav-cruce));
+}
+
+.vidrio {
+  bottom: calc(var(--hero-vidrio-abajo) + var(--hero-nav-cruce));
+}
+
+@media (max-width: 767px) {
+  .hero[data-con-nav] {
+    --hero-nav-cruce: 30px;
+  }
+
+  /* En móvil el vidrio va anclado por arriba (CLS 0): sube lo mismo. */
+  .vidrio {
+    top: calc(100% - var(--hero-texto-abajo) + 16px - var(--hero-nav-cruce));
+    bottom: auto;
+  }
+}

@@ -3784,16 +3784,16 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface Cabecera {
   id: number;
   /**
-   * En el orden de la barra (escritorio y móvil). Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro en su sitio de la barra y se abre en una pestaña nueva. Desmarca «Mostrar» para quitarlo sin borrarlo.
+   * Hasta 8, en el orden de la barra (escritorio y móvil). Si en escritorio no caben todos, los últimos pasan a un desplegable «Más» al final de la barra; en el móvil salen todos en lista. Un enlace a otro sitio (https://), como la tienda, sale como botón oscuro en su sitio de la barra y se abre en una pestaña nueva. Desmarca «Mostrar» para quitarlo sin borrarlo, o para crearlo antes de tener su enlace: oculto, no ocupa sitio.
    */
   enlaces?:
     | {
         mostrar?: boolean | null;
         etiqueta: string;
         /**
-         * Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva).
+         * Una ruta del sitio (/…/) o https:// (otro sitio: pestaña nueva). Puede quedar vacío si la fila está oculta.
          */
-        enlace: string;
+        enlace?: string | null;
         id?: string | null;
       }[]
     | null;

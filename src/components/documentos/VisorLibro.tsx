@@ -151,28 +151,61 @@ export function VisorLibro({
   );
 
   /*
-   * Una o dos páginas a la vez, DESDE LA CARGA y en cada cambio de ancho del visor. Antes del
-   * libro, por el ancho (el mismo umbral que el CSS); con el libro, lo que diga page-flip, que se
-   * recoloca con `update()` (solo escucha el `resize` de la ventana, no el de su caja).
+   * Una o dos páginas a la vez, DESDE LA CARGA y en CUALQUIER cambio de tamaño: el de la caja del
+   * visor y del libro (ResizeObserver), la ventana, el zoom del navegador (`resize` y
+   * `visualViewport`) y el giro del móvil. Antes del libro, con la MISMA medida que page-flip (el
+   * `offsetWidth` de la caja del libro, entero) y su umbral; con el libro, lo que diga page-flip,
+   * que se recoloca con `update()`. La caja la pinta el CSS con `data-paginas`, que sale de aquí:
+   * una sola decisión para la caja, el contador, las flechas y page-flip (2026-11-05).
    */
+  const [medido, setMedido] = useState(false);
+  const sincronizar = useCallback(() => {
+    const pf = libro.current;
+    if (pf) {
+      pf.update();
+      setDobles(pf.getOrientation() === "landscape");
+      setIndice(pf.getCurrentPageIndex());
+    } else {
+      const caja = escenario.current;
+      if (!caja || caja.offsetWidth === 0) return;
+      setDobles(dosPaginasCaben(caja.offsetWidth));
+    }
+    setMedido(true);
+  }, []);
+
   useEffect(() => {
     const visor = raiz.current;
     if (!visor) return;
-    const medir = () => {
-      const pf = libro.current;
-      if (pf) {
-        pf.update();
-        setDobles(pf.getOrientation() === "landscape");
-        setIndice(pf.getCurrentPageIndex());
-      } else {
-        setDobles(dosPaginasCaben(visor.clientWidth));
-      }
+    sincronizar();
+    // Un cambio de tamaño puede llegar por varias vías a la vez: una medida por fotograma.
+    let pendiente = 0;
+    const alCambiar = () => {
+      if (pendiente) return;
+      pendiente = requestAnimationFrame(() => {
+        pendiente = 0;
+        sincronizar();
+      });
     };
-    medir();
-    const observador = new ResizeObserver(() => medir());
+    const observador = new ResizeObserver(alCambiar);
     observador.observe(visor);
-    return () => observador.disconnect();
-  }, []);
+    if (escenario.current) observador.observe(escenario.current);
+    window.addEventListener("resize", alCambiar);
+    window.visualViewport?.addEventListener("resize", alCambiar);
+    window.addEventListener("orientationchange", alCambiar);
+    return () => {
+      cancelAnimationFrame(pendiente);
+      observador.disconnect();
+      window.removeEventListener("resize", alCambiar);
+      window.visualViewport?.removeEventListener("resize", alCambiar);
+      window.removeEventListener("orientationchange", alCambiar);
+    };
+  }, [sincronizar]);
+
+  // Al pasar de una a dos páginas (o al revés) cambia el alto de la caja: el libro se recoloca.
+  useEffect(() => {
+    const f = requestAnimationFrame(() => libro.current?.update());
+    return () => cancelAnimationFrame(f);
+  }, [dobles]);
 
   useEffect(() => {
     const cambio = () => {
@@ -193,6 +226,15 @@ export function VisorLibro({
     async (accion: "anterior" | "siguiente" | "inicio" | "fin" | number) => {
       const pf = await asegurar();
       if (!pf) return;
+      // Antes de pasar página, el libro al tamaño de AHORA: si un cambio de tamaño no llegó a
+      // avisar (o llegó a medias), page-flip pasaría con la geometría y la orientación de antes.
+      pf.update();
+      const dos = pf.getOrientation() === "landscape";
+      const actual = pf.getCurrentPageIndex();
+      setDobles(dos);
+      setIndice(actual);
+      if (accion === "siguiente" && !haySiguiente(actual, total, dos)) return;
+      if (accion === "anterior" && !hayAnterior(actual)) return;
       if (accion === "anterior") pf.flipPrev();
       else if (accion === "siguiente") pf.flipNext();
       else if (accion === "inicio") pf.turnToPage(0);
@@ -249,6 +291,8 @@ export function VisorLibro({
       style={{ ["--proporcion" as string]: String(proporcion) }}
       data-completa={completa ? "" : undefined}
       data-miniaturas={miniaturas ? "" : undefined}
+      // Una o dos páginas, ya medido (antes, lo decide la consulta de contenedor del CSS).
+      data-paginas={medido ? (dobles ? "dos" : "una") : undefined}
       // Dentro del texto, sale de la columna de lectura al ancho de la página (`RichText`).
       data-ancho-pagina=""
     >

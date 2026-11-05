@@ -36,11 +36,13 @@ export function WhatsAppFlotante({ href }: { href: string }) {
 
     const colocar = () => {
       frame = 0;
-      // La caja SIN desplazar: la de ahora menos lo que ya se subió.
-      const subido = Number(a.dataset.subido ?? 0);
-      const caja = a.getBoundingClientRect();
-      const arriba = caja.top + subido;
-      const abajo = caja.bottom + subido;
+      // La caja SIN desplazar. `offsetTop`/`offsetLeft` de un elemento fijo no cuentan la
+      // `transform`: antes se restaba lo subido a la caja pintada, y si un aviso de scroll
+      // llegaba en mitad de la transición (0,2 s) la cuenta salía mal y el botón se quedaba
+      // encima de la barra de secciones hasta el siguiente scroll (2026-11-05, medido a 390 y 1010).
+      const arriba = a.offsetTop;
+      const abajo = arriba + a.offsetHeight;
+      const caja = { left: a.offsetLeft, right: a.offsetLeft + a.offsetWidth };
       // Al subir por encima de uno puede caer sobre otro (a 1010 px, la barra de secciones y
       // el vidrio del hero): se repite hasta que el sitio quede libre.
       const cajas = [...document.querySelectorAll<HTMLElement>("[data-evita-flotante]")]

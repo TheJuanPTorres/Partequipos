@@ -94,4 +94,50 @@ describe("barraDeMarcas", () => {
       [],
     );
   });
+  it("activa con baldosa de repuestos: su color y su «Logo para la baldosa» tal cual, sin tinta", () => {
+    const blanco = { url: "/hitachi-blanco.png", width: 40, height: 10, oscuro: false };
+    const amarillo = { url: "/case-original.png", width: 40, height: 10, oscuro: false };
+    const baldosas = new Map([
+      ["hitachi", { color: "#c2410c", logo: blanco }],
+      ["case", { color: "#ffcd00", logo: amarillo }],
+    ]);
+    const r = barraDeMarcas(
+      [
+        grupo("hitachi-ex", "hitachi-landcros", "Hitachi", "#ff6600"),
+        grupo("case-ex", "case", "Case", "#ffcd00"),
+      ],
+      () => logo,
+      baldosas,
+    );
+    assert.deepEqual(
+      r.map((p) => [p.color.fondo, p.activa.logo?.url, p.activa.logo?.blanco, p.activa.placa]),
+      [
+        ["#c2410c", "/hitachi-blanco.png", false, false],
+        ["#ffcd00", "/case-original.png", false, false],
+      ],
+    );
+    // La inactiva, con el logo de todo el sitio, como siempre; el alt, el de ese logo.
+    assert.deepEqual(
+      r.map((p) => [p.logo?.url, p.activa.logo?.alt]),
+      [
+        ["/l.png", "Logo"],
+        ["/l.png", "Logo"],
+      ],
+    );
+  });
+
+  it("activa sin baldosa: el color de la marca y su logo de siempre sobre plaquita blanca", () => {
+    const r = barraDeMarcas(
+      [grupo("dynapac-x", "dynapac", "Dynapac", "#bf2e1a"), grupo("sin-x", "sin", "Sin logo")],
+      (m) => (m.slug === "dynapac" ? logo : null),
+      new Map(),
+    );
+    assert.deepEqual(
+      r.map((p) => [p.color.fondo, p.activa.logo?.url ?? null, p.activa.placa]),
+      [
+        ["#bf2e1a", "/l.png", true],
+        [COLOR_BARRA_SIN_MARCA, null, false],
+      ],
+    );
+  });
 });

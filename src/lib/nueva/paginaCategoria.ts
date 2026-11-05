@@ -1,11 +1,12 @@
 import type { EquiposNuevo, MarcasMaquinaria, Media, TiposMaquinaria } from "@/payload-types";
 
 import { COLOR_SIN_MARCA, colorDeMarca, tintaDeLogoSobre } from "../marca/colorMarca";
-import type { LogoConAlt } from "../marca/logoMarca";
+import { buscarPorNombre, claveDeMarca, type LogoConAlt } from "../marca/logoMarca";
 import type { VistaEncabezado } from "../repuestos/marca";
 import { adjetivoConcordado, tituloPorDefecto } from "../seo/porDefecto";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
 
+import type { BaldosaDeRepuestos } from "./indiceMarcas";
 import type { TarjetaEquipo } from "./paginaMarcaAndres";
 import { SLUG_ADITAMENTOS } from "./indiceTipos";
 import { porOrden } from "./orden";
@@ -75,32 +76,59 @@ export type PastillaMarca = {
   ancla: string;
   /** El nombre de la marca: el texto sin logo y el nombre accesible con él. */
   titulo: string;
+  /** El logo de la pastilla INACTIVA: el de todo el sitio, con sus colores (como siempre). */
   logo: LogoConAlt | null;
-  /** El fondo de la pastilla activa (el color de la marca o el naranja) y la tinta del logo encima
-   * (`tintaDeLogoSobre`: blanco con 3:1 o más, negro solo en los claros). */
+  /**
+   * La pastilla ACTIVA (dirección, 2026-11-05, regla «una marca, un solo logo» del #420): su fondo
+   * y el logo encima, SIN ningún filtro que lo aplane a una tinta (`tinta` queda para el foco y un
+   * nombre sin logo).
+   */
   color: { fondo: string; tinta: string };
+  activa: {
+    /** El logo encima del fondo: el «Logo para la baldosa» o, sin baldosa, el de siempre. */
+    logo: LogoConAlt | null;
+    /** `true`: el logo de siempre va sobre una plaquita blanca dentro de la pastilla. */
+    placa: boolean;
+  };
 };
 
 /**
  * LA BARRA DE MARCAS de la página general de tipo (dirección, 2026-10-23): una pastilla por
  * marca, en el orden de los grupos, que lleva a la franja de su primer grupo (`grupo-<clave>`).
  * Solo con 2 o más marcas; con una, ninguna.
+ *
+ * LA ACTIVA (2026-11-05): antes, el logo en una sola tinta (blanco o negro) sobre el color de la
+ * marca, que en Hitachi LANDCROS dejaba manchas. Ahora:
+ * - con la BALDOSA de la marca de repuestos del mismo nombre (#417: «Color de la baldosa» y «Logo
+ *   para la baldosa», pareja ya diseñada y medida con 3:1), ese fondo y ese logo tal cual: Hitachi,
+ *   Yanmar y LiuGong con su logo blanco; Case, su logo original sobre su amarillo;
+ * - sin baldosa, el color de la marca (o el naranja) y su logo de siempre sobre una plaquita blanca.
  */
 export function barraDeMarcas(
   grupos: GrupoDeCategoria[],
   logoDe: (marca: MarcasMaquinaria) => LogoConAlt | null,
+  baldosas: ReadonlyMap<string, BaldosaDeRepuestos> = new Map(),
 ): PastillaMarca[] {
   const vistas = new Set<string>();
   const pastillas: PastillaMarca[] = [];
   for (const g of grupos) {
     if (vistas.has(g.marca.slug)) continue;
     vistas.add(g.marca.slug);
-    const fondo = colorDeMarca(g.marca.colorMarca) ?? COLOR_BARRA_SIN_MARCA;
+    const titulo = g.marca.nombre.trim();
+    const logo = logoDe(g.marca);
+    const baldosa = buscarPorNombre(claveDeMarca(g.marca.nombre), baldosas);
+    const fondo = baldosa?.color ?? colorDeMarca(g.marca.colorMarca) ?? COLOR_BARRA_SIN_MARCA;
     pastillas.push({
       ancla: `grupo-${g.clave}`,
-      titulo: g.marca.nombre.trim(),
-      logo: logoDe(g.marca),
+      titulo,
+      logo,
       color: { fondo, tinta: tintaDeLogoSobre(fondo) },
+      activa: baldosa
+        ? {
+            logo: { ...baldosa.logo, oscuro: false, blanco: false, alt: logo?.alt ?? titulo },
+            placa: false,
+          }
+        : { logo, placa: logo !== null },
     });
   }
   return pastillas.length >= 2 ? pastillas : [];

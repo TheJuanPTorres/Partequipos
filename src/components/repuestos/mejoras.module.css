@@ -101,13 +101,11 @@
 
 /*
  * Barra de MARCAS de nueva (2026-10-23): el logo en lugar del texto, entero en una caja de
- * 22 px de alto (la pastilla sigue en 40). Activa, sobre el color de la marca, el logo en una
- * sola tinta: blanco sobre colores oscuros y negro sobre claros (`data-tinta`, por contraste).
+ * 22 px de alto (la pastilla sigue en 40). LA ACTIVA (2026-11-05): su fondo y su logo propio
+ * (`.barraActiva`, de `barraDeMarcas`), nunca el de siempre aplanado con un filtro: el «Logo para
+ * la baldosa» de la marca de repuestos tal cual o, sin él, el logo de siempre sobre una plaquita
+ * blanca (`data-placa`).
  */
-.barraConLogo {
-  padding: 0 16px;
-}
-
 .barraLogo {
   display: block;
   width: auto;
@@ -136,14 +134,41 @@
   height: 30px;
 }
 
-.barraEnlace[aria-current][data-tinta="clara"] .barraLogo {
-  filter: brightness(0) invert(1);
-  opacity: 1;
+/* El logo de la activa: oculto hasta que la pastilla es la actual; entonces sustituye al otro. */
+.barraActiva {
+  display: none;
 }
 
-.barraEnlace[aria-current][data-tinta="oscura"] .barraLogo {
-  filter: brightness(0);
-  opacity: 1;
+.barraEnlace[aria-current][data-con-activa] .barraLogo {
+  display: none;
+}
+
+.barraEnlace[aria-current][data-con-activa] .barraActiva {
+  display: block;
+}
+
+.barraLogoActivo {
+  display: block;
+  width: auto;
+  max-width: 96px;
+  height: 22px;
+}
+
+.barraGrande .barraLogoActivo {
+  max-width: 130px;
+  height: 30px;
+}
+
+/* Sin baldosa: el logo de siempre, con sus colores, sobre una plaquita blanca dentro del color. */
+.barraActiva[data-placa] {
+  margin: 0 -10px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.barraGrande .barraActiva[data-placa] .barraLogoActivo {
+  height: 26px;
 }
 
 @media (max-width: 1024px) {

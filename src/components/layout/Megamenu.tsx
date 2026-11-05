@@ -289,6 +289,36 @@ function FilaExterna({ grupo, nivel }: { grupo: GrupoMenu & { externo: string };
   );
 }
 
+/**
+ * Una marca de lubricante de «Otra web» todavía SIN enlace (Dispel, 2026-11-05): la misma fila,
+ * pero un enlace a una página de este sitio (la categoría con el selector de marcas), en la misma
+ * pestaña y sin el icono de enlace externo. No despliega nada.
+ */
+function FilaInterna({
+  grupo,
+  nivel,
+  alElegir,
+}: {
+  grupo: GrupoMenu & { interno: string };
+  nivel: number;
+  alElegir: () => void;
+}) {
+  return (
+    <div className={estilos.acordeon} data-nivel={nivel}>
+      <Link
+        href={grupo.interno}
+        className={`${estilos.titulo} ${estilos.tituloEnlace}`}
+        onClick={alElegir}
+      >
+        {grupo.logo ? <LogoDeFila logo={grupo.logo} /> : null}
+        {grupo.pais ? <BanderaDeFila pais={grupo.pais} /> : null}
+        {grupo.titulo}
+        {grupo.pais ? <PaisDeFila pais={grupo.pais} /> : null}
+      </Link>
+    </div>
+  );
+}
+
 function Acordeon({
   grupo,
   nivel,
@@ -300,6 +330,10 @@ function Acordeon({
 }) {
   if (grupo.externo)
     return <FilaExterna grupo={{ ...grupo, externo: grupo.externo }} nivel={nivel} />;
+  if (grupo.interno)
+    return (
+      <FilaInterna grupo={{ ...grupo, interno: grupo.interno }} nivel={nivel} alElegir={alElegir} />
+    );
   return <AcordeonDesplegable grupo={grupo} nivel={nivel} alElegir={alElegir} />;
 }
 

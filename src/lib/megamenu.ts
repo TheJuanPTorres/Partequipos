@@ -97,6 +97,12 @@ export type GrupoMenu = {
    */
   externo?: string;
   /**
+   * Como `externo`, pero a una página de ESTE sitio, en la misma pestaña y sin icono: una marca
+   * de lubricante de «Otra web» todavía sin enlace lleva a la página de la categoría con el
+   * selector de marcas, donde su panel dice «Muy pronto» (Dispel, 2026-11-05).
+   */
+  interno?: string;
+  /**
    * El país de origen de la marca (las de lubricantes, 2026-11-04): su bandera junto al nombre,
    * decorativa, y el nombre del país solo para lectores de pantalla.
    */
@@ -126,6 +132,11 @@ export type CategoriaTecnicaMenu = Pick<
   /** La categoría de la que cuelga (solo su dirección). */
   padre?: number | { id: number; slug?: string | null } | null;
   iconoMarca?: number | LogoCatalogo | null;
+  /** Solo lo que decide adónde lleva una marca de lubricante de «Otra web» sin enlace. */
+  selectorMarcas?: {
+    activo?: boolean | null;
+    marcas?: ReadonlyArray<number | { id: number } | null> | null;
+  } | null;
 };
 
 /** La entrada editable de la política de garantías (global `cabecera`). */
@@ -507,10 +518,13 @@ export function panelRepuestos(d: DatosMegamenu): PanelMenu {
  * ninguna marca, no hay panel: «Lubricantes» sigue siendo un enlace.
  */
 export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
-  // Una marca de «Otra web» sin enlace válido no sale: sin enlaces rotos (Dispel, 2026-11-04).
+  // Una marca de «Otra web» va a su web; sin enlace válido, a la página del selector de marcas
+  // que la muestra (Dispel, 2026-11-05: «Muy pronto»). Sin ninguna de las dos, no sale: sin
+  // enlaces rotos.
+  const selector = paginaDelSelector(d.categoriasTecnicas ?? []);
   const marcas = [...(d.marcasLubricante ?? [])]
     .filter((m) => m.nombre && m.slug)
-    .filter((m) => tienePaginaPropiaLubricante(m) || enlaceExternoLubricante(m))
+    .filter((m) => tienePaginaPropiaLubricante(m) || enlaceExternoLubricante(m) || selector(m.id))
     // Primero las de página propia (Eni) y después las de otra web (Dispel); cada grupo, por nombre.
     .sort(
       (a, b) =>
@@ -528,6 +542,11 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
       // «Otra web» (Dispel): un enlace fuera, en otra pestaña, sin líneas.
       const externo = enlaceExternoLubricante(m);
       if (externo) return { titulo, ...conPais, externo, enlaces: [], grupos: [] };
+      // «Otra web» sin enlace: a la página del selector, en la misma pestaña.
+      if (!tienePaginaPropiaLubricante(m)) {
+        const interno = selector(m.id)!;
+        return { titulo, ...conPais, interno, enlaces: [], grupos: [] };
+      }
       return {
         titulo,
         ...conPais,
@@ -546,6 +565,28 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
         grupos: [],
       };
     }),
+  };
+}
+
+/**
+ * La página de la categoría técnica que muestra una marca de lubricante en su selector (la
+ * categoría «Lubricantes»): la primera, por nombre, con el selector encendido y la marca entre las
+ * elegidas (o sin ninguna elegida: entonces salen todas). `null` si ninguna la muestra.
+ */
+function paginaDelSelector(
+  categorias: ReadonlyArray<CategoriaTecnicaMenu>,
+): (marca: number) => string | null {
+  const conSelector = [...categorias]
+    .filter((c) => c.slug && c.selectorMarcas?.activo && esCategoriaPrincipal(c))
+    .sort(porNombre);
+  return (marca) => {
+    const c = conSelector.find((c) => {
+      const ids = (c.selectorMarcas?.marcas ?? [])
+        .map((r) => (typeof r === "object" ? r?.id : r))
+        .filter((id): id is number => typeof id === "number");
+      return ids.length === 0 || ids.includes(marca);
+    });
+    return c ? conBarra(rutas.categoriaRepuestos(c.slug)) : null;
   };
 }
 

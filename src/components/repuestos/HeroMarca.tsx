@@ -54,7 +54,6 @@ export function HeroMarca({
   etiquetaRaton,
   migas,
   reservarTitulo = false,
-  ratonReservado = false,
   accion,
 }: {
   vista: VistaEncabezado;
@@ -84,12 +83,6 @@ export function HeroMarca({
    */
   reservarTitulo?: boolean;
   /**
-   * Con `bajo`, el contenido deja libre el pie de la tarjeta para el icono del ratón: sin esto,
-   * un título de varias líneas con su texto llega hasta él y el icono pisa la última línea (la
-   * categoría «Lubricantes», 2026-11-04).
-   */
-  ratonReservado?: boolean;
-  /**
    * Un botón bajo la presentación, visible al entrar («Ver catálogo» de la página general de
    * lubricantes, petición del cliente, 2026-10-26).
    */
@@ -101,7 +94,7 @@ export function HeroMarca({
   // el velo del índice, que deja el antetítulo en AA sobre la foto. Solo con `bajo` explícito:
   // la baja por `bajaSinFoto` (el índice del blog) se queda como estaba.
   const variante = baja
-    ? `${estilos.heroBajo} ${bajo && indice ? estilos.heroBajoIndice : ""} ${ratonReservado ? estilos.heroBajoRaton : ""}`
+    ? `${estilos.heroBajo} ${bajo && indice ? estilos.heroBajoIndice : ""}`
     : indice
       ? estilos.heroIndice
       : "";

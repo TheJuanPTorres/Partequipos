@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { SelectorMarcas } from "@/components/lubricantes/SelectorMarcas";
 import { SeccionTestimonios } from "@/components/portada/diferidos";
+import { CabeceraRoja } from "@/components/repuestos/CabeceraRoja";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
@@ -126,23 +127,30 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
     marca: nombre.toLowerCase(),
   });
 
+  const encabezado = vistaEncabezadoCategoria(categoria, global, fondoDeRespaldo(marcas));
+
   return (
     <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <div className={estilos.migas}>
-        <Breadcrumbs items={breadcrumbs} />
-      </div>
+      {/* Con la cabecera roja, las migas van a la vista dentro de ella. */}
+      {selector ? null : (
+        <div className={estilos.migas}>
+          <Breadcrumbs items={breadcrumbs} />
+        </div>
+      )}
 
-      <HeroMarca
-        vista={vistaEncabezadoCategoria(categoria, global, fondoDeRespaldo(marcas))}
-        anclaSiguiente={ANCLA_GRUPOS}
-        franja={false}
-        reservarTitulo
-        // Con el selector (la categoría «Lubricantes», Juan Pablo, 2026-11-04), la cabecera baja:
-        // 380 px (420 en móvil) en lugar de 630 (670). Las demás categorías, igual.
-        bajo={selector !== null}
-        ratonReservado
-      />
+      {selector ? (
+        // Con el selector (la categoría «Lubricantes», Juan Pablo, 2026-11-04): sin foto, la
+        // cabecera roja de los índices de marcas, baja y con las migas a la vista. Las demás
+        // categorías, con su cabecera de siempre.
+        <CabeceraRoja
+          migas={breadcrumbs}
+          antetitulo={encabezado.linea1}
+          titulo={encabezado.linea2}
+        />
+      ) : (
+        <HeroMarca vista={encabezado} anclaSiguiente={ANCLA_GRUPOS} franja={false} reservarTitulo />
+      )}
 
       {/*
        * Con el selector de marcas encendido (la categoría «Lubricantes», 2026-11-04), un panel por

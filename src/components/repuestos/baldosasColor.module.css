@@ -251,3 +251,91 @@
     transition: none;
   }
 }
+
+/*
+ * LA CABECERA ROJA SUELTA (`CabeceraRoja`, la categoría «Lubricantes», 2026-11-04): la de arriba,
+ * más baja (300 px desde 768; en móvil, lo que pida el título) y con las migas visibles encima
+ * del `<h1>`, en blanco (7,9:1 sobre el rojo). Mismo margen alrededor que en los índices.
+ */
+.marcoCabecera {
+  padding: 24px 12px 0;
+}
+
+.cabecera.cabeceraBaja {
+  min-height: 0;
+  padding: 28px 20px 32px;
+  gap: 14px;
+}
+
+@media (min-width: 768px) {
+  .cabecera.cabeceraBaja {
+    min-height: 300px;
+    padding: 32px 32px;
+  }
+}
+
+.migasRojas ol {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 8px;
+  list-style: none;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.migasRojas li + li::before {
+  margin-right: 8px;
+  content: "/";
+  opacity: 0.7;
+}
+
+.migasRojas a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.migasRojas a:hover {
+  text-decoration: underline;
+}
+
+.migasRojas a:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/*
+ * Sin desplazamiento al llegar Inter, que es más ancha que la fuente de respaldo: el alto lo fija
+ * una copia invisible del texto en esa fuente, ensanchada 0,04 em, en la misma celda de una
+ * rejilla (la técnica de `cabeceraArticulo.module.css`). La copia hereda el tamaño de su línea.
+ */
+.h1 .reservada,
+.migasRojas.reservada {
+  display: grid;
+  justify-items: center;
+}
+
+.reservada > *,
+.reservada::after {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.reservada::after {
+  content: attr(data-reserva);
+  visibility: hidden;
+  pointer-events: none;
+  font-family: "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.migasRojas.reservada::after {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: pre-wrap;
+}

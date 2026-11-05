@@ -378,6 +378,13 @@
   height: 14px;
 }
 
+/* El hueco del icono «+» en una fila que no despliega (Dispel sin enlace): mismo ancho, sin dibujo. */
+.huecoIcono {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
 .titulo:hover,
 .acordeon[data-abierto="si"] > .titulo {
   color: var(--mega-rojo);

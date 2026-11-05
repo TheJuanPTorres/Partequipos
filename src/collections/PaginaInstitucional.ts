@@ -7,6 +7,7 @@ import {
 } from "../lib/fields/alineacionTexto";
 import { avisoField } from "../lib/fields/avisoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
+import { validarMarcasSinRepetir, type ValorRelacion } from "../lib/portada/marcasBanda";
 import { seoField } from "../lib/fields/seoField";
 import { SLUG_POLITICA_GARANTIA } from "../lib/politica/animaciones";
 import { tipografiaTituloField } from "../lib/fields/tipografiaTitulo";
@@ -784,12 +785,33 @@ export const PaginaInstitucional: CollectionConfig = {
       admin: {
         condition: (data) => data?.slug === "inicio",
         description:
-          "Los logos son los de las marcas de repuestos, por orden alfabético; se cambian en cada marca.",
+          "Los logos son los de las marcas de repuestos (se cambian en cada marca) y cada uno lleva a la página de su marca.",
       },
       fields: [
         texto("antetitulo", "Antetítulo", "Repuestos"),
         texto("titulo", "Título", "Repuestos para"),
         texto("tituloResaltado", "Final del título, en rojo", "las marcas que trabajas"),
+        /*
+         * Qué marcas salen y en qué orden (2026-11-05, dirección). Vacía, todas por orden
+         * alfabético, como hasta ahora. La decisión, en `src/lib/portada/marcasBanda.ts`.
+         */
+        {
+          name: "marcasBanda",
+          type: "relationship",
+          relationTo: "marcas",
+          hasMany: true,
+          // Solo los ids: la portada ya tiene las marcas con su logo (`getMarcasRepuestosDePortada`).
+          maxDepth: 0,
+          label: "Marcas de la banda",
+          validate: (valor: unknown) =>
+            validarMarcasSinRepetir(Array.isArray(valor) ? (valor as ValorRelacion[]) : null),
+          admin: {
+            isSortable: true,
+            allowCreate: false,
+            description:
+              "Elige qué marcas salen en la banda y arrástralas para cambiar el orden: salen de izquierda a derecha en el orden de esta lista. Si la dejas vacía, salen todas las marcas de repuestos por orden alfabético. Una marca sin logo no sale.",
+          },
+        },
         imagenKit(
           "maquina",
           "Máquina (PNG o WebP transparente)",

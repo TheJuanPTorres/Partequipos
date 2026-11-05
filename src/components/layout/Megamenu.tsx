@@ -310,6 +310,8 @@ function FilaInterna({
         className={`${estilos.titulo} ${estilos.tituloEnlace}`}
         onClick={alElegir}
       >
+        {/* El hueco del «+» de las filas que despliegan: la bandera queda alineada con la de Eni. */}
+        <span aria-hidden="true" className={estilos.huecoIcono} />
         {grupo.logo ? <LogoDeFila logo={grupo.logo} /> : null}
         {grupo.pais ? <BanderaDeFila pais={grupo.pais} /> : null}
         {grupo.titulo}

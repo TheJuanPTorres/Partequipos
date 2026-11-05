@@ -17,17 +17,43 @@ export function validarEnlace(valor: unknown): true | string {
   return "Usa una ruta del sitio que empiece por «/» (p. ej. /contactanos/) o una dirección https://.";
 }
 
-/** Coordenadas de una sede. */
+/**
+ * Coordenadas de una sede: el rango razonable de Colombia con sus islas
+ * (San Andrés, Providencia). Una sede fuera de él es casi siempre un error de
+ * escritura (el signo menos de la longitud, o latitud y longitud cambiadas) y
+ * rompería el encuadre del mapa de sedes (2026-11-05, Caucasia con la longitud
+ * positiva).
+ */
+export const RANGO_COLOMBIA = { latMin: -5, latMax: 14, lngMin: -83, lngMax: -66 } as const;
+
+export function coordenadasEnColombia(lat: unknown, lng: unknown): boolean {
+  return (
+    typeof lat === "number" &&
+    typeof lng === "number" &&
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    lat >= RANGO_COLOMBIA.latMin &&
+    lat <= RANGO_COLOMBIA.latMax &&
+    lng >= RANGO_COLOMBIA.lngMin &&
+    lng <= RANGO_COLOMBIA.lngMax
+  );
+}
+
 export function validarLatitud(valor: unknown): true | string {
-  return typeof valor === "number" && valor >= -90 && valor <= 90
-    ? true
-    : "La latitud va de −90 a 90 (Colombia: entre −5 y 13).";
+  if (typeof valor !== "number" || !Number.isFinite(valor))
+    return "La latitud tiene que ser un número.";
+  if (valor >= RANGO_COLOMBIA.latMin && valor <= RANGO_COLOMBIA.latMax) return true;
+  return "La latitud de Colombia va entre −5 y 14. ¿Pusiste la longitud en este campo? La latitud va primero (Bogotá: 4,65).";
 }
 
 export function validarLongitud(valor: unknown): true | string {
-  return typeof valor === "number" && valor >= -180 && valor <= 180
-    ? true
-    : "La longitud va de −180 a 180 (Colombia: entre −82 y −66).";
+  if (typeof valor !== "number" || !Number.isFinite(valor))
+    return "La longitud tiene que ser un número.";
+  if (valor >= RANGO_COLOMBIA.lngMin && valor <= RANGO_COLOMBIA.lngMax) return true;
+  if (valor > 0 && -valor >= RANGO_COLOMBIA.lngMin && -valor <= RANGO_COLOMBIA.lngMax) {
+    return `En Colombia la longitud es negativa. ¿Falta el signo menos? Prueba con −${valor}.`;
+  }
+  return "La longitud de Colombia va entre −83 y −66 (Bogotá: −74,07). Revisa el valor y el signo menos.";
 }
 
 /*

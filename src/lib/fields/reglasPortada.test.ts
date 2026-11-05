@@ -10,6 +10,7 @@ import {
   validarEnlace,
   validarLatitud,
   validarLongitud,
+  coordenadasEnColombia,
   validarPublicacionTestimonio,
 } from "./reglasPortada";
 
@@ -35,6 +36,21 @@ describe("coordenadas de sede", () => {
     assert.notEqual(validarLatitud(91), true);
     assert.notEqual(validarLongitud(-181), true);
     assert.notEqual(validarLatitud("4.6"), true);
+    // Colombia con sus islas: San Andrés, Leticia, Punta Gallinas.
+    assert.equal(validarLongitud(-81.7), true);
+    assert.equal(validarLatitud(-4.2), true);
+    assert.equal(validarLatitud(12.5), true);
+    // Fuera de Colombia, aunque sea un valor válido en el mundo.
+    assert.notEqual(validarLatitud(40.4), true);
+    assert.notEqual(validarLongitud(-3.7), true);
+    assert.notEqual(validarLongitud(Number.NaN), true);
+    assert.equal(coordenadasEnColombia(4.65, -74.1), true);
+    assert.equal(coordenadasEnColombia(7.98, 75.2), false);
+    assert.equal(coordenadasEnColombia(-75.2, 7.98), false);
+    assert.equal(coordenadasEnColombia(undefined, -74), false);
+    // Longitud positiva: el mensaje sugiere el signo menos con el valor ya negado.
+    assert.match(String(validarLongitud(75.1983)), /signo menos.*−75\.1983/);
+    assert.doesNotMatch(String(validarLongitud(-3.7)), /signo menos\? Prueba/);
   });
 });
 

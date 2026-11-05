@@ -368,6 +368,16 @@
   object-fit: contain;
 }
 
+/*
+ * Bandera del país de origen tras el nombre (lubricantes, 2026-11-04): 21 × 14, sin cambiar el
+ * alto de la fila (la línea mide 22,4 px) y sin encogerse. Pisa el tamaño de iconos de `.titulo svg`.
+ */
+.titulo .bandera {
+  flex: none;
+  width: 21px;
+  height: 14px;
+}
+
 .titulo:hover,
 .acordeon[data-abierto="si"] > .titulo {
   color: var(--mega-rojo);

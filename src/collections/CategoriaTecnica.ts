@@ -407,6 +407,50 @@ export const CategoriaTecnica: CollectionConfig = {
         },
       ],
     },
+    /*
+     * SELECTOR DE MARCAS (2026-11-04, dirección: la categoría «Lubricantes»): en lugar de «Qué
+     * incluye», un panel por marca de lubricantes (Eni → su página; Dispel → su web).
+     * `src/lib/lubricantes/selector.ts`.
+     */
+    {
+      name: "selectorMarcas",
+      type: "group",
+      label: "Selector de marcas de lubricantes",
+      admin: {
+        description:
+          "Solo para la categoría «Lubricantes»: la página muestra un panel por marca de lubricantes en lugar de la lista «Qué incluye».",
+      },
+      fields: [
+        {
+          name: "activo",
+          type: "checkbox",
+          defaultValue: false,
+          label: "Mostrar el selector de marcas en lugar de «Qué incluye»",
+        },
+        {
+          name: "titulo",
+          type: "text",
+          label: "Título del selector",
+          admin: {
+            condition: (_, hermanos) => hermanos?.activo === true,
+            placeholder: "Elige tu marca de lubricantes",
+            description: "Vacío, «Elige tu marca de lubricantes».",
+          },
+        },
+        {
+          name: "marcas",
+          type: "relationship",
+          relationTo: "marcas-lubricante",
+          hasMany: true,
+          label: "Marcas (en este orden)",
+          admin: {
+            condition: (_, hermanos) => hermanos?.activo === true,
+            description:
+              "Vacío, todas las marcas de lubricantes: primero las que tienen página aquí. Una marca de «Otra web» sin enlace sale con «Muy pronto».",
+          },
+        },
+      ],
+    },
     // Tiene página propia desde el 2026-10-13 (provisional hasta el diseño de Andrés). Las URL
     // heredadas de segundo nivel y las duplicadas siguen sin decidir (docs/redirects-map.csv).
     seoField(),

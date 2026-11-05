@@ -1,5 +1,6 @@
 import type { CollectionSlug, GeneratePreviewURL, PayloadRequest } from "payload";
 
+import { tienePaginaPropiaLubricante, type ConDestino } from "../lubricantes/destino";
 import { tienePaginaPropia } from "../nueva/enlaceExterno";
 import { segmentoDeTipo } from "../repuestos/anidado";
 import { rutas } from "../routes";
@@ -112,6 +113,8 @@ export const RUTAS_EN_EL_SITIO: Partial<Record<CollectionSlug, Generador>> = {
     return s ? rutas.marcaUsada(s) : null;
   },
   "marcas-lubricante": async (doc) => {
+    // «Otra web» (Dispel, 2026-11-04): no tiene página aquí.
+    if (!tienePaginaPropiaLubricante(doc as ConDestino)) return null;
     const s = slugPropio(doc);
     return s ? rutas.marcaLubricante(s) : null;
   },

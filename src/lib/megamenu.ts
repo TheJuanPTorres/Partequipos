@@ -1,6 +1,8 @@
 import type { CategoriasTecnica } from "@/payload-types";
 
 import { claveDeMarca, logoPropio } from "./marca/logoMarca";
+import { enlaceExternoLubricante, tienePaginaPropiaLubricante } from "./lubricantes/destino";
+import { paisDe, type CodigoPais } from "./lubricantes/pais";
 import { enlaceExternoDe } from "./nueva/enlaceExterno";
 import { colorConBlanco } from "./marca/franjaMarca";
 import { porOrden } from "./nueva/orden";
@@ -94,6 +96,11 @@ export type GrupoMenu = {
    * otro sitio (su distribuidor), en pestaña nueva y con el icono de enlace externo.
    */
   externo?: string;
+  /**
+   * El país de origen de la marca (las de lubricantes, 2026-11-04): su bandera junto al nombre,
+   * decorativa, y el nombre del país solo para lectores de pantalla.
+   */
+  pais?: { codigo: CodigoPais; nombre: string };
   /** Tarjetas con foto bajo los enlaces (las categorías técnicas de Repuestos). */
   tarjetas?: TarjetaMenu[];
 };
@@ -138,8 +145,14 @@ export type ItemCatalogo = {
   slug: string;
   logo?: number | LogoCatalogo | null;
   logoOscuroEnMenu?: boolean | null;
-  /** Solo las marcas de maquinaria nueva: «Enlace externo» (`src/lib/nueva/enlaceExterno.ts`). */
+  /**
+   * «Enlace externo»: las marcas de maquinaria nueva (`src/lib/nueva/enlaceExterno.ts`) y las de
+   * lubricantes de «Otra web» (`src/lib/lubricantes/destino.ts`).
+   */
   enlaceExterno?: string | null;
+  /** Solo las marcas de lubricantes: «Destino» y «País de origen» (2026-11-04). */
+  destino?: string | null;
+  paisOrigen?: string | null;
 };
 
 /** Alto con el que se pinta el logo de una marca en el menú (px). */
@@ -494,27 +507,45 @@ export function panelRepuestos(d: DatosMegamenu): PanelMenu {
  * ninguna marca, no hay panel: «Lubricantes» sigue siendo un enlace.
  */
 export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
-  const marcas = [...(d.marcasLubricante ?? [])].filter((m) => m.nombre && m.slug).sort(porNombre);
+  // Una marca de «Otra web» sin enlace válido no sale: sin enlaces rotos (Dispel, 2026-11-04).
+  const marcas = [...(d.marcasLubricante ?? [])]
+    .filter((m) => m.nombre && m.slug)
+    .filter((m) => tienePaginaPropiaLubricante(m) || enlaceExternoLubricante(m))
+    // Primero las de página propia (Eni) y después las de otra web (Dispel); cada grupo, por nombre.
+    .sort(
+      (a, b) =>
+        Number(tienePaginaPropiaLubricante(b)) - Number(tienePaginaPropiaLubricante(a)) ||
+        porNombre(a, b),
+    );
   if (marcas.length === 0) return null;
   const categorias = [...(d.categoriasLubricante ?? [])].sort(porNombre);
   return {
     verTodo: { etiqueta: "Ver todos los lubricantes", href: conBarra(rutas.lubricantes()) },
-    grupos: marcas.map((m) => ({
-      titulo: `Lubricantes ${m.nombre}`,
-      enlaces: [
-        {
-          etiqueta: `Ver todo Lubricantes ${m.nombre}`,
-          href: conBarra(rutas.marcaLubricante(m.slug)),
-        },
-        ...categorias
-          .filter((c) => c.nombre && c.slug && idDeMarcaLubricante(c) === m.id)
-          .map((c) => ({
-            etiqueta: c.nombre,
-            href: c.enlaceMenu?.trim() || conBarra(rutas.categoriaLubricante(m.slug, c.slug)),
-          })),
-      ],
-      grupos: [],
-    })),
+    grupos: marcas.map((m): GrupoMenu => {
+      const titulo = `Lubricantes ${m.nombre}`;
+      const pais = paisDe(m.paisOrigen);
+      const conPais = pais ? { pais } : {};
+      // «Otra web» (Dispel): un enlace fuera, en otra pestaña, sin líneas.
+      const externo = enlaceExternoLubricante(m);
+      if (externo) return { titulo, ...conPais, externo, enlaces: [], grupos: [] };
+      return {
+        titulo,
+        ...conPais,
+        enlaces: [
+          {
+            etiqueta: `Ver todo Lubricantes ${m.nombre}`,
+            href: conBarra(rutas.marcaLubricante(m.slug)),
+          },
+          ...categorias
+            .filter((c) => c.nombre && c.slug && idDeMarcaLubricante(c) === m.id)
+            .map((c) => ({
+              etiqueta: c.nombre,
+              href: c.enlaceMenu?.trim() || conBarra(rutas.categoriaLubricante(m.slug, c.slug)),
+            })),
+        ],
+        grupos: [],
+      };
+    }),
   };
 }
 
@@ -537,7 +568,9 @@ export function construirMegamenu(d: DatosMegamenu): Record<string, PanelMenu> {
   if (lubricantes) {
     for (const href of [
       rutas.lubricantes(),
-      ...(d.marcasLubricante ?? []).map((m) => rutas.marcaLubricante(m.slug)),
+      ...(d.marcasLubricante ?? [])
+        .filter(tienePaginaPropiaLubricante)
+        .map((m) => rutas.marcaLubricante(m.slug)),
     ]) {
       paneles[claveDeEnlace(href)] = lubricantes;
     }

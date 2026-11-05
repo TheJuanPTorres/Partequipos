@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { SelectorMarcas } from "@/components/lubricantes/SelectorMarcas";
 import { SeccionTestimonios } from "@/components/portada/diferidos";
+import { CabeceraRoja } from "@/components/repuestos/CabeceraRoja";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
@@ -12,12 +14,14 @@ import { TarjetasGrupos } from "@/components/repuestos/TarjetasGrupos";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
+import { vistaSelector } from "@/lib/lubricantes/selector";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import {
   getCategoriaRepuestosPorSlug,
   getCategoriasRepuestos,
 } from "@/lib/queries/getCategoriasRepuestos";
+import { getMarcasLubricanteSelector } from "@/lib/queries/getLubricantes";
 import { getMarcas } from "@/lib/queries/getMarcas";
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
@@ -81,13 +85,17 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
   const categoria = await getCategoriaRepuestosPorSlug(slug);
   if (!categoria) notFound();
 
-  const [global, marcas, testimonios, empresa, sedes, todas] = await Promise.all([
+  const [global, marcas, testimonios, empresa, sedes, todas, selector] = await Promise.all([
     getRepuestosMarca(),
     getMarcas(),
     getTestimoniosDePortada(),
     getEmpresa(),
     getSedesDePortada(),
     getCategoriasRepuestos(),
+    // El selector de marcas de lubricantes (2026-11-04): solo si la categoría lo enciende.
+    categoria.selectorMarcas?.activo
+      ? getMarcasLubricanteSelector().then((m) => vistaSelector(categoria, m))
+      : Promise.resolve(null),
   ]);
   // Las páginas que cuelgan de esta categoría (Filtros Donaldson en Filtración, 2026-10-26),
   // con el banner de marca del #385: su color y, a la derecha, su «Fondo del encabezado» o, sin
@@ -119,30 +127,53 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
     marca: nombre.toLowerCase(),
   });
 
+  const encabezado = vistaEncabezadoCategoria(categoria, global, fondoDeRespaldo(marcas));
+
   return (
     <main className={estilos.pagina}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <div className={estilos.migas}>
-        <Breadcrumbs items={breadcrumbs} />
-      </div>
+      {/* Con la cabecera roja, las migas van a la vista dentro de ella. */}
+      {selector ? null : (
+        <div className={estilos.migas}>
+          <Breadcrumbs items={breadcrumbs} />
+        </div>
+      )}
 
-      <HeroMarca
-        vista={vistaEncabezadoCategoria(categoria, global, fondoDeRespaldo(marcas))}
-        anclaSiguiente={ANCLA_GRUPOS}
-        franja={false}
-        reservarTitulo
-      />
+      {selector ? (
+        // Con el selector (la categoría «Lubricantes», Juan Pablo, 2026-11-04): sin foto, la
+        // cabecera roja de los índices de marcas, baja y con las migas a la vista. Las demás
+        // categorías, con su cabecera de siempre.
+        <CabeceraRoja
+          migas={breadcrumbs}
+          antetitulo={encabezado.linea1}
+          titulo={encabezado.linea2}
+        />
+      ) : (
+        <HeroMarca vista={encabezado} anclaSiguiente={ANCLA_GRUPOS} franja={false} reservarTitulo />
+      )}
 
-      {accesos.length > 0 ? <AccesosSubcategorias accesos={accesos} categoria={nombre} /> : null}
+      {/*
+       * Con el selector de marcas encendido (la categoría «Lubricantes», 2026-11-04), un panel por
+       * marca en lugar de la lista de productos; el resto de la página, igual.
+       */}
+      {selector ? (
+        <SelectorMarcas id={ANCLA_GRUPOS} vista={selector} />
+      ) : (
+        <>
+          {accesos.length > 0 ? (
+            <AccesosSubcategorias accesos={accesos} categoria={nombre} />
+          ) : null}
 
-      <TarjetasGrupos
-        id={ANCLA_GRUPOS}
-        titulo={tituloEligeRepuesto(nombre, true)}
-        categoria={nombre}
-        grupos={gruposDeCategoria(categoria)}
-        formulario={formulario}
-        anclaContacto={ANCLA_CONTACTO}
-      />
+          <TarjetasGrupos
+            id={ANCLA_GRUPOS}
+            titulo={tituloEligeRepuesto(nombre, true)}
+            categoria={nombre}
+            grupos={gruposDeCategoria(categoria)}
+            formulario={formulario}
+            anclaContacto={ANCLA_CONTACTO}
+          />
+        </>
+      )}
 
       <ContactoMarca
         id={ANCLA_CONTACTO}

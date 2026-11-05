@@ -2,6 +2,7 @@ import config from "@payload-config";
 import { getPayload } from "payload";
 import { cache } from "react";
 
+import { LUBRICANTE_CON_PAGINA, tienePaginaPropiaLubricante } from "@/lib/lubricantes/destino";
 import type { CategoriasLubricante, MarcasLubricante } from "@/payload-types";
 
 /*
@@ -24,7 +25,28 @@ import type { CategoriasLubricante, MarcasLubricante } from "@/payload-types";
  * sus productos (desde el 2026-10-22; antes, secciones de la de la marca).
  */
 
+/*
+ * Solo las marcas con página en este sitio: una de «Otra web» (Dispel, 2026-11-04) no tiene
+ * página (404), ni sitemap, ni sale como marca destacada (`lib/lubricantes/destino.ts`). El menú
+ * la lee aparte, en `getMegamenu`.
+ */
 export const getMarcasLubricante = cache(async (): Promise<MarcasLubricante[]> => {
+  const payload = await getPayload({ config });
+  const { docs } = await payload.find({
+    collection: "marcas-lubricante",
+    where: LUBRICANTE_CON_PAGINA,
+    depth: 1,
+    limit: 0,
+    sort: "nombre",
+  });
+  return docs;
+});
+
+/**
+ * TODAS las marcas de lubricantes, también las de «Otra web» (Dispel): las pinta el selector de
+ * marcas de la categoría técnica «Lubricantes» (2026-11-04), cada una con su botón.
+ */
+export const getMarcasLubricanteSelector = cache(async (): Promise<MarcasLubricante[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "marcas-lubricante",
@@ -40,7 +62,7 @@ export const getMarcaLubricantePorSlug = cache(
     const payload = await getPayload({ config });
     const { docs } = await payload.find({
       collection: "marcas-lubricante",
-      where: { slug: { equals: slug } },
+      where: { and: [{ slug: { equals: slug } }, LUBRICANTE_CON_PAGINA] },
       depth: 1,
       limit: 1,
     });
@@ -91,8 +113,9 @@ export const getCategoriasLubricante = cache(
       pagination: false,
       select: { slug: true, marca: true, updatedAt: true },
     });
+    // Las líneas de una marca sin página propia tampoco tienen la suya.
     return docs.flatMap((c) =>
-      typeof c.marca === "object" && c.marca?.slug
+      typeof c.marca === "object" && c.marca?.slug && tienePaginaPropiaLubricante(c.marca)
         ? [{ slug: c.slug, marcaSlug: c.marca.slug, updatedAt: c.updatedAt }]
         : [],
     );

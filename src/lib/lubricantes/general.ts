@@ -1,5 +1,6 @@
 import type { MarcasLubricante, PaginasIndice } from "@/payload-types";
 
+import { tienePaginaPropiaLubricante } from "./destino";
 import { conAlt, logoPropio, type LogoConAlt } from "../marca/logoMarca";
 import type { VistaEncabezado } from "../repuestos/marca";
 import { rutas } from "../routes";
@@ -51,10 +52,14 @@ export function parrafos(valor: string): string[] {
  */
 export function vistaLubricantes(
   grupo: GrupoLubricantes | null | undefined,
-  marcas: Pick<MarcasLubricante, "id" | "nombre" | "slug" | "logo">[],
+  marcas: Pick<MarcasLubricante, "id" | "nombre" | "slug" | "logo" | "destino">[],
 ): VistaLubricantes {
   const elegida = poblado<MarcasLubricante>(grupo?.marca ?? null);
-  const marca = [elegida, ...marcas].find((m) => m && texto(m.nombre) && texto(m.slug)) ?? null;
+  // Una marca de «Otra web» (Dispel) no tiene página: no puede ser la destacada.
+  const marca =
+    [elegida, ...marcas].find(
+      (m) => m && texto(m.nombre) && texto(m.slug) && tienePaginaPropiaLubricante(m),
+    ) ?? null;
   return {
     encabezado: {
       antetitulo: texto(grupo?.antetitulo) || TEXTOS_LUBRICANTES.antetitulo,

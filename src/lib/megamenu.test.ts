@@ -462,6 +462,47 @@ describe("megamenú: lubricantes con bandera y marca de otra web (Dispel, 2026-1
     assert.deepEqual(dispel.enlaces, []);
   });
 
+  // La categoría técnica «Lubricantes», con el selector de marcas encendido (2026-11-05).
+  const conSelector = (marcas: number[], activo = true): DatosMegamenu => ({
+    ...base,
+    categoriasTecnicas: [
+      ...(base.categoriasTecnicas ?? []),
+      {
+        id: 90,
+        nombre: "Lubricantes",
+        slug: "lubricantes-para-maquinaria-pesada",
+        selectorMarcas: { activo, marcas },
+      },
+    ],
+  });
+  const PAGINA_SELECTOR =
+    "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada/lubricantes-para-maquinaria-pesada/";
+
+  it("sin enlace pero en un selector encendido, Dispel sale después de Eni y lleva a esa página", () => {
+    for (const marcas of [[1, 2], []]) {
+      const p = panelLubricantes(conSelector(marcas))!;
+      assert.deepEqual(titulos(p.grupos), ["Lubricantes Eni", "Lubricantes Dispel"], `${marcas}`);
+      const dispel = p.grupos[1]!;
+      assert.equal(dispel.interno, PAGINA_SELECTOR);
+      assert.equal(dispel.externo, undefined);
+      assert.deepEqual(dispel.pais, { codigo: "co", nombre: "Colombia" });
+      assert.deepEqual(dispel.enlaces, []);
+    }
+  });
+
+  it("con enlace, el enlace gana a la página del selector", () => {
+    const d = { ...conSelector([1, 2]), marcasLubricante: conEnlace.marcasLubricante };
+    const dispel = panelLubricantes(d)!.grupos[1]!;
+    assert.equal(dispel.externo, "https://example.com/");
+    assert.equal(dispel.interno, undefined);
+  });
+
+  it("sin enlace, Dispel no sale si el selector está apagado o no la elige", () => {
+    for (const d of [conSelector([1, 2], false), conSelector([1])]) {
+      assert.deepEqual(titulos(panelLubricantes(d)!.grupos), ["Lubricantes Eni"]);
+    }
+  });
+
   it("un enlace que no es https o es de este sitio cuenta como vacío", () => {
     for (const enlace of ["http://example.com/", "https://partequipos.com/x/", "no es url"]) {
       const d = {

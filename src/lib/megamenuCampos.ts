@@ -33,6 +33,9 @@ export const CAMPOS_MENU = {
     "padre",
     "iconoMarca",
     "colorMarca",
+    // El selector de marcas de lubricantes: a su página lleva una marca de «Otra web» sin
+    // enlace (Dispel, 2026-11-05).
+    "selectorMarcas",
   ],
   // «Otra web» con su enlace, y la bandera del país (Dispel y Eni, 2026-11-04).
   "marcas-lubricante": ["nombre", "slug", "destino", "enlaceExterno", "paisOrigen"],

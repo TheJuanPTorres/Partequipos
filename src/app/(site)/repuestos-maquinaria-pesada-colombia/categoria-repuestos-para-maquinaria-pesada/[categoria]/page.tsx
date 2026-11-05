@@ -138,6 +138,9 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
         anclaSiguiente={ANCLA_GRUPOS}
         franja={false}
         reservarTitulo
+        // Con el selector (la categoría «Lubricantes», Juan Pablo, 2026-11-04), la cabecera baja:
+        // 380 px (420 en móvil) en lugar de 630 (670). Las demás categorías, igual.
+        bajo={selector !== null}
       />
 
       {/*

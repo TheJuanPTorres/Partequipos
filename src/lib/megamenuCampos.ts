@@ -34,7 +34,8 @@ export const CAMPOS_MENU = {
     "iconoMarca",
     "colorMarca",
   ],
-  "marcas-lubricante": ["nombre", "slug"],
+  // «Otra web» con su enlace, y la bandera del país (Dispel y Eni, 2026-11-04).
+  "marcas-lubricante": ["nombre", "slug", "destino", "enlaceExterno", "paisOrigen"],
   "categorias-lubricante": ["nombre", "slug", "marca", "enlaceMenu", "orden"],
 } as const;
 

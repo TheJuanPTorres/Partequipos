@@ -430,6 +430,65 @@ describe("megamenú: lubricantes (2026-10-20)", () => {
   });
 });
 
+describe("megamenú: lubricantes con bandera y marca de otra web (Dispel, 2026-11-04)", () => {
+  const base: DatosMegamenu = {
+    ...DATOS,
+    marcasLubricante: [
+      { id: 2, nombre: "Dispel", slug: "dispel", destino: "externo", paisOrigen: "co" },
+      { id: 1, nombre: "Eni", slug: "lubricantes-eni", destino: "pagina", paisOrigen: "it" },
+    ],
+    categoriasLubricante: [{ id: 1, nombre: "Auto liviano", slug: "auto-liviano", marca: 1 }],
+  };
+  const conEnlace: DatosMegamenu = {
+    ...base,
+    marcasLubricante: base.marcasLubricante!.map((m) =>
+      m.id === 2 ? { ...m, enlaceExterno: "https://example.com/" } : m,
+    ),
+  };
+
+  it("sin enlace, Dispel no sale (sin enlaces rotos); Eni con su bandera de Italia", () => {
+    const p = panelLubricantes(base)!;
+    assert.deepEqual(titulos(p.grupos), ["Lubricantes Eni"]);
+    assert.deepEqual(p.grupos[0]!.pais, { codigo: "it", nombre: "Italia" });
+    assert.equal(p.grupos[0]!.externo, undefined);
+  });
+
+  it("con enlace, Dispel sale DESPUÉS de Eni, como enlace fuera y con la bandera de Colombia", () => {
+    const p = panelLubricantes(conEnlace)!;
+    assert.deepEqual(titulos(p.grupos), ["Lubricantes Eni", "Lubricantes Dispel"]);
+    const dispel = p.grupos[1]!;
+    assert.equal(dispel.externo, "https://example.com/");
+    assert.deepEqual(dispel.pais, { codigo: "co", nombre: "Colombia" });
+    assert.deepEqual(dispel.enlaces, []);
+  });
+
+  it("un enlace que no es https o es de este sitio cuenta como vacío", () => {
+    for (const enlace of ["http://example.com/", "https://partequipos.com/x/", "no es url"]) {
+      const d = {
+        ...base,
+        marcasLubricante: base.marcasLubricante!.map((m) =>
+          m.id === 2 ? { ...m, enlaceExterno: enlace } : m,
+        ),
+      };
+      assert.deepEqual(titulos(panelLubricantes(d)!.grupos), ["Lubricantes Eni"], enlace);
+    }
+  });
+
+  it("la dirección de una marca de otra web no abre el panel (no tiene página)", () => {
+    const m = construirMegamenu(conEnlace);
+    assert.ok(m["/lubricantes/lubricantes-eni/"]);
+    assert.equal(m["/lubricantes/dispel/"], undefined);
+  });
+
+  it("sin país, sin bandera", () => {
+    const d = {
+      ...base,
+      marcasLubricante: [{ id: 1, nombre: "Eni", slug: "lubricantes-eni" }],
+    };
+    assert.equal(panelLubricantes(d)!.grupos[0]!.pais, undefined);
+  });
+});
+
 describe("megamenú: qué enlace de la cabecera abre qué panel", () => {
   it("por su ruta, con o sin barra final", () => {
     const m = construirMegamenu(DATOS);

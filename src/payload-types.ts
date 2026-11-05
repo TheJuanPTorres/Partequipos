@@ -1664,12 +1664,16 @@ export interface Pagina {
     maquinaReflejo?: (number | null) | Media;
   };
   /**
-   * Los logos son los de las marcas de repuestos, por orden alfabético; se cambian en cada marca.
+   * Los logos son los de las marcas de repuestos (se cambian en cada marca) y cada uno lleva a la página de su marca.
    */
   seccionMarcasRepuestos?: {
     antetitulo?: string | null;
     titulo?: string | null;
     tituloResaltado?: string | null;
+    /**
+     * Elige qué marcas salen en la banda y arrástralas para cambiar el orden: salen de izquierda a derecha en el orden de esta lista. Si la dejas vacía, salen todas las marcas de repuestos por orden alfabético. Una marca sin logo no sale.
+     */
+    marcasBanda?: (number | Marca)[] | null;
     /**
      * Decorativa: la máquina a la izquierda, por delante de la banda de logos (hoy, la Yanmar ViO80). Opcional.
      */
@@ -3262,6 +3266,7 @@ export interface PaginasSelect<T extends boolean = true> {
         antetitulo?: T;
         titulo?: T;
         tituloResaltado?: T;
+        marcasBanda?: T;
         maquina?: T;
         tamanoMaquina?: T;
       };

@@ -43,7 +43,7 @@ export const getLogosMarca = cache(async (): Promise<IndiceLogos> => new Map(awa
 /**
  * Las marcas de repuestos con logo para la sección «Marcas de repuestos» de la portada: nombre,
  * dirección y el logo con la regla común. Misma caché del marco que los logos de arriba (la
- * invalidan los ganchos de `marcas`). En orden alfabético: la colección no tiene otro orden.
+ * invalidan los ganchos de `marcas`). En orden alfabético; la portada elige y ordena con «Marcas de la banda» (`marcasBanda.ts`).
  */
 const marcasEnCache = unstable_cache(
   async (): Promise<MarcaDeRepuestos[]> => {

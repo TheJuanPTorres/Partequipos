@@ -352,6 +352,15 @@ oficial, no lo pongas.
   de 1080 × 1620.
 - Cada sección de la portada tiene su bloque en esa página. Lo que dejes vacío
   no se pinta.
+- **Marcas de repuestos (la banda de logos):** en el grupo «Sección «Marcas de
+  repuestos» de la portada», el campo **«Marcas de la banda»** decide qué
+  marcas salen y en qué orden. Elige las marcas en la lista desplegable (cada
+  una solo una vez) y **arrástralas** para ordenarlas: la banda las pinta en
+  ese orden. Para quitar una, pulsa la «×».
+  **Si dejas el campo vacío, salen todas las marcas de repuestos por orden
+  alfabético**, como hasta ahora. El logo y el enlace no se eligen aquí: son
+  los de cada marca (**Repuestos → Marcas de repuestos**), y una marca sin
+  logo no sale.
 
 ### 5.9 Menú, pie y datos de la empresa
 

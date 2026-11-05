@@ -7,6 +7,7 @@ import { LogoMarca } from "@/components/marca/LogoMarca";
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { usePausa } from "@/components/movimiento/useMovimiento";
 import type { LogoDePortada } from "@/lib/portada/kitCliente";
+import { rellenoDeBanda } from "@/lib/portada/marcasBanda";
 import { sizesDeLogo } from "@/lib/portada/sizesLogo";
 
 import estilos from "./marcasKit.module.css";
@@ -18,12 +19,21 @@ import estilos from "./marcasKit.module.css";
  *
  * POR QUÉ ES COMPONENTE DE CLIENTE (CLAUDE.md §3.1): el botón de pausa del sitio (D2, WCAG 2.2.2),
  * que el prototipo no tenía; parado de partida con «reducir movimiento», y entonces la banda se
- * desplaza a mano. Solo la primera copia es accesible: las demás, `aria-hidden` y `alt` vacío.
+ * desplaza a mano. Solo la primera copia es accesible: las demás, `aria-hidden` y `alt` vacío. Con
+ * pocos logos, cada copia los repite (`MINIMO_POR_COPIA`) y las repeticiones tampoco se leen.
  */
 
 const COPIAS = 4;
 /** El prototipo: 32 s por vuelta con 6 marcas (dos copias). */
 const SEGUNDOS_POR_LOGO = 2.7;
+/**
+ * Logos mínimos por copia (2026-11-05, #429): la pista se desplaza la mitad, así que DOS copias
+ * tienen que cubrir el ancho de la banda o el bucle deja un hueco. Con «Marcas de la banda» se
+ * pueden elegir solo una o dos marcas (~200 px cada una frente a una banda de ~1200 px a 1440), y
+ * entonces cada copia repite sus logos hasta tener al menos estos. Con 6, dos copias miden ~2400 px;
+ * y la banda de «Marcas que mueven» (7 logos) no cambia.
+ */
+const MINIMO_POR_COPIA = 6;
 
 export function BandaLogos({
   logos,
@@ -38,7 +48,9 @@ export function BandaLogos({
 }) {
   const { pausado, alternar } = usePausa();
   const idPista = useId();
-  const duracion = { "--banda-duracion": `${logos.length * 2 * SEGUNDOS_POR_LOGO}s` };
+  const relleno = rellenoDeBanda(logos, MINIMO_POR_COPIA);
+  // La duración cuenta los logos pintados: la velocidad no cambia al repetirlos.
+  const duracion = { "--banda-duracion": `${relleno.length * 2 * SEGUNDOS_POR_LOGO}s` };
   return (
     <>
       <div className={estilos.banda}>
@@ -57,31 +69,39 @@ export function BandaLogos({
                 aria-label={copia === 0 ? etiqueta : undefined}
                 aria-hidden={copia > 0 ? true : undefined}
               >
-                {logos.map((l) => (
-                  <li key={l.id} className={estilos.item}>
-                    {l.href && copia === 0 ? (
-                      // Solo la primera copia es enlace: las demás son decorativas y no se enfocan.
-                      <Link href={l.href} className={estilos.caja} prefetch={false}>
-                        <LogoMarca
-                          logo={l.logo}
-                          alt={l.logo.alt}
-                          sizes={sizesDeLogo(l.logo, espejo)}
-                          className={estilos.logo}
-                        />
-                      </Link>
-                    ) : (
-                      <span className={estilos.caja}>
-                        <LogoMarca
-                          logo={l.logo}
-                          alt={copia === 0 ? l.logo.alt : ""}
-                          sizes={sizesDeLogo(l.logo, espejo)}
-                          className={estilos.logo}
-                        />
-                      </span>
-                    )}
-                    <span className={estilos.separador} aria-hidden="true" />
-                  </li>
-                ))}
+                {relleno.map((l, k) => {
+                  // Solo la primera vez de cada logo en la primera copia es accesible.
+                  const accesible = copia === 0 && k < logos.length;
+                  return (
+                    <li
+                      key={`${l.id}-${k}`}
+                      className={estilos.item}
+                      aria-hidden={copia === 0 && !accesible ? true : undefined}
+                    >
+                      {l.href && accesible ? (
+                        // Solo la primera copia es enlace: las demás son decorativas y no se enfocan.
+                        <Link href={l.href} className={estilos.caja} prefetch={false}>
+                          <LogoMarca
+                            logo={l.logo}
+                            alt={l.logo.alt}
+                            sizes={sizesDeLogo(l.logo, espejo)}
+                            className={estilos.logo}
+                          />
+                        </Link>
+                      ) : (
+                        <span className={estilos.caja}>
+                          <LogoMarca
+                            logo={l.logo}
+                            alt={accesible ? l.logo.alt : ""}
+                            sizes={sizesDeLogo(l.logo, espejo)}
+                            className={estilos.logo}
+                          />
+                        </span>
+                      )}
+                      <span className={estilos.separador} aria-hidden="true" />
+                    </li>
+                  );
+                })}
               </ul>
             ))}
           </div>

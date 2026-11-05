@@ -104,6 +104,7 @@ import * as migration_20261104_155843_portada_barra_baldosas from './20261104_15
 import * as migration_20261104_200956_cabecera_enlace_opcional from './20261104_200956_cabecera_enlace_opcional';
 import * as migration_20261104_211848_sedes_tipo from './20261104_211848_sedes_tipo';
 import * as migration_20261104_214353_lubricantes_dispel_selector from './20261104_214353_lubricantes_dispel_selector';
+import * as migration_20261105_190757_portada_marcas_banda from './20261105_190757_portada_marcas_banda';
 
 export const migrations = [
   {
@@ -634,6 +635,11 @@ export const migrations = [
   {
     up: migration_20261104_214353_lubricantes_dispel_selector.up,
     down: migration_20261104_214353_lubricantes_dispel_selector.down,
-    name: '20261104_214353_lubricantes_dispel_selector'
+    name: '20261104_214353_lubricantes_dispel_selector',
+  },
+  {
+    up: migration_20261105_190757_portada_marcas_banda.up,
+    down: migration_20261105_190757_portada_marcas_banda.down,
+    name: '20261105_190757_portada_marcas_banda'
   },
 ];

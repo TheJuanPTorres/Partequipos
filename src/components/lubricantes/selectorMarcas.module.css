@@ -119,11 +119,16 @@
   box-shadow: 0 6px 18px -10px rgb(16 15 15 / 0.45);
 }
 
+/*
+ * Alto FIJO: con `width` y `height` en `auto` el logo no reservaba su sitio hasta llegar, y la
+ * placa crecía 44 px empujando el texto del panel (CLS al cargar, visible con la cabecera baja).
+ * El ancho sale de las medidas del fichero; si pasa de 150, el logo cabe entero en la caja.
+ */
 .logo {
   width: auto;
   max-width: 150px;
-  height: auto;
-  max-height: 44px;
+  height: 44px;
+  object-fit: contain;
 }
 
 .pais {

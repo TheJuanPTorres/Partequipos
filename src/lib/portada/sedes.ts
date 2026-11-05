@@ -1,6 +1,7 @@
 import type { Sede } from "@/payload-types";
 
 import { hrefTelefono } from "../pie";
+import { coordenadasEnColombia } from "../fields/reglasPortada";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
 /**
@@ -59,7 +60,13 @@ export function sedesDePortada(sedes: Sede[]): SedeLista[] {
     const lng = s.longitud;
     if (!nombre || !ciudad || !departamento) return [];
     if (typeof lat !== "number" || typeof lng !== "number") return [];
-    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return [];
+    if (!coordenadasEnColombia(lat, lng)) {
+      // Una sede mal puesta rompería el encuadre del mapa: se omite y se avisa.
+      console.error(
+        `[sedes] la sede «${nombre}» tiene coordenadas fuera de Colombia (${lat}, ${lng}) y no sale en el mapa. Corrige la latitud y la longitud en el panel (la longitud es negativa).`,
+      );
+      return [];
+    }
     const foto = imagenDeMedia(s.foto, `Sede ${nombre}`);
     const lineas = (s.lineas ?? []).flatMap((l): LineaSede[] => {
       const linea = l.linea?.trim();

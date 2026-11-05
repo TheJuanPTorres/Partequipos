@@ -48,6 +48,21 @@ describe("sección 9: sedes", () => {
     );
   });
 
+  it("omite, con aviso en el registro, una sede fuera de Colombia y deja las demás", (t) => {
+    const aviso = t.mock.method(console, "error", () => {});
+    const sedes = sedesDePortada([
+      sede({ nombre: "Buena" }),
+      sede({ nombre: "Mala", longitud: 75.1983 }),
+      sede({ nombre: "Cambiada", latitud: -75.2, longitud: 7.98 }),
+    ]);
+    assert.deepEqual(
+      sedes.map((x) => x.titulo),
+      ["Sede Buena"],
+    );
+    assert.equal(aviso.mock.callCount(), 2);
+    assert.match(String(aviso.mock.calls[0]?.arguments[0]), /\[sedes\].*Mala.*fuera de Colombia/);
+  });
+
   it("descarta líneas incompletas", () => {
     const [s] = sedesDePortada([sede({ lineas: [{ linea: "X", direccion: " " }] })]);
     assert.deepEqual(s?.lineas, []);

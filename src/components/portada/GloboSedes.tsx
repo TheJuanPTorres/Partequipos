@@ -40,21 +40,15 @@ const CFG = {
    * ve nunca. El mapa se limita a Colombia y su entorno, y nunca enseña más de
    * `anchoMaxGrados` de longitud (Colombia mide unos 12°): lo calcula
    * `zoomMinimo` según el ancho del mapa. Acercarse a cada sede sigue libre.
+   * Los límites son un poco más anchos que `anchoMaxGrados`: si fueran más
+   * estrechos que la vista, Mapbox centraría el mapa en ellos e ignoraría el
+   * encuadre con el hueco del panel (las sedes quedaban pegadas a un borde).
    */
   limites: [
-    [-82.5, -6],
-    [-63, 14.5],
+    [-91, -7],
+    [-56, 15.5],
   ] as [[number, number], [number, number]],
   anchoMaxGrados: 34,
-  /*
-   * El hueco del panel lo reserva `relleno` (derechaExtra). Sin desplazamientos
-   * añadidos (en ux-9, −0,2 de ancho a la izquierda y 0,5 de alto en móvil): las
-   * sedes quedan centradas en el área libre. En móvil el mapa va ENCIMA del
-   * panel, no detrás, así que no hay nada que esquivar (el 0,5 de alto lo
-   * llevaba a zoom 1,2: el planeta entero).
-   */
-  desplazamiento: { x: 0, y: 0 },
-  desplazamientoMovil: { x: 0, y: 0 },
   colores: { mar: "#FFFFFF", tierra: "#F4F4F4", fronteras: "#000000", iso: "CO" },
 };
 
@@ -161,66 +155,74 @@ export function GloboSedes({ token, sedes, children }: Props) {
   const contenedorMapa = useRef<HTMLDivElement>(null);
   const carril = useRef<HTMLUListElement>(null);
   const panel = useRef<HTMLDivElement>(null);
+  const leyenda = useRef<HTMLUListElement>(null);
   const mapa = useRef<Mapa | null>(null);
   const pines = useRef<HTMLButtonElement[]>([]);
   const volando = useRef(false);
+  const enGeneral = useRef(true);
+  const actualRef = useRef(0);
   const [actual, setActual] = useState(0);
   const [plegado, setPlegado] = useState(false);
   const total = sedes.length;
 
-  const relleno = useCallback((derechaExtra: number): Padding => {
-    const el = contenedorMapa.current;
-    const w = el?.offsetWidth ?? 0;
-    const h = el?.offsetHeight ?? 0;
-    const d = esMovil() ? CFG.desplazamientoMovil : CFG.desplazamiento;
+  /**
+   * La zona visible del mapa: lo que queda al quitar el panel (a la derecha en
+   * escritorio; en móvil va debajo del mapa y no tapa nada) y la leyenda (arriba
+   * a la izquierda en escritorio). Es el `padding` del mapa: lo que se centra
+   * (todas las sedes o una) queda en el centro de esa zona.
+   */
+  const relleno = useCallback((cerrado: boolean): Padding => {
+    const caja = contenedorMapa.current?.getBoundingClientRect();
+    if (!caja || esMovil()) return { top: 0, bottom: 0, left: 0, right: 0 };
+    const ley = leyenda.current?.getBoundingClientRect();
     return {
-      top: Math.max(0, d.y * h),
-      bottom: Math.max(0, -d.y * h),
-      left: Math.max(0, d.x * w),
-      right: Math.max(0, -d.x * w) + derechaExtra,
+      top: ley ? Math.max(0, ley.bottom - caja.top) + 12 : 0,
+      bottom: 0,
+      left: 0,
+      right: !cerrado && panel.current ? panel.current.offsetWidth + 24 : 0,
     };
   }, []);
 
-  const anchoPanel = useCallback(
-    (estaPlegado: boolean) =>
-      !esMovil() && !estaPlegado && panel.current ? panel.current.offsetWidth + 24 : 0,
-    [],
-  );
+  const estaPlegado = () => raiz.current?.hasAttribute("data-plegado") ?? false;
 
   const vistaGeneral = useCallback(
-    (estaPlegado: boolean, duracion: number) => {
+    (plegadoAhora: boolean, duracion: number) => {
       const m = mapa.current;
       const gl = window.mapboxgl;
       if (!m || !gl || sedes.length === 0) return;
+      enGeneral.current = true;
       const limites = new gl.LngLatBounds();
       sedes.forEach((s) => limites.extend([s.lng, s.lat]));
       // El `padding` de `fitBounds` SUSTITUYE al del mapa (no se suma): lleva el hueco del panel.
-      const p = relleno(anchoPanel(estaPlegado));
+      const p = relleno(plegadoAhora);
       const g = esMovil() ? CFG.margenVistaMovil : CFG.margenVista;
       m.fitBounds(limites, {
-        padding: { top: p.top + g, bottom: p.bottom + g, left: p.left + g, right: p.right + g },
+        padding: { top: Math.max(g, p.top + 16), bottom: g, left: g, right: p.right + g },
         duration: sinMovimiento() ? 0 : duracion,
         essential: true,
       });
     },
-    [sedes, relleno, anchoPanel],
+    [sedes, relleno],
   );
 
   const volarA = useCallback(
-    (i: number) => {
+    (i: number, instantaneo = false) => {
       const s = sedes[i];
       if (!mapa.current || !s) return;
+      enGeneral.current = false;
       mapa.current.flyTo({
         center: [s.lng, s.lat],
         zoom: esMovil() ? CFG.zoomSedeMovil : CFG.zoomSede,
         minZoom: CFG.zoomAlejado,
+        // La sede queda en el centro de la zona visible, no bajo el panel.
+        padding: relleno(estaPlegado()),
         speed: 0.9,
         curve: 1.6,
-        duration: sinMovimiento() ? 0 : CFG.duracion,
+        duration: instantaneo || sinMovimiento() ? 0 : CFG.duracion,
         essential: true,
       });
     },
-    [sedes],
+    [sedes, relleno],
   );
 
   /** Ir a la sede `i`: desplaza el carril, marca el pin y vuela. */
@@ -241,6 +243,7 @@ export function GloboSedes({ token, sedes, children }: Props) {
 
   // Pin activo, en el DOM de Mapbox.
   useEffect(() => {
+    actualRef.current = actual;
     pines.current.forEach((p, i) => {
       if (i === actual) p.setAttribute("data-activo", "");
       else p.removeAttribute("data-activo");
@@ -303,7 +306,7 @@ export function GloboSedes({ token, sedes, children }: Props) {
             m.on("load", () => {
               if (cancelado) return;
               pintarColores(m);
-              m.setPadding(relleno(anchoPanel(false)));
+              m.setPadding(relleno(false));
               pines.current = sedes.map((s, i) => {
                 const pin = document.createElement("button");
                 pin.type = "button";
@@ -348,15 +351,15 @@ export function GloboSedes({ token, sedes, children }: Props) {
       mapa.current?.remove();
       mapa.current = null;
     };
-  }, [token, sedes, relleno, anchoPanel, vistaGeneral, ir]);
+  }, [token, sedes, relleno, vistaGeneral, ir]);
 
   // Plegar o abrir el panel: recoloca el globo.
   useEffect(() => {
     const m = mapa.current;
     if (!m) return;
-    m.setPadding(relleno(anchoPanel(plegado)));
+    m.setPadding(relleno(plegado));
     if (plegado) vistaGeneral(true, CFG.duracion);
-  }, [plegado, relleno, anchoPanel, vistaGeneral]);
+  }, [plegado, relleno, vistaGeneral]);
 
   // Cambio de tamaño.
   useEffect(() => {
@@ -366,7 +369,10 @@ export function GloboSedes({ token, sedes, children }: Props) {
       if (!m) return;
       m.resize();
       m.setMinZoom(zoomMinimo(contenedorMapa.current?.offsetWidth ?? 0));
-      m.setPadding(relleno(anchoPanel(plegado)));
+      m.setPadding(relleno(plegado));
+      // Con otro tamaño, el encuadre se rehace (sin animación): todas las sedes o la elegida.
+      if (enGeneral.current) vistaGeneral(plegado, 0);
+      else volarA(actualRef.current, true);
     };
     const alCambiar = () => {
       window.clearTimeout(t);
@@ -377,7 +383,7 @@ export function GloboSedes({ token, sedes, children }: Props) {
       window.clearTimeout(t);
       window.removeEventListener("resize", alCambiar);
     };
-  }, [plegado, relleno, anchoPanel]);
+  }, [plegado, relleno, vistaGeneral, volarA]);
 
   return (
     <div ref={raiz} className={estilos.globo} data-plegado={plegado ? "" : undefined}>
@@ -389,7 +395,7 @@ export function GloboSedes({ token, sedes, children }: Props) {
       />
 
       {/* Qué significa cada marcador. Texto visible: el tipo no depende solo del tamaño. */}
-      <ul className={estilos.leyenda} aria-label="Leyenda del mapa">
+      <ul ref={leyenda} className={estilos.leyenda} aria-label="Leyenda del mapa">
         {(["principal", "secundaria"] as const).map((t) => (
           <li key={t} className={estilos.leyendaItem}>
             <span className={estilos.leyendaPunto} data-tipo={t} aria-hidden="true" />

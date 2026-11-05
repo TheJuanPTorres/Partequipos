@@ -252,23 +252,17 @@ function LogoDeFila({ logo }: { logo: NonNullable<GrupoMenu["logo"]> }) {
 }
 
 /**
- * La bandera del país de origen tras el nombre (las marcas de lubricantes, 2026-11-04): el dibujo
- * es DECORATIVO y el país va en texto solo para lectores, una vez (`conTexto={false}` cuando ya va
- * en el `aria-label` del enlace).
+ * La bandera del país de origen A LA IZQUIERDA del nombre (las marcas de lubricantes, 2026-11-04;
+ * a la izquierda desde el 2026-11-05, dirección): el dibujo es DECORATIVO y el país va en texto
+ * solo para lectores, una vez y DESPUÉS del nombre (`PaisDeFila`; no va cuando ya está en el
+ * `aria-label` del enlace).
  */
-function BanderaDeFila({
-  pais,
-  conTexto = true,
-}: {
-  pais: NonNullable<GrupoMenu["pais"]>;
-  conTexto?: boolean;
-}) {
-  return (
-    <>
-      <Bandera codigo={pais.codigo} className={estilos.bandera} />
-      {conTexto ? <span className="sr-only"> ({pais.nombre})</span> : null}
-    </>
-  );
+function BanderaDeFila({ pais }: { pais: NonNullable<GrupoMenu["pais"]> }) {
+  return <Bandera codigo={pais.codigo} className={estilos.bandera} />;
+}
+
+function PaisDeFila({ pais }: { pais: NonNullable<GrupoMenu["pais"]> }) {
+  return <span className="sr-only"> ({pais.nombre})</span>;
 }
 
 /**
@@ -288,8 +282,8 @@ function FilaExterna({ grupo, nivel }: { grupo: GrupoMenu & { externo: string };
       >
         <IconExternalLink aria-hidden="true" focusable="false" stroke={2} />
         {grupo.logo ? <LogoDeFila logo={grupo.logo} /> : null}
+        {grupo.pais ? <BanderaDeFila pais={grupo.pais} /> : null}
         {grupo.titulo}
-        {grupo.pais ? <BanderaDeFila pais={grupo.pais} conTexto={false} /> : null}
       </a>
     </div>
   );
@@ -343,8 +337,9 @@ function AcordeonDesplegable({
          * explícitas: sin CLS.
          */}
         {grupo.logo ? <LogoDeFila logo={grupo.logo} /> : null}
-        {grupo.titulo}
         {grupo.pais ? <BanderaDeFila pais={grupo.pais} /> : null}
+        {grupo.titulo}
+        {grupo.pais ? <PaisDeFila pais={grupo.pais} /> : null}
       </button>
       <div
         ref={region}

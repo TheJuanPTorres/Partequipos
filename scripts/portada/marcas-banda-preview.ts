@@ -11,6 +11,8 @@
  *   del panel y no el alfabético) y guarda en el manifiesto lo que había antes.
  * - `retirar`: devuelve el valor de antes, solo si el campo sigue con la selección de prueba (lo
  *   cambiado después a mano se respeta y se avisa).
+ * - `comprobar-repetida`: intenta guardar la primera marca dos veces y exige que el servidor lo
+ *   RECHACE y que el campo siga como estaba (por efecto, CLAUDE.md §10.15).
  *
  * SOLO preview: el mismo guardián que el hero de prueba, antes de conectar. No sube ni borra
  * ficheros ni toca el esquema. `revalidar=` (con `REVALIDACION_TOKEN` del preview en el entorno)
@@ -28,7 +30,7 @@ import { fetchAlPreview, origenDePreview } from "../../src/lib/preview/derivacio
 import { CABECERA_REVALIDACION } from "../../src/lib/seguridad/tokenRevalidacion";
 
 const args = process.argv.slice(2);
-const modo = args.find((a) => a === "ver" || a === "aplicar" || a === "retirar");
+const modo = args.find((a) => ["ver", "aplicar", "retirar", "comprobar-repetida"].includes(a));
 const valorDe = (k: string) => args.find((a) => a.startsWith(`${k}=`))?.slice(k.length + 1);
 // Para fallar se LANZA: `payload run` sale con 0 tras el import y pisaría un `exitCode` (§10.25).
 const fallar = (m: string): never => {
@@ -36,7 +38,7 @@ const fallar = (m: string): never => {
   e.stack = e.message;
   throw e;
 };
-if (!modo) fallar("indica el modo: ver, aplicar o retirar");
+if (!modo) fallar("indica el modo: ver, aplicar, retirar o comprobar-repetida");
 const v = puedeTocarHeroDePrueba(process.env.DATABASE_URI, process.env.BLOB_READ_WRITE_TOKEN);
 if (!v.permitido) fallar(`NO se hace nada: ${v.motivo}`);
 
@@ -99,7 +101,32 @@ const guardarCampo = (ids: number[]) =>
     overrideAccess: true,
   });
 
-if (modo === "ver") {
+if (modo === "comprobar-repetida") {
+  const { docs } = await payload.find({
+    collection: "marcas",
+    depth: 0,
+    limit: 1,
+    sort: "nombre",
+    overrideAccess: true,
+  });
+  const id = docs[0]?.id;
+  if (!id) fallar("no hay marcas");
+  let rechazo = "";
+  try {
+    await guardarCampo([id!, id!]);
+  } catch (e) {
+    rechazo = e instanceof Error ? e.message : String(e);
+  }
+  const leido = idsElegidos(
+    (await payload.findByID({ collection: "paginas", id: pagina!.id, depth: 0 }))
+      .seccionMarcasRepuestos?.marcasBanda,
+  );
+  log(`rechazo: ${rechazo || "NINGUNO"}`);
+  log(`campo después: ${JSON.stringify(leido)} (antes ${JSON.stringify(actual)})`);
+  if (!rechazo) fallar("el servidor aceptó una marca repetida");
+  if (!iguales(leido, actual)) fallar("el campo cambió");
+  log("✓ REPETIDA RECHAZADA y el campo sin cambios");
+} else if (modo === "ver") {
   const { docs } = await payload.find({
     collection: "marcas",
     depth: 0,

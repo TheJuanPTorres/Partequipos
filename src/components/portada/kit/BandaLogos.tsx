@@ -29,10 +29,11 @@ const SEGUNDOS_POR_LOGO = 2.7;
 /**
  * Logos mínimos por copia (2026-11-05, #429): la pista se desplaza la mitad, así que DOS copias
  * tienen que cubrir el ancho de la banda o el bucle deja un hueco. Con «Marcas de la banda» se
- * pueden elegir solo una o dos marcas (~210 px cada una frente a una banda de ~1200 px a 1440), y
- * entonces cada copia repite sus logos hasta tener al menos estos.
+ * pueden elegir solo una o dos marcas (~200 px cada una frente a una banda de ~1200 px a 1440), y
+ * entonces cada copia repite sus logos hasta tener al menos estos. Con 6, dos copias miden ~2400 px;
+ * y la banda de «Marcas que mueven» (7 logos) no cambia.
  */
-const MINIMO_POR_COPIA = 8;
+const MINIMO_POR_COPIA = 6;
 
 export function BandaLogos({
   logos,

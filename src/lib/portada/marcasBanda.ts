@@ -51,3 +51,14 @@ export function validarMarcasSinRepetir(
     ? true
     : "Hay una marca repetida en «Marcas de la banda». Quita la copia: cada marca sale una vez.";
 }
+
+/**
+ * Los logos de UNA copia de la banda en bucle: la lista repetida entera hasta tener al menos
+ * `minimo`, para que dos copias cubran siempre el ancho de la banda (`BandaLogos`). Sin logos,
+ * nada.
+ */
+export function rellenoDeBanda<T>(logos: readonly T[], minimo: number): T[] {
+  if (logos.length === 0) return [];
+  const vueltas = Math.max(1, Math.ceil(minimo / logos.length));
+  return Array.from({ length: vueltas }, () => logos).flat();
+}

@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { idsElegidos, marcasDeLaBanda, validarMarcasSinRepetir } from "./marcasBanda";
+import {
+  idsElegidos,
+  marcasDeLaBanda,
+  rellenoDeBanda,
+  validarMarcasSinRepetir,
+} from "./marcasBanda";
 
 const todas = [
   { id: 3, nombre: "Bobcat" },
@@ -56,5 +61,16 @@ describe("validarMarcasSinRepetir", () => {
   it("rechaza la misma marca dos veces, también poblada", () => {
     assert.match(String(validarMarcasSinRepetir([1, 2, 1])), /repetida/);
     assert.match(String(validarMarcasSinRepetir([{ id: 4 }, 4])), /repetida/);
+  });
+});
+
+describe("rellenoDeBanda", () => {
+  it("repite la lista entera hasta el mínimo, en su orden", () => {
+    assert.deepEqual(rellenoDeBanda(["a", "b"], 5), ["a", "b", "a", "b", "a", "b"]);
+    assert.deepEqual(rellenoDeBanda(["a"], 3), ["a", "a", "a"]);
+  });
+  it("con suficientes logos, la lista tal cual; sin logos, nada", () => {
+    assert.deepEqual(rellenoDeBanda(["a", "b", "c"], 2), ["a", "b", "c"]);
+    assert.deepEqual(rellenoDeBanda([], 8), []);
   });
 });

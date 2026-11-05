@@ -7,8 +7,8 @@
  *   npm run preview:marcas-banda:retirar -- revalidar=<URL del preview>
  *
  * - `ver`: lo que hay en el campo y las marcas de repuestos con logo, por orden alfabético.
- * - `aplicar`: elige 5 marcas con logo en orden alfabético INVERSO (así se ve que manda el orden
- *   del panel y no el alfabético) y guarda en el manifiesto lo que había antes.
+ * - `aplicar`: elige 5 marcas con logo (o las de `cuantas=<n>`) en orden alfabético INVERSO (así se
+ *   ve que manda el orden del panel y no el alfabético) y guarda en el manifiesto lo que había antes.
  * - `retirar`: devuelve el valor de antes, solo si el campo sigue con la selección de prueba (lo
  *   cambiado después a mano se respeta y se avisa).
  * - `comprobar-repetida`: intenta guardar la primera marca dos veces y exige que el servidor lo
@@ -50,7 +50,8 @@ const MANIFIESTO = path.join(
   "partequipos-cierre",
   "manifiesto-marcas-banda-preview.json",
 );
-const CUANTAS = 5;
+const CUANTAS = Number(valorDe("cuantas") ?? 5);
+if (!Number.isInteger(CUANTAS) || CUANTAS < 1) fallar("`cuantas=` tiene que ser un entero ≥ 1");
 
 // Un script de datos no toca el esquema ni deja el hijo de tipos (CLAUDE.md §10.9, §10.34, §10.25).
 process.env.PAYLOAD_DISABLE_PUSH = "true";
@@ -164,7 +165,7 @@ if (modo === "comprobar-repetida") {
       overrideAccess: true,
     });
     const elegidas = docs.filter((m) => m.logo && m.slug).slice(0, CUANTAS);
-    if (elegidas.length < 2) fallar("hacen falta al menos 2 marcas con logo");
+    if (elegidas.length < CUANTAS) fallar(`no hay ${CUANTAS} marcas con logo`);
     const ahora = elegidas.map((m) => m.id);
     const manifiesto: Manifiesto = {
       inicio: new Date().toISOString(),

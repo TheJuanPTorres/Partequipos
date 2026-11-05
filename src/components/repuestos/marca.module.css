@@ -305,6 +305,22 @@
   transform: translateX(-50%);
 }
 
+/*
+ * `ratonReservado`: el pie de la tarjeta baja queda para el icono del ratón (24 px de margen,
+ * 40 de icono y 24 de aire), así no pisa el texto. En móvil, menos relleno arriba para que la
+ * tarjeta no crezca por ello.
+ */
+.heroBajoRaton .heroContenido {
+  padding-bottom: 88px;
+}
+
+@media (max-width: 767px) {
+  .heroBajoRaton .heroContenido {
+    padding-top: 28px;
+    padding-bottom: 76px;
+  }
+}
+
 /* Anchos del texto del encabezado medidos: 880 a 1010 y 278 a 390. */
 @media (max-width: 1024px) {
   .heroContenido {

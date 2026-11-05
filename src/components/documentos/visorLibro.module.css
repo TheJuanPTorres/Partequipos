@@ -242,29 +242,49 @@
   margin-block: 1rem;
 }
 
-/* Una página: en móvil y en visores estrechos (deslizar para pasar). */
+/*
+ * Una página: en móvil y en visores estrechos (deslizar para pasar).
+ *
+ * UNA SOLA DECISIÓN (2026-11-05): ya medido el visor, lo decide el componente
+ * (`data-paginas`, con la misma medida que page-flip). La consulta de contenedor
+ * queda solo para antes de medir (sin JavaScript o al cargar): con el zoom del
+ * navegador el ancho es fraccionario, y entre 639 y 639,5 px el CSS pintaba dos
+ * páginas mientras page-flip y las flechas iban con una.
+ */
+.visor[data-paginas="una"] .escenario {
+  aspect-ratio: var(--proporcion);
+}
+
+.visor[data-paginas="una"] .portada img {
+  width: 100%;
+}
+
+.visor[data-paginas="una"] .portada .segunda,
+.visor[data-paginas="una"] .ampliadaPaginas img + img,
+.visor[data-paginas="una"] .siDobles {
+  display: none;
+}
+
+.visor[data-paginas="una"] .siUna {
+  display: inline;
+}
+
 @container (max-width: 639px) {
-  .escenario {
+  .visor:not([data-paginas]) .escenario {
     aspect-ratio: var(--proporcion);
   }
 
-  .portada img {
+  .visor:not([data-paginas]) .portada img {
     width: 100%;
   }
 
-  .portada .segunda {
+  .visor:not([data-paginas]) .portada .segunda,
+  .visor:not([data-paginas]) .ampliadaPaginas img + img,
+  .visor:not([data-paginas]) .siDobles {
     display: none;
   }
 
-  .ampliadaPaginas img + img {
-    display: none;
-  }
-
-  .siDobles {
-    display: none;
-  }
-
-  .siUna {
+  .visor:not([data-paginas]) .siUna {
     display: inline;
   }
 

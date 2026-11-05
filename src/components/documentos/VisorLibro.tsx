@@ -36,6 +36,9 @@ export type PaginaLibro = {
   miniatura: string;
 };
 
+/** page-flip pasa una página o la arrastra el usuario: un `update()` ahora la cortaría. */
+const ocupado = (pf: PageFlip) => ["flipping", "user_fold"].includes(pf.getState());
+
 /**
  * VISOR TIPO LIBRO de un PDF (2026-10-20, petición del cliente). Cliente
  * porque pasa páginas, escucha el teclado y usa la pantalla completa.
@@ -80,6 +83,28 @@ export function VisorLibro({
   const total = paginas.length;
   const primera = paginas[0]!;
   const proporcion = primera.width / primera.height;
+
+  const [medido, setMedido] = useState(false);
+  // El ancho con el que se colocó el libro por última vez: solo un cambio de ANCHO lo recoloca
+  // (un cambio de alto, como el del contador o el de montar el libro, no).
+  const anchoColocado = useRef(-1);
+  const sincronizar = useCallback(() => {
+    const caja = escenario.current;
+    if (!caja || caja.offsetWidth === 0) return;
+    const pf = libro.current;
+    if (pf) {
+      // `update()` en mitad de un paso de página lo corta: se espera a que acabe (`changeState`).
+      if (ocupado(pf) || caja.offsetWidth === anchoColocado.current) return;
+      anchoColocado.current = caja.offsetWidth;
+      pf.update();
+      setDobles(pf.getOrientation() === "landscape");
+      setIndice(pf.getCurrentPageIndex());
+    } else {
+      setDobles(dosPaginasCaben(caja.offsetWidth));
+    }
+    setMedido(true);
+  }, []);
+  const sincronizarRef = useRef(sincronizar);
 
   /** Monta el libro la primera vez que hace falta; las siguientes, el mismo. */
   const asegurar = useCallback((): Promise<PageFlip | null> => {
@@ -126,6 +151,10 @@ export function VisorLibro({
       });
       pf.on("flip", (e) => setIndice(Number(e.data) || 0));
       pf.on("changeOrientation", (e) => setDobles(e.data === "landscape"));
+      // Un cambio de tamaño que llegó en mitad de un paso de página se aplica al acabar.
+      pf.on("changeState", (e) => {
+        if (e.data === "read") requestAnimationFrame(() => sincronizarRef.current());
+      });
       pf.loadFromHTML(hojas);
       await new Promise<void>((listo) => pf.on("init", () => listo()));
       // Recién montado, page-flip todavía no ha pintado sus hojas: un paso de página ahora se
@@ -135,6 +164,7 @@ export function VisorLibro({
       );
       setDobles(pf.getOrientation() === "landscape");
       setIndice(pf.getCurrentPageIndex());
+      anchoColocado.current = escenario.current?.offsetWidth ?? -1;
       libro.current = pf;
       setActivo(true);
       return pf;
@@ -151,28 +181,50 @@ export function VisorLibro({
   );
 
   /*
-   * Una o dos páginas a la vez, DESDE LA CARGA y en cada cambio de ancho del visor. Antes del
-   * libro, por el ancho (el mismo umbral que el CSS); con el libro, lo que diga page-flip, que se
-   * recoloca con `update()` (solo escucha el `resize` de la ventana, no el de su caja).
+   * Una o dos páginas a la vez, DESDE LA CARGA y en CUALQUIER cambio de tamaño: el de la caja del
+   * visor y del libro (ResizeObserver), la ventana, el zoom del navegador (`resize` y
+   * `visualViewport`) y el giro del móvil. Antes del libro, con la MISMA medida que page-flip (el
+   * `offsetWidth` de la caja del libro, entero) y su umbral; con el libro, lo que diga page-flip,
+   * que se recoloca con `update()`. La caja la pinta el CSS con `data-paginas`, que sale de aquí:
+   * una sola decisión para la caja, el contador, las flechas y page-flip (2026-11-05).
    */
+
   useEffect(() => {
     const visor = raiz.current;
     if (!visor) return;
-    const medir = () => {
-      const pf = libro.current;
-      if (pf) {
-        pf.update();
-        setDobles(pf.getOrientation() === "landscape");
-        setIndice(pf.getCurrentPageIndex());
-      } else {
-        setDobles(dosPaginasCaben(visor.clientWidth));
-      }
+    sincronizar();
+    // Un cambio de tamaño puede llegar por varias vías a la vez: una medida por fotograma.
+    let pendiente = 0;
+    const alCambiar = () => {
+      if (pendiente) return;
+      pendiente = requestAnimationFrame(() => {
+        pendiente = 0;
+        sincronizar();
+      });
     };
-    medir();
-    const observador = new ResizeObserver(() => medir());
+    const observador = new ResizeObserver(alCambiar);
     observador.observe(visor);
-    return () => observador.disconnect();
-  }, []);
+    if (escenario.current) observador.observe(escenario.current);
+    window.addEventListener("resize", alCambiar);
+    window.visualViewport?.addEventListener("resize", alCambiar);
+    window.addEventListener("orientationchange", alCambiar);
+    return () => {
+      cancelAnimationFrame(pendiente);
+      observador.disconnect();
+      window.removeEventListener("resize", alCambiar);
+      window.visualViewport?.removeEventListener("resize", alCambiar);
+      window.removeEventListener("orientationchange", alCambiar);
+    };
+  }, [sincronizar]);
+
+  // Al pasar de una a dos páginas (o al revés) cambia el alto de la caja: el libro se recoloca.
+  useEffect(() => {
+    const f = requestAnimationFrame(() => {
+      const pf = libro.current;
+      if (pf && !ocupado(pf)) pf.update();
+    });
+    return () => cancelAnimationFrame(f);
+  }, [dobles]);
 
   useEffect(() => {
     const cambio = () => {
@@ -193,6 +245,18 @@ export function VisorLibro({
     async (accion: "anterior" | "siguiente" | "inicio" | "fin" | number) => {
       const pf = await asegurar();
       if (!pf) return;
+      // Antes de pasar página, el libro al tamaño de AHORA: si un cambio de tamaño no llegó a
+      // avisar (o llegó a medias), page-flip pasaría con la geometría y la orientación de antes.
+      if (!ocupado(pf)) {
+        anchoColocado.current = escenario.current?.offsetWidth ?? -1;
+        pf.update();
+      }
+      const dos = pf.getOrientation() === "landscape";
+      const actual = pf.getCurrentPageIndex();
+      setDobles(dos);
+      setIndice(actual);
+      if (accion === "siguiente" && !haySiguiente(actual, total, dos)) return;
+      if (accion === "anterior" && !hayAnterior(actual)) return;
       if (accion === "anterior") pf.flipPrev();
       else if (accion === "siguiente") pf.flipNext();
       else if (accion === "inicio") pf.turnToPage(0);
@@ -249,6 +313,8 @@ export function VisorLibro({
       style={{ ["--proporcion" as string]: String(proporcion) }}
       data-completa={completa ? "" : undefined}
       data-miniaturas={miniaturas ? "" : undefined}
+      // Una o dos páginas, ya medido (antes, lo decide la consulta de contenedor del CSS).
+      data-paginas={medido ? (dobles ? "dos" : "una") : undefined}
       // Dentro del texto, sale de la columna de lectura al ancho de la página (`RichText`).
       data-ancho-pagina=""
     >

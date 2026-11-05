@@ -40,6 +40,7 @@ declare module "page-flip" {
     getCurrentPageIndex(): number;
     getPageCount(): number;
     getOrientation(): "portrait" | "landscape";
+    getState(): "user_fold" | "fold_corner" | "flipping" | "read";
     on(
       evento: "flip" | "init" | "changeOrientation" | "changeState",
       fn: (e: EventoPageFlip) => void,

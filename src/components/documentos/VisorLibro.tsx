@@ -36,6 +36,9 @@ export type PaginaLibro = {
   miniatura: string;
 };
 
+/** page-flip pasa una página o la arrastra el usuario: un `update()` ahora la cortaría. */
+const ocupado = (pf: PageFlip) => ["flipping", "user_fold"].includes(pf.getState());
+
 /**
  * VISOR TIPO LIBRO de un PDF (2026-10-20, petición del cliente). Cliente
  * porque pasa páginas, escucha el teclado y usa la pantalla completa.
@@ -80,6 +83,28 @@ export function VisorLibro({
   const total = paginas.length;
   const primera = paginas[0]!;
   const proporcion = primera.width / primera.height;
+
+  const [medido, setMedido] = useState(false);
+  // El ancho con el que se colocó el libro por última vez: solo un cambio de ANCHO lo recoloca
+  // (un cambio de alto, como el del contador o el de montar el libro, no).
+  const anchoColocado = useRef(-1);
+  const sincronizar = useCallback(() => {
+    const caja = escenario.current;
+    if (!caja || caja.offsetWidth === 0) return;
+    const pf = libro.current;
+    if (pf) {
+      // `update()` en mitad de un paso de página lo corta: se espera a que acabe (`changeState`).
+      if (ocupado(pf) || caja.offsetWidth === anchoColocado.current) return;
+      anchoColocado.current = caja.offsetWidth;
+      pf.update();
+      setDobles(pf.getOrientation() === "landscape");
+      setIndice(pf.getCurrentPageIndex());
+    } else {
+      setDobles(dosPaginasCaben(caja.offsetWidth));
+    }
+    setMedido(true);
+  }, []);
+  const sincronizarRef = useRef(sincronizar);
 
   /** Monta el libro la primera vez que hace falta; las siguientes, el mismo. */
   const asegurar = useCallback((): Promise<PageFlip | null> => {
@@ -126,6 +151,10 @@ export function VisorLibro({
       });
       pf.on("flip", (e) => setIndice(Number(e.data) || 0));
       pf.on("changeOrientation", (e) => setDobles(e.data === "landscape"));
+      // Un cambio de tamaño que llegó en mitad de un paso de página se aplica al acabar.
+      pf.on("changeState", (e) => {
+        if (e.data === "read") requestAnimationFrame(() => sincronizarRef.current());
+      });
       pf.loadFromHTML(hojas);
       await new Promise<void>((listo) => pf.on("init", () => listo()));
       // Recién montado, page-flip todavía no ha pintado sus hojas: un paso de página ahora se
@@ -135,6 +164,7 @@ export function VisorLibro({
       );
       setDobles(pf.getOrientation() === "landscape");
       setIndice(pf.getCurrentPageIndex());
+      anchoColocado.current = escenario.current?.offsetWidth ?? -1;
       libro.current = pf;
       setActivo(true);
       return pf;
@@ -158,20 +188,6 @@ export function VisorLibro({
    * que se recoloca con `update()`. La caja la pinta el CSS con `data-paginas`, que sale de aquí:
    * una sola decisión para la caja, el contador, las flechas y page-flip (2026-11-05).
    */
-  const [medido, setMedido] = useState(false);
-  const sincronizar = useCallback(() => {
-    const pf = libro.current;
-    if (pf) {
-      pf.update();
-      setDobles(pf.getOrientation() === "landscape");
-      setIndice(pf.getCurrentPageIndex());
-    } else {
-      const caja = escenario.current;
-      if (!caja || caja.offsetWidth === 0) return;
-      setDobles(dosPaginasCaben(caja.offsetWidth));
-    }
-    setMedido(true);
-  }, []);
 
   useEffect(() => {
     const visor = raiz.current;
@@ -203,7 +219,10 @@ export function VisorLibro({
 
   // Al pasar de una a dos páginas (o al revés) cambia el alto de la caja: el libro se recoloca.
   useEffect(() => {
-    const f = requestAnimationFrame(() => libro.current?.update());
+    const f = requestAnimationFrame(() => {
+      const pf = libro.current;
+      if (pf && !ocupado(pf)) pf.update();
+    });
     return () => cancelAnimationFrame(f);
   }, [dobles]);
 
@@ -228,7 +247,10 @@ export function VisorLibro({
       if (!pf) return;
       // Antes de pasar página, el libro al tamaño de AHORA: si un cambio de tamaño no llegó a
       // avisar (o llegó a medias), page-flip pasaría con la geometría y la orientación de antes.
-      pf.update();
+      if (!ocupado(pf)) {
+        anchoColocado.current = escenario.current?.offsetWidth ?? -1;
+        pf.update();
+      }
       const dos = pf.getOrientation() === "landscape";
       const actual = pf.getCurrentPageIndex();
       setDobles(dos);

@@ -3,9 +3,13 @@ import { describe, it } from "node:test";
 
 import type { EquiposNuevo } from "@/payload-types";
 
+import { contraste, luminancia, rgbDeHex } from "../portada/contraste";
+
 import {
   COLOR_BARRA_SIN_MARCA,
+  CONTRASTE_BLANCO_PASTILLA,
   barraDeMarcas,
+  fondoDePastilla,
   sinAditamentos,
   tituloBannerTipoNueva,
   type GrupoDeCategoria,
@@ -93,5 +97,66 @@ describe("barraDeMarcas", () => {
       barraDeMarcas([grupo("a-x", "a", "A"), grupo("a-y", "a", "A")], () => null),
       [],
     );
+  });
+  it("activa con baldosa de repuestos: su color y su «Logo para la baldosa» tal cual, sin tinta", () => {
+    const blanco = { url: "/hitachi-blanco.png", width: 40, height: 10, oscuro: false };
+    const amarillo = { url: "/case-original.png", width: 40, height: 10, oscuro: false };
+    const baldosas = new Map([
+      ["hitachi", { color: "#f36c1b", logo: blanco }],
+      ["case", { color: "#ffcd00", logo: amarillo }],
+    ]);
+    const r = barraDeMarcas(
+      [
+        grupo("hitachi-ex", "hitachi-landcros", "Hitachi", "#ff6600"),
+        grupo("case-ex", "case", "Case", "#ffcd00"),
+      ],
+      () => logo,
+      baldosas,
+    );
+    assert.deepEqual(
+      r.map((p) => [p.color.fondo, p.activa.logo?.url, p.activa.logo?.blanco, p.activa.placa]),
+      [
+        [fondoDePastilla("#f36c1b"), "/hitachi-blanco.png", false, false],
+        ["#ffcd00", "/case-original.png", false, false],
+      ],
+    );
+    // La inactiva, con el logo de todo el sitio, como siempre; el alt, el de ese logo.
+    assert.deepEqual(
+      r.map((p) => [p.logo?.url, p.activa.logo?.alt]),
+      [
+        ["/l.png", "Logo"],
+        ["/l.png", "Logo"],
+      ],
+    );
+  });
+
+  it("activa sin baldosa: el color de la marca y su logo de siempre sobre plaquita blanca", () => {
+    const r = barraDeMarcas(
+      [grupo("dynapac-x", "dynapac", "Dynapac", "#bf2e1a"), grupo("sin-x", "sin", "Sin logo")],
+      (m) => (m.slug === "dynapac" ? logo : null),
+      new Map(),
+    );
+    assert.deepEqual(
+      r.map((p) => [p.color.fondo, p.activa.logo?.url ?? null, p.activa.placa]),
+      [
+        ["#bf2e1a", "/l.png", true],
+        [COLOR_BARRA_SIN_MARCA, null, false],
+      ],
+    );
+  });
+});
+
+describe("fondoDePastilla", () => {
+  const conBlanco = (c: string) => contraste(1, luminancia(...rgbDeHex(c)!));
+  it("el naranja de Hitachi (blanco a 3,01:1) se oscurece lo justo hasta el margen", () => {
+    const c = fondoDePastilla("#f36c1b");
+    assert.notEqual(c, "#f36c1b");
+    assert.ok(conBlanco(c) >= CONTRASTE_BLANCO_PASTILLA);
+    assert.ok(conBlanco(c) < CONTRASTE_BLANCO_PASTILLA + 0.2, "solo lo justo");
+  });
+  it("con margen de sobra (Yanmar), un fondo claro (Case) o un valor raro, tal cual", () => {
+    assert.equal(fondoDePastilla("#e20d1a"), "#e20d1a");
+    assert.equal(fondoDePastilla("#f3e7cc"), "#f3e7cc");
+    assert.equal(fondoDePastilla("naranja"), "naranja");
   });
 });

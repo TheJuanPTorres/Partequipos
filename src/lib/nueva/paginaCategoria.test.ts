@@ -3,9 +3,13 @@ import { describe, it } from "node:test";
 
 import type { EquiposNuevo } from "@/payload-types";
 
+import { contraste, luminancia, rgbDeHex } from "../portada/contraste";
+
 import {
   COLOR_BARRA_SIN_MARCA,
+  CONTRASTE_BLANCO_PASTILLA,
   barraDeMarcas,
+  fondoDePastilla,
   sinAditamentos,
   tituloBannerTipoNueva,
   type GrupoDeCategoria,
@@ -98,7 +102,7 @@ describe("barraDeMarcas", () => {
     const blanco = { url: "/hitachi-blanco.png", width: 40, height: 10, oscuro: false };
     const amarillo = { url: "/case-original.png", width: 40, height: 10, oscuro: false };
     const baldosas = new Map([
-      ["hitachi", { color: "#c2410c", logo: blanco }],
+      ["hitachi", { color: "#f36c1b", logo: blanco }],
       ["case", { color: "#ffcd00", logo: amarillo }],
     ]);
     const r = barraDeMarcas(
@@ -112,7 +116,7 @@ describe("barraDeMarcas", () => {
     assert.deepEqual(
       r.map((p) => [p.color.fondo, p.activa.logo?.url, p.activa.logo?.blanco, p.activa.placa]),
       [
-        ["#c2410c", "/hitachi-blanco.png", false, false],
+        [fondoDePastilla("#f36c1b"), "/hitachi-blanco.png", false, false],
         ["#ffcd00", "/case-original.png", false, false],
       ],
     );
@@ -139,5 +143,20 @@ describe("barraDeMarcas", () => {
         [COLOR_BARRA_SIN_MARCA, null, false],
       ],
     );
+  });
+});
+
+describe("fondoDePastilla", () => {
+  const conBlanco = (c: string) => contraste(1, luminancia(...rgbDeHex(c)!));
+  it("el naranja de Hitachi (blanco a 3,01:1) se oscurece lo justo hasta el margen", () => {
+    const c = fondoDePastilla("#f36c1b");
+    assert.notEqual(c, "#f36c1b");
+    assert.ok(conBlanco(c) >= CONTRASTE_BLANCO_PASTILLA);
+    assert.ok(conBlanco(c) < CONTRASTE_BLANCO_PASTILLA + 0.2, "solo lo justo");
+  });
+  it("con margen de sobra (Yanmar), un fondo claro (Case) o un valor raro, tal cual", () => {
+    assert.equal(fondoDePastilla("#e20d1a"), "#e20d1a");
+    assert.equal(fondoDePastilla("#f3e7cc"), "#f3e7cc");
+    assert.equal(fondoDePastilla("naranja"), "naranja");
   });
 });

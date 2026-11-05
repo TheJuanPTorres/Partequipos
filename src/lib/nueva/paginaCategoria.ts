@@ -1,7 +1,9 @@
 import type { EquiposNuevo, MarcasMaquinaria, Media, TiposMaquinaria } from "@/payload-types";
 
 import { COLOR_SIN_MARCA, colorDeMarca, tintaDeLogoSobre } from "../marca/colorMarca";
+import { oscurecer } from "../marca/franjaMarca";
 import { buscarPorNombre, claveDeMarca, type LogoConAlt } from "../marca/logoMarca";
+import { contraste, luminancia, rgbDeHex } from "../portada/contraste";
 import type { VistaEncabezado } from "../repuestos/marca";
 import { adjetivoConcordado, tituloPorDefecto } from "../seo/porDefecto";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
@@ -93,6 +95,33 @@ export type PastillaMarca = {
 };
 
 /**
+ * Contraste mínimo del blanco puro sobre el fondo de una pastilla activa con logo en blanco
+ * (2026-11-05). WCAG pide 3:1 al logo (1.4.11), pero el blanco de un logo real no es puro (bordes
+ * suavizados, WebP): medido en Hitachi LANDCROS, con el blanco puro a 3,01:1 el logo daba 2,78.
+ * Con 3,5 de margen, el logo pasa de 3.
+ */
+export const CONTRASTE_BLANCO_PASTILLA = 3.5;
+
+/**
+ * El fondo de la pastilla activa: el de la baldosa tal cual, salvo que el logo vaya en blanco (la
+ * tinta que toca sobre ese color) y el blanco no llegue a `CONTRASTE_BLANCO_PASTILLA`: entonces,
+ * OSCURECIDO lo justo (mismo tono mezclado con negro, como `colorDeBaldosaNueva` del #420). Un
+ * fondo claro (Case, su logo original oscuro) no se toca.
+ */
+export function fondoDePastilla(color: string): string {
+  const t = color.trim().toLowerCase();
+  if (!/^#[0-9a-f]{6}$/.test(t) || tintaDeLogoSobre(t) !== "#ffffff") return color;
+  const conBlanco = (c: string) => contraste(1, luminancia(...rgbDeHex(c)!));
+  let k = 0;
+  let c = t;
+  while (conBlanco(c) < CONTRASTE_BLANCO_PASTILLA && k < 1) {
+    k = Math.round((k + 0.01) * 100) / 100;
+    c = oscurecer(t, k);
+  }
+  return c;
+}
+
+/**
  * LA BARRA DE MARCAS de la página general de tipo (dirección, 2026-10-23): una pastilla por
  * marca, en el orden de los grupos, que lleva a la franja de su primer grupo (`grupo-<clave>`).
  * Solo con 2 o más marcas; con una, ninguna.
@@ -100,8 +129,9 @@ export type PastillaMarca = {
  * LA ACTIVA (2026-11-05): antes, el logo en una sola tinta (blanco o negro) sobre el color de la
  * marca, que en Hitachi LANDCROS dejaba manchas. Ahora:
  * - con la BALDOSA de la marca de repuestos del mismo nombre (#417: «Color de la baldosa» y «Logo
- *   para la baldosa», pareja ya diseñada y medida con 3:1), ese fondo y ese logo tal cual: Hitachi,
- *   Yanmar y LiuGong con su logo blanco; Case, su logo original sobre su amarillo;
+ *   para la baldosa», pareja ya diseñada), ese logo tal cual sobre ese fondo (`fondoDePastilla`:
+ *   un poco más oscuro si su logo blanco no llegaría a 3:1, como Hitachi): Hitachi, Yanmar y
+ *   LiuGong con su logo blanco; Case, su logo original sobre su crema;
  * - sin baldosa, el color de la marca (o el naranja) y su logo de siempre sobre una plaquita blanca.
  */
 export function barraDeMarcas(
@@ -117,7 +147,9 @@ export function barraDeMarcas(
     const titulo = g.marca.nombre.trim();
     const logo = logoDe(g.marca);
     const baldosa = buscarPorNombre(claveDeMarca(g.marca.nombre), baldosas);
-    const fondo = baldosa?.color ?? colorDeMarca(g.marca.colorMarca) ?? COLOR_BARRA_SIN_MARCA;
+    const fondo = baldosa
+      ? fondoDePastilla(baldosa.color)
+      : (colorDeMarca(g.marca.colorMarca) ?? COLOR_BARRA_SIN_MARCA);
     pastillas.push({
       ancla: `grupo-${g.clave}`,
       titulo,

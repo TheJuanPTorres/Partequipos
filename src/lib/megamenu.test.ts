@@ -521,6 +521,25 @@ describe("megamenú: lubricantes con bandera y marca de otra web (Dispel, 2026-1
     assert.equal(m["/lubricantes/dispel/"], undefined);
   });
 
+  it("Eni con «Enlace externo»: «Ver todo» a su web, fuera; sus líneas siguen aquí", () => {
+    const d = {
+      ...base,
+      marcasLubricante: base.marcasLubricante!.map((m) =>
+        m.id === 1 ? { ...m, enlaceExterno: "https://lubricantesenicolombia.com/" } : m,
+      ),
+    };
+    const eni = panelLubricantes(d)!.grupos[0]!;
+    assert.equal(eni.externo, undefined);
+    assert.deepEqual(eni.enlaces[0], {
+      etiqueta: "Ver todo Lubricantes Eni",
+      href: "https://lubricantesenicolombia.com/",
+      externo: true,
+    });
+    assert.equal(eni.enlaces[1]!.href, "/lubricantes/lubricantes-eni/auto-liviano/");
+    // Su página sigue teniendo el panel del menú (no da 404).
+    assert.ok(construirMegamenu(d)["/lubricantes/lubricantes-eni/"]);
+  });
+
   it("sin país, sin bandera", () => {
     const d = {
       ...base,

@@ -4,7 +4,7 @@ import { colorDeMarca, tintaSobre } from "../marca/colorMarca";
 import { conAlt, logoPropio, type LogoConAlt } from "../marca/logoMarca";
 import { rutas } from "../routes";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
-import { enlaceExternoLubricante, tienePaginaPropiaLubricante } from "./destino";
+import { enlaceExternoLubricante, tienePaginaPropiaLubricante, webDeLubricante } from "./destino";
 import { paisDe, type CodigoPais } from "./pais";
 
 /**
@@ -12,7 +12,8 @@ import { paisDe, type CodigoPais } from "./pais";
  * listar productos, un panel por marca de lubricantes, del color de la marca, con su logo en placa
  * blanca, su bandera, su foto teñida con su color y su botón:
  *
- * - con página aquí (Eni): «Ver productos» → su página;
+ * - con página aquí (Eni): «Ver productos» → su página o, con «Enlace externo», a esa web en otra
+ *   pestaña (2026-11-08);
  * - de «Otra web» con enlace (Dispel): «Ir a su web» → su enlace, en otra pestaña;
  * - de «Otra web» sin enlace: «Muy pronto», sin enlace.
  *
@@ -28,7 +29,7 @@ export const COLOR_SIN_COLOR = "#33373d";
 
 export type AccionSelector =
   | { tipo: "pagina"; href: string; texto: "Ver productos" }
-  | { tipo: "externo"; href: string; texto: "Ir a su web" }
+  | { tipo: "externo"; href: string; texto: "Ir a su web" | "Ver productos" }
   | { tipo: "pronto"; texto: "Muy pronto" };
 
 export type PanelSelector = {
@@ -73,6 +74,8 @@ export function primeraFrase(texto: string | null | undefined): string {
 
 export function accionDe(m: MarcaSelector): AccionSelector {
   if (tienePaginaPropiaLubricante(m)) {
+    const web = webDeLubricante(m);
+    if (web) return { tipo: "externo", href: web, texto: "Ver productos" };
     return { tipo: "pagina", href: `${rutas.marcaLubricante(m.slug)}/`, texto: "Ver productos" };
   }
   const externo = enlaceExternoLubricante(m);

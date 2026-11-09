@@ -18,10 +18,10 @@ const categoria = {
 const marca = (id: number, nombre: string, slug: string) => ({ id, nombre, slug }) as Marca;
 
 describe("vistaEncabezadoCategoria", () => {
-  it("compone el título con la categoría en mayúsculas, como el de la marca", () => {
+  it("compone el título con la categoría en mayúsculas, SIN «En Colombia» (2026-11-08)", () => {
     const v = vistaEncabezadoCategoria(categoria, global, null);
     assert.equal(v.linea1, "Repuestos para maquinaria pesada");
-    assert.equal(v.linea2, "TREN DE RODAJE En Colombia");
+    assert.equal(v.linea2, "TREN DE RODAJE");
     assert.equal(v.descripcion, "Cadenas y rodillos.");
     assert.equal(v.logo, null);
   });

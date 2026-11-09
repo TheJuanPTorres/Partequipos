@@ -66,16 +66,16 @@
   }
 
   /*
-   * Con su proporción a todo el ancho, con tope de alto: a 2560 px la foto no crece más que a
-   * 1920, recorta por abajo (se funde ahí de todos modos) y se queda anclada a la derecha.
+   * A todo el ancho con el alto de su proporción (1921 × 819) y un tope de 820 px: a 2560 px la
+   * caja sigue a todo el ancho (con `aspect-ratio` y `max-height` se estrechaba y la foto acababa
+   * en seco), la foto se recorta por abajo, donde se funde de todos modos, anclada arriba a la derecha.
    */
   .fondoFoto {
     position: absolute;
     top: 0;
     right: 0;
     left: 0;
-    aspect-ratio: 1921 / 819;
-    max-height: 820px;
+    height: min(42.64vw, 820px);
     mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 100%);
   }
 
@@ -211,9 +211,21 @@
   object-position: 100% 70%;
 }
 
+/* El render trae aire transparente arriba (~20 %): la caja sube por encima para no dejar hueco. */
 .compactaMaquina {
   position: absolute;
-  inset: 2% 6%;
+  inset: -10% 6% 2%;
+}
+
+/* En tableta, más baja: a 460 px de alto la escena se comía la pantalla con aire encima. */
+@media (min-width: 768px) {
+  .compacta {
+    height: min(40vw, 400px);
+  }
+
+  .compactaMaquina {
+    inset: -12% 14% 2%;
+  }
 }
 
 /* --- Tarjetas --------------------------------------------------------------------------------- */

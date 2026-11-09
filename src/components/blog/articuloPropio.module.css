@@ -659,7 +659,8 @@
 .relacionados {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 64px 16px 96px;
+  /* Arriba, el comun (tope 64): en movil y tablet los 64 fijos daban 68 desde la llamada. */
+  padding: min(64px, var(--espacio-seccion)) 16px 96px;
 }
 
 .relacionados h2 {

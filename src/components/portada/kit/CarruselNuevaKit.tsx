@@ -12,7 +12,7 @@ const INTERVALO = 5000;
 /**
  * LAS TARJETAS DE MARCA de «Maquinaria pesada nueva» (diseño del cliente, 2026-10-27): carrusel
  * en el teléfono y la tablet, y rejilla de 2 × 2 desde 1024 px (fila de 4 desde 1536 px), donde no
- * hay nada que deslizar y no salen puntos ni pausa. Como el de usados (`SliderUsados`): el
+ * hay nada que deslizar y no salen puntos ni pausa. Como el que tuvo usados hasta el 2026-11-09: el
  * desplazamiento es NATIVO (scroll-snap); los puntos y el avance automático solo mueven
  * `scrollLeft`. Avanza cada 5 s, se para con el ratón o el foco dentro y lleva el botón de pausa
  * del sitio (D2), parado de partida con «reducir movimiento».

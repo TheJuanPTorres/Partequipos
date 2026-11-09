@@ -1155,11 +1155,11 @@ export interface EquiposUsado {
    */
   disponible?: boolean | null;
   /**
-   * Ordena la portada y los listados: primero la más reciente. Por defecto, hoy; se puede cambiar.
+   * Ordena los listados: primero la más reciente. Por defecto, hoy; se puede cambiar.
    */
   fechaPublicacion?: string | null;
   /**
-   * Desde el 2026-10-20 la portada solo enseña excavadoras: una marcada como «Aditamentos» no sale en ella.
+   * Sin efecto desde el 2026-11-09: la portada ya no enseña unidades (se quitó el carrusel). Se conserva el dato.
    */
   pestanaPortada?: ('categoria' | 'aditamentos') | null;
   /**
@@ -1596,7 +1596,7 @@ export interface Pagina {
      */
     descripcionAncho?: ('estrecho' | 'medio' | 'ancho' | 'columna') | null;
     /**
-     * La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.
+     * La máquina recortada (PNG o WebP transparente) de la tarjeta de tipo. Opcional.
      */
     imagenExcavadoras?: (number | null) | Media;
     /**
@@ -1608,15 +1608,15 @@ export interface Pagina {
      */
     imagenAditamentos?: (number | null) | Media;
     /**
-     * Tarjeta del filtro sobre el carrusel; «Ver todo» lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».
+     * Tarjeta de tipo de la sección; lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».
      */
     pestanaExcavadoras?: string | null;
     /**
-     * Tarjeta del filtro; «Ver todo» lleva a la página «Otros» de usados. Vacío: «Otros».
+     * Tarjeta de tipo de la sección; lleva a la página «Otros» de usados. Vacío: «Otros».
      */
     pestanaOtros?: string | null;
     /**
-     * Tarjeta del filtro; «Ver todo» lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».
+     * Tarjeta de tipo de la sección; lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».
      */
     pestanaAditamentos?: string | null;
     /**
@@ -1640,7 +1640,7 @@ export interface Pagina {
      */
     marcasTextoAncho?: ('estrecho' | 'medio' | 'ancho' | 'columna') | null;
     /**
-     * El botón baja al carrusel de la categoría elegida.
+     * El botón lleva a la página de maquinaria usada.
      */
     botonTexto?: string | null;
   };

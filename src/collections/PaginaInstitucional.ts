@@ -577,7 +577,7 @@ export const PaginaInstitucional: CollectionConfig = {
         imagenKit(
           "imagenExcavadoras",
           "Imagen del filtro «Excavadora»",
-          "La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.",
+          "La máquina recortada (PNG o WebP transparente) de la tarjeta de tipo. Opcional.",
         ),
         imagenKit(
           "imagenOtros",
@@ -595,19 +595,19 @@ export const PaginaInstitucional: CollectionConfig = {
           // El valor por defecto sigue en plural: cambiarlo cambia el DEFAULT de la columna y pide
           // migración. El texto se pone en el panel (runbook del singular, 2026-10-23).
           "Excavadoras",
-          "Tarjeta del filtro sobre el carrusel; «Ver todo» lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».",
+          "Tarjeta de tipo de la sección; lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».",
         ),
         texto(
           "pestanaOtros",
           "Filtro «Otros»",
           "Otros",
-          "Tarjeta del filtro; «Ver todo» lleva a la página «Otros» de usados. Vacío: «Otros».",
+          "Tarjeta de tipo de la sección; lleva a la página «Otros» de usados. Vacío: «Otros».",
         ),
         texto(
           "pestanaAditamentos",
           "Filtro de los aditamentos",
           "Aditamentos",
-          "Tarjeta del filtro; «Ver todo» lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».",
+          "Tarjeta de tipo de la sección; lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».",
         ),
         texto(
           "verProductoTexto",
@@ -643,7 +643,7 @@ export const PaginaInstitucional: CollectionConfig = {
           "botonTexto",
           "Texto del botón de la cabecera",
           "Ver todo",
-          "El botón baja al carrusel de la categoría elegida.",
+          "El botón lleva a la página de maquinaria usada.",
         ),
       ],
     },

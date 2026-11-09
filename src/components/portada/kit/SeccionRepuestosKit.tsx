@@ -35,6 +35,15 @@ export type TextosRepuestosKit = {
 
 const TITULO_POR_DEFECTO = "Encuentra Maquinaria y Repuestos Rápido y Fácil";
 
+/**
+ * El ancho de la foto en la tarjeta (18 vw en escritorio, 30 en tablet y 45 en el teléfono), por
+ * cuánto se amplía el fichero para igualar las piezas: así se pide a la resolución que se pinta.
+ */
+function sizesEscalados(factor: number): string {
+  const vw = (n: number) => `${Math.round(n * Math.max(1, factor))}vw`;
+  return `(min-width: 1025px) ${vw(18)}, (min-width: 768px) ${vw(30)}, ${vw(45)}`;
+}
+
 export function SeccionRepuestosKit({
   categorias,
   textos,
@@ -73,12 +82,30 @@ export function SeccionRepuestosKit({
               <Link href={c.href} className={estilos.tarjeta}>
                 <span className={estilos.esquina} aria-hidden="true" />
                 <span className={estilos.foto}>
-                  {c.imagen ? (
+                  {c.imagen && c.colocacion ? (
+                    <span
+                      className={estilos.fotoColocada}
+                      style={{
+                        left: `${c.colocacion.izquierda}%`,
+                        top: `${c.colocacion.arriba}%`,
+                        width: `${c.colocacion.ancho}%`,
+                        height: `${c.colocacion.alto}%`,
+                      }}
+                    >
+                      <Image
+                        src={c.imagen.url}
+                        alt=""
+                        fill
+                        sizes={sizesEscalados(c.colocacion.ancho / 100)}
+                        className={estilos.fotoImg}
+                      />
+                    </span>
+                  ) : c.imagen ? (
                     <Image
                       src={c.imagen.url}
                       alt=""
                       fill
-                      sizes="(min-width: 1025px) 18vw, (min-width: 768px) 30vw, 45vw"
+                      sizes={sizesEscalados(1)}
                       className={estilos.fotoImg}
                     />
                   ) : null}

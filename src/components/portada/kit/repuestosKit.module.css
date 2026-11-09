@@ -249,8 +249,15 @@
 .foto {
   position: relative;
   display: block;
+  overflow: hidden;
   width: 100%;
   aspect-ratio: 4 / 3;
+}
+
+/* El fichero entero, escalado para que su pieza ocupe el tamaño común (`colocarFotoRepuesto`). */
+.fotoColocada {
+  position: absolute;
+  display: block;
 }
 
 .fotoImg {

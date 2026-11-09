@@ -1,89 +1,22 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import type {
-  CategoriasTecnica,
-  CategoriasUsada,
-  EquiposUsado,
-  Media,
-  Pagina,
-} from "@/payload-types";
+import type { CategoriasTecnica, Media, Pagina } from "@/payload-types";
 
 import {
   partirTitulo,
   categoriasDePortada,
-  fichaCompleta,
+  CAJA_FOTO,
+  colocarFotoRepuesto,
   filtrosDeUsados,
   logosDeLaBanda,
   logosDeMarcasRepuestos,
-  tarjetasDeUnidades,
-  USADOS_POR_FILTRO,
 } from "./kitCliente";
 
 const media = (id: number, alt = ""): Media =>
   ({ id, url: `/m/${id}.webp`, alt, width: 800, height: 600 }) as Media;
 
-const cat = (slug: string): CategoriasUsada =>
-  ({ id: slug.length, slug, nombre: slug }) as CategoriasUsada;
-
-const unidad = (
-  id: number,
-  categoria: CategoriasUsada | number,
-  over: Partial<EquiposUsado> = {},
-) => ({ id, nombre: `Equipo ${id}`, categoria, disponible: true, ...over }) as EquiposUsado;
-
-describe("kit de la portada: ficha de la tarjeta de usados", () => {
-  it("siempre tres filas, con coma decimal y separador de miles", () => {
-    assert.deepEqual(
-      fichaCompleta({ pesoOperativo: 8.4, anio: 2016, horometro: 4500 }).map(
-        (d) => `${d.etiqueta}: ${d.valor}`,
-      ),
-      ["Peso operativo: 8,4 t", "Año: 2016", "Horómetro: 4.500 h"],
-    );
-  });
-
-  it("un guion donde falta el dato (o no tiene sentido): las filas no se descuadran", () => {
-    assert.deepEqual(
-      fichaCompleta({ pesoOperativo: 0, anio: null, horometro: -3 }).map((d) => d.valor),
-      ["—", "—", "—"],
-    );
-  });
-});
-
-describe("kit de la portada: tarjetas y filtro de usados", () => {
-  const exc = cat("excavadoras");
-  const bull = cat("bulldozers");
-  const adit = cat("aditamentos");
-
-  it("tarjetas en el orden recibido, con la página de su categoría, y como mucho las del filtro", () => {
-    const r = tarjetasDeUnidades([
-      unidad(1, bull, { nombre: "Bulldozer Caterpillar D6", slug: "bulldozer-caterpillar-d6" }),
-      ...Array.from({ length: 12 }, (_, i) => unidad(i + 2, exc)),
-    ]);
-    assert.equal(r.length, USADOS_POR_FILTRO);
-    assert.deepEqual(
-      [r[0]?.nombre, r[0]?.href, r[1]?.href],
-      [
-        "Bulldozer Caterpillar D6",
-        "/maquinaria-pesada/maquinaria-pesada-usada/bulldozers/bulldozer-caterpillar-d6/",
-        null,
-      ],
-    );
-  });
-
-  it("descarta las no disponibles, sin nombre o sin la categoría poblada", () => {
-    const r = tarjetasDeUnidades([
-      unidad(1, exc, { disponible: false }),
-      unidad(2, 9),
-      unidad(3, exc, { nombre: "  " }),
-      unidad(4, exc),
-    ]);
-    assert.deepEqual(
-      r.map((t) => t.id),
-      [4],
-    );
-  });
-
+describe("kit de la portada: tipos de usados", () => {
   it("siempre los tres filtros, en orden, con su página, nombre del panel e imagen decorativa", () => {
     const seccion = {
       pestanaExcavadoras: "Excavadora",
@@ -91,16 +24,13 @@ describe("kit de la portada: tarjetas y filtro de usados", () => {
       pestanaAditamentos: "Aditamento",
       imagenOtros: media(7, "Bulldozer"),
     } as Pagina["seccionUsada"];
-    const r = filtrosDeUsados(
-      { excavadoras: [unidad(1, exc)], otros: [], aditamentos: [unidad(2, adit)] },
-      seccion,
-    );
+    const r = filtrosDeUsados(seccion);
     assert.deepEqual(
-      r.map((f) => [f.nombre, f.href, f.tarjetas.length, f.imagen?.alt ?? null]),
+      r.map((f) => [f.nombre, f.href, f.imagen?.alt ?? null]),
       [
-        ["Excavadora", "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/", 1, null],
-        ["Otros", "/maquinaria-pesada/maquinaria-pesada-usada/otros/", 0, ""],
-        ["Aditamento", "/maquinaria-pesada/maquinaria-pesada-usada/aditamentos/", 1, null],
+        ["Excavadora", "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/", null],
+        ["Otros", "/maquinaria-pesada/maquinaria-pesada-usada/otros/", ""],
+        ["Aditamento", "/maquinaria-pesada/maquinaria-pesada-usada/aditamentos/", null],
       ],
     );
   });
@@ -230,5 +160,44 @@ describe("partirTitulo (Venta de repuestos v3)", () => {
       resaltado: "Repuestos",
       despues: " y más repuestos",
     });
+  });
+});
+
+describe("kit de la portada: piezas de repuestos al mismo tamaño", () => {
+  // La pieza dentro de la caja de la foto, en px de la caja virtual (400 × 300).
+  const pieza = (
+    img: { width: number; height: number },
+    r: { x: number; y: number; w: number; h: number },
+  ) => {
+    const c = colocarFotoRepuesto(img, r)!;
+    const anchoImg = (c.ancho / 100) * CAJA_FOTO.ancho;
+    const altoImg = (c.alto / 100) * CAJA_FOTO.alto;
+    return {
+      x: (c.izquierda / 100) * CAJA_FOTO.ancho + r.x * anchoImg,
+      y: (c.arriba / 100) * CAJA_FOTO.alto + r.y * altoImg,
+      w: r.w * anchoImg,
+      h: r.h * altoImg,
+      proporcionImg: anchoImg / altoImg,
+    };
+  };
+
+  it("una pieza que llena el fichero y otra con mucho margen salen con la misma área", () => {
+    const llena = pieza({ width: 800, height: 600 }, { x: 0, y: 0, w: 1, h: 1 });
+    const pequena = pieza({ width: 800, height: 600 }, { x: 0.3, y: 0.35, w: 0.4, h: 0.3 });
+    assert.ok(Math.abs(llena.w * llena.h - pequena.w * pequena.h) < 2);
+  });
+
+  it("centrada, sin deformar el fichero y sin salirse de la caja", () => {
+    const p = pieza({ width: 1000, height: 1000 }, { x: 0.1, y: 0.4, w: 0.3, h: 0.2 });
+    assert.ok(Math.abs(p.x + p.w / 2 - CAJA_FOTO.ancho / 2) < 0.5);
+    assert.ok(Math.abs(p.y + p.h / 2 - CAJA_FOTO.alto / 2) < 0.5);
+    assert.ok(Math.abs(p.proporcionImg - 1) < 0.01);
+    const larga = pieza({ width: 800, height: 600 }, { x: 0, y: 0.45, w: 1, h: 0.1 });
+    assert.ok(larga.x >= 0 && larga.x + larga.w <= CAJA_FOTO.ancho + 0.01);
+    assert.ok(larga.y >= 0 && larga.y + larga.h <= CAJA_FOTO.alto + 0.01);
+  });
+
+  it("sin medidas del fichero, nada que colocar", () => {
+    assert.equal(colocarFotoRepuesto({ width: 0, height: 0 }, { x: 0, y: 0, w: 1, h: 1 }), null);
   });
 });

@@ -105,3 +105,11 @@
     font-size: 9vw;
   }
 }
+
+/*
+ * Ronda 12, t5: si el bloque de contacto de lubricantes es lo último de la página, su aire de abajo sobra. Antes del pie manda
+ * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ */
+.seccion:last-child {
+  padding-bottom: 0;
+}

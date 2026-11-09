@@ -5,8 +5,9 @@
  *
  * Las mejoras cuelgan de `[data-anim~="V…"]` (`ZonaAnimada`, `ANIMACIONES_POLITICA`).
  */
+/* Ronda 12, t5: sin aire propio antes del pie; manda el espaciado común del pie. */
 .pagina {
-  padding-bottom: 20px;
+  padding-bottom: 0;
 }
 
 .cuerpo {

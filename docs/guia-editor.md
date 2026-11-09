@@ -361,7 +361,8 @@ oficial, no lo pongas.
     marca (**Repuestos → Marcas de repuestos**).
   - **Logo libre:** un fabricante de repuestos que no es marca de maquinaria
     (Donaldson, Berco, ESCO…). Lleva el **logo** (PNG o WebP con fondo
-    transparente, subido antes en **Archivos → Imágenes**), el **nombre** (lo
+    transparente, subido antes en **Archivos → Imágenes**; un SVG se convierte
+    antes a PNG, porque «Imágenes» no lo admite), el **nombre** (lo
     leen los lectores de pantalla) y, si quieres, un **enlace**: una ruta del
     sitio (`/…/`) o una dirección `https://` de otro sitio, que se abre en otra
     pestaña con un icono. Sin enlace, el logo no es un enlace. No crea ninguna

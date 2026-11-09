@@ -9,7 +9,8 @@ import { validarEnlace } from "../../lib/fields/reglasPortada";
  * - `bandaLogo`: un LOGO LIBRE de un fabricante de repuestos que no es marca de maquinaria
  *   (Donaldson, Berco, ESCO…). No se crea como marca de repuestos, porque tendría página, índice,
  *   sitemap y menú. Solo imagen, nombre y enlace opcional.
- * La decisión de qué se pinta está en `src/lib/portada/marcasBanda.ts`.
+ * La decisión de qué se pinta está en `src/lib/portada/marcasBanda.ts`. Sin SVG (dirección,
+ * 2026-11-08): «Imágenes» no lo admite (`Media.ts`); un SVG se convierte a PNG antes de subirlo.
  */
 export const BLOQUE_BANDA_MARCA: Block = {
   slug: "bandaMarca",
@@ -45,7 +46,7 @@ export const BLOQUE_BANDA_LOGO: Block = {
       filterOptions: { mimeType: { in: ["image/png", "image/webp"] } },
       admin: {
         description:
-          "Súbelo antes en «Archivos → Imágenes». Sale a la misma altura que los demás logos de la banda.",
+          "Súbelo antes en «Archivos → Imágenes». Sale a la misma altura que los demás logos de la banda. Si el fabricante te lo da en SVG, conviértelo antes a PNG transparente: «Imágenes» no admite SVG.",
       },
     },
     {

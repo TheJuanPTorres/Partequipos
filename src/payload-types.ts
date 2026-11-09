@@ -1720,7 +1720,7 @@ export interface Pagina {
             }
           | {
               /**
-               * Súbelo antes en «Archivos → Imágenes». Sale a la misma altura que los demás logos de la banda.
+               * Súbelo antes en «Archivos → Imágenes». Sale a la misma altura que los demás logos de la banda. Si el fabricante te lo da en SVG, conviértelo antes a PNG transparente: «Imágenes» no admite SVG.
                */
               imagen: number | Media;
               /**

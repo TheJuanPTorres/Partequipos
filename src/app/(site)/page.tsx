@@ -18,6 +18,8 @@ import { diapositivasDeHero } from "@/lib/portada/hero";
 import { botonesNav } from "@/lib/portada/navSecciones";
 import {
   categoriasDePortada,
+  colocarFotoRepuesto,
+  type CategoriaDePortada,
   filtrosDeUsados,
   imagenDecorativa,
   logosDeLaBanda,
@@ -30,14 +32,14 @@ import { sedesDePortada, tokenMapbox } from "@/lib/portada/sedes";
 import { getCategoriasTecnicasDePortada } from "@/lib/queries/getCategoriasTecnicas";
 import { getPreguntasDePortada, getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getVideoPorId } from "@/lib/queries/getVideos";
-import { getMarcasDePortada, getUsadosDePortada } from "@/lib/queries/getMaquinaria";
+import { recorteVisible } from "@/lib/marca/recorteLogo";
+import { getMarcasDePortada } from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { getLogosMarca, getMarcasRepuestosDePortada } from "@/lib/queries/getLogosMarca";
 import { metadataDe } from "@/lib/seo/metadata";
-import { turnstileSiteKey } from "@/lib/turnstile";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
 import { imagenDeMedia } from "@/lib/utils/relations";
 
@@ -75,7 +77,6 @@ export default async function HomePage() {
   const diapositivas = diapositivasDeHero(pagina.hero);
   const [
     marcas,
-    usados,
     categoriasTecnicas,
     testimonios,
     preguntas,
@@ -88,7 +89,6 @@ export default async function HomePage() {
     baldosas,
   ] = await Promise.all([
     getMarcasDePortada(),
-    getUsadosDePortada(),
     getCategoriasTecnicasDePortada(),
     getTestimoniosDePortada(),
     getPreguntasDePortada(),
@@ -175,10 +175,9 @@ export default async function HomePage() {
        * repuestos». Datos e imágenes, del panel.
        */}
       <SeccionUsadosKit
-        filtros={filtrosDeUsados(usados, usada)}
+        filtros={filtrosDeUsados(usada)}
         maquina={imagenDecorativa(usada?.imagen)}
         hrefVerTodo={RUTA_USADA}
-        cotizar={{ siteKey: turnstileSiteKey(), telefono: empresa.whatsapp }}
         textos={{
           antetitulo: tx(usada?.antetitulo),
           titulo: tx(usada?.titulo),
@@ -199,7 +198,7 @@ export default async function HomePage() {
         reflejo={imagenDecorativa(pagina.seccionLogos?.maquinaReflejo)}
       />
       <SeccionRepuestosKit
-        categorias={categoriasDePortada(categoriasTecnicas)}
+        categorias={await conPiezasParejas(categoriasDePortada(categoriasTecnicas))}
         textos={{
           antetitulo: tx(repuestos?.antetitulo),
           titulo: tx(repuestos?.titulo),
@@ -289,5 +288,16 @@ export default async function HomePage() {
         }}
       />
     </main>
+  );
+}
+
+/** Cada foto de «Venta de repuestos» con su pieza medida y colocada al tamaño común. */
+async function conPiezasParejas(categorias: CategoriaDePortada[]): Promise<CategoriaDePortada[]> {
+  return Promise.all(
+    categorias.map(async (c) =>
+      c.imagen
+        ? { ...c, colocacion: colocarFotoRepuesto(c.imagen, await recorteVisible(c.imagen.url)) }
+        : c,
+    ),
   );
 }

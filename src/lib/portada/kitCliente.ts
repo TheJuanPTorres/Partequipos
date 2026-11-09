@@ -1,4 +1,4 @@
-import type { CategoriasTecnica, CategoriasUsada, EquiposUsado, Pagina } from "@/payload-types";
+import type { CategoriasTecnica, Pagina } from "@/payload-types";
 
 import { SLUG_CATEGORIA_USADA_ADITAMENTOS } from "../aditamentos/wordpress";
 import {
@@ -11,23 +11,18 @@ import {
 import { validarEnlace } from "../fields/reglasPortada";
 import { normalizarEnlaceExterno } from "../nueva/enlaceExterno";
 import { rutas, SEGMENTO_OTROS_USADA } from "../routes";
-import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
+import { imagenDeMedia, type ImagenLista } from "../utils/relations";
+import { colocarLogo, type Recorte } from "../marca/tamanoOptico";
 import { filasDeLaBanda, type FilaBanda } from "./marcasBanda";
-import {
-  hrefDeCategoriaUsada,
-  SLUG_EXCAVADORAS,
-  type DatoFicha,
-  type EtiquetasEnlaces,
-  type TarjetaEquipo,
-} from "./secciones";
+import { hrefDeCategoriaUsada, SLUG_EXCAVADORAS, type EtiquetasEnlaces } from "./secciones";
 
 /**
  * EL KIT DE LA PORTADA DEL CLIENTE (2026-10-26): tres secciones con diseño propio del cliente,
  * PORTADAS (no copiadas) de sus prototipos y alimentadas desde el panel. Lógica pura: lo que
  * devuelve Payload, en lo que se pinta.
  *
- * - «Maquinaria pesada usada»: cabecera con la máquina, un FILTRO de tres categorías y el
- *   carrusel de las unidades de la elegida.
+ * - «Maquinaria pesada usada»: cabecera con la máquina y las tarjetas de tres tipos (enlaces a
+ *   su categoría). Sin carrusel de unidades desde el 2026-11-09 (dirección).
  * - «Venta de repuestos»: las categorías técnicas con posición en la portada, con su foto.
  * - Marcas: la banda de logos en bucle, con la máquina delante.
  */
@@ -40,80 +35,22 @@ export function imagenDecorativa(media: Parameters<typeof imagenDeMedia>[0]): Im
 
 // --- Maquinaria pesada usada ------------------------------------------------------------------
 
-/** Unidades por categoría del filtro: tres posiciones del carrusel de tres. */
-export const USADOS_POR_FILTRO = 9;
-
 export type ClaveFiltro = typeof SLUG_EXCAVADORAS | typeof SEGMENTO_OTROS_USADA | "aditamentos";
 
 export type FiltroUsados = {
   clave: ClaveFiltro;
-  /** El nombre de la tarjeta del filtro (del panel; vacío, el de siempre). */
+  /** El nombre de la tarjeta del tipo (del panel; vacío, el de siempre). */
   nombre: string;
-  /** «Ver todo» de esa categoría: su página. */
+  /** La página de esa categoría. */
   href: string;
   imagen: ImagenLista | null;
-  tarjetas: TarjetaEquipo[];
 };
 
 /**
- * La ficha de la tarjeta con las TRES filas siempre (peso operativo, año y horómetro), un guion
- * donde falte el dato: así las filas de las tarjetas vecinas no se descuadran (diseño del cliente).
+ * Las TRES tarjetas de tipo, en el orden del diseño (Excavadora, Otros y Aditamentos). Siempre
+ * las tres, aunque una no tenga unidades: su página existe.
  */
-export function fichaCompleta(
-  e: Pick<EquiposUsado, "pesoOperativo" | "anio" | "horometro">,
-): DatoFicha[] {
-  const valido = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v) && v > 0;
-  const numero = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 1 });
-  const horas = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 0, useGrouping: "always" });
-  return [
-    {
-      clave: "peso",
-      etiqueta: "Peso operativo",
-      valor: valido(e.pesoOperativo) ? `${numero.format(e.pesoOperativo)} t` : "—",
-    },
-    {
-      clave: "anio",
-      etiqueta: "Año",
-      valor: valido(e.anio) && Number.isInteger(e.anio) ? String(e.anio) : "—",
-    },
-    {
-      clave: "horometro",
-      etiqueta: "Horómetro",
-      valor: valido(e.horometro) ? `${horas.format(e.horometro)} h` : "—",
-    },
-  ];
-}
-
-/** Las tarjetas de unas unidades, en su orden: solo las disponibles, con nombre y categoría. */
-export function tarjetasDeUnidades(
-  equipos: EquiposUsado[],
-  por: number = USADOS_POR_FILTRO,
-): TarjetaEquipo[] {
-  const tarjetas: TarjetaEquipo[] = [];
-  for (const e of equipos) {
-    const categoria = poblado<CategoriasUsada>(e.categoria);
-    const nombre = e.nombre?.trim();
-    if (!e.disponible || !nombre || !categoria?.slug) continue;
-    tarjetas.push({
-      id: e.id,
-      nombre,
-      imagen: imagenDeMedia(Array.isArray(e.imagenes) ? e.imagenes[0] : null, nombre),
-      ficha: fichaCompleta(e),
-      href: e.slug ? `${hrefDeCategoriaUsada(categoria.slug)}${e.slug}/` : null,
-    });
-  }
-  return tarjetas.slice(0, por);
-}
-
-/**
- * Las TRES categorías del filtro, en el orden del diseño (Excavadora, Otros y Aditamentos), con
- * sus unidades. Siempre las tres, aunque una no tenga unidades: su página existe y el carrusel
- * enseña un aviso.
- */
-export function filtrosDeUsados(
-  unidades: { excavadoras: EquiposUsado[]; otros: EquiposUsado[]; aditamentos: EquiposUsado[] },
-  seccion: Pagina["seccionUsada"],
-): FiltroUsados[] {
+export function filtrosDeUsados(seccion: Pagina["seccionUsada"]): FiltroUsados[] {
   const nombre = (v: string | null | undefined, defecto: string) => v?.trim() || defecto;
   const etiquetas: EtiquetasEnlaces = {
     excavadoras: seccion?.pestanaExcavadoras,
@@ -126,32 +63,70 @@ export function filtrosDeUsados(
       nombre: nombre(etiquetas.excavadoras, "Excavadora"),
       href: hrefDeCategoriaUsada(SLUG_EXCAVADORAS),
       imagen: imagenDecorativa(seccion?.imagenExcavadoras),
-      tarjetas: tarjetasDeUnidades(unidades.excavadoras),
     },
     {
       clave: SEGMENTO_OTROS_USADA,
       nombre: nombre(etiquetas.otros, "Otros"),
       href: hrefDeCategoriaUsada(SEGMENTO_OTROS_USADA),
       imagen: imagenDecorativa(seccion?.imagenOtros),
-      tarjetas: tarjetasDeUnidades(unidades.otros),
     },
     {
       clave: SLUG_CATEGORIA_USADA_ADITAMENTOS,
       nombre: nombre(etiquetas.aditamentos, "Aditamentos"),
       href: hrefDeCategoriaUsada(SLUG_CATEGORIA_USADA_ADITAMENTOS),
       imagen: imagenDecorativa(seccion?.imagenAditamentos),
-      tarjetas: tarjetasDeUnidades(unidades.aditamentos),
     },
   ];
 }
 
 // --- Venta de repuestos -----------------------------------------------------------------------
 
+/**
+ * LAS PIEZAS DE «VENTA DE REPUESTOS» AL MISMO TAMAÑO (dirección, 2026-11-09). Cada foto trae su
+ * propio margen blanco (unas piezas llenan el fichero y otras ocupan un tercio), y con
+ * `object-fit: contain` unas se veían grandes y otras encogidas. El servidor mide la caja de la
+ * pieza (`recorteVisible`, `sharp().trim()`, en caché) y aquí se escala el fichero para que TODAS
+ * las piezas tengan la misma ÁREA visible, centradas en la caja 4:3 de la tarjeta: lo mismo que
+ * los logos del selector de marcas (#439, `colocarLogo`).
+ *
+ * Nunca se deforma (misma escala en los dos ejes) ni se corta la pieza: su caja cabe siempre en
+ * `MARCO_PIEZA` (el 86 % de la caja); lo que sale fuera es margen blanco del fichero, recortado por
+ * la tarjeta. Una pieza muy alargada toca el marco y queda con algo menos de área.
+ */
+export const CAJA_FOTO = { ancho: 400, alto: 300 };
+const MARCO_PIEZA = 0.86;
+/** El área de una pieza 4:3 que ocupa el 70 % del ancho de la caja: ~280 × 210. */
+const AREA_PIEZA = 280 * 210;
+
+/** Dónde va el fichero entero, en % de la caja de la foto (puede salirse por los lados). */
+export type ColocacionFoto = { izquierda: number; arriba: number; ancho: number; alto: number };
+
+const pct = (n: number) => Math.round(n * 1000) / 1000;
+
+export function colocarFotoRepuesto(
+  imagen: { width: number; height: number },
+  recorte: Recorte,
+): ColocacionFoto | null {
+  if (!(imagen.width > 0 && imagen.height > 0)) return null;
+  const marco = { ancho: CAJA_FOTO.ancho * MARCO_PIEZA, alto: CAJA_FOTO.alto * MARCO_PIEZA };
+  const c = colocarLogo({ ...imagen, recorte }, { ...marco, area: AREA_PIEZA });
+  const desdeX = (CAJA_FOTO.ancho - marco.ancho) / 2 + c.visible.izquierda + c.imagen.izquierda;
+  const desdeY = (CAJA_FOTO.alto - marco.alto) / 2 + c.visible.arriba + c.imagen.arriba;
+  return {
+    izquierda: pct((desdeX / CAJA_FOTO.ancho) * 100),
+    arriba: pct((desdeY / CAJA_FOTO.alto) * 100),
+    ancho: pct((c.imagen.ancho / CAJA_FOTO.ancho) * 100),
+    alto: pct((c.imagen.alto / CAJA_FOTO.alto) * 100),
+  };
+}
+
 export type CategoriaDePortada = {
   id: number;
   nombre: string;
   /** La «Foto en la portada» o, vacía, la «Imagen de la tarjeta». Decorativa. */
   imagen: ImagenLista | null;
+  /** La pieza al tamaño común (`colocarFotoRepuesto`); sin medir, `null` y la foto en `contain`. */
+  colocacion?: ColocacionFoto | null;
   /** «Ver todos»: el enlace de la tarjeta del panel o la página de la categoría. */
   href: string;
 };

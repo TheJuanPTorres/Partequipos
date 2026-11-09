@@ -1,5 +1,5 @@
 import { BannerMarcaTipo } from "@/components/nueva/BannerMarcaTipo";
-import type { VistaBanner } from "@/lib/nueva/bannerMarca";
+import type { BannerConLogo } from "@/lib/nueva/bannerMarca";
 import type { AccesoSubcategoria } from "@/lib/repuestos/subcategorias";
 
 import estilos from "./accesos.module.css";
@@ -16,7 +16,7 @@ export function AccesosSubcategorias({
   accesos,
   categoria,
 }: {
-  accesos: (AccesoSubcategoria & { vista: VistaBanner })[];
+  accesos: (AccesoSubcategoria & { banner: BannerConLogo })[];
   /** El nombre de la categoría: «Marcas de filtración». */
   categoria: string;
 }) {
@@ -33,8 +33,7 @@ export function AccesosSubcategorias({
               id={`acceso-${a.id}`}
               titulo={a.nombre}
               marca={{ nombre: a.nombre, href: `${a.href}/` }}
-              logo={a.logo}
-              vista={a.vista}
+              banner={a.banner}
               nivel="h3"
             />
           </li>

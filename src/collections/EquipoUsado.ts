@@ -242,8 +242,8 @@ export const EquipoUsado: CollectionConfig = {
       },
     },
     /*
-     * FECHA DE PUBLICACIÓN (2026-10-17, dirección): ordena el carrusel de la
-     * portada y los listados de usados, de la más reciente a la más antigua. Por
+     * FECHA DE PUBLICACIÓN (2026-10-17, dirección): ordena los listados (y,
+     * hasta el 2026-11-09, el carrusel de la portada) de usados, de la más reciente a la más antigua. Por
      * defecto, el momento de crear la unidad; en las importadas de WordPress, la
      * fecha original de cada anuncio (el importador la rellena). Editable.
      */
@@ -256,7 +256,7 @@ export const EquipoUsado: CollectionConfig = {
         position: "sidebar",
         date: { pickerAppearance: "dayAndTime", displayFormat: "d MMM yyyy, HH:mm" },
         description:
-          "Ordena la portada y los listados: primero la más reciente. Por defecto, hoy; se puede cambiar.",
+          "Ordena los listados: primero la más reciente. Por defecto, hoy; se puede cambiar.",
       },
     },
     /*
@@ -270,7 +270,7 @@ export const EquipoUsado: CollectionConfig = {
       name: "pestanaPortada",
       type: "select",
       defaultValue: "categoria",
-      label: "Pestaña en la portada",
+      label: "Pestaña en la portada (ya no se usa)",
       options: [
         { label: "Según su categoría (Excavadora u Otros)", value: "categoria" },
         { label: "Aditamentos", value: "aditamentos" },
@@ -278,7 +278,7 @@ export const EquipoUsado: CollectionConfig = {
       admin: {
         position: "sidebar",
         description:
-          "Desde el 2026-10-20 la portada solo enseña excavadoras: una marcada como «Aditamentos» no sale en ella.",
+          "Sin efecto desde el 2026-11-09: la portada ya no enseña unidades (se quitó el carrusel). Se conserva el dato.",
       },
     },
     seoField(),

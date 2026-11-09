@@ -122,17 +122,6 @@
   inset: 0;
 }
 
-/* El contenido visible del logo (sin márgenes), centrado en la caja. */
-.barraRecorte {
-  position: absolute;
-  overflow: hidden;
-}
-
-/* El fichero entero, desplazado para que su contenido caiga en el recorte. */
-.barraImagen {
-  position: absolute;
-}
-
 /*
  * Variante GRANDE de la barra de marcas (dirección, 2026-10-25): pastillas de 54 px de alto en
  * lugar de 40 (+35 %) y más relleno a los lados (22 en lugar de 16). La barra de series no la usa.

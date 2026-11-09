@@ -75,17 +75,23 @@ async function contexto(ancho, reducir) {
 
 /** En la página: las secciones, su caja pintada y los huecos entre ellas. */
 function medirEnPagina() {
+  // Cualquier formato de color calculado: `rgb()`, `rgba()` y también `color(srgb …)` u `oklch(…)`,
+  // que es lo que devuelve Chrome para un `color-mix()` (el botón rojo «Ver todo» de nueva no
+  // contaba como pintado).
   const opaco = (c) => {
-    const m = c.match(/rgba?\(([^)]+)\)/);
-    if (!m) return false;
-    const p = m[1].split(/[\s,/]+/).filter(Boolean);
-    return p.length < 4 || Number(p[3]) > 0.02;
+    if (!c || c === "transparent" || c === "none") return false;
+    const coma = c.match(/^rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\s*\)$/);
+    const barra = c.match(/\/\s*([\d.]+)(%?)\s*\)$/);
+    const alfa = coma ? Number(coma[1]) : barra ? Number(barra[1]) / (barra[2] ? 100 : 1) : 1;
+    return alfa > 0.02;
   };
   const visible = (el) => {
     const cs = getComputedStyle(el);
     // La opacidad NO cuenta: las animaciones de entrada (el pie, P1–P4) dejan en 0 lo que no está
     // en pantalla, y lo que importa es el sitio que ocupa cuando se ve.
     if (cs.display === "none" || cs.visibility === "hidden") return false;
+    // `display: contents` no tiene caja (0 × 0) pero sus hijos sí se pintan (las columnas del pie).
+    if (cs.display === "contents") return true;
     const r = el.getBoundingClientRect();
     if (r.width <= 2 && r.height <= 2) return false; // sr-only
     return true;
@@ -147,7 +153,11 @@ function medirEnPagina() {
       const dentro = corta
         ? { top: Math.max(recorte.top, caja.top), bottom: Math.min(recorte.bottom, caja.bottom) }
         : recorte;
+      // Un `<details>` cerrado solo enseña su `<summary>`: el resto lo recorta `::details-content`,
+      // que no es un elemento y este recorrido no ve (las respuestas de «Preguntas frecuentes»).
+      const cerrado = el.tagName === "DETAILS" && !el.open;
       for (const n of el.childNodes) {
+        if (cerrado && !(n.nodeType === 1 && n.tagName === "SUMMARY")) continue;
         if (n.nodeType === 3 && n.textContent.trim()) {
           const rango = document.createRange();
           rango.selectNodeContents(n);

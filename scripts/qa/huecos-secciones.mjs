@@ -47,10 +47,16 @@ const [base, carpeta, ...rutasArg] = process.argv.slice(2);
 if (!base || !carpeta) throw new Error("Uso: huecos-secciones.mjs <base> <carpeta> [ruta…]");
 const origen = new URL(base).origin;
 const rutas = rutasArg.length > 0 ? rutasArg : ["/", "/maquinaria-pesada/"];
-/** `HUECOS_ANCHOS=390,1440` para medir solo esos anchos. */
-const ANCHOS = process.env.HUECOS_ANCHOS
-  ? process.env.HUECOS_ANCHOS.split(",").map(Number)
-  : [390, 768, 1010, 1440, 1920, 2560];
+/**
+ * Las vistas: «ancho» (900 px de alto) o «anchoxalto», para lo que crece con la altura (vh, svh).
+ * `HUECOS_ANCHOS=390,1440,3840x2160` para medir solo esas.
+ */
+const ANCHOS = (
+  process.env.HUECOS_ANCHOS ??
+  "390,768,1010,1440,1920,2560,3440,3840,1920x1080,2560x1080,3440x2160,3840x2160"
+).split(",");
+const anchoDe = (vista) => Number(vista.split("x")[0]);
+const altoDe = (vista) => Number(vista.split("x")[1] ?? 900);
 const MAXIMO = 48;
 /** El espaciado común a un ancho: clamp(24px, 15px + 2.3vw, 48px). */
 const comun = (ancho) => Math.min(MAXIMO, Math.max(24, 15 + 0.023 * ancho));
@@ -64,7 +70,7 @@ const navegador = await pw.chromium.launch({
 
 async function contexto(ancho, reducir) {
   const ctx = await navegador.newContext({
-    viewport: { width: ancho, height: 900 },
+    viewport: { width: anchoDe(ancho), height: altoDe(ancho) },
     reducedMotion: reducir ? "reduce" : "no-preference",
   });
   if (origenDePreview(origen)) {
@@ -324,7 +330,7 @@ for (const ruta of rutas) {
     const celdas = ANCHOS.map((a) => {
       const f = deRuta.find((x) => x.ancho === a)?.filas.find((g) => g.entre === clave);
       if (!f) return "—";
-      const marca = f.hueco > MAXIMO ? " ✗" : f.hueco > comun(a) + 8 ? " ⚠" : "";
+      const marca = f.hueco > MAXIMO ? " ✗" : f.hueco > comun(anchoDe(a)) + 8 ? " ⚠" : "";
       return `${f.hueco}${marca}`;
     });
     lineas.push(`| ${clave.replace(/\|/g, "/")} | ${celdas.join(" | ")} |`);
@@ -336,6 +342,6 @@ for (const ruta of rutas) {
   );
 }
 lineas.push(
-  `Espaciado común por ancho: ${ANCHOS.map((a) => `${a}: ${Math.round(comun(a))}`).join(" · ")}. ⚠ pasa del común + 8 px; ✗ pasa de ${MAXIMO} px.`,
+  `Espaciado común por ancho: ${ANCHOS.map((a) => `${a}: ${Math.round(comun(anchoDe(a)))}`).join(" · ")}. ⚠ pasa del común + 8 px; ✗ pasa de ${MAXIMO} px.`,
 );
 fs.writeFileSync(path.join(carpeta, "huecos.md"), lineas.join("\n") + "\n");

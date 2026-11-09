@@ -47,7 +47,9 @@
 
 @media (min-width: 1025px) {
   .panel {
-    --panel-x: 4%;
+    /* Con techo de ancho: el contenido a 1680 px como mucho (como «nueva»), centrado; antes, con el
+       4 % solo, las tarjetas medían ~680 px a 3840. */
+    --panel-x: max(4%, calc((100% - 1680px) / 2));
     padding-block: 56px;
     border-radius: 32px;
   }

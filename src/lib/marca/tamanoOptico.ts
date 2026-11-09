@@ -27,14 +27,15 @@ export type Caja = {
 };
 
 /**
- * La caja de la barra de marcas grande (pastillas de 54 px): 132 × 32. El área es la de un logo
+ * La caja de la barra de marcas grande (pastillas de 54 px): 140 × 38. El área es la de un logo
  * de proporción 3:1 a 29 px de alto; uno más alargado se ajusta al ancho y uno más compacto, al
- * alto.
+ * alto. Medido en el preview (2026-11-09): con 132 × 32, el Hitachi de tres líneas y el Yanmar
+ * alargado topaban con la caja y se veían más pequeños que Case.
  */
-export const CAJA_GRANDE: Caja = { ancho: 132, alto: 32, area: 87 * 29 };
+export const CAJA_GRANDE: Caja = { ancho: 140, alto: 38, area: 87 * 29 };
 
 /** La caja de la barra normal (pastillas de 40 px), en la misma proporción. */
-export const CAJA_NORMAL: Caja = { ancho: 96, alto: 23, area: 63 * 21 };
+export const CAJA_NORMAL: Caja = { ancho: 102, alto: 27, area: 63 * 21 };
 
 /**
  * Dónde y a qué tamaño va el logo: `visible` es la caja del contenido, centrada en la caja fija;

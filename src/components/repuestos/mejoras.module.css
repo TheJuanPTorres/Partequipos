@@ -160,11 +160,11 @@
 
 /*
  * Sin baldosa: el logo de siempre, con sus colores, sobre una plaquita blanca dentro del color.
- * La plaquita es fija (la caja y 10 px a los lados, 5 arriba y abajo), igual en todas.
+ * La plaquita es fija (la caja y 10 px a los lados, 3 arriba y abajo), igual en todas.
  */
 .barraActiva[data-placa]::before {
   position: absolute;
-  inset: -5px -10px;
+  inset: -3px -10px;
   border-radius: 999px;
   background: #ffffff;
   content: "";

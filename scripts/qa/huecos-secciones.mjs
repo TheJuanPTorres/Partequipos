@@ -83,8 +83,9 @@ function medirEnPagina() {
   };
   const visible = (el) => {
     const cs = getComputedStyle(el);
-    if (cs.display === "none" || cs.visibility === "hidden" || Number(cs.opacity) === 0)
-      return false;
+    // La opacidad NO cuenta: las animaciones de entrada (el pie, P1–P4) dejan en 0 lo que no está
+    // en pantalla, y lo que importa es el sitio que ocupa cuando se ve.
+    if (cs.display === "none" || cs.visibility === "hidden") return false;
     const r = el.getBoundingClientRect();
     if (r.width <= 2 && r.height <= 2) return false; // sr-only
     return true;

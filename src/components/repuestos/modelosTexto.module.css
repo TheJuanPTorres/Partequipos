@@ -1,0 +1,230 @@
+/*
+ * Modelos de la página de tipo de repuestos SIN FOTOS (Ronda 12, 2026-11-08). Va dentro de
+ * `.pagina` de marca: usa `--marca-amarillo` (el color de la marca) con el rojo de marca de
+ * respaldo. Tarjetas compactas de texto: franja fina del color de la marca, el modelo en grande,
+ * su serie o código y una flecha; toda la tarjeta es el enlace.
+ */
+
+/* Menos aire que la sección con fotos: aquí no hay imágenes que sostener. */
+.seccion {
+  padding-bottom: 96px;
+}
+
+.grupo {
+  margin-top: 40px;
+}
+
+.grupo[hidden] {
+  display: none;
+}
+
+.grupo + .grupo {
+  margin-top: 48px;
+}
+
+.serie {
+  margin: 0 0 20px;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-4);
+  font-weight: 500;
+  line-height: 1.2;
+  scroll-margin-top: 94px;
+}
+
+.rejilla {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  list-style: none;
+}
+
+.tarjeta[hidden] {
+  display: none;
+}
+
+.enlace {
+  position: relative;
+  display: flex;
+  min-height: 112px;
+  box-sizing: border-box;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 22px 52px 18px 20px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--color-fondo-seccion);
+  color: var(--color-texto);
+  text-decoration: none;
+  transition:
+    box-shadow 0.25s,
+    transform 0.25s;
+}
+
+/* La franja fina del color de la marca. */
+.enlace::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: var(--marca-amarillo, var(--color-marca));
+  content: "";
+}
+
+a.enlace:hover {
+  box-shadow: 0 8px 20px rgb(16 15 15 / 0.14);
+  transform: translateY(-2px);
+}
+
+a.enlace:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.nombre {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.detalle {
+  color: #4b4a49;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.flecha {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  color: var(--color-marca);
+  transition: transform 0.25s;
+}
+
+a.enlace:hover .flecha {
+  transform: translateX(4px);
+}
+
+/* Una entrada que WordPress nombra y no tiene página: tarjeta sin enlace, algo más tenue. */
+.sinPagina {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgb(16 15 15 / 0.14);
+}
+
+/* --- Busca tu modelo ---------------------------------------------------------------------- */
+
+/* Sin JavaScript el filtro no funcionaría: no se pinta. */
+.buscador {
+  display: none;
+  max-width: 560px;
+  margin: 28px auto 0;
+}
+
+@media (scripting: enabled) {
+  .buscador {
+    display: block;
+  }
+}
+
+.buscadorEtiqueta {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-texto);
+  font-size: var(--texto-etiqueta);
+  font-weight: 500;
+}
+
+.buscadorCaja {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--color-fondo);
+  box-shadow: inset 0 0 0 1.5px #6b6a69;
+  color: #4b4a49;
+}
+
+.buscadorCaja:focus-within {
+  box-shadow: inset 0 0 0 3px var(--color-texto);
+}
+
+.buscadorCampo {
+  width: 100%;
+  min-width: 0;
+  height: 50px;
+  border: 0;
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.buscadorAviso {
+  min-height: 20px;
+  margin: 8px 0 0;
+  color: #4b4a49;
+  font-size: 14px;
+  text-align: center;
+}
+
+.buscadorVacio {
+  margin: 12px 0 0;
+  color: var(--color-texto);
+  text-align: center;
+}
+
+.buscadorVacio[hidden] {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .rejilla {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .seccion {
+    padding-bottom: 64px;
+  }
+
+  .rejilla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .enlace {
+    min-height: 96px;
+    padding: 20px 40px 14px 14px;
+  }
+
+  .nombre {
+    font-size: 18px;
+  }
+
+  .flecha {
+    right: 10px;
+    bottom: 12px;
+  }
+
+  .grupo {
+    margin-top: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enlace,
+  .flecha {
+    transition: none;
+  }
+
+  a.enlace:hover,
+  a.enlace:hover .flecha {
+    transform: none;
+  }
+}

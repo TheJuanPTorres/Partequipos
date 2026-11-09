@@ -15,8 +15,8 @@ import type { GrupoDeSubtipo } from "./subtipos";
  * Lógica pura de la PÁGINA DE TIPO de maquinaria nueva (2026-10-18, petición
  * del cliente): se pinta como la de tipo de repuestos (diseño de Andrés), con el
  * encabezado de foto y la franja amarilla de botones píldora, uno por equipo,
- * a su ficha. Reutiliza `HeroMarca` y `ModelosTipo`: aquí solo se convierten los
- * datos a lo que esos componentes esperan.
+ * a su ficha. Reutiliza `HeroMarca`: aquí solo se convierten los datos a lo que
+ * espera.
  */
 
 const texto = (v: string | null | undefined) => v?.trim() ?? "";

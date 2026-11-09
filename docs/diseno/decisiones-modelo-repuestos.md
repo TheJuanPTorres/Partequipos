@@ -64,3 +64,31 @@ del #355) con los modelos de la serie del modelo o, sin series, de todo el tipo:
 página del tipo, con las mismas fotos. El modelo de la página sale MARCADO (borde y fondo suave del color
 de la marca, check y «(página actual)» para lectores de pantalla). Sin JavaScript, el botón lleva a la
 página del tipo, al ancla de la serie. Con un solo modelo no se pinta (`OtrosModelos`).
+
+## Repuestos por modelo SIN fotos de máquinas (Ronda 12, 2026-11-08, propuesta de dirección)
+
+El cliente vende repuestos, no máquinas: las dos páginas pierden las fotos de máquina. Sin diseño de
+Andrés; estilo de la web nueva. Aplica a TODAS las marcas y tipos (33 tipos, 349 modelos en el preview).
+
+**Datos que hay** (inventario del preview): los 349 modelos tienen nombre, código y descripción de
+WordPress; la **serie** solo existe en los 46 de Hitachi (EX y ZAXIS); los tipos eligen entre 0 y 10
+categorías de repuesto (`categoriasModelo`; los tres de Komatsu, 0, y ahí no hay etiquetas); 17
+modelos tienen la lista de piezas visible. **Falta:** especificaciones de la máquina, año y cualquier
+dato técnico (no existen; no se inventan), y un texto breve propio por modelo (la «línea» es la
+primera frase de la descripción de WordPress).
+
+- **Tipo** (`ModelosTexto`, sustituye a `ModelosTipo`): campo «Busca tu modelo» (`BuscadorModelos`,
+  filtra al escribir sin volver a pintar: el HTML lleva todos los modelos; sin JavaScript no sale) y
+  tarjetas de texto: modelo en grande, serie o código, franja fina del color de la marca, flecha;
+  toda la tarjeta enlaza. 4 por fila, 3 en tablet, 2 en móvil. Con series, agrupadas con la barra
+  (R2) y el «¿No encuentras tu modelo?» (R4) de siempre. «Ver todos» deja de existir en esta página
+  (ya se ven todos); el panel «Ver todos» de la página de la marca no cambia.
+- **Modelo** (`FichaModelo`): un solo contenedor a dos columnas. Izquierda: migas, logo pequeño de la
+  marca, `<h1>`, una línea de texto, datos clave (marca, tipo, serie si la hay, modelo) y los tipos
+  de repuesto como etiquetas a su categoría. Derecha: «Pedir cotización» con el formulario corto
+  (`compacto`, mensaje en 3 filas) con el modelo ya puesto y el botón verde de WhatsApp con el
+  modelo en el mensaje. Móvil: información arriba, formulario debajo. Debajo, «Otros modelos de
+  {tipo} {marca}» (`OtrosModelosLista`). Se quitan `CabeceraModelo`, sus animaciones H1–H3 y las
+  baldosas de categorías con foto.
+- **SEO:** URL, migas, `<h1>` y metadatos igual; el JSON-LD `Product` ya no declara `image` (la
+  página no muestra fotos); `og:image` sigue con la foto del modelo si la hay.

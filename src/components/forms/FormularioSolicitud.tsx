@@ -70,6 +70,11 @@ type Props = {
    */
   mensajeInicial?: string;
   /**
+   * Versión corta (ficha de modelo de repuestos, Ronda 12): el mensaje en 3 filas en lugar de 5.
+   * Los mismos campos y la misma validación.
+   */
+  compacto?: boolean;
+  /**
    * Las mejoras de la ventana emergente que están encendidas (`F3`, `F4`; `animacionesVentana.ts`).
    * Solo las lee la variante `emergente`.
    */
@@ -97,6 +102,7 @@ export function FormularioSolicitud({
   etiquetaMensaje: etiquetaPagina = "Mensaje",
   conCiudad: conCiudadPagina = false,
   mensajeInicial,
+  compacto = false,
   animar = [],
   alCerrar,
 }: Props) {
@@ -411,7 +417,7 @@ export function FormularioSolicitud({
             <textarea
               {...p}
               name="mensaje"
-              rows={5}
+              rows={compacto ? 3 : 5}
               defaultValue={previo.mensaje ?? mensajeInicial}
               placeholder={conMarcador ? etiquetaMensaje : undefined}
               className={claseControl}

@@ -4,7 +4,7 @@ import { SeccionTestimonios } from "@/components/portada/diferidos";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { InterruptorMejoras } from "@/components/repuestos/InterruptorMejoras";
-import { ModelosTipo } from "@/components/repuestos/ModelosTipo";
+import { ModelosTexto } from "@/components/repuestos/ModelosTexto";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
 import { SedesCompactas } from "@/components/repuestos/SedesCompactas";
 import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
@@ -18,7 +18,7 @@ import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepu
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
-import { colorDeMarca, estiloDeMarca } from "@/lib/marca/colorMarca";
+import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { tarjetasDeCategorias, vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
@@ -111,13 +111,11 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
 
       <HeroMarca vista={vistaEncabezadoTipo(marca, tipo, global)} anclaSiguiente={ANCLA_MODELOS} />
 
-      <ModelosTipo
+      {/* Ronda 12 (2026-11-08): los modelos SIN FOTOS, con buscador y tarjetas de texto. */}
+      <ModelosTexto
         id={ANCLA_MODELOS}
         titulo={`Modelos de ${tipoEnTitulo(tipo.nombre)} ${marca.nombre}`}
-        tipo={tipo}
         modelos={enlaces}
-        verTodo="Ver repuestos"
-        tituloPanel={`${tipoEnTitulo(tipo.nombre)} ${marca.nombre.trim().toUpperCase()}`}
         grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
         barraSeries={MEJORAS_ACTIVAS.R2}
@@ -131,8 +129,6 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
               }
             : null
         }
-        panelR5={MEJORAS_ACTIVAS.R5}
-        acento={colorDeMarca(marca.colorMarca)}
       />
 
       <TarjetasMarca

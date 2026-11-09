@@ -82,8 +82,8 @@ export function TarjetasMarca({
 }
 
 /**
- * La REJILLA de tarjetas (la lista), también suelta: la página de tipo pinta una por serie
- * (`ModelosTipo`). `nivel` es el de los títulos de las tarjetas: sin título de sección (páginas
+ * La REJILLA de tarjetas (la lista), también suelta: el panel «Ver todos» de la marca y las
+ * páginas índice. `nivel` es el de los títulos de las tarjetas: sin título de sección (páginas
  * índice) cuelgan del h1 (h2); bajo un título de sección, h3; bajo el de una serie, h4.
  *
  * El botón: con `panel` (marca de repuestos), «Ver todo» abre el panel con los modelos de la

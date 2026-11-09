@@ -21,7 +21,7 @@ import {
   filtrosDeUsados,
   imagenDecorativa,
   logosDeLaBanda,
-  logosDeMarcasRepuestos,
+  logosDeLaBandaDeRepuestos,
 } from "@/lib/portada/kitCliente";
 import { RUTA_USADA, tarjetasDeMarcas } from "@/lib/portada/secciones";
 import { videoDeCompania, videoDeYouTube } from "@/lib/portada/seccionesF";
@@ -36,7 +36,6 @@ import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
 import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { getLogosMarca, getMarcasRepuestosDePortada } from "@/lib/queries/getLogosMarca";
-import { marcasDeLaBanda } from "@/lib/portada/marcasBanda";
 import { metadataDe } from "@/lib/seo/metadata";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
@@ -214,11 +213,12 @@ export default async function HomePage() {
       {/*
        * «Marcas de repuestos» (2026-11-03, diseño del cliente): justo debajo de «Venta de repuestos»,
        * las marcas en espejo. Los logos son los de las marcas de repuestos y enlazan a su página; salen
-       * las de «Marcas de la banda» en su orden o, con la lista vacía, todas por orden alfabético.
+       * las filas de «Marcas de la banda» (marcas o logos libres) en su orden o, con la lista vacía,
+       * todas por orden alfabético.
        */}
       <SeccionMarcasKit
         espejo
-        logos={logosDeMarcasRepuestos(marcasDeLaBanda(marcasRepuestos, marcasRep?.marcasBanda))}
+        logos={logosDeLaBandaDeRepuestos(marcasRepuestos, marcasRep?.marcasBanda)}
         antetitulo={tx(marcasRep?.antetitulo)}
         titulo={tx(marcasRep?.titulo)}
         resaltado={tx(marcasRep?.tituloResaltado)}

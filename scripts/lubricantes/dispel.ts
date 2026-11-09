@@ -4,10 +4,12 @@
  * - Crea la marca de lubricante «Dispel» SIN página en este sitio («Destino: Otra web»), de
  *   Colombia, con su color (el azul de su logo, `#005684`), su logo del WordPress del cliente
  *   (recortado a su contenido) y la foto de su selector (un producto Dispel del mismo WordPress).
- *   Su «Enlace externo» queda VACÍO (no sale en el menú y su panel dice «Muy pronto») salvo que se
+ *   Su «Enlace externo» queda VACÍO (en el menú lleva a la categoría «Lubricantes», donde su panel dice «Muy pronto») salvo que se
  *   pase `enlace=<https://…>`; `enlace=` (vacío) lo vacía. Solo preview y prueba: en el sitio
  *   publicado el enlace lo pone Juan Pablo en el panel.
- * - Eni: «País de origen» Italia.
+ * - Eni: «País de origen» Italia. Con `webEni=<https://…>`, su «Enlace externo» («Ver todo» del
+ *   menú y «Ver productos» del selector a su web, 2026-11-08); `webEni=` lo vacía. Solo preview y
+ *   prueba: en el sitio publicado se pone en el panel.
  * - Categoría técnica «Lubricantes»: enciende el selector de marcas con Eni y Dispel, en ese orden.
  *
  *   npm run preview:dispel:simular   # no escribe nada
@@ -67,6 +69,15 @@ const ENLACE: string | null | undefined =
 if (ENLACE_ARG && !ENLACE) fallar(`«${ENLACE_ARG}» no es una dirección https de otro sitio`);
 if (ENLACE_ARG !== undefined && destino !== "preview" && destino !== "prueba") {
   fallar("`enlace=` solo en el preview: en el sitio publicado el enlace se pone en el panel");
+}
+
+/** `webEni=<url>`: el «Enlace externo» de Eni; `webEni=` lo vacía; sin el argumento, no se toca. */
+const WEB_ENI_ARG = valorDe("webEni");
+const WEB_ENI: string | null | undefined =
+  WEB_ENI_ARG === undefined ? undefined : WEB_ENI_ARG ? normalizarEnlaceExterno(WEB_ENI_ARG) : null;
+if (WEB_ENI_ARG && !WEB_ENI) fallar(`«${WEB_ENI_ARG}» no es una dirección https de otro sitio`);
+if (WEB_ENI_ARG !== undefined && destino !== "preview" && destino !== "prueba") {
+  fallar("`webEni=` solo en el preview: en el sitio publicado el enlace se pone en el panel");
 }
 
 if (modo === "simular") process.env.BLOB_READ_WRITE_TOKEN = "";
@@ -305,7 +316,7 @@ if (modo === "retirar") {
   };
   const enlaceFinal = ENLACE !== undefined ? ENLACE : (existente?.enlaceExterno ?? null);
   log(
-    `${existente ? "actualizar" : "crear"} marca Dispel: Otra web, Colombia, ${COLOR_DISPEL}, enlace ${enlaceFinal ?? "VACÍO (no sale en el menú; «Muy pronto»)"}`,
+    `${existente ? "actualizar" : "crear"} marca Dispel: Otra web, Colombia, ${COLOR_DISPEL}, enlace ${enlaceFinal ?? "VACÍO (en el menú, a la categoría «Lubricantes»; «Muy pronto»)"}`,
   );
   let idDispel: Id | null = existente?.id ?? null;
   if (modo === "aplicar") {
@@ -343,6 +354,20 @@ if (modo === "retirar") {
       depth: 0,
       overrideAccess: true,
     });
+  }
+
+  // Eni: su web (solo con `webEni=`).
+  if (WEB_ENI !== undefined) {
+    log(`Eni: enlace externo ${eni!.enlaceExterno || "VACÍO"} → ${WEB_ENI ?? "VACÍO"}`);
+    if (modo === "aplicar" && (eni!.enlaceExterno ?? null) !== WEB_ENI) {
+      await payload.update({
+        collection: "marcas-lubricante",
+        id: eni!.id,
+        data: { enlaceExterno: WEB_ENI },
+        depth: 0,
+        overrideAccess: true,
+      });
+    }
   }
 
   // La categoría «Lubricantes».

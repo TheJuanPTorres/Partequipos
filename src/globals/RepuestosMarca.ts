@@ -76,7 +76,10 @@ export const RepuestosMarca: GlobalConfig = {
       name: "subtituloHero",
       type: "text",
       label: "Segunda línea, tras el nombre de la marca",
-      admin: { description: "Ej.: «En Colombia» → «CATERPILLAR En Colombia»." },
+      admin: {
+        description:
+          "Ej.: «En Colombia» → «CATERPILLAR En Colombia». En las marcas y sus tipos; las categorías técnicas no la llevan.",
+      },
     },
     {
       name: "tituloCategorias",

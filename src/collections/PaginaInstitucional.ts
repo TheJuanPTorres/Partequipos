@@ -7,10 +7,11 @@ import {
 } from "../lib/fields/alineacionTexto";
 import { avisoField } from "../lib/fields/avisoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
-import { validarMarcasSinRepetir, type ValorRelacion } from "../lib/portada/marcasBanda";
+import { validarMarcasSinRepetir, type FilaBanda } from "../lib/portada/marcasBanda";
 import { seoField } from "../lib/fields/seoField";
 import { SLUG_POLITICA_GARANTIA } from "../lib/politica/animaciones";
 import { tipografiaTituloField } from "../lib/fields/tipografiaTitulo";
+import { BLOQUE_BANDA_LOGO, BLOQUE_BANDA_MARCA } from "./bloques/bandaLogos";
 import { BLOQUES_PAGINA } from "./bloques/bloquesPagina";
 import { validarYouTube } from "../lib/fields/youtube";
 import { enlace, parrafo, texto } from "../lib/fields/textosPortada";
@@ -797,24 +798,23 @@ export const PaginaInstitucional: CollectionConfig = {
         texto("titulo", "Título", "Repuestos para"),
         texto("tituloResaltado", "Final del título, en rojo", "las marcas que trabajas"),
         /*
-         * Qué marcas salen y en qué orden (2026-11-05, dirección). Vacía, todas por orden
-         * alfabético, como hasta ahora. La decisión, en `src/lib/portada/marcasBanda.ts`.
+         * Qué logos salen y en qué orden (2026-11-05, dirección; logos libres desde el
+         * 2026-11-08): filas de marca de repuestos o de LOGO LIBRE en la misma lista. Vacía, todas
+         * las marcas por orden alfabético, como hasta ahora. La decisión, en
+         * `src/lib/portada/marcasBanda.ts`.
          */
         {
           name: "marcasBanda",
-          type: "relationship",
-          relationTo: "marcas",
-          hasMany: true,
-          // Solo los ids: la portada ya tiene las marcas con su logo (`getMarcasRepuestosDePortada`).
-          maxDepth: 0,
+          type: "blocks",
           label: "Marcas de la banda",
+          labels: { singular: "Logo de la banda", plural: "Logos de la banda" },
+          blocks: [BLOQUE_BANDA_MARCA, BLOQUE_BANDA_LOGO],
           validate: (valor: unknown) =>
-            validarMarcasSinRepetir(Array.isArray(valor) ? (valor as ValorRelacion[]) : null),
+            validarMarcasSinRepetir(Array.isArray(valor) ? (valor as FilaBanda[]) : null),
           admin: {
-            isSortable: true,
-            allowCreate: false,
+            initCollapsed: false,
             description:
-              "Elige qué marcas salen en la banda y arrástralas para cambiar el orden: salen de izquierda a derecha en el orden de esta lista. Si la dejas vacía, salen todas las marcas de repuestos por orden alfabético. Una marca sin logo no sale.",
+              "Qué logos salen en la banda y en qué orden: de izquierda a derecha, el de esta lista (arrastra las filas para cambiarlo). Con «Añadir» eliges una «Marca de repuestos» (su logo y su página) o un «Logo libre» (un fabricante que no es marca de repuestos, como Donaldson: su logo, su nombre y un enlace si quieres). Si la dejas vacía, salen todas las marcas de repuestos por orden alfabético.",
           },
         },
         imagenKit(

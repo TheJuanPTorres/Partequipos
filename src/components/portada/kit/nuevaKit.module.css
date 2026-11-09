@@ -18,13 +18,20 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding: 48px var(--nueva-lado) 56px;
+  /*
+   * Abajo, el espaciado común entre secciones (globals.css) MENOS el relleno de la tarjeta de
+   * «Maquinaria pesada usada», que viene debajo (12 · 20 · 24 px en usadosKit.module.css, con sus
+   * mismos cortes): así el hueco visible es el común y no la suma de los dos.
+   */
+  --nueva-hasta-usada: 12px;
+  padding: 48px var(--nueva-lado) calc(var(--espacio-seccion) - var(--nueva-hasta-usada));
   background: #fff;
 }
 
 @media (min-width: 640px) {
   .seccion {
     --nueva-lado: 40px;
+    --nueva-hasta-usada: 20px;
   }
 }
 
@@ -32,7 +39,12 @@
   .seccion {
     --nueva-lado: 2.6%;
     padding-top: 64px;
-    padding-bottom: 64px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .seccion {
+    --nueva-hasta-usada: 24px;
   }
 }
 

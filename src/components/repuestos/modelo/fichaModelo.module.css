@@ -163,7 +163,9 @@
 /*
  * Ronda 12, t5: si «Otros modelos» es lo último de la página, su aire de abajo sobra. Antes del pie manda
  * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ * También el relleno de abajo del #437: manda el común (dirección, 2026-11-09).
  */
 .otros:last-child {
   margin-bottom: 0;
+  padding-bottom: 0;
 }

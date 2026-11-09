@@ -47,12 +47,7 @@
 
 @media (min-width: 1025px) {
   .panel {
-    /*
-     * El contenido no pasa de 1400 px (criterio de espacios, 2026-11-09): sin tope, a 3840 las cinco
-     * tarjetas medían ~680 px de ancho cada una. Los `%` se resuelven contra el ancho del panel, en
-     * el relleno y en el `left` de las franjas.
-     */
-    --panel-x: max(4%, calc((100% - 1400px) / 2));
+    --panel-x: 4%;
     padding-block: 56px;
     border-radius: 32px;
   }

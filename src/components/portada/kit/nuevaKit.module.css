@@ -25,10 +25,10 @@
    */
   --nueva-hasta-usada: 12px;
   /*
-   * Arriba, bajo la barra de secciones: el espaciado común (criterio de espacios de Juan Pablo,
-   * 2026-11-09: ~24 px en móvil, 48 como mucho). Antes tenía un suelo de 48 px también en móvil.
+   * Arriba, bajo la barra de secciones (dirección, ronda 12, t5: se veía pegada): el espaciado
+   * común, sin bajar de los 48 px de antes (48 · 55 · 64 a 390 · 768 · 1010).
    */
-  padding: var(--espacio-seccion) var(--nueva-lado)
+  padding: max(48px, var(--espacio-seccion)) var(--nueva-lado)
     calc(var(--espacio-seccion) - var(--nueva-hasta-usada));
   background: #fff;
 }

@@ -90,9 +90,7 @@
 
 @media (min-width: 1025px) {
   .cabeceraRejilla {
-    /* El alto de la pantalla menos la cabecera, con techo: en una pantalla de 2160 px de alto la
-       cabecera medía 1840 px de aire alrededor de la máquina (criterio de espacios, 2026-11-09). */
-    min-height: min(calc(100svh - 20rem), 600px);
+    min-height: calc(100svh - 20rem);
     padding: 40px;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   }

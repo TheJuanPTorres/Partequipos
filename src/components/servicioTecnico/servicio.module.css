@@ -15,7 +15,8 @@
   display: grid;
   gap: 0;
   /* El contenedor de la página: 0 · 1,5 % · 1,5 %. */
-  padding: 0 1.5% 1.5%;
+  /* Abajo, sin aire propio: antes del pie manda el espaciado común del pie (ronda 12, t5). */
+  padding: 0 1.5%;
   color: var(--color-texto);
 }
 
@@ -630,5 +631,20 @@ video.medio {
   }
   .galeria {
     padding: 0;
+  }
+}
+
+/*
+ * Aquí el contacto va DENTRO de su caja blanca (`.contacto`): el relleno de abajo de
+ * `ContactoMarca` es parte de la caja y se queda (marca.module.css lo quita cuando es lo último
+ * de la página, ronda 12, t5). Mismos valores que allí: 58 px, y 40 px hasta 1024.
+ */
+.contacto > section:last-child {
+  padding-bottom: 58px;
+}
+
+@media (max-width: 1024px) {
+  .contacto > section:last-child {
+    padding-bottom: 40px;
   }
 }

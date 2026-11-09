@@ -720,3 +720,11 @@
     transition: none;
   }
 }
+
+/*
+ * Ronda 12, t5: si «Artículos relacionados» es lo último de la página, su aire de abajo sobra. Antes del pie manda
+ * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ */
+.relacionados:last-child {
+  padding-bottom: 0;
+}

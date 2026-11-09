@@ -469,3 +469,11 @@
   min-height: 44px;
   padding: 0 4px;
 }
+
+/*
+ * Ronda 12, t5: si el índice del blog es lo último de la página, su aire de abajo sobra. Antes del pie manda
+ * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ */
+.zona:last-child {
+  padding-bottom: 0;
+}

@@ -159,3 +159,11 @@
     padding: 0;
   }
 }
+
+/*
+ * Ronda 12, t5: si «Otros modelos» es lo último de la página, su aire de abajo sobra. Antes del pie manda
+ * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ */
+.otros:last-child {
+  margin-bottom: 0;
+}

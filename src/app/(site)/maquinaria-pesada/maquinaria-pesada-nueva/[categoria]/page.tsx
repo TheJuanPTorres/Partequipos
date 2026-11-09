@@ -13,7 +13,7 @@ import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { metadataSinIndexar } from "@/lib/filtros/seo";
-import { recorteVisible } from "@/lib/marca/recorteLogo";
+import { conRecorte } from "@/lib/marca/recorteLogo";
 import {
   barraDeMarcas,
   gruposPorMarcaYTipo,
@@ -22,8 +22,8 @@ import {
   vistaEncabezadoCategoriaNueva,
 } from "@/lib/nueva/paginaCategoria";
 import { tintaSobre } from "@/lib/marca/colorMarca";
-import { conAlt, logoDeMarca, type LogoConAlt } from "@/lib/marca/logoMarca";
-import { vistaBanner } from "@/lib/nueva/bannerMarca";
+import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
+import { bannerDeMarca, vistaBanner } from "@/lib/nueva/bannerMarca";
 import { columnaDeTarjeta } from "@/lib/nueva/paginaKit";
 import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { getLogosMarca } from "@/lib/queries/getLogosMarca";
@@ -182,8 +182,7 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
                   id={`grupo-${g.clave}-t`}
                   titulo={g.titulo}
                   marca={{ nombre, href: `${rutas.marcaMaquinaria(g.marca.slug)}/` }}
-                  logo={logoDe(g.marca)}
-                  vista={vista}
+                  banner={bannerDeMarca(marca, logoDe(g.marca), baldosas)}
                 />
                 <ul className={`${estilosKit.rejilla} ${estilosTarjetas.rejillaKit}`}>
                   {g.tarjetas.map((e, j) => (
@@ -223,9 +222,4 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
       />
     </main>
   );
-}
-
-/** El logo con la parte visible de su fichero (`recorteVisible`), o `null`. */
-async function conRecorte(logo: LogoConAlt | null): Promise<LogoConAlt | null> {
-  return logo ? { ...logo, recorte: await recorteVisible(logo.url) } : null;
 }

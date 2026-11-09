@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache";
 
 import { CLAVE_DESPLIEGUE } from "@/lib/cacheDatos";
 
+import type { LogoConAlt } from "./logoMarca";
 import { SIN_RECORTE, type Recorte } from "./tamanoOptico";
 
 /**
@@ -54,4 +55,9 @@ export async function recorteVisible(url: string): Promise<Recorte> {
     console.error("[logos] No se pudo medir la parte visible de un logo:", String(error));
     return SIN_RECORTE;
   }
+}
+
+/** El logo con la parte visible de su fichero (`recorteVisible`), o `null`. */
+export async function conRecorte(logo: LogoConAlt | null): Promise<LogoConAlt | null> {
+  return logo ? { ...logo, recorte: await recorteVisible(logo.url) } : null;
 }

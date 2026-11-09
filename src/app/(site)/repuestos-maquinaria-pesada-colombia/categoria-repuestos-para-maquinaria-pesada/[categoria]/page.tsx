@@ -32,7 +32,8 @@ import { gruposDeCategoria } from "@/lib/repuestos/grupos";
 import { accesosDe, esCategoriaPrincipal } from "@/lib/repuestos/subcategorias";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { rutas } from "@/lib/routes";
-import { vistaBannerDe } from "@/lib/nueva/bannerMarca";
+import { bannerConLogo } from "@/lib/nueva/bannerMarca";
+import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { metadataDe } from "@/lib/seo/metadata";
 import { tituloEligeRepuesto } from "@/lib/repuestos/tituloGrupos";
 import { tituloPorDefecto } from "@/lib/seo/porDefecto";
@@ -85,18 +86,20 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
   const categoria = await getCategoriaRepuestosPorSlug(slug);
   if (!categoria) notFound();
 
-  const [global, marcas, testimonios, empresa, sedes, todas, selector] = await Promise.all([
-    getRepuestosMarca(),
-    getMarcas(),
-    getTestimoniosDePortada(),
-    getEmpresa(),
-    getSedesDePortada(),
-    getCategoriasRepuestos(),
-    // El selector de marcas de lubricantes (2026-11-04): solo si la categoría lo enciende.
-    categoria.selectorMarcas?.activo
-      ? getMarcasLubricanteSelector().then((m) => vistaSelector(categoria, m))
-      : Promise.resolve(null),
-  ]);
+  const [global, marcas, testimonios, empresa, sedes, todas, selector, baldosas] =
+    await Promise.all([
+      getRepuestosMarca(),
+      getMarcas(),
+      getTestimoniosDePortada(),
+      getEmpresa(),
+      getSedesDePortada(),
+      getCategoriasRepuestos(),
+      // El selector de marcas de lubricantes (2026-11-04): solo si la categoría lo enciende.
+      categoria.selectorMarcas?.activo
+        ? getMarcasLubricanteSelector().then((m) => vistaSelector(categoria, m))
+        : Promise.resolve(null),
+      getBaldosasMarca(),
+    ]);
   // Las páginas que cuelgan de esta categoría (Filtros Donaldson en Filtración, 2026-10-26),
   // con el banner de marca del #385: su color y, a la derecha, su «Fondo del encabezado» o, sin
   // él, la imagen de su tarjeta.
@@ -104,9 +107,13 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
     const c = todas.find((t) => t.id === a.id);
     return {
       ...a,
-      vista: vistaBannerDe(
+      // El logo sobre su color con la regla del selector (2026-11-09, `bannerConLogo`).
+      banner: bannerConLogo(
+        a.nombre,
+        a.logo,
         c?.colorMarca,
         imagenDeMedia(c?.fondoHero, "") ?? imagenDeMedia(c?.imagen, ""),
+        baldosas,
       ),
     };
   });

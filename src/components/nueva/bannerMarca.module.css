@@ -85,34 +85,50 @@
   align-items: center;
   justify-content: center;
   padding: 0 6% 0 12px;
-  background: var(--acento);
-  clip-path: polygon(0 0, 100% 0, 84% 100%, 0 100%);
-}
-
-.logo {
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  max-height: 36px;
-}
-
-/* El logo en una sola tinta sobre el color de la marca (como la barra de marcas). */
-.logoCaja[data-tinta="clara"] .logo {
-  filter: brightness(0) invert(1);
-  opacity: 1;
-}
-
-.logoCaja[data-tinta="oscura"] .logo {
-  filter: brightness(0);
-  opacity: 1;
-}
-
-/* Un logo JPEG (opaco): con sus colores sobre una placa blanca, como la cabecera del kit. */
-.logoCaja[data-tinta="placa"] .logo {
-  box-sizing: content-box;
-  padding: 6px 10px;
-  border-radius: 8px;
+  /* En móvil, el logo de siempre con sus colores sobre la tarjeta blanca (dirección,
+     2026-11-09); el color de la marca, en la franja de la izquierda. */
   background: #fff;
+  box-shadow: inset 5px 0 0 var(--acento);
+}
+
+/*
+ * EL LOGO (2026-11-09, la regla del selector #432/#439): dos versiones en cajas FIJAS
+ * (`CAJA_BANNER`/`CAJA_BANNER_MOVIL`, el tamaño va en línea) con el mismo tamaño óptico y SIN
+ * filtros. En móvil, la de siempre con sus colores; desde tablet, la de la baldosa sobre el color
+ * (o la de siempre sobre una plaquita blanca, `data-placa`).
+ */
+.cajaEscritorio,
+.cajaMovil {
+  position: relative;
+  display: block;
+  flex: none;
+}
+
+.cajaEscritorio {
+  display: none;
+}
+
+.version {
+  position: absolute;
+  inset: 0;
+}
+
+/* La plaquita blanca: fija, la caja y un margen, igual en todas las marcas. */
+.version[data-placa]::before {
+  position: absolute;
+  inset: -6px -12px;
+  border-radius: 10px;
+  background: #fff;
+  content: "";
+}
+
+.soloLectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .logoTexto {
@@ -122,12 +138,15 @@
   text-align: center;
 }
 
-.logoCaja[data-tinta="clara"] .logoTexto {
-  color: #fff;
-}
+/* Sobre la forma de color (desde tablet), el nombre sin logo en la tinta que se lee. */
+@media (min-width: 768px) {
+  .logoCaja[data-tinta="clara"] .logoTexto {
+    color: #fff;
+  }
 
-.logoCaja[data-tinta="oscura"] .logoTexto {
-  color: #000;
+  .logoCaja[data-tinta="oscura"] .logoTexto {
+    color: #000;
+  }
 }
 
 .texto {
@@ -220,12 +239,15 @@
     align-self: stretch;
     padding: 0 3.5rem 0 0;
     background: transparent;
-    clip-path: none;
+    box-shadow: none;
   }
 
-  .logo {
-    max-width: 170px;
-    max-height: 48px;
+  .cajaEscritorio {
+    display: block;
+  }
+
+  .cajaMovil {
+    display: none;
   }
 
   .texto {

@@ -955,7 +955,7 @@ export interface CategoriasTecnica {
      */
     titulo?: string | null;
     /**
-     * Vacío, todas las marcas de lubricantes: primero las que tienen página aquí. Una marca de «Otra web» sin enlace sale con «Muy pronto».
+     * Vacío, todas las marcas de lubricantes: primero las que tienen página aquí. Una marca de «Otra web» sin enlace lleva su «Ver productos» a la portada.
      */
     marcas?: (number | MarcasLubricante)[] | null;
   };
@@ -979,11 +979,11 @@ export interface MarcasLubricante {
   id: number;
   nombre: string;
   /**
-   * «Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, a la categoría «Lubricantes» (su panel dice «Muy pronto»).
+   * «Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, a la categoría «Lubricantes» (su panel lleva a la portada).
    */
   destino?: ('pagina' | 'externo') | null;
   /**
-   * La web de la marca, completa y con https://. Con «Otra web»: adónde lleva en el menú (vacía, a la categoría «Lubricantes», donde dice «Muy pronto»). Con «Su página en este sitio»: «Ver todo» del menú y «Ver productos» del selector llevan a esta web en otra pestaña; su página de aquí sigue igual.
+   * La web de la marca, completa y con https://. Con «Otra web»: adónde lleva en el menú (vacía, a la categoría «Lubricantes», donde su «Ver productos» lleva a la portada). Con «Su página en este sitio»: «Ver todo» del menú y «Ver productos» del selector llevan a esta web en otra pestaña; su página de aquí sigue igual.
    */
   enlaceExterno?: string | null;
   /**

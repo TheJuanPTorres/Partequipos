@@ -15,7 +15,8 @@ import { paisDe, type CodigoPais } from "./pais";
  * - con página aquí (Eni): «Ver productos» → su página o, con «Enlace externo», a esa web en otra
  *   pestaña (2026-11-08);
  * - de «Otra web» con enlace (Dispel): «Ir a su web» → su enlace, en otra pestaña;
- * - de «Otra web» sin enlace: «Muy pronto», sin enlace.
+ * - de «Otra web» sin enlace: «Ver productos» → la portada, en la misma pestaña (2026-11-09,
+ *   provisional hasta que tenga productos).
  *
  * Se enciende con la casilla «Mostrar el selector de marcas» de la categoría
  * (`selectorMarcas.activo`); las marcas, las elegidas en su orden o, vacío, todas (primero las de
@@ -29,8 +30,7 @@ export const COLOR_SIN_COLOR = "#33373d";
 
 export type AccionSelector =
   | { tipo: "pagina"; href: string; texto: "Ver productos" }
-  | { tipo: "externo"; href: string; texto: "Ir a su web" | "Ver productos" }
-  | { tipo: "pronto"; texto: "Muy pronto" };
+  | { tipo: "externo"; href: string; texto: "Ir a su web" | "Ver productos" };
 
 export type PanelSelector = {
   id: number;
@@ -81,7 +81,7 @@ export function accionDe(m: MarcaSelector): AccionSelector {
   const externo = enlaceExternoLubricante(m);
   return externo
     ? { tipo: "externo", href: externo, texto: "Ir a su web" }
-    : { tipo: "pronto", texto: "Muy pronto" };
+    : { tipo: "pagina", href: "/", texto: "Ver productos" };
 }
 
 export function panelDe(m: MarcaSelector): PanelSelector {

@@ -161,8 +161,7 @@
   line-height: 1.5;
 }
 
-.boton,
-.pronto {
+.boton {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -202,12 +201,6 @@
 .boton:focus-visible {
   outline: 3px solid var(--panel-tinta);
   outline-offset: 3px;
-}
-
-/* «Muy pronto» (sin enlace): un recuadro con la tinta del panel, no un botón. */
-.pronto {
-  border: 1.5px solid currentColor;
-  opacity: 0.9;
 }
 
 /* Escritorio y tablet: lado a lado; el elegido se ensancha un 4 % y el otro se recoge otro tanto. */

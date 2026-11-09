@@ -14,7 +14,7 @@
 /* Cabecera roja, baja, con el `<h1>` centrado (blanco sobre #a20f14: 7,9:1). */
 .cabecera {
   display: flex;
-  min-height: 35vh;
+  min-height: clamp(240px, 35vh, 320px);
   box-sizing: border-box;
   padding: 48px 24px;
   flex-direction: column;
@@ -218,8 +218,8 @@
 
 @media (min-width: 1024px) {
   .seccion {
-    padding: 24px 1.5vw 1.5vw;
-    gap: 1.5vw;
+    padding: 24px min(1.5vw, 24px) min(1.5vw, 24px);
+    gap: min(1.5vw, 24px);
   }
 
   .titulo {

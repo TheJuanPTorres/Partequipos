@@ -8,7 +8,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   gap: 48px;
   align-items: center;
-  padding: 24px 5% 96px;
+  padding: 24px 5% 48px;
 }
 
 .texto {
@@ -177,6 +177,6 @@
   .bienvenida {
     grid-template-columns: minmax(0, 1fr);
     gap: 32px;
-    padding: 16px 5% 72px;
+    padding: 16px 5% 32px;
   }
 }

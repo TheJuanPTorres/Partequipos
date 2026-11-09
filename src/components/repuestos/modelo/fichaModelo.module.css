@@ -115,8 +115,8 @@
 /* --- Otros modelos -------------------------------------------------------------------------- */
 
 .otros {
-  margin: 56px max(1.5vw, 12px) 0;
-  padding: 0 4px 56px;
+  margin: 48px max(1.5vw, 12px) 0;
+  padding: 0 4px 48px;
 }
 
 .otrosTitulo {
@@ -140,7 +140,7 @@
 
 @media (max-width: 767px) {
   .ficha {
-    margin-top: 32px;
+    margin-top: 24px;
   }
 
   /* Si el logo y el título no caben en la misma línea, el logo va encima. */
@@ -159,6 +159,6 @@
   }
 
   .otros {
-    padding: 0 0 40px;
+    padding: 0 0 24px;
   }
 }

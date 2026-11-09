@@ -33,6 +33,15 @@ export function enlaceExternoLubricante(m: ConDestino | null | undefined): strin
   return normalizarEnlaceExterno(m.enlaceExterno);
 }
 
+/**
+ * La web de la marca, tenga o no página aquí (Eni → su web oficial, Juan Pablo, 2026-11-08): con
+ * página propia, «Ver todo» del menú y «Ver productos» del selector van a ella en otra pestaña; su
+ * página de este sitio se queda (sitemap y URL, igual). `null` si está vacía o no es válida.
+ */
+export function webDeLubricante(m: ConDestino | null | undefined): string | null {
+  return m ? normalizarEnlaceExterno(m.enlaceExterno) : null;
+}
+
 /** Para las consultas públicas: solo las marcas con página en este sitio. */
 export const LUBRICANTE_CON_PAGINA: Where = {
   or: [{ destino: { exists: false } }, { destino: { not_equals: DESTINO_EXTERNO } }],

@@ -107,6 +107,19 @@ describe("lubricantes: selector de marcas de la categoría «Lubricantes» (2026
     assert.equal(p.logo?.alt, "Logo de Eni");
   });
 
+  it("Eni con «Enlace externo»: «Ver productos» a su web, fuera (2026-11-08)", () => {
+    const conWeb = { ...eni, enlaceExterno: "https://lubricantesenicolombia.com/" };
+    const p = vistaSelector(activa, [conWeb])!.paneles[0]!;
+    assert.deepEqual(p.accion, {
+      tipo: "externo",
+      href: "https://lubricantesenicolombia.com/",
+      texto: "Ver productos",
+    });
+    // Sigue teniendo su página aquí: el destino no cambia.
+    assert.equal(tienePaginaPropiaLubricante(conWeb), true);
+    assert.equal(enlaceExternoLubricante(conWeb), null);
+  });
+
   it("Dispel: sin enlace, «Muy pronto»; con enlace, «Ir a su web» a ese enlace", () => {
     assert.deepEqual(vistaSelector(activa, [dispel])!.paneles[0]!.accion, {
       tipo: "pronto",

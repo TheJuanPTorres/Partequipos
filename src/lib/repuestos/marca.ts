@@ -109,6 +109,8 @@ export type PanelTarjeta = {
 export type TarjetaMarca = {
   clave: string;
   titulo: string;
+  /** Nombre corto para las tarjetas de texto de la marca («Excavadora EX»); el largo es `titulo`. */
+  tituloCorto?: string;
   /** `null`: una tarjeta sin página (un modelo que WordPress nombra sin ficha): sin botón. */
   href: string | null;
   /** Decorativa: el título ya nombra la tarjeta. */
@@ -181,6 +183,7 @@ export function tarjetasDeTipos(
           {
             clave: `tipo-${t.id}`,
             titulo,
+            tituloCorto: t.nombre.trim(),
             href,
             imagen: imagenTipo,
             soloEscritorio: false,
@@ -196,6 +199,7 @@ export function tarjetasDeTipos(
         return {
           clave: `tipo-${t.id}-${s.ancla}`,
           titulo: `${titulo} ${s.nombre.toUpperCase()}`,
+          tituloCorto: `${t.nombre.trim()} ${s.nombre.toUpperCase()}`,
           // Con la barra final: así el ancla no pasa por la redirección de `trailingSlash`.
           href: `${href}/#${s.ancla}`,
           imagen: imagenSerie,

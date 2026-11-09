@@ -39,8 +39,8 @@ export function fondoDePastilla(color: string): string {
  *   y su «Logo para la baldosa», pareja ya diseñada), ese logo tal cual sobre ese fondo, un poco
  *   más oscuro si su logo blanco no llegaría a 3:1 (`fondoDePastilla`): Hitachi, Yanmar y LiuGong
  *   con su logo blanco; Case, su logo original sobre su crema;
- * - sin baldosa, el color propio (o el naranja de siempre) y el logo de siempre, con sus colores,
- *   sobre una plaquita blanca (`placa`).
+ * - sin baldosa, el color propio (o el naranja de siempre) y el logo de siempre sobre una plaquita
+ *   blanca (`placa`), tal como sale en todo el sitio sobre fondo claro (`LogoMarca`).
  */
 export type LogoSobreColor = { fondo: string; logo: LogoConAlt | null; placa: boolean };
 
@@ -60,7 +60,9 @@ export function logoSobreColor(
     };
   return {
     fondo: colorDeMarca(colorPropio) ?? COLOR_SIN_MARCA,
-    logo: logo ? { ...logo, oscuro: false, blanco: false } : null,
+    // Sobre la plaquita BLANCA, como en todo el sitio (`LogoMarca`): con sus colores o, si la
+    // marca tiene «Pintar el logo en oscuro en el menú» (un logo blanco), en tinta oscura.
+    logo,
     placa: logo !== null,
   };
 }

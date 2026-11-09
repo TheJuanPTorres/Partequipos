@@ -110,9 +110,9 @@ describe("bannerConLogo: el logo sobre el color, con la regla del selector (2026
     assert.equal(b.vista.acento, fondoDePastilla("#f36c1b"));
     // El blanco del logo, al menos a 3:1 sobre la forma.
     assert.ok(contraste(1, luminancia(...rgbDeHex(b.vista.acento)!)) >= 3);
-    // En móvil, el de siempre con sus colores (sin la tinta del menú).
+    // En móvil (fondo blanco), el de todo el sitio tal cual: un logo blanco, con su tinta oscura.
     assert.equal(b.movil?.url, "/hitachi.png");
-    assert.equal(b.movil?.oscuro, false);
+    assert.equal(b.movil?.oscuro, true);
   });
 
   it("Case: su logo original sobre su crema, que no se toca", () => {

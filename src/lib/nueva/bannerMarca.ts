@@ -86,7 +86,7 @@ export function logoOpaco(url: string): boolean {
  * sobre la forma del color va el logo de `logoSobreColor` (la baldosa de la marca de repuestos
  * del mismo nombre con su color, oscurecido lo justo para el logo blanco; o el logo de siempre
  * sobre una plaquita blanca), SIN filtros; el color del banner es ese fondo. `movil`: el logo de
- * siempre, con sus colores, para la tarjeta blanca del móvil.
+ * siempre, tal como sale en todo el sitio sobre fondo claro, para la tarjeta blanca del móvil.
  */
 export type BannerConLogo = {
   vista: VistaBanner;
@@ -107,7 +107,9 @@ export function bannerConLogo(
   return {
     vista: vistaBannerDe(sobre.fondo, foto),
     sobreColor: { ...sobre, placa },
-    movil: logo ? { ...logo, oscuro: false, blanco: false } : null,
+    // Sobre la tarjeta blanca, el logo de todo el sitio tal cual (`LogoMarca`: sus colores o,
+    // con «Pintar el logo en oscuro en el menú», un logo blanco en tinta oscura).
+    movil: logo,
   };
 }
 

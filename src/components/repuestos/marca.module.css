@@ -1906,6 +1906,63 @@ a.modelo:hover {
 }
 
 /*
+ * BALDOSAS COMPACTAS dentro de la ficha de modelo (Juan Pablo, #433): las mismas baldosas, más
+ * pequeñas, 3 por fila (2 en móvil). El `li` no lleva `categoriaCaja`: sin la colocación de 5.
+ */
+.baldosasFichaSeccion {
+  margin-top: 8px;
+}
+
+.baldosasFichaTitulo {
+  margin: 0 0 14px;
+  color: var(--color-texto);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.baldosasFicha {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  list-style: none;
+}
+
+.baldosasFicha > li {
+  display: flex;
+  min-width: 0;
+}
+
+.baldosaCompacta {
+  padding: 8px 8px 12px;
+  gap: 6px;
+  border-radius: 16px;
+}
+
+.baldosaCompacta .baldosaFoto {
+  aspect-ratio: 16 / 9;
+}
+
+.baldosaCompacta .baldosaNombre {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.baldosaCompacta .baldosaVer {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+@media (max-width: 767px) {
+  .baldosasFicha {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+}
+
+/*
  * ANIMACIONES del índice de categorías (`ANIMACIONES_CATEGORIAS`, interruptor por animación;
  * cuelgan de `data-anim` de `ZonaAnimada`). Curva y duración del listado de usados (#320).
  * C1 (entrada escalonada) va en `ZonaAnimada`.

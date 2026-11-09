@@ -8,7 +8,7 @@
   display: grid;
   margin: 48px max(1.5vw, 12px) 0;
   overflow: hidden;
-  grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+  grid-template-columns: minmax(0, 13fr) minmax(0, 8fr);
   border-radius: 30px;
   background: var(--color-fondo);
 }
@@ -86,7 +86,11 @@
 /* --- Formulario corto ---------------------------------------------------------------------- */
 
 /* El formulario sobre un panel gris DENTRO de la tarjeta blanca: el contenedor queda cerrado. */
+/* Pegado arriba mientras se recorren las baldosas de la izquierda: el formulario siempre a la vista. */
 .cotizar {
+  position: sticky;
+  top: 92px;
+  align-self: start;
   min-width: 0;
   margin: 20px 20px 20px 0;
   padding: 32px 32px;
@@ -131,6 +135,7 @@
   }
 
   .cotizar {
+    position: static;
     margin: 0 16px 16px;
     padding: 20px;
   }

@@ -7,7 +7,6 @@ import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { AyudaWhatsApp } from "@/components/repuestos/modelo/AyudaWhatsApp";
-import { BaldosasCategorias } from "@/components/repuestos/BaldosasCategorias";
 import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
 import { FichaModelo } from "@/components/repuestos/modelo/FichaModelo";
 import { OtrosModelosLista } from "@/components/repuestos/modelo/OtrosModelosLista";
@@ -149,44 +148,40 @@ export async function PaginaModeloRepuesto({
         <JsonLd data={[productJsonLd, buildBreadcrumbJsonLd(breadcrumbs)]} />
         {/* La página ya tiene su formulario: el pie no pinta la tarjeta roja. */}
         <PieSinTarjeta />
-        <FichaModelo
-          migas={breadcrumbs}
-          titulo={tituloFichaModelo({ tipo, modelo })}
-          logo={logo}
-          linea={lineaDeTexto(modelo.descripcion)}
-          datos={datosClaveModelo({
-            tipo: tipo.nombre,
-            serie: modelo.serie,
-            modelo: texto(modelo.codigo) || modelo.nombre,
-          })}
-          formulario={configContactoMarca({
-            origen: ruta,
-            siteKey: turnstileSiteKey(),
-            whatsapp: whatsappModelo
-              ? conMensaje(whatsappModelo, `Hola, busco ${referencia}.`)
-              : undefined,
-            boton: "Pedir cotización",
-            marca: modelo.nombre,
-            modelo: { id: modelo.id, nombre: modelo.nombre },
-            formulario: {
-              titulo: "Pedir cotización",
-              conCiudad: true,
-              etiquetaMensaje: "¿En qué estás interesado?",
-            },
-            // El «Consulta sobre» ya lo dice el formulario: el mensaje solo invita a seguir.
-            mensajeInicial: `Necesito cotizar ${referencia.charAt(0).toLowerCase()}${referencia.slice(1)}: `,
-          })}
-        />
-        {/* Los tipos de repuesto, con el estilo que ya tenía esta sección (baldosas del índice). */}
         <ZonaAnimada
           interruptores={ANIMACIONES_CATEGORIAS}
           permitirUrl={process.env.VERCEL_ENV !== "production"}
           entrada="C1"
         >
-          <BaldosasCategorias
-            id={ANCLA_CATEGORIAS}
-            titulo={tituloDisponibles4086({ marca, tipo, modelo })}
+          <FichaModelo
             categorias={tarjetasDeCategorias(delTipo)}
+            tituloCategorias={tituloDisponibles4086({ marca, tipo, modelo })}
+            migas={breadcrumbs}
+            titulo={tituloFichaModelo({ tipo, modelo })}
+            logo={logo}
+            linea={lineaDeTexto(modelo.descripcion)}
+            datos={datosClaveModelo({
+              tipo: tipo.nombre,
+              serie: modelo.serie,
+              modelo: texto(modelo.codigo) || modelo.nombre,
+            })}
+            formulario={configContactoMarca({
+              origen: ruta,
+              siteKey: turnstileSiteKey(),
+              whatsapp: whatsappModelo
+                ? conMensaje(whatsappModelo, `Hola, busco ${referencia}.`)
+                : undefined,
+              boton: "Pedir cotización",
+              marca: modelo.nombre,
+              modelo: { id: modelo.id, nombre: modelo.nombre },
+              formulario: {
+                titulo: "Pedir cotización",
+                conCiudad: true,
+                etiquetaMensaje: "¿En qué estás interesado?",
+              },
+              // El «Consulta sobre» ya lo dice el formulario: el mensaje solo invita a seguir.
+              mensajeInicial: `Necesito cotizar ${referencia.charAt(0).toLowerCase()}${referencia.slice(1)}: `,
+            })}
           />
         </ZonaAnimada>
         {vista.piezas.length > 0 ? (

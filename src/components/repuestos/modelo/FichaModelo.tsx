@@ -1,8 +1,10 @@
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
+import { BaldosasCategorias } from "@/components/repuestos/BaldosasCategorias";
 import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
+import type { TarjetaMarca } from "@/lib/repuestos/marca";
 import type { DatoClave } from "@/lib/repuestos/fichaModelo";
 import type { BreadcrumbItem } from "@/lib/seo/jsonLd";
 
@@ -28,6 +30,8 @@ export function FichaModelo({
   logo,
   linea,
   datos,
+  categorias,
+  tituloCategorias,
   formulario,
 }: {
   migas: BreadcrumbItem[];
@@ -36,6 +40,9 @@ export function FichaModelo({
   /** Una línea de texto bajo el título; vacía, no se pinta. */
   linea: string;
   datos: DatoClave[];
+  /** Los tipos de repuesto del tipo de máquina, en baldosas compactas bajo los datos clave. */
+  categorias: TarjetaMarca[];
+  tituloCategorias: string;
   formulario: ConfigFormulario;
 }) {
   return (
@@ -72,6 +79,12 @@ export function FichaModelo({
             ))}
           </dl>
         ) : null}
+        <BaldosasCategorias
+          id="modelo-categorias"
+          titulo={tituloCategorias}
+          categorias={categorias}
+          compacta
+        />
       </div>
 
       <div className={estilos.cotizar} id="modelo-contacto">

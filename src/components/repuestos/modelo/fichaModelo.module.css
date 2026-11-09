@@ -1,0 +1,161 @@
+/*
+ * Ficha de la página de modelo SIN FOTO (Ronda 12, 2026-11-08). Un solo contenedor blanco de
+ * radio 30, como la cabecera anterior, a dos columnas: información (55 %) y el formulario corto
+ * (45 %) sobre el gris de sección. En móvil, la información arriba y el formulario debajo.
+ * Va dentro de `.pagina` de marca: usa `--marca-amarillo` (el color de la marca).
+ */
+.ficha {
+  display: grid;
+  margin: 48px max(1.5vw, 12px) 0;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 13fr) minmax(0, 8fr);
+  border-radius: 30px;
+  background: var(--color-fondo);
+}
+
+.info {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 26px;
+  padding: 4.5% 5%;
+}
+
+.migas nav {
+  margin-bottom: 0;
+}
+
+.marcaFila {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: auto;
+  height: 30px;
+  max-width: 120px;
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto);
+  overflow-wrap: break-word;
+}
+
+.sinCorte {
+  white-space: nowrap;
+}
+
+.linea {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--color-texto);
+  line-height: 1.5;
+}
+
+/* Datos clave: pastillas pequeñas con la etiqueta encima del valor. */
+.datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+}
+
+.dato {
+  min-width: 96px;
+  padding: 8px 16px;
+  border-radius: 14px;
+  background: var(--color-fondo-seccion);
+}
+
+.dato dt {
+  color: #4b4a49;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.dato dd {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* --- Formulario corto ---------------------------------------------------------------------- */
+
+/* El formulario sobre un panel gris DENTRO de la tarjeta blanca: el contenedor queda cerrado. */
+/* Pegado arriba mientras se recorren las baldosas de la izquierda: el formulario siempre a la vista. */
+.cotizar {
+  position: sticky;
+  top: 92px;
+  align-self: start;
+  min-width: 0;
+  margin: 20px 20px 20px 0;
+  padding: 32px 32px;
+  border-radius: 22px;
+  background: var(--color-fondo-seccion);
+}
+
+.cotizarTitulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-4);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.cotizar form {
+  margin-top: 14px;
+}
+
+/* --- Otros modelos -------------------------------------------------------------------------- */
+
+.otros {
+  margin: 56px max(1.5vw, 12px) 72px;
+  padding: 0 4px;
+}
+
+.otrosTitulo {
+  margin: 0 0 16px;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-4);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* Borde fino y visible: las tarjetas se distinguen del fondo (Juan Pablo, #433). */
+.otros ul a {
+  border: 1px solid #c8c8c8;
+}
+
+@media (max-width: 1024px) {
+  .ficha {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .info {
+    padding: 28px 24px;
+  }
+
+  .cotizar {
+    position: static;
+    margin: 0 16px 16px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  .ficha {
+    margin-top: 32px;
+  }
+
+  .info {
+    padding: 24px 20px;
+  }
+
+  .otros {
+    padding: 0;
+  }
+}

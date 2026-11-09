@@ -22,14 +22,56 @@ export function BaldosasCategorias({
   id,
   titulo,
   categorias,
+  compacta = false,
 }: {
   id: string;
   titulo: string;
   categorias: TarjetaMarca[];
+  /**
+   * Dentro de la ficha de modelo (Juan Pablo, #433): sin el recuadro blanco ni el título grande,
+   * 3 por fila (2 en móvil) y la baldosa más pequeña; el mismo estilo y las mismas animaciones.
+   */
+  compacta?: boolean;
 }) {
   const conEnlace = categorias.filter((c) => c.href);
   if (conEnlace.length === 0) return null;
   const idTitulo = `${id}-titulo`;
+  if (compacta) {
+    return (
+      <section id={id} className={estilos.baldosasFichaSeccion} aria-labelledby={idTitulo}>
+        <h2 id={idTitulo} className={estilos.baldosasFichaTitulo}>
+          {titulo.split("\n").join(" ")}
+        </h2>
+        <ul className={estilos.baldosasFicha} data-entrada>
+          {conEnlace.map((c) => (
+            <li key={c.clave}>
+              <Link
+                href={c.href ?? "#"}
+                className={`${estilos.baldosaCategoria} ${estilos.baldosaCompacta}`}
+              >
+                <span className={estilos.baldosaFoto}>
+                  {c.imagen ? (
+                    <Image
+                      src={c.imagen.url}
+                      alt=""
+                      width={c.imagen.width}
+                      height={c.imagen.height}
+                      sizes="(max-width: 767px) 40vw, 200px"
+                      className={estilos.baldosaFotoImg}
+                    />
+                  ) : null}
+                </span>
+                <span className={estilos.baldosaNombre}>{c.titulo}</span>
+                <span className={estilos.baldosaVer} aria-hidden="true">
+                  Ver productos <span className={estilos.baldosaFlecha}>→</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  }
   return (
     <section id={id} className={estilos.mostrarMarcas} aria-labelledby={idTitulo}>
       <div className={`${estilos.mostrarMarcasRecuadro} ${estilos.categoriasRecuadro}`}>

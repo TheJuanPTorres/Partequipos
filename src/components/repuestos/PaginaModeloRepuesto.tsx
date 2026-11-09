@@ -2,37 +2,43 @@ import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
-import { BaldosasCategorias } from "@/components/repuestos/BaldosasCategorias";
 import { CategoriasMarca } from "@/components/repuestos/CategoriasMarca";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { AyudaWhatsApp } from "@/components/repuestos/modelo/AyudaWhatsApp";
-import { CabeceraModelo } from "@/components/repuestos/modelo/CabeceraModelo";
-import { PresentacionModelo } from "@/components/repuestos/modelo/PresentacionModelo";
 import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
+import { FichaModelo } from "@/components/repuestos/modelo/FichaModelo";
+import { OtrosModelosLista } from "@/components/repuestos/modelo/OtrosModelosLista";
+import { PresentacionModelo } from "@/components/repuestos/modelo/PresentacionModelo";
 import estilosModelo from "@/components/repuestos/modelo/modelo.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
+import { getModelosDeTipo } from "@/lib/queries/getModelos";
 import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { categoriasDeMarca, logoConAlt } from "@/lib/repuestos/marca";
 import { ANIMACIONES_CATEGORIAS } from "@/lib/repuestos/animacionesCategorias";
-import { ANIMACIONES_MODELO } from "@/lib/repuestos/animacionesModelo";
+import { tarjetasDeCategorias } from "@/lib/repuestos/plantillaTipo";
+import {
+  datosClaveModelo,
+  tituloFichaModelo,
+  lineaDeTexto,
+  otrosModelosDelTipo,
+} from "@/lib/repuestos/fichaModelo";
 import {
   categoriasDelTipo,
   referenciaModelo4086,
   tituloDisponibles4086,
-  tituloModelo4086,
   usaDisenoPropio,
   vistaModelo,
 } from "@/lib/repuestos/modelo";
-import { tarjetasDeCategorias } from "@/lib/repuestos/plantillaTipo";
+import { enlacesDeModelos } from "@/lib/repuestos/tipo";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
-import { tituloPorDefecto } from "@/lib/seo/porDefecto";
+import { tipoEnTitulo, tituloPorDefecto } from "@/lib/seo/porDefecto";
 import { buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonLd";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
@@ -125,61 +131,57 @@ export async function PaginaModeloRepuesto({
     descripcion: modelo.descripcion,
     marca: marca.nombre,
     codigo: modelo.codigo,
-    imagenes: imagenes.map((img) => img.url),
+    // Sin imagen: la página ya no muestra fotos de máquinas (Ronda 12) y el JSON-LD no declara lo que no se ve.
   });
 
   if (!usaDisenoPropio(global)) {
     const referencia = referenciaModelo4086({ marca, tipo, modelo });
     const whatsappModelo = enlaceWhatsApp(empresa.whatsapp);
-    // La plantilla 4086 de Andrés (2026-10-26): cabecera partida, las categorías del tipo en las
-    // BALDOSAS del índice de categorías técnicas (con C1–C3) y el formulario.
+    const otros = otrosModelosDelTipo(
+      enlacesDeModelos(marca, tipo, await getModelosDeTipo(tipo.id)),
+      modelo,
+    );
+    // Ronda 12 (2026-11-08): SIN FOTOS de máquinas (el cliente vende repuestos). Una ficha a dos
+    // columnas (información y formulario corto con el modelo puesto) y, debajo, los otros modelos.
     return (
-      <main className={estilos.pagina}>
+      <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
         <JsonLd data={[productJsonLd, buildBreadcrumbJsonLd(breadcrumbs)]} />
         {/* La página ya tiene su formulario: el pie no pinta la tarjeta roja. */}
         <PieSinTarjeta />
         <ZonaAnimada
-          interruptores={{ ...ANIMACIONES_CATEGORIAS, ...ANIMACIONES_MODELO }}
+          interruptores={ANIMACIONES_CATEGORIAS}
           permitirUrl={process.env.VERCEL_ENV !== "production"}
           entrada="C1"
         >
-          <CabeceraModelo
+          <FichaModelo
+            categorias={tarjetasDeCategorias(delTipo)}
+            tituloCategorias={tituloDisponibles4086({ marca, tipo, modelo })}
             migas={breadcrumbs}
-            titulo={tituloModelo4086({ marca, tipo, modelo })}
-            datos={{
-              codigo: texto(modelo.codigo),
-              tipo: texto(tipo.nombre),
-              marca: texto(marca.nombre),
-            }}
-            // UNA sola foto (Juan Pablo, 2026-10-26): la del modelo y, sin ella, la del tipo o la
-            // de la marca (estas dos, decorativas).
-            fondo={
-              imagenes[0] ?? imagenDeMedia(tipo.imagen, "") ?? imagenDeMedia(marca.fondoHero, "")
-            }
-            texto={texto(modelo.descripcion)}
-            cotizarHref={`#${ANCLA_CONTACTO}`}
+            titulo={tituloFichaModelo({ tipo, modelo })}
+            logo={logo}
+            linea={lineaDeTexto(modelo.descripcion)}
+            datos={datosClaveModelo({
+              tipo: tipo.nombre,
+              serie: modelo.serie,
+              modelo: texto(modelo.codigo) || modelo.nombre,
+            })}
             formulario={configContactoMarca({
               origen: ruta,
               siteKey: turnstileSiteKey(),
-              whatsapp: enlaceWhatsApp(empresa.whatsapp),
-              boton: "Enviar",
+              whatsapp: whatsappModelo
+                ? conMensaje(whatsappModelo, `Hola, busco ${referencia}.`)
+                : undefined,
+              boton: "Pedir cotización",
               marca: modelo.nombre,
               modelo: { id: modelo.id, nombre: modelo.nombre },
               formulario: {
-                titulo: "Cotizar repuestos",
+                titulo: "Pedir cotización",
                 conCiudad: true,
                 etiquetaMensaje: "¿En qué estás interesado?",
               },
-              mensajeInicial: `Consulta sobre: ${referencia}`,
+              // El «Consulta sobre» ya lo dice el formulario: el mensaje solo invita a seguir.
+              mensajeInicial: `Necesito cotizar ${referencia.charAt(0).toLowerCase()}${referencia.slice(1)}: `,
             })}
-            whatsapp={
-              whatsappModelo ? conMensaje(whatsappModelo, `Hola, busco ${referencia}.`).href : null
-            }
-          />
-          <BaldosasCategorias
-            id={ANCLA_CATEGORIAS}
-            titulo={tituloDisponibles4086({ marca, tipo, modelo })}
-            categorias={tarjetasDeCategorias(delTipo)}
           />
         </ZonaAnimada>
         {vista.piezas.length > 0 ? (
@@ -189,21 +191,10 @@ export async function PaginaModeloRepuesto({
             ))}
           </ul>
         ) : null}
-        <ContactoMarca
-          id={ANCLA_CONTACTO}
-          titulo={texto(global.contactoTitulo)}
-          subtitulo={texto(global.modeloContactoTitulo) || texto(global.contactoSubtitulo)}
-          boton={texto(global.contactoBoton) || "Enviar solicitud"}
-          origen={ruta}
-          siteKey={turnstileSiteKey()}
-          whatsapp={enlaceWhatsApp(empresa.whatsapp)}
-          marca={modelo.nombre}
-          modelo={{ id: modelo.id, nombre: modelo.nombre }}
-          formulario={{
-            titulo: texto(global.modeloContactoTitulo) || "Solicitar este repuesto",
-            conCiudad: true,
-            etiquetaMensaje: "¿En qué estás interesado?",
-          }}
+        <OtrosModelosLista
+          id="otros-modelos"
+          titulo={`Otros modelos de ${tipoEnTitulo(tipo.nombre)} ${marca.nombre}`}
+          modelos={otros}
         />
       </main>
     );

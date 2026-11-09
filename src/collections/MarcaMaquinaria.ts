@@ -80,7 +80,7 @@ export const MarcaMaquinaria: CollectionConfig = {
         position: "sidebar",
         placeholder: "https://…",
         description:
-          "Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap ni como tarjeta de la portada. Vacío, la marca tiene su página como siempre.",
+          "Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap, y su tarjeta de «Maquinaria pesada nueva» en la portada lleva a esta dirección. Vacío, la marca tiene su página como siempre.",
       },
     },
     // Nivel superior de su rama: unicidad global del slug.
@@ -109,6 +109,58 @@ export const MarcaMaquinaria: CollectionConfig = {
         description:
           "Fondo de la tarjeta de esta marca en el inicio si no tiene «Foto de fondo de la cabecera» del «Kit de marca» (esa manda).",
       },
+    },
+    /*
+     * TARJETA DE «MAQUINARIA PESADA NUEVA» EN LA PORTADA (2026-11-08, diseño del cliente
+     * `portada-nueva-v2`): la máquina recortada sobre el paisaje y, para una marca que vende un
+     * distribuidor (LiuGong), «Distribuido por» con su logo. Todo opcional.
+     */
+    {
+      name: "portada",
+      type: "group",
+      label: "Tarjeta en la portada («Maquinaria pesada nueva»)",
+      admin: {
+        description:
+          "La tarjeta lleva el color y el logo de la marca (el de su baldosa si la tiene), esta máquina sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.",
+      },
+      fields: [
+        {
+          name: "maquina",
+          type: "upload",
+          relationTo: "media",
+          label: "Máquina de la tarjeta (PNG o WebP transparente)",
+          admin: {
+            description:
+              "La máquina recortada, de perfil y sin fondo (900 px de ancho o más). Decorativa. Vacía, la tarjeta lleva la foto de la marca.",
+          },
+        },
+        {
+          type: "row",
+          fields: [
+            {
+              name: "distribuidorNombre",
+              type: "text",
+              label: "Distribuidor: nombre",
+              admin: {
+                width: "50%",
+                description:
+                  "Solo si la marca la vende un distribuidor (por ejemplo, Maquitecno). Sale «Distribuido por» con su logo.",
+              },
+            },
+            {
+              name: "distribuidorLogo",
+              type: "upload",
+              relationTo: "media",
+              label: "Distribuidor: logo (PNG o WebP transparente)",
+              admin: {
+                width: "50%",
+                description:
+                  "Sobre un color oscuro se pinta en blanco. Su texto alternativo es el nombre del distribuidor.",
+              },
+            },
+          ],
+        },
+      ],
     },
     {
       name: "ordenPortada",

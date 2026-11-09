@@ -531,6 +531,11 @@ export const PaginaInstitucional: CollectionConfig = {
           "Foto de obra del fondo",
           "Foto horizontal grande (1920 px o más), con el lado izquierdo ya fundido en blanco: título y tarjetas van encima. Decorativa. Vacía, fondo blanco.",
         ),
+        imagenKit(
+          "fondoTarjetas",
+          "Paisaje de las tarjetas de marca",
+          "Foto horizontal de montañas y terreno (2000 px o más) que va al pie de cada tarjeta, bajo la máquina, fundida con el color de la marca. Decorativa. Vacía, las tarjetas van solo con su color.",
+        ),
       ],
     },
     /*

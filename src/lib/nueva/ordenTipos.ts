@@ -1,6 +1,8 @@
 /**
  * ORDEN DE LOS TIPOS DE MAQUINARIA NUEVA (2026-10-22, dirección): el de la web antigua, para el
- * megamenú «Maquinaria pesada nueva → Por tipo de máquina» y el índice de tipos. Se compara por
+ * megamenú «Maquinaria pesada nueva → Por tipo de máquina» y el índice de tipos. Desde el
+ * 2026-11-09 las CATEGORÍAS siguen el orden del panel (`unaEntradaPorTipo`); esta lista solo
+ * ordena los tipos sueltos (sin categoría) y fue el orden inicial que sembró la migración. Se compara por
  * el COMIENZO del nombre y su raíz, sin tildes ni mayúsculas, así «Bulldozers» va donde «Bulldozer». Un
  * tipo que no está en la lista va detrás, por orden alfabético.
  */
@@ -49,14 +51,19 @@ function claveDeTipo(nombre: string): string {
 }
 
 /**
- * UNA entrada por tipo, para el megamenú y el índice de tipos, en el orden de la web antigua.
+ * UNA entrada por tipo, para el megamenú y el índice de tipos.
+ *
+ * EL ORDEN ES EL DEL PANEL (dirección, 2026-11-09): las categorías llegan ya ordenadas por su
+ * `_order` (se arrastran en la lista de «Categorías de maquinaria nueva», `orderable`) y se
+ * conservan en ese orden. La migración `…_categorias_nueva_orden` sembró como orden inicial el de
+ * la web antigua (`ORDEN_TIPOS_NUEVA`), el que había hasta entonces.
  *
  * Desde el 2026-10-23 (dirección, tarea 9) la CATEGORÍA del tipo gana SIEMPRE al tipo de una
  * marca: «Por tipo de máquina» lleva a la página GENERAL del tipo (la de las categorías que
  * mezclan marcas, #326), aunque hoy solo tenga equipos de una marca. El tipo de una marca (casilla
  * «Tarjeta en el índice de tipos») solo sale si su tipo NO tiene categoría, para no perder la
- * entrada mientras se crea. Dos categorías del mismo tipo: la de más marcas. (Antes, la del 2026-10-22:
- * la categoría solo ganaba si mezclaba 2 o más marcas.)
+ * entrada mientras se crea: va DETRÁS de las categorías, en el orden de la web antigua. Dos
+ * categorías del mismo tipo: la de más marcas, en el puesto de la primera.
  */
 export function unaEntradaPorTipo<T>(
   categorias: readonly { nombre: string; marcas: number; dato: T }[],
@@ -68,9 +75,13 @@ export function unaEntradaPorTipo<T>(
     const previa = porClave.get(clave);
     if (!previa || c.marcas > previa.marcas) porClave.set(clave, c);
   }
+  const sueltos = new Map<string, { nombre: string; dato: T }>();
   for (const t of tipos) {
     const clave = claveDeTipo(t.nombre);
-    if (!porClave.has(clave)) porClave.set(clave, { nombre: t.nombre, marcas: 1, dato: t.dato });
+    if (!porClave.has(clave) && !sueltos.has(clave)) sueltos.set(clave, t);
   }
-  return ordenarTiposNueva([...porClave.values()], (e) => e.nombre).map((e) => e.dato);
+  return [
+    ...[...porClave.values()].map((e) => e.dato),
+    ...ordenarTiposNueva([...sueltos.values()], (e) => e.nombre).map((e) => e.dato),
+  ];
 }

@@ -526,11 +526,14 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Para cambiar el orden de las tarjetas del índice de tipos y del menú «Por tipo de máquina», arrastra cada fila por su asa (a la izquierda). El orden se guarda solo al soltarla. Si la lista está ordenada por otra columna, quita ese orden para ver el asa.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categorias-maquinaria".
  */
 export interface CategoriasMaquinaria {
   id: number;
+  _order?: string | null;
   nombre: string;
   /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
@@ -955,7 +958,7 @@ export interface CategoriasTecnica {
      */
     titulo?: string | null;
     /**
-     * Vacío, todas las marcas de lubricantes: primero las que tienen página aquí. Una marca de «Otra web» sin enlace sale con «Muy pronto».
+     * Vacío, todas las marcas de lubricantes: primero las que tienen página aquí. Una marca de «Otra web» sin enlace lleva su «Ver productos» a la portada.
      */
     marcas?: (number | MarcasLubricante)[] | null;
   };
@@ -979,11 +982,11 @@ export interface MarcasLubricante {
   id: number;
   nombre: string;
   /**
-   * «Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, a la categoría «Lubricantes» (su panel dice «Muy pronto»).
+   * «Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, a la categoría «Lubricantes» (su panel lleva a la portada).
    */
   destino?: ('pagina' | 'externo') | null;
   /**
-   * La web de la marca, completa y con https://. Con «Otra web»: adónde lleva en el menú (vacía, a la categoría «Lubricantes», donde dice «Muy pronto»). Con «Su página en este sitio»: «Ver todo» del menú y «Ver productos» del selector llevan a esta web en otra pestaña; su página de aquí sigue igual.
+   * La web de la marca, completa y con https://. Con «Otra web»: adónde lleva en el menú (vacía, a la categoría «Lubricantes», donde su «Ver productos» lleva a la portada). Con «Su página en este sitio»: «Ver todo» del menú y «Ver productos» del selector llevan a esta web en otra pestaña; su página de aquí sigue igual.
    */
   enlaceExterno?: string | null;
   /**
@@ -3079,6 +3082,7 @@ export interface TiposMaquinariaSelect<T extends boolean = true> {
  * via the `definition` "categorias-maquinaria_select".
  */
 export interface CategoriasMaquinariaSelect<T extends boolean = true> {
+  _order?: T;
   nombre?: T;
   slug?: T;
   descripcion?: T;
@@ -4171,7 +4175,7 @@ export interface RepuestosMarca {
   createdAt?: string | null;
 }
 /**
- * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada», de su página «Otros», de «Lubricantes» y de «Trabaja con nosotros».
+ * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», la foto del encabezado de «Maquinaria pesada nueva», y los textos de «Maquinaria pesada usada», de su página «Otros», de «Lubricantes» y de «Trabaja con nosotros».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "paginas-indice".
@@ -4211,6 +4215,12 @@ export interface PaginasIndice {
   categoriasRepuestos?: {
     /**
      * Opcional. Foto de obra a todo el ancho; sin ella, la del encabezado de la primera marca de repuestos que lo tenga.
+     */
+    fondo?: (number | null) | Media;
+  };
+  nuevaTipos?: {
+    /**
+     * Opcional. Foto de obra horizontal a todo el ancho (mejor de 1920 px o más), con zona tranquila donde va el título. Sin ella, la del encabezado de la primera marca de repuestos que lo tenga.
      */
     fondo?: (number | null) | Media;
   };
@@ -4617,6 +4627,11 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
             };
       };
   categoriasRepuestos?:
+    | T
+    | {
+        fondo?: T;
+      };
+  nuevaTipos?:
     | T
     | {
         fondo?: T;

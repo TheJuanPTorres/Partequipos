@@ -19,7 +19,8 @@ export const CAMPOS_MENU = {
     "enlaceExterno",
   ],
   "tipos-maquinaria": ["nombre", "slug", "marca", "subtipos", "pestanaIndiceNueva", "orden"],
-  "categorias-maquinaria": ["nombre", "slug", "tiposIncluidos"],
+  // `_order`: el orden arrastrando del panel (`orderable`, 2026-11-09).
+  "categorias-maquinaria": ["nombre", "slug", "tiposIncluidos", "_order"],
   "categorias-usada": ["nombre", "slug", "enOtros", "orden", "mostrarEnWeb"],
   marcas: ["nombre", "slug", "logo", "logoOscuroEnMenu"],
   "tipos-equipo": ["nombre", "slug", "marca", "slugPadre"],

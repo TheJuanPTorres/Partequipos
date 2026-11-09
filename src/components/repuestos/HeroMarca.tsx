@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 
 import reserva from "@/components/blog/cabeceraArticulo.module.css";
 import { LogoMarca } from "@/components/marca/LogoMarca";
@@ -174,7 +174,7 @@ export function HeroMarca({
                   );
                   // Con dos líneas, la reserva va por línea: cada una con su tamaño
                   // (categorías técnicas, 2026-11-03: CLS 0,056 a 390 al llegar Inter).
-                  return reservarTitulo ? (
+                  const bloque = reservarTitulo ? (
                     <span
                       key={i}
                       className={`${l.clase} ${estilos.lineaReservada}`}
@@ -185,6 +185,10 @@ export function HeroMarca({
                   ) : (
                     linea
                   );
+                  // Un espacio entre las dos líneas: sin él, el texto del `<h1>` (lectores de
+                  // pantalla, buscadores) las juntaba («…pesadaTREN DE RODAJE»). En el `<h1>`
+                  // flex, un espacio entre hijos no se pinta: nada cambia a la vista (2026-11-08).
+                  return i === 0 ? bloque : <Fragment key={i}> {bloque}</Fragment>;
                 })}
             </h1>
           )}

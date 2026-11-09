@@ -24,6 +24,7 @@ import { tintaSobre } from "@/lib/marca/colorMarca";
 import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
 import { vistaBanner } from "@/lib/nueva/bannerMarca";
 import { columnaDeTarjeta } from "@/lib/nueva/paginaKit";
+import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { getLogosMarca } from "@/lib/queries/getLogosMarca";
 import {
   getEquiposDeTipos,
@@ -104,11 +105,12 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
     { nombre: categoria.nombre, path: rutas.categoriaNueva(categoria.slug) },
   ];
 
-  const [global, empresa, logos, marcas] = await Promise.all([
+  const [global, empresa, logos, marcas, baldosas] = await Promise.all([
     getRepuestosMarca(),
     getEmpresa(),
     getLogosMarca(),
     getMarcasMaquinaria(),
+    getBaldosasMarca(),
   ]);
   const texto = (v: string | null | undefined) => v?.trim() ?? "";
   const grupos = gruposPorMarcaYTipo(equipos);
@@ -118,7 +120,7 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
   const logoDe = (m: (typeof grupos)[number]["marca"]) =>
     conAlt(logoDeMarca(marcaConLogo.get(m.slug) ?? m, logos), `Logo de ${m.nombre}`);
   // Con 2 o más marcas, la barra de marcas fija arriba (la de series de repuestos, R2).
-  const pastillas = barraDeMarcas(grupos, logoDe);
+  const pastillas = barraDeMarcas(grupos, logoDe, baldosas);
 
   return (
     <main className={estilos.pagina}>

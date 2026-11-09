@@ -1,7 +1,11 @@
 import type { CategoriasTecnica } from "@/payload-types";
 
 import { claveDeMarca, logoPropio } from "./marca/logoMarca";
-import { enlaceExternoLubricante, tienePaginaPropiaLubricante } from "./lubricantes/destino";
+import {
+  enlaceExternoLubricante,
+  tienePaginaPropiaLubricante,
+  webDeLubricante,
+} from "./lubricantes/destino";
 import { paisDe, type CodigoPais } from "./lubricantes/pais";
 import { enlaceExternoDe } from "./nueva/enlaceExterno";
 import { colorConBlanco } from "./marca/franjaMarca";
@@ -41,6 +45,8 @@ export type EnlaceMenu = {
   href: string;
   /** Marca discreta tras la etiqueta (las categorías de usados sin unidades, 2026-10-18). */
   nota?: string;
+  /** A OTRO sitio: pestaña nueva, icono y aviso («Ver todo» de Eni → su web, 2026-11-08). */
+  externo?: true;
 };
 
 /**
@@ -547,14 +553,18 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
         const interno = selector(m.id)!;
         return { titulo, ...conPais, interno, enlaces: [], grupos: [] };
       }
+      // Con «Enlace externo», «Ver todo» lleva a su web (Eni, 2026-11-08); sus líneas, aquí.
+      const web = webDeLubricante(m);
       return {
         titulo,
         ...conPais,
         enlaces: [
-          {
-            etiqueta: `Ver todo Lubricantes ${m.nombre}`,
-            href: conBarra(rutas.marcaLubricante(m.slug)),
-          },
+          web
+            ? { etiqueta: `Ver todo Lubricantes ${m.nombre}`, href: web, externo: true as const }
+            : {
+                etiqueta: `Ver todo Lubricantes ${m.nombre}`,
+                href: conBarra(rutas.marcaLubricante(m.slug)),
+              },
           ...categorias
             .filter((c) => c.nombre && c.slug && idDeMarcaLubricante(c) === m.id)
             .map((c) => ({

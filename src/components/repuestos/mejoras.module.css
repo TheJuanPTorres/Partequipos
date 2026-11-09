@@ -100,26 +100,42 @@
 }
 
 /*
- * Barra de MARCAS de nueva (2026-10-23): el logo en lugar del texto, entero en una caja de
- * 22 px de alto (la pastilla sigue en 40). LA ACTIVA (2026-11-05): su fondo y su logo propio
- * (`.barraActiva`, de `barraDeMarcas`), nunca el de siempre aplanado con un filtro: el «Logo para
- * la baldosa» de la marca de repuestos tal cual o, sin él, el logo de siempre sobre una plaquita
- * blanca (`data-placa`).
+ * Barra de MARCAS de nueva (2026-10-23): el logo en lugar del texto. LA ACTIVA (2026-11-05): su
+ * fondo y su logo propio (`.barraActiva`, de `barraDeMarcas`), nunca el de siempre aplanado con
+ * un filtro: el «Logo para la baldosa» de la marca de repuestos tal cual o, sin él, el logo de
+ * siempre sobre una plaquita blanca (`data-placa`).
+ *
+ * CAJA FIJA (2026-11-09): los dos logos, uno encima del otro en una caja del mismo tamaño en
+ * todas las pastillas (`CAJA_GRANDE`/`CAJA_NORMAL`, de `tamanoOptico.ts`, que pone el tamaño en
+ * línea), cada uno con su área visible igualada y sin márgenes. El que no toca queda con
+ * `visibility: hidden` (no `display: none`): sigue en su sitio y descargado, y la pastilla no
+ * cambia de ancho al activarse.
  */
-.barraLogo {
+.barraCaja {
+  position: relative;
   display: block;
-  width: auto;
-  max-width: 96px;
-  height: 22px;
-  transition:
-    filter 0.2s,
-    opacity 0.2s;
+  flex: none;
+}
+
+.barraVersion {
+  position: absolute;
+  inset: 0;
+}
+
+/* El contenido visible del logo (sin márgenes), centrado en la caja. */
+.barraRecorte {
+  position: absolute;
+  overflow: hidden;
+}
+
+/* El fichero entero, desplazado para que su contenido caiga en el recorte. */
+.barraImagen {
+  position: absolute;
 }
 
 /*
  * Variante GRANDE de la barra de marcas (dirección, 2026-10-25): pastillas de 54 px de alto en
- * lugar de 40 (+35 %), más relleno a los lados (22 en lugar de 16) y el logo a 30 px de alto y
- * hasta 130 de ancho en lugar de 22 y 96 (+36 %). La barra de series no la usa.
+ * lugar de 40 (+35 %) y más relleno a los lados (22 en lugar de 16). La barra de series no la usa.
  */
 .barraGrande .barraEnlace {
   min-height: 54px;
@@ -129,46 +145,29 @@
   padding: 0 22px;
 }
 
-.barraGrande .barraLogo {
-  max-width: 130px;
-  height: 30px;
-}
-
 /* El logo de la activa: oculto hasta que la pastilla es la actual; entonces sustituye al otro. */
 .barraActiva {
-  display: none;
+  visibility: hidden;
 }
 
-.barraEnlace[aria-current][data-con-activa] .barraLogo {
-  display: none;
+.barraEnlace[aria-current][data-con-activa] .barraVersion:not(.barraActiva) {
+  visibility: hidden;
 }
 
 .barraEnlace[aria-current][data-con-activa] .barraActiva {
-  display: block;
+  visibility: visible;
 }
 
-.barraLogoActivo {
-  display: block;
-  width: auto;
-  max-width: 96px;
-  height: 22px;
-}
-
-.barraGrande .barraLogoActivo {
-  max-width: 130px;
-  height: 30px;
-}
-
-/* Sin baldosa: el logo de siempre, con sus colores, sobre una plaquita blanca dentro del color. */
-.barraActiva[data-placa] {
-  margin: 0 -10px;
-  padding: 5px 10px;
+/*
+ * Sin baldosa: el logo de siempre, con sus colores, sobre una plaquita blanca dentro del color.
+ * La plaquita es fija (la caja y 10 px a los lados, 5 arriba y abajo), igual en todas.
+ */
+.barraActiva[data-placa]::before {
+  position: absolute;
+  inset: -5px -10px;
   border-radius: 999px;
   background: #ffffff;
-}
-
-.barraGrande .barraActiva[data-placa] .barraLogoActivo {
-  height: 26px;
+  content: "";
 }
 
 @media (max-width: 1024px) {
@@ -186,8 +185,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .barraEnlace,
-  .barraLogo {
+  .barraEnlace {
     transition: none;
   }
 }

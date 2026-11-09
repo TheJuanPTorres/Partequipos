@@ -19,7 +19,7 @@ import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { PaginaVisor } from "@/lib/documentos/visor";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
 import type { DatoDestacado } from "@/lib/maquinaria/fichaTecnica";
-import type { VistaBanner } from "@/lib/nueva/bannerMarca";
+import type { BannerConLogo } from "@/lib/nueva/bannerMarca";
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import nueva from "./fichaNueva.module.css";
@@ -112,9 +112,9 @@ type Props = {
    */
   otras: {
     titulo: string;
-    logo: LogoConAlt | null;
+    /** El banner con su logo sobre el color (`bannerDeMarca`, la regla del selector). */
+    banner: BannerConLogo;
     tarjetas: TarjetaOtra[];
-    vista: VistaBanner;
     marca: { nombre: string; href: string };
   };
   imagenContacto: ImagenLista | null;
@@ -354,8 +354,7 @@ ${tituloEscritorio.modelo}`}
             id="otras-del-tipo"
             titulo={otras.titulo}
             marca={otras.marca}
-            logo={otras.logo}
-            vista={otras.vista}
+            banner={otras.banner}
           />
           <ul className={`${nueva.rejilla} ${nueva.rejillaOtras}`}>
             {otras.tarjetas.map((o) => (

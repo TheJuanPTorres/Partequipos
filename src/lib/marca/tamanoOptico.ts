@@ -38,6 +38,15 @@ export const CAJA_GRANDE: Caja = { ancho: 140, alto: 38, area: 87 * 29 };
 export const CAJA_NORMAL: Caja = { ancho: 102, alto: 27, area: 63 * 21 };
 
 /**
+ * El logo sobre la forma de color del BANNER DE MARCA (escritorio, 2026-11-09): hasta 170 × 48,
+ * como antes, con el área de un logo 3:1 a 38 px de alto.
+ */
+export const CAJA_BANNER: Caja = { ancho: 170, alto: 48, area: 114 * 38 };
+
+/** El logo del banner en MÓVIL (la tarjeta blanca): en su bloque de ~96 px de ancho. */
+export const CAJA_BANNER_MOVIL: Caja = { ancho: 96, alto: 34, area: 72 * 24 };
+
+/**
  * Dónde y a qué tamaño va el logo: `visible` es la caja del contenido, centrada en la caja fija;
  * `imagen`, el fichero entero, desplazado para que su contenido caiga en `visible` (lo que sobra
  * son sus márgenes transparentes, que se recortan).

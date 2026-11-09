@@ -1,17 +1,10 @@
-import { IconCalendar, IconClock, IconWeight } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { ANCLA_COTIZAR } from "@/components/ficha/FichaProducto";
-import { BotonFormulario } from "@/components/forms/BotonFormulario";
 import type { AlineacionTexto, AnchoTexto } from "@/lib/fields/alineacionTexto";
-import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { FiltroUsados } from "@/lib/portada/kitCliente";
-import type { DatoFicha, TarjetaEquipo } from "@/lib/portada/secciones";
 import type { ImagenLista } from "@/lib/utils/relations";
-import { enlaceWhatsApp } from "@/lib/whatsapp";
 
-import { SliderUsados } from "./diferidosKit";
 import { Flecha } from "./Flecha";
 import { TextoEditable } from "./TextoEditable";
 import estilos from "./usadosKit.module.css";
@@ -20,137 +13,21 @@ import estilos from "./usadosKit.module.css";
  * «MAQUINARIA PESADA USADA» CON EL DISEÑO DEL CLIENTE (2026-10-26; prototipos `CatalogoUsados` y
  * `UsedHero` de `partequipos-diseno\portada\maquinaria-usada`), PORTADO a CSS modules y sin
  * `motion`. Un solo panel redondeado con la cabecera (la máquina sobre su piso, con reflejo y
- * sombras, y el texto), tres ENLACES a las categorías de usados y el carrusel de las EXCAVADORAS.
+ * sombras, y el texto) y tres ENLACES a las categorías de usados. El carrusel de las excavadoras
+ * (con «Cotizar ahora» y el aviso sin unidades) se QUITÓ el 2026-11-09 (dirección): la sección
+ * acaba en las tarjetas de tipo.
  *
  * Los tres botones (Excavadora, «Otros», Aditamentos) eran un filtro del carrusel; desde el
- * 2026-10-26 (dirección) son enlaces a la página de su categoría, sin estado «seleccionado», y el
- * carrusel enseña siempre las excavadoras disponibles. Componente de SERVIDOR: el único JavaScript
- * es el del carrusel.
+ * 2026-10-26 (dirección) son enlaces a la página de su categoría, sin estado «seleccionado».
+ * Componente de SERVIDOR, sin JavaScript.
  *
  * Se aparta del prototipo:
- * - Datos del panel: las unidades disponibles y visibles de cada categoría, sus textos e imágenes.
- * - «Cotizar ahora» abre NUESTRA ventana de cotización (no la ficha). Sin excavadoras
- *   disponibles, en lugar del carrusel, el aviso con «Avísame cuando llegue» (la misma ventana).
- *   «Ver todo» lleva al índice de usados.
- * - El título en `<h2>` (el `<h1>` de la portada es otro) y el carrusel con el botón de pausa del
- *   sitio (D2), parado con «reducir movimiento».
+ * - Datos del panel: sus textos e imágenes. «Ver todo» lleva al índice de usados.
+ * - El título en `<h2>` (el `<h1>` de la portada es otro).
  */
 
-const ICONOS: Record<DatoFicha["clave"], typeof IconWeight> = {
-  peso: IconWeight,
-  anio: IconCalendar,
-  horometro: IconClock,
-};
-
-/** Ancho pintado de la foto: 1 por fila en el móvil, 2 en tablet y 3 en escritorio. */
-const SIZES_TARJETA = "(max-width: 767px) 92vw, (max-width: 1279px) 46vw, 31vw";
 /** La máquina de la cabecera: toda la fila en el móvil, ~60 % del panel en escritorio. */
 const SIZES_MAQUINA = "(max-width: 1024px) 100vw, 60vw";
-
-/** Lo que la ventana de «Cotizar» necesita del servidor. */
-export type DatosCotizar = { siteKey: string | null; telefono: string };
-
-/**
- * El formulario de la ventana: el MISMO que el de la página de la unidad, con la unidad como
- * referencia. La solicitud guarda de dónde viene: la portada.
- */
-function formularioDeCotizar(nombre: string, datos: DatosCotizar): ConfigFormulario {
-  return {
-    tipo: "cotizacion",
-    origen: "/",
-    siteKey: datos.siteKey,
-    whatsapp: enlaceWhatsApp(datos.telefono, `Hola, quiero cotizar la ${nombre}.`),
-    referencia: { texto: nombre },
-    titulo: "Solicitar cotización",
-    descripcion: "Te enviamos precio, disponibilidad y condiciones de entrega.",
-    textoBoton: "Pedir cotización",
-  };
-}
-
-/** Sin unidades en la categoría: el aviso del prototipo, con nuestra ventana («Avísame»). */
-function formularioDeAviso(categoria: string, datos: DatosCotizar): ConfigFormulario {
-  return {
-    tipo: "contacto",
-    origen: "/",
-    siteKey: datos.siteKey,
-    whatsapp: enlaceWhatsApp(datos.telefono, `Hola, busco ${categoria.toLowerCase()} usada.`),
-    titulo: "Avísame cuando llegue",
-    textoBoton: "Enviar",
-    mensajeInicial: `Busco ${categoria.toLowerCase()} usada: `,
-  };
-}
-
-function Tarjeta({
-  equipo,
-  idNombre,
-  cotizar,
-}: {
-  equipo: TarjetaEquipo;
-  idNombre: string;
-  cotizar: DatosCotizar;
-}) {
-  const foto = equipo.imagen;
-  return (
-    <article className={estilos.tarjeta} aria-labelledby={idNombre}>
-      {equipo.href ? (
-        <Link href={equipo.href} tabIndex={-1} aria-hidden="true" className={estilos.foto}>
-          {foto ? (
-            <Image
-              src={foto.url}
-              alt=""
-              fill
-              sizes={SIZES_TARJETA}
-              className={estilos.fotoImg}
-              style={{ objectPosition: foto.posicion }}
-            />
-          ) : null}
-        </Link>
-      ) : (
-        <div className={estilos.foto} aria-hidden="true">
-          {foto ? (
-            <Image src={foto.url} alt="" fill sizes={SIZES_TARJETA} className={estilos.fotoImg} />
-          ) : null}
-        </div>
-      )}
-      <h3 id={idNombre} className={estilos.nombre}>
-        {equipo.href ? (
-          <Link href={equipo.href} className={estilos.nombreEnlace}>
-            {equipo.nombre}
-          </Link>
-        ) : (
-          equipo.nombre
-        )}
-      </h3>
-      <dl className={estilos.ficha}>
-        {equipo.ficha.map((d) => {
-          const Icono = ICONOS[d.clave];
-          return (
-            <div key={d.clave} className={estilos.dato}>
-              <Icono aria-hidden="true" focusable="false" stroke={1.6} className={estilos.icono} />
-              <dt>{d.etiqueta}:</dt>
-              <dd>{d.valor}</dd>
-            </div>
-          );
-        })}
-      </dl>
-      <div className={estilos.botones}>
-        {equipo.href ? (
-          <Link href={equipo.href} className={estilos.boton}>
-            Ver más<span className="sr-only">: {equipo.nombre}</span>
-          </Link>
-        ) : null}
-        {/* Sin JavaScript, baja al formulario de la página de la unidad. */}
-        <BotonFormulario
-          href={equipo.href ? `${equipo.href}#${ANCLA_COTIZAR}` : "/contactanos/"}
-          className={`${estilos.boton} ${estilos.botonOscuro}`}
-          formulario={formularioDeCotizar(equipo.nombre, cotizar)}
-        >
-          Cotizar ahora<span className="sr-only">: {equipo.nombre}</span>
-        </BotonFormulario>
-      </div>
-    </article>
-  );
-}
 
 export type TextosUsadosKit = {
   antetitulo: string;
@@ -170,17 +47,13 @@ export function SeccionUsadosKit({
   maquina,
   textos,
   hrefVerTodo,
-  cotizar,
 }: {
   filtros: FiltroUsados[];
   maquina: ImagenLista | null;
   textos: TextosUsadosKit;
   hrefVerTodo: string;
-  cotizar: DatosCotizar;
 }) {
   const idTitulo = "usados-kit-titulo";
-  // El carrusel es siempre el de las excavadoras (la primera categoría de `filtrosDeUsados`).
-  const excavadoras = filtros[0];
   return (
     <section className={estilos.seccion} aria-labelledby={idTitulo}>
       <div className={estilos.panel}>
@@ -245,34 +118,6 @@ export function SeccionUsadosKit({
 
         <div className={estilos.cuerpo}>
           <EnlacesCategorias filtros={filtros} />
-          <div className={estilos.listado}>
-            {excavadoras && excavadoras.tarjetas.length > 0 ? (
-              <SliderUsados etiqueta={excavadoras.nombre}>
-                {excavadoras.tarjetas.map((t, i) => (
-                  <li key={t.id} className={estilos.item}>
-                    <Tarjeta equipo={t} idNombre={`usados-kit-${i}`} cotizar={cotizar} />
-                  </li>
-                ))}
-              </SliderUsados>
-            ) : excavadoras ? (
-              <div className={estilos.vacio}>
-                <p className={estilos.vacioTitulo}>
-                  Por ahora no hay {excavadoras.nombre.toLowerCase()} usada en el inventario.
-                </p>
-                <p className={estilos.vacioTexto}>
-                  Cuéntanos qué buscas y te avisamos cuando llegue.
-                </p>
-                <BotonFormulario
-                  href={excavadoras.href}
-                  className={estilos.verTodo}
-                  formulario={formularioDeAviso(excavadoras.nombre, cotizar)}
-                >
-                  Avísame cuando llegue
-                  <Flecha className={estilos.flecha} />
-                </BotonFormulario>
-              </div>
-            ) : null}
-          </div>
         </div>
       </div>
     </section>

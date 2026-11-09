@@ -33,7 +33,8 @@ import {
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
-import { vistaBanner } from "@/lib/nueva/bannerMarca";
+import { bannerDeMarca } from "@/lib/nueva/bannerMarca";
+import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { usaDisenoKit } from "@/lib/nueva/paginaAditamentos";
 import { acentoDeMarca, mediosDeKit } from "@/lib/nueva/paginaKit";
 import { productoVisible } from "@/lib/nueva/visibilidad";
@@ -120,13 +121,14 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
   // «Mostrar en la web» desmarcada: redirección TEMPORAL (307) a la página de su tipo.
   if (!productoVisible(equipo)) redirect(`${rutas.tipoMaquinaria(marca.slug, tipo.slug)}/`);
 
-  const [empresa, ficha, otras, logos, global, testimonios] = await Promise.all([
+  const [empresa, ficha, otras, logos, global, testimonios, baldosas] = await Promise.all([
     getEmpresa(),
     getFichaProducto(),
     getOtrasReferencias(tipo.id, equipo.id),
     getLogosMarca(),
     getRepuestosMarca(),
     getTestimoniosDePortada(),
+    getBaldosasMarca(),
   ]);
   // El PDF del equipo y el de cada tarjeta, con sus páginas, en una sola consulta.
   const documentos = await getDocumentosParaVisor(
@@ -239,10 +241,10 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
       experto={experto ?? null}
       otras={{
         titulo: tituloOtras(tipo.nombre),
-        // El banner de marca del #385: logo (el único del sitio), color y foto de la marca.
-        logo,
+        // El banner de marca del #385: color y foto de la marca, con el logo sobre su color con la
+        // regla del selector (`bannerDeMarca`: la baldosa, o el de siempre sobre una plaquita).
+        banner: bannerDeMarca(marca, logo, baldosas),
         tarjetas,
-        vista: vistaBanner(marca),
         marca: { nombre: marca.nombre, href: `${rutas.tipoMaquinaria(marca.slug, tipo.slug)}/` },
       }}
       imagenContacto={imagenContacto}

@@ -526,11 +526,14 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Para cambiar el orden de las tarjetas del índice de tipos y del menú «Por tipo de máquina», arrastra cada fila por su asa (a la izquierda). El orden se guarda solo al soltarla. Si la lista está ordenada por otra columna, quita ese orden para ver el asa.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categorias-maquinaria".
  */
 export interface CategoriasMaquinaria {
   id: number;
+  _order?: string | null;
   nombre: string;
   /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
@@ -3079,6 +3082,7 @@ export interface TiposMaquinariaSelect<T extends boolean = true> {
  * via the `definition` "categorias-maquinaria_select".
  */
 export interface CategoriasMaquinariaSelect<T extends boolean = true> {
+  _order?: T;
   nombre?: T;
   slug?: T;
   descripcion?: T;

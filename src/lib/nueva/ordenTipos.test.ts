@@ -69,10 +69,23 @@ describe("unaEntradaPorTipo", () => {
         { nombre: "Excavadoras", dato: "tipo-excavadoras" },
       ],
     );
-    assert.deepEqual(r, ["cat-bulldozer", "cat-excavadoras", "cat-compactadoras"]);
+    // En el orden en que llegan las categorías: el del panel (`_order`, 2026-11-09).
+    assert.deepEqual(r, ["cat-excavadoras", "cat-bulldozer", "cat-compactadoras"]);
   });
 
-  it("un tipo sin categoría sale con su página de marca (mientras se crea la general)", () => {
+  it("respeta el orden del panel aunque no sea el de la web antigua (2026-11-09)", () => {
+    const r = unaEntradaPorTipo(
+      [
+        { nombre: "Cargadores", marcas: 1, dato: "cargadores" },
+        { nombre: "Excavadoras", marcas: 3, dato: "excavadoras" },
+        { nombre: "Bulldozer", marcas: 1, dato: "bulldozer" },
+      ],
+      [],
+    );
+    assert.deepEqual(r, ["cargadores", "excavadoras", "bulldozer"]);
+  });
+
+  it("un tipo sin categoría sale con su página de marca, detrás de las categorías y en el orden de la web antigua", () => {
     const r = unaEntradaPorTipo(
       [{ nombre: "Excavadoras", marcas: 2, dato: "cat-excavadoras" }],
       [
@@ -80,7 +93,7 @@ describe("unaEntradaPorTipo", () => {
         { nombre: "Bulldozers", dato: "tipo-bulldozer" },
       ],
     );
-    assert.deepEqual(r, ["tipo-bulldozer", "cat-excavadoras", "tipo-retro"]);
+    assert.deepEqual(r, ["cat-excavadoras", "tipo-bulldozer", "tipo-retro"]);
   });
 
   it("dos categorías con el mismo tipo: la de más marcas", () => {

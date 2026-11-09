@@ -78,6 +78,8 @@ const megamenuEnCache = unstable_cache(
       payload.find({
         collection: "categorias-maquinaria",
         ...base,
+        // En el orden del panel (arrastrando, `orderable`, 2026-11-09).
+        sort: "_order",
         select: selectDelMenu("categorias-maquinaria"),
       }),
       payload.find({

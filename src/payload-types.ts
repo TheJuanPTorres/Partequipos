@@ -349,6 +349,23 @@ export interface MarcasMaquinaria {
   id: number;
   nombre: string;
   /**
+   * Aquí va la máquina recortada de la tarjeta de esta marca en la portada. La tarjeta lleva el color y el logo de la marca (el de su baldosa si la tiene), esta máquina sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.
+   */
+  portada?: {
+    /**
+     * La máquina recortada, de perfil y sin fondo (900 px de ancho o más). Decorativa. Vacía, la tarjeta lleva la foto de la marca.
+     */
+    maquina?: (number | null) | Media;
+    /**
+     * Solo si la marca la vende un distribuidor (por ejemplo, Maquitecno). Sale «Distribuido por» con su logo.
+     */
+    distribuidorNombre?: string | null;
+    /**
+     * Sobre un color oscuro se pinta en blanco. Su texto alternativo es el nombre del distribuidor.
+     */
+    distribuidorLogo?: (number | null) | Media;
+  };
+  /**
    * Desmarcada, la marca, sus tipos y sus equipos desaparecen de toda la web (menú, listados, filtros, portada, buscador y sitemap) sin borrarse del panel, y sus páginas llevan con un 301 a la página de abajo.
    */
   mostrarEnWeb?: boolean | null;
@@ -375,26 +392,9 @@ export interface MarcasMaquinaria {
    */
   logoOscuroEnMenu?: boolean | null;
   /**
-   * Fondo de la tarjeta de esta marca en el inicio si no tiene «Foto de fondo de la cabecera» del «Kit de marca» (esa manda).
+   * Una foto de obra de la marca, NO la máquina recortada (esa va arriba, en el grupo «PORTADA: tarjeta…», campo «Máquina recortada de la tarjeta»). Es el fondo de la cabecera de la página de la marca y la foto de su tarjeta de la portada mientras no tenga máquina. Si el «Kit de marca» tiene «Foto de fondo de la cabecera», manda esa.
    */
   imagenTarjeta?: (number | null) | Media;
-  /**
-   * La tarjeta lleva el color y el logo de la marca (el de su baldosa si la tiene), esta máquina sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.
-   */
-  portada?: {
-    /**
-     * La máquina recortada, de perfil y sin fondo (900 px de ancho o más). Decorativa. Vacía, la tarjeta lleva la foto de la marca.
-     */
-    maquina?: (number | null) | Media;
-    /**
-     * Solo si la marca la vende un distribuidor (por ejemplo, Maquitecno). Sale «Distribuido por» con su logo.
-     */
-    distribuidorNombre?: string | null;
-    /**
-     * Sobre un color oscuro se pinta en blanco. Su texto alternativo es el nombre del distribuidor.
-     */
-    distribuidorLogo?: (number | null) | Media;
-  };
   /**
    * 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» de la portada. Todas las marcas visibles salen; las que no tienen número, al final por nombre.
    */
@@ -466,38 +466,6 @@ export interface MarcasMaquinaria {
   createdAt: string;
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categorias-maquinaria".
- */
-export interface CategoriasMaquinaria {
-  id: number;
-  nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  descripcion?: string | null;
-  /**
-   * Opcional. Foto de la categoría para su tarjeta en el índice de tipos de maquinaria nueva. Si la dejas vacía, se usa la primera foto del primer equipo de la categoría.
-   */
-  imagen?: (number | null) | Media;
-  /**
-   * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
-   */
-  tiposIncluidos?: (number | TiposMaquinaria)[] | null;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  actualizadoPor?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * Fotos y logos del sitio, en JPEG, PNG o WebP, de hasta 15 MB (suben directo al almacén). El texto alternativo describe la imagen a quien no la ve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -556,6 +524,38 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-maquinaria".
+ */
+export interface CategoriasMaquinaria {
+  id: number;
+  nombre: string;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  descripcion?: string | null;
+  /**
+   * Opcional. Foto de la categoría para su tarjeta en el índice de tipos de maquinaria nueva. Si la dejas vacía, se usa la primera foto del primer equipo de la categoría.
+   */
+  imagen?: (number | null) | Media;
+  /**
+   * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
+   */
+  tiposIncluidos?: (number | TiposMaquinaria)[] | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2994,6 +2994,13 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
  */
 export interface MarcasMaquinariaSelect<T extends boolean = true> {
   nombre?: T;
+  portada?:
+    | T
+    | {
+        maquina?: T;
+        distribuidorNombre?: T;
+        distribuidorLogo?: T;
+      };
   mostrarEnWeb?: T;
   destinoOculta?: T;
   enlaceExterno?: T;
@@ -3003,13 +3010,6 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
   colorMarca?: T;
   logoOscuroEnMenu?: T;
   imagenTarjeta?: T;
-  portada?:
-    | T
-    | {
-        maquina?: T;
-        distribuidorNombre?: T;
-        distribuidorLogo?: T;
-      };
   ordenPortada?: T;
   disenoPagina?: T;
   plantillaAditamentos?:

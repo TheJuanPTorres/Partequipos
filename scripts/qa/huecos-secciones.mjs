@@ -15,8 +15,8 @@
  * falsean la medida. El CLS de carga se mide aparte, sin emular nada.
  *
  * Marca (⚠) cada hueco que pasa del ESPACIADO COMÚN a ese ancho más 8 px de margen, y (✗) los que
- * pasan de 80 px, el máximo. El espaciado común es `--espacio-seccion` de `globals.css`:
- * clamp(40px, 24px + 4vw, 80px).
+ * pasan de 48 px, el máximo. El espaciado común es `--espacio-seccion` de `globals.css`:
+ * clamp(24px, 15px + 2.3vw, 48px).
  *
  *   npm run preview:ejecutar -- npx -y -p playwright-core@1.63.0 node scripts/qa/huecos-secciones.mjs <preview> <carpeta> [ruta…]
  *
@@ -51,9 +51,9 @@ const rutas = rutasArg.length > 0 ? rutasArg : ["/", "/maquinaria-pesada/"];
 const ANCHOS = process.env.HUECOS_ANCHOS
   ? process.env.HUECOS_ANCHOS.split(",").map(Number)
   : [390, 768, 1010, 1440, 1920, 2560];
-const MAXIMO = 80;
-/** El espaciado común a un ancho: clamp(40px, 24px + 4vw, 80px). */
-const comun = (ancho) => Math.min(MAXIMO, Math.max(40, 24 + 0.04 * ancho));
+const MAXIMO = 48;
+/** El espaciado común a un ancho: clamp(24px, 15px + 2.3vw, 48px). */
+const comun = (ancho) => Math.min(MAXIMO, Math.max(24, 15 + 0.023 * ancho));
 fs.mkdirSync(carpeta, { recursive: true });
 
 const navegador = await pw.chromium.launch({

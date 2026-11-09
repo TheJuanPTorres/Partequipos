@@ -218,6 +218,7 @@
 }
 
 .caja {
+  position: relative;
   display: flex;
   width: 13.5rem;
   height: 64px;
@@ -233,6 +234,16 @@
     height: max(4rem, 5.2cqw);
     padding: 0 max(1.5rem, 2cqw);
   }
+}
+
+/* Logo libre con enlace a otro sitio (2026-11-08): el icono de otra pestaña, arriba a la derecha. */
+.externo {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 14px;
+  height: 14px;
+  color: var(--color-texto-suave, #555555);
 }
 
 .logo {

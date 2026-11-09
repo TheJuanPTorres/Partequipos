@@ -1,11 +1,13 @@
 "use client";
 
+import { IconExternalLink } from "@tabler/icons-react";
 import Link from "next/link";
 import { useId, type CSSProperties } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { usePausa } from "@/components/movimiento/useMovimiento";
+import { AVISO_OTRA_PESTANA } from "@/lib/nueva/enlaceExterno";
 import type { LogoDePortada } from "@/lib/portada/kitCliente";
 import { rellenoDeBanda } from "@/lib/portada/marcasBanda";
 import { sizesDeLogo } from "@/lib/portada/sizesLogo";
@@ -78,7 +80,24 @@ export function BandaLogos({
                       className={estilos.item}
                       aria-hidden={copia === 0 && !accesible ? true : undefined}
                     >
-                      {l.href && accesible ? (
+                      {l.href && accesible && l.externo ? (
+                        // Logo libre con enlace a OTRO sitio: otra pestaña, con icono y aviso.
+                        <a
+                          href={l.href}
+                          className={estilos.caja}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${l.nombre} (${AVISO_OTRA_PESTANA})`}
+                        >
+                          <LogoMarca
+                            logo={l.logo}
+                            alt=""
+                            sizes={sizesDeLogo(l.logo, espejo)}
+                            className={estilos.logo}
+                          />
+                          <IconoExterno />
+                        </a>
+                      ) : l.href && accesible ? (
                         // Solo la primera copia es enlace: las demás son decorativas y no se enfocan.
                         <Link href={l.href} className={estilos.caja} prefetch={false}>
                           <LogoMarca
@@ -96,6 +115,8 @@ export function BandaLogos({
                             sizes={sizesDeLogo(l.logo, espejo)}
                             className={estilos.logo}
                           />
+                          {/* En las copias decorativas, el mismo icono: la banda se ve igual. */}
+                          {l.href && l.externo ? <IconoExterno /> : null}
                         </span>
                       )}
                       <span className={estilos.separador} aria-hidden="true" />
@@ -115,5 +136,17 @@ export function BandaLogos({
         className={estilos.pausa}
       />
     </>
+  );
+}
+
+/** El icono de «se abre en otra pestaña» de un logo libre con enlace externo (decorativo). */
+function IconoExterno() {
+  return (
+    <IconExternalLink
+      aria-hidden="true"
+      focusable="false"
+      stroke={1.75}
+      className={estilos.externo}
+    />
   );
 }

@@ -5,8 +5,8 @@ import type { Where } from "payload";
  * oficial, maquitecno.co). El campo «Enlace externo» de `marcas-maquinaria`: si está relleno, la
  * marca NO tiene página en este sitio y sus enlaces (megamenú e índice de marcas) van a esa
  * dirección, en pestaña nueva. En la banda de logos de la portada su logo NO es enlace, como los
- * demás (dirección, 2026-11-03). Su URL de aquí da 404 y no sale en el sitemap; tampoco va como
- * tarjeta de «Maquinaria pesada nueva» en la portada.
+ * demás (dirección, 2026-11-03). Su URL de aquí da 404 y no sale en el sitemap. En «Maquinaria pesada
+ * nueva» de la portada SÍ lleva tarjeta desde el diseño v2 (2026-11-08), que va a esa dirección.
  *
  * Solo https y a OTRO sitio: una dirección de este sitio se pone como redirección, no aquí.
  */

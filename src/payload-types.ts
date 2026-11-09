@@ -357,7 +357,7 @@ export interface MarcasMaquinaria {
    */
   destinoOculta?: (number | null) | CategoriasMaquinaria;
   /**
-   * Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap ni como tarjeta de la portada. Vacío, la marca tiene su página como siempre.
+   * Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap, y su tarjeta de «Maquinaria pesada nueva» en la portada lleva a esta dirección. Vacío, la marca tiene su página como siempre.
    */
   enlaceExterno?: string | null;
   /**
@@ -378,6 +378,23 @@ export interface MarcasMaquinaria {
    * Fondo de la tarjeta de esta marca en el inicio si no tiene «Foto de fondo de la cabecera» del «Kit de marca» (esa manda).
    */
   imagenTarjeta?: (number | null) | Media;
+  /**
+   * La tarjeta lleva el color y el logo de la marca (el de su baldosa si la tiene), esta máquina sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.
+   */
+  portada?: {
+    /**
+     * La máquina recortada, de perfil y sin fondo (900 px de ancho o más). Decorativa. Vacía, la tarjeta lleva la foto de la marca.
+     */
+    maquina?: (number | null) | Media;
+    /**
+     * Solo si la marca la vende un distribuidor (por ejemplo, Maquitecno). Sale «Distribuido por» con su logo.
+     */
+    distribuidorNombre?: string | null;
+    /**
+     * Sobre un color oscuro se pinta en blanco. Su texto alternativo es el nombre del distribuidor.
+     */
+    distribuidorLogo?: (number | null) | Media;
+  };
   /**
    * 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» de la portada. Todas las marcas visibles salen; las que no tienen número, al final por nombre.
    */
@@ -1554,6 +1571,10 @@ export interface Pagina {
      * Foto horizontal grande (1920 px o más), con el lado izquierdo ya fundido en blanco: título y tarjetas van encima. Decorativa. Vacía, fondo blanco.
      */
     fondo?: (number | null) | Media;
+    /**
+     * Foto horizontal de montañas y terreno (2000 px o más) que va al pie de cada tarjeta, bajo la máquina, fundida con el color de la marca. Decorativa. Vacía, las tarjetas van solo con su color.
+     */
+    fondoTarjetas?: (number | null) | Media;
   };
   seccionUsada?: {
     /**
@@ -2953,6 +2974,13 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
   colorMarca?: T;
   logoOscuroEnMenu?: T;
   imagenTarjeta?: T;
+  portada?:
+    | T
+    | {
+        maquina?: T;
+        distribuidorNombre?: T;
+        distribuidorLogo?: T;
+      };
   ordenPortada?: T;
   disenoPagina?: T;
   plantillaAditamentos?:
@@ -3250,6 +3278,7 @@ export interface PaginasSelect<T extends boolean = true> {
         botonEnlace?: T;
         maquina?: T;
         fondo?: T;
+        fondoTarjetas?: T;
       };
   seccionUsada?:
     | T

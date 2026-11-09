@@ -1,8 +1,8 @@
 /*
- * «MAQUINARIA PESADA NUEVA» CON EL DISEÑO DEL CLIENTE (2026-10-27), portado del prototipo
- * (Tailwind) a CSS modules con los tokens del sitio. Cortes del prototipo: 480 (dos tarjetas a la
- * vista), 640, 768 (tres tarjetas; máquina a la derecha del título), 1024 (rejilla de 2 × 2, foto de
- * obra de fondo y máquina pegada a las tarjetas), 1440 y 1536 (fila de 4).
+ * «MAQUINARIA PESADA NUEVA», DISEÑO DEL CLIENTE V2 (2026-11-08), portado del prototipo (Tailwind)
+ * a CSS modules con los tokens del sitio. Cortes del prototipo: 640 (sm), 768 (md), 1024 (lg: fila
+ * de 5, foto de obra de fondo y máquina arriba a la derecha), 1280 (xl) y 1536 (2xl). Añadido: el
+ * contenido no pasa de 1680 px, para que a 1920 y 2560 nada se estire.
  */
 
 .seccion {
@@ -11,41 +11,32 @@
    * `scroll-padding-top` (globals.css); esto es el aire de más.
    */
   scroll-margin-top: 24px;
-  /* El rojo de marca no llega a AA en texto pequeño sobre blanco: el rótulo va más oscuro. */
+  /* El rojo de marca en texto pequeño o con texto blanco encima: un punto más oscuro (AA). */
   --nueva-rojo-texto: color-mix(in srgb, var(--color-marca) 78%, #000);
+  --nueva-rojo-relleno: color-mix(in srgb, var(--color-marca) 90%, #000);
+  --nueva-lado: 20px;
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding: 56px 20px;
+  padding: 48px var(--nueva-lado) 56px;
   background: #fff;
 }
 
 @media (min-width: 640px) {
   .seccion {
-    padding-right: 40px;
-    padding-left: 40px;
+    --nueva-lado: 40px;
   }
 }
 
 @media (min-width: 1024px) {
   .seccion {
-    padding: 80px 2.6% 56px;
+    --nueva-lado: 2.6%;
+    padding-top: 64px;
+    padding-bottom: 64px;
   }
 }
 
-@media (min-width: 1440px) {
-  .seccion {
-    padding-top: 96px;
-  }
-}
-
-@media (min-width: 1536px) {
-  .seccion {
-    padding-bottom: 80px;
-  }
-}
-
-.foto {
+.cubrir {
   object-fit: cover;
 }
 
@@ -53,121 +44,155 @@
   object-fit: contain;
 }
 
-/* --- Fondo desde 1024 px: la foto de obra cubre la sección y se disuelve abajo ------------------ */
+.marco {
+  position: relative;
+  max-width: 1680px;
+  margin: 0 auto;
+}
 
-.escena {
+/* --- Fondo desde 1024 px: la foto de obra, anclada arriba, que se funde a blanco hacia abajo ---- */
+
+.fondo {
   display: none;
 }
 
 @media (min-width: 1024px) {
-  .escena {
+  .fondo {
     position: absolute;
     inset: 0;
     z-index: -1;
     display: block;
     pointer-events: none;
-    mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
+  }
+
+  /*
+   * Con su proporción a todo el ancho, con tope de alto: a 2560 px la foto no crece más que a
+   * 1920, recorta por abajo (se funde ahí de todos modos) y se queda anclada a la derecha.
+   */
+  .fondoFoto {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    aspect-ratio: 1921 / 819;
+    max-height: 820px;
+    mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 100%);
+  }
+
+  .fondoFoto img {
+    object-position: 100% 0%;
+  }
+
+  /* La foto ya es blanca por la izquierda; el velo deja el título siempre sobre claro. */
+  .fondoVelo {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      rgb(255 255 255 / 0.95) 0%,
+      rgb(255 255 255 / 0.8) 40%,
+      rgb(255 255 255 / 0) 58%
+    );
   }
 }
 
-/* La foto se alarga hacia abajo y la sección corta ese 14 %: las ruedas pisan tierra plana. */
-.escenaFoto {
-  position: absolute;
-  inset: 0 0 -14%;
+@media (min-width: 1280px) {
+  .fondoVelo {
+    background: linear-gradient(
+      100deg,
+      rgb(255 255 255 / 0.9) 0%,
+      rgb(255 255 255 / 0.55) 30%,
+      rgb(255 255 255 / 0) 50%
+    );
+  }
 }
 
-/* Refuerza el blanco bajo título y tarjetas, que la foto deja a medias si la sección es alta. */
-.escenaVelo {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    #fff 0%,
-    rgb(255 255 255 / 0.95) 28%,
-    rgb(255 255 255 / 0.6) 40%,
-    rgb(255 255 255 / 0) 50%
-  );
+/* La retroexcavadora grande arriba a la derecha; las tarjetas le tapan la parte de abajo. */
+.maquinaGrande {
+  display: none;
 }
 
-/* --- Columna de contenido --------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  .maquinaGrande {
+    position: absolute;
+    top: -2%;
+    right: 0;
+    z-index: 0;
+    display: block;
+    width: min(44%, 46rem);
+    pointer-events: none;
+  }
+}
 
-.columna {
+@media (min-width: 1280px) {
+  .maquinaGrande {
+    top: -3%;
+    width: min(42%, 48rem);
+  }
+}
+
+/* --- Textos ------------------------------------------------------------------------------------ */
+
+.textos {
   position: relative;
   z-index: 1;
 }
 
 @media (min-width: 1024px) {
-  .columna {
-    max-width: 52%;
+  .textos {
+    max-width: 50%;
+    padding-top: clamp(1rem, 3vw, 3.5rem);
   }
 }
 
-@media (min-width: 1536px) {
-  .columna {
-    max-width: 67%;
-  }
-}
-
-.cabecera {
-  display: grid;
-  align-items: end;
-  column-gap: 32px;
-}
-
-@media (min-width: 768px) {
-  .cabeceraConMaquina {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 48%);
-  }
-
-  .cabeceraConMaquina .textos {
-    align-self: center;
-  }
-}
-
-@media (min-width: 1024px) {
-  .cabecera,
-  .cabeceraConMaquina {
-    display: block;
+@media (min-width: 1280px) {
+  .textos {
+    max-width: 46%;
   }
 }
 
 .antetitulo {
   margin: 0;
   color: var(--nueva-rojo-texto);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.025em;
+}
+
+@media (min-width: 640px) {
+  .antetitulo {
+    font-size: 16px;
+  }
 }
 
 .titulo {
-  margin: 16px 0 0;
+  margin: 12px 0 0;
   color: var(--color-texto);
-  font-size: clamp(2rem, 6vw, 2.6rem);
+  font-size: clamp(2.1rem, 7vw, 2.8rem);
   font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 
 @media (min-width: 1024px) {
   .titulo {
-    font-size: clamp(2.4rem, 3.3vw, 3.4rem);
+    font-size: clamp(2.3rem, 3.5vw, 4rem);
   }
 }
 
-/* --- La máquina por debajo de 1024 px, en la cabecera ------------------------------------------ */
+.rojo {
+  /* Texto grande (≥ 24 px): el rojo de marca pasa de 3:1 sobre blanco (4,54:1). */
+  color: var(--color-marca);
+  white-space: nowrap;
+}
+
+/* --- La máquina por debajo de 1024 px, entre el texto y las tarjetas --------------------------- */
 
 .compacta {
   position: relative;
-  aspect-ratio: 1920 / 992;
-  width: 100%;
-  margin-top: 24px;
+  height: min(56.25vw, 460px);
+  margin: 24px calc(-1 * var(--nueva-lado)) 0;
   pointer-events: none;
-}
-
-@media (min-width: 768px) {
-  .compacta {
-    margin-top: 0;
-  }
 }
 
 @media (min-width: 1024px) {
@@ -178,79 +203,48 @@
 
 .compactaFoto {
   position: absolute;
-  top: -18%;
-  right: -20px;
-  bottom: -16%;
-  left: -20px;
-  mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgb(0 0 0 / 0.15) 12%,
-    rgb(0 0 0 / 0.45) 24%,
-    rgb(0 0 0 / 0.8) 34%,
-    #000 42%,
-    #000 78%,
-    rgb(0 0 0 / 0.5) 90%,
-    transparent 100%
-  );
+  inset: 0;
+  mask-image: linear-gradient(180deg, #000 60%, transparent);
 }
 
-@media (min-width: 640px) {
-  .compactaFoto {
-    right: -40px;
-    left: -40px;
-  }
+.compactaFoto img {
+  object-position: 100% 70%;
 }
 
-@media (min-width: 768px) {
-  .compactaFoto {
-    left: -12%;
-    mask-image:
-      linear-gradient(
-        180deg,
-        transparent 0%,
-        rgb(0 0 0 / 0.15) 12%,
-        rgb(0 0 0 / 0.45) 24%,
-        rgb(0 0 0 / 0.8) 34%,
-        #000 42%,
-        #000 78%,
-        rgb(0 0 0 / 0.5) 90%,
-        transparent 100%
-      ),
-      linear-gradient(90deg, transparent 0%, rgb(0 0 0 / 0.3) 10%, rgb(0 0 0 / 0.75) 22%, #000 32%);
-    mask-composite: intersect;
-  }
-}
-
-/* El render trae aire arriba: la caja de la cabecera lo recorta subiendo la máquina. */
 .compactaMaquina {
   position: absolute;
-  top: -17.7%;
-  left: 0;
-  width: 100%;
+  inset: 2% 6%;
 }
 
 /* --- Tarjetas --------------------------------------------------------------------------------- */
 
-.zonaTarjetas {
-  position: relative;
-}
-
 .carrusel {
+  position: relative;
+  z-index: 1;
   margin-top: 32px;
 }
 
-/* El margen negativo con relleno deja aire para el contorno de foco, que el overflow recortaría. */
+@media (min-width: 1024px) {
+  .carrusel {
+    margin-top: clamp(3.5rem, 7vw, 7rem);
+  }
+}
+
+/*
+ * Tira deslizable hasta el borde de la pantalla, con un fundido a la derecha que dice «hay más». El
+ * relleno de arriba y abajo deja aire para la sombra y el contorno de foco, que el overflow recortaría.
+ */
 .pista {
   display: flex;
-  margin: -4px;
-  padding: 4px;
+  margin: 0 calc(-1 * var(--nueva-lado));
+  padding: 4px var(--nueva-lado) 12px;
   gap: 16px;
   overflow-x: auto;
   list-style: none;
-  scroll-padding-inline: 4px;
+  scroll-padding-inline: var(--nueva-lado);
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
+  mask-image: linear-gradient(90deg, #000 88%, transparent);
 }
 
 .pista::-webkit-scrollbar {
@@ -260,34 +254,41 @@
 @media (min-width: 1024px) {
   .pista {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    /* Todas las tarjetas con el alto de la más alta, también entre filas. */
-    grid-auto-rows: 1fr;
+    margin: 0;
+    padding: 4px 0 0;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     overflow: visible;
+    mask-image: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .pista {
+    gap: 20px;
   }
 }
 
 @media (min-width: 1536px) {
   .pista {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
   }
 }
 
 .item {
-  width: 78%;
+  width: 72%;
   flex-shrink: 0;
   scroll-snap-align: start;
 }
 
-@media (min-width: 480px) {
+@media (min-width: 640px) {
   .item {
-    width: calc((100% - 1rem) / 2);
+    width: 40%;
   }
 }
 
 @media (min-width: 768px) {
   .item {
-    width: calc((100% - 2rem) / 3);
+    width: 30%;
   }
 }
 
@@ -299,132 +300,234 @@
 
 .tarjeta {
   position: relative;
-  isolation: isolate;
   display: flex;
   height: 100%;
-  min-height: 25rem;
-  padding: 52% 16px 16px;
   overflow: hidden;
   flex-direction: column;
-  border-radius: 18px;
-  background: #1f1d1b;
-  color: #fff;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(20 17 15 / 0.06),
+    0 8px 18px -12px rgb(20 17 15 / 0.25);
+  color: var(--color-texto);
   text-decoration: none;
 }
 
-@media (min-width: 1024px) {
-  .tarjeta {
-    min-height: 0;
-    padding: 28% 24px 24px;
-  }
-}
-
-@media (min-width: 1536px) {
-  .tarjeta {
-    padding: 42% 6% 6%;
-  }
-}
-
 .tarjeta:focus-visible {
-  outline: 3px solid var(--color-marca);
+  outline: 3px solid var(--nueva-rojo-texto);
   outline-offset: 3px;
 }
 
-.tarjetaFoto {
-  z-index: -2;
-  object-fit: cover;
+/* Arriba, el panel del color de la marca (`--panel-inicio` → `--panel-fin`, del servidor). */
+.panel {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 0.94;
+  overflow: hidden;
+  background: linear-gradient(150deg, var(--panel-inicio) 0%, var(--panel-fin) 100%);
 }
 
-.tarjetaVelo {
+/* Franja de luz en diagonal: blanca sobre colores, oscura sobre claros. */
+.luz {
   position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(
-    to top,
-    rgb(16 14 13 / 0.94) 0%,
-    rgb(16 14 13 / 0.88) 45%,
-    rgb(16 14 13 / 0.55) 58%,
-    rgb(16 14 13 / 0.1) 72%,
-    transparent 82%
-  );
+  top: -10%;
+  right: 8%;
+  width: 30%;
+  height: 85%;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.16) 0%, transparent 100%);
+  transform: skewX(-30deg);
 }
 
-.placa {
+.panel[data-claro] .luz {
+  background: linear-gradient(180deg, rgb(20 17 15 / 0.06) 0%, transparent 100%);
+}
+
+/* El paisaje de montañas al pie, que se funde con el color por arriba. */
+.paisaje,
+.fotoMarca {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 52%;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 45%);
+}
+
+.paisaje img {
+  object-position: 50% 100%;
+}
+
+/* Sin máquina: la foto de la marca ocupa su sitio, algo más alta. */
+.fotoMarca {
+  height: 66%;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 30%);
+}
+
+.logoCaja,
+.logoConDistribuidor {
+  position: absolute;
+  top: 7%;
+  left: 10%;
   display: flex;
-  aspect-ratio: 1;
-  width: 40%;
-  min-width: 84px;
-  max-width: 110px;
-  padding: 10px;
+  width: 80%;
+  height: 24%;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 2px 6px -2px rgb(0 0 0 / 0.35);
 }
 
-/*
- * Desde 1024 px, la placa crece con la pantalla de 96 a 112 px (108 px a 1440; Juan Pablo,
- * 2026-10-27): en los 80 px del prototipo los logos anchos, como el de Hitachi LANDCROS, no se leían.
- */
-@media (min-width: 1024px) {
-  .placa {
-    width: clamp(96px, 7.5vw, 112px);
-    min-width: 0;
-    max-width: none;
-    padding: 9px;
-    border-radius: 13px;
-  }
-}
-
-@media (min-width: 1536px) {
-  .placa {
-    width: clamp(96px, 40%, 112px);
-    padding: 10px;
-    border-radius: 14px;
-  }
+.logoConDistribuidor {
+  height: 26%;
+  flex-direction: column;
+  gap: 6%;
 }
 
 .logo {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
   max-height: 100%;
   object-fit: contain;
 }
 
-.placaNombre {
-  color: var(--color-texto);
-  font-size: 13px;
+.logoConDistribuidor .logo {
+  max-width: 88%;
+  max-height: 52%;
+}
+
+.nombre {
+  color: #fff;
+  font-size: 1.25rem;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.1;
   text-align: center;
 }
 
-.presentacion {
-  margin-top: 16px;
+.panel[data-claro] .nombre {
+  color: var(--color-texto);
+}
+
+.distribuidor {
+  display: flex;
+  max-height: 34%;
+  align-items: center;
+  gap: 6px;
   color: rgb(255 255 255 / 0.9);
-  font-size: 15px;
-  line-height: 1.375;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.panel[data-claro] .distribuidor {
+  color: #57524e;
+}
+
+.logoDistribuidor {
+  width: auto;
+  height: 1.15rem;
+  object-fit: contain;
+}
+
+.maquina {
+  position: absolute;
+  right: 3%;
+  bottom: 2%;
+  left: 3%;
+  height: 62%;
+}
+
+.maquinaImagen {
+  object-fit: contain;
+  object-position: 50% 100%;
+}
+
+/* Abajo, en blanco, el botón. */
+.pieTarjeta {
+  display: block;
+  padding: 16px;
 }
 
 @media (min-width: 1024px) {
-  .presentacion {
-    margin-top: 12px;
-    font-size: 14.5px;
+  .pieTarjeta {
+    padding: 14px;
   }
 }
 
-@media (min-width: 1536px) {
-  .presentacion {
-    margin-top: 16px;
+@media (min-width: 1280px) {
+  .pieTarjeta {
+    padding: 16px;
   }
 }
 
-/* --- Puntos y pausa del carrusel (no salen en rejilla) ------------------------------------------ */
+.boton {
+  display: flex;
+  min-height: 44px;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px solid var(--color-marca);
+  border-radius: 999px;
+  color: var(--nueva-rojo-texto);
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+.boton svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+/* Al pasar el ratón (o con el foco) el botón se rellena de rojo; el externo ya va relleno. */
+.tarjeta:hover .boton,
+.tarjeta:focus-visible .boton,
+.boton[data-externo] {
+  border-color: var(--nueva-rojo-relleno);
+  background: var(--nueva-rojo-relleno);
+  color: #fff;
+}
+
+.tarjeta:hover .boton[data-externo],
+.tarjeta:focus-visible .boton[data-externo] {
+  border-color: var(--nueva-rojo-texto);
+  background: var(--nueva-rojo-texto);
+}
+
+@media (min-width: 1024px) {
+  .boton {
+    font-size: 0.85rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .boton {
+    font-size: 0.95rem;
+  }
+}
+
+/* En tarjetas angostas (768–1279 px) solo el dominio; el nombre accesible sigue completo. */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .visitar {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* --- Puntos y pausa del carrusel (no salen en la fila de 5) ------------------------------------ */
 
 .controles {
   display: flex;
-  margin-top: 20px;
+  margin-top: 12px;
   align-items: center;
   justify-content: center;
   gap: 4px;
@@ -462,7 +565,7 @@
 
 .punto:focus-visible,
 .verTodo:focus-visible {
-  outline: 2px solid var(--color-marca);
+  outline: 2px solid var(--nueva-rojo-texto);
   outline-offset: 3px;
 }
 
@@ -470,59 +573,30 @@
   margin-left: 8px;
 }
 
-/* --- La máquina desde 1024 px: pegada al borde derecho de las tarjetas ------------------------- */
-
-.empujaZona {
-  display: none;
-}
-
-/*
- * Se mide por la ALTURA de las tarjetas, con tope por el ancho de la pantalla (45vw en 2 × 2, 32vw
- * en fila de 4) para que la rueda trasera quepa siempre. El render (1920 × 1344) tiene la punta del
- * cucharón al 1,6 % del ancho y las ruedas al 84,4 % del alto: la caja se pega a la última tarjeta
- * (98,3 %) y baja un 15,6 % para dejarlas a ras del pie. `translate` (no `transform`): la entrada
- * (N1) anima `transform` sin pisarlo.
- */
-@media (min-width: 1024px) {
-  .empujaZona {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    display: block;
-    pointer-events: none;
-  }
-
-  .empuja {
-    position: absolute;
-    bottom: 0;
-    left: 98.3%;
-    height: min(112%, 45vw);
-    translate: 0 15.6%;
-  }
-}
-
-@media (min-width: 1536px) {
-  .empuja {
-    height: min(150%, 32vw);
-  }
-}
-
 /* --- «Ver todo» -------------------------------------------------------------------------------- */
 
 .pie {
+  position: relative;
+  z-index: 1;
   display: flex;
   margin-top: 32px;
   justify-content: center;
 }
 
+@media (min-width: 1024px) {
+  .pie {
+    margin-top: 40px;
+  }
+}
+
 .verTodo {
   display: inline-flex;
   min-height: 48px;
-  padding: 0 32px;
+  padding: 0 36px;
   align-items: center;
   gap: 12px;
   border-radius: 999px;
-  background: var(--color-marca);
+  background: var(--nueva-rojo-relleno);
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
@@ -531,11 +605,15 @@
 }
 
 .verTodo:hover {
-  background: color-mix(in srgb, var(--color-marca) 85%, #fff);
+  background: var(--nueva-rojo-texto);
 }
 
-.verTodo:active {
-  background: color-mix(in srgb, var(--color-marca) 78%, #000);
+@media (min-width: 1024px) {
+  .verTodo {
+    min-height: 56px;
+    padding: 0 44px;
+    font-size: 1.125rem;
+  }
 }
 
 .verTodo svg {
@@ -544,15 +622,15 @@
   flex: none;
 }
 
-/* --- N2: zoom lento de la foto al pasar el ratón (solo con movimiento) ------------------------- */
+/* --- N2: al pasar el ratón, la máquina avanza un poco (solo con movimiento) --------------------- */
 
 @media (prefers-reduced-motion: no-preference) {
-  [data-anim~="N2"] .tarjetaFoto {
+  [data-anim~="N2"] .maquinaImagen {
     transition: transform 500ms cubic-bezier(0.33, 1, 0.68, 1);
   }
 
-  [data-anim~="N2"] .tarjeta:hover .tarjetaFoto,
-  [data-anim~="N2"] .tarjeta:focus-visible .tarjetaFoto {
-    transform: scale(1.05);
+  [data-anim~="N2"] .tarjeta:hover .maquinaImagen,
+  [data-anim~="N2"] .tarjeta:focus-visible .maquinaImagen {
+    transform: translateX(6px);
   }
 }

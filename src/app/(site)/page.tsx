@@ -34,6 +34,7 @@ import { getMarcasDePortada, getUsadosDePortada } from "@/lib/queries/getMaquina
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
+import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { getLogosMarca, getMarcasRepuestosDePortada } from "@/lib/queries/getLogosMarca";
 import { marcasDeLaBanda } from "@/lib/portada/marcasBanda";
 import { metadataDe } from "@/lib/seo/metadata";
@@ -85,6 +86,7 @@ export default async function HomePage() {
     logo,
     logosMarca,
     marcasRepuestos,
+    baldosas,
   ] = await Promise.all([
     getMarcasDePortada(),
     getUsadosDePortada(),
@@ -97,6 +99,7 @@ export default async function HomePage() {
     getLogo(),
     getLogosMarca(),
     getMarcasRepuestosDePortada(),
+    getBaldosasMarca(),
   ]);
   const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
   const relVideo = pagina.seccionCompania?.video;
@@ -151,13 +154,15 @@ export default async function HomePage() {
       ) : null}
 
       {/*
-       * «Maquinaria pesada nueva» con el DISEÑO DEL CLIENTE (2026-10-27): una tarjeta por marca
-       * visible de nueva, la máquina y la foto de obra del panel. Sin marcas, no se pinta.
+       * «Maquinaria pesada nueva» con el DISEÑO DEL CLIENTE v2 (2026-11-08): una tarjeta por marca
+       * visible de nueva con su color, su logo y su máquina, más la máquina, la foto de obra y el
+       * paisaje de las tarjetas del panel. Sin marcas, no se pinta.
        */}
       <SeccionNuevaKit
-        tarjetas={tarjetasDeMarcas(marcas, logosMarca)}
+        tarjetas={tarjetasDeMarcas(marcas, logosMarca, baldosas)}
         maquina={imagenDecorativa(nueva?.maquina)}
         fondo={imagenDecorativa(nueva?.fondo)}
+        paisaje={imagenDecorativa(nueva?.fondoTarjetas)}
         textos={{
           antetitulo: tx(nueva?.antetitulo),
           titulo: tx(nueva?.titulo),

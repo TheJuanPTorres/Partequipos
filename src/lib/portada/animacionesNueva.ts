@@ -4,7 +4,8 @@
  *
  * - N1: al llegar a la sección, las tarjetas de marca entran escalonadas y la máquina, con un
  *   fundido (la entrada de `ZonaAnimada`, una sola por zona).
- * - N2: al pasar el ratón, zoom lento de la foto de la marca (el del prototipo).
+ * - N2: al pasar el ratón, la máquina de la tarjeta avanza un poco (diseño v2, 2026-11-08; antes,
+ *   zoom lento de la foto de la marca).
  *
  * En un preview se prueban con `?anim=N1` o `?anim=N2`; en el sitio publicado el parámetro no hace nada.
  * Solo `opacity` y `transform`, nada con «reducir movimiento» y, sin JavaScript, todo quieto.

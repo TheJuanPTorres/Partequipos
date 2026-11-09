@@ -22,12 +22,7 @@ import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { categoriasDeMarca, logoConAlt } from "@/lib/repuestos/marca";
 import { ANIMACIONES_CATEGORIAS } from "@/lib/repuestos/animacionesCategorias";
 import { tarjetasDeCategorias } from "@/lib/repuestos/plantillaTipo";
-import {
-  datosClaveModelo,
-  tituloFichaModelo,
-  lineaDeTexto,
-  otrosModelosDelTipo,
-} from "@/lib/repuestos/fichaModelo";
+import { tituloFichaModelo, lineaDeTexto, otrosModelosDelTipo } from "@/lib/repuestos/fichaModelo";
 import {
   categoriasDelTipo,
   referenciaModelo4086,
@@ -160,11 +155,7 @@ export async function PaginaModeloRepuesto({
             titulo={tituloFichaModelo({ tipo, modelo })}
             logo={logo}
             linea={lineaDeTexto(modelo.descripcion)}
-            datos={datosClaveModelo({
-              tipo: tipo.nombre,
-              serie: modelo.serie,
-              modelo: texto(modelo.codigo) || modelo.nombre,
-            })}
+            datos={[]}
             formulario={configContactoMarca({
               origen: ruta,
               siteKey: turnstileSiteKey(),

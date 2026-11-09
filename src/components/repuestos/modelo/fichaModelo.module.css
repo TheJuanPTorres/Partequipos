@@ -113,8 +113,8 @@
 /* --- Otros modelos -------------------------------------------------------------------------- */
 
 .otros {
-  margin: 56px max(1.5vw, 12px) 72px;
-  padding: 0 4px;
+  margin: 56px max(1.5vw, 12px) 0;
+  padding: 0 4px 56px;
 }
 
 .otrosTitulo {
@@ -156,6 +156,6 @@
   }
 
   .otros {
-    padding: 0;
+    padding: 0 0 40px;
   }
 }

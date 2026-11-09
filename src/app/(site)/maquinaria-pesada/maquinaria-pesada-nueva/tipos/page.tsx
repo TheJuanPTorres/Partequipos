@@ -8,11 +8,13 @@ import { vistaEncabezadoDeIndice } from "@/lib/indices/paginasIndice";
 import { DESCRIPCION_NUEVA, TITULO_NUEVA, tarjetasDeTiposNueva } from "@/lib/nueva/indiceTipos";
 import { getListadoNueva } from "@/lib/queries/getMaquinaria";
 import { getMarcas } from "@/lib/queries/getMarcas";
+import { getPaginasIndice } from "@/lib/queries/getPaginasIndice";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { fondoDeRespaldo } from "@/lib/repuestos/categoria";
 import { rutas } from "@/lib/routes";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
+import { imagenDeMedia } from "@/lib/utils/relations";
 
 // La página principal de maquinaria nueva (2026-10-23, cliente): el título y la descripción del
 // antiguo índice de nueva, que da 301 aquí, para que su SEO pase a esta URL.
@@ -37,10 +39,11 @@ const ANCLA = "nueva-tipos";
  * título y su descripción; canónica, la propia; en las migas es «Nueva».
  */
 export default async function NuevaTiposPage() {
-  const [listado, global, marcas] = await Promise.all([
+  const [listado, global, marcas, indice] = await Promise.all([
     getListadoNueva(),
     getRepuestosMarca(),
     getMarcas(),
+    getPaginasIndice(),
   ]);
 
   const breadcrumbs = [
@@ -49,7 +52,14 @@ export default async function NuevaTiposPage() {
     { nombre: "Nueva", path: rutas.nuevaTipos() },
   ];
 
-  const vista = vistaEncabezadoDeIndice(null, TITULO, fondoDeRespaldo(marcas));
+  // La foto de la cabecera, editable (2026-11-09, dirección): «Páginas índice y contacto» →
+  // «Maquinaria pesada nueva»; vacía, la de siempre (el encabezado de la primera marca de
+  // repuestos que lo tenga).
+  const vista = vistaEncabezadoDeIndice(
+    null,
+    TITULO,
+    imagenDeMedia(indice.nuevaTipos?.fondo, "") ?? fondoDeRespaldo(marcas),
+  );
 
   return (
     <main className={estilos.pagina}>

@@ -4175,7 +4175,7 @@ export interface RepuestosMarca {
   createdAt?: string | null;
 }
 /**
- * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada», de su página «Otros», de «Lubricantes» y de «Trabaja con nosotros».
+ * Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», la foto del encabezado de «Maquinaria pesada nueva», y los textos de «Maquinaria pesada usada», de su página «Otros», de «Lubricantes» y de «Trabaja con nosotros».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "paginas-indice".
@@ -4215,6 +4215,12 @@ export interface PaginasIndice {
   categoriasRepuestos?: {
     /**
      * Opcional. Foto de obra a todo el ancho; sin ella, la del encabezado de la primera marca de repuestos que lo tenga.
+     */
+    fondo?: (number | null) | Media;
+  };
+  nuevaTipos?: {
+    /**
+     * Opcional. Foto de obra horizontal a todo el ancho (mejor de 1920 px o más), con zona tranquila donde va el título. Sin ella, la del encabezado de la primera marca de repuestos que lo tenga.
      */
     fondo?: (number | null) | Media;
   };
@@ -4621,6 +4627,11 @@ export interface PaginasIndiceSelect<T extends boolean = true> {
             };
       };
   categoriasRepuestos?:
+    | T
+    | {
+        fondo?: T;
+      };
+  nuevaTipos?:
     | T
     | {
         fondo?: T;

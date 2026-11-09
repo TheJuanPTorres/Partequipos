@@ -108,6 +108,7 @@ import * as migration_20261105_190757_portada_marcas_banda from './20261105_1907
 import * as migration_20261109_041143_portada_banda_logos_libres from './20261109_041143_portada_banda_logos_libres';
 import * as migration_20261109_121811_portada_nueva_v2 from './20261109_121811_portada_nueva_v2';
 import * as migration_20261109_143314_categorias_nueva_orden from './20261109_143314_categorias_nueva_orden';
+import * as migration_20261109_150028_indice_tipos_nueva_fondo from './20261109_150028_indice_tipos_nueva_fondo';
 
 export const migrations = [
   {
@@ -658,6 +659,11 @@ export const migrations = [
   {
     up: migration_20261109_143314_categorias_nueva_orden.up,
     down: migration_20261109_143314_categorias_nueva_orden.down,
-    name: '20261109_143314_categorias_nueva_orden'
+    name: '20261109_143314_categorias_nueva_orden',
+  },
+  {
+    up: migration_20261109_150028_indice_tipos_nueva_fondo.up,
+    down: migration_20261109_150028_indice_tipos_nueva_fondo.down,
+    name: '20261109_150028_indice_tipos_nueva_fondo'
   },
 ];

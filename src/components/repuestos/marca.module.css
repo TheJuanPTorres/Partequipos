@@ -721,7 +721,8 @@ a.pildora:hover {
 
 .contacto {
   display: flex;
-  padding: 30px 72px 58px;
+  /* Abajo, medio espaciado común: con la sección siguiente suman el común (ronda 12, t5, fase 2). */
+  padding: 30px 72px calc(var(--espacio-seccion) / 2);
   flex-direction: column;
   gap: 20px;
 }
@@ -752,13 +753,13 @@ a.pildora:hover {
 
 @media (max-width: 1024px) {
   .contacto {
-    padding: 30px 5vw 40px;
+    padding: 30px 5vw calc(var(--espacio-seccion) / 2);
   }
 }
 
 @media (max-width: 767px) {
   .contacto {
-    padding: 30px 20px 40px;
+    padding: 30px 20px calc(var(--espacio-seccion) / 2);
   }
 }
 

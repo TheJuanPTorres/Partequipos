@@ -105,7 +105,7 @@ export type GrupoMenu = {
   /**
    * Como `externo`, pero a una página de ESTE sitio, en la misma pestaña y sin icono: una marca
    * de lubricante de «Otra web» todavía sin enlace lleva a la página de la categoría con el
-   * selector de marcas, donde su panel dice «Muy pronto» (Dispel, 2026-11-05).
+   * selector de marcas, donde su panel lleva a la portada (Dispel, 2026-11-05).
    */
   interno?: string;
   /**
@@ -525,7 +525,7 @@ export function panelRepuestos(d: DatosMegamenu): PanelMenu {
  */
 export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
   // Una marca de «Otra web» va a su web; sin enlace válido, a la página del selector de marcas
-  // que la muestra (Dispel, 2026-11-05: «Muy pronto»). Sin ninguna de las dos, no sale: sin
+  // que la muestra (Dispel, 2026-11-05). Sin ninguna de las dos, no sale: sin
   // enlaces rotos.
   const selector = paginaDelSelector(d.categoriasTecnicas ?? []);
   const marcas = [...(d.marcasLubricante ?? [])]
@@ -540,7 +540,10 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
   if (marcas.length === 0) return null;
   const categorias = [...(d.categoriasLubricante ?? [])].sort(porNombre);
   return {
-    verTodo: { etiqueta: "Ver todos los lubricantes", href: conBarra(rutas.lubricantes()) },
+    verTodo: {
+      etiqueta: "Ver todos los lubricantes",
+      href: paginaDeLubricantes(d.categoriasTecnicas ?? []) ?? conBarra(rutas.lubricantes()),
+    },
     grupos: marcas.map((m): GrupoMenu => {
       const titulo = `Lubricantes ${m.nombre}`;
       const pais = paisDe(m.paisOrigen);
@@ -583,6 +586,17 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
  * categoría «Lubricantes»): la primera, por nombre, con el selector encendido y la marca entre las
  * elegidas (o sin ninguna elegida: entonces salen todas). `null` si ninguna la muestra.
  */
+/**
+ * «Ver todos los lubricantes» va a la página de la categoría técnica «Lubricantes» (la del
+ * selector de marcas, 2026-11-09); sin ella, a la página general `/lubricantes/`.
+ */
+function paginaDeLubricantes(categorias: ReadonlyArray<CategoriaTecnicaMenu>): string | null {
+  const c = [...categorias]
+    .filter((c) => c.slug && c.selectorMarcas?.activo && esCategoriaPrincipal(c))
+    .sort(porNombre)[0];
+  return c ? conBarra(rutas.categoriaRepuestos(c.slug)) : null;
+}
+
 function paginaDelSelector(
   categorias: ReadonlyArray<CategoriaTecnicaMenu>,
 ): (marca: number) => string | null {

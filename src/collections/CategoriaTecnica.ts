@@ -446,7 +446,7 @@ export const CategoriaTecnica: CollectionConfig = {
           admin: {
             condition: (_, hermanos) => hermanos?.activo === true,
             description:
-              "Vacío, todas las marcas de lubricantes: primero las que tienen página aquí. Una marca de «Otra web» sin enlace sale con «Muy pronto».",
+              "Vacío, todas las marcas de lubricantes: primero las que tienen página aquí. Una marca de «Otra web» sin enlace lleva su «Ver productos» a la portada.",
           },
         },
       ],

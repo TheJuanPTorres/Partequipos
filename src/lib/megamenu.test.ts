@@ -490,6 +490,11 @@ describe("megamenú: lubricantes con bandera y marca de otra web (Dispel, 2026-1
     }
   });
 
+  it("«Ver todos los lubricantes» va a la categoría Lubricantes si tiene el selector; si no, a la general", () => {
+    assert.equal(panelLubricantes(conSelector([1, 2]))!.verTodo.href, PAGINA_SELECTOR);
+    assert.equal(panelLubricantes(conSelector([1, 2], false))!.verTodo.href, "/lubricantes/");
+  });
+
   it("con enlace, el enlace gana a la página del selector", () => {
     const d = { ...conSelector([1, 2]), marcasLubricante: conEnlace.marcasLubricante };
     const dispel = panelLubricantes(d)!.grupos[1]!;

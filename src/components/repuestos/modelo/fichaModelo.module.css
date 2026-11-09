@@ -125,6 +125,11 @@
   line-height: 1.2;
 }
 
+/* Borde fino y visible: las tarjetas se distinguen del fondo (Juan Pablo, #433). */
+.otros ul a {
+  border: 1px solid #c8c8c8;
+}
+
 @media (max-width: 1024px) {
   .ficha {
     grid-template-columns: minmax(0, 1fr);

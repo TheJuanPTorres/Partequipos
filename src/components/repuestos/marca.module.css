@@ -1925,8 +1925,8 @@ a.modelo:hover {
   display: grid;
   margin: 0;
   padding: 0;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
   list-style: none;
 }
 
@@ -1936,29 +1936,43 @@ a.modelo:hover {
 }
 
 .baldosaCompacta {
-  padding: 8px 8px 12px;
-  gap: 6px;
-  border-radius: 16px;
+  padding: 6px 6px 10px;
+  gap: 5px;
+  border-radius: 12px;
 }
 
 .baldosaCompacta .baldosaFoto {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
 }
 
 .baldosaCompacta .baldosaNombre {
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.2;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .baldosaCompacta .baldosaVer {
-  padding: 5px 12px;
-  font-size: 12px;
+  padding: 4px 9px;
+  gap: 4px;
+  font-size: 11px;
+  white-space: nowrap;
 }
 
 @media (max-width: 767px) {
   .baldosasFicha {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+  }
+
+  .baldosaCompacta .baldosaNombre {
+    font-size: 14px;
+  }
+
+  .baldosaCompacta .baldosaVer {
+    padding: 5px 12px;
+    font-size: 12px;
   }
 }
 

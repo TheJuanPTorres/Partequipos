@@ -8,8 +8,11 @@ import {
   type LogoConAlt,
   type LogoMarca,
 } from "../marca/logoMarca";
+import { validarEnlace } from "../fields/reglasPortada";
+import { normalizarEnlaceExterno } from "../nueva/enlaceExterno";
 import { rutas, SEGMENTO_OTROS_USADA } from "../routes";
 import { imagenDeMedia, poblado, type ImagenLista } from "../utils/relations";
+import { filasDeLaBanda, type FilaBanda } from "./marcasBanda";
 import {
   hrefDeCategoriaUsada,
   SLUG_EXCAVADORAS,
@@ -200,6 +203,8 @@ export type LogoDePortada = {
   logo: LogoConAlt;
   /** A dónde lleva el logo (la página de la marca de repuestos); sin él, no es un enlace. */
   href?: string;
+  /** `href` es de otro sitio: se abre en otra pestaña, con icono y aviso (logos libres). */
+  externo?: boolean;
 };
 
 /** Una marca de repuestos tal como la lee la consulta ligera de la portada. */
@@ -219,6 +224,41 @@ export function logosDeMarcasRepuestos(marcas: MarcaDeRepuestos[]): LogoDePortad
         nombre,
         logo: { ...m.logo, alt: nombre },
         href: `${rutas.marca(m.slug)}/`,
+      },
+    ];
+  });
+}
+
+/**
+ * Los logos de la banda «Marcas de repuestos» (#429 y logos libres, 2026-11-08): las filas de
+ * «Marcas de la banda» en su orden —una marca, con su logo y su página; un logo libre, con su
+ * imagen tal cual, su nombre como alt y su enlace si lo tiene— o, con la lista vacía, TODAS las marcas por orden alfabético, como siempre. Una marca elegida sin logo o borrada
+ * no deja hueco (si ninguna se pinta, la banda queda vacía y la sección no sale, como en el #429).
+ * El enlace de un logo libre: una ruta o dirección del sitio (misma pestaña) o una dirección https
+ * de otro sitio (`externo`: otra pestaña); uno que no valga, ninguno.
+ */
+export function logosDeLaBandaDeRepuestos(
+  todas: MarcaDeRepuestos[],
+  filas: readonly FilaBanda[] | null | undefined,
+): LogoDePortada[] {
+  const elegidas = filasDeLaBanda(filas);
+  if (elegidas.length === 0) return logosDeMarcasRepuestos(todas);
+  const porId = new Map(todas.map((m) => [m.id, m]));
+  return elegidas.flatMap((f): LogoDePortada[] => {
+    if (f.tipo === "marca") {
+      const m = porId.get(f.marca);
+      return m ? logosDeMarcasRepuestos([m]) : [];
+    }
+    const externo = f.enlace ? normalizarEnlaceExterno(f.enlace) : null;
+    const interno = f.enlace && !externo && validarEnlace(f.enlace) === true ? f.enlace : null;
+    const href = externo ?? interno ?? undefined;
+    return [
+      {
+        id: `libre-${f.clave}`,
+        nombre: f.nombre,
+        logo: { ...f.imagen, oscuro: false, alt: f.nombre },
+        ...(href ? { href } : {}),
+        ...(externo ? { externo: true } : {}),
       },
     ];
   });

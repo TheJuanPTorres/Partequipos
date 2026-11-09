@@ -1705,9 +1705,38 @@ export interface Pagina {
     titulo?: string | null;
     tituloResaltado?: string | null;
     /**
-     * Elige qué marcas salen en la banda y arrástralas para cambiar el orden: salen de izquierda a derecha en el orden de esta lista. Si la dejas vacía, salen todas las marcas de repuestos por orden alfabético. Una marca sin logo no sale.
+     * Qué logos salen en la banda y en qué orden: de izquierda a derecha, el de esta lista (arrastra las filas para cambiarlo). Con «Añadir» eliges una «Marca de repuestos» (su logo y su página) o un «Logo libre» (un fabricante que no es marca de repuestos, como Donaldson: su logo, su nombre y un enlace si quieres). Si la dejas vacía, salen todas las marcas de repuestos por orden alfabético.
      */
-    marcasBanda?: (number | Marca)[] | null;
+    marcasBanda?:
+      | (
+          | {
+              /**
+               * Sale con su logo de siempre y lleva a la página de la marca.
+               */
+              marca: number | Marca;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'bandaMarca';
+            }
+          | {
+              /**
+               * Súbelo antes en «Archivos → Imágenes». Sale a la misma altura que los demás logos de la banda.
+               */
+              imagen: number | Media;
+              /**
+               * Por ejemplo, «Donaldson». Es el texto alternativo del logo: lo leen los lectores de pantalla y los buscadores.
+               */
+              nombre: string;
+              /**
+               * Una ruta del sitio (p. ej. /repuestos-maquinaria-pesada-colombia/…/) o una dirección https:// de otro sitio, que se abre en otra pestaña. Vacío: el logo no es un enlace.
+               */
+              enlace?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'bandaLogo';
+            }
+        )[]
+      | null;
     /**
      * Decorativa: la máquina a la izquierda, por delante de la banda de logos (hoy, la Yanmar ViO80). Opcional.
      */
@@ -3312,7 +3341,26 @@ export interface PaginasSelect<T extends boolean = true> {
         antetitulo?: T;
         titulo?: T;
         tituloResaltado?: T;
-        marcasBanda?: T;
+        marcasBanda?:
+          | T
+          | {
+              bandaMarca?:
+                | T
+                | {
+                    marca?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+              bandaLogo?:
+                | T
+                | {
+                    imagen?: T;
+                    nombre?: T;
+                    enlace?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+            };
         maquina?: T;
         tamanoMaquina?: T;
       };

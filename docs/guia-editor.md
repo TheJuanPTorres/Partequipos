@@ -354,12 +354,22 @@ oficial, no lo pongas.
   no se pinta.
 - **Marcas de repuestos (la banda de logos):** en el grupo «Sección «Marcas de
   repuestos» de la portada», el campo **«Marcas de la banda»** decide qué
-  marcas salen y en qué orden. Elige las marcas en la lista desplegable (cada
-  una solo una vez) y **arrástralas** para ordenarlas: la banda las pinta en
-  ese orden. Para quitar una, pulsa la «×».
-  **Si dejas el campo vacío, salen todas las marcas de repuestos por orden
-  alfabético**, como hasta ahora. El logo y el enlace no se eligen aquí: son
-  los de cada marca (**Repuestos → Marcas de repuestos**), y una marca sin
+  logos salen y en qué orden. Con **«Añadir»** eliges una de dos clases de
+  fila:
+  - **Marca de repuestos:** una marca que ya existe (cada una solo una vez).
+    Sale con su logo de siempre y lleva a su página. El logo se cambia en la
+    marca (**Repuestos → Marcas de repuestos**).
+  - **Logo libre:** un fabricante de repuestos que no es marca de maquinaria
+    (Donaldson, Berco, ESCO…). Lleva el **logo** (PNG o WebP con fondo
+    transparente, subido antes en **Archivos → Imágenes**), el **nombre** (lo
+    leen los lectores de pantalla) y, si quieres, un **enlace**: una ruta del
+    sitio (`/…/`) o una dirección `https://` de otro sitio, que se abre en otra
+    pestaña con un icono. Sin enlace, el logo no es un enlace. No crea ninguna
+    página.
+
+  **Arrastra** las filas para ordenarlas: la banda las pinta en ese orden. Para
+  quitar una, usa el menú de la fila. **Si dejas el campo vacío, salen todas las
+  marcas de repuestos por orden alfabético**, como hasta ahora. Una marca sin
   logo no sale.
 
 ### 5.9 Menú, pie y datos de la empresa

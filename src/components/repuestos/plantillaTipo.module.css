@@ -6,7 +6,8 @@
 /* --- ¿Por qué elegirnos? ----------------------------------------------------------- */
 
 .porQue {
-  padding: 5% 3%;
+  /* Con techo: el 5 % · 3 % crecía sin tope con la pantalla (la sección lleva fondo propio). */
+  padding: min(5%, 72px) min(3%, 48px);
   background: var(--color-fondo-seccion);
 }
 
@@ -42,7 +43,7 @@
 .porQueTexto {
   display: flex;
   width: 60%;
-  padding: 5%;
+  padding: min(5%, 64px);
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
@@ -148,7 +149,8 @@
 /* --- Sedes ------------------------------------------------------------------------- */
 
 .sedes {
-  padding: 3%;
+  /* Arriba y abajo, el común (el 3 % llegaba a 115 px a 3840); a los lados, con techo. */
+  padding: var(--espacio-seccion) min(3%, 48px);
 }
 
 .sedesLista {

@@ -16,6 +16,8 @@
   --sedes-curva: cubic-bezier(0.625, 0.05, 0, 1);
 
   width: 100%;
+  /* Abajo, medio común: con el medio de arriba de los testimonios suman el común. */
+  padding-bottom: calc(var(--espacio-seccion) / 2);
   background: #fff;
   color: var(--sedes-tinta);
 }

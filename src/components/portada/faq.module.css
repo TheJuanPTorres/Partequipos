@@ -8,6 +8,8 @@
 .seccion {
   position: relative;
   /* Con techo: el 5 % · 3 % crecía con la pantalla (192 px arriba a 3840). */
+  /* Sobre el medio común de abajo de los testimonios, el otro medio. */
+  margin-top: calc(var(--espacio-seccion) / 2);
   padding: min(5%, 72px) min(3%, 48px);
   background: var(--color-fondo-seccion);
 }

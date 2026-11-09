@@ -13,6 +13,14 @@
 
 .pagina {
   container-type: inline-size;
+  /*
+   * TOPE DE ANCHO (criterio de espacios de Juan Pablo, 2026-11-09): el contenido no pasa de
+   * 1680 px. Va como relleno y no como `max-width` para que el gris siga a todo el ancho, y porque
+   * los `cqi` se miden sobre la caja de contenido del contenedor: así el margen de 3 %, los rellenos
+   * de la galería y todo lo que va en `cqi` se quedan en su valor de 1680 px y no crecen más. Hasta
+   * 1680 px no cambia nada.
+   */
+  padding-inline: max(0px, calc((100% - 1680px) / 2));
   /* El fondo gris del kit (#F0F0F0) va en el `<main>`, como en Nosotros. */
   background: var(--color-fondo-seccion);
   color: var(--color-texto);
@@ -79,7 +87,8 @@
   grid-template-columns: 1fr 1fr;
   /* 20 px entre columnas (y entre filas, en tablet y móvil), como en ux-9. */
   gap: 20px;
-  min-height: 65vh;
+  /* Con techo: en una pantalla de 2160 px de alto eran 1400 px de tarjeta con aire. */
+  min-height: min(65vh, 720px);
   /*
    * DESVIACIÓN (cliente, sesión del 2026-10-14): 24 px de aire bajo la
    * cabecera fija, como en las páginas de repuestos (#189). En ux-9 la tarjeta

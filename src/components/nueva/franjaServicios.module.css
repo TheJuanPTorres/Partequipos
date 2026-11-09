@@ -1,7 +1,8 @@
 /* Franja de servicios de la plantilla de aditamentos (elementor 4020). */
 
 .franja {
-  padding: 0 3% 3%;
+  /* El 3 % de abajo, con tope: a 3840 px eran 115 px (criterio de espacios, 2026-11-09). */
+  padding: 0 3% min(3%, 48px);
 }
 
 .lista {

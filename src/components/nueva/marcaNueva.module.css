@@ -121,13 +121,9 @@ a.enlaceFranja:focus-visible {
    contaba la franja, así que el margen lo pone entero: 100 px; 64 en móvil (medido en el #404,
    2026-10-27: quedaban 25, menos que los 32 / 24 entre el banner y sus propias tarjetas). */
 .grupoMarca + .grupoMarca {
-  margin-top: 100px;
-}
-
-@media (max-width: 767px) {
-  .grupoMarca + .grupoMarca {
-    margin-top: 64px;
-  }
+  /* Criterio de espacios de Juan Pablo (2026-11-09): el espaciado común, ~24 px en móvil y 48
+     como mucho. Sustituye a los 100 · 64 px de arriba. */
+  margin-top: var(--espacio-seccion);
 }
 
 /*
@@ -396,7 +392,8 @@ nav.barraMarcas {
 
 /* Aire antes del formulario de contacto: no pegado a la última tarjeta. */
 .tipos {
-  padding-bottom: 100px;
+  /* Antes 100 px; el espaciado común (criterio de espacios, 2026-11-09). */
+  padding-bottom: var(--espacio-seccion);
 }
 
 .verTodos {

@@ -28,8 +28,8 @@ export function fondoDeRespaldo(marcas: Marca[]): ImagenLista | null {
 }
 
 /**
- * Encabezado de una categoría: «Repuestos para maquinaria pesada» y
- * «<CATEGORÍA> En Colombia» (como el de la marca), con su descripción. El fondo
+ * Encabezado de una categoría: «Repuestos para maquinaria pesada» y «<CATEGORÍA>», sin la
+ * segunda línea de la marca («En Colombia»: Juan Pablo, 2026-11-08), con su descripción. El fondo
  * es su «Fondo del encabezado»; vacío, la imagen de su tarjeta, y sin ella, el de
  * respaldo (2026-10-20); sin logo.
  */
@@ -38,10 +38,9 @@ export function vistaEncabezadoCategoria(
   global: RepuestosMarca,
   respaldo: ImagenLista | null,
 ): VistaEncabezado {
-  const sufijo = texto(global.subtituloHero);
   return {
     linea1: texto(global.tituloHero) || "Repuestos para maquinaria pesada",
-    linea2: [categoria.nombre.trim().toUpperCase(), sufijo].filter(Boolean).join(" "),
+    linea2: categoria.nombre.trim().toUpperCase(),
     descripcion: texto(categoria.descripcion),
     fondo:
       imagenDeMedia(categoria.fondoHero, "") ?? imagenDeMedia(categoria.imagen, "") ?? respaldo,

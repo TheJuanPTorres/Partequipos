@@ -151,11 +151,26 @@ function Lista({ enlaces, alElegir }: { enlaces: EnlaceMenu[]; alElegir: () => v
     <ul className={estilos.lista}>
       {enlaces.map((e) => (
         <li key={e.href}>
-          <Link href={e.href} className={estilos.hoja} onClick={alElegir}>
-            <IconCheck aria-hidden="true" focusable="false" stroke={2.5} />
-            {e.etiqueta}
-            {e.nota ? <span className={estilos.nota}> · {e.nota}</span> : null}
-          </Link>
+          {e.externo ? (
+            // A otro sitio (la web de Eni, 2026-11-08): pestaña nueva, icono y aviso.
+            <a
+              href={e.href}
+              className={estilos.hoja}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${e.etiqueta} (${AVISO_OTRA_PESTANA})`}
+              onClick={alElegir}
+            >
+              <IconExternalLink aria-hidden="true" focusable="false" stroke={2.5} />
+              {e.etiqueta}
+            </a>
+          ) : (
+            <Link href={e.href} className={estilos.hoja} onClick={alElegir}>
+              <IconCheck aria-hidden="true" focusable="false" stroke={2.5} />
+              {e.etiqueta}
+              {e.nota ? <span className={estilos.nota}> · {e.nota}</span> : null}
+            </Link>
+          )}
         </li>
       ))}
     </ul>

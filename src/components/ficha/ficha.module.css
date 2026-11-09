@@ -607,7 +607,8 @@
 /* ====================== 3. OTRAS REFERENCIAS ====================== */
 
 .otras {
-  padding-top: 70px;
+  /* Antes 70 px (criterio de espacios, 2026-11-09). */
+  padding-top: var(--espacio-seccion);
 }
 
 .tituloOtras {

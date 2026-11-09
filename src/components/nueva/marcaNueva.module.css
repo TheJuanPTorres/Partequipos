@@ -9,7 +9,8 @@
 /* --- «Nuestra línea de equipos <marca> incluye:» y la franja de tipos --- */
 
 .linea {
-  padding: 60px 1.5vw 20px;
+  /* Arriba, el espaciado común (antes 60 · 40 px; criterio de espacios, 2026-11-09). */
+  padding: var(--espacio-seccion) min(1.5vw, 24px) 20px;
   text-align: center;
 }
 
@@ -110,9 +111,10 @@ a.enlaceFranja:focus-visible {
 
 /* --- Una sección por tipo --- */
 
+/* Medio espaciado común a cada lado de la línea (antes 40 + 40; criterio de espacios, 2026-11-09). */
 .seccionTipo {
-  margin: 40px 5% 0;
-  padding-top: 40px;
+  margin: calc(var(--espacio-seccion) / 2) 5% 0;
+  padding-top: calc(var(--espacio-seccion) / 2);
   border-top: 1px solid rgb(0 0 0 / 12%);
 }
 
@@ -255,7 +257,8 @@ nav.barraMarcas {
  */
 .rejilla > .tarjeta {
   display: grid;
-  margin-bottom: 55px;
+  /* Entre filas de tarjetas, el espaciado común (antes 55 px, que se sumaba al hueco de debajo). */
+  margin-bottom: var(--espacio-seccion);
   grid-row: span 4;
   grid-template-rows: subgrid;
   row-gap: 0;
@@ -408,18 +411,14 @@ nav.barraMarcas {
 }
 
 @media (max-width: 767px) {
-  .linea {
-    padding-top: 40px;
-  }
-
   .enlaceFranja,
   .separador {
     font-size: 6.5vw;
   }
 
   .seccionTipo {
-    margin: 30px 20px 0;
-    padding-top: 30px;
+    margin: calc(var(--espacio-seccion) / 2) 20px 0;
+    padding-top: calc(var(--espacio-seccion) / 2);
   }
 
   .tituloTipo {

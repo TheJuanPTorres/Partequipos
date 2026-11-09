@@ -1,6 +1,7 @@
-import { IconSettings } from "@tabler/icons-react";
+import { IconArrowRight, IconArrowUpRight, IconSettings } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties, ReactNode } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
@@ -12,26 +13,31 @@ import { CarruselNuevaKit } from "./diferidosKit";
 import estilos from "./nuevaKit.module.css";
 
 /**
- * «MAQUINARIA PESADA NUEVA» CON EL DISEÑO DEL CLIENTE (2026-10-27; prototipo `MaquinariaNueva` de
- * `partequipos-diseno\portada-nueva`), PORTADO a CSS modules. Rótulo y título, una TARJETA por
- * marca de nueva (foto de la marca, su logo en una placa blanca y su presentación, enlace a su
- * página) y la retroexcavadora de perfil, todo sobre la foto de obra de fondo. Tarjetas en
- * carrusel en el teléfono y la tablet, y en rejilla de 2 × 2 desde 1024 px (fila de 4 desde
- * 1536 px); desde 1024 px la máquina va pegada a la última tarjeta, como si las empujara, y por
- * debajo va junto al título.
+ * «MAQUINARIA PESADA NUEVA», DISEÑO DEL CLIENTE V2 (2026-11-08; `partequipos-diseno\portada-nueva-v2`,
+ * `MaquinariaNueva`), PORTADO a CSS modules sobre la sección del #389.
  *
- * Todo del panel: textos y botón de la sección (página «inicio»), la máquina y la foto de obra
- * (opcionales: sin ellas, la sección sale sin máquina o sobre blanco) y las marcas visibles de
- * nueva. Componente de SERVIDOR: el único JavaScript es el del carrusel y el de las animaciones.
+ * - Rótulo y título con «nueva» en rojo; detrás, la foto de obra que se funde a blanco y la
+ *   retroexcavadora grande arriba a la derecha. Por debajo de 1024 px la máquina va entre el texto
+ *   y las tarjetas, sobre la misma foto.
+ * - Una tarjeta por marca: panel del color de la marca con su logo (regla «una marca, un solo
+ *   logo»), una franja de luz en diagonal y la máquina sobre el paisaje; abajo, en blanco, el botón.
+ *   Al pasar el ratón la máquina avanza (N2) y el botón se rellena de rojo. LiuGong lleva
+ *   «Distribuido por» con el logo de Maquitecno y su botón va a su web, en otra pestaña.
+ * - Cinco en fila desde 1024 px; por debajo, tira deslizable (carrusel con pausa, D2).
  *
- * Se aparta del prototipo: el título en `<h2>` (el `<h1>` de la portada es otro), «Ver todo» con
- * el enlace del panel, el carrusel con el botón de pausa del sitio (D2) y las animaciones N1 y N2
- * con su interruptor (`ANIMACIONES_NUEVA`).
+ * Todo del panel: textos, enlace de «Ver todo», máquina, foto de obra y paisaje (página «inicio»),
+ * y por marca el color, el logo, la máquina y el distribuidor. Componente de SERVIDOR: el único
+ * JavaScript es el del carrusel y el de las animaciones.
+ *
+ * Se aparta del prototipo: el título es `<h2>` (el `<h1>` de la portada es otro); el contenido no
+ * pasa de 1680 px (a 1920 y 2560 las tarjetas se estirarían); el panel de Yanmar y el de LiuGong
+ * llevan el color de su baldosa con el logo en blanco (regla de dirección) en vez del blanco del
+ * diseño, y por eso el logo de Maquitecno va en blanco.
  */
 
-/** Ancho pintado de la foto de la tarjeta: 78 % / ½ / ⅓ de la fila; ¼–½ de ~52 % en rejilla. */
+/** Ancho pintado de la máquina de la tarjeta: 72 % / 40 % / 30 % del ancho en tira; ⅕ de ≤ 1680 px. */
 const SIZES_TARJETA =
-  "(max-width: 479px) 78vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1535px) 26vw, 17vw";
+  "(max-width: 639px) 70vw, (max-width: 767px) 40vw, (max-width: 1023px) 30vw, (max-width: 1680px) 18vw, 320px";
 
 export type TextosNueva = {
   antetitulo: string;
@@ -40,34 +46,42 @@ export type TextosNueva = {
   botonEnlace: string;
 };
 
+/** El título con la palabra «nueva» (la última, sin mirar mayúsculas) en rojo, como el diseño. */
+function tituloConNueva(titulo: string): ReactNode {
+  const m = /^([\s\S]*)\b(nueva)\b([\s\S]*)$/i.exec(titulo);
+  if (!m) return titulo;
+  return (
+    <>
+      {m[1]}
+      <span className={estilos.rojo}>{m[2]}</span>
+      {m[3]}
+    </>
+  );
+}
+
 export function SeccionNuevaKit({
   tarjetas,
   textos,
   maquina,
   fondo,
+  paisaje,
 }: {
   tarjetas: TarjetaMarca[];
   textos: TextosNueva;
   maquina: ImagenLista | null;
   fondo: ImagenLista | null;
+  paisaje: ImagenLista | null;
 }) {
   if (tarjetas.length === 0) return null;
   const idTitulo = "portada-nueva-titulo";
   return (
     <section id="nueva" className={estilos.seccion} aria-labelledby={idTitulo}>
       {fondo ? (
-        <div aria-hidden="true" className={estilos.escena}>
-          <div className={estilos.escenaFoto}>
-            <Image
-              src={fondo.url}
-              alt=""
-              fill
-              sizes="100vw"
-              className={estilos.foto}
-              style={{ objectPosition: "100% 100%" }}
-            />
+        <div aria-hidden="true" className={estilos.fondo}>
+          <div className={estilos.fondoFoto}>
+            <Image src={fondo.url} alt="" fill sizes="100vw" className={estilos.cubrir} />
+            <span className={estilos.fondoVelo} />
           </div>
-          <span className={estilos.escenaVelo} />
         </div>
       ) : null}
 
@@ -76,44 +90,39 @@ export function SeccionNuevaKit({
         permitirUrl={process.env.VERCEL_ENV !== "production"}
         entrada="N1"
       >
-        <div className={estilos.columna}>
-          <div className={`${estilos.cabecera} ${maquina ? estilos.cabeceraConMaquina : ""}`}>
-            <div className={estilos.textos}>
-              {textos.antetitulo ? <p className={estilos.antetitulo}>{textos.antetitulo}</p> : null}
-              <h2 id={idTitulo} className={estilos.titulo}>
-                {textos.titulo || "Maquinaria pesada nueva"}
-              </h2>
+        <div className={estilos.marco}>
+          {maquina ? (
+            <div
+              aria-hidden="true"
+              className={estilos.maquinaGrande}
+              style={{ aspectRatio: `${maquina.width} / ${maquina.height}` }}
+            >
+              <Image
+                src={maquina.url}
+                alt=""
+                fill
+                sizes="(max-width: 1023px) 1px, (max-width: 1680px) 44vw, 740px"
+                className={estilos.contener}
+              />
             </div>
-            {maquina ? <EscenaCompacta maquina={maquina} fondo={fondo} /> : null}
+          ) : null}
+
+          <div className={estilos.textos}>
+            {textos.antetitulo ? <p className={estilos.antetitulo}>{textos.antetitulo}</p> : null}
+            <h2 id={idTitulo} className={estilos.titulo}>
+              {tituloConNueva(textos.titulo || "Maquinaria pesada nueva")}
+            </h2>
           </div>
 
-          <div className={estilos.zonaTarjetas}>
-            <CarruselNuevaKit etiqueta="Marcas de maquinaria nueva" entrada>
-              {tarjetas.map((t) => (
-                <li key={t.id} className={estilos.item}>
-                  <Tarjeta marca={t} />
-                </li>
-              ))}
-            </CarruselNuevaKit>
-            {maquina ? (
-              // N1: la máquina entra con las tarjetas (`data-entrada` hace entrar a su hijo).
-              <div className={estilos.empujaZona} data-entrada="">
-                <div
-                  aria-hidden="true"
-                  className={estilos.empuja}
-                  style={{ aspectRatio: `${maquina.width} / ${maquina.height}` }}
-                >
-                  <Image
-                    src={maquina.url}
-                    alt=""
-                    fill
-                    sizes="(max-width: 1280px) 50vw, 40vw"
-                    className={estilos.contener}
-                  />
-                </div>
-              </div>
-            ) : null}
-          </div>
+          {maquina ? <EscenaCompacta maquina={maquina} fondo={fondo} /> : null}
+
+          <CarruselNuevaKit etiqueta="Marcas de maquinaria nueva" entrada>
+            {tarjetas.map((t) => (
+              <li key={t.id} className={estilos.item}>
+                <Tarjeta marca={t} paisaje={paisaje} />
+              </li>
+            ))}
+          </CarruselNuevaKit>
 
           {textos.botonTexto && textos.botonEnlace ? (
             <div className={estilos.pie}>
@@ -129,11 +138,7 @@ export function SeccionNuevaKit({
   );
 }
 
-/**
- * Por debajo de 1024 px la máquina va en la cabecera: a la derecha del título desde 768 px y
- * debajo de él en el teléfono, con la foto de obra detrás, que sale hasta los bordes y se funde en
- * blanco arriba y abajo. La caja recorta el aire de arriba del render.
- */
+/** Por debajo de 1024 px la retroexcavadora va entre el texto y las tarjetas, sobre la foto. */
 function EscenaCompacta({ maquina, fondo }: { maquina: ImagenLista; fondo: ImagenLista | null }) {
   return (
     <div aria-hidden="true" className={estilos.compacta}>
@@ -143,21 +148,17 @@ function EscenaCompacta({ maquina, fondo }: { maquina: ImagenLista; fondo: Image
             src={fondo.url}
             alt=""
             fill
-            sizes="(max-width: 767px) 180vw, 90vw"
-            className={estilos.foto}
-            style={{ objectPosition: "100% 100%" }}
+            sizes="(max-width: 1023px) 100vw, 1px"
+            className={estilos.cubrir}
           />
         </div>
       ) : null}
-      <div
-        className={estilos.compactaMaquina}
-        style={{ aspectRatio: `${maquina.width} / ${maquina.height}` }}
-      >
+      <div className={estilos.compactaMaquina}>
         <Image
           src={maquina.url}
           alt=""
           fill
-          sizes="(max-width: 767px) 100vw, 48vw"
+          sizes="(max-width: 1023px) 90vw, 1px"
           className={estilos.contener}
         />
       </div>
@@ -166,33 +167,91 @@ function EscenaCompacta({ maquina, fondo }: { maquina: ImagenLista; fondo: Image
 }
 
 /**
- * La tarjeta de una marca: la foto llena la tarjeta y se oscurece hacia abajo; el logo va en una
- * placa blanca (la regla común del logo, `LogoMarca`) y debajo la presentación. La placa arranca a
- * la misma altura en todas (relleno de arriba en % del ancho), así logos y textos quedan alineados.
+ * La tarjeta de una marca. Toda la tarjeta es el enlace; su nombre accesible es el logo (`alt` =
+ * nombre de la marca), el distribuidor y el texto del botón.
  */
-function Tarjeta({ marca }: { marca: TarjetaMarca }) {
-  return (
-    <Link href={marca.href} className={estilos.tarjeta}>
-      {marca.fondo ? (
-        <Image
-          src={marca.fondo.url}
-          alt=""
-          fill
-          sizes={SIZES_TARJETA}
-          className={estilos.tarjetaFoto}
-          style={{ objectPosition: marca.fondo.posicion }}
-        />
-      ) : null}
-      <span aria-hidden="true" className={estilos.tarjetaVelo} />
-      <span className={estilos.placa}>
-        {marca.logo ? (
-          <LogoMarca logo={marca.logo} alt={marca.nombre} sizes="110px" className={estilos.logo} />
-        ) : (
-          <span className={estilos.placaNombre}>{marca.nombre}</span>
-        )}
+function Tarjeta({ marca: m, paisaje }: { marca: TarjetaMarca; paisaje: ImagenLista | null }) {
+  const estiloPanel = {
+    "--panel-inicio": m.panel.inicio,
+    "--panel-fin": m.panel.fin,
+  } as CSSProperties;
+  const abajo = m.maquina ? paisaje : m.foto;
+  const contenido = (
+    <>
+      <span
+        className={estilos.panel}
+        style={estiloPanel}
+        data-claro={m.panel.claro ? "" : undefined}
+      >
+        <span aria-hidden="true" className={estilos.luz} />
+        {abajo ? (
+          <span aria-hidden="true" className={m.maquina ? estilos.paisaje : estilos.fotoMarca}>
+            <Image src={abajo.url} alt="" fill sizes={SIZES_TARJETA} className={estilos.cubrir} />
+          </span>
+        ) : null}
+        <span className={m.distribuidor ? estilos.logoConDistribuidor : estilos.logoCaja}>
+          {m.logo ? (
+            <LogoMarca logo={m.logo} alt={m.nombre} sizes="220px" className={estilos.logo} />
+          ) : (
+            <span className={estilos.nombre}>{m.nombre}</span>
+          )}
+          {m.distribuidor ? (
+            <span className={estilos.distribuidor}>
+              Distribuido por
+              {m.distribuidor.logo ? (
+                <LogoMarca
+                  logo={m.distribuidor.logo}
+                  alt={m.distribuidor.nombre}
+                  sizes="120px"
+                  className={estilos.logoDistribuidor}
+                />
+              ) : (
+                <strong>{m.distribuidor.nombre}</strong>
+              )}
+            </span>
+          ) : null}
+        </span>
+        {m.maquina ? (
+          <span aria-hidden="true" className={estilos.maquina}>
+            <Image
+              src={m.maquina.url}
+              alt=""
+              fill
+              sizes={SIZES_TARJETA}
+              className={estilos.maquinaImagen}
+            />
+          </span>
+        ) : null}
       </span>
-      {marca.texto ? <span className={estilos.presentacion}>{marca.texto}</span> : null}
-      <span className="sr-only">: ver la marca</span>
+
+      <span className={estilos.pieTarjeta}>
+        <span className={estilos.boton} data-externo={m.externo ? "" : undefined}>
+          {m.externo ? (
+            <span>
+              <span className={estilos.visitar}>Visitar </span>
+              {m.externo.dominio}
+            </span>
+          ) : (
+            "Ver maquinaria"
+          )}
+          {m.externo ? (
+            <IconArrowUpRight aria-hidden="true" focusable="false" stroke={2} />
+          ) : (
+            <IconArrowRight aria-hidden="true" focusable="false" stroke={2} />
+          )}
+        </span>
+      </span>
+    </>
+  );
+
+  return m.externo ? (
+    <a href={m.href} target="_blank" rel="noopener noreferrer" className={estilos.tarjeta}>
+      {contenido}
+      <span className="sr-only"> (se abre en otra pestaña)</span>
+    </a>
+  ) : (
+    <Link href={m.href} className={estilos.tarjeta}>
+      {contenido}
     </Link>
   );
 }

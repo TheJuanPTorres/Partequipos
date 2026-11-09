@@ -779,16 +779,16 @@ export const getCategoriaNuevaConEquipos = cache(async (slug: string) => {
 /**
  * Las marcas de nueva VISIBLES para «Maquinaria pesada nueva» de la portada (diseño del cliente,
  * 2026-10-27): todas menos la de aditamentos (no es una marca de máquinas), por «Posición en la
- * portada» y, sin ella, al final por nombre. Sin las que no tienen página propia («Enlace externo»,
- * LiuGong, 2026-11-03). `depth: 1` trae la foto de la cabecera del kit, la
- * de la tarjeta y el logo.
+ * portada» y, sin ella, al final por nombre. Desde el diseño v2 (2026-11-08) TAMBIÉN las que no
+ * tienen página propia («Enlace externo», LiuGong): su tarjeta lleva a su distribuidor. `depth: 1`
+ * trae el logo, la máquina y el distribuidor de «Tarjeta en la portada» y las fotos de respaldo.
  */
 export const getMarcasDePortada = cache(async (): Promise<MarcasMaquinaria[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "marcas-maquinaria",
     where: {
-      and: [{ disenoPagina: { not_equals: "aditamentos" } }, MARCA_VISIBLE, MARCA_CON_PAGINA],
+      and: [{ disenoPagina: { not_equals: "aditamentos" } }, MARCA_VISIBLE],
     },
     depth: 1,
     limit: 0,

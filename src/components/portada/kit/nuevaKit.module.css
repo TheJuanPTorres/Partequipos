@@ -18,21 +18,43 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding: 48px var(--nueva-lado) 56px;
+  /*
+   * Abajo, el espaciado común entre secciones (globals.css) MENOS el relleno de la tarjeta de
+   * «Maquinaria pesada usada», que viene debajo (12 · 20 · 24 px en usadosKit.module.css, con sus
+   * mismos cortes): así el hueco visible es el común y no la suma de los dos.
+   */
+  --nueva-hasta-usada: 12px;
+  /*
+   * Arriba, bajo la barra de secciones (dirección, ronda 12, t5: se veía pegada): el espaciado
+   * común, sin bajar de los 48 px de antes (48 · 55 · 64 a 390 · 768 · 1010).
+   */
+  padding: max(48px, var(--espacio-seccion)) var(--nueva-lado)
+    calc(var(--espacio-seccion) - var(--nueva-hasta-usada));
   background: #fff;
 }
 
 @media (min-width: 640px) {
   .seccion {
     --nueva-lado: 40px;
+    --nueva-hasta-usada: 20px;
   }
 }
 
 @media (min-width: 1024px) {
   .seccion {
     --nueva-lado: 2.6%;
+    /*
+     * Desde 1024 la foto de obra cubre la sección desde arriba y tocaba la tarjeta de la barra:
+     * medio espaciado común de blanco antes de la foto (40 px a 1440), y el título a 64 dentro.
+     */
+    margin-top: calc(var(--espacio-seccion) / 2);
     padding-top: 64px;
-    padding-bottom: 64px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .seccion {
+    --nueva-hasta-usada: 24px;
   }
 }
 

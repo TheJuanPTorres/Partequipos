@@ -2084,3 +2084,11 @@ a.modelo:hover {
   background: var(--marca-hover-fondo);
   color: var(--marca-hover-texto);
 }
+
+/*
+ * Ronda 12, t5: si el contacto (`ContactoMarca`) es lo último de la página, su aire de abajo sobra. Antes del pie manda
+ * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ */
+.contacto:last-child {
+  padding-bottom: 0;
+}

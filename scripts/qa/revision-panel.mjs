@@ -27,9 +27,10 @@
  *   (la pantalla de acceso, §17–§19 de decisiones-panel.md), `avisos` (los
  *   avisos del panel, §22), `listas` (estados, fechas, miniaturas y ordenar,
  *   filtrar y buscar, §24), `orden` (las listas de tipos y equipos nuevos de Case por su
- *   «Orden», #379) y `oscuro`, solo o detrás de otro modo
+ *   «Orden», #379), `arrastrar` (ordena «Categorías de maquinaria nueva» arrastrando y lo
+ *   devuelve a como estaba, #441) y `oscuro`, solo o detrás de otro modo
  *   («avisos oscuro»). Sin modo, la pasada normal en claro.
- * - No escribe nada en el panel: solo navega y lee. En modo `ficha` pulsa
+ * - No escribe nada en el panel, salvo el modo `arrastrar`, que cambia el orden y lo devuelve: solo navega y lee. En modo `ficha` pulsa
  *   «Guardar» con 5 «Destacar» marcados, que la validación rechaza, y comprueba
  *   después en la API que no se guardó nada.
  */
@@ -498,6 +499,143 @@ try {
         });
         hallazgos.push({ pantalla: nombre, ancho: ancho.nombre, ...lista });
         decir(`✓ ${nombre} (${ancho.nombre})`);
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `arrastrar` (2026-11-09, #441): la lista de «Categorías de maquinaria nueva» tal como
+     * entra el editor (desde el menú, sin `?sort`), con su asa por fila. A 1440, ARRASTRA la
+     * última fila al principio, comprueba por su efecto que el índice de tipos y «Por tipo de
+     * máquina» del menú la ponen primera y la DEVUELVE a su sitio (y comprueba que todo queda
+     * como estaba). A 390 solo captura. Escribe solo el orden, y lo deja como lo encontró.
+     */
+    if (MODO === "arrastrar") {
+      const LISTA = "/admin/collections/categorias-maquinaria";
+      const INDICE = "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/";
+      const filas = async () => {
+        await pagina.goto(`${base}${LISTA}`, { waitUntil: "networkidle" });
+        await pagina.waitForSelector("table tbody tr", { timeout: 30_000 });
+        await pagina.waitForTimeout(1000);
+        return pagina.evaluate(() =>
+          [...document.querySelectorAll("table tbody tr")].map((tr) => ({
+            nombre: tr.querySelector("a")?.textContent?.trim() ?? "",
+            asa: !!tr.querySelector(".sort-row"),
+            activa: !!tr.querySelector(".sort-row.active"),
+          })),
+        );
+      };
+      // El índice y el menú, leídos del HTML servido (sin pintar): el orden de los enlaces.
+      const ordenPublico = async () => {
+        // Por una pestaña del mismo contexto: la derivación solo va por sus rutas (`derivacion.mjs`).
+        const lector = await contexto.newPage();
+        await lector.goto(`${base}${INDICE}`, { waitUntil: "domcontentloaded" });
+        const html = await lector.content();
+        await lector.close();
+        const enlaces = (trozo) =>
+          [
+            ...new Set(
+              [
+                ...trozo.matchAll(
+                  /href="\/maquinaria-pesada\/maquinaria-pesada-nueva\/([a-z0-9-]+)\/"/g,
+                ),
+              ].map((m) => m[1]),
+            ),
+          ].filter((s) => !["tipos", "marcas", "pagina"].includes(s));
+        const main = html.slice(html.indexOf("<main"));
+        const menu = html.slice(html.indexOf("Por tipo de máquina"), html.indexOf("<main"));
+        return { indice: enlaces(main), menu: enlaces(menu) };
+      };
+      const arrastrar = async (desde, hasta) => {
+        const asas = pagina.locator("table tbody tr .sort-row");
+        const a = await asas.nth(desde).boundingBox();
+        const b = await asas.nth(hasta).boundingBox();
+        if (!a || !b) fallar("No encuentro las asas de arrastre.");
+        const respuesta = pagina.waitForResponse((r) => r.url().includes("/reorder"), {
+          timeout: 30_000,
+        });
+        await pagina.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
+        await pagina.mouse.down();
+        const destinoY = hasta < desde ? b.y + 2 : b.y + b.height - 2;
+        for (let i = 1; i <= 15; i++)
+          await pagina.mouse.move(
+            a.x + a.width / 2,
+            a.y + a.height / 2 + ((destinoY - a.y - a.height / 2) * i) / 15,
+          );
+        await pagina.waitForTimeout(300);
+        await pagina.mouse.up();
+        const r = await respuesta.catch(() => null);
+        return r ? r.status() : "sin petición";
+      };
+      const esperarPrimera = async (slug, deMenu = true) => {
+        for (let i = 0; i < 18; i++) {
+          const o = await ordenPublico();
+          if (o.indice[0] === slug && (!deMenu || o.menu[0] === slug))
+            return { ...o, segundos: i * 5 };
+          await pagina.waitForTimeout(5000);
+        }
+        return { ...(await ordenPublico()), segundos: "más de 90" };
+      };
+
+      const antes = await filas();
+      await pagina.screenshot({
+        path: path.join(salida, `arrastrar-lista-${ancho.nombre}.png`),
+        fullPage: true,
+      });
+      const ingles = await pagina.evaluate(
+        (re) => (document.body.innerText.match(new RegExp(re.source, "g")) ?? []).slice(0, 10),
+        { source: INGLES.source },
+      );
+      hallazgos.push({ pantalla: "arrastrar-lista", ancho: ancho.nombre, filas: antes, ingles });
+      decir(
+        `✓ lista (${ancho.nombre}): ${antes.length} filas, ${antes.filter((f) => f.asa).length} con asa, ${antes.filter((f) => f.activa).length} activas · ${antes.map((f) => f.nombre).join(" · ")}`,
+      );
+      if (!ancho.movil && antes.length >= 2) {
+        const publicoAntes = await ordenPublico();
+        decir(`  índice antes: ${publicoAntes.indice.join(" · ")}`);
+        decir(`  menú antes:   ${publicoAntes.menu.join(" · ")}`);
+        const ultima = antes.length - 1;
+        const estado1 = await arrastrar(ultima, 0);
+        const despues = await filas();
+        await pagina.screenshot({
+          path: path.join(salida, `arrastrar-movida-${ancho.nombre}.png`),
+          fullPage: true,
+        });
+        decir(
+          `  arrastrar «${antes[ultima].nombre}» al principio: reorder ${estado1} · lista ${despues.map((f) => f.nombre).join(" · ")}`,
+        );
+        const slugMovida = publicoAntes.indice[publicoAntes.indice.length - 1];
+        const publicoMovido = await esperarPrimera(slugMovida);
+        decir(`  índice tras ${publicoMovido.segundos} s: ${publicoMovido.indice.join(" · ")}`);
+        decir(`  menú:         ${publicoMovido.menu.join(" · ")}`);
+        // Devolverla: de la primera fila a la última.
+        const estado2 = await arrastrar(0, despues.length - 1);
+        const final = await filas();
+        decir(`  devolverla: reorder ${estado2} · lista ${final.map((f) => f.nombre).join(" · ")}`);
+        const publicoFinal = await esperarPrimera(publicoAntes.indice[0]);
+        decir(`  índice tras ${publicoFinal.segundos} s: ${publicoFinal.indice.join(" · ")}`);
+        decir(`  menú:         ${publicoFinal.menu.join(" · ")}`);
+        const igual = (x, y) => JSON.stringify(x) === JSON.stringify(y);
+        decir(
+          `  restaurado: lista ${igual(
+            final.map((f) => f.nombre),
+            antes.map((f) => f.nombre),
+          )} · índice ${igual(publicoFinal.indice, publicoAntes.indice)} · menú ${igual(publicoFinal.menu, publicoAntes.menu)}`,
+        );
+        hallazgos.push({
+          pantalla: "arrastrar",
+          antes,
+          despues,
+          final,
+          publicoAntes,
+          publicoMovido,
+          publicoFinal,
+          estado1,
+          estado2,
+        });
       }
       hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
       hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });

@@ -220,7 +220,8 @@ export const getCategoriasMaquinaria = cache(async (): Promise<CategoriasMaquina
     collection: "categorias-maquinaria",
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    // En el orden del panel (arrastrando, `orderable`, 2026-11-09).
+    sort: "_order",
   });
   return sinTiposOcultos(docs);
 });
@@ -607,7 +608,8 @@ const listadoNuevaEnCache = unstable_cache(
         depth: 0,
         limit: 0,
         pagination: false,
-        sort: "nombre",
+        // En el orden del panel (arrastrando, `orderable`, 2026-11-09).
+        sort: "_order",
         select: {
           slug: true,
           nombre: true,

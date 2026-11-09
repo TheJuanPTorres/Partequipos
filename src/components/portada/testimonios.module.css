@@ -294,3 +294,11 @@
  * TÍTULOS ANIMADOS: los manda el DISEÑO (export 2516), no la web publicada
  * (decisión de dirección del 2026-10-05, decisiones-home-ux9.md §27.1).
  */
+
+/*
+ * Ronda 12, t5: si «Testimonios» es lo último de la página, su aire de abajo sobra. Antes del pie manda
+ * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ */
+.seccion:last-child {
+  padding-bottom: 0;
+}

@@ -77,7 +77,7 @@ export const PaginasIndice: GlobalConfig = {
   admin: {
     group: "Partes del sitio",
     description:
-      "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», y los textos de «Maquinaria pesada usada», de su página «Otros», de «Lubricantes» y de «Trabaja con nosotros».",
+      "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», la foto del encabezado de «Maquinaria pesada nueva», y los textos de «Maquinaria pesada usada», de su página «Otros», de «Lubricantes» y de «Trabaja con nosotros».",
   },
   access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
@@ -92,6 +92,7 @@ export const PaginasIndice: GlobalConfig = {
             "/repuestos-maquinaria-pesada-colombia",
             "/repuestos-maquinaria-pesada-colombia/categoria-repuestos-para-maquinaria-pesada",
             "/maquinaria-pesada",
+            "/maquinaria-pesada/maquinaria-pesada-nueva/tipos",
             "/maquinaria-pesada/maquinaria-pesada-usada",
             "/maquinaria-pesada/maquinaria-pesada-usada/otros",
             "/contactanos",
@@ -134,6 +135,20 @@ export const PaginasIndice: GlobalConfig = {
           "fondo",
           "Foto de fondo del encabezado",
           "Opcional. Foto de obra a todo el ancho; sin ella, la del encabezado de la primera marca de repuestos que lo tenga.",
+        ),
+      ],
+    },
+    {
+      // Solo la foto (2026-11-09, dirección): el título, el texto y las tarjetas de este índice
+      // salen del código y de «Categorías de maquinaria nueva» (en el orden de su lista).
+      name: "nuevaTipos",
+      type: "group",
+      label: "Página «Maquinaria pesada nueva» (índice de tipos)",
+      fields: [
+        imagen(
+          "fondo",
+          "Foto de fondo del encabezado",
+          "Opcional. Foto de obra horizontal a todo el ancho (mejor de 1920 px o más), con zona tranquila donde va el título. Sin ella, la del encabezado de la primera marca de repuestos que lo tenga.",
         ),
       ],
     },

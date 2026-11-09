@@ -94,7 +94,7 @@ export function SelectorMarcas({ id, vista }: { id: string; vista: VistaSelector
                       {p.accion.texto}
                       <IconArrowRight aria-hidden="true" focusable="false" size={18} stroke={2.2} />
                     </Link>
-                  ) : p.accion.tipo === "externo" ? (
+                  ) : (
                     <a
                       href={p.accion.href}
                       className={estilos.boton}
@@ -110,8 +110,6 @@ export function SelectorMarcas({ id, vista }: { id: string; vista: VistaSelector
                         stroke={2.2}
                       />
                     </a>
-                  ) : (
-                    <span className={estilos.pronto}>{p.accion.texto}</span>
                   )}
                 </div>
               </div>

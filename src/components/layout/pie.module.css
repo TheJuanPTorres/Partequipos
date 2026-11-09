@@ -8,7 +8,9 @@
  */
 
 .pie {
-  --pie-margen: 70px;
+  /* El hueco sobre la tarjeta roja: el espaciado común (antes 70 px más el 4 % del ancho del
+     relleno de `.marco`: 128 px a 1440 y 173 a 2560, medido). */
+  --pie-margen: var(--espacio-seccion);
   --pie-radio: 30px;
 
   margin-top: var(--pie-margen);
@@ -29,7 +31,8 @@
  * relleno (medido: sus tarjetas empiezan a 72 px a 1440, el 5 % del ancho).
  */
 .marco {
-  padding: 4% 4% 0;
+  /* Sin relleno arriba: el hueco sobre la tarjeta es solo `--pie-margen` (ronda 12, tarea 5). */
+  padding: 0 4%;
 }
 
 .tarjeta {
@@ -167,8 +170,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  margin-top: 4%;
-  padding: 5% 5% 2%;
+  /*
+   * Bajo la tarjeta roja, hasta el logo, el espaciado común: antes el 4 % de margen más el 5 % de
+   * relleno, que crecían con el ancho (130 px a 1440, 230 a 2560, medido). Abajo, 24 px hasta la
+   * línea de la fila legal (antes el 2 %).
+   */
+  margin-top: 0;
+  padding: var(--espacio-seccion) 5% 24px;
   border-radius: var(--pie-radio) var(--pie-radio) 0 0;
   background: var(--color-fondo);
 }
@@ -467,8 +475,9 @@
  * todo el ancho; radio y relleno de 20 px.
  */
 @media (max-width: 767px) {
+  /* Arriba, 10 px más los 30 de relleno de `.empresa`: el espaciado común (40) hasta el logo. */
   .panel {
-    padding: 3%;
+    padding: 10px 3% 24px;
   }
 
   .empresa {
@@ -518,11 +527,12 @@
  */
 .legal {
   /*
-   * Abajo, el sitio del botón flotante de WhatsApp (2026-10-17): 16 + 56 + 16 px
-   * y la zona segura. Al final de la página la barra queda por encima de él y
-   * no la tapa; «Volver arriba» va centrado, lejos de su esquina.
+   * Abajo, 40 px y la zona segura (antes 88: el sitio entero del botón flotante de WhatsApp, que
+   * dejaba mucho aire bajo «Volver arriba», ronda 12, tarea 5). «Volver arriba» es lo último, va
+   * centrado y lejos de la esquina del botón (56 px a 16 del borde); lo de encima queda por encima
+   * de los 72 px que ocupa el botón.
    */
-  padding: 0 5% calc(88px + env(safe-area-inset-bottom, 0px));
+  padding: 0 5% calc(40px + env(safe-area-inset-bottom, 0px));
   background: var(--color-fondo);
   color: var(--color-texto-suave);
   font-size: 15px;

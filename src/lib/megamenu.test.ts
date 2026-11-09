@@ -144,18 +144,19 @@ describe("megamenú: maquinaria", () => {
       },
     ]);
     // «Ver todos los tipos de máquina» primero, al índice de tipos (2026-10-23); después TODOS los
-    // tipos, en el orden de la web antigua: el que tiene categoría a su página general, los que
-    // aún no la tienen a la de su tipo en la marca; nunca a un listado.
+    // tipos: los que tienen categoría a su página general, en el orden del panel (2026-11-09); los
+    // que aún no la tienen, detrás y en el orden de la web antigua, a la de su tipo en la marca;
+    // nunca a un listado.
     assert.deepEqual(nueva.grupos[1]!.enlaces, [
       {
         etiqueta: "Ver todos los tipos de máquina",
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/",
       },
+      { etiqueta: "Excavadoras", href: "/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/" },
       {
         etiqueta: "Bulldozers",
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/bulldozer/",
       },
-      { etiqueta: "Excavadoras", href: "/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/" },
       {
         etiqueta: "Miniexcavadoras",
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/yanmar/miniexcavadoras/",
@@ -176,10 +177,10 @@ describe("megamenú: maquinaria", () => {
       ],
     });
     const porTipo = conGeneral.grupos[0]!.grupos[1]!.enlaces;
-    assert.deepEqual(porTipo[1], {
-      etiqueta: "Bulldozers",
-      href: "/maquinaria-pesada/maquinaria-pesada-nueva/bulldozers/",
-    });
+    assert.deepEqual(
+      porTipo.find((e) => e.etiqueta === "Bulldozers"),
+      { etiqueta: "Bulldozers", href: "/maquinaria-pesada/maquinaria-pesada-nueva/bulldozers/" },
+    );
     assert.equal(
       porTipo.some((e) => e.href.endsWith("/case-construction/bulldozer/")),
       false,
@@ -488,6 +489,11 @@ describe("megamenú: lubricantes con bandera y marca de otra web (Dispel, 2026-1
       assert.deepEqual(dispel.pais, { codigo: "co", nombre: "Colombia" });
       assert.deepEqual(dispel.enlaces, []);
     }
+  });
+
+  it("«Ver todos los lubricantes» va a la categoría Lubricantes si tiene el selector; si no, a la general", () => {
+    assert.equal(panelLubricantes(conSelector([1, 2]))!.verTodo.href, PAGINA_SELECTOR);
+    assert.equal(panelLubricantes(conSelector([1, 2], false))!.verTodo.href, "/lubricantes/");
   });
 
   it("con enlace, el enlace gana a la página del selector", () => {

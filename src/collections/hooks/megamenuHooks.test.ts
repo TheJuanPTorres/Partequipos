@@ -149,6 +149,8 @@ describe("megamenú: la lista de campos (CAMPOS_MENU) no se separa de nada", () 
       const col = porSlug.get(slug);
       assert.ok(col, `no existe la colección «${slug}»`);
       const nombres = nombresDeCampos(col.fields);
+      // `orderable`: Payload añade `_order` al sanear la configuración (orden arrastrando).
+      if (col.orderable) nombres.add("_order");
       for (const campo of CAMPOS_MENU[slug])
         assert.ok(nombres.has(campo), `«${slug}» no tiene el campo «${campo}»`);
     }

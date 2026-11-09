@@ -61,7 +61,7 @@ export const MarcaLubricante: CollectionConfig = {
       admin: {
         position: "sidebar",
         description:
-          "«Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, a la categoría «Lubricantes» (su panel dice «Muy pronto»).",
+          "«Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, a la categoría «Lubricantes» (su panel lleva a la portada).",
       },
     },
     {
@@ -74,7 +74,7 @@ export const MarcaLubricante: CollectionConfig = {
         position: "sidebar",
         placeholder: "https://…",
         description:
-          "La web de la marca, completa y con https://. Con «Otra web»: adónde lleva en el menú (vacía, a la categoría «Lubricantes», donde dice «Muy pronto»). Con «Su página en este sitio»: «Ver todo» del menú y «Ver productos» del selector llevan a esta web en otra pestaña; su página de aquí sigue igual.",
+          "La web de la marca, completa y con https://. Con «Otra web»: adónde lleva en el menú (vacía, a la categoría «Lubricantes», donde su «Ver productos» lleva a la portada). Con «Su página en este sitio»: «Ver todo» del menú y «Ver productos» del selector llevan a esta web en otra pestaña; su página de aquí sigue igual.",
       },
     },
     {

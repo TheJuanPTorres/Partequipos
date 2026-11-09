@@ -106,6 +106,7 @@ import * as migration_20261104_211848_sedes_tipo from './20261104_211848_sedes_t
 import * as migration_20261104_214353_lubricantes_dispel_selector from './20261104_214353_lubricantes_dispel_selector';
 import * as migration_20261105_190757_portada_marcas_banda from './20261105_190757_portada_marcas_banda';
 import * as migration_20261109_041143_portada_banda_logos_libres from './20261109_041143_portada_banda_logos_libres';
+import * as migration_20261109_121811_portada_nueva_v2 from './20261109_121811_portada_nueva_v2';
 
 export const migrations = [
   {
@@ -646,6 +647,11 @@ export const migrations = [
   {
     up: migration_20261109_041143_portada_banda_logos_libres.up,
     down: migration_20261109_041143_portada_banda_logos_libres.down,
-    name: '20261109_041143_portada_banda_logos_libres'
+    name: '20261109_041143_portada_banda_logos_libres',
+  },
+  {
+    up: migration_20261109_121811_portada_nueva_v2.up,
+    down: migration_20261109_121811_portada_nueva_v2.down,
+    name: '20261109_121811_portada_nueva_v2'
   },
 ];

@@ -979,11 +979,11 @@ export interface MarcasLubricante {
   id: number;
   nombre: string;
   /**
-   * «Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, la marca no sale en el menú.
+   * «Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, a la categoría «Lubricantes» (su panel dice «Muy pronto»).
    */
   destino?: ('pagina' | 'externo') | null;
   /**
-   * La web de la marca, completa y con https://. Vacío, la marca no sale en el menú.
+   * La web de la marca, completa y con https://. Con «Otra web»: adónde lleva en el menú (vacía, a la categoría «Lubricantes», donde dice «Muy pronto»). Con «Su página en este sitio»: «Ver todo» del menú y «Ver productos» del selector llevan a esta web en otra pestaña; su página de aquí sigue igual.
    */
   enlaceExterno?: string | null;
   /**
@@ -4080,7 +4080,7 @@ export interface RepuestosMarca {
    */
   tituloHero?: string | null;
   /**
-   * Ej.: «En Colombia» → «CATERPILLAR En Colombia».
+   * Ej.: «En Colombia» → «CATERPILLAR En Colombia». En las marcas y sus tipos; las categorías técnicas no la llevan.
    */
   subtituloHero?: string | null;
   /**

@@ -9,10 +9,10 @@ import {
   type MouseEvent,
 } from "react";
 
-import { LogoMarca } from "@/components/marca/LogoMarca";
+import { LogoEnCaja, tamanoCaja } from "@/components/marca/LogoEnCaja";
 import { CURVA, CURVA_FRENADA, DURACION_DESLIZAR_MS, DURACION_MS } from "@/lib/listado/animaciones";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
-import { CAJA_GRANDE, CAJA_NORMAL, colocarLogo, type Caja } from "@/lib/marca/tamanoOptico";
+import { CAJA_GRANDE, CAJA_NORMAL } from "@/lib/marca/tamanoOptico";
 
 import mejoras from "./mejoras.module.css";
 
@@ -274,57 +274,6 @@ function entradaEscalonada(grupo: HTMLElement): Animation[] {
     animacion.pause();
     return animacion;
   });
-}
-
-const px = (n: number) => `${n}px`;
-
-function tamanoCaja(caja: Caja): CSSProperties {
-  return { width: px(caja.ancho), height: px(caja.alto) };
-}
-
-/**
- * Una versión del logo en la caja fija de la pastilla (2026-11-09): con la misma área visible que
- * las demás marcas (`colocarLogo`), sin sus márgenes transparentes, y SIEMPRE en el HTML y
- * descargada desde el principio (`eager`): la versión que no toca queda oculta con `visibility`,
- * no con `display`, así que al cambiar de marca no hay carga, ni parpadeo, ni cambio de ancho.
- */
-function LogoEnCaja({
-  logo,
-  caja,
-  className,
-  placa = false,
-}: {
-  logo: LogoConAlt;
-  caja: Caja;
-  className?: string;
-  placa?: boolean;
-}) {
-  const { visible, imagen } = colocarLogo(logo, caja);
-  return (
-    <span className={className} data-placa={placa ? "" : undefined} aria-hidden="true">
-      <span
-        className={mejoras.barraRecorte}
-        style={{
-          left: px(visible.izquierda),
-          top: px(visible.arriba),
-          width: px(visible.ancho),
-          height: px(visible.alto),
-        }}
-      >
-        <span
-          className={mejoras.barraImagen}
-          style={{
-            left: px(imagen.izquierda),
-            top: px(imagen.arriba),
-            width: px(imagen.ancho),
-            height: px(imagen.alto),
-          }}
-        >
-          <LogoMarca logo={logo} alt="" fill loading="eager" sizes={px(Math.ceil(imagen.ancho))} />
-        </span>
-      </span>
-    </span>
-  );
 }
 
 function suave() {

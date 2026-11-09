@@ -3,9 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
-import { LogoMarca } from "@/components/marca/LogoMarca";
-import { logoOpaco, type VistaBanner } from "@/lib/nueva/bannerMarca";
-import type { LogoConAlt } from "@/lib/marca/logoMarca";
+import { LogoEnCaja, tamanoCaja } from "@/components/marca/LogoEnCaja";
+import { conRecorte } from "@/lib/marca/recorteLogo";
+import { CAJA_BANNER, CAJA_BANNER_MOVIL } from "@/lib/marca/tamanoOptico";
+import type { BannerConLogo } from "@/lib/nueva/bannerMarca";
 
 import estilos from "./bannerMarca.module.css";
 
@@ -16,27 +17,35 @@ import estilos from "./bannerMarca.module.css";
  * redondeadas (con otra más oscura detrás), el título en `<h2>` sobre un tono claro de la marca y,
  * a la derecha, la foto de la marca teñida con su color que se oscurece hacia «Ver marca».
  * Móvil (≤ 767 px): tarjeta blanca con el bloque de color del logo, el título y una flecha.
- * Sin logo, el nombre de la marca en el bloque; un logo JPEG (opaco), con sus colores sobre una
- * placa blanca; sin foto, el banner en su color.
+ * Sin logo, el nombre de la marca en el bloque; sin foto, el banner en su color.
+ *
+ * EL LOGO (dirección, 2026-11-09, la regla del selector #432/#439; `bannerConLogo`): sobre la forma
+ * de color, el de la baldosa de la marca de repuestos con su color (o el de siempre sobre una
+ * plaquita blanca), SIN filtros; en móvil, el de siempre con sus colores sobre la tarjeta blanca.
+ * Los dos en una caja fija con el mismo tamaño óptico (`LogoEnCaja`, sin márgenes medidos).
  */
-export function BannerMarcaTipo({
+export async function BannerMarcaTipo({
   id,
   titulo,
   marca,
-  logo,
-  vista,
+  banner,
   nivel = "h2",
 }: {
   /** `id` del título. */
   id: string;
   titulo: string;
   marca: { nombre: string; href: string };
-  logo: LogoConAlt | null;
-  vista: VistaBanner;
+  banner: BannerConLogo;
   /** El nivel del título: `h3` si el banner va bajo el `<h2>` de su sección. */
   nivel?: "h2" | "h3";
 }) {
   const Titulo = nivel;
+  const { vista, sobreColor } = banner;
+  const [escritorio, movil] = await Promise.all([
+    conRecorte(sobreColor.logo),
+    conRecorte(banner.movil),
+  ]);
+  const nombreLogo = banner.movil?.alt ?? sobreColor.logo?.alt ?? null;
   const variables = {
     "--acento": vista.acento,
     "--acento-oscuro": vista.acentoOscuro,
@@ -61,12 +70,32 @@ export function BannerMarcaTipo({
       <span aria-hidden="true" className={estilos.formaAtras} />
       <span aria-hidden="true" className={estilos.forma} />
 
-      <div
-        className={estilos.logoCaja}
-        data-tinta={logo && logoOpaco(logo.url) ? "placa" : vista.tintaLogo}
-      >
-        {logo ? (
-          <LogoMarca logo={logo} alt={logo.alt} sizes="180px" className={estilos.logo} />
+      <div className={estilos.logoCaja} data-tinta={vista.tintaLogo}>
+        {escritorio || movil ? (
+          <>
+            {escritorio ? (
+              <span className={estilos.cajaEscritorio} style={tamanoCaja(CAJA_BANNER)}>
+                <LogoEnCaja
+                  logo={escritorio}
+                  caja={CAJA_BANNER}
+                  className={estilos.version}
+                  placa={sobreColor.placa}
+                  loading="lazy"
+                />
+              </span>
+            ) : null}
+            {movil ? (
+              <span className={estilos.cajaMovil} style={tamanoCaja(CAJA_BANNER_MOVIL)}>
+                <LogoEnCaja
+                  logo={movil}
+                  caja={CAJA_BANNER_MOVIL}
+                  className={estilos.version}
+                  loading="lazy"
+                />
+              </span>
+            ) : null}
+            {nombreLogo ? <span className={estilos.soloLectores}>{nombreLogo}</span> : null}
+          </>
         ) : (
           <span className={estilos.logoTexto}>{marca.nombre}</span>
         )}

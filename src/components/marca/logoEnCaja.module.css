@@ -1,0 +1,10 @@
+/* `LogoEnCaja`: el contenido visible del logo (sin márgenes), centrado en su caja fija. */
+.recorte {
+  position: absolute;
+  overflow: hidden;
+}
+
+/* El fichero entero, desplazado para que su contenido caiga en el recorte. */
+.imagen {
+  position: absolute;
+}

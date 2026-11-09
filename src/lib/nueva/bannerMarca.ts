@@ -1,7 +1,11 @@
 import type { MarcasMaquinaria } from "@/payload-types";
 
 import { COLOR_SIN_MARCA, colorDeMarca, tintaDeLogoSobre, tintaSobre } from "../marca/colorMarca";
+import type { LogoConAlt } from "../marca/logoMarca";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
+
+import type { BaldosaDeRepuestos } from "./indiceMarcas";
+import { logoSobreColor, type LogoSobreColor } from "./logoSobreColor";
 
 /**
  * Lógica pura del BANNER DE MARCA de la página general de un tipo de maquinaria nueva
@@ -75,4 +79,43 @@ export function vistaBannerDe(
  */
 export function logoOpaco(url: string): boolean {
   return /\.jpe?g(?:$|[?#])/i.test(url);
+}
+
+/**
+ * EL BANNER CON EL LOGO SOBRE SU COLOR (dirección, 2026-11-09; la regla del selector #432/#439):
+ * sobre la forma del color va el logo de `logoSobreColor` (la baldosa de la marca de repuestos
+ * del mismo nombre con su color, oscurecido lo justo para el logo blanco; o el logo de siempre
+ * sobre una plaquita blanca), SIN filtros; el color del banner es ese fondo. `movil`: el logo de
+ * siempre, con sus colores, para la tarjeta blanca del móvil.
+ */
+export type BannerConLogo = {
+  vista: VistaBanner;
+  sobreColor: LogoSobreColor;
+  movil: LogoConAlt | null;
+};
+
+export function bannerConLogo(
+  nombre: string,
+  logo: LogoConAlt | null,
+  colorPropio: string | null | undefined,
+  foto: ImagenLista | null,
+  baldosas: ReadonlyMap<string, BaldosaDeRepuestos>,
+): BannerConLogo {
+  const sobre = logoSobreColor(nombre, logo, colorPropio, baldosas);
+  // Un logo JPEG (opaco) no puede ir sin placa: sería un rectángulo sobre el color.
+  const placa = sobre.placa || (sobre.logo !== null && logoOpaco(sobre.logo.url));
+  return {
+    vista: vistaBannerDe(sobre.fondo, foto),
+    sobreColor: { ...sobre, placa },
+    movil: logo ? { ...logo, oscuro: false, blanco: false } : null,
+  };
+}
+
+/** `bannerConLogo` de una marca de maquinaria nueva: su color y la foto de `vistaBanner`. */
+export function bannerDeMarca(
+  marca: Pick<MarcasMaquinaria, "nombre" | "colorMarca" | "kit" | "imagenTarjeta">,
+  logo: LogoConAlt | null,
+  baldosas: ReadonlyMap<string, BaldosaDeRepuestos>,
+): BannerConLogo {
+  return bannerConLogo(marca.nombre, logo, marca.colorMarca, vistaBanner(marca).foto, baldosas);
 }

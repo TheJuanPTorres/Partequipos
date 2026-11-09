@@ -38,7 +38,16 @@ export function TiposTexto({
           {tarjetas.map((t) => {
             const contenido = (
               <>
-                <span className={estilosTexto.nombre}>{t.titulo}</span>
+                {t.tituloCorto ? (
+                  <>
+                    <span className={estilosTexto.nombre} aria-hidden="true">
+                      {t.tituloCorto}
+                    </span>
+                    <span className="sr-only">{t.titulo}</span>
+                  </>
+                ) : (
+                  <span className={estilosTexto.nombre}>{t.titulo}</span>
+                )}
                 {t.panel ? (
                   <span className={estilosTexto.detalle}>
                     {t.panel.total} {t.panel.total === 1 ? "modelo" : "modelos"}

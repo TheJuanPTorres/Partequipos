@@ -1,10 +1,12 @@
+import { RejillaModelos } from "@/components/repuestos/ModelosTexto";
 import type { ModeloEnlace } from "@/lib/repuestos/tipo";
 
 import estilos from "./fichaModelo.module.css";
 
 /**
- * «OTROS MODELOS DE {TIPO} {MARCA}» bajo la ficha (Ronda 12, 2026-11-08): los demás modelos del
- * mismo tipo en una lista compacta de enlaces de texto, sin fotos. Sin otros modelos, no se pinta.
+ * «OTROS MODELOS DE {TIPO} {MARCA}» bajo la ficha: los demás modelos del tipo con las MISMAS
+ * tarjetas de la lista de la página de tipo (franja del color de la marca, modelo, serie y flecha;
+ * Juan Pablo, #433), sin fotos. Sin otros modelos con página, no se pinta.
  */
 export function OtrosModelosLista({
   id,
@@ -23,16 +25,7 @@ export function OtrosModelosLista({
       <h2 id={idTitulo} className={estilos.otrosTitulo}>
         {titulo}
       </h2>
-      <ul className={estilos.otrosLista}>
-        {conPagina.map((m) => (
-          <li key={m.id}>
-            {/* El modelo corto a la vista y el nombre completo como nombre accesible. */}
-            <a href={m.href as string} aria-label={m.nombre} className={estilos.otroEnlace}>
-              {m.corto ?? m.nombre}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <RejillaModelos modelos={conPagina} />
     </section>
   );
 }

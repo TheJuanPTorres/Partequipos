@@ -7,6 +7,8 @@ import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { AyudaWhatsApp } from "@/components/repuestos/modelo/AyudaWhatsApp";
+import { BaldosasCategorias } from "@/components/repuestos/BaldosasCategorias";
+import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
 import { FichaModelo } from "@/components/repuestos/modelo/FichaModelo";
 import { OtrosModelosLista } from "@/components/repuestos/modelo/OtrosModelosLista";
 import { PresentacionModelo } from "@/components/repuestos/modelo/PresentacionModelo";
@@ -19,11 +21,18 @@ import { getCategoriasParaMarca, getRepuestosMarca } from "@/lib/queries/getRepu
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { categoriasDeMarca, logoConAlt } from "@/lib/repuestos/marca";
-import { datosClaveModelo, lineaDeTexto, otrosModelosDelTipo } from "@/lib/repuestos/fichaModelo";
+import { ANIMACIONES_CATEGORIAS } from "@/lib/repuestos/animacionesCategorias";
+import { tarjetasDeCategorias } from "@/lib/repuestos/plantillaTipo";
+import {
+  datosClaveModelo,
+  tituloFichaModelo,
+  lineaDeTexto,
+  otrosModelosDelTipo,
+} from "@/lib/repuestos/fichaModelo";
 import {
   categoriasDelTipo,
   referenciaModelo4086,
-  tituloModelo4086,
+  tituloDisponibles4086,
   usaDisenoPropio,
   vistaModelo,
 } from "@/lib/repuestos/modelo";
@@ -129,11 +138,6 @@ export async function PaginaModeloRepuesto({
   if (!usaDisenoPropio(global)) {
     const referencia = referenciaModelo4086({ marca, tipo, modelo });
     const whatsappModelo = enlaceWhatsApp(empresa.whatsapp);
-    // Los tipos de repuesto del tipo de máquina, como etiquetas enlazadas a su categoría.
-    const etiquetas = delTipo.flatMap((c) => {
-      const d = conEnlace.find((x) => x.id === c.id);
-      return d?.href ? [{ id: d.id, nombre: d.nombre, href: d.href }] : [];
-    });
     const otros = otrosModelosDelTipo(
       enlacesDeModelos(marca, tipo, await getModelosDeTipo(tipo.id)),
       modelo,
@@ -147,16 +151,14 @@ export async function PaginaModeloRepuesto({
         <PieSinTarjeta />
         <FichaModelo
           migas={breadcrumbs}
-          titulo={tituloModelo4086({ marca, tipo, modelo })}
+          titulo={tituloFichaModelo({ tipo, modelo })}
           logo={logo}
           linea={lineaDeTexto(modelo.descripcion)}
           datos={datosClaveModelo({
-            marca: marca.nombre,
             tipo: tipo.nombre,
             serie: modelo.serie,
             modelo: texto(modelo.codigo) || modelo.nombre,
           })}
-          categorias={etiquetas}
           formulario={configContactoMarca({
             origen: ruta,
             siteKey: turnstileSiteKey(),
@@ -175,6 +177,18 @@ export async function PaginaModeloRepuesto({
             mensajeInicial: `Necesito cotizar ${referencia.charAt(0).toLowerCase()}${referencia.slice(1)}: `,
           })}
         />
+        {/* Los tipos de repuesto, con el estilo que ya tenía esta sección (baldosas del índice). */}
+        <ZonaAnimada
+          interruptores={ANIMACIONES_CATEGORIAS}
+          permitirUrl={process.env.VERCEL_ENV !== "production"}
+          entrada="C1"
+        >
+          <BaldosasCategorias
+            id={ANCLA_CATEGORIAS}
+            titulo={tituloDisponibles4086({ marca, tipo, modelo })}
+            categorias={tarjetasDeCategorias(delTipo)}
+          />
+        </ZonaAnimada>
         {vista.piezas.length > 0 ? (
           <ul className={estilosModelo.piezas}>
             {vista.piezas.map((p, i) => (

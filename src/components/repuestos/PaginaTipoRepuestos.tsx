@@ -2,14 +2,13 @@ import type { Metadata } from "next";
 
 import { SeccionTestimonios } from "@/components/portada/diferidos";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
-import { HeroMarca } from "@/components/repuestos/HeroMarca";
+import { CabeceraRoja } from "@/components/repuestos/CabeceraRoja";
 import { InterruptorMejoras } from "@/components/repuestos/InterruptorMejoras";
 import { ModelosTexto } from "@/components/repuestos/ModelosTexto";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
 import { SedesCompactas } from "@/components/repuestos/SedesCompactas";
 import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
 import estilos from "@/components/repuestos/marca.module.css";
-import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
 import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
@@ -101,15 +100,18 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
     { nombre: tipo.nombre, path: rutas.tipo(marca.slug, seg) },
   ];
 
+  const encabezadoTipo = vistaEncabezadoTipo(marca, tipo, global);
+
   return (
     <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
       <InterruptorMejoras />
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      <div className={estilos.migas}>
-        <Breadcrumbs items={breadcrumbs} />
-      </div>
-
-      <HeroMarca vista={vistaEncabezadoTipo(marca, tipo, global)} anclaSiguiente={ANCLA_MODELOS} />
+      {/* Cabecera ROJA de los índices de marcas, sin foto (Juan Pablo, #433). */}
+      <CabeceraRoja
+        migas={breadcrumbs}
+        antetitulo={encabezadoTipo.linea1}
+        titulo={encabezadoTipo.linea2}
+      />
 
       {/* Ronda 12 (2026-11-08): los modelos SIN FOTOS, con buscador y tarjetas de texto. */}
       <ModelosTexto
@@ -119,6 +121,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
         barraSeries={MEJORAS_ACTIVAS.R2}
+        sinFranja
         ayuda={
           MEJORAS_ACTIVAS.R4
             ? {

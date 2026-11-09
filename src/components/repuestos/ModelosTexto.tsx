@@ -34,6 +34,7 @@ export function ModelosTexto({
   vacio,
   barraSeries = false,
   ayuda = null,
+  sinFranja = false,
 }: {
   id: string;
   titulo: string;
@@ -42,6 +43,8 @@ export function ModelosTexto({
   vacio: string;
   /** R2. */
   barraSeries?: boolean;
+  /** Bajo la cabecera roja (sin la franja de color que la sección solapaba). */
+  sinFranja?: boolean;
   /** R4: el formulario que abre «¿No encuentras tu modelo?». */
   ayuda?: { formulario: ConfigFormulario; anclaContacto: string } | null;
 }) {
@@ -54,7 +57,7 @@ export function ModelosTexto({
   return (
     <section
       id={id}
-      className={`${estilos.tarjetas} ${estilosTexto.seccion} ${conBarra ? estilos.conBarraSeries : ""}`}
+      className={`${estilos.tarjetas} ${estilosTexto.seccion} ${conBarra ? estilos.conBarraSeries : ""} ${sinFranja ? estilosTexto.sinFranja : ""}`}
       aria-labelledby={idTitulo}
     >
       <h2 id={idTitulo} className={estilos.tituloSeccion}>
@@ -75,12 +78,12 @@ export function ModelosTexto({
                 data-grupo-modelos=""
               >
                 <h3 className={estilosTexto.serie}>{g.titulo}</h3>
-                <Rejilla modelos={g.modelos} />
+                <RejillaModelos modelos={g.modelos} />
               </div>
             ))
           ) : (
             <div className={estilosTexto.grupo} data-grupo-modelos="">
-              <Rejilla modelos={modelos} />
+              <RejillaModelos modelos={modelos} />
             </div>
           )}
         </>
@@ -92,7 +95,7 @@ export function ModelosTexto({
   );
 }
 
-function Rejilla({ modelos }: { modelos: ModeloEnlace[] }) {
+export function RejillaModelos({ modelos }: { modelos: ModeloEnlace[] }) {
   return (
     <ul className={estilosTexto.rejilla}>
       {modelos.map((m) => {

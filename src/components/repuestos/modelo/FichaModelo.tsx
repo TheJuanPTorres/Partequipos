@@ -28,7 +28,6 @@ export function FichaModelo({
   logo,
   linea,
   datos,
-  categorias,
   formulario,
 }: {
   migas: BreadcrumbItem[];
@@ -37,8 +36,6 @@ export function FichaModelo({
   /** Una línea de texto bajo el título; vacía, no se pinta. */
   linea: string;
   datos: DatoClave[];
-  /** Los tipos de repuesto (categorías técnicas) elegidos en el tipo de máquina, con su página. */
-  categorias: { id: number; nombre: string; href: string }[];
   formulario: ConfigFormulario;
 }) {
   return (
@@ -51,7 +48,6 @@ export function FichaModelo({
           {logo ? (
             <LogoMarca logo={logo} alt={logo.alt} sizes="120px" className={estilos.logo} priority />
           ) : null}
-          <p className={`${estilos.antetitulo} texto-etiqueta`}>Repuestos para Maquinaria Pesada</p>
         </div>
         <h1 id="modelo-titulo" className={`${estilos.titulo} texto-titulo-bloque`}>
           {titulo.split(" ").map((palabra, i) => (
@@ -75,22 +71,6 @@ export function FichaModelo({
               </div>
             ))}
           </dl>
-        ) : null}
-        {categorias.length > 0 ? (
-          <nav aria-labelledby="modelo-tipos-repuesto" className={estilos.tipos}>
-            <p id="modelo-tipos-repuesto" className={estilos.tiposTitulo}>
-              Repuestos disponibles
-            </p>
-            <ul className={estilos.etiquetas}>
-              {categorias.map((c) => (
-                <li key={c.id}>
-                  <a href={c.href} className={estilos.etiqueta}>
-                    {c.nombre}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
         ) : null}
       </div>
 

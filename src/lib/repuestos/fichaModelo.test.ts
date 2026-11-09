@@ -6,6 +6,7 @@ import {
   datosClaveModelo,
   lineaDeTexto,
   otrosModelosDelTipo,
+  tituloFichaModelo,
   textoDeBusqueda,
 } from "./fichaModelo";
 import { enlacesDeModelos, type ModeloEnlace } from "./tipo";
@@ -56,23 +57,22 @@ describe("lineaDeTexto", () => {
 
 describe("datosClaveModelo", () => {
   it("sin serie, no hay fila de serie", () => {
-    const d = datosClaveModelo({ marca: "Case", tipo: "Bulldozer", serie: null, modelo: "1150M" });
+    const d = datosClaveModelo({ tipo: "Bulldozer", serie: null, modelo: "1150M" });
     assert.deepEqual(
       d.map((x) => x.etiqueta),
-      ["Marca", "Tipo", "Modelo"],
+      ["Tipo", "Modelo"],
     );
   });
 
   it("con serie, la pone entre el tipo y el modelo", () => {
     const d = datosClaveModelo({
-      marca: "Hitachi",
       tipo: "Excavadora",
       serie: "EX",
       modelo: "EX120",
     });
     assert.deepEqual(
       d.map((x) => x.etiqueta),
-      ["Marca", "Tipo", "Serie", "Modelo"],
+      ["Tipo", "Serie", "Modelo"],
     );
   });
 });
@@ -116,5 +116,23 @@ describe("modelo corto de la lista", () => {
     const clave = textoDeBusqueda({ nombre: "Excavadora Hitachi EX120-2", corto: "EX120-2" });
     assert.ok(coincideModelo(clave, "excavadora hitachi"));
     assert.ok(coincideModelo(clave, "ex120"));
+  });
+});
+
+describe("tituloFichaModelo", () => {
+  it("es el tipo y el modelo corto, sin la marca", () => {
+    assert.equal(
+      tituloFichaModelo({
+        tipo: { nombre: "Bulldozer" },
+        modelo: { nombre: "Bulldozer CASE 1150M", codigo: "1150M" },
+      }),
+      "Bulldozer 1150M",
+    );
+  });
+  it("sin código, usa el nombre", () => {
+    assert.equal(
+      tituloFichaModelo({ tipo: { nombre: "Cargador" }, modelo: { nombre: "W20F" } }),
+      "Cargador W20F",
+    );
   });
 });

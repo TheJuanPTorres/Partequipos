@@ -32,17 +32,28 @@ export function lineaDeTexto(descripcion: string | null | undefined, max = 160):
   return `${(espacio > max * 0.6 ? corte.slice(0, espacio) : corte).replace(/[\s,;:.]+$/, "")}…`;
 }
 
+/**
+ * El `<h1>` de la ficha (Juan Pablo, #433): solo tipo y modelo corto, «Bulldozer 1150M». La marca ya
+ * va en el logo, en las migas y en el `<title>`.
+ */
+export function tituloFichaModelo(d: {
+  tipo: { nombre: string };
+  modelo: { nombre: string; codigo?: string | null };
+}): string {
+  return [texto(d.tipo.nombre), texto(d.modelo.codigo) || texto(d.modelo.nombre)]
+    .filter(Boolean)
+    .join(" ");
+}
+
 export type DatoClave = { etiqueta: string; valor: string };
 
-/** Los datos clave de la ficha: marca, tipo, serie (si la hay) y modelo. Los vacíos no salen. */
+/** Los datos clave de la ficha: tipo, serie (si la hay) y modelo (la marca ya va en el logo). */
 export function datosClaveModelo(d: {
-  marca: string;
   tipo: string;
   serie?: string | null;
   modelo: string;
 }): DatoClave[] {
   return [
-    { etiqueta: "Marca", valor: texto(d.marca) },
     { etiqueta: "Tipo", valor: texto(d.tipo) },
     { etiqueta: "Serie", valor: texto(d.serie) },
     { etiqueta: "Modelo", valor: texto(d.modelo) },

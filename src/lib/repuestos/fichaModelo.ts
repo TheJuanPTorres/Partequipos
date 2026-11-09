@@ -11,10 +11,11 @@ const texto = (v: string | null | undefined) => v?.trim() ?? "";
 /** El texto por el que se busca una tarjeta de modelo: su nombre, su código y su serie, normalizados. */
 export function textoDeBusqueda(m: {
   nombre: string;
+  corto?: string | null;
   codigo?: string | null;
   serie?: string | null;
 }): string {
-  return normalizarBusqueda([m.nombre, m.codigo, m.serie].filter(Boolean).join(" "));
+  return normalizarBusqueda([m.nombre, m.corto, m.codigo, m.serie].filter(Boolean).join(" "));
 }
 
 /**

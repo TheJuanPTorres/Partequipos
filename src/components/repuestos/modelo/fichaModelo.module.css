@@ -183,7 +183,7 @@
 
 .otrosLista {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
   gap: 8px 10px;
   margin: 0;
   padding: 0;
@@ -195,9 +195,9 @@
   min-height: 44px;
   box-sizing: border-box;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0 6px;
-  padding: 6px 16px;
+  justify-content: center;
+  padding: 6px 12px;
+  text-align: center;
   border-radius: 10px;
   background: var(--color-fondo);
   color: var(--color-texto);
@@ -214,11 +214,6 @@
 .otroEnlace:focus-visible {
   outline: 3px solid var(--color-texto);
   outline-offset: 3px;
-}
-
-.otroCodigo {
-  color: #4b4a49;
-  font-weight: 400;
 }
 
 @media (max-width: 1024px) {

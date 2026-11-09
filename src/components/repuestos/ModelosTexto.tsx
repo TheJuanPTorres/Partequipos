@@ -75,12 +75,12 @@ export function ModelosTexto({
                 data-grupo-modelos=""
               >
                 <h3 className={estilosTexto.serie}>{g.titulo}</h3>
-                <Rejilla modelos={g.modelos} conSerie />
+                <Rejilla modelos={g.modelos} />
               </div>
             ))
           ) : (
             <div className={estilosTexto.grupo} data-grupo-modelos="">
-              <Rejilla modelos={modelos} conSerie={false} />
+              <Rejilla modelos={modelos} />
             </div>
           )}
         </>
@@ -92,17 +92,15 @@ export function ModelosTexto({
   );
 }
 
-function Rejilla({ modelos, conSerie }: { modelos: ModeloEnlace[]; conSerie: boolean }) {
+function Rejilla({ modelos }: { modelos: ModeloEnlace[] }) {
   return (
     <ul className={estilosTexto.rejilla}>
       {modelos.map((m) => {
-        const detalle = [conSerie && m.serie ? `Serie ${m.serie}` : null, m.codigo]
-          .filter(Boolean)
-          .join(" · ");
+        // El modelo en grande (su código: «EX120-2»); debajo, su serie, si la tiene.
         const contenido = (
           <>
-            <span className={estilosTexto.nombre}>{m.nombre}</span>
-            {detalle ? <span className={estilosTexto.detalle}>{detalle}</span> : null}
+            <span className={estilosTexto.nombre}>{m.corto ?? m.nombre}</span>
+            {m.serie ? <span className={estilosTexto.detalle}>Serie {m.serie}</span> : null}
             {m.href ? (
               <IconArrowRight
                 aria-hidden="true"
@@ -117,7 +115,8 @@ function Rejilla({ modelos, conSerie }: { modelos: ModeloEnlace[]; conSerie: boo
         return (
           <li key={m.id} className={estilosTexto.tarjeta} data-modelo-busqueda={textoDeBusqueda(m)}>
             {m.href ? (
-              <a href={m.href} className={estilosTexto.enlace}>
+              // El nombre completo como nombre accesible: «Excavadora Hitachi EX120-2», no solo el código.
+              <a href={m.href} aria-label={m.nombre} className={estilosTexto.enlace}>
                 {contenido}
               </a>
             ) : (

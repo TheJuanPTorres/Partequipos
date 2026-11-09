@@ -26,9 +26,9 @@ export function OtrosModelosLista({
       <ul className={estilos.otrosLista}>
         {conPagina.map((m) => (
           <li key={m.id}>
-            <a href={m.href as string} className={estilos.otroEnlace}>
-              {m.nombre}
-              {m.codigo ? <span className={estilos.otroCodigo}>{m.codigo}</span> : null}
+            {/* El modelo corto a la vista y el nombre completo como nombre accesible. */}
+            <a href={m.href as string} aria-label={m.nombre} className={estilos.otroEnlace}>
+              {m.corto ?? m.nombre}
             </a>
           </li>
         ))}

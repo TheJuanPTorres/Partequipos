@@ -41,6 +41,11 @@ export type ModeloEnlace = {
   /** Clave de la lista: el id del modelo, o `entrada-<n>` para una «otra entrada». */
   id: number | string;
   nombre: string;
+  /**
+   * El modelo corto («EX120-2»): su código de fabricante o, sin él, el nombre. Es lo que se ve en
+   * grande en la lista sin fotos de la página de tipo (Ronda 12); sin él, se usa el nombre.
+   */
+  corto?: string;
   /** Código de fabricante, si lo hay y el nombre no lo lleva ya: acompaña al nombre. */
   codigo: string | null;
   /** `null`: una entrada sin ficha (WordPress la nombra y no tiene página): va como texto. */
@@ -65,6 +70,7 @@ export function enlacesDeModelos(
       return {
         id: m.id,
         nombre,
+        corto: codigo || nombre,
         // Un código que el nombre ya lleva («Excavadora CATERPILLAR 311» y «311») no se repite.
         codigo: codigo && !nombre.toLowerCase().includes(codigo.toLowerCase()) ? codigo : null,
         href: rutas.modelo(marca.slug, segmentoDeTipo(tipo), m.slug),

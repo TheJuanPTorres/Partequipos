@@ -8,7 +8,8 @@ import {
   otrosModelosDelTipo,
   textoDeBusqueda,
 } from "./fichaModelo";
-import type { ModeloEnlace } from "./tipo";
+import { enlacesDeModelos, type ModeloEnlace } from "./tipo";
+import type { Marca, ModelosRepuesto, TiposEquipo } from "@/payload-types";
 
 describe("textoDeBusqueda", () => {
   it("junta nombre, código y serie, normalizados, para que «ex 120» encuentre «EX120-2»", () => {
@@ -91,5 +92,29 @@ describe("otrosModelosDelTipo", () => {
       r.map((x) => x.id),
       [2],
     );
+  });
+});
+
+describe("modelo corto de la lista", () => {
+  const marca = { slug: "hitachi", nombre: "Hitachi" } as Marca;
+  const tipo = { slug: "excavadora", nombre: "Excavadora" } as TiposEquipo;
+  const modelo = (nombre: string, codigo: string | null) =>
+    ({ id: 1, nombre, slug: "m", codigo, serie: null, imagenes: [] }) as unknown as ModelosRepuesto;
+
+  it("es el código del modelo, aunque el nombre ya lo lleve", () => {
+    const [m] = enlacesDeModelos(marca, tipo, [modelo("Excavadora Hitachi EX120-2", "EX120-2")]);
+    assert.equal(m?.corto, "EX120-2");
+    assert.equal(m?.nombre, "Excavadora Hitachi EX120-2");
+  });
+
+  it("sin código, es el nombre", () => {
+    const [m] = enlacesDeModelos(marca, tipo, [modelo("Hitachi sin código", null)]);
+    assert.equal(m?.corto, "Hitachi sin código");
+  });
+
+  it("la búsqueda encuentra por el nombre completo y por el corto", () => {
+    const clave = textoDeBusqueda({ nombre: "Excavadora Hitachi EX120-2", corto: "EX120-2" });
+    assert.ok(coincideModelo(clave, "excavadora hitachi"));
+    assert.ok(coincideModelo(clave, "ex120"));
   });
 });

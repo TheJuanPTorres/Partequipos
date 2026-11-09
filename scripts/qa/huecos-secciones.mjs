@@ -47,7 +47,10 @@ const [base, carpeta, ...rutasArg] = process.argv.slice(2);
 if (!base || !carpeta) throw new Error("Uso: huecos-secciones.mjs <base> <carpeta> [ruta…]");
 const origen = new URL(base).origin;
 const rutas = rutasArg.length > 0 ? rutasArg : ["/", "/maquinaria-pesada/"];
-const ANCHOS = [390, 768, 1010, 1440, 1920, 2560];
+/** `HUECOS_ANCHOS=390,1440` para medir solo esos anchos. */
+const ANCHOS = process.env.HUECOS_ANCHOS
+  ? process.env.HUECOS_ANCHOS.split(",").map(Number)
+  : [390, 768, 1010, 1440, 1920, 2560];
 const MAXIMO = 80;
 /** El espaciado común a un ancho: clamp(40px, 24px + 4vw, 80px). */
 const comun = (ancho) => Math.min(MAXIMO, Math.max(40, 24 + 0.04 * ancho));
@@ -102,38 +105,60 @@ function medirEnPagina() {
     }
     return false;
   };
-  // La unión de lo que se pinta dentro de `raiz` (con su propio fondo si lo pinta).
+  // La unión de lo que se pinta dentro de `raiz` (con su propio fondo si lo pinta). Lo fijo
+  // (`position: fixed`) no cuenta, y cada caja se recorta a sus antepasados con `overflow` oculto:
+  // lo que queda fuera no se ve.
   const pintado = (raiz, fondo) => {
     let top = Infinity;
     let bottom = -Infinity;
-    const anadir = (r) => {
-      if (r.width < 1 || r.height < 1) return;
-      top = Math.min(top, r.top + scrollY);
-      bottom = Math.max(bottom, r.bottom + scrollY);
+    let deArriba = "";
+    let deAbajo = "";
+    const anadir = (r, recorte, quien) => {
+      const t = Math.max(r.top, recorte.top);
+      const b = Math.min(r.bottom, recorte.bottom);
+      if (r.width < 1 || b - t < 1) return;
+      if (t + scrollY < top) {
+        top = t + scrollY;
+        deArriba = quien;
+      }
+      if (b + scrollY > bottom) {
+        bottom = b + scrollY;
+        deAbajo = quien;
+      }
     };
-    const recorrer = (el, fondoActual) => {
+    const etiqueta = (el) =>
+      `${el.tagName.toLowerCase()}.${(el.className?.toString?.() ?? "").replace(/\w+-module__\w+__/g, "").slice(0, 30)}`;
+    const recorrer = (el, fondoActual, recorte) => {
       if (!visible(el)) return;
-      const tag = el.tagName;
-      if (/^(IMG|SVG|VIDEO|CANVAS|IFRAME|PICTURE)$/i.test(tag)) {
-        anadir(el.getBoundingClientRect());
+      const cs = getComputedStyle(el);
+      if (cs.position === "fixed") return;
+      const caja = el.getBoundingClientRect();
+      if (/^(IMG|SVG|VIDEO|CANVAS|IFRAME|PICTURE)$/i.test(el.tagName)) {
+        anadir(caja, recorte, etiqueta(el));
         return;
       }
       let f = fondoActual;
       if (pinta(el, fondoActual)) {
-        anadir(el.getBoundingClientRect());
-        const cs = getComputedStyle(el);
+        anadir(caja, recorte, etiqueta(el));
         if (opaco(cs.backgroundColor)) f = cs.backgroundColor;
       }
+      const corta = cs.overflowY !== "visible" || cs.overflowX !== "visible";
+      const dentro = corta
+        ? { top: Math.max(recorte.top, caja.top), bottom: Math.min(recorte.bottom, caja.bottom) }
+        : recorte;
       for (const n of el.childNodes) {
         if (n.nodeType === 3 && n.textContent.trim()) {
           const rango = document.createRange();
           rango.selectNodeContents(n);
-          for (const r of rango.getClientRects()) anadir(r);
-        } else if (n.nodeType === 1) recorrer(n, f);
+          for (const r of rango.getClientRects())
+            anadir(r, dentro, `texto «${n.textContent.trim().slice(0, 20)}»`);
+        } else if (n.nodeType === 1) recorrer(n, f, dentro);
       }
     };
-    recorrer(raiz, fondo);
-    return top === Infinity ? null : { top: Math.round(top), bottom: Math.round(bottom) };
+    recorrer(raiz, fondo, { top: -Infinity, bottom: Infinity });
+    return top === Infinity
+      ? null
+      : { top: Math.round(top), bottom: Math.round(bottom), deArriba, deAbajo };
   };
   const nombre = (el) => {
     const id = el.id ? `#${el.id}` : "";
@@ -176,6 +201,8 @@ function medirEnPagina() {
       zona: "main",
       entre: `${nombre(enMain[i - 1].el)} → ${nombre(enMain[i].el)}`,
       hueco: enMain[i].caja.top - enMain[i - 1].caja.bottom,
+      desde: enMain[i - 1].caja.deAbajo,
+      hasta: enMain[i].caja.deArriba,
     });
   }
   if (pie) {
@@ -186,6 +213,8 @@ function medirEnPagina() {
         zona: "main→pie",
         entre: `${nombre(ultimo.el)} → pie`,
         hueco: cajaPie.top - ultimo.caja.bottom,
+        desde: ultimo.caja.deAbajo,
+        hasta: cajaPie.deArriba,
       });
     }
     const fondoPie = fondoDe(pie);
@@ -205,6 +234,8 @@ function medirEnPagina() {
         zona: "pie",
         entre: `${nombre(dentro[i - 1].el)} → ${nombre(dentro[i].el)}`,
         hueco: dentro[i].caja.top - dentro[i - 1].caja.bottom,
+        desde: dentro[i - 1].caja.deAbajo,
+        hasta: dentro[i].caja.deArriba,
       });
     }
     if (dentro.length > 0) {

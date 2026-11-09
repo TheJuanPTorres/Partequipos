@@ -341,6 +341,14 @@ body {
   --boton-radio: 50px;
   --boton-relleno: 12px 25px 10px 25px;
   --boton-borde: 1px;
+
+  /*
+   * ESPACIADO COMÚN ENTRE SECCIONES (ronda 12, tarea 5, 2026-11-08): el hueco VISIBLE entre una
+   * sección y la siguiente, de 40 px en móvil a 80 px como mucho (a 1440 y más ya no crece).
+   * Una sola vez: la sección de abajo no le suma su propio margen o relleno de arriba.
+   * Lo mide `npm run qa:huecos` (scripts/qa/huecos-secciones.mjs).
+   */
+  --espacio-seccion: clamp(40px, calc(24px + 4vw), 80px);
 }
 
 @media (max-width: 1024px) {

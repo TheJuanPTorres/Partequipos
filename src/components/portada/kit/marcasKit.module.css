@@ -54,15 +54,20 @@
   }
 }
 
+/*
+ * En móvil y tablet el panel es blanco sobre blanco: el relleno de arriba de la cabecera es, a la
+ * vista, el hueco con la sección de encima, y se sumaba a su relleno de abajo (57 px a 390, 64 a
+ * 768, medido). Con 24 px, el espaciado común (ronda 12, tarea 5).
+ */
 .cabecera {
   position: relative;
   z-index: 1;
-  padding: 40px 24px 0;
+  padding: 24px 24px 0;
 }
 
 @media (min-width: 640px) {
   .cabecera {
-    padding: 40px 40px 0;
+    padding: 24px 40px 0;
   }
 }
 

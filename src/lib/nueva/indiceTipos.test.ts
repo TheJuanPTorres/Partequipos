@@ -72,10 +72,10 @@ const datos = {
 describe("tarjetasDeTiposNueva", () => {
   const tarjetas = tarjetasDeTiposNueva(datos);
 
-  it("una por categoría con equipos y por tipo con pestaña, por orden alfabético", () => {
+  it("una por categoría con equipos y por tipo con pestaña: las categorías en el orden del panel y los tipos sueltos detrás", () => {
     assert.deepEqual(
       tarjetas.map((t) => t.titulo),
-      ["Bulldozers", "Excavadoras", "Retrocargadoras"],
+      ["Excavadoras", "Bulldozers", "Retrocargadoras"],
     );
   });
 

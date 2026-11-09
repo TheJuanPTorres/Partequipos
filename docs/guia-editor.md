@@ -412,6 +412,23 @@ vacío no rompe nada: el sitio usa el dato de siempre.**
     `https://`. En el pie salen LinkedIn, X, Facebook, Instagram, TikTok y
     YouTube, en el orden de la lista; las demás solo las leen los buscadores.
 
+### 5.10 Maquinaria pesada nueva: orden de los tipos y foto de la cabecera
+
+La página **Maquinaria pesada nueva** (`/maquinaria-pesada/maquinaria-pesada-nueva/tipos/`)
+lleva una tarjeta por tipo de máquina.
+
+- **El orden de las tarjetas** se cambia en **Maquinaria → Categorías de
+  maquinaria nueva**, arrastrando cada fila por su asa (los puntos de la
+  izquierda). Se guarda al soltarla, sin botón «Guardar». Es también el orden de
+  «Maquinaria pesada → Por tipo de máquina» del menú. Si no ves el asa, la lista
+  está ordenada por otra columna: quita ese orden. Una categoría nueva se crea al
+  final.
+- **La foto de la cabecera** se elige en **Partes del sitio → Páginas índice y
+  contacto → Página «Maquinaria pesada nueva» (índice de tipos) → Foto de fondo
+  del encabezado**. Mejor una foto de obra horizontal de 1920 px o más, con una
+  zona tranquila donde va el título. Vacía, sale la del encabezado de la primera
+  marca de repuestos que lo tenga.
+
 ## 6. Retirar algo sin borrarlo
 
 | Qué                  | Cómo                         |

@@ -41,7 +41,9 @@ export function NavSecciones({ botones }: { botones: BotonSeccion[] }) {
                     src={b.imagen.url}
                     alt=""
                     fill
-                    sizes="(max-width: 639px) 30vw, 200px"
+                    // La caja de la máquina: ~30 % del ancho en móvil; desde 640, un tercio de la
+                    // barra (como mucho 1040 px) menos su relleno: hasta 320 px.
+                    sizes="(max-width: 639px) 30vw, 320px"
                     className={estilos.maquina}
                   />
                 ) : null}

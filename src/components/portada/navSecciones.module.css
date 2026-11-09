@@ -97,12 +97,17 @@
   outline-offset: 2px;
 }
 
-/* La máquina recortada: entera, y avanza un poco al pasar. */
+/*
+ * La máquina recortada: entera, y avanza un poco al pasar. MÁS GRANDE desde el 2026-11-05
+ * (cliente: «dar más valor a las imágenes»): un 40–45 % más alta que en el #417 (40 → 56 px en
+ * móvil, 56 → 80 desde 640 y 60 → 86 desde 1024); el panel crece hacia abajo, así que lo que
+ * monta sobre el hero (`--nav-cruce`) no cambia y no tapa sus controles.
+ */
 .imagen {
   position: relative;
   display: block;
   width: 100%;
-  height: 40px;
+  height: 56px;
 }
 
 .maquina {
@@ -111,7 +116,7 @@
 }
 
 .boton:is(:hover, :focus-visible) .maquina {
-  transform: translateX(4px);
+  transform: translateX(6px);
 }
 
 /* El nombre: el mismo alto en todos (tres líneas en móvil, dos desde 640 px), alineados. */
@@ -142,16 +147,17 @@
 
 @media (min-width: 640px) {
   .nav {
-    width: min(92%, 896px);
+    width: min(92%, 1040px);
     padding: 8px;
   }
 
   .boton {
-    padding: 14px 12px 16px;
+    padding: 16px 12px 18px;
+    gap: 10px;
   }
 
   .imagen {
-    height: 56px;
+    height: 80px;
   }
 
   .etiqueta {
@@ -168,11 +174,11 @@
 
 @media (min-width: 1024px) {
   .imagen {
-    height: 60px;
+    height: 86px;
   }
 
   .etiqueta {
-    font-size: 16.8px;
+    font-size: 18px;
   }
 }
 

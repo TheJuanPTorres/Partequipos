@@ -1910,7 +1910,7 @@ a.modelo:hover {
  * pequeñas, 3 por fila (2 en móvil). El `li` no lleva `categoriaCaja`: sin la colocación de 5.
  */
 .baldosasFichaSeccion {
-  margin-top: 8px;
+  margin-top: 28px;
 }
 
 .baldosasFichaTitulo {

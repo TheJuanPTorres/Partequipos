@@ -18,7 +18,8 @@
   color: var(--color-texto);
 
   --ficha-radio: 30px;
-  --ficha-margen: 3cqi; /* 3 % de la página a cada lado (43 px a 1440) */
+  /* 3 % de la página a cada lado (43 px a 1440), con techo: a 3840 eran 115 px de hueco. */
+  --ficha-margen: min(3cqi, 48px);
   --ficha-borde-suave: #dddddd; /* separadores de las listas */
 }
 

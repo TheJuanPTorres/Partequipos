@@ -7,7 +7,8 @@
  */
 .seccion {
   position: relative;
-  padding: 5% 3%;
+  /* Con techo: el 5 % · 3 % crecía con la pantalla (192 px arriba a 3840). */
+  padding: min(5%, 72px) min(3%, 48px);
   background: var(--color-fondo-seccion);
 }
 
@@ -27,7 +28,7 @@
   box-sizing: border-box;
   width: 40%;
   min-height: 440px;
-  padding: 5%;
+  padding: min(5%, 64px);
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-start;
@@ -66,7 +67,7 @@
   display: flex;
   box-sizing: border-box;
   width: 60%;
-  padding: 5%;
+  padding: min(5%, 64px);
   flex-direction: column;
   /* Centrada en vertical respecto a la tarjeta (pedido de Andrés). */
   justify-content: center;

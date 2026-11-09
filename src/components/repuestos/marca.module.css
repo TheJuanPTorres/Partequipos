@@ -41,7 +41,8 @@
 
 .heroSeccion {
   /* Aire bajo la cabecera fija (petición del cliente): el hero ya no queda pegado a ella. */
-  padding: 24px 1.5vw 1.5vw;
+  /* Con techo (24 px): el 1,5vw llegaba a 58 px a 3840 entre la tarjeta y lo siguiente. */
+  padding: 24px min(1.5vw, 24px) min(1.5vw, 24px);
   /* La mitad de abajo de la franja de color asoma a los lados de la tarjeta. */
   background: linear-gradient(var(--color-fondo-seccion) 50%, var(--marca-amarillo) 50%);
 }
@@ -1059,7 +1060,8 @@ a.modelo:hover {
  * animación «shrink» del export), salvo con movimiento reducido.
  */
 .tarjetasIndice {
-  padding: 5% 5% 10%;
+  /* Con techo: el 5 % · 10 % crecía con la pantalla (192 y 384 px a 3840). */
+  padding: min(5%, 72px) min(5%, 72px) min(10%, 72px);
 }
 
 .tarjetasIndice .rejilla {
@@ -1389,9 +1391,9 @@ a.modelo:hover {
  */
 .mostrarMarcas {
   display: flex;
-  padding: 0 1.5vw 1.5vw;
+  padding: 0 min(1.5vw, 24px) min(1.5vw, 24px);
   flex-direction: column;
-  gap: 1.5vw;
+  gap: min(1.5vw, 24px);
 }
 
 /* El export pinta una foto del kit con gris en «multiply»; sin ella (licencia L3), el tono

@@ -42,8 +42,9 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  /* Algo menos de relleno que el export (7 % · 6 %), sin apretar el texto ni el boton. */
-  padding: max(20px, 5%) 5% max(20px, 4.5%);
+  /* Algo menos de relleno que el export (7 % · 6 %), sin apretar el texto ni el boton, y con
+     techo: a 3840 el porcentaje daba más de 170 px. */
+  padding: clamp(20px, 5%, 64px) 5% clamp(20px, 4.5%, 58px);
   border-radius: var(--pie-radio);
   background: var(--color-marca); /* global `primary` */
   color: var(--color-fondo); /* global `099f28a` */

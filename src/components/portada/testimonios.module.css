@@ -5,7 +5,8 @@
  */
 .seccion {
   display: flex;
-  padding: 3%;
+  /* Arriba y abajo, el común (el 3 % llegaba a 115 px a 3840); a los lados, con techo. */
+  padding: var(--espacio-seccion) min(3%, 48px);
   flex-direction: column;
   align-items: center;
   gap: 20px;

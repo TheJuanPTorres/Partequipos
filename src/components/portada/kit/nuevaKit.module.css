@@ -25,10 +25,10 @@
    */
   --nueva-hasta-usada: 12px;
   /*
-   * Arriba, bajo la barra de secciones (dirección, ronda 12, t5: se veía pegada): el espaciado
-   * común, sin bajar de los 48 px de antes (48 · 55 · 64 a 390 · 768 · 1010).
+   * Arriba, bajo la barra de secciones: el espaciado común desde el borde de su tarjeta (qa:huecos
+   * mide desde el texto de dentro de la barra y suma su relleno interior, 21–39 px).
    */
-  padding: max(48px, var(--espacio-seccion)) var(--nueva-lado)
+  padding: var(--espacio-seccion) var(--nueva-lado)
     calc(var(--espacio-seccion) - var(--nueva-hasta-usada));
   background: #fff;
 }
@@ -45,9 +45,9 @@
     --nueva-lado: 2.6%;
     /*
      * Desde 1024 la foto de obra cubre la sección desde arriba y tocaba la tarjeta de la barra:
-     * medio espaciado común de blanco antes de la foto (40 px a 1440), y el título a 64 dentro.
+     * el espaciado común de blanco antes de la foto (48 px a 1440), y el título a 64 dentro.
      */
-    margin-top: calc(var(--espacio-seccion) / 2);
+    margin-top: var(--espacio-seccion);
     padding-top: 64px;
   }
 }

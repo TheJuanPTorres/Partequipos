@@ -171,7 +171,8 @@ export async function PaginaModeloRepuesto({
               conCiudad: true,
               etiquetaMensaje: "¿En qué estás interesado?",
             },
-            mensajeInicial: `Consulta sobre: ${referencia}`,
+            // El «Consulta sobre» ya lo dice el formulario: el mensaje solo invita a seguir.
+            mensajeInicial: `Necesito cotizar ${referencia.charAt(0).toLowerCase()}${referencia.slice(1)}: `,
           })}
         />
         {vista.piezas.length > 0 ? (

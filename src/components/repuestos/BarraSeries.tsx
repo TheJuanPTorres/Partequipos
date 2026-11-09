@@ -12,6 +12,7 @@ import {
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import { CURVA, CURVA_FRENADA, DURACION_DESLIZAR_MS, DURACION_MS } from "@/lib/listado/animaciones";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
+import { CAJA_GRANDE, CAJA_NORMAL, colocarLogo, type Caja } from "@/lib/marca/tamanoOptico";
 
 import mejoras from "./mejoras.module.css";
 
@@ -43,6 +44,10 @@ import mejoras from "./mejoras.module.css";
  * logo de `activa` (`barraDeMarcas`: la baldosa de la marca de repuestos, o el logo de siempre
  * sobre una plaquita blanca), SIN filtro que aplane el logo a una tinta. Los dos logos van en el
  * HTML y el CSS enseña uno u otro con `aria-current`: al cambiar de marca no hay que descargar.
+ * CAJA FIJA (2026-11-09): los dos logos van en la misma caja (mismo ancho y alto en todas las
+ * pastillas, activa e inactiva), con la misma área visible y sin sus márgenes (`colocarLogo`),
+ * descargados desde el principio: al cambiar de marca, ni la pastilla cambia de ancho ni el logo
+ * de tamaño.
  */
 export function BarraSeries({
   series,
@@ -75,6 +80,7 @@ export function BarraSeries({
   grande?: boolean;
 }) {
   const [actual, setActual] = useState<string | null>(null);
+  const caja = grande ? CAJA_GRANDE : CAJA_NORMAL;
   const barra = useRef<HTMLElement>(null);
   const lista = useRef<HTMLUListElement>(null);
   /** La serie elegida mientras dura el desplazamiento: manda sobre lo que se ve. */
@@ -221,24 +227,20 @@ export function BarraSeries({
               onClick={(e) => irA(e, s.ancla)}
             >
               {s.logo ? (
-                <LogoMarca logo={s.logo} alt="" sizes="96px" className={mejoras.barraLogo} />
+                <span className={mejoras.barraCaja} style={tamanoCaja(caja)}>
+                  <LogoEnCaja logo={s.logo} caja={caja} className={mejoras.barraVersion} />
+                  {s.activa?.logo ? (
+                    <LogoEnCaja
+                      logo={s.activa.logo}
+                      caja={caja}
+                      className={`${mejoras.barraVersion} ${mejoras.barraActiva}`}
+                      placa={s.activa.placa}
+                    />
+                  ) : null}
+                </span>
               ) : (
                 s.titulo
               )}
-              {s.logo && s.activa?.logo ? (
-                <span
-                  className={mejoras.barraActiva}
-                  data-placa={s.activa.placa ? "" : undefined}
-                  aria-hidden="true"
-                >
-                  <LogoMarca
-                    logo={s.activa.logo}
-                    alt=""
-                    sizes="96px"
-                    className={mejoras.barraLogoActivo}
-                  />
-                </span>
-              ) : null}
               {s.total === undefined ? null : (
                 <>
                   {" "}
@@ -272,6 +274,57 @@ function entradaEscalonada(grupo: HTMLElement): Animation[] {
     animacion.pause();
     return animacion;
   });
+}
+
+const px = (n: number) => `${n}px`;
+
+function tamanoCaja(caja: Caja): CSSProperties {
+  return { width: px(caja.ancho), height: px(caja.alto) };
+}
+
+/**
+ * Una versión del logo en la caja fija de la pastilla (2026-11-09): con la misma área visible que
+ * las demás marcas (`colocarLogo`), sin sus márgenes transparentes, y SIEMPRE en el HTML y
+ * descargada desde el principio (`eager`): la versión que no toca queda oculta con `visibility`,
+ * no con `display`, así que al cambiar de marca no hay carga, ni parpadeo, ni cambio de ancho.
+ */
+function LogoEnCaja({
+  logo,
+  caja,
+  className,
+  placa = false,
+}: {
+  logo: LogoConAlt;
+  caja: Caja;
+  className?: string;
+  placa?: boolean;
+}) {
+  const { visible, imagen } = colocarLogo(logo, caja);
+  return (
+    <span className={className} data-placa={placa ? "" : undefined} aria-hidden="true">
+      <span
+        className={mejoras.barraRecorte}
+        style={{
+          left: px(visible.izquierda),
+          top: px(visible.arriba),
+          width: px(visible.ancho),
+          height: px(visible.alto),
+        }}
+      >
+        <span
+          className={mejoras.barraImagen}
+          style={{
+            left: px(imagen.izquierda),
+            top: px(imagen.arriba),
+            width: px(imagen.ancho),
+            height: px(imagen.alto),
+          }}
+        >
+          <LogoMarca logo={logo} alt="" fill loading="eager" sizes={px(Math.ceil(imagen.ancho))} />
+        </span>
+      </span>
+    </span>
+  );
 }
 
 function suave() {

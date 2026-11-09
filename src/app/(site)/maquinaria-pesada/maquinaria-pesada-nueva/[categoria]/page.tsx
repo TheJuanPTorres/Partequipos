@@ -13,6 +13,7 @@ import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { metadataSinIndexar } from "@/lib/filtros/seo";
+import { recorteVisible } from "@/lib/marca/recorteLogo";
 import {
   barraDeMarcas,
   gruposPorMarcaYTipo,
@@ -21,7 +22,7 @@ import {
   vistaEncabezadoCategoriaNueva,
 } from "@/lib/nueva/paginaCategoria";
 import { tintaSobre } from "@/lib/marca/colorMarca";
-import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
+import { conAlt, logoDeMarca, type LogoConAlt } from "@/lib/marca/logoMarca";
 import { vistaBanner } from "@/lib/nueva/bannerMarca";
 import { columnaDeTarjeta } from "@/lib/nueva/paginaKit";
 import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
@@ -120,7 +121,14 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
   const logoDe = (m: (typeof grupos)[number]["marca"]) =>
     conAlt(logoDeMarca(marcaConLogo.get(m.slug) ?? m, logos), `Logo de ${m.nombre}`);
   // Con 2 o más marcas, la barra de marcas fija arriba (la de series de repuestos, R2).
-  const pastillas = barraDeMarcas(grupos, logoDe, baldosas);
+  // Cada logo con su parte visible medida (sin márgenes), para la caja fija de la pastilla.
+  const pastillas = await Promise.all(
+    barraDeMarcas(grupos, logoDe, baldosas).map(async (p) => ({
+      ...p,
+      logo: await conRecorte(p.logo),
+      activa: { ...p.activa, logo: await conRecorte(p.activa.logo) },
+    })),
+  );
 
   return (
     <main className={estilos.pagina}>
@@ -215,4 +223,9 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
       />
     </main>
   );
+}
+
+/** El logo con la parte visible de su fichero (`recorteVisible`), o `null`. */
+async function conRecorte(logo: LogoConAlt | null): Promise<LogoConAlt | null> {
+  return logo ? { ...logo, recorte: await recorteVisible(logo.url) } : null;
 }

@@ -38,9 +38,11 @@ import mejoras from "./mejoras.module.css";
  * sin cuenta, con su nombre accesible y sin la entrada escalonada (`entrada={false}`).
  *
  * Y la BARRA DE MARCAS de las páginas generales de tipo de nueva (2026-10-23): cada pastilla con
- * el logo de su marca (`LogoMarca`) y su nombre como `aria-label`; la activa, del color de la
- * marca, con el logo en blanco si se lee (3:1) y negro solo en los claros (`tintaDeLogoSobre`).
- * Desde el 2026-10-25, en la variante `grande`: pastillas y logos un ~35 % mayores.
+ * el logo de su marca (`LogoMarca`) y su nombre como `aria-label`. Desde el 2026-10-25, en la
+ * variante `grande`: pastillas y logos un ~35 % mayores. LA ACTIVA (2026-11-05): el fondo y el
+ * logo de `activa` (`barraDeMarcas`: la baldosa de la marca de repuestos, o el logo de siempre
+ * sobre una plaquita blanca), SIN filtro que aplane el logo a una tinta. Los dos logos van en el
+ * HTML y el CSS enseña uno u otro con `aria-current`: al cambiar de marca no hay que descargar.
  */
 export function BarraSeries({
   series,
@@ -60,6 +62,8 @@ export function BarraSeries({
     total?: number;
     logo?: LogoConAlt | null;
     color?: { fondo: string; tinta: string };
+    /** El logo de la pastilla activa y si va sobre una plaquita blanca (barra de marcas). */
+    activa?: { logo: LogoConAlt | null; placa: boolean };
   }[];
   /** Nombre accesible de la barra. */
   etiqueta?: string;
@@ -213,6 +217,7 @@ export function BarraSeries({
                   : undefined
               }
               data-tinta={s.color ? (s.color.tinta === "#ffffff" ? "clara" : "oscura") : undefined}
+              data-con-activa={s.logo && s.activa?.logo ? "" : undefined}
               onClick={(e) => irA(e, s.ancla)}
             >
               {s.logo ? (
@@ -220,6 +225,20 @@ export function BarraSeries({
               ) : (
                 s.titulo
               )}
+              {s.logo && s.activa?.logo ? (
+                <span
+                  className={mejoras.barraActiva}
+                  data-placa={s.activa.placa ? "" : undefined}
+                  aria-hidden="true"
+                >
+                  <LogoMarca
+                    logo={s.activa.logo}
+                    alt=""
+                    sizes="96px"
+                    className={mejoras.barraLogoActivo}
+                  />
+                </span>
+              ) : null}
               {s.total === undefined ? null : (
                 <>
                   {" "}

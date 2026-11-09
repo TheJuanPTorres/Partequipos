@@ -162,8 +162,25 @@ const FORMULARIOS_NUEVOS = [
   { nombre: "formulario-categoria-tecnica", coleccion: "categorias-tecnicas" },
   { nombre: "formulario-equipo-nuevo", coleccion: "equipos-nuevos" },
 ];
-const PANTALLAS = MODO === "nuevos" ? PANTALLAS_NUEVAS : PANTALLAS_TODAS;
-const FORMULARIOS = MODO === "nuevos" ? FORMULARIOS_NUEVOS : FORMULARIOS_TODOS;
+/*
+ * Modo `marca-nueva` (2026-11-09): solo el formulario de una marca de maquinaria nueva, para el
+ * runbook de la portada: dónde están «PORTADA: tarjeta…» y «Foto de la marca (fondo de su página)».
+ */
+const FORMULARIOS_MARCA_NUEVA = [
+  {
+    nombre: "formulario-marca-nueva",
+    coleccion: "marcas-maquinaria",
+    filtro: "?where[slug][equals]=case-construction",
+  },
+];
+const PANTALLAS =
+  MODO === "nuevos" ? PANTALLAS_NUEVAS : MODO === "marca-nueva" ? [] : PANTALLAS_TODAS;
+const FORMULARIOS =
+  MODO === "nuevos"
+    ? FORMULARIOS_NUEVOS
+    : MODO === "marca-nueva"
+      ? FORMULARIOS_MARCA_NUEVA
+      : FORMULARIOS_TODOS;
 // Palabras inglesas que no deberían verse en un panel en español.
 const INGLES =
   /\b(Create New|Search|Filters?|Columns|Loading|Save|Delete|Upload|Collections|Globals|Dashboard|Log ?out|Sign in|Login|No results|Nothing found|Per Page|Sort|Edit|Back|Settings|Previous|Next)\b/;

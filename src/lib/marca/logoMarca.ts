@@ -22,6 +22,8 @@ export type LogoMarca = {
   oscuro: boolean;
   /** Se pinta en una sola tinta BLANCA (baldosas de color de maquinaria nueva). */
   blanco?: boolean;
+  /** La parte visible del fichero, sin márgenes (`recorteVisible`): solo la barra de marcas. */
+  recorte?: import("./tamanoOptico").Recorte | null;
 };
 
 type MediaLogo = { url?: string | null; width?: number | null; height?: number | null };

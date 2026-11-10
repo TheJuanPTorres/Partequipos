@@ -12,7 +12,9 @@
    * Abajo, como mucho el espaciado común hasta las sedes, contando sus 10 px de arriba (antes 50 px
    * fijos: 60 de hueco también a 390, donde el común es 40; ronda 12, tarea 5). Nunca más de 50.
    */
-  padding: 40px 10px min(50px, calc(var(--espacio-seccion) - 10px));
+  /* Arriba, el común menos el borde de la tarjeta de «Nuestra Compañía» (1,5 %, tope 22 px). */
+  padding: max(0px, calc(var(--espacio-seccion) - min(1.5vw, 22px))) 10px
+    min(50px, calc(var(--espacio-seccion) - 10px));
   flex-direction: column;
   align-items: center;
   gap: 20px;

@@ -65,7 +65,8 @@
 
 .secciones {
   width: 100%;
-  margin-top: 20px;
+  /* Con el relleno de cada enlace (12 px) y el interlineado, suma el común: antes 40 fijos. */
+  margin-top: max(0px, calc(var(--espacio-seccion) - 20px));
 }
 
 .lista {

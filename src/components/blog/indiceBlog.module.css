@@ -19,7 +19,8 @@
   gap: 32px;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 48px 22px 80px;
+  /* Arriba, con el relleno inferior de la cabecera (`min(1.5vw, 24px)`) suma el común; antes 48 fijos: 56–72. */
+  padding: max(0px, calc(var(--espacio-seccion) - min(1.5vw, 24px))) 22px 80px;
   color: var(--gris-texto);
 }
 

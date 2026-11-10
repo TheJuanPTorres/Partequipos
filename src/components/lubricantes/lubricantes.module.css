@@ -18,8 +18,8 @@
 .lineas {
   max-width: 1600px;
   margin: 0 auto;
-  /* Con el relleno superior del contacto (1.5vw, `general .seccion`) suma el comun. */
-  padding: 20px 3vw max(0px, calc(var(--espacio-seccion) - 1.5vw));
+  /* Con el relleno superior del contacto (`general .seccion`) suma el comun. */
+  padding: 20px min(3vw, 48px) max(0px, calc(var(--espacio-seccion) - min(1.5vw, 24px)));
 }
 
 .grupo + .grupo {

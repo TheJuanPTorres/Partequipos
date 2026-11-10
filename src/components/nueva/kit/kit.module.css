@@ -619,7 +619,11 @@
 /* ------------------------------------------------------------------ 4 · Secciones por tipo */
 
 .tipos {
-  padding-bottom: 100px;
+  /*
+   * Hasta el contacto, el espaciado común: el contacto (`ContactoMarca`) ya pone 30 px arriba
+   * (ronda 12, t5, fase 2; antes 100 px, y 144 en móvil).
+   */
+  padding-bottom: max(0px, calc(var(--espacio-seccion) - 30px));
 }
 
 .seccion {
@@ -969,10 +973,6 @@
 
   .heroTexto {
     font-size: 13px;
-  }
-
-  .tipos {
-    padding-bottom: 144px;
   }
 
   .seccion {

@@ -305,7 +305,8 @@ section.principal[data-con-izquierda] {
 /* ====================== 2. «OTRAS <TIPO>» ====================== */
 
 .otras {
-  padding: 0 var(--ficha-margen) 5cqi;
+  /* Hasta el comun: el 5cqi llegaba a 192 px a 3840 hasta la llamada. */
+  padding: 0 var(--ficha-margen) min(5cqi, var(--espacio-seccion));
 }
 
 /* En móvil el banner quedaba a 12 px de la tarjeta del equipo (medido en el #404): 32. */

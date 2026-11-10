@@ -16,6 +16,8 @@
   --sedes-curva: cubic-bezier(0.625, 0.05, 0, 1);
 
   width: 100%;
+  /* Abajo, medio común: con el medio de arriba de los testimonios suman el común. */
+  padding-bottom: calc(var(--espacio-seccion) / 2);
   background: #fff;
   color: var(--sedes-tinta);
 }
@@ -574,7 +576,8 @@
     position: relative;
     inset: auto;
     justify-content: space-between;
-    padding: 1em 1.5em;
+    /* Sin relleno abajo: es lo último de la sección y el común ya lo pone .seccion. */
+    padding: 1em 1.5em 0;
   }
 
   .lista {

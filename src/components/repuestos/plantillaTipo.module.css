@@ -6,7 +6,9 @@
 /* --- ¿Por qué elegirnos? ----------------------------------------------------------- */
 
 .porQue {
-  padding: 5% 3%;
+  /* Arriba y abajo, medio espaciado común: con la sección de al lado suman el común; a los lados,
+     el 3 % con techo (llegaba a 115 px a 3840). */
+  padding: calc(var(--espacio-seccion) / 2) min(3%, 48px);
   background: var(--color-fondo-seccion);
 }
 
@@ -42,7 +44,7 @@
 .porQueTexto {
   display: flex;
   width: 60%;
-  padding: 5%;
+  padding: min(5%, 64px);
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
@@ -148,7 +150,9 @@
 /* --- Sedes ------------------------------------------------------------------------- */
 
 .sedes {
-  padding: 3%;
+  /* Arriba y abajo, medio espaciado común: con la sección de al lado suman el común; a los lados,
+     el 3 % con techo (llegaba a 115 px a 3840). */
+  padding: calc(var(--espacio-seccion) / 2) min(3%, 48px);
 }
 
 .sedesLista {
@@ -234,7 +238,7 @@
 
 @media (max-width: 767px) {
   .porQue {
-    padding: 40px 12px;
+    padding: calc(var(--espacio-seccion) / 2) 12px;
   }
 
   .porQueTarjeta {
@@ -242,7 +246,7 @@
   }
 
   .sedes {
-    padding: 12px;
+    padding: calc(var(--espacio-seccion) / 2) 12px;
   }
 
   .sedesLista {

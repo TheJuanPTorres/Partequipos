@@ -90,7 +90,8 @@
 
 @media (min-width: 1025px) {
   .cabeceraRejilla {
-    min-height: calc(100svh - 20rem);
+    /* Con techo: en pantallas de 2160 de alto llegaba a ~1840 px. */
+    min-height: min(calc(100svh - 20rem), 600px);
     padding: 40px;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   }

@@ -305,8 +305,8 @@ section.principal[data-con-izquierda] {
 /* ====================== 2. «OTRAS <TIPO>» ====================== */
 
 .otras {
-  /* Abajo, el espaciado común en lugar del 5 % de la página (72 px a 1440; criterio de espacios). */
-  padding: 0 var(--ficha-margen) var(--espacio-seccion);
+  /* Hasta el comun: el 5cqi llegaba a 192 px a 3840 hasta la llamada. */
+  padding: 0 var(--ficha-margen) min(5cqi, var(--espacio-seccion));
 }
 
 /* En móvil el banner quedaba a 12 px de la tarjeta del equipo (medido en el #404): 32. */

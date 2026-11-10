@@ -45,7 +45,8 @@
   z-index: 2;
   box-sizing: border-box;
   height: 100%;
-  padding: 0 1.5% 1.5%;
+  /* Con techo: el 1,5 % llegaba a 57 px a 3840 (más el aire de la sección 8). */
+  padding: 0 min(1.5%, 22px) min(1.5%, 22px);
   overflow: hidden;
   border-radius: var(--compania-radio, 0);
   transform: scale(var(--compania-escala, 1));
@@ -276,7 +277,8 @@
 
   .marquee {
     position: static;
-    padding: 24px 0;
+    /* 12 y no 24: con lo de encima, el hueco desde «Repuestos para las marcas» pasaba de 48. */
+    padding: 12px 0;
     opacity: 1;
   }
 }

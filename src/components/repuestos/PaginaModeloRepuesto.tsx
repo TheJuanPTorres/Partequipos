@@ -132,6 +132,9 @@ export async function PaginaModeloRepuesto({
   if (!usaDisenoPropio(global)) {
     const referencia = referenciaModelo4086({ marca, tipo, modelo });
     const whatsappModelo = enlaceWhatsApp(empresa.whatsapp);
+    const whatsappConModelo = whatsappModelo
+      ? conMensaje(whatsappModelo, `Hola, busco ${referencia}.`)
+      : undefined;
     const otros = otrosModelosDelTipo(
       enlacesDeModelos(marca, tipo, await getModelosDeTipo(tipo.id)),
       modelo,
@@ -155,13 +158,11 @@ export async function PaginaModeloRepuesto({
             titulo={tituloFichaModelo({ tipo, modelo })}
             logo={logo}
             linea={lineaDeTexto(modelo.descripcion)}
-            datos={[]}
+            whatsapp={whatsappConModelo?.href}
             formulario={configContactoMarca({
               origen: ruta,
               siteKey: turnstileSiteKey(),
-              whatsapp: whatsappModelo
-                ? conMensaje(whatsappModelo, `Hola, busco ${referencia}.`)
-                : undefined,
+              whatsapp: whatsappConModelo,
               boton: "Pedir cotización",
               marca: modelo.nombre,
               modelo: { id: modelo.id, nombre: modelo.nombre },

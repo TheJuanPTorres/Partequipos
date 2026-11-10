@@ -8,7 +8,7 @@ import { HeroMarca } from "@/components/repuestos/HeroMarca";
 import { InterruptorMejoras } from "@/components/repuestos/InterruptorMejoras";
 import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
 import { SedesCompactas } from "@/components/repuestos/SedesCompactas";
-import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
+import { TiposTexto } from "@/components/repuestos/TiposTexto";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { tarjetasDeTestimonios } from "@/lib/portada/seccionesH";
@@ -20,7 +20,6 @@ import { getEmpresa } from "@/lib/queries/getSeo";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
 import { tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
 import { idsDeOtrasEntradas, listaDeModelos } from "@/lib/repuestos/tipo";
-import { MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
@@ -107,14 +106,10 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
 
       <HeroMarca vista={vistaEncabezado(marca, global)} anclaSiguiente={ANCLA_TIPOS} />
 
-      <TarjetasMarca
+      <TiposTexto
         id={ANCLA_TIPOS}
         titulo={texto(global.tituloTipos)}
-        verTodo={texto(global.verTodoTexto)}
         tarjetas={tarjetasDeTipos(marca, tipos, modelosDe)}
-        // El estilo «difuminado» de las tarjetas del sitio (dirección, 2026-10-21).
-        indice
-        panelR5={MEJORAS_ACTIVAS.R5}
       />
 
       <ContactoMarca

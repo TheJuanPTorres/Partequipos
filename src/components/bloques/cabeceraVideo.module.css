@@ -11,7 +11,8 @@
  * 2026-10-16 (decisiones-nosotros.md §7; antes iba a la izquierda).
  */
 .seccion {
-  padding: 0 1.5vw 1.5vw;
+  /* Con techo: a 3840 el 1,5vw daba 58 px a los lados y hasta el bloque siguiente. */
+  padding: 0 min(1.5vw, 24px) min(1.5vw, 24px);
 }
 
 .tarjeta {

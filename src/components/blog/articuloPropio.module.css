@@ -178,11 +178,6 @@
     margin: 0;
   }
 
-  /* En escritorio lo último es texto: su interlineado suma unos 6 px al común. */
-  .llamada {
-    margin-top: calc(var(--espacio-seccion) - 6px);
-  }
-
   /* A2: fijo al bajar, solo en escritorio. */
   .pagina[data-anim~="A2"] .lateral {
     position: sticky;
@@ -580,6 +575,13 @@
   max-width: 1200px;
   margin: var(--espacio-seccion) auto 0;
   padding: 0 16px;
+}
+
+/* En escritorio lo último de la lectura es texto: su interlineado suma unos 6 px al común. */
+@media (min-width: 1025px) {
+  .llamada {
+    margin-top: calc(var(--espacio-seccion) - 6px);
+  }
 }
 
 .llamadaInterior {

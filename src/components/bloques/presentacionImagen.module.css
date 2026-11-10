@@ -122,9 +122,4 @@
   .columnaTexto {
     width: 100%;
   }
-
-  /* Una debajo de la otra, el alto mínimo de escritorio dejaba ~90 px vacíos sobre el mapa. */
-  .columnaImagen {
-    min-height: 0;
-  }
 }

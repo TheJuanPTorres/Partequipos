@@ -18,7 +18,8 @@
 .lineas {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 20px 3vw 72px;
+  /* Con el relleno superior del contacto (`general .seccion`) suma el comun. */
+  padding: 20px min(3vw, 48px) max(0px, calc(var(--espacio-seccion) - min(1.5vw, 24px)));
 }
 
 .grupo + .grupo {
@@ -171,10 +172,6 @@
 }
 
 @media (max-width: 1024px) {
-  .lineas {
-    padding-bottom: 50px;
-  }
-
   .grupo + .grupo {
     margin-top: 50px;
   }
@@ -201,7 +198,6 @@
 @media (max-width: 767px) {
   .lineas {
     padding-top: 12px;
-    padding-bottom: 32px;
   }
 
   .grupo + .grupo {

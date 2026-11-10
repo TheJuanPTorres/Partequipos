@@ -5,7 +5,8 @@
  * (en tablet con 20 px entre ellas) y, en móvil, una sobre otra.
  */
 .seccion {
-  padding: 1.5vw 3% 3%;
+  /* Con techo: a 3840 el 1,5vw y el 3 % daban 58 y 115 px. */
+  padding: min(1.5vw, 24px) min(3%, 48px) min(3%, 48px);
 }
 
 .recuadro {

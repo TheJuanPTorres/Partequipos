@@ -145,7 +145,8 @@
   gap: 48px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px 16px 24px;
+  /* Abajo sin relleno: el hueco hasta la llamada lo pone `.llamada` con el común. */
+  padding: 24px 16px 0;
 }
 
 .columna {
@@ -169,12 +170,17 @@
     grid-template-columns: minmax(0, 1fr) clamp(340px, 30vw, 400px);
     align-items: start;
     gap: 56px;
-    padding: 32px 16px 40px;
+    padding: 32px 16px 0;
   }
 
   .columna,
   .lateral {
     margin: 0;
+  }
+
+  /* En escritorio lo último es texto: su interlineado suma unos 6 px al común. */
+  .llamada {
+    margin-top: calc(var(--espacio-seccion) - 6px);
   }
 
   /* A2: fijo al bajar, solo en escritorio. */
@@ -572,7 +578,7 @@
 /* ---- Llamada final ---------------------------------------------------------- */
 .llamada {
   max-width: 1200px;
-  margin: 24px auto 0;
+  margin: var(--espacio-seccion) auto 0;
   padding: 0 16px;
 }
 
@@ -659,8 +665,8 @@
 .relacionados {
   max-width: 1200px;
   margin: 0 auto;
-  /* Arriba, el comun (tope 64): en movil y tablet los 64 fijos daban 68 desde la llamada. */
-  padding: min(64px, var(--espacio-seccion)) 16px 96px;
+  /* Arriba, el común menos los 4 px que suma el interlineado del título (antes, 64 fijos: 68 desde la llamada). */
+  padding: calc(var(--espacio-seccion) - 4px) 16px 96px;
 }
 
 .relacionados h2 {

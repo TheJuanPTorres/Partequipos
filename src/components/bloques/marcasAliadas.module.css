@@ -6,7 +6,8 @@
  */
 .seccion {
   box-sizing: border-box;
-  padding: 0 1.5vw 5vw;
+  /* Hasta el comun: a 1920 y 2560 el 5vw daba 96 y 128 px hasta el bloque siguiente. */
+  padding: 0 1.5vw min(5vw, var(--espacio-seccion));
 }
 
 .contenedor {

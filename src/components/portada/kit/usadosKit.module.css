@@ -83,7 +83,8 @@
   display: grid;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 32px 24px 40px;
+  /* Abajo, 20: hasta los tres botones sobraba aire (clienta, 2026-11-12). */
+  padding: 32px 24px 20px;
   align-items: center;
   gap: 24px 40px;
 }
@@ -91,8 +92,8 @@
 @media (min-width: 1025px) {
   .cabeceraRejilla {
     /* Con techo: en pantallas de 2160 de alto llegaba a ~1840 px. */
-    min-height: min(calc(100svh - 20rem), 600px);
-    padding: 40px;
+    min-height: min(calc(100svh - 20rem), 500px);
+    padding: 40px 40px 12px;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   }
 }
@@ -291,12 +292,13 @@
   z-index: 1;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px 40px;
+  /* Abajo, como a los lados: de los botones al borde del panel sobraba aire (clienta, 2026-11-12). */
+  padding: 0 24px 24px;
 }
 
 @media (min-width: 1025px) {
   .cuerpo {
-    padding: 0 40px 56px;
+    padding: 0 40px 32px;
   }
 }
 

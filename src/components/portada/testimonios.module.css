@@ -16,7 +16,8 @@
 .titulo {
   width: 100%;
   max-width: 815px;
-  margin: 0 0 60px;
+  /* Con el `gap` de 20 de la sección, el común hasta los vídeos (antes 60 + 20; clienta, 2026-11-12). */
+  margin: 0 0 max(0px, calc(var(--espacio-seccion) - 20px));
   color: var(--color-texto);
   text-align: center;
 }

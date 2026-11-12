@@ -10,7 +10,8 @@
   /* Con techo: el 5 % · 3 % crecía con la pantalla (192 px arriba a 3840). */
   /* Sobre el medio común de abajo de los testimonios, el otro medio. */
   margin-top: calc(var(--espacio-seccion) / 2);
-  padding: min(5%, 72px) min(3%, 48px);
+  /* Arriba y abajo, el común: del contenido al borde gris sobraba aire (72 px a 1440; clienta, 2026-11-12). */
+  padding: var(--espacio-seccion) min(3%, 48px);
   background: var(--color-fondo-seccion);
 }
 
@@ -245,7 +246,7 @@
 /* La tarjeta arriba, a todo el ancho, y la lista debajo. */
 @media (max-width: 767px) {
   .seccion {
-    padding: 10% 5%;
+    padding: var(--espacio-seccion) 5%;
   }
 
   .fila {
@@ -264,4 +265,13 @@
     width: 100%;
     padding: 0;
   }
+}
+
+/*
+ * Si las preguntas son lo último de la página (la portada): el bloque rojo del pie, a medio común
+ * del borde gris (clienta, 2026-11-12: menos aire sobre el bloque rojo). El pie pone el común
+ * entero (`--pie-margen`); aquí se le resta la mitad.
+ */
+.seccion:last-child {
+  margin-bottom: calc(var(--espacio-seccion) / -2);
 }

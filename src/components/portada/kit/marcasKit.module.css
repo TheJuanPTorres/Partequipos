@@ -33,7 +33,13 @@
 
 @media (min-width: 1025px) {
   .panel {
-    height: max(26rem, 33cqw);
+    /*
+     * Más bajo (28cqw; antes 33) para quitar aire arriba y abajo (clienta, 2026-11-12), y con
+     * techo de ancho: a 3840 el panel medía ~1250 px de alto, porque todo va en cqw.
+     */
+    max-width: 1680px;
+    height: max(22rem, min(28cqw, 470px));
+    margin-inline: auto;
     border-radius: 32px;
   }
 }
@@ -74,7 +80,7 @@
 @media (min-width: 1025px) {
   .cabecera {
     position: absolute;
-    top: 14%;
+    top: 9%;
     left: 5%;
     padding: 0;
   }
@@ -118,7 +124,8 @@
     position: absolute;
     top: 50%;
     right: 3%;
-    width: 46%;
+    /* 40 % (antes 46): con el panel más bajo, la máquina cabe entera. */
+    width: 40%;
     margin: 0;
     transform: translateY(-49%);
   }
@@ -150,7 +157,7 @@
 @media (min-width: 1025px) {
   .banda {
     position: absolute;
-    top: 45%;
+    top: var(--banda-arriba, 42%);
     left: 0;
     width: 66%;
     margin: 0;
@@ -274,16 +281,44 @@
   }
 }
 
-/* El botón de pausa (D2): bajo la banda en el móvil; abajo a la izquierda del panel en escritorio. */
+/*
+ * El botón de pausa (D2), PEQUEÑO y pegado a los logos (clienta, 2026-11-12): 28 px a la vista
+ * (el mínimo de WCAG 2.5.8 es 24) y, con el `::after`, 44 px para el dedo. En el móvil va bajo la
+ * banda; en escritorio, justo debajo de ella, a la izquierda (en el espejo, a la derecha).
+ */
 .panel .pausa {
+  position: relative;
   display: grid;
+  width: 28px;
+  height: 28px;
   margin: 0 auto 20px;
 }
 
+.panel .pausa::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+.panel .pausa svg {
+  width: 12px;
+  height: 12px;
+}
+
 @media (min-width: 1025px) {
+  .panel {
+    --banda-arriba: 42%;
+    /* El alto de la banda: su relleno arriba y abajo más la caja de los logos. */
+    --banda-alto: calc(2 * max(1.3rem, 1.8cqw) + max(4rem, 5.2cqw));
+  }
+
+  .seccion[data-espejo] .panel {
+    --banda-arriba: 46%;
+  }
+
   .panel .pausa {
     position: absolute;
-    bottom: 8%;
+    top: calc(var(--banda-arriba) + var(--banda-alto) + 4px);
     left: 5%;
     z-index: 3;
     margin: 0;
@@ -318,7 +353,7 @@
 
 @media (min-width: 1025px) {
   .seccion[data-espejo] .cabecera {
-    top: 14%;
+    top: 9%;
     right: 5%;
     left: auto;
     text-align: right;
@@ -328,14 +363,14 @@
     top: 50%;
     right: auto;
     left: 2%;
-    width: 46%;
+    width: 40%;
     margin: 0;
     transform: translateY(-50%) scale(var(--escala-maquina, 1));
     transform-origin: 50% 50%;
   }
 
   .seccion[data-espejo] .banda {
-    top: 52%;
+    top: var(--banda-arriba, 46%);
     right: 0;
     left: auto;
     width: 86%;

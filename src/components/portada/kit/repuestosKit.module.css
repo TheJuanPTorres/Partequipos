@@ -78,6 +78,13 @@
   }
 }
 
+/* Con el título centrado, la columna del texto va al centro y las franjas empiezan a su derecha. */
+@media (min-width: 1280px) {
+  .panel[data-titulo="center"] .franjas {
+    left: calc(50% + 26rem + 24px);
+  }
+}
+
 .losa {
   position: absolute;
   top: 0;
@@ -121,6 +128,25 @@
 .cabecera {
   position: relative;
   max-width: 52rem;
+}
+
+/*
+ * «Alineación del título» del panel (clienta, 2026-11-12; centrado por defecto). Centrado: la columna
+ * del texto se centra en el panel y el antetítulo acompaña al título. Justificado: solo el título, en
+ * su columna. El texto de debajo conserva su propia alineación.
+ */
+.panel[data-titulo="center"] .cabecera {
+  margin-inline: auto;
+}
+
+.panel[data-titulo="center"] .antetitulo,
+.panel[data-titulo="center"] .titulo {
+  text-align: center;
+  text-wrap: balance;
+}
+
+.panel[data-titulo="justify"] .titulo {
+  text-align: justify;
 }
 
 .antetitulo {

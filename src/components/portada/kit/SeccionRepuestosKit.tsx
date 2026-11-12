@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import type { AlineacionTexto, AnchoTexto } from "@/lib/fields/alineacionTexto";
+import type { AlineacionTexto, AlineacionTitulo, AnchoTexto } from "@/lib/fields/alineacionTexto";
 import { partirTitulo, type CategoriaDePortada } from "@/lib/portada/kitCliente";
 
 import { Flecha } from "./Flecha";
@@ -27,6 +27,8 @@ export type TextosRepuestosKit = {
   titulo: string;
   /** «Palabra del título en rojo». */
   tituloResaltado: string;
+  /** «Alineación del título» (clienta, 2026-11-12): centrado por defecto. Mueve también el antetítulo. */
+  tituloAlineacion: AlineacionTitulo;
   /** «Texto bajo el título»: un párrafo por línea. Vacío, no se pinta. */
   descripcion: string;
   descripcionAlineacion: AlineacionTexto;
@@ -56,7 +58,7 @@ export function SeccionRepuestosKit({
   const titulo = partirTitulo(textos.titulo || TITULO_POR_DEFECTO, textos.tituloResaltado);
   return (
     <section id="repuestos" className={estilos.seccion} aria-labelledby={idTitulo}>
-      <div className={estilos.panel}>
+      <div className={estilos.panel} data-titulo={textos.tituloAlineacion}>
         <Franjas />
 
         <div className={estilos.cabecera}>

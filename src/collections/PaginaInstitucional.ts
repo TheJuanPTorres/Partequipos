@@ -2,6 +2,7 @@ import type { CollectionConfig, Field } from "payload";
 
 import {
   alineacionTextoField,
+  alineacionTituloField,
   anchoTextoField,
   tamanoMaquinaField,
 } from "../lib/fields/alineacionTexto";
@@ -717,6 +718,7 @@ export const PaginaInstitucional: CollectionConfig = {
           "Repuestos",
           "Se pinta en rojo donde aparezca en el título (la primera vez). Vacía, o si el título no la lleva, todo el título va en negro.",
         ),
+        alineacionTituloField("tituloAlineacion", "Alineación del título"),
         {
           // Campo nuevo (2026-10-26): los «ya no se usa» de esta sección son de una línea y con un
           // valor por defecto que saldría en la web, así que no sirven para un párrafo.

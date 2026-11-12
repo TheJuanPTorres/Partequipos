@@ -266,12 +266,3 @@
     padding: 0;
   }
 }
-
-/*
- * Si las preguntas son lo último de la página (la portada): el bloque rojo del pie, a medio común
- * del borde gris (clienta, 2026-11-12: menos aire sobre el bloque rojo). El pie pone el común
- * entero (`--pie-margen`); aquí se le resta la mitad.
- */
-.seccion:last-child {
-  margin-bottom: calc(var(--espacio-seccion) / -2);
-}

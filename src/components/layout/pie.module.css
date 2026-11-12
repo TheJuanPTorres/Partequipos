@@ -8,9 +8,10 @@
  */
 
 .pie {
-  /* El hueco sobre la tarjeta roja: el espaciado común (antes 70 px más el 4 % del ancho del
-     relleno de `.marco`: 128 px a 1440 y 173 a 2560, medido). */
-  --pie-margen: var(--espacio-seccion);
+  /* El hueco sobre la tarjeta roja: MEDIO espaciado común, 12–24 px, en todas las páginas
+     (clienta, 2026-11-12: menos aire sobre el bloque rojo; antes el común entero, y antes 70 px
+     más el 4 % del ancho del relleno de `.marco`). Sin tarjeta roja, el común entero (abajo). */
+  --pie-margen: calc(var(--espacio-seccion) / 2);
   --pie-radio: 30px;
 
   margin-top: var(--pie-margen);
@@ -101,7 +102,8 @@
  */
 @media (min-width: 1025px) and (max-width: 1279px) {
   .pie[data-con-imagen] {
-    margin-top: calc(var(--pie-margen) + 100px);
+    /* La reserva no baja con `--pie-margen`: es la medida con `qa:vuelo-pie`. */
+    margin-top: calc(var(--espacio-seccion) + 100px);
   }
 }
 
@@ -112,6 +114,11 @@
  */
 :global(body:has([data-pie-sin-tarjeta])) .marco {
   display: none;
+}
+
+/* Sin bloque rojo no hay nada que acercar: el panel del pie queda al común entero, como antes. */
+:global(body:has([data-pie-sin-tarjeta])) .pie {
+  --pie-margen: var(--espacio-seccion);
 }
 
 :global(body:has([data-pie-sin-tarjeta])) .pie[data-con-imagen] {

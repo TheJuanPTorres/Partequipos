@@ -34,12 +34,14 @@
 @media (min-width: 1025px) {
   .panel {
     /*
-     * Más bajo (28cqw; antes 33) para quitar aire arriba y abajo (clienta, 2026-11-12), y con
-     * techo de ancho: a 3840 el panel medía ~1250 px de alto, porque todo va en cqw.
+     * EN FLUJO y sin alto fijo (Juan Pablo, 2026-11-12): hueco interno, título, hueco, banda de
+     * logos y hueco; nada más. Antes 28cqw de alto (y antes 33) con todo colocado en %, y sobraba
+     * aire sobre el título, entre el título y la banda y bajo la pausa. La máquina se ajusta al
+     * alto que salga. Con techo de ancho: a 3840 todo crecía con los cqw.
      */
     max-width: 1680px;
-    height: max(22rem, min(28cqw, 470px));
     margin-inline: auto;
+    padding-block: var(--hueco-interno);
     border-radius: 32px;
   }
 }
@@ -79,10 +81,8 @@
 
 @media (min-width: 1025px) {
   .cabecera {
-    position: absolute;
-    top: 9%;
-    left: 5%;
-    padding: 0;
+    /* El 40 % de la derecha es de la máquina: el título nunca pasa por debajo de ella. */
+    padding: 0 40% 0 5%;
   }
 }
 
@@ -121,13 +121,19 @@
 
 @media (min-width: 1025px) {
   .maquina {
+    /*
+     * Su caja mide el 110 % del alto del panel y se centra por el centro VISIBLE del render (52,5 %):
+     * el compactador (y ≈ 12–93 % de la caja) queda entero, con un ~5 % del panel libre arriba y
+     * abajo; lo que se sale es margen transparente. El ancho, el de su proporción (`aspect-ratio`).
+     */
     position: absolute;
     top: 50%;
     right: 3%;
-    /* 40 % (antes 46): con el panel más bajo, la máquina cabe entera. */
-    width: 40%;
+    width: auto;
+    max-width: 40%;
+    height: 110%;
     margin: 0;
-    transform: translateY(-49%);
+    transform: translateY(-52.5%);
   }
 }
 
@@ -149,18 +155,19 @@
 .banda {
   position: relative;
   z-index: 1;
-  margin: 8px 0 16px;
+  /* Abajo, 4: la pausa va pegada a los logos. */
+  margin: 8px 0 4px;
   padding: 20px 0;
   background: var(--color-fondo);
 }
 
 @media (min-width: 1025px) {
   .banda {
-    position: absolute;
-    top: var(--banda-arriba, 42%);
-    left: 0;
-    width: 66%;
-    margin: 0;
+    /* Alto fijo: al pausar, la barra de desplazamiento no mueve el panel. */
+    width: 78%;
+    height: var(--banda-alto);
+    box-sizing: border-box;
+    margin: var(--hueco-interno) 0 0;
     padding: max(1.3rem, 1.8cqw) 0;
     mask-image: linear-gradient(90deg, #000 80%, transparent);
   }
@@ -284,7 +291,8 @@
 /*
  * El botón de pausa (D2), PEQUEÑO y pegado a los logos (clienta, 2026-11-12): 28 px a la vista
  * (el mínimo de WCAG 2.5.8 es 24) y, con el `::after`, 44 px para el dedo. En el móvil va bajo la
- * banda; en escritorio, justo debajo de ella, a la izquierda (en el espejo, a la derecha).
+ * banda, a 4 px; en escritorio, SOBRE la banda, centrada en su alto, en el margen por donde entran
+ * los logos (a la izquierda; en el espejo, a la derecha), con fondo blanco opaco.
  */
 .panel .pausa {
   position: relative;
@@ -307,21 +315,18 @@
 
 @media (min-width: 1025px) {
   .panel {
-    --banda-arriba: 42%;
     /* El alto de la banda: su relleno arriba y abajo más la caja de los logos. */
     --banda-alto: calc(2 * max(1.3rem, 1.8cqw) + max(4rem, 5.2cqw));
   }
 
-  .seccion[data-espejo] .panel {
-    --banda-arriba: 46%;
-  }
-
   .panel .pausa {
     position: absolute;
-    top: calc(var(--banda-arriba) + var(--banda-alto) + 4px);
-    left: 5%;
+    /* La banda es lo último del panel: su centro queda a medio alto suyo del relleno de abajo. */
+    bottom: calc(var(--hueco-interno) + var(--banda-alto) / 2 - 14px);
+    left: max(8px, calc(2.5% - 14px));
     z-index: 3;
     margin: 0;
+    background: var(--color-fondo);
   }
 }
 
@@ -353,27 +358,22 @@
 
 @media (min-width: 1025px) {
   .seccion[data-espejo] .cabecera {
-    top: 9%;
-    right: 5%;
-    left: auto;
+    padding: 0 5% 0 40%;
     text-align: right;
   }
 
+  /* La caja, al alto del panel: la máquina que elija el editor cabe entera sea cual sea su margen. */
   .seccion[data-espejo] .maquina {
-    top: 50%;
     right: auto;
     left: 2%;
-    width: 40%;
-    margin: 0;
+    height: 100%;
     transform: translateY(-50%) scale(var(--escala-maquina, 1));
     transform-origin: 50% 50%;
   }
 
   .seccion[data-espejo] .banda {
-    top: var(--banda-arriba, 46%);
-    right: 0;
-    left: auto;
     width: 86%;
+    margin-left: auto;
     padding: max(1.3rem, 1.8cqw) 0;
     mask-image: linear-gradient(270deg, #000 70%, transparent 92%);
   }
@@ -400,7 +400,7 @@
 
   /* El botón de pausa, abajo a la derecha del panel: a la izquierda quedaría bajo la máquina. */
   .seccion[data-espejo] .panel .pausa {
-    right: 5%;
+    right: max(8px, calc(2.5% - 14px));
     left: auto;
   }
 }

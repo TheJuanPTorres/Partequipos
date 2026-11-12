@@ -83,16 +83,17 @@
   display: grid;
   max-width: 1400px;
   margin: 0 auto;
-  /* Abajo, 20: hasta los tres botones sobraba aire (clienta, 2026-11-12). */
-  padding: 32px 24px 20px;
+  /* Arriba y abajo, el hueco interno: hasta el borde y hasta los tres botones sobraba aire
+     (clienta, 2026-11-12). */
+  padding: var(--hueco-interno) 24px;
   align-items: center;
-  gap: 24px 40px;
+  gap: var(--hueco-interno) 40px;
 }
 
 @media (min-width: 1025px) {
   .cabeceraRejilla {
-    /* Con techo: en pantallas de 2160 de alto llegaba a ~1840 px. */
-    min-height: min(calc(100svh - 20rem), 500px);
+    /* Sin alto mínimo: lo da la máquina (antes hasta 500 px). Arriba, 40: la máquina, ampliada
+       un 10 %, sube esos 40 px y sin ellos el panel le cortaría el brazo. Abajo, 12 hasta los botones. */
     padding: 40px 40px 12px;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   }
@@ -226,7 +227,7 @@
 /* «Frase de la cabecera»: entradilla bajo el título, con sus saltos de línea y ancho de lectura. */
 .frase {
   max-width: 36rem;
-  margin: 20px 0 0;
+  margin: 16px 0 0;
   color: var(--color-texto);
   font-size: 1.1rem;
   font-weight: 500;
@@ -241,7 +242,7 @@
 }
 
 .descripcion {
-  margin: 20px 0 0;
+  margin: 16px 0 0;
   color: var(--color-texto-suave);
   font-size: 16px;
   line-height: 1.625;
@@ -255,7 +256,7 @@
 
 .verTodo {
   display: inline-flex;
-  margin-top: 32px;
+  margin-top: var(--hueco-interno);
   padding: 14px 24px 14px 20px;
   align-items: center;
   gap: 12px;
@@ -292,20 +293,20 @@
   z-index: 1;
   max-width: 1400px;
   margin: 0 auto;
-  /* Abajo, como a los lados: de los botones al borde del panel sobraba aire (clienta, 2026-11-12). */
-  padding: 0 24px 24px;
+  /* De los botones al borde del panel, el hueco interno (clienta, 2026-11-12). */
+  padding: 0 24px var(--hueco-interno);
 }
 
 @media (min-width: 1025px) {
   .cuerpo {
-    padding: 0 40px 32px;
+    padding: 0 40px var(--hueco-interno);
   }
 }
 
 .filtros {
   display: grid;
   margin: 0;
-  padding: 4px 0;
+  padding: 0;
   gap: 12px;
   list-style: none;
 }

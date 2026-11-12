@@ -350,6 +350,13 @@ body {
    * Lo mide `npm run qa:huecos` (scripts/qa/huecos-secciones.mjs).
    */
   --espacio-seccion: clamp(24px, calc(15px + 2.3vw), 48px);
+  /*
+   * ESPACIO INTERNO de una sección: REGLA FIJA de todo el sitio (Juan Pablo, 2026-11-12). Es el hueco
+   * del título al contenido, del contenido al borde de su contenedor y de los botones al borde:
+   * 16 px a 390, 22 a 768 y 32 como MUCHO desde 1125 px, también en pantallas gigantes. Entre
+   * secciones manda `--espacio-seccion`; dentro de una, este. No se escribe el número a mano.
+   */
+  --espacio-interno: clamp(16px, max(calc(9.8px + 1.59vw), calc(0.5px + 2.8vw)), 32px);
 }
 
 @media (max-width: 1024px) {

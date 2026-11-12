@@ -476,8 +476,13 @@
 .descripcion {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin: 0 var(--ficha-margen) var(--ficha-margen);
-  padding: 2.82cqi;
+  /*
+   * Abajo, el común hasta la sección siguiente (otras unidades o el contacto); antes el margen de
+   * la ficha más los 48 de «Otras», 95 px a 3840 (criterio de espacios, 2026-11-12). Dentro, el
+   * espacio interno arriba y abajo; a los lados, el de siempre.
+   */
+  margin: 0 var(--ficha-margen) var(--espacio-seccion);
+  padding: var(--espacio-interno) 2.82cqi;
   border-radius: var(--ficha-radio);
   background: var(--color-fondo);
 }
@@ -608,8 +613,8 @@
 /* ====================== 3. OTRAS REFERENCIAS ====================== */
 
 .otras {
-  /* Antes 70 px (criterio de espacios, 2026-11-09). */
-  padding-top: var(--espacio-seccion);
+  /* El hueco de arriba lo pone la descripción (el común, una sola vez). Antes 70 px. */
+  padding-top: 0;
 }
 
 .tituloOtras {
@@ -624,7 +629,11 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin: 0;
-  padding: 5cqi;
+  /*
+   * Del título a las tarjetas, el espacio interno; de las tarjetas al contacto, el común (antes 5cqi
+   * arriba y abajo: 72 px a 1440 y 84 a 1680). A los lados, como siempre.
+   */
+  padding: var(--espacio-interno) 5cqi var(--espacio-seccion);
   list-style: none;
 }
 
@@ -933,7 +942,7 @@
 
   .descripcion {
     grid-template-columns: 1fr;
-    padding: 2.82cqi;
+    padding: var(--espacio-interno) 2.82cqi;
   }
 
   .columnaTexto {

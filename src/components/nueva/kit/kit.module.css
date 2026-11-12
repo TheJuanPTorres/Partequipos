@@ -73,7 +73,8 @@
   align-items: center;
   justify-content: center;
   gap: 20px;
-  padding: 50px min(2.9vw, 48px);
+  /* Arriba y abajo, el espacio interno (antes 50 px); a los lados, con tope. */
+  padding: var(--espacio-interno) min(2.9vw, 48px);
   color: #fff;
   text-align: center;
 }
@@ -430,7 +431,8 @@
 }
 
 .lineaTitulo {
-  margin: 0 0 20px;
+  /* Del título a la cinta, el espacio interno (antes 20 px). */
+  margin: 0 0 var(--espacio-interno);
   padding: 0 1.5vw;
   color: #100f0f;
   font-size: 20px;
@@ -606,7 +608,7 @@
 }
 
 .cierre {
-  margin: 24px auto 0;
+  margin: var(--espacio-interno) auto 0;
   max-width: 760px;
   padding: 0 min(1.5vw, 24px);
   color: var(--tinta-suave);
@@ -639,6 +641,45 @@
   scroll-margin-top: 96px;
 }
 
+/*
+ * La PRIMERA sección de tipo: el común entero sobre la línea (no la mitad) y, de la línea al título,
+ * el espacio interno (2026-11-12). Sin esto, a 1440 la foto de la franja asomaba 3 px por encima de
+ * la cabecera de la página.
+ */
+.tipos > .seccion:first-child {
+  margin-top: var(--espacio-seccion);
+  padding-top: var(--espacio-interno);
+}
+
+/*
+ * Con la franja diagonal visible (desde su ancho, `data-desde`), la foto en gris sube unos 51 px por
+ * encima del título (`.detalle` empieza 40 px más arriba y la foto va pegada abajo): en la primera
+ * sección se le deja ese sitio bajo la línea para que no la cruce ni se acerque a la cabecera.
+ */
+@media (min-width: 1280px) {
+  .tipos > .seccion:first-child:has(.detalle[data-desde="1280"]) {
+    padding-top: 52px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .tipos > .seccion:first-child:has(.detalle[data-desde="1440"]) {
+    padding-top: 52px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .tipos > .seccion:first-child:has(.detalle[data-desde="1600"]) {
+    padding-top: 52px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .tipos > .seccion:first-child:has(.detalle[data-desde="1920"]) {
+    padding-top: 52px;
+  }
+}
+
 .cabeceraSeccion {
   position: relative;
 }
@@ -648,7 +689,8 @@
   align-items: center;
   justify-content: center;
   gap: 32px;
-  margin: 0 0 30px;
+  /* Del título a los modelos, el espacio interno (antes 30 px). */
+  margin: 0 0 var(--espacio-interno);
   color: #100f0f;
   font-size: 55px;
   font-weight: 700;
@@ -758,7 +800,8 @@
   grid-row: span 4;
   grid-template-rows: subgrid;
   row-gap: 0;
-  margin-bottom: 32px;
+  /* Entre filas de modelos, el espacio interno (antes 32 px). */
+  margin-bottom: var(--espacio-interno);
   overflow: hidden;
   border-radius: 14px;
   background: #fff;

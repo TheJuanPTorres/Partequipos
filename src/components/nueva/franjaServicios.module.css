@@ -1,8 +1,11 @@
 /* Franja de servicios de la plantilla de aditamentos (elementor 4020). */
 
 .franja {
-  /* El 3 % de abajo, con tope: a 3840 px eran 115 px (criterio de espacios, 2026-11-09). */
-  padding: 0 3% min(3%, 48px);
+  /*
+   * Abajo, medio común: «Nuestro compromiso» pone la otra mitad, y el hueco entre las dos secciones
+   * queda en el común (antes el 3 % con tope: 72 px a 3840; criterio de espacios, 2026-11-12).
+   */
+  padding: 0 3% calc(var(--espacio-seccion) / 2);
 }
 
 .lista {
@@ -17,7 +20,7 @@
   flex: 1 1 0;
   justify-content: center;
   align-items: center;
-  padding: 8px 16px;
+  padding: 8px var(--espacio-interno);
   text-align: center;
 }
 

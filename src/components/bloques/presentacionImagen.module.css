@@ -122,4 +122,20 @@
   .columnaTexto {
     width: 100%;
   }
+
+  /*
+   * Con animación (el mapa de Nosotros): sin el alto mínimo de escritorio, que dejaba la caja
+   * centrada con 91 px vacíos encima (97 de hueco desde la cabecera a 390). El dibujo del mapa
+   * deja ya transparente arriba el 8 % del ancho de su caja (28 px a 390), así que la caja sube
+   * hasta el borde pintado de la cabecera de vídeo (su relleno inferior es `min(1.5vw, 24px)`)
+   * y nunca por encima: el hueco visible queda en ese margen del dibujo, ~28 px a 390.
+   */
+  .columnaImagen:has(> .caja) {
+    min-height: auto;
+    padding-top: 0;
+  }
+
+  .columnaImagen > .caja {
+    margin-top: calc(-1 * min(1.5vw, 24px));
+  }
 }

@@ -85,9 +85,9 @@
   margin: 0 auto;
   /* Arriba y abajo, el hueco interno: hasta el borde y hasta los tres botones sobraba aire
      (clienta, 2026-11-12). */
-  padding: var(--hueco-interno) 24px;
+  padding: var(--espacio-interno) 24px;
   align-items: center;
-  gap: var(--hueco-interno) 40px;
+  gap: var(--espacio-interno) 40px;
 }
 
 @media (min-width: 1025px) {
@@ -256,7 +256,7 @@
 
 .verTodo {
   display: inline-flex;
-  margin-top: var(--hueco-interno);
+  margin-top: var(--espacio-interno);
   padding: 14px 24px 14px 20px;
   align-items: center;
   gap: 12px;
@@ -294,12 +294,12 @@
   max-width: 1400px;
   margin: 0 auto;
   /* De los botones al borde del panel, el hueco interno (clienta, 2026-11-12). */
-  padding: 0 24px var(--hueco-interno);
+  padding: 0 24px var(--espacio-interno);
 }
 
 @media (min-width: 1025px) {
   .cuerpo {
-    padding: 0 40px var(--hueco-interno);
+    padding: 0 40px var(--espacio-interno);
   }
 }
 

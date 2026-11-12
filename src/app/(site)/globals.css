@@ -351,11 +351,12 @@ body {
    */
   --espacio-seccion: clamp(24px, calc(15px + 2.3vw), 48px);
   /*
-   * HUECO INTERNO de una sección (Juan Pablo, 2026-11-12): del título al contenido, del contenido al
-   * borde de su contenedor y de los botones al borde. 12 px a 390, 18 a 768 y 24 como MUCHO desde
-   * 1125 px, también en pantallas gigantes.
+   * ESPACIO INTERNO de una sección: REGLA FIJA de todo el sitio (Juan Pablo, 2026-11-12). Es el hueco
+   * del título al contenido, del contenido al borde de su contenedor y de los botones al borde:
+   * 16 px a 390, 22 a 768 y 32 como MUCHO desde 1125 px, también en pantallas gigantes. Entre
+   * secciones manda `--espacio-seccion`; dentro de una, este. No se escribe el número a mano.
    */
-  --hueco-interno: clamp(12px, calc(6px + 1.6vw), 24px);
+  --espacio-interno: clamp(16px, max(calc(9.8px + 1.59vw), calc(0.5px + 2.8vw)), 32px);
 }
 
 @media (max-width: 1024px) {

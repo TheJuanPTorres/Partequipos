@@ -10,9 +10,9 @@
   /* Con techo: el 5 % · 3 % crecía con la pantalla (192 px arriba a 3840). */
   /* Sobre el medio común de abajo de los testimonios, el otro medio. */
   margin-top: calc(var(--espacio-seccion) / 2);
-  /* Arriba y abajo, el hueco interno (12–24 px): del contenido al borde gris sobraba aire (72 px a
+  /* Arriba y abajo, el hueco interno (16–32 px): del contenido al borde gris sobraba aire (72 px a
      1440; clienta, 2026-11-12). */
-  padding: var(--hueco-interno) min(3%, 48px);
+  padding: var(--espacio-interno) min(3%, 48px);
   background: var(--color-fondo-seccion);
 }
 
@@ -247,12 +247,12 @@
 /* La tarjeta arriba, a todo el ancho, y la lista debajo. */
 @media (max-width: 767px) {
   .seccion {
-    padding: var(--hueco-interno) 5%;
+    padding: var(--espacio-interno) 5%;
   }
 
   .fila {
     flex-direction: column;
-    gap: var(--hueco-interno);
+    gap: var(--espacio-interno);
   }
 
   .tarjeta {

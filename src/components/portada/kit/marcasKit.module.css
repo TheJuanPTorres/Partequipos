@@ -41,7 +41,7 @@
      */
     max-width: 1680px;
     margin-inline: auto;
-    padding-block: var(--hueco-interno);
+    padding-block: var(--espacio-interno);
     border-radius: 32px;
   }
 }
@@ -167,7 +167,7 @@
     width: 78%;
     height: var(--banda-alto);
     box-sizing: border-box;
-    margin: var(--hueco-interno) 0 0;
+    margin: var(--espacio-interno) 0 0;
     padding: max(1.3rem, 1.8cqw) 0;
     mask-image: linear-gradient(90deg, #000 80%, transparent);
   }
@@ -322,7 +322,7 @@
   .panel .pausa {
     position: absolute;
     /* La banda es lo último del panel: su centro queda a medio alto suyo del relleno de abajo. */
-    bottom: calc(var(--hueco-interno) + var(--banda-alto) / 2 - 14px);
+    bottom: calc(var(--espacio-interno) + var(--banda-alto) / 2 - 14px);
     left: max(8px, calc(2.5% - 14px));
     z-index: 3;
     margin: 0;

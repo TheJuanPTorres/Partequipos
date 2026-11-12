@@ -34,7 +34,7 @@
   isolation: isolate;
   overflow: hidden;
   /* Arriba y abajo, el hueco interno (antes 36 · 44 · 56; Juan Pablo, 2026-11-12). */
-  padding: var(--hueco-interno) var(--panel-x);
+  padding: var(--espacio-interno) var(--panel-x);
   border-radius: 28px;
   background: var(--kit-gris);
 }
@@ -195,7 +195,7 @@
   position: relative;
   display: grid;
   /* Del texto a las tarjetas, el hueco interno (antes 36 · 44). */
-  margin: var(--hueco-interno) 0 0;
+  margin: var(--espacio-interno) 0 0;
   padding: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;

@@ -73,7 +73,8 @@
   width: 60%;
   padding: min(5%, 64px);
   flex-direction: column;
-  /* Centrada en vertical respecto a la tarjeta (pedido de Andrés). */
+  /* Centrada en vertical respecto a la tarjeta (pedido de Andrés); desde 768 px, a todo su alto
+     (abajo). */
   justify-content: center;
 }
 
@@ -236,7 +237,43 @@
   text-underline-offset: 2px;
 }
 
+/*
+ * LA LISTA OCUPA TODO EL ALTO DE LA TARJETA (clienta, 2026-11-12), con las dos columnas lado a lado
+ * (desde 768 px). Cerradas, las barras se reparten el alto de la tarjeta: cada pregunta crece
+ * (`flex-grow`) y su barra blanca la llena, con el texto centrado en vertical; entre ellas, el hueco
+ * interno. Al abrir una, todas vuelven a su alto mínimo para dejar sitio a la respuesta, y el alto
+ * que sobre queda debajo de la lista: la sección solo crece si la respuesta no cabe. El cambio se
+ * anima con el mismo ritmo que la respuesta. Solo donde `<details>` admite `display: flex` (los
+ * navegadores con `::details-content`); en el resto, la lista centrada de siempre.
+ */
+@media (min-width: 768px) {
+  @supports selector(::details-content) {
+    .der {
+      padding-block: 0;
+      justify-content: flex-start;
+      gap: var(--espacio-interno);
+    }
+
+    .item {
+      display: flex;
+      margin: 0;
+      flex: 1 0 auto;
+      flex-direction: column;
+      transition: flex-grow 400ms cubic-bezier(0.37, 0, 0.63, 1);
+    }
+
+    .der:has(.item[open]) .item {
+      flex-grow: 0;
+    }
+
+    .cabecera {
+      flex: 1 0 auto;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .item,
   .item::details-content {
     transition: none;
   }

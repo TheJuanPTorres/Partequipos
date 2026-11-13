@@ -31,6 +31,9 @@ import estilos from "./faq.module.css";
  * título, texto y botón en blanco abajo a la izquierda; a la derecha, la lista
  * centrada en vertical respecto a la tarjeta. Icono de círculo con
  * interrogación. En móvil, la tarjeta arriba y la lista debajo.
+ *
+ * LISTA A TODO EL ALTO (clienta, 2026-11-12): con las columnas lado a lado, las barras se reparten
+ * el alto de la tarjeta y, al abrir una, vuelven a su alto mínimo. Solo CSS (`faq.module.css`).
  */
 export type TextosFaq = { titulo: string; intro: string; botonTexto: string; botonEnlace: string };
 

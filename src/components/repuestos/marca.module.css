@@ -1062,8 +1062,8 @@ a.modelo:hover {
  * animación «shrink» del export), salvo con movimiento reducido.
  */
 .tarjetasIndice {
-  /* Con techo de 48 px (criterio común): el 5 % · 10 % crecía con la pantalla. */
-  padding: min(5%, 48px) min(5%, 48px) min(10%, 48px);
+  /* Espacio interno común (Juan Pablo, 2026-11-12): 16 a 390, 22 a 768 y 32 como mucho; el 5 % · 10 % crecía con la pantalla. */
+  padding: var(--espacio-interno);
 }
 
 .tarjetasIndice .rejilla {

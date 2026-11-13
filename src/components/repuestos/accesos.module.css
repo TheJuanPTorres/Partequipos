@@ -12,7 +12,7 @@
 }
 
 .titulo {
-  margin: 0 0 24px;
+  margin: 0 0 var(--espacio-interno);
   color: var(--color-texto);
   font-size: var(--texto-titulo-3);
   font-weight: 500;
@@ -22,7 +22,7 @@
 
 .lista {
   display: grid;
-  gap: 16px;
+  gap: var(--espacio-interno);
   margin: 0;
   padding: 0;
   list-style: none;

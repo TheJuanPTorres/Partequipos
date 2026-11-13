@@ -81,7 +81,8 @@ describe("página de marca de aditamentos", () => {
     });
     assert.equal(t.titulo, "Título propio");
     assert.equal(t.antetitulo, "Partequipos");
-    assert.deepEqual(t.franja, ["Maquinaria pesada", "Servicio técnico", "Repuestos de calidad"]);
+    // La franja de servicios ya no se pinta (2026-11-13): sus textos del panel no salen.
+    assert.equal("franja" in t, false);
     assert.equal(t.compromisoBoton, "Solicita asesoría");
     assert.equal(textosAditamentos({}).titulo, "Aditamentos para maquinaria pesada");
   });

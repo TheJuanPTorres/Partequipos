@@ -422,6 +422,10 @@ export interface MarcasMaquinaria {
      * El botón abre el formulario de contacto.
      */
     compromisoBoton?: string | null;
+    /**
+     * La foto a la derecha del texto (en el móvil, debajo). Cuadrada o apaisada, de 1000 px o más. Vacía, el texto ocupa toda la tarjeta.
+     */
+    foto?: (number | null) | Media;
   };
   /**
    * Los textos fijos de la página de la marca (no sirve para Aditamentos, que tiene los suyos). Vacío, el texto de siempre.
@@ -3031,6 +3035,7 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
         compromisoEntradilla?: T;
         compromisoTexto?: T;
         compromisoBoton?: T;
+        foto?: T;
       };
   plantillaLinea?:
     | T

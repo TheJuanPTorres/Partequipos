@@ -1,4 +1,5 @@
 import { RejillaModelos } from "@/components/repuestos/ModelosTexto";
+import type { LogoMarca } from "@/lib/marca/logoMarca";
 import type { ModeloEnlace } from "@/lib/repuestos/tipo";
 
 import estilos from "./fichaModelo.module.css";
@@ -12,10 +13,12 @@ export function OtrosModelosLista({
   id,
   titulo,
   modelos,
+  logo = null,
 }: {
   id: string;
   titulo: string;
   modelos: ModeloEnlace[];
+  logo?: LogoMarca | null;
 }) {
   const conPagina = modelos.filter((m) => m.href);
   if (conPagina.length === 0) return null;
@@ -25,7 +28,7 @@ export function OtrosModelosLista({
       <h2 id={idTitulo} className={estilos.otrosTitulo}>
         {titulo}
       </h2>
-      <RejillaModelos modelos={conPagina} />
+      <RejillaModelos modelos={conPagina} logo={logo} />
     </section>
   );
 }

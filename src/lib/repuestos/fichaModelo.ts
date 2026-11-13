@@ -23,7 +23,8 @@ export function textoDeBusqueda(m: {
  * una palabra si pasa de `max` caracteres. Sin descripción, vacío (la línea no se pinta).
  */
 export function lineaDeTexto(descripcion: string | null | undefined, max = 160): string {
-  const limpio = texto(descripcion).replace(/\s+/g, " ");
+  // Un guion de lista («- Filtros para …») no se pinta (Juan Pablo, #458).
+  const limpio = texto(descripcion).replace(/\s+/g, " ").replace(/^-\s+/, "");
   if (!limpio) return "";
   const frase = limpio.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? limpio;
   if (frase.length <= max) return frase;

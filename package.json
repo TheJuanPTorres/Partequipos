@@ -143,6 +143,7 @@
     "preview:dispel:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/lubricantes/dispel.ts retirar preview",
     "preview:dynapac-logo": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/dynapac-logo.ts",
     "preview:nueva-v2": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/nueva-v2.ts",
+    "preview:nueva-referencia": "tsx scripts/preview/con-entorno.ts payload run scripts/portada/nueva-referencia.ts",
     "preview:real:retirar": "tsx scripts/preview/con-entorno.ts payload run scripts/contenido-real/importar.ts retirar preview",
     "preview:fichas:simular": "tsx scripts/preview/con-entorno.ts payload run scripts/maquinaria/importar-fichas.ts simular preview",
     "preview:fichas:importar": "tsx scripts/preview/con-entorno.ts payload run scripts/maquinaria/importar-fichas.ts importar preview",

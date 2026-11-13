@@ -1,20 +1,13 @@
 import type { MarcasMaquinaria } from "@/payload-types";
 
 import {
-  buscarPorNombre,
-  claveDeMarca,
   conAlt,
   logoDeMarca,
   logoPropio,
   type IndiceLogos,
   type LogoConAlt,
 } from "../marca/logoMarca";
-import {
-  colorDeBaldosaNueva,
-  CONTRASTE_LOGO_BLANCO,
-  logoEnBlanco,
-  type BaldosaDeRepuestos,
-} from "../nueva/indiceMarcas";
+import { CONTRASTE_LOGO_BLANCO, logoEnBlanco } from "../nueva/indiceMarcas";
 import { enlaceExternoDe } from "../nueva/enlaceExterno";
 import { contraste, luminancia, rgbDeHex } from "./contraste";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
@@ -85,15 +78,27 @@ export function dominioDe(url: string): string {
   return new URL(url).hostname.replace(/^www\./i, "");
 }
 
+/** Un `#rrggbb` válido, en minúscula, o `null`. */
+function colorValido(color: string | null | undefined): string | null {
+  const c = color?.trim().toLowerCase() ?? "";
+  return /^#[0-9a-f]{6}$/.test(c) ? c : null;
+}
+
+/** El panel con el color de la tarjeta y, si lo hay, su final de degradado propio. */
+export function panelDeTarjeta(color: string, fin: string | null): PanelTarjeta {
+  const panel = panelDeColor(color);
+  return fin ? { ...panel, fin } : panel;
+}
+
 /**
  * Una tarjeta por marca VISIBLE de nueva (la consulta ya quita las ocultas y la de aditamentos),
  * en el orden del panel: «Posición en la portada» y, sin ella, al final por nombre. Una marca sin
  * página propia (LiuGong) también va: su tarjeta lleva a su «Enlace externo».
  *
- * Color y logo con la regla «una marca, un solo logo» (dirección, 2026-11-04), la misma de las
- * baldosas del índice de marcas: la baldosa de la marca de repuestos con su nombre (su color y su
- * logo tal cual); si no hay, su «Color de la marca» con su logo en blanco (Dynapac); si tampoco,
- * panel blanco con el logo de todo el sitio.
+ * COLOR Y LOGO PROPIOS de la tarjeta (dirección, 2026-11-13; antes, los de la baldosa de
+ * repuestos): el «Color de la tarjeta» (y su final de degradado) del grupo «PORTADA: tarjeta»;
+ * vacío, panel blanco. El logo es el de todo el sitio («una marca, un solo logo»), con su
+ * «Logo de la tarjeta»: a color tal cual (sin la tinta oscura del menú) o en blanco.
  *
  * La máquina es la de su «Tarjeta en la portada»; sin ella, la foto de la marca de antes (la de la
  * cabecera del kit o la de la tarjeta). El logo del distribuidor se pinta en blanco sobre un panel
@@ -102,7 +107,6 @@ export function dominioDe(url: string): string {
 export function tarjetasDeMarcas(
   marcas: MarcasMaquinaria[],
   logos: IndiceLogos = new Map(),
-  baldosas: ReadonlyMap<string, BaldosaDeRepuestos> = new Map(),
 ): TarjetaMarca[] {
   const posicion = (m: MarcasMaquinaria) =>
     typeof m.ordenPortada === "number" ? m.ordenPortada : Number.POSITIVE_INFINITY;
@@ -113,21 +117,19 @@ export function tarjetasDeMarcas(
       if (!nombre || !m.slug) return [];
       const externo = enlaceExternoDe(m);
 
+      const tp = m.portada;
       const logoSitio = logoDeMarca(m, logos);
-      const deRepuestos = buscarPorNombre(claveDeMarca(m.nombre), baldosas);
-      const enBlanco = logoEnBlanco(logoSitio);
-      const colorPropio = enBlanco ? colorDeBaldosaNueva(m.colorMarca) : null;
-      const [panel, logo] = deRepuestos
-        ? [panelDeColor(deRepuestos.color), deRepuestos.logo]
-        : colorPropio && enBlanco
-          ? [panelDeColor(colorPropio), enBlanco]
-          : [PANEL_BLANCO, logoSitio];
+      const color = colorValido(tp?.colorPanel);
+      const panel = color ? panelDeTarjeta(color, colorValido(tp?.colorPanelFin)) : PANEL_BLANCO;
+      const logo =
+        tp?.logoVariante === "blanco"
+          ? (logoEnBlanco(logoSitio) ?? logoSitio)
+          : logoSitio && { ...logoSitio, oscuro: false };
 
       const decorativa = (media: Parameters<typeof imagenDeMedia>[0]) => {
         const i = imagenDeMedia(media, "");
         return i ? { ...i, alt: "" } : null;
       };
-      const tp = m.portada;
       const nombreDistribuidor = tp?.distribuidorNombre?.trim();
       const logoDistribuidor = logoPropio({ logo: tp?.distribuidorLogo });
       return [

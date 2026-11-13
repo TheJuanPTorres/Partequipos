@@ -37,12 +37,11 @@ import { sedesDePortada, tokenMapbox } from "@/lib/portada/sedes";
 import { getCategoriasTecnicasDePortada } from "@/lib/queries/getCategoriasTecnicas";
 import { getPreguntasDePortada, getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getVideoPorId } from "@/lib/queries/getVideos";
-import { recorteVisible } from "@/lib/marca/recorteLogo";
+import { conRecorte, recorteVisible } from "@/lib/marca/recorteLogo";
 import { getMarcasDePortada } from "@/lib/queries/getMaquinaria";
 import { SLUG_PORTADA, getPaginaPorSlug } from "@/lib/queries/getPaginas";
 import { getEmpresa, getHorario, getLogo } from "@/lib/queries/getSeo";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
-import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { getLogosMarca, getMarcasRepuestosDePortada } from "@/lib/queries/getLogosMarca";
 import { metadataDe } from "@/lib/seo/metadata";
 import { buildOrganizationJsonLd } from "@/lib/seo/jsonLd";
@@ -91,7 +90,6 @@ export default async function HomePage() {
     logo,
     logosMarca,
     marcasRepuestos,
-    baldosas,
   ] = await Promise.all([
     getMarcasDePortada(),
     getCategoriasTecnicasDePortada(),
@@ -103,8 +101,17 @@ export default async function HomePage() {
     getLogo(),
     getLogosMarca(),
     getMarcasRepuestosDePortada(),
-    getBaldosasMarca(),
   ]);
+  // Los logos de las tarjetas de «Maquinaria pesada nueva», con su parte visible (misma área en todas).
+  const tarjetasNueva = await Promise.all(
+    tarjetasDeMarcas(marcas, logosMarca).map(async (t) => ({
+      ...t,
+      logo: await conRecorte(t.logo),
+      distribuidor: t.distribuidor
+        ? { ...t.distribuidor, logo: await conRecorte(t.distribuidor.logo) }
+        : null,
+    })),
+  );
   const maquinaFaq = imagenDeMedia(pagina.seccionFaq?.imagen, "");
   const relVideo = pagina.seccionCompania?.video;
   const idVideo = typeof relVideo === "object" && relVideo ? relVideo.id : relVideo;
@@ -163,7 +170,7 @@ export default async function HomePage() {
        * paisaje de las tarjetas del panel. Sin marcas, no se pinta.
        */}
       <SeccionNuevaKit
-        tarjetas={tarjetasDeMarcas(marcas, logosMarca, baldosas)}
+        tarjetas={tarjetasNueva}
         maquina={imagenDecorativa(nueva?.maquina)}
         fondo={imagenDecorativa(nueva?.fondo)}
         paisaje={imagenDecorativa(nueva?.fondoTarjetas)}

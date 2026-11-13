@@ -392,7 +392,8 @@ section.principal[data-con-izquierda] {
 
 /* El contacto y los testimonios siguen sobre el blanco de la llamada. */
 .cierre {
-  padding-top: 5cqi;
+  /* Del recuadro de asesoría al formulario, el común (antes 5cqi: 84 px a 1680; 2026-11-12). */
+  padding-top: var(--espacio-seccion);
   background: var(--color-fondo);
 }
 

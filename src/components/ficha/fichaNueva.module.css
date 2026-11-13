@@ -82,6 +82,11 @@
  */
 section.principal[data-con-izquierda] {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  /*
+   * Sin el alto mínimo de la V2 (`min(65vh, 720px)`): con él, la fila la marcaba la tarjeta y no
+   * la foto, y la derecha se estiraba por debajo de una foto apaisada (medido a 1440 y 1920).
+   */
+  min-height: 0;
 }
 
 .principal[data-con-izquierda] .columnaIzquierda {

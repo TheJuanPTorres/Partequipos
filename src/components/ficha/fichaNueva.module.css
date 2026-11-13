@@ -92,13 +92,21 @@ section.principal[data-con-izquierda] {
 .principal[data-con-izquierda] .columnaIzquierda {
   grid-column: 1;
   grid-row: 1;
+  /*
+   * Sin relleno propio abajo (dirección, 2026-11-13): ya lo pone la galería de la V2. Con los dos
+   * sumados quedaban ~37 px en blanco bajo la foto, y la derecha se alargaba hasta ahí.
+   */
+  padding-bottom: 0;
 }
 
 .principal[data-con-izquierda] .columnaTexto {
   grid-column: 2;
   grid-row: 1;
-  /* Arriba, a la altura de la foto (el relleno de la galería); a la derecha, el de la tarjeta. */
-  padding: 2.82cqi 3.5cqi 2.82cqi 1cqi;
+  /*
+   * Arriba y abajo, el relleno de la galería: la columna empieza y acaba a la altura de la foto. A
+   * la derecha, el de la tarjeta.
+   */
+  padding: 2.82cqi 3.5cqi calc(2.82cqi - 3px) 1cqi;
 }
 
 .columnaTexto {
@@ -255,6 +263,9 @@ section.principal[data-con-izquierda] {
 
 /* El sitio de «Leer más», reservado aunque no salga; pegado al texto. */
 .ranuraLeerMas {
+  /* La letra del enlace, para que la ranura mida lo mismo que él y no deje aire debajo. */
+  font-size: var(--texto-etiqueta);
+  line-height: 1;
   min-height: calc(1lh + 8px);
   margin-top: calc(var(--espacio-interno) * -0.5);
   /* Sin el relleno de abajo del enlace: de «Leer más» a los botones, solo el interno. */
@@ -268,7 +279,7 @@ section.principal[data-con-izquierda] {
  */
 .envoltura .botones {
   margin-top: 0;
-  padding-top: 0;
+  padding-block: 0;
 }
 
 /* «Leer más»: un enlace de texto, en el rojo de la marca, con el foco visible. */

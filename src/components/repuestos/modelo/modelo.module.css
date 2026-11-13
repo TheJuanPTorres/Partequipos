@@ -10,7 +10,7 @@
 
 .presentacion {
   /* Abajo, el aire hasta el título de las categorías (que empieza pegado a su franja). */
-  padding: 0 1.5vw 40px;
+  padding: 0 min(1.5vw, 24px) 40px;
   background: var(--marca-amarillo, var(--color-fondo-seccion));
 }
 
@@ -85,7 +85,7 @@
 .columnaTexto {
   display: flex;
   max-width: 600px;
-  padding: 56px 5vw 56px 7vw;
+  padding: 48px min(5vw, 96px) 48px min(7vw, 128px);
   grid-column: 2;
   flex-direction: column;
   gap: 28px;
@@ -182,7 +182,7 @@
   position: relative;
   display: flex;
   min-height: 360px;
-  margin: 40px 1.5vw 0;
+  margin: 40px min(1.5vw, 24px) 0;
   overflow: hidden;
   align-items: center;
   justify-content: center;

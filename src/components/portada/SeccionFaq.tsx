@@ -1,6 +1,7 @@
 import { IconHelpCircle } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { EnlaceContacto } from "@/components/forms/EnlaceContacto";
 
 import { Revelado } from "@/components/movimiento/Revelado";
@@ -31,6 +32,9 @@ import estilos from "./faq.module.css";
  * título, texto y botón en blanco abajo a la izquierda; a la derecha, la lista
  * centrada en vertical respecto a la tarjeta. Icono de círculo con
  * interrogación. En móvil, la tarjeta arriba y la lista debajo.
+ *
+ * LISTA A TODO EL ALTO (clienta, 2026-11-12): con las columnas lado a lado, las barras se reparten
+ * el alto de la tarjeta y, al abrir una, vuelven a su alto mínimo. Solo CSS (`faq.module.css`).
  */
 export type TextosFaq = { titulo: string; intro: string; botonTexto: string; botonEnlace: string };
 
@@ -81,7 +85,8 @@ export function SeccionFaq({ preguntas, imagen, textos }: Props) {
             </div>
           ) : null}
         </div>
-        <div className={estilos.der}>
+        {/* `--faq-n`: cuántas preguntas hay, para reservar el alto de la lista cerrada (CSS). */}
+        <div className={estilos.der} style={{ "--faq-n": preguntas.length } as CSSProperties}>
           {preguntas.map((p) => (
             <details key={p.id} name="portada-faq" className={estilos.item}>
               <summary className={estilos.cabecera}>

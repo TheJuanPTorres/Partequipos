@@ -85,7 +85,6 @@ export function sedesDePortada(sedes: Sede[]): SedeLista[] {
             coordenadas: l.coordenadas,
             direccion,
             ciudad,
-            sede: { lat, lng, lineas: conDatos.length },
           }),
         },
       ];

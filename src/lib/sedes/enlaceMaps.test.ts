@@ -9,8 +9,6 @@ import {
   validarEnlaceMaps,
 } from "./enlaceMaps";
 
-const sedeUna = { lat: 4.6467, lng: -74.1287, lineas: 1 };
-const sedeVarias = { ...sedeUna, lineas: 3 };
 const base = { direccion: "Calle 6 Nro 26-73", ciudad: "Bogotá" };
 
 describe("enlace de Google Maps", () => {
@@ -76,7 +74,6 @@ describe("el botón «Ver en Google Maps», por orden", () => {
       ...base,
       enlace: "https://maps.app.goo.gl/AbCdEf123",
       coordenadas: "4.6, -74.1",
-      sede: sedeUna,
     });
     assert.deepEqual(r, { href: "https://maps.app.goo.gl/AbCdEf123", origen: "enlace" });
   });
@@ -86,21 +83,22 @@ describe("el botón «Ver en Google Maps», por orden", () => {
       ...base,
       enlace: "https://www.waze.com/x",
       coordenadas: "4.61, -74.08",
-      sede: sedeVarias,
     });
     assert.equal(r.origen, "coordenadas");
     assert.equal(r.href, "https://www.google.com/maps/search/?api=1&query=4.61,-74.08");
   });
 
-  it("3. las coordenadas de la sede, solo si tiene UNA línea", () => {
-    const una = enlaceDeLinea({ ...base, sede: sedeUna });
-    assert.equal(una.origen, "sede");
-    assert.equal(una.href, "https://www.google.com/maps/search/?api=1&query=4.6467,-74.1287");
-    assert.equal(enlaceDeLinea({ ...base, sede: sedeVarias }).origen, "direccion");
+  it("3. la dirección escrita: sin enlace ni coordenadas de la línea (las de la sede no cuentan)", () => {
+    const r = enlaceDeLinea({ ...base });
+    assert.equal(r.origen, "direccion");
+    assert.equal(
+      r.href,
+      "https://www.google.com/maps/search/?api=1&query=Calle%206%20Nro%2026-73%2C%20Bogot%C3%A1",
+    );
   });
 
-  it("4. la dirección escrita, como antes", () => {
-    const r = enlaceDeLinea({ ...base, coordenadas: "4.6, 74.1", sede: sedeVarias });
+  it("3. también con coordenadas de la línea inválidas", () => {
+    const r = enlaceDeLinea({ ...base, coordenadas: "4.6, 74.1" });
     assert.equal(r.origen, "direccion");
     assert.equal(
       r.href,

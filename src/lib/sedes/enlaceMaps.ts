@@ -8,9 +8,10 @@ import { coordenadasEnColombia, validarLatitud, validarLongitud } from "../field
  *
  * 1. el enlace de la línea;
  * 2. las coordenadas de la línea;
- * 3. las coordenadas de la sede, si la sede tiene UNA sola línea (con varias, el punto de la sede
- *    no es el de cada línea: Antioquia tiene Guarne y Medellín);
- * 4. la dirección escrita, como antes.
+ * 3. la dirección escrita, como antes.
+ *
+ * Las coordenadas de la SEDE no se usan (dirección, 2026-11-13): son el punto del mapa de la
+ * portada y en varias sedes es el centro de la ciudad, peor que buscar la dirección.
  */
 
 /** `google.com`, `google.com.co`, `google.co`… con o sin `www.`/`maps.`. */
@@ -79,7 +80,7 @@ export function urlPorDireccion(direccion: string, ciudad: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(consulta)}`;
 }
 
-export type OrigenEnlaceMaps = "enlace" | "coordenadas" | "sede" | "direccion";
+export type OrigenEnlaceMaps = "enlace" | "coordenadas" | "direccion";
 
 /** El enlace del botón de una línea y de dónde sale (el origen, para el inventario y las pruebas). */
 export function enlaceDeLinea(entrada: {
@@ -87,18 +88,12 @@ export function enlaceDeLinea(entrada: {
   coordenadas?: string | null;
   direccion: string;
   ciudad: string;
-  /** Coordenadas de la sede, y cuántas líneas tiene. */
-  sede: { lat: number; lng: number; lineas: number };
 }): { href: string; origen: OrigenEnlaceMaps } {
   const enlace = enlaceDeGoogleMaps(entrada.enlace);
   if (enlace) return { href: enlace.toString(), origen: "enlace" };
   const c = leerCoordenadas(entrada.coordenadas);
   if (c && coordenadasEnColombia(c.lat, c.lng)) {
     return { href: urlPorCoordenadas(c.lat, c.lng), origen: "coordenadas" };
-  }
-  const { sede } = entrada;
-  if (sede.lineas === 1 && coordenadasEnColombia(sede.lat, sede.lng)) {
-    return { href: urlPorCoordenadas(sede.lat, sede.lng), origen: "sede" };
   }
   return { href: urlPorDireccion(entrada.direccion, entrada.ciudad), origen: "direccion" };
 }

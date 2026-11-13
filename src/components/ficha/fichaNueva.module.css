@@ -204,9 +204,9 @@ section.principal[data-con-izquierda] {
   .principal[data-con-izquierda] .envoltura[data-con-descripcion]:not([data-abierto]) {
     flex: 1 1 auto;
     contain: size;
-    /* Unas 5 líneas de texto, «Leer más» y los botones. */
-    contain-intrinsic-block-size: calc(5lh + 140px);
-    min-height: calc(5lh + 140px);
+    /* Lo mínimo: 2 líneas de texto, «Leer más» y los botones (con 5, pasaba de una foto apaisada). */
+    contain-intrinsic-block-size: calc(2lh + 120px);
+    min-height: calc(2lh + 120px);
   }
 
   .principal[data-con-izquierda] .envoltura:not([data-abierto]) .descripcion {

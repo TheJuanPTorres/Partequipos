@@ -29,6 +29,12 @@ export type TextosRepuestosKit = {
   tituloResaltado: string;
   /** «Alineación del título» (clienta, 2026-11-12): centrado por defecto. Mueve también el antetítulo. */
   tituloAlineacion: AlineacionTitulo;
+  /**
+   * Botón rojo bajo el título (clienta, 2026-11-12): «Ver todos los repuestos», al índice de
+   * repuestos. Sigue la alineación del título. Sin texto o sin enlace, no se pinta.
+   */
+  botonTexto: string;
+  botonEnlace: string;
   /** «Texto bajo el título»: un párrafo por línea. Vacío, no se pinta. */
   descripcion: string;
   descripcionAlineacion: AlineacionTexto;
@@ -70,6 +76,14 @@ export function SeccionRepuestosKit({
             ) : null}
             {titulo.despues}
           </h2>
+          {textos.botonTexto && textos.botonEnlace ? (
+            <p className={estilos.verTodoFila}>
+              <Link href={textos.botonEnlace} className={estilos.verTodo}>
+                {textos.botonTexto}
+                <Flecha className={estilos.flecha} />
+              </Link>
+            </p>
+          ) : null}
           <TextoEditable
             texto={textos.descripcion}
             alineacion={textos.descripcionAlineacion}

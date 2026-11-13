@@ -719,6 +719,17 @@ export const PaginaInstitucional: CollectionConfig = {
           "Se pinta en rojo donde aparezca en el título (la primera vez). Vacía, o si el título no la lleva, todo el título va en negro.",
         ),
         alineacionTituloField("tituloAlineacion", "Alineación del título"),
+        texto(
+          "botonTexto",
+          "Texto del botón bajo el título",
+          "Ver todos los repuestos",
+          "Botón rojo entre el título y el texto, con la alineación del título. Vacío, no se pinta.",
+        ),
+        enlace(
+          "botonEnlace",
+          "Enlace del botón bajo el título",
+          "/repuestos-maquinaria-pesada-colombia/",
+        ),
         {
           // Campo nuevo (2026-10-26): los «ya no se usa» de esta sección son de una línea y con un
           // valor por defecto que saldría en la web, así que no sirven para un párrafo.
@@ -757,17 +768,6 @@ export const PaginaInstitucional: CollectionConfig = {
           "Texto del botón de cada tarjeta (ya no se usa)",
           "Ver más",
           "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): el botón de cada tarjeta es una flecha redonda, sin texto.",
-        ),
-        texto(
-          "botonTexto",
-          "Texto del botón (ya no se usa)",
-          "Ver todos los repuestos",
-          "Sin efecto desde el 2026-10-26 (diseño del cliente): cada tarjeta lleva su botón.",
-        ),
-        enlace(
-          "botonEnlace",
-          "Enlace del botón (ya no se usa)",
-          "/repuestos-maquinaria-pesada-colombia/",
         ),
         imagenKit(
           "maquina",

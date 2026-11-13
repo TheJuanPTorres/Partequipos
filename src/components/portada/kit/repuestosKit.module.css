@@ -175,6 +175,46 @@
   color: var(--color-marca);
 }
 
+/*
+ * Botón rojo bajo el título (clienta, 2026-11-12), como los «Ver todo» de la portada. Sigue la
+ * alineación del título: centrado con él, a la izquierda si no. Del título al botón y del botón al
+ * texto, el hueco interno.
+ */
+.verTodoFila {
+  margin: var(--espacio-interno) 0 0;
+}
+
+.panel[data-titulo="center"] .verTodoFila {
+  text-align: center;
+}
+
+.verTodo {
+  display: inline-flex;
+  padding: 14px 24px 14px 20px;
+  align-items: center;
+  gap: 12px;
+  border-radius: 999px;
+  background: var(--color-marca);
+  box-shadow: 0 2px 6px -2px rgb(185 28 28 / 0.45);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.verTodo:hover {
+  background: color-mix(in srgb, var(--color-marca) 85%, #fff);
+}
+
+.verTodo:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 3px;
+}
+
+.verTodoFila + .descripcion {
+  margin-top: var(--espacio-interno);
+}
+
 /* «Texto bajo el título»: un párrafo por línea; ancho y alineación, del panel. */
 .descripcion {
   margin: 12px 0 0;
@@ -393,6 +433,10 @@
     transition:
       background-color 180ms ease,
       color 180ms ease;
+  }
+
+  .verTodo {
+    transition: background-color 180ms ease;
   }
 
   .flecha {

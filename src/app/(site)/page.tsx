@@ -209,6 +209,8 @@ export default async function HomePage() {
           titulo: tx(repuestos?.titulo),
           tituloResaltado: tx(repuestos?.tituloResaltado),
           tituloAlineacion: alineacionDeTitulo(repuestos?.tituloAlineacion),
+          botonTexto: tx(repuestos?.botonTexto),
+          botonEnlace: tx(repuestos?.botonEnlace),
           descripcion: tx(repuestos?.descripcion),
           descripcionAlineacion: alineacionDeTexto(repuestos?.descripcionAlineacion),
           descripcionAncho: anchoDeTexto(repuestos?.descripcionAncho, "ancho"),

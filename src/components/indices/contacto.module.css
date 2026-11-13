@@ -136,7 +136,8 @@
   z-index: 0;
   top: -88px;
   right: 2%;
-  width: 30%;
+  /* Con techo: a 2560 y más, al 30 % sobresalía bajo la sección y tocaba la tarjeta roja del pie. */
+  width: min(30%, 560px);
   height: auto;
   pointer-events: none;
 }

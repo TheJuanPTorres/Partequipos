@@ -6,6 +6,7 @@
 
 .seccion {
   display: flex;
+  margin-bottom: max(0px, calc(var(--espacio-seccion) - 31px));
   padding: 24px 12px 0;
   flex-direction: column;
   gap: 12px;

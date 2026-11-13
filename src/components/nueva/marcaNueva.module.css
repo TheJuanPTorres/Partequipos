@@ -10,7 +10,8 @@
 
 .linea {
   /* Arriba, el espaciado común (antes 60 · 40 px; criterio de espacios, 2026-11-09). */
-  padding: var(--espacio-seccion) min(1.5vw, 24px) 20px;
+  /* Los 3 px que suma la franja de arriba se restan: el hueco medido es el común. */
+  padding: calc(var(--espacio-seccion) - 3px) min(1.5vw, 24px) 0;
   text-align: center;
 }
 
@@ -114,7 +115,7 @@ a.enlaceFranja:focus-visible {
 
 /* Medio espaciado común a cada lado de la línea (antes 40 + 40; criterio de espacios, 2026-11-09). */
 .seccionTipo {
-  margin: calc(var(--espacio-seccion) / 2) max(5%, calc((100% - 2200px) / 2)) 0;
+  margin: calc(var(--espacio-seccion) / 2) 5% 0;
   padding-top: calc(var(--espacio-seccion) / 2);
   border-top: 1px solid rgb(0 0 0 / 12%);
 }
@@ -398,7 +399,7 @@ nav.barraMarcas {
 /* Aire antes del formulario de contacto: no pegado a la última tarjeta. */
 .tipos {
   /* Antes 100 px; el espaciado común (criterio de espacios, 2026-11-09). */
-  padding-bottom: var(--espacio-seccion);
+  padding-bottom: max(0px, calc(var(--espacio-seccion) - 31px));
 }
 
 .verTodos {
@@ -461,4 +462,20 @@ nav.barraMarcas {
  */
 .seccionTipo:not(.seccionTipo + .seccionTipo) {
   margin-top: var(--espacio-seccion);
+}
+
+/*
+ * Responsive de las marcas de nueva (2026-11-13): solo en la página de marca (`.tipos`; `.seccionTipo`
+ * la comparten las páginas de tipo y de categoría general). La primera sección va al común desde
+ * la franja (la línea de equipos ya no suma 20 px), y el contenido de las secciones llega a 2200 px
+ * como mucho en pantallas gigantes.
+ */
+.tipos > .seccionTipo:first-child {
+  margin-top: calc(var(--espacio-seccion) - 3px);
+}
+
+@media (min-width: 1025px) {
+  .tipos > .seccionTipo {
+    margin-inline: max(5%, calc((100% - 2200px) / 2));
+  }
 }

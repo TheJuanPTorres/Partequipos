@@ -647,7 +647,8 @@
  * la cabecera de la página.
  */
 .tipos > .seccion:first-child {
-  margin-top: var(--espacio-seccion);
+  /* El borde de arriba de la sección suma 1 px al hueco medido. */
+  margin-top: calc(var(--espacio-seccion) - 1px);
   padding-top: var(--espacio-interno);
 }
 

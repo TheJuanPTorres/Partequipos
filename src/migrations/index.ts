@@ -110,7 +110,8 @@ import * as migration_20261109_121811_portada_nueva_v2 from './20261109_121811_p
 import * as migration_20261109_143314_categorias_nueva_orden from './20261109_143314_categorias_nueva_orden';
 import * as migration_20261109_150028_indice_tipos_nueva_fondo from './20261109_150028_indice_tipos_nueva_fondo';
 import * as migration_20261112_210351_portada_repuestos_titulo_alineacion from './20261112_210351_portada_repuestos_titulo_alineacion';
-import * as migration_20261113_061739_sedes_lineas_enlace_maps from './20261113_061739_sedes_lineas_enlace_maps';
+import * as migration_20261113_055720_aditamentos_compromiso_foto from './20261113_055720_aditamentos_compromiso_foto';
+import * as migration_20261113_125918_sedes_lineas_enlace_maps from './20261113_125918_sedes_lineas_enlace_maps';
 
 export const migrations = [
   {
@@ -674,8 +675,13 @@ export const migrations = [
     name: '20261112_210351_portada_repuestos_titulo_alineacion',
   },
   {
-    up: migration_20261113_061739_sedes_lineas_enlace_maps.up,
-    down: migration_20261113_061739_sedes_lineas_enlace_maps.down,
-    name: '20261113_061739_sedes_lineas_enlace_maps'
+    up: migration_20261113_055720_aditamentos_compromiso_foto.up,
+    down: migration_20261113_055720_aditamentos_compromiso_foto.down,
+    name: '20261113_055720_aditamentos_compromiso_foto',
+  },
+  {
+    up: migration_20261113_125918_sedes_lineas_enlace_maps.up,
+    down: migration_20261113_125918_sedes_lineas_enlace_maps.down,
+    name: '20261113_125918_sedes_lineas_enlace_maps'
   },
 ];

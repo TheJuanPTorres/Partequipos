@@ -176,17 +176,13 @@ export async function PaginaModeloRepuesto({
             })}
           />
         </ZonaAnimada>
-        {vista.piezas.length > 0 ? (
-          <ul className={estilosModelo.piezas}>
-            {vista.piezas.map((p, i) => (
-              <li key={`${i}-${p}`}>{p}</li>
-            ))}
-          </ul>
-        ) : null}
+        {/* Ficha v2 (2026-11-13, Juan Pablo): la lista de piezas de WordPress («- Filtros para …», el campo
+            `piezas` del modelo) NO se pinta. */}
         <OtrosModelosLista
           id="otros-modelos"
           titulo={`Otros modelos de ${tipoEnTitulo(tipo.nombre)} ${marca.nombre}`}
           modelos={otros}
+          logo={logo}
         />
       </main>
     );

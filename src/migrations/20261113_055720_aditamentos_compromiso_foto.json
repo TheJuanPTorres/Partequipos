@@ -4032,6 +4032,12 @@
           "notNull": false,
           "default": "'Solicita asesoría'"
         },
+        "plantilla_aditamentos_foto_id": {
+          "name": "plantilla_aditamentos_foto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "plantilla_linea_intro": {
           "name": "plantilla_linea_intro",
           "type": "varchar",
@@ -4193,6 +4199,21 @@
           "method": "btree",
           "with": {}
         },
+        "marcas_maquinaria_plantilla_aditamentos_plantilla_aditam_idx": {
+          "name": "marcas_maquinaria_plantilla_aditamentos_plantilla_aditam_idx",
+          "columns": [
+            {
+              "expression": "plantilla_aditamentos_foto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "marcas_maquinaria_kit_kit_foto_cabecera_idx": {
           "name": "marcas_maquinaria_kit_kit_foto_cabecera_idx",
           "columns": [
@@ -4343,6 +4364,19 @@
           "tableTo": "media",
           "columnsFrom": [
             "imagen_tarjeta_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "marcas_maquinaria_plantilla_aditamentos_foto_id_media_id_fk": {
+          "name": "marcas_maquinaria_plantilla_aditamentos_foto_id_media_id_fk",
+          "tableFrom": "marcas_maquinaria",
+          "tableTo": "media",
+          "columnsFrom": [
+            "plantilla_aditamentos_foto_id"
           ],
           "columnsTo": [
             "id"
@@ -10290,20 +10324,6 @@
           "notNull": false,
           "default": "'center'"
         },
-        "seccion_repuestos_boton_texto": {
-          "name": "seccion_repuestos_boton_texto",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'Ver todos los repuestos'"
-        },
-        "seccion_repuestos_boton_enlace": {
-          "name": "seccion_repuestos_boton_enlace",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'/repuestos-maquinaria-pesada-colombia/'"
-        },
         "seccion_repuestos_descripcion": {
           "name": "seccion_repuestos_descripcion",
           "type": "varchar",
@@ -10353,6 +10373,20 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'Ver más'"
+        },
+        "seccion_repuestos_boton_texto": {
+          "name": "seccion_repuestos_boton_texto",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Ver todos los repuestos'"
+        },
+        "seccion_repuestos_boton_enlace": {
+          "name": "seccion_repuestos_boton_enlace",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'/repuestos-maquinaria-pesada-colombia/'"
         },
         "seccion_repuestos_maquina_id": {
           "name": "seccion_repuestos_maquina_id",
@@ -12301,18 +12335,6 @@
         },
         "telefono": {
           "name": "telefono",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "enlace_maps": {
-          "name": "enlace_maps",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "coordenadas": {
-          "name": "coordenadas",
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
@@ -18343,6 +18365,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "8b477d29-5b86-4c01-abbb-32815e3bd39a",
+  "id": "957da5f6-5a79-4218-8695-1613ece5027a",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

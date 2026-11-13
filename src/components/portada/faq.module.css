@@ -73,7 +73,8 @@
   width: 60%;
   padding: min(5%, 64px);
   flex-direction: column;
-  /* Centrada en vertical respecto a la tarjeta (pedido de Andrés). */
+  /* Centrada en vertical respecto a la tarjeta (pedido de Andrés); desde 768 px, a todo su alto
+     (abajo). */
   justify-content: center;
 }
 
@@ -236,7 +237,53 @@
   text-underline-offset: 2px;
 }
 
+/*
+ * LA LISTA OCUPA TODO EL ALTO DE LA TARJETA (clienta, 2026-11-12), con las dos columnas lado a lado
+ * (desde 768 px). Cerradas, las barras se reparten el alto de la tarjeta: cada pregunta crece
+ * (`flex-grow`) y su barra blanca la llena, con el texto centrado en vertical; entre ellas, el hueco
+ * interno. Al abrir una, todas vuelven a su alto mínimo y el hueco baja a 10 px para dejar sitio a la respuesta, y el alto
+ * que sobre queda debajo de la lista: la sección solo crece si la respuesta no cabe. El cambio se
+ * anima con el mismo ritmo que la respuesta. Solo donde `<details>` admite `display: flex` (los
+ * navegadores con `::details-content`); en el resto, la lista centrada de siempre.
+ */
+@media (min-width: 768px) {
+  @supports selector(::details-content) {
+    .der {
+      /* El alto de la lista cerrada (barras de 60 px y el hueco interno entre ellas) queda reservado:
+         con una pregunta abierta el hueco baja a 10 px y la respuesta ocupa el sitio que eso libera,
+         sin que la sección encoja ni, si cabe, crezca (dirección, 2026-11-13). */
+      min-height: calc(var(--faq-n, 1) * 60px + (var(--faq-n, 1) - 1) * var(--espacio-interno));
+      padding-block: 0;
+      justify-content: flex-start;
+      gap: var(--espacio-interno);
+      transition: gap 400ms cubic-bezier(0.37, 0, 0.63, 1);
+    }
+
+    .der:has(.item[open]) {
+      gap: 10px;
+    }
+
+    .item {
+      display: flex;
+      margin: 0;
+      flex: 1 0 auto;
+      flex-direction: column;
+      transition: flex-grow 400ms cubic-bezier(0.37, 0, 0.63, 1);
+    }
+
+    .der:has(.item[open]) .item {
+      flex-grow: 0;
+    }
+
+    .cabecera {
+      flex: 1 0 auto;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .der,
+  .item,
   .item::details-content {
     transition: none;
   }

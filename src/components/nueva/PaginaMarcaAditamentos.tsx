@@ -1,7 +1,6 @@
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { HeroMarca } from "@/components/repuestos/HeroMarca";
-import { PorQueElegirnos } from "@/components/repuestos/PorQueElegirnos";
 import { SedesCompactas } from "@/components/repuestos/SedesCompactas";
 import { TarjetasMarca } from "@/components/repuestos/TarjetasMarca";
 import estilos from "@/components/repuestos/marca.module.css";
@@ -20,7 +19,7 @@ import { imagenDeMedia } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 import type { MarcasMaquinaria } from "@/payload-types";
 
-import { FranjaServicios } from "./FranjaServicios";
+import { CompromisoAditamentos } from "./CompromisoAditamentos";
 
 const ANCLA_PRODUCTOS = "aditamentos-por-tipo";
 const ANCLA_CONTACTO = "contacto-aditamentos";
@@ -40,8 +39,8 @@ const FORMULARIO = {
  *   del ratón) con «Aditamentos para maquinaria pesada» como `<h1>`.
  * - Un bloque por tipo, uno debajo del otro (en el export, a dos columnas), con
  *   sus productos como tarjetas de la «Plantilla 1» y la regla de colocación del #281.
- * - Contacto, la franja de servicios, «Nuestro compromiso…» (sin foto, solo el
- *   texto) y las sedes: los componentes de repuestos.
+ * - Contacto, «Nuestro compromiso…» a doble columna con su foto (editable en la marca;
+ *   dirección, 2026-11-13, que quitó también la franja de servicios) y las sedes.
  */
 export async function PaginaMarcaAditamentos({ marca }: { marca: MarcasMaquinaria }) {
   const [tipos, global, empresa, sedes] = await Promise.all([
@@ -113,19 +112,13 @@ export async function PaginaMarcaAditamentos({ marca }: { marca: MarcasMaquinari
         formulario={FORMULARIO}
       />
 
-      <FranjaServicios textos={t.franja} />
-
-      <PorQueElegirnos
+      <CompromisoAditamentos
         id="nuestro-compromiso"
-        vista={{
-          titulo: t.compromisoTitulo,
-          imagen: null,
-          entradilla: t.compromisoEntradilla,
-          texto: t.compromisoTexto,
-          puntos: [],
-          cierre: "",
-          boton: t.compromisoBoton,
-        }}
+        titulo={t.compromisoTitulo}
+        entradilla={t.compromisoEntradilla}
+        texto={t.compromisoTexto}
+        boton={t.compromisoBoton}
+        imagen={imagenDeMedia(marca.plantillaAditamentos?.foto, t.compromisoTitulo)}
         anclaContacto={ANCLA_CONTACTO}
         formulario={configContactoMarca({
           origen,

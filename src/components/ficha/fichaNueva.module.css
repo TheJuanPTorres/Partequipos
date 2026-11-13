@@ -137,9 +137,19 @@ section.principal[data-con-izquierda] {
   padding: 0;
 }
 
+/*
+ * De 3 en 3, LA ÚLTIMA FILA LLENA EL ANCHO (dirección, 2026-11-13): rejilla de 6 columnas, cada
+ * tarjeta ocupa 2; si al final quedan 2, cada una ocupa media fila (3), y si queda 1, la fila
+ * entera. Así los nombres largos («Profundidad máxima de excavación») caben en una o dos líneas y
+ * las tarjetas quedan bajas.
+ */
 @container (min-width: 560px) {
   .principal .datos {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .principal .datos li {
+    grid-column: span 2;
   }
 
   .principal .datos li:nth-child(3n + 1):last-child {
@@ -148,7 +158,7 @@ section.principal[data-con-izquierda] {
 
   .principal .datos li:nth-child(3n + 1):nth-last-child(2),
   .principal .datos li:nth-child(3n + 2):last-child {
-    grid-column: span 1;
+    grid-column: span 3;
   }
 }
 
@@ -247,6 +257,18 @@ section.principal[data-con-izquierda] {
 .ranuraLeerMas {
   min-height: calc(1lh + 8px);
   margin-top: calc(var(--espacio-interno) * -0.5);
+  /* Sin el relleno de abajo del enlace: de «Leer más» a los botones, solo el interno. */
+  margin-bottom: -4px;
+}
+
+/*
+ * De «Leer más» a los botones, SOLO `--espacio-interno` (dirección, 2026-11-13): sin el margen de
+ * 30 px ni el relleno de arriba de los botones de la V2 (`ficha.module.css`), que se sumaban al
+ * hueco de la envoltura y alargaban la columna derecha por debajo de la foto.
+ */
+.envoltura .botones {
+  margin-top: 0;
+  padding-top: 0;
 }
 
 /* «Leer más»: un enlace de texto, en el rojo de la marca, con el foco visible. */

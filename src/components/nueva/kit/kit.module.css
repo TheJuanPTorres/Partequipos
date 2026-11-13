@@ -39,15 +39,17 @@
 
 /* Banda partida: gris arriba y el color de la marca abajo, con el panel de foto encima. */
 .hero {
-  padding: 24px 1.5vw 1.5vw;
+  /* Rellenos en vw con tope (criterio de espacios, 2026-11-09): a 3840 eran 58 px. */
+  padding: 24px min(1.5vw, 24px) min(1.5vw, 24px);
   background: linear-gradient(var(--gris) 50%, var(--acento) 50%);
 }
 
-/* Alto reservado (70vh como mínimo): el texto no mueve nada al llegar Inter. */
+/* Alto reservado (70vh como mínimo, con techo): el texto no mueve nada al llegar Inter. Sin el
+   techo, en una pantalla de 2160 px de alto eran 1512 px de cabecera. */
 .heroPanel {
   position: relative;
   display: flex;
-  min-height: 70vh;
+  min-height: min(70vh, 760px);
   flex-direction: column;
   overflow: hidden;
   border-radius: 30px;
@@ -71,7 +73,8 @@
   align-items: center;
   justify-content: center;
   gap: 20px;
-  padding: 50px 2.9vw;
+  /* Arriba y abajo, el espacio interno (antes 50 px); a los lados, con tope. */
+  padding: var(--espacio-interno) min(2.9vw, 48px);
   color: #fff;
   text-align: center;
 }
@@ -423,11 +426,13 @@
 /* ------------------------------------------------------------------ 3 · Línea de equipos */
 
 .linea {
-  padding: 60px 0 20px;
+  /* Arriba, el espaciado común (antes 60 · 40 px; criterio de espacios, 2026-11-09). */
+  padding: var(--espacio-seccion) 0 20px;
 }
 
 .lineaTitulo {
-  margin: 0 0 20px;
+  /* Del título a la cinta, el espacio interno (antes 20 px). */
+  margin: 0 0 var(--espacio-interno);
   padding: 0 1.5vw;
   color: #100f0f;
   font-size: 20px;
@@ -603,9 +608,9 @@
 }
 
 .cierre {
-  margin: 24px auto 0;
+  margin: var(--espacio-interno) auto 0;
   max-width: 760px;
-  padding: 0 1.5vw;
+  padding: 0 min(1.5vw, 24px);
   color: var(--tinta-suave);
   font-size: 18px;
   line-height: 1.5;
@@ -629,10 +634,50 @@
 .seccion {
   position: relative;
   isolation: isolate;
-  margin: 40px 5% 0;
-  padding-top: 40px;
+  /* Medio espaciado común a cada lado de la línea: el hueco entre tipos es el común (antes 40 + 40). */
+  margin: calc(var(--espacio-seccion) / 2) 5% 0;
+  padding-top: calc(var(--espacio-seccion) / 2);
   border-top: 1px solid rgb(0 0 0 / 0.12);
   scroll-margin-top: 96px;
+}
+
+/*
+ * La PRIMERA sección de tipo: el común entero sobre la línea (no la mitad) y, de la línea al título,
+ * el espacio interno (2026-11-12). Sin esto, a 1440 la foto de la franja asomaba 3 px por encima de
+ * la cabecera de la página.
+ */
+.tipos > .seccion:first-child {
+  margin-top: var(--espacio-seccion);
+  padding-top: var(--espacio-interno);
+}
+
+/*
+ * Con la franja diagonal visible (desde su ancho, `data-desde`), la foto en gris sube unos 51 px por
+ * encima del título (`.detalle` empieza 40 px más arriba y la foto va pegada abajo): en la primera
+ * sección se le deja ese sitio bajo la línea para que no la cruce ni se acerque a la cabecera.
+ */
+@media (min-width: 1280px) {
+  .tipos > .seccion:first-child:has(.detalle[data-desde="1280"]) {
+    padding-top: 52px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .tipos > .seccion:first-child:has(.detalle[data-desde="1440"]) {
+    padding-top: 52px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .tipos > .seccion:first-child:has(.detalle[data-desde="1600"]) {
+    padding-top: 52px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .tipos > .seccion:first-child:has(.detalle[data-desde="1920"]) {
+    padding-top: 52px;
+  }
 }
 
 .cabeceraSeccion {
@@ -644,7 +689,8 @@
   align-items: center;
   justify-content: center;
   gap: 32px;
-  margin: 0 0 30px;
+  /* Del título a los modelos, el espacio interno (antes 30 px). */
+  margin: 0 0 var(--espacio-interno);
   color: #100f0f;
   font-size: 55px;
   font-weight: 700;
@@ -754,7 +800,8 @@
   grid-row: span 4;
   grid-template-rows: subgrid;
   row-gap: 0;
-  margin-bottom: 32px;
+  /* Entre filas de modelos, el espacio interno (antes 32 px). */
+  margin-bottom: var(--espacio-interno);
   overflow: hidden;
   border-radius: 14px;
   background: #fff;
@@ -940,10 +987,6 @@
     font-size: 14px;
   }
 
-  .linea {
-    padding-top: 40px;
-  }
-
   .seccion {
     margin-right: 2%;
     margin-left: 2%;
@@ -976,8 +1019,8 @@
   }
 
   .seccion {
-    margin: 30px 20px 0;
-    padding-top: 30px;
+    margin: calc(var(--espacio-seccion) / 2) 20px 0;
+    padding-top: calc(var(--espacio-seccion) / 2);
   }
 
   .tituloTipo {

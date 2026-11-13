@@ -111,6 +111,7 @@ import * as migration_20261109_143314_categorias_nueva_orden from './20261109_14
 import * as migration_20261109_150028_indice_tipos_nueva_fondo from './20261109_150028_indice_tipos_nueva_fondo';
 import * as migration_20261112_210351_portada_repuestos_titulo_alineacion from './20261112_210351_portada_repuestos_titulo_alineacion';
 import * as migration_20261113_055720_aditamentos_compromiso_foto from './20261113_055720_aditamentos_compromiso_foto';
+import * as migration_20261113_125918_sedes_lineas_enlace_maps from './20261113_125918_sedes_lineas_enlace_maps';
 
 export const migrations = [
   {
@@ -676,6 +677,11 @@ export const migrations = [
   {
     up: migration_20261113_055720_aditamentos_compromiso_foto.up,
     down: migration_20261113_055720_aditamentos_compromiso_foto.down,
-    name: '20261113_055720_aditamentos_compromiso_foto'
+    name: '20261113_055720_aditamentos_compromiso_foto',
+  },
+  {
+    up: migration_20261113_125918_sedes_lineas_enlace_maps.up,
+    down: migration_20261113_125918_sedes_lineas_enlace_maps.down,
+    name: '20261113_125918_sedes_lineas_enlace_maps'
   },
 ];

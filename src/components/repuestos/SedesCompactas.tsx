@@ -1,6 +1,6 @@
 import { IconMapPin } from "@tabler/icons-react";
 
-import { urlGoogleMaps, type SedeLista } from "@/lib/portada/sedes";
+import { type SedeLista } from "@/lib/portada/sedes";
 
 import estilos from "./sedesCompactas.module.css";
 
@@ -55,7 +55,7 @@ export function SedesCompactas({ id, sedes }: { id: string; sedes: SedeLista[] }
                     <strong>{l.etiqueta}:</strong>
                     <br />
                     <a
-                      href={urlGoogleMaps(l.direccion, s.ciudad)}
+                      href={l.mapa.href}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={estilos.sedeDireccion}

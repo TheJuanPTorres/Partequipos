@@ -81,7 +81,7 @@
   display: flex;
   width: 100%;
   flex: 1;
-  padding: 50px 2.9vw;
+  padding: 48px min(2.9vw, 48px);
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -480,7 +480,9 @@ a.pildora:hover {
   --rejilla-relleno: 82px;
   /* Asoma bajo las esquinas redondeadas del amarillo. */
   margin-top: -50px;
-  padding: 120px 82px 144px;
+  margin-bottom: max(0px, calc(var(--espacio-seccion) - 31px));
+  /* 50 de solape bajo el amarillo + 48 de aire; 48 abajo (criterio de espacios, 2026-11-09). */
+  padding: 98px 82px 48px;
   border-radius: 0 0 var(--marca-radio) var(--marca-radio);
   background: var(--color-fondo);
 }
@@ -593,7 +595,7 @@ a.pildora:hover {
 @media (max-width: 1024px) {
   .tarjetas {
     --rejilla-relleno: calc(5vw + 10px);
-    padding: 120px var(--rejilla-relleno) 101px;
+    padding: 98px var(--rejilla-relleno) 48px;
   }
 
   .rejilla {
@@ -609,7 +611,7 @@ a.pildora:hover {
 @media (max-width: 767px) {
   .tarjetas {
     --rejilla-relleno: 30px;
-    padding: 120px var(--rejilla-relleno) 60px;
+    padding: 74px var(--rejilla-relleno) 24px;
   }
 
   .rejilla {
@@ -1023,7 +1025,7 @@ a.modelo:hover {
  * cabecera baja sin foto (`heroBajo`) no lleva esta clase.
  */
 .hero.heroIndice {
-  min-height: 70vh;
+  min-height: clamp(420px, 70vh, 630px);
 }
 
 .heroIndice .heroContenido {
@@ -1061,8 +1063,8 @@ a.modelo:hover {
  * animación «shrink» del export), salvo con movimiento reducido.
  */
 .tarjetasIndice {
-  /* Con techo: el 5 % · 10 % crecía con la pantalla (192 y 384 px a 3840). */
-  padding: min(5%, 72px) min(5%, 72px) min(10%, 72px);
+  /* Espacio interno común (Juan Pablo, 2026-11-12): 16 a 390, 22 a 768 y 32 como mucho; el 5 % · 10 % crecía con la pantalla. */
+  padding: var(--espacio-interno);
 }
 
 .tarjetasIndice .rejilla {
@@ -1257,7 +1259,7 @@ a.modelo:hover {
 
 @media (max-width: 1024px) {
   .tarjetasIndice {
-    padding: 5% 5% 10%;
+    padding: min(5%, 48px) 5% min(10%, 48px);
   }
 
   .tarjetasIndice .panel[data-con-foto] {
@@ -1267,7 +1269,7 @@ a.modelo:hover {
 
 @media (max-width: 767px) {
   .tarjetasIndice {
-    padding: 5% 5% 10%;
+    padding: min(5%, 48px) 5% min(10%, 48px);
   }
 
   .tarjetasIndice .panel[data-con-foto] {
@@ -1401,7 +1403,7 @@ a.modelo:hover {
    oscuro de los encabezados sin foto: el texto blanco se lee. */
 .mostrarMarcasCabecera {
   display: flex;
-  min-height: 35vh;
+  min-height: clamp(240px, 35vh, 320px);
   box-sizing: border-box;
   padding: 50px;
   flex-direction: column;

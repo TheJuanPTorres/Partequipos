@@ -292,7 +292,7 @@ for (const ruta of rutas) {
     await p.screenshot({
       path: path.join(
         carpeta,
-        `${ruta === "/" ? "portada" : ruta.replace(/\W+/g, "-").replace(/^-|-$/g, "")}-${ancho}.png`,
+        `${ruta === "/" ? "portada" : ruta.replace(/\W+/g, "-").replace(/^-|-$/g, "").slice(-120)}-${ancho}.png`,
       ),
       fullPage: true,
     });

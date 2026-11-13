@@ -7,8 +7,8 @@ import { imagenDeMedia } from "../utils/relations";
 /**
  * Lógica pura de la PÁGINA DE MARCA «ADITAMENTOS» con la plantilla de Andrés
  * (elementor 4020, 2026-10-20): cabecera con el título revelado, un bloque por
- * tipo con sus productos como tarjetas, contacto, la franja de servicios,
- * «Nuestro compromiso…» y las sedes. Las demás marcas siguen con la «Plantilla 1».
+ * tipo con sus productos como tarjetas, contacto, «Nuestro compromiso…» con su
+ * foto y las sedes (la franja de servicios se quitó el 2026-11-13, dirección). Las demás marcas siguen con la «Plantilla 1».
  */
 
 /**
@@ -18,7 +18,6 @@ import { imagenDeMedia } from "../utils/relations";
 export const TEXTOS_ADITAMENTOS = {
   antetitulo: "Partequipos",
   titulo: "Aditamentos para maquinaria pesada",
-  franja: ["Maquinaria pesada", "Servicio técnico", "Repuestos de calidad"],
   compromisoTitulo:
     "Nuestro compromiso es ofrecerle soluciones para cada una de sus necesidades y proyectos a nivel nacional.",
   compromisoEntradilla: "Somos especialistas en repuestos de maquinaria pesada.",
@@ -40,7 +39,6 @@ export function usaDisenoKit(marca: Pick<MarcasMaquinaria, "disenoPagina">): boo
 export type TextosAditamentos = {
   antetitulo: string;
   titulo: string;
-  franja: string[];
   compromisoTitulo: string;
   compromisoEntradilla: string;
   compromisoTexto: string;
@@ -56,9 +54,6 @@ export function textosAditamentos(
   return {
     antetitulo: o(p.antetitulo, TEXTOS_ADITAMENTOS.antetitulo),
     titulo: o(p.titulo, TEXTOS_ADITAMENTOS.titulo),
-    franja: [p.franja1, p.franja2, p.franja3].map((v, i) =>
-      o(v, TEXTOS_ADITAMENTOS.franja[i] ?? ""),
-    ),
     compromisoTitulo: o(p.compromisoTitulo, TEXTOS_ADITAMENTOS.compromisoTitulo),
     compromisoEntradilla: o(p.compromisoEntradilla, TEXTOS_ADITAMENTOS.compromisoEntradilla),
     compromisoTexto: o(p.compromisoTexto, TEXTOS_ADITAMENTOS.compromisoTexto),

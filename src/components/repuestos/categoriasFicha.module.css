@@ -1,0 +1,184 @@
+/*
+ * Categorías de repuestos de la ficha de modelo, diseño v2 (2026-11-13). Dentro de `.pagina` de
+ * marca: el color es `--marca-amarillo`. El panel es un tono SUAVE de ese color (mezcla con blanco, nunca un color fijo) (las fotos con
+ * fondo blanco se funden con él al multiplicar).
+ */
+
+.seccion {
+  margin-top: var(--espacio-seccion);
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-4);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.rejilla {
+  display: grid;
+  max-width: 1600px;
+  margin: var(--espacio-interno) 0 0;
+  padding: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  list-style: none;
+}
+
+.caja {
+  display: flex;
+  min-width: 0;
+}
+
+.tarjeta {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(20 17 15 / 0.06),
+    0 8px 18px -12px rgb(20 17 15 / 0.25);
+  color: var(--color-texto);
+  text-decoration: none;
+}
+
+.tarjeta:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+.panel {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 0.82;
+  overflow: hidden;
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--marca-amarillo, #d0d0d0) 8%, #fff) 0%,
+    color-mix(in srgb, var(--marca-amarillo, #d0d0d0) 17%, #fff) 100%
+  );
+}
+
+.luz {
+  position: absolute;
+  top: -10%;
+  right: 8%;
+  width: 30%;
+  height: 85%;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--marca-amarillo, #d0d0d0) 22%, #fff) 0%,
+    transparent 100%
+  );
+  transform: skewX(-30deg);
+}
+
+.foto {
+  position: absolute;
+  inset: 9%;
+}
+
+.fotoImg {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.tarjeta:hover .fotoImg {
+  transform: scale(1.06);
+}
+
+.pie {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 14px 14px 14px;
+}
+
+.nombre {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.ver {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  padding: 0 12px;
+  border: 1.5px solid #e5242d;
+  border-radius: 9999px;
+  color: #c81e26;
+  font-size: 14.4px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.tarjeta:hover .ver {
+  background: #e5242d;
+  color: #fff;
+}
+
+.flecha {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  transition: transform 0.3s;
+}
+
+.tarjeta:hover .flecha {
+  transform: translateX(2px);
+}
+
+@media (min-width: 640px) {
+  .rejilla {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .nombre {
+    font-size: 16px;
+  }
+
+  .pie {
+    padding: 16px 20px 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rejilla {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  /* Con 4 o menos, 4 por fila para no dejar hueco. */
+  .rejilla.cuatro {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fotoImg,
+  .flecha,
+  .ver {
+    transition: none;
+  }
+
+  .tarjeta:hover .fotoImg,
+  .tarjeta:hover .flecha {
+    transform: none;
+  }
+}

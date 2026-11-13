@@ -1,16 +1,38 @@
 /*
- * Ficha de la página de modelo SIN FOTO (Ronda 12, 2026-11-08; Ronda 17, 2026-11-09). Un solo
- * contenedor blanco de radio 30 sobre el gris de sección: migas; el logo a la izquierda y el
- * título a la derecha; la descripción con «Pedir cotización» y WhatsApp a su derecha (debajo en
- * móvil); y las baldosas de tipos de repuesto debajo, a todo el ancho.
+ * Ficha de la página de modelo, diseño v2 del cliente (2026-11-13), SIN FOTO de máquina. Un
+ * contenedor blanco de radio 30 con una luz diagonal del color de la marca arriba a la derecha:
+ * migas; el logo, una línea de separación y el modelo con su línea; «Pedir cotización» y WhatsApp a
+ * la derecha desde xl (debajo en pantallas menores); y las categorías de repuestos debajo.
  * Va dentro de `.pagina` de marca: usa `--marca-amarillo` (el color de la marca).
  */
 .ficha {
+  position: relative;
+  isolation: isolate;
   margin: var(--espacio-seccion) max(1.5vw, 12px) 0;
-  padding: clamp(24px, 3.5vw, 48px) clamp(20px, 5vw, 64px) clamp(28px, 3.5vw, 48px);
+  padding: clamp(24px, 3.5vw, 48px) clamp(20px, 3.5vw, 56px) clamp(28px, 3.5vw, 48px);
   overflow: hidden;
   border-radius: 30px;
-  background: var(--color-fondo);
+  background: #fff;
+}
+
+/* La luz: una franja inclinada del color de la marca que se apaga hacia abajo, detrás de todo. */
+.ficha::before {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 22%;
+  display: none;
+  width: 11%;
+  height: 272px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--marca-amarillo, transparent) 33%, transparent) 0%,
+    color-mix(in srgb, var(--marca-amarillo, transparent) 12%, transparent) 45%,
+    transparent 100%
+  );
+  content: "";
+  pointer-events: none;
+  transform: skewX(-32deg);
 }
 
 .migas nav {
@@ -19,22 +41,45 @@
 
 .cabecera {
   display: flex;
-  align-items: center;
-  gap: 28px;
-  margin-top: 20px;
+  flex-direction: column;
+  gap: var(--espacio-interno);
+  margin-top: var(--espacio-interno);
+}
+
+.identidad {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .logo {
   width: auto;
   height: 44px;
-  max-width: 160px;
+  max-width: 170px;
   flex: none;
 }
 
-.titulo {
+.separador {
+  display: none;
+  width: 1px;
+  height: 72px;
+  flex: none;
+  border-radius: 9999px;
+  background: #d4d4d4;
+}
+
+.titular {
   min-width: 0;
+}
+
+.titulo {
   margin: 0;
   color: var(--color-texto);
+  font-size: clamp(30px, 2.6vw, 38px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
   overflow-wrap: break-word;
 }
 
@@ -42,25 +87,17 @@
   white-space: nowrap;
 }
 
-.cuerpo {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 16px 40px;
-  margin-top: 24px;
-}
-
 .linea {
-  max-width: 60ch;
-  margin: 0;
-  color: var(--color-texto);
-  line-height: 1.5;
+  max-width: 34rem;
+  margin: 8px 0 0;
+  color: #56545a;
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 .acciones {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
 }
 
@@ -82,12 +119,13 @@
   transition: background-color 0.3s;
 }
 
+/* #E5242D con texto blanco da 4,6:1 (AA). */
 .botonCotizar {
-  background: var(--color-texto);
+  background: #e5242d;
 }
 
 .botonCotizar:hover {
-  background: #3a3837;
+  background: #c81e26;
 }
 
 /* #0F7B45 con texto blanco da 5,3:1 (AA), como el de los formularios. */
@@ -96,13 +134,57 @@
 }
 
 .botonWhatsapp:hover {
-  background: #0a6e37;
+  background: #0b6438;
 }
 
 .botonCotizar:focus-visible,
 .botonWhatsapp:focus-visible {
   outline: 3px solid var(--color-texto);
   outline-offset: 3px;
+}
+
+@media (min-width: 640px) {
+  .identidad {
+    flex-direction: row;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .logo {
+    height: 52px;
+  }
+
+  .separador {
+    display: block;
+  }
+
+  .acciones {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+@media (min-width: 768px) {
+  .ficha::before {
+    display: block;
+  }
+}
+
+/* Desde xl, los botones a la derecha, en la misma fila que el modelo. */
+@media (min-width: 1280px) {
+  .cabecera {
+    flex-direction: row;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .identidad {
+    flex: 1;
+  }
+
+  .acciones {
+    flex: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -120,42 +202,16 @@
 }
 
 .otrosTitulo {
-  margin: 0 0 16px;
+  margin: 0 0 var(--espacio-interno);
   color: var(--color-texto);
   font-size: var(--texto-titulo-4);
   font-weight: 500;
   line-height: 1.2;
 }
 
-/* Borde fino y visible: las tarjetas se distinguen del fondo (Juan Pablo, #433). */
-.otros ul a {
-  border: 1px solid #c8c8c8;
-}
-
-@media (max-width: 1024px) {
-  .cuerpo {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 @media (max-width: 767px) {
   .ficha {
     margin-top: 24px;
-  }
-
-  /* Si el logo y el título no caben en la misma línea, el logo va encima. */
-  .cabecera {
-    flex-wrap: wrap;
-    gap: 14px 20px;
-  }
-
-  .logo {
-    height: 36px;
-  }
-
-  .acciones {
-    flex-direction: column;
-    align-items: stretch;
   }
 
   .otros {

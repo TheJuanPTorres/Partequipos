@@ -235,3 +235,11 @@ a.enlace:hover .flecha {
     transform: none;
   }
 }
+
+/*
+ * Tras los modelos de la página de tipo viene otra tarjeta blanca (las categorías): sin esto, las
+ * dos quedaban pegadas (hueco 0). Entre secciones manda `--espacio-seccion` (#458).
+ */
+.conSiguiente + section {
+  margin-top: var(--espacio-seccion);
+}

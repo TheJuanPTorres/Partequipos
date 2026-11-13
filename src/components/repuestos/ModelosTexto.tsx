@@ -1,5 +1,4 @@
-import { IconArrowRight } from "@tabler/icons-react";
-
+import type { LogoMarca } from "@/lib/marca/logoMarca";
 import { textoDeBusqueda } from "@/lib/repuestos/fichaModelo";
 import type { GrupoDeModelos } from "@/lib/repuestos/series";
 import type { ModeloEnlace } from "@/lib/repuestos/tipo";
@@ -11,6 +10,8 @@ import { BarraSeries } from "./BarraSeries";
 import { BuscadorModelos } from "./BuscadorModelos";
 import estilos from "./marca.module.css";
 import estilosTexto from "./modelosTexto.module.css";
+import { TarjetaModelo } from "./TarjetaModelo";
+import estilosTarjeta from "./tarjetaModelo.module.css";
 
 /**
  * «MODELOS DE <TIPO> <MARCA>» de la página de tipo, SIN FOTOS (Ronda 12, 2026-11-08: el cliente
@@ -35,6 +36,7 @@ export function ModelosTexto({
   barraSeries = false,
   ayuda = null,
   sinFranja = false,
+  logo = null,
 }: {
   id: string;
   titulo: string;
@@ -47,6 +49,8 @@ export function ModelosTexto({
   sinFranja?: boolean;
   /** R4: el formulario que abre «¿No encuentras tu modelo?». */
   ayuda?: { formulario: ConfigFormulario; anclaContacto: string } | null;
+  /** El logo de la marca (una marca, un solo logo) para las tarjetas de modelo. */
+  logo?: LogoMarca | null;
 }) {
   const idTitulo = `${id}-titulo`;
   const series = (grupos ?? []).flatMap((g) =>
@@ -57,7 +61,7 @@ export function ModelosTexto({
   return (
     <section
       id={id}
-      className={`${estilos.tarjetas} ${estilosTexto.seccion} ${conBarra ? estilos.conBarraSeries : ""} ${sinFranja ? estilosTexto.sinFranja : ""}`}
+      className={`${estilos.tarjetas} ${estilosTexto.seccion} ${conBarra ? estilos.conBarraSeries : ""} ${sinFranja ? `${estilosTexto.sinFranja} ${estilosTexto.conSiguiente}` : ""}`}
       aria-labelledby={idTitulo}
     >
       <h2 id={idTitulo} className={estilos.tituloSeccion}>
@@ -78,12 +82,12 @@ export function ModelosTexto({
                 data-grupo-modelos=""
               >
                 <h3 className={estilosTexto.serie}>{g.titulo}</h3>
-                <RejillaModelos modelos={g.modelos} />
+                <RejillaModelos modelos={g.modelos} logo={logo} />
               </div>
             ))
           ) : (
             <div className={estilosTexto.grupo} data-grupo-modelos="">
-              <RejillaModelos modelos={modelos} />
+              <RejillaModelos modelos={modelos} logo={logo} />
             </div>
           )}
         </>
@@ -95,39 +99,27 @@ export function ModelosTexto({
   );
 }
 
-export function RejillaModelos({ modelos }: { modelos: ModeloEnlace[] }) {
+export function RejillaModelos({
+  modelos,
+  logo = null,
+}: {
+  modelos: ModeloEnlace[];
+  logo?: LogoMarca | null;
+}) {
   return (
-    <ul className={estilosTexto.rejilla}>
-      {modelos.map((m) => {
-        // El modelo en grande (su código: «EX120-2»); debajo, su serie, si la tiene.
-        const contenido = (
-          <>
-            <span className={estilosTexto.nombre}>{m.corto ?? m.nombre}</span>
-            {m.serie ? <span className={estilosTexto.detalle}>Serie {m.serie}</span> : null}
-            {m.href ? (
-              <IconArrowRight
-                aria-hidden="true"
-                focusable="false"
-                size={22}
-                stroke={2}
-                className={estilosTexto.flecha}
-              />
-            ) : null}
-          </>
-        );
-        return (
-          <li key={m.id} className={estilosTexto.tarjeta} data-modelo-busqueda={textoDeBusqueda(m)}>
-            {m.href ? (
-              // El nombre completo como nombre accesible: «Excavadora Hitachi EX120-2», no solo el código.
-              <a href={m.href} aria-label={m.nombre} className={estilosTexto.enlace}>
-                {contenido}
-              </a>
-            ) : (
-              <div className={`${estilosTexto.enlace} ${estilosTexto.sinPagina}`}>{contenido}</div>
-            )}
-          </li>
-        );
-      })}
+    <ul className={estilosTarjeta.rejilla}>
+      {modelos.map((m) => (
+        <li key={m.id} className={estilosTexto.tarjeta} data-modelo-busqueda={textoDeBusqueda(m)}>
+          {/* El nombre completo como nombre accesible: «Excavadora Hitachi EX120-2», no solo el código. */}
+          <TarjetaModelo
+            modelo={m.corto ?? m.nombre}
+            detalle={m.serie ? `Serie ${m.serie}` : null}
+            nombreCompleto={m.nombre}
+            href={m.href}
+            logo={logo}
+          />
+        </li>
+      ))}
     </ul>
   );
 }

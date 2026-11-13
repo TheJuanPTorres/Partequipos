@@ -444,6 +444,11 @@ promote`/`rollback`/`redeploy`, `--prod`, `--target production`; **no** la
   documentación— pueden ir por un fichero `.md` o `.txt`, y se menciona en el
   informe.
 
+  **Si la barrera pide una RUTA LITERAL** (2026-11-12, dirección), repetir el
+  comando con las rutas escritas a mano y sin variables **NO es rodearla** y
+  no requiere permiso. Si con la ruta literal vuelve a bloquear, **se PARA y
+  se avisa a dirección.**
+
 - **Lo que este hook NO ve:** un script que escribe en el Blob con el token
   que tenga el entorno, sin nombrar el almacén en el comando. Así fue la subida
   a producción del 2026-10-01 (§10.37). Eso lo para la **guarda del almacén**,

@@ -187,6 +187,7 @@ export async function PaginaModeloRepuesto({
           id="otros-modelos"
           titulo={`Otros modelos de ${tipoEnTitulo(tipo.nombre)} ${marca.nombre}`}
           modelos={otros}
+          logo={logo}
         />
       </main>
     );

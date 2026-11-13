@@ -18,6 +18,7 @@ import { getEmpresa } from "@/lib/queries/getSeo";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { MEJORAS_ACTIVAS } from "@/lib/repuestos/mejoras";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
+import { logoConAlt } from "@/lib/repuestos/marca";
 import { tarjetasDeCategorias, vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
 import { getSedesDePortada } from "@/lib/queries/getSedes";
@@ -121,6 +122,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
         grupos={gruposDeModelos(tipo, enlaces)}
         vacio={`Todavía no hay modelos publicados para ${nombreTipo} ${marca.nombre}.`}
         barraSeries={MEJORAS_ACTIVAS.R2}
+        logo={logoConAlt(marca)}
         sinFranja
         ayuda={
           MEJORAS_ACTIVAS.R4

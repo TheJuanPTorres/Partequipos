@@ -433,7 +433,7 @@
 .lineaTitulo {
   /* Del título a la cinta, el espacio interno (antes 20 px). */
   margin: 0 0 var(--espacio-interno);
-  padding: 0 1.5vw;
+  padding: 0 min(1.5vw, 24px);
   color: #100f0f;
   font-size: 20px;
   font-weight: 500;
@@ -635,7 +635,7 @@
   position: relative;
   isolation: isolate;
   /* Medio espaciado común a cada lado de la línea: el hueco entre tipos es el común (antes 40 + 40). */
-  margin: calc(var(--espacio-seccion) / 2) 5% 0;
+  margin: calc(var(--espacio-seccion) / 2) max(5%, calc((100% - 2200px) / 2)) 0;
   padding-top: calc(var(--espacio-seccion) / 2);
   border-top: 1px solid rgb(0 0 0 / 0.12);
   scroll-margin-top: 96px;
@@ -647,7 +647,8 @@
  * la cabecera de la página.
  */
 .tipos > .seccion:first-child {
-  margin-top: var(--espacio-seccion);
+  /* El borde de arriba de la sección suma 1 px al hueco medido. */
+  margin-top: calc(var(--espacio-seccion) - 1px);
   padding-top: var(--espacio-interno);
 }
 

@@ -134,7 +134,7 @@ export function RejillaTarjetas({
                   logo={t.logo}
                   alt=""
                   fill
-                  sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
+                  sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 34vw"
                   className={`${estilos.fotoImg} ${estilos.fotoLogo}`}
                 />
               </div>
@@ -144,7 +144,7 @@ export function RejillaTarjetas({
                   src={t.imagen.url}
                   alt=""
                   fill
-                  sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
+                  sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 34vw"
                   className={estilos.fotoImg}
                   style={{ objectPosition: t.imagen.posicion }}
                 />

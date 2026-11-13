@@ -480,7 +480,7 @@ a.pildora:hover {
   --rejilla-relleno: 82px;
   /* Asoma bajo las esquinas redondeadas del amarillo. */
   margin-top: -50px;
-  margin-bottom: max(0px, calc(var(--espacio-seccion) - 31px));
+  margin-bottom: max(0px, calc(var(--espacio-seccion) - 32px));
   /* 50 de solape bajo el amarillo + 48 de aire; 48 abajo (criterio de espacios, 2026-11-09). */
   padding: 98px 82px 48px;
   border-radius: 0 0 var(--marca-radio) var(--marca-radio);

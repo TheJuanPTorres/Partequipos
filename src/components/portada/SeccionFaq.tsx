@@ -96,16 +96,19 @@ export function SeccionFaq({ preguntas, imagen, textos }: Props) {
                 <span className={`${estilos.pregunta} texto-destacado`}>{p.pregunta}</span>
                 <span className={estilos.indicador} aria-hidden="true" />
               </summary>
-              <div className={`${estilos.respuesta} texto-cuerpo`}>
-                {partesDeRespuesta(p.respuesta).map((parte, i) =>
-                  typeof parte === "string" ? (
-                    parte
-                  ) : (
-                    <Link key={i} href={parte.href} className={estilos.enlace}>
-                      {parte.texto}
-                    </Link>
-                  ),
-                )}
+              {/* La caja que se encoge a cero: el alto de la respuesta se anima en CSS. */}
+              <div className={estilos.respuestaCaja}>
+                <div className={`${estilos.respuesta} texto-cuerpo`}>
+                  {partesDeRespuesta(p.respuesta).map((parte, i) =>
+                    typeof parte === "string" ? (
+                      parte
+                    ) : (
+                      <Link key={i} href={parte.href} className={estilos.enlace}>
+                        {parte.texto}
+                      </Link>
+                    ),
+                  )}
+                </div>
               </div>
             </details>
           ))}

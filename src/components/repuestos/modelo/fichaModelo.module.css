@@ -6,7 +6,7 @@
  * Va dentro de `.pagina` de marca: usa `--marca-amarillo` (el color de la marca).
  */
 .ficha {
-  margin: 48px max(1.5vw, 12px) 0;
+  margin: var(--espacio-seccion) max(1.5vw, 12px) 0;
   padding: clamp(24px, 3.5vw, 48px) clamp(20px, 5vw, 64px) clamp(28px, 3.5vw, 48px);
   overflow: hidden;
   border-radius: 30px;
@@ -115,7 +115,7 @@
 /* --- Otros modelos -------------------------------------------------------------------------- */
 
 .otros {
-  margin: 48px max(1.5vw, 12px) 0;
+  margin: var(--espacio-seccion) max(1.5vw, 12px) 0;
   padding: 0 4px 0;
 }
 

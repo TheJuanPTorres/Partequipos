@@ -6,7 +6,7 @@
 .seccion {
   width: 100%;
   max-width: 1100px;
-  margin: 24px auto 48px;
+  margin: 24px auto var(--espacio-seccion);
   padding: 0 20px;
   box-sizing: border-box;
 }
@@ -30,6 +30,6 @@
 
 @media (max-width: 767px) {
   .seccion {
-    margin: 24px auto 32px;
+    margin: 24px auto var(--espacio-seccion);
   }
 }

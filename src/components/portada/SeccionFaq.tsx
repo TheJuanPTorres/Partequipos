@@ -1,6 +1,7 @@
 import { IconHelpCircle } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { EnlaceContacto } from "@/components/forms/EnlaceContacto";
 
 import { Revelado } from "@/components/movimiento/Revelado";
@@ -84,7 +85,8 @@ export function SeccionFaq({ preguntas, imagen, textos }: Props) {
             </div>
           ) : null}
         </div>
-        <div className={estilos.der}>
+        {/* `--faq-n`: cuántas preguntas hay, para reservar el alto de la lista cerrada (CSS). */}
+        <div className={estilos.der} style={{ "--faq-n": preguntas.length } as CSSProperties}>
           {preguntas.map((p) => (
             <details key={p.id} name="portada-faq" className={estilos.item}>
               <summary className={estilos.cabecera}>

@@ -237,10 +237,10 @@ section.principal[data-con-izquierda] {
   }
 }
 
-/* Recortada: el final se funde con el fondo, para que se vea que sigue. */
+/* Recortada: la última línea se funde con el fondo, para que se vea que sigue (solo una: con 2, una caja de 2 líneas quedaba en blanco). */
 .envoltura[data-cortado] .descripcion {
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2lh), transparent);
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 2lh), transparent);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1lh), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 1lh), transparent);
 }
 
 /* El sitio de «Leer más», reservado aunque no salga; pegado al texto. */

@@ -72,11 +72,13 @@
 }
 
 /*
- * REPARTO EN ESCRITORIO (dirección, 2026-10-21): la derecha (migas, título,
- * descripción y botones) era mucho más alta que la galería y dejaba un hueco
- * bajo la foto. Ahora la izquierda lleva la galería y, debajo, las
- * características; las dos columnas se centran en vertical. En el HTML la
- * derecha va primero (el <h1> antes que la galería): la rejilla la coloca.
+ * REPARTO EN ESCRITORIO (dirección, 2026-11-12): a la izquierda, la galería; a
+ * la derecha, ARRIBA y de arriba abajo, las migas y el título, las
+ * características, la descripción y los botones. La derecha nunca es más alta
+ * que la foto: la descripción y los botones (`.envoltura`) no aportan su alto a
+ * la fila, así que la fila la marca la galería y la descripción se recorta en lo
+ * que quede, con «Leer más» (`DescripcionPlegable`). En el HTML la derecha va
+ * primero (el <h1> antes que la galería): la rejilla la coloca.
  */
 section.principal[data-con-izquierda] {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -90,50 +92,62 @@ section.principal[data-con-izquierda] {
 .principal[data-con-izquierda] .columnaTexto {
   grid-column: 2;
   grid-row: 1;
-  /* Más ancho para el título que en la V2: «CASE CONSTRUCTION» cabe en una línea. */
-  padding: 4.7cqi 3.5cqi 4.7cqi 1cqi;
+  /* Arriba, a la altura de la foto (el relleno de la galería); a la derecha, el de la tarjeta. */
+  padding: 2.82cqi 3.5cqi 2.82cqi 1cqi;
 }
 
 .columnaTexto {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
-  gap: 20px;
+  gap: var(--espacio-interno);
   padding: 4.7cqi;
+  /* Las características se reparten por el ancho de la columna (2 o 3 por fila). */
+  container-type: inline-size;
 }
 
 .columnaIzquierda {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 4px;
   padding-bottom: 2.82cqi;
 }
 
 /*
- * LAS CARACTERÍSTICAS (dirección, 2026-10-21): cada tarjeta en DOS líneas
- * exactas, el nombre y el valor, todas con el mismo alto y el contenido
- * centrado en vertical. Reparto: 3 por fila y la última fila se reparte el
- * ancho entero (con 5, 3 + 2 a mitad y mitad; con 3, una fila); con 4, 2 + 2
- * (dirección). En móvil, 2 por fila y la impar del final a todo el ancho.
- * Rejilla de 6 columnas: cada tarjeta ocupa 2, las dos últimas de una fila de
- * dos ocupan 3 y la sola, 6. El ancho no depende del texto, así que al llegar
- * Inter nada se mueve (CLS); lo que no cabe se corta con «…» (`PastillaDato`).
+ * LAS CARACTERÍSTICAS (dirección, 2026-11-12): en la columna derecha, 2 por fila
+ * y 3 si la columna da para ello; la impar del final, a todo el ancho. El
+ * nombre y el valor se PARTEN en líneas si no caben («Profundidad máxima de
+ * excavación» entera, sin «…»). Todas las tarjetas de una fila, del mismo alto.
  */
 .principal .datos {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  width: auto;
+  width: 100%;
   margin: 0;
-  padding: 0 2.82cqi;
+  padding: 0;
+}
+
+@container (min-width: 560px) {
+  .principal .datos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .principal .datos li:nth-child(3n + 1):last-child {
+    grid-column: 1 / -1;
+  }
+
+  .principal .datos li:nth-child(3n + 1):nth-last-child(2),
+  .principal .datos li:nth-child(3n + 2):last-child {
+    grid-column: span 1;
+  }
 }
 
 .principal .datos li {
-  grid-column: span 2;
   min-width: 0;
   min-height: 0;
   align-items: center;
@@ -143,26 +157,14 @@ section.principal[data-con-izquierda] {
   line-height: 1.35;
 }
 
-/* Última fila de dos: mitad y mitad. */
-.principal .datos li:nth-child(3n + 1):nth-last-child(2),
-.principal .datos li:nth-child(3n + 2):last-child {
-  grid-column: span 3;
-}
-
-/* Última fila de una: todo el ancho. */
-.principal .datos li:nth-child(3n + 1):last-child {
-  grid-column: 1 / -1;
-}
-
-/* Con 4, 2 + 2 (dirección): no 3 + 1. En móvil ya van de 2 en 2. */
-@media (min-width: 768px) {
-  .principal .datos li:first-child:nth-last-child(4),
-  .principal .datos li:first-child:nth-last-child(4) ~ li {
-    grid-column: span 3;
+/* De 2 en 2, la impar del final a todo el ancho. */
+@container (max-width: 559.98px) {
+  .principal .datos li:nth-child(odd):last-child {
+    grid-column: 1 / -1;
   }
 }
 
-/* El icono, centrado con las dos líneas. */
+/* El icono, centrado con las líneas. */
 .principal .datos li > svg {
   height: 1.35em;
   align-self: center;
@@ -172,11 +174,91 @@ section.principal[data-con-izquierda] {
   min-width: 0;
 }
 
-/* Cada línea, entera si cabe y con «…» si no. */
+/* Cada línea se parte si no cabe: nada se corta. */
 .dosLineas > * {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  hyphens: manual;
+}
+
+/*
+ * LA DESCRIPCIÓN Y LOS BOTONES (`DescripcionPlegable`). En escritorio, con galería,
+ * la envoltura no aporta su alto a la fila (`contain: size`): ocupa lo que la
+ * foto deje bajo el título y las características, con un mínimo de unas líneas y
+ * los botones. Dentro, la descripción se encoge (y se recorta) y los botones van
+ * justo debajo; si sobra sitio, queda abajo, no entre el texto y los botones.
+ */
+.envoltura {
+  display: flex;
+  align-self: stretch;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espacio-interno);
+}
+
+.envoltura:not([data-con-descripcion]) {
+  display: contents;
+}
+
+@media (min-width: 1025px) {
+  .principal[data-con-izquierda] .envoltura[data-con-descripcion]:not([data-abierto]) {
+    flex: 1 1 auto;
+    contain: size;
+    /* Unas 5 líneas de texto, «Leer más» y los botones. */
+    contain-intrinsic-block-size: calc(5lh + 140px);
+    min-height: calc(5lh + 140px);
+  }
+
+  .principal[data-con-izquierda] .envoltura:not([data-abierto]) .descripcion {
+    flex: 0 1 auto;
+    min-height: 3lh;
+    overflow: hidden;
+  }
+
+  .envoltura > :not(.descripcion) {
+    flex: none;
+  }
+}
+
+/* En tablet y móvil, la descripción se pliega a unas líneas. */
+@media (max-width: 1024px) {
+  .envoltura:not([data-abierto]) .descripcion {
+    max-height: 8lh;
+    overflow: hidden;
+  }
+}
+
+/* Recortada: el final se funde con el fondo, para que se vea que sigue. */
+.envoltura[data-cortado] .descripcion {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2lh), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 2lh), transparent);
+}
+
+/* El sitio de «Leer más», reservado aunque no salga; pegado al texto. */
+.ranuraLeerMas {
+  min-height: calc(1lh + 8px);
+  margin-top: calc(var(--espacio-interno) * -0.5);
+}
+
+/* «Leer más»: un enlace de texto, en el rojo de la marca, con el foco visible. */
+.leerMas {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--color-marca);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.leerMas:hover {
+  color: var(--color-texto);
+}
+
+.leerMas:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
 }
 
 .dosLineas b {
@@ -408,7 +490,8 @@ section.principal[data-con-izquierda] {
   section.principal {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--espacio-interno);
+    padding-bottom: 4.7cqi;
   }
 
   .columnaTexto,
@@ -429,9 +512,16 @@ section.principal[data-con-izquierda] {
     padding: 0 4.7cqi;
   }
 
+  /* Galería, título, características, descripción y botones (dirección, 2026-11-12). */
   .principal .datos {
     order: 3;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: auto;
     padding: 0 4.7cqi;
+  }
+
+  .principal .datos li:nth-child(3n + 1):last-child {
+    grid-column: 1 / -1;
   }
 
   .solo360 {
@@ -440,15 +530,19 @@ section.principal[data-con-izquierda] {
     padding: 0 4.7cqi;
   }
 
-  .principal .botones {
-    order: 4;
-    margin: 0;
+  .envoltura {
+    order: 5;
     padding: 0 4.7cqi;
   }
 
-  .descripcion {
-    order: 5;
-    padding: 0 4.7cqi 4.7cqi;
+  .principal .botones {
+    order: 6;
+    margin: 0;
+  }
+
+  /* Sin descripción, los botones van sueltos en la tarjeta: con su relleno. */
+  .envoltura:not([data-con-descripcion]) .botones {
+    padding: 0 4.7cqi;
   }
 
   /* La píldora de las migas de la V2 en tablet y móvil es para ir sobre la foto desenfocada. */

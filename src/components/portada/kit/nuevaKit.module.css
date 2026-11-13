@@ -417,9 +417,15 @@
 
 /* Con distribuidor (LiuGong): la misma caja de logo que las demás y, debajo, «Distribuido por». */
 .logoConDistribuidor {
+  top: 4%;
   height: auto;
   flex-direction: column;
   gap: 4px;
+}
+
+/* Un poco más pequeño, para que «Distribuido por» quede por encima de la máquina, como el diseño. */
+.logoConDistribuidor .logoFijo {
+  width: 86%;
 }
 
 /*

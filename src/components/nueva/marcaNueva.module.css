@@ -114,7 +114,7 @@ a.enlaceFranja:focus-visible {
 
 /* Medio espaciado común a cada lado de la línea (antes 40 + 40; criterio de espacios, 2026-11-09). */
 .seccionTipo {
-  margin: calc(var(--espacio-seccion) / 2) 5% 0;
+  margin: calc(var(--espacio-seccion) / 2) max(5%, calc((100% - 2200px) / 2)) 0;
   padding-top: calc(var(--espacio-seccion) / 2);
   border-top: 1px solid rgb(0 0 0 / 12%);
 }

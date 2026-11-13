@@ -116,7 +116,7 @@
 
 .otros {
   margin: 48px max(1.5vw, 12px) 0;
-  padding: 0 4px 48px;
+  padding: 0 4px 0;
 }
 
 .otrosTitulo {
@@ -159,6 +159,6 @@
   }
 
   .otros {
-    padding: 0 0 24px;
+    padding: 0;
   }
 }

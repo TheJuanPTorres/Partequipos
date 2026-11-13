@@ -490,6 +490,14 @@
   height: 62%;
 }
 
+/*
+ * Con distribuidor (LiuGong), la máquina más baja (dirección, 2026-11-13): con el logo y la línea
+ * «Distribuido por» encima, el brazo de la excavadora rozaba esa línea. Apoyada abajo, igual.
+ */
+.panel[data-distribuidor] .maquina {
+  height: 54%;
+}
+
 .maquinaImagen {
   object-fit: contain;
   object-position: 50% 100%;

@@ -225,6 +225,7 @@ function Tarjeta({ marca: m, paisaje }: { marca: TarjetaMarca; paisaje: ImagenLi
         className={estilos.panel}
         style={estiloPanel}
         data-claro={m.panel.claro ? "" : undefined}
+        data-distribuidor={m.distribuidor ? "" : undefined}
       >
         <span aria-hidden="true" className={estilos.luz} />
         {abajo ? (

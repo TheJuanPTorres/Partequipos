@@ -7,13 +7,13 @@
 
 /* Menos aire que la sección con fotos: aquí no hay imágenes que sostener. */
 .seccion {
-  padding-bottom: 96px;
+  padding-bottom: 48px;
 }
 
 /* Bajo la cabecera roja: una tarjeta blanca propia, sin el solape con la franja de la marca. */
 .seccion.sinFranja {
   margin: 24px max(1.5vw, 12px) 0;
-  padding-top: 64px;
+  padding-top: 48px;
   border-radius: 30px;
 }
 
@@ -197,7 +197,7 @@ a.enlace:hover .flecha {
 
 @media (max-width: 767px) {
   .seccion {
-    padding-bottom: 64px;
+    padding-bottom: 32px;
   }
 
   .rejilla {

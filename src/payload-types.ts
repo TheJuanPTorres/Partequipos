@@ -349,9 +349,25 @@ export interface MarcasMaquinaria {
   id: number;
   nombre: string;
   /**
-   * Aquí va la máquina recortada de la tarjeta de esta marca en la portada. La tarjeta lleva el color y el logo de la marca (el de su baldosa si la tiene), esta máquina sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.
+   * La tarjeta de esta marca en la portada: su color, su logo (a color o en blanco), la máquina recortada sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.
    */
   portada?: {
+    /**
+     * El fondo de la tarjeta, arriba a la izquierda. Vacío: blanco. Sobre un color claro, la franja de luz y los textos van oscuros.
+     */
+    colorPanel?: string | null;
+    /**
+     * Abajo a la derecha. Vacío: el mismo color, un poco más claro (u oscuro si es claro).
+     */
+    colorPanelFin?: string | null;
+    /**
+     * Solo si «Logo de la tarjeta» está vacío: el logo de la marca de todo el sitio, tal cual o en blanco (para colores oscuros).
+     */
+    logoVariante?: ('original' | 'blanco') | null;
+    /**
+     * Se pinta tal cual, con su color, en la caja del logo (todos al mismo tamaño visual). Vacío: el logo del sitio, como diga el campo de arriba.
+     */
+    logo?: (number | null) | Media;
     /**
      * La máquina recortada, de perfil y sin fondo (900 px de ancho o más). Decorativa. Vacía, la tarjeta lleva la foto de la marca.
      */
@@ -3016,6 +3032,10 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
   portada?:
     | T
     | {
+        colorPanel?: T;
+        colorPanelFin?: T;
+        logoVariante?: T;
+        logo?: T;
         maquina?: T;
         distribuidorNombre?: T;
         distribuidorLogo?: T;

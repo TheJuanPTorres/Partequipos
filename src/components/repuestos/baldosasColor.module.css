@@ -6,7 +6,7 @@
 
 .seccion {
   display: flex;
-  padding: 24px 12px 12px;
+  padding: 24px 12px 0;
   flex-direction: column;
   gap: 12px;
 }
@@ -178,7 +178,7 @@
 
 @media (min-width: 640px) {
   .seccion {
-    padding: 24px 20px 20px;
+    padding: 24px 20px 0;
     gap: 16px;
   }
 
@@ -218,7 +218,7 @@
 
 @media (min-width: 1024px) {
   .seccion {
-    padding: 24px min(1.5vw, 24px) min(1.5vw, 24px);
+    padding: 24px min(1.5vw, 24px) 0;
     gap: min(1.5vw, 24px);
   }
 

@@ -1,6 +1,6 @@
 /*
  * Categorías de repuestos de la ficha de modelo, diseño v2 (2026-11-13). Dentro de `.pagina` de
- * marca: el color es `--marca-amarillo`. El panel es un tono muy claro de ese color (las fotos con
+ * marca: el color es `--marca-amarillo`. El panel es un tono SUAVE de ese color (mezcla con blanco, nunca un color fijo) (las fotos con
  * fondo blanco se funden con él al multiplicar).
  */
 
@@ -57,8 +57,8 @@
   overflow: hidden;
   background: linear-gradient(
     150deg,
-    color-mix(in srgb, var(--marca-amarillo, #d0d0d0) 14%, #fff) 0%,
-    color-mix(in srgb, var(--marca-amarillo, #d0d0d0) 30%, #fff) 100%
+    color-mix(in srgb, var(--marca-amarillo, #d0d0d0) 8%, #fff) 0%,
+    color-mix(in srgb, var(--marca-amarillo, #d0d0d0) 17%, #fff) 100%
   );
 }
 
@@ -70,7 +70,7 @@
   height: 85%;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--marca-amarillo, #d0d0d0) 40%, #fff) 0%,
+    color-mix(in srgb, var(--marca-amarillo, #d0d0d0) 22%, #fff) 0%,
     transparent 100%
   );
   transform: skewX(-30deg);

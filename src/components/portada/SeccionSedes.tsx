@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { ETIQUETA_TIPO, urlGoogleMaps, type SedeLista } from "@/lib/portada/sedes";
+import { ETIQUETA_TIPO, type SedeLista } from "@/lib/portada/sedes";
 
 import { GloboSedes } from "./diferidos";
 import estilos from "./sedes.module.css";
@@ -59,7 +59,7 @@ function Ficha({ sede, i }: { sede: SedeLista; i: number }) {
               ) : null}
               <a
                 className={estilos.verMapa}
-                href={urlGoogleMaps(l.direccion, sede.ciudad)}
+                href={l.mapa.href}
                 target="_blank"
                 rel="noopener noreferrer"
               >

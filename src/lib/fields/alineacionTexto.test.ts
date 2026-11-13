@@ -1,7 +1,24 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { alineacionDeTexto, anchoDeTexto, escalaDeMaquina, lineasDeTexto } from "./alineacionTexto";
+import {
+  alineacionDeTexto,
+  alineacionDeTitulo,
+  anchoDeTexto,
+  escalaDeMaquina,
+  lineasDeTexto,
+} from "./alineacionTexto";
+
+describe("alineacionDeTitulo", () => {
+  it("acepta izquierda, centrado y justificado", () => {
+    for (const a of ["left", "center", "justify"]) assert.equal(alineacionDeTitulo(a), a);
+  });
+  it("cae al centro con vacío, «derecha» o un valor desconocido", () => {
+    assert.equal(alineacionDeTitulo(undefined), "center");
+    assert.equal(alineacionDeTitulo(null), "center");
+    assert.equal(alineacionDeTitulo("right"), "center");
+  });
+});
 
 describe("alineacionDeTexto", () => {
   it("acepta las cuatro alineaciones", () => {

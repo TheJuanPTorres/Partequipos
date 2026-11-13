@@ -8,9 +8,10 @@
  */
 
 .pie {
-  /* El hueco sobre la tarjeta roja: el espaciado común (antes 70 px más el 4 % del ancho del
-     relleno de `.marco`: 128 px a 1440 y 173 a 2560, medido). */
-  --pie-margen: var(--espacio-seccion);
+  /* El hueco sobre la tarjeta roja: el ESPACIO INTERNO (16–32 px), en todas las páginas (clienta
+     y Juan Pablo, 2026-11-12: menos aire sobre el bloque rojo; antes el común entero, y antes
+     70 px más el 4 % del ancho del relleno de `.marco`). Sin tarjeta roja, el común entero (abajo). */
+  --pie-margen: var(--espacio-interno);
   --pie-radio: 30px;
 
   margin-top: var(--pie-margen);
@@ -42,9 +43,9 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  /* Algo menos de relleno que el export (7 % · 6 %), sin apretar el texto ni el boton, y con
-     techo: a 3840 el porcentaje daba más de 170 px. */
-  padding: clamp(20px, 5%, 64px) 5% clamp(20px, 4.5%, 58px);
+  /* Arriba y abajo, el hueco interno (16–32 px; Juan Pablo, 2026-11-12). Antes hasta 64 · 58, y
+     en el export el 7 % · 6 %. */
+  padding: var(--espacio-interno) 5%;
   border-radius: var(--pie-radio);
   background: var(--color-marca); /* global `primary` */
   color: var(--color-fondo); /* global `099f28a` */
@@ -101,7 +102,8 @@
  */
 @media (min-width: 1025px) and (max-width: 1279px) {
   .pie[data-con-imagen] {
-    margin-top: calc(var(--pie-margen) + 100px);
+    /* La reserva no baja con `--pie-margen`: es la medida con `qa:vuelo-pie`. */
+    margin-top: calc(var(--espacio-seccion) + 100px);
   }
 }
 
@@ -112,6 +114,11 @@
  */
 :global(body:has([data-pie-sin-tarjeta])) .marco {
   display: none;
+}
+
+/* Sin bloque rojo no hay nada que acercar: el panel del pie queda al común entero, como antes. */
+:global(body:has([data-pie-sin-tarjeta])) .pie {
+  --pie-margen: var(--espacio-seccion);
 }
 
 :global(body:has([data-pie-sin-tarjeta])) .pie[data-con-imagen] {

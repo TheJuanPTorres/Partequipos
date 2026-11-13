@@ -260,7 +260,8 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    // Sin relleno abajo: el aire hasta el pie ya es el común (antes, 40 px de más: 67–91).
+    <main className="mx-auto max-w-4xl px-4 pt-10">
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       {/* /contactanos/ ya tiene su formulario: el pie no pinta la tarjeta roja. */}
       {clave === SLUG_CONTACTO ? <PieSinTarjeta /> : null}

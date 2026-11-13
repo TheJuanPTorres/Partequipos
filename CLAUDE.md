@@ -274,6 +274,16 @@ docs/
 - Formularios: Server Actions + validación con Zod en el servidor.
   Validar en cliente es cortesía, no seguridad.
 - Imágenes siempre con `next/image` y dimensiones explícitas.
+- **Espaciado: dos tokens, nunca un número a mano** (`src/app/(site)/globals.css`;
+  regla fija de Juan Pablo, 2026-11-12, para todos los agentes):
+  - **`--espacio-seccion`** (24–48 px): el hueco ENTRE dos secciones, una sola
+    vez. Lo mide `npm run qa:huecos`.
+  - **`--espacio-interno`** (16 px a 390, 22 a 768 y 32 como mucho desde
+    1125 px, también en pantallas gigantes): los huecos DENTRO de una sección:
+    del título al contenido, del contenido al borde de su contenedor y de los
+    botones al borde. También es el hueco sobre el bloque rojo del pie.
+  - Nada que crezca con `vw`, `vh`, `%` o `min-height` sin techo, y nada debe
+    tocarse ni cortarse (texto, máquinas, botones).
 - Sin `console.log` en el código entregado. Los errores van a `console.error`
   con prefijo de área (`[revalidación]`, `[redirects]`, `[proxy]`), y de ahí a
   los **registros de Vercel**. **NO hay Sentry** (§10.31), así que nadie recibe

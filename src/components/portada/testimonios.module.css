@@ -7,7 +7,9 @@
   display: flex;
   /* Arriba y abajo, medio espaciado común: con la sección de al lado suman el común; a los lados,
      el 3 % con techo (llegaba a 115 px a 3840). */
-  padding: calc(var(--espacio-seccion) / 2) min(3%, 48px);
+  /* Arriba, 1 px menos: tras el contacto de repuestos el hueco medía 49 (25 a 390), 1 px sobre el
+     común (medido en las páginas de marca, 2026-11-12). */
+  padding: calc(var(--espacio-seccion) / 2 - 1px) min(3%, 48px) calc(var(--espacio-seccion) / 2);
   flex-direction: column;
   align-items: center;
   /* Del título a los vídeos, el hueco interno (16–32 px; antes el común, y antes 60 + 20). */

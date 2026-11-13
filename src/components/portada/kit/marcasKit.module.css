@@ -99,6 +99,11 @@
   .titulo {
     font-size: clamp(2.2rem, 3.3cqw, 4rem);
   }
+
+  /* Sin antetítulo, el título es lo primero del panel: sus 8 px se sumaban al hueco interno. */
+  .titulo:first-child {
+    margin-top: 0;
+  }
 }
 
 .resaltado {
@@ -381,7 +386,9 @@
   .seccion[data-espejo] .carrusel {
     padding-right: 5%;
     padding-left: 0;
-    mask-image: none;
+    /* Como en la otra banda: los logos se funden antes de llegar al botón de pausa (sin esto, un
+       logo pasaba por debajo del botón; medido a 1440). */
+    mask-image: linear-gradient(270deg, transparent, #000 8%);
   }
 
   .seccion[data-espejo] .caja {

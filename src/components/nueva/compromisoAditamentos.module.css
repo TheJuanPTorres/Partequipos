@@ -41,7 +41,9 @@
   }
 }
 
+/* Ancho de lectura (Juan Pablo, 2026-11-13): unos 65 caracteres por línea como mucho, en todos los anchos. */
 .texto p {
+  max-width: 65ch;
   margin: 0;
   color: var(--color-texto-suave);
 }

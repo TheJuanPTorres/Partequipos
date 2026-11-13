@@ -1,0 +1,119 @@
+/*
+ * «NUESTRO COMPROMISO…» DE ADITAMENTOS (2026-11-13): tarjeta blanca sobre el gris de la página,
+ * texto a la izquierda y foto a la derecha. Sin la franja de servicios encima, esta sección lleva
+ * el común entero arriba (antes: medio común de la franja y medio de aquí) y medio abajo, como la
+ * de repuestos, para las sedes. Dentro, `--espacio-interno`.
+ */
+.seccion {
+  padding: var(--espacio-seccion) min(3%, 48px) calc(var(--espacio-seccion) / 2);
+  background: var(--color-fondo-seccion);
+}
+
+.tarjeta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1680px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 30px;
+  background: var(--color-fondo);
+}
+
+@media (min-width: 768px) {
+  .tarjeta[data-con-foto] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.texto {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--espacio-interno);
+  padding: min(5%, 64px);
+}
+
+@media (max-width: 767px) {
+  .texto {
+    padding: 24px 20px;
+  }
+}
+
+.texto p {
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+.titulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: var(--texto-titulo-3);
+  font-weight: 500;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.entradilla strong {
+  color: var(--color-texto);
+  font-weight: 600;
+}
+
+/* La foto, a todo el alto de la tarjeta en escritorio; en móvil, una banda debajo del texto. */
+.foto {
+  position: relative;
+  min-width: 0;
+  min-height: 260px;
+}
+
+.fotoImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (min-width: 768px) {
+  .foto {
+    min-height: 0;
+  }
+
+  .fotoImg {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .fotoImg {
+    aspect-ratio: 1 / 1;
+    height: auto;
+  }
+}
+
+/* El botón de la plantilla: rojo de la marca, como «Solicita asesoría» de repuestos. */
+.boton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 28px;
+  border-radius: 8px;
+  background: var(--color-marca);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.boton:hover {
+  background: var(--color-texto);
+  color: #fff;
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}

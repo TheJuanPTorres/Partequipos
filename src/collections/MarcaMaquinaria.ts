@@ -211,11 +211,29 @@ export const MarcaMaquinaria: CollectionConfig = {
           admin: { description: "El título principal (h1) de la página." },
         },
         {
+          // La franja de servicios se quitó de la página (dirección, 2026-11-13). Los campos se
+          // quedan (sin migración que borre datos), ocultos y marcados: no se pintan en ningún sitio.
           type: "row",
+          admin: { condition: () => false },
           fields: [
-            { name: "franja1", type: "text", label: "Franja: texto 1", defaultValue: T.franja[0] },
-            { name: "franja2", type: "text", label: "Franja: texto 2", defaultValue: T.franja[1] },
-            { name: "franja3", type: "text", label: "Franja: texto 3", defaultValue: T.franja[2] },
+            {
+              name: "franja1",
+              type: "text",
+              label: "Franja: texto 1 (ya no se usa)",
+              defaultValue: "Maquinaria pesada",
+            },
+            {
+              name: "franja2",
+              type: "text",
+              label: "Franja: texto 2 (ya no se usa)",
+              defaultValue: "Servicio técnico",
+            },
+            {
+              name: "franja3",
+              type: "text",
+              label: "Franja: texto 3 (ya no se usa)",
+              defaultValue: "Repuestos de calidad",
+            },
           ],
         },
         {
@@ -242,6 +260,18 @@ export const MarcaMaquinaria: CollectionConfig = {
           label: "«Nuestro compromiso»: texto del botón",
           defaultValue: T.compromisoBoton,
           admin: { description: "El botón abre el formulario de contacto." },
+        },
+        {
+          // «foto» y no «compromisoImagen»: con el nombre largo, su clave foránea pasaba de los
+          // 63 bytes de Postgres (y `dbName` no se aplica a una subida dentro de un grupo).
+          name: "foto",
+          type: "upload",
+          relationTo: "media",
+          label: "«Nuestro compromiso»: foto",
+          admin: {
+            description:
+              "La foto a la derecha del texto (en el móvil, debajo). Cuadrada o apaisada, de 1000 px o más. Vacía, el texto ocupa toda la tarjeta.",
+          },
         },
       ],
     },

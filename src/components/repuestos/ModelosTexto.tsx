@@ -61,7 +61,7 @@ export function ModelosTexto({
   return (
     <section
       id={id}
-      className={`${estilos.tarjetas} ${estilosTexto.seccion} ${conBarra ? estilos.conBarraSeries : ""} ${sinFranja ? estilosTexto.sinFranja : ""}`}
+      className={`${estilos.tarjetas} ${estilosTexto.seccion} ${conBarra ? estilos.conBarraSeries : ""} ${sinFranja ? `${estilosTexto.sinFranja} ${estilosTexto.conSiguiente}` : ""}`}
       aria-labelledby={idTitulo}
     >
       <h2 id={idTitulo} className={estilos.tituloSeccion}>

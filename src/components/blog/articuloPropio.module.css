@@ -737,3 +737,8 @@
 .relacionados:last-child {
   padding-bottom: 0;
 }
+
+/* El interlineado de «Ver todo el blog» sumaba 2 px al común del pie (50 desde 1440, medido). */
+.relacionados:last-child .verTodos {
+  margin-bottom: -2px;
+}

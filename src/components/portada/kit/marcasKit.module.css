@@ -369,3 +369,49 @@
     left: auto;
   }
 }
+
+/*
+ * Ronda 12, t5 (2026-11-12): en móvil y tablet, el común entre las tarjetas del kit. El panel es
+ * blanco sobre blanco, así que el hueco visible va del borde de la sección de encima (12 px de
+ * relleno abajo hasta 639, 20 desde 640) al título de esta. Medido a 390 · 768 · 1010:
+ * usados → marcas daba 41 · 48 · 48, repuestos → marcas de repuestos 37 · 45 · 45 (común:
+ * 24 · 33 · 38). La pausa, lo último del panel, sumaba sus 20 px al relleno de abajo de la
+ * sección: 32 · 40 · 40 hasta repuestos y 40 · 47 · 45 hasta «Nuestra Compañía».
+ * Los descuentos fijos son ese relleno de la sección de encima y el interlineado del título
+ * (4–5 px) o, en el espejo, del antetítulo (1 px) y el aire de la marquesina de la compañía (7 px).
+ */
+@media (max-width: 1024px) {
+  .cabecera {
+    padding-top: max(0px, calc(var(--espacio-seccion) - 17px));
+  }
+
+  .seccion[data-espejo] .cabecera {
+    padding-top: max(0px, calc(var(--espacio-seccion) - 13px));
+  }
+
+  .panel .pausa {
+    margin-bottom: max(0px, calc(var(--espacio-seccion) - 12px));
+  }
+
+  .seccion[data-espejo] .panel .pausa {
+    margin-bottom: max(0px, calc(var(--espacio-seccion) - 20px));
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1024px) {
+  .cabecera {
+    padding-top: max(0px, calc(var(--espacio-seccion) - 25px));
+  }
+
+  .seccion[data-espejo] .cabecera {
+    padding-top: max(0px, calc(var(--espacio-seccion) - 21px));
+  }
+
+  .panel .pausa {
+    margin-bottom: max(0px, calc(var(--espacio-seccion) - 20px));
+  }
+
+  .seccion[data-espejo] .panel .pausa {
+    margin-bottom: max(0px, calc(var(--espacio-seccion) - 27px));
+  }
+}

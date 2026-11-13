@@ -352,6 +352,16 @@ oficial, no lo pongas.
   de 1080 × 1620.
 - Cada sección de la portada tiene su bloque en esa página. Lo que dejes vacío
   no se pinta.
+- **Los espacios no se eligen en el panel.** La separación entre secciones y
+  los huecos de dentro de cada una (del título al contenido, del contenido al
+  borde y de los botones al borde) son fijos y los mismos en todo el sitio:
+  entre 16 y 32 px por dentro, según el tamaño de la pantalla. Si un texto
+  largo o una imagen muy alta deja una sección descompensada, se arregla
+  acortando el texto o cambiando la imagen, no con líneas en blanco.
+- **Venta de repuestos, «Alineación del título»:** el título de esa sección
+  puede ir a la **izquierda**, **centrado** (así viene por defecto) o
+  **justificado**. El «Texto bajo el título» tiene su propia alineación, en el
+  campo de al lado.
 - **Marcas de repuestos (la banda de logos):** en el grupo «Sección «Marcas de
   repuestos» de la portada», el campo **«Marcas de la banda»** decide qué
   logos salen y en qué orden. Con **«Añadir»** eliges una de dos clases de

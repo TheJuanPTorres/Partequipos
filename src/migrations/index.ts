@@ -109,6 +109,7 @@ import * as migration_20261109_041143_portada_banda_logos_libres from './2026110
 import * as migration_20261109_121811_portada_nueva_v2 from './20261109_121811_portada_nueva_v2';
 import * as migration_20261109_143314_categorias_nueva_orden from './20261109_143314_categorias_nueva_orden';
 import * as migration_20261109_150028_indice_tipos_nueva_fondo from './20261109_150028_indice_tipos_nueva_fondo';
+import * as migration_20261112_210351_portada_repuestos_titulo_alineacion from './20261112_210351_portada_repuestos_titulo_alineacion';
 
 export const migrations = [
   {
@@ -664,6 +665,11 @@ export const migrations = [
   {
     up: migration_20261109_150028_indice_tipos_nueva_fondo.up,
     down: migration_20261109_150028_indice_tipos_nueva_fondo.down,
-    name: '20261109_150028_indice_tipos_nueva_fondo'
+    name: '20261109_150028_indice_tipos_nueva_fondo',
+  },
+  {
+    up: migration_20261112_210351_portada_repuestos_titulo_alineacion.up,
+    down: migration_20261112_210351_portada_repuestos_titulo_alineacion.down,
+    name: '20261112_210351_portada_repuestos_titulo_alineacion'
   },
 ];

@@ -3,7 +3,12 @@ import { notFound } from "next/navigation";
 
 import { HeroPortada } from "@/components/hero/HeroPortada";
 import { NavSecciones } from "@/components/portada/NavSecciones";
-import { alineacionDeTexto, anchoDeTexto, escalaDeMaquina } from "@/lib/fields/alineacionTexto";
+import {
+  alineacionDeTexto,
+  alineacionDeTitulo,
+  anchoDeTexto,
+  escalaDeMaquina,
+} from "@/lib/fields/alineacionTexto";
 import { SeccionMarcasKit } from "@/components/portada/kit/SeccionMarcasKit";
 import { SeccionNuevaKit } from "@/components/portada/kit/SeccionNuevaKit";
 import { SeccionRepuestosKit } from "@/components/portada/kit/SeccionRepuestosKit";
@@ -203,6 +208,7 @@ export default async function HomePage() {
           antetitulo: tx(repuestos?.antetitulo),
           titulo: tx(repuestos?.titulo),
           tituloResaltado: tx(repuestos?.tituloResaltado),
+          tituloAlineacion: alineacionDeTitulo(repuestos?.tituloAlineacion),
           descripcion: tx(repuestos?.descripcion),
           descripcionAlineacion: alineacionDeTexto(repuestos?.descripcionAlineacion),
           descripcionAncho: anchoDeTexto(repuestos?.descripcionAncho, "ancho"),

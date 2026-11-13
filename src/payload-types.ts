@@ -1677,6 +1677,10 @@ export interface Pagina {
      */
     tituloResaltado?: string | null;
     /**
+     * Cómo se alinea el título en la web. Por defecto, centrado.
+     */
+    tituloAlineacion?: ('left' | 'center' | 'justify') | null;
+    /**
      * Bajo el título. Cada línea es un párrafo (el diseño lleva dos: qué repuestos y para qué marcas). Vacío, no se pinta.
      */
     descripcion?: string | null;
@@ -3356,6 +3360,7 @@ export interface PaginasSelect<T extends boolean = true> {
         antetitulo?: T;
         titulo?: T;
         tituloResaltado?: T;
+        tituloAlineacion?: T;
         descripcion?: T;
         descripcionAlineacion?: T;
         descripcionAncho?: T;

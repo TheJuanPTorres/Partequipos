@@ -362,6 +362,11 @@ oficial, no lo pongas.
   puede ir a la **izquierda**, **centrado** (así viene por defecto) o
   **justificado**. El «Texto bajo el título» tiene su propia alineación, en el
   campo de al lado.
+- **Venta de repuestos, botón bajo el título:** entre el título y el texto
+  hay un botón rojo, **«Ver todos los repuestos»**, que lleva al índice de
+  repuestos. Su texto y su enlace se cambian en «Texto del botón bajo el
+  título» y «Enlace del botón bajo el título»; va alineado como el título. Con
+  el texto vacío, el botón no sale.
 - **Marcas de repuestos (la banda de logos):** en el grupo «Sección «Marcas de
   repuestos» de la portada», el campo **«Marcas de la banda»** decide qué
   logos salen y en qué orden. Con **«Añadir»** eliges una de dos clases de

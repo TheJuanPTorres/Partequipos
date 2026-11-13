@@ -13,6 +13,14 @@
 
 .pagina {
   container-type: inline-size;
+  /*
+   * TOPE DE ANCHO (criterio de espacios de Juan Pablo, 2026-11-09): el contenido no pasa de
+   * 1680 px. Va como relleno y no como `max-width` para que el gris siga a todo el ancho, y porque
+   * los `cqi` se miden sobre la caja de contenido del contenedor: así el margen de 3 %, los rellenos
+   * de la galería y todo lo que va en `cqi` se quedan en su valor de 1680 px y no crecen más. Hasta
+   * 1680 px no cambia nada.
+   */
+  padding-inline: max(0px, calc((100% - 1680px) / 2));
   /* El fondo gris del kit (#F0F0F0) va en el `<main>`, como en Nosotros. */
   background: var(--color-fondo-seccion);
   color: var(--color-texto);
@@ -80,7 +88,8 @@
   grid-template-columns: 1fr 1fr;
   /* 20 px entre columnas (y entre filas, en tablet y móvil), como en ux-9. */
   gap: 20px;
-  min-height: 65vh;
+  /* Con techo: en una pantalla de 2160 px de alto eran 1400 px de tarjeta con aire. */
+  min-height: min(65vh, 720px);
   /*
    * DESVIACIÓN (cliente, sesión del 2026-10-14): 24 px de aire bajo la
    * cabecera fija, como en las páginas de repuestos (#189). En ux-9 la tarjeta
@@ -467,8 +476,13 @@
 .descripcion {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin: 0 var(--ficha-margen) var(--ficha-margen);
-  padding: 2.82cqi;
+  /*
+   * Abajo, el común hasta la sección siguiente (otras unidades o el contacto); antes el margen de
+   * la ficha más los 48 de «Otras», 95 px a 3840 (criterio de espacios, 2026-11-12). Dentro, el
+   * espacio interno arriba y abajo; a los lados, el de siempre.
+   */
+  margin: 0 var(--ficha-margen) var(--espacio-seccion);
+  padding: var(--espacio-interno) 2.82cqi;
   border-radius: var(--ficha-radio);
   background: var(--color-fondo);
 }
@@ -599,7 +613,8 @@
 /* ====================== 3. OTRAS REFERENCIAS ====================== */
 
 .otras {
-  padding-top: 70px;
+  /* El hueco de arriba lo pone la descripción (el común, una sola vez). Antes 70 px. */
+  padding-top: 0;
 }
 
 .tituloOtras {
@@ -614,7 +629,11 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin: 0;
-  padding: 5cqi;
+  /*
+   * Del título a las tarjetas, el espacio interno; de las tarjetas al contacto, el común (antes 5cqi
+   * arriba y abajo: 72 px a 1440 y 84 a 1680). A los lados, como siempre.
+   */
+  padding: var(--espacio-interno) 5cqi var(--espacio-seccion);
   list-style: none;
 }
 
@@ -923,7 +942,7 @@
 
   .descripcion {
     grid-template-columns: 1fr;
-    padding: 2.82cqi;
+    padding: var(--espacio-interno) 2.82cqi;
   }
 
   .columnaTexto {

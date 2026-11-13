@@ -1,0 +1,157 @@
+/*
+ * SEDES COMPACTAS (ronda 18, t5): las tarjetas de sedes al final de Aditamentos y de las páginas
+ * de marca, tipo, categoría técnica y subcategoría de repuestos.
+ *
+ * - Tarjetas UNIFORMES: flex con salto de línea, así todas las de una fila tienen el alto de la más
+ *   alta (`align-items: stretch`), y la última fila incompleta va centrada (regla del #281).
+ * - 4 por fila; 2 en tablet (≤ 1024) y 1 en móvil (≤ 767), las dos medidas comunes.
+ * - Techo de 1440 px para la lista: a 2560 no se estiran tarjetas de 600 px.
+ */
+
+.sedes {
+  /* Arriba y abajo, medio espaciado común: con la sección de al lado suman el común; a los lados,
+     el 3 % con techo (llegaba a 115 px a 3840). */
+  --sedes-hueco: 20px;
+  padding: calc(var(--espacio-seccion) / 2) min(3%, 48px);
+}
+
+/*
+ * Ronda 12, t5: si «Sedes» es lo último de la página, su aire de abajo sobra. Antes del pie manda
+ * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ */
+.sedes:last-child {
+  padding-bottom: 0;
+}
+
+.sedesLista {
+  display: flex;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: var(--sedes-hueco);
+  list-style: none;
+}
+
+.sede {
+  display: flex;
+  box-sizing: border-box;
+  /* Cuatro por fila, descontados los tres huecos. */
+  flex: 0 0 calc((100% - 3 * var(--sedes-hueco)) / 4);
+  min-width: 0;
+  padding: 20px;
+  align-items: flex-start;
+  gap: 14px;
+  border-radius: 20px;
+  /* La página es gris: las tarjetas, blancas. */
+  background: #fff;
+}
+
+.sedeIcono {
+  flex: none;
+  color: var(--color-marca);
+}
+
+.sedeCuerpo {
+  min-width: 0;
+}
+
+.sedeCabecera {
+  margin: 0 0 12px;
+}
+
+.sedeTitulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Principal / secundaria: discreto, en versalitas pequeñas bajo el título. */
+.sedeTipo {
+  display: inline-flex;
+  margin: 6px 0 0;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-texto-suave);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.sedeTipo::before {
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--color-marca);
+  border-radius: 50%;
+  content: "";
+}
+
+.sedeTipoPrincipal::before {
+  background: var(--color-marca);
+}
+
+.sedeLinea {
+  margin: 0 0 10px;
+  color: var(--color-texto-suave);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.sedeLinea:last-child {
+  margin-bottom: 0;
+}
+
+.sedeLinea strong {
+  color: var(--color-texto);
+}
+
+/* Sede sin líneas todavía (Sincelejo, Yopal, Cartagena): un texto discreto en vez del vacío. */
+.sedeProximamente {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.sedeDireccion,
+.sedeTelefono {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sedeDireccion:hover,
+.sedeTelefono:hover {
+  color: var(--color-marca);
+  text-decoration: underline;
+}
+
+.sedeDireccion:focus-visible,
+.sedeTelefono:focus-visible {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1024px) {
+  .sede {
+    flex-basis: calc((100% - var(--sedes-hueco)) / 2);
+  }
+}
+
+@media (max-width: 767px) {
+  .sedes {
+    --sedes-hueco: 12px;
+    padding: calc(var(--espacio-seccion) / 2) 12px;
+  }
+
+  .sede {
+    flex-basis: 100%;
+  }
+}

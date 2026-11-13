@@ -1,6 +1,6 @@
 /*
  * Piezas de la plantilla de Andrés para las páginas de marca y de tipo de repuestos
- * (2026-10-19): «¿Por qué elegirnos?» y las sedes en tarjetas.
+ * (2026-10-19): «¿Por qué elegirnos?». Las sedes, en `sedesCompactas.module.css`.
  */
 
 /* --- ¿Por qué elegirnos? ----------------------------------------------------------- */
@@ -147,75 +147,6 @@
   outline-color: #fff;
 }
 
-/* --- Sedes ------------------------------------------------------------------------- */
-
-.sedes {
-  /* Arriba y abajo, medio espaciado común: con la sección de al lado suman el común; a los lados,
-     el 3 % con techo (llegaba a 115 px a 3840). */
-  padding: calc(var(--espacio-seccion) / 2) min(3%, 48px);
-}
-
-.sedesLista {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  list-style: none;
-}
-
-.sede {
-  display: flex;
-  padding: 20px;
-  align-items: flex-start;
-  gap: 14px;
-  border-radius: 20px;
-  /* La página es gris: las tarjetas, blancas. */
-  background: #fff;
-}
-
-.sedeIcono {
-  flex: none;
-  color: var(--color-marca);
-}
-
-.sedeCiudad {
-  margin: 0 0 8px;
-  color: var(--color-texto);
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.sedeLinea {
-  margin: 0 0 10px;
-  color: var(--color-texto-suave);
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-.sedeLinea strong {
-  color: var(--color-texto);
-}
-
-.sedeDireccion,
-.sedeTelefono {
-  color: inherit;
-  text-decoration: none;
-}
-
-.sedeDireccion:hover,
-.sedeTelefono:hover {
-  color: var(--color-marca);
-  text-decoration: underline;
-}
-
-.sedeDireccion:focus-visible,
-.sedeTelefono:focus-visible {
-  outline: 2px solid var(--color-texto);
-  outline-offset: 2px;
-}
-
 @media (max-width: 1024px) {
   .porQueTarjeta {
     flex-direction: column;
@@ -230,10 +161,6 @@
     width: 100%;
     padding: 36px 28px;
   }
-
-  .sedesLista {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (max-width: 767px) {
@@ -243,15 +170,6 @@
 
   .porQueTarjeta {
     border-radius: 20px;
-  }
-
-  .sedes {
-    padding: calc(var(--espacio-seccion) / 2) 12px;
-  }
-
-  .sedesLista {
-    grid-template-columns: 1fr;
-    gap: 12px;
   }
 }
 
@@ -288,12 +206,4 @@
 
 .porQueEntradilla strong {
   color: var(--color-texto);
-}
-
-/*
- * Ronda 12, t5: si «Sedes» es lo último de la página, su aire de abajo sobra. Antes del pie manda
- * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
- */
-.sedes:last-child {
-  padding-bottom: 0;
 }

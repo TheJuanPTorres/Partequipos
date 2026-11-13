@@ -1,7 +1,7 @@
 import { IconBrandWhatsapp, IconMessageCircle } from "@tabler/icons-react";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { BaldosasCategorias } from "@/components/repuestos/BaldosasCategorias";
+import { CategoriasFicha } from "@/components/repuestos/CategoriasFicha";
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
@@ -17,14 +17,14 @@ import estilos from "./fichaModelo.module.css";
  * blanco:
  *
  * 1. Las migas.
- * 2. Primera línea: el logo de la marca a la IZQUIERDA y el `<h1>` a la DERECHA (en móvil, si no
- *    caben, el logo encima).
- * 3. A la altura de la descripción: «Pedir cotización» (abre la VENTANA del formulario del sitio
- *    con el modelo ya puesto) y el botón verde de WhatsApp, a su derecha en escritorio y debajo
- *    en móvil.
- * 4. Los tipos de repuesto del tipo de máquina como baldosas, DEBAJO y a todo el ancho.
+ * 2. El logo de la marca, una línea de separación y el `<h1>` con su línea de descripción.
+ * 3. «Pedir cotización» (abre la VENTANA del formulario del sitio con el modelo ya puesto) y el
+ *    botón verde de WhatsApp, a la derecha desde xl (1280 px) y debajo en pantallas menores.
+ * 4. Los tipos de repuesto del tipo de máquina como tarjetas con panel del tono de la marca,
+ *    DEBAJO y a todo el ancho.
  *
- * Propuesta de dirección, sin diseño de Andrés.
+ * Diseño v2 del cliente (2026-11-13): fondo blanco con una luz diagonal del color de la marca,
+ * cabecera con logo, separación y modelo con su línea.
  */
 export function FichaModelo({
   migas,
@@ -56,25 +56,27 @@ export function FichaModelo({
       </div>
 
       <div className={estilos.cabecera}>
-        {logo ? (
-          <LogoMarca logo={logo} alt={logo.alt} sizes="120px" className={estilos.logo} priority />
-        ) : null}
-        <h1 id="modelo-titulo" className={`${estilos.titulo} texto-titulo-bloque`}>
-          {titulo.split(" ").map((palabra, i) => (
-            <span key={`${i}-${palabra}`}>
-              {i > 0 ? " " : null}
-              {palabra.includes("-") ? (
-                <span className={estilos.sinCorte}>{palabra}</span>
-              ) : (
-                palabra
-              )}
-            </span>
-          ))}
-        </h1>
-      </div>
-
-      <div className={estilos.cuerpo}>
-        {linea ? <p className={`${estilos.linea} texto-cuerpo`}>{linea}</p> : <span />}
+        <div className={estilos.identidad}>
+          {logo ? (
+            <LogoMarca logo={logo} alt={logo.alt} sizes="170px" className={estilos.logo} priority />
+          ) : null}
+          {logo ? <span aria-hidden="true" className={estilos.separador} /> : null}
+          <div className={estilos.titular}>
+            <h1 id="modelo-titulo" className={estilos.titulo}>
+              {titulo.split(" ").map((palabra, i) => (
+                <span key={`${i}-${palabra}`}>
+                  {i > 0 ? " " : null}
+                  {palabra.includes("-") ? (
+                    <span className={estilos.sinCorte}>{palabra}</span>
+                  ) : (
+                    palabra
+                  )}
+                </span>
+              ))}
+            </h1>
+            {linea ? <p className={estilos.linea}>{linea}</p> : null}
+          </div>
+        </div>
         <div className={estilos.acciones} id="modelo-contacto">
           <BotonFormulario
             href="/contactanos/"
@@ -101,12 +103,7 @@ export function FichaModelo({
         </div>
       </div>
 
-      <BaldosasCategorias
-        id="modelo-categorias"
-        titulo={tituloCategorias}
-        categorias={categorias}
-        compacta
-      />
+      <CategoriasFicha id="modelo-categorias" titulo={tituloCategorias} categorias={categorias} />
     </section>
   );
 }

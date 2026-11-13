@@ -27,6 +27,11 @@ describe("textoDeBusqueda", () => {
 });
 
 describe("lineaDeTexto", () => {
+  it("quita el guion de lista del comienzo, y solo el del comienzo", () => {
+    assert.equal(lineaDeTexto("- Filtros para la 1150M. Otra."), "Filtros para la 1150M.");
+    assert.equal(lineaDeTexto("Motor 4-cilindros."), "Motor 4-cilindros.");
+  });
+
   it("toma la primera frase", () => {
     assert.equal(
       lineaDeTexto("Filtros para la 1150M. Aceites y más. Otra frase."),

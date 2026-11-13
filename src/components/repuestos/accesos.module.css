@@ -6,13 +6,13 @@
 .seccion {
   width: 100%;
   max-width: 1100px;
-  margin: 72px auto 96px;
+  margin: 24px auto var(--espacio-seccion);
   padding: 0 20px;
   box-sizing: border-box;
 }
 
 .titulo {
-  margin: 0 0 24px;
+  margin: 0 0 var(--espacio-interno);
   color: var(--color-texto);
   font-size: var(--texto-titulo-3);
   font-weight: 500;
@@ -22,7 +22,7 @@
 
 .lista {
   display: grid;
-  gap: 16px;
+  gap: var(--espacio-interno);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -30,6 +30,6 @@
 
 @media (max-width: 767px) {
   .seccion {
-    margin: 48px auto 64px;
+    margin: 24px auto var(--espacio-seccion);
   }
 }

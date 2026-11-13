@@ -33,7 +33,8 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding: 36px var(--panel-x);
+  /* Arriba y abajo, el hueco interno (antes 36 · 44 · 56; Juan Pablo, 2026-11-12). */
+  padding: var(--espacio-interno) var(--panel-x);
   border-radius: 28px;
   background: var(--kit-gris);
 }
@@ -41,7 +42,6 @@
 @media (min-width: 640px) {
   .panel {
     --panel-x: 40px;
-    padding-block: 44px;
   }
 }
 
@@ -50,7 +50,6 @@
     /* Con techo de ancho: el contenido a 1680 px como mucho (como «nueva»), centrado; antes, con el
        4 % solo, las tarjetas medían ~680 px a 3840. */
     --panel-x: max(4%, calc((100% - 1680px) / 2));
-    padding-block: 56px;
     border-radius: 32px;
   }
 }
@@ -75,6 +74,13 @@
     left: calc(var(--panel-x) + 52rem + 24px);
     display: block;
     pointer-events: none;
+  }
+}
+
+/* Con el título centrado, la columna del texto va al centro y las franjas empiezan a su derecha. */
+@media (min-width: 1280px) {
+  .panel[data-titulo="center"] .franjas {
+    left: calc(50% + 26rem + 24px);
   }
 }
 
@@ -123,6 +129,25 @@
   max-width: 52rem;
 }
 
+/*
+ * «Alineación del título» del panel (clienta, 2026-11-12; centrado por defecto). Centrado: la columna
+ * del texto se centra en el panel y el antetítulo acompaña al título. Justificado: solo el título, en
+ * su columna. El texto de debajo conserva su propia alineación.
+ */
+.panel[data-titulo="center"] .cabecera {
+  margin-inline: auto;
+}
+
+.panel[data-titulo="center"] .antetitulo,
+.panel[data-titulo="center"] .titulo {
+  text-align: center;
+  text-wrap: balance;
+}
+
+.panel[data-titulo="justify"] .titulo {
+  text-align: justify;
+}
+
 .antetitulo {
   margin: 0;
   color: var(--kit-rojo-texto);
@@ -132,7 +157,7 @@
 }
 
 .titulo {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   color: var(--color-texto);
   font-size: clamp(1.7rem, 6vw, 2.4rem);
   font-weight: 700;
@@ -152,7 +177,7 @@
 
 /* «Texto bajo el título»: un párrafo por línea; ancho y alineación, del panel. */
 .descripcion {
-  margin: 16px 0 0;
+  margin: 12px 0 0;
   color: var(--color-texto-suave);
   font-size: 0.95rem;
   line-height: 1.625;
@@ -169,7 +194,8 @@
 .tarjetas {
   position: relative;
   display: grid;
-  margin: 36px 0 0;
+  /* Del texto a las tarjetas, el hueco interno (antes 36 · 44). */
+  margin: var(--espacio-interno) 0 0;
   padding: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
@@ -190,7 +216,6 @@
 
 @media (min-width: 1025px) {
   .tarjetas {
-    margin-top: 44px;
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }

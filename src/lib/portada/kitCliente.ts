@@ -90,13 +90,16 @@ export function filtrosDeUsados(seccion: Pagina["seccionUsada"]): FiltroUsados[]
  * los logos del selector de marcas (#439, `colocarLogo`).
  *
  * Nunca se deforma (misma escala en los dos ejes) ni se corta la pieza: su caja cabe siempre en
- * `MARCO_PIEZA` (el 86 % de la caja); lo que sale fuera es margen blanco del fichero, recortado por
+ * `MARCO_PIEZA` (el 94 % de la caja); lo que sale fuera es margen blanco del fichero, recortado por
  * la tarjeta. Una pieza muy alargada toca el marco y queda con algo menos de área.
+ *
+ * MÁS GRANDES (clienta, 2026-11-12): el área común sube un 31 % (la pieza 4:3 pasa del 70 al 80 %
+ * del ancho de la caja) y el marco, del 86 al 94 %. La igualación no cambia: misma área para todas.
  */
 export const CAJA_FOTO = { ancho: 400, alto: 300 };
-const MARCO_PIEZA = 0.86;
-/** El área de una pieza 4:3 que ocupa el 70 % del ancho de la caja: ~280 × 210. */
-const AREA_PIEZA = 280 * 210;
+const MARCO_PIEZA = 0.94;
+/** El área de una pieza 4:3 que ocupa el 80 % del ancho de la caja: 320 × 240. */
+const AREA_PIEZA = 320 * 240;
 
 /** Dónde va el fichero entero, en % de la caja de la foto (puede salirse por los lados). */
 export type ColocacionFoto = { izquierda: number; arriba: number; ancho: number; alto: number };

@@ -28,6 +28,34 @@ export function alineacionDeTexto(valor: unknown): AlineacionTexto {
   return (ALINEACIONES as readonly unknown[]).includes(valor) ? (valor as AlineacionTexto) : "left";
 }
 
+/**
+ * ALINEACIÓN DE UN TÍTULO de sección (clienta, 2026-11-12): izquierda, centrado o justificado, y
+ * CENTRADO por defecto (también con el campo vacío o un valor desconocido).
+ */
+export const ALINEACIONES_TITULO = ["left", "center", "justify"] as const;
+export type AlineacionTitulo = (typeof ALINEACIONES_TITULO)[number];
+
+export function alineacionTituloField(name: string, label: string): Field {
+  return {
+    name,
+    type: "select",
+    label,
+    defaultValue: "center",
+    options: [
+      { label: "Izquierda", value: "left" },
+      { label: "Centrado", value: "center" },
+      { label: "Justificado", value: "justify" },
+    ],
+    admin: { description: "Cómo se alinea el título en la web. Por defecto, centrado." },
+  };
+}
+
+export function alineacionDeTitulo(valor: unknown): AlineacionTitulo {
+  return (ALINEACIONES_TITULO as readonly unknown[]).includes(valor)
+    ? (valor as AlineacionTitulo)
+    : "center";
+}
+
 /** Un párrafo por cada línea escrita en el panel; las líneas vacías no cuentan. */
 export function lineasDeTexto(texto: string | null | undefined): string[] {
   return (texto ?? "")

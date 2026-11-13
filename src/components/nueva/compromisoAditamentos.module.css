@@ -1,11 +1,12 @@
 /*
  * «NUESTRO COMPROMISO…» DE ADITAMENTOS (2026-11-13): tarjeta blanca sobre el gris de la página,
- * texto a la izquierda y foto a la derecha. Sin la franja de servicios encima, esta sección lleva
- * el común entero arriba (antes: medio común de la franja y medio de aquí) y medio abajo, como la
- * de repuestos, para las sedes. Dentro, `--espacio-interno`.
+ * texto a la izquierda y foto a la derecha. Medio común arriba y medio abajo: el contacto de encima
+ * ya deja la otra mitad bajo su tarjeta (medido: 13 · 18 · 25 px a 390 · 768 · 1440), y las sedes
+ * de abajo, igual. Con el común entero arriba daba 37 · 50 · 73. Dentro, `--espacio-interno`.
  */
 .seccion {
-  padding: var(--espacio-seccion) min(3%, 48px) calc(var(--espacio-seccion) / 2);
+  /* −1 px: el contacto deja 25 a 1440 y no 24 (con la mitad justa, 49). */
+  padding: calc(var(--espacio-seccion) / 2 - 1px) min(3%, 48px) calc(var(--espacio-seccion) / 2);
   background: var(--color-fondo-seccion);
 }
 

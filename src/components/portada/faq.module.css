@@ -121,27 +121,45 @@
 
 /* ------------------------------------------------------------ acordeón */
 
+/*
+ * UN SOLO RITMO para todo lo que se mueve al abrir o cerrar una pregunta (dirección, 2026-11-13):
+ * la respuesta, el hueco entre barras y el reparto del alto van con la misma duración y la misma
+ * curva de salida suave, para que nada salte ni vaya a destiempo.
+ */
+.der {
+  --faq-ritmo: 360ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
 .item {
   margin: 0 0 10px;
-  /* Para animar la altura hasta `auto` (abajo). */
-  interpolate-size: allow-keywords;
 }
 
 /*
- * Abrir y cerrar como el widget (`icon_accordion.js`, leído): `slideDown` y
- * `slideUp` de jQuery, 400 ms con su curva `swing` (= 0,5 − cos(πt)/2). Donde
- * el navegador no anima `::details-content`, abre de golpe, sin más.
+ * LA RESPUESTA SE DESPLIEGA animando su alto: una rejilla de una fila que pasa de 0fr a 1fr, con
+ * la respuesta dentro de una caja que se puede encoger a cero. No depende de `interpolate-size`
+ * (solo Chrome), así que vale en todo navegador con `::details-content`; donde no lo hay, abre de
+ * golpe, sin más. `min-height: 0` y `flex: none`: con las columnas lado a lado la pregunta es una
+ * caja flexible y, sin esto, el mínimo automático de sus hijos abría la respuesta entera de golpe
+ * (era el salto de la tarjeta de la foto).
  */
 .item::details-content {
-  height: 0;
+  display: grid;
+  min-height: 0;
+  flex: none;
+  grid-template-rows: 0fr;
   overflow: clip;
   transition:
-    height 400ms cubic-bezier(0.37, 0, 0.63, 1),
-    content-visibility 400ms allow-discrete;
+    grid-template-rows var(--faq-ritmo),
+    content-visibility var(--faq-ritmo) allow-discrete;
 }
 
 .item[open]::details-content {
-  height: auto;
+  grid-template-rows: 1fr;
+}
+
+.respuestaCaja {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .item:last-child {
@@ -241,9 +259,9 @@
  * LA LISTA OCUPA TODO EL ALTO DE LA TARJETA (clienta, 2026-11-12), con las dos columnas lado a lado
  * (desde 768 px). Cerradas, las barras se reparten el alto de la tarjeta: cada pregunta crece
  * (`flex-grow`) y su barra blanca la llena, con el texto centrado en vertical; entre ellas, el hueco
- * interno. Al abrir una, todas vuelven a su alto mínimo y el hueco baja a 10 px para dejar sitio a la respuesta, y el alto
- * que sobre queda debajo de la lista: la sección solo crece si la respuesta no cabe. El cambio se
- * anima con el mismo ritmo que la respuesta. Solo donde `<details>` admite `display: flex` (los
+ * interno. Al abrir una, todas vuelven a su alto mínimo y el hueco baja a 10 px para dejar sitio a
+ * la respuesta, y el alto que sobre queda debajo de la lista: la tarjeta de la foto no cambia de
+ * alto si la respuesta cabe y, si no cabe, crece a la vez que ella. Todo con `--faq-ritmo`. Solo donde `<details>` admite `display: flex` (los
  * navegadores con `::details-content`); en el resto, la lista centrada de siempre.
  */
 @media (min-width: 768px) {
@@ -256,7 +274,7 @@
       padding-block: 0;
       justify-content: flex-start;
       gap: var(--espacio-interno);
-      transition: gap 400ms cubic-bezier(0.37, 0, 0.63, 1);
+      transition: gap var(--faq-ritmo);
     }
 
     .der:has(.item[open]) {
@@ -268,7 +286,7 @@
       margin: 0;
       flex: 1 0 auto;
       flex-direction: column;
-      transition: flex-grow 400ms cubic-bezier(0.37, 0, 0.63, 1);
+      transition: flex-grow var(--faq-ritmo);
     }
 
     .der:has(.item[open]) .item {

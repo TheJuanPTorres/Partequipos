@@ -97,8 +97,9 @@ export function panelDeTarjeta(color: string, fin: string | null): PanelTarjeta 
  *
  * COLOR Y LOGO PROPIOS de la tarjeta (dirección, 2026-11-13; antes, los de la baldosa de
  * repuestos): el «Color de la tarjeta» (y su final de degradado) del grupo «PORTADA: tarjeta»;
- * vacío, panel blanco. El logo es el de todo el sitio («una marca, un solo logo»), con su
- * «Logo de la tarjeta»: a color tal cual (sin la tinta oscura del menú) o en blanco.
+ * vacío, panel blanco. El logo es el «Logo de la tarjeta» tal cual (el del diseño: a color sobre
+ * los paneles claros); sin él, el de todo el sitio, tal cual (sin la tinta oscura del menú) o en
+ * blanco.
  *
  * La máquina es la de su «Tarjeta en la portada»; sin ella, la foto de la marca de antes (la de la
  * cabecera del kit o la de la tarjeta). El logo del distribuidor se pinta en blanco sobre un panel
@@ -121,10 +122,12 @@ export function tarjetasDeMarcas(
       const logoSitio = logoDeMarca(m, logos);
       const color = colorValido(tp?.colorPanel);
       const panel = color ? panelDeTarjeta(color, colorValido(tp?.colorPanelFin)) : PANEL_BLANCO;
+      const logoTarjeta = logoPropio({ logo: tp?.logo });
       const logo =
-        tp?.logoVariante === "blanco"
+        logoTarjeta ??
+        (tp?.logoVariante === "blanco"
           ? (logoEnBlanco(logoSitio) ?? logoSitio)
-          : logoSitio && { ...logoSitio, oscuro: false };
+          : logoSitio && { ...logoSitio, oscuro: false });
 
       const decorativa = (media: Parameters<typeof imagenDeMedia>[0]) => {
         const i = imagenDeMedia(media, "");

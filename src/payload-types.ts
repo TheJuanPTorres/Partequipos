@@ -361,9 +361,13 @@ export interface MarcasMaquinaria {
      */
     colorPanelFin?: string | null;
     /**
-     * El logo de la marca (el mismo de todo el sitio). En blanco, para colores oscuros.
+     * Solo si «Logo de la tarjeta» está vacío: el logo de la marca de todo el sitio, tal cual o en blanco (para colores oscuros).
      */
     logoVariante?: ('original' | 'blanco') | null;
+    /**
+     * Se pinta tal cual, con su color, en la caja del logo (todos al mismo tamaño visual). Vacío: el logo del sitio, como diga el campo de arriba.
+     */
+    logo?: (number | null) | Media;
     /**
      * La máquina recortada, de perfil y sin fondo (900 px de ancho o más). Decorativa. Vacía, la tarjeta lleva la foto de la marca.
      */
@@ -3031,6 +3035,7 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
         colorPanel?: T;
         colorPanelFin?: T;
         logoVariante?: T;
+        logo?: T;
         maquina?: T;
         distribuidorNombre?: T;
         distribuidorLogo?: T;

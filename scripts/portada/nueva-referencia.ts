@@ -69,6 +69,19 @@ const FICHEROS = [
 ] as const;
 type Campo = (typeof FICHEROS)[number][0];
 
+/** El logo de cada tarjeta del diseño: dirección web de la marca, fichero del kit y alt. */
+const LOGOS = [
+  [
+    "hitachi",
+    path.join("repuestos", "marcas", "hitachi-landcros-blanco.webp"),
+    "Logo de Hitachi LANDCROS en blanco",
+  ],
+  ["case-construction", path.join("marcas", "case", "logo.png"), "Logo de CASE Construction"],
+  ["dynapac", path.join("nueva", "dynapac-logo-blanco.webp"), "Logo de Dynapac en blanco"],
+  ["yanmar", path.join("marcas", "yanmar", "logo.png"), "Logo de Yanmar"],
+  ["liugong", path.join("nueva", "liugong-logo.webp"), "Logo de LiuGong"],
+] as const;
+
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 const { default: config } = await import("../../src/payload.config");
@@ -80,6 +93,8 @@ const idDe = (x: unknown): number | null =>
 type Manifiesto = {
   pagina: number;
   campos: { campo: Campo; antes: number | null; puesto: number }[];
+  /** «Logo de la tarjeta» de cada marca (2026-11-13, segunda pasada). */
+  logos?: { marca: number; antes: number | null; puesto: number }[];
 };
 const guardado = fs.existsSync(MANIFIESTO)
   ? (JSON.parse(fs.readFileSync(MANIFIESTO, "utf8")) as Manifiesto)
@@ -97,19 +112,30 @@ const inicio = (
 if (!inicio) fallar("no hay página «inicio»");
 const actual = (campo: Campo) => idDe(inicio!.seccionNueva?.[campo]);
 for (const [campo] of FICHEROS) log(`inicio ${inicio!.id}: ${campo} = ${actual(campo) ?? "—"}`);
+const marcas = (
+  await payload.find({
+    collection: "marcas-maquinaria",
+    where: { slug: { in: LOGOS.map(([s]) => s) } },
+    depth: 0,
+    limit: 0,
+    overrideAccess: true,
+  })
+).docs;
+const logoDe = (id: number) => idDe(marcas.find((m) => m.id === id)?.portada?.logo);
+for (const m of marcas) log(`marca ${m.id} ${m.slug}: logo de la tarjeta = ${logoDe(m.id) ?? "—"}`);
 log(`manifiesto: ${guardado ? "sí" : "ninguno"}`);
 
 if (modo === "aplicar") {
+  const manifiesto: Manifiesto = guardado ?? { pagina: inicio!.id, campos: [] };
+  const guardar = () => {
+    fs.mkdirSync(path.dirname(MANIFIESTO), { recursive: true });
+    fs.writeFileSync(MANIFIESTO, JSON.stringify(manifiesto, null, 2));
+  };
   if (guardado) {
-    log("ya aplicado (hay manifiesto): nada que hacer");
+    log("fondo y máquina ya aplicados (hay manifiesto)");
   } else {
     for (const [, f] of FICHEROS)
       if (!fs.existsSync(path.join(KIT, f))) fallar(`no existe ${path.join(KIT, f)}`);
-    const manifiesto: Manifiesto = { pagina: inicio!.id, campos: [] };
-    const guardar = () => {
-      fs.mkdirSync(path.dirname(MANIFIESTO), { recursive: true });
-      fs.writeFileSync(MANIFIESTO, JSON.stringify(manifiesto, null, 2));
-    };
     const datos: Partial<Record<Campo, number>> = {};
     for (const [campo, fichero, alt] of FICHEROS) {
       const id = (
@@ -133,6 +159,37 @@ if (modo === "aplicar") {
     });
     log("inicio: puestos");
   }
+  if (manifiesto.logos) {
+    log("logos ya aplicados (hay manifiesto)");
+  } else {
+    for (const [, f] of LOGOS)
+      if (!fs.existsSync(path.join(KIT, f))) fallar(`no existe ${path.join(KIT, f)}`);
+    manifiesto.logos = [];
+    for (const [slug, fichero, alt] of LOGOS) {
+      const m = marcas.find((x) => x.slug === slug);
+      if (!m) {
+        log(`sin marca «${slug}»: se salta`);
+        continue;
+      }
+      const id = (
+        await payload.create({
+          collection: "media",
+          data: { alt },
+          filePath: path.join(KIT, fichero),
+          overrideAccess: true,
+        })
+      ).id;
+      manifiesto.logos.push({ marca: m.id, antes: logoDe(m.id), puesto: id });
+      guardar();
+      await payload.update({
+        collection: "marcas-maquinaria",
+        id: m.id,
+        data: { portada: { ...m.portada, logo: id } },
+        overrideAccess: true,
+      });
+      log(`${slug}: logo de la tarjeta media ${id}`);
+    }
+  }
   if (REVALIDAR) {
     const token = process.env.REVALIDACION_TOKEN ?? "";
     if (!token) log("sin REVALIDACION_TOKEN: no se revalida (redesplegar el preview)");
@@ -151,6 +208,18 @@ if (modo === "aplicar") {
 
 if (modo === "retirar") {
   if (!guardado) fallar("no hay manifiesto: nada que retirar");
+  for (const { marca, antes, puesto } of guardado!.logos ?? []) {
+    if (logoDe(marca) === puesto) {
+      await payload.update({
+        collection: "marcas-maquinaria",
+        id: marca,
+        data: { portada: { ...marcas.find((x) => x.id === marca)?.portada, logo: antes } },
+        overrideAccess: true,
+      });
+      await payload.delete({ collection: "media", id: puesto, overrideAccess: true });
+      log(`marca ${marca}: logo devuelto a ${antes ?? "—"} y media ${puesto} borrada`);
+    } else log(`marca ${marca}: logo cambiado en el panel, no se toca`);
+  }
   const devolver: Partial<Record<Campo, number | null>> = {};
   for (const { campo, antes, puesto } of guardado!.campos) {
     if (actual(campo) === puesto) devolver[campo] = antes;

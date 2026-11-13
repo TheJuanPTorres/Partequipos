@@ -113,6 +113,7 @@ import * as migration_20261112_210351_portada_repuestos_titulo_alineacion from '
 import * as migration_20261113_055720_aditamentos_compromiso_foto from './20261113_055720_aditamentos_compromiso_foto';
 import * as migration_20261113_125918_sedes_lineas_enlace_maps from './20261113_125918_sedes_lineas_enlace_maps';
 import * as migration_20261113_140439_portada_tarjeta_color_logo from './20261113_140439_portada_tarjeta_color_logo';
+import * as migration_20261113_142500_portada_tarjeta_logo from './20261113_142500_portada_tarjeta_logo';
 
 export const migrations = [
   {
@@ -688,6 +689,11 @@ export const migrations = [
   {
     up: migration_20261113_140439_portada_tarjeta_color_logo.up,
     down: migration_20261113_140439_portada_tarjeta_color_logo.down,
-    name: '20261113_140439_portada_tarjeta_color_logo'
+    name: '20261113_140439_portada_tarjeta_color_logo',
+  },
+  {
+    up: migration_20261113_142500_portada_tarjeta_logo.up,
+    down: migration_20261113_142500_portada_tarjeta_logo.down,
+    name: '20261113_142500_portada_tarjeta_logo'
   },
 ];

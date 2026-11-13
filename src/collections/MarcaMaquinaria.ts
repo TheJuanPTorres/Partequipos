@@ -96,19 +96,34 @@ export const MarcaMaquinaria: CollectionConfig = {
             {
               name: "logoVariante",
               type: "select",
-              label: "Logo de la tarjeta",
+              label: "Sin logo propio: el del sitio",
               defaultValue: "original",
               options: [
-                { label: "A color (el original)", value: "original" },
+                { label: "Tal cual", value: "original" },
                 { label: "En blanco", value: "blanco" },
               ],
               admin: {
                 width: "33%",
                 description:
-                  "El logo de la marca (el mismo de todo el sitio). En blanco, para colores oscuros.",
+                  "Solo si «Logo de la tarjeta» está vacío: el logo de la marca de todo el sitio, tal cual o en blanco (para colores oscuros).",
               },
             },
           ],
+        },
+        /*
+         * El logo PROPIO de la tarjeta (dirección, 2026-11-13): el del diseño del cliente, a color
+         * sobre los paneles claros (Case, Yanmar, LiuGong) y en blanco sobre los oscuros. Los logos
+         * del sitio de esas marcas son blancos (los de repuestos) y no sirven sobre un panel claro.
+         */
+        {
+          name: "logo",
+          type: "upload",
+          relationTo: "media",
+          label: "Logo de la tarjeta (PNG o WebP transparente)",
+          admin: {
+            description:
+              "Se pinta tal cual, con su color, en la caja del logo (todos al mismo tamaño visual). Vacío: el logo del sitio, como diga el campo de arriba.",
+          },
         },
         {
           name: "maquina",

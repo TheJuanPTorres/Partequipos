@@ -81,6 +81,18 @@ describe("«Maquinaria pesada nueva»: tarjetas de marca", () => {
     assert.equal(t!.logo!.blanco, undefined);
   });
 
+  it("con «Logo de la tarjeta», ese logo tal cual, aunque pida el del sitio en blanco", () => {
+    const [t] = tarjetasDeMarcas([
+      marca({
+        logo: png(12),
+        portada: { logo: png(50), logoVariante: "blanco", colorPanel: "#c8141f" },
+      }),
+    ]);
+    assert.equal(t!.logo!.url, "/m/50.png");
+    assert.equal(t!.logo!.blanco, undefined);
+    assert.equal(t!.logo!.alt, "Hitachi");
+  });
+
   it("logo en blanco sobre un color oscuro; sin final, el degradado sale del color (Dynapac)", () => {
     const [d] = tarjetasDeMarcas([
       marca({

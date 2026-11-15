@@ -201,6 +201,8 @@
   display: block;
   width: 39%;
   min-width: 140px;
+  /* Techo: sin él crecía con la pantalla (526 px a 3840) y se veía ampliado al doble. */
+  max-width: 285px;
   height: auto;
 }
 

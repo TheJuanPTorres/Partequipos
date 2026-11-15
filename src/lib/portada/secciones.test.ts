@@ -53,7 +53,7 @@ describe("«Maquinaria pesada nueva»: tarjetas de marca", () => {
     assert.equal(t!.maquina!.alt, "");
   });
 
-  it("enlace a la marca; logo con el nombre como alt; sin baldosa ni color, panel blanco", () => {
+  it("enlace a la marca; logo con el nombre como alt; sin color de tarjeta, panel blanco", () => {
     const [t] = tarjetasDeMarcas([marca({ logo: media(11, "logo viejo") })]);
     assert.equal(t!.logo!.alt, "Hitachi");
     assert.equal(t!.href, "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/hitachi/");
@@ -62,53 +62,94 @@ describe("«Maquinaria pesada nueva»: tarjetas de marca", () => {
     assert.equal(t!.logo!.blanco, undefined);
   });
 
-  it("con la baldosa de la marca de repuestos: su color y su logo tal cual", () => {
-    const logoB = { url: "/b.webp", width: 300, height: 90, oscuro: false };
-    const [t] = tarjetasDeMarcas(
-      [marca({ nombre: "Hitachi LANDCROS", logo: media(11), colorMarca: "#000000" })],
-      new Map(),
-      new Map([["hitachilandcros", { color: "#f36c1b", logo: logoB }]]),
-    );
-    assert.equal(t!.panel.inicio, "#f36c1b");
-    assert.equal(t!.panel.claro, false);
-    assert.equal(t!.logo!.url, "/b.webp");
-    assert.equal(t!.logo!.blanco, undefined);
-  });
-
-  it("sin baldosa, su color de marca con su logo en blanco; un panel claro lo es (Case)", () => {
-    const [d] = tarjetasDeMarcas([
-      marca({ nombre: "Dynapac", slug: "dynapac", logo: png(12), colorMarca: "#bf2e1a" }),
-    ]);
-    assert.equal(d!.panel.inicio, "#bf2e1a");
-    assert.equal(d!.logo!.blanco, true);
-    const logoB = { url: "/c.webp", width: 300, height: 90, oscuro: false };
-    const [c] = tarjetasDeMarcas(
-      [marca({ nombre: "Case Construction", slug: "case-construction" })],
-      new Map(),
-      new Map([["caseconstruction", { color: "#f3e7cc", logo: logoB }]]),
-    );
-    assert.equal(c!.panel.claro, true);
-  });
-
-  it("marca sin página propia: a su enlace externo, con el dominio y el distribuidor en blanco", () => {
-    const logoB = { url: "/l.webp", width: 300, height: 60, oscuro: false };
+  it("color de la tarjeta y su final; logo a color tal cual, sin la tinta oscura del menú", () => {
+    const logoR = { url: "/r.webp", width: 300, height: 90, oscuro: true };
     const [t] = tarjetasDeMarcas(
       [
         marca({
-          nombre: "LiuGong",
-          slug: "liugong",
-          enlaceExterno: "https://www.maquitecno.co/",
-          portada: { distribuidorNombre: " Maquitecno ", distribuidorLogo: png(40) },
+          nombre: "Yanmar",
+          slug: "yanmar",
+          colorMarca: "#c8141f",
+          portada: { colorPanel: "#FFFFFF", colorPanelFin: "#e9e9eb", logoVariante: "original" },
         }),
       ],
-      new Map(),
-      new Map([["liugong", { color: "#002568", logo: logoB }]]),
+      new Map([["yanmar", logoR]]),
     );
+    assert.deepEqual(t!.panel, { inicio: "#ffffff", fin: "#e9e9eb", claro: true });
+    assert.equal(t!.logo!.url, "/r.webp");
+    assert.equal(t!.logo!.oscuro, false);
+    assert.equal(t!.logo!.blanco, undefined);
+  });
+
+  it("con «Logo de la tarjeta», ese logo tal cual, aunque pida el del sitio en blanco", () => {
+    const [t] = tarjetasDeMarcas([
+      marca({
+        logo: png(12),
+        portada: { logo: png(50), logoVariante: "blanco", colorPanel: "#c8141f" },
+      }),
+    ]);
+    assert.equal(t!.logo!.url, "/m/50.png");
+    assert.equal(t!.logo!.blanco, undefined);
+    assert.equal(t!.logo!.alt, "Hitachi");
+  });
+
+  it("logo en blanco sobre un color oscuro; sin final, el degradado sale del color (Dynapac)", () => {
+    const [d] = tarjetasDeMarcas([
+      marca({
+        nombre: "Dynapac",
+        slug: "dynapac",
+        logo: png(12),
+        portada: { colorPanel: "#c8141f", logoVariante: "blanco" },
+      }),
+    ]);
+    assert.equal(d!.panel.inicio, "#c8141f");
+    assert.equal(d!.panel.claro, false);
+    assert.notEqual(d!.panel.fin, "#c8141f");
+    assert.equal(d!.logo!.blanco, true);
+  });
+
+  it("ya no usa el «Color de la marca» ni las baldosas: sin color de tarjeta, panel blanco", () => {
+    const [c] = tarjetasDeMarcas([
+      marca({ nombre: "Case Construction", slug: "case-construction", colorMarca: "#bf2e1a" }),
+    ]);
+    assert.equal(c!.panel.inicio, "#ffffff");
+    assert.equal(c!.panel.claro, true);
+    const [x] = tarjetasDeMarcas([marca({ portada: { colorPanel: "rojo" } })]);
+    assert.equal(x!.panel.inicio, "#ffffff");
+  });
+
+  it("marca sin página propia: a su enlace externo; el distribuidor, a color sobre un panel claro y en blanco sobre uno oscuro", () => {
+    const base = {
+      nombre: "LiuGong",
+      slug: "liugong",
+      enlaceExterno: "https://www.maquitecno.co/",
+    };
+    const [t] = tarjetasDeMarcas([
+      marca({
+        ...base,
+        portada: {
+          distribuidorNombre: " Maquitecno ",
+          distribuidorLogo: png(40),
+          colorPanel: "#ffffff",
+        },
+      }),
+    ]);
     assert.equal(t!.href, "https://www.maquitecno.co/");
     assert.deepEqual(t!.externo, { dominio: "maquitecno.co" });
     assert.equal(t!.distribuidor!.nombre, "Maquitecno");
     assert.equal(t!.distribuidor!.logo!.alt, "Maquitecno");
-    assert.equal(t!.distribuidor!.logo!.blanco, true);
+    assert.notEqual(t!.distribuidor!.logo!.blanco, true);
+    const [o] = tarjetasDeMarcas([
+      marca({
+        ...base,
+        portada: {
+          distribuidorNombre: "Maquitecno",
+          distribuidorLogo: png(40),
+          colorPanel: "#002568",
+        },
+      }),
+    ]);
+    assert.equal(o!.distribuidor!.logo!.blanco, true);
   });
 
   it("sin logo poblado la tarjeta sale igual, sin logo; sin slug no sale", () => {

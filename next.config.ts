@@ -33,6 +33,12 @@ const nextConfig: NextConfig = {
      * el límite de Hobby, en docs/diseno/decisiones-home-ux9.md §17.
      */
     formats: ["image/avif", "image/webp"],
+    /*
+     * 75 para todo; 90 SOLO para el render grande de «Maquinaria pesada nueva» de la portada
+     * (dirección, 2026-11-13: «con la calidad de la referencia», que lo pinta a 90). Next 16 solo
+     * acepta las calidades de esta lista.
+     */
+    qualities: [75, 90],
   },
   /*
    * TRAZADO DE FICHEROS — mete la biblioteca nativa de sharp en el lambda.

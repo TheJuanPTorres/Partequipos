@@ -4,6 +4,8 @@ import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
+import type { LogoConAlt } from "@/lib/marca/logoMarca";
+import { colocarLogo, type Caja } from "@/lib/marca/tamanoOptico";
 import { ZonaAnimada } from "@/components/repuestos/ZonaAnimada";
 import { ANIMACIONES_NUEVA } from "@/lib/portada/animacionesNueva";
 import type { TarjetaMarca } from "@/lib/portada/secciones";
@@ -102,6 +104,7 @@ export function SeccionNuevaKit({
                 alt=""
                 fill
                 sizes="(max-width: 1023px) 1px, (max-width: 1680px) 44vw, 740px"
+                quality={90}
                 className={estilos.contener}
               />
             </div>
@@ -159,10 +162,50 @@ function EscenaCompacta({ maquina, fondo }: { maquina: ImagenLista; fondo: Image
           alt=""
           fill
           sizes="(max-width: 1023px) 90vw, 1px"
+          quality={90}
           className={estilos.contener}
         />
       </div>
     </div>
+  );
+}
+
+/**
+ * LA CAJA DEL LOGO DE LA TARJETA (dirección, 2026-11-13; la regla del #439): todas iguales, con la
+ * proporción de la zona del logo del diseño (80 % del ancho × 24 % del alto del panel, 3,55:1), y
+ * cada logo con la MISMA ÁREA VISIBLE sin sus márgenes transparentes (`colocarLogo`, con la parte
+ * visible que mide el servidor). El área es la de un logo 3:1 a ~70 % del alto de la caja. Va en
+ * porcentajes de la caja: crece con la tarjeta.
+ */
+const CAJA_TARJETA: Caja = { ancho: 213, alto: 60, area: 126 * 42 };
+
+function LogoTarjeta({ logo }: { logo: LogoConAlt }) {
+  const { visible, imagen } = colocarLogo(logo, CAJA_TARJETA);
+  const pct = (n: number, de: number) => `${(n / de) * 100}%`;
+  return (
+    <span className={estilos.logoFijo}>
+      <span
+        className={estilos.logoRecorte}
+        style={{
+          left: pct(visible.izquierda, CAJA_TARJETA.ancho),
+          top: pct(visible.arriba, CAJA_TARJETA.alto),
+          width: pct(visible.ancho, CAJA_TARJETA.ancho),
+          height: pct(visible.alto, CAJA_TARJETA.alto),
+        }}
+      >
+        <span
+          className={estilos.logoImagen}
+          style={{
+            left: pct(imagen.izquierda, visible.ancho),
+            top: pct(imagen.arriba, visible.alto),
+            width: pct(imagen.ancho, visible.ancho),
+            height: pct(imagen.alto, visible.alto),
+          }}
+        >
+          <LogoMarca logo={logo} alt={logo.alt} fill sizes="300px" />
+        </span>
+      </span>
+    </span>
   );
 }
 
@@ -182,6 +225,7 @@ function Tarjeta({ marca: m, paisaje }: { marca: TarjetaMarca; paisaje: ImagenLi
         className={estilos.panel}
         style={estiloPanel}
         data-claro={m.panel.claro ? "" : undefined}
+        data-distribuidor={m.distribuidor ? "" : undefined}
       >
         <span aria-hidden="true" className={estilos.luz} />
         {abajo ? (
@@ -191,7 +235,7 @@ function Tarjeta({ marca: m, paisaje }: { marca: TarjetaMarca; paisaje: ImagenLi
         ) : null}
         <span className={m.distribuidor ? estilos.logoConDistribuidor : estilos.logoCaja}>
           {m.logo ? (
-            <LogoMarca logo={m.logo} alt={m.nombre} sizes="220px" className={estilos.logo} />
+            <LogoTarjeta logo={m.logo} />
           ) : (
             <span className={estilos.nombre}>{m.nombre}</span>
           )}

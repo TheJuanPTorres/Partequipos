@@ -5,6 +5,7 @@ import type { CSSProperties, ReactNode } from "react";
 
 import { BotonVisorPdf } from "@/components/ficha/BotonVisorPdf";
 import { BotonVista360 } from "@/components/ficha/BotonVista360";
+import { DescripcionPlegable } from "@/components/ficha/DescripcionPlegable";
 import { GaleriaFicha, type FotoFicha } from "@/components/ficha/GaleriaFicha";
 import { IconoDato } from "@/components/ficha/IconoDato";
 import { PastillaDato } from "@/components/ficha/PastillaDato";
@@ -160,7 +161,36 @@ export function FichaNueva({
   cierre,
   kit = null,
 }: Props) {
-  const hayIzquierda = fotos.length > 0 || datos.length > 0;
+  // La izquierda es solo la galería: las características van a la derecha (2026-11-12).
+  const hayIzquierda = fotos.length > 0;
+  const botones =
+    pdf || experto ? (
+      <div className={`${estilos.botones} ${nueva.botones}`}>
+        {pdf ? (
+          <BotonVisorPdf
+            titulo={`Ficha técnica: ${nombre}`}
+            pdf={{ url: pdf.url, tamano: pdf.tamano }}
+            paginas={pdf.paginas}
+            className={`${estilos.boton} ${estilos.botonGrande}`}
+          >
+            <IconFileTypePdf aria-hidden="true" stroke={1.75} />
+            Ficha técnica
+          </BotonVisorPdf>
+        ) : null}
+        {experto ? (
+          <a
+            href={experto.href}
+            className={`${estilos.boton} ${estilos.botonOscuro} ${estilos.botonGrande}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconBrandWhatsapp aria-hidden="true" stroke={1.75} />
+            Habla con un experto
+            <span className="sr-only"> (abre WhatsApp)</span>
+          </a>
+        ) : null}
+      </div>
+    ) : null;
   const boton360 = vista360 ? (
     <BotonVista360 url={vista360} nombre={nombre} className={nueva.boton360}>
       <IconView360 aria-hidden="true" stroke={1.75} />
@@ -237,13 +267,13 @@ ${tituloEscritorio.modelo}`}
       <PieSinTarjeta />
 
       {/*
-        1. CABECERA DEL PRODUCTO (dirección, 2026-10-21). En escritorio, dos
-        columnas equilibradas: a la izquierda la galería y, debajo, las
-        características; a la derecha las migas, el título, la descripción y los
-        botones. En el HTML va primero la derecha (el <h1> antes que la galería).
-        En tablet y móvil las dos columnas se deshacen (`display: contents`) y
-        los bloques se ordenan: galería, migas y título, características,
-        botones y descripción.
+        1. CABECERA DEL PRODUCTO (dirección, 2026-11-12). En escritorio, dos
+        columnas: a la izquierda la galería; a la derecha, arriba, las migas, el
+        título, las características, la descripción (con «Leer más» si no cabe:
+        la derecha nunca es más alta que la foto) y los botones. En el HTML va
+        primero la derecha (el <h1> antes que la galería). En tablet y móvil las
+        dos columnas se deshacen (`display: contents`) y los bloques se apilan:
+        galería, migas y título, características, descripción y botones.
       */}
       {kit ? (
         <div
@@ -289,59 +319,28 @@ ${tituloEscritorio.modelo}`}
               </div>
             )}
 
-            {descripcion ? (
-              <div
-                className={`${nueva.descripcion} ${nueva.reserva} texto-cuerpo`}
-                data-reserva={reservaDescripcion}
-              >
-                <div className={nueva.cuerpoDescripcion}>{descripcion}</div>
-              </div>
-            ) : null}
+            <ListaDatos
+              datos={datos}
+              clase={`${estilos.datos} ${nueva.datos} texto-cuerpo`}
+              apilado
+            />
 
             {fotos.length === 0 ? <div className={nueva.solo360}>{boton360}</div> : null}
 
-            {pdf || experto ? (
-              <div className={`${estilos.botones} ${nueva.botones}`}>
-                {pdf ? (
-                  <BotonVisorPdf
-                    titulo={`Ficha técnica: ${nombre}`}
-                    pdf={{ url: pdf.url, tamano: pdf.tamano }}
-                    paginas={pdf.paginas}
-                    className={`${estilos.boton} ${estilos.botonGrande}`}
-                  >
-                    <IconFileTypePdf aria-hidden="true" stroke={1.75} />
-                    Ficha técnica
-                  </BotonVisorPdf>
-                ) : null}
-                {experto ? (
-                  <a
-                    href={experto.href}
-                    className={`${estilos.boton} ${estilos.botonOscuro} ${estilos.botonGrande}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <IconBrandWhatsapp aria-hidden="true" stroke={1.75} />
-                    Habla con un experto
-                    <span className="sr-only"> (abre WhatsApp)</span>
-                  </a>
-                ) : null}
-              </div>
-            ) : null}
+            <DescripcionPlegable
+              descripcion={descripcion}
+              reserva={reservaDescripcion}
+              claseTexto="texto-cuerpo"
+              botones={botones}
+            />
           </div>
 
           {hayIzquierda ? (
             <div className={nueva.columnaIzquierda}>
-              {fotos.length > 0 ? (
-                <div className={`${estilos.columnaGaleria} ${nueva.columnaGaleria}`}>
-                  {boton360}
-                  <GaleriaFicha fotos={fotos} nombre={nombre} sinFondo />
-                </div>
-              ) : null}
-              <ListaDatos
-                datos={datos}
-                clase={`${estilos.datos} ${nueva.datos} texto-cuerpo`}
-                apilado
-              />
+              <div className={`${estilos.columnaGaleria} ${nueva.columnaGaleria}`}>
+                {boton360}
+                <GaleriaFicha fotos={fotos} nombre={nombre} sinFondo />
+              </div>
             </div>
           ) : null}
         </section>

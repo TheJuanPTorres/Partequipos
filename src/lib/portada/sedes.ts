@@ -2,6 +2,7 @@ import type { Sede } from "@/payload-types";
 
 import { hrefTelefono } from "../pie";
 import { coordenadasEnColombia } from "../fields/reglasPortada";
+import { enlaceDeLinea, urlPorDireccion, type OrigenEnlaceMaps } from "../sedes/enlaceMaps";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
 /**
@@ -14,13 +15,12 @@ export type LineaSede = {
   etiqueta: string;
   direccion: string;
   telefono: { texto: string; href: string } | null;
+  /** «Ver en Google Maps»: el enlace de la línea, sus coordenadas, las de la sede o la dirección. */
+  mapa: { href: string; origen: OrigenEnlaceMaps };
 };
 
-/** Enlace de búsqueda de Google Maps por dirección (sin clave de API): «dirección, ciudad». */
-export function urlGoogleMaps(direccion: string, ciudad: string): string {
-  const consulta = `${direccion.trim()}, ${ciudad.trim()}`;
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(consulta)}`;
-}
+/** Búsqueda de Google Maps por dirección: el último recurso de `enlaceDeLinea` (ronda 18, t6). */
+export const urlGoogleMaps = urlPorDireccion;
 
 export type TipoDeSede = "principal" | "secundaria";
 
@@ -68,7 +68,8 @@ export function sedesDePortada(sedes: Sede[]): SedeLista[] {
       return [];
     }
     const foto = imagenDeMedia(s.foto, `Sede ${nombre}`);
-    const lineas = (s.lineas ?? []).flatMap((l): LineaSede[] => {
+    const conDatos = (s.lineas ?? []).filter((l) => l.linea?.trim() && l.direccion?.trim());
+    const lineas = conDatos.flatMap((l): LineaSede[] => {
       const linea = l.linea?.trim();
       const direccion = l.direccion?.trim();
       if (!linea || !direccion) return [];
@@ -79,6 +80,12 @@ export function sedesDePortada(sedes: Sede[]): SedeLista[] {
           etiqueta: localidad ? `${linea} · ${localidad}` : linea,
           direccion,
           telefono: tel ? { texto: tel, href: hrefTelefono(tel) } : null,
+          mapa: enlaceDeLinea({
+            enlace: l.enlaceMaps,
+            coordenadas: l.coordenadas,
+            direccion,
+            ciudad,
+          }),
         },
       ];
     });

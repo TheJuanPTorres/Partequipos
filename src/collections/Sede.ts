@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { validarLatitud, validarLongitud } from "../lib/fields/reglasPortada";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMarcasDeRepuestos } from "../lib/revalidation";
+import { validarCoordenadas, validarEnlaceMaps } from "../lib/sedes/enlaceMaps";
 import { revalidarPortada } from "./hooks/portadaHooks";
 
 const portada = revalidarPortada("sedes");
@@ -123,7 +124,7 @@ export const Sede: CollectionConfig = {
       labels: { singular: "Línea", plural: "Líneas" },
       admin: {
         description:
-          "Cada línea con su dirección. Ej. Maquinaria · Diagonal 16 # 96 G – 85. Puede quedar vacía mientras se consiguen los datos de la sede: entonces solo sale su nombre y su punto en el mapa.",
+          "Cada línea con su dirección y, si se tiene, su enlace de Google Maps. Ej. Maquinaria · Diagonal 16 # 96 G – 85. Puede quedar vacía mientras se consiguen los datos de la sede: entonces solo sale su nombre y su punto en el mapa.",
       },
       fields: [
         { name: "linea", type: "text", required: true, label: "Línea" },
@@ -141,6 +142,26 @@ export const Sede: CollectionConfig = {
           admin: {
             description:
               "Opcional: en ux-9, tres sedes no tienen teléfono. Con indicativo. Ej. (601) 492 62 60.",
+          },
+        },
+        {
+          name: "enlaceMaps",
+          type: "text",
+          label: "Enlace de Google Maps",
+          validate: validarEnlaceMaps,
+          admin: {
+            description:
+              "Opcional, y lo más exacto para «Ver en Google Maps». Cómo copiarlo: abre Google Maps, busca el sitio y haz clic en él, pulsa «Compartir» y luego «Copiar enlace», y pégalo aquí (empieza por https://maps.app.goo.gl/). Si lo dejas vacío, el botón usa las coordenadas de abajo y, si tampoco hay, busca la dirección escrita, que a veces lleva a otro sitio.",
+          },
+        },
+        {
+          name: "coordenadas",
+          type: "text",
+          label: "Coordenadas",
+          validate: validarCoordenadas,
+          admin: {
+            description:
+              "Opcional: solo se usan si no hay enlace. Latitud y longitud con punto decimal, separadas por una coma. Ej. 4.6467, -74.1287. Cómo copiarlas: en Google Maps, clic derecho sobre el punto exacto y clic en los números que salen arriba del menú.",
           },
         },
       ],

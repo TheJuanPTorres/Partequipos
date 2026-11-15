@@ -349,9 +349,25 @@ export interface MarcasMaquinaria {
   id: number;
   nombre: string;
   /**
-   * Aquí va la máquina recortada de la tarjeta de esta marca en la portada. La tarjeta lleva el color y el logo de la marca (el de su baldosa si la tiene), esta máquina sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.
+   * La tarjeta de esta marca en la portada: su color, su logo (a color o en blanco), la máquina recortada sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.
    */
   portada?: {
+    /**
+     * El fondo de la tarjeta, arriba a la izquierda. Vacío: blanco. Sobre un color claro, la franja de luz y los textos van oscuros.
+     */
+    colorPanel?: string | null;
+    /**
+     * Abajo a la derecha. Vacío: el mismo color, un poco más claro (u oscuro si es claro).
+     */
+    colorPanelFin?: string | null;
+    /**
+     * Solo si «Logo de la tarjeta» está vacío: el logo de la marca de todo el sitio, tal cual o en blanco (para colores oscuros).
+     */
+    logoVariante?: ('original' | 'blanco') | null;
+    /**
+     * Se pinta tal cual, con su color, en la caja del logo (todos al mismo tamaño visual). Vacío: el logo del sitio, como diga el campo de arriba.
+     */
+    logo?: (number | null) | Media;
     /**
      * La máquina recortada, de perfil y sin fondo (900 px de ancho o más). Decorativa. Vacía, la tarjeta lleva la foto de la marca.
      */
@@ -1685,6 +1701,14 @@ export interface Pagina {
      */
     tituloAlineacion?: ('left' | 'center' | 'justify') | null;
     /**
+     * Botón rojo entre el título y el texto, con la alineación del título. Vacío, no se pinta.
+     */
+    botonTexto?: string | null;
+    /**
+     * Una ruta del sitio (/…/) o una dirección https://.
+     */
+    botonEnlace?: string | null;
+    /**
      * Bajo el título. Cada línea es un párrafo (el diseño lleva dos: qué repuestos y para qué marcas). Vacío, no se pinta.
      */
     descripcion?: string | null;
@@ -1712,14 +1736,6 @@ export interface Pagina {
      * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): el botón de cada tarjeta es una flecha redonda, sin texto.
      */
     verMasTexto?: string | null;
-    /**
-     * Sin efecto desde el 2026-10-26 (diseño del cliente): cada tarjeta lleva su botón.
-     */
-    botonTexto?: string | null;
-    /**
-     * Una ruta del sitio (/…/) o una dirección https://.
-     */
-    botonEnlace?: string | null;
     /**
      * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina; la de la portada va en la banda «Marcas de repuestos».
      */
@@ -2493,7 +2509,7 @@ export interface Sede {
   latitud: number;
   longitud: number;
   /**
-   * Cada línea con su dirección. Ej. Maquinaria · Diagonal 16 # 96 G – 85. Puede quedar vacía mientras se consiguen los datos de la sede: entonces solo sale su nombre y su punto en el mapa.
+   * Cada línea con su dirección y, si se tiene, su enlace de Google Maps. Ej. Maquinaria · Diagonal 16 # 96 G – 85. Puede quedar vacía mientras se consiguen los datos de la sede: entonces solo sale su nombre y su punto en el mapa.
    */
   lineas?:
     | {
@@ -2507,6 +2523,14 @@ export interface Sede {
          * Opcional: en ux-9, tres sedes no tienen teléfono. Con indicativo. Ej. (601) 492 62 60.
          */
         telefono?: string | null;
+        /**
+         * Opcional, y lo más exacto para «Ver en Google Maps». Cómo copiarlo: abre Google Maps, busca el sitio y haz clic en él, pulsa «Compartir» y luego «Copiar enlace», y pégalo aquí (empieza por https://maps.app.goo.gl/). Si lo dejas vacío, el botón usa las coordenadas de abajo y, si tampoco hay, busca la dirección escrita, que a veces lleva a otro sitio.
+         */
+        enlaceMaps?: string | null;
+        /**
+         * Opcional: solo se usan si no hay enlace. Latitud y longitud con punto decimal, separadas por una coma. Ej. 4.6467, -74.1287. Cómo copiarlas: en Google Maps, clic derecho sobre el punto exacto y clic en los números que salen arriba del menú.
+         */
+        coordenadas?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -3008,6 +3032,10 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
   portada?:
     | T
     | {
+        colorPanel?: T;
+        colorPanelFin?: T;
+        logoVariante?: T;
+        logo?: T;
         maquina?: T;
         distribuidorNombre?: T;
         distribuidorLogo?: T;
@@ -3366,6 +3394,8 @@ export interface PaginasSelect<T extends boolean = true> {
         titulo?: T;
         tituloResaltado?: T;
         tituloAlineacion?: T;
+        botonTexto?: T;
+        botonEnlace?: T;
         descripcion?: T;
         descripcionAlineacion?: T;
         descripcionAncho?: T;
@@ -3373,8 +3403,6 @@ export interface PaginasSelect<T extends boolean = true> {
         whatsappTexto?: T;
         whatsappMensaje?: T;
         verMasTexto?: T;
-        botonTexto?: T;
-        botonEnlace?: T;
         maquina?: T;
         maquinaReflejo?: T;
       };
@@ -3740,6 +3768,8 @@ export interface SedesSelect<T extends boolean = true> {
         localidad?: T;
         direccion?: T;
         telefono?: T;
+        enlaceMaps?: T;
+        coordenadas?: T;
         id?: T;
       };
   foto?: T;

@@ -16,10 +16,17 @@
 }
 
 /*
- * Ronda 12, t5: si «Sedes» es lo último de la página, su aire de abajo sobra. Antes del pie manda
- * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ * Si «Sedes» cierra la página, el hueco hasta el pie es el COMÚN (`--espacio-seccion`), sin
+ * duplicarlo. El pie ya pone encima `--pie-margen`, que con la tarjeta roja es `--espacio-interno`
+ * (16–32 px, regla de A del 2026-11-12): la sección pone solo la diferencia. Con 0 (ronda 12, t5)
+ * la última fila de tarjetas quedaba pegada al pie (ronda 18, t6). Sin tarjeta roja el pie ya pone
+ * el común entero, así que ahí no se añade nada.
  */
 .sedes:last-child {
+  padding-bottom: max(0px, calc(var(--espacio-seccion) - var(--espacio-interno)));
+}
+
+:global(body:has([data-pie-sin-tarjeta])) .sedes:last-child {
   padding-bottom: 0;
 }
 

@@ -415,23 +415,37 @@
   justify-content: center;
 }
 
+/* Con distribuidor (LiuGong): la misma caja de logo que las demás y, debajo, «Distribuido por». */
 .logoConDistribuidor {
-  height: 26%;
-  flex-direction: column;
-  gap: 6%;
-}
-
-.logo {
-  width: auto;
-  max-width: 100%;
+  top: 4%;
   height: auto;
-  max-height: 100%;
-  object-fit: contain;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.logoConDistribuidor .logo {
-  max-width: 88%;
-  max-height: 52%;
+/* Un poco más pequeño, para que «Distribuido por» quede por encima de la máquina, como el diseño. */
+.logoConDistribuidor .logoFijo {
+  width: 86%;
+}
+
+/*
+ * La caja FIJA del logo (2026-11-13, regla del #439): la de la zona del logo del diseño, 3,55:1;
+ * dentro, el contenido visible del logo con la misma área en todas las tarjetas (`LogoTarjeta`).
+ */
+.logoFijo {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 213 / 60;
+}
+
+.logoRecorte {
+  position: absolute;
+  overflow: hidden;
+}
+
+.logoImagen {
+  position: absolute;
 }
 
 .nombre {
@@ -474,6 +488,14 @@
   bottom: 2%;
   left: 3%;
   height: 62%;
+}
+
+/*
+ * Con distribuidor (LiuGong), la máquina más baja (dirección, 2026-11-13): con el logo y la línea
+ * «Distribuido por» encima, el brazo de la excavadora rozaba esa línea. Apoyada abajo, igual.
+ */
+.panel[data-distribuidor] .maquina {
+  height: 54%;
 }
 
 .maquinaImagen {

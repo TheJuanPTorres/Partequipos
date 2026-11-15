@@ -1,4 +1,5 @@
 import { campoColorMarca } from "@/lib/fields/colorMarca";
+import { validarColor } from "@/lib/fields/tipografiaTitulo";
 import { normalizarEnlaceExterno, validarEnlaceExterno } from "@/lib/nueva/enlaceExterno";
 import { TEXTOS_ADITAMENTOS as T } from "@/lib/nueva/paginaAditamentos";
 import type { CollectionConfig } from "payload";
@@ -56,9 +57,74 @@ export const MarcaMaquinaria: CollectionConfig = {
       label: "PORTADA: tarjeta de «Maquinaria pesada nueva»",
       admin: {
         description:
-          "Aquí va la máquina recortada de la tarjeta de esta marca en la portada. La tarjeta lleva el color y el logo de la marca (el de su baldosa si la tiene), esta máquina sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.",
+          "La tarjeta de esta marca en la portada: su color, su logo (a color o en blanco), la máquina recortada sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.",
       },
       fields: [
+        /*
+         * Color y logo PROPIOS de la tarjeta (dirección, 2026-11-13: la sección deja de usar los
+         * de las baldosas de repuestos, que no cambian). Valores del diseño en la migración.
+         */
+        {
+          type: "row",
+          fields: [
+            {
+              name: "colorPanel",
+              type: "text",
+              label: "Color de la tarjeta",
+              validate: validarColor,
+              admin: {
+                width: "33%",
+                placeholder: "#FFFFFF",
+                components: { Field: "/components/admin/CampoColor" },
+                description:
+                  "El fondo de la tarjeta, arriba a la izquierda. Vacío: blanco. Sobre un color claro, la franja de luz y los textos van oscuros.",
+              },
+            },
+            {
+              name: "colorPanelFin",
+              type: "text",
+              label: "Color de la tarjeta: final del degradado",
+              validate: validarColor,
+              admin: {
+                width: "33%",
+                placeholder: "#E9E9EB",
+                components: { Field: "/components/admin/CampoColor" },
+                description:
+                  "Abajo a la derecha. Vacío: el mismo color, un poco más claro (u oscuro si es claro).",
+              },
+            },
+            {
+              name: "logoVariante",
+              type: "select",
+              label: "Sin logo propio: el del sitio",
+              defaultValue: "original",
+              options: [
+                { label: "Tal cual", value: "original" },
+                { label: "En blanco", value: "blanco" },
+              ],
+              admin: {
+                width: "33%",
+                description:
+                  "Solo si «Logo de la tarjeta» está vacío: el logo de la marca de todo el sitio, tal cual o en blanco (para colores oscuros).",
+              },
+            },
+          ],
+        },
+        /*
+         * El logo PROPIO de la tarjeta (dirección, 2026-11-13): el del diseño del cliente, a color
+         * sobre los paneles claros (Case, Yanmar, LiuGong) y en blanco sobre los oscuros. Los logos
+         * del sitio de esas marcas son blancos (los de repuestos) y no sirven sobre un panel claro.
+         */
+        {
+          name: "logo",
+          type: "upload",
+          relationTo: "media",
+          label: "Logo de la tarjeta (PNG o WebP transparente)",
+          admin: {
+            description:
+              "Se pinta tal cual, con su color, en la caja del logo (todos al mismo tamaño visual). Vacío: el logo del sitio, como diga el campo de arriba.",
+          },
+        },
         {
           name: "maquina",
           type: "upload",

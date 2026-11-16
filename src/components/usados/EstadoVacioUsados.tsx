@@ -43,7 +43,8 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
           El inventario de usados cambia con frecuencia. Mientras tanto, mira estas opciones o
           déjanos tus datos y te avisamos en cuanto llegue una.
         </p>
-        <div className={estilos.acciones}>
+        {/* El botón flotante de WhatsApp sube si cae sobre estos botones (a 390 tapaba el verde). */}
+        <div className={estilos.acciones} data-evita-flotante="">
           <BotonFormulario
             href="/contactanos/"
             className={`${estilos.boton} ${estilos.botonRojo}`}

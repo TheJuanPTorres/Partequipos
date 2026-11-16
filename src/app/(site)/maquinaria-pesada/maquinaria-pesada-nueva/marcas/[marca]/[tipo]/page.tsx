@@ -13,6 +13,7 @@ import estilosTarjetas from "@/components/nueva/marcaNueva.module.css";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { colorDeMarca, estiloDeMarca, tintaSobre } from "@/lib/marca/colorMarca";
+import { migasDeMarca } from "@/lib/nueva/enlaceExterno";
 import { usaDisenoKit } from "@/lib/nueva/paginaAditamentos";
 import { tarjetasDeEquipos, tituloFranja, vistaEncabezadoTipoNueva } from "@/lib/nueva/paginaTipo";
 import type { TarjetaEquipo as DatosTarjeta } from "@/lib/nueva/paginaMarcaAndres";
@@ -104,7 +105,8 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
     { nombre: "Maquinaria pesada", path: rutas.maquinaria() },
     { nombre: "Nueva", path: rutas.nuevaTipos() },
     { nombre: "Marcas", path: rutas.marcasMaquinaria() },
-    { nombre: marca.nombre, path: rutas.marcaMaquinaria(marca.slug) },
+    // Sin página propia, sin nivel (como el megamenú): hoy esta página ya da 404 para esa marca.
+    ...migasDeMarca(marca, { nombre: marca.nombre, path: rutas.marcaMaquinaria(marca.slug) }),
     { nombre: tipo.nombre, path: rutas.tipoMaquinaria(marca.slug, tipo.slug) },
   ];
 

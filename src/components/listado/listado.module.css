@@ -276,9 +276,15 @@
 }
 
 /* ---- Cuerpo: filtros y resultados --------------------------------------- */
+/*
+ * Arriba, el hueco entre secciones (responsive de usada, 2026-11-15): de la cabecera al primer
+ * texto del cuerpo se ve `--espacio-seccion`. Sin categorías al lado, se restan 4 px del aire del
+ * botón de los filtros en escritorio; antes, 24 y 28 px fijos (28 visibles a cualquier ancho:
+ * cortos desde 768).
+ */
 .cuerpo {
   max-width: 1400px;
-  margin: 24px auto 0;
+  margin: calc(var(--espacio-seccion) - 4px) auto 0;
   /* Abajo, el espaciado común (criterio de espacios, 2026-11-09); antes 64 · 80 px. */
   padding: 0 16px var(--espacio-seccion);
 }
@@ -849,8 +855,19 @@
 .columnaResultados > .resultados {
   margin-top: 0;
 }
+/*
+ * Sin las categorías al lado (marcas de usada), en móvil y tablet lo primero es «Filtrar», centrado
+ * en su caja de 44 px: su aire de arriba (unos 11 px) ya es parte del hueco.
+ */
+@media (max-width: 1024px) {
+  .cuerpo:not([data-lateral]) {
+    margin-top: calc(var(--espacio-seccion) - 15px);
+  }
+}
+
+/* Con las categorías al lado, lo primero es el título «Categorías», sin aire propio arriba. */
 .cuerpo[data-lateral] {
-  margin-top: 28px;
+  margin-top: var(--espacio-seccion);
 }
 .cuerpo[data-lateral] .columnaResultados {
   margin-top: 24px;

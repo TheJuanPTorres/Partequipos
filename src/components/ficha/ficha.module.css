@@ -103,6 +103,15 @@
   background: var(--color-fondo);
 }
 
+/*
+ * Ficha de usados (`FichaProducto`; responsive de usada, 2026-11-15): de la tarjeta principal a la
+ * descripción (u «Otras unidades»), el hueco entre secciones. Con `--ficha-margen` eran 11 px a 390
+ * y 23 a 768. La ficha de nueva (`FichaNueva`) no lleva esta clase.
+ */
+.principalUsada {
+  margin-bottom: var(--espacio-seccion);
+}
+
 /* Sin fotos: solo la columna de datos, a todo el ancho y sobre blanco. */
 .principal[data-sin-fotos] {
   grid-template-columns: 1fr;

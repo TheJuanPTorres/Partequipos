@@ -107,7 +107,8 @@ export function HeroMarca({
             alt=""
             fill
             priority
-            sizes="100vw"
+            // La foto se recorta con cover en una caja de 630–670 px de alto: pide al menos 1200 px de ancho, o se amplía.
+            sizes="max(100vw, 1200px)"
             className={estilos.fondo}
             style={{ objectPosition: fondo.posicion }}
           />

@@ -27,7 +27,8 @@ export function Breadcrumbs({ items }: { items: BreadcrumbItem[] }) {
                 </span>
               ) : (
                 <>
-                  <Link href={item.path} className="underline hover:text-gray-900">
+                  {/* `py-0.5`: zona pulsable de 24 px (medía 20; WCAG 2.5.8), sin mover la línea. */}
+                  <Link href={item.path} className="py-0.5 underline hover:text-gray-900">
                     {item.nombre}
                   </Link>
                   <span aria-hidden="true">/</span>

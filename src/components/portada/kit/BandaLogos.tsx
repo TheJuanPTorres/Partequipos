@@ -5,8 +5,10 @@ import Link from "next/link";
 import { useId, type CSSProperties } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
+import { LogoOptico } from "@/components/marca/LogoOptico";
 import { BotonPausa } from "@/components/movimiento/BotonPausa";
 import { usePausa } from "@/components/movimiento/useMovimiento";
+import type { CajaRelativa } from "@/lib/marca/tamanoOptico";
 import { AVISO_OTRA_PESTANA } from "@/lib/nueva/enlaceExterno";
 import type { LogoDePortada } from "@/lib/portada/kitCliente";
 import { rellenoDeBanda } from "@/lib/portada/marcasBanda";
@@ -89,31 +91,20 @@ export function BandaLogos({
                           rel="noopener noreferrer"
                           aria-label={`${l.nombre} (${AVISO_OTRA_PESTANA})`}
                         >
-                          <LogoMarca
-                            logo={l.logo}
-                            alt=""
-                            sizes={sizesDeLogo(l.logo, espejo)}
-                            className={estilos.logo}
-                          />
+                          <LogoDeBanda logo={l.logo} alt="" espejo={espejo} />
                           <IconoExterno />
                         </a>
                       ) : l.href && accesible ? (
                         // Solo la primera copia es enlace: las demás son decorativas y no se enfocan.
                         <Link href={l.href} className={estilos.caja} prefetch={false}>
-                          <LogoMarca
-                            logo={l.logo}
-                            alt={l.logo.alt}
-                            sizes={sizesDeLogo(l.logo, espejo)}
-                            className={estilos.logo}
-                          />
+                          <LogoDeBanda logo={l.logo} alt={l.logo.alt} espejo={espejo} />
                         </Link>
                       ) : (
                         <span className={estilos.caja}>
-                          <LogoMarca
+                          <LogoDeBanda
                             logo={l.logo}
                             alt={accesible ? l.logo.alt : ""}
-                            sizes={sizesDeLogo(l.logo, espejo)}
-                            className={estilos.logo}
+                            espejo={espejo}
                           />
                           {/* En las copias decorativas, el mismo icono: la banda se ve igual. */}
                           {l.href && l.externo ? <IconoExterno /> : null}
@@ -148,5 +139,42 @@ function IconoExterno() {
       stroke={1.75}
       className={estilos.externo}
     />
+  );
+}
+
+/**
+ * La caja útil de un logo en la banda de «Marcas de repuestos»: ~152 × 44 px en el teléfono y a
+ * 1440 (`.seccion[data-espejo] .caja` menos su relleno), 3,3:1. Con un área del 40 % caben sin
+ * tocar el borde los logos de las marcas de repuestos medidos (de 3,1:1 a 8,2:1).
+ */
+const CAJA_BANDA_REPUESTOS: CajaRelativa = { proporcion: 3.3, area: 0.4 };
+
+/**
+ * Un logo de la banda. En «Marcas de repuestos» (`espejo`), con el MISMO TAMAÑO A LA VISTA
+ * (`LogoOptico`, regla común de #439/#445; la parte visible la mide `SeccionMarcasKit`). En
+ * «Marcas que mueven», como siempre.
+ */
+function LogoDeBanda({
+  logo,
+  alt,
+  espejo,
+}: {
+  logo: LogoDePortada["logo"];
+  alt: string;
+  espejo: boolean;
+}) {
+  if (espejo && logo.recorte) {
+    return (
+      <LogoOptico
+        logo={logo}
+        caja={CAJA_BANDA_REPUESTOS}
+        alt={alt}
+        sizes="(min-width: 1025px) max(152px, 10.8vw), 152px"
+        className={estilos.logoOptico}
+      />
+    );
+  }
+  return (
+    <LogoMarca logo={logo} alt={alt} sizes={sizesDeLogo(logo, espejo)} className={estilos.logo} />
   );
 }

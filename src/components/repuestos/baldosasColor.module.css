@@ -135,6 +135,17 @@
   transition: transform 0.3s;
 }
 
+/*
+ * Con el mismo tamaño a la vista (`LogoOptico`, índice de marcas de repuestos): la caja es más
+ * ancha (84 %; el alto lo da su proporción, 3,7:1) y el logo ocupa en ella la misma área que los
+ * demás. 168 px de antes × 84/68.
+ */
+.logo.logoOptico {
+  width: 84%;
+  max-width: 207px;
+  height: auto;
+}
+
 /* Un logo en dos pisos (Hitachi LANDCROS): más alto, para que pese como los demás. */
 .logoAlto {
   height: 50%;

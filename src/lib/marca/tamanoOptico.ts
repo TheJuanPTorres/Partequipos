@@ -103,3 +103,47 @@ function valido(r: Recorte | null | undefined): r is Recorte {
     r.y + r.h <= 1.0001
   );
 }
+
+/**
+ * UNA CAJA QUE CAMBIA DE TAMAÑO (logos de repuestos, ronda 19, 2026-11-15): la caja tiene una
+ * PROPORCIÓN fija (ancho / alto) y el área visible que se busca es una FRACCIÓN de la suya. Así
+ * la misma regla vale en una baldosa del 30 % de la pantalla o en una tarjeta de 152 px.
+ */
+export type CajaRelativa = {
+  /** Ancho / alto de la caja. */
+  proporcion: number;
+  /** El área visible que se busca, en fracción del área de la caja (0–1). */
+  area: number;
+};
+
+/**
+ * `colocarLogo` en PORCENTAJES: `visible` en % de la caja y `imagen` en % de `visible` (el fichero
+ * entero, desplazado para que su contenido caiga en `visible`). Lo pinta `LogoOptico`.
+ */
+export function colocarLogoRelativo(
+  logo: { width: number; height: number; recorte?: Recorte | null },
+  caja: CajaRelativa,
+): Colocacion {
+  const alto = 1000;
+  const ancho = alto * caja.proporcion;
+  const { visible, imagen } = colocarLogo(logo, {
+    ancho,
+    alto,
+    area: caja.area * ancho * alto,
+  });
+  const pct = (n: number, de: number) => redondear((n / de) * 100);
+  return {
+    visible: {
+      izquierda: pct(visible.izquierda, ancho),
+      arriba: pct(visible.arriba, alto),
+      ancho: pct(visible.ancho, ancho),
+      alto: pct(visible.alto, alto),
+    },
+    imagen: {
+      izquierda: pct(imagen.izquierda, visible.ancho),
+      arriba: pct(imagen.arriba, visible.alto),
+      ancho: pct(imagen.ancho, visible.ancho),
+      alto: pct(imagen.alto, visible.alto),
+    },
+  };
+}

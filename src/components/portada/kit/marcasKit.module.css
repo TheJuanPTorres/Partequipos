@@ -363,6 +363,14 @@
   max-height: 44px;
 }
 
+/*
+ * Con el mismo tamaño a la vista (`LogoOptico`, ronda 19): el logo llena el ancho útil de la caja
+ * y su alto sale de la proporción (3,3:1, ~44 px); dentro, cada logo ocupa la misma área.
+ */
+.logoOptico {
+  width: 100%;
+}
+
 @media (min-width: 1025px) {
   .seccion[data-espejo] .cabecera {
     padding: 0 5% 0 40%;

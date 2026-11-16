@@ -3,9 +3,11 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
+import { LogoOpticoServidor } from "@/components/marca/LogoOpticoServidor";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { AVISO_OTRA_PESTANA } from "@/lib/nueva/enlaceExterno";
 import { vistaBaldosa } from "@/lib/repuestos/baldosasColor";
+import type { CajaRelativa } from "@/lib/marca/tamanoOptico";
 import type { PlacaMarca } from "@/lib/repuestos/categoria";
 
 import estilos from "./baldosasColor.module.css";
@@ -27,13 +29,25 @@ import estilosMarca from "./marca.module.css";
  *
  * También el índice de marcas de maquinaria nueva (2026-11-04, `sobre="maquinaria"`): una marca
  * sin página propia (`externo`, LiuGong) lleva a su distribuidor en pestaña nueva, con su icono.
+ *
+ * `tamanoOptico` (índice de marcas de REPUESTOS, ronda 19, 2026-11-15): los logos con el MISMO
+ * TAMAÑO A LA VISTA (`LogoOptico`, la regla común de #439/#445): sin sus márgenes y con la misma
+ * área en una caja de 3,7:1. Sustituye al apaño de `alto` para los logos en dos pisos.
  */
+
+/**
+ * La caja del logo en la baldosa: 84 % de su ancho y 3,7:1 (el 34 % de su alto, como antes). Con
+ * un área del 42 % caben sin tocar el borde los logos medidos, de 2:1 (Hitachi LANDCROS) a 8,7:1
+ * (Caterpillar), y el área a la vista queda como la de antes (≈12 % de la baldosa).
+ */
+export const CAJA_BALDOSA: CajaRelativa = { proporcion: 3.7, area: 0.42 };
 export function BaldosasColorMarcas({
   id,
   marcas,
   h1,
   sobre = "repuestos",
   cabecera = "roja",
+  tamanoOptico = false,
 }: {
   id: string;
   marcas: PlacaMarca[];
@@ -41,6 +55,8 @@ export function BaldosasColorMarcas({
   /** Qué se ve en cada marca, para el nombre accesible de «Ver más». */
   sobre?: string;
   cabecera?: "roja" | "oscura";
+  /** Logos con el mismo tamaño a la vista (índice de marcas de repuestos). */
+  tamanoOptico?: boolean;
 }) {
   const idTitulo = `${id}-titulo`;
   const oscura = cabecera === "oscura";
@@ -94,7 +110,15 @@ export function BaldosasColorMarcas({
               };
               const contenido = (
                 <>
-                  {v.logo ? (
+                  {v.logo && tamanoOptico ? (
+                    <LogoOpticoServidor
+                      logo={v.logo}
+                      caja={CAJA_BALDOSA}
+                      alt=""
+                      sizes="(max-width: 1023px) 38vw, 207px"
+                      className={`${estilos.logo} ${estilos.logoOptico}`}
+                    />
+                  ) : v.logo ? (
                     <LogoMarca
                       logo={v.logo}
                       alt=""

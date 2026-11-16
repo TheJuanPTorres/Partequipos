@@ -1,0 +1,17 @@
+/* `LogoOptico`: la caja (proporción fija; el ancho lo pone quien la usa). */
+.caja {
+  position: relative;
+  display: block;
+  flex: none;
+}
+
+/* La parte visible del logo, sin márgenes, centrada en la caja. */
+.recorte {
+  position: absolute;
+  overflow: hidden;
+}
+
+/* El fichero entero, desplazado para que su contenido caiga en el recorte. */
+.imagen {
+  position: absolute;
+}

@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { recorteVisible } from "@/lib/marca/recorteLogo";
 import type { LogoDePortada } from "@/lib/portada/kitCliente";
 import type { ImagenLista } from "@/lib/utils/relations";
 
@@ -26,7 +27,7 @@ import estilos from "./marcasKit.module.css";
 
 const SIZES_MAQUINA = "(min-width: 1025px) 46vw, 85vw";
 
-export function SeccionMarcasKit({
+export async function SeccionMarcasKit({
   logos,
   titulo,
   resaltado,
@@ -49,6 +50,16 @@ export function SeccionMarcasKit({
   altMaquina?: string;
 }) {
   if (logos.length === 0) return null;
+  // «Marcas de repuestos»: cada logo con su parte visible medida (`recorteVisible`, en caché), para
+  // que la banda los pinte con el mismo tamaño a la vista (`LogoOptico`, ronda 19, 2026-11-15).
+  const logosBanda = espejo
+    ? await Promise.all(
+        logos.map(async (l) => ({
+          ...l,
+          logo: { ...l.logo, recorte: l.logo.recorte ?? (await recorteVisible(l.logo.url)) },
+        })),
+      )
+    : logos;
   const idTitulo = espejo ? "marcas-repuestos-titulo" : "marcas-kit-titulo";
   return (
     <section
@@ -106,7 +117,7 @@ export function SeccionMarcasKit({
         ) : null}
 
         <BandaLogos
-          logos={logos}
+          logos={logosBanda}
           etiqueta={espejo ? "Marcas de repuestos" : undefined}
           espejo={espejo}
         />

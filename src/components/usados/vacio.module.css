@@ -5,11 +5,12 @@
  */
 .vacio {
   display: grid;
-  gap: 10px;
+  /* Entre la cabecera y cada bloque de alternativas: el hueco entre secciones (§5). */
+  gap: var(--espacio-seccion);
 }
 
 .cabecera {
-  padding: 40px 20px;
+  padding: var(--espacio-interno);
   border-radius: 30px;
   background: #fff;
   text-align: center;
@@ -36,7 +37,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: var(--espacio-interno);
 }
 
 /* Móvil: un botón debajo del otro. */
@@ -96,14 +97,10 @@
   margin-top: 0;
   border-radius: 30px;
   /* El 10 % de relleno de abajo de la «Plantilla 1» dejaba un hueco grande bajo la tarjeta. */
-  padding-bottom: 40px;
+  padding-bottom: var(--espacio-interno);
 }
 
 @media (min-width: 1025px) {
-  .cabecera {
-    padding: 56px 40px;
-  }
-
   .titulo {
     font-size: 30px;
   }

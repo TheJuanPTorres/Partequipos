@@ -106,4 +106,5 @@ for (const ruta of rutas) {
 }
 fs.writeFileSync(salida, lineas.join("\n"));
 await navegador.close();
-console.log(`escrito ${salida}`);
+process.stdout.write(`escrito ${salida}
+`);

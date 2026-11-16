@@ -855,19 +855,18 @@
 .columnaResultados > .resultados {
   margin-top: 0;
 }
-/*
- * Sin las categorías al lado (marcas de usada), en móvil y tablet lo primero es «Filtrar», centrado
- * en su caja de 44 px: su aire de arriba (unos 11 px) ya es parte del hueco.
- */
-@media (max-width: 1024px) {
-  .cuerpo:not([data-lateral]) {
-    margin-top: calc(var(--espacio-seccion) - 15px);
-  }
-}
-
 /* Con las categorías al lado, lo primero es el título «Categorías», sin aire propio arriba. */
 .cuerpo[data-lateral] {
   margin-top: var(--espacio-seccion);
+}
+/*
+ * Sin categorías (marcas de usada), en móvil y tablet lo primero es «Filtrar», centrado en su caja
+ * de 44 px: sus 11 px de aire de arriba ya son parte del hueco (medido: 35 px a 390 sin restarlos).
+ */
+@media (max-width: 1024px) {
+  .cuerpo[data-lateral]:not(:has(.categorias)) {
+    margin-top: calc(var(--espacio-seccion) - 11px);
+  }
 }
 .cuerpo[data-lateral] .columnaResultados {
   margin-top: 24px;

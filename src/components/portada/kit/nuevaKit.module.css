@@ -425,7 +425,7 @@
 
 /* Un poco más pequeño, para que «Distribuido por» quede por encima de la máquina, como el diseño. */
 .logoConDistribuidor .logoFijo {
-  width: 86%;
+  width: 100%;
 }
 
 /*
@@ -544,6 +544,34 @@
   width: 16px;
   height: 16px;
   flex: none;
+}
+
+/* Como en el diseño: la flecha se adelanta un poco al pasar el ratón (sin movimiento, quieta). */
+.flechaBoton {
+  transition: transform 300ms ease;
+}
+
+.tarjeta:hover .flechaBoton,
+.tarjeta:focus-visible .flechaBoton {
+  transform: translateX(2px);
+}
+
+.tarjeta:hover .flechaBoton[data-afuera],
+.tarjeta:focus-visible .flechaBoton[data-afuera] {
+  transform: translate(2px, -2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flechaBoton {
+    transition: none;
+  }
+
+  .tarjeta:hover .flechaBoton,
+  .tarjeta:focus-visible .flechaBoton,
+  .tarjeta:hover .flechaBoton[data-afuera],
+  .tarjeta:focus-visible .flechaBoton[data-afuera] {
+    transform: none;
+  }
 }
 
 /* Al pasar el ratón (o con el foco) el botón se rellena de rojo; el externo ya va relleno. */

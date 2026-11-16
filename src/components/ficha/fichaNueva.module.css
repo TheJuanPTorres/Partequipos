@@ -428,31 +428,33 @@ section.principal[data-con-izquierda] {
 
 /* ====================== 2. «OTRAS <TIPO>» ====================== */
 
-.otras {
-  /* Hasta el comun: el 5cqi llegaba a 192 px a 3840 hasta la llamada. */
-  padding: 0 var(--ficha-margen) min(5cqi, var(--espacio-seccion));
+/*
+ * RESPONSIVE DE NUEVA POR DENTRO (2026-11-16, regla de espaciado de Juan Pablo): de la tarjeta del
+ * equipo a «Otros modelos», el espaciado común. Antes, `--ficha-margen` (3cqi) más 20 px en móvil:
+ * 32 · 23 · 30 · 44 px a 390 · 768 · 1010 · 1440. Con la clase repetida, para ganar a `.principal`
+ * de `ficha.module.css` (compartido con la ficha de usados, que no se toca).
+ */
+.principal.principal {
+  margin-bottom: var(--espacio-seccion);
 }
 
-/* En móvil el banner quedaba a 12 px de la tarjeta del equipo (medido en el #404): 32. */
-@media (max-width: 767px) {
-  .otras {
-    padding-top: 20px;
-  }
+/* Con la cabecera del kit, de ella a la tarjeta también el común (antes, 24 px fijos). */
+.principal.principal[data-con-kit] {
+  margin-top: var(--espacio-seccion);
+}
+
+.otras {
+  /* Hasta la llamada, el común (antes `min(5cqi, …)`: 19 px a 390). */
+  padding: 0 var(--ficha-margen) var(--espacio-seccion);
 }
 
 /*
- * El banner (logo, título y «Ver marca») es `BannerMarcaTipo` (src/components/nueva/). Aire
- * entre el banner y las tarjetas (Juan Pablo, 2026-10-27): 32 px; 24 en móvil. Con `.otras`
- * delante, porque `.rejilla { margin: 0 }` va después y lo pisaba (quedaba pegado).
+ * El banner (logo, título y «Ver marca») es `BannerMarcaTipo` (src/components/nueva/). Del banner a
+ * las tarjetas, el espacio interno (antes 32 px y 24 en móvil, a mano). Con `.otras` delante,
+ * porque `.rejilla { margin: 0 }` va después y lo pisaba (quedaba pegado).
  */
 .otras .rejillaOtras {
-  margin-top: 32px;
-}
-
-@media (max-width: 767px) {
-  .otras .rejillaOtras {
-    margin-top: 24px;
-  }
+  margin-top: var(--espacio-interno);
 }
 
 /*

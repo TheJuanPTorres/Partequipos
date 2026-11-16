@@ -6,6 +6,7 @@ import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { BannerMarcaTipo } from "@/components/nueva/BannerMarcaTipo";
 import estilosKit from "@/components/nueva/kit/kit.module.css";
 import { TarjetaKit } from "@/components/nueva/kit/TarjetaKit";
+import estilosInterior from "@/components/nueva/interiorNueva.module.css";
 import estilosTarjetas from "@/components/nueva/marcaNueva.module.css";
 import { BarraSeries } from "@/components/repuestos/BarraSeries";
 import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
@@ -152,7 +153,7 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
           lectores de pantalla. */}
       <section
         id={ANCLA_MODELOS}
-        className={estilosTarjetas.seccionTipo}
+        className={`${estilosTarjetas.seccionTipo} ${estilosInterior.seccion}`}
         aria-label={`Modelos de ${titulo}`}
       >
         {pastillas.length > 0 ? (

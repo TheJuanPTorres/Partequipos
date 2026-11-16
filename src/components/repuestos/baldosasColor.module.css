@@ -128,8 +128,8 @@
 
 .logo {
   width: 68%;
-  /* Los ficheros de logo miden 179–216 px: más ancho que eso los amplía (a 1010, con 2 por fila, ×1,24–1,5). */
-  max-width: 216px;
+  /* Los ficheros de logo miden 160–216 px: más ancho que 168 los amplía (a 1010, con 2 por fila, ×1,24–1,5). */
+  max-width: 168px;
   height: 34%;
   transform: translateY(-6%);
   transition: transform 0.3s;

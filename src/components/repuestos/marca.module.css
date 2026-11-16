@@ -1298,6 +1298,10 @@ a.modelo:hover {
  */
 @media (min-width: 1025px) {
   .rejillaTarjetas {
+    /* Techo de ancho (criterio de Juan Pablo: nada crece sin techo): a 2000 px cada tarjeta mide
+       ~650 px y la foto, que se recorta a 3:2, no pasa de ×1,1 de lo que mide el fichero. */
+    max-width: 2000px;
+    margin-inline: auto;
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 

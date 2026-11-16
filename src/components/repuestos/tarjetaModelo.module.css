@@ -77,8 +77,20 @@
 .texto {
   position: relative;
   display: flex;
+  min-width: 0;
   flex-direction: column;
   gap: 2px;
+}
+
+/* El tipo de máquina: pequeño, negro y de una sola línea (con elipsis si no cabe). */
+.tipo {
+  overflow: hidden;
+  color: var(--color-texto);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .modelo {

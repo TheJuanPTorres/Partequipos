@@ -77,8 +77,10 @@ export const RepuestosMarca: GlobalConfig = {
       type: "text",
       label: "Segunda línea, tras el nombre de la marca",
       admin: {
+        // Sin uso desde 2026-11-15 (Juan Pablo): las cabeceras llevan solo el nombre de la marca.
+        hidden: true,
         description:
-          "Ej.: «En Colombia» → «CATERPILLAR En Colombia». En las marcas y sus tipos; las categorías técnicas no la llevan.",
+          "Sin uso: la cabecera de la marca y del tipo lleva solo el nombre de la marca.",
       },
     },
     {

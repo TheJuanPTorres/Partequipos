@@ -13,12 +13,15 @@ import estilos from "./tarjetaModelo.module.css";
  * pinta sin botón ni enlace. El guion del modelo no se corta («ZX270LC-3»).
  */
 export function TarjetaModelo({
+  tipo,
   modelo,
   detalle,
   nombreCompleto,
   href,
   logo,
 }: {
+  /** El tipo de máquina, pequeño y negro encima del modelo, en una sola línea. */
+  tipo?: string | null;
   modelo: string;
   detalle?: string | null;
   nombreCompleto: string;
@@ -34,6 +37,7 @@ export function TarjetaModelo({
         </span>
       ) : null}
       <span className={estilos.texto}>
+        {tipo ? <span className={estilos.tipo}>{tipo}</span> : null}
         <span className={estilos.modelo}>{modelo.replaceAll("-", "\u2011")}</span>
         {detalle ? <span className={estilos.detalle}>{detalle}</span> : null}
       </span>

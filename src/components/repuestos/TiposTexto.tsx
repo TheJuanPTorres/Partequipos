@@ -1,26 +1,29 @@
-import { IconArrowRight } from "@tabler/icons-react";
-
+import type { LogoMarca } from "@/lib/marca/logoMarca";
 import type { TarjetaMarca } from "@/lib/repuestos/marca";
 
 import estilos from "./marca.module.css";
 import estilosTexto from "./modelosTexto.module.css";
+import { TarjetaModelo } from "./TarjetaModelo";
+import estilosTarjeta from "./tarjetaModelo.module.css";
 
 /**
  * «REPUESTOS SEGÚN TIPO DE MÁQUINA» de la página de marca, SIN FOTOS (Ronda 17, 2026-11-09: el
- * cliente vende repuestos, no máquinas). El mismo listado de antes —una entrada por tipo, o por
- * serie en los tipos con series—, pero como las tarjetas de texto de la lista de modelos
- * (`ModelosTexto`, #433): el nombre en grande, cuántos modelos tiene, la franja fina del color de
- * la marca y una flecha. Toda la tarjeta es el enlace a la página del tipo (o al ancla de la
- * serie). 4 por fila en escritorio, 3 en tablet y 2 en móvil.
+ * cliente vende repuestos, no máquinas). Una entrada por tipo, o por serie en los tipos con
+ * series, con la TARJETA DE MODELO del diseño v2 (`TarjetaModelo`, 2026-11-15, Juan Pablo): dos
+ * capas, el logo de la marca, el tipo en grande, «N modelos» donde va la serie, la barrida gris y
+ * el botón del color de la marca. Toda la tarjeta es el enlace a la página del tipo (o al ancla
+ * de la serie).
  */
 export function TiposTexto({
   id,
   titulo,
   tarjetas,
+  logo = null,
 }: {
   id: string;
   titulo: string;
   tarjetas: TarjetaMarca[];
+  logo?: LogoMarca | null;
 }) {
   if (!titulo || tarjetas.length === 0) return null;
   const idTitulo = `${id}-titulo`;
@@ -34,50 +37,20 @@ export function TiposTexto({
         {titulo}
       </h2>
       <div className={estilosTexto.grupo}>
-        <ul className={estilosTexto.rejilla}>
-          {tarjetas.map((t) => {
-            const contenido = (
-              <>
-                {t.tituloCorto ? (
-                  <>
-                    <span className={estilosTexto.nombre} aria-hidden="true">
-                      {t.tituloCorto}
-                    </span>
-                    <span className="sr-only">{t.titulo}</span>
-                  </>
-                ) : (
-                  <span className={estilosTexto.nombre}>{t.titulo}</span>
-                )}
-                {t.panel ? (
-                  <span className={estilosTexto.detalle}>
-                    {t.panel.total} {t.panel.total === 1 ? "modelo" : "modelos"}
-                  </span>
-                ) : null}
-                {t.href ? (
-                  <IconArrowRight
-                    aria-hidden="true"
-                    focusable="false"
-                    size={22}
-                    stroke={2}
-                    className={estilosTexto.flecha}
-                  />
-                ) : null}
-              </>
-            );
-            return (
-              <li key={t.clave} className={estilosTexto.tarjeta}>
-                {t.href ? (
-                  <a href={t.href} className={estilosTexto.enlace}>
-                    {contenido}
-                  </a>
-                ) : (
-                  <div className={`${estilosTexto.enlace} ${estilosTexto.sinPagina}`}>
-                    {contenido}
-                  </div>
-                )}
-              </li>
-            );
-          })}
+        <ul className={estilosTarjeta.rejilla}>
+          {tarjetas.map((t) => (
+            <li key={t.clave} className={estilosTexto.tarjeta}>
+              <TarjetaModelo
+                modelo={t.tituloCorto || t.titulo}
+                detalle={
+                  t.panel ? `${t.panel.total} ${t.panel.total === 1 ? "modelo" : "modelos"}` : null
+                }
+                nombreCompleto={t.titulo}
+                href={t.href}
+                logo={logo}
+              />
+            </li>
+          ))}
         </ul>
       </div>
     </section>

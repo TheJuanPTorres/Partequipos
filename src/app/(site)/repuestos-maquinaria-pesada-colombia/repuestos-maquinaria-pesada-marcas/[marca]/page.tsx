@@ -18,7 +18,7 @@ import { getModelosDeMarca, getModelosPorIds } from "@/lib/queries/getModelos";
 import { getRepuestosMarca, getTiposDeMarcaConImagen } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { estiloDeMarca } from "@/lib/marca/colorMarca";
-import { tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
+import { logoConAlt, tarjetasDeTipos, vistaEncabezado } from "@/lib/repuestos/marca";
 import { idsDeOtrasEntradas, listaDeModelos } from "@/lib/repuestos/tipo";
 import { vistaPorQue } from "@/lib/repuestos/plantillaTipo";
 import { sedesDePortada } from "@/lib/portada/sedes";
@@ -110,6 +110,7 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
         id={ANCLA_TIPOS}
         titulo={texto(global.tituloTipos)}
         tarjetas={tarjetasDeTipos(marca, tipos, modelosDe)}
+        logo={logoConAlt(marca)}
       />
 
       <ContactoMarca

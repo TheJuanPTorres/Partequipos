@@ -25,7 +25,7 @@ export type VistaEncabezado = {
   antetitulo?: string;
   /** Primera línea del `<h1>`: «Repuestos para maquinaria pesada». */
   linea1: string;
-  /** Segunda: «CATERPILLAR En Colombia». Vacía: no se pinta. */
+  /** Segunda: el nombre de la marca, «CATERPILLAR» (sin «En Colombia»: Juan Pablo, 2026-11-15). */
   linea2: string;
   /** Texto de presentación: la descripción de la marca. */
   descripcion: string;
@@ -46,10 +46,9 @@ export function logoConAlt(marca: Marca, nombre = marca.nombre.trim()): LogoConA
 export function vistaEncabezado(marca: Marca, global: RepuestosMarca): VistaEncabezado {
   const nombre = marca.nombre.trim();
   const linea1 = texto(global.tituloHero) || "Repuestos para maquinaria pesada";
-  const sufijo = texto(global.subtituloHero);
   return {
     linea1,
-    linea2: [nombre.toUpperCase(), sufijo].filter(Boolean).join(" "),
+    linea2: nombre.toUpperCase(),
     descripcion: texto(marca.descripcion),
     fondo: imagenDeMedia(marca.fondoHero, ""),
     logo: logoConAlt(marca, nombre),

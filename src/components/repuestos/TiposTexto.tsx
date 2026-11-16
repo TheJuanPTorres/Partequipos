@@ -41,6 +41,7 @@ export function TiposTexto({
           {tarjetas.map((t) => (
             <li key={t.clave} className={estilosTexto.tarjeta}>
               <TarjetaModelo
+                nombreLargo
                 modelo={t.tituloCorto || t.titulo}
                 detalle={
                   t.panel ? `${t.panel.total} ${t.panel.total === 1 ? "modelo" : "modelos"}` : null

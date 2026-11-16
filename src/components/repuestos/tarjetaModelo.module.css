@@ -101,6 +101,12 @@
   overflow-wrap: anywhere;
 }
 
+/* Un nombre de tipo en vez de un código: se parte entre palabras, nunca dentro de una. */
+.modeloNombre {
+  font-size: 18px;
+  overflow-wrap: break-word;
+}
+
 .detalle {
   color: #56545a;
   font-size: 14px;

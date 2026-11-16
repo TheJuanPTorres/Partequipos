@@ -6,7 +6,7 @@
 
 .seccion {
   display: flex;
-  margin-bottom: max(0px, calc(var(--espacio-seccion) - 31px));
+  margin-bottom: max(0px, calc(var(--espacio-seccion) - 32px));
   padding: 24px 12px 0;
   flex-direction: column;
   gap: 12px;
@@ -128,6 +128,8 @@
 
 .logo {
   width: 68%;
+  /* Los ficheros de logo miden 160–216 px: más ancho que 168 los amplía (a 1010, con 2 por fila, ×1,24–1,5). */
+  max-width: 168px;
   height: 34%;
   transform: translateY(-6%);
   transition: transform 0.3s;

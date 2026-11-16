@@ -112,6 +112,7 @@ export function RejillaModelos({
         <li key={m.id} className={estilosTexto.tarjeta} data-modelo-busqueda={textoDeBusqueda(m)}>
           {/* El nombre completo como nombre accesible: «Excavadora Hitachi EX120-2», no solo el código. */}
           <TarjetaModelo
+            tipo={m.tipo}
             modelo={m.corto ?? m.nombre}
             detalle={m.serie ? `Serie ${m.serie}` : null}
             nombreCompleto={m.nombre}

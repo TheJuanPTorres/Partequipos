@@ -1,4 +1,4 @@
-import type { Marca, ModelosRepuesto, RepuestosMarca, TiposEquipo } from "@/payload-types";
+import type { Marca, ModelosRepuesto, TiposEquipo } from "@/payload-types";
 
 import { rutas } from "../routes";
 import { tipoEnTitulo } from "../seo/porDefecto";
@@ -17,20 +17,15 @@ import { agruparPorSerie, claveSerie, seriesDeTipo, type GrupoDeModelos } from "
 const texto = (v: string | null | undefined) => v?.trim() ?? "";
 
 /**
- * Encabezado del tipo: «Repuestos para <tipo>» y «<MARCA> En Colombia». El
+ * Encabezado del tipo: «Repuestos para <tipo>» y «<MARCA>». El
  * fondo es el de la marca (una foto de obra a todo el ancho); si no lo tiene,
  * la imagen del propio tipo. El logo, el de la marca.
  */
-export function vistaEncabezadoTipo(
-  marca: Marca,
-  tipo: TiposEquipo,
-  global: RepuestosMarca,
-): VistaEncabezado {
+export function vistaEncabezadoTipo(marca: Marca, tipo: TiposEquipo): VistaEncabezado {
   const nombre = marca.nombre.trim();
-  const sufijo = texto(global.subtituloHero);
   return {
     linea1: `Repuestos para ${tipoEnTitulo(tipo.nombre)}`,
-    linea2: [nombre.toUpperCase(), sufijo].filter(Boolean).join(" "),
+    linea2: nombre.toUpperCase(),
     descripcion: texto(tipo.descripcion),
     fondo: imagenDeMedia(marca.fondoHero, "") ?? imagenDeMedia(tipo.imagen, ""),
     logo: logoConAlt(marca, nombre),
@@ -54,6 +49,8 @@ export type ModeloEnlace = {
   serie: string | null;
   /** La primera de sus «Imágenes» (decorativa en la tarjeta); sin ella o sin poblar, `null`. */
   imagen?: ImagenLista | null;
+  /** El tipo de máquina («Cargador frontal»): va pequeño encima del modelo en su tarjeta (2026-11-15). */
+  tipo?: string;
 };
 
 /** Un enlace por modelo, a su ficha. Uno sin nombre o sin slug no sale. */
@@ -76,6 +73,7 @@ export function enlacesDeModelos(
         href: rutas.modelo(marca.slug, segmentoDeTipo(tipo), m.slug),
         serie: texto(m.serie) || null,
         imagen: imagenDeMedia(m.imagenes?.[0], ""),
+        tipo: texto(tipo.nombre),
       };
     });
 }
@@ -105,6 +103,7 @@ export function conOtrasEntradas(
         href: id === null ? null : hrefDeModelo(id),
         serie: texto(e.serie) || null,
         imagen: null,
+        tipo: texto(tipo.nombre),
       },
     ];
   });

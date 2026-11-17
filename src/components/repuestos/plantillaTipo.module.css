@@ -207,3 +207,12 @@
 .porQueEntradilla strong {
   color: var(--color-texto);
 }
+
+/*
+ * «¿Por qué elegirnos?» PROPIO de una página de marca (Filtros Donaldson, 2026-11-16, hallazgo de A):
+ * va justo antes del contacto, que ya lleva 30 px de relleno arriba; con el medio espaciado de abajo el
+ * hueco era 43 · 55 px. Sin él, queda 30 px: dentro de lo común.
+ */
+.porQueAntesDelContacto {
+  padding-bottom: 0;
+}

@@ -5,7 +5,8 @@
  */
 
 .seccion {
-  margin-top: var(--espacio-seccion);
+  width: min(100%, 1600px);
+  margin: var(--espacio-seccion) auto 0;
 }
 
 .titulo {

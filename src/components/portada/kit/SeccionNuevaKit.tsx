@@ -1,4 +1,4 @@
-import { IconArrowRight, IconArrowUpRight, IconSettings } from "@tabler/icons-react";
+import { IconSettings } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
@@ -179,18 +179,28 @@ function EscenaCompacta({ maquina, fondo }: { maquina: ImagenLista; fondo: Image
  */
 const CAJA_TARJETA: Caja = { ancho: 213, alto: 60, area: 126 * 42 };
 
-function LogoTarjeta({ logo }: { logo: LogoConAlt }) {
-  const { visible, imagen } = colocarLogo(logo, CAJA_TARJETA);
+/**
+ * Con distribuidor (LiuGong; ronda 20, cierre del 1:1 con la referencia): la caja es más baja, para que
+ * «Distribuido por» quede pegado al logo, y el logo algo mayor (~175 px a 1440, como la referencia).
+ */
+const CAJA_CON_DISTRIBUIDOR: Caja = { ancho: 213, alto: 40, area: 126 * 42 * 1.2 };
+
+function LogoTarjeta({ logo, conDistribuidor }: { logo: LogoConAlt; conDistribuidor?: boolean }) {
+  const caja = conDistribuidor ? CAJA_CON_DISTRIBUIDOR : CAJA_TARJETA;
+  const { visible, imagen } = colocarLogo(logo, caja);
   const pct = (n: number, de: number) => `${(n / de) * 100}%`;
   return (
-    <span className={estilos.logoFijo}>
+    <span
+      className={estilos.logoFijo}
+      style={conDistribuidor ? { aspectRatio: `${caja.ancho} / ${caja.alto}` } : undefined}
+    >
       <span
         className={estilos.logoRecorte}
         style={{
-          left: pct(visible.izquierda, CAJA_TARJETA.ancho),
-          top: pct(visible.arriba, CAJA_TARJETA.alto),
-          width: pct(visible.ancho, CAJA_TARJETA.ancho),
-          height: pct(visible.alto, CAJA_TARJETA.alto),
+          left: pct(visible.izquierda, caja.ancho),
+          top: pct(visible.arriba, caja.alto),
+          width: pct(visible.ancho, caja.ancho),
+          height: pct(visible.alto, caja.alto),
         }}
       >
         <span
@@ -235,7 +245,7 @@ function Tarjeta({ marca: m, paisaje }: { marca: TarjetaMarca; paisaje: ImagenLi
         ) : null}
         <span className={m.distribuidor ? estilos.logoConDistribuidor : estilos.logoCaja}>
           {m.logo ? (
-            <LogoTarjeta logo={m.logo} />
+            <LogoTarjeta logo={m.logo} conDistribuidor={Boolean(m.distribuidor)} />
           ) : (
             <span className={estilos.nombre}>{m.nombre}</span>
           )}
@@ -273,16 +283,12 @@ function Tarjeta({ marca: m, paisaje }: { marca: TarjetaMarca; paisaje: ImagenLi
           {m.externo ? (
             <span>
               <span className={estilos.visitar}>Visitar </span>
-              {m.externo.dominio}
+              {mayuscula(m.externo.dominio)}
             </span>
           ) : (
             "Ver maquinaria"
           )}
-          {m.externo ? (
-            <IconArrowUpRight aria-hidden="true" focusable="false" stroke={2} />
-          ) : (
-            <IconArrowRight aria-hidden="true" focusable="false" stroke={2} />
-          )}
+          {m.externo ? <FlechaAfuera /> : <FlechaDerecha />}
         </span>
       </span>
     </>
@@ -297,5 +303,38 @@ function Tarjeta({ marca: m, paisaje }: { marca: TarjetaMarca; paisaje: ImagenLi
     <Link href={m.href} className={estilos.tarjeta}>
       {contenido}
     </Link>
+  );
+}
+
+/** «maquitecno.co» sale en minúscula del enlace; el botón lo escribe con mayúscula inicial, como el diseño. */
+function mayuscula(texto: string): string {
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+/** Las flechas del botón, las del diseño: trazo de 2 px a 16 px (las de Tabler, a 24 px, quedaban en 1,3 px). */
+const ATRIBUTOS_FLECHA = {
+  viewBox: "0 0 16 16",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  "aria-hidden": true,
+  focusable: "false",
+} as const;
+
+function FlechaDerecha() {
+  return (
+    <svg {...ATRIBUTOS_FLECHA} className={estilos.flechaBoton}>
+      <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" />
+    </svg>
+  );
+}
+
+function FlechaAfuera() {
+  return (
+    <svg {...ATRIBUTOS_FLECHA} className={estilos.flechaBoton} data-afuera="">
+      <path d="M6 3.5h6.5V10M12.5 3.5 4 12" />
+    </svg>
   );
 }

@@ -12,7 +12,8 @@
 
 /* Bajo la cabecera roja: una tarjeta blanca propia, sin el solape con la franja de la marca. */
 .seccion.sinFranja {
-  margin: 24px max(1.5vw, 12px) 0;
+  width: min(calc(100% - 2 * max(1.5vw, 12px)), 1600px);
+  margin: 24px auto 0;
   padding-top: 48px;
   border-radius: 30px;
 }

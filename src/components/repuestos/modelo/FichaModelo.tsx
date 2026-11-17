@@ -3,13 +3,20 @@ import { IconBrandWhatsapp, IconMessageCircle } from "@tabler/icons-react";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { CategoriasFicha } from "@/components/repuestos/CategoriasFicha";
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
-import { LogoMarca } from "@/components/marca/LogoMarca";
+import { LogoOpticoServidor } from "@/components/marca/LogoOpticoServidor";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
+import type { CajaRelativa } from "@/lib/marca/tamanoOptico";
 import type { TarjetaMarca } from "@/lib/repuestos/marca";
 import type { BreadcrumbItem } from "@/lib/seo/jsonLd";
 
 import estilos from "./fichaModelo.module.css";
+
+/**
+ * La caja del logo de la cabecera: 170 × 49 px (3,5:1). Área del 54 % (2026-11-16, Juan Pablo: más
+ * grandes; antes 42 %); los muy alargados se quedan en el 92 % del ancho, sin tocar el borde.
+ */
+const CAJA_LOGO_FICHA: CajaRelativa = { proporcion: 3.5, area: 0.54, tope: 0.92 };
 
 /**
  * FICHA DE LA PÁGINA DE MODELO de repuestos SIN FOTO (Ronda 12, 2026-11-08: el cliente vende
@@ -58,7 +65,15 @@ export function FichaModelo({
       <div className={estilos.cabecera}>
         <div className={estilos.identidad}>
           {logo ? (
-            <LogoMarca logo={logo} alt={logo.alt} sizes="170px" className={estilos.logo} priority />
+            <LogoOpticoServidor
+              logo={logo}
+              caja={CAJA_LOGO_FICHA}
+              alt={logo.alt}
+              sizes="170px"
+              alinear="izquierda"
+              className={estilos.logo}
+              priority
+            />
           ) : null}
           {logo ? <span aria-hidden="true" className={estilos.separador} /> : null}
           <div className={estilos.titular}>

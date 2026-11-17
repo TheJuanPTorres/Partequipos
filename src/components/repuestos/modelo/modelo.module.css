@@ -182,7 +182,8 @@
   position: relative;
   display: flex;
   min-height: 360px;
-  margin: 40px min(1.5vw, 24px) 0;
+  width: min(calc(100% - 2 * min(1.5vw, 24px)), 1600px);
+  margin: 40px auto 0;
   overflow: hidden;
   align-items: center;
   justify-content: center;

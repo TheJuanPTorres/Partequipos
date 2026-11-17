@@ -62,7 +62,7 @@ export async function BannerMarcaTipo({
             src={vista.foto.url}
             alt=""
             fill
-            sizes="(max-width: 1024px) 60vw, 820px"
+            sizes="(max-width: 1024px) 62vw, 58vw"
             style={{ objectFit: "cover", objectPosition: vista.foto.posicion }}
           />
           <span className={estilos.fotoTinte} />

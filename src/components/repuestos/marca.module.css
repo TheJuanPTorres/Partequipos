@@ -2095,9 +2095,30 @@ a.modelo:hover {
 }
 
 /*
- * Ronda 12, t5: si el contacto (`ContactoMarca`) es lo último de la página, su aire de abajo sobra. Antes del pie manda
- * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ * Ronda 12, t5 y ronda 20: si el contacto (`ContactoMarca`) es lo último de la página, el hueco hasta el pie es el
+ * espaciado común (`--espacio-seccion`, 24–48 px). El pie ya pone `--pie-margen` (= `--espacio-interno`, 16–32 px)
+ * sobre su tarjeta roja; el contacto solo añade la diferencia. Antes valía 0 y quedaba en 17 px a 390 y 33 a 1440,
+ * por debajo del común (hallazgo de C).
  */
 .contacto:last-child {
+  padding-bottom: max(0px, calc(var(--espacio-seccion) - var(--espacio-interno)));
+}
+
+/*
+ * Índice de categorías técnicas (2026-11-16, hallazgo de A): la sección va seguida del contacto, que ya
+ * lleva 30 px de relleno arriba; con el relleno de abajo de esta (6 a 22 px) el hueco era 37 · 53 px.
+ * Sin él, queda 30 px: dentro de lo común (24–48).
+ */
+.mostrarMarcasSinAireAbajo {
   padding-bottom: 0;
+}
+
+/*
+ * MARCA «ADITAMENTOS»: del final de la cabecera a las tarjetas (2026-11-16, hallazgo de C). El
+ * relleno inferior de la cabecera era `min(1.5vw, 24px)` y daba 6 · 12 · 15 · 22 · 24 px según
+ * el ancho. Pasa al hueco común entre secciones (24 a 48 px, una sola vez); el aire interno de
+ * las tarjetas ya es `--espacio-interno`.
+ */
+.paginaAditamentos .heroSeccion {
+  padding-bottom: var(--espacio-seccion);
 }

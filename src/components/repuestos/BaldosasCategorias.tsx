@@ -73,7 +73,11 @@ export function BaldosasCategorias({
     );
   }
   return (
-    <section id={id} className={estilos.mostrarMarcas} aria-labelledby={idTitulo}>
+    <section
+      id={id}
+      className={`${estilos.mostrarMarcas} ${estilos.mostrarMarcasSinAireAbajo}`}
+      aria-labelledby={idTitulo}
+    >
       <div className={`${estilos.mostrarMarcasRecuadro} ${estilos.categoriasRecuadro}`}>
         <Revelado
           como="h2"

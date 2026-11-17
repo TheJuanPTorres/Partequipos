@@ -538,12 +538,12 @@
  */
 .legal {
   /*
-   * Abajo, 40 px y la zona segura (antes 88: el sitio entero del botón flotante de WhatsApp, que
-   * dejaba mucho aire bajo «Volver arriba», ronda 12, tarea 5). «Volver arriba» es lo último, va
-   * centrado y lejos de la esquina del botón (56 px a 16 del borde); lo de encima queda por encima
-   * de los 72 px que ocupa el botón.
+   * Abajo, el hueco interno común y la zona segura (antes 40 px fijos, que a 390 eran más del
+   * doble de los 16 del resto; y antes 88: el sitio entero del botón flotante de WhatsApp, ronda
+   * 12, tarea 5). «Volver arriba» es lo último, va centrado y lejos de la esquina del botón
+   * (56 px a 16 del borde).
    */
-  padding: 0 5% calc(40px + env(safe-area-inset-bottom, 0px));
+  padding: 0 5% calc(var(--espacio-interno) + env(safe-area-inset-bottom, 0px));
   background: var(--color-fondo);
   color: var(--color-texto-suave);
   font-size: 15px;

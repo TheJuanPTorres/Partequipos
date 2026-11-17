@@ -1,7 +1,15 @@
-import { LogoMarca } from "@/components/marca/LogoMarca";
+import { LogoOpticoServidor } from "@/components/marca/LogoOpticoServidor";
 import type { LogoMarca as DatosLogo } from "@/lib/marca/logoMarca";
+import type { CajaRelativa } from "@/lib/marca/tamanoOptico";
 
 import estilos from "./tarjetaModelo.module.css";
+
+/**
+ * La caja del logo de la tarjeta: 152 × 24 px (6,3:1), pegado a la izquierda. Área del 58 % de la caja
+ * (2026-11-16, Juan Pablo: más grandes; antes 45 %): los muy alargados se quedan en el 92 % del ancho y
+ * el alto, sin tocar el borde; el resto, con el mismo tamaño (ronda 20, t1).
+ */
+const CAJA_LOGO_TARJETA: CajaRelativa = { proporcion: 152 / 24, area: 0.58, tope: 0.92 };
 
 /**
  * TARJETA DE MODELO del diseño v2 del cliente (2026-11-13), la de la lista de modelos de la página
@@ -35,9 +43,14 @@ export function TarjetaModelo({
     <span className={estilos.panel}>
       {href ? <span aria-hidden="true" className={estilos.barrida} /> : null}
       {logo ? (
-        <span className={estilos.logo}>
-          <LogoMarca logo={logo} alt="" sizes="152px" fill className={estilos.logoImg} />
-        </span>
+        <LogoOpticoServidor
+          logo={logo}
+          caja={CAJA_LOGO_TARJETA}
+          alt=""
+          sizes="152px"
+          alinear="izquierda"
+          className={estilos.logo}
+        />
       ) : null}
       <span className={estilos.texto}>
         {tipo ? <span className={estilos.tipo}>{tipo}</span> : null}

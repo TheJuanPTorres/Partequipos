@@ -66,7 +66,7 @@ export async function PaginaMarcaAditamentos({ marca }: { marca: MarcasMaquinari
   ];
 
   return (
-    <main className={estilos.pagina}>
+    <main className={`${estilos.pagina} ${estilos.paginaAditamentos}`}>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
       <div className={estilos.migas}>
         <Breadcrumbs items={breadcrumbs} />

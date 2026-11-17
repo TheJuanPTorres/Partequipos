@@ -54,9 +54,9 @@
 }
 
 .logo {
-  width: auto;
-  height: 44px;
-  max-width: 170px;
+  width: 170px;
+  max-width: 100%;
+  height: auto;
   flex: none;
 }
 
@@ -151,7 +151,7 @@
   }
 
   .logo {
-    height: 52px;
+    width: 182px;
   }
 
   .separador {

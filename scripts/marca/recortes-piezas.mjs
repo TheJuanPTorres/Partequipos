@@ -23,7 +23,7 @@ const urls = [
 const destino = new URL("../../src/lib/marca/recortesPiezas.json", import.meta.url);
 const actual = fs.existsSync(destino) ? JSON.parse(fs.readFileSync(destino, "utf8")) : {};
 for (const u of urls) {
-  const clave = new URL(u).pathname;
+  const clave = new URL(u).pathname.replace(/-[A-Za-z0-9]{20,}(?=\.\w+$)/, "");
   const r = await fetchAlPreview(
     `${origen}/_next/image/?url=${encodeURIComponent(u)}&w=1080&q=75`,
     origen,

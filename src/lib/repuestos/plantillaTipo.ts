@@ -15,10 +15,18 @@ import type { TarjetaMarca } from "./marca";
 
 const texto = (v: string | null | undefined) => v?.trim() ?? "";
 
-/** La parte visible de una foto de pieza ya medida (`scripts/marca/recortes-piezas.mjs`); sin ella, se mide al pintar. */
+/**
+ * La parte visible de una foto de pieza ya medida (`scripts/marca/recortes-piezas.mjs`); sin ella, se
+ * mide al pintar. La clave es el nombre del fichero SIN el sufijo aleatorio del Blob: cada entorno sube
+ * su propia copia de la misma foto.
+ */
 function recorteConocido(url: string) {
   try {
-    return (RECORTES_PIEZAS as Record<string, Recorte>)[new URL(url).pathname] ?? null;
+    return (
+      (RECORTES_PIEZAS as Record<string, Recorte>)[
+        new URL(url).pathname.replace(/-[A-Za-z0-9]{20,}(?=\.\w+$)/, "")
+      ] ?? null
+    );
   } catch {
     return null;
   }

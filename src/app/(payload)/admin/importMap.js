@@ -7,6 +7,7 @@ import { default as default_40a9883d727ab65fdd0e9c9df10e79e2 } from '../../../co
 import { default as default_137d3220b5ae877ef2c31422510baf68 } from '../../../components/admin/SeoGuiado'
 import { default as default_5c55248894877e0ef25c11c535b2b5bf } from '../../../components/admin/VerEnElSitio'
 import { default as default_adf6b68ce64d26f52375d6ee194bc8e3 } from '../../../components/admin/CampoColor'
+import { default as default_f0687b4ab35e63832190f4471448ae75 } from '../../../components/admin/aviso/AvisoMarcaEnlaceExterno'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -69,6 +70,7 @@ export const importMap = {
   "/components/admin/SeoGuiado#default": default_137d3220b5ae877ef2c31422510baf68,
   "/components/admin/VerEnElSitio#default": default_5c55248894877e0ef25c11c535b2b5bf,
   "/components/admin/CampoColor#default": default_adf6b68ce64d26f52375d6ee194bc8e3,
+  "/components/admin/aviso/AvisoMarcaEnlaceExterno#default": default_f0687b4ab35e63832190f4471448ae75,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,

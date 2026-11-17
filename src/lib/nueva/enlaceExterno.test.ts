@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  AVISO_EQUIPOS_NO_PUBLICADOS,
+  destinoDeMarca,
   enlaceExternoDe,
+  migasDeMarca,
   normalizarEnlaceExterno,
   tienePaginaPropia,
   validarEnlaceExterno,
@@ -43,5 +46,33 @@ describe("enlace externo de una marca de nueva", () => {
     const liugong = { enlaceExterno: "https://maquitecno.co/" };
     assert.equal(enlaceExternoDe(liugong), "https://maquitecno.co/");
     assert.equal(tienePaginaPropia(liugong), false);
+  });
+
+  it("«Ver marca» lleva al enlace externo, en pestaña nueva, si la marca no tiene página", () => {
+    const pagina = "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/liugong/";
+    assert.deepEqual(destinoDeMarca({ enlaceExterno: "https://maquitecno.co" }, pagina), {
+      href: "https://maquitecno.co/",
+      externo: true,
+    });
+    // Con página propia (o un enlace no válido, que no cuenta), a su página.
+    for (const marca of [{}, { enlaceExterno: "" }, { enlaceExterno: "http://maquitecno.co/" }]) {
+      assert.deepEqual(destinoDeMarca(marca, pagina), { href: pagina, externo: false });
+    }
+  });
+
+  it("las migas no llevan el nivel de una marca sin página propia", () => {
+    const item = {
+      nombre: "LiuGong",
+      path: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/liugong",
+    };
+    assert.deepEqual(migasDeMarca({ enlaceExterno: "https://maquitecno.co/" }, item), []);
+    assert.deepEqual(migasDeMarca({ enlaceExterno: null }, item), [item]);
+  });
+
+  it("el aviso del panel dice que sus equipos no se publican", () => {
+    assert.equal(
+      AVISO_EQUIPOS_NO_PUBLICADOS,
+      "Esta marca tiene enlace externo: sus equipos no se publican en la web",
+    );
   });
 });

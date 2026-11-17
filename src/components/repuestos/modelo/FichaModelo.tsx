@@ -12,8 +12,11 @@ import type { BreadcrumbItem } from "@/lib/seo/jsonLd";
 
 import estilos from "./fichaModelo.module.css";
 
-/** La caja del logo de la cabecera: 170 × 49 px (3,5:1), entre los 44 y 52 px de alto de antes; mismo tamaño a la vista en todas las marcas (ronda 20, t1). */
-const CAJA_LOGO_FICHA: CajaRelativa = { proporcion: 3.5, area: 0.42 };
+/**
+ * La caja del logo de la cabecera: 170 × 49 px (3,5:1). Área del 54 % (2026-11-16, Juan Pablo: más
+ * grandes; antes 42 %); los muy alargados se quedan en el 92 % del ancho, sin tocar el borde.
+ */
+const CAJA_LOGO_FICHA: CajaRelativa = { proporcion: 3.5, area: 0.54, tope: 0.92 };
 
 /**
  * FICHA DE LA PÁGINA DE MODELO de repuestos SIN FOTO (Ronda 12, 2026-11-08: el cliente vende

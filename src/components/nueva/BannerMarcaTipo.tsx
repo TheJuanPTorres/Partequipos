@@ -1,4 +1,4 @@
-import { IconArrowRight } from "@tabler/icons-react";
+import { IconArrowRight, IconExternalLink } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
@@ -7,6 +7,7 @@ import { LogoEnCaja, tamanoCaja } from "@/components/marca/LogoEnCaja";
 import { conRecorte } from "@/lib/marca/recorteLogo";
 import { CAJA_BANNER, CAJA_BANNER_MOVIL } from "@/lib/marca/tamanoOptico";
 import type { BannerConLogo } from "@/lib/nueva/bannerMarca";
+import { AVISO_OTRA_PESTANA } from "@/lib/nueva/enlaceExterno";
 
 import estilos from "./bannerMarca.module.css";
 
@@ -34,7 +35,8 @@ export async function BannerMarcaTipo({
   /** `id` del título. */
   id: string;
   titulo: string;
-  marca: { nombre: string; href: string };
+  /** `externo`: la marca no tiene página aquí (`destinoDeMarca`) y `href` es su enlace externo. */
+  marca: { nombre: string; href: string; externo?: boolean };
   banner: BannerConLogo;
   /** El nivel del título: `h3` si el banner va bajo el `<h2>` de su sección. */
   nivel?: "h2" | "h3";
@@ -60,7 +62,7 @@ export async function BannerMarcaTipo({
             src={vista.foto.url}
             alt=""
             fill
-            sizes="(max-width: 1024px) 60vw, 820px"
+            sizes="(max-width: 1024px) 62vw, 58vw"
             style={{ objectFit: "cover", objectPosition: vista.foto.posicion }}
           />
           <span className={estilos.fotoTinte} />
@@ -109,10 +111,24 @@ export async function BannerMarcaTipo({
 
       {/* El botón flotante de WhatsApp sube al pasar sobre «Ver marca» (a 390 lo tapaba al bajar). */}
       <div className={estilos.accion} data-evita-flotante="">
-        <Link href={marca.href} aria-label={`Ver marca ${marca.nombre}`} className={estilos.ver}>
-          <span className={estilos.verTexto}>Ver marca</span>
-          <IconArrowRight aria-hidden="true" size={18} stroke={2.2} />
-        </Link>
+        {marca.externo ? (
+          // Marca sin página propia (LiuGong): a su enlace externo, en pestaña nueva, como el megamenú.
+          <a
+            href={marca.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Ver marca ${marca.nombre} (${AVISO_OTRA_PESTANA})`}
+            className={estilos.ver}
+          >
+            <span className={estilos.verTexto}>Ver marca</span>
+            <IconExternalLink aria-hidden="true" size={18} stroke={2.2} />
+          </a>
+        ) : (
+          <Link href={marca.href} aria-label={`Ver marca ${marca.nombre}`} className={estilos.ver}>
+            <span className={estilos.verTexto}>Ver marca</span>
+            <IconArrowRight aria-hidden="true" size={18} stroke={2.2} />
+          </Link>
+        )}
       </div>
     </header>
   );

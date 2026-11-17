@@ -1,3 +1,4 @@
+import { avisoField } from "@/lib/fields/avisoField";
 import { campoColorMarca } from "@/lib/fields/colorMarca";
 import { validarColor } from "@/lib/fields/tipografiaTitulo";
 import { normalizarEnlaceExterno, validarEnlaceExterno } from "@/lib/nueva/enlaceExterno";
@@ -45,6 +46,8 @@ export const MarcaMaquinaria: CollectionConfig = {
     afterDelete: [revalidarMarcaMaquinariaBorrada, portada.afterDelete, menu.afterDelete],
   },
   fields: [
+    // Con enlace externo, sus equipos no se publican (#475).
+    avisoField("avisoMarcaEnlaceExterno", "AvisoMarcaEnlaceExterno"),
     { name: "nombre", type: "text", required: true, label: "Nombre" },
     /*
      * TARJETA DE «MAQUINARIA PESADA NUEVA» EN LA PORTADA (2026-11-08, diseño del cliente
@@ -198,7 +201,7 @@ export const MarcaMaquinaria: CollectionConfig = {
         position: "sidebar",
         placeholder: "https://…",
         description:
-          "Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap, y su tarjeta de «Maquinaria pesada nueva» en la portada lleva a esta dirección. Vacío, la marca tiene su página como siempre.",
+          "Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap, sus equipos nuevos no se publican en la web, y su tarjeta de «Maquinaria pesada nueva» en la portada lleva a esta dirección. Vacío, la marca tiene su página como siempre.",
       },
     },
     // Nivel superior de su rama: unicidad global del slug.

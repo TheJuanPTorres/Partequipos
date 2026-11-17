@@ -114,6 +114,12 @@ export type CajaRelativa = {
   proporcion: number;
   /** El área visible que se busca, en fracción del área de la caja (0–1). */
   area: number;
+  /**
+   * Lo más que puede ocupar el logo de la caja, a lo ancho y a lo alto (0–1; por defecto 1). Un
+   * logo muy alargado (Caterpillar) se queda en ese ancho, SIN TOCAR EL BORDE, y sale algo menor
+   * que los demás; el resto sigue con la misma área (2026-11-16, Juan Pablo: logos más grandes).
+   */
+  tope?: number;
 };
 
 /**
@@ -126,11 +132,19 @@ export function colocarLogoRelativo(
 ): Colocacion {
   const alto = 1000;
   const ancho = alto * caja.proporcion;
-  const { visible, imagen } = colocarLogo(logo, {
-    ancho,
-    alto,
+  const tope = Math.min(1, Math.max(0.1, caja.tope ?? 1));
+  // Se coloca en la caja reducida por el tope y se centra en la caja entera.
+  const colocado = colocarLogo(logo, {
+    ancho: ancho * tope,
+    alto: alto * tope,
     area: caja.area * ancho * alto,
   });
+  const { imagen } = colocado;
+  const visible = {
+    ...colocado.visible,
+    izquierda: colocado.visible.izquierda + (ancho * (1 - tope)) / 2,
+    arriba: colocado.visible.arriba + (alto * (1 - tope)) / 2,
+  };
   const pct = (n: number, de: number) => redondear((n / de) * 100);
   return {
     visible: {

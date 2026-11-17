@@ -11,8 +11,8 @@ import type { TarjetaMarca } from "@/lib/repuestos/marca";
 import estilos from "./marca.module.css";
 import { RecuadrosConScroll } from "./RecuadrosConScroll";
 
-/** La caja de una foto de pieza (3:2): con un área del 50 % caben fotos de 1:2 a 3:1, enteras. */
-const CAJA_PIEZA: CajaRelativa = { proporcion: 3 / 2, area: 0.5, tope: 0.9 };
+/** La caja de una foto de pieza (2:1, apaisada): ocupa ~78 % de su área, entera; las muy alargadas se quedan en el 92 % del ancho. */
+const CAJA_PIEZA: CajaRelativa = { proporcion: 2, area: 0.78, tope: 0.92 };
 
 /**
  * «REPUESTOS SEGÚN TIPO DE MÁQUINA» (ux-9): una tarjeta por tipo de la marca

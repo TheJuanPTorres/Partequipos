@@ -2125,18 +2125,21 @@ a.modelo:hover {
 
 /*
  * FOTO DE PIEZA de las tarjetas de categoría técnica (2026-11-17, ronda 19 t9): entera (sin recortar
- * ni salirse de la tarjeta), más pequeña y con el mismo tamaño a la vista en todas (`LogoOptico`).
- * La caja de 3:2 ocupa el 70 % del ancho de la foto y va algo arriba, porque el recuadro de abajo
- * sube 34 px sobre ella; el blanco del fondo toma el gris de la caja.
+ * ni tocar el borde), con el mismo tamaño a la vista en todas (`LogoOptico`, ~78 % de su caja) y sin
+ * aire de más: la zona de la foto es más apaisada (2:1) y la caja ocupa su alto, con 12 px de margen
+ * parejo; abajo se suman los 34 px que el recuadro del nombre sube sobre la foto.
  */
 .fotoPieza {
   display: flex;
+  box-sizing: border-box;
+  padding: 12px 12px calc(12px + 34px);
   align-items: center;
   justify-content: center;
+  aspect-ratio: 2 / 1;
 }
 
 .piezaCaja {
-  width: 70%;
-  margin-bottom: 34px;
+  height: 100%;
+  max-width: 100%;
   mix-blend-mode: multiply;
 }

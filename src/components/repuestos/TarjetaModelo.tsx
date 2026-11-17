@@ -1,7 +1,14 @@
-import { LogoMarca } from "@/components/marca/LogoMarca";
+import { LogoOpticoServidor } from "@/components/marca/LogoOpticoServidor";
 import type { LogoMarca as DatosLogo } from "@/lib/marca/logoMarca";
+import type { CajaRelativa } from "@/lib/marca/tamanoOptico";
 
 import estilos from "./tarjetaModelo.module.css";
+
+/**
+ * La caja del logo de la tarjeta: 152 × 24 px (6,3:1), pegado a la izquierda. Con un área del 45 % de la
+ * caja caben los logos de 3:1 a 8,2:1, y todas las marcas se ven con el mismo tamaño (ronda 20, t1).
+ */
+const CAJA_LOGO_TARJETA: CajaRelativa = { proporcion: 152 / 24, area: 0.45 };
 
 /**
  * TARJETA DE MODELO del diseño v2 del cliente (2026-11-13), la de la lista de modelos de la página
@@ -13,12 +20,18 @@ import estilos from "./tarjetaModelo.module.css";
  * pinta sin botón ni enlace. El guion del modelo no se corta («ZX270LC-3»).
  */
 export function TarjetaModelo({
+  tipo,
+  nombreLargo = false,
   modelo,
   detalle,
   nombreCompleto,
   href,
   logo,
 }: {
+  /** El tipo de máquina, pequeño y negro encima del modelo, en una sola línea. */
+  tipo?: string | null;
+  /** El título es un nombre de tipo («Miniexcavadora EX»), no un código: más pequeño y sin partir palabras. */
+  nombreLargo?: boolean;
   modelo: string;
   detalle?: string | null;
   nombreCompleto: string;
@@ -29,12 +42,20 @@ export function TarjetaModelo({
     <span className={estilos.panel}>
       {href ? <span aria-hidden="true" className={estilos.barrida} /> : null}
       {logo ? (
-        <span className={estilos.logo}>
-          <LogoMarca logo={logo} alt="" sizes="152px" fill className={estilos.logoImg} />
-        </span>
+        <LogoOpticoServidor
+          logo={logo}
+          caja={CAJA_LOGO_TARJETA}
+          alt=""
+          sizes="152px"
+          alinear="izquierda"
+          className={estilos.logo}
+        />
       ) : null}
       <span className={estilos.texto}>
-        <span className={estilos.modelo}>{modelo.replaceAll("-", "\u2011")}</span>
+        {tipo ? <span className={estilos.tipo}>{tipo}</span> : null}
+        <span className={`${estilos.modelo} ${nombreLargo ? estilos.modeloNombre : ""}`}>
+          {modelo.replaceAll("-", "\u2011")}
+        </span>
         {detalle ? <span className={estilos.detalle}>{detalle}</span> : null}
       </span>
       {href ? (

@@ -24,7 +24,7 @@ describe("vistaEncabezado", () => {
   it("compone las dos líneas del título con la marca en mayúsculas", () => {
     const v = vistaEncabezado(marca, global);
     assert.equal(v.linea1, "Repuestos para maquinaria pesada");
-    assert.equal(v.linea2, "CATERPILLAR En Colombia");
+    assert.equal(v.linea2, "CATERPILLAR");
     assert.equal(v.descripcion, "Texto.");
     assert.equal(v.fondo, null);
   });

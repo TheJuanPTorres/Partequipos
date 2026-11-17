@@ -480,7 +480,7 @@ a.pildora:hover {
   --rejilla-relleno: 82px;
   /* Asoma bajo las esquinas redondeadas del amarillo. */
   margin-top: -50px;
-  margin-bottom: max(0px, calc(var(--espacio-seccion) - 31px));
+  margin-bottom: max(0px, calc(var(--espacio-seccion) - 32px));
   /* 50 de solape bajo el amarillo + 48 de aire; 48 abajo (criterio de espacios, 2026-11-09). */
   padding: 98px 82px 48px;
   border-radius: 0 0 var(--marca-radio) var(--marca-radio);
@@ -1298,6 +1298,10 @@ a.modelo:hover {
  */
 @media (min-width: 1025px) {
   .rejillaTarjetas {
+    /* Techo de ancho (criterio de Juan Pablo: nada crece sin techo): a 2000 px cada tarjeta mide
+       ~650 px y la foto, que se recorta a 3:2, no pasa de ×1,1 de lo que mide el fichero. */
+    max-width: 2000px;
+    margin-inline: auto;
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
@@ -2091,9 +2095,11 @@ a.modelo:hover {
 }
 
 /*
- * Ronda 12, t5: si el contacto (`ContactoMarca`) es lo último de la página, su aire de abajo sobra. Antes del pie manda
- * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ * Ronda 12, t5 y ronda 20: si el contacto (`ContactoMarca`) es lo último de la página, el hueco hasta el pie es el
+ * espaciado común (`--espacio-seccion`, 24–48 px). El pie ya pone `--pie-margen` (= `--espacio-interno`, 16–32 px)
+ * sobre su tarjeta roja; el contacto solo añade la diferencia. Antes valía 0 y quedaba en 17 px a 390 y 33 a 1440,
+ * por debajo del común (hallazgo de C).
  */
 .contacto:last-child {
-  padding-bottom: 0;
+  padding-bottom: max(0px, calc(var(--espacio-seccion) - var(--espacio-interno)));
 }

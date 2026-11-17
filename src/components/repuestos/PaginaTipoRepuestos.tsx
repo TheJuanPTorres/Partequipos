@@ -101,7 +101,7 @@ export async function PaginaTipoRepuestos({ marca, tipo }: { marca: Marca; tipo:
     { nombre: tipo.nombre, path: rutas.tipo(marca.slug, seg) },
   ];
 
-  const encabezadoTipo = vistaEncabezadoTipo(marca, tipo, global);
+  const encabezadoTipo = vistaEncabezadoTipo(marca, tipo);
 
   return (
     <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>

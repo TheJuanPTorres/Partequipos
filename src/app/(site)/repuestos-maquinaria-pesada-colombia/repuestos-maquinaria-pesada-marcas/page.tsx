@@ -46,6 +46,7 @@ export default async function MarcasIndexPage() {
       </div>
 
       <BaldosasColorMarcas
+        tamanoOptico
         id={ANCLA}
         marcas={placasDeMarcas(marcas)}
         h1={{

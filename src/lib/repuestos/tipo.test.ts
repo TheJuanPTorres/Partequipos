@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import type { Marca, ModelosRepuesto, RepuestosMarca, TiposEquipo } from "@/payload-types";
+import type { Marca, ModelosRepuesto, TiposEquipo } from "@/payload-types";
 
 import { enlacesDeModelos, vistaEncabezadoTipo } from "./tipo";
 
@@ -12,26 +12,25 @@ const tipo = {
   slug: "excavadora",
   descripcion: " Piezas de desgaste. ",
 } as TiposEquipo;
-const global = { subtituloHero: "En Colombia" } as RepuestosMarca;
 const modelo = (id: number, nombre: string, slug: string, codigo?: string) =>
   ({ id, nombre, slug, codigo }) as ModelosRepuesto;
 
 describe("vistaEncabezadoTipo", () => {
   it("compone el título con el tipo y la marca, y toma la descripción del tipo", () => {
-    const v = vistaEncabezadoTipo(marca, tipo, global);
+    const v = vistaEncabezadoTipo(marca, tipo);
     assert.equal(v.linea1, "Repuestos para Excavadora");
-    assert.equal(v.linea2, "CATERPILLAR En Colombia");
+    assert.equal(v.linea2, "CATERPILLAR");
     assert.equal(v.descripcion, "Piezas de desgaste.");
   });
 
   it("sin imágenes no hay fondo ni logo (la página se pinta igual, sin hueco)", () => {
-    const v = vistaEncabezadoTipo(marca, tipo, global);
+    const v = vistaEncabezadoTipo(marca, tipo);
     assert.equal(v.fondo, null);
     assert.equal(v.logo, null);
   });
 
   it("sin el texto del global, la segunda línea es solo la marca", () => {
-    assert.equal(vistaEncabezadoTipo(marca, tipo, {} as RepuestosMarca).linea2, "CATERPILLAR");
+    assert.equal(vistaEncabezadoTipo(marca, tipo).linea2, "CATERPILLAR");
   });
 });
 

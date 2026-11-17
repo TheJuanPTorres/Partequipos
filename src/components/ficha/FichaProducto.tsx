@@ -141,7 +141,7 @@ export function FichaProducto({
 
       {/* 1. TARJETA PRINCIPAL: galería, migas, título, datos y botones. */}
       <section
-        className={estilos.principal}
+        className={`${estilos.principal} ${estilos.principalUsada}`}
         data-sin-fotos={fotos.length === 0 ? "" : undefined}
         aria-labelledby="ficha-titulo"
       >

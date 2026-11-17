@@ -1,0 +1,25 @@
+/*
+ * RESPONSIVE DE NUEVA POR DENTRO (2026-11-15): la categoría general
+ * (`/maquinaria-pesada/maquinaria-pesada-nueva/<tipo>/`) y el tipo de una marca sin Kit
+ * (Aditamentos: `…/marcas/<marca>/<tipo>/`). Va sobre `.seccionTipo` de `marcaNueva.module.css`,
+ * sin tocarlo: la clase se repite para ganarle en especificidad también a sus reglas de tablet
+ * y móvil.
+ *
+ * - Hasta el contacto, el espaciado común: `ContactoMarca` ya pone 30 px arriba y la línea de la
+ *   sección 1 más (antes, 31 px en todos los anchos: 17 menos que el común a 1440). Es la misma
+ *   cuenta que el #462 en las páginas de marca (`.tipos`), pero como MARGEN: la sección tiene línea
+ *   arriba, así que su caja cuenta como pintada y un relleno no movía el hueco que mide
+ *   `qa:huecos` (medido en el preview: seguía en 31). Sin fondo, a la vista es lo mismo.
+ * - Techo de ancho en pantallas gigantes: el contenido llega a 1800 px como mucho. Así cada
+ *   tarjeta del kit mide unos 580 px, lo que pide su `sizes` (560 px). Antes, a 3840, medía
+ *   1131 px y la foto se ampliaba ×2.
+ */
+.seccion.seccion {
+  margin-bottom: max(0px, calc(var(--espacio-seccion) - 31px));
+}
+
+@media (min-width: 1025px) {
+  .seccion.seccion {
+    margin-inline: max(5%, calc((100% - 1800px) / 2));
+  }
+}

@@ -30,7 +30,9 @@ export function BuscadorPie() {
           autoComplete="off"
           maxLength={80}
         />
-        <button type="submit" className={estilos.buscadorBoton}>
+        {/* El flotante de WhatsApp sube mientras el botón pasa por su sitio (a 390 lo tapaba
+            56 × 47 px al desplazar; dirección, 2026-11-16). */}
+        <button type="submit" className={estilos.buscadorBoton} data-evita-flotante="">
           Buscar
         </button>
       </div>

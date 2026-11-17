@@ -184,6 +184,7 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
           anclaContacto={ANCLA_CONTACTO}
           formulario={formulario}
           acento={Boolean(color)}
+          antesDelContacto
         />
       ) : null}
 

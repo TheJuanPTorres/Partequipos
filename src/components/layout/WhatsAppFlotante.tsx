@@ -19,8 +19,8 @@ import estilos from "./whatsappFlotante.module.css";
  * recuadro de descripción con su «+», los controles del hero ni la barra de secciones. Cualquier
  * elemento con `data-evita-flotante` que caiga donde está el botón lo hace
  * subir lo justo (con `transform`: un elemento fijo que se desplaza así no
- * cuenta como CLS). El pie no lo necesita: la franja legal reserva su sitio
- * (`pie.module.css`).
+ * cuenta como CLS). En el pie lo lleva el botón «Buscar» (2026-11-16); al fondo de la
+ * página, «Volver arriba» va centrado y lejos de su esquina (`pie.module.css`).
  */
 
 /** Aire entre el botón y lo que esquiva, en px. */

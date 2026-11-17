@@ -2125,21 +2125,68 @@ a.modelo:hover {
 
 /*
  * FOTO DE PIEZA de las tarjetas de categoría técnica (2026-11-17, ronda 19 t9): entera (sin recortar
- * ni tocar el borde), con el mismo tamaño a la vista en todas (`LogoOptico`, ~78 % de su caja) y sin
- * aire de más: la zona de la foto es más apaisada (2:1) y la caja ocupa su alto, con 12 px de margen
- * parejo; abajo se suman los 34 px que el recuadro del nombre sube sobre la foto.
+ * ni tocar el borde) y con el mismo tamaño a la vista en todas (`LogoOptico`, ~89 % de su caja por el
+ * lado limitante). La foto es 4:3, cercana a la de las piezas; la zona útil deja 8 px parejos y,
+ * abajo, además los 34 px que el recuadro del nombre sube sobre ella. La caja de la pieza (4:3) se
+ * ajusta a esa zona por su lado limitante (unidades de contenedor).
  */
 .fotoPieza {
+  aspect-ratio: 4 / 3;
+}
+
+.piezaZona {
+  position: absolute;
   display: flex;
-  box-sizing: border-box;
-  padding: 12px 12px calc(12px + 34px);
+  container-type: size;
+  inset: 8px 8px calc(8px + 34px);
   align-items: center;
   justify-content: center;
-  aspect-ratio: 2 / 1;
 }
 
 .piezaCaja {
-  height: 100%;
-  max-width: 100%;
+  width: min(100cqw, calc(100cqh * 4 / 3));
   mix-blend-mode: multiply;
+}
+
+/*
+ * La rejilla de las piezas: 4 por fila desde escritorio (con techo de ancho), 3 en tablet y 2 en
+ * móvil; la última fila, centrada. Los nombres largos pasan a dos líneas centradas.
+ */
+.rejillaPiezas {
+  display: flex;
+  max-width: 1400px;
+  margin-inline: auto;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px 12px;
+}
+
+.rejillaPiezas > .tarjeta {
+  width: calc((100% - 12px) / 2);
+}
+
+.rejillaPiezas .tituloTarjeta {
+  text-align: center;
+  text-wrap: balance;
+}
+
+.rejillaPiezas .botonTarjeta {
+  min-width: 0;
+  padding: 0 14px;
+}
+
+@media (min-width: 768px) {
+  .rejillaPiezas {
+    column-gap: 20px;
+  }
+
+  .rejillaPiezas > .tarjeta {
+    width: calc((100% - 40px) / 3);
+  }
+}
+
+@media (min-width: 1025px) {
+  .rejillaPiezas > .tarjeta {
+    width: calc((100% - 60px) / 4);
+  }
 }

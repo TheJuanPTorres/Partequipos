@@ -11,8 +11,8 @@ import type { TarjetaMarca } from "@/lib/repuestos/marca";
 import estilos from "./marca.module.css";
 import { RecuadrosConScroll } from "./RecuadrosConScroll";
 
-/** La caja de una foto de pieza (2:1, apaisada): ocupa ~78 % de su área, entera; las muy alargadas se quedan en el 92 % del ancho. */
-const CAJA_PIEZA: CajaRelativa = { proporcion: 2, area: 0.78, tope: 0.92 };
+/** La caja de una foto de pieza (4:3, como las fotos): ocupa ~80 % de su área (~89 % por su lado limitante); las muy alargadas se quedan en el 90 % del ancho. */
+const CAJA_PIEZA: CajaRelativa = { proporcion: 4 / 3, area: 0.8, tope: 0.9 };
 
 /**
  * «REPUESTOS SEGÚN TIPO DE MÁQUINA» (ux-9): una tarjeta por tipo de la marca
@@ -113,9 +113,14 @@ export function RejillaTarjetas({
   /** Ver `TarjetasMarca`. */
   cuatroEnUnaFila?: boolean;
 }) {
+  const conPiezas = tarjetas.some((t) => t.pieza);
   return (
     <ul
-      className={`${estilos.rejilla} ${estilos.rejillaTarjetas} ${cuatroEnUnaFila ? estilos.rejillaCuatroEnUnaFila : ""}`}
+      className={
+        conPiezas
+          ? `${estilos.rejilla} ${estilos.rejillaPiezas}`
+          : `${estilos.rejilla} ${estilos.rejillaTarjetas} ${cuatroEnUnaFila ? estilos.rejillaCuatroEnUnaFila : ""}`
+      }
     >
       {tarjetas.map((t) => {
         const idT = `${id}-${t.clave}`;
@@ -135,13 +140,15 @@ export function RejillaTarjetas({
           >
             {t.pieza ? (
               <div className={`${estilos.foto} ${estilos.fotoPieza}`}>
-                <LogoOpticoServidor
-                  logo={t.pieza}
-                  caja={CAJA_PIEZA}
-                  alt=""
-                  sizes="(max-width: 767px) 80vw, (max-width: 1024px) 40vw, min(30vw, 560px)"
-                  className={estilos.piezaCaja}
-                />
+                <span className={estilos.piezaZona}>
+                  <LogoOpticoServidor
+                    logo={t.pieza}
+                    caja={CAJA_PIEZA}
+                    alt=""
+                    sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, min(25vw, 350px)"
+                    className={estilos.piezaCaja}
+                  />
+                </span>
               </div>
             ) : t.logo ? (
               <div className={estilos.foto}>

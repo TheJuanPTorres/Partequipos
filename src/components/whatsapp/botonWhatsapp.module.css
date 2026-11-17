@@ -8,7 +8,8 @@
  * Solo pone los COLORES y la transición: el tamaño, el relleno, la forma y el foco siguen siendo
  * los de cada botón (se añade esta clase a la suya). Más específico que los estilos de cada sitio
  * (también los de Tailwind y la ventana del formulario) para que mande sin `!important`.
- * El botón flotante de la esquina NO lo usa: se queda como está.
+ * También el «WhatsApp» de la tarjeta roja del pie (dirección, 2026-11-17). El botón flotante de
+ * la esquina NO lo usa: se queda como está.
  */
 :is(a, button).botonWhatsapp.botonWhatsapp {
   border-color: #100f0f;

@@ -207,6 +207,22 @@
 }
 
 /*
+ * Escritorio: logo y textos alineados con el CONTENIDO de las columnas (sus 30 px de relleno), no
+ * con el borde de sus tarjetas (ronda 19, t8, 2026-11-17). En tablet y móvil va centrada.
+ */
+@media (min-width: 1025px) {
+  .empresa {
+    box-sizing: border-box;
+    padding-left: 30px;
+  }
+
+  /* El 39 % de la empresa sin ese relleno: el logo, del mismo tamaño que antes. */
+  .logo {
+    width: calc((100% + 30px) * 0.39);
+  }
+}
+
+/*
  * BUSCADOR PROVISIONAL (dirección, 2026-10-05; `BuscadorPie.tsx`): el campo y
  * el botón de ux-9, que solo anuncian «Buscador disponible pronto». MEDIDO en
  * ux-9 publicado a 1440, 1010 y 390: 476 × 58 alineado a la derecha (centrado

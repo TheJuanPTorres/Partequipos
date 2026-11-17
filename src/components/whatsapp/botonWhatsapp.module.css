@@ -1,0 +1,39 @@
+/*
+ * EL BOTÓN DE WHATSAPP, IGUAL EN TODA LA WEB (ronda 19, t6, 2026-11-17; dirección): el estilo del
+ * «Habla con un experto» de la ficha de usado. En reposo, NEGRO con texto e icono blancos; al
+ * pasar el ratón o con el foco, pasa SUAVE (250 ms) al verde de WhatsApp que ya usaba el sitio
+ * (#0f7b45). Contraste del texto blanco: 19:1 sobre el negro y 5,3:1 sobre el verde (AA).
+ * Con «reducir movimiento», el cambio es inmediato.
+ *
+ * Solo pone los COLORES y la transición: el tamaño, el relleno, la forma y el foco siguen siendo
+ * los de cada botón (se añade esta clase a la suya). Más específico que los estilos de cada sitio
+ * (también los de Tailwind y la ventana del formulario) para que mande sin `!important`.
+ * También el «WhatsApp» de la tarjeta roja del pie (dirección, 2026-11-17). El botón flotante de
+ * la esquina NO lo usa: se queda como está.
+ */
+:is(a, button).botonWhatsapp.botonWhatsapp {
+  border-color: #100f0f;
+  background: #100f0f;
+  color: #ffffff;
+  transition:
+    background-color 250ms ease,
+    border-color 250ms ease,
+    color 250ms ease;
+}
+
+:is(a, button).botonWhatsapp.botonWhatsapp:hover,
+:is(a, button).botonWhatsapp.botonWhatsapp:focus-visible {
+  border-color: #0f7b45;
+  background: #0f7b45;
+  color: #ffffff;
+}
+
+:is(a, button).botonWhatsapp.botonWhatsapp svg {
+  color: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(a, button).botonWhatsapp.botonWhatsapp {
+    transition: none;
+  }
+}

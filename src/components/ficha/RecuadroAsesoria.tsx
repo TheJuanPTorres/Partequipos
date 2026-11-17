@@ -6,6 +6,7 @@ import { EngranajeMarca } from "@/components/ficha/EngranajeMarca";
 import estilos from "@/components/ficha/ficha.module.css";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 import type { ImagenLista } from "@/lib/utils/relations";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * «CONTÁCTANOS PARA RECIBIR ASESORÍA» de las fichas (ux-9): el recuadro gris con
@@ -47,7 +48,7 @@ export function RecuadroAsesoria({
           {experto ? (
             <a
               href={experto.href}
-              className={`${estilos.boton} texto-etiqueta`}
+              className={`${estilos.boton} texto-etiqueta ${wa.botonWhatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
             >

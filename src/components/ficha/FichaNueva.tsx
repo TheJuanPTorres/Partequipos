@@ -24,6 +24,7 @@ import type { BannerConLogo } from "@/lib/nueva/bannerMarca";
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import nueva from "./fichaNueva.module.css";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /*
  * FICHA DE MAQUINARIA NUEVA con la plantilla de Andrés («Ficha maquinaria
@@ -180,7 +181,7 @@ export function FichaNueva({
         {experto ? (
           <a
             href={experto.href}
-            className={`${estilos.boton} ${estilos.botonOscuro} ${estilos.botonGrande}`}
+            className={`${estilos.boton} ${estilos.botonOscuro} ${estilos.botonGrande} ${wa.botonWhatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
           >

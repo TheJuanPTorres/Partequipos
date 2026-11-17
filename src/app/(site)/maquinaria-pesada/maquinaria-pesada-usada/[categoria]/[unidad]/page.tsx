@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect, redirect } from "next/navigation";
 
-import { FichaProducto, type OtraReferencia } from "@/components/ficha/FichaProducto";
+import {
+  ANCLA_COTIZAR,
+  FichaProducto,
+  type OtraReferencia,
+} from "@/components/ficha/FichaProducto";
+import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import type { FotoFicha } from "@/components/ficha/GaleriaFicha";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { configContactoMarca } from "@/lib/formularios/configFormulario";
+import { enlaceTelefono } from "@/lib/indices/paginasIndice";
 import { getFichaProducto } from "@/lib/queries/getFichaProducto";
 import { getInventarioUsados, getUnidadUsadaPorSlug } from "@/lib/queries/getMaquinaria";
+import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { productoVisible } from "@/lib/nueva/visibilidad";
 import { rutas } from "@/lib/routes";
@@ -17,6 +25,7 @@ import { METADATA_404 } from "@/lib/seo/noEncontrada";
 import { turnstileSiteKey } from "@/lib/turnstile";
 import { camposDeAditamento } from "@/lib/usados/aditamentos";
 import { datosDeUnidad, parrafos } from "@/lib/usados/ficha";
+import { sinTelefonoDeEmpresa } from "@/lib/usados/telefonoEnDescripcion";
 import { imagenDeMedia, poblado, posicionFocal, type ImagenLista } from "@/lib/utils/relations";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 import type { Documento, Media } from "@/payload-types";
@@ -76,6 +85,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
+const texto = (v: string | null | undefined) => v?.trim() ?? "";
+
 export default async function UnidadUsadaPage({ params }: { params: Promise<Params> }) {
   const { categoria: categoriaSlug, unidad: slug } = await params;
   const data = await getUnidadUsadaPorSlug(categoriaSlug, slug);
@@ -86,10 +97,11 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
   // Oculta («Mostrar en la web» desmarcada): a la misma categoría, pero de forma TEMPORAL (307).
   if (!productoVisible(unidad)) redirect(`${rutas.categoriaUsada(categoria.slug)}/`);
 
-  const [empresa, ficha, inventario] = await Promise.all([
+  const [empresa, ficha, inventario, global] = await Promise.all([
     getEmpresa(),
     getFichaProducto(),
     getInventarioUsados(),
+    getRepuestosMarca(),
   ]);
 
   const ruta = rutas.unidadUsada(categoria.slug, slug);
@@ -146,6 +158,32 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
       pdf: null,
     }));
 
+  // El teléfono, destacado en el bloque de acciones (el del global de la empresa). Si la
+  // descripción ya lo trae (las importadas de WordPress acaban en «📞 317 670 7071 — …»),
+  // se quita del texto para no repetirlo (solo lo que se pinta; el dato no cambia).
+  const descripcion = sinTelefonoDeEmpresa(parrafos(unidad.descripcion), empresa.telefono);
+  const telefono = empresa.telefono
+    ? { etiqueta: empresa.telefono, href: enlaceTelefono(empresa.telefono) }
+    : null;
+  // El contacto moderno de las fichas de nueva y repuestos, con la unidad en la consulta y el
+  // mismo envío que antes: una cotización con su nombre como referencia.
+  const contacto = {
+    origen: ruta,
+    siteKey: turnstileSiteKey(),
+    whatsapp: enlaceWhatsApp(
+      empresa.whatsapp,
+      `Hola, quiero cotizar ${articulo} ${unidad.nombre}.`,
+    ),
+    boton: texto(global.contactoBoton),
+    marca: marca ?? "",
+    producto: unidad.nombre,
+    formulario: {
+      titulo: `Cotización: ${unidad.nombre}`,
+      conCiudad: true,
+      etiquetaMensaje: "¿Qué necesitas?",
+    },
+  };
+
   return (
     <FichaProducto
       nombre={unidad.nombre}
@@ -155,31 +193,27 @@ export default async function UnidadUsadaPage({ params }: { params: Promise<Para
       datos={datos}
       experto={experto}
       logo={null}
-      cuerpo={parrafos(unidad.descripcion).map((t) => (
+      cuerpo={descripcion.parrafos.map((t) => (
         <p key={t}>{t}</p>
       ))}
       especificaciones={[]}
       pdf={pdf}
-      ocultarTituloSinFicha
       tituloOtras="Otras unidades de esta categoría"
       textoVerMas="Ver unidad"
       otras={otras}
       imagenContacto={imagenContacto}
       contactoEsFoto={contactoEsFoto}
       jsonLd={<JsonLd data={[productJsonLd, buildBreadcrumbJsonLd(migas)]} />}
-      formulario={{
-        tipo: "cotizacion",
-        origen: ruta,
-        siteKey: turnstileSiteKey(),
-        whatsapp: enlaceWhatsApp(
-          empresa.whatsapp,
-          `Hola, quiero cotizar ${articulo} ${unidad.nombre}.`,
-        ),
-        referencia: { texto: unidad.nombre },
-        titulo: "Solicitar cotización",
-        descripcion: "Te enviamos precio, disponibilidad y condiciones de entrega.",
-        textoBoton: "Pedir cotización",
-      }}
+      formulario={configContactoMarca(contacto)}
+      telefono={telefono}
+      contacto={
+        <ContactoMarca
+          id={ANCLA_COTIZAR}
+          titulo={texto(global.contactoTitulo)}
+          subtitulo={texto(global.contactoSubtitulo)}
+          {...contacto}
+        />
+      }
     />
   );
 }

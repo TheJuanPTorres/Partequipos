@@ -31,6 +31,7 @@ import { conMensaje, type EnlaceWhatsApp } from "@/lib/whatsapp";
 import { CarruselVideos } from "./CarruselVideos";
 import estilos from "./servicio.module.css";
 import { VideoFondo } from "./VideoFondo";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * SERVICIO TÉCNICO CON LA PLANTILLA DE ANDRÉS (`elementor-4010`, 2026-10-19).
@@ -188,7 +189,9 @@ export function PlantillaServicioTecnico({
             alt=""
             fill
             priority
-            sizes="97vw"
+            // En móvil la caja es más alta que la foto (3:2) y `cover` la escala por el alto:
+            // con 97vw se ampliaba ×1,8 a 390 (revisión responsive, 2026-11-16).
+            sizes="(max-width: 767px) 175vw, 97vw"
             className={estilos.medio}
             style={{ objectPosition: fotoHero.posicion }}
           />
@@ -395,7 +398,9 @@ export function PlantillaServicioTecnico({
                           src={posventa.imagen.url}
                           alt={posventa.imagen.alt}
                           fill
-                          sizes="(max-width: 767px) 90vw, 22vw"
+                          // Foto apaisada en una caja casi cuadrada: `cover` la escala por el alto
+                          // (×2 a 1440 con 22vw; revisión responsive, 2026-11-16).
+                          sizes="(max-width: 767px) 125vw, 45vw"
                           className={estilos.medio}
                           style={{ objectPosition: posventa.imagen.posicion }}
                         />
@@ -411,7 +416,7 @@ export function PlantillaServicioTecnico({
                     {whatsapp ? (
                       <a
                         href={conMensaje(whatsapp, MENSAJE_POSVENTA).href}
-                        className={`${estilos.boton} ${estilos.botonWhatsapp}`}
+                        className={`${estilos.boton} ${estilos.botonWhatsapp} ${wa.botonWhatsapp}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >

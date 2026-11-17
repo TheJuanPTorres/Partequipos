@@ -1,0 +1,141 @@
+/*
+ * FICHA DE USADO: LA SECCIÓN BAJO LA TARJETA (ronda 19, t7, 2026-11-17, dirección). Antes, la
+ * descripción a media página y, a la derecha, solo tres iconos de 32 px sin texto: mucho hueco.
+ * Ahora, la descripción con ancho de lectura (~70 caracteres) y, debajo, una FRANJA DE ACCIONES
+ * con botones con texto y el teléfono destacado (al lado dejaba hueco con descripciones cortas).
+ * Apilada en móvil. Espacios: los dos tokens (`--espacio-interno` dentro; el hueco hasta la
+ * sección siguiente, `--espacio-seccion`).
+ */
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-interno);
+  margin: 0 var(--ficha-margen) var(--espacio-seccion);
+  padding: var(--espacio-interno);
+  border-radius: var(--ficha-radio);
+  background: var(--color-fondo);
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  max-width: 70ch;
+  color: var(--color-texto);
+}
+
+.texto p {
+  margin: 0;
+}
+
+/* La franja de acciones: gris, con el título, los botones en fila y el teléfono a la derecha. */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px var(--espacio-interno);
+  padding: var(--espacio-interno);
+  border-radius: var(--ficha-radio);
+  background: var(--color-fondo-seccion);
+}
+
+.accionesTitulo {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-texto);
+  font-weight: 600;
+}
+
+.boton {
+  display: inline-flex;
+  min-height: 44px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border: 1px solid var(--color-texto);
+  border-radius: 30px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 250ms ease,
+    color 250ms ease;
+}
+
+.boton svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.boton:hover {
+  background: var(--color-texto);
+  color: var(--color-fondo);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/* El teléfono, destacado: grande y enlazado (`tel:`), al final de la fila. */
+.telefono {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 0 auto;
+}
+
+.telefonoEtiqueta {
+  color: var(--color-texto-suave);
+}
+
+.telefonoNumero {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-texto);
+  font-size: var(--texto-destacado);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.telefonoNumero:hover {
+  color: var(--color-marca);
+}
+
+.telefonoNumero:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/* Móvil: botones a todo el ancho, uno debajo de otro, y el teléfono al final. */
+@media (max-width: 639px) {
+  .acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .telefono {
+    margin: 4px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--ficha-borde-suave);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton {
+    transition: none;
+  }
+}
+
+@media print {
+  .acciones {
+    display: none;
+  }
+}

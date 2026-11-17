@@ -35,6 +35,19 @@
   opacity: 0.35;
 }
 
+/*
+ * En el teléfono las tarjetas van una debajo de otra y la sección mide ~1900 px: la foto, con
+ * `cover`, se ampliaba ×6,5 (medido a 390, 2026-11-17). Ahí el fondo ocupa solo los primeros
+ * 640 px y se funde con el oscuro del panel; abajo quedan las tarjetas sobre el oscuro.
+ */
+@media (max-width: 767px) {
+  .fotos {
+    bottom: auto;
+    height: min(100%, 640px);
+    mask-image: linear-gradient(#000 55%, transparent);
+  }
+}
+
 /* Una foto por capa: la de turno se ve y se acerca muy despacio; las demás, transparentes. */
 .foto {
   object-fit: cover;

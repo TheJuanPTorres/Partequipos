@@ -17,10 +17,10 @@ import { SIN_RECORTE, type Recorte } from "./tamanoOptico";
  * entero y se vuelve a intentar en la siguiente generación.
  */
 const medir = unstable_cache(
-  async (url: string): Promise<Recorte> => {
+  async (url: string, umbral: number): Promise<Recorte> => {
     const respuesta = await fetch(url, {
       redirect: "error",
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(15000),
       cache: "no-store",
     });
     if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
@@ -30,7 +30,7 @@ const medir = unstable_cache(
     const alto = meta.height ?? 0;
     if (!ancho || !alto) throw new Error("sin medidas");
     const { info } = await sharp(bytes)
-      .trim({ threshold: 12 })
+      .trim({ threshold: umbral })
       .toBuffer({ resolveWithObject: true });
     const izquierda = -(info.trimOffsetLeft ?? 0);
     const arriba = -(info.trimOffsetTop ?? 0);
@@ -47,14 +47,22 @@ const medir = unstable_cache(
 /** Solo el Blob (las URL de los logos): nunca se descarga otra cosa desde el servidor. */
 const DEL_BLOB = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\//;
 
-export async function recorteVisible(url: string): Promise<Recorte> {
+/** `umbral`: lo que se aparta del fondo para contar como contenido (12 por defecto; más alto, también recorta sombras y fondos casi blancos). */
+export async function recorteVisible(url: string, umbral = 12): Promise<Recorte> {
   if (!DEL_BLOB.test(url)) return SIN_RECORTE;
-  try {
-    return await medir(url);
-  } catch (error) {
-    console.error("[logos] No se pudo medir la parte visible de un logo:", String(error));
-    return SIN_RECORTE;
+  // Tres intentos con espera: en el build, con muchas páginas a la vez, el almacén responde 403 a algunas
+  // peticiones (visto en el registro del build) y con un solo intento se podía
+  // dejar la medida SIN recorte dentro del HTML prerenderizado (piezas de las categorías, 2026-11-17).
+  for (let intento = 1; intento <= 3; intento++) {
+    try {
+      return await medir(url, umbral);
+    } catch (error) {
+      if (intento === 3)
+        console.error("[logos] No se pudo medir la parte visible de un logo:", String(error));
+      else await new Promise((listo) => setTimeout(listo, 1500 * intento + Math.random() * 1000));
+    }
   }
+  return SIN_RECORTE;
 }
 
 /** El logo con la parte visible de su fichero (`recorteVisible`), o `null`. */

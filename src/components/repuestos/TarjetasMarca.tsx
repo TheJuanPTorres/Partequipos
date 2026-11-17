@@ -1,13 +1,24 @@
 import { IconArrowRight } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
+import { LogoOpticoServidor } from "@/components/marca/LogoOpticoServidor";
+import type { CajaRelativa } from "@/lib/marca/tamanoOptico";
 import { VerTodosEquipos } from "@/components/nueva/VerTodosEquipos";
 import type { TarjetaMarca } from "@/lib/repuestos/marca";
 
 import estilos from "./marca.module.css";
 import { RecuadrosConScroll } from "./RecuadrosConScroll";
+
+/**
+ * La caja de una foto de pieza (1,6:1, la forma de la zona gris visible): cada pieza se escala al máximo
+ * que quepa, ~90 % por su lado limitante (área 1 y tope 0,9), sin cortar. Las anchas llenan el ancho y
+ * las altas el alto. Se mide sin el margen blanco de su foto (umbral 30).
+ */
+const UMBRAL_PIEZA = 30;
+const CAJA_PIEZA: CajaRelativa = { proporcion: 1.6, area: 1, tope: 0.9 };
 
 /**
  * «REPUESTOS SEGÚN TIPO DE MÁQUINA» (ux-9): una tarjeta por tipo de la marca
@@ -108,9 +119,14 @@ export function RejillaTarjetas({
   /** Ver `TarjetasMarca`. */
   cuatroEnUnaFila?: boolean;
 }) {
+  const conPiezas = tarjetas.some((t) => t.pieza);
   return (
     <ul
-      className={`${estilos.rejilla} ${estilos.rejillaTarjetas} ${cuatroEnUnaFila ? estilos.rejillaCuatroEnUnaFila : ""}`}
+      className={
+        conPiezas
+          ? `${estilos.rejilla} ${estilos.rejillaPiezas}`
+          : `${estilos.rejilla} ${estilos.rejillaTarjetas} ${cuatroEnUnaFila ? estilos.rejillaCuatroEnUnaFila : ""}`
+      }
     >
       {tarjetas.map((t) => {
         const idT = `${id}-${t.clave}`;
@@ -128,7 +144,20 @@ export function RejillaTarjetas({
             key={t.clave}
             className={`${estilos.tarjeta} ${t.soloEscritorio ? estilos.soloEscritorio : ""}`}
           >
-            {t.logo ? (
+            {t.pieza ? (
+              <div className={`${estilos.foto} ${estilos.fotoPieza}`}>
+                <span className={estilos.piezaZona}>
+                  <LogoOpticoServidor
+                    logo={t.pieza}
+                    caja={CAJA_PIEZA}
+                    alt=""
+                    sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, min(25vw, 350px)"
+                    className={estilos.piezaCaja}
+                    umbral={UMBRAL_PIEZA}
+                  />
+                </span>
+              </div>
+            ) : t.logo ? (
               <div className={estilos.foto}>
                 <LogoMarca
                   logo={t.logo}
@@ -156,7 +185,11 @@ export function RejillaTarjetas({
               // En los índices, el recuadro se desplaza con el scroll (`RecuadrosConScroll`).
               data-recuadro-scroll={indice && (t.imagen || t.logo) ? "" : undefined}
             >
-              <Nivel id={idT} className={estilos.tituloTarjeta}>
+              <Nivel
+                id={idT}
+                className={estilos.tituloTarjeta}
+                style={t.pieza ? ({ "--letras": t.titulo.length } as CSSProperties) : undefined}
+              >
                 {t.titulo}
               </Nivel>
               {t.detalle ? <p className={estilos.detalleTarjeta}>{t.detalle}</p> : null}

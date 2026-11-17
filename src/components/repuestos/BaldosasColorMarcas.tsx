@@ -36,11 +36,12 @@ import estilosMarca from "./marca.module.css";
  */
 
 /**
- * La caja del logo en la baldosa: 84 % de su ancho y 3,7:1 (el 34 % de su alto, como antes). Con
- * un área del 42 % caben sin tocar el borde los logos medidos, de 2:1 (Hitachi LANDCROS) a 8,7:1
- * (Caterpillar), y el área a la vista queda como la de antes (≈12 % de la baldosa).
+ * La caja del logo en la baldosa: 84 % de su ancho y 3,7:1 (el 34 % de su alto, como antes). Área
+ * del 54 % (2026-11-16, Juan Pablo: más grandes; antes 42 %, ajustada a Caterpillar): los logos
+ * muy alargados (Caterpillar, Yanmar) se quedan en el 92 % del ancho de la caja, sin tocar el
+ * borde, y salen algo menores; el resto crece y sigue parejo.
  */
-export const CAJA_BALDOSA: CajaRelativa = { proporcion: 3.7, area: 0.42 };
+export const CAJA_BALDOSA: CajaRelativa = { proporcion: 3.7, area: 0.54, tope: 0.92 };
 export function BaldosasColorMarcas({
   id,
   marcas,

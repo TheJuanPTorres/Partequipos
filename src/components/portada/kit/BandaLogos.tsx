@@ -144,10 +144,10 @@ function IconoExterno() {
 
 /**
  * La caja útil de un logo en la banda de «Marcas de repuestos»: ~152 × 44 px en el teléfono y a
- * 1440 (`.seccion[data-espejo] .caja` menos su relleno), 3,3:1. Con un área del 40 % caben sin
- * tocar el borde los logos de las marcas de repuestos medidos (de 3,1:1 a 8,2:1).
+ * 1440 (`.seccion[data-espejo] .caja` menos su relleno), 3,3:1. Área del 51 % (2026-11-16, Juan
+ * Pablo: más grandes; antes 40 %): los muy alargados se quedan en el 92 % del ancho, sin tocar el borde.
  */
-const CAJA_BANDA_REPUESTOS: CajaRelativa = { proporcion: 3.3, area: 0.4 };
+const CAJA_BANDA_REPUESTOS: CajaRelativa = { proporcion: 3.3, area: 0.51, tope: 0.92 };
 
 /**
  * Un logo de la banda. En «Marcas de repuestos» (`espejo`), con el MISMO TAMAÑO A LA VISTA

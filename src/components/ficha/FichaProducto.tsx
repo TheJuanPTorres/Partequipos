@@ -1,16 +1,22 @@
-import { IconBrandWhatsapp, IconCirclePlus, IconFileTypePdf, IconMail } from "@tabler/icons-react";
+import {
+  IconBrandWhatsapp,
+  IconCirclePlus,
+  IconFileTypePdf,
+  IconMail,
+  IconPhone,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { BotonFormulario } from "@/components/forms/BotonFormulario";
-import { FormularioSolicitud } from "@/components/forms/FormularioSolicitud";
 import type { ConfigFormulario } from "@/lib/formularios/configFormulario";
 
 import { BotonImprimir } from "@/components/ficha/BotonImprimir";
 import { GaleriaFicha, type FotoFicha } from "@/components/ficha/GaleriaFicha";
 import { IconoDato } from "@/components/ficha/IconoDato";
 import estilos from "@/components/ficha/ficha.module.css";
+import usado from "@/components/ficha/fichaUsado.module.css";
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
 import { RecuadroAsesoria } from "@/components/ficha/RecuadroAsesoria";
 import type { DatoDestacado } from "@/lib/maquinaria/fichaTecnica";
@@ -91,11 +97,6 @@ type Props = {
   especificaciones: FilaEspecificacion[];
   /** PDF de la ficha técnica; sin él, no hay botón. */
   pdf: string | null;
-  /**
-   * Con `true` y sin filas ni PDF, la columna lateral no lleva el título «Ficha
-   * técnica» (solo los botones de compartir): la unidad usada no tiene ficha en filas.
-   */
-  ocultarTituloSinFicha?: boolean;
   /** «Otras referencias» (nueva) / «Otras unidades de esta categoría» (usada). */
   tituloOtras: string;
   textoVerMas: string;
@@ -105,8 +106,12 @@ type Props = {
   contactoEsFoto: boolean;
   /** Datos estructurados (Product y BreadcrumbList), ya construidos por la página. */
   jsonLd: ReactNode;
-  /** El formulario de cotización, con la referencia a lo que se cotiza. */
+  /** El formulario de cotización (la ventana emergente), con la referencia a lo que se cotiza. */
   formulario: ConfigFormulario;
+  /** El teléfono de la empresa, destacado en el bloque de acciones; sin él, no sale. */
+  telefono?: { etiqueta: string; href: string | null } | null;
+  /** El bloque de contacto del final (con su ancla `ANCLA_COTIZAR`). */
+  contacto: ReactNode;
 };
 
 export function FichaProducto({
@@ -120,7 +125,6 @@ export function FichaProducto({
   cuerpo,
   especificaciones,
   pdf,
-  ocultarTituloSinFicha = false,
   tituloOtras,
   textoVerMas,
   otras,
@@ -128,11 +132,10 @@ export function FichaProducto({
   contactoEsFoto,
   jsonLd,
   formulario,
+  telefono,
+  contacto,
 }: Props) {
-  const compartirWhatsApp = `https://wa.me/?text=${encodeURIComponent(`${nombre}: ${urlFicha}`)}`;
   const compartirCorreo = `mailto:?subject=${encodeURIComponent(nombre)}&body=${encodeURIComponent(urlFicha)}`;
-  const hayFicha = especificaciones.length > 0 || Boolean(pdf);
-  const tituloFicha = hayFicha || !ocultarTituloSinFicha;
 
   return (
     <main className={estilos.pagina}>
@@ -205,72 +208,83 @@ export function FichaProducto({
         </div>
       </section>
 
-      {/* 2. DESCRIPCIÓN Y FICHA TÉCNICA. */}
-      <section
-        className={estilos.descripcion}
-        aria-labelledby={tituloFicha ? "ficha-tecnica" : undefined}
-        aria-label={tituloFicha ? undefined : "Descripción"}
-      >
-        <div className={estilos.columnaTexto}>
+      {/*
+       * 2. DESCRIPCIÓN Y ACCIONES (ronda 19, t7, 2026-11-17): la descripción con ancho de lectura
+       * y, al lado, el bloque de acciones con texto (WhatsApp, correo, imprimir, la ficha técnica
+       * en PDF si la hay) y el teléfono destacado. Apilado en móvil y tablet.
+       */}
+      <section className={usado.seccion} aria-label="Descripción y acciones">
+        <div className={`${usado.texto} texto-cuerpo`}>
           {logo ? (
             <LogoMarca logo={logo} alt={logo.alt} sizes="95px" className={estilos.logoMarca} />
           ) : null}
-          <div className={`${estilos.texto} texto-cuerpo`}>{cuerpo}</div>
+          {cuerpo}
+          {especificaciones.length > 0 ? (
+            <>
+              <h2 id="ficha-tecnica" className={`${estilos.subtitulo} texto-titulo-3`}>
+                Ficha técnica
+              </h2>
+              <dl className={`${estilos.especificaciones} texto-cuerpo`}>
+                {especificaciones.map((e) => (
+                  <div key={e.id ?? e.etiqueta}>
+                    <dt>{e.etiqueta}:</dt> <dd>{e.valor}</dd>
+                  </div>
+                ))}
+              </dl>
+            </>
+          ) : null}
         </div>
 
-        <div className={estilos.columnaFicha}>
-          {tituloFicha ? (
-            <h2 id="ficha-tecnica" className={`${estilos.subtitulo} texto-titulo-3`}>
-              Ficha técnica
-            </h2>
+        <aside
+          className={`${usado.acciones} ${estilos.noImprimir}`}
+          aria-labelledby="ficha-acciones"
+        >
+          <h2 id="ficha-acciones" className={`${usado.accionesTitulo} texto-destacado`}>
+            ¿Te interesa esta unidad?
+          </h2>
+          {formulario.whatsapp ? (
+            <a
+              href={formulario.whatsapp.href}
+              className={`${usado.boton} ${wa.botonWhatsapp} texto-etiqueta`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconBrandWhatsapp aria-hidden="true" stroke={1.75} />
+              Escríbenos por WhatsApp
+              <span className="sr-only"> (se abre en otra pestaña)</span>
+            </a>
           ) : null}
-          {especificaciones.length > 0 ? (
-            <dl className={`${estilos.especificaciones} texto-cuerpo`}>
-              {especificaciones.map((e) => (
-                <div key={e.id ?? e.etiqueta}>
-                  <dt>{e.etiqueta}:</dt> <dd>{e.valor}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
+          <a href={compartirCorreo} className={`${usado.boton} texto-etiqueta`}>
+            <IconMail aria-hidden="true" stroke={1.75} />
+            Enviar por correo
+          </a>
+          <BotonImprimir className={`${usado.boton} texto-etiqueta`}>Imprimir ficha</BotonImprimir>
           {pdf ? (
             <a
               href={pdf}
-              className={`${estilos.boton} ${estilos.noImprimir} texto-etiqueta`}
+              className={`${usado.boton} texto-etiqueta`}
               target="_blank"
               rel="noopener"
             >
               <IconFileTypePdf aria-hidden="true" stroke={1.75} />
-              Descargar ficha técnica completa
+              Ficha técnica
               <span className="sr-only"> (PDF)</span>
             </a>
           ) : null}
-          <ul className={`${estilos.compartir} ${estilos.noImprimir}`} aria-label="Compartir">
-            <li>
-              <a
-                href={compartirWhatsApp}
-                className={estilos.botonCompartir}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Compartir por WhatsApp"
-              >
-                <IconBrandWhatsapp aria-hidden="true" stroke={1.75} />
-              </a>
-            </li>
-            <li>
-              <a
-                href={compartirCorreo}
-                className={estilos.botonCompartir}
-                aria-label="Compartir por correo"
-              >
-                <IconMail aria-hidden="true" stroke={1.75} />
-              </a>
-            </li>
-            <li>
-              <BotonImprimir className={estilos.botonCompartir} />
-            </li>
-          </ul>
-        </div>
+          {telefono ? (
+            <p className={usado.telefono}>
+              <span className={`${usado.telefonoEtiqueta} texto-etiqueta`}>O llámanos</span>
+              {telefono.href ? (
+                <a href={telefono.href} className={usado.telefonoNumero}>
+                  <IconPhone aria-hidden="true" stroke={1.75} size={22} />
+                  {telefono.etiqueta}
+                </a>
+              ) : (
+                <span className={usado.telefonoNumero}>{telefono.etiqueta}</span>
+              )}
+            </p>
+          ) : null}
+        </aside>
       </section>
 
       {/* 3. OTRAS REFERENCIAS (sin otras, no sale). */}
@@ -328,15 +342,14 @@ export function FichaProducto({
           imagenContacto={imagenContacto}
           contactoEsFoto={contactoEsFoto}
         />
-
-        <div id={ANCLA_COTIZAR} className={estilos.formulario}>
-          {/*
-           * Cotización con la referencia ya preseleccionada: quien llega hasta aquí ya
-           * sabe qué quiere, y volver a escribirlo es fricción que cuesta leads.
-           */}
-          <FormularioSolicitud {...formulario} />
-        </div>
       </section>
+
+      {/*
+       * 5. CONTACTO: el bloque moderno de las fichas de nueva y de repuestos (`ContactoMarca`,
+       * 2026-11-17), con la unidad ya puesta en la consulta. Lo pinta la página, con el ancla
+       * `ANCLA_COTIZAR` («Cotizar el equipo» y «Contáctanos» bajan aquí).
+       */}
+      <div className={estilos.noImprimir}>{contacto}</div>
     </main>
   );
 }

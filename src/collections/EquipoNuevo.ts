@@ -43,6 +43,8 @@ export const EquipoNuevo: CollectionConfig = {
   fields: [
     // Aviso en vivo si la galería está vacía (F4).
     avisoField("avisoSinFotos", "AvisoSinFotos"),
+    // Marca con enlace externo: sus equipos no se publican (#475).
+    avisoField("avisoMarcaEnlaceExterno", "AvisoMarcaEnlaceExterno"),
     { name: "nombre", type: "text", required: true, label: "Nombre" },
     mostrarEnWebField({
       descripcion:

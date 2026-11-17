@@ -3,7 +3,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 
-import { aplanarHaciaOcultas, marcaVisible, redirectsDeMarcasOcultas } from "./visibilidad";
+import {
+  aplanarHaciaOcultas,
+  conEquipoVisible,
+  DE_MARCA_CON_PAGINA,
+  marcaVisible,
+  redirectsDeMarcasOcultas,
+} from "./visibilidad";
 
 const NUEVA = "/maquinaria-pesada/maquinaria-pesada-nueva";
 
@@ -143,5 +149,20 @@ describe("guardarraíl: las lecturas públicas de nueva filtran las marcas ocult
     assert.deepEqual(lecturasSinFiltro([{ ruta: "z.ts", texto: cuenta }]), [
       "z.ts:2 (marcas-maquinaria)",
     ]);
+  });
+});
+
+describe("equipos de una marca con enlace externo (#475)", () => {
+  it("no se publican: toda consulta pública de equipos exige que su marca tenga página propia", () => {
+    for (const where of [conEquipoVisible(), conEquipoVisible({ tipo: { equals: 1 } })]) {
+      const partes = (where as { and: unknown[] }).and;
+      assert.ok(partes.includes(DE_MARCA_CON_PAGINA), JSON.stringify(where));
+    }
+  });
+
+  it("la condición es «la marca no tiene enlace externo» (vacío o sin valor)", () => {
+    assert.deepEqual(DE_MARCA_CON_PAGINA, {
+      or: [{ "marca.enlaceExterno": { exists: false } }, { "marca.enlaceExterno": { equals: "" } }],
+    });
   });
 });

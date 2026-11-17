@@ -86,3 +86,7 @@ export const MARCA_CON_PAGINA: Where = {
 
 /** El texto que se añade al nombre accesible de un enlace que abre otra pestaña. */
 export const AVISO_OTRA_PESTANA = "se abre en otra pestaña";
+
+/** El aviso del panel en una marca con enlace externo y en sus equipos nuevos (#475). */
+export const AVISO_EQUIPOS_NO_PUBLICADOS =
+  "Esta marca tiene enlace externo: sus equipos no se publican en la web";

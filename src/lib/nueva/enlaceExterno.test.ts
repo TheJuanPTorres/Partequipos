@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  AVISO_EQUIPOS_NO_PUBLICADOS,
   destinoDeMarca,
   enlaceExternoDe,
   migasDeMarca,
@@ -66,5 +67,12 @@ describe("enlace externo de una marca de nueva", () => {
     };
     assert.deepEqual(migasDeMarca({ enlaceExterno: "https://maquitecno.co/" }, item), []);
     assert.deepEqual(migasDeMarca({ enlaceExterno: null }, item), [item]);
+  });
+
+  it("el aviso del panel dice que sus equipos no se publican", () => {
+    assert.equal(
+      AVISO_EQUIPOS_NO_PUBLICADOS,
+      "Esta marca tiene enlace externo: sus equipos no se publican en la web",
+    );
   });
 });

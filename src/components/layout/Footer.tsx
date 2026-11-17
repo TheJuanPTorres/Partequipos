@@ -27,6 +27,7 @@ import { seoConfig } from "@/lib/seo/config";
 import { AnimacionesPie } from "./AnimacionesPie";
 import { BuscadorPie } from "./BuscadorPie";
 import estilos from "./pie.module.css";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * PIE DEL SITIO — ux-9 (export 2178 de Andrés, que sustituye al 2696). Server Component: solo el lema
@@ -171,7 +172,7 @@ export async function Footer() {
             />
             <a
               href={enlaceWhatsApp(empresa.whatsapp)}
-              className={`${estilos.whatsapp} texto-etiqueta`}
+              className={`${estilos.whatsapp} ${wa.botonWhatsapp} texto-etiqueta`}
               target="_blank"
               rel="noopener noreferrer"
             >

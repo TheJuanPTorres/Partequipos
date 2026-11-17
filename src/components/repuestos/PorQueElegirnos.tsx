@@ -22,11 +22,14 @@ export function PorQueElegirnos({
   anclaContacto,
   formulario,
   acento = false,
+  antesDelContacto = false,
 }: {
   id: string;
   vista: VistaPorQue | null;
   /** El propio de una página de marca: el texto sobre el color de la marca (Filtros Donaldson). */
   acento?: boolean;
+  /** Va justo antes del contacto: sin el aire de abajo, que el contacto ya lleva arriba. */
+  antesDelContacto?: boolean;
   anclaContacto: string;
   /** El formulario de contacto de la página: el botón lo abre en una ventana. */
   formulario: ConfigFormulario;
@@ -36,7 +39,7 @@ export function PorQueElegirnos({
   return (
     <section
       id={id}
-      className={`${estilos.porQue} ${acento ? estilos.porQueAcento : ""}`}
+      className={`${estilos.porQue} ${acento ? estilos.porQueAcento : ""} ${antesDelContacto ? estilos.porQueAntesDelContacto : ""}`}
       aria-labelledby={idTitulo}
     >
       <div className={estilos.porQueTarjeta}>

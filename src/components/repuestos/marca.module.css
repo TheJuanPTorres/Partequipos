@@ -2103,3 +2103,12 @@ a.modelo:hover {
 .contacto:last-child {
   padding-bottom: max(0px, calc(var(--espacio-seccion) - var(--espacio-interno)));
 }
+
+/*
+ * Índice de categorías técnicas (2026-11-16, hallazgo de A): la sección va seguida del contacto, que ya
+ * lleva 30 px de relleno arriba; con el relleno de abajo de esta (6 a 22 px) el hueco era 37 · 53 px.
+ * Sin él, queda 30 px: dentro de lo común (24–48).
+ */
+.mostrarMarcasSinAireAbajo {
+  padding-bottom: 0;
+}

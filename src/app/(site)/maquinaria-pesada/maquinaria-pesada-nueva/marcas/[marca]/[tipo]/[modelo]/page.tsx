@@ -34,6 +34,7 @@ import { getTestimoniosDePortada } from "@/lib/queries/getPortadaH";
 import { getRepuestosMarca } from "@/lib/queries/getRepuestosMarca";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { bannerDeMarca } from "@/lib/nueva/bannerMarca";
+import { migasDeMarca } from "@/lib/nueva/enlaceExterno";
 import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { usaDisenoKit } from "@/lib/nueva/paginaAditamentos";
 import { acentoDeMarca, mediosDeKit } from "@/lib/nueva/paginaKit";
@@ -171,7 +172,8 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     { nombre: "Maquinaria pesada", path: rutas.maquinaria() },
     { nombre: "Nueva", path: rutas.nuevaTipos() },
     { nombre: "Marcas", path: rutas.marcasMaquinaria() },
-    { nombre: marca.nombre, path: rutas.marcaMaquinaria(marca.slug) },
+    // Sin página propia, sin nivel (como el megamenú): hoy esta página ya da 404 para esa marca.
+    ...migasDeMarca(marca, { nombre: marca.nombre, path: rutas.marcaMaquinaria(marca.slug) }),
     { nombre: tipo.nombre, path: rutas.tipoMaquinaria(marca.slug, tipo.slug) },
     { nombre: equipo.nombre, path: ruta },
   ];

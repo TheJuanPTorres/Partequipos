@@ -51,6 +51,31 @@ export function enlaceExternoDe(marca: ConEnlaceExterno | null | undefined): str
 export const tienePaginaPropia = (marca: ConEnlaceExterno | null | undefined) =>
   enlaceExternoDe(marca) === null;
 
+/** Adónde lleva el nombre de una marca: su página, o su enlace externo (en pestaña nueva). */
+export type DestinoMarca = { href: string; externo: boolean };
+
+/**
+ * El destino de «Ver marca» (banner de la categoría general de nueva), con la misma comprobación
+ * que el megamenú y el índice de marcas: con enlace externo, a él; si no, a su página
+ * (`paginaPropia`). Así ningún enlace interno lleva a la URL de LiuGong, que da 404.
+ */
+export function destinoDeMarca(
+  marca: ConEnlaceExterno | null | undefined,
+  paginaPropia: string,
+): DestinoMarca {
+  const externo = enlaceExternoDe(marca);
+  return externo ? { href: externo, externo: true } : { href: paginaPropia, externo: false };
+}
+
+/**
+ * El nivel de la marca en las migas (y su `BreadcrumbList`): una marca sin página propia no lleva
+ * nivel, porque las migas solo enlazan a este sitio y su URL daría 404. Hoy las páginas de tipo y
+ * de ficha de esa marca ya dan 404 (`MARCA_CON_PAGINA`); esto lo deja dicho en las migas también.
+ */
+export function migasDeMarca<T>(marca: ConEnlaceExterno | null | undefined, item: T): T[] {
+  return tienePaginaPropia(marca) ? [item] : [];
+}
+
 /**
  * Para las consultas: solo las marcas CON página (sin enlace externo). El gancho del campo guarda
  * `null` cuando se vacía, así que basta con «no existe»; la cadena vacía, por si acaso.
@@ -61,3 +86,7 @@ export const MARCA_CON_PAGINA: Where = {
 
 /** El texto que se añade al nombre accesible de un enlace que abre otra pestaña. */
 export const AVISO_OTRA_PESTANA = "se abre en otra pestaña";
+
+/** El aviso del panel en una marca con enlace externo y en sus equipos nuevos (#475). */
+export const AVISO_EQUIPOS_NO_PUBLICADOS =
+  "Esta marca tiene enlace externo: sus equipos no se publican en la web";

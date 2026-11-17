@@ -25,6 +25,7 @@ import {
 import { tintaSobre } from "@/lib/marca/colorMarca";
 import { conAlt, logoDeMarca } from "@/lib/marca/logoMarca";
 import { bannerDeMarca, vistaBanner } from "@/lib/nueva/bannerMarca";
+import { destinoDeMarca } from "@/lib/nueva/enlaceExterno";
 import { columnaDeTarjeta } from "@/lib/nueva/paginaKit";
 import { getBaldosasMarca } from "@/lib/queries/getBaldosasMarca";
 import { getLogosMarca } from "@/lib/queries/getLogosMarca";
@@ -182,7 +183,11 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
                 <BannerMarcaTipo
                   id={`grupo-${g.clave}-t`}
                   titulo={g.titulo}
-                  marca={{ nombre, href: `${rutas.marcaMaquinaria(g.marca.slug)}/` }}
+                  marca={{
+                    nombre,
+                    // Sin página propia (LiuGong), a su enlace externo: su URL de aquí da 404.
+                    ...destinoDeMarca(marca, `${rutas.marcaMaquinaria(g.marca.slug)}/`),
+                  }}
                   banner={bannerDeMarca(marca, logoDe(g.marca), baldosas)}
                 />
                 <ul className={`${estilosKit.rejilla} ${estilosTarjetas.rejillaKit}`}>

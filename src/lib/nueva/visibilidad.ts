@@ -39,11 +39,23 @@ export const conMarcaVisible = (where?: Where): Where =>
  */
 export const PRODUCTO_VISIBLE: Where = { mostrarEnWeb: { not_equals: false } };
 
-/** `where` + que el equipo nuevo se muestre y su marca también. */
+/**
+ * EQUIPOS DE UNA MARCA SIN PÁGINA PROPIA (2026-11-17, dirección, #475): si la marca tiene
+ * «Enlace externo» (LiuGong → su distribuidor), sus equipos nuevos no se publican en la web,
+ * como la marca: ni listados, ni buscador, ni menú, ni portada, ni sitemap. Sus fichas ya dan
+ * 404 (`MARCA_CON_PAGINA`). El panel lo avisa en la marca y en el equipo
+ * (`AvisoMarcaEnlaceExterno`). El gancho del campo guarda `null` al vaciarlo; la cadena vacía,
+ * por si acaso. Mismo criterio que `MARCA_CON_PAGINA` (`enlaceExterno.ts`).
+ */
+export const DE_MARCA_CON_PAGINA: Where = {
+  or: [{ "marca.enlaceExterno": { exists: false } }, { "marca.enlaceExterno": { equals: "" } }],
+};
+
+/** `where` + que el equipo nuevo se muestre y su marca también (y tenga página propia). */
 export const conEquipoVisible = (where?: Where): Where =>
   where
-    ? { and: [where, DE_MARCA_VISIBLE, PRODUCTO_VISIBLE] }
-    : { and: [DE_MARCA_VISIBLE, PRODUCTO_VISIBLE] };
+    ? { and: [where, DE_MARCA_VISIBLE, DE_MARCA_CON_PAGINA, PRODUCTO_VISIBLE] }
+    : { and: [DE_MARCA_VISIBLE, DE_MARCA_CON_PAGINA, PRODUCTO_VISIBLE] };
 
 /** `where` + que el producto se muestre (usados y modelos de repuestos). */
 export const conProductoVisible = (where?: Where): Where =>

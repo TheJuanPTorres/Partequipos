@@ -189,6 +189,9 @@ export async function Footer() {
             alt={seoConfig.siteName}
             width={logo.sitio.width}
             height={logo.sitio.height}
+            // Sin `sizes`, Next pedía el logo a 256 px (el `width` de 187 a 1x) y se pintaba
+            // a 285: ampliado ×1,11. Con el ancho pintado pide 384 o más (el fichero mide 731).
+            sizes="(max-width: 767px) 75vw, 285px"
             className={estilos.logo}
           />
           <div>

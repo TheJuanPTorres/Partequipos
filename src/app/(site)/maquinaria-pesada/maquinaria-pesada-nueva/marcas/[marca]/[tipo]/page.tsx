@@ -8,6 +8,7 @@ import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { TarjetaEquipo } from "@/components/nueva/TarjetaEquipo";
 import { PaginaTipoKit } from "@/components/nueva/kit/PaginaTipoKit";
+import estilosInterior from "@/components/nueva/interiorNueva.module.css";
 import estilosTarjetas from "@/components/nueva/marcaNueva.module.css";
 import estilos from "@/components/repuestos/marca.module.css";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -153,7 +154,7 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
 
       <section
         id={ANCLA_MODELOS}
-        className={estilosTarjetas.seccionTipo}
+        className={`${estilosTarjetas.seccionTipo} ${estilosInterior.seccion}`}
         aria-labelledby="modelos-nueva-t"
       >
         <Revelado

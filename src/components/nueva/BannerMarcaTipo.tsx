@@ -107,7 +107,8 @@ export async function BannerMarcaTipo({
         </Titulo>
       </div>
 
-      <div className={estilos.accion}>
+      {/* El botón flotante de WhatsApp sube al pasar sobre «Ver marca» (a 390 lo tapaba al bajar). */}
+      <div className={estilos.accion} data-evita-flotante="">
         <Link href={marca.href} aria-label={`Ver marca ${marca.nombre}`} className={estilos.ver}>
           <span className={estilos.verTexto}>Ver marca</span>
           <IconArrowRight aria-hidden="true" size={18} stroke={2.2} />

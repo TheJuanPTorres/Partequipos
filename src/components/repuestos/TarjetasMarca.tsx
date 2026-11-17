@@ -11,8 +11,13 @@ import type { TarjetaMarca } from "@/lib/repuestos/marca";
 import estilos from "./marca.module.css";
 import { RecuadrosConScroll } from "./RecuadrosConScroll";
 
-/** La caja de una foto de pieza (4:3, como las fotos): ocupa ~80 % de su área (~89 % por su lado limitante); las muy alargadas se quedan en el 90 % del ancho. */
-const CAJA_PIEZA: CajaRelativa = { proporcion: 4 / 3, area: 0.8, tope: 0.9 };
+/**
+ * La caja de una foto de pieza (1,6:1, la forma de la zona gris visible): cada pieza se escala al máximo
+ * que quepa, ~90 % por su lado limitante (área 1 y tope 0,9), sin cortar. Las anchas llenan el ancho y
+ * las altas el alto. Se mide sin el margen blanco de su foto (umbral 30).
+ */
+const UMBRAL_PIEZA = 30;
+const CAJA_PIEZA: CajaRelativa = { proporcion: 1.6, area: 1, tope: 0.9 };
 
 /**
  * «REPUESTOS SEGÚN TIPO DE MÁQUINA» (ux-9): una tarjeta por tipo de la marca
@@ -147,6 +152,7 @@ export function RejillaTarjetas({
                     alt=""
                     sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, min(25vw, 350px)"
                     className={estilos.piezaCaja}
+                    umbral={UMBRAL_PIEZA}
                   />
                 </span>
               </div>

@@ -2144,7 +2144,7 @@ a.modelo:hover {
 }
 
 .piezaCaja {
-  width: min(100cqw, calc(100cqh * 4 / 3));
+  width: min(100cqw, calc(100cqh * 1.6));
   mix-blend-mode: multiply;
 }
 

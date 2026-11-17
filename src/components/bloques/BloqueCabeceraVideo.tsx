@@ -61,7 +61,9 @@ export function BloqueCabeceraVideo({ antetitulo, titulo, video, imagen }: Datos
             alt=""
             fill
             priority
-            sizes="97vw"
+            // En el teléfono la tarjeta (450 px de alto) es más alta que la foto y `cover` la escala
+            // por el alto: con 97vw se ampliaba ×1,89 a 390 (revisión responsive, 2026-11-17).
+            sizes="(max-width: 767px) 190vw, 97vw"
             className={estilos.medio}
             style={{ objectPosition: fondo.posicion }}
           />

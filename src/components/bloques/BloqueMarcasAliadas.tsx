@@ -48,7 +48,9 @@ export function BloqueMarcasAliadas({ titulo, fondos, tarjetas }: Datos) {
                   src={f.url}
                   alt=""
                   fill
-                  sizes="100vw"
+                  // En el teléfono la caja es de ~390 × 640 (vertical) y `cover` escala la foto por el
+                  // alto: se pide más ancha que la pantalla.
+                  sizes="(max-width: 767px) 220vw, 100vw"
                   priority={i === 0}
                   data-actual={i === actual ? "" : undefined}
                   className={estilos.foto}

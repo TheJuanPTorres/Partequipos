@@ -1,4 +1,6 @@
 import type { CategoriasTecnica, Marca, RepuestosMarca } from "@/payload-types";
+import RECORTES_PIEZAS from "@/lib/marca/recortesPiezas.json";
+import type { Recorte } from "@/lib/marca/tamanoOptico";
 
 import { rutas } from "../routes";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
@@ -12,6 +14,15 @@ import type { TarjetaMarca } from "./marca";
  */
 
 const texto = (v: string | null | undefined) => v?.trim() ?? "";
+
+/** La parte visible de una foto de pieza ya medida (`scripts/marca/recortes-piezas.mjs`); sin ella, se mide al pintar. */
+function recorteConocido(url: string) {
+  try {
+    return (RECORTES_PIEZAS as Record<string, Recorte>)[new URL(url).pathname] ?? null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Las categorías técnicas como tarjetas con su foto y «Ver todo», en el orden de la marca
@@ -36,7 +47,13 @@ export function tarjetasDeCategorias(categorias: CategoriasTecnica[]): TarjetaMa
         imagen,
         // La foto de la pieza, entera y al mismo tamaño a la vista que las demás.
         pieza: imagen
-          ? { url: imagen.url, width: imagen.width, height: imagen.height, oscuro: false }
+          ? {
+              url: imagen.url,
+              width: imagen.width,
+              height: imagen.height,
+              oscuro: false,
+              recorte: recorteConocido(imagen.url),
+            }
           : undefined,
         soloEscritorio: false,
       };

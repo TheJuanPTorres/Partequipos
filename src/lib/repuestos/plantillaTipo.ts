@@ -27,13 +27,20 @@ export function tarjetasDeCategorias(categorias: CategoriasTecnica[]): TarjetaMa
       if (oa !== ob) return oa < ob ? -1 : 1;
       return a.nombre.localeCompare(b.nombre, "es");
     })
-    .map((c) => ({
-      clave: `categoria-${c.id}`,
-      titulo: texto(c.nombre),
-      href: rutas.categoriaRepuestos(texto(c.slug)),
-      imagen: imagenDeMedia(c.imagen, ""),
-      soloEscritorio: false,
-    }));
+    .map((c) => {
+      const imagen = imagenDeMedia(c.imagen, "");
+      return {
+        clave: `categoria-${c.id}`,
+        titulo: texto(c.nombre),
+        href: rutas.categoriaRepuestos(texto(c.slug)),
+        imagen,
+        // La foto de la pieza, entera y al mismo tamaño a la vista que las demás.
+        pieza: imagen
+          ? { url: imagen.url, width: imagen.width, height: imagen.height, oscuro: false }
+          : undefined,
+        soloEscritorio: false,
+      };
+    });
 }
 
 export type VistaPorQue = {

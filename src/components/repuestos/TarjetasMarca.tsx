@@ -3,11 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
+import { LogoOpticoServidor } from "@/components/marca/LogoOpticoServidor";
+import type { CajaRelativa } from "@/lib/marca/tamanoOptico";
 import { VerTodosEquipos } from "@/components/nueva/VerTodosEquipos";
 import type { TarjetaMarca } from "@/lib/repuestos/marca";
 
 import estilos from "./marca.module.css";
 import { RecuadrosConScroll } from "./RecuadrosConScroll";
+
+/** La caja de una foto de pieza (3:2): con un área del 50 % caben fotos de 1:2 a 3:1, enteras. */
+const CAJA_PIEZA: CajaRelativa = { proporcion: 3 / 2, area: 0.5, tope: 0.9 };
 
 /**
  * «REPUESTOS SEGÚN TIPO DE MÁQUINA» (ux-9): una tarjeta por tipo de la marca
@@ -128,7 +133,17 @@ export function RejillaTarjetas({
             key={t.clave}
             className={`${estilos.tarjeta} ${t.soloEscritorio ? estilos.soloEscritorio : ""}`}
           >
-            {t.logo ? (
+            {t.pieza ? (
+              <div className={`${estilos.foto} ${estilos.fotoPieza}`}>
+                <LogoOpticoServidor
+                  logo={t.pieza}
+                  caja={CAJA_PIEZA}
+                  alt=""
+                  sizes="(max-width: 767px) 80vw, (max-width: 1024px) 40vw, min(30vw, 560px)"
+                  className={estilos.piezaCaja}
+                />
+              </div>
+            ) : t.logo ? (
               <div className={estilos.foto}>
                 <LogoMarca
                   logo={t.logo}

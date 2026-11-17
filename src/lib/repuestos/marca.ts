@@ -120,6 +120,8 @@ export type TarjetaMarca = {
   detalle?: string;
   /** El logo de la marca (`LogoMarca`), entero y sin recortar, en lugar de la foto (índice de usados). */
   logo?: LogoMarca;
+  /** Foto de pieza (categoría técnica): entera, más pequeña y al mismo tamaño a la vista que las demás (`LogoOptico`). */
+  pieza?: LogoMarca;
   /** Con él, «Ver todo» abre el panel con la lista; sin JavaScript sigue llevando a `href`. */
   panel?: PanelTarjeta;
 };

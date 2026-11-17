@@ -2113,7 +2113,7 @@ a.modelo:hover {
   padding-bottom: 0;
 }
 
-
+/*
  * MARCA «ADITAMENTOS»: del final de la cabecera a las tarjetas (2026-11-16, hallazgo de C). El
  * relleno inferior de la cabecera era `min(1.5vw, 24px)` y daba 6 · 12 · 15 · 22 · 24 px según
  * el ancho. Pasa al hueco común entre secciones (24 a 48 px, una sola vez); el aire interno de

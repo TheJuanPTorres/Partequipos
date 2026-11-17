@@ -7,6 +7,7 @@ import { turnstileSiteKey } from "@/lib/turnstile";
 import type { DatosVacio } from "@/lib/usados/listado";
 
 import estilos from "./vacio.module.css";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * ESTADO VACÍO de un listado de usados sin unidades (petición del cliente,
@@ -56,7 +57,7 @@ export function EstadoVacioUsados({ datos, origen }: { datos: DatosVacio; origen
           {datos.whatsapp ? (
             <a
               href={datos.whatsapp.href}
-              className={`${estilos.boton} ${estilos.botonVerde}`}
+              className={`${estilos.boton} ${estilos.botonVerde} ${wa.botonWhatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
             >

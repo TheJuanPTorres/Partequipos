@@ -46,6 +46,7 @@ import estilos from "./articuloPropio.module.css";
 import reserva from "./cabeceraArticulo.module.css";
 import { PostRecientes } from "./PostRecientes";
 import { ProgresoLectura } from "./ProgresoLectura";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 const ID_CUERPO = "articulo-cuerpo";
 const ID_PAGINA = "articulo-pagina";
@@ -281,7 +282,7 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
             </BotonFormulario>
             <a
               href={whatsapp?.href}
-              className={`${estilos.botonLlamada} ${estilos.botonClaro}`}
+              className={`${estilos.botonLlamada} ${estilos.botonClaro} ${wa.botonWhatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
             >

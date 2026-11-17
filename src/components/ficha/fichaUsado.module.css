@@ -1,0 +1,134 @@
+/*
+ * FICHA DE USADO: LA SECCIÓN BAJO LA TARJETA (ronda 19, t7, 2026-11-17, dirección). Antes, la
+ * descripción a media página y, a la derecha, solo tres iconos de 32 px sin texto: mucho hueco.
+ * Ahora, la descripción con ancho de lectura (~70 caracteres) y, al lado, un BLOQUE DE ACCIONES
+ * con botones con texto y el teléfono destacado. Apilado en móvil y tablet. Espacios: los dos
+ * tokens (`--espacio-interno` dentro; el hueco hasta la sección siguiente lo pone la tarjeta).
+ */
+.seccion {
+  display: grid;
+  grid-template-columns: minmax(0, 70ch) minmax(260px, 340px);
+  justify-content: space-between;
+  gap: var(--espacio-interno);
+  margin: 0 var(--ficha-margen) var(--espacio-seccion);
+  padding: var(--espacio-interno);
+  border-radius: var(--ficha-radio);
+  background: var(--color-fondo);
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  max-width: 70ch;
+  color: var(--color-texto);
+}
+
+.texto p {
+  margin: 0;
+}
+
+/* El bloque de acciones: una tarjeta gris con los botones apilados y el teléfono. */
+.acciones {
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  gap: 12px;
+  padding: var(--espacio-interno);
+  border-radius: var(--ficha-radio);
+  background: var(--color-fondo-seccion);
+}
+
+.accionesTitulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-weight: 600;
+}
+
+.boton {
+  display: inline-flex;
+  min-height: 44px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border: 1px solid var(--color-texto);
+  border-radius: 30px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 250ms ease,
+    color 250ms ease;
+}
+
+.boton svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.boton:hover {
+  background: var(--color-texto);
+  color: var(--color-fondo);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+/* El teléfono, destacado: grande y enlazado (`tel:`). */
+.telefono {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ficha-borde-suave);
+}
+
+.telefonoEtiqueta {
+  color: var(--color-texto-suave);
+}
+
+.telefonoNumero {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-texto);
+  font-size: var(--texto-destacado);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.telefonoNumero:hover {
+  color: var(--color-marca);
+}
+
+.telefonoNumero:focus-visible {
+  outline: 3px solid var(--color-texto);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1024px) {
+  .seccion {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton {
+    transition: none;
+  }
+}
+
+@media print {
+  .acciones {
+    display: none;
+  }
+}

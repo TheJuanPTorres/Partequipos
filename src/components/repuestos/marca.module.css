@@ -2095,11 +2095,13 @@ a.modelo:hover {
 }
 
 /*
- * Ronda 12, t5: si el contacto (`ContactoMarca`) es lo último de la página, su aire de abajo sobra. Antes del pie manda
- * el espaciado común del pie (`--pie-margen` = `--espacio-seccion`); sumado, el hueco crecía.
+ * Ronda 12, t5 y ronda 20: si el contacto (`ContactoMarca`) es lo último de la página, el hueco hasta el pie es el
+ * espaciado común (`--espacio-seccion`, 24–48 px). El pie ya pone `--pie-margen` (= `--espacio-interno`, 16–32 px)
+ * sobre su tarjeta roja; el contacto solo añade la diferencia. Antes valía 0 y quedaba en 17 px a 390 y 33 a 1440,
+ * por debajo del común (hallazgo de C).
  */
 .contacto:last-child {
-  padding-bottom: 0;
+  padding-bottom: max(0px, calc(var(--espacio-seccion) - var(--espacio-interno)));
 }
 
 /*

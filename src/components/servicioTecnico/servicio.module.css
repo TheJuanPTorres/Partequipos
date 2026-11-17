@@ -46,7 +46,8 @@ video.medio {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
+  /* Techo: igual que antes hasta 1080 px de alto; sin él, 1296 px a 3440 × 2160. */
+  min-height: min(60vh, 648px);
   padding: 3%;
   overflow: hidden;
   border-radius: 30px;
@@ -165,9 +166,9 @@ video.medio {
   border-radius: 30px;
   background: var(--color-fondo-seccion);
 }
-/* La foto del taller: fondo de 50vh de alto mínimo. */
+/* La foto del taller: fondo de 50vh de alto mínimo, con techo (igual que antes hasta 1080 px de alto). */
 .fotoTaller {
-  min-height: 50vh;
+  min-height: min(50vh, 540px);
 }
 .columnaTexto {
   display: flex;
@@ -576,7 +577,7 @@ video.medio {
 /* ====================== MÓVIL (≤ 767) ====================== */
 @media (max-width: 767px) {
   .hero {
-    min-height: 50vh;
+    min-height: min(50vh, 540px);
     padding: 20px;
   }
   .accesos {

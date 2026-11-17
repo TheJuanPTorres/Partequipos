@@ -308,10 +308,12 @@ export function TarjetaArticulo({
               src={imagen.url}
               alt=""
               fill
+              // La caja es más alta que la foto (≈ 16:9) y `cover` la escala por el alto: se pide
+              // más ancha (×1,25–1,57 con los valores de antes; revisión responsive, 2026-11-16).
               sizes={
                 destacada
-                  ? "(max-width: 767px) 92vw, (max-width: 1024px) 90vw, 640px"
-                  : "(max-width: 767px) 92vw, (max-width: 1024px) 45vw, 380px"
+                  ? "(max-width: 767px) 120vw, (max-width: 1024px) 90vw, 800px"
+                  : "(max-width: 767px) 120vw, (max-width: 1024px) 45vw, 440px"
               }
               className={estilos.fotoImg}
               style={{ objectPosition: imagen.posicion }}

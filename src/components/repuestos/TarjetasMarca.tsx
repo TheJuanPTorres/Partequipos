@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
-
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import { LogoOpticoServidor } from "@/components/marca/LogoOpticoServidor";
 import type { CajaRelativa } from "@/lib/marca/tamanoOptico";

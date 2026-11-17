@@ -29,7 +29,7 @@ export function PostRecientes({ articulos }: { articulos: ArticuloLista[] }) {
                     src={a.imagen.url}
                     alt=""
                     fill
-                    sizes="(min-width: 1025px) 128px, 96px"
+                    sizes="(min-width: 1025px) 240px, 192px"
                     style={{ objectPosition: a.imagen.posicion }}
                   />
                 </Link>

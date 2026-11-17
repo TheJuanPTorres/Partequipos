@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import estilos from "./modelo.module.css";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * «ESTAMOS AQUÍ PARA AYUDARLO» (la tarjeta de WordPress de cada modelo, textos
@@ -38,7 +39,12 @@ export function AyudaWhatsApp({
           {titulo}
         </h2>
         <p className={estilos.ayudaTexto}>{texto}</p>
-        <a href={href} className={estilos.ayudaBoton} target="_blank" rel="noopener noreferrer">
+        <a
+          href={href}
+          className={`${estilos.ayudaBoton} ${wa.botonWhatsapp}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <IconBrandWhatsapp aria-hidden="true" stroke={1.75} />
           {boton}
           <span className="sr-only"> (abre WhatsApp)</span>

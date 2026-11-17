@@ -17,6 +17,7 @@ import type { DatoDestacado } from "@/lib/maquinaria/fichaTecnica";
 import type { ImagenLista } from "@/lib/utils/relations";
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import type { LogoConAlt } from "@/lib/marca/logoMarca";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /*
  * FICHA DE PRODUCTO V2 de ux-9 (export 3166, docs/diseno/decisiones-ficha.md).
@@ -191,7 +192,7 @@ export function FichaProducto({
             {experto ? (
               <a
                 href={experto.href}
-                className={`${estilos.boton} ${estilos.botonOscuro} ${estilos.botonGrande}`}
+                className={`${estilos.boton} ${estilos.botonOscuro} ${estilos.botonGrande} ${wa.botonWhatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

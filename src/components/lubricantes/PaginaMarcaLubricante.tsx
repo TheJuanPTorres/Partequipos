@@ -15,6 +15,7 @@ import type { MarcasLubricante } from "@/payload-types";
 
 import estilos from "./marcaLubricante.module.css";
 import { VideoCabecera } from "./VideoCabecera";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * PÁGINA DE LA MARCA DE LUBRICANTES (`/lubricantes/lubricantes-eni/`) — un «sitio dentro del
@@ -107,7 +108,7 @@ export function PaginaMarcaLubricante({
               {whatsapp ? (
                 <a
                   href={whatsapp.href}
-                  className={`${estilos.boton} ${estilos.botonSecundario}`}
+                  className={`${estilos.boton} ${estilos.botonSecundario} ${wa.botonWhatsapp}`}
                   target="_blank"
                   rel="noopener"
                 >
@@ -266,7 +267,7 @@ export function PaginaMarcaLubricante({
             {whatsapp ? (
               <a
                 href={whatsapp.href}
-                className={`${estilos.boton} ${estilos.botonPrincipal}`}
+                className={`${estilos.boton} ${estilos.botonPrincipal} ${wa.botonWhatsapp}`}
                 target="_blank"
                 rel="noopener"
               >

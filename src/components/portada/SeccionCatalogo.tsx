@@ -2,6 +2,7 @@ import { IconBrandWhatsapp, IconTruck } from "@tabler/icons-react";
 import Link from "next/link";
 
 import estilos from "./catalogo.module.css";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * SECCIÓN 8 DE LA PORTADA — llamada a la acción tras «Nuestra Compañía» (ux-9).
@@ -56,7 +57,7 @@ export function SeccionCatalogo({ whatsapp, textos }: Props) {
             href={whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className={`${estilos.boton} texto-etiqueta`}
+            className={`${estilos.boton} texto-etiqueta ${wa.botonWhatsapp}`}
           >
             <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={1.75} />
             {textos.whatsappTexto}

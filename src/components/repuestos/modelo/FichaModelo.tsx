@@ -11,6 +11,7 @@ import type { TarjetaMarca } from "@/lib/repuestos/marca";
 import type { BreadcrumbItem } from "@/lib/seo/jsonLd";
 
 import estilos from "./fichaModelo.module.css";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * La caja del logo de la cabecera: 170 × 49 px (3,5:1). Área del 54 % (2026-11-16, Juan Pablo: más
@@ -106,7 +107,7 @@ export function FichaModelo({
             <a
               href={whatsapp}
               data-whatsapp-boton=""
-              className={estilos.botonWhatsapp}
+              className={`${estilos.botonWhatsapp} ${wa.botonWhatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
             >

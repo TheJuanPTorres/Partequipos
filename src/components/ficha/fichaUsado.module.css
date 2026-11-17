@@ -1,14 +1,14 @@
 /*
  * FICHA DE USADO: LA SECCIÓN BAJO LA TARJETA (ronda 19, t7, 2026-11-17, dirección). Antes, la
  * descripción a media página y, a la derecha, solo tres iconos de 32 px sin texto: mucho hueco.
- * Ahora, la descripción con ancho de lectura (~70 caracteres) y, al lado, un BLOQUE DE ACCIONES
- * con botones con texto y el teléfono destacado. Apilado en móvil y tablet. Espacios: los dos
- * tokens (`--espacio-interno` dentro; el hueco hasta la sección siguiente lo pone la tarjeta).
+ * Ahora, la descripción con ancho de lectura (~70 caracteres) y, debajo, una FRANJA DE ACCIONES
+ * con botones con texto y el teléfono destacado (al lado dejaba hueco con descripciones cortas).
+ * Apilada en móvil. Espacios: los dos tokens (`--espacio-interno` dentro; el hueco hasta la
+ * sección siguiente, `--espacio-seccion`).
  */
 .seccion {
-  display: grid;
-  grid-template-columns: minmax(0, 70ch) minmax(260px, 340px);
-  justify-content: space-between;
+  display: flex;
+  flex-direction: column;
   gap: var(--espacio-interno);
   margin: 0 var(--ficha-margen) var(--espacio-seccion);
   padding: var(--espacio-interno);
@@ -28,18 +28,19 @@
   margin: 0;
 }
 
-/* El bloque de acciones: una tarjeta gris con los botones apilados y el teléfono. */
+/* La franja de acciones: gris, con el título, los botones en fila y el teléfono a la derecha. */
 .acciones {
   display: flex;
-  flex-direction: column;
-  align-self: start;
-  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px var(--espacio-interno);
   padding: var(--espacio-interno);
   border-radius: var(--ficha-radio);
   background: var(--color-fondo-seccion);
 }
 
 .accionesTitulo {
+  flex-basis: 100%;
   margin: 0;
   color: var(--color-texto);
   font-weight: 600;
@@ -82,14 +83,12 @@
   outline-offset: 3px;
 }
 
-/* El teléfono, destacado: grande y enlazado (`tel:`). */
+/* El teléfono, destacado: grande y enlazado (`tel:`), al final de la fila. */
 .telefono {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-top: 4px;
-  padding-top: 12px;
-  border-top: 1px solid var(--ficha-borde-suave);
+  margin: 0 0 0 auto;
 }
 
 .telefonoEtiqueta {
@@ -115,9 +114,17 @@
   outline-offset: 3px;
 }
 
-@media (max-width: 1024px) {
-  .seccion {
-    grid-template-columns: minmax(0, 1fr);
+/* Móvil: botones a todo el ancho, uno debajo de otro, y el teléfono al final. */
+@media (max-width: 639px) {
+  .acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .telefono {
+    margin: 4px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--ficha-borde-suave);
   }
 }
 

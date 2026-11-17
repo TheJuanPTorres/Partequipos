@@ -101,4 +101,17 @@ describe("colocarLogoRelativo", () => {
     cerca(rel.visible.ancho, px.visible.ancho / 3, 0.05);
     cerca(rel.visible.alto, px.visible.alto, 0.05);
   });
+
+  it("con `tope`, un logo muy alargado se queda en ese ancho (sin tocar el borde) y el resto conserva su área", () => {
+    const caja = { proporcion: 3.7, area: 0.54, tope: 0.92 };
+    const cat = colocarLogoRelativo({ width: 866, height: 100 }, caja);
+    cerca(cat.visible.ancho, 92, 0.05);
+    cerca(cat.visible.izquierda, 4, 0.05);
+    const normal = colocarLogoRelativo({ width: 400, height: 100 }, caja);
+    cerca((normal.visible.ancho * normal.visible.alto) / 1e4, 0.54, 0.001);
+    assert.ok(normal.visible.ancho < 92 && normal.visible.alto < 92);
+    // Sin tope, como antes.
+    const sin = colocarLogoRelativo({ width: 866, height: 100 }, { proporcion: 3.7, area: 0.54 });
+    cerca(sin.visible.ancho, 100, 0.05);
+  });
 });

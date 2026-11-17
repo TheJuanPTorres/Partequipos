@@ -5,10 +5,11 @@ import type { CajaRelativa } from "@/lib/marca/tamanoOptico";
 import estilos from "./tarjetaModelo.module.css";
 
 /**
- * La caja del logo de la tarjeta: 152 × 24 px (6,3:1), pegado a la izquierda. Con un área del 45 % de la
- * caja caben los logos de 3:1 a 8,2:1, y todas las marcas se ven con el mismo tamaño (ronda 20, t1).
+ * La caja del logo de la tarjeta: 152 × 24 px (6,3:1), pegado a la izquierda. Área del 58 % de la caja
+ * (2026-11-16, Juan Pablo: más grandes; antes 45 %): los muy alargados se quedan en el 92 % del ancho y
+ * el alto, sin tocar el borde; el resto, con el mismo tamaño (ronda 20, t1).
  */
-const CAJA_LOGO_TARJETA: CajaRelativa = { proporcion: 152 / 24, area: 0.45 };
+const CAJA_LOGO_TARJETA: CajaRelativa = { proporcion: 152 / 24, area: 0.58, tope: 0.92 };
 
 /**
  * TARJETA DE MODELO del diseño v2 del cliente (2026-11-13), la de la lista de modelos de la página

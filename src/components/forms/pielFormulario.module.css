@@ -115,7 +115,7 @@
   background: var(--color-texto);
 }
 
-/* El botón verde de WhatsApp (2026-10-27), del mismo alto, radio y letra que «Enviar». */
+/* El botón de WhatsApp (2026-10-27), del mismo alto, radio y letra que «Enviar»; colores, los del botón común. */
 .formulario a[data-whatsapp-boton] {
   min-height: 40px;
   box-sizing: border-box;

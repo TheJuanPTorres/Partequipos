@@ -9,6 +9,7 @@ import { ESTADO_INICIAL } from "@/lib/actions/estadoFormulario";
 import { enviarSolicitud } from "@/lib/actions/solicitudes";
 import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/opcionesSolicitud";
 import { conMensaje, mensajeWhatsApp } from "@/lib/whatsapp";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * Formulario de solicitud. Sirve a los tres casos (contacto, cotización de
@@ -460,7 +461,7 @@ export function FormularioSolicitud({
           </span>
 
           {whatsappContexto ? (
-            // Botón verde con el icono: en la VENTANA desde el 2026-10-25 (#351) y en los formularios
+            // Botón de WhatsApp con el icono (negro y verde al pasar, estilo común `botonWhatsapp`, 2026-11-17): en la VENTANA desde el 2026-10-25 (#351) y en los formularios
             // de página desde el 2026-10-27. Pestaña nueva, con el contexto de la página en el
             // mensaje. Fuera de la ventana el aspecto lo dan estas clases (y la piel de Contáctanos
             // el radio); en la ventana manda `ventanaFormulario.module.css`.
@@ -471,8 +472,8 @@ export function FormularioSolicitud({
               target="_blank"
               className={
                 emergente
-                  ? undefined
-                  : "inline-flex w-full items-center justify-center gap-2 rounded bg-[#0f7b45] px-5 py-2.5 font-medium text-white no-underline transition-colors duration-300 hover:bg-[#0a6e37] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#0a6e37] motion-reduce:transition-none sm:w-auto"
+                  ? wa.botonWhatsapp
+                  : `inline-flex w-full items-center justify-center gap-2 rounded px-5 py-2.5 font-medium no-underline focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#0a6e37] sm:w-auto ${wa.botonWhatsapp}`
               }
             >
               <IconBrandWhatsapp aria-hidden="true" focusable="false" stroke={2} size={20} />

@@ -31,6 +31,7 @@ import { conMensaje, type EnlaceWhatsApp } from "@/lib/whatsapp";
 import { CarruselVideos } from "./CarruselVideos";
 import estilos from "./servicio.module.css";
 import { VideoFondo } from "./VideoFondo";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * SERVICIO TÉCNICO CON LA PLANTILLA DE ANDRÉS (`elementor-4010`, 2026-10-19).
@@ -411,7 +412,7 @@ export function PlantillaServicioTecnico({
                     {whatsapp ? (
                       <a
                         href={conMensaje(whatsapp, MENSAJE_POSVENTA).href}
-                        className={`${estilos.boton} ${estilos.botonWhatsapp}`}
+                        className={`${estilos.boton} ${estilos.botonWhatsapp} ${wa.botonWhatsapp}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >

@@ -15,6 +15,7 @@ import { EstadoVacioUsados } from "@/components/usados/EstadoVacioUsados";
 import type { Ambito, AvisoVacio, DatosVacio } from "@/lib/usados/listado";
 import { camposDeAditamento } from "@/lib/usados/aditamentos";
 import { AVISO_SIN_UNIDADES } from "@/lib/usados/vacia";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 const numero = (n: number) => n.toLocaleString("es-CO");
 
@@ -167,7 +168,7 @@ function BotonWhatsApp({ href }: { href: string }) {
   return (
     <a
       href={href}
-      className={estilosListado.whatsappVerde}
+      className={`${estilosListado.whatsappVerde} ${wa.botonWhatsapp}`}
       target="_blank"
       rel="noopener noreferrer"
     >

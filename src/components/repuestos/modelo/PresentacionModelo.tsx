@@ -8,6 +8,7 @@ import type { LogoMarca as LogoMarcaDatos } from "@/lib/marca/logoMarca";
 import type { ImagenLista } from "@/lib/utils/relations";
 
 import estilos from "./modelo.module.css";
+import wa from "@/components/whatsapp/botonWhatsapp.module.css";
 
 /**
  * PRESENTACIÓN DEL MODELO (página de modelo de repuestos, diseño propio del
@@ -70,7 +71,7 @@ export function PresentacionModelo({
             {whatsapp ? (
               <a
                 href={whatsapp}
-                className={`${estilos.boton} ${estilos.botonOscuro}`}
+                className={`${estilos.boton} ${estilos.botonOscuro} ${wa.botonWhatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

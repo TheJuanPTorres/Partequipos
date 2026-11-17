@@ -20,7 +20,7 @@ const medir = unstable_cache(
   async (url: string, umbral: number): Promise<Recorte> => {
     const respuesta = await fetch(url, {
       redirect: "error",
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(15000),
       cache: "no-store",
     });
     if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
@@ -50,12 +50,17 @@ const DEL_BLOB = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\//;
 /** `umbral`: lo que se aparta del fondo para contar como contenido (12 por defecto; más alto, también recorta sombras y fondos casi blancos). */
 export async function recorteVisible(url: string, umbral = 12): Promise<Recorte> {
   if (!DEL_BLOB.test(url)) return SIN_RECORTE;
-  try {
-    return await medir(url, umbral);
-  } catch (error) {
-    console.error("[logos] No se pudo medir la parte visible de un logo:", String(error));
-    return SIN_RECORTE;
+  // Dos intentos: en el build, con muchas páginas a la vez, un solo intento con 5 s podía agotarse y
+  // dejar la medida SIN recorte dentro del HTML prerenderizado (piezas de las categorías, 2026-11-17).
+  for (let intento = 1; intento <= 2; intento++) {
+    try {
+      return await medir(url, umbral);
+    } catch (error) {
+      if (intento === 2)
+        console.error("[logos] No se pudo medir la parte visible de un logo:", String(error));
+    }
   }
+  return SIN_RECORTE;
 }
 
 /** El logo con la parte visible de su fichero (`recorteVisible`), o `null`. */

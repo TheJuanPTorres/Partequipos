@@ -8,7 +8,8 @@
 .ficha {
   position: relative;
   isolation: isolate;
-  margin: var(--espacio-seccion) max(1.5vw, 12px) 0;
+  width: min(calc(100% - 2 * max(1.5vw, 12px)), 1600px);
+  margin: var(--espacio-seccion) auto 0;
   padding: clamp(24px, 3.5vw, 48px) clamp(20px, 3.5vw, 56px) clamp(28px, 3.5vw, 48px);
   overflow: hidden;
   border-radius: 30px;
@@ -197,7 +198,8 @@
 /* --- Otros modelos -------------------------------------------------------------------------- */
 
 .otros {
-  margin: var(--espacio-seccion) max(1.5vw, 12px) 0;
+  width: min(calc(100% - 2 * max(1.5vw, 12px)), 1600px);
+  margin: var(--espacio-seccion) auto 0;
   padding: 0 4px 0;
 }
 

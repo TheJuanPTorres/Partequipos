@@ -50,14 +50,16 @@ const DEL_BLOB = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\//;
 /** `umbral`: lo que se aparta del fondo para contar como contenido (12 por defecto; más alto, también recorta sombras y fondos casi blancos). */
 export async function recorteVisible(url: string, umbral = 12): Promise<Recorte> {
   if (!DEL_BLOB.test(url)) return SIN_RECORTE;
-  // Dos intentos: en el build, con muchas páginas a la vez, un solo intento con 5 s podía agotarse y
+  // Tres intentos con espera: en el build, con muchas páginas a la vez, el almacén responde 403 a algunas
+  // peticiones (visto en el registro del build) y con un solo intento se podía
   // dejar la medida SIN recorte dentro del HTML prerenderizado (piezas de las categorías, 2026-11-17).
-  for (let intento = 1; intento <= 2; intento++) {
+  for (let intento = 1; intento <= 3; intento++) {
     try {
       return await medir(url, umbral);
     } catch (error) {
-      if (intento === 2)
+      if (intento === 3)
         console.error("[logos] No se pudo medir la parte visible de un logo:", String(error));
+      else await new Promise((listo) => setTimeout(listo, 1500 * intento + Math.random() * 1000));
     }
   }
   return SIN_RECORTE;

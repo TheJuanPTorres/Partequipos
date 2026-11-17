@@ -1,6 +1,8 @@
 import { IconArrowRight } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
+
 
 import { LogoMarca } from "@/components/marca/LogoMarca";
 import { LogoOpticoServidor } from "@/components/marca/LogoOpticoServidor";
@@ -184,7 +186,11 @@ export function RejillaTarjetas({
               // En los índices, el recuadro se desplaza con el scroll (`RecuadrosConScroll`).
               data-recuadro-scroll={indice && (t.imagen || t.logo) ? "" : undefined}
             >
-              <Nivel id={idT} className={estilos.tituloTarjeta}>
+              <Nivel
+                id={idT}
+                className={estilos.tituloTarjeta}
+                style={t.pieza ? ({ "--letras": t.titulo.length } as CSSProperties) : undefined}
+              >
                 {t.titulo}
               </Nivel>
               {t.detalle ? <p className={estilos.detalleTarjeta}>{t.detalle}</p> : null}

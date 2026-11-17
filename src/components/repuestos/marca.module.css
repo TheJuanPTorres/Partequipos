@@ -2165,9 +2165,20 @@ a.modelo:hover {
   width: calc((100% - 12px) / 2);
 }
 
+/* La tarjeta del nombre: menos relleno lateral y, como contenedor, la medida del título. */
+.tarjetasIndice .rejillaPiezas .panel[data-con-foto] {
+  padding-inline: 8px;
+  container-type: inline-size;
+}
+
+/*
+ * El título en UNA línea: el tamaño de siempre y, si el nombre es largo, solo ese baja hasta caber (a
+ * ~0,56 em por letra, Inter 700), con un mínimo legible de 15 px. Sin «…» ni corte.
+ */
 .rejillaPiezas .tituloTarjeta {
+  font-size: clamp(15px, calc(100cqw / (var(--letras, 1) * 0.56)), var(--texto-destacado));
   text-align: center;
-  text-wrap: balance;
+  white-space: nowrap;
 }
 
 .rejillaPiezas .botonTarjeta {

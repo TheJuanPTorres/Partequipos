@@ -523,6 +523,22 @@ section.principal[data-con-izquierda] {
   background: var(--color-fondo);
 }
 
+/*
+ * EL BLANCO DEL FINAL DE BORDE A BORDE (auditoría de «Maquinaria pesada», 2026-11-18): desde
+ * 1680 px el tope de ancho de `.pagina` dejaba la asesoría, el formulario y los testimonios en un
+ * bloque blanco de 1680 px con gris a los lados y corte recto contra el pie. Como la franja de la
+ * cabecera (#482): una sombra sin desenfoque los alarga a los lados y `clip-path` la deja en su
+ * alto; no cuenta para el desplazamiento (sin barra horizontal). Por debajo, las esquinas
+ * redondeadas de siempre.
+ */
+@media (min-width: 1700px) {
+  .asesoria,
+  .cierre {
+    box-shadow: 0 0 0 100vmax var(--color-fondo);
+    clip-path: inset(0 -100vmax);
+  }
+}
+
 /* ====================== TABLET (768–1024) ====================== */
 
 @media (max-width: 1024px) {

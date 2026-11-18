@@ -1056,6 +1056,15 @@ a.modelo:hover {
 }
 
 /*
+ * LAS TARJETAS SON LO ÚLTIMO DE LA PÁGINA (índices de la «Plantilla 1», auditoría de «Maquinaria
+ * pesada», 2026-11-18): sobre el bloque rojo del pie va el espacio interno, que ya pone el pie.
+ * El margen de `.tarjetas` (pensado para otra sección debajo) lo subía a 48 desde 1440.
+ */
+.tarjetas.tarjetasFinal {
+  margin-bottom: 0;
+}
+
+/*
  * TARJETAS DE LA «PLANTILLA 1» (2026-10-18): la foto a todo el ancho de la
  * columna y un recuadro blanco al 90 % que sube 54 px sobre ella, con relleno
  * 30/20/10/20, en los tres tamaños; 20 px entre columnas y la sección con un 5 %

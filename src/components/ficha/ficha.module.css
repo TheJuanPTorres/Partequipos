@@ -795,6 +795,17 @@
   margin: 0 auto;
 }
 
+/*
+ * EL CONTACTO DEL FINAL DE LA FICHA DE USADA (`ContactoMarca`; auditoría de «Maquinaria pesada»,
+ * 2026-11-18): de la asesoría a su antetítulo, el común (antes 30 px fijos); y abajo, nada: la
+ * ficha no lleva el bloque rojo del pie (`PieSinTarjeta`) y el pie ya pone el común. Su relleno
+ * de abajo, pensado para ir sobre el bloque rojo, lo subía a 33 · 44 · 65 px.
+ */
+.cierreContacto > section:only-child {
+  padding-top: var(--espacio-seccion);
+  padding-bottom: 0;
+}
+
 /* ====================== TABLET (768–1024) ====================== */
 
 @media (max-width: 1024px) {

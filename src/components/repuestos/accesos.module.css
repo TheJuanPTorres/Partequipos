@@ -6,7 +6,9 @@
 .seccion {
   width: 100%;
   max-width: 1100px;
-  margin: 24px auto var(--espacio-seccion);
+  /* Arriba nada: de la cabecera a esta sección ya hay el hueco común (el relleno de la cabecera); con 24 px
+     más eran 48 · 57 · 72 px (auditoría de A, 2026-11-18). */
+  margin: 0 auto var(--espacio-seccion);
   padding: 0 20px;
   box-sizing: border-box;
 }
@@ -30,6 +32,6 @@
 
 @media (max-width: 767px) {
   .seccion {
-    margin: 24px auto var(--espacio-seccion);
+    margin: 0 auto var(--espacio-seccion);
   }
 }

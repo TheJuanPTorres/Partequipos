@@ -40,15 +40,8 @@
 /* Banda partida: gris arriba y el color de la marca abajo, con el panel de foto encima. */
 .hero {
   /* Rellenos en vw con tope (criterio de espacios, 2026-11-09): a 3840 eran 58 px. */
-  padding: 24px min(1.5vw, 24px) calc(min(1.5vw, 24px) - 2px);
+  padding: 24px min(1.5vw, 24px) min(1.5vw, 24px);
   background: linear-gradient(var(--gris) 50%, var(--acento) 50%);
-}
-
-/* De la cabecera a la línea de equipos, el hueco común: medido, desde 1025 px faltaban 8 px (40 en lugar de 48; auditoría de C, 2026-11-18). */
-@media (min-width: 1025px) {
-  .hero {
-    padding-bottom: calc(min(1.5vw, 24px) + 8px);
-  }
 }
 
 /* Alto reservado (70vh como mínimo, con techo): el texto no mueve nada al llegar Inter. Sin el

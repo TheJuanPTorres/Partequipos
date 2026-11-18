@@ -48,7 +48,11 @@ export function BloqueLubricantes({
       aria-labelledby={idTitulo}
     >
       <div className={estilos.recuadro}>
-        <div className={`${estilos.columnaFormulario} ${estilosMarca.formulario}`}>
+        {/* El flotante de WhatsApp sube si cae sobre el formulario (a 390 tapaba «Teléfono»). */}
+        <div
+          className={`${estilos.columnaFormulario} ${estilosMarca.formulario}`}
+          data-evita-flotante=""
+        >
           <FormularioSolicitud
             {...(formulario ??
               configContactoMarca({

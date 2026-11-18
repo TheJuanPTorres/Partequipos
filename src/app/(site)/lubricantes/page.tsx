@@ -73,6 +73,7 @@ export default async function LubricantesPage() {
 
       <BloqueLubricantes
         id={ANCLA}
+        trasCabecera
         bloque={vista.bloque}
         origen={`${rutas.lubricantes()}/`}
         siteKey={turnstileSiteKey()}

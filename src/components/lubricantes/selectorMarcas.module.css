@@ -11,6 +11,14 @@
   gap: var(--espacio-interno);
 }
 
+/*
+ * Separado de la cabecera roja por el hueco común (auditoría de Lubricantes, 2026-11-18): el
+ * recuadro blanco la tocaba (0 px). Más específico que `.tarjetasIndice` (margen 0).
+ */
+.seccion.seccion {
+  margin-top: var(--espacio-seccion);
+}
+
 /* Más específico que `.tarjetasIndice > .tituloSeccion` (`marca.module.css`), que añade 32 px. */
 .seccion.seccion > h2 {
   margin-bottom: 0;

@@ -36,7 +36,8 @@
   display: flex;
   align-items: center;
   min-height: 380px;
-  margin: 8px 8px 0;
+  /* A los lados, el margen de la cabecera del Kit de marca (cabeceras iguales, 2026-11-18). */
+  margin: 8px min(1.5vw, 24px) 0;
   overflow: hidden;
   border-radius: 30px;
   background:

@@ -63,7 +63,11 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: url("/isotipo-partequipos.svg") left bottom / contain no-repeat;
+  /*
+   * Un poco a la derecha del borde (dirección, 2026-11-18): pegada a él, la esquina redondeada de
+   * la tarjeta le recortaba el engranaje. Entre 12 y 30 px (el radio de la tarjeta), según el ancho.
+   */
+  background: url("/isotipo-partequipos.svg") left clamp(12px, 2%, 30px) bottom / contain no-repeat;
   opacity: 0.11;
 }
 

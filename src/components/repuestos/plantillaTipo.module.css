@@ -14,6 +14,10 @@
 
 .porQueTarjeta {
   display: flex;
+  /* El mismo ancho máximo que el resto de la página (1600 px, como la presentación): a 3840 iba a todo el ancho
+     mientras lo demás iba centrado (auditoría de A, 2026-11-18). */
+  max-width: 1600px;
+  margin-inline: auto;
   overflow: hidden;
   min-height: 460px;
   border-radius: 30px;

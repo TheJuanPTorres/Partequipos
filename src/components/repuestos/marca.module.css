@@ -953,6 +953,9 @@ a.modelo:hover {
 
 /* Sin la franja amarilla tras la tarjeta del encabezado: el fondo es el gris de la página. */
 .heroSeccionPlano {
+  /* De la cabecera a lo siguiente, el hueco común entre secciones (24–48 px, una sola vez): el relleno
+     de abajo era `min(1.5vw, 24px)` y daba 6 · 12 · 22 · 24 px en los índices (auditoría de C, 2026-11-18). */
+  padding-bottom: var(--espacio-seccion);
   background: var(--color-fondo-seccion);
 }
 
@@ -2095,13 +2098,13 @@ a.modelo:hover {
 }
 
 /*
- * Ronda 12, t5 y ronda 20: si el contacto (`ContactoMarca`) es lo último de la página, el hueco hasta el pie es el
- * espaciado común (`--espacio-seccion`, 24–48 px). El pie ya pone `--pie-margen` (= `--espacio-interno`, 16–32 px)
- * sobre su tarjeta roja; el contacto solo añade la diferencia. Antes valía 0 y quedaba en 17 px a 390 y 33 a 1440,
- * por debajo del común (hallazgo de C).
+ * Si el contacto (`ContactoMarca`) es lo último de la página, el hueco hasta el bloque rojo del pie es el espacio
+ * INTERNO (16–32 px, regla de Juan Pablo: sobre el bloque rojo del pie, `--espacio-interno`): lo pone el
+ * pie con `--pie-margen`, y el contacto no añade nada. Antes añadía la diferencia hasta el común y daba
+ * 25 · 33 · 49 px en la categoría y los tipos de nueva (auditoría de C, 2026-11-18).
  */
 .contacto:last-child {
-  padding-bottom: max(0px, calc(var(--espacio-seccion) - var(--espacio-interno)));
+  padding-bottom: 0;
 }
 
 /*

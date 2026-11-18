@@ -61,6 +61,7 @@ export function SeccionTipoKit({
             className={estilos.verCategoria}
             data-fila={fila}
             data-una={n === 1 ? "" : undefined}
+            data-evita-flotante=""
           >
             Ver toda la categoría
             <span className="sr-only"> de {seccion.titulo}</span>

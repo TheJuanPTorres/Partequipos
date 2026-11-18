@@ -86,6 +86,8 @@ export function PaginaMarcaLubricantePlantilla({
         }}
         anclaSiguiente={ANCLA_LINEAS}
         indice
+        // Sin la franja de la marca a los lados, como sus líneas y los índices (hallazgo de B, 2026-11-18).
+        franja={false}
       />
 
       <TarjetasMarca

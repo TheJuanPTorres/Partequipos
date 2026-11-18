@@ -7,7 +7,9 @@
 .descripcion {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 48px 3vw 8px;
+  /* Arriba, el hueco ya lo pone la cabecera; abajo, el común hasta los productos (auditoría de
+     Lubricantes, 2026-11-18; antes 48 y 8 px fijos). */
+  padding: 0 3vw var(--espacio-seccion);
   color: var(--color-texto-suave);
 }
 
@@ -18,10 +20,12 @@
 .lineas {
   max-width: 1600px;
   margin: 0 auto;
-  /* Con el relleno superior del contacto (`general .seccion`) suma el comun. */
-  /* Arriba, nada: de la cabecera a los productos manda su relleno inferior, el común (antes 20 · 12
-     px de más: 36 · 68 a 390 · 1440; hallazgo de B, 2026-11-18). */
-  padding: 0 min(3vw, 48px) max(0px, calc(var(--espacio-seccion) - min(1.5vw, 24px)));
+  /*
+   * Sin relleno arriba ni abajo (auditoría de Lubricantes, 2026-11-18): el hueco de arriba lo pone
+   * la cabecera (antes +20 px: 36/53/68 px a 390/768/1440) y el de abajo, el contacto
+   * (`general .seccion`, `--espacio-seccion`).
+   */
+  padding: 0 min(3vw, 48px);
 }
 
 .grupo + .grupo {

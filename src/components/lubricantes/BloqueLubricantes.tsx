@@ -25,6 +25,8 @@ export function BloqueLubricantes({
   siteKey,
   whatsapp,
   formulario,
+  trasCabecera = false,
+  trasTarjetas = false,
 }: {
   id: string;
   bloque: VistaLubricantes["bloque"];
@@ -33,12 +35,24 @@ export function BloqueLubricantes({
   whatsapp?: { href: string; etiqueta: string };
   /** El formulario de la página, si no es el de la página general. */
   formulario?: ConfigFormulario;
+  /** Justo después de la cabecera (`/lubricantes/`): sin hueco propio arriba. */
+  trasCabecera?: boolean;
+  /** Tras las tarjetas de las líneas (Eni): solo lo que falta hasta el hueco común. */
+  trasTarjetas?: boolean;
 }) {
   const idTitulo = `${id}-titulo`;
   return (
-    <section id={id} className={estilos.seccion} aria-labelledby={idTitulo}>
+    <section
+      id={id}
+      className={`${estilos.seccion} ${trasCabecera ? estilos.seccionTrasCabecera : ""} ${trasTarjetas ? estilos.seccionTrasTarjetas : ""}`}
+      aria-labelledby={idTitulo}
+    >
       <div className={estilos.recuadro}>
-        <div className={`${estilos.columnaFormulario} ${estilosMarca.formulario}`}>
+        {/* El flotante de WhatsApp sube si cae sobre el formulario (a 390 tapaba «Teléfono»). */}
+        <div
+          className={`${estilos.columnaFormulario} ${estilosMarca.formulario}`}
+          data-evita-flotante=""
+        >
           <FormularioSolicitud
             {...(formulario ??
               configContactoMarca({

@@ -112,6 +112,7 @@ export function PaginaMarcaLubricantePlantilla({
       ) : null}
 
       <BloqueLubricantes
+        trasTarjetas
         id={ANCLA_CONTACTO}
         bloque={{
           ...bloque,

@@ -6,7 +6,22 @@
 
 .seccion {
   display: grid;
-  gap: 40px;
+  /* Del título a los paneles, el hueco interno común (16–32 px); antes 40 + los 32 de margen del
+     título de las páginas índice: ~70–90 px (auditoría de Repuestos, 2026-11-18). */
+  gap: var(--espacio-interno);
+}
+
+/*
+ * Separado de la cabecera roja por el hueco común (auditoría de Lubricantes, 2026-11-18): el
+ * recuadro blanco la tocaba (0 px). Más específico que `.tarjetasIndice` (margen 0).
+ */
+.seccion.seccion {
+  margin-top: var(--espacio-seccion);
+}
+
+/* Más específico que `.tarjetasIndice > .tituloSeccion` (`marca.module.css`), que añade 32 px. */
+.seccion.seccion > h2 {
+  margin-bottom: 0;
 }
 
 /* Móvil: apilados. */
@@ -155,7 +170,8 @@
 }
 
 .texto {
-  max-width: 46ch;
+  /* 46ch dejaba el texto de Eni en una columna de ~330 px dentro de un panel de 1238 a 2560. */
+  max-width: 62ch;
   margin: 0;
   font-size: 15px;
   line-height: 1.5;

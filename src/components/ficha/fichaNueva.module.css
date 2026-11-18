@@ -689,26 +689,18 @@ section.principal[data-con-izquierda] {
  */
 .cabeceraKit {
   --gris: var(--color-fondo-seccion);
-  position: relative;
-  isolation: isolate;
 }
 
 /*
- * FRANJA DE BORDE A BORDE (ronda 19, 2026-11-17, dirección): desde 1680 px, `.pagina` mete un
- * relleno a los lados (tope de ancho) y la franja del color de la marca (la mitad baja del
- * degradado de `.hero` del kit) se cortaba. Detrás de la cabecera, la mitad baja en el color de la
- * marca y una sombra sin desenfoque que la alarga a los lados; `clip-path` la deja en su alto. La
- * sombra no cuenta para el desplazamiento: sin barra horizontal. La tarjeta conserva su techo y
- * queda centrada; hasta 1680 px no cambia nada (la sombra cae fuera de la ventana).
+ * CABECERA DEL KIT A TODO EL ANCHO (dirección, 2026-11-18): con el kit, la ficha es `main.paginaKit`
+ * con la cabecera y, debajo, `.pagina` con el resto (su tope de ancho y sus `cqi`). La cabecera queda
+ * fuera del tope, como en la página de la marca: tarjeta a todo el ancho con el margen del kit
+ * (`min(1.5vw, 24px)`) y su franja de borde a borde (antes, desde 1920, 1632 px y la franja
+ * alargada con una sombra, #482).
  */
-.cabeceraKit::before {
-  position: absolute;
-  z-index: -1;
-  inset: 50% 0 0;
-  background: var(--acento);
-  box-shadow: 0 0 0 100vmax var(--acento);
-  clip-path: inset(0 -100vmax);
-  content: "";
+.paginaKit {
+  background: var(--color-fondo-seccion);
+  color: var(--color-texto);
 }
 
 /* Las migas, sobre la foto oscurecida: en blanco, centradas y a lo ancho del título. */

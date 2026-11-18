@@ -261,45 +261,17 @@ ${tituloEscritorio.modelo}`}
     </h1>
   );
 
-  return (
-    <main className={estilos.pagina}>
-      {jsonLd}
-      {/* La ficha ya tiene su llamada a la acción: el pie no pinta la tarjeta roja. */}
-      <PieSinTarjeta />
-
-      {/*
-        1. CABECERA DEL PRODUCTO (dirección, 2026-11-12). En escritorio, dos
-        columnas: a la izquierda la galería; a la derecha, arriba, las migas, el
-        título, las características, la descripción (con «Leer más» si no cabe:
-        la derecha nunca es más alta que la foto) y los botones. En el HTML va
-        primero la derecha (el <h1> antes que la galería). En tablet y móvil las
-        dos columnas se deshacen (`display: contents`) y los bloques se apilan:
-        galería, migas y título, características, descripción y botones.
-      */}
-      {kit ? (
-        <div
-          className={nueva.cabeceraKit}
-          style={{ "--acento": kit.acento, "--tinta": kit.tinta } as CSSProperties}
-        >
-          <CabeceraKit
-            id="ficha-titulo"
-            titulo={nombre}
-            texto=""
-            fondo={kit.fondo}
-            logo={kit.logo}
-            destino={`#${ANCLA_PRODUCTO}`}
-            etiquetaRaton="Ir al equipo"
-            migas={migasFicha(`${estilos.migas} ${nueva.migas} ${nueva.migasKit}`)}
-            contenidoTitulo={
-              // Con reserva de alto: el contenido va centrado en el panel y no se mueve.
-              <span className={`${nueva.reserva} ${nueva.reservaKit}`} data-reserva={nombre}>
-                <span>{sinCortarCodigos(nombre, nueva.sinCorte)}</span>
-              </span>
-            }
-          />
-        </div>
-      ) : null}
-
+  /*
+   * El cuerpo de la ficha, con el tope de ancho de `.pagina` (sus `cqi` se miden sobre él).
+   * 1. CABECERA DEL PRODUCTO (dirección, 2026-11-12). En escritorio, dos columnas: a la izquierda
+   * la galería; a la derecha, arriba, las migas, el título, las características, la descripción
+   * (con «Leer más» si no cabe: la derecha nunca es más alta que la foto) y los botones. En el HTML
+   * va primero la derecha (el <h1> antes que la galería). En tablet y móvil las dos columnas se
+   * deshacen (`display: contents`) y los bloques se apilan: galería, migas y título,
+   * características, descripción y botones.
+   */
+  const cuerpo = (
+    <>
       <EmblemaKit emblema={kit?.emblema ?? null}>
         <section
           id={ANCLA_PRODUCTO}
@@ -405,6 +377,52 @@ ${tituloEscritorio.modelo}`}
 
       {/* 4 y 5. CONTACTO (nuestro formulario) y TESTIMONIOS. */}
       <div className={nueva.cierre}>{cierre}</div>
+    </>
+  );
+
+  /*
+   * CABECERA DEL KIT A TODO EL ANCHO (dirección, 2026-11-18): como la de la página de la marca,
+   * fuera del tope de ancho de `.pagina` (antes se quedaba en 1632 px desde 1920). El cuerpo sigue
+   * dentro, con su tope y sus `cqi` de siempre.
+   */
+  if (kit) {
+    return (
+      <main className={nueva.paginaKit}>
+        {jsonLd}
+        {/* La ficha ya tiene su llamada a la acción: el pie no pinta la tarjeta roja. */}
+        <PieSinTarjeta />
+        <div
+          className={nueva.cabeceraKit}
+          style={{ "--acento": kit.acento, "--tinta": kit.tinta } as CSSProperties}
+        >
+          <CabeceraKit
+            id="ficha-titulo"
+            titulo={nombre}
+            texto=""
+            fondo={kit.fondo}
+            logo={kit.logo}
+            destino={`#${ANCLA_PRODUCTO}`}
+            etiquetaRaton="Ir al equipo"
+            migas={migasFicha(`${estilos.migas} ${nueva.migas} ${nueva.migasKit}`)}
+            contenidoTitulo={
+              // Con reserva de alto: el contenido va centrado en el panel y no se mueve.
+              <span className={`${nueva.reserva} ${nueva.reservaKit}`} data-reserva={nombre}>
+                <span>{sinCortarCodigos(nombre, nueva.sinCorte)}</span>
+              </span>
+            }
+          />
+        </div>
+        <div className={estilos.pagina}>{cuerpo}</div>
+      </main>
+    );
+  }
+
+  return (
+    <main className={estilos.pagina}>
+      {jsonLd}
+      {/* La ficha ya tiene su llamada a la acción: el pie no pinta la tarjeta roja. */}
+      <PieSinTarjeta />
+      {cuerpo}
     </main>
   );
 }

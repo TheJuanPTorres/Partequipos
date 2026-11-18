@@ -16,7 +16,11 @@
   gap: 0;
   /* El contenedor de la página: 0 · 1,5 % · 1,5 %. */
   /* Abajo, sin aire propio: antes del pie manda el espaciado común del pie (ronda 12, t5). */
-  padding: 0 1.5%;
+  /*
+   * A los lados, con techo (cabeceras a todo el ancho, 2026-11-18): el 1,5 % daba 58 px a 3840; con
+   * `min(…, 24px)`, la cabecera y las secciones llevan el margen de la del Kit de marca.
+   */
+  padding: 0 min(1.5%, 24px);
   color: var(--color-texto);
 }
 

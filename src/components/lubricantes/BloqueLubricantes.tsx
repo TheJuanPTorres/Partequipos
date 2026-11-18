@@ -26,6 +26,7 @@ export function BloqueLubricantes({
   whatsapp,
   formulario,
   trasCabecera = false,
+  trasTarjetas = false,
 }: {
   id: string;
   bloque: VistaLubricantes["bloque"];
@@ -36,12 +37,14 @@ export function BloqueLubricantes({
   formulario?: ConfigFormulario;
   /** Justo después de la cabecera (`/lubricantes/`): sin hueco propio arriba. */
   trasCabecera?: boolean;
+  /** Tras las tarjetas de las líneas (Eni): solo lo que falta hasta el hueco común. */
+  trasTarjetas?: boolean;
 }) {
   const idTitulo = `${id}-titulo`;
   return (
     <section
       id={id}
-      className={`${estilos.seccion} ${trasCabecera ? estilos.seccionTrasCabecera : ""}`}
+      className={`${estilos.seccion} ${trasCabecera ? estilos.seccionTrasCabecera : ""} ${trasTarjetas ? estilos.seccionTrasTarjetas : ""}`}
       aria-labelledby={idTitulo}
     >
       <div className={estilos.recuadro}>

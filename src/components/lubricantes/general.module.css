@@ -18,6 +18,14 @@
   padding-top: 0;
 }
 
+/*
+ * Tras las tarjetas de las líneas (página de Eni): las tarjetas ya dejan `max(0, común - 32 px)`
+ * abajo (`marca .tarjetas`), así que aquí, como mucho, 32 px: la suma es el común (24/33/48).
+ */
+.seccionTrasTarjetas {
+  padding-top: min(var(--espacio-seccion), 32px);
+}
+
 .recuadro {
   display: flex;
   box-sizing: border-box;

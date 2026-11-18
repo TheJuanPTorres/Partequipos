@@ -203,7 +203,7 @@
 
 @media (max-width: 767px) {
   .lineas {
-    padding-top: 12px;
+    padding-top: 0;
   }
 
   .grupo + .grupo {

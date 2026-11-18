@@ -51,7 +51,15 @@ export function IndiceTarjetas({
         indice
         etiquetaRaton="Ir a las tarjetas"
       />
-      <TarjetasMarca id={id} verTodo={verTodo} tarjetas={tarjetas} indice etiqueta={etiqueta} />
+      {/* Las tarjetas cierran siempre la página índice: encima del pie, solo su hueco. */}
+      <TarjetasMarca
+        id={id}
+        verTodo={verTodo}
+        tarjetas={tarjetas}
+        indice
+        final
+        etiqueta={etiqueta}
+      />
     </>
   );
 }

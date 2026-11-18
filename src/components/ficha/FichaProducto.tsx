@@ -349,7 +349,7 @@ export function FichaProducto({
        * 2026-11-17), con la unidad ya puesta en la consulta. Lo pinta la página, con el ancla
        * `ANCLA_COTIZAR` («Cotizar el equipo» y «Contáctanos» bajan aquí).
        */}
-      <div className={estilos.noImprimir}>{contacto}</div>
+      <div className={`${estilos.noImprimir} ${estilos.cierreContacto}`}>{contacto}</div>
     </main>
   );
 }

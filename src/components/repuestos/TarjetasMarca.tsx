@@ -47,6 +47,7 @@ export function TarjetasMarca({
   cuatroEnUnaFila = false,
   etiqueta = "Páginas de la sección",
   panelR5 = false,
+  final = false,
 }: {
   id: string;
   /** Sin título (las páginas índice no lo llevan) la sección se nombra con `etiqueta`. */
@@ -63,13 +64,15 @@ export function TarjetasMarca({
   etiqueta?: string;
   /** R5 de repuestos: el panel «Ver todo» con buscador y orden natural. */
   panelR5?: boolean;
+  /** Lo último de la página, justo encima del pie: sin margen abajo (el pie ya pone su hueco). */
+  final?: boolean;
 }) {
   if ((!titulo && !indice) || tarjetas.length === 0) return null;
   const idTitulo = `${id}-titulo`;
   return (
     <section
       id={id}
-      className={`${estilos.tarjetas} ${indice ? estilos.tarjetasIndice : ""}`}
+      className={`${estilos.tarjetas} ${indice ? estilos.tarjetasIndice : ""} ${final ? estilos.tarjetasFinal : ""}`}
       aria-labelledby={titulo ? idTitulo : undefined}
       aria-label={titulo ? undefined : etiqueta}
     >

@@ -25,6 +25,7 @@ export function BloqueLubricantes({
   siteKey,
   whatsapp,
   formulario,
+  trasCabecera = false,
 }: {
   id: string;
   bloque: VistaLubricantes["bloque"];
@@ -33,10 +34,16 @@ export function BloqueLubricantes({
   whatsapp?: { href: string; etiqueta: string };
   /** El formulario de la página, si no es el de la página general. */
   formulario?: ConfigFormulario;
+  /** Justo después de la cabecera (`/lubricantes/`): sin hueco propio arriba. */
+  trasCabecera?: boolean;
 }) {
   const idTitulo = `${id}-titulo`;
   return (
-    <section id={id} className={estilos.seccion} aria-labelledby={idTitulo}>
+    <section
+      id={id}
+      className={`${estilos.seccion} ${trasCabecera ? estilos.seccionTrasCabecera : ""}`}
+      aria-labelledby={idTitulo}
+    >
       <div className={estilos.recuadro}>
         <div className={`${estilos.columnaFormulario} ${estilosMarca.formulario}`}>
           <FormularioSolicitud

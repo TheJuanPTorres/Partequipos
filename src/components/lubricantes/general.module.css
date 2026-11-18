@@ -5,8 +5,17 @@
  * (en tablet con 20 px entre ellas) y, en móvil, una sobre otra.
  */
 .seccion {
-  /* Con techo: a 3840 el 1,5vw y el 3 % daban 58 y 115 px. */
-  padding: min(1.5vw, 24px) min(3%, 48px) min(3%, 48px);
+  /*
+   * Arriba, el hueco común entre secciones (auditoría de Lubricantes, 2026-11-18): antes
+   * min(1.5vw, 24px), y en Eni quedaban 6–40 px entre las tarjetas y el contacto. A los lados y
+   * abajo, con techo: a 3840 el 3 % daba 115 px.
+   */
+  padding: var(--espacio-seccion) min(3%, 48px) min(3%, 48px);
+}
+
+/* Justo después de la cabecera (`/lubricantes/`): el hueco ya lo pone la cabecera. */
+.seccionTrasCabecera {
+  padding-top: 0;
 }
 
 .recuadro {

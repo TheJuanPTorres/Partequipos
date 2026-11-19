@@ -1,4 +1,5 @@
 import type { CollectionConfig, Where } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
@@ -98,7 +99,8 @@ export const TipoEquipo: CollectionConfig = {
      * Foto de la tarjeta «Repuestos según tipo de máquina» de la página de la
      * marca. Opcional: sin ella la tarjeta se pinta solo con el título.
      */
-    {
+    // Las listas de repuestos van sin fotos (rondas 12 y 17): oculta (limpieza, paso 1).
+    ocultoSinUso({
       name: "imagen",
       type: "upload",
       relationTo: "media",
@@ -106,7 +108,7 @@ export const TipoEquipo: CollectionConfig = {
       admin: {
         description: "Opcional. Foto del tipo de máquina para la tarjeta de la página de la marca.",
       },
-    },
+    }),
     /*
      * SERIES (2026-10-17, dirección): un tipo puede repartir sus modelos por
      * serie de fabricante, como Hitachi en WordPress (excavadora EX y ZAXIS).
@@ -134,13 +136,14 @@ export const TipoEquipo: CollectionConfig = {
           label: "Nombre de la serie",
           admin: { description: "Como lo escribe el fabricante, ej. «EX» o «ZAXIS»." },
         },
-        {
+        // Sin fotos en las listas de repuestos: oculta (limpieza, paso 1).
+        ocultoSinUso({
           name: "imagen",
           type: "upload",
           relationTo: "media",
           label: "Foto de la tarjeta",
           admin: { description: "Opcional. Sin ella, la tarjeta usa la imagen del tipo." },
-        },
+        }),
       ],
     },
     /*

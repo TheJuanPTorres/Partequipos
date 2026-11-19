@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { validarVista360 } from "../lib/maquinaria/fichaNueva";
 import { ICONOS_FICHA, validarDestacarFila, type FilaFicha } from "../lib/maquinaria/fichaTecnica";
@@ -103,7 +104,8 @@ export const EquipoNuevo: CollectionConfig = {
      * numérico cuyo nombre empieza por «peso»). El sitio lo pinta en toneladas.
      * La fila «Peso operativo» de la ficha técnica sigue siendo el texto visible.
      */
-    {
+    // Sin uso en la web: solo alimentaba unos filtros que ninguna página pinta (limpieza, paso 1).
+    ocultoSinUso({
       name: "pesoOperativoKg",
       type: "number",
       label: "Peso operativo (kg)",
@@ -113,7 +115,7 @@ export const EquipoNuevo: CollectionConfig = {
         description:
           "En kilogramos, sin puntos: 8400 para 8,4 t. Sirve para filtrar y ordenar el listado; vacío, el equipo no sale en los filtros de peso.",
       },
-    },
+    }),
     {
       name: "entradilla",
       type: "textarea",
@@ -130,14 +132,15 @@ export const EquipoNuevo: CollectionConfig = {
      * la plantilla los presenta destacados y porque así el editor no depende de
      * acordarse de maquetarlos dentro del texto.
      */
-    {
+    // Sin uso en la web (limpieza, paso 1).
+    ocultoSinUso({
       name: "destacados",
       type: "array",
       label: "Puntos destacados",
       labels: { singular: "Punto", plural: "Puntos" },
       admin: { description: "Ventajas o argumentos de venta, uno por línea." },
       fields: [{ name: "texto", type: "text", required: true, label: "Texto" }],
-    },
+    }),
     {
       name: "imagenes",
       type: "upload",
@@ -254,7 +257,8 @@ export const EquipoNuevo: CollectionConfig = {
      * las pinta. Decisión de dirección (fase 6): cuando las fichas se muestren,
      * colección aparte para documentos; los PDF no entran en `Media`.
      */
-    {
+    // Sin uso en la web (limpieza, paso 1).
+    ocultoSinUso({
       name: "documentos",
       type: "upload",
       relationTo: "media",
@@ -264,7 +268,7 @@ export const EquipoNuevo: CollectionConfig = {
         description:
           "Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). No se muestran en el sitio. El PDF de la ficha técnica va en «Ficha técnica completa (PDF)».",
       },
-    },
+    }),
     seoField(),
   ],
 };

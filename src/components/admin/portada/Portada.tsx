@@ -1,10 +1,15 @@
 import type { DashboardViewServerProps } from "@payloadcms/next/views";
 import { Gutter } from "@payloadcms/ui";
 import {
+  IconBackhoe,
+  IconBook,
+  IconCircleCheck,
+  IconExternalLink,
   IconFilePlus,
-  IconFileUpload,
+  IconMessage,
   IconPhotoPlus,
   IconPlus,
+  IconSlideshow,
   type Icon,
 } from "@tabler/icons-react";
 import Link from "next/link";
@@ -12,20 +17,23 @@ import Link from "next/link";
 import { ICONOS_DE_GRUPO } from "@/components/admin/Nav/iconos";
 import { idDeGrupo } from "@/lib/panel/menu";
 import { fechaExacta, fechaRelativa } from "@/lib/panel/fechas";
-import { esGrupoDelMenu, rutaCrear } from "@/lib/panel/portada";
+import { esGrupoDelMenu, type IconoHabitual } from "@/lib/panel/portada";
 import { getPortadaPanel } from "@/lib/queries/getPortadaPanel";
 
 import { Aviso } from "../aviso/Aviso";
 import { SOLO_ADMINISTRADOR } from "@/lib/panel/menu";
 import { esAdministrador } from "@/lib/seguridad/acceso";
 
-/** Accesos rápidos: solo los que el rol puede crear. */
-const ACCESOS: { slug: string; texto: string; icono: Icon }[] = [
-  { slug: "equipos-nuevos", texto: "Nueva máquina", icono: IconPlus },
-  { slug: "articulos", texto: "Nuevo artículo", icono: IconFilePlus },
-  { slug: "media", texto: "Subir imagen", icono: IconPhotoPlus },
-  { slug: "documentos", texto: "Subir documento", icono: IconFileUpload },
-];
+/** Icono de cada acción de «Lo más habitual». */
+const ICONOS_HABITUALES: Record<IconoHabitual, Icon> = {
+  usada: IconBackhoe,
+  vendida: IconCircleCheck,
+  nueva: IconPlus,
+  diapositiva: IconSlideshow,
+  articulo: IconFilePlus,
+  mensajes: IconMessage,
+  imagenes: IconPhotoPlus,
+};
 
 const formatoNumero = new Intl.NumberFormat("es-CO");
 
@@ -42,8 +50,12 @@ const formatoNumero = new Intl.NumberFormat("es-CO");
  * tarjetas de Payload; la plantilla, el menú y las migas siguen siendo suyos.
  *
  * Componente de SERVIDOR: los datos llegan ya calculados con el acceso del
- * usuario (`getPortadaPanel`) y no hay JavaScript de cliente. De
- * «solicitudes» solo se muestran contadores.
+ * usuario (`getPortadaPanel`) y no hay JavaScript de cliente.
+ *
+ * Fase 2, PR 6 (2026-11-19; plan `2026-11-18-panel-organizacion-fase1.md` §3):
+ * «Ver la web» y el manual, «Mensajes» (las 5 solicitudes nuevas más recientes:
+ * nombre, tipo y fecha, solo para quien puede leer solicitudes), avisos nuevos
+ * y «Lo más habitual» en lugar de «Accesos rápidos».
  */
 export default async function Portada(props: DashboardViewServerProps) {
   const { payload, permissions, user, visibleEntities } = props;
@@ -57,15 +69,11 @@ export default async function Portada(props: DashboardViewServerProps) {
     collections: paraElRol(visibleEntities.collections as string[]),
     globals: paraElRol(visibleEntities.globals as string[]),
   };
-  const { avisos, tarjetas, recientes } = await getPortadaPanel(
+  const { avisos, tarjetas, recientes, habituales, mensajes, manual } = await getPortadaPanel(
     payload,
     user,
     permissions,
     visibles,
-  );
-  const permisos = permissions.collections as Record<string, { create?: boolean }> | undefined;
-  const accesos = ACCESOS.filter(
-    (a) => visibles.collections.includes(a.slug) && Boolean(permisos?.[a.slug]?.create),
   );
   const ahora = new Date();
 
@@ -74,7 +82,61 @@ export default async function Portada(props: DashboardViewServerProps) {
       <header className="pq-portada__cabecera">
         <h1 className="pq-portada__titulo">Panel de control</h1>
         <p className="pq-portada__saludo">Hola. Esto es lo que hay hoy en el sitio.</p>
+        <ul className="pq-portada__enlaces">
+          <li>
+            {/* El sitio publicado, en otra pestaña: es el mismo dominio que el panel. */}
+            <a className="pq-portada__enlace" href="/" rel="noopener" target="_blank">
+              <IconExternalLink aria-hidden="true" size={16} />
+              Ver la web
+              <span className="pq-solo-lector"> (se abre en otra pestaña)</span>
+            </a>
+          </li>
+          {manual ? (
+            <li>
+              <a className="pq-portada__enlace" href={manual} rel="noopener" target="_blank">
+                <IconBook aria-hidden="true" size={16} />
+                Manual del panel
+                <span className="pq-solo-lector"> (PDF, se abre en otra pestaña)</span>
+              </a>
+            </li>
+          ) : null}
+        </ul>
       </header>
+
+      {mensajes ? (
+        <section aria-labelledby="pq-portada-mensajes" className="pq-portada__seccion">
+          <h2 className="pq-portada__subtitulo" id="pq-portada-mensajes">
+            Mensajes
+          </h2>
+          {mensajes.lista.length ? (
+            <ol className="pq-portada__recientes">
+              {mensajes.lista.map((m) => (
+                <li className="pq-portada__reciente" key={m.id}>
+                  <Link prefetch={false} className="pq-portada__reciente-titulo" href={m.href}>
+                    {m.nombre}
+                  </Link>
+                  <span className="pq-portada__reciente-coleccion">{m.tipo}</span>
+                  <time
+                    className="pq-portada__reciente-fecha"
+                    dateTime={m.creado}
+                    title={fechaExacta(m.creado)}
+                  >
+                    {fechaRelativa(m.creado, ahora)}
+                    <span className="pq-solo-lector">, {fechaExacta(m.creado)}</span>
+                  </time>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="pq-portada__vacio">No hay mensajes nuevos sin atender.</p>
+          )}
+          <p className="pq-portada__ver-todas">
+            <Link prefetch={false} href={mensajes.todas}>
+              Ver todos los mensajes nuevos
+            </Link>
+          </p>
+        </section>
+      ) : null}
 
       <section aria-labelledby="pq-portada-avisos" className="pq-portada__seccion">
         <h2 className="pq-portada__subtitulo" id="pq-portada-avisos">
@@ -104,20 +166,23 @@ export default async function Portada(props: DashboardViewServerProps) {
         )}
       </section>
 
-      {accesos.length ? (
-        <section aria-labelledby="pq-portada-accesos" className="pq-portada__seccion">
-          <h2 className="pq-portada__subtitulo" id="pq-portada-accesos">
-            Accesos rápidos
+      {habituales.length ? (
+        <section aria-labelledby="pq-portada-habitual" className="pq-portada__seccion">
+          <h2 className="pq-portada__subtitulo" id="pq-portada-habitual">
+            Lo más habitual
           </h2>
           <ul className="pq-portada__accesos">
-            {accesos.map(({ slug, texto, icono: Icono }) => (
-              <li key={slug}>
-                <Link prefetch={false} className="pq-portada__acceso" href={rutaCrear(slug)}>
-                  <Icono aria-hidden="true" size={16} />
-                  {texto}
-                </Link>
-              </li>
-            ))}
+            {habituales.map(({ clave, texto, href }) => {
+              const Icono = ICONOS_HABITUALES[clave];
+              return (
+                <li key={clave}>
+                  <Link prefetch={false} className="pq-portada__acceso" href={href}>
+                    <Icono aria-hidden="true" size={16} />
+                    {texto}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}

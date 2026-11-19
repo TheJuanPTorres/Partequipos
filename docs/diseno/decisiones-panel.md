@@ -1007,3 +1007,42 @@ Avanzado (solo Administrador).
   una pestaña por página (diez); «SEO y datos de la empresa», «Datos de la empresa» e «Imágenes».
 - Preguntas frecuentes no lleva pestañas: solo tendría «Contenido».
 - Pestañas sin nombre: ni columnas ni rutas de campo cambian (`db:deriva` sin diferencias).
+
+## 34. Listados: columnas, búsqueda y filtro de fotos pequeñas (2026-11-19, organización del panel, PR 5; rama `feat/panel-listados`)
+
+- **Una tabla para todas las listas** (`src/lib/panel/listados.ts`, `conListados` en
+  `payload.config.ts`): columnas por defecto y campos del buscador de 18 colecciones, según el plan
+  (§5). Manda sobre `defaultColumns` y `listSearchableFields` de cada colección, así que cambiar
+  columnas no toca la colección. `listados.test.ts` falla si una columna o un campo de búsqueda no
+  existe.
+- **Imagen primero**: las columnas de subida sin celda propia (logos e imágenes de marcas, tipos y
+  categorías) se pintan como miniatura (`CeldaMiniatura`).
+- **Imágenes**: columna «Ancho» y, encima de la tabla, «Ver solo las pequeñas (menos de 1.200 px de
+  ancho)» (`FiltroFotosPequenas`), un filtro en la dirección que se combina con los de Payload.
+- Los demás filtros rápidos del plan (categoría, marca, disponible…) son los filtros de Payload de
+  la propia lista; no se añade nada.
+- Sin esquema.
+
+## 35. Portada del panel: mensajes, avisos nuevos y «Lo más habitual» (2026-11-19, organización del panel, PR 6; rama `feat/panel-portada`)
+
+Amplía la portada propia (§23) con el orden del plan (§3): saludo, mensajes, «Necesita atención»,
+«Lo más habitual», secciones y lo último modificado.
+
+- **«Ver la web» y «Manual del panel»**, bajo el saludo, en otra pestaña. El manual es el PDF más
+  reciente de «Documentos» con `guia-editor` en el nombre; si no hay ninguno, el enlace no sale.
+- **«Mensajes»**: las 5 solicitudes nuevas más recientes (nombre, tipo y fecha relativa) y «Ver
+  todos los mensajes nuevos». Solo para quien puede leer solicitudes. Antes, de solicitudes solo se
+  mostraban contadores (§23); el plan aprobado pide el nombre.
+- **Avisos nuevos**, cada uno con enlace a la lista con el mismo criterio que cuenta:
+  - fotos de las galerías de las fichas (nuevas, usadas y modelos) de menos de 1.200 px de ancho;
+    enlaza a «Imágenes» con «Ver solo las pequeñas» (lista todas las pequeñas, no solo las de las
+    galerías);
+  - fichas sin descripción (vacía o nunca rellenada; en nueva, un texto enriquecido vaciado no
+    cuenta, porque la base guarda un párrafo vacío);
+  - fichas sin descripción propia para buscadores (informativo: el sitio usa la de por defecto);
+  - búsquedas sin resultado (`busquedas-sin-resultado`).
+- **«Lo más habitual»** sustituye a «Accesos rápidos»: publicar una usada, marcarla vendida (lista de
+  las disponibles), añadir una nueva, cambiar una diapositiva (la página de la portada), escribir un
+  artículo, responder mensajes y subir imágenes. Solo las que el rol puede hacer.
+- Sin esquema ni dependencias. Las cabeceras y fondos de páginas no entran en «fotos pequeñas»:
+  solo las galerías.

@@ -3,6 +3,7 @@ import { getPayload } from "payload";
 import { cache } from "react";
 
 import { LUBRICANTE_CON_PAGINA, tienePaginaPropiaLubricante } from "@/lib/lubricantes/destino";
+import { ordenDe } from "@/lib/ordenArrastre";
 import type { CategoriasLubricante, MarcasLubricante } from "@/payload-types";
 
 /*
@@ -37,7 +38,8 @@ export const getMarcasLubricante = cache(async (): Promise<MarcasLubricante[]> =
     where: LUBRICANTE_CON_PAGINA,
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    // En el orden del panel (arrastrando, 2026-11-19; el inicial, por nombre).
+    sort: ordenDe("marcas-lubricante"),
   });
   return docs;
 });
@@ -52,7 +54,8 @@ export const getMarcasLubricanteSelector = cache(async (): Promise<MarcasLubrica
     collection: "marcas-lubricante",
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    // En el orden del panel (arrastrando, 2026-11-19; el inicial, por nombre).
+    sort: ordenDe("marcas-lubricante"),
   });
   return docs;
 });
@@ -70,7 +73,7 @@ export const getMarcaLubricantePorSlug = cache(
   },
 );
 
-/** Las líneas de una marca, en el orden del panel («Orden») y, sin orden, por nombre. */
+/** Las líneas de una marca, en el orden del panel (arrastrando en la ficha de la marca). */
 export const getCategoriasDeMarcaLubricante = cache(
   async (marcaId: number): Promise<CategoriasLubricante[]> => {
     const payload = await getPayload({ config });
@@ -79,7 +82,7 @@ export const getCategoriasDeMarcaLubricante = cache(
       where: { marca: { equals: marcaId } },
       depth: 1,
       limit: 0,
-      sort: ["orden", "nombre"],
+      sort: ordenDe("categorias-lubricante"),
     });
     return docs;
   },
@@ -111,6 +114,7 @@ export const getCategoriasLubricante = cache(
       depth: 1,
       limit: 0,
       pagination: false,
+      // orden-libre: rutas estáticas y sitemap.
       select: { slug: true, marca: true, updatedAt: true },
     });
     // Las líneas de una marca sin página propia tampoco tienen la suya.

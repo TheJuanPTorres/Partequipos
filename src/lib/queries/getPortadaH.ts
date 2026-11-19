@@ -2,6 +2,7 @@ import { cache } from "react";
 import config from "@payload-config";
 import { getPayload } from "payload";
 
+import { ordenDe } from "@/lib/ordenArrastre";
 import type { PreguntasFrecuente, Testimonio } from "@/payload-types";
 
 /**
@@ -18,7 +19,8 @@ export const getTestimoniosDePortada = cache(async (): Promise<Testimonio[]> => 
     where: { publicado: { equals: true } },
     depth: 1,
     limit: 8,
-    sort: "orden",
+    // En el orden del panel (arrastrando, 2026-11-19; el inicial, «Orden»).
+    sort: ordenDe("testimonios"),
   });
   return docs;
 });
@@ -30,7 +32,8 @@ export const getPreguntasDePortada = cache(async (): Promise<PreguntasFrecuente[
     where: { publicada: { equals: true } },
     depth: 0,
     limit: 20,
-    sort: "orden",
+    // En el orden del panel (arrastrando, 2026-11-19; el inicial, «Orden»).
+    sort: ordenDe("preguntas-frecuentes"),
   });
   return docs;
 });

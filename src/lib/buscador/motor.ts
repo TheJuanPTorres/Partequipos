@@ -18,6 +18,7 @@ import { compacto, distancia, plegar, singular, terminos, toleranciaDe } from ".
  */
 
 export type Clase =
+  | "marca"
   | "nueva"
   | "usada"
   | "modelo"
@@ -26,6 +27,7 @@ export type Clase =
   | "lubricante"
   | "blog"
   | "servicio"
+  | "pagina"
   | "sede";
 
 export type Campo = "titulo" | "codigo" | "marca" | "tipo" | "categoria" | "descripcion" | "specs";
@@ -58,15 +60,32 @@ const PESO: Record<Campo, number> = {
 
 /** A igualdad de relevancia, qué va antes. */
 const PRIORIDAD: Record<Clase, number> = {
-  modelo: 0,
+  marca: 0,
+  modelo: 1,
   nueva: 1,
   usada: 1,
-  categoria: 2,
   repuestos: 2,
+  categoria: 2,
   lubricante: 3,
   servicio: 4,
+  pagina: 5,
   sede: 5,
-  blog: 6,
+  blog: 7,
+};
+
+/** Nombre de cada clase para mostrarlo (etiquetas y grupos de resultados). */
+export const ETIQUETA_CLASE: Record<Clase, string> = {
+  marca: "Marcas",
+  nueva: "Maquinaria nueva",
+  usada: "Maquinaria usada",
+  modelo: "Modelos de repuestos",
+  repuestos: "Repuestos",
+  categoria: "Categorías",
+  lubricante: "Lubricantes",
+  servicio: "Servicios",
+  pagina: "Páginas",
+  sede: "Sedes",
+  blog: "Noticias",
 };
 
 type Posting = { doc: number; campo: Campo };
@@ -324,7 +343,7 @@ export function buscarEnIndice(
           // Lo que es del estado pedido («usada») va antes que lo que no tiene estado.
           (estadoPedido && estadoDe(doc) === estadoPedido ? 6 : 0) +
           (exacto ? 1000 : 0) -
-          PRIORIDAD[doc.clase] * 0.05,
+          PRIORIDAD[doc.clase] * 1.5,
         exacto,
       },
     ];

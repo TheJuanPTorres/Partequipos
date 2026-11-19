@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { normalizarConsulta } from "@/lib/buscador/consulta";
 import type { Clase, Estado, Filtros } from "@/lib/buscador/motor";
-import { buscarEnCatalogo } from "@/lib/buscador/servidor";
+import { buscarEnCatalogo, indiceActual } from "@/lib/buscador/servidor";
 
 /**
  * `GET /api/buscar/?q=…&marca=…&tipo=…&estado=nueva|usada&clase=…&limite=8` (2026-11-18): lo que
@@ -16,6 +16,8 @@ const CLASES = new Set<Clase>([
   "usada",
   "modelo",
   "repuestos",
+  "marca",
+  "pagina",
   "categoria",
   "lubricante",
   "blog",
@@ -36,6 +38,11 @@ export async function GET(peticion: NextRequest) {
     "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
     "X-Robots-Tag": "noindex",
   };
+  // La lupa lo pide al abrirse: carga el índice antes de que se escriba la primera letra.
+  if (p.get("calentar")) {
+    await indiceActual();
+    return NextResponse.json({ ok: true }, { headers: { "X-Robots-Tag": "noindex" } });
+  }
   if (consulta.estado === "vacia") {
     return NextResponse.json({ consulta: "", resultados: [], total: 0 }, { headers: cabeceras });
   }

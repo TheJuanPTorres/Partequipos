@@ -87,6 +87,16 @@ const DOCS: DocBusqueda[] = [
   doc("s1", "servicio", "Servicio técnico y taller", {
     campos: { descripcion: "Mantenimiento y reparación" },
   }),
+  doc("k1", "marca", "Repuestos para maquinaria pesada Hitachi LANDCROS", {
+    marca: "Hitachi LANDCROS",
+    campos: { marca: "Hitachi LANDCROS" },
+  }),
+  doc("b2", "blog", "Hitachi, Yanmar y Case: tres marcas de confianza", {
+    campos: { descripcion: "Comparamos las marcas Hitachi, Yanmar y Case" },
+  }),
+  doc("p1", "pagina", "Política de garantía de repuestos", {
+    campos: { descripcion: "Garantía y devoluciones" },
+  }),
   doc("e1", "sede", "Sede Medellín", { campos: { descripcion: "Dirección y teléfono" } }),
 ];
 
@@ -178,6 +188,15 @@ describe("buscador: sin resultados", () => {
     assert.equal(r.sugerencia, null);
   });
   it("una consulta vacía no busca", () => assert.equal(buscarEnIndice(indice, "  ").total, 0));
+});
+
+describe("buscador: la marca primero y páginas", () => {
+  it("«hitachi» pone la marca antes que el blog, aunque la marca sea «Hitachi LANDCROS»", () => {
+    const r = ids("hitachi");
+    assert.equal(r[0], "k1");
+    assert.ok(r.indexOf("b2") > r.indexOf("n1"));
+  });
+  it("«garantia» encuentra la página de garantía", () => assert.equal(primero("garantia"), "p1"));
 });
 
 describe("buscador: otras clases", () => {

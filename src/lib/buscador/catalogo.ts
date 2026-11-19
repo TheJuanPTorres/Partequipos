@@ -4,10 +4,12 @@ import { getPayload } from "payload";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { rutas } from "@/lib/routes";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
-import { conEquipoVisible, conProductoVisible } from "@/lib/nueva/visibilidad";
+import { conEquipoVisible, conProductoVisible, MARCA_VISIBLE } from "@/lib/nueva/visibilidad";
 import type {
   Articulo,
   CategoriasLubricante,
+  CategoriasMaquinaria,
+  Pagina,
   CategoriasTecnica,
   CategoriasUsada,
   Marca,
@@ -48,23 +50,41 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
   const payload = await getPayload({ config });
   const todo = { depth: 1, limit: 0, pagination: false } as const;
 
-  const [nuevos, usados, modelos, marcas, tipos, categorias, lubMarcas, lubCats, articulos, sedes] =
-    await Promise.all([
-      payload.find({ collection: "equipos-nuevos", where: conEquipoVisible(), ...todo }),
-      payload.find({
-        collection: "equipos-usados",
-        where: conProductoVisible({ disponible: { equals: true } }),
-        ...todo,
-      }),
-      payload.find({ collection: "modelos-repuesto", where: conProductoVisible(), ...todo }),
-      payload.find({ collection: "marcas", ...todo }),
-      payload.find({ collection: "tipos-equipo", ...todo }),
-      payload.find({ collection: "categorias-tecnicas", ...todo }),
-      payload.find({ collection: "marcas-lubricante", ...todo }),
-      payload.find({ collection: "categorias-lubricante", ...todo }),
-      payload.find({ collection: "articulos", ...todo, depth: 0 }),
-      payload.find({ collection: "sedes", ...todo, depth: 0 }),
-    ]);
+  const [
+    nuevos,
+    usados,
+    modelos,
+    marcas,
+    tipos,
+    categorias,
+    lubMarcas,
+    lubCats,
+    articulos,
+    sedes,
+    marcasNueva,
+    categoriasNueva,
+    categoriasUsada,
+    paginas,
+  ] = await Promise.all([
+    payload.find({ collection: "equipos-nuevos", where: conEquipoVisible(), ...todo }),
+    payload.find({
+      collection: "equipos-usados",
+      where: conProductoVisible({ disponible: { equals: true } }),
+      ...todo,
+    }),
+    payload.find({ collection: "modelos-repuesto", where: conProductoVisible(), ...todo }),
+    payload.find({ collection: "marcas", ...todo }),
+    payload.find({ collection: "tipos-equipo", ...todo }),
+    payload.find({ collection: "categorias-tecnicas", ...todo }),
+    payload.find({ collection: "marcas-lubricante", ...todo }),
+    payload.find({ collection: "categorias-lubricante", ...todo }),
+    payload.find({ collection: "articulos", ...todo, depth: 0 }),
+    payload.find({ collection: "sedes", ...todo, depth: 0 }),
+    payload.find({ collection: "marcas-maquinaria", where: MARCA_VISIBLE, ...todo }),
+    payload.find({ collection: "categorias-maquinaria", ...todo }),
+    payload.find({ collection: "categorias-usada", ...todo }),
+    payload.find({ collection: "paginas", ...todo, depth: 0 }),
+  ]);
 
   const docs: DocBusqueda[] = [];
 
@@ -142,7 +162,7 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
   for (const m of marcas.docs) {
     docs.push({
       id: `repuestos-marca-${m.id}`,
-      clase: "repuestos",
+      clase: "marca",
       titulo: `Repuestos para maquinaria pesada ${m.nombre}`,
       href: `${rutas.marca(m.slug)}/`,
       detalle: unir("Repuestos", m.nombre),
@@ -153,6 +173,62 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
         marca: m.nombre,
         descripcion: texto(m.descripcion),
       },
+    });
+  }
+
+  for (const m of marcasNueva.docs) {
+    docs.push({
+      id: `nueva-marca-${m.id}`,
+      clase: "marca",
+      titulo: `Maquinaria pesada ${m.nombre}`,
+      href: `${rutas.marcaMaquinaria(m.slug)}/`,
+      detalle: unir("Maquinaria nueva", m.nombre),
+      marca: m.nombre,
+      imagen: imagen(m.logo),
+      campos: {
+        titulo: `Maquinaria pesada ${m.nombre}`,
+        marca: m.nombre,
+        descripcion: texto(m.descripcion),
+      },
+    });
+  }
+
+  for (const c of categoriasNueva.docs as CategoriasMaquinaria[]) {
+    docs.push({
+      id: `nueva-categoria-${c.id}`,
+      clase: "categoria",
+      titulo: `${c.nombre} nuevas`,
+      href: `${rutas.categoriaNueva(c.slug)}/`,
+      detalle: "Maquinaria nueva",
+      tipo: c.nombre,
+      campos: { titulo: `${c.nombre} nuevas`, tipo: c.nombre },
+    });
+  }
+
+  for (const c of categoriasUsada.docs) {
+    docs.push({
+      id: `usada-categoria-${c.id}`,
+      clase: "categoria",
+      titulo: `${c.nombre} usadas`,
+      href: `${rutas.categoriaUsada(c.slug)}/`,
+      detalle: "Maquinaria usada",
+      tipo: c.nombre,
+      campos: { titulo: `${c.nombre} usadas`, tipo: c.nombre },
+    });
+  }
+
+  for (const p of paginas.docs as Pagina[]) {
+    // La portada no es un resultado; el resto (servicio técnico, garantías, nosotros…) sí.
+    if (p.slug === "inicio" || p.tipoPagina === "portada") continue;
+    docs.push({
+      id: `pagina-${p.id}`,
+      clase: /servicio|taller|mantenimiento|garantia|financiaci/i.test(p.slug)
+        ? "servicio"
+        : "pagina",
+      titulo: p.titulo,
+      href: `/${p.slug}/`,
+      detalle: p.tipoPagina === "legal" ? "Información legal" : "Información",
+      campos: { titulo: p.titulo, descripcion: texto(p.entradilla) },
     });
   }
 

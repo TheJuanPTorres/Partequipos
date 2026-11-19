@@ -1060,3 +1060,26 @@ Con el #516 de D en main, «Posición en las páginas de repuestos» (`ordenMarc
 técnicas va **oculto** en el formulario (`admin.hidden`): la web ya no lo lee. La columna se queda en
 la base hasta su borrado con migración. Los tipos de repuestos (`tipos-equipo`) no tienen campo
 «Orden» propio: su orden es el del arrastre dentro de la marca.
+
+## 36. Apariencia: rojo de marca y avisos de Payload en español (2026-11-19, organización del panel, PR 10; rama `feat/panel-apariencia`)
+
+- **Rojo de marca en el panel y en el acceso:** `--pq-primary` pasa del `#dc2626` del sistema del
+  cliente al `#D92035` de la «P» del logo y de la web. Lo usan los botones primarios, el foco, los
+  bordes de los campos activos, el contador del menú y el botón de «Iniciar sesión».
+  - Contrastes medidos: blanco encima **4,99:1** (antes 4,83), sobre el fondo claro **4,86:1**, y
+    el texto claro del sistema `#fef2f2` **4,56:1** (antes 4,41, que no llegaba a AA).
+  - Sobre el fondo oscuro, 3,75:1 (antes 3,88): sirve para bordes y foco (≥ 3:1), no para texto.
+    Por eso «Ver la web» de la portada va en el color del texto, con el icono en rojo, y el
+    contador del menú pasa a blanco puro.
+  - El degradado de respaldo del acceso (sin foto elegida) arranca en el mismo rojo.
+- **El logo ya estaba:** el wordmark y el isotipo del sistema del cliente en el panel, las migas y
+  el acceso (§10.27). Sin cambios.
+- **Avisos en inglés:** Payload escribe en su código, sin pasar por su traducción, el aviso de
+  reordenar filas del orden por arrastre («To reorder the rows…») y cuatro errores de petición o
+  descarga. El proveedor `TraducirAvisos` (`admin.components.providers`) envuelve las funciones de
+  `toast` de `@payloadcms/ui` y cambia solo esos textos (`src/lib/panel/avisosEnIngles.ts`); el
+  resto pasa igual. `avisosEnIngles.test.ts` falla si una actualización de Payload cambia o quita
+  uno de esos textos.
+- **No entra aquí:** el global «Apariencia del panel» con la imagen del acceso (plan §7.4), que
+  mueve `imagenAcceso` y necesita migración; y el favicon cuadrado, pendiente del cliente (#9).
+- Sin esquema ni dependencias.

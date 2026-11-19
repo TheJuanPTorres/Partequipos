@@ -102,6 +102,12 @@ export const Testimonio: CollectionConfig = {
     description:
       "Testimonios de la portada. Un testimonio no se publica sin la autorización de uso de la persona.",
   },
+  /*
+   * ORDEN POR ARRASTRE (2026-11-19, dirección; informe del panel §6): `_order` oculto de Payload,
+   * con el orden inicial de hoy puesto por la migración `orden_resto`. Lo nuevo entra al final. La
+   * web lo usa cuando se pasen sus consultas a `_order` (§6.3).
+   */
+  orderable: true,
   access: {
     read: leerTestimonios,
     create: escrituraContenido,
@@ -114,7 +120,9 @@ export const Testimonio: CollectionConfig = {
     afterChange: [portada.afterChange],
     afterDelete: [portada.afterDelete],
   },
-  defaultSort: "orden",
+  // Con `orderable`, la lista se ordena por el arrastre (sin esto, avisa de que hay que ordenar
+  // por «Orden» antes de arrastrar).
+  defaultSort: "_order",
   fields: conPestanas(
     [
       { name: "nombre", type: "text", required: true, label: "Nombre de la persona" },

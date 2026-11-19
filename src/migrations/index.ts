@@ -116,6 +116,7 @@ import * as migration_20261113_140439_portada_tarjeta_color_logo from './2026111
 import * as migration_20261113_142500_portada_tarjeta_logo from './20261113_142500_portada_tarjeta_logo';
 import * as migration_20261119_023114_buscador from './20261119_023114_buscador';
 import * as migration_20261119_061503_orden_repuestos from './20261119_061503_orden_repuestos';
+import * as migration_20261119_065236_orden_resto from './20261119_065236_orden_resto';
 
 export const migrations = [
   {
@@ -706,6 +707,11 @@ export const migrations = [
   {
     up: migration_20261119_061503_orden_repuestos.up,
     down: migration_20261119_061503_orden_repuestos.down,
-    name: '20261119_061503_orden_repuestos'
+    name: '20261119_061503_orden_repuestos',
+  },
+  {
+    up: migration_20261119_065236_orden_resto.up,
+    down: migration_20261119_065236_orden_resto.down,
+    name: '20261119_065236_orden_resto'
   },
 ];

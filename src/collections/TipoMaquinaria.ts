@@ -1,4 +1,5 @@
 import type { CollectionConfig, Where } from "payload";
+import { joinsSoloEnElPanel } from "./hooks/joinsSoloEnElPanel";
 import { conPestanas } from "../lib/fields/pestanasFicha";
 
 import { seoField } from "../lib/fields/seoField";
@@ -28,6 +29,7 @@ export const TipoMaquinaria: CollectionConfig = {
     delete: borradoAdmin,
   },
   hooks: {
+    beforeOperation: [joinsSoloEnElPanel],
     afterChange: [revalidarTipoMaquinaria, menu.afterChange],
     afterDelete: [revalidarTipoMaquinariaBorrado, menu.afterDelete],
   },
@@ -126,6 +128,24 @@ export const TipoMaquinaria: CollectionConfig = {
         admin: {
           description:
             "Solo para un tipo que todavía NO tiene su página general (una «Categoría de maquinaria nueva» con su nombre): marcada, el índice de tipos y el menú enseñan este tipo y llevan a su página en la marca. Con categoría, el índice y el menú llevan siempre a la categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.",
+        },
+      },
+      /*
+       * LOS EQUIPOS DEL TIPO, EN SU ORDEN (2026-11-19): se arrastran aquí (join ordenable: el orden es de
+       * cada ficha). Va en la pestaña «Contenido». Solo se rellena en el panel (`joinsSoloEnElPanel`).
+       */
+      {
+        name: "equipos",
+        type: "join",
+        collection: "equipos-nuevos",
+        on: "tipo",
+        orderable: true,
+        defaultLimit: 100,
+        label: "Equipos del tipo",
+        admin: {
+          defaultColumns: ["nombre", "codigo", "mostrarEnWeb"],
+          description:
+            "En el orden en que salen en la web. Arrastra las filas para cambiarlo; uno nuevo entra al final.",
         },
       },
       seoField(),

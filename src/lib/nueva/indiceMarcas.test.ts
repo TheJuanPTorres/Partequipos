@@ -20,10 +20,11 @@ describe("placasDeMarcasNueva", () => {
   ];
   const equipos = [{ marca: 1 }, { marca: marca(2, "aditamentos") }, { marca: 3 }, { marca: 5 }];
 
-  it("solo las marcas con equipos, por nombre", () => {
+  // Llegan en el orden del panel (arrastrando, `getMarcasMaquinaria`) y se conserva (2026-11-19).
+  it("solo las marcas con equipos, en el orden recibido (no por nombre)", () => {
     assert.deepEqual(
       placasDeMarcasNueva(marcas, equipos, new Map()).map((p) => p.nombre),
-      ["Case", "Hitachi", "Yanmar"],
+      ["Yanmar", "Case", "Hitachi"],
     );
   });
 
@@ -41,10 +42,10 @@ describe("placasDeMarcasNueva", () => {
     assert.deepEqual(
       placas.map((p) => [p.nombre, p.href, p.externo]),
       [
+        ["Yanmar", "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/yanmar/", undefined],
         ["Case", "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case/", undefined],
         ["Hitachi", "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/hitachi/", undefined],
         ["Liugong", "https://maquitecno.co/", true],
-        ["Yanmar", "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/yanmar/", undefined],
       ],
     );
   });
@@ -80,7 +81,7 @@ describe("baldosas de color de nueva", () => {
 
   it("con color y logo, baldosa de color; sin alguno, el respaldo gris", () => {
     const logos = new Map([["yanmar", logo]]);
-    const [b, a] = placasDeMarcasNueva(
+    const [a, b] = placasDeMarcasNueva(
       [marca(1, "yanmar", { colorMarca: "#ed1c24" }), marca(2, "case", { colorMarca: "#ed1c24" })],
       [{ marca: 1 }, { marca: 2 }],
       logos,

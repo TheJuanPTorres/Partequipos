@@ -9,7 +9,6 @@ import {
 import { paisDe, type CodigoPais } from "./lubricantes/pais";
 import { enlaceExternoDe } from "./nueva/enlaceExterno";
 import { colorConBlanco } from "./marca/franjaMarca";
-import { porOrden } from "./nueva/orden";
 import { unaEntradaPorTipo } from "./nueva/ordenTipos";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
@@ -262,9 +261,12 @@ const idDeMarca = (t: TipoCatalogo) => (typeof t.marca === "object" ? t.marca?.i
 const porNombre = <T extends { nombre: string }>(a: T, b: T) =>
   a.nombre.localeCompare(b.nombre, "es");
 
-/** Los tipos de una marca, por su «Orden» (vacío, al final, por nombre), como en su página. */
+/**
+ * Los tipos de una marca en el orden de su página: el del panel (arrastrando en la ficha de la
+ * marca), que ya trae la consulta (`getMegamenu.ts`).
+ */
 function tiposDe(marca: ItemCatalogo, tipos: TipoCatalogo[]) {
-  return tipos.filter((t) => idDeMarca(t) === marca.id).sort(porOrden);
+  return tipos.filter((t) => idDeMarca(t) === marca.id);
 }
 
 /** Acordeón de una marca: «Ver todo» y sus tipos. */
@@ -303,7 +305,8 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
     const r = deRepuestos.get(claveDeMarca(m.nombre));
     return r && logoPropio(r) ? { ...m, logo: r.logo, logoOscuroEnMenu: r.logoOscuroEnMenu } : m;
   };
-  const marcas = d.marcasMaquinaria.map(conLogoUnico).sort(porNombre);
+  // En el orden del panel (arrastrando), que ya trae la consulta.
+  const marcas = d.marcasMaquinaria.map(conLogoUnico);
   const aditamentos = marcas.find((m) => m.slug === SLUG_ADITAMENTOS);
   const deMarca = (m: ItemCatalogo): GrupoMenu => {
     // Sin página propia (LiuGong → su distribuidor, 2026-11-03): un enlace fuera, sin tipos.
@@ -531,11 +534,10 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
   const marcas = [...(d.marcasLubricante ?? [])]
     .filter((m) => m.nombre && m.slug)
     .filter((m) => tienePaginaPropiaLubricante(m) || enlaceExternoLubricante(m) || selector(m.id))
-    // Primero las de página propia (Eni) y después las de otra web (Dispel); cada grupo, por nombre.
+    // Primero las de página propia (Eni) y después las de otra web (Dispel); cada grupo, en el
+    // orden del panel (arrastrando), que ya trae la consulta (`sort` es estable).
     .sort(
-      (a, b) =>
-        Number(tienePaginaPropiaLubricante(b)) - Number(tienePaginaPropiaLubricante(a)) ||
-        porNombre(a, b),
+      (a, b) => Number(tienePaginaPropiaLubricante(b)) - Number(tienePaginaPropiaLubricante(a)),
     );
   if (marcas.length === 0) return null;
   const categorias = [...(d.categoriasLubricante ?? [])].sort(porNombre);

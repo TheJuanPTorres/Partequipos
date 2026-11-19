@@ -6,7 +6,8 @@
  * el menú y el gancho no lo veía (el menú de las páginas que no son de nueva se quedaba viejo).
  *
  * Van también los campos de los FILTROS de la consulta (`mostrarEnWeb`), que deciden si una
- * fila sale, y los del orden (`orden`, `ordenMarca`). El `id` no: no cambia.
+ * fila sale, y los del orden (`orden`, `ordenMarca` y, desde el 2026-11-19, las claves del orden
+ * por arrastre de `ordenArrastre.ts`: arrastrar en el panel refresca el menú). El `id` no: no cambia.
  */
 export const CAMPOS_MENU = {
   "marcas-maquinaria": [
@@ -17,11 +18,20 @@ export const CAMPOS_MENU = {
     "mostrarEnWeb",
     // Marca sin página propia: su entrada lleva fuera (LiuGong, 2026-11-03).
     "enlaceExterno",
+    "_order",
   ],
-  "tipos-maquinaria": ["nombre", "slug", "marca", "subtipos", "pestanaIndiceNueva", "orden"],
+  "tipos-maquinaria": [
+    "nombre",
+    "slug",
+    "marca",
+    "subtipos",
+    "pestanaIndiceNueva",
+    "orden",
+    "_tipos-maquinaria_tipos_order",
+  ],
   // `_order`: el orden arrastrando del panel (`orderable`, 2026-11-09).
   "categorias-maquinaria": ["nombre", "slug", "tiposIncluidos", "_order"],
-  "categorias-usada": ["nombre", "slug", "enOtros", "orden", "mostrarEnWeb"],
+  "categorias-usada": ["nombre", "slug", "enOtros", "orden", "mostrarEnWeb", "_order"],
   marcas: ["nombre", "slug", "logo", "logoOscuroEnMenu"],
   "tipos-equipo": ["nombre", "slug", "marca", "slugPadre"],
   // `padre`, `logo` y `colorMarca`: el botón de una página que cuelga de una categoría bajo su
@@ -39,8 +49,15 @@ export const CAMPOS_MENU = {
     "selectorMarcas",
   ],
   // «Otra web» con su enlace, y la bandera del país (Dispel y Eni, 2026-11-04).
-  "marcas-lubricante": ["nombre", "slug", "destino", "enlaceExterno", "paisOrigen"],
-  "categorias-lubricante": ["nombre", "slug", "marca", "enlaceMenu", "orden"],
+  "marcas-lubricante": ["nombre", "slug", "destino", "enlaceExterno", "paisOrigen", "_order"],
+  "categorias-lubricante": [
+    "nombre",
+    "slug",
+    "marca",
+    "enlaceMenu",
+    "orden",
+    "_categorias-lubricante_lineas_order",
+  ],
 } as const;
 
 export type ColeccionDelMenu = keyof typeof CAMPOS_MENU;

@@ -74,32 +74,34 @@ export function placasDeMarcasNueva(
     equipos.map((e) => (typeof e.marca === "number" ? e.marca : e.marca?.id)),
   );
   const nombre = (m: MarcasMaquinaria) => m.nombre.trim();
-  return marcas
-    .filter(
-      (m) =>
-        m.nombre?.trim() &&
-        m.slug?.trim() &&
-        m.slug !== SLUG_ADITAMENTOS &&
-        (conEquipos.has(m.id) || enlaceExternoDe(m)),
-    )
-    .sort((a, b) => nombre(a).localeCompare(nombre(b), "es"))
-    .map((m) => {
-      const externo = enlaceExternoDe(m);
-      const logo = logoDeMarca(m, logos);
-      // «Una marca, un solo logo»: la baldosa de la marca de repuestos con su nombre (Case, Hitachi,
-      // Yanmar, LiuGong…); si no hay, su color de marca y su logo en blanco (Dynapac).
-      const deRepuestos = buscarPorNombre(claveDeMarca(m.nombre), baldosas);
-      const propia = logoEnBlanco(logo);
-      const colorPropio = propia ? colorDeBaldosaNueva(m.colorMarca) : null;
-      return {
-        id: m.id,
-        nombre: nombre(m),
-        href: externo ?? `${rutas.marcaMaquinaria(m.slug)}/`,
-        ...(externo ? { externo: true as const } : {}),
-        // El logo de todo el sitio (`LogoMarca`).
-        logo,
-        color: deRepuestos ? deRepuestos.color : colorPropio,
-        logoSobreColor: deRepuestos ? deRepuestos.logo : colorPropio ? propia : null,
-      };
-    });
+  return (
+    marcas
+      .filter(
+        (m) =>
+          m.nombre?.trim() &&
+          m.slug?.trim() &&
+          m.slug !== SLUG_ADITAMENTOS &&
+          (conEquipos.has(m.id) || enlaceExternoDe(m)),
+      )
+      // En el orden recibido: el del panel (arrastrando, 2026-11-19), que trae `getMarcasMaquinaria`.
+      .map((m) => {
+        const externo = enlaceExternoDe(m);
+        const logo = logoDeMarca(m, logos);
+        // «Una marca, un solo logo»: la baldosa de la marca de repuestos con su nombre (Case, Hitachi,
+        // Yanmar, LiuGong…); si no hay, su color de marca y su logo en blanco (Dynapac).
+        const deRepuestos = buscarPorNombre(claveDeMarca(m.nombre), baldosas);
+        const propia = logoEnBlanco(logo);
+        const colorPropio = propia ? colorDeBaldosaNueva(m.colorMarca) : null;
+        return {
+          id: m.id,
+          nombre: nombre(m),
+          href: externo ?? `${rutas.marcaMaquinaria(m.slug)}/`,
+          ...(externo ? { externo: true as const } : {}),
+          // El logo de todo el sitio (`LogoMarca`).
+          logo,
+          color: deRepuestos ? deRepuestos.color : colorPropio,
+          logoSobreColor: deRepuestos ? deRepuestos.logo : colorPropio ? propia : null,
+        };
+      })
+  );
 }

@@ -13,6 +13,7 @@ import {
   DE_MARCA_VISIBLE,
   MARCA_VISIBLE,
 } from "@/lib/nueva/visibilidad";
+import { ordenDe } from "@/lib/ordenArrastre";
 
 /**
  * Datos del megamenú (`src/lib/megamenu.ts`): doce consultas LIGERAS (con las
@@ -66,12 +67,16 @@ const megamenuEnCache = unstable_cache(
         collection: "marcas-maquinaria",
         ...conLogo,
         where: MARCA_VISIBLE,
+        // En el orden del panel (arrastrando, 2026-11-19), y así salen en el menú.
+        sort: ordenDe("marcas-maquinaria"),
         select: selectDelMenu("marcas-maquinaria"),
       }),
       payload.find({
         collection: "tipos-maquinaria",
         ...base,
         where: DE_MARCA_VISIBLE,
+        // El orden de cada marca (arrastrando en su ficha): el menú agrupa por marca y lo conserva.
+        sort: ordenDe("tipos-maquinaria"),
         // La casilla «Tarjeta en el índice de tipos»: «Por tipo de máquina» del menú (2026-10-22).
         select: selectDelMenu("tipos-maquinaria"),
       }),
@@ -79,12 +84,13 @@ const megamenuEnCache = unstable_cache(
         collection: "categorias-maquinaria",
         ...base,
         // En el orden del panel (arrastrando, `orderable`, 2026-11-09).
-        sort: "_order",
+        sort: ordenDe("categorias-maquinaria"),
         select: selectDelMenu("categorias-maquinaria"),
       }),
       payload.find({
         collection: "categorias-usada",
         ...base,
+        sort: ordenDe("categorias-usada"),
         // Sin las ocultas (`mostrarEnWeb`, 2026-10-20).
         where: { mostrarEnWeb: { not_equals: false } },
         select: selectDelMenu("categorias-usada"),
@@ -100,6 +106,7 @@ const megamenuEnCache = unstable_cache(
         collection: "equipos-nuevos",
         ...base,
         where: conEquipoVisible(),
+        // orden-libre: solo el tipo de cada equipo, para saber qué tipos tienen.
         select: { tipo: true },
       }),
       // Solo la categoría de las unidades disponibles: «Sin unidades por ahora» en las vacías.
@@ -122,13 +129,14 @@ const megamenuEnCache = unstable_cache(
       payload.find({
         collection: "marcas-lubricante",
         ...base,
+        sort: ordenDe("marcas-lubricante"),
         select: selectDelMenu("marcas-lubricante"),
       }),
       payload.find({
         collection: "categorias-lubricante",
         ...base,
-        // En el orden del panel («Orden», 2026-10-22), y sin orden, por nombre.
-        sort: ["orden", "nombre"],
+        // El orden de cada marca (arrastrando en su ficha, 2026-11-19).
+        sort: ordenDe("categorias-lubricante"),
         select: selectDelMenu("categorias-lubricante"),
       }),
     ]);

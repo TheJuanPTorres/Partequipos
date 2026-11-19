@@ -1007,3 +1007,18 @@ Avanzado (solo Administrador).
   una pestaña por página (diez); «SEO y datos de la empresa», «Datos de la empresa» e «Imágenes».
 - Preguntas frecuentes no lleva pestañas: solo tendría «Contenido».
 - Pestañas sin nombre: ni columnas ni rutas de campo cambian (`db:deriva` sin diferencias).
+
+## 34. Listados: columnas, búsqueda y filtro de fotos pequeñas (2026-11-19, organización del panel, PR 5; rama `feat/panel-listados`)
+
+- **Una tabla para todas las listas** (`src/lib/panel/listados.ts`, `conListados` en
+  `payload.config.ts`): columnas por defecto y campos del buscador de 18 colecciones, según el plan
+  (§5). Manda sobre `defaultColumns` y `listSearchableFields` de cada colección, así que cambiar
+  columnas no toca la colección. `listados.test.ts` falla si una columna o un campo de búsqueda no
+  existe.
+- **Imagen primero**: las columnas de subida sin celda propia (logos e imágenes de marcas, tipos y
+  categorías) se pintan como miniatura (`CeldaMiniatura`).
+- **Imágenes**: columna «Ancho» y, encima de la tabla, «Ver solo las pequeñas (menos de 1.200 px de
+  ancho)» (`FiltroFotosPequenas`), un filtro en la dirección que se combina con los de Payload.
+- Los demás filtros rápidos del plan (categoría, marca, disponible…) son los filtros de Payload de
+  la propia lista; no se añade nada.
+- Sin esquema.

@@ -148,13 +148,13 @@ const nuevas = [
   {
     titulo: "Hitachi LANDCROS",
     parrafo:
-      "En Partequipos encuentras maquinaria Hitachi, diseñada para ofrecer rendimiento, precisión y confiabilidad en cada operación.",
+      "En Partequipos encuentras maquinaria Hitachi LANDCROS, diseñada para ofrecer rendimiento, precisión y confiabilidad en cada operación.",
     imagenFondo: ids.fondo1,
     imagenFrontal: ids.maquina1,
     posicionMaquina: "sobre",
     textoCircular: "Fuerza. Tradición. Respaldo.",
-    enlace: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/hitachi/",
-    enlaceNombre: "Ver maquinaria Hitachi",
+    enlace: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/hitachi-landcros/",
+    enlaceNombre: "Ver maquinaria Hitachi LANDCROS",
   },
   {
     titulo: "Versatilidad. Fuerza. Experiencia.",

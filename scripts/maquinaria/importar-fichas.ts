@@ -197,6 +197,14 @@ const marcas = new Map(
     await payload.find({ collection: "marcas-maquinaria", depth: 0, limit: 0, pagination: false })
   ).docs.map((m) => [m.slug, m]),
 );
+// Desde el 2026-11-18 la marca Hitachi tiene sus direcciones con «hitachi-landcros»
+// (scripts/marcas/hitachi-landcros-urls.ts). Este importador busca por los slugs de WordPress: no
+// encontraría la marca ni sus tipos, y sus fichas se crearían otra vez con la dirección antigua.
+if (marcas.has("hitachi-landcros")) {
+  fallar(
+    "la marca Hitachi ya tiene sus direcciones con «hitachi-landcros»: este importador usa los slugs de WordPress. No se hace nada",
+  );
+}
 const tipos = (
   await payload.find({ collection: "tipos-maquinaria", depth: 0, limit: 0, pagination: false })
 ).docs;

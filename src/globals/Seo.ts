@@ -154,12 +154,17 @@ export const Seo: GlobalConfig = {
            * Panel visual de la pantalla de acceso al panel (`/admin/login`,
            * decisiones-panel.md §18). Vacía, un degradado rojo hacia negro.
            * Solo se ve en escritorio.
+           *
+           * OCULTO desde el 2026-11-19 (plan del panel §7.4): pasa al global «Apariencia del panel»
+           * (`apariencia-panel`), y la migración copió la imagen elegida aquí al global nuevo. Sin uso; se borra con
+           * su migración.
            */
           name: "imagenAcceso",
           type: "upload",
           relationTo: "media",
           label: "Imagen de la pantalla de acceso",
           admin: {
+            hidden: true,
             description:
               "La que sale a la izquierda de la pantalla para entrar al panel, solo en computador. Mejor una imagen cuadrada o vertical y oscura, porque lleva texto blanco encima. Si la dejas vacía, sale un fondo rojo degradado.",
           },

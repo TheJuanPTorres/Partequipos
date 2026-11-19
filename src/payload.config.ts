@@ -61,6 +61,7 @@ import { FichaProducto } from "./globals/FichaProducto";
 import { PaginasIndice } from "./globals/PaginasIndice";
 import { RepuestosMarca } from "./globals/RepuestosMarca";
 import { Buscador } from "./globals/Buscador";
+import { AparienciaPanel } from "./globals/AparienciaPanel";
 import { VacantesBuk } from "./globals/VacantesBuk";
 import { CorreoFormularios } from "./globals/CorreoFormularios";
 import { adaptadorCorreo } from "./lib/correo/adaptador";
@@ -262,6 +263,7 @@ export default buildConfig({
     VacantesBuk,
     Buscador,
     CorreoFormularios,
+    AparienciaPanel,
   ]),
   // El «Documento en visor» también dentro del texto (2026-10-20): un PDF que se
   // lee como libro entre dos párrafos de una sección (`documentoVisor.ts`).

@@ -81,6 +81,7 @@ export const ORDEN_DE_ENTRADAS = [
   "users",
   "animaciones",
   "fuentes",
+  "apariencia-panel",
 ] as const;
 
 /**
@@ -125,10 +126,17 @@ export const ETIQUETAS_DEL_MENU: Record<string, string> = {
   users: "Usuarios",
   animaciones: "Animaciones",
   fuentes: "Fuentes",
+  "apariencia-panel": "Apariencia del panel",
 };
 
 /** Lo técnico: solo lo ve en el menú el Administrador (el acceso de cada colección no cambia). */
-export const SOLO_ADMINISTRADOR = new Set(["redirects", "users", "animaciones", "fuentes"]);
+export const SOLO_ADMINISTRADOR = new Set([
+  "redirects",
+  "users",
+  "animaciones",
+  "fuentes",
+  "apariencia-panel",
+]);
 
 /**
  * Entradas que llevan a UNA ficha concreta desde otro grupo. `pagina`: la página con esa dirección

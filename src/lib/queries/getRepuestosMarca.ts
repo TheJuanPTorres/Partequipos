@@ -26,7 +26,8 @@ export const getTiposDeMarcaConImagen = cache(async (marcaId: number): Promise<T
     where: { marca: { equals: marcaId } },
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    // En el orden de la marca (join «Tipos» de la marca, arrastrando, 2026-11-19).
+    sort: "_tipos-equipo_tipos_order",
   });
   return docs;
 });
@@ -43,7 +44,8 @@ export const getCategoriasParaMarca = cache(async (): Promise<CategoriasTecnica[
     // depth 1: la FOTO de la categoría (las tarjetas de la página de tipo) llega poblada.
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    // En el orden del panel (arrastrando, `orderable`, 2026-11-19).
+    sort: "_order",
   });
   return docs;
 });

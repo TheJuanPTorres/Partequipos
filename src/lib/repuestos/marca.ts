@@ -66,18 +66,12 @@ export type CategoriaMarca = {
 };
 
 /**
- * Orden: primero las que tienen `ordenMarca` (de menor a mayor), luego el
- * resto por nombre. Una categoría sin nombre no sale.
+ * Orden: el que el editor arrastró en el panel (`_order`): la consulta ya las trae así y aquí no
+ * se reordena (2026-11-19). Una categoría sin nombre no sale.
  */
 export function categoriasDeMarca(categorias: CategoriasTecnica[]): CategoriaMarca[] {
   return categorias
     .filter((c) => c.nombre?.trim())
-    .sort((a, b) => {
-      const oa = typeof a.ordenMarca === "number" ? a.ordenMarca : Infinity;
-      const ob = typeof b.ordenMarca === "number" ? b.ordenMarca : Infinity;
-      if (oa !== ob) return oa < ob ? -1 : 1;
-      return a.nombre.localeCompare(b.nombre, "es");
-    })
     .map((c) => ({
       id: c.id,
       nombre: c.nombre.trim(),

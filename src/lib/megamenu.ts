@@ -263,8 +263,10 @@ const porNombre = <T extends { nombre: string }>(a: T, b: T) =>
   a.nombre.localeCompare(b.nombre, "es");
 
 /** Los tipos de una marca, por su «Orden» (vacío, al final, por nombre), como en su página. */
-function tiposDe(marca: ItemCatalogo, tipos: TipoCatalogo[]) {
-  return tipos.filter((t) => idDeMarca(t) === marca.id).sort(porOrden);
+function tiposDe(marca: ItemCatalogo, tipos: TipoCatalogo[], enSuOrden = false) {
+  const suyos = tipos.filter((t) => idDeMarca(t) === marca.id);
+  // Repuestos: ya vienen en el orden que arrastró el editor en la marca (2026-11-19).
+  return enSuOrden ? suyos : suyos.sort(porOrden);
 }
 
 /** Acordeón de una marca: «Ver todo» y sus tipos. */
@@ -275,6 +277,7 @@ function grupoDeMarca(
   hrefTipo: (m: string, t: string) => string,
   titulo = marca.nombre,
   conLogo = true,
+  tiposEnSuOrden = false,
 ): GrupoMenu {
   const logo = conLogo ? logoDeMenu(marca.logo, marca.logoOscuroEnMenu) : undefined;
   return {
@@ -282,7 +285,7 @@ function grupoDeMarca(
     ...(logo ? { logo } : {}),
     enlaces: [
       { etiqueta: `Ver todo ${marca.nombre}`, href: conBarra(hrefMarca(marca.slug)) },
-      ...tiposDe(marca, tipos).map((t) => ({
+      ...tiposDe(marca, tipos, tiposEnSuOrden).map((t) => ({
         etiqueta: t.nombre,
         href: conBarra(hrefTipo(marca.slug, segmentoDeTipo(t))),
       })),
@@ -498,7 +501,8 @@ export function enlacePolitica(p: PoliticaMenu | undefined): EnlaceMenu | null {
 }
 
 export function panelRepuestos(d: DatosMegamenu): PanelMenu {
-  const marcas = [...d.marcasRepuestos].sort(porNombre);
+  // En el orden del panel (arrastrando, 2026-11-19): la consulta ya las trae así.
+  const marcas = [...d.marcasRepuestos];
   const categorias = grupoCategoriasTecnicas(d.categoriasTecnicas ?? []);
   const politica = enlacePolitica(d.politicaRepuestos);
   return {
@@ -507,7 +511,9 @@ export function panelRepuestos(d: DatosMegamenu): PanelMenu {
       {
         titulo: "Repuestos por marca",
         enlaces: [{ etiqueta: "Ver todas las marcas", href: conBarra(rutas.marcas()) }],
-        grupos: marcas.map((m) => grupoDeMarca(m, d.tiposRepuestos, rutas.marca, rutas.tipo)),
+        grupos: marcas.map((m) =>
+          grupoDeMarca(m, d.tiposRepuestos, rutas.marca, rutas.tipo, m.nombre, true, true),
+        ),
       },
       ...(categorias ? [categorias] : []),
     ],

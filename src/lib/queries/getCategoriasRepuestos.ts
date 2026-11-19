@@ -17,7 +17,8 @@ export const getCategoriasRepuestos = cache(async (): Promise<CategoriasTecnica[
     collection: "categorias-tecnicas",
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    // En el orden del panel (arrastrando, `orderable`, 2026-11-19).
+    sort: "_order",
   });
   return docs;
 });

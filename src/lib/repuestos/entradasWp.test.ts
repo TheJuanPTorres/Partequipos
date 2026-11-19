@@ -25,11 +25,11 @@ describe("otras entradas de la lista (WordPress tal cual)", () => {
     );
   });
 
-  it("una sin ficha va como texto (href null) y todo se ordena con los números en su orden", () => {
+  it("una sin ficha va como texto (href null) y cada una cae en su sitio con los números en su orden", () => {
     const t = tipo({ otrasEntradas: [{ texto: "Excavadora Caterpillar 326D2" }] });
     const r = conOtrasEntradas(
       t,
-      [modelo(1, "Excavadora CATERPILLAR 330"), modelo(2, "Excavadora CATERPILLAR 32")],
+      [modelo(2, "Excavadora CATERPILLAR 32"), modelo(1, "Excavadora CATERPILLAR 330")],
       () => null,
     );
     assert.deepEqual(

@@ -21,7 +21,7 @@ const baldosasEnCache = unstable_cache(
       depth: 1,
       limit: 0,
       pagination: false,
-      sort: "nombre",
+      sort: "_order",
       select: { nombre: true, colorBaldosa: true, logoBaldosa: true },
       populate: { media: { url: true, filename: true, width: true, height: true } },
     });

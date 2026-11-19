@@ -32,7 +32,8 @@ export const getModelos = cache(async (): Promise<ModelosRepuesto[]> => {
     where: conProductoVisible(),
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    // En el orden de cada tipo (join «Modelos», arrastrando, 2026-11-19).
+    sort: "_modelos-repuesto_modelos_order",
   });
 
   return docs;
@@ -52,7 +53,8 @@ export const getModelosDeMarca = cache(async (marcaId: number): Promise<ModelosR
     where: conProductoVisible({ marca: { equals: marcaId } }),
     depth: 0,
     limit: 0,
-    sort: "nombre",
+    // En el orden de su tipo (join «Modelos» del tipo, arrastrando, 2026-11-19).
+    sort: "_modelos-repuesto_modelos_order",
     select: { nombre: true, slug: true, codigo: true, serie: true, tipo: true, imagenes: true },
   });
   const modelos = docs as ModelosRepuesto[];
@@ -88,7 +90,8 @@ export const getModelosDeTipo = cache(async (tipoId: number): Promise<ModelosRep
     where: conProductoVisible({ tipo: { equals: tipoId } }),
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    // En el orden del tipo (join «Modelos», arrastrando, 2026-11-19).
+    sort: "_modelos-repuesto_modelos_order",
   });
 
   return docs;

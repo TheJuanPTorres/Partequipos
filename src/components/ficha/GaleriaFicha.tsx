@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import estilos from "./ficha.module.css";
+import { sizesDeFoto, type FotoFicha } from "@/lib/ficha/sizesGaleria";
 
 /**
  * GALERÍA DE LA FICHA (ux-9, ficha V2: `uc_slider_image` + `remote_tabs`).
@@ -32,7 +33,7 @@ import estilos from "./ficha.module.css";
  * el dedo. Con movimiento reducido, los cambios son instantáneos.
  */
 
-export type FotoFicha = { url: string; alt: string; width: number; height: number };
+export type { FotoFicha };
 
 const INTERVALO_MS = 5000;
 const MINIATURAS_VISIBLES = 3;
@@ -45,11 +46,18 @@ export function GaleriaFicha({
   nombre,
   sinFondo = false,
   sizesFoto = SIZES_FOTO,
+  altoMovil,
 }: {
   fotos: FotoFicha[];
   nombre: string;
   /** Lo que pinta la foto grande (con `cover`, puede ser más que su caja). */
   sizesFoto?: string;
+  /**
+   * El alto de la foto grande en móvil (≤ 767), si con `cover` se pinta más ancha que la pantalla:
+   * entonces se pide a ese alto × la proporción de cada foto (la CX130D, 400 px de alto: 752 de
+   * ancho a 390, y con «85vw» se pedía a 384). Sin él, el `sizes` tal cual.
+   */
+  altoMovil?: number;
   /** Sin el fondo desenfocado de la tarjeta (ficha de maquinaria nueva, fondo neutro). */
   sinFondo?: boolean;
 }) {
@@ -208,7 +216,7 @@ export function GaleriaFicha({
                   alt={f.alt}
                   fill
                   priority={i === 0}
-                  sizes={sizesFoto}
+                  sizes={sizesDeFoto(sizesFoto, altoMovil, f)}
                   className={estilos.fotoVisor}
                 />
               </li>

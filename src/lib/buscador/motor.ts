@@ -73,20 +73,7 @@ const PRIORIDAD: Record<Clase, number> = {
   blog: 7,
 };
 
-/** Nombre de cada clase para mostrarlo (etiquetas y grupos de resultados). */
-export const ETIQUETA_CLASE: Record<Clase, string> = {
-  marca: "Marcas",
-  nueva: "Maquinaria nueva",
-  usada: "Maquinaria usada",
-  modelo: "Modelos de repuestos",
-  repuestos: "Repuestos",
-  categoria: "Categorías",
-  lubricante: "Lubricantes",
-  servicio: "Servicios",
-  pagina: "Páginas",
-  sede: "Sedes",
-  blog: "Noticias",
-};
+export { ETIQUETA_CLASE } from "./etiquetas";
 
 type Posting = { doc: number; campo: Campo };
 
@@ -436,27 +423,4 @@ function sugerir(indice: Indice, palabrasConsulta: string[], filtros: Filtros): 
   return prueba.total > 0 ? texto : null;
 }
 
-/** Las partes de un texto con lo buscado marcado, para resaltar: [{ texto, marca }]. */
-export function resaltar(texto: string, consulta: string): { texto: string; marca: boolean }[] {
-  const buscadas = terminos(consulta).filter((t) => t.length >= 2);
-  if (buscadas.length === 0) return [{ texto, marca: false }];
-  const partes: { texto: string; marca: boolean }[] = [];
-  const re = /[A-Za-zÀ-ÿ0-9]+/g;
-  let ultimo = 0;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(texto))) {
-    const trozos = plegarTrozos(m[0]);
-    // La palabra del texto se marca si alguna parte suya (letras/números) casa con lo buscado.
-    const casa = trozos.some((t) => buscadas.some((b) => t.startsWith(b) || singular(t) === b));
-    if (!casa) continue;
-    if (m.index > ultimo) partes.push({ texto: texto.slice(ultimo, m.index), marca: false });
-    partes.push({ texto: m[0], marca: true });
-    ultimo = m.index + m[0].length;
-  }
-  if (ultimo < texto.length) partes.push({ texto: texto.slice(ultimo), marca: false });
-  return partes.length ? partes : [{ texto, marca: false }];
-}
-
-function plegarTrozos(palabra: string): string[] {
-  return terminos(palabra);
-}
+export { resaltar } from "./resaltar";

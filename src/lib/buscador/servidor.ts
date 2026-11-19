@@ -1,62 +1,85 @@
-import { unstable_cache } from "next/cache";
+import { fetchAlPreview, origenDePreview } from "@/lib/preview/derivacion.mjs";
 
-import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
-
-import { cargarDocumentos } from "./catalogo";
 import {
   buscarEnIndice,
   crearIndice,
-  type DocBusqueda,
   type Filtros,
   type Indice,
   type RespuestaBusqueda,
 } from "./motor";
+import type { DatosBuscador } from "./datos";
+import { gruposDelPanel } from "./sinonimos";
 
 /**
- * EL ÍNDICE EN EL SERVIDOR (2026-11-18). Los documentos del catálogo van en la caché de datos con
- * la etiqueta `datos:busqueda` (la que invalidan `revalidarIndices` y los ganchos del panel) y una
- * vigencia de una hora como red. El índice invertido se construye una vez por instancia y se
- * reconstruye solo cuando los documentos cambian: cada letra que escribe el visitante es una
- * búsqueda en memoria, sin tocar la base.
+ * EL ÍNDICE EN EL SERVIDOR (2026-11-18). El índice invertido se construye una vez por instancia y se
+ * rehace como mucho cada 30 s: cada letra que escribe el visitante es una búsqueda en memoria.
+ *
+ * DE DÓNDE SALEN LOS DATOS, para que la primera búsqueda no espere (antes ~3 s, casi todo el arranque
+ * de Payload en una instancia fría):
+ *   1. La ruta ESTÁTICA `/api/buscar/precalentar/` (se genera en el build y la sirve la CDN: unas
+ *      decenas de ms, sin Payload ni base de datos). La regenera la etiqueta `datos:busqueda` cuando
+ *      algo cambia en el panel.
+ *   2. Si no está disponible (un preview con la protección de Vercel sin permiso, un fallo de red),
+ *      la caché de datos / la base (`datos.ts`), cargada solo entonces (`import()` dinámico).
  */
 
-const VIGENCIA_DOCUMENTOS = 3600;
+const REFRESCO_MS = 30_000;
+const PAUSA_ESTATICA_MS = 2500;
 
-const documentosEnCache = unstable_cache(
-  cargarDocumentos,
-  ["buscador-documentos", CLAVE_DESPLIEGUE],
-  {
-    revalidate: VIGENCIA_DOCUMENTOS,
-    tags: [ETIQUETAS_DATOS.busqueda],
-  },
-);
+let memoria: { en: number; huella: string; indice: Indice } | null = null;
 
-let memoria: { huella: string; indice: Indice } | null = null;
-
-/** Una huella barata de los documentos: si no cambia, el índice en memoria sigue valiendo. */
-function huellaDe(docs: DocBusqueda[]): string {
+function huellaDe(d: DatosBuscador): string {
   let h = 5381;
-  for (const d of docs) {
-    const s = `${d.id}|${d.titulo}|${d.href}|${d.campos.descripcion ?? ""}|${d.campos.specs ?? ""}`;
+  for (const x of d.docs) {
+    const s = `${x.id}|${x.titulo}|${x.href}|${x.campos.descripcion ?? ""}|${x.campos.specs ?? ""}`;
     for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
   }
-  return `${docs.length}:${h}`;
+  return `${d.docs.length}:${h}|${d.sinonimos}`;
 }
 
-export async function indiceActual(): Promise<Indice> {
-  const docs = await documentosEnCache();
-  const huella = huellaDe(docs);
-  if (memoria?.huella === huella) return memoria.indice;
-  const indice = crearIndice(docs);
-  memoria = { huella, indice };
+async function desdeLaRutaEstatica(origen: string): Promise<DatosBuscador | null> {
+  try {
+    const url = new URL("/api/buscar/precalentar/", origen).toString();
+    // En un preview lleva el permiso de derivación (solo al propio origen del preview).
+    const opciones = { signal: AbortSignal.timeout(PAUSA_ESTATICA_MS) };
+    const r = origenDePreview(origen)
+      ? await fetchAlPreview(
+          url,
+          origen,
+          process.env.VERCEL_AUTOMATION_BYPASS_SECRET ?? "",
+          opciones,
+        )
+      : await fetch(url, opciones);
+    if (!r.ok) return null;
+    const d = (await r.json()) as Partial<DatosBuscador>;
+    return Array.isArray(d.docs) ? { docs: d.docs, sinonimos: d.sinonimos ?? "" } : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function indiceActual(origen?: string): Promise<Indice> {
+  const ahora = Date.now();
+  if (memoria && ahora - memoria.en < REFRESCO_MS) return memoria.indice;
+  const datos =
+    (origen ? await desdeLaRutaEstatica(origen) : null) ??
+    (await (await import("./datos")).datosDelBuscador());
+  const huella = huellaDe(datos);
+  if (memoria?.huella === huella) {
+    memoria.en = ahora;
+    return memoria.indice;
+  }
+  const indice = crearIndice(datos.docs, gruposDelPanel(datos.sinonimos));
+  memoria = { en: ahora, huella, indice };
   return indice;
 }
 
-/** Busca en el catálogo publicado. */
+/** Busca en el catálogo publicado. `origen`: el de la petición (para tomar los datos de la ruta estática). */
 export async function buscarEnCatalogo(
   consulta: string,
   filtros: Filtros = {},
   limite = 200,
+  origen?: string,
 ): Promise<RespuestaBusqueda> {
-  return buscarEnIndice(await indiceActual(), consulta, filtros, limite);
+  return buscarEnIndice(await indiceActual(origen), consulta, filtros, limite);
 }

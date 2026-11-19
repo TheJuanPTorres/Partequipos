@@ -159,6 +159,23 @@ export default function PanelBuscador({
     };
   }, [texto, clave, porTexto]);
 
+  // Sin resultados tras dejar de escribir: se avisa al servidor (una vez por texto) para el registro
+  // de «Búsquedas sin resultado» del panel. Solo viaja el texto, que el servidor vuelve a comprobar.
+  const avisados = useRef(new Set<string>());
+  const sinResultados = texto.length >= 3 && datos !== null && datos.total === 0;
+  useEffect(() => {
+    if (!sinResultados || avisados.current.has(clave)) return;
+    const t = setTimeout(() => {
+      avisados.current.add(clave);
+      fetch("/api/buscar/registro/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ q: texto }),
+      }).catch(() => {});
+    }, 900);
+    return () => clearTimeout(t);
+  }, [sinResultados, clave, texto]);
+
   const items = texto.length >= 2 && datos ? datos.resultados : [];
   const hayExacto = texto.length >= 2 && datos?.exacto;
   // Orden de lectura: las filas que se pueden elegir con las flechas.

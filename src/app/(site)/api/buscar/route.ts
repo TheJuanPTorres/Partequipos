@@ -40,7 +40,7 @@ export async function GET(peticion: NextRequest) {
   };
   // La lupa lo pide al abrirse: carga el índice antes de que se escriba la primera letra.
   if (p.get("calentar")) {
-    await indiceActual();
+    await indiceActual(peticion.nextUrl.origin);
     return NextResponse.json({ ok: true }, { headers: { "X-Robots-Tag": "noindex" } });
   }
   if (consulta.estado === "vacia") {
@@ -58,7 +58,7 @@ export async function GET(peticion: NextRequest) {
   if (clase && CLASES.has(clase)) filtros.clase = clase;
   const limite = Math.min(200, Math.max(1, Number(p.get("limite")) || 8));
 
-  const r = await buscarEnCatalogo(consulta.texto, filtros, limite);
+  const r = await buscarEnCatalogo(consulta.texto, filtros, limite, peticion.nextUrl.origin);
   return NextResponse.json(
     {
       ...r,

@@ -62,6 +62,13 @@ export const CategoriaTecnica: CollectionConfig = {
     defaultColumns: ["nombre", "slug"],
     group: "Repuestos",
   },
+  /*
+   * ORDEN POR ARRASTRE (2026-11-19, dirección; informe del panel §6): sustituye a «Posición en
+   * las páginas de repuestos» (`ordenMarca`); la migración parte de ese orden (vacíos al final,
+   * por nombre). `ordenMarca` sigue hasta que D pase sus consultas a `_order` (§6.3).
+   * «Posición en la portada» (`ordenPortada`) se queda: además decide si sale en la portada.
+   */
+  orderable: true,
   access: {
     read: lecturaContenido,
     create: escrituraContenido,

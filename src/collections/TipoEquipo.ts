@@ -1,4 +1,5 @@
 import type { CollectionConfig, Where } from "payload";
+import { joinsSoloEnElPanel } from "./hooks/joinsSoloEnElPanel";
 import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { seoField } from "../lib/fields/seoField";
@@ -38,6 +39,7 @@ export const TipoEquipo: CollectionConfig = {
   indexes: [{ fields: ["marca", "slug"], unique: true }],
   // ISR: revalida el tipo, la página de su marca y las fichas de sus modelos.
   hooks: {
+    beforeOperation: [joinsSoloEnElPanel],
     beforeValidate: [slugPadreDelTipo],
     afterChange: [slugPadreDeLosHijos, revalidarTipo, menu.afterChange],
     afterDelete: [revalidarTipoBorrado, menu.afterDelete],
@@ -212,6 +214,25 @@ export const TipoEquipo: CollectionConfig = {
         admin: {
           description:
             "Las categorías de repuestos que se muestran en la página de cada modelo de este tipo, en este orden. Vacío: no se muestra ninguna.",
+        },
+      },
+      /*
+       * LOS MODELOS DEL TIPO, EN SU ORDEN (2026-11-19): se arrastran aquí (join ordenable, el orden
+       * es de cada tipo). Con series, los modelos se agrupan por serie y dentro de cada una van en
+       * este orden. Va en la pestaña «Contenido». Solo se rellena en el panel (`joinsSoloEnElPanel`).
+       */
+      {
+        name: "modelos",
+        type: "join",
+        collection: "modelos-repuesto",
+        on: "tipo",
+        orderable: true,
+        defaultLimit: 100,
+        label: "Modelos del tipo",
+        admin: {
+          defaultColumns: ["nombre", "codigo", "serie", "mostrarEnWeb"],
+          description:
+            "En el orden en que salen en la web. Arrastra las filas para cambiarlo; un modelo nuevo entra al final.",
         },
       },
       seoField(),

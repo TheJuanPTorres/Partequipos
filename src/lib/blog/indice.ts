@@ -30,6 +30,8 @@ export type ArticuloLista = {
   titulo: string;
   /** ISO, la fecha que ordena el blog. */
   fecha: string;
+  /** «Fijar arriba» del panel: va antes que los no fijados. */
+  fijado: boolean;
   /** Unos 100 caracteres, cortados en una palabra. */
   extracto: string;
   imagen: ImagenLista | null;
@@ -109,7 +111,9 @@ export const CATALOGO_BLOG: Catalogo<ArticuloLista> = {
     {
       valor: "recientes",
       etiqueta: "Más recientes",
-      comparar: (a, b) => b.fecha.localeCompare(a.fecha) || b.id - a.id,
+      // Los fijados («Fijar arriba») primero; dentro de cada grupo, lo más reciente primero.
+      comparar: (a, b) =>
+        Number(b.fijado) - Number(a.fijado) || b.fecha.localeCompare(a.fecha) || b.id - a.id,
     },
   ],
 };

@@ -57,7 +57,13 @@
 :root {
   --pq-background: oklch(0.9911 0 112.86); /* #fcfcfc */
   --pq-foreground: oklch(0 0 0); /* #000000 */
-  --pq-primary: oklch(0.577 0.215 27.33); /* #dc2626 */
+  /*
+   * ROJO DE MARCA (organización del panel, PR 10, 2026-11-19; plan §7): el de la «P» del logo y de
+   * la web, #D92035, en lugar del #dc2626 del sistema del cliente. Blanco encima 4,99:1 (AA),
+   * sobre el fondo claro 4,86:1, y su texto claro #fef2f2 4,56:1 (con el anterior, 4,41).
+   * Antes: oklch(0.577 0.215 27.33), #dc2626.
+   */
+  --pq-primary: oklch(0.5698 0.2145 22.9); /* #d92035 */
   --pq-primary-foreground: oklch(0.971 0.013 17.49); /* #fef2f2 */
   --pq-secondary: oklch(0.96 0 112.93); /* #f2f2f2 */
   --pq-secondary-foreground: oklch(0.2046 0 112.89); /* #171717 */
@@ -115,7 +121,7 @@
   /*
    * Texto sobre --pq-primary. DESVIACIÓN APROBADA del sistema: su
    * --primary-foreground (#fef2f2) da 4,41:1 sobre #dc2626, por debajo del
-   * 4,5:1 de AA para texto normal. Blanco puro da 4,83:1. Se declara como token
+   * 4,5:1 de AA para texto normal. Blanco puro da 4,83:1 (4,99 con el rojo de marca, PR 10). Se declara como token
    * propio y NO se sobrescribe --pq-primary-foreground, para que el valor del
    * cliente siga siendo trazable. Ver docs/design-tokens.md §8.
    */
@@ -256,7 +262,7 @@ $posiciones: (
    * Se cambia a --pq-primary y NO a --pq-ring, que es lo que pediría la
    * convención, por una razón medida: --pq-ring (#a1a1a1) da 2,52:1 contra el
    * fondo y WCAG 1.4.11 exige 3:1 para indicadores no textuales.
-   * --pq-primary da 4,71:1. Desviación deliberada, documentada en
+   * --pq-primary da 4,71:1 (4,86 con el rojo de marca, PR 10). Desviación deliberada, documentada en
    * docs/design-tokens.md.
    * ------------------------------------------------------------------- */
   --accessibility-outline: 2px solid var(--pq-primary);
@@ -337,7 +343,7 @@ $pasos-estado: 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 7
  * rojo. Así que la marca se aplica acotada a la clase del botón, que expone sus
  * propias variables (@payloadcms/ui/dist/elements/Button/index.scss).
  *
- * CONTRASTE: el texto usa --pq-on-primary (blanco, 4,83:1) y no el
+ * CONTRASTE: el texto usa --pq-on-primary (blanco, 4,99:1 con el rojo de marca) y no el
  * --primary-foreground del sistema (4,41:1). Ver el apartado 1.
  *
  * El hover se oscurece mezclando con NEGRO y no con --pq-foreground: en modo
@@ -655,7 +661,7 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 /*
  * FOCO. Forma del sistema (halo de 3 px) en el color PRIMARIO, no en --ring:
  * --ring da 2,52:1 y al 30 % queda muy por debajo del 3:1. El indicador que
- * cumple es el BORDE primario (4,71:1 claro · 3,88:1 oscuro); el halo es solo
+ * cumple es el BORDE primario (4,86:1 claro · 3,75:1 oscuro, con el rojo de marca); el halo es solo
  * refuerzo visual.
  */
 /* Una pseudoclase o clase de estado más que el reposo: gana sin repetir nada. */
@@ -978,7 +984,7 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   padding-inline: 6px;
   border-radius: 999px;
   background: var(--pq-primary);
-  color: var(--pq-primary-foreground);
+  color: var(--pq-on-primary);
   font-size: 11px;
   font-weight: 600;
   line-height: 18px;
@@ -993,7 +999,7 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
 
 /*
  * FOCO. Payload solo subraya. Decisión ya tomada: forma del sistema en color
- * accesible, así que contorno primario (4,71:1 claro · 3,88:1 oscuro) en vez
+ * accesible, así que contorno primario (4,86:1 claro · 3,75:1 oscuro, con el rojo de marca) en vez
  * del anillo del sistema.
  */
 .nav a.nav__link:focus-visible {
@@ -1447,7 +1453,7 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
       overflow: hidden;
       border-radius: min(var(--pq-radius-4xl), 24px);
       /* Respaldo si no hay imagen en Media: rojo de marca hacia negro. */
-      background: radial-gradient(120% 80% at 50% 0%, #c81e1e 0%, #6b0d0d 45%, #140404 100%);
+      background: radial-gradient(120% 80% at 50% 0%, #d92035 0%, #6b0d0d 45%, #140404 100%);
       box-shadow: 0 0 0 1px color-mix(in oklab, var(--pq-foreground) 10%, transparent);
 
       &::after {
@@ -1890,10 +1896,15 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
     gap: 6px;
     align-items: center;
     min-height: 24px;
-    color: var(--pq-primary);
+    /* Texto en el color del texto: el rojo sobre el fondo oscuro da 3,75:1 (no llega a AA). */
+    color: var(--pq-foreground);
     font-size: 14px;
     font-weight: 500;
     text-underline-offset: 3px;
+
+    svg {
+      color: var(--pq-primary);
+    }
   }
 
   &__ver-todas {

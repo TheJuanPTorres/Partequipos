@@ -127,6 +127,10 @@ transformando el OKLCH original en la compilación. Consecuencia:
   `--destructive` desde el valor OKLCH de gama amplia. **No es un error de la
   extracción: son dos rojos distintos.** Lo confirma que
   `--sidebar-primary` en modo claro es literalmente `#dc2626`.
+- **En el panel, desde el 2026-11-19 (organización del panel, PR 10), `--pq-primary` es el rojo
+  de marca `#D92035`** (el de la «P» del logo y de la web), no el `#dc2626` del sistema. La tabla
+  de abajo sigue siendo la del sistema del cliente. Contrastes y motivo:
+  `docs/diseno/decisiones-panel.md` §36.
 
 **El hex es el dato duro** (es lo que se pinta). El OKLCH es la forma canónica.
 

@@ -172,6 +172,11 @@ export default buildConfig({
        */
       Nav: "/components/admin/Nav",
       /*
+       * Traduce los avisos emergentes que Payload escribe en inglés en su código (el de reordenar
+       * filas del orden por arrastre, errores de petición): `src/lib/panel/avisosEnIngles.ts`.
+       */
+      providers: ["/components/admin/TraducirAvisos"],
+      /*
        * Pantalla de acceso con el diseño `login-screen` del sistema del cliente.
        * La autenticación sigue siendo la de Payload; ver el componente y
        * docs/diseno/decisiones-panel.md §17.

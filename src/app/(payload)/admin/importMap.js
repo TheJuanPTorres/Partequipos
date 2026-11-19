@@ -55,6 +55,7 @@ import { default as default_2f74b216bdaff3354c93592e0c5fa496 } from '../../../co
 import { default as default_965175d01b56876a09418037afb35340 } from '../../../components/admin/Nav'
 import { default as default_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { default as default_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
+import { default as default_426d496ad050846e3e363b775e19801e } from '../../../components/admin/TraducirAvisos'
 import { ManejadorSubidaDirecta as ManejadorSubidaDirecta_50ab0ed780cf9cdd6f7f88ce54f9a956 } from '../../../components/admin/ManejadorSubidaDirecta'
 import { default as default_f96219a7d8f8d4b4be2a5fe5a468a16d } from '../../../components/admin/acceso/Acceso'
 import { default as default_c67881d3814123d86ea324bd8f04842d } from '../../../components/admin/portada/Portada'
@@ -120,6 +121,7 @@ export const importMap = {
   "/components/admin/Nav#default": default_965175d01b56876a09418037afb35340,
   "/components/admin/Icon#default": default_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#default": default_91a09b539d3c86b0aebf520e7564ce08,
+  "/components/admin/TraducirAvisos#default": default_426d496ad050846e3e363b775e19801e,
   "/components/admin/ManejadorSubidaDirecta#ManejadorSubidaDirecta": ManejadorSubidaDirecta_50ab0ed780cf9cdd6f7f88ce54f9a956,
   "/components/admin/acceso/Acceso#default": default_f96219a7d8f8d4b4be2a5fe5a468a16d,
   "/components/admin/portada/Portada#default": default_c67881d3814123d86ea324bd8f04842d,

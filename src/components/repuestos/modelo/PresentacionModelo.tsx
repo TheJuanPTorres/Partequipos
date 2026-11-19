@@ -56,7 +56,12 @@ export function PresentacionModelo({
             />
           ) : logo ? (
             <span className={estilos.logoGrande} aria-hidden="true">
-              <LogoMarca logo={logo} alt="" sizes="420px" className={estilos.logoGrandeImg} />
+              <LogoMarca
+                logo={logo}
+                alt=""
+                sizes="max(420px, 26.25vw)"
+                className={estilos.logoGrandeImg}
+              />
             </span>
           ) : null}
         </div>

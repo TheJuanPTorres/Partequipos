@@ -56,7 +56,7 @@ export function BaldosasCategorias({
                       alt=""
                       width={c.imagen.width}
                       height={c.imagen.height}
-                      sizes="(max-width: 767px) 40vw, 200px"
+                      sizes="(max-width: 767px) 40vw, max(200px, 12.5vw)"
                       className={estilos.baldosaFotoImg}
                     />
                   ) : null}
@@ -97,7 +97,7 @@ export function BaldosasCategorias({
                       alt=""
                       width={c.imagen.width}
                       height={c.imagen.height}
-                      sizes="(max-width: 767px) 40vw, (max-width: 1024px) 28vw, 220px"
+                      sizes="(max-width: 767px) 40vw, (max-width: 1024px) 28vw, max(220px, 13.75vw)"
                       className={estilos.baldosaFotoImg}
                     />
                   ) : null}

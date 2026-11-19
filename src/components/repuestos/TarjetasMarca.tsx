@@ -154,7 +154,7 @@ export function RejillaTarjetas({
                     logo={t.pieza}
                     caja={CAJA_PIEZA}
                     alt=""
-                    sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, min(25vw, 350px)"
+                    sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, min(25vw, max(350px, 21.875vw))"
                     className={estilos.piezaCaja}
                     umbral={UMBRAL_PIEZA}
                   />
@@ -166,7 +166,7 @@ export function RejillaTarjetas({
                   logo={t.logo}
                   alt=""
                   fill
-                  sizes="(max-width: 767px) 125vw, (max-width: 1024px) 56vw, min(42vw, 800px)"
+                  sizes="(max-width: 767px) 125vw, (max-width: 1024px) 56vw, min(42vw, max(800px, 50vw))"
                   className={`${estilos.fotoImg} ${estilos.fotoLogo}`}
                 />
               </div>
@@ -176,7 +176,7 @@ export function RejillaTarjetas({
                   src={t.imagen.url}
                   alt=""
                   fill
-                  sizes="(max-width: 767px) 125vw, (max-width: 1024px) 56vw, min(42vw, 800px)"
+                  sizes="(max-width: 767px) 125vw, (max-width: 1024px) 56vw, min(42vw, max(800px, 50vw))"
                   className={estilos.fotoImg}
                   style={{ objectPosition: t.imagen.posicion }}
                 />

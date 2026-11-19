@@ -20,7 +20,7 @@ import estilos from "./sedes.module.css";
  * - La atribución y el logo de Mapbox se ven (ux-9 los ocultaba).
  * - Sin token, lista en rejilla en vez de globo.
  */
-const SIZES_FOTO = "(max-width: 479px) 80vw, (max-width: 991px) 80vw, 416px";
+const SIZES_FOTO = "(max-width: 479px) 80vw, (max-width: 991px) 80vw, max(416px, 26vw)";
 
 function Ficha({ sede, i }: { sede: SedeLista; i: number }) {
   const idTitulo = `portada-sede-${i + 1}`;

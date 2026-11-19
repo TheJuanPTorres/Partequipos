@@ -99,7 +99,7 @@ export function CuerpoArticulo({ data }: { data: unknown }) {
               alt={pie ? "" : (media.alt ?? "")}
               width={media.width}
               height={media.height}
-              sizes="(min-width: 1025px) 720px, calc(100vw - 40px)"
+              sizes="(min-width: 1025px) max(720px, 45vw), calc(100vw - 40px)"
               className={estilos.imagenCuerpo}
             />
             {pie ? <figcaption>{pie}</figcaption> : null}

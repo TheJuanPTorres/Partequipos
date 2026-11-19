@@ -97,7 +97,7 @@ function Tarjeta({ aliada: a }: { aliada: TarjetaAliada }) {
             alt=""
             width={a.logo.width}
             height={a.logo.height}
-            sizes="200px"
+            sizes="max(200px, 12.5vw)"
             className={estilos.logoImagen}
           />
         ) : (

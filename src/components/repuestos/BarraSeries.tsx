@@ -15,6 +15,7 @@ import type { LogoConAlt } from "@/lib/marca/logoMarca";
 import { CAJA_GRANDE, CAJA_NORMAL } from "@/lib/marca/tamanoOptico";
 
 import mejoras from "./mejoras.module.css";
+import { escalaPx } from "@/lib/estilos/escala";
 
 /**
  * R2 (dirección, 2026-10-21): la BARRA DE SERIES de la página de tipo de repuestos. Va dentro de
@@ -99,7 +100,7 @@ export function BarraSeries({
         return;
       }
       // La serie llega 40 px bajo la barra (32 en móvil, `scroll-margin-top`): margen de sobra.
-      const limite = (barra.current?.getBoundingClientRect().bottom ?? 0) + 64;
+      const limite = (barra.current?.getBoundingClientRect().bottom ?? 0) + escalaPx(64);
       let elegida: string | null = null;
       for (const s of series) {
         const g = document.getElementById(s.ancla);

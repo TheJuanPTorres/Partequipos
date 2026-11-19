@@ -65,7 +65,7 @@ export function CompromisoAditamentos({
               alt={imagen.alt}
               width={imagen.width}
               height={imagen.height}
-              sizes="(max-width: 767px) 92vw, (max-width: 1680px) 45vw, 760px"
+              sizes="(max-width: 767px) 92vw, (max-width: 1680px) 45vw, max(760px, 47.5vw)"
               className={estilos.fotoImg}
               style={{ objectPosition: imagen.posicion }}
             />

@@ -39,7 +39,7 @@ import estilos from "./nuevaKit.module.css";
 
 /** Ancho pintado de la máquina de la tarjeta: 72 % / 40 % / 30 % del ancho en tira; ⅕ de ≤ 1680 px. */
 const SIZES_TARJETA =
-  "(max-width: 639px) 70vw, (max-width: 767px) 40vw, (max-width: 1023px) 30vw, (max-width: 1680px) 18vw, 320px";
+  "(max-width: 639px) 70vw, (max-width: 767px) 40vw, (max-width: 1023px) 30vw, (max-width: 1680px) 18vw, max(320px, 20vw)";
 
 export type TextosNueva = {
   antetitulo: string;
@@ -103,7 +103,7 @@ export function SeccionNuevaKit({
                 src={maquina.url}
                 alt=""
                 fill
-                sizes="(max-width: 1023px) 1px, (max-width: 1680px) 44vw, 740px"
+                sizes="(max-width: 1023px) 1px, (max-width: 1680px) 44vw, max(740px, 46.25vw)"
                 quality={90}
                 className={estilos.contener}
               />
@@ -212,7 +212,7 @@ function LogoTarjeta({ logo, conDistribuidor }: { logo: LogoConAlt; conDistribui
             height: pct(imagen.alto, visible.alto),
           }}
         >
-          <LogoMarca logo={logo} alt={logo.alt} fill sizes="300px" />
+          <LogoMarca logo={logo} alt={logo.alt} fill sizes="max(300px, 18.75vw)" />
         </span>
       </span>
     </span>
@@ -256,7 +256,7 @@ function Tarjeta({ marca: m, paisaje }: { marca: TarjetaMarca; paisaje: ImagenLi
                 <LogoMarca
                   logo={m.distribuidor.logo}
                   alt={m.distribuidor.nombre}
-                  sizes="120px"
+                  sizes="max(120px, 7.5vw)"
                   className={estilos.logoDistribuidor}
                 />
               ) : (

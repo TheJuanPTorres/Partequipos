@@ -278,12 +278,34 @@ docs/
   regla fija de Juan Pablo, 2026-11-12, para todos los agentes):
   - **`--espacio-seccion`** (24–48 px): el hueco ENTRE dos secciones, una sola
     vez. Lo mide `npm run qa:huecos`.
-  - **`--espacio-interno`** (16 px a 390, 22 a 768 y 32 como mucho desde
-    1125 px, también en pantallas gigantes): los huecos DENTRO de una sección:
-    del título al contenido, del contenido al borde de su contenedor y de los
-    botones al borde. También es el hueco sobre el bloque rojo del pie.
+  - **`--espacio-interno`** (16 px a 390, 22 a 768 y 32 desde 1125 px): los
+    huecos DENTRO de una sección: del título al contenido, del contenido al
+    borde de su contenedor y de los botones al borde. También es el hueco sobre
+    el bloque rojo del pie.
   - Nada que crezca con `vw`, `vh`, `%` o `min-height` sin techo, y nada debe
     tocarse ni cortarse (texto, máquinas, botones).
+- **Pantallas grandes: escala proporcional desde 1600 px** (Juan Pablo,
+  2026-11-18; sustituye al «techo en pantallas gigantes»). Desde 1600 px de
+  ventana, la página es el diseño de 1600 ampliado: contenedores, letra,
+  botones, iconos y huecos crecen en proporción (×2,4 a 3840). Por debajo de
+  1600 no cambia nada.
+  - **Cómo:** se escribe en `px`, como siempre. El plugin
+    `src/lib/estilos/escalaPostcss.mjs` (en `postcss.config.mjs`) pasa cada
+    `Npx` del CSS del sitio a `calc(N * var(--escala-px, 1px))`, con
+    `--escala-px: max(1px, 100vw / 1600)` en `globals.css`; la letra raíz crece igual,
+    así que los `rem` de Tailwind también. No toca las condiciones de `@media`
+    ni de `@container`, el panel ni `node_modules`.
+  - **Sin reglas de `@media` por encima de 1600** que cambien la composición
+    (más columnas, otro techo): desde 1600 manda la escala.
+  - **Fotos:** un `sizes` con un ancho fijo se escribe
+    `max(Npx, <N/16>vw)` (`sizesEscalado` en `src/lib/estilos/escala.ts`),
+    para que pida el tamaño escalado.
+  - **JavaScript:** lo que se mide en el DOM ya viene escalado; una constante
+    en píxeles que sea geometría de la página (márgenes al desplazar,
+    recorridos de una animación) pasa por `escalaPx`.
+  - Los iconos de Tabler escalan con `globals.css`. Una `<img>` o un `<svg>`
+    con su tamaño solo en los atributos `width`/`height` NO escala: dale
+    tamaño en CSS.
 - Sin `console.log` en el código entregado. Los errores van a `console.error`
   con prefijo de área (`[revalidación]`, `[redirects]`, `[proxy]`), y de ahí a
   los **registros de Vercel**. **NO hay Sentry** (§10.31), así que nadie recibe

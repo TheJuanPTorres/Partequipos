@@ -47,7 +47,7 @@ export function TarjetaModelo({
           logo={logo}
           caja={CAJA_LOGO_TARJETA}
           alt=""
-          sizes="152px"
+          sizes="max(152px, 9.5vw)"
           alinear="izquierda"
           className={estilos.logo}
         />

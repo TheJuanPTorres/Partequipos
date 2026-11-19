@@ -70,7 +70,7 @@ export function TarjetasGrupos({
                     src={g.imagen.url}
                     alt=""
                     fill
-                    sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, 400px"
+                    sizes="(max-width: 767px) 100vw, (max-width: 1024px) 45vw, max(400px, 25vw)"
                     className={`${estilos.fotoImg} ${estilos.fotoProducto}`}
                   />
                 </div>

@@ -156,7 +156,7 @@ export function GaleriaFicha({
             src={foto.url}
             alt=""
             fill
-            sizes="64px"
+            sizes="max(64px, 4vw)"
             className={estilos.fondoFoto}
           />
         </div>
@@ -265,7 +265,7 @@ export function GaleriaFicha({
                       src={f.url}
                       alt=""
                       fill
-                      sizes="(max-width: 767px) 30vw, 180px"
+                      sizes="(max-width: 767px) 30vw, max(180px, 11.25vw)"
                       className={estilos.fotoMiniatura}
                     />
                   </button>

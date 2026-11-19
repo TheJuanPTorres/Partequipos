@@ -79,7 +79,7 @@ export function RecuadroAsesoria({
               alt=""
               width={imagenContacto.width}
               height={imagenContacto.height}
-              sizes="(min-width: 1025px) 430px, (min-width: 768px) 305px, 210px"
+              sizes="(min-width: 1025px) max(430px, 26.875vw), (min-width: 768px) max(305px, 19.062vw), max(210px, 13.125vw)"
               className={estilos.fotoContacto}
             />
           ) : null}

@@ -733,3 +733,34 @@ section.principal[data-con-izquierda] {
 section.principal[data-con-kit] {
   scroll-margin-top: 110px;
 }
+
+/*
+ * MUESTRA DE PANTALLAS GRANDES, OPCIÓN 1 (fase 1, 2026-11-18, solo con `?ancho=1` en un preview):
+ * contenedores más anchos. Desde 1700 px el tope de `.pagina` sube de 1680 a 3200 y el margen
+ * lateral es proporcional (3 % sin techo); las «Otras» ganan columnas (4 desde 1920, 5 desde 2560)
+ * y los textos largos conservan su ancho de lectura (la descripción, 650 px; el formulario, el suyo).
+ */
+@media (min-width: 1700px) {
+  :global(html[data-ancho="1"]) .paginaAncha {
+    padding-inline: max(0px, calc((100% - 3200px) / 2));
+    --ficha-margen: 3cqi;
+  }
+}
+
+@media (min-width: 1920px) {
+  :global(html[data-ancho="1"]) .paginaAncha .rejilla {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  :global(html[data-ancho="1"]) .paginaAncha .rejilla > .tarjeta {
+    flex: 0 1 calc((100% - 3 * 20px) / 4);
+  }
+}
+
+@media (min-width: 2560px) {
+  :global(html[data-ancho="1"]) .paginaAncha .rejilla > .tarjeta {
+    flex-basis: calc((100% - 4 * 20px) / 5);
+  }
+}

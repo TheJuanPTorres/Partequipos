@@ -142,6 +142,8 @@ type Props = {
   } | null;
 };
 
+const SCRIPT_MUESTRA_ANCHO = `(function(){try{var v=new URLSearchParams(location.search).get("ancho");if(v!=="1"&&v!=="2")return;var d=document.documentElement;d.setAttribute("data-ancho",v);if(v==="2"){var e=document.createElement("style");e.textContent="body{zoom:var(--escala,1)}";document.head.appendChild(e);var f=function(){d.style.setProperty("--escala",String(Math.max(1,innerWidth/1600)))};f();addEventListener("resize",f)}}catch(e){}})()`;
+
 export function FichaNueva({
   nombre,
   tituloEscritorio,
@@ -385,10 +387,21 @@ ${tituloEscritorio.modelo}`}
    * fuera del tope de ancho de `.pagina` (antes se quedaba en 1632 px desde 1920). El cuerpo sigue
    * dentro, con su tope y sus `cqi` de siempre.
    */
+  /*
+   * MUESTRA DE PANTALLAS GRANDES (fase 1, 2026-11-18, SOLO EN UN PREVIEW): `?ancho=1` pone
+   * `data-ancho="1"` en `<html>` (contenedores más anchos) y `?ancho=2` pone `data-ancho="2"` y
+   * `--escala` (todo crece en proporción desde 1600 px). En el sitio publicado no se pinta.
+   */
+  const muestraAncho =
+    process.env.VERCEL_ENV === "production" ? null : (
+      <script dangerouslySetInnerHTML={{ __html: SCRIPT_MUESTRA_ANCHO }} />
+    );
+
   if (kit) {
     return (
       <main className={nueva.paginaKit}>
         {jsonLd}
+        {muestraAncho}
         {/* La ficha ya tiene su llamada a la acción: el pie no pinta la tarjeta roja. */}
         <PieSinTarjeta />
         <div
@@ -412,14 +425,15 @@ ${tituloEscritorio.modelo}`}
             }
           />
         </div>
-        <div className={estilos.pagina}>{cuerpo}</div>
+        <div className={`${estilos.pagina} ${nueva.paginaAncha}`}>{cuerpo}</div>
       </main>
     );
   }
 
   return (
-    <main className={estilos.pagina}>
+    <main className={`${estilos.pagina} ${nueva.paginaAncha}`}>
       {jsonLd}
+      {muestraAncho}
       {/* La ficha ya tiene su llamada a la acción: el pie no pinta la tarjeta roja. */}
       <PieSinTarjeta />
       {cuerpo}

@@ -113,7 +113,7 @@ export function avisosDePortada(d: DatosAvisos): AvisoPortada[] {
     avisos.push({
       clave: "fotos-pequenas",
       tono: "aviso",
-      texto: `${d.fotosPequenas} ${plural(d.fotosPequenas, "foto de las galerías de las fichas mide", "fotos de las galerías de las fichas miden")} menos de ${formatoMiles.format(ANCHO_MINIMO)} px de ancho: en pantallas grandes se ven borrosas.`,
+      texto: `${formatoMiles.format(d.fotosPequenas)} ${plural(d.fotosPequenas, "foto de las galerías de las fichas mide", "fotos de las galerías de las fichas miden")} menos de ${formatoMiles.format(ANCHO_MINIMO)} px de ancho: en pantallas grandes se ven borrosas.`,
       enlace: { href: rutaLista("media", FILTRO_FOTOS_PEQUENAS), texto: "Ver las pequeñas" },
     });
   }

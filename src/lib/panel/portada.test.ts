@@ -131,7 +131,7 @@ describe("avisos nuevos de la fase 2 (PR 6)", () => {
     const avisos = avisosDePortada({
       ...base,
       etiquetas: { "equipos-usados": "Equipos usados", "equipos-nuevos": "Equipos nuevos" },
-      fotosPequenas: 12,
+      fotosPequenas: 1629,
       sinDescripcion: { "equipos-usados": 4 },
       sinSeo: { "equipos-nuevos": 101 },
       busquedasSinResultado: 1,
@@ -151,7 +151,7 @@ describe("avisos nuevos de la fase 2 (PR 6)", () => {
     );
     assert.equal(
       avisos[0]?.texto,
-      "12 fotos de las galerías de las fichas miden menos de 1.200 px de ancho: en pantallas grandes se ven borrosas.",
+      "1.629 fotos de las galerías de las fichas miden menos de 1.200 px de ancho: en pantallas grandes se ven borrosas.",
     );
     assert.equal(avisos[0]?.enlace?.href, "/admin/collections/media?where[width][less_than]=1200");
     assert.equal(avisos[1]?.texto, "4 fichas de equipos usados sin descripción.");

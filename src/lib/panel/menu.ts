@@ -115,6 +115,8 @@ export const ETIQUETAS_DEL_MENU: Record<string, string> = {
   documentos: "Documentos",
   videos: "Vídeos",
   seo: "Buscadores e imágenes del sitio",
+  buscador: "Buscador del sitio (sinónimos)",
+  "busquedas-sin-resultado": "Búsquedas sin resultado",
   "correo-formularios": "Correo de los formularios",
   redirects: "Redirecciones",
   users: "Usuarios",

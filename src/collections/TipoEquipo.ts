@@ -25,7 +25,6 @@ export const TipoEquipo: CollectionConfig = {
   },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "marca", "slug"],
     group: "Repuestos",
   },
   access: {

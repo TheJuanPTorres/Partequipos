@@ -5,13 +5,15 @@ import type { CollectionConfig, Field } from "payload";
  * `2026-11-18-panel-organizacion-fase1.md` §5): qué columnas salen por defecto en la lista de cada
  * colección y por qué campos busca su buscador. Una sola tabla para todas, aplicada en
  * `payload.config.ts` con `conListados`: así un cambio de columnas no toca la colección (ni choca
- * con quien trabaja en sus campos). Lo que diga aquí MANDA sobre `defaultColumns` y
- * `listSearchableFields` de la colección. Sin esquema.
+ * con quien trabaja en sus campos). Es el ÚNICO sitio de `defaultColumns` y `listSearchableFields`
+ * de estas colecciones: las suyas propias se quitaron (2026-11-19). Sin esquema.
  *
  * - La primera columna es la imagen cuando la hay: las de subida sin celda propia se pintan como
  *   miniatura (`CeldaMiniatura`, la de la F3).
  * - «Mostrar en la web» ya trae su insignia (`mostrarEnWeb.ts`).
- * - El orden por arrastre (`orderable`, de B) añade su asa solo; no hace falta columna.
+ * - El orden por arrastre (`orderable`, de B) añade su asa solo; no hace falta columna. El campo
+ *   «Orden» antiguo ya no lo lee la web (#514), así que no sale como columna.
+ * - El código («320D») va en el buscador: es como busca un comercial; el nombre solo no basta.
  * - Cada columna y cada campo de búsqueda tiene que existir (`listados.test.ts`).
  */
 export type Listado = {
@@ -34,7 +36,7 @@ export const LISTADOS: Record<string, Listado> = {
     busqueda: ["nombre", "marca", "modelo"],
   },
   "equipos-nuevos": {
-    columnas: ["imagenes", "nombre", "marca", "tipo", "mostrarEnWeb", "orden"],
+    columnas: ["imagenes", "nombre", "marca", "tipo", "mostrarEnWeb"],
     busqueda: ["nombre", "codigo"],
   },
   "modelos-repuesto": {
@@ -46,7 +48,7 @@ export const LISTADOS: Record<string, Listado> = {
   "marcas-usada": { columnas: ["logo", "nombre"], busqueda: ["nombre"] },
   "marcas-lubricante": { columnas: ["logo", "nombre"], busqueda: ["nombre"] },
   "tipos-equipo": { columnas: ["nombre", "marca", "tipoPadre"], busqueda: ["nombre"] },
-  "tipos-maquinaria": { columnas: ["imagen", "nombre", "marca", "orden"], busqueda: ["nombre"] },
+  "tipos-maquinaria": { columnas: ["imagen", "nombre", "marca"], busqueda: ["nombre"] },
   "categorias-maquinaria": { columnas: ["imagen", "nombre"], busqueda: ["nombre"] },
   "categorias-usada": {
     columnas: ["imagen", "nombre", "enOtros", "mostrarEnWeb"],
@@ -54,7 +56,7 @@ export const LISTADOS: Record<string, Listado> = {
   },
   "categorias-tecnicas": { columnas: ["imagen", "nombre", "padre"], busqueda: ["nombre"] },
   "categorias-lubricante": {
-    columnas: ["imagen", "nombre", "marca", "orden"],
+    columnas: ["imagen", "nombre", "marca"],
     busqueda: ["nombre"],
   },
   articulos: {

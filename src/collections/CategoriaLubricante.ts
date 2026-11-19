@@ -34,7 +34,6 @@ export const CategoriaLubricante: CollectionConfig = {
   labels: { singular: "Categoría de lubricante", plural: "Categorías de lubricante" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "marca", "orden", "slug"],
     group: "Lubricantes",
   },
   access: {

@@ -24,7 +24,6 @@ export const Marca: CollectionConfig = {
   },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "slug"],
     group: "Repuestos",
   },
   /*

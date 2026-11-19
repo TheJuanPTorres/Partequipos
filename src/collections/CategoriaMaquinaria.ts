@@ -36,7 +36,6 @@ export const CategoriaMaquinaria: CollectionConfig = {
   orderable: true,
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "slug"],
     group: "Maquinaria",
     description:
       "Para cambiar el orden de las tarjetas del índice de tipos y del menú «Por tipo de máquina», arrastra cada fila por su asa (a la izquierda). El orden se guarda solo al soltarla. Si la lista está ordenada por otra columna, quita ese orden para ver el asa.",

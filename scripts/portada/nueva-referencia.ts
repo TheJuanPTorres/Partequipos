@@ -72,7 +72,7 @@ type Campo = (typeof FICHEROS)[number][0];
 /** El logo de cada tarjeta del diseño: dirección web de la marca, fichero del kit y alt. */
 const LOGOS = [
   [
-    "hitachi",
+    "hitachi-landcros",
     path.join("repuestos", "marcas", "hitachi-landcros-blanco.webp"),
     "Logo de Hitachi LANDCROS en blanco",
   ],

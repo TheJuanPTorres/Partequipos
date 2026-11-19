@@ -585,6 +585,14 @@ const enMarcas = await todo<DocMarca>("marcas");
 const enTipos = await todo<DocTipo>("tipos-equipo");
 const enModelos = await todo<DocModelo>("modelos-repuesto");
 const enMedia = await todo<{ id: number; filename?: string | null }>("media");
+// Desde el 2026-11-18 la marca Hitachi tiene sus direcciones con «hitachi-landcros»
+// (scripts/marcas/hitachi-landcros-urls.ts). Este importador trabaja con los slugs de WordPress:
+// volvería a crear la marca antigua con sus tipos y modelos y trataría la actual como demo.
+if (enMarcas.some((m) => m.slug.includes("hitachi-landcros"))) {
+  fallar(
+    "la marca Hitachi ya tiene sus direcciones con «hitachi-landcros»: este importador usa los slugs de WordPress y la duplicaría. No se hace nada",
+  );
+}
 
 const idMarca = new Map(enMarcas.map((m) => [m.slug, m.id]));
 const claveTipo = new Map(enTipos.map((t) => [`${t.marca}/${t.slug}`, t.id]));

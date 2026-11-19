@@ -210,9 +210,10 @@ function puntuarTermino(indice: Indice, termino: string): Map<number, number> {
   const resultado = puntuarForma(indice, [termino], false);
   const alternativas = indice.sinonimos.get(termino) ?? [];
   for (const forma of alternativas) {
-    // Un sinónimo vale algo menos que lo escrito tal cual.
+    // Un sinónimo vale bastante menos que lo escrito tal cual: «rodaje» pone «Tren de rodaje» antes que
+    // unas cadenas que solo coinciden por el sinónimo «cadena».
     for (const [doc, puntos] of puntuarForma(indice, forma, true)) {
-      const valor = (puntos / forma.length) * 0.85;
+      const valor = (puntos / forma.length) * 0.6;
       if (valor > (resultado.get(doc) ?? 0)) resultado.set(doc, valor);
     }
   }

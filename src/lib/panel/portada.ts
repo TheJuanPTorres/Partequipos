@@ -3,7 +3,7 @@
  * §23). Decisiones puras, sin acceso a datos: qué avisos salen, qué tarjetas,
  * con qué enlaces. Los datos los trae `src/lib/queries/getPortadaPanel.ts`.
  */
-import { GRUPOS_DEL_MENU, ordenarMenu, type GrupoDelMenu } from "./menu";
+import { ETIQUETAS_DEL_MENU, GRUPOS_DEL_MENU, ordenarMenu, type GrupoDelMenu } from "./menu";
 
 const ADMIN = "/admin";
 
@@ -116,7 +116,7 @@ export type Tarjeta = { nombre: string; entradas: EntradaTarjeta[] };
 
 /**
  * Una tarjeta por grupo del menú, en el ORDEN DEL MENÚ (`ordenarMenu`, F1):
- * así «Partes del sitio» sale antes que «Configuración», que la portada de
+ * así los globales salen en su grupo y no detrás de todo, que la portada de
  * Payload no respetaba. Solo con lo que el usuario puede ver.
  */
 export function tarjetasDePortada(
@@ -128,6 +128,8 @@ export function tarjetasDePortada(
   for (const e of entidades) {
     const entrada: EntradaTarjeta = {
       ...e,
+      // El mismo nombre que en el menú (en las palabras del cliente).
+      etiqueta: ETIQUETAS_DEL_MENU[e.slug] ?? e.etiqueta,
       href: e.tipo === "global" ? rutaGlobal(e.slug) : rutaLista(e.slug),
       hrefCrear: e.tipo === "collection" && e.puedeCrear ? rutaCrear(e.slug) : null,
       contador: e.tipo === "collection" ? (contadores[e.slug] ?? null) : null,
@@ -138,7 +140,7 @@ export function tarjetasDePortada(
   return ordenarMenu([...porGrupo].map(([nombre, entradas]) => ({ nombre, entradas })));
 }
 
-/** ¿Es uno de los 8 grupos del menú? (para el icono). */
+/** ¿Es uno de los grupos del menú? (para el icono). */
 export const esGrupoDelMenu = (nombre: string): nombre is GrupoDelMenu =>
   (GRUPOS_DEL_MENU as readonly string[]).includes(nombre);
 

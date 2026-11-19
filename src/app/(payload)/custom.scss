@@ -968,6 +968,23 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   text-decoration: none;
 }
 
+/*
+ * CONTADOR DEL MENÚ (organización del panel, PR 1, 2026-11-18): las solicitudes que siguen en
+ * «Nueva», junto a «Solicitudes y contacto». Rojo del sistema con su texto claro (contraste AA).
+ */
+.pq-nav-contador {
+  margin-inline-start: auto;
+  min-width: 20px;
+  padding-inline: 6px;
+  border-radius: 999px;
+  background: var(--pq-primary);
+  color: var(--pq-primary-foreground);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
 /* Peso: Payload usa 600 en el activo; el sistema, font-medium. */
 .nav__link.active,
 .nav__link:has(.nav__link-indicator) {

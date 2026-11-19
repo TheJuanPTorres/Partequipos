@@ -72,7 +72,7 @@ export const PaginasIndice: GlobalConfig = {
   slug: "paginas-indice",
   label: "Páginas índice y contacto",
   admin: {
-    group: "Partes del sitio",
+    group: "Configuración",
     description:
       "Los textos y las tarjetas de «Repuestos para maquinaria pesada», «Maquinaria pesada» y «Contáctanos», la foto del encabezado de «Maquinaria pesada nueva», y los textos de «Maquinaria pesada usada», de su página «Otros», de «Lubricantes» y de «Trabaja con nosotros».",
   },

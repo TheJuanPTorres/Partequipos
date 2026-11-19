@@ -18,7 +18,7 @@ export const Media: CollectionConfig = {
   // Solo admite imágenes (ver `mimeTypes`): «Media» a secas no le dice nada al editor.
   labels: { singular: "Imagen", plural: "Imágenes" },
   admin: {
-    group: "Archivos",
+    group: "Fotos y archivos",
     description:
       "Fotos y logos del sitio, en JPEG, PNG o WebP, de hasta 15 MB (suben directo al almacén). El texto alternativo describe la imagen a quien no la ve.",
     // El texto alternativo en la lista, para ver de un vistazo cuáles están flojos.

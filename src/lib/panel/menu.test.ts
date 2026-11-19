@@ -1,7 +1,16 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { GRUPOS_DEL_MENU, idDeGrupo, ORDEN_DE_ENTRADAS, ordenarMenu } from "./menu";
+import {
+  ENTRADAS_DIRECTAS,
+  ETIQUETAS_DEL_MENU,
+  entradaActiva,
+  GRUPOS_DEL_MENU,
+  idDeGrupo,
+  ORDEN_DE_ENTRADAS,
+  ordenarMenu,
+  SOLO_ADMINISTRADOR,
+} from "./menu";
 
 const g = (nombre: string, ...slugs: string[]) => ({
   nombre,
@@ -10,17 +19,16 @@ const g = (nombre: string, ...slugs: string[]) => ({
 
 describe("ordenarMenu", () => {
   it("pone los grupos en el orden aprobado, aunque Payload los dé en otro", () => {
-    // Payload pone los globales detrás de las colecciones: «Partes del sitio»
-    // (solo globales) llegaría detrás de «Configuración».
+    // Payload agrupa por orden de aparición y pone los globales detrás de las colecciones.
     const de_payload = [
       g("Configuración", "redirects", "users", "seo"),
-      g("Solicitudes", "solicitudes"),
-      g("Partes del sitio", "cabecera", "pie"),
+      g("Mensajes recibidos", "solicitudes"),
+      g("Empresa y sedes", "sedes", "vacantes-buk"),
       g("Repuestos", "marcas", "modelos-repuesto"),
     ];
     assert.deepEqual(
       ordenarMenu(de_payload).map((x) => x.nombre),
-      ["Solicitudes", "Repuestos", "Partes del sitio", "Configuración"],
+      ["Mensajes recibidos", "Repuestos", "Empresa y sedes", "Configuración"],
     );
   });
 
@@ -43,10 +51,10 @@ describe("ordenarMenu", () => {
   });
 
   it("lo desconocido va al final y no se pierde (comprobación del guardián)", () => {
-    const r = ordenarMenu([g("Nuevo grupo", "x"), g("Solicitudes", "otra", "solicitudes")]);
+    const r = ordenarMenu([g("Nuevo grupo", "x"), g("Mensajes recibidos", "otra", "solicitudes")]);
     assert.deepEqual(
       r.map((x) => x.nombre),
-      ["Solicitudes", "Nuevo grupo"],
+      ["Mensajes recibidos", "Nuevo grupo"],
     );
     assert.deepEqual(
       r[0]?.entradas.map((e) => e.slug),
@@ -67,5 +75,39 @@ describe("idDeGrupo", () => {
     const ids = GRUPOS_DEL_MENU.map(idDeGrupo);
     assert.equal(new Set(ids).size, ids.length);
     for (const id of ids) assert.match(id, /^[a-z0-9-]+$/);
+  });
+});
+
+describe("menú nuevo (organización del panel, PR 1)", () => {
+  it("toda entrada del orden tiene nombre del cliente, y lo técnico está en el orden", () => {
+    for (const slug of ORDEN_DE_ENTRADAS)
+      assert.ok(ETIQUETAS_DEL_MENU[slug], `«${slug}» sin nombre`);
+    for (const slug of SOLO_ADMINISTRADOR) {
+      assert.ok(
+        (ORDEN_DE_ENTRADAS as readonly string[]).includes(slug),
+        `«${slug}» no está en el menú`,
+      );
+    }
+  });
+
+  it("las entradas directas van a grupos del menú y tienen clave única", () => {
+    for (const d of ENTRADAS_DIRECTAS) assert.ok(GRUPOS_DEL_MENU.includes(d.grupo));
+    assert.equal(new Set(ENTRADAS_DIRECTAS.map((d) => d.clave)).size, ENTRADAS_DIRECTAS.length);
+  });
+
+  it("entradaActiva: la de href más largo, con el límite de Payload y la primera si empatan", () => {
+    const entradas = [
+      { clave: "portada", href: "/admin/collections/paginas/12" },
+      { clave: "paginas", href: "/admin/collections/paginas" },
+      { clave: "marcas", href: "/admin/collections/marcas" },
+      { clave: "empresa", href: "/admin/globals/seo" },
+      { clave: "buscadores", href: "/admin/globals/seo" },
+    ];
+    assert.equal(entradaActiva("/admin/collections/paginas/12", entradas), "portada");
+    assert.equal(entradaActiva("/admin/collections/paginas/7", entradas), "paginas");
+    assert.equal(entradaActiva("/admin/collections/paginas/120", entradas), "paginas");
+    assert.equal(entradaActiva("/admin/collections/marcas-lubricante", entradas), null);
+    assert.equal(entradaActiva("/admin/globals/seo", entradas), "empresa");
+    assert.equal(entradaActiva("/admin", entradas), null);
   });
 });

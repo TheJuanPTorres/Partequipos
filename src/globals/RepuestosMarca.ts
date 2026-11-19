@@ -50,7 +50,7 @@ export const RepuestosMarca: GlobalConfig = {
   slug: "repuestos-marca",
   label: "Páginas de marca de repuestos",
   admin: {
-    group: "Partes del sitio",
+    group: "Repuestos",
     description:
       "Títulos y tarjetas comunes a las páginas de cada marca de repuestos (Caterpillar, Case…).",
   },

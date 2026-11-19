@@ -26,7 +26,7 @@ export const Articulo: CollectionConfig = {
   admin: {
     useAsTitle: "titulo",
     defaultColumns: ["titulo", "imagenDestacada", "categoria", "fechaPublicacion", "slug"],
-    group: "Páginas y blog",
+    group: "Blog",
     description:
       "Cada artículo tiene su dirección en partequipos.com/<dirección>/, y no puede repetir la de una página.",
   },

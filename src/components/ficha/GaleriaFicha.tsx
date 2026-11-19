@@ -37,13 +37,19 @@ export type FotoFicha = { url: string; alt: string; width: number; height: numbe
 const INTERVALO_MS = 5000;
 const MINIATURAS_VISIBLES = 3;
 
+/** La foto grande de la ficha de usados (medido: 586 px a 1440, 41vw). */
+const SIZES_FOTO = "(min-width: 1025px) 41vw, (min-width: 768px) 88vw, 85vw";
+
 export function GaleriaFicha({
   fotos,
   nombre,
   sinFondo = false,
+  sizesFoto = SIZES_FOTO,
 }: {
   fotos: FotoFicha[];
   nombre: string;
+  /** Lo que pinta la foto grande (con `cover`, puede ser más que su caja). */
+  sizesFoto?: string;
   /** Sin el fondo desenfocado de la tarjeta (ficha de maquinaria nueva, fondo neutro). */
   sinFondo?: boolean;
 }) {
@@ -202,7 +208,7 @@ export function GaleriaFicha({
                   alt={f.alt}
                   fill
                   priority={i === 0}
-                  sizes="(min-width: 1025px) 41vw, (min-width: 768px) 88vw, 85vw"
+                  sizes={sizesFoto}
                   className={estilos.fotoVisor}
                 />
               </li>

@@ -28,7 +28,7 @@ export const Fuente: CollectionConfig = {
   admin: {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "filename", "formato"],
-    group: "Archivos",
+    group: "Configuración",
     description:
       "Tipos de letra propios para el título del hero (WOFF2, o WOFF/TTF/OTF; máximo 4 MB). Después se eligen en «Tipografía del título» de cada diapositiva. Comprueba que la licencia permite usarla en una web.",
   },

@@ -97,7 +97,7 @@ export const Testimonio: CollectionConfig = {
   admin: {
     useAsTitle: "nombre",
     defaultColumns: ["nombre", "empresa", "autorizacionUso", "publicado"],
-    group: "Páginas y blog",
+    group: "Portada",
     description:
       "Testimonios de la portada. Un testimonio no se publica sin la autorización de uso de la persona.",
   },

@@ -302,7 +302,8 @@ async function redirecciones(): Promise<void> {
       });
     }
     if (!manifiesto.redirects.some((x) => x.desde === desde)) {
-      manifiesto.redirects.push({ desde, antes: null, despues: hacia });
+      // Si ya existía con otro destino, la retirada la devuelve a él en vez de borrarla.
+      manifiesto.redirects.push({ desde, antes: r ? r.hacia : null, despues: hacia });
     }
     guardar();
   }

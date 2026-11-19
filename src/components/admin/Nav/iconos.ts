@@ -6,6 +6,7 @@ import {
   IconHome,
   IconInbox,
   IconNews,
+  IconPhoto,
   IconSettingsCog,
   IconTool,
   type Icon,
@@ -39,6 +40,7 @@ export const ICONOS_DE_GRUPO: Record<GrupoDelMenu, Icon> = {
   "Servicio técnico": IconSettingsCog,
   Blog: IconNews,
   "Empresa y sedes": IconBuilding,
+  "Fotos y archivos": IconPhoto,
   Configuración: IconAdjustments,
 };
 

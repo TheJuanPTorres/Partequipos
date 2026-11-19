@@ -27,7 +27,7 @@ export const Documento: CollectionConfig = {
     // Sin «Tamaño del archivo»: la lista lo da en bytes sin unidad («714»). El
     // tamaño, legible, sale al abrir el documento.
     defaultColumns: ["titulo", "filename", "updatedAt"],
-    group: "Configuración",
+    group: "Fotos y archivos",
     description:
       "Documentos en PDF para descargar desde el sitio (por ejemplo, la ficha técnica de un equipo). Máximo 30 MB. Las imágenes van en «Imágenes».",
   },

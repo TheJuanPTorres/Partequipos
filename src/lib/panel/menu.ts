@@ -3,9 +3,10 @@
  * `partequipos-cierre\informes6-11-18-panel-organizacion-fase1.md` §2). Sustituye a los 8
  * grupos de la F1 (2026-10-06).
  *
- * Nueve grupos en el orden en que piensa el cliente: primero lo que llega (mensajes), luego lo que
+ * Diez grupos en el orden en que piensa el cliente: primero lo que llega (mensajes), luego lo que
  * ve el visitante (portada, maquinaria, repuestos, lubricantes, servicio técnico, blog), la empresa
- * y, al final, la configuración. Cada colección y global lleva su grupo en `admin.group`; las
+ *  las fotos y archivos (grupo propio, decisión de dirección del 2026-11-19) y, al final, la
+ * configuración. Cada colección y global lleva su grupo en `admin.group`; las
  * entradas DIRECTAS (`ENTRADAS_DIRECTAS`) ponen una misma colección en otro grupo (la página de
  * inicio en «Portada», la de Servicio técnico en su grupo y los datos de la empresa en «Empresa y
  * sedes»), con enlace a su ficha.
@@ -23,6 +24,7 @@ export const GRUPOS_DEL_MENU = [
   "Servicio técnico",
   "Blog",
   "Empresa y sedes",
+  "Fotos y archivos",
   "Configuración",
 ] as const;
 
@@ -63,13 +65,14 @@ export const ORDEN_DE_ENTRADAS = [
   "sedes",
   "paginas",
   "vacantes-buk",
+  // Fotos y archivos
+  "media",
+  "documentos",
+  "videos",
   // Configuración
   "cabecera",
   "pie",
   "paginas-indice",
-  "media",
-  "documentos",
-  "videos",
   "seo",
   "buscador",
   "busquedas-sin-resultado",

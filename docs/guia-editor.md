@@ -75,7 +75,8 @@ A la izquierda, en grupos:
 | Servicio técnico   | La página de Servicio técnico (abre su ficha)                                                            |
 | Blog               | Artículos y categorías del blog                                                                          |
 | Empresa y sedes    | Datos de la empresa y redes, sedes, páginas (Nosotros, Contáctanos, legales…) y «Trabaja con nosotros»   |
-| Configuración      | Cabecera y menú, pie, textos de las páginas índice, imágenes, documentos y vídeos, buscadores y correo   |
+| Fotos y archivos   | Imágenes, documentos (PDF) y vídeos                                                                      |
+| Configuración      | Cabecera y menú, pie, textos de las páginas índice, buscadores y correo                                  |
 
 El Administrador ve además, en Configuración, Redirecciones, Usuarios,
 Animaciones y Fuentes.
@@ -180,7 +181,7 @@ oficial, no lo pongas.
   elige uno ya subido. Solo PDF, **máximo 30 MB**. Sale en la ficha como el
   botón **«Ficha técnica»**, que abre el PDF como un libro (el visor) en una
   ventana sobre la ficha; sin PDF, el botón no aparece. Para el visor, el PDF
-  necesita sus **«Páginas como imágenes»** (en **Configuración → Documentos**); las
+  necesita sus **«Páginas como imágenes»** (en **Fotos y archivos → Documentos**); las
   genera un script al importarlo. Sin ellas, el botón abre el PDF en otra
   pestaña.
 - **«Vista 360 (enlace)»** (opcional): el enlace de la vista 360 del equipo,
@@ -273,7 +274,7 @@ oficial, no lo pongas.
 
 ### 5.5 Subir imágenes
 
-- **Configuración → Imágenes**, o directamente desde el campo de imagen de una
+- **Fotos y archivos → Imágenes**, o directamente desde el campo de imagen de una
   ficha.
 - **Formatos: JPEG, PNG o WebP.** Ni SVG, ni PDF, ni AVIF, ni HEIC (las fotos
   del iPhone): conviértelas antes. El panel lo comprueba por el contenido, no
@@ -297,7 +298,7 @@ oficial, no lo pongas.
 
 ### 5.6 Subir vídeos
 
-- **Configuración → Vídeos.** MP4 o WebM, **máximo 4 MB**. Si pesa más, hay que
+- **Fotos y archivos → Vídeos.** MP4 o WebM, **máximo 4 MB**. Si pesa más, hay que
   exportarlo con más compresión.
 - **Imagen de póster, obligatoria:** es lo que se ve antes de que cargue y para
   quien tiene el movimiento reducido activado.
@@ -306,7 +307,7 @@ oficial, no lo pongas.
 ### 5.6 bis Un PDF para leer como libro («Documento en visor»)
 
 - En una página, el bloque **«Documento en visor»** muestra un PDF de
-  **Configuración → Documentos** como un libro: se pasan las páginas, hay
+  **Fotos y archivos → Documentos** como un libro: se pasan las páginas, hay
   miniaturas, zoom, pantalla completa y el botón **«Descargar PDF»**. Se puede
   añadir en **«Bloques»** de la página o **dentro de un texto**: en el editor
   de texto, con el botón «+» o escribiendo «/», elige «Documento en visor».
@@ -380,7 +381,7 @@ oficial, no lo pongas.
     marca (**Repuestos → Marcas de repuestos**).
   - **Logo libre:** un fabricante de repuestos que no es marca de maquinaria
     (Donaldson, Berco, ESCO…). Lleva el **logo** (PNG o WebP con fondo
-    transparente, subido antes en **Configuración → Imágenes**; un SVG se convierte
+    transparente, subido antes en **Fotos y archivos → Imágenes**; un SVG se convierte
     antes a PNG, porque «Imágenes» no lo admite), el **nombre** (lo
     leen los lectores de pantalla) y, si quieres, un **enlace**: una ruta del
     sitio (`/…/`) o una dirección `https://` de otro sitio, que se abre en otra

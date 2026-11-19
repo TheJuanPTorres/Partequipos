@@ -34,7 +34,7 @@ export const Video: CollectionConfig = {
   admin: {
     useAsTitle: "descripcion",
     defaultColumns: ["filename", "descripcion", "decorativo"],
-    group: "Configuración",
+    group: "Fotos y archivos",
     description: "Vídeos del sitio: MP4 o WebM, máximo 10 MB, con imagen de póster obligatoria.",
   },
   access: {

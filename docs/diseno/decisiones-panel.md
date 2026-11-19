@@ -970,13 +970,13 @@ dependencias.
 
 **Lo que no se toca.** El JSON-LD `Organization` y la imagen social por defecto siguen usando `seoConfig.logoPath` cuando el campo «Logo» del global `seo` está vacío (§10.8).
 
-## 32. Menú nuevo de nueve grupos (2026-11-18, organización del panel, PR 1; rama `feat/panel-menu-nuevo`)
+## 32. Menú nuevo de diez grupos (2026-11-18, organización del panel, PR 1; rama `feat/panel-menu-nuevo`)
 
 Plan: `partequipos-cierre\informes\2026-11-18-panel-organizacion-fase1.md` §2. Sustituye a los 8
 grupos de la F1 (§20).
 
 - **Grupos, en este orden:** Mensajes recibidos · Portada · Maquinaria · Repuestos · Lubricantes ·
-  Servicio técnico · Blog · Empresa y sedes · Configuración. Cada colección y global lleva el suyo
+  Servicio técnico · Blog · Empresa y sedes · Fotos y archivos · Configuración. Cada colección y global lleva el suyo
   en `admin.group` (`src/lib/panel/menu.ts` fija el orden y lo vigila `grupos.test.ts`).
 - **Nombres del cliente** solo en el menú y en la portada del panel (`ETIQUETAS_DEL_MENU`): la
   lista y la ficha conservan el nombre de la colección.
@@ -986,8 +986,8 @@ grupos de la F1 (§20).
   «Buscadores e imágenes del sitio». La entrada activa es la de href más largo (`entradaActiva`).
 - **Lo técnico, solo para el Administrador** en el menú y en la portada del panel: Redirecciones,
   Usuarios, Animaciones y Fuentes (`SOLO_ADMINISTRADOR`). El acceso de cada colección no cambia.
-- **«Archivos» dentro de Configuración**, como tres entradas (Imágenes, Documentos y Vídeos), la
-  opción por defecto del plan; un grupo propio sería el décimo.
+- **«Fotos y archivos», grupo propio** (decisión de dirección, 2026-11-19): Imágenes, Documentos y
+  Vídeos. Animaciones y Fuentes siguen en Configuración, solo para el Administrador.
 - **Contador** junto a «Solicitudes y contacto»: las que siguen en «Nueva» (`payload.count` con el
   acceso de quien mira).
 - Las preferencias de grupo plegado se guardan por nombre: con los nombres nuevos, todos los grupos

@@ -64,6 +64,7 @@ import { Buscador } from "./globals/Buscador";
 import { VacantesBuk } from "./globals/VacantesBuk";
 import { CorreoFormularios } from "./globals/CorreoFormularios";
 import { adaptadorCorreo } from "./lib/correo/adaptador";
+import { conListados } from "./lib/panel/listados";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -187,57 +188,61 @@ export default buildConfig({
     },
   },
   /*
-   * ORDEN DEL MENÚ: lo fija `src/lib/panel/menu.ts` (F1 del rediseño,
-   * 2026-10-06), con 8 grupos: Solicitudes · Repuestos · Maquinaria ·
-   * Lubricantes · Páginas y blog · Archivos · Partes del sitio · Configuración.
+   * ORDEN DEL MENÚ: lo fija `src/lib/panel/menu.ts` (organización del panel,
+   * 2026-11-18), con 10 grupos: Mensajes recibidos · Portada · Maquinaria ·
+   * Repuestos · Lubricantes · Servicio técnico · Blog · Empresa y sedes ·
+   * Fotos y archivos · Configuración.
    * Este array sigue el mismo orden para que la portada de Payload —que agrupa
    * por orden de aparición— salga igual; los globales van siempre detrás. No
    * afecta al esquema: las tablas se generan por slug. Ninguna colección ni
    * global puede quedar sin `admin.group` aprobado (`grupos.test.ts`).
    */
   // Último editor en las de contenido (§25), nunca en Solicitudes ni Usuarios.
-  collections: sinPestanaApi(
-    conUltimoEditor(
-      conVerEnElSitio([
-        // Leads de los formularios publicos. Unica coleccion con datos personales:
-        // su control de acceso de lectura es privado, no publico como el catalogo.
-        // Primero en el menu: es lo mas urgente de revisar (CLAUDE.md §10.11).
-        Solicitud,
-        // Repuestos: la ficha primero, luego sus clasificaciones.
-        ModeloRepuesto,
-        Marca,
-        TipoEquipo,
-        CategoriaTecnica,
-        // Maquinaria (ADR 0007): colecciones propias, separadas de las de repuestos.
-        EquipoNuevo,
-        EquipoUsado,
-        MarcaMaquinaria,
-        TipoMaquinaria,
-        CategoriaMaquinaria,
-        CategoriaUsada,
-        MarcaUsada,
-        // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.
-        MarcaLubricante,
-        CategoriaLubricante,
-        // Páginas y blog. Los articulos se sirven en la raiz /{slug}/, igual que las
-        // paginas institucionales: de ahi el guardarrail de unicidad entre ambas.
-        PaginaInstitucional,
-        Articulo,
-        CategoriaBlog,
-        PreguntaFrecuente,
-        Testimonio,
-        Sede,
-        BusquedaSinResultado,
-        // Archivos. Los PDF (ficha técnica de los equipos nuevos) nunca en Media.
-        Media,
-        Documento,
-        Video,
-        Animacion,
-        Fuente,
-        // Configuracion (el global de SEO va el primero del grupo en el menú).
-        Redirects,
-        Users,
-      ]),
+  // Columnas, búsqueda y miniaturas de las listas (organización del panel, PR 5): `listados.ts`.
+  collections: conListados(
+    sinPestanaApi(
+      conUltimoEditor(
+        conVerEnElSitio([
+          // Leads de los formularios publicos. Unica coleccion con datos personales:
+          // su control de acceso de lectura es privado, no publico como el catalogo.
+          // Primero en el menu: es lo mas urgente de revisar (CLAUDE.md §10.11).
+          Solicitud,
+          // Repuestos: la ficha primero, luego sus clasificaciones.
+          ModeloRepuesto,
+          Marca,
+          TipoEquipo,
+          CategoriaTecnica,
+          // Maquinaria (ADR 0007): colecciones propias, separadas de las de repuestos.
+          EquipoNuevo,
+          EquipoUsado,
+          MarcaMaquinaria,
+          TipoMaquinaria,
+          CategoriaMaquinaria,
+          CategoriaUsada,
+          MarcaUsada,
+          // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.
+          MarcaLubricante,
+          CategoriaLubricante,
+          // Páginas y blog. Los articulos se sirven en la raiz /{slug}/, igual que las
+          // paginas institucionales: de ahi el guardarrail de unicidad entre ambas.
+          PaginaInstitucional,
+          Articulo,
+          CategoriaBlog,
+          PreguntaFrecuente,
+          Testimonio,
+          Sede,
+          BusquedaSinResultado,
+          // Archivos. Los PDF (ficha técnica de los equipos nuevos) nunca en Media.
+          Media,
+          Documento,
+          Video,
+          Animacion,
+          Fuente,
+          // Configuracion (el global de SEO va el primero del grupo en el menú).
+          Redirects,
+          Users,
+        ]),
+      ),
     ),
   ),
   // Globales: contenido único, no listas. El pie de todas las páginas (§13 de

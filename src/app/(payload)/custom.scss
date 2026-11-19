@@ -2279,3 +2279,16 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
     margin: 0;
   }
 }
+
+/* FILTRO RÁPIDO encima de una lista (organización del panel, PR 5): «Ver solo las pequeñas». */
+.pq-filtro-rapido {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--pq-muted-foreground);
+
+  a {
+    color: var(--pq-foreground);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}

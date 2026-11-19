@@ -1,43 +1,43 @@
 /**
- * ORGANIZACIÓN DEL MENÚ DEL PANEL (F1 del rediseño, 2026-10-06; propuesta en
- * `partequipos-cierre\propuestas\2026-10-06-panel-sistema-diseno.md` §3 y
- * `docs/diseno/decisiones-panel.md` §20).
+ * ORGANIZACIÓN DEL MENÚ DEL PANEL (fase 2 de la organización del panel, PR 1, 2026-11-18; plan en
+ * `partequipos-cierre\informes6-11-18-panel-organizacion-fase1.md` §2). Sustituye a los 8
+ * grupos de la F1 (2026-10-06).
  *
- * Ocho grupos ordenados por uso, pensados para un editor no técnico: primero lo
- * que entra a diario (solicitudes y catálogo), luego lo editorial, los archivos
- * y al final lo que se toca una vez.
+ * Nueve grupos en el orden en que piensa el cliente: primero lo que llega (mensajes), luego lo que
+ * ve el visitante (portada, maquinaria, repuestos, lubricantes, servicio técnico, blog), la empresa
+ * y, al final, la configuración. Cada colección y global lleva su grupo en `admin.group`; las
+ * entradas DIRECTAS (`ENTRADAS_DIRECTAS`) ponen una misma colección en otro grupo (la página de
+ * inicio en «Portada», la de Servicio técnico en su grupo y los datos de la empresa en «Empresa y
+ * sedes»), con enlace a su ficha.
  *
- * El orden lo fija ESTA lista, no el array de `payload.config.ts`: Payload
- * agrupa por orden de aparición y pone los globales detrás de todas las
- * colecciones, así que un grupo solo de globales («Partes del sitio») saldría
- * detrás de «Configuración». No afecta al esquema: las tablas van por slug.
+ * El orden lo fija ESTA lista, no el array de `payload.config.ts`: Payload agrupa por orden de
+ * aparición y pone los globales detrás de todas las colecciones. No afecta al esquema: las tablas
+ * van por slug.
  */
 export const GRUPOS_DEL_MENU = [
-  "Solicitudes",
-  "Repuestos",
+  "Mensajes recibidos",
+  "Portada",
   "Maquinaria",
+  "Repuestos",
   "Lubricantes",
-  "Páginas y blog",
-  "Archivos",
-  "Partes del sitio",
+  "Servicio técnico",
+  "Blog",
+  "Empresa y sedes",
   "Configuración",
 ] as const;
 
 export type GrupoDelMenu = (typeof GRUPOS_DEL_MENU)[number];
 
 /**
- * Orden de las entradas dentro de cada grupo: primero la ficha que más se edita
- * («Modelos», «Equipos nuevos»), después sus clasificaciones. Un slug que no
- * esté aquí va al final de su grupo, en el orden de Payload.
+ * Orden de las entradas dentro de cada grupo. Un slug que no esté aquí va al final de su grupo, en
+ * el orden de Payload. Las directas van primero en su grupo.
  */
 export const ORDEN_DE_ENTRADAS = [
-  // Solicitudes
+  // Mensajes recibidos
   "solicitudes",
-  // Repuestos
-  "modelos-repuesto",
-  "marcas",
-  "tipos-equipo",
-  "categorias-tecnicas",
+  // Portada (+ la página de inicio, directa)
+  "testimonios",
+  "preguntas-frecuentes",
   // Maquinaria
   "equipos-nuevos",
   "equipos-usados",
@@ -46,35 +46,128 @@ export const ORDEN_DE_ENTRADAS = [
   "categorias-maquinaria",
   "categorias-usada",
   "marcas-usada",
+  "ficha-producto",
+  // Repuestos
+  "modelos-repuesto",
+  "marcas",
+  "tipos-equipo",
+  "categorias-tecnicas",
+  "repuestos-marca",
   // Lubricantes
   "marcas-lubricante",
   "categorias-lubricante",
-  // Páginas y blog
-  "paginas",
+  // Blog
   "articulos",
   "categorias-blog",
-  "preguntas-frecuentes",
-  "testimonios",
+  // Empresa y sedes (+ los datos de la empresa, directa)
   "sedes",
-  // Archivos
+  "paginas",
+  "vacantes-buk",
+  // Configuración
+  "cabecera",
+  "pie",
+  "paginas-indice",
   "media",
   "documentos",
   "videos",
-  "animaciones",
-  "fuentes",
-  // Partes del sitio (globales)
-  "cabecera",
-  "pie",
-  "ficha-producto",
-  "repuestos-marca",
-  "paginas-indice",
-  "vacantes-buk",
-  // Configuración
   "seo",
   "correo-formularios",
   "redirects",
   "users",
+  "animaciones",
+  "fuentes",
 ] as const;
+
+/**
+ * El nombre de cada entrada en el menú, en las palabras del cliente (§2 del plan). Solo cambia el
+ * menú: la ficha y su lista conservan su nombre de colección.
+ */
+export const ETIQUETAS_DEL_MENU: Record<string, string> = {
+  solicitudes: "Solicitudes y contacto",
+  testimonios: "Testimonios",
+  "preguntas-frecuentes": "Preguntas frecuentes",
+  "equipos-nuevos": "Máquinas nuevas",
+  "equipos-usados": "Máquinas usadas",
+  "marcas-maquinaria": "Marcas (nuevas)",
+  "tipos-maquinaria": "Tipos de máquina",
+  "categorias-maquinaria": "Categorías (nuevas)",
+  "categorias-usada": "Categorías (usadas)",
+  "marcas-usada": "Marcas (usadas)",
+  "ficha-producto": "Textos de las fichas",
+  "modelos-repuesto": "Modelos",
+  marcas: "Marcas",
+  "tipos-equipo": "Tipos de equipo",
+  "categorias-tecnicas": "Categorías técnicas",
+  "repuestos-marca": "Textos de las páginas de repuestos",
+  "marcas-lubricante": "Marcas",
+  "categorias-lubricante": "Líneas y productos",
+  articulos: "Artículos",
+  "categorias-blog": "Categorías del blog",
+  sedes: "Sedes",
+  paginas: "Páginas (Nosotros, Contáctanos, legales…)",
+  "vacantes-buk": "Trabaja con nosotros",
+  cabecera: "Cabecera y menú",
+  pie: "Pie de página",
+  "paginas-indice": "Textos de las páginas índice",
+  media: "Imágenes",
+  documentos: "Documentos",
+  videos: "Vídeos",
+  seo: "Buscadores e imágenes del sitio",
+  "correo-formularios": "Correo de los formularios",
+  redirects: "Redirecciones",
+  users: "Usuarios",
+  animaciones: "Animaciones",
+  fuentes: "Fuentes",
+};
+
+/** Lo técnico: solo lo ve en el menú el Administrador (el acceso de cada colección no cambia). */
+export const SOLO_ADMINISTRADOR = new Set(["redirects", "users", "animaciones", "fuentes"]);
+
+/**
+ * Entradas que llevan a UNA ficha concreta desde otro grupo. `pagina`: la página con esa dirección
+ * (su ficha, buscada por `slug`); `global`: el global entero.
+ */
+export type EntradaDirecta = {
+  grupo: GrupoDelMenu;
+  etiqueta: string;
+  clave: string;
+} & ({ pagina: string } | { global: string });
+
+export const ENTRADAS_DIRECTAS: EntradaDirecta[] = [
+  { grupo: "Portada", etiqueta: "Portada", clave: "pagina-inicio", pagina: "inicio" },
+  {
+    grupo: "Servicio técnico",
+    etiqueta: "Página de Servicio técnico",
+    clave: "pagina-servicio-tecnico",
+    pagina: "servicio-tecnico",
+  },
+  {
+    grupo: "Empresa y sedes",
+    etiqueta: "Datos de la empresa y redes",
+    clave: "global-seo-empresa",
+    global: "seo",
+  },
+];
+
+/**
+ * La entrada activa: la de href más largo que contiene la ruta (`/collections/paginas/12` activa
+ * «Portada» si es la ficha de inicio, y no también «Páginas»). Misma regla que Payload para el
+ * límite: después del href, «/» o nada. Con dos iguales (la de la empresa y «Buscadores» llevan
+ * a `seo`), la primera del menú.
+ */
+export function entradaActiva(
+  pathname: string,
+  entradas: { clave: string; href: string }[],
+): string | null {
+  let mejor: { clave: string; largo: number } | null = null;
+  for (const { clave, href } of entradas) {
+    const siguiente = pathname[href.length];
+    if (pathname.startsWith(href) && (siguiente === undefined || siguiente === "/")) {
+      if (!mejor || href.length > mejor.largo) mejor = { clave, largo: href.length };
+    }
+  }
+  return mejor?.clave ?? null;
+}
 
 const posicion = (lista: readonly string[], valor: string) => {
   const i = lista.indexOf(valor);

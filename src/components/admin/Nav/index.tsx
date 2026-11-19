@@ -2,11 +2,18 @@ import { NavHamburger, NavWrapper } from "@payloadcms/next/client";
 import { RenderServerComponent } from "@payloadcms/ui/elements/RenderServerComponent";
 import { type EntityToGroup, EntityType, groupNavItems } from "@payloadcms/ui/shared";
 import type { PayloadRequest, ServerProps } from "payload";
-import { PREFERENCE_KEYS } from "payload/shared";
+import { formatAdminURL, PREFERENCE_KEYS } from "payload/shared";
 
-import { ordenarMenu } from "@/lib/panel/menu";
+import {
+  ENTRADAS_DIRECTAS,
+  ETIQUETAS_DEL_MENU,
+  ordenarMenu,
+  SOLO_ADMINISTRADOR,
+  type GrupoDelMenu,
+} from "@/lib/panel/menu";
+import { esAdministrador } from "@/lib/seguridad/acceso";
 
-import { MenuCliente, type GrupoMenu } from "./MenuCliente";
+import { MenuCliente, type EntradaMenu, type GrupoMenu } from "./MenuCliente";
 import { Salir } from "./Salir";
 
 /**
@@ -135,23 +142,98 @@ export default async function Nav(props: { req?: PayloadRequest } & ServerProps)
   const gruposDePayload = groupNavItems(entidades, permissions, i18n);
 
   const preferencia = await leerPreferenciaNav(req);
+  const adminRoute = payload.config.routes.admin;
+  const ruta = (path: `/${string}`) => formatAdminURL({ adminRoute, path });
+  const admin = esAdministrador(user);
 
-  // Orden de grupos y entradas del rediseño (F1): `src/lib/panel/menu.ts`.
+  // Orden de grupos y entradas, nombres y lo técnico solo para el Administrador: `src/lib/panel/menu.ts`.
+  const ordenados = ordenarMenu(
+    gruposDePayload.map((grupo) => ({
+      nombre: typeof grupo.label === "string" ? grupo.label : String(grupo.label),
+      entradas: grupo.entities
+        .filter((entidad) => admin || !SOLO_ADMINISTRADOR.has(entidad.slug))
+        .map((entidad) => ({ entidad, slug: entidad.slug })),
+    })),
+  );
+
+  // «Solicitudes y contacto» lleva cuántas siguen en «Nueva».
+  const contadores: Record<string, number> = {};
+  if (visibleEntities.collections.includes("solicitudes")) {
+    const { totalDocs } = await payload.count({
+      collection: "solicitudes",
+      overrideAccess: false,
+      req,
+      where: { estado: { equals: "nueva" } },
+    });
+    if (totalDocs > 0) contadores.solicitudes = totalDocs;
+  }
+
+  // Las entradas directas (la portada, Servicio técnico y los datos de la empresa), con el acceso de quien mira.
+  const slugsDePagina = ENTRADAS_DIRECTAS.flatMap((d) => ("pagina" in d ? [d.pagina] : []));
+  const idDePagina = new Map<string, number | string>();
+  if (visibleEntities.collections.includes("paginas") && slugsDePagina.length > 0) {
+    const { docs } = await payload.find({
+      collection: "paginas",
+      depth: 0,
+      limit: slugsDePagina.length,
+      overrideAccess: false,
+      pagination: false,
+      req,
+      select: { slug: true },
+      where: { slug: { in: slugsDePagina } },
+    });
+    for (const doc of docs as { id: number | string; slug?: string | null }[]) {
+      if (doc.slug) idDePagina.set(doc.slug, doc.id);
+    }
+  }
+  const directas = new Map<string, EntradaMenu[]>();
+  for (const d of ENTRADAS_DIRECTAS) {
+    let href: string | null = null;
+    if ("pagina" in d) {
+      const id = idDePagina.get(d.pagina);
+      if (id !== undefined) href = ruta(`/collections/paginas/${id}`);
+    } else if ((visibleEntities.globals as string[]).includes(d.global)) {
+      href = ruta(`/globals/${d.global}`);
+    }
+    if (href) {
+      directas.set(d.grupo, [
+        ...(directas.get(d.grupo) ?? []),
+        { clave: d.clave, href, id: `nav-${d.clave}`, label: d.etiqueta },
+      ]);
+    }
+  }
+
+  const nombres = [
+    ...ordenados.map((g) => g.nombre),
+    ...[...directas.keys()].filter((n) => !ordenados.some((g) => g.nombre === n)),
+  ];
   const grupos: GrupoMenu[] = ordenarMenu(
-    gruposDePayload.map((grupo) => {
-      const nombre = typeof grupo.label === "string" ? grupo.label : String(grupo.label);
-      const guardado = preferencia?.groups?.[nombre]?.open;
+    nombres.map((nombre) => ({ nombre, entradas: [] as { slug: string }[] })),
+  )
+    .map(({ nombre }) => {
+      const dePayload = ordenados.find((g) => g.nombre === nombre)?.entradas ?? [];
+      const entradas: EntradaMenu[] = [
+        ...(directas.get(nombre as GrupoDelMenu) ?? []),
+        ...dePayload.map(({ entidad }) => {
+          const global = entidad.type === EntityType.global;
+          return {
+            clave: `${global ? "global" : "coleccion"}-${entidad.slug}`,
+            contador: contadores[entidad.slug],
+            href: ruta(global ? `/globals/${entidad.slug}` : `/collections/${entidad.slug}`),
+            id: global ? `nav-global-${entidad.slug}` : `nav-${entidad.slug}`,
+            label:
+              ETIQUETAS_DEL_MENU[entidad.slug] ??
+              (typeof entidad.label === "string" ? entidad.label : String(entidad.label)),
+          };
+        }),
+      ];
       return {
-        abierto: guardado ?? ABIERTO_POR_DEFECTO,
-        entradas: grupo.entities.map((entidad) => ({
-          label: typeof entidad.label === "string" ? entidad.label : String(entidad.label),
-          slug: entidad.slug,
-          type: entidad.type,
-        })),
+        abierto: preferencia?.groups?.[nombre]?.open ?? ABIERTO_POR_DEFECTO,
+        entradas,
         nombre,
       };
-    }),
-  );
+    })
+    .filter((g) => g.entradas.length > 0);
 
   const serverProps = { i18n, locale, params, payload, permissions, searchParams, user };
   const clientProps = { documentSubViewType, viewType };

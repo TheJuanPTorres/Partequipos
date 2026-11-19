@@ -24,7 +24,7 @@ export const VacantesBuk: GlobalConfig = {
   slug: SLUG_VACANTES_BUK,
   label: "Vacantes de Buk",
   admin: {
-    group: "Partes del sitio",
+    group: "Empresa y sedes",
     description:
       "Las vacantes de la página «Trabaja con nosotros» se leen del portal de empleo de Buk, como mucho cada 6 horas. Aquí se puede cortar esa lectura y ver cómo fue la última.",
   },

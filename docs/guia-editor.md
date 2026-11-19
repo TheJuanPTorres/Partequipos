@@ -65,16 +65,20 @@ Consecuencias prácticas:
 
 A la izquierda, en grupos:
 
-| Grupo            | Qué hay                                                                                              |
-| ---------------- | ---------------------------------------------------------------------------------------------------- |
-| Solicitudes      | Las **solicitudes** que llegan de los formularios del sitio                                          |
-| Repuestos        | Modelos, marcas de repuestos, tipos de equipo y categorías técnicas                                  |
-| Maquinaria       | Equipos nuevos y usados; marcas, tipos y categorías de nueva; categorías y marcas de usada           |
-| Lubricantes      | Marcas y categorías de lubricante                                                                    |
-| Páginas y blog   | Páginas, artículos y categorías del blog, preguntas frecuentes, testimonios y sedes                  |
-| Archivos         | Imágenes, documentos (PDF), vídeos y animaciones                                                     |
-| Partes del sitio | Cabecera, pie, ficha de producto y páginas de marca de repuestos: lo que se repite en muchas páginas |
-| Configuración    | «SEO y datos de la empresa» (horario, imágenes y contacto), redirecciones y usuarios                 |
+| Grupo              | Qué hay                                                                                                  |
+| ------------------ | -------------------------------------------------------------------------------------------------------- |
+| Mensajes recibidos | **Solicitudes y contacto**: lo que llega de los formularios, con el número de las que siguen sin atender |
+| Portada            | La **portada** (abre su ficha), testimonios y preguntas frecuentes                                       |
+| Maquinaria         | Máquinas nuevas y usadas; marcas, tipos y categorías; los textos de las fichas                           |
+| Repuestos          | Modelos, marcas, tipos de equipo, categorías técnicas y los textos de las páginas de repuestos           |
+| Lubricantes        | Marcas y líneas y productos                                                                              |
+| Servicio técnico   | La página de Servicio técnico (abre su ficha)                                                            |
+| Blog               | Artículos y categorías del blog                                                                          |
+| Empresa y sedes    | Datos de la empresa y redes, sedes, páginas (Nosotros, Contáctanos, legales…) y «Trabaja con nosotros»   |
+| Configuración      | Cabecera y menú, pie, textos de las páginas índice, imágenes, documentos y vídeos, buscadores y correo   |
+
+El Administrador ve además, en Configuración, Redirecciones, Usuarios,
+Animaciones y Fuentes.
 
 Dentro de cada grupo, primero va lo que más se edita (los modelos, los
 equipos) y después sus clasificaciones.
@@ -136,7 +140,7 @@ izquierda) cuando algo merece tu atención. Ninguno bloquea nada; solo avisan:
 
 ### 5.1 Atender una solicitud
 
-1. **Solicitudes → Solicitudes.** Lo más nuevo sale primero.
+1. **Mensajes recibidos → Solicitudes y contacto.** Lo más nuevo sale primero.
 2. Ábrela, atiende al cliente por tu canal habitual.
 3. Cambia **Estado** a **Atendida** y guarda.
 
@@ -176,15 +180,15 @@ oficial, no lo pongas.
   elige uno ya subido. Solo PDF, **máximo 30 MB**. Sale en la ficha como el
   botón **«Ficha técnica»**, que abre el PDF como un libro (el visor) en una
   ventana sobre la ficha; sin PDF, el botón no aparece. Para el visor, el PDF
-  necesita sus **«Páginas como imágenes»** (en **Archivos → Documentos**); las
+  necesita sus **«Páginas como imágenes»** (en **Configuración → Documentos**); las
   genera un script al importarlo. Sin ellas, el botón abre el PDF en otra
   pestaña.
 - **«Vista 360 (enlace)»** (opcional): el enlace de la vista 360 del equipo,
   empezando por `https://`. Sale el botón **«Ver en vista 360»** sobre la
   galería, que la abre en una ventana sobre la ficha. Vacío, no hay botón.
 - **La imagen del recuadro «Contáctanos para recibir asesoría»**, al final de
-  todas las fichas, es la misma para todas: está en **Partes del sitio → Ficha de
-  producto**.
+  todas las fichas, es la misma para todas: está en **Maquinaria → Textos de las
+  fichas**.
 
 ### 5.3 Equipos usados y sus marcas
 
@@ -212,7 +216,7 @@ oficial, no lo pongas.
   Aditamentos y «Otros», como en la web anterior. Marcada (lo normal), la
   categoría sale dentro de «Otros»; desmarcada, sale sola en el primer nivel,
   en el lugar de su **«Orden en el primer nivel»**. Los textos de la página
-  «Otros» están en **Partes del sitio → Páginas índice**.
+  «Otros» están en **Configuración → Textos de las páginas índice**.
 - **Al venderse, desmarca «Disponible»** en vez de borrarlo. Si fue un error,
   se vuelve a marcar.
 - «Pestaña en la portada»: por defecto, según su categoría; elige
@@ -253,13 +257,13 @@ oficial, no lo pongas.
   editan en cada categoría (**Repuestos → Categorías técnicas**).
 - Lo común a todas las páginas de marca (títulos de las secciones, el
   contacto y los testimonios) está en
-  **Partes del sitio → Páginas de marca de repuestos**. Un título vacío
+  **Repuestos → Textos de las páginas de repuestos**. Un título vacío
   esconde su sección: cada campo dice cuál.
 
 ### 5.4 Escribir un artículo del blog
 
 1. **Recuerda §3: se publica al guardar.** Tenlo terminado antes.
-2. **Páginas y blog → Artículos → Crear.** Título, categoría y **fecha de
+2. **Blog → Artículos → Crear.** Título, categoría y **fecha de
    publicación** (ordena el blog y es la que ven los buscadores).
 3. **Entradilla:** el resumen que sale en el listado y al compartir.
 4. **Imagen destacada:** sale en el listado y al compartir en redes.
@@ -269,7 +273,7 @@ oficial, no lo pongas.
 
 ### 5.5 Subir imágenes
 
-- **Archivos → Imágenes**, o directamente desde el campo de imagen de una
+- **Configuración → Imágenes**, o directamente desde el campo de imagen de una
   ficha.
 - **Formatos: JPEG, PNG o WebP.** Ni SVG, ni PDF, ni AVIF, ni HEIC (las fotos
   del iPhone): conviértelas antes. El panel lo comprueba por el contenido, no
@@ -293,7 +297,7 @@ oficial, no lo pongas.
 
 ### 5.6 Subir vídeos
 
-- **Archivos → Vídeos.** MP4 o WebM, **máximo 4 MB**. Si pesa más, hay que
+- **Configuración → Vídeos.** MP4 o WebM, **máximo 4 MB**. Si pesa más, hay que
   exportarlo con más compresión.
 - **Imagen de póster, obligatoria:** es lo que se ve antes de que cargue y para
   quien tiene el movimiento reducido activado.
@@ -302,7 +306,7 @@ oficial, no lo pongas.
 ### 5.6 bis Un PDF para leer como libro («Documento en visor»)
 
 - En una página, el bloque **«Documento en visor»** muestra un PDF de
-  **Archivos → Documentos** como un libro: se pasan las páginas, hay
+  **Configuración → Documentos** como un libro: se pasan las páginas, hay
   miniaturas, zoom, pantalla completa y el botón **«Descargar PDF»**. Se puede
   añadir en **«Bloques»** de la página o **dentro de un texto**: en el editor
   de texto, con el botón «+» o escribiendo «/», elige «Documento en visor».
@@ -324,7 +328,7 @@ oficial, no lo pongas.
 
 ### 5.8 La portada
 
-- Es la página de tipo «Portada» (ruta `inicio`) en **Páginas y blog → Páginas**.
+- Es la página de tipo «Portada» (ruta `inicio`) en **Portada → Portada** (o en Empresa y sedes → Páginas).
 - **Hero (carrusel):** cada diapositiva lleva título, párrafo, imagen de fondo,
   una versión **vertical para móvil** (recomendada: el móvil carga mucho más
   rápido) y, si quieres, la máquina recortada en PNG transparente.
@@ -342,7 +346,7 @@ oficial, no lo pongas.
   móvil), el interlineado, el interletrado, las mayúsculas, la alineación, el
   color y la posición del título en cada tamaño de pantalla. **Todo es
   opcional:** lo que dejes vacío se queda como siempre. Para usar una fuente
-  propia, súbela antes en **Archivos → Fuentes** (WOFF2, o WOFF/TTF, y con
+  propia, súbela antes en **Configuración → Fuentes** (solo el Administrador) (WOFF2, o WOFF/TTF, y con
   licencia para web). Si eliges un color que puede leerse mal sobre la foto,
   el panel te avisa, pero no te impide guardar.
 - **Si una diapositiva no tiene la versión vertical, el panel lo avisa** encima
@@ -376,7 +380,7 @@ oficial, no lo pongas.
     marca (**Repuestos → Marcas de repuestos**).
   - **Logo libre:** un fabricante de repuestos que no es marca de maquinaria
     (Donaldson, Berco, ESCO…). Lleva el **logo** (PNG o WebP con fondo
-    transparente, subido antes en **Archivos → Imágenes**; un SVG se convierte
+    transparente, subido antes en **Configuración → Imágenes**; un SVG se convierte
     antes a PNG, porque «Imágenes» no lo admite), el **nombre** (lo
     leen los lectores de pantalla) y, si quieres, un **enlace**: una ruta del
     sitio (`/…/`) o una dirección `https://` de otro sitio, que se abre en otra
@@ -401,7 +405,7 @@ oficial, no lo pongas.
 - Los enlaces son rutas del sitio que empiezan por «/» (p. ej.
   `/contactanos/`) o direcciones completas `https://…`.
 
-**Configuración → SEO y datos de la empresa** tiene tres partes. **Lo que dejes
+**Empresa y sedes → Datos de la empresa y redes** (o Configuración → Buscadores e imágenes del sitio; es la misma pantalla) tiene tres partes. **Lo que dejes
 vacío no rompe nada: el sitio usa el dato de siempre.**
 
 - **Horario de atención:** un tramo por grupo de días con el mismo horario.
@@ -438,8 +442,8 @@ lleva una tarjeta por tipo de máquina.
   «Maquinaria pesada → Por tipo de máquina» del menú. Si no ves el asa, la lista
   está ordenada por otra columna: quita ese orden. Una categoría nueva se crea al
   final.
-- **La foto de la cabecera** se elige en **Partes del sitio → Páginas índice y
-  contacto → Página «Maquinaria pesada nueva» (índice de tipos) → Foto de fondo
+- **La foto de la cabecera** se elige en **Configuración → Textos de las páginas índice
+  y contacto → Página «Maquinaria pesada nueva» (índice de tipos) → Foto de fondo
   del encabezado**. Mejor una foto de obra horizontal de 1920 px o más, con una
   zona tranquila donde va el título. Vacía, sale la del encabezado de la primera
   marca de repuestos que lo tenga.
@@ -465,7 +469,7 @@ lleva una tarjeta por tipo de máquina.
   «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá
   llevando a la nueva (el sitio crea solo una redirección de origen «Cambio de
   dirección web»).
-- En las **páginas** (Páginas y blog → Páginas) funciona igual, y puede llevar
+- En las **páginas** (Empresa y sedes → Páginas) funciona igual, y puede llevar
   más de un tramo («nosotros/trabaja-con-nosotros»).
 
 ## 8. Buscadores y redes sociales

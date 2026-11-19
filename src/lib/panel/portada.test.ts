@@ -55,19 +55,19 @@ describe("tarjetasDePortada", () => {
   const e = (slug: string, grupo: string, tipo: "collection" | "global" = "collection") =>
     ({ slug, grupo, tipo, etiqueta: slug, puedeCrear: tipo === "collection" }) as EntidadPortada;
 
-  it("ordena como el menú: «Partes del sitio» antes que «Configuración»", () => {
+  it("ordena como el menú: «Empresa y sedes» antes que «Configuración»", () => {
     const t = tarjetasDePortada(
       [
         e("redirects", "Configuración"),
         e("seo", "Configuración", "global"),
-        e("pie", "Partes del sitio", "global"),
-        e("solicitudes", "Solicitudes"),
+        e("vacantes-buk", "Empresa y sedes", "global"),
+        e("solicitudes", "Mensajes recibidos"),
       ],
       { redirects: 10, solicitudes: 4 },
     );
     assert.deepEqual(
       t.map((x) => x.nombre),
-      ["Solicitudes", "Partes del sitio", "Configuración"],
+      ["Mensajes recibidos", "Empresa y sedes", "Configuración"],
     );
     const config = t[2]!;
     assert.deepEqual(
@@ -80,7 +80,9 @@ describe("tarjetasDePortada", () => {
   });
 
   it("sin permiso de crear, no hay enlace de crear", () => {
-    const [t] = tarjetasDePortada([{ ...e("media", "Archivos"), puedeCrear: false }], { media: 3 });
+    const [t] = tarjetasDePortada([{ ...e("media", "Configuración"), puedeCrear: false }], {
+      media: 3,
+    });
     assert.equal(t?.entradas[0]?.hrefCrear, null);
   });
 });

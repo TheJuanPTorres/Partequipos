@@ -107,6 +107,15 @@ export interface Config {
     'tipos-equipo': {
       modelos: 'modelos-repuesto';
     };
+    'marcas-maquinaria': {
+      tipos: 'tipos-maquinaria';
+    };
+    'tipos-maquinaria': {
+      equipos: 'equipos-nuevos';
+    };
+    'marcas-lubricante': {
+      lineas: 'categorias-lubricante';
+    };
   };
   collectionsSelect: {
     solicitudes: SolicitudesSelect<false> | SolicitudesSelect<true>;
@@ -243,6 +252,7 @@ export interface Solicitude {
  */
 export interface EquiposNuevo {
   id: number;
+  '_equipos-nuevos_equipos_order'?: string | null;
   nombre: string;
   /**
    * Tiene que ser la marca del tipo de equipo de abajo. Si la cambias, vuelve a elegir el tipo.
@@ -358,6 +368,7 @@ export interface EquiposNuevo {
  */
 export interface MarcasMaquinaria {
   id: number;
+  _order?: string | null;
   nombre: string;
   /**
    * La tarjeta de esta marca en la portada: su color, su logo (a color o en blanco), la máquina recortada sobre el paisaje y un botón. Sin máquina, la tarjeta lleva la foto de la marca.
@@ -454,6 +465,14 @@ export interface MarcasMaquinaria {
      * Desmarcada, el emblema no se pinta aunque esté subido (por ejemplo, mientras el cliente no confirme el permiso de uso de la mascota).
      */
     mostrarEmblema?: boolean | null;
+  };
+  /**
+   * En el orden en que salen en la web. Arrastra las filas para cambiarlo; uno nuevo entra al final.
+   */
+  tipos?: {
+    docs?: (number | TiposMaquinaria)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
   };
   /**
    * Tamaño recomendado: SVG, o PNG transparente de 600 px de ancho.
@@ -560,6 +579,60 @@ export interface User {
   collection: 'users';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tipos-maquinaria".
+ */
+export interface TiposMaquinaria {
+  id: number;
+  '_tipos-maquinaria_tipos_order'?: string | null;
+  nombre: string;
+  marca: number | MarcasMaquinaria;
+  descripcion?: string | null;
+  /**
+   * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Vibrocompactador» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
+   */
+  subtipos?: (number | TiposMaquinaria)[] | null;
+  /**
+   * En el orden en que salen en la web. Arrastra las filas para cambiarlo; uno nuevo entra al final.
+   */
+  equipos?: {
+    docs?: (number | EquiposNuevo)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo. Tamaño recomendado: 1.200 × 900 px.
+   */
+  imagen?: (number | null) | Media;
+  /**
+   * Opcional. La máquina recortada, PNG o WebP con fondo transparente, para la cinta de tipos de la página de la marca (diseño «Kit de marca»). Si la dejas vacía, se usa la imagen de la tarjeta o la primera foto de sus equipos. Tamaño recomendado: PNG o WebP transparente, 1.600 px de ancho.
+   */
+  render?: (number | null) | Media;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  /**
+   * Solo para un tipo que todavía NO tiene su página general (una «Categoría de maquinaria nueva» con su nombre): marcada, el índice de tipos y el menú enseñan este tipo y llevan a su página en la marca. Con categoría, el índice y el menú llevan siempre a la categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.
+   */
+  pestanaIndiceNueva?: boolean | null;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * Posición del tipo en la página de su marca, en la barra de tipos y en el menú (1, 2, 3…). Vacío: después de los que tienen orden, por nombre.
+   */
+  orden?: number | null;
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Para cambiar el orden de las tarjetas del índice de tipos y del menú «Por tipo de máquina», arrastra cada fila por su asa (a la izquierda). El orden se guarda solo al soltarla. Si la lista está ordenada por otra columna, quita ese orden para ver el asa.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -590,51 +663,6 @@ export interface CategoriasMaquinaria {
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
-  actualizadoPor?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tipos-maquinaria".
- */
-export interface TiposMaquinaria {
-  id: number;
-  nombre: string;
-  marca: number | MarcasMaquinaria;
-  descripcion?: string | null;
-  /**
-   * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Vibrocompactador» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
-   */
-  subtipos?: (number | TiposMaquinaria)[] | null;
-  /**
-   * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo. Tamaño recomendado: 1.200 × 900 px.
-   */
-  imagen?: (number | null) | Media;
-  /**
-   * Opcional. La máquina recortada, PNG o WebP con fondo transparente, para la cinta de tipos de la página de la marca (diseño «Kit de marca»). Si la dejas vacía, se usa la imagen de la tarjeta o la primera foto de sus equipos. Tamaño recomendado: PNG o WebP transparente, 1.600 px de ancho.
-   */
-  render?: (number | null) | Media;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  /**
-   * Solo para un tipo que todavía NO tiene su página general (una «Categoría de maquinaria nueva» con su nombre): marcada, el índice de tipos y el menú enseñan este tipo y llevan a su página en la marca. Con categoría, el índice y el menú llevan siempre a la categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.
-   */
-  pestanaIndiceNueva?: boolean | null;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  /**
-   * Posición del tipo en la página de su marca, en la barra de tipos y en el menú (1, 2, 3…). Vacío: después de los que tienen orden, por nombre.
-   */
-  orden?: number | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -1037,6 +1065,7 @@ export interface CategoriasTecnica {
  */
 export interface MarcasLubricante {
   id: number;
+  _order?: string | null;
   nombre: string;
   /**
    * Resumen de una o dos líneas, bajo el título.
@@ -1065,6 +1094,14 @@ export interface MarcasLubricante {
    * El color de acento de la página (botones, franjas, etiquetas): en ENI, el amarillo. El texto sobre él se pone solo en negro o blanco, el que mejor se lea.
    */
   colorPrincipal?: string | null;
+  /**
+   * En el orden en que salen en la web. Arrastra las filas para cambiarlo; uno nuevo entra al final.
+   */
+  lineas?: {
+    docs?: (number | CategoriasLubricante)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   /**
    * Tamaño recomendado: SVG, o PNG transparente de 600 px de ancho.
    */
@@ -1113,6 +1150,96 @@ export interface MarcasLubricante {
    * El fondo oscuro de la cabecera y de la zona de contacto: en ENI, el negro.
    */
   colorOscuro?: string | null;
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias-lubricante".
+ */
+export interface CategoriasLubricante {
+  id: number;
+  '_categorias-lubricante_lineas_order'?: string | null;
+  nombre: string;
+  marca: number | MarcasLubricante;
+  /**
+   * Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su página.
+   */
+  enlaceMenu?: string | null;
+  /**
+   * Texto de la cabecera de su página, bajo el título. Vacío, la entradilla de la marca.
+   */
+  entradilla?: string | null;
+  descripcion?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * En este orden en la página. Nombre y grado tal como los publica el fabricante; no inventes especificaciones.
+   */
+  productos?:
+    | {
+        /**
+         * Ej. «I-SINT».
+         */
+        nombre: string;
+        /**
+         * Ej. «0W-20» o «DOT 4». Opcional.
+         */
+        grado?: string | null;
+        /**
+         * Opcional. Los productos seguidos con el mismo grupo salen bajo ese subtítulo (p. ej. «Compresores»).
+         */
+        grupo?: string | null;
+        imagen?: (number | null) | Media;
+        /**
+         * El PDF del fabricante. Sale como «Ficha técnica».
+         */
+        ficha?: (number | null) | Documento;
+        descripcion?: string | null;
+        /**
+         * Desmarcado, el producto desaparece de la página de su línea (y de sus grupos y fichas) sin borrarse del panel. Vuelve al marcarlo.
+         */
+        mostrarEnWeb?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Foto de su tarjeta en la página de la marca. También la de la cabecera de su página si «Imagen de cabecera» está vacía. Tamaño recomendado: 1.200 × 900 px.
+   */
+  imagen?: (number | null) | Media;
+  /**
+   * Opcional. Fondo de la cabecera de su página. Vacía, la «Imagen» de la línea; sin ninguna, fondo oscuro. Tamaño recomendado: 2.560 × 1.440 px (horizontal).
+   */
+  imagenCabecera?: (number | null) | Media;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * Posición de la línea en la página de la marca y en el menú «Lubricantes» (1, 2, 3…). Vacío, después de las que tienen orden, por nombre.
+   */
+  orden?: number | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -1243,6 +1370,7 @@ export interface EquiposUsado {
  */
 export interface CategoriasUsada {
   id: number;
+  _order?: string | null;
   nombre: string;
   descripcion?: string | null;
   /**
@@ -1285,6 +1413,7 @@ export interface CategoriasUsada {
  */
 export interface MarcasUsada {
   id: number;
+  _order?: string | null;
   nombre: string;
   /**
    * Texto bajo el título de la página de la marca. También sirve de descripción en Google si no escribes una abajo.
@@ -1314,95 +1443,6 @@ export interface MarcasUsada {
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
-  actualizadoPor?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categorias-lubricante".
- */
-export interface CategoriasLubricante {
-  id: number;
-  nombre: string;
-  marca: number | MarcasLubricante;
-  /**
-   * Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su página.
-   */
-  enlaceMenu?: string | null;
-  /**
-   * Texto de la cabecera de su página, bajo el título. Vacío, la entradilla de la marca.
-   */
-  entradilla?: string | null;
-  descripcion?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * En este orden en la página. Nombre y grado tal como los publica el fabricante; no inventes especificaciones.
-   */
-  productos?:
-    | {
-        /**
-         * Ej. «I-SINT».
-         */
-        nombre: string;
-        /**
-         * Ej. «0W-20» o «DOT 4». Opcional.
-         */
-        grado?: string | null;
-        /**
-         * Opcional. Los productos seguidos con el mismo grupo salen bajo ese subtítulo (p. ej. «Compresores»).
-         */
-        grupo?: string | null;
-        imagen?: (number | null) | Media;
-        /**
-         * El PDF del fabricante. Sale como «Ficha técnica».
-         */
-        ficha?: (number | null) | Documento;
-        descripcion?: string | null;
-        /**
-         * Desmarcado, el producto desaparece de la página de su línea (y de sus grupos y fichas) sin borrarse del panel. Vuelve al marcarlo.
-         */
-        mostrarEnWeb?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Foto de su tarjeta en la página de la marca. También la de la cabecera de su página si «Imagen de cabecera» está vacía. Tamaño recomendado: 1.200 × 900 px.
-   */
-  imagen?: (number | null) | Media;
-  /**
-   * Opcional. Fondo de la cabecera de su página. Vacía, la «Imagen» de la línea; sin ninguna, fondo oscuro. Tamaño recomendado: 2.560 × 1.440 px (horizontal).
-   */
-  imagenCabecera?: (number | null) | Media;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  /**
-   * Posición de la línea en la página de la marca y en el menú «Lubricantes» (1, 2, 3…). Vacío, después de las que tienen orden, por nombre.
-   */
-  orden?: number | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -2475,6 +2515,7 @@ export interface CategoriasBlog {
  */
 export interface PreguntasFrecuente {
   id: number;
+  _order?: string | null;
   pregunta: string;
   /**
    * Texto sin formato. Para enlazar a otra página escribe [texto del enlace](/ruta/) o [texto](https://…).
@@ -2494,6 +2535,7 @@ export interface PreguntasFrecuente {
  */
 export interface Testimonio {
   id: number;
+  _order?: string | null;
   nombre: string;
   empresa?: string | null;
   ciudad?: string | null;
@@ -2540,6 +2582,7 @@ export interface Testimonio {
  */
 export interface Sede {
   id: number;
+  _order?: string | null;
   /**
    * Nombre de la sede. La ficha dice «Sede <nombre>». Ej. «Bogotá», «Antioquia».
    */
@@ -3023,6 +3066,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
  * via the `definition` "equipos-nuevos_select".
  */
 export interface EquiposNuevosSelect<T extends boolean = true> {
+  '_equipos-nuevos_equipos_order'?: T;
   nombre?: T;
   marca?: T;
   tipo?: T;
@@ -3105,6 +3149,7 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
  * via the `definition` "marcas-maquinaria_select".
  */
 export interface MarcasMaquinariaSelect<T extends boolean = true> {
+  _order?: T;
   nombre?: T;
   portada?:
     | T
@@ -3147,6 +3192,7 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
         emblema?: T;
         mostrarEmblema?: T;
       };
+  tipos?: T;
   logo?: T;
   imagenTarjeta?: T;
   seo?:
@@ -3171,10 +3217,12 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
  * via the `definition` "tipos-maquinaria_select".
  */
 export interface TiposMaquinariaSelect<T extends boolean = true> {
+  '_tipos-maquinaria_tipos_order'?: T;
   nombre?: T;
   marca?: T;
   descripcion?: T;
   subtipos?: T;
+  equipos?: T;
   imagen?: T;
   render?: T;
   seo?:
@@ -3218,6 +3266,7 @@ export interface CategoriasMaquinariaSelect<T extends boolean = true> {
  * via the `definition` "categorias-usada_select".
  */
 export interface CategoriasUsadaSelect<T extends boolean = true> {
+  _order?: T;
   nombre?: T;
   descripcion?: T;
   enOtros?: T;
@@ -3241,6 +3290,7 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
  * via the `definition` "marcas-usada_select".
  */
 export interface MarcasUsadaSelect<T extends boolean = true> {
+  _order?: T;
   nombre?: T;
   descripcion?: T;
   marcaNueva?: T;
@@ -3263,11 +3313,13 @@ export interface MarcasUsadaSelect<T extends boolean = true> {
  * via the `definition` "marcas-lubricante_select".
  */
 export interface MarcasLubricanteSelect<T extends boolean = true> {
+  _order?: T;
   nombre?: T;
   entradilla?: T;
   descripcion?: T;
   textoSelector?: T;
   colorPrincipal?: T;
+  lineas?: T;
   logo?: T;
   fotoSelector?: T;
   imagenCabecera?: T;
@@ -3294,6 +3346,7 @@ export interface MarcasLubricanteSelect<T extends boolean = true> {
  * via the `definition` "categorias-lubricante_select".
  */
 export interface CategoriasLubricanteSelect<T extends boolean = true> {
+  '_categorias-lubricante_lineas_order'?: T;
   nombre?: T;
   marca?: T;
   enlaceMenu?: T;
@@ -3798,6 +3851,7 @@ export interface CategoriasBlogSelect<T extends boolean = true> {
  * via the `definition` "preguntas-frecuentes_select".
  */
 export interface PreguntasFrecuentesSelect<T extends boolean = true> {
+  _order?: T;
   pregunta?: T;
   respuesta?: T;
   orden?: T;
@@ -3811,6 +3865,7 @@ export interface PreguntasFrecuentesSelect<T extends boolean = true> {
  * via the `definition` "testimonios_select".
  */
 export interface TestimoniosSelect<T extends boolean = true> {
+  _order?: T;
   nombre?: T;
   empresa?: T;
   ciudad?: T;
@@ -3833,6 +3888,7 @@ export interface TestimoniosSelect<T extends boolean = true> {
  * via the `definition` "sedes_select".
  */
 export interface SedesSelect<T extends boolean = true> {
+  _order?: T;
   nombre?: T;
   ciudad?: T;
   departamento?: T;

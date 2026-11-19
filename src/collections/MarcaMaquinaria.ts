@@ -1,4 +1,5 @@
 import { avisoField } from "@/lib/fields/avisoField";
+import { joinsSoloEnElPanel } from "./hooks/joinsSoloEnElPanel";
 import { conPestanas } from "../lib/fields/pestanasFicha";
 import { campoColorMarca } from "@/lib/fields/colorMarca";
 import { validarColor } from "@/lib/fields/tipografiaTitulo";
@@ -36,6 +37,12 @@ export const MarcaMaquinaria: CollectionConfig = {
     defaultColumns: ["nombre", "slug", "mostrarEnWeb"],
     group: "Maquinaria",
   },
+  /*
+   * ORDEN POR ARRASTRE (2026-11-19, dirección; informe del panel §6): `_order` oculto de Payload,
+   * con el orden inicial de hoy puesto por la migración `orden_resto`. Lo nuevo entra al final. La
+   * web lo usa cuando se pasen sus consultas a `_order` (§6.3).
+   */
+  orderable: true,
   access: {
     read: lecturaContenido,
     create: escrituraContenido,
@@ -43,6 +50,7 @@ export const MarcaMaquinaria: CollectionConfig = {
     delete: borradoAdmin,
   },
   hooks: {
+    beforeOperation: [joinsSoloEnElPanel],
     afterChange: [revalidarMarcaMaquinaria, portada.afterChange, menu.afterChange],
     afterDelete: [revalidarMarcaMaquinariaBorrada, portada.afterDelete, menu.afterDelete],
   },
@@ -423,6 +431,24 @@ export const MarcaMaquinaria: CollectionConfig = {
             },
           },
         ],
+      },
+      /*
+       * LOS TIPOS DE LA MARCA, EN SU ORDEN (2026-11-19): se arrastran aquí (join ordenable: el orden es de
+       * cada ficha). Va en la pestaña «Contenido». Solo se rellena en el panel (`joinsSoloEnElPanel`).
+       */
+      {
+        name: "tipos",
+        type: "join",
+        collection: "tipos-maquinaria",
+        on: "marca",
+        orderable: true,
+        defaultLimit: 100,
+        label: "Tipos de máquina de la marca",
+        admin: {
+          defaultColumns: ["nombre", "slug"],
+          description:
+            "En el orden en que salen en la web. Arrastra las filas para cambiarlo; uno nuevo entra al final.",
+        },
       },
       seoField(),
     ],

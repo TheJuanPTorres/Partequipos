@@ -30,6 +30,12 @@ export const MarcaUsada: CollectionConfig = {
     description:
       "Cada marca tiene su página con las unidades usadas disponibles. Se crea sola al guardar una unidad con una marca nueva.",
   },
+  /*
+   * ORDEN POR ARRASTRE (2026-11-19, dirección; informe del panel §6): `_order` oculto de Payload,
+   * con el orden inicial de hoy puesto por la migración `orden_resto`. Lo nuevo entra al final. La
+   * web lo usa cuando se pasen sus consultas a `_order` (§6.3).
+   */
+  orderable: true,
   access: {
     read: lecturaContenido,
     create: escrituraContenido,

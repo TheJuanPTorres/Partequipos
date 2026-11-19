@@ -24,6 +24,12 @@ export const PreguntaFrecuente: CollectionConfig = {
     defaultColumns: ["pregunta", "orden", "publicada"],
     group: "Portada",
   },
+  /*
+   * ORDEN POR ARRASTRE (2026-11-19, dirección; informe del panel §6): `_order` oculto de Payload,
+   * con el orden inicial de hoy puesto por la migración `orden_resto`. Lo nuevo entra al final. La
+   * web lo usa cuando se pasen sus consultas a `_order` (§6.3).
+   */
+  orderable: true,
   access: {
     read: leerPreguntas,
     create: escrituraContenido,
@@ -31,7 +37,9 @@ export const PreguntaFrecuente: CollectionConfig = {
     delete: borradoAdmin,
   },
   hooks: { afterChange: [portada.afterChange], afterDelete: [portada.afterDelete] },
-  defaultSort: "orden",
+  // Con `orderable`, la lista se ordena por el arrastre (sin esto, avisa de que hay que ordenar
+  // por «Orden» antes de arrastrar).
+  defaultSort: "_order",
   fields: [
     { name: "pregunta", type: "text", required: true, label: "Pregunta" },
     {

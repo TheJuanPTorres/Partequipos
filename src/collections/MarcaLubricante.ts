@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { validarColor } from "../lib/fields/tipografiaTitulo";
 import { DESTINO_EXTERNO, DESTINO_PAGINA } from "../lib/lubricantes/destino";
@@ -135,7 +136,8 @@ export const MarcaLubricante: CollectionConfig = {
           "Foto de fondo de la cabecera de la página. Opcional: sin ella, un fondo oscuro.",
       },
     },
-    {
+    // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+    ocultoSinUso({
       name: "videoCabecera",
       type: "upload",
       relationTo: "videos",
@@ -144,12 +146,13 @@ export const MarcaLubricante: CollectionConfig = {
         description:
           "Vídeo de fondo de la cabecera (sin sonido, de hasta 4 MB: se carga primero en «Vídeos», con su póster). Se ve solo en pantallas grandes: en móvil, con ahorro de datos o con «reducir movimiento», queda solo la imagen de cabecera.",
       },
-    },
+    }),
     /*
      * Identidad de la marca (2026-10-19, cliente): la página de la marca de lubricantes es un
      * «sitio dentro del sitio» con los colores de la marca. Vacíos: amarillo y negro de ENI.
      */
-    {
+    // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+    ocultoSinUso({
       name: "disenoPropio",
       type: "checkbox",
       label: "Diseño propio de Partequipos (no es de Andrés)",
@@ -158,7 +161,7 @@ export const MarcaLubricante: CollectionConfig = {
         description:
           "Desmarcada (por defecto), la página usa la plantilla de Andrés («Categoría Lubricantes»). Marcada, el diseño propio con la identidad de la marca (colores, vídeo de cabecera…). En producción solo se publican plantillas de Andrés.",
       },
-    },
+    }),
     {
       name: "colorPrincipal",
       type: "text",
@@ -171,7 +174,8 @@ export const MarcaLubricante: CollectionConfig = {
           "El color de acento de la página (botones, franjas, etiquetas): en ENI, el amarillo. El texto sobre él se pone solo en negro o blanco, el que mejor se lea.",
       },
     },
-    {
+    // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+    ocultoSinUso({
       name: "colorOscuro",
       type: "text",
       label: "Color oscuro de la marca",
@@ -181,7 +185,7 @@ export const MarcaLubricante: CollectionConfig = {
         components: { Field: "/components/admin/CampoColor" },
         description: "El fondo oscuro de la cabecera y de la zona de contacto: en ENI, el negro.",
       },
-    },
+    }),
     seoField(),
   ],
 };

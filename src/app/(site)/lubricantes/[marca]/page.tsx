@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { PaginaMarcaLubricante } from "@/components/lubricantes/PaginaMarcaLubricante";
 import { PaginaMarcaLubricantePlantilla } from "@/components/lubricantes/PaginaMarcaLubricantePlantilla";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { vistaLubricantes } from "@/lib/lubricantes/general";
@@ -74,25 +73,15 @@ export default async function MarcaLubricantePage({ params }: { params: Promise<
   return (
     <>
       <JsonLd data={buildBreadcrumbJsonLd(breadcrumbs)} />
-      {/* En producción solo van plantillas de Andrés: el diseño propio es opt-in (dirección, 2026-10-19). */}
-      {marca.disenoPropio ? (
-        <PaginaMarcaLubricante
-          marca={marca}
-          secciones={seccionesDeCategorias(categorias)}
-          whatsapp={enlaceWhatsApp(
-            empresa.whatsapp,
-            `Hola, quiero cotizar lubricantes ${marca.nombre}`,
-          )}
-        />
-      ) : (
-        <PaginaMarcaLubricantePlantilla
-          marca={marca}
-          secciones={seccionesDeCategorias(categorias)}
-          // Los textos del bloque final son los de la página general (`/lubricantes/`), del panel.
-          bloque={vistaLubricantes(indice.lubricantes, marcas).bloque}
-          whatsapp={enlaceWhatsApp(empresa.whatsapp)}
-        />
-      )}
+      {/* La plantilla de Andrés. El diseño propio de la marca (#260) se retiró el 2026-11-18
+          (dirección, limpieza del panel); queda en git. */}
+      <PaginaMarcaLubricantePlantilla
+        marca={marca}
+        secciones={seccionesDeCategorias(categorias)}
+        // Los textos del bloque final son los de la página general (`/lubricantes/`), del panel.
+        bloque={vistaLubricantes(indice.lubricantes, marcas).bloque}
+        whatsapp={enlaceWhatsApp(empresa.whatsapp)}
+      />
     </>
   );
 }

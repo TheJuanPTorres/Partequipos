@@ -4,8 +4,11 @@ import { describe, it } from "node:test";
 import type { Block, Field } from "payload";
 
 import { BLOQUES_PAGINA, bloquesElegibles } from "../../collections/bloques/bloquesPagina";
+import { CategoriaTecnica } from "../../collections/CategoriaTecnica";
 import { EquipoNuevo } from "../../collections/EquipoNuevo";
 import { EquipoUsado } from "../../collections/EquipoUsado";
+import { MarcaLubricante } from "../../collections/MarcaLubricante";
+import { ModeloRepuesto } from "../../collections/ModeloRepuesto";
 import { PaginaInstitucional } from "../../collections/PaginaInstitucional";
 import { Redirects } from "../../collections/Redirects";
 import { TipoEquipo } from "../../collections/TipoEquipo";
@@ -27,6 +30,9 @@ const OCULTOS: Record<string, { fields: Field[] }> = {
   "tipos-equipo": TipoEquipo,
   "repuestos-marca": RepuestosMarca,
   "paginas-indice": PaginasIndice,
+  "modelos-repuesto": ModeloRepuesto,
+  "categorias-tecnicas": CategoriaTecnica,
+  "marcas-lubricante": MarcaLubricante,
 };
 
 const RUTAS_OCULTAS: [keyof typeof OCULTOS, string][] = [
@@ -60,6 +66,24 @@ const RUTAS_OCULTAS: [keyof typeof OCULTOS, string][] = [
   ["paginas-indice", "trabaja.textoHojaDeVida"],
   ["paginas-indice", "trabaja.botonHojaDeVida"],
   ["paginas-indice", "trabaja.imagenHojaDeVida"],
+  // Diseños retirados el 2026-11-18: los propios del modelo de repuestos y de ENI, y el
+  // interruptor del artículo (se quedó el diseño publicado, `ArticuloPropio`).
+  ["repuestos-marca", "disenoModelo"],
+  ["repuestos-marca", "modeloAyudaTitulo"],
+  ["repuestos-marca", "modeloAyudaTexto"],
+  ["repuestos-marca", "modeloAyudaBoton"],
+  ["repuestos-marca", "modeloAyudaFoto"],
+  ["repuestos-marca", "modeloContactoTitulo"],
+  ["modelos-repuesto", "antetitulo"],
+  ["modelos-repuesto", "tituloPagina"],
+  ["modelos-repuesto", "tituloDisponibles"],
+  ["modelos-repuesto", "piezas"],
+  ["modelos-repuesto", "mostrarPiezas"],
+  ["categorias-tecnicas", "icono"],
+  ["marcas-lubricante", "disenoPropio"],
+  ["marcas-lubricante", "videoCabecera"],
+  ["marcas-lubricante", "colorOscuro"],
+  ["paginas-indice", "blog.disenoArticulo"],
 ];
 
 /** Los subcampos de un campo: grupos, filas, colapsables, filas de array y pestañas. */

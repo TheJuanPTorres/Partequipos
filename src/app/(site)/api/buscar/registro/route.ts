@@ -15,7 +15,7 @@ export async function POST(peticion: NextRequest) {
     const cuerpo = (await peticion.json()) as { q?: unknown };
     const consulta = normalizarConsulta(typeof cuerpo.q === "string" ? cuerpo.q : undefined);
     if (consulta.estado === "valida") {
-      const r = await buscarEnCatalogo(consulta.texto, {}, 1);
+      const r = await buscarEnCatalogo(consulta.texto, {}, 1, peticion.nextUrl.origin);
       if (r.total === 0) await registrarSinResultado(consulta.texto);
     }
   } catch {

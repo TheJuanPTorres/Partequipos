@@ -3,22 +3,20 @@ import { getPayload } from "payload";
 
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
 import { rutas } from "@/lib/routes";
-import { imagenDeMedia, poblado } from "@/lib/utils/relations";
-import { conEquipoVisible, conProductoVisible, MARCA_VISIBLE } from "@/lib/nueva/visibilidad";
+import {
+  conEquipoVisible,
+  conProductoVisible,
+  MARCA_VISIBLE,
+  DE_MARCA_VISIBLE,
+} from "@/lib/nueva/visibilidad";
 import type {
   Articulo,
   CategoriasLubricante,
   CategoriasMaquinaria,
   Pagina,
   CategoriasTecnica,
-  CategoriasUsada,
-  Marca,
   MarcasLubricante,
-  MarcasMaquinaria,
-  MarcasUsada,
   Sede,
-  TiposEquipo,
-  TiposMaquinaria,
 } from "@/payload-types";
 
 import type { DocBusqueda } from "./motor";
@@ -93,12 +91,12 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
     payload.find({ collection: "categorias-maquinaria", ...todo }),
     payload.find({ collection: "categorias-usada", ...todo }),
     payload.find({ collection: "paginas", ...todo, depth: 0 }),
-    payload.find({ collection: "tipos-maquinaria", ...todo }),
+    payload.find({ collection: "tipos-maquinaria", where: DE_MARCA_VISIBLE, ...todo }),
     payload.find({ collection: "marcas-usada", ...todo }),
     payload.find({
       collection: "media",
       ...todo,
-      select: { url: true, width: true, height: true },
+      select: { url: true, filename: true, width: true, height: true },
     }),
   ]);
 

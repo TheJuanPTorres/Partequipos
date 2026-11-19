@@ -28,7 +28,8 @@
  *   avisos del panel, §22), `listas` (estados, fechas, miniaturas y ordenar,
  *   filtrar y buscar, §24), `orden` (las listas de tipos y equipos nuevos de Case por su
  *   «Orden», #379), `arrastrar` (ordena «Categorías de maquinaria nueva» arrastrando y lo
- *   devuelve a como estaba, #441) y `oscuro`, solo o detrás de otro modo
+ *   devuelve a como estaba, #441), `pestanas` (cada pestaña de una ficha de maquinaria y una de
+ *   lubricantes, solo a 1440, #507) y `oscuro`, solo o detrás de otro modo
  *   («avisos oscuro»). Sin modo, la pasada normal en claro.
  * - No escribe nada en el panel, salvo el modo `arrastrar`, que cambia el orden y lo devuelve: solo navega y lee. En modo `ficha` pulsa
  *   «Guardar» con 5 «Destacar» marcados, que la validación rechaza, y comprueba
@@ -499,6 +500,61 @@ try {
         });
         hallazgos.push({ pantalla: nombre, ancho: ancho.nombre, ...lista });
         decir(`✓ ${nombre} (${ancho.nombre})`);
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `pestanas` (2026-11-19, #507): las fichas con pestañas (Contenido · Fotos · Buscadores y
+     * redes · Avanzado), solo a 1440: un equipo usado (maquinaria) y una línea de lubricantes.
+     * Pulsa cada pestaña, la captura y anota qué pestañas ve la cuenta (un editor no ve
+     * «Avanzado») y si sale el aviso de foto pequeña. Solo lee: no guarda nada.
+     */
+    if (MODO === "pestanas") {
+      if (ancho.movil) {
+        await contexto.close();
+        continue;
+      }
+      const FICHAS = [
+        ["pestanas-equipo-usado", "equipos-usados"],
+        ["pestanas-linea-lubricante", "categorias-lubricante"],
+      ];
+      for (const [nombre, coleccion] of FICHAS) {
+        const primero = await pagina.evaluate(
+          async (u) => (await (await fetch(u, { credentials: "include" })).json()).docs?.[0]?.id,
+          `/api/${coleccion}/?limit=1&depth=0&select[nombre]=true`,
+        );
+        if (!primero) {
+          decir(`· ${nombre}: la colección está vacía`);
+          continue;
+        }
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${primero}`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(1500);
+        const botones = pagina.locator(".tabs-field__tab-button");
+        const etiquetas = (await botones.allInnerTexts()).map((t) => t.trim());
+        const vistas = [];
+        for (let i = 0; i < etiquetas.length; i++) {
+          await botones.nth(i).click();
+          await pagina.waitForTimeout(1200);
+          const aviso = await pagina
+            .locator(".pq-aviso")
+            .filter({ hasText: /pequeñ/ })
+            .count();
+          const fichero = `${nombre}-${i + 1}-${etiquetas[i]
+            .normalize("NFD")
+            .replace(/\p{Diacritic}/gu, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")}-${ancho.nombre}.png`;
+          await pagina.screenshot({ path: path.join(salida, fichero), fullPage: true });
+          vistas.push({ pestana: etiquetas[i], avisoFotoPequena: aviso > 0, fichero });
+          decir(`✓ ${nombre} · ${etiquetas[i]}${aviso ? " (aviso de foto pequeña)" : ""}`);
+        }
+        hallazgos.push({ pantalla: nombre, ancho: ancho.nombre, pestanas: etiquetas, vistas });
       }
       hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
       hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });

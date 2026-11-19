@@ -319,7 +319,13 @@ ${tituloEscritorio.modelo}`}
             <div className={nueva.columnaIzquierda}>
               <div className={`${estilos.columnaGaleria} ${nueva.columnaGaleria}`}>
                 {boton360}
-                <GaleriaFicha fotos={fotos} nombre={nombre} sinFondo sizesFoto={SIZES_GALERIA} altoMovil={400} />
+                <GaleriaFicha
+                  fotos={fotos}
+                  nombre={nombre}
+                  sinFondo
+                  sizesFoto={SIZES_GALERIA}
+                  altoMovil={400}
+                />
               </div>
             </div>
           ) : null}

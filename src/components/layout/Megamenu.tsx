@@ -52,6 +52,7 @@ import {
 import { AVISO_OTRA_PESTANA } from "@/lib/nueva/enlaceExterno";
 
 import estilos from "./megamenu.module.css";
+import { escalaPx } from "@/lib/estilos/escala";
 
 /**
  * PANEL DEL MEGAMENÚ (ux-9, export 2162 del 2026-10-05; decisiones-home-ux9.md
@@ -509,9 +510,13 @@ export function SubmenuMovil({
   );
 }
 
-/** El radio de las esquinas de abajo del marco (`--mega-radio`). */
+/**
+ * El radio de las esquinas de abajo del marco (`--mega-radio`, 30 px del diseño). La variable llega
+ * como `calc(30 * var(--escala-px, 1px))` (escala de las pantallas grandes, CLAUDE.md §5), que
+ * `parseFloat` no lee: entonces, los 30 del diseño escalados.
+ */
 const radioDe = (m: HTMLElement) =>
-  parseFloat(getComputedStyle(m).getPropertyValue("--mega-radio")) || 30;
+  parseFloat(getComputedStyle(m).getPropertyValue("--mega-radio")) || escalaPx(30);
 
 /** Cómo está cada panel dentro del marco. */
 export type EstadoPanel = "activo" | "saliendo" | "oculto";

@@ -1,5 +1,5 @@
 /**
- * La escala de las pantallas grandes vista desde JavaScript (la del CSS es `--u`, `globals.css`):
+ * La escala de las pantallas grandes vista desde JavaScript (la del CSS es `--escala-px`, `globals.css`):
  * 1 hasta 1600 px de ventana y, desde ahí, `ancho / 1600`. Para las medidas en píxeles que viven
  * en el código (márgenes al desplazar, recorridos de una animación…) y que tienen que crecer como
  * el resto de la página. Las que se miden en el DOM ya vienen escaladas: no se tocan.

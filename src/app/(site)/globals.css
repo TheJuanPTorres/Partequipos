@@ -29,13 +29,13 @@
 
 /*
  * ESCALA PROPORCIONAL EN PANTALLAS GRANDES (opción 2 de Juan Pablo, 2026-11-18; CLAUDE.md §5).
- * `--u` es el «píxel del diseño»: 1 px hasta 1600 px de ventana y, desde ahí, crece en proporción
+ * `--escala-px` es el «píxel del diseño»: 1 px hasta 1600 px de ventana y, desde ahí, crece en proporción
  * (2,4 px a 3840). El plugin `src/lib/estilos/escalaPostcss.mjs` pasa cada `Npx` del CSS del sitio
- * a `calc(N * var(--u))`, y la letra raíz crece igual, así que los `rem` de Tailwind también. Por
+ * a `calc(N * var(--escala-px, 1px))`, y la letra raíz crece igual, así que los `rem` de Tailwind también. Por
  * debajo de 1600, todo igual que antes. El panel no usa esta hoja.
  */
 :root {
-  --u: max(1px, 100vw / 1600);
+  --escala-px: max(1px, 100vw / 1600);
 }
 
 html {

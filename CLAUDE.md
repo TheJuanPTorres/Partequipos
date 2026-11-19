@@ -291,8 +291,8 @@ docs/
   1600 no cambia nada.
   - **Cómo:** se escribe en `px`, como siempre. El plugin
     `src/lib/estilos/escalaPostcss.mjs` (en `postcss.config.mjs`) pasa cada
-    `Npx` del CSS del sitio a `calc(N * var(--u, 1px))`, con
-    `--u: max(1px, 100vw / 1600)` en `globals.css`; la letra raíz crece igual,
+    `Npx` del CSS del sitio a `calc(N * var(--escala-px, 1px))`, con
+    `--escala-px: max(1px, 100vw / 1600)` en `globals.css`; la letra raíz crece igual,
     así que los `rem` de Tailwind también. No toca las condiciones de `@media`
     ni de `@container`, el panel ni `node_modules`.
   - **Sin reglas de `@media` por encima de 1600** que cambien la composición

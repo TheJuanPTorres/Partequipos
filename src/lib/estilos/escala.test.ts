@@ -22,23 +22,29 @@ describe("escala de las pantallas grandes", () => {
 
 describe("plugin de PostCSS", () => {
   it("pasa los px a la unidad fluida", () => {
-    assert.equal(escalarValor("24px"), "calc(24 * var(--u, 1px))");
+    assert.equal(escalarValor("24px"), "calc(24 * var(--escala-px, 1px))");
     assert.equal(
       escalarValor("0 24px -8px"),
-      "0 calc(24 * var(--u, 1px)) calc(-8 * var(--u, 1px))",
+      "0 calc(24 * var(--escala-px, 1px)) calc(-8 * var(--escala-px, 1px))",
     );
-    assert.equal(escalarValor("calc(100% - 1.5px)"), "calc(100% - calc(1.5 * var(--u, 1px)))");
-    assert.equal(escalarValor("min(1.5vw, 24px)"), "min(1.5vw, calc(24 * var(--u, 1px)))");
+    assert.equal(
+      escalarValor("calc(100% - 1.5px)"),
+      "calc(100% - calc(1.5 * var(--escala-px, 1px)))",
+    );
+    assert.equal(escalarValor("min(1.5vw, 24px)"), "min(1.5vw, calc(24 * var(--escala-px, 1px)))");
     assert.equal(
       escalarValor("12px/20px Inter"),
-      "calc(12 * var(--u, 1px))/calc(20 * var(--u, 1px)) Inter",
+      "calc(12 * var(--escala-px, 1px))/calc(20 * var(--escala-px, 1px)) Inter",
     );
   });
 
   it("no toca 0px, url(), cadenas, nombres de variable ni colores", () => {
     assert.equal(escalarValor("0px"), "0px");
     assert.equal(escalarValor('url("foto-24px.png")'), 'url("foto-24px.png")');
-    assert.equal(escalarValor("url(a-24px.svg) 8px"), "url(a-24px.svg) calc(8 * var(--u, 1px))");
+    assert.equal(
+      escalarValor("url(a-24px.svg) 8px"),
+      "url(a-24px.svg) calc(8 * var(--escala-px, 1px))",
+    );
     assert.equal(escalarValor('"24px"'), '"24px"');
     assert.equal(escalarValor("var(--hueco-24px)"), "var(--hueco-24px)");
     assert.equal(escalarValor("1rem 2vw 50%"), "1rem 2vw 50%");

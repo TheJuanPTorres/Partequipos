@@ -2,7 +2,7 @@
  * ESCALA PROPORCIONAL EN PANTALLAS GRANDES (opción 2 de Juan Pablo, 2026-11-18).
  *
  * Plugin de PostCSS propio (sin dependencias): en el CSS del SITIO pasa cada longitud en `px` a
- * `calc(N * var(--u, 1px))` (1 px si `--u` no existe, p. ej. dentro del panel). `--u` vale `max(1px, 100vw / 1600)` (`globals.css`): 1 px hasta 1600 px de
+ * `calc(N * var(--escala-px, 1px))` (1 px si `--escala-px` no existe, p. ej. dentro del panel). `--escala-px` vale `max(1px, 100vw / 1600)` (`globals.css`): 1 px hasta 1600 px de
  * ventana, así que por debajo el resultado es el mismo número de píxeles que hoy (390 y 1440 sin
  * cambios), y desde 1600 todo —contenedores, letra, botones, iconos y huecos— crece en proporción,
  * como si el diseño de 1600 se ampliara. Con CSS y no con `zoom`: lo que mide con JavaScript ve las
@@ -23,7 +23,7 @@ const PX = /(^|[^\w.#-])(-?(?:\d+\.?\d*|\.\d+))px(?![\w-])/g;
 function convertirTramo(tramo) {
   return tramo.replace(PX, (todo, antes, numero) => {
     if (Number(numero) === 0) return `${antes}0px`;
-    return `${antes}calc(${numero} * var(--u, 1px))`;
+    return `${antes}calc(${numero} * var(--escala-px, 1px))`;
   });
 }
 
@@ -74,7 +74,7 @@ export default function escalaPostcss() {
       });
       if (sinEscala) return;
       raiz.walkDecls((d) => {
-        if (d.prop === "--u") return;
+        if (d.prop === "--escala-px") return;
         const nuevo = escalarValor(d.value);
         if (nuevo !== d.value) d.value = nuevo;
       });

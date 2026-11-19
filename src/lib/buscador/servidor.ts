@@ -2,7 +2,11 @@ import { unstable_cache } from "next/cache";
 
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 
+import config from "@payload-config";
+import { getPayload } from "payload";
+
 import { cargarDocumentos } from "./catalogo";
+import { gruposDelPanel } from "./sinonimos";
 import {
   buscarEnIndice,
   crearIndice,
@@ -31,6 +35,17 @@ const documentosEnCache = unstable_cache(
   },
 );
 
+/** Los sinónimos propios del panel (global «Buscador»), en la misma caché y con la misma etiqueta. */
+const sinonimosEnCache = unstable_cache(
+  async (): Promise<string> => {
+    const payload = await getPayload({ config });
+    const ajustes = await payload.findGlobal({ slug: "buscador", depth: 0 });
+    return ajustes.sinonimos ?? "";
+  },
+  ["buscador-sinonimos", CLAVE_DESPLIEGUE],
+  { revalidate: VIGENCIA_DOCUMENTOS, tags: [ETIQUETAS_DATOS.busqueda] },
+);
+
 let memoria: { huella: string; indice: Indice } | null = null;
 
 /** Una huella barata de los documentos: si no cambia, el índice en memoria sigue valiendo. */
@@ -44,10 +59,10 @@ function huellaDe(docs: DocBusqueda[]): string {
 }
 
 export async function indiceActual(): Promise<Indice> {
-  const docs = await documentosEnCache();
-  const huella = huellaDe(docs);
+  const [docs, sinonimos] = await Promise.all([documentosEnCache(), sinonimosEnCache()]);
+  const huella = `${huellaDe(docs)}|${sinonimos}`;
   if (memoria?.huella === huella) return memoria.indice;
-  const indice = crearIndice(docs);
+  const indice = crearIndice(docs, gruposDelPanel(sinonimos));
   memoria = { huella, indice };
   return indice;
 }

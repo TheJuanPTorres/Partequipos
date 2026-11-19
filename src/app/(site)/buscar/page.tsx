@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LONGITUD_MAXIMA, LONGITUD_MINIMA, normalizarConsulta } from "@/lib/buscador/consulta";
 import { ETIQUETA_CLASE } from "@/lib/buscador/etiquetas";
 import type { Clase, Estado, Faceta, Filtros } from "@/lib/buscador/motor";
+import { registrarSinResultado } from "@/lib/buscador/registro";
 import { buscarEnCatalogo } from "@/lib/buscador/servidor";
 import { getCabecera } from "@/lib/queries/getCabecera";
 import { getEmpresa } from "@/lib/queries/getSeo";
@@ -122,6 +123,7 @@ export default async function BuscarPage({ searchParams }: Props) {
     r && filtros.clase && texto
       ? await buscarEnCatalogo(texto, { ...filtros, clase: undefined }, 1)
       : r;
+  const hayFiltros = Boolean(filtros.marca || filtros.tipo || filtros.estado || filtros.clase);
   const pagina = Math.max(1, Number(sp.p) || 1);
   const visibles = r ? r.resultados.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA) : [];
   const paginas = r ? Math.ceil(r.total / POR_PAGINA) : 0;
@@ -136,6 +138,8 @@ export default async function BuscarPage({ searchParams }: Props) {
 
   // Sin resultados: WhatsApp con la búsqueda y las secciones del menú.
   const sinResultados = r !== null && r.total === 0;
+  // Una búsqueda sin nada (y sin filtros que la expliquen) se anota para el panel: solo el texto.
+  if (sinResultados && !hayFiltros && texto) await registrarSinResultado(texto);
   const empresa = sinResultados ? await getEmpresa() : null;
   const { enlaces, boton } = sinResultados ? await getCabecera() : { enlaces: [], boton: null };
   const secciones = boton ? [...enlaces, boton] : enlaces;
@@ -150,8 +154,6 @@ export default async function BuscarPage({ searchParams }: Props) {
       return wa;
     }
   })();
-
-  const hayFiltros = Boolean(filtros.marca || filtros.tipo || filtros.estado || filtros.clase);
 
   return (
     <main className={estilos.seccion}>

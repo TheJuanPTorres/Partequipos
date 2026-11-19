@@ -1,5 +1,5 @@
 import { crearMapaSinonimos, type MapaSinonimos } from "./sinonimos";
-import { compacto, distancia, plegar, singular, terminos, toleranciaDe } from "./texto";
+import { compacto, distancia, plegar, terminos, toleranciaDe } from "./texto";
 
 /**
  * MOTOR DEL BUSCADOR (2026-11-18): un índice invertido en memoria, sin dependencias, que corre en el

@@ -78,8 +78,8 @@ describe("la API no se lee sin sesión ni token", () => {
     process.env.API_LECTURA_TOKEN = TOKEN;
     try {
       const todas = [...(await configs("collections")), ...(await configs("globals"))];
-      // 27 colecciones + 8 globales («Correo y formularios», 2026-10-26). Si cambia, revisa el acceso de la nueva.
-      assert.equal(todas.length, 35);
+      // 28 colecciones + 9 globales («Buscador», 2026-11-18). Si cambia, revisa el acceso de la nueva.
+      assert.equal(todas.length, 37);
       for (const c of todas) {
         const anonimo = await leer(c.access?.read as Access, new Headers());
         assert.equal(anonimo, false, `«${c.slug}» se lee por la API sin sesión ni token`);

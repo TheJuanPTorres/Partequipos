@@ -116,14 +116,14 @@ export function BaldosasColorMarcas({
                       logo={v.logo}
                       caja={CAJA_BALDOSA}
                       alt=""
-                      sizes="(max-width: 1023px) 38vw, 207px"
+                      sizes="(max-width: 1023px) 38vw, max(207px, 12.937vw)"
                       className={`${estilos.logo} ${estilos.logoOptico}`}
                     />
                   ) : v.logo ? (
                     <LogoMarca
                       logo={v.logo}
                       alt=""
-                      sizes="(max-width: 1023px) 30vw, 180px"
+                      sizes="(max-width: 1023px) 30vw, max(180px, 11.25vw)"
                       className={`${estilos.logo} ${v.alto ? estilos.logoAlto : ""}`}
                     />
                   ) : (

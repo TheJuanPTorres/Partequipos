@@ -28,6 +28,156 @@
 }
 
 /*
+ * ESCALA PROPORCIONAL EN PANTALLAS GRANDES (opción 2 de Juan Pablo, 2026-11-18; CLAUDE.md §5).
+ * `--escala-px` es el «píxel del diseño»: 1 px hasta 1600 px de ventana y, desde ahí, crece en proporción
+ * (2,4 px a 3840). El plugin `src/lib/estilos/escalaPostcss.mjs` pasa cada `Npx` del CSS del sitio
+ * a `calc(N * var(--escala-px, 1px))`, y la letra raíz crece igual, así que los `rem` de Tailwind también. Por
+ * debajo de 1600, todo igual que antes. El panel no usa esta hoja.
+ */
+:root {
+  --escala-px: max(1px, 100vw / 1600);
+}
+
+html {
+  font-size: max(100%, 100vw / 100);
+}
+
+/*
+ * Los iconos de Tabler llevan su tamaño en los atributos `width` y `height` (fuera del CSS, así que
+ * el plugin no los ve). Con `:where`, sin especificidad: cualquier regla de un módulo que les ponga
+ * tamaño gana; esto solo sustituye al atributo.
+ */
+:where(svg.tabler-icon[width="10"]) {
+  width: 10px;
+  height: 10px;
+}
+
+:where(svg.tabler-icon[width="11"]) {
+  width: 11px;
+  height: 11px;
+}
+
+:where(svg.tabler-icon[width="12"]) {
+  width: 12px;
+  height: 12px;
+}
+
+:where(svg.tabler-icon[width="13"]) {
+  width: 13px;
+  height: 13px;
+}
+
+:where(svg.tabler-icon[width="14"]) {
+  width: 14px;
+  height: 14px;
+}
+
+:where(svg.tabler-icon[width="15"]) {
+  width: 15px;
+  height: 15px;
+}
+
+:where(svg.tabler-icon[width="16"]) {
+  width: 16px;
+  height: 16px;
+}
+
+:where(svg.tabler-icon[width="17"]) {
+  width: 17px;
+  height: 17px;
+}
+
+:where(svg.tabler-icon[width="18"]) {
+  width: 18px;
+  height: 18px;
+}
+
+:where(svg.tabler-icon[width="19"]) {
+  width: 19px;
+  height: 19px;
+}
+
+:where(svg.tabler-icon[width="20"]) {
+  width: 20px;
+  height: 20px;
+}
+
+:where(svg.tabler-icon[width="21"]) {
+  width: 21px;
+  height: 21px;
+}
+
+:where(svg.tabler-icon[width="22"]) {
+  width: 22px;
+  height: 22px;
+}
+
+:where(svg.tabler-icon[width="24"]) {
+  width: 24px;
+  height: 24px;
+}
+
+:where(svg.tabler-icon[width="26"]) {
+  width: 26px;
+  height: 26px;
+}
+
+:where(svg.tabler-icon[width="28"]) {
+  width: 28px;
+  height: 28px;
+}
+
+:where(svg.tabler-icon[width="30"]) {
+  width: 30px;
+  height: 30px;
+}
+
+:where(svg.tabler-icon[width="32"]) {
+  width: 32px;
+  height: 32px;
+}
+
+:where(svg.tabler-icon[width="34"]) {
+  width: 34px;
+  height: 34px;
+}
+
+:where(svg.tabler-icon[width="36"]) {
+  width: 36px;
+  height: 36px;
+}
+
+:where(svg.tabler-icon[width="40"]) {
+  width: 40px;
+  height: 40px;
+}
+
+:where(svg.tabler-icon[width="42"]) {
+  width: 42px;
+  height: 42px;
+}
+
+:where(svg.tabler-icon[width="44"]) {
+  width: 44px;
+  height: 44px;
+}
+
+:where(svg.tabler-icon[width="48"]) {
+  width: 48px;
+  height: 48px;
+}
+
+:where(svg.tabler-icon[width="56"]) {
+  width: 56px;
+  height: 56px;
+}
+
+:where(svg.tabler-icon[width="64"]) {
+  width: 64px;
+  height: 64px;
+}
+
+/*
  * LA CABECERA ES FIJA (petición de Andrés, 2026-10-14): un anclaje (`#id`) o el
  * foco que llega a un elemento no pueden quedar debajo de ella. `scroll-padding-top`
  * reserva su alto: 72 px en tablet y móvil (la barra mide 71 y 67) y 76 en

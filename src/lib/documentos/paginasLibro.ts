@@ -8,8 +8,8 @@ import type { PaginaVisor } from "./visor";
  * Anchos que pide cada imagen: en el libro abierto cada página ocupa la mitad
  * del visor (que no pasa de 1120 px), en móvil todo el ancho; con zoom, el doble.
  */
-const SIZES_PAGINA = "(max-width: 640px) 100vw, 560px";
-const SIZES_ZOOM = "(max-width: 640px) 200vw, 1120px";
+const SIZES_PAGINA = "(max-width: 640px) 100vw, max(560px, 35vw)";
+const SIZES_ZOOM = "(max-width: 640px) 200vw, max(1120px, 70vw)";
 /** Las miniaturas, a ancho fijo: `getImageProps` da la de 1x y 2x. */
 const ANCHO_MINIATURA = 64;
 

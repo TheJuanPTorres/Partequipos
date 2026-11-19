@@ -314,7 +314,7 @@ export function VerTodosEquipos({
                               src={e.imagen.url}
                               alt=""
                               fill
-                              sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, 320px"
+                              sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, max(320px, 20vw)"
                               className={panel.fotoImg}
                               style={{ objectPosition: e.imagen.posicion }}
                             />

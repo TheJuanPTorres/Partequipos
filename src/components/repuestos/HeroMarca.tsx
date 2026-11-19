@@ -108,7 +108,7 @@ export function HeroMarca({
             fill
             priority
             // La foto se recorta con cover en una caja de 630–670 px de alto: pide al menos 1200 px de ancho, o se amplía.
-            sizes="max(100vw, 1200px)"
+            sizes="max(100vw, max(1200px, 75vw))"
             className={estilos.fondo}
             style={{ objectPosition: fondo.posicion }}
           />
@@ -136,7 +136,12 @@ export function HeroMarca({
 
           {logo ? (
             <div className={estilos.placa}>
-              <LogoMarca logo={logo} alt={logo.alt} sizes="120px" className={estilos.logo} />
+              <LogoMarca
+                logo={logo}
+                alt={logo.alt}
+                sizes="max(120px, 7.5vw)"
+                className={estilos.logo}
+              />
             </div>
           ) : null}
 

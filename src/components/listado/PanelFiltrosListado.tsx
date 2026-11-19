@@ -89,7 +89,7 @@ export function PanelFiltrosListado({
                             <LogoMarca
                               logo={logo}
                               alt=""
-                              sizes="56px"
+                              sizes="max(56px, 3.5vw)"
                               className={estilos.marcaLogo}
                             />
                           ) : null}

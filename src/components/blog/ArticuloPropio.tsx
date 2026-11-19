@@ -220,7 +220,7 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
               alt={imagen.alt}
               width={imagen.width}
               height={imagen.height}
-              sizes="(min-width: 1240px) 1200px, calc(100vw - 32px)"
+              sizes="(min-width: 1240px) max(1200px, 75vw), calc(100vw - 32px)"
               className={estilos.destacadaImg}
               style={{ objectPosition: imagen.posicion }}
               preload

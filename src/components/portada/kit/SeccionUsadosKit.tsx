@@ -137,7 +137,13 @@ function EnlacesCategorias({ filtros }: { filtros: FiltroUsados[] }) {
           <Link href={f.href} className={estilos.filtro}>
             <span className={estilos.filtroImagen}>
               {f.imagen ? (
-                <Image src={f.imagen.url} alt="" fill sizes="120px" className={estilos.filtroImg} />
+                <Image
+                  src={f.imagen.url}
+                  alt=""
+                  fill
+                  sizes="max(120px, 7.5vw)"
+                  className={estilos.filtroImg}
+                />
               ) : null}
             </span>
             <span className={estilos.filtroNombre}>{f.nombre}</span>

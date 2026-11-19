@@ -32,7 +32,7 @@ export function TarjetaEquipo({
             alt=""
             fill
             priority={prioridad}
-            sizes="(max-width: 767px) 90vw, (max-width: 1024px) 45vw, 400px"
+            sizes="(max-width: 767px) 90vw, (max-width: 1024px) 45vw, max(400px, 25vw)"
             className={estilos.fotoImg}
             style={{ objectPosition: foto.posicion }}
           />

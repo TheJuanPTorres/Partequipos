@@ -207,7 +207,7 @@ export async function getPortadaPanel(
             limit: 1,
             sort: "-updatedAt",
             where: { filename: { contains: "guia-editor" } },
-            select: { url: true },
+            select: { url: true, filename: true },
             ...acceso,
           });
           const url = (docs[0] as { url?: unknown } | undefined)?.url;

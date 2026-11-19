@@ -64,7 +64,8 @@ export const CategoriaTecnica: CollectionConfig = {
   /*
    * ORDEN POR ARRASTRE (2026-11-19, dirección; informe del panel §6): sustituye a «Posición en
    * las páginas de repuestos» (`ordenMarca`); la migración parte de ese orden (vacíos al final,
-   * por nombre). `ordenMarca` sigue hasta que D pase sus consultas a `_order` (§6.3).
+   * por nombre). Desde el #516 la web ya no lee `ordenMarca`: el campo va OCULTO hasta su borrado
+   * con migración (2026-11-19, dirección).
    * «Posición en la portada» (`ordenPortada`) se queda: además decide si sale en la portada.
    */
   orderable: true,
@@ -285,6 +286,7 @@ export const CategoriaTecnica: CollectionConfig = {
         min: 1,
         label: "Posición en las páginas de repuestos",
         admin: {
+          hidden: true,
           position: "sidebar",
           description:
             "Orden en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo, y en el menú. Vacío: al final, por nombre.",
@@ -473,7 +475,7 @@ export const CategoriaTecnica: CollectionConfig = {
         fondoHero: "cabecera",
         imagenPortada: "tarjeta",
       },
-      avanzado: ["ordenPortada", "ordenMarca"],
+      avanzado: ["ordenPortada"],
     },
   ),
 };

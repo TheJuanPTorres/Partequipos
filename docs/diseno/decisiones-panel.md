@@ -1055,3 +1055,8 @@ propias `defaultColumns` ni `listSearchableFields`: la tabla es la única fuente
 de una marca o un tipo) se quedan: son de esa lista y `listados.ts` no las cubre. Sale también la
 columna «Orden» de máquinas nuevas, tipos de máquina y líneas de lubricante: la web ya no lee ese
 campo (manda el orden por arrastre). Sin esquema.
+
+Con el #516 de D en main, «Posición en las páginas de repuestos» (`ordenMarca`) de las categorías
+técnicas va **oculto** en el formulario (`admin.hidden`): la web ya no lo lee. La columna se queda en
+la base hasta su borrado con migración. Los tipos de repuestos (`tipos-equipo`) no tienen campo
+«Orden» propio: su orden es el del arrastre dentro de la marca.

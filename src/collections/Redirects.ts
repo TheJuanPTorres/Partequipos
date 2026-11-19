@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { normalizarDestino, normalizarRuta } from "../lib/redirects/normalizar";
 import { soloAdmin, soloPersonal } from "../lib/seguridad/acceso";
@@ -159,11 +160,12 @@ export const Redirects: CollectionConfig = {
           "mientras se migra; «No corresponde a ninguna ruta» hay que corregirlo antes de publicar.",
       },
     },
-    {
+    // Solo lo escribe `redirects:check`; nadie lo lee (limpieza, paso 1).
+    ocultoSinUso({
       name: "destinoVerificadoEn",
       type: "date",
       label: "Destino verificado el",
       admin: { position: "sidebar", readOnly: true },
-    },
+    }),
   ],
 };

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { revalidarEquipoUsado, revalidarEquipoUsadoBorrado } from "./hooks/maquinariaHooks";
 import { mostrarEnWebField } from "../lib/fields/mostrarEnWeb";
@@ -148,19 +149,20 @@ export const EquipoUsado: CollectionConfig = {
           min: 0,
           admin: { step: 0.1, width: "33%" },
         },
-        {
+        // Sin uso en la web desde el 2026-11-09 (limpieza, paso 1).
+        ocultoSinUso({
           name: "potencia",
           type: "number",
           label: "Potencia (hp)",
           min: 0,
           admin: { width: "33%" },
-        },
-        {
+        }),
+        ocultoSinUso({
           name: "motor",
           type: "text",
           label: "Motor",
           admin: { width: "34%", description: "Ej. YANMAR 4TNV98CT" },
-        },
+        }),
       ],
     },
     /*
@@ -266,7 +268,7 @@ export const EquipoUsado: CollectionConfig = {
      * sitio actual no tiene (§3.3). Así que el equipo se marca aquí: por
      * defecto, la pestaña sale de su categoría (excavadoras u «Otros»).
      */
-    {
+    ocultoSinUso({
       name: "pestanaPortada",
       type: "select",
       defaultValue: "categoria",
@@ -280,7 +282,7 @@ export const EquipoUsado: CollectionConfig = {
         description:
           "Sin efecto desde el 2026-11-09: la portada ya no enseña unidades (se quitó el carrusel). Se conserva el dato.",
       },
-    },
+    }),
     seoField(),
   ],
 };

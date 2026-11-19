@@ -1,4 +1,5 @@
 import type { Block, Field } from "payload";
+import { ocultoSinUso } from "../../lib/fields/ocultoSinUso";
 
 import { validarAncla } from "../../lib/fields/ancla";
 import { validarColor } from "../../lib/fields/tipografiaTitulo";
@@ -66,7 +67,8 @@ const antetitulo: Field = {
  * clara que se pinta una vez, al pie de la sección (la de WordPress son
  * siluetas de maquinaria).
  */
-const textura: Field = {
+// Sin uso en la web: ninguna de las dos plantillas la pinta (limpieza, paso 1).
+const textura: Field = ocultoSinUso({
   name: "textura",
   type: "upload",
   relationTo: "media",
@@ -75,7 +77,7 @@ const textura: Field = {
     description:
       "Opcional. Imagen clara que se pinta una vez al pie de la sección, detrás del texto. Solo la usa el diseño «Servicio técnico».",
   },
-};
+});
 
 export const BloqueCabeceraVideo: Block = {
   slug: "cabeceraVideo",
@@ -429,12 +431,13 @@ export const BloqueGaleria: Block = {
         description: "Opcional. Sin título, la galería se anuncia solo a lectores de pantalla.",
       },
     },
-    {
+    // Sin uso en la web: ninguna plantilla pinta el texto de la galería (limpieza, paso 1).
+    ocultoSinUso({
       name: "texto",
       type: "textarea",
       label: "Texto de presentación",
       admin: { description: "Opcional. Una frase bajo el título que presenta las fotos." },
-    },
+    }),
     {
       name: "imagenes",
       type: "array",
@@ -501,7 +504,8 @@ export const BloqueVideoYoutube: Block = {
           "Un vídeo de «Vídeos» que se pinta junto al de YouTube, con sus controles y su póster. Solo lo usa el diseño «Servicio técnico».",
       },
     },
-    {
+    // Sin uso en la web: la plantilla de Servicio técnico no lo pinta (limpieza, paso 1).
+    ocultoSinUso({
       name: "videoFondo",
       type: "upload",
       relationTo: "videos",
@@ -510,7 +514,7 @@ export const BloqueVideoYoutube: Block = {
         description:
           "Decorativo, sin sonido: detrás del texto, solo en pantallas grandes y con botón de pausa. Solo lo usa el diseño «Servicio técnico».",
       },
-    },
+    }),
   ],
 };
 
@@ -552,3 +556,29 @@ export const BLOQUES_PAGINA: Block[] = [
   BloqueProcesoPasos,
   BloqueDocumentoVisor,
 ];
+
+/**
+ * BLOQUES RETIRADOS DEL SELECTOR (limpieza del panel, paso 1, 2026-11-18, dirección): siguen en
+ * el esquema —sus tablas y lo que ya se haya guardado no se tocan—, pero «Añadir bloque» ya no los
+ * ofrece. «Franja con texto en movimiento» la sustituyó «Marcas aliadas» en Nosotros. El paso 3
+ * los borra con migración, tras comprobar en producción que ninguna página los lleva.
+ */
+export const BLOQUES_RETIRADOS: readonly string[] = ["franjaMarquee"];
+
+/**
+ * `filterOptions` del campo de bloques: los bloques que se pueden añadir. Si la página YA lleva un
+ * bloque retirado, se permiten todos, porque Payload rechaza al guardar un bloque presente que no
+ * esté permitido y la página no se podría guardar.
+ */
+export function bloquesElegibles(bloques: unknown): true | string[] {
+  const lleva = Array.isArray(bloques)
+    ? bloques.some(
+        (b) =>
+          typeof b === "object" &&
+          b !== null &&
+          BLOQUES_RETIRADOS.includes((b as { blockType?: string }).blockType ?? ""),
+      )
+    : false;
+  if (lleva) return true;
+  return BLOQUES_PAGINA.map((b) => b.slug).filter((slug) => !BLOQUES_RETIRADOS.includes(slug));
+}

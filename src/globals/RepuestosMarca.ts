@@ -4,6 +4,7 @@ import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMarcasDeRepuestos, revalidarModelosDeRepuestos } from "../lib/revalidation";
+import { conPestanas } from "../lib/fields/pestanasFicha";
 
 /**
  * Lo COMÚN a las páginas de marca de repuestos (ux-9,
@@ -24,26 +25,29 @@ const tarjeta = (nombre: string, etiqueta: string): Field => ({
   type: "group",
   label: etiqueta,
   admin: { hidden: true },
-  fields: [
-    { name: "titulo", type: "text", label: "Título" },
-    {
-      name: "enlace",
-      type: "text",
-      label: "Enlace",
-      validate: validarEnlace,
-      admin: {
-        description:
-          "Ruta del sitio (/…) o https://. Vacío: la tarjeta no se pinta (no hay enlaces rotos).",
+  fields: conPestanas(
+    [
+      { name: "titulo", type: "text", label: "Título" },
+      {
+        name: "enlace",
+        type: "text",
+        label: "Enlace",
+        validate: validarEnlace,
+        admin: {
+          description:
+            "Ruta del sitio (/…) o https://. Vacío: la tarjeta no se pinta (no hay enlaces rotos).",
+        },
       },
-    },
-    {
-      name: "imagen",
-      type: "upload",
-      relationTo: "media",
-      label: "Imagen",
-      admin: { description: "Opcional. Sin imagen, la tarjeta se pinta solo con el título." },
-    },
-  ],
+      {
+        name: "imagen",
+        type: "upload",
+        relationTo: "media",
+        label: "Imagen",
+        admin: { description: "Opcional. Sin imagen, la tarjeta se pinta solo con el título." },
+      },
+    ],
+    { fotos: { porQueImagen: "tarjeta" } },
+  ),
 });
 
 export const RepuestosMarca: GlobalConfig = {

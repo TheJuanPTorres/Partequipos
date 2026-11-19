@@ -675,14 +675,6 @@ export interface ModelosRepuesto {
   '_modelos-repuesto_modelos_order'?: string | null;
   nombre: string;
   /**
-   * Desmarcado, el modelo desaparece de toda la web (listados del tipo y de la marca, buscador y sitemap) sin borrarse del panel, y su página lleva a la de su tipo. Vuelve al marcarlo.
-   */
-  mostrarEnWeb?: boolean | null;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  /**
    * Tiene que ser la marca del tipo de equipo de abajo. Si la cambias, vuelve a elegir el tipo.
    */
   marca: number | Marca;
@@ -727,6 +719,9 @@ export interface ModelosRepuesto {
    * En WordPress la lista solo se ve en algunas páginas; en el resto está guardada pero oculta.
    */
   mostrarPiezas?: boolean | null;
+  /**
+   * Tamaño recomendado: 1.600 px de ancho o más; la primera es la de la tarjeta.
+   */
   imagenes?: (number | Media)[] | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
@@ -736,6 +731,14 @@ export interface ModelosRepuesto {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * Desmarcado, el modelo desaparece de toda la web (listados del tipo y de la marca, buscador y sitemap) sin borrarse del panel, y su página lleva a la de su tipo. Vuelve al marcarlo.
+   */
+  mostrarEnWeb?: boolean | null;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -749,17 +752,9 @@ export interface Marca {
   _order?: string | null;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  /**
    * Presentación bajo el título de la página de la marca. También sirve de descripción en Google si no hay otra.
    */
   descripcion?: string | null;
-  /**
-   * Con fondo transparente (PNG o WebP). En la página de la marca va sobre una placa oscura, porque los logos actuales del cliente son blancos.
-   */
-  logo?: (number | null) | Media;
   /**
    * Color de la franja de las páginas de esta marca (y de sus tipos). Vacío: sin color, igual que el fondo (si no es una marca, p. ej. Aditamentos, déjalo vacío). El texto de la franja se pone solo en blanco o negro, el que mejor se lea.
    */
@@ -773,14 +768,6 @@ export interface Marca {
    */
   colorBaldosa?: string | null;
   /**
-   * El logo que va sobre el «Color de la baldosa» (en el diseño, en blanco; Case y Caterpillar, con sus colores). PNG o WebP transparente. Comprueba que se lee bien sobre ese color.
-   */
-  logoBaldosa?: (number | null) | Media;
-  /**
-   * Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.
-   */
-  fondoHero?: (number | null) | Media;
-  /**
    * En el orden en que salen en la web. Arrastra las filas para cambiarlo; un tipo nuevo entra al final.
    */
   tipos?: {
@@ -789,6 +776,18 @@ export interface Marca {
     totalDocs?: number;
   };
   /**
+   * Con fondo transparente (PNG o WebP). En la página de la marca va sobre una placa oscura, porque los logos actuales del cliente son blancos. Tamaño recomendado: SVG, o PNG transparente de 600 px de ancho.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * El logo que va sobre el «Color de la baldosa» (en el diseño, en blanco; Case y Caterpillar, con sus colores). PNG o WebP transparente. Comprueba que se lee bien sobre ese color. Tamaño recomendado: SVG, o PNG transparente de 600 px de ancho.
+   */
+  logoBaldosa?: (number | null) | Media;
+  /**
+   * Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca. Tamaño recomendado: 2.560 × 1.440 px (horizontal).
+   */
+  fondoHero?: (number | null) | Media;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -796,6 +795,10 @@ export interface Marca {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -808,24 +811,11 @@ export interface TiposEquipo {
   id: number;
   '_tipos-equipo_tipos_order'?: string | null;
   nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
   marca: number | Marca;
-  /**
-   * Casi siempre vacío. Solo para conservar una dirección web antigua en la que este tipo colgaba de otro tipo de la misma marca: la página del tipo quedará bajo la de ese tipo. Cambiarlo cambia la dirección web (se crea la redirección).
-   */
-  tipoPadre?: (number | null) | TiposEquipo;
-  slugPadre?: string | null;
   /**
    * Texto bajo el título de la página del tipo. También sirve de descripción en Google si no hay otra.
    */
   descripcion?: string | null;
-  /**
-   * Opcional. Foto del tipo de máquina para la tarjeta de la página de la marca.
-   */
-  imagen?: (number | null) | Media;
   /**
    * Opcional. Solo si los modelos de este tipo se reparten por serie del fabricante (ej. EX y ZAXIS). La página de la marca pinta una tarjeta por serie, en este orden, y la del tipo agrupa los modelos. Cada modelo elige su serie en su ficha.
    */
@@ -882,6 +872,19 @@ export interface TiposEquipo {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * Casi siempre vacío. Solo para conservar una dirección web antigua en la que este tipo colgaba de otro tipo de la misma marca: la página del tipo quedará bajo la de ese tipo. Cambiarlo cambia la dirección web (se crea la redirección).
+   */
+  tipoPadre?: (number | null) | TiposEquipo;
+  slugPadre?: string | null;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * Opcional. Foto del tipo de máquina para la tarjeta de la página de la marca. Tamaño recomendado: 1.200 × 900 px.
+   */
+  imagen?: (number | null) | Media;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -895,60 +898,18 @@ export interface CategoriasTecnica {
   _order?: string | null;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  /**
-   * Solo para una página dentro de otra categoría (p. ej. «Filtros Donaldson» dentro de «Filtración»). Su dirección web es la de esa categoría seguida de la suya, y sale bajo ella en el menú y en su página, no en el índice. Vacío: una categoría normal.
-   */
-  padre?: (number | null) | CategoriasTecnica;
-  /**
-   * Opcional, para una página de MARCA dentro de una categoría (p. ej. Donaldson): va en la cabecera de su página y en su acceso desde la categoría.
-   */
-  logo?: (number | null) | Media;
-  /**
-   * Opcional: el símbolo de la marca SIN su nombre, para el botón del menú (ahí el nombre va escrito al lado). Vacío, el botón lleva solo el nombre.
-   */
-  iconoMarca?: (number | null) | Media;
-  /**
    * Opcional, con el logo: el color del botón de esta página en el menú y de su acceso desde la categoría. El texto se pone solo en blanco o negro, el que mejor se lea.
    */
   colorMarca?: string | null;
   descripcion?: string | null;
   /**
-   * La de su tarjeta en la portada, el menú, el índice de categorías técnicas y las páginas de tipo. También la cabecera de su página si no tiene «Fondo del encabezado».
-   */
-  imagen?: (number | null) | Media;
-  /**
-   * Opcional. Foto horizontal de obra a todo el ancho para la cabecera de su página. Vacía, la imagen de la tarjeta (y sin ella, la de la primera marca de repuestos con foto).
-   */
-  fondoHero?: (number | null) | Media;
-  /**
-   * Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo.
-   */
-  icono?:
-    | ('corte' | 'llanta' | 'lubricante' | 'filtro' | 'motor' | 'rodaje' | 'miscelaneos' | 'componentes' | 'diesel')
-    | null;
-  /**
    * Opcional. Vacío: la tarjeta de la portada usa el nombre de la categoría.
    */
   tituloPortada?: string | null;
   /**
-   * Opcional: si se rellena, manda en la tarjeta de la portada. Vacía: la «Imagen de la tarjeta». Mínimo 500 px de ancho: la tarjeta se pinta hasta 250 px, y el doble en pantallas de alta densidad; más pequeña, se ve pixelada.
-   */
-  imagenPortada?: (number | null) | Media;
-  /**
    * A dónde llevan la tarjeta de la portada y la categoría en las páginas de marca. Ruta del sitio (/…) o https://.
    */
   enlace?: string | null;
-  /**
-   * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».
-   */
-  ordenPortada?: number | null;
-  /**
-   * Orden en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo, y en el menú. Vacío: al final, por nombre.
-   */
-  ordenMarca?: number | null;
   /**
    * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Elige el repuesto de … que necesitas».
    */
@@ -1017,6 +978,26 @@ export interface CategoriasTecnica {
     marcas?: (number | MarcasLubricante)[] | null;
   };
   /**
+   * Opcional, para una página de MARCA dentro de una categoría (p. ej. Donaldson): va en la cabecera de su página y en su acceso desde la categoría. Tamaño recomendado: SVG, o PNG transparente de 600 px de ancho.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Opcional: el símbolo de la marca SIN su nombre, para el botón del menú (ahí el nombre va escrito al lado). Vacío, el botón lleva solo el nombre. Tamaño recomendado: SVG, o PNG transparente de 600 px de ancho.
+   */
+  iconoMarca?: (number | null) | Media;
+  /**
+   * La de su tarjeta en la portada, el menú, el índice de categorías técnicas y las páginas de tipo. También la cabecera de su página si no tiene «Fondo del encabezado». Tamaño recomendado: 1.200 × 900 px.
+   */
+  imagen?: (number | null) | Media;
+  /**
+   * Opcional. Foto horizontal de obra a todo el ancho para la cabecera de su página. Vacía, la imagen de la tarjeta (y sin ella, la de la primera marca de repuestos con foto). Tamaño recomendado: 2.560 × 1.440 px (horizontal).
+   */
+  fondoHero?: (number | null) | Media;
+  /**
+   * Opcional: si se rellena, manda en la tarjeta de la portada. Vacía: la «Imagen de la tarjeta». Mínimo 500 px de ancho: la tarjeta se pinta hasta 250 px, y el doble en pantallas de alta densidad; más pequeña, se ve pixelada. Tamaño recomendado: 1.200 × 900 px.
+   */
+  imagenPortada?: (number | null) | Media;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -1024,6 +1005,28 @@ export interface CategoriasTecnica {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * Dibujo que acompaña a la categoría en la tarjeta de la portada y en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo.
+   */
+  icono?:
+    | ('corte' | 'llanta' | 'lubricante' | 'filtro' | 'motor' | 'rodaje' | 'miscelaneos' | 'componentes' | 'diesel')
+    | null;
+  /**
+   * Vacío: no sale en la portada. 1, 2, 3… es el orden de las tarjetas de «Venta de repuestos».
+   */
+  ordenPortada?: number | null;
+  /**
+   * Orden en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo, y en el menú. Vacío: al final, por nombre.
+   */
+  ordenMarca?: number | null;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * Solo para una página dentro de otra categoría (p. ej. «Filtros Donaldson» dentro de «Filtración»). Su dirección web es la de esa categoría seguida de la suya, y sale bajo ella en el menú y en su página, no en el índice. Vacío: una categoría normal.
+   */
+  padre?: (number | null) | CategoriasTecnica;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -1414,21 +1417,9 @@ export interface Pagina {
   id: number;
   titulo: string;
   /**
-   * La dirección de la página, sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio». Después de crearla ya no se puede cambiar; si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  /**
-   * «Legal / cumplimiento» para tratamiento de datos, términos y similares: tienen que estar siempre en el sitio, así que no se borran.
-   */
-  tipoPagina?: ('institucional' | 'legal' | 'portada') | null;
-  /**
    * Párrafo introductorio bajo el título.
    */
   entradilla?: string | null;
-  /**
-   * Opcional. Foto a todo el ancho detrás del título, con un velo oscuro para que se lea. Sin ella, el encabezado queda en un tono oscuro.
-   */
-  fotoCabecera?: (number | null) | Media;
   contenido?: {
     root: {
       type: string;
@@ -1469,10 +1460,6 @@ export interface Pagina {
         id?: string | null;
       }[]
     | null;
-  /**
-   * «Servicio técnico» compone los bloques con su diseño propio, por su ancla: taller, alistamiento, posventa, Siniestros y contacto.
-   */
-  diseno?: ('bloques' | 'servicioTecnico') | null;
   /**
    * Opcional. Si añades bloques, la página se compone con ellos y dejan de mostrarse «Contenido» y «Secciones con ancla».
    */
@@ -1891,6 +1878,10 @@ export interface Pagina {
     botonEnlace?: string | null;
   };
   /**
+   * Opcional. Foto a todo el ancho detrás del título, con un velo oscuro para que se lea. Sin ella, el encabezado queda en un tono oscuro. Tamaño recomendado: 2.560 × 1.440 px (horizontal).
+   */
+  fotoCabecera?: (number | null) | Media;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -1898,6 +1889,18 @@ export interface Pagina {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * «Servicio técnico» compone los bloques con su diseño propio, por su ancla: taller, alistamiento, posventa, Siniestros y contacto.
+   */
+  diseno?: ('bloques' | 'servicioTecnico') | null;
+  /**
+   * La dirección de la página, sin barras al principio ni al final. Ej.: «nosotros» o «nosotros/trabaja-con-nosotros». La portada usa «inicio». Después de crearla ya no se puede cambiar; si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * «Legal / cumplimiento» para tratamiento de datos, términos y similares: tienen que estar siempre en el sitio, así que no se borran.
+   */
+  tipoPagina?: ('institucional' | 'legal' | 'portada') | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -2498,7 +2501,6 @@ export interface Testimonio {
    * La frase de la persona. Es opcional solo en un vídeo que el cliente ya publicó en su canal (casilla de abajo).
    */
   cita?: string | null;
-  foto?: (number | null) | Media;
   /**
    * Opcional. Un MP4 propio; para YouTube, el campo de abajo.
    */
@@ -2517,6 +2519,10 @@ export interface Testimonio {
    * Para poder encontrarlo si la persona pide retirar su testimonio.
    */
   referenciaAutorizacion?: string | null;
+  /**
+   * Tamaño recomendado: 1.200 × 900 px.
+   */
+  foto?: (number | null) | Media;
   /**
    * Solo se puede marcar con la autorización de uso marcada, o con la casilla del vídeo ya publicado por el cliente.
    */
@@ -2574,6 +2580,9 @@ export interface Sede {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Tamaño recomendado: 1.200 × 900 px.
+   */
   foto?: (number | null) | Media;
   /**
    * En el mapa, la principal lleva un punto más grande con doble círculo y la secundaria uno más pequeño con un solo círculo. La lista dice de cuál se trata.
@@ -2845,8 +2854,6 @@ export interface SolicitudesSelect<T extends boolean = true> {
 export interface ModelosRepuestoSelect<T extends boolean = true> {
   '_modelos-repuesto_modelos_order'?: T;
   nombre?: T;
-  mostrarEnWeb?: T;
-  slug?: T;
   marca?: T;
   tipo?: T;
   codigo?: T;
@@ -2870,6 +2877,8 @@ export interface ModelosRepuestoSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  mostrarEnWeb?: T;
+  slug?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2881,15 +2890,14 @@ export interface ModelosRepuestoSelect<T extends boolean = true> {
 export interface MarcasSelect<T extends boolean = true> {
   _order?: T;
   nombre?: T;
-  slug?: T;
   descripcion?: T;
-  logo?: T;
   colorMarca?: T;
   logoOscuroEnMenu?: T;
   colorBaldosa?: T;
+  tipos?: T;
+  logo?: T;
   logoBaldosa?: T;
   fondoHero?: T;
-  tipos?: T;
   seo?:
     | T
     | {
@@ -2897,6 +2905,7 @@ export interface MarcasSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  slug?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2908,12 +2917,8 @@ export interface MarcasSelect<T extends boolean = true> {
 export interface TiposEquipoSelect<T extends boolean = true> {
   '_tipos-equipo_tipos_order'?: T;
   nombre?: T;
-  slug?: T;
   marca?: T;
-  tipoPadre?: T;
-  slugPadre?: T;
   descripcion?: T;
-  imagen?: T;
   series?:
     | T
     | {
@@ -2938,6 +2943,10 @@ export interface TiposEquipoSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  tipoPadre?: T;
+  slugPadre?: T;
+  slug?: T;
+  imagen?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2949,20 +2958,10 @@ export interface TiposEquipoSelect<T extends boolean = true> {
 export interface CategoriasTecnicasSelect<T extends boolean = true> {
   _order?: T;
   nombre?: T;
-  slug?: T;
-  padre?: T;
-  logo?: T;
-  iconoMarca?: T;
   colorMarca?: T;
   descripcion?: T;
-  imagen?: T;
-  fondoHero?: T;
-  icono?: T;
   tituloPortada?: T;
-  imagenPortada?: T;
   enlace?: T;
-  ordenPortada?: T;
-  ordenMarca?: T;
   grupos?:
     | T
     | {
@@ -2998,6 +2997,11 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
         titulo?: T;
         marcas?: T;
       };
+  logo?: T;
+  iconoMarca?: T;
+  imagen?: T;
+  fondoHero?: T;
+  imagenPortada?: T;
   seo?:
     | T
     | {
@@ -3005,6 +3009,11 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  icono?: T;
+  ordenPortada?: T;
+  ordenMarca?: T;
+  slug?: T;
+  padre?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3323,10 +3332,7 @@ export interface CategoriasLubricanteSelect<T extends boolean = true> {
  */
 export interface PaginasSelect<T extends boolean = true> {
   titulo?: T;
-  slug?: T;
-  tipoPagina?: T;
   entradilla?: T;
-  fotoCabecera?: T;
   contenido?: T;
   secciones?:
     | T
@@ -3336,7 +3342,6 @@ export interface PaginasSelect<T extends boolean = true> {
         contenido?: T;
         id?: T;
       };
-  diseno?: T;
   bloques?:
     | T
     | {
@@ -3542,6 +3547,7 @@ export interface PaginasSelect<T extends boolean = true> {
         botonTexto?: T;
         botonEnlace?: T;
       };
+  fotoCabecera?: T;
   seo?:
     | T
     | {
@@ -3549,6 +3555,9 @@ export interface PaginasSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  diseno?: T;
+  slug?: T;
+  tipoPagina?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3806,13 +3815,13 @@ export interface TestimoniosSelect<T extends boolean = true> {
   empresa?: T;
   ciudad?: T;
   cita?: T;
-  foto?: T;
   video?: T;
   youtube?: T;
   videoDelCliente?: T;
   autorizacionUso?: T;
   fechaAutorizacion?: T;
   referenciaAutorizacion?: T;
+  foto?: T;
   publicado?: T;
   orden?: T;
   actualizadoPor?: T;
@@ -4083,10 +4092,6 @@ export interface Pie {
    * El número sale de la configuración de la empresa.
    */
   textoBoton: string;
-  /**
-   * Opcional. Máquina recortada (PNG transparente) que asoma sobre la esquina derecha de la tarjeta roja, solo en escritorio. Vacío: la tarjeta sin imagen.
-   */
-  imagenDecorativa?: (number | null) | Media;
   empresaTitulo?: string | null;
   empresaTexto?: string | null;
   columnas?:
@@ -4117,6 +4122,10 @@ export interface Pie {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Opcional. Máquina recortada (PNG transparente) que asoma sobre la esquina derecha de la tarjeta roja, solo en escritorio. Vacío: la tarjeta sin imagen. Tamaño recomendado: PNG o WebP transparente, 1.600 px de ancho.
+   */
+  imagenDecorativa?: (number | null) | Media;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -4128,6 +4137,28 @@ export interface Pie {
  */
 export interface Seo {
   id: number;
+  /**
+   * Sale en el pie, la cabecera, el botón de WhatsApp y la información que leen los buscadores. Si dejas un campo vacío, se usa el dato de siempre.
+   */
+  empresa?: {
+    telefono?: string | null;
+    /**
+     * Si lo dejas vacío, se usa el teléfono.
+     */
+    whatsapp?: string | null;
+    correo?: string | null;
+    direccion?: string | null;
+    ciudad?: string | null;
+    /**
+     * La dirección completa de cada perfil oficial. En el pie salen LinkedIn, X, Facebook, Instagram, TikTok y YouTube, en el orden en que estén aquí; las demás solo las leen los buscadores.
+     */
+    redes?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   /**
    * Un tramo por grupo de días con el mismo horario. Ejemplo: lunes a viernes de 08:00 a 17:30.
    */
@@ -4151,28 +4182,6 @@ export interface Seo {
    * La que sale a la izquierda de la pantalla para entrar al panel, solo en computador. Mejor una imagen cuadrada o vertical y oscura, porque lleva texto blanco encima. Si la dejas vacía, sale un fondo rojo degradado.
    */
   imagenAcceso?: (number | null) | Media;
-  /**
-   * Sale en el pie, la cabecera, el botón de WhatsApp y la información que leen los buscadores. Si dejas un campo vacío, se usa el dato de siempre.
-   */
-  empresa?: {
-    telefono?: string | null;
-    /**
-     * Si lo dejas vacío, se usa el teléfono.
-     */
-    whatsapp?: string | null;
-    correo?: string | null;
-    direccion?: string | null;
-    ciudad?: string | null;
-    /**
-     * La dirección completa de cada perfil oficial. En el pie salen LinkedIn, X, Facebook, Instagram, TikTok y YouTube, en el orden en que estén aquí; las demás solo las leen los buscadores.
-     */
-    redes?:
-      | {
-          url: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -4618,7 +4627,6 @@ export interface CabeceraSelect<T extends boolean = true> {
 export interface PieSelect<T extends boolean = true> {
   lema?: T;
   textoBoton?: T;
-  imagenDecorativa?: T;
   empresaTitulo?: T;
   empresaTexto?: T;
   columnas?:
@@ -4643,6 +4651,7 @@ export interface PieSelect<T extends boolean = true> {
         enlace?: T;
         id?: T;
       };
+  imagenDecorativa?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -4652,17 +4661,6 @@ export interface PieSelect<T extends boolean = true> {
  * via the `definition` "seo_select".
  */
 export interface SeoSelect<T extends boolean = true> {
-  horario?:
-    | T
-    | {
-        dias?: T;
-        abre?: T;
-        cierra?: T;
-        id?: T;
-      };
-  logo?: T;
-  imagenSocial?: T;
-  imagenAcceso?: T;
   empresa?:
     | T
     | {
@@ -4678,6 +4676,17 @@ export interface SeoSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  horario?:
+    | T
+    | {
+        dias?: T;
+        abre?: T;
+        cierra?: T;
+        id?: T;
+      };
+  logo?: T;
+  imagenSocial?: T;
+  imagenAcceso?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

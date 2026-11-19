@@ -9,6 +9,7 @@ import { slugField } from "../lib/fields/slugField";
 import { revalidarMarca, revalidarMarcaBorrada } from "./hooks/revalidateHooks";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMegamenu } from "./hooks/megamenuHooks";
+import { conPestanas } from "../lib/fields/pestanasFicha";
 
 const menu = revalidarMegamenu("marcas");
 
@@ -44,110 +45,114 @@ export const Marca: CollectionConfig = {
     afterChange: [revalidarMarca, menu.afterChange],
     afterDelete: [revalidarMarcaBorrada, menu.afterDelete],
   },
-  fields: [
-    {
-      name: "nombre",
-      type: "text",
-      required: true,
-      label: "Nombre",
-    },
-    // Marca es de nivel superior: unicidad global del slug.
-    slugField({ unique: true }),
-    {
-      name: "descripcion",
-      type: "textarea",
-      label: "Descripción",
-      admin: {
-        description:
-          "Presentación bajo el título de la página de la marca. También sirve de descripción en Google si no hay otra.",
+  fields: conPestanas(
+    [
+      {
+        name: "nombre",
+        type: "text",
+        required: true,
+        label: "Nombre",
       },
-    },
-    {
-      name: "logo",
-      type: "upload",
-      relationTo: "media",
-      label: "Logo",
-      admin: {
-        description:
-          "Con fondo transparente (PNG o WebP). En la página de la marca va sobre una placa oscura, porque los logos actuales del cliente son blancos.",
+      // Marca es de nivel superior: unicidad global del slug.
+      slugField({ unique: true }),
+      {
+        name: "descripcion",
+        type: "textarea",
+        label: "Descripción",
+        admin: {
+          description:
+            "Presentación bajo el título de la página de la marca. También sirve de descripción en Google si no hay otra.",
+        },
       },
-    },
-    // Megamenú (2026-10-17): el submenú es blanco sólido desde el #205.
-    campoColorMarca,
-    {
-      name: "logoOscuroEnMenu",
-      type: "checkbox",
-      defaultValue: false,
-      label: "Pintar el logo en oscuro (menú y cabecera)",
-      admin: {
-        description:
-          "Márcala si el logo es blanco o muy claro: en el menú de la cabecera y en la placa clara de la página de la marca se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.",
+      {
+        name: "logo",
+        type: "upload",
+        relationTo: "media",
+        label: "Logo",
+        admin: {
+          description:
+            "Con fondo transparente (PNG o WebP). En la página de la marca va sobre una placa oscura, porque los logos actuales del cliente son blancos.",
+        },
       },
-    },
-    /*
-     * Baldosas de color del índice de marcas de repuestos (diseño del cliente, 2026-11-03;
-     * `BaldosasColorMarcas`). Van en pareja: la baldosa solo se pinta en color con los dos;
-     * si falta uno, el logo de siempre sobre gris (`vistaBaldosa`).
-     */
-    {
-      name: "colorBaldosa",
-      type: "text",
-      label: "Color de la baldosa",
-      validate: validarColor,
-      admin: {
-        placeholder: "#E30613",
-        components: { Field: "/components/admin/CampoColor" },
-        description:
-          "Fondo de la baldosa de esta marca en el índice de marcas de repuestos. Solo se usa junto con el «Logo para la baldosa»: con los dos, la baldosa va en este color; si falta uno, el logo de siempre sobre gris.",
+      // Megamenú (2026-10-17): el submenú es blanco sólido desde el #205.
+      campoColorMarca,
+      {
+        name: "logoOscuroEnMenu",
+        type: "checkbox",
+        defaultValue: false,
+        label: "Pintar el logo en oscuro (menú y cabecera)",
+        admin: {
+          description:
+            "Márcala si el logo es blanco o muy claro: en el menú de la cabecera y en la placa clara de la página de la marca se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.",
+        },
       },
-    },
-    {
-      name: "logoBaldosa",
-      type: "upload",
-      relationTo: "media",
-      label: "Logo para la baldosa",
-      admin: {
-        description:
-          "El logo que va sobre el «Color de la baldosa» (en el diseño, en blanco; Case y Caterpillar, con sus colores). PNG o WebP transparente. Comprueba que se lee bien sobre ese color.",
+      /*
+       * Baldosas de color del índice de marcas de repuestos (diseño del cliente, 2026-11-03;
+       * `BaldosasColorMarcas`). Van en pareja: la baldosa solo se pinta en color con los dos;
+       * si falta uno, el logo de siempre sobre gris (`vistaBaldosa`).
+       */
+      {
+        name: "colorBaldosa",
+        type: "text",
+        label: "Color de la baldosa",
+        validate: validarColor,
+        admin: {
+          placeholder: "#E30613",
+          components: { Field: "/components/admin/CampoColor" },
+          description:
+            "Fondo de la baldosa de esta marca en el índice de marcas de repuestos. Solo se usa junto con el «Logo para la baldosa»: con los dos, la baldosa va en este color; si falta uno, el logo de siempre sobre gris.",
+        },
       },
-    },
-    /*
-     * Página de marca de ux-9 (docs/diseno/decisiones-repuestos-marca.md).
-     * La imagen es OPCIONAL: sin ella el encabezado se pinta sobre
-     * un fondo liso (el logo de la marca, que ya existe, va sobre el título), sin hueco. Opcionales también para no romper el importador
-     * de marcas (scripts/repuestos), que no la trae.
-     */
-    {
-      name: "fondoHero",
-      type: "upload",
-      relationTo: "media",
-      label: "Fondo del encabezado",
-      admin: {
-        description:
-          "Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.",
+      {
+        name: "logoBaldosa",
+        type: "upload",
+        relationTo: "media",
+        label: "Logo para la baldosa",
+        admin: {
+          description:
+            "El logo que va sobre el «Color de la baldosa» (en el diseño, en blanco; Case y Caterpillar, con sus colores). PNG o WebP transparente. Comprueba que se lee bien sobre ese color.",
+        },
       },
-    },
-    /*
-     * LOS TIPOS DE LA MARCA, EN SU ORDEN (2026-11-19): se arrastran aquí, dentro de la marca
-     * (join ordenable: el orden es de cada marca). Solo en el panel (`joinsSoloEnElPanel`).
-     */
-    {
-      name: "tipos",
-      type: "join",
-      collection: "tipos-equipo",
-      on: "marca",
-      orderable: true,
-      defaultLimit: 100,
-      label: "Tipos de equipo de la marca",
-      admin: {
-        defaultColumns: ["nombre", "slug"],
-        description:
-          "En el orden en que salen en la web. Arrastra las filas para cambiarlo; un tipo nuevo entra al final.",
+      /*
+       * Página de marca de ux-9 (docs/diseno/decisiones-repuestos-marca.md).
+       * La imagen es OPCIONAL: sin ella el encabezado se pinta sobre
+       * un fondo liso (el logo de la marca, que ya existe, va sobre el título), sin hueco. Opcionales también para no romper el importador
+       * de marcas (scripts/repuestos), que no la trae.
+       */
+      {
+        name: "fondoHero",
+        type: "upload",
+        relationTo: "media",
+        label: "Fondo del encabezado",
+        admin: {
+          description:
+            "Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.",
+        },
       },
-    },
-    // Buscadores y redes sociales (2026-10-13, aprobado por dirección): las
-    // 13 páginas de marca del mapa de alcance no tenían título ni descripción
-    // editables.
-    seoField(),
-  ],
+      /*
+       * LOS TIPOS DE LA MARCA, EN SU ORDEN (2026-11-19): se arrastran aquí, dentro de la marca
+       * (join ordenable: el orden es de cada marca). Va en la pestaña «Contenido». Solo se
+       * rellena en el panel (`joinsSoloEnElPanel`).
+       */
+      {
+        name: "tipos",
+        type: "join",
+        collection: "tipos-equipo",
+        on: "marca",
+        orderable: true,
+        defaultLimit: 100,
+        label: "Tipos de equipo de la marca",
+        admin: {
+          defaultColumns: ["nombre", "slug"],
+          description:
+            "En el orden en que salen en la web. Arrastra las filas para cambiarlo; un tipo nuevo entra al final.",
+        },
+      },
+      // Buscadores y redes sociales (2026-10-13, aprobado por dirección): las
+      // 13 páginas de marca del mapa de alcance no tenían título ni descripción
+      // editables.
+      seoField(),
+    ],
+    { fotos: { logo: "logo", logoBaldosa: "logo", fondoHero: "cabecera" } },
+  ),
 };

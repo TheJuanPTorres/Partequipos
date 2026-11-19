@@ -993,3 +993,17 @@ grupos de la F1 (§20).
 - Las preferencias de grupo plegado se guardan por nombre: con los nombres nuevos, todos los grupos
   salen desplegados la primera vez.
 - Sin esquema ni migración. La guía del editor (`docs/guia-editor.md`) usa ya los nombres nuevos.
+
+## 33. Pestañas en repuestos, páginas, portada y configuración (2026-11-19, organización del panel, PR 4; rama `feat/panel-pestanas-repuestos-paginas`)
+
+La «ficha tipo» del plan (§4) con la utilidad de B, `conPestanas` (`src/lib/fields/pestanasFicha.ts`):
+Contenido · Fotos (con el tamaño recomendado y el aviso de foto pequeña) · Buscadores y redes ·
+Avanzado (solo Administrador).
+
+- **Colecciones:** Modelos, Marcas, Tipos de equipo y Categorías técnicas de repuestos; Páginas
+  (el interruptor «Diseño» a Avanzado); Testimonios y Sedes. A Avanzado van además el tipo padre
+  de los tipos de equipo y los órdenes numéricos antiguos de las categorías técnicas.
+- **Globales:** «Páginas de marca de repuestos» y «Pie» con la misma utilidad; «Páginas índice»,
+  una pestaña por página (diez); «SEO y datos de la empresa», «Datos de la empresa» e «Imágenes».
+- Preguntas frecuentes no lleva pestañas: solo tendría «Contenido».
+- Pestañas sin nombre: ni columnas ni rutas de campo cambian (`db:deriva` sin diferencias).

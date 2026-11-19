@@ -42,8 +42,17 @@ describe("joins solo en el panel", () => {
   });
 
   it("los joins ordenables y las colecciones ordenables, como se aprobaron", () => {
+    // Dentro de las pestañas sin nombre de la ficha (Contenido): se busca en todo el árbol.
+    const todos = (campos: Field[]): Field[] =>
+      campos.flatMap((f) =>
+        f.type === "tabs"
+          ? todos(f.tabs.flatMap((t) => t.fields))
+          : !("name" in f) && "fields" in f
+            ? todos(f.fields)
+            : [f],
+      );
     const join = (campos: Field[], nombre: string) =>
-      campos.find((f) => f.type === "join" && f.name === nombre) as
+      todos(campos).find((f) => f.type === "join" && f.name === nombre) as
         { collection: string; on: string; orderable?: boolean } | undefined;
     assert.deepEqual(
       { ...join(Marca.fields, "tipos") },
@@ -58,6 +67,20 @@ describe("joins solo en el panel", () => {
         orderable: true,
       },
     );
+    // En la pestaña «Contenido» de su ficha.
+    for (const [c, n] of [
+      [Marca, "tipos"],
+      [TipoEquipo, "modelos"],
+    ] as const) {
+      const tabs = c.fields.find((f) => f.type === "tabs") as {
+        tabs: { label: unknown; fields: Field[] }[];
+      };
+      const contenido = tabs.tabs.find((t) => t.label === "Contenido")!;
+      assert.ok(
+        todos(contenido.fields).some((f) => "name" in f && f.name === n),
+        `${c.slug}.${n}`,
+      );
+    }
     assert.equal(Marca.orderable, true);
     assert.equal(CategoriaTecnica.orderable, true);
   });

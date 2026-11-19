@@ -33,19 +33,13 @@ function recorteConocido(url: string) {
 }
 
 /**
- * Las categorías técnicas como tarjetas con su foto y «Ver todo», en el orden de la marca
- * (primero las de `ordenMarca`, luego por nombre). Una categoría sin nombre o sin página no sale
+ * Las categorías técnicas como tarjetas con su foto y «Ver todo», en el orden del panel
+ * (el que el editor arrastró: la consulta ya las trae así, 2026-11-19). Una categoría sin nombre o sin página no sale
  * (no hay enlace al que ir); sin foto, la tarjeta se pinta solo con el panel.
  */
 export function tarjetasDeCategorias(categorias: CategoriasTecnica[]): TarjetaMarca[] {
   return categorias
     .filter((c) => texto(c.nombre) && texto(c.slug))
-    .sort((a, b) => {
-      const oa = typeof a.ordenMarca === "number" ? a.ordenMarca : Infinity;
-      const ob = typeof b.ordenMarca === "number" ? b.ordenMarca : Infinity;
-      if (oa !== ob) return oa < ob ? -1 : 1;
-      return a.nombre.localeCompare(b.nombre, "es");
-    })
     .map((c) => {
       const imagen = imagenDeMedia(c.imagen, "");
       return {

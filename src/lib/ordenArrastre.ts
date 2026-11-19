@@ -23,6 +23,12 @@ export const ORDEN_ARRASTRE = {
   "marcas-lubricante": "_order",
   // Dentro de su marca (join `lineas` de `marcas-lubricante`).
   "categorias-lubricante": "_categorias-lubricante_lineas_order",
+  marcas: "_order",
+  "categorias-tecnicas": "_order",
+  // Dentro de su marca (join `tipos` de `marcas`).
+  "tipos-equipo": "_tipos-equipo_tipos_order",
+  // Dentro de su tipo (join `modelos` de `tipos-equipo`).
+  "modelos-repuesto": "_modelos-repuesto_modelos_order",
   sedes: "_order",
   testimonios: "_order",
   "preguntas-frecuentes": "_order",

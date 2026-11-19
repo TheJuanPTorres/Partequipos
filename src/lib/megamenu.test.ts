@@ -296,7 +296,7 @@ describe("megamenú: repuestos", () => {
     );
   });
 
-  it("una marca nueva del catálogo aparece sola, sin tocar el código", () => {
+  it("una marca nueva del catálogo aparece sola, en el orden en que llega (el del panel)", () => {
     const p = panelRepuestos({
       ...DATOS,
       marcasRepuestos: [
@@ -304,7 +304,7 @@ describe("megamenú: repuestos", () => {
         { id: 41, nombre: "Bobcat", slug: "repuestos-para-maquinaria-pesada-bobcat" },
       ],
     });
-    assert.deepEqual(titulos(p.grupos[0]!.grupos), ["Bobcat", "Caterpillar"]);
+    assert.deepEqual(titulos(p.grupos[0]!.grupos), ["Caterpillar", "Bobcat"]);
   });
 });
 
@@ -313,19 +313,19 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
     ...DATOS,
     categoriasTecnicas: [
       {
-        id: 1,
-        nombre: "Tren de rodaje",
-        slug: "tren-de-rodaje-para-maquinaria-pesada",
-        ordenMarca: 2,
-        imagen: { url: "/api/media/file/rodaje.jpg", width: 800, height: 600 },
-      },
-      {
         id: 2,
         nombre: "Filtración",
         slug: "filtros-para-maquinaria-pesada",
         ordenMarca: 1,
         // Sin medidas: la tarjeta va sin foto.
         imagen: { url: "/api/media/file/filtro.jpg", width: null, height: null },
+      },
+      {
+        id: 1,
+        nombre: "Tren de rodaje",
+        slug: "tren-de-rodaje-para-maquinaria-pesada",
+        ordenMarca: 2,
+        imagen: { url: "/api/media/file/rodaje.jpg", width: 800, height: 600 },
       },
       { id: 3, nombre: "Accesorios", slug: "accesorios", ordenMarca: null, imagen: 9 },
       { id: 4, nombre: "Sin página", slug: "", ordenMarca: null, imagen: null },

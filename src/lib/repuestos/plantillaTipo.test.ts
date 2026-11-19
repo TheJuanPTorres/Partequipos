@@ -10,7 +10,7 @@ const categoria = (id: number, extra: Partial<CategoriasTecnica> = {}) =>
   ({ id, nombre: `Categoría ${id}`, slug: `categoria-${id}`, ...extra }) as CategoriasTecnica;
 
 describe("tarjetasDeCategorias", () => {
-  it("orden de la marca primero, luego por nombre; sin las que no tienen nombre o página", () => {
+  it("conserva el orden en que llegan (el del panel); sin las que no tienen nombre o página", () => {
     const r = tarjetasDeCategorias([
       categoria(1, { nombre: "Zeta" }),
       categoria(2, { nombre: "Alfa" }),
@@ -20,7 +20,7 @@ describe("tarjetasDeCategorias", () => {
     ]);
     assert.deepEqual(
       r.map((t) => t.titulo),
-      ["Beta", "Alfa", "Zeta"],
+      ["Zeta", "Alfa", "Beta"],
     );
   });
 

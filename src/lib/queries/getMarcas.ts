@@ -1,6 +1,7 @@
 import { cache } from "react";
 import config from "@payload-config";
 import { getPayload } from "payload";
+import { ordenDe } from "../ordenArrastre";
 
 import type { Marca } from "@/payload-types";
 
@@ -29,7 +30,8 @@ export const getMarcas = cache(async (): Promise<Marca[]> => {
     collection: "marcas",
     depth: 1,
     limit: 0, // sin límite: el catálogo completo
-    sort: "nombre",
+    // En el orden del panel (arrastrando, `orderable`, 2026-11-19).
+    sort: ordenDe("marcas"),
   });
 
   return docs;

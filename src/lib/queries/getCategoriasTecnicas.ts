@@ -16,6 +16,7 @@ export const getCategoriasTecnicasDePortada = cache(async (): Promise<Categorias
     where: { ordenPortada: { exists: true } },
     depth: 1,
     limit: 0,
+    // orden-libre: la portada tiene su propio orden («Posición en la portada»), que además decide si sale.
     sort: "ordenPortada",
   });
   return docs;

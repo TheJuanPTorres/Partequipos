@@ -118,10 +118,9 @@ export function vistaSelector(
   const marcas = (
     elegidas.length > 0
       ? elegidas
-      : [...todas].sort(
-          (a, b) =>
-            Number(tienePaginaPropiaLubricante(b)) - Number(tienePaginaPropiaLubricante(a)) ||
-            a.nombre.localeCompare(b.nombre, "es"),
+      : // Las de página propia primero; cada grupo, en el orden del panel (el de la consulta).
+        [...todas].sort(
+          (a, b) => Number(tienePaginaPropiaLubricante(b)) - Number(tienePaginaPropiaLubricante(a)),
         )
   ).filter((m) => limpio(m.nombre) && limpio(m.slug));
   if (marcas.length === 0) return null;

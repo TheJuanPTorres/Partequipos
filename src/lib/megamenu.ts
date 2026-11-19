@@ -9,7 +9,6 @@ import {
 import { paisDe, type CodigoPais } from "./lubricantes/pais";
 import { enlaceExternoDe } from "./nueva/enlaceExterno";
 import { colorConBlanco } from "./marca/franjaMarca";
-import { porOrden } from "./nueva/orden";
 import { unaEntradaPorTipo } from "./nueva/ordenTipos";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
@@ -262,11 +261,12 @@ const idDeMarca = (t: TipoCatalogo) => (typeof t.marca === "object" ? t.marca?.i
 const porNombre = <T extends { nombre: string }>(a: T, b: T) =>
   a.nombre.localeCompare(b.nombre, "es");
 
-/** Los tipos de una marca, por su «Orden» (vacío, al final, por nombre), como en su página. */
-function tiposDe(marca: ItemCatalogo, tipos: TipoCatalogo[], enSuOrden = false) {
-  const suyos = tipos.filter((t) => idDeMarca(t) === marca.id);
-  // Repuestos: ya vienen en el orden que arrastró el editor en la marca (2026-11-19).
-  return enSuOrden ? suyos : suyos.sort(porOrden);
+/**
+ * Los tipos de una marca en el orden de su página: el del panel (arrastrando en la ficha de la
+ * marca), que ya trae la consulta (`getMegamenu.ts`).
+ */
+function tiposDe(marca: ItemCatalogo, tipos: TipoCatalogo[]) {
+  return tipos.filter((t) => idDeMarca(t) === marca.id);
 }
 
 /** Acordeón de una marca: «Ver todo» y sus tipos. */
@@ -277,7 +277,6 @@ function grupoDeMarca(
   hrefTipo: (m: string, t: string) => string,
   titulo = marca.nombre,
   conLogo = true,
-  tiposEnSuOrden = false,
 ): GrupoMenu {
   const logo = conLogo ? logoDeMenu(marca.logo, marca.logoOscuroEnMenu) : undefined;
   return {
@@ -285,7 +284,7 @@ function grupoDeMarca(
     ...(logo ? { logo } : {}),
     enlaces: [
       { etiqueta: `Ver todo ${marca.nombre}`, href: conBarra(hrefMarca(marca.slug)) },
-      ...tiposDe(marca, tipos, tiposEnSuOrden).map((t) => ({
+      ...tiposDe(marca, tipos).map((t) => ({
         etiqueta: t.nombre,
         href: conBarra(hrefTipo(marca.slug, segmentoDeTipo(t))),
       })),
@@ -306,7 +305,8 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
     const r = deRepuestos.get(claveDeMarca(m.nombre));
     return r && logoPropio(r) ? { ...m, logo: r.logo, logoOscuroEnMenu: r.logoOscuroEnMenu } : m;
   };
-  const marcas = d.marcasMaquinaria.map(conLogoUnico).sort(porNombre);
+  // En el orden del panel (arrastrando), que ya trae la consulta.
+  const marcas = d.marcasMaquinaria.map(conLogoUnico);
   const aditamentos = marcas.find((m) => m.slug === SLUG_ADITAMENTOS);
   const deMarca = (m: ItemCatalogo): GrupoMenu => {
     // Sin página propia (LiuGong → su distribuidor, 2026-11-03): un enlace fuera, sin tipos.
@@ -511,9 +511,7 @@ export function panelRepuestos(d: DatosMegamenu): PanelMenu {
       {
         titulo: "Repuestos por marca",
         enlaces: [{ etiqueta: "Ver todas las marcas", href: conBarra(rutas.marcas()) }],
-        grupos: marcas.map((m) =>
-          grupoDeMarca(m, d.tiposRepuestos, rutas.marca, rutas.tipo, m.nombre, true, true),
-        ),
+        grupos: marcas.map((m) => grupoDeMarca(m, d.tiposRepuestos, rutas.marca, rutas.tipo)),
       },
       ...(categorias ? [categorias] : []),
     ],
@@ -537,14 +535,15 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
   const marcas = [...(d.marcasLubricante ?? [])]
     .filter((m) => m.nombre && m.slug)
     .filter((m) => tienePaginaPropiaLubricante(m) || enlaceExternoLubricante(m) || selector(m.id))
-    // Primero las de página propia (Eni) y después las de otra web (Dispel); cada grupo, por nombre.
+    // Primero las de página propia (Eni) y después las de otra web (Dispel); cada grupo, en el
+    // orden del panel (arrastrando), que ya trae la consulta (`sort` es estable).
     .sort(
-      (a, b) =>
-        Number(tienePaginaPropiaLubricante(b)) - Number(tienePaginaPropiaLubricante(a)) ||
-        porNombre(a, b),
+      (a, b) => Number(tienePaginaPropiaLubricante(b)) - Number(tienePaginaPropiaLubricante(a)),
     );
   if (marcas.length === 0) return null;
-  const categorias = [...(d.categoriasLubricante ?? [])].sort(porNombre);
+  // Las líneas de cada marca, en el orden del panel (arrastrando en la ficha de la marca), que ya
+  // trae la consulta: el mismo de la página de la marca (2026-11-19, dirección).
+  const categorias = d.categoriasLubricante ?? [];
   return {
     verTodo: {
       etiqueta: "Ver todos los lubricantes",

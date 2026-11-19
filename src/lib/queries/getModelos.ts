@@ -1,6 +1,7 @@
 import { cache } from "react";
 import config from "@payload-config";
 import { getPayload } from "payload";
+import { ordenDe } from "../ordenArrastre";
 
 import type { Media, ModelosRepuesto } from "@/payload-types";
 
@@ -33,7 +34,7 @@ export const getModelos = cache(async (): Promise<ModelosRepuesto[]> => {
     depth: 1,
     limit: 0,
     // En el orden de cada tipo (join «Modelos», arrastrando, 2026-11-19).
-    sort: "_modelos-repuesto_modelos_order",
+    sort: ordenDe("modelos-repuesto"),
   });
 
   return docs;
@@ -54,7 +55,7 @@ export const getModelosDeMarca = cache(async (marcaId: number): Promise<ModelosR
     depth: 0,
     limit: 0,
     // En el orden de su tipo (join «Modelos» del tipo, arrastrando, 2026-11-19).
-    sort: "_modelos-repuesto_modelos_order",
+    sort: ordenDe("modelos-repuesto"),
     select: { nombre: true, slug: true, codigo: true, serie: true, tipo: true, imagenes: true },
   });
   const modelos = docs as ModelosRepuesto[];
@@ -91,7 +92,7 @@ export const getModelosDeTipo = cache(async (tipoId: number): Promise<ModelosRep
     depth: 1,
     limit: 0,
     // En el orden del tipo (join «Modelos», arrastrando, 2026-11-19).
-    sort: "_modelos-repuesto_modelos_order",
+    sort: ordenDe("modelos-repuesto"),
   });
 
   return docs;
@@ -132,6 +133,7 @@ export async function getModelosPorIds(ids: number[]): Promise<ModelosRepuesto[]
     where: conProductoVisible({ id: { in: ids } }),
     depth: 1,
     limit: 0,
+    // orden-libre: se buscan por id y su sitio lo da la lista del tipo («Otras entradas»).
   });
   return docs;
 }

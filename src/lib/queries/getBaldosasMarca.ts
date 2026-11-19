@@ -2,6 +2,7 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import config from "@payload-config";
 import { getPayload } from "payload";
+import { ordenDe } from "../ordenArrastre";
 
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 import { claveDeMarca, logoPropio } from "@/lib/marca/logoMarca";
@@ -21,7 +22,7 @@ const baldosasEnCache = unstable_cache(
       depth: 1,
       limit: 0,
       pagination: false,
-      sort: "_order",
+      sort: ordenDe("marcas"),
       select: { nombre: true, colorBaldosa: true, logoBaldosa: true },
       populate: { media: { url: true, filename: true, width: true, height: true } },
     });

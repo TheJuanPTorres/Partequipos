@@ -25,24 +25,23 @@ export const DESCRIPCION_OTROS =
 
 type ConAgrupacion = Pick<CategoriasUsada, "nombre"> & {
   enOtros?: boolean | null;
-  orden?: number | null;
 };
 
 /** Vacía (filas anteriores a la casilla) cuenta como marcada: va a «Otros». */
 export const vaEnOtros = (c: { enOtros?: boolean | null }) => c.enOtros !== false;
 
 /**
- * Las de primer nivel (casilla desmarcada), por «Orden en el primer nivel» y,
- * sin orden o empatadas, por nombre; y las agrupadas, en el orden recibido.
+ * Las de primer nivel (casilla desmarcada) y las agrupadas, las dos en el orden recibido: el del
+ * panel (arrastrando, 2026-11-19), que trae la consulta. Antes las de primer nivel se ordenaban
+ * aquí por «Orden en el primer nivel» y nombre, que es el orden inicial que puso la migración.
  */
 export function separarCategorias<T extends ConAgrupacion>(
   categorias: readonly T[],
 ): { primerNivel: T[]; agrupadas: T[] } {
-  const orden = (c: T) => (typeof c.orden === "number" ? c.orden : Number.POSITIVE_INFINITY);
-  const primerNivel = categorias
-    .filter((c) => !vaEnOtros(c))
-    .sort((a, b) => orden(a) - orden(b) || a.nombre.localeCompare(b.nombre, "es"));
-  return { primerNivel, agrupadas: categorias.filter(vaEnOtros) };
+  return {
+    primerNivel: categorias.filter((c) => !vaEnOtros(c)),
+    agrupadas: categorias.filter(vaEnOtros),
+  };
 }
 
 /**

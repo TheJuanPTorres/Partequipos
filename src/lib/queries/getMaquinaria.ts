@@ -29,7 +29,7 @@ import type {
 
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "../cacheDatos";
 import type { EquipoFiltrable } from "../nueva/filtros";
-import { SORT_POR_ORDEN } from "../nueva/orden";
+import { ordenDe } from "../ordenArrastre";
 import { rutas } from "../routes";
 import type { UnidadFiltrable } from "../usados/filtros";
 import { idsDePrimeraImagen } from "../usados/primeraImagen";
@@ -56,7 +56,8 @@ export const getMarcasMaquinaria = cache(async (): Promise<MarcasMaquinaria[]> =
     where: MARCA_VISIBLE,
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    // En el orden del panel (arrastrando, 2026-11-19; el inicial, por nombre).
+    sort: ordenDe("marcas-maquinaria"),
   });
   return docs;
 });
@@ -82,7 +83,8 @@ export const getTiposMaquinaria = cache(async (): Promise<TiposMaquinaria[]> => 
     where: DE_MARCA_VISIBLE,
     depth: 1,
     limit: 0,
-    sort: SORT_POR_ORDEN,
+    // El orden de cada marca (arrastrando dentro de la marca): entre marcas no significa nada.
+    sort: ordenDe("tipos-maquinaria"),
   });
   return docs;
 });
@@ -96,7 +98,8 @@ export const getTiposDeMarcaMaquinaria = cache(
       // `depth: 1` puebla la imagen de la tarjeta del tipo.
       depth: 1,
       limit: 0,
-      sort: SORT_POR_ORDEN,
+      // En el orden del panel: arrastrando en la ficha de la marca (2026-11-19).
+      sort: ordenDe("tipos-maquinaria"),
     });
     return docs;
   },
@@ -127,7 +130,8 @@ export const getEquiposNuevos = cache(async (): Promise<EquiposNuevo[]> => {
     where: conEquipoVisible(),
     depth: 1,
     limit: 0,
-    sort: SORT_POR_ORDEN,
+    // El orden de cada tipo (arrastrando en la ficha del tipo, 2026-11-19).
+    sort: ordenDe("equipos-nuevos"),
   });
   return docs;
 });
@@ -139,7 +143,8 @@ export const getEquiposDeTipo = cache(async (tipoId: number): Promise<EquiposNue
     where: conEquipoVisible({ tipo: { equals: tipoId } }),
     depth: 1,
     limit: 0,
-    sort: SORT_POR_ORDEN,
+    // El orden de cada tipo (arrastrando en la ficha del tipo, 2026-11-19).
+    sort: ordenDe("equipos-nuevos"),
   });
   return docs;
 });
@@ -171,7 +176,8 @@ export const getOtrasReferencias = cache(
       where: conEquipoVisible({
         and: [{ tipo: { equals: tipoId } }, { id: { not_equals: excluirId } }],
       }),
-      sort: SORT_POR_ORDEN,
+      // El orden de cada tipo (arrastrando en la ficha del tipo, 2026-11-19).
+      sort: ordenDe("equipos-nuevos"),
       depth: 1,
       limit: 3,
     });
@@ -188,7 +194,8 @@ export const getEquiposDeTipos = cache(async (tipoIds: number[]): Promise<Equipo
     where: conEquipoVisible({ tipo: { in: tipoIds } }),
     depth: 1,
     limit: 0,
-    sort: SORT_POR_ORDEN,
+    // El orden de cada tipo (arrastrando en la ficha del tipo, 2026-11-19).
+    sort: ordenDe("equipos-nuevos"),
   });
   return docs;
 });
@@ -203,6 +210,7 @@ async function sinTiposOcultos(docs: CategoriasMaquinaria[]): Promise<Categorias
     depth: 0,
     limit: 0,
     pagination: false,
+    // orden-libre: solo los ids, para filtrar.
     select: {},
   });
   const ids = new Set(visibles.map((t) => t.id));
@@ -221,7 +229,7 @@ export const getCategoriasMaquinaria = cache(async (): Promise<CategoriasMaquina
     depth: 1,
     limit: 0,
     // En el orden del panel (arrastrando, `orderable`, 2026-11-09).
-    sort: "_order",
+    sort: ordenDe("categorias-maquinaria"),
   });
   return sinTiposOcultos(docs);
 });
@@ -256,7 +264,9 @@ const categoriasUsadaEnCache = unstable_cache(
       collection: "categorias-usada",
       depth: 1,
       limit: 0,
-      sort: "nombre",
+      // En el orden del panel (arrastrando, 2026-11-19; el inicial, «Orden en el primer nivel»
+      // y nombre). Los índices reordenan por unidades donde toca (`usados/indice.ts`).
+      sort: ordenDe("categorias-usada"),
       populate: {
         // `filename` hace falta: sin él, la URL sale null (Payload la calcula con él).
         media: {
@@ -305,7 +315,8 @@ const marcasUsadaEnCache = unstable_cache(
       collection: "marcas-usada",
       depth: 1,
       limit: 0,
-      sort: "nombre",
+      // En el orden del panel (arrastrando, 2026-11-19; el inicial, por nombre).
+      sort: ordenDe("marcas-usada"),
       populate: {
         // `mostrarEnWeb`: una marca de nueva oculta no se enlaza (`marcaVisible`); con
         // `enlaceExterno`, tampoco: no tiene página (`tienePaginaPropia`).
@@ -321,7 +332,7 @@ const marcasUsadaEnCache = unstable_cache(
   { tags: [ETIQUETAS_DATOS.usados] },
 );
 
-/** Las marcas de usada (paso b del marketplace), por nombre. */
+/** Las marcas de usada (paso b del marketplace), en el orden del panel. */
 export const getMarcasUsada = cache(() => marcasUsadaEnCache());
 
 export const getMarcaUsadaPorSlug = cache(
@@ -563,6 +574,7 @@ const listadoNuevaEnCache = unstable_cache(
     const [equipos, marcas, tipos, categorias] = await Promise.all([
       payload.find({
         collection: "equipos-nuevos",
+        // orden-libre: el listado ordena con «Ordenar» (`nueva/filtros.ts`, «Recomendados» por id).
         // Los de marcas ocultas tampoco: ni en tarjetas ni en filtros ni en contadores.
         where: conEquipoVisible(),
         depth: 0,
@@ -586,6 +598,7 @@ const listadoNuevaEnCache = unstable_cache(
         depth: 0,
         limit: 0,
         pagination: false,
+        // orden-libre: un índice por id (opciones de los filtros y tarjetas).
         select: { slug: true, nombre: true, logo: true, logoOscuroEnMenu: true },
       }),
       payload.find({
@@ -594,6 +607,7 @@ const listadoNuevaEnCache = unstable_cache(
         depth: 0,
         limit: 0,
         pagination: false,
+        // orden-libre: las pestañas de tipo mezclan marcas y van por nombre (más abajo).
         select: {
           slug: true,
           nombre: true,
@@ -609,7 +623,7 @@ const listadoNuevaEnCache = unstable_cache(
         limit: 0,
         pagination: false,
         // En el orden del panel (arrastrando, `orderable`, 2026-11-09).
-        sort: "_order",
+        sort: ordenDe("categorias-maquinaria"),
         select: {
           slug: true,
           nombre: true,
@@ -790,6 +804,7 @@ export const getMarcasDePortada = cache(async (): Promise<MarcasMaquinaria[]> =>
     },
     depth: 1,
     limit: 0,
+    // orden-libre: la portada tiene su propio «Orden en la portada».
     sort: ["ordenPortada", "nombre"],
   });
   return docs;

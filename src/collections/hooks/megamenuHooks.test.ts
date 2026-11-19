@@ -92,15 +92,24 @@ describe("megamenú: cuándo hay que revalidar el sitio", () => {
       nombre: "Excavadoras",
       slug: "excavadoras",
       enOtros: true,
-      orden: 1,
+      _order: "a1",
       mostrarEnWeb: true,
     };
     const cu = "categorias-usada";
     assert.equal(cambiaElMenu("update", { ...u, mostrarEnWeb: false }, u, cu), true);
     assert.equal(cambiaElMenu("update", { ...u, enOtros: false }, u, cu), true);
-    assert.equal(cambiaElMenu("update", { ...u, orden: 2 }, u, cu), true);
-    const l = { nombre: "Grasas", slug: "grasas", marca: 1, enlaceMenu: null, orden: 1 };
-    assert.equal(cambiaElMenu("update", { ...l, orden: 3 }, l, "categorias-lubricante"), true);
+    assert.equal(cambiaElMenu("update", { ...u, _order: "a2" }, u, cu), true);
+    const l = {
+      nombre: "Grasas",
+      slug: "grasas",
+      marca: 1,
+      enlaceMenu: null,
+      "_categorias-lubricante_lineas_order": "a1",
+    };
+    const otro = { ...l, "_categorias-lubricante_lineas_order": "a3" };
+    assert.equal(cambiaElMenu("update", otro, l, "categorias-lubricante"), true);
+    // El «Orden» numérico ya no lo lee el menú (2026-11-19): cambiarlo no revalida todo el sitio.
+    assert.equal(cambiaElMenu("update", { ...u, orden: 2 }, { ...u, orden: 1 }, cu), false);
   });
 });
 

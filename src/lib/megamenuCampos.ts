@@ -6,8 +6,9 @@
  * el menú y el gancho no lo veía (el menú de las páginas que no son de nueva se quedaba viejo).
  *
  * Van también los campos de los FILTROS de la consulta (`mostrarEnWeb`), que deciden si una
- * fila sale, y los del orden (`orden`, `ordenMarca` y, desde el 2026-11-19, las claves del orden
- * por arrastre de `ordenArrastre.ts`: arrastrar en el panel refresca el menú). El `id` no: no cambia.
+ * fila sale, y los del orden: `ordenMarca` (repuestos) y las claves del orden por arrastre de
+ * `ordenArrastre.ts` (arrastrar en el panel refresca el menú). Desde el 2026-11-19 el menú ya no lee
+ * el «Orden» numérico de tipos, categorías de usados ni líneas de lubricante. El `id` no: no cambia.
  */
 export const CAMPOS_MENU = {
   "marcas-maquinaria": [
@@ -26,12 +27,11 @@ export const CAMPOS_MENU = {
     "marca",
     "subtipos",
     "pestanaIndiceNueva",
-    "orden",
     "_tipos-maquinaria_tipos_order",
   ],
   // `_order`: el orden arrastrando del panel (`orderable`, 2026-11-09).
   "categorias-maquinaria": ["nombre", "slug", "tiposIncluidos", "_order"],
-  "categorias-usada": ["nombre", "slug", "enOtros", "orden", "mostrarEnWeb", "_order"],
+  "categorias-usada": ["nombre", "slug", "enOtros", "mostrarEnWeb", "_order"],
   marcas: ["nombre", "slug", "logo", "logoOscuroEnMenu"],
   "tipos-equipo": ["nombre", "slug", "marca", "slugPadre"],
   // `padre`, `logo` y `colorMarca`: el botón de una página que cuelga de una categoría bajo su
@@ -55,7 +55,6 @@ export const CAMPOS_MENU = {
     "slug",
     "marca",
     "enlaceMenu",
-    "orden",
     "_categorias-lubricante_lineas_order",
   ],
 } as const;

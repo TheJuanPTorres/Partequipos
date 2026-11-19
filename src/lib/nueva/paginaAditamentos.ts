@@ -22,7 +22,7 @@ export const TEXTOS_ADITAMENTOS = {
     "Nuestro compromiso es ofrecerle soluciones para cada una de sus necesidades y proyectos a nivel nacional.",
   compromisoEntradilla: "Somos especialistas en repuestos de maquinaria pesada.",
   compromisoTexto:
-    "Trabajamos con una amplia variedad de marcas de maquinaria pesada y repuestos, incluyendo: Link Belt, Caterpillar, Hitachi LANDCROS, Hyundai, Doosan, Komatsu, Kobelco, Case, John Deere, New Holland, Volvo, Liugong, Sumitomo, Yanmar, Sany, Jcb y muchas más.",
+    "Trabajamos con una amplia variedad de marcas de maquinaria pesada y repuestos, incluyendo: Link Belt, Caterpillar, Hitachi, Hyundai, Doosan, Komatsu, Kobelco, Case, John Deere, New Holland, Volvo, Liugong, Sumitomo, Yanmar, Sany, Jcb y muchas más.",
   compromisoBoton: "Solicita asesoría",
 } as const;
 

@@ -11,6 +11,7 @@ import {
 } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 import { createPortal } from "react-dom";
 import {
@@ -172,6 +173,17 @@ function Logo({
     </Link>
   );
 }
+
+/** El panel de resultados de la lupa: se descarga solo al abrirla (2026-11-18). */
+const PanelBuscador = dynamic(() => import("./PanelBuscador"), { ssr: false });
+
+const EJEMPLOS = [
+  "Excavadora Hitachi",
+  "ZX200",
+  "filtros Donaldson",
+  "retroexcavadora usada",
+  "tren de rodaje",
+];
 
 export function Cabecera({
   enlaces,
@@ -420,6 +432,38 @@ export function Cabecera({
     setBuscandoEn(null);
     setAltoFila(null);
   };
+
+  // Ejemplos que rotan en el campo (quieto con «reducir movimiento») y atajos de teclado: «/» y
+  // Ctrl+K abren la lupa en escritorio.
+  const [ejemplo, setEjemplo] = useState(0);
+  useEffect(() => {
+    if (!buscando || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setEjemplo((e) => e + 1), 3500);
+    return () => clearInterval(t);
+  }, [buscando]);
+  useEffect(() => {
+    const alTeclear = (e: globalThis.KeyboardEvent) => {
+      if (!matchMedia("(min-width: 1025px)").matches) return;
+      const t = e.target as HTMLElement | null;
+      const escribiendo =
+        !!t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+      const atajo =
+        (e.key === "/" && !escribiendo && !e.ctrlKey && !e.metaKey && !e.altKey) ||
+        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k");
+      if (!atajo) return;
+      e.preventDefault();
+      abridor.current =
+        cabecera.current?.querySelector<HTMLButtonElement>(
+          "form button[aria-controls=cab-busqueda]",
+        ) ?? null;
+      setAltoFila(fila.current?.offsetHeight ?? null);
+      setMega(null);
+      setAbiertoEn(null);
+      setBuscandoEn(ruta);
+    };
+    addEventListener("keydown", alTeclear);
+    return () => removeEventListener("keydown", alTeclear);
+  }, [ruta]);
 
   // Clic fuera de la cabecera y del panel: se cierra el megamenú.
   useEffect(() => {
@@ -859,9 +903,13 @@ export function Cabecera({
               name="q"
               type="search"
               className={estilos.busquedaCampo}
-              placeholder="Escribe los términos de búsqueda…"
+              placeholder={`Prueba con «${EJEMPLOS[ejemplo % EJEMPLOS.length]}»`}
               autoComplete="off"
               maxLength={80}
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={buscando}
+              aria-controls="cab-resultados"
             />
             <button type="submit" className={`${estilos.busquedaBoton} texto-etiqueta`}>
               <IconSearch aria-hidden="true" focusable="false" stroke={1.75} />
@@ -875,6 +923,9 @@ export function Cabecera({
             >
               <IconX aria-hidden="true" focusable="false" stroke={1.75} />
             </button>
+            {buscando ? (
+              <PanelBuscador campo={campo} whatsapp={whatsapp} alIr={cerrarBusqueda} />
+            ) : null}
           </form>
           <div className={estilos.derechaMovil}>
             {lupa}

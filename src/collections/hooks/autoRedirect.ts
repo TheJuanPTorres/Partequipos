@@ -2,6 +2,9 @@ import type { PayloadRequest } from "payload";
 
 import { normalizarRuta } from "@/lib/redirects/normalizar";
 
+/** Clave de `context` con la que un script pide que el guardado NO cree redirecciones por su cuenta. */
+export const SIN_REDIRECT_AUTOMATICO = "sinRedirectAutomatico";
+
 /**
  * Crea (o actualiza) el redirect 301 que salva una URL cuando cambia un slug
  * (ADR 0005, parte A). Se invoca desde los hooks `afterChange` del catálogo.
@@ -14,6 +17,14 @@ export async function crearRedirectPorCambioDeSlug(
   rutaAnterior: string,
   rutaNueva: string,
 ): Promise<void> {
+  /*
+   * Un cambio masivo de direcciones por script (`scripts/marcas/hitachi-landcros-urls.ts`) crea él
+   * mismo sus redirecciones y lo pide así: la cascada de una marca con decenas de modelos, hecha
+   * aquí dentro de la transacción del guardado, tarda minutos y la base la corta por inactividad
+   * (pasó en el preview el 2026-11-18, con la marca a medio cambiar).
+   */
+  if (req.context?.[SIN_REDIRECT_AUTOMATICO]) return;
+
   const desde = normalizarRuta(rutaAnterior);
   const hacia = normalizarRuta(rutaNueva);
 

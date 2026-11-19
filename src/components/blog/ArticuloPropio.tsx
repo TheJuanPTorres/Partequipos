@@ -54,9 +54,9 @@ const ID_PAGINA = "articulo-pagina";
 /**
  * El artículo del blog con el DISEÑO PROPIO (2026-10-21, dirección): Andrés no
  * tiene plantilla de artículo, así que se compone con sus piezas (tipografía,
- * colores, tarjetas del índice, cabecera baja) detrás del interruptor «Diseño
- * del artículo» de «Páginas índice y contacto» → «Blog». Apagado (provisional),
- * el artículo es `ArticuloCuerpo`, como siempre.
+ * colores, tarjetas del índice, cabecera baja). Es el que se publica: dirección
+ * retiró el 2026-11-18 el artículo de antes (`ArticuloCuerpo`) y el interruptor
+ * «Diseño del artículo», que queda oculto en el panel.
  *
  * - cabecera baja con migas, categoría, `<h1>`, fecha, autor y tiempo de lectura;
  * - imagen destacada grande con esquinas redondeadas y, debajo (como WordPress,

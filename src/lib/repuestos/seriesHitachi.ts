@@ -5,7 +5,7 @@
  * Detalle en docs/repuestos-importacion.md §8.
  */
 
-export const MARCA_HITACHI = "repuestos-para-maquinaria-pesada-hitachi";
+export const MARCA_HITACHI = "repuestos-para-maquinaria-pesada-hitachi-landcros";
 
 export type PlanFotoSerie = { url: string; fichero: string; alt: string };
 
@@ -19,7 +19,7 @@ const SUBIDAS = "https://partequipos.com/wp-content/uploads/2024/01";
 
 export const PLAN_HITACHI: PlanSeriesTipo[] = [
   {
-    tipoSlug: "repuestos-para-maquinaria-pesada-excavadora-hitachi",
+    tipoSlug: "repuestos-para-maquinaria-pesada-excavadora-hitachi-landcros",
     series: [
       { nombre: "EX", foto: null },
       {
@@ -34,7 +34,7 @@ export const PLAN_HITACHI: PlanSeriesTipo[] = [
     ],
   },
   {
-    tipoSlug: "repuestos-para-maquinaria-pesada-miniexcavadora-hitachi",
+    tipoSlug: "repuestos-para-maquinaria-pesada-miniexcavadora-hitachi-landcros",
     series: [
       { nombre: "EX", foto: null },
       {

@@ -59,7 +59,7 @@ const MANIFIESTO = path.join(
 
 /** La máquina de cada tarjeta: slug de la marca, fichero y texto alternativo. */
 const MAQUINAS = [
-  ["hitachi", "nueva-tarjeta-hitachi.webp", "Excavadora Hitachi LANDCROS ZX210 recortada"],
+  ["hitachi-landcros", "nueva-tarjeta-hitachi.webp", "Excavadora Hitachi LANDCROS ZX210 recortada"],
   ["case-construction", "nueva-tarjeta-case.webp", "Retroexcavadora CASE 580N recortada"],
   ["dynapac", "nueva-tarjeta-dynapac.webp", "Vibrocompactador Dynapac CA1500D recortado"],
   ["yanmar", "nueva-tarjeta-yanmar.webp", "Miniexcavadora Yanmar ViO80 recortada"],

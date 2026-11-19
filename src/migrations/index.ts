@@ -114,6 +114,7 @@ import * as migration_20261113_055720_aditamentos_compromiso_foto from './202611
 import * as migration_20261113_125918_sedes_lineas_enlace_maps from './20261113_125918_sedes_lineas_enlace_maps';
 import * as migration_20261113_140439_portada_tarjeta_color_logo from './20261113_140439_portada_tarjeta_color_logo';
 import * as migration_20261113_142500_portada_tarjeta_logo from './20261113_142500_portada_tarjeta_logo';
+import * as migration_20261119_023114_buscador from './20261119_023114_buscador';
 
 export const migrations = [
   {
@@ -694,6 +695,11 @@ export const migrations = [
   {
     up: migration_20261113_142500_portada_tarjeta_logo.up,
     down: migration_20261113_142500_portada_tarjeta_logo.down,
-    name: '20261113_142500_portada_tarjeta_logo'
+    name: '20261113_142500_portada_tarjeta_logo',
+  },
+  {
+    up: migration_20261119_023114_buscador.up,
+    down: migration_20261119_023114_buscador.down,
+    name: '20261119_023114_buscador'
   },
 ];

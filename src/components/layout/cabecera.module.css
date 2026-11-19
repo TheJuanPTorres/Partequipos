@@ -131,6 +131,21 @@
   }
 }
 
+/*
+ * Con el buscador abierto el panel de resultados cuelga bajo la cabecera: no se recorta (el recorte
+ * del encogido y el del filete lo dejarían invisible) y, con la barra encogida, cuelga de sus 70 px.
+ */
+@media (min-width: 1025px) {
+  .cabecera[data-buscando="si"],
+  .cabecera[data-buscando="si"][data-encogida="si"] {
+    clip-path: none;
+  }
+
+  .cabecera[data-buscando="si"][data-encogida="si"] #cab-resultados {
+    top: 70px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cabecera,
   .fila {

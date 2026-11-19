@@ -69,7 +69,7 @@ const MANIFIESTO = path.join(CARPETA, "manifiesto-preview.json");
 const MARCA = MARCA_EJEMPLO;
 
 /** Los 4 primeros equipos del tipo, por nombre (ver arriba). */
-const SLUG_TIPO = "excavadoras-hitachi";
+const SLUG_TIPO = "excavadoras-hitachi-landcros";
 const CUANTOS = 4;
 
 const FOTOS = {

@@ -7,7 +7,7 @@
   display: flex;
   box-sizing: border-box;
   width: 100%;
-  max-width: 860px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 60px 20px 100px;
   flex-direction: column;
@@ -22,6 +22,8 @@
 
 .formulario {
   display: flex;
+  width: 100%;
+  max-width: 860px;
   gap: 8px;
 }
 
@@ -177,5 +179,275 @@
 
   .campo {
     flex-basis: 100%;
+  }
+}
+
+/* --- Búsqueda completa (2026-11-18) --------------------------------------------------------- */
+
+.detectado {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: 15px;
+}
+
+.chips {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  min-height: 40px;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid #cdcdcd;
+  border-radius: 999px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.chip:hover {
+  border-color: var(--color-marca);
+  color: var(--color-marca);
+}
+
+.chip[data-activo] {
+  border-color: var(--color-texto);
+  background: var(--color-texto);
+  color: var(--color-fondo);
+}
+
+.chip[data-activo] .cuenta {
+  color: inherit;
+}
+
+.chip:focus-visible,
+.filtroEnlace:focus-visible,
+.tarjetaEnlace:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+}
+
+.cuerpo {
+  display: grid;
+  align-items: start;
+  gap: var(--espacio-interno);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.filtros {
+  border: 1px solid var(--color-fondo-seccion);
+  border-radius: 16px;
+  background: var(--color-fondo);
+}
+
+.filtrosResumen {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.filtrosCuerpo {
+  display: grid;
+  padding: 0 16px 16px;
+  gap: var(--espacio-interno);
+}
+
+.filtroTitulo {
+  margin: 0 0 6px;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-etiqueta);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.filtroLista {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 2px;
+  list-style: none;
+}
+
+.filtroEnlace {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 8px;
+  border-radius: 8px;
+  color: var(--color-texto);
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.filtroEnlace:hover {
+  background: var(--color-fondo-seccion);
+}
+
+.filtroEnlace[data-activo] {
+  background: var(--color-fondo-seccion);
+  font-weight: 600;
+}
+
+.quitar {
+  color: var(--color-marca);
+  font-size: 15px;
+}
+
+.rejilla {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  list-style: none;
+}
+
+.tarjeta {
+  display: flex;
+}
+
+.tarjetaEnlace {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+  flex-direction: column;
+  border: 1px solid var(--color-fondo-seccion);
+  border-radius: 20px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  text-decoration: none;
+}
+
+.tarjetaEnlace:hover {
+  border-color: var(--color-marca);
+}
+
+.tarjetaFoto {
+  display: grid;
+  aspect-ratio: 399 / 266;
+  place-items: center;
+  background: var(--color-fondo-seccion);
+  color: var(--color-texto-suave);
+}
+
+.tarjetaFoto img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.tarjetaTexto {
+  display: grid;
+  padding: 16px 16px 8px;
+  flex: 1;
+  gap: 4px;
+  align-content: start;
+}
+
+.etiqueta {
+  color: var(--color-marca);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tarjetaTitulo {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.tarjetaBoton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 16px 16px;
+  padding: 0 16px;
+  min-height: 40px;
+  align-self: flex-start;
+  border: 1px solid var(--color-marca);
+  border-radius: 999px;
+  color: var(--color-marca);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.paginas {
+  display: flex;
+  margin-top: var(--espacio-interno);
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.vacio {
+  display: grid;
+  gap: 12px;
+}
+
+.sugerencia {
+  margin: 0;
+  font-size: 18px;
+}
+
+.whatsapp {
+  display: inline-flex;
+  min-height: 44px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-self: start;
+  gap: 8px;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: #128c4a;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (min-width: 768px) {
+  .rejilla {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1025px) {
+  .cuerpo {
+    grid-template-columns: 260px minmax(0, 1fr);
+  }
+
+  /* En escritorio los filtros van siempre a la vista, sin el botón de desplegar. */
+  .filtros::details-content {
+    display: block;
+    content-visibility: visible;
+  }
+
+  .filtrosResumen {
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .rejilla {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1700px) {
+  .rejilla {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

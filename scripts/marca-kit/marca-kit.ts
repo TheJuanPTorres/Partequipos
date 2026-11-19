@@ -139,13 +139,13 @@ const CONFIGS: Record<(typeof MARCAS)[number], Config> = {
   },
   hitachi: {
     nombre: "Hitachi",
-    slug: "hitachi",
+    slug: "hitachi-landcros",
     carpeta: kitDe("kit-marca-hitachi", "hitachi"),
     emblemaAlt: "Emblema de Hitachi, el Ojo Hitachi",
     renders: [
       {
         fichero: "../../maq-hitachi-zx210.png",
-        slug: "excavadoras-hitachi",
+        slug: "excavadoras-hitachi-landcros",
         clave: "excavadora",
         nombre: "Excavadora",
       },

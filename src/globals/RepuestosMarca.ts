@@ -1,4 +1,5 @@
 import type { Field, GlobalConfig } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
@@ -179,15 +180,16 @@ export const RepuestosMarca: GlobalConfig = {
     {
       type: "collapsible",
       label: "Páginas de modelo",
-      admin: { initCollapsed: true },
+      // Todo lo de dentro va oculto (diseño propio retirado el 2026-11-18): el grupo, también.
+      admin: { initCollapsed: true, condition: () => false },
       fields: [
         /*
-         * Dirección, 2026-10-19: en el sitio publicado solo van diseños de
-         * Andrés. Desde el 2026-10-26 el valor `provisional` pinta su plantilla
-         * 4086 (el valor no cambia: sin migración); el diseño propio del #267
-         * sigue en el código, apagado.
+         * Dirección, 2026-10-19: en el sitio publicado solo van diseños de Andrés; desde el
+         * 2026-10-26, la plantilla 4086. El diseño propio del #267 se retiró del código el
+         * 2026-11-18 (queda en git): el interruptor ya no hace nada.
          */
-        {
+        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        ocultoSinUso({
           name: "disenoModelo",
           type: "select",
           label: "Diseño de las páginas de modelo",
@@ -201,28 +203,35 @@ export const RepuestosMarca: GlobalConfig = {
             description:
               "«Plantilla de Andrés»: la ficha 4086 (cabecera partida y las categorías del tipo en baldosas), la del sitio publicado. «Diseño propio»: el diseño nuestro, sin aprobar para el sitio publicado.",
           },
-        },
-        {
+        }),
+        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        ocultoSinUso({
           name: "modeloAyudaTitulo",
           type: "text",
           label: "Tarjeta de ayuda: título",
           admin: { description: "Vacío: la tarjeta de WhatsApp no se pinta." },
-        },
-        { name: "modeloAyudaTexto", type: "text", label: "Tarjeta de ayuda: texto" },
-        { name: "modeloAyudaBoton", type: "text", label: "Tarjeta de ayuda: texto del botón" },
-        {
+        }),
+        ocultoSinUso({ name: "modeloAyudaTexto", type: "text", label: "Tarjeta de ayuda: texto" }),
+        ocultoSinUso({
+          name: "modeloAyudaBoton",
+          type: "text",
+          label: "Tarjeta de ayuda: texto del botón",
+        }),
+        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        ocultoSinUso({
           name: "modeloAyudaFoto",
           type: "upload",
           relationTo: "media",
           label: "Tarjeta de ayuda: foto de fondo",
           admin: { description: "Opcional. Lleva un velo oscuro encima para que el texto se lea." },
-        },
-        {
+        }),
+        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        ocultoSinUso({
           name: "modeloContactoTitulo",
           type: "text",
           label: "Título del formulario",
           admin: { description: "Ej. «Si deseas más info, contáctanos»." },
-        },
+        }),
       ],
     },
   ],

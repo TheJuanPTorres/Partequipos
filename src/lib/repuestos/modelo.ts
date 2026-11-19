@@ -1,46 +1,12 @@
 import type { CategoriasTecnica, Marca, ModelosRepuesto, TiposEquipo } from "@/payload-types";
 
 /**
- * Lógica pura de la PÁGINA DE MODELO de repuestos (diseño propio aprobado el
- * 2026-10-19, docs/diseno/decisiones-modelo-repuestos.md): los textos de
- * WordPress del modelo (tal cual, decisión del cliente) con su respaldo, y las
- * categorías elegidas en su tipo de máquina, en ese orden.
+ * Lógica pura de la PÁGINA DE MODELO de repuestos (plantilla 4086 de Andrés,
+ * docs/diseno/decisiones-modelo-repuestos.md): las categorías elegidas en su tipo
+ * de máquina, en ese orden, y los títulos y referencias de la plantilla.
  */
 
 const texto = (v: string | null | undefined) => v?.trim() ?? "";
-
-export type VistaModelo = {
-  /** Sobre el título; vacío, no se pinta. */
-  antetitulo: string;
-  /** El `<h1>`: el título de WordPress o, sin él, «Repuestos <nombre>». */
-  titulo: string;
-  /** El título de las categorías: el de WordPress o «Repuestos disponibles para <nombre>». */
-  disponibles: string;
-  /** La lista de piezas, SOLO si se muestra (en WordPress, oculta en la mayoría). */
-  piezas: string[];
-};
-
-export function vistaModelo(modelo: ModelosRepuesto): VistaModelo {
-  const nombre = texto(modelo.nombre);
-  const piezas = modelo.mostrarPiezas
-    ? (modelo.piezas ?? []).map((p) => texto(p.texto)).filter(Boolean)
-    : [];
-  return {
-    antetitulo: texto(modelo.antetitulo),
-    titulo: texto(modelo.tituloPagina) || `Repuestos ${nombre}`,
-    disponibles: texto(modelo.tituloDisponibles) || `Repuestos disponibles para ${nombre}`,
-    piezas,
-  };
-}
-
-/**
- * ¿Se pinta el diseño propio? Solo si el global lo elige expresamente: sin
- * valor, o con cualquier otro, la versión provisional (dirección, 2026-10-19:
- * en el sitio publicado solo van diseños de Andrés).
- */
-export function usaDisenoPropio(global: { disenoModelo?: string | null }): boolean {
-  return global.disenoModelo === "propio";
-}
 
 /**
  * Las categorías de la página de un modelo: las que su tipo eligió en

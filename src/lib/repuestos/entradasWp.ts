@@ -49,10 +49,13 @@ export const ENTRADAS_WP: EntradaWp[] = [
     texto: "Miniexcavadora YANMAR VIO 70-3",
   },
   {
-    marca: `${M}hitachi`,
-    tipo: `${M}miniexcavadora-hitachi`,
+    marca: `${M}hitachi-landcros`,
+    tipo: `${M}miniexcavadora-hitachi-landcros`,
     texto: "Miniexcavadora Hitachi LANDCROS EX450LC-5",
     serie: "EX",
-    enlace: { tipo: `${M}excavadora-hitachi`, modelo: "repuestos-excavadora-hitachi-zx450lc-5" },
+    enlace: {
+      tipo: `${M}excavadora-hitachi-landcros`,
+      modelo: "repuestos-excavadora-hitachi-landcros-zx450lc-5",
+    },
   },
 ];

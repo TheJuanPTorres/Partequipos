@@ -46,6 +46,7 @@ import { ModeloRepuesto } from "./collections/ModeloRepuesto";
 import { PaginaInstitucional } from "./collections/PaginaInstitucional";
 import { PreguntaFrecuente } from "./collections/PreguntaFrecuente";
 import { Redirects } from "./collections/Redirects";
+import { BusquedaSinResultado } from "./collections/BusquedaSinResultado";
 import { Sede } from "./collections/Sede";
 import { Solicitud } from "./collections/Solicitud";
 import { Testimonio } from "./collections/Testimonio";
@@ -59,6 +60,7 @@ import { Documento } from "./collections/Documento";
 import { FichaProducto } from "./globals/FichaProducto";
 import { PaginasIndice } from "./globals/PaginasIndice";
 import { RepuestosMarca } from "./globals/RepuestosMarca";
+import { Buscador } from "./globals/Buscador";
 import { VacantesBuk } from "./globals/VacantesBuk";
 import { CorreoFormularios } from "./globals/CorreoFormularios";
 import { adaptadorCorreo } from "./lib/correo/adaptador";
@@ -225,6 +227,7 @@ export default buildConfig({
         PreguntaFrecuente,
         Testimonio,
         Sede,
+        BusquedaSinResultado,
         // Archivos. Los PDF (ficha técnica de los equipos nuevos) nunca en Media.
         Media,
         Documento,
@@ -247,6 +250,7 @@ export default buildConfig({
     RepuestosMarca,
     PaginasIndice,
     VacantesBuk,
+    Buscador,
     CorreoFormularios,
   ]),
   // El «Documento en visor» también dentro del texto (2026-10-20): un PDF que se

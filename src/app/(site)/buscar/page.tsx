@@ -1,31 +1,50 @@
-import { IconArrowRight, IconSearch } from "@tabler/icons-react";
+import { IconArrowRight, IconBrandWhatsapp, IconSearch } from "@tabler/icons-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { LONGITUD_MAXIMA, LONGITUD_MINIMA, normalizarConsulta } from "@/lib/buscador/consulta";
-import { buscar, type GrupoBusqueda } from "@/lib/queries/getBusqueda";
+import { ETIQUETA_CLASE } from "@/lib/buscador/etiquetas";
+import type { Clase, Estado, Faceta, Filtros } from "@/lib/buscador/motor";
+import { buscarEnCatalogo } from "@/lib/buscador/servidor";
 import { getCabecera } from "@/lib/queries/getCabecera";
+import { getEmpresa } from "@/lib/queries/getSeo";
+import { enlaceWhatsApp } from "@/lib/navegacion";
 
 import estilos from "./buscar.module.css";
 
 /**
- * RESULTADOS DE BÚSQUEDA: `/buscar/?q=…` (petición del cliente, diseño de
- * Andrés, 2026-10-14; CLAUDE.md §10.33 p.9). Formulario GET que funciona sin
- * JavaScript: el de aquí, el de la cabecera y el del pie envían a esta página.
+ * RESULTADOS DE BÚSQUEDA: `/buscar/?q=…` (petición del cliente, diseño de Andrés, 2026-10-14;
+ * CLAUDE.md §10.33 p.9). Desde el 2026-11-18 con el motor completo (`src/lib/buscador/`): sin
+ * mayúsculas ni tildes, modelos escritos de cualquier forma, errores de escritura, sinónimos y
+ * búsquedas compuestas («excavadora volvo usada»).
  *
- * - `noindex, follow` y FUERA del sitemap (`RUTAS_FUERA_DEL_SITEMAP`): una
- *   página por cada texto que alguien escriba no es contenido que indexar.
- * - El `<title>` NO lleva lo que escribió el visitante: un texto ajeno dentro
- *   del título de una página del sitio no aporta nada y no se refleja.
+ * - Chips por tipo de resultado con su número, y filtros por marca, tipo y estado (lateral en
+ *   escritorio, panel desplegable en móvil). Todo son ENLACES: funciona sin JavaScript.
+ * - `noindex, follow` y FUERA del sitemap (`RUTAS_FUERA_DEL_SITEMAP`).
+ * - El `<title>` NO lleva lo que escribió el visitante.
  * - Dinámica por construcción (lee `searchParams`).
  */
-type Props = { searchParams: Promise<{ q?: string | string[] }> };
+type Props = {
+  searchParams: Promise<{
+    q?: string | string[];
+    clase?: string;
+    marca?: string;
+    tipo?: string;
+    estado?: string;
+    p?: string;
+  }>;
+};
 
-/**
- * Con una búsqueda hecha el título cambia («Resultados de la búsqueda»): quien
- * usa lector de pantalla oye el cambio de página (WCAG 2.4.2) sin que el título
- * repita el texto del visitante.
- */
+const POR_PAGINA = 24;
+const POPULARES = [
+  "Excavadora Hitachi",
+  "Retroexcavadora",
+  "Filtros Donaldson",
+  "Tren de rodaje",
+  "Lubricantes",
+];
+const CLASES = Object.keys(ETIQUETA_CLASE) as Clase[];
+
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const { q } = await searchParams;
   const buscando = normalizarConsulta(q).estado !== "vacia";
@@ -36,57 +55,109 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   };
 }
 
-const GRUPOS: { clave: "nuevos" | "usados" | "modelos" | "articulos"; titulo: string }[] = [
-  { clave: "nuevos", titulo: "Maquinaria nueva" },
-  { clave: "usados", titulo: "Maquinaria usada" },
-  { clave: "modelos", titulo: "Repuestos" },
-  { clave: "articulos", titulo: "Noticias" },
-];
+/** La dirección de esta misma búsqueda con otros parámetros (vacío = quitar el filtro). */
+function enlace(base: Record<string, string | undefined>, cambios: Record<string, string | null>) {
+  const p = new URLSearchParams();
+  const todo = { ...base, ...cambios, p: undefined };
+  for (const [k, v] of Object.entries(todo)) if (v) p.set(k, v);
+  return `/buscar/?${p.toString()}`;
+}
 
-function Grupo({ clave, titulo, grupo }: { clave: string; titulo: string; grupo: GrupoBusqueda }) {
-  if (grupo.items.length === 0) return null;
+function Filtro({
+  titulo,
+  campo,
+  valores,
+  actual,
+  base,
+}: {
+  titulo: string;
+  campo: string;
+  valores: Faceta[];
+  actual?: string;
+  base: Record<string, string | undefined>;
+}) {
+  if (valores.length === 0) return null;
   return (
-    <section aria-labelledby={`grupo-${clave}`} className={estilos.grupo}>
-      <h2 id={`grupo-${clave}`} className={estilos.grupoTitulo}>
-        {titulo} <span className={estilos.cuenta}>({grupo.total})</span>
-      </h2>
-      <ul className={estilos.lista}>
-        {grupo.items.map((r) => (
-          <li key={`${r.href}-${r.id}`}>
-            <Link href={r.href} className={estilos.resultado}>
-              <span className={estilos.resultadoTexto}>
-                <span className={estilos.resultadoTitulo}>{r.titulo}</span>
-                {r.detalle ? <span className={estilos.resultadoDetalle}>{r.detalle}</span> : null}
-              </span>
-              <IconArrowRight aria-hidden="true" focusable="false" stroke={1.75} />
-            </Link>
-          </li>
-        ))}
+    <section aria-labelledby={`f-${campo}`} className={estilos.filtro}>
+      <h3 id={`f-${campo}`} className={estilos.filtroTitulo}>
+        {titulo}
+      </h3>
+      <ul className={estilos.filtroLista}>
+        {valores.slice(0, 12).map((v) => {
+          const activo = actual?.toLowerCase() === v.valor.toLowerCase();
+          return (
+            <li key={v.valor}>
+              <Link
+                href={enlace(base, { [campo]: activo ? null : v.valor })}
+                className={estilos.filtroEnlace}
+                aria-current={activo ? "true" : undefined}
+                data-activo={activo ? "" : undefined}
+              >
+                <span>{v.valor}</span>
+                <span className={estilos.cuenta}>{v.total}</span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
-      {grupo.total > grupo.items.length ? (
-        <p className={estilos.mas}>
-          Se muestran {grupo.items.length} de {grupo.total}. Afina la búsqueda para ver el resto.
-        </p>
-      ) : null}
     </section>
   );
 }
 
 export default async function BuscarPage({ searchParams }: Props) {
-  const { q } = await searchParams;
-  const consulta = normalizarConsulta(q);
+  const sp = await searchParams;
+  const consulta = normalizarConsulta(sp.q);
   const texto = consulta.estado === "vacia" ? "" : consulta.texto;
-  const resultados = consulta.estado === "valida" ? await buscar(consulta.texto) : null;
-  const total = resultados ? GRUPOS.reduce((suma, g) => suma + resultados[g.clave].total, 0) : 0;
 
-  // Sin resultados se ofrecen las secciones del menú (global `cabecera` del panel).
-  const { enlaces, boton } =
-    resultados && total === 0 ? await getCabecera() : { enlaces: [], boton: null };
+  const filtros: Filtros = {};
+  if (sp.marca) filtros.marca = sp.marca.slice(0, 60);
+  if (sp.tipo) filtros.tipo = sp.tipo.slice(0, 60);
+  if (sp.estado === "nueva" || sp.estado === "usada") filtros.estado = sp.estado as Estado;
+  if (sp.clase && (CLASES as string[]).includes(sp.clase)) filtros.clase = sp.clase as Clase;
+
+  const r =
+    consulta.estado === "valida" ? await buscarEnCatalogo(consulta.texto, filtros, 600) : null;
+  // Los chips de tipo cuentan con los filtros de marca, tipo y estado, sin el de clase.
+  const sinClase =
+    r && filtros.clase && texto
+      ? await buscarEnCatalogo(texto, { ...filtros, clase: undefined }, 1)
+      : r;
+  const pagina = Math.max(1, Number(sp.p) || 1);
+  const visibles = r ? r.resultados.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA) : [];
+  const paginas = r ? Math.ceil(r.total / POR_PAGINA) : 0;
+
+  const base = {
+    q: texto || undefined,
+    clase: filtros.clase,
+    marca: filtros.marca,
+    tipo: filtros.tipo,
+    estado: filtros.estado,
+  };
+
+  // Sin resultados: WhatsApp con la búsqueda y las secciones del menú.
+  const sinResultados = r !== null && r.total === 0;
+  const empresa = sinResultados ? await getEmpresa() : null;
+  const { enlaces, boton } = sinResultados ? await getCabecera() : { enlaces: [], boton: null };
   const secciones = boton ? [...enlaces, boton] : enlaces;
+  const wa = empresa ? enlaceWhatsApp(empresa.whatsapp) : null;
+  const linkWhatsApp = (() => {
+    if (!wa) return null;
+    try {
+      const u = new URL(wa);
+      u.searchParams.set("text", `Hola, busco: ${texto}`);
+      return u.toString();
+    } catch {
+      return wa;
+    }
+  })();
+
+  const hayFiltros = Boolean(filtros.marca || filtros.tipo || filtros.estado || filtros.clase);
 
   return (
     <main className={estilos.seccion}>
-      <h1 className={`${estilos.titulo} texto-titulo-seccion`}>Buscar</h1>
+      <h1 className={`${estilos.titulo} texto-titulo-seccion`}>
+        {texto && r && r.total > 0 ? `Resultados para «${texto}»` : "Buscar"}
+      </h1>
 
       <form role="search" action="/buscar/" method="get" className={estilos.formulario}>
         <label htmlFor="buscar-q" className="sr-only">
@@ -98,7 +169,7 @@ export default async function BuscarPage({ searchParams }: Props) {
           type="search"
           className={estilos.campo}
           defaultValue={texto}
-          placeholder="Escribe los términos de búsqueda…"
+          placeholder="Prueba con «Excavadora Hitachi», «ZX200» o «filtros Donaldson»"
           autoComplete="off"
           maxLength={LONGITUD_MAXIMA}
         />
@@ -111,38 +182,194 @@ export default async function BuscarPage({ searchParams }: Props) {
       {/* Región viva: el lector de pantalla anuncia el resultado de la búsqueda. */}
       <p role="status" className={estilos.estado}>
         {consulta.estado === "vacia"
-          ? "Escribe lo que buscas: un equipo, un repuesto o un tema."
+          ? "Escribe lo que buscas: un equipo, un repuesto, un modelo o un tema."
           : consulta.estado === "corta"
             ? `Escribe al menos ${LONGITUD_MINIMA} letras para buscar.`
-            : total === 0
+            : r && r.total === 0
               ? `No encontramos resultados para «${consulta.texto}».`
-              : `${total} ${total === 1 ? "resultado" : "resultados"} para «${consulta.texto}».`}
+              : r
+                ? `${r.total} ${r.total === 1 ? "resultado" : "resultados"} para «${consulta.texto}».${
+                    r.completa ? "" : " Se muestran los que más se parecen."
+                  }`
+                : ""}
       </p>
 
-      {resultados && total > 0 ? (
-        <div className={estilos.grupos}>
-          {GRUPOS.map((g) => (
-            <Grupo key={g.clave} clave={g.clave} titulo={g.titulo} grupo={resultados[g.clave]} />
+      {r && r.detectado && (r.detectado.estado || r.detectado.marca) ? (
+        <p className={estilos.detectado}>
+          Entendimos:{" "}
+          {[
+            r.detectado.marca ? `marca «${r.detectado.marca}»` : null,
+            r.detectado.estado ? `estado «${r.detectado.estado}»` : null,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+          .
+        </p>
+      ) : null}
+
+      {sinClase && sinClase.total > 0 ? (
+        <nav aria-label="Tipos de resultado" className={estilos.chips}>
+          <Link
+            href={enlace(base, { clase: null })}
+            className={estilos.chip}
+            data-activo={!filtros.clase ? "" : undefined}
+          >
+            Todo <span className={estilos.cuenta}>{sinClase.total}</span>
+          </Link>
+          {CLASES.filter((c) => sinClase.porClase[c]).map((c) => (
+            <Link
+              key={c}
+              href={enlace(base, { clase: c })}
+              className={estilos.chip}
+              data-activo={filtros.clase === c ? "" : undefined}
+            >
+              {ETIQUETA_CLASE[c]} <span className={estilos.cuenta}>{sinClase.porClase[c]}</span>
+            </Link>
           ))}
+        </nav>
+      ) : null}
+
+      {r && (r.total > 0 || hayFiltros) ? (
+        <div className={estilos.cuerpo}>
+          {sinClase &&
+          (sinClase.marcas.length + sinClase.tipos.length + sinClase.estados.length > 0 ||
+            hayFiltros) ? (
+            <details className={estilos.filtros}>
+              <summary className={estilos.filtrosResumen}>
+                Filtros{hayFiltros ? " (activos)" : ""}
+              </summary>
+              <div className={estilos.filtrosCuerpo}>
+                <Filtro
+                  titulo="Estado"
+                  campo="estado"
+                  valores={sinClase.estados}
+                  actual={filtros.estado}
+                  base={base}
+                />
+                <Filtro
+                  titulo="Marca"
+                  campo="marca"
+                  valores={sinClase.marcas}
+                  actual={filtros.marca}
+                  base={base}
+                />
+                <Filtro
+                  titulo="Tipo"
+                  campo="tipo"
+                  valores={sinClase.tipos}
+                  actual={filtros.tipo}
+                  base={base}
+                />
+                {hayFiltros ? (
+                  <Link href={enlace({ q: texto || undefined }, {})} className={estilos.quitar}>
+                    Quitar filtros
+                  </Link>
+                ) : null}
+              </div>
+            </details>
+          ) : null}
+
+          <div className={estilos.resultados}>
+            {r.total === 0 ? <p>No hay resultados con esos filtros.</p> : null}
+            <ul className={estilos.rejilla}>
+              {visibles.map((x) => (
+                <li key={x.doc.id} className={estilos.tarjeta}>
+                  <Link href={x.doc.href} className={estilos.tarjetaEnlace}>
+                    <span className={estilos.tarjetaFoto} aria-hidden="true">
+                      {x.doc.imagen ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- miniatura con medidas
+                        <img
+                          src={x.doc.imagen.url}
+                          alt=""
+                          width={x.doc.imagen.width}
+                          height={x.doc.imagen.height}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <IconSearch size={28} stroke={1.25} />
+                      )}
+                    </span>
+                    <span className={estilos.tarjetaTexto}>
+                      <span className={estilos.etiqueta}>{ETIQUETA_CLASE[x.doc.clase]}</span>
+                      <span className={estilos.tarjetaTitulo}>{x.doc.titulo}</span>
+                      {x.doc.detalle ? (
+                        <span className={estilos.resultadoDetalle}>{x.doc.detalle}</span>
+                      ) : null}
+                    </span>
+                    <span className={estilos.tarjetaBoton}>
+                      Ver más
+                      <IconArrowRight aria-hidden="true" size={16} stroke={2.2} />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {paginas > 1 ? (
+              <nav aria-label="Páginas de resultados" className={estilos.paginas}>
+                {pagina > 1 ? (
+                  <Link href={`${enlace(base, {})}&p=${pagina - 1}`} rel="prev">
+                    ← Anterior
+                  </Link>
+                ) : null}
+                <span>
+                  Página {pagina} de {paginas}
+                </span>
+                {pagina < paginas ? (
+                  <Link href={`${enlace(base, {})}&p=${pagina + 1}`} rel="next">
+                    Siguiente →
+                  </Link>
+                ) : null}
+              </nav>
+            ) : null}
+          </div>
         </div>
       ) : null}
 
-      {resultados && total === 0 && secciones.length > 0 ? (
-        <nav aria-label="Secciones principales" className={estilos.secciones}>
-          <p className={estilos.seccionesTitulo}>
-            Prueba con otra palabra o entra por una sección:
-          </p>
-          <ul className={estilos.lista}>
-            {secciones.map((s) => (
-              <li key={s.href}>
-                <Link href={s.href} className={estilos.resultado}>
-                  <span className={estilos.resultadoTitulo}>{s.etiqueta}</span>
-                  <IconArrowRight aria-hidden="true" focusable="false" stroke={1.75} />
+      {sinResultados && !hayFiltros ? (
+        <div className={estilos.vacio}>
+          {r?.sugerencia ? (
+            <p className={estilos.sugerencia}>
+              ¿Quisiste decir{" "}
+              <Link href={`/buscar/?q=${encodeURIComponent(r.sugerencia)}`}>{r.sugerencia}</Link>?
+            </p>
+          ) : null}
+          <p className={estilos.seccionesTitulo}>Búsquedas populares</p>
+          <ul className={estilos.chips}>
+            {POPULARES.map((p) => (
+              <li key={p}>
+                <Link href={`/buscar/?q=${encodeURIComponent(p)}`} className={estilos.chip}>
+                  {p}
                 </Link>
               </li>
             ))}
           </ul>
-        </nav>
+          {linkWhatsApp ? (
+            <a
+              href={linkWhatsApp}
+              className={estilos.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconBrandWhatsapp aria-hidden="true" size={20} stroke={1.75} />
+              Pregúntanos por WhatsApp
+            </a>
+          ) : null}
+          {secciones.length > 0 ? (
+            <nav aria-label="Secciones principales" className={estilos.secciones}>
+              <p className={estilos.seccionesTitulo}>O entra por una sección:</p>
+              <ul className={estilos.chips}>
+                {secciones.map((s) => (
+                  <li key={s.href}>
+                    <Link href={s.href} className={estilos.chip}>
+                      {s.etiqueta}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
+        </div>
       ) : null}
     </main>
   );

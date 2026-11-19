@@ -823,6 +823,25 @@ try {
       await pagina.screenshot({ path: fichero, fullPage: true });
       const texto = await pagina.locator("body").innerText();
       const ingles = [...new Set(texto.split(/\n+/).filter((l) => INGLES.test(l)))].slice(0, 15);
+      /*
+       * FICHAS CON PESTAÑAS (organización del panel, 2026-11-18): el bloque SEO vive en «Buscadores
+       * y redes» y Payload no lo pinta hasta abrirla. Si la pestaña existe, se abre, se recorre y
+       * se captura aparte (`<pantalla>-<ancho>-buscadores.png`) ANTES de buscar los campos.
+       */
+      let pestanaBuscadores = false;
+      if (formulario) {
+        const pestana = pagina.getByRole("button", { name: "Buscadores y redes", exact: true });
+        if (await pestana.count()) {
+          await pestana.first().click();
+          await pagina.waitForTimeout(1000);
+          await pintarTodo();
+          await pagina.screenshot({
+            path: path.join(salida, `${nombre}-${ancho.nombre}-buscadores.png`),
+            fullPage: true,
+          });
+          pestanaBuscadores = true;
+        }
+      }
       // En un formulario, que la sección SEO llegó a pintarse con sus campos.
       const seo = formulario
         ? await pagina.evaluate(() => ({
@@ -831,10 +850,13 @@ try {
             vistaGoogle: document.querySelector(".pq-seo__google-titulo")?.textContent ?? null,
           }))
         : undefined;
-      if (seo) seo.sinRecorrer = seoSinRecorrer;
+      if (seo) {
+        seo.sinRecorrer = seoSinRecorrer;
+        seo.enPestana = pestanaBuscadores;
+      }
       hallazgos.push({ pantalla: nombre, ancho: ancho.nombre, ingles, ...(seo ? { seo } : {}) });
       const marcaSeo = seo
-        ? ` · SEO ${seo.titulo && seo.descripcion ? "con campos" : "SIN CAMPOS"}`
+        ? ` · SEO ${seo.titulo && seo.descripcion ? "con campos" : "SIN CAMPOS"}${pestanaBuscadores ? " (pestaña «Buscadores y redes»)" : ""}`
         : "";
       decir(`✓ ${nombre} (${ancho.nombre}) → ${path.basename(fichero)}${marcaSeo}`);
     };

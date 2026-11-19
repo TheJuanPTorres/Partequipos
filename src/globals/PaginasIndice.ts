@@ -378,7 +378,8 @@ export const PaginasIndice: GlobalConfig = {
           "Foto de fondo del encabezado del índice",
           "Opcional. Foto a todo el ancho detrás de «Partequipos · Nuestro Blog» en /noticias/ y en las categorías del blog; sin ella, el encabezado oscuro de siempre.",
         ),
-        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        // Interruptor retirado el 2026-11-18: el artículo es siempre el diseño publicado
+        // (`ArticuloPropio`); el valor guardado ya no hace nada (limpieza, paso 1).
         ocultoSinUso({
           name: "disenoArticulo",
           type: "select",

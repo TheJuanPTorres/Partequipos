@@ -4,7 +4,6 @@ import { describe, it } from "node:test";
 import type { Block, Field } from "payload";
 
 import { BLOQUES_PAGINA, bloquesElegibles } from "../../collections/bloques/bloquesPagina";
-import { Articulo } from "../../collections/Articulo";
 import { CategoriaTecnica } from "../../collections/CategoriaTecnica";
 import { EquipoNuevo } from "../../collections/EquipoNuevo";
 import { EquipoUsado } from "../../collections/EquipoUsado";
@@ -34,7 +33,6 @@ const OCULTOS: Record<string, { fields: Field[] }> = {
   "modelos-repuesto": ModeloRepuesto,
   "categorias-tecnicas": CategoriaTecnica,
   "marcas-lubricante": MarcaLubricante,
-  articulos: Articulo,
 };
 
 const RUTAS_OCULTAS: [keyof typeof OCULTOS, string][] = [
@@ -68,8 +66,8 @@ const RUTAS_OCULTAS: [keyof typeof OCULTOS, string][] = [
   ["paginas-indice", "trabaja.textoHojaDeVida"],
   ["paginas-indice", "trabaja.botonHojaDeVida"],
   ["paginas-indice", "trabaja.imagenHojaDeVida"],
-  // Diseños propios retirados el 2026-11-18 (modelo de repuestos, Eni y artículo): sus
-  // interruptores y lo que solo pintaban ellos.
+  // Diseños retirados el 2026-11-18: los propios del modelo de repuestos y de ENI, y el
+  // interruptor del artículo (se quedó el diseño publicado, `ArticuloPropio`).
   ["repuestos-marca", "disenoModelo"],
   ["repuestos-marca", "modeloAyudaTitulo"],
   ["repuestos-marca", "modeloAyudaTexto"],
@@ -86,7 +84,6 @@ const RUTAS_OCULTAS: [keyof typeof OCULTOS, string][] = [
   ["marcas-lubricante", "videoCabecera"],
   ["marcas-lubricante", "colorOscuro"],
   ["paginas-indice", "blog.disenoArticulo"],
-  ["articulos", "categoriaRelacionada"],
 ];
 
 /** Los subcampos de un campo: grupos, filas, colapsables, filas de array y pestañas. */

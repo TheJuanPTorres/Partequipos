@@ -1,5 +1,4 @@
 import type { CollectionConfig } from "payload";
-import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
@@ -54,8 +53,7 @@ export const Articulo: CollectionConfig = {
       label: "Categoría",
       admin: { description: "En qué listado del blog aparece el artículo." },
     },
-    // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
-    ocultoSinUso({
+    {
       name: "categoriaRelacionada",
       type: "relationship",
       relationTo: ["categorias-tecnicas", "categorias-usada", "categorias-maquinaria"],
@@ -64,7 +62,7 @@ export const Articulo: CollectionConfig = {
         description:
           "Opcional. Una categoría de repuestos, de maquinaria usada o de maquinaria nueva: el final del artículo enlaza a ella. Vacío: se intenta deducir del título.",
       },
-    }),
+    },
     {
       name: "fechaPublicacion",
       type: "date",

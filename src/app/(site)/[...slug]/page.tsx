@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Fragment } from "react";
 
-import { ArticuloCuerpo } from "@/components/blog/ArticuloCuerpo";
+import { ArticuloPropio } from "@/components/blog/ArticuloPropio";
 import { PaginaConBloques } from "@/components/bloques/PaginaConBloques";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { ContactoPagina } from "@/components/indices/ContactoPagina";
@@ -140,9 +140,10 @@ export default async function PaginaRaizPage({ params }: { params: Promise<Param
   if (!resuelto) notFound();
 
   if (resuelto.tipo === "articulo") {
-    // El artículo de Andrés. El diseño propio (#2026-10-21) se retiró el 2026-11-18 (dirección,
-    // limpieza del panel); queda en git.
-    return <ArticuloCuerpo articulo={resuelto.articulo} />;
+    // El diseño del artículo que se publica (`ArticuloPropio`, 2026-10-21). El de antes
+    // (`ArticuloCuerpo`) y el interruptor que elegía entre los dos se retiraron el 2026-11-18
+    // (dirección, limpieza del panel); quedan en git.
+    return <ArticuloPropio articulo={resuelto.articulo} />;
   }
 
   const { pagina } = resuelto;

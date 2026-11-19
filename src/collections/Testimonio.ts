@@ -18,6 +18,7 @@ import { borradoAdmin, escrituraContenido, lecturaFiltrada } from "../lib/seguri
 import { validarYouTube, videoDeYouTube } from "../lib/fields/youtube";
 import { revalidarPortada } from "./hooks/portadaHooks";
 import { avisoField } from "../lib/fields/avisoField";
+import { conPestanas } from "../lib/fields/pestanasFicha";
 
 const portada = revalidarPortada("testimonios");
 
@@ -114,133 +115,136 @@ export const Testimonio: CollectionConfig = {
     afterDelete: [portada.afterDelete],
   },
   defaultSort: "orden",
-  fields: [
-    { name: "nombre", type: "text", required: true, label: "Nombre de la persona" },
-    { name: "empresa", type: "text", label: "Empresa" },
-    { name: "ciudad", type: "text", label: "Ciudad o departamento" },
-    {
-      name: "cita",
-      type: "textarea",
-      label: "Testimonio",
-      validate: (
-        valor: unknown,
-        { siblingData }: { siblingData: { videoDelCliente?: boolean; youtube?: string } },
-      ) =>
-        validarCita(
-          valor,
-          exentoDeAutorizacion(
-            siblingData?.videoDelCliente,
-            !!videoDeYouTube(siblingData?.youtube),
+  fields: conPestanas(
+    [
+      { name: "nombre", type: "text", required: true, label: "Nombre de la persona" },
+      { name: "empresa", type: "text", label: "Empresa" },
+      { name: "ciudad", type: "text", label: "Ciudad o departamento" },
+      {
+        name: "cita",
+        type: "textarea",
+        label: "Testimonio",
+        validate: (
+          valor: unknown,
+          { siblingData }: { siblingData: { videoDelCliente?: boolean; youtube?: string } },
+        ) =>
+          validarCita(
+            valor,
+            exentoDeAutorizacion(
+              siblingData?.videoDelCliente,
+              !!videoDeYouTube(siblingData?.youtube),
+            ),
           ),
-        ),
-      admin: {
-        description:
-          "La frase de la persona. Es opcional solo en un vídeo que el cliente ya publicó en su canal (casilla de abajo).",
-      },
-    },
-    { name: "foto", type: "upload", relationTo: "media", label: "Foto" },
-    {
-      name: "video",
-      type: "relationship",
-      relationTo: "videos",
-      label: "Vídeo del testimonio",
-      admin: {
-        description: "Opcional. Un MP4 propio; para YouTube, el campo de abajo.",
-      },
-    },
-    /*
-     * Fase H: en ux-9 los cuatro testimonios abren un vídeo de YouTube con su
-     * segundo de inicio (la nota de la fase B decía que ninguno tenía vídeo:
-     * era falsa). Se abre desde youtube-nocookie.com y solo al pulsar.
-     */
-    {
-      name: "youtube",
-      type: "text",
-      label: "Vídeo de YouTube del testimonio",
-      validate: validarYouTube,
-      admin: {
-        description: "Opcional. Enlace de YouTube; si lleva «&t=21s», empieza en ese segundo.",
-      },
-    },
-    {
-      name: "videoDelCliente",
-      type: "checkbox",
-      label: "Vídeo ya publicado por el cliente en su canal de YouTube",
-      defaultValue: false,
-      validate: (valor: unknown, { siblingData }: { siblingData: { youtube?: string } }) =>
-        validarVideoDelCliente(valor, !!videoDeYouTube(siblingData?.youtube)),
-      admin: {
-        description:
-          "Márcala solo si el vídeo del enlace de YouTube ya está publicado en el canal de Partequipos. Entonces la frase y la autorización de uso son opcionales. Si más adelante llegan, añádelas aquí.",
-      },
-    },
-    {
-      type: "collapsible",
-      label: "Autorización de uso",
-      admin: { initCollapsed: false },
-      fields: [
-        {
-          name: "autorizacionUso",
-          type: "checkbox",
-          label:
-            "Tengo la autorización firmada de esta persona para publicar su nombre, foto y testimonio",
-          defaultValue: false,
-          admin: { components: { Cell: "/components/admin/celdas/CeldaAutorizacion" } },
+        admin: {
+          description:
+            "La frase de la persona. Es opcional solo en un vídeo que el cliente ya publicó en su canal (casilla de abajo).",
         },
-        {
-          name: "fechaAutorizacion",
-          type: "date",
-          label: "Fecha de la autorización",
-          admin: { condition: (_, s) => s?.autorizacionUso === true },
-          validate: (
-            valor: unknown,
-            { siblingData }: { siblingData: { autorizacionUso?: boolean } },
-          ) =>
-            siblingData?.autorizacionUso === true && !valor
-              ? "Indica la fecha de la autorización."
-              : true,
+      },
+      { name: "foto", type: "upload", relationTo: "media", label: "Foto" },
+      {
+        name: "video",
+        type: "relationship",
+        relationTo: "videos",
+        label: "Vídeo del testimonio",
+        admin: {
+          description: "Opcional. Un MP4 propio; para YouTube, el campo de abajo.",
         },
-        {
-          name: "referenciaAutorizacion",
-          type: "text",
-          label: "Dónde está el documento",
-          admin: {
-            condition: (_, s) => s?.autorizacionUso === true,
-            description: "Para poder encontrarlo si la persona pide retirar su testimonio.",
+      },
+      /*
+       * Fase H: en ux-9 los cuatro testimonios abren un vídeo de YouTube con su
+       * segundo de inicio (la nota de la fase B decía que ninguno tenía vídeo:
+       * era falsa). Se abre desde youtube-nocookie.com y solo al pulsar.
+       */
+      {
+        name: "youtube",
+        type: "text",
+        label: "Vídeo de YouTube del testimonio",
+        validate: validarYouTube,
+        admin: {
+          description: "Opcional. Enlace de YouTube; si lleva «&t=21s», empieza en ese segundo.",
+        },
+      },
+      {
+        name: "videoDelCliente",
+        type: "checkbox",
+        label: "Vídeo ya publicado por el cliente en su canal de YouTube",
+        defaultValue: false,
+        validate: (valor: unknown, { siblingData }: { siblingData: { youtube?: string } }) =>
+          validarVideoDelCliente(valor, !!videoDeYouTube(siblingData?.youtube)),
+        admin: {
+          description:
+            "Márcala solo si el vídeo del enlace de YouTube ya está publicado en el canal de Partequipos. Entonces la frase y la autorización de uso son opcionales. Si más adelante llegan, añádelas aquí.",
+        },
+      },
+      {
+        type: "collapsible",
+        label: "Autorización de uso",
+        admin: { initCollapsed: false },
+        fields: [
+          {
+            name: "autorizacionUso",
+            type: "checkbox",
+            label:
+              "Tengo la autorización firmada de esta persona para publicar su nombre, foto y testimonio",
+            defaultValue: false,
+            admin: { components: { Cell: "/components/admin/celdas/CeldaAutorizacion" } },
           },
-        },
-      ],
-    },
-    // Junto a «Publicado»: sin la autorización no se puede publicar (F4).
-    avisoField("avisoAutorizacion", "AvisoAutorizacion", { sidebar: true }),
-    {
-      name: "publicado",
-      type: "checkbox",
-      label: "Publicado",
-      defaultValue: false,
-      validate: (
-        valor: unknown,
-        {
-          siblingData,
-        }: {
-          siblingData: { autorizacionUso?: boolean; videoDelCliente?: boolean; youtube?: string };
-        },
-      ) =>
-        validarPublicacionTestimonio(
-          valor,
-          siblingData?.autorizacionUso,
-          exentoDeAutorizacion(
-            siblingData?.videoDelCliente,
-            !!videoDeYouTube(siblingData?.youtube),
-          ),
-        ),
-      admin: {
-        components: { Cell: "/components/admin/celdas/CeldaPublicado" },
-        position: "sidebar",
-        description:
-          "Solo se puede marcar con la autorización de uso marcada, o con la casilla del vídeo ya publicado por el cliente.",
+          {
+            name: "fechaAutorizacion",
+            type: "date",
+            label: "Fecha de la autorización",
+            admin: { condition: (_, s) => s?.autorizacionUso === true },
+            validate: (
+              valor: unknown,
+              { siblingData }: { siblingData: { autorizacionUso?: boolean } },
+            ) =>
+              siblingData?.autorizacionUso === true && !valor
+                ? "Indica la fecha de la autorización."
+                : true,
+          },
+          {
+            name: "referenciaAutorizacion",
+            type: "text",
+            label: "Dónde está el documento",
+            admin: {
+              condition: (_, s) => s?.autorizacionUso === true,
+              description: "Para poder encontrarlo si la persona pide retirar su testimonio.",
+            },
+          },
+        ],
       },
-    },
-    { name: "orden", type: "number", label: "Orden", admin: { position: "sidebar" } },
-  ],
+      // Junto a «Publicado»: sin la autorización no se puede publicar (F4).
+      avisoField("avisoAutorizacion", "AvisoAutorizacion", { sidebar: true }),
+      {
+        name: "publicado",
+        type: "checkbox",
+        label: "Publicado",
+        defaultValue: false,
+        validate: (
+          valor: unknown,
+          {
+            siblingData,
+          }: {
+            siblingData: { autorizacionUso?: boolean; videoDelCliente?: boolean; youtube?: string };
+          },
+        ) =>
+          validarPublicacionTestimonio(
+            valor,
+            siblingData?.autorizacionUso,
+            exentoDeAutorizacion(
+              siblingData?.videoDelCliente,
+              !!videoDeYouTube(siblingData?.youtube),
+            ),
+          ),
+        admin: {
+          components: { Cell: "/components/admin/celdas/CeldaPublicado" },
+          position: "sidebar",
+          description:
+            "Solo se puede marcar con la autorización de uso marcada, o con la casilla del vídeo ya publicado por el cliente.",
+        },
+      },
+      { name: "orden", type: "number", label: "Orden", admin: { position: "sidebar" } },
+    ],
+    { fotos: { foto: "tarjeta" } },
+  ),
 };

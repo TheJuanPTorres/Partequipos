@@ -156,7 +156,7 @@ export async function Footer() {
                 aria-hidden="true"
                 width={decorativa.width}
                 height={decorativa.height}
-                sizes="518px"
+                sizes="max(518px, 32.375vw)"
                 loading="lazy"
                 className={estilos.decorativa}
               />
@@ -192,7 +192,7 @@ export async function Footer() {
             height={logo.sitio.height}
             // Sin `sizes`, Next pedía el logo a 256 px (el `width` de 187 a 1x) y se pintaba
             // a 285: ampliado ×1,11. Con el ancho pintado pide 384 o más (el fichero mide 731).
-            sizes="(max-width: 767px) 75vw, 285px"
+            sizes="(max-width: 767px) 75vw, max(285px, 17.812vw)"
             className={estilos.logo}
           />
           <div>

@@ -52,6 +52,7 @@ import {
 import { AVISO_OTRA_PESTANA } from "@/lib/nueva/enlaceExterno";
 
 import estilos from "./megamenu.module.css";
+import { escalaPx } from "@/lib/estilos/escala";
 
 /**
  * PANEL DEL MEGAMENÚ (ux-9, export 2162 del 2026-10-05; decisiones-home-ux9.md
@@ -200,7 +201,7 @@ function Tarjetas({ tarjetas, alElegir }: { tarjetas: TarjetaMenu[]; alElegir: (
                   width={t.imagen.width}
                   height={t.imagen.height}
                   alt=""
-                  sizes="(max-width: 767px) 45vw, (max-width: 1024px) 19vw, 130px"
+                  sizes="(max-width: 767px) 45vw, (max-width: 1024px) 19vw, max(130px, 8.125vw)"
                   loading="lazy"
                 />
               ) : null}
@@ -236,7 +237,7 @@ function Tarjetas({ tarjetas, alElegir }: { tarjetas: TarjetaMenu[]; alElegir: (
                         width={a.icono.width}
                         height={a.icono.height}
                         alt=""
-                        sizes="24px"
+                        sizes="max(24px, 1.5vw)"
                         loading="lazy"
                         className={estilos.accesoIcono}
                       />
@@ -259,7 +260,7 @@ function LogoDeFila({ logo }: { logo: NonNullable<GrupoMenu["logo"]> }) {
     <LogoMarca
       logo={{ ...logo, oscuro: logo.oscuro === true }}
       alt=""
-      sizes="96px"
+      sizes="max(96px, 6vw)"
       loading="lazy"
       className={estilos.logo}
     />
@@ -509,9 +510,13 @@ export function SubmenuMovil({
   );
 }
 
-/** El radio de las esquinas de abajo del marco (`--mega-radio`). */
+/**
+ * El radio de las esquinas de abajo del marco (`--mega-radio`, 30 px del diseño). La variable llega
+ * como `calc(30 * var(--escala-px, 1px))` (escala de las pantallas grandes, CLAUDE.md §5), que
+ * `parseFloat` no lee: entonces, los 30 del diseño escalados.
+ */
 const radioDe = (m: HTMLElement) =>
-  parseFloat(getComputedStyle(m).getPropertyValue("--mega-radio")) || 30;
+  parseFloat(getComputedStyle(m).getPropertyValue("--mega-radio")) || escalaPx(30);
 
 /** Cómo está cada panel dentro del marco. */
 export type EstadoPanel = "activo" | "saliendo" | "oculto";

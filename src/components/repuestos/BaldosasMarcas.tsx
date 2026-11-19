@@ -79,7 +79,7 @@ export function BaldosasMarcas({
               <LogoMarca
                 logo={m.logo}
                 alt={m.externo ? "" : m.nombre}
-                sizes="(max-width: 1024px) 40vw, 240px"
+                sizes="(max-width: 1024px) 40vw, max(240px, 15vw)"
                 className={estilos.baldosaLogo}
               />
             ) : (

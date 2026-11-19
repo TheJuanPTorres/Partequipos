@@ -70,7 +70,7 @@ export function FichaModelo({
               logo={logo}
               caja={CAJA_LOGO_FICHA}
               alt={logo.alt}
-              sizes="170px"
+              sizes="max(170px, 10.625vw)"
               alinear="izquierda"
               className={estilos.logo}
               priority

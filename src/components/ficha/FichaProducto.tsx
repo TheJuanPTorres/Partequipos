@@ -216,7 +216,12 @@ export function FichaProducto({
       <section className={usado.seccion} aria-label="Descripción y acciones">
         <div className={`${usado.texto} texto-cuerpo`}>
           {logo ? (
-            <LogoMarca logo={logo} alt={logo.alt} sizes="95px" className={estilos.logoMarca} />
+            <LogoMarca
+              logo={logo}
+              alt={logo.alt}
+              sizes="max(95px, 5.938vw)"
+              className={estilos.logoMarca}
+            />
           ) : null}
           {cuerpo}
           {especificaciones.length > 0 ? (

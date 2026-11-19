@@ -1,4 +1,5 @@
 import type { CollectionConfig, Field } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import {
   alineacionTextoField,
@@ -13,7 +14,7 @@ import { seoField } from "../lib/fields/seoField";
 import { SLUG_POLITICA_GARANTIA } from "../lib/politica/animaciones";
 import { tipografiaTituloField } from "../lib/fields/tipografiaTitulo";
 import { BLOQUE_BANDA_LOGO, BLOQUE_BANDA_MARCA } from "./bloques/bandaLogos";
-import { BLOQUES_PAGINA } from "./bloques/bloquesPagina";
+import { BLOQUES_PAGINA, bloquesElegibles } from "./bloques/bloquesPagina";
 import { validarYouTube } from "../lib/fields/youtube";
 import { enlace, parrafo, texto } from "../lib/fields/textosPortada";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
@@ -60,7 +61,7 @@ export const PaginaInstitucional: CollectionConfig = {
   },
   admin: {
     useAsTitle: "titulo",
-    defaultColumns: ["titulo", "slug", "tipoPagina"],
+    defaultColumns: ["titulo", "slug"],
     group: "Páginas y blog",
     description:
       "Páginas fijas del sitio (Nosotros, Contacto, textos legales…) y la portada. No cambies la ruta de una página publicada: Google ya conoce esa dirección.",
@@ -102,7 +103,8 @@ export const PaginaInstitucional: CollectionConfig = {
       // permiso. El 301 desde la ruta anterior ya lo crea `revalidarPagina`.
       access: { update: slugEditable },
     },
-    {
+    // Sin uso en la web: solo era una columna del panel (limpieza, paso 1).
+    ocultoSinUso({
       name: "tipoPagina",
       type: "select",
       defaultValue: "institucional",
@@ -117,7 +119,7 @@ export const PaginaInstitucional: CollectionConfig = {
         description:
           "«Legal / cumplimiento» para tratamiento de datos, términos y similares: tienen que estar siempre en el sitio, así que no se borran.",
       },
-    },
+    }),
     {
       name: "entradilla",
       type: "textarea",
@@ -222,6 +224,8 @@ export const PaginaInstitucional: CollectionConfig = {
       label: "Bloques de la página",
       labels: { singular: "Bloque", plural: "Bloques" },
       blocks: BLOQUES_PAGINA,
+      filterOptions: ({ siblingData }) =>
+        bloquesElegibles((siblingData as { bloques?: unknown } | undefined)?.bloques),
       admin: {
         condition: (data) => data?.slug !== "inicio",
         description:
@@ -610,17 +614,21 @@ export const PaginaInstitucional: CollectionConfig = {
           "Aditamentos",
           "Tarjeta de tipo de la sección; lleva a la categoría «Aditamentos» de usados. Vacío: «Aditamentos».",
         ),
-        texto(
-          "verProductoTexto",
-          "Texto del botón de cada equipo (ya no se usa)",
-          "Ver más",
-          "Sin efecto desde el 2026-10-20: cada equipo lleva «Ver producto» y «Cotizar».",
+        ocultoSinUso(
+          texto(
+            "verProductoTexto",
+            "Texto del botón de cada equipo (ya no se usa)",
+            "Ver más",
+            "Sin efecto desde el 2026-10-20: cada equipo lleva «Ver producto» y «Cotizar».",
+          ),
         ),
-        texto(
-          "marcasTitulo",
-          "Subtítulo de la cabecera (ya no se usa)",
-          "Marcas que Respaldan Nuestro Trabajo",
-          "Sin efecto desde el 2026-10-26 (diseño del cliente): la cabecera lleva el «Texto de la cabecera».",
+        ocultoSinUso(
+          texto(
+            "marcasTitulo",
+            "Subtítulo de la cabecera (ya no se usa)",
+            "Marcas que Respaldan Nuestro Trabajo",
+            "Sin efecto desde el 2026-10-26 (diseño del cliente): la cabecera lleva el «Texto de la cabecera».",
+          ),
         ),
         {
           name: "marcasTexto",
@@ -743,41 +751,51 @@ export const PaginaInstitucional: CollectionConfig = {
         },
         alineacionTextoField("descripcionAlineacion", "Alineación del texto bajo el título"),
         anchoTextoField("descripcionAncho", "Ancho del texto bajo el título", "ancho"),
-        {
+        ocultoSinUso({
           ...tamanoMaquinaField(),
           label: "Tamaño de la máquina (%) (ya no se usa)",
           admin: {
             description:
               "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.",
           },
-        } as Field,
-        texto(
-          "whatsappTexto",
-          "Texto del botón de WhatsApp (ya no se usa)",
-          "Encuentra la referencia que tu máquina necesita",
-          "Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp (decisión de Juan Pablo). El texto va en «Texto bajo el título».",
+        } as Field),
+        ocultoSinUso(
+          texto(
+            "whatsappTexto",
+            "Texto del botón de WhatsApp (ya no se usa)",
+            "Encuentra la referencia que tu máquina necesita",
+            "Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp (decisión de Juan Pablo). El texto va en «Texto bajo el título».",
+          ),
         ),
-        texto(
-          "whatsappMensaje",
-          "Mensaje ya escrito en WhatsApp (ya no se usa)",
-          "Hola, busco la referencia de un repuesto para mi máquina.",
-          "Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp.",
+        ocultoSinUso(
+          texto(
+            "whatsappMensaje",
+            "Mensaje ya escrito en WhatsApp (ya no se usa)",
+            "Hola, busco la referencia de un repuesto para mi máquina.",
+            "Sin efecto desde el 2026-11-03: la sección no lleva botón de WhatsApp.",
+          ),
         ),
-        texto(
-          "verMasTexto",
-          "Texto del botón de cada tarjeta (ya no se usa)",
-          "Ver más",
-          "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): el botón de cada tarjeta es una flecha redonda, sin texto.",
+        ocultoSinUso(
+          texto(
+            "verMasTexto",
+            "Texto del botón de cada tarjeta (ya no se usa)",
+            "Ver más",
+            "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): el botón de cada tarjeta es una flecha redonda, sin texto.",
+          ),
         ),
+        // NO está sin uso: es la máquina de reserva del tercer botón de la barra de secciones cuando
+        // ese botón no tiene imagen propia (`app/(site)/page.tsx`, `botonesNav`). No se oculta.
         imagenKit(
           "maquina",
-          "Máquina (ya no se usa)",
-          "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina; la de la portada va en la banda «Marcas de repuestos».",
+          "Máquina de reserva de la barra de secciones",
+          "Ya no se pinta en esta sección (diseño v3 del cliente). Solo la usa el botón «Repuestos» de la barra de secciones de la portada cuando ese botón no tiene imagen propia.",
         ),
-        imagenKit(
-          "maquinaReflejo",
-          "Reflejo de la máquina (ya no se usa)",
-          "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.",
+        ocultoSinUso(
+          imagenKit(
+            "maquinaReflejo",
+            "Reflejo de la máquina (ya no se usa)",
+            "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.",
+          ),
         ),
       ],
     },

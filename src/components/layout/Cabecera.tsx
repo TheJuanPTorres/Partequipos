@@ -163,6 +163,9 @@ function Logo({
         alt={nombreSitio}
         width={logo.width}
         height={logo.height}
+        // Se pinta a unos 187 px hasta 1600 y en proporción después (escala, CLAUDE.md §5): sin
+        // `sizes`, Next lo pedía a 256 px y a 3840 se pintaba a 449.
+        sizes="max(190px, 11.875vw)"
         className={estilos.logo}
         preload
       />

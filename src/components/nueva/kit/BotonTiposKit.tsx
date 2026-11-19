@@ -124,7 +124,11 @@ export function BotonTiposKit({
       >
         <span className={estilos.botonTiposLogo}>
           {logo ? (
-            <LogoMarca logo={{ ...logo, oscuro: logo.oscuro ?? false }} alt="" sizes="64px" />
+            <LogoMarca
+              logo={{ ...logo, oscuro: logo.oscuro ?? false }}
+              alt=""
+              sizes="max(64px, 4vw)"
+            />
           ) : (
             <span>{nombre}</span>
           )}

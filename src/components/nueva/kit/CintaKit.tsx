@@ -110,7 +110,7 @@ export function CintaKit({
                         src={t.render.imagen.url}
                         alt=""
                         fill
-                        sizes="280px"
+                        sizes="max(280px, 17.5vw)"
                         className={`${estilos.renderImg} ${t.render.recortado ? "" : estilos.renderFoto}`}
                         style={
                           t.render.recortado

@@ -111,7 +111,7 @@ export function DialogoYouTube({ video, etiqueta, titulo, miniatura, className, 
                   src={miniatura.url}
                   alt=""
                   fill
-                  sizes="(max-width: 1132px) 100vw, 1100px"
+                  sizes="(max-width: 1132px) 100vw, max(1100px, 68.75vw)"
                   className={estilos.miniatura}
                   style={{ objectPosition: miniatura.posicion }}
                 />

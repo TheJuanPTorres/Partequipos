@@ -10,6 +10,7 @@ import {
   type Animacion,
 } from "@/lib/listado/animaciones";
 import { esEnvioDelCatalogo } from "@/lib/listado/envioCatalogo";
+import { escalaPx } from "@/lib/estilos/escala";
 
 /** Los enlaces que solo cambian el catálogo van dentro de un elemento con este atributo. */
 const ATRIBUTO_NAVEGACION = "data-catalogo-nav";
@@ -56,9 +57,10 @@ function subirAlListado(zona: HTMLElement | null) {
   const listado = zona?.querySelector("[data-inicio-listado]") ?? zona;
   if (!listado) return;
   const arriba = listado.getBoundingClientRect().top;
-  if (arriba >= MARGEN_CABECERA) return;
+  const margen = escalaPx(MARGEN_CABECERA);
+  if (arriba >= margen) return;
   scrollTo({
-    top: scrollY + arriba - MARGEN_CABECERA,
+    top: scrollY + arriba - margen,
     behavior: reducirMovimiento() ? "auto" : "smooth",
   });
 }

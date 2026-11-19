@@ -64,7 +64,7 @@ export function CabeceraKit({
               <LogoMarca
                 logo={{ ...logo, oscuro: logo.oscuro ?? false }}
                 alt={logo.alt}
-                sizes="120px"
+                sizes="max(120px, 7.5vw)"
                 priority
               />
             </div>

@@ -675,12 +675,6 @@
   }
 }
 
-@media (min-width: 1920px) {
-  .tipos > .seccion:first-child:has(.detalle[data-desde="1920"]) {
-    padding-top: 52px;
-  }
-}
-
 .cabeceraSeccion {
   position: relative;
 }
@@ -1124,12 +1118,6 @@
 
 @media (min-width: 1600px) {
   .detalle[data-desde="1600"] {
-    display: block;
-  }
-}
-
-@media (min-width: 1920px) {
-  .detalle[data-desde="1920"] {
     display: block;
   }
 }

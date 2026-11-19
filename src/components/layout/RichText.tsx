@@ -12,7 +12,7 @@ import type { Media } from "@/payload-types";
  * Ancho máximo del texto (`max-w-2xl`, 672 px): las imágenes del cuerpo nunca
  * se pintan más anchas, así que `sizes` no pide más que eso.
  */
-const SIZES_CUERPO = "(min-width: 704px) 672px, calc(100vw - 32px)";
+const SIZES_CUERPO = "(min-width: 704px) max(672px, 42vw), calc(100vw - 32px)";
 
 /**
  * Las imágenes del cuerpo con `next/image` (formato y ancho a medida, carga

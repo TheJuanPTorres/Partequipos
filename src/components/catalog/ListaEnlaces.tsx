@@ -38,7 +38,7 @@ export function ListaEnlaces({ items, vacio }: { items: EnlaceItem[]; vacio: str
               <LogoMarca
                 logo={item.logo}
                 alt={item.logo.alt}
-                sizes="200px"
+                sizes="max(200px, 12.5vw)"
                 className="h-12 w-auto shrink-0"
               />
             ) : item.imagen ? (

@@ -34,7 +34,6 @@ export const MarcaMaquinaria: CollectionConfig = {
   labels: { singular: "Marca de maquinaria nueva", plural: "Marcas de maquinaria nueva" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "slug", "mostrarEnWeb"],
     group: "Maquinaria",
   },
   /*

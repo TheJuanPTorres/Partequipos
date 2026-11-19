@@ -24,9 +24,7 @@ export const EquipoNuevo: CollectionConfig = {
   labels: { singular: "Equipo nuevo", plural: "Equipos nuevos" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "imagenes", "marca", "tipo", "orden", "slug", "mostrarEnWeb"],
     group: "Maquinaria",
-    listSearchableFields: ["nombre", "codigo"],
   },
   access: {
     read: lecturaContenido,

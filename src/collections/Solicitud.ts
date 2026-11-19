@@ -16,11 +16,9 @@ export const Solicitud: CollectionConfig = {
   labels: { singular: "Solicitud", plural: "Solicitudes" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "tipo", "estado", "correo", "telefono", "createdAt"],
     group: "Mensajes recibidos",
     description:
       "Formularios enviados desde el sitio. Contienen datos personales: no se publican y solo son visibles aquí.",
-    listSearchableFields: ["nombre", "correo", "empresa", "mensaje"],
     // Ayuda arriba de la lista (F4). Solo texto: no lee filas ni cambia el acceso.
     components: { beforeList: ["/components/admin/aviso/AvisoSolicitudes"] },
   },

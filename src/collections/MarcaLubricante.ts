@@ -33,7 +33,6 @@ export const MarcaLubricante: CollectionConfig = {
   labels: { singular: "Marca de lubricante", plural: "Marcas de lubricante" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "slug"],
     group: "Lubricantes",
   },
   /*

@@ -74,3 +74,13 @@ describe("listados del panel (PR 5)", () => {
     assert.equal(conListados([original])[0], original);
   });
 });
+
+describe("una sola fuente de columnas", () => {
+  it("las colecciones de LISTADOS no declaran sus propias columnas ni campos de búsqueda", async () => {
+    const conPropias = (await colecciones())
+      .filter((c) => LISTADOS[c.slug])
+      .filter((c) => c.admin?.defaultColumns || c.admin?.listSearchableFields)
+      .map((c) => c.slug);
+    assert.deepEqual(conPropias, [], "van en src/lib/panel/listados.ts");
+  });
+});

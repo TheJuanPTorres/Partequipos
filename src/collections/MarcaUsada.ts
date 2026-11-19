@@ -25,7 +25,6 @@ export const MarcaUsada: CollectionConfig = {
   labels: { singular: "Marca de maquinaria usada", plural: "Marcas de maquinaria usada" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "slug"],
     group: "Maquinaria",
     description:
       "Cada marca tiene su página con las unidades usadas disponibles. Se crea sola al guardar una unidad con una marca nueva.",

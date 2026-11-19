@@ -23,10 +23,8 @@ export const ModeloRepuesto: CollectionConfig = {
   },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "imagenes", "marca", "tipo", "slug", "mostrarEnWeb"],
     group: "Repuestos",
     // El código («320D») es como busca un comercial; el nombre solo no basta.
-    listSearchableFields: ["nombre", "codigo"],
   },
   access: {
     read: lecturaContenido,

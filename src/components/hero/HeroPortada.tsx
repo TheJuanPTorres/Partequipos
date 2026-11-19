@@ -645,7 +645,7 @@ export function HeroPortada({ diapositivas, conNav = false }: Props) {
                     src={s.frontal.url}
                     alt={s.frontal.alt}
                     fill
-                    sizes="(max-width: 767px) 100vw, (max-width: 1024px) 631px, 1000px"
+                    sizes="(max-width: 767px) 100vw, (max-width: 1024px) max(631px, 39.438vw), max(1000px, 62.5vw)"
                     className={estilos.frontal}
                   />
                 </div>

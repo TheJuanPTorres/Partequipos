@@ -22,7 +22,7 @@ import estilos from "./listado.module.css";
  * cualquier pantalla.
  */
 const SIZES_FOTO =
-  "(min-width: 1025px) 343px, (min-width: 768px) 430px, (min-width: 640px) 343px, calc(100vw - 100px)";
+  "(min-width: 1025px) max(343px, 21.438vw), (min-width: 768px) max(430px, 26.875vw), (min-width: 640px) max(343px, 21.438vw), calc(100vw - 100px)";
 /** Solo para la proporción de la foto: el ancho que se pide lo decide `sizes`. */
 const ANCHO_FOTO = 384;
 
@@ -99,7 +99,7 @@ export function TarjetaListado({
         ) : null}
         {logo ? (
           <span className={estilos.logo}>
-            <LogoMarca logo={logo} alt={logoAlt} sizes="96px" />
+            <LogoMarca logo={logo} alt={logoAlt} sizes="max(96px, 6vw)" />
           </span>
         ) : null}
       </div>

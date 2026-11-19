@@ -112,9 +112,11 @@ export function enFilaDe(cantidad: number): number {
 /**
  * Anchos de pantalla desde los que caben la franja y la máquina al lado del título centrado
  * (300 px pegados al borde derecho): el título mide unos 33 px por letra más ~160 px de número
- * y barra, y la sección es el 90 % de la pantalla.
+ * y barra, y la sección es el 90 % de la pantalla. Hasta 1600: desde ahí la página es la de 1600
+ * ampliada (escala de las pantallas grandes, CLAUDE.md §5), así que lo que no cabe a 1600 no cabe
+ * a ningún ancho mayor.
  */
-const ANCHOS_FRANJA = [1280, 1440, 1600, 1920] as const;
+const ANCHOS_FRANJA = [1280, 1440, 1600] as const;
 
 export function franjaDesde(nombre: string, cantidad: number): number {
   // La franja tiene que caer sobre una tarjeta: con la fila centrada (1 o 2), debajo del borde

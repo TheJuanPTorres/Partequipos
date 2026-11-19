@@ -1535,36 +1535,3 @@
 .cuerpo:last-child {
   padding-bottom: 0;
 }
-
-/*
- * PANTALLAS GRANDES (auditoría de «Maquinaria pesada», 2026-11-18): desde 1920 el listado deja
- * su techo de 1400 px y toma el de las fichas (1680), con más tarjetas por fila: la lista en dos
- * columnas (la foto al 38 %) y la rejilla en cuatro. Antes, a 3840, una sola columna de unas
- * 1000 px en medio de la pantalla.
- */
-@media (min-width: 1920px) {
-  .cuerpo {
-    max-width: 1680px;
-  }
-  .columnaResultados > .barra {
-    max-width: none;
-  }
-  .tarjetas[data-vista="lista"] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-  }
-  /* La foto al 38 %: los datos tienen sitio para «Ver producto» y «Cotizar» en una línea. */
-  .tarjetas[data-vista="lista"] .tarjeta {
-    grid-template-columns: minmax(0, 38%) minmax(0, 1fr);
-  }
-  .tarjetas[data-vista="lista"] .botones {
-    flex-wrap: nowrap;
-  }
-  .tarjetas[data-vista="lista"] .boton {
-    padding-inline: 18px;
-    white-space: nowrap;
-  }
-  .tarjetas[data-vista="rejilla"] {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}

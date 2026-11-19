@@ -76,7 +76,7 @@ export function ContactoPagina({
               alt=""
               fill
               priority
-              sizes="(max-width: 767px) 0px, (max-width: 1024px) 300px, 420px"
+              sizes="(max-width: 767px) 0px, (max-width: 1024px) max(300px, 18.75vw), max(420px, 26.25vw)"
               className={estilos.fotoImg}
               style={{ objectPosition: foto.posicion }}
             />
@@ -105,7 +105,7 @@ export function ContactoPagina({
               alt=""
               width={decorativa.width}
               height={decorativa.height}
-              sizes="(max-width: 767px) 80vw, 430px"
+              sizes="(max-width: 767px) 80vw, max(430px, 26.875vw)"
               className={estilos.decorativa}
             />
           ) : null}

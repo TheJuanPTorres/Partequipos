@@ -58,7 +58,7 @@ export function SelectorMarcas({ id, vista }: { id: string; vista: VistaSelector
                       src={p.foto.url}
                       alt=""
                       fill
-                      sizes="(max-width: 767px) 100vw, 640px"
+                      sizes="(max-width: 767px) 100vw, max(640px, 40vw)"
                       style={{ objectFit: "cover", objectPosition: p.foto.posicion }}
                       className={estilos.fotoImagen}
                     />
@@ -69,7 +69,12 @@ export function SelectorMarcas({ id, vista }: { id: string; vista: VistaSelector
                 <div className={estilos.contenido}>
                   {p.logo ? (
                     <span className={estilos.placa}>
-                      <LogoMarca logo={p.logo} alt="" sizes="180px" className={estilos.logo} />
+                      <LogoMarca
+                        logo={p.logo}
+                        alt=""
+                        sizes="max(180px, 11.25vw)"
+                        className={estilos.logo}
+                      />
                     </span>
                   ) : null}
 

@@ -6,6 +6,7 @@ import { pinesAmontonados } from "@/lib/portada/pinesSedes";
 import { ETIQUETA_TIPO, type TipoDeSede } from "@/lib/portada/sedes";
 
 import estilos from "./sedes.module.css";
+import { escalaPx } from "@/lib/estilos/escala";
 
 /**
  * GLOBO DE SEDES (sección 9, fase G). Cliente: Mapbox GL necesita el
@@ -176,10 +177,10 @@ export function GloboSedes({ token, sedes, children }: Props) {
     if (!caja || esMovil()) return { top: 0, bottom: 0, left: 0, right: 0 };
     const ley = leyenda.current?.getBoundingClientRect();
     return {
-      top: ley ? Math.max(0, ley.bottom - caja.top) + 12 : 0,
+      top: ley ? Math.max(0, ley.bottom - caja.top) + escalaPx(12) : 0,
       bottom: 0,
       left: 0,
-      right: !cerrado && panel.current ? panel.current.offsetWidth + 24 : 0,
+      right: !cerrado && panel.current ? panel.current.offsetWidth + escalaPx(24) : 0,
     };
   }, []);
 
@@ -195,9 +196,9 @@ export function GloboSedes({ token, sedes, children }: Props) {
       sedes.forEach((s) => limites.extend([s.lng, s.lat]));
       // El `padding` de `fitBounds` SUSTITUYE al del mapa (no se suma): lleva el hueco del panel.
       const p = relleno(plegadoAhora);
-      const g = esMovil() ? CFG.margenVistaMovil : CFG.margenVista;
+      const g = esMovil() ? CFG.margenVistaMovil : escalaPx(CFG.margenVista);
       m.fitBounds(limites, {
-        padding: { top: Math.max(g, p.top + 16), bottom: g, left: g, right: p.right + g },
+        padding: { top: Math.max(g, p.top + escalaPx(16)), bottom: g, left: g, right: p.right + g },
         duration: sinMovimiento() ? 0 : duracion,
         essential: true,
       });

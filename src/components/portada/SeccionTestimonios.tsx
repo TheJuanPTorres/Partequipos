@@ -48,7 +48,7 @@ type Props = { tarjetas: TarjetaTestimonio[]; textos: TextosTestimonios };
  * tablet: 818 y 996 px), no el ancho de la tarjeta. Con «100vw / 50vw» se pedía a 384–720 px y
  * se ampliaba ×2,1 a 390, ×2,6 a 768 y ×1,4 a 1440 (medido). Desde 1920 px, la mitad del ancho.
  */
-const SIZES_FOTO = "(max-width: 767px) 820px, (max-width: 1919px) 1000px, 50vw";
+const SIZES_FOTO = "(max-width: 767px) 820px, (max-width: 1919px) max(1000px, 62.5vw), 50vw";
 
 export function SeccionTestimonios({ tarjetas, textos }: Props) {
   const inicial = tarjetaInicial(tarjetas.length);

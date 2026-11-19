@@ -90,7 +90,7 @@ export function BloqueFranjaMarquee({ texto, fondos, imagenFrontal }: Datos) {
             alt=""
             width={imagenFrontal.width}
             height={imagenFrontal.height}
-            sizes="(max-width: 767px) 80vw, 704px"
+            sizes="(max-width: 767px) 80vw, max(704px, 44vw)"
             className={estilos.maquina}
           />
         ) : null}

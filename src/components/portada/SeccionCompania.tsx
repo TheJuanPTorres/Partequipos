@@ -15,6 +15,7 @@ import type { VideoCompania } from "@/lib/portada/seccionesF";
 
 import estilos from "./compania.module.css";
 import { DialogoYouTube } from "./DialogoYouTube";
+import { escalaPx } from "@/lib/estilos/escala";
 
 /**
  * SECCIONES 6 Y 7 DE LA PORTADA — «Nuestra Compañía» (ux-9).
@@ -87,8 +88,8 @@ const BAJADA_MOVIL = 0.06;
  * franja libre bajo el vídeo encogido menos su hueco.
  */
 function finEncogidoMovil(alto: number): number {
-  const subida = (1 - BAJADA_MOVIL - ESCALA_FINAL_MOVIL) * alto - TITULO_BAJO_VIDEO_PX;
-  return Math.min(0.9, Math.max(FIN_ENCOGIDO, 1 - subida / RECORRIDO_PX));
+  const subida = (1 - BAJADA_MOVIL - ESCALA_FINAL_MOVIL) * alto - escalaPx(TITULO_BAJO_VIDEO_PX);
+  return Math.min(0.9, Math.max(FIN_ENCOGIDO, 1 - subida / escalaPx(RECORRIDO_PX)));
 }
 /** Aire mínimo entre el pie del vídeo y el título de la llamada para mostrarla. */
 const LLAMADA_AIRE_PX = 16;
@@ -168,7 +169,8 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
     if (!g || !p) return;
     const medir = () => {
       const ancho = g.getBoundingClientRect().width;
-      if (ancho > 0) p.style.setProperty("--marquee-duracion", `${ancho / MARQUEE_PX_S}s`);
+      if (ancho > 0)
+        p.style.setProperty("--marquee-duracion", `${ancho / escalaPx(MARQUEE_PX_S)}s`);
     };
     void document.fonts?.ready.then(medir);
     medir();
@@ -216,12 +218,12 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
       const r = caja.getBoundingClientRect();
       const escala = r.height / (caja.offsetHeight || 1);
       const pie = r.bottom - parseFloat(getComputedStyle(caja).paddingBottom) * escala;
-      sec.dataset.llamada = pie + LLAMADA_AIRE_PX <= tituloFinal ? "visible" : "oculta";
+      sec.dataset.llamada = pie + escalaPx(LLAMADA_AIRE_PX) <= tituloFinal ? "visible" : "oculta";
     };
 
     const objetivo = () => {
       const inicio = zona.getBoundingClientRect().top + scrollY;
-      return Math.min(1, Math.max(0, (scrollY - inicio) / RECORRIDO_PX));
+      return Math.min(1, Math.max(0, (scrollY - inicio) / escalaPx(RECORRIDO_PX)));
     };
     const pintar = (ahora: number) => {
       const meta = objetivo();
@@ -238,7 +240,7 @@ export function SeccionCompania({ video, imagen = null, youtube, textos }: Props
       const final = mq.matches ? ESCALA_FINAL_MOVIL : ESCALA_FINAL;
       caja.style.setProperty("--compania-escala", String(1 - (1 - final) * encogido));
       caja.style.setProperty("--compania-encogido", String(encogido));
-      caja.style.setProperty("--compania-radio", `${RADIO_FINAL_PX * encogido}px`);
+      caja.style.setProperty("--compania-radio", `${escalaPx(RADIO_FINAL_PX) * encogido}px`);
       texto.style.opacity = String(tramo(actual, desdeTexto, hastaTexto));
       blanco.style.opacity = String(opacidadFondo(actual));
       decidirLlamada();

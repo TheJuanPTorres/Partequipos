@@ -200,7 +200,7 @@ function Tarjetas({ tarjetas, alElegir }: { tarjetas: TarjetaMenu[]; alElegir: (
                   width={t.imagen.width}
                   height={t.imagen.height}
                   alt=""
-                  sizes="(max-width: 767px) 45vw, (max-width: 1024px) 19vw, 130px"
+                  sizes="(max-width: 767px) 45vw, (max-width: 1024px) 19vw, max(130px, 8.125vw)"
                   loading="lazy"
                 />
               ) : null}
@@ -236,7 +236,7 @@ function Tarjetas({ tarjetas, alElegir }: { tarjetas: TarjetaMenu[]; alElegir: (
                         width={a.icono.width}
                         height={a.icono.height}
                         alt=""
-                        sizes="24px"
+                        sizes="max(24px, 1.5vw)"
                         loading="lazy"
                         className={estilos.accesoIcono}
                       />
@@ -259,7 +259,7 @@ function LogoDeFila({ logo }: { logo: NonNullable<GrupoMenu["logo"]> }) {
     <LogoMarca
       logo={{ ...logo, oscuro: logo.oscuro === true }}
       alt=""
-      sizes="96px"
+      sizes="max(96px, 6vw)"
       loading="lazy"
       className={estilos.logo}
     />

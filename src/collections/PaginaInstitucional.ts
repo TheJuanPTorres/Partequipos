@@ -305,7 +305,7 @@ export const PaginaInstitucional: CollectionConfig = {
               admin: {
                 rows: 2,
                 description:
-                  "Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas. Obligatorio aunque esté oculto: lo usan los lectores de pantalla.",
+                  "Ej. «Potencia Hitachi LANDCROS». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas. Obligatorio aunque esté oculto: lo usan los lectores de pantalla.",
               },
             },
             {
@@ -441,7 +441,7 @@ export const PaginaInstitucional: CollectionConfig = {
                     { siblingData }: { siblingData: { enlace?: string } },
                   ) =>
                     siblingData?.enlace && !valor
-                      ? "El «+» no tiene texto visible: di adónde lleva (p. ej. «Ver maquinaria Hitachi»)."
+                      ? "El «+» no tiene texto visible: di adónde lleva (p. ej. «Ver maquinaria Hitachi LANDCROS»)."
                       : true,
                   admin: { width: "50%" },
                 },

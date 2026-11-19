@@ -141,7 +141,7 @@ export const ModeloRepuesto: CollectionConfig = {
           label: "Título de las categorías",
           admin: {
             description:
-              "Sobre las categorías, ej. «repuestos disponibles para excavadora hitachi zx200». Vacío: «Repuestos disponibles para» y el nombre.",
+              "Sobre las categorías, ej. «repuestos disponibles para excavadora Hitachi LANDCROS ZX200». Vacío: «Repuestos disponibles para» y el nombre.",
           },
         },
         {

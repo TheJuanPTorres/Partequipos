@@ -13,8 +13,8 @@
  *     (`hitachi` → `hitachi-landcros` dentro del slug). NO toca las unidades usadas, la marca de
  *     usados ni los artículos: los lista para que decida dirección.
  *  2. REDIRECCIONES: un 301 de cada URL antigua a la nueva; las que ya apuntaban a una URL antigua
- *     pasan a apuntar DIRECTO a la nueva (sin cadenas); se quitan las intermedias que crean los
- *     ganchos de repuestos al cambiar la marca y luego el tipo.
+ *     pasan a apuntar DIRECTO a la nueva (sin cadenas). Las crea este script: los guardados van con
+ *     `SIN_REDIRECT_AUTOMATICO`, para que los ganchos de repuestos no lancen su cascada.
  *  3. ENLACES: los enlaces relativos a una URL antigua escritos en el panel (hero, menús, textos
  *     enriquecidos…) pasan a la nueva.
  *
@@ -27,6 +27,7 @@ import path from "node:path";
 
 import { getPayload, type CollectionSlug, type GlobalSlug } from "payload";
 
+import { SIN_REDIRECT_AUTOMATICO } from "../../src/collections/hooks/autoRedirect";
 import { veredictoDestino } from "../../src/lib/demo/copiaDemo";
 import {
   leFaltaLandcros,
@@ -130,6 +131,14 @@ const esHitachi = (slug: string | undefined) => /(^|-)hitachi(-|$)/.test(slug ??
 // ---------------------------------------------------------------------------
 const slugs: CambioSlug[] = [];
 const pares = new Map<string, string>(manifiesto.pares);
+/**
+ * El slug de ANTES del cambio: el que guardó el manifiesto o, si el documento no se ha tocado, el
+ * que tiene. Así el plan sale igual con el cambio sin hacer, a medias o hecho.
+ */
+const viejo = (coleccion: string, d: Doc): string =>
+  manifiesto.slugs.find((c) => c.coleccion === coleccion && c.id === d.id)?.antes ??
+  String(d.slug ?? "");
+/** El slug de DESPUÉS, y apunta el cambio si el documento todavía no lo tiene. */
 const nuevo = (coleccion: string, d: Doc): string => {
   const antes = String(d.slug ?? "");
   const despues = slugConLandcros(antes);
@@ -147,15 +156,15 @@ async function planRepuestos(): Promise<void> {
   const tipos = await todos("tipos-equipo");
   const modelos = await todos("modelos-repuesto");
   for (const marca of marcas) {
-    const mAntes = String(marca.slug);
+    const mAntes = viejo("marcas", marca);
     const mDespues = nuevo("marcas", marca);
     par(rutas.marca(mAntes), rutas.marca(mDespues));
     const suyos = tipos.filter((t) => idDe(t.marca) === marca.id);
     for (const tipo of suyos) {
       const padre = suyos.find((t) => t.id === idDe(tipo.tipoPadre));
       const segAntes = segmentoDeTipo({
-        slug: String(tipo.slug),
-        slugPadre: padre ? String(padre.slug) : null,
+        slug: viejo("tipos-equipo", tipo),
+        slugPadre: padre ? viejo("tipos-equipo", padre) : null,
       });
       const segDespues = segmentoDeTipo({
         slug: nuevoSinApuntar(tipo),
@@ -165,7 +174,7 @@ async function planRepuestos(): Promise<void> {
       par(rutas.tipo(mAntes, segAntes), rutas.tipo(mDespues, segDespues));
       for (const modelo of modelos.filter((x) => idDe(x.tipo) === tipo.id)) {
         par(
-          rutas.modelo(mAntes, segAntes, String(modelo.slug)),
+          rutas.modelo(mAntes, segAntes, viejo("modelos-repuesto", modelo)),
           rutas.modelo(mDespues, segDespues, nuevo("modelos-repuesto", modelo)),
         );
       }
@@ -179,16 +188,16 @@ async function planNueva(): Promise<void> {
   const tipos = await todos("tipos-maquinaria");
   const equipos = await todos("equipos-nuevos");
   for (const marca of marcas) {
-    const mAntes = String(marca.slug);
+    const mAntes = viejo("marcas-maquinaria", marca);
     const mDespues = nuevo("marcas-maquinaria", marca);
     par(rutas.marcaMaquinaria(mAntes), rutas.marcaMaquinaria(mDespues));
     for (const tipo of tipos.filter((t) => idDe(t.marca) === marca.id)) {
-      const tAntes = String(tipo.slug);
+      const tAntes = viejo("tipos-maquinaria", tipo);
       const tDespues = nuevo("tipos-maquinaria", tipo);
       par(rutas.tipoMaquinaria(mAntes, tAntes), rutas.tipoMaquinaria(mDespues, tDespues));
       for (const equipo of equipos.filter((e) => idDe(e.tipo) === tipo.id)) {
         par(
-          rutas.equipoNuevo(mAntes, tAntes, String(equipo.slug)),
+          rutas.equipoNuevo(mAntes, tAntes, viejo("equipos-nuevos", equipo)),
           rutas.equipoNuevo(mDespues, tDespues, nuevo("equipos-nuevos", equipo)),
         );
       }
@@ -226,11 +235,15 @@ async function cambiarSlugs(): Promise<void> {
       data: { slug: c.despues } as never,
       depth: 0,
       overrideAccess: true,
+      // Las redirecciones las crea el paso 3, no los ganchos (ver `autoRedirect.ts`).
+      context: { [SIN_REDIRECT_AUTOMATICO]: true },
     })) as unknown as Doc;
     if (doc.slug !== c.despues) {
       fallar(`${c.coleccion} ${c.id}: quedó «${String(doc.slug)}» y no «${c.despues}»`);
     }
-    manifiesto.slugs.push(c);
+    if (!manifiesto.slugs.some((x) => x.coleccion === c.coleccion && x.id === c.id)) {
+      manifiesto.slugs.push(c);
+    }
     guardar();
   }
   log(`direcciones: ${slugs.length}`);
@@ -250,8 +263,8 @@ async function redirecciones(): Promise<void> {
   let reapuntadas = 0;
   let quitadas = 0;
 
-  // Una URL nueva nunca es ORIGEN de una redirección: ni las vivas ni las intermedias de los ganchos
-  // (marca nueva con tipo antiguo), que no fueron nunca una URL publicada.
+  // Una URL nueva nunca es ORIGEN de una redirección: ni las vivas ni las intermedias (marca nueva
+  // con tipo antiguo) que deja un cambio hecho a mano o a medias; no fueron nunca una URL publicada.
   for (const r of existentes) {
     const esNuestra =
       PREFIJOS.some((p) => r.desde.startsWith(p)) && r.desde.includes("hitachi-landcros");
@@ -476,6 +489,7 @@ async function retirar(): Promise<void> {
       data: { slug: c.antes } as never,
       depth: 0,
       overrideAccess: true,
+      context: { [SIN_REDIRECT_AUTOMATICO]: true },
     });
   }
   // Redirecciones: fuera las del cambio (y las que crean los ganchos al volver), y las reapuntadas,
@@ -497,6 +511,8 @@ async function retirar(): Promise<void> {
       }
     } else if (delCambio) {
       await payload.delete({ collection: "redirects", id: r.id, overrideAccess: true });
+    } else if (r.hacia.includes("hitachi-landcros")) {
+      log(`  · OJO, queda una redirección hacia una URL nueva: ${r.desde} → ${r.hacia}`);
     }
   }
   log(

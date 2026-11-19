@@ -501,7 +501,8 @@ export function enlacePolitica(p: PoliticaMenu | undefined): EnlaceMenu | null {
 }
 
 export function panelRepuestos(d: DatosMegamenu): PanelMenu {
-  const marcas = [...d.marcasRepuestos].sort(porNombre);
+  // En el orden del panel (arrastrando, 2026-11-19): la consulta ya las trae así.
+  const marcas = [...d.marcasRepuestos];
   const categorias = grupoCategoriasTecnicas(d.categoriasTecnicas ?? []);
   const politica = enlacePolitica(d.politicaRepuestos);
   return {

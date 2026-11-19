@@ -1,6 +1,7 @@
 import { cache } from "react";
 import config from "@payload-config";
 import { getPayload } from "payload";
+import { ordenDe } from "../ordenArrastre";
 
 import type { TiposEquipo } from "@/payload-types";
 
@@ -25,7 +26,8 @@ export const getTipos = cache(async (): Promise<TiposEquipo[]> => {
     collection: "tipos-equipo",
     depth: 1,
     limit: 0, // sin límite: el catálogo completo
-    sort: "nombre",
+    // En el orden de cada marca (join «Tipos», arrastrando, 2026-11-19).
+    sort: ordenDe("tipos-equipo"),
   });
 
   return docs;
@@ -40,7 +42,8 @@ export const getTiposDeMarca = cache(async (marcaId: number): Promise<TiposEquip
     where: { marca: { equals: marcaId } },
     depth: 0,
     limit: 0,
-    sort: "nombre",
+    // En el orden de la marca (join «Tipos» de la marca, arrastrando, 2026-11-19).
+    sort: ordenDe("tipos-equipo"),
   });
 
   return docs;

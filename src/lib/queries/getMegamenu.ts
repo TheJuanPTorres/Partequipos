@@ -95,10 +95,18 @@ const megamenuEnCache = unstable_cache(
         where: { mostrarEnWeb: { not_equals: false } },
         select: selectDelMenu("categorias-usada"),
       }),
-      payload.find({ collection: "marcas", ...conLogo, select: selectDelMenu("marcas") }),
+      // En el orden del panel (arrastrando, `orderable`, 2026-11-19).
+      payload.find({
+        collection: "marcas",
+        ...conLogo,
+        sort: ordenDe("marcas"),
+        select: selectDelMenu("marcas"),
+      }),
       payload.find({
         collection: "tipos-equipo",
         ...base,
+        // En el orden de cada marca (join «Tipos», arrastrando, 2026-11-19).
+        sort: ordenDe("tipos-equipo"),
         select: selectDelMenu("tipos-equipo"),
       }),
       // Solo el tipo de cada equipo: el menú no enlaza a los tipos de maquinaria nueva sin equipos.
@@ -121,6 +129,7 @@ const megamenuEnCache = unstable_cache(
       payload.find({
         collection: "categorias-tecnicas",
         ...conLogo,
+        sort: ordenDe("categorias-tecnicas"),
         select: selectDelMenu("categorias-tecnicas"),
       }),
       // «Política de garantías y repuestos», editable en el global de la cabecera.

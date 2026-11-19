@@ -78,14 +78,13 @@ export function accesoDeSubcategoria(c: FuenteAcceso): AccesoSubcategoria | null
   };
 }
 
-/** Los accesos de las subpáginas de una categoría, por nombre. */
+/** Los accesos de las subpáginas de una categoría, en el orden que llegan (el del panel, 2026-11-19). */
 export function accesosDe(
   padreId: number,
   todas: ReadonlyArray<FuenteAcceso>,
 ): AccesoSubcategoria[] {
   return todas
     .filter((c) => idDelPadre(c) === padreId)
-    .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
     .flatMap((c) => {
       const a = accesoDeSubcategoria(c);
       return a ? [a] : [];

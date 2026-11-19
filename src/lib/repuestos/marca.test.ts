@@ -37,7 +37,7 @@ describe("vistaEncabezado", () => {
 });
 
 describe("categoriasDeMarca", () => {
-  it("ordena por posición y deja al final las que no la tienen, por nombre", () => {
+  it("conserva el orden en que llegan (el del panel) y quita las que no tienen nombre", () => {
     const r = categoriasDeMarca([
       cat(1, "Zeta"),
       cat(2, "Beta", 2),
@@ -46,7 +46,7 @@ describe("categoriasDeMarca", () => {
     ]);
     assert.deepEqual(
       r.map((c) => c.nombre),
-      ["Alfa", "Beta", "Ceta", "Zeta"],
+      ["Zeta", "Beta", "Alfa", "Ceta"],
     );
   });
 

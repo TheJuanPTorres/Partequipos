@@ -2447,6 +2447,10 @@ export interface Articulo {
    */
   fechaPublicacion: string;
   /**
+   * Marcado, el artículo sale primero en el blog y en su categoría, aunque haya otros más recientes. Con varios marcados, van primero todos, del más reciente al más antiguo.
+   */
+  destacado?: boolean | null;
+  /**
    * Firma que aparece en el artículo. Vacío: «Partequipos». Con un nombre de persona, los buscadores lo leen como autor (persona); con «Partequipos», como la empresa.
    */
   autor?: string | null;
@@ -3812,6 +3816,7 @@ export interface ArticulosSelect<T extends boolean = true> {
   categoria?: T;
   categoriaRelacionada?: T;
   fechaPublicacion?: T;
+  destacado?: T;
   autor?: T;
   entradilla?: T;
   imagenDestacada?: T;

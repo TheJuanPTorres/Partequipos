@@ -11,14 +11,10 @@ import { ORDEN_ARRASTRE, porClave } from "./ordenArrastre";
 /*
  * GUARDARRAÍL DEL ORDEN POR ARRASTRE (2026-11-19). Si una consulta pública de una colección
  * ordenable sigue ordenando por «Orden» o por nombre, el editor arrastra en el panel y la web no
- * cambia, sin ningún error. Para repuestos (D): añadir sus colecciones a `ORDEN_ARRASTRE` y
- * quitarlas de `PENDIENTES_DE_D`.
+ * cambia, sin ningún error.
  */
 
 const RAIZ = path.resolve(process.cwd(), "src");
-
-/** Las de repuestos: su orden ya existe (#510) y sus consultas las pasa D. */
-const PENDIENTES_DE_D = ["marcas", "categorias-tecnicas", "tipos-equipo", "modelos-repuesto"];
 
 /** Fuera del sitio público, o con su propio orden. */
 const EXCLUIDOS = [
@@ -110,12 +106,8 @@ function consultasSinOrden(archivos: { ruta: string; texto: string }[]): string[
 }
 
 describe("orden por arrastre en la web", () => {
-  it("la lista es la de la configuración (sin las de repuestos, que pasa D)", async () => {
+  it("la lista es la de la configuración", async () => {
     const config = await ordenDeLaConfiguracion();
-    for (const slug of PENDIENTES_DE_D) {
-      assert.ok(config.has(slug), `«${slug}» ya no es ordenable: quítala de PENDIENTES_DE_D`);
-      config.delete(slug);
-    }
     assert.deepEqual(Object.fromEntries([...config].sort()), {
       ...Object.fromEntries(Object.entries(ORDEN_ARRASTRE).sort()),
     });

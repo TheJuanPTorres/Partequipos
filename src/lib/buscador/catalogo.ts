@@ -36,10 +36,14 @@ const texto = (v: string | null | undefined) => v?.trim() ?? "";
 const unir = (...partes: (string | null | undefined)[]) =>
   partes.map(texto).filter(Boolean).join(" · ");
 
-const imagen = (media: Parameters<typeof imagenDeMedia>[0]) => {
-  const i = imagenDeMedia(media, "");
-  return i ? { url: i.url, width: i.width, height: i.height } : null;
-};
+type MediaMin = { id: number; url?: string | null; width?: number | null; height?: number | null };
+
+const referencia = <T extends { id: number }>(
+  rel: number | T | null | undefined,
+  mapa: Map<number, T>,
+): T | null => (typeof rel === "number" ? (mapa.get(rel) ?? null) : (rel ?? null));
+
+const porId = <T extends { id: number }>(docs: T[]) => new Map(docs.map((d) => [d.id, d]));
 
 /** Las filas de la ficha técnica («Potencia neta 122 kW») como un solo texto. */
 function specs(filas: { etiqueta: string; valor: string }[] | null | undefined): string {
@@ -48,7 +52,9 @@ function specs(filas: { etiqueta: string; valor: string }[] | null | undefined):
 
 export async function cargarDocumentos(): Promise<DocBusqueda[]> {
   const payload = await getPayload({ config });
-  const todo = { depth: 1, limit: 0, pagination: false } as const;
+  // Sin profundidad: una consulta por colección y las relaciones se resuelven aquí con mapas (con
+  // `depth: 1` cada equipo traía sus fotos, su marca y su tipo, y la primera búsqueda tardaba ~3 s).
+  const todo = { depth: 0, limit: 0, pagination: false } as const;
 
   const [
     nuevos,
@@ -65,6 +71,9 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
     categoriasNueva,
     categoriasUsada,
     paginas,
+    tiposNueva,
+    marcasUsadas,
+    mediaDocs,
   ] = await Promise.all([
     payload.find({ collection: "equipos-nuevos", where: conEquipoVisible(), ...todo }),
     payload.find({
@@ -84,13 +93,35 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
     payload.find({ collection: "categorias-maquinaria", ...todo }),
     payload.find({ collection: "categorias-usada", ...todo }),
     payload.find({ collection: "paginas", ...todo, depth: 0 }),
+    payload.find({ collection: "tipos-maquinaria", ...todo }),
+    payload.find({ collection: "marcas-usada", ...todo }),
+    payload.find({
+      collection: "media",
+      ...todo,
+      select: { url: true, width: true, height: true },
+    }),
   ]);
+
+  const mMarca = porId(marcas.docs);
+  const mTipoEquipo = porId(tipos.docs);
+  const mMarcaNueva = porId(marcasNueva.docs);
+  const mTipoNueva = porId(tiposNueva.docs);
+  const mCategoriaUsada = porId(categoriasUsada.docs);
+  const mMarcaUsada = porId(marcasUsadas.docs);
+  const mLubMarca = porId(lubMarcas.docs);
+  const media = porId(mediaDocs.docs as MediaMin[]);
+  const imagen = (m: number | MediaMin | null | undefined) => {
+    const doc = referencia(m, media);
+    return doc?.url && doc.width && doc.height
+      ? { url: doc.url, width: doc.width, height: doc.height }
+      : null;
+  };
 
   const docs: DocBusqueda[] = [];
 
   for (const e of nuevos.docs) {
-    const marca = poblado<MarcasMaquinaria>(e.marca);
-    const tipo = poblado<TiposMaquinaria>(e.tipo);
+    const marca = referencia(e.marca, mMarcaNueva);
+    const tipo = referencia(e.tipo, mTipoNueva);
     if (!marca || !tipo) continue;
     docs.push({
       id: `nueva-${e.id}`,
@@ -113,9 +144,9 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
   }
 
   for (const u of usados.docs) {
-    const categoria = poblado<CategoriasUsada>(u.categoria);
+    const categoria = referencia(u.categoria, mCategoriaUsada);
     if (!categoria) continue;
-    const marca = texto(poblado<MarcasUsada>(u.marcaUsada)?.nombre) || texto(u.marca);
+    const marca = texto(referencia(u.marcaUsada, mMarcaUsada)?.nombre) || texto(u.marca);
     docs.push({
       id: `usada-${u.id}`,
       clase: "usada",
@@ -137,8 +168,8 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
   }
 
   for (const m of modelos.docs) {
-    const marca = poblado<Marca>(m.marca);
-    const tipo = poblado<TiposEquipo>(m.tipo);
+    const marca = referencia(m.marca, mMarca);
+    const tipo = referencia(m.tipo, mTipoEquipo);
     if (!marca || !tipo) continue;
     docs.push({
       id: `modelo-${m.id}`,
@@ -233,7 +264,7 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
   }
 
   for (const t of tipos.docs) {
-    const marca = poblado<Marca>(t.marca);
+    const marca = referencia(t.marca, mMarca);
     if (!marca) continue;
     docs.push({
       id: `repuestos-tipo-${t.id}`,
@@ -283,7 +314,7 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
     });
   }
   for (const c of lubCats.docs as CategoriasLubricante[]) {
-    const marca = poblado<MarcasLubricante>(c.marca);
+    const marca = referencia(c.marca, mLubMarca);
     if (!marca || marca.destino === "externo") continue;
     docs.push({
       id: `lubricante-${c.id}`,

@@ -1875,6 +1875,32 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
     font-size: 14px;
   }
 
+  /* «Ver la web» y el manual (fase 2, PR 6). */
+  &__enlaces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__enlace {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    min-height: 24px;
+    color: var(--pq-primary);
+    font-size: 14px;
+    font-weight: 500;
+    text-underline-offset: 3px;
+  }
+
+  &__ver-todas {
+    margin: 8px 0 0;
+    font-size: 14px;
+  }
+
   &__seccion {
     margin-top: 32px;
   }

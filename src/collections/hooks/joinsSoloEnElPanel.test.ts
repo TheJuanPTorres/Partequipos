@@ -7,6 +7,14 @@ import { describe, it } from "node:test";
 import type { Field } from "payload";
 
 import { CategoriaTecnica } from "../CategoriaTecnica";
+import { CategoriaUsada } from "../CategoriaUsada";
+import { MarcaLubricante } from "../MarcaLubricante";
+import { MarcaMaquinaria } from "../MarcaMaquinaria";
+import { MarcaUsada } from "../MarcaUsada";
+import { PreguntaFrecuente } from "../PreguntaFrecuente";
+import { Sede } from "../Sede";
+import { Testimonio } from "../Testimonio";
+import { TipoMaquinaria } from "../TipoMaquinaria";
 import { Marca } from "../Marca";
 import { TipoEquipo } from "../TipoEquipo";
 import { joinsSoloEnElPanel } from "./joinsSoloEnElPanel";
@@ -36,7 +44,7 @@ describe("joins solo en el panel", () => {
   });
 
   it("lo llevan las dos colecciones con join ordenable", () => {
-    for (const c of [Marca, TipoEquipo]) {
+    for (const c of [Marca, TipoEquipo, MarcaMaquinaria, TipoMaquinaria, MarcaLubricante]) {
       assert.ok(c.hooks?.beforeOperation?.includes(joinsSoloEnElPanel), c.slug);
     }
   });
@@ -71,6 +79,9 @@ describe("joins solo en el panel", () => {
     for (const [c, n] of [
       [Marca, "tipos"],
       [TipoEquipo, "modelos"],
+      [MarcaMaquinaria, "tipos"],
+      [TipoMaquinaria, "equipos"],
+      [MarcaLubricante, "lineas"],
     ] as const) {
       const tabs = c.fields.find((f) => f.type === "tabs") as {
         tabs: { label: unknown; fields: Field[] }[];
@@ -81,8 +92,34 @@ describe("joins solo en el panel", () => {
         `${c.slug}.${n}`,
       );
     }
-    assert.equal(Marca.orderable, true);
-    assert.equal(CategoriaTecnica.orderable, true);
+    for (const [c, coleccion, on] of [
+      [MarcaMaquinaria, "tipos-maquinaria", "marca"],
+      [TipoMaquinaria, "equipos-nuevos", "tipo"],
+      [MarcaLubricante, "categorias-lubricante", "marca"],
+    ] as const) {
+      const j = todos(c.fields).find((f) => f.type === "join") as
+        { collection: string; on: string; orderable?: boolean } | undefined;
+      assert.deepEqual(
+        [j?.collection, j?.on, j?.orderable],
+        [coleccion, on, true],
+        `join de ${c.slug}`,
+      );
+    }
+    for (const c of [
+      Marca,
+      CategoriaTecnica,
+      MarcaMaquinaria,
+      CategoriaUsada,
+      MarcaUsada,
+      MarcaLubricante,
+      Sede,
+      Testimonio,
+      PreguntaFrecuente,
+    ]) {
+      assert.equal(c.orderable, true, c.slug);
+      // La lista se abre ordenada por el arrastre (si no, Payload no deja arrastrar).
+      assert.ok(c.defaultSort === undefined || c.defaultSort === "_order", c.slug);
+    }
   });
 
   // El gancho depende de que `find` lea `args.joins` DESPUÉS de `beforeOperation` (Payload 3.89).

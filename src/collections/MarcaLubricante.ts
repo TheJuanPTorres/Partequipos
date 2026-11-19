@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { joinsSoloEnElPanel } from "./hooks/joinsSoloEnElPanel";
 import { conPestanas } from "../lib/fields/pestanasFicha";
 import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
@@ -35,6 +36,12 @@ export const MarcaLubricante: CollectionConfig = {
     defaultColumns: ["nombre", "slug"],
     group: "Lubricantes",
   },
+  /*
+   * ORDEN POR ARRASTRE (2026-11-19, dirección; informe del panel §6): `_order` oculto de Payload,
+   * con el orden inicial de hoy puesto por la migración `orden_resto`. Lo nuevo entra al final. La
+   * web lo usa cuando se pasen sus consultas a `_order` (§6.3).
+   */
+  orderable: true,
   access: {
     read: lecturaContenido,
     create: escrituraContenido,
@@ -42,6 +49,7 @@ export const MarcaLubricante: CollectionConfig = {
     delete: borradoAdmin,
   },
   hooks: {
+    beforeOperation: [joinsSoloEnElPanel],
     afterChange: [revalidarMarcaLubricante, megamenu.afterChange],
     afterDelete: [revalidarMarcaLubricanteBorrada, megamenu.afterDelete],
   },
@@ -189,6 +197,24 @@ export const MarcaLubricante: CollectionConfig = {
           description: "El fondo oscuro de la cabecera y de la zona de contacto: en ENI, el negro.",
         },
       }),
+      /*
+       * LAS LÍNEAS DE LA MARCA, EN SU ORDEN (2026-11-19): se arrastran aquí (join ordenable: el orden es de
+       * cada ficha). Va en la pestaña «Contenido». Solo se rellena en el panel (`joinsSoloEnElPanel`).
+       */
+      {
+        name: "lineas",
+        type: "join",
+        collection: "categorias-lubricante",
+        on: "marca",
+        orderable: true,
+        defaultLimit: 100,
+        label: "Líneas de la marca",
+        admin: {
+          defaultColumns: ["nombre", "slug"],
+          description:
+            "En el orden en que salen en la web. Arrastra las filas para cambiarlo; uno nuevo entra al final.",
+        },
+      },
       seoField(),
     ],
     { fotos: { logo: "logo", fotoSelector: "tarjeta", imagenCabecera: "cabecera" } },

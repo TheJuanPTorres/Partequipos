@@ -41,6 +41,12 @@ export const Sede: CollectionConfig = {
     group: "Empresa y sedes",
     description: "Sedes del mapa de la portada. No generan URLs propias.",
   },
+  /*
+   * ORDEN POR ARRASTRE (2026-11-19, dirección; informe del panel §6): `_order` oculto de Payload,
+   * con el orden inicial de hoy puesto por la migración `orden_resto`. Lo nuevo entra al final. La
+   * web lo usa cuando se pasen sus consultas a `_order` (§6.3).
+   */
+  orderable: true,
   access: {
     read: lecturaContenido,
     create: escrituraContenido,
@@ -64,7 +70,9 @@ export const Sede: CollectionConfig = {
       },
     ],
   },
-  defaultSort: "orden",
+  // Con `orderable`, la lista se ordena por el arrastre (sin esto, avisa de que hay que ordenar
+  // por «Orden» antes de arrastrar).
+  defaultSort: "_order",
   fields: conPestanas(
     [
       {

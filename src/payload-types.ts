@@ -100,7 +100,14 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    marcas: {
+      tipos: 'tipos-equipo';
+    };
+    'tipos-equipo': {
+      modelos: 'modelos-repuesto';
+    };
+  };
   collectionsSelect: {
     solicitudes: SolicitudesSelect<false> | SolicitudesSelect<true>;
     'modelos-repuesto': ModelosRepuestoSelect<false> | ModelosRepuestoSelect<true>;
@@ -238,14 +245,6 @@ export interface EquiposNuevo {
   id: number;
   nombre: string;
   /**
-   * Desmarcada, el equipo desaparece de toda la web (listados, «Otras referencias», menú, buscador, portada y sitemap) sin borrarse del panel, y su ficha lleva a la página de su tipo. Vuelve al marcarla.
-   */
-  mostrarEnWeb?: boolean | null;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  /**
    * Tiene que ser la marca del tipo de equipo de abajo. Si la cambias, vuelve a elegir el tipo.
    */
   marca: number | MarcasMaquinaria;
@@ -254,17 +253,9 @@ export interface EquiposNuevo {
    */
   tipo: number | TiposMaquinaria;
   /**
-   * Posición del equipo dentro de su tipo (1, 2, 3…), en la página de la marca y en las del tipo. Vacío: después de los que tienen orden, por nombre.
-   */
-  orden?: number | null;
-  /**
    * Referencia del fabricante, ej. 1150M o ZX350LC-6.
    */
   codigo?: string | null;
-  /**
-   * En kilogramos, sin puntos: 8400 para 8,4 t. Sirve para filtrar y ordenar el listado; vacío, el equipo no sale en los filtros de peso.
-   */
-  pesoOperativoKg?: number | null;
   /**
    * Resumen de una o dos líneas, bajo el título.
    */
@@ -284,19 +275,6 @@ export interface EquiposNuevo {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Ventajas o argumentos de venta, uno por línea.
-   */
-  destacados?:
-    | {
-        texto: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * La primera imagen se usa como portada y como imagen social.
-   */
-  imagenes?: (number | Media)[] | null;
   /**
    * Pares etiqueta/valor tal como los publica el fabricante. No inventar datos: si no hay dato oficial, se deja fuera. En la ficha salen como mucho 5, junto al título: potencia neta, peso operativo, motor, fuerza de tracción máxima y ancho de la zapata (se reconocen por la etiqueta); si falta alguna, se completa con las siguientes filas, en el orden de aquí. «Destacar» elige los datos de la tarjeta del equipo en la página de su marca.
    */
@@ -330,9 +308,9 @@ export interface EquiposNuevo {
    */
   vista360?: string | null;
   /**
-   * Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). No se muestran en el sitio. El PDF de la ficha técnica va en «Ficha técnica completa (PDF)».
+   * La primera imagen se usa como portada y como imagen social. Tamaño recomendado: 1.600 px de ancho o más; la primera es la de la tarjeta.
    */
-  documentos?: (number | Media)[] | null;
+  imagenes?: (number | Media)[] | null;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -341,6 +319,35 @@ export interface EquiposNuevo {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * Desmarcada, el equipo desaparece de toda la web (listados, «Otras referencias», menú, buscador, portada y sitemap) sin borrarse del panel, y su ficha lleva a la página de su tipo. Vuelve al marcarla.
+   */
+  mostrarEnWeb?: boolean | null;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * Posición del equipo dentro de su tipo (1, 2, 3…), en la página de la marca y en las del tipo. Vacío: después de los que tienen orden, por nombre.
+   */
+  orden?: number | null;
+  /**
+   * En kilogramos, sin puntos: 8400 para 8,4 t. Sirve para filtrar y ordenar el listado; vacío, el equipo no sale en los filtros de peso.
+   */
+  pesoOperativoKg?: number | null;
+  /**
+   * Ventajas o argumentos de venta, uno por línea.
+   */
+  destacados?:
+    | {
+        texto: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Imágenes de fichas o folletos del fabricante (JPEG, PNG o WebP). No se muestran en el sitio. El PDF de la ficha técnica va en «Ficha técnica completa (PDF)».
+   */
+  documentos?: (number | Media)[] | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -385,24 +392,7 @@ export interface MarcasMaquinaria {
      */
     distribuidorLogo?: (number | null) | Media;
   };
-  /**
-   * Desmarcada, la marca, sus tipos y sus equipos desaparecen de toda la web (menú, listados, filtros, portada, buscador y sitemap) sin borrarse del panel, y sus páginas llevan con un 301 a la página de abajo.
-   */
-  mostrarEnWeb?: boolean | null;
-  /**
-   * Categoría de maquinaria nueva a la que redirigen (301) la página de la marca, las de sus tipos y sus fichas. Vacío: el índice de maquinaria nueva.
-   */
-  destinoOculta?: (number | null) | CategoriasMaquinaria;
-  /**
-   * Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap, sus equipos nuevos no se publican en la web, y su tarjeta de «Maquinaria pesada nueva» en la portada lleva a esta dirección. Vacío, la marca tiene su página como siempre.
-   */
-  enlaceExterno?: string | null;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
   descripcion?: string | null;
-  logo?: (number | null) | Media;
   /**
    * Color de la franja de las páginas de esta marca (y de sus tipos). Vacío: sin color, igual que el fondo (si no es una marca, p. ej. Aditamentos, déjalo vacío). El texto de la franja se pone solo en blanco o negro, el que mejor se lea.
    */
@@ -411,18 +401,6 @@ export interface MarcasMaquinaria {
    * Márcala si el logo es blanco o muy claro: en el menú de la cabecera y en la placa clara de la página de la marca se pintará en una sola tinta oscura para que se vea. Desmarcada, el logo sale con sus colores.
    */
   logoOscuroEnMenu?: boolean | null;
-  /**
-   * Una foto de obra de la marca, NO la máquina recortada (esa va arriba, en el grupo «PORTADA: tarjeta…», campo «Máquina recortada de la tarjeta»). Es el fondo de la cabecera de la página de la marca y la foto de su tarjeta de la portada mientras no tenga máquina. Si el «Kit de marca» tiene «Foto de fondo de la cabecera», manda esa.
-   */
-  imagenTarjeta?: (number | null) | Media;
-  /**
-   * 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» de la portada. Todas las marcas visibles salen; las que no tienen número, al final por nombre.
-   */
-  ordenPortada?: number | null;
-  /**
-   * «Plantilla 1»: una tarjeta por tipo, como las demás marcas. «Aditamentos»: la plantilla de Andrés de la marca de aditamentos, con un bloque por tipo y sus productos, el contacto, la franja de servicios, «Nuestro compromiso» y las sedes. «Kit de marca»: el diseño nuevo del cliente (2026-10-25) con la cabecera partida en el color de la marca, la píldora de navegación, la cinta de tipos y una sección por tipo; usa el «Color de la marca», la foto de fondo y el emblema de abajo.
-   */
-  disenoPagina?: ('plantilla1' | 'aditamentos' | 'kit') | null;
   /**
    * Solo se usan con el diseño «Aditamentos». Vacío, el texto de siempre.
    */
@@ -478,6 +456,14 @@ export interface MarcasMaquinaria {
     mostrarEmblema?: boolean | null;
   };
   /**
+   * Tamaño recomendado: SVG, o PNG transparente de 600 px de ancho.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Una foto de obra de la marca, NO la máquina recortada (esa va arriba, en el grupo «PORTADA: tarjeta…», campo «Máquina recortada de la tarjeta»). Es el fondo de la cabecera de la página de la marca y la foto de su tarjeta de la portada mientras no tenga máquina. Si el «Kit de marca» tiene «Foto de fondo de la cabecera», manda esa. Tamaño recomendado: 1.200 × 900 px.
+   */
+  imagenTarjeta?: (number | null) | Media;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -485,6 +471,30 @@ export interface MarcasMaquinaria {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * «Plantilla 1»: una tarjeta por tipo, como las demás marcas. «Aditamentos»: la plantilla de Andrés de la marca de aditamentos, con un bloque por tipo y sus productos, el contacto, la franja de servicios, «Nuestro compromiso» y las sedes. «Kit de marca»: el diseño nuevo del cliente (2026-10-25) con la cabecera partida en el color de la marca, la píldora de navegación, la cinta de tipos y una sección por tipo; usa el «Color de la marca», la foto de fondo y el emblema de abajo.
+   */
+  disenoPagina?: ('plantilla1' | 'aditamentos' | 'kit') | null;
+  /**
+   * Desmarcada, la marca, sus tipos y sus equipos desaparecen de toda la web (menú, listados, filtros, portada, buscador y sitemap) sin borrarse del panel, y sus páginas llevan con un 301 a la página de abajo.
+   */
+  mostrarEnWeb?: boolean | null;
+  /**
+   * Categoría de maquinaria nueva a la que redirigen (301) la página de la marca, las de sus tipos y sus fichas. Vacío: el índice de maquinaria nueva.
+   */
+  destinoOculta?: (number | null) | CategoriasMaquinaria;
+  /**
+   * Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap, sus equipos nuevos no se publican en la web, y su tarjeta de «Maquinaria pesada nueva» en la portada lleva a esta dirección. Vacío, la marca tiene su página como siempre.
+   */
+  enlaceExterno?: string | null;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * 1, 2, 3… es el orden de las tarjetas de «Maquinaria pesada nueva» de la portada. Todas las marcas visibles salen; las que no tienen número, al final por nombre.
+   */
+  ordenPortada?: number | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -499,7 +509,7 @@ export interface Media {
   id: number;
   updatedAt: string;
   /**
-   * Describe lo que se ve, como se lo contarías a alguien por teléfono: «Excavadora Hitachi ZX200 trabajando en una obra». Ni «foto1», ni «imagen», ni el nombre del fichero.
+   * Describe lo que se ve, como se lo contarías a alguien por teléfono: «Excavadora Hitachi LANDCROS ZX200 trabajando en una obra». Ni «foto1», ni «imagen», ni el nombre del fichero.
    */
   alt: string;
   actualizadoPor?: (number | null) | User;
@@ -559,19 +569,15 @@ export interface CategoriasMaquinaria {
   id: number;
   _order?: string | null;
   nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
   descripcion?: string | null;
-  /**
-   * Opcional. Foto de la categoría para su tarjeta en el índice de tipos de maquinaria nueva. Si la dejas vacía, se usa la primera foto del primer equipo de la categoría.
-   */
-  imagen?: (number | null) | Media;
   /**
    * Tipos de distintas marcas que se listan en esta categoría. Es lo que define su contenido.
    */
   tiposIncluidos?: (number | TiposMaquinaria)[] | null;
+  /**
+   * Opcional. Foto de la categoría para su tarjeta en el índice de tipos de maquinaria nueva. Si la dejas vacía, se usa la primera foto del primer equipo de la categoría. Tamaño recomendado: 1.200 × 900 px.
+   */
+  imagen?: (number | null) | Media;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -580,6 +586,10 @@ export interface CategoriasMaquinaria {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -591,32 +601,20 @@ export interface CategoriasMaquinaria {
 export interface TiposMaquinaria {
   id: number;
   nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
   marca: number | MarcasMaquinaria;
-  /**
-   * Posición del tipo en la página de su marca, en la barra de tipos y en el menú (1, 2, 3…). Vacío: después de los que tienen orden, por nombre.
-   */
-  orden?: number | null;
   descripcion?: string | null;
-  /**
-   * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.
-   */
-  imagen?: (number | null) | Media;
-  /**
-   * Opcional. La máquina recortada, PNG o WebP con fondo transparente, para la cinta de tipos de la página de la marca (diseño «Kit de marca»). Si la dejas vacía, se usa la imagen de la tarjeta o la primera foto de sus equipos.
-   */
-  render?: (number | null) | Media;
   /**
    * Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Vibrocompactador» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.
    */
   subtipos?: (number | TiposMaquinaria)[] | null;
   /**
-   * Solo para un tipo que todavía NO tiene su página general (una «Categoría de maquinaria nueva» con su nombre): marcada, el índice de tipos y el menú enseñan este tipo y llevan a su página en la marca. Con categoría, el índice y el menú llevan siempre a la categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.
+   * Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo. Tamaño recomendado: 1.200 × 900 px.
    */
-  pestanaIndiceNueva?: boolean | null;
+  imagen?: (number | null) | Media;
+  /**
+   * Opcional. La máquina recortada, PNG o WebP con fondo transparente, para la cinta de tipos de la página de la marca (diseño «Kit de marca»). Si la dejas vacía, se usa la imagen de la tarjeta o la primera foto de sus equipos. Tamaño recomendado: PNG o WebP transparente, 1.600 px de ancho.
+   */
+  render?: (number | null) | Media;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -625,6 +623,18 @@ export interface TiposMaquinaria {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * Solo para un tipo que todavía NO tiene su página general (una «Categoría de maquinaria nueva» con su nombre): marcada, el índice de tipos y el menú enseñan este tipo y llevan a su página en la marca. Con categoría, el índice y el menú llevan siempre a la categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.
+   */
+  pestanaIndiceNueva?: boolean | null;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * Posición del tipo en la página de su marca, en la barra de tipos y en el menú (1, 2, 3…). Vacío: después de los que tienen orden, por nombre.
+   */
+  orden?: number | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -639,7 +649,7 @@ export interface Documento {
   id: number;
   updatedAt: string;
   /**
-   * Para el panel. Ej. «Ficha técnica Hitachi ZX130-7H».
+   * Para el panel. Ej. «Ficha técnica Hitachi LANDCROS ZX130-7H».
    */
   titulo: string;
   /**
@@ -662,6 +672,7 @@ export interface Documento {
  */
 export interface ModelosRepuesto {
   id: number;
+  '_modelos-repuesto_modelos_order'?: string | null;
   nombre: string;
   /**
    * Desmarcado, el modelo desaparece de toda la web (listados del tipo y de la marca, buscador y sitemap) sin borrarse del panel, y su página lleva a la de su tipo. Vuelve al marcarlo.
@@ -700,7 +711,7 @@ export interface ModelosRepuesto {
    */
   tituloPagina?: string | null;
   /**
-   * Sobre las categorías, ej. «repuestos disponibles para excavadora hitachi zx200». Vacío: «Repuestos disponibles para» y el nombre.
+   * Sobre las categorías, ej. «repuestos disponibles para excavadora Hitachi LANDCROS ZX200». Vacío: «Repuestos disponibles para» y el nombre.
    */
   tituloDisponibles?: string | null;
   /**
@@ -735,6 +746,7 @@ export interface ModelosRepuesto {
  */
 export interface Marca {
   id: number;
+  _order?: string | null;
   nombre: string;
   /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
@@ -769,6 +781,14 @@ export interface Marca {
    */
   fondoHero?: (number | null) | Media;
   /**
+   * En el orden en que salen en la web. Arrastra las filas para cambiarlo; un tipo nuevo entra al final.
+   */
+  tipos?: {
+    docs?: (number | TiposEquipo)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -786,6 +806,7 @@ export interface Marca {
  */
 export interface TiposEquipo {
   id: number;
+  '_tipos-equipo_tipos_order'?: string | null;
   nombre: string;
   /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
@@ -846,6 +867,14 @@ export interface TiposEquipo {
    */
   categoriasModelo?: (number | CategoriasTecnica)[] | null;
   /**
+   * En el orden en que salen en la web. Arrastra las filas para cambiarlo; un modelo nuevo entra al final.
+   */
+  modelos?: {
+    docs?: (number | ModelosRepuesto)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -863,6 +892,7 @@ export interface TiposEquipo {
  */
 export interface CategoriasTecnica {
   id: number;
+  _order?: string | null;
   nombre: string;
   /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
@@ -1006,22 +1036,6 @@ export interface MarcasLubricante {
   id: number;
   nombre: string;
   /**
-   * «Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, a la categoría «Lubricantes» (su panel lleva a la portada).
-   */
-  destino?: ('pagina' | 'externo') | null;
-  /**
-   * La web de la marca, completa y con https://. Con «Otra web»: adónde lleva en el menú (vacía, a la categoría «Lubricantes», donde su «Ver productos» lleva a la portada). Con «Su página en este sitio»: «Ver todo» del menú y «Ver productos» del selector llevan a esta web en otra pestaña; su página de aquí sigue igual.
-   */
-  enlaceExterno?: string | null;
-  /**
-   * Pinta su bandera junto al nombre en el menú de Lubricantes. Vacío, sin bandera.
-   */
-  paisOrigen?: ('it' | 'co' | 'de' | 'us' | 'gb' | 'nl' | 'fr' | 'es' | 'jp' | 'kr' | 'cn' | 'br') | null;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  /**
    * Resumen de una o dos líneas, bajo el título.
    */
   entradilla?: string | null;
@@ -1040,19 +1054,50 @@ export interface MarcasLubricante {
     };
     [k: string]: unknown;
   } | null;
-  logo?: (number | null) | Media;
-  /**
-   * La foto del panel de esta marca en la página de la categoría técnica «Lubricantes», teñida con el color principal de la marca. Vacía, la imagen de cabecera; sin ninguna, el panel en su color.
-   */
-  fotoSelector?: (number | null) | Media;
   /**
    * Una o dos líneas bajo el nombre, en el panel de esta marca del selector. Vacío, la primera frase de la entradilla.
    */
   textoSelector?: string | null;
   /**
-   * Foto de fondo de la cabecera de la página. Opcional: sin ella, un fondo oscuro.
+   * El color de acento de la página (botones, franjas, etiquetas): en ENI, el amarillo. El texto sobre él se pone solo en negro o blanco, el que mejor se lea.
+   */
+  colorPrincipal?: string | null;
+  /**
+   * Tamaño recomendado: SVG, o PNG transparente de 600 px de ancho.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * La foto del panel de esta marca en la página de la categoría técnica «Lubricantes», teñida con el color principal de la marca. Vacía, la imagen de cabecera; sin ninguna, el panel en su color. Tamaño recomendado: 1.200 × 900 px.
+   */
+  fotoSelector?: (number | null) | Media;
+  /**
+   * Foto de fondo de la cabecera de la página. Opcional: sin ella, un fondo oscuro. Tamaño recomendado: 2.560 × 1.440 px (horizontal).
    */
   imagenCabecera?: (number | null) | Media;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  /**
+   * «Otra web»: la marca no tiene página aquí (su dirección da «no encontrada» y no sale en el sitemap). En el menú de Lubricantes lleva a su «Enlace externo» en otra pestaña; mientras el enlace esté vacío, a la categoría «Lubricantes» (su panel lleva a la portada).
+   */
+  destino?: ('pagina' | 'externo') | null;
+  /**
+   * La web de la marca, completa y con https://. Con «Otra web»: adónde lleva en el menú (vacía, a la categoría «Lubricantes», donde su «Ver productos» lleva a la portada). Con «Su página en este sitio»: «Ver todo» del menú y «Ver productos» del selector llevan a esta web en otra pestaña; su página de aquí sigue igual.
+   */
+  enlaceExterno?: string | null;
+  /**
+   * Pinta su bandera junto al nombre en el menú de Lubricantes. Vacío, sin bandera.
+   */
+  paisOrigen?: ('it' | 'co' | 'de' | 'us' | 'gb' | 'nl' | 'fr' | 'es' | 'jp' | 'kr' | 'cn' | 'br') | null;
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
   /**
    * Vídeo de fondo de la cabecera (sin sonido, de hasta 4 MB: se carga primero en «Vídeos», con su póster). Se ve solo en pantallas grandes: en móvil, con ahorro de datos o con «reducir movimiento», queda solo la imagen de cabecera.
    */
@@ -1062,21 +1107,9 @@ export interface MarcasLubricante {
    */
   disenoPropio?: boolean | null;
   /**
-   * El color de acento de la página (botones, franjas, etiquetas): en ENI, el amarillo. El texto sobre él se pone solo en negro o blanco, el que mejor se lea.
-   */
-  colorPrincipal?: string | null;
-  /**
    * El fondo oscuro de la cabecera y de la zona de contacto: en ENI, el negro.
    */
   colorOscuro?: string | null;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -1125,10 +1158,6 @@ export interface EquiposUsado {
    */
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug?: string | null;
-  /**
    * Determina en qué listado de categoría aparece la unidad.
    */
   categoria: number | CategoriasUsada;
@@ -1136,7 +1165,6 @@ export interface EquiposUsado {
    * Si la marca no está en la lista, créala aquí mismo: tendrá su propia página en el sitio.
    */
   marcaUsada?: (number | null) | MarcasUsada;
-  marca?: string | null;
   modelo?: string | null;
   /**
    * Año del equipo, no de la publicación.
@@ -1165,11 +1193,26 @@ export interface EquiposUsado {
    */
   descripcionCorta?: string | null;
   descripcion?: string | null;
-  imagenes?: (number | Media)[] | null;
   /**
    * Opcional. Sale como «Ficha técnica» en la tarjeta de la portada. Sin documento, el botón no aparece. Súbelo aquí con «Crear» (PDF, máximo 30 MB) o elige uno ya subido en «Documentos».
    */
   fichaTecnicaPdf?: (number | null) | Documento;
+  /**
+   * Tamaño recomendado: 1.600 px de ancho o más; la primera es la de la tarjeta.
+   */
+  imagenes?: (number | Media)[] | null;
+  /**
+   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
+   */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug?: string | null;
   /**
    * Desmarcada, la unidad desaparece de toda la web (listados, portada, menú, buscador y sitemap) sin borrarse del panel, y su página lleva a su categoría de forma temporal. Para una unidad VENDIDA usa «Disponible».
    */
@@ -1186,14 +1229,7 @@ export interface EquiposUsado {
    * Sin efecto desde el 2026-11-09: la portada ya no enseña unidades (se quitó el carrusel). Se conserva el dato.
    */
   pestanaPortada?: ('categoria' | 'aditamentos') | null;
-  /**
-   * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
-   */
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    ogImage?: (number | null) | Media;
-  };
+  marca?: string | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -1205,27 +1241,19 @@ export interface EquiposUsado {
 export interface CategoriasUsada {
   id: number;
   nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
   descripcion?: string | null;
-  /**
-   * Opcional. La foto de la tarjeta de esta categoría en la página «Maquinaria pesada usada». Vacía, sale la primera foto de su unidad más reciente.
-   */
-  imagen?: (number | null) | Media;
   /**
    * Marcada, la categoría sale dentro de «Otros» (menú e índice de usados). Desmarcada, sale sola en el primer nivel, como Excavadora y Aditamentos. Su página no cambia.
    */
   enOtros?: boolean | null;
   /**
-   * Desmarcada, la categoría y sus unidades desaparecen de toda la web (menú, índice, «Otros», pestañas, listados y sitemap) sin borrarse del panel, y su dirección da «página no encontrada». Para llevarla a otra página, crear una redirección en «Redirecciones».
-   */
-  mostrarEnWeb?: boolean | null;
-  /**
    * Solo para las que NO van en «Otros»: el número más bajo sale primero (vacío, al final, por nombre). «Otros» va siempre detrás.
    */
   orden?: number | null;
+  /**
+   * Opcional. La foto de la tarjeta de esta categoría en la página «Maquinaria pesada usada». Vacía, sale la primera foto de su unidad más reciente. Tamaño recomendado: 1.200 × 900 px.
+   */
+  imagen?: (number | null) | Media;
   /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
@@ -1234,6 +1262,14 @@ export interface CategoriasUsada {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * Desmarcada, la categoría y sus unidades desaparecen de toda la web (menú, índice, «Otros», pestañas, listados y sitemap) sin borrarse del panel, y su dirección da «página no encontrada». Para llevarla a otra página, crear una redirección en «Redirecciones».
+   */
+  mostrarEnWeb?: boolean | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -1248,17 +1284,9 @@ export interface MarcasUsada {
   id: number;
   nombre: string;
   /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
-  /**
    * Texto bajo el título de la página de la marca. También sirve de descripción en Google si no escribes una abajo.
    */
   descripcion?: string | null;
-  /**
-   * Opcional. Sale en la tarjeta de la marca en la página «Maquinaria pesada usada» (entero, sobre gris claro: mejor un logo de color). Vacío, sale la primera foto de su unidad más reciente. Todavía no sale en la página de la marca.
-   */
-  logo?: (number | null) | Media;
   /**
    * Opcional. Si la vendemos nueva, su página enlaza a la de nueva.
    */
@@ -1268,6 +1296,10 @@ export interface MarcasUsada {
    */
   marcaRepuestos?: (number | null) | Marca;
   /**
+   * Opcional. Sale en la tarjeta de la marca en la página «Maquinaria pesada usada» (entero, sobre gris claro: mejor un logo de color). Vacío, sale la primera foto de su unidad más reciente. Todavía no sale en la página de la marca. Tamaño recomendado: SVG, o PNG transparente de 600 px de ancho.
+   */
+  logo?: (number | null) | Media;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -1275,6 +1307,10 @@ export interface MarcasUsada {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -1286,15 +1322,7 @@ export interface MarcasUsada {
 export interface CategoriasLubricante {
   id: number;
   nombre: string;
-  /**
-   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
-   */
-  slug: string;
   marca: number | MarcasLubricante;
-  /**
-   * Posición de la línea en la página de la marca y en el menú «Lubricantes» (1, 2, 3…). Vacío, después de las que tienen orden, por nombre.
-   */
-  orden?: number | null;
   /**
    * Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su página.
    */
@@ -1318,14 +1346,6 @@ export interface CategoriasLubricante {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Foto de su tarjeta en la página de la marca. También la de la cabecera de su página si «Imagen de cabecera» está vacía.
-   */
-  imagen?: (number | null) | Media;
-  /**
-   * Opcional. Fondo de la cabecera de su página. Vacía, la «Imagen» de la línea; sin ninguna, fondo oscuro.
-   */
-  imagenCabecera?: (number | null) | Media;
   /**
    * En este orden en la página. Nombre y grado tal como los publica el fabricante; no inventes especificaciones.
    */
@@ -1357,6 +1377,14 @@ export interface CategoriasLubricante {
       }[]
     | null;
   /**
+   * Foto de su tarjeta en la página de la marca. También la de la cabecera de su página si «Imagen de cabecera» está vacía. Tamaño recomendado: 1.200 × 900 px.
+   */
+  imagen?: (number | null) | Media;
+  /**
+   * Opcional. Fondo de la cabecera de su página. Vacía, la «Imagen» de la línea; sin ninguna, fondo oscuro. Tamaño recomendado: 2.560 × 1.440 px (horizontal).
+   */
+  imagenCabecera?: (number | null) | Media;
+  /**
    * Opcional. Debajo ves cómo saldrá en Google y qué se usa si lo dejas vacío.
    */
   seo?: {
@@ -1364,6 +1392,14 @@ export interface CategoriasLubricante {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
+  /**
+   * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
+   */
+  slug: string;
+  /**
+   * Posición de la línea en la página de la marca y en el menú «Lubricantes» (1, 2, 3…). Vacío, después de las que tienen orden, por nombre.
+   */
+  orden?: number | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -1474,7 +1510,7 @@ export interface Pagina {
            */
           mostrarDescripcion?: boolean | null;
           /**
-           * Ej. «Potencia Hitachi». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas. Obligatorio aunque esté oculto: lo usan los lectores de pantalla.
+           * Ej. «Potencia Hitachi LANDCROS». Se pinta en mayúsculas por diseño. Un salto de línea parte el título en varias líneas. Obligatorio aunque esté oculto: lo usan los lectores de pantalla.
            */
           titulo: string;
           /**
@@ -1741,7 +1777,7 @@ export interface Pagina {
      */
     verMasTexto?: string | null;
     /**
-     * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina; la de la portada va en la banda «Marcas de repuestos».
+     * Ya no se pinta en esta sección (diseño v3 del cliente). Solo la usa el botón «Repuestos» de la barra de secciones de la portada cuando ese botón no tiene imagen propia.
      */
     maquina?: (number | null) | Media;
     /**
@@ -2807,6 +2843,7 @@ export interface SolicitudesSelect<T extends boolean = true> {
  * via the `definition` "modelos-repuesto_select".
  */
 export interface ModelosRepuestoSelect<T extends boolean = true> {
+  '_modelos-repuesto_modelos_order'?: T;
   nombre?: T;
   mostrarEnWeb?: T;
   slug?: T;
@@ -2842,6 +2879,7 @@ export interface ModelosRepuestoSelect<T extends boolean = true> {
  * via the `definition` "marcas_select".
  */
 export interface MarcasSelect<T extends boolean = true> {
+  _order?: T;
   nombre?: T;
   slug?: T;
   descripcion?: T;
@@ -2851,6 +2889,7 @@ export interface MarcasSelect<T extends boolean = true> {
   colorBaldosa?: T;
   logoBaldosa?: T;
   fondoHero?: T;
+  tipos?: T;
   seo?:
     | T
     | {
@@ -2867,6 +2906,7 @@ export interface MarcasSelect<T extends boolean = true> {
  * via the `definition` "tipos-equipo_select".
  */
 export interface TiposEquipoSelect<T extends boolean = true> {
+  '_tipos-equipo_tipos_order'?: T;
   nombre?: T;
   slug?: T;
   marca?: T;
@@ -2890,6 +2930,7 @@ export interface TiposEquipoSelect<T extends boolean = true> {
         id?: T;
       };
   categoriasModelo?: T;
+  modelos?: T;
   seo?:
     | T
     | {
@@ -2906,6 +2947,7 @@ export interface TiposEquipoSelect<T extends boolean = true> {
  * via the `definition` "categorias-tecnicas_select".
  */
 export interface CategoriasTecnicasSelect<T extends boolean = true> {
+  _order?: T;
   nombre?: T;
   slug?: T;
   padre?: T;
@@ -2973,22 +3015,11 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
  */
 export interface EquiposNuevosSelect<T extends boolean = true> {
   nombre?: T;
-  mostrarEnWeb?: T;
-  slug?: T;
   marca?: T;
   tipo?: T;
-  orden?: T;
   codigo?: T;
-  pesoOperativoKg?: T;
   entradilla?: T;
   descripcion?: T;
-  destacados?:
-    | T
-    | {
-        texto?: T;
-        id?: T;
-      };
-  imagenes?: T;
   fichaTecnica?:
     | T
     | {
@@ -3000,7 +3031,7 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
       };
   fichaTecnicaPdf?: T;
   vista360?: T;
-  documentos?: T;
+  imagenes?: T;
   seo?:
     | T
     | {
@@ -3008,6 +3039,17 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  mostrarEnWeb?: T;
+  slug?: T;
+  orden?: T;
+  pesoOperativoKg?: T;
+  destacados?:
+    | T
+    | {
+        texto?: T;
+        id?: T;
+      };
+  documentos?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3018,10 +3060,8 @@ export interface EquiposNuevosSelect<T extends boolean = true> {
  */
 export interface EquiposUsadosSelect<T extends boolean = true> {
   nombre?: T;
-  slug?: T;
   categoria?: T;
   marcaUsada?: T;
-  marca?: T;
   modelo?: T;
   anio?: T;
   horometro?: T;
@@ -3032,12 +3072,8 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
   serial?: T;
   descripcionCorta?: T;
   descripcion?: T;
-  imagenes?: T;
   fichaTecnicaPdf?: T;
-  mostrarEnWeb?: T;
-  disponible?: T;
-  fechaPublicacion?: T;
-  pestanaPortada?: T;
+  imagenes?: T;
   seo?:
     | T
     | {
@@ -3045,6 +3081,12 @@ export interface EquiposUsadosSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  slug?: T;
+  mostrarEnWeb?: T;
+  disponible?: T;
+  fechaPublicacion?: T;
+  pestanaPortada?: T;
+  marca?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3066,17 +3108,9 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
         distribuidorNombre?: T;
         distribuidorLogo?: T;
       };
-  mostrarEnWeb?: T;
-  destinoOculta?: T;
-  enlaceExterno?: T;
-  slug?: T;
   descripcion?: T;
-  logo?: T;
   colorMarca?: T;
   logoOscuroEnMenu?: T;
-  imagenTarjeta?: T;
-  ordenPortada?: T;
-  disenoPagina?: T;
   plantillaAditamentos?:
     | T
     | {
@@ -3104,6 +3138,8 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
         emblema?: T;
         mostrarEmblema?: T;
       };
+  logo?: T;
+  imagenTarjeta?: T;
   seo?:
     | T
     | {
@@ -3111,6 +3147,12 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  disenoPagina?: T;
+  mostrarEnWeb?: T;
+  destinoOculta?: T;
+  enlaceExterno?: T;
+  slug?: T;
+  ordenPortada?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3121,14 +3163,11 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
  */
 export interface TiposMaquinariaSelect<T extends boolean = true> {
   nombre?: T;
-  slug?: T;
   marca?: T;
-  orden?: T;
   descripcion?: T;
+  subtipos?: T;
   imagen?: T;
   render?: T;
-  subtipos?: T;
-  pestanaIndiceNueva?: T;
   seo?:
     | T
     | {
@@ -3136,6 +3175,9 @@ export interface TiposMaquinariaSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  pestanaIndiceNueva?: T;
+  slug?: T;
+  orden?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3147,10 +3189,9 @@ export interface TiposMaquinariaSelect<T extends boolean = true> {
 export interface CategoriasMaquinariaSelect<T extends boolean = true> {
   _order?: T;
   nombre?: T;
-  slug?: T;
   descripcion?: T;
-  imagen?: T;
   tiposIncluidos?: T;
+  imagen?: T;
   seo?:
     | T
     | {
@@ -3158,6 +3199,7 @@ export interface CategoriasMaquinariaSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  slug?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3168,12 +3210,10 @@ export interface CategoriasMaquinariaSelect<T extends boolean = true> {
  */
 export interface CategoriasUsadaSelect<T extends boolean = true> {
   nombre?: T;
-  slug?: T;
   descripcion?: T;
-  imagen?: T;
   enOtros?: T;
-  mostrarEnWeb?: T;
   orden?: T;
+  imagen?: T;
   seo?:
     | T
     | {
@@ -3181,6 +3221,8 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  slug?: T;
+  mostrarEnWeb?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3191,11 +3233,10 @@ export interface CategoriasUsadaSelect<T extends boolean = true> {
  */
 export interface MarcasUsadaSelect<T extends boolean = true> {
   nombre?: T;
-  slug?: T;
   descripcion?: T;
-  logo?: T;
   marcaNueva?: T;
   marcaRepuestos?: T;
+  logo?: T;
   seo?:
     | T
     | {
@@ -3203,6 +3244,7 @@ export interface MarcasUsadaSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  slug?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3213,20 +3255,13 @@ export interface MarcasUsadaSelect<T extends boolean = true> {
  */
 export interface MarcasLubricanteSelect<T extends boolean = true> {
   nombre?: T;
-  destino?: T;
-  enlaceExterno?: T;
-  paisOrigen?: T;
-  slug?: T;
   entradilla?: T;
   descripcion?: T;
+  textoSelector?: T;
+  colorPrincipal?: T;
   logo?: T;
   fotoSelector?: T;
-  textoSelector?: T;
   imagenCabecera?: T;
-  videoCabecera?: T;
-  disenoPropio?: T;
-  colorPrincipal?: T;
-  colorOscuro?: T;
   seo?:
     | T
     | {
@@ -3234,6 +3269,13 @@ export interface MarcasLubricanteSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  destino?: T;
+  enlaceExterno?: T;
+  paisOrigen?: T;
+  slug?: T;
+  videoCabecera?: T;
+  disenoPropio?: T;
+  colorOscuro?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3244,14 +3286,10 @@ export interface MarcasLubricanteSelect<T extends boolean = true> {
  */
 export interface CategoriasLubricanteSelect<T extends boolean = true> {
   nombre?: T;
-  slug?: T;
   marca?: T;
-  orden?: T;
   enlaceMenu?: T;
   entradilla?: T;
   descripcion?: T;
-  imagen?: T;
-  imagenCabecera?: T;
   productos?:
     | T
     | {
@@ -3264,6 +3302,8 @@ export interface CategoriasLubricanteSelect<T extends boolean = true> {
         mostrarEnWeb?: T;
         id?: T;
       };
+  imagen?: T;
+  imagenCabecera?: T;
   seo?:
     | T
     | {
@@ -3271,6 +3311,8 @@ export interface CategoriasLubricanteSelect<T extends boolean = true> {
         metaDescription?: T;
         ogImage?: T;
       };
+  slug?: T;
+  orden?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;

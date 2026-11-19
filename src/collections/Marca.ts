@@ -1,4 +1,5 @@
 import { campoColorMarca } from "@/lib/fields/colorMarca";
+import { joinsSoloEnElPanel } from "./hooks/joinsSoloEnElPanel";
 import { validarColor } from "@/lib/fields/tipografiaTitulo";
 import type { CollectionConfig } from "payload";
 
@@ -25,6 +26,12 @@ export const Marca: CollectionConfig = {
     defaultColumns: ["nombre", "slug"],
     group: "Repuestos",
   },
+  /*
+   * ORDEN POR ARRASTRE (2026-11-19, dirección; informe del panel §6): `_order` oculto de Payload,
+   * con el orden inicial de hoy (por nombre) puesto por la migración. Lo nuevo entra al final.
+   * La web lo usa cuando D cambie sus consultas (§6.3).
+   */
+  orderable: true,
   access: {
     read: lecturaContenido,
     create: escrituraContenido,
@@ -33,6 +40,7 @@ export const Marca: CollectionConfig = {
   },
   // ISR: revalida la marca, los índices y su subárbol. Ver lib/revalidation.ts.
   hooks: {
+    beforeOperation: [joinsSoloEnElPanel],
     afterChange: [revalidarMarca, menu.afterChange],
     afterDelete: [revalidarMarcaBorrada, menu.afterDelete],
   },
@@ -117,6 +125,24 @@ export const Marca: CollectionConfig = {
       admin: {
         description:
           "Opcional. Foto de obra a todo el ancho detrás del título de la página de la marca.",
+      },
+    },
+    /*
+     * LOS TIPOS DE LA MARCA, EN SU ORDEN (2026-11-19): se arrastran aquí, dentro de la marca
+     * (join ordenable: el orden es de cada marca). Solo en el panel (`joinsSoloEnElPanel`).
+     */
+    {
+      name: "tipos",
+      type: "join",
+      collection: "tipos-equipo",
+      on: "marca",
+      orderable: true,
+      defaultLimit: 100,
+      label: "Tipos de equipo de la marca",
+      admin: {
+        defaultColumns: ["nombre", "slug"],
+        description:
+          "En el orden en que salen en la web. Arrastra las filas para cambiarlo; un tipo nuevo entra al final.",
       },
     },
     // Buscadores y redes sociales (2026-10-13, aprobado por dirección): las

@@ -417,10 +417,11 @@ describe("megamenú: lubricantes (2026-10-20)", () => {
     assert.deepEqual(
       p.grupos[0]!.enlaces.map((e) => [e.etiqueta, e.href]),
       [
+        // En el orden que trae la consulta (el del arrastre en la ficha de la marca), no por nombre.
         ["Ver todo Lubricantes Eni", "/lubricantes/lubricantes-eni/"],
+        ["Motos & Scooter", "/lubricantes/lubricantes-eni/motos-scooter/"],
         ["Auto liviano", "/lubricantes/lubricantes-eni/auto-liviano/"],
         ["Engranajes", "/lubricantes/lubricantes-eni/engranajes/"],
-        ["Motos & Scooter", "/lubricantes/lubricantes-eni/motos-scooter/"],
       ],
     );
   });

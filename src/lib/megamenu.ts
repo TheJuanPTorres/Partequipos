@@ -540,7 +540,9 @@ export function panelLubricantes(d: DatosMegamenu): PanelMenu | null {
       (a, b) => Number(tienePaginaPropiaLubricante(b)) - Number(tienePaginaPropiaLubricante(a)),
     );
   if (marcas.length === 0) return null;
-  const categorias = [...(d.categoriasLubricante ?? [])].sort(porNombre);
+  // Las líneas de cada marca, en el orden del panel (arrastrando en la ficha de la marca), que ya
+  // trae la consulta: el mismo de la página de la marca (2026-11-19, dirección).
+  const categorias = d.categoriasLubricante ?? [];
   return {
     verTodo: {
       etiqueta: "Ver todos los lubricantes",

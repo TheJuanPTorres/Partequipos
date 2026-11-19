@@ -71,6 +71,8 @@ export const ORDEN_DE_ENTRADAS = [
   "documentos",
   "videos",
   "seo",
+  "buscador",
+  "busquedas-sin-resultado",
   "correo-formularios",
   "redirects",
   "users",

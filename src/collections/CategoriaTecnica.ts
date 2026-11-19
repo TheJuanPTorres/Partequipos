@@ -1,4 +1,5 @@
 import type { CollectionConfig, RelationshipFieldSingleValidation, Where } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { validarColor } from "../lib/fields/tipografiaTitulo";
 import { seoField } from "../lib/fields/seoField";
@@ -187,7 +188,8 @@ export const CategoriaTecnica: CollectionConfig = {
           "Opcional. Foto horizontal de obra a todo el ancho para la cabecera de su página. Vacía, la imagen de la tarjeta (y sin ella, la de la primera marca de repuestos con foto).",
       },
     },
-    {
+    // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+    ocultoSinUso({
       name: "icono",
       type: "select",
       label: "Icono",
@@ -206,7 +208,7 @@ export const CategoriaTecnica: CollectionConfig = {
         { label: "Componentes mayores", value: "componentes" },
         { label: "Motor diésel", value: "diesel" },
       ],
-    },
+    }),
     /*
      * Título de la tarjeta de la portada (2026-10-02): ux-9 dice «Blades y
      * corte» donde el catálogo dice «Herramienta de Corte (GETS)». Vacío, la

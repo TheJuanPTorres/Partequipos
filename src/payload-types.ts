@@ -87,6 +87,7 @@ export interface Config {
     'preguntas-frecuentes': PreguntasFrecuente;
     testimonios: Testimonio;
     sedes: Sede;
+    'busquedas-sin-resultado': BusquedasSinResultado;
     media: Media;
     documentos: Documento;
     videos: Video;
@@ -121,6 +122,7 @@ export interface Config {
     'preguntas-frecuentes': PreguntasFrecuentesSelect<false> | PreguntasFrecuentesSelect<true>;
     testimonios: TestimoniosSelect<false> | TestimoniosSelect<true>;
     sedes: SedesSelect<false> | SedesSelect<true>;
+    'busquedas-sin-resultado': BusquedasSinResultadoSelect<false> | BusquedasSinResultadoSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     documentos: DocumentosSelect<false> | DocumentosSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
@@ -145,6 +147,7 @@ export interface Config {
     'repuestos-marca': RepuestosMarca;
     'paginas-indice': PaginasIndice;
     'vacantes-buk': VacantesBuk;
+    buscador: Buscador;
     'correo-formularios': CorreoFormulario;
   };
   globalsSelect: {
@@ -155,6 +158,7 @@ export interface Config {
     'repuestos-marca': RepuestosMarcaSelect<false> | RepuestosMarcaSelect<true>;
     'paginas-indice': PaginasIndiceSelect<false> | PaginasIndiceSelect<true>;
     'vacantes-buk': VacantesBukSelect<false> | VacantesBukSelect<true>;
+    buscador: BuscadorSelect<false> | BuscadorSelect<true>;
     'correo-formularios': CorreoFormulariosSelect<false> | CorreoFormulariosSelect<true>;
   };
   locale: null;
@@ -390,7 +394,7 @@ export interface MarcasMaquinaria {
    */
   destinoOculta?: (number | null) | CategoriasMaquinaria;
   /**
-   * Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap, y su tarjeta de «Maquinaria pesada nueva» en la portada lleva a esta dirección. Vacío, la marca tiene su página como siempre.
+   * Solo para una marca que NO tiene página en este sitio (por ejemplo, la de un distribuidor oficial). Relleno, sus enlaces del menú y del índice de marcas llevan a esta dirección en otra pestaña (en la banda de logos de la portada el logo no es enlace, como los demás), su página de aquí deja de existir, no sale en el sitemap, sus equipos nuevos no se publican en la web, y su tarjeta de «Maquinaria pesada nueva» en la portada lleva a esta dirección. Vacío, la marca tiene su página como siempre.
    */
   enlaceExterno?: string | null;
   /**
@@ -2548,6 +2552,24 @@ export interface Sede {
   createdAt: string;
 }
 /**
+ * Lo que los visitantes buscaron y no encontraron, de la más repetida a la menos. Solo se guarda el texto y cuántas veces se repitió: nada de quien buscó. Si una se repite, añade un sinónimo en «Buscador» o crea la página que falta. Bórrala cuando la hayas atendido.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "busquedas-sin-resultado".
+ */
+export interface BusquedasSinResultado {
+  id: number;
+  texto: string;
+  /**
+   * Cuántas veces se buscó sin encontrar nada.
+   */
+  veces?: number | null;
+  ultimaVez?: string | null;
+  actualizadoPor?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Redirecciones de URLs antiguas hacia las vigentes. Evita perder posicionamiento cuando una URL cambia.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2684,6 +2706,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'sedes';
         value: number | Sede;
+      } | null)
+    | ({
+        relationTo: 'busquedas-sin-resultado';
+        value: number | BusquedasSinResultado;
       } | null)
     | ({
         relationTo: 'media';
@@ -3781,6 +3807,18 @@ export interface SedesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "busquedas-sin-resultado_select".
+ */
+export interface BusquedasSinResultadoSelect<T extends boolean = true> {
+  texto?: T;
+  veces?: T;
+  ultimaVez?: T;
+  actualizadoPor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
@@ -4124,7 +4162,7 @@ export interface RepuestosMarca {
    */
   tituloHero?: string | null;
   /**
-   * Ej.: «En Colombia» → «CATERPILLAR En Colombia». En las marcas y sus tipos; las categorías técnicas no la llevan.
+   * Sin uso: la cabecera de la marca y del tipo lleva solo el nombre de la marca.
    */
   subtituloHero?: string | null;
   /**
@@ -4434,6 +4472,25 @@ export interface VacantesBuk {
     | number
     | boolean
     | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Ayuda al buscador del sitio a entender cómo hablan tus clientes. Las búsquedas que no encontraron nada están en «Búsquedas sin resultado».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "buscador".
+ */
+export interface Buscador {
+  id: number;
+  /**
+   * Una línea por grupo, con las palabras separadas por «=» o por comas. Por ejemplo: «dientes = gets = cuchillas». Quien escriba cualquiera de ellas encontrará también lo de las demás. Ya vienen incluidos los más comunes (retro, pala, aceite, rodaje, filtro…).
+   */
+  sinonimos?: string | null;
+  /**
+   * Marcada, se guarda el texto de lo que nadie encontró y cuántas veces se repitió (nunca datos de quien busca). Desmarcada, no se guarda nada.
+   */
+  guardarSinResultado?: boolean | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -4769,6 +4826,17 @@ export interface VacantesBukSelect<T extends boolean = true> {
   ultimoIntento?: T;
   ultimoError?: T;
   vacantes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "buscador_select".
+ */
+export interface BuscadorSelect<T extends boolean = true> {
+  sinonimos?: T;
+  guardarSinResultado?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

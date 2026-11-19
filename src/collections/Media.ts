@@ -103,7 +103,7 @@ export const Media: CollectionConfig = {
       validate: validarAlt,
       admin: {
         description:
-          "Describe lo que se ve, como se lo contarías a alguien por teléfono: «Excavadora Hitachi ZX200 trabajando en una obra». Ni «foto1», ni «imagen», ni el nombre del fichero.",
+          "Describe lo que se ve, como se lo contarías a alguien por teléfono: «Excavadora Hitachi LANDCROS ZX200 trabajando en una obra». Ni «foto1», ni «imagen», ni el nombre del fichero.",
       },
     },
   ],

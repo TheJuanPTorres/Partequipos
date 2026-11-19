@@ -107,7 +107,7 @@ const MARCAS: [string, string, string, string][] = [
   ["case-construction", "Case Construction", "case", "#f3e7cc"],
   ["caterpillar", "Caterpillar", "caterpillar", "#ffcd11"],
   ["doosan", "Doosan", "doosan-blanco", "#005eb7"],
-  ["hitachi", "Hitachi LANDCROS", "hitachi-landcros-blanco", "#f36c1b"],
+  ["hitachi-landcros", "Hitachi LANDCROS", "hitachi-landcros-blanco", "#f36c1b"],
   ["hyundai", "Hyundai", "hyundai-blanco", "#2c4b97"],
   ["kobelco", "Kobelco", "kobelco-blanco", "#15a4af"],
   ["komatsu", "Komatsu", "komatsu-blanco", "#000099"],

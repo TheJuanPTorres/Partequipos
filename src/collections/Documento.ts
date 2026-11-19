@@ -58,7 +58,7 @@ export const Documento: CollectionConfig = {
       type: "text",
       required: true,
       label: "Nombre del documento",
-      admin: { description: "Para el panel. Ej. «Ficha técnica Hitachi ZX130-7H»." },
+      admin: { description: "Para el panel. Ej. «Ficha técnica Hitachi LANDCROS ZX130-7H»." },
     },
     /*
      * Las páginas del PDF como imágenes (2026-10-20), para el bloque «Documento

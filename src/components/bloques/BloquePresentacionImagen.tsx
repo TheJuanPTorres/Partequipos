@@ -11,7 +11,7 @@ import estilos from "./presentacionImagen.module.css";
 /** ux-9: los dos títulos de este bloque van más rápidos que el ritmo por defecto. */
 const RITMO = { escalon: 0.08, duracion: 0.75 } as const;
 
-const SIZES = "(max-width: 767px) 92vw, 455px";
+const SIZES = "(max-width: 767px) 92vw, max(455px, 28.438vw)";
 /** La foto apaisada ocupa su columna entera (media página menos márgenes). */
 const SIZES_APAISADA = "(max-width: 767px) 92vw, 47vw";
 

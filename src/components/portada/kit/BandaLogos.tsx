@@ -169,7 +169,7 @@ function LogoDeBanda({
         logo={logo}
         caja={CAJA_BANDA_REPUESTOS}
         alt={alt}
-        sizes="(min-width: 1025px) max(152px, 10.8vw), 152px"
+        sizes="(min-width: 1025px) max(152px, 10.8vw), max(152px, 9.5vw)"
         className={estilos.logoOptico}
       />
     );

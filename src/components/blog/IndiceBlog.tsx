@@ -312,8 +312,8 @@ export function TarjetaArticulo({
               // más ancha (×1,25–1,57 con los valores de antes; revisión responsive, 2026-11-16).
               sizes={
                 destacada
-                  ? "(max-width: 767px) 120vw, (max-width: 1024px) 90vw, 800px"
-                  : "(max-width: 767px) 120vw, (max-width: 1024px) 45vw, 440px"
+                  ? "(max-width: 767px) 120vw, (max-width: 1024px) 90vw, max(800px, 50vw)"
+                  : "(max-width: 767px) 120vw, (max-width: 1024px) 45vw, max(440px, 27.5vw)"
               }
               className={estilos.fotoImg}
               style={{ objectPosition: imagen.posicion }}

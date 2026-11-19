@@ -47,7 +47,7 @@ export function SeccionTipoKit({
                   src={seccion.render.imagen.url}
                   alt=""
                   fill
-                  sizes="210px"
+                  sizes="max(210px, 13.125vw)"
                   style={seccion.render.recortado ? undefined : { objectPosition: "bottom" }}
                 />
               </span>

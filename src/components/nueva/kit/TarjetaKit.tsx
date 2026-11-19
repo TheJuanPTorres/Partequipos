@@ -45,7 +45,7 @@ export function TarjetaKit({
             alt=""
             fill
             priority={prioridad}
-            sizes="(max-width: 767px) 90vw, (max-width: 1024px) 45vw, 560px"
+            sizes="(max-width: 767px) 90vw, (max-width: 1024px) 45vw, max(560px, 35vw)"
             style={{ objectPosition: foto.posicion }}
           />
         ) : null}

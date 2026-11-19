@@ -79,7 +79,7 @@ export function ProductosLinea({
                           alt={p.imagen.alt}
                           width={p.imagen.width}
                           height={p.imagen.height}
-                          sizes="(max-width: 767px) 88vw, (max-width: 1024px) 44vw, 280px"
+                          sizes="(max-width: 767px) 88vw, (max-width: 1024px) 44vw, max(280px, 17.5vw)"
                           className={estilos.foto}
                         />
                       ) : null}

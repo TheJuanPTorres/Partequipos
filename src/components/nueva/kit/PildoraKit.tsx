@@ -175,7 +175,11 @@ export function PildoraKit({
         >
           {logo ? (
             // Sobre la cápsula clara: el logo con su regla común (en tinta oscura si es blanco).
-            <LogoMarca logo={{ ...logo, oscuro: logo.oscuro ?? false }} alt="" sizes="96px" />
+            <LogoMarca
+              logo={{ ...logo, oscuro: logo.oscuro ?? false }}
+              alt=""
+              sizes="max(96px, 6vw)"
+            />
           ) : (
             <span>{nombre}</span>
           )}

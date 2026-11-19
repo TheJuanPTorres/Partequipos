@@ -96,7 +96,7 @@ export function BloqueLubricantes({
                 <LogoMarca
                   logo={bloque.marca.logo}
                   alt={bloque.marca.logo.alt}
-                  sizes="115px"
+                  sizes="max(115px, 7.187vw)"
                   className={estilos.logo}
                 />
               ) : null}

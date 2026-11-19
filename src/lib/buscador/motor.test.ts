@@ -75,6 +75,15 @@ const DOCS: DocBusqueda[] = [
   doc("c2", "categoria", "Tren de rodaje", {
     campos: { descripcion: "Cadenas, zapatas y rodillos" },
   }),
+  doc("n5", "nueva", "Cadenas de llanta para minicargador", {
+    marca: "Bobcat",
+    tipo: "Minicargadores",
+    campos: {
+      marca: "Bobcat",
+      tipo: "Minicargadores",
+      descripcion: "Cadenas para trabajo pesado en rodaje de barro",
+    },
+  }),
   doc("c3", "categoria", "Herramienta de corte (GETS)", {
     campos: { descripcion: "Dientes y cuchillas para baldes" },
   }),
@@ -150,7 +159,10 @@ describe("buscador: sinónimos del sector", () => {
   it("«retro» → retroexcavadora", () => assert.equal(primero("retro"), "n3"));
   it("«pala» → cargadores/minicargadores", () => assert.ok(ids("pala cargadora").length >= 0));
   it("«aceite» → lubricantes", () => assert.equal(primero("aceite"), "l1"));
-  it("«rodaje» → tren de rodaje", () => assert.equal(primero("rodaje"), "c2"));
+  it("«rodaje» pone «Tren de rodaje» primero, antes que lo que solo coincide por «cadena»", () => {
+    assert.equal(primero("rodaje"), "c2");
+    assert.ok(ids("rodaje").includes("n5"));
+  });
   it("«filtro» → filtración", () => assert.equal(primero("filtro"), "c1"));
   it("los sinónimos del panel se suman", () => {
     const con = crearIndice(DOCS, [["dientes", "gets"]]);

@@ -129,7 +129,7 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
       detalle: unir("Maquinaria nueva", marca.nombre, tipo.nombre),
       marca: marca.nombre,
       tipo: tipo.nombre,
-      imagen: imagen((e.imagenes ?? [])[0]),
+      imagen: imagen((e.imagenes ?? [])[0]) ?? imagen(tipo.imagen) ?? imagen(marca.logo),
       campos: {
         titulo: e.nombre,
         codigo: e.codigo ?? undefined,
@@ -153,7 +153,7 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
       detalle: unir("Maquinaria usada", categoria.nombre, u.anio ? String(u.anio) : ""),
       marca: marca || undefined,
       tipo: categoria.nombre,
-      imagen: imagen((u.imagenes ?? [])[0]),
+      imagen: imagen((u.imagenes ?? [])[0]) ?? imagen(categoria.imagen),
       campos: {
         titulo: u.nombre,
         codigo: u.modelo ?? undefined,
@@ -177,7 +177,7 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
       detalle: unir("Repuestos", marca.nombre, tipo.nombre),
       marca: marca.nombre,
       tipo: tipo.nombre,
-      imagen: imagen((m.imagenes ?? [])[0]),
+      imagen: imagen((m.imagenes ?? [])[0]) ?? imagen(tipo.imagen) ?? imagen(marca.logo),
       campos: {
         titulo: m.nombre,
         codigo: unir(m.codigo, m.serie) || undefined,
@@ -272,7 +272,7 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
       detalle: unir("Repuestos", marca.nombre, t.nombre),
       marca: marca.nombre,
       tipo: t.nombre,
-      imagen: imagen(t.imagen),
+      imagen: imagen(t.imagen) ?? imagen(marca.logo),
       campos: {
         titulo: `Repuestos ${t.nombre} ${marca.nombre}`,
         marca: marca.nombre,
@@ -321,7 +321,7 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
       href: `${rutas.categoriaLubricante(marca.slug, c.slug)}/`,
       detalle: unir("Lubricantes", marca.nombre),
       marca: marca.nombre,
-      imagen: imagen(c.imagen),
+      imagen: imagen(c.imagen) ?? imagen(marca.logo),
       campos: {
         titulo: `${c.nombre} ${marca.nombre}`,
         marca: marca.nombre,

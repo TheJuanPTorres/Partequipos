@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  accionesHabituales,
   avisosDePortada,
+  mensajesRecientes,
   etiquetaEditor,
   tarjetasDePortada,
   ultimosModificados,
@@ -121,5 +123,106 @@ describe("etiquetaEditor", () => {
     assert.equal(etiquetaEditor(7, 5), "otra persona del equipo");
     assert.equal(etiquetaEditor(null, 5), "—");
     assert.equal(etiquetaEditor(undefined, 5), "—");
+  });
+});
+
+describe("avisos nuevos de la fase 2 (PR 6)", () => {
+  it("salen en su orden y enlazan con el mismo criterio que cuentan", () => {
+    const avisos = avisosDePortada({
+      ...base,
+      etiquetas: { "equipos-usados": "Equipos usados", "equipos-nuevos": "Equipos nuevos" },
+      fotosPequenas: 12,
+      sinDescripcion: { "equipos-usados": 4 },
+      sinSeo: { "equipos-nuevos": 101 },
+      busquedasSinResultado: 1,
+      altFlojos: 2,
+      indexacionPermitida: false,
+    });
+    assert.deepEqual(
+      avisos.map((a) => a.clave),
+      [
+        "fotos-pequenas",
+        "sin-descripcion-equipos-usados",
+        "alt",
+        "sin-seo-equipos-nuevos",
+        "busquedas",
+        "buscadores",
+      ],
+    );
+    assert.equal(
+      avisos[0]?.texto,
+      "12 fotos de las galerías de las fichas miden menos de 1.200 px de ancho: en pantallas grandes se ven borrosas.",
+    );
+    assert.equal(avisos[0]?.enlace?.href, "/admin/collections/media?where[width][less_than]=1200");
+    assert.equal(avisos[1]?.texto, "4 fichas de equipos usados sin descripción.");
+    assert.match(avisos[1]?.enlace?.href ?? "", /where\[or\]\[0\]\[descripcion\]\[exists\]=false/);
+    assert.equal(avisos[3]?.tono, "info");
+    assert.match(avisos[3]?.enlace?.href ?? "", /seo\.metaDescription/);
+    assert.equal(
+      avisos[4]?.texto,
+      "1 búsqueda de los visitantes sin resultado: puede faltar un sinónimo o una página.",
+    );
+  });
+
+  it("con 0 no salen", () => {
+    const avisos = avisosDePortada({
+      ...base,
+      fotosPequenas: 0,
+      sinDescripcion: { "equipos-usados": 0 },
+      sinSeo: {},
+      busquedasSinResultado: 0,
+    });
+    assert.deepEqual(avisos, []);
+  });
+});
+
+describe("accionesHabituales", () => {
+  it("todas, en el orden del plan, con todos los permisos y la portada", () => {
+    const acciones = accionesHabituales(() => true, 3);
+    assert.deepEqual(
+      acciones.map((a) => a.clave),
+      ["usada", "vendida", "nueva", "diapositiva", "articulo", "mensajes", "imagenes"],
+    );
+    assert.equal(acciones[3]?.href, "/admin/collections/paginas/3");
+    assert.equal(
+      acciones[1]?.href,
+      "/admin/collections/equipos-usados?where[disponible][equals]=true",
+    );
+  });
+
+  it("solo lo que el rol puede hacer, y sin portada no hay diapositiva", () => {
+    const acciones = accionesHabituales(
+      (slug, permiso) => slug === "equipos-usados" && permiso === "update",
+    );
+    assert.deepEqual(
+      acciones.map((a) => a.clave),
+      ["vendida"],
+    );
+    assert.equal(
+      accionesHabituales(() => true).some((a) => a.clave === "diapositiva"),
+      false,
+    );
+  });
+});
+
+describe("mensajesRecientes", () => {
+  it("pone la etiqueta del tipo y el enlace a la solicitud", () => {
+    const [m] = mensajesRecientes(
+      [{ id: 9, nombre: "Ana Prueba", tipo: "cotizacion", createdAt: "2026-11-19T10:00:00.000Z" }],
+      { cotizacion: "Cotización de equipo" },
+    );
+    assert.deepEqual(m, {
+      id: 9,
+      nombre: "Ana Prueba",
+      tipo: "Cotización de equipo",
+      creado: "2026-11-19T10:00:00.000Z",
+      href: "/admin/collections/solicitudes/9",
+    });
+  });
+
+  it("sin nombre, lo dice", () => {
+    const [m] = mensajesRecientes([{ id: 1, nombre: " ", tipo: "otro" }], {});
+    assert.equal(m?.nombre, "Sin nombre");
+    assert.equal(m?.tipo, "otro");
   });
 });

@@ -9,21 +9,31 @@ import type {
 
 import { CAMPO_ULTIMO_EDITOR } from "../fields/ultimoEditor";
 import { motivoAltFlojo } from "../media/altFlojo";
+import { ANCHO_MINIMO } from "../panel/fotoPequena";
 import {
+  accionesHabituales,
   avisosDePortada,
   CON_GALERIA,
+  FILTRO_SOLICITUDES_NUEVAS,
   FUERA_DE_RECIENTES,
+  mensajesRecientes,
   rutaGlobal,
   tarjetasDePortada,
   etiquetaEditor,
   ultimosModificados,
+  WHERE_SIN_DESCRIPCION,
+  WHERE_SIN_SEO,
   type AvisoPortada,
   type ConGaleria,
   type EntidadPortada,
+  type Habitual,
+  type Mensaje,
+  type Permiso,
   type Reciente,
   type Tarjeta,
 } from "../panel/portada";
 import { indexacionPermitida } from "../seo/config";
+import { SLUG_PORTADA } from "./getPaginas";
 
 type Visibles = { collections: string[]; globals: string[] };
 
@@ -31,9 +41,31 @@ export type DatosPortada = {
   avisos: AvisoPortada[];
   tarjetas: Tarjeta[];
   recientes: Reciente[];
+  habituales: Habitual[];
+  /** `undefined` si el rol no ve las solicitudes: entonces la sección no sale. */
+  mensajes?: { lista: Mensaje[]; todas: string };
+  /** El manual del editor (un PDF de «Documentos» con `guia-editor` en el nombre), si está subido. */
+  manual?: string;
 };
 
+/** Las solicitudes nuevas que se enseñan en «Mensajes». */
+const MENSAJES_EN_PORTADA = 5;
+
 const texto = (v: unknown, respaldo: string) => (typeof v === "string" && v ? v : respaldo);
+
+/** Las etiquetas de las opciones de un `select` de primer nivel, por su valor (de la config). */
+function etiquetasDeOpciones(
+  payload: Payload,
+  slug: string,
+  campo: string,
+): Record<string, string> {
+  const col = payload.config.collections.find((c) => c.slug === slug);
+  const f = col?.flattenedFields.find((x) => x.name === campo);
+  if (!f || f.type !== "select") return {};
+  return Object.fromEntries(
+    f.options.map((o) => (typeof o === "string" ? [o, o] : [o.value, texto(o.label, o.value)])),
+  );
+}
 
 /**
  * Datos de la portada propia del panel (F2, decisiones-panel.md §23).
@@ -45,7 +77,10 @@ const texto = (v: unknown, respaldo: string) => (typeof v === "string" && v ? v 
  * documentos) y «lo último modificado» pide solo el título y la fecha
  * (`select`). La única lectura de filas completas es la de textos
  * alternativos (`alt` y `filename` de Imágenes), la misma que ya hace la lista
- * de Imágenes. De «solicitudes» solo se cuenta: el total y las nuevas.
+ * de Imágenes. De «solicitudes», además de contarlas, se leen las 5 nuevas más
+ * recientes con solo su nombre, tipo y fecha («Mensajes», fase 2, PR 6). Las
+ * fotos pequeñas leen solo los ids de las galerías (`select: imagenes`) y
+ * cuentan en Imágenes las de menos de 1.200 px.
  */
 export async function getPortadaPanel(
   payload: Payload,
@@ -86,6 +121,101 @@ export async function getPortadaPanel(
           })
         ).totalDocs,
     );
+
+  const galerias = CON_GALERIA.filter(puedeLeer);
+  const porColeccion = (where: Where) =>
+    Promise.all(galerias.map(async (slug) => [slug, await contar(slug, where)] as const));
+
+  const [
+    sinDescripcion,
+    sinSeo,
+    fotosPequenas,
+    busquedas,
+    mensajes,
+    idPortada,
+    manual,
+    tiposSolicitud,
+  ] = await Promise.all([
+    porColeccion(WHERE_SIN_DESCRIPCION),
+    porColeccion(WHERE_SIN_SEO),
+    // Fotos pequeñas EN USO en las galerías de las fichas: los ids de sus galerías y, de esas,
+    // cuántas miden menos de 1.200 px de ancho.
+    puedeLeer("media") && galerias.length
+      ? seguro("fotos pequeñas", async () => {
+          const ids = new Set<number>();
+          for (const slug of galerias) {
+            const { docs } = await payload.find({
+              collection: slug,
+              depth: 0,
+              pagination: false,
+              select: { imagenes: true },
+              ...acceso,
+            });
+            for (const d of docs) {
+              for (const v of ((d as { imagenes?: unknown }).imagenes as unknown[] | undefined) ??
+                []) {
+                const id = typeof v === "object" && v ? (v as { id?: unknown }).id : v;
+                if (typeof id === "number") ids.add(id);
+              }
+            }
+          }
+          if (!ids.size) return 0;
+          return (
+            await payload.count({
+              collection: "media",
+              where: {
+                and: [{ id: { in: [...ids] } }, { width: { less_than: ANCHO_MINIMO } }],
+              },
+              ...acceso,
+            })
+          ).totalDocs;
+        })
+      : undefined,
+    puedeLeer("busquedas-sin-resultado") ? contar("busquedas-sin-resultado") : undefined,
+    puedeLeer("solicitudes")
+      ? seguro("mensajes", async () => {
+          const { docs } = await payload.find({
+            collection: "solicitudes",
+            depth: 0,
+            limit: MENSAJES_EN_PORTADA,
+            sort: "-createdAt",
+            where: { estado: { equals: "nueva" } },
+            select: { nombre: true, tipo: true, createdAt: true },
+            ...acceso,
+          });
+          return docs;
+        })
+      : undefined,
+    puedeLeer("paginas")
+      ? seguro("página de la portada", async () => {
+          const { docs } = await payload.find({
+            collection: "paginas",
+            depth: 0,
+            limit: 1,
+            where: { slug: { equals: SLUG_PORTADA } },
+            select: { slug: true },
+            ...acceso,
+          });
+          return docs[0]?.id;
+        })
+      : undefined,
+    puedeLeer("documentos")
+      ? seguro("manual", async () => {
+          const { docs } = await payload.find({
+            collection: "documentos",
+            depth: 0,
+            limit: 1,
+            sort: "-updatedAt",
+            where: { filename: { contains: "guia-editor" } },
+            select: { url: true },
+            ...acceso,
+          });
+          const url = (docs[0] as { url?: unknown } | undefined)?.url;
+          return typeof url === "string" && url ? url : undefined;
+        })
+      : Promise.resolve(undefined),
+    Promise.resolve(etiquetasDeOpciones(payload, "solicitudes", "tipo")),
+  ]);
 
   const [totales, nuevas, disponibles, sinFotos, rotas, altFlojos, recientesCol, recientesGlob] =
     await Promise.all([
@@ -217,8 +347,23 @@ export async function getPortadaPanel(
       altFlojos,
       solicitudesNuevas: nuevas,
       redireccionesRotas: rotas,
+      sinDescripcion: Object.fromEntries(sinDescripcion),
+      sinSeo: Object.fromEntries(sinSeo),
+      fotosPequenas,
+      busquedasSinResultado: busquedas,
       indexacionPermitida: indexacionPermitida(),
     }),
+    habituales: accionesHabituales((slug, permiso: Permiso) => {
+      if (!visibles.collections.includes(slug)) return false;
+      return Boolean(permissions.collections?.[slug as CollectionSlug]?.[permiso]);
+    }, idPortada),
+    mensajes: mensajes
+      ? {
+          lista: mensajesRecientes(mensajes, tiposSolicitud),
+          todas: `/admin/collections/solicitudes${FILTRO_SOLICITUDES_NUEVAS}`,
+        }
+      : undefined,
+    manual,
     tarjetas: tarjetasDePortada(entidades, contadores, detalles),
     recientes: ultimosModificados([
       ...recientesCol.map((r) => r ?? []),

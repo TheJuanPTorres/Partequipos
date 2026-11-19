@@ -3,6 +3,7 @@
  * §23). Decisiones puras, sin acceso a datos: qué avisos salen, qué tarjetas,
  * con qué enlaces. Los datos los trae `src/lib/queries/getPortadaPanel.ts`.
  */
+import { ANCHO_MINIMO } from "./fotoPequena";
 import { ETIQUETAS_DEL_MENU, GRUPOS_DEL_MENU, ordenarMenu, type GrupoDelMenu } from "./menu";
 
 const ADMIN = "/admin";
@@ -21,6 +22,24 @@ export const FILTRO_SIN_FOTOS = "?where[imagenes][exists]=false";
 export const FILTRO_SOLICITUDES_NUEVAS = "?where[estado][equals]=nueva";
 /** Filtro de lista «redirecciones a ninguna ruta». */
 export const FILTRO_REDIRECCION_ROTA = "?where[estadoDestino][equals]=sin-ruta";
+/** Filtro de «Imágenes» con las de menos de 1.200 px de ancho (el de «Ver solo las pequeñas»). */
+export const FILTRO_FOTOS_PEQUENAS = `?where[width][less_than]=${ANCHO_MINIMO}`;
+/**
+ * «Sin descripción»: vacía o nunca rellenada; el filtro de la lista y el `where` que cuenta el
+ * aviso dicen lo mismo. En la de nueva (texto enriquecido) un editor vaciado no cuenta: la base
+ * guarda un párrafo vacío, no un nulo.
+ */
+export const FILTRO_SIN_DESCRIPCION =
+  "?where[or][0][descripcion][exists]=false&where[or][1][descripcion][equals]=";
+export const WHERE_SIN_DESCRIPCION = {
+  or: [{ descripcion: { exists: false } }, { descripcion: { equals: "" } }],
+};
+/** «Sin descripción para buscadores»: la del bloque SEO de la ficha. */
+export const FILTRO_SIN_SEO =
+  "?where[or][0][seo.metaDescription][exists]=false&where[or][1][seo.metaDescription][equals]=";
+export const WHERE_SIN_SEO = {
+  or: [{ "seo.metaDescription": { exists: false } }, { "seo.metaDescription": { equals: "" } }],
+};
 
 export type AvisoPortada = {
   clave: string;
@@ -36,15 +55,27 @@ export type DatosAvisos = {
   altFlojos?: number;
   solicitudesNuevas?: number;
   redireccionesRotas?: number;
+  /** Fichas sin descripción, por colección (fase 2, 2026-11-19). */
+  sinDescripcion?: Partial<Record<ConGaleria, number>>;
+  /** Fichas sin descripción propia para buscadores, por colección. */
+  sinSeo?: Partial<Record<ConGaleria, number>>;
+  /** Fotos de las galerías de las fichas con menos de 1.200 px de ancho. */
+  fotosPequenas?: number;
+  /** Textos que los visitantes buscaron sin encontrar nada (`busquedas-sin-resultado`). */
+  busquedasSinResultado?: number;
   indexacionPermitida: boolean;
 };
 
 const plural = (n: number, uno: string, varios: string) => (n === 1 ? uno : varios);
+const formatoMiles = new Intl.NumberFormat("es-CO");
 
 /**
  * Solo lo que NECESITA atención, en este orden: solicitudes sin atender,
- * redirecciones rotas, fichas sin fotos, textos alternativos flojos y, al
- * final, el sitio cerrado a buscadores (informativo). Con 0, el aviso no sale.
+ * redirecciones rotas, fichas sin fotos, fotos pequeñas, fichas sin
+ * descripción, textos alternativos flojos, fichas sin descripción para
+ * buscadores, búsquedas sin resultado y, al final, el sitio cerrado a
+ * buscadores (informativo). Con 0, el aviso no sale. Cada uno enlaza a la
+ * lista con el MISMO criterio que cuenta.
  */
 export function avisosDePortada(d: DatosAvisos): AvisoPortada[] {
   const avisos: AvisoPortada[] = [];
@@ -78,12 +109,50 @@ export function avisosDePortada(d: DatosAvisos): AvisoPortada[] {
       enlace: { href: rutaLista(slug, FILTRO_SIN_FOTOS), texto: "Ver cuáles" },
     });
   }
+  if (d.fotosPequenas) {
+    avisos.push({
+      clave: "fotos-pequenas",
+      tono: "aviso",
+      texto: `${d.fotosPequenas} ${plural(d.fotosPequenas, "foto de las galerías de las fichas mide", "fotos de las galerías de las fichas miden")} menos de ${formatoMiles.format(ANCHO_MINIMO)} px de ancho: en pantallas grandes se ven borrosas.`,
+      enlace: { href: rutaLista("media", FILTRO_FOTOS_PEQUENAS), texto: "Ver las pequeñas" },
+    });
+  }
+  for (const slug of CON_GALERIA) {
+    const n = d.sinDescripcion?.[slug];
+    if (!n) continue;
+    const nombre = (d.etiquetas[slug] ?? slug).toLowerCase();
+    avisos.push({
+      clave: `sin-descripcion-${slug}`,
+      tono: "aviso",
+      texto: `${n} ${plural(n, "ficha", "fichas")} de ${nombre} sin descripción.`,
+      enlace: { href: rutaLista(slug, FILTRO_SIN_DESCRIPCION), texto: "Ver cuáles" },
+    });
+  }
   if (d.altFlojos) {
     avisos.push({
       clave: "alt",
       tono: "aviso",
       texto: `${d.altFlojos} ${plural(d.altFlojos, "imagen tiene", "imágenes tienen")} el texto alternativo flojo.`,
       enlace: { href: rutaLista("media"), texto: "Ver cuáles" },
+    });
+  }
+  for (const slug of CON_GALERIA) {
+    const n = d.sinSeo?.[slug];
+    if (!n) continue;
+    const nombre = (d.etiquetas[slug] ?? slug).toLowerCase();
+    avisos.push({
+      clave: `sin-seo-${slug}`,
+      tono: "info",
+      texto: `${n} ${plural(n, "ficha", "fichas")} de ${nombre} sin descripción propia para buscadores: Google ve la de por defecto.`,
+      enlace: { href: rutaLista(slug, FILTRO_SIN_SEO), texto: "Ver cuáles" },
+    });
+  }
+  if (d.busquedasSinResultado) {
+    avisos.push({
+      clave: "busquedas",
+      tono: "info",
+      texto: `${d.busquedasSinResultado} ${plural(d.busquedasSinResultado, "búsqueda", "búsquedas")} de los visitantes sin resultado: puede faltar un sinónimo o una página.`,
+      enlace: { href: rutaLista("busquedas-sin-resultado"), texto: "Ver cuáles" },
     });
   }
   if (!d.indexacionPermitida) {
@@ -186,4 +255,113 @@ export function ultimosModificados(listas: Reciente[][], n = 8): Reciente[] {
     .filter((r) => !FUERA_DE_RECIENTES.has(r.slug) && r.actualizado)
     .sort((a, b) => b.actualizado.localeCompare(a.actualizado))
     .slice(0, n);
+}
+
+/* «Lo más habitual» y «Mensajes» (organización del panel, fase 2, PR 6, 2026-11-19; plan §3). */
+
+export type Permiso = "create" | "read" | "update";
+
+export type IconoHabitual =
+  "usada" | "vendida" | "nueva" | "diapositiva" | "articulo" | "mensajes" | "imagenes";
+
+export type Habitual = { clave: IconoHabitual; texto: string; href: string };
+
+type DefHabitual = {
+  clave: IconoHabitual;
+  texto: string;
+  slug: string;
+  permiso: Permiso;
+  href: (idPortada?: number | string) => string | null;
+};
+
+/** Lo que el cliente hace a diario, en el orden del plan. Sustituye a «Accesos rápidos». */
+const HABITUALES: DefHabitual[] = [
+  {
+    clave: "usada",
+    texto: "Publicar una máquina usada",
+    slug: "equipos-usados",
+    permiso: "create",
+    href: () => rutaCrear("equipos-usados"),
+  },
+  {
+    clave: "vendida",
+    texto: "Marcar una usada como vendida",
+    slug: "equipos-usados",
+    permiso: "update",
+    href: () => rutaLista("equipos-usados", "?where[disponible][equals]=true"),
+  },
+  {
+    clave: "nueva",
+    texto: "Añadir una máquina nueva",
+    slug: "equipos-nuevos",
+    permiso: "create",
+    href: () => rutaCrear("equipos-nuevos"),
+  },
+  {
+    clave: "diapositiva",
+    texto: "Cambiar una diapositiva de la portada",
+    slug: "paginas",
+    permiso: "update",
+    href: (id) => (id === undefined ? null : `${ADMIN}/collections/paginas/${id}`),
+  },
+  {
+    clave: "articulo",
+    texto: "Escribir un artículo",
+    slug: "articulos",
+    permiso: "create",
+    href: () => rutaCrear("articulos"),
+  },
+  {
+    clave: "mensajes",
+    texto: "Responder mensajes",
+    slug: "solicitudes",
+    permiso: "read",
+    href: () => rutaLista("solicitudes", FILTRO_SOLICITUDES_NUEVAS),
+  },
+  {
+    clave: "imagenes",
+    texto: "Subir imágenes",
+    slug: "media",
+    permiso: "create",
+    href: () => rutaCrear("media"),
+  },
+];
+
+/**
+ * Solo las acciones que el rol puede hacer (`puede(slug, permiso)`) y que tienen destino: sin la
+ * página de la portada, «Cambiar una diapositiva» no sale.
+ */
+export function accionesHabituales(
+  puede: (slug: string, permiso: Permiso) => boolean,
+  idPortada?: number | string,
+): Habitual[] {
+  return HABITUALES.flatMap(({ clave, texto, slug, permiso, href }) => {
+    const destino = puede(slug, permiso) ? href(idPortada) : null;
+    return destino ? [{ clave, texto, href: destino }] : [];
+  });
+}
+
+export type Mensaje = {
+  id: number | string;
+  nombre: string;
+  tipo: string;
+  creado: string;
+  href: string;
+};
+
+/** Las solicitudes nuevas más recientes, con la etiqueta de su tipo («Cotización de equipo»). */
+export function mensajesRecientes(
+  docs: { id: number | string; nombre?: unknown; tipo?: unknown; createdAt?: unknown }[],
+  etiquetasTipo: Record<string, string>,
+): Mensaje[] {
+  return docs.map((d) => {
+    const tipo = typeof d.tipo === "string" ? d.tipo : "";
+    return {
+      id: d.id,
+      nombre: typeof d.nombre === "string" && d.nombre.trim() ? d.nombre : "Sin nombre",
+      tipo: etiquetasTipo[tipo] ?? tipo,
+      creado: typeof d.createdAt === "string" ? d.createdAt : "",
+      href: `${ADMIN}/collections/solicitudes/${d.id}`,
+    };
+  });
 }

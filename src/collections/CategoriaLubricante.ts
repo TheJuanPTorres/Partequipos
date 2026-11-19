@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { conPestanas } from "../lib/fields/pestanasFicha";
 
 import { seoField } from "../lib/fields/seoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
@@ -48,125 +49,129 @@ export const CategoriaLubricante: CollectionConfig = {
   },
   // Unicidad por marca: dos marcas pueden tener una categoría "auto-liviano".
   indexes: [{ fields: ["marca", "slug"], unique: true }],
-  fields: [
-    { name: "nombre", type: "text", required: true, label: "Nombre" },
-    slugField(),
-    {
-      name: "marca",
-      type: "relationship",
-      relationTo: "marcas-lubricante",
-      required: true,
-      label: "Marca",
-    },
-    {
-      name: "orden",
-      type: "number",
-      label: "Orden",
-      admin: {
-        position: "sidebar",
-        description:
-          "Posición de la línea en la página de la marca y en el menú «Lubricantes» (1, 2, 3…). Vacío, después de las que tienen orden, por nombre.",
+  // Pestañas Contenido · Fotos · Buscadores y redes · Avanzado (fase 2 del panel, sin esquema).
+  fields: conPestanas(
+    [
+      { name: "nombre", type: "text", required: true, label: "Nombre" },
+      slugField(),
+      {
+        name: "marca",
+        type: "relationship",
+        relationTo: "marcas-lubricante",
+        required: true,
+        label: "Marca",
       },
-    },
-    {
-      name: "enlaceMenu",
-      type: "text",
-      label: "Enlace en el menú",
-      validate: validarEnlace,
-      admin: {
-        description:
-          "Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su página.",
-      },
-    },
-    {
-      name: "entradilla",
-      type: "textarea",
-      label: "Entradilla",
-      admin: {
-        description:
-          "Texto de la cabecera de su página, bajo el título. Vacío, la entradilla de la marca.",
-      },
-    },
-    { name: "descripcion", type: "richText", label: "Descripción" },
-    {
-      name: "imagen",
-      type: "upload",
-      relationTo: "media",
-      label: "Imagen",
-      admin: {
-        description:
-          "Foto de su tarjeta en la página de la marca. También la de la cabecera de su página si «Imagen de cabecera» está vacía.",
-      },
-    },
-    {
-      name: "imagenCabecera",
-      type: "upload",
-      relationTo: "media",
-      label: "Imagen de cabecera",
-      admin: {
-        description:
-          "Opcional. Fondo de la cabecera de su página. Vacía, la «Imagen» de la línea; sin ninguna, fondo oscuro.",
-      },
-    },
-    /*
-     * Productos de la línea, como en el sitio actual: nombre comercial, grado
-     * (viscosidad o variante), foto y ficha técnica en PDF del fabricante.
-     * Nada de especificaciones inventadas: solo lo que publica el fabricante.
-     * El grupo los agrupa bajo un subtítulo (p. ej. «Compresores»).
-     */
-    {
-      name: "productos",
-      type: "array",
-      label: "Productos",
-      labels: { singular: "Producto", plural: "Productos" },
-      admin: {
-        description:
-          "En este orden en la página. Nombre y grado tal como los publica el fabricante; no inventes especificaciones.",
-      },
-      fields: [
-        {
-          type: "row",
-          fields: [
-            {
-              name: "nombre",
-              type: "text",
-              required: true,
-              label: "Nombre",
-              admin: { width: "50%", description: "Ej. «I-SINT»." },
-            },
-            {
-              name: "grado",
-              type: "text",
-              label: "Grado o variante",
-              admin: { width: "50%", description: "Ej. «0W-20» o «DOT 4». Opcional." },
-            },
-          ],
+      {
+        name: "orden",
+        type: "number",
+        label: "Orden",
+        admin: {
+          position: "sidebar",
+          description:
+            "Posición de la línea en la página de la marca y en el menú «Lubricantes» (1, 2, 3…). Vacío, después de las que tienen orden, por nombre.",
         },
-        {
-          name: "grupo",
-          type: "text",
-          label: "Grupo",
-          admin: {
-            description:
-              "Opcional. Los productos seguidos con el mismo grupo salen bajo ese subtítulo (p. ej. «Compresores»).",
+      },
+      {
+        name: "enlaceMenu",
+        type: "text",
+        label: "Enlace en el menú",
+        validate: validarEnlace,
+        admin: {
+          description:
+            "Opcional. A dónde lleva esta categoría en el menú «Lubricantes» de la cabecera. Vacío, a su página.",
+        },
+      },
+      {
+        name: "entradilla",
+        type: "textarea",
+        label: "Entradilla",
+        admin: {
+          description:
+            "Texto de la cabecera de su página, bajo el título. Vacío, la entradilla de la marca.",
+        },
+      },
+      { name: "descripcion", type: "richText", label: "Descripción" },
+      {
+        name: "imagen",
+        type: "upload",
+        relationTo: "media",
+        label: "Imagen",
+        admin: {
+          description:
+            "Foto de su tarjeta en la página de la marca. También la de la cabecera de su página si «Imagen de cabecera» está vacía.",
+        },
+      },
+      {
+        name: "imagenCabecera",
+        type: "upload",
+        relationTo: "media",
+        label: "Imagen de cabecera",
+        admin: {
+          description:
+            "Opcional. Fondo de la cabecera de su página. Vacía, la «Imagen» de la línea; sin ninguna, fondo oscuro.",
+        },
+      },
+      /*
+       * Productos de la línea, como en el sitio actual: nombre comercial, grado
+       * (viscosidad o variante), foto y ficha técnica en PDF del fabricante.
+       * Nada de especificaciones inventadas: solo lo que publica el fabricante.
+       * El grupo los agrupa bajo un subtítulo (p. ej. «Compresores»).
+       */
+      {
+        name: "productos",
+        type: "array",
+        label: "Productos",
+        labels: { singular: "Producto", plural: "Productos" },
+        admin: {
+          description:
+            "En este orden en la página. Nombre y grado tal como los publica el fabricante; no inventes especificaciones.",
+        },
+        fields: [
+          {
+            type: "row",
+            fields: [
+              {
+                name: "nombre",
+                type: "text",
+                required: true,
+                label: "Nombre",
+                admin: { width: "50%", description: "Ej. «I-SINT»." },
+              },
+              {
+                name: "grado",
+                type: "text",
+                label: "Grado o variante",
+                admin: { width: "50%", description: "Ej. «0W-20» o «DOT 4». Opcional." },
+              },
+            ],
           },
-        },
-        { name: "imagen", type: "upload", relationTo: "media", label: "Foto del producto" },
-        {
-          name: "ficha",
-          type: "upload",
-          relationTo: "documentos",
-          label: "Ficha técnica (PDF)",
-          admin: { description: "El PDF del fabricante. Sale como «Ficha técnica»." },
-        },
-        { name: "descripcion", type: "textarea", label: "Descripción" },
-        mostrarEnWebField({
-          sidebar: false,
-          descripcion:
-            "Desmarcado, el producto desaparece de la página de su línea (y de sus grupos y fichas) sin borrarse del panel. Vuelve al marcarlo.",
-        }),
-      ],
-    },
-    seoField(),
-  ],
+          {
+            name: "grupo",
+            type: "text",
+            label: "Grupo",
+            admin: {
+              description:
+                "Opcional. Los productos seguidos con el mismo grupo salen bajo ese subtítulo (p. ej. «Compresores»).",
+            },
+          },
+          { name: "imagen", type: "upload", relationTo: "media", label: "Foto del producto" },
+          {
+            name: "ficha",
+            type: "upload",
+            relationTo: "documentos",
+            label: "Ficha técnica (PDF)",
+            admin: { description: "El PDF del fabricante. Sale como «Ficha técnica»." },
+          },
+          { name: "descripcion", type: "textarea", label: "Descripción" },
+          mostrarEnWebField({
+            sidebar: false,
+            descripcion:
+              "Desmarcado, el producto desaparece de la página de su línea (y de sus grupos y fichas) sin borrarse del panel. Vuelve al marcarlo.",
+          }),
+        ],
+      },
+      seoField(),
+    ],
+    { fotos: { imagen: "tarjeta", imagenCabecera: "cabecera" } },
+  ),
 };

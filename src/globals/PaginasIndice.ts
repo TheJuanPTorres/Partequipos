@@ -40,7 +40,7 @@ const tarjetas = (): Field => ({
       "Hasta seis, de tres en tres (la última fila, centrada). Cada una lleva un título, la página a la que lleva y, si se quiere, una foto (sin foto, la tarjeta se pinta solo con el título).",
     initCollapsed: true,
   },
-  fields: [
+  fields: unaPestanaPorPagina([
     { name: "titulo", type: "text", required: true, label: "Título" },
     {
       name: "enlace",
@@ -65,8 +65,39 @@ const tarjetas = (): Field => ({
           "Desmarcada, la tarjeta no se pinta, pero se conserva para volver a mostrarla.",
       },
     },
-  ],
+  ]),
 });
+
+/**
+ * UNA PESTAÑA POR PÁGINA (organización del panel, PR 4, 2026-11-19): los diez grupos de esta
+ * pantalla, cada uno en su pestaña con el nombre corto de la página. Pestañas sin nombre: el
+ * esquema y los datos no cambian (el grupo conserva su nombre).
+ */
+const PESTANA_DE_PAGINA: Record<string, string> = {
+  repuestos: "Repuestos",
+  categoriasRepuestos: "Categorías técnicas",
+  nuevaTipos: "Maquinaria nueva",
+  maquinaria: "Maquinaria pesada",
+  usada: "Maquinaria usada",
+  usadaOtros: "Usada «Otros»",
+  lubricantes: "Lubricantes",
+  trabaja: "Trabaja con nosotros",
+  blog: "Blog",
+  contacto: "Contáctanos",
+};
+
+function unaPestanaPorPagina(campos: Field[]): Field[] {
+  return [
+    {
+      type: "tabs",
+      tabs: campos.map((c) => {
+        const nombre = "name" in c ? c.name : "";
+        const etiqueta = "label" in c && typeof c.label === "string" ? c.label : nombre;
+        return { label: PESTANA_DE_PAGINA[nombre] ?? etiqueta, fields: [c] };
+      }),
+    },
+  ];
+}
 
 export const PaginasIndice: GlobalConfig = {
   slug: "paginas-indice",

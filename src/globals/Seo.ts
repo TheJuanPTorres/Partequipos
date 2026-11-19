@@ -1,4 +1,4 @@
-import type { GlobalConfig } from "payload";
+import type { Field, GlobalConfig } from "payload";
 
 import { validarTelefono, validarUrlRed } from "../lib/seo/empresa";
 import { DIAS, NOMBRE_DIA, validarHora } from "../lib/seo/horario";
@@ -33,6 +33,33 @@ import { avisoField } from "../lib/fields/avisoField";
  *
  * Al guardar se revalida todo el sitio: el JSON-LD va en varias páginas.
  */
+/**
+ * DOS PESTAÑAS (organización del panel, PR 4, 2026-11-19): «Datos de la empresa» (contacto y
+ * horario; es lo que abre «Empresa y sedes → Datos de la empresa y redes») e «Imágenes» (logo,
+ * imagen al compartir y la de la pantalla de acceso). El aviso de buscadores, encima. Pestañas sin
+ * nombre: el esquema no cambia.
+ */
+function pestanasSeo(campos: Field[]): Field[] {
+  const arriba = campos.filter((c) => c.type === "ui");
+  const imagenes = campos.filter((c) => c.type === "collapsible");
+  const empresa = campos
+    .filter((c) => c.type !== "ui" && c.type !== "collapsible")
+    .sort(
+      (a, b) =>
+        Number("name" in b && b.name === "empresa") - Number("name" in a && a.name === "empresa"),
+    );
+  return [
+    ...arriba,
+    {
+      type: "tabs",
+      tabs: [
+        { label: "Datos de la empresa", fields: empresa },
+        { label: "Imágenes", fields: imagenes },
+      ],
+    },
+  ];
+}
+
 export const Seo: GlobalConfig = {
   slug: "seo",
   label: "SEO y datos de la empresa",
@@ -50,7 +77,7 @@ export const Seo: GlobalConfig = {
       },
     ],
   },
-  fields: [
+  fields: pestanasSeo([
     // «El sitio está cerrado a buscadores» mientras dure §10.6 (F4).
     avisoField("avisoBuscadores", "AvisoBuscadores"),
     {
@@ -210,5 +237,5 @@ export const Seo: GlobalConfig = {
         },
       ],
     },
-  ],
+  ]),
 };

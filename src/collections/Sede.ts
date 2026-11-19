@@ -5,6 +5,7 @@ import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/segur
 import { revalidarMarcasDeRepuestos } from "../lib/revalidation";
 import { validarCoordenadas, validarEnlaceMaps } from "../lib/sedes/enlaceMaps";
 import { revalidarPortada } from "./hooks/portadaHooks";
+import { conPestanas } from "../lib/fields/pestanasFicha";
 
 const portada = revalidarPortada("sedes");
 
@@ -64,129 +65,133 @@ export const Sede: CollectionConfig = {
     ],
   },
   defaultSort: "orden",
-  fields: [
-    {
-      name: "nombre",
-      type: "text",
-      required: true,
-      label: "Nombre",
-      admin: {
-        description: "Nombre de la sede. La ficha dice «Sede <nombre>». Ej. «Bogotá», «Antioquia».",
+  fields: conPestanas(
+    [
+      {
+        name: "nombre",
+        type: "text",
+        required: true,
+        label: "Nombre",
+        admin: {
+          description:
+            "Nombre de la sede. La ficha dice «Sede <nombre>». Ej. «Bogotá», «Antioquia».",
+        },
       },
-    },
-    {
-      type: "row",
-      fields: [
-        {
-          name: "ciudad",
-          type: "text",
-          required: true,
-          label: "Ciudad",
-          admin: { width: "50%", description: "Ej. «Medellín» en la sede Antioquia." },
-        },
-        {
-          name: "departamento",
-          type: "text",
-          required: true,
-          label: "Departamento",
-          admin: {
-            width: "50%",
-            description: "Ej. «Antioquia». Etiqueta: «Ciudad, Departamento».",
+      {
+        type: "row",
+        fields: [
+          {
+            name: "ciudad",
+            type: "text",
+            required: true,
+            label: "Ciudad",
+            admin: { width: "50%", description: "Ej. «Medellín» en la sede Antioquia." },
           },
-        },
-      ],
-    },
-    {
-      type: "row",
-      fields: [
-        {
-          name: "latitud",
-          type: "number",
-          required: true,
-          label: "Latitud",
-          validate: validarLatitud,
-          admin: { step: 0.000001, width: "50%" },
-        },
-        {
-          name: "longitud",
-          type: "number",
-          required: true,
-          label: "Longitud",
-          validate: validarLongitud,
-          admin: { step: 0.000001, width: "50%" },
-        },
-      ],
-    },
-    {
-      name: "lineas",
-      type: "array",
-      label: "Líneas de negocio",
-      labels: { singular: "Línea", plural: "Líneas" },
-      admin: {
-        description:
-          "Cada línea con su dirección y, si se tiene, su enlace de Google Maps. Ej. Maquinaria · Diagonal 16 # 96 G – 85. Puede quedar vacía mientras se consiguen los datos de la sede: entonces solo sale su nombre y su punto en el mapa.",
+          {
+            name: "departamento",
+            type: "text",
+            required: true,
+            label: "Departamento",
+            admin: {
+              width: "50%",
+              description: "Ej. «Antioquia». Etiqueta: «Ciudad, Departamento».",
+            },
+          },
+        ],
       },
-      fields: [
-        { name: "linea", type: "text", required: true, label: "Línea" },
-        {
-          name: "localidad",
-          type: "text",
-          label: "Municipio",
-          admin: { description: "Solo si no es el de la sede. Ej. «Guarne» en Antioquia." },
-        },
-        { name: "direccion", type: "text", required: true, label: "Dirección" },
-        {
-          name: "telefono",
-          type: "text",
-          label: "Teléfono",
-          admin: {
-            description:
-              "Opcional: en ux-9, tres sedes no tienen teléfono. Con indicativo. Ej. (601) 492 62 60.",
+      {
+        type: "row",
+        fields: [
+          {
+            name: "latitud",
+            type: "number",
+            required: true,
+            label: "Latitud",
+            validate: validarLatitud,
+            admin: { step: 0.000001, width: "50%" },
           },
-        },
-        {
-          name: "enlaceMaps",
-          type: "text",
-          label: "Enlace de Google Maps",
-          validate: validarEnlaceMaps,
-          admin: {
-            description:
-              "Opcional, y lo más exacto para «Ver en Google Maps». Cómo copiarlo: abre Google Maps, busca el sitio y haz clic en él, pulsa «Compartir» y luego «Copiar enlace», y pégalo aquí (empieza por https://maps.app.goo.gl/). Si lo dejas vacío, el botón usa las coordenadas de abajo y, si tampoco hay, busca la dirección escrita, que a veces lleva a otro sitio.",
+          {
+            name: "longitud",
+            type: "number",
+            required: true,
+            label: "Longitud",
+            validate: validarLongitud,
+            admin: { step: 0.000001, width: "50%" },
           },
-        },
-        {
-          name: "coordenadas",
-          type: "text",
-          label: "Coordenadas",
-          validate: validarCoordenadas,
-          admin: {
-            description:
-              "Opcional: solo se usan si no hay enlace. Latitud y longitud con punto decimal, separadas por una coma. Ej. 4.6467, -74.1287. Cómo copiarlas: en Google Maps, clic derecho sobre el punto exacto y clic en los números que salen arriba del menú.",
-          },
-        },
-      ],
-    },
-    { name: "foto", type: "upload", relationTo: "media", label: "Foto" },
-    {
-      name: "tipo",
-      type: "select",
-      label: "Tipo de sede",
-      defaultValue: "secundaria",
-      options: [
-        { label: "Principal", value: "principal" },
-        { label: "Secundaria", value: "secundaria" },
-      ],
-      admin: {
-        position: "sidebar",
-        description:
-          "En el mapa, la principal lleva un punto más grande con doble círculo y la secundaria uno más pequeño con un solo círculo. La lista dice de cuál se trata.",
+        ],
       },
-    },
-    {
-      name: "orden",
-      type: "number",
-      label: "Orden",
-      admin: { position: "sidebar", description: "Menor primero." },
-    },
-  ],
+      {
+        name: "lineas",
+        type: "array",
+        label: "Líneas de negocio",
+        labels: { singular: "Línea", plural: "Líneas" },
+        admin: {
+          description:
+            "Cada línea con su dirección y, si se tiene, su enlace de Google Maps. Ej. Maquinaria · Diagonal 16 # 96 G – 85. Puede quedar vacía mientras se consiguen los datos de la sede: entonces solo sale su nombre y su punto en el mapa.",
+        },
+        fields: [
+          { name: "linea", type: "text", required: true, label: "Línea" },
+          {
+            name: "localidad",
+            type: "text",
+            label: "Municipio",
+            admin: { description: "Solo si no es el de la sede. Ej. «Guarne» en Antioquia." },
+          },
+          { name: "direccion", type: "text", required: true, label: "Dirección" },
+          {
+            name: "telefono",
+            type: "text",
+            label: "Teléfono",
+            admin: {
+              description:
+                "Opcional: en ux-9, tres sedes no tienen teléfono. Con indicativo. Ej. (601) 492 62 60.",
+            },
+          },
+          {
+            name: "enlaceMaps",
+            type: "text",
+            label: "Enlace de Google Maps",
+            validate: validarEnlaceMaps,
+            admin: {
+              description:
+                "Opcional, y lo más exacto para «Ver en Google Maps». Cómo copiarlo: abre Google Maps, busca el sitio y haz clic en él, pulsa «Compartir» y luego «Copiar enlace», y pégalo aquí (empieza por https://maps.app.goo.gl/). Si lo dejas vacío, el botón usa las coordenadas de abajo y, si tampoco hay, busca la dirección escrita, que a veces lleva a otro sitio.",
+            },
+          },
+          {
+            name: "coordenadas",
+            type: "text",
+            label: "Coordenadas",
+            validate: validarCoordenadas,
+            admin: {
+              description:
+                "Opcional: solo se usan si no hay enlace. Latitud y longitud con punto decimal, separadas por una coma. Ej. 4.6467, -74.1287. Cómo copiarlas: en Google Maps, clic derecho sobre el punto exacto y clic en los números que salen arriba del menú.",
+            },
+          },
+        ],
+      },
+      { name: "foto", type: "upload", relationTo: "media", label: "Foto" },
+      {
+        name: "tipo",
+        type: "select",
+        label: "Tipo de sede",
+        defaultValue: "secundaria",
+        options: [
+          { label: "Principal", value: "principal" },
+          { label: "Secundaria", value: "secundaria" },
+        ],
+        admin: {
+          position: "sidebar",
+          description:
+            "En el mapa, la principal lleva un punto más grande con doble círculo y la secundaria uno más pequeño con un solo círculo. La lista dice de cuál se trata.",
+        },
+      },
+      {
+        name: "orden",
+        type: "number",
+        label: "Orden",
+        admin: { position: "sidebar", description: "Menor primero." },
+      },
+    ],
+    { fotos: { foto: "tarjeta" } },
+  ),
 };

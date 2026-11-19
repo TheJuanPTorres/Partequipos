@@ -1,13 +1,10 @@
 import type { Field, GlobalConfig } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { avisoField } from "../lib/fields/avisoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
-import {
-  revalidarMarcasDeLubricante,
-  revalidarRutas,
-  revalidarTodoElSitio,
-} from "../lib/revalidation";
+import { revalidarMarcasDeLubricante, revalidarRutas } from "../lib/revalidation";
 
 /**
  * Las páginas ÍNDICE de repuestos, de maquinaria y de usados y la de CONTÁCTANOS (plantillas
@@ -82,11 +79,7 @@ export const PaginasIndice: GlobalConfig = {
   access: { read: lecturaContenido, update: escrituraContenido },
   hooks: {
     afterChange: [
-      ({ doc, previousDoc }) => {
-        // Cambiar el diseño del artículo cambia las 53 páginas de artículo (estáticas).
-        if (doc?.blog?.disenoArticulo !== previousDoc?.blog?.disenoArticulo) {
-          revalidarTodoElSitio("global paginas-indice: diseño del artículo");
-        }
+      ({ doc }) => {
         revalidarRutas(
           [
             "/repuestos-maquinaria-pesada-colombia",
@@ -385,7 +378,8 @@ export const PaginasIndice: GlobalConfig = {
           "Foto de fondo del encabezado del índice",
           "Opcional. Foto a todo el ancho detrás de «Partequipos · Nuestro Blog» en /noticias/ y en las categorías del blog; sin ella, el encabezado oscuro de siempre.",
         ),
-        {
+        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        ocultoSinUso({
           name: "disenoArticulo",
           type: "select",
           label: "Diseño del artículo",
@@ -399,7 +393,7 @@ export const PaginasIndice: GlobalConfig = {
             description:
               "«Provisional»: el artículo sencillo de siempre. «Diseño propio»: cabecera baja con migas, imagen destacada, columna de lectura con índice fijo, barra de progreso, compartir, llamada a contactar y artículos relacionados. Cambiarlo actualiza todos los artículos.",
           },
-        },
+        }),
       ],
     },
     {

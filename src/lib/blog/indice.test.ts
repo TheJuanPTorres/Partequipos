@@ -13,12 +13,6 @@ import {
   PRIMERA_PAGINA_BLOG_CON_DESTACADO,
   type ArticuloLista,
 } from "./indice";
-import {
-  articulosRelacionados,
-  categoriaRelacionada,
-  entradillaRepiteCuerpo,
-  textoEnlaceRelacionada,
-} from "./relacionada";
 import { idsUnicos, slugDeTitulo, titulosDeLexical } from "./titulos";
 
 /** Aserciones con la forma de siempre, sobre `node:assert`. */
@@ -238,49 +232,6 @@ describe("listado del blog con el módulo común de filtros", () => {
   });
 });
 
-describe("categoría del sitio relacionada", () => {
-  const candidatas = [
-    { nombre: "Llantas y Rines", href: "/r/llantas/", tipo: "repuestos" as const },
-    { nombre: "Componentes Hidráulicos", href: "/r/hidraulicos/", tipo: "repuestos" as const },
-    { nombre: "Tren de Rodaje", href: "/r/rodaje/", tipo: "repuestos" as const },
-    { nombre: "Excavadoras", href: "/u/excavadoras/", tipo: "usada" as const },
-  ];
-
-  it("casa por una palabra distintiva del nombre", () => {
-    expect(
-      categoriaRelacionada(
-        "¿Qué significa una protuberancia en una llanta de maquinaria pesada?",
-        candidatas,
-      )?.href,
-    ).toBe("/r/llantas/");
-    expect(categoriaRelacionada("Fuga de aceite: repuestos hidráulicos", candidatas)?.href).toBe(
-      "/r/hidraulicos/",
-    );
-  });
-
-  it("gana la que aparece antes en el título", () => {
-    expect(
-      categoriaRelacionada("Tornamesa de excavadora y su tren de rodaje", candidatas)?.href,
-    ).toBe("/u/excavadoras/");
-  });
-
-  it("no inventa nada si no hay relación, ni casa por palabras genéricas", () => {
-    expect(
-      categoriaRelacionada("Partequipos, distribuidor oficial de Handok", candidatas),
-    ).toBeNull();
-    expect(
-      categoriaRelacionada("Repuestos de maquinaria pesada", [
-        { nombre: "Repuestos Motor Diesel", href: "/x/", tipo: "repuestos" },
-      ]),
-    ).toBeNull();
-  });
-
-  it("el texto del enlace dice qué es", () => {
-    expect(textoEnlaceRelacionada(candidatas[0]!)).toBe("Ver repuestos de Llantas y Rines");
-    expect(textoEnlaceRelacionada(candidatas[3]!)).toBe("Ver Excavadoras Usadas");
-  });
-});
-
 describe("títulos del artículo", () => {
   const cuerpo = {
     root: {
@@ -311,59 +262,5 @@ describe("títulos del artículo", () => {
 
   it("un cuerpo vacío no tiene títulos", () => {
     expect(titulosDeLexical(null)).toEqual([]);
-  });
-});
-
-describe("artículos relacionados", () => {
-  const mk = (id: number, titulo: string, fecha: string) =>
-    ({ id, titulo, fecha, categoria: { slug: "noticias" } }) as const;
-  const todos = [
-    mk(1, "Motor de giro de excavadora: síntomas de falla", "2026-09-01"),
-    mk(2, "Tornamesa de excavadora: síntomas de falla", "2026-09-02"),
-    mk(3, "Lubricantes ENI para maquinaria", "2026-09-30"),
-    mk(4, "Handok Hydraulic en Colombia", "2026-09-29"),
-    mk(5, "Fuga de aceite en excavadora", "2026-09-05"),
-  ];
-
-  it("primero los que se parecen, nunca el propio", () => {
-    const r = articulosRelacionados(todos[0]!, todos, 3).map((a) => a.id);
-    expect(r).not.toContain(1);
-    expect(r.slice(0, 2)).toEqual([2, 5]);
-    expect(r).toHaveLength(3);
-  });
-
-  it("sin parecido, los más recientes", () => {
-    const r = articulosRelacionados(mk(9, "Zzzzzz yyyyyy", "2026-01-01"), todos, 2).map(
-      (a) => a.id,
-    );
-    expect(r).toEqual([3, 4]);
-  });
-});
-
-describe("entradillaRepiteCuerpo", () => {
-  it("detecta la entradilla igual al primer párrafo o contenida en él", () => {
-    assert.equal(entradillaRepiteCuerpo("Una llanta, con bulto.", "Una llanta con bulto"), true);
-    assert.equal(
-      entradillaRepiteCuerpo("Una llanta con bulto", "Una llanta con bulto y otras cosas más."),
-      true,
-    );
-    assert.equal(
-      entradillaRepiteCuerpo("Una llanta con bulto y algo más largo", "Una llanta con bulto"),
-      true,
-    );
-  });
-  it("no la oculta si es distinta o está vacía", () => {
-    assert.equal(entradillaRepiteCuerpo("Resumen propio", "Otro texto del cuerpo"), false);
-    assert.equal(entradillaRepiteCuerpo("", "Texto"), false);
-  });
-  it("el enlace concuerda con la máquina, en plural y en singular", () => {
-    assert.equal(
-      textoEnlaceRelacionada({ nombre: "Excavadoras", href: "/x/", tipo: "nueva" }),
-      "Ver Excavadoras Nuevas",
-    );
-    assert.equal(
-      textoEnlaceRelacionada({ nombre: "Bulldozer", href: "/x/", tipo: "usada" }),
-      "Ver Bulldozer Usado",
-    );
   });
 });

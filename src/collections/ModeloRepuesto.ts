@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
@@ -120,13 +121,15 @@ export const ModeloRepuesto: CollectionConfig = {
       label: "Textos de la página del modelo",
       admin: { initCollapsed: true },
       fields: [
-        {
+        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        ocultoSinUso({
           name: "antetitulo",
           type: "text",
           label: "Antetítulo",
           admin: { description: "Sobre el título, ej. «Repuestos para Maquinaria Pesada»." },
-        },
-        {
+        }),
+        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        ocultoSinUso({
           name: "tituloPagina",
           type: "text",
           label: "Título de la página",
@@ -134,8 +137,9 @@ export const ModeloRepuesto: CollectionConfig = {
             description:
               "El título grande, ej. «HITACHI Excavadora ZX200». Vacío: «Repuestos» y el nombre del modelo.",
           },
-        },
-        {
+        }),
+        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        ocultoSinUso({
           name: "tituloDisponibles",
           type: "text",
           label: "Título de las categorías",
@@ -143,8 +147,9 @@ export const ModeloRepuesto: CollectionConfig = {
             description:
               "Sobre las categorías, ej. «repuestos disponibles para excavadora hitachi zx200». Vacío: «Repuestos disponibles para» y el nombre.",
           },
-        },
-        {
+        }),
+        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        ocultoSinUso({
           name: "piezas",
           type: "array",
           label: "Lista de piezas",
@@ -155,8 +160,9 @@ export const ModeloRepuesto: CollectionConfig = {
             initCollapsed: true,
           },
           fields: [{ name: "texto", type: "text", required: true, label: "Texto" }],
-        },
-        {
+        }),
+        // Solo lo usaba el diseño propio, retirado el 2026-11-18 (limpieza, paso 1).
+        ocultoSinUso({
           name: "mostrarPiezas",
           type: "checkbox",
           label: "Mostrar la lista de piezas",
@@ -165,7 +171,7 @@ export const ModeloRepuesto: CollectionConfig = {
             description:
               "En WordPress la lista solo se ve en algunas páginas; en el resto está guardada pero oculta.",
           },
-        },
+        }),
       ],
     },
     {

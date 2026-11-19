@@ -8,16 +8,6 @@ export function fechaCorta(iso: string): string {
   });
 }
 
-/** «15 de octubre de 2026». */
-export function fechaLarga(iso: string): string {
-  return new Date(iso).toLocaleDateString("es-CO", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  });
-}
-
 const MESES_BREVES = [
   "ene",
   "feb",

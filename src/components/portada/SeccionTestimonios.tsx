@@ -46,9 +46,10 @@ type Props = { tarjetas: TarjetaTestimonio[]; textos: TextosTestimonios };
  * La foto es apaisada (16:9) y la tarjeta es alta, así que `cover` la escala por el ALTO: el
  * ancho que hace falta es el alto de la tarjeta × 16/9 (460 px de alto en móvil y 560 desde
  * tablet: 818 y 996 px), no el ancho de la tarjeta. Con «100vw / 50vw» se pedía a 384–720 px y
- * se ampliaba ×2,1 a 390, ×2,6 a 768 y ×1,4 a 1440 (medido). Desde 1920 px, la mitad del ancho.
+ * se ampliaba ×2,1 a 390, ×2,6 a 768 y ×1,4 a 1440 (medido). Desde 1600 px la página crece en
+ * proporción (CLAUDE.md §5) y la foto se pinta a un 72 % de la ventana (2748 px a 3840, medido).
  */
-const SIZES_FOTO = "(max-width: 767px) 820px, (max-width: 1919px) max(1000px, 62.5vw), 50vw";
+const SIZES_FOTO = "(max-width: 767px) 820px, (max-width: 1599px) 1000px, 72vw";
 
 export function SeccionTestimonios({ tarjetas, textos }: Props) {
   const inicial = tarjetaInicial(tarjetas.length);

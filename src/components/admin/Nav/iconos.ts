@@ -1,11 +1,13 @@
 import {
-  IconArticle,
+  IconAdjustments,
+  IconBuilding,
   IconBulldozer,
   IconDroplet,
+  IconHome,
   IconInbox,
-  IconLayout,
+  IconNews,
   IconPhoto,
-  IconSettings,
+  IconSettingsCog,
   IconTool,
   type Icon,
 } from "@tabler/icons-react";
@@ -24,20 +26,22 @@ import type { GrupoDelMenu } from "@/lib/panel/menu";
  *
  * La clave es el NOMBRE del grupo, que es el `admin.group` de las colecciones
  * y los globales. Los grupos y su orden están en `src/lib/panel/menu.ts`
- * (F1 del rediseño, 2026-10-06); el tipo obliga a que estén todos.
+ * (fase 2 de la organización del panel, 2026-11-18); el tipo obliga a que estén todos.
  * `src/collections/grupos.test.ts` comprueba que todo grupo aprobado tiene su
  * icono aquí: si alguien renombra un grupo, CI lo para en vez de dejar una
  * entrada sin icono.
  */
 export const ICONOS_DE_GRUPO: Record<GrupoDelMenu, Icon> = {
-  Solicitudes: IconInbox,
-  Repuestos: IconTool,
+  "Mensajes recibidos": IconInbox,
+  Portada: IconHome,
   Maquinaria: IconBulldozer,
+  Repuestos: IconTool,
   Lubricantes: IconDroplet,
-  "Páginas y blog": IconArticle,
-  Archivos: IconPhoto,
-  "Partes del sitio": IconLayout,
-  Configuración: IconSettings,
+  "Servicio técnico": IconSettingsCog,
+  Blog: IconNews,
+  "Empresa y sedes": IconBuilding,
+  "Fotos y archivos": IconPhoto,
+  Configuración: IconAdjustments,
 };
 
 /** Tamaño del icono: `size-4` del sistema, en px porque la raíz del panel mide 13. */

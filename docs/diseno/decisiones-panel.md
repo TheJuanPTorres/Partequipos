@@ -969,3 +969,27 @@ dependencias.
 **Qué cambia.** El icono pasa a ser `public/logo-partequipos.png` (`LOGO_SITIO_RESPALDO.src`, el logo transparente de Andrés que ya usan la cabecera y el pie), servido por el propio despliegue. Misma forma que antes (tira horizontal): el icono cuadrado sigue pendiente del cliente (§10.3 p.15). Sin esquema ni dependencias.
 
 **Lo que no se toca.** El JSON-LD `Organization` y la imagen social por defecto siguen usando `seoConfig.logoPath` cuando el campo «Logo» del global `seo` está vacío (§10.8).
+
+## 32. Menú nuevo de diez grupos (2026-11-18, organización del panel, PR 1; rama `feat/panel-menu-nuevo`)
+
+Plan: `partequipos-cierre\informes\2026-11-18-panel-organizacion-fase1.md` §2. Sustituye a los 8
+grupos de la F1 (§20).
+
+- **Grupos, en este orden:** Mensajes recibidos · Portada · Maquinaria · Repuestos · Lubricantes ·
+  Servicio técnico · Blog · Empresa y sedes · Fotos y archivos · Configuración. Cada colección y global lleva el suyo
+  en `admin.group` (`src/lib/panel/menu.ts` fija el orden y lo vigila `grupos.test.ts`).
+- **Nombres del cliente** solo en el menú y en la portada del panel (`ETIQUETAS_DEL_MENU`): la
+  lista y la ficha conservan el nombre de la colección.
+- **Entradas directas** (`ENTRADAS_DIRECTAS`): «Portada» abre la ficha de la página `inicio`,
+  «Página de Servicio técnico» la de `servicio-tecnico` (buscadas con el acceso de quien mira) y
+  «Datos de la empresa y redes» el global `seo`, que también sale en Configuración como
+  «Buscadores e imágenes del sitio». La entrada activa es la de href más largo (`entradaActiva`).
+- **Lo técnico, solo para el Administrador** en el menú y en la portada del panel: Redirecciones,
+  Usuarios, Animaciones y Fuentes (`SOLO_ADMINISTRADOR`). El acceso de cada colección no cambia.
+- **«Fotos y archivos», grupo propio** (decisión de dirección, 2026-11-19): Imágenes, Documentos y
+  Vídeos. Animaciones y Fuentes siguen en Configuración, solo para el Administrador.
+- **Contador** junto a «Solicitudes y contacto»: las que siguen en «Nueva» (`payload.count` con el
+  acceso de quien mira).
+- Las preferencias de grupo plegado se guardan por nombre: con los nombres nuevos, todos los grupos
+  salen desplegados la primera vez.
+- Sin esquema ni migración. La guía del editor (`docs/guia-editor.md`) usa ya los nombres nuevos.

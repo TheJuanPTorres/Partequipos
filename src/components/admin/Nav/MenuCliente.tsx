@@ -1,16 +1,20 @@
 "use client";
 
-import { Link, useConfig } from "@payloadcms/ui";
-import { EntityType } from "@payloadcms/ui/shared";
+import { Link } from "@payloadcms/ui";
 import { usePathname } from "next/navigation";
-import { formatAdminURL } from "payload/shared";
+
+import { entradaActiva } from "@/lib/panel/menu";
 
 import { GrupoNav } from "./GrupoNav";
 
 export type EntradaMenu = {
+  /** Única en el menú (una colección puede salir dos veces: su lista y una entrada directa). */
+  clave: string;
+  href: string;
+  id: string;
   label: string;
-  slug: string;
-  type: EntityType;
+  /** Un número junto al nombre (las solicitudes nuevas). */
+  contador?: number;
 };
 
 export type GrupoMenu = {
@@ -28,7 +32,8 @@ export type GrupoMenu = {
  *
  * 1. **Página activa:** misma comprobación que Payload
  *    (`startsWith` + siguiente carácter «/» o ninguno), para que
- *    `/collections/marcas` no se active estando en `/collections/marcas-lubricante`.
+ *    `/collections/marcas` no se active estando en `/collections/marcas-lubricante`; y, desde
+ *    las entradas directas (2026-11-18), una sola: la de href más largo (`entradaActiva`).
  * 2. **La barra indicadora** (`nav__link-indicator`) se pinta en la entrada
  *    activa: es lo que distingue la página actual del hover (docs/design-tokens.md,
  *    fase 3).
@@ -36,53 +41,50 @@ export type GrupoMenu = {
  *    un `div`. Un enlace a la página en la que ya estás es ruido para quien
  *    navega con teclado o lector.
  *
- * Las etiquetas llegan ya traducidas del servidor (`groupNavItems` resuelve la
- * i18n), así que aquí no hace falta `getTranslation`.
+ * Las etiquetas y los enlaces llegan hechos del servidor (`Nav`), así que aquí no hace falta
+ * `getTranslation` ni `formatAdminURL`.
  */
 export function MenuCliente({ grupos }: { grupos: GrupoMenu[] }) {
   const pathname = usePathname();
-  const {
-    config: {
-      routes: { admin: adminRoute },
-    },
-  } = useConfig();
+  const activa = entradaActiva(
+    pathname,
+    grupos.flatMap((g) => g.entradas),
+  );
 
   return (
     <>
       {grupos.map((grupo) => (
         <GrupoNav abierto={grupo.abierto} key={grupo.nombre} nombre={grupo.nombre}>
           {grupo.entradas.map((entrada) => {
-            const href = formatAdminURL({
-              adminRoute,
-              path:
-                entrada.type === EntityType.global
-                  ? `/globals/${entrada.slug}`
-                  : `/collections/${entrada.slug}`,
-            });
-            const id =
-              entrada.type === EntityType.global
-                ? `nav-global-${entrada.slug}`
-                : `nav-${entrada.slug}`;
-            const activa =
-              pathname.startsWith(href) && ["/", undefined].includes(pathname[href.length]);
-
             const contenido = (
               <>
-                {activa ? <div className="nav__link-indicator" /> : null}
+                {entrada.clave === activa ? <div className="nav__link-indicator" /> : null}
                 <span className="nav__link-label">{entrada.label}</span>
+                {entrada.contador ? (
+                  <span className="pq-nav-contador">
+                    {entrada.contador}
+                    <span className="sr-only"> sin atender</span>
+                  </span>
+                ) : null}
               </>
             );
 
-            if (pathname === href) {
+            if (pathname === entrada.href) {
               return (
-                <div className="nav__link" id={id} key={entrada.slug}>
+                <div className="nav__link" id={entrada.id} key={entrada.clave}>
                   {contenido}
                 </div>
               );
             }
 
             return (
-              <Link className="nav__link" href={href} id={id} key={entrada.slug} prefetch={false}>
+              <Link
+                className="nav__link"
+                href={entrada.href}
+                id={entrada.id}
+                key={entrada.clave}
+                prefetch={false}
+              >
                 {contenido}
               </Link>
             );

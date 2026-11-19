@@ -16,6 +16,8 @@ import { esGrupoDelMenu, rutaCrear } from "@/lib/panel/portada";
 import { getPortadaPanel } from "@/lib/queries/getPortadaPanel";
 
 import { Aviso } from "../aviso/Aviso";
+import { SOLO_ADMINISTRADOR } from "@/lib/panel/menu";
+import { esAdministrador } from "@/lib/seguridad/acceso";
 
 /** Accesos rápidos: solo los que el rol puede crear. */
 const ACCESOS: { slug: string; texto: string; icono: Icon }[] = [
@@ -47,9 +49,13 @@ export default async function Portada(props: DashboardViewServerProps) {
   const { payload, permissions, user, visibleEntities } = props;
   if (!user || !permissions || !visibleEntities) return null;
 
+  // Lo técnico (Redirecciones, Usuarios, Animaciones y Fuentes), solo para el Administrador, como en el menú.
+  const admin = esAdministrador(user);
+  const paraElRol = (slugs: string[]) =>
+    admin ? slugs : slugs.filter((s) => !SOLO_ADMINISTRADOR.has(s));
   const visibles = {
-    collections: visibleEntities.collections as string[],
-    globals: visibleEntities.globals as string[],
+    collections: paraElRol(visibleEntities.collections as string[]),
+    globals: paraElRol(visibleEntities.globals as string[]),
   };
   const { avisos, tarjetas, recientes } = await getPortadaPanel(
     payload,

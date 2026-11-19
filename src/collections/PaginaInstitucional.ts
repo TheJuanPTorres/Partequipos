@@ -20,7 +20,13 @@ import { enlace, parrafo, texto } from "../lib/fields/textosPortada";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
 import { slugEditable } from "../lib/fields/slugField";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
-import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
+import {
+  borradoAdmin,
+  escrituraContenido,
+  lecturaFiltrada,
+  soloPersonal,
+} from "../lib/seguridad/acceso";
+import { nacePublicado, PUBLICADO, VERSIONES_CON_BORRADORES } from "../lib/borradores";
 import { conPestanas } from "../lib/fields/pestanasFicha";
 
 /**
@@ -67,12 +73,17 @@ export const PaginaInstitucional: CollectionConfig = {
       "Páginas fijas del sitio (Nosotros, Contacto, textos legales…) y la portada. No cambies la ruta de una página publicada: Google ya conoce esa dirección.",
   },
   access: {
-    read: lecturaContenido,
+    // Con el token de lectura (runbooks), solo lo publicado: nunca un borrador.
+    read: lecturaFiltrada(PUBLICADO),
+    readVersions: soloPersonal,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,
   },
+  // Borradores y versiones (PR 8): la web solo lee lo publicado (`soloPublicado`).
+  versions: VERSIONES_CON_BORRADORES,
   hooks: {
+    beforeOperation: [nacePublicado],
     // Lado inverso del guardarraiz: una pagina no puede tapar un articulo del
     // blog, que vive en el mismo espacio de nombres raiz.
     beforeValidate: [slugUnicoFrenteA("articulos", "un artículo del blog")],
@@ -751,7 +762,15 @@ export const PaginaInstitucional: CollectionConfig = {
                 "Bajo el título. Cada línea es un párrafo (el diseño lleva dos: qué repuestos y para qué marcas). Vacío, no se pinta.",
             },
           },
-          alineacionTextoField("descripcionAlineacion", "Alineación del texto bajo el título"),
+          {
+            ...alineacionTextoField("descripcionAlineacion", "Alineación del texto bajo el título"),
+            // En la tabla de versiones (`_paginas_v_version_…`) el nombre del enum pasaría de 63
+            // caracteres: se acorta solo ahí; el de la tabla principal es el de siempre.
+            enumName: ({ tableName }: { tableName: string }) =>
+              tableName.startsWith("_paginas_v")
+                ? "enum__paginas_v_version_secc_rep_desc_alineacion"
+                : `enum_${tableName}_descripcion_alineacion`,
+          } as Field,
           anchoTextoField("descripcionAncho", "Ancho del texto bajo el título", "ancho"),
           ocultoSinUso({
             ...tamanoMaquinaField(),

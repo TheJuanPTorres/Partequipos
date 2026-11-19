@@ -6,6 +6,7 @@ import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 
 import { TOPE_POR_GRUPO } from "@/lib/buscador/consulta";
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
+import { soloPublicado } from "@/lib/borradores";
 import { rutas } from "@/lib/routes";
 import { poblado } from "@/lib/utils/relations";
 import type {
@@ -88,7 +89,7 @@ async function buscarEnLaBase(texto: string): Promise<ResultadosBusqueda> {
     }),
     payload.find({
       collection: "articulos",
-      where: { titulo: { contains: texto } },
+      where: soloPublicado({ titulo: { contains: texto } }),
       depth: 0,
       limit: TOPE_POR_GRUPO,
       sort: "-fechaPublicacion",

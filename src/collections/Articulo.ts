@@ -4,7 +4,13 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { revalidarArticulo, revalidarArticuloBorrado } from "./hooks/blogHooks";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
-import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
+import {
+  borradoAdmin,
+  escrituraContenido,
+  lecturaFiltrada,
+  soloPersonal,
+} from "../lib/seguridad/acceso";
+import { nacePublicado, PUBLICADO, VERSIONES_CON_BORRADORES } from "../lib/borradores";
 
 /**
  * Artículo del blog. Se sirve en `/{slug}/`, **en la raíz**.
@@ -30,14 +36,19 @@ export const Articulo: CollectionConfig = {
       "Cada artículo tiene su dirección en partequipos.com/<dirección>/, y no puede repetir la de una página.",
   },
   access: {
-    read: lecturaContenido,
+    // Con el token de lectura (runbooks), solo lo publicado: nunca un borrador.
+    read: lecturaFiltrada(PUBLICADO),
+    readVersions: soloPersonal,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,
   },
+  // Borradores y versiones (PR 8): la web solo lee lo publicado (`soloPublicado`).
+  versions: VERSIONES_CON_BORRADORES,
   // Lo más reciente primero: es un blog.
   defaultSort: "-fechaPublicacion",
   hooks: {
+    beforeOperation: [nacePublicado],
     beforeValidate: [slugUnicoFrenteA("paginas", "una página institucional")],
     afterChange: [revalidarArticulo],
     afterDelete: [revalidarArticuloBorrado],

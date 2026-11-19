@@ -2,6 +2,7 @@ import config from "@payload-config";
 import { getPayload } from "payload";
 
 import { segmentoDeTipo } from "@/lib/repuestos/anidado";
+import { soloPublicado } from "@/lib/borradores";
 import { rutas } from "@/lib/routes";
 import {
   conEquipoVisible,
@@ -85,12 +86,12 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
     payload.find({ collection: "categorias-tecnicas", ...todo }),
     payload.find({ collection: "marcas-lubricante", ...todo }),
     payload.find({ collection: "categorias-lubricante", ...todo }),
-    payload.find({ collection: "articulos", ...todo, depth: 0 }),
+    payload.find({ collection: "articulos", where: soloPublicado(), ...todo, depth: 0 }),
     payload.find({ collection: "sedes", ...todo, depth: 0 }),
     payload.find({ collection: "marcas-maquinaria", where: MARCA_VISIBLE, ...todo }),
     payload.find({ collection: "categorias-maquinaria", ...todo }),
     payload.find({ collection: "categorias-usada", ...todo }),
-    payload.find({ collection: "paginas", ...todo, depth: 0 }),
+    payload.find({ collection: "paginas", where: soloPublicado(), ...todo, depth: 0 }),
     payload.find({ collection: "tipos-maquinaria", where: DE_MARCA_VISIBLE, ...todo }),
     payload.find({ collection: "marcas-usada", ...todo }),
     payload.find({

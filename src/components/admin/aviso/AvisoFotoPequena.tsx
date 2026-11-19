@@ -24,13 +24,15 @@ export default function AvisoFotoPequena({ campos = [] }: Props) {
     () => [...new Set(valores.split("|").flatMap((v) => idsDeSubida(JSON.parse(v || "null"))))],
     [valores],
   );
-  const [pequenas, setPequenas] = useState<Medida[]>([]);
+  const clave = ids.join(",");
+  // El resultado va con la clave de las fotos que se miraron: si cambian, el viejo no se pinta.
+  const [medidas, setMedidas] = useState<{ clave: string; pequenas: Medida[] }>({
+    clave: "",
+    pequenas: [],
+  });
 
   useEffect(() => {
-    if (ids.length === 0) {
-      setPequenas([]);
-      return;
-    }
+    if (ids.length === 0) return;
     const control = new AbortController();
     const consulta = new URLSearchParams({ depth: "0", limit: String(ids.length) });
     ids.forEach((id, i) => consulta.append(`where[id][in][${i}]`, String(id)));
@@ -38,11 +40,14 @@ export default function AvisoFotoPequena({ campos = [] }: Props) {
     consulta.append("select[width]", "true");
     fetch(`/api/media/?${consulta}`, { credentials: "include", signal: control.signal })
       .then((r) => (r.ok ? r.json() : { docs: [] }))
-      .then((r: { docs?: Medida[] }) => setPequenas(fotosPequenas(r.docs ?? [])))
+      .then((r: { docs?: Medida[] }) =>
+        setMedidas({ clave: ids.join(","), pequenas: fotosPequenas(r.docs ?? []) }),
+      )
       .catch(() => {});
     return () => control.abort();
   }, [ids]);
 
+  const pequenas = medidas.clave === clave && ids.length > 0 ? medidas.pequenas : [];
   if (pequenas.length === 0) return null;
   return (
     <Aviso

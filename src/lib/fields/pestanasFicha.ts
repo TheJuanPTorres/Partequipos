@@ -46,7 +46,8 @@ function visible(c: Field): boolean {
 /** Quita `position: "sidebar"`: dentro de una pestaña no significa nada. */
 function sinBarraLateral(c: Field): Field {
   if (!enBarraLateral(c)) return c;
-  const { position: _quitada, ...admin } = (c as { admin: Record<string, unknown> }).admin;
+  const admin = { ...(c as { admin: Record<string, unknown> }).admin };
+  delete admin.position;
   return { ...c, admin } as Field;
 }
 

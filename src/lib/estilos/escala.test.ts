@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { escalaPx, factorEscala, sizesEscalado } from "./escala";
+import { escalaPx, factorEscala, sizesEscalado, sizesPorFactor } from "./escala";
 import { escalarValor, ficheroExcluido } from "./escalaPostcss.mjs";
 
 describe("escala de las pantallas grandes", () => {
@@ -55,5 +55,20 @@ describe("plugin de PostCSS", () => {
     assert.equal(ficheroExcluido("/p/src/components/admin/aviso/aviso.module.css"), true);
     assert.equal(ficheroExcluido("/p/node_modules/@payloadcms/ui/dist/styles.css"), true);
     assert.equal(ficheroExcluido("/p/src/components/ficha/ficha.module.css"), false);
+  });
+});
+
+describe("sizesPorFactor", () => {
+  it("multiplica cada valor y deja las condiciones", () => {
+    assert.equal(
+      sizesPorFactor("(max-width: 767px) 30vw, max(180px, 11.25vw)", 1.5),
+      "(max-width: 767px) calc(30vw * 1.5), calc(max(180px, 11.25vw) * 1.5)",
+    );
+    assert.equal(sizesPorFactor("120px", 2), "calc(120px * 2)");
+  });
+
+  it("con factor 1 (o inválido) no cambia nada", () => {
+    assert.equal(sizesPorFactor("120px", 1), "120px");
+    assert.equal(sizesPorFactor("120px", Number.NaN), "120px");
   });
 });

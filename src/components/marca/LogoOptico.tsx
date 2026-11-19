@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import type { LogoMarca as DatosLogo } from "@/lib/marca/logoMarca";
+import { sizesPorFactor } from "@/lib/estilos/escala";
 import { colocarLogoRelativo, type CajaRelativa } from "@/lib/marca/tamanoOptico";
 
 import { LogoMarca } from "./LogoMarca";
@@ -42,6 +43,9 @@ export function LogoOptico({
   alinear?: "centro" | "izquierda";
 }) {
   const { visible, imagen } = colocarLogoRelativo(logo, caja);
+  // El fichero se pinta a `visible.ancho` % de la caja × `imagen.ancho` % de lo visible (más
+  // grande que la caja si el logo tiene márgenes transparentes): se pide en esa proporción.
+  const sizesImagen = sizesPorFactor(sizes, (visible.ancho / 100) * (imagen.ancho / 100));
   return (
     <span
       className={`${estilos.caja} ${className ?? ""}`}
@@ -68,7 +72,14 @@ export function LogoOptico({
             height: pct(imagen.alto),
           }}
         >
-          <LogoMarca logo={logo} alt="" fill sizes={sizes} loading={loading} priority={priority} />
+          <LogoMarca
+            logo={logo}
+            alt=""
+            fill
+            sizes={sizesImagen}
+            loading={loading}
+            priority={priority}
+          />
         </span>
       </span>
     </span>

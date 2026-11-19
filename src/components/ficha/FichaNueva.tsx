@@ -142,6 +142,13 @@ type Props = {
   } | null;
 };
 
+/**
+ * La foto grande de la ficha de nueva: la caja es más alta que en la de usados y la foto (con
+ * `cover`) se pinta a unos 800 px entre 1025 y 1600 (806 a 1280 y 790 a 1440, medido en la CX130D);
+ * con `41vw` se pedía a 640. Desde 1600, en proporción (escala, CLAUDE.md §5).
+ */
+const SIZES_GALERIA = "(min-width: 1025px) max(810px, 50.625vw), (min-width: 768px) 88vw, 85vw";
+
 export function FichaNueva({
   nombre,
   tituloEscritorio,
@@ -312,7 +319,7 @@ ${tituloEscritorio.modelo}`}
             <div className={nueva.columnaIzquierda}>
               <div className={`${estilos.columnaGaleria} ${nueva.columnaGaleria}`}>
                 {boton360}
-                <GaleriaFicha fotos={fotos} nombre={nombre} sinFondo />
+                <GaleriaFicha fotos={fotos} nombre={nombre} sinFondo sizesFoto={SIZES_GALERIA} />
               </div>
             </div>
           ) : null}

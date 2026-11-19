@@ -34,17 +34,7 @@ export const EquipoUsado: CollectionConfig = {
   labels: { singular: "Equipo usado", plural: "Equipos usados" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: [
-      "nombre",
-      "imagenes",
-      "categoria",
-      "marcaUsada",
-      "anio",
-      "disponible",
-      "mostrarEnWeb",
-    ],
     group: "Maquinaria",
-    listSearchableFields: ["nombre", "marca", "modelo"],
     description:
       "Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros, y tiene su propia página.",
   },

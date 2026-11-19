@@ -48,6 +48,7 @@ function articulo(n: number, extra: Partial<ArticuloLista> = {}): ArticuloLista 
     slug: `articulo-${n}`,
     titulo,
     fecha: `2026-09-${String(10 + (n % 15)).padStart(2, "0")}T00:00:00.000Z`,
+    fijado: false,
     extracto: "",
     imagen: null,
     categoria: { slug: "noticias", nombre: "Noticias" },
@@ -365,5 +366,24 @@ describe("entradillaRepiteCuerpo", () => {
       textoEnlaceRelacionada({ nombre: "Bulldozer", href: "/x/", tipo: "usada" }),
       "Ver Bulldozer Usado",
     );
+  });
+});
+
+describe("«Fijar arriba» (2026-11-19)", () => {
+  const ordenar = (lista: ArticuloLista[]) =>
+    [...lista].sort(CATALOGO_BLOG.ordenes[0]!.comparar).map((a) => a.id);
+
+  it("sin fijados, lo más reciente primero, como siempre", () => {
+    assert.deepEqual(ordenar([articulo(1), articulo(3), articulo(2)]), [3, 2, 1]);
+  });
+
+  it("los fijados primero, aunque sean más antiguos; entre ellos, también por fecha", () => {
+    const lista = [
+      articulo(1, { fijado: true }),
+      articulo(5),
+      articulo(2, { fijado: true }),
+      articulo(4),
+    ];
+    assert.deepEqual(ordenar(lista), [2, 1, 5, 4]);
   });
 });

@@ -1047,6 +1047,20 @@ Amplía la portada propia (§23) con el orden del plan (§3): saludo, mensajes, 
 - Sin esquema ni dependencias. Las cabeceras y fondos de páginas no entran en «fotos pequeñas»:
   solo las galerías.
 
+### 34.1 Columnas antiguas fuera (2026-11-19, rama `chore/panel-columnas-antiguas`)
+
+Con B terminado en sus ficheros (#514), las 17 colecciones de `listados.ts` ya no declaran sus
+propias `defaultColumns` ni `listSearchableFields`: la tabla es la única fuente, y
+`listados.test.ts` falla si una vuelve a declararlas. Las de los campos de unión (las listas dentro
+de una marca o un tipo) se quedan: son de esa lista y `listados.ts` no las cubre. Sale también la
+columna «Orden» de máquinas nuevas, tipos de máquina y líneas de lubricante: la web ya no lee ese
+campo (manda el orden por arrastre). Sin esquema.
+
+Con el #516 de D en main, «Posición en las páginas de repuestos» (`ordenMarca`) de las categorías
+técnicas va **oculto** en el formulario (`admin.hidden`): la web ya no lo lee. La columna se queda en
+la base hasta su borrado con migración. Los tipos de repuestos (`tipos-equipo`) no tienen campo
+«Orden» propio: su orden es el del arrastre dentro de la marca.
+
 ## 36. Apariencia: rojo de marca y avisos de Payload en español (2026-11-19, organización del panel, PR 10; rama `feat/panel-apariencia`)
 
 - **Rojo de marca en el panel y en el acceso:** `--pq-primary` pasa del `#dc2626` del sistema del

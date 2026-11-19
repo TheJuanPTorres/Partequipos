@@ -10,10 +10,44 @@ import {
   CONTRASTE_BLANCO_PASTILLA,
   barraDeMarcas,
   fondoDePastilla,
+  gruposPorMarcaYTipo,
   sinAditamentos,
   tituloBannerTipoNueva,
   type GrupoDeCategoria,
 } from "./paginaCategoria";
+
+describe("gruposPorMarcaYTipo", () => {
+  // Marcas en el orden del panel y, en cada una, sus tipos en el de su ficha (2026-11-19).
+  const marca = (id: number, nombre: string, _order: string) => ({
+    id,
+    nombre,
+    slug: nombre,
+    _order,
+  });
+  const tipo = (id: number, nombre: string, clave: string) => ({
+    id,
+    nombre,
+    slug: nombre,
+    "_tipos-maquinaria_tipos_order": clave,
+  });
+  const yanmar = marca(1, "yanmar", "a0");
+  const case_ = marca(2, "case", "a1");
+  const equipo = (id: number, m: object, t: object) =>
+    ({ id, nombre: `E${id}`, slug: `e${id}`, marca: m, tipo: t }) as unknown as EquiposNuevo;
+
+  it("por el orden por arrastre de la marca y del tipo, no por nombre", () => {
+    const grupos = gruposPorMarcaYTipo([
+      equipo(1, case_, tipo(10, "bulldozer", "a0")),
+      equipo(2, yanmar, tipo(20, "retro", "a1")),
+      equipo(3, yanmar, tipo(21, "excavadoras", "a0")),
+      equipo(4, case_, tipo(11, "aaa", "a5")),
+    ]);
+    assert.deepEqual(
+      grupos.map((g) => g.clave),
+      ["yanmar-excavadoras", "yanmar-retro", "case-bulldozer", "case-aaa"],
+    );
+  });
+});
 
 describe("tituloBannerTipoNueva", () => {
   it("«Maquinaria Pesada {Nombre} Nuevo/Nueva», concordado con cada máquina", () => {

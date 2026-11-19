@@ -14,6 +14,8 @@ import {
   type GrupoMenu,
 } from "./megamenu";
 
+// Las listas llegan en el orden del panel (arrastrando, `getMegamenu.ts`); el menú lo conserva: por
+// eso Yanmar va antes que Case y los tipos de Case no van por nombre (2026-11-19).
 const DATOS: DatosMegamenu = {
   marcasMaquinaria: [
     { id: 1, nombre: "Yanmar", slug: "yanmar" },
@@ -50,9 +52,10 @@ const DATOS: DatosMegamenu = {
   categoriasUsada: [
     { id: 30, nombre: "Motoniveladoras", slug: "motoniveladoras" },
     { id: 31, nombre: "Bulldozers", slug: "bulldozer" },
-    // Primer nivel (casilla «Agrupar en «Otros»» desmarcada), por su orden.
-    { id: 33, nombre: "Aditamentos", slug: "aditamentos", enOtros: false, orden: 2 },
-    { id: 32, nombre: "Excavadoras", slug: "excavadoras", enOtros: false, orden: 1 },
+    // Primer nivel (casilla «Agrupar en «Otros»» desmarcada), en el orden recibido: el «Orden» ya
+    // no cuenta (2026-11-19).
+    { id: 32, nombre: "Excavadoras", slug: "excavadoras", enOtros: false, orden: 2 },
+    { id: 33, nombre: "Aditamentos", slug: "aditamentos", enOtros: false, orden: 1 },
   ],
   marcasRepuestos: [
     { id: 40, nombre: "Caterpillar", slug: "repuestos-para-maquinaria-pesada-caterpillar" },
@@ -108,8 +111,8 @@ describe("megamenú: maquinaria", () => {
       ],
     });
     const porMarca = conLiugong.grupos[0]!.grupos[0]!;
-    assert.deepEqual(titulos(porMarca.grupos), ["Case Construction", "LiuGong", "Yanmar"]);
-    const liugong = porMarca.grupos[1]!;
+    assert.deepEqual(titulos(porMarca.grupos), ["Yanmar", "Case Construction", "LiuGong"]);
+    const liugong = porMarca.grupos[2]!;
     assert.equal(liugong.externo, "https://maquitecno.co/");
     assert.deepEqual(liugong.enlaces, []);
     assert.deepEqual(liugong.grupos, []);
@@ -118,17 +121,21 @@ describe("megamenú: maquinaria", () => {
     assert.equal(porMarca.grupos[0]!.externo, undefined);
   });
 
-  it("nueva: por marca (sin aditamentos, en orden alfabético) y por tipo", () => {
+  it("nueva: por marca (sin aditamentos, en el orden del panel) y por tipo", () => {
     const nueva = panel.grupos[0]!;
     // «Ver toda la maquinaria nueva» lleva al índice de tipos (2026-10-23).
     assert.equal(nueva.enlaces[0]?.href, "/maquinaria-pesada/maquinaria-pesada-nueva/tipos/");
     assert.deepEqual(titulos(nueva.grupos), ["Por marca", "Por tipo de máquina"]);
     const porMarca = nueva.grupos[0]!;
-    assert.deepEqual(titulos(porMarca.grupos), ["Case Construction", "Yanmar"]);
-    assert.deepEqual(porMarca.grupos[0]!.enlaces, [
+    assert.deepEqual(titulos(porMarca.grupos), ["Yanmar", "Case Construction"]);
+    assert.deepEqual(porMarca.grupos[1]!.enlaces, [
       {
         etiqueta: "Ver todo Case Construction",
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/",
+      },
+      {
+        etiqueta: "Retrocargadoras",
+        href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/",
       },
       {
         etiqueta: "Bulldozers",
@@ -137,10 +144,6 @@ describe("megamenú: maquinaria", () => {
       {
         etiqueta: "Excavadoras",
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/excavadoras-case/",
-      },
-      {
-        etiqueta: "Retrocargadoras",
-        href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/",
       },
     ]);
     // «Ver todos los tipos de máquina» primero, al índice de tipos (2026-10-23); después TODOS los
@@ -187,7 +190,7 @@ describe("megamenú: maquinaria", () => {
     );
   });
 
-  it("usada: como en WordPress, las de primer nivel por su orden y «Otros» al final", () => {
+  it("usada: como en WordPress, las de primer nivel en el orden del panel y «Otros» al final", () => {
     const usada = panel.grupos[1]!;
     assert.equal(usada.grupos.length, 0);
     assert.deepEqual(
@@ -293,7 +296,7 @@ describe("megamenú: repuestos", () => {
     );
   });
 
-  it("una marca nueva del catálogo aparece sola, sin tocar el código", () => {
+  it("una marca nueva del catálogo aparece sola, en el orden en que llega (el del panel)", () => {
     const p = panelRepuestos({
       ...DATOS,
       marcasRepuestos: [
@@ -301,7 +304,7 @@ describe("megamenú: repuestos", () => {
         { id: 41, nombre: "Bobcat", slug: "repuestos-para-maquinaria-pesada-bobcat" },
       ],
     });
-    assert.deepEqual(titulos(p.grupos[0]!.grupos), ["Bobcat", "Caterpillar"]);
+    assert.deepEqual(titulos(p.grupos[0]!.grupos), ["Caterpillar", "Bobcat"]);
   });
 });
 
@@ -310,19 +313,19 @@ describe("megamenú: repuestos por categoría técnica y política de garantías
     ...DATOS,
     categoriasTecnicas: [
       {
-        id: 1,
-        nombre: "Tren de rodaje",
-        slug: "tren-de-rodaje-para-maquinaria-pesada",
-        ordenMarca: 2,
-        imagen: { url: "/api/media/file/rodaje.jpg", width: 800, height: 600 },
-      },
-      {
         id: 2,
         nombre: "Filtración",
         slug: "filtros-para-maquinaria-pesada",
         ordenMarca: 1,
         // Sin medidas: la tarjeta va sin foto.
         imagen: { url: "/api/media/file/filtro.jpg", width: null, height: null },
+      },
+      {
+        id: 1,
+        nombre: "Tren de rodaje",
+        slug: "tren-de-rodaje-para-maquinaria-pesada",
+        ordenMarca: 2,
+        imagen: { url: "/api/media/file/rodaje.jpg", width: 800, height: 600 },
       },
       { id: 3, nombre: "Accesorios", slug: "accesorios", ordenMarca: null, imagen: 9 },
       { id: 4, nombre: "Sin página", slug: "", ordenMarca: null, imagen: null },
@@ -414,10 +417,11 @@ describe("megamenú: lubricantes (2026-10-20)", () => {
     assert.deepEqual(
       p.grupos[0]!.enlaces.map((e) => [e.etiqueta, e.href]),
       [
+        // En el orden que trae la consulta (el del arrastre en la ficha de la marca), no por nombre.
         ["Ver todo Lubricantes Eni", "/lubricantes/lubricantes-eni/"],
+        ["Motos & Scooter", "/lubricantes/lubricantes-eni/motos-scooter/"],
         ["Auto liviano", "/lubricantes/lubricantes-eni/auto-liviano/"],
         ["Engranajes", "/lubricantes/lubricantes-eni/engranajes/"],
-        ["Motos & Scooter", "/lubricantes/lubricantes-eni/motos-scooter/"],
       ],
     );
   });

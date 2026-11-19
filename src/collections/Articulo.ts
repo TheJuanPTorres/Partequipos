@@ -25,7 +25,6 @@ export const Articulo: CollectionConfig = {
   labels: { singular: "Artículo", plural: "Artículos" },
   admin: {
     useAsTitle: "titulo",
-    defaultColumns: ["titulo", "imagenDestacada", "categoria", "fechaPublicacion", "slug"],
     group: "Blog",
     description:
       "Cada artículo tiene su dirección en partequipos.com/<dirección>/, y no puede repetir la de una página.",
@@ -74,6 +73,22 @@ export const Articulo: CollectionConfig = {
         description:
           "Ordena el blog (lo más reciente primero) y es la fecha que ven los buscadores.",
         date: { pickerAppearance: "dayOnly", displayFormat: "d MMM yyyy" },
+      },
+    },
+    /*
+     * «Fijar arriba» (2026-11-19, plan del panel §6.2, PR 7c): el blog no se ordena arrastrando,
+     * por fecha; los fijados van primero (entre ellos, también por fecha) en el índice y en el
+     * archivo de su categoría. Sin fijados, como siempre: el destacado es el más reciente.
+     */
+    {
+      name: "destacado",
+      type: "checkbox",
+      label: "Fijar arriba",
+      defaultValue: false,
+      admin: {
+        position: "sidebar",
+        description:
+          "Marcado, el artículo sale primero en el blog y en su categoría, aunque haya otros más recientes. Con varios marcados, van primero todos, del más reciente al más antiguo.",
       },
     },
     /*

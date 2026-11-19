@@ -92,15 +92,24 @@ describe("megamenú: cuándo hay que revalidar el sitio", () => {
       nombre: "Excavadoras",
       slug: "excavadoras",
       enOtros: true,
-      orden: 1,
+      _order: "a1",
       mostrarEnWeb: true,
     };
     const cu = "categorias-usada";
     assert.equal(cambiaElMenu("update", { ...u, mostrarEnWeb: false }, u, cu), true);
     assert.equal(cambiaElMenu("update", { ...u, enOtros: false }, u, cu), true);
-    assert.equal(cambiaElMenu("update", { ...u, orden: 2 }, u, cu), true);
-    const l = { nombre: "Grasas", slug: "grasas", marca: 1, enlaceMenu: null, orden: 1 };
-    assert.equal(cambiaElMenu("update", { ...l, orden: 3 }, l, "categorias-lubricante"), true);
+    assert.equal(cambiaElMenu("update", { ...u, _order: "a2" }, u, cu), true);
+    const l = {
+      nombre: "Grasas",
+      slug: "grasas",
+      marca: 1,
+      enlaceMenu: null,
+      "_categorias-lubricante_lineas_order": "a1",
+    };
+    const otro = { ...l, "_categorias-lubricante_lineas_order": "a3" };
+    assert.equal(cambiaElMenu("update", otro, l, "categorias-lubricante"), true);
+    // El «Orden» numérico ya no lo lee el menú (2026-11-19): cambiarlo no revalida todo el sitio.
+    assert.equal(cambiaElMenu("update", { ...u, orden: 2 }, { ...u, orden: 1 }, cu), false);
   });
 });
 
@@ -128,6 +137,18 @@ function nombresDeCampos(campos: Field[]): Set<string> {
   return nombres;
 }
 
+/** Los joins ordenables de una colección, también dentro de pestañas y filas. */
+function joinsOrdenables(campos: Field[]): { name: string; collection: string }[] {
+  return campos.flatMap((c): { name: string; collection: string }[] => {
+    if (c.type === "join" && c.orderable && typeof c.collection === "string")
+      return [{ name: c.name, collection: c.collection }];
+    if (c.type === "tabs") return c.tabs.flatMap((t) => joinsOrdenables(t.fields));
+    if ("fields" in c && Array.isArray(c.fields) && !("name" in c && c.type === "group"))
+      return joinsOrdenables(c.fields);
+    return [];
+  });
+}
+
 async function coleccionesPorSlug(): Promise<Map<string, CollectionConfig>> {
   const dir = path.join(raiz, "src", "collections");
   const mapa = new Map<string, CollectionConfig>();
@@ -145,12 +166,22 @@ describe("megamenú: la lista de campos (CAMPOS_MENU) no se separa de nada", () 
 
   it("cada campo de la lista existe en su colección", async () => {
     const porSlug = await coleccionesPorSlug();
+    // Un join ordenable (los tipos de una marca…): Payload añade a la colección HIJA el campo
+    // `_<hija>_<join>_order` al sanear la configuración.
+    const deJoins = new Map<string, Set<string>>();
+    for (const col of porSlug.values())
+      for (const j of joinsOrdenables(col.fields)) {
+        const s = deJoins.get(j.collection) ?? new Set<string>();
+        s.add(`_${j.collection}_${j.name}_order`);
+        deJoins.set(j.collection, s);
+      }
     for (const slug of colecciones) {
       const col = porSlug.get(slug);
       assert.ok(col, `no existe la colección «${slug}»`);
       const nombres = nombresDeCampos(col.fields);
       // `orderable`: Payload añade `_order` al sanear la configuración (orden arrastrando).
       if (col.orderable) nombres.add("_order");
+      for (const n of deJoins.get(slug) ?? []) nombres.add(n);
       for (const campo of CAMPOS_MENU[slug])
         assert.ok(nombres.has(campo), `«${slug}» no tiene el campo «${campo}»`);
     }

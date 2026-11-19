@@ -12,11 +12,12 @@ const cat = (id: number, nombre: string, enOtros?: boolean | null, orden?: numbe
   orden,
 });
 
+// En el orden del panel (arrastrando), como las trae la consulta (2026-11-19).
 const CATEGORIAS = [
-  cat(1, "Aditamentos", false, 2),
+  cat(4, "Excavadoras", false, 2),
   cat(2, "Bulldozer"),
   cat(3, "Cargadores", true),
-  cat(4, "Excavadoras", false, 1),
+  cat(1, "Aditamentos", false, 1),
   cat(5, "Motoniveladoras", null),
 ];
 
@@ -34,7 +35,7 @@ describe("usados: primer nivel y «Otros»", () => {
     assert.equal(vaEnOtros({ enOtros: false }), false);
   });
 
-  it("primer nivel por su orden; las agrupadas en el orden recibido", () => {
+  it("las de primer nivel y las agrupadas, en el orden recibido (el «Orden» ya no cuenta)", () => {
     const { primerNivel, agrupadas } = separarCategorias(CATEGORIAS);
     assert.deepEqual(
       primerNivel.map((c) => c.nombre),
@@ -46,7 +47,7 @@ describe("usados: primer nivel y «Otros»", () => {
     );
   });
 
-  it("sin orden, las de primer nivel van detrás y por nombre", () => {
+  it("tampoco reordena por nombre", () => {
     const { primerNivel } = separarCategorias([
       cat(1, "Zeta", false),
       cat(2, "Alfa", false),
@@ -54,7 +55,7 @@ describe("usados: primer nivel y «Otros»", () => {
     ]);
     assert.deepEqual(
       primerNivel.map((c) => c.nombre),
-      ["Media", "Alfa", "Zeta"],
+      ["Zeta", "Alfa", "Media"],
     );
   });
 

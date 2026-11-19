@@ -95,6 +95,7 @@ export function aArticuloLista(a: Articulo): ArticuloLista {
     slug: a.slug,
     titulo: a.titulo,
     fecha: a.fechaPublicacion,
+    fijado: a.destacado === true,
     extracto: extracto(entradilla || cuerpo, 100),
     imagen: imagenDeMedia(a.imagenDestacada, a.titulo),
     categoria: categoria ? { slug: categoria.slug, nombre: categoria.nombre } : null,

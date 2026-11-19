@@ -2,6 +2,7 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import config from "@payload-config";
 import { getPayload } from "payload";
+import { ordenDe } from "../ordenArrastre";
 
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
 import type { MarcaDeRepuestos } from "@/lib/portada/kitCliente";
@@ -22,7 +23,7 @@ const logosEnCache = unstable_cache(
       depth: 1,
       limit: 0,
       pagination: false,
-      sort: "nombre",
+      sort: ordenDe("marcas"),
       select: { nombre: true, logo: true, logoOscuroEnMenu: true },
       // `filename` hace falta: la `url` la calcula un gancho de lectura a partir de él.
       populate: { media: { url: true, filename: true, width: true, height: true } },
@@ -53,7 +54,7 @@ const marcasEnCache = unstable_cache(
       depth: 1,
       limit: 0,
       pagination: false,
-      sort: "nombre",
+      sort: ordenDe("marcas"),
       select: { nombre: true, slug: true, logo: true, logoOscuroEnMenu: true },
       populate: { media: { url: true, filename: true, width: true, height: true } },
     });

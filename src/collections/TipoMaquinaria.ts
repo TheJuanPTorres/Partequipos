@@ -19,7 +19,6 @@ export const TipoMaquinaria: CollectionConfig = {
   labels: { singular: "Tipo de maquinaria nueva", plural: "Tipos de maquinaria nueva" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "marca", "orden", "slug"],
     group: "Maquinaria",
   },
   access: {

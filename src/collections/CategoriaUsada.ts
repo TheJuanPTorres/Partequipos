@@ -24,7 +24,6 @@ export const CategoriaUsada: CollectionConfig = {
   labels: { singular: "Categoría de maquinaria usada", plural: "Categorías de maquinaria usada" },
   admin: {
     useAsTitle: "nombre",
-    defaultColumns: ["nombre", "slug", "enOtros", "mostrarEnWeb"],
     group: "Maquinaria",
   },
   /*

@@ -1,6 +1,7 @@
 import { cache } from "react";
 import config from "@payload-config";
 import { getPayload } from "payload";
+import { ordenDe } from "../ordenArrastre";
 
 import type { CategoriasTecnica } from "@/payload-types";
 
@@ -17,7 +18,8 @@ export const getCategoriasRepuestos = cache(async (): Promise<CategoriasTecnica[
     collection: "categorias-tecnicas",
     depth: 1,
     limit: 0,
-    sort: "nombre",
+    // En el orden del panel (arrastrando, `orderable`, 2026-11-19).
+    sort: ordenDe("categorias-tecnicas"),
   });
   return docs;
 });

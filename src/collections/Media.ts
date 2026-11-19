@@ -21,9 +21,6 @@ export const Media: CollectionConfig = {
     group: "Fotos y archivos",
     description:
       "Fotos y logos del sitio, en JPEG, PNG o WebP, de hasta 15 MB (suben directo al almacén). El texto alternativo describe la imagen a quien no la ve.",
-    // El texto alternativo en la lista, para ver de un vistazo cuáles están flojos.
-    defaultColumns: ["filename", "alt", "updatedAt"],
-    listSearchableFields: ["filename", "alt"],
     // Aviso con las imágenes de texto alternativo flojo (`src/lib/media/altFlojo.ts`).
     // Entre el buscador y la tabla: `beforeList` lo pintaba fuera del margen.
     components: { beforeListTable: ["/components/admin/AltFlojos"] },

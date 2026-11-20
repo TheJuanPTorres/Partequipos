@@ -2490,6 +2490,7 @@ export interface Articulo {
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3833,6 +3834,7 @@ export interface ArticulosSelect<T extends boolean = true> {
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

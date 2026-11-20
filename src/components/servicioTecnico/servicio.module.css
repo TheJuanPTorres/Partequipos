@@ -640,16 +640,12 @@ video.medio {
 }
 
 /*
- * Aquí el contacto va DENTRO de su caja blanca (`.contacto`): el relleno de abajo de
- * `ContactoMarca` es parte de la caja y se queda (marca.module.css lo quita cuando es lo último
- * de la página, ronda 12, t5). Mismos valores que allí: 58 px, y 40 px hasta 1024.
+ * El contacto es lo último de la página y su caja (`.contacto`) es blanca sobre blanco: no se
+ * distingue. El relleno de abajo de `ContactoMarca` (58 px; 40 hasta 1024) se veía como hueco y,
+ * sumado al aire del pie, daba 90 px hasta el bloque rojo a 1440 (auditoría 2026-11-20). Sin él, el
+ * hueco es el del pie (`--espacio-interno`), como cuando el contacto es lo último
+ * (marca.module.css).
  */
 .contacto > section:last-child {
-  padding-bottom: 58px;
-}
-
-@media (max-width: 1024px) {
-  .contacto > section:last-child {
-    padding-bottom: 40px;
-  }
+  padding-bottom: 0;
 }

@@ -27,7 +27,8 @@ const SI_NO: Record<"disponible" | "publicado" | "autorizacion", [si: Insignia, 
 const OPCIONES: Record<"solicitud" | "destino", Record<string, Insignia>> = {
   solicitud: {
     nueva: { texto: "Nueva", tono: "aviso" },
-    atendida: { texto: "Atendida", tono: "exito" },
+    contactada: { texto: "Contactada", tono: "info" },
+    cerrada: { texto: "Cerrada", tono: "exito" },
   },
   destino: {
     resuelve: { texto: "Resuelve", tono: "exito" },

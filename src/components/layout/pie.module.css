@@ -597,10 +597,25 @@
   content: "·" / "";
 }
 
-.legalEnlaces a {
+.legalEnlaces a,
+.legalBoton {
   color: var(--color-texto);
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* «Configurar cookies»: un botón con el aspecto de los enlaces de la fila. */
+.legalBoton {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.legalBoton:hover {
+  color: var(--color-marca);
 }
 
 .legal a {

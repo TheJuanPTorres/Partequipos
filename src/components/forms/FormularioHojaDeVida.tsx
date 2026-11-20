@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } 
 
 import { Campo, claseControl } from "@/components/forms/Campo";
 import { Turnstile } from "@/components/forms/Turnstile";
+import { enviarEvento } from "@/lib/analitica/navegador";
 import {
   MAX_PDF_BYTES,
   MAX_PDF_MB,
@@ -121,6 +122,7 @@ export function FormularioHojaDeVida({
       const cuerpo = (await r.json().catch(() => null)) as RespuestaHv | null;
       if (cuerpo?.ok) {
         setHecho(cuerpo.mensaje);
+        enviarEvento("envio_formulario", { formulario: "hoja-de-vida" });
       } else if (cuerpo) {
         setErrores(cuerpo.errores ?? {});
         setMensaje(cuerpo.mensaje);

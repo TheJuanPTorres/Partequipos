@@ -2,6 +2,7 @@ import { IconArrowRight, IconBrandWhatsapp, IconSearch } from "@tabler/icons-rea
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { EventoBusqueda } from "@/components/analitica/EventoBusqueda";
 import { LONGITUD_MAXIMA, LONGITUD_MINIMA, normalizarConsulta } from "@/lib/buscador/consulta";
 import { ETIQUETA_CLASE } from "@/lib/buscador/etiquetas";
 import type { Clase, Estado, Faceta, Filtros } from "@/lib/buscador/motor";
@@ -157,6 +158,10 @@ export default async function BuscarPage({ searchParams }: Props) {
 
   return (
     <main className={estilos.seccion}>
+      {/* Analítica: la búsqueda, una vez por término y sin filtros ni página. */}
+      {r && !hayFiltros && pagina === 1 ? (
+        <EventoBusqueda termino={texto} resultados={r.total} />
+      ) : null}
       <h1 className={`${estilos.titulo} texto-titulo-seccion`}>
         {texto && r && r.total > 0 ? `Resultados para «${texto}»` : "Buscar"}
       </h1>

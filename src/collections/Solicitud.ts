@@ -3,6 +3,13 @@ import type { CollectionConfig } from "payload";
 import { notificarSolicitud } from "./hooks/notificarSolicitud";
 import { escrituraContenido, soloAdmin, soloPersonal } from "../lib/seguridad/acceso";
 import { fechaCreado } from "../lib/fields/fechasDeLista";
+import {
+  ESTADOS_SOLICITUD,
+  ESTADO_PENDIENTE,
+  fechaDeContacto,
+  solicitudesACsv,
+  type FilaSolicitud,
+} from "../lib/solicitudes/seguimiento";
 
 /**
  * Solicitudes enviadas desde los formularios públicos: el lead comercial, que es
@@ -73,15 +80,40 @@ export const Solicitud: CollectionConfig = {
       type: "select",
       required: true,
       label: "Estado",
-      defaultValue: "nueva",
-      options: [
-        { label: "Nueva", value: "nueva" },
-        { label: "Atendida", value: "atendida" },
-      ],
+      defaultValue: ESTADO_PENDIENTE,
+      options: [...ESTADOS_SOLICITUD],
       admin: {
         components: { Cell: "/components/admin/celdas/CeldaSolicitud" },
         position: "sidebar",
-        description: "Marcar como atendida en vez de borrar: conserva el historial.",
+        description:
+          "Nueva → Contactada (ya hablaste con la persona) → Cerrada. No la borres: conserva el historial. Solo las «Nuevas» cuentan como pendientes.",
+      },
+    },
+    // Seguimiento (2026-11-20): quién la lleva, cuándo se contactó y notas del equipo.
+    {
+      name: "responsable",
+      type: "relationship",
+      relationTo: "users",
+      label: "Responsable",
+      admin: { position: "sidebar", description: "Quién se encarga de esta solicitud." },
+    },
+    {
+      name: "fechaContacto",
+      type: "date",
+      label: "Fecha de contacto",
+      admin: {
+        position: "sidebar",
+        date: { pickerAppearance: "dayAndTime" },
+        description: "Se apunta sola al pasar de «Nueva»; puedes corregirla.",
+      },
+    },
+    {
+      name: "notasInternas",
+      type: "textarea",
+      label: "Notas internas",
+      admin: {
+        position: "sidebar",
+        description: "Solo las ve el equipo en el panel; nunca salen al visitante.",
       },
     },
 
@@ -165,7 +197,50 @@ export const Solicitud: CollectionConfig = {
    * Aviso por correo al recibir el lead. Nunca puede tumbar el envío: si el
    * correo falla, la solicitud ya está guardada y eso es lo que importa.
    */
-  hooks: { afterChange: [notificarSolicitud] },
+  hooks: {
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        const fecha = fechaDeContacto(
+          originalDoc?.estado,
+          data?.estado ?? originalDoc?.estado,
+          data?.fechaContacto ?? originalDoc?.fechaContacto,
+          new Date(),
+        );
+        if (fecha && data) data.fechaContacto = fecha;
+        return data;
+      },
+    ],
+    afterChange: [notificarSolicitud],
+  },
+
+  // Exportar a Excel (CSV): respeta el filtro de la lista (`?where[…]`) y el acceso del usuario.
+  endpoints: [
+    {
+      path: "/exportar",
+      method: "get",
+      handler: async (req) => {
+        if (!req.user) return Response.json({ mensaje: "Sin sesión." }, { status: 401 });
+        const { docs } = await req.payload.find({
+          collection: "solicitudes",
+          where: (req.query?.where as never) ?? undefined,
+          sort: "-createdAt",
+          limit: 5000,
+          depth: 1,
+          pagination: false,
+          user: req.user,
+          overrideAccess: false,
+        });
+        const dia = new Date().toISOString().slice(0, 10);
+        return new Response(solicitudesACsv(docs as unknown as FilaSolicitud[]), {
+          headers: {
+            "content-type": "text/csv; charset=utf-8",
+            "content-disposition": `attachment; filename="solicitudes-${dia}.csv"`,
+            "cache-control": "no-store",
+          },
+        });
+      },
+    },
+  ],
 
   timestamps: true,
 };

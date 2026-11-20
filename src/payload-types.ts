@@ -165,6 +165,7 @@ export interface Config {
     'vacantes-buk': VacantesBuk;
     buscador: Buscador;
     'correo-formularios': CorreoFormulario;
+    'apariencia-panel': AparienciaPanel;
   };
   globalsSelect: {
     cabecera: CabeceraSelect<false> | CabeceraSelect<true>;
@@ -176,6 +177,7 @@ export interface Config {
     'vacantes-buk': VacantesBukSelect<false> | VacantesBukSelect<true>;
     buscador: BuscadorSelect<false> | BuscadorSelect<true>;
     'correo-formularios': CorreoFormulariosSelect<false> | CorreoFormulariosSelect<true>;
+    'apariencia-panel': AparienciaPanelSelect<false> | AparienciaPanelSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1044,10 +1046,6 @@ export interface CategoriasTecnica {
    */
   ordenPortada?: number | null;
   /**
-   * Orden en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo, y en el menú. Vacío: al final, por nombre.
-   */
-  ordenMarca?: number | null;
-  /**
    * Es la última parte de la dirección web de esta página. Se crea sola a partir del nombre. Después ya no se puede cambiar, porque Google ya conoce esa dirección. Si tiene una errata, pide a un administrador el permiso «Puede cambiar direcciones web ya publicadas»: la dirección antigua seguirá llevando a la nueva.
    */
   slug: string;
@@ -1055,6 +1053,10 @@ export interface CategoriasTecnica {
    * Solo para una página dentro de otra categoría (p. ej. «Filtros Donaldson» dentro de «Filtración»). Su dirección web es la de esa categoría seguida de la suya, y sale bajo ella en el menú y en su página, no en el índice. Vacío: una categoría normal.
    */
   padre?: (number | null) | CategoriasTecnica;
+  /**
+   * Orden en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo, y en el menú. Vacío: al final, por nombre.
+   */
+  ordenMarca?: number | null;
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -3058,9 +3060,9 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
       };
   icono?: T;
   ordenPortada?: T;
-  ordenMarca?: T;
   slug?: T;
   padre?: T;
+  ordenMarca?: T;
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -4656,6 +4658,21 @@ export interface CorreoFormulario {
   createdAt?: string | null;
 }
 /**
+ * Lo que se ve en el panel, no en la web. Hoy, la imagen de la pantalla para entrar al panel.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "apariencia-panel".
+ */
+export interface AparienciaPanel {
+  id: number;
+  /**
+   * La que sale a la izquierda de la pantalla para entrar al panel, solo en computador. Mejor una imagen cuadrada o vertical y oscura, porque lleva texto blanco encima. Si la dejas vacía, sale un fondo rojo degradado.
+   */
+  imagenAcceso?: (number | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cabecera_select".
  */
@@ -4974,6 +4991,16 @@ export interface CorreoFormulariosSelect<T extends boolean = true> {
         remitenteCorreo?: T;
         remitenteNombre?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "apariencia-panel_select".
+ */
+export interface AparienciaPanelSelect<T extends boolean = true> {
+  imagenAcceso?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

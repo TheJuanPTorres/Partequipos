@@ -7,7 +7,7 @@
  * de Microsoft está activo. Detalle en `docs/diseno/decisiones-panel.md` §17.
  */
 
-/** Lo que llega del campo `imagenAcceso` del global `seo` con `depth: 1`. */
+/** Lo que llega del campo `imagenAcceso` del global `apariencia-panel` con `depth: 1`. */
 export type ImagenAccesoGlobal =
   | number
   | { url?: string | null; width?: number | null; height?: number | null }
@@ -17,8 +17,8 @@ export type ImagenAccesoGlobal =
 export type ImagenAcceso = { url: string; width: number; height: number };
 
 /**
- * La imagen del panel visual, elegida en «SEO y datos de la empresa» →
- * «Imágenes» → «Imagen de la pantalla de acceso». Si el campo está vacío, sin
+ * La imagen del panel visual, elegida en «Apariencia del panel» →
+ * «Imagen de la pantalla de acceso». Si el campo está vacío, sin
  * poblar o sin medidas, `null`: la pantalla pinta el degradado.
  */
 export function imagenDeAcceso(valor: ImagenAccesoGlobal): ImagenAcceso | null {

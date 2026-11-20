@@ -17,8 +17,7 @@ import {
 
 /**
  * El global `seo`, UNA consulta para todo lo de abajo. `depth: 1` para poblar
- * las imágenes del global (logo, imagen al compartir y la de la pantalla de
- * acceso). En la caché de datos del MARCO (`datos:marco`): la cabecera y el
+ * las imágenes del global (logo e imagen al compartir). En la caché de datos del MARCO (`datos:marco`): la cabecera y el
  * pie de todas las páginas leen de aquí la empresa y el logo.
  */
 const seoEnCache = unstable_cache(
@@ -66,13 +65,17 @@ export const getLogo = cache(
 );
 
 /**
- * Imagen del panel visual de la pantalla de acceso al panel (`imagenAcceso`
- * del global `seo`), o `null` si está vacía o si falla la consulta: el acceso
- * nunca depende de una imagen, así que un fallo aquí pinta el degradado.
+ * Imagen del panel visual de la pantalla de acceso al panel (`imagenAcceso` del global
+ * «Apariencia del panel», plan §7.4; antes en `seo`), o `null` si está vacía o si falla la
+ * consulta: el acceso nunca depende de una imagen, así que un fallo aquí pinta el degradado.
+ * Sin caché de datos: la pantalla de acceso se visita poco y así un cambio se ve en la siguiente
+ * carga. La API local no pasa por el acceso del global (solo Administrador).
  */
 export const getImagenAcceso = cache(async (): Promise<ImagenAcceso | null> => {
   try {
-    return imagenDeAcceso((await getSeoGlobal()).imagenAcceso);
+    const payload = await getPayload({ config });
+    const apariencia = await payload.findGlobal({ slug: "apariencia-panel", depth: 1 });
+    return imagenDeAcceso(apariencia.imagenAcceso);
   } catch (error) {
     console.error("[acceso] no se pudo leer la imagen de la pantalla de acceso:", error);
     return null;

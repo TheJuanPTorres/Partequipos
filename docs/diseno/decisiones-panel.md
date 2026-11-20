@@ -1083,3 +1083,17 @@ la base hasta su borrado con migración. Los tipos de repuestos (`tipos-equipo`)
 - **No entra aquí:** el global «Apariencia del panel» con la imagen del acceso (plan §7.4), que
   mueve `imagenAcceso` y necesita migración; y el favicon cuadrado, pendiente del cliente (#9).
 - Sin esquema ni dependencias.
+
+## 37. Global «Apariencia del panel» (2026-11-19, organización del panel, plan §7.4; rama `feat/panel-global-apariencia`)
+
+- **Qué:** global `apariencia-panel` (grupo «Configuración»), con lo que se ve en el panel y no en
+  la web. Hoy, solo la «Imagen de la pantalla de acceso» (`imagenAcceso`), que salía en el global
+  `seo` («Imágenes»), que es de la web.
+- **Solo el Administrador** lo lee y lo edita (`soloAdmin`), también en el menú y la portada
+  (`SOLO_ADMINISTRADOR`); `lecturaApi.test.ts` lo cuenta entre los privados.
+- **La pantalla de acceso** lo lee con la API local en cada visita (`getImagenAcceso`), sin caché
+  de datos: guardar se ve en la siguiente carga.
+- **Migración `20261120_011227_apariencia_panel`:** crea la tabla y COPIA con SQL explícito
+  `seo.imagen_acceso_id` a la fila nueva (§3.5), así la imagen elegida en producción no se
+  pierde. La columna de `seo` se queda: el campo va oculto y sin uso hasta borrarlo con su
+  migración.

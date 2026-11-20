@@ -118,6 +118,7 @@ import * as migration_20261119_023114_buscador from './20261119_023114_buscador'
 import * as migration_20261119_061503_orden_repuestos from './20261119_061503_orden_repuestos';
 import * as migration_20261119_065236_orden_resto from './20261119_065236_orden_resto';
 import * as migration_20261119_144427_blog_fijar_arriba from './20261119_144427_blog_fijar_arriba';
+import * as migration_20261120_011227_apariencia_panel from './20261120_011227_apariencia_panel';
 
 export const migrations = [
   {
@@ -718,6 +719,11 @@ export const migrations = [
   {
     up: migration_20261119_144427_blog_fijar_arriba.up,
     down: migration_20261119_144427_blog_fijar_arriba.down,
-    name: '20261119_144427_blog_fijar_arriba'
+    name: '20261119_144427_blog_fijar_arriba',
+  },
+  {
+    up: migration_20261120_011227_apariencia_panel.up,
+    down: migration_20261120_011227_apariencia_panel.down,
+    name: '20261120_011227_apariencia_panel'
   },
 ];

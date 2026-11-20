@@ -18,7 +18,7 @@ import {
 /*
  * GUARDARRAÍL DE LOS BORRADORES (2026-11-19, PR 8). Un borrador nuevo o despublicado está en la
  * tabla principal con `_status = 'draft'`, y la API local no pasa por el control de acceso: una
- * consulta pública de páginas o artículos sin `soloPublicado` lo publicaría sin ningún error.
+ * consulta pública de artículos sin `soloPublicado` lo publicaría sin ningún error.
  */
 
 const RAIZ = path.resolve(process.cwd(), "src");
@@ -56,7 +56,7 @@ function llamada(texto: string, pos: number): { nombre: string; texto: string } 
   return { nombre, texto: texto.slice(inicio) };
 }
 
-/** Las lecturas públicas de páginas o artículos que podrían devolver un borrador. */
+/** Las lecturas públicas de artículos que podrían devolver un borrador. */
 function lecturasConBorradores(archivos: { ruta: string; texto: string }[]): string[] {
   const fallos: string[] = [];
   for (const { ruta, texto } of archivos)
@@ -71,7 +71,7 @@ function lecturasConBorradores(archivos: { ruta: string; texto: string }[]): str
 }
 
 describe("borradores: la web nunca lee uno", () => {
-  it("toda consulta pública de páginas y artículos filtra lo publicado", () => {
+  it("toda consulta pública de artículos filtra lo publicado", () => {
     const archivos = ficheros(RAIZ)
       .map((p) => path.relative(process.cwd(), p))
       .filter((r) => !EXCLUIDOS.some((x) => r.startsWith(x)))
@@ -83,8 +83,10 @@ describe("borradores: la web nunca lee uno", () => {
   it("y falla cuando una se lo olvida (comprobación del guardián)", () => {
     const de = (cuerpo: string) => [{ ruta: "x.ts", texto: cuerpo }];
     assert.deepEqual(
-      lecturasConBorradores(de(`await payload.find({\n  collection: "paginas",\n  limit: 0,\n});`)),
-      ["x.ts:2 (paginas)"],
+      lecturasConBorradores(
+        de(`await payload.find({\n  collection: "articulos",\n  limit: 0,\n});`),
+      ),
+      ["x.ts:2 (articulos)"],
     );
     assert.deepEqual(
       lecturasConBorradores(
@@ -93,8 +95,8 @@ describe("borradores: la web nunca lee uno", () => {
       ["x.ts:1 (articulos)"],
     );
     assert.deepEqual(
-      lecturasConBorradores(de(`await payload.findByID({ collection: "paginas", id: 3 });`)),
-      ["x.ts:1 (paginas)"],
+      lecturasConBorradores(de(`await payload.findByID({ collection: "articulos", id: 3 });`)),
+      ["x.ts:1 (articulos)"],
     );
     assert.deepEqual(
       lecturasConBorradores(
@@ -113,9 +115,9 @@ describe("borradores: la web nunca lee uno", () => {
 });
 
 describe("borradores: la configuración", () => {
-  const colecciones = [PaginaInstitucional, Articulo];
+  const colecciones = [Articulo];
 
-  it("páginas y artículos guardan versiones con borradores, sin guardado automático", () => {
+  it("los artículos guardan versiones con borradores, sin guardado automático", () => {
     assert.deepEqual(
       colecciones.map((c) => c.slug),
       [...COLECCIONES_CON_BORRADORES],
@@ -127,6 +129,11 @@ describe("borradores: la configuración", () => {
       assert.deepEqual(v.drafts, { autosave: false }, c.slug);
       assert.ok(c.hooks?.beforeOperation?.includes(nacePublicado), c.slug);
     }
+  });
+
+  it("las páginas todavía no (PR posterior, con la vista previa y el renombrado)", () => {
+    assert.equal(PaginaInstitucional.versions, undefined);
+    assert.ok(!(COLECCIONES_CON_BORRADORES as readonly string[]).includes("paginas"));
   });
 
   it("con el token de lectura, solo lo publicado; las versiones, solo el personal", async () => {

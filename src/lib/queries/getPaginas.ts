@@ -1,7 +1,6 @@
 import { cache } from "react";
 import config from "@payload-config";
 import { getPayload } from "payload";
-import { soloPublicado } from "@/lib/borradores";
 
 import type { Pagina } from "@/payload-types";
 
@@ -34,7 +33,6 @@ export const getPaginas = cache(async (): Promise<Pagina[]> => {
 
   const { docs } = await payload.find({
     collection: "paginas",
-    where: soloPublicado(),
     depth: 1,
     limit: 0,
     sort: "titulo",
@@ -49,7 +47,7 @@ export const getPaginaPorSlug = cache(async (slug: string): Promise<Pagina | nul
 
   const { docs } = await payload.find({
     collection: "paginas",
-    where: soloPublicado({ slug: { equals: slug } }),
+    where: { slug: { equals: slug } },
     depth: 1,
     limit: 1,
   });

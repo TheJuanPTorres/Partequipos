@@ -91,7 +91,7 @@ export async function cargarDocumentos(): Promise<DocBusqueda[]> {
     payload.find({ collection: "marcas-maquinaria", where: MARCA_VISIBLE, ...todo }),
     payload.find({ collection: "categorias-maquinaria", ...todo }),
     payload.find({ collection: "categorias-usada", ...todo }),
-    payload.find({ collection: "paginas", where: soloPublicado(), ...todo, depth: 0 }),
+    payload.find({ collection: "paginas", ...todo, depth: 0 }),
     payload.find({ collection: "tipos-maquinaria", where: DE_MARCA_VISIBLE, ...todo }),
     payload.find({ collection: "marcas-usada", ...todo }),
     payload.find({

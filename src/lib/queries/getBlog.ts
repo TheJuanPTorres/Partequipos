@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { cache } from "react";
 
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "@/lib/cacheDatos";
+import { soloPublicado } from "@/lib/borradores";
 import { extracto, minutosDeLectura, normalizar, type ArticuloLista } from "@/lib/blog/indice";
 import { textoPlanoLexical } from "@/lib/maquinaria/reservaTexto";
 import { imagenDeMedia, poblado } from "@/lib/utils/relations";
@@ -25,6 +26,7 @@ export const getArticulos = cache(async (): Promise<Articulo[]> => {
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "articulos",
+    where: soloPublicado(),
     depth: 1,
     limit: 0,
     sort: "-fechaPublicacion",
@@ -42,7 +44,7 @@ export const getArticuloPorSlug = cache(async (slug: string): Promise<Articulo |
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "articulos",
-    where: { slug: { equals: slug } },
+    where: soloPublicado({ slug: { equals: slug } }),
     depth: 2,
     limit: 1,
   });
@@ -77,7 +79,7 @@ export const getArticulosDeCategoria = cache(async (categoriaId: number): Promis
   const payload = await getPayload({ config });
   const { docs } = await payload.find({
     collection: "articulos",
-    where: { categoria: { equals: categoriaId } },
+    where: soloPublicado({ categoria: { equals: categoriaId } }),
     depth: 1,
     limit: 0,
     sort: "-fechaPublicacion",

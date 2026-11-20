@@ -9,7 +9,11 @@
   width: 100%;
   max-width: 1320px;
   margin: 0 auto;
-  padding: 60px 20px 100px;
+  /*
+   * Abajo, nada: el hueco hasta el bloque rojo lo pone el pie (`--pie-margen`). Con 100 px eran
+   * 118 · 124 · 134 px a 390 · 768 · 1440 (auditoría 2026-11-20).
+   */
+  padding: 60px 20px 0;
   flex-direction: column;
   gap: 20px;
 }

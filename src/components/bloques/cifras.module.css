@@ -7,8 +7,14 @@
  * la izquierda, conservando el filete a la derecha.
  */
 .seccion {
-  /* El hueco inferior del contenedor de ux-9: 41 / 28 / 11 px. */
-  padding: 0 3vw 41px;
+  /*
+   * Arriba y abajo, el espaciado común entre secciones (auditoría 2026-11-20). Los 41 / 28 / 11 px
+   * de ux-9 (abajo) y el 0 de arriba dejaban 9–13 px desde «Contáctanos» y 12 px hasta «Marcas
+   * aliadas» a 390. Se resta el relleno de 10 px de cada cifra y, arriba, el de la columna de
+   * texto de la presentación, que viene encima.
+   */
+  padding: max(0px, calc(var(--espacio-seccion) - 20px)) 3vw
+    max(0px, calc(var(--espacio-seccion) - 10px));
 }
 
 .lista {
@@ -23,6 +29,8 @@
 .cifra {
   display: flex;
   flex: 1 1 0;
+  /* Sin esto, la etiqueta de 237 px no deja encoger la columna: a 768, «Repuestos disponibles» salía 68 px de la ventana. */
+  min-width: 0;
   padding: 10px;
   flex-direction: column;
   align-items: center;
@@ -64,15 +72,11 @@
   color: var(--color-texto-suave);
 }
 
-@media (max-width: 1024px) {
-  .seccion {
-    padding-bottom: 28px;
-  }
-}
-
 @media (max-width: 767px) {
+  /* En columna las cifras no tienen relleno: solo se resta el de la columna de texto de arriba. */
   .seccion {
-    padding-bottom: 11px;
+    padding-top: max(0px, calc(var(--espacio-seccion) - 10px));
+    padding-bottom: var(--espacio-seccion);
   }
 
   .lista {

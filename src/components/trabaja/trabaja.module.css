@@ -8,7 +8,11 @@
 
 /* --- «Únete a nuestro equipo» y las vacantes (contenedor a178fc5) --------- */
 .equipo {
-  margin-top: 20px;
+  /*
+   * Sin margen arriba: la cabecera (`heroSeccion`) ya deja el espaciado común debajo. Con los 20 px
+   * del kit el hueco era 44 · 53 · 68 px a 390 · 768 · 1440 (común 24 · 33 · 48; auditoría 2026-11-20).
+   */
+  margin-top: 0;
   padding: 5% 3%;
   border-radius: 30px;
   background: var(--color-fondo);

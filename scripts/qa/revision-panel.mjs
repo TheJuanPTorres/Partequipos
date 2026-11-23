@@ -1014,15 +1014,38 @@ try {
         a.textContent.trim(),
       ),
       recientes: document.querySelectorAll(".pq-portada__reciente").length,
-      enlacesASolicitudes: [...document.querySelectorAll('a[href*="/collections/solicitudes"]')]
-        .map((a) => a.getAttribute("href") ?? "")
-        // Una solicitud concreta es /collections/solicitudes/<id>; la lista
-        // (con o sin barra y filtros) y «crear» no cuentan.
-        .filter((h) => /\/collections\/solicitudes\/(?!create)[^/?#]+/.test(h)),
+      // Una solicitud concreta es /collections/solicitudes/<id>; la lista (con o sin barra y
+      // filtros) y «crear» no cuentan. Desde el #515 (decisiones-panel.md §35) la portada las
+      // enlaza A PROPÓSITO en el bloque «Mensajes» (las 5 nuevas más recientes): se separan las
+      // de ese bloque de las de cualquier otro sitio.
+      ...(() => {
+        const concretas = [
+          ...document.querySelectorAll('a[href*="/collections/solicitudes"]'),
+        ].filter((a) =>
+          /\/collections\/solicitudes\/(?!create(?:[/?#]|$))[^/?#]+/.test(
+            a.getAttribute("href") ?? "",
+          ),
+        );
+        const enMensajes = (a) =>
+          Boolean(a.closest('section[aria-labelledby="pq-portada-mensajes"]'));
+        return {
+          mensajesEnlazados: concretas.filter(enMensajes).length,
+          enlacesASolicitudes: concretas
+            .filter((a) => !enMensajes(a))
+            .map((a) => a.getAttribute("href") ?? ""),
+        };
+      })(),
     }));
     hallazgos.push({ pantalla: "portada-estructura", ancho: ancho.nombre, ...portada });
     if (portada.enlacesASolicitudes.length) {
-      fallar("La portada enlaza a solicitudes concretas: solo debe haber contadores.");
+      fallar(
+        "La portada enlaza a solicitudes concretas fuera de «Mensajes»: ahí solo debe haber contadores.",
+      );
+    }
+    if (portada.mensajesEnlazados > 5) {
+      fallar(
+        `«Mensajes» de la portada enlaza ${portada.mensajesEnlazados} solicitudes: el tope es 5.`,
+      );
     }
 
     // El MENÚ LATERAL desplegado (F1 del rediseño): se abre con su botón y se

@@ -20,7 +20,13 @@ import { enlace, parrafo, texto } from "../lib/fields/textosPortada";
 import { revalidarPagina, revalidarPaginaBorrada } from "./hooks/revalidateHooks";
 import { slugEditable } from "../lib/fields/slugField";
 import { slugUnicoFrenteA } from "./hooks/slugUnicoEntreColecciones";
-import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
+import {
+  borradoAdmin,
+  escrituraContenido,
+  lecturaFiltrada,
+  soloPersonal,
+} from "../lib/seguridad/acceso";
+import { nacePublicado, PUBLICADO, VERSIONES_CON_BORRADORES } from "../lib/borradores";
 import { conPestanas } from "../lib/fields/pestanasFicha";
 
 /**
@@ -67,12 +73,18 @@ export const PaginaInstitucional: CollectionConfig = {
       "Páginas fijas del sitio (Nosotros, Contacto, textos legales…) y la portada. No cambies la ruta de una página publicada: Google ya conoce esa dirección.",
   },
   access: {
-    read: lecturaContenido,
+    // Con el token de lectura (runbooks), solo lo publicado: nunca un borrador.
+    read: lecturaFiltrada(PUBLICADO),
+    readVersions: soloPersonal,
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,
   },
+  // Borradores y versiones (PR 8b): la web solo lee lo publicado (`soloPublicado`), salvo la vista
+  // previa del borrador, que pide el personal con sesión.
+  versions: VERSIONES_CON_BORRADORES,
   hooks: {
+    beforeOperation: [nacePublicado],
     // Lado inverso del guardarraiz: una pagina no puede tapar un articulo del
     // blog, que vive en el mismo espacio de nombres raiz.
     beforeValidate: [slugUnicoFrenteA("articulos", "un artículo del blog")],
@@ -254,6 +266,12 @@ export const PaginaInstitucional: CollectionConfig = {
           {
             name: "diapositivas",
             type: "array",
+            // En las versiones (PR 8b), tabla con nombre corto: con el de siempre, sus claves
+            // foráneas pasaban de 63 bytes. La tabla principal conserva su nombre.
+            dbName: ({ tableName }: { tableName?: string }) =>
+              tableName?.startsWith("_paginas_v")
+                ? "_paginas_v_hero_diap"
+                : `${tableName}_diapositivas`,
             label: "Diapositivas",
             labels: { singular: "Diapositiva", plural: "Diapositivas" },
             fields: [
@@ -476,6 +494,11 @@ export const PaginaInstitucional: CollectionConfig = {
           {
             name: "botones",
             type: "array",
+            // Nombre corto solo en las versiones (PR 8b), como `hero.diapositivas`.
+            dbName: ({ tableName }: { tableName?: string }) =>
+              tableName?.startsWith("_paginas_v")
+                ? "_paginas_v_barra_botones"
+                : `${tableName}_botones`,
             label: "Botones",
             labels: { singular: "Botón", plural: "Botones" },
             maxRows: 3,
@@ -581,8 +604,10 @@ export const PaginaInstitucional: CollectionConfig = {
             "columna",
             AYUDA_ANCHO_USADOS,
           ),
+          // Nombre corto (PR 8b): con `imagenExcavadoras`, la clave foránea de la tabla de
+          // versiones pasaba de 63 bytes. `RENAME COLUMN` en la migración: el valor se conserva.
           imagenKit(
-            "imagenExcavadoras",
+            "imgExcavadoras",
             "Imagen del filtro «Excavadora»",
             "La máquina recortada (PNG o WebP transparente) de la tarjeta de tipo. Opcional.",
           ),
@@ -592,7 +617,7 @@ export const PaginaInstitucional: CollectionConfig = {
             "La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.",
           ),
           imagenKit(
-            "imagenAditamentos",
+            "imgAditamentos", // nombre corto (PR 8b), como `imgExcavadoras`
             "Imagen del filtro de los aditamentos",
             "El aditamento recortado (PNG o WebP transparente) de la tarjeta del filtro. Opcional.",
           ),
@@ -751,7 +776,15 @@ export const PaginaInstitucional: CollectionConfig = {
                 "Bajo el título. Cada línea es un párrafo (el diseño lleva dos: qué repuestos y para qué marcas). Vacío, no se pinta.",
             },
           },
-          alineacionTextoField("descripcionAlineacion", "Alineación del texto bajo el título"),
+          {
+            ...alineacionTextoField("descripcionAlineacion", "Alineación del texto bajo el título"),
+            // En la tabla de versiones (`_paginas_v_version_…`) el nombre del enum pasaría de 63
+            // caracteres: se acorta solo ahí; el de la tabla principal es el de siempre.
+            enumName: ({ tableName }: { tableName: string }) =>
+              tableName.startsWith("_paginas_v")
+                ? "enum__paginas_v_version_secc_rep_desc_alineacion"
+                : `enum_${tableName}_descripcion_alineacion`,
+          } as Field,
           anchoTextoField("descripcionAncho", "Ancho del texto bajo el título", "ancho"),
           ocultoSinUso({
             ...tamanoMaquinaField(),
@@ -794,7 +827,7 @@ export const PaginaInstitucional: CollectionConfig = {
           ),
           ocultoSinUso(
             imagenKit(
-              "maquinaReflejo",
+              "reflejo", // antes `maquinaReflejo` (nombre corto, PR 8b)
               "Reflejo de la máquina (ya no se usa)",
               "Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.",
             ),
@@ -839,8 +872,9 @@ export const PaginaInstitucional: CollectionConfig = {
                 "Qué logos salen en la banda y en qué orden: de izquierda a derecha, el de esta lista (arrastra las filas para cambiarlo). Con «Añadir» eliges una «Marca de repuestos» (su logo y su página) o un «Logo libre» (un fabricante que no es marca de repuestos, como Donaldson: su logo, su nombre y un enlace si quieres). Si la dejas vacía, salen todas las marcas de repuestos por orden alfabético.",
             },
           },
+          // Antes `maquina` (nombre corto, PR 8b: la clave foránea de las versiones pasaba de 63).
           imagenKit(
-            "maquina",
+            "foto",
             "Máquina (PNG o WebP transparente)",
             "Decorativa: la máquina a la izquierda, por delante de la banda de logos (hoy, la Yanmar ViO80). Opcional.",
           ),

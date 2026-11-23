@@ -1687,7 +1687,7 @@ export interface Pagina {
     /**
      * La máquina recortada (PNG o WebP transparente) de la tarjeta de tipo. Opcional.
      */
-    imagenExcavadoras?: (number | null) | Media;
+    imgExcavadoras?: (number | null) | Media;
     /**
      * La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.
      */
@@ -1695,7 +1695,7 @@ export interface Pagina {
     /**
      * El aditamento recortado (PNG o WebP transparente) de la tarjeta del filtro. Opcional.
      */
-    imagenAditamentos?: (number | null) | Media;
+    imgAditamentos?: (number | null) | Media;
     /**
      * Tarjeta de tipo de la sección; lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».
      */
@@ -1812,7 +1812,7 @@ export interface Pagina {
     /**
      * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.
      */
-    maquinaReflejo?: (number | null) | Media;
+    reflejo?: (number | null) | Media;
   };
   /**
    * Los logos son los de las marcas de repuestos (se cambian en cada marca) y cada uno lleva a la página de su marca.
@@ -1857,7 +1857,7 @@ export interface Pagina {
     /**
      * Decorativa: la máquina a la izquierda, por delante de la banda de logos (hoy, la Yanmar ViO80). Opcional.
      */
-    maquina?: (number | null) | Media;
+    foto?: (number | null) | Media;
     /**
      * Entre 60 y 100. 100 es el tamaño del diseño original; por defecto, 100. Solo desde portátil: en el teléfono no cambia.
      */
@@ -1946,6 +1946,7 @@ export interface Pagina {
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3492,9 +3493,9 @@ export interface PaginasSelect<T extends boolean = true> {
         descripcion?: T;
         descripcionAlineacion?: T;
         descripcionAncho?: T;
-        imagenExcavadoras?: T;
+        imgExcavadoras?: T;
         imagenOtros?: T;
-        imagenAditamentos?: T;
+        imgAditamentos?: T;
         pestanaExcavadoras?: T;
         pestanaOtros?: T;
         pestanaAditamentos?: T;
@@ -3537,7 +3538,7 @@ export interface PaginasSelect<T extends boolean = true> {
         whatsappMensaje?: T;
         verMasTexto?: T;
         maquina?: T;
-        maquinaReflejo?: T;
+        reflejo?: T;
       };
   seccionMarcasRepuestos?:
     | T
@@ -3565,7 +3566,7 @@ export interface PaginasSelect<T extends boolean = true> {
                     blockName?: T;
                   };
             };
-        maquina?: T;
+        foto?: T;
         tamanoMaquina?: T;
       };
   seccionCompania?:
@@ -3621,6 +3622,7 @@ export interface PaginasSelect<T extends boolean = true> {
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

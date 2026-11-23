@@ -32,7 +32,15 @@ const EXCLUIDOS = [
   path.join("src", "migrations"),
   // «Lo último modificado» de la portada del panel.
   path.join("src", "lib", "queries", "getPortadaPanel.ts"),
+  // La vista previa del borrador: exige sesión del panel antes de leer (PR 8b).
+  path.join("src", "app", "(site)", "api", "borrador"),
 ];
+
+/** Los únicos ficheros públicos que pueden pedir un borrador (`draft:`), y con qué condición. */
+const LEEN_BORRADOR: Record<string, RegExp> = {
+  [path.join("src", "lib", "queries", "getPaginas.ts")]:
+    /const borrador = await vistaPreviaActiva\(\);[\s\S]*draft: borrador,/,
+};
 
 function ficheros(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
@@ -70,14 +78,29 @@ function lecturasConBorradores(archivos: { ruta: string; texto: string }[]): str
   return fallos;
 }
 
+const archivosPublicos = () =>
+  ficheros(RAIZ)
+    .map((p) => path.relative(process.cwd(), p))
+    .filter((r) => !EXCLUIDOS.some((x) => r.startsWith(x)))
+    .map((ruta) => ({ ruta, texto: fs.readFileSync(ruta, "utf8") }));
+
 describe("borradores: la web nunca lee uno", () => {
-  it("toda consulta pública de artículos filtra lo publicado", () => {
-    const archivos = ficheros(RAIZ)
-      .map((p) => path.relative(process.cwd(), p))
-      .filter((r) => !EXCLUIDOS.some((x) => r.startsWith(x)))
-      .map((ruta) => ({ ruta, texto: fs.readFileSync(ruta, "utf8") }));
+  it("toda consulta pública de artículos y páginas filtra lo publicado", () => {
+    const archivos = archivosPublicos();
     assert.ok(archivos.length > 50, "no encontró el código del sitio");
     assert.deepEqual(lecturasConBorradores(archivos), []);
+  });
+
+  it("solo getPaginaPorSlug pide un borrador, y solo con la vista previa y sesión", () => {
+    const conDraft = archivosPublicos().filter((a) => /\bdraft:\s/.test(a.texto));
+    assert.deepEqual(
+      conDraft.map((a) => a.ruta),
+      Object.keys(LEEN_BORRADOR),
+    );
+    for (const a of conDraft) assert.match(a.texto, LEEN_BORRADOR[a.ruta]!, a.ruta);
+    // Comprobación del guardián: un borrador pedido sin la vista previa no pasa.
+    const regla = Object.values(LEEN_BORRADOR)[0]!;
+    assert.doesNotMatch('await payload.find({ collection: "paginas", draft: true });', regla);
   });
 
   it("y falla cuando una se lo olvida (comprobación del guardián)", () => {
@@ -115,9 +138,9 @@ describe("borradores: la web nunca lee uno", () => {
 });
 
 describe("borradores: la configuración", () => {
-  const colecciones = [Articulo];
+  const colecciones = [Articulo, PaginaInstitucional];
 
-  it("los artículos guardan versiones con borradores, sin guardado automático", () => {
+  it("artículos y páginas guardan versiones con borradores, sin guardado automático", () => {
     assert.deepEqual(
       colecciones.map((c) => c.slug),
       [...COLECCIONES_CON_BORRADORES],
@@ -129,11 +152,6 @@ describe("borradores: la configuración", () => {
       assert.deepEqual(v.drafts, { autosave: false }, c.slug);
       assert.ok(c.hooks?.beforeOperation?.includes(nacePublicado), c.slug);
     }
-  });
-
-  it("las páginas todavía no (PR posterior, con la vista previa y el renombrado)", () => {
-    assert.equal(PaginaInstitucional.versions, undefined);
-    assert.ok(!(COLECCIONES_CON_BORRADORES as readonly string[]).includes("paginas"));
   });
 
   it("con el token de lectura, solo lo publicado; las versiones, solo el personal", async () => {

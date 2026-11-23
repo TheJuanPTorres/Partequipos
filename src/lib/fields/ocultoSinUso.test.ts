@@ -49,7 +49,7 @@ const RUTAS_OCULTAS: [keyof typeof OCULTOS, string][] = [
   ["paginas", "seccionRepuestos.whatsappTexto"],
   ["paginas", "seccionRepuestos.whatsappMensaje"],
   ["paginas", "seccionRepuestos.verMasTexto"],
-  ["paginas", "seccionRepuestos.maquinaReflejo"],
+  ["paginas", "seccionRepuestos.reflejo"],
   ["paginas", "bloques.bloque:presentacionImagen.textura"],
   ["paginas", "bloques.bloque:procesoPasos.textura"],
   ["paginas", "bloques.bloque:galeria.texto"],

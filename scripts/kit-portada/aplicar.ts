@@ -235,13 +235,13 @@ async function aplicar(): Promise<void> {
     manifiesto.inicio = {
       seccionUsada: {
         imagen: idDe(usada.imagen),
-        imagenExcavadoras: idDe(usada.imagenExcavadoras),
+        imgExcavadoras: idDe(usada.imgExcavadoras),
         imagenOtros: idDe(usada.imagenOtros),
-        imagenAditamentos: idDe(usada.imagenAditamentos),
+        imgAditamentos: idDe(usada.imgAditamentos),
       },
       seccionRepuestos: {
         maquina: idDe(repuestos.maquina),
-        maquinaReflejo: idDe(repuestos.maquinaReflejo),
+        reflejo: idDe(repuestos.reflejo),
         verMasTexto: repuestos.verMasTexto ?? null,
       },
       seccionLogos: {
@@ -263,14 +263,14 @@ async function aplicar(): Promise<void> {
   const nuevaUsada = {
     ...usada,
     imagen: excavadora,
-    imagenExcavadoras: excavadora,
+    imgExcavadoras: excavadora,
     imagenOtros: await id("otros"),
-    imagenAditamentos: await id("aditamento"),
+    imgAditamentos: await id("aditamento"),
   };
   const nuevaRepuestos = {
     ...repuestos,
     maquina: await id("yanmar"),
-    maquinaReflejo: await id("yanmarReflejo"),
+    reflejo: await id("yanmarReflejo"),
     verMasTexto: "Ver todos",
   };
 

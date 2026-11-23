@@ -119,6 +119,12 @@ export const BloqueCabeceraVideo: Block = {
 export const BloquePresentacionImagen: Block = {
   slug: "presentacionImagen",
   interfaceName: "BloquePresentacionImagen",
+  // En las versiones de las páginas (PR 8b), tabla con nombre corto: con el de siempre, la clave
+  // foránea de la animación pasaba de 63 bytes. En el resto, el nombre de siempre.
+  dbName: ({ tableName }: { tableName?: string }) =>
+    tableName?.startsWith("_paginas_v")
+      ? "_paginas_v_blocks_pres_imagen"
+      : `${tableName}_blocks_presentacion_imagen`,
   labels: { singular: "Presentación con imagen", plural: "Presentaciones con imagen" },
   fields: [
     ancla,

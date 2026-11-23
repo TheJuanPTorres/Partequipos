@@ -32,6 +32,7 @@ export const ORDEN_ARRASTRE = {
   sedes: "_order",
   testimonios: "_order",
   "preguntas-frecuentes": "_order",
+  "atributos-ficha": "_order",
 } as const;
 
 export type ColeccionOrdenable = keyof typeof ORDEN_ARRASTRE;

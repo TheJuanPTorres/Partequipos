@@ -55,6 +55,7 @@ import { TipoMaquinaria } from "./collections/TipoMaquinaria";
 import { Users } from "./collections/Users";
 import { Video } from "./collections/Video";
 import { Animacion } from "./collections/Animacion";
+import { AtributoFicha } from "./collections/AtributoFicha";
 import { Fuente } from "./collections/Fuente";
 import { Documento } from "./collections/Documento";
 import { FichaProducto } from "./globals/FichaProducto";
@@ -224,6 +225,7 @@ export default buildConfig({
           MarcaMaquinaria,
           TipoMaquinaria,
           CategoriaMaquinaria,
+          AtributoFicha,
           CategoriaUsada,
           MarcaUsada,
           // Lubricantes: marca -> categoria de aplicacion. Dos niveles, no tres.

@@ -1,8 +1,9 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, TextFieldSingleValidation } from "payload";
 import { conPestanas } from "../lib/fields/pestanasFicha";
 import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 
 import { validarVista360 } from "../lib/maquinaria/fichaNueva";
+import { validarLista, validarValor } from "../lib/maquinaria/atributosFicha";
 import { ICONOS_FICHA, validarDestacarFila, type FilaFicha } from "../lib/maquinaria/fichaTecnica";
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
@@ -19,6 +20,27 @@ import { avisoField } from "../lib/fields/avisoField";
  * De ahí los campos por encima de los de repuestos: galería, argumentos
  * destacados y ficha técnica.
  */
+/** El valor de una fila de «Atributos destacados»: con un atributo numérico, tiene que ser un número. */
+const valorDeAtributo: TextFieldSingleValidation = async (valor, { siblingData, req }) => {
+  const rel = (siblingData as { atributo?: unknown } | undefined)?.atributo;
+  const id = typeof rel === "object" && rel !== null ? (rel as { id?: unknown }).id : rel;
+  let tipo: string | undefined;
+  if (typeof id === "number" || typeof id === "string") {
+    try {
+      const a = await req.payload.findByID({
+        collection: "atributos-ficha",
+        id,
+        depth: 0,
+        req,
+      });
+      tipo = a.tipoValor;
+    } catch {
+      tipo = undefined;
+    }
+  }
+  return validarValor(valor, tipo);
+};
+
 export const EquipoNuevo: CollectionConfig = {
   slug: "equipos-nuevos",
   labels: { singular: "Equipo nuevo", plural: "Equipos nuevos" },
@@ -152,6 +174,51 @@ export const EquipoNuevo: CollectionConfig = {
           components: { Cell: "/components/admin/celdas/CeldaMiniatura" },
           description: "La primera imagen se usa como portada y como imagen social.",
         },
+      },
+      /*
+       * ATRIBUTOS DESTACADOS (2026-11-23, tanda 21 tarea 4): los datos que la ficha enseña junto al
+       * título, hasta 5, en el orden en que se arrastran. Cada fila: el atributo del catálogo
+       * «Atributos de ficha» (nombre, icono y unidad) y solo el valor. SIN filas, la ficha usa lo
+       * de siempre (los elige el código de la «Ficha técnica»), así que nada cambia hasta que
+       * se rellene. La «Ficha técnica» de abajo no se toca.
+       */
+      {
+        name: "atributosDestacados",
+        type: "array",
+        label: "Atributos destacados",
+        labels: { singular: "Atributo", plural: "Atributos" },
+        maxRows: 5,
+        validate: (valor: unknown) => validarLista(valor as Parameters<typeof validarLista>[0]),
+        admin: {
+          description:
+            "Los datos que salen junto al título de la ficha, hasta 5. Elige el atributo (escribe para buscarlo en el catálogo «Atributos de ficha») y escribe solo el valor; arrastra para ordenarlos. Si no pones ninguno, la ficha enseña los de siempre, sacados de la «Ficha técnica».",
+        },
+        fields: [
+          {
+            type: "row",
+            fields: [
+              {
+                name: "atributo",
+                type: "relationship",
+                relationTo: "atributos-ficha",
+                required: true,
+                label: "Atributo",
+                admin: { width: "55%" },
+              },
+              {
+                name: "valor",
+                type: "text",
+                required: true,
+                label: "Valor",
+                validate: valorDeAtributo,
+                admin: {
+                  width: "45%",
+                  description: "Solo el valor: la unidad la pone el catálogo.",
+                },
+              },
+            ],
+          },
+        ],
       },
       /*
        * FICHA TÉCNICA como pares etiqueta/valor, NO como campos fijos.

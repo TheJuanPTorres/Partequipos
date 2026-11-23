@@ -9,6 +9,7 @@ import { ContactoMarca } from "@/components/repuestos/ContactoMarca";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { vistaDeDocumento } from "@/lib/documentos/visor";
 import { configContactoMarca } from "@/lib/formularios/configFormulario";
+import { datosDeAtributos } from "@/lib/maquinaria/atributosFicha";
 import {
   datosDeCabecera,
   enlaceVista360,
@@ -150,7 +151,9 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     .map(({ url, alt, width, height }) => ({ url, alt, width, height }));
 
   // Máximo 5 características (regla del cliente): las de prioridad y, si faltan, otras reales.
-  const datos = datosDeCabecera(equipo.fichaTecnica);
+  // «Atributos destacados» del panel; sin ninguno, los de siempre (los elige el código de la ficha técnica).
+  const datos =
+    datosDeAtributos(equipo.atributosDestacados) ?? datosDeCabecera(equipo.fichaTecnica);
   const especificaciones = filasCompletas(equipo.fichaTecnica);
   const imagenContacto = imagenDeMedia(ficha.imagenContacto, "");
   // Un PNG es el recorte de ux-9 (sobresale del recuadro); otra cosa, una foto que lo llena.
@@ -218,7 +221,9 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     nombre: o.nombre,
     href: `${rutas.equipoNuevo(marca.slug, tipo.slug, o.slug)}/`,
     foto: imagenDeMedia(Array.isArray(o.imagenes) ? o.imagenes[0] : null, o.nombre),
-    datos: datosDeCabecera(o.fichaTecnica, DESTACADAS_EN_TARJETA),
+    datos:
+      datosDeAtributos(o.atributosDestacados, DESTACADAS_EN_TARJETA) ??
+      datosDeCabecera(o.fichaTecnica, DESTACADAS_EN_TARJETA),
     pdf: pdfDe(o),
   }));
 

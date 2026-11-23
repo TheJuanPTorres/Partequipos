@@ -1,4 +1,5 @@
 import { valoresParaReintento, type EstadoFormulario } from "@/lib/actions/estadoFormulario";
+import { revisarTiempo, trampaRellena } from "@/lib/formularios/antiSpam";
 import { desdeFormData, validarSolicitud, type DatosSolicitud } from "@/lib/validation/solicitud";
 
 /**
@@ -18,6 +19,10 @@ export type Dependencias = {
   /** Registra un fallo de guardado (el detalle no va al usuario, §8). */
   registrarError: (error: unknown) => void;
   ip?: string;
+  /** Cuenta un envío de esa IP; `false` si pasó el límite. Sin él, no se limita. */
+  permitirIp?: (ip: string | undefined) => boolean;
+  /** La hora actual (para probar el tiempo mínimo). */
+  ahora?: number;
 };
 
 /** Mensaje único para los fallos del servidor: no se filtran detalles al usuario. */
@@ -26,6 +31,10 @@ export const ERROR_GENERICO =
 export const ERROR_TURNSTILE =
   "No pudimos comprobar que eres una persona. Revisa la casilla de verificación y vuelve a enviar: lo que escribiste sigue aquí.";
 export const ERROR_VALIDACION = "Revisa los campos marcados.";
+export const ERROR_RAPIDO =
+  "Enviaste el formulario demasiado rápido. Espera unos segundos y vuelve a enviar: lo que escribiste sigue aquí.";
+export const ERROR_LIMITE =
+  "Has enviado varias solicitudes seguidas. Espera unos minutos o escríbenos por WhatsApp.";
 export const OK = "Recibimos tu solicitud. Te responderemos por correo o teléfono.";
 
 export async function procesarSolicitud(
@@ -35,6 +44,16 @@ export async function procesarSolicitud(
   // En cualquier error se devuelven los valores: React vacía el formulario
   // al terminar la acción, y así vuelve a rellenarse con lo que escribió.
   const valores = valoresParaReintento(formData);
+
+  // 0. Anti-spam, antes de cualquier trabajo. Campo trampa: se responde «enviado» sin guardar,
+  // para que el robot no sepa que fue descubierto.
+  if (trampaRellena(formData)) return { estado: "ok", mensaje: OK };
+  if (revisarTiempo(formData, deps.ahora) !== "ok") {
+    return { estado: "error", mensaje: ERROR_RAPIDO, valores };
+  }
+  if (deps.permitirIp && !deps.permitirIp(deps.ip)) {
+    return { estado: "error", mensaje: ERROR_LIMITE, valores };
+  }
 
   // 1. Validación. Primero, porque es barata y no toca la red.
   const resultado = validarSolicitud(desdeFormData(formData));

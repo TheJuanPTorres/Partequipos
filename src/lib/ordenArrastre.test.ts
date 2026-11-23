@@ -6,7 +6,7 @@ import { describe, it } from "node:test";
 
 import type { CollectionConfig, Field } from "payload";
 
-import { ORDEN_ARRASTRE, porClave } from "./ordenArrastre";
+import { ORDEN_ARRASTRE, ORDEN_LISTADO, porClave } from "./ordenArrastre";
 
 /*
  * GUARDARRAÍL DEL ORDEN POR ARRASTRE (2026-11-19). Si una consulta pública de una colección
@@ -52,17 +52,27 @@ function joinsOrdenables(campos: Field[]): { name: string; collection: string }[
   });
 }
 
-/** Lo que Payload ordena por arrastre: colección → su campo de orden. */
-async function ordenDeLaConfiguracion(): Promise<Map<string, string>> {
-  const mapa = new Map<string, string>();
+/**
+ * Lo que Payload ordena por arrastre: colección → su campo de orden (el del join si lo tiene) y,
+ * aparte, las que ADEMÁS son `orderable` para los listados que mezclan padres (`ORDEN_LISTADO`).
+ */
+async function ordenDeLaConfiguracion(): Promise<{
+  arrastre: Map<string, string>;
+  listado: Map<string, string>;
+}> {
+  const arrastre = new Map<string, string>();
+  const listado = new Map<string, string>();
   const todas = await colecciones();
-  for (const c of todas) if (c.orderable) mapa.set(c.slug, "_order");
+  for (const c of todas) if (c.orderable) arrastre.set(c.slug, "_order");
+  const joins = new Set<string>();
   for (const c of todas)
     for (const j of joinsOrdenables(c.fields)) {
-      assert.ok(!mapa.has(j.collection), `«${j.collection}» se ordena de dos maneras`);
-      mapa.set(j.collection, `_${j.collection}_${j.name}_order`);
+      assert.ok(!joins.has(j.collection), `«${j.collection}» tiene dos joins ordenables`);
+      joins.add(j.collection);
+      if (arrastre.has(j.collection)) listado.set(j.collection, "_order");
+      arrastre.set(j.collection, `_${j.collection}_${j.name}_order`);
     }
-  return mapa;
+  return { arrastre, listado };
 }
 
 function ficheros(dir: string): string[] {
@@ -96,6 +106,8 @@ function consultasSinOrden(archivos: { ruta: string; texto: string }[]): string[
         if (llamada === null) continue;
         const bien =
           llamada.includes(`ordenDe("${c}")`) ||
+          // Un listado que mezcla padres, con el arrastre de la lista de la colección.
+          (c in ORDEN_LISTADO && llamada.includes(`ordenDeListado("${c}")`)) ||
           // Una sola fila (por dirección web): no hay orden que respetar.
           /\blimit: 1\b/.test(llamada) ||
           // Con su motivo escrito: «orden-libre: …».
@@ -107,9 +119,12 @@ function consultasSinOrden(archivos: { ruta: string; texto: string }[]): string[
 
 describe("orden por arrastre en la web", () => {
   it("la lista es la de la configuración", async () => {
-    const config = await ordenDeLaConfiguracion();
-    assert.deepEqual(Object.fromEntries([...config].sort()), {
+    const { arrastre, listado } = await ordenDeLaConfiguracion();
+    assert.deepEqual(Object.fromEntries([...arrastre].sort()), {
       ...Object.fromEntries(Object.entries(ORDEN_ARRASTRE).sort()),
+    });
+    assert.deepEqual(Object.fromEntries([...listado].sort()), {
+      ...Object.fromEntries(Object.entries(ORDEN_LISTADO).sort()),
     });
   });
 

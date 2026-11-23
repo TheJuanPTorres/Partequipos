@@ -143,6 +143,41 @@ export const CorreoFormularios: GlobalConfig = {
     },
     {
       type: "collapsible",
+      label: "Respuesta automática al visitante",
+      admin: {
+        initCollapsed: false,
+        description:
+          "Al llegar una solicitud, el visitante recibe este correo («Hemos recibido tu mensaje…»). Si dejas el asunto o el texto vacíos, se usan los de siempre. Escribe {nombre} donde quieras su nombre. Solo sale en el sitio publicado: en un preview va al buzón de pruebas.",
+      },
+      fields: [
+        {
+          name: "respuestaActiva",
+          type: "checkbox",
+          label: "Enviar la respuesta automática",
+          defaultValue: true,
+        },
+        {
+          name: "respuestaAsunto",
+          type: "text",
+          label: "Asunto",
+          maxLength: 120,
+          admin: { placeholder: "Hemos recibido tu mensaje" },
+        },
+        {
+          name: "respuestaTexto",
+          type: "textarea",
+          label: "Texto",
+          maxLength: 2000,
+          admin: {
+            placeholder:
+              "Hola {nombre}, hemos recibido tu mensaje y un asesor te contactará muy pronto…",
+            description: "Texto simple. No incluye el mensaje que escribió el visitante.",
+          },
+        },
+      ],
+    },
+    {
+      type: "collapsible",
       label: "Correo de salida (SMTP) desde el panel",
       admin: {
         initCollapsed: false,

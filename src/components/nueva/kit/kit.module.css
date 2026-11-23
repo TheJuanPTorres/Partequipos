@@ -1059,7 +1059,7 @@
   .verCategoria {
     position: static;
     order: 2;
-    margin-top: 12px;
+    margin-top: var(--espacio-interno);
   }
 }
 

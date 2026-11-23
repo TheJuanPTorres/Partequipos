@@ -151,10 +151,28 @@ export async function rutaEnElSitio(
   return ruta.endsWith("/") || ruta.includes("#") ? ruta : `${ruta}/`;
 }
 
+/**
+ * Las colecciones con borradores cuyo botón abre la VISTA PREVIA (PR 8b): pasa por
+ * `/api/borrador/`, que exige sesión, activa el modo borrador y lleva a la página con el último
+ * borrador guardado. Un documento sin guardar (sin id) no tiene botón.
+ */
+export async function enlaceVistaPrevia(
+  coleccion: CollectionSlug,
+  doc: Doc,
+): Promise<string | null | undefined> {
+  if (coleccion !== "paginas") return undefined;
+  const id = doc.id;
+  if ((typeof id !== "number" && typeof id !== "string") || !String(id)) return null;
+  if (!slugPropio(doc)) return null;
+  return `/api/borrador/?pagina=${encodeURIComponent(String(id))}`;
+}
+
 /** `admin.preview` para una colección: busca las relaciones con la API local. */
 export function verEnElSitio(coleccion: CollectionSlug): GeneratePreviewURL {
-  return (doc, { req }) =>
-    rutaEnElSitio(coleccion, doc, async (c, id) => {
+  return async (doc, { req }) => {
+    const previa = await enlaceVistaPrevia(coleccion, doc);
+    if (previa !== undefined) return previa;
+    return rutaEnElSitio(coleccion, doc, async (c, id) => {
       const d = (await (req as PayloadRequest).payload.findByID({
         collection: c,
         id,
@@ -168,4 +186,5 @@ export function verEnElSitio(coleccion: CollectionSlug): GeneratePreviewURL {
         slugPadre: typeof d.slugPadre === "string" ? d.slugPadre : null,
       });
     });
+  };
 }

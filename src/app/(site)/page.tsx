@@ -236,11 +236,11 @@ export default async function HomePage() {
         antetitulo={tx(marcasRep?.antetitulo)}
         titulo={tx(marcasRep?.titulo)}
         resaltado={tx(marcasRep?.tituloResaltado)}
-        maquina={imagenDecorativa(marcasRep?.maquina)}
+        maquina={imagenDecorativa(marcasRep?.foto)}
         reflejo={null}
         escalaMaquina={escalaDeMaquina(marcasRep?.tamanoMaquina, 100)}
         altMaquina={tx(
-          marcasRep?.maquina && typeof marcasRep.maquina === "object" ? marcasRep.maquina.alt : "",
+          marcasRep?.foto && typeof marcasRep.foto === "object" ? marcasRep.foto.alt : "",
         )}
       />
 

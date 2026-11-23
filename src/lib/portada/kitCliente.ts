@@ -62,7 +62,7 @@ export function filtrosDeUsados(seccion: Pagina["seccionUsada"]): FiltroUsados[]
       clave: SLUG_EXCAVADORAS,
       nombre: nombre(etiquetas.excavadoras, "Excavadora"),
       href: hrefDeCategoriaUsada(SLUG_EXCAVADORAS),
-      imagen: imagenDecorativa(seccion?.imagenExcavadoras),
+      imagen: imagenDecorativa(seccion?.imgExcavadoras),
     },
     {
       clave: SEGMENTO_OTROS_USADA,
@@ -74,7 +74,7 @@ export function filtrosDeUsados(seccion: Pagina["seccionUsada"]): FiltroUsados[]
       clave: SLUG_CATEGORIA_USADA_ADITAMENTOS,
       nombre: nombre(etiquetas.aditamentos, "Aditamentos"),
       href: hrefDeCategoriaUsada(SLUG_CATEGORIA_USADA_ADITAMENTOS),
-      imagen: imagenDecorativa(seccion?.imagenAditamentos),
+      imagen: imagenDecorativa(seccion?.imgAditamentos),
     },
   ];
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
 import { ProveedorContacto } from "@/components/forms/ProveedorContacto";
+import { AvisoVistaPrevia } from "@/components/layout/AvisoVistaPrevia";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { WhatsApp } from "@/components/layout/WhatsApp";
@@ -68,6 +69,7 @@ export default function RootLayout({
         >
           Saltar al contenido
         </a>
+        <AvisoVistaPrevia />
         <Header />
         <div id="contenido" className="flex-1">
           <ProveedorContacto>{children}</ProveedorContacto>

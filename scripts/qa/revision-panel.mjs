@@ -23,6 +23,8 @@
  *   corta), los errores de consola y las peticiones que fallan (solo host y
  *   ruta), para no depender solo de mirar.
  * - Navegador: Chrome instalado (otra ruta con `CHROME_PATH`).
+ * - Modo `imagenes <carpeta>`: sube imágenes de prueba, lee lo guardado y las borra (reducción al
+ *   subir, 2026-11-23).
  * - Modos (tercer argumento): `ficha` (aviso de más de 4 «Destacar»), `acceso`
  *   (la pantalla de acceso, §17–§19 de decisiones-panel.md), `avisos` (los
  *   avisos del panel, §22), `listas` (estados, fechas, miniaturas y ordenar,
@@ -414,6 +416,96 @@ try {
         }, id);
         hallazgos.push({ pantalla: "fuente", nombre, creada, id, ...doc });
         decir(`✓ ${nombre}: id ${id} · ${doc.mimeType} · formato ${doc.formato}`);
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `imagenes` (`… imagenes <carpeta>`): sube por el formulario del panel cada JPEG, PNG y
+     * WebP de la carpeta y lee lo que guardó Payload (nombre, tipo, peso y medidas) y lo que
+     * sirve el almacén, para comprobar la reducción al subir (3840 px de ancho, WebP). Crea
+     * imágenes «Prueba de reducción al subir…» y las BORRA al terminar (si no puede, lo dice).
+     */
+    if (MODO === "imagenes") {
+      const carpeta = process.argv[4];
+      if (!carpeta || !fs.existsSync(carpeta)) fallar("Uso: … imagenes <carpeta con las imágenes>");
+      if (ancho.movil) {
+        await contexto.close();
+        continue;
+      }
+      const TIPOS = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp" };
+      const ficheros = fs.readdirSync(carpeta).filter((f) => /\.(jpe?g|png|webp)$/i.test(f));
+      for (const nombre of ficheros) {
+        const datos = fs.readFileSync(path.join(carpeta, nombre));
+        await pagina.goto(`${base}/admin/collections/media/create`, { waitUntil: "networkidle" });
+        await pagina.locator('input[type="file"]').setInputFiles({
+          name: nombre,
+          mimeType: TIPOS[nombre.split(".").pop().toLowerCase()],
+          buffer: datos,
+        });
+        await pagina
+          .locator("#field-alt")
+          .fill(
+            `Prueba de reducción al subir, fichero ${nombre.replace(/\W+/g, " ")} ${Date.now()}`,
+          );
+        await pagina.locator("#action-save").click();
+        const creada = await pagina
+          .waitForURL((u) => /\/media\/\d+/.test(u.pathname), { timeout: 60_000 })
+          .then(() => true)
+          .catch(() => false);
+        await pagina.waitForTimeout(1500);
+        const avisos = await pagina.locator("[data-sonner-toast]").allTextContents();
+        await pagina.screenshot({
+          path: path.join(salida, `imagen-${nombre}.png`),
+          fullPage: true,
+        });
+        if (!creada) {
+          hallazgos.push({ pantalla: "imagen", nombre, creada, avisos });
+          decir(`✗ ${nombre}: no se guardó — ${avisos.join(" | ").slice(0, 300)}`);
+          continue;
+        }
+        const id = new URL(pagina.url()).pathname.split("/").filter(Boolean).pop();
+        const doc = await pagina.evaluate(async (i) => {
+          const r = await fetch(`/api/media/${i}?depth=0`, { credentials: "include" });
+          const d = await r.json();
+          const f = await fetch(d.url);
+          const b = new Uint8Array(await f.arrayBuffer());
+          const firma = String.fromCharCode(...b.slice(0, 4), ...b.slice(8, 12));
+          const mapa = await createImageBitmap(new Blob([b]));
+          return {
+            filename: d.filename,
+            mimeType: d.mimeType,
+            filesize: d.filesize,
+            medidas: `${d.width}x${d.height}`,
+            servido: {
+              estado: f.status,
+              tipo: f.headers.get("content-type"),
+              bytes: b.length,
+              firma,
+              medidas: `${mapa.width}x${mapa.height}`,
+            },
+          };
+        }, id);
+        const borrada = await pagina.evaluate(async (i) => {
+          const r = await fetch(`/api/media/${i}`, { method: "DELETE", credentials: "include" });
+          return r.status;
+        }, id);
+        hallazgos.push({
+          pantalla: "imagen",
+          nombre,
+          original: datos.length,
+          id,
+          ...doc,
+          avisos,
+          borrada,
+        });
+        decir(
+          `✓ ${nombre} (${datos.length} bytes) → id ${id} · ${doc.filename} · ${doc.mimeType} · ` +
+            `${doc.filesize} bytes · ${doc.medidas} · servido ${JSON.stringify(doc.servido)} · ` +
+            `avisos: ${avisos.join(" | ").slice(0, 300) || "ninguno"} · borrado: HTTP ${borrada}`,
+        );
       }
       hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
       await contexto.close();

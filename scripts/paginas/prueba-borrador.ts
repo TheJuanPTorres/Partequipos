@@ -8,6 +8,8 @@
  *   «PRUEBA BORRADOR 8B» en el título. Solo escribe en la tabla de versiones: lo publicado no cambia.
  * - `retirar`: borra las versiones con la marca. Lo publicado sigue igual.
  */
+export {};
+
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 

@@ -296,12 +296,15 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Este orden es el del listado de maquinaria nueva de la web (el índice y las categorías, con «Recomendados»). Arrastra las filas para cambiarlo; uno nuevo entra al final. El de dentro de cada tipo se cambia en la ficha del tipo.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "equipos-nuevos".
  */
 export interface EquiposNuevo {
   id: number;
   '_equipos-nuevos_equipos_order'?: string | null;
+  _order?: string | null;
   nombre: string;
   /**
    * Tiene que ser la marca del tipo de equipo de abajo. Si la cambias, vuelve a elegir el tipo.
@@ -516,7 +519,7 @@ export interface MarcasMaquinaria {
     mostrarEmblema?: boolean | null;
   };
   /**
-   * En el orden en que salen en la web. Arrastra las filas para cambiarlo; uno nuevo entra al final.
+   * Este orden es el de dentro de la marca (su página y su menú). Arrastra las filas para cambiarlo; uno nuevo entra al final. El de las pestañas de tipo del listado de maquinaria nueva se cambia en «Tipos de maquinaria nueva».
    */
   tipos?: {
     docs?: (number | TiposMaquinaria)[];
@@ -593,12 +596,15 @@ export interface Media {
   focalY?: number | null;
 }
 /**
+ * Este orden es el de las pestañas de tipo del listado de maquinaria nueva y de «Por tipo de máquina». Arrastra las filas para cambiarlo; uno nuevo entra al final. El de dentro de cada marca se cambia en la ficha de la marca.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "tipos-maquinaria".
  */
 export interface TiposMaquinaria {
   id: number;
   '_tipos-maquinaria_tipos_order'?: string | null;
+  _order?: string | null;
   nombre: string;
   marca: number | MarcasMaquinaria;
   descripcion?: string | null;
@@ -607,7 +613,7 @@ export interface TiposMaquinaria {
    */
   subtipos?: (number | TiposMaquinaria)[] | null;
   /**
-   * En el orden en que salen en la web. Arrastra las filas para cambiarlo; uno nuevo entra al final.
+   * Este orden es el de dentro del tipo (su página y «Otras referencias» de la ficha). Arrastra las filas para cambiarlo; uno nuevo entra al final. El del listado de maquinaria nueva se cambia en «Equipos nuevos».
    */
   equipos?: {
     docs?: (number | EquiposNuevo)[];
@@ -3090,6 +3096,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
  */
 export interface EquiposNuevosSelect<T extends boolean = true> {
   '_equipos-nuevos_equipos_order'?: T;
+  _order?: T;
   nombre?: T;
   marca?: T;
   tipo?: T;
@@ -3241,6 +3248,7 @@ export interface MarcasMaquinariaSelect<T extends boolean = true> {
  */
 export interface TiposMaquinariaSelect<T extends boolean = true> {
   '_tipos-maquinaria_tipos_order'?: T;
+  _order?: T;
   nombre?: T;
   marca?: T;
   descripcion?: T;

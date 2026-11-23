@@ -568,7 +568,7 @@ export interface MarcasMaquinaria {
   createdAt: string;
 }
 /**
- * Fotos y logos del sitio, en JPEG, PNG o WebP, de hasta 15 MB (suben directo al almacén). El texto alternativo describe la imagen a quien no la ve.
+ * Fotos y logos del sitio, en JPEG, PNG o WebP. Al subirlas se reducen solas a 3840 px de ancho como mucho y se guardan en WebP; ya reducidas, hasta 15 MB. El texto alternativo describe la imagen a quien no la ve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".

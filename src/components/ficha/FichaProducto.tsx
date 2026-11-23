@@ -1,3 +1,4 @@
+import { TextoTitulo } from "@/components/comun/TextoTitulo";
 import {
   IconBrandWhatsapp,
   IconCirclePlus,
@@ -177,7 +178,7 @@ export function FichaProducto({
             </nav>
 
             <h1 id="ficha-titulo" className={`${estilos.titulo} texto-titulo-bloque`}>
-              {nombre}
+              <TextoTitulo texto={nombre} />
             </h1>
           </div>
 

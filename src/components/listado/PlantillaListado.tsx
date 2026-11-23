@@ -1,3 +1,4 @@
+import { TextoTitulo } from "@/components/comun/TextoTitulo";
 import { IconAdjustmentsHorizontal, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -340,8 +341,8 @@ export function PlantillaListado<T>({
               </span>
             ))}
           </nav>
-          <h1 className={estilos.titulo}>
-            {titulo}
+          <h1 className={`${estilos.titulo}`}>
+            <TextoTitulo texto={titulo} />
             {pagina > 1 ? <small>Página {pagina}</small> : null}
           </h1>
           {descripcion ? <p className={estilos.descripcion}>{descripcion}</p> : null}

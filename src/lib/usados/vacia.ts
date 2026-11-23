@@ -61,6 +61,8 @@ export type EquipoNuevoAlternativa = {
   tipoRef: { slug: string; nombre: string } | null;
   marcaRef: { slug: string; nombre: string } | null;
   foto: Foto;
+  /** Su puesto en el orden del listado de nueva (el del panel, `ORDEN_LISTADO`). */
+  orden?: number;
 };
 
 export type CategoriaNuevaAlternativa = { slug: string; nombre: string; tipos: number[] };
@@ -132,7 +134,12 @@ function alternativasPorNombre(
     if (!e.tipoRef || !e.marcaRef || nombreComparable(e.tipoRef.nombre) !== buscado) continue;
     porTipo.set(e.tipoId, [...(porTipo.get(e.tipoId) ?? []), e]);
   }
+  // En el orden del panel (tanda 21, H10): el del listado de nueva, por el primer equipo de cada
+  // tipo; antes, por el título. Sin puesto, al final.
+  const puesto = (suyos: EquipoNuevoAlternativa[]) =>
+    Math.min(...suyos.map((e) => e.orden ?? Number.MAX_SAFE_INTEGER));
   const deTipo = [...porTipo.values()]
+    .sort((a, b) => puesto(a) - puesto(b))
     .map((suyos) => {
       const { tipoRef, marcaRef } = suyos[0]!;
       return {
@@ -143,7 +150,6 @@ function alternativasPorNombre(
         soloEscritorio: false,
       };
     })
-    .sort((a, b) => a.titulo.localeCompare(b.titulo, "es"))
     .slice(0, tope);
   if (deTipo.length) return deTipo;
 

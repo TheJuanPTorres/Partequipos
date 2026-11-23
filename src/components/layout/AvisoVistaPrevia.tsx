@@ -6,6 +6,11 @@ import { draftMode } from "next/headers";
  * que vuelve a la misma página (por la cabecera `Referer`, solo si es del propio sitio).
  * `draftMode()` no hace dinámica la página para los demás visitantes.
  */
+/** Lo que no debe correr en la vista previa del borrador (la analítica: no son visitas). */
+export async function FueraDeVistaPrevia({ children }: { children: React.ReactNode }) {
+  return (await draftMode()).isEnabled ? null : children;
+}
+
 export async function AvisoVistaPrevia() {
   if (!(await draftMode()).isEnabled) return null;
   return (

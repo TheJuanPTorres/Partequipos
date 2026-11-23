@@ -7,6 +7,7 @@ import { AvisoVistaPrevia, FueraDeVistaPrevia } from "@/components/layout/AvisoV
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { WhatsApp } from "@/components/layout/WhatsApp";
+import { SCRIPT_TECHO_ESCALA } from "@/lib/estilos/escala";
 import { indexacionPermitida } from "@/lib/seo/config";
 
 import "./globals.css";
@@ -51,7 +52,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} h-full antialiased`}>
+    // `suppressHydrationWarning`: el script de abajo pone `--escala-techo` en `<html>` antes de hidratar.
+    <html lang="es" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        {/* Techo de la escala de pantallas grandes por monitor, para que el zoom funcione (globals.css). */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_TECHO_ESCALA }} />
+      </head>
       <body className="flex min-h-full flex-col">
         {/*
          * Enlace de salto al contenido (WCAG 2.4.1, nivel A).

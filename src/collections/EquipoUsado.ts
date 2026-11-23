@@ -89,6 +89,8 @@ export const EquipoUsado: CollectionConfig = {
       // Avisos en vivo (F4): sin fotos, y «no sale en el sitio» si no está disponible.
       avisoField("avisoNoDisponible", "AvisoNoDisponible"),
       avisoField("avisoSinFotos", "AvisoSinFotos"),
+      // El nombre empieza por «test» o «prueba»: avisa, no bloquea (tanda 21, tarea 8).
+      avisoField("avisoNombreDePrueba", "AvisoNombreDePrueba"),
       {
         name: "nombre",
         type: "text",

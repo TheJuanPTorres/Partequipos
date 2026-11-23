@@ -31,3 +31,12 @@ export function tieneSubida(valor: unknown): boolean {
   if (typeof valor === "string") return valor.trim() !== "";
   return typeof valor === "object" && valor !== null;
 }
+
+/**
+ * ¿Parece un dato de PRUEBA? El nombre empieza por «test» o «prueba» (con o sin «s», en cualquier
+ * mayúscula). Tanda 21, tarea 8 (2026-11-23): en el listado publicado apareció una unidad «Test
+ * segunda pasada». El aviso NO bloquea: avisa y deja guardar. «Testimonio» no cuenta.
+ */
+export function pareceDePrueba(nombre: unknown): boolean {
+  return typeof nombre === "string" && /^\s*(test|prueba)s?(?![\p{L}\p{N}])/iu.test(nombre);
+}

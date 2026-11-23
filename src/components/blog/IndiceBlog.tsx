@@ -157,7 +157,12 @@ export async function IndiceBlog({
                   placeholder="Buscar artículos…"
                   autoComplete="off"
                 />
-                <button type="submit" className={estilos.lupa} aria-label="Buscar">
+                <button
+                  type="submit"
+                  className={estilos.lupa}
+                  aria-label="Buscar"
+                  data-evita-flotante=""
+                >
                   <IconSearch aria-hidden="true" size={18} stroke={2.2} />
                 </button>
               </form>

@@ -28,6 +28,8 @@ export const CAMPOS_MENU = {
     "subtipos",
     "pestanaIndiceNueva",
     "_tipos-maquinaria_tipos_order",
+    // El de la colección: el orden de «Por tipo de máquina» de los tipos sueltos (2026-11-23).
+    "_order",
   ],
   // `_order`: el orden arrastrando del panel (`orderable`, 2026-11-09).
   "categorias-maquinaria": ["nombre", "slug", "tiposIncluidos", "_order"],

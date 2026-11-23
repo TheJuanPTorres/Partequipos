@@ -2,6 +2,7 @@ import { default as default_7d4eccb57b337121abb97170a6625d97 } from '../../../co
 import { default as default_4fdf05aabfcf02e659803b82d700369d } from '../../../components/admin/celdas/CeldaSolicitud'
 import { default as default_0c32825fe60d0fe4ee2f9fbf6df19841 } from '../../../components/admin/aviso/AvisoSolicitudes'
 import { default as default_c9f64be0d161498ee822e08aa62ffab9 } from '../../../components/admin/aviso/AvisoSinFotos'
+import { default as default_cd6b9752772376bd5330c6c1a5a710c7 } from '../../../components/admin/aviso/AvisoNombreDePrueba'
 import { default as default_c27194df1b451b2a5c6b9699120a24a9 } from '../../../components/admin/aviso/AvisoFotoPequena'
 import { default as default_40a9883d727ab65fdd0e9c9df10e79e2 } from '../../../components/admin/celdas/CeldaMiniatura'
 import { default as default_137d3220b5ae877ef2c31422510baf68 } from '../../../components/admin/SeoGuiado'
@@ -73,6 +74,7 @@ export const importMap = {
   "/components/admin/celdas/CeldaSolicitud#default": default_4fdf05aabfcf02e659803b82d700369d,
   "/components/admin/aviso/AvisoSolicitudes#default": default_0c32825fe60d0fe4ee2f9fbf6df19841,
   "/components/admin/aviso/AvisoSinFotos#default": default_c9f64be0d161498ee822e08aa62ffab9,
+  "/components/admin/aviso/AvisoNombreDePrueba#default": default_cd6b9752772376bd5330c6c1a5a710c7,
   "/components/admin/aviso/AvisoFotoPequena#default": default_c27194df1b451b2a5c6b9699120a24a9,
   "/components/admin/celdas/CeldaMiniatura#default": default_40a9883d727ab65fdd0e9c9df10e79e2,
   "/components/admin/SeoGuiado#default": default_137d3220b5ae877ef2c31422510baf68,

@@ -1,4 +1,4 @@
-import { IconAdjustmentsHorizontal, IconChevronDown, IconX } from "@tabler/icons-react";
+import { IconAdjustmentsHorizontal, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -17,6 +17,7 @@ import type { LogoMarca } from "@/lib/marca/logoMarca";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 
 import { CambioDeVista } from "./CambioDeVista";
+import { DesplegableOrdenar } from "./DesplegableOrdenar";
 import { CategoriasListado } from "./CategoriasListado";
 import { iconoDePestana } from "./iconos";
 import estilos from "./listado.module.css";
@@ -174,12 +175,7 @@ export function PlantillaListado<T>({
             </>
           ) : null}
           {total > 1 && ordenActual ? (
-            <details className={estilos.ordenar}>
-              <summary>
-                Ordenar
-                <span className="sr-only">: {ordenActual.etiqueta}</span>
-                <IconChevronDown size={18} stroke={2} aria-hidden="true" />
-              </summary>
+            <DesplegableOrdenar etiqueta={ordenActual.etiqueta}>
               <ul>
                 {ordenes.map((o) => (
                   <li key={o.valor}>
@@ -194,7 +190,7 @@ export function PlantillaListado<T>({
                   </li>
                 ))}
               </ul>
-            </details>
+            </DesplegableOrdenar>
           ) : null}
           {elementos.length > 1 ? (
             <CambioDeVista idLista={idLista} recolocar={anim.has("A8")} />

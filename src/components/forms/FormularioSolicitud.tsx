@@ -5,6 +5,7 @@ import { useActionState, useEffect, useId, useRef } from "react";
 
 import { Campo, claseControl } from "@/components/forms/Campo";
 import { Turnstile } from "@/components/forms/Turnstile";
+import { enviarEvento } from "@/lib/analitica/navegador";
 import { ESTADO_INICIAL } from "@/lib/actions/estadoFormulario";
 import { enviarSolicitud } from "@/lib/actions/solicitudes";
 import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/opcionesSolicitud";
@@ -156,6 +157,11 @@ export function FormularioSolicitud({
     vuelta.current += 1;
     formulario.current.dataset.vuelta = String(vuelta.current % 2);
   }, [estado, f4]);
+
+  // Analítica: el envío con éxito, solo con el tipo de formulario (ningún dato de la persona).
+  useEffect(() => {
+    if (estado.estado === "ok") enviarEvento("envio_formulario", { formulario: tipo });
+  }, [estado, tipo]);
 
   useEffect(() => {
     if (estado.estado === "ok") confirmacionRef.current?.focus();

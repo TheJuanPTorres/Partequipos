@@ -86,6 +86,7 @@ export function WhatsAppFlotante({ href }: { href: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Escríbenos por WhatsApp"
+      data-analitica="whatsapp-flotante"
       className={estilos.flotante}
     >
       <svg viewBox="68 68 320 320" aria-hidden="true" focusable="false">

@@ -27,6 +27,10 @@ async function colecciones(): Promise<CollectionConfig[]> {
 // Los que Payload añade solo: fechas, y los de los ficheros en las colecciones de subida.
 const AUTOMATICOS = new Set(["id", "createdAt", "updatedAt"]);
 const DE_SUBIDA = new Set(["filename", "width", "height", "filesize", "mimeType", "url"]);
+// El estado de una colección con borradores (`versions.drafts`).
+const DE_BORRADORES = new Set(["_status"]);
+const conBorradores = (c: CollectionConfig) =>
+  typeof c.versions === "object" && Boolean(c.versions.drafts);
 
 describe("listados del panel (PR 5)", () => {
   it("cada colección de la tabla existe, y sus columnas y campos de búsqueda también", async () => {
@@ -38,7 +42,10 @@ describe("listados del panel (PR 5)", () => {
         camposDeDatos(c.fields).flatMap((f) => ("name" in f && f.name ? [f.name] : [])),
       );
       const existe = (n: string) =>
-        nombres.has(n) || AUTOMATICOS.has(n) || (Boolean(c.upload) && DE_SUBIDA.has(n));
+        nombres.has(n) ||
+        AUTOMATICOS.has(n) ||
+        (Boolean(c.upload) && DE_SUBIDA.has(n)) ||
+        (conBorradores(c) && DE_BORRADORES.has(n));
       for (const n of [...listado.columnas, ...(listado.busqueda ?? [])]) {
         assert.ok(existe(n), `«${slug}»: no existe el campo «${n}»`);
       }

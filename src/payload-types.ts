@@ -218,9 +218,21 @@ export interface Solicitude {
   createdAt: string;
   tipo: 'contacto' | 'cotizacion' | 'repuesto';
   /**
-   * Marcar como atendida en vez de borrar: conserva el historial.
+   * Nueva → Contactada (ya hablaste con la persona) → Cerrada. No la borres: conserva el historial. Solo las «Nuevas» cuentan como pendientes.
    */
-  estado: 'nueva' | 'atendida';
+  estado: 'nueva' | 'contactada' | 'cerrada';
+  /**
+   * Quién se encarga de esta solicitud.
+   */
+  responsable?: (number | null) | User;
+  /**
+   * Se apunta sola al pasar de «Nueva»; puedes corregirla.
+   */
+  fechaContacto?: string | null;
+  /**
+   * Solo las ve el equipo en el panel; nunca salen al visitante.
+   */
+  notasInternas?: string | null;
   nombre: string;
   correo: string;
   telefono?: string | null;
@@ -247,6 +259,41 @@ export interface Solicitude {
    */
   origen?: string | null;
   updatedAt: string;
+}
+/**
+ * Cuentas con acceso al panel. Solo un administrador puede crear usuarios o cambiar roles.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  /**
+   * El editor no puede crear usuarios, cambiar roles ni borrar registros. Solo un administrador cambia este campo.
+   */
+  rol: 'administrador' | 'editor';
+  /**
+   * Permite cambiar la dirección web de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.
+   */
+  puedeEditarSlugs?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -521,7 +568,7 @@ export interface MarcasMaquinaria {
   createdAt: string;
 }
 /**
- * Fotos y logos del sitio, en JPEG, PNG o WebP, de hasta 15 MB (suben directo al almacén). El texto alternativo describe la imagen a quien no la ve.
+ * Fotos y logos del sitio, en JPEG, PNG o WebP. Al subirlas se reducen solas a 3840 px de ancho como mucho y se guardan en WebP; ya reducidas, hasta 15 MB. El texto alternativo describe la imagen a quien no la ve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -544,41 +591,6 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
-}
-/**
- * Cuentas con acceso al panel. Solo un administrador puede crear usuarios o cambiar roles.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number;
-  /**
-   * El editor no puede crear usuarios, cambiar roles ni borrar registros. Solo un administrador cambia este campo.
-   */
-  rol: 'administrador' | 'editor';
-  /**
-   * Permite cambiar la dirección web de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.
-   */
-  puedeEditarSlugs?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1687,7 +1699,7 @@ export interface Pagina {
     /**
      * La máquina recortada (PNG o WebP transparente) de la tarjeta de tipo. Opcional.
      */
-    imagenExcavadoras?: (number | null) | Media;
+    imgExcavadoras?: (number | null) | Media;
     /**
      * La máquina recortada (PNG o WebP transparente) de la tarjeta del filtro. Opcional.
      */
@@ -1695,7 +1707,7 @@ export interface Pagina {
     /**
      * El aditamento recortado (PNG o WebP transparente) de la tarjeta del filtro. Opcional.
      */
-    imagenAditamentos?: (number | null) | Media;
+    imgAditamentos?: (number | null) | Media;
     /**
      * Tarjeta de tipo de la sección; lleva a la categoría «Excavadora» de usados. Vacío: «Excavadora».
      */
@@ -1812,7 +1824,7 @@ export interface Pagina {
     /**
      * Sin efecto desde el 2026-11-03 (diseño v3 del cliente): la sección ya no lleva máquina.
      */
-    maquinaReflejo?: (number | null) | Media;
+    reflejo?: (number | null) | Media;
   };
   /**
    * Los logos son los de las marcas de repuestos (se cambian en cada marca) y cada uno lleva a la página de su marca.
@@ -1857,7 +1869,7 @@ export interface Pagina {
     /**
      * Decorativa: la máquina a la izquierda, por delante de la banda de logos (hoy, la Yanmar ViO80). Opcional.
      */
-    maquina?: (number | null) | Media;
+    foto?: (number | null) | Media;
     /**
      * Entre 60 y 100. 100 es el tamaño del diseño original; por defecto, 100. Solo desde portátil: en el teléfono no cambia.
      */
@@ -1946,6 +1958,7 @@ export interface Pagina {
   actualizadoPor?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2884,6 +2897,9 @@ export interface SolicitudesSelect<T extends boolean = true> {
   createdAt?: T;
   tipo?: T;
   estado?: T;
+  responsable?: T;
+  fechaContacto?: T;
+  notasInternas?: T;
   nombre?: T;
   correo?: T;
   telefono?: T;
@@ -3492,9 +3508,9 @@ export interface PaginasSelect<T extends boolean = true> {
         descripcion?: T;
         descripcionAlineacion?: T;
         descripcionAncho?: T;
-        imagenExcavadoras?: T;
+        imgExcavadoras?: T;
         imagenOtros?: T;
-        imagenAditamentos?: T;
+        imgAditamentos?: T;
         pestanaExcavadoras?: T;
         pestanaOtros?: T;
         pestanaAditamentos?: T;
@@ -3537,7 +3553,7 @@ export interface PaginasSelect<T extends boolean = true> {
         whatsappMensaje?: T;
         verMasTexto?: T;
         maquina?: T;
-        maquinaReflejo?: T;
+        reflejo?: T;
       };
   seccionMarcasRepuestos?:
     | T
@@ -3565,7 +3581,7 @@ export interface PaginasSelect<T extends boolean = true> {
                     blockName?: T;
                   };
             };
-        maquina?: T;
+        foto?: T;
         tamanoMaquina?: T;
       };
   seccionCompania?:
@@ -3621,6 +3637,7 @@ export interface PaginasSelect<T extends boolean = true> {
   actualizadoPor?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

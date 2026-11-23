@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
+import { Analitica } from "@/components/analitica/Analitica";
 import { ProveedorContacto } from "@/components/forms/ProveedorContacto";
+import { AvisoVistaPrevia, FueraDeVistaPrevia } from "@/components/layout/AvisoVistaPrevia";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { WhatsApp } from "@/components/layout/WhatsApp";
@@ -68,6 +70,7 @@ export default function RootLayout({
         >
           Saltar al contenido
         </a>
+        <AvisoVistaPrevia />
         <Header />
         <div id="contenido" className="flex-1">
           <ProveedorContacto>{children}</ProveedorContacto>
@@ -75,6 +78,10 @@ export default function RootLayout({
         <Footer />
         {/* Botón flotante de WhatsApp: en todo el sitio público, no en el panel. */}
         <WhatsApp />
+        {/* Aviso de cookies y Analytics: solo con `NEXT_PUBLIC_GA4_ID`, y nada hasta aceptar. */}
+        <FueraDeVistaPrevia>
+          <Analitica />
+        </FueraDeVistaPrevia>
       </body>
     </html>
   );

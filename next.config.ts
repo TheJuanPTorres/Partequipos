@@ -177,18 +177,21 @@ const nextConfig: NextConfig = {
        *    (`connect-src`), solo cuando el bloque se acerca a la pantalla.
        * 7. Hero: las fuentes propias del título (colección «Fuentes») se
        *    sirven desde el Blob (`font-src`).
+       * 8. Analítica (2026-11-20): Google Analytics 4, solo con `NEXT_PUBLIC_GA4_ID`
+       *    y solo tras aceptar las cookies: el script de `googletagmanager.com`
+       *    y sus envíos a `google-analytics.com` y `analytics.google.com`.
        */
       {
         key: "Content-Security-Policy-Report-Only",
         value: [
           "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://api.mapbox.com",
+          "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://api.mapbox.com https://www.googletagmanager.com",
           "style-src 'self' 'unsafe-inline' https://api.mapbox.com",
-          "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
+          "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://*.google-analytics.com https://*.googletagmanager.com",
           "font-src 'self' data: https://*.public.blob.vercel-storage.com",
           "media-src 'self' https://*.public.blob.vercel-storage.com",
           "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com",
-          "connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com https://*.public.blob.vercel-storage.com",
+          "connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com https://*.public.blob.vercel-storage.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
           "worker-src 'self' blob:",
           "child-src blob:",
           "object-src 'none'",

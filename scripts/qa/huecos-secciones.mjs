@@ -15,7 +15,7 @@
  * falsean la medida. El CLS de carga se mide aparte, sin emular nada.
  *
  * Marca (⚠) cada hueco que pasa del ESPACIADO COMÚN a ese ancho más 8 px de margen, y (✗) los que
- * pasan de 48 px, el máximo. El espaciado común es `--espacio-seccion` de `globals.css`:
+ * pasan de 48 px, el máximo (desde 1600 px, los dos ×ancho/1600: escala del #499). El espaciado común es `--espacio-seccion` de `globals.css`:
  * clamp(24px, 15px + 2.3vw, 48px).
  *
  *   npm run preview:ejecutar -- npx -y -p playwright-core@1.63.0 node scripts/qa/huecos-secciones.mjs <preview> <carpeta> [ruta…]
@@ -58,8 +58,18 @@ const ANCHOS = (
 const anchoDe = (vista) => Number(vista.split("x")[0]);
 const altoDe = (vista) => Number(vista.split("x")[1] ?? 900);
 const MAXIMO = 48;
-/** El espaciado común a un ancho: clamp(24px, 15px + 2.3vw, 48px). */
-const comun = (ancho) => Math.min(MAXIMO, Math.max(24, 15 + 0.023 * ancho));
+/**
+ * La escala proporcional desde 1600 px (#499, `--escala-px` de `globals.css`): los píxeles del CSS
+ * crecen ×ancho/1600, así que el común y el máximo también.
+ */
+const escala = (ancho) => Math.max(1, ancho / 1600);
+const maximo = (ancho) => MAXIMO * escala(ancho);
+/** El espaciado común a un ancho: clamp(24px, 15px + 2.3vw, 48px), con la escala. */
+const comun = (ancho) =>
+  Math.min(
+    MAXIMO * escala(ancho),
+    Math.max(24 * escala(ancho), 15 * escala(ancho) + 0.023 * ancho),
+  );
 fs.mkdirSync(carpeta, { recursive: true });
 
 const navegador = await pw.chromium.launch({
@@ -330,7 +340,8 @@ for (const ruta of rutas) {
     const celdas = ANCHOS.map((a) => {
       const f = deRuta.find((x) => x.ancho === a)?.filas.find((g) => g.entre === clave);
       if (!f) return "—";
-      const marca = f.hueco > MAXIMO ? " ✗" : f.hueco > comun(anchoDe(a)) + 8 ? " ⚠" : "";
+      const marca =
+        f.hueco > maximo(anchoDe(a)) + 1 ? " ✗" : f.hueco > comun(anchoDe(a)) + 8 ? " ⚠" : "";
       return `${f.hueco}${marca}`;
     });
     lineas.push(`| ${clave.replace(/\|/g, "/")} | ${celdas.join(" | ")} |`);
@@ -342,6 +353,6 @@ for (const ruta of rutas) {
   );
 }
 lineas.push(
-  `Espaciado común por ancho: ${ANCHOS.map((a) => `${a}: ${Math.round(comun(anchoDe(a)))}`).join(" · ")}. ⚠ pasa del común + 8 px; ✗ pasa de ${MAXIMO} px.`,
+  `Espaciado común por ancho: ${ANCHOS.map((a) => `${a}: ${Math.round(comun(anchoDe(a)))}`).join(" · ")}. ⚠ pasa del común + 8 px; ✗ pasa del máximo (${MAXIMO} px; desde 1600, ×ancho/1600).`,
 );
 fs.writeFileSync(path.join(carpeta, "huecos.md"), lineas.join("\n") + "\n");

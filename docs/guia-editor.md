@@ -279,9 +279,14 @@ oficial, no lo pongas.
 - **Formatos: JPEG, PNG o WebP.** Ni SVG, ni PDF, ni AVIF, ni HEIC (las fotos
   del iPhone): conviértelas antes. El panel lo comprueba por el contenido, no
   por el nombre del fichero.
-- **Máximo 15 MB por imagen.** Si pesa más, el panel avisa antes de empezar a
-  subir y no sube nada: redúcela al exportarla. Las fichas en PDF
-  (**Documentos**) admiten hasta **30 MB**.
+- **Se reducen solas al subir.** El panel deja cada imagen en **3840 px de
+  ancho como mucho** (una más pequeña no se amplía) y la guarda en **WebP**;
+  por eso el nombre guardado acaba en `.webp`. Las imágenes que ya estaban no
+  cambian.
+- **Máximo 15 MB por imagen, ya reducida** (y 60 MB el original). Si el
+  original pesaba 8 MB o más, el panel avisa: se sube igual, pero conviene
+  exportarlas a 3840 px de ancho. Las fichas en PDF (**Documentos**) admiten
+  hasta **30 MB**.
 - **Texto alternativo, obligatorio:** describe lo que se ve, como se lo
   contarías a alguien por teléfono. «Excavadora Hitachi ZX200 trabajando en una
   obra», no «foto1» ni «imagen». Lo leen los lectores de pantalla y los

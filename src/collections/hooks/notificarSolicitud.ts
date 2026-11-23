@@ -1,7 +1,13 @@
 import type { CollectionAfterChangeHook } from "payload";
 
 import { leerSmtpEnVigor } from "@/lib/correo/servidor";
+import {
+  correoAlEquipo,
+  destinoRespuesta,
+  respuestaAlVisitante,
+} from "@/lib/correo/avisoSolicitud";
 import { destinoAvisos } from "@/lib/correo/smtp";
+import { getSiteUrl } from "@/lib/seo/config";
 import { datosEmpresa } from "@/lib/seo/empresa";
 
 /**
@@ -14,7 +20,8 @@ import { datosEmpresa } from "@/lib/seo/empresa";
  * Nunca se relanza el error: hacerlo devolvería un fallo al usuario por algo
  * que, desde su punto de vista, salió bien.
  *
- * Solo avisa al crear: marcar una solicitud como atendida no vuelve a notificar.
+ * Solo avisa al crear: cambiar el estado de una solicitud no vuelve a notificar.
+ * Tarea 2 (2026-11-23): el aviso lleva el enlace al panel y hay respuesta automática al visitante.
  */
 export const notificarSolicitud: CollectionAfterChangeHook = async ({
   doc,
@@ -47,45 +54,57 @@ export const notificarSolicitud: CollectionAfterChangeHook = async ({
    */
   // El SMTP en vigor: el del panel si está completo, si no el de las variables de Vercel.
   const correo = await leerSmtpEnVigor(req.payload);
-  if (correo.origen === "ninguno" || !destino) {
-    const falta =
-      correo.origen === "ninguno"
-        ? correo.motivo
-        : "falta SOLICITUDES_EMAIL_TO (fuera de producción no se avisa al cliente)";
+  if (correo.origen === "ninguno") {
     req.payload.logger.warn(
       { solicitud: doc.id },
-      `Solicitud guardada SIN aviso por correo: ${falta}. El lead está en /admin y no se ha perdido.`,
+      `Solicitud guardada SIN aviso por correo: ${correo.motivo}. El lead está en /admin y no se ha perdido.`,
     );
     return doc;
   }
 
-  try {
-    const enviado = (await req.payload.sendEmail({
-      to: destino,
-      subject: `Nueva solicitud (${doc.tipo}) de ${doc.nombre}`,
-      text: [
-        `Tipo:     ${doc.tipo}`,
-        `Nombre:   ${doc.nombre}`,
-        `Correo:   ${doc.correo}`,
-        `Teléfono: ${doc.telefono ?? "—"}`,
-        `Empresa:  ${doc.empresa ?? "—"}`,
-        `Ciudad:   ${doc.ciudad ?? "—"}`,
-        `Producto: ${doc.referenciaTexto ?? "—"}`,
-        `Origen:   ${doc.origen ?? "—"}`,
-        "",
-        "Mensaje:",
-        doc.mensaje,
-      ].join("\n"),
-    })) as { messageId?: string } | undefined;
-    // El identificador del mensaje, para seguirlo si no llega (sin datos personales).
-    req.payload.logger.info(
-      { solicitud: doc.id, messageId: enviado?.messageId },
-      "[avisos] Aviso de solicitud enviado por SMTP.",
+  // 1. Aviso al equipo (con el enlace a la solicitud en el panel).
+  if (!destino) {
+    req.payload.logger.warn(
+      { solicitud: doc.id },
+      "Solicitud guardada SIN aviso al equipo: falta SOLICITUDES_EMAIL_TO (fuera de producción no se avisa al cliente). El lead está en /admin.",
     );
+  } else {
+    try {
+      const { subject, text, replyTo } = correoAlEquipo(doc, getSiteUrl());
+      const enviado = (await req.payload.sendEmail({ to: destino, subject, text, replyTo })) as
+        { messageId?: string } | undefined;
+      // El identificador del mensaje, para seguirlo si no llega (sin datos personales).
+      req.payload.logger.info(
+        { solicitud: doc.id, messageId: enviado?.messageId },
+        "[avisos] Aviso de solicitud enviado por SMTP.",
+      );
+    } catch (error) {
+      req.payload.logger.error(
+        { err: error, solicitud: doc.id },
+        "Solicitud guardada pero el aviso por correo FALLÓ. El lead está en /admin.",
+      );
+    }
+  }
+
+  // 2. Respuesta automática al visitante (editable; apagable). Un fallo aquí tampoco cuesta el lead.
+  try {
+    const respuesta = respuestaAlVisitante(doc, correoFormularios);
+    const salida = respuesta && destinoRespuesta(doc.correo, respuesta.subject);
+    if (respuesta && salida) {
+      const enviado = (await req.payload.sendEmail({
+        to: salida.to,
+        subject: salida.subject,
+        text: respuesta.text,
+      })) as { messageId?: string } | undefined;
+      req.payload.logger.info(
+        { solicitud: doc.id, messageId: enviado?.messageId },
+        "[avisos] Respuesta automática enviada por SMTP.",
+      );
+    }
   } catch (error) {
     req.payload.logger.error(
       { err: error, solicitud: doc.id },
-      "Solicitud guardada pero el aviso por correo FALLÓ. El lead está en /admin.",
+      "[avisos] La respuesta automática al visitante FALLÓ. La solicitud está guardada.",
     );
   }
 

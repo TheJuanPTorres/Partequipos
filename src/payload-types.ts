@@ -4641,6 +4641,12 @@ export interface CorreoFormulario {
    * A este correo llegan las hojas de vida de «Trabaja con nosotros» («Enviar HV»), con el PDF adjunto (no se guarda en el sitio). Vacío, el correo para solicitudes. Solo cuenta en el sitio publicado.
    */
   correoHojasDeVida?: string | null;
+  respuestaActiva?: boolean | null;
+  respuestaAsunto?: string | null;
+  /**
+   * Texto simple. No incluye el mensaje que escribió el visitante.
+   */
+  respuestaTexto?: string | null;
   smtpPanel?: {
     /**
      * El servidor de correo saliente (SMTP) de la cuenta.
@@ -4994,6 +5000,9 @@ export interface BuscadorSelect<T extends boolean = true> {
 export interface CorreoFormulariosSelect<T extends boolean = true> {
   correoSolicitudes?: T;
   correoHojasDeVida?: T;
+  respuestaActiva?: T;
+  respuestaAsunto?: T;
+  respuestaTexto?: T;
   smtpPanel?:
     | T
     | {

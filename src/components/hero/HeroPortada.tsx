@@ -140,7 +140,8 @@ function TextoCircular({ texto }: { texto: string }) {
             d={`M 50,50 m -${radio},0 a ${radio},${radio} 0 1,1 ${radio * 2},0 a ${radio},${radio} 0 1,1 -${radio * 2},0`}
           />
         </defs>
-        <text>
+        {/* Letra en unidades del dibujo: escala con el círculo a cualquier tamaño y zoom. */}
+        <text fontSize="16">
           <textPath href={`#${id}`} textLength={String(Math.floor(2 * Math.PI * radio) - 2)}>
             {`${texto} `}
           </textPath>

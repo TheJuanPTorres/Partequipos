@@ -23,6 +23,8 @@ export type EquipoFiltrable = {
   tipoRef: { slug: string; nombre: string } | null;
   /** Peso operativo en KILOGRAMOS (`pesoOperativoKg`, #136). */
   pesoKg?: number | null;
+  /** Su puesto en el orden del panel («Equipos nuevos», arrastrando): «Recomendados». */
+  orden?: number;
 };
 
 /**
@@ -65,17 +67,20 @@ const FACETAS: Faceta<EquipoFiltrable>[] = [
 ];
 
 const porId = (a: EquipoFiltrable, b: EquipoFiltrable) => a.id - b.id;
+/** El orden del panel (2026-11-23, tanda 21); sin puesto, al final. Desempata por id. */
+const porPanel = (a: EquipoFiltrable, b: EquipoFiltrable) =>
+  (a.orden ?? Number.MAX_SAFE_INTEGER) - (b.orden ?? Number.MAX_SAFE_INTEGER) || porId(a, b);
 const porNombre = (a: EquipoFiltrable, b: EquipoFiltrable) =>
   a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base", numeric: true });
 
 /**
- * Órdenes aprobados: recomendados (el de alta en el panel, el primero y por
- * defecto), peso de menor a mayor y de mayor a menor (los que no tienen peso,
+ * Órdenes aprobados: recomendados (el del panel, arrastrando en «Equipos
+ * nuevos»; el primero y por defecto; antes, el de alta), peso de menor a mayor y de mayor a menor (los que no tienen peso,
  * al final) y nombre A–Z. Todos desempatan por id: si no, la paginación
  * repetiría equipos.
  */
 const ORDENES: Catalogo<EquipoFiltrable>["ordenes"] = [
-  { valor: "recomendados", etiqueta: "Recomendados", comparar: porId },
+  { valor: "recomendados", etiqueta: "Recomendados", comparar: porPanel },
   {
     valor: "menor-peso",
     etiqueta: "Peso: de menor a mayor",

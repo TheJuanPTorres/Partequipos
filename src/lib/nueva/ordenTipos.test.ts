@@ -85,7 +85,7 @@ describe("unaEntradaPorTipo", () => {
     assert.deepEqual(r, ["cargadores", "excavadoras", "bulldozer"]);
   });
 
-  it("un tipo sin categoría sale con su página de marca, detrás de las categorías y en el orden de la web antigua", () => {
+  it("un tipo sin categoría sale con su página de marca, detrás de las categorías y en el orden recibido (el del panel)", () => {
     const r = unaEntradaPorTipo(
       [{ nombre: "Excavadoras", marcas: 2, dato: "cat-excavadoras" }],
       [
@@ -93,7 +93,7 @@ describe("unaEntradaPorTipo", () => {
         { nombre: "Bulldozers", dato: "tipo-bulldozer" },
       ],
     );
-    assert.deepEqual(r, ["cat-excavadoras", "tipo-bulldozer", "tipo-retro"]);
+    assert.deepEqual(r, ["cat-excavadoras", "tipo-retro", "tipo-bulldozer"]);
   });
 
   it("dos categorías con el mismo tipo: la de más marcas", () => {

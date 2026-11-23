@@ -19,8 +19,12 @@
   gap: 32px;
   max-width: 1440px;
   margin: 0 auto;
-  /* Arriba, con el relleno inferior de la cabecera (`min(1.5vw, 24px)`) suma el común; antes 48 fijos: 56–72. */
-  padding: max(0px, calc(var(--espacio-seccion) - min(1.5vw, 24px))) 22px 80px;
+  /*
+   * Arriba, nada: la cabecera plana (`heroSeccionPlano`) ya deja el común debajo desde la auditoría del
+   * 2026-11-18. Con el relleno de antes se sumaban los dos: 45 · 54 · 74 px a 390 · 768 · 1440
+   * (auditoría 2026-11-20).
+   */
+  padding: 0 22px 80px;
   color: var(--gris-texto);
 }
 

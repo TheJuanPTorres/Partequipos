@@ -33,13 +33,22 @@
  * (2,4 px a 3840). El plugin `src/lib/estilos/escalaPostcss.mjs` pasa cada `Npx` del CSS del sitio
  * a `calc(N * var(--escala-px, 1px))`, y la letra raíz crece igual, así que los `rem` de Tailwind también. Por
  * debajo de 1600, todo igual que antes. El panel no usa esta hoja.
+ *
+ * CON TECHO POR MONITOR (2026-11-23): `100vw` crece al ALEJAR EL ZOOM del navegador (al 25 % en un
+ * monitor de 1920, la ventana mide 7680 px de CSS), así que la escala crecía lo mismo que el zoom
+ * encogía y la página no cambiaba. `--escala-techo` es la escala máxima de ESTE monitor
+ * (`screen.width / 1600`, que no cambia con el zoom); lo pone un script en línea del `<head>`
+ * (`src/lib/estilos/escala.ts`) antes del primer pintado. Con la ventana al 100 % no cambia nada
+ * (la ventana nunca es más ancha que el monitor); al alejar, la escala se queda en la del monitor
+ * y el zoom encoge la página, como en cualquier web. Sin JavaScript, sin techo (lo de antes).
  */
 :root {
-  --escala-px: max(1px, 100vw / 1600);
+  --escala-techo: 1000;
+  --escala-px: clamp(1px, 100vw / 1600, var(--escala-techo) * 1px);
 }
 
 html {
-  font-size: max(100%, 100vw / 100);
+  font-size: max(100%, min(100vw / 100, var(--escala-techo) * 100%));
 }
 
 /*

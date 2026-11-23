@@ -2,6 +2,8 @@ import { cache } from "react";
 import config from "@payload-config";
 import { getPayload } from "payload";
 
+import { soloPublicado } from "@/lib/borradores";
+import { vistaPreviaActiva } from "@/lib/vistaPrevia/activa";
 import type { Pagina } from "@/payload-types";
 
 /*
@@ -33,6 +35,7 @@ export const getPaginas = cache(async (): Promise<Pagina[]> => {
 
   const { docs } = await payload.find({
     collection: "paginas",
+    where: soloPublicado(),
     depth: 1,
     limit: 0,
     sort: "titulo",
@@ -41,13 +44,18 @@ export const getPaginas = cache(async (): Promise<Pagina[]> => {
   return docs;
 });
 
-/** Una página por su slug (ruta completa, sin barras). */
+/**
+ * Una página por su slug (ruta completa, sin barras). Lo publicado; con la vista previa del
+ * borrador activa y sesión del panel (`vistaPreviaActiva`), el último borrador guardado (PR 8b).
+ */
 export const getPaginaPorSlug = cache(async (slug: string): Promise<Pagina | null> => {
   const payload = await getPayload({ config });
+  const borrador = await vistaPreviaActiva();
 
   const { docs } = await payload.find({
     collection: "paginas",
-    where: { slug: { equals: slug } },
+    where: borrador ? { slug: { equals: slug } } : soloPublicado({ slug: { equals: slug } }),
+    draft: borrador,
     depth: 1,
     limit: 1,
   });

@@ -327,6 +327,49 @@ try {
     }
 
     /*
+     * Modo `borrador` (`… borrador <id de la página>`, PR 8b): con la sesión abierta, el botón del
+     * panel (`/api/borrador/?pagina=<id>`) lleva a la página con su ÚLTIMO BORRADOR y el aviso de
+     * vista previa; «Salir de la vista previa» vuelve a lo publicado. El borrador de prueba lo
+     * pone y lo quita `scripts/paginas/prueba-borrador.ts` (marca «PRUEBA BORRADOR 8B»).
+     */
+    if (MODO === "borrador") {
+      const id = process.argv[4];
+      if (!/^\d+$/.test(id ?? "")) fallar("Uso: … borrador <id de la página>");
+      const MARCA_BORRADOR = "PRUEBA BORRADOR 8B";
+      const leer = () =>
+        pagina.evaluate(
+          (marca) => ({
+            ruta: location.pathname,
+            marca: document.body.innerText.includes(marca),
+            aviso: document.body.innerText.includes("Vista previa del borrador"),
+            h1: document.querySelector("h1")?.textContent?.trim().slice(0, 80) ?? "",
+          }),
+          MARCA_BORRADOR,
+        );
+      await pagina.goto(`${base}/api/borrador/?pagina=${id}`, { waitUntil: "networkidle" });
+      const dentro = await leer();
+      await pagina.screenshot({ path: path.join(salida, `borrador-dentro-${ancho.nombre}.png`) });
+      await Promise.all([
+        pagina.waitForNavigation({ waitUntil: "networkidle" }),
+        pagina.getByRole("button", { name: "Salir de la vista previa" }).click(),
+      ]).catch(() => fallar(`No se pudo salir de la vista previa (${ancho.nombre}).`));
+      const fuera = await leer();
+      await pagina.screenshot({ path: path.join(salida, `borrador-fuera-${ancho.nombre}.png`) });
+      hallazgos.push({ pantalla: "borrador", ancho: ancho.nombre, dentro, fuera });
+      decir(
+        `borrador (${ancho.nombre}): dentro ${JSON.stringify(dentro)} · fuera ${JSON.stringify(fuera)}`,
+      );
+      if (!dentro.marca || !dentro.aviso)
+        fallar(`La vista previa no muestra el borrador (${ancho.nombre}).`);
+      if (fuera.marca || fuera.aviso) fallar(`Al salir sigue el borrador (${ancho.nombre}).`);
+      if (fuera.ruta !== dentro.ruta) fallar(`Al salir cambió de página: ${fuera.ruta}.`);
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
      * Modo `fuentes` (`… fuentes <carpeta>`): sube por el formulario del panel
      * cada `*.woff2`, `*.woff`, `*.ttf` y `*.otf` de la carpeta con el tipo
      * que manda Chrome en Windows (`application/octet-stream`) y lee lo que

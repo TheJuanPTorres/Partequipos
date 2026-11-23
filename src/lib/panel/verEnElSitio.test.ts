@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { RUTAS_EN_EL_SITIO, rutaEnElSitio, type BuscarSlug } from "./verEnElSitio";
+import {
+  enlaceVistaPrevia,
+  RUTAS_EN_EL_SITIO,
+  rutaEnElSitio,
+  type BuscarSlug,
+} from "./verEnElSitio";
 
 /** Base falsa: colección → id → slug. */
 const base: Record<string, Record<string, string>> = {
@@ -41,6 +46,16 @@ describe("rutaEnElSitio", () => {
       await rutaEnElSitio("categorias-lubricante", { slug: "auto-liviano", marca: 5 }, buscar),
       "/lubricantes/lubricantes-eni/auto-liviano/",
     );
+  });
+
+  it("páginas: el botón abre la vista previa del borrador; sin guardar o sin dirección, nada", async () => {
+    assert.equal(
+      await enlaceVistaPrevia("paginas", { id: 7, slug: "nosotros" }),
+      "/api/borrador/?pagina=7",
+    );
+    assert.equal(await enlaceVistaPrevia("paginas", { slug: "nosotros" }), null);
+    assert.equal(await enlaceVistaPrevia("paginas", { id: 7, slug: "" }), null);
+    assert.equal(await enlaceVistaPrevia("articulos", { id: 7, slug: "a" }), undefined);
   });
 
   it("páginas: la portada es la raíz; artículos en la raíz", async () => {

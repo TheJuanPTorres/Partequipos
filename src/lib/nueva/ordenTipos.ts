@@ -37,6 +37,7 @@ export function posicionDeTipo(nombre: string): number {
 
 /** Copia ordenada: la web antigua primero; empates y desconocidos, por nombre. */
 export function ordenarTiposNueva<T>(tipos: readonly T[], nombreDe: (t: T) => string): T[] {
+  // orden-libre: desde el #534 ningún listado la usa (los tipos van al orden del panel).
   return [...tipos].sort(
     (a, b) =>
       posicionDeTipo(nombreDe(a)) - posicionDeTipo(nombreDe(b)) ||

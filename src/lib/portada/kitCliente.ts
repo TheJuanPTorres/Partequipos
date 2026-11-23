@@ -139,18 +139,21 @@ export type CategoriaDePortada = {
  * título de portada o su nombre.
  */
 export function categoriasDePortada(categorias: CategoriasTecnica[]): CategoriaDePortada[] {
-  return categorias
-    .filter((c) => typeof c.ordenPortada === "number" && c.nombre?.trim() && c.slug)
-    .sort(
-      (a, b) =>
-        (a.ordenPortada ?? 0) - (b.ordenPortada ?? 0) || a.nombre.localeCompare(b.nombre, "es"),
-    )
-    .map((c) => ({
-      id: c.id,
-      nombre: c.tituloPortada?.trim() || c.nombre.trim(),
-      imagen: imagenDecorativa(c.imagenPortada) ?? imagenDecorativa(c.imagen),
-      href: c.enlace?.trim() || rutas.categoriaRepuestos(c.slug),
-    }));
+  return (
+    categorias
+      .filter((c) => typeof c.ordenPortada === "number" && c.nombre?.trim() && c.slug)
+      // orden-libre: «Posición en la portada» del panel (número; H8, opción a de dirección).
+      .sort(
+        (a, b) =>
+          (a.ordenPortada ?? 0) - (b.ordenPortada ?? 0) || a.nombre.localeCompare(b.nombre, "es"),
+      )
+      .map((c) => ({
+        id: c.id,
+        nombre: c.tituloPortada?.trim() || c.nombre.trim(),
+        imagen: imagenDecorativa(c.imagenPortada) ?? imagenDecorativa(c.imagen),
+        href: c.enlace?.trim() || rutas.categoriaRepuestos(c.slug),
+      }))
+  );
 }
 
 /**

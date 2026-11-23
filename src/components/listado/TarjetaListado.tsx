@@ -1,3 +1,4 @@
+import { TextoTitulo } from "@/components/comun/TextoTitulo";
 import { IconArrowRight, IconEye, IconFileDescription, type Icon } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -104,7 +105,15 @@ export function TarjetaListado({
         ) : null}
       </div>
       <div className={estilos.datos}>
-        <h3 className={estilos.nombre}>{href ? <Link href={href}>{titulo}</Link> : titulo}</h3>
+        <h3 className={`${estilos.nombre} contenedor-titulo`}>
+          {href ? (
+            <Link href={href}>
+              <TextoTitulo texto={titulo} mayusculas nivel="pequeno" />
+            </Link>
+          ) : (
+            <TextoTitulo texto={titulo} mayusculas nivel="pequeno" />
+          )}
+        </h3>
         {codigo ? <p className={estilos.modelo}>{codigo}</p> : null}
         {resumen ? <p className={estilos.descripcionCorta}>{resumen}</p> : null}
         <hr className={estilos.linea} />

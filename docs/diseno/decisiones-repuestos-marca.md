@@ -271,10 +271,10 @@ El cliente pidió reducir más lo que se ajustó en el #496. Es una **excepción
 (`--espacio-interno` y `--espacio-seccion`, regla del 2026-11-12) y vale **solo en la página de tipo de repuestos**
 (la misma plantilla para todas las marcas); el resto del sitio sigue con los tokens.
 
-| Hueco | Antes | Ahora |
-| --- | --- | --- |
-| Del recuadro «¿No encuentras tu modelo?» al borde inferior de la tarjeta blanca | `--espacio-interno` (16 · 22 · 32 px) | **16 px** |
-| El gris entre la tarjeta y «Nuestras categorías de repuestos» | `--espacio-seccion` (24–48 px) | **24 px**, y **16 px** en móvil (hasta 767 px) |
+| Hueco                                                                           | Antes                                 | Ahora                                          |
+| ------------------------------------------------------------------------------- | ------------------------------------- | ---------------------------------------------- |
+| Del recuadro «¿No encuentras tu modelo?» al borde inferior de la tarjeta blanca | `--espacio-interno` (16 · 22 · 32 px) | **16 px**                                      |
+| El gris entre la tarjeta y «Nuestras categorías de repuestos»                   | `--espacio-seccion` (24–48 px)        | **24 px**, y **16 px** en móvil (hasta 767 px) |
 
 Desde 1600 px los dos crecen con la escala proporcional, como todo. Está en `modelosTexto.module.css`
 (`.conSiguiente`, que solo lleva la tarjeta de modelos de esta página). `npm run qa:huecos` verá aquí un hueco

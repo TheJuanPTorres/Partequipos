@@ -123,7 +123,7 @@ export const BloquePresentacionImagen: Block = {
   // foránea de la animación pasaba de 63 bytes. En el resto, el nombre de siempre.
   dbName: ({ tableName }: { tableName?: string }) =>
     tableName?.startsWith("_paginas_v")
-      ? "_paginas_v_blocks_pres_imagen"
+      ? "paginas_blocks_pres_imagen"
       : `${tableName}_blocks_presentacion_imagen`,
   labels: { singular: "Presentación con imagen", plural: "Presentaciones con imagen" },
   fields: [

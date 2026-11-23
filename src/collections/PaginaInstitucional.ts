@@ -270,7 +270,7 @@ export const PaginaInstitucional: CollectionConfig = {
             // foráneas pasaban de 63 bytes. La tabla principal conserva su nombre.
             dbName: ({ tableName }: { tableName?: string }) =>
               tableName?.startsWith("_paginas_v")
-                ? "_paginas_v_hero_diap"
+                ? "paginas_hero_diap"
                 : `${tableName}_diapositivas`,
             label: "Diapositivas",
             labels: { singular: "Diapositiva", plural: "Diapositivas" },
@@ -497,7 +497,7 @@ export const PaginaInstitucional: CollectionConfig = {
             // Nombre corto solo en las versiones (PR 8b), como `hero.diapositivas`.
             dbName: ({ tableName }: { tableName?: string }) =>
               tableName?.startsWith("_paginas_v")
-                ? "_paginas_v_barra_botones"
+                ? "paginas_barra_botones"
                 : `${tableName}_botones`,
             label: "Botones",
             labels: { singular: "Botón", plural: "Botones" },

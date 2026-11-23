@@ -9,6 +9,7 @@ import { DescripcionPlegable } from "@/components/ficha/DescripcionPlegable";
 import { GaleriaFicha, type FotoFicha } from "@/components/ficha/GaleriaFicha";
 import { IconoDato } from "@/components/ficha/IconoDato";
 import { PastillaDato } from "@/components/ficha/PastillaDato";
+import { TextoTitulo } from "@/components/comun/TextoTitulo";
 import { sinCortarCodigos } from "@/components/ficha/SinCorte";
 import { RecuadroAsesoria } from "@/components/ficha/RecuadroAsesoria";
 import estilos from "@/components/ficha/ficha.module.css";
@@ -246,7 +247,10 @@ export function FichaNueva({
    * kit, el <h1> va en su cabecera (el nombre completo).
    */
   const tituloFicha = (
-    <h1 id="ficha-titulo" className={`${estilos.titulo} ${nueva.titulo} texto-titulo-bloque`}>
+    <h1
+      id="ficha-titulo"
+      className={`${estilos.titulo} ${nueva.titulo} texto-titulo-bloque contenedor-titulo`}
+    >
       {tituloEscritorio ? (
         <>
           {/* Con reserva de alto: «Case Construction» ocupa 2 líneas o 1 según la fuente. */}
@@ -260,10 +264,13 @@ ${tituloEscritorio.modelo}`}
               <span>{sinCortarCodigos(tituloEscritorio.modelo, nueva.sinCorte)}</span>
             </span>
           </span>
-          <span className={nueva.tituloMovil}>{sinCortarCodigos(nombre, nueva.sinCorte)}</span>
+          {/* En móvil, el tamaño baja lo justo si la palabra más larga no cabe (tarea 7). */}
+          <span className={nueva.tituloMovil}>
+            <TextoTitulo texto={nombre}>{sinCortarCodigos(nombre, nueva.sinCorte)}</TextoTitulo>
+          </span>
         </>
       ) : (
-        nombre
+        <TextoTitulo texto={nombre} />
       )}
     </h1>
   );

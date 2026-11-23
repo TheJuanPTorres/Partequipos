@@ -14,6 +14,8 @@ import type { CollectionConfig, Field } from "payload";
  * - El orden por arrastre (`orderable`, de B) añade su asa solo; no hace falta columna. El campo
  *   «Orden» antiguo ya no lo lee la web (#514), así que no sale como columna.
  * - El código («320D») va en el buscador: es como busca un comercial; el nombre solo no basta.
+ * - Los artículos llevan «Estado» (`_status`: borrador o publicado), que Payload añade con los
+ *   borradores (#521).
  * - Cada columna y cada campo de búsqueda tiene que existir (`listados.test.ts`).
  */
 export type Listado = {
@@ -60,7 +62,7 @@ export const LISTADOS: Record<string, Listado> = {
     busqueda: ["nombre"],
   },
   articulos: {
-    columnas: ["imagenDestacada", "titulo", "categoria", "fechaPublicacion"],
+    columnas: ["imagenDestacada", "titulo", "_status", "categoria", "fechaPublicacion"],
     busqueda: ["titulo", "entradilla"],
   },
   solicitudes: {

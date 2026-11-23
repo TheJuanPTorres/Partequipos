@@ -20,7 +20,7 @@ export const Media: CollectionConfig = {
   admin: {
     group: "Fotos y archivos",
     description:
-      "Fotos y logos del sitio, en JPEG, PNG o WebP, de hasta 15 MB (suben directo al almacén). El texto alternativo describe la imagen a quien no la ve.",
+      "Fotos y logos del sitio, en JPEG, PNG o WebP. Al subirlas se reducen solas a 3840 px de ancho como mucho y se guardan en WebP; ya reducidas, hasta 15 MB. El texto alternativo describe la imagen a quien no la ve.",
     // Aviso con las imágenes de texto alternativo flojo (`src/lib/media/altFlojo.ts`).
     // Entre el buscador y la tabla: `beforeList` lo pintaba fuera del margen.
     components: { beforeListTable: ["/components/admin/AltFlojos"] },

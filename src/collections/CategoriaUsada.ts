@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { ocultoSinUso } from "../lib/fields/ocultoSinUso";
 import { conPestanas } from "../lib/fields/pestanasFicha";
 
 import { seoField } from "../lib/fields/seoField";
@@ -87,7 +88,11 @@ export const CategoriaUsada: CollectionConfig = {
             "Desmarcada, la categoría y sus unidades desaparecen de toda la web (menú, índice, «Otros», pestañas, listados y sitemap) sin borrarse del panel, y su dirección da «página no encontrada». Para llevarla a otra página, crear una redirección en «Redirecciones».",
         },
       },
-      {
+      /*
+       * La web ya no lo lee (manda el orden arrastrando de la lista): OCULTO sin tocar el esquema
+       * (tanda 21, PR-4, 2026-11-23), hasta su borrado con migración.
+       */
+      ocultoSinUso({
         name: "orden",
         type: "number",
         label: "Orden en el primer nivel",
@@ -96,7 +101,7 @@ export const CategoriaUsada: CollectionConfig = {
             "Solo para las que NO van en «Otros»: el número más bajo sale primero (vacío, al final, por nombre). «Otros» va siempre detrás.",
           condition: (datos) => datos?.enOtros === false,
         },
-      },
+      }),
       seoField(),
     ],
     { fotos: { imagen: "tarjeta" } },

@@ -29,7 +29,7 @@ import type {
 
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "../cacheDatos";
 import type { EquipoFiltrable } from "../nueva/filtros";
-import { ordenDe } from "../ordenArrastre";
+import { ordenDe, ordenDeListado } from "../ordenArrastre";
 import { rutas } from "../routes";
 import type { UnidadFiltrable } from "../usados/filtros";
 import { idsDePrimeraImagen } from "../usados/primeraImagen";
@@ -574,9 +574,11 @@ const listadoNuevaEnCache = unstable_cache(
     const [equipos, marcas, tipos, categorias] = await Promise.all([
       payload.find({
         collection: "equipos-nuevos",
-        // orden-libre: el listado ordena con «Ordenar» (`nueva/filtros.ts`, «Recomendados» por id).
+        // En el orden del LISTADO (arrastrando en «Equipos nuevos», 2026-11-23): es «Recomendados»
+        // (`orden`, más abajo); «Ordenar» del visitante lo cambia (`nueva/filtros.ts`).
         // Los de marcas ocultas tampoco: ni en tarjetas ni en filtros ni en contadores.
         where: conEquipoVisible(),
+        sort: ordenDeListado("equipos-nuevos"),
         depth: 0,
         limit: 0,
         pagination: false,
@@ -607,7 +609,9 @@ const listadoNuevaEnCache = unstable_cache(
         depth: 0,
         limit: 0,
         pagination: false,
-        // orden-libre: las pestañas de tipo mezclan marcas y van por nombre (más abajo).
+        // Las pestañas de tipo mezclan marcas: el orden del LISTADO (arrastrando en «Tipos de
+        // maquinaria nueva», 2026-11-23), no el de cada marca.
+        sort: ordenDeListado("tipos-maquinaria"),
         select: {
           slug: true,
           nombre: true,
@@ -711,7 +715,7 @@ const listadoNuevaEnCache = unstable_cache(
     const tipoPorId = new Map(tipos.docs.map((t) => [t.id, t]));
 
     const lista: EquipoNuevoListado[] = [];
-    for (const e of equipos.docs) {
+    for (const [orden, e] of equipos.docs.entries()) {
       const marca = marcaPorId.get(idRel(e.marca) ?? -1);
       const tipo = tipoPorId.get(idRel(e.tipo) ?? -1);
       if (!marca || !tipo) continue; // sin marca o tipo no hay URL de la ficha
@@ -725,6 +729,7 @@ const listadoNuevaEnCache = unstable_cache(
         marcaRef: { slug: marca.slug, nombre: marca.nombre },
         tipoRef: { slug: tipo.slug, nombre: tipo.nombre },
         tipoId: tipo.id,
+        orden,
         pesoKg: e.pesoOperativoKg ?? null,
         foto: foto(primera == null ? null : idRel(primera)),
         logo: foto(idRel(marca.logo)),
@@ -768,8 +773,7 @@ const listadoNuevaEnCache = unstable_cache(
               tipos: ids,
             },
           ];
-        })
-        .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
+        }),
     };
   },
   ["listado-nueva", CLAVE_DESPLIEGUE],

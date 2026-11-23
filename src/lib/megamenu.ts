@@ -10,6 +10,7 @@ import { paisDe, type CodigoPais } from "./lubricantes/pais";
 import { enlaceExternoDe } from "./nueva/enlaceExterno";
 import { colorConBlanco } from "./marca/franjaMarca";
 import { unaEntradaPorTipo } from "./nueva/ordenTipos";
+import { porClave } from "./ordenArrastre";
 import { tiposConEquipos } from "./nueva/tiposConEquipos";
 import { segmentoDeTipo } from "./repuestos/anidado";
 import { categoriasDeMarca } from "./repuestos/marca";
@@ -203,6 +204,8 @@ export type TipoCatalogo = ItemCatalogo & {
   subtipos?: ReadonlyArray<number | { id: number } | null | undefined> | null;
   /** Solo maquinaria nueva: «Tarjeta en el índice de tipos» (va en «Por tipo de máquina»). */
   pestanaIndiceNueva?: boolean | null;
+  /** Solo maquinaria nueva: el orden de la colección (`ORDEN_LISTADO`), para los tipos sueltos. */
+  _order?: string | null;
 };
 
 export type DatosMegamenu = {
@@ -350,7 +353,9 @@ export function panelMaquinaria(d: DatosMegamenu): PanelMenu {
         ]
       : [];
   });
-  const deTipos = tiposConEquiposNuevos
+  // Los tipos sueltos, en el orden del panel de la colección (no el de cada marca): 2026-11-23.
+  const deTipos = [...tiposConEquiposNuevos]
+    .sort((a, b) => porClave(a._order, b._order))
     .filter((t) => t.pestanaIndiceNueva)
     .flatMap((t) => {
       const marca = slugDeMarca.get(idRel(t.marca) ?? -1);

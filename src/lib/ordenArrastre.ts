@@ -41,6 +41,24 @@ export const ordenDe = <C extends ColeccionOrdenable>(coleccion: C): (typeof ORD
   ORDEN_ARRASTRE[coleccion];
 
 /**
+ * EL ORDEN DE LOS LISTADOS QUE MEZCLAN PADRES (2026-11-23, tanda 21, PR-2; decisión de dirección,
+ * opción (b)). El orden de un join solo vale entre hermanos, y el listado de nueva y las pestañas de
+ * tipo mezclan marcas y tipos: para ellos, la colección es ADEMÁS `orderable` y se arrastra en su
+ * lista del panel. Orden inicial = el que pintaba la web (equipos por id, tipos por nombre).
+ */
+export const ORDEN_LISTADO = {
+  "equipos-nuevos": "_order",
+  "tipos-maquinaria": "_order",
+} as const;
+
+export type ColeccionConListado = keyof typeof ORDEN_LISTADO;
+
+/** El `sort` de un listado que mezcla padres: el arrastre de la lista de la colección. */
+export const ordenDeListado = <C extends ColeccionConListado>(
+  coleccion: C,
+): (typeof ORDEN_LISTADO)[C] => ORDEN_LISTADO[coleccion];
+
+/**
  * El mismo orden en JavaScript, para lo que se agrupa después de leer (los grupos de una
  * categoría de nueva por marca y tipo). Sin clave (una fila anterior a la migración), al final.
  */

@@ -1,3 +1,4 @@
+import { TextoTitulo } from "@/components/comun/TextoTitulo";
 import { IconArrowRight, IconBrandWhatsapp, IconMail } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -200,7 +201,7 @@ export async function ArticuloPropio({ articulo }: { articulo: Articulo }) {
               </Link>
             ) : null}
             <h1 className={`${reserva.reserva} ${estilos.titulo}`} data-reserva={articulo.titulo}>
-              <span>{articulo.titulo}</span>
+              <TextoTitulo texto={articulo.titulo} nivel="medio" />
             </h1>
             <p className={`${reserva.reserva} ${estilos.meta}`} data-reserva={meta}>
               <span>

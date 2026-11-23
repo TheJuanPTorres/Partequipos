@@ -122,6 +122,8 @@ import * as migration_20261120_011227_apariencia_panel from './20261120_011227_a
 import * as migration_20261120_032202_borradores_articulos from './20261120_032202_borradores_articulos';
 import * as migration_20261120_143417_solicitudes_seguimiento from './20261120_143417_solicitudes_seguimiento';
 import * as migration_20261123_064232_borradores_paginas from './20261123_064232_borradores_paginas';
+import * as migration_20261123_215916_correo_respuesta_automatica from './20261123_215916_correo_respuesta_automatica';
+import * as migration_20261123_223246_orden_listado_nueva from './20261123_223246_orden_listado_nueva';
 
 export const migrations = [
   {
@@ -742,6 +744,16 @@ export const migrations = [
   {
     up: migration_20261123_064232_borradores_paginas.up,
     down: migration_20261123_064232_borradores_paginas.down,
-    name: '20261123_064232_borradores_paginas'
+    name: '20261123_064232_borradores_paginas',
+  },
+  {
+    up: migration_20261123_215916_correo_respuesta_automatica.up,
+    down: migration_20261123_215916_correo_respuesta_automatica.down,
+    name: '20261123_215916_correo_respuesta_automatica',
+  },
+  {
+    up: migration_20261123_223246_orden_listado_nueva.up,
+    down: migration_20261123_223246_orden_listado_nueva.down,
+    name: '20261123_223246_orden_listado_nueva'
   },
 ];

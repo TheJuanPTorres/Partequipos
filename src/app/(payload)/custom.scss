@@ -2353,6 +2353,11 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   font-weight: 500;
   text-decoration: none;
 
+  // La miniatura no se encoge cuando la columna es estrecha (móvil).
+  .pq-miniatura {
+    flex: none;
+  }
+
   &:hover .pq-celda-nombre__texto,
   &:focus-visible .pq-celda-nombre__texto {
     text-decoration: underline;

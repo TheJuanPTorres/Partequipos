@@ -241,8 +241,25 @@ a.enlace:hover .flecha {
 
 /*
  * Tras los modelos de la página de tipo viene otra tarjeta blanca (las categorías): sin esto, las
- * dos quedaban pegadas (hueco 0). Entre secciones manda `--espacio-seccion` (#458).
+ * dos quedaban pegadas (hueco 0).
+ *
+ * EXCEPCIÓN DEL CLIENTE a los dos tokens de espaciado, SOLO en la página de tipo de repuestos
+ * (2026-11-23; `docs/diseno/decisiones-repuestos-marca.md` §13): pidió menos aire que el del #496.
+ * - Del recuadro «¿No encuentras tu modelo?» al borde inferior de la tarjeta: 16 px (antes
+ *   `--espacio-interno`, 32 en escritorio).
+ * - El gris hasta «Nuestras categorías de repuestos»: 24 px, y 16 en móvil (antes
+ *   `--espacio-seccion`, hasta 48).
  */
+.seccion.sinFranja.conSiguiente {
+  padding-bottom: 16px;
+}
+
 .conSiguiente + section {
-  margin-top: var(--espacio-seccion);
+  margin-top: 24px;
+}
+
+@media (max-width: 767px) {
+  .conSiguiente + section {
+    margin-top: 16px;
+  }
 }

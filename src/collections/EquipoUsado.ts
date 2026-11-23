@@ -158,7 +158,7 @@ export const EquipoUsado: CollectionConfig = {
         validate: (v: unknown) => validarAnio(v),
         admin: {
           step: 1,
-          placeholder: "2016",
+          placeholder: "Ej. 2016",
           description: "Año de fabricación de la máquina, no de la publicación. Cuatro cifras.",
         },
       },
@@ -169,7 +169,7 @@ export const EquipoUsado: CollectionConfig = {
         validate: (v: unknown) => validarHorometro(v),
         admin: {
           step: 1,
-          placeholder: "8450",
+          placeholder: "Ej. 8450",
           description:
             "Horas de trabajo acumuladas, sin puntos. Es el dato que más comparan los compradores.",
         },
@@ -179,7 +179,7 @@ export const EquipoUsado: CollectionConfig = {
         type: "text",
         label: "Ubicación",
         admin: {
-          placeholder: "Bogotá",
+          placeholder: "Ej. Bogotá",
           description: "Ciudad donde está la máquina; condiciona el costo de traslado.",
         },
       },

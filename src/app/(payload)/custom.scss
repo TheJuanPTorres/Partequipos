@@ -2560,3 +2560,8 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
     }
   }
 }
+
+/* El campo «Modelo» va envuelto (sugerencias debajo): recupera el hueco entre campos. */
+.pq-campo-modelo {
+  margin-bottom: var(--spacing-field, 30px);
+}

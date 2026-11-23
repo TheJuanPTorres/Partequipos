@@ -47,7 +47,14 @@ export const EquipoNuevo: CollectionConfig = {
   admin: {
     useAsTitle: "nombre",
     group: "Maquinaria",
+    description:
+      "Este orden es el del listado de maquinaria nueva de la web (el índice y las categorías, con «Recomendados»). Arrastra las filas para cambiarlo; uno nuevo entra al final. El de dentro de cada tipo se cambia en la ficha del tipo.",
   },
+  /*
+   * DOS ÓRDENES (2026-11-23, tanda 21, PR-2): este `_order` es el del LISTADO, que mezcla marcas y
+   * tipos (`ORDEN_LISTADO`); el join «Equipos del tipo» guarda el de dentro de cada tipo.
+   */
+  orderable: true,
   access: {
     read: lecturaContenido,
     create: escrituraContenido,

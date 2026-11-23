@@ -52,6 +52,8 @@ export const EquipoNuevo: CollectionConfig = {
     [
       // Aviso en vivo si la galería está vacía (F4).
       avisoField("avisoSinFotos", "AvisoSinFotos"),
+      // El nombre empieza por «test» o «prueba»: avisa, no bloquea (tanda 21, tarea 8).
+      avisoField("avisoNombreDePrueba", "AvisoNombreDePrueba"),
       // Marca con enlace externo: sus equipos no se publican (#475).
       avisoField("avisoMarcaEnlaceExterno", "AvisoMarcaEnlaceExterno"),
       { name: "nombre", type: "text", required: true, label: "Nombre" },

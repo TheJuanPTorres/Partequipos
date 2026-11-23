@@ -12,9 +12,11 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
+import { BotonCookies } from "@/components/analitica/BotonCookies";
 import { BotonVisorPdf } from "@/components/ficha/BotonVisorPdf";
 import { Revelado } from "@/components/movimiento/Revelado";
 import { ADELANTOS } from "@/components/movimiento/ritmos";
+import { idGa4 } from "@/lib/analitica/config";
 import { ANIMACIONES_PIE, COLOR_RED } from "@/lib/animacionesPie";
 import { activasDe } from "@/lib/listado/animaciones";
 import { enlaceWhatsApp } from "@/lib/navegacion";
@@ -243,6 +245,12 @@ export async function Footer() {
                   <Link href={item.href}>{item.etiqueta}</Link>
                 </li>
               ))}
+              {/* Solo con analítica: reabre el aviso de cookies para cambiar la decisión. */}
+              {idGa4() ? (
+                <li>
+                  <BotonCookies className={estilos.legalBoton} />
+                </li>
+              ) : null}
             </ul>
           </nav>
           <address className={estilos.legalDireccion}>

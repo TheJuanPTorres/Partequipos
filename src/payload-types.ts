@@ -218,9 +218,21 @@ export interface Solicitude {
   createdAt: string;
   tipo: 'contacto' | 'cotizacion' | 'repuesto';
   /**
-   * Marcar como atendida en vez de borrar: conserva el historial.
+   * Nueva → Contactada (ya hablaste con la persona) → Cerrada. No la borres: conserva el historial. Solo las «Nuevas» cuentan como pendientes.
    */
-  estado: 'nueva' | 'atendida';
+  estado: 'nueva' | 'contactada' | 'cerrada';
+  /**
+   * Quién se encarga de esta solicitud.
+   */
+  responsable?: (number | null) | User;
+  /**
+   * Se apunta sola al pasar de «Nueva»; puedes corregirla.
+   */
+  fechaContacto?: string | null;
+  /**
+   * Solo las ve el equipo en el panel; nunca salen al visitante.
+   */
+  notasInternas?: string | null;
   nombre: string;
   correo: string;
   telefono?: string | null;
@@ -247,6 +259,41 @@ export interface Solicitude {
    */
   origen?: string | null;
   updatedAt: string;
+}
+/**
+ * Cuentas con acceso al panel. Solo un administrador puede crear usuarios o cambiar roles.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  /**
+   * El editor no puede crear usuarios, cambiar roles ni borrar registros. Solo un administrador cambia este campo.
+   */
+  rol: 'administrador' | 'editor';
+  /**
+   * Permite cambiar la dirección web de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.
+   */
+  puedeEditarSlugs?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -544,41 +591,6 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
-}
-/**
- * Cuentas con acceso al panel. Solo un administrador puede crear usuarios o cambiar roles.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number;
-  /**
-   * El editor no puede crear usuarios, cambiar roles ni borrar registros. Solo un administrador cambia este campo.
-   */
-  rol: 'administrador' | 'editor';
-  /**
-   * Permite cambiar la dirección web de lo que ya está publicado. Úsalo solo para corregir erratas: la dirección antigua seguirá llevando a la nueva, pero Google tarda en enterarse.
-   */
-  puedeEditarSlugs?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2884,6 +2896,9 @@ export interface SolicitudesSelect<T extends boolean = true> {
   createdAt?: T;
   tipo?: T;
   estado?: T;
+  responsable?: T;
+  fechaContacto?: T;
+  notasInternas?: T;
   nombre?: T;
   correo?: T;
   telefono?: T;

@@ -3,6 +3,8 @@
 import { IconArrowRight, IconBrandWhatsapp, IconSearch } from "@tabler/icons-react";
 import { useEffect, useId, useRef, useState, type RefObject } from "react";
 
+import { terminoSeguro } from "@/lib/analitica/eventos";
+import { enviarEvento } from "@/lib/analitica/navegador";
 import type { Clase } from "@/lib/buscador/motor";
 import { resaltar } from "@/lib/buscador/resaltar";
 import { ETIQUETA_CLASE } from "@/lib/buscador/etiquetas";
@@ -175,6 +177,19 @@ export default function PanelBuscador({
     }, 900);
     return () => clearTimeout(t);
   }, [sinResultados, clave, texto]);
+
+  // Analítica: una búsqueda del panel cuenta al dejar de escribir, una vez por texto.
+  const medidos = useRef(new Set<string>());
+  const total = datos?.total ?? null;
+  useEffect(() => {
+    if (texto.length < 3 || total === null || medidos.current.has(clave)) return;
+    const t = setTimeout(() => {
+      medidos.current.add(clave);
+      const termino = terminoSeguro(texto);
+      if (termino) enviarEvento("busqueda", { termino, resultados: total, lugar: "panel" });
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [texto, clave, total]);
 
   const items = texto.length >= 2 && datos ? datos.resultados : [];
   const hayExacto = texto.length >= 2 && datos?.exacto;

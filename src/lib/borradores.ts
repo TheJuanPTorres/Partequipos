@@ -18,7 +18,7 @@ import type { CollectionBeforeOperationHook, CollectionConfig, Where } from "pay
  *   `soloPublicado` (la API local no pasa por el control de acceso): lo vigila
  *   `borradores.test.ts`.
  */
-export const COLECCIONES_CON_BORRADORES = ["articulos"] as const;
+export const COLECCIONES_CON_BORRADORES = ["articulos", "paginas"] as const;
 
 /** Las versiones que se guardan por documento (las más antiguas se borran solas). */
 export const MAXIMO_VERSIONES = 25;

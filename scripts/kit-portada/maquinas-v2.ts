@@ -88,7 +88,8 @@ type Manifiesto = {
   /** Los campos de «inicio» tal como estaban. */
   antes: {
     logos: { maquina: number | null; maquinaReflejo: number | null };
-    repuestos: { maquina: number | null; maquinaReflejo: number | null };
+    // `reflejo`: antes `maquinaReflejo` (nombre corto, PR 8b).
+    repuestos: { maquina: number | null; reflejo: number | null };
   } | null;
   media: { id: number; filename: string; url: string }[];
 };
@@ -157,7 +158,7 @@ async function aplicar(): Promise<void> {
       logos: { maquina: idDe(logos.maquina), maquinaReflejo: idDe(logos.maquinaReflejo) },
       repuestos: {
         maquina: idDe(repuestos.maquina),
-        maquinaReflejo: idDe(repuestos.maquinaReflejo),
+        reflejo: idDe(repuestos.reflejo),
       },
     };
     guardar();
@@ -170,7 +171,7 @@ async function aplicar(): Promise<void> {
       id: inicio.id,
       data: {
         seccionLogos: { ...logos, maquina: dynapac, maquinaReflejo: null },
-        seccionRepuestos: { ...repuestos, maquina: yanmar, maquinaReflejo: null },
+        seccionRepuestos: { ...repuestos, maquina: yanmar, reflejo: null },
       },
       overrideAccess: true,
     });

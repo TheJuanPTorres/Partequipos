@@ -134,7 +134,7 @@ if (modo === "ver") {
   await payload.update({
     collection: "paginas",
     id: pagina.id,
-    data: { seccionMarcasRepuestos: { ...pagina.seccionMarcasRepuestos, maquina: imagen.id } },
+    data: { seccionMarcasRepuestos: { ...pagina.seccionMarcasRepuestos, foto: imagen.id } },
   });
   log("máquina elegida en el grupo «Marcas de repuestos» de la portada.");
 } else {
@@ -142,7 +142,7 @@ if (modo === "ver") {
   await payload.update({
     collection: "paginas",
     id: pagina.id,
-    data: { seccionMarcasRepuestos: { ...pagina.seccionMarcasRepuestos, maquina: null } },
+    data: { seccionMarcasRepuestos: { ...pagina.seccionMarcasRepuestos, foto: null } },
   });
   log("campo vaciado.");
   if (imagen) {

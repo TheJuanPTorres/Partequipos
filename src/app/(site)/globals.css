@@ -640,7 +640,7 @@ body {
   display: block;
   font-size: max(
     var(--titulo-minimo),
-    min(1em, calc(var(--ancho-titulo, 100vw - 40px) / var(--palabra-em, 1)))
+    min(1em, calc(var(--ancho-titulo, calc(100vw - 40px)) / var(--palabra-em, 1)))
   );
 }
 

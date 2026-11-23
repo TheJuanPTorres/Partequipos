@@ -6,6 +6,7 @@ import { getPayload } from "payload";
 
 import type { EstadoFormulario } from "@/lib/actions/estadoFormulario";
 import { procesarSolicitud } from "@/lib/actions/procesarSolicitud";
+import { limiteDeEnvios } from "@/lib/formularios/antiSpam";
 import { verificarTurnstile } from "@/lib/turnstile";
 
 /**
@@ -33,6 +34,8 @@ export async function enviarSolicitud(
 
   return procesarSolicitud(formData, {
     ip,
+    // En memoria de esta instancia y sin guardar la IP (antiSpam.ts): aproximado en serverless.
+    permitirIp: (direccion) => limiteDeEnvios.permitir(direccion),
     verificar: verificarTurnstile,
     // Persistencia por API local (CLAUDE.md §3.2), que ignora el control de
     // acceso: por eso la colección puede tener `create: false` y aun así

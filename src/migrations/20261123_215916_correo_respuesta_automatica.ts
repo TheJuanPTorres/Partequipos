@@ -1,0 +1,15 @@
+import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
+
+export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  await db.execute(sql`
+   ALTER TABLE "correo_formularios" ADD COLUMN "respuesta_activa" boolean DEFAULT true;
+  ALTER TABLE "correo_formularios" ADD COLUMN "respuesta_asunto" varchar;
+  ALTER TABLE "correo_formularios" ADD COLUMN "respuesta_texto" varchar;`)
+}
+
+export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+  await db.execute(sql`
+   ALTER TABLE "correo_formularios" DROP COLUMN "respuesta_activa";
+  ALTER TABLE "correo_formularios" DROP COLUMN "respuesta_asunto";
+  ALTER TABLE "correo_formularios" DROP COLUMN "respuesta_texto";`)
+}

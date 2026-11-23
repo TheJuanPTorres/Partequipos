@@ -20,7 +20,14 @@ export const TipoMaquinaria: CollectionConfig = {
   admin: {
     useAsTitle: "nombre",
     group: "Maquinaria",
+    description:
+      "Este orden es el de las pestañas de tipo del listado de maquinaria nueva y de «Por tipo de máquina». Arrastra las filas para cambiarlo; uno nuevo entra al final. El de dentro de cada marca se cambia en la ficha de la marca.",
   },
+  /*
+   * DOS ÓRDENES (2026-11-23, tanda 21, PR-2): este `_order` es el de los LISTADOS que mezclan marcas
+   * (`ORDEN_LISTADO`); el join «Tipos de máquina de la marca» guarda el de dentro de cada marca.
+   */
+  orderable: true,
   access: {
     read: lecturaContenido,
     create: escrituraContenido,
@@ -144,7 +151,7 @@ export const TipoMaquinaria: CollectionConfig = {
         admin: {
           defaultColumns: ["nombre", "codigo", "mostrarEnWeb"],
           description:
-            "En el orden en que salen en la web. Arrastra las filas para cambiarlo; uno nuevo entra al final.",
+            "Este orden es el de dentro del tipo (su página y «Otras referencias» de la ficha). Arrastra las filas para cambiarlo; uno nuevo entra al final. El del listado de maquinaria nueva se cambia en «Equipos nuevos».",
         },
       },
       seoField(),

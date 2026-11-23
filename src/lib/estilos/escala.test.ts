@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { escalaPx, factorEscala, sizesEscalado, sizesPorFactor } from "./escala";
+import {
+  SCRIPT_TECHO_ESCALA,
+  escalaPx,
+  factorEscala,
+  sizesEscalado,
+  sizesPorFactor,
+  techoEscala,
+} from "./escala";
 import { escalarValor, ficheroExcluido } from "./escalaPostcss.mjs";
 
 describe("escala de las pantallas grandes", () => {
@@ -12,6 +19,47 @@ describe("escala de las pantallas grandes", () => {
     assert.equal(factorEscala(3840), 2.4);
     assert.equal(escalaPx(110, 1440), 110);
     assert.equal(escalaPx(110, 3200), 220);
+  });
+
+  it("con la ventana al 100 % el techo del monitor no cambia nada", () => {
+    // La ventana nunca es más ancha que el monitor.
+    for (const [ancho, pantalla] of [
+      [390, 390],
+      [1440, 1440],
+      [1920, 1920],
+      [1600, 2560],
+      [2560, 2560],
+      [3840, 3840],
+    ]) {
+      assert.equal(factorEscala(ancho, pantalla), factorEscala(ancho, 0));
+    }
+  });
+
+  it("al alejar el zoom la escala se queda en la del monitor", () => {
+    // Monitor de 1920 con el zoom al 50 % y al 25 %: la ventana mide 3840 y 7680 px de CSS.
+    assert.equal(factorEscala(3840, 1920), 1.2);
+    assert.equal(factorEscala(7680, 1920), 1.2);
+    // Monitor de 1440: sin escala a ningún zoom.
+    assert.equal(factorEscala(5760, 1440), 1);
+    // Al acercar (200 %), la ventana mide menos de 1600: escala 1 y la página se recoloca.
+    assert.equal(factorEscala(960, 1920), 1);
+    assert.equal(techoEscala(0), Infinity);
+    assert.equal(escalaPx(100, 7680, 1920), 120);
+  });
+
+  it("el script del techo hace la misma cuenta que techoEscala", () => {
+    const estilo = new Map<string, string>();
+    const ventana = { screen: { width: 2560 } };
+    const documento = {
+      documentElement: { style: { setProperty: (k: string, v: string) => estilo.set(k, v) } },
+    };
+    new Function("window", "screen", "document", "addEventListener", SCRIPT_TECHO_ESCALA)(
+      ventana,
+      ventana.screen,
+      documento,
+      () => undefined,
+    );
+    assert.equal(Number(estilo.get("--escala-techo")), techoEscala(2560));
   });
 
   it("el sizes pide lo mismo hasta 1600 y en proporción después", () => {

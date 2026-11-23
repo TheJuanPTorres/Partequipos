@@ -523,8 +523,11 @@
 
 .circular text {
   fill: #fff;
-  /* En unidades del dibujo (100 × 100): ~16 px de letra en el círculo de 120 px. */
-  font-size: 16px;
+  /*
+   * El tamaño de la letra va en el atributo `font-size` del `<text>` (16, en unidades del dibujo
+   * de 100 × 100), NO aquí: en esta hoja el plugin de la escala lo multiplicaría otra vez, y la
+   * letra crecería más que su círculo (pantallas de más de 1600 px y zoom alejado).
+   */
   font-weight: 300;
   text-transform: none;
 }

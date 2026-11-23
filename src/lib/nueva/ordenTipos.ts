@@ -62,7 +62,8 @@ function claveDeTipo(nombre: string): string {
  * marca: «Por tipo de máquina» lleva a la página GENERAL del tipo (la de las categorías que
  * mezclan marcas, #326), aunque hoy solo tenga equipos de una marca. El tipo de una marca (casilla
  * «Tarjeta en el índice de tipos») solo sale si su tipo NO tiene categoría, para no perder la
- * entrada mientras se crea: va DETRÁS de las categorías, en el orden de la web antigua. Dos
+ * entrada mientras se crea: va DETRÁS de las categorías, en el orden en que llega (el del panel,
+ * arrastrando en «Tipos de maquinaria nueva», desde el 2026-11-23; antes, el de la web antigua). Dos
  * categorías del mismo tipo: la de más marcas, en el puesto de la primera.
  */
 export function unaEntradaPorTipo<T>(
@@ -82,6 +83,7 @@ export function unaEntradaPorTipo<T>(
   }
   return [
     ...[...porClave.values()].map((e) => e.dato),
-    ...ordenarTiposNueva([...sueltos.values()], (e) => e.nombre).map((e) => e.dato),
+    // En el orden recibido: el del panel («Tipos de maquinaria nueva», arrastrando; 2026-11-23).
+    ...[...sueltos.values()].map((e) => e.dato),
   ];
 }

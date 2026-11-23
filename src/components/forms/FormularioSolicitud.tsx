@@ -8,6 +8,7 @@ import { Turnstile } from "@/components/forms/Turnstile";
 import { enviarEvento } from "@/lib/analitica/navegador";
 import { ESTADO_INICIAL } from "@/lib/actions/estadoFormulario";
 import { enviarSolicitud } from "@/lib/actions/solicitudes";
+import { CAMPO_TIEMPO, CAMPO_TRAMPA } from "@/lib/formularios/antiSpam";
 import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/opcionesSolicitud";
 import { conMensaje, mensajeWhatsApp } from "@/lib/whatsapp";
 import wa from "@/components/whatsapp/botonWhatsapp.module.css";
@@ -132,6 +133,15 @@ export function FormularioSolicitud({
     emergente && etiquetaPagina === "Mensaje" ? "¿Qué necesitas?" : etiquetaPagina;
   const [estado, accion, enviando] = useActionState(enviarSolicitud, ESTADO_INICIAL);
 
+  // Hora a la que se mostró el formulario (antiSpam.ts: tiempo mínimo). Se pone ya montado, no al
+  // generar la página, para que sea la de quien lo ve.
+  // Un `input` oculto: su valor es su atributo, así que el restablecimiento del formulario tras un
+  // error no lo borra.
+  const campoInicio = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (campoInicio.current) campoInicio.current.value = String(Date.now());
+  }, []);
+
   const idBase = useId();
   const campo = (n: string) => `${idBase}-${n}`;
 
@@ -187,26 +197,24 @@ export function FormularioSolicitud({
               : "mt-4 rounded border border-green-700 bg-green-50 p-4 text-green-900 focus:outline-none focus:ring-2 focus:ring-green-700"
           }
         >
-          {f3 ? (
-            <svg
-              viewBox="0 0 52 52"
-              aria-hidden="true"
-              focusable="false"
-              data-check=""
-              className="mx-auto mb-3 h-16 w-16"
-            >
-              <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" strokeWidth="3" />
-              <path
-                d="M15 27l8 8 15-17"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          ) : null}
-          <p className="font-medium">Solicitud enviada</p>
+          <svg
+            viewBox="0 0 52 52"
+            aria-hidden="true"
+            focusable="false"
+            data-check=""
+            className={f3 ? "mx-auto mb-3 h-16 w-16" : "mb-2 h-10 w-10"}
+          >
+            <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" strokeWidth="3" />
+            <path
+              d="M15 27l8 8 15-17"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <p className="text-lg font-medium">Solicitud enviada</p>
           <p className="mt-1 text-sm">{estado.mensaje}</p>
           {whatsapp ? (
             <p className="mt-3 text-sm">
@@ -359,6 +367,23 @@ export function FormularioSolicitud({
         {/* Campos que no toca el usuario. El servidor los valida igual. */}
         <input type="hidden" name="tipo" value={tipo} />
         <input type="hidden" name="origen" value={origen} />
+        <input ref={campoInicio} type="hidden" name={CAMPO_TIEMPO} defaultValue="" />
+        {/* Campo trampa: fuera de pantalla y del teclado; una persona no lo rellena, un robot sí. */}
+        <div
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-10000px", height: 0, overflow: "hidden" }}
+        >
+          <label>
+            No rellenar este campo
+            <input
+              type="text"
+              name={CAMPO_TRAMPA}
+              tabIndex={-1}
+              autoComplete="off"
+              defaultValue=""
+            />
+          </label>
+        </div>
         {referencia ? (
           <>
             {referencia.tipo && referencia.id !== undefined ? (

@@ -673,74 +673,24 @@
 
 /*
  * Vista en REJILLA (el icono de cuadrícula). Con 4 por fila las tarjetas
- * quedaban estrechas y desalineadas (dirección, 2026-10-18): ahora 2 por fila (desde la tarea 9 de la tanda 21; antes 1)
- * en móvil, 2 en tablet y como mucho 3 en escritorio (2 si no caben a 260 px).
+ * quedaban estrechas y desalineadas (dirección, 2026-10-18): ahora 1 por fila
+ * en móvil (sin botón, abajo), 2 en tablet y como mucho 3 en escritorio (2 si no caben a 260 px).
  * Todas las de una fila miden lo mismo: la foto va en una caja de proporción
  * fija (así el logo y el título empiezan a la misma altura), el título ocupa
  * siempre dos líneas, cada dato como mucho tres (con «…»; el completo está en
  * la ficha) y los botones bajan al pie de la tarjeta.
  */
 /*
- * En móvil, 2 por fila (Juan Pablo, tanda 21, tarea 9: antes 1, igual que la lista, y el botón de la
- * cuadrícula «no hacía nada»). Tarjeta compacta: foto, nombre en dos líneas, los datos y el botón a
- * todo el ancho, con letra y aire más pequeños.
+ * En móvil, 1 por fila, y SIN el botón de la cuadrícula (Juan Pablo, tanda 21, tarea 9): con 2 por
+ * fila a 390 px el nombre se cortaba y el modelo no se veía (medido el 2026-11-23), y con 1 la
+ * cuadrícula es igual que la lista, así que el botón «no hacía nada». Desde 768 px vuelve (2 y 3).
  */
 .tarjetas[data-vista="rejilla"] {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
 }
 @media (max-width: 767px) {
-  .tarjetas[data-vista="rejilla"] .tarjeta {
-    border-radius: 20px;
-  }
-  .tarjetas[data-vista="rejilla"] .foto > img:first-child {
-    inset: 10px;
-    width: calc(100% - 20px);
-    height: calc(100% - 20px);
-  }
-  .tarjetas[data-vista="rejilla"] .logo {
-    left: 10px;
-    bottom: 8px;
-  }
-  .tarjetas[data-vista="rejilla"] .logo img {
-    max-width: 64px;
-    height: 16px;
-  }
-  .tarjetas[data-vista="rejilla"] .datos {
-    padding: 6px 12px 14px;
-  }
-  .tarjetas[data-vista="rejilla"] .nombre {
-    font-size: 15px;
-  }
-  .tarjetas[data-vista="rejilla"] .modelo {
-    margin-top: 8px;
-    font-size: 13px;
-  }
-  .tarjetas[data-vista="rejilla"] .descripcionCorta {
+  .vista {
     display: none;
-  }
-  .tarjetas[data-vista="rejilla"] .linea {
-    margin: 10px 0;
-  }
-  .tarjetas[data-vista="rejilla"] .lista {
-    gap: 8px;
-    font-size: 13px;
-  }
-  .tarjetas[data-vista="rejilla"] .lista li {
-    gap: 6px;
-  }
-  .tarjetas[data-vista="rejilla"] .circulo {
-    width: 24px;
-    height: 24px;
-  }
-  .tarjetas[data-vista="rejilla"] .botones {
-    flex-direction: column;
-    gap: 8px;
-    padding-top: 14px;
-  }
-  .tarjetas[data-vista="rejilla"] .boton {
-    width: 100%;
-    padding: 0 12px;
-    font-size: 13px;
   }
 }
 @media (min-width: 768px) {

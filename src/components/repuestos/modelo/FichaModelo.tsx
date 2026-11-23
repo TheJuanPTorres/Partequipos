@@ -1,3 +1,4 @@
+import { TextoTitulo } from "@/components/comun/TextoTitulo";
 import { IconBrandWhatsapp, IconMessageCircle } from "@tabler/icons-react";
 
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
@@ -78,17 +79,19 @@ export function FichaModelo({
           ) : null}
           {logo ? <span aria-hidden="true" className={estilos.separador} /> : null}
           <div className={estilos.titular}>
-            <h1 id="modelo-titulo" className={estilos.titulo}>
-              {titulo.split(" ").map((palabra, i) => (
-                <span key={`${i}-${palabra}`}>
-                  {i > 0 ? " " : null}
-                  {palabra.includes("-") ? (
-                    <span className={estilos.sinCorte}>{palabra}</span>
-                  ) : (
-                    palabra
-                  )}
-                </span>
-              ))}
+            <h1 id="modelo-titulo" className={`${estilos.titulo}`}>
+              <TextoTitulo texto={titulo}>
+                {titulo.split(" ").map((palabra, i) => (
+                  <span key={`${i}-${palabra}`}>
+                    {i > 0 ? " " : null}
+                    {palabra.includes("-") ? (
+                      <span className={estilos.sinCorte}>{palabra}</span>
+                    ) : (
+                      palabra
+                    )}
+                  </span>
+                ))}
+              </TextoTitulo>
             </h1>
             {linea ? <p className={estilos.linea}>{linea}</p> : null}
           </div>

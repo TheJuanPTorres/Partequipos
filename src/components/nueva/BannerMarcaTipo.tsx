@@ -1,3 +1,4 @@
+import { TextoTitulo } from "@/components/comun/TextoTitulo";
 import { IconArrowRight, IconExternalLink } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -105,7 +106,7 @@ export async function BannerMarcaTipo({
 
       <div className={estilos.texto}>
         <Titulo id={id} className={estilos.titulo}>
-          {titulo}
+          <TextoTitulo texto={titulo} nivel="medio" />
         </Titulo>
       </div>
 

@@ -19,7 +19,10 @@ import { getPayload, type Payload } from "payload";
 
 import { HOST_PRODUCCION } from "../../src/lib/portada/heroPrueba";
 import { CAMPO_ULTIMO_EDITOR } from "../../src/lib/fields/ultimoEditor";
+import { exigirBaseDePrueba } from "../../src/lib/db/basePrueba";
 
+// Solo contra una base de prueba (development, el preview o local): se niega antes de conectar.
+exigirBaseDePrueba("ultimo-editor");
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 const ENDPOINT_REAL = HOST_PRODUCCION.split(".")[0]!.replace(/-pooler$/, "");

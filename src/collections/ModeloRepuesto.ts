@@ -45,6 +45,8 @@ export const ModeloRepuesto: CollectionConfig = {
     [
       // Aviso en vivo si la galería está vacía (F4).
       avisoField("avisoSinFotos", "AvisoSinFotos"),
+      // El nombre empieza por «test» o «prueba»: avisa, no bloquea (tanda 21, tarea 8).
+      avisoField("avisoNombreDePrueba", "AvisoNombreDePrueba"),
       {
         name: "nombre",
         type: "text",

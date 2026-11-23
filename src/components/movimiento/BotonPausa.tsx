@@ -27,6 +27,8 @@ export function BotonPausa({ pausado, alPulsar, que, controla, className }: Prop
       onClick={alPulsar}
       aria-label={etiquetaPausa(pausado, que)}
       aria-controls={controla}
+      // El WhatsApp flotante sube si cae encima (a 3840, la banda de logos y el vídeo de la compañía).
+      data-evita-flotante=""
     >
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         {pausado ? (

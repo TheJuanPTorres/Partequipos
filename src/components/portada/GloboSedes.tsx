@@ -428,6 +428,7 @@ export function GloboSedes({ token, sedes, children }: Props) {
           type="button"
           className={estilos.cerrar}
           onClick={() => setPlegado(true)}
+          data-evita-flotante=""
           aria-label="Ocultar el panel de sedes"
         >
           <svg viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false">
@@ -441,7 +442,8 @@ export function GloboSedes({ token, sedes, children }: Props) {
         </button>
       </div>
 
-      <nav className={estilos.nav} aria-label="Navegación de sedes">
+      {/* Con `data-evita-flotante`: a 390 y 768 la flecha «Sede siguiente» cae bajo el WhatsApp. */}
+      <nav className={estilos.nav} aria-label="Navegación de sedes" data-evita-flotante="">
         <button
           type="button"
           className={estilos.navBoton}

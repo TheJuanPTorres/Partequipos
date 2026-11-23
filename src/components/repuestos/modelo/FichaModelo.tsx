@@ -79,7 +79,7 @@ export function FichaModelo({
           ) : null}
           {logo ? <span aria-hidden="true" className={estilos.separador} /> : null}
           <div className={estilos.titular}>
-            <h1 id="modelo-titulo" className={`${estilos.titulo} contenedor-titulo`}>
+            <h1 id="modelo-titulo" className={`${estilos.titulo}`}>
               <TextoTitulo texto={titulo}>
                 {titulo.split(" ").map((palabra, i) => (
                   <span key={`${i}-${palabra}`}>

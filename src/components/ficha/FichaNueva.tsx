@@ -247,10 +247,7 @@ export function FichaNueva({
    * kit, el <h1> va en su cabecera (el nombre completo).
    */
   const tituloFicha = (
-    <h1
-      id="ficha-titulo"
-      className={`${estilos.titulo} ${nueva.titulo} texto-titulo-bloque contenedor-titulo`}
-    >
+    <h1 id="ficha-titulo" className={`${estilos.titulo} ${nueva.titulo} texto-titulo-bloque`}>
       {tituloEscritorio ? (
         <>
           {/* Con reserva de alto: «Case Construction» ocupa 2 líneas o 1 según la fuente. */}

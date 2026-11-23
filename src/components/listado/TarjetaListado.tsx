@@ -105,7 +105,7 @@ export function TarjetaListado({
         ) : null}
       </div>
       <div className={estilos.datos}>
-        <h3 className={`${estilos.nombre} contenedor-titulo`}>
+        <h3 className={`${estilos.nombre}`}>
           {href ? (
             <Link href={href}>
               <TextoTitulo texto={titulo} mayusculas nivel="pequeno" />

@@ -621,8 +621,12 @@ body {
  * 2. Con `<TextoTitulo>` (src/components/comun/TextoTitulo.tsx), el tamaño baja lo justo para que
  *    la palabra más larga quepa en el ancho del título, con un mínimo legible por nivel. El
  *    servidor manda el ancho de esa palabra en `em` (`--palabra-em`): sin JavaScript ni CLS. Un
- *    título que cabe se queda en su tamaño (`min(1em, …)`). `cqi` es el ancho del propio título,
- *    que pasa a contenedor; con la escala de pantallas grandes, ancho y letra crecen a la vez y la
+ *    título que cabe se queda en su tamaño (`min(1em, …)`). El ancho de referencia es la ventana
+ *    menos el margen lateral (`--ancho-titulo`, por defecto `100vw - 40px`), que es donde la
+ *    palabra no cabía (móvil); una plantilla con el título en una columna más estrecha puede
+ *    darle su ancho. NO es una consulta de contenedor a propósito: un título contenedor dentro de
+ *    una caja que se ajusta a su contenido queda a ancho 0 (medido en la ficha nueva, una letra
+ *    por línea). Con la escala de pantallas grandes, ventana y letra crecen a la vez y la
  *    proporción no cambia.
  * 3. Último recurso: si ni al mínimo cabe (`data-guion`, calculado en el servidor), guion con las
  *    reglas del español (`lang="es"` en <html>).
@@ -631,15 +635,13 @@ body {
   overflow-wrap: break-word;
 }
 
-:has(> .texto-ajustado),
-.contenedor-titulo {
-  container-type: inline-size;
-}
-
 .texto-ajustado {
   --titulo-minimo: 22px;
   display: block;
-  font-size: max(var(--titulo-minimo), min(1em, calc(100cqi / var(--palabra-em, 1))));
+  font-size: max(
+    var(--titulo-minimo),
+    min(1em, calc(var(--ancho-titulo, 100vw - 40px) / var(--palabra-em, 1)))
+  );
 }
 
 .texto-ajustado[data-nivel="medio"] {

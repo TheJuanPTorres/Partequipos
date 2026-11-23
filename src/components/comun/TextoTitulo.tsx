@@ -15,8 +15,7 @@ type Props = {
 
 /**
  * TEXTO DE UN TÍTULO QUE SE AJUSTA SI SU PALABRA MÁS LARGA NO CABE (tanda 21, tarea 7). Va DENTRO
- * del título (`<h1><TextoTitulo texto={…} /></h1>`); el título pasa a contenedor (solo o, si el texto
- * no es su hijo directo, con la clase `contenedor-titulo`) y el texto
+ * del título (`<h1><TextoTitulo texto={…} /></h1>`); el texto
  * baja de tamaño lo justo para que esa palabra quepa, nunca por debajo del mínimo del nivel. Un
  * título que cabe se queda igual (`min(1em, …)`). Si ni al mínimo cabe, se parte con guion.
  * Sin JavaScript en el navegador: componente de servidor o de cliente, da igual.

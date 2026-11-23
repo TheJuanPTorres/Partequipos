@@ -345,7 +345,7 @@ export function PlantillaListado<T>({
               </span>
             ))}
           </nav>
-          <h1 className={`${estilos.titulo} contenedor-titulo`}>
+          <h1 className={`${estilos.titulo}`}>
             <TextoTitulo texto={titulo} />
             {pagina > 1 ? <small>Página {pagina}</small> : null}
           </h1>

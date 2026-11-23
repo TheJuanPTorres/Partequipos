@@ -48,7 +48,8 @@ export async function procesarSolicitud(
   // 0. Anti-spam, antes de cualquier trabajo. Campo trampa: se responde «enviado» sin guardar,
   // para que el robot no sepa que fue descubierto.
   if (trampaRellena(formData)) return { estado: "ok", mensaje: OK };
-  if (revisarTiempo(formData, deps.ahora) !== "ok") {
+  // Sin la hora (sin JavaScript) NO se rechaza: perder una solicitud real es peor que algo de spam.
+  if (revisarTiempo(formData, deps.ahora) === "muy-rapido") {
     return { estado: "error", mensaje: ERROR_RAPIDO, valores };
   }
   if (deps.permitirIp && !deps.permitirIp(deps.ip)) {

@@ -6,8 +6,8 @@ import { createHash, randomBytes } from "node:crypto";
  * 1. CAMPO TRAMPA (`sitio_web`): un campo que una persona no ve y un robot rellena. Con él relleno
  *    se responde «enviado» sin guardar nada, para que el robot no aprenda.
  * 2. TIEMPO MÍNIMO: el formulario lleva la hora a la que se mostró (`tiempo_inicio`); un envío
- *    que llega antes de `TIEMPO_MINIMO_MS` lo mandó un programa. Sin ese campo también se rechaza
- *    (un POST hecho a mano no lo trae). Lo pone el navegador, así que un robot atento puede
+ *    que llega antes de `TIEMPO_MINIMO_MS` lo mandó un programa. Sin ese campo NO se rechaza (sin JavaScript no
+ *    existe): perder una solicitud real es peor que algo de spam; quedan la trampa y el límite. Lo pone el navegador, así que un robot atento puede
  *    falsearlo: es una barrera más, no la única (el límite por IP y Turnstile siguen).
  * 3. LÍMITE POR IP, SIN GUARDAR LA IP: en memoria de cada instancia, con la IP convertida en una
  *    huella (SHA-256 con una sal que nace con la instancia y no se guarda en ninguna parte). La

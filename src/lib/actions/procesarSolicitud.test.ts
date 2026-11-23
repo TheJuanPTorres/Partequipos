@@ -132,12 +132,30 @@ describe("procesarSolicitud: anti-spam", () => {
     assert.deepEqual(r.valores, ESPERADOS);
   });
 
-  it("sin la hora del formulario (POST a mano): no guarda", async () => {
+  it("sin la hora del formulario (sin JavaScript): NO se rechaza y se guarda", async () => {
     const { deps, guardados } = dependencias(true);
     const f = formulario();
     f.delete(CAMPO_TIEMPO);
     const r = await procesarSolicitud(f, deps);
-    assert.equal(r.estado, "error");
+    assert.equal(r.estado, "ok");
+    assert.equal(guardados.length, 1);
+  });
+
+  it("sin la hora pero con el campo trampa relleno: no se guarda", async () => {
+    const { deps, guardados } = dependencias(true);
+    const f = formulario({ [CAMPO_TRAMPA]: "x" });
+    f.delete(CAMPO_TIEMPO);
+    await procesarSolicitud(f, deps);
+    assert.equal(guardados.length, 0);
+  });
+
+  it("sin la hora, el límite por IP sigue mandando", async () => {
+    const { deps, guardados } = dependencias(true);
+    deps.permitirIp = () => false;
+    const f = formulario();
+    f.delete(CAMPO_TIEMPO);
+    const r = await procesarSolicitud(f, deps);
+    assert.equal(r.mensaje, ERROR_LIMITE);
     assert.equal(guardados.length, 0);
   });
 

@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import {
+  COOKIE_TEMA,
+  esRutaDelPanel,
+  temaQueFalta,
+  VIGENCIA_COOKIE_TEMA_S,
+} from "@/lib/panel/temaPorDefecto";
 import { crearCacheMapa } from "@/lib/redirects/cacheMapa";
 import { resumenDeRuta, type EntradaMapa } from "@/lib/redirects/mapaConClave";
 import { aRutaCanonica, normalizarRuta, separarAncla } from "@/lib/redirects/normalizar";
@@ -86,7 +92,30 @@ function obtenerMapa(origin: string): Promise<Map<string, RedirectEntry>> {
   return cacheMapa.obtener(() => cargarMapa(origin));
 }
 
+/**
+ * El panel sale en CLARO si el usuario no ha elegido tema (`temaPorDefecto.ts`): la cookie se pone
+ * en la petición, para que el servidor ya pinte en claro, y en la respuesta, para el navegador.
+ * No es `httpOnly`: el panel la lee y la cambia desde el navegador al elegir tema.
+ */
+function panelConTema(request: NextRequest): NextResponse {
+  const tema = temaQueFalta(request.cookies.get(COOKIE_TEMA)?.value);
+  if (!tema) return NextResponse.next();
+  request.cookies.set(COOKIE_TEMA, tema);
+  const cabeceras = new Headers(request.headers);
+  cabeceras.set("cookie", request.cookies.toString());
+  const respuesta = NextResponse.next({ request: { headers: cabeceras } });
+  respuesta.cookies.set(COOKIE_TEMA, tema, {
+    path: "/",
+    maxAge: VIGENCIA_COOKIE_TEMA_S,
+    sameSite: "lax",
+  });
+  return respuesta;
+}
+
 export async function proxy(request: NextRequest) {
+  // El panel no pasa por las redirecciones: solo se le pone el tema por defecto.
+  if (esRutaDelPanel(request.nextUrl.pathname)) return panelConTema(request);
+
   const ruta = normalizarRuta(request.nextUrl.pathname);
 
   try {
@@ -128,5 +157,11 @@ export const config = {
      *  - archivos con extensión (favicon.ico, robots.txt, sitemap.xml, .png…)
      */
     "/((?!api|admin|_next/static|_next/image|.*\\.[\\w]+$).*)",
+    /*
+     * Y el panel, SOLO para el tema claro por defecto (tanda 23): `proxy` sale por
+     * `panelConTema` antes de mirar las redirecciones, que en el panel siguen sin aplicarse.
+     */
+    "/admin",
+    "/admin/:path*",
   ],
 };

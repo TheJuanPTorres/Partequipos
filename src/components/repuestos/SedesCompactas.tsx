@@ -1,4 +1,5 @@
 import { IconMapPin } from "@tabler/icons-react";
+import { Fragment } from "react";
 
 import { type SedeLista } from "@/lib/portada/sedes";
 
@@ -63,14 +64,19 @@ export function SedesCompactas({ id, sedes }: { id: string; sedes: SedeLista[] }
                       {l.direccion}
                       <span className="sr-only"> (se abre en una pestaña nueva)</span>
                     </a>
-                    {l.telefono ? (
-                      <>
-                        <br />
-                        <a href={l.telefono.href} className={estilos.sedeTelefono}>
-                          {l.telefono.texto}
-                        </a>
-                      </>
-                    ) : null}
+                    {l.telefonos.length > 0 ? <br /> : null}
+                    {l.telefonos.map((t, i) => (
+                      <Fragment key={t.texto}>
+                        {i > 0 ? " / " : null}
+                        {t.href ? (
+                          <a href={t.href} className={estilos.sedeTelefono}>
+                            {t.texto}
+                          </a>
+                        ) : (
+                          t.texto
+                        )}
+                      </Fragment>
+                    ))}
                   </p>
                 ))
               )}

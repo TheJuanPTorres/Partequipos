@@ -25,26 +25,36 @@ describe("otras entradas de la lista (WordPress tal cual)", () => {
     );
   });
 
-  it("una sin ficha va como texto (href null) y todas van al final, en el orden de sus filas", () => {
+  it("una sin página no sale ni se cuenta; las que enlazan van al final, en el orden de sus filas", () => {
     const t = tipo({
       otrasEntradas: [
         { texto: "Excavadora Caterpillar 326D2" },
-        { texto: "Excavadora Caterpillar 311X" },
+        { texto: "Excavadora Caterpillar 311X", modelo: 8 },
+        { texto: "Excavadora Caterpillar 300Z", modelo: 9 },
+        { texto: "Excavadora Caterpillar 399", modelo: 404 },
       ],
     });
     const r = conOtrasEntradas(
       t,
       [modelo(1, "Excavadora CATERPILLAR 330"), modelo(2, "Excavadora CATERPILLAR 32")],
-      () => null,
+      (id) => (id === 404 ? null : `/otra/${id}/`),
     );
     assert.deepEqual(
       r.map((m) => [m.nombre, m.href]),
       [
         ["Excavadora CATERPILLAR 330", "/m1/"],
         ["Excavadora CATERPILLAR 32", "/m2/"],
-        ["Excavadora Caterpillar 326D2", null],
-        ["Excavadora Caterpillar 311X", null],
+        ["Excavadora Caterpillar 311X", "/otra/8/"],
+        ["Excavadora Caterpillar 300Z", "/otra/9/"],
       ],
+    );
+  });
+
+  it("solo con entradas sin página, la lista de siempre", () => {
+    const lista = [modelo(1, "A 10")];
+    assert.deepEqual(
+      conOtrasEntradas(tipo({ otrasEntradas: [{ texto: "Sin ficha" }] }), lista, () => null),
+      lista,
     );
   });
 

@@ -99,6 +99,8 @@
   overflow: visible;
   clip-path: none;
   white-space: normal;
+  /* A la izquierda, sobre la píldora, también en la ventana (que centra sus textos). */
+  text-align: left;
   color: var(--color-texto);
   font-size: 13px;
   font-weight: 600;

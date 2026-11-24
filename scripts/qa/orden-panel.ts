@@ -15,6 +15,8 @@
  * una URL que no sea de un preview (`origenDePreview`). Si algo falla a mitad, el `finally` devuelve
  * las claves. Necesita `REVALIDACION_TOKEN` del preview.
  */
+import { readFileSync, writeFileSync } from "node:fs";
+
 import { sql } from "@payloadcms/db-postgres";
 import { getPayload, type CollectionSlug, type Payload } from "payload";
 
@@ -361,7 +363,32 @@ async function ponerClave(c: Caso, id: number, clave: string): Promise<void> {
   );
 }
 
-const lista = await casos();
+/*
+ * FASES, para mirar la web con el orden cambiado (capturas a ojo, 2026-11-23):
+ * - `ORDEN_FASE=intercambiar`: intercambia, comprueba y NO devuelve; guarda las claves de antes en
+ *   `ORDEN_ESTADO` (fichero JSON, obligatorio).
+ * - `ORDEN_FASE=devolver`: lee ese fichero, devuelve las claves y revalida.
+ * Sin fase, todo de una vez (lo normal). `ORDEN_SOLO` (textos separados por comas) limita los
+ * listados a los que contienen alguno en su nombre.
+ */
+const FASE = process.env.ORDEN_FASE ?? "";
+const ESTADO = process.env.ORDEN_ESTADO ?? "";
+type Guardada = { tabla: string; columna: string; id: number; clave: string };
+if (FASE && !ESTADO) throw new Error("[orden-panel] ORDEN_FASE necesita ORDEN_ESTADO (fichero)");
+if (FASE === "devolver") {
+  const guardadas = JSON.parse(readFileSync(ESTADO, "utf8")) as Guardada[];
+  for (const g of guardadas)
+    await ponerClave({ tabla: g.tabla, columna: g.columna } as Caso, g.id, g.clave);
+  await revalidar();
+  decir(`devueltas ${guardadas.length} claves y revalidado el preview`);
+  process.exit(0);
+}
+
+const solo = (process.env.ORDEN_SOLO ?? "")
+  .split(",")
+  .map((x) => x.trim())
+  .filter(Boolean);
+const lista = (await casos()).filter((c) => !solo.length || solo.some((x) => c.nombre.includes(x)));
 // Los dos primeros (en su orden) que se ven en su página, y que hoy salen en ese orden.
 const pares: { c: Caso; a: Elemento; b: Elemento }[] = [];
 const lineas = new Map<Caso, string>();
@@ -402,12 +429,33 @@ try {
       fallos++;
     }
   }
-} finally {
-  for (const { c, a, b } of pares) {
-    await ponerClave(c, a.id, a.clave);
-    await ponerClave(c, b.id, b.clave);
+  if (FASE === "intercambiar") {
+    const guardadas: Guardada[] = pares.flatMap(({ c, a, b }) => [
+      { tabla: c.tabla, columna: c.columna, id: a.id, clave: a.clave },
+      { tabla: c.tabla, columna: c.columna, id: b.id, clave: b.clave },
+    ]);
+    writeFileSync(ESTADO, JSON.stringify(guardadas, null, 2));
+    for (const c of lista) if (lineas.get(c)) decir(lineas.get(c)!);
+    for (const { c, a, b } of pares) decir(`  ${barra(c.pagina)} · ${a.marca} ⇄ ${b.marca}`);
+    decir(`SIN DEVOLVER: claves de antes en ${ESTADO}. Después: ORDEN_FASE=devolver.`);
+    process.exit(fallos ? 1 : 0);
   }
-  decir("claves devueltas; revalidando…");
+} catch (e) {
+  // Un fallo a mitad de una fase «intercambiar» también devuelve.
+  if (FASE === "intercambiar")
+    for (const { c, a, b } of pares) {
+      await ponerClave(c, a.id, a.clave);
+      await ponerClave(c, b.id, b.clave);
+    }
+  throw e;
+} finally {
+  if (FASE !== "intercambiar") {
+    for (const { c, a, b } of pares) {
+      await ponerClave(c, a.id, a.clave);
+      await ponerClave(c, b.id, b.clave);
+    }
+    decir("claves devueltas; revalidando…");
+  }
 }
 const vuelto = await esperar(pares, true);
 for (const { c } of pares) {

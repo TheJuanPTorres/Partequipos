@@ -620,6 +620,75 @@ try {
     }
 
     /*
+     * Modo `csp` (2026-11-23, para A): los avisos de la Content-Security-Policy (en modo
+     * report-only) en el panel con sesión: inicio, lista de usadas, una usada y una nueva. Junta los
+     * eventos `securitypolicyviolation` de la página y los mensajes de consola que nombran la CSP.
+     * Solo lee.
+     */
+    if (MODO === "csp") {
+      const consola = [];
+      pagina.on("console", (m) => {
+        const t = m.text();
+        if (/Content[- ]Security[- ]Policy|Report Only/i.test(t)) consola.push(t.slice(0, 400));
+      });
+      await contexto.addInitScript(() => {
+        window.__violaciones = [];
+        document.addEventListener("securitypolicyviolation", (e) =>
+          window.__violaciones.push({
+            directiva: e.effectiveDirective,
+            bloqueado: e.blockedURI,
+            fuente: e.sourceFile ? `${e.sourceFile}:${e.lineNumber}` : "",
+            disposicion: e.disposition,
+            muestra: (e.sample ?? "").slice(0, 80),
+          }),
+        );
+      });
+      const idDe = async (coleccion) =>
+        pagina.evaluate(
+          async (r) => (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+          `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+        );
+      const usada = await idDe("equipos-usados");
+      const nueva = await idDe("equipos-nuevos");
+      const RUTAS = [
+        ["inicio", "/admin"],
+        ["lista-usadas", "/admin/collections/equipos-usados"],
+        ["ficha-usada", `/admin/collections/equipos-usados/${usada}`],
+        ["ficha-nueva", `/admin/collections/equipos-nuevos/${nueva}`],
+      ];
+      for (const [nombre, ruta] of RUTAS) {
+        const antes = consola.length;
+        await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(2500);
+        const violaciones = await pagina.evaluate(() => window.__violaciones ?? []);
+        const unicas = [...new Map(violaciones.map((v) => [JSON.stringify(v), v])).values()];
+        // Sin la query: solo origen y ruta de lo bloqueado.
+        const limpias = unicas.map((v) => ({
+          ...v,
+          bloqueado: /^https?:/.test(v.bloqueado)
+            ? (() => {
+                const u = new URL(v.bloqueado);
+                return `${u.origin === origin ? "(mismo origen)" : u.origin}${u.pathname}`;
+              })()
+            : v.bloqueado,
+          fuente: v.fuente.replace(origin, ""),
+        }));
+        hallazgos.push({
+          pantalla: `csp-${nombre}`,
+          ancho: ancho.nombre,
+          violaciones: limpias,
+          consola: consola.slice(antes),
+        });
+        decir(
+          `· ${nombre} (${ancho.nombre}): ${limpias.length} violaciones${limpias.length ? `: ${limpias.map((v) => `${v.directiva} ← ${v.bloqueado}`).join(" | ")}` : ""} · ${consola.length - antes} mensajes de consola`,
+        );
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      await contexto.close();
+      continue;
+    }
+
+    /*
      * Modo `borrador` (`… borrador <id de la página>`, PR 8b): con la sesión abierta, el botón del
      * panel (`/api/borrador/?pagina=<id>`) lleva a la página con su ÚLTIMO BORRADOR y el aviso de
      * vista previa; «Salir de la vista previa» vuelve a lo publicado. El borrador de prueba lo

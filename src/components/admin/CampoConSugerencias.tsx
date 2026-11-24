@@ -18,6 +18,12 @@ type Props = TextFieldClientProps & {
   filtro?: string;
   /** El texto delante de las sugerencias. */
   titulo?: string;
+  /**
+   * Otra fuente: en lugar de las otras fichas, una lista del documento RELACIONADO por `filtro`
+   * (p. ej. las series del tipo elegido: `{ coleccion: "tipos-equipo", lista: "series",
+   * subcampo: "nombre" }`).
+   */
+  desde?: { coleccion: string; lista: string; subcampo: string };
 };
 
 /**
@@ -29,7 +35,10 @@ type Props = TextFieldClientProps & {
  * Se configura en la colección con `admin.components.Field: { path, clientProps: { filtro, titulo } }`.
  */
 export default function CampoConSugerencias(props: Props) {
-  const { filtro = "marca", titulo = "Ya usados con esta marca:", ...campo } = props;
+  const { filtro = "marca", titulo = "Ya usados con esta marca:", desde, ...campo } = props;
+  const desdeColeccion = desde?.coleccion;
+  const desdeLista = desde?.lista;
+  const desdeSubcampo = desde?.subcampo;
   const { collectionSlug, id } = useDocumentInfo();
   const nombre = campo.field.name;
   const valorFiltro = idDe(useFormFields(([campos]) => campos?.[filtro]?.value));
@@ -43,6 +52,24 @@ export default function CampoConSugerencias(props: Props) {
   useEffect(() => {
     if (!clave || !collectionSlug) return;
     const control = new AbortController();
+    if (desdeColeccion && desdeLista && desdeSubcampo) {
+      fetch(`/api/${desdeColeccion}/${valorFiltro}?depth=0`, {
+        credentials: "include",
+        signal: control.signal,
+      })
+        .then((r) => (r.ok ? r.json() : {}))
+        .then((d: Record<string, unknown>) => {
+          const filas = Array.isArray(d[desdeLista])
+            ? (d[desdeLista] as Record<string, unknown>[])
+            : [];
+          setSugeridos({
+            clave,
+            lista: valoresSugeridos(filas.map((f) => f?.[desdeSubcampo])).slice(0, 12),
+          });
+        })
+        .catch(() => undefined);
+      return () => control.abort();
+    }
     const q = new URLSearchParams({ depth: "0", limit: "200", [`select[${nombre}]`]: "true" });
     q.set(`where[${filtro}][equals]`, String(valorFiltro));
     if (id !== undefined && id !== null) q.set("where[id][not_equals]", String(id));
@@ -56,7 +83,17 @@ export default function CampoConSugerencias(props: Props) {
       )
       .catch(() => undefined);
     return () => control.abort();
-  }, [clave, collectionSlug, filtro, id, nombre, valorFiltro]);
+  }, [
+    clave,
+    collectionSlug,
+    desdeColeccion,
+    desdeLista,
+    desdeSubcampo,
+    filtro,
+    id,
+    nombre,
+    valorFiltro,
+  ]);
 
   const actual = (value ?? "").trim().toLowerCase();
   const lista = clave && sugeridos.clave === clave ? sugeridos.lista : [];

@@ -24,15 +24,17 @@ export type Listado = {
 };
 
 export const LISTADOS: Record<string, Listado> = {
+  // Tarea 3 (prototipo): el nombre lleva la miniatura y los dos abren la ficha; «Estado» y los
+  // dos interruptores directos.
   "equipos-usados": {
     columnas: [
-      "imagenes",
       "nombre",
+      "estadoWeb",
       "categoria",
       "marcaUsada",
       "anio",
-      "disponible",
       "mostrarEnWeb",
+      "disponible",
       "fechaPublicacion",
     ],
     busqueda: ["nombre", "marca", "modelo"],

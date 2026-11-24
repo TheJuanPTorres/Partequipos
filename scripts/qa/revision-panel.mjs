@@ -1372,6 +1372,149 @@ try {
       continue;
     }
 
+    /*
+     * Modo `paleta` (`… paleta [texto de una ficha]`, tanda 23): el BUSCADOR GLOBAL por efecto, a
+     * 1440 y 390. Ctrl+K abre un diálogo con el foco en el campo; «usad» da secciones y «Crear…»;
+     * el texto de una ficha (por defecto «zx350») da fichas; ↓ + Intro navega; Escape cierra y
+     * devuelve el foco; el filtro del menú deja solo lo que coincide. Capturas de cada paso.
+     */
+    if (MODO === "paleta") {
+      const ficha = process.argv[4] ?? "zx350";
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto} (${ancho.nombre})`);
+      };
+      const foto = (n) =>
+        pagina.screenshot({ path: path.join(salida, `paleta-${n}-${ancho.nombre}.png`) });
+      await pagina.goto(`${base}/admin/`, { waitUntil: "networkidle" });
+      await pagina
+        .locator("body")
+        .click({ position: { x: 5, y: 5 } })
+        .catch(() => null);
+      const antes = await pagina.evaluate(() => document.activeElement?.tagName ?? "");
+      await pagina.keyboard.press("Control+k");
+      const dialogo = pagina.getByRole("dialog", { name: "Buscar en el panel" });
+      const abierto = await dialogo.waitFor({ timeout: 5000 }).then(
+        () => true,
+        () => false,
+      );
+      ok("Ctrl+K abre el diálogo «Buscar en el panel»", abierto);
+      if (!abierto) {
+        await foto("fallo");
+        hallazgos.push({ pantalla: "paleta", ancho: ancho.nombre, resultado, errores, fallidas });
+        await contexto.close();
+        continue;
+      }
+      const campo = pagina.getByRole("combobox", { name: /Buscar secciones/ });
+      ok("el foco está en el campo", await campo.evaluate((el) => el === document.activeElement));
+      await foto("vacia");
+      await campo.fill("usad");
+      await pagina.waitForTimeout(400);
+      const opciones = async () =>
+        pagina.getByRole("option").evaluateAll((os) => os.map((o) => o.textContent?.trim() ?? ""));
+      const conUsad = await opciones();
+      ok(
+        `«usad» da secciones (${conUsad.filter((t) => /usad/i.test(t)).length})`,
+        conUsad.some((t) => /M.quinas usadas|Equipos usados/i.test(t)),
+      );
+      ok(
+        "«usad» da la acción «Crear equipo usado»",
+        conUsad.some((t) => /Crear equipo usado/i.test(t)),
+      );
+      await foto("usad");
+      await campo.fill(ficha);
+      let conFicha = [];
+      for (let i = 0; i < 20 && !conFicha.some((t) => new RegExp(ficha, "i").test(t)); i++) {
+        await pagina.waitForTimeout(300);
+        conFicha = await opciones();
+      }
+      ok(
+        `«${ficha}» da fichas (${conFicha.length}: ${conFicha.slice(0, 3).join(" | ")})`,
+        conFicha.some((t) => new RegExp(ficha, "i").test(t)),
+      );
+      const aviso =
+        (await pagina
+          .getByRole("status")
+          .filter({ hasText: /resultado|Nada|Buscando/ })
+          .first()
+          .textContent()) ?? "";
+      ok(`el aviso en vivo cuenta los resultados («${aviso.trim()}»)`, /resultado/.test(aviso));
+      await foto("ficha");
+      await campo.press("ArrowDown");
+      const activa = await campo.getAttribute("aria-activedescendant");
+      ok(
+        "↓ mueve la opción activa (aria-activedescendant)",
+        Boolean(activa && activa.endsWith("op-1")),
+      );
+      await campo.press("Escape");
+      const cerrado = await dialogo.waitFor({ state: "detached", timeout: 3000 }).then(
+        () => true,
+        () => false,
+      );
+      ok("Escape cierra", cerrado);
+      const despues = await pagina.evaluate(() => document.activeElement?.tagName ?? "");
+      ok(`el foco vuelve a donde estaba (${antes} → ${despues})`, antes === despues);
+      // Intro abre la primera opción.
+      await pagina.keyboard.press("Control+k");
+      await campo.fill(ficha);
+      for (
+        let i = 0;
+        i < 20 && !(await opciones()).some((t) => new RegExp(ficha, "i").test(t));
+        i++
+      )
+        await pagina.waitForTimeout(300);
+      const primeraFicha = await pagina
+        .getByRole("option")
+        .filter({ hasText: new RegExp(ficha, "i") })
+        .first();
+      await primeraFicha.click();
+      await pagina
+        .waitForURL(/\/admin\/collections\/[^/]+\/\d+/, { timeout: 15000 })
+        .catch(() => null);
+      ok(
+        `elegir una ficha abre su ficha (${new URL(pagina.url()).pathname})`,
+        /\/admin\/collections\/[^/]+\/\d+/.test(pagina.url()),
+      );
+      // Filtro del menú. El menú puede estar cerrado (Payload lo recuerda por usuario): se abre.
+      await pagina.goto(`${base}/admin/`, { waitUntil: "networkidle" });
+      const filtro = pagina.getByRole("searchbox", { name: "Filtrar el menú" });
+      // Cerrado, el menú está fuera de la pantalla e `inert` (no oculto): se mira la clase de Payload.
+      if ((await pagina.locator(".nav--nav-open").count()) === 0)
+        await pagina
+          .locator(
+            ancho.movil ? ".app-header__mobile-nav-toggler" : ".template-default__nav-toggler",
+          )
+          .first()
+          .click()
+          .catch(() => null);
+      await pagina.waitForTimeout(400);
+      ok(
+        "con el menú abierto, el filtro se ve",
+        (await pagina.locator(".nav--nav-open").count()) > 0 && (await filtro.isVisible()),
+      );
+      await filtro.fill("marcas");
+      await pagina.waitForTimeout(300);
+      const enlaces = await pagina
+        .locator(".nav__link .nav__link-label")
+        .evaluateAll((ls) =>
+          ls.filter((l) => l.offsetParent !== null).map((l) => l.textContent?.trim() ?? ""),
+        );
+      ok(
+        `el filtro del menú deja solo lo que coincide (${enlaces.join(", ")})`,
+        enlaces.length > 0 && enlaces.every((t) => /marca/i.test(t)),
+      );
+      await foto("filtro");
+      await filtro.fill("zzzz");
+      ok(
+        "sin coincidencias, lo dice",
+        await pagina.getByText(/Nada en el menú coincide/).isVisible(),
+      );
+      hallazgos.push({ pantalla: "paleta", ancho: ancho.nombre, resultado, errores, fallidas });
+      await contexto.close();
+      continue;
+    }
+
     if (MODO === "borrador") {
       const id = process.argv[4];
       if (!/^\d+$/.test(id ?? "")) fallar("Uso: … borrador <id de la página>");

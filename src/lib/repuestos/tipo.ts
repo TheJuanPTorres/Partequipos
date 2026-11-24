@@ -86,6 +86,11 @@ export function enlacesDeModelos(
  * orden; con ellas, van AL FINAL, en el orden de sus filas en el panel (Juan Pablo,
  * 2026-11-23): los modelos conservan el orden que el editor arrastró, y una entrada ya no se
  * cuela entre ellos por su nombre. En un tipo con series, cada una cierra la suya.
+ *
+ * UNA ENTRADA SIN PÁGINA NO SALE (Juan Pablo, 2026-11-24; QA externo, punto 15): solo se
+ * pintan y se cuentan las que enlazan a una ficha que existe. Un modelo nombrado sin ficha
+ * (el 326D2 de Caterpillar) era una tarjeta que no llevaba a ningún sitio y sumaba en los
+ * contadores. La fila sigue en el panel, por si un día tiene ficha.
  * `hrefDeModelo` da la URL de la ficha enlazada, o `null` si ya no existe.
  */
 export function conOtrasEntradas(
@@ -97,12 +102,14 @@ export function conOtrasEntradas(
     const nombre = texto(e.texto);
     if (!nombre) return [];
     const id = typeof e.modelo === "number" ? e.modelo : (e.modelo?.id ?? null);
+    const href = id === null ? null : hrefDeModelo(id);
+    if (!href) return [];
     return [
       {
         id: `entrada-${i}`,
         nombre,
         codigo: null,
-        href: id === null ? null : hrefDeModelo(id),
+        href,
         serie: texto(e.serie) || null,
         imagen: null,
         tipo: texto(tipo.nombre),

@@ -400,7 +400,7 @@ tipo repiten las de la marca), comparadas **por código** con las páginas de mo
 | Yanmar · miniexcavadora       | Miniexcavadora YANMAR VIO 70-3   | Texto, sin enlace                                              |
 | Hitachi · miniexcavadora (EX) | Miniexcavadora Hitachi EX450LC-5 | Con su texto, **enlazando a la excavadora ZX450LC-5** (errata) |
 
-Las otras entradas van al final de la lista del tipo (o de su serie), en el orden de sus filas en el panel (Juan Pablo, 2026-11-23; antes cada una caía en su sitio por texto); los modelos, en su orden del panel. Datos:
+Las otras entradas van al final de la lista del tipo (o de su serie), en el orden de sus filas en el panel (Juan Pablo, 2026-11-23; antes cada una caía en su sitio por texto); los modelos, en su orden del panel. **Desde el 2026-11-24 (Juan Pablo; QA externo, punto 15), una entrada sin página no se muestra ni se cuenta:** de las cinco de WordPress solo sale la EX450LC-5 de Hitachi LANDCROS, que enlaza a la ZX450LC-5; las cuatro sin ficha (D6D, 326D2 y 426B de Caterpillar, y VIO 70-3 de Yanmar) siguen en el panel. Datos:
 `scripts/repuestos/entradas-wp.ts` (`npm run preview:repuestos:entradas:simular|aplicar|retirar`, plan en
 `src/lib/repuestos/entradasWp.ts`); la de Hitachi necesita antes las series (§8). Conserva las entradas de un editor.
 Sitio publicado: `Desktop/partequipos-cierre/runbook-repuestos-listas-wp.md` (sustituye a `runbook-series-hitachi.md`).

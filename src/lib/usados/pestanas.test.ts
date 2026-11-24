@@ -19,19 +19,19 @@ describe("botones de categoría de los listados de usada", () => {
     { categoria: 4 },
   ]);
 
-  it("primero las que tienen unidades, de más a menos y por nombre; después las vacías", () => {
+  it("primero las que tienen unidades y después las vacías, cada grupo en el orden recibido (el del panel)", () => {
     const p = pestanasDeCategorias(categorias, cuentas, 2);
     assert.deepEqual(
       p.map((x) => [x.texto, x.activa, x.cuenta ?? null, x.nota ?? null]),
       [
+        ["Bulldozers", false, 1, null],
         ["Excavadoras", false, 3, null],
         ["Aditamentos", false, 1, null],
-        ["Bulldozers", false, 1, null],
         ["Cargadores", true, null, "Sin unidades por ahora"],
         ["Motoniveladoras", false, null, "Sin unidades por ahora"],
       ],
     );
-    assert.equal(p[0]?.href, "/maquinaria-pesada/maquinaria-pesada-usada/excavadoras/");
+    assert.equal(p[0]?.href, "/maquinaria-pesada/maquinaria-pesada-usada/bulldozer/");
   });
 
   it("cuenta las unidades de cada categoría", () => {

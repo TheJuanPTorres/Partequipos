@@ -367,7 +367,20 @@ try {
             path: path.join(salida, `ficha-${coleccion}-${ancho.nombre}.png`),
             fullPage: false,
           });
+          // Las filas de una lista (los productos de lubricante): su etiqueta, a la vista.
+          const etiquetas = pagina.locator(".pq-etiqueta-producto");
+          if ((await etiquetas.count()) > 0) {
+            await etiquetas.first().scrollIntoViewIfNeeded();
+            await pagina.waitForTimeout(500);
+            await pagina.screenshot({
+              path: path.join(salida, `filas-${coleccion}-${ancho.nombre}.png`),
+              fullPage: false,
+            });
+          }
           ficha = await pagina.evaluate(() => ({
+            filas: [...document.querySelectorAll(".pq-etiqueta-producto")]
+              .slice(0, 6)
+              .map((e) => e.textContent.trim()),
             resumen:
               document.querySelector(".pq-resumen-web__completa strong")?.textContent?.trim() ??
               null,

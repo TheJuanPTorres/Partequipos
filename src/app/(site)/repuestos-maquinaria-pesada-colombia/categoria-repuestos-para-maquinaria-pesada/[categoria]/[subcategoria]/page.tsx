@@ -152,6 +152,7 @@ export default async function SubcategoriaRepuestosPage({ params }: { params: Pr
       <HeroMarca
         vista={vista}
         anclaSiguiente={ANCLA_GRUPOS}
+        etiquetaRaton="Ir a los productos"
         franja={Boolean(color)}
         reservarTitulo
       />

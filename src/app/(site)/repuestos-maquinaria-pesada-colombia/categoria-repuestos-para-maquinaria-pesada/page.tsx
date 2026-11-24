@@ -84,6 +84,7 @@ export default async function CategoriasRepuestosIndexPage() {
             imagenDeMedia(indice.categoriasRepuestos?.fondo, "") ?? fondoDeRespaldo(marcas),
           )}
           anclaSiguiente={ANCLA}
+          etiquetaRaton="Ir a las categorías de repuestos"
         />
 
         <BaldosasCategorias

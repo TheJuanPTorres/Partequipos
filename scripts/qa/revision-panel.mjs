@@ -1780,6 +1780,9 @@ try {
       const malVistos = [];
       for (let i = 0; i < 400 && vistos.size < total; i++) {
         await pagina.keyboard.press("Tab");
+        // Se deja terminar el desplazamiento que haga la página al recibir el foco.
+        if (await pagina.evaluate(() => document.activeElement?.classList?.contains("pqma-editar")))
+          await pagina.waitForTimeout(400);
         const info = await pagina.evaluate(() => {
           const a = document.activeElement;
           if (!a || !a.classList?.contains("pqma-editar")) return null;
@@ -1789,12 +1792,14 @@ try {
             href: a.getAttribute("href") ?? "",
             dentro: r.top >= 0 && r.bottom <= window.innerHeight && r.width > 0 && r.height > 0,
             opaco: op > 0.5,
+            caja: `${Math.round(r.top)}..${Math.round(r.bottom)} de ${window.innerHeight}, opacidad ${op}`,
           };
         });
         if (!info) continue;
         if (!vistos.has(info.href)) {
           vistos.add(info.href);
-          if (!(info.dentro && info.opaco)) malVistos.push(info.href);
+          if (!(info.dentro && info.opaco))
+            malVistos.push(`${info.href.replace(/^.*\?/, "?")} (${info.caja})`);
         }
       }
       ok(

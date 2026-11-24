@@ -66,6 +66,7 @@ export function PaginaLineaLubricante({
       <HeroMarca
         vista={vista}
         anclaSiguiente={ANCLA_PRODUCTOS}
+        etiquetaRaton="Ir a los productos"
         indice
         franja={false}
         migas={migas}

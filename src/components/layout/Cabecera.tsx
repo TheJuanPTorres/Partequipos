@@ -39,6 +39,7 @@ import {
 } from "@/lib/cabecera/fluidez";
 import { inicioDelPanel, modoCabecera } from "@/lib/cabecera/modo";
 import { activasDe, PARAMETRO_ANIMACIONES } from "@/lib/listado/animaciones";
+import { claveDeFila, etiquetaOtraPestana } from "@/lib/cabecera/enlaces";
 import { claveDeEnlace, type PanelMenu } from "@/lib/megamenu";
 import type { ImagenLogo } from "@/lib/seo/logo";
 
@@ -92,7 +93,8 @@ type Enlace = { etiqueta: string; href: string };
 
 type Props = {
   /** `externo`: otro sitio (la tienda): botón oscuro en su sitio de la fila (`enlacesDeCabecera`). */
-  enlaces: readonly (Enlace & { externo?: boolean })[];
+  /** `otraPestana`: dirección completa (https://…); se abre en otra pestaña con su aspecto de siempre. */
+  enlaces: readonly (Enlace & { externo?: boolean; otraPestana?: boolean })[];
   /** Botón de la cabecera (global `cabecera`). Sin él, no se pinta. */
   contacto: Enlace | null;
   whatsapp: string;
@@ -120,9 +122,37 @@ function BotonExterno({ enlace }: { enlace: Enlace }) {
       className={`${estilos.boton} ${estilos.botonExterno} texto-etiqueta`}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${enlace.etiqueta} (se abre en otra pestaña)`}
+      aria-label={etiquetaOtraPestana(enlace.etiqueta)}
     >
       <IconShoppingBag aria-hidden="true" focusable="false" stroke={1.75} />
+      {enlace.etiqueta}
+    </a>
+  );
+}
+
+/**
+ * Enlace del menú con dirección completa del dominio del cliente («Transporte»,
+ * tanda 22): el aspecto de un enlace normal, en otra pestaña y con el aviso en
+ * el nombre accesible.
+ */
+function EnlaceOtraPestana({
+  enlace,
+  className,
+  onClick,
+}: {
+  enlace: Enlace;
+  className?: string;
+  onClick?: () => void;
+}) {
+  return (
+    <a
+      href={enlace.href}
+      className={className}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={etiquetaOtraPestana(enlace.etiqueta)}
+      onClick={onClick}
+    >
       {enlace.etiqueta}
     </a>
   );
@@ -631,7 +661,9 @@ export function Cabecera({
   // Los externos (la tienda) son botones en su sitio de la fila; sin megamenú.
   const internos = enlaces.filter((e) => !e.externo);
 
-  const actual = (href: string) => (ruta === href || ruta.startsWith(href) ? "page" : undefined);
+  // La portada («/») solo es la actual en la portada: toda ruta empieza por «/».
+  const actual = (href: string) =>
+    ruta === href || (href !== "/" && ruta.startsWith(href)) ? "page" : undefined;
 
   // Móvil: las entradas con panel despliegan su contenido (el mismo del megamenú, 2026-10-20).
   const listaEnlaces = (
@@ -639,7 +671,7 @@ export function Cabecera({
       {enlaces.map((e) => {
         const datos = paneles[claveDeEnlace(e.href)];
         return (
-          <li key={e.href}>
+          <li key={claveDeFila(e)}>
             {e.externo ? (
               <BotonExterno enlace={e} />
             ) : datos ? (
@@ -651,6 +683,8 @@ export function Cabecera({
                 claseEnlace={estilos.enlace}
                 alElegir={() => setAbiertoEn(null)}
               />
+            ) : e.otraPestana ? (
+              <EnlaceOtraPestana enlace={e} className={estilos.enlace} />
             ) : (
               <Link href={e.href} className={estilos.enlace} aria-current={actual(e.href)}>
                 {e.etiqueta}
@@ -668,21 +702,25 @@ export function Cabecera({
 
   const filasMas = enMas.map((e) =>
     e.externo ? (
-      <li key={e.href}>
+      <li key={claveDeFila(e)}>
         <a
           href={e.href}
           className={estilos.masEnlace}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`${e.etiqueta} (se abre en otra pestaña)`}
+          aria-label={etiquetaOtraPestana(e.etiqueta)}
           onClick={cerrarMas}
         >
           <IconShoppingBag aria-hidden="true" focusable="false" stroke={1.75} />
           {e.etiqueta}
         </a>
       </li>
+    ) : e.otraPestana ? (
+      <li key={claveDeFila(e)}>
+        <EnlaceOtraPestana enlace={e} className={estilos.masEnlace} onClick={cerrarMas} />
+      </li>
     ) : (
-      <li key={e.href}>
+      <li key={claveDeFila(e)}>
         <Link
           href={e.href}
           className={estilos.masEnlace}
@@ -764,14 +802,21 @@ export function Cabecera({
         const clave = claveDeEnlace(e.href);
         if (e.externo) {
           return (
-            <li key={e.href} className={estilos.conBoton} hidden={fuera(i)}>
+            <li key={claveDeFila(e)} className={estilos.conBoton} hidden={fuera(i)}>
               <BotonExterno enlace={e} />
+            </li>
+          );
+        }
+        if (e.otraPestana) {
+          return (
+            <li key={claveDeFila(e)} hidden={fuera(i)}>
+              <EnlaceOtraPestana enlace={e} className={estilos.enlace} />
             </li>
           );
         }
         if (!paneles[clave]) {
           return (
-            <li key={e.href} hidden={fuera(i)}>
+            <li key={claveDeFila(e)} hidden={fuera(i)}>
               <Link href={e.href} className={estilos.enlace} aria-current={actual(e.href)}>
                 {e.etiqueta}
               </Link>
@@ -780,7 +825,7 @@ export function Cabecera({
         }
         return (
           <li
-            key={e.href}
+            key={claveDeFila(e)}
             hidden={fuera(i)}
             onMouseEnter={() => {
               encima.current = clave;

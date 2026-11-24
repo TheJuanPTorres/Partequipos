@@ -1,6 +1,7 @@
 import { IconArrowRight, IconHome } from "@tabler/icons-react";
 import Link from "next/link";
 
+import { claveDeFila, etiquetaOtraPestana } from "@/lib/cabecera/enlaces";
 import { getCabecera } from "@/lib/queries/getCabecera";
 import { METADATA_404 } from "@/lib/seo/noEncontrada";
 
@@ -37,11 +38,24 @@ export default async function NoEncontrada() {
         <nav aria-label="Secciones principales" className={estilos.secciones}>
           <ul className={estilos.lista}>
             {secciones.map((s) => (
-              <li key={s.href}>
-                <Link href={s.href} className={estilos.enlace}>
-                  {s.etiqueta}
-                  <IconArrowRight aria-hidden="true" focusable="false" stroke={1.75} />
-                </Link>
+              <li key={claveDeFila(s)}>
+                {"otraPestana" in s && s.otraPestana ? (
+                  <a
+                    href={s.href}
+                    className={estilos.enlace}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={etiquetaOtraPestana(s.etiqueta)}
+                  >
+                    {s.etiqueta}
+                    <IconArrowRight aria-hidden="true" focusable="false" stroke={1.75} />
+                  </a>
+                ) : (
+                  <Link href={s.href} className={estilos.enlace}>
+                    {s.etiqueta}
+                    <IconArrowRight aria-hidden="true" focusable="false" stroke={1.75} />
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

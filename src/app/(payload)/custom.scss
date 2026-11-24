@@ -85,6 +85,9 @@
   --pq-warning-foreground: oklch(0.555 0.163 48.998); /* amber-700 */
   /* El par del rojo de error, de la misma familia (tanda 23): lo usa la insignia. */
   --pq-destructive-foreground: oklch(0.505 0.213 27.518); /* red-700 */
+  /* Morado de «Vendida» (tanda 23): no es del sistema del cliente; la misma familia de Tailwind v4. */
+  --pq-vendida: oklch(0.606 0.25 292.717); /* violet-500 */
+  --pq-vendida-foreground: oklch(0.491 0.27 292.581); /* violet-700 */
 
   /*
    * ESPACIADO (tanda 23, 2026-11-24): UNA escala para todo lo propio del panel (portada, buscador,
@@ -184,6 +187,7 @@ html[data-theme="dark"] {
   --pq-success-foreground: oklch(0.765 0.177 163.223); /* emerald-400 */
   --pq-warning-foreground: oklch(0.828 0.189 84.429); /* amber-400 */
   --pq-destructive-foreground: oklch(0.704 0.191 22.216); /* red-400 */
+  --pq-vendida-foreground: oklch(0.702 0.183 293.541); /* violet-400 */
   --pq-background: oklch(0.1822 0 113.1); /* #121212 */
   --pq-foreground: oklch(0.9288 0.0126 255.44); /* #e2e8f0 */
   --pq-secondary: oklch(0.29 0 113.31); /* #2b2b2b */
@@ -2144,8 +2148,8 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  */
 /*
  * TANDA 23 (2026-11-24, prototipo): la insignia lleva COLOR también en el texto, no solo en el
- * punto: verde Publicada, ámbar Oculta, azul el tono «info», rojo el error y gris lo neutro
- * (Borrador, Vendida). El texto usa el `-foreground` del tono (el 700 en claro y el 400 en oscuro)
+ * punto: verde Publicada, ámbar Oculta, morado Vendida, azul el tono «info», rojo el error y gris lo
+ * neutro (Borrador). El texto usa el `-foreground` del tono (el 700 en claro y el 400 en oscuro)
  * sobre el fondo teñido; el contraste de cada par se mide en los dos temas (AA, ≥ 4,5:1) y va en
  * el PR. El texto sigue diciendo el estado: el color acompaña (WCAG 1.4.1).
  */
@@ -2184,6 +2188,11 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   &--info {
     --pq-insignia-tono: var(--pq-info);
     --pq-insignia-texto: var(--pq-info-foreground);
+  }
+
+  &--vendida {
+    --pq-insignia-tono: var(--pq-vendida);
+    --pq-insignia-texto: var(--pq-vendida-foreground);
   }
 
   &__punto {

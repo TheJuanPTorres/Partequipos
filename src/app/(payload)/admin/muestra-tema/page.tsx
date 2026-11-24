@@ -21,7 +21,11 @@ export const metadata: Metadata = {
 const INSIGNIAS: Array<{ donde: string; insignia: Insignia | null }> = [
   { donde: "Ficha publicada", insignia: insigniaWeb({ mostrarEnWeb: true }) },
   { donde: "Ficha oculta", insignia: insigniaWeb({ mostrarEnWeb: false }) },
-  { donde: "Usada vendida", insignia: insigniaUsada({ mostrarEnWeb: true, disponible: false }) },
+  // El texto, de `insigniaUsada`; el tono morado, hasta que `fichaUsada.ts` (de C) lo lleve.
+  {
+    donde: "Usada vendida",
+    insignia: { ...insigniaUsada({ mostrarEnWeb: true, disponible: false }), tono: "vendida" },
+  },
   { donde: "Artículo publicado", insignia: insigniaDe("publicado", true) },
   { donde: "Artículo en borrador", insignia: insigniaDe("publicado", false) },
   { donde: "Mensaje nuevo", insignia: insigniaDe("solicitud", "nueva") },
@@ -43,6 +47,7 @@ const COLORES = [
   "warning",
   "destructive",
   "info",
+  "vendida",
 ];
 
 export default function MuestraTema() {

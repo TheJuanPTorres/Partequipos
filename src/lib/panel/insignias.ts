@@ -3,7 +3,8 @@
  * decisiones-panel.md §24). Siempre con TEXTO: el color acompaña, nunca es lo
  * único que dice el estado (WCAG 1.4.1).
  */
-export type TonoInsignia = "exito" | "aviso" | "error" | "info" | "neutro";
+/** `vendida` (tanda 23): morado, para que «Vendida» no se confunda con el gris de «Borrador». */
+export type TonoInsignia = "exito" | "aviso" | "error" | "info" | "vendida" | "neutro";
 export type Insignia = { texto: string; tono: TonoInsignia };
 
 export type TipoInsignia =

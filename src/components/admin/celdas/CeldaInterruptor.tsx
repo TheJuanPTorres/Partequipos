@@ -23,13 +23,18 @@ export default function CeldaInterruptor({
   const etiqueta = "label" in field && typeof field.label === "string" ? field.label : nombre;
   const id = (rowData as { id?: unknown } | undefined)?.id;
   const nombreFila = String((rowData as { nombre?: unknown } | undefined)?.nombre ?? "");
-  const [valor, setValor] = useState(cellData !== false);
+  // Lo guardado manda: un cambio de otra parte (en bloque, desde la ficha) llega con el refresco de
+  // la lista. Encima, el cambio optimista de este interruptor, solo mientras lo guardado siga siendo
+  // el valor desde el que se pulsó.
+  const guardado = cellData !== false;
+  const [optimista, setOptimista] = useState<{ desde: boolean; valor: boolean } | null>(null);
+  const valor = optimista && optimista.desde === guardado ? optimista.valor : guardado;
   const [guardando, setGuardando] = useState(false);
 
   async function cambiar() {
     if (guardando || (typeof id !== "number" && typeof id !== "string")) return;
     const nuevo = !valor;
-    setValor(nuevo);
+    setOptimista({ desde: guardado, valor: nuevo });
     setGuardando(true);
     try {
       const r = await fetch(`/api/${collectionSlug}/${id}`, {
@@ -42,7 +47,7 @@ export default function CeldaInterruptor({
       toast.success(`${etiqueta}: ${nuevo ? "sí" : "no"} · ${nombreFila}`);
       router.refresh();
     } catch {
-      setValor(!nuevo);
+      setOptimista(null);
       toast.error(`No se pudo guardar «${etiqueta}». Inténtalo otra vez desde la ficha.`);
     } finally {
       setGuardando(false);

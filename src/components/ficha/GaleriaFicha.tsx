@@ -306,6 +306,14 @@ export function GaleriaFicha({
         className={estilos.pantallaCompleta}
         aria-label={`Foto ${actual + 1} de ${total} de ${nombre}`}
         onClose={() => botonCompleta.current?.focus()}
+        // Flechas del teclado: foto anterior y siguiente (tanda 22, punto 31). Escape ya lo
+        // cierra el propio <dialog>. Con una sola foto no hay adónde ir.
+        onKeyDown={(e) => {
+          if (total < 2 || e.altKey || e.ctrlKey || e.metaKey) return;
+          if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+          e.preventDefault();
+          ir(actual + (e.key === "ArrowRight" ? 1 : -1));
+        }}
         onClick={(e) => {
           if (e.target === e.currentTarget) cerrar();
         }}

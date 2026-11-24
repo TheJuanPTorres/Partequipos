@@ -23,6 +23,7 @@ import sharp from "sharp";
 import { conUltimoEditor } from "./lib/fields/ultimoEditor";
 import { pushPermitido } from "./lib/db/pushEsquema";
 import { fusionarTraducciones, traduccionesEnOracion } from "./lib/panel/oracion";
+import { seoConfig } from "./lib/seo/config";
 import { RUTAS_EN_EL_SITIO, verEnElSitio } from "./lib/panel/verEnElSitio";
 
 import { BloqueDocumentoVisor } from "./collections/bloques/documentoVisor";
@@ -136,10 +137,30 @@ export default buildConfig({
      * gráficas se sustituyen por RUTA DE FICHERO, no por import — el panel las
      * resuelve por su cuenta a través del import map.
      */
+    /*
+     * Avatar de la cuenta (tanda 22, 2026-11-23): el icono de Payload. Por
+     * defecto Payload pide la foto a Gravatar con el hash del correo de quien
+     * edita: un dato personal enviado a un tercero en cada pantalla, y una
+     * imagen de otro dominio que la política de contenido no admite.
+     */
+    avatar: "default",
     meta: {
       title: "Panel",
       titleSuffix: "· Partequipos",
       description: "Gestión de contenido de partequipos.com",
+      /*
+       * Al compartir el enlace del panel (tanda 22, punto 34): sin esto Payload
+       * rellena Open Graph con sus valores («Payload App», su descripción) y una
+       * imagen generada cuya URL sale con `http://localhost:3000`, porque la
+       * config no fija `serverURL`. Aquí van el nombre, la descripción y la
+       * imagen del sitio (URL completa), y se apaga la imagen generada.
+       */
+      defaultOGImageType: "off",
+      openGraph: {
+        siteName: seoConfig.siteName,
+        description: "Gestión de contenido de partequipos.com",
+        images: [{ url: seoConfig.defaultOgImagePath, alt: seoConfig.siteName }],
+      },
       /*
        * Icono de la pestaña: el favicon del cliente (2026-10-27), el mismo del
        * sitio (`src/app/favicon.ico` e `icon0.png`), del MISMO origen que el

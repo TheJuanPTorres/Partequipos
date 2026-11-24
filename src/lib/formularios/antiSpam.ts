@@ -1,5 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 
+import { CAMPO_TIEMPO, CAMPO_TRAMPA } from "./camposAntiSpam";
+
 /**
  * FORMULARIOS SIN SPAM, SIN CAPTCHAS (2026-11-23, dirección). Lógica pura, con pruebas:
  *
@@ -16,8 +18,9 @@ import { createHash, randomBytes } from "node:crypto";
  *    ser mayor; si hace falta más exactitud, se pasa a una tabla (con migración).
  */
 
-export const CAMPO_TRAMPA = "sitio_web";
-export const CAMPO_TIEMPO = "tiempo_inicio";
+// Los nombres de los campos viven en `camposAntiSpam.ts` (sin Node), que es de donde los toma
+// el formulario; aquí se reexportan para el servidor y las pruebas.
+export { CAMPO_TIEMPO, CAMPO_TRAMPA };
 
 /** Menos que esto entre mostrar el formulario y enviarlo no lo escribe una persona. */
 export const TIEMPO_MINIMO_MS = 3_000;

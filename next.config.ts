@@ -101,6 +101,8 @@ const nextConfig: NextConfig = {
      * Se aplican las que no pueden romper nada. La política de contenido (CSP)
      * NO está aquí a propósito: ver la nota al final.
      */
+    // Un preview de Vercel: lleva su barra de comentarios (nota 10 de la política).
+    const enPreview = process.env.VERCEL_ENV === "preview";
     const seguridad = [
       /*
        * Impide que el navegador «adivine» el tipo de un fichero. Sin esto, un
@@ -180,18 +182,26 @@ const nextConfig: NextConfig = {
        * 8. Analítica (2026-11-20): Google Analytics 4, solo con `NEXT_PUBLIC_GA4_ID`
        *    y solo tras aceptar las cookies: el script de `googletagmanager.com`
        *    y sus envíos a `google-analytics.com` y `analytics.google.com`.
+       * 9. Panel, subida directa (tanda 22, 2026-11-23): el navegador sube las
+       *    imágenes y los documentos a `https://vercel.com/api/blob` (leído en
+       *    `@vercel/blob`, la subida de cliente de §10.39). Faltaba en
+       *    `connect-src`: con la política aplicada, el panel no podría subir.
+       * 10. Previews (tanda 22): Vercel inyecta su barra de comentarios
+       *    (`vercel.live`) SOLO en los previews. Se admite solo ahí, para que
+       *    la consola de un preview enseñe únicamente lo que también fallaría
+       *    en el sitio publicado. Lista de la documentación de Vercel.
        */
       {
         key: "Content-Security-Policy-Report-Only",
         value: [
           "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://api.mapbox.com https://www.googletagmanager.com",
-          "style-src 'self' 'unsafe-inline' https://api.mapbox.com",
-          "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://*.google-analytics.com https://*.googletagmanager.com",
-          "font-src 'self' data: https://*.public.blob.vercel-storage.com",
+          `script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://api.mapbox.com https://www.googletagmanager.com${enPreview ? " https://vercel.live" : ""}`,
+          `style-src 'self' 'unsafe-inline' https://api.mapbox.com${enPreview ? " https://vercel.live" : ""}`,
+          `img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://*.google-analytics.com https://*.googletagmanager.com${enPreview ? " https://vercel.live https://vercel.com" : ""}`,
+          `font-src 'self' data: https://*.public.blob.vercel-storage.com${enPreview ? " https://vercel.live https://assets.vercel.com" : ""}`,
           "media-src 'self' https://*.public.blob.vercel-storage.com",
-          "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com",
-          "connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com https://*.public.blob.vercel-storage.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
+          `frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com${enPreview ? " https://vercel.live" : ""}`,
+          `connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com https://*.public.blob.vercel-storage.com https://vercel.com/api/blob https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com${enPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""}`,
           "worker-src 'self' blob:",
           "child-src blob:",
           "object-src 'none'",

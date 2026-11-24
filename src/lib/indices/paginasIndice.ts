@@ -1,6 +1,7 @@
 import type { PaginasIndice } from "@/payload-types";
 
 import type { TarjetaMarca, VistaEncabezado } from "../repuestos/marca";
+import { enlaceTel } from "../telefonos";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
 /**
@@ -77,8 +78,7 @@ type EmpresaContacto = { telefono: string; correo: string; direccion: string; ci
 
 /** «+57 317 670 7071» → `tel:+573176707071`; sin dígitos suficientes, sin enlace. */
 export function enlaceTelefono(telefono: string): string | null {
-  const digitos = telefono.replace(/[^\d+]/g, "");
-  return digitos.replace(/\D/g, "").length >= 7 ? `tel:${digitos}` : null;
+  return enlaceTel(telefono);
 }
 
 /**

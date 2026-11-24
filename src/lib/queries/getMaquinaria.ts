@@ -28,7 +28,7 @@ import type {
 } from "@/payload-types";
 
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "../cacheDatos";
-import { ordenDe, ordenDeListado } from "../ordenArrastre";
+import { ordenDe } from "../ordenArrastre";
 import { rutas } from "../routes";
 import type { UnidadFiltrable } from "../usados/filtros";
 import { idsDePrimeraImagen } from "../usados/primeraImagen";
@@ -519,7 +519,7 @@ export type EquipoNuevoListado = {
   tipoRef: { slug: string; nombre: string } | null;
   /** Peso operativo en KILOGRAMOS (`pesoOperativoKg`, #136). */
   pesoKg?: number | null;
-  /** Su puesto en el orden de la lista de «Equipos nuevos» del panel (`ORDEN_LISTADO`). */
+  /** Su puesto en el listado (el orden de cada tipo, arrastrando en su ficha). */
   orden?: number;
   slug: string;
   /** La ficha, con su barra final. */
@@ -583,12 +583,10 @@ const listadoNuevaEnCache = unstable_cache(
     const [equipos, marcas, tipos, categorias] = await Promise.all([
       payload.find({
         collection: "equipos-nuevos",
-        // En el orden de la lista de «Equipos nuevos» del panel (`orden`, más abajo, 2026-11-23).
-        // Hoy solo lo usan las sugerencias de la página de una categoría de usados vacía: las
-        // páginas de nueva ordenan por marca y por el join del tipo (desde el #326 no hay listado
-        // con «Ordenar»). Los de marcas ocultas tampoco.
+        // En el orden del panel de cada tipo (`orden`, más abajo): lo usan las sugerencias de la
+        // página de una categoría de usados vacía. Los de marcas ocultas tampoco.
         where: conEquipoVisible(),
-        sort: ordenDeListado("equipos-nuevos"),
+        sort: ordenDe("equipos-nuevos"),
         depth: 0,
         limit: 0,
         pagination: false,
@@ -619,9 +617,8 @@ const listadoNuevaEnCache = unstable_cache(
         depth: 0,
         limit: 0,
         pagination: false,
-        // Las pestañas de tipo mezclan marcas: el orden del LISTADO (arrastrando en «Tipos de
-        // maquinaria nueva», 2026-11-23), no el de cada marca.
-        sort: ordenDeListado("tipos-maquinaria"),
+        // El orden del panel de cada marca (los tipos sueltos del índice de tipos; hoy ninguno).
+        sort: ordenDe("tipos-maquinaria"),
         select: {
           slug: true,
           nombre: true,

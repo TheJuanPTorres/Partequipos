@@ -30,8 +30,6 @@ const DATOS: DatosMegamenu = {
       slug: "miniexcavadoras",
       marca: 1,
       pestanaIndiceNueva: true,
-      // El orden de la colección (2026-11-23): el de «Por tipo de máquina», distinto del recibido.
-      _order: "a1",
     },
     {
       id: 11,
@@ -39,7 +37,6 @@ const DATOS: DatosMegamenu = {
       slug: "retrocargadoras",
       marca: { id: 3 },
       pestanaIndiceNueva: true,
-      _order: "a2",
     },
     {
       id: 12,
@@ -47,7 +44,6 @@ const DATOS: DatosMegamenu = {
       slug: "bulldozer",
       marca: 3,
       pestanaIndiceNueva: true,
-      _order: "a0",
     },
     // Sin la casilla: solo por su categoría «Excavadoras», que mezcla marcas.
     { id: 15, nombre: "Excavadoras", slug: "excavadoras-case", marca: 3 },
@@ -158,8 +154,8 @@ describe("megamenú: maquinaria", () => {
     ]);
     // «Ver todos los tipos de máquina» primero, al índice de tipos (2026-10-23); después TODOS los
     // tipos: los que tienen categoría a su página general, en el orden del panel (2026-11-09); los
-    // que aún no la tienen, detrás y en el orden de la colección en el panel (`_order`, 2026-11-23;
-    // antes, el de la web antigua), a la de su tipo en la marca;
+    // que aún no la tienen, detrás y en el orden en que llegan (el del panel; antes, el de la
+    // web antigua), a la de su tipo en la marca;
     // nunca a un listado.
     assert.deepEqual(nueva.grupos[1]!.enlaces, [
       {
@@ -168,16 +164,16 @@ describe("megamenú: maquinaria", () => {
       },
       { etiqueta: "Excavadoras", href: "/maquinaria-pesada/maquinaria-pesada-nueva/excavadoras/" },
       {
-        etiqueta: "Bulldozers",
-        href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/bulldozer/",
-      },
-      {
         etiqueta: "Miniexcavadoras",
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/yanmar/miniexcavadoras/",
       },
       {
         etiqueta: "Retrocargadoras",
         href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/retrocargadoras/",
+      },
+      {
+        etiqueta: "Bulldozers",
+        href: "/maquinaria-pesada/maquinaria-pesada-nueva/marcas/case-construction/bulldozer/",
       },
     ]);
   });

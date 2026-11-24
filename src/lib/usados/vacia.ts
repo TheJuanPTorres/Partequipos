@@ -61,7 +61,7 @@ export type EquipoNuevoAlternativa = {
   tipoRef: { slug: string; nombre: string } | null;
   marcaRef: { slug: string; nombre: string } | null;
   foto: Foto;
-  /** Su puesto en el orden del listado de nueva (el del panel, `ORDEN_LISTADO`). */
+  /** Su puesto en el listado de nueva (el orden del panel de cada tipo). */
   orden?: number;
 };
 

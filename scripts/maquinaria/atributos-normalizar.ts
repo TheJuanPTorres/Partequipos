@@ -6,6 +6,7 @@
  *   npm run preview:ejecutar -- npx payload run scripts/maquinaria/atributos-normalizar.ts simular
  *   npm run preview:ejecutar -- npx payload run scripts/maquinaria/atributos-normalizar.ts aplicar
  *   npm run preview:ejecutar -- npx payload run scripts/maquinaria/atributos-normalizar.ts revertir
+ *   npm run preview:ejecutar -- npx payload run scripts/maquinaria/atributos-normalizar.ts volcar   (solo lee)
  *
  * - `simular` (por defecto) NO escribe nada: imprime la lista «antes → después» con los dudosos
  *   marcados y escribe el informe en `INFORME_SALIDA` si está puesto.
@@ -24,7 +25,9 @@ process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 
 const modo =
-  process.argv.find((a) => a === "simular" || a === "aplicar" || a === "revertir") ?? "simular";
+  process.argv.find(
+    (a) => a === "simular" || a === "aplicar" || a === "revertir" || a === "volcar",
+  ) ?? "simular";
 const veredicto = puedeVaciarSolicitudes(process.env.DATABASE_URI);
 if (!veredicto.permitido) {
   throw new Error(`[atributos-normalizar] Solo contra la base del preview. ${veredicto.motivo}`);
@@ -56,6 +59,25 @@ if (modo === "revertir") {
   salida(
     `Revertido: ${m.equipos.length} máquinas · ${m.atributosCreados.length} atributos borrados`,
   );
+  process.exit(0);
+}
+
+if (modo === "volcar") {
+  // Todas las filas de «Atributos destacados» tal cual, para comparar antes y después (`revertir`).
+  const { docs: todos } = await payload.find({
+    collection: "equipos-nuevos",
+    limit: 0,
+    pagination: false,
+    depth: 0,
+  });
+  const filas = todos
+    .filter((e) => (e.atributosDestacados?.length ?? 0) > 0)
+    .map((e) => ({
+      equipo: e.id,
+      filas: (e.atributosDestacados ?? []).map((f) => ({ atributo: f.atributo, valor: f.valor })),
+    }));
+  const { totalDocs } = await payload.count({ collection: "atributos-ficha" });
+  salida(`VOLCADO ${JSON.stringify({ catalogo: totalDocs, filas })}`);
   process.exit(0);
 }
 

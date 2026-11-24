@@ -108,7 +108,7 @@ export function PaginaMarcaLubricantePlantilla({
 
       {marca.descripcion ? (
         <div className={`${estilos.descripcion} texto-cuerpo`}>
-          <RichText data={marca.descripcion} />
+          <RichText data={marca.descripcion} encabezadosDesde={2} />
         </div>
       ) : null}
 

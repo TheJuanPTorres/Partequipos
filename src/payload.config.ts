@@ -137,6 +137,13 @@ export default buildConfig({
      * gráficas se sustituyen por RUTA DE FICHERO, no por import — el panel las
      * resuelve por su cuenta a través del import map.
      */
+    /*
+     * Avatar de la cuenta (tanda 22, 2026-11-23): el icono de Payload. Por
+     * defecto Payload pide la foto a Gravatar con el hash del correo de quien
+     * edita: un dato personal enviado a un tercero en cada pantalla, y una
+     * imagen de otro dominio que la política de contenido no admite.
+     */
+    avatar: "default",
     meta: {
       title: "Panel",
       titleSuffix: "· Partequipos",

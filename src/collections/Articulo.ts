@@ -11,6 +11,7 @@ import {
   soloPersonal,
 } from "../lib/seguridad/acceso";
 import { nacePublicado, PUBLICADO, VERSIONES_CON_BORRADORES } from "../lib/borradores";
+import { conCopia, duplicarComoBorrador } from "../lib/fields/duplicar";
 
 /**
  * Artículo del blog. Se sirve en `/{slug}/`, **en la raíz**.
@@ -48,13 +49,21 @@ export const Articulo: CollectionConfig = {
   // Lo más reciente primero: es un blog.
   defaultSort: "-fechaPublicacion",
   hooks: {
-    beforeOperation: [nacePublicado],
+    // Una copia («Duplicar») nace en BORRADOR; lo demás creado sin estado, publicado.
+    beforeOperation: [duplicarComoBorrador, nacePublicado],
     beforeValidate: [slugUnicoFrenteA("paginas", "una página institucional")],
     afterChange: [revalidarArticulo],
     afterDelete: [revalidarArticuloBorrado],
   },
   fields: [
-    { name: "titulo", type: "text", required: true, label: "Título" },
+    // Al duplicar, «(copia)» (tanda 21, `duplicar.ts`).
+    {
+      name: "titulo",
+      type: "text",
+      required: true,
+      label: "Título",
+      hooks: { beforeDuplicate: [conCopia] },
+    },
     slugField({ from: "titulo", unique: true }),
     {
       name: "categoria",

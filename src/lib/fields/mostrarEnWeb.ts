@@ -1,5 +1,7 @@
 import type { CheckboxField } from "payload";
 
+import { nacerOculta } from "./duplicar";
+
 /**
  * «MOSTRAR EN LA WEB» de un PRODUCTO (2026-10-23, dirección): oculta ese producto
  * de toda la web pública SIN borrarlo; sigue en el panel. Marcada por defecto.
@@ -20,6 +22,8 @@ export function mostrarEnWebField(
     type: "checkbox",
     defaultValue: true,
     label: "Mostrar en la web",
+    // Una copia (botón «Duplicar») nace OCULTA: tanda 21, `duplicar.ts`.
+    hooks: { beforeDuplicate: [nacerOculta] },
     admin: {
       ...(sidebar ? { position: "sidebar" as const } : {}),
       components: { Cell: "/components/admin/celdas/CeldaVisible" },

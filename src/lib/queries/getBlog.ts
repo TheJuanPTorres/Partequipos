@@ -57,6 +57,7 @@ export const getCategoriasBlog = cache(async (): Promise<CategoriasBlog[]> => {
     collection: "categorias-blog",
     depth: 0,
     limit: 0,
+    // orden-libre: el blog se queda como está (Juan Pablo, tanda 21).
     sort: "nombre",
   });
   return docs;

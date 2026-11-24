@@ -82,6 +82,7 @@ export function categoriasDePlantillas(listas: string[][]): {
   }
   const conPlantilla = [...cuenta].filter(([k]) => k);
   if (conPlantilla.length === 0) return { slugs: [], mezcla: null };
+  // orden-libre: cuenta plantillas de WordPress, no ordena nada de la web.
   conPlantilla.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
   const [ganadora] = conPlantilla[0]!;
   const mezcla =

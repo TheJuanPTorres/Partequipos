@@ -111,54 +111,57 @@ export function tarjetasDeMarcas(
 ): TarjetaMarca[] {
   const posicion = (m: MarcasMaquinaria) =>
     typeof m.ordenPortada === "number" ? m.ordenPortada : Number.POSITIVE_INFINITY;
-  return [...marcas]
-    .sort((a, b) => posicion(a) - posicion(b) || a.nombre.localeCompare(b.nombre, "es"))
-    .flatMap((m) => {
-      const nombre = m.nombre?.trim();
-      if (!nombre || !m.slug) return [];
-      const externo = enlaceExternoDe(m);
+  return (
+    [...marcas]
+      // orden-libre: «Posición en la portada» del panel (número; H7, opción a de dirección).
+      .sort((a, b) => posicion(a) - posicion(b) || a.nombre.localeCompare(b.nombre, "es"))
+      .flatMap((m) => {
+        const nombre = m.nombre?.trim();
+        if (!nombre || !m.slug) return [];
+        const externo = enlaceExternoDe(m);
 
-      const tp = m.portada;
-      const logoSitio = logoDeMarca(m, logos);
-      const color = colorValido(tp?.colorPanel);
-      const panel = color ? panelDeTarjeta(color, colorValido(tp?.colorPanelFin)) : PANEL_BLANCO;
-      const logoTarjeta = logoPropio({ logo: tp?.logo });
-      const logo =
-        logoTarjeta ??
-        (tp?.logoVariante === "blanco"
-          ? (logoEnBlanco(logoSitio) ?? logoSitio)
-          : logoSitio && { ...logoSitio, oscuro: false });
+        const tp = m.portada;
+        const logoSitio = logoDeMarca(m, logos);
+        const color = colorValido(tp?.colorPanel);
+        const panel = color ? panelDeTarjeta(color, colorValido(tp?.colorPanelFin)) : PANEL_BLANCO;
+        const logoTarjeta = logoPropio({ logo: tp?.logo });
+        const logo =
+          logoTarjeta ??
+          (tp?.logoVariante === "blanco"
+            ? (logoEnBlanco(logoSitio) ?? logoSitio)
+            : logoSitio && { ...logoSitio, oscuro: false });
 
-      const decorativa = (media: Parameters<typeof imagenDeMedia>[0]) => {
-        const i = imagenDeMedia(media, "");
-        return i ? { ...i, alt: "" } : null;
-      };
-      const nombreDistribuidor = tp?.distribuidorNombre?.trim();
-      const logoDistribuidor = logoPropio({ logo: tp?.distribuidorLogo });
-      return [
-        {
-          id: m.id,
-          nombre,
-          href: externo ?? `${RUTA_MARCAS_NUEVA}${m.slug}/`,
-          externo: externo ? { dominio: dominioDe(externo) } : null,
-          panel,
-          logo: conAlt(logo, nombre),
-          maquina: decorativa(tp?.maquina),
-          foto: decorativa(m.kit?.fotoCabecera) ?? decorativa(m.imagenTarjeta),
-          distribuidor: nombreDistribuidor
-            ? {
-                nombre: nombreDistribuidor,
-                logo: conAlt(
-                  logoDistribuidor && !panel.claro
-                    ? logoEnBlanco(logoDistribuidor)
-                    : logoDistribuidor,
-                  nombreDistribuidor,
-                ),
-              }
-            : null,
-        },
-      ];
-    });
+        const decorativa = (media: Parameters<typeof imagenDeMedia>[0]) => {
+          const i = imagenDeMedia(media, "");
+          return i ? { ...i, alt: "" } : null;
+        };
+        const nombreDistribuidor = tp?.distribuidorNombre?.trim();
+        const logoDistribuidor = logoPropio({ logo: tp?.distribuidorLogo });
+        return [
+          {
+            id: m.id,
+            nombre,
+            href: externo ?? `${RUTA_MARCAS_NUEVA}${m.slug}/`,
+            externo: externo ? { dominio: dominioDe(externo) } : null,
+            panel,
+            logo: conAlt(logo, nombre),
+            maquina: decorativa(tp?.maquina),
+            foto: decorativa(m.kit?.fotoCabecera) ?? decorativa(m.imagenTarjeta),
+            distribuidor: nombreDistribuidor
+              ? {
+                  nombre: nombreDistribuidor,
+                  logo: conAlt(
+                    logoDistribuidor && !panel.claro
+                      ? logoEnBlanco(logoDistribuidor)
+                      : logoDistribuidor,
+                    nombreDistribuidor,
+                  ),
+                }
+              : null,
+          },
+        ];
+      })
+  );
 }
 
 // --- Sección de usados: la tarjeta de una unidad (kit del cliente, `kitCliente.ts`) ----

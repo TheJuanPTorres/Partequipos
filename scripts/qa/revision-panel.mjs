@@ -637,6 +637,193 @@ try {
     }
 
     /*
+     * Modo `versiones` (2026-11-24, #575): el HISTORIAL SIN BORRADORES por efecto, a 1440, en
+     * `… versiones <coleccion> <id>` (por defecto, el equipo nuevo 1). Dos guardados con la sesión
+     * del editor (la entradilla con « v» y otra vez como estaba), la pestaña «Versiones», comparar,
+     * y RESTAURAR la versión con « v» y después la de antes: al final la ficha queda como estaba
+     * (si no, se devuelve con la API). Capturas de la lista y de la comparación.
+     */
+    if (MODO === "versiones") {
+      if (ancho.movil) {
+        await contexto.close();
+        continue;
+      }
+      const coleccion = process.argv[4] ?? "equipos-nuevos";
+      const id = Number(process.argv[5] ?? 1);
+      const campo = "entradilla";
+      const api = (ruta, opciones = {}) =>
+        pagina.evaluate(
+          async ([r, o]) => {
+            const res = await fetch(r, { credentials: "include", ...o });
+            return { estado: res.status, cuerpo: await res.json().catch(() => null) };
+          },
+          [`${base}/api${ruta}`, opciones],
+        );
+      const poner = (valor) =>
+        api(`/${coleccion}/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ [campo]: valor }),
+        });
+      const leer = async () => (await api(`/${coleccion}/${id}?depth=0`)).cuerpo?.[campo] ?? null;
+      const versiones = async () =>
+        (
+          await api(
+            `/${coleccion}/versions?where[parent][equals]=${id}&sort=-updatedAt&limit=10&depth=0`,
+          )
+        ).cuerpo?.docs ?? [];
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto}`);
+      };
+      const original = await leer();
+      const conV = `${original ?? ""} v`;
+      const r1 = await poner(conV);
+      const r2 = await poner(original);
+      ok(
+        `dos guardados con la sesión del editor (${r1.estado}, ${r2.estado})`,
+        r1.estado === 200 && r2.estado === 200,
+      );
+      const lista = await versiones();
+      ok(`el historial tiene versiones (${lista.length})`, lista.length >= 2);
+      const vConV = lista.find((v) => v.version?.[campo] === conV);
+      const vOriginal = lista.find((v) => v.version?.[campo] === original);
+      ok("están la versión con « v» y la de antes", Boolean(vConV && vOriginal));
+      // Sin sesión, el historial no se lee.
+      const anonimo = await pagina.evaluate(
+        async (r) => (await fetch(r, { credentials: "omit" })).status,
+        `${base}/api/${coleccion}/versions?limit=1`,
+      );
+      ok(
+        `sin sesión, el historial no se lee (HTTP ${anonimo})`,
+        anonimo === 403 || anonimo === 401,
+      );
+      await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions`, {
+        waitUntil: "networkidle",
+      });
+      await pagina.waitForTimeout(2000);
+      await pagina.screenshot({
+        path: path.join(salida, `versiones-lista-${coleccion}-1440.png`),
+        fullPage: false,
+      });
+      const filasVista = await pagina.locator("table tbody tr").count();
+      ok(`la pestaña «Versiones» lista ${filasVista} guardados`, filasVista >= 2);
+      const restaurar = async (v, nombre) => {
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions/${v.id}`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(2000);
+        if (nombre === "con « v»") {
+          await pagina.screenshot({
+            path: path.join(salida, `versiones-comparar-${coleccion}-1440.png`),
+            fullPage: false,
+          });
+        }
+        await pagina
+          .getByRole("button", { name: /Restaurar/i })
+          .first()
+          .click({ timeout: 8000 });
+        await pagina.waitForTimeout(800);
+        await pagina
+          .getByRole("button", { name: /Confirmar|Restaurar|Sí/i })
+          .last()
+          .click({ timeout: 8000 })
+          .catch(() => null);
+        await pagina.waitForTimeout(3500);
+      };
+      if (vConV && vOriginal && process.argv.includes("api")) {
+        // Diagnóstico: el mismo restaurar por la API, con la respuesta (sin datos de la ficha).
+        const r = await api(`/${coleccion}/versions/${vConV.id}?depth=0`, { method: "POST" });
+        const errores = JSON.stringify(r.cuerpo?.errors ?? r.cuerpo?.message ?? null).slice(0, 600);
+        decir(`   restaurar por la API: HTTP ${r.estado} · ${errores}`);
+      } else if (vConV && vOriginal) {
+        await restaurar(vConV, "con « v»");
+        ok(`restaurar la versión con « v» la pone en la ficha`, (await leer()) === conV);
+        const otra = (await versiones()).find((v) => v.version?.[campo] === original);
+        if (otra) await restaurar(otra, "la de antes");
+      }
+      const final = await leer();
+      ok("al final, la ficha queda como estaba", final === original);
+      if (final !== original) {
+        await poner(original);
+        decir("   devuelta con la API");
+      }
+      hallazgos.push({
+        pantalla: "versiones",
+        ancho: ancho.nombre,
+        coleccion,
+        id,
+        resultado,
+        errores,
+        fallidas,
+      });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `joins` (2026-11-24, para dirección): en la ficha de cada colección
+     * (`… joins <col1,col2,…>`), el primer listado de la pestaña «Contenido» (un campo `join`, con
+     * su asa de arrastre), a la vista y capturado. NO arrastra nada: solo lee.
+     */
+    if (MODO === "joins") {
+      const colecciones = (
+        process.argv[4] ??
+        "marcas-maquinaria,tipos-maquinaria,marcas,tipos-equipo,marcas-lubricante"
+      )
+        .split(",")
+        .filter(Boolean);
+      for (const coleccion of colecciones) {
+        const id = await pagina.evaluate(
+          async (r) => (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+          `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+        );
+        if (!id) {
+          decir(`${coleccion} (${ancho.nombre}): sin fichas`);
+          continue;
+        }
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(2500);
+        const listado = pagina.locator(".relationship-table, .join-field, [class*='join']").first();
+        const hay = (await listado.count()) > 0;
+        if (hay) {
+          await listado.scrollIntoViewIfNeeded();
+          await pagina.waitForTimeout(800);
+        }
+        await pagina.screenshot({
+          path: path.join(salida, `listado-${coleccion}-${ancho.nombre}.png`),
+          fullPage: false,
+        });
+        const info = await pagina.evaluate(() => {
+          const t = document.querySelector(".relationship-table, .join-field, [class*='join']");
+          return {
+            titulo:
+              t
+                ?.querySelector("h2, h3, h4, label, .relationship-table__header")
+                ?.textContent?.trim()
+                ?.slice(0, 80) ?? null,
+            filas: t ? t.querySelectorAll("tbody tr").length : 0,
+            asas: t
+              ? t.querySelectorAll(
+                  "[class*='drag'], [aria-roledescription='sortable'], [data-dnd-kit]",
+                ).length
+              : 0,
+          };
+        });
+        hallazgos.push({ pantalla: `joins-${coleccion}`, ancho: ancho.nombre, id, hay, ...info });
+        decir(
+          `${coleccion} ${id} (${ancho.nombre}): ${hay ? `listado «${info.titulo ?? "-"}», ${info.filas} filas, ${info.asas} asas` : "SIN listado"}`,
+        );
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      await contexto.close();
+      continue;
+    }
+
+    /*
      * Modo `abrir` (2026-11-24, #574): en la lista de cada colección (`… abrir <col1,col2>`), pulsa
      * en la primera fila la PRIMERA celda (el logo, la foto o el estado) y la del NOMBRE, y anota si
      * entra en la ficha. Solo lee.

@@ -6,7 +6,7 @@ import { describe, it } from "node:test";
 
 import type { CollectionConfig, Field } from "payload";
 
-import { ORDEN_ARRASTRE, ORDEN_LISTADO, porClave } from "./ordenArrastre";
+import { ORDEN_ARRASTRE, porClave } from "./ordenArrastre";
 
 /*
  * GUARDARRAÍL DEL ORDEN POR ARRASTRE (2026-11-19). Si una consulta pública de una colección
@@ -54,7 +54,7 @@ function joinsOrdenables(campos: Field[]): { name: string; collection: string }[
 
 /**
  * Lo que Payload ordena por arrastre: colección → su campo de orden (el del join si lo tiene) y,
- * aparte, las que ADEMÁS son `orderable` para los listados que mezclan padres (`ORDEN_LISTADO`).
+ * aparte, las que ADEMÁS son `orderable` en su lista (tiene que haber ninguna).
  */
 async function ordenDeLaConfiguracion(): Promise<{
   arrastre: Map<string, string>;
@@ -114,8 +114,6 @@ function consultasSinOrden(archivos: { ruta: string; texto: string }[]): string[
         if (llamada === null) continue;
         const bien =
           llamada.includes(`ordenDe("${c}")`) ||
-          // Un listado que mezcla padres, con el arrastre de la lista de la colección.
-          (c in ORDEN_LISTADO && llamada.includes(`ordenDeListado("${c}")`)) ||
           // Una sola fila (por dirección web): no hay orden que respetar.
           /\blimit: 1\b/.test(llamada) ||
           // Con su motivo escrito: «orden-libre: …».
@@ -168,9 +166,9 @@ describe("orden por arrastre en la web", () => {
     assert.deepEqual(Object.fromEntries([...arrastre].sort()), {
       ...Object.fromEntries(Object.entries(ORDEN_ARRASTRE).sort()),
     });
-    assert.deepEqual(Object.fromEntries([...listado].sort()), {
-      ...Object.fromEntries(Object.entries(ORDEN_LISTADO).sort()),
-    });
+    // Una colección ordenable en su lista Y por un join tendría dos órdenes: el de la lista no se
+    // pintaría (tanda 21: se quitó el de «Equipos nuevos» y «Tipos de maquinaria nueva»).
+    assert.deepEqual(Object.fromEntries([...listado].sort()), {});
   });
 
   it("toda consulta pública de una colección ordenable ordena por su arrastre", () => {

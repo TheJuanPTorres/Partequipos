@@ -88,7 +88,6 @@ export default async function UsadaOtrosPage() {
         vista={{ ...vista, descripcion: vista.descripcion || DESCRIPCION_OTROS }}
         tarjetas={tarjetasDeCategoriasUsada(agrupadas, inventario, rutas.categoriaUsada, {
           incluirVacias: true,
-          porUnidades: true,
         })}
         verTodo={global.verTodoTexto?.trim() || "Ver todo"}
         etiqueta="Otras categorías de maquinaria usada"

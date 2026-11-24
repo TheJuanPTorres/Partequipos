@@ -58,19 +58,18 @@ export const textoUnidades = (n: number) =>
   `${n} ${n === 1 ? "unidad disponible" : "unidades disponibles"}`;
 
 /**
- * Una tarjeta por categoría, en el orden recibido (por nombre), enlazando a su
- * listado. Por defecto solo las que tienen unidades; con `incluirVacias`
- * (el índice de usados, petición del cliente del 2026-10-18), también las
- * vacías, DESPUÉS de las que tienen unidades y con «Sin unidades por ahora».
+ * Una tarjeta por categoría, en el orden recibido (el del panel, arrastrando
+ * en «Categorías de usados»), enlazando a su listado. Por defecto solo las que
+ * tienen unidades; con `incluirVacias` (el índice de usados y «Otros»), también
+ * las vacías, DESPUÉS de las que tienen unidades y con «Sin unidades por
+ * ahora». «Otros» iba de más a menos unidades hasta la tanda 21 (H1, Juan
+ * Pablo: un solo orden, el del panel).
  */
 export function tarjetasDeCategoriasUsada(
   categorias: Pick<CategoriasUsada, "id" | "nombre" | "slug" | "imagen">[],
   unidades: UnidadDelIndice[],
   ruta: (slug: string) => string,
-  {
-    incluirVacias = false,
-    porUnidades = false,
-  }: { incluirVacias?: boolean; porUnidades?: boolean } = {},
+  { incluirVacias = false }: { incluirVacias?: boolean } = {},
 ): TarjetaMarca[] {
   const porCategoria = agrupar(unidades, (u) => u.categoria);
   const filas = categorias
@@ -87,17 +86,8 @@ export function tarjetasDeCategoriasUsada(
       };
       return { tarjeta, n: suyas.length };
     });
-  /*
-   * `porUnidades` («Otros», dirección 2026-10-20): de más a menos unidades
-   * DISPONIBLES (el inventario ya excluye las vendidas) y, con las mismas, por
-   * nombre. Sale de los datos de cada petición: si cambian las unidades, cambia
-   * el orden. Las vacías, al final, también por nombre.
-   */
-  const ordenUnidades = (a: (typeof filas)[number], b: (typeof filas)[number]) =>
-    b.n - a.n || a.tarjeta.titulo.localeCompare(b.tarjeta.titulo, "es");
   const con = filas.filter((f) => f.n > 0);
   const vacias = incluirVacias ? filas.filter((f) => f.n === 0) : [];
-  if (porUnidades) return [...con, ...vacias].sort(ordenUnidades).map((f) => f.tarjeta);
   return [...con, ...vacias].map((f) => f.tarjeta);
 }
 

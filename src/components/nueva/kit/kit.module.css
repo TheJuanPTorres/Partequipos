@@ -1029,16 +1029,37 @@
     height: 2px;
   }
 
-  .verCategoria {
-    bottom: -25px;
-  }
-
   .modeloFoto {
     height: 210px;
   }
 
   .cierre {
     padding: 0 24px;
+  }
+}
+
+/*
+ * «VER TODA LA CATEGORÍA» EN EL FLUJO, hasta 1024 px (2026-11-23, Juan Pablo: en móvil se montaba
+ * sobre la foto de la primera tarjeta). Va BAJO el título del grupo, centrado, y de ahí a las
+ * tarjetas, `--espacio-interno`. Desde 1025 px (rejilla de 6 columnas) sigue a la derecha de la
+ * cabecera, sobre el hueco que deja la rejilla, como antes.
+ */
+@media (max-width: 1024px) {
+  .cabeceraSeccion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: var(--espacio-interno);
+  }
+
+  .cabeceraSeccion .tituloTipo {
+    margin-bottom: 0;
+  }
+
+  .verCategoria {
+    position: static;
+    order: 2;
+    margin-top: var(--espacio-interno);
   }
 }
 

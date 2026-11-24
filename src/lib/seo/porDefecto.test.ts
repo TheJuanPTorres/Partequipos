@@ -9,6 +9,7 @@ import {
   concuerda,
   descripcionPorDefecto,
   recortarDescripcion,
+  separarFrasesPegadas,
   tituloPorDefecto,
 } from "./porDefecto";
 import { SEO_POR_COLECCION, estadoLongitud } from "./seoPanel";
@@ -51,6 +52,24 @@ describe("recortarDescripcion", () => {
     const largo = recortarDescripcion("a".repeat(200));
     assert.equal(largo.length, 160);
     assert.ok(largo.endsWith("…"));
+  });
+
+  it("separa las frases pegadas («fallar.Primero») sin tocar siglas ni dominios (QA, punto 27)", () => {
+    assert.equal(
+      recortarDescripcion("avisa antes de fallar.Primero cambia el sonido.Después, el golpe."),
+      "avisa antes de fallar. Primero cambia el sonido. Después, el golpe.",
+    );
+    assert.equal(
+      separarFrasesPegadas("¿Por qué?¿Cuándo? Ya.¡Listo!"),
+      "¿Por qué? ¿Cuándo? Ya. ¡Listo!",
+    );
+    for (const igual of [
+      "Partequipos S.A.S.",
+      "visita partequipos.com",
+      "modelo 3.5L",
+      "CAT.Diesel",
+    ])
+      assert.equal(separarFrasesPegadas(igual), igual, igual);
   });
 });
 

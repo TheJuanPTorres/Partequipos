@@ -114,7 +114,7 @@ export function FormularioSolicitud({
   const whatsappContexto = whatsapp
     ? new URL(whatsapp.href).searchParams.has("text")
       ? whatsapp
-      : conMensaje(whatsapp, mensajeWhatsApp(referencia?.texto, titulo))
+      : conMensaje(whatsapp, mensajeWhatsApp(referencia?.texto, titulo, mensajeInicial))
     : undefined;
   /*
    * La VENTANA EMERGENTE lleva siempre «Ciudad» y «¿Qué necesitas?» (dirección,

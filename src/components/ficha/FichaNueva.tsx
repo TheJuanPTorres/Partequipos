@@ -1,3 +1,4 @@
+import { ContextoWhatsApp } from "@/components/layout/ContextoWhatsApp";
 import { IconBrandWhatsapp, IconFileTypePdf, IconView360 } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -406,6 +407,7 @@ ${tituloEscritorio.modelo}`}
     return (
       <main className={nueva.paginaKit}>
         {jsonLd}
+        <ContextoWhatsApp texto={nombre} />
         {/* La ficha ya tiene su llamada a la acción: el pie no pinta la tarjeta roja. */}
         <PieSinTarjeta />
         <div
@@ -437,6 +439,7 @@ ${tituloEscritorio.modelo}`}
   return (
     <main className={estilos.pagina}>
       {jsonLd}
+      <ContextoWhatsApp texto={nombre} />
       {/* La ficha ya tiene su llamada a la acción: el pie no pinta la tarjeta roja. */}
       <PieSinTarjeta />
       {cuerpo}

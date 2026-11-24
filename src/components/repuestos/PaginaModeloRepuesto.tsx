@@ -1,3 +1,4 @@
+import { ContextoWhatsApp } from "@/components/layout/ContextoWhatsApp";
 import type { Metadata } from "next";
 
 import { PieSinTarjeta } from "@/components/layout/PieSinTarjeta";
@@ -112,6 +113,7 @@ export async function PaginaModeloRepuesto({
   return (
     <main className={estilos.pagina} style={estiloDeMarca(marca.colorMarca)}>
       <JsonLd data={[productJsonLd, buildBreadcrumbJsonLd(breadcrumbs)]} />
+      <ContextoWhatsApp texto={referencia} />
       {/* La página ya tiene su formulario: el pie no pinta la tarjeta roja. */}
       <PieSinTarjeta />
       <ZonaAnimada

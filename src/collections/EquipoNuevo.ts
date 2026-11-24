@@ -192,6 +192,8 @@ export const EquipoNuevo: CollectionConfig = {
       {
         name: "atributosDestacados",
         type: "array",
+        // Nombre corto de la tabla: con el largo, la clave foránea pasaba de 63 bytes (Postgres la recorta).
+        dbName: "equipos_nuevos_atributos",
         label: "Atributos destacados",
         labels: { singular: "Atributo", plural: "Atributos" },
         maxRows: 5,

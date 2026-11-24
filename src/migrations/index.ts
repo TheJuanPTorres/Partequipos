@@ -124,6 +124,7 @@ import * as migration_20261120_143417_solicitudes_seguimiento from './20261120_1
 import * as migration_20261123_064232_borradores_paginas from './20261123_064232_borradores_paginas';
 import * as migration_20261123_215916_correo_respuesta_automatica from './20261123_215916_correo_respuesta_automatica';
 import * as migration_20261123_223246_orden_listado_nueva from './20261123_223246_orden_listado_nueva';
+import * as migration_20261124_024724_atributos_ficha from './20261124_024724_atributos_ficha';
 
 export const migrations = [
   {
@@ -754,6 +755,11 @@ export const migrations = [
   {
     up: migration_20261123_223246_orden_listado_nueva.up,
     down: migration_20261123_223246_orden_listado_nueva.down,
-    name: '20261123_223246_orden_listado_nueva'
+    name: '20261123_223246_orden_listado_nueva',
+  },
+  {
+    up: migration_20261124_024724_atributos_ficha.up,
+    down: migration_20261124_024724_atributos_ficha.down,
+    name: '20261124_024724_atributos_ficha'
   },
 ];

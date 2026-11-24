@@ -8,6 +8,7 @@ import { ETIQUETA_CLASE } from "@/lib/buscador/etiquetas";
 import type { Clase, Estado, Faceta, Filtros } from "@/lib/buscador/motor";
 import { registrarSinResultado } from "@/lib/buscador/registro";
 import { buscarEnCatalogo } from "@/lib/buscador/servidor";
+import { claveDeFila, etiquetaOtraPestana } from "@/lib/cabecera/enlaces";
 import { getCabecera } from "@/lib/queries/getCabecera";
 import { getEmpresa } from "@/lib/queries/getSeo";
 import { enlaceWhatsApp } from "@/lib/navegacion";
@@ -367,10 +368,22 @@ export default async function BuscarPage({ searchParams }: Props) {
               <p className={estilos.seccionesTitulo}>O entra por una sección:</p>
               <ul className={estilos.chips}>
                 {secciones.map((s) => (
-                  <li key={s.href}>
-                    <Link href={s.href} className={estilos.chip}>
-                      {s.etiqueta}
-                    </Link>
+                  <li key={claveDeFila(s)}>
+                    {"otraPestana" in s && s.otraPestana ? (
+                      <a
+                        href={s.href}
+                        className={estilos.chip}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={etiquetaOtraPestana(s.etiqueta)}
+                      >
+                        {s.etiqueta}
+                      </a>
+                    ) : (
+                      <Link href={s.href} className={estilos.chip}>
+                        {s.etiqueta}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

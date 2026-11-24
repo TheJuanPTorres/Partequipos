@@ -83,8 +83,9 @@ export function enlacesDeModelos(
  * 2026-10-17: la lista de WordPress, tal cual): un modelo sin página propia va
  * como texto, y uno que enlaza a otra ficha («EX450LC-5» → la ZX450LC-5), con
  * el texto de WordPress. Sin otras entradas, la lista de siempre, sin tocar su
- * orden; con ellas, cada entrada va en su sitio alfabético (con los números en su orden) SIN
- * reordenar los modelos: conservan el orden que el editor arrastró en el panel (2026-11-19).
+ * orden; con ellas, van AL FINAL, en el orden de sus filas en el panel (Juan Pablo,
+ * 2026-11-23): los modelos conservan el orden que el editor arrastró, y una entrada ya no se
+ * cuela entre ellos por su nombre. En un tipo con series, cada una cierra la suya.
  * `hrefDeModelo` da la URL de la ficha enlazada, o `null` si ya no existe.
  */
 export function conOtrasEntradas(
@@ -108,15 +109,7 @@ export function conOtrasEntradas(
       },
     ];
   });
-  if (otras.length === 0) return modelos;
-  const antes = (a: ModeloEnlace, b: ModeloEnlace) =>
-    a.nombre.localeCompare(b.nombre, "es", { numeric: true, sensitivity: "base" }) < 0;
-  const lista = [...modelos];
-  for (const o of [...otras].sort((a, b) => (antes(a, b) ? -1 : antes(b, a) ? 1 : 0))) {
-    const i = lista.findIndex((m) => antes(o, m));
-    lista.splice(i === -1 ? lista.length : i, 0, o);
-  }
-  return lista;
+  return otras.length === 0 ? modelos : [...modelos, ...otras];
 }
 
 /** Los ids de las fichas a las que enlazan las «otras entradas» de unos tipos (pueden ser de otro tipo). */

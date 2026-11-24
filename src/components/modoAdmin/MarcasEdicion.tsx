@@ -51,6 +51,9 @@ export function MarcasEdicion({
 }) {
   const [cajas, setCajas] = useState<Caja[]>([]);
   const [activa, setActiva] = useState<string | null>(null);
+  // El foco del teclado va APARTE del ratón: al bajar la página bajo un ratón quieto, otro bloque
+  // «entra» y apagaba el botón enfocado (visto con Tab a 1440, 2026-11-24).
+  const [enfocada, setEnfocada] = useState<string | null>(null);
 
   useEffect(() => {
     const encontrados = bloques.flatMap((b, i) => {
@@ -127,7 +130,7 @@ export function MarcasEdicion({
         <div
           key={c.clave}
           className="pqma-bloque"
-          data-activo={activa === c.clave ? "" : undefined}
+          data-activo={activa === c.clave || enfocada === c.clave ? "" : undefined}
           onMouseEnter={() => setActiva(c.clave)}
           onMouseLeave={() => setActiva((antes) => (antes === c.clave ? null : antes))}
         >
@@ -142,8 +145,12 @@ export function MarcasEdicion({
             href={c.href}
             target="_blank"
             rel="noopener"
-            onFocus={() => setActiva(c.clave)}
-            onBlur={() => setActiva((antes) => (antes === c.clave ? null : antes))}
+            onFocus={(e) => {
+              setEnfocada(c.clave);
+              // Que se vea: la página va hasta el botón, sin animación (también con «reducir movimiento»).
+              e.currentTarget.scrollIntoView({ block: "center", behavior: "instant" });
+            }}
+            onBlur={() => setEnfocada((antes) => (antes === c.clave ? null : antes))}
           >
             Editar {c.etiqueta}
           </a>

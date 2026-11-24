@@ -52,7 +52,7 @@ html[data-modo-admin] body > header { top: ${ALTO_FRANJA}px; }
   opacity: 0; pointer-events: none; transition: opacity 120ms ease;
 }
 .pqma-bloque[data-activo] .pqma-marco, .pqma-bloque:focus-within .pqma-marco { opacity: 1; }
-.pqma-bloque[data-activo] .pqma-editar, .pqma-editar:focus-visible, .pqma-editar:hover {
+.pqma-bloque[data-activo] .pqma-editar, .pqma-editar:focus, .pqma-editar:hover {
   opacity: 1; pointer-events: auto;
 }
 /* Sin ratón (táctil) no hay «pasar por encima»: los botones se ven siempre. */

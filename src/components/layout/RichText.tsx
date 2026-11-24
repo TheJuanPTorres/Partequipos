@@ -6,6 +6,7 @@ import {
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 
 import { DocumentoVisor } from "@/components/documentos/DocumentoVisor";
+import { encabezadosDesde } from "@/lib/richtext/encabezados";
 import type { Media } from "@/payload-types";
 
 /*
@@ -76,12 +77,23 @@ export const convertidores: JSXConvertersFunction = ({ defaultConverters }) => (
  * desbordar. Sin el contenedor de Payload, para que el espaciado llegue
  * a los párrafos, que de otro modo quedan un nivel más abajo.
  */
-export function RichText({ data }: { data: unknown }) {
+export function RichText({
+  data,
+  encabezadosDesde: desde,
+}: {
+  data: unknown;
+  /**
+   * En una ficha (con su `<h1>`), los encabezados del texto se renumeran desde este nivel sin
+   * saltos (`encabezadosDesde`, QA del 2026-11-17, punto 32). Sin él, tal cual.
+   */
+  encabezadosDesde?: number;
+}) {
   if (!data || typeof data !== "object") return null;
+  const estado = desde ? encabezadosDesde(data, desde) : data;
   return (
     <div className="space-y-4 leading-relaxed break-words text-gray-700 [&_a]:underline [&_h2]:mt-10 [&_h2]:text-2xl [&_h2]:leading-snug [&_h2]:font-semibold [&_h2]:text-gray-900 [&_h3]:mt-8 [&_h3]:text-xl [&_h3]:leading-snug [&_h3]:font-semibold [&_h3]:text-gray-900 [&_h4]:mt-6 [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:text-gray-900 [&_li]:ml-5 [&_li+li]:mt-1 [&_ol]:list-decimal [&_ul]:list-disc [&>*]:max-w-2xl [&>[data-ancho-pagina]]:max-w-none">
       <LexicalRichText
-        data={data as SerializedEditorState}
+        data={estado as SerializedEditorState}
         converters={convertidores}
         disableContainer
       />

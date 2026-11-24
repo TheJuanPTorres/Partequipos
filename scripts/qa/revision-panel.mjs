@@ -1460,6 +1460,59 @@ try {
       continue;
     }
 
+    /*
+     * Modo `pista` (tanda 23, modo administración): la pista `pq-modo-admin` por efecto. Con
+     * sesión, en el panel, vale «1»; al pulsar «Cerrar sesión» desaparece y en la pantalla de
+     * acceso sigue sin estar. Cierra la sesión del editor de pruebas (es lo que se prueba).
+     */
+    if (MODO === "pista") {
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto} (${ancho.nombre})`);
+      };
+      const pista = () =>
+        pagina.evaluate(() => {
+          try {
+            return localStorage.getItem("pq-modo-admin");
+          } catch {
+            return "(sin localStorage)";
+          }
+        });
+      await pagina.goto(`${base}/admin/`, { waitUntil: "load", timeout: 30000 });
+      let valor = null;
+      for (let i = 0; i < 20 && valor !== "1"; i++) {
+        await pagina.waitForTimeout(250);
+        valor = await pista();
+      }
+      ok(`con sesión, en el panel, la pista vale «${valor}»`, valor === "1");
+      // El enlace de salir está en el menú: si está cerrado, se abre.
+      if ((await pagina.locator(".nav--nav-open").count()) === 0)
+        await pagina
+          .locator(
+            ancho.movil ? ".app-header__mobile-nav-toggler" : ".template-default__nav-toggler",
+          )
+          .first()
+          .click()
+          .catch(() => null);
+      await pagina.waitForTimeout(400);
+      await pagina.locator("a.nav__log-out").first().click({ timeout: 10000 });
+      await pagina.waitForURL(/\/admin\/(login|logout)/, { timeout: 20000 }).catch(() => null);
+      await pagina.waitForTimeout(1500);
+      const tras = await pista();
+      ok(`al cerrar sesión desaparece (${tras === null ? "no está" : `«${tras}»`})`, tras === null);
+      await pagina.goto(`${base}/admin/login`, { waitUntil: "load", timeout: 30000 });
+      await pagina.waitForTimeout(1500);
+      const enAcceso = await pista();
+      ok(
+        `en la pantalla de acceso no está (${enAcceso === null ? "no está" : `«${enAcceso}»`})`,
+        enAcceso === null,
+      );
+      hallazgos.push({ pantalla: "pista", ancho: ancho.nombre, resultado, errores, fallidas });
+      await contexto.close();
+      continue;
+    }
+
     if (MODO === "borrador") {
       const id = process.argv[4];
       if (!/^\d+$/.test(id ?? "")) fallar("Uso: … borrador <id de la página>");

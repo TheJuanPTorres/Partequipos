@@ -62,6 +62,8 @@ export type VistaServicioTecnico = {
   accesos: { ancla: string; titulo: string }[];
   taller: {
     ancla: string;
+    /** El ancla tal como la escribió el panel, si no estaba en minúscula: sigue funcionando. */
+    alias?: string;
     antetitulo: string | null;
     titulo: string;
     parrafos: string[];
@@ -71,6 +73,8 @@ export type VistaServicioTecnico = {
   } | null;
   alistamiento: {
     ancla: string;
+    /** El ancla tal como la escribió el panel, si no estaba en minúscula: sigue funcionando. */
+    alias?: string;
     titulo: string;
     parrafos: string[];
     /** El vídeo del taller (el de las etapas) y el corto de YouTube. */
@@ -84,6 +88,8 @@ export type VistaServicioTecnico = {
   } | null;
   posventa: {
     ancla: string;
+    /** El ancla tal como la escribió el panel, si no estaba en minúscula: sigue funcionando. */
+    alias?: string;
     /** El antetítulo de su columna (el del bloque en el panel; vacío, «Servicio postventa»). */
     antetitulo: string | null;
     titulo: string;
@@ -93,6 +99,8 @@ export type VistaServicioTecnico = {
   } | null;
   siniestros: {
     ancla: string;
+    /** El ancla tal como la escribió el panel, si no estaba en minúscula: sigue funcionando. */
+    alias?: string;
     titulo: string;
     intro: string | null;
     pasos: Paso[];
@@ -121,6 +129,16 @@ const ETIQUETA_ACCESO: Record<string, string> = {
 };
 
 const texto = (p: Parrafo) => [p.negrita, p.texto].filter(Boolean).join(" ");
+
+/**
+ * Las anclas, SIEMPRE en minúscula (informe de QA del 2026-11-17, punto 21: «#Siniestros» venía así
+ * de WordPress, y las demás eran «#taller», «#alistamiento», «#posventa»). La forma de antes se
+ * conserva como alias, para los enlaces que ya la usen.
+ */
+export function anclaYAlias(ancla: string): { ancla: string; alias?: string } {
+  const minuscula = ancla.toLowerCase();
+  return minuscula === ancla ? { ancla } : { ancla: minuscula, alias: ancla };
+}
 
 export function vistaServicioTecnico(bloques: VistaBloque[]): VistaServicioTecnico {
   const porAncla = (ancla: string) =>
@@ -174,12 +192,12 @@ export function vistaServicioTecnico(bloques: VistaBloque[]): VistaServicioTecni
     accesos: [taller, alist, posventa, siniestros]
       .filter((b): b is NonNullable<typeof b> => Boolean(b?.ancla))
       .map((b) => ({
-        ancla: b.ancla!,
+        ancla: b.ancla!.toLowerCase(),
         titulo: ETIQUETA_ACCESO[b.ancla!.toLowerCase()] ?? b.titulo,
       })),
     taller: taller
       ? {
-          ancla: taller.ancla!,
+          ...anclaYAlias(taller.ancla!),
           antetitulo: taller.antetitulo ?? null,
           titulo: taller.titulo,
           parrafos: pTaller.filter((p) => p.texto).map(texto),
@@ -190,7 +208,7 @@ export function vistaServicioTecnico(bloques: VistaBloque[]): VistaServicioTecni
       : null,
     alistamiento: alist
       ? {
-          ancla: alist.ancla!,
+          ...anclaYAlias(alist.ancla!),
           titulo: alist.titulo,
           parrafos: parrafosDe(alist.texto).map(texto),
           etapas: alist.videoTaller ?? null,
@@ -202,7 +220,7 @@ export function vistaServicioTecnico(bloques: VistaBloque[]): VistaServicioTecni
       : null,
     posventa: posventa
       ? {
-          ancla: posventa.ancla!,
+          ...anclaYAlias(posventa.ancla!),
           antetitulo: posventa.antetitulo?.trim() || null,
           titulo: posventa.titulo,
           parrafos: parrafosDe(posventa.texto).map(texto),
@@ -212,7 +230,7 @@ export function vistaServicioTecnico(bloques: VistaBloque[]): VistaServicioTecni
       : null,
     siniestros: siniestros
       ? {
-          ancla: siniestros.ancla!,
+          ...anclaYAlias(siniestros.ancla!),
           titulo: siniestros.titulo,
           intro,
           pasos,

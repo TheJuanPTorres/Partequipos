@@ -3,6 +3,8 @@
  * Solo se usa desde componentes de cliente. Antes de aceptar, NADA de esto toca a Google: ni el
  * script, ni una petición, ni una cookie.
  */
+import { hayPista } from "@/lib/modoAdmin/pista";
+
 import { CLAVE_CONSENTIMIENTO, interpretar, serializar } from "./consentimiento";
 import { paginaDeOrigen } from "./eventos";
 
@@ -69,6 +71,9 @@ const MAX_EN_ESPERA = 20;
 
 /** Carga Analytics (la primera vez) o lo reactiva. Solo se llama con la analítica aceptada. */
 export function activarAnalitica(id: string) {
+  // Quien viene del panel (la pista del modo administración) no se cuenta: no se carga Analytics.
+  // Si la pista es vieja y ya no hay sesión, el módulo la borra y la visita siguiente sí cuenta.
+  if (hayPista()) return;
   const w = ventana();
   w[`ga-disable-${id}`] = false;
   activo = true;

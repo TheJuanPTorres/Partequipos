@@ -1420,11 +1420,14 @@ try {
       const malicioso =
         "?pestana=__proto__&campo=" + encodeURIComponent('"><img src=x onerror=alert(1)>');
       await pagina.goto(`${ficha}${malicioso}`, { waitUntil: "networkidle" });
+      for (let i = 0; i < 20 && !(await pestanaActiva()); i++) await pagina.waitForTimeout(250);
       await pagina.waitForTimeout(2500);
       const inyectada = await pagina.locator('img[src="x"]').count();
+      const focoMalo = await pagina.evaluate(() => document.activeElement?.id ?? "");
+      // La pestaña es la que Payload recuerde del usuario: lo que importa es que nada se inyecte.
       ok(
-        `valores maliciosos: no hace nada (pestaña «${await pestanaActiva()}», ${inyectada} imágenes inyectadas, ${dialogos} diálogos)`,
-        inyectada === 0 && dialogos === 0 && (await pestanaActiva()) === "Contenido",
+        `valores maliciosos: no hace nada (${inyectada} imágenes inyectadas, ${dialogos} diálogos, foco «${focoMalo}», pestaña «${await pestanaActiva()}»)`,
+        inyectada === 0 && dialogos === 0 && !focoMalo.startsWith("field-"),
       );
       hallazgos.push({ pantalla: "editar", ancho: ancho.nombre, resultado, errores, fallidas });
       await contexto.close();

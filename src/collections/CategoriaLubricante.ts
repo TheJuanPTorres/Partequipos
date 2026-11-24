@@ -36,6 +36,12 @@ export const CategoriaLubricante: CollectionConfig = {
     useAsTitle: "nombre",
     group: "Lubricantes",
   },
+  /*
+   * SIN «Duplicar» (tanda 21, 2026-11-23): una línea no tiene «Mostrar en la web», así que su copia
+   * saldría publicada al momento (página, menú y ENI). Los PRODUCTOS sí se duplican: son filas de
+   * «Productos» (el botón de duplicar fila de Payload) y llevan su «Mostrar en la web».
+   */
+  disableDuplicate: true,
   access: {
     read: lecturaContenido,
     create: escrituraContenido,

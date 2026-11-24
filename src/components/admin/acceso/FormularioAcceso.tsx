@@ -3,7 +3,9 @@
 import { useAuth } from "@payloadcms/ui";
 import { IconAlertTriangle, IconLoader2 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
+
+import { quitarPistaModoAdmin } from "@/lib/panel/pistaModoAdmin";
 import type { UserWithToken } from "@payloadcms/ui";
 
 import { mensajeDeError, type Bloqueo } from "@/lib/panel/acceso";
@@ -33,6 +35,10 @@ export default function FormularioAcceso({ accion, bloqueo, olvido, redireccion 
   const { setUser } = useAuth();
   const router = useRouter();
   const [enviando, setEnviando] = useState(false);
+
+  // En la pantalla de acceso no hay sesión (cerrada, caducada o por inactividad): fuera la pista
+  // del modo administración de la web (tanda 23; la vuelve a poner el panel al entrar).
+  useEffect(() => quitarPistaModoAdmin(), []);
   const [error, setError] = useState<string | null>(null);
   const id = useId();
   const idError = `${id}-error`;

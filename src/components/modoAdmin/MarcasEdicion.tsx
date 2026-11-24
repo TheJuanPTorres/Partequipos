@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 import type { RespuestaMapa } from "@/lib/modoAdmin/mapa";
 
+import { ALTO_FRANJA } from "./estilos";
+
 /**
  * Los botones «Editar» sobre cada bloque de la página (modo administración, tanda 23).
  *
@@ -25,9 +27,12 @@ type Caja = {
   y: number;
   ancho: number;
   alto: number;
+  yBoton: number;
 };
 
 const MARGEN = 8;
+/** Alto del botón, para que no se salga por abajo de su bloque. */
+const ALTO_BOTON = 32;
 
 function buscar(selector: string): Element | null {
   try {
@@ -56,9 +61,21 @@ export function MarcasEdicion({
     let pendiente = 0;
     const medir = () => {
       pendiente = 0;
+      // Hasta dónde tapan la franja y la cabecera pegada arriba.
+      const cabecera = document.querySelector("body > header")?.getBoundingClientRect();
+      const tope = Math.max(
+        ALTO_FRANJA,
+        cabecera && cabecera.top <= ALTO_FRANJA ? cabecera.bottom : 0,
+      );
       setCajas(
         encontrados.map(({ clave, etiqueta, href, elemento }) => {
           const r = elemento.getBoundingClientRect();
+          // El botón va arriba del bloque; si esa parte ya pasó bajo la cabecera, baja con la
+          // pantalla (sin salirse del bloque), para que siempre se pueda pulsar.
+          const yBoton = Math.max(
+            r.top + MARGEN,
+            Math.min(tope + MARGEN, r.bottom - ALTO_BOTON - MARGEN),
+          );
           return {
             clave,
             etiqueta,
@@ -67,6 +84,7 @@ export function MarcasEdicion({
             y: r.top + window.scrollY,
             ancho: r.width,
             alto: r.height,
+            yBoton: yBoton + window.scrollY,
           };
         }),
       );
@@ -120,7 +138,7 @@ export function MarcasEdicion({
           />
           <a
             className="pqma-editar"
-            style={{ left: c.x + MARGEN, top: c.y + MARGEN }}
+            style={{ left: c.x + MARGEN, top: c.yBoton }}
             href={c.href}
             target="_blank"
             rel="noopener"

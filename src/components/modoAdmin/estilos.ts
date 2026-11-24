@@ -21,7 +21,11 @@ html[data-modo-admin] body > header { top: ${ALTO_FRANJA}px; }
   overflow-x: auto; white-space: nowrap; scrollbar-width: none;
 }
 .pqma-franja::-webkit-scrollbar { display: none; }
-.pqma-aviso { margin-right: auto; padding-right: 12px; font-weight: 400; color: #e5e5e5; }
+.pqma-aviso {
+  margin-right: auto; padding-right: 12px; font-weight: 400; color: #e5e5e5;
+  flex: 0 1 auto; min-width: 96px; overflow: hidden; text-overflow: ellipsis;
+}
+.pqma-franja > a, .pqma-franja > button { flex: none; }
 .pqma-aviso strong { color: #fff; font-weight: 600; }
 .pqma-quien { color: #d4d4d4; }
 .pqma-boton {
@@ -50,6 +54,10 @@ html[data-modo-admin] body > header { top: ${ALTO_FRANJA}px; }
 .pqma-bloque[data-activo] .pqma-marco, .pqma-bloque:focus-within .pqma-marco { opacity: 1; }
 .pqma-bloque[data-activo] .pqma-editar, .pqma-editar:focus-visible, .pqma-editar:hover {
   opacity: 1; pointer-events: auto;
+}
+/* Sin ratón (táctil) no hay «pasar por encima»: los botones se ven siempre. */
+@media (hover: none) {
+  .pqma-editar { opacity: 1; pointer-events: auto; }
 }
 @media (max-width: 700px) {
   .pqma-quien, .pqma-tecla { display: none; }

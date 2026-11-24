@@ -41,6 +41,15 @@ export const VERSIONES_SIN_BORRADORES: NonNullable<CollectionConfig["versions"]>
   maxPerDoc: MAXIMO_VERSIONES_PRODUCTO,
 };
 
+/**
+ * LA LISTA DE VERSIONES, LA MÁS RECIENTE PRIMERO (2026-11-24, dirección). Payload 3.89 pide las
+ * versiones sin orden y el adaptador cae al `defaultSort` de la colección, que no es la fecha: en la
+ * lista salían mezcladas. Si nadie pide otro orden (pulsando una columna), se ordena por
+ * `-updatedAt`, la fecha que pinta la lista. Lo vigila `versionesProducto.test.ts`.
+ */
+export const versionesRecientesPrimero: CollectionBeforeOperationHook = ({ args, operation }) =>
+  operation === "findVersions" && !args.sort ? { ...args, sort: "-updatedAt" } : args;
+
 /** La condición de lo publicado. */
 export const PUBLICADO = { _status: { equals: "published" } } satisfies Where;
 

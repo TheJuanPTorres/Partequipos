@@ -15,7 +15,7 @@ import {
   lecturaContenido,
   soloPersonal,
 } from "../lib/seguridad/acceso";
-import { VERSIONES_SIN_BORRADORES } from "../lib/borradores";
+import { VERSIONES_SIN_BORRADORES, versionesRecientesPrimero } from "../lib/borradores";
 import { avisoField } from "../lib/fields/avisoField";
 import { ordenListaSinUso } from "../lib/fields/ordenListaSinUso";
 import { conCopia } from "../lib/fields/duplicar";
@@ -59,6 +59,8 @@ export const EquipoNuevo: CollectionConfig = {
   versions: VERSIONES_SIN_BORRADORES,
   hooks: {
     // La marca desnormalizada tiene que ser la del tipo (ver el hook).
+    // La lista de versiones, la más reciente primero.
+    beforeOperation: [versionesRecientesPrimero],
     beforeValidate: [marcaDelTipoCoincide("tipos-maquinaria")],
     afterChange: [revalidarEquipoNuevo],
     afterDelete: [revalidarEquipoNuevoBorrado],

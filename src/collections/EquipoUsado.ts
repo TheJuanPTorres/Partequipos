@@ -10,7 +10,7 @@ import {
   lecturaContenido,
   soloPersonal,
 } from "../lib/seguridad/acceso";
-import { VERSIONES_SIN_BORRADORES } from "../lib/borradores";
+import { VERSIONES_SIN_BORRADORES, versionesRecientesPrimero } from "../lib/borradores";
 import { revalidarPortada } from "./hooks/portadaHooks";
 import { avisoField } from "../lib/fields/avisoField";
 import { marcaUsadaSincronizada } from "./hooks/marcaUsada";
@@ -65,6 +65,8 @@ export const EquipoUsado: CollectionConfig = {
   // La dirección web es única dentro de la categoría (la ruta lleva categoría y unidad).
   indexes: [{ fields: ["categoria", "slug"], unique: true }],
   hooks: {
+    // La lista de versiones, la más reciente primero.
+    beforeOperation: [versionesRecientesPrimero],
     beforeValidate: [slugUnidadUsada],
     beforeChange: [marcaUsadaSincronizada],
     afterChange: [revalidarEquipoUsado, portada.afterChange],

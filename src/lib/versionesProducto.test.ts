@@ -3,7 +3,6 @@ import { it } from "node:test";
 
 import type { Access } from "payload";
 
-import { CategoriaLubricante } from "../collections/CategoriaLubricante";
 import { EquipoNuevo } from "../collections/EquipoNuevo";
 import { EquipoUsado } from "../collections/EquipoUsado";
 import { ModeloRepuesto } from "../collections/ModeloRepuesto";
@@ -15,7 +14,12 @@ import { MAXIMO_VERSIONES_PRODUCTO } from "./borradores";
  * para el personal. Si alguien activa los borradores aquí, cambia cómo se publica todo el
  * catálogo: este guardarraíl lo para.
  */
-const PRODUCTOS = [EquipoNuevo, EquipoUsado, ModeloRepuesto, CategoriaLubricante];
+/*
+ * Las líneas de lubricante NO: sus productos son filas, no fichas, y las tablas de su historial
+ * pasarían de 63 bytes en Postgres (`_categorias_lubricante_v_version_productos_…_fk`); acortarlas
+ * obligaría a renombrar tablas que ya existen.
+ */
+const PRODUCTOS = [EquipoNuevo, EquipoUsado, ModeloRepuesto];
 
 it("las fichas de producto guardan versiones, sin borradores, las 10 últimas", () => {
   for (const c of PRODUCTOS) {

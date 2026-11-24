@@ -5,6 +5,7 @@ import type { Block, Field } from "payload";
 
 import { BLOQUES_PAGINA, bloquesElegibles } from "../../collections/bloques/bloquesPagina";
 import { CategoriaTecnica } from "../../collections/CategoriaTecnica";
+import { CategoriaUsada } from "../../collections/CategoriaUsada";
 import { EquipoNuevo } from "../../collections/EquipoNuevo";
 import { EquipoUsado } from "../../collections/EquipoUsado";
 import { MarcaLubricante } from "../../collections/MarcaLubricante";
@@ -32,6 +33,7 @@ const OCULTOS: Record<string, { fields: Field[] }> = {
   "paginas-indice": PaginasIndice,
   "modelos-repuesto": ModeloRepuesto,
   "categorias-tecnicas": CategoriaTecnica,
+  "categorias-usada": CategoriaUsada,
   "marcas-lubricante": MarcaLubricante,
 };
 
@@ -84,6 +86,9 @@ const RUTAS_OCULTAS: [keyof typeof OCULTOS, string][] = [
   ["marcas-lubricante", "videoCabecera"],
   ["marcas-lubricante", "colorOscuro"],
   ["paginas-indice", "blog.disenoArticulo"],
+  // Órdenes con número que la web ya no lee: manda el orden arrastrando (tanda 21, PR-4).
+  ["categorias-tecnicas", "ordenMarca"],
+  ["categorias-usada", "orden"],
 ];
 
 /** Los subcampos de un campo: grupos, filas, colapsables, filas de array y pestañas. */

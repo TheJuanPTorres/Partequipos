@@ -25,6 +25,7 @@ import { pushPermitido } from "./lib/db/pushEsquema";
 import { fusionarTraducciones, traduccionesEnOracion } from "./lib/panel/oracion";
 import { seoConfig } from "./lib/seo/config";
 import { RUTAS_EN_EL_SITIO, verEnElSitio } from "./lib/panel/verEnElSitio";
+import { fijarZonaDelPanel } from "./lib/panel/zonaHoraria";
 
 import { BloqueDocumentoVisor } from "./collections/bloques/documentoVisor";
 import { Articulo } from "./collections/Articulo";
@@ -70,6 +71,9 @@ import { conListados } from "./lib/panel/listados";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+
+// La hora del panel, también la que formatea el servidor, es la de Colombia (ver el módulo).
+fijarZonaDelPanel();
 
 /*
  * Adaptador de correo (SMTP con nodemailer), SIEMPRE montado desde el 2026-10-27: decide en cada

@@ -6,7 +6,7 @@ import type { Access } from "payload";
 import { EquipoNuevo } from "../collections/EquipoNuevo";
 import { EquipoUsado } from "../collections/EquipoUsado";
 import { ModeloRepuesto } from "../collections/ModeloRepuesto";
-import { MAXIMO_VERSIONES_PRODUCTO } from "./borradores";
+import { MAXIMO_VERSIONES_PRODUCTO, versionesRecientesPrimero } from "./borradores";
 
 /**
  * HISTORIAL DE LAS FICHAS DE PRODUCTO (tanda 21, tarea 3, fase 2, punto 4): versiones SIN
@@ -37,4 +37,22 @@ it("el historial no se lee sin sesión ni con la de un usuario que no es del per
     const anonimo = await leer({ req: { user: null, headers: new Headers() } } as never);
     assert.equal(anonimo, false, c.slug);
   }
+});
+
+it("la lista de versiones sale por fecha, la más reciente primero, salvo que se pida otro orden", async () => {
+  type Args = Parameters<typeof versionesRecientesPrimero>[0];
+  const llamar = (operation: string, sort?: string) =>
+    versionesRecientesPrimero({ args: { sort }, operation } as unknown as Args) as {
+      sort?: string;
+    };
+  for (const c of PRODUCTOS) {
+    assert.ok(
+      c.hooks?.beforeOperation?.includes(versionesRecientesPrimero),
+      `${c.slug}: sin el orden de las versiones`,
+    );
+  }
+  assert.equal((await llamar("findVersions")).sort, "-updatedAt");
+  assert.equal((await llamar("findVersions", "updatedAt")).sort, "updatedAt");
+  // Las demás operaciones (las listas normales) no se tocan.
+  assert.equal((await llamar("read")).sort, undefined);
 });

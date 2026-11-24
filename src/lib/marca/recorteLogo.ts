@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { CLAVE_DESPLIEGUE } from "@/lib/cacheDatos";
 
 import type { LogoConAlt } from "./logoMarca";
+import { medidaCompartida } from "./medidaCompartida";
 import { SIN_RECORTE, type Recorte } from "./tamanoOptico";
 
 /**
@@ -47,22 +48,42 @@ const medir = unstable_cache(
 /** Solo el Blob (las URL de los logos): nunca se descarga otra cosa desde el servidor. */
 const DEL_BLOB = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\//;
 
+const SEPARADOR = "\n";
+
+/**
+ * Una medida por fichero y proceso (`medidaCompartida`), con tres intentos y espera: en el build,
+ * con muchas páginas a la vez, el almacén responde 403 a algunas peticiones, y la medida SIN
+ * recorte se quedaba dentro del HTML prerenderizado (piezas de las categorías, 2026-11-17). Hasta
+ * el 2026-11-24 cada página pedía el fichero por su cuenta: 102 avisos en un build y 10 páginas
+ * publicadas con el logo sin medir.
+ */
+const medirCompartido = medidaCompartida<Recorte>({
+  medir: (clave) => {
+    const { url, umbral } = partes(clave);
+    return medir(url, umbral);
+  },
+  espera: (intento) => 1500 * intento + Math.random() * 1000,
+  alFallar: (clave, error) =>
+    console.error(
+      // Solo el nombre del fichero: dice qué logo es sin escribir el almacén en el registro.
+      `[logos] No se pudo medir la parte visible de «${nombreDeFichero(partes(clave).url)}»; sale con sus márgenes hasta que la página se regenere:`,
+      String(error),
+    ),
+});
+
+function partes(clave: string): { url: string; umbral: number } {
+  const corte = clave.lastIndexOf(SEPARADOR);
+  return { url: clave.slice(0, corte), umbral: Number(clave.slice(corte + 1)) };
+}
+
+function nombreDeFichero(url: string): string {
+  return new URL(url).pathname.split("/").pop() ?? "";
+}
+
 /** `umbral`: lo que se aparta del fondo para contar como contenido (12 por defecto; más alto, también recorta sombras y fondos casi blancos). */
 export async function recorteVisible(url: string, umbral = 12): Promise<Recorte> {
   if (!DEL_BLOB.test(url)) return SIN_RECORTE;
-  // Tres intentos con espera: en el build, con muchas páginas a la vez, el almacén responde 403 a algunas
-  // peticiones (visto en el registro del build) y con un solo intento se podía
-  // dejar la medida SIN recorte dentro del HTML prerenderizado (piezas de las categorías, 2026-11-17).
-  for (let intento = 1; intento <= 3; intento++) {
-    try {
-      return await medir(url, umbral);
-    } catch (error) {
-      if (intento === 3)
-        console.error("[logos] No se pudo medir la parte visible de un logo:", String(error));
-      else await new Promise((listo) => setTimeout(listo, 1500 * intento + Math.random() * 1000));
-    }
-  }
-  return SIN_RECORTE;
+  return (await medirCompartido(`${url}${SEPARADOR}${umbral}`)) ?? SIN_RECORTE;
 }
 
 /** El logo con la parte visible de su fichero (`recorteVisible`), o `null`. */

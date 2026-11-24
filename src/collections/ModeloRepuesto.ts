@@ -12,7 +12,7 @@ import {
   lecturaContenido,
   soloPersonal,
 } from "../lib/seguridad/acceso";
-import { VERSIONES_SIN_BORRADORES } from "../lib/borradores";
+import { VERSIONES_SIN_BORRADORES, versionesRecientesPrimero } from "../lib/borradores";
 import { avisoField } from "../lib/fields/avisoField";
 import { validarSerieDelModelo } from "../lib/repuestos/series";
 import { conPestanas } from "../lib/fields/pestanasFicha";
@@ -54,6 +54,8 @@ export const ModeloRepuesto: CollectionConfig = {
   // ISR: revalida la ficha y la página del tipo donde el modelo se lista.
   hooks: {
     // La marca desnormalizada tiene que ser la del tipo (ver el hook).
+    // La lista de versiones, la más reciente primero.
+    beforeOperation: [versionesRecientesPrimero],
     beforeValidate: [marcaDelTipoCoincide("tipos-equipo")],
     afterChange: [revalidarModelo],
     afterDelete: [revalidarModeloBorrado],

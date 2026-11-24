@@ -68,6 +68,7 @@ export function PaginaPolitica({
             logo: null,
           }}
           anclaSiguiente={ANCLA_INICIO}
+          etiquetaRaton="Ir a las políticas"
           franja={false}
           indice
           bajo

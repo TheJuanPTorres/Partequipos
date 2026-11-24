@@ -151,6 +151,7 @@ export default async function TipoMaquinariaPage({ params }: { params: Promise<P
       <HeroMarca
         vista={vistaEncabezadoTipoNueva(marca, tipo, equipos)}
         anclaSiguiente={ANCLA_MODELOS}
+        etiquetaRaton="Ir a los modelos"
         bajaSinFoto
       />
 

@@ -30,7 +30,7 @@ export const COLOR_SIN_COLOR = "#33373d";
 
 export type AccionSelector =
   | { tipo: "pagina"; href: string; texto: "Ver productos" }
-  | { tipo: "externo"; href: string; texto: "Ir a su web" | "Ver productos" };
+  | { tipo: "externo"; href: string; texto: "Ver productos" };
 
 export type PanelSelector = {
   id: number;
@@ -42,7 +42,8 @@ export type PanelSelector = {
   pais: { codigo: CodigoPais; nombre: string } | null;
   texto: string;
   foto: ImagenLista | null;
-  accion: AccionSelector;
+  /** `null`: sin botón (una marca de otra web sin enlace válido). */
+  accion: AccionSelector | null;
 };
 
 export type VistaSelector = { titulo: string; paneles: PanelSelector[] };
@@ -72,16 +73,19 @@ export function primeraFrase(texto: string | null | undefined): string {
   return fin === -1 ? t : t.slice(0, fin + 1);
 }
 
-export function accionDe(m: MarcaSelector): AccionSelector {
+/**
+ * El botón de la marca. Una de «Otra web» (Dispel) lleva a su «Enlace externo», en pestaña nueva y
+ * con «Ver productos»; SIN enlace válido no hay botón (antes iba a la portada: informe de QA del
+ * 2026-11-17, punto 19).
+ */
+export function accionDe(m: MarcaSelector): AccionSelector | null {
   if (tienePaginaPropiaLubricante(m)) {
     const web = webDeLubricante(m);
     if (web) return { tipo: "externo", href: web, texto: "Ver productos" };
     return { tipo: "pagina", href: `${rutas.marcaLubricante(m.slug)}/`, texto: "Ver productos" };
   }
   const externo = enlaceExternoLubricante(m);
-  return externo
-    ? { tipo: "externo", href: externo, texto: "Ir a su web" }
-    : { tipo: "pagina", href: "/", texto: "Ver productos" };
+  return externo ? { tipo: "externo", href: externo, texto: "Ver productos" } : null;
 }
 
 export function panelDe(m: MarcaSelector): PanelSelector {

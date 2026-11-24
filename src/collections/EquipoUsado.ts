@@ -13,6 +13,7 @@ import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { MAX_DESCRIPCION_CORTA, MAX_SERIAL } from "../lib/usados/aditamentos";
 import { validarAnio, validarHorometro } from "../lib/panel/fichaUsada";
+import { conCopia } from "../lib/fields/duplicar";
 
 /** «Mostrar en la web» con interruptor directo en la lista (tarea 3, punto 2). */
 const conInterruptor = <T extends { admin?: Record<string, unknown> }>(c: T): T => ({
@@ -96,6 +97,8 @@ export const EquipoUsado: CollectionConfig = {
         type: "text",
         required: true,
         label: "Nombre",
+        // Al duplicar, «(copia)» (tanda 21, `duplicar.ts`).
+        hooks: { beforeDuplicate: [conCopia] },
         admin: {
           description:
             "Como sale en el título de la ficha y en la tarjeta: tipo, marca, modelo y año. Ej. «Excavadora Hitachi ZX200-3 2016».",

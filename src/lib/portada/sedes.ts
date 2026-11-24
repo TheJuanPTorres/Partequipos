@@ -1,8 +1,8 @@
 import type { Sede } from "@/payload-types";
 
-import { hrefTelefono } from "../pie";
 import { coordenadasEnColombia } from "../fields/reglasPortada";
 import { enlaceDeLinea, urlPorDireccion, type OrigenEnlaceMaps } from "../sedes/enlaceMaps";
+import { telefonosDeTexto, type TelefonoEnlace } from "../telefonos";
 import { imagenDeMedia, type ImagenLista } from "../utils/relations";
 
 /**
@@ -14,7 +14,8 @@ export type LineaSede = {
   /** «Maquinaria», o «Maquinaria · Guarne» si la línea está en otro municipio. */
   etiqueta: string;
   direccion: string;
-  telefono: { texto: string; href: string } | null;
+  /** Un elemento por número del campo («3176707071 / (601)4926260» son dos), cada uno con su `tel:`. */
+  telefonos: TelefonoEnlace[];
   /** «Ver en Google Maps»: el enlace de la línea, sus coordenadas, las de la sede o la dirección. */
   mapa: { href: string; origen: OrigenEnlaceMaps };
 };
@@ -74,12 +75,11 @@ export function sedesDePortada(sedes: Sede[]): SedeLista[] {
       const direccion = l.direccion?.trim();
       if (!linea || !direccion) return [];
       const localidad = l.localidad?.trim();
-      const tel = l.telefono?.trim();
       return [
         {
           etiqueta: localidad ? `${linea} · ${localidad}` : linea,
           direccion,
-          telefono: tel ? { texto: tel, href: hrefTelefono(tel) } : null,
+          telefonos: telefonosDeTexto(l.telefono),
           mapa: enlaceDeLinea({
             enlace: l.enlaceMaps,
             coordenadas: l.coordenadas,

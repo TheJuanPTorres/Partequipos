@@ -156,7 +156,13 @@ export default async function CategoriaRepuestosPage({ params }: { params: Promi
           titulo={encabezado.linea2}
         />
       ) : (
-        <HeroMarca vista={encabezado} anclaSiguiente={ANCLA_GRUPOS} franja={false} reservarTitulo />
+        <HeroMarca
+          vista={encabezado}
+          anclaSiguiente={ANCLA_GRUPOS}
+          etiquetaRaton="Ir a los grupos de repuestos"
+          franja={false}
+          reservarTitulo
+        />
       )}
 
       {/*

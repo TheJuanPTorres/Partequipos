@@ -100,7 +100,14 @@ export default async function TrabajaConNosotrosPage({ searchParams }: Props) {
         permitirUrl={process.env.VERCEL_ENV !== "production"}
       >
         {/* Cabecera BAJA (Juan Pablo, 2026-10-23): 380 px (420 en móvil), centrada en vertical. */}
-        <HeroMarca vista={vista.encabezado} anclaSiguiente={ANCLA} franja={false} indice bajo />
+        <HeroMarca
+          vista={vista.encabezado}
+          anclaSiguiente={ANCLA}
+          etiquetaRaton="Ir a las vacantes"
+          franja={false}
+          indice
+          bajo
+        />
 
         <Vacantes
           id={ANCLA}

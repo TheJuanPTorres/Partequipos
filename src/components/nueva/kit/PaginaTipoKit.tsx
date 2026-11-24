@@ -102,6 +102,7 @@ export async function PaginaTipoKit({
         fondo={fondo}
         logo={logo}
         destino={`#${ANCLA_MODELOS}`}
+        etiquetaRaton="Ir a los modelos"
       />
       <EmblemaKit emblema={emblema}>
         <div id={ANCLA_MODELOS} className={estilos.tipos} tabIndex={-1}>

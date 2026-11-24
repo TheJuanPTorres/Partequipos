@@ -13,6 +13,12 @@ import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/segur
 import { avisoField } from "../lib/fields/avisoField";
 import { ordenListaSinUso } from "../lib/fields/ordenListaSinUso";
 import { conCopia } from "../lib/fields/duplicar";
+import {
+  CELDA_NOMBRE_FICHA,
+  camposResumenWeb,
+  campoConSugerencias,
+  conInterruptor,
+} from "../lib/fields/fichaFacil";
 
 /**
  * Ficha de un equipo de la línea NUEVA. Es una página de **venta**, no una
@@ -53,6 +59,9 @@ export const EquipoNuevo: CollectionConfig = {
   fields: [
     ...conPestanas(
       [
+        // EDICIÓN FÁCIL (tanda 21, tarea 3, fase 2): «Así se ve hoy en la web» con la ficha completa,
+        // y la columna «Estado» de la lista. Campos `ui`: no guardan nada.
+        ...camposResumenWeb(),
         // Aviso en vivo si la galería está vacía (F4).
         avisoField("avisoSinFotos", "AvisoSinFotos"),
         // El nombre empieza por «test» o «prueba»: avisa, no bloquea (tanda 21, tarea 8).
@@ -66,11 +75,20 @@ export const EquipoNuevo: CollectionConfig = {
           required: true,
           label: "Nombre",
           hooks: { beforeDuplicate: [conCopia] },
+          admin: {
+            description:
+              "Como sale en el título de la ficha: tipo, marca y referencia. Ej. «Excavadora Hitachi LANDCROS ZX130-5B» o, en aditamentos, «Martillo para Excavadoras».",
+            // En la lista, con la miniatura, y los dos abren la ficha (punto 1).
+            components: { Cell: CELDA_NOMBRE_FICHA },
+          },
         },
-        mostrarEnWebField({
-          descripcion:
-            "Desmarcada, el equipo desaparece de toda la web (listados, «Otras referencias», menú, buscador, portada y sitemap) sin borrarse del panel, y su ficha lleva a la página de su tipo. Vuelve al marcarla.",
-        }),
+        // En la lista, interruptor directo (punto 2).
+        conInterruptor(
+          mostrarEnWebField({
+            descripcion:
+              "Desmarcada, el equipo desaparece de toda la web (listados, «Otras referencias», menú, buscador, portada y sitemap) sin borrarse del panel, y su ficha lleva a la página de su tipo. Vuelve al marcarla.",
+          }),
+        ),
         slugField(),
         {
           name: "marca",
@@ -114,7 +132,14 @@ export const EquipoNuevo: CollectionConfig = {
           name: "codigo",
           type: "text",
           label: "Código / referencia",
-          admin: { description: "Referencia del fabricante, ej. 1150M o ZX350LC-6." },
+          admin: {
+            description: "Referencia del fabricante, ej. 1150M o ZX350LC-6.",
+            placeholder: "Ej. ZX350LC-6",
+            // Debajo, las referencias que ya llevan otros equipos de la marca elegida (punto 7).
+            components: {
+              Field: campoConSugerencias("marca", "Ya usadas con esta marca:"),
+            },
+          },
         },
         /*
          * PESO OPERATIVO NUMÉRICO (2026-10-14, aprobado por dirección): para filtrar
@@ -140,7 +165,10 @@ export const EquipoNuevo: CollectionConfig = {
           name: "entradilla",
           type: "textarea",
           label: "Entradilla",
-          admin: { description: "Resumen de una o dos líneas, bajo el título." },
+          admin: {
+            description: "Resumen de una o dos líneas, bajo el título.",
+            placeholder: "Ej. Excavadora de 13 toneladas, ágil en obra urbana y de bajo consumo.",
+          },
         },
         {
           name: "descripcion",
@@ -166,10 +194,12 @@ export const EquipoNuevo: CollectionConfig = {
           type: "upload",
           relationTo: "media",
           hasMany: true,
-          label: "Galería",
+          label: "Fotos",
           admin: {
             components: { Cell: "/components/admin/celdas/CeldaMiniatura" },
-            description: "La primera imagen se usa como portada y como imagen social.",
+            // Punto 8: subir varias a la vez y ordenar por arrastre.
+            description:
+              "Puedes subir varias a la vez. Ordénalas arrastrando: la primera es la portada (y la imagen al compartir en redes).",
           },
         },
         /*

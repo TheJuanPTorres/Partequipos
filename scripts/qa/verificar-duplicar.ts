@@ -32,7 +32,6 @@ const CASOS: { coleccion: CollectionSlug; nombre: "nombre" | "titulo"; oculta: b
   { coleccion: "modelos-repuesto", nombre: "nombre", oculta: true },
   // Sin «Mostrar en la web»: nace en borrador.
   { coleccion: "articulos", nombre: "titulo", oculta: false },
-  // Usadas: dirección y «Mostrar en la web» (comunes); el «(copia)» del nombre, tras el #533.
   { coleccion: "equipos-usados", nombre: "nombre", oculta: true },
 ];
 
@@ -51,13 +50,11 @@ for (const { coleccion, nombre, oculta } of CASOS) {
       depth: 0,
       overrideAccess: true,
     })) as unknown as Doc;
-    const conCopia = coleccion !== "equipos-usados";
-    if (conCopia)
-      comprobar(
-        `${coleccion}: el nombre lleva «(copia)»`,
-        copia[nombre] === `${String(original[nombre])} (copia)`,
-        String(copia[nombre]),
-      );
+    comprobar(
+      `${coleccion}: el nombre lleva «(copia)»`,
+      copia[nombre] === `${String(original[nombre])} (copia)`,
+      String(copia[nombre]),
+    );
     comprobar(
       `${coleccion}: dirección libre y distinta`,
       typeof copia.slug === "string" && copia.slug.startsWith(`${String(original.slug)}-copia`),

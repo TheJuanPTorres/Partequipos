@@ -7,6 +7,10 @@
  *
  *   npm run preview:ejecutar -- npx payload run scripts/maquinaria/atributos-ficha.ts simular
  *   npm run preview:ejecutar -- npx payload run scripts/maquinaria/atributos-ficha.ts aplicar
+ *   npm run preview:ejecutar -- npx payload run scripts/maquinaria/atributos-ficha.ts reiniciar
+ *
+ * `reiniciar` (solo para el preview, para repetir la prueba) deja «Atributos destacados» vacío en
+ * todas las máquinas y borra el catálogo: así se vuelve a copiar con `aplicar`.
  *
  * - NO borra ni vacía nada: «Ficha técnica» queda como está (los campos viejos se ocultan más
  *   adelante, y el borrado va en otro PR con Juan Pablo).
@@ -26,7 +30,8 @@ import { datosDeCabecera } from "../../src/lib/maquinaria/fichaNueva";
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 process.env.PAYLOAD_SIN_GENERAR_TIPOS = "true";
 
-const modo = process.argv.find((a) => a === "simular" || a === "aplicar") ?? "simular";
+const modo =
+  process.argv.find((a) => a === "simular" || a === "aplicar" || a === "reiniciar") ?? "simular";
 const veredicto = puedeVaciarSolicitudes(process.env.DATABASE_URI);
 if (!veredicto.permitido) {
   throw new Error(`[atributos-ficha] Solo contra la base del preview. ${veredicto.motivo}`);
@@ -39,6 +44,34 @@ const payload = await getPayload({ config });
 type Clave = string;
 const clave = (nombre: string, unidad: string, tipo: string, icono: string): Clave =>
   JSON.stringify([nombre, unidad, tipo, icono]);
+
+if (modo === "reiniciar") {
+  const { docs: todos } = await payload.find({
+    collection: "equipos-nuevos",
+    limit: 0,
+    pagination: false,
+    depth: 0,
+  });
+  let vaciadas = 0;
+  for (const e of todos) {
+    if (!e.atributosDestacados || e.atributosDestacados.length === 0) continue;
+    await payload.update({
+      collection: "equipos-nuevos",
+      id: e.id,
+      data: { atributosDestacados: [] },
+    });
+    vaciadas++;
+  }
+  const borrados = await payload.delete({
+    collection: "atributos-ficha",
+    where: { id: { exists: true } },
+  });
+  process.stdout.write(
+    `Reiniciado: ${vaciadas} máquinas vaciadas · ${borrados.docs.length} atributos del catálogo borrados
+`,
+  );
+  process.exit(0);
+}
 
 const { docs: existentes } = await payload.find({
   collection: "atributos-ficha",

@@ -53,14 +53,21 @@ describe("separarValor", () => {
   it("número y unidad", () => {
     assert.deepEqual(separarValor("3658 mm"), { tipo: "numero", valor: "3658", unidad: "mm" });
     assert.deepEqual(separarValor("20.500 kg"), { tipo: "numero", valor: "20.500", unidad: "kg" });
-    assert.deepEqual(separarValor("122hp"), { tipo: "numero", valor: "122", unidad: "hp" });
     assert.deepEqual(separarValor("5,5 km/h"), { tipo: "numero", valor: "5,5", unidad: "km/h" });
   });
   it("número solo", () => {
     assert.deepEqual(separarValor("4"), { tipo: "numero", valor: "4", unidad: "" });
   });
   it("lo que no encaja queda como texto, tal cual", () => {
-    for (const t of ["angulo 20 grds derecha/izquierda", "Cummins 4B3.9", "1,2 m³ (SAE)", "N/A"]) {
+    for (const t of [
+      "angulo 20 grds derecha/izquierda",
+      "Cummins 4B3.9",
+      "1,2 m³ (SAE)",
+      "N/A",
+      // Sin espacio: separarlo cambiaría lo publicado («8,65m» pasaría a «8,65 m»).
+      "8,65m",
+      "122hp",
+    ]) {
       assert.deepEqual(separarValor(t), { tipo: "texto", valor: t, unidad: "" });
     }
   });

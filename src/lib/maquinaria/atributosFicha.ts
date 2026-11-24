@@ -88,7 +88,8 @@ export function datosDeAtributos(
 
 /**
  * Para la SIEMBRA y la importación: separa «3658 mm» en valor «3658» y unidad «mm». Solo si es un
- * número seguido de una unidad corta (letras, `/`, `²`, `³`, `%`, `°`); lo demás («angulo 20 grds
+ * número, un ESPACIO y una unidad corta (sin espacio, «8,65m», va como texto: al pintarlo se
+ * añadiría uno y la ficha cambiaría) (letras, `/`, `²`, `³`, `%`, `°`); lo demás («angulo 20 grds
  * derecha/izquierda», «Cummins 4B3.9», «1,2 m³ (SAE)») queda como TEXTO tal cual. Un número sin
  * unidad es número con unidad vacía. El valor no se reformatea: «20.500» sigue «20.500».
  */
@@ -98,7 +99,7 @@ export function separarValor(texto: string): {
   unidad: string;
 } {
   const t = texto.trim();
-  const m = /^(-?\d[\d.,]*)\s*([A-Za-zµ°%²³/]{1,8})?$/.exec(t);
+  const m = /^(-?\d[\d.,]*)(?:\s+([A-Za-zµ°%²³/]{1,8}))?$/.exec(t);
   if (!m) return { tipo: "texto", valor: t, unidad: "" };
   return { tipo: "numero", valor: m[1]!, unidad: m[2] ?? "" };
 }

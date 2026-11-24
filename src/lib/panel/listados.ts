@@ -39,8 +39,9 @@ export const LISTADOS: Record<string, Listado> = {
     ],
     busqueda: ["nombre", "marca", "modelo"],
   },
+  // Fase 2 de la tarea 3: miniatura con el nombre (abren la ficha), «Estado» e interruptor directo.
   "equipos-nuevos": {
-    columnas: ["imagenes", "nombre", "marca", "tipo", "mostrarEnWeb"],
+    columnas: ["nombre", "estadoWeb", "marca", "tipo", "mostrarEnWeb"],
     busqueda: ["nombre", "codigo"],
   },
   "modelos-repuesto": {

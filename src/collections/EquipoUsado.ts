@@ -11,6 +11,7 @@ import {
   soloPersonal,
 } from "../lib/seguridad/acceso";
 import { VERSIONES_SIN_BORRADORES, versionesRecientesPrimero } from "../lib/borradores";
+import { VISTA_PREVIA_USADA } from "../lib/vistaPrevia/enVivo";
 import { revalidarPortada } from "./hooks/portadaHooks";
 import { avisoField } from "../lib/fields/avisoField";
 import { marcaUsadaSincronizada } from "./hooks/marcaUsada";
@@ -51,6 +52,8 @@ export const EquipoUsado: CollectionConfig = {
     group: "Maquinaria",
     description:
       "Inventario de maquinaria usada. Cada unidad sale en la página de su categoría y en la de su marca, con filtros, y tiene su propia página.",
+    // Vista previa en vivo (tanda 21, tarea 3, fase 2, punto 5): la ficha se pinta mientras se escribe.
+    livePreview: VISTA_PREVIA_USADA,
   },
   access: {
     read: lecturaContenido,

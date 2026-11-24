@@ -644,12 +644,39 @@ try {
      * (si no, se devuelve con la API). Capturas de la lista y de la comparación.
      */
     if (MODO === "versiones") {
+      const coleccion = process.argv[4] ?? "equipos-nuevos";
+      const id = Number(process.argv[5] ?? 1);
       if (ancho.movil) {
+        // En móvil, solo las capturas de la lista y de la última versión: sin guardar ni restaurar.
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(2000);
+        await pagina.screenshot({
+          path: path.join(salida, `versiones-lista-${coleccion}-movil.png`),
+          fullPage: false,
+        });
+        const enlace = pagina.locator("table tbody tr a").first();
+        if (await enlace.count()) {
+          await enlace.click();
+          await pagina.waitForLoadState("networkidle");
+          await pagina.waitForTimeout(2000);
+          await pagina.screenshot({
+            path: path.join(salida, `versiones-comparar-${coleccion}-movil.png`),
+            fullPage: false,
+          });
+        }
+        hallazgos.push({
+          pantalla: "versiones",
+          ancho: ancho.nombre,
+          coleccion,
+          id,
+          errores,
+          fallidas,
+        });
         await contexto.close();
         continue;
       }
-      const coleccion = process.argv[4] ?? "equipos-nuevos";
-      const id = Number(process.argv[5] ?? 1);
       // `… versiones <coleccion> <id> <campo de texto>`: en usadas y modelos no hay entradilla.
       const campo = process.argv[6] && process.argv[6] !== "api" ? process.argv[6] : "entradilla";
       const api = (ruta, opciones = {}) =>
@@ -1087,6 +1114,91 @@ try {
      * vista previa; «Salir de la vista previa» vuelve a lo publicado. El borrador de prueba lo
      * pone y lo quita `scripts/paginas/prueba-borrador.ts` (marca «PRUEBA BORRADOR 8B»).
      */
+    /*
+     * Modo `vivo` (`… vivo <id de una unidad usada>`, punto 5): la VISTA PREVIA EN VIVO por efecto.
+     * Sin sesión la ruta da 404; con sesión pinta la ficha con `noindex`. A 1440, en el formulario
+     * de la unidad se abre «Vista previa en vivo», se escribe una marca en el nombre SIN GUARDAR y
+     * el título del iframe la muestra. En móvil, la ruta misma. Nada se guarda: el contexto se cierra.
+     */
+    if (MODO === "vivo") {
+      const id = process.argv[4];
+      if (!/^\d+$/.test(id ?? "")) fallar("Uso: … vivo <id de una unidad usada>");
+      const ruta = `${base}/vista-previa/equipos-usados/${id}/`;
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto} (${ancho.nombre})`);
+      };
+      const anonimo = await pagina.evaluate(
+        async (r) => (await fetch(r, { credentials: "omit" })).status,
+        ruta,
+      );
+      ok(`sin sesión, la ruta da 404 (HTTP ${anonimo})`, anonimo === 404);
+      await pagina.goto(ruta, { waitUntil: "networkidle" });
+      const directa = await pagina.evaluate(() => ({
+        h1: document.querySelector("h1")?.textContent?.trim() ?? "",
+        robots: document.querySelector('meta[name="robots"]')?.getAttribute("content") ?? "",
+      }));
+      ok(`con sesión pinta la ficha («${directa.h1.slice(0, 50)}»)`, directa.h1.length > 0);
+      ok(`noindex (${directa.robots})`, /noindex/.test(directa.robots));
+      await pagina.screenshot({ path: path.join(salida, `vivo-ruta-${ancho.nombre}.png`) });
+      if (!ancho.movil) {
+        const MARCA = " PRUEBA VIVO";
+        await pagina.goto(`${base}/admin/collections/equipos-usados/${id}`, {
+          waitUntil: "networkidle",
+        });
+        const paso = async (nombrePaso, accion) => {
+          try {
+            await accion();
+          } catch (e) {
+            await pagina.screenshot({ path: path.join(salida, `vivo-fallo-${ancho.nombre}.png`) });
+            const estado = await pagina.evaluate(() => {
+              const v = document.querySelector(".live-preview-window");
+              const f = document.querySelector("iframe.live-preview-iframe");
+              const caja = (el) => (el ? JSON.stringify(el.getBoundingClientRect()) : "—");
+              return {
+                ventana: v ? `${v.className} ${caja(v)}` : "no hay",
+                iframe: f ? `${f.getAttribute("src")} ${caja(f)}` : "no hay",
+                boton: document.querySelector(".live-preview-toggler")?.className ?? "no hay",
+                html: v ? v.innerHTML.replace(/<svg[\s\S]*?<\/svg>/g, "").slice(0, 1500) : "",
+              };
+            });
+            decir(`   estado: ${JSON.stringify(estado)}`);
+            fallar(`vivo: falló «${nombrePaso}» (${String(e).split("\n")[0]})`);
+          }
+        };
+        // Payload recuerda por usuario si la dejó abierta: solo se pulsa si está cerrada.
+        await paso("abrir la vista previa en vivo", async () => {
+          const boton = pagina.locator(".live-preview-toggler").first();
+          await boton.waitFor({ timeout: 10000 });
+          const activa = (await boton.getAttribute("class"))?.includes("--active");
+          if (!activa) await boton.click();
+        });
+        const marco = pagina.frameLocator("#live-preview-iframe");
+        await paso("la ficha en el iframe", () =>
+          marco.locator("h1").first().waitFor({ timeout: 20000 }),
+        );
+        const nombre = pagina.locator("#field-nombre");
+        await nombre.click();
+        await nombre.press("End");
+        await nombre.pressSequentially(MARCA, { delay: 30 });
+        let vivo = "";
+        for (let i = 0; i < 20 && !vivo.includes(MARCA.trim()); i++) {
+          await pagina.waitForTimeout(500);
+          vivo = (await marco.locator("h1").first().textContent()) ?? "";
+        }
+        ok(
+          `al escribir sin guardar, el iframe lo muestra («${vivo.trim().slice(-40)}»)`,
+          vivo.includes(MARCA.trim()),
+        );
+        await pagina.screenshot({ path: path.join(salida, `vivo-panel-${ancho.nombre}.png`) });
+      }
+      hallazgos.push({ pantalla: "vivo", ancho: ancho.nombre, id, resultado, errores, fallidas });
+      // Sin guardar: se cierra el contexto y lo escrito se pierde.
+      await contexto.close();
+      continue;
+    }
+
     if (MODO === "borrador") {
       const id = process.argv[4];
       if (!/^\d+$/.test(id ?? "")) fallar("Uso: … borrador <id de la página>");

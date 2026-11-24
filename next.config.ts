@@ -197,6 +197,10 @@ const nextConfig: NextConfig = {
        *    (`vercel.live`) SOLO en los previews. Se admite solo ahí, para que
        *    la consola de un preview enseñe únicamente lo que también fallaría
        *    en el sitio publicado. Lista de la documentación de Vercel.
+       * 11. Panel, vista previa en vivo (tanda 21, tarea 3, fase 2, punto 5): el
+       *    formulario de «Equipos usados» pinta la ficha en un `iframe` del MISMO
+       *    origen (`/vista-previa/…`). Sin `'self'` en `frame-src`, la política
+       *    aplicada lo bloqueaba (lo vio el agente C en el preview del #579).
        */
       {
         key: "Content-Security-Policy-Report-Only",
@@ -207,7 +211,7 @@ const nextConfig: NextConfig = {
           `img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://*.google-analytics.com https://*.googletagmanager.com${enPreview ? " https://vercel.live https://vercel.com" : ""}`,
           `font-src 'self' data: https://*.public.blob.vercel-storage.com${enPreview ? " https://vercel.live https://assets.vercel.com" : ""}`,
           "media-src 'self' https://*.public.blob.vercel-storage.com",
-          `frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com${enPreview ? " https://vercel.live" : ""}`,
+          `frame-src 'self' https://challenges.cloudflare.com https://www.youtube-nocookie.com${enPreview ? " https://vercel.live" : ""}`,
           `connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com https://*.public.blob.vercel-storage.com https://vercel.com/api/blob/ https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com${enPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""}`,
           "worker-src 'self' blob:",
           "child-src blob:",

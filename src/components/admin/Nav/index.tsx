@@ -13,6 +13,8 @@ import {
 } from "@/lib/panel/menu";
 import { esAdministrador } from "@/lib/seguridad/acceso";
 
+import { IrAlCampo } from "@/components/admin/editar/IrAlCampo";
+
 import { MenuCliente, type EntradaMenu, type GrupoMenu } from "./MenuCliente";
 import { Salir } from "./Salir";
 
@@ -248,6 +250,8 @@ export default async function Nav(props: { req?: PayloadRequest } & ServerProps)
   return (
     <NavWrapper baseClass="nav">
       {renderizar(beforeNav)}
+      {/* Enlaces «Editar» de la web: abre la pestaña y lleva al campo (tanda 23). */}
+      <IrAlCampo />
       <nav className="nav__wrap">
         {renderizar(beforeNavLinks)}
         <MenuCliente grupos={grupos} />

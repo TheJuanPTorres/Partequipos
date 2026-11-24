@@ -38,7 +38,7 @@ export function estadoUsada(d: Pick<DatosUsada, "mostrarEnWeb" | "disponible">):
 const INSIGNIAS: Record<EstadoUsada, Insignia> = {
   publicada: { texto: "Publicada", tono: "exito" },
   oculta: { texto: "Oculta", tono: "aviso" },
-  vendida: { texto: "Vendida", tono: "neutro" },
+  vendida: { texto: "Vendida", tono: "vendida" },
 };
 
 export const insigniaUsada = (d: Pick<DatosUsada, "mostrarEnWeb" | "disponible">): Insignia =>

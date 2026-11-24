@@ -365,3 +365,97 @@ export function mensajesRecientes(
     };
   });
 }
+
+/*
+ * TABLERO (tanda 23, punto 3): las cifras de arriba de la portada. Cada tarjeta lleva su número y
+ * un enlace a lo que lo explica. Si el rol no puede leer el dato (`undefined`), la tarjeta no sale.
+ */
+export type ClaveCifra = "solicitudes" | "incompletas" | "fotos" | "busquedas";
+
+export type Cifra = {
+  clave: ClaveCifra;
+  etiqueta: string;
+  valor: number;
+  /** Una línea que explica el número. */
+  detalle: string;
+  href: string;
+  /** Con algo pendiente, «atencion»; a cero, «exito». */
+  tono: "atencion" | "exito";
+};
+
+export type DatosCifras = {
+  solicitudesNuevas?: number;
+  /** Fichas sin fotos O sin descripción, por colección (cada ficha cuenta una vez). */
+  incompletas?: Partial<Record<ConGaleria, number>>;
+  fotosPequenas?: number;
+  busquedasSinResultado?: number;
+};
+
+export function cifrasDePortada(d: DatosCifras): Cifra[] {
+  const cifras: Cifra[] = [];
+  const tono = (n: number): Cifra["tono"] => (n > 0 ? "atencion" : "exito");
+  if (d.solicitudesNuevas !== undefined) {
+    const n = d.solicitudesNuevas;
+    cifras.push({
+      clave: "solicitudes",
+      etiqueta: "Solicitudes nuevas",
+      valor: n,
+      detalle: n ? "sin atender" : "Todas atendidas",
+      href: rutaLista("solicitudes", FILTRO_SOLICITUDES_NUEVAS),
+      tono: tono(n),
+    });
+  }
+  if (d.incompletas) {
+    const entradas = Object.entries(d.incompletas).filter(([, n]) => n !== undefined) as [
+      ConGaleria,
+      number,
+    ][];
+    if (entradas.length) {
+      const n = entradas.reduce((s, [, v]) => s + v, 0);
+      // El enlace, a la lista con más fichas incompletas.
+      const peor = [...entradas].sort((a, b) => b[1] - a[1])[0]![0];
+      cifras.push({
+        clave: "incompletas",
+        etiqueta: "Fichas incompletas",
+        valor: n,
+        detalle: n ? "sin fotos o sin descripción" : "Todas completas",
+        href: rutaLista(peor),
+        tono: tono(n),
+      });
+    }
+  }
+  if (d.fotosPequenas !== undefined) {
+    const n = d.fotosPequenas;
+    cifras.push({
+      clave: "fotos",
+      etiqueta: "Fotos pequeñas",
+      valor: n,
+      detalle: n
+        ? `de menos de ${formatoMiles.format(ANCHO_MINIMO)} px en las fichas`
+        : "Ninguna en las fichas",
+      href: rutaLista("media", FILTRO_FOTOS_PEQUENAS),
+      tono: tono(n),
+    });
+  }
+  if (d.busquedasSinResultado !== undefined) {
+    const n = d.busquedasSinResultado;
+    cifras.push({
+      clave: "busquedas",
+      etiqueta: "Búsquedas sin resultado",
+      valor: n,
+      detalle: n ? "en el buscador de la web" : "Ninguna",
+      href: rutaLista("busquedas-sin-resultado"),
+      tono: tono(n),
+    });
+  }
+  return cifras;
+}
+
+/** «Lo último que editaste»: de los recientes de cada colección, solo los de quien mira, los `n` más nuevos. */
+export function editadosPorMi(listas: Reciente[][], n = 6): Reciente[] {
+  return listas
+    .flat()
+    .filter((r) => r.editor === "ti")
+    .sort((a, b) => b.actualizado.localeCompare(a.actualizado))
+    .slice(0, n);
+}

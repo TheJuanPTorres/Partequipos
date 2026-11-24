@@ -11,7 +11,10 @@ import {
   SOLO_ADMINISTRADOR,
   type GrupoDelMenu,
 } from "@/lib/panel/menu";
+import { COLECCIONES_BUSCABLES, type Comando } from "@/lib/panel/buscador";
 import { esAdministrador } from "@/lib/seguridad/acceso";
+
+import { IrAlCampo } from "@/components/admin/editar/IrAlCampo";
 
 import { MenuCliente, type EntradaMenu, type GrupoMenu } from "./MenuCliente";
 import { Salir } from "./Salir";
@@ -235,6 +238,31 @@ export default async function Nav(props: { req?: PayloadRequest } & ServerProps)
     })
     .filter((g) => g.entradas.length > 0);
 
+  /*
+   * BUSCADOR GLOBAL (Ctrl+K, tanda 23): «Crear …» en cada colección del menú en la que quien mira
+   * puede crear (su permiso de Payload), en el orden del menú; y las colecciones donde puede buscar
+   * fichas (las que ve). Nunca solicitudes ni usuarios.
+   */
+  const enMenu = grupos.flatMap((g) =>
+    g.entradas.flatMap((e) => (e.clave.startsWith("coleccion-") ? [e.clave.slice(10)] : [])),
+  );
+  const acciones: Comando[] = enMenu.flatMap((slug) => {
+    const coleccion = collections.find((c) => c.slug === slug);
+    if (!coleccion || slug === "solicitudes" || slug === "users") return [];
+    if (!permissions.collections?.[slug]?.create) return [];
+    const singular = coleccion.labels?.singular;
+    const nombre = typeof singular === "string" ? singular : slug;
+    return [
+      {
+        id: `crear-${slug}`,
+        tipo: "accion" as const,
+        etiqueta: `Crear ${nombre.charAt(0).toLowerCase()}${nombre.slice(1)}`,
+        href: ruta(`/collections/${slug}/create`),
+      },
+    ];
+  });
+  const buscables = COLECCIONES_BUSCABLES.filter((c) => enMenu.includes(c.slug)).map((c) => c.slug);
+
   const serverProps = { i18n, locale, params, payload, permissions, searchParams, user };
   const clientProps = { documentSubViewType, viewType };
   const renderizar = (Component: unknown) =>
@@ -248,9 +276,17 @@ export default async function Nav(props: { req?: PayloadRequest } & ServerProps)
   return (
     <NavWrapper baseClass="nav">
       {renderizar(beforeNav)}
+      {/* Enlaces «Editar» de la web: abre la pestaña y lleva al campo (tanda 23). */}
+      <IrAlCampo />
       <nav className="nav__wrap">
         {renderizar(beforeNavLinks)}
-        <MenuCliente grupos={grupos} />
+        <MenuCliente
+          acciones={acciones}
+          admin={adminRoute}
+          api={payload.config.routes.api}
+          buscables={buscables}
+          grupos={grupos}
+        />
         {renderizar(afterNavLinks)}
         <div className="nav__controls">
           <Salir />

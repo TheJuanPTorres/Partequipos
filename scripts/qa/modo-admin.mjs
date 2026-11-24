@@ -56,7 +56,9 @@ const PROHIBIDO_EN_HTML = [
   /\/vista-previa\//,
 ];
 /** Lo que delata al MÓDULO dentro de un script (no al cargador). */
-const MODULO = [/Est[aá]s viendo la web como/i, /pqma-franja/, /api\/modo-admin\/mapa/];
+// Solo ASCII (el minificador puede escapar las tildes). `modoAdmin.test.ts` exige que el módulo
+// los contenga, para que esta comprobación no pase en vacío si se renombra algo.
+const MODULO = [/pqma-franja/, /api\/modo-admin\/mapa/, /pqma-editar/];
 
 const decir = (texto) =>
   process.stdout.write(`${texto}

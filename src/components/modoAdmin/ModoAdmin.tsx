@@ -43,6 +43,7 @@ export function ModoAdmin() {
   const [sesion, setSesion] = useState<"comprobando" | "si" | "no">("comprobando");
   const [mapa, setMapa] = useState<Mapa | null>(null);
   const [marcas, setMarcas] = useState(true);
+  const [confirmado, setConfirmado] = useState(false);
 
   // 1. La sesión, con el servidor. La pista sola no vale.
   useEffect(() => {
@@ -77,7 +78,13 @@ export function ModoAdmin() {
           setSesion("no");
           return;
         }
-        setMapa(r.ok ? ((await r.json()) as Mapa) : null);
+        if (!r.ok) {
+          setMapa(null);
+          return;
+        }
+        setMapa((await r.json()) as Mapa);
+        // El mapa solo responde bien a personal del panel: hasta entonces no se pinta nada.
+        setConfirmado(true);
       })
       .catch(() => vivo && setMapa(null));
     return () => {
@@ -131,7 +138,7 @@ export function ModoAdmin() {
       });
   }, []);
 
-  if (sesion !== "si") return null;
+  if (sesion !== "si" || !confirmado) return null;
 
   return createPortal(
     <>

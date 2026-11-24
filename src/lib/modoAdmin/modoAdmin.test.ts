@@ -219,6 +219,8 @@ describe("modo administración: la respuesta del endpoint", () => {
       { collections: { paginas: { update: false } } },
       { collections: { paginas: { update: { permission: false } } } },
       { collections: { paginas: { update: { where: {} } } } },
+      // La forma real de un permiso con filtro en Payload 3.89.
+      { collections: { paginas: { update: { permission: true, where: { id: { equals: 1 } } } } } },
       { collections: { paginas: { update: "true" } } },
       { globals: { paginas: { update: true } } },
     ]) {
@@ -285,6 +287,39 @@ describe("modo administración: nada llega a un visitante", () => {
     const layout = leer("src/app/(site)/layout.tsx");
     assert.match(layout, /<CargadorModoAdmin \/>/);
     assert.equal([...layout.matchAll(/modoAdmin/g)].length, 1);
+  });
+
+  it("el QA anónimo reconoce el módulo de verdad (no pasa en vacío si se renombra algo)", () => {
+    const qa = leer("scripts/qa/modo-admin.mjs");
+    // Las tres marcas por las que el QA reconoce el módulo dentro de un script.
+    const marcas = ["pqma-franja", "api/modo-admin/mapa", "pqma-editar"];
+    const lista = qa.slice(
+      qa.indexOf("const MODULO = ["),
+      qa.indexOf("];", qa.indexOf("const MODULO = [")),
+    );
+    const modulo = ["ModoAdmin.tsx", "MarcasEdicion.tsx", "estilos.ts"]
+      .map((f) => leer(`src/components/modoAdmin/${f}`))
+      .join(" ");
+    // El cargador sí llega a todos: sin sus comentarios, no puede llevar ninguna.
+    const cargador = leer("src/components/modoAdmin/CargadorModoAdmin.tsx")
+      .split("\n")
+      .filter((linea) => !/^\s*(\/\*|\*|\/\/)/.test(linea))
+      .join(" ");
+    assert.equal(
+      lista.split("/,").length,
+      marcas.length,
+      "el QA y esta prueba no llevan las mismas marcas",
+    );
+    for (const marca of marcas) {
+      assert.ok(lista.includes(marca.replaceAll("/", "\\/")), `el QA ya no busca «${marca}»`);
+      assert.ok(modulo.includes(marca), `el módulo ya no contiene «${marca}»`);
+      assert.ok(!cargador.includes(marca), `el cargador lleva «${marca}»`);
+    }
+  });
+
+  it("la franja no se pinta hasta que el mapa (que exige rol de personal) responde bien", () => {
+    const modulo = leer("src/components/modoAdmin/ModoAdmin.tsx");
+    assert.match(modulo, /if \(sesion !== "si" \|\| !confirmado\) return null;/);
   });
 
   it("la ruta del mapa no se cachea y consulta con el acceso del usuario", () => {

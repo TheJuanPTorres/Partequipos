@@ -149,10 +149,13 @@ export function puedeEditar(permisos: Permisos | null | undefined, destino: Dest
   const recurso = grupo?.[slug] as { update?: unknown } | undefined;
   const update = recurso?.update;
   if (update === true) return true;
+  // Con filtro, Payload 3.89 da `{ permission: true, where }` (`sanitizePermissions`): puede editar
+  // ALGUNOS documentos, no se sabe si este. Cuenta como NO (verificador, 2026-11-24).
   return (
     typeof update === "object" &&
     update !== null &&
-    (update as { permission?: unknown }).permission === true
+    (update as { permission?: unknown }).permission === true &&
+    !("where" in update)
   );
 }
 

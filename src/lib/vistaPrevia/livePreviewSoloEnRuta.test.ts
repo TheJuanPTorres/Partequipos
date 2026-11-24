@@ -5,7 +5,12 @@ import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { RUTAS_FUERA_DEL_SITEMAP } from "../seo/sitemap";
-import { CARPETA_VISTA_PREVIA, rutaVistaPreviaUsada } from "./enVivo";
+import {
+  CARPETA_VISTA_PREVIA,
+  COLECCIONES_VISTA_PREVIA,
+  rutaVistaPrevia,
+  rutaVistaPreviaUsada,
+} from "./enVivo";
 
 /*
  * GUARDARRAÍL (tanda 21, tarea 3, fase 2, punto 5; condición de dirección al aprobar la
@@ -82,19 +87,48 @@ describe("vista previa en vivo: el paquete solo en su ruta", () => {
     assert.deepEqual(importacionesFuera(buenos), [`${CARPETA_VISTA_PREVIA}-otra/x.tsx`]);
   });
 
-  it("la ruta queda fuera del sitemap y su página es noindex y solo con sesión", () => {
-    assert.ok("/vista-previa/equipos-usados/[id]" in RUTAS_FUERA_DEL_SITEMAP);
-    const pagina = fs.readFileSync(
-      path.join(RAIZ, CARPETA_VISTA_PREVIA, "equipos-usados/[id]/page.tsx"),
-      "utf8",
-    );
-    assert.match(pagina, /robots:\s*\{\s*index:\s*false,\s*follow:\s*false\s*\}/);
-    assert.match(pagina, /if \(!esPersonal\(user\)\) notFound\(\);/);
+  const leer = (rel: string) => fs.readFileSync(path.join(RAIZ, CARPETA_VISTA_PREVIA, rel), "utf8");
+  const NOINDEX = /robots:\s*\{\s*index:\s*false,\s*follow:\s*false\s*\}/;
+
+  it("cada colección tiene su página, fuera del sitemap, noindex y solo con sesión", () => {
+    const comun = leer("paginaServidor.tsx");
+    for (const coleccion of COLECCIONES_VISTA_PREVIA) {
+      assert.ok(`/vista-previa/${coleccion}/[id]` in RUTAS_FUERA_DEL_SITEMAP, coleccion);
+      const pagina = leer(`${coleccion}/[id]/page.tsx`);
+      assert.match(pagina, /export const dynamic = "force-dynamic";/, coleccion);
+      if (coleccion === "equipos-usados") {
+        assert.match(pagina, NOINDEX);
+        assert.match(pagina, /if \(!esPersonal\(user\)\) notFound\(\);/);
+      } else {
+        // Las pintadas en el servidor lo hacen en `PaginaVistaPreviaServidor`.
+        assert.match(pagina, /metadata = METADATA_VISTA_PREVIA;/, coleccion);
+        assert.match(pagina, new RegExp(`coleccion="${coleccion}"`), coleccion);
+      }
+    }
+    assert.match(comun, NOINDEX);
+    assert.match(comun, /if \(!\(await sesionDelPersonal\(\)\)\) notFound\(\);/);
+  });
+
+  it("la función de servidor comprueba la sesión ANTES de leer nada", () => {
+    const accion = leer("acciones.ts");
+    const sesion = accion.indexOf("if (!(await sesionDelPersonal())) return null;");
+    assert.ok(sesion > 0, "sin comprobación de sesión");
+    assert.ok(sesion < accion.indexOf("await documentoGuardado("), "lee antes de comprobar");
+  });
+
+  it("no hay una página de vista previa de más, sin colección declarada", () => {
+    const carpetas = fs
+      .readdirSync(path.join(RAIZ, CARPETA_VISTA_PREVIA), { withFileTypes: true })
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
+    assert.deepEqual(carpetas, [...COLECCIONES_VISTA_PREVIA].sort());
   });
 
   it("la dirección de la vista previa, solo con un id entero positivo", () => {
     assert.equal(rutaVistaPreviaUsada(27), "/vista-previa/equipos-usados/27/");
     assert.equal(rutaVistaPreviaUsada("27"), "/vista-previa/equipos-usados/27/");
+    assert.equal(rutaVistaPrevia("modelos-repuesto", 5), "/vista-previa/modelos-repuesto/5/");
     for (const malo of [undefined, null, 0, -1, 1.5, "x", ""])
       assert.equal(rutaVistaPreviaUsada(malo), null, String(malo));
   });

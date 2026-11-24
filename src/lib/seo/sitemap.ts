@@ -143,6 +143,8 @@ export const RUTAS_FUERA_DEL_SITEMAP = {
    * personal (sin ella, 404) y `noindex, nofollow`. No es una página del sitio.
    */
   "/vista-previa/equipos-usados/[id]": "vista previa del panel: solo con sesión, noindex",
+  "/vista-previa/equipos-nuevos/[id]": "vista previa del panel: solo con sesión, noindex",
+  "/vista-previa/modelos-repuesto/[id]": "vista previa del panel: solo con sesión, noindex",
 } as const;
 
 /** Slug reservado de la portada dentro de la colección de páginas. */

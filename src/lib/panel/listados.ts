@@ -112,9 +112,21 @@ function conMiniatura(campos: Field[], columnas: Set<string>): Field[] {
   });
 }
 
-/** Componentes encima de la tabla: el filtro rápido de las imágenes pequeñas. */
-const ENCIMA_DE_LA_TABLA: Record<string, string> = {
+/** Los botones de «cambios en bloque» (tanda 21, `accionesEnBloque.ts`), con su colección. */
+const enBloque = (coleccion: string) => ({
+  path: "/components/admin/listados/AccionesEnBloque",
+  clientProps: { coleccion },
+});
+
+/**
+ * Componentes encima de la tabla: el filtro rápido de las imágenes pequeñas y los cambios en
+ * bloque (mostrar/ocultar y, en usadas, vendida) de los productos.
+ */
+const ENCIMA_DE_LA_TABLA: Record<string, string | ReturnType<typeof enBloque>> = {
   media: "/components/admin/listados/FiltroFotosPequenas",
+  "equipos-nuevos": enBloque("equipos-nuevos"),
+  "equipos-usados": enBloque("equipos-usados"),
+  "modelos-repuesto": enBloque("modelos-repuesto"),
 };
 
 export function conListados(colecciones: CollectionConfig[]): CollectionConfig[] {

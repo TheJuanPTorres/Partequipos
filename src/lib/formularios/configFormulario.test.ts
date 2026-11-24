@@ -15,6 +15,15 @@ describe("configContactoMarca", () => {
     assert.equal(c.textoBoton, "Enviar solicitud");
   });
 
+  it("un nombre que ya empieza por «repuestos» no repite la palabra (punto 18)", () => {
+    const c = configContactoMarca({ ...base, marca: "repuestos por categoría" });
+    assert.equal(c.titulo, "Contacto sobre repuestos por categoría");
+    assert.equal(
+      configContactoMarca({ ...base, marca: "Repuestos por marca" }).titulo,
+      "Contacto sobre Repuestos por marca",
+    );
+  });
+
   it("modelo: solicitud de repuesto con el modelo, ciudad y sin clasificación", () => {
     const c = configContactoMarca({ ...base, modelo: { id: 7, nombre: "SK200" } });
     assert.equal(c.tipo, "repuesto");

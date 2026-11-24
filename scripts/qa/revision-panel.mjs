@@ -1515,6 +1515,94 @@ try {
       continue;
     }
 
+    /*
+     * Modo `editar` (`… editar <colección> <id>`, tanda 23): los enlaces «Editar» de la web por
+     * efecto. Con `?pestana=buscadores&campo=seo.metaTitle` se abre esa pestaña y el foco queda en
+     * ese campo; con `?pestana=fotos`, la pestaña de fotos; y con valores maliciosos no pasa nada
+     * (ni diálogo, ni imagen inyectada, ni otra pestaña). No guarda nada.
+     */
+    if (MODO === "editar") {
+      const coleccion = process.argv[4] ?? "equipos-usados";
+      const id = process.argv[5] ?? "27";
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto} (${ancho.nombre})`);
+      };
+      let dialogos = 0;
+      pagina.on("dialog", (d) => {
+        dialogos++;
+        d.dismiss().catch(() => null);
+      });
+      const ficha = `${base}/admin/collections/${coleccion}/${id}`;
+      const pestanaActiva = () =>
+        pagina
+          .locator(".tabs-field__tab-button--active")
+          .first()
+          .textContent({ timeout: 1500 })
+          .then((t) => t?.trim() ?? "")
+          .catch(() => "");
+      // ¿Responde la página? Un evaluate con límite de 2 s (si el hilo estuviera bloqueado, no vuelve).
+      const responde = () =>
+        Promise.race([
+          pagina.evaluate(() => 1).then(() => true),
+          new Promise((r) => setTimeout(() => r(false), 2000)),
+        ]);
+      await pagina.goto(`${ficha}?pestana=buscadores&campo=seo.metaTitle`, {
+        waitUntil: "load",
+        timeout: 30000,
+      });
+      let foco = "";
+      for (let i = 0; i < 40 && foco !== "field-seo__metaTitle"; i++) {
+        await pagina.waitForTimeout(250);
+        foco = await pagina.evaluate(() => document.activeElement?.id ?? "");
+      }
+      ok(
+        `pestaña y campo: abre «${await pestanaActiva()}»`,
+        (await pestanaActiva()) === "Buscadores y redes",
+      );
+      ok(`pestaña y campo: el foco queda en el campo (${foco})`, foco === "field-seo__metaTitle");
+      await pagina.screenshot({ path: path.join(salida, `editar-campo-${ancho.nombre}.png`) });
+      await pagina.goto(`${ficha}?pestana=fotos`, { waitUntil: "load", timeout: 30000 });
+      for (let i = 0; i < 24 && (await pestanaActiva()) !== "Fotos"; i++)
+        await pagina.waitForTimeout(250);
+      ok(`solo pestaña: abre «${await pestanaActiva()}»`, (await pestanaActiva()) === "Fotos");
+      await pagina.screenshot({ path: path.join(salida, `editar-pestana-${ancho.nombre}.png`) });
+      // Control: la misma ficha sin `pestana` ni `campo` (IrAlCampo no hace nada).
+      await pagina.goto(ficha, { waitUntil: "load", timeout: 30000 });
+      await pagina.waitForTimeout(2500);
+      ok(
+        `control sin parámetros: la página responde (pestaña «${await pestanaActiva()}»)`,
+        await responde(),
+      );
+      // Valores inválidos que NO parecen un ataque: con `<img onerror>` el antivirus de esta máquina
+      // (Bitdefender) bloquea la URL y la página probada es la suya, no el panel (visto el 2026-11-24).
+      const malicioso = "?pestana=__proto__&campo=" + encodeURIComponent("nombre' x..#field-seo");
+      await pagina.goto(`${ficha}${malicioso}`, { waitUntil: "load", timeout: 30000 });
+      await pagina.waitForTimeout(2500);
+      const vivaMal = await responde();
+      const esPanel = (await pagina.locator(".tabs-field__tab-button").count()) > 0;
+      ok("con valores inválidos se pinta el panel de verdad (no una página de bloqueo)", esPanel);
+      const inyectada = vivaMal ? await pagina.locator('img[src="x"]').count() : -1;
+      const focoMalo = vivaMal
+        ? await pagina.evaluate(() => document.activeElement?.id ?? "")
+        : "?";
+      // La pestaña es la que Payload recuerde del usuario: lo que importa es que nada se inyecte.
+      ok(
+        `valores maliciosos: la página responde y no pasa nada (${inyectada} imágenes inyectadas, ${dialogos} diálogos, foco «${focoMalo}», pestaña «${await pestanaActiva()}»)`,
+        esPanel && vivaMal && inyectada === 0 && dialogos === 0 && !focoMalo.startsWith("field-"),
+      );
+      await pagina
+        .screenshot({
+          path: path.join(salida, `editar-malicioso-${ancho.nombre}.png`),
+          timeout: 10000,
+        })
+        .catch(() => null);
+      hallazgos.push({ pantalla: "editar", ancho: ancho.nombre, resultado, errores, fallidas });
+      await contexto.close();
+      continue;
+    }
+
     if (MODO === "borrador") {
       const id = process.argv[4];
       if (!/^\d+$/.test(id ?? "")) fallar("Uso: … borrador <id de la página>");

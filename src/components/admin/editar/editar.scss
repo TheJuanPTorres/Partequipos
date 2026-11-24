@@ -1,0 +1,13 @@
+// Modo administración sobre la web (tanda 23, agente C): el resalte breve del campo al que lleva
+// un enlace «Editar». Solo tokens del panel (`--pq-…`, de A). Sin animación con «reducir movimiento».
+
+.pq-campo-destacado {
+  border-radius: var(--pq-radius-lg);
+  outline: 3px solid var(--pq-primary);
+  outline-offset: 6px;
+  transition: outline-color 600ms ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}

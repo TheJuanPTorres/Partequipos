@@ -10,6 +10,7 @@ import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/segur
 import { avisoField } from "../lib/fields/avisoField";
 import { validarSerieDelModelo } from "../lib/repuestos/series";
 import { conPestanas } from "../lib/fields/pestanasFicha";
+import { conCopia } from "../lib/fields/duplicar";
 
 /**
  * Modelo concreto dentro de un tipo de equipo (ej. "CAT 320D" en Excavadora).
@@ -52,6 +53,8 @@ export const ModeloRepuesto: CollectionConfig = {
         type: "text",
         required: true,
         label: "Nombre",
+        // Al duplicar, «(copia)» (tanda 21, `duplicar.ts`).
+        hooks: { beforeDuplicate: [conCopia] },
       },
       mostrarEnWebField({
         descripcion:

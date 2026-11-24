@@ -12,6 +12,7 @@ import { revalidarEquipoNuevo, revalidarEquipoNuevoBorrado } from "./hooks/maqui
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { avisoField } from "../lib/fields/avisoField";
 import { ordenListaSinUso } from "../lib/fields/ordenListaSinUso";
+import { conCopia } from "../lib/fields/duplicar";
 
 /**
  * Ficha de un equipo de la línea NUEVA. Es una página de **venta**, no una
@@ -58,7 +59,14 @@ export const EquipoNuevo: CollectionConfig = {
         avisoField("avisoNombreDePrueba", "AvisoNombreDePrueba"),
         // Marca con enlace externo: sus equipos no se publican (#475).
         avisoField("avisoMarcaEnlaceExterno", "AvisoMarcaEnlaceExterno"),
-        { name: "nombre", type: "text", required: true, label: "Nombre" },
+        // Al duplicar, «(copia)» (tanda 21, `duplicar.ts`).
+        {
+          name: "nombre",
+          type: "text",
+          required: true,
+          label: "Nombre",
+          hooks: { beforeDuplicate: [conCopia] },
+        },
         mostrarEnWebField({
           descripcion:
             "Desmarcada, el equipo desaparece de toda la web (listados, «Otras referencias», menú, buscador, portada y sitemap) sin borrarse del panel, y su ficha lleva a la página de su tipo. Vuelve al marcarla.",

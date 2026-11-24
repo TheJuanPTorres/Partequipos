@@ -1432,11 +1432,14 @@ try {
         `control sin parámetros: la página responde (pestaña «${await pestanaActiva()}»)`,
         await responde(),
       );
-      const malicioso =
-        "?pestana=__proto__&campo=" + encodeURIComponent('"><img src=x onerror=alert(1)>');
+      // Valores inválidos que NO parecen un ataque: con `<img onerror>` el antivirus de esta máquina
+      // (Bitdefender) bloquea la URL y la página probada es la suya, no el panel (visto el 2026-11-24).
+      const malicioso = "?pestana=__proto__&campo=" + encodeURIComponent("nombre' x..#field-seo");
       await pagina.goto(`${ficha}${malicioso}`, { waitUntil: "load", timeout: 30000 });
       await pagina.waitForTimeout(2500);
       const vivaMal = await responde();
+      const esPanel = (await pagina.locator(".tabs-field__tab-button").count()) > 0;
+      ok("con valores inválidos se pinta el panel de verdad (no una página de bloqueo)", esPanel);
       const inyectada = vivaMal ? await pagina.locator('img[src="x"]').count() : -1;
       const focoMalo = vivaMal
         ? await pagina.evaluate(() => document.activeElement?.id ?? "")
@@ -1444,7 +1447,7 @@ try {
       // La pestaña es la que Payload recuerde del usuario: lo que importa es que nada se inyecte.
       ok(
         `valores maliciosos: la página responde y no pasa nada (${inyectada} imágenes inyectadas, ${dialogos} diálogos, foco «${focoMalo}», pestaña «${await pestanaActiva()}»)`,
-        vivaMal && inyectada === 0 && dialogos === 0 && !focoMalo.startsWith("field-"),
+        esPanel && vivaMal && inyectada === 0 && dialogos === 0 && !focoMalo.startsWith("field-"),
       );
       await pagina
         .screenshot({

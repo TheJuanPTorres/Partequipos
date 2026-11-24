@@ -104,7 +104,11 @@ export default async function MarcaPage({ params }: { params: Promise<Params> })
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <HeroMarca vista={vistaEncabezado(marca, global)} anclaSiguiente={ANCLA_TIPOS} />
+      <HeroMarca
+        vista={vistaEncabezado(marca, global)}
+        anclaSiguiente={ANCLA_TIPOS}
+        etiquetaRaton="Ir a los tipos de equipo"
+      />
 
       <TiposTexto
         id={ANCLA_TIPOS}

@@ -4,7 +4,7 @@ import { useDocumentInfo, useFormFields, useLivePreviewContext } from "@payloadc
 import { useEffect, useState } from "react";
 
 import { InsigniaEstado } from "@/components/admin/celdas/InsigniaEstado";
-import { FICHAS, completitud, type DatosFicha } from "@/lib/panel/fichaProducto";
+import { completitud, configFicha, type DatosFicha } from "@/lib/panel/fichaProducto";
 import { primeraImagen, urlMiniatura } from "@/lib/panel/miniatura";
 
 const FECHA = new Intl.DateTimeFormat("es-CO", { dateStyle: "medium", timeStyle: "short" });
@@ -33,7 +33,7 @@ async function leer<T>(ruta: string, señal: AbortSignal): Promise<T | null> {
  */
 export default function ResumenWeb() {
   const { id, savedDocumentData, collectionSlug } = useDocumentInfo();
-  const ficha = FICHAS[collectionSlug ?? ""];
+  const ficha = configFicha(collectionSlug);
   const { previewURL } = useLivePreviewContext();
   const campos = ficha?.campos ?? [];
   const valores = useFormFields(([estado]) =>

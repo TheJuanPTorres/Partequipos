@@ -91,6 +91,11 @@ const RITMO = { ritmo: "titulo", disparo: 0.95 } as const;
 const posterOptimizado = (url: string | undefined) =>
   url ? `/_next/image?url=${encodeURIComponent(url)}&w=1080&q=75` : undefined;
 
+/** El ancla de antes (p. ej. «#Siniestros»), para que los enlaces viejos sigan llegando. */
+function Alias({ alias }: { alias?: string }) {
+  return alias ? <span id={alias} aria-hidden="true" /> : null;
+}
+
 function Antetitulo({ ancla }: { ancla: string }) {
   const s = SECCIONES[ancla.toLowerCase()];
   return s ? (
@@ -242,6 +247,7 @@ export function PlantillaServicioTecnico({
           className={estilos.seccion}
           aria-labelledby={`${taller.ancla}-antetitulo`}
         >
+          <Alias alias={taller.alias} />
           <Antetitulo ancla={taller.ancla} />
           <div className={estilos.fila}>
             <div className={`${estilos.medioCaja} ${estilos.fotoTaller}`}>
@@ -296,6 +302,7 @@ export function PlantillaServicioTecnico({
               className={`${estilos.columnaMedio} ${estilos.columnaSeccion}`}
               aria-labelledby={`${alistamiento.ancla}-antetitulo`}
             >
+              <Alias alias={alistamiento.alias} />
               <TituloServicio ancla={alistamiento.ancla} />
               <CarruselVideos etiqueta="Vídeos del alistamiento de maquinaria">
                 {alistamiento.etapas ? (
@@ -354,6 +361,7 @@ export function PlantillaServicioTecnico({
                 className={`${estilos.columnaSeccion} ${estilos.columnaPosventa}`}
                 aria-labelledby={`${posventa.ancla}-antetitulo`}
               >
+                <Alias alias={posventa.alias} />
                 <TituloServicio ancla={posventa.ancla} texto={posventa.antetitulo} />
                 {/*
                  * La tarjeta reparte su alto (Juan Pablo, 2026-10-27): el texto, los cuatro
@@ -450,6 +458,7 @@ export function PlantillaServicioTecnico({
           className={estilos.seccion}
           aria-labelledby={`${siniestros.ancla}-antetitulo`}
         >
+          <Alias alias={siniestros.alias} />
           <Antetitulo ancla={siniestros.ancla} />
           <div className={estilos.fila}>
             {siniestros.galeria.length ? (

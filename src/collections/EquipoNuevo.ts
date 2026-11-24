@@ -26,11 +26,13 @@ export const EquipoNuevo: CollectionConfig = {
     useAsTitle: "nombre",
     group: "Maquinaria",
     description:
-      "Este orden es el del listado de maquinaria nueva de la web (el índice y las categorías, con «Recomendados»). Arrastra las filas para cambiarlo; uno nuevo entra al final. El de dentro de cada tipo se cambia en la ficha del tipo.",
+      "El orden en que salen los equipos en la web se cambia en la ficha de su TIPO («Equipos del tipo»), y el de las marcas en «Marcas de maquinaria nueva». El orden de esta lista hoy solo se usa en las sugerencias de maquinaria nueva de una categoría de usados sin unidades.",
   },
   /*
-   * DOS ÓRDENES (2026-11-23, tanda 21, PR-2): este `_order` es el del LISTADO, que mezcla marcas y
-   * tipos (`ORDEN_LISTADO`); el join «Equipos del tipo» guarda el de dentro de cada tipo.
+   * DOS ÓRDENES (2026-11-23, tanda 21, PR-2): este `_order` es el de la LISTA de la colección
+   * (`ORDEN_LISTADO`); el join «Equipos del tipo» guarda el que se ve en la web. CORREGIDO el mismo
+   * día (QA del orden): desde el #326 no hay listado de nueva con «Ordenar», así que esta lista solo
+   * ordena las sugerencias de una categoría de usados vacía. Quitarla (migración) es de Juan Pablo.
    */
   orderable: true,
   access: {
@@ -52,6 +54,8 @@ export const EquipoNuevo: CollectionConfig = {
     [
       // Aviso en vivo si la galería está vacía (F4).
       avisoField("avisoSinFotos", "AvisoSinFotos"),
+      // El nombre empieza por «test» o «prueba»: avisa, no bloquea (tanda 21, tarea 8).
+      avisoField("avisoNombreDePrueba", "AvisoNombreDePrueba"),
       // Marca con enlace externo: sus equipos no se publican (#475).
       avisoField("avisoMarcaEnlaceExterno", "AvisoMarcaEnlaceExterno"),
       { name: "nombre", type: "text", required: true, label: "Nombre" },

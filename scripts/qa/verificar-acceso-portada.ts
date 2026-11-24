@@ -19,8 +19,12 @@
  */
 import { getPayload, type Payload } from "payload";
 
+import { exigirBaseDePrueba } from "../../src/lib/db/basePrueba";
+
 import { HOST_PRODUCCION } from "../../src/lib/portada/heroPrueba";
 
+// Solo contra una base de prueba (development, el preview o local): se niega antes de conectar.
+exigirBaseDePrueba("acceso-portada");
 process.env.PAYLOAD_DISABLE_PUSH = "true";
 // El endpoint sin «-pooler»: vale para la cadena directa y para la pooled.
 const ENDPOINT_PRODUCCION = HOST_PRODUCCION.split(".")[0]!.replace(/-pooler$/, "");

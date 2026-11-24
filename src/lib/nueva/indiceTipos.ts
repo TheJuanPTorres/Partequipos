@@ -47,6 +47,7 @@ function primeraFoto(
   equipos: EquipoNuevoListado[],
   filtro: (e: EquipoNuevoListado) => boolean,
 ): ImagenLista | null {
+  // orden-libre: solo elige qué foto se pinta, no ordena tarjetas.
   const ordenados = equipos.filter(filtro).sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
   for (const e of ordenados) {
     const foto = imagen(e.foto);

@@ -35,6 +35,17 @@ type Entrada = {
   producto?: string;
 };
 
+/**
+ * «Contacto sobre repuestos Hitachi»: la palabra «repuestos» solo se antepone si el nombre no la
+ * trae ya («repuestos por categoría» daba «repuestos repuestos por categoría»).
+ */
+export function tituloContactoRepuestos(nombre: string): string {
+  const limpio = nombre.trim();
+  return /\brepuestos\b/i.test(limpio)
+    ? `Contacto sobre ${limpio}`
+    : `Contacto sobre repuestos ${limpio}`;
+}
+
 /** Las propiedades del formulario de `ContactoMarca`, compartidas con su ventana emergente. */
 export function configContactoMarca(e: Entrada): ConfigFormulario {
   const { modelo, formulario, equipo, producto } = e;
@@ -74,7 +85,7 @@ export function configContactoMarca(e: Entrada): ConfigFormulario {
     referencia: modelo
       ? { tipo: "modelos-repuesto", id: modelo.id, texto: modelo.nombre }
       : undefined,
-    titulo: formulario?.titulo ?? `Contacto sobre repuestos ${e.marca}`,
+    titulo: formulario?.titulo ?? tituloContactoRepuestos(e.marca),
     textoBoton: e.boton || "Enviar",
     clasificacion: !modelo && !formulario,
     conCiudad: formulario ? Boolean(formulario.conCiudad) : Boolean(modelo),

@@ -133,8 +133,17 @@ export const descripcionPorDefecto = {
 export const MAX_DESCRIPCION = 160;
 
 /** Recorta una descripción a una longitud sensata para un meta tag. */
+/**
+ * Las frases pegadas por haber unido párrafos sin espacio («fallar.Primero»): un espacio entre
+ * el punto (o «!», «?») y la mayúscula, SOLO si antes del punto hay una minúscula, para no tocar
+ * siglas ni dominios («S.A.S.», «A.C.», «partequipos.com»). Informe de QA del 2026-11-17, punto 27.
+ */
+export function separarFrasesPegadas(texto: string): string {
+  return texto.replace(/(\p{Ll})([.!?])(\p{Lu}|[¿¡])/gu, "$1$2 $3");
+}
+
 export function recortarDescripcion(texto: string, max = MAX_DESCRIPCION): string {
-  const limpio = texto.replace(/\s+/g, " ").trim();
+  const limpio = separarFrasesPegadas(texto).replace(/\s+/g, " ").trim();
   if (limpio.length <= max) return limpio;
   return `${limpio.slice(0, max - 1).trimEnd()}…`;
 }

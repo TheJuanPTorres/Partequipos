@@ -1,6 +1,9 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
+
+import { hrefConContexto } from "@/lib/whatsapp";
 
 import estilos from "./whatsappFlotante.module.css";
 
@@ -28,6 +31,18 @@ const AIRE = 8;
 
 export function WhatsAppFlotante({ href }: { href: string }) {
   const enlace = useRef<HTMLAnchorElement>(null);
+  const ruta = usePathname();
+
+  // Las fichas ponen su nombre en `data-whatsapp-contexto` (`ContextoWhatsApp`): el mensaje lo
+  // nombra. Se lee tras cada cambio de página; sin marca, el enlace es el de siempre.
+  useEffect(() => {
+    const a = enlace.current;
+    if (!a) return;
+    const contexto = document
+      .querySelector<HTMLElement>("[data-whatsapp-contexto]")
+      ?.getAttribute("data-whatsapp-contexto");
+    a.href = hrefConContexto(href, contexto);
+  }, [href, ruta]);
 
   useEffect(() => {
     const a = enlace.current;

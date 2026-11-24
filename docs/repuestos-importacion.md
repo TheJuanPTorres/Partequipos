@@ -400,7 +400,7 @@ tipo repiten las de la marca), comparadas **por código** con las páginas de mo
 | Yanmar · miniexcavadora       | Miniexcavadora YANMAR VIO 70-3   | Texto, sin enlace                                              |
 | Hitachi · miniexcavadora (EX) | Miniexcavadora Hitachi EX450LC-5 | Con su texto, **enlazando a la excavadora ZX450LC-5** (errata) |
 
-Con otras entradas, la lista del tipo se ordena por texto (con los números en su orden); sin ellas, como siempre. Datos:
+Las otras entradas van al final de la lista del tipo (o de su serie), en el orden de sus filas en el panel (Juan Pablo, 2026-11-23; antes cada una caía en su sitio por texto); los modelos, en su orden del panel. Datos:
 `scripts/repuestos/entradas-wp.ts` (`npm run preview:repuestos:entradas:simular|aplicar|retirar`, plan en
 `src/lib/repuestos/entradasWp.ts`); la de Hitachi necesita antes las series (§8). Conserva las entradas de un editor.
 Sitio publicado: `Desktop/partequipos-cierre/runbook-repuestos-listas-wp.md` (sustituye a `runbook-series-hitachi.md`).

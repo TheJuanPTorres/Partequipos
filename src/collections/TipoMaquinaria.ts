@@ -7,6 +7,7 @@ import { slugField } from "../lib/fields/slugField";
 import { revalidarTipoMaquinaria, revalidarTipoMaquinariaBorrado } from "./hooks/maquinariaHooks";
 import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
 import { revalidarMegamenu } from "./hooks/megamenuHooks";
+import { ordenListaSinUso } from "../lib/fields/ordenListaSinUso";
 
 const menu = revalidarMegamenu("tipos-maquinaria");
 
@@ -21,13 +22,13 @@ export const TipoMaquinaria: CollectionConfig = {
     useAsTitle: "nombre",
     group: "Maquinaria",
     description:
-      "Este orden es el de las pestañas de tipo del listado de maquinaria nueva y de «Por tipo de máquina». Arrastra las filas para cambiarlo; uno nuevo entra al final. El de dentro de cada marca se cambia en la ficha de la marca.",
+      "El orden en que salen los tipos de una marca se cambia en la ficha de la MARCA («Tipos de máquina de la marca»).",
   },
   /*
-   * DOS ÓRDENES (2026-11-23, tanda 21, PR-2): este `_order` es el de los LISTADOS que mezclan marcas
-   * (`ORDEN_LISTADO`); el join «Tipos de máquina de la marca» guarda el de dentro de cada marca.
+   * SIN `orderable` desde el 2026-11-23 (Juan Pablo, tanda 21): el arrastre de esta lista no movía
+   * nada de la web (el orden que se ve es el de la ficha de la marca y del tipo). Su columna sigue,
+   * oculta (`ordenListaSinUso`), hasta el PR 11.
    */
-  orderable: true,
   access: {
     read: lecturaContenido,
     create: escrituraContenido,
@@ -46,116 +47,120 @@ export const TipoMaquinaria: CollectionConfig = {
    */
   indexes: [{ fields: ["marca", "slug"], unique: true }],
   // Pestañas Contenido · Fotos · Buscadores y redes · Avanzado (fase 2 del panel, sin esquema).
-  fields: conPestanas(
-    [
-      { name: "nombre", type: "text", required: true, label: "Nombre" },
-      slugField(),
-      {
-        name: "marca",
-        type: "relationship",
-        relationTo: "marcas-maquinaria",
-        required: true,
-        label: "Marca",
-      },
-      /*
-       * ORDEN (2026-10-26, cliente): el de las secciones de la página de su marca (y de la píldora,
-       * la cinta y el menú). Vacío, al final, por nombre.
-       */
-      {
-        name: "orden",
-        type: "number",
-        label: "Orden",
-        admin: {
-          position: "sidebar",
-          step: 1,
-          description:
-            "Posición del tipo en la página de su marca, en la barra de tipos y en el menú (1, 2, 3…). Vacío: después de los que tienen orden, por nombre.",
+  fields: [
+    ...conPestanas(
+      [
+        { name: "nombre", type: "text", required: true, label: "Nombre" },
+        slugField(),
+        {
+          name: "marca",
+          type: "relationship",
+          relationTo: "marcas-maquinaria",
+          required: true,
+          label: "Marca",
         },
-      },
-      { name: "descripcion", type: "textarea", label: "Descripción" },
-      /*
-       * Foto de la tarjeta del tipo en la página de su marca (2026-10-17). Vacía,
-       * la tarjeta usa la primera foto del primer equipo del tipo.
-       */
-      {
-        name: "imagen",
-        type: "upload",
-        relationTo: "media",
-        label: "Imagen de la tarjeta",
-        admin: {
-          description:
-            "Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.",
+        /*
+         * ORDEN (2026-10-26, cliente): el de las secciones de la página de su marca (y de la píldora,
+         * la cinta y el menú). Vacío, al final, por nombre.
+         */
+        {
+          name: "orden",
+          type: "number",
+          label: "Orden",
+          admin: {
+            position: "sidebar",
+            step: 1,
+            description:
+              "Posición del tipo en la página de su marca, en la barra de tipos y en el menú (1, 2, 3…). Vacío: después de los que tienen orden, por nombre.",
+          },
         },
-      },
-      /*
-       * Render recortado del tipo (2026-10-25, diseño «Kit de marca»): la máquina sola, con fondo
-       * transparente, para la cinta de tipos y la franja de cada sección. Vacío, se usa la
-       * imagen de la tarjeta o la primera foto de sus equipos.
-       */
-      {
-        name: "render",
-        type: "upload",
-        relationTo: "media",
-        label: "Render recortado",
-        admin: {
-          description:
-            "Opcional. La máquina recortada, PNG o WebP con fondo transparente, para la cinta de tipos de la página de la marca (diseño «Kit de marca»). Si la dejas vacía, se usa la imagen de la tarjeta o la primera foto de sus equipos.",
+        { name: "descripcion", type: "textarea", label: "Descripción" },
+        /*
+         * Foto de la tarjeta del tipo en la página de su marca (2026-10-17). Vacía,
+         * la tarjeta usa la primera foto del primer equipo del tipo.
+         */
+        {
+          name: "imagen",
+          type: "upload",
+          relationTo: "media",
+          label: "Imagen de la tarjeta",
+          admin: {
+            description:
+              "Opcional. Foto del tipo para su tarjeta en la página de la marca. Si la dejas vacía, se usa la primera foto del primer equipo de este tipo.",
+          },
         },
-      },
-      /*
-       * TIPOS QUE AGRUPA (auditoría de estructura, 2026-10-17): un tipo «paraguas»
-       * (Compactadores y Pavimentadoras de Dynapac) lista en su página los equipos
-       * de estos tipos, por grupos. No lleva equipos propios, así que no sale como
-       * tarjeta en la página de su marca.
-       */
-      {
-        name: "subtipos",
-        type: "relationship",
-        relationTo: "tipos-maquinaria",
-        hasMany: true,
-        label: "Tipos que agrupa",
-        filterOptions: ({ id, data }): Where => {
-          const misma: Where = {
-            marca: { equals: (data as { marca?: unknown } | undefined)?.marca ?? null },
-          };
-          return id ? { and: [misma, { id: { not_equals: id } }] } : misma;
+        /*
+         * Render recortado del tipo (2026-10-25, diseño «Kit de marca»): la máquina sola, con fondo
+         * transparente, para la cinta de tipos y la franja de cada sección. Vacío, se usa la
+         * imagen de la tarjeta o la primera foto de sus equipos.
+         */
+        {
+          name: "render",
+          type: "upload",
+          relationTo: "media",
+          label: "Render recortado",
+          admin: {
+            description:
+              "Opcional. La máquina recortada, PNG o WebP con fondo transparente, para la cinta de tipos de la página de la marca (diseño «Kit de marca»). Si la dejas vacía, se usa la imagen de la tarjeta o la primera foto de sus equipos.",
+          },
         },
-        admin: {
-          description:
-            "Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Vibrocompactador» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.",
+        /*
+         * TIPOS QUE AGRUPA (auditoría de estructura, 2026-10-17): un tipo «paraguas»
+         * (Compactadores y Pavimentadoras de Dynapac) lista en su página los equipos
+         * de estos tipos, por grupos. No lleva equipos propios, así que no sale como
+         * tarjeta en la página de su marca.
+         */
+        {
+          name: "subtipos",
+          type: "relationship",
+          relationTo: "tipos-maquinaria",
+          hasMany: true,
+          label: "Tipos que agrupa",
+          filterOptions: ({ id, data }): Where => {
+            const misma: Where = {
+              marca: { equals: (data as { marca?: unknown } | undefined)?.marca ?? null },
+            };
+            return id ? { and: [misma, { id: { not_equals: id } }] } : misma;
+          },
+          admin: {
+            description:
+              "Opcional. Solo para un tipo que reúne otros de la misma marca (ej. «Vibrocompactador» reúne los de suelo, de llantas y de doble rodillo): su página lista los equipos de estos tipos.",
+          },
         },
-      },
-      {
-        name: "pestanaIndiceNueva",
-        type: "checkbox",
-        defaultValue: false,
-        // Solo la etiqueta y la ayuda cambian (2026-10-22): el campo y su columna son los de siempre.
-        label: "Tarjeta en el índice de tipos de maquinaria nueva",
-        admin: {
-          description:
-            "Solo para un tipo que todavía NO tiene su página general (una «Categoría de maquinaria nueva» con su nombre): marcada, el índice de tipos y el menú enseñan este tipo y llevan a su página en la marca. Con categoría, el índice y el menú llevan siempre a la categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.",
+        {
+          name: "pestanaIndiceNueva",
+          type: "checkbox",
+          defaultValue: false,
+          // Solo la etiqueta y la ayuda cambian (2026-10-22): el campo y su columna son los de siempre.
+          label: "Tarjeta en el índice de tipos de maquinaria nueva",
+          admin: {
+            description:
+              "Solo para un tipo que todavía NO tiene su página general (una «Categoría de maquinaria nueva» con su nombre): marcada, el índice de tipos y el menú enseñan este tipo y llevan a su página en la marca. Con categoría, el índice y el menú llevan siempre a la categoría. Solo sale si el tipo (o los que agrupa) tiene equipos.",
+          },
         },
-      },
-      /*
-       * LOS EQUIPOS DEL TIPO, EN SU ORDEN (2026-11-19): se arrastran aquí (join ordenable: el orden es de
-       * cada ficha). Va en la pestaña «Contenido». Solo se rellena en el panel (`joinsSoloEnElPanel`).
-       */
-      {
-        name: "equipos",
-        type: "join",
-        collection: "equipos-nuevos",
-        on: "tipo",
-        orderable: true,
-        defaultLimit: 100,
-        label: "Equipos del tipo",
-        admin: {
-          defaultColumns: ["nombre", "codigo", "mostrarEnWeb"],
-          description:
-            "Este orden es el de dentro del tipo (su página y «Otras referencias» de la ficha). Arrastra las filas para cambiarlo; uno nuevo entra al final. El del listado de maquinaria nueva se cambia en «Equipos nuevos».",
+        /*
+         * LOS EQUIPOS DEL TIPO, EN SU ORDEN (2026-11-19): se arrastran aquí (join ordenable: el orden es de
+         * cada ficha). Va en la pestaña «Contenido». Solo se rellena en el panel (`joinsSoloEnElPanel`).
+         */
+        {
+          name: "equipos",
+          type: "join",
+          collection: "equipos-nuevos",
+          on: "tipo",
+          orderable: true,
+          defaultLimit: 100,
+          label: "Equipos del tipo",
+          admin: {
+            defaultColumns: ["nombre", "codigo", "mostrarEnWeb"],
+            description:
+              "En el orden en que salen en la web: la página del tipo, la de su categoría y «Otras referencias» de la ficha. Arrastra las filas para cambiarlo; uno nuevo entra al final.",
+          },
         },
-      },
-      seoField(),
-    ],
-    { fotos: { imagen: "tarjeta", render: "recorte" }, avanzado: ["pestanaIndiceNueva"] },
-  ),
+        seoField(),
+      ],
+      { fotos: { imagen: "tarjeta", render: "recorte" }, avanzado: ["pestanaIndiceNueva"] },
+    ),
+    // La columna del arrastre de la lista, oculta y sin uso (ver `ordenListaSinUso`).
+    ordenListaSinUso(),
+  ],
 };

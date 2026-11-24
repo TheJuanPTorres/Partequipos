@@ -120,10 +120,13 @@ export function articulosRelacionados<
   const puntos = (a: T) =>
     [...palabrasDeTitulo(a.titulo)].filter((p) => propias.has(p)).length * 2 +
     (a.categoria && a.categoria.slug === actual.categoria?.slug ? 1 : 0);
-  return todos
-    .filter((a) => a.id !== actual.id)
-    .map((a) => ({ a, p: puntos(a) }))
-    .sort((x, y) => y.p - x.p || y.a.fecha.localeCompare(x.a.fecha) || y.a.id - x.a.id)
-    .slice(0, n)
-    .map(({ a }) => a);
+  return (
+    todos
+      .filter((a) => a.id !== actual.id)
+      .map((a) => ({ a, p: puntos(a) }))
+      // orden-libre: por relación con el artículo y fecha (blog, como está).
+      .sort((x, y) => y.p - x.p || y.a.fecha.localeCompare(x.a.fecha) || y.a.id - x.a.id)
+      .slice(0, n)
+      .map(({ a }) => a)
+  );
 }

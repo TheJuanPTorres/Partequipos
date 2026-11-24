@@ -446,7 +446,7 @@ export const MarcaMaquinaria: CollectionConfig = {
         admin: {
           defaultColumns: ["nombre", "slug"],
           description:
-            "Este orden es el de dentro de la marca (su página y su menú). Arrastra las filas para cambiarlo; uno nuevo entra al final. El de las pestañas de tipo del listado de maquinaria nueva se cambia en «Tipos de maquinaria nueva».",
+            "En el orden en que salen en la web: la página de la marca, su menú y las categorías de maquinaria nueva. Arrastra las filas para cambiarlo; uno nuevo entra al final.",
         },
       },
       seoField(),

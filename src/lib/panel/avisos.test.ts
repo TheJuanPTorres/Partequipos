@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { cuantasFilas, filaDeDiapositiva, tieneSubida } from "./avisos";
+import { cuantasFilas, filaDeDiapositiva, pareceDePrueba, tieneSubida } from "./avisos";
 
 describe("cuantasFilas", () => {
   it("cuenta listas y números de filas", () => {
@@ -42,5 +42,16 @@ describe("tieneSubida", () => {
 
   it("vacío no cuenta (y saca el aviso de «sin recorte móvil»)", () => {
     for (const v of [null, undefined, "", " ", 0]) assert.equal(tieneSubida(v), false, String(v));
+  });
+});
+
+describe("pareceDePrueba", () => {
+  it("avisa con «test» o «prueba» al principio, en cualquier mayúscula", () => {
+    for (const n of ["Test segunda pasada", "TEST", "  prueba 3", "Pruebas del panel", "test-1"])
+      assert.equal(pareceDePrueba(n), true, n);
+  });
+  it("no avisa con nombres reales ni con la palabra en medio", () => {
+    for (const n of ["Testimonio", "Excavadora de prueba", "Probador", "", null, 3])
+      assert.equal(pareceDePrueba(n), false, String(n));
   });
 });

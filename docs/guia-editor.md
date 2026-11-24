@@ -247,7 +247,8 @@ oficial, no lo pongas.
   lo que la lista de la página del tipo nombra sin ser un modelo de ese tipo.
   Con solo el **texto**, sale sin enlace (un modelo que no tiene ficha); con
   **Enlaza a la ficha de**, enlaza a la ficha de otro modelo. En un tipo con
-  series, la **serie** dice en qué grupo sale.
+  series, la **serie** dice en qué grupo sale. Salen **al final** de la lista
+  (o de su serie), en el orden de sus filas: arrástralas para cambiarlo.
 - **Cuelga de** (en el tipo de equipo): casi siempre vacío. Solo sirve para
   conservar una dirección web antigua en la que un tipo colgaba de otro, como
   la **Excavadora de CASE**, que cuelga de **Cargador frontal**: su página y

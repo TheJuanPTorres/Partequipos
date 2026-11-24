@@ -1,3 +1,4 @@
+import { TextoTitulo } from "@/components/comun/TextoTitulo";
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -71,7 +72,7 @@ export function CabeceraKit({
           ) : null}
           {migas}
           <h1 id={id} className={estilos.heroTitulo}>
-            {contenidoTitulo ?? titulo}
+            {contenidoTitulo ?? <TextoTitulo texto={titulo} />}
           </h1>
           {texto ? <p className={estilos.heroTexto}>{texto}</p> : null}
           <a href={destino} aria-label={etiquetaRaton} className={estilos.raton}>

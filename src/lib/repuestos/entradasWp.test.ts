@@ -25,19 +25,25 @@ describe("otras entradas de la lista (WordPress tal cual)", () => {
     );
   });
 
-  it("una sin ficha va como texto (href null) y cada una cae en su sitio con los números en su orden", () => {
-    const t = tipo({ otrasEntradas: [{ texto: "Excavadora Caterpillar 326D2" }] });
+  it("una sin ficha va como texto (href null) y todas van al final, en el orden de sus filas", () => {
+    const t = tipo({
+      otrasEntradas: [
+        { texto: "Excavadora Caterpillar 326D2" },
+        { texto: "Excavadora Caterpillar 311X" },
+      ],
+    });
     const r = conOtrasEntradas(
       t,
-      [modelo(2, "Excavadora CATERPILLAR 32"), modelo(1, "Excavadora CATERPILLAR 330")],
+      [modelo(1, "Excavadora CATERPILLAR 330"), modelo(2, "Excavadora CATERPILLAR 32")],
       () => null,
     );
     assert.deepEqual(
       r.map((m) => [m.nombre, m.href]),
       [
+        ["Excavadora CATERPILLAR 330", "/m1/"],
         ["Excavadora CATERPILLAR 32", "/m2/"],
         ["Excavadora Caterpillar 326D2", null],
-        ["Excavadora CATERPILLAR 330", "/m1/"],
+        ["Excavadora Caterpillar 311X", null],
       ],
     );
   });

@@ -15,9 +15,11 @@ export type PestanaListado = {
 /**
  * Los botones de categoría del listado de una categoría de usada: TODAS las
  * categorías (petición del cliente, 2026-10-18), con la actual marcada.
- * Desde el 2026-10-21 (cliente) van primero las que tienen unidades, de más a
- * menos y, a igual número, por nombre (como en «Otros»), con su número; las
- * vacías, después, en el orden recibido y con «Sin unidades por ahora».
+ * Van primero las que tienen unidades, con su número, y después las vacías,
+ * con «Sin unidades por ahora». Cada grupo, EN EL ORDEN DEL PANEL (el que
+ * llega: arrastrando en «Categorías de usados», el mismo del índice y del
+ * megamenú; Juan Pablo, tanda 21, H2). Antes, las de unidades iban de más a
+ * menos (2026-10-21).
  */
 export function pestanasDeCategorias(
   categorias: { id: number; slug: string; nombre: string }[],
@@ -25,9 +27,7 @@ export function pestanasDeCategorias(
   actual: number,
 ): PestanaListado[] {
   const n = (id: number) => unidadesPorCategoria.get(id) ?? 0;
-  const con = categorias
-    .filter((c) => n(c.id) > 0)
-    .sort((a, b) => n(b.id) - n(a.id) || a.nombre.localeCompare(b.nombre, "es"));
+  const con = categorias.filter((c) => n(c.id) > 0);
   const vacias = categorias.filter((c) => n(c.id) === 0);
   return [...con, ...vacias].map((c) => ({
     href: `${rutas.categoriaUsada(c.slug)}/`,

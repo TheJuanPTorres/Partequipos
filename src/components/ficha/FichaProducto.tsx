@@ -1,3 +1,4 @@
+import { ContextoWhatsApp } from "@/components/layout/ContextoWhatsApp";
 import { TextoTitulo } from "@/components/comun/TextoTitulo";
 import {
   IconBrandWhatsapp,
@@ -141,6 +142,7 @@ export function FichaProducto({
   return (
     <main className={estilos.pagina}>
       {jsonLd}
+      <ContextoWhatsApp texto={nombre} />
       {/* La ficha ya tiene su llamada a la acción: el pie no pinta la tarjeta roja. */}
       <PieSinTarjeta />
 

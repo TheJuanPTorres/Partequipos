@@ -42,10 +42,19 @@ type SlugFieldOptions = {
  * Exportado para los slugs que no usan este campo, como la ruta de las páginas
  * institucionales.
  */
-export const slugEditable: FieldAccess = ({ req, doc }) => {
+export const slugEditable: FieldAccess = ({ req, doc, data, siblingData }) => {
   // Sin `doc` es una creación: el slug se puede establecer libremente.
   if (!doc) return true;
-  return Boolean(req.user && "puedeEditarSlugs" in req.user && req.user.puedeEditarSlugs);
+  if (req.user && "puedeEditarSlugs" in req.user && req.user.puedeEditarSlugs) return true;
+  /*
+   * Mandar el MISMO slug que ya tiene no es cambiarlo (2026-11-24, historial del #575): al
+   * RESTAURAR una versión, Payload manda la ficha entera, slug incluido; sin esto, el acceso
+   * quitaba el slug y la restauración fallaba con «Dirección web: este campo es obligatorio».
+   * Cualquier valor DISTINTO sigue necesitando el permiso. Sin datos (Payload calcula así si el
+   * campo es de solo lectura en el formulario), sigue bloqueado.
+   */
+  const enviado = ((siblingData ?? data) as { slug?: unknown } | undefined)?.slug;
+  return typeof enviado === "string" && enviado === (doc as { slug?: unknown }).slug;
 };
 
 /**

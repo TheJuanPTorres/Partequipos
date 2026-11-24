@@ -353,10 +353,14 @@ try {
           estados: [...document.querySelectorAll(".pq-insignia")].map((e) => e.textContent.trim()),
           interruptores: document.querySelectorAll('[role="switch"]').length,
         }));
-        const primera = await pagina.evaluate(
-          async (r) => (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
-          `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
-        );
+        // `… facil <colecciones> <id>`: esa ficha en lugar de la primera.
+        const primera = /^\d+$/.test(process.argv[5] ?? "")
+          ? Number(process.argv[5])
+          : await pagina.evaluate(
+              async (r) =>
+                (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+              `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+            );
         let ficha = null;
         if (primera) {
           await pagina.goto(`${base}/admin/collections/${coleccion}/${primera}`, {
@@ -628,6 +632,382 @@ try {
       hallazgos.push({ pantalla: "bloque-duplicar", ancho: ancho.nombre, resultado });
       hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
       hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `versiones` (2026-11-24, #575): el HISTORIAL SIN BORRADORES por efecto, a 1440, en
+     * `… versiones <coleccion> <id>` (por defecto, el equipo nuevo 1). Dos guardados con la sesión
+     * del editor (la entradilla con « v» y otra vez como estaba), la pestaña «Versiones», comparar,
+     * y RESTAURAR la versión con « v» y después la de antes: al final la ficha queda como estaba
+     * (si no, se devuelve con la API). Capturas de la lista y de la comparación.
+     */
+    if (MODO === "versiones") {
+      if (ancho.movil) {
+        await contexto.close();
+        continue;
+      }
+      const coleccion = process.argv[4] ?? "equipos-nuevos";
+      const id = Number(process.argv[5] ?? 1);
+      // `… versiones <coleccion> <id> <campo de texto>`: en usadas y modelos no hay entradilla.
+      const campo = process.argv[6] && process.argv[6] !== "api" ? process.argv[6] : "entradilla";
+      const api = (ruta, opciones = {}) =>
+        pagina.evaluate(
+          async ([r, o]) => {
+            const res = await fetch(r, { credentials: "include", ...o });
+            return { estado: res.status, cuerpo: await res.json().catch(() => null) };
+          },
+          [`${base}/api${ruta}`, opciones],
+        );
+      const poner = (valor) =>
+        api(`/${coleccion}/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ [campo]: valor }),
+        });
+      const leer = async () => (await api(`/${coleccion}/${id}?depth=0`)).cuerpo?.[campo] ?? null;
+      const versiones = async () =>
+        (
+          await api(
+            `/${coleccion}/versions?where[parent][equals]=${id}&sort=-updatedAt&limit=10&depth=0`,
+          )
+        ).cuerpo?.docs ?? [];
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto}`);
+      };
+      const original = await leer();
+      const conV = `${original ?? ""} v`;
+      const r1 = await poner(conV);
+      const r2 = await poner(original);
+      ok(
+        `dos guardados con la sesión del editor (${r1.estado}, ${r2.estado})`,
+        r1.estado === 200 && r2.estado === 200,
+      );
+      const lista = await versiones();
+      ok(`el historial tiene versiones (${lista.length})`, lista.length >= 2);
+      const vConV = lista.find((v) => v.version?.[campo] === conV);
+      const vOriginal = lista.find((v) => v.version?.[campo] === original);
+      ok("están la versión con « v» y la de antes", Boolean(vConV && vOriginal));
+      // Sin sesión, el historial no se lee.
+      const anonimo = await pagina.evaluate(
+        async (r) => (await fetch(r, { credentials: "omit" })).status,
+        `${base}/api/${coleccion}/versions?limit=1`,
+      );
+      ok(
+        `sin sesión, el historial no se lee (HTTP ${anonimo})`,
+        anonimo === 403 || anonimo === 401,
+      );
+      await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions`, {
+        waitUntil: "networkidle",
+      });
+      await pagina.waitForTimeout(2000);
+      await pagina.screenshot({
+        path: path.join(salida, `versiones-lista-${coleccion}-1440.png`),
+        fullPage: false,
+      });
+      const filasVista = await pagina.locator("table tbody tr").count();
+      ok(`la pestaña «Versiones» lista ${filasVista} guardados`, filasVista >= 2);
+      const restaurar = async (v, nombre) => {
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions/${v.id}`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(2000);
+        if (nombre === "con « v»") {
+          await pagina.screenshot({
+            path: path.join(salida, `versiones-comparar-${coleccion}-1440.png`),
+            fullPage: false,
+          });
+        }
+        await pagina
+          .getByRole("button", { name: /Restaurar/i })
+          .first()
+          .click({ timeout: 8000 });
+        await pagina.waitForTimeout(800);
+        await pagina
+          .getByRole("button", { name: /Confirmar|Restaurar|Sí/i })
+          .last()
+          .click({ timeout: 8000 })
+          .catch(() => null);
+        await pagina.waitForTimeout(3500);
+      };
+      if (vConV && vOriginal && process.argv.includes("api")) {
+        // Diagnóstico: el mismo restaurar por la API, con la respuesta (sin datos de la ficha).
+        const r = await api(`/${coleccion}/versions/${vConV.id}?depth=0`, { method: "POST" });
+        const errores = JSON.stringify(r.cuerpo?.errors ?? r.cuerpo?.message ?? null).slice(0, 600);
+        decir(`   restaurar por la API: HTTP ${r.estado} · ${errores}`);
+      } else if (vConV && vOriginal) {
+        await restaurar(vConV, "con « v»");
+        ok(`restaurar la versión con « v» la pone en la ficha`, (await leer()) === conV);
+        const otra = (await versiones()).find((v) => v.version?.[campo] === original);
+        if (otra) await restaurar(otra, "la de antes");
+      }
+      const final = await leer();
+      ok("al final, la ficha queda como estaba", final === original);
+      if (final !== original) {
+        await poner(original);
+        decir("   devuelta con la API");
+      }
+      hallazgos.push({
+        pantalla: "versiones",
+        ancho: ancho.nombre,
+        coleccion,
+        id,
+        resultado,
+        errores,
+        fallidas,
+      });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `joins` (2026-11-24, para dirección): en la ficha de cada colección
+     * (`… joins <col1,col2,…>`), el primer listado de la pestaña «Contenido» (un campo `join`, con
+     * su asa de arrastre), a la vista y capturado. NO arrastra nada: solo lee.
+     */
+    if (MODO === "joins") {
+      const colecciones = (
+        process.argv[4] ??
+        "marcas-maquinaria,tipos-maquinaria,marcas,tipos-equipo,marcas-lubricante"
+      )
+        .split(",")
+        .filter(Boolean);
+      for (const coleccion of colecciones) {
+        const id = await pagina.evaluate(
+          async (r) => (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+          `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+        );
+        if (!id) {
+          decir(`${coleccion} (${ancho.nombre}): sin fichas`);
+          continue;
+        }
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(2500);
+        const listado = pagina.locator(".relationship-table, .join-field, [class*='join']").first();
+        const hay = (await listado.count()) > 0;
+        if (hay) {
+          await listado.scrollIntoViewIfNeeded();
+          await pagina.waitForTimeout(800);
+        }
+        await pagina.screenshot({
+          path: path.join(salida, `listado-${coleccion}-${ancho.nombre}.png`),
+          fullPage: false,
+        });
+        const info = await pagina.evaluate(() => {
+          const t = document.querySelector(".relationship-table, .join-field, [class*='join']");
+          return {
+            titulo:
+              t
+                ?.querySelector("h2, h3, h4, label, .relationship-table__header")
+                ?.textContent?.trim()
+                ?.slice(0, 80) ?? null,
+            filas: t ? t.querySelectorAll("tbody tr").length : 0,
+            asas: t
+              ? t.querySelectorAll(
+                  "[class*='drag'], [aria-roledescription='sortable'], [data-dnd-kit]",
+                ).length
+              : 0,
+          };
+        });
+        hallazgos.push({ pantalla: `joins-${coleccion}`, ancho: ancho.nombre, id, hay, ...info });
+        decir(
+          `${coleccion} ${id} (${ancho.nombre}): ${hay ? `listado «${info.titulo ?? "-"}», ${info.filas} filas, ${info.asas} asas` : "SIN listado"}`,
+        );
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `abrir` (2026-11-24, #574): en la lista de cada colección (`… abrir <col1,col2>`), pulsa
+     * en la primera fila la PRIMERA celda (el logo, la foto o el estado) y la del NOMBRE, y anota si
+     * entra en la ficha. Solo lee.
+     */
+    if (MODO === "abrir") {
+      const colecciones = (process.argv[4] ?? "marcas-maquinaria,solicitudes")
+        .split(",")
+        .filter(Boolean);
+      for (const coleccion of colecciones) {
+        const lista = `${base}/admin/collections/${coleccion}?limit=5`;
+        await pagina.goto(lista, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(1500);
+        await pagina.screenshot({
+          path: path.join(salida, `abrir-${coleccion}-${ancho.nombre}.png`),
+          fullPage: false,
+        });
+        const cabeceras = await pagina
+          .locator("table thead th")
+          .evaluateAll((ths) => ths.map((th) => th.textContent.trim()));
+        const iNombre = cabeceras.findIndex((t) => /^Nombre/.test(t));
+        // La primera columna de datos: la que sigue a la casilla de marcar (si la hay).
+        const iPrimera = cabeceras.findIndex((t) => t !== "");
+        const resultados = [];
+        for (const [que, indice] of [
+          [`primera celda («${cabeceras[iPrimera] || "-"}»)`, iPrimera],
+          ["celda «Nombre»", iNombre],
+        ]) {
+          if (indice < 0) {
+            resultados.push(`${que}: no hay esa columna`);
+            continue;
+          }
+          await pagina.goto(lista, { waitUntil: "networkidle" });
+          await pagina.waitForTimeout(1200);
+          const celda = pagina.locator("table tbody tr").first().locator("td").nth(indice);
+          const enlace = celda.locator("a").first();
+          const objetivo = (await enlace.count()) > 0 ? enlace : celda;
+          await objetivo.click({ timeout: 5000 }).catch(() => null);
+          await pagina.waitForTimeout(2500);
+          const ruta = new URL(pagina.url()).pathname;
+          const entra = new RegExp(`/collections/${coleccion}/\\d+/?$`).test(ruta);
+          resultados.push(`${que}: ${entra ? "ENTRA" : "NO entra"} (${ruta})`);
+        }
+        hallazgos.push({
+          pantalla: `abrir-${coleccion}`,
+          ancho: ancho.nombre,
+          cabeceras,
+          resultados,
+        });
+        decir(`${coleccion} (${ancho.nombre}): ${resultados.join(" · ")}`);
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `csp-subidas` (2026-11-24, para A, tras el #566): los avisos de la CSP HACIENDO cosas en
+     * el panel, a 1440: subir una imagen y un PDF (subida directa al Blob), abrir la vista previa
+     * del documento, escribir en un texto enriquecido y guardar una ficha (y deshacerlo). Imprime
+     * los ids de lo subido: se borra después con la API local (el editor no puede borrar).
+     */
+    if (MODO === "csp-subidas") {
+      if (ancho.movil) {
+        await contexto.close();
+        continue;
+      }
+      const consola = [];
+      pagina.on("console", (m) => {
+        const t = m.text();
+        if (/Content[- ]Security[- ]Policy|Report Only/i.test(t)) consola.push(t.slice(0, 300));
+      });
+      await contexto.addInitScript(() => {
+        window.__violaciones = [];
+        document.addEventListener("securitypolicyviolation", (e) =>
+          window.__violaciones.push(`${e.effectiveDirective} ← ${e.blockedURI}`),
+        );
+      });
+      const limpiar = (v) =>
+        v.replace(/(https?:\/\/[^/\s?]+)([^\s?]*)\?\S*/g, "$1$2").replace(origin, "(mismo origen)");
+      const pasos = [];
+      const anotar = async (paso, extra = "") => {
+        const v = await pagina.evaluate(() => window.__violaciones ?? []).catch(() => []);
+        const unicas = [...new Set(v.map(limpiar))];
+        pasos.push({ paso, violaciones: unicas, extra });
+        decir(
+          `· ${paso}: ${unicas.length ? unicas.join(" | ") : "limpio"}${extra ? ` (${extra})` : ""}`,
+        );
+      };
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "csp-subidas-"));
+      const png = path.join(tmp, "prueba-csp-panel.png");
+      fs.writeFileSync(
+        png,
+        Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+          "base64",
+        ),
+      );
+      const pdf = path.join(tmp, "prueba-csp-panel.pdf");
+      fs.writeFileSync(
+        pdf,
+        "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 200]>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n164\n%%EOF\n",
+      );
+      const guardar = async () => {
+        await pagina.getByRole("button", { name: "Guardar" }).first().click();
+        await pagina.waitForTimeout(4000);
+      };
+      const subidos = {};
+      for (const [coleccion, fichero, campo, texto] of [
+        ["media", png, "alt", "Prueba de subida para la CSP del panel"],
+        ["documentos", pdf, "titulo", "Prueba de subida para la CSP del panel"],
+      ]) {
+        await pagina.goto(`${base}/admin/collections/${coleccion}/create`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(1500);
+        await pagina.locator('input[type="file"]').first().setInputFiles(fichero);
+        await pagina.waitForTimeout(800);
+        await pagina.locator(`input[name="${campo}"]`).fill(texto);
+        await guardar();
+        await pagina
+          .waitForURL((u) => /\/\d+\/?$/.test(u.pathname), { timeout: 30_000 })
+          .catch(() => null);
+        const id = Number(new URL(pagina.url()).pathname.match(/\/(\d+)\/?$/)?.[1]) || null;
+        subidos[coleccion] = id;
+        await anotar(`subir a ${coleccion}`, id ? `id ${id}` : "NO se guardó");
+      }
+      if (subidos.documentos) {
+        // La vista previa del documento: su miniatura o el enlace al fichero (otra pestaña o un panel).
+        const nueva = contexto.waitForEvent("page", { timeout: 6000 }).catch(() => null);
+        await pagina
+          .locator(".file-details a, .file-details__thumbnail, .thumbnail, .file-meta__url a")
+          .first()
+          .click({ timeout: 5000 })
+          .catch(() => null);
+        const pestana = await nueva;
+        await pagina.waitForTimeout(1500);
+        await anotar(
+          "vista previa del documento",
+          pestana
+            ? `abre otra pestaña en ${new URL(pestana.url()).host === new URL(base).host ? "el mismo origen" : "otro origen (el Blob)"}`
+            : "en el mismo panel",
+        );
+        if (pestana) await pestana.close();
+      }
+      // Escribir en un texto enriquecido y guardar; después, deshacerlo y guardar otra vez.
+      const leerDescripcion = () =>
+        pagina.evaluate(
+          async (r) =>
+            JSON.stringify(
+              (await (await fetch(r, { credentials: "include" })).json())?.descripcion ?? null,
+            ),
+          `${base}/api/equipos-nuevos/1?depth=0`,
+        );
+      const antes = await leerDescripcion();
+      await pagina.goto(`${base}/admin/collections/equipos-nuevos/1`, { waitUntil: "networkidle" });
+      await pagina.waitForTimeout(2000);
+      const editor = pagina.locator('[data-lexical-editor="true"]').first();
+      await editor.click();
+      await pagina.keyboard.press("ControlOrMeta+End");
+      await pagina.keyboard.type(" CSP");
+      await anotar("escribir en el texto enriquecido");
+      await guardar();
+      await anotar("guardar la ficha");
+      await editor.click();
+      await pagina.keyboard.press("ControlOrMeta+End");
+      for (let i = 0; i < 4; i++) await pagina.keyboard.press("Backspace");
+      await guardar();
+      const despues = await leerDescripcion();
+      await anotar(
+        "deshacer y guardar",
+        despues === antes ? "la descripción queda como estaba" : "¡la descripción NO quedó igual!",
+      );
+      hallazgos.push({
+        pantalla: "csp-subidas",
+        ancho: ancho.nombre,
+        pasos,
+        subidos,
+        consola,
+        // Solo si no quedó igual: para devolverla con la API local.
+        ...(despues === antes ? {} : { descripcionAntes: antes }),
+      });
+      decir(`subidos (para borrar): ${JSON.stringify(subidos)}`);
+      fs.rmSync(tmp, { recursive: true, force: true });
       await contexto.close();
       continue;
     }

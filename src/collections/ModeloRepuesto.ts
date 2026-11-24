@@ -6,7 +6,13 @@ import { slugField } from "../lib/fields/slugField";
 import { marcaDelTipoCoincide } from "./hooks/marcaDelTipo";
 import { revalidarModelo, revalidarModeloBorrado } from "./hooks/revalidateHooks";
 import { mostrarEnWebField } from "../lib/fields/mostrarEnWeb";
-import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
+import {
+  borradoAdmin,
+  escrituraContenido,
+  lecturaContenido,
+  soloPersonal,
+} from "../lib/seguridad/acceso";
+import { VERSIONES_SIN_BORRADORES } from "../lib/borradores";
 import { avisoField } from "../lib/fields/avisoField";
 import { validarSerieDelModelo } from "../lib/repuestos/series";
 import { conPestanas } from "../lib/fields/pestanasFicha";
@@ -38,7 +44,11 @@ export const ModeloRepuesto: CollectionConfig = {
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,
+    // El historial de versiones, solo con sesión del personal (tanda 21, tarea 3, fase 2, punto 4).
+    readVersions: soloPersonal,
   },
+  // Historial sin borradores: cada guardado, una versión que se compara y se restaura.
+  versions: VERSIONES_SIN_BORRADORES,
   // Unicidad del slug POR TIPO (el tipo ya implica una marca). Ver reporte.
   indexes: [{ fields: ["tipo", "slug"], unique: true }],
   // ISR: revalida la ficha y la página del tipo donde el modelo se lista.

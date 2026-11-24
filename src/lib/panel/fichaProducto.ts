@@ -103,7 +103,7 @@ export const PARTES_MODELO: ReadonlyArray<ParteFicha> = [
   { campo: "imagenes", texto: "Foto", peso: 2, minimo: 1 },
 ];
 
-export const FICHAS: Record<string, ConfigFicha> = {
+export const FICHAS = {
   "equipos-usados": config(
     PARTES_USADA as ReadonlyArray<ParteFicha>,
     (d) => insigniaUsada(d as DatosUsada),
@@ -111,7 +111,12 @@ export const FICHAS: Record<string, ConfigFicha> = {
   ),
   "equipos-nuevos": config(PARTES_NUEVA, insigniaWeb, ["mostrarEnWeb"]),
   "modelos-repuesto": config(PARTES_MODELO, insigniaWeb, ["mostrarEnWeb"]),
-};
+} satisfies Record<string, ConfigFicha>;
+
+/** La configuración de una colección, o `undefined` si no tiene edición fácil. */
+export function configFicha(coleccion: string | undefined): ConfigFicha | undefined {
+  return coleccion && coleccion in FICHAS ? FICHAS[coleccion as keyof typeof FICHAS] : undefined;
+}
 
 /** Valores distintos, sin vacíos, ordenados, para las sugerencias de un campo de texto. */
 export function valoresSugeridos(valores: unknown[]): string[] {

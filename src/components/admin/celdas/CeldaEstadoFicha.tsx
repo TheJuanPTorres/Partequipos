@@ -2,7 +2,7 @@
 
 import type { DefaultCellComponentProps } from "payload";
 
-import { FICHAS, insigniaWeb, type DatosFicha } from "@/lib/panel/fichaProducto";
+import { configFicha, insigniaWeb, type DatosFicha } from "@/lib/panel/fichaProducto";
 
 import { InsigniaEstado } from "./InsigniaEstado";
 
@@ -12,6 +12,6 @@ import { InsigniaEstado } from "./InsigniaEstado";
  */
 export default function CeldaEstadoFicha({ rowData, collectionSlug }: DefaultCellComponentProps) {
   const fila = (rowData ?? {}) as DatosFicha;
-  const insignia = (FICHAS[collectionSlug]?.insignia ?? insigniaWeb)(fila);
+  const insignia = (configFicha(collectionSlug)?.insignia ?? insigniaWeb)(fila);
   return <InsigniaEstado insignia={insignia} />;
 }

@@ -73,9 +73,13 @@ describe("servicio técnico con diseño propio", () => {
       v.accesos.map((a) => [a.ancla, a.titulo]),
       [
         ["taller", "Taller"],
-        ["Siniestros", "Siniestros"],
+        // En minúscula como las demás (QA del 2026-11-17, punto 21); «Siniestros», de alias.
+        ["siniestros", "Siniestros"],
       ],
     );
+    assert.equal(v.siniestros?.ancla, "siniestros");
+    assert.equal(v.siniestros?.alias, "Siniestros");
+    assert.equal(v.taller?.alias, undefined);
     assert.deepEqual(v.taller?.parrafos, ["Nuestro departamento…"]);
     assert.equal(v.alistamiento, null);
     assert.equal(v.contacto?.botonTexto, "Enviar solicitud");

@@ -147,6 +147,7 @@ export default async function CategoriaNuevaPage({ params }: { params: Promise<P
           categoria.foto as Media | null,
         )}
         anclaSiguiente={ANCLA_MODELOS}
+        etiquetaRaton="Ir a los modelos"
         bajaSinFoto
       />
 

@@ -13,6 +13,9 @@ import { ANCHO_MINIMO } from "../panel/fotoPequena";
 import {
   accionesHabituales,
   avisosDePortada,
+  cifrasDePortada,
+  editadosPorMi,
+  type Cifra,
   CON_GALERIA,
   FILTRO_SOLICITUDES_NUEVAS,
   FUERA_DE_RECIENTES,
@@ -39,6 +42,10 @@ type Visibles = { collections: string[]; globals: string[] };
 
 export type DatosPortada = {
   avisos: AvisoPortada[];
+  /** Tablero (tanda 23): las cifras de arriba. */
+  cifras: Cifra[];
+  /** Tablero (tanda 23): lo último que guardó quien mira. */
+  mios: Reciente[];
   tarjetas: Tarjeta[];
   recientes: Reciente[];
   habituales: Habitual[];
@@ -129,6 +136,7 @@ export async function getPortadaPanel(
   const [
     sinDescripcion,
     sinSeo,
+    incompletas,
     fotosPequenas,
     busquedas,
     mensajes,
@@ -138,6 +146,8 @@ export async function getPortadaPanel(
   ] = await Promise.all([
     porColeccion(WHERE_SIN_DESCRIPCION),
     porColeccion(WHERE_SIN_SEO),
+    // Tablero: sin fotos O sin descripción, para que cada ficha cuente una vez.
+    porColeccion({ or: [{ imagenes: { exists: false } }, WHERE_SIN_DESCRIPCION] }),
     // Fotos pequeñas EN USO en las galerías de las fichas: los ids de sus galerías y, de esas,
     // cuántas miden menos de 1.200 px de ancho.
     puedeLeer("media") && galerias.length
@@ -216,6 +226,38 @@ export async function getPortadaPanel(
       : Promise.resolve(undefined),
     Promise.resolve(etiquetasDeOpciones(payload, "solicitudes", "tipo")),
   ]);
+
+  // «Lo último que editaste» (tablero): en cada colección con último editor, lo que guardó quien mira.
+  const conUltimoEditor = colecciones.filter(
+    (c) =>
+      !FUERA_DE_RECIENTES.has(c.slug) &&
+      c.fields.some((f) => "name" in f && f.name === CAMPO_ULTIMO_EDITOR),
+  );
+  const mios = await Promise.all(
+    conUltimoEditor.map((c) =>
+      seguro(`míos ${c.slug}`, async () => {
+        const campo = c.admin?.useAsTitle ?? (c.upload ? "filename" : "id");
+        const { docs } = await payload.find({
+          collection: c.slug as CollectionSlug,
+          depth: 0,
+          limit: 3,
+          sort: "-updatedAt",
+          where: { [CAMPO_ULTIMO_EDITOR]: { equals: user.id } },
+          select: { [campo]: true, updatedAt: true },
+          ...acceso,
+        });
+        const coleccion = texto(c.labels?.plural, c.slug);
+        return docs.map((d): Reciente => ({
+          slug: c.slug,
+          coleccion,
+          titulo: texto((d as unknown as Record<string, unknown>)[campo], `#${d.id}`),
+          href: `/admin/collections/${c.slug}/${d.id}`,
+          actualizado: texto((d as { updatedAt?: unknown }).updatedAt, ""),
+          editor: "ti",
+        }));
+      }),
+    ),
+  );
 
   const [totales, nuevas, disponibles, sinFotos, rotas, altFlojos, recientesCol, recientesGlob] =
     await Promise.all([
@@ -341,6 +383,15 @@ export async function getPortadaPanel(
   }
 
   return {
+    cifras: cifrasDePortada({
+      solicitudesNuevas: nuevas,
+      incompletas: Object.fromEntries(
+        incompletas.filter(([, n]) => n !== undefined) as [ConGaleria, number][],
+      ),
+      fotosPequenas,
+      busquedasSinResultado: busquedas,
+    }),
+    mios: editadosPorMi(mios.map((m) => m ?? [])),
     avisos: avisosDePortada({
       sinFotos: Object.fromEntries(sinFotos),
       etiquetas,

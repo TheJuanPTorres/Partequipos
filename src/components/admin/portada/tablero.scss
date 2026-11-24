@@ -1,0 +1,138 @@
+// TABLERO de la portada del panel (tanda 23, punto 3; lo lleva C por B). Solo tokens del panel
+// (`--pq-…`, de A en custom.scss), sin colores fijos: claro y oscuro salen solos. Los espacios,
+// con `--pq-espacio-N` de A y un respaldo mientras su borrador no esté en `main`.
+
+.pq-tablero {
+  margin: 0 0 var(--pq-espacio-6, 32px);
+}
+
+.pq-tablero__cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--pq-espacio-4, 16px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pq-tablero__cifra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pq-espacio-2, 6px);
+  height: 100%;
+  padding: var(--pq-espacio-5, 20px);
+  color: var(--pq-foreground);
+  text-decoration: none;
+  background: var(--pq-card);
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-xl);
+  // El tono, en la barra de la izquierda (y en el texto del detalle): no solo con color.
+  box-shadow: inset 4px 0 0 var(--pq-tono-cifra, var(--pq-border));
+  transition:
+    border-color var(--pq-transicion, 150ms),
+    background-color var(--pq-transicion, 150ms);
+
+  &:hover {
+    border-color: var(--pq-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pq-primary);
+    outline-offset: 2px;
+  }
+}
+
+.pq-tablero__cifra--atencion {
+  --pq-tono-cifra: var(--pq-warning);
+}
+
+.pq-tablero__cifra--exito {
+  --pq-tono-cifra: var(--pq-success);
+}
+
+.pq-tablero__cifra-cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--pq-espacio-2, 8px);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pq-muted-foreground);
+}
+
+.pq-tablero__cifra-valor {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pq-tablero__cifra-detalle {
+  font-size: 13px;
+  color: var(--pq-muted-foreground);
+}
+
+.pq-tablero__accesos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--pq-espacio-3, 12px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pq-tablero__acceso {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--pq-espacio-3, 12px);
+  height: 100%;
+  min-height: 104px; // grande y fácil de pulsar
+  padding: var(--pq-espacio-4, 16px);
+  font-weight: 600;
+  color: var(--pq-foreground);
+  text-decoration: none;
+  background: var(--pq-muted);
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-xl);
+  transition:
+    border-color var(--pq-transicion, 150ms),
+    background-color var(--pq-transicion, 150ms);
+
+  svg {
+    color: var(--pq-primary);
+  }
+
+  &:hover {
+    background: var(--pq-card);
+    border-color: var(--pq-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pq-primary);
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pq-tablero__cifras {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--pq-espacio-3, 12px);
+  }
+
+  .pq-tablero__cifra {
+    padding: var(--pq-espacio-4, 14px);
+  }
+
+  .pq-tablero__cifra-valor {
+    font-size: 28px;
+  }
+
+  .pq-tablero__accesos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pq-tablero__acceso {
+    min-height: 88px;
+  }
+}

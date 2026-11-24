@@ -83,6 +83,29 @@
   --pq-info-foreground: oklch(0.488 0.243 264.376); /* blue-700 */
   --pq-success-foreground: oklch(0.508 0.118 165.612); /* emerald-700 */
   --pq-warning-foreground: oklch(0.555 0.163 48.998); /* amber-700 */
+  /* El par del rojo de error, de la misma familia (tanda 23): lo usa la insignia. */
+  --pq-destructive-foreground: oklch(0.505 0.213 27.518); /* red-700 */
+  /* Morado de «Vendida» (tanda 23): no es del sistema del cliente; la misma familia de Tailwind v4. */
+  --pq-vendida: oklch(0.606 0.25 292.717); /* violet-500 */
+  --pq-vendida-foreground: oklch(0.491 0.27 292.581); /* violet-700 */
+
+  /*
+   * ESPACIADO (tanda 23, 2026-11-24): UNA escala para todo lo propio del panel (portada, buscador,
+   * insignias, avisos), en px porque la raíz del panel mide 13. Los estilos de B y C usan estos
+   * tokens y los colores `--pq-…`, nunca un número o un color a mano
+   * (partequipos-coordinacion/REPARTO-TANDA-23.md).
+   *   1 · dentro de un control (icono y texto)      4 · entre campos o tarjetas
+   *   2 · entre elementos de una fila               5 · relleno de una tarjeta o panel
+   *   3 · relleno corto de una píldora o un botón   6 · entre secciones · 7 · entre bloques
+   */
+  --pq-espacio-1: 4px;
+  --pq-espacio-2: 6px;
+  --pq-espacio-3: 8px;
+  --pq-espacio-4: 12px;
+  --pq-espacio-5: 16px;
+  --pq-espacio-6: 24px;
+  --pq-espacio-7: 32px;
+
   /*
    * --radius del sistema: .45rem. Se escribe en PX (7,2 px) y NO en rem.
    *
@@ -163,6 +186,8 @@ html[data-theme="dark"] {
   --pq-info-foreground: oklch(0.707 0.165 254.624); /* blue-400 */
   --pq-success-foreground: oklch(0.765 0.177 163.223); /* emerald-400 */
   --pq-warning-foreground: oklch(0.828 0.189 84.429); /* amber-400 */
+  --pq-destructive-foreground: oklch(0.704 0.191 22.216); /* red-400 */
+  --pq-vendida-foreground: oklch(0.702 0.183 293.541); /* violet-400 */
   --pq-background: oklch(0.1822 0 113.1); /* #121212 */
   --pq-foreground: oklch(0.9288 0.0126 255.44); /* #e2e8f0 */
   --pq-secondary: oklch(0.29 0 113.31); /* #2b2b2b */
@@ -2121,36 +2146,53 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
  * color del tono y el texto en el color normal, así el contraste no depende del
  * tono (el punto es decorativo: el estado lo dice el texto).
  */
+/*
+ * TANDA 23 (2026-11-24, prototipo): la insignia lleva COLOR también en el texto, no solo en el
+ * punto: verde Publicada, ámbar Oculta, morado Vendida, azul el tono «info», rojo el error y gris lo
+ * neutro (Borrador). El texto usa el `-foreground` del tono (el 700 en claro y el 400 en oscuro)
+ * sobre el fondo teñido; el contraste de cada par se mide en los dos temas (AA, ≥ 4,5:1) y va en
+ * el PR. El texto sigue diciendo el estado: el color acompaña (WCAG 1.4.1).
+ */
 .pq-insignia {
   --pq-insignia-tono: var(--pq-muted-foreground);
+  --pq-insignia-texto: var(--pq-foreground);
 
   display: inline-flex;
-  gap: 6px;
+  gap: var(--pq-espacio-2);
   align-items: center;
-  padding: 2px 8px;
+  padding: 2px var(--pq-espacio-3);
   border-radius: 999px;
   background: color-mix(in oklab, var(--pq-insignia-tono) 12%, var(--pq-background));
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--pq-insignia-tono) 32%, transparent);
-  color: var(--pq-foreground);
+  color: var(--pq-insignia-texto);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 16px;
   white-space: nowrap;
 
   &--exito {
     --pq-insignia-tono: var(--pq-success);
+    --pq-insignia-texto: var(--pq-success-foreground);
   }
 
   &--aviso {
     --pq-insignia-tono: var(--pq-warning);
+    --pq-insignia-texto: var(--pq-warning-foreground);
   }
 
   &--error {
     --pq-insignia-tono: var(--pq-destructive);
+    --pq-insignia-texto: var(--pq-destructive-foreground);
   }
 
   &--info {
     --pq-insignia-tono: var(--pq-info);
+    --pq-insignia-texto: var(--pq-info-foreground);
+  }
+
+  &--vendida {
+    --pq-insignia-tono: var(--pq-vendida);
+    --pq-insignia-texto: var(--pq-vendida-foreground);
   }
 
   &__punto {
@@ -2639,5 +2681,80 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   &__falta {
     color: var(--pq-muted-foreground);
     font-size: 13px;
+  }
+}
+
+/* =========================================================================
+ * TEMA: SOLO «CLARO» Y «OSCURO» (tanda 23, 2026-11-24; Juan Pablo)
+ *
+ * El panel sale en claro y el oscuro es una opción de cada usuario
+ * (`src/lib/panel/temaPorDefecto.ts`). «Automático» seguía al sistema
+ * operativo: con el claro por defecto ya no haría nada (borra la cookie y
+ * volvería a claro), así que se quita de «Tema del admin», en la cuenta.
+ * El `id` es el del campo de Payload 3.89: `field-<ruta>-<valor>`.
+ * ========================================================================= */
+.radio-group li:has(#field-theme-auto) {
+  display: none;
+}
+
+/* =========================================================================
+ * MUESTRA DEL SISTEMA VISUAL (`/admin/muestra-tema/`, tanda 23; solo fuera del
+ * sitio publicado). Sin datos: sirve para medir el contraste en los dos temas.
+ * ========================================================================= */
+.pq-muestra {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--pq-espacio-7) var(--pq-espacio-5);
+  color: var(--pq-foreground);
+
+  h1,
+  h2 {
+    margin: var(--pq-espacio-6) 0 var(--pq-espacio-4);
+  }
+
+  &__fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pq-espacio-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      gap: var(--pq-espacio-1);
+      align-items: flex-start;
+    }
+
+    small {
+      color: var(--pq-muted-foreground);
+    }
+  }
+
+  &__atenuado {
+    color: var(--pq-muted-foreground);
+  }
+
+  &__primario {
+    display: inline-block;
+    padding: var(--pq-espacio-3) var(--pq-espacio-5);
+    border-radius: var(--pq-radius-lg);
+    background: var(--pq-primary);
+    color: var(--pq-on-primary);
+    font-weight: 500;
+  }
+
+  &__color {
+    width: 56px;
+    height: 40px;
+    border-radius: var(--pq-radius-md);
+    box-shadow: inset 0 0 0 1px var(--pq-border);
+  }
+
+  &__espacio {
+    height: 16px;
+    border-radius: 2px;
+    background: var(--pq-primary);
   }
 }

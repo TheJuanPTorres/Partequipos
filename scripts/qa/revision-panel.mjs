@@ -327,6 +327,73 @@ try {
     }
 
     /*
+     * Modo `facil` (2026-11-23, tarea 3, fase 2): la EDICIÓN FÁCIL de las fichas de producto. Por
+     * colección (las de `… facil <col1,col2>`; por defecto nuevas, modelos y usadas), la lista y la
+     * cabecera de la primera ficha, y si salen el resumen «Así se ve hoy en la web», la columna
+     * «Estado», los interruptores y las sugerencias. Solo lee.
+     */
+    if (MODO === "facil") {
+      const colecciones = (process.argv[4] ?? "equipos-nuevos,modelos-repuesto,equipos-usados")
+        .split(",")
+        .filter(Boolean);
+      for (const coleccion of colecciones) {
+        await pagina.goto(`${base}/admin/collections/${coleccion}?limit=5&sort=id`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(1500);
+        await pagina.screenshot({
+          path: path.join(salida, `lista-${coleccion}-${ancho.nombre}.png`),
+          fullPage: true,
+        });
+        const lista = await pagina.evaluate(() => ({
+          columnas: [...document.querySelectorAll("table thead th")].map((th) =>
+            th.textContent.trim(),
+          ),
+          celdasNombre: document.querySelectorAll(".pq-celda-nombre").length,
+          estados: [...document.querySelectorAll(".pq-insignia")].map((e) => e.textContent.trim()),
+          interruptores: document.querySelectorAll('[role="switch"]').length,
+        }));
+        const primera = await pagina.evaluate(
+          async (r) => (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+          `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+        );
+        let ficha = null;
+        if (primera) {
+          await pagina.goto(`${base}/admin/collections/${coleccion}/${primera}`, {
+            waitUntil: "networkidle",
+          });
+          await pagina.waitForTimeout(2500);
+          await pagina.screenshot({
+            path: path.join(salida, `ficha-${coleccion}-${ancho.nombre}.png`),
+            fullPage: false,
+          });
+          ficha = await pagina.evaluate(() => ({
+            resumen:
+              document.querySelector(".pq-resumen-web__completa strong")?.textContent?.trim() ??
+              null,
+            falta:
+              document.querySelector(".pq-resumen-web__barra-texto span")?.textContent?.trim() ??
+              null,
+            estado:
+              document.querySelector(".pq-resumen-web .pq-insignia")?.textContent?.trim() ?? null,
+            verEnLaWeb: Boolean(document.querySelector(".pq-resumen-web__ver")),
+            sugerencias: [...document.querySelectorAll(".pq-sugerencias")].map((s) =>
+              s.textContent.trim().slice(0, 120),
+            ),
+          }));
+        }
+        hallazgos.push({ pantalla: `facil-${coleccion}`, ancho: ancho.nombre, lista, ficha });
+        decir(
+          `✓ ${coleccion} (${ancho.nombre}): ${lista.celdasNombre} nombres con foto, estados ${[...new Set(lista.estados)].join("/") || "-"}, ${lista.interruptores} interruptores · ficha ${primera ?? "-"}: ${ficha?.estado ?? "-"}, ${ficha?.resumen ?? "sin resumen"}${ficha?.verEnLaWeb ? ", «Ver en la web»" : ""}${ficha?.sugerencias?.length ? ` · sugerencias: ${ficha.sugerencias.join(" | ")}` : ""}`,
+        );
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
      * Modo `borrador` (`… borrador <id de la página>`, PR 8b): con la sesión abierta, el botón del
      * panel (`/api/borrador/?pagina=<id>`) lleva a la página con su ÚLTIMO BORRADOR y el aviso de
      * vista previa; «Salir de la vista previa» vuelve a lo publicado. El borrador de prueba lo

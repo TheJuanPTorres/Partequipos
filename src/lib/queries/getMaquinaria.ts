@@ -28,7 +28,6 @@ import type {
 } from "@/payload-types";
 
 import { CLAVE_DESPLIEGUE, ETIQUETAS_DATOS } from "../cacheDatos";
-import type { EquipoFiltrable } from "../nueva/filtros";
 import { ordenDe, ordenDeListado } from "../ordenArrastre";
 import { rutas } from "../routes";
 import type { UnidadFiltrable } from "../usados/filtros";
@@ -510,8 +509,18 @@ export const getUnidadesDeCategoriaUsada = cache(
  * `categorias-maquinaria` (`src/lib/cacheDatos.ts`).
  */
 
-/** Lo que pinta la tarjeta de un equipo nuevo y lo que usan sus filtros. */
-export type EquipoNuevoListado = EquipoFiltrable & {
+/** Un equipo nuevo del listado: lo que pintan sus tarjetas y sugerencias. */
+export type EquipoNuevoListado = {
+  id: number;
+  nombre: string;
+  /** Código del fabricante («ZX75US-7»). */
+  codigo?: string | null;
+  marcaRef: { slug: string; nombre: string } | null;
+  tipoRef: { slug: string; nombre: string } | null;
+  /** Peso operativo en KILOGRAMOS (`pesoOperativoKg`, #136). */
+  pesoKg?: number | null;
+  /** Su puesto en el orden de la lista de «Equipos nuevos» del panel (`ORDEN_LISTADO`). */
+  orden?: number;
   slug: string;
   /** La ficha, con su barra final. */
   href: string;
@@ -574,9 +583,10 @@ const listadoNuevaEnCache = unstable_cache(
     const [equipos, marcas, tipos, categorias] = await Promise.all([
       payload.find({
         collection: "equipos-nuevos",
-        // En el orden del LISTADO (arrastrando en «Equipos nuevos», 2026-11-23): es «Recomendados»
-        // (`orden`, más abajo); «Ordenar» del visitante lo cambia (`nueva/filtros.ts`).
-        // Los de marcas ocultas tampoco: ni en tarjetas ni en filtros ni en contadores.
+        // En el orden de la lista de «Equipos nuevos» del panel (`orden`, más abajo, 2026-11-23).
+        // Hoy solo lo usan las sugerencias de la página de una categoría de usados vacía: las
+        // páginas de nueva ordenan por marca y por el join del tipo (desde el #326 no hay listado
+        // con «Ordenar»). Los de marcas ocultas tampoco.
         where: conEquipoVisible(),
         sort: ordenDeListado("equipos-nuevos"),
         depth: 0,

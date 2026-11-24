@@ -140,7 +140,11 @@ const nextConfig: NextConfig = {
        */
       { key: "Strict-Transport-Security", value: "max-age=31536000" },
       /*
-       * POLÍTICA DE CONTENIDO — FASE 1: SOLO OBSERVA, NO BLOQUEA.
+       * POLÍTICA DE CONTENIDO. DESDE EL 2026-11-24 TAMBIÉN SE APLICA (ver «FASE
+       * 2» al final de esta función). Lo que sigue se escribió para la fase 1 y
+       * se conserva porque explica cada directiva.
+       *
+       * FASE 1: SOLO OBSERVA, NO BLOQUEA.
        *
        * `Report-Only` significa exactamente eso: el navegador avisa por consola
        * de lo que la política prohibiría, pero **no impide nada**. En esta fase
@@ -218,17 +222,29 @@ const nextConfig: NextConfig = {
     const indexable = process.env.NEXT_PUBLIC_PERMITIR_INDEXACION?.trim().toLowerCase() === "true";
 
     /*
-     * FASE 2, SOLO EN EL PANEL (Juan Pablo, tanda 22, 2026-11-24): en `/admin`
-     * la MISMA política va además APLICADA (`Content-Security-Policy`), así
-     * que allí el navegador sí bloquea lo que no admite. El resto del sitio
-     * sigue en solo informe hasta su propio PR.
+     * FASE 2: LA POLÍTICA SE APLICA (Juan Pablo, tanda 22, 2026-11-24). La
+     * MISMA política de arriba va además como `Content-Security-Policy`, así
+     * que el navegador SÍ bloquea lo que no admite. Primero entró solo en
+     * `/admin` (#573) y después en todo el sitio.
      *
-     * Antes de aplicarla se leyó la consola del panel con sesión (agente C):
-     * inicio, listas, fichas, subida de imagen y de PDF, vista previa de un
-     * documento, texto enriquecido y guardar. SI EL PANEL FALLA EN ALGO TRAS UN
-     * CAMBIO DE ESTA POLÍTICA O DE PAYLOAD, lo primero es mirar la consola: un
-     * bloqueo sale como «Refused to…». Para volver atrás basta quitar esta
-     * regla (la de solo informe sigue en todo el sitio).
+     * Qué se probó antes, con la consola delante:
+     * - Panel, con sesión (agente C): inicio, listas, fichas, subida de imagen
+     *   y de PDF, vista previa de un documento, texto enriquecido y guardar.
+     * - Sitio público, en un preview a 390 y 1440 (agente A): portada, Contáctanos,
+     *   Servicio técnico, Nosotros y una ficha de usada, con el mapa de Mapbox,
+     *   un vídeo de YouTube, los vídeos y animaciones del Blob, Turnstile con
+     *   las claves de prueba y un envío del formulario.
+     *
+     * SIN PROBAR: Google Analytics. Ni el preview ni producción tenían
+     * `NEXT_PUBLIC_GA4_ID`, así que nada de Google se cargó. EL DÍA QUE SE PONGA
+     * EL IDENTIFICADOR hay que aceptar las cookies con la consola abierta y
+     * comprobar que no sale ningún «Refused to…» (nota 8 de la política).
+     * Tampoco Turnstile con claves reales, que aún no existen.
+     *
+     * SI ALGO DEJA DE CARGAR tras un cambio de esta política, de Payload o de un
+     * servicio de terceros, lo primero es la consola: un bloqueo sale como
+     * «Refused to…». Para volver atrás basta quitar esta regla: la de solo
+     * informe sigue en todo el sitio.
      */
     const politica = seguridad.find((c) => c.key === "Content-Security-Policy-Report-Only")?.value;
 
@@ -242,7 +258,7 @@ const nextConfig: NextConfig = {
       ...(politica
         ? [
             {
-              source: "/admin/:path*",
+              source: "/:path*",
               headers: [{ key: "Content-Security-Policy", value: politica }],
             },
           ]

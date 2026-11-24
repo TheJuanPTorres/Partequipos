@@ -183,9 +183,12 @@ const nextConfig: NextConfig = {
        *    y solo tras aceptar las cookies: el script de `googletagmanager.com`
        *    y sus envíos a `google-analytics.com` y `analytics.google.com`.
        * 9. Panel, subida directa (tanda 22, 2026-11-23): el navegador sube las
-       *    imágenes y los documentos a `https://vercel.com/api/blob` (leído en
+       *    imágenes y los documentos a `https://vercel.com/api/blob/` (leído en
        *    `@vercel/blob`, la subida de cliente de §10.39). Faltaba en
        *    `connect-src`: con la política aplicada, el panel no podría subir.
+       *    CON LA BARRA FINAL: una fuente con ruta y sin barra solo casa con
+       *    esa ruta exacta, y el navegador pide `/api/blob/?pathname=…` (lo
+       *    vio el agente C subiendo una imagen y un PDF en un preview).
        * 10. Previews (tanda 22): Vercel inyecta su barra de comentarios
        *    (`vercel.live`) SOLO en los previews. Se admite solo ahí, para que
        *    la consola de un preview enseñe únicamente lo que también fallaría
@@ -201,7 +204,7 @@ const nextConfig: NextConfig = {
           `font-src 'self' data: https://*.public.blob.vercel-storage.com${enPreview ? " https://vercel.live https://assets.vercel.com" : ""}`,
           "media-src 'self' https://*.public.blob.vercel-storage.com",
           `frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com${enPreview ? " https://vercel.live" : ""}`,
-          `connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com https://*.public.blob.vercel-storage.com https://vercel.com/api/blob https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com${enPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""}`,
+          `connect-src 'self' https://challenges.cloudflare.com https://api.mapbox.com https://events.mapbox.com https://*.public.blob.vercel-storage.com https://vercel.com/api/blob/ https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com${enPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""}`,
           "worker-src 'self' blob:",
           "child-src blob:",
           "object-src 'none'",
@@ -214,6 +217,21 @@ const nextConfig: NextConfig = {
 
     const indexable = process.env.NEXT_PUBLIC_PERMITIR_INDEXACION?.trim().toLowerCase() === "true";
 
+    /*
+     * FASE 2, SOLO EN EL PANEL (Juan Pablo, tanda 22, 2026-11-24): en `/admin`
+     * la MISMA política va además APLICADA (`Content-Security-Policy`), así
+     * que allí el navegador sí bloquea lo que no admite. El resto del sitio
+     * sigue en solo informe hasta su propio PR.
+     *
+     * Antes de aplicarla se leyó la consola del panel con sesión (agente C):
+     * inicio, listas, fichas, subida de imagen y de PDF, vista previa de un
+     * documento, texto enriquecido y guardar. SI EL PANEL FALLA EN ALGO TRAS UN
+     * CAMBIO DE ESTA POLÍTICA O DE PAYLOAD, lo primero es mirar la consola: un
+     * bloqueo sale como «Refused to…». Para volver atrás basta quitar esta
+     * regla (la de solo informe sigue en todo el sitio).
+     */
+    const politica = seguridad.find((c) => c.key === "Content-Security-Policy-Report-Only")?.value;
+
     return [
       {
         source: "/:path*",
@@ -221,6 +239,14 @@ const nextConfig: NextConfig = {
           ? seguridad
           : [...seguridad, { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
       },
+      ...(politica
+        ? [
+            {
+              source: "/admin/:path*",
+              headers: [{ key: "Content-Security-Policy", value: politica }],
+            },
+          ]
+        : []),
     ];
   },
 };

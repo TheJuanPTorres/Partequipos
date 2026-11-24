@@ -12,6 +12,14 @@ import { slugUnidadUsada, validarSlugUnidadUsada } from "./hooks/slugUnidadUsada
 import { seoField } from "../lib/fields/seoField";
 import { slugField } from "../lib/fields/slugField";
 import { MAX_DESCRIPCION_CORTA, MAX_SERIAL } from "../lib/usados/aditamentos";
+import { validarAnio, validarHorometro } from "../lib/panel/fichaUsada";
+import { conCopia } from "../lib/fields/duplicar";
+
+/** «Mostrar en la web» con interruptor directo en la lista (tarea 3, punto 2). */
+const conInterruptor = <T extends { admin?: Record<string, unknown> }>(c: T): T => ({
+  ...c,
+  admin: { ...c.admin, components: { Cell: "/components/admin/celdas/CeldaInterruptor" } },
+});
 
 const portada = revalidarPortada("equipos-usados");
 
@@ -55,6 +63,30 @@ export const EquipoUsado: CollectionConfig = {
   // Pestañas Contenido · Fotos · Buscadores y redes · Avanzado (fase 2 del panel, sin esquema).
   fields: conPestanas(
     [
+      /*
+       * EDICIÓN FÁCIL (tanda 21, tarea 3, fase 1: PROTOTIPO en el preview, sin esquema): arriba, «Así
+       * se ve hoy en la web» con el indicador de ficha completa, y en la lista la columna «Estado»
+       * (Publicada · Oculta · Vendida). Los dos son campos `ui`: no guardan nada.
+       */
+      {
+        name: "resumenWeb",
+        type: "ui",
+        admin: {
+          components: { Field: "/components/admin/ResumenWebUsada" },
+          disableListColumn: true,
+        },
+      },
+      {
+        name: "estadoWeb",
+        type: "ui",
+        label: "Estado",
+        admin: {
+          components: {
+            Field: "/components/admin/Nada",
+            Cell: "/components/admin/celdas/CeldaEstadoUsada",
+          },
+        },
+      },
       // Avisos en vivo (F4): sin fotos, y «no sale en el sitio» si no está disponible.
       avisoField("avisoNoDisponible", "AvisoNoDisponible"),
       avisoField("avisoSinFotos", "AvisoSinFotos"),
@@ -65,7 +97,13 @@ export const EquipoUsado: CollectionConfig = {
         type: "text",
         required: true,
         label: "Nombre",
-        admin: { description: "Ej. «Excavadora Hitachi ZX200-3»." },
+        // Al duplicar, «(copia)» (tanda 21, `duplicar.ts`).
+        hooks: { beforeDuplicate: [conCopia] },
+        admin: {
+          description:
+            "Como sale en el título de la ficha y en la tarjeta: tipo, marca, modelo y año. Ej. «Excavadora Hitachi ZX200-3 2016».",
+          components: { Cell: "/components/admin/celdas/CeldaNombreFicha" },
+        },
       },
       /*
        * `required: false` en el esquema a propósito: el gancho `slugUnidadUsada`
@@ -108,26 +146,47 @@ export const EquipoUsado: CollectionConfig = {
         label: "Marca",
         admin: { hidden: true },
       },
-      { name: "modelo", type: "text", label: "Modelo" },
+      {
+        name: "modelo",
+        type: "text",
+        label: "Modelo",
+        admin: {
+          description:
+            "Como lo escribe el fabricante, con guiones y mayúsculas. Ej. «ZX200-3». Debajo salen los que ya usan otras unidades de esta marca.",
+          components: { Field: "/components/admin/CampoModeloUsada" },
+        },
+      },
       {
         name: "anio",
         type: "number",
         label: "Año",
-        admin: { description: "Año del equipo, no de la publicación." },
+        validate: (v: unknown) => validarAnio(v),
+        admin: {
+          step: 1,
+          placeholder: "Ej. 2016",
+          description: "Año de fabricación de la máquina, no de la publicación. Cuatro cifras.",
+        },
       },
       {
         name: "horometro",
         type: "number",
         label: "Horómetro (horas)",
+        validate: (v: unknown) => validarHorometro(v),
         admin: {
-          description: "Horas de trabajo acumuladas. Es el dato que más comparan los compradores.",
+          step: 1,
+          placeholder: "Ej. 8450",
+          description:
+            "Horas de trabajo acumuladas, sin puntos. Es el dato que más comparan los compradores.",
         },
       },
       {
         name: "ubicacion",
         type: "text",
         label: "Ubicación",
-        admin: { description: "Ciudad donde está el equipo; condiciona el costo de traslado." },
+        admin: {
+          placeholder: "Ej. Bogotá",
+          description: "Ciudad donde está la máquina; condiciona el costo de traslado.",
+        },
       },
       /*
        * FICHA TÉCNICA de la tarjeta de la portada (sección 3 de ux-9: «Peso
@@ -198,8 +257,12 @@ export const EquipoUsado: CollectionConfig = {
         type: "upload",
         relationTo: "media",
         hasMany: true,
-        label: "Imágenes",
-        admin: { components: { Cell: "/components/admin/celdas/CeldaMiniatura" } },
+        label: "Fotos",
+        admin: {
+          components: { Cell: "/components/admin/celdas/CeldaMiniatura" },
+          description:
+            "Puedes elegir o subir varias a la vez. Arrastra para ordenarlas: la PRIMERA es la portada (la de la tarjeta del listado y la de arriba de la ficha).",
+        },
       },
       /*
        * PDF de la unidad (Home V2, sección «Maquinaria pesada usada»): la tarjeta
@@ -222,17 +285,20 @@ export const EquipoUsado: CollectionConfig = {
        * decide mostrarlo, se añade entonces con su moneda y su vigencia.
        */
       // Distinto de «Disponible» (vendida: su página lleva a la categoría con 308). Oculta: 307.
-      mostrarEnWebField({
-        descripcion:
-          "Desmarcada, la unidad desaparece de toda la web (listados, portada, menú, buscador y sitemap) sin borrarse del panel, y su página lleva a su categoría de forma temporal. Para una unidad VENDIDA usa «Disponible».",
-      }),
+      conInterruptor(
+        mostrarEnWebField({
+          descripcion:
+            "Desmarcada, la unidad desaparece de toda la web (listados, portada, menú, buscador y sitemap) sin borrarse del panel, y su página lleva a su categoría de forma temporal. Para una unidad VENDIDA usa «Disponible».",
+        }),
+      ),
       {
         name: "disponible",
         type: "checkbox",
         defaultValue: true,
         label: "Disponible",
         admin: {
-          components: { Cell: "/components/admin/celdas/CeldaDisponible" },
+          // En la lista, interruptor directo (tarea 3, punto 2): desmarcada = «Vendida».
+          components: { Cell: "/components/admin/celdas/CeldaInterruptor" },
           position: "sidebar",
           description:
             "Al venderse, desmarcar en vez de borrar: conserva el historial y permite deshacer.",

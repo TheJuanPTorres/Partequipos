@@ -41,7 +41,7 @@ type Entrada = {
  */
 export function tituloContactoRepuestos(nombre: string): string {
   const limpio = nombre.trim();
-  return /^repuestos\b/i.test(limpio)
+  return /\brepuestos\b/i.test(limpio)
     ? `Contacto sobre ${limpio}`
     : `Contacto sobre repuestos ${limpio}`;
 }

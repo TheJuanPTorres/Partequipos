@@ -1147,9 +1147,37 @@ try {
         await pagina.goto(`${base}/admin/collections/equipos-usados/${id}`, {
           waitUntil: "networkidle",
         });
-        await pagina.locator(".live-preview-toggler").first().click({ timeout: 10000 });
-        const marco = pagina.frameLocator("iframe.live-preview-iframe");
-        await marco.locator("h1").first().waitFor({ timeout: 20000 });
+        const paso = async (nombrePaso, accion) => {
+          try {
+            await accion();
+          } catch (e) {
+            await pagina.screenshot({ path: path.join(salida, `vivo-fallo-${ancho.nombre}.png`) });
+            const estado = await pagina.evaluate(() => {
+              const v = document.querySelector(".live-preview-window");
+              const f = document.querySelector("iframe.live-preview-iframe");
+              const caja = (el) => (el ? JSON.stringify(el.getBoundingClientRect()) : "—");
+              return {
+                ventana: v ? `${v.className} ${caja(v)}` : "no hay",
+                iframe: f ? `${f.getAttribute("src")} ${caja(f)}` : "no hay",
+                boton: document.querySelector(".live-preview-toggler")?.className ?? "no hay",
+                html: v ? v.innerHTML.replace(/<svg[\s\S]*?<\/svg>/g, "").slice(0, 1500) : "",
+              };
+            });
+            decir(`   estado: ${JSON.stringify(estado)}`);
+            fallar(`vivo: falló «${nombrePaso}» (${String(e).split("\n")[0]})`);
+          }
+        };
+        // Payload recuerda por usuario si la dejó abierta: solo se pulsa si está cerrada.
+        await paso("abrir la vista previa en vivo", async () => {
+          const boton = pagina.locator(".live-preview-toggler").first();
+          await boton.waitFor({ timeout: 10000 });
+          const activa = (await boton.getAttribute("class"))?.includes("--active");
+          if (!activa) await boton.click();
+        });
+        const marco = pagina.frameLocator("#live-preview-iframe");
+        await paso("la ficha en el iframe", () =>
+          marco.locator("h1").first().waitFor({ timeout: 20000 }),
+        );
         const nombre = pagina.locator("#field-nombre");
         await nombre.click();
         await nombre.press("End");

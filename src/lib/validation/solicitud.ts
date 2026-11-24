@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MENSAJE_TELEFONO, telefonoValido } from "@/lib/validation/telefono";
 
 import {
   INTERESES,
@@ -27,15 +28,13 @@ const VALORES_PERFIL = PERFILES.map((p) => p.valor) as [string, ...string[]];
 
 /*
  * Teléfono: se acepta cualquier combinación de dígitos, espacios, guiones,
- * paréntesis y un `+` inicial, con entre 7 y 15 dígitos.
+ * paréntesis y un `+` inicial, con entre 7 y 15 dígitos (`telefono.ts`, la misma regla en todos los formularios).
  *
  * Deliberadamente laxo. Colombia mezcla fijos de 7 cifras con indicativo,
  * móviles de 10 y números internacionales; una expresión estricta rechazaría
  * clientes reales, y rechazar un lead válido es peor que guardar un teléfono
  * mal escrito que el comercial verá igualmente.
  */
-const TELEFONO = /^[+]?[\d\s\-().]{7,25}$/;
-const soloDigitos = (v: string) => v.replace(/\D/g, "").length;
 
 const textoObligatorio = (campo: string, max: number) =>
   z
@@ -72,9 +71,7 @@ export const esquemaSolicitud = z.object({
     .max(MAX.telefono, "El teléfono es demasiado largo.")
     .optional()
     .transform((v) => (v ? v : undefined))
-    .refine((v) => v === undefined || (TELEFONO.test(v) && soloDigitos(v) >= 7), {
-      message: "Ese teléfono no parece válido. Ejemplo: +57 317 670 7071.",
-    }),
+    .refine((v) => v === undefined || telefonoValido(v), { message: MENSAJE_TELEFONO }),
 
   empresa: textoOpcional(MAX.empresa, "El nombre de la empresa es demasiado largo."),
 

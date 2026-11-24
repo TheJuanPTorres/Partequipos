@@ -21,7 +21,7 @@ describe("enlaceDeFilaObligatorio", () => {
 });
 
 describe("enlacesDeCabecera", () => {
-  it("la tienda (https de otro sitio) es externa; las rutas y el propio dominio, no", () => {
+  it("la tienda (https de otro sitio) es externa; el propio dominio con https, enlace normal en otra pestaña", () => {
     assert.deepEqual(
       enlacesDeCabecera([
         { etiqueta: "Blog", enlace: "/noticias/", mostrar: true },
@@ -30,8 +30,13 @@ describe("enlacesDeCabecera", () => {
       ]),
       [
         { etiqueta: "Blog", href: "/noticias/" },
-        { etiqueta: "Tienda", href: "https://tienda.partequipos.com/", externo: true },
-        { etiqueta: "Nosotros", href: "https://partequipos.com/nosotros/" },
+        {
+          etiqueta: "Tienda",
+          href: "https://tienda.partequipos.com/",
+          externo: true,
+          otraPestana: true,
+        },
+        { etiqueta: "Nosotros", href: "https://partequipos.com/nosotros/", otraPestana: true },
       ],
     );
   });
@@ -53,7 +58,14 @@ describe("enlacesDeCabecera", () => {
         { etiqueta: "Y", enlace: "" },
         { etiqueta: " Tienda ", enlace: " https://tienda.partequipos.com/ " },
       ]),
-      [{ etiqueta: "Tienda", href: "https://tienda.partequipos.com/", externo: true }],
+      [
+        {
+          etiqueta: "Tienda",
+          href: "https://tienda.partequipos.com/",
+          externo: true,
+          otraPestana: true,
+        },
+      ],
     );
     assert.deepEqual(enlacesDeCabecera(undefined), []);
   });

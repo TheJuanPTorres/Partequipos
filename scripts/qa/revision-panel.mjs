@@ -1396,11 +1396,18 @@ try {
         pagina
           .locator(".tabs-field__tab-button--active")
           .first()
-          .textContent()
+          .textContent({ timeout: 1500 })
           .then((t) => t?.trim() ?? "")
           .catch(() => "");
+      // ¿Responde la página? Un evaluate con límite de 2 s (si el hilo estuviera bloqueado, no vuelve).
+      const responde = () =>
+        Promise.race([
+          pagina.evaluate(() => 1).then(() => true),
+          new Promise((r) => setTimeout(() => r(false), 2000)),
+        ]);
       await pagina.goto(`${ficha}?pestana=buscadores&campo=seo.metaTitle`, {
-        waitUntil: "networkidle",
+        waitUntil: "load",
+        timeout: 30000,
       });
       let foco = "";
       for (let i = 0; i < 40 && foco !== "field-seo__metaTitle"; i++) {
@@ -1413,22 +1420,38 @@ try {
       );
       ok(`pestaña y campo: el foco queda en el campo (${foco})`, foco === "field-seo__metaTitle");
       await pagina.screenshot({ path: path.join(salida, `editar-campo-${ancho.nombre}.png`) });
-      await pagina.goto(`${ficha}?pestana=fotos`, { waitUntil: "networkidle" });
-      await pagina.waitForTimeout(2000);
+      await pagina.goto(`${ficha}?pestana=fotos`, { waitUntil: "load", timeout: 30000 });
+      for (let i = 0; i < 24 && (await pestanaActiva()) !== "Fotos"; i++)
+        await pagina.waitForTimeout(250);
       ok(`solo pestaña: abre «${await pestanaActiva()}»`, (await pestanaActiva()) === "Fotos");
       await pagina.screenshot({ path: path.join(salida, `editar-pestana-${ancho.nombre}.png`) });
+      // Control: la misma ficha sin `pestana` ni `campo` (IrAlCampo no hace nada).
+      await pagina.goto(ficha, { waitUntil: "load", timeout: 30000 });
+      await pagina.waitForTimeout(2500);
+      ok(
+        `control sin parámetros: la página responde (pestaña «${await pestanaActiva()}»)`,
+        await responde(),
+      );
       const malicioso =
         "?pestana=__proto__&campo=" + encodeURIComponent('"><img src=x onerror=alert(1)>');
-      await pagina.goto(`${ficha}${malicioso}`, { waitUntil: "networkidle" });
-      for (let i = 0; i < 20 && !(await pestanaActiva()); i++) await pagina.waitForTimeout(250);
+      await pagina.goto(`${ficha}${malicioso}`, { waitUntil: "load", timeout: 30000 });
       await pagina.waitForTimeout(2500);
-      const inyectada = await pagina.locator('img[src="x"]').count();
-      const focoMalo = await pagina.evaluate(() => document.activeElement?.id ?? "");
+      const vivaMal = await responde();
+      const inyectada = vivaMal ? await pagina.locator('img[src="x"]').count() : -1;
+      const focoMalo = vivaMal
+        ? await pagina.evaluate(() => document.activeElement?.id ?? "")
+        : "?";
       // La pestaña es la que Payload recuerde del usuario: lo que importa es que nada se inyecte.
       ok(
-        `valores maliciosos: no hace nada (${inyectada} imágenes inyectadas, ${dialogos} diálogos, foco «${focoMalo}», pestaña «${await pestanaActiva()}»)`,
-        inyectada === 0 && dialogos === 0 && !focoMalo.startsWith("field-"),
+        `valores maliciosos: la página responde y no pasa nada (${inyectada} imágenes inyectadas, ${dialogos} diálogos, foco «${focoMalo}», pestaña «${await pestanaActiva()}»)`,
+        vivaMal && inyectada === 0 && dialogos === 0 && !focoMalo.startsWith("field-"),
       );
+      await pagina
+        .screenshot({
+          path: path.join(salida, `editar-malicioso-${ancho.nombre}.png`),
+          timeout: 10000,
+        })
+        .catch(() => null);
       hallazgos.push({ pantalla: "editar", ancho: ancho.nombre, resultado, errores, fallidas });
       await contexto.close();
       continue;

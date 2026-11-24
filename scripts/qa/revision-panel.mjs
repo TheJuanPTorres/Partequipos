@@ -650,7 +650,8 @@ try {
       }
       const coleccion = process.argv[4] ?? "equipos-nuevos";
       const id = Number(process.argv[5] ?? 1);
-      const campo = "entradilla";
+      // `… versiones <coleccion> <id> <campo de texto>`: en usadas y modelos no hay entradilla.
+      const campo = process.argv[6] && process.argv[6] !== "api" ? process.argv[6] : "entradilla";
       const api = (ruta, opciones = {}) =>
         pagina.evaluate(
           async ([r, o]) => {

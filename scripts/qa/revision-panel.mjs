@@ -1115,15 +1115,18 @@ try {
      * pone y lo quita `scripts/paginas/prueba-borrador.ts` (marca «PRUEBA BORRADOR 8B»).
      */
     /*
-     * Modo `vivo` (`… vivo <id de una unidad usada>`, punto 5): la VISTA PREVIA EN VIVO por efecto.
-     * Sin sesión la ruta da 404; con sesión pinta la ficha con `noindex`. A 1440, en el formulario
-     * de la unidad se abre «Vista previa en vivo», se escribe una marca en el nombre SIN GUARDAR y
-     * el título del iframe la muestra. En móvil, la ruta misma. Nada se guarda: el contexto se cierra.
+     * Modo `vivo` (`… vivo <id> [colección] [campo]`, punto 5): la VISTA PREVIA EN VIVO por efecto.
+     * Por defecto, una unidad usada y su nombre. Sin sesión la ruta da 404; con sesión pinta la
+     * ficha con `noindex`. A 1440, en el formulario se abre «Vista previa en vivo», se escribe una
+     * marca en el campo SIN GUARDAR y el iframe la muestra. En móvil, la ruta misma. Nada se
+     * guarda: el contexto se cierra.
      */
     if (MODO === "vivo") {
       const id = process.argv[4];
-      if (!/^\d+$/.test(id ?? "")) fallar("Uso: … vivo <id de una unidad usada>");
-      const ruta = `${base}/vista-previa/equipos-usados/${id}/`;
+      if (!/^\d+$/.test(id ?? "")) fallar("Uso: … vivo <id> [colección] [campo]");
+      const coleccion = process.argv[5] ?? "equipos-usados";
+      const campo = process.argv[6] ?? "nombre";
+      const ruta = `${base}/vista-previa/${coleccion}/${id}/`;
       const resultado = [];
       const ok = (texto, bien) => {
         resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
@@ -1141,10 +1144,12 @@ try {
       }));
       ok(`con sesión pinta la ficha («${directa.h1.slice(0, 50)}»)`, directa.h1.length > 0);
       ok(`noindex (${directa.robots})`, /noindex/.test(directa.robots));
-      await pagina.screenshot({ path: path.join(salida, `vivo-ruta-${ancho.nombre}.png`) });
+      await pagina.screenshot({
+        path: path.join(salida, `vivo-ruta-${coleccion}-${ancho.nombre}.png`),
+      });
       if (!ancho.movil) {
         const MARCA = " PRUEBA VIVO";
-        await pagina.goto(`${base}/admin/collections/equipos-usados/${id}`, {
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}`, {
           waitUntil: "networkidle",
         });
         const paso = async (nombrePaso, accion) => {
@@ -1178,22 +1183,30 @@ try {
         await paso("la ficha en el iframe", () =>
           marco.locator("h1").first().waitFor({ timeout: 20000 }),
         );
-        const nombre = pagina.locator("#field-nombre");
-        await nombre.click();
-        await nombre.press("End");
-        await nombre.pressSequentially(MARCA, { delay: 30 });
-        let vivo = "";
-        for (let i = 0; i < 20 && !vivo.includes(MARCA.trim()); i++) {
+        const entrada = pagina.locator(`#field-${campo}`);
+        await entrada.click();
+        await entrada.press("End");
+        await entrada.pressSequentially(MARCA, { delay: 30 });
+        // Las pintadas en el servidor tardan más (pausa de 500 ms y la petición): hasta 20 s.
+        let vivo = false;
+        for (let i = 0; i < 40 && !vivo; i++) {
           await pagina.waitForTimeout(500);
-          vivo = (await marco.locator("h1").first().textContent()) ?? "";
+          vivo = ((await marco.locator("body").textContent()) ?? "").includes(MARCA.trim());
         }
-        ok(
-          `al escribir sin guardar, el iframe lo muestra («${vivo.trim().slice(-40)}»)`,
-          vivo.includes(MARCA.trim()),
-        );
-        await pagina.screenshot({ path: path.join(salida, `vivo-panel-${ancho.nombre}.png`) });
+        ok(`al escribir en «${campo}» sin guardar, el iframe lo muestra`, vivo);
+        await pagina.screenshot({
+          path: path.join(salida, `vivo-panel-${coleccion}-${ancho.nombre}.png`),
+        });
       }
-      hallazgos.push({ pantalla: "vivo", ancho: ancho.nombre, id, resultado, errores, fallidas });
+      hallazgos.push({
+        pantalla: "vivo",
+        ancho: ancho.nombre,
+        coleccion,
+        id,
+        resultado,
+        errores,
+        fallidas,
+      });
       // Sin guardar: se cierra el contexto y lo escrito se pierde.
       await contexto.close();
       continue;

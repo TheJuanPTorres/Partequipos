@@ -327,6 +327,86 @@ try {
     }
 
     /*
+     * Modo `facil` (2026-11-23, tarea 3, fase 2): la EDICIÓN FÁCIL de las fichas de producto. Por
+     * colección (las de `… facil <col1,col2>`; por defecto nuevas, modelos y usadas), la lista y la
+     * cabecera de la primera ficha, y si salen el resumen «Así se ve hoy en la web», la columna
+     * «Estado», los interruptores y las sugerencias. Solo lee.
+     */
+    if (MODO === "facil") {
+      const colecciones = (process.argv[4] ?? "equipos-nuevos,modelos-repuesto,equipos-usados")
+        .split(",")
+        .filter(Boolean);
+      for (const coleccion of colecciones) {
+        await pagina.goto(`${base}/admin/collections/${coleccion}?limit=5&sort=id`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(1500);
+        await pagina.screenshot({
+          path: path.join(salida, `lista-${coleccion}-${ancho.nombre}.png`),
+          fullPage: true,
+        });
+        const lista = await pagina.evaluate(() => ({
+          columnas: [...document.querySelectorAll("table thead th")].map((th) =>
+            th.textContent.trim(),
+          ),
+          celdasNombre: document.querySelectorAll(".pq-celda-nombre").length,
+          estados: [...document.querySelectorAll(".pq-insignia")].map((e) => e.textContent.trim()),
+          interruptores: document.querySelectorAll('[role="switch"]').length,
+        }));
+        const primera = await pagina.evaluate(
+          async (r) => (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+          `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+        );
+        let ficha = null;
+        if (primera) {
+          await pagina.goto(`${base}/admin/collections/${coleccion}/${primera}`, {
+            waitUntil: "networkidle",
+          });
+          await pagina.waitForTimeout(2500);
+          await pagina.screenshot({
+            path: path.join(salida, `ficha-${coleccion}-${ancho.nombre}.png`),
+            fullPage: false,
+          });
+          // Las filas de una lista (los productos de lubricante): su etiqueta, a la vista.
+          const etiquetas = pagina.locator(".pq-etiqueta-producto");
+          if ((await etiquetas.count()) > 0) {
+            await etiquetas.first().scrollIntoViewIfNeeded();
+            await pagina.waitForTimeout(500);
+            await pagina.screenshot({
+              path: path.join(salida, `filas-${coleccion}-${ancho.nombre}.png`),
+              fullPage: false,
+            });
+          }
+          ficha = await pagina.evaluate(() => ({
+            filas: [...document.querySelectorAll(".pq-etiqueta-producto")]
+              .slice(0, 6)
+              .map((e) => e.textContent.trim()),
+            resumen:
+              document.querySelector(".pq-resumen-web__completa strong")?.textContent?.trim() ??
+              null,
+            falta:
+              document.querySelector(".pq-resumen-web__barra-texto span")?.textContent?.trim() ??
+              null,
+            estado:
+              document.querySelector(".pq-resumen-web .pq-insignia")?.textContent?.trim() ?? null,
+            verEnLaWeb: Boolean(document.querySelector(".pq-resumen-web__ver")),
+            sugerencias: [...document.querySelectorAll(".pq-sugerencias")].map((s) =>
+              s.textContent.trim().slice(0, 120),
+            ),
+          }));
+        }
+        hallazgos.push({ pantalla: `facil-${coleccion}`, ancho: ancho.nombre, lista, ficha });
+        decir(
+          `✓ ${coleccion} (${ancho.nombre}): ${lista.celdasNombre} nombres con foto, estados ${[...new Set(lista.estados)].join("/") || "-"}, ${lista.interruptores} interruptores · ficha ${primera ?? "-"}: ${ficha?.estado ?? "-"}, ${ficha?.resumen ?? "sin resumen"}${ficha?.verEnLaWeb ? ", «Ver en la web»" : ""}${ficha?.sugerencias?.length ? ` · sugerencias: ${ficha.sugerencias.join(" | ")}` : ""}`,
+        );
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
      * Modo `bloque` (2026-11-23, #558): CAMBIOS EN BLOQUE y DUPLICAR, por efecto (§10.15), a 1440.
      * En usadas y nuevas marca las 2 primeras filas visibles y en la web y disponibles, pulsa cada
      * acción («Sí, hacerlo»), y lee por la API con la sesión que solo cambian esas 2 (las otras 8
@@ -548,6 +628,75 @@ try {
       hallazgos.push({ pantalla: "bloque-duplicar", ancho: ancho.nombre, resultado });
       hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
       hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `csp` (2026-11-23, para A): los avisos de la Content-Security-Policy (en modo
+     * report-only) en el panel con sesión: inicio, lista de usadas, una usada y una nueva. Junta los
+     * eventos `securitypolicyviolation` de la página y los mensajes de consola que nombran la CSP.
+     * Solo lee.
+     */
+    if (MODO === "csp") {
+      const consola = [];
+      pagina.on("console", (m) => {
+        const t = m.text();
+        if (/Content[- ]Security[- ]Policy|Report Only/i.test(t)) consola.push(t.slice(0, 400));
+      });
+      await contexto.addInitScript(() => {
+        window.__violaciones = [];
+        document.addEventListener("securitypolicyviolation", (e) =>
+          window.__violaciones.push({
+            directiva: e.effectiveDirective,
+            bloqueado: e.blockedURI,
+            fuente: e.sourceFile ? `${e.sourceFile}:${e.lineNumber}` : "",
+            disposicion: e.disposition,
+            muestra: (e.sample ?? "").slice(0, 80),
+          }),
+        );
+      });
+      const idDe = async (coleccion) =>
+        pagina.evaluate(
+          async (r) => (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+          `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+        );
+      const usada = await idDe("equipos-usados");
+      const nueva = await idDe("equipos-nuevos");
+      const RUTAS = [
+        ["inicio", "/admin"],
+        ["lista-usadas", "/admin/collections/equipos-usados"],
+        ["ficha-usada", `/admin/collections/equipos-usados/${usada}`],
+        ["ficha-nueva", `/admin/collections/equipos-nuevos/${nueva}`],
+      ];
+      for (const [nombre, ruta] of RUTAS) {
+        const antes = consola.length;
+        await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(2500);
+        const violaciones = await pagina.evaluate(() => window.__violaciones ?? []);
+        const unicas = [...new Map(violaciones.map((v) => [JSON.stringify(v), v])).values()];
+        // Sin la query: solo origen y ruta de lo bloqueado.
+        const limpias = unicas.map((v) => ({
+          ...v,
+          bloqueado: /^https?:/.test(v.bloqueado)
+            ? (() => {
+                const u = new URL(v.bloqueado);
+                return `${u.origin === origin ? "(mismo origen)" : u.origin}${u.pathname}`;
+              })()
+            : v.bloqueado,
+          fuente: v.fuente.replace(origin, ""),
+        }));
+        hallazgos.push({
+          pantalla: `csp-${nombre}`,
+          ancho: ancho.nombre,
+          violaciones: limpias,
+          consola: consola.slice(antes),
+        });
+        decir(
+          `· ${nombre} (${ancho.nombre}): ${limpias.length} violaciones${limpias.length ? `: ${limpias.map((v) => `${v.directiva} ← ${v.bloqueado}`).join(" | ")}` : ""} · ${consola.length - antes} mensajes de consola`,
+        );
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
       await contexto.close();
       continue;
     }

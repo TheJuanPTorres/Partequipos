@@ -48,7 +48,11 @@ export const camposResumenWeb = (): Field[] => [
 export const CELDA_NOMBRE_FICHA = "/components/admin/celdas/CeldaNombreFicha";
 
 /** Campo de texto con sugerencias de otras fichas con el mismo `filtro` (punto 7). */
-export const campoConSugerencias = (filtro: string, titulo: string) => ({
+export const campoConSugerencias = (
+  filtro: string,
+  titulo: string,
+  desde?: { coleccion: string; lista: string; subcampo: string },
+) => ({
   path: "/components/admin/CampoConSugerencias",
-  clientProps: { filtro, titulo },
+  clientProps: desde ? { filtro, titulo, desde } : { filtro, titulo },
 });

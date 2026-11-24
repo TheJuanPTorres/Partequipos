@@ -45,7 +45,7 @@ export const LISTADOS: Record<string, Listado> = {
     busqueda: ["nombre", "codigo"],
   },
   "modelos-repuesto": {
-    columnas: ["imagenes", "nombre", "codigo", "marca", "tipo", "mostrarEnWeb"],
+    columnas: ["nombre", "estadoWeb", "codigo", "marca", "tipo", "mostrarEnWeb"],
     busqueda: ["nombre", "codigo"],
   },
   marcas: { columnas: ["logo", "nombre"], busqueda: ["nombre"] },

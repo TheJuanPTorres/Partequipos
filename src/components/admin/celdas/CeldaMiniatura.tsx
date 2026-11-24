@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { DefaultServerCellComponentProps } from "payload";
 import { cache } from "react";
 
+import { hrefDeFicha, tituloDeFila } from "@/lib/panel/enlaceFicha";
 import { primeraImagen } from "@/lib/panel/miniatura";
 
 /*
@@ -29,17 +30,20 @@ const leerImagen = cache(
  * destacada), pequeña y diferida (F3, decisiones-panel.md §24). Componente de
  * servidor; `next/image` la pide a 40 px (1x y 2x) con `loading="lazy"`.
  * Decorativa (`alt=""`): el nombre de la fila ya dice qué es.
+ *
+ * SI ES LA PRIMERA COLUMNA, ENLAZA A LA FICHA (2026-11-24, urgente): en la lista de Payload solo la
+ * primera columna abre la ficha, y Payload le pasa `link` a su celda; una celda propia tiene que
+ * pintar el enlace ella. Sin esto, en las listas que empiezan por el logo o la imagen (marcas,
+ * tipos, categorías) ninguna celda abría la ficha (desde el #513). El enlace lleva el nombre de la
+ * fila para los lectores de pantalla. Lo vigila `listadosAbrenFicha.test.ts`.
  */
-export default async function CeldaMiniatura({
-  cellData,
-  payload,
-}: DefaultServerCellComponentProps) {
+export default async function CeldaMiniatura(props: DefaultServerCellComponentProps) {
+  const { cellData, payload } = props;
   const id = primeraImagen(cellData);
   const imagen = id !== null ? await leerImagen(payload, id) : null;
-  if (!imagen?.url) {
-    return <span className="pq-miniatura pq-miniatura--vacia">Sin foto</span>;
-  }
-  return (
+  const miniatura = !imagen?.url ? (
+    <span className="pq-miniatura pq-miniatura--vacia">Sin foto</span>
+  ) : (
     <span className="pq-miniatura">
       <Image
         alt=""
@@ -51,5 +55,13 @@ export default async function CeldaMiniatura({
         width={40}
       />
     </span>
+  );
+  const href = props.link ? hrefDeFicha(props) : undefined;
+  if (!href) return miniatura;
+  return (
+    <a href={href} className="pq-celda-enlace">
+      {miniatura}
+      <span className="sr-only">{tituloDeFila(props)}</span>
+    </a>
   );
 }

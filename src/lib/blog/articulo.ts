@@ -87,10 +87,13 @@ export function postRecientes(
   idActual: number,
   n = 3,
 ): ArticuloLista[] {
-  return articulos
-    .filter((a) => a.id !== idActual)
-    .sort((a, b) => b.fecha.localeCompare(a.fecha))
-    .slice(0, n);
+  return (
+    articulos
+      .filter((a) => a.id !== idActual)
+      // orden-libre: por fecha (blog, como está).
+      .sort((a, b) => b.fecha.localeCompare(a.fecha))
+      .slice(0, n)
+  );
 }
 
 /**

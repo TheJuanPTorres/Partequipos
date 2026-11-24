@@ -27,6 +27,7 @@ export function pestanasDeCategorias(
   const n = (id: number) => unidadesPorCategoria.get(id) ?? 0;
   const con = categorias
     .filter((c) => n(c.id) > 0)
+    // orden-libre: por unidades, PENDIENTE de la decisión de Juan Pablo (H2, tanda 21).
     .sort((a, b) => n(b.id) - n(a.id) || a.nombre.localeCompare(b.nombre, "es"));
   const vacias = categorias.filter((c) => n(c.id) === 0);
   return [...con, ...vacias].map((c) => ({

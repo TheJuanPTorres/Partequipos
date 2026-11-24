@@ -86,6 +86,7 @@ export function ciudadesDe(vacantes: Vacante[]): OpcionCiudad[] {
     if (actual) actual.cuantas += 1;
     else mapa.set(slug, { slug, nombre: v.ciudad, cuantas: 1 });
   }
+  // orden-libre: las ciudades de las vacantes de Buk (vienen de fuera, no del panel).
   return [...mapa.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
 }
 

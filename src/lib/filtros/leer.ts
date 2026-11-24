@@ -80,9 +80,11 @@ function enOrden<T>(catalogo: Catalogo<T>, clave: string, valores: readonly stri
   const faceta = catalogo.facetas.find((f) => f.clave === clave);
   if (faceta?.tipo === "tramos") {
     const posicion = new Map(faceta.tramos.map((t, i) => [t.valor, i]));
+    // orden-libre: la forma canónica de la URL de los filtros, no un listado.
     return [...valores].sort((a, b) => (posicion.get(a) ?? 0) - (posicion.get(b) ?? 0));
   }
   if (faceta?.ordenOpciones === "valor-desc") {
+    // orden-libre: la forma canónica de la URL de los filtros, no un listado.
     return [...valores].sort((a, b) => b.localeCompare(a, "es", { numeric: true }));
   }
   return [...valores].sort();

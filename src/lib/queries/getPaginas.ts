@@ -38,6 +38,7 @@ export const getPaginas = cache(async (): Promise<Pagina[]> => {
     where: soloPublicado(),
     depth: 1,
     limit: 0,
+    // orden-libre: solo da las rutas de generateStaticParams; no se pinta como lista.
     sort: "titulo",
   });
 

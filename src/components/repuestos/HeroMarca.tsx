@@ -68,8 +68,8 @@ export function HeroMarca({
   bajo?: boolean;
   /** Títulos largos de una sola línea (los de WordPress de cada modelo): más pequeños en móvil. */
   tituloLargo?: boolean;
-  /** Nombre accesible del icono del ratón. */
-  etiquetaRaton?: string;
+  /** Nombre accesible del icono del ratón: adónde lleva `anclaSiguiente` («Ir a los modelos»). */
+  etiquetaRaton: string;
   /**
    * Migas VISIBLES sobre el logo (la plantilla de Andrés de las líneas de lubricante, 4039),
    * con los mismos items del `BreadcrumbList`. Sin ellas, la página pone las suyas.

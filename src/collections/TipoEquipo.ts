@@ -165,7 +165,7 @@ export const TipoEquipo: CollectionConfig = {
         labels: { singular: "Entrada", plural: "Entradas" },
         admin: {
           description:
-            "Opcional. Modelos que se nombran en la lista de la página del tipo sin ser modelos de este tipo: sin ficha (solo el texto) o con enlace a la ficha de otro modelo.",
+            "Opcional. Modelos que se nombran en la lista de la página del tipo sin ser modelos de este tipo, con enlace a la ficha de otro modelo. Una entrada sin «Enlaza a la ficha de» no se muestra en la web: se guarda aquí por si un día tiene ficha.",
           initCollapsed: true,
         },
         fields: [

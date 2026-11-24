@@ -8,7 +8,7 @@ import { Turnstile } from "@/components/forms/Turnstile";
 import { enviarEvento } from "@/lib/analitica/navegador";
 import { ESTADO_INICIAL } from "@/lib/actions/estadoFormulario";
 import { enviarSolicitud } from "@/lib/actions/solicitudes";
-import { CAMPO_TIEMPO, CAMPO_TRAMPA } from "@/lib/formularios/antiSpam";
+import { CAMPO_TIEMPO, CAMPO_TRAMPA } from "@/lib/formularios/camposAntiSpam";
 import { INTERESES, PERFILES, type TipoSolicitud } from "@/lib/validation/opcionesSolicitud";
 import { conMensaje, mensajeWhatsApp } from "@/lib/whatsapp";
 import wa from "@/components/whatsapp/botonWhatsapp.module.css";
@@ -114,7 +114,7 @@ export function FormularioSolicitud({
   const whatsappContexto = whatsapp
     ? new URL(whatsapp.href).searchParams.has("text")
       ? whatsapp
-      : conMensaje(whatsapp, mensajeWhatsApp(referencia?.texto, titulo))
+      : conMensaje(whatsapp, mensajeWhatsApp(referencia?.texto, titulo, mensajeInicial))
     : undefined;
   /*
    * La VENTANA EMERGENTE lleva siempre «Ciudad» y «¿Qué necesitas?» (dirección,

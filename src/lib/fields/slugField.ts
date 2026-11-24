@@ -1,6 +1,7 @@
 import type { Field, FieldAccess, TextFieldSingleValidation } from "payload";
 
 import { formatSlugHook } from "../utils/formatSlug";
+import { slugDeCopia } from "./duplicar";
 
 type SlugFieldOptions = {
   /** Campo del que se deriva el slug si está vacío. Por defecto "nombre". */
@@ -77,6 +78,8 @@ export function slugField({
     access: { update: slugEditable },
     hooks: {
       beforeValidate: [formatSlugHook(from)],
+      // Al duplicar, una dirección libre («-copia», «-copia-2»…): tanda 21, `duplicar.ts`.
+      beforeDuplicate: [slugDeCopia],
     },
   };
 }

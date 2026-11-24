@@ -2329,3 +2329,289 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
     text-underline-offset: 2px;
   }
 }
+
+/* Cambios en bloque encima de la lista (tanda 21, `AccionesEnBloque.tsx`): una barra que envuelve
+   en móvil, con botones de 36 px de alto (táctil) y el aviso del resultado. */
+.pq-en-bloque {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--pq-foreground);
+}
+.pq-en-bloque__boton {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius, 0.45rem);
+  background: var(--pq-background);
+  color: var(--pq-foreground);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--pq-foreground);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--pq-ring, currentColor);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+}
+.pq-en-bloque__boton--si {
+  border-color: var(--pq-foreground);
+  background: var(--pq-foreground);
+  color: var(--pq-background);
+}
+.pq-en-bloque__estado {
+  flex-basis: 100%;
+}
+.pq-en-bloque__estado--error {
+  color: var(--pq-destructive, #b91c1c);
+}
+
+/* ===================================================================
+ * EDICIÓN FÁCIL DE LA FICHA DE USADA (tanda 21, tarea 3, fase 1: PROTOTIPO)
+ * Lista: nombre con miniatura que abre la ficha e interruptores directos.
+ * Ficha: «Así se ve hoy en la web» e indicador de ficha completa.
+ * =================================================================== */
+
+.pq-solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.pq-celda-nombre {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--pq-foreground);
+  font-weight: 500;
+  text-decoration: none;
+
+  // La miniatura no se encoge cuando la columna es estrecha (móvil).
+  .pq-miniatura {
+    flex: none;
+  }
+
+  &:hover .pq-celda-nombre__texto,
+  &:focus-visible .pq-celda-nombre__texto {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+.pq-interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--pq-foreground);
+  font: inherit;
+  cursor: pointer;
+
+  &__pista {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--pq-muted);
+    box-shadow: inset 0 0 0 1px var(--pq-campo-borde);
+    transition: background var(--pq-transicion);
+  }
+
+  &__bola {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--pq-background);
+    box-shadow: 0 0 0 1px var(--pq-campo-borde);
+    transition: transform var(--pq-transicion);
+  }
+
+  &[aria-checked="true"] &__pista {
+    background: var(--pq-primary);
+    box-shadow: none;
+  }
+
+  &[aria-checked="true"] &__bola {
+    transform: translateX(16px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pq-primary);
+    outline-offset: 2px;
+    border-radius: var(--pq-radius);
+  }
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+}
+
+.pq-resumen-web {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  border-radius: var(--pq-radius-xl);
+  background: var(--pq-card);
+  box-shadow: inset 0 0 0 1px var(--pq-border);
+
+  &__tarjeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__foto {
+    display: grid;
+    place-items: center;
+    width: 128px;
+    height: 96px;
+    overflow: hidden;
+    flex: none;
+    border-radius: var(--pq-radius-lg);
+    background: var(--pq-muted);
+    color: var(--pq-muted-foreground);
+    font-size: 13px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__datos {
+    display: grid;
+    gap: 4px;
+    flex: 1 1 240px;
+    min-width: 0;
+  }
+
+  &__antetitulo {
+    margin: 0;
+    color: var(--pq-muted-foreground);
+    font-size: 13px;
+  }
+
+  &__nombre {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  &__linea {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    color: var(--pq-muted-foreground);
+    font-size: 13px;
+  }
+
+  &__ver {
+    padding: 8px 14px;
+    border-radius: var(--pq-radius);
+    box-shadow: inset 0 0 0 1px var(--pq-campo-borde);
+    color: var(--pq-foreground);
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+      background: var(--pq-muted);
+    }
+  }
+
+  &__completa {
+    display: grid;
+    gap: 6px;
+  }
+
+  &__barra-texto {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 14px;
+
+    span {
+      color: var(--pq-muted-foreground);
+    }
+  }
+
+  &__barra {
+    width: 100%;
+    height: 8px;
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--pq-muted);
+
+    &::-webkit-progress-bar {
+      background: var(--pq-muted);
+    }
+
+    &::-webkit-progress-value {
+      background: var(--pq-success);
+    }
+
+    &::-moz-progress-bar {
+      background: var(--pq-success);
+    }
+  }
+}
+
+.pq-sugerencias {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: -8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+
+  &__titulo {
+    color: var(--pq-muted-foreground);
+  }
+
+  &__opcion {
+    padding: 4px 10px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--pq-muted);
+    color: var(--pq-foreground);
+    font: inherit;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--pq-secondary);
+      color: var(--pq-secondary-foreground);
+    }
+  }
+}
+
+/* El campo «Modelo» va envuelto (sugerencias debajo): recupera el hueco entre campos. */
+.pq-campo-modelo {
+  margin-bottom: var(--spacing-field, 30px);
+}

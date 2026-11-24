@@ -24,21 +24,24 @@ export type Listado = {
 };
 
 export const LISTADOS: Record<string, Listado> = {
+  // Tarea 3 (prototipo): el nombre lleva la miniatura y los dos abren la ficha; «Estado» y los
+  // dos interruptores directos.
   "equipos-usados": {
     columnas: [
-      "imagenes",
       "nombre",
+      "estadoWeb",
       "categoria",
       "marcaUsada",
       "anio",
-      "disponible",
       "mostrarEnWeb",
+      "disponible",
       "fechaPublicacion",
     ],
     busqueda: ["nombre", "marca", "modelo"],
   },
+  // Fase 2 de la tarea 3: miniatura con el nombre (abren la ficha), «Estado» e interruptor directo.
   "equipos-nuevos": {
-    columnas: ["imagenes", "nombre", "marca", "tipo", "mostrarEnWeb"],
+    columnas: ["nombre", "estadoWeb", "marca", "tipo", "mostrarEnWeb"],
     busqueda: ["nombre", "codigo"],
   },
   "modelos-repuesto": {
@@ -110,9 +113,21 @@ function conMiniatura(campos: Field[], columnas: Set<string>): Field[] {
   });
 }
 
-/** Componentes encima de la tabla: el filtro rápido de las imágenes pequeñas. */
-const ENCIMA_DE_LA_TABLA: Record<string, string> = {
+/** Los botones de «cambios en bloque» (tanda 21, `accionesEnBloque.ts`), con su colección. */
+const enBloque = (coleccion: string) => ({
+  path: "/components/admin/listados/AccionesEnBloque",
+  clientProps: { coleccion },
+});
+
+/**
+ * Componentes encima de la tabla: el filtro rápido de las imágenes pequeñas y los cambios en
+ * bloque (mostrar/ocultar y, en usadas, vendida) de los productos.
+ */
+const ENCIMA_DE_LA_TABLA: Record<string, string | ReturnType<typeof enBloque>> = {
   media: "/components/admin/listados/FiltroFotosPequenas",
+  "equipos-nuevos": enBloque("equipos-nuevos"),
+  "equipos-usados": enBloque("equipos-usados"),
+  "modelos-repuesto": enBloque("modelos-repuesto"),
 };
 
 export function conListados(colecciones: CollectionConfig[]): CollectionConfig[] {

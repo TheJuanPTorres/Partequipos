@@ -85,6 +85,7 @@ export function PaginaMarcaLubricantePlantilla({
           logo,
         }}
         anclaSiguiente={ANCLA_LINEAS}
+        etiquetaRaton="Ir a las líneas de lubricantes"
         indice
         // Sin la franja de la marca a los lados, como sus líneas y los índices (hallazgo de B, 2026-11-18).
         franja={false}
@@ -107,7 +108,7 @@ export function PaginaMarcaLubricantePlantilla({
 
       {marca.descripcion ? (
         <div className={`${estilos.descripcion} texto-cuerpo`}>
-          <RichText data={marca.descripcion} />
+          <RichText data={marca.descripcion} encabezadosDesde={2} />
         </div>
       ) : null}
 

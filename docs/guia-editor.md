@@ -245,8 +245,9 @@ oficial, no lo pongas.
   sale al final, en «Otros modelos».
 - **Otras entradas de la lista de modelos** (opcional, en el tipo de equipo):
   lo que la lista de la página del tipo nombra sin ser un modelo de ese tipo.
-  Con solo el **texto**, sale sin enlace (un modelo que no tiene ficha); con
-  **Enlaza a la ficha de**, enlaza a la ficha de otro modelo. En un tipo con
+  Con **Enlaza a la ficha de**, enlaza a la ficha de otro modelo. Con solo el
+  **texto** (un modelo que no tiene ficha) **no se muestra en la web** ni
+  cuenta en los totales: queda guardada por si un día tiene ficha. En un tipo con
   series, la **serie** dice en qué grupo sale. Salen **al final** de la lista
   (o de su serie), en el orden de sus filas: arrástralas para cambiarlo.
 - **Cuelga de** (en el tipo de equipo): casi siempre vacío. Solo sirve para

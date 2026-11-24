@@ -120,18 +120,14 @@ describe("lubricantes: selector de marcas de la categoría «Lubricantes» (2026
     assert.equal(enlaceExternoLubricante(conWeb), null);
   });
 
-  it("Dispel: sin enlace, «Ver productos» a la portada; con enlace, «Ir a su web» a ese enlace", () => {
-    assert.deepEqual(vistaSelector(activa, [dispel])!.paneles[0]!.accion, {
-      tipo: "pagina",
-      href: "/",
-      texto: "Ver productos",
-    });
+  it("Dispel: sin enlace, sin botón (nunca a la portada); con enlace, «Ver productos» a ese enlace", () => {
+    assert.equal(vistaSelector(activa, [dispel])!.paneles[0]!.accion, null);
     const conEnlace = { ...dispel, enlaceExterno: "https://example.com" };
     const p = vistaSelector(activa, [conEnlace])!.paneles[0]!;
     assert.deepEqual(p.accion, {
       tipo: "externo",
       href: "https://example.com/",
-      texto: "Ir a su web",
+      texto: "Ver productos",
     });
     assert.equal(p.tinta, "#ffffff");
     assert.equal(p.foto?.url, "/dispel.jpg");

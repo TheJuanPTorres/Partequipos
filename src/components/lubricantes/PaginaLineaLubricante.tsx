@@ -66,6 +66,7 @@ export function PaginaLineaLubricante({
       <HeroMarca
         vista={vista}
         anclaSiguiente={ANCLA_PRODUCTOS}
+        etiquetaRaton="Ir a los productos"
         indice
         franja={false}
         migas={migas}
@@ -73,7 +74,7 @@ export function PaginaLineaLubricante({
 
       {linea.descripcion ? (
         <div className={`${estilos.descripcion} texto-cuerpo`}>
-          <RichText data={linea.descripcion} />
+          <RichText data={linea.descripcion} encabezadosDesde={2} />
         </div>
       ) : null}
 

@@ -197,7 +197,7 @@ export default async function EquipoNuevoPage({ params }: { params: Promise<Para
     entradilla || equipo.descripcion ? (
       <>
         {entradilla ? <p>{entradilla}</p> : null}
-        {equipo.descripcion ? <RichText data={equipo.descripcion} /> : null}
+        {equipo.descripcion ? <RichText data={equipo.descripcion} encabezadosDesde={2} /> : null}
       </>
     ) : null;
 

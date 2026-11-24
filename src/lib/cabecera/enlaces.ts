@@ -4,8 +4,23 @@ import { esDelSitio } from "../pie";
  * Un enlace de la barra de la cabecera. `externo`: una dirección https:// de
  * otro sitio (la tienda del cliente, 2026-10-27), que se pinta como botón oscuro
  * en su sitio de la fila (2026-11-03) y se abre en una pestaña nueva.
+ * `otraPestana` (2026-11-23, tanda 22): toda dirección completa (https://…), sea
+ * de otro sitio o del dominio del cliente («Transporte», que vive fuera de esta
+ * web), se abre en una pestaña nueva; dentro del sitio se enlaza con la ruta (`/…`).
+ * Una del dominio del cliente conserva el aspecto de enlace normal.
  */
-export type EnlaceCabecera = { etiqueta: string; href: string; externo?: boolean };
+export type EnlaceCabecera = {
+  etiqueta: string;
+  href: string;
+  externo?: boolean;
+  otraPestana?: boolean;
+};
+
+/** Nombre accesible de un enlace que se abre en otra pestaña. */
+export const etiquetaOtraPestana = (etiqueta: string) => `${etiqueta} (se abre en otra pestaña)`;
+
+/** Clave de React de un enlace del menú: dos filas pueden compartir destino (la portada). */
+export const claveDeFila = (e: { etiqueta: string; href: string }) => `${e.etiqueta}|${e.href}`;
 
 /** Filas de «Enlaces del menú» (2026-11-04: de 6 a 8, «Transporte» e «Industrial»). */
 export const MAX_ENLACES_CABECERA = 8;
@@ -44,7 +59,10 @@ export function enlacesDeCabecera(
     const etiqueta = e.etiqueta?.trim();
     const href = e.enlace?.trim();
     if (e.mostrar === false || !etiqueta || !href) return [];
-    const externo = !href.startsWith("/") && !esDelSitio(href);
-    return [{ etiqueta, href, ...(externo ? { externo } : {}) }];
+    const otraPestana = !href.startsWith("/");
+    const externo = otraPestana && !esDelSitio(href);
+    return [
+      { etiqueta, href, ...(externo ? { externo } : {}), ...(otraPestana ? { otraPestana } : {}) },
+    ];
   });
 }

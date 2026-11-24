@@ -48,12 +48,15 @@ function resolver(desde: string, especificador: string): string | null {
 }
 
 const esZod = (esp: string) => esp === "zod" || esp.startsWith("zod/");
+/** Un módulo de Node (`node:crypto`…): en el navegador entra su sustituto entero. */
+const esDeNode = (esp: string) => esp.startsWith("node:");
 
 /** Cadena de ficheros por la que un import estático llega a `zod`, o null. */
 export function caminoAZod(
   fichero: string,
   leer: (f: string) => string = (f) => fs.readFileSync(f, "utf8"),
   resolverImport: (desde: string, esp: string) => string | null = resolver,
+  prohibido: (esp: string) => boolean = esZod,
 ): string[] | null {
   const visitados = new Set<string>();
   const buscar = (f: string, camino: string[]): string[] | null => {
@@ -62,7 +65,7 @@ export function caminoAZod(
     const codigo = leer(f);
     if (camino.length > 1 && /^\s*["']use server["']/.test(codigo)) return null;
     for (const esp of importsEstaticos(codigo)) {
-      if (esZod(esp)) return [...camino, "zod"];
+      if (prohibido(esp)) return [...camino, prohibido === esZod ? "zod" : esp];
       const r = resolverImport(f, esp);
       if (!r) continue;
       const hallado = buscar(r, [...camino, r]);
@@ -93,6 +96,28 @@ describe("componentes de cliente sin Zod", () => {
       .filter((c): c is string[] => c !== null)
       .map((c) => c.map((f) => path.relative(RAIZ, f)).join(" → "));
     assert.deepEqual(fallos, [], `Zod llegaría al navegador:\n${fallos.join("\n")}`);
+  });
+
+  it("ningún componente de cliente alcanza un módulo de Node (`node:…`) por un import estático", () => {
+    // 2026-11-23: el formulario tomaba dos constantes de `antiSpam.ts` (`node:crypto`) y cada
+    // página con formulario cargaba el sustituto de `crypto`, con su aviso de `eval` en la CSP.
+    const fallos = deCliente()
+      .map((f) => caminoAZod(f, undefined, undefined, esDeNode))
+      .filter((c): c is string[] => c !== null)
+      .map((c) => c.map((f) => (f.startsWith("node:") ? f : path.relative(RAIZ, f))).join(" → "));
+    assert.deepEqual(fallos, [], `Un módulo de Node llegaría al navegador:\n${fallos.join("\n")}`);
+  });
+
+  it("el guardián de Node falla cuando debe: constante importada de un módulo con `node:crypto`", () => {
+    const ficheros: Record<string, string> = {
+      "/c.tsx": '"use client";\nimport { CAMPO } from "./servidor";',
+      "/servidor.ts": 'import { createHash } from "node:crypto";\nexport const CAMPO = "x";',
+    };
+    const res = (_: string, esp: string) => (esp.startsWith("./") ? `/${esp.slice(2)}.ts` : null);
+    assert.deepEqual(
+      caminoAZod("/c.tsx", (f) => ficheros[f]!, res, esDeNode),
+      ["/c.tsx", "/servidor.ts", "node:crypto"],
+    );
   });
 
   it("el guardián falla cuando debe: constante importada de un módulo con Zod", () => {

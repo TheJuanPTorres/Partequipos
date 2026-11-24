@@ -74,7 +74,7 @@ export function PaginaLineaLubricante({
 
       {linea.descripcion ? (
         <div className={`${estilos.descripcion} texto-cuerpo`}>
-          <RichText data={linea.descripcion} />
+          <RichText data={linea.descripcion} encabezadosDesde={2} />
         </div>
       ) : null}
 

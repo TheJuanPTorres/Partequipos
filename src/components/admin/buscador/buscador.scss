@@ -1,0 +1,198 @@
+// BUSCADOR GLOBAL (Ctrl+K) y filtro del menú — tanda 23, fase 1 (agente C).
+// Solo tokens del panel (`--pq-…`, de A en custom.scss), sin colores fijos: el tema claro y el
+// oscuro salen solos. Si A renombra un token, se cambia aquí.
+
+.pq-paleta {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12vh 16px 16px;
+  background: color-mix(in srgb, var(--pq-foreground) 35%, transparent);
+
+  @media (max-width: 768px) {
+    padding-top: 16px;
+  }
+}
+
+.pq-paleta__caja {
+  display: flex;
+  flex-direction: column;
+  width: min(640px, 100%);
+  max-height: min(560px, 80vh);
+  overflow: hidden;
+  background: var(--pq-card);
+  color: var(--pq-foreground);
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-xl);
+  box-shadow: 0 24px 48px color-mix(in srgb, var(--pq-foreground) 20%, transparent);
+}
+
+.pq-paleta__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--pq-border);
+}
+
+.pq-paleta__lupa {
+  flex: none;
+  color: var(--pq-muted-foreground);
+}
+
+.pq-paleta__campo {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 0;
+  font: inherit;
+  font-size: 16px; // 16 px: el móvil no hace zoom al enfocar
+  color: inherit;
+  background: transparent;
+  border: 0;
+  outline: none;
+
+  &::placeholder {
+    color: var(--pq-muted-foreground);
+  }
+}
+
+.pq-paleta__tecla,
+.pq-paleta__pie kbd,
+.pq-menu-buscar kbd {
+  padding: 1px 6px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--pq-muted-foreground);
+  background: var(--pq-muted);
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius);
+}
+
+.pq-paleta__lista {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.pq-paleta__grupo {
+  padding: 10px 10px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pq-muted-foreground);
+}
+
+.pq-paleta__opcion {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px; // objetivo táctil
+  padding: 9px 10px;
+  border-radius: var(--pq-radius-lg);
+  cursor: pointer;
+}
+
+.pq-paleta__opcion--activa {
+  background: var(--pq-sidebar-accent, var(--pq-muted));
+  color: var(--pq-sidebar-accent-foreground, var(--pq-foreground));
+  // Además del fondo, una barra: el estado no depende solo del color.
+  box-shadow: inset 3px 0 0 var(--pq-primary);
+}
+
+.pq-paleta__etiqueta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pq-paleta__contexto {
+  flex: none;
+  font-size: 13px;
+  color: var(--pq-muted-foreground);
+}
+
+.pq-paleta__aviso {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--pq-muted-foreground);
+  border-top: 1px solid var(--pq-border);
+}
+
+.pq-paleta__pie {
+  margin: 0;
+  padding: 0 16px 10px;
+  font-size: 12px;
+  color: var(--pq-muted-foreground);
+
+  @media (max-width: 768px) {
+    display: none; // en el móvil no hay teclado físico
+  }
+}
+
+// --- En el menú lateral: botón de la paleta y filtro de texto ---
+
+.pq-menu-busqueda {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.pq-menu-buscar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--pq-muted-foreground);
+  text-align: left;
+  background: var(--pq-campo-fondo, var(--pq-background));
+  border: 1px solid var(--pq-campo-borde, var(--pq-border));
+  border-radius: var(--pq-radius-lg);
+  cursor: pointer;
+
+  span {
+    flex: 1;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pq-primary);
+    outline-offset: 2px;
+  }
+}
+
+.pq-menu-filtro {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 16px;
+  color: var(--pq-foreground);
+  background: var(--pq-campo-fondo, var(--pq-background));
+  border: 1px solid var(--pq-campo-borde, var(--pq-border));
+  border-radius: var(--pq-radius-lg);
+
+  &::placeholder {
+    color: var(--pq-muted-foreground);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pq-primary);
+    outline-offset: 2px;
+  }
+}
+
+.pq-menu-vacio {
+  margin: 4px 0 12px;
+  font-size: 14px;
+  color: var(--pq-muted-foreground);
+}

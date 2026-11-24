@@ -37,13 +37,17 @@ import { ICONOS_DE_GRUPO, TAMANO_ICONO } from "./iconos";
 export function GrupoNav({
   abierto,
   children,
+  forzarAbierto = false,
   nombre,
 }: {
   abierto: boolean;
   children: React.ReactNode;
+  /** Con el filtro del menú escrito, el grupo se enseña abierto sin cambiar la preferencia guardada. */
+  forzarAbierto?: boolean;
   nombre: string;
 }) {
-  const [plegado, setPlegado] = useState(!abierto);
+  const [plegadoGuardado, setPlegado] = useState(!abierto);
+  const plegado = plegadoGuardado && !forzarAbierto;
   const [animar, setAnimar] = useState(false);
   const { setPreference } = usePreferences();
   const { navOpen } = useNav();

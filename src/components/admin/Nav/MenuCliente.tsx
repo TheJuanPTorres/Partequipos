@@ -1,8 +1,12 @@
 "use client";
 
+import { IconSearch } from "@tabler/icons-react";
 import { Link } from "@payloadcms/ui";
 import { usePathname } from "next/navigation";
+import { useMemo, useState } from "react";
 
+import { EVENTO_ABRIR_PALETA, PaletaComandos } from "@/components/admin/buscador/PaletaComandos";
+import { coincide, type Comando } from "@/lib/panel/buscador";
 import { entradaActiva } from "@/lib/panel/menu";
 
 import { GrupoNav } from "./GrupoNav";
@@ -44,17 +48,97 @@ export type GrupoMenu = {
  * Las etiquetas y los enlaces llegan hechos del servidor (`Nav`), así que aquí no hace falta
  * `getTranslation` ni `formatAdminURL`.
  */
-export function MenuCliente({ grupos }: { grupos: GrupoMenu[] }) {
+export function MenuCliente({
+  grupos,
+  acciones,
+  buscables,
+  admin,
+  api,
+}: {
+  grupos: GrupoMenu[];
+  /** «Crear …» de las colecciones en que puede crear quien mira (buscador Ctrl+K). */
+  acciones: Comando[];
+  /** Colecciones donde la paleta busca fichas. */
+  buscables: string[];
+  admin: string;
+  api: string;
+}) {
   const pathname = usePathname();
   const activa = entradaActiva(
     pathname,
     grupos.flatMap((g) => g.entradas),
   );
 
+  // Filtro de texto del menú (tanda 23): por el nombre de la entrada o de su grupo, sin tildes.
+  const [filtro, setFiltro] = useState("");
+  const visibles = useMemo(
+    () =>
+      grupos
+        .map((g) => ({
+          ...g,
+          entradas: g.entradas.filter((e) => coincide(`${e.label} ${g.nombre}`, filtro)),
+        }))
+        .filter((g) => g.entradas.length > 0),
+    [grupos, filtro],
+  );
+  const filtrando = filtro.trim().length > 0;
+
+  // Las secciones de la paleta son las mismas entradas del menú, con su grupo.
+  const secciones: Comando[] = useMemo(
+    () =>
+      grupos.flatMap((g) =>
+        g.entradas.map((e) => ({
+          id: `seccion-${e.clave}`,
+          tipo: "seccion" as const,
+          etiqueta: e.label,
+          contexto: g.nombre,
+          href: e.href,
+        })),
+      ),
+    [grupos],
+  );
+
   return (
     <>
-      {grupos.map((grupo) => (
-        <GrupoNav abierto={grupo.abierto} key={grupo.nombre} nombre={grupo.nombre}>
+      <div className="pq-menu-busqueda">
+        <button
+          className="pq-menu-buscar"
+          onClick={() => window.dispatchEvent(new Event(EVENTO_ABRIR_PALETA))}
+          type="button"
+        >
+          <IconSearch aria-hidden="true" size={16} />
+          <span>Buscar en el panel</span>
+          <kbd aria-label="atajo Control más K">Ctrl K</kbd>
+        </button>
+        <input
+          aria-label="Filtrar el menú"
+          className="pq-menu-filtro"
+          onChange={(e) => setFiltro(e.target.value)}
+          onKeyDown={(e) => e.key === "Escape" && setFiltro("")}
+          placeholder="Filtrar el menú"
+          type="search"
+          value={filtro}
+        />
+      </div>
+      <PaletaComandos
+        acciones={acciones}
+        admin={admin}
+        api={api}
+        buscables={buscables}
+        secciones={secciones}
+      />
+      {filtrando && visibles.length === 0 ? (
+        <p className="pq-menu-vacio" role="status">
+          Nada en el menú coincide con «{filtro.trim()}». Prueba con Ctrl+K: busca también fichas.
+        </p>
+      ) : null}
+      {visibles.map((grupo) => (
+        <GrupoNav
+          abierto={grupo.abierto}
+          forzarAbierto={filtrando}
+          key={grupo.nombre}
+          nombre={grupo.nombre}
+        >
           {grupo.entradas.map((entrada) => {
             const contenido = (
               <>

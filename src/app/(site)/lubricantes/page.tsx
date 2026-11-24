@@ -57,6 +57,7 @@ export default async function LubricantesPage() {
       <HeroMarca
         vista={vista.encabezado}
         anclaSiguiente={ANCLA}
+        etiquetaRaton="Ir a las marcas de lubricantes"
         franja={false}
         indice
         accion={

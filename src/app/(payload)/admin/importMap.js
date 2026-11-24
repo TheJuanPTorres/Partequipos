@@ -7,6 +7,7 @@ import { default as default_c27194df1b451b2a5c6b9699120a24a9 } from '../../../co
 import { default as default_40a9883d727ab65fdd0e9c9df10e79e2 } from '../../../components/admin/celdas/CeldaMiniatura'
 import { default as default_137d3220b5ae877ef2c31422510baf68 } from '../../../components/admin/SeoGuiado'
 import { default as default_f4712ba04226872691305c226599165d } from '../../../components/admin/celdas/CeldaVisible'
+import { default as default_40354e37e27f4a271be0ae82fc0596ca } from '../../../components/admin/listados/AccionesEnBloque'
 import { default as default_5c55248894877e0ef25c11c535b2b5bf } from '../../../components/admin/VerEnElSitio'
 import { default as default_adf6b68ce64d26f52375d6ee194bc8e3 } from '../../../components/admin/CampoColor'
 import { default as default_995c62da4474a980dc2501c7f5652493 } from '../../../components/admin/ResumenWeb'
@@ -82,6 +83,7 @@ export const importMap = {
   "/components/admin/celdas/CeldaMiniatura#default": default_40a9883d727ab65fdd0e9c9df10e79e2,
   "/components/admin/SeoGuiado#default": default_137d3220b5ae877ef2c31422510baf68,
   "/components/admin/celdas/CeldaVisible#default": default_f4712ba04226872691305c226599165d,
+  "/components/admin/listados/AccionesEnBloque#default": default_40354e37e27f4a271be0ae82fc0596ca,
   "/components/admin/VerEnElSitio#default": default_5c55248894877e0ef25c11c535b2b5bf,
   "/components/admin/CampoColor#default": default_adf6b68ce64d26f52375d6ee194bc8e3,
   "/components/admin/ResumenWeb#default": default_995c62da4474a980dc2501c7f5652493,

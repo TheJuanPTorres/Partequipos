@@ -43,7 +43,7 @@ export function SelectorMarcas({ id, vista }: { id: string; vista: VistaSelector
               key={p.id}
               className={estilos.panel}
               style={variables}
-              data-accion={p.accion.tipo}
+              data-accion={p.accion?.tipo}
               data-con-foto={p.foto ? "" : undefined}
             >
               {/*
@@ -90,7 +90,7 @@ export function SelectorMarcas({ id, vista }: { id: string; vista: VistaSelector
                   </h3>
                   {p.texto ? <p className={estilos.texto}>{p.texto}</p> : null}
 
-                  {p.accion.tipo === "pagina" ? (
+                  {!p.accion ? null : p.accion.tipo === "pagina" ? (
                     <Link
                       href={p.accion.href}
                       className={estilos.boton}

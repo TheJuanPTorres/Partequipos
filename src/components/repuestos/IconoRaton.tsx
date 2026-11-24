@@ -15,11 +15,15 @@ import estilos from "./marca.module.css";
  */
 export function IconoRaton({
   href,
-  etiqueta = "Ir a las categorías de repuestos",
+  etiqueta,
 }: {
   href: string;
-  /** Nombre accesible del enlace: dice adónde lleva. */
-  etiqueta?: string;
+  /**
+   * Nombre accesible del enlace: dice adónde lleva DE VERDAD («Ir a los modelos»). Obligatorio
+   * (tanda 22, punto 13): con un valor por defecto, cada plantilla nueva heredaba «Ir a las
+   * categorías de repuestos» aunque llevara a otra cosa.
+   */
+  etiqueta: string;
 }) {
   return (
     <a href={href} className={estilos.raton} aria-label={etiqueta}>

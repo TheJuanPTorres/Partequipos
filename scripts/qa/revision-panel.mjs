@@ -394,6 +394,232 @@ try {
     }
 
     /*
+     * Modo `bloque` (2026-11-23, #558): CAMBIOS EN BLOQUE y DUPLICAR, por efecto (§10.15), a 1440.
+     * En usadas y nuevas marca las 2 primeras filas visibles y en la web y disponibles, pulsa cada
+     * acción («Sí, hacerlo»), y lee por la API con la sesión que solo cambian esas 2 (las otras 8
+     * de la página, no); al final tienen que quedar como estaban (si no, se devuelven). Después,
+     * «Duplicar» desde el formulario de una de ellas: la copia lleva «(copia)», otra dirección y
+     * nace oculta, el original no cambia, y la copia se BORRA.
+     */
+    if (MODO === "bloque") {
+      if (ancho.movil) {
+        await contexto.close();
+        continue;
+      }
+      const api = (ruta, opciones = {}) =>
+        pagina.evaluate(
+          async ([r, o]) => {
+            const res = await fetch(r, { credentials: "include", ...o });
+            return { estado: res.status, cuerpo: await res.json().catch(() => null) };
+          },
+          [`${base}/api${ruta}`, opciones],
+        );
+      const CASOS = [
+        {
+          coleccion: "equipos-usados",
+          acciones: [
+            ["Ocultar de la web", { mostrarEnWeb: false }],
+            ["Mostrar en la web", { mostrarEnWeb: true }],
+            ["Marcar vendida", { disponible: false }],
+            ["Marcar disponible", { disponible: true }],
+          ],
+        },
+        {
+          coleccion: "equipos-nuevos",
+          acciones: [
+            ["Ocultar de la web", { mostrarEnWeb: false }],
+            ["Mostrar en la web", { mostrarEnWeb: true }],
+          ],
+        },
+      ];
+      const LISTA = "?sort=id&limit=10";
+      const estados = async (coleccion) => {
+        const { cuerpo } = await api(`/${coleccion}${LISTA}&depth=0`);
+        return Object.fromEntries(
+          (cuerpo?.docs ?? []).map((d) => [
+            d.id,
+            { mostrarEnWeb: d.mostrarEnWeb, disponible: d.disponible, nombre: d.nombre },
+          ]),
+        );
+      };
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto}`);
+      };
+      for (const caso of CASOS) {
+        const ruta = `/admin/collections/${caso.coleccion}${LISTA}`;
+        await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(1500);
+        const inicial = await estados(caso.coleccion);
+        const ids = Object.keys(inicial).map(Number);
+        // Las 2 primeras que están en la web (y, en usadas, disponibles): así acaban igual.
+        const elegidas = ids
+          .filter(
+            (id) =>
+              inicial[id].mostrarEnWeb === true &&
+              (caso.coleccion !== "equipos-usados" || inicial[id].disponible === true),
+          )
+          .slice(0, 2);
+        if (elegidas.length < 2) {
+          ok(`${caso.coleccion}: no hay 2 fichas en la web en la primera página`, false);
+          continue;
+        }
+        decir(`${caso.coleccion}: marco ${elegidas.join(", ")} de ${ids.length} filas`);
+        let paso = 0;
+        for (const [boton, datos] of caso.acciones) {
+          paso++;
+          await pagina.goto(`${base}${ruta}`, { waitUntil: "networkidle" });
+          await pagina.waitForTimeout(1200);
+          // Marcar SOLO las elegidas: por la posición de su id en la lista (orden por id).
+          for (const id of elegidas) {
+            const fila = pagina.locator("table tbody tr").nth(ids.indexOf(id));
+            await fila.locator('input[type="checkbox"]').first().check();
+          }
+          await pagina.locator(".pq-en-bloque").getByRole("button", { name: boton }).click();
+          if (paso === 1) {
+            await pagina.screenshot({
+              path: path.join(salida, `bloque-${caso.coleccion}-pregunta-1440.png`),
+            });
+          }
+          await pagina
+            .locator(".pq-en-bloque")
+            .getByRole("button", { name: "Sí, hacerlo" })
+            .click();
+          const aviso = await pagina
+            .locator(".pq-en-bloque__estado")
+            .first()
+            .textContent({ timeout: 20_000 })
+            .catch(() => "(sin aviso)");
+          await pagina.waitForTimeout(1500);
+          if (paso === 1) {
+            await pagina.screenshot({
+              path: path.join(salida, `bloque-${caso.coleccion}-hecho-1440.png`),
+            });
+          }
+          const ahora = await estados(caso.coleccion);
+          const [campo, valor] = Object.entries(datos)[0];
+          const marcadasBien = elegidas.every((id) => ahora[id]?.[campo] === valor);
+          const otrasIgual = ids
+            .filter((id) => !elegidas.includes(id))
+            .every(
+              (id) =>
+                ahora[id]?.mostrarEnWeb === inicial[id].mostrarEnWeb &&
+                ahora[id]?.disponible === inicial[id].disponible,
+            );
+          ok(`${caso.coleccion} · «${boton}»: las 2 marcadas con ${campo}=${valor}`, marcadasBien);
+          ok(`${caso.coleccion} · «${boton}»: las otras ${ids.length - 2} sin cambios`, otrasIgual);
+          // El interruptor de la fila (solo en usadas) tiene que enseñar lo guardado, sin recargar.
+          if (caso.coleccion === "equipos-usados") {
+            const indice = campo === "mostrarEnWeb" ? 0 : 1;
+            const interruptores = await Promise.all(
+              elegidas.map((id) =>
+                pagina
+                  .locator("table tbody tr")
+                  .nth(ids.indexOf(id))
+                  .locator('[role="switch"]')
+                  .nth(indice)
+                  .getAttribute("aria-checked"),
+              ),
+            );
+            ok(
+              `${caso.coleccion} · «${boton}»: el interruptor de las 2 filas enseña ${valor} sin recargar (${interruptores.join(", ")})`,
+              interruptores.every((v) => v === String(valor)),
+            );
+          }
+          decir(`   aviso: «${aviso?.trim()}»`);
+        }
+        const final = await estados(caso.coleccion);
+        const igual = ids.every(
+          (id) =>
+            final[id]?.mostrarEnWeb === inicial[id].mostrarEnWeb &&
+            final[id]?.disponible === inicial[id].disponible,
+        );
+        ok(`${caso.coleccion}: al final, las ${ids.length} como estaban`, igual);
+        if (!igual) {
+          for (const id of elegidas) {
+            const { mostrarEnWeb, disponible } = inicial[id];
+            await api(`/${caso.coleccion}/${id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(
+                caso.coleccion === "equipos-usados"
+                  ? { mostrarEnWeb, disponible }
+                  : { mostrarEnWeb },
+              ),
+            });
+          }
+          decir(`   devueltas ${elegidas.join(", ")} a su estado inicial`);
+        }
+
+        // DUPLICAR desde el formulario de la primera elegida.
+        const original = elegidas[0];
+        const antes = (await api(`/${caso.coleccion}/${original}?depth=0`)).cuerpo;
+        await pagina.goto(`${base}/admin/collections/${caso.coleccion}/${original}`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(1500);
+        await pagina.locator(".doc-controls__popup button, .doc-controls__dots").first().click();
+        await pagina.waitForTimeout(500);
+        await pagina.screenshot({
+          path: path.join(salida, `duplicar-${caso.coleccion}-menu-1440.png`),
+        });
+        await Promise.all([
+          pagina.waitForURL(
+            (u) =>
+              /\/collections\/[^/]+\/\d+/.test(u.pathname) && !u.pathname.endsWith(`/${original}`),
+            { timeout: 30_000 },
+          ),
+          pagina
+            .getByRole("button", { name: /Duplicar/ })
+            .first()
+            .click(),
+        ]).catch(() => null);
+        await pagina.waitForTimeout(2000);
+        const nuevaId = Number(new URL(pagina.url()).pathname.match(/\/(\d+)\/?$/)?.[1]);
+        if (!nuevaId || nuevaId === original) {
+          ok(`${caso.coleccion}: «Duplicar» no llevó a una ficha nueva`, false);
+          continue;
+        }
+        await pagina.screenshot({
+          path: path.join(salida, `duplicar-${caso.coleccion}-copia-1440.png`),
+          fullPage: false,
+        });
+        const copia = (await api(`/${caso.coleccion}/${nuevaId}?depth=0`)).cuerpo;
+        const despues = (await api(`/${caso.coleccion}/${original}?depth=0`)).cuerpo;
+        ok(
+          `${caso.coleccion}: copia ${nuevaId} con «(copia)» en el nombre («${copia?.nombre}»)`,
+          typeof copia?.nombre === "string" && copia.nombre.includes("(copia)"),
+        );
+        ok(
+          `${caso.coleccion}: copia con otra dirección («${copia?.slug}»)`,
+          Boolean(copia?.slug) && copia.slug !== antes?.slug,
+        );
+        ok(
+          `${caso.coleccion}: copia oculta (mostrarEnWeb=${copia?.mostrarEnWeb})`,
+          copia?.mostrarEnWeb === false,
+        );
+        ok(
+          `${caso.coleccion}: el original sin cambios`,
+          despues?.nombre === antes?.nombre &&
+            despues?.slug === antes?.slug &&
+            despues?.mostrarEnWeb === antes?.mostrarEnWeb,
+        );
+        const borrado = await api(`/${caso.coleccion}/${nuevaId}`, { method: "DELETE" });
+        const queda = await api(`/${caso.coleccion}/${nuevaId}?depth=0`);
+        ok(
+          `${caso.coleccion}: copia ${nuevaId} borrada (DELETE ${borrado.estado}, después ${queda.estado})`,
+          queda.estado === 404,
+        );
+      }
+      hallazgos.push({ pantalla: "bloque-duplicar", ancho: ancho.nombre, resultado });
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
      * Modo `borrador` (`… borrador <id de la página>`, PR 8b): con la sesión abierta, el botón del
      * panel (`/api/borrador/?pagina=<id>`) lleva a la página con su ÚLTIMO BORRADOR y el aviso de
      * vista previa; «Salir de la vista previa» vuelve a lo publicado. El borrador de prueba lo

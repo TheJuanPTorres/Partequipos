@@ -99,6 +99,11 @@
 }
 
 .heroTitulo {
+  /*
+   * Títulos que no caben (tarea 7): el ancho real del título es la ventana menos el relleno de la
+   * cabecera y el del contenido, no la ventana menos 40 px (a 390 «Miniexcavadora» se partía).
+   */
+  --ancho-titulo: calc(100vw - 2 * min(1.5vw, 24px) - 2 * min(2.9vw, 48px));
   width: 100%;
   max-width: 1000px;
   margin: 0;
@@ -1006,6 +1011,8 @@
   }
 
   .heroTitulo {
+    /* En móvil el contenido lleva 14,4 vw a cada lado. */
+    --ancho-titulo: calc(100vw - 2 * min(1.5vw, 24px) - 2 * 14.4vw);
     font-size: 10vw;
   }
 

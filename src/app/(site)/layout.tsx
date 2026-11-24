@@ -7,6 +7,7 @@ import { AvisoVistaPrevia, FueraDeVistaPrevia } from "@/components/layout/AvisoV
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { WhatsApp } from "@/components/layout/WhatsApp";
+import { CargadorModoAdmin } from "@/components/modoAdmin/CargadorModoAdmin";
 import { SCRIPT_TECHO_ESCALA } from "@/lib/estilos/escala";
 import { indexacionPermitida } from "@/lib/seo/config";
 
@@ -88,6 +89,8 @@ export default function RootLayout({
         <FueraDeVistaPrevia>
           <Analitica />
         </FueraDeVistaPrevia>
+        {/* Barra de edición para el personal con sesión: no pinta nada en el servidor ni para un visitante. */}
+        <CargadorModoAdmin />
       </body>
     </html>
   );

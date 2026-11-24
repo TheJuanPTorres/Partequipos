@@ -6,8 +6,9 @@
  *   npx payload run scripts/titulos/tipo-titulo.ts <modo> <destino> [lista=<fichero.md>]
  *
  *   modo:     simular  → por defecto; no escribe nada; saca la lista antes/después
- *             aplicar  → cambia SOLO el nombre o el título; repetirlo no cambia nada
- *             retirar  → devuelve cada título al de antes, si sigue con el nuestro
+ *             aplicar  → cambia SOLO el nombre o el título y, si está TODO en mayúsculas, el
+ *                        «Título para buscadores» (seo.metaTitle); repetirlo no cambia nada
+ *             retirar  → devuelve cada título (y el de buscadores) al de antes, si sigue con el nuestro
  *   destino:  preview | produccion (Juan Pablo, con runbook) | prueba
  *
  * No toca la dirección web: la lee antes y después de cada cambio y, si cambiara, devuelve el
@@ -25,6 +26,7 @@ import { puedeTocarHeroDePrueba } from "../../src/lib/portada/heroPrueba";
 import {
   TITULOS_EN_MAYUSCULAS,
   aTipoTitulo,
+  cambioSeo,
   decidir,
   type ColeccionTitulo,
 } from "../../src/lib/titulos/tipoTitulo";
@@ -92,40 +94,59 @@ async function conBorrador(id: number): Promise<boolean> {
 const filas: string[] = [];
 const cuenta = { cambiar: 0, "ya-estaba": 0, distinto: 0 };
 const verbo = modo === "simular" ? "cambiaría" : modo === "aplicar" ? "cambia" : "devuelve";
+const m = modo === "retirar" ? "retirar" : "aplicar";
 for (const t of TITULOS_EN_MAYUSCULAS) {
   const despues = aTipoTitulo(t.antes);
   const campo = campoDe(t.coleccion);
   const doc = await leer(t.coleccion, t.id);
   const actual = doc ? (doc[campo] as string | null | undefined) : null;
-  const d = decidir(modo === "retirar" ? "retirar" : "aplicar", actual, t.antes, despues);
-  let estado: string = d;
-  if (d === "cambiar" && t.coleccion === "paginas" && (await conBorrador(t.id))) {
-    estado = "borrador";
+  const d = decidir(m, actual, t.antes, despues);
+  const seo = (doc?.seo ?? null) as Record<string, unknown> | null;
+  const s = doc ? cambioSeo(m, seo?.metaTitle as string | null | undefined) : null;
+  const cambia = d === "cambiar" || s?.decision === "cambiar";
+  const borrador = cambia && t.coleccion === "paginas" && (await conBorrador(t.id));
+  const estadoDe = (x: string) => (borrador && x === "cambiar" ? "borrador" : x);
+  filas.push(`| ${t.coleccion} | ${t.id} | ${campo} | ${t.antes} | ${despues} | ${estadoDe(d)} |`);
+  if (s) {
+    filas.push(
+      `| ${t.coleccion} | ${t.id} | título para buscadores | ${s.antes} | ${s.despues} | ${estadoDe(s.decision)} |`,
+    );
   }
-  filas.push(`| ${t.coleccion} | ${t.id} | ${t.antes} | ${despues} | ${estado} |`);
-  if (estado === "borrador") {
-    cuenta.distinto++;
+  for (const x of [d, ...(s ? [s.decision] : [])]) {
+    if (borrador && x === "cambiar") cuenta.distinto++;
+    else cuenta[x]++;
+  }
+  if (borrador) {
     log(`AVISO, no se toca (tiene un borrador sin publicar): ${t.coleccion} ${t.id}`);
     continue;
   }
-  cuenta[d]++;
   if (d === "distinto") {
     log(
-      `AVISO, no se toca (${doc ? `título distinto del esperado: «${actual}»` : "no existe"}): ${t.coleccion} ${t.id}`,
+      `AVISO, no se toca el ${campo} (${doc ? `distinto del esperado: «${actual}»` : "no existe"}): ${t.coleccion} ${t.id}`,
     );
-    continue;
+  } else if (d === "ya-estaba") {
+    log(`ya estaba: ${t.coleccion} ${t.id} ${campo} «${actual}»`);
   }
-  if (d === "ya-estaba") {
-    log(`ya estaba: ${t.coleccion} ${t.id} «${actual}»`);
-    continue;
+  if (s?.decision === "ya-estaba") {
+    log(`ya estaba: ${t.coleccion} ${t.id} título para buscadores «${seo?.metaTitle}»`);
   }
-  const nuevo = modo === "retirar" ? t.antes : despues;
-  log(`${verbo}: ${t.coleccion} ${t.id} «${actual}» → «${nuevo}»`);
-  if (modo === "simular" || !doc) continue;
+  if (!cambia || !doc) continue;
+  const data: Record<string, unknown> = {};
+  if (d === "cambiar") {
+    const nuevo = m === "retirar" ? t.antes : despues;
+    log(`${verbo}: ${t.coleccion} ${t.id} ${campo} «${actual}» → «${nuevo}»`);
+    data[campo] = nuevo;
+  }
+  if (s?.decision === "cambiar") {
+    const nuevo = m === "retirar" ? s.antes : s.despues;
+    log(`${verbo}: ${t.coleccion} ${t.id} título para buscadores «${seo?.metaTitle}» → «${nuevo}»`);
+    data.seo = { ...seo, metaTitle: nuevo };
+  }
+  if (modo === "simular") continue;
   await payload.update({
     collection: t.coleccion,
     id: t.id,
-    data: { [campo]: nuevo } as never,
+    data: data as never,
     depth: 0,
     overrideAccess: true,
   });
@@ -134,7 +155,7 @@ for (const t of TITULOS_EN_MAYUSCULAS) {
     await payload.update({
       collection: t.coleccion,
       id: t.id,
-      data: { [campo]: actual, slug: doc.slug } as never,
+      data: { [campo]: actual, seo, slug: doc.slug } as never,
       depth: 0,
       overrideAccess: true,
     });
@@ -146,8 +167,8 @@ for (const t of TITULOS_EN_MAYUSCULAS) {
 }
 
 const tabla = [
-  "| Colección | id | Antes | Después | Estado |",
-  "| --- | --- | --- | --- | --- |",
+  "| Colección | id | Campo | Antes | Después | Estado |",
+  "| --- | --- | --- | --- | --- | --- |",
   ...filas,
 ].join("\n");
 process.stdout.write(`\n${tabla}\n\n`);

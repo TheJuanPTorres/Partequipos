@@ -295,6 +295,21 @@ export const CategoriaTecnica: CollectionConfig = {
         },
       }),
       /*
+       * TÍTULO DE LA SECCIÓN DE TIPOS (2026-11-24, Juan Pablo): el título que va sobre los grupos
+       * de «Qué incluye». Vacío, el automático de siempre («Elige el repuesto de … que necesitas»,
+       * `tituloDeGrupos`). Sale tal cual se escribe, sin pasar a minúsculas.
+       */
+      {
+        name: "tituloGrupos",
+        type: "text",
+        maxLength: 90,
+        label: "Título de la sección de tipos",
+        admin: {
+          description:
+            "El título que sale sobre los grupos de «Qué incluye». Déjalo vacío para el automático: «Elige el repuesto de (el nombre de la categoría) que necesitas».",
+        },
+      },
+      /*
        * «QUÉ INCLUYE» (2026-10-18, dirección): los grupos de productos de la categoría, como
        * en WordPress: una tarjeta por grupo con su foto, su nombre y la lista de productos
        * que despliega «Ver productos». Vacío: la página no pinta el apartado.

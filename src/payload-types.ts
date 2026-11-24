@@ -965,6 +965,10 @@ export interface CategoriasTecnica {
    */
   enlace?: string | null;
   /**
+   * El título que sale sobre los grupos de «Qué incluye». Déjalo vacío para el automático: «Elige el repuesto de (el nombre de la categoría) que necesitas».
+   */
+  tituloGrupos?: string | null;
+  /**
    * Los grupos de productos de la categoría (de 2 a 8 suelen bastar): cada uno con su foto, su nombre y la lista de lo que incluye. Salen en la página de la categoría bajo «Elige el repuesto de … que necesitas».
    */
   grupos?:
@@ -3046,6 +3050,7 @@ export interface CategoriasTecnicasSelect<T extends boolean = true> {
   descripcion?: T;
   tituloPortada?: T;
   enlace?: T;
+  tituloGrupos?: T;
   grupos?:
     | T
     | {

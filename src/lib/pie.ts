@@ -3,6 +3,7 @@ import type { Documento, Pie } from "@/payload-types";
 import { vistaDeDocumento, type VistaDocumentoVisor } from "./documentos/visor";
 import { validarEnlace } from "./fields/reglasPortada";
 import { enlaceWhatsApp } from "./navegacion";
+import { enlaceTel } from "./telefonos";
 import { poblado } from "./utils/relations";
 
 /**
@@ -100,9 +101,9 @@ export function esDelSitio(url: string): boolean {
   }
 }
 
-/** `href` de un teléfono publicado: `tel:+573176707071`. */
+/** `href` de UN teléfono publicado: `tel:+573176707071` (con el +57 si le falta, `telefonos.ts`). */
 export function hrefTelefono(telefono: string): string {
-  return `tel:${telefono.replace(/[^\d+]/g, "")}`;
+  return enlaceTel(telefono) ?? `tel:${telefono.replace(/[^\d+]/g, "")}`;
 }
 
 /**

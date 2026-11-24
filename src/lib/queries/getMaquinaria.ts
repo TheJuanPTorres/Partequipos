@@ -827,6 +827,27 @@ export const getMarcasDePortada = cache(async (): Promise<MarcasMaquinaria[]> =>
  * disponibles: la página las redirige a su categoría en vez de dar 404. Solo
  * una combinación categoría + unidad que no existe da `null`.
  */
+/**
+ * Una unidad usada por su id, con su categoría, para la VISTA PREVIA EN VIVO del panel
+ * (`/vista-previa/equipos-usados/<id>/`, solo con sesión del personal: la comprueba la página).
+ * Trae también la oculta y la vendida: el editor las previsualiza igual.
+ */
+export const getUnidadUsadaVistaPrevia = cache(
+  async (id: number): Promise<{ unidad: EquiposUsado; categoria: CategoriasUsada } | null> => {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: "equipos-usados",
+      // producto-oculto-ok: vista previa del panel, solo con sesión.
+      where: { id: { equals: id } },
+      depth: 1,
+      limit: 1,
+    });
+    const unidad = docs[0];
+    const categoria = unidad?.categoria;
+    return unidad && categoria && typeof categoria === "object" ? { unidad, categoria } : null;
+  },
+);
+
 export const getUnidadUsadaPorSlug = cache(
   async (
     categoriaSlug: string,

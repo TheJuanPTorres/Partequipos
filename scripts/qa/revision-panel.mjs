@@ -644,12 +644,39 @@ try {
      * (si no, se devuelve con la API). Capturas de la lista y de la comparación.
      */
     if (MODO === "versiones") {
+      const coleccion = process.argv[4] ?? "equipos-nuevos";
+      const id = Number(process.argv[5] ?? 1);
       if (ancho.movil) {
+        // En móvil, solo las capturas de la lista y de la última versión: sin guardar ni restaurar.
+        await pagina.goto(`${base}/admin/collections/${coleccion}/${id}/versions`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(2000);
+        await pagina.screenshot({
+          path: path.join(salida, `versiones-lista-${coleccion}-movil.png`),
+          fullPage: false,
+        });
+        const enlace = pagina.locator("table tbody tr a").first();
+        if (await enlace.count()) {
+          await enlace.click();
+          await pagina.waitForLoadState("networkidle");
+          await pagina.waitForTimeout(2000);
+          await pagina.screenshot({
+            path: path.join(salida, `versiones-comparar-${coleccion}-movil.png`),
+            fullPage: false,
+          });
+        }
+        hallazgos.push({
+          pantalla: "versiones",
+          ancho: ancho.nombre,
+          coleccion,
+          id,
+          errores,
+          fallidas,
+        });
         await contexto.close();
         continue;
       }
-      const coleccion = process.argv[4] ?? "equipos-nuevos";
-      const id = Number(process.argv[5] ?? 1);
       // `… versiones <coleccion> <id> <campo de texto>`: en usadas y modelos no hay entradilla.
       const campo = process.argv[6] && process.argv[6] !== "api" ? process.argv[6] : "entradilla";
       const api = (ruta, opciones = {}) =>

@@ -78,6 +78,7 @@ export function facetasConCuenta<T>(
           activa: elegidos.includes(valor),
         }))
         .filter((o) => mantener || o.cuenta > 0 || o.activa);
+      // orden-libre: las opciones de un filtro (marcas, años…), no un listado del panel.
       opciones.sort(
         faceta.ordenOpciones === "valor-desc"
           ? (a, b) => b.valor.localeCompare(a.valor, "es", { numeric: true })

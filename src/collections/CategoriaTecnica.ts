@@ -279,19 +279,21 @@ export const CategoriaTecnica: CollectionConfig = {
        * Páginas de marca de repuestos: las categorías son COMUNES a todas las
        * marcas (decisión de dirección, 2026-10-13). Aquí solo el ORDEN: vacío,
        * van al final por nombre. Sin relación con la marca.
+       *
+       * Desde el #516 la web no lo lee (manda el orden arrastrando): OCULTO sin tocar el esquema
+       * (tanda 21, PR-4, 2026-11-23), hasta su borrado con migración.
        */
-      {
+      ocultoSinUso({
         name: "ordenMarca",
         type: "number",
         min: 1,
         label: "Posición en las páginas de repuestos",
         admin: {
-          hidden: true,
           position: "sidebar",
           description:
             "Orden en «Nuestras categorías de repuestos» de las páginas de tipo y de modelo, y en el menú. Vacío: al final, por nombre.",
         },
-      },
+      }),
       /*
        * «QUÉ INCLUYE» (2026-10-18, dirección): los grupos de productos de la categoría, como
        * en WordPress: una tarjeta por grupo con su foto, su nombre y la lista de productos

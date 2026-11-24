@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { MENSAJE_TELEFONO, telefonoValido } from "@/lib/validation/telefono";
+
 import { MAX_HV, type ErroresHv, type RespuestaHv } from "@/lib/hojaDeVida/constantes";
 import { nombreAdjunto, validarPdf } from "@/lib/hojaDeVida/pdf";
 
@@ -36,9 +38,7 @@ export const esquemaHojaDeVida = z.object({
     .trim()
     .min(1, "Escribe tu teléfono.")
     .max(MAX_HV.telefono, "El teléfono es demasiado largo.")
-    .refine((v) => /^[+]?[\d\s\-().]{7,25}$/.test(v) && v.replace(/\D/g, "").length >= 7, {
-      message: "Ese teléfono no parece válido. Ejemplo: +57 317 670 7071.",
-    }),
+    .refine(telefonoValido, { message: MENSAJE_TELEFONO }),
   vacante: texto("vacante", MAX_HV.vacante),
   mensaje: z
     .string()

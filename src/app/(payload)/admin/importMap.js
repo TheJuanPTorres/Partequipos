@@ -43,6 +43,7 @@ import { default as default_6d682fd22369dc678c3e749bcc0f63bb } from '../../../co
 import { default as default_6e0a7f95b752e38279b0c95732beef83 } from '../../../components/admin/CampoModeloUsada'
 import { default as default_62f5c571abea184f2a2009cb72fbc5c0 } from '../../../components/admin/CampoSoloAditamentos'
 import { default as default_3d7669299a3622bec50747e81be0a39b } from '../../../components/admin/celdas/CeldaInterruptor'
+import { default as default_5d7e611db279a1e64d6ebeff0181e8da } from '../../../components/admin/EtiquetaProducto'
 import { default as default_7afa784110d90c3c093bacc977ecd19b } from '../../../components/admin/AvisoBloques'
 import { default as default_c109ce541d2210185cddcb9e5d98a2d1 } from '../../../components/admin/aviso/AvisoContrasteTitulo'
 import { default as default_6b3563e09f348391483892d49429a65e } from '../../../components/admin/aviso/AvisoRecorteMovil'
@@ -115,6 +116,7 @@ export const importMap = {
   "/components/admin/CampoModeloUsada#default": default_6e0a7f95b752e38279b0c95732beef83,
   "/components/admin/CampoSoloAditamentos#default": default_62f5c571abea184f2a2009cb72fbc5c0,
   "/components/admin/celdas/CeldaInterruptor#default": default_3d7669299a3622bec50747e81be0a39b,
+  "/components/admin/EtiquetaProducto#default": default_5d7e611db279a1e64d6ebeff0181e8da,
   "/components/admin/AvisoBloques#default": default_7afa784110d90c3c093bacc977ecd19b,
   "/components/admin/aviso/AvisoContrasteTitulo#default": default_c109ce541d2210185cddcb9e5d98a2d1,
   "/components/admin/aviso/AvisoRecorteMovil#default": default_6b3563e09f348391483892d49429a65e,

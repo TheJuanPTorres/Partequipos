@@ -32,8 +32,10 @@ describe("sección 9: sedes", () => {
     assert.equal(s?.etiqueta, "Medellín, Antioquia");
     assert.equal(s?.ciudad, "Medellín");
     assert.equal(s?.lineas[0]?.etiqueta, "Maquinaria · Guarne");
-    assert.deepEqual(s?.lineas[0]?.telefono, { texto: "(604) 448 58 78", href: "tel:6044485878" });
-    assert.equal(s?.lineas[1]?.telefono, null);
+    assert.deepEqual(s?.lineas[0]?.telefonos, [
+      { texto: "(604) 448 58 78", href: "tel:+576044485878" },
+    ]);
+    assert.deepEqual(s?.lineas[1]?.telefonos, []);
   });
 
   it("descarta sedes sin ciudad, departamento o coordenadas válidas", () => {

@@ -52,11 +52,15 @@ function Ficha({ sede, i }: { sede: SedeLista; i: number }) {
             <li key={`${l.etiqueta}-${l.direccion}`} className={estilos.detalle}>
               <span className={estilos.detalleEtiqueta}>{l.etiqueta}</span>
               <address className={estilos.direccion}>{l.direccion}</address>
-              {l.telefono ? (
-                <a className={estilos.telefono} href={l.telefono.href}>
-                  {l.telefono.texto}
-                </a>
-              ) : null}
+              {l.telefonos.map((t) =>
+                t.href ? (
+                  <a key={t.texto} className={estilos.telefono} href={t.href}>
+                    {t.texto}
+                  </a>
+                ) : (
+                  <span key={t.texto}>{t.texto}</span>
+                ),
+              )}
               <a
                 className={estilos.verMapa}
                 href={l.mapa.href}

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { TITULOS_EN_MAYUSCULAS, aTipoTitulo, decidir, enMayusculas } from "./tipoTitulo";
+import { TITULOS_EN_MAYUSCULAS, aTipoTitulo, cambioSeo, decidir, enMayusculas } from "./tipoTitulo";
 
 test("los 18 de la lista, a tipo título con siglas, códigos y preposiciones", () => {
   const despues = TITULOS_EN_MAYUSCULAS.map((t) => aTipoTitulo(t.antes));
@@ -55,4 +55,22 @@ test("no pisa lo editado en el panel", () => {
   assert.equal(decidir("retirar", antes, antes, despues), "ya-estaba");
   assert.equal(decidir("retirar", "Otro", antes, despues), "distinto");
   assert.equal(decidir("aplicar", null, antes, despues), "distinto");
+});
+
+test("título para buscadores: solo el que está todo en mayúsculas, y retirada exacta", () => {
+  const caps = "TÉRMINOS Y CONDICIONES CAMPAÑA BONOS DE RECOMPRA";
+  const nuestro = "Términos y Condiciones Campaña Bonos de Recompra";
+  assert.deepEqual(cambioSeo("aplicar", caps), {
+    decision: "cambiar",
+    antes: caps,
+    despues: nuestro,
+  });
+  assert.equal(cambioSeo("aplicar", nuestro)?.decision, "ya-estaba");
+  assert.equal(cambioSeo("retirar", nuestro)?.decision, "cambiar");
+  assert.equal(cambioSeo("retirar", caps)?.decision, "ya-estaba");
+  assert.equal(cambioSeo("aplicar", "Términos de la campaña de bonos"), null);
+  assert.equal(cambioSeo("aplicar", "Martillo Npk | partequipos"), null);
+  assert.equal(cambioSeo("aplicar", "ZX200-3 CX130D"), null);
+  assert.equal(cambioSeo("aplicar", ""), null);
+  assert.equal(cambioSeo("aplicar", null), null);
 });

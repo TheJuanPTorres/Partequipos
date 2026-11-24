@@ -115,3 +115,25 @@ export function decidir(
   if (actual === desde) return "cambiar";
   return "distinto";
 }
+
+/**
+ * El «Título para buscadores» (seo.metaTitle) de los mismos documentos (dirección, 2026-11-23):
+ * solo se toca si está TODO en mayúsculas, con la misma regla. Al retirar vuelve a mayúsculas,
+ * solo si sigue siendo el nuestro. Vacío o escrito a mano en otro formato: no se toca.
+ */
+export function cambioSeo(
+  modo: "aplicar" | "retirar",
+  actual: string | null | undefined,
+): { decision: "cambiar" | "ya-estaba"; antes: string; despues: string } | null {
+  if (typeof actual !== "string" || !actual.trim()) return null;
+  const mayus = actual.toLocaleUpperCase("es");
+  if (!enMayusculas(mayus)) return null;
+  const nuestro = aTipoTitulo(mayus);
+  const enMayus = actual === mayus;
+  const esNuestro = actual === nuestro && !enMayus;
+  if (!enMayus && !esNuestro) return null;
+  if (modo === "aplicar") {
+    return { decision: enMayus ? "cambiar" : "ya-estaba", antes: mayus, despues: nuestro };
+  }
+  return { decision: esNuestro ? "cambiar" : "ya-estaba", antes: mayus, despues: nuestro };
+}

@@ -204,7 +204,7 @@ try {
       hasTouch: ancho.movil,
       locale: "es-CO",
       // Modo `modo-admin`: vídeo del recorrido a 1440 (tanda 23).
-      ...(MODO === "modo-admin" && !ancho.movil
+      ...(MODO === "modo-admin" && !ancho.movil && process.argv.includes("video")
         ? { recordVideo: { dir: salida, size: ancho.viewport } }
         : {}),
     });
@@ -1538,11 +1538,16 @@ try {
           })
           .catch(() => null);
       const franja = () => pagina.locator(".pqma-franja");
+      // La franja sale enseguida; el mapa (botones «Editar», «Ver borrador») llega después: se espera a él.
       const esperarFranja = () =>
-        franja()
+        pagina
+          .locator(".pqma-franja .pqma-boton--principal")
           .waitFor({ timeout: 20000 })
           .then(
-            () => true,
+            async () => {
+              await pagina.waitForTimeout(800);
+              return true;
+            },
             () => false,
           );
       // 1) Entrar al panel deja la pista.
@@ -1589,6 +1594,9 @@ try {
           (h) => (h.match(/\/admin\/(?:collections|globals)\/([a-z0-9-]+)/) ?? [])[1] ?? "?",
         );
         const ajenos = slugs.filter((s) => !puede(s));
+        decir(
+          `   enlaces de ${nombre}: ${enlaces.map((h) => h.replace(/^https?:\/\/[^/]+/, "")).join(" | ")}`,
+        );
         ok(
           `${nombre}: ${enlaces.length} botones «Editar», todos de lo que puede editar (${[...new Set(slugs)].join(", ")})`,
           enlaces.length > 0 && ajenos.length === 0,
@@ -1603,10 +1611,23 @@ try {
         const href = (await conCampo.getAttribute("href")) ?? "";
         const campo = new URL(href, base).searchParams.get("campo") ?? "";
         const idCampo = `field-${campo.replace(/\./g, "__")}`;
-        const [nueva] = await Promise.all([
-          contexto.waitForEvent("page", { timeout: 15000 }),
-          conCampo.click({ force: true }),
-        ]);
+        // Como una persona: el botón se activa al pasar por su bloque; luego, clic normal.
+        await pagina
+          .locator('section[aria-label="Descripción y acciones"]')
+          .hover()
+          .catch(() => null);
+        await pagina.waitForTimeout(500);
+        let nueva = await Promise.all([
+          contexto.waitForEvent("page", { timeout: 8000 }),
+          conCampo.click({ timeout: 5000 }),
+        ])
+          .then(([p]) => p)
+          .catch(() => null);
+        ok("el botón «Editar» del bloque abre otra pestaña al pulsarlo", Boolean(nueva));
+        if (!nueva) {
+          nueva = await contexto.newPage();
+          await nueva.goto(new URL(href, base).toString(), { waitUntil: "load", timeout: 30000 });
+        }
         let foco = "";
         for (let i = 0; i < 48 && foco !== idCampo; i++) {
           await nueva.waitForTimeout(250);
@@ -1621,8 +1642,8 @@ try {
       } else {
         ok("hay algún «Editar» con campo en la usada", false);
       }
-      // 4) «Ver borrador» (si la página lo tiene) e «Ir al panel».
-      await pagina.goto(`${base}/`, { waitUntil: "load", timeout: 30000 });
+      // 4) «Ver borrador» (sale en la usada: su vista previa) e «Ir al panel».
+      await pagina.goto(`${base}${usada ?? "/"}`, { waitUntil: "load", timeout: 30000 });
       await esperarFranja();
       const borrador = pagina.locator(".pqma-franja a", { hasText: "Ver borrador" });
       if (await borrador.count()) {
@@ -1637,13 +1658,13 @@ try {
             .textContent()
             .catch(() => "")) ?? "";
         ok(
-          `«Ver borrador» abre la vista previa del borrador (${new URL(p2.url()).pathname})`,
-          /borrador/i.test(texto),
+          `«Ver borrador» abre la vista previa (${new URL(p2.url()).pathname}, «${texto.trim().slice(0, 40)}…»)`,
+          /\/vista-previa\/|borrador/i.test(`${p2.url()} ${texto}`) && texto.trim().length > 50,
         );
         await foto("ver-borrador", p2);
         await p2.close();
       } else {
-        ok("«Ver borrador» no sale en la portada (no tiene borrador guardado)", true);
+        ok("«Ver borrador» sale en la usada", false);
       }
       const [p3] = await Promise.all([
         contexto.waitForEvent("page", { timeout: 15000 }),
@@ -1692,7 +1713,9 @@ try {
       await foto("tras-salir");
       await pagina.waitForTimeout(1000);
       hallazgos.push({ pantalla: "modo-admin", ancho: ancho.nombre, resultado, errores, fallidas });
-      await contexto.close();
+      // Con vídeo, se cierra antes la página (así se termina de escribir) y con un límite.
+      await pagina.close().catch(() => null);
+      await Promise.race([contexto.close(), new Promise((r) => setTimeout(r, 20000))]);
       continue;
     }
 

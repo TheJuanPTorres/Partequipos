@@ -203,6 +203,10 @@ try {
       isMobile: ancho.movil,
       hasTouch: ancho.movil,
       locale: "es-CO",
+      // Modo `modo-admin`: vídeo del recorrido a 1440 (tanda 23).
+      ...(MODO === "modo-admin" && !ancho.movil
+        ? { recordVideo: { dir: salida, size: ancho.viewport } }
+        : {}),
     });
     // El token solo a ese origen, nunca a terceros (`derivacion.mjs`).
     await instalarDerivacion(contexto, origin, bypass);
@@ -1509,6 +1513,185 @@ try {
         enAcceso === null,
       );
       hallazgos.push({ pantalla: "pista", ancho: ancho.nombre, resultado, errores, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `modo-admin` (tanda 23, la barra de A en la web, con la pista de C): por efecto, con la
+     * sesión del editor de pruebas. En la portada y en una usada sale la franja con su nombre y los
+     * botones «Editar»; cada «Editar» es de algo que ese usuario puede editar (`/api/access`); uno
+     * cae en la pestaña y el campo exactos; «Ver borrador» (si lo hay) e «Ir al panel» abren;
+     * «Cerrar sesión» quita la franja, la sesión y la pista. A 1440 graba el vídeo del recorrido.
+     */
+    if (MODO === "modo-admin") {
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto} (${ancho.nombre})`);
+      };
+      const foto = (n, p = pagina) =>
+        p
+          .screenshot({
+            path: path.join(salida, `modo-admin-${n}-${ancho.nombre}.png`),
+            timeout: 10000,
+          })
+          .catch(() => null);
+      const franja = () => pagina.locator(".pqma-franja");
+      const esperarFranja = () =>
+        franja()
+          .waitFor({ timeout: 20000 })
+          .then(
+            () => true,
+            () => false,
+          );
+      // 1) Entrar al panel deja la pista.
+      await pagina.goto(`${base}/admin/`, { waitUntil: "load", timeout: 30000 });
+      await pagina.waitForTimeout(1500);
+      const pista = await pagina.evaluate(() => localStorage.getItem("pq-modo-admin"));
+      ok(`al entrar al panel queda la pista («${pista}»)`, pista === "1");
+      const permisos = await pagina.evaluate(async () => (await fetch("/api/access/")).json());
+      const puede = (s) =>
+        Boolean(permisos?.collections?.[s]?.update || permisos?.globals?.[s]?.update);
+      // 2) Portada y una usada.
+      const usada = await pagina.evaluate(async () => {
+        const d = await (await fetch("/api/equipos-usados/27/?depth=1")).json();
+        return d?.slug && d?.categoria?.slug
+          ? `/maquinaria-pesada/maquinaria-pesada-usada/${d.categoria.slug}/${d.slug}/`
+          : null;
+      });
+      for (const [nombre, ruta] of [
+        ["portada", "/"],
+        ["usada", usada],
+      ]) {
+        if (!ruta) {
+          ok(`${nombre}: no se encontró la página`, false);
+          continue;
+        }
+        await pagina.goto(`${base}${ruta}`, { waitUntil: "load", timeout: 30000 });
+        const hay = await esperarFranja();
+        const quien = hay
+          ? (
+              (await pagina
+                .locator(".pqma-quien")
+                .textContent()
+                .catch(() => "")) ?? ""
+            ).trim()
+          : "";
+        ok(
+          `${nombre}: sale la franja con el usuario («${quien.replace(/^·\s*/, "")}»)`,
+          hay && quien.length > 2,
+        );
+        const enlaces = await pagina
+          .locator(".pqma-editar, .pqma-boton--principal")
+          .evaluateAll((as) => as.map((a) => a.getAttribute("href") ?? ""));
+        const slugs = enlaces.map(
+          (h) => (h.match(/\/admin\/(?:collections|globals)\/([a-z0-9-]+)/) ?? [])[1] ?? "?",
+        );
+        const ajenos = slugs.filter((s) => !puede(s));
+        ok(
+          `${nombre}: ${enlaces.length} botones «Editar», todos de lo que puede editar (${[...new Set(slugs)].join(", ")})`,
+          enlaces.length > 0 && ajenos.length === 0,
+        );
+        await foto(nombre);
+      }
+      // 3) Un «Editar» con campo cae en la pestaña y el campo (se abre en otra pestaña).
+      await pagina.goto(`${base}${usada ?? "/"}`, { waitUntil: "load", timeout: 30000 });
+      await esperarFranja();
+      const conCampo = pagina.locator('.pqma-editar[href*="campo="]').first();
+      if (await conCampo.count()) {
+        const href = (await conCampo.getAttribute("href")) ?? "";
+        const campo = new URL(href, base).searchParams.get("campo") ?? "";
+        const idCampo = `field-${campo.replace(/\./g, "__")}`;
+        const [nueva] = await Promise.all([
+          contexto.waitForEvent("page", { timeout: 15000 }),
+          conCampo.click({ force: true }),
+        ]);
+        let foco = "";
+        for (let i = 0; i < 48 && foco !== idCampo; i++) {
+          await nueva.waitForTimeout(250);
+          foco = await nueva.evaluate(() => document.activeElement?.id ?? "").catch(() => "");
+        }
+        ok(
+          `«Editar» de «${campo}» abre la ficha con el foco en el campo (${foco})`,
+          foco === idCampo,
+        );
+        await foto("editar-campo", nueva);
+        await nueva.close();
+      } else {
+        ok("hay algún «Editar» con campo en la usada", false);
+      }
+      // 4) «Ver borrador» (si la página lo tiene) e «Ir al panel».
+      await pagina.goto(`${base}/`, { waitUntil: "load", timeout: 30000 });
+      await esperarFranja();
+      const borrador = pagina.locator(".pqma-franja a", { hasText: "Ver borrador" });
+      if (await borrador.count()) {
+        const [p2] = await Promise.all([
+          contexto.waitForEvent("page", { timeout: 15000 }),
+          borrador.click(),
+        ]);
+        await p2.waitForLoadState("load").catch(() => null);
+        const texto =
+          (await p2
+            .locator("body")
+            .textContent()
+            .catch(() => "")) ?? "";
+        ok(
+          `«Ver borrador» abre la vista previa del borrador (${new URL(p2.url()).pathname})`,
+          /borrador/i.test(texto),
+        );
+        await foto("ver-borrador", p2);
+        await p2.close();
+      } else {
+        ok("«Ver borrador» no sale en la portada (no tiene borrador guardado)", true);
+      }
+      const [p3] = await Promise.all([
+        contexto.waitForEvent("page", { timeout: 15000 }),
+        pagina.locator(".pqma-franja a", { hasText: "Ir al panel" }).click(),
+      ]);
+      await p3.waitForLoadState("load").catch(() => null);
+      ok(
+        `«Ir al panel» abre el panel (${new URL(p3.url()).pathname})`,
+        /^\/admin\/?$/.test(new URL(p3.url()).pathname),
+      );
+      await p3.close();
+      // 5) Vídeo (1440): portada → Editar → campo → volver, en la MISMA pestaña (un solo vídeo).
+      if (!ancho.movil) {
+        await pagina.goto(`${base}/`, { waitUntil: "load", timeout: 30000 });
+        await esperarFranja();
+        await pagina.waitForTimeout(1500);
+        const primero = pagina.locator('.pqma-editar[href*="campo="], .pqma-editar').first();
+        await primero.hover({ force: true }).catch(() => null);
+        await pagina.waitForTimeout(1200);
+        const href = await primero.getAttribute("href").catch(() => null);
+        if (href) {
+          await pagina.goto(new URL(href, base).toString(), { waitUntil: "load", timeout: 30000 });
+          await pagina.waitForTimeout(4000);
+          await pagina.goBack({ waitUntil: "load" }).catch(() => null);
+          await esperarFranja();
+          await pagina.waitForTimeout(1500);
+        }
+      }
+      // 6) «Cerrar sesión» quita la franja, la sesión y la pista.
+      await pagina.locator(".pqma-franja button", { hasText: "Cerrar sesión" }).click();
+      const fuera = await franja()
+        .waitFor({ state: "detached", timeout: 15000 })
+        .then(
+          () => true,
+          () => false,
+        );
+      await pagina.waitForTimeout(1000);
+      const yo = await pagina.evaluate(
+        async () => (await (await fetch("/api/users/me/")).json())?.user ?? null,
+      );
+      const pistaFinal = await pagina.evaluate(() => localStorage.getItem("pq-modo-admin"));
+      ok(
+        `«Cerrar sesión» quita la franja, la sesión y la pista (franja ${fuera ? "fuera" : "sigue"}, usuario ${yo ? "sigue" : "ninguno"}, pista ${pistaFinal ?? "fuera"})`,
+        fuera && !yo && pistaFinal === null,
+      );
+      await foto("tras-salir");
+      await pagina.waitForTimeout(1000);
+      hallazgos.push({ pantalla: "modo-admin", ancho: ancho.nombre, resultado, errores, fallidas });
       await contexto.close();
       continue;
     }

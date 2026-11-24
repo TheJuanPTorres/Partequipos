@@ -29,6 +29,18 @@ export const VERSIONES_CON_BORRADORES: NonNullable<CollectionConfig["versions"]>
   maxPerDoc: MAXIMO_VERSIONES,
 };
 
+/**
+ * HISTORIAL SIN BORRADORES (tanda 21, tarea 3, fase 2, punto 4) para las fichas de producto: cada
+ * guardado deja una versión (fecha y quién), que se compara campo a campo y se restaura. Sin
+ * borradores: lo que se guarda se publica, como siempre. Las 10 últimas por ficha; el historial,
+ * solo con sesión del personal (`readVersions: soloPersonal`).
+ */
+export const MAXIMO_VERSIONES_PRODUCTO = 10;
+export const VERSIONES_SIN_BORRADORES: NonNullable<CollectionConfig["versions"]> = {
+  drafts: false,
+  maxPerDoc: MAXIMO_VERSIONES_PRODUCTO,
+};
+
 /** La condición de lo publicado. */
 export const PUBLICADO = { _status: { equals: "published" } } satisfies Where;
 

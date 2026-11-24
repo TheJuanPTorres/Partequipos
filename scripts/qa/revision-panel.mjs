@@ -353,10 +353,14 @@ try {
           estados: [...document.querySelectorAll(".pq-insignia")].map((e) => e.textContent.trim()),
           interruptores: document.querySelectorAll('[role="switch"]').length,
         }));
-        const primera = await pagina.evaluate(
-          async (r) => (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
-          `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
-        );
+        // `… facil <colecciones> <id>`: esa ficha en lugar de la primera.
+        const primera = /^\d+$/.test(process.argv[5] ?? "")
+          ? Number(process.argv[5])
+          : await pagina.evaluate(
+              async (r) =>
+                (await (await fetch(r, { credentials: "include" })).json())?.docs?.[0]?.id,
+              `${base}/api/${coleccion}?limit=1&sort=id&depth=0`,
+            );
         let ficha = null;
         if (primera) {
           await pagina.goto(`${base}/admin/collections/${coleccion}/${primera}`, {
@@ -628,6 +632,194 @@ try {
       hallazgos.push({ pantalla: "bloque-duplicar", ancho: ancho.nombre, resultado });
       hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
       hallazgos.push({ pantalla: "peticiones-fallidas", ancho: ancho.nombre, fallidas });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `abrir` (2026-11-24, #574): en la lista de cada colección (`… abrir <col1,col2>`), pulsa
+     * en la primera fila la PRIMERA celda (el logo, la foto o el estado) y la del NOMBRE, y anota si
+     * entra en la ficha. Solo lee.
+     */
+    if (MODO === "abrir") {
+      const colecciones = (process.argv[4] ?? "marcas-maquinaria,solicitudes")
+        .split(",")
+        .filter(Boolean);
+      for (const coleccion of colecciones) {
+        const lista = `${base}/admin/collections/${coleccion}?limit=5`;
+        await pagina.goto(lista, { waitUntil: "networkidle" });
+        await pagina.waitForTimeout(1500);
+        await pagina.screenshot({
+          path: path.join(salida, `abrir-${coleccion}-${ancho.nombre}.png`),
+          fullPage: false,
+        });
+        const cabeceras = await pagina
+          .locator("table thead th")
+          .evaluateAll((ths) => ths.map((th) => th.textContent.trim()));
+        const iNombre = cabeceras.findIndex((t) => /^Nombre/.test(t));
+        // La primera columna de datos: la que sigue a la casilla de marcar (si la hay).
+        const iPrimera = cabeceras.findIndex((t) => t !== "");
+        const resultados = [];
+        for (const [que, indice] of [
+          [`primera celda («${cabeceras[iPrimera] || "-"}»)`, iPrimera],
+          ["celda «Nombre»", iNombre],
+        ]) {
+          if (indice < 0) {
+            resultados.push(`${que}: no hay esa columna`);
+            continue;
+          }
+          await pagina.goto(lista, { waitUntil: "networkidle" });
+          await pagina.waitForTimeout(1200);
+          const celda = pagina.locator("table tbody tr").first().locator("td").nth(indice);
+          const enlace = celda.locator("a").first();
+          const objetivo = (await enlace.count()) > 0 ? enlace : celda;
+          await objetivo.click({ timeout: 5000 }).catch(() => null);
+          await pagina.waitForTimeout(2500);
+          const ruta = new URL(pagina.url()).pathname;
+          const entra = new RegExp(`/collections/${coleccion}/\\d+/?$`).test(ruta);
+          resultados.push(`${que}: ${entra ? "ENTRA" : "NO entra"} (${ruta})`);
+        }
+        hallazgos.push({
+          pantalla: `abrir-${coleccion}`,
+          ancho: ancho.nombre,
+          cabeceras,
+          resultados,
+        });
+        decir(`${coleccion} (${ancho.nombre}): ${resultados.join(" · ")}`);
+      }
+      hallazgos.push({ pantalla: "consola", ancho: ancho.nombre, errores });
+      await contexto.close();
+      continue;
+    }
+
+    /*
+     * Modo `csp-subidas` (2026-11-24, para A, tras el #566): los avisos de la CSP HACIENDO cosas en
+     * el panel, a 1440: subir una imagen y un PDF (subida directa al Blob), abrir la vista previa
+     * del documento, escribir en un texto enriquecido y guardar una ficha (y deshacerlo). Imprime
+     * los ids de lo subido: se borra después con la API local (el editor no puede borrar).
+     */
+    if (MODO === "csp-subidas") {
+      if (ancho.movil) {
+        await contexto.close();
+        continue;
+      }
+      const consola = [];
+      pagina.on("console", (m) => {
+        const t = m.text();
+        if (/Content[- ]Security[- ]Policy|Report Only/i.test(t)) consola.push(t.slice(0, 300));
+      });
+      await contexto.addInitScript(() => {
+        window.__violaciones = [];
+        document.addEventListener("securitypolicyviolation", (e) =>
+          window.__violaciones.push(`${e.effectiveDirective} ← ${e.blockedURI}`),
+        );
+      });
+      const limpiar = (v) =>
+        v.replace(/(https?:\/\/[^/\s?]+)([^\s?]*)\?\S*/g, "$1$2").replace(origin, "(mismo origen)");
+      const pasos = [];
+      const anotar = async (paso, extra = "") => {
+        const v = await pagina.evaluate(() => window.__violaciones ?? []).catch(() => []);
+        const unicas = [...new Set(v.map(limpiar))];
+        pasos.push({ paso, violaciones: unicas, extra });
+        decir(
+          `· ${paso}: ${unicas.length ? unicas.join(" | ") : "limpio"}${extra ? ` (${extra})` : ""}`,
+        );
+      };
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "csp-subidas-"));
+      const png = path.join(tmp, "prueba-csp-panel.png");
+      fs.writeFileSync(
+        png,
+        Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+          "base64",
+        ),
+      );
+      const pdf = path.join(tmp, "prueba-csp-panel.pdf");
+      fs.writeFileSync(
+        pdf,
+        "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 200]>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n164\n%%EOF\n",
+      );
+      const guardar = async () => {
+        await pagina.getByRole("button", { name: "Guardar" }).first().click();
+        await pagina.waitForTimeout(4000);
+      };
+      const subidos = {};
+      for (const [coleccion, fichero, campo, texto] of [
+        ["media", png, "alt", "Prueba de subida para la CSP del panel"],
+        ["documentos", pdf, "titulo", "Prueba de subida para la CSP del panel"],
+      ]) {
+        await pagina.goto(`${base}/admin/collections/${coleccion}/create`, {
+          waitUntil: "networkidle",
+        });
+        await pagina.waitForTimeout(1500);
+        await pagina.locator('input[type="file"]').first().setInputFiles(fichero);
+        await pagina.waitForTimeout(800);
+        await pagina.locator(`input[name="${campo}"]`).fill(texto);
+        await guardar();
+        await pagina
+          .waitForURL((u) => /\/\d+\/?$/.test(u.pathname), { timeout: 30_000 })
+          .catch(() => null);
+        const id = Number(new URL(pagina.url()).pathname.match(/\/(\d+)\/?$/)?.[1]) || null;
+        subidos[coleccion] = id;
+        await anotar(`subir a ${coleccion}`, id ? `id ${id}` : "NO se guardó");
+      }
+      if (subidos.documentos) {
+        // La vista previa del documento: su miniatura o el enlace al fichero (otra pestaña o un panel).
+        const nueva = contexto.waitForEvent("page", { timeout: 6000 }).catch(() => null);
+        await pagina
+          .locator(".file-details a, .file-details__thumbnail, .thumbnail, .file-meta__url a")
+          .first()
+          .click({ timeout: 5000 })
+          .catch(() => null);
+        const pestana = await nueva;
+        await pagina.waitForTimeout(1500);
+        await anotar(
+          "vista previa del documento",
+          pestana
+            ? `abre otra pestaña en ${new URL(pestana.url()).host === new URL(base).host ? "el mismo origen" : "otro origen (el Blob)"}`
+            : "en el mismo panel",
+        );
+        if (pestana) await pestana.close();
+      }
+      // Escribir en un texto enriquecido y guardar; después, deshacerlo y guardar otra vez.
+      const leerDescripcion = () =>
+        pagina.evaluate(
+          async (r) =>
+            JSON.stringify(
+              (await (await fetch(r, { credentials: "include" })).json())?.descripcion ?? null,
+            ),
+          `${base}/api/equipos-nuevos/1?depth=0`,
+        );
+      const antes = await leerDescripcion();
+      await pagina.goto(`${base}/admin/collections/equipos-nuevos/1`, { waitUntil: "networkidle" });
+      await pagina.waitForTimeout(2000);
+      const editor = pagina.locator('[data-lexical-editor="true"]').first();
+      await editor.click();
+      await pagina.keyboard.press("ControlOrMeta+End");
+      await pagina.keyboard.type(" CSP");
+      await anotar("escribir en el texto enriquecido");
+      await guardar();
+      await anotar("guardar la ficha");
+      await editor.click();
+      await pagina.keyboard.press("ControlOrMeta+End");
+      for (let i = 0; i < 4; i++) await pagina.keyboard.press("Backspace");
+      await guardar();
+      const despues = await leerDescripcion();
+      await anotar(
+        "deshacer y guardar",
+        despues === antes ? "la descripción queda como estaba" : "¡la descripción NO quedó igual!",
+      );
+      hallazgos.push({
+        pantalla: "csp-subidas",
+        ancho: ancho.nombre,
+        pasos,
+        subidos,
+        consola,
+        // Solo si no quedó igual: para devolverla con la API local.
+        ...(despues === antes ? {} : { descripcionAntes: antes }),
+      });
+      decir(`subidos (para borrar): ${JSON.stringify(subidos)}`);
+      fs.rmSync(tmp, { recursive: true, force: true });
       await contexto.close();
       continue;
     }

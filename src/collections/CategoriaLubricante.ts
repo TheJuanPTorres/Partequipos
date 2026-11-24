@@ -5,7 +5,13 @@ import { seoField } from "../lib/fields/seoField";
 import { validarEnlace } from "../lib/fields/reglasPortada";
 import { slugField } from "../lib/fields/slugField";
 import { mostrarEnWebField } from "../lib/fields/mostrarEnWeb";
-import { borradoAdmin, escrituraContenido, lecturaContenido } from "../lib/seguridad/acceso";
+import {
+  borradoAdmin,
+  escrituraContenido,
+  lecturaContenido,
+  soloPersonal,
+} from "../lib/seguridad/acceso";
+import { VERSIONES_SIN_BORRADORES } from "../lib/borradores";
 import {
   revalidarCategoriaLubricante,
   revalidarCategoriaLubricanteBorrada,
@@ -47,7 +53,11 @@ export const CategoriaLubricante: CollectionConfig = {
     create: escrituraContenido,
     update: escrituraContenido,
     delete: borradoAdmin,
+    // El historial de versiones, solo con sesión del personal (tanda 21, tarea 3, fase 2, punto 4).
+    readVersions: soloPersonal,
   },
+  // Historial sin borradores: cada guardado, una versión que se compara y se restaura.
+  versions: VERSIONES_SIN_BORRADORES,
   hooks: {
     afterChange: [revalidarCategoriaLubricante, megamenu.afterChange],
     afterDelete: [revalidarCategoriaLubricanteBorrada, megamenu.afterDelete],

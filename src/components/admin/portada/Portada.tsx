@@ -1,9 +1,13 @@
 import type { DashboardViewServerProps } from "@payloadcms/next/views";
 import { Gutter } from "@payloadcms/ui";
 import {
+  IconAlertTriangle,
   IconBackhoe,
   IconBook,
   IconCircleCheck,
+  IconMessages,
+  IconPhoto,
+  IconSearchOff,
   IconExternalLink,
   IconFilePlus,
   IconMessage,
@@ -17,12 +21,22 @@ import Link from "next/link";
 import { ICONOS_DE_GRUPO } from "@/components/admin/Nav/iconos";
 import { idDeGrupo } from "@/lib/panel/menu";
 import { fechaExacta, fechaRelativa } from "@/lib/panel/fechas";
-import { esGrupoDelMenu, type IconoHabitual } from "@/lib/panel/portada";
+import { esGrupoDelMenu, type ClaveCifra, type IconoHabitual } from "@/lib/panel/portada";
 import { getPortadaPanel } from "@/lib/queries/getPortadaPanel";
 
 import { Aviso } from "../aviso/Aviso";
 import { SOLO_ADMINISTRADOR } from "@/lib/panel/menu";
 import { esAdministrador } from "@/lib/seguridad/acceso";
+
+import "./tablero.scss";
+
+/** Icono de cada cifra del tablero (tanda 23). */
+const ICONOS_CIFRAS: Record<ClaveCifra, Icon> = {
+  solicitudes: IconMessages,
+  incompletas: IconAlertTriangle,
+  fotos: IconPhoto,
+  busquedas: IconSearchOff,
+};
 
 /** Icono de cada acción de «Lo más habitual». */
 const ICONOS_HABITUALES: Record<IconoHabitual, Icon> = {
@@ -69,12 +83,8 @@ export default async function Portada(props: DashboardViewServerProps) {
     collections: paraElRol(visibleEntities.collections as string[]),
     globals: paraElRol(visibleEntities.globals as string[]),
   };
-  const { avisos, tarjetas, recientes, habituales, mensajes, manual } = await getPortadaPanel(
-    payload,
-    user,
-    permissions,
-    visibles,
-  );
+  const { cifras, mios, avisos, tarjetas, recientes, habituales, mensajes, manual } =
+    await getPortadaPanel(payload, user, permissions, visibles);
   const ahora = new Date();
 
   return (
@@ -102,6 +112,87 @@ export default async function Portada(props: DashboardViewServerProps) {
           ) : null}
         </ul>
       </header>
+
+      {/* TABLERO (tanda 23, punto 3): cifras, lo último que editaste y accesos rápidos grandes. */}
+      {cifras.length ? (
+        <section aria-labelledby="pq-tablero-cifras" className="pq-tablero">
+          <h2 className="pq-solo-lector" id="pq-tablero-cifras">
+            Resumen
+          </h2>
+          <ul className="pq-tablero__cifras">
+            {cifras.map((c) => {
+              const Icono = ICONOS_CIFRAS[c.clave];
+              return (
+                <li key={c.clave}>
+                  <Link
+                    prefetch={false}
+                    className={`pq-tablero__cifra pq-tablero__cifra--${c.tono}`}
+                    href={c.href}
+                  >
+                    <span className="pq-tablero__cifra-cabecera">
+                      <Icono aria-hidden="true" size={20} />
+                      {c.etiqueta}
+                    </span>
+                    <span className="pq-tablero__cifra-valor">{formatoNumero.format(c.valor)}</span>
+                    <span className="pq-tablero__cifra-detalle">{c.detalle}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
+
+      {habituales.length ? (
+        <section aria-labelledby="pq-portada-habitual" className="pq-portada__seccion">
+          <h2 className="pq-portada__subtitulo" id="pq-portada-habitual">
+            Accesos rápidos
+          </h2>
+          <ul className="pq-tablero__accesos">
+            {habituales.map(({ clave, texto, href }) => {
+              const Icono = ICONOS_HABITUALES[clave];
+              return (
+                <li key={clave}>
+                  <Link prefetch={false} className="pq-tablero__acceso" href={href}>
+                    <Icono aria-hidden="true" size={28} />
+                    <span>{texto}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
+
+      <section aria-labelledby="pq-tablero-mios" className="pq-portada__seccion">
+        <h2 className="pq-portada__subtitulo" id="pq-tablero-mios">
+          Lo último que editaste
+        </h2>
+        {mios.length ? (
+          <ol className="pq-portada__recientes">
+            {mios.map((r) => (
+              <li className="pq-portada__reciente" key={`${r.slug}-${r.href}`}>
+                <Link prefetch={false} className="pq-portada__reciente-titulo" href={r.href}>
+                  {r.titulo}
+                </Link>
+                <span className="pq-portada__reciente-coleccion">{r.coleccion}</span>
+                <time
+                  className="pq-portada__reciente-fecha"
+                  dateTime={r.actualizado}
+                  title={fechaExacta(r.actualizado)}
+                >
+                  {fechaRelativa(r.actualizado, ahora)}
+                  <span className="pq-solo-lector">, {fechaExacta(r.actualizado)}</span>
+                </time>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="pq-portada__vacio">
+            Aún no has guardado nada. Lo que edites saldrá aquí para volver rápido.
+          </p>
+        )}
+      </section>
 
       {mensajes ? (
         <section aria-labelledby="pq-portada-mensajes" className="pq-portada__seccion">
@@ -165,27 +256,6 @@ export default async function Portada(props: DashboardViewServerProps) {
           </Aviso>
         )}
       </section>
-
-      {habituales.length ? (
-        <section aria-labelledby="pq-portada-habitual" className="pq-portada__seccion">
-          <h2 className="pq-portada__subtitulo" id="pq-portada-habitual">
-            Lo más habitual
-          </h2>
-          <ul className="pq-portada__accesos">
-            {habituales.map(({ clave, texto, href }) => {
-              const Icono = ICONOS_HABITUALES[clave];
-              return (
-                <li key={clave}>
-                  <Link prefetch={false} className="pq-portada__acceso" href={href}>
-                    <Icono aria-hidden="true" size={16} />
-                    {texto}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ) : null}
 
       <section aria-labelledby="pq-portada-secciones" className="pq-portada__seccion">
         <h2 className="pq-portada__subtitulo" id="pq-portada-secciones">

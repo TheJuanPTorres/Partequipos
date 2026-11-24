@@ -2330,6 +2330,51 @@ html[data-theme="dark"] :is(.auth-fields, .where-builder, .group-by-builder, .up
   }
 }
 
+/* Cambios en bloque encima de la lista (tanda 21, `AccionesEnBloque.tsx`): una barra que envuelve
+   en móvil, con botones de 36 px de alto (táctil) y el aviso del resultado. */
+.pq-en-bloque {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--pq-foreground);
+}
+.pq-en-bloque__boton {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius, 0.45rem);
+  background: var(--pq-background);
+  color: var(--pq-foreground);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--pq-foreground);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--pq-ring, currentColor);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+}
+.pq-en-bloque__boton--si {
+  border-color: var(--pq-foreground);
+  background: var(--pq-foreground);
+  color: var(--pq-background);
+}
+.pq-en-bloque__estado {
+  flex-basis: 100%;
+}
+.pq-en-bloque__estado--error {
+  color: var(--pq-destructive, #b91c1c);
+}
+
 /* ===================================================================
  * EDICIÓN FÁCIL DE LA FICHA DE USADA (tanda 21, tarea 3, fase 1: PROTOTIPO)
  * Lista: nombre con miniatura que abre la ficha e interruptores directos.

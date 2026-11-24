@@ -1719,6 +1719,112 @@ try {
       continue;
     }
 
+    /*
+     * Modo `franja` (tanda 23, pasada rápida del modo administración de A): con sesión,
+     * - cuánto tarda la franja (y el mapa con los «Editar») en salir en la portada, en frío (primera
+     *   carga) y en caliente (dos cargas más);
+     * - con Tab desde el principio de la portada, se llega a cada «Editar» y, con el foco, se ve
+     *   (dentro de la pantalla y no transparente);
+     * - de la portada a una usada y «Atrás»: cuánto tarda la franja en volver.
+     */
+    if (MODO === "franja") {
+      const resultado = [];
+      const ok = (texto, bien) => {
+        resultado.push(`${bien ? "✓" : "✗"} ${texto}`);
+        decir(`${bien ? "✓" : "✗"} ${texto} (${ancho.nombre})`);
+      };
+      const MAXIMO_MS = 3000;
+      // Tiempo desde que empieza la navegación hasta la franja y hasta el mapa («Editar esta página»).
+      const medir = async (accion) => {
+        const t0 = Date.now();
+        await accion();
+        const franja = await pagina
+          .locator(".pqma-franja")
+          .waitFor({ timeout: 25000 })
+          .then(
+            () => Date.now() - t0,
+            () => null,
+          );
+        const mapa = await pagina
+          .locator(".pqma-franja .pqma-boton--principal")
+          .waitFor({ timeout: 25000 })
+          .then(
+            () => Date.now() - t0,
+            () => null,
+          );
+        return { franja, mapa };
+      };
+      const texto = (m) => `franja ${m.franja ?? "—"} ms, mapa ${m.mapa ?? "—"} ms`;
+      // La pista: entrar al panel.
+      await pagina.goto(`${base}/admin/`, { waitUntil: "load", timeout: 30000 });
+      await pagina.waitForTimeout(1500);
+      // En frío y en caliente.
+      const ir = () => pagina.goto(`${base}/`, { waitUntil: "commit", timeout: 30000 });
+      const frio = await medir(ir);
+      ok(`portada en frío: ${texto(frio)}`, frio.mapa !== null && frio.mapa <= MAXIMO_MS * 2);
+      const calientes = [];
+      for (let i = 0; i < 2; i++) calientes.push(await medir(ir));
+      for (const [i, m] of calientes.entries())
+        ok(`portada en caliente ${i + 1}: ${texto(m)}`, m.mapa !== null && m.mapa <= MAXIMO_MS);
+      await pagina.screenshot({ path: path.join(salida, `franja-portada-${ancho.nombre}.png`) });
+      // Tab desde el principio.
+      await pagina.goto(`${base}/`, { waitUntil: "load", timeout: 30000 });
+      await pagina.locator(".pqma-franja .pqma-boton--principal").waitFor({ timeout: 25000 });
+      await pagina.waitForTimeout(800);
+      const total = await pagina.locator(".pqma-editar").count();
+      await pagina.evaluate(() => {
+        document.activeElement?.blur?.();
+        window.scrollTo(0, 0);
+      });
+      const vistos = new Set();
+      const malVistos = [];
+      for (let i = 0; i < 400 && vistos.size < total; i++) {
+        await pagina.keyboard.press("Tab");
+        const info = await pagina.evaluate(() => {
+          const a = document.activeElement;
+          if (!a || !a.classList?.contains("pqma-editar")) return null;
+          const r = a.getBoundingClientRect();
+          const op = Number(getComputedStyle(a).opacity);
+          return {
+            href: a.getAttribute("href") ?? "",
+            dentro: r.top >= 0 && r.bottom <= window.innerHeight && r.width > 0 && r.height > 0,
+            opaco: op > 0.5,
+          };
+        });
+        if (!info) continue;
+        if (!vistos.has(info.href)) {
+          vistos.add(info.href);
+          if (!(info.dentro && info.opaco)) malVistos.push(info.href);
+        }
+      }
+      ok(
+        `con Tab se llega a ${vistos.size} de ${total} «Editar»`,
+        total > 0 && vistos.size === total,
+      );
+      ok(
+        `con el foco, cada «Editar» se ve (dentro de la pantalla y opaco)${malVistos.length ? `: fallan ${malVistos.join(", ")}` : ""}`,
+        malVistos.length === 0,
+      );
+      await pagina.screenshot({ path: path.join(salida, `franja-tab-${ancho.nombre}.png`) });
+      // De la portada a una usada y «Atrás».
+      const usada = await pagina.evaluate(async () => {
+        const d = await (await fetch("/api/equipos-usados/27/?depth=1")).json();
+        return d?.slug && d?.categoria?.slug
+          ? `/maquinaria-pesada/maquinaria-pesada-usada/${d.categoria.slug}/${d.slug}/`
+          : null;
+      });
+      if (usada) {
+        await pagina.goto(`${base}${usada}`, { waitUntil: "load", timeout: 30000 });
+        await pagina.locator(".pqma-franja .pqma-boton--principal").waitFor({ timeout: 25000 });
+        const atras = await medir(() => pagina.goBack({ waitUntil: "commit" }));
+        ok(`«Atrás» a la portada: ${texto(atras)}`, atras.mapa !== null && atras.mapa <= MAXIMO_MS);
+        await pagina.screenshot({ path: path.join(salida, `franja-atras-${ancho.nombre}.png`) });
+      }
+      hallazgos.push({ pantalla: "franja", ancho: ancho.nombre, resultado, errores, fallidas });
+      await contexto.close();
+      continue;
+    }
+
     if (MODO === "borrador") {
       const id = process.argv[4];
       if (!/^\d+$/.test(id ?? "")) fallar("Uso: … borrador <id de la página>");

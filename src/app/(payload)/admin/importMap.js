@@ -10,7 +10,12 @@ import { default as default_f4712ba04226872691305c226599165d } from '../../../co
 import { default as default_40354e37e27f4a271be0ae82fc0596ca } from '../../../components/admin/listados/AccionesEnBloque'
 import { default as default_5c55248894877e0ef25c11c535b2b5bf } from '../../../components/admin/VerEnElSitio'
 import { default as default_adf6b68ce64d26f52375d6ee194bc8e3 } from '../../../components/admin/CampoColor'
+import { default as default_995c62da4474a980dc2501c7f5652493 } from '../../../components/admin/ResumenWeb'
+import { default as default_c3a501d4d9c91de728cb4e1b04127878 } from '../../../components/admin/Nada'
+import { default as default_c64705a92d0796cedaffd68920a37f81 } from '../../../components/admin/celdas/CeldaEstadoFicha'
 import { default as default_f0687b4ab35e63832190f4471448ae75 } from '../../../components/admin/aviso/AvisoMarcaEnlaceExterno'
+import { default as default_6d682fd22369dc678c3e749bcc0f63bb } from '../../../components/admin/celdas/CeldaNombreFicha'
+import { default as default_720d3c30275d1460f158620ba029ebfb } from '../../../components/admin/CampoConSugerencias'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -36,14 +41,12 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_ee64598c7457a4d9197213cdb580e4d5 } from '../../../components/admin/ContadorDestacadas'
+import { default as default_3d7669299a3622bec50747e81be0a39b } from '../../../components/admin/celdas/CeldaInterruptor'
 import { default as default_c9244e8895bab58e2ad878b2dd00ff58 } from '../../../components/admin/ResumenWebUsada'
-import { default as default_c3a501d4d9c91de728cb4e1b04127878 } from '../../../components/admin/Nada'
 import { default as default_f4cc75fc08a2745957afd6c38c455745 } from '../../../components/admin/celdas/CeldaEstadoUsada'
 import { default as default_6dd5387c7f2e5f0ef6f0dcb5c3b7a99a } from '../../../components/admin/aviso/AvisoNoDisponible'
-import { default as default_6d682fd22369dc678c3e749bcc0f63bb } from '../../../components/admin/celdas/CeldaNombreFicha'
 import { default as default_6e0a7f95b752e38279b0c95732beef83 } from '../../../components/admin/CampoModeloUsada'
 import { default as default_62f5c571abea184f2a2009cb72fbc5c0 } from '../../../components/admin/CampoSoloAditamentos'
-import { default as default_3d7669299a3622bec50747e81be0a39b } from '../../../components/admin/celdas/CeldaInterruptor'
 import { default as default_7afa784110d90c3c093bacc977ecd19b } from '../../../components/admin/AvisoBloques'
 import { default as default_c109ce541d2210185cddcb9e5d98a2d1 } from '../../../components/admin/aviso/AvisoContrasteTitulo'
 import { default as default_6b3563e09f348391483892d49429a65e } from '../../../components/admin/aviso/AvisoRecorteMovil'
@@ -83,7 +86,12 @@ export const importMap = {
   "/components/admin/listados/AccionesEnBloque#default": default_40354e37e27f4a271be0ae82fc0596ca,
   "/components/admin/VerEnElSitio#default": default_5c55248894877e0ef25c11c535b2b5bf,
   "/components/admin/CampoColor#default": default_adf6b68ce64d26f52375d6ee194bc8e3,
+  "/components/admin/ResumenWeb#default": default_995c62da4474a980dc2501c7f5652493,
+  "/components/admin/Nada#default": default_c3a501d4d9c91de728cb4e1b04127878,
+  "/components/admin/celdas/CeldaEstadoFicha#default": default_c64705a92d0796cedaffd68920a37f81,
   "/components/admin/aviso/AvisoMarcaEnlaceExterno#default": default_f0687b4ab35e63832190f4471448ae75,
+  "/components/admin/celdas/CeldaNombreFicha#default": default_6d682fd22369dc678c3e749bcc0f63bb,
+  "/components/admin/CampoConSugerencias#default": default_720d3c30275d1460f158620ba029ebfb,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -109,14 +117,12 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/ContadorDestacadas#default": default_ee64598c7457a4d9197213cdb580e4d5,
+  "/components/admin/celdas/CeldaInterruptor#default": default_3d7669299a3622bec50747e81be0a39b,
   "/components/admin/ResumenWebUsada#default": default_c9244e8895bab58e2ad878b2dd00ff58,
-  "/components/admin/Nada#default": default_c3a501d4d9c91de728cb4e1b04127878,
   "/components/admin/celdas/CeldaEstadoUsada#default": default_f4cc75fc08a2745957afd6c38c455745,
   "/components/admin/aviso/AvisoNoDisponible#default": default_6dd5387c7f2e5f0ef6f0dcb5c3b7a99a,
-  "/components/admin/celdas/CeldaNombreFicha#default": default_6d682fd22369dc678c3e749bcc0f63bb,
   "/components/admin/CampoModeloUsada#default": default_6e0a7f95b752e38279b0c95732beef83,
   "/components/admin/CampoSoloAditamentos#default": default_62f5c571abea184f2a2009cb72fbc5c0,
-  "/components/admin/celdas/CeldaInterruptor#default": default_3d7669299a3622bec50747e81be0a39b,
   "/components/admin/AvisoBloques#default": default_7afa784110d90c3c093bacc977ecd19b,
   "/components/admin/aviso/AvisoContrasteTitulo#default": default_c109ce541d2210185cddcb9e5d98a2d1,
   "/components/admin/aviso/AvisoRecorteMovil#default": default_6b3563e09f348391483892d49429a65e,

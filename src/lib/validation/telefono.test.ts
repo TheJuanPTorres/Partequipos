@@ -15,6 +15,14 @@ describe("telefonoValido", () => {
       assert.equal(telefonoValido(t), true, t);
     }
   });
+  it("sin «+» ni «57», más de 10 dígitos no vale; con prefijo, sí", () => {
+    assert.equal(telefonoValido("31767070712"), false);
+    assert.equal(telefonoValido("317670707123456"), false);
+    assert.equal(telefonoValido("3176707071"), true);
+    assert.equal(telefonoValido("573176707071"), true);
+    assert.equal(telefonoValido("+573176707071"), true);
+    assert.equal(telefonoValido("+57 317 670 7071"), true);
+  });
   it("acepta justo 15 dígitos y rechaza 16", () => {
     assert.equal(telefonoValido("+123456789012345"), true);
     assert.equal(telefonoValido("+1234567890123456"), false);
